@@ -158,13 +158,36 @@
         <BooleanDomain name="bool" />
         <Documentation>Enable/Disable widget interaction.</Documentation>
       </IntVectorProperty>
+
+      <DoubleVectorProperty argument_is_array="1"
+                            command="PlaceWidget"
+                            default_values="none"
+                            name="PlaceWidget"
+                            number_of_elements="6">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetReferenceBounds"
+                            default_values="none"
+                            name="ReferenceBounds"
+                            number_of_elements="6">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="UseReferenceBounds"
+                         command="SetUseReferenceBounds"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <SubProxy>
         <Proxy name="Prop"
                proxygroup="3d_widget_representations"
                proxyname="BoxRepresentation"></Proxy>
         <ExposedProperties>
           <Property name="PlaceFactor" />
-          <Property name="PlaceWidget" />
           <Property name="Visibility" />
           <Property name="Position" />
           <Property name="PositionInfo" />
@@ -1036,13 +1059,6 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <DoubleVectorProperty argument_is_array="1"
-                            command="PlaceWidget"
-                            default_values="none"
-                            name="PlaceWidget"
-                            number_of_elements="6">
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
       <DoubleVectorProperty command="SetPlaceFactor"
                             default_values="1.0"
                             name="PlaceFactor"

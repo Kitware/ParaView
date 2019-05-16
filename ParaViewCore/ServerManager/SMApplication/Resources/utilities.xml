@@ -768,9 +768,9 @@
         <Property function="Position" name="Position" />
         <Property function="Rotation" name="Rotation" />
         <Property function="Scale" name="Scale" />
-        <Property function="PlaceWidget" name="Bounds" />
         <Property function="Input" name="Input" />
         <Property function="UseReferenceBounds" name="UseReferenceBounds" />
+        <Property function="ReferenceBounds" name="Bounds" />
       </PropertyGroup>
       <Hints>
         <ProxyList>

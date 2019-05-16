@@ -141,7 +141,7 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
   }
 
   auto useRefBounds = smgroup->GetProperty("UseReferenceBounds");
-  auto refBounds = smgroup->GetProperty("PlaceWidget");
+  auto refBounds = smgroup->GetProperty("ReferenceBounds");
   if (useRefBounds && refBounds)
   {
     this->addPropertyLink(ui.useReferenceBounds, "checked", SIGNAL(toggled(bool)), useRefBounds);
@@ -164,9 +164,12 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
     ui.zmin->hide();
     ui.zmax->hide();
 
-    // if `PlaceWidget` or `UseReferenceBounds` is not present, which is the
+    // if `ReferenceBounds` or `UseReferenceBounds` is not present, which is the
     // case for `Transform`, the box is providing params relative to the input
     // bounds.
+    vtkSMPropertyHelper(wdgProxy, "UseReferenceBounds").Set(0);
+    wdgProxy->UpdateVTKObjects();
+
     this->BoxIsRelativeToInput = true;
   }
 
@@ -177,18 +180,18 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
   ui.show3DWidget->connect(this, SIGNAL(widgetVisibilityToggled(bool)), SLOT(setChecked(bool)));
   this->setWidgetVisible(ui.show3DWidget->isChecked());
 
-  QObject::connect(ui.resetBounds, &QAbstractButton::clicked, [this, wdgProxy, useRefBounds](bool) {
+  QObject::connect(ui.resetBounds, &QAbstractButton::clicked, [this, wdgProxy](bool) {
     auto bbox = this->dataBounds();
     if (!bbox.IsValid())
     {
       return;
     }
     if (this->BoxIsRelativeToInput ||
-      (useRefBounds && vtkSMUncheckedPropertyHelper(useRefBounds).GetAsInt() == 1))
+      vtkSMUncheckedPropertyHelper(wdgProxy, "UseReferenceBounds").GetAsInt() == 1)
     {
       double bds[6];
       bbox.GetBounds(bds);
-      vtkSMPropertyHelper(wdgProxy, "PlaceWidget").Set(bds, 6);
+      vtkSMPropertyHelper(wdgProxy, "ReferenceBounds").Set(bds, 6);
 
       const double scale[3] = { 1, 1, 1 };
       vtkSMPropertyHelper(wdgProxy, "Scale").Set(scale, 3);
@@ -202,7 +205,7 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
     else
     {
       double bds[6] = { 0, 1, 0, 1, 0, 1 };
-      vtkSMPropertyHelper(wdgProxy, "PlaceWidget").Set(bds, 6);
+      vtkSMPropertyHelper(wdgProxy, "ReferenceBounds").Set(bds, 6);
 
       double lengths[3];
       bbox.GetLengths(lengths);
@@ -227,7 +230,8 @@ pqBoxPropertyWidget::~pqBoxPropertyWidget()
 //-----------------------------------------------------------------------------
 void pqBoxPropertyWidget::placeWidget()
 {
-  if (this->BoxIsRelativeToInput)
+  auto wdgProxy = this->widgetProxy();
+  if (this->BoxIsRelativeToInput || vtkSMPropertyHelper(wdgProxy, "UseReferenceBounds").GetAsInt())
   {
     auto bbox = this->dataBounds();
     if (bbox.IsValid())
@@ -235,9 +239,14 @@ void pqBoxPropertyWidget::placeWidget()
       double bds[6];
       bbox.GetBounds(bds);
 
-      auto wdgProxy = this->widgetProxy();
       vtkSMPropertyHelper(wdgProxy, "PlaceWidget").Set(bds, 6);
       wdgProxy->UpdateVTKObjects();
     }
+  }
+  else
+  {
+    double bds[6] = { 0, 1, 0, 1, 0, 1 };
+    vtkSMPropertyHelper(wdgProxy, "PlaceWidget").Set(bds, 6);
+    wdgProxy->UpdateVTKObjects();
   }
 }

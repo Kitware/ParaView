@@ -21,10 +21,15 @@
 #include "vtkRenderer.h"
 #include "vtkWidgetRepresentation.h"
 
+#include <algorithm>
+
 vtkStandardNewMacro(vtk3DWidgetRepresentation);
 vtkCxxSetObjectMacro(vtk3DWidgetRepresentation, Widget, vtkAbstractWidget);
 //----------------------------------------------------------------------------
 vtk3DWidgetRepresentation::vtk3DWidgetRepresentation()
+  : ReferenceBounds{ 0, 0, 0, 0, 0, 0 }
+  , UseReferenceBounds(false)
+  , PlaceWidgetBounds{ 0, 0, 0, 0, 0, 0 }
 {
   this->SetNumberOfInputPorts(0);
   this->Widget = 0;
@@ -194,6 +199,52 @@ bool vtk3DWidgetRepresentation::RemoveFromView(vtkView* view)
     return true;
   }
   return false;
+}
+
+//----------------------------------------------------------------------------
+void vtk3DWidgetRepresentation::SetReferenceBounds(const double bds[6])
+{
+  if (!std::equal(bds, bds + 6, this->ReferenceBounds))
+  {
+    std::copy(bds, bds + 6, this->ReferenceBounds);
+    this->PlaceWidget();
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtk3DWidgetRepresentation::SetUseReferenceBounds(bool use_ref_bds)
+{
+  if (this->UseReferenceBounds != use_ref_bds)
+  {
+    this->UseReferenceBounds = use_ref_bds;
+    this->PlaceWidget();
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtk3DWidgetRepresentation::PlaceWidget(const double bds[6])
+{
+  if (!std::equal(bds, bds + 6, this->PlaceWidgetBounds))
+  {
+    std::copy(bds, bds + 6, this->PlaceWidgetBounds);
+    this->PlaceWidget();
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtk3DWidgetRepresentation::PlaceWidget()
+{
+  if (this->UseReferenceBounds && this->Representation)
+  {
+    this->Representation->PlaceWidget(this->ReferenceBounds);
+  }
+  else if (this->Representation)
+  {
+    this->Representation->PlaceWidget(this->PlaceWidgetBounds);
+  }
 }
 
 //----------------------------------------------------------------------------

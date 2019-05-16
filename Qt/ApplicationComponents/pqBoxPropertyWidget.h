@@ -54,11 +54,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * scale for the box.
  * * **Input**: a vtkSMInputProperty that is used to get data information for bounds
  * when placing/resetting the widget.
- * * **PlaceWidget**: a vtkSMDoubleVectorProperty with 6 elements that is linked
- * to bounds used to place the vtkBoxWidget2.
  * * **UseReferenceBounds**: a vtkSMIntVectorProperty that enables the widget to
  * place the box relative to unit box or a explicitly specified bounds.
- * **UseReferenceBounds** and **PlaceWidget** must be used together i.e. both
+ * * **ReferenceBounds**: a vtkSMDoubleVectorProperty with 6 elements that is linked
+ * to bounds used to place the box widget
+ *
+ * **UseReferenceBounds** and **ReferenceBounds** must be used together i.e. both
  * are required for this to work.
  *
  * Note while all of the above are optional, it really doesn't make much sense
