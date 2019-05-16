@@ -36,6 +36,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkVector.h"
 #include "vtkVectorOperators.h"
+#include "vtkViewLayout.h"
 #include "vtkWeakPointer.h"
 
 #include <algorithm>
@@ -161,7 +162,7 @@ public:
     }
   }
 
-  void UpdateViewPositions(int root = 0, int posx = 0, int posy = 0)
+  void UpdateViewPositions(int spacing, int root = 0, int posx = 0, int posy = 0)
   {
     if (root == 0)
     {
@@ -188,18 +189,18 @@ public:
 
       if (cell.Direction == vtkSMViewLayoutProxy::HORIZONTAL)
       {
-        this->UpdateViewPositions(2 * root + 1, posx, posy);
-        this->UpdateViewPositions(2 * root + 2, posx + size[0], posy);
+        this->UpdateViewPositions(spacing, 2 * root + 1, posx, posy);
+        this->UpdateViewPositions(spacing, 2 * root + 2, posx + size[0] + spacing, posy);
       }
       else // cell.Direction == VERTICAL
       {
-        this->UpdateViewPositions(2 * root + 1, posx, posy);
-        this->UpdateViewPositions(2 * root + 2, posx, posy + size[1]);
+        this->UpdateViewPositions(spacing, 2 * root + 1, posx, posy);
+        this->UpdateViewPositions(spacing, 2 * root + 2, posx, posy + size[1] + spacing);
       }
     }
   }
 
-  void ResizeCell(int root, const vtkVector2i& new_size)
+  void ResizeCell(int spacing, int root, const vtkVector2i& new_size)
   {
     if (root >= static_cast<int>(this->KDTree.size()))
     {
@@ -218,12 +219,17 @@ public:
     else
     {
       // distribute size by fraction.
+      const int lspacing = spacing / 2;
+      const int rspacing = spacing - lspacing;
+
       vtkVector2i size_1(new_size), size_2(new_size);
       const int index = cell.Direction == vtkSMViewLayoutProxy::HORIZONTAL ? 0 : 1;
-      size_1[index] = std::ceil(new_size[index] * cell.SplitFraction);
-      size_2[index] = new_size[index] - size_1[index];
-      this->ResizeCell(vtkSMViewLayoutProxy::GetFirstChild(root), size_1);
-      this->ResizeCell(vtkSMViewLayoutProxy::GetSecondChild(root), size_2);
+      const auto delta0 = std::ceil(new_size[index] * cell.SplitFraction);
+      const auto delta1 = new_size[index] - delta0;
+      size_1[index] = delta0 - lspacing;
+      size_2[index] = delta1 - rspacing;
+      this->ResizeCell(spacing, vtkSMViewLayoutProxy::GetFirstChild(root), size_1);
+      this->ResizeCell(spacing, vtkSMViewLayoutProxy::GetSecondChild(root), size_2);
     }
   }
 
@@ -288,13 +294,10 @@ vtkStandardNewMacro(vtkSMViewLayoutProxy);
 //----------------------------------------------------------------------------
 vtkSMViewLayoutProxy::vtkSMViewLayoutProxy()
   : MaximizedCell(-1)
-  , SeparatorWidth(0)
   , Internals(new vtkInternals())
   , BlockUpdate(false)
   , BlockUpdateViewPositions(false)
 {
-  this->SeparatorColor[0] = this->SeparatorColor[1] = this->SeparatorColor[2] = 0;
-
   this->Internals->Observer =
     vtkMakeMemberFunctionCommand(*this, &vtkSMViewLayoutProxy::UpdateViewPositions);
 
@@ -310,13 +313,6 @@ vtkSMViewLayoutProxy::~vtkSMViewLayoutProxy()
   this->Internals->Observer = NULL;
   delete this->Internals;
   this->Internals = NULL;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMViewLayoutProxy::SetSeparatorColor(unsigned char r, unsigned char g, unsigned char b)
-{
-  double rgb[3] = { r / 255.0, g / 255.0, b / 255.0 };
-  this->SetSeparatorColor(rgb);
 }
 
 //----------------------------------------------------------------------------
@@ -992,7 +988,10 @@ void vtkSMViewLayoutProxy::UpdateViewPositions()
 
   if (this->MaximizedCell == -1)
   {
-    this->Internals->UpdateViewPositions();
+    auto vlayout = vtkViewLayout::SafeDownCast(this->GetClientSideObject());
+    assert(vlayout);
+
+    this->Internals->UpdateViewPositions(vlayout->GetSeparatorWidth());
     this->Internals->UpdateViewports();
   }
   else
@@ -1051,7 +1050,9 @@ void vtkSMViewLayoutProxy::SetSize(const int size[2])
   const bool prev = this->SetBlockUpdateViewPositions(true);
 
   // recursively distribute space available among views.
-  this->Internals->ResizeCell(0, vtkVector2i(size));
+  auto vlayout = vtkViewLayout::SafeDownCast(this->GetClientSideObject());
+  assert(vlayout);
+  this->Internals->ResizeCell(vlayout->GetSeparatorWidth(), 0, vtkVector2i(size));
   this->SetBlockUpdateViewPositions(prev);
 
   this->UpdateViewPositions();
@@ -1125,11 +1126,18 @@ vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magX, int magY)
     return NULL;
   }
 
-  unsigned char separatorColor[3] = { static_cast<unsigned char>(255 * this->SeparatorColor[0]),
-    static_cast<unsigned char>(255 * this->SeparatorColor[1]),
-    static_cast<unsigned char>(255 * this->SeparatorColor[2]) };
-  vtkSmartPointer<vtkImageData> img =
-    vtkSMUtilities::MergeImages(images, this->SeparatorWidth, separatorColor);
+  auto vlayout = vtkViewLayout::SafeDownCast(this->GetClientSideObject());
+  assert(vlayout);
+
+  double dcolor[3];
+  vlayout->GetSeparatorColor(dcolor);
+
+  unsigned char uccolor[3] = { static_cast<unsigned char>(255 * dcolor[0]),
+    static_cast<unsigned char>(255 * dcolor[1]), static_cast<unsigned char>(255 * dcolor[2]) };
+
+  // note, we pass separator width as 0 to MergeImages since the individual
+  // images already have spacing/separator width taken into consideration.
+  auto img = vtkSMUtilities::MergeImages(images, 0, uccolor);
   if (img)
   {
     img->Register(this);
@@ -1200,7 +1208,4 @@ void vtkSMViewLayoutProxy::SaveAsPNG(int rank, const char* fname)
 void vtkSMViewLayoutProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "SeparatorColor: " << this->SeparatorColor[0] << ", " << this->SeparatorColor[1]
-     << ", " << this->SeparatorColor[2] << endl;
-  os << indent << "SeparatorWidth: " << this->SeparatorWidth << endl;
 }

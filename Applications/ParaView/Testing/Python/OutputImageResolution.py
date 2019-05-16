@@ -15,6 +15,7 @@ renderView1.Background = [0.32, 0.34, 0.43]
 AssignViewToLayout(renderView1)
 
 layout1 = GetLayout()
+layout1.SeparatorWidth = 2
 layout1.SplitVertical(0, 0.5)
 
 # Create a new 'Render View'
@@ -31,6 +32,7 @@ size = (a[1] - a[0] + 1, a[3] - a[2] + 1)
 
 # Ensure that the current size has odd height
 assert size[1] % 2 != 0
+assert size[1] == (renderView1.ViewSize[1] + renderView2.ViewSize[1] + layout1.SeparatorWidth)
 
 def SaveAndCheckSize(filename, layout, resolution):
     SaveScreenshot(filename, layout, SaveAllViews=1, ImageResolution=resolution)

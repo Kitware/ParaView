@@ -105,6 +105,8 @@ vtkViewLayout::vtkViewLayout()
   , TileMullions{ 0, 0 }
   , InCave(false)
   , DisplayResults(false)
+  , SeparatorWidth(0)
+  , SeparatorColor{ 0, 0, 0 }
 {
   if (auto processWindow = vtkPVProcessWindow::GetRenderWindow())
   {
@@ -547,4 +549,7 @@ bool vtkViewLayout::SaveAsPNG(int rank, const char* filename)
 void vtkViewLayout::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "SeparatorColor: " << this->SeparatorColor[0] << ", " << this->SeparatorColor[1]
+     << ", " << this->SeparatorColor[2] << endl;
+  os << indent << "SeparatorWidth: " << this->SeparatorWidth << endl;
 }

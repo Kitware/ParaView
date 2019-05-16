@@ -319,21 +319,21 @@ public:
     vtkSMPropertyHelper swdHelper(layout, "PreviewMode");
     swdHelper.Get(this->PreviewMode, 2);
 
-    this->OriginalSeparatorWidth = layout->GetSeparatorWidth();
-    layout->GetSeparatorColor(this->OriginalSeparatorColor);
+    this->OriginalSeparatorWidth = vtkSMPropertyHelper(layout, "SeparatorWidth").GetAsInt();
+    vtkSMPropertyHelper(layout, "SeparatorColor").Get(this->OriginalSeparatorColor, 3);
   }
 
   ~vtkStateLayout() override
   {
     vtkSMPropertyHelper(this->Layout, "PreviewMode").Set(this->PreviewMode, 2);
+    vtkSMPropertyHelper(this->Layout, "SeparatorWidth").Set(this->OriginalSeparatorWidth);
+    vtkSMPropertyHelper(this->Layout, "SeparatorColor").Set(this->OriginalSeparatorColor, 3);
+    this->Layout->UpdateVTKObjects();
+
     if (this->OriginalSize[0] > 0 && this->OriginalSize[1] > 0)
     {
       this->Resize(this->OriginalSize);
     }
-
-    this->Layout->SetSeparatorWidth(this->OriginalSeparatorWidth);
-    this->Layout->SetSeparatorColor(this->OriginalSeparatorColor);
-    this->Layout->UpdateVTKObjects();
   }
 
   vtkVector2i GetSize() const override { return this->Layout->GetSize(); }
@@ -363,9 +363,17 @@ public:
     }
   }
 
-  void SetSeparatorWidth(int width) override { this->Layout->SetSeparatorWidth(width); }
+  void SetSeparatorWidth(int width) override
+  {
+    vtkSMPropertyHelper(this->Layout, "SeparatorWidth").Set(width);
+    this->Layout->UpdateVTKObjects();
+  }
 
-  void SetSeparatorColor(double color[3]) override { this->Layout->SetSeparatorColor(color); }
+  void SetSeparatorColor(double color[3]) override
+  {
+    vtkSMPropertyHelper(this->Layout, "SeparatorColor").Set(color, 3);
+    this->Layout->UpdateVTKObjects();
+  }
 
 protected:
   void Resize(const vtkVector2i& size) override { this->Layout->SetSize(size.GetData()); }
@@ -635,18 +643,17 @@ bool vtkSMSaveScreenshotProxy::Prepare()
   // Update size.
   vtkVector2i targetSize;
   vtkSMPropertyHelper(this, "ImageResolution").Get(targetSize.GetData(), 2);
-  this->State->SetSize(targetSize);
   this->State->SetTransparentBackground(
     vtkSMPropertyHelper(this, "TransparentBackground").GetAsInt() != 0);
   this->State->SetColorPalette(vtkSMPropertyHelper(this, "OverrideColorPalette").GetAsString());
   this->State->SetStereoMode(vtkSMPropertyHelper(this, "StereoMode").GetAsInt());
   this->State->SetFontScaling(vtkSMPropertyHelper(this, "FontScaling").GetAsInt());
   this->State->SetSeparatorWidth(vtkSMPropertyHelper(this, "SeparatorWidth").GetAsInt());
-
   double scolor[3];
   vtkSMPropertyHelper(this, "SeparatorColor").Get(scolor, 3);
   this->State->SetSeparatorColor(scolor);
 
+  this->State->SetSize(targetSize);
   return true;
 }
 
