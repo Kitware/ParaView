@@ -38,33 +38,19 @@ void vtkSMViewResolutionDomain::Update(vtkSMProperty*)
   vtkSMProperty* viewProperty = this->GetRequiredProperty("View");
 
   int resolution[2] = { 0, 0 };
+  if (useLayoutProperty && vtkSMUncheckedPropertyHelper(useLayoutProperty).GetAsInt() != 0)
+  {
+    this->GetLayoutResolution(vtkSMViewLayoutProxy::SafeDownCast(
+                                vtkSMUncheckedPropertyHelper(layoutProperty).GetAsProxy(0)),
+      resolution);
+  }
+  else if (viewProperty)
+  {
+    this->GetViewResolution(
+      vtkSMViewProxy::SafeDownCast(vtkSMUncheckedPropertyHelper(viewProperty).GetAsProxy(0)),
+      resolution);
+  }
 
-  // First try to use the PreviewMode property in the vtkSMViewLayoutProxy
-  if (layoutProperty)
-  {
-    if (auto layout = vtkSMViewLayoutProxy::SafeDownCast(
-          vtkSMUncheckedPropertyHelper(layoutProperty).GetAsProxy(0)))
-    {
-      vtkSMUncheckedPropertyHelper(layout, "PreviewMode").Get(resolution, 2);
-    }
-  }
-  // If the PreviewMode property is not set because we were not in preview mode,
-  // then use the extent or view size
-  if (resolution[0] == 0 && resolution[1] == 0)
-  {
-    if (useLayoutProperty && vtkSMUncheckedPropertyHelper(useLayoutProperty).GetAsInt() != 0)
-    {
-      this->GetLayoutResolution(vtkSMViewLayoutProxy::SafeDownCast(
-                                  vtkSMUncheckedPropertyHelper(layoutProperty).GetAsProxy(0)),
-        resolution);
-    }
-    else if (viewProperty)
-    {
-      this->GetViewResolution(
-        vtkSMViewProxy::SafeDownCast(vtkSMUncheckedPropertyHelper(viewProperty).GetAsProxy(0)),
-        resolution);
-    }
-  }
   if (resolution[0] != 0 && resolution[1] != 0)
   {
     std::vector<vtkEntry> values;
@@ -79,9 +65,14 @@ void vtkSMViewResolutionDomain::GetLayoutResolution(vtkSMViewLayoutProxy* layout
 {
   if (layout)
   {
-    auto size = layout->GetSize();
-    resolution[0] = size[0];
-    resolution[1] = size[1];
+    // for layout size, prefer preview mode size, if non-empty.
+    vtkSMUncheckedPropertyHelper(layout, "PreviewMode").Get(resolution, 2);
+    if (resolution[0] == 0 || resolution[1] == 0)
+    {
+      auto size = layout->GetSize();
+      resolution[0] = size[0];
+      resolution[1] = size[1];
+    }
   }
 }
 

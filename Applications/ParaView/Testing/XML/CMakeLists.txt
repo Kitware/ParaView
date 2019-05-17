@@ -250,7 +250,10 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSetCollection_Surface.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PLYWriter.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PointGaussianScaleOpacityArrayA.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PointGaussianScaleOpacityArrayA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PolyLineSourceInterA.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Preview-SingleView.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Preview-AllViews.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PythonAlgorithmPlugin.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PythonAlgorithmReadersAndWriters.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/QuartilePlotArea.png}"
@@ -405,7 +408,6 @@ SET (TESTS_WITHOUT_BASELINES
   OpenHelp.xml
   PartialArrayInLineChart.xml
   PointCellDataConversion.xml
-  Preview.xml
   ReloadCGNSFile.xml
   SearchBox.xml
   ServerConnectDialog.xml
@@ -459,6 +461,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   NonlinearSubdivisionDisplay.xml
   PartitionedDataSet.xml
   PartitionedDataSetCollection.xml
+  Preview.xml
   QuartilePlot.xml
   ReadPartitionedCGNS.xml
   RectilinearFractal.xml
