@@ -244,7 +244,8 @@ static void populateMenu(pqSpreadSheetView* view, QMenu* menu)
   }
 
   updateAllCheckState(allCheckbox, (*checkboxes.get()));
-  QObject::connect(allCheckbox, &QCheckBox::stateChanged, [view, checkboxes](int checkState) {
+  QObject::connect(allCheckbox, &QCheckBox::stateChanged, [view, checkboxes, allCheckbox](
+                                                            int checkState) {
     std::vector<std::string> hidden_columns;
     for (auto cb : (*checkboxes))
     {
@@ -256,6 +257,10 @@ static void populateMenu(pqSpreadSheetView* view, QMenu* menu)
         hidden_columns.push_back(cb->text().toLocal8Bit().data());
       }
     }
+
+    // turn off tristate to avoid the `All Columns` checkbox from entering the
+    // partially-checked state through user clicks.
+    allCheckbox->setTristate(false);
 
     auto vproxy = view->getViewProxy();
     auto vsvp = vtkSMStringVectorProperty::SafeDownCast(vproxy->GetProperty("HiddenColumnLabels"));
