@@ -8,7 +8,7 @@ readonly name="cinema"
 readonly ownership="Cinema Python Upstream <kwrobot@kitware.com>"
 readonly subtree="ThirdParty/cinema/paraview/tpl"
 readonly repo="https://gitlab.kitware.com/third-party/cinema_python.git"
-readonly tag="9204e650"
+readonly tag="557a7ec0"
 
 readonly paths="
 .gitignore
