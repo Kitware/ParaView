@@ -106,6 +106,11 @@ public:
   */
   vtkBoundingBox dataBounds() const;
 
+  /**
+   * Returns the vtkSMPropertyGroup pass to the constructor.
+   */
+  vtkSMPropertyGroup* propertyGroup() const;
+
 public slots:
   /**
   * Toggle the interactive widget's visibility. This, along with

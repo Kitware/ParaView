@@ -27,6 +27,9 @@
  * \li \c ORIENTED_MAGNITUDE:  same as MAGNITUDE, but instead of the diagonal, a
  * vector determined using two additional required properties with functions
  * Normal, and Origin is used.
+ * \li \c COMPONENT_MAGNITUDE: similar to MAGNITUDE except suitable for 3
+ * component properties where each component is given range for the
+ * corresponding axis i.e. `(0, xmax-xmin), (0, ymax-ymin), (0, zmax-zmin)`.
  * \li \c SCALED_EXTENT: the range is set to (0, maxbounds * this->ScaleFactor)
  * where maxbounds is the length of the longest axis for the bounding box.
  * \li \c ARRAY_SCALED_EXTENT: the range is set to (0, (arrayMagnitude / maxbounds) *
@@ -96,6 +99,7 @@ public:
     APPROXIMATE_CELL_LENGTH,
     DATA_BOUNDS,
     EXTENTS,
+    COMPONENT_MAGNITUDE,
   };
 
   vtkGetMacro(ScaleFactor, double);

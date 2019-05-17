@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkPVBox
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -13,11 +13,13 @@
 
 =========================================================================*/
 /**
- * @class   vtkPVBox
- * @brief   extends vtkBox to add ParaView specific API.
+ * @class vtkPVBox
+ * @brief extends vtkBox to add ParaView specific API.
  *
- * vtkPVBox extends vtkBox to add ParaView specific API.
-*/
+ * vtkPVBox extends vtkBox to add ParaView specific API. We add ability to
+ * provide a transform using position, scale and orientation. The transform can
+ * be applied to a unit box or a explicitly specified bounds.
+ */
 
 #ifndef vtkPVBox_h
 #define vtkPVBox_h
@@ -31,6 +33,32 @@ public:
   static vtkPVBox* New();
   vtkTypeMacro(vtkPVBox, vtkBox);
   void PrintSelf(ostream& os, vtkIndent indent) override;
+
+  //@{
+  /**
+   * These bounds are used when `UseReferenceBounds` is set to true.
+   * In that case, the position, rotation and scale is assumed to be relative
+   * to these bounds. Otherwise, it's assumed to be absolute values i.e.
+   * relative to a unit box.
+   */
+  void SetReferenceBounds(const double bds[6]);
+  void SetReferenceBounds(
+    double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
+  {
+    double bds[6] = { xmin, xmax, ymin, ymax, zmin, zmax };
+    this->SetReferenceBounds(bds);
+  }
+  vtkGetVector6Macro(ReferenceBounds, double);
+  //@}
+
+  //@{
+  /**
+   * Set to true to use ReferenceBounds as the basis for the transformation
+   * instead of unit box.
+   */
+  void SetUseReferenceBounds(bool val);
+  vtkGetMacro(UseReferenceBounds, bool);
+  //@}
 
   //@{
   /**
@@ -79,6 +107,8 @@ protected:
   double Position[3];
   double Rotation[3];
   double Scale[3];
+  double ReferenceBounds[6];
+  bool UseReferenceBounds;
 
 private:
   vtkPVBox(const vtkPVBox&) = delete;

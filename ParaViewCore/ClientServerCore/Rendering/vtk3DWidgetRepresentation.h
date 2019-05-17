@@ -73,6 +73,21 @@ public:
   vtkBooleanMacro(Enabled, bool);
   //@}
 
+  //@{
+  /**
+   * These are needed to support BoxWidget use-case where we want to support
+   * specification of the box using global transform or relative to some
+   * reference bounds. Since this may be applicable to other 3D widgets that
+   * have similar requirements, we add this ability to vtk3DWidgetRepresentation
+   * itself. All this does it based on the state of UseReferenceBounds,
+   * `vtkWidgetRepresentation::PlaceWidget` is called using either the
+   * `ReferenceBounds` or the bounds passed to `PlaceWidget`.
+   */
+  void SetReferenceBounds(const double bds[6]);
+  void PlaceWidget(const double bds[6]);
+  void SetUseReferenceBounds(bool);
+  //@}
+
 protected:
   vtk3DWidgetRepresentation();
   ~vtk3DWidgetRepresentation() override;
@@ -121,6 +136,12 @@ private:
   void operator=(const vtk3DWidgetRepresentation&) = delete;
   unsigned long RepresentationObserverTag;
   unsigned long ViewObserverTag;
+
+  double ReferenceBounds[6];
+  bool UseReferenceBounds;
+  double PlaceWidgetBounds[6];
+
+  void PlaceWidget();
 };
 
 #endif

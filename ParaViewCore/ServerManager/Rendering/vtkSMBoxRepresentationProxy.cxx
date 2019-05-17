@@ -56,17 +56,12 @@ void vtkSMBoxRepresentationProxy::UpdateVTKObjects()
     return;
   }
 
-  int something_changed = this->ArePropertiesModified();
-
   this->Superclass::UpdateVTKObjects();
 
-  if (something_changed)
-  {
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "SetTransform"
-           << VTKOBJECT(this->GetSubProxy("Transform")) << vtkClientServerStream::End;
-    this->ExecuteStream(stream);
-  }
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "SetTransform"
+         << VTKOBJECT(this->GetSubProxy("Transform")) << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
 }
 
 //----------------------------------------------------------------------------

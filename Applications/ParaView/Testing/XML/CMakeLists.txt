@@ -111,6 +111,10 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/AxesGrid8.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/AxesGrid9.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BatchAxesGrid.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BoxWidget-Transform.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BoxWidget-ClipDefault.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BoxWidget-ClipCheckUseReferenceBounds.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BoxWidget-ClipUncheckUseReferenceBounds.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CalculatorQuotedVariable1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CalculatorQuotedVariable2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CameraLink-Parallel.png}"
@@ -428,6 +432,7 @@ endif()
 SET (TESTS_WITH_INLINE_COMPARES
   AxesGrid.xml
   BoundingRuler.xml
+  BoxWidget.xml
   CalculatorQuotedVariable.xml
   CameraLink.xml
   ChartLoadNoVariables.xml
@@ -1582,6 +1587,11 @@ if (TARGET paraview)
     ARGS "--state=${CMAKE_CURRENT_BINARY_DIR}/exodusStateFile.3.14.1.pvsm"
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS LoadExodusStateFile.xml)
+
+  paraview_add_client_tests(
+    ARGS "--state=${CMAKE_CURRENT_SOURCE_DIR}/boxClip.5.6.pvsm"
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS BoxClipStateBackwardsCompatibility.xml)
 
   if (PARAVIEW_ENABLE_PYTHON)
     # Test whether or not we can load a Python state file with the --state

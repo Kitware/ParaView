@@ -283,7 +283,7 @@ public:
    * works for compatible properties and currently only supported for numeric
    * vtkSMVectorProperty subclasses.
    */
-  bool Copy(vtkSMPropertyHelper& source);
+  bool Copy(const vtkSMPropertyHelper& source);
 
   /**
    * Set the proxy to modified if necessary before calling Set()
@@ -311,7 +311,7 @@ private:
   void SetPropertyArray(const T* values, unsigned int count);
   void SetPropertyArrayIdType(const vtkIdType* values, unsigned int count);
   template <typename T>
-  bool CopyInternal(vtkSMPropertyHelper& source);
+  bool CopyInternal(const vtkSMPropertyHelper& source);
 
   enum PType
   {

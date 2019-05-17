@@ -61,6 +61,7 @@ class pqInteractivePropertyWidget::pqInternals
 public:
   vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> WidgetProxy;
   vtkWeakPointer<vtkSMProxy> DataSource;
+  vtkSmartPointer<vtkSMPropertyGroup> SMGroup;
   bool WidgetVisibility;
   unsigned long UserEventObserverId;
 
@@ -86,6 +87,7 @@ pqInteractivePropertyWidget::pqInteractivePropertyWidget(const char* widget_smgr
   BEGIN_UNDO_EXCLUDE();
 
   pqInternals& internals = (*this->Internals);
+  internals.SMGroup = smgroup;
 
   pqServer* server =
     pqApplicationCore::instance()->getServerManagerModel()->findServer(smproxy->GetSession());
@@ -169,6 +171,12 @@ pqInteractivePropertyWidget::~pqInteractivePropertyWidget()
 
   // ensures that the widget proxy is removed from the active view, if any.
   this->setView(NULL);
+}
+
+//-----------------------------------------------------------------------------
+vtkSMPropertyGroup* pqInteractivePropertyWidget::propertyGroup() const
+{
+  return this->Internals->SMGroup;
 }
 
 //-----------------------------------------------------------------------------

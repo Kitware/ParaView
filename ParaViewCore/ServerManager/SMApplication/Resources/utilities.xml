@@ -707,16 +707,35 @@
     </Proxy>
     <Proxy class="vtkPVBox" name="Box">
       <InputProperty is_internal="1" name="Input" />
-      <DoubleVectorProperty command="SetBounds"
+      <IntVectorProperty name="UseReferenceBounds"
+        command="SetUseReferenceBounds"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetReferenceBounds"
                             default_values="0 1 0 1 0 1"
                             name="Bounds"
-                            number_of_elements="6"></DoubleVectorProperty>
+                            number_of_elements="6">
+        <BoundsDomain mode="data_bounds" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+      </DoubleVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetPosition"
                             default_values="0.0 0.0 0.0"
                             name="Position"
                             number_of_elements="3">
-        <DoubleRangeDomain name="range" />
+        <BoundsDomain default_mode="min" mode="normal" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
         <Documentation>
           Set the position of the box.
         </Documentation>
@@ -734,9 +753,13 @@
       <DoubleVectorProperty animateable="1"
                             command="SetScale"
                             default_values="1.0 1.0 1.0"
-                            name="Scale"
+                            name="Length"
                             number_of_elements="3">
-        <DoubleRangeDomain name="range" />
+        <BoundsDomain default_mode="max" mode="component_magnitude" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
         <Documentation>
           Set the size of the box via a scale factor.
         </Documentation>
@@ -744,9 +767,10 @@
       <PropertyGroup label="Box Parameters" panel_widget="InteractiveBox">
         <Property function="Position" name="Position" />
         <Property function="Rotation" name="Rotation" />
-        <Property function="Scale" name="Scale" />
-        <Property function="PlaceWidget" name="Bounds" />
+        <Property function="Scale" name="Length" />
         <Property function="Input" name="Input" />
+        <Property function="UseReferenceBounds" name="UseReferenceBounds" />
+        <Property function="ReferenceBounds" name="Bounds" />
       </PropertyGroup>
       <Hints>
         <ProxyList>

@@ -18,7 +18,10 @@
  *
  * vtkSMBoxRepresentationProxy is a proxy for vtkBoxRepresentation. A
  * specialization is needed to set the transform on the vtkBoxRepresentation.
-*/
+ * Since `vtkBoxRepresentation::SetTranform` is really akin to `ApplyTransform`,
+ * the transform must be set each time the transform changes or the widget
+ * is placed using PlaceWidget or something like that.
+ */
 
 #ifndef vtkSMBoxRepresentationProxy_h
 #define vtkSMBoxRepresentationProxy_h
