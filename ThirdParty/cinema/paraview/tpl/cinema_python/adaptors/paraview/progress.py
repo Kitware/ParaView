@@ -2,19 +2,16 @@ import paraview
 
 
 class ProgressObject():
-    '''Progress reporter. Creates a dummy vtkCinemaExporter proxy to use it
-    as the emitter of progress events.'''
+    '''Dummy progress reporter. See git history for how this used to work.'''
     def __init__(self):
-        self.proxy = paraview.simple.servermanager.CreateProxy(
-                "exporters", "CinemaExporter")
-        self.obj = self.proxy.GetClientSideObject()
+        pass
 
     def UpdateProgress(self, progress):
         ''' 'progress' is expected to be in the range [0, 1]. '''
-        self.obj.InvokeEvent(paraview.vtk.vtkCommand.ProgressEvent, progress)
+        pass
 
     def StartEvent(self):
-        self.obj.InvokeEvent(paraview.vtk.vtkCommand.StartEvent)
+        pass
 
     def EndEvent(self):
-        self.obj.InvokeEvent(paraview.vtk.vtkCommand.EndEvent)
+        pass
