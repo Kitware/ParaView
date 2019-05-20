@@ -356,8 +356,13 @@ class CoProcessor(object):
                         # let simple.SaveScreenshot pick a default.
                         quality = None
 
-                    simple.SaveScreenshot(fname, view,
-                            magnification=view.cpMagnification, quality=quality)
+                    if fname.endswith('png') and view.cpCompression is not None :
+                        simple.SaveScreenshot(fname, view,
+                            CompressionLevel=view.cpCompression)
+                    else:
+                        simple.SaveScreenshot(fname, view,
+                                              magnification=view.cpMagnification,
+                                              quality=quality)
                     self.__AppendToCinemaDTable(timestep, "view_%s" % self.__ViewsList.index(view), fname)
 
         if len(cinema_dirs) > 1:
@@ -551,7 +556,7 @@ class CoProcessor(object):
         return proxy
 
     def RegisterView(self, view, filename, freq, fittoscreen, magnification, width, height,
-                     cinema=None):
+                     cinema=None, compression=None):
         """Register a view for image capture with extra meta-data such
         as magnification, size and frequency."""
         if not isinstance(view, servermanager.Proxy):
@@ -561,6 +566,7 @@ class CoProcessor(object):
         view.add_attribute("cpFitToScreen", fittoscreen)
         view.add_attribute("cpMagnification", magnification)
         view.add_attribute("cpCinemaOptions", cinema)
+        view.add_attribute("cpCompression", compression)
         view.ViewSize = [ width, height ]
         self.__ViewsList.append(view)
         return view
