@@ -232,26 +232,6 @@ void vtkPVClientServerSynchronizedRenderers::ConfigureCompressor(const char* str
 }
 
 //----------------------------------------------------------------------------
-void vtkPVClientServerSynchronizedRenderers::PushImageToScreen()
-{
-  // This trick allows us to not clear the color buffer before pasting back
-  // the image from the server. This makes it possible to preserve any
-  // annotations rendered esp. vtkGridAxes3DActor which renders in multiple
-  // layers.
-  // This is not the most elegant solution. We should rethink if
-  // vtkSynchronizedRenderers::PushImageToScreen() should clear the screen by
-  // default -- I can argue not.
-  int layer = this->Renderer->GetLayer();
-  int prev = this->Renderer->GetPreserveColorBuffer();
-  if (layer == 0)
-  {
-    this->Renderer->SetPreserveColorBuffer(1);
-  }
-  this->Superclass::PushImageToScreen();
-  this->Renderer->SetPreserveColorBuffer(prev);
-}
-
-//----------------------------------------------------------------------------
 void vtkPVClientServerSynchronizedRenderers::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

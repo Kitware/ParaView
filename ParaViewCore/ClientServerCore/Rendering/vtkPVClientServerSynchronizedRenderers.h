@@ -63,13 +63,6 @@ protected:
   vtkPVClientServerSynchronizedRenderers();
   ~vtkPVClientServerSynchronizedRenderers() override;
 
-  /**
-   * Overridden to not clear the color buffer before pasting back image from
-   * the server. This ensures that any annotations rendered on the back of any
-   * 3D geometry will be preserved.
-   */
-  void PushImageToScreen() override;
-
   //@{
   /**
    * Set/Get the compressor object, it's setting can be manipulated directly.
