@@ -1,9 +1,8 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file mi/base/interface_merger.h
 /// \brief Mixin class template to merge an interface with an implementation.
-//*****************************************************************************
 
 #ifndef MI_BASE_INTERFACE_MERGER_H
 #define MI_BASE_INTERFACE_MERGER_H

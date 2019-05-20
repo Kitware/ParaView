@@ -1,4 +1,4 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -33,10 +33,9 @@
 #include <mi/math/bbox.h>
 
 #include "vtkImageVolumeRepresentation.h"
+#include "vtkIndeXRepresentationsModule.h"
 
 #include "vtknvindex_rtc_kernel_params.h"
-
-#include "vtkIndeXRepresentationsModule.h"
 
 class vtkMultiProcessController;
 
@@ -88,6 +87,9 @@ public:
   // Overrides from vtkPVDataRepresentation.
   int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
+
+  // Get/Set the visibility for this representation. When the visibility of
+  void SetVisibility(bool val) override;
 
   //
   // Configuration options set by ParaView GUI.
@@ -163,6 +165,10 @@ public:
   void set_edge_range(double edge_range);
   void set_edge_samples(int edge_samples);
 
+  // Set gradient parameters.
+  void set_gradient_level(double gradient_level);
+  void set_gradient_scale(double gradient_scale);
+
   // Set region of interest.
   void update_index_roi();
 
@@ -224,6 +230,7 @@ private:
   vtknvindex_isosurface_params m_isosurface_params;
   vtknvindex_depth_enhancement_params m_depth_enhancement_params;
   vtknvindex_edge_enhancement_params m_edge_enhancement_params;
+  vtknvindex_gradient_params m_gradient_params;
 };
 
 // Schwartz counter to manage initialization.

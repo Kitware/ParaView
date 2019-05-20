@@ -1,4 +1,4 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -347,7 +347,6 @@ void vtknvindex_config_settings::set_filter_mode(mi::Sint32 filter_mode)
 nv::index::IConfig_settings::Volume_filtering_modes vtknvindex_config_settings::get_filter_mode()
   const
 {
-#ifdef USE_SPARSE_VOLUME
   mi::Uint32 filter_mode = m_filter_mode;
   if (filter_mode == 5)
     filter_mode = 3;
@@ -355,21 +354,6 @@ nv::index::IConfig_settings::Volume_filtering_modes vtknvindex_config_settings::
     filter_mode = 5;
 
   return static_cast<nv::index::IConfig_settings::Volume_filtering_modes>(filter_mode);
-#else
-  switch (m_filter_mode)
-  {
-    case 0:
-      return nv::index::IConfig_settings::VOLUME_FILTER_NEAREST;
-    case 1:
-      return nv::index::IConfig_settings::VOLUME_FILTER_TRILINEAR_POST_HW;
-    case 5:
-      return nv::index::IConfig_settings::VOLUME_FILTER_TRICUBIC_CATMULL_POST_HW;
-    case 7:
-      return nv::index::IConfig_settings::VOLUME_FILTER_TRICUBIC_BSPLINE_POST_HW;
-    default:
-      return nv::index::IConfig_settings::VOLUME_FILTER_NEAREST;
-  }
-#endif
 }
 
 //-------------------------------------------------------------------------------------------------

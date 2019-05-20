@@ -1,4 +1,4 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -52,6 +52,7 @@
 #include "vtknvindex_cluster_properties.h"
 #include "vtknvindex_config_settings.h"
 #include "vtknvindex_forwarding_logger.h"
+#include "vtknvindex_instance.h"
 #include "vtknvindex_representation.h"
 #include "vtknvindex_utilities.h"
 #include "vtknvindex_volumemapper.h"
@@ -61,11 +62,7 @@ vtknvindex_representation_initializer::vtknvindex_representation_initializer()
   static unsigned int counter = 0;
   if (counter == 0)
   {
-#ifdef USE_SPARSE_VOLUME
     vtkProcessModule::SetDefaultMinimumGhostLevelsToRequestForStructuredPipelines(2);
-#else
-    vtkProcessModule::SetDefaultMinimumGhostLevelsToRequestForStructuredPipelines(3);
-#endif
     ++counter;
   }
 }
@@ -251,6 +248,9 @@ vtkStandardNewMacro(vtknvindex_lod_volume);
 vtknvindex_representation::vtknvindex_representation()
 {
   m_controller = vtkMultiProcessController::GetGlobalController();
+
+  // Init IndeX and ARC
+  vtknvindex_instance::get()->init_index();
 
   // Replace default volume mapper with vtknvindex_volumemapper.
   this->VolumeMapper->Delete();
@@ -656,6 +656,7 @@ int vtknvindex_representation::RequestData(
   return 1;
 }
 
+//-------------------------------------------------------------------------------------------------
 int vtknvindex_representation::RequestUpdateExtent(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
@@ -676,6 +677,15 @@ int vtknvindex_representation::RequestUpdateExtent(
   inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(), ghost_levels);
 
   return 1;
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtknvindex_representation::SetVisibility(bool val)
+{
+  static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)->set_visibility(val);
+  update_index_roi();
+
+  this->Superclass::SetVisibility(val);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -934,6 +944,12 @@ void vtknvindex_representation::update_current_kernel()
           reinterpret_cast<void*>(&m_edge_enhancement_params), sizeof(m_edge_enhancement_params));
       break;
 
+    case RTC_KERNELS_GRADIENT:
+      static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)
+        ->rtc_kernel_changed(RTC_KERNELS_GRADIENT, reinterpret_cast<void*>(&m_gradient_params),
+          sizeof(m_gradient_params));
+      break;
+
     case RTC_KERNELS_NONE:
     default:
       static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)
@@ -965,8 +981,8 @@ void vtknvindex_representation::set_light_type(int light_type)
     case RTC_KERNELS_DEPTH_ENHANCEMENT:
       update_current_kernel();
       break;
-    case RTC_KERNELS_EDGE_ENHANCEMENT:
-    case RTC_KERNELS_NONE:
+
+    default:
       break;
   }
 }
@@ -984,8 +1000,8 @@ void vtknvindex_representation::set_light_angle(double light_angle)
     case RTC_KERNELS_DEPTH_ENHANCEMENT:
       update_current_kernel();
       break;
-    case RTC_KERNELS_EDGE_ENHANCEMENT:
-    case RTC_KERNELS_NONE:
+
+    default:
       break;
   }
 }
@@ -1005,8 +1021,8 @@ void vtknvindex_representation::set_light_elevation(double light_elevation)
     case RTC_KERNELS_DEPTH_ENHANCEMENT:
       update_current_kernel();
       break;
-    case RTC_KERNELS_EDGE_ENHANCEMENT:
-    case RTC_KERNELS_NONE:
+
+    default:
       break;
   }
 }
@@ -1023,8 +1039,8 @@ void vtknvindex_representation::set_surf_ambient(double ambient)
     case RTC_KERNELS_DEPTH_ENHANCEMENT:
       update_current_kernel();
       break;
-    case RTC_KERNELS_EDGE_ENHANCEMENT:
-    case RTC_KERNELS_NONE:
+
+    default:
       break;
   }
 }
@@ -1041,8 +1057,8 @@ void vtknvindex_representation::set_surf_specular(double specular)
     case RTC_KERNELS_DEPTH_ENHANCEMENT:
       update_current_kernel();
       break;
-    case RTC_KERNELS_EDGE_ENHANCEMENT:
-    case RTC_KERNELS_NONE:
+
+    default:
       break;
   }
 }
@@ -1059,8 +1075,8 @@ void vtknvindex_representation::set_surf_specular_power(double specular_power)
     case RTC_KERNELS_DEPTH_ENHANCEMENT:
       update_current_kernel();
       break;
-    case RTC_KERNELS_EDGE_ENHANCEMENT:
-    case RTC_KERNELS_NONE:
+
+    default:
       break;
   }
 }
@@ -1134,5 +1150,20 @@ void vtknvindex_representation::set_edge_samples(int edge_samples)
   m_edge_enhancement_params.stp_num = edge_samples;
 
   if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_EDGE_ENHANCEMENT)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_representation::set_gradient_level(double gradient_level)
+{
+  m_gradient_params.gradient = static_cast<mi::Float32>(gradient_level / 100.0);
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_GRADIENT)
+    update_current_kernel();
+}
+//----------------------------------------------------------------------------
+void vtknvindex_representation::set_gradient_scale(double gradient_scale)
+{
+  m_gradient_params.grad_max = static_cast<mi::Float32>(gradient_scale);
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_GRADIENT)
     update_current_kernel();
 }

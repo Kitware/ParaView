@@ -1,12 +1,10 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file mi/base/uuid.h
 /// \brief A 128 bit representation of a universally unique identifier (UUID or GUID).
 ///
 /// See \ref mi_base_iinterface, type #mi::base::Uuid and template class #mi::base::Uuid_t.
-///
-//*****************************************************************************
 
 #ifndef MI_BASE_UUID_H
 #define MI_BASE_UUID_H

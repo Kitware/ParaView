@@ -1,4 +1,4 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,6 +35,7 @@ enum vtknvindex_rtc_kernels
   RTC_KERNELS_ISOSURFACE,
   RTC_KERNELS_DEPTH_ENHANCEMENT,
   RTC_KERNELS_EDGE_ENHANCEMENT,
+  RTC_KERNELS_GRADIENT,
 };
 
 // kernel parameter buffer
@@ -160,6 +161,21 @@ struct vtknvindex_edge_enhancement_params
   }
 };
 
+// Gradient CUDA code parameters.
+struct vtknvindex_gradient_params
+{
+  float gradient; // [0.1, 1] gradient value
+  float grad_max; // 20.0f maximum gradient scale
+  float dummy1;
+  float dummy2;
+
+  vtknvindex_gradient_params()
+    : gradient(0.5f)
+    , grad_max(20.0f)
+  {
+  }
+};
+
 // IVOL isosurface CUDA code parameters.
 struct vtknvindex_ivol_isosurface_params
 {
@@ -255,6 +271,7 @@ struct vtknvindex_ivol_edge_enhancement_params
 extern const char* KERNEL_ISOSURFACE_STRING;
 extern const char* KERNEL_DEPTH_ENHANCEMENT_STRING;
 extern const char* KERNEL_EDGE_ENHANCEMENT_STRING;
+extern const char* KERNEL_GRADIENT_STRING;
 
 // rtc irregular volume programs
 extern const char* KERNEL_IRREGULAR_ISOSURFACE_STRING;

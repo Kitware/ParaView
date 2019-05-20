@@ -1,29 +1,29 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions
-* are met:
-*  * Redistributions of source code must retain the above copyright
-*    notice, this list of conditions and the following disclaimer.
-*  * Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the
-*    documentation and/or other materials provided with the distribution.
-*  * Neither the name of NVIDIA CORPORATION nor the names of its
-*    contributors may be used to endorse or promote products derived
-*    from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-* PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-* OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *  * Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *  * Neither the name of NVIDIA CORPORATION nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <fstream>
 #include <iomanip>
@@ -31,8 +31,8 @@
 
 #include "vtksys/SystemTools.hxx"
 
-#include "vtknvindex_application.h"
 #include "vtknvindex_forwarding_logger.h"
+#include "vtknvindex_instance.h"
 #include "vtknvindex_performance_values.h"
 
 //-------------------------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ vtknvindex_performance_values::~vtknvindex_performance_values()
 
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_performance_values::print_perf_values(
-  vtknvindex_application& application, mi::base::Handle<nv::index::IFrame_results> frame_results)
+  mi::base::Handle<nv::index::IFrame_results> frame_results)
 {
   // Prints only a subset of the full performance values that NVIDIA IndeX provides.
   // Additional fields can be added as and when required.
@@ -86,7 +86,7 @@ void vtknvindex_performance_values::print_perf_values(
     header_str << "--------------------------------------------------------------------------------"
                   "------------------------------------------------------------------------"
                << "\n";
-    const mi::base::Handle<nv::index::IIndex>& index = application.get_interface();
+    const mi::base::Handle<nv::index::IIndex>& index = vtknvindex_instance::get()->get_interface();
 
     header_str << "NVIDIA IndeX version               : " << index->get_version() << ", "
                << index->get_revision() << "\n";
@@ -179,13 +179,13 @@ std::string vtknvindex_performance_values::to_string(mi::Uint64 memory) const
   if (memory < K)
     number_str << memory << " b";
   else if (memory < K * K)
-    number_str << memory / K << " Kb";
+    number_str << std::setprecision(4) << memory / (K * 1.0f) << " Kb";
   else if (memory < K * K * K)
-    number_str << memory / (K * K) << " Mb";
+    number_str << std::setprecision(4) << memory / ((K * K) * 1.0f) << " Mb";
   else if (memory < K * K * K * K)
-    number_str << memory / (K * K * K) << " Gb";
+    number_str << std::setprecision(4) << memory / ((K * K * K) * 1.0f) << " Gb";
   else
-    number_str << memory / (K * K * K * K) << " Tb";
+    number_str << std::setprecision(4) << memory / ((K * K * K * K) * 1.0f) << " Tb";
 
   return number_str.str();
 }
@@ -193,20 +193,28 @@ std::string vtknvindex_performance_values::to_string(mi::Uint64 memory) const
 //-------------------------------------------------------------------------------------------------
 vtknvindex_sysinfo::vtknvindex_sysinfo()
 {
-  m_sys_info.RunOSCheck();
-  m_sys_info.RunCPUCheck();
-  m_nb_logical_cpu = m_sys_info.GetNumberOfLogicalCPU();
+  vtksys::SystemInformation sys_info;
+  sys_info.RunOSCheck();
+  sys_info.RunCPUCheck();
+  m_nb_logical_cpu = sys_info.GetNumberOfLogicalCPU();
 }
 
 //-------------------------------------------------------------------------------------------------
 vtknvindex_sysinfo::~vtknvindex_sysinfo()
 {
+  delete s_vtknvindex_sysinfo;
 }
 
 //-------------------------------------------------------------------------------------------------
-vtksys::SystemInformation& vtknvindex_sysinfo::get_sysinfo()
+vtknvindex_sysinfo* vtknvindex_sysinfo::create_sysinfo()
 {
-  return m_sys_info;
+  return new vtknvindex_sysinfo();
+}
+
+//-------------------------------------------------------------------------------------------------
+vtknvindex_sysinfo* vtknvindex_sysinfo::get_sysinfo()
+{
+  return s_vtknvindex_sysinfo;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -214,3 +222,6 @@ mi::Uint32 vtknvindex_sysinfo::get_number_logical_cpu() const
 {
   return m_nb_logical_cpu;
 }
+
+//-------------------------------------------------------------------------------------------------
+vtknvindex_sysinfo* vtknvindex_sysinfo::s_vtknvindex_sysinfo = vtknvindex_sysinfo::create_sysinfo();

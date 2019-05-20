@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene element for sparse volumes.
@@ -25,11 +25,6 @@ class ISparse_volume_scene_element
       0x76, 0x1b, nv::index::IDistributed_data>
 {
 public:
-  /// Returns the tag of the import strategy that is used for
-  /// loading the dataset.
-  ///
-  /// \return tag of the IDistributed_data_import_strategy
-  virtual mi::neuraylib::Tag_struct get_import_callback() const = 0;
 };
 
 } // namespace index

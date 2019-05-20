@@ -1,4 +1,4 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -31,10 +31,13 @@
 
 #include "vtkFloatArray.h"
 #include "vtkImageData.h"
+#include "vtkUnstructuredGrid.h"
+
 #include "vtksys/SystemInformation.hxx"
 
 #include "vtknvindex_cluster_properties.h"
 #include "vtknvindex_forwarding_logger.h"
+#include "vtknvindex_instance.h"
 #include "vtknvindex_utilities.h"
 
 // ------------------------------------------------------------------------------------------------
@@ -124,41 +127,6 @@ mi::Sint32 vtknvindex_cluster_properties::rank_id() const
 }
 
 // ------------------------------------------------------------------------------------------------
-mi::Sint32 vtknvindex_cluster_properties::get_cur_local_rank_id() const
-{
-  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
-  mi::Sint32 cur_rank_id = controller->GetLocalProcessId();
-
-  vtksys::SystemInformation sys_info;
-  std::string cur_host = sys_info.GetHostname();
-
-  std::map<std::string, std::vector<mi::Sint32> >::const_iterator it =
-    m_hostmane_to_rankids.find(cur_host);
-  if (it == m_hostmane_to_rankids.end())
-    return -1;
-
-  for (mi::Size j = 0; j < it->second.size(); ++j)
-  {
-    if (it->second[j] == cur_rank_id)
-      return j;
-  }
-
-  return -1;
-}
-
-// ------------------------------------------------------------------------------------------------
-mi::Uint32 vtknvindex_cluster_properties::get_nb_hosts() const
-{
-  return static_cast<mi::Uint32>(m_host_names.size());
-}
-
-// ------------------------------------------------------------------------------------------------
-const std::vector<std::string>& vtknvindex_cluster_properties::get_host_names() const
-{
-  return m_host_names;
-}
-
-// ------------------------------------------------------------------------------------------------
 vtknvindex_host_properties* vtknvindex_cluster_properties::get_host_properties(
   const mi::Sint32& rankid) const
 {
@@ -172,47 +140,6 @@ vtknvindex_host_properties* vtknvindex_cluster_properties::get_host_properties(
     return NULL;
 
   return shmit->second;
-}
-
-// ------------------------------------------------------------------------------------------------
-void vtknvindex_cluster_properties::build_hosts_rank_distribution()
-{
-  m_host_names.clear();
-  m_hostmane_to_rankids.clear();
-
-  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
-
-  mi::Uint32 num_ranks = controller->GetNumberOfProcesses();
-  mi::Sint32 rank_id = controller->GetLocalProcessId();
-
-  std::vector<mi::Sint32> rank_ids;
-  rank_ids.resize(num_ranks);
-
-  // Gather all the rank ids.
-  controller->AllGather(&rank_id, &rank_ids[0], 1);
-
-  // Gather host names from all the ranks.
-  {
-    vtksys::SystemInformation sys_info;
-    std::string current_host = sys_info.GetHostname() + std::string(" ");
-
-    char* all_hosts = (char*)calloc(num_ranks, current_host.length() + 1);
-    controller->AllGather(current_host.c_str(), all_hosts, current_host.length());
-
-    std::string str(all_hosts);
-    std::string buf;
-    std::stringstream ss(str);
-
-    while (ss >> buf)
-      m_host_names.push_back(buf);
-
-    free(all_hosts);
-  }
-
-  controller->Barrier();
-
-  for (mi::Uint32 i = 0; i < num_ranks; i++)
-    m_hostmane_to_rankids[m_host_names[i]].push_back(rank_ids[i]);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -328,12 +255,10 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
         shm_size = volume_size * sizeof(mi::Uint8);
       else if (scalar_type == "unsigned short")
         shm_size = volume_size * sizeof(mi::Uint16);
-#ifdef USE_SPARSE_VOLUME
       else if (scalar_type == "char")
         shm_size = volume_size * sizeof(mi::Sint8);
       else if (scalar_type == "short")
         shm_size = volume_size * sizeof(mi::Sint16);
-#endif
       else if (scalar_type == "float")
         shm_size = volume_size * sizeof(mi::Float32);
       else if (scalar_type == "double")
@@ -379,7 +304,8 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
 
 // ------------------------------------------------------------------------------------------------
 bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
-  const vtknvindex_dataset_parameters& dataset_parameters, mi::Sint32 current_hostid)
+  const vtknvindex_dataset_parameters& dataset_parameters, mi::Sint32 current_hostid,
+  bool is_index_rank)
 {
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
   m_num_ranks = controller->GetNumberOfProcesses();
@@ -427,8 +353,9 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
     controller->AllGather(dataset_parameters.bounds, all_rank_extents, 6);
   }
 
-  // Gather local node rank sizes.
-  mi::Sint32 current_localrank = get_cur_local_rank_id();
+  //// Gather local node rank sizes.
+  vtknvindex_instance* index_instance = vtknvindex_instance::get();
+  mi::Sint32 current_localrank = index_instance->get_cur_local_rank_id();
 
   std::vector<mi::Sint32> all_localrank_ids;
   all_localrank_ids.resize(m_num_ranks);
@@ -439,9 +366,30 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
   all_hostids.resize(m_num_ranks);
   controller->AllGather(&current_hostid, &all_hostids[0], 1);
 
+  // Gather all volume data direct pointers
+  std::vector<std::intptr_t> all_data_ptrs;
+  all_data_ptrs.resize(m_num_ranks);
+  std::intptr_t cur_data_ptr = 0;
+
+  if (is_index_rank)
+  {
+    if (dataset_parameters.volume_type == vtknvindex_scene::VOLUME_TYPE_REGULAR)
+    {
+      vtknvindex_regular_volume_data* volume_data =
+        static_cast<vtknvindex_regular_volume_data*>(dataset_parameters.volume_data);
+      cur_data_ptr = reinterpret_cast<std::intptr_t>(volume_data->scalars);
+    }
+    else
+    {
+      vtknvindex_irregular_volume_data* volume_data =
+        static_cast<vtknvindex_irregular_volume_data*>(dataset_parameters.volume_data);
+      cur_data_ptr = reinterpret_cast<std::intptr_t>(volume_data);
+    }
+  }
+  controller->AllGather(&cur_data_ptr, &all_data_ptrs[0], 1);
+
   // Gather all gpu ids.
-  // std::string display(getenv("DISPLAY"));
-  mi::Sint32 gpu_id = current_localrank; // std::atoi(display.substr(display.length() - 1).c_str());
+  mi::Sint32 gpu_id = current_localrank;
 
   std::vector<mi::Sint32> all_gpu_ids;
   all_gpu_ids.resize(m_num_ranks);
@@ -609,12 +557,10 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
           shm_size = volume_size * sizeof(mi::Uint8);
         else if (scalar_type == "unsigned short")
           shm_size = volume_size * sizeof(mi::Uint16);
-#ifdef USE_SPARSE_VOLUME
         else if (scalar_type == "char")
           shm_size = volume_size * sizeof(mi::Sint8);
         else if (scalar_type == "short")
           shm_size = volume_size * sizeof(mi::Sint16);
-#endif
         else if (scalar_type == "float")
           shm_size = volume_size * sizeof(mi::Float32);
         else if (scalar_type == "double")
@@ -630,7 +576,8 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
         shm_size = all_shm_sizes[i];
       }
 
-      host_properties->set_shminfo(time_step, ss.str(), current_bbox, shm_size);
+      host_properties->set_shminfo(
+        time_step, ss.str(), current_bbox, shm_size, reinterpret_cast<void*>(all_data_ptrs[i]));
     }
   }
   delete[] all_rank_extents;

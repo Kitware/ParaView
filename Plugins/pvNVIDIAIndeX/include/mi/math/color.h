@@ -1,11 +1,10 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file mi/math/color.h
 /// \brief Standard RGBA color class with floating point elements and operations.
 ///
 /// See \ref mi_math_color.
-//*****************************************************************************
 
 #ifndef MI_MATH_COLOR_H
 #define MI_MATH_COLOR_H
@@ -121,7 +120,7 @@ public:
   /// The default constructor leaves the color elements uninitialized.
   inline Color()
   {
-#if !defined(NDEBUG) || (defined(_MSC_VER) && _MSC_VER <= 1310)
+#if defined(DEBUG) || (defined(_MSC_VER) && _MSC_VER <= 1310)
     // In debug mode, default-constructed colors are initialized with signaling NaNs or, if not
     // applicable, with a maximum value to increase the chances of diagnosing incorrect use of
     // an uninitialized color.

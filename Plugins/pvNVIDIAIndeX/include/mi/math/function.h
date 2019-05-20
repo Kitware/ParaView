@@ -1,18 +1,25 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file mi/math/function.h
 /// \brief Math functions and function templates on simple types or generic container and vector
 ///        concepts.
 ///
 /// See \ref mi_math_function.
-//*****************************************************************************
 
 #ifndef MI_MATH_FUNCTION_H
 #define MI_MATH_FUNCTION_H
 
 #include <mi/base/assert.h>
 #include <mi/base/types.h>
+
+#ifdef MI_PLATFORM_WINDOWS
+#include <intrin.h>
+#pragma intrinsic(_BitScanReverse)
+#ifdef MI_ARCH_64BIT
+#pragma intrinsic(_BitScanReverse64)
+#endif
+#endif
 
 namespace mi
 {
@@ -814,26 +821,100 @@ inline bool is_approx_equal(Float64 left, Float64 right, Float64 e)
   return abs(left - right) <= e;
 }
 
-/// Returns the %base 2 logarithm of \p s.
-inline Float32 log2 MI_PREVENT_MACRO_EXPAND(Float32 s)
+/// Returns the number of leading zeros of \p v, 32-bit version.
+inline Uint32 leading_zeros(Uint32 v)
 {
-  return std::log(s) * 1.4426950408889634073599246810019f /* log(2) */;
-}
-/// Returns the %base 2 logarithm of \p s.
-inline Float64 log2 MI_PREVENT_MACRO_EXPAND(Float64 s)
-{
-  return std::log(s) * 1.4426950408889634073599246810019 /* log(2) */;
+// This implementation tries to use built-in functions if available. For the fallback
+// method, see Henry Warren: "Hacker's Delight" for reference.
+#if defined(MI_COMPILER_MSC)
+  unsigned long index;
+  const unsigned char valid = _BitScanReverse(&index, v);
+  return (valid != 0) ? 31 - index : 32;
+#elif defined(MI_COMPILER_ICC) || defined(MI_COMPILER_GCC)
+  return (v != 0) ? __builtin_clz(v) : 32;
+#else
+  // use fallback
+  if (v == 0)
+    return 32;
+  Uint32 n = 1;
+  if ((v >> 16) == 0)
+  {
+    n += 16;
+    v <<= 16;
+  };
+  if ((v >> 24) == 0)
+  {
+    n += 8;
+    v <<= 8;
+  };
+  if ((v >> 28) == 0)
+  {
+    n += 4;
+    v <<= 4;
+  };
+  if ((v >> 30) == 0)
+  {
+    n += 2;
+    v <<= 2;
+  };
+  n -= Uint32(v >> 31);
+  return n;
+#endif
 }
 
-/// Returns the %base 10 logarithm of \p s.
-inline Float32 log10(Float32 s)
+/// Returns the number of leading zeros of \p v, 64-bit version.
+inline Uint32 leading_zeros(Uint64 v)
 {
-  return std::log10(s);
-}
-/// Returns the %base 10 logarithm of \p s.
-inline Float64 log10(Float64 s)
-{
-  return std::log10(s);
+// This implementation tries to use built-in functions if available. For the fallback
+// method, see Henry Warren: "Hacker's Delight" for reference.
+#if defined(MI_COMPILER_MSC)
+#if defined(MI_ARCH_64BIT)
+  unsigned long index;
+  const unsigned char valid = _BitScanReverse64(&index, v);
+  return (valid != 0) ? 63 - index : 64;
+#else
+  unsigned long index_h, index_l;
+  const unsigned char valid_h = _BitScanReverse(&index_h, (Uint32)(v >> 32));
+  const unsigned char valid_l = _BitScanReverse(&index_l, (Uint32)(v & 0xFFFFFFFF));
+  if (valid_h == 0)
+    return (valid_l != 0) ? 63 - index_l : 64;
+  return 63 - index_h + 32;
+#endif
+#elif defined(MI_COMPILER_ICC) || defined(MI_COMPILER_GCC)
+  return (v != 0) ? __builtin_clzll(v) : 64;
+#else
+  // use fallback, e.g. on Solaris
+  if (v == 0)
+    return 64;
+  Uint32 n = 1;
+  if ((v >> 32) == 0)
+  {
+    n += 32;
+    v <<= 32;
+  };
+  if ((v >> 48) == 0)
+  {
+    n += 16;
+    v <<= 16;
+  };
+  if ((v >> 56) == 0)
+  {
+    n += 8;
+    v <<= 8;
+  };
+  if ((v >> 60) == 0)
+  {
+    n += 4;
+    v <<= 4;
+  };
+  if ((v >> 62) == 0)
+  {
+    n += 2;
+    v <<= 2;
+  };
+  n -= Uint32(v >> 63);
+  return n;
+#endif
 }
 
 /// Returns the linear interpolation between \p s1 and \c s2, i.e., it returns
@@ -852,6 +933,60 @@ inline Float64 lerp(Float64 s1, ///< one scalar
   Float64 t)                    ///< interpolation parameter in [0,1]
 {
   return s1 * (Float64(1) - t) + s2 * t;
+}
+
+/// Returns the %base 2 logarithm of \p s.
+inline Float32 log2 MI_PREVENT_MACRO_EXPAND(Float32 s)
+{
+  return std::log(s) * 1.4426950408889634073599246810019f /* log(2) */;
+}
+/// Returns the %base 2 logarithm of \p s.
+inline Float64 log2 MI_PREVENT_MACRO_EXPAND(Float64 s)
+{
+  return std::log(s) * 1.4426950408889634073599246810019 /* log(2) */;
+}
+
+/// Returns the integer log2 of \p v.
+inline Sint32 log2_int(const Uint32 v)
+{
+  return (v != 0) ? 31 - leading_zeros(v) : 0;
+}
+
+/// Returns the integer log2 of \p v.
+inline Sint32 log2_int(const Uint64 v)
+{
+  return (v != 0) ? 63 - leading_zeros(v) : 0;
+}
+
+/// Returns the integer log2 of \p v.
+inline Sint32 log2_int(const Float32 v)
+{
+  return (mi::base::binary_cast<Uint32>(v) >> 23) - 127;
+}
+
+/// Returns the integer log2 of \p v.
+inline Sint32 log2_int(const Float64 v)
+{
+  return static_cast<Sint32>(mi::base::binary_cast<Uint64>(v) >> 52) - 1023;
+}
+
+/// Returns the integer log2 of \p v, i.e., rounded up to the next integer.
+template <typename Integer>
+inline Sint32 log2_int_ceil(const Integer v)
+{
+  // See Henry Warren: "Hacker's Delight" for reference.
+  return (v > 1) ? log2_int(v - 1) + 1 : 0;
+}
+
+/// Returns the %base 10 logarithm of \p s.
+inline Float32 log10(Float32 s)
+{
+  return std::log10(s);
+}
+/// Returns the %base 10 logarithm of \p s.
+inline Float64 log10(Float64 s)
+{
+  return std::log10(s);
 }
 
 /// Returns the fractional part of \p s and stores the integral part of \p s in \p i.

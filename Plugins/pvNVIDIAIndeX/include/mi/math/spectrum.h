@@ -1,11 +1,10 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file mi/math/spectrum.h
 /// \brief %Spectrum class with floating point elements and operations.
 ///
 /// See \ref mi_math_spectrum.
-//*****************************************************************************
 
 #ifndef MI_MATH_SPECTRUM_H
 #define MI_MATH_SPECTRUM_H
@@ -92,7 +91,7 @@ public:
   /// The default constructor leaves the spectrum elements uninitialized.
   inline Spectrum()
   {
-#if !defined(NDEBUG) || (defined(_MSC_VER) && _MSC_VER <= 1310)
+#if defined(DEBUG) || (defined(_MSC_VER) && _MSC_VER <= 1310)
     // In debug mode, default-constructed spectra are initialized with signaling NaNs or, if not
     // applicable, with a maximum value to increase the chances of diagnosing incorrect use of
     // an uninitialized spectrum.

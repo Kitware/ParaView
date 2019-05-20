@@ -1,9 +1,8 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file
 /// \brief API component that allows extensions of the \neurayApiName.
-//*****************************************************************************
 
 #ifndef MI_NEURAYLIB_IEXTENSION_API_H
 #define MI_NEURAYLIB_IEXTENSION_API_H
@@ -41,8 +40,9 @@ public:
   ///
   /// All user-defined classes to be used with the \neurayApiName must be registered. The only
   /// exception are classes that never cross the API boundary, for example, classes only used
-  /// locally within a plugin. Class registration must be done before \neurayProductName has been
-  /// started or in #mi::neuraylib::IPlugin::init().
+  /// locally within a plugin. Class registration must be done
+  /// \ifnot MDL_SOURCE_RELEASE in #mi::neuraylib::IPlugin::init() or \endif
+  /// before \neurayProductName has been started.
   ///
   /// \param class_name   The class name under which the class is to be registered. The class
   ///                     name must consist only of alphanumeric characters or underscores,
@@ -64,8 +64,9 @@ public:
   ///
   /// All user-defined classes to be used with the \neurayApiName must be registered. The only
   /// exception are classes that never cross the API boundary, for example, classes only used
-  /// locally within a plugin. Class registration must be done before \neurayProductName has been
-  /// started or in #mi::neuraylib::IPlugin::init().
+  /// locally within a plugin. Class registration must be done
+  /// \ifnot MDL_SOURCE_RELEASE in #mi::neuraylib::IPlugin::init() or \endif
+  /// before \neurayProductName has been started.
   ///
   /// This templated member function is a wrapper of the non-template variant for the user's
   /// convenience. It uses the default class factory #mi::neuraylib::User_class_factory
@@ -94,8 +95,9 @@ public:
 
   /// Registers a new importer with the \neurayApiName.
   ///
-  /// Importer registration must be done before \neurayProductName has been started or in
-  /// #mi::neuraylib::IPlugin::init().
+  /// Importer registration must be done
+  /// \ifnot MDL_SOURCE_RELEASE in #mi::neuraylib::IPlugin::init() or \endif
+  /// before \neurayProductName has been started.
   ///
   /// \param importer     The new importer to register.
   /// \return
@@ -106,8 +108,9 @@ public:
 
   /// Registers a new exporter with the \neurayApiName.
   ///
-  /// Exporter registration must be done before \neurayProductName has been started or in
-  /// #mi::neuraylib::IPlugin::init().
+  /// Exporter registration must be done
+  /// \ifnot MDL_SOURCE_RELEASE in #mi::neuraylib::IPlugin::init() or \endif
+  /// before \neurayProductName has been started.
   ///
   /// \param exporter     The new exporter to register.
   /// \return
@@ -118,8 +121,9 @@ public:
 
   /// Unregisters an importer registered with the \neurayApiName.
   ///
-  /// Unregistration must be done after \neurayProductName has been shut down or in
-  /// #mi::neuraylib::IPlugin::exit().
+  /// Unregistration must be done
+  /// \ifnot MDL_SOURCE_RELEASE in #mi::neuraylib::IPlugin::exit() or \endif
+  /// after \neurayProductName has been shut down.
   ///
   /// \param importer     The importer to unregister.
   /// \return
@@ -131,8 +135,9 @@ public:
 
   /// Unregisters an exporter registered with the \neurayApiName.
   ///
-  /// Unregistration must be done after \neurayProductName has been shut down or in
-  /// #mi::neuraylib::IPlugin::exit().
+  /// Unregistration must be done
+  /// \ifnot MDL_SOURCE_RELEASE in #mi::neuraylib::IPlugin::exit() or \endif
+  /// after \neurayProductName has been shut down.
   ///
   /// \param exporter     The exporter to unregister.
   /// \return

@@ -1,4 +1,4 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -31,7 +31,6 @@
 #include <mi/dice.h>
 
 class vtkVolume;
-
 class vtknvindex_regular_volume_properties;
 
 namespace nv
@@ -50,21 +49,15 @@ class vtknvindex_colormap
 {
 
 public:
-  vtknvindex_colormap();
+  vtknvindex_colormap(
+    const mi::neuraylib::Tag& volume_colormap_tag, const mi::neuraylib::Tag& slice_colormap_tag);
   ~vtknvindex_colormap();
 
   // Dumps colormap's values to console.
   void dump_colormap(mi::base::Handle<const nv::index::IColormap> const& cmap);
 
-  // Creates new colormap and add it to the NVIDIA IndeX scene graph.
-  void create_scene_colormaps(vtkVolume* vol, mi::neuraylib::Tag& volume_colormap_tag,
-    std::vector<mi::neuraylib::Tag>& slices_colormap_tags, const nv::index::IScene* scene,
-    vtknvindex_regular_volume_properties* regular_volume_properties,
-    const mi::base::Handle<mi::neuraylib::IDice_transaction>& dice_transaction);
-
   // Updates an already created colormap in NVIDIA IndeX scene graph.
-  void update_scene_colormaps(vtkVolume* vol, const mi::neuraylib::Tag& volume_colormap_tag,
-    const std::vector<mi::neuraylib::Tag>& slices_colormap_tags,
+  void update_scene_colormaps(vtkVolume* vol,
     const mi::base::Handle<mi::neuraylib::IDice_transaction>& dice_transaction,
     vtknvindex_regular_volume_properties* regular_volume_properties);
 
@@ -89,11 +82,14 @@ private:
   void get_paraview_colormaps(vtkVolume* vol,
     vtknvindex_regular_volume_properties* regular_volume_properties,
     mi::base::Handle<nv::index::IColormap>& volume_colormap,
-    std::vector<mi::base::Handle<nv::index::IColormap> >& slice_colormaps);
+    mi::base::Handle<nv::index::IColormap>& slice_colormap);
 
   bool m_changed;             // true if color map was changed and needs to be updated.
   mi::Uint64 m_color_mtime;   // Modification time for color transfer function.
   mi::Uint64 m_opacity_mtime; // Modification time for opacity transfer function.
+
+  mi::neuraylib::Tag m_volume_colormap_tag; // Colormap shared among all volumes.
+  mi::neuraylib::Tag m_slice_colormap_tag;  // Colormap shared among all slices.
 };
 
 #endif

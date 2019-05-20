@@ -1,12 +1,10 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file mi/base/default_allocator.h
 /// \brief Default allocator implementation based on global new and delete.
 ///
 /// See \ref mi_base_iinterface.
-///
-//*****************************************************************************
 
 #ifndef MI_BASE_DEFAULT_ALLOCATOR_H
 #define MI_BASE_DEFAULT_ALLOCATOR_H

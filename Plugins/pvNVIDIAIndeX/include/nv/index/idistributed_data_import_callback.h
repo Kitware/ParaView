@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief The interface class for implementing import callbacks used for distributed large-scale
@@ -184,6 +184,8 @@ public:
     return estimate(bbox, dice_transaction);
   }
 
+  using mi::neuraylib::Base<id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11, I>::create;
+
   /// Shall create and provide the dataset subset contained in the given bounding box.
   ///
   /// \param[in] bounding_box             The 3D area for which data shall be imported. The bounding
@@ -243,10 +245,15 @@ public:
   /// \return                             Returns the portion of the dataset contained in the
   ///                                     3D area.
   ///
-  virtual IDistributed_data_subset* create(
-    const mi::math::Bbox_struct<mi::Sint32, 3>& /*bounding_box*/, mi::Uint32 /*time_step*/,
-    IData_subset_factory* /*factory*/, mi::neuraylib::IDice_transaction* /*dice_transaction*/) const
+  virtual IDistributed_data_subset* create(const mi::math::Bbox_struct<mi::Sint32, 3>& bounding_box,
+    mi::Uint32 time_step, IData_subset_factory* factory,
+    mi::neuraylib::IDice_transaction* dice_transaction) const
   {
+    (void)bounding_box;     // avoid unused warnings
+    (void)time_step;        // avoid unused warnings
+    (void)factory;          // avoid unused warnings
+    (void)dice_transaction; // avoid unused warnings
+
     return 0;
   }
 
@@ -279,8 +286,6 @@ public:
     bbox.max.z = static_cast<mi::Sint32>(mi::math::ceil(bounding_box.max.z));
     return create(bbox, time_step, factory, dice_transaction);
   }
-
-  // using mi::neuraylib::Base<id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11, I>::create;
 
   /// Empty body, i.e., no member data is serialized.
   /// \param[in] serializer unused.
@@ -316,20 +321,25 @@ class Distributed_continuous_data_import_callback
   : public mi::neuraylib::Base<id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11, I>
 {
 public:
+  using mi::neuraylib::Base<id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11, I>::create;
+
   /// Empty body, i.e., no data import required based on floating-point bounding boxes.
   /// \param[in] bbox                     unused.
   /// \param[in] time_step                unused.
   /// \param[in] factory                  unused.
   /// \param[in] dice_transaction         unused.
   /// \return                             0.
-  virtual IDistributed_data_subset* create(const mi::math::Bbox_struct<mi::Float32, 3>& /*bbox*/,
-    mi::Uint32 /*time_step*/, IData_subset_factory* /*factory*/,
-    mi::neuraylib::IDice_transaction* /*dice_transaction*/) const
+  virtual IDistributed_data_subset* create(const mi::math::Bbox_struct<mi::Float32, 3>& bbox,
+    mi::Uint32 time_step, IData_subset_factory* factory,
+    mi::neuraylib::IDice_transaction* dice_transaction) const
   {
+    (void)bbox;             // avoid unused warnings
+    (void)time_step;        // avoid unused warnings
+    (void)factory;          // avoid unused warnings
+    (void)dice_transaction; // avoid unused warnings
+
     return 0;
   }
-
-  // using mi::neuraylib::Base<id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11, I>::create;
 
   /// Empty body, i.e., no member data is serialized.
   /// \param[in] serializer unused

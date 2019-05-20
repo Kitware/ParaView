@@ -1,10 +1,9 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file
 /// \brief API component that allows to start timers to elapse at configured timer
 ///        times triggering callbacks.
-//*****************************************************************************
 
 #ifndef MI_NEURAYLIB_ITIMER_CONFIGURATION_H
 #define MI_NEURAYLIB_ITIMER_CONFIGURATION_H

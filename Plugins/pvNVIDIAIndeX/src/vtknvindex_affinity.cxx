@@ -1,4 +1,4 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -56,7 +56,6 @@ void vtknvindex_affinity::set_hostinfo(std::map<mi::Uint32, vtknvindex_host_prop
 
   // Prepare a vector that is used to return correct gpu ids later.
   // Based on a round-robin scheme.
-
   for (it = m_host_info.begin(); it != m_host_info.end(); it++)
     m_roundrobin_ids[it->first] = 0;
 }
@@ -86,9 +85,9 @@ void vtknvindex_affinity::scene_dump_affinity_info(std::ostringstream& s)
   for (mi::Size i = 0; i < nb_elements; ++i)
   {
     affinity_struct& affinity = m_final_spatial_subdivision[i];
-    s << "index::domain_subdivision::spatial_region_" << i << "::bbox = " << affinity.m_bbox.min.z
-      << " " << affinity.m_bbox.min.y << " " << affinity.m_bbox.min.x << " "
-      << affinity.m_bbox.max.z << " " << affinity.m_bbox.max.y << " " << affinity.m_bbox.max.x
+    s << "index::domain_subdivision::spatial_region_" << i << "::bbox = " << affinity.m_bbox.min.x
+      << " " << affinity.m_bbox.min.y << " " << affinity.m_bbox.min.z << " "
+      << affinity.m_bbox.max.x << " " << affinity.m_bbox.max.y << " " << affinity.m_bbox.max.z
       << "\n";
     s << "index::domain_subdivision::affinity_information_" << i
       << "::host = " << affinity.m_host_id << "\n";

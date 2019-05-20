@@ -1,4 +1,4 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -97,8 +97,6 @@ public:
 
   // Get the shared memory info for the current bounding box and the time step.
   shm_info* get_shminfo(const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step);
-
-  bool mark_shm_used(const std::string& shmname, void* shmpointer, const mi::Uint64& shmsize);
 
   // Set/get the GPU ids of the present host.
   void set_gpuids(std::vector<mi::Sint32> gpuids);

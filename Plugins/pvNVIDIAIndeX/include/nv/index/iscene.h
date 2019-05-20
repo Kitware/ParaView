@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for a scene
@@ -12,9 +12,11 @@
 #include <mi/dice.h>
 
 #include <nv/index/iattribute.h>
+#include <nv/index/icorner_point_grid.h>
 #include <nv/index/idistributed_data_import_callback.h>
+#include <nv/index/iheight_field_scene_element.h>
 #include <nv/index/iirregular_volume_scene_element.h>
-#include <nv/index/ipipe.h>
+#include <nv/index/ipipe_set.h>
 #include <nv/index/iregular_heightfield.h>
 #include <nv/index/iregular_volume.h>
 #include <nv/index/iscene_group.h>
@@ -211,6 +213,27 @@ public:
     nv::index::IDistributed_data_import_callback* importer_callback,
     mi::neuraylib::IDice_transaction* dice_transaction) const = 0;
 
+  /// Creates a new corner-point grid scene element from the given import configuration, but does
+  /// not yet
+  /// add it to the scene description.
+  ///
+  /// \param[in] bbox                         The local space bounding box.
+  /// \param[in] transform_matrix             Transformation matrix.
+  /// \param[in] importer_callback            Distributed data import callback function.
+  /// \param[in] dice_transaction             The DiCE transaction.
+  ///
+  /// \return                                 The new \c ISparse_volume_scene_element instance.
+  ///
+  virtual ICorner_point_grid* create_corner_point_grid(
+    const mi::math::Bbox_struct<mi::Float32, 3>& bbox,
+    const mi::math::Matrix_struct<mi::Float32, 4, 4>& transform_matrix,
+    nv::index::IDistributed_data_import_callback* importer_callback,
+    mi::neuraylib::IDice_transaction* dice_transaction) const = 0;
+
+  virtual IPipe_set* create_pipe_set(const mi::math::Bbox_struct<mi::Float32, 3>& bbox,
+    nv::index::IDistributed_data_import_callback* importer_callback,
+    mi::neuraylib::IDice_transaction* dice_transaction) const = 0;
+
   /// Creates a new regular heightfield scene element from the given import
   /// configuration.  The created heightfield scene element will be returned
   /// and must then be added to the scene description.
@@ -268,11 +291,37 @@ public:
     const mi::math::Vector_struct<mi::Float32, 2>& k_range,
     mi::neuraylib::IDice_transaction* dice_transaction) const = 0;
 
+  /// Creates a default height field scene element.  The default
+  /// heightfield has the given elevation value at each grid location of the
+  /// given 2D patch.  The scene element can be transformed by specifying
+  /// scaling, a rotation around its local K-axis, and a translation. These
+  /// transformations generate the matrix that will be returned by
+  /// IHeight_field_scene_element::get_transform() and is applied to transform the
+  /// scene element from the heightfield's local space to the global space.
+  ///
+  /// \param[in] scaling           Scaling; use (1, 1, 1) to disable
+  /// \param[in] rotation_k        Rotation around the K-axis (in radians)
+  /// \param[in] translation       Translation; use (0, 0, 0) to remain at the origin
+  /// \param[in] grid_size         Number of grid points in each direction
+  /// \param[in] k_range           Minimum and maximum K-value (equal to height)
+  ///                              in the heightfield
+  /// \param[in] importer_callback Distributed data import callback function.
+  /// \param[in] dice_transaction  The DiCE transaction.
+  ///
+  /// \return                      The new \c IRegular_heightfield instance..
+  virtual IHeight_field_scene_element* create_height_field(
+    const mi::math::Vector_struct<mi::Float32, 3>& scaling, mi::Float32 rotation_k,
+    const mi::math::Vector_struct<mi::Float32, 3>& translation,
+    const mi::math::Vector_struct<mi::Uint32, 2>& grid_size,
+    const mi::math::Vector_struct<mi::Float32, 2>& k_range,
+    nv::index::IDistributed_data_import_callback* importer_callback,
+    mi::neuraylib::IDice_transaction* dice_transaction) const = 0;
+
   /// Creates a new triangle mesh scene element from the given import configuration, but does not
   /// yet
   /// add it to the scene description.
   ///
-  /// \param[in]  ijk_bbox                    The local space bounding box.
+  /// \param[in] ijk_bbox                     The local space bounding box.
   /// \param[in] importer_callback            Distributed data import callback function.
   /// \param[in] dice_transaction             The DiCE transaction.
   /// \return                                 The new \c ITriangle_mesh_scene_element instance.
@@ -302,8 +351,6 @@ public:
   ///         The bounding box is defined in the joint subdivision space.
   ///
   virtual mi::math::Bbox_struct<mi::Float32, 3> get_clipped_bounding_box() const = 0;
-
-  ///@}
 
   ///@}
 };

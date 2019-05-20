@@ -1,9 +1,8 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file
 /// \brief API component for scheduling related settings.
-//*****************************************************************************
 
 #ifndef MI_NEURAYLIB_ISCHEDULING_CONFIGURATION_H
 #define MI_NEURAYLIB_ISCHEDULING_CONFIGURATION_H

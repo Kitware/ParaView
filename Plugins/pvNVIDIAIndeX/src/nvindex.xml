@@ -1,5 +1,5 @@
 <!--
-* Copyright 2018 NVIDIA Corporation. All rights reserved.
+* Copyright 2019 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -483,6 +483,7 @@
               <Entry value="1" text="Isosurface"/>
               <Entry value="2" text="Depth enhancement"/>
               <Entry value="3" text="Edge enhancement"/>
+              <Entry value="4" text="Gradient"/>
             </EnumerationDomain>
             <Documentation>
               It selects the element to be visualized.
@@ -764,6 +765,45 @@
               </PropertyWidgetDecorator>
             </Hints>
           </IntVectorProperty>
+
+          <DoubleVectorProperty
+              label="Level"
+              name="gradient_level"
+              command="set_gradient_level"
+              number_of_elements="1"
+              default_values="50.0">
+            <DoubleRangeDomain
+                name="range"
+                min ="1.0"
+                max ="100.0">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set gradient level
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="4">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="Scale"
+              name="gradient_scale"
+              command="set_gradient_scale"
+              number_of_elements="1"
+              default_values="20.0">
+            <DoubleRangeDomain
+                name="range"
+                min ="0.1">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set gradient level
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="4">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
 
           <!-- End of NvidiaIndexRegularVolumeRepresentation -->
         </RepresentationProxy>
@@ -1358,6 +1398,8 @@
               <Property name="depth_gamma"/>
               <Property name="edge_range"/>
               <Property name="edge_samples"/>
+              <Property name="gradient_level"/>
+              <Property name="gradient_scale"/>
             </PropertyGroup>
         </ExposedProperties>
 

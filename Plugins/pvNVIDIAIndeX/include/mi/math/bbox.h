@@ -1,13 +1,11 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file mi/math/bbox.h
 /// \brief An axis-aligned N-dimensional bounding box class template of fixed dimension with
 ///        supporting functions.
 ///
 /// See \ref mi_math_bbox.
-///
-//*****************************************************************************
 
 #ifndef MI_MATH_BBOX_H
 #define MI_MATH_BBOX_H

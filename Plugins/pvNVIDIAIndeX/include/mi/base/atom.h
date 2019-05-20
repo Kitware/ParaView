@@ -1,11 +1,10 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file  mi/base/atom.h
 /// \brief 32-bit unsigned counter with atomic arithmetic, increments, and decrements.
 ///
 /// See \ref mi_base_threads.
-//*****************************************************************************
 
 #ifndef MI_BASE_ATOM_H
 #define MI_BASE_ATOM_H

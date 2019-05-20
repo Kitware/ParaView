@@ -1,4 +1,4 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -127,26 +127,6 @@ void vtknvindex_host_properties::free_shm_pointer(mi::Uint32 time_step)
       }
     }
   }
-}
-
-// ------------------------------------------------------------------------------------------------
-bool vtknvindex_host_properties::mark_shm_used(
-  const std::string& /*shmname*/, void* /*shmpointer*/, const mi::Uint64& /*shmsize*/)
-{
-  // std::map<std::string, mi::Uint32>::iterator shmit = m_shmref.find(shmname);
-
-  // ERROR_LOG << "Mark Used shared memory: " << shmname << ": used = " << shmit->second;
-
-  // shmit->second--;
-
-  // if (shmit->second == 0)
-  // {
-  // INFO_LOG << "Removing shared memory: " << shmname;
-  // munmap(shmpointer, shmsize);
-  // shm_unlink(shmname.c_str());
-  // return true;
-  // }
-  return false;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -384,14 +364,23 @@ void vtknvindex_host_properties::serialize(mi::neuraylib::ISerializer* serialize
 
       for (mi::Uint32 i = 0; i < shmlist_size; ++i)
       {
+        // shm bbox
         const shm_info& shm = shmlist[i];
         serializer->write(&shm.m_shm_bbox.min.x, 6);
 
+        // shm name
         mi::Uint32 shmname_size = mi::Uint32(shm.m_shm_name.size());
         serializer->write(&shmname_size, 1);
         serializer->write(reinterpret_cast<const mi::Uint8*>(shm.m_shm_name.c_str()), shmname_size);
 
+        // shm size
         serializer->write(&shm.m_size, 1);
+
+        // shm raw pointer
+        mi::Uint32 shm_ptr_size = sizeof(void*);
+        serializer->write(&shm_ptr_size, 1);
+        serializer->write(
+          reinterpret_cast<const mi::Uint8*>(&(shm.m_raw_mem_pointer)), shm_ptr_size);
       }
 
       // Serialize the time step.
@@ -449,15 +438,23 @@ void vtknvindex_host_properties::deserialize(mi::neuraylib::IDeserializer* deser
 
       for (mi::Uint32 j = 0; j < shmlist_size; ++j)
       {
+        // shm bbox
         shm_info shm;
         deserializer->read(&shm.m_shm_bbox.min.x, 6);
 
+        // shm name
         mi::Uint32 shmname_size = 0;
         deserializer->read(&shmname_size, 1);
         shm.m_shm_name.resize(shmname_size);
         deserializer->read(reinterpret_cast<mi::Uint8*>(&shm.m_shm_name[0]), shmname_size);
 
+        // shm size
         deserializer->read(&shm.m_size, 1);
+
+        // shm raw pointer
+        mi::Uint32 shm_ptr_size = 0;
+        deserializer->read(&shm_ptr_size, 1);
+        deserializer->read(reinterpret_cast<mi::Uint8*>(&shm.m_raw_mem_pointer), shm_ptr_size);
 
         shmlist.push_back(shm);
       }

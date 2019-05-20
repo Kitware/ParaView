@@ -1,4 +1,4 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -42,7 +42,6 @@
 
 // Defines max slices and slice maps in the scene graph
 #define MAX_SLICES 3
-#define MAX_SLICE_MAPS 1
 
 // Represents NVIDIA IndeX's slice parameter.
 struct vtknvindex_slice_params

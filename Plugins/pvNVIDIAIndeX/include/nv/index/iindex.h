@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Main API of the NVIDIA IndeX library.
@@ -16,6 +16,7 @@
 #include <nv/index/icluster_change_callback.h>
 #include <nv/index/idistributed_data_locality.h>
 #include <nv/index/ierror.h>
+#include <nv/index/ievent_tracing.h>
 #include <nv/index/iheightfield_interaction.h>
 #include <nv/index/iindex_canvas.h>
 #include <nv/index/iindex_scene_query.h>

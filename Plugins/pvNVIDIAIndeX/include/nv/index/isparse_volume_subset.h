@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Distributed subsets of sparse volume datasets.
@@ -43,6 +43,11 @@ enum Sparse_volume_voxel_format
                                         /// precision per component
   SPARSE_VOLUME_VOXEL_FORMAT_SINT16_4,  ///< Vector voxel format with 4 components and sint16
                                         /// precision per component
+  SPARSE_VOLUME_VOXEL_FORMAT_FLOAT16,   ///< Scalar voxel format with float16 precision
+  SPARSE_VOLUME_VOXEL_FORMAT_FLOAT16_2, ///< Vector voxel format with 2 components and float16
+                                        /// precision per component
+  SPARSE_VOLUME_VOXEL_FORMAT_FLOAT16_4, ///< Vector voxel format with 4 components and float16
+                                        /// precision per component
   SPARSE_VOLUME_VOXEL_FORMAT_FLOAT32,   ///< Scalar voxel format with float32 precision
   SPARSE_VOLUME_VOXEL_FORMAT_FLOAT32_2, ///< Vector voxel format with 2 components and float32
                                         /// precision per component
@@ -50,6 +55,41 @@ enum Sparse_volume_voxel_format
                                         /// precision per component
 
   SPARSE_VOLUME_VOXEL_FORMAT_COUNT
+};
+
+/// @ingroup nv_index_data_storage
+/// Volume device-data accessor interface.
+///
+/// An instance of this class will hold ownership of the device data. For this reason managing the
+/// life-time of an instance
+/// is important for when to free up the data.
+///
+/// \note WORK IN PROGRESS
+///  - for now uses the Sparse_volume_voxel_format enum to represent volume type
+///
+class IVolume_device_data_buffer : public mi::base::Interface_declare<0x60d74933, 0xd556, 0x49de,
+                                     0xaa, 0xbc, 0x5d, 0xa7, 0xaa, 0xc1, 0x4c, 0x50>
+{
+public:
+  virtual bool is_valid() const = 0;
+
+  /// Voxel format of the volume data.
+  virtual Sparse_volume_voxel_format get_data_format() const = 0;
+
+  /// Volume data position in local volume space.
+  virtual mi::math::Vector<mi::Sint32, 3> get_data_position() const = 0;
+
+  /// Volume data extent.
+  virtual mi::math::Vector<mi::Uint32, 3> get_data_extent() const = 0;
+
+  /// Raw memory pointer to internal device-buffer data.
+  virtual void* get_device_data() const = 0;
+
+  ///< The size of the buffer in Bytes.
+  virtual mi::Size get_data_size() const = 0;
+
+  ///< GPU device id if the buffer is located on a GPU device,
+  virtual mi::Sint32 get_gpu_device_id() const = 0;
 };
 
 /// @ingroup nv_index_data_storage
@@ -120,7 +160,7 @@ public:
   {
     mi::math::Vector_struct<mi::Sint32, 3>
       brick_position;           ///< Position in volume local space of the
-                                ///< the particular brick (on it's level-of-detail).
+                                ///< the particular brick (on its level-of-detail).
     mi::Uint32 brick_lod_level; ///< Level-of-detail of the particular brick.
   };
 
@@ -152,6 +192,10 @@ public:
   /// Returns the dimensions of the volume-data bricks.
   ///
   virtual mi::math::Vector_struct<mi::Uint32, 3> get_subset_data_brick_dimensions() const = 0;
+
+  /// Returns the size of the shared volume-data brick boundary.
+  ///
+  virtual mi::Uint32 get_subset_data_brick_shared_border_size() const = 0;
 
   /// Returns the data bounds covering all volume-data bricks required for the subset on a
   /// particular level-of-detail.
@@ -276,7 +320,7 @@ public:
 
   /// Write multiple volume-data bricks to the subset from a single \c IRDMA_buffer.
   /// The packing of the volume-data bricks to be written from the \c IRDMA_buffer is defined
-  /// in the passed \c src_rdma_buffer_offsets parameter. It this parameter is 0, the volume
+  /// in the passed \c src_rdma_buffer_offsets parameter. If this parameter is 0, the volume
   /// sub-blocks need to be tightly packed after each other in the source buffer.
   ///
   /// \note The \c IRDMA_buffer can be located either in CPU or GPU memory. If a GPU-memory
@@ -309,7 +353,7 @@ public:
     Data_transformation brick_data_transform = DATA_TRANSFORMATION_NONE) = 0;
 
   /// Query the internal buffer information of the data-subset instance for a volume-data brick
-  /// in otder to gain access to the internal buffer-data for direct write operations.
+  /// in order to gain access to the internal buffer-data for direct write operations.
   ///
   /// \param[in]  brick_subset_idx    Volume-data brick subset index for which to query internal
   /// buffer.
@@ -322,8 +366,10 @@ public:
   ///
   virtual const Data_brick_buffer_info access_brick_data_buffer(
     mi::Uint32 brick_subset_idx, mi::Uint32 brick_attrib_idx) = 0;
+  virtual const Data_brick_buffer_info access_brick_data_buffer(
+    mi::Uint32 brick_subset_idx, mi::Uint32 brick_attrib_idx) const = 0;
 
-  /// Creates an RDMA buffer that is a wrapper for of the internal buffer.
+  /// Creates an RDMA buffer that is a wrapper for the internal buffer.
   ///
   /// \param[in]  rdma_ctx            The RDMA context used for wrapping the internal buffer.
   /// \param[in]  brick_subset_idx    Volume-data brick subset index for which to query internal
@@ -348,6 +394,22 @@ public:
   ///
   virtual bool store_internal_data_representation(const char* output_filename) const = 0;
   virtual bool load_internal_data_representation(const char* input_filename) = 0;
+
+  /// Experimental API
+  /// \note WORK IN PROGRESS
+  /// - will be refactored into a separate device-data interface exposing device available data
+  ///   if it is available in the particular context of usage
+  /// - this is future work as we have to work out how to handle the existing APIs for writing
+  ///   directly to the GPU (write_brick_data(), especially with IRDMA_buffer interface).
+  /// - for now we will expose currently required methods directly. they will return invalid
+  ///   GPU-resources when no GPU-device access is given at the particular point
+  /// - the plan is to currently have these methods working for the inferencing-technique
+  ///   APIs added for Phase X M2
+  ///
+
+  virtual IVolume_device_data_buffer* generate_volume_sub_data_device(mi::Uint32 subdata_attrib_idx,
+    mi::math::Vector_struct<mi::Sint32, 3> subdata_position,
+    mi::math::Vector_struct<mi::Uint32, 3> subdata_extent) const = 0;
 };
 
 } // namespace index

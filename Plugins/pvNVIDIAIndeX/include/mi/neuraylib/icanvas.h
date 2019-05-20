@@ -1,9 +1,8 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file
 /// \brief Abstract interface for canvases
-//*****************************************************************************
 
 #ifndef MI_NEURAYLIB_ICANVAS_H
 #define MI_NEURAYLIB_ICANVAS_H
@@ -20,7 +19,7 @@ class ITile;
 
 /** \if IRAY_API \addtogroup mi_neuray_rendering
     \elseif DICE_API \addtogroup mi_neuray_rtmp
-    \else \addtogroup mi_neuray_misc
+    \else \addtogroup mi_neuray_mdl_sdk_misc
     \endif
 @{
 */

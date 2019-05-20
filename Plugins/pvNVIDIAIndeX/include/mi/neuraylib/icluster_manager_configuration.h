@@ -1,9 +1,8 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file
 /// \brief API component to interact with the cluster manager
-//*****************************************************************************
 
 #ifndef MI_NEURAYLIB_ICLUSTER_MANAGER_CONFIGURATION_H
 #define MI_NEURAYLIB_ICLUSTER_MANAGER_CONFIGURATION_H
@@ -159,6 +158,44 @@ public:
 
   /// Returns a descriptor of the head node of the cluster.
   virtual ICluster_manager_node* get_head_node_descriptor() = 0;
+
+  /// Grows the cluster by one node.
+  ///
+  /// \see #shrink_cluster
+  ///
+  /// \param[out] errors   An optional pointer to an #mi::Sint32 to which an error code
+  ///                      will be written. The error codes have the following meaning:
+  ///                      -  0: Success.
+  ///                      - -1: No nodes were available.
+  ///                      - -2: No cluster is running.
+  ///                      - -3: The connection to the cluster manager broke down.
+  ///                      - -4: The request timed out. Please check if the cluster
+  ///                            manager is working properly.
+  /// \return              The decriptor of the node that has been added to the cluster, or
+  ///                      \c NULL if no node was available to be added.
+  virtual ICluster_manager_node* grow_cluster(Sint32* errors) = 0;
+
+  /// Shrinks the cluster by one node.
+  ///
+  /// Shrinking the cluster if there's only one node remaining is not allowed. Removing the
+  /// head node of the cluster is not prevented but should be avoided when calling this.
+  /// There's no built-in way after the cluster has been started to tell a head node process
+  /// that is has been selected as the new head node.
+  ///
+  /// \see #grow_cluster
+  ///
+  /// \param node    The descriptor of the node that is to be removed from the cluster.
+  /// \return
+  ///                -  0: Success.
+  ///                -  1: Success. The removed node was the head node.
+  ///                - -1: Node not removed because it's the last node in the cluster.
+  ///                - -2: No cluster is running.
+  ///                - -3: The connection to the cluster manager broke down.
+  ///                - -4: The request timed out. Please check if the cluster
+  ///                      manager is working properly.
+  ///                - -5: The server failed to remove the node from the cluster.
+  ///
+  virtual Sint32 shrink_cluster(ICluster_manager_node* node) = 0;
 };
 
 /// Represents a pool of nodes managed though the cluster manager.

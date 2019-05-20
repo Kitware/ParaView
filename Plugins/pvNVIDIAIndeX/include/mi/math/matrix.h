@@ -1,12 +1,11 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file mi/math/matrix.h
 /// \brief A NxM-dimensional matrix class template of fixed dimensions with supporting
 ///        functions.
 ///
 /// See \ref mi_math_matrix.
-//*****************************************************************************
 
 #ifndef MI_MATH_MATRIX_H
 #define MI_MATH_MATRIX_H

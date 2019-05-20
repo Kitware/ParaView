@@ -1,9 +1,8 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file
 /// \brief Callback interface for notifications about joining or leaving hosts.
-//*****************************************************************************
 
 #ifndef MI_NEURAYLIB_IHOST_CALLBACK_H
 #define MI_NEURAYLIB_IHOST_CALLBACK_H

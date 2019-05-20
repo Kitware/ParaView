@@ -1,4 +1,4 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -57,6 +57,7 @@
 #include "vtknvindex_cluster_properties.h"
 #include "vtknvindex_config_settings.h"
 #include "vtknvindex_forwarding_logger.h"
+#include "vtknvindex_instance.h"
 #include "vtknvindex_irregular_volume_mapper.h"
 #include "vtknvindex_irregular_volume_representation.h"
 #include "vtknvindex_utilities.h"
@@ -76,6 +77,9 @@ vtkStandardNewMacro(vtknvindex_irregular_volume_representation);
 vtknvindex_irregular_volume_representation::vtknvindex_irregular_volume_representation()
 {
   m_controller = vtkMultiProcessController::GetGlobalController();
+
+  // Init IndeX and ARC
+  vtknvindex_instance::get()->init_index();
 
   this->ResampleToImageFilter = vtkResampleToImage::New();
   this->ResampleToImageFilter->SetSamplingDimensions(128, 128, 128);
@@ -305,6 +309,7 @@ int vtknvindex_irregular_volume_representation::ProcessViewRequest(
 
     vtkPVRenderView::SetPiece(inInfo, this, this->CacheKeeper->GetOutputDataObject(0));
     vtkPVRenderView::MarkAsRedistributable(inInfo, this);
+    vtkPVRenderView::SetRedistributionModeToDuplicateBoundaryCells(inInfo, this);
 
     vtkNew<vtkMatrix4x4> matrix;
     this->Actor->GetMatrix(matrix.GetPointer());
@@ -460,6 +465,9 @@ void vtknvindex_irregular_volume_representation::SetScale(double x, double y, do
 //----------------------------------------------------------------------------
 void vtknvindex_irregular_volume_representation::SetVisibility(bool val)
 {
+  DefaultMapper->set_visibility(val);
+  update_index_roi();
+
   this->Actor->SetVisibility(val ? 1 : 0);
   this->Superclass::SetVisibility(val);
 }

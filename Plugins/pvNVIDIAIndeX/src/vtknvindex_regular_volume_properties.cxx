@@ -1,4 +1,4 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -25,6 +25,9 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "vtkCellData.h"
+#include "vtkCellIterator.h"
+#include "vtkUnstructuredGrid.h"
 #include <vtkDataArray.h>
 
 #include "vtknvindex_cluster_properties.h"
@@ -159,6 +162,12 @@ void vtknvindex_regular_volume_properties::set_volume_extents(
   mi::math::Bbox<mi::Sint32, 3> volume_extents)
 {
   m_volume_extents = volume_extents;
+  m_ivol_volume_extents.min.x = volume_extents.min.x;
+  m_ivol_volume_extents.min.y = volume_extents.min.y;
+  m_ivol_volume_extents.min.z = volume_extents.min.z;
+  m_ivol_volume_extents.max.x = volume_extents.max.x;
+  m_ivol_volume_extents.max.y = volume_extents.max.y;
+  m_ivol_volume_extents.max.z = volume_extents.max.z;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -242,7 +251,7 @@ void vtknvindex_regular_volume_properties::transform_zyx_to_xyz(
 //----------------------------------------------------------------------------
 bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* scalar_array,
   mi::Sint32* bounds, // vtkImageData*              current_piece,
-  vtknvindex_host_properties* host_properties, mi::Uint32 current_timestep, bool is_MPI)
+  vtknvindex_host_properties* host_properties, mi::Uint32 current_timestep, bool use_shared_mem)
 {
   if (!host_properties)
   {
@@ -274,30 +283,18 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* sca
     return false;
   }
 
-  if (is_MPI)
+  if (use_shared_mem)
   {
     void* shm_ptr = NULL;
 
     if (m_scalar_type == "unsigned char")
     {
       shm_ptr = vtknvindex::util::get_vol_shm<mi::Uint8>(shm_info->m_shm_name, shm_info->m_size);
-
-#ifndef USE_SPARSE_VOLUME
-      transform_zyx_to_xyz<mi::Uint8>(reinterpret_cast<mi::Uint8*>(scalar_array->GetVoidPointer(0)),
-        reinterpret_cast<mi::Uint8*>(shm_ptr), bounds);
-#endif
     }
     else if (m_scalar_type == "unsigned short")
     {
       shm_ptr = vtknvindex::util::get_vol_shm<mi::Uint16>(shm_info->m_shm_name, shm_info->m_size);
-
-#ifndef USE_SPARSE_VOLUME
-      transform_zyx_to_xyz<mi::Uint16>(
-        reinterpret_cast<mi::Uint16*>(scalar_array->GetVoidPointer(0)),
-        reinterpret_cast<mi::Uint16*>(shm_ptr), bounds);
-#endif
     }
-#ifdef USE_SPARSE_VOLUME
     else if (m_scalar_type == "char")
     {
       shm_ptr = vtknvindex::util::get_vol_shm<mi::Sint8>(shm_info->m_shm_name, shm_info->m_size);
@@ -306,26 +303,13 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* sca
     {
       shm_ptr = vtknvindex::util::get_vol_shm<mi::Sint16>(shm_info->m_shm_name, shm_info->m_size);
     }
-#endif
     else if (m_scalar_type == "float")
     {
       shm_ptr = vtknvindex::util::get_vol_shm<mi::Float32>(shm_info->m_shm_name, shm_info->m_size);
-
-#ifndef USE_SPARSE_VOLUME
-      transform_zyx_to_xyz<mi::Float32>(
-        reinterpret_cast<mi::Float32*>(scalar_array->GetVoidPointer(0)),
-        reinterpret_cast<mi::Float32*>(shm_ptr), bounds);
-#endif
     }
     else if (m_scalar_type == "double")
     {
       shm_ptr = vtknvindex::util::get_vol_shm<mi::Float64>(shm_info->m_shm_name, shm_info->m_size);
-
-#ifndef USE_SPARSE_VOLUME
-      transform_zyx_to_xyz<mi::Float64>(
-        reinterpret_cast<mi::Float64*>(scalar_array->GetVoidPointer(0)),
-        reinterpret_cast<mi::Float64*>(shm_ptr), bounds);
-#endif
     }
     else
     {
@@ -340,19 +324,14 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* sca
       return false;
     }
 
-#ifdef USE_SPARSE_VOLUME
     memcpy(shm_ptr, scalar_array->GetVoidPointer(0), shm_info->m_size);
-#endif // USE_SPARSE_VOLUME
 
     // free memory space linked to shared memory
     vtknvindex::util::unmap_shm(shm_ptr, shm_info->m_size);
   }
   else
   {
-    shm_info->m_raw_mem_pointer = malloc(shm_info->m_size); // scalar_array->GetVoidPointer(0);
-    memcpy(shm_info->m_raw_mem_pointer, scalar_array->GetVoidPointer(0), shm_info->m_size);
-
-    // shm_info->m_raw_mem_pointer = scalar_array->GetVoidPointer(0);
+    shm_info->m_raw_mem_pointer = scalar_array->GetVoidPointer(0);
   }
 
   m_time_steps_written++;
@@ -365,8 +344,8 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* sca
 
 // ------------------------------------------------------------------------------------------------
 bool vtknvindex_regular_volume_properties::write_shared_memory(
-  vtknvindex_irregular_volume_data* ivol_data, vtknvindex_host_properties* host_properties,
-  mi::Uint32 current_timestep)
+  vtknvindex_irregular_volume_data* ivol_data, vtkUnstructuredGridBase* ugrid,
+  vtknvindex_host_properties* host_properties, mi::Uint32 current_timestep)
 {
   if (!host_properties)
   {
@@ -445,14 +424,60 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(
   shm_offset += size_elm;
 
   // points
-  size_elm = sizeof(mi::Float32) * 3 * ivol_data->num_points;
-  memcpy(shm_offset, &ivol_data->points[0].x, size_elm);
-  shm_offset += size_elm;
+  size_elm = sizeof(mi::Float32) * 3;
+
+  for (vtkIdType i = 0; i < ivol_data->num_points; ++i)
+  {
+    mi::Float64 point_pv[3];
+    ugrid->GetPoint(i, point_pv);
+
+    mi::Float32 point_index[3] = { static_cast<mi::Float32>(point_pv[0]),
+      static_cast<mi::Float32>(point_pv[1]), static_cast<mi::Float32>(point_pv[2]) };
+
+    memcpy(shm_offset, point_index, size_elm);
+    shm_offset += size_elm;
+  }
 
   // cells
-  size_elm = sizeof(mi::Uint32) * 4 * ivol_data->num_cells;
-  memcpy(shm_offset, &ivol_data->cells[0].x, size_elm);
-  shm_offset += size_elm;
+  size_elm = sizeof(mi::Uint32) * 4;
+
+  vtkSmartPointer<vtkCellIterator> cellIter =
+    vtkSmartPointer<vtkCellIterator>::Take(ugrid->NewCellIterator());
+  for (cellIter->InitTraversal(); !cellIter->IsDoneWithTraversal(); cellIter->GoToNextCell())
+  {
+    vtkIdType npts = cellIter->GetNumberOfPoints();
+    if (npts != 4)
+      continue;
+
+    vtkIdType* cell_point_ids = cellIter->GetPointIds()->GetPointer(0);
+
+    // check for degenerated cells
+    bool invalid_cell = false;
+    for (mi::Uint32 i = 0; i < 3; i++)
+    {
+      for (mi::Uint32 j = i + 1; j < 4; j++)
+      {
+        if (cell_point_ids[i] == cell_point_ids[j])
+        {
+          invalid_cell = true;
+          break;
+        }
+      }
+
+      if (invalid_cell)
+        break;
+    }
+
+    if (invalid_cell)
+      continue;
+
+    mi::Uint32 cur_cell_index[4] = { static_cast<mi::Uint32>(cell_point_ids[0]),
+      static_cast<mi::Uint32>(cell_point_ids[1]), static_cast<mi::Uint32>(cell_point_ids[2]),
+      static_cast<mi::Uint32>(cell_point_ids[3]) };
+
+    memcpy(shm_offset, cur_cell_index, size_elm);
+    shm_offset += size_elm;
+  }
 
   // scalars
   size_elm = scalar_size * ivol_data->num_points;
@@ -487,8 +512,8 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(
 void vtknvindex_regular_volume_properties::print_info() const
 {
   INFO_LOG << "Scalar type: " << m_scalar_type;
-  INFO_LOG << "Volume bbox: " << m_volume_extents;
-  INFO_LOG << "Volume size: " << m_volume_size;
+  INFO_LOG << "Volume bbox: " << m_ivol_volume_extents;
+  INFO_LOG << "Volume size: " << m_ivol_volume_extents.max - m_ivol_volume_extents.min;
   INFO_LOG << "Voxel range: " << m_voxel_range;
   INFO_LOG << "Time series: " << ((m_is_timeseries_data) ? "Yes" : "No");
 }

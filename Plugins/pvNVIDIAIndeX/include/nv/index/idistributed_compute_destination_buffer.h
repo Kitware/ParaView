@@ -1,5 +1,5 @@
 /******************************************************************************
-* Copyright 2018 NVIDIA Corporation. All rights reserved.
+* Copyright 2019 NVIDIA Corporation. All rights reserved.
 *****************************************************************************/
 /// \file
 /// \brief Asynchronous texture generation for use with shapes.
@@ -356,7 +356,7 @@ public:
   ///
   /// \return     An interface pointer to an instance of \c ISparse_volume_subset_P9.
   ///
-  virtual ISparse_volume_subset* get_volume_data_subset() = 0;
+  virtual ISparse_volume_subset* get_distributed_data_subset() = 0;
 };
 
 /// @ingroup nv_index_data_computing

@@ -1,4 +1,4 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -42,10 +42,13 @@
 #include "vtknvindex_utilities.h"
 
 //-------------------------------------------------------------------------------------------------
-vtknvindex_colormap::vtknvindex_colormap()
+vtknvindex_colormap::vtknvindex_colormap(
+  const mi::neuraylib::Tag& volume_colormap_tag, const mi::neuraylib::Tag& slice_colormap_tag)
   : m_changed(false)
   , m_color_mtime(0)
   , m_opacity_mtime(0)
+  , m_volume_colormap_tag(volume_colormap_tag)
+  , m_slice_colormap_tag(slice_colormap_tag)
 {
   // empty
 }
@@ -169,7 +172,7 @@ void vtknvindex_colormap::get_paraview_colormap(vtkVolume* vol,
 void vtknvindex_colormap::get_paraview_colormaps(vtkVolume* vol,
   vtknvindex_regular_volume_properties* regular_volume_properties,
   mi::base::Handle<nv::index::IColormap>& volume_colormap,
-  std::vector<mi::base::Handle<nv::index::IColormap> >& slice_colormaps)
+  mi::base::Handle<nv::index::IColormap>& slice_colormap)
 {
   vtkColorTransferFunction* app_color_transfer_function =
     vol->GetProperty()->GetRGBTransferFunction(0);
@@ -256,53 +259,16 @@ void vtknvindex_colormap::get_paraview_colormaps(vtkVolume* vol,
       colormap_entry[idx].a = 1.f;
   }
 
-  for (mi::Uint32 i = 0; i < slice_colormaps.size(); i++)
-  {
-    slice_colormaps[i]->set_domain_boundary_mode(nv::index::IColormap::CLAMP_TO_EDGE);
-    slice_colormaps[i]->set_domain(domain_range.x, domain_range.y);
-    slice_colormaps[i]->set_colormap(&(colormap_entry[0]), array_size);
-  }
+  slice_colormap->set_domain_boundary_mode(nv::index::IColormap::CLAMP_TO_EDGE);
+  slice_colormap->set_domain(domain_range.x, domain_range.y);
+  slice_colormap->set_colormap(&(colormap_entry[0]), array_size);
 
   m_color_mtime = app_color_transfer_function->GetMTime();
   m_opacity_mtime = app_opacity_transfer_function->GetMTime();
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_colormap::create_scene_colormaps(vtkVolume* vol,
-  mi::neuraylib::Tag& volume_colormap_tag, std::vector<mi::neuraylib::Tag>& slices_colormap_tags,
-  const nv::index::IScene* scene, vtknvindex_regular_volume_properties* regular_volume_properties,
-  const mi::base::Handle<mi::neuraylib::IDice_transaction>& dice_transaction)
-{
-  assert(dice_transaction.is_valid_interface());
-
-  mi::base::Handle<nv::index::IColormap> volume_colormap(
-    scene->create_attribute<nv::index::IColormap>());
-
-  mi::Size nb_slice_colormaps = slices_colormap_tags.size();
-  std::vector<mi::base::Handle<nv::index::IColormap> > slice_colormaps;
-  slice_colormaps.resize(nb_slice_colormaps);
-
-  for (mi::Uint32 i = 0; i < nb_slice_colormaps; i++)
-    slice_colormaps[i] = scene->create_attribute<nv::index::IColormap>();
-
-  get_paraview_colormaps(vol, regular_volume_properties, volume_colormap, slice_colormaps);
-
-  volume_colormap_tag = dice_transaction->store_for_reference_counting(
-    volume_colormap.get(), mi::neuraylib::NULL_TAG, "volume_colormap");
-  assert(volume_colormap_tag.is_valid());
-
-  for (mi::Uint32 i = 0; i < nb_slice_colormaps; i++)
-  {
-    slices_colormap_tags[i] = dice_transaction->store_for_reference_counting(
-      slice_colormaps[i].get(), mi::neuraylib::NULL_TAG, "slice_colormap");
-    assert(slices_colormap_tags[i].is_valid());
-  }
-}
-
-//-------------------------------------------------------------------------------------------------
 void vtknvindex_colormap::update_scene_colormaps(vtkVolume* vol,
-  const mi::neuraylib::Tag& volume_colormap_tag,
-  const std::vector<mi::neuraylib::Tag>& slices_colormap_tags,
   const mi::base::Handle<mi::neuraylib::IDice_transaction>& dice_transaction,
   vtknvindex_regular_volume_properties* regular_volume_properties)
 {
@@ -322,18 +288,15 @@ void vtknvindex_colormap::update_scene_colormaps(vtkVolume* vol,
   assert(dice_transaction.is_valid_interface());
 
   // Update the existing colormap.
-  mi::base::Handle<nv::index::IColormap> colormap(
-    dice_transaction->edit<nv::index::IColormap>(volume_colormap_tag));
-  assert(colormap.is_valid_interface());
+  mi::base::Handle<nv::index::IColormap> volume_colormap(
+    dice_transaction->edit<nv::index::IColormap>(m_volume_colormap_tag));
+  assert(volume_colormap.is_valid_interface());
 
-  mi::Size nb_slice_colormaps = slices_colormap_tags.size();
-  std::vector<mi::base::Handle<nv::index::IColormap> > slice_colormaps;
-  slice_colormaps.resize(nb_slice_colormaps);
+  mi::base::Handle<nv::index::IColormap> slice_colormap(
+    dice_transaction->edit<nv::index::IColormap>(m_slice_colormap_tag));
+  assert(slice_colormap.is_valid_interface());
 
-  for (mi::Uint32 i = 0; i < nb_slice_colormaps; i++)
-    slice_colormaps[i] = dice_transaction->edit<nv::index::IColormap>(slices_colormap_tags[i]);
-
-  get_paraview_colormaps(vol, regular_volume_properties, colormap, slice_colormaps);
+  get_paraview_colormaps(vol, regular_volume_properties, volume_colormap, slice_colormap);
 
   // Dump colormap into the console, copy/paste directly into.
   // dump_colormap(colormap);

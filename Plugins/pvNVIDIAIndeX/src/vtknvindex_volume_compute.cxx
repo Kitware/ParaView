@@ -1,4 +1,4 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -30,7 +30,6 @@
 #include "vtknvindex_forwarding_logger.h"
 #include "vtknvindex_sparse_volume_importer.h"
 #include "vtknvindex_utilities.h"
-#include "vtknvindex_volume_importer.h"
 
 inline mi::Sint32 volume_format_size(const nv::index::Sparse_volume_voxel_format fmt)
 {
@@ -81,8 +80,6 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
   mi::Sint32 rankid = controller ? controller->GetLocalProcessId() : 0;
 
-#ifdef USE_SPARSE_VOLUME
-
   static const std::string LOG_prefix = "Sparse volume compute technique: ";
 
   using namespace nv::index;
@@ -102,7 +99,7 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
   }
 
   mi::base::Handle<ISparse_volume_subset> svol_data_subset(
-    svol_dst_buffer->get_volume_data_subset());
+    svol_dst_buffer->get_distributed_data_subset());
 
   if (!svol_data_subset.is_valid_interface())
   {
@@ -208,268 +205,6 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
     // free memory space linked to shared memory
     vtknvindex::util::unmap_shm(subdivision_ptr, shmsize);
   }
-
-#else // USE_SPARSE_VOLUME
-
-  using nv::index::IDistributed_compute_destination_buffer_3d_volume;
-
-  // retrieve d texture buffer destination buffer interface
-  const mi::base::Handle<IDistributed_compute_destination_buffer_3d_volume> dst_buffer_3d(
-    dst_buffer->get_interface<IDistributed_compute_destination_buffer_3d_volume>());
-
-  if (!dst_buffer_3d)
-  {
-    ERROR_LOG << "Volume compute : "
-              << "Unable to retrieve valid 3d volume destination buffer interface.";
-    return;
-  }
-
-  const mi::math::Bbox<mi::Sint32, 3> bounds = dst_buffer_3d->get_clipped_volume_brick_bbox();
-  mi::Sint64 dx = bounds.max.x - bounds.min.x;
-  mi::Sint64 dy = bounds.max.y - bounds.min.y;
-  mi::Sint64 dz = bounds.max.z - bounds.min.z;
-  const mi::Size brick_size = dx * dy * dz;
-
-  // Calculate bounds without the border.
-  // Because VTK bbox written into the shared memory has no border.
-  mi::math::Bbox<mi::Float32, 3> bounds_no_border;
-  bounds_no_border.min.x = bounds.min.x + m_border_size;
-  bounds_no_border.min.y = bounds.min.y + m_border_size;
-  bounds_no_border.min.z = bounds.min.z + m_border_size;
-  bounds_no_border.max.x = bounds.max.x - m_border_size;
-  bounds_no_border.max.y = bounds.max.y - m_border_size;
-  bounds_no_border.max.z = bounds.max.z - m_border_size;
-
-  // Fetch shared memory details from host properties
-  std::string shm_memory_name;
-  mi::math::Bbox<mi::Float32, 3> shmbbox_flt;
-  mi::math::Bbox<mi::Sint32, 3> shmbbox;
-  mi::Uint64 shmsize = 0;
-  void* pv_subdivision_ptr = NULL;
-
-  if (!m_cluster_properties->get_host_properties(rankid)->get_shminfo(
-        bounds_no_border, shm_memory_name, shmbbox_flt, shmsize, &pv_subdivision_ptr, 0))
-  {
-    ERROR_LOG << "Failed to get shared memory information in regular volume importer for rank: "
-              << rankid << ".";
-    return;
-  }
-
-  shmbbox.min.x = static_cast<mi::Sint32>(shmbbox_flt.min.x);
-  shmbbox.min.y = static_cast<mi::Sint32>(shmbbox_flt.min.y);
-  shmbbox.min.z = static_cast<mi::Sint32>(shmbbox_flt.min.z);
-  shmbbox.max.x = static_cast<mi::Sint32>(shmbbox_flt.max.x);
-  shmbbox.max.y = static_cast<mi::Sint32>(shmbbox_flt.max.y);
-  shmbbox.max.z = static_cast<mi::Sint32>(shmbbox_flt.max.z);
-
-  if (shm_memory_name.empty() || shmbbox.empty())
-  {
-    ERROR_LOG << "Failed to open shared memory shmname: " << shm_memory_name
-              << " with bbox: " << shmbbox << ".";
-    return;
-  }
-
-  INFO_LOG << "Using shared memory: " << shm_memory_name << " box " << shmbbox
-           << " from rank: " << rankid << ".";
-  INFO_LOG << "Bounding box requested by NVIDIA IndeX: " << bounds
-           << " size: " << mi::math::Vector<mi::Sint32, 3>(dx, dy, dz) << ".";
-
-  nv::index::IDistributed_data_subset* data_subset_ret = 0;
-
-  // get volume data from shared memory for this bounding_box
-  if (m_scalar_type == "unsigned char")
-  {
-    mi::Uint8* shmem_volume = pv_subdivision_ptr
-      ? reinterpret_cast<mi::Uint8*>(pv_subdivision_ptr)
-      : vtknvindex::util::get_vol_shm<mi::Uint8>(shm_memory_name, shmsize);
-
-    using nv::index::IDistributed_compute_destination_buffer_3d_volume_uint8;
-    const mi::base::Handle<IDistributed_compute_destination_buffer_3d_volume_uint8>
-      dst_buffer_3d_uint8(
-        dst_buffer_3d->get_interface<IDistributed_compute_destination_buffer_3d_volume_uint8>());
-
-    if (!dst_buffer_3d_uint8)
-    {
-      ERROR_LOG << "Volume compute: "
-                << "Unable to retrieve valid uint8 volume destination buffer interface.";
-      return;
-    }
-
-    mi::Uint8* brick_array = new mi::Uint8[brick_size];
-
-    if (!brick_array)
-    {
-      ERROR_LOG << "Unable to create a volume brick : " << m_scalar_type << ".";
-    }
-    else
-    {
-      // Allocate voxel data storage via volume_brick.
-
-      if (resolve_voxel_type<mi::Uint8>(shmem_volume, brick_array, bounds, shmbbox,
-            dice_transaction, pv_subdivision_ptr != NULL))
-      {
-        m_cluster_properties->get_host_properties(rankid)->mark_shm_used(
-          shm_memory_name, shmem_volume, shmsize);
-      }
-
-      dst_buffer_3d_uint8->write(bounds, brick_array, -1);
-
-      delete[] brick_array;
-    }
-
-    // free memory space linked to shared memory
-    vtknvindex::util::unmap_shm(shmem_volume, shmsize);
-  }
-  else if (m_scalar_type == "unsigned short")
-  {
-    mi::Uint16* shmem_volume = pv_subdivision_ptr
-      ? reinterpret_cast<mi::Uint16*>(pv_subdivision_ptr)
-      : vtknvindex::util::get_vol_shm<mi::Uint16>(shm_memory_name, shmsize);
-
-    using nv::index::IDistributed_compute_destination_buffer_3d_volume_uint16;
-    const mi::base::Handle<IDistributed_compute_destination_buffer_3d_volume_uint16>
-      dst_buffer_3d_uint16(
-        dst_buffer_3d->get_interface<IDistributed_compute_destination_buffer_3d_volume_uint16>());
-
-    if (!dst_buffer_3d_uint16)
-    {
-      ERROR_LOG << "Volume compute: "
-                << "Unable to retrieve valid uint16 volume destination buffer interface.";
-      return;
-    }
-
-    mi::Uint16* brick_array = new mi::Uint16[brick_size];
-
-    if (!brick_array)
-    {
-      ERROR_LOG << "Unable to create a volume brick : " << m_scalar_type << ".";
-    }
-    else
-    {
-      // Allocate voxel data storage via volume_brick.
-
-      if (resolve_voxel_type<mi::Uint16>(shmem_volume, brick_array, bounds, shmbbox,
-            dice_transaction, pv_subdivision_ptr != NULL))
-      {
-        m_cluster_properties->get_host_properties(rankid)->mark_shm_used(
-          shm_memory_name, shmem_volume, shmsize);
-      }
-
-      dst_buffer_3d_uint16->write(bounds, brick_array, -1);
-
-      delete[] brick_array;
-    }
-
-    // free memory space linked to shared memory
-    vtknvindex::util::unmap_shm(shmem_volume, shmsize);
-  }
-  else if (m_scalar_type == "float")
-  {
-    mi::Float32* shmem_volume = pv_subdivision_ptr
-      ? reinterpret_cast<mi::Float32*>(pv_subdivision_ptr)
-      : vtknvindex::util::get_vol_shm<mi::Float32>(shm_memory_name, shmsize);
-
-    using nv::index::IDistributed_compute_destination_buffer_3d_volume_float32;
-    const mi::base::Handle<IDistributed_compute_destination_buffer_3d_volume_float32>
-      dst_buffer_float(
-        dst_buffer_3d->get_interface<IDistributed_compute_destination_buffer_3d_volume_float32>());
-
-    if (!dst_buffer_float)
-    {
-      ERROR_LOG << "Volume compute: "
-                << "Unable to retrieve valid float volume destination buffer interface.";
-      return;
-    }
-
-    mi::Float32* brick_array = new mi::Float32[brick_size];
-
-    if (!brick_array)
-    {
-      ERROR_LOG << "Unable to create a volume brick : " << m_scalar_type << ".";
-    }
-    else
-    {
-      // Allocate voxel data storage via volume_brick.
-
-      if (resolve_voxel_type<mi::Float32>(shmem_volume, brick_array, bounds, shmbbox,
-            dice_transaction, pv_subdivision_ptr != NULL))
-      {
-        m_cluster_properties->get_host_properties(rankid)->mark_shm_used(
-          shm_memory_name, shmem_volume, shmsize);
-      }
-
-      dst_buffer_float->write(bounds, brick_array, -1);
-
-      delete[] brick_array;
-    }
-
-    // free memory space linked to shared memory
-    vtknvindex::util::unmap_shm(shmem_volume, shmsize);
-  }
-  else if (m_scalar_type == "double")
-  {
-    mi::Float64* shmem_volume = pv_subdivision_ptr
-      ? reinterpret_cast<mi::Float64*>(pv_subdivision_ptr)
-      : vtknvindex::util::get_vol_shm<mi::Float64>(shm_memory_name, shmsize);
-
-    mi::Uint64 nb_scalars = shmsize / sizeof(mi::Float64);
-
-    mi::Float32* shmem_volume_flt = new mi::Float32[nb_scalars];
-    if (!shmem_volume_flt)
-    {
-      ERROR_LOG << "Unable to create conversion buffer.";
-      return;
-    }
-
-    for (mi::Uint64 i = 0; i < nb_scalars; ++i)
-      shmem_volume_flt[i] = static_cast<mi::Float32>(shmem_volume[i]);
-
-    using nv::index::IDistributed_compute_destination_buffer_3d_volume_float32;
-    const mi::base::Handle<IDistributed_compute_destination_buffer_3d_volume_float32>
-      dst_buffer_float(
-        dst_buffer_3d->get_interface<IDistributed_compute_destination_buffer_3d_volume_float32>());
-
-    if (!dst_buffer_float)
-    {
-      ERROR_LOG << "Volume compute: "
-                << "Unable to retrieve valid float volume destination buffer interface.";
-      return;
-    }
-
-    mi::Float32* brick_array = new mi::Float32[brick_size];
-
-    if (!brick_array)
-    {
-      ERROR_LOG << "Unable to create a volume brick : " << m_scalar_type << ".";
-    }
-    else
-    {
-      // Allocate voxel data storage via volume_brick.
-
-      if (resolve_voxel_type<mi::Float32>(shmem_volume_flt, brick_array, bounds, shmbbox,
-            dice_transaction, pv_subdivision_ptr != NULL))
-      {
-        m_cluster_properties->get_host_properties(rankid)->mark_shm_used(
-          shm_memory_name, shmem_volume, shmsize);
-      }
-
-      dst_buffer_float->write(bounds, brick_array, -1);
-
-      delete[] brick_array;
-    }
-
-    delete[] shmem_volume_flt;
-
-    // free memory space linked to shared memory
-    vtknvindex::util::unmap_shm(shmem_volume, shmsize);
-  }
-  else
-  {
-    // It will fail in the Representation class as well
-    ERROR_LOG << "Volume scalar type are not supported by NVIDIA IndeX.";
-  }
-
-#endif // USE_SPARSE_VOLUME
 }
 
 //-------------------------------------------------------------------------------------------------

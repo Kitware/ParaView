@@ -1,9 +1,8 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-// ****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file
 /// \brief Video plugin API
-// ****************************************************************************
 
 #ifndef MI_NEURAYLIB_IVIDEO_PLUGIN_H
 #define MI_NEURAYLIB_IVIDEO_PLUGIN_H
@@ -28,7 +27,7 @@ class IPlugin_api;
 */
 
 /// Type of video encoder plugins
-#define MI_NEURAY_VIDEO_PLUGIN_TYPE "video v16"
+#define MI_NEURAY_VIDEO_PLUGIN_TYPE "video v21"
 
 /// A buffer for video data representing a frame.
 class IVideo_data : public mi::base::Interface_declare<0xbdd686fa, 0x3e37, 0x43aa, 0xbd, 0xe6, 0x7b,

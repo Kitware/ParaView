@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Setting that configure NVIDIA IndeX's rendering and computing.
@@ -77,7 +77,9 @@ public:
     COMPOSITING_LOCAL_ONLY = 1,
     /// Perform compositing on all cluster machines except the local (viewer or head) cluster
     /// machine.
-    COMPOSITING_REMOTE_ONLY = 2
+    COMPOSITING_REMOTE_ONLY = 2,
+    /// Disable compositing for performance testing.
+    NO_COMPOSITING = 3
   };
 
   /// The heightfield vertex normal calculation mode.
@@ -170,6 +172,14 @@ public:
     mi::Uint32 brick_shared_border_size;
   };
 
+  /// Configuration settings for corner-point grid scene elements.
+  struct Corner_point_grid_config
+  {
+    /// Controls the dimensions of corner-point grid layer tiles and therefore the granularity of
+    /// the corner-point grid renderer for empty-space leaping.
+    mi::math::Vector_struct<mi::Uint32, 2> tile_dimensions;
+  };
+
   /// Configuration settings for tiled/level-of-detail height-field scene elements.
   struct Height_field_lod_config
   {
@@ -206,6 +216,21 @@ public:
   /// \return The current sparse volume renderer configuration (c.f., \c Sparse_volume_config).
   ///
   virtual const Sparse_volume_config& get_sparse_volume_configuration() const = 0;
+
+  /// Sets the corner-point grid renderer configuration.
+  ///
+  /// \param[in]  cpg_config      The new corner-point grid configuration.
+  ///
+  /// \return    Return \c true if the configuration succeeded, false otherwise.
+  ///
+  virtual bool set_corner_point_grid_configuration(const Corner_point_grid_config& cpg_config) = 0;
+
+  /// Returns the current corner-point grid renderer configuration.
+  ///
+  /// \return The current corner-point grid renderer configuration (c.f., \c
+  /// Corner_point_grid_config).
+  ///
+  virtual const Corner_point_grid_config& get_corner_point_grid_configuration() const = 0;
 
   /// Sets the level-of-detail height-field renderer configuration.
   ///
@@ -605,64 +630,6 @@ public:
   ///
   virtual void set_step_size_max(mi::Float32 max_step_size) = 0;
 
-  /// Returns the minimum number of samples per pixel for geometry rendering.
-  ///
-  /// \deprecated Only applies to certain geometry primitives, use the full
-  /// screen antialiasing provided by set_rendering_samples() instead.
-  ///
-  /// \return minimum number of samples
-  virtual mi::Uint32 get_geometry_samples_min() const = 0;
-
-  /// Set the minimum number of samples per pixel for geometry rendering.
-  /// Using different values for minimum and maximum enables adaptive supersampling, using the
-  /// same value always uses the given number of samples. (default: 1)
-  ///
-  /// \deprecated Only applies to certain geometry primitives, use the full
-  /// screen antialiasing provided by set_rendering_samples() instead.
-  ///
-  /// \param[in] samples The minimum number of samples to be used for each pixel when rendering
-  ///                    geometry.
-  virtual void set_geometry_samples_min(mi::Uint32 samples) = 0;
-
-  /// Returns the maximum number of samples per pixel for geometry rendering.
-  ///
-  /// \deprecated Only applies to certain geometry primitives, use the full
-  /// screen antialiasing provided by set_rendering_samples() instead.
-  ///
-  /// \return maximum number of samples
-  virtual mi::Uint32 get_geometry_samples_max() const = 0;
-
-  /// Set the maximum number of samples per pixel for geometry rendering.
-  /// Using different values for minimum and maximum enables adaptive supersampling, using the
-  /// same value always uses the given number of samples. (default: 1)
-  ///
-  /// \deprecated Only applies to certain geometry primitives, use the full
-  /// screen antialiasing provided by set_rendering_samples() instead.
-  ///
-  /// \param[in] samples The maximum number of samples to be used for each pixel when rendering
-  ///                    geometry.
-  virtual void set_geometry_samples_max(mi::Uint32 samples) = 0;
-
-  /// Returns the maximum error per supersampled pixel for geometry rendering.
-  ///
-  /// \deprecated Only applies to certain geometry primitives, use the full
-  /// screen antialiasing provided by set_rendering_samples() instead.
-  ///
-  /// \return maximum error
-  virtual mi::Float32 get_geometry_samples_error() const = 0;
-
-  /// Set the maximum error per supersampled pixel for geometry rendering.
-  /// When the error is below this threshold, supersampling may terminate early. When the minimum
-  /// and maximum number of samples per pixels are the same, then this setting has no effect.
-  /// (default: 0)
-  ///
-  /// \deprecated Only applies to certain geometry primitives, use the full
-  /// screen antialiasing provided by set_rendering_samples() instead.
-  ///
-  /// \param[in] error Maximum allowed error.
-  ///
-  virtual void set_geometry_samples_error(mi::Float32 error) = 0;
-
   /// Returns the number of samples per pixel used during rendering.
   /// \returns current number samples.
   virtual mi::Uint32 get_rendering_samples() const = 0;
@@ -670,12 +637,6 @@ public:
   /// Set the number of samples per pixel used during rendering.
   /// Using a sample value of 1 or less effectively disables the full screen antialiasing.
   /// (default: 1)
-  ///
-  /// \note This rendering samples facility represents a general supersampling solution which
-  ///       will eventually replace the geometry supersampling solution entirely. Currently,
-  ///       it is still possible to use the geometry supersampling solution, which only applies
-  ///       to certain primitives in the scene. The state of this general supersampling solution
-  ///       takes precedence over the geometry supersampling solution.
   ///
   /// \param[in] samples The number of samples to be used for each pixel when rendering the scene.
   ///

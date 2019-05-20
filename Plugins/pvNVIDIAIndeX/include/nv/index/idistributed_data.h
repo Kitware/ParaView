@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface class representing NVIDIA IndeX's distributed datasets.
@@ -58,7 +58,7 @@ public:
   /// importer calls.
   ///
   /// \return     The clip region of the dataset defined in its local
-  ////            coordinate system.
+  ///            coordinate system.
   ///
   virtual void set_clip_region(const mi::math::Bbox_struct<mi::Float32, 3>&){};
 
@@ -66,7 +66,7 @@ public:
   /// rendering or computing can be restricted by a clip region.
   ///
   /// \return     The clip region of the dataset in its local
-  ////            coordinate system.
+  ///            coordinate system.
   ///
   virtual mi::math::Bbox_struct<mi::Float32, 3> get_clip_region() const
   {

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene attribute representing user programmable rendering kernel
@@ -47,6 +47,23 @@ class IRendering_kernel_program
       0xe4, 0x83, 0x7d, nv::index::IAttribute>
 {
 public:
+  struct Program_options
+  {
+    mi::Sint32 max_registers; ///< Define the maximum number of registers to use for the program.
+                              ///< Special values:  0 - use NVIDIA IndeX internal limit
+                              ///<                 -1 - no limit, let CUDA decide the register count
+                              ///< (default value: 0)
+    mi::math::Vector_struct<mi::Uint32, 2>
+      block_size;           ///< Define the execution block size of the rendering kernel using
+                            ///< the program.
+                            ///< Special values: (0, 0) - let NVIDIA IndeX decide
+                            ///< the block size)
+                            ///< (default value: (0, 0))
+    mi::Uint32 debug_flags; ///< Internal debug options.
+                            ///< (default value: 0)
+  };
+
+public:
   /// Sets the source code for the rendering kernel program.
   ///
   /// \param[in] prog_src     String containing the program source code.
@@ -58,6 +75,18 @@ public:
   /// \return String containing the program source code.
   ///
   virtual const char* get_program_source() const = 0;
+
+  /// Sets the program options for the rendering kernel program.
+  ///
+  /// \param[in] prog_options Program options to set for the kernel program.
+  ///
+  virtual void set_program_options(const Program_options& prog_options) = 0;
+
+  /// Returns the program options of the rendering kernel program.
+  ///
+  /// \return The currently set program options.
+  ///
+  virtual const Program_options& get_program_options() const = 0;
 };
 
 /// @ingroup nv_index_scene_description_attribute

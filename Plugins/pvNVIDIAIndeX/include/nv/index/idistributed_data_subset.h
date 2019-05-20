@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Distributed subset of a large-scale dataset.
@@ -32,7 +32,7 @@ class IDistributed_data_subset_data_descriptor
       0xaa, 0xc8>
 {
 public:
-  /// Returns wheather the data-subset data descriptor is valid or not.
+  /// Returns whether the data-subset data descriptor is valid or not.
   ///
   virtual bool is_valid() const = 0;
 

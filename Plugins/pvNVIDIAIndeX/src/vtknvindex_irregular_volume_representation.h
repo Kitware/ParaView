@@ -1,4 +1,4 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -30,12 +30,11 @@
 
 #include <mi/math/bbox.h>
 
+#include "vtkIndeXRepresentationsModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVDataRepresentation.h"
 
 #include "vtknvindex_rtc_kernel_params.h"
-
-#include "vtkIndeXRepresentationsModule.h"
 
 //#if PARAVIEW_VERSION_MAJOR == 5 && PARAVIEW_VERSION_MINOR >= 2
 #define PARAVIEW_UGRID_USE_PARTITIONS
