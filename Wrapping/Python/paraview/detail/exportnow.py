@@ -222,8 +222,25 @@ def ExportNow(root_directory,
                     fnamefilled = root_directory+fname+padded_tstep
                 else:
                     fnamefilled = root_directory+fname.replace("%t", padded_tstep)
+
+                DataMode = wp.GetProperty("DataMode")
+                if DataMode is not None:
+                    DataMode = wp.GetProperty("DataMode").GetElement(0)
+                HeaderType = wp.GetProperty("HeaderType")
+                if HeaderType is not None:
+                    HeaderType = wp.GetProperty("HeaderType").GetElement(0)
+                EncodeAppendedData=wp.GetProperty("EncodeAppendedData")
+                if EncodeAppendedData is not None:
+                    EncodeAppendedData = wp.GetProperty("EncodeAppendedData").GetElement(0)
+                CompressorType = wp.GetProperty("CompressorType")
+                if CompressorType is not None:
+                    CompressorType = wp.GetProperty("CompressorType").GetElement(0)
+                CompressionLevel = wp.GetProperty("CompressionLevel")
+                if CompressionLevel is not None:
+                    CompressionLevel = wp.GetProperty("CompressionLevel").GetElement(0)
+
                 # finally after all of the finageling above, save the data
-                SaveData(fnamefilled, inputproxy)
+                SaveData(fnamefilled, inputproxy, DataMode=DataMode, HeaderType=HeaderType, EncodeAppendedData=EncodeAppendedData, CompressorType=CompressorType, CompressionLevel=CompressionLevel)
                 # don't forget to tell cinema D about it
                 CIND.AppendToCinemaDTable(tnow, "writer_%s" % writercnt, fnamefilled)
             wp = ed.GetNextWriterProxy()
