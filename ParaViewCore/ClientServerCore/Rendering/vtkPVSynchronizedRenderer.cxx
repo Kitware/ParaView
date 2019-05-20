@@ -143,13 +143,20 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
           isr->SetTileMullions(tile_mullions[0], tile_mullions[1]);
           this->ParallelSynchronizer = isr;
         }
-        else
-#else
-        {
-          this->ParallelSynchronizer = vtkCompositedSynchronizedRenderers::New();
-        }
 #endif
-          this->ParallelSynchronizer->SetParallelController(pm->GetGlobalController());
+        if (this->ParallelSynchronizer == nullptr)
+        {
+          if (pm->GetNumberOfLocalPartitions() > 1)
+          {
+            this->ParallelSynchronizer = vtkCompositedSynchronizedRenderers::New();
+          }
+          else
+          {
+            this->ParallelSynchronizer = vtkSynchronizedRenderers::New();
+          }
+        }
+
+        this->ParallelSynchronizer->SetParallelController(pm->GetGlobalController());
         this->ParallelSynchronizer->SetRootProcessId(0);
         if (in_tile_display_mode)
         {

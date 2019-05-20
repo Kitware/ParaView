@@ -111,8 +111,8 @@ void vtknvindex_opengl_canvas::prepare()
 
   if (ostate)
   {
-    ostate->ResetGlBlendFuncState();
-    ostate->ResetGlDepthMaskState();
+    ostate->ResetGLBlendFuncState();
+    ostate->ResetGLDepthMaskState();
     ostate->ResetEnumState(GL_DEPTH_TEST);
   }
 #endif
