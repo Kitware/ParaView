@@ -51,6 +51,13 @@ function(build_adaptor name languages)
       -DCMAKE_${lang}_FLAGS:STRING=${CMAKE_${lang}_FLAGS})
   endforeach ()
 
+  #build-and-test source dir is buggy so we'll ensure it is known
+  set(_source_dir_arg "-S")
+  if(${CMAKE_VERSION} VERSION_LESS "3.13.0")
+    #for older cmake, we have to use an undocumented flag to do this
+    set(_source_dir_arg "-H")
+  endif()
+
   #This generated file ensures that the adaptor's CMakeCache ends up with
   #the same CMAKE_PREFIX_PATH that ParaView's does, even if that has multiple
   #paths in it. It is necessary because ctest's argument parsing in the
@@ -88,6 +95,7 @@ set(CMAKE_PREFIX_PATH \"${CMAKE_PREFIX_PATH}\" CACHE STRING \"\")
                             ${language_options}
                             ${extra_params}
                             --no-warn-unused-cli
+                           "${_source_dir_arg}${SOURCE_DIR}/${name}"
     COMMAND ${CMAKE_COMMAND}
             -E touch "${BINARY_DIR}/${lname}.done"
 
