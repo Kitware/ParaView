@@ -478,7 +478,7 @@ class CoProcessor(object):
                     print("Ensight 'Set string' input is '", writer.FileName, ".*."+str(nump)+ \
                           ".<"+str(nump)+":%0."+str(len(str(nump-1)))+"d>'", sep="")
 
-    def RegisterWriter(self, writer, filename, freq, paddingamount=0):
+    def RegisterWriter(self, writer, filename, freq, paddingamount=0, **params):
         """Registers a writer proxy. This method is generally used in
            CreatePipeline() to register writers. All writes created as such will
            write the output files appropriately in WriteData() is called."""
@@ -487,6 +487,12 @@ class CoProcessor(object):
 
         writer.FileName = filename
         writer.add_attribute("parameters", writerParametersProxy)
+        for p in params:
+            v = params[p]
+            if writer.GetProperty(p) is not None:
+                wp = writer.GetProperty(p)
+                wp.SetData(v)
+
 
         self.__WritersList.append(writer)
 

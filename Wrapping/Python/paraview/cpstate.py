@@ -374,7 +374,21 @@ class NewStyleWriters(object):
             padding_amount = globalepxy.GetProperty("FileNamePadding").GetElement(0)
             write_frequency = pxy.GetProperty("WriteFrequency").GetElement(0)
             filename = pxy.GetProperty("CatalystFilePattern").GetElement(0)
-
+            DataMode = pxy.GetProperty("DataMode")
+            if DataMode is not None:
+                DataMode = pxy.GetProperty("DataMode").GetElement(0)
+            HeaderType = pxy.GetProperty("HeaderType")
+            if HeaderType is not None:
+                HeaderType = pxy.GetProperty("HeaderType").GetElement(0)
+            EncodeAppendedData=pxy.GetProperty("EncodeAppendedData")
+            if EncodeAppendedData is not None:
+                EncodeAppendedData = pxy.GetProperty("EncodeAppendedData").GetElement(0)!=0
+            CompressorType = pxy.GetProperty("CompressorType")
+            if CompressorType is not None:
+                CompressorType = pxy.GetProperty("CompressorType").GetElement(0)
+            CompressionLevel = pxy.GetProperty("CompressionLevel")
+            if CompressionLevel is not None:
+                CompressionLevel = pxy.GetProperty("CompressionLevel").GetElement(0)
 
             sim_inputs = locate_simulation_inputs(pxy)
             for sim_input_name in sim_inputs:
@@ -396,8 +410,8 @@ class NewStyleWriters(object):
                 f = "STP.RegisterWriter(%s, '%s', tp_writers)" % (
                     varname, filename)
             else:
-                f = "coprocessor.RegisterWriter(%s, filename='%s', freq=%s, paddingamount=%s)" % (
-                    varname, filename, write_frequency, padding_amount)
+                f = "coprocessor.RegisterWriter(%s, filename='%s', freq=%s, paddingamount=%s, DataMode='%s', HeaderType='%s', EncodeAppendedData=%s, CompressorType='%s', CompressionLevel='%s')" % (
+                    varname, filename, write_frequency, padding_amount, DataMode, HeaderType, EncodeAppendedData, CompressorType, CompressionLevel)
             res.append(f)
             res.append("")
         if len(res) == 2:
