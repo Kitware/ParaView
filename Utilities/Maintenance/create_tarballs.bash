@@ -151,7 +151,7 @@ index_data_objects () {
         obj="$( git hash-object -t blob -w "$file" )"
         case "$userealpath" in
           "inplace")
-              echo "100644 blob $obj	$realpath"
+              echo "100644 blob $obj	${realpath%.sha512}"
               ;;
           "extdata")
               echo "100644 blob $obj	$path"
