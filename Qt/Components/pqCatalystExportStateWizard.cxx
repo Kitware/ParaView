@@ -146,7 +146,7 @@ bool pqCatalystExportStateWizard::getCommandString(QString& command)
   else if (this->Internals->outputRendering->isChecked())
   {
     // Format as defined in cpstate.py
-    QString format("'%1' : ['%2', %3, '%4', '%5', '%6', '%7', '%8']");
+    QString format("'%1' : ['%2', %3, '%4', '%5', '%6', '%7', '%8', -1]");
     rendering_info = this->Internals->wViewSelection->getSelectionAsString(format);
   }
 

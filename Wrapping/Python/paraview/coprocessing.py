@@ -356,7 +356,7 @@ class CoProcessor(object):
                         # let simple.SaveScreenshot pick a default.
                         quality = None
 
-                    if fname.endswith('png') and view.cpCompression is not None :
+                    if fname.endswith('png') and view.cpCompression is not None and view.cpCompression != -1 :
                         simple.SaveScreenshot(fname, view,
                             CompressionLevel=view.cpCompression)
                     else:
