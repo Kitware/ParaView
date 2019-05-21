@@ -32,6 +32,7 @@
 #ifndef vtkSMViewProxy_h
 #define vtkSMViewProxy_h
 
+#include "vtkCommand.h"                        // needed for vtkCommand.
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMProxy.h"
 
@@ -246,6 +247,15 @@ public:
    * Helper method to locate a view to which the representation has been added.
    */
   static vtkSMViewProxy* FindView(vtkSMProxy* repr, const char* reggroup = "views");
+
+  enum
+  {
+    /**
+     * Fired in `IsContextReadyForRendering` if the context is not already ready
+     * for rendering.
+     */
+    PrepareContextForRendering = vtkCommand::UserEvent + 1,
+  };
 
 protected:
   vtkSMViewProxy();
