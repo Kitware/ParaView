@@ -45,7 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // #define PV_DEBUG_STREAMING
 #include "vtkPVStreamingMacros.h"
 
-static const int PQ_STREAMING_INTERVAL = 1000;
+static const int PQ_STREAMING_LONG_INTERVAL = 1000;
+static const int PQ_STREAMING_SHORT_INTERVAL = 0;
 
 //-----------------------------------------------------------------------------
 pqViewStreamingBehavior::pqViewStreamingBehavior(QObject* parentObject)
@@ -96,7 +97,7 @@ void pqViewStreamingBehavior::onViewUpdated(vtkObject* vtkNotUsed(caller), unsig
     this->Pass = 0;
     if (!this->DisableAutomaticUpdates)
     {
-      this->Timer.start(PQ_STREAMING_INTERVAL);
+      this->Timer.start(PQ_STREAMING_LONG_INTERVAL);
     }
   }
 }
@@ -123,7 +124,7 @@ void pqViewStreamingBehavior::onEndInteractionEvent()
   {
     if (vtkPVView::GetEnableStreaming())
     {
-      this->Timer.start(PQ_STREAMING_INTERVAL);
+      this->Timer.start(PQ_STREAMING_SHORT_INTERVAL);
       vtkStreamingStatusMacro("View interaction changed. Restart streaming loop.");
     }
   }
@@ -150,7 +151,7 @@ void pqViewStreamingBehavior::onTimeout()
     if (rvProxy->GetSession()->GetPendingProgress() || view->getServer()->isProcessingPending() ||
       this->DelayUpdate)
     {
-      this->Timer.start(PQ_STREAMING_INTERVAL);
+      this->Timer.start(PQ_STREAMING_SHORT_INTERVAL);
     }
     else
     {
@@ -188,7 +189,7 @@ void pqViewStreamingBehavior::stopAutoUpdates()
 void pqViewStreamingBehavior::resumeAutoUpdates()
 {
   vtkStreamingStatusMacro("Resuming automatic updates.");
-  this->Timer.start(PQ_STREAMING_INTERVAL);
+  this->Timer.start(PQ_STREAMING_LONG_INTERVAL);
   this->DisableAutomaticUpdates = false;
 }
 
