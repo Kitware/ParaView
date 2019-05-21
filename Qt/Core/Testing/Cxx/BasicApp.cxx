@@ -3,6 +3,7 @@
 #include "BasicApp.h"
 
 #include <QApplication>
+#include <QSurfaceFormat>
 #include <QTimer>
 
 #include "pqApplicationCore.h"
@@ -14,6 +15,7 @@
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 
+#include "QVTKRenderWindowAdapter.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -121,6 +123,9 @@ bool MainWindow::compareView(
 
 int main(int argc, char** argv)
 {
+  QSurfaceFormat::setDefaultFormat(
+    QVTKRenderWindowAdapter::defaultFormat(/*supports_stereo=*/false));
+
   QApplication app(argc, argv);
   pqApplicationCore appCore(argc, argv);
   MainWindow window;
