@@ -609,6 +609,7 @@ set(paraview_default_plugins
   ExplicitStructuredGrid
   GenericIOReader
   GeodesicMeasurement
+  GLTFReader
   GMVReader
   LagrangianParticleTracker
   Moments
