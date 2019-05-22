@@ -34,14 +34,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QResizeEvent>
 
 #include "pqApplicationCore.h"
+#include "pqEventDispatcher.h"
 #include "pqOptions.h"
 #include "pqUndoStack.h"
 #include "vtkPVLogger.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMProxy.h"
 #include "vtkSMSession.h"
+#include "vtkSMViewProxy.h"
 #include "vtksys/SystemTools.hxx"
+
+#include <chrono>
+#include <numeric>
 
 //----------------------------------------------------------------------------
 pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f)
@@ -74,7 +78,16 @@ pqQVTKWidget::~pqQVTKWidget()
 //----------------------------------------------------------------------------
 void pqQVTKWidget::setViewProxy(vtkSMProxy* view)
 {
-  this->ViewProxy = view;
+  if (view != this->ViewProxy)
+  {
+    this->VTKConnect->Disconnect();
+    this->ViewProxy = view;
+    if (view)
+    {
+      this->VTKConnect->Connect(
+        view, vtkSMViewProxy::PrepareContextForRendering, this, SLOT(prepareContextForRendering()));
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -142,6 +155,34 @@ void pqQVTKWidget::resizeEvent(QResizeEvent* evt)
   }
 }
 #endif
+
+//----------------------------------------------------------------------------
+void pqQVTKWidget::prepareContextForRendering()
+{
+  if (!this->isVisible())
+  {
+    // if not visible, waiting for a bit isn't going to help with the context
+    // creation at all.
+    return;
+  }
+
+  auto start = std::chrono::system_clock::now();
+  while (!this->isValid())
+  {
+    pqEventDispatcher::processEventsAndWait(10);
+    auto end = std::chrono::system_clock::now();
+    const std::chrono::duration<double> diff = end - start;
+    if (diff.count() >= 5)
+    {
+      break;
+    }
+  }
+
+  if (!this->isValid())
+  {
+    qCritical("Failed to create a valid OpenGL context for 5 seconds....giving up!");
+  }
+}
 
 //----------------------------------------------------------------------------
 void pqQVTKWidget::paintMousePointer(int xLocation, int yLocation)

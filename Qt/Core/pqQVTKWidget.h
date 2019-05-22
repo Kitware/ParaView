@@ -87,6 +87,9 @@ public:
 public slots:
   void paintMousePointer(int x, int y);
 
+private slots:
+  void prepareContextForRendering();
+
 protected:
   bool renderVTK();
   bool canRender();

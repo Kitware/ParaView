@@ -784,6 +784,15 @@ bool vtkSMViewProxy::IsContextReadyForRendering()
 {
   if (vtkRenderWindow* window = this->GetRenderWindow())
   {
+    if (window->IsDrawable())
+    {
+      return true;
+    }
+
+    // If window is not drawable, we fire an event to notify the application
+    // that we really need the OpenGL context. The application may use delays
+    // etc to try to provide the context, if possible (see paraview/paraview#18945).
+    this->InvokeEvent(vtkSMViewProxy::PrepareContextForRendering);
     return window->IsDrawable();
   }
   return true;
