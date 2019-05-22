@@ -291,6 +291,13 @@ void pqCatalystExportReaction::onTriggered()
     QString width = QString::fromStdString(std::to_string(targetSize.GetX()));
     QString height = QString::fromStdString(std::to_string(targetSize.GetY()));
 
+    int compression = -1;
+    vtkSMProxy* writerProxy = ssProxy->GetFormatProxy(filename);
+    if (writerProxy)
+    {
+      compression = vtkSMPropertyHelper(writerProxy, "CompressionLevel", true).GetAsInt(0);
+    }
+
     // this is catalyst specific, need to add to SSSProxy
     // but will come from a new CinemaSpecific file format
     QString cinema_options = "{}";
@@ -298,7 +305,6 @@ void pqCatalystExportReaction::onTriggered()
     if (imagefilename.endsWith("cdb"))
     {
       // get the cinema database shape from the CDB subproxy
-      vtkSMProxy* writerProxy = ssProxy->GetFormatProxy(filename);
       if (writerProxy)
       {
         imagefilename = imagefilename.replace("cdb", "png"); // just always use png for normal
@@ -460,7 +466,7 @@ void pqCatalystExportReaction::onTriggered()
       }
     }
 
-    QString viewformat = "'%1' : ['%2', %3, %4, %5, %6, %7, %8]";
+    QString viewformat = "'%1' : ['%2', %3, %4, %5, %6, %7, %8, %9]";
     QString nextview = viewformat.arg(viewname)
                          .arg(imagefilename)
                          .arg(frequency)
@@ -468,7 +474,8 @@ void pqCatalystExportReaction::onTriggered()
                          .arg(magnification)
                          .arg(width)
                          .arg(height)
-                         .arg(cinema_options);
+                         .arg(cinema_options)
+                         .arg(compression);
     rendering_info += nextview + ",";
   }
 

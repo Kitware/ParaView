@@ -207,11 +207,11 @@ class ViewAccessor(smtrace.RealProxyAccessor):
           "# and provide it with information such as the filename to use,",
           "# how frequently to write the images, etc."])
            params = cpstate_globals.screenshot_info[self.ProxyName]
-           assert len(params) == 7
+           assert len(params) == 8
            trace.append([
               "coprocessor.RegisterView(%s," % self,
-              "    filename='%s', freq=%s, fittoscreen=%s, magnification=%s, width=%s, height=%s, cinema=%s)" %\
-                  (params[0], params[1], params[2], params[3], params[4], params[5], params[6]),
+               "    filename='%s', freq=%s, fittoscreen=%s, magnification=%s, width=%s, height=%s, cinema=%s, compression=%s)" %\
+                  (params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7]),
               "%s.ViewTime = datadescription.GetTime()" % self])
            trace.append_separator()
         return trace.raw_data()
@@ -374,7 +374,21 @@ class NewStyleWriters(object):
             padding_amount = globalepxy.GetProperty("FileNamePadding").GetElement(0)
             write_frequency = pxy.GetProperty("WriteFrequency").GetElement(0)
             filename = pxy.GetProperty("CatalystFilePattern").GetElement(0)
-
+            DataMode = pxy.GetProperty("DataMode")
+            if DataMode is not None:
+                DataMode = pxy.GetProperty("DataMode").GetElement(0)
+            HeaderType = pxy.GetProperty("HeaderType")
+            if HeaderType is not None:
+                HeaderType = pxy.GetProperty("HeaderType").GetElement(0)
+            EncodeAppendedData=pxy.GetProperty("EncodeAppendedData")
+            if EncodeAppendedData is not None:
+                EncodeAppendedData = pxy.GetProperty("EncodeAppendedData").GetElement(0)!=0
+            CompressorType = pxy.GetProperty("CompressorType")
+            if CompressorType is not None:
+                CompressorType = pxy.GetProperty("CompressorType").GetElement(0)
+            CompressionLevel = pxy.GetProperty("CompressionLevel")
+            if CompressionLevel is not None:
+                CompressionLevel = pxy.GetProperty("CompressionLevel").GetElement(0)
 
             sim_inputs = locate_simulation_inputs(pxy)
             for sim_input_name in sim_inputs:
@@ -396,8 +410,8 @@ class NewStyleWriters(object):
                 f = "STP.RegisterWriter(%s, '%s', tp_writers)" % (
                     varname, filename)
             else:
-                f = "coprocessor.RegisterWriter(%s, filename='%s', freq=%s, paddingamount=%s)" % (
-                    varname, filename, write_frequency, padding_amount)
+                f = "coprocessor.RegisterWriter(%s, filename='%s', freq=%s, paddingamount=%s, DataMode='%s', HeaderType='%s', EncodeAppendedData=%s, CompressorType='%s', CompressionLevel='%s')" % (
+                    varname, filename, write_frequency, padding_amount, DataMode, HeaderType, EncodeAppendedData, CompressorType, CompressionLevel)
             res.append(f)
             res.append("")
         if len(res) == 2:
@@ -422,7 +436,7 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
       * key -> view proxy name
 
       * value -> [filename, writefreq, fitToScreen, magnification, width, height,
-        cinemacamera options]
+        cinemacamera options, compressionlevel]
 
     cinema_tracks
       map with information about cinema tracks to record
