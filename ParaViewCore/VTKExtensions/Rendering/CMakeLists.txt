@@ -38,6 +38,7 @@ set(Module_SRCS
   vtkCompositeDataToUnstructuredGridFilter.cxx
   vtkContext2DScalarBarActor.cxx
   vtkCSVExporter.cxx
+  vtkDataObjectTreeToPointSetFilter.cxx
   vtkImageCompressor.cxx
   vtkImageTransparencyFilter.cxx
   vtkKdTreeGenerator.cxx
