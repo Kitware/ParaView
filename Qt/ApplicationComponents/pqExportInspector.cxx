@@ -42,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqProxyWidget.h"
 #include "pqProxyWidgetDialog.h"
-#include "pqRenderViewBase.h"
 #include "pqServerManagerModel.h"
+#include "pqView.h"
 
 #include "vtkSMExportProxyDepot.h"
 #include "vtkSMPropertyHelper.h"
@@ -182,11 +182,11 @@ void pqExportInspector::Update()
   QObject::disconnect(
     this->Internals->Ui.viewChoice, SIGNAL(currentIndexChanged(int)), this, SLOT(Update()));
   // the views we might configure for export
-  QList<pqRenderViewBase*> views = smModel->findItems<pqRenderViewBase*>();
+  QList<pqView*> views = smModel->findItems<pqView*>();
   QComboBox* viewChoice = this->Internals->Ui.viewChoice;
   current = viewChoice->currentText();
 
-  pqRenderViewBase* activeView = static_cast<pqRenderViewBase*>(ao.activeView());
+  pqView* activeView = static_cast<pqView*>(ao.activeView());
   if (activeView)
   {
     current = activeView->getSMName();
@@ -547,7 +547,7 @@ void pqExportInspector::ExportView(bool enableSS)
   }
 
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
-  pqRenderViewBase* pqview = smModel->findItem<pqRenderViewBase*>(viewName);
+  pqView* pqview = smModel->findItem<pqView*>(viewName);
   vtkSMViewProxy* view = pqview->getViewProxy();
   if (!view)
   {
@@ -625,7 +625,7 @@ void pqExportInspector::ConfigureScreenshotProxy()
   }
 
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
-  pqRenderViewBase* pqview = smModel->findItem<pqRenderViewBase*>(viewName);
+  pqView* pqview = smModel->findItem<pqView*>(viewName);
   vtkSMViewProxy* view = pqview->getViewProxy();
   if (!view)
   {
@@ -673,7 +673,7 @@ bool pqExportInspector::IsScreenShotChecked(const QString& viewName, const QStri
   }
 
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
-  pqRenderViewBase* pqview = smModel->findItem<pqRenderViewBase*>(viewName);
+  pqView* pqview = smModel->findItem<pqView*>(viewName);
   vtkSMViewProxy* view = pqview->getViewProxy();
   if (!view)
   {
@@ -716,7 +716,7 @@ void pqExportInspector::InternalScreenshotCheckbox(int i)
   }
 
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
-  pqRenderViewBase* pqview = smModel->findItem<pqRenderViewBase*>(viewName);
+  pqView* pqview = smModel->findItem<pqView*>(viewName);
   vtkSMViewProxy* view = pqview->getViewProxy();
   if (!view)
   {
