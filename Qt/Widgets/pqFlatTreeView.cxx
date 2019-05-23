@@ -1021,7 +1021,7 @@ void pqFlatTreeView::cancelEditing()
     // Clean up the editor.
     QWidget* editor = this->Internal->Editor;
     this->Internal->Editor = 0;
-    delete editor;
+    editor->deleteLater();
 
     // Repaint the affected area.
     pqFlatTreeViewItem* item = this->getItem(this->Internal->Index);
