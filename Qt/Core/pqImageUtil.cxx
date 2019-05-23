@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "vtkSMUtilities.h"
 
+#include <QBuffer>
 #include <QImage>
 
 // NOTES:
@@ -110,6 +111,27 @@ bool pqImageUtil::fromImageData(vtkImageData* vtkimage, QImage& img)
   }
 
   img = newimg;
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+bool pqImageUtil::imageDataToFormatedByteArray(
+  vtkImageData* vtkimage, QByteArray& bArray, const char* format)
+{
+  if (vtkimage->GetScalarType() != VTK_UNSIGNED_CHAR)
+  {
+    return false;
+  }
+
+  QImage qimg;
+  if (!pqImageUtil::fromImageData(vtkimage, qimg))
+  {
+    return false;
+  }
+
+  QBuffer buff(&bArray);
+  qimg.save(&buff, format);
+
   return true;
 }
 
