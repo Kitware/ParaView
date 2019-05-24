@@ -13,11 +13,7 @@
   <pqevent object="pqClientMainWindow/SelectInputDialog/pipelineView" command="mousePress" arguments="1,1,0,19,5,/0:0/1:0" />
   <pqevent object="pqClientMainWindow/SelectInputDialog/pipelineView" command="mouseRelease" arguments="1,0,0,19,5,/0:0/1:0" />
   <pqevent object="pqClientMainWindow/SelectInputDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayToGenerate/1QGroupBox0" command="mousePress" arguments="1,1,0,74,2" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayToGenerate/1QGroupBox0" command="mouseRelease" arguments="1,0,0,74,2" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayToGenerate/1QGroupBox0/1pqLineEdit0" command="set_string" arguments="1" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayToGenerate/1QGroupBox0/1pqLineEdit0" command="set_string" arguments="19" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayToGenerate/1QGroupBox0/1pqLineEdit0" command="set_string" arguments="192" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayToGenerate/1QGroupBox0" command="set_boolean" arguments="true"/>
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayToGenerate/1QGroupBox0/1pqLineEdit0" command="set_string" arguments="1920" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayToGenerate/1QGroupBox1" command="mousePress" arguments="1,1,0,53,5" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayToGenerate/1QGroupBox1" command="mouseRelease" arguments="1,0,0,53,5" />
