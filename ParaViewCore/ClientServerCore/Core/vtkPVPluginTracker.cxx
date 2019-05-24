@@ -146,7 +146,7 @@ std::string vtkLocatePluginOrConfigFile(
 
   // First try the test plugin path, if it exists.
   vtkPVOptions* options = pm->GetOptions();
-  if (options->GetTestPluginPath() && strlen(options->GetTestPluginPath()) > 0)
+  if (options && options->GetTestPluginPath() && strlen(options->GetTestPluginPath()) > 0)
   {
     auto path = locator->Locate(options->GetTestPluginPath(), landmark);
     if (!path.empty())
