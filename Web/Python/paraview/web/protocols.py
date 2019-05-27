@@ -485,15 +485,16 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
 
 
     def renderStaleImage(self, vId):
-        self.staleHandlerCount[vId] -= 1
+        if vId in self.staleHandlerCount:
+            self.staleHandlerCount[vId] -= 1
 
-        if self.lastStaleTime[vId] != 0:
-            delta = (time.time() - self.lastStaleTime[vId])
-            if delta >= self.deltaStaleTimeBeforeRender:
-                self.pushRender(vId)
-            else:
-                self.staleHandlerCount[vId] += 1
-                reactor.callLater(self.deltaStaleTimeBeforeRender - delta + 0.001, lambda: self.renderStaleImage(vId))
+            if self.lastStaleTime[vId] != 0:
+                delta = (time.time() - self.lastStaleTime[vId])
+                if delta >= self.deltaStaleTimeBeforeRender:
+                    self.pushRender(vId)
+                else:
+                    self.staleHandlerCount[vId] += 1
+                    reactor.callLater(self.deltaStaleTimeBeforeRender - delta + 0.001, lambda: self.renderStaleImage(vId))
 
 
     def animate(self):
