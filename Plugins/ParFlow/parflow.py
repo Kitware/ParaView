@@ -10,6 +10,7 @@ class pftools:
     """This class defines some utilities to perform computations similar
     to those implemented by ParFlow's pftools suite."""
 
+    @staticmethod
     def dataPointExtent(dataset):
         """Return the parflow extents in (k,j,i) order of the *point*
         extents of this dataset, which is assumed to be structured.
@@ -18,6 +19,7 @@ class pftools:
         ext = tuple(np.flip(dataset.GetDimensions()))
         return ext
 
+    @staticmethod
     def dataCellExtent(dataset):
         """Return the parflow extents in (k,j,i) order of the *cell*
         extents of this dataset, which is assumed to be structured.
@@ -29,6 +31,7 @@ class pftools:
         ext = tuple(np.flip(dataset.GetDimensions()) - 1)
         return ext
 
+    @staticmethod
     def computeTopSurface(ext, mask):
         # I. Reshape the mask and create zk, a column of k-axis indices:
         mr = np.reshape(mask > 0, ext)
@@ -45,6 +48,7 @@ class pftools:
         top = top - np.all(mr, axis=0) # Subtract 1 from masked column entries.
         return top
 
+    @staticmethod
     def computeTopSurfaceIndices(top):
         """Convert the "top" surface matrix into an array of indices that
         only include valid top-surface cells. Any negative entry of "top"
@@ -59,6 +63,7 @@ class pftools:
                     if top[i,j] >= 0])
         return itop
 
+    @staticmethod
     def computeSurfaceStorage(ext, itop, xx, pressure):
         # I. Compute the dx * dy area term using point coordinates from the mesh:
         xt = xx[itop[:,0], itop[:,1], itop[:,2]]
@@ -77,12 +82,14 @@ class pftools:
         sus = pt * (pt > 0.0) * dx * dy
         return sus
 
+    @staticmethod
     def computeSubsurfaceStorage(saturation, pressure, volume, porosity, specific_storage):
         """Compute the subsurface storage for the entire domain."""
         import numpy as np
         sbs = saturation * volume * (porosity + pressure * specific_storage)
         return sbs
 
+    @staticmethod
     def computeGroundwaterStorage(saturation, pressure, volume, porosity, specific_storage):
         """Compute the groundwater storage.
         This is the same calculation as subsurface storage, but only
@@ -92,6 +99,7 @@ class pftools:
         sbs = (saturation == 1.0) * volume * (porosity + pressure * specific_storage)
         return sbs
 
+    @staticmethod
     def computeSurfaceRunoff(top, xx, pressure, slope, mannings):
         """Compute surface runoff (water leaving the domain boundary
         or flowing into a masked area)"""
@@ -159,6 +167,7 @@ class pftools:
 
         return sro
 
+    @staticmethod
     def computeWaterTableDepth(top, saturation, xx):
         """Compute the depth to the water table.
 
