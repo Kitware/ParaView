@@ -7,7 +7,7 @@ set(private_headers
 
 vtk_module_find_package(
   PACKAGE Gmsh
-  VERSION 4.0.0)
+  VERSION 4.1.0)
 
 vtk_module_add_module(GmshReader::vtkGmshReader
   CLASSES ${classes}

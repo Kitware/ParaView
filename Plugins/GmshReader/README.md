@@ -3,7 +3,7 @@ ParaView/VTK reader for visualization of high-order polynomial solutions under t
 Version: 1.0
 
 See Copyright.txt, License.txt and Credits.txt for respective copyright,
-license and authors information. You should have received a copy of
+license and credits information. You should have received a copy of
 these files along with ParaViewGMSHReaderPlugin.
 
 -For more information on Gmsh see http://geuz.org/gmsh/
@@ -20,7 +20,7 @@ Pre-requirements for building GmshReader Plugin:
 ----------------------------------------------------
 
 To build this plugin you will need a version of the Gmsh library compiled with specific options.
-The Gmsh version required by this plugin must be at least 3.0.7.
+The Gmsh version required by this plugin must be at least 4.1.0.
 The Gmsh source code can be downloaded from http://gitlab.onelab.info/gmsh/gmsh.git.
 For more information on Gmsh, see also http://gitlab.onelab.info/gmsh/gmsh/wikis/home.
 
@@ -42,7 +42,7 @@ Then, build and install the library with for instance:
 make -j 8 install
 
 This configuration should keep the memory requirement for the Gmsh library as low as possible.
-Beware: the default Gmsh library provided by some Linux distributions under their software package manager, or simply built with default cmake variables may include additional components that are not compatible with this plugin.
+Beware: the default Gmsh library provided by some Linux distributions under their software package manager, or simply built with default cmake variables, may include additional components that are not compatible with this plugin.
 It is strongly advised to build your own version of the Gmsh library using the cmake variables listed above.
 Please contact us if you can't build your own version with the cmake command above.
 
@@ -64,7 +64,8 @@ In this case, it is advised though to help cmake find the paths to the right ver
 Loading the ParaView Gmsh reader plugin:
 ---------------------------------------
 
-First make sure that libgmsh.so will be found at runtime, this will be automatic if you have set a standard CMAKE_INSTALL_PREFIX for gmsh
+First make sure that libgmsh.so will be found at runtime.
+This will be automatic if you have set a standard CMAKE_INSTALL_PREFIX for gmsh.
 Alternativaly, you can set LD_LIBRARY_PATH to the directory containing libgmsh.so.
 
 Open up ParaView, from the "Tools" menu, then choose "Manage Plugins".
@@ -76,8 +77,8 @@ This plugin is a client and server plugin, so make sure to load it in both in cl
 Note on the MSH file format:
 ---------------------------
 
-This plugin has been tested with Gmsh format 2.0.
-Under Gmsh format version 2.0, a partitioned mesh with N parts can be saved in
+This plugin supports Gmsh IO format version 2.0, which is still supported under Gmsh 4.1.0.
+Under IO format version 2.0, a partitioned mesh with N parts can be saved in
 
  1. either one single .msh file (in this case, the lines storing the connectivity information for each element will also include the partition ID of this element);
  2. N distinct .msh files corresponding to one file per mesh part.
@@ -89,6 +90,8 @@ To save a partitioned mesh in N distinct files from the Gmsh GUI, follow this pr
  * select "Mesh - Gmsh msh" format
  * check "Save all" and "Save one file per partition".
 
+Note that the Gmsh IO format version 4.0 is currently being developped and is not supported yet by the plugin.
+
 Reading your msh files:
 ----------------------
 
@@ -99,13 +102,10 @@ For a demo xml file, configure ParaView with BUILD_TESTING set to ON, then build
 The format of this xml file is the following:
 
 <GmshMetaFile number_of_partitioned_msh_files="4">
-<GeometryInfo has_piece_entry="1"
-              has_time_entry="0"
-              pattern="./naca0012/naca_4part.msh_%06d"/>
-<FieldInfo has_piece_entry="1"
-           has_time_entry="1">
-           <PatternList pattern="./naca0012/domainPressure_t%d.msh_%06d"/>
-           <PatternList pattern="./naca0012/domainVelocity_t%d.msh_%06d"/>
+<GeometryInfo path="./naca0012/naca_4part_[partID].msh"/>
+<FieldInfo>
+  <PathList path="./naca0012/domainPressure_t[step]_[partID].msh"/>
+  <PathList path="./naca0012/domainVelocity_t[step]_[partID].msh"/>
 </FieldInfo>
 <TimeSteps number_of_steps="3"
            auto_generate_indices="1"
@@ -132,32 +132,24 @@ However, each pvserver process will then have to read the single mesh file compl
 If a mesh has been partitioned in N parts but both the mesh and solution files have been saved in a single file, rank 0 of the pvserver will load all the data (mesh plus solution), which can be extremely slow and put a high pressure on the memory consumption if the data are heavy.
 If this step succeeds, it is still possible to enjoy the parallelism of the pvserver by redistributing the data amongs the pvserver processes with the D3 filter.
 
-Side note: The upcoming Gmsh format version 3.0 under development should rely on a parallel IO format which should allow more flexibility in terms of number of mesh part per files.
+Side note: The upcoming Gmsh format version 4.0 under development should rely on a format which will allow more flexibility in terms of number of mesh part per files.
 
- * The GeometryInfo has three attributes:
-    1. has_piece_entry (0 or 1): Specifies whether the path pattern to the mesh msh file has a file (piece) placeholder.
-                             The piece placeholder ("%06d" in the example above) is automatically  by the update piece number.
-                             Note that the current convention in Gmsh for file IDs includes always 6 digits
-                             for better sorting and must be prepadded with 0 accordingly (use %06d instead of %d).
-    2. has_time_entry (0 or 1): Specifies whether the pattern has a time placeholder.
-                            The time placeholder ("%d" in the example above) is replaced by an index specified in the TimeSteps element below.
-                            Use 0 unless the mesh changes with time step through adaptation for instance.
-    3. pattern: This is the pattern used to access the Gmsh mesh, which includes the path
-            (absolute or relative to the mshi file location) and the mesh filename(s).
-            The %d and %06d placeholders in the example above will be replaced by appropriate indices following C++ convention.
-            The first index is time (if specified), the second one is piece.
+ * The GeometryInfo has one attribute:
+    1. path: This is the path used to access the Gmsh mesh (absolute or relative to the mshi file location) and the mesh filename(s).
+Note that three keywords can be used in the path: "[step]", "[partID]" and "[zeroPadPartID]".
+All occurences of "[step]" in the path will be replaced by the time step number(s) specified later in the mshi file.
+All occurences of "[partID]" in the path will be replaced by the piece id of the mesh part.
+All occurences of "[zeroPadPartID]" in the path will be replaced by the piece id of the mesh part, padded with leading zeros in such a way that the total number of digits in the part id number is equal to 6.
+This corresponds to the old numbering format which was in place before Gmsh 4.1.0 was released.
 
  * The FieldInfo element is optional. If not present, the gmsh mesh with no additional data will be displayed.
-If present, FieldInfo contains at least three elements related to the solution data:
-    1. has_piece_entry (0 or 1): same as above.
-    2. has_time_entry (0 or 1): same as above.
-    3. PatternList pattern: This is the pattern used to get the Gmsh solution, which includes the path
+If present, FieldInfo contains a series of paths pointing to the solution files with the follwing xml entry.
+    1. PathList path: This is the path used to get the Gmsh solution,
                         (absolute or relative to the mshi file location) and the solution filename(s).
                         There can be any arbitrary number of Gmsh solution filenames (velocity, pressure, etc).
                         In the examples above. two distinct sets of files are loaded (domainPressure* and domainVelocity*).
-                        All the pfields included in these Gmsh files will be passed to ParaView.
-                        As usual, the %d and %06d placeholders will be replaced by appropriate indices.
-                        The first index is time (if specified), the second one is piece.
+                        All the fields included in these Gmsh files will be passed to ParaView.
+                        Like GeometryInfo, the same keywords "[step]", "[partID]" and "[zeroPadPartID]"  can be used with the same meaning as above.
 
  * The TimeSteps element contains TimeStep sub-elements. Each TimeStep element specifies an index (index_attribute), an index used in the geometry filename pattern (geometry_index), an index used in the field filename pattern (field_index) and a time value (float).
     1. number_of_steps specifies how many steps of your solution you want to visualize. These steps can then be visualized sequentially with the ParaView play button (green arrow).

@@ -195,11 +195,7 @@ int vtkGmshMetaReader::RequestData(
   output->SetBlock(0, multiPieceDataSet.Get());
 
   const char* filePathPattern = nullptr;
-  const char* geometryPattern = nullptr;
-  int fieldHasPiece = 0;
-  int fieldHasTime = 0;
-  int geomHasPiece = 0;
-  int geomHasTime = 0;
+  const char* geometryPath = nullptr;
 
   unsigned int numElements = rootElement->GetNumberOfNestedElements();
   for (unsigned int i = 0; i < numElements; i++)
@@ -208,43 +204,22 @@ int vtkGmshMetaReader::RequestData(
 
     if (strcmp("GeometryInfo", nested->GetName()) == 0)
     {
-      geometryPattern =
-        nested->GetAttribute("pattern"); // Only one geometry file pattern is expected
-      if (!nested->GetScalarAttribute("has_piece_entry", &geomHasPiece))
-      {
-        geomHasPiece = 0;
-      }
-      if (!nested->GetScalarAttribute("has_time_entry", &geomHasTime))
-      {
-        geomHasTime = 0;
-      }
+      geometryPath = nested->GetAttribute("path");
     }
 
     if (strcmp("FieldInfo", nested->GetName()) == 0)
     {
       unsigned int numElements2 = nested->GetNumberOfNestedElements();
-
-      if (!nested->GetScalarAttribute("has_piece_entry", &fieldHasPiece))
-      {
-        fieldHasPiece = 0;
-      }
-      if (!nested->GetScalarAttribute("has_time_entry", &fieldHasTime))
-      {
-        fieldHasTime = 0;
-      }
-
-      this->Reader->SetFieldInfoPieceTimeEntry(fieldHasPiece, fieldHasTime);
-
       for (unsigned int j = 0; j < numElements2; j++)
       {
         // Several field file patterns are allowed
         vtkPVXMLElement* nested2 = nested->GetNestedElement(j);
-        if (strcmp("PatternList", nested2->GetName()) == 0)
+        if (strcmp("PathList", nested2->GetName()) == 0)
         {
-          filePathPattern = nested2->GetAttribute("pattern");
+          filePathPattern = nested2->GetAttribute("path");
           if (!filePathPattern)
           {
-            vtkErrorMacro("No field pattern was provided");
+            vtkErrorMacro("No field path was provided");
           }
           else
           {
@@ -259,14 +234,11 @@ int vtkGmshMetaReader::RequestData(
     }
   }
 
-  if (!geometryPattern)
+  if (!geometryPath)
   {
     vtkErrorMacro("No geometry pattern was specified. Cannot load file");
     return 0;
   }
-
-  char* geomName;
-  int geomName_size;
 
   int numPiecesPerFile = numPieces / numFiles;
 
@@ -292,40 +264,24 @@ int vtkGmshMetaReader::RequestData(
       << piece << ", loadingPiece+1=" << loadingPiece + 1 << ", numPieces=" << numPieces
       << ", fileID=" << fileID << ", numProcPieces=" << numProcPieces << ", timeStep=" << timeStep);
 
-    // Add +1 for null terminating character.
-    if (geomHasTime && geomHasPiece)
+    std::string geomFName(geometryPath);
+    std::string pIdentifier;
+
+    pIdentifier = "[partID]";
+    this->Reader->ReplaceAllStringPattern(geomFName, pIdentifier, fileID);
+
+    // Test the old format with 6 digits with zero padding (000001, etc)
+    if (fileID < 1e7)
     {
-      geomName_size = snprintf(nullptr, 0, geometryPattern,
-                        this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex, fileID) +
-        1;
-      geomName = new char[geomName_size];
-      snprintf(geomName, geomName_size, geometryPattern,
-        this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex, fileID);
-    }
-    else if (geomHasPiece)
-    {
-      geomName_size = snprintf(nullptr, 0, geometryPattern, fileID) + 1;
-      geomName = new char[geomName_size];
-      snprintf(geomName, geomName_size, geometryPattern, fileID);
-    }
-    else if (geomHasTime)
-    {
-      geomName_size = snprintf(nullptr, 0, geometryPattern,
-                        this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex) +
-        1;
-      geomName = new char[geomName_size];
-      snprintf(geomName, geomName_size, geometryPattern,
-        this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex);
-    }
-    else
-    {
-      geomName_size = snprintf(nullptr, 0, geometryPattern, fileID) + 1;
-      geomName = new char[geomName_size];
-      strcpy(geomName, geometryPattern);
+      pIdentifier = "[zeroPadPartID]";
+      std::ostringstream paddedFileID;
+      paddedFileID << std::setw(6) << std::setfill('0') << fileID;
+      this->Reader->ReplaceAllStringPattern(geomFName, pIdentifier, paddedFileID.str());
     }
 
-    std::string geomFName(geomName);
-    delete[] geomName;
+    pIdentifier = "[step]";
+    this->Reader->ReplaceAllStringPattern(
+      geomFName, pIdentifier, this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex);
 
     // Returns the directory path specified in the xml file without the geom file name
     std::string gpath = vtksys::SystemTools::GetFilenamePath(geomFName);
@@ -363,7 +319,7 @@ int vtkGmshMetaReader::RequestData(
 //----------------------------------------------------------------------------
 namespace
 {
-// Convert the fileName to a human readable name
+// Convert the fileName to a human readable name for the GUI
 std::string FormatArrayName(const std::string& fileName)
 {
   std::string outFieldName = fileName;
@@ -372,10 +328,17 @@ std::string FormatArrayName(const std::string& fileName)
   {
     outFieldName = outFieldName.substr(s + 1);
   }
-  s = outFieldName.find("t%d");
+  // Typically, time steps and iterations are sperated from the main name with dots or under scores.
+  // Split the name of the file based on these characters.
+  s = outFieldName.find(".");
   if (s != std::string::npos)
   {
-    outFieldName = outFieldName.substr(0, s - 1);
+    outFieldName = outFieldName.substr(0, s);
+  }
+  s = outFieldName.find("_");
+  if (s != std::string::npos)
+  {
+    outFieldName = outFieldName.substr(0, s);
   }
   return outFieldName;
 }
@@ -523,14 +486,14 @@ int vtkGmshMetaReader::RequestInformation(
       unsigned int numElements2 = nested->GetNumberOfNestedElements();
       for (unsigned int j = 0; j < numElements2; j++)
       {
-        // Several field file patterns are allowed
+        // Several field file paths are allowed
         vtkPVXMLElement* nested2 = nested->GetNestedElement(j);
-        if (strcmp("PatternList", nested2->GetName()) == 0)
+        if (strcmp("PathList", nested2->GetName()) == 0)
         {
-          const char* filePathPattern = nested2->GetAttribute("pattern");
+          const char* filePathPattern = nested2->GetAttribute("path");
           if (!filePathPattern)
           {
-            vtkErrorMacro("No field pattern was provided");
+            vtkErrorMacro("No field path was provided");
           }
           else
           {

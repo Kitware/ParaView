@@ -23,7 +23,7 @@
  * See the Copyright.txt and License.txt files provided
  * with ParaViewGmshReaderPlugin for license information.
  *
-*/
+ */
 
 #ifndef vtkGmshMetaReader_h
 #define vtkGmshMetaReader_h
@@ -69,9 +69,9 @@ public:
 
   //@{
   /** The following methods allow selective reading of solutions fields. By
-    * default, ALL point data fields are read,
-    * but this can be modified (e.g. from the ParaView GUI).
-    */
+   * default, ALL point data fields are read,
+   * but this can be modified (e.g. from the ParaView GUI).
+   */
   int GetNumberOfPointArrays();
   const char* GetPointArrayName(int index);
   int GetPointArrayStatus(const char* name);
