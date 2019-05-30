@@ -730,7 +730,7 @@ function (paraview_add_plugin name)
               "${_paraview_build_plugin_qch_path}"
       DEPENDS "${_paraview_build_plugin_qch_path}"
               "${_paraview_build_plugin}_qch"
-              ParaView::ProcessXML
+              "$<TARGET_FILE:ParaView::ProcessXML>"
       COMMENT "Generating header for ${_paraview_build_plugin} documentation")
     set_property(SOURCE "${_paraview_add_plugin_qch_output}"
       PROPERTY
@@ -875,6 +875,7 @@ function (paraview_add_plugin name)
                 "_source"
                 "${_paraview_add_plugin_python_path}"
         DEPENDS "${_paraview_add_plugin_python_path}"
+                "$<TARGET_FILE:ParaView::ProcessXML>"
         COMMENT "Convert Python module ${_paraview_add_plugin_python_module_name} for ${_paraview_build_plugin}")
 
       list(APPEND _paraview_add_plugin_python_sources
