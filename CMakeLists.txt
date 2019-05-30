@@ -592,6 +592,10 @@ set_property(GLOBAL
   PROPERTY
     "_vtk_module_autoinit_include" "\"vtkAutoInit.h\"")
 
+# Note that the way that this flag gets used, it only has an effect on the
+# initial configuration.
+option(PARAVIEW_PLUGINS_DEFAULT "Default state for ParaView plugins" ON)
+mark_as_advanced(PARAVIEW_PLUGINS_DEFAULT)
 set(paraview_default_plugins
   AcceleratedAlgorithms
   AnalyzeNIfTIReaderWriter
@@ -623,7 +627,7 @@ set(paraview_default_plugins
   VTKmFilters
   pvblot)
 foreach (paraview_default_plugin IN LISTS paraview_default_plugins)
-  set("_paraview_plugin_default_${paraview_default_plugin}" ON)
+  set("_paraview_plugin_default_${paraview_default_plugin}" "${PARAVIEW_PLUGINS_DEFAULT}")
 endforeach ()
 
 set(paraview_plugin_directories

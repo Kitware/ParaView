@@ -262,6 +262,9 @@ More advanced options:
     `PARAVIEW_VERSIONED_INSTALL`): The custom suffix for libraries built by
     ParaView. Defaults to either an empty string or `pvX.Y` where `X` and `Y`
     are ParaView's major and minor version components, respectively.
+  * `PARAVIEW_PLUGINS_DEFAULT` (default `ON`): The state for ParaView's set of
+    enabled-by-default plugins. Note that this variable only really has an
+    effect on initial configures or newly added plugins.
 
 <!--
 These variables should be documented once they're effective again.
