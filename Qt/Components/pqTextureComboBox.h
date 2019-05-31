@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTextureComboBox.h
+   Module:  pqTextureComboBox.h
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2019 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -12,7 +12,7 @@
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
-   28 Corporate Drive
+   1712 Route 9, Suite 300
    Clifton Park, NY 12065
    USA
 
@@ -33,81 +33,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqTextureComboBox_h
 
 #include "pqComponentsModule.h"
+#include "vtkNew.h"
+
 #include <QComboBox>
 
-class pqDataRepresentation;
-class pqRenderView;
-
-class vtkSMProxy;
-
 /**
-* This is a ComboBox that is used on the display tab to select available
-* textures. It checks whether current representation has texture coordinates,
-* if not, the widget will be disabled automatically.
-* It also provides the user with an option to load new images as textures.
-*/
+ * This is a ComboBox that is used on the display tab to select available
+ * textures. It can be used with Representations, Sources and Views.
+ * It provides the user with an option to load new images as textures.
+ */
+class vtkSMProxyGroupDomain;
+class vtkSMProxy;
+class vtkEventQtSlotConnect;
 class PQCOMPONENTS_EXPORT pqTextureComboBox : public QComboBox
 {
   Q_OBJECT
   typedef QComboBox Superclass;
 
 public:
-  pqTextureComboBox(QWidget* parent = 0);
-  ~pqTextureComboBox() override;
-
-public slots:
-  /**
-  * Set the representation. We need the representation, since we need to
-  * update the enable state of the widget depending on whether texture
-  * coordinates are available.
-  */
-  void setRepresentation(pqDataRepresentation* repr);
-
-  void setRenderView(pqRenderView* rview);
+  pqTextureComboBox(vtkSMProxyGroupDomain* domain, QWidget* parent = nullptr);
+  ~pqTextureComboBox() override = default;
 
   /**
-  * Forces a reload of the widget. Generally one does not need to call this
-  * method explicity.
-  */
-  void reload();
+   * Update the selected index in the combobox using the provided texture if it
+   * is present in the combobox
+   */
+  void updateFromTexture(vtkSMProxy* texture);
 
-protected slots:
-  /**
-  * Update the enable state of the widget.
-  */
-  virtual void updateEnableState();
+  static const std::string TEXTURES_GROUP;
+
+signals:
 
   /**
-  * Called when user activates an item.
-  */
-  void onActivated(int);
-
-  void updateFromProperty();
-
-  void updateTextures();
-
-  void proxyRegistered(const QString& groupname);
-  void proxyUnRegistered(const QString& group, const QString&, vtkSMProxy* proxy);
+   * Emitted whenever the texture has been changed
+   */
+  void textureChanged(vtkSMProxy* texture);
 
 protected:
-  /**
-  * Get the texture proxy associated with the given data.
-  */
-  vtkSMProxy* getTextureProxy(const QVariant& data) const;
-
-  /**
-  * Prompts the user to load a texture file.
-  */
   void loadTexture();
   bool loadTexture(const QString& filename);
+
+protected slots:
+  void onCurrentIndexChanged(int index);
+  void updateTextures();
+  void proxyRegistered(const QString& group, const QString&, vtkSMProxy* proxy);
+  void proxyUnRegistered(const QString& group, const QString&, vtkSMProxy* proxy);
 
 private:
   Q_DISABLE_COPY(pqTextureComboBox)
 
-  class pqInternal;
-  pqInternal* Internal;
-
-  bool InOnActivate;
+  vtkSMProxyGroupDomain* Domain;
+  vtkNew<vtkEventQtSlotConnect> VTKConnector;
 };
 
 #endif

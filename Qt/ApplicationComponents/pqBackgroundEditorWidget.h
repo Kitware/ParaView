@@ -55,9 +55,6 @@ signals:
   void gradientBackgroundChanged();
   void imageBackgroundChanged();
 
-public slots:
-  void setView(pqView* newView) override;
-
 protected slots:
   void currentIndexChangedBackgroundType(int type);
   void clickedRestoreDefaultColor();

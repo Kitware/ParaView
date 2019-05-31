@@ -32,44 +32,110 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqTextureSelectorPropertyWidget.h"
 
+// ParaView Includes
+#include "pqApplicationCore.h"
+#include "pqDataRepresentation.h"
+#include "pqServerManagerModel.h"
+#include "pqTextureComboBox.h"
+#include "pqUndoStack.h"
+#include "pqView.h"
+
+// Server Manager Includes
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyGroupDomain.h"
+
+// Qt Includes
 #include <QVBoxLayout>
 
-#include "pqApplicationCore.h"
-#include "pqPipelineRepresentation.h"
-#include "pqRenderView.h"
-#include "pqServerManagerModel.h"
-
 pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(
-  vtkSMProxy* smProxy, QWidget* pWidget)
+  vtkSMProxy* smProxy, vtkSMProperty* smProperty, QWidget* pWidget)
   : pqPropertyWidget(smProxy, pWidget)
 {
+  this->setProperty(smProperty);
+  this->setToolTip("Select/Load texture to apply.");
+
   QVBoxLayout* l = new QVBoxLayout;
   l->setMargin(0);
 
-  this->Selector = new pqTextureComboBox(this);
-
-  pqServerManagerModel* smm = pqApplicationCore::instance()->getServerManagerModel();
-  pqPipelineRepresentation* repr = smm->findItem<pqPipelineRepresentation*>(smProxy);
-  if (repr)
+  // Recover domain and sanity check
+  this->Domain = smProperty->FindDomain<vtkSMProxyGroupDomain>();
+  if (!this->Domain || this->Domain->GetNumberOfGroups() != 1 ||
+    strcmp(this->Domain->GetGroup(0), pqTextureComboBox::TEXTURES_GROUP.c_str()) != 0)
   {
-    this->Selector->setRepresentation(repr);
+    qCritical() << "pqTextureSelectorPropertyWidget can only be used with a ProxyProperty"
+                   " with a ProxyGroupDomain containing only the \""
+                << QString(pqTextureComboBox::TEXTURES_GROUP.c_str()) << "\" group";
   }
 
-  this->connect(this, SIGNAL(viewChanged(pqView*)), this, SLOT(handleViewChanged(pqView*)));
-
+  // Create the combobox selector and set its value
+  this->Selector = new pqTextureComboBox(this->Domain, this);
+  this->onPropertyChanged();
   l->addWidget(this->Selector);
   this->setLayout(l);
-}
 
-pqTextureSelectorPropertyWidget::~pqTextureSelectorPropertyWidget()
-{
-}
+  // Connect the combo box to the property
+  QObject::connect(
+    this->Selector, SIGNAL(textureChanged(vtkSMProxy*)), this, SLOT(onTextureChanged(vtkSMProxy*)));
+  this->VTKConnector->Connect(
+    smProperty, vtkCommand::ModifiedEvent, this, SLOT(onPropertyChanged()));
 
-void pqTextureSelectorPropertyWidget::handleViewChanged(pqView* v)
-{
-  pqRenderView* renderView = qobject_cast<pqRenderView*>(v);
-  if (renderView)
+  pqServerManagerModel* smm = pqApplicationCore::instance()->getServerManagerModel();
+
+  // If check_tcoords="1" is specified, we enabled the widget only if tcoords are available
+  // Valid only for a RepresentationProxy
+  vtkPVXMLElement* hints = smProperty->GetHints()
+    ? smProperty->GetHints()->FindNestedElementByName("TextureSelectorWidget")
+    : NULL;
+  if (hints && strcmp(hints->GetAttributeOrDefault("check_tcoords", ""), "1") == 0)
   {
-    this->Selector->setRenderView(renderView);
+    this->Representation = smm->findItem<pqDataRepresentation*>(smProxy);
+    if (this->Representation)
+    {
+      QObject::connect(this->Representation, SIGNAL(dataUpdated()), this, SLOT(checkTCoords()));
+    }
+    this->checkTCoords();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqTextureSelectorPropertyWidget::onTextureChanged(vtkSMProxy* texture)
+{
+  BEGIN_UNDO_SET("Texture Change");
+  vtkSMPropertyHelper(this->property()).Set(texture);
+  this->proxy()->UpdateVTKObjects();
+  END_UNDO_SET();
+  emit this->changeAvailable();
+  emit this->changeFinished();
+}
+
+//-----------------------------------------------------------------------------
+void pqTextureSelectorPropertyWidget::onPropertyChanged()
+{
+  bool block = this->blockSignals(true);
+  this->Selector->updateFromTexture(vtkSMPropertyHelper(this->property()).GetAsProxy());
+  this->blockSignals(block);
+}
+
+//-----------------------------------------------------------------------------
+void pqTextureSelectorPropertyWidget::checkTCoords()
+{
+  bool enable = false;
+  // Enable only if we have point texture coordinates.
+  vtkPVDataInformation* dataInfo = this->Representation->getRepresentedDataInformation();
+  if (dataInfo)
+  {
+    vtkPVDataSetAttributesInformation* pdInfo = dataInfo->GetPointDataInformation();
+    if (pdInfo && pdInfo->GetAttributeInformation(vtkDataSetAttributes::TCOORDS))
+    {
+      enable = true;
+    }
+  }
+  this->setEnabled(enable);
+  if (!enable)
+  {
+    this->setToolTip("No texture coordinates present in the data. Cannot apply texture.");
   }
 }

@@ -135,7 +135,7 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
   }
   else if (name == "texture_selector")
   {
-    return new pqTextureSelectorPropertyWidget(smProxy, parentWidget);
+    return new pqTextureSelectorPropertyWidget(smProxy, smProperty, parentWidget);
   }
   else if (name == "shader_replacements_selector")
   {

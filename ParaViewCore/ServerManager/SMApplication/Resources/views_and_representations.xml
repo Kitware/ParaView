@@ -10729,6 +10729,10 @@ Select how you want the text to be represented in the view.
         <ProxyGroupDomain name="groups">
           <Group name="textures" />
         </ProxyGroupDomain>
+        <Hints>
+          <TextureSelectorWidget check_tcoords="1" />
+          <!-- enable the texture selector only when tcoords is available. -->
+        </Hints>
       </ProxyProperty>
       <ProxyProperty command="SetLookupTable"
                      name="LookupTable" >
