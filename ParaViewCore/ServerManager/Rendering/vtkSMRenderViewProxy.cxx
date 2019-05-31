@@ -481,6 +481,10 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
         {
           return "ProgressBarSourceRepresentation";
         }
+        else if (strcmp(childType, "logo") == 0)
+        {
+          return "LogoSourceRepresentation";
+        }
       }
     }
   }

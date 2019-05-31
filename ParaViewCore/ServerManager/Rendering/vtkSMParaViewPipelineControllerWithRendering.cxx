@@ -102,11 +102,7 @@ bool vtkIsOutputTypeNonStandard(vtkPVXMLElement* hints, const int outputPort)
       }
       if (const char* type = child->GetAttribute("type"))
       {
-        if (strcmp(type, "text") == 0)
-        {
-          return true;
-        }
-        else if (strcmp(type, "progress") == 0)
+        if (strcmp(type, "text") == 0 || strcmp(type, "progress") == 0 || strcmp(type, "logo") == 0)
         {
           return true;
         }

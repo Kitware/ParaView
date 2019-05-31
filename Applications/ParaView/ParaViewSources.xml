@@ -4,6 +4,7 @@
     <Proxy group="sources" name="VectorText" />
     <Proxy group="sources" name="TimeToTextConvertorSource" />
     <Proxy group="sources" name="ArrowSource" />
+    <Proxy group="sources" name="LogoSource" />
     <Proxy group="sources" name="TextSource" />
   </Category>
   <Category name="DataObjects" menu_label="&amp;Data Objects" preserve_order="1"
