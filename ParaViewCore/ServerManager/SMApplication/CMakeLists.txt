@@ -115,6 +115,9 @@ if (TARGET VTK::FiltersMomentInvariants)
 endif ()
 
 if (TARGET VTK::PythonInterpreter)
+  _vtk_module_set_module_property(ParaView::ServerManagerApplication APPEND
+    PROPERTY  "forward_link"
+    VALUE     VTK::PythonUsed)
   list(APPEND xml_files
     Resources/pythonfilter.xml
     Resources/pythonviews.xml)
