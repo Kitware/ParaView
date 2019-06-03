@@ -2245,39 +2245,64 @@ def CreateRepresentation(aProxy, view, **extraArgs):
     view.Representations.append(proxy)
     return proxy
 
-class ParaViewMetaPathFinder(object):
-    def find_module(self, fullname, path=None):
-        if vtkPVPythonModule.HasModule(fullname):
-            return self
-        return None
+if sys.version_info < (3, 3):
+    class ParaViewMetaPathFinder(object):
+        def find_module(self, fullname, path=None):
+            if vtkPVPythonModule.HasModule(fullname):
+                return self
+            return None
 
-    def load_module(self, fullname):
-        try:
-            return sys.modules[fullname]
-        except KeyError:
-            pass
+        def load_module(self, fullname):
+            try:
+                return sys.modules[fullname]
+            except KeyError:
+                pass
 
-        info = vtkPVPythonModule.GetModule(fullname)
-        if not info:
-            raise ImportError
+            info = vtkPVPythonModule.GetModule(fullname)
+            if not info:
+                raise ImportError
 
-        import imp
-        module = imp.new_module(fullname)
-        module.__file__ = "<%s>" % fullname
-        module.__loader__ = self
-        if info.GetIsPackage():
-            module.__path__ = []
-            module.__package__ = fullname
-        else:
-            module.__package__ = fullname.rpartition('.')[0]
+            import imp
+            module = imp.new_module(fullname)
+            module.__file__ = "<%s>" % fullname
+            module.__loader__ = self
+            if info.GetIsPackage():
+                module.__path__ = []
+                module.__package__ = fullname
+            else:
+                module.__package__ = fullname.rpartition('.')[0]
 
-        sys.modules[fullname] = module
-        try:
-            exec(info.GetSource(), module.__dict__)
-        except:
-            del sys.modules[fullname]
-            raise
-        return module
+            sys.modules[fullname] = module
+            try:
+                exec(info.GetSource(), module.__dict__)
+            except:
+                del sys.modules[fullname]
+                raise
+            return module
+else:
+    import importlib
+    class ParaViewMetaPathFinder(importlib.abc.MetaPathFinder):
+        def __init__(self):
+            self._loader = ParaViewLoader()
+
+        def find_spec(self, fullname, path, target=None):
+            info = vtkPVPythonModule.GetModule(fullname)
+            if info:
+                package = None
+                if info.GetIsPackage():
+                    package = fullname
+                return importlib.machinery.ModuleSpec(fullname, self._loader, is_package=package)
+            return None
+
+    class ParaViewLoader(importlib.abc.InspectLoader):
+        def _info(self, fullname):
+            return vtkPVPythonModule.GetModule(fullname)
+
+        def is_package(self, fullname):
+            return self._info(fullname).GetIsPackage()
+
+        def get_source(self, fullname):
+            return self._info(fullname).GetSource()
 
 def LoadXML(xmlstring):
     """DEPRECATED. Given a server manager XML as a string, parse and process it."""
