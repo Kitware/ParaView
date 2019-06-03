@@ -2249,8 +2249,8 @@ class _ModuleLoader(object):
     def find_module(self, fullname, path=None):
         if vtkPVPythonModule.HasModule(fullname):
             return self
-        else:
-            return None
+        return None
+
     def load_module(self, fullname):
         import imp
         moduleInfo = vtkPVPythonModule.GetModule(fullname)
