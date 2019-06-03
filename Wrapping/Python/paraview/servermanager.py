@@ -2266,7 +2266,11 @@ class _ModuleLoader(object):
         module.__loader__ = self
         if moduleInfo.GetIsPackage():
             module.__path__ = moduleInfo.GetFullName()
-        exec(moduleInfo.GetSource(), module.__dict__)
+        try:
+            exec(moduleInfo.GetSource(), module.__dict__)
+        except:
+            del sys.modules[fullname]
+            raise
         return module
 
 def LoadXML(xmlstring):
