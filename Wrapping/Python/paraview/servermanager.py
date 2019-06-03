@@ -2264,7 +2264,7 @@ class _ModuleLoader(object):
         module = sys.modules.setdefault(fullname, imp.new_module(fullname))
         module.__file__ = "<%s>" % moduleInfo.GetFullName()
         module.__loader__ = self
-        if moduleInfo.GetIsPackage:
+        if moduleInfo.GetIsPackage():
             module.__path__ = moduleInfo.GetFullName()
         code = compile(moduleInfo.GetSource(), module.__file__, 'exec')
         exec (code in module.__dict__)
