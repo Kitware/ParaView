@@ -2245,7 +2245,7 @@ def CreateRepresentation(aProxy, view, **extraArgs):
     view.Representations.append(proxy)
     return proxy
 
-class _ModuleLoader(object):
+class ParaViewMetaPathFinder(object):
     def find_module(self, fullname, path=None):
         if vtkPVPythonModule.HasModule(fullname):
             return self
@@ -2257,17 +2257,23 @@ class _ModuleLoader(object):
         except KeyError:
             pass
 
-        import imp
-        moduleInfo = vtkPVPythonModule.GetModule(fullname)
-        if not moduleInfo:
+        info = vtkPVPythonModule.GetModule(fullname)
+        if not info:
             raise ImportError
-        module = sys.modules.setdefault(fullname, imp.new_module(fullname))
-        module.__file__ = "<%s>" % moduleInfo.GetFullName()
+
+        import imp
+        module = imp.new_module(fullname)
+        module.__file__ = "<%s>" % fullname
         module.__loader__ = self
-        if moduleInfo.GetIsPackage():
-            module.__path__ = moduleInfo.GetFullName()
+        if info.GetIsPackage():
+            module.__path__ = []
+            module.__package__ = fullname
+        else:
+            module.__package__ = fullname.rpartition('.')[0]
+
+        sys.modules[fullname] = module
         try:
-            exec(moduleInfo.GetSource(), module.__dict__)
+            exec(info.GetSource(), module.__dict__)
         except:
             del sys.modules[fullname]
             raise
@@ -3202,8 +3208,8 @@ _pyproxies = {}
 # _createModules()
 
 # Set up our custom importer (if possible)
-loader = _ModuleLoader()
-sys.meta_path.append(loader)
+finder = ParaViewMetaPathFinder()
+sys.meta_path.append(finder)
 
 def __exposeActiveModules__():
     """Update servermanager submodules to point to the current
