@@ -2252,6 +2252,11 @@ class _ModuleLoader(object):
         return None
 
     def load_module(self, fullname):
+        try:
+            return sys.modules[fullname]
+        except KeyError:
+            pass
+
         import imp
         moduleInfo = vtkPVPythonModule.GetModule(fullname)
         if not moduleInfo:
