@@ -51,12 +51,9 @@
 //-----------------------------------------------------------------------------
 struct vtkGmshReaderInternal
 {
-  vtkGmshReaderInternal(
-    int adaptLevel = 0, double adaptTol = -0.0001, int fieldHasPiece = -1, int fieldHasTime = -1)
+  vtkGmshReaderInternal(int adaptLevel = 0, double adaptTol = -0.0001)
     : AdaptTolerance(adaptTol)
     , AdaptLevel(adaptLevel)
-    , FieldHasPiece(fieldHasPiece)
-    , FieldHasTime(fieldHasTime)
   {
   }
 
@@ -103,8 +100,6 @@ struct vtkGmshReaderInternal
 
   double AdaptTolerance;
   int AdaptLevel;
-  int FieldHasPiece;
-  int FieldHasTime;
   std::vector<std::string> FieldPathPattern;
   std::vector<vectInt> Connectivity; // connectivity (vector of vector)
   std::vector<int> CellType;         // topology
@@ -146,18 +141,6 @@ void vtkGmshReader::ClearFieldInfo()
 {
   this->Internal->FieldPathPattern.clear();
   this->Modified();
-}
-
-//-----------------------------------------------------------------------------
-void vtkGmshReader::SetFieldInfoPieceTimeEntry(int hasPieceEntry, int hasTimeEntry)
-{
-  if (this->Internal->FieldHasPiece != hasPieceEntry ||
-    this->Internal->FieldHasTime != hasTimeEntry)
-  {
-    this->Internal->FieldHasPiece = hasPieceEntry;
-    this->Internal->FieldHasTime = hasTimeEntry;
-    this->Modified();
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -253,45 +236,26 @@ int vtkGmshReader::ReadGeomAndFieldFile(int& firstVertexNo, vtkUnstructuredGrid*
     std::vector<std::string>::iterator itfieldpath = this->Internal->FieldPathPattern.begin();
     std::vector<std::string>::iterator itfieldpathend = this->Internal->FieldPathPattern.end();
 
-    int fieldHasPiece = this->Internal->FieldHasPiece;
-    int fieldHasTime = this->Internal->FieldHasTime;
-
     for (; itfieldpath != itfieldpathend; ++itfieldpath)
     {
       // ParaView sorts the fields by alphabetical order
-      char* field_name;
-      int field_name_size;
+      std::string str_field_name(itfieldpath->c_str());
+      std::string pIdentifier;
 
-      // Beware: According to Gmsh convention, the file id should
-      // always include 6 digits and be padded with 0 as needed.
-      // Add +1 for null terminating character.
-      if (fieldHasTime && fieldHasPiece)
+      pIdentifier = "[partID]";
+      this->ReplaceAllStringPattern(str_field_name, pIdentifier, PartID);
+
+      // Test the old format with 6 digits and zero padding (000001, etc)
+      if (PartID < 1e7)
       {
-        field_name_size = snprintf(nullptr, 0, itfieldpath->c_str(), TimeStep, PartID) + 1;
-        field_name = new char[field_name_size];
-        snprintf(field_name, field_name_size, itfieldpath->c_str(), TimeStep, PartID);
-      }
-      else if (fieldHasPiece)
-      {
-        field_name_size = snprintf(nullptr, 0, itfieldpath->c_str(), FileID) + 1;
-        field_name = new char[field_name_size];
-        snprintf(field_name, field_name_size, itfieldpath->c_str(), FileID);
-      }
-      else if (fieldHasTime)
-      {
-        field_name_size = snprintf(nullptr, 0, itfieldpath->c_str(), TimeStep) + 1;
-        field_name = new char[field_name_size];
-        snprintf(field_name, field_name_size, itfieldpath->c_str(), TimeStep);
-      }
-      else
-      {
-        field_name_size = snprintf(nullptr, 0, "%s", itfieldpath->c_str()) + 1;
-        field_name = new char[field_name_size];
-        strcpy(field_name, itfieldpath->c_str());
+        pIdentifier = "[zeroPadPartID]";
+        std::ostringstream paddedFileID;
+        paddedFileID << std::setw(6) << std::setfill('0') << PartID;
+        this->ReplaceAllStringPattern(str_field_name, pIdentifier, paddedFileID.str());
       }
 
-      std::string str_field_name(field_name); // convert to string
-      delete[] field_name;
+      pIdentifier = "[step]";
+      this->ReplaceAllStringPattern(str_field_name, pIdentifier, TimeStep);
 
       // Returns the directory path specified in the xml file without the geom file name
       std::string fpath = vtksys::SystemTools::GetFilenamePath(str_field_name);
@@ -580,7 +544,11 @@ int vtkGmshReader::ReadGeomAndFieldFile(int& firstVertexNo, vtkUnstructuredGrid*
       // Initialize datafilename string
       std::string datafilename(mimargv[i]);
       // Merge Field msh files
-      MergeFile(datafilename);
+      // Prototype:
+      //   int MergeFile(const std::string &fileName, bool warnIfMissing = false,
+      //                 bool setBoundingBox = true, bool importPhysicalsInOnelab = true,
+      //                 int partitionToRead = --1);
+      MergeFile(datafilename, false, false, false, PartID - 1);
     }
 
     if (PView::list.empty())
@@ -818,11 +786,7 @@ int vtkGmshReader::ReadGeomAndFieldFile(int& firstVertexNo, vtkUnstructuredGrid*
             // Adapt and generate the GmshS object globVTKData
             if (testPViewData->getAdaptiveData())
             {
-              vtkWarningMacro("Pointer _adaptiveData is not empty...\nYou are likely using a "
-                              "Gmsh library compiled in a non-optimal way for this plugin.\nIn "
-                              "addition to a higher memory consumption, the plugin may not "
-                              "behave as expected.\nUse at your own risk or rebuild Gmsh "
-                              "according to the procedure described in the README file");
+              // Clean any existing adaptive data that could have been pre-allcoated
               testPViewData->destroyAdaptiveData();
             }
 
@@ -1042,6 +1006,7 @@ int vtkGmshReader::ReadGeomAndFieldFile(int& firstVertexNo, vtkUnstructuredGrid*
       {
         field->AddArray(dataArray);
         dataArray->Delete();
+        dataArray = nullptr;
       }
 
       this->Internal->ClearData();
@@ -1056,3 +1021,29 @@ int vtkGmshReader::ReadGeomAndFieldFile(int& firstVertexNo, vtkUnstructuredGrid*
 
   return 1;
 } // end of ReadGeomAndFieldFile
+
+//----------------------------------------------------------------------------
+template <class T>
+void vtkGmshReader::ReplaceAllStringPattern(
+  std::string& input, const std::string& pIdentifier, const T& target)
+{
+  vtkDebugMacro("Entering vtkGmshMetaReader::ReplaceStringPatternByInt()");
+
+  size_t foundPID = input.find(pIdentifier);
+  while (foundPID != std::string::npos)
+  {
+    std::string base = input.substr(0, foundPID);
+    std::string ext = input.substr(foundPID + pIdentifier.size(), input.size());
+    std::ostringstream fStr;
+    fStr << base << target << ext;
+    input = fStr.str();
+    foundPID = input.find(pIdentifier);
+  }
+}
+
+// Explicit instantiations
+template void vtkGmshReader::ReplaceAllStringPattern(
+  std::string& input, const std::string& pIdentifier, const int& target);
+
+template void vtkGmshReader::ReplaceAllStringPattern(
+  std::string& input, const std::string& pIdentifier, const std::string& target);

@@ -23,7 +23,7 @@
  * See the Copyright.txt and License.txt files provided
  * with ParaViewGmshReaderPlugin for license information.
  *
-*/
+ */
 
 #ifndef vtkGmshReader_h
 #define vtkGmshReader_h
@@ -39,6 +39,8 @@ public:
   static vtkGmshReader* New();
   vtkTypeMacro(vtkGmshReader, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
+  template <class T>
+  void ReplaceAllStringPattern(std::string& input, const std::string& pIdentifier, const T& target);
 
   //@{
   /**
@@ -102,7 +104,6 @@ public:
    */
   void ClearFieldInfo();
   void SetAdaptInfo(int adaptLevel, double adaptTol);
-  void SetFieldInfoPieceTimeEntry(int hasPieceEntry, int hasTimeEntry);
   void SetFieldInfoPath(const std::string& addPath);
   int GetSizeFieldPathPattern();
   //@}
