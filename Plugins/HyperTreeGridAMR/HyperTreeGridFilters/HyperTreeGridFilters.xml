@@ -1,0 +1,241 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy name="HyperTreeGridAMR Box" class="vtkHyperTreeGridBox" label="Hyper Tree Grid - AMR (Box)">
+      <Documentation
+        long_help="Adaptive Mesh Refinement using a Hyper Tree Grid."
+        short_help="Adaptive Mesh Refinement using a Hyper Tree Grid.">
+          This Filter generates a Hyper Tree Grid using certain metrics to refine
+          the input data set.
+          As refinment goes, cells are box-clipped, which is relatively computationally expensive.
+          The metric is a criteria such that if and only if the data set in the cell matches it, the tree is refined.
+      </Documentation>
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+            <ProxyGroupDomain name="groups">
+              <Group name="sources"/>
+              <Group name="filters"/>
+            </ProxyGroupDomain>
+            <DataTypeDomain name="input_type">
+              <DataType value="vtkDataSet"/>
+            </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty
+          name="Dimensions"
+          label="Dimensions"
+          command="SetDimensions"
+          number_of_elements="3"
+          animateable="1"
+          default_values="4 4 4" >
+          <Documentation>
+            Define one end of the line (small scalar values). Default is (0,0,0).
+          </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty
+          name="BranchFactor"
+          label="Branch Factor"
+          command="SetBranchFactor"
+          number_of_elements="1"
+          default_values="2" >
+          <EnumerationDomain name="enum">
+            <Entry value="2" text="2" />
+            <Entry value="3" text="3" />
+          </EnumerationDomain>
+          <Documentation>
+            Define other end of the line (large scalar values). Default is (0,0,1).
+          </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty
+         name="MaxTreeDepth"
+         label="MaxTreeDepth"
+         command="SetMaxTreeDepth"
+         number_of_elements="1"
+         animateable="0"
+         default_values="1" >
+         <Documentation>
+           Define one end of the line (small scalar values). Default is (0,0,0).
+         </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty name="SelectInputScalars"
+                            label="Array"
+                            command="SetInputArrayToProcess"
+                            number_of_elements="5"
+                            element_types="int int int int str"
+                            animateable="0">
+        <ArrayListDomain name="array_list"
+                          attribute_type="Scalars"
+                          input_domain_name="inputs_array">
+          <RequiredProperties>
+            <Property name="Input"
+                      function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <IntVectorProperty name="Use Max"
+                     command="SetUseMax"
+                     number_of_elements="1"
+                     default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="MaxMetricValue"
+                        command="SetMaxValue"
+                        number_of_elements="1"
+                        default_values="1">
+      </DoubleVectorProperty>
+      <IntVectorProperty name="Use Min"
+                     command="SetUseMin"
+                     number_of_elements="1"
+                     default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="MinMetricValue"
+                        command="SetMinValue"
+                        number_of_elements="1"
+                        default_values="1">
+      </DoubleVectorProperty>
+      <IntVectorProperty name="Use Entropy"
+                     command="SetUseEntropy"
+                     number_of_elements="1"
+                     default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="EntropyValue"
+                        command="SetEntropyValue"
+                        number_of_elements="1"
+                        default_values="1">
+      </DoubleVectorProperty>
+      <IntVectorProperty name="Use Range"
+                     command="SetUseRange"
+                     number_of_elements="1"
+                     default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="RangeValue"
+                        command="SetRangeValue"
+                        number_of_elements="1"
+                        animateable="0"
+                        default_values="0">
+      </DoubleVectorProperty>
+      <!-- End HyperTreeGridAMR -->
+    </SourceProxy>
+
+    <SourceProxy name="HyperTreeGridAMR Plane" class="vtkHyperTreeGridPlane" label="Hyper Tree Grid - AMR (Plane)">
+      <Documentation
+        long_help="Adaptive Mesh Refinement using a Hyper Tree Grid."
+        short_help="Adaptive Mesh Refinement using a Hyper Tree Grid.">
+          This Filter generates a Hyper Tree Grid using certain metrics to refine
+          the input data set.
+          This is a recursive algorithm with planes recursively slicing the data.
+          The metric is a criteria such that if and only if the data set in the cell matches it, the tree is refined.
+      </Documentation>
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+            <ProxyGroupDomain name="groups">
+              <Group name="sources"/>
+              <Group name="filters"/>
+            </ProxyGroupDomain>
+            <DataTypeDomain name="input_type">
+              <DataType value="vtkDataSet"/>
+            </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty
+          name="Dimensions"
+          label="Dimensions"
+          command="SetDimensions"
+          number_of_elements="3"
+          animateable="1"
+          default_values="4 4 4" >
+          <Documentation>
+            Define one end of the line (small scalar values). Default is (0,0,0).
+          </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty
+          name="BranchFactor"
+          label="Branch Factor"
+          command="SetBranchFactor"
+          number_of_elements="1"
+          default_values="2" >
+          <EnumerationDomain name="enum">
+            <Entry value="2" text="2" />
+            <Entry value="3" text="3" />
+          </EnumerationDomain>
+          <Documentation>
+            Define other end of the line (large scalar values). Default is (0,0,1).
+          </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty
+         name="MaxTreeDepth"
+         label="MaxTreeDepth"
+         command="SetMaxDepth"
+         number_of_elements="1"
+         animateable="0"
+         default_values="1" >
+         <Documentation>
+           Define one end of the line (small scalar values). Default is (0,0,0).
+         </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty name="SelectInputScalars"
+                            label="Array"
+                            command="SetInputArrayToProcess"
+                            number_of_elements="5"
+                            element_types="int int int int str"
+                            animateable="0">
+        <ArrayListDomain name="array_list"
+                          attribute_type="Scalars"
+                          input_domain_name="inputs_array">
+          <RequiredProperties>
+            <Property name="Input"
+                      function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <IntVectorProperty name="Use Max"
+                     command="SetUseMax"
+                     number_of_elements="1"
+                     default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="MaxMetricValue"
+                        command="SetMax"
+                        number_of_elements="1"
+                        default_values="1">
+      </DoubleVectorProperty>
+      <IntVectorProperty name="Use Min"
+                     command="SetUseMin"
+                     number_of_elements="1"
+                     default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="MinMetricValue"
+                        command="SetMin"
+                        number_of_elements="1"
+                        default_values="1">
+      </DoubleVectorProperty>
+      <IntVectorProperty name="Use Entropy"
+                     command="SetUseEntropy"
+                     number_of_elements="1"
+                     default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="EntropyValue"
+                        command="SetEntropyValue"
+                        number_of_elements="1"
+                        default_values="1">
+      </DoubleVectorProperty>
+      <IntVectorProperty name="Use Range"
+                     command="SetUseRange"
+                     number_of_elements="1"
+                     default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="RangeValue"
+                        command="SetRangeValue"
+                        number_of_elements="1"
+                        animateable="0"
+                        default_values="0">
+      </DoubleVectorProperty>
+      <!-- End HyperTreeGridAMR -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
