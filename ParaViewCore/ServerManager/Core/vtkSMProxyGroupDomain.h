@@ -88,6 +88,11 @@ public:
   const char* GetProxyName(unsigned int idx);
 
   /**
+   * Given an index, returns a proxy.
+   */
+  vtkSMProxy* GetProxy(unsigned int idx);
+
+  /**
    * Returns the name (in the group) of a proxy.
    */
   const char* GetProxyName(vtkSMProxy* proxy);

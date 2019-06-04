@@ -161,6 +161,12 @@ const char* vtkSMProxyGroupDomain::GetProxyName(unsigned int idx)
 }
 
 //---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxyGroupDomain::GetProxy(unsigned int idx)
+{
+  return this->GetProxy(this->GetProxyName(idx));
+}
+
+//---------------------------------------------------------------------------
 const char* vtkSMProxyGroupDomain::GetProxyName(vtkSMProxy* proxy)
 {
   const char* proxyName = 0;
