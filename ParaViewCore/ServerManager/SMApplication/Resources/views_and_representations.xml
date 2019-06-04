@@ -4124,10 +4124,18 @@
                       panel_visibility_default_for_representation="volume"/>
             <Property name="UseFloatingPointFrameBuffer" />
             <Hints>
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="Representation"
-                                       value="Volume" />
+              <PropertyWidgetDecorator type="CompositeDecorator">
+                <Expression type="or">
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Volume" />
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="NVIDIA IndeX" />
+                </Expression>
+              </PropertyWidgetDecorator>
             </Hints>
           </PropertyGroup>
         </ExposedProperties>
@@ -4255,10 +4263,18 @@
             <Property name="ShowIsosurfaces" />
             <Property name="IsosurfaceValues" />
             <Hints>
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="Representation"
-                                       value="Volume" />
+              <PropertyWidgetDecorator type="CompositeDecorator">
+                <Expression type="or">
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Volume" />
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="NVIDIA IndeX" />
+                </Expression>
+              </PropertyWidgetDecorator>
             </Hints>
           </PropertyGroup>
         </ExposedProperties>
