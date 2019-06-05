@@ -163,7 +163,7 @@ function (paraview_server_manager_process_files)
   add_custom_command(
     OUTPUT  "${_paraview_sm_process_files_output}"
     DEPENDS ${_paraview_sm_process_files_FILES}
-            ParaView::ProcessXML
+            "$<TARGET_FILE:ParaView::ProcessXML>"
     COMMAND ParaView::ProcessXML
             "${_paraview_sm_process_files_output}"
             "${_paraview_sm_process_files_TARGET}"

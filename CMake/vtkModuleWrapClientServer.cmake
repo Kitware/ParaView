@@ -88,7 +88,7 @@ $<$<BOOL:${_vtk_client_server_genex_include_directories}>:\n-I\'$<JOIN:${_vtk_cl
               CXX "${_vtk_client_server_header}"
       COMMENT "Generating client_server wrapper sources for ${_vtk_client_server_basename}"
       DEPENDS
-        ParaView::WrapClientServer
+        "$<TARGET_FILE:ParaView::WrapClientServer>"
         "${_vtk_client_server_header}"
         "${_vtk_client_server_args_file}"
         "${_vtk_client_server_command_depend}")
