@@ -97,7 +97,7 @@ endif ()
 if (TARGET VTK::IOADIOS2)
   list(APPEND xml_files
     Resources/proxies_adios2.xml)
-endif()
+endif ()
 
 if (TARGET VTK::IOMotionFX)
   list(APPEND xml_files
