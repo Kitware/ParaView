@@ -351,7 +351,7 @@ void vtkPVPluginLoader::LoadPluginsFromPath(const char* path)
   for (vtkIdType cc = 0; cc < dir->GetNumberOfFiles(); cc++)
   {
     std::string ext = vtksys::SystemTools::GetFilenameLastExtension(dir->GetFile(cc));
-    if (ext == ".so" || ext == ".dll" || ext == ".xml" || ext == ".sl")
+    if (ext == ".so" || ext == ".dll" || ext == ".xml" || ext == ".sl" || ext == ".py")
     {
       std::string file = dir->GetPath();
       file += "/";
