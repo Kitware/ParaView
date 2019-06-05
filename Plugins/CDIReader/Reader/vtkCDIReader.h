@@ -46,6 +46,10 @@
 #include "vtkSmartPointer.h"
 #include "vtkUnstructuredGridAlgorithm.h"
 
+#ifdef PARAVIEW_USE_MPI
+class vtkMultiProcessController;
+#endif
+
 class vtkCallbackCommand;
 class vtkDoubleArray;
 class vtkStringArray;
