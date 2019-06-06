@@ -303,6 +303,15 @@ if (PARAVIEW_ENABLE_PYTHON)
   # The pqSGExportStateWizard has subclasses that directly access the UI file,
   # and currently we don't have a clean way to break this hard dependency, so
   # for now we manually install this ui file.
+  get_property(generator_is_multi_config GLOBAL
+    PROPERTY GENERATOR_IS_MULTI_CONFIG)
+  if (generator_is_multi_config)
+    set(ui_pqExportStateWizard_path
+      "${CMAKE_CURRENT_BINARY_DIR}/pqComponents_autogen/include_$<CONFIG>/ui_pqExportStateWizard.h")
+  else ()
+    set(ui_pqExportStateWizard_path
+      "${CMAKE_CURRENT_BINARY_DIR}/pqComponents_autogen/include/ui_pqExportStateWizard.h")
+  endif ()
   vtk_module_install_headers(
-    FILES "${CMAKE_CURRENT_BINARY_DIR}/pqComponents_autogen/include/ui_pqExportStateWizard.h")
+    FILES "${ui_pqExportStateWizard_path}")
 endif ()
