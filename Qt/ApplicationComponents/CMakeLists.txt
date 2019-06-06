@@ -85,6 +85,7 @@ set(classes
   pqDataAssemblyPropertyWidget
   pqDataQueryReaction
   pqDataTimeStepBehavior
+  pqDefaultContextMenu
   pqDefaultMainWindow
   pqDefaultViewBehavior
   pqDeleteReaction

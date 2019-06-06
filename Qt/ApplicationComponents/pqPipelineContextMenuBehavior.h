@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPoint> // needed for QPoint.
 #include <QPointer>
 
+class pqContextMenuInterface;
 class pqDataRepresentation;
 class pqPipelineRepresentation;
 class pqView;
@@ -63,74 +64,12 @@ public:
   ~pqPipelineContextMenuBehavior() override;
 
 protected Q_SLOTS:
+
   /**
   * Called when a new view is added. We add actions to the widget for context
   * menu if the view is a render-view.
   */
   void onViewAdded(pqView*);
-
-  /**
-  * called to hide the representation.
-  */
-  void hide();
-
-  /**
-  * called to hide the block. the action which emits the signal will
-  * contain the block index in its data().
-  */
-  void hideBlock();
-
-  /**
-  * called to show only the selected block. the action which emits the
-  * signal will contain the block index in its data().
-  */
-  void showOnlyBlock();
-
-  /**
-  * called to show all blocks.
-  */
-  void showAllBlocks();
-
-  /**
-  * called to unset the visibility flag for the block. after this call the
-  * block will inherit the visibility from its parent. the action which
-  * emits the signal will contain the block index in its data()
-  */
-  void unsetBlockVisibility();
-
-  /**
-  * called to set the color for the block. the action which emits the
-  * signal will contain the block index in its data()
-  */
-  void setBlockColor();
-
-  /**
-  * called to unset the color for the block. the action which emits the
-  * signal will contain the block index in its data()
-  */
-  void unsetBlockColor();
-
-  /**
-  * called to set the opacity for the block. the action which emits the
-  * signal will contain the block index in its data()
-  */
-  void setBlockOpacity();
-
-  /**
-  * called to unset the opacity for the block. the action which emits the
-  * signal will contain the block index in its data()
-  */
-  void unsetBlockOpacity();
-
-  /**
-  * called to change the representation type.
-  */
-  void reprTypeChanged(QAction* action);
-
-  /**
-  * called to change the coloring mode.
-  */
-  void colorMenuTriggered(QAction* action);
 
 protected:
   /**
@@ -141,11 +80,6 @@ protected:
   virtual void buildMenu(pqDataRepresentation* repr, unsigned int blockIndex);
 
   /**
-  * called to build the color arrays submenu.
-  */
-  virtual void buildColorFieldsMenu(pqPipelineRepresentation* pipelineRepr, QMenu* menu);
-
-  /**
   * event filter to capture the right-click. We don't directly use mechanisms
   * from QWidget to popup the context menu since all of those mechanism seem
   * to eat away the right button release, leaving the render window in a
@@ -153,15 +87,8 @@ protected:
   */
   bool eventFilter(QObject* caller, QEvent* e) override;
 
-  /**
-  * return the name of the block from its flat index
-  */
-  QString lookupBlockName(unsigned int flatIndex) const;
-
   QMenu* Menu;
   QPoint Position;
-  QPointer<pqDataRepresentation> PickedRepresentation;
-  QList<unsigned int> PickedBlocks;
 
 private:
   Q_DISABLE_COPY(pqPipelineContextMenuBehavior)
