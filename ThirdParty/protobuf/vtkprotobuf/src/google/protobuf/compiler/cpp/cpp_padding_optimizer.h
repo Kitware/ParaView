@@ -35,6 +35,10 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_CPP_PADDING_OPTIMIZER_H__
 #define GOOGLE_PROTOBUF_COMPILER_CPP_PADDING_OPTIMIZER_H__
 
+#ifndef protobuf
+#define protobuf vtkprotobuf
+#endif
+
 #include <google/protobuf/compiler/cpp/cpp_message_layout_helper.h>
 
 namespace google {
@@ -59,6 +63,6 @@ class PaddingOptimizer : public MessageLayoutHelper {
 }  // namespace cpp
 }  // namespace compiler
 }  // namespace protobuf
-
 }  // namespace google
+
 #endif  // GOOGLE_PROTOBUF_COMPILER_CPP_PADDING_OPTIMIZER_H__
