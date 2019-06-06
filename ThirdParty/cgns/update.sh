@@ -8,7 +8,7 @@ readonly name="cgns"
 readonly ownership="cgns Upstream <kwrobot@kitware.com>"
 readonly subtree="ThirdParty/$name/vtk$name"
 readonly repo="https://gitlab.kitware.com/third-party/cgns.git"
-readonly tag="for/paraview-20190124-3.3.1"
+readonly tag="for/paraview-20191025-3.4.0"
 
 readonly paths="
 .gitattributes
