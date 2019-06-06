@@ -35,6 +35,10 @@
 #ifndef GOOGLE_PROTOBUF_COMPILER_CPP_SERVICE_H__
 #define GOOGLE_PROTOBUF_COMPILER_CPP_SERVICE_H__
 
+#ifndef protobuf
+#define protobuf vtkprotobuf
+#endif
+
 #include <map>
 #include <string>
 #include <google/protobuf/compiler/cpp/cpp_options.h>
@@ -42,11 +46,13 @@
 
 namespace google {
 namespace protobuf {
-  namespace io {
-    class Printer;             // printer.h
-  }
+namespace io {
+class Printer;  // printer.h
 }
+}  // namespace protobuf
+}  // namespace google
 
+namespace google {
 namespace protobuf {
 namespace compiler {
 namespace cpp {
@@ -55,6 +61,7 @@ class ServiceGenerator {
  public:
   // See generator.cc for the meaning of dllexport_decl.
   explicit ServiceGenerator(const ServiceDescriptor* descriptor,
+                            const std::map<std::string, std::string>& vars,
                             const Options& options);
   ~ServiceGenerator();
 
@@ -66,11 +73,8 @@ class ServiceGenerator {
 
   // Source file stuff.
 
-  // Generate code that initializes the global variable storing the service's
-  // descriptor.
-  void GenerateDescriptorInitializer(io::Printer* printer, int index);
-
-  // Generate implementations of everything declared by GenerateDeclarations().
+  // Generate implementations of everything declared by
+  // GenerateDeclarations().
   void GenerateImplementation(io::Printer* printer);
 
  private:
@@ -105,7 +109,8 @@ class ServiceGenerator {
   void GenerateStubMethods(io::Printer* printer);
 
   const ServiceDescriptor* descriptor_;
-  std::map<string, string> vars_;
+  std::map<std::string, std::string> vars_;
+  const Options& options_;
 
   int index_in_metadata_;
 
@@ -116,6 +121,6 @@ class ServiceGenerator {
 }  // namespace cpp
 }  // namespace compiler
 }  // namespace protobuf
-
 }  // namespace google
+
 #endif  // GOOGLE_PROTOBUF_COMPILER_CPP_SERVICE_H__

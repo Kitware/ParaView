@@ -11,6 +11,7 @@ add_library(protobuf
 
   google/protobuf/io/coded_stream.cc
   google/protobuf/io/gzip_stream.cc
+  google/protobuf/io/io_win32.cc
   google/protobuf/io/printer.cc
   google/protobuf/io/strtod.cc
   google/protobuf/io/tokenizer.cc
@@ -21,7 +22,6 @@ add_library(protobuf
   google/protobuf/stubs/bytestream.cc
   google/protobuf/stubs/common.cc
   google/protobuf/stubs/int128.cc
-  google/protobuf/stubs/io_win32.cc
   google/protobuf/stubs/mathlimits.cc
   google/protobuf/stubs/status.cc
   google/protobuf/stubs/statusor.cc
@@ -55,10 +55,10 @@ add_library(protobuf
   google/protobuf/util/internal/utility.cc
 
   google/protobuf/any.cc
+  google/protobuf/any_lite.cc
   google/protobuf/any.pb.cc
   google/protobuf/api.pb.cc
   google/protobuf/arena.cc
-  google/protobuf/arenastring.cc
   google/protobuf/descriptor.cc
   google/protobuf/descriptor.pb.cc
   google/protobuf/descriptor_database.cc
@@ -76,6 +76,7 @@ add_library(protobuf
   google/protobuf/map_field.cc
   google/protobuf/message.cc
   google/protobuf/message_lite.cc
+  google/protobuf/parse_context.cc
   google/protobuf/reflection_ops.cc
   google/protobuf/repeated_field.cc
   google/protobuf/service.cc
@@ -147,6 +148,7 @@ set(headers
   google/protobuf/metadata.h
   google/protobuf/metadata_lite.h
   google/protobuf/package_info.h
+  google/protobuf/parse_context.h
   google/protobuf/reflection.h
   google/protobuf/reflection_internal.h
   google/protobuf/reflection_ops.h
