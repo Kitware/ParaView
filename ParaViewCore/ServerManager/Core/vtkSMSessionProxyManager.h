@@ -271,8 +271,11 @@ public:
   /**
    * Given a group, returns a name not already used for proxies registered in
    * the given group. The prefix is used to come up with a new name.
+   * if alwaysAppend is true, then a suffix will always be appended, if not,
+   * the prefix may be used directly if possible.
    */
-  std::string GetUniqueProxyName(const char* groupname, const char* prefix);
+  std::string GetUniqueProxyName(
+    const char* groupname, const char* prefix, bool alwaysAppend = true);
 
   /**
    * If the proxy is in the given group, return its name, otherwise
