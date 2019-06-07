@@ -748,6 +748,9 @@ else ()
   # Forward Python option to VTK.
   set(VTK_WRAP_PYTHON "${PARAVIEW_ENABLE_PYTHON}")
 
+  # Forward MPI option to VTK.
+  set(VTK_USE_MPI "${PARAVIEW_USE_MPI}")
+
   # Forward logging option to VTK.
   set(VTK_ENABLE_LOGGING "${PARAVIEW_ENABLE_LOGGING}")
   if (PARAVIEW_ENABLE_LOGGING)
