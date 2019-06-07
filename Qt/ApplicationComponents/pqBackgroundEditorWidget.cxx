@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 #include "pqProxy.h"
 #include "pqRenderView.h"
+#include "pqTextureSelectorPropertyWidget.h"
 #include "pqUndoStack.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
@@ -70,6 +71,7 @@ class pqBackgroundEditorWidget::pqInternal : public Ui::BackgroundEditorWidget
 {
 public:
   enum BackgroundType PreviousType;
+  pqTextureSelectorPropertyWidget* TextureSelector = nullptr;
 
   pqInternal(pqBackgroundEditorWidget* self)
     : PreviousType(SINGLE_COLOR_TYPE)
@@ -120,6 +122,19 @@ pqBackgroundEditorWidget::pqBackgroundEditorWidget(
     ui.BackgroundType->hide();
   }
   currentIndexChangedBackgroundType(this->Internal->PreviousType);
+
+  smProperty = smGroup->GetProperty(IMAGE_PROPERTY);
+  if (smProperty)
+  {
+    // Can't use property link with texture, create the widget manually and connect signals
+    this->Internal->TextureSelector =
+      new pqTextureSelectorPropertyWidget(smProxy, smProperty, this);
+    QObject::connect(
+      this->Internal->TextureSelector, SIGNAL(changeAvailable()), this, SIGNAL(changeAvailable()));
+    QObject::connect(
+      this->Internal->TextureSelector, SIGNAL(changeFinished()), this, SIGNAL(changeFinished()));
+    ui.page3Layout->insertWidget(0, this->Internal->TextureSelector);
+  }
 }
 
 pqBackgroundEditorWidget::~pqBackgroundEditorWidget()
@@ -138,7 +153,7 @@ void pqBackgroundEditorWidget::currentIndexChangedBackgroundType(int type)
   bool visibleControls[TYPE_COUNT][ROWS] = { { true, false, false }, { true, true, false },
     { false, false, true } };
   QWidget* controls[ROWS][COLS] = { { ui.Color, ui.RestoreDefaultColor },
-    { ui.Color2, ui.RestoreDefaultColor2 }, { ui.Image, 0 } };
+    { ui.Color2, ui.RestoreDefaultColor2 }, { this->Internal->TextureSelector, 0 } };
   for (int i = 0; i < ROWS; ++i)
   {
     for (int j = 0; j < COLS; ++j)
@@ -200,11 +215,6 @@ void pqBackgroundEditorWidget::fireGradientAndImageChanged(int oldType, int newT
   {
     emit imageBackgroundChanged();
   }
-}
-
-void pqBackgroundEditorWidget::setView(pqView* _view)
-{
-  this->Internal->Image->setRenderView(qobject_cast<pqRenderView*>(_view));
 }
 
 void pqBackgroundEditorWidget::clickedRestoreDefaultColor()

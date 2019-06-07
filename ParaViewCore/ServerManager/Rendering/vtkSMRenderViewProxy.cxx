@@ -457,6 +457,38 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
     return reprName;
   }
 
+  if (vtkPVXMLElement* hints = producer->GetHints())
+  {
+    // If the source has an hint as follows, then it's a text producer and must
+    // be display-able.
+    //  <Hints>
+    //    <OutputPort name="..." index="..." type="text" />
+    //  </Hints>
+    for (unsigned int cc = 0, max = hints->GetNumberOfNestedElements(); cc < max; cc++)
+    {
+      int index;
+      vtkPVXMLElement* child = hints->GetNestedElement(cc);
+      const char* childName = child->GetName();
+      const char* childType = child->GetAttribute("type");
+      if (childName && strcmp(childName, "OutputPort") == 0 &&
+        child->GetScalarAttribute("index", &index) && index == outputPort && childType)
+      {
+        if (strcmp(childType, "text") == 0)
+        {
+          return "TextSourceRepresentation";
+        }
+        else if (strcmp(childType, "progress") == 0)
+        {
+          return "ProgressBarSourceRepresentation";
+        }
+        else if (strcmp(childType, "logo") == 0)
+        {
+          return "LogoSourceRepresentation";
+        }
+      }
+    }
+  }
+
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   const char* representationsToTry[] = { "UnstructuredGridRepresentation",
     "StructuredGridRepresentation", "UniformGridRepresentation", "AMRRepresentation",
@@ -498,35 +530,6 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
       }
     }
   }
-
-  if (vtkPVXMLElement* hints = producer->GetHints())
-  {
-    // If the source has an hint as follows, then it's a text producer and must
-    // be display-able.
-    //  <Hints>
-    //    <OutputPort name="..." index="..." type="text" />
-    //  </Hints>
-    for (unsigned int cc = 0, max = hints->GetNumberOfNestedElements(); cc < max; cc++)
-    {
-      int index;
-      vtkPVXMLElement* child = hints->GetNestedElement(cc);
-      const char* childName = child->GetName();
-      if (childName && strcmp(childName, "OutputPort") == 0 &&
-        child->GetScalarAttribute("index", &index) && index == outputPort &&
-        child->GetAttribute("type"))
-      {
-        if (strcmp(child->GetAttribute("type"), "text") == 0)
-        {
-          return "TextSourceRepresentation";
-        }
-        else if (strcmp(child->GetAttribute("type"), "progress") == 0)
-        {
-          return "ProgressBarSourceRepresentation";
-        }
-      }
-    }
-  }
-
   return NULL;
 }
 

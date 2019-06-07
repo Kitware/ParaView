@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 
 #include "pqPropertyWidget.h"
-#include "pqTextureComboBox.h"
+#include "vtkNew.h"
 
 /**
 * Property widget for selecting the texture to apply to a surface.
@@ -44,19 +44,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * To use this widget for a property add the 'panel_widget="texture_selector"'
 * to the property's XML.
 */
+class vtkSMProxyGroupDomain;
+class pqTextureComboBox;
+class pqDataRepresentation;
 class PQCOMPONENTS_EXPORT pqTextureSelectorPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
 
 public:
-  pqTextureSelectorPropertyWidget(vtkSMProxy* proxy, QWidget* parent = 0);
-  ~pqTextureSelectorPropertyWidget() override;
+  pqTextureSelectorPropertyWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
+  ~pqTextureSelectorPropertyWidget() override = default;
 
-private slots:
-  void handleViewChanged(pqView* view);
+protected slots:
+  void onTextureChanged(vtkSMProxy* texture);
+  void onPropertyChanged();
+  void checkTCoords();
 
 private:
+  vtkNew<vtkEventQtSlotConnect> VTKConnector;
   pqTextureComboBox* Selector;
+  vtkSMProxyGroupDomain* Domain;
+  pqDataRepresentation* Representation = nullptr;
+  pqView* View = nullptr;
 };
 
 #endif // _pqTextureSelectorPropertyWidget_h

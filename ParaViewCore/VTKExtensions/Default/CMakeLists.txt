@@ -105,6 +105,7 @@ set(classes
   vtkPVGlyphFilterLegacy
   vtkPVGridAxes3DActor
   vtkPVLinearExtrusionFilter
+  vtkPVLogoSource
   vtkPVMetaClipDataSet
   vtkPVMetaSliceDataSet
   vtkPVPLYWriter

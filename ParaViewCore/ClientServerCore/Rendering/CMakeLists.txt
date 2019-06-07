@@ -48,6 +48,7 @@ set(classes
   vtkGlyph3DRepresentation
   vtkImageSliceRepresentation
   vtkImageVolumeRepresentation
+  vtkLogoSourceRepresentation
   vtkMoleculeRepresentation
   vtkMPIMoveData
   vtkOutlineRepresentation

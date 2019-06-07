@@ -674,6 +674,46 @@
       </SubProxy>
       <!-- End of ProgressBarWidgetRepresentation -->
     </NewWidgetRepresentationProxy>
+    <!-- ================================================================== -->
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                   name="LogoWidgetRepresentation">
+      <Documentation>LogoWidgetRepresentation is a representation for a logo widget
+      </Documentation>
+      <IntVectorProperty command="SetEnabled"
+                         default_values="1"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseNonCompositedRenderer"
+                         default_values="1"
+                         name="UseNonCompositedRenderer"
+                         number_of_elements="1"></IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Prop2D"
+               proxygroup="3d_widget_representations"
+               proxyname="LogoRepresentation"></Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="Position" />
+          <Property name="Position2" />
+          <Property name="PositionInfo" />
+          <Property name="Position2Info" />
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Widget"
+               proxygroup="3d_widgets"
+               proxyname="LogoWidget"></Proxy>
+        <ExposedProperties>
+          <Property name="ProcessEvents" />
+          <Property name="Selectable" />
+          <Property name="Resizable" />
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of LogoWidgetRepresentation -->
+    </NewWidgetRepresentationProxy>
   </ProxyGroup>
   <!-- ****************************************************************** -->
   <ProxyGroup name="3d_widget_representations">
@@ -1658,6 +1698,46 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
     </Proxy>
+    <!-- ================================================================== -->
+    <Proxy class="vtkLogoRepresentation"
+           name="LogoRepresentation">
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0.02 0.02"
+                            information_property="PositionInfo"
+                            name="Position"
+                            number_of_elements="2">
+        <DoubleRangeDomain max="1 1"
+                           min="0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPosition"
+                            information_only="1"
+                            name="PositionInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPosition2"
+                            default_values="0.08 0.08"
+                            information_property="Position2Info"
+                            name="Position2"
+                            number_of_elements="2">
+        <DoubleRangeDomain max="1 1"
+                           min="0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPosition2"
+                            information_only="1"
+                            name="Position2Info">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+    </Proxy>
+
   </ProxyGroup>
   <!-- ****************************************************************** -->
   <ProxyGroup name="3d_widgets">
@@ -1824,6 +1904,31 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <!-- End of ProgressBarWidget -->
+    </Proxy>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkLogoWidget"
+           name="LogoWidget">
+      <IntVectorProperty command="SetSelectable"
+                         default_values="0"
+                         name="Selectable"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetResizable"
+                         default_values="1"
+                         name="Resizable"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetProcessEvents"
+                         default_values="1"
+                         name="ProcessEvents"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- End of LogoWidget -->
     </Proxy>
     <Proxy base_proxygroup="3d_widgets"
            base_proxyname="WidgetBase"

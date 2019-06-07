@@ -76,6 +76,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/non_convex_polygon.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/office.binary.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/pointSet.vtk}"
+  "DATA{${paraview_test_data_directory_input}/Data/ParaView_Mark.png}"
+  "DATA{${paraview_test_data_directory_input}/Data/ParaView_Logo.png}"
   "DATA{${paraview_test_data_directory_input}/Data/porphyrin.cml}"
   "DATA{${paraview_test_data_directory_input}/Data/quadraticTetra01.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/quadratic_tets_with_ghost_cells.pvtu}"
@@ -824,6 +826,7 @@ list(APPEND TESTS_WITH_BASELINES
   TimeInspector.xml
   TimeStepProgressBar.xml
   Tessellate.xml
+  TextureUsages.xml
   UndoRedo.xml
   UndoRedo1.xml
   UndoRedo2.xml
@@ -1378,10 +1381,9 @@ set (FFTOverTime_THRESHOLD 70) # since there's a plot, account for minor
 SET (ColorEditorVolumeControls_DISABLE_CS TRUE)
 SET (ColorEditorVolumeControls_DISABLE_CRS TRUE)
 
-# ViewSettingsDialog uses texture background which is currently supported only
-# in local render mode.
-SET (ViewSettingsDialog_DISABLE_CS TRUE)
+# ViewSettingsDialog and TextureUsages uses texture which are not supported in pvcrs mode.
 SET (ViewSettingsDialog_DISABLE_CRS TRUE)
+SET (TextureUsages_DISABLE_CRS TRUE)
 
 # MultiBlockAttributes1 requires selection which doesn't work on pvcrs
 SET (MultiBlockAttributes1_DISABLE_CRS TRUE)
