@@ -2072,6 +2072,13 @@ def ResetProperty(propertyName, proxy=None, restoreFromSettings=True):
 
         proxy.SMProxy.UpdateVTKObjects()
 
+def GetOpenGLInformation(location=servermanager.vtkSMSession.CLIENT):
+    """Recover OpenGL information, by default on the client"""
+    openGLInfo = servermanager.vtkPVServerImplementationRendering.vtkPVClientServerCoreRendering.vtkPVOpenGLInformation()
+    session = servermanager.vtkSMProxyManager.GetProxyManager().GetActiveSession()
+    session.GatherInformation(location, openGLInfo, 0)
+    return openGLInfo
+
 #==============================================================================
 # Usage and demo code set
 #==============================================================================
