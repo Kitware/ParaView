@@ -119,13 +119,14 @@ set(headers
   google/protobuf/arena.h
   google/protobuf/arena_impl.h
   google/protobuf/arenastring.h
+  google/protobuf/descriptor_database.h
   google/protobuf/descriptor.h
   google/protobuf/descriptor.pb.h
-  google/protobuf/descriptor_database.h
   google/protobuf/duration.pb.h
   google/protobuf/dynamic_message.h
   google/protobuf/empty.pb.h
   google/protobuf/extension_set.h
+  google/protobuf/extension_set_inl.h
   google/protobuf/field_mask.pb.h
   google/protobuf/generated_enum_reflection.h
   google/protobuf/generated_enum_util.h
@@ -136,12 +137,12 @@ set(headers
   google/protobuf/has_bits.h
   google/protobuf/implicit_weak_message.h
   google/protobuf/inlined_string_field.h
-  google/protobuf/map.h
   google/protobuf/map_entry.h
   google/protobuf/map_entry_lite.h
   google/protobuf/map_field.h
   google/protobuf/map_field_inl.h
   google/protobuf/map_field_lite.h
+  google/protobuf/map.h
   google/protobuf/map_type_handler.h
   google/protobuf/message.h
   google/protobuf/message_lite.h
@@ -149,6 +150,7 @@ set(headers
   google/protobuf/metadata_lite.h
   google/protobuf/package_info.h
   google/protobuf/parse_context.h
+  google/protobuf/port.h
   google/protobuf/reflection.h
   google/protobuf/reflection_internal.h
   google/protobuf/reflection_ops.h
@@ -162,7 +164,6 @@ set(headers
   google/protobuf/unknown_field_set.h
   google/protobuf/wire_format.h
   google/protobuf/wire_format_lite.h
-  google/protobuf/wire_format_lite_inl.h
   google/protobuf/wrappers.pb.h
 
   google/protobuf/any.proto
@@ -186,15 +187,16 @@ set(compiler_headers
   google/protobuf/compiler/parser.h
   google/protobuf/compiler/plugin.h
   google/protobuf/compiler/plugin.pb.h
+  google/protobuf/compiler/scc.h
   google/protobuf/compiler/subprocess.h
   google/protobuf/compiler/zip_writer.h
-
   google/protobuf/compiler/plugin.proto)
 
 set(io_headers
   google/protobuf/io/coded_stream.h
   google/protobuf/io/coded_stream_inl.h
   google/protobuf/io/gzip_stream.h
+  google/protobuf/io/io_win32.h
   google/protobuf/io/package_info.h
   google/protobuf/io/printer.h
   google/protobuf/io/strtod.h
@@ -211,7 +213,6 @@ set(stubs_headers
   google/protobuf/stubs/fastmem.h
   google/protobuf/stubs/hash.h
   google/protobuf/stubs/int128.h
-  google/protobuf/stubs/io_win32.h
   google/protobuf/stubs/logging.h
   google/protobuf/stubs/macros.h
   google/protobuf/stubs/map_util.h
@@ -221,7 +222,6 @@ set(stubs_headers
   google/protobuf/stubs/once.h
   google/protobuf/stubs/platform_macros.h
   google/protobuf/stubs/port.h
-  google/protobuf/stubs/singleton.h
   google/protobuf/stubs/status.h
   google/protobuf/stubs/status_macros.h
   google/protobuf/stubs/statusor.h
@@ -244,6 +244,7 @@ set(util_headers
   google/protobuf/util/type_resolver.h
   google/protobuf/util/type_resolver_util.h
 
+  google/protobuf/util/json_format.proto
   google/protobuf/util/json_format_proto3.proto)
 
 vtk_module_install_headers(
