@@ -542,5 +542,184 @@
       <!-- End VTKmAverageToCells -->
     </SourceProxy>
 
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkmWarpScalar"
+                 label="VTKm Warp By Scalar"
+                 name="VTKmWarpScalar">
+      <Documentation long_help="This filter moves point coordinates along a vector scaled by a point attribute.  It can be used to produce carpet plots."
+                     short_help="Warp point scalars into a spatial elevation plot.">
+                     The Warp (scalar) filter translates the points of the
+                     input data set along a vector by a distance determined by
+                     the specified scalars. This filter operates on polygonal,
+                     curvilinear, and unstructured grid data sets containing
+                     single-component scalar arrays. Because it only changes
+                     the positions of the points, the output data set type is
+                     the same as that of the input. Any scalars in the input
+                     dataset are copied to the output, so the data can be
+                     colored by them.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPointSet" />
+          <DataType value="vtkImageData" />
+          <DataType value="vtkRectilinearGrid" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array"
+                          number_of_components="1" />
+        <Documentation>This property specifies the input to the Warp (scalar)
+        filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Scalars"
+                            name="SelectInputScalars"
+                            number_of_elements="5"
+                            panel_visibility="default">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property contains the name of the scalar array by
+        which to warp the dataset.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetScaleFactor"
+                            default_values="1.0"
+                            name="ScaleFactor"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <BoundsDomain name="range" mode="array_scaled_extent">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ArraySelection" name="SelectInputScalars" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Hints>
+          <NoDefault/>
+        </Hints>
+        <Documentation>The scalar value at a given point is multiplied by the
+        value of this property to determine the magnitude of the change vector
+        for that point.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetNormal"
+                            default_values="0 0 1"
+                            name="Normal"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The values of this property specify the direction along
+        which to warp the dataset if any normals contained in the input dataset
+        are not being used for this purpose. (See the UseNormal
+        property.)</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseNormal"
+                         default_values="0"
+                         name="UseNormal"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If point normals are present in the dataset, the value
+        of this property toggles whether to use a single normal value (value =
+        1) or the normals from the dataset (value = 0).</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetXYPlane"
+                         default_values="0"
+                         label="XY Plane"
+                         name="XYPlane"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the value of this property is 1, then the
+        Z-coordinates from the input are considered to be the scalar values,
+        and the displacement is along the Z axis. This is useful for creating
+        carpet plots.</Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <ShowInMenu category="VTKm" />
+      </Hints>
+
+      <!-- End VTKm WarpScalar -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkmWarpVector"
+                 label="VTKm Warp By Vector"
+                 name="VTKmWarpVector">
+      <Documentation long_help="This filter displaces point coordinates along a vector attribute. It is useful for showing mechanical deformation."
+                     short_help="Warp (displace) the geometry with a given vector field.">
+                     The Warp (vector) filter translates the points of the
+                     input dataset using a specified vector array. The vector
+                     array chosen specifies a vector per point in the input.
+                     Each point is translated along its vector by a given scale
+                     factor. This filter operates on polygonal, curvilinear,
+                     and unstructured grid datasets. Because this filter only
+                     changes the positions of the points, the output dataset
+                     type is the same as that of the input.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPointSet" />
+          <DataType value="vtkImageData" />
+          <DataType value="vtkRectilinearGrid" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array"
+                          number_of_components="3" />
+        <Documentation>This property specifies the input to the Warp (vector)
+        filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Vectors"
+                            name="SelectInputVectors"
+                            number_of_elements="5"
+                            panel_visibility="default">
+        <ArrayListDomain attribute_type="Vectors"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>The value of this property contains the name of the
+        vector array by which to warp the dataset's point
+        coordinates.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty command="SetScaleFactor"
+                            default_values="1.0"
+                            name="ScaleFactor"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <BoundsDomain name="range" mode="array_scaled_extent">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ArraySelection" name="SelectInputVectors" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Hints>
+          <NoDefault/>
+        </Hints>
+        <Documentation>Each component of the selected vector array will be
+        multiplied by the value of this property before being used to compute
+        new point coordinates.</Documentation>
+      </DoubleVectorProperty>
+      <!-- End VTKm WarpVector -->
+
+      <Hints>
+        <ShowInMenu category="VTKm" />
+      </Hints>
+
+    </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>
