@@ -20,15 +20,15 @@ if (ParaView_BINARY_DIR)
                 "${CMAKE_CURRENT_SOURCE_DIR}/${dir}"
                 "${CMAKE_CURRENT_BINARY_DIR}/${dir}"
               --build-options
-                "-DBUILD_TESTING=ON"
+                "-DBUILD_TESTING:BOOL=ON"
                 "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
                 "-DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}"
-                "-DParaView_DIR=${paraview_cmake_build_dir}"
+                "-DParaView_DIR:PATH=${paraview_cmake_build_dir}"
                 # XXX(paraview-config): `find_package(ParaView)` should provide
                 # this information automatically. In this case, VTK should be
                 # providing this information.
                 # https://gitlab.kitware.com/vtk/vtk/issues/17503
-                "-DQt5_DIR=${Qt5_DIR}"
+                "-DQt5_DIR:PATH=${Qt5_DIR}"
               --test-command
                 "${CMAKE_CTEST_COMMAND}"
                   -C $<CONFIGURATION>)
