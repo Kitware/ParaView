@@ -32,18 +32,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsInit.h"
 
 #include "pqComponentsInit.h"
-#include "vtkPVConfig.h"
 #include <QObject> // for Q_INIT_RESOURCE
 #include <QtPlugin>
 
 void pqApplicationComponentsInit()
 {
-#ifndef PARAVIEW_BUILD_SHARED_LIBS
+#if !BUILD_SHARED_LIBS
   // init dependents
   pqComponentsInit();
 
   // init resources
   Q_INIT_RESOURCE(pqApplicationComponents);
-
 #endif
 }

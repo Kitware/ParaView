@@ -16,43 +16,12 @@
 #ifndef vtkPVConfig_h
 #define vtkPVConfig_h
 
-#cmakedefine PARAVIEW_USE_ICE_T
 #cmakedefine PARAVIEW_USE_QTHELP
-
-// defined when ParaView is built with MPI.
-#cmakedefine PARAVIEW_USE_MPI
-
-// flags controlling various visit-bridge components being built.
-#cmakedefine VISIT_BUILD_READER_CGNS
-#cmakedefine VISIT_BUILD_READER_GMV
-#cmakedefine VISIT_BUILD_READER_Silo
-#cmakedefine VISIT_BUILD_READER_Boxlib3D
-#cmakedefine VISIT_BUILD_READER_Mili
-
-#cmakedefine PARAVIEW_ENABLE_PYTHON
-#cmakedefine PARAVIEW_FREEZE_PYTHON
 
 #define PARAVIEW_VERSION_MAJOR @PARAVIEW_VERSION_MAJOR@
 #define PARAVIEW_VERSION_MINOR @PARAVIEW_VERSION_MINOR@
 #define PARAVIEW_VERSION_PATCH @PARAVIEW_VERSION_PATCH@
 #define PARAVIEW_VERSION "@PARAVIEW_VERSION@"
 #define PARAVIEW_VERSION_FULL "@PARAVIEW_VERSION_FULL@"
-
-#define CMAKE_CXX_COMPILER_ID "@CMAKE_CXX_COMPILER_ID@"
-
-#ifdef PARAVIEW_ENABLE_QT_SUPPORT
-# define PARAVIEW_QT_VERSION @PARAVIEW_QT_VERSION@
-#endif
-
-#cmakedefine BUILD_SHARED_LIBS
-#ifdef BUILD_SHARED_LIBS
-// for sake of old code, we define the PARAVIEW_BUILD_SHARED_LIBS variable. This
-// can be deprecated once the cleanup is complete.
-# define PARAVIEW_BUILD_SHARED_LIBS
-#endif
-
-// The default prevision value for conversion for string to double
-// and double to string
-#define DEFAULT_DOUBLE_PRECISION_VALUE 16
 
 #endif

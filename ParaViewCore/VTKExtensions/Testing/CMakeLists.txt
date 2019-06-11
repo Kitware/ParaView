@@ -18,6 +18,19 @@ vtk_add_test_cxx(${vtk-modules}ServerFilterTests tests
   TestSpyPlotTracers.cxx
   TestPVAMRDualContour.cxx
   )
+
+if (PARAVIEW_USE_MPI)
+  set_property(SOURCE ParaViewCoreVTKExtensionsPrintSelf.cxx APPEND
+    PROPERTY
+      COMPILE_DEFINITIONS PARAVIEW_USE_MPI)
+endif ()
+
+if (PARAVIEW_USE_ICE_T)
+  set_property(SOURCE ParaViewCoreVTKExtensionsPrintSelf.cxx APPEND
+    PROPERTY
+      COMPILE_DEFINITIONS PARAVIEW_USE_ICE_T)
+endif ()
+
 vtk_test_cxx_executable(${vtk-modules}ServerFilterTests tests)
 target_link_libraries(${vtk-modules}ServerFilterTests
   vtkPVVTKExtensions

@@ -33,7 +33,7 @@
 
 #include "vtkObject.h"
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
-#include "vtkPVConfig.h" // needed for PARAVIEW_VERSION and CMAKE_CXX_COMPILER_ID
+#include "vtkPVConfig.h"                     // needed for PARAVIEW_VERSION
 #include <string>
 #include <vector>
 
@@ -157,12 +157,10 @@ private:
 //@}
 
 #ifndef __WRAP__
-typedef const char*(C_DECL* pv_plugin_query_verification_data_fptr)();
 typedef vtkPVPlugin*(C_DECL* pv_plugin_query_instance_fptr)();
 #endif
 
-/// TODO: add compiler version.
-#define _PV_PLUGIN_VERIFICATION_STRING "paraviewplugin|" CMAKE_CXX_COMPILER_ID "|" PARAVIEW_VERSION
+#ifdef PARAVIEW_BUILDING_PLUGIN
 
 // vtkPVPluginLoader checks for existence of this function
 // to determine if the shared-library is a paraview-server-manager plugin or
@@ -170,18 +168,14 @@ typedef vtkPVPlugin*(C_DECL* pv_plugin_query_instance_fptr)();
 // etc. These global functions are added only for shared builds. In static
 // builds, plugins cannot be loaded at runtime (only at compile time) so
 // verification is not necessary.
-#ifdef BUILD_SHARED_LIBS
+#if PARAVIEW_PLUGIN_BUILT_SHARED
 #define _PV_PLUGIN_GLOBAL_FUNCTIONS(PLUGIN)                                                        \
-  C_EXPORT const char* C_DECL pv_plugin_query_verification_data()                                  \
-  {                                                                                                \
-    return _PV_PLUGIN_VERIFICATION_STRING;                                                         \
-  }                                                                                                \
   C_EXPORT vtkPVPlugin* C_DECL pv_plugin_instance() { return pv_plugin_instance_##PLUGIN(); }
-#else // BUILD_SHARED_LIBS
+#else
 // define empty export. When building static, we don't want to define the global
 // functions.
 #define _PV_PLUGIN_GLOBAL_FUNCTIONS(PLUGIN)
-#endif // BUILD_SHARED_LIBS
+#endif
 
 // vtkPVPluginLoader uses this function to obtain the vtkPVPlugin instance  for
 // this plugin. In a plugin, there can only be one call to this macro. When
@@ -205,6 +199,8 @@ typedef vtkPVPlugin*(C_DECL* pv_plugin_query_instance_fptr)();
 #define PV_PLUGIN_IMPORT_INIT(PLUGIN) extern "C" vtkPVPlugin* pv_plugin_instance_##PLUGIN();
 
 #define PV_PLUGIN_IMPORT(PLUGIN) vtkPVPlugin::ImportPlugin(pv_plugin_instance_##PLUGIN());
+
+#endif
 
 #endif // vtkPVPlugin_h
 // VTK-HeaderTest-Exclude: vtkPVPlugin.h

@@ -291,7 +291,7 @@ vtkPVPluginLoader::~vtkPVPluginLoader()
 //-----------------------------------------------------------------------------
 void vtkPVPluginLoader::LoadPluginsFromPluginSearchPath()
 {
-#ifdef BUILD_SHARED_LIBS
+#if BUILD_SHARED_LIBS
   vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "Loading Plugins from standard PLUGIN_PATHS\n%s",
     (this->SearchPaths ? this->SearchPaths : "(nullptr)"));
 
@@ -314,7 +314,7 @@ void vtkPVPluginLoader::LoadPluginsFromPluginSearchPath()
 //-----------------------------------------------------------------------------
 void vtkPVPluginLoader::LoadPluginsFromPluginConfigFile()
 {
-#ifdef BUILD_SHARED_LIBS
+#if BUILD_SHARED_LIBS
   const char* configFiles = vtksys::SystemTools::GetEnv("PV_PLUGIN_CONFIG_FILE");
   if (configFiles != NULL)
   {
@@ -399,7 +399,7 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
     return false;
   }
 
-#ifndef BUILD_SHARED_LIBS
+#if !BUILD_SHARED_LIBS
   vtkPVPluginLoaderErrorMacro("Could not find the plugin statically linked in, and "
                               "cannot load dynamic plugins  in static builds.");
   return false;
@@ -424,45 +424,7 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
     "Loaded shared library successfully. Now trying to validate that it's a ParaView plugin.");
 
   // A plugin shared library has two global functions:
-  // * pv_plugin_query_verification_data -- to obtain version
   // * pv_plugin_instance -- to obtain the plugin instance.
-
-  pv_plugin_query_verification_data_fptr pv_plugin_query_verification_data =
-    (pv_plugin_query_verification_data_fptr)(
-      vtkDynamicLoader::GetSymbolAddress(lib, "pv_plugin_query_verification_data"));
-  if (!pv_plugin_query_verification_data)
-  {
-    vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
-      "Failed to locate the global function "
-      "\"pv_plugin_query_verification_data\" which is required to test the "
-      "plugin signature. This may not be a ParaView plugin dll or maybe "
-      "from a older version of ParaView when this function was not required.");
-    vtkPVPluginLoaderErrorMacro(
-      "Not a ParaView Plugin since could not locate the plugin-verification function");
-    vtkDynamicLoader::CloseLibrary(lib);
-    return false;
-  }
-
-  std::string pv_verfication_data = pv_plugin_query_verification_data();
-  vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "Plugin's signature: %s", pv_verfication_data.c_str());
-
-  // Validate the signature. If the signature is invalid, then this plugin is
-  // totally bogus (even for the GUI layer).
-  if (pv_verfication_data != _PV_PLUGIN_VERIFICATION_STRING)
-  {
-    std::ostringstream error;
-    error << "Mismatch in versions: \n"
-          << "ParaView Signature: " << _PV_PLUGIN_VERIFICATION_STRING << "\n"
-                                                                         "Plugin Signature: "
-          << pv_verfication_data;
-    vtkPVPluginLoaderErrorMacro(error.str().c_str());
-    vtkDynamicLoader::CloseLibrary(lib);
-    vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
-      "Mismatch in versions signifies that the plugin was built for "
-      "a different version of ParaView or with a different compilter. "
-      "Look at the signatures to determine what caused the mismatch.");
-    return false;
-  }
 
   // If we succeeded so far, then obtain the instance of vtkPVPlugin for this
   // plugin and load it.
@@ -481,11 +443,6 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
     vtkDynamicLoader::CloseLibrary(lib);
     return false;
   }
-
-  vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
-    "Plugin signature verification successful. "
-    "This is definitely a ParaView plugin compiled with correct compiler for "
-    "correct ParaView version.");
 
   // BUG # 0008673
   // Tell the platform to look in the plugin's directory for

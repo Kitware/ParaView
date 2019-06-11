@@ -31,13 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 
 #include "pqCoreInit.h"
-#include "vtkPVConfig.h"
 #include <QObject>
 #include <QtPlugin>
 
 void pqCoreInit()
 {
-#ifndef BUILD_SHARED_LIBS
+#if !BUILD_SHARED_LIBS
   Q_INIT_RESOURCE(pqCore);
   Q_INIT_RESOURCE(QtWidgets);
 #endif

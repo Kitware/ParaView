@@ -281,6 +281,11 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
     PROPERTY
       Qt5Core_VERSION_MINOR "${Qt5Core_VERSION_MAJOR}")
 
+  set(_paraview_client_built_shared 0)
+  if (BUILD_SHARED_LIBS)
+    set(_paraview_client_built_shared 1)
+  endif ()
+
   set(_paraview_client_source_files
     "${CMAKE_CURRENT_BINARY_DIR}/${_paraview_client_NAME}_main.cxx"
     "${CMAKE_CURRENT_BINARY_DIR}/pq${_paraview_client_NAME}Initializer.cxx"

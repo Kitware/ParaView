@@ -30,11 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "vtkPVConfig.h"
-#ifdef PARAVIEW_ENABLE_PYTHON
-extern "C" {
-void vtkPVInitializePythonModules();
-}
-#endif
 
 #include "ParaViewMainWindow.h"
 #include "ui_ParaViewMainWindow.h"
@@ -58,8 +53,8 @@ void vtkPVInitializePythonModules();
 #include "vtkSMSettings.h"
 #include "vtksys/SystemTools.hxx"
 
-#ifndef BUILD_SHARED_LIBS
-#include "pvStaticPluginsInit.h"
+#ifdef PARAVIEW_ENABLE_PYTHON
+#include "pvpythonmodules.h"
 #endif
 
 #ifdef PARAVIEW_USE_QTHELP
@@ -116,7 +111,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   }
 
 #ifdef PARAVIEW_ENABLE_PYTHON
-  vtkPVInitializePythonModules();
+  pvpythonmodules_load();
 #endif
 
 #ifdef PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
@@ -382,7 +377,7 @@ void ParaViewMainWindow::updateFontSize()
   }
 
 // Console font size
-#if defined(PARAVIEW_ENABLE_PYTHON)
+#ifdef PARAVIEW_ENABLE_PYTHON
   pqPythonShell* shell = qobject_cast<pqPythonShell*>(this->Internals->pythonShellDock->widget());
   shell->setFontSize(fontSize);
 #endif

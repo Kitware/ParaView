@@ -176,6 +176,14 @@ set(classes
   pqViewManager
   pqWidgetRangeDomain)
 
+set(built_shared 0)
+if (BUILD_SHARED_LIBS)
+  set(built_shared 1)
+endif ()
+set_property(SOURCE pqComponentsInit.cxx APPEND
+  PROPERTY
+    COMPILE_DEFINITIONS "BUILD_SHARED_LIBS=${built_shared}")
+
 set(headers
   pqPluginTreeWidget.h)
 
@@ -244,7 +252,7 @@ set(sources)
 set(private_headers
   pqSGExportStateWizardInternals.h)
 
-if (TARGET pqPython)
+if (TARGET ParaView::pqPython)
   # code for generating specialized Python scripts
   # from the GUI using trace information
   list(APPEND classes

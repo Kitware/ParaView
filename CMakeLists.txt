@@ -189,7 +189,7 @@ endif ()
 # Add ability to freeze Python modules.
 cmake_dependent_option(PARAVIEW_FREEZE_PYTHON
   "Freeze Python packages/modules into the application." OFF
-  # XXX(python): Freezing is not yet supported.
+  # FIXME(python): Freezing is not yet supported.
   "PARAVIEW_ENABLE_PYTHON;NOT WIN32;NOT APPLE;FALSE" OFF)
 mark_as_advanced(PARAVIEW_FREEZE_PYTHON)
 cmake_dependent_option(PARAVIEW_ENABLE_WEB "Enable/Disable web support" "${paraview_web_default}"

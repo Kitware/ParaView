@@ -907,6 +907,13 @@ function (paraview_add_plugin name)
   get_property(_paraview_add_plugin_description GLOBAL
     PROPERTY "_paraview_plugin_${_paraview_build_plugin}_description")
 
+  set(_paraview_build_plugin_type MODULE)
+  set(_paraview_add_plugin_built_shared 1)
+  if (NOT BUILD_SHARED_LIBS OR _paraview_add_plugin_FORCE_STATIC)
+    set(_paraview_build_plugin_type STATIC)
+    set(_paraview_add_plugin_built_shared 0)
+  endif ()
+
   configure_file(
     "${_paraview_plugin_source_dir}/paraview_plugin.h.in"
     "${_paraview_add_plugin_header}")
@@ -923,11 +930,6 @@ function (paraview_add_plugin name)
     string(APPEND CMAKE_LIBRARY_OUTPUT_DIRECTORY "/${_paraview_build_LIBRARY_SUBDIRECTORY}")
   endif ()
   string(APPEND CMAKE_LIBRARY_OUTPUT_DIRECTORY "/${_paraview_build_plugin}")
-
-  set(_paraview_build_plugin_type MODULE)
-  if (NOT BUILD_SHARED_LIBS OR _paraview_add_plugin_FORCE_STATIC)
-    set(_paraview_build_plugin_type STATIC)
-  endif ()
 
   add_library("${_paraview_build_plugin}" "${_paraview_build_plugin_type}"
     ${_paraview_add_plugin_header}
