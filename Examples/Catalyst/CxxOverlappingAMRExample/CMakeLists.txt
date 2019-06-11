@@ -8,6 +8,8 @@ add_library(CxxOverlappingAMRExampleAdaptor
   FEAdaptor.cxx
   FEAdaptor.h)
 target_link_libraries(CxxOverlappingAMRExampleAdaptor
+  INTERFACE
+    VTK::PythonUsed
   PRIVATE
     ParaView::PythonCatalyst
     VTK::CommonDataModel
