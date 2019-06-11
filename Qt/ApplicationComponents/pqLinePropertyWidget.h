@@ -65,9 +65,9 @@ public:
   ~pqLinePropertyWidget() override;
 
 public slots:
-  void useXAxis();
-  void useYAxis();
-  void useZAxis();
+  void useXAxis() { this->useAxis(0); }
+  void useYAxis() { this->useAxis(1); }
+  void useZAxis() { this->useAxis(2); }
   void centerOnBounds();
 
   /**
@@ -98,6 +98,8 @@ private:
   class pqInternals;
   QScopedPointer<pqInternals> Internals;
   vtkBoundingBox referenceBounds() const;
+
+  void useAxis(int axis);
 };
 
 #endif

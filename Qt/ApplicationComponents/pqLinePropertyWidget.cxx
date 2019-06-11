@@ -196,61 +196,24 @@ vtkBoundingBox pqLinePropertyWidget::referenceBounds() const
 }
 
 //-----------------------------------------------------------------------------
-void pqLinePropertyWidget::useXAxis()
+void pqLinePropertyWidget::useAxis(int axis)
 {
   vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
   vtkBoundingBox bbox = this->referenceBounds();
   if (bbox.IsValid())
   {
+    const auto delta =
+      0.5 * (bbox.GetLength(axis) > 0 ? bbox.GetLength(axis) : bbox.GetDiagonalLength());
+
     double center[3];
     bbox.GetCenter(center);
-    center[0] -= bbox.GetLength(0) * 0.5;
+
+    center[axis] -= delta;
     vtkSMPropertyHelper(wdgProxy, "Point1WorldPosition").Set(center, 3);
 
     bbox.GetCenter(center);
-    center[0] += bbox.GetLength(0) * 0.5;
-    vtkSMPropertyHelper(wdgProxy, "Point2WorldPosition").Set(center, 3);
-    wdgProxy->UpdateVTKObjects();
-    emit this->changeAvailable();
-    this->render();
-  }
-}
+    center[axis] += delta;
 
-//-----------------------------------------------------------------------------
-void pqLinePropertyWidget::useYAxis()
-{
-  vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
-  vtkBoundingBox bbox = this->referenceBounds();
-  if (bbox.IsValid())
-  {
-    double center[3];
-    bbox.GetCenter(center);
-    center[1] -= bbox.GetLength(1) * 0.5;
-    vtkSMPropertyHelper(wdgProxy, "Point1WorldPosition").Set(center, 3);
-
-    bbox.GetCenter(center);
-    center[1] += bbox.GetLength(1) * 0.5;
-    vtkSMPropertyHelper(wdgProxy, "Point2WorldPosition").Set(center, 3);
-    wdgProxy->UpdateVTKObjects();
-    emit this->changeAvailable();
-    this->render();
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqLinePropertyWidget::useZAxis()
-{
-  vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
-  vtkBoundingBox bbox = this->referenceBounds();
-  if (bbox.IsValid())
-  {
-    double center[3];
-    bbox.GetCenter(center);
-    center[2] -= bbox.GetLength(2) * 0.5;
-    vtkSMPropertyHelper(wdgProxy, "Point1WorldPosition").Set(center, 3);
-
-    bbox.GetCenter(center);
-    center[2] += bbox.GetLength(2) * 0.5;
     vtkSMPropertyHelper(wdgProxy, "Point2WorldPosition").Set(center, 3);
     wdgProxy->UpdateVTKObjects();
     emit this->changeAvailable();
