@@ -113,6 +113,12 @@ can be found on [its website][mesa].
     - `ninja-build`
       - `ninja` is a speedy replacement for `make`, highly recommended.
 
+*Note*: If you are using an Ubuntu-provided compiler, there is a known issue
+with the optional Python linking. This case is hard to auto-detect, so if
+undefined symbol errors related to Python symbols arise, setting
+`vtk_undefined_symbols_allowed=OFF` may resolve the errors. If it does not,
+please file a new issue.
+
 ### Windows
 
   * [Visual Studio Community Edition][visual-studio]
