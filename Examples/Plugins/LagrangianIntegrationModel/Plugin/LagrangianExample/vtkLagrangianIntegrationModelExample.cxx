@@ -39,6 +39,9 @@ vtkLagrangianIntegrationModelExample::vtkLagrangianIntegrationModelExample()
 
   this->NumIndepVars = 8; // x, y, z, u, v, w, diameter, t
   this->NumFuncs = this->NumIndepVars - 1;
+
+  // Adding a tracked user data
+  this->NumberOfTrackedUserData = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -142,6 +145,12 @@ int vtkLagrangianIntegrationModelExample::FunctionValues(vtkLagrangianParticle* 
 
   // Compute the supplementary variable diameter
   f[6] = -particleDiameter * 1 / 10;
+
+  // An usage example of tracked user data that sum the number of steps alongside the particles
+  std::vector<double>& prevUserData = particle->GetTrackedUserData();
+  std::vector<double>& userData = particle->GetTrackedUserData();
+  userData[0] = prevUserData[0] + particle->GetNumberOfSteps();
+
   return 1;
 }
 
@@ -201,9 +210,11 @@ void vtkLagrangianIntegrationModelExample::InitializeParticle(vtkLagrangianParti
 }
 
 //----------------------------------------------------------------------------
-void vtkLagrangianIntegrationModelExample::InitializeVariablesParticleData(
-  vtkPointData* variablesParticleData, int maxTuples)
+void vtkLagrangianIntegrationModelExample::InitializeParticleData(
+  vtkFieldData* variablesParticleData, int maxTuples)
 {
+  this->Superclass::InitializeParticleData(variablesParticleData, maxTuples);
+
   // Create a double array
   vtkNew<vtkDoubleArray> diameterArray;
 
@@ -222,9 +233,11 @@ void vtkLagrangianIntegrationModelExample::InitializeVariablesParticleData(
 }
 
 //----------------------------------------------------------------------------
-void vtkLagrangianIntegrationModelExample::InsertVariablesParticleData(
-  vtkLagrangianParticle* particle, vtkPointData* data, int stepEnum)
+void vtkLagrangianIntegrationModelExample::InsertParticleData(
+  vtkLagrangianParticle* particle, vtkFieldData* data, int stepEnum)
 {
+  this->Superclass::InsertParticleData(particle, data, stepEnum);
+
   vtkDataArray* diameterArray = data->GetArray("VariableDiameter");
 
   // Add the correct data depending of the step enum

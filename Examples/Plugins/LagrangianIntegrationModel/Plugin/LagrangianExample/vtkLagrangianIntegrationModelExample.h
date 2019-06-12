@@ -66,7 +66,7 @@ public:
    * Add some User Variable Data Array in provided particleData, allocate
    * maxTuples tuples.
    */
-  void InitializeVariablesParticleData(vtkPointData* particleData, int maxTuples = 0) override;
+  void InitializeParticleData(vtkFieldData* particleData, int maxTuples = 0) override;
 
   /**
    * This method is called when inserting particle data in output point data
@@ -75,8 +75,8 @@ public:
    * Insert user variables data in provided point data, user variables data array begins at
    * arrayOffset. use stepEnum to identify which step ( prev, current or next ) should be inserted.
    */
-  void InsertVariablesParticleData(
-    vtkLagrangianParticle* particle, vtkPointData* data, int stepEnum) override;
+  void InsertParticleData(
+    vtkLagrangianParticle* particle, vtkFieldData* data, int stepEnum) override;
 
   /**
    * This method is called when checking if a particle should be terminated in free flight
