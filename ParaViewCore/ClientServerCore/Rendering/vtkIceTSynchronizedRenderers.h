@@ -160,12 +160,10 @@ protected:
   vtkIceTSynchronizedRenderers();
   ~vtkIceTSynchronizedRenderers();
 
-  virtual void HandleEndRender() override;
-
   /**
    * Overridden to capture image from icet buffers instead of the screen.
    */
-  virtual vtkRawImage& CaptureRenderedImage() override;
+  vtkRawImage& CaptureRenderedImage() override;
 
   // We use vtkIceTCompositePass internally.
   vtkCameraPass* CameraRenderPass;
@@ -174,8 +172,6 @@ protected:
   // User specified custom passes
   vtkRenderPass* RenderPass;
   vtkImageProcessingPass* ImageProcessingPass;
-
-  virtual void SlaveStartRender() override;
 
 private:
   vtkIceTSynchronizedRenderers(const vtkIceTSynchronizedRenderers&) = delete;

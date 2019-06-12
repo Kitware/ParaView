@@ -54,7 +54,7 @@ void vtkPVClientServerSynchronizedRenderers::MasterEndRender()
   assert(this->ParallelController->IsA("vtkSocketController") ||
     this->ParallelController->IsA("vtkCompositeMultiProcessController"));
 
-  vtkRawImage& rawImage = (this->ImageReductionFactor == 1) ? this->FullImage : this->ReducedImage;
+  vtkRawImage& rawImage = this->Image;
 
   int header[4];
   this->ParallelController->Receive(header, 4, 1, 0x023430);
@@ -75,24 +75,6 @@ void vtkPVClientServerSynchronizedRenderers::MasterEndRender()
     }
     rawImage.MarkValid();
   }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVClientServerSynchronizedRenderers::SlaveStartRender()
-{
-  this->Superclass::SlaveStartRender();
-
-  // In client-server mode, we want all the server ranks to simply render using
-  // a black background. That makes it easier to blend the image we obtain from
-  // the server rank on top of the background rendered locally on the client.
-  // vtkPVSynchronizedRenderer only creates
-  // vtkPVClientServerSynchronizedRenderers in client-server mode that support
-  // image delivery to client (i.e. not in tile-display, or cave mode).
-  // Hence, we know it won't affect server ranks that do display the rendered
-  // result. (Fixes BUG #0015961).
-  this->Renderer->SetBackground(0, 0, 0);
-  this->Renderer->SetGradientBackground(false);
-  this->Renderer->SetTexturedBackground(false);
 }
 
 //----------------------------------------------------------------------------
