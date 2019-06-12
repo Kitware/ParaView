@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
 
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_VTK_PythonInterpreter
 #include "vtkPythonInterpreter.h"
 #endif
 
@@ -411,7 +411,7 @@ void pqImmediateExportReaction::onTriggered()
 // cerr << command.toStdString() << endl;
 
 // ensure Python in initialized.
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_VTK_PythonInterpreter
     vtkPythonInterpreter::Initialize();
     vtkPythonInterpreter::RunSimpleString(command.toLocal8Bit().data());
 #else
