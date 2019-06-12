@@ -172,14 +172,14 @@
 #include "vtkXMLPVDWriter.h"
 #include "vtkZlibImageCompressor.h"
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
 #include "vtkAllToNRedistributeCompositePolyData.h"
 #include "vtkAllToNRedistributePolyData.h"
 #include "vtkBalancedRedistributePolyData.h"
 #include "vtkMPICompositeManager.h"
 #include "vtkRedistributePolyData.h"
 #include "vtkWeightedRedistributePolyData.h"
-#ifdef PARAVIEW_USE_ICE_T
+#if VTK_MODULE_ENABLE_ParaView_icet
 #include "vtkIceTCompositePass.h"
 #include "vtkIceTContext.h"
 #endif
