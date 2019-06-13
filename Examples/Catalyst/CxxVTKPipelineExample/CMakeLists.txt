@@ -11,6 +11,11 @@ if (USE_CATALYST)
       ParaView::ClientServerCoreCore
       ParaView::VTKExtensionsDefault
       ParaView::ServerManagerCore)
+  if (TARGET VTK::PythonUsed)
+    target_link_libraries(CxxVTKPipelineExampleAdaptor
+      INTERFACE
+        VTK::PythonUsed)
+  endif ()
 endif ()
 
 add_executable(CxxVTKPipelineExample

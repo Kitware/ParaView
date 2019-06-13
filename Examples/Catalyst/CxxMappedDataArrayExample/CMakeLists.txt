@@ -5,6 +5,8 @@ if (USE_CATALYST)
     vtkCPMappedVectorArrayTemplate.h
     vtkCPMappedVectorArrayTemplate.txx)
   target_link_libraries(CxxMappedDataArrayExampleAdaptor
+    INTERFACE
+      VTK::PythonUsed
     PRIVATE
       ParaView::PythonCatalyst
       VTK::CommonDataModel

@@ -3,6 +3,8 @@ if (USE_CATALYST)
     FEAdaptor.cxx
     FEAdaptor.h)
   target_link_libraries(CxxMultiChannelInputExampleAdaptor
+    INTERFACE
+      VTK::PythonUsed
     PRIVATE
       ParaView::PythonCatalyst
       VTK::CommonDataModel
