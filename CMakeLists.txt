@@ -528,6 +528,7 @@ list(APPEND paraview_requested_modules
   VTK::IOAsynchronous # needed for cinema, but no harm adding always.
   VTK::IOH5part
   VTK::IOParallelLSDyna
+  VTK::IOSegY
   VTK::IOTecplotTable
   VTK::IOTRUCHAS
   VTK::IOVeraOut
