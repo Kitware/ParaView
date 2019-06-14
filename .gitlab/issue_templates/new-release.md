@@ -118,6 +118,10 @@ set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
     - [ ] Guide selections in `versions.cmake`
     - [ ] `git add versions.cmake CMakeLists.txt`
     - [ ] `git commit -m "Update the default version to VERSION"`
+  - Update default versions in container build recipes
+    - Docker: update default tag strings (in `Scripts/docker/ubuntu/Dockerfile`)
+      - [ ] ARG PARAVIEW_TAG=vVERSION
+      - [ ] ARG SUPERBUILD_TAG=vVERSION
   - Integrate changes to `master` branch
     - [ ] Create a merge request targeting `master`, title beginning with WIP (do *not* add `Backport: release` to description)
     - [ ] Build binaries (`Do: test`)
