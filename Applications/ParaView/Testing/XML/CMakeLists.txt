@@ -661,6 +661,7 @@ list(APPEND TESTS_WITH_BASELINES
   AnimatePipelineTime.xml
   AngularPeriodicFilter.xml
   3DWidgetInCustomFilter.xml
+  BlockOpacities.xml
   CalcParens.xml
   Calculator.xml
   CalculatorInput.xml
@@ -1201,6 +1202,7 @@ set(SelectionLinkMultiple_DISABLE_CRS TRUE)
 set(SelectionLinkRemove_DISABLE_CRS TRUE)
 set(SelectionLinkReaction_DISABLE_CRS TRUE)
 set(ExportSelectionToCSV_DISABLE_CRS TRUE)
+set(BlockOpacities_DISABLE_CRS TRUE)
 
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
