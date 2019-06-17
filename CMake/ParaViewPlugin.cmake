@@ -620,7 +620,6 @@ function (paraview_add_plugin name)
   endif ()
 
   # TODO: resource initialization for static builds
-  # WITH_PYTHON
 
   if (_paraview_add_plugin_REQUIRED_ON_SERVER)
     set(_paraview_add_plugin_required_on_server "true")
