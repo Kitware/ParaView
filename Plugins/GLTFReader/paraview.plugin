@@ -2,7 +2,5 @@ NAME
  GLTFReader
 DESCRIPTION
   glTF reader plugin
-CONDITION
-  BUILD_TESTING
 REQUIRES_MODULES
   VTK::FiltersSources
