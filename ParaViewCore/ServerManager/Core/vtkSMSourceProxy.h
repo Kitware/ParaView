@@ -255,11 +255,6 @@ protected:
    */
   int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) override;
 
-  /**
-   * Internal method which creates the output port proxies using the proxy specified.
-   */
-  void CreateOutputPortsInternal(vtkSMProxy* op);
-
   //@{
   /**
    * Method to set an output port at the given index. Provided for subclasses to
@@ -277,6 +272,12 @@ protected:
    * Overwritten from superclass to invoke
    */
   void PostUpdateData() override;
+
+  /**
+   * Overridden to pass the logname to the internal ExtractSelection proxies.
+   */
+  void SetLogNameInternal(
+    const char* name, bool propagate_to_subproxies, bool propagate_to_proxylistdomains) override;
 
   // flag used to avoid creation of extract selection proxies for this source
   // proxy.

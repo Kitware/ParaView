@@ -56,6 +56,7 @@ vtkSISourceProxy::vtkSISourceProxy()
   this->SetExecutiveName("vtkPVCompositeDataPipeline");
   this->Internals = new vtkInternals();
   this->PortsCreated = false;
+  this->StartEventCounter = 0;
   this->DisablePipelineExecution = false;
 }
 
@@ -295,22 +296,28 @@ void vtkSISourceProxy::SetupSelectionProxy(int port, vtkSIProxy* extractSelectio
 //----------------------------------------------------------------------------
 void vtkSISourceProxy::MarkStartEvent()
 {
-  std::ostringstream filterName;
-  filterName << "Execute " << this->GetLogNameOrDefault() << " id: " << this->GetGlobalID();
-  vtkTimerLog::MarkStartEvent(filterName.str().c_str());
+  if (this->StartEventCounter++ == 0)
+  {
+    std::ostringstream filterName;
+    filterName << "Execute " << this->GetLogNameOrDefault() << " id: " << this->GetGlobalID();
+    vtkTimerLog::MarkStartEvent(filterName.str().c_str());
 
-  vtkVLogStartScopeF(PARAVIEW_LOG_PIPELINE_VERBOSITY(), vtkLogIdentifier(this), "%s: execute",
-    this->GetLogNameOrDefault());
+    vtkVLogStartScopeF(PARAVIEW_LOG_EXECUTION_VERBOSITY(), vtkLogIdentifier(this), "%s: execute",
+      this->GetLogNameOrDefault());
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkSISourceProxy::MarkEndEvent()
 {
-  vtkLogEndScope(vtkLogIdentifier(this));
+  if (--this->StartEventCounter == 0)
+  {
+    vtkLogEndScope(vtkLogIdentifier(this));
 
-  std::ostringstream filterName;
-  filterName << "Execute " << this->GetLogNameOrDefault() << " id: " << this->GetGlobalID();
-  vtkTimerLog::MarkEndEvent(filterName.str().c_str());
+    std::ostringstream filterName;
+    filterName << "Execute " << this->GetLogNameOrDefault() << " id: " << this->GetGlobalID();
+    vtkTimerLog::MarkEndEvent(filterName.str().c_str());
+  }
 }
 
 //----------------------------------------------------------------------------

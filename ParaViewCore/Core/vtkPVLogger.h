@@ -58,7 +58,7 @@ public:
   //@{
   /**
    * Use this verbosity level when logging messages that provide information
-   * about pipeline execution.
+   * about pipeline update requests, etc.
    *
    * Default level is `vtkLogger::VERBOSITY_TRACE` unless overridden by calling
    * `SetPipelineVerbosity` or by setting the environment variable
@@ -66,6 +66,19 @@ public:
    */
   static Verbosity GetPipelineVerbosity();
   static void SetPipelineVerbosity(Verbosity value);
+  //@}
+
+  //@{
+  /**
+   * Use this verbosity level when logging messages that provide information
+   * about algorithm execution.
+   *
+   * Default level is `vtkLogger::VERBOSITY_TRACE` unless overridden by calling
+   * `SetPipelineVerbosity` or by setting the environment variable
+   * `PARAVIEW_LOG_EXECUTION_VERBOSITY` to the expected verbosity level.
+   */
+  static Verbosity GetExecutionVerbosity();
+  static void SetExecutionVerbosity(Verbosity value);
   //@}
 
   //@{
@@ -149,6 +162,16 @@ private:
  * @endcode
  */
 #define PARAVIEW_LOG_PIPELINE_VERBOSITY() vtkPVLogger::GetPipelineVerbosity()
+
+/**
+ * Macro to use for verbosity when logging execution messages. Same as calling
+ * vtkPVLogger::GetExecutionVerbosity() e.g.
+ *
+ * @code{cpp}
+ *  vtkVLogF(PARAVIEW_LOG_EXECUTION_VERBOSITY(), "filter executed");
+ * @endcode
+ */
+#define PARAVIEW_LOG_EXECUTION_VERBOSITY() vtkPVLogger::GetExecutionVerbosity()
 
 /**
  * Macro to use for verbosity when logging plugin messages. Same as calling
