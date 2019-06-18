@@ -382,6 +382,14 @@ protected:
    */
   void UpdateShaderReplacements();
 
+  /**
+   * Returns true if this representation has translucent geometry. Unlike
+   * `vtkActor::HasTranslucentPolygonalGeometry` which cannot be called in
+   * `Update`, this method can be called in `Update` i.e. before the mapper has
+   * all the data to decide if it is doing translucent rendering.
+   */
+  virtual bool NeedsOrderedCompositing();
+
   vtkAlgorithm* GeometryFilter;
   vtkAlgorithm* MultiBlockMaker;
   vtkPVCacheKeeper* CacheKeeper;

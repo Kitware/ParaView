@@ -101,6 +101,8 @@ protected:
    */
   void UpdateColoringParameters() override;
 
+  bool NeedsOrderedCompositing() override;
+
   vtkMapper* BackfaceMapper;
   vtkMapper* LODBackfaceMapper;
   vtkPVLODActor* BackfaceActor;

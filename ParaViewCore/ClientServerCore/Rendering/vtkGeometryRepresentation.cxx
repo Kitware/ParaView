@@ -43,11 +43,13 @@
 #include "vtkProcessModule.h"
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
+#include "vtkScalarsToColors.h"
 #include "vtkSelection.h"
 #include "vtkSelectionConverter.h"
 #include "vtkSelectionNode.h"
 #include "vtkShaderProperty.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkTexture.h"
 #include "vtkTransform.h"
 #include "vtkUnstructuredGrid.h"
 
@@ -59,6 +61,7 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <memory>
+#include <numeric>
 #include <tuple>
 #include <vector>
 
@@ -314,16 +317,12 @@ int vtkGeometryRepresentation::ProcessViewRequest(
     // redistribute data as and when needed.
     vtkPVRenderView::MarkAsRedistributable(inInfo, this);
 
-    this->ComputeVisibleDataBounds();
-
     // Tell the view if this representation needs ordered compositing. We need
     // ordered compositing when rendering translucent geometry.
-    if (this->Actor->HasTranslucentPolygonalGeometry())
+    if (this->NeedsOrderedCompositing())
     {
-      // We need to extend this condition to consider translucent LUTs once we
-      // start supporting them,
-
       outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
+
       // Pass partitioning information to the render view.
       if (this->UseDataPartitions == true)
       {
@@ -335,6 +334,8 @@ int vtkGeometryRepresentation::ProcessViewRequest(
     // information for resetting camera and clip planes. Since this
     // representation allows users to transform the geometry, we need to ensure
     // that the bounds we report include the transformation as well.
+    this->ComputeVisibleDataBounds();
+
     vtkNew<vtkMatrix4x4> matrix;
     this->Actor->GetMatrix(matrix.GetPointer());
     vtkPVRenderView::SetGeometryBounds(inInfo, this->VisibleDataBounds, matrix.GetPointer());
@@ -696,6 +697,75 @@ void vtkGeometryRepresentation::SetVisibility(bool val)
 {
   this->Actor->SetVisibility(val);
   this->Superclass::SetVisibility(val);
+}
+
+//----------------------------------------------------------------------------
+bool vtkGeometryRepresentation::NeedsOrderedCompositing()
+{
+  // One would think simply calling `vtkActor::HasTranslucentPolygonalGeometry`
+  // should do the trick, however that method relies on the mapper's input
+  // having up-to-date data. vtkGeometryRepresentation needs to determine
+  // whether the representation needs ordered compositing in `REQUEST_UPDATE`
+  // pass i.e. before the mapper's input is updated. Hence we explicitly
+  // determine if the mapper may choose to render translucent geometry.
+  if (this->Actor->GetForceOpaque())
+  {
+    return false;
+  }
+
+  if (this->Actor->GetForceTranslucent())
+  {
+    return true;
+  }
+
+  if (auto prop = this->Actor->GetProperty())
+  {
+    auto opacity = prop->GetOpacity();
+    if (opacity > 0.0 && opacity < 1.0)
+    {
+      return true;
+    }
+  }
+
+  if (auto texture = this->Actor->GetTexture())
+  {
+    if (texture->IsTranslucent())
+    {
+      return true;
+    }
+  }
+
+  // Check is BlockOpacities has any value not 0 or 1.
+  if (std::accumulate(this->BlockOpacities.begin(), this->BlockOpacities.end(), false,
+        [](bool result, const std::pair<unsigned int, double>& apair) {
+          return result || (apair.second > 0.0 && apair.second < 1.0);
+        }))
+  {
+    // a translucent block may be present.
+    return true;
+  }
+
+  auto colorarrayname = this->GetColorArrayName();
+  if (colorarrayname && colorarrayname[0])
+  {
+    if (this->Mapper->GetColorMode() == VTK_COLOR_MODE_DIRECT_SCALARS)
+    {
+      // when mapping scalars directly, assume the scalars have an alpha
+      // component since we cannot check if that is indeed the case consistently
+      // on all ranks without a bit of work.
+      return true;
+    }
+
+    if (auto lut = this->Mapper->GetLookupTable())
+    {
+      if (lut->IsOpaque() == 0)
+      {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 //----------------------------------------------------------------------------

@@ -224,6 +224,17 @@ void vtkGeometryRepresentationWithFaces::PrintSelf(ostream& os, vtkIndent indent
   this->Superclass::PrintSelf(os, indent);
 }
 
+//----------------------------------------------------------------------------
+bool vtkGeometryRepresentationWithFaces::NeedsOrderedCompositing()
+{
+  if (this->BackfaceProperty->GetOpacity() > 0.0 && this->BackfaceProperty->GetOpacity() < 1.0)
+  {
+    return true;
+  }
+
+  return this->Superclass::NeedsOrderedCompositing();
+}
+
 //***************************************************************************
 // Forwarded to vtkProperty(BackfaceProperty)
 //----------------------------------------------------------------------------

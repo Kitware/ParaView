@@ -1032,23 +1032,26 @@ int vtkPVGeometryFilter::RequestCompositeData(
       this->Controller->AllReduce(
         &non_null_leaves[0], &reduced_non_null_leaves[0], reduced_size, vtkCommunicator::MAX_OP);
 
-      vtkPolyData* trivalInput = vtkPolyData::New();
       iter->SkipEmptyNodesOff();
+      block_id = 0;
       if (vtkDataObjectTreeIterator* treeIter = vtkDataObjectTreeIterator::SafeDownCast(iter))
       {
-        treeIter->VisitOnlyLeavesOff();
+        treeIter->VisitOnlyLeavesOn();
       }
-      for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+      for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem(), ++block_id)
       {
-        unsigned int index = iter->GetCurrentFlatIndex();
+        const unsigned int index = iter->GetCurrentFlatIndex();
         if (iter->GetCurrentDataObject() == NULL &&
           index < static_cast<unsigned int>(reduced_non_null_leaves.size()) &&
           reduced_non_null_leaves[index] != 0)
         {
+          vtkPolyData* trivalInput = vtkPolyData::New();
           output->SetDataSet(iter, trivalInput);
+          trivalInput->FastDelete();
+          this->AddCompositeIndex(trivalInput, index);
+          this->AddBlockColors(trivalInput, block_id);
         }
       }
-      trivalInput->Delete();
     }
   }
 
