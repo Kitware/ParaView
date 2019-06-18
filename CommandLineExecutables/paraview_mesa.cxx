@@ -175,6 +175,13 @@ int main(int argc, char* argv[])
   bool in_tool_args = false;
   bool print = false;
   std::vector<char const*> args;
+
+  if (argc == 1)
+  {
+    usage(argv[0]);
+    return EXIT_FAILURE;
+  }
+
   for (int i = 1; i < argc; ++i)
   {
     char const* arg = argv[i];
@@ -268,6 +275,13 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
       }
     }
+  }
+
+  if (!tool)
+  {
+    error("no tool specified", nullptr);
+    available("tools", tools);
+    return EXIT_FAILURE;
   }
 
   // Set up the environment to use Mesa.
