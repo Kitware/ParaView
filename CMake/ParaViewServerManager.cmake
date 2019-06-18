@@ -123,7 +123,7 @@ endfunction ()
 #[==[.md
 The second way to process XML files directly.
 
-``
+```
 paraview_server_manager_process_files(
   FILES <file>...
   TARGET <target>)

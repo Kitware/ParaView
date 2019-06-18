@@ -101,7 +101,9 @@ TAB_SIZE             = 3
 SHORT_NAMES          = @DOXYGEN_SHORT_NAMES@
 # PAPER_TYPE           = letter
 
-FILE_PATTERNS        = *.h *.md
+FILE_PATTERNS        = *.h *.md *.cmake
+EXTENSION_MAPPING    = cmake=c
+FILTER_PATTERNS      = *.cmake="@PERL_EXECUTABLE@ @ParaView_SOURCE_DIR@/Utilities/Doxygen/filters/cmake2c.pl"
 RECURSIVE            = YES
 
 ALPHABETICAL_INDEX   = YES
