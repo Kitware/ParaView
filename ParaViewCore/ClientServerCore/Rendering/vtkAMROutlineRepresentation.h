@@ -55,6 +55,35 @@ public:
    */
   void SetVisibility(bool val) override;
 
+  //@{
+  /**
+   * Forwarded to vtkProperty
+   */
+  void SetAmbient(double);
+  void SetDiffuse(double);
+  void SetSpecular(double);
+  void SetSpecularPower(double val);
+  void SetAmbientColor(double r, double g, double b);
+  void SetDiffuseColor(double r, double g, double b);
+  void SetSpecularColor(double r, double g, double b);
+  void SetLineWidth(double val);
+  void SetOpacity(double val);
+  void SetLuminosity(double val);
+  void SetRenderLinesAsTubes(bool);
+  //@}
+
+  //@{
+  /**
+   * Forwarded to vtkActor
+   */
+  void SetOrientation(double, double, double);
+  void SetOrigin(double, double, double);
+  void SetPickable(int val);
+  void SetPosition(double, double, double);
+  void SetScale(double, double, double);
+  void SetUserTransform(const double[16]);
+  //@}
+
 protected:
   vtkAMROutlineRepresentation();
   ~vtkAMROutlineRepresentation() override;

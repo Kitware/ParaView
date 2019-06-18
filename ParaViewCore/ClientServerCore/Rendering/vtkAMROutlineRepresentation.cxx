@@ -33,8 +33,13 @@
 #include "vtkPolyData.h"
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
+#include "vtkTransform.h"
 
-#include <assert.h>
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+#include "vtkOSPRayActorNode.h"
+#endif
+
+#include <cassert>
 
 vtkStandardNewMacro(vtkAMROutlineRepresentation);
 //----------------------------------------------------------------------------
@@ -335,6 +340,114 @@ bool vtkAMROutlineRepresentation::RemoveFromView(vtkView* view)
     return this->Superclass::RemoveFromView(view);
   }
   return false;
+}
+
+//----------------------------------------------------------------------------
+void vtkAMROutlineRepresentation::SetLineWidth(double val)
+{
+  this->Actor->GetProperty()->SetLineWidth(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkAMROutlineRepresentation::SetOpacity(double val)
+{
+  this->Actor->GetProperty()->SetOpacity(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkAMROutlineRepresentation::SetLuminosity(double val)
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  vtkOSPRayActorNode::SetLuminosity(val, this->Actor->GetProperty());
+#else
+  (void)val;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkAMROutlineRepresentation::SetRenderLinesAsTubes(bool val)
+{
+  this->Actor->GetProperty()->SetRenderLinesAsTubes(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkAMROutlineRepresentation::SetAmbient(double val)
+{
+  this->Actor->GetProperty()->SetAmbient(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkAMROutlineRepresentation::SetDiffuse(double val)
+{
+  this->Actor->GetProperty()->SetDiffuse(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkAMROutlineRepresentation::SetSpecular(double val)
+{
+  this->Actor->GetProperty()->SetSpecular(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkAMROutlineRepresentation::SetAmbientColor(double r, double g, double b)
+{
+  this->Actor->GetProperty()->SetAmbientColor(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkAMROutlineRepresentation::SetDiffuseColor(double r, double g, double b)
+{
+  this->Actor->GetProperty()->SetDiffuseColor(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkAMROutlineRepresentation::SetSpecularColor(double r, double g, double b)
+{
+  this->Actor->GetProperty()->SetSpecularColor(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkAMROutlineRepresentation::SetSpecularPower(double val)
+{
+  this->Actor->GetProperty()->SetSpecularPower(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkAMROutlineRepresentation::SetOrientation(double x, double y, double z)
+{
+  this->Actor->SetOrientation(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkAMROutlineRepresentation::SetOrigin(double x, double y, double z)
+{
+  this->Actor->SetOrigin(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkAMROutlineRepresentation::SetPickable(int val)
+{
+  this->Actor->SetPickable(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkAMROutlineRepresentation::SetPosition(double x, double y, double z)
+{
+  this->Actor->SetPosition(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkAMROutlineRepresentation::SetScale(double x, double y, double z)
+{
+  this->Actor->SetScale(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkAMROutlineRepresentation::SetUserTransform(const double matrix[16])
+{
+  vtkNew<vtkTransform> transform;
+  transform->SetMatrix(matrix);
+  this->Actor->SetUserTransform(transform.GetPointer());
 }
 
 //----------------------------------------------------------------------------
