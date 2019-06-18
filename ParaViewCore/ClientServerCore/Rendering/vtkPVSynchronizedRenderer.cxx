@@ -110,23 +110,6 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
     case vtkProcessModule::PROCESS_SERVER:
     case vtkProcessModule::PROCESS_RENDER_SERVER:
     case vtkProcessModule::PROCESS_BATCH:
-      if (auto cs_controller = session->GetController(vtkPVSession::CLIENT))
-      {
-        // note cs_controller will be null in batch mode and on satellites.
-        assert(pm->GetPartitionId() == 0);
-        if (in_tile_display_mode || in_cave_mode)
-        {
-          this->CSSynchronizer = vtkSynchronizedRenderers::New();
-        }
-        else
-        {
-          this->CSSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
-        }
-        this->CSSynchronizer->WriteBackImagesOff();
-        this->CSSynchronizer->SetRootProcessId(1);
-        this->CSSynchronizer->SetParallelController(cs_controller);
-      }
-
       if (in_cave_mode)
       {
         this->ParallelSynchronizer = vtkCaveSynchronizedRenderers::New();
@@ -156,6 +139,11 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
           }
         }
 
+        assert(this->ParallelSynchronizer != nullptr);
+
+        // ensure that the server ranks always render on a black background to simplify
+        // compositing and avoiding issues like #15961, #18998.
+        this->ParallelSynchronizer->FixBackgroundOn();
         this->ParallelSynchronizer->SetParallelController(pm->GetGlobalController());
         this->ParallelSynchronizer->SetRootProcessId(0);
         if (in_tile_display_mode)
@@ -172,6 +160,40 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
           this->ParallelSynchronizer->WriteBackImagesOff();
         }
       }
+
+      if (auto cs_controller = session->GetController(vtkPVSession::CLIENT))
+      {
+        // note cs_controller will be null in batch mode and on satellites.
+        assert(pm->GetPartitionId() == 0);
+        if (in_tile_display_mode || in_cave_mode)
+        {
+          this->CSSynchronizer = vtkSynchronizedRenderers::New();
+        }
+        else
+        {
+          this->CSSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
+        }
+        this->CSSynchronizer->WriteBackImagesOff();
+        this->CSSynchronizer->SetRootProcessId(1);
+        this->CSSynchronizer->SetParallelController(cs_controller);
+
+        if (this->ParallelSynchronizer)
+        {
+          // This ensures that CSSynchronizer simply fetches the captured buffer from
+          // iceT without requiring icet to render to screen on the root node.
+          this->CSSynchronizer->SetCaptureDelegate(this->ParallelSynchronizer);
+          this->ParallelSynchronizer->AutomaticEventHandlingOff();
+        }
+        else
+        {
+          // no ParallelSynchronizer is being used, however, we still need to
+          // fix the background color so that we don't overblend the background.
+          // hence we will make the CSSynchronizer to fix the background,
+          // otherwise the ParallelSynchronizer is fixing the background (either
+          // explicitly or via IceT.
+          this->CSSynchronizer->FixBackgroundOn();
+        }
+      }
       break;
 
     case vtkProcessModule::PROCESS_DATA_SERVER:
@@ -180,14 +202,6 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
     default:
       vtkErrorMacro("Unknown process type detected. Aborting for debugging purposes!");
       abort();
-  }
-
-  // This ensures that CSSynchronizer simply fetches the captured buffer from
-  // iceT without requiring icet to render to screen on the root node.
-  if (this->ParallelSynchronizer && this->CSSynchronizer)
-  {
-    this->CSSynchronizer->SetCaptureDelegate(this->ParallelSynchronizer);
-    this->ParallelSynchronizer->AutomaticEventHandlingOff();
   }
 }
 

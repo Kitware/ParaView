@@ -44,12 +44,12 @@ vtkIceTSynchronizedRenderers::vtkIceTSynchronizedRenderers()
 //----------------------------------------------------------------------------
 vtkIceTSynchronizedRenderers::~vtkIceTSynchronizedRenderers()
 {
+  this->SetImageProcessingPass(0);
+  this->SetRenderPass(0);
   this->IceTCompositePass->Delete();
   this->IceTCompositePass = 0;
   this->CameraRenderPass->Delete();
   this->CameraRenderPass = 0;
-  this->SetImageProcessingPass(0);
-  this->SetRenderPass(0);
 }
 
 //----------------------------------------------------------------------------
@@ -60,14 +60,20 @@ void vtkIceTSynchronizedRenderers::SetImageProcessingPass(vtkImageProcessingPass
   {
     pass->SetDelegatePass(this->CameraRenderPass);
     this->Renderer->SetPass(pass);
-    this->IceTCompositePass->SetDisplayRGBAResults(true);
   }
   else if (this->Renderer && this->CameraRenderPass)
   {
     this->CameraRenderPass->SetAspectRatioOverride(1.0);
     this->Renderer->SetPass(this->CameraRenderPass);
-    this->IceTCompositePass->SetDisplayRGBAResults(this->WriteBackImages);
   }
+
+  // When ImageProcessingPass is present, that's the only time when we really
+  // want to do the extra work of pasting back IceT compositing results the
+  // frame buffer in vtkIceTCompositePass. In other cases, no need for
+  // vtkIceTCompositePass spend time uploading those buffers.
+  // For cases like tile-display mode, `vtkIceTSynchronizedRenderers` will
+  // upload them if `this->WriteBackImages` is true.
+  this->IceTCompositePass->SetDisplayRGBAResults(this->ImageProcessingPass != nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -93,18 +99,6 @@ void vtkIceTSynchronizedRenderers::SetRenderPass(vtkRenderPass* pass)
       defaultPass->Delete();
     }
   }
-}
-
-//----------------------------------------------------------------------------
-void vtkIceTSynchronizedRenderers::HandleEndRender()
-{
-  // vtkIceTSynchronizedRenderers handles write back direcly using API on
-  // vtkIceTCompositePass and hence we skip superclass' write-back
-  // code.
-  const bool prev = this->WriteBackImages;
-  this->WriteBackImages = false;
-  this->Superclass::HandleEndRender();
-  this->WriteBackImages = prev;
 }
 
 //----------------------------------------------------------------------------
@@ -146,9 +140,7 @@ vtkSynchronizedRenderers::vtkRawImage& vtkIceTSynchronizedRenderers::CaptureRend
 {
   // We capture the image from IceTCompositePass. This avoids the capture of
   // buffer from screen when not necessary.
-  vtkRawImage& rawImage =
-    (this->GetImageReductionFactor() == 1) ? this->FullImage : this->ReducedImage;
-
+  vtkRawImage& rawImage = this->Image;
   if (!rawImage.IsValid())
   {
     this->IceTCompositePass->GetLastRenderedTile(rawImage);
@@ -167,25 +159,4 @@ vtkSynchronizedRenderers::vtkRawImage& vtkIceTSynchronizedRenderers::CaptureRend
 void vtkIceTSynchronizedRenderers::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-}
-
-//----------------------------------------------------------------------------
-void vtkIceTSynchronizedRenderers::SlaveStartRender()
-{
-  this->Superclass::SlaveStartRender();
-
-  int x, y;
-  this->IceTCompositePass->GetTileDimensions(x, y);
-  if (!(x == 1 && y == 1))
-  {
-    // Don't mess with tile mode behavior.
-    return;
-  }
-  // Otherwise ensure that every node starts with a black background
-  // to blend onto. This is somewhat redundant, we do the same elsewhere
-  // with a glClear call, but OSPRay can't see that one.
-  // see also vtkPVClientServerSynchronizedRenderers
-  this->Renderer->SetBackground(0, 0, 0);
-  this->Renderer->SetGradientBackground(false);
-  this->Renderer->SetTexturedBackground(false);
 }
