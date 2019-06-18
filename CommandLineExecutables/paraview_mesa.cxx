@@ -270,6 +270,13 @@ int main(int argc, char* argv[])
     }
   }
 
+  if (!tool)
+  {
+    error("no tool specified", nullptr);
+    available("tools", tools);
+    return EXIT_FAILURE;
+  }
+
   // Set up the environment to use Mesa.
   std::string const exe_dir = current_exe_dir(argv[0]);
   std::string const mesa_libdir = exe_dir + "/" + mesa_relative_libdir;
