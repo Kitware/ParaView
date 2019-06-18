@@ -1,0 +1,20 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPolyPointSource"
+                 label="OpenVR Source"
+                 name="OpenVRSource">
+      <Documentation long_help="Accept points created from within VR.">
+      </Documentation>
+      <DoubleVectorProperty command="SetPoint"
+                            default_values=""
+                            name="Points"
+                            number_of_elements="0"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfPoints"
+                            use_index="1">
+      </DoubleVectorProperty>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

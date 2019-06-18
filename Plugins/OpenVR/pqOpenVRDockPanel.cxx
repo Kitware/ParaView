@@ -1,9 +1,10 @@
-#include "pvOpenVRDockPanel.h"
-#include "ui_pvOpenVRDockPanel.h"
+#include "pqOpenVRDockPanel.h"
+#include "ui_pqOpenVRDockPanel.h"
 
 #include "pqActiveObjects.h"
 #include "pqAnimationManager.h"
 #include "pqAnimationScene.h"
+#include "pqOpenVRControls.h"
 #include "pqPVApplicationCore.h"
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
@@ -19,13 +20,16 @@
 
 #include <sstream>
 
-class pvOpenVRDockPanel::pqInternals : public Ui::pvOpenVRDockPanel
+class pqOpenVRDockPanel::pqInternals : public Ui::pqOpenVRDockPanel
 {
 };
 
-void pvOpenVRDockPanel::constructor()
+void pqOpenVRDockPanel::constructor()
 {
   this->Helper = vtkPVOpenVRHelper::New();
+  this->OpenVRControls = new pqOpenVRControls(this->Helper);
+  this->Helper->SetOpenVRControls(this->OpenVRControls);
+
   this->setWindowTitle("OpenVR");
   QWidget* t_widget = new QWidget(this);
   this->Internals = new pqInternals();
@@ -41,10 +45,6 @@ void pvOpenVRDockPanel::constructor()
     this->Internals->multisamples, SIGNAL(stateChanged(int)), this, SLOT(multiSampleChanged(int)));
   connect(this->Internals->cropThickness, SIGNAL(textChanged(const QString&)), this,
     SLOT(defaultCropThicknessChanged(const QString&)));
-  connect(this->Internals->editableField, SIGNAL(textChanged(const QString&)), this,
-    SLOT(editableFieldChanged(const QString&)));
-  connect(this->Internals->fieldValues, SIGNAL(textChanged(const QString&)), this,
-    SLOT(fieldValuesChanged(const QString&)));
 
   // connect(
   //   &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this,
@@ -68,8 +68,6 @@ void pvOpenVRDockPanel::constructor()
   QObject::connect(
     pqPVApplicationCore::instance()->animationManager(), SIGNAL(endPlay()), this, SLOT(endPlay()));
 
-  this->Helper->SetFieldValues(this->Internals->fieldValues->text().toLatin1().data());
-
   if (this->Helper->GetCollaborationClient()->SupportsCollaboration())
   {
     this->Internals->cConnectButton->setEnabled(false);
@@ -91,7 +89,7 @@ void pvOpenVRDockPanel::constructor()
   }
 }
 
-void pvOpenVRDockPanel::sendToOpenVR()
+void pqOpenVRDockPanel::sendToOpenVR()
 {
   pqView* view = pqActiveObjects::instance().activeView();
 
@@ -109,12 +107,12 @@ void pvOpenVRDockPanel::sendToOpenVR()
   }
 }
 
-void pvOpenVRDockPanel::collaborationConnect()
+void pqOpenVRDockPanel::collaborationConnect()
 {
   if (this->Internals->cConnectButton->text() == "Connect")
   {
     vtkPVOpenVRCollaborationClient* cc = this->Helper->GetCollaborationClient();
-    cc->SetLogCallback(std::bind(&pvOpenVRDockPanel::collaborationCallback, this,
+    cc->SetLogCallback(std::bind(&pqOpenVRDockPanel::collaborationCallback, this,
                          std::placeholders::_1, std::placeholders::_2),
       nullptr);
     cc->SetCollabHost(this->Internals->cServerValue->text().toLatin1().data());
@@ -133,7 +131,7 @@ void pvOpenVRDockPanel::collaborationConnect()
   }
 }
 
-void pvOpenVRDockPanel::collaborationCallback(std::string const& msg, void*)
+void pqOpenVRDockPanel::collaborationCallback(std::string const& msg, void*)
 {
   // send message if any to text window
   if (!msg.length())
@@ -144,7 +142,7 @@ void pvOpenVRDockPanel::collaborationCallback(std::string const& msg, void*)
   this->Internals->outputWindow->appendPlainText(msg.c_str());
 }
 
-void pvOpenVRDockPanel::exportLocationsAsSkyboxes()
+void pqOpenVRDockPanel::exportLocationsAsSkyboxes()
 {
   pqView* view = pqActiveObjects::instance().activeView();
   vtkSMViewProxy* smview = view->getViewProxy();
@@ -152,7 +150,7 @@ void pvOpenVRDockPanel::exportLocationsAsSkyboxes()
   this->Helper->ExportLocationsAsSkyboxes(smview);
 }
 
-void pvOpenVRDockPanel::exportLocationsAsView()
+void pqOpenVRDockPanel::exportLocationsAsView()
 {
   pqView* view = pqActiveObjects::instance().activeView();
   vtkSMViewProxy* smview = view->getViewProxy();
@@ -160,12 +158,12 @@ void pvOpenVRDockPanel::exportLocationsAsView()
   this->Helper->ExportLocationsAsView(smview);
 }
 
-void pvOpenVRDockPanel::multiSampleChanged(int state)
+void pqOpenVRDockPanel::multiSampleChanged(int state)
 {
   this->Helper->SetMultiSample(state == Qt::Checked);
 }
 
-void pvOpenVRDockPanel::defaultCropThicknessChanged(const QString& text)
+void pqOpenVRDockPanel::defaultCropThicknessChanged(const QString& text)
 {
   bool ok;
   double d = text.toDouble(&ok);
@@ -175,24 +173,14 @@ void pvOpenVRDockPanel::defaultCropThicknessChanged(const QString& text)
   }
 }
 
-void pvOpenVRDockPanel::editableFieldChanged(const QString& text)
-{
-  this->Helper->SetEditableField(text.toLatin1().data());
-}
-
-void pvOpenVRDockPanel::fieldValuesChanged(const QString& text)
-{
-  this->Helper->SetFieldValues(text.toLatin1().data());
-}
-
-pvOpenVRDockPanel::~pvOpenVRDockPanel()
+pqOpenVRDockPanel::~pqOpenVRDockPanel()
 {
   delete this->Internals;
   this->Helper->Delete();
 }
 
 //-----------------------------------------------------------------------------
-void pvOpenVRDockPanel::setActiveView(pqView* /*view*/)
+void pqOpenVRDockPanel::setActiveView(pqView* /*view*/)
 {
   //  pqRenderView* rview = qobject_cast<pqRenderView*>(view);
 
@@ -207,7 +195,7 @@ void pvOpenVRDockPanel::setActiveView(pqView* /*view*/)
   //  }
 }
 
-void pvOpenVRDockPanel::loadState(vtkPVXMLElement* root, vtkSMProxyLocator* locator)
+void pqOpenVRDockPanel::loadState(vtkPVXMLElement* root, vtkSMProxyLocator* locator)
 {
   vtkPVXMLElement* e = root->FindNestedElementByName("OpenVR");
   if (e)
@@ -224,12 +212,7 @@ void pvOpenVRDockPanel::loadState(vtkPVXMLElement* root, vtkSMProxyLocator* loca
       this->Internals->cropThickness->setText(QString::number(dcropThickness));
     }
 
-    std::string tmp = e->GetAttributeOrEmpty("EditableField");
-    this->Internals->editableField->setText(QString(tmp.c_str()));
-    tmp = e->GetAttributeOrEmpty("FieldValues");
-    this->Internals->fieldValues->setText(QString(tmp.c_str()));
-
-    tmp = e->GetAttributeOrEmpty("CollaborationServer");
+    std::string tmp = e->GetAttributeOrEmpty("CollaborationServer");
     if (tmp.size())
     {
       this->Internals->cServerValue->setText(QString(tmp.c_str()));
@@ -248,14 +231,10 @@ void pvOpenVRDockPanel::loadState(vtkPVXMLElement* root, vtkSMProxyLocator* loca
   }
 }
 
-void pvOpenVRDockPanel::saveState(vtkPVXMLElement* root)
+void pqOpenVRDockPanel::saveState(vtkPVXMLElement* root)
 {
   vtkNew<vtkPVXMLElement> e;
   e->SetName("OpenVR");
-
-  e->AddAttribute("EditableField", this->Internals->editableField->text().toLatin1().data());
-
-  e->AddAttribute("FieldValues", this->Internals->fieldValues->text().toLatin1().data());
 
   e->AddAttribute("MultiSample", this->Helper->GetMultiSample() ? 1 : 0);
 
@@ -270,38 +249,38 @@ void pvOpenVRDockPanel::saveState(vtkPVXMLElement* root)
   root->AddNestedElement(e.Get(), 1);
 }
 
-void pvOpenVRDockPanel::prepareForQuit()
+void pqOpenVRDockPanel::prepareForQuit()
 {
   this->Helper->Quit();
 }
 
-void pvOpenVRDockPanel::beginPlay()
+void pqOpenVRDockPanel::beginPlay()
 {
   pqAnimationManager* am = pqPVApplicationCore::instance()->animationManager();
   pqAnimationScene* as = am->getActiveScene();
   QObject::connect(as, SIGNAL(animationTime(double)), this, SLOT(updateSceneTime()));
 }
 
-void pvOpenVRDockPanel::endPlay()
+void pqOpenVRDockPanel::endPlay()
 {
   pqAnimationManager* am = pqPVApplicationCore::instance()->animationManager();
   pqAnimationScene* as = am->getActiveScene();
   QObject::disconnect(as, 0, this, 0);
 }
 
-void pvOpenVRDockPanel::updateSceneTime()
+void pqOpenVRDockPanel::updateSceneTime()
 {
   this->Helper->UpdateProps();
 }
 
 //-----------------------------------------------------------------------------
-void pvOpenVRDockPanel::onViewAdded(pqView*)
+void pqOpenVRDockPanel::onViewAdded(pqView*)
 {
   // nothing right now
 }
 
 //-----------------------------------------------------------------------------
-void pvOpenVRDockPanel::onViewRemoved(pqView* view)
+void pqOpenVRDockPanel::onViewRemoved(pqView* view)
 {
   if (dynamic_cast<pqRenderView*>(view))
   {
