@@ -237,6 +237,8 @@ More advanced options:
     files.
   * `PARAVIEW_ENABLE_MOTIONFX` (default `OFF`): Enable support for reading
     MotionFX files.
+  * `PARAVIEW_ENABLE_MOMENTINVARIANTS` (default `OFF`): Enable
+    MomentInvariants filters.
   * `PARAVIEW_ENABLE_XDMF2` (default `OFF`): Enable support for reading Xdmf2
     files.
   * `PARAVIEW_ENABLE_XDMF3` (default `OFF`): Enable support for reading Xdmf3
