@@ -243,7 +243,7 @@ vtk_module_wrap_client_server(
   * `DESTINATION`: (Defaults to `${CMAKE_INSTALL_LIBDIR}`) Where to install the
     generated libraries.
   * `INSTALL_EXPORT`: If provided, installs will add the installed
-    libraries to the provided export set.
+    libraries and generated interface target to the provided export set.
   * `COMPONENT`: (Defaults to `development`) All install rules created by this
     function will use this installation component.
 #]==]
@@ -364,6 +364,18 @@ ${_vtk_client_server_calls}}
     target_link_libraries("${_vtk_client_server_TARGET}"
       INTERFACE
         ${_vtk_client_server_all_modules})
+
+    set(_vtk_client_server_export)
+    if (_vtk_client_server_INSTALL_EXPORT)
+      set(_vtk_client_server_export
+        EXPORT "${_vtk_client_server_INSTALL_EXPORT}")
+    endif ()
+
+    install(
+      TARGETS             "${_vtk_client_server_TARGET}"
+      ${_vtk_client_server_export}
+      COMPONENT           "${_vtk_client_server_COMPONENT}"
+      ARCHIVE DESTINATION "${_vtk_client_server_DESTINATION}")
   endif ()
 endfunction ()
 
