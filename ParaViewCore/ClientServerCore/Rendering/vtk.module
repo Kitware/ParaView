@@ -24,7 +24,7 @@ PRIVATE_DEPENDS
 OPTIONAL_DEPENDS
   ParaView::nvpipe
   VTK::AcceleratorsVTKm
-  VTK::FiltersOpenTurns
+  VTK::FiltersOpenTURNS
   VTK::ParallelMPI
   VTK::RenderingRayTracing
   VTK::vtkm

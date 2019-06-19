@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringArray.h"
 #include "vtkTable.h"
 
-#if VTK_MODULE_ENABLE_VTK_FiltersOpenTurns
+#if VTK_MODULE_ENABLE_VTK_FiltersOpenTURNS
 #include "vtkOTScatterPlotMatrix.h"
 #endif
 
@@ -194,7 +194,7 @@ void vtkPVPlotMatrixRepresentation::PrepareForRendering()
   plotMatrix->SetPlotMarkerSize(vtkScatterPlotMatrix::SCATTERPLOT, this->ScatterPlotMarkerSize);
   plotMatrix->SetPlotMarkerSize(vtkScatterPlotMatrix::ACTIVEPLOT, this->ActivePlotMarkerSize);
 
-#if VTK_MODULE_ENABLE_VTK_FiltersOpenTurns
+#if VTK_MODULE_ENABLE_VTK_FiltersOpenTURNS
   vtkOTScatterPlotMatrix* otPlotMatrix = vtkOTScatterPlotMatrix::SafeDownCast(plotMatrix);
   if (otPlotMatrix)
   {
