@@ -77,7 +77,6 @@ public:
   //***************************************************************************
   // Forwarded to Actor->GetProperty()
   virtual void SetAmbientColor(double r, double g, double b);
-  virtual void SetColor(double r, double g, double b);
   virtual void SetDiffuseColor(double r, double g, double b);
   virtual void SetEdgeColor(double r, double g, double b);
   virtual void SetInterpolation(int val);

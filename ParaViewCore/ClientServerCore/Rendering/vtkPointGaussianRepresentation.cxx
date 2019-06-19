@@ -495,7 +495,6 @@ vtkForwardActorCallMacro3Args(SetScale, double);
 
 vtkForwardActorCallMacro(SetPickable, value, int);
 
-vtkForwardPropertyCallMacro3Args(SetColor, double);
 vtkForwardPropertyCallMacro3Args(SetAmbientColor, double);
 vtkForwardPropertyCallMacro3Args(SetDiffuseColor, double);
 vtkForwardPropertyCallMacro3Args(SetSpecularColor, double);
