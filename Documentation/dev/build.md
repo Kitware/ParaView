@@ -232,7 +232,7 @@ More advanced options:
   * `PARAVIEW_ENABLE_LAS` (default `OFF`): Enable support for reading LAS
     files.
   * `PARAVIEW_ENABLE_OPENTURNS` (default `OFF`): Enable support for reading
-    OpenTurns files.
+    OpenTURNS files.
   * `PARAVIEW_ENABLE_PDAL` (default `OFF`): Enable support for reading PDAL
     files.
   * `PARAVIEW_ENABLE_MOTIONFX` (default `OFF`): Enable support for reading

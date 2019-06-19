@@ -563,31 +563,13 @@
         or the StepFactorMin limit the decrease of the StepFactor.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetUseParticlePathsRenderingThreshold"
-                         default_values="0"
-                         name="UseParticlePathsRenderingThreshold"
+      <IntVectorProperty command="SetGenerateParticlePathsOutput"
+                         default_values="1"
+                         name="GenerateParticlePathsOutput"
                          number_of_elements="1"
                          panel_visibility="advanced" >
         <BooleanDomain name="bool" />
-        <Documentation>If UseParticlePathsRenderingThreshold is true, the tracker will check
-        if the number of points in the paths is greater than the
-        PathsRenderingPointsThreshold, in that case no output
-        will be rendered for the particle paths.
-        </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetParticlePathsRenderingPointsThreshold"
-                            default_values="100"
-                            name="PathsRenderingPointsThreshold"
-                            number_of_elements="1">
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="UseParticlePathsRenderingThreshold"
-                                   value="1" />
-        </Hints>
-        <Documentation>This property contains a threshold of number of points.
-        If the particle paths contain more points than this threshold and UseParticlePathsRenderingThreshold
-        is true, then no output will be rendered for the particle paths.
+        <Documentation>If GenerateParticlePathsOutput is true, the tracker will generate the particle paths output.
         </Documentation>
       </IntVectorProperty>
       <!-- End LagrangianParticleTracker -->

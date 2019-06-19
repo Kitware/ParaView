@@ -203,7 +203,7 @@ option(PARAVIEW_ENABLE_GDAL "Enable GDAL support." OFF)
 mark_as_advanced(PARAVIEW_ENABLE_GDAL)
 option(PARAVIEW_ENABLE_LAS "Enable LAS support." OFF)
 mark_as_advanced(PARAVIEW_ENABLE_LAS)
-option(PARAVIEW_ENABLE_OPENTURNS "Enable OpenTurns support." OFF)
+option(PARAVIEW_ENABLE_OPENTURNS "Enable OpenTURNS support." OFF)
 option(PARAVIEW_ENABLE_PDAL "Enable PDAL support." OFF)
 mark_as_advanced(PARAVIEW_ENABLE_PDAL)
 option(PARAVIEW_ENABLE_MOTIONFX "Enable MotionFX support." OFF)
@@ -426,7 +426,7 @@ endif ()
 
 if (PARAVIEW_ENABLE_OPENTURNS)
   list(APPEND paraview_requested_modules
-    VTK::FiltersOpenTurns)
+    VTK::FiltersOpenTURNS)
 endif ()
 
 if (PARAVIEW_ENABLE_PDAL)

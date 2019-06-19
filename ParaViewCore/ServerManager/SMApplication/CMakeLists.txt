@@ -104,7 +104,7 @@ if (TARGET VTK::IOMotionFX)
     Resources/proxies_motionfx.xml)
 endif ()
 
-if (TARGET VTK::FiltersOpenTurns)
+if (TARGET VTK::FiltersOpenTURNS)
   list(APPEND xml_files
     Resources/proxies_openturns.xml)
 endif ()

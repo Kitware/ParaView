@@ -171,7 +171,7 @@ int vtkLagrangianSeedHelper::RequestData(
 
       // Create and set a dummy particle so FindInLocators can use caching.
       vtkLagrangianParticle dummyParticle(
-        0, 0, 0, 0, 0, nullptr, this->IntegrationModel->GetWeightsSize());
+        0, 0, 0, 0, 0, nullptr, this->IntegrationModel->GetWeightsSize(), 0);
       for (int iPt = 0; iPt < output->GetNumberOfPoints(); iPt++)
       {
         if (this->IntegrationModel->FindInLocators(
