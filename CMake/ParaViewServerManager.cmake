@@ -61,6 +61,7 @@ uses modules:
 paraview_server_manager_process(
   MODULES <module>...
   TARGET <target>
+  [INSTALL_EXPORT <export>]
   [FILES <file>...]
   [XML_FILES  <variable>])
 ```
@@ -73,11 +74,14 @@ files are required, they may be passed via `FILES`.
 
 If `XML_FILES` is given, the list of process XML files are set on the given
 variable.
+
+If `INSTALL_EXPORT` is given, the interface target will be added to the given
+export set.
 #]==]
 function (paraview_server_manager_process)
   cmake_parse_arguments(_paraview_sm_process
     ""
-    "TARGET;XML_FILES"
+    "TARGET;XML_FILES;INSTALL_EXPORT"
     "MODULES;FILES"
     ${ARGN})
 
@@ -109,9 +113,16 @@ function (paraview_server_manager_process)
   list(APPEND _paraview_sm_process_files
     ${_paraview_sm_process_FILES})
 
+  set(_paraview_sm_process_export_args)
+  if (DEFINED _paraview_sm_process_INSTALL_EXPORT)
+    set(_paraview_sm_process_export_args
+      INSTALL_EXPORT "${_paraview_sm_process_INSTALL_EXPORT}")
+  endif ()
+
   paraview_server_manager_process_files(
     TARGET  ${_paraview_sm_process_TARGET}
-    FILES   ${_paraview_sm_process_files})
+    FILES   ${_paraview_sm_process_files}
+    ${_paraview_sm_process_export_args})
 
   if (DEFINED _paraview_sm_process_XML_FILES)
     set("${_paraview_sm_process_XML_FILES}"
@@ -126,7 +137,8 @@ The second way to process XML files directly.
 ```
 paraview_server_manager_process_files(
   FILES <file>...
-  TARGET <target>)
+  TARGET <target>
+  [INSTALL_EXPORT <export>])
 ```
 
 The files passed to the `FILES` argument will be processed in to functions
@@ -137,11 +149,14 @@ filename is `<TARGET>.h` and it contains a function named
 `<TARGET>_initialize`. They may be changed using the `FILE_NAME` and
 `FUNCTION_NAME` arguments. The target has an interface usage requirement that
 will allow the generated header to be included.
+
+If `INSTALL_EXPORT` is given, the interface target will be added to the given
+export set.
 #]==]
 function (paraview_server_manager_process_files)
   cmake_parse_arguments(_paraview_sm_process_files
     ""
-    "TARGET"
+    "TARGET;INSTALL_EXPORT"
     "FILES"
     ${ARGN})
 
@@ -210,5 +225,9 @@ void ${_paraview_sm_process_files_TARGET}_initialize(std::vector<std::string>& x
     INTERFACE
       "$<BUILD_INTERFACE:${_paraview_sm_process_files_output_dir}>")
   _vtk_module_apply_properties("${_paraview_sm_process_files_TARGET}")
+  if (DEFINED _paraview_sm_process_files_INSTALL_EXPORT)
+    set(_vtk_build_INSTALL_EXPORT
+      "${_paraview_sm_process_files_INSTALL_EXPORT}")
+  endif ()
   _vtk_module_install("${_paraview_sm_process_files_TARGET}")
 endfunction ()
