@@ -627,7 +627,7 @@ pqPresetDialog::pqPresetDialog(QWidget* parentObject, pqPresetDialog::Modes mode
   auto groupMgr = this->Internals->Model->GroupManager;
   this->connect(
     groupMgr, &pqPresetGroupsManager::groupsUpdated, this, &pqPresetDialog::updateGroups);
-  this->connect(this, SIGNAL(rejected()), SLOT(onRejected()));
+  this->connect(this, SIGNAL(rejected()), SLOT(close()));
   this->updateGroups();
 }
 
@@ -959,12 +959,6 @@ void pqPresetDialog::exportPresets()
   }
   outfs << presetCollection.toStyledString().c_str() << endl;
   outfs.close();
-}
-
-//-----------------------------------------------------------------------------
-void pqPresetDialog::onRejected()
-{
-  close();
 }
 
 //-----------------------------------------------------------------------------

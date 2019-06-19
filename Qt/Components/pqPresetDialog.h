@@ -140,7 +140,6 @@ protected slots:
   void removePreset(const QModelIndex& idx = QModelIndex());
   void importPresets();
   void exportPresets();
-  void onRejected();
 
   void setPresetIsAdvanced(int newState);
 
