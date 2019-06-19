@@ -20,7 +20,7 @@ def convert_pose_to_camera(iPosition, iFocalPoint, iViewUp, pose, camType):
             ]
 
     def MatrixMatrixMul(mtx_a, mtx_b):
-        tpos_b = zip(*mtx_b)
+        tpos_b = list(zip(*mtx_b))
         rtn = [
             [sum(ea*eb for ea, eb in zip(a, b)) for b in tpos_b]
             for a in mtx_a]
