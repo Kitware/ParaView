@@ -15,6 +15,15 @@ try:
 except ImportError:
     # python 3
     imap = map
+
+def py23iteritems(d):
+    myit = None
+    try:
+        myit = d.iteritems()
+    except AttributeError:
+        myit = d.items()
+    return myit
+
 import math
 import os.path
 import paraview
@@ -956,7 +965,7 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection, for
     atLeastOneViewExported = False
     cinema_dirs = []
     new_files = {}
-    for viewName, viewParams in viewSelection.iteritems():
+    for viewName, viewParams in py23iteritems(viewSelection):
 
         extension = os.path.splitext(viewParams[0])[1]
 
@@ -1077,7 +1086,7 @@ def prepare_selection(trackSelection, arraySelection):
     could be accessed by name directly), we comply for compatibility.
     '''
     userDef = {}
-    for name, values in trackSelection.iteritems():
+    for name, values in py23iteritems(trackSelection):
         source = paraview.simple.FindSource(name)
         if (source is None):
             # Following the smtrace.py convention pqCinemaTrackSelection passes
@@ -1110,7 +1119,7 @@ def prepare_selection(trackSelection, arraySelection):
                 options[controlName] = values
                 userDef[source] = options
 
-    for name, arrayNames in arraySelection.iteritems():
+    for name, arrayNames in py23iteritems(arraySelection):
         source = paraview.simple.FindSource(name)
         if (source is None):
             # Following the smtrace.py convention pqCinemaTrackSelection passes
