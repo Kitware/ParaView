@@ -880,7 +880,8 @@ paraview_server_manager_process(
   MODULES   ${paraview_modules}
             ${vtk_modules}
   TARGET    paraview_server_manager
-  XML_FILES paraview_server_manager_files)
+  XML_FILES paraview_server_manager_files
+  INSTALL_EXPORT ParaView)
 
 if (PARAVIEW_ENABLE_PYTHON)
   if (PARAVIEW_USE_EXTERNAL_VTK)
