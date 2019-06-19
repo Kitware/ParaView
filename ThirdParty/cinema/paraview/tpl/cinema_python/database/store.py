@@ -5,6 +5,19 @@ from __future__ import absolute_import
 
 import json
 import itertools
+try:
+    from itertools import izip as zip
+except ImportError: #use py 3's native zip
+    pass
+
+def py23iteritems(d):
+    myit = None
+    try:
+        myit = d.iteritems()
+    except AttributeError:
+        myit = d.items()
+    return myit
+
 import re
 from . import raster_wrangler
 
@@ -122,17 +135,17 @@ class Store(object):
         potential_vectors = {}
         if 'types' in properties:
             for x in range(0, len(properties['types'])):
-                if properties['types'][x] == 'depth':
-                    value = properties['values'][x]
+                if list(properties['types'])[x] == 'depth':
+                    value = list(properties['values'])[x]
                     newentry = [name, value]
                     Zs.append(newentry)
-                if properties['types'][x] == 'luminance':
-                    value = properties['values'][x]
+                if list(properties['types'])[x] == 'luminance':
+                    value = list(properties['values'])[x]
                     newentry = [name, value]
                     Ls.append(newentry)
                 # Mark value renders
-                if properties['types'][x] == 'value':
-                    value = properties['values'][x]
+                if list(properties['types'])[x] == 'value':
+                    value = list(properties['values'])[x]
                     newentry = [name, value]
                     Vs.append(newentry)
                     # Check if vector component
@@ -143,8 +156,8 @@ class Store(object):
                             potential_vectors[vecname[0]] += 1
                         else:
                             potential_vectors[vecname[0]] = 1
-                if properties['types'][x] == 'magnitude':
-                    value = properties['values'][x]
+                if list(properties['types'])[x] == 'magnitude':
+                    value = list(properties['values'])[x]
                     newentry = [name, value]
                     Ms.append(newentry)
 
@@ -392,7 +405,7 @@ class Store(object):
 
     def isdependee(self, name):
         """ check if the named parameter has others that depend on it """
-        for depender, dependees in self.parameter_associations.iteritems():
+        for depender, dependees in py23iteritems(self.parameter_associations):
             if name in dependees:
                 return True
         return False
@@ -413,7 +426,7 @@ class Store(object):
         return a list of all the parameters that depend on the given one
         """
         result = []
-        for depender, dependees in self.parameter_associations.iteritems():
+        for depender, dependees in py23iteritems(self.parameter_associations):
             if name in dependees["vis"]:
                 result.append(depender)
         return result
@@ -430,7 +443,7 @@ class Store(object):
 
     def getRelatedField(self, parameter):
         ''' Returns the 'field' argument related to a 'parameter'. '''
-        for depender, dependees in self.parameter_associations.iteritems():
+        for depender, dependees in py23iteritems(self.parameter_associations):
             if parameter in dependees["vis"] and \
                self.isfield(depender):
                 return depender
@@ -577,7 +590,7 @@ class Store(object):
 
         elem_accum = 0.0
         for element in itertools.product(*values):
-            descriptor = dict(itertools.izip(params, element))
+            descriptor = dict(zip(params, element))
 
             if progressObject:
                 elem_accum += 1.0
@@ -587,13 +600,13 @@ class Store(object):
                 descriptor.update(fixedargs)
 
             ok_desc = {}
-            for param, value in descriptor.iteritems():
+            for param, value in py23iteritems(descriptor):
                 if self.dependencies_satisfied(param, descriptor):
                     ok_desc.update({param: value})
 
             OK = True
             if fixedargs:
-                for k, v in fixedargs.iteritems():
+                for k, v in py23iteritems(fixedargs):
                     if not (k in ok_desc and ok_desc[k] == v):
                         OK = False
             if OK:
@@ -648,8 +661,8 @@ def make_field(name, _values, **kwargs):
     named 'value' type color selections.
     """
 
-    values = _values.keys()
-    img_types = _values.values()
+    values = list(_values.keys())
+    img_types = list(_values.values())
     valid_itypes = ['rgb', 'lut', 'depth', 'value', 'luminance', 'normals']
     for i in img_types:
         if i not in valid_itypes:

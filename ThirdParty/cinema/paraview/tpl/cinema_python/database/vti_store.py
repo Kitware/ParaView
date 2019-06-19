@@ -8,6 +8,10 @@ import numpy as np
 import os
 import json
 import itertools
+try:
+    from itertools import izip as zip
+except ImportError: #use py 3's native zip
+    pass
 
 
 class VTIFileStore(store.Store):
@@ -81,7 +85,7 @@ class VTIFileStore(store.Store):
             values.append(vals)
         index = 0
         for element in itertools.product(*values):
-            desc = dict(itertools.izip(args, element))
+            desc = dict(zip(args, element))
             fail = False
             for k, v in descriptor.items():
                 if desc[k] != v:
@@ -181,7 +185,7 @@ class VTIFileStore(store.Store):
 
         index = 0
         for element in itertools.product(*values):
-            desc = dict(itertools.izip(args, element))
+            desc = dict(zip(args, element))
             fail = False
             for k, v in q.items():
                 if desc[k] != v:
