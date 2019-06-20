@@ -17,20 +17,26 @@
  * @brief   parallel meta-writer for serial formats
  *
  * vtkParallelSerialWriter is a meta-writer that enables serial writers
- * to work in parallel. It gathers data to the 1st node and invokes the
- * internal writer. The reduction is controlled defined by the PreGatherHelper
- * and PostGatherHelper.
+ * to work in parallel. By default, it gathers data to the 1st node (root node)
+ * and invokes the internal writer. The reduction is controlled by the
+ * PreGatherHelper and PostGatherHelper. Instead of collecting all the data to
+ * the root node the filter supports reducing down to a target number of ranks
+ * which ranks chosen in either round-robin or contiguous fashion.
+ *
  * This also makes it possible to write time-series for temporal datasets using
  * simple non-time-aware writers.
-*/
+ */
 
 #ifndef vtkParallelSerialWriter_h
 #define vtkParallelSerialWriter_h
 
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsCoreModule.h" //needed for exports
+#include "vtkSmartPointer.h"              // needed for vtkSmartPointer
+#include <string>                         // for std::string
 
 class vtkClientServerInterpreter;
+class vtkMultiProcessController;
 
 class VTKPVVTKEXTENSIONSCORE_EXPORT vtkParallelSerialWriter : public vtkDataObjectAlgorithm
 {
@@ -146,6 +152,54 @@ public:
   vtkSetStringMacro(FileNameSuffix);
   //@}
 
+  //@{
+  /**
+   * In parallel runs, this writer can consolidate output from multiple ranks to
+   * a subset of ranks. This specifies the number of ranks that will do the final writing
+   * to disk. If NumberOfIORanks is 0, then all ranks will save the local data.
+   * If set to 1 (default), the root node alone will write to disk. All data from all ranks will
+   * be gathered to the root node before being written out.
+   */
+  vtkSetClampMacro(NumberOfIORanks, int, 0, VTK_INT_MAX);
+  vtkGetMacro(NumberOfIORanks, int);
+  //@}
+
+  enum
+  {
+    ASSIGNMENT_MODE_CONTIGUOUS,
+    ASSIGNMENT_MODE_ROUND_ROBIN
+  };
+
+  //@{
+  /**
+   * When `NumberOfIORanks` is greater than 1 and less than the number of MPI ranks,
+   * this controls how the ranks that write to disk are determined. This also affects which
+   * ranks send data to which rank for IO.
+   *
+   * In ASSIGNMENT_MODE_CONTIGUOUS (default), all MPI ranks are numerically grouped into
+   * `NumberOfIORanks` groups with the first rank in each group acting as the `root` node for that
+   * group and is the one that does IO. For example, if there are 16 MPI ranks and NumberOfIORanks
+   * is set to 3 then the groups are
+   * `[0 - 5], [6 - 10], [11 - 15]` with the first rank in each group 0, 6, and 15 doing the IO.
+   *
+   * In ASSIGNMENT_MODE_ROUND_ROBIN, the grouping is done in round robin fashion, thus for 16 MPI
+   * ranks with NumberOfIORanks set to 3, the groups are
+   * `[0, 3, ..., 15], [1, 4, ..., 13], [2, 5, ..., 14]` with 0, 1 and 2 doing the IO.
+   */
+  vtkSetClampMacro(
+    RankAssignmentMode, int, ASSIGNMENT_MODE_CONTIGUOUS, ASSIGNMENT_MODE_ROUND_ROBIN);
+  vtkGetMacro(RankAssignmentMode, int);
+  //@}
+
+  //@{
+  /**
+   * Get/Set the controller to use. By default initialized to
+   * `vtkMultiProcessController::GetGlobalController` in the constructor.
+   */
+  void SetController(vtkMultiProcessController* controller);
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  //@}
+
 protected:
   vtkParallelSerialWriter();
   ~vtkParallelSerialWriter() override;
@@ -162,10 +216,12 @@ private:
   void operator=(const vtkParallelSerialWriter&) = delete;
 
   void WriteATimestep(vtkDataObject* input);
-  void WriteAFile(const char* fname, vtkDataObject* input);
+  void WriteAFile(const std::string& fname, vtkDataObject* input);
 
   void SetWriterFileName(const char* fname);
   void WriteInternal();
+
+  std::string GetPartitionFileName(const std::string& fname);
 
   vtkAlgorithm* PreGatherHelper;
   vtkAlgorithm* PostGatherHelper;
@@ -185,6 +241,13 @@ private:
   char* FileNameSuffix;
 
   vtkClientServerInterpreter* Interpreter;
+
+  int NumberOfIORanks;
+  int RankAssignmentMode;
+
+  vtkMultiProcessController* Controller;
+  vtkSmartPointer<vtkMultiProcessController> SubController;
+  int SubControllerColor;
 };
 
 #endif

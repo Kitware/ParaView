@@ -29,6 +29,8 @@
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
+#include <algorithm>
+#include <cassert>
 #include <sstream>
 #include <string>
 #include <vtksys/SystemTools.hxx>
@@ -52,8 +54,13 @@ vtkStandardNewMacro(vtkParallelSerialWriter);
 vtkCxxSetObjectMacro(vtkParallelSerialWriter, Writer, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkParallelSerialWriter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkParallelSerialWriter, PostGatherHelper, vtkAlgorithm);
+vtkCxxSetObjectMacro(vtkParallelSerialWriter, Controller, vtkMultiProcessController);
 //-----------------------------------------------------------------------------
 vtkParallelSerialWriter::vtkParallelSerialWriter()
+  : NumberOfIORanks(1)
+  , RankAssignmentMode(vtkParallelSerialWriter::ASSIGNMENT_MODE_CONTIGUOUS)
+  , Controller(nullptr)
+  , SubController(nullptr)
 {
   this->SetNumberOfOutputPorts(0);
 
@@ -76,6 +83,7 @@ vtkParallelSerialWriter::vtkParallelSerialWriter()
 
   this->Interpreter = nullptr;
   this->SetInterpreter(vtkClientServerInterpreterInitializer::GetGlobalInterpreter());
+  this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
 //-----------------------------------------------------------------------------
@@ -88,6 +96,7 @@ vtkParallelSerialWriter::~vtkParallelSerialWriter()
   this->SetPreGatherHelper(nullptr);
   this->SetPostGatherHelper(nullptr);
   this->SetInterpreter(nullptr);
+  this->SetController(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -154,8 +163,19 @@ int vtkParallelSerialWriter::RequestData(vtkInformation* request,
     return 0;
   }
 
-  bool write_all = (this->WriteAllTimeSteps != 0 && this->NumberOfTimeSteps > 0);
+  if (!this->Controller)
+  {
+    vtkErrorMacro("No controller specified!");
+    return 0;
+  }
 
+  if (!this->FileName || this->FileName[0] == '\0')
+  {
+    vtkErrorMacro("Invalid filename specified!");
+    return 0;
+  }
+
+  bool write_all = (this->WriteAllTimeSteps != 0 && this->NumberOfTimeSteps > 0);
   if (write_all)
   {
     if (this->CurrentTimeIndex == 0)
@@ -168,6 +188,40 @@ int vtkParallelSerialWriter::RequestData(vtkInformation* request,
   {
     request->Remove(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING());
     this->CurrentTimeIndex = 0;
+  }
+
+  const int num_ranks = this->Controller->GetNumberOfProcesses();
+  int num_io_ranks = std::min(this->NumberOfIORanks, num_ranks);
+  num_io_ranks = num_io_ranks <= 0 ? num_ranks : num_io_ranks;
+  if (num_io_ranks == 1)
+  {
+    this->SubController = nullptr;
+    this->SubControllerColor = -1;
+  }
+  else
+  {
+    const int myid = this->Controller->GetLocalProcessId();
+    if (this->RankAssignmentMode == ASSIGNMENT_MODE_CONTIGUOUS)
+    {
+      const int div = num_ranks / num_io_ranks;
+      const int mod = num_ranks % num_io_ranks;
+      const int r = myid / (div + 1);
+      if (r < mod)
+      {
+        this->SubControllerColor = r;
+      }
+      else
+      {
+        this->SubControllerColor = mod + (myid - (div + 1) * mod) / div;
+      }
+    }
+    else
+    {
+      this->SubControllerColor = myid % num_io_ranks;
+    }
+    assert(this->SubControllerColor >= 0 && this->SubControllerColor < num_io_ranks);
+    this->SubController.TakeReference(
+      this->Controller->PartitionController(this->SubControllerColor, myid));
   }
 
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
@@ -185,6 +239,7 @@ int vtkParallelSerialWriter::RequestData(vtkInformation* request,
     }
   }
 
+  this->SubController = nullptr;
   return 1;
 }
 
@@ -206,7 +261,7 @@ void vtkParallelSerialWriter::WriteATimestep(vtkDataObject* input)
       std::string ext = vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
       std::ostringstream fname;
       fname << path << "/" << fnamenoext << idx << ext;
-      this->WriteAFile(fname.str().c_str(), curObj);
+      this->WriteAFile(fname.str(), curObj);
     }
   }
   else if (input)
@@ -219,9 +274,11 @@ void vtkParallelSerialWriter::WriteATimestep(vtkDataObject* input)
 }
 
 //----------------------------------------------------------------------------
-void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* input)
+void vtkParallelSerialWriter::WriteAFile(const std::string& filename_arg, vtkDataObject* input)
 {
-  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
+  auto controller = this->SubController ? this->SubController.GetPointer() : this->Controller;
+
+  const auto filename = this->GetPartitionFileName(filename_arg);
 
   vtkSmartPointer<vtkReductionFilter> reductionFilter = vtkSmartPointer<vtkReductionFilter>::New();
   reductionFilter->SetController(controller);
@@ -298,6 +355,19 @@ void vtkParallelSerialWriter::WriteInternal()
            << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
   }
+}
+
+//-----------------------------------------------------------------------------
+std::string vtkParallelSerialWriter::GetPartitionFileName(const std::string& fname)
+{
+  if (this->SubController != nullptr && this->SubControllerColor >= 0)
+  {
+    std::string path = vtksys::SystemTools::GetFilenamePath(fname);
+    std::string fnamenoext = vtksys::SystemTools::GetFilenameWithoutLastExtension(fname);
+    std::string ext = vtksys::SystemTools::GetFilenameLastExtension(fname);
+    return path + "/" + fnamenoext + "-" + std::to_string(this->SubControllerColor) + ext;
+  }
+  return fname;
 }
 
 //-----------------------------------------------------------------------------
