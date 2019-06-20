@@ -10,6 +10,7 @@
 #include "vtkOpenVRInteractorStyle.h"
 #include "vtkPVOpenVRHelper.h"
 
+#include <QItemSelectionModel>
 #include <QMenu>
 #include <QTabWidget>
 
