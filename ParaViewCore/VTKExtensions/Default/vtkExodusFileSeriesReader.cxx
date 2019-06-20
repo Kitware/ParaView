@@ -240,7 +240,10 @@ void vtkExodusFileSeriesReader::FindRestartedResults()
   // there on the first file set (before the first restart occurred).  Thus it is
   // optional (although there can only be one as this is the only place we check
   // numbering).
-  vtksys::RegularExpression regEx("^(.*\\.e)(-s.[0-9]+)?(\\.[0-9]+\\.[0-9]+)?$");
+  //
+  // The `e` in the above pattern can be any of exodus supported extensions e.g.
+  // exo, ex2, etc. Hence we keep the regex generic (ref: paraview/paraview#19056).
+  vtksys::RegularExpression regEx("^(.*\\.[a-zA-Z0-9]+)(-s.[0-9]+)?(\\.[0-9]+\\.[0-9]+)?$");
   if (!regEx.find(baseName))
   {
     // Filename does not follow convention.  Just use it.
