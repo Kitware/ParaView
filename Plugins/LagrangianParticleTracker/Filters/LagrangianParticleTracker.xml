@@ -175,6 +175,8 @@
                      panel_visibility="default">
         <ProxyListDomain name="proxy_list">
           <Proxy group="cell_locators"
+                 name="StaticCellLocator"/>
+          <Proxy group="cell_locators"
                  name="CellLocator"/>
           <Proxy group="cell_locators"
                  name="CellTreeLocator"/>
