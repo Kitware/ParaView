@@ -450,10 +450,6 @@ if (PARAVIEW_ENABLE_MOMENTINVARIANTS)
       VTK::ParallelMomentInvariants)
   endif()
   set(use_vtk_remote_modules ON)
-else()
-  list(APPEND paraview_rejected_modules
-    VTK::MomentInvariants
-    VTK::ParallelMomentInvariants)
 endif ()
 
 if (PARAVIEW_ENABLE_VISITBRIDGE)
