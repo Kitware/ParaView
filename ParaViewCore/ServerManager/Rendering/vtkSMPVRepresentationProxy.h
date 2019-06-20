@@ -282,14 +282,16 @@ public:
 
   //@{
   /**
-   * Returns the array information for the data array used for scalar coloring,
-   * if any. Otherwise returns NULL.
+   * Returns the array information for the data array used for scalar coloring, from input data.
+   * If checkRepresentedData is true, it will also check in the represented data. Default is true.
+   * If none is found, returns NULL.
    */
-  virtual vtkPVArrayInformation* GetArrayInformationForColorArray();
-  static vtkPVArrayInformation* GetArrayInformationForColorArray(vtkSMProxy* proxy)
+  virtual vtkPVArrayInformation* GetArrayInformationForColorArray(bool checkRepresentedData = true);
+  static vtkPVArrayInformation* GetArrayInformationForColorArray(
+    vtkSMProxy* proxy, bool checkRepresentedData = true)
   {
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    return self ? self->GetArrayInformationForColorArray() : NULL;
+    return self ? self->GetArrayInformationForColorArray(checkRepresentedData) : nullptr;
   }
   //@}
 

@@ -758,7 +758,8 @@ bool vtkSMPVRepresentationProxy::IsScalarBarVisible(vtkSMProxy* view)
 }
 
 //----------------------------------------------------------------------------
-vtkPVArrayInformation* vtkSMPVRepresentationProxy::GetArrayInformationForColorArray()
+vtkPVArrayInformation* vtkSMPVRepresentationProxy::GetArrayInformationForColorArray(
+  bool checkRepresentedData)
 {
   if (!this->GetUsingScalarColoring())
   {
@@ -780,11 +781,14 @@ vtkPVArrayInformation* vtkSMPVRepresentationProxy::GetArrayInformationForColorAr
     }
   }
 
-  vtkPVArrayInformation* arrayInfo = this->GetRepresentedDataInformation()->GetArrayInformation(
-    colorArrayHelper.GetInputArrayNameToProcess(), colorArrayHelper.GetInputArrayAssociation());
-  if (arrayInfo)
+  if (checkRepresentedData)
   {
-    return arrayInfo;
+    vtkPVArrayInformation* arrayInfo = this->GetRepresentedDataInformation()->GetArrayInformation(
+      colorArrayHelper.GetInputArrayNameToProcess(), colorArrayHelper.GetInputArrayAssociation());
+    if (arrayInfo)
+    {
+      return arrayInfo;
+    }
   }
 
   return NULL;
