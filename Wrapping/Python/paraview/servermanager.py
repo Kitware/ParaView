@@ -795,6 +795,8 @@ class VectorProperty(Property):
     def SetData(self, values):
         """Allows setting of all values at once. Requires a single value or
         a iterable object."""
+        if self.SMProperty.GetInformationOnly() != 0:
+          raise RuntimeError("Cannot set an InformationOnly property!")
         # Python3: str now has attr "__iter__", test separately
         if (not hasattr(values, "__iter__")) or (type(values) == type("")):
             values = (values,)
@@ -868,7 +870,8 @@ class DoubleMapProperty(Property):
 
     def SetData(self, elements):
         """Sets all the elements at once."""
-
+        if self.SMProperty.GetInformationOnly() != 0:
+          raise RuntimeError("Cannot set an InformationOnly property!")
         # first clear existing data
         self.Clear()
 
@@ -977,6 +980,8 @@ class ArraySelectionProperty(VectorProperty):
     def SetData(self, values):
         """Allows setting of all values at once. Requires a single value,
         a tuple or list."""
+        if self.SMProperty.GetInformationOnly() != 0:
+          raise RuntimeError("Cannot set an InformationOnly property!")
         if not values:
             # if values is None or empty list, we are resetting the selection.
             self.SMProperty.SetElement(4, "")
@@ -1100,6 +1105,8 @@ class ArrayListProperty(VectorProperty):
     def SetData(self, values):
         """Allows setting of all values at once. Requires a single value,
         a tuple or list."""
+        if self.SMProperty.GetInformationOnly() != 0:
+          raise RuntimeError("Cannot set an InformationOnly property!")
         # Clean up first
         iup = self.SMProperty.GetImmediateUpdate()
         self.SMProperty.SetImmediateUpdate(False)
@@ -1297,6 +1304,8 @@ class ProxyProperty(Property):
     def SetData(self, values):
         """Allows setting of all values at once. Requires a single value,
         a tuple or list."""
+        if self.SMProperty.GetInformationOnly() != 0:
+          raise RuntimeError("Cannot set an InformationOnly property!")
         if isinstance(values, str):
             position = -1
             try:
@@ -2711,8 +2720,8 @@ def _createClass(groupName, proxyName, apxm=None):
     for prop in iter:
         propName = iter.GetKey()
         if paraview.compatibility.GetVersion() >= 3.5:
-            if (prop.GetInformationOnly() and propName != "TimestepValues" ) \
-              or prop.GetIsInternal():
+            if (prop.GetInformationOnly() and propName != "TimestepValues" \
+              and prop.GetPanelVisibility() == "never") or prop.GetIsInternal():
                 continue
         names = [propName]
         if paraview.compatibility.GetVersion() >= 3.5:
