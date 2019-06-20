@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqPipelineRepresentation.h"
-#include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
@@ -100,30 +99,29 @@ void pqEditColorMapReaction::editColorMap(pqPipelineRepresentation* repr)
 
     vtkSMProperty* diffuse = proxy->GetProperty("DiffuseColor");
     vtkSMProperty* ambient = proxy->GetProperty("AmbientColor");
-    QString reprType = vtkSMPropertyHelper(proxy, "Representation", /*quiet=*/true).GetAsString();
-    bool use_ambient = (reprType == "Wireframe" || reprType == "Points" || reprType == "Outline");
-    if (diffuse && ambient)
+    if (diffuse == nullptr && ambient == nullptr)
+    {
+      diffuse = proxy->GetProperty("Color");
+    }
+
+    if (diffuse || ambient)
     {
       // Get the current color from the property.
-      QList<QVariant> rgb = pqSMAdaptor::getMultipleElementProperty(diffuse);
-      QColor color(Qt::white);
-      if (rgb.size() >= 3)
-      {
-        color = QColor::fromRgbF(rgb[0].toDouble(), rgb[1].toDouble(), rgb[2].toDouble());
-      }
+      double rgb[3];
+      vtkSMPropertyHelper(diffuse ? diffuse : ambient).Get(rgb, 3);
 
       // Let the user pick a new color.
-      color = QColorDialog::getColor(color, pqCoreUtilities::mainWidget(), "Pick Solid Color",
-        QColorDialog::DontUseNativeDialog);
+      auto color = QColorDialog::getColor(QColor::fromRgbF(rgb[0], rgb[1], rgb[2]),
+        pqCoreUtilities::mainWidget(), "Pick Solid Color", QColorDialog::DontUseNativeDialog);
       if (color.isValid())
       {
         // Set the properties to the new color.
-        rgb.clear();
-        rgb.append(color.redF());
-        rgb.append(color.greenF());
-        rgb.append(color.blueF());
+        rgb[0] = color.redF();
+        rgb[1] = color.greenF();
+        rgb[2] = color.blueF();
         BEGIN_UNDO_SET("Changed Solid Color");
-        pqSMAdaptor::setMultipleElementProperty(use_ambient ? ambient : diffuse, rgb);
+        vtkSMPropertyHelper(diffuse, /*quiet=*/true).Set(rgb, 3);
+        vtkSMPropertyHelper(ambient, /*quiet=*/true).Set(rgb, 3);
         proxy->UpdateVTKObjects();
         repr->renderViewEventually();
         END_UNDO_SET();

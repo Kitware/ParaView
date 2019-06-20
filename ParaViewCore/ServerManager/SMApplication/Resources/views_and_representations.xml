@@ -3934,7 +3934,6 @@
             <Property name="CustomTriangleScale" />
             <Property name="CustomShader" />
             <Property name="Emissive" />
-            <Property name="Color" />
             <Property name="ScaleByArray" />
             <Property name="SetScaleArray" />
             <Property name="ScaleArrayComponent" />
@@ -4995,18 +4994,6 @@
         <Documentation>
           The opacity to use when rendering the model.
         </Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetColor"
-                            default_values="1.0 1.0 1.0"
-                            name="Color"
-                            number_of_elements="3"
-                            panel_visibility="never">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="ForegroundColor" />
-        </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetEdgeColor"
                             default_values="0 0 0.5"
