@@ -206,7 +206,6 @@ public:
 
     this->ChartXY->SetAutoSize(true);
     this->ChartXY->SetShowLegend(false);
-    this->ChartXY->SetForceAxesToBounds(true);
     this->ChartXY->SetZoomWithMouseWheel(false);
     this->ContextView->GetScene()->AddItem(this->ChartXY.GetPointer());
     this->ContextView->SetInteractor(this->Widget->interactor());

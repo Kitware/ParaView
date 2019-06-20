@@ -246,6 +246,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/OBBMajorAxis.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/OBBMediumAxis.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/OBBMinorAxis.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/OpacityWidgetRange.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSet_Slice.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSet_Surface.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSetCollection_Slice.png}"
@@ -408,6 +409,7 @@ SET (TESTS_WITHOUT_BASELINES
   FindWidget.xml
   ModifyGUIWindowTitle.xml
   OpenHelp.xml
+  OpacityWidgetRange.xml
   PartialArrayInLineChart.xml
   PointCellDataConversion.xml
   ReloadCGNSFile.xml
