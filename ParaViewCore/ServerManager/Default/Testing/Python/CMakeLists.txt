@@ -91,6 +91,10 @@ endif()
 set(PVBATCH_NO_SYMMETRIC_TESTS
   SaveAnimation.py
   )
+
+set(PVBATCH_TESTS_5_RANKS
+    ParallelSerialWriterMultipleRankIO.py)
+
 IF (MPIEXEC_EXECUTABLE)
   set(vtkPVServerManagerDefault_NUMPROCS 2)
   paraview_add_test_pvbatch_mpi(
@@ -98,6 +102,13 @@ IF (MPIEXEC_EXECUTABLE)
     ${PVBATCH_TESTS}
     ${PVBATCH_NO_SYMMETRIC_TESTS}
     )
+  set(vtkPVServerManagerDefault_NUMPROCS 5)
+  paraview_add_test_pvbatch_mpi(
+    JUST_VALID
+    ${PVBATCH_TESTS_5_RANKS}
+    )
+
+  set(vtkPVServerManagerDefault_NUMPROCS 2)
   set(paraview_pvbatch_args
     --symmetric)
   set(vtk_test_prefix Symmetric)
@@ -105,6 +116,13 @@ IF (MPIEXEC_EXECUTABLE)
     JUST_VALID
     ${PVBATCH_TESTS}
     )
+
+  set(vtkPVServerManagerDefault_NUMPROCS 5)
+  paraview_add_test_pvbatch_mpi(
+    JUST_VALID
+    ${PVBATCH_TESTS_5_RANKS}
+    )
+
   unset(paraview_pvbatch_args)
   unset(vtk_test_prefix)
   unset(vtkPVServerManagerDefault_NUMPROCS)

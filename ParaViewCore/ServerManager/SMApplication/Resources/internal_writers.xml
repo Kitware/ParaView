@@ -235,6 +235,107 @@
 
       <!-- End of ParallelFileSeriesWriter -->
     </Proxy>
+
+    <!-- ================================================================= -->
+    <Proxy name="ParallelSerialWriter">
+
+      <IntVectorProperty command="SetWriteAllTimeSteps"
+                         default_values="0"
+                         name="WriteTimeSteps"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteTimeSteps is turned ON, the writer is
+        executed once for each timestep available from its input.</Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetFileNameSuffix"
+                            default_values="_%d"
+                            label = "File name suffix"
+                            name="FileNameSuffix"
+                            number_of_elements="1">
+        <Documentation>
+        The suffix to append to the file name when writing files at different timesteps.
+        (File extensions such as .vtk should be excluded.)
+        The % format specifiers are used. For example, _%d will write files as FileName_0,
+        FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
+        FileName_001, FileName_002 etc.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="NumberOfIORanks"
+                         label="Number Of IO Ranks"
+                         command="SetNumberOfIORanks"
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="0" />
+        <Documentation>
+           In parallel runs, this writer can consolidate output from multiple ranks to
+           a subset of ranks. This specifies the number of ranks that will do the final writing
+           to disk. If **NumberOfIORanks** is 0, then all ranks will save the local data.
+           If set to 1 (default), the root node alone will write to disk. All data from all ranks will
+           be gathered to the root node before being written out.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="RankAssignmentMode"
+                         command="SetRankAssignmentMode"
+                         number_of_elements="1"
+                         default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Contiguous" value="0" />
+          <Entry text="RoundRobin" value="1" />
+        </EnumerationDomain>
+        <Documentation>
+          When **NumberOfIORanks** is greater than 1 and less than the number of MPI ranks,
+          this controls how the ranks that write to disk are determined. This also affects which
+          ranks send data to which rank for IO.
+
+          In **Contiguous** mode (default), all MPI ranks are numerically grouped into **NumberOfIORanks**
+          groups with the first rank in each group acting as the `root` node for that group and is the one that
+          does IO. For example, if there are 16 MPI ranks and NumberOfIORanks is set to 3 then the groups are
+          `[0 - 5], [6 - 10], [11 - 15]` with the first rank in each group 0, 6, and 15 doing the IO.
+
+          In **RoundRobin** mode, the grouping is done in round robin fashion, thus for 16 MPI
+          ranks with NumberOfIORanks set to 3, the groups are
+          `[0, 3, ..., 15], [1, 4, ..., 13], [2, 5, ..., 14]` with 0, 1 and 2 doing the IO.
+        </Documentation>
+        <Hints>
+          <!-- enable this widget when NumberOfIORanks != 0 or 1 -->
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="enabled_state"
+                                       property="NumberOfIORanks"
+                                       value="1"
+                                       inverse="1"/>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="enabled_state"
+                                       property="NumberOfIORanks"
+                                       value="0"
+                                       inverse="1"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Time Support">
+        <Property name="WriteTimeSteps" />
+        <Property name="FileNameSuffix" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Parallel I/O Support">
+        <Property name="NumberOfIORanks" />
+        <Property name="RankAssignmentMode" />
+      </PropertyGroup>
+
+      <!-- end of ParallelSerialWriter -->
+    </Proxy>
+
     <!-- ================================================================= -->
     <Proxy base_proxygroup="internal_writers"
            base_proxyname="DataWriterBase"

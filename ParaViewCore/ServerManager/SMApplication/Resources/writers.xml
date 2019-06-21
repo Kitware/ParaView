@@ -902,7 +902,9 @@
     <PSWriterProxy class="vtkParallelSerialWriter"
                    file_name_method="SetFileName"
                    name="PDataSetWriterPolyData"
-                   parallel_only="1">
+                   parallel_only="1"
+                   base_proxygroup="internal_writers"
+                   base_proxyname="ParallelSerialWriter">
       <Documentation short_help="Writer that writes polydata as legacy vtk files.">
       Writer to write vtkPolyData in a legacy vtk data file. This
       version is used when running in parallel. It gathers data to first node
@@ -929,14 +931,6 @@
                             number_of_elements="1">
         <Documentation>The name of the file to be written.</Documentation>
       </StringVectorProperty>
-      <IntVectorProperty command="SetWriteAllTimeSteps"
-                         default_values="0"
-                         name="WriteTimeSteps"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>When WriteTimeSteps is turned ON, the writer is
-        executed once for each timestep available from its input.</Documentation>
-      </IntVectorProperty>
       <SubProxy>
         <Proxy name="PostGatherHelper"
                proxygroup="filters"
@@ -957,7 +951,9 @@
     <PSWriterProxy class="vtkParallelSerialWriter"
                    file_name_method="SetFileName"
                    name="PDataSetWriterUnstructuredGrid"
-                   parallel_only="1">
+                   parallel_only="1"
+                   base_proxygroup="internal_writers"
+                   base_proxyname="ParallelSerialWriter">
       <Documentation short_help="Writer that writes unstructured grid as legacy vtk files.">
       Writer to write vtkUnstructuredGrid of data object in a legacy vtk data file. This
       version is used when running in parallel. It gathers data to first node
@@ -984,14 +980,6 @@
                             number_of_elements="1">
         <Documentation>The name of the file to be written.</Documentation>
       </StringVectorProperty>
-      <IntVectorProperty command="SetWriteAllTimeSteps"
-                         default_values="0"
-                         name="WriteTimeSteps"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>When WriteTimeSteps is turned ON, the writer is
-        executed once for each timestep available from its input.</Documentation>
-      </IntVectorProperty>
       <SubProxy>
         <Proxy name="PostGatherHelper"
                proxygroup="filters"
@@ -1011,7 +999,9 @@
     <!-- ================================================================= -->
     <PSWriterProxy class="vtkParallelSerialWriter"
                    file_name_method="SetFileName"
-                   name="PPLYWriter">
+                   name="PPLYWriter"
+                   base_proxygroup="internal_writers"
+                   base_proxyname="ParallelSerialWriter">
       <Documentation short_help="Write polygonal data in Stanford University PLY format.">
       Writer to write polygonal data in Stanford University PLY format. The
       data can be written in either binary (little or big endian) or ASCII
@@ -1053,32 +1043,6 @@
                             number_of_elements="1">
         <Documentation>The name of the file to be written.</Documentation>
       </StringVectorProperty>
-      <IntVectorProperty command="SetWriteAllTimeSteps"
-                         default_values="0"
-                         name="WriteTimeSteps"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>When WriteTimeSteps is turned ON, the writer is
-        executed once for each time step available from its input.</Documentation>
-      </IntVectorProperty>
-      <StringVectorProperty command="SetFileNameSuffix"
-                            default_values="_%d"
-                            label = "File name suffix"
-                            name="FileNameSuffix"
-                            number_of_elements="1">
-        <Documentation>
-        The suffix to append to the file name when writing files at different timesteps.
-        (File extensions such as .vtk should be excluded.)
-        The % format specifiers are used. For example, _%d will write files as FileName_0,
-        FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
-        FileName_001, FileName_002 etc.
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="EnableWidgetDecorator">
-          <Property name="WriteTimeSteps" function="boolean" />
-          </PropertyWidgetDecorator>
-        </Hints>
-      </StringVectorProperty>
       <SubProxy>
         <Proxy name="PostGatherHelper"
                proxygroup="filters"
@@ -1098,7 +1062,9 @@
     <!-- ================================================================= -->
     <PSWriterProxy class="vtkParallelSerialWriter"
                    file_name_method="SetFileName"
-                   name="POBJWriter">
+                   name="POBJWriter"
+                   base_proxygroup="internal_writers"
+                   base_proxyname="ParallelSerialWriter">
       <Documentation short_help="Write polygonal data in Wavefront OBJ format.">
       Writer to write polygonal data in Wavefront OBJ format.
       Written files contain the geometry including lines, triangles and polygons.
@@ -1126,32 +1092,6 @@
                             number_of_elements="1">
         <Documentation>The name of the file to be written.</Documentation>
       </StringVectorProperty>
-      <IntVectorProperty command="SetWriteAllTimeSteps"
-                         default_values="0"
-                         name="WriteTimeSteps"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>When WriteTimeSteps is turned ON, the writer is
-        executed once for each time step available from its input.</Documentation>
-      </IntVectorProperty>
-      <StringVectorProperty command="SetFileNameSuffix"
-                            default_values="_%d"
-                            label = "File name suffix"
-                            name="FileNameSuffix"
-                            number_of_elements="1">
-        <Documentation>
-        The suffix to append to the file name when writing files at different timesteps.
-        (File extensions such as .vtk should be excluded.)
-        The % format specifiers are used. For example, _%d will write files as FileName_0,
-        FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
-        FileName_001, FileName_002 etc.
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="EnableWidgetDecorator">
-          <Property name="WriteTimeSteps" function="boolean" />
-          </PropertyWidgetDecorator>
-        </Hints>
-      </StringVectorProperty>
       <SubProxy>
         <Proxy name="PostGatherHelper"
                proxygroup="filters"
@@ -1170,7 +1110,9 @@
     <!-- ================================================================= -->
     <PSWriterProxy class="vtkParallelSerialWriter"
                    file_name_method="SetFileName"
-                   name="PSTLWriter">
+                   name="PSTLWriter"
+                   base_proxygroup="internal_writers"
+                   base_proxyname="ParallelSerialWriter">
       <Documentation short_help="Write stereo lithography files.">STLWriter
       writes stereo lithography (.stl) files in either ASCII or binary form.
       Stereo lithography files only contain triangles. If polygons with more
@@ -1199,14 +1141,6 @@
                             number_of_elements="1">
         <Documentation>The name of the file to be written.</Documentation>
       </StringVectorProperty>
-      <IntVectorProperty name="WriteTimeSteps"
-                         command="SetWriteAllTimeSteps"
-                         number_of_elements="1"
-                         default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>When WriteTimeSteps is turned ON, the writer is
-        executed once for each timestep available from its input.</Documentation>
-      </IntVectorProperty>
       <SubProxy>
         <Proxy name="PostGatherHelper"
                proxygroup="filters"
@@ -1225,7 +1159,9 @@
     <!-- ================================================================= -->
     <PSWriterProxy class="vtkParallelSerialWriter"
                    file_name_method="SetFileName"
-                   name="HoudiniWriter">
+                   name="HoudiniWriter"
+                   base_proxygroup="internal_writers"
+                   base_proxyname="ParallelSerialWriter">
       <Documentation short_help="Write polygonal data in Houdini .geo format.">
       Writer to write polygonal data in ASCII Houdini .geo (pre-v12.0)
       format. </Documentation>
@@ -1242,15 +1178,6 @@
                             number_of_elements="1">
         <Documentation>The name of the file to be written.</Documentation>
       </StringVectorProperty>
-      <IntVectorProperty name="WriteTimeSteps"
-                         command="SetWriteAllTimeSteps"
-                         number_of_elements="1"
-                         default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>When WriteTimeSteps is turned ON, the writer is
-        executed once for each timestep available from its input.
-        </Documentation>
-      </IntVectorProperty>
       <SubProxy>
         <Proxy name="PostGatherHelper"
                proxygroup="filters"
