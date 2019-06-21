@@ -666,4 +666,11 @@ def GetProxy(module, key):
             glyph = module.__dict__["GlyphLegacy"]()
             print(glyph)
             return glyph
+    if version < 5.7:
+        if key == "ExodusRestartReader" or key == "ExodusIIReader":
+            # in 5.7, we changed the names for blocks, this preserves old
+            # behavior
+            reader = module.__dict__[key]()
+            reader.UseLegacyBlockNamesWithElementTypes = 1
+            return reader
     return module.__dict__[key]()
