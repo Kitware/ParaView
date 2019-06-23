@@ -40,7 +40,7 @@
                         number_of_elements="1"
                         default_values="velocity">
         <Documentation>
-          Field to be used in computing the moments.
+          Field used in computing moments.
         </Documentation>
       </StringVectorProperty>
       <IntVectorProperty name="Order"

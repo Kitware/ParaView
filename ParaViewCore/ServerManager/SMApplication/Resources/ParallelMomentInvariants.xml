@@ -35,11 +35,14 @@
              Optional. The grid locations where the moments are computed. If not set, use the original grid.
            </Documentation>
       </InputProperty>
-<!--       <StringVectorProperty name="NameOfPointData"
+      <StringVectorProperty name="NameOfPointData"
                         command="SetNameOfPointData"
                         number_of_elements="1"
-                        default_values="points">
-      </StringVectorProperty> -->
+                        default_values="velocity">
+        <Documentation>
+          Field used in computing moments.
+        </Documentation>
+      </StringVectorProperty>
       <IntVectorProperty name="Order"
                      command="SetOrder"
                      number_of_elements="1"
