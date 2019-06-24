@@ -771,8 +771,7 @@ else ()
 
   if (use_vtk_remote_modules)
     if (PARAVIEW_ENABLE_MOMENTINVARIANTS)
-      set(VTK_MODULE_ENABLE_VTK_MomentInvariants YES
-          CACHE INTERNAL "Enable MomentInvariants" FORCE)
+      set(VTK_MODULE_ENABLE_VTK_MomentInvariants WANT)
     endif()
     # include the Remote module
     include("${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake/vtkDownload.cmake")
