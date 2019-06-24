@@ -903,6 +903,14 @@ if (PARAVIEW_USE_MPI)
     #UseDataPartitions.xml
   )
 
+  list(APPEND TESTS_WITH_INLINE_COMPARES
+    # needs parallel server for the columns to match those in the test.
+    SpreadSheetParallelData.xml)
+
+  # test only checks for spreadsheet columns correctly in
+  # parallel client-server mode.
+  set (SpreadSheetParallelData_DISABLE_C TRUE)
+
   # DistributePoints is only tested in non-built-in mode.
   paraview_add_client_server_tests(
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}

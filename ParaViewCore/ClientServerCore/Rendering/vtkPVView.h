@@ -266,9 +266,13 @@ protected:
   void AllReduce(const vtkBoundingBox& source, vtkBoundingBox& dest);
 
   /**
-   * Reduce the max value between all participating processes.
+   * Reduce between all participating processes using the operation
+   * (vtkCommunicator::StandardOperations) specified. Currently only
+   * vtkCommunicator::MIN_OP, vtkCommunicator::MAX_OP, and
+   * vtkCommunicator::SUM_OP are supported.
    */
-  void AllReduceMAX(const vtkTypeUInt64 source, vtkTypeUInt64& dest, bool skip_data_server = false);
+  void AllReduce(
+    const vtkTypeUInt64 source, vtkTypeUInt64& dest, int operation, bool skip_data_server = false);
 
   /**
    * Overridden to check that the representation has View setup properly. Older

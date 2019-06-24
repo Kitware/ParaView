@@ -434,7 +434,7 @@ void vtkPVView::Update()
     {
       cache_full = 1;
     }
-    this->AllReduceMAX(cache_full, cache_full);
+    this->AllReduce(cache_full, cache_full, vtkCommunicator::MAX_OP);
     cacheSizeKeeper->SetCacheFull(cache_full > 0);
   }
 
@@ -641,17 +641,31 @@ void vtkPVView::AllReduce(const vtkBoundingBox& arg_source, vtkBoundingBox& dest
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVView::AllReduceMAX(
-  const vtkTypeUInt64 arg_source, vtkTypeUInt64& dest, bool skip_data_server)
+void vtkPVView::AllReduce(
+  const vtkTypeUInt64 arg_source, vtkTypeUInt64& dest, int operation, bool skip_data_server)
 {
   assert(this->Session);
-  vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "all-reduce-max");
+  vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "all-reduce (op=%d)", operation);
+
+  auto evaluator = [operation](vtkTypeUInt64 a, vtkTypeUInt64 b) {
+    switch (operation)
+    {
+      case vtkCommunicator::MAX_OP:
+        return std::max(a, b);
+      case vtkCommunicator::MIN_OP:
+        return std::min(a, b);
+      case vtkCommunicator::SUM_OP:
+        return a + b;
+      default:
+        abort();
+    }
+  };
 
   vtkTypeUInt64 source = arg_source;
   auto pController = vtkMultiProcessController::GetGlobalController();
   if (pController)
   {
-    pController->Reduce(&source, &dest, 1, vtkCommunicator::MAX_OP, 0);
+    pController->Reduce(&source, &dest, 1, operation, 0);
     source = dest;
   }
 
@@ -674,14 +688,14 @@ void vtkPVView::AllReduceMAX(
   {
     vtkTypeUInt64 val;
     crController->Receive(&val, 1, 1, 41234);
-    source = std::max(source, val);
+    source = evaluator(source, val);
   }
 
   if (cdController)
   {
     vtkTypeUInt64 val;
     cdController->Receive(&val, 1, 1, 41234);
-    source = std::max(source, val);
+    source = evaluator(source, val);
   }
 
   if (crController)

@@ -24,6 +24,7 @@
 #include "vtkCamera.h"
 #include "vtkCollection.h"
 #include "vtkCommand.h"
+#include "vtkCommunicator.h"
 #include "vtkCuller.h"
 #include "vtkDataRepresentation.h"
 #include "vtkFXAAOptions.h"
@@ -1258,7 +1259,7 @@ void vtkPVRenderView::Update()
   // Gather information about geometry sizes from all representations.
   const vtkTypeUInt64 lsize = this->GetDeliveryManager()->GetVisibleDataSize(/*low_res*/ false);
   vtkTypeUInt64 gsize;
-  this->AllReduceMAX(lsize, gsize);
+  this->AllReduce(lsize, gsize, vtkCommunicator::SUM_OP);
   const double geometry_size = gsize / 1024;
 
   // cout << "Full Geometry size: " << geometry_size << endl;
@@ -1327,7 +1328,7 @@ void vtkPVRenderView::UpdateLOD()
 
   const vtkTypeUInt64 lsize = this->GetDeliveryManager()->GetVisibleDataSize(/*low_res*/ true);
   vtkTypeUInt64 gsize;
-  this->AllReduceMAX(lsize, gsize);
+  this->AllReduce(lsize, gsize, vtkCommunicator::SUM_OP);
   const double geometry_size = gsize / 1024;
   // cout << "LOD Geometry size: " << geometry_size << endl;
 
@@ -3401,8 +3402,8 @@ void vtkPVRenderView::SynchronizeMaximumIds(vtkIdType* maxPointId, vtkIdType* ma
 
     // skip data server since this method is only called on processes involved
     // in rendering.
-    this->AllReduceMAX(ptid, ptid, /*skip_data_server=*/true);
-    this->AllReduceMAX(cellid, cellid, /*skip_data_server=*/true);
+    this->AllReduce(ptid, ptid, vtkCommunicator::MAX_OP, /*skip_data_server=*/true);
+    this->AllReduce(cellid, cellid, vtkCommunicator::MAX_OP, /*skip_data_server=*/true);
 
     *maxPointId = static_cast<vtkIdType>(ptid);
     *maxCellId = static_cast<vtkIdType>(cellid);
