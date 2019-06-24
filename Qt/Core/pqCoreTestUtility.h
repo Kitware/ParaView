@@ -93,8 +93,9 @@ public:
   * Compares the contents of a render window to a reference image,
   * returning true iff the two match within a given threshold
   */
-  static bool CompareImage(vtkRenderWindow* RenderWindow, const QString& ReferenceImage,
-    double Threshold, ostream& Output, const QString& TempDirectory);
+  static bool CompareImage(vtkRenderWindow* renderWindow, const QString& referenceImage,
+    double threshold, ostream& output, const QString& tempDirectory,
+    const QSize& size = QSize(300, 300));
 
   /**
   * Compares the test image to a reference image,

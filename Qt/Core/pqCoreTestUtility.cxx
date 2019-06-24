@@ -44,6 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QtTestingConfigure.h"
 
+#include "QVTKOpenGLNativeWidget.h"
+#include "QVTKOpenGLWidget.h"
 #include "pqApplicationCore.h"
 #include "pqCollaborationEventPlayer.h"
 #include "pqColorButtonEventPlayer.h"
@@ -60,7 +62,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqImageUtil.h"
 #include "pqLineEditEventPlayer.h"
 #include "pqOptions.h"
-#include "pqQVTKWidget.h"
 #include "pqQVTKWidgetEventPlayer.h"
 #include "pqQVTKWidgetEventTranslator.h"
 #include "pqServer.h"
@@ -246,20 +247,28 @@ bool pqCoreTestUtility::SaveScreenshot(vtkRenderWindow* RenderWindow, const QStr
 }
 
 //-----------------------------------------------------------------------------
-bool pqCoreTestUtility::CompareImage(vtkRenderWindow* RenderWindow, const QString& ReferenceImage,
-  double Threshold, ostream& vtkNotUsed(Output), const QString& TempDirectory)
+bool pqCoreTestUtility::CompareImage(vtkRenderWindow* renderWindow, const QString& referenceImage,
+  double threshold, ostream& vtkNotUsed(output), const QString& tempDirectory, const QSize& size)
 {
+  // Store the original size
+  int originalSize[2];
+  int* tmpSize = renderWindow->GetSize();
+  originalSize[0] = tmpSize[0];
+  originalSize[1] = tmpSize[1];
+  if (size.isValid() && !size.isEmpty())
+  {
+    renderWindow->SetSize(size.width(), size.height());
+  }
+
   vtkSmartPointer<vtkTesting> testing = vtkSmartPointer<vtkTesting>::New();
   testing->AddArgument("-T");
-  testing->AddArgument(TempDirectory.toLocal8Bit().data());
+  testing->AddArgument(tempDirectory.toLocal8Bit().data());
   testing->AddArgument("-V");
-  testing->AddArgument(ReferenceImage.toLocal8Bit().data());
-  testing->SetRenderWindow(RenderWindow);
-  if (testing->RegressionTest(Threshold) == vtkTesting::PASSED)
-  {
-    return true;
-  }
-  return false;
+  testing->AddArgument(referenceImage.toLocal8Bit().data());
+  testing->SetRenderWindow(renderWindow);
+  bool ret = testing->RegressionTest(threshold) == vtkTesting::PASSED;
+  renderWindow->SetSize(originalSize);
+  return ret;
 }
 
 //-----------------------------------------------------------------------------
@@ -296,6 +305,30 @@ bool pqCoreTestUtility::CompareImage(QWidget* widget, const QString& referenceIm
     {
       cout << "Using View API for capture" << endl;
       return pqCoreTestUtility::CompareView(view, referenceImage, threshold, tempDirectory, size);
+    }
+  }
+
+  // try to recover the render window directly
+  QVTKOpenGLWidget* glWidget = qobject_cast<QVTKOpenGLWidget*>(widget);
+  if (glWidget)
+  {
+    vtkRenderWindow* rw = glWidget->renderWindow();
+    if (rw)
+    {
+      cout << "Using QVTKOpenGLWidget RenderWindow API for capture" << endl;
+      return pqCoreTestUtility::CompareImage(
+        rw, referenceImage, threshold, std::cerr, tempDirectory, size);
+    }
+  }
+  QVTKOpenGLNativeWidget* nativeWidget = qobject_cast<QVTKOpenGLNativeWidget*>(widget);
+  if (nativeWidget)
+  {
+    vtkRenderWindow* rw = nativeWidget->renderWindow();
+    if (rw)
+    {
+      cout << "Using QVTKOpenGLNativeWidget RenderWindow API for capture" << endl;
+      return pqCoreTestUtility::CompareImage(
+        rw, referenceImage, threshold, std::cerr, tempDirectory, size);
     }
   }
 
