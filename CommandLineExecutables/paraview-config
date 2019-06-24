@@ -151,6 +151,7 @@ def extract_paraview_flags(components, cmake='cmake',
         ]
 
         if paraview_dir is not None:
+            paraview_dir = os.path.abspath(paraview_dir)
             configure_cmd.append('-DParaView_DIR:PATH=' + paraview_dir)
         if sys.version_info.major == 3:
             stdout = subprocess.DEVNULL
