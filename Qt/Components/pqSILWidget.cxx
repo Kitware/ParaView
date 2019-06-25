@@ -134,6 +134,7 @@ void pqSILWidget::onModelReset()
   // First add the active-tree.
   pqTreeView* activeTree = new pqTreeView(this, /*use_pqHeaderView=*/true);
   activeTree->header()->setStretchLastSection(true);
+  activeTree->setUniformRowHeights(true);
   activeTree->setRootIsDecorated(false);
   activeTree->setModel(this->SortModel);
   activeTree->expandAll();
@@ -152,6 +153,7 @@ void pqSILWidget::onModelReset()
     }
 
     pqTreeView* tree = new pqTreeView(this, /*use_pqHeaderView=*/true);
+    tree->setUniformRowHeights(true);
     tree->header()->setStretchLastSection(true);
     tree->setRootIsDecorated(false);
 
