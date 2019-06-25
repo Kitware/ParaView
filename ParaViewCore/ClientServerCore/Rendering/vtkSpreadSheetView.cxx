@@ -18,6 +18,7 @@
 #include "vtkCSVExporter.h"
 #include "vtkCharArray.h"
 #include "vtkClientServerMoveData.h"
+#include "vtkCommunicator.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataSetAttributes.h"
@@ -644,7 +645,7 @@ int vtkSpreadSheetView::StreamToClient()
     this->DeliveryFilter->RemoveAllInputs();
   }
 
-  this->AllReduceMAX(num_rows, num_rows);
+  this->AllReduce(num_rows, num_rows, vtkCommunicator::SUM_OP);
 
   if (this->NumberOfRows != static_cast<vtkIdType>(num_rows))
   {
