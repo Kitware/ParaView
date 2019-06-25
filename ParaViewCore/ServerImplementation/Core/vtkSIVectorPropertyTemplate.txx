@@ -26,275 +26,97 @@
 
 namespace
 {
-// ********* INT *************
-vtkMaybeUnused("not used for non-int specializations") std::vector<int>& operator<<(
-  std::vector<int>& values, const Variant& variant)
+template <typename T, typename ForceIdType>
+struct HelperTraits
 {
-  int num_elems = variant.integer_size();
-  values.resize(values.size() + num_elems);
+};
+
+template <typename ForceIdType>
+struct HelperTraits<int, ForceIdType>
+{
+  static int size(const Variant& variant) { return variant.integer_size(); }
+  static int get(const Variant& variant, int idx) { return variant.integer(idx); }
+  static Variant_Type variant_type() { return Variant::INT; }
+  static void append(Variant& variant, int value) { variant.add_integer(value); }
+};
+
+template <typename ForceIdType>
+struct HelperTraits<double, ForceIdType>
+{
+  static int size(const Variant& variant) { return variant.float64_size(); }
+  static double get(const Variant& variant, int idx) { return variant.float64(idx); }
+  static Variant_Type variant_type() { return Variant::FLOAT64; }
+  static void append(Variant& variant, double value) { variant.add_float64(value); }
+};
+
+template <>
+struct HelperTraits<vtkIdType, bool>
+{
+  static int size(const Variant& variant) { return variant.idtype_size(); }
+  static vtkIdType get(const Variant& variant, int idx) { return variant.idtype(idx); }
+  static Variant_Type variant_type() { return Variant::IDTYPE; }
+  static void append(Variant& variant, vtkIdType value) { variant.add_idtype(value); }
+};
+
+template <typename T, typename ForceIdType>
+std::vector<T> VariantToVector(const Variant& variant)
+{
+  const int num_elems = HelperTraits<T, ForceIdType>::size(variant);
+  std::vector<T> values(num_elems);
   for (int cc = 0; cc < num_elems; cc++)
   {
-    values[cc] = variant.integer(cc);
+    values[cc] = HelperTraits<T, ForceIdType>::get(variant, cc);
   }
   return values;
 }
 
-vtkMaybeUnused("not used for non-int specializations") Variant& operator<<(
-  Variant& variant, const std::vector<int>& values)
+template <typename T, typename ForceIdType>
+void VectorToVariant(const std::vector<T> values, Variant& variant)
 {
-  variant.set_type(Variant::INT);
-  std::vector<int>::const_iterator iter;
-  for (iter = values.begin(); iter != values.end(); ++iter)
+  variant.set_type(HelperTraits<T, ForceIdType>::variant_type());
+  for (const auto& v : values)
   {
-    variant.add_integer(*iter);
+    HelperTraits<T, ForceIdType>::append(variant, v);
   }
-  return variant;
 }
 
-vtkMaybeUnused("not used for non-int specializations") bool operator<<(
-  std::vector<int>& values, const vtkClientServerStream& stream)
+template <typename T, typename ForceIdType>
+bool CSStreamToVector(
+  const vtkClientServerStream& stream, const int msgIndex, std::vector<T>& values)
 {
-  size_t cur_size = values.size();
-  int argType = stream.GetArgumentType(0, 0);
-
-  // If single value, all int types
-  if (argType == vtkClientServerStream::int64_value ||
-    argType == vtkClientServerStream::uint64_value ||
-    argType == vtkClientServerStream::int32_value ||
-    argType == vtkClientServerStream::int16_value || argType == vtkClientServerStream::int8_value ||
-    argType == vtkClientServerStream::uint32_value ||
-    argType == vtkClientServerStream::uint16_value ||
-    argType == vtkClientServerStream::uint8_value || argType == vtkClientServerStream::bool_value)
+  const int numArgs = stream.GetNumberOfArguments(msgIndex);
+  for (int argIdx = 0; argIdx < numArgs; ++argIdx)
   {
-    int ires;
-    int retVal = stream.GetArgument(0, 0, &ires);
-    if (!retVal)
+    vtkTypeUInt32 array_length;
+    if (!stream.GetArgumentLength(msgIndex, argIdx, &array_length))
     {
-      return false;
+      // GetArgumentLength will return failure for non-array types, in which
+      // case we read the value directly.
+      T val;
+      if (stream.GetArgument(msgIndex, argIdx, &val))
+      {
+        values.push_back(val);
+      }
+      else
+      {
+        // type conversion failed -- let's report as error so it's easy to catch
+        // such issues.
+        return false;
+      }
     }
-    values.resize(cur_size + 1);
-    values[cur_size] = ires;
-    return true;
-  }
-  // if array, only 32 bit ints work
-  else if (argType == vtkClientServerStream::int32_array)
-  {
-    vtkTypeUInt32 length;
-    stream.GetArgumentLength(0, 0, &length);
-    values.resize(cur_size + length);
-    int retVal = stream.GetArgument(0, 0, &values[cur_size], length);
-    if (!retVal)
+    else if (array_length > 0)
     {
-      values.resize(cur_size);
-      return false;
-    }
-    return true;
-  }
-
-#define copy_to_vector(type)                                                                       \
-  do                                                                                               \
-  {                                                                                                \
-    vtkTypeUInt32 length;                                                                          \
-    stream.GetArgumentLength(0, 0, &length);                                                       \
-    std::vector<type> tmp_vec(length);                                                             \
-    int retVal = stream.GetArgument(0, 0, &tmp_vec[0], length);                                    \
-    if (!retVal)                                                                                   \
-    {                                                                                              \
-      return false;                                                                                \
-    }                                                                                              \
-    values.resize(cur_size + length);                                                              \
-    std::copy(tmp_vec.begin(), tmp_vec.end(), &values[cur_size]);                                  \
-    return true;                                                                                   \
-  } while (0)
-
-  // match the type for uint32
-  else if (argType == vtkClientServerStream::uint32_array)
-  {
-    copy_to_vector(vtkTypeUInt32);
-  }
-  // if 64 bit array, squash into 32 bit
-  else if (argType == vtkClientServerStream::int64_array)
-  {
-    copy_to_vector(vtkTypeInt64);
-  }
-  else if (argType == vtkClientServerStream::uint64_array)
-  {
-    copy_to_vector(vtkTypeUInt64);
-  }
-
-#undef copy_to_vector
-
-  return false;
-}
-
-// ********* DOUBLE *************
-vtkMaybeUnused("not used for non-double specializations") std::vector<double>& operator<<(
-  std::vector<double>& values, const Variant& variant)
-{
-  int num_elems = variant.float64_size();
-  values.resize(values.size() + num_elems);
-  for (int cc = 0; cc < num_elems; cc++)
-  {
-    values[cc] = variant.float64(cc);
-  }
-  return values;
-}
-
-vtkMaybeUnused("not used for non-double specializations") Variant& operator<<(
-  Variant& variant, const std::vector<double>& values)
-{
-  variant.set_type(Variant::FLOAT64);
-  std::vector<double>::const_iterator iter;
-  for (iter = values.begin(); iter != values.end(); ++iter)
-  {
-    variant.add_float64(*iter);
-  }
-  return variant;
-}
-
-vtkMaybeUnused("not used for non-double specializations") bool operator<<(
-  std::vector<double>& values, const vtkClientServerStream& stream)
-{
-  size_t cur_size = values.size();
-  int argType = stream.GetArgumentType(0, 0);
-
-  // If single value, both float and double works
-  if (argType == vtkClientServerStream::float64_value ||
-    argType == vtkClientServerStream::float32_value)
-  {
-    double ires;
-    int retVal = stream.GetArgument(0, 0, &ires);
-    if (!retVal)
-    {
-      return false;
-    }
-    values.resize(cur_size + 1);
-    values[cur_size] = ires;
-  }
-  // If array, handle 32 bit and 64 bit separately
-  else if (argType == vtkClientServerStream::float64_array)
-  {
-    vtkTypeUInt32 length;
-    stream.GetArgumentLength(0, 0, &length);
-    values.resize(cur_size + length);
-    int retVal = stream.GetArgument(0, 0, &values[cur_size], length);
-    if (!retVal)
-    {
-      return false;
+      const auto offset = values.size();
+      values.resize(offset + array_length);
+      if (!stream.GetArgument(msgIndex, argIdx, &values[offset], array_length))
+      {
+        // type conversion failed -- let's report as error so it's easy to catch
+        // such issues.
+        return false;
+      }
     }
   }
-  else if (argType == vtkClientServerStream::float32_array)
-  {
-    vtkTypeUInt32 length;
-    stream.GetArgumentLength(0, 0, &length);
-    float* fvalues = new float[length + 1];
-    int retVal = stream.GetArgument(0, 0, fvalues, length);
-    if (!retVal)
-    {
-      delete[] fvalues;
-      return false;
-    }
-
-    values.resize(cur_size + length);
-    delete[] fvalues;
-    std::copy(fvalues, fvalues + length, &values[cur_size]);
-  }
-  return false;
-}
-
-// ********* vtkIdType *************
-vtkMaybeUnused("not used for non-vtkIdType specializations") void OperatorIdType(
-  std::vector<vtkIdType>& values, const Variant& variant)
-{
-  int num_elems = variant.idtype_size();
-  values.resize(values.size() + num_elems);
-  for (int cc = 0; cc < num_elems; cc++)
-  {
-    values[cc] = variant.idtype(cc);
-  }
-}
-vtkMaybeUnused("not used for non-vtkIdType specializations") void OperatorIdType(
-  Variant& variant, const std::vector<vtkIdType>& values)
-{
-  variant.set_type(Variant::IDTYPE);
-  std::vector<vtkIdType>::const_iterator iter;
-  for (iter = values.begin(); iter != values.end(); ++iter)
-  {
-    variant.add_idtype(*iter);
-  }
-}
-
-vtkMaybeUnused("not used for non-vtkIdType specializations") bool OperatorIdType(
-  std::vector<vtkIdType>& values, const vtkClientServerStream& stream)
-{
-  size_t cur_size = values.size();
-  int argType = stream.GetArgumentType(0, 0);
-
-  // If single value, all int types
-  if (argType == vtkClientServerStream::int32_value ||
-    argType == vtkClientServerStream::int64_value)
-  {
-    vtkIdType ires;
-    int retVal = stream.GetArgument(0, 0, &ires);
-    if (!retVal)
-    {
-      return false;
-    }
-    values.resize(cur_size + 1);
-    values[cur_size] = ires;
-    return true;
-  }
-  // if array, only 32 or 64 bit ints work
-  else if (argType == vtkClientServerStream::int32_array ||
-    argType == vtkClientServerStream::int64_value)
-  {
-    vtkTypeUInt32 length;
-    stream.GetArgumentLength(0, 0, &length);
-    values.resize(cur_size + length);
-    int retVal = stream.GetArgument(0, 0, &values[cur_size], length);
-    if (!retVal)
-    {
-      values.resize(cur_size);
-      return false;
-    }
-    return true;
-  }
-  return false;
-}
-
-#if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
-vtkMaybeUnused("not used for non-vtkIdType specializations") std::vector<vtkIdType>& operator<<(
-  std::vector<vtkIdType>& values, const Variant& variant)
-{
-  OperatorIdType(values, variant);
-  return values;
-}
-
-vtkMaybeUnused("not used for non-vtkIdType specializations") Variant& operator<<(
-  Variant& variant, const std::vector<vtkIdType>& values)
-{
-  OperatorIdType(variant, values);
-  return variant;
-}
-
-vtkMaybeUnused("not used for non-vtkIdType specializations") bool operator<<(
-  std::vector<vtkIdType>& values, const vtkClientServerStream& stream)
-{
-  return OperatorIdType(values, stream);
-}
-#endif
-
-// This absurdity is needed for cases where vtkIdType == int.
-template <class TARG1, class TARG2, class force_idtype>
-void AppendValues(TARG1& arg1, const TARG2& arg2, const force_idtype&)
-{
-  arg1 << arg2;
-}
-
-template <class TARG1, class TARG2>
-void AppendValues(TARG1& arg1, const TARG2& arg2, const bool&)
-{
-  OperatorIdType(arg1, arg2);
+  return true;
 }
 }
 
@@ -324,10 +146,7 @@ bool vtkSIVectorPropertyTemplate<T, force_idtype>::Push(vtkSMMessage* message, i
   this->SaveValueToCache(message, offset);
 
   const Variant* variant = &prop->value();
-  std::vector<T> values;
-
-  AppendValues(values, *variant, force_idtype());
-
+  std::vector<T> values = VariantToVector<T, force_idtype>(*variant);
   return (values.size() > 0) ? this->Push(&values[0], static_cast<int>(values.size()))
                              : this->Push(static_cast<T*>(NULL), static_cast<int>(values.size()));
 }
@@ -372,13 +191,20 @@ bool vtkSIVectorPropertyTemplate<T, force_idtype>::Pull(vtkSMMessage* message)
   }
 
   std::vector<T> values;
-  AppendValues(values, res, force_idtype());
+  if (!CSStreamToVector<T, force_idtype>(res, 0, values))
+  {
+    vtkErrorMacro("'" << this->GetXMLName()
+                      << "' failed to *pull* values. "
+                         "May indicate a type mismatch between values returned by "
+                         "the command and the values expected by the property.");
+    values.clear();
+  }
 
   // now add 'values' to the message.
   ProxyState_Property* prop = message->AddExtension(ProxyState::property);
   prop->set_name(this->GetXMLName());
 
-  AppendValues(*prop->mutable_value(), values, force_idtype());
+  VectorToVariant<T, force_idtype>(values, *prop->mutable_value());
   return true;
 }
 
