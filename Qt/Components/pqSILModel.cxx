@@ -471,5 +471,5 @@ void pqSILModel::checkStateUpdated(
 {
   vtkIdType vertexId = *reinterpret_cast<vtkIdType*>(calldata);
   QModelIndex idx = this->makeIndex(vertexId);
-  emit this->dataChanged(idx, idx);
+  emit this->dataChanged(idx, idx, QVector<int>{ Qt::CheckStateRole });
 }
