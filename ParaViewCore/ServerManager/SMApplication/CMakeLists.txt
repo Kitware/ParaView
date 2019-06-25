@@ -109,10 +109,16 @@ if (TARGET VTK::FiltersOpenTURNS)
     Resources/proxies_openturns.xml)
 endif ()
 
-if (TARGET VTK::FiltersMomentInvariants)
+if (TARGET VTK::MomentInvariants)
   list(APPEND xml_files
     Resources/MomentInvariants.xml)
 endif ()
+
+if (TARGET VTK::ParallelMomentInvariants)
+  list(APPEND xml_files
+    Resources/ParallelMomentInvariants.xml)
+endif ()
+
 
 if (TARGET VTK::PythonInterpreter)
   _vtk_module_set_module_property(ParaView::ServerManagerApplication APPEND

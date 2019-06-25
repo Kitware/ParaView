@@ -208,6 +208,8 @@ option(PARAVIEW_ENABLE_PDAL "Enable PDAL support." OFF)
 mark_as_advanced(PARAVIEW_ENABLE_PDAL)
 option(PARAVIEW_ENABLE_MOTIONFX "Enable MotionFX support." OFF)
 mark_as_advanced(PARAVIEW_ENABLE_MOTIONFX)
+option(PARAVIEW_ENABLE_MOMENTINVARIANTS "Enable MomentInvariants filters" OFF)
+mark_as_advanced(PARAVIEW_ENABLE_MOMENTINVARIANTS)
 option(PARAVIEW_ENABLE_VISITBRIDGE "Enable VisIt readers." OFF)
 option(PARAVIEW_ENABLE_XDMF2 "Enable Xdmf2 support." ON)
 mark_as_advanced(PARAVIEW_ENABLE_XDMF2)
@@ -437,6 +439,17 @@ endif ()
 if (PARAVIEW_ENABLE_MOTIONFX)
   list(APPEND paraview_requested_modules
     VTK::IOMotionFX)
+endif ()
+
+set(use_vtk_remote_modules OFF)
+if (PARAVIEW_ENABLE_MOMENTINVARIANTS)
+  list(APPEND paraview_requested_modules
+    VTK::MomentInvariants)
+  if (PARAVIEW_USE_MPI)
+    list(APPEND paraview_requested_modules
+      VTK::ParallelMomentInvariants)
+  endif()
+  set(use_vtk_remote_modules ON)
 endif ()
 
 if (PARAVIEW_ENABLE_VISITBRIDGE)
@@ -754,6 +767,18 @@ else ()
   set(VTK_ENABLE_LOGGING "${PARAVIEW_ENABLE_LOGGING}")
   if (PARAVIEW_ENABLE_LOGGING)
     list(APPEND vtk_requested_modules VTK::loguru)
+  endif()
+
+  if (use_vtk_remote_modules)
+    if (PARAVIEW_ENABLE_MOMENTINVARIANTS)
+      set(VTK_MODULE_ENABLE_VTK_MomentInvariants WANT)
+    endif()
+    # include the Remote module
+    include("${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake/vtkDownload.cmake")
+    # TODO: remove this after changing in vtkModuleRemote.cmake:160
+    # "${VTK_SOURCE_DIR}/Remote/${_name}" to "${CMAKE_CURRENT_LIST_DIR}/${_name}"
+    set(VTK_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/VTK")
+    add_subdirectory(VTK/Remote)
   endif()
 
   vtk_module_find_modules(vtk_module_files "${CMAKE_CURRENT_SOURCE_DIR}/VTK")
