@@ -70,6 +70,25 @@ class PythonSuperquadricSource(VTKPythonAlgorithmBase):
         self._realAlgorithm.SetThickness(x)
         self.Modified()
 
+    # "ValueRangeInfo" and "Value" demonstrate how one can have a slider in the
+    # UI for a property with its range fetched at runtime. For int values,
+    # use `intvector` and `IntRangeDomain` instead of the double variants used
+    # below.
+    @smproperty.doublevector(name="ValueRangeInfo", information_only="1")
+    def GetValueRange(self):
+        print("getting range: (0, 100)")
+        return (0, 100)
+
+    @smproperty.doublevector(name="Value", default_values=[0.0])
+    @smdomain.xml(\
+        """<DoubleRangeDomain name="range" default_mode="mid">
+                <RequiredProperties>
+                    <Property name="ValueRangeInfo" function="RangeInfo" />
+                </RequiredProperties>
+           </DoubleRangeDomain>
+        """)
+    def SetValue(self, val):
+        print("settings value:", val)
 
 
 #------------------------------------------------------------------------------
