@@ -904,6 +904,8 @@ int vtkClientServerStreamGetArgument(
     VTK_CSS_GET_ARGUMENT_CASE(int32_value, vtkTypeInt32);
     VTK_CSS_GET_ARGUMENT_CASE(uint32_value, vtkTypeUInt32);
     VTK_CSS_GET_ARGUMENT_CASE(float64_value, vtkTypeFloat64);
+    VTK_CSS_GET_ARGUMENT_CASE(int64_value, vtkTypeInt64);
+    VTK_CSS_GET_ARGUMENT_CASE(uint64_value, vtkTypeUInt64);
     default:
       return 0;
   };
@@ -923,8 +925,11 @@ int vtkClientServerStreamGetArgument(
     VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
     VTK_CSS_GET_ARGUMENT_CASE(uint16_value, vtkTypeUInt16);
     VTK_CSS_GET_ARGUMENT_CASE(uint32_value, vtkTypeUInt32);
+    VTK_CSS_GET_ARGUMENT_CASE(int64_value, vtkTypeInt64);
+    VTK_CSS_GET_ARGUMENT_CASE(uint64_value, vtkTypeUInt64);
     VTK_CSS_GET_ARGUMENT_CASE(float32_value, vtkTypeFloat32);
     VTK_CSS_GET_ARGUMENT_CASE(float64_value, vtkTypeFloat64);
+
     default:
       return 0;
   };
