@@ -13,6 +13,10 @@
 
 =========================================================================*/
 
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkPolyData.h"
+
 // We'll use the VTKm decimation filter if TBB is enabled, otherwise we'll
 // fallback to vtkQuadricClustering, since vtkmLevelOfDetail is slow on the
 // serial backend.
@@ -22,6 +26,7 @@
 #endif
 
 #if defined(VTKM_ENABLE_TBB) && VTK_MODULE_ENABLE_VTK_AcceleratorsVTKm
+#include "vtkQuadricClustering.h"
 #include "vtkmLevelOfDetail.h"
 namespace vtkGeometryRepresentation_detail
 {
@@ -43,6 +48,40 @@ public:
     int divs = static_cast<int>(std::pow(2, 4. * factor + 6.));
     this->SetNumberOfDivisions(divs, divs, divs);
   }
+
+protected:
+  DecimationFilterType()
+  {
+    this->Fallback->SetUseInputPoints(1);
+    this->Fallback->SetCopyCellData(1);
+    this->Fallback->SetUseInternalTriangles(0);
+  }
+
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override
+  {
+    if (this->Superclass::RequestData(request, inputVector, outputVector))
+    {
+      return 1;
+    }
+
+    // The accelerated implementation returns 0 when the input contains cells
+    // that aren't triangles. Handle this by falling back to
+    // vtkQuadricClustering:
+    vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+    vtkDataSet* input = vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+    vtkInformation* outInfo = outputVector->GetInformationObject(0);
+    vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+    this->Fallback->SetInputData(input);
+    this->Fallback->Update();
+    output->ShallowCopy(this->Fallback->GetOutput(0));
+
+    return 1;
+  }
+
+  vtkNew<vtkQuadricClustering> Fallback;
 };
 vtkStandardNewMacro(DecimationFilterType)
 }
@@ -72,6 +111,7 @@ public:
     this->SetNumberOfDivisions(divs, divs, divs);
   }
 
+protected:
   DecimationFilterType()
   {
     this->SetUseInputPoints(1);
