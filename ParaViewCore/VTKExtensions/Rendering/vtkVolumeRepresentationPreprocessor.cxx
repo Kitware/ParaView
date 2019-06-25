@@ -32,7 +32,7 @@ vtkVolumeRepresentationPreprocessor::vtkVolumeRepresentationPreprocessor()
   this->DataSetTriangleFilter = vtkDataSetTriangleFilter::New();
   this->ExtractBlockFilter = vtkExtractBlock::New();
   this->ExtractBlockFilter->SetPruneOutput(1);
-  this->ExtractedBlockIndex = -1;
+  this->ExtractedBlockIndex = VTK_UNSIGNED_INT_MAX;
   this->SetExtractedBlockIndex(0);
   this->SetTetrahedraOnly(0);
 }
@@ -144,7 +144,7 @@ vtkDataSet* vtkVolumeRepresentationPreprocessor::MultiBlockToDataSet(vtkMultiBlo
 
 //----------------------------------------------------------------------------
 /// Choose which block to volume render.  Ignored if input is not multiblock.
-void vtkVolumeRepresentationPreprocessor::SetExtractedBlockIndex(int index)
+void vtkVolumeRepresentationPreprocessor::SetExtractedBlockIndex(unsigned int index)
 {
   if (this->ExtractedBlockIndex != index)
   {

@@ -127,6 +127,11 @@ pqCompositeTreePropertyWidget::pqCompositeTreePropertyWidget(
   // time. If not, then tell the model that it should uncheck other subtrees
   // when a user clicks on an item.
   dmodel->setExclusivity(smproperty->GetRepeatCommand() == 0);
+  if (dmodel->exclusivity())
+  {
+    // if exclusive, are we limiting to selecting 1 leaf node?
+    dmodel->setOnlyLeavesAreUserCheckable(ctd->GetMode() == vtkSMCompositeTreeDomain::LEAVES);
+  }
 
   if (ctd->GetMode() == vtkSMCompositeTreeDomain::AMR &&
     ((smproperty->GetRepeatCommand() == 1 && smproperty->GetNumberOfElementsPerCommand() == 2) ||
