@@ -648,7 +648,7 @@ Qt::ItemFlags pqCompositeDataInformationTreeModel::flags(const QModelIndex& idx)
   Qt::ItemFlags pflags = this->Superclass::flags(idx);
   if (this->UserCheckable && idx.column() == 0)
   {
-    if (this->OnlyLeavesAreUserCheckable && !this->hasChildren(idx))
+    if (this->OnlyLeavesAreUserCheckable == false || !this->hasChildren(idx))
     {
       pflags |= Qt::ItemIsUserCheckable | Qt::ItemIsTristate;
     }
