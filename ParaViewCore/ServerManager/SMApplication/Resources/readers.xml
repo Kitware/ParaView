@@ -2653,6 +2653,22 @@
         containing part and material descriptions and a mapping to element
         blocks.</Documentation>
       </StringVectorProperty>
+
+      <IntVectorProperty name="UseLegacyBlockNamesWithElementTypes"
+        command="SetUseLegacyBlockNames"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          In previous versions, the reader added the type of elements in the block to
+          the block name when no name was provided for the block. This has issues
+          with consistency when naming blocks across ranks for partitioned files.
+          Hence we no longer do that. For legacy pipelines, one can enable
+          the old behavior by setting this flag to true.
+        </Documentation>
+      </IntVectorProperty>
+
       <!-- End ExodusIIReaderCore -->
     </SourceProxy>
     <Proxy class="vtkTecplotReader"
@@ -6227,6 +6243,7 @@
             <Property name="XMLFileNameInfo" />
           </PropertyGroup>
           <Property name="GenerateFileIdArray" />
+          <Property name="UseLegacyBlockNamesWithElementTypes" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
@@ -6365,6 +6382,7 @@
             <Property name="XMLFileNameInfo" />
           </PropertyGroup>
           <Property name="GenerateFileIdArray" />
+          <Property name="UseLegacyBlockNamesWithElementTypes" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
