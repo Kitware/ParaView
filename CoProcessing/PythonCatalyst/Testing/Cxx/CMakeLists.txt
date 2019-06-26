@@ -294,5 +294,21 @@ if (PARAVIEW_BUILD_QT_GUI)
     set_tests_properties(ExportNow PROPERTIES RUN_SERIAL ON)
     _set_standard_test_properties(ExportNow)
 
+    add_test(NAME CinemaExportGeometry
+      COMMAND ${CMAKE_COMMAND}
+      -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::paraview>
+      -DCOPROCESSING_TEST_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
+      -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/CinemaExportGeometry.xml
+      -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::pvbatch>
+      -DCOPROCESSING_DATA_DIR:PATH=${paraview_test_data_directory_output}
+      -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_SOURCE_DIR}/Examples/Catalyst/SampleScripts/filedriver.py
+      -DCINEMA_DATABASE_TESTER:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/CinemaExportCheck.py
+      -DCINEMA_INPUT_DATA:FILEPATH=${CMAKE_BINARY_DIR}/ExternalData/Testing/Data/can.ex2
+      -DCINEMA_BATCH_SCRIPT:FILEPATH=cinema/CinemaExportGeometry.py
+      -DTEST_NAME:STRING=CinemaExportGeometry
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/CinemaExportFullWorkflowTest.cmake)
+    set_tests_properties(CinemaExportGeometry PROPERTIES RUN_SERIAL ON)
+    _set_standard_test_properties(CinemaExportGeometry)
+
   ENDIF ()
 endif()
