@@ -229,12 +229,12 @@ QModelIndex pqSILModel::index(
   }
 
   // Ensure that the vertexId refers to a non-leaf node.
-  if (!this->SILDomain)
+  if (!this->SILModel)
   {
     return QModelIndex();
   }
 
-  auto sil = this->SILDomain->GetSIL();
+  auto sil = this->SILModel->GetSIL();
   if (sil && !this->isLeaf(vertexId))
   {
     if (row < sil->GetOutDegree(vertexId))
@@ -359,7 +359,7 @@ QModelIndex pqSILModel::makeIndex(vtkIdType vertexid) const
 
   int count = 0;
   vtkSmartPointer<vtkOutEdgeIterator> iter = vtkSmartPointer<vtkOutEdgeIterator>::New();
-  auto sil = this->SILDomain->GetSIL();
+  auto sil = this->SILModel->GetSIL();
   sil->GetOutEdges(parentId, iter);
   vtkDataArray* crossEdgesArray =
     vtkDataArray::SafeDownCast(sil->GetEdgeData()->GetAbstractArray("CrossEdges"));
@@ -471,5 +471,5 @@ void pqSILModel::checkStateUpdated(
 {
   vtkIdType vertexId = *reinterpret_cast<vtkIdType*>(calldata);
   QModelIndex idx = this->makeIndex(vertexId);
-  emit this->dataChanged(idx, idx);
+  emit this->dataChanged(idx, idx, QVector<int>{ Qt::CheckStateRole });
 }
