@@ -22,10 +22,11 @@
 #include "vtkType.h"
 #include "vtkTypeTraits.h"
 #include "vtkVariantExtract.h"
-#include <typeinfo>
 
+#include <algorithm>
 #include <sstream>
 #include <string>
+#include <typeinfo>
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -904,6 +905,8 @@ int vtkClientServerStreamGetArgument(
     VTK_CSS_GET_ARGUMENT_CASE(int32_value, vtkTypeInt32);
     VTK_CSS_GET_ARGUMENT_CASE(uint32_value, vtkTypeUInt32);
     VTK_CSS_GET_ARGUMENT_CASE(float64_value, vtkTypeFloat64);
+    VTK_CSS_GET_ARGUMENT_CASE(int64_value, vtkTypeInt64);
+    VTK_CSS_GET_ARGUMENT_CASE(uint64_value, vtkTypeUInt64);
     default:
       return 0;
   };
@@ -923,8 +926,11 @@ int vtkClientServerStreamGetArgument(
     VTK_CSS_GET_ARGUMENT_CASE(uint8_value, vtkTypeUInt8);
     VTK_CSS_GET_ARGUMENT_CASE(uint16_value, vtkTypeUInt16);
     VTK_CSS_GET_ARGUMENT_CASE(uint32_value, vtkTypeUInt32);
+    VTK_CSS_GET_ARGUMENT_CASE(int64_value, vtkTypeInt64);
+    VTK_CSS_GET_ARGUMENT_CASE(uint64_value, vtkTypeUInt64);
     VTK_CSS_GET_ARGUMENT_CASE(float32_value, vtkTypeFloat32);
     VTK_CSS_GET_ARGUMENT_CASE(float64_value, vtkTypeFloat64);
+
     default:
       return 0;
   };
@@ -1023,6 +1029,32 @@ VTK_CSS_GET_ARGUMENT(unsigned __int64)
 #endif
 #undef VTK_CSS_GET_ARGUMENT
 
+template <typename SourceType, typename DestType>
+int vtkClientServerStreamGetArgumentArrayCase(
+  const unsigned char* src, DestType* dest, vtkTypeUInt32 length)
+{
+  // Get the length of the value in the stream.
+  vtkTypeUInt32 len;
+  memcpy(&len, src, sizeof(len));
+  src += sizeof(len);
+  if (len == length)
+  {
+    // Copy the value out of the stream.
+    std::transform(reinterpret_cast<const SourceType*>(src),
+      reinterpret_cast<const SourceType*>(src) + len, dest,
+      [](const SourceType& val) { return static_cast<DestType>(val); });
+    return 1;
+  }
+
+  return 0;
+}
+
+#define VTK_CSS_GET_ARGUMENT_ARRAY_CASE(TypeId, SourceType)                                        \
+  case vtkClientServerStream::TypeId:                                                              \
+  {                                                                                                \
+    return vtkClientServerStreamGetArgumentArrayCase<SourceType, T>(data, value, length);          \
+  }
+
 //----------------------------------------------------------------------------
 // Template and macro to implement array GetArgument methods in the same way.
 template <class T>
@@ -1039,7 +1071,8 @@ int vtkClientServerStreamGetArgumentArray(
     data += sizeof(tp);
 
     // If the type and length of the array match, use it.
-    if (static_cast<vtkClientServerStream::Types>(tp) == vtkClientServerTypeTraits<Type>::Array())
+    const auto array_type = vtkClientServerTypeTraits<Type>::Array();
+    if (static_cast<vtkClientServerStream::Types>(tp) == array_type)
     {
       // Get the length of the value in the stream.
       vtkTypeUInt32 len;
@@ -1051,6 +1084,37 @@ int vtkClientServerStreamGetArgumentArray(
         // Copy the value out of the stream.
         memcpy(value, data, len * sizeof(Type));
         return 1;
+      }
+    }
+    else if (array_type == vtkClientServerStream::int8_array ||
+      array_type == vtkClientServerStream::int16_array ||
+      array_type == vtkClientServerStream::int32_array ||
+      array_type == vtkClientServerStream::int64_array ||
+      array_type == vtkClientServerStream::uint8_array ||
+      array_type == vtkClientServerStream::uint16_array ||
+      array_type == vtkClientServerStream::uint32_array ||
+      array_type == vtkClientServerStream::uint64_array ||
+      array_type == vtkClientServerStream::float32_array ||
+      array_type == vtkClientServerStream::float64_array)
+    {
+      // if the dest array is a numeric type, we will transform the array values
+      // in the stream that are of supported numeric types to the dest. note, it
+      // simply uses static_cast and hence may cause precision loss, overflow
+      // etc.
+      switch (static_cast<vtkClientServerStream::Types>(tp))
+      {
+        VTK_CSS_GET_ARGUMENT_ARRAY_CASE(int8_array, vtkTypeInt8);
+        VTK_CSS_GET_ARGUMENT_ARRAY_CASE(int16_array, vtkTypeInt16);
+        VTK_CSS_GET_ARGUMENT_ARRAY_CASE(int32_array, vtkTypeInt32);
+        VTK_CSS_GET_ARGUMENT_ARRAY_CASE(int64_array, vtkTypeInt64);
+        VTK_CSS_GET_ARGUMENT_ARRAY_CASE(uint8_array, vtkTypeUInt8);
+        VTK_CSS_GET_ARGUMENT_ARRAY_CASE(uint16_array, vtkTypeUInt16);
+        VTK_CSS_GET_ARGUMENT_ARRAY_CASE(uint32_array, vtkTypeUInt32);
+        VTK_CSS_GET_ARGUMENT_ARRAY_CASE(uint64_array, vtkTypeUInt64);
+        VTK_CSS_GET_ARGUMENT_ARRAY_CASE(float32_array, vtkTypeFloat32);
+        VTK_CSS_GET_ARGUMENT_ARRAY_CASE(float64_array, vtkTypeFloat64);
+        default:
+          break;
       }
     }
   }

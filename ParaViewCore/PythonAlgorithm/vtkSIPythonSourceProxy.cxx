@@ -65,13 +65,12 @@ class convert_error : public std::exception
 {
 };
 
-// push contents of return value from a vtkSmartPyObject to a
-// vtkClientServerStream.
-vtkClientServerStream& operator<<(vtkClientServerStream& os, vtkSmartPyObject& obj)
+// push contents of return value from a PyObject to a vtkClientServerStream.
+vtkClientServerStream& operator<<(vtkClientServerStream& os, PyObject* obj)
 {
   if (PyBool_Check(obj))
   {
-    os << ((obj.GetPointer() == Py_True) ? true : false);
+    os << ((obj == Py_True) ? true : false);
   }
   else if (PyInt_Check(obj))
   {
@@ -93,11 +92,32 @@ vtkClientServerStream& operator<<(vtkClientServerStream& os, vtkSmartPyObject& o
   {
     os << PyVTKObject_GetObject(obj);
   }
+  else if (PyTuple_Check(obj))
+  {
+    const auto len = PyTuple_Size(obj);
+    for (Py_ssize_t cc = 0; cc < len; ++cc)
+    {
+      os << PyTuple_GetItem(obj, cc);
+    }
+  }
+  else if (PyList_Check(obj))
+  {
+    const auto len = PyList_Size(obj);
+    for (Py_ssize_t cc = 0; cc < len; ++cc)
+    {
+      os << PyList_GetItem(obj, cc);
+    }
+  }
   else
   {
     throw convert_error();
   }
   return os;
+}
+
+vtkClientServerStream& operator<<(vtkClientServerStream& os, vtkSmartPyObject& obj)
+{
+  return os << obj.GetPointer();
 }
 
 template <typename T, typename F>
