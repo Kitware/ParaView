@@ -743,6 +743,7 @@ list(APPEND TESTS_WITH_BASELINES
   MultiBlockAttributes1.xml
   MultiBlockInspector.xml
   MultiBlockSingleBlock.xml
+  MultiBlockVolumeRendering.xml
   MultiSliceMultiBlock.xml
   MultiSliceWavelet.xml
   NormalGlyphs.xml
@@ -1306,7 +1307,7 @@ set (VolumeRenderingWithContour_DISABLE_CRS TRUE)
 set (VolumeRenderingWithContour_THRESHOLD 50)
 set (VolumeNoMapScalars_DISABLE_CRS TRUE)
 set (VolumeNoMapScalars_THRESHOLD 50)
-
+set (MultiBlockVolumeRendering_DISABLE_CRS TRUE)
 
 # Histogram filter produces different results when running in parallel, so
 # disable it.

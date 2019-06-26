@@ -387,7 +387,11 @@ void vtkUnstructuredGridVolumeRepresentation::PrintSelf(ostream& os, vtkIndent i
 //----------------------------------------------------------------------------
 void vtkUnstructuredGridVolumeRepresentation::SetExtractedBlockIndex(unsigned int index)
 {
-  this->Preprocessor->SetExtractedBlockIndex(index);
+  if (this->Preprocessor->GetExtractedBlockIndex() != index)
+  {
+    this->Preprocessor->SetExtractedBlockIndex(index);
+    this->MarkModified();
+  }
 }
 
 //***************************************************************************

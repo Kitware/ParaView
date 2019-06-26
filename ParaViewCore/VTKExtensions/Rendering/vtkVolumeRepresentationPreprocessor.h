@@ -61,8 +61,8 @@ public:
    * Sets which block will be extracted for volume rendering.
    * Ignored if input is not multiblock.  Default is 0.
    */
-  void SetExtractedBlockIndex(int);
-  vtkGetMacro(ExtractedBlockIndex, int);
+  void SetExtractedBlockIndex(unsigned int);
+  vtkGetMacro(ExtractedBlockIndex, unsigned int);
   //@}
 
 protected:
@@ -76,7 +76,7 @@ protected:
   int FillInputPortInformation(int port, vtkInformation* info) override;
 
   int TetrahedraOnly;
-  int ExtractedBlockIndex;
+  unsigned int ExtractedBlockIndex;
 
   vtkDataSetTriangleFilter* DataSetTriangleFilter;
   vtkExtractBlock* ExtractBlockFilter;

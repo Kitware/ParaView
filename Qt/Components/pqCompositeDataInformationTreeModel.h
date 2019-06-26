@@ -189,6 +189,16 @@ public:
 
   //@{
   /**
+   * When `UserCheckable` is true, this limits use-checkability to leaf nodes
+   * only. Note that this has no effect if `userCheckable` is false.
+   * Also please call reset() after changing this.
+   */
+  void setOnlyLeavesAreUserCheckable(bool val) { this->OnlyLeavesAreUserCheckable = val; }
+  bool onlyLeavesAreUserCheckable() const { return this->OnlyLeavesAreUserCheckable; }
+  //@}
+
+  //@{
+  /**
    * Get/Set the default check state for nodes. Default is unchecked (false).
    * Note: please call reset() after changing this.
    */
@@ -358,6 +368,7 @@ private:
   QScopedPointer<pqInternals> Internals;
   QString HeaderLabel;
   bool UserCheckable;
+  bool OnlyLeavesAreUserCheckable;
   bool ExpandMultiPiece;
   bool Exclusivity;
   bool DefaultCheckState;

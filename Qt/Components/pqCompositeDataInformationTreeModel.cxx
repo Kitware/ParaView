@@ -493,6 +493,7 @@ pqCompositeDataInformationTreeModel::pqCompositeDataInformationTreeModel(QObject
   : Superclass(parentObject)
   , Internals(new pqCompositeDataInformationTreeModel::pqInternals())
   , UserCheckable(false)
+  , OnlyLeavesAreUserCheckable(false)
   , ExpandMultiPiece(false)
   , Exclusivity(false)
   , DefaultCheckState(false)
@@ -647,7 +648,10 @@ Qt::ItemFlags pqCompositeDataInformationTreeModel::flags(const QModelIndex& idx)
   Qt::ItemFlags pflags = this->Superclass::flags(idx);
   if (this->UserCheckable && idx.column() == 0)
   {
-    pflags |= Qt::ItemIsUserCheckable | Qt::ItemIsTristate;
+    if (this->OnlyLeavesAreUserCheckable && !this->hasChildren(idx))
+    {
+      pflags |= Qt::ItemIsUserCheckable | Qt::ItemIsTristate;
+    }
   }
 
   // can't use Qt::ItemIsAutoTristate till we drop support for Qt 4 :(.

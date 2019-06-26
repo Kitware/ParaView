@@ -4114,7 +4114,7 @@
             <Property name="ScalarOpacityUnitDistance"
                       panel_visibility="advanced" />
             <Property name="ExtractedBlockIndex"
-                      panel_visibility="never" />
+                      panel_visibility="advanced" />
             <Property name="SelectMapper"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="volume" />
@@ -5160,8 +5160,8 @@
                          default_values="0"
                          name="ExtractedBlockIndex"
                          number_of_elements="1">
-        <Documentation>In case of multiblock datasets, choose the flat index of
-        the dataset to volume render. The flat index must point to an
+        <Documentation>In case of multiblock datasets, choose the index of
+        the dataset to volume render. The index must point to an
         unstructured grid dataset. If the input is not a multiblock dataset
         then this index is ignored.</Documentation>
         <CompositeTreeDomain mode="leaves"
