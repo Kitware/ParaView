@@ -153,11 +153,7 @@ public:
   /// \param[in] tag  The tag that refers to the user-defined meta
   ///                 data associated with the scene element.
   ///
-  virtual void set_meta_data(mi::neuraylib::Tag_struct tag)
-  {
-    // avoid warnings
-    (void)tag;
-  }
+  virtual void set_meta_data(mi::neuraylib::Tag_struct tag) { (void)tag; }
 
   /// Retrieve the scene element's reference to the user-defined meta data.
   ///

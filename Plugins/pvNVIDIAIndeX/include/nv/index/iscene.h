@@ -217,6 +217,9 @@ public:
   /// not yet
   /// add it to the scene description.
   ///
+  /// \param[in] grid_dims                    Dimensions of the corner-pointer grid. Layer
+  /// resolution in
+  ///                                         x and y, number of layers in z.
   /// \param[in] bbox                         The local space bounding box.
   /// \param[in] transform_matrix             Transformation matrix.
   /// \param[in] importer_callback            Distributed data import callback function.
@@ -225,6 +228,7 @@ public:
   /// \return                                 The new \c ISparse_volume_scene_element instance.
   ///
   virtual ICorner_point_grid* create_corner_point_grid(
+    const mi::math::Vector_struct<mi::Uint32, 3>& grid_dims,
     const mi::math::Bbox_struct<mi::Float32, 3>& bbox,
     const mi::math::Matrix_struct<mi::Float32, 4, 4>& transform_matrix,
     nv::index::IDistributed_data_import_callback* importer_callback,

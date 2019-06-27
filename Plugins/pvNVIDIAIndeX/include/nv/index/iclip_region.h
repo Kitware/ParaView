@@ -19,7 +19,7 @@ namespace index
 /// @ingroup nv_index_scene_description_attribute
 
 /// Defines a generic clipping region that is applied to shapes.
-/// Clipping is only supported for some shapes, as describe in the documentation of the individual
+/// Clipping is only supported for some shapes, as described in the documentation of the individual
 /// shape scene elements.
 ///
 class IClip_region : public mi::base::Interface_declare<0x7693cba2, 0x8c85, 0x4023, 0xa2, 0x96,

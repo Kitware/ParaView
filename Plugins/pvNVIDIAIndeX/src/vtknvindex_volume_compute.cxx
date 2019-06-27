@@ -134,13 +134,21 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
   mi::math::Bbox<mi::Float32, 3> shm_bbox_flt;
   mi::Uint64 shmsize = 0;
   void* pv_subdivision_ptr = NULL;
+  void* shm_ptr = NULL;
 
   if (!m_cluster_properties->get_host_properties(rankid)->get_shminfo(
-        request_bbox, shm_memory_name, shm_bbox_flt, shmsize, &pv_subdivision_ptr, 0))
+        request_bbox, shm_memory_name, shm_bbox_flt, shmsize, &shm_ptr, 0))
   {
     ERROR_LOG << "Failed to get shared memory information in regular volume importer for rank: "
               << rankid << ".";
     return;
+  }
+
+  // retrieve subset scalars for the currrent time step from the subset scalars array
+  if (shm_ptr != NULL)
+  {
+    void** pv_subdivision_pointers = static_cast<void**>(shm_ptr);
+    pv_subdivision_ptr = pv_subdivision_pointers[0];
   }
 
   const Bbox3i shm_bbox(static_cast<mi::Sint32>(shm_bbox_flt.min.x),

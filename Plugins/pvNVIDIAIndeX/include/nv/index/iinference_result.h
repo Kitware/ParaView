@@ -37,18 +37,22 @@ public:
   /// program, e.g., memory buffer overflows are not managed by NVIDIA IndeX but the user has to
   /// take care of those.
   ///
-  /// \param[in]      xac_program
+  /// \param[out]     xac_program
   ///                 The XAC program that shall make use of the inference results.
   ///                 The infeernce will be bound to this program and the program
   ///                 is responsible to grab and apply the inference results when
   ///                 rendering or computing the dataset.
+  ///                 \note
+  ///                 The tag is ignored today but whill be considered in the future.
   ///
-  /// \param[in]      slot_id
+  /// \param[out]     slot_id
   ///                 The unique identifier that binds the inference results to an
   ///                 XAC program. The slot id needs to be availble in the XAC program
   ///                 so that the program can make use of the bound data.
+  ///                 \note
+  ///                 The slot id is ignored today but whill be considered in the future.
   ///
-  /// \param[in]      inference_results
+  /// \param[out]     inference_results
   ///                 The CUDA memory buffer containing the inference results to be bound
   ///                 to the XAC program.
   ///

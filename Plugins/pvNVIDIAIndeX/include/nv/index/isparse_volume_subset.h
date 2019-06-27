@@ -85,10 +85,10 @@ public:
   /// Raw memory pointer to internal device-buffer data.
   virtual void* get_device_data() const = 0;
 
-  ///< The size of the buffer in Bytes.
+  /// The size of the buffer in Bytes.
   virtual mi::Size get_data_size() const = 0;
 
-  ///< GPU device id if the buffer is located on a GPU device,
+  /// GPU device id if the buffer is located on a GPU device,
   virtual mi::Sint32 get_gpu_device_id() const = 0;
 };
 

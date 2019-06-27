@@ -107,6 +107,10 @@
 /// printing debugging information, transformation handling, basic shading
 /// operations and generic gradient operators.
 
+/// @defgroup xac_compute XAC compute
+/// @ingroup xac
+/// IndeX Accelerated Compute (XAC) facilities for gpu accelerated computing of data.
+
 /// @defgroup nv_index_scene_description_shape Scene shapes
 /// @ingroup nv_index_scene_description
 ///

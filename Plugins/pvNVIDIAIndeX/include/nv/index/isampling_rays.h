@@ -235,7 +235,7 @@ public:
   /// get_user_value_masks().
   ///
   /// \param[in] sample_range     Range of samples to access.
-  /// \param value_index          Index of user value, \see get_limit(MAX_USER_VALUES).
+  /// \param[in] value_index      Index of user value, \see get_limit(MAX_USER_VALUES).
   /// \param[out] data            Pointer to buffer to receive values. Must be sized according to
   /// the configured value size,
   ///                             \see IRay_sampling_value_format.

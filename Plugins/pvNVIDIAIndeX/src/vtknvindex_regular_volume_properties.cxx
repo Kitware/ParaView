@@ -313,7 +313,6 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* sca
     }
     else
     {
-      ERROR_LOG << "The scalar type: " << m_scalar_type << " not supported by NVIDIA IndeX.";
       return false;
     }
 
@@ -331,7 +330,7 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* sca
   }
   else
   {
-    shm_info->m_raw_mem_pointer = scalar_array->GetVoidPointer(0);
+    // shm_info->m_subset_ptr = scalar_array->GetVoidPointer(0);
   }
 
   m_time_steps_written++;
@@ -357,10 +356,10 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(
   std::string shm_memory_name;
   mi::math::Bbox<mi::Float32, 3> shm_bbox;
   mi::Uint64 shm_size = 0;
-  void* raw_mem_pointer = NULL;
+  void* subset_ptr = NULL;
 
   if (!host_properties->get_shminfo(ivol_data->subregion_bbox, shm_memory_name, shm_bbox, shm_size,
-        &raw_mem_pointer, current_timestep))
+        &subset_ptr, current_timestep))
   {
     ERROR_LOG << "Failed to get shared memory in "
               << "vtknvindex_regular_volume_properties::write_shared_memory.";
@@ -395,7 +394,6 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(
   }
   else
   {
-    ERROR_LOG << "The scalar type: " << m_scalar_type << " not supported by NVIDIA IndeX.";
     return false;
   }
 

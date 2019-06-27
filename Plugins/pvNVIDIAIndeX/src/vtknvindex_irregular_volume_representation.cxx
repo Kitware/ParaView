@@ -495,6 +495,7 @@ void vtknvindex_irregular_volume_representation::SetScalarOpacity(vtkPiecewiseFu
 //----------------------------------------------------------------------------
 void vtknvindex_irregular_volume_representation::SetScalarOpacityUnitDistance(double val)
 {
+  static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)->opacity_changed();
   this->Property->SetScalarOpacityUnitDistance(val);
 }
 

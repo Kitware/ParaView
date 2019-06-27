@@ -56,6 +56,9 @@ public:
   /// in the cluster environment.
   ///
   /// \return     Returns an interface pointer to an instance of \c IDistributed_data_access.
+  ///             \note
+  ///             Future version will enable a user to request data beyond the data extent
+  ///             stored locally. This feature is currently not implementd.
   ///
   virtual IDistributed_data_access* get_distributed_data_access() const = 0;
 };

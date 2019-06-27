@@ -81,9 +81,10 @@ public:
 
   /// Get a specific collection id.
   ///
-  /// \param[in] collection_id The if of the collection. It currently maps to the frame id.
+  /// \param[in] collection_id The id of the collection. It currently maps to the frame id.
+  /// \param[in] raw           Provide raw trace events (triggers collection from all hosts).
   ///
-  /// \return
+  /// \return                  Returns a trace collection which could be empty.
   virtual ITrace_collection* get_collection(mi::Uint32 collection_id, bool raw = false) = 0;
 
   virtual void record(const char* ns, mi::Sint32 ns_id, const char* name, mi::Uint64 value) = 0;

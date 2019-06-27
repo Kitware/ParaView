@@ -37,25 +37,27 @@ public:
   ///
   /// \note This method must only return upon finishing the compute tasks.
   ///
-  /// \param[in]     dice_transaction     The current DiCE transaction.
+  /// \param[in]      dice_transaction
+  ///                 The current DiCE transaction.
   ///
-  /// \param[in]     source_data
-  ///                An instance of a \c IInference_source allows accessing
-  ///                the data stored locally on the machine/GPU.
-  ///                \note Future version shall allow accessing data beyond the local data extent.
+  /// \param[in]      source_data
+  ///                 An instance of a \c IInference_source allows accessing
+  ///                 the data stored locally on the machine/GPU.
+  ///                 \note
+  ///                 Future version shall allow accessing data beyond the local data extent.
   ///
-  /// \param[in]     memory_allocator
-  ///                An instance of a \c IMemory_allocator allows allocating library-side memory
-  ///                that shall be filled with application-side data.
+  /// \param[in]      memory_manager
+  ///                 An instance of a \c IMemory_manager allows allocating library-side memory
+  ///                 that shall be filled with application-side data.
   ///
-  /// \param[in,out] result_data_assignment
-  ///                Receives the inference result data from the external inference operations and
-  ///                maps them
-  ///                to a unique identifier. The identifier or slot shall be know by subsequent XAC
-  ///                shader or
-  ///                compute programs to make use of the results inside. Making the slot available
-  ///                to the
-  ///                XAC shader represents the responsibility of the user or application writer.
+  /// \param[in,out]  result_data_assignment
+  ///                 Receives the inference result data from the external inference operations and
+  ///                 maps them
+  ///                 to a unique identifier. The identifier or slot shall be know by subsequent XAC
+  ///                 shader or
+  ///                 compute programs to make use of the results inside. Making the slot available
+  ///                 to the
+  ///                 XAC shader represents the responsibility of the user or application writer.
   ///
   virtual void inference(mi::neuraylib::IDice_transaction* dice_transaction,
     const IInference_source_data* source_data, IMemory_manager* memory_manager,
@@ -122,7 +124,11 @@ public:
   /// \param[in] tag  The tag that refers to the user-defined meta
   ///                 data associated with the scene element.
   ///
-  virtual void set_meta_data(mi::neuraylib::Tag_struct /*tag*/) {}
+  virtual void set_meta_data(mi::neuraylib::Tag_struct tag)
+  {
+    // avoid warnings
+    (void)tag;
+  }
 
   /// Retrieve the scene element's reference to the user-defined meta data.
   ///

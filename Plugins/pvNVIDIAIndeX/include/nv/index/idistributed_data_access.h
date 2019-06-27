@@ -71,7 +71,7 @@ public:
   /// \param[in] dice_transaction     The DiCE transaction active when
   ///                                 launching the distributed data access.
   ///
-  /// \return                         Returns an status code. The access operation succeeded,
+  /// \return                         Returns a status code. The access operation succeeded,
   ///                                 if the returned values is larger-equal 0, otherwise
   ///                                 the access procedure failed.
   ///
@@ -104,10 +104,10 @@ public:
   /// The method returns a pointer to an \c IDistributed_data_subset
   /// interface.
   /// For accessing the datasets specific data, such as voxel values,
-  /// the interface class needs to by casted to an conrete data subset, e.g.,
+  /// the interface class needs to be cast to a concrete data subset, e.g.,
   /// \c ISparse_volume_subset.
   /// A \c IDistributed_data_subset interface class owns the
-  /// data and shall only grants access to the data.
+  /// data and shall only grant access to the data.
   /// In particular, the destructor of the implemented interface
   /// class deletes the local data.
   ///
