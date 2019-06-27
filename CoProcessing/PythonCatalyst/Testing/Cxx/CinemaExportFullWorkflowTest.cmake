@@ -88,6 +88,16 @@ if("${TEST_NAME}" STREQUAL "CinemaExportGeometry")
   if(rv)
     message(FATAL_ERROR "CoProcessingCompareImageTester second image return value was = '${rv}' ")
   endif()
+elseif("${TEST_NAME}" STREQUAL "CinemaExportGeometryAndImages")
+  message("${CINEMA_DATABASE_TESTER}")
+  execute_process_with_echo(COMMAND 
+    ${CINEMA_DATABASE_TESTER} 
+    --interactive ${COPROCESSING_TEST_DIR}/cinema/interactive/CinemaExportGeometryAndImages.cdb
+    --batch ${COPROCESSING_TEST_DIR}/cinema/batch/CinemaExportGeometryAndImages.cdb
+    RESULT_VARIABLE rv)
+  if(rv)
+    message(FATAL_ERROR "CoProcessingCompareImageTester second image return value was = '${rv}' ")
+  endif()
 endif()
 
 if("${TEST_NAME}" STREQUAL "ExportNow")
