@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/can.ex2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeX" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="Solid Color" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Multi-block Inspector" />
+  <pqevent object="pqClientMainWindow/1QTabBar2" command="set_tab_with_text" arguments="Multi-block Inspector" />
+
+  <!-- select "Unnamed block ID: 2" -->
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="setCurrent" arguments="0.0.0.0.1.0" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/MultiBlockInspectorSelection-SelectBlock2.png" width="400" height="400" />
+
+  <!-- select "Element blocks" -->
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="setCurrent" arguments="0.0.0.0" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/MultiBlockInspectorSelection-SelectElementBlocks.png" width="400" height="400" />
+
+  <!-- hide "Unnamed block ID: 1" -->
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/treeView" command="setCheckState" arguments="0.0.0.0.0.0,0" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/MultiBlockInspectorSelection-HideBlock1.png" width="400" height="400" />
+</pqevents>
