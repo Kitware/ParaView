@@ -9,10 +9,8 @@
 
 #include <mi/dice.h>
 
-namespace nv
-{
-namespace index
-{
+namespace nv {
+namespace index {
 
 /// A viewport defines a two-dimensional area of a canvas where the
 /// scene from a given DiCE scope should be rendered. Creating
@@ -78,52 +76,53 @@ namespace index
 ///
 /// @ingroup nv_index_rendering
 ///
-class IViewport : public mi::base::Interface_declare<0x3dd9ae6f, 0x819d, 0x4c9c, 0xbb, 0x72, 0x7f,
-                    0x5a, 0x8c, 0x49, 0xc7, 0x01>
+class IViewport :
+    public mi::base::Interface_declare<0x3dd9ae6f,0x819d,0x4c9c,0xbb,0x72,0x7f,0x5a,0x8c,0x49,0xc7,0x01>
 {
 public:
-  /// Sets the DiCE scope that should be used for this viewport.
-  ///
-  /// \param[in] scope DiCE scope, this class takes ownership.
-  virtual void set_scope(mi::neuraylib::IScope* scope) = 0;
+    /// Sets the DiCE scope that should be used for this viewport.
+    ///
+    /// \param[in] scope DiCE scope, this class takes ownership.
+    virtual void set_scope(mi::neuraylib::IScope* scope) = 0;
 
-  /// Returns the DiCE scope of this viewport.
-  ///
-  /// \return DiCE scope.
-  virtual mi::neuraylib::IScope* get_scope() const = 0;
+    /// Returns the DiCE scope of this viewport.
+    ///
+    /// \return DiCE scope.
+    virtual mi::neuraylib::IScope* get_scope() const = 0;
 
-  /// Sets the anchor point of the viewport window on the
-  /// \c IIndex_canvas.
-  ///
-  /// \param[in] anchor_position Lower left position of viewport window in pixels
-  virtual void set_position(const mi::math::Vector_struct<mi::Sint32, 2>& anchor_position) = 0;
+    /// Sets the anchor point of the viewport window on the
+    /// \c IIndex_canvas.
+    ///
+    /// \param[in] anchor_position Lower left position of viewport window in pixels
+    virtual void set_position(const mi::math::Vector_struct<mi::Sint32, 2>& anchor_position) = 0;
 
-  /// Returns the anchor point of the viewport window on the
-  /// \c IIndex_canvas in pixel
-  ///
-  /// \return Anchor point position
-  virtual mi::math::Vector_struct<mi::Sint32, 2> get_position() const = 0;
+    /// Returns the anchor point of the viewport window on the
+    /// \c IIndex_canvas in pixel
+    ///
+    /// \return Anchor point position
+    virtual mi::math::Vector_struct<mi::Sint32, 2> get_position() const = 0;
 
-  /// Sets the window size (resolution).
-  ///
-  /// \param[in] resolution Window resolution in pixels
-  virtual void set_size(const mi::math::Vector_struct<mi::Sint32, 2>& resolution) = 0;
+    /// Sets the window size (resolution).
+    ///
+    /// \param[in] resolution Window resolution in pixels
+    virtual void set_size(const mi::math::Vector_struct<mi::Sint32, 2>& resolution) = 0;
 
-  /// Return the window size (resolution).
-  ///
-  /// \return Window resolution in pixels
-  virtual mi::math::Vector_struct<mi::Sint32, 2> get_size() const = 0;
+    /// Return the window size (resolution).
+    ///
+    /// \return Window resolution in pixels
+    virtual mi::math::Vector_struct<mi::Sint32, 2> get_size() const = 0;
 
-  /// Enable or disable the viewport for inclusion in rendering.
-  ///
-  /// \param[in] enable   If false, viewport will be skipped for rendering.
-  virtual void set_enabled(bool enable) = 0;
+    /// Enable or disable the viewport for inclusion in rendering.
+    ///
+    /// \param[in] enable   If false, viewport will be skipped for rendering.
+    virtual void set_enabled(bool enable) = 0;
 
-  /// Returns whether the viewport should be rendered.
-  ///
-  /// \return True if viewport should be rendered, false otherwise.
-  virtual bool get_enabled() const = 0;
+    /// Returns whether the viewport should be rendered.
+    ///
+    /// \return True if viewport should be rendered, false otherwise.
+    virtual bool get_enabled() const = 0;
 };
+
 
 /// Defines a list of viewports that will be rendered onto a canvas.
 ///
@@ -137,60 +136,62 @@ public:
 ///
 /// @ingroup nv_index_rendering
 ///
-class IViewport_list : public mi::base::Interface_declare<0xbd7cbc5a, 0x4628, 0x47ea, 0x94, 0x9d,
-                         0x64, 0x3c, 0x34, 0xa3, 0xc6, 0x8e>
+class IViewport_list :
+    public mi::base::Interface_declare<0xbd7cbc5a,0x4628,0x47ea,0x94,0x9d,0x64,0x3c,0x34,0xa3,0xc6,0x8e>
 {
 public:
-  /// Returns the number of viewports contained in the list.
-  ///
-  /// \return Number of viewports
-  virtual mi::Size size() const = 0;
+    /// Returns the number of viewports contained in the list.
+    ///
+    /// \return Number of viewports
+    virtual mi::Size size() const = 0;
 
-  /// Returns the viewport at the given position in the list.
-  ///
-  /// \param[in] index Position in the list.
-  /// \return Selected viewport, or 0 when \c index is invalid
-  virtual nv::index::IViewport* get(mi::Size index) const = 0;
+    /// Returns the viewport at the given position in the list.
+    ///
+    /// \param[in] index Position in the list.
+    /// \return Selected viewport, or 0 when \c index is invalid
+    virtual nv::index::IViewport* get(mi::Size index) const = 0;
 
-  /// Appends a viewport to the end of the list.
-  ///
-  /// This class takes ownership of the viewport.
-  ///
-  /// \param[in] viewport Viewport to append, this class takes ownership.
-  virtual void append(nv::index::IViewport* viewport) = 0;
+    /// Appends a viewport to the end of the list.
+    ///
+    /// This class takes ownership of the viewport.
+    ///
+    /// \param[in] viewport Viewport to append, this class takes ownership.
+    virtual void append(nv::index::IViewport* viewport) = 0;
 
-  /// Inserts a viewport into the list at the given position.
-  ///
-  /// This class takes ownership of the viewport.
-  ///
-  /// \param[in] index    Position in the list.
-  /// \param[in] viewport Viewport to insert, this class takes ownership.
-  /// \return true on success, false when \c index is invalid.
-  virtual bool insert(mi::Size index, nv::index::IViewport* viewport) = 0;
+    /// Inserts a viewport into the list at the given position.
+    ///
+    /// This class takes ownership of the viewport.
+    ///
+    /// \param[in] index    Position in the list.
+    /// \param[in] viewport Viewport to insert, this class takes ownership.
+    /// \return true on success, false when \c index is invalid.
+    virtual bool insert(
+        mi::Size              index,
+        nv::index::IViewport* viewport) = 0;
 
-  /// Removes the viewport at the given position from the list.
-  ///
-  /// \param[in] index Position in the list.
-  /// \return true on success, or false when \c index is invalid.
-  virtual bool remove(mi::Size index) = 0;
+    /// Removes the viewport at the given position from the list.
+    ///
+    /// \param[in] index Position in the list.
+    /// \return true on success, or false when \c index is invalid.
+    virtual bool remove(mi::Size index) = 0;
 
-  /// Removes all viewports from the list.
-  virtual void clear() = 0;
+    /// Removes all viewports from the list.
+    virtual void clear() = 0;
+    
+    /// Enables or disables the advisory output.
+    ///
+    /// When the advisory is enabled, extra debug messages related
+    /// to multi-view support will be printed to the log.
+    ///
+    /// The advisory output is disabled by default.
+    ///
+    /// \param[in] enable   Advisory output state
+    virtual void set_advisory_enabled(bool enable) = 0;
 
-  /// Enables or disables the advisory output.
-  ///
-  /// When the advisory is enabled, extra debug messages related
-  /// to multi-view support will be printed to the log.
-  ///
-  /// The advisory output is disabled by default.
-  ///
-  /// \param[in] enable   Advisory output state
-  virtual void set_advisory_enabled(bool enable) = 0;
-
-  /// Returns whether if the advisory output is enabled.
-  ///
-  /// \return \c true when advisory is enabled
-  virtual bool get_advisory_enabled() const = 0;
+    /// Returns whether if the advisory output is enabled.
+    ///
+    /// \return \c true when advisory is enabled
+    virtual bool get_advisory_enabled() const = 0;
 };
 
 /// Defines a list of canvases with associated viewports. This allows rendering to multiple
@@ -205,57 +206,60 @@ public:
 ///
 /// @ingroup nv_index_rendering
 ///
-class ICanvas_viewport_list : public mi::base::Interface_declare<0x84643c8a, 0xd6cb, 0x47d8, 0xa1,
-                                0x5c, 0xff, 0x6a, 0xc9, 0x90, 0x4b, 0x14>
+class ICanvas_viewport_list :
+    public mi::base::Interface_declare<0x84643c8a,0xd6cb,0x47d8,0xa1,0x5c,0xff,0x6a,0xc9,0x90,0x4b,0x14>
 {
 public:
-  /// Returns the number of canvases and viewport-lists contained in the list.
-  ///
-  /// \return Number of canvas/viewport-list pairs stored in the list.
-  virtual mi::Size size() const = 0;
+    /// Returns the number of canvases and viewport-lists contained in the list.
+    ///
+    /// \return Number of canvas/viewport-list pairs stored in the list.
+    virtual mi::Size size() const = 0;
 
-  /// Returns the canvas at the given position in the list.
-  ///
-  /// \param[in] index Position in the list.
-  /// \return Selected canvas, or 0 when \c index is invalid
-  virtual nv::index::IIndex_canvas* get_canvas(mi::Size index) const = 0;
+    /// Returns the canvas at the given position in the list.
+    ///
+    /// \param[in] index Position in the list.
+    /// \return Selected canvas, or 0 when \c index is invalid
+    virtual nv::index::IIndex_canvas* get_canvas(mi::Size index) const = 0;
 
-  /// Returns the viewport-list at the given position in the list.
-  ///
-  /// \param[in] index Position in the list.
-  /// \return Selected viewport-list, or 0 when \c index is invalid
-  virtual nv::index::IViewport_list* get_viewport_list(mi::Size index) const = 0;
+    /// Returns the viewport-list at the given position in the list.
+    ///
+    /// \param[in] index Position in the list.
+    /// \return Selected viewport-list, or 0 when \c index is invalid
+    virtual nv::index::IViewport_list* get_viewport_list(mi::Size index) const = 0;
 
-  /// Appends a canvas/viewport-list pair to the end of the list.
-  ///
-  /// This class takes ownership of the viewport-list.
-  ///
-  /// \param[in] canvas   Canvas to append, this class does \em not take ownership.
-  /// \param[in] viewport_list Viewport-list to append, this class takes ownership.
-  virtual void append(
-    nv::index::IIndex_canvas* canvas, nv::index::IViewport_list* viewport_list) = 0;
+    /// Appends a canvas/viewport-list pair to the end of the list.
+    ///
+    /// This class takes ownership of the viewport-list.
+    ///
+    /// \param[in] canvas   Canvas to append, this class does \em not take ownership.
+    /// \param[in] viewport_list Viewport-list to append, this class takes ownership.
+    virtual void append(
+        nv::index::IIndex_canvas*  canvas,
+        nv::index::IViewport_list* viewport_list) = 0;
 
-  /// Inserts a canvas/viewport-list pair into the list at the given position.
-  ///
-  /// This class takes ownership of the viewport-list.
-  ///
-  /// \param[in] index    Position in the list.
-  /// \param[in] canvas   Canvas to insert, this class does \em not take ownership.
-  /// \param[in] viewport_list Viewport-list to append, this class takes ownership.
-  /// \return true on success, false when \c index is invalid.
-  virtual bool insert(
-    mi::Size index, nv::index::IIndex_canvas* canvas, nv::index::IViewport_list* viewport_list) = 0;
+    /// Inserts a canvas/viewport-list pair into the list at the given position.
+    ///
+    /// This class takes ownership of the viewport-list.
+    ///
+    /// \param[in] index    Position in the list.
+    /// \param[in] canvas   Canvas to insert, this class does \em not take ownership.
+    /// \param[in] viewport_list Viewport-list to append, this class takes ownership.
+    /// \return true on success, false when \c index is invalid.
+    virtual bool insert(
+        mi::Size                   index,
+        nv::index::IIndex_canvas*  canvas,
+        nv::index::IViewport_list* viewport_list) = 0;
 
-  /// Removes the canvas/viewport-list pair at the given position from the list.
-  ///
-  /// \param[in] index Position in the list.
-  /// \return true on success, or false when \c index is invalid.
-  virtual bool remove(mi::Size index) = 0;
+    /// Removes the canvas/viewport-list pair at the given position from the list.
+    ///
+    /// \param[in] index Position in the list.
+    /// \return true on success, or false when \c index is invalid.
+    virtual bool remove(mi::Size index) = 0;
 
-  /// Removes all canvas/viewport-list pairs from the list.
-  virtual void clear() = 0;
+    /// Removes all canvas/viewport-list pairs from the list.
+    virtual void clear() = 0;
 };
-}
-} // namespace index / nv
+
+}} // namespace index / nv
 
 #endif // NVIDIA_INDEX_IVIEWPORT_H

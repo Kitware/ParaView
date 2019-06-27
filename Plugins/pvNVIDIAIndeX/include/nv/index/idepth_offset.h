@@ -26,21 +26,22 @@ namespace index
 /// application related to shape rendering.  Such a hint could, for example,
 /// describe how the renderer should handle a numerical problem with a z-value.
 ///
-class IDepth_offset : public mi::base::Interface_declare<0x09b90263, 0x58b2, 0x4be4, 0xbf, 0xb1,
-                        0xae, 0xd1, 0xae, 0xab, 0xbc, 0x95, nv::index::IAttribute>
+class IDepth_offset :
+        public mi::base::Interface_declare<0x09b90263,0x58b2,0x4be4,0xbf,0xb1,0xae,0xd1,0xae,0xab,0xbc,0x95,
+                                           nv::index::IAttribute>
 {
 public:
-  /// Set depth-offset value of this attribute.
-  ///
-  /// \param[in] offset depth offset value
-  virtual void set_depth_offset(mi::Float32 offset) = 0;
+    /// Set depth-offset value of this attribute.
+    ///
+    /// \param[in] offset depth offset value
+    virtual void set_depth_offset(mi::Float32 offset) = 0;
 
-  /// Get current depth-offset value of this attribute.
-  ///
-  /// \return current depth-offset value
-  virtual mi::Float32 get_depth_offset() const = 0;
+    /// Get current depth-offset value of this attribute.
+    ///
+    /// \return current depth-offset value
+    virtual mi::Float32 get_depth_offset() const = 0;
 };
-}
-} // namespace index / nv
+
+}} // namespace index / nv
 
 #endif // NVIDIA_INDEX_IDEPTH_OFFSET_H

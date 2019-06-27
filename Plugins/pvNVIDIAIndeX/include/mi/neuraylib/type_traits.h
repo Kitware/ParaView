@@ -15,8 +15,7 @@
 #include <mi/math/spectrum.h>
 #include <mi/math/vector.h>
 
-namespace mi
-{
+namespace mi {
 
 /** \addtogroup mi_neuray_types
 @{
@@ -158,1414 +157,1106 @@ class IBbox3;
 ///
 /// \note Note that \c const \c char* is the only primitive type that does not have value semantics,
 ///       but pointer semantics.
-template <typename I>
-struct Type_traits
-{
-};
+template<typename I> struct Type_traits {};
 
-template <>
-struct Type_traits<mi::IBoolean>
+template<> struct Type_traits<mi::IBoolean>
 {
-  static const char* get_type_name() { return "Boolean"; }
-  typedef bool Primitive_type;
+    static const char* get_type_name() { return "Boolean"; }
+    typedef bool Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::ISint8>
+template<> struct Type_traits<mi::ISint8>
 {
-  static const char* get_type_name() { return "Sint8"; }
-  typedef mi::Sint8 Primitive_type;
+    static const char* get_type_name() { return "Sint8"; }
+    typedef mi::Sint8 Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::ISint16>
+template<> struct Type_traits<mi::ISint16>
 {
-  static const char* get_type_name() { return "Sint16"; }
-  typedef mi::Sint16 Primitive_type;
+    static const char* get_type_name() { return "Sint16"; }
+    typedef mi::Sint16 Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::ISint32>
+template<> struct Type_traits<mi::ISint32>
 {
-  static const char* get_type_name() { return "Sint32"; }
-  typedef mi::Sint32 Primitive_type;
+    static const char* get_type_name() { return "Sint32"; }
+    typedef mi::Sint32 Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::ISint64>
+template<> struct Type_traits<mi::ISint64>
 {
-  static const char* get_type_name() { return "Sint64"; }
-  typedef mi::Sint64 Primitive_type;
+    static const char* get_type_name() { return "Sint64"; }
+    typedef mi::Sint64 Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IUint8>
+template<> struct Type_traits<mi::IUint8>
 {
-  static const char* get_type_name() { return "Uint8"; }
-  typedef mi::Uint8 Primitive_type;
+    static const char* get_type_name() { return "Uint8"; }
+    typedef mi::Uint8 Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IUint16>
+template<> struct Type_traits<mi::IUint16>
 {
-  static const char* get_type_name() { return "Uint16"; }
-  typedef mi::Uint16 Primitive_type;
+    static const char* get_type_name() { return "Uint16"; }
+    typedef mi::Uint16 Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IUint32>
+template<> struct Type_traits<mi::IUint32>
 {
-  static const char* get_type_name() { return "Uint32"; }
-  typedef mi::Uint32 Primitive_type;
+    static const char* get_type_name() { return "Uint32"; }
+    typedef mi::Uint32 Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IUint64>
+template<> struct Type_traits<mi::IUint64>
 {
-  static const char* get_type_name() { return "Uint64"; }
-  typedef mi::Uint64 Primitive_type;
+    static const char* get_type_name() { return "Uint64"; }
+    typedef mi::Uint64 Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat32>
+template<> struct Type_traits<mi::IFloat32>
 {
-  static const char* get_type_name() { return "Float32"; }
-  typedef mi::Float32 Primitive_type;
+    static const char* get_type_name() { return "Float32"; }
+    typedef mi::Float32 Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat64>
+template<> struct Type_traits<mi::IFloat64>
 {
-  static const char* get_type_name() { return "Float64"; }
-  typedef mi::Float64 Primitive_type;
+    static const char* get_type_name() { return "Float64"; }
+    typedef mi::Float64 Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::ISize>
+template<> struct Type_traits<mi::ISize>
 {
-  static const char* get_type_name() { return "Size"; }
-  typedef mi::Size Primitive_type;
+    static const char* get_type_name() { return "Size"; }
+    typedef mi::Size Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IDifference>
+template<> struct Type_traits<mi::IDifference>
 {
-  static const char* get_type_name() { return "Difference"; }
-  typedef mi::Difference Primitive_type;
+    static const char* get_type_name() { return "Difference"; }
+    typedef mi::Difference Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IString>
+template<> struct Type_traits<mi::IString>
 {
-  static const char* get_type_name() { return "String"; }
-  typedef const char* Primitive_type;
+    static const char* get_type_name() { return "String"; }
+    typedef const char* Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IUuid>
+template<> struct Type_traits<mi::IUuid>
 {
-  static const char* get_type_name() { return "Uuid"; }
-  typedef mi::base::Uuid Primitive_type;
+    static const char* get_type_name() { return "Uuid"; }
+    typedef mi::base::Uuid Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IVoid>
+template<> struct Type_traits<mi::IVoid>
 {
-  static const char* get_type_name() { return "Void"; }
-  typedef void Primitive_type;
+    static const char* get_type_name() { return "Void"; }
+    typedef void Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IRef>
+template<> struct Type_traits<mi::IRef>
 {
-  static const char* get_type_name() { return "Ref"; }
-  typedef const char* Primitive_type;
+    static const char* get_type_name() { return "Ref"; }
+    typedef const char* Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IBoolean_2>
+template<> struct Type_traits<mi::IBoolean_2>
 {
-  static const char* get_type_name() { return "Boolean<2>"; }
-  typedef mi::math::Vector<bool, 2> Primitive_type;
+    static const char* get_type_name() { return "Boolean<2>"; }
+    typedef mi::math::Vector<bool,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IBoolean_3>
+template<> struct Type_traits<mi::IBoolean_3>
 {
-  static const char* get_type_name() { return "Boolean<3>"; }
-  typedef mi::math::Vector<bool, 3> Primitive_type;
+    static const char* get_type_name() { return "Boolean<3>"; }
+    typedef mi::math::Vector<bool,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IBoolean_4>
+template<> struct Type_traits<mi::IBoolean_4>
 {
-  static const char* get_type_name() { return "Boolean<4>"; }
-  typedef mi::math::Vector<bool, 4> Primitive_type;
+    static const char* get_type_name() { return "Boolean<4>"; }
+    typedef mi::math::Vector<bool,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::ISint32_2>
+template<> struct Type_traits<mi::ISint32_2>
 {
-  static const char* get_type_name() { return "Sint32<2>"; }
-  typedef mi::math::Vector<mi::Sint32, 2> Primitive_type;
+    static const char* get_type_name() { return "Sint32<2>"; }
+    typedef mi::math::Vector<mi::Sint32,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::ISint32_3>
+template<> struct Type_traits<mi::ISint32_3>
 {
-  static const char* get_type_name() { return "Sint32<3>"; }
-  typedef mi::math::Vector<mi::Sint32, 3> Primitive_type;
+    static const char* get_type_name() { return "Sint32<3>"; }
+    typedef mi::math::Vector<mi::Sint32,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::ISint32_4>
+template<> struct Type_traits<mi::ISint32_4>
 {
-  static const char* get_type_name() { return "Sint32<4>"; }
-  typedef mi::math::Vector<mi::Sint32, 4> Primitive_type;
+    static const char* get_type_name() { return "Sint32<4>"; }
+    typedef mi::math::Vector<mi::Sint32,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IUint32_2>
+template<> struct Type_traits<mi::IUint32_2>
 {
-  static const char* get_type_name() { return "Uint32<2>"; }
-  typedef mi::math::Vector<mi::Uint32, 2> Primitive_type;
+    static const char* get_type_name() { return "Uint32<2>"; }
+    typedef mi::math::Vector<mi::Uint32,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IUint32_3>
+template<> struct Type_traits<mi::IUint32_3>
 {
-  static const char* get_type_name() { return "Uint32<3>"; }
-  typedef mi::math::Vector<mi::Uint32, 3> Primitive_type;
+    static const char* get_type_name() { return "Uint32<3>"; }
+    typedef mi::math::Vector<mi::Uint32,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IUint32_4>
+template<> struct Type_traits<mi::IUint32_4>
 {
-  static const char* get_type_name() { return "Uint32<4>"; }
-  typedef mi::math::Vector<mi::Uint32, 4> Primitive_type;
+    static const char* get_type_name() { return "Uint32<4>"; }
+    typedef mi::math::Vector<mi::Uint32,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat32_2>
+template<> struct Type_traits<mi::IFloat32_2>
 {
-  static const char* get_type_name() { return "Float32<2>"; }
-  typedef mi::math::Vector<mi::Float32, 2> Primitive_type;
+    static const char* get_type_name() { return "Float32<2>"; }
+    typedef mi::math::Vector<mi::Float32,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat32_3>
+template<> struct Type_traits<mi::IFloat32_3>
 {
-  static const char* get_type_name() { return "Float32<3>"; }
-  typedef mi::math::Vector<mi::Float32, 3> Primitive_type;
+    static const char* get_type_name() { return "Float32<3>"; }
+    typedef mi::math::Vector<mi::Float32,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat32_4>
+template<> struct Type_traits<mi::IFloat32_4>
 {
-  static const char* get_type_name() { return "Float32<4>"; }
-  typedef mi::math::Vector<mi::Float32, 4> Primitive_type;
+    static const char* get_type_name() { return "Float32<4>"; }
+    typedef mi::math::Vector<mi::Float32,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat64_2>
+template<> struct Type_traits<mi::IFloat64_2>
 {
-  static const char* get_type_name() { return "Float64<2>"; }
-  typedef mi::math::Vector<mi::Float64, 2> Primitive_type;
+    static const char* get_type_name() { return "Float64<2>"; }
+    typedef mi::math::Vector<mi::Float64,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat64_3>
+template<> struct Type_traits<mi::IFloat64_3>
 {
-  static const char* get_type_name() { return "Float64<3>"; }
-  typedef mi::math::Vector<mi::Float64, 3> Primitive_type;
+    static const char* get_type_name() { return "Float64<3>"; }
+    typedef mi::math::Vector<mi::Float64,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat64_4>
+template<> struct Type_traits<mi::IFloat64_4>
 {
-  static const char* get_type_name() { return "Float64<4>"; }
-  typedef mi::math::Vector<mi::Float64, 4> Primitive_type;
+    static const char* get_type_name() { return "Float64<4>"; }
+    typedef mi::math::Vector<mi::Float64,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IBoolean_2_2>
+template<> struct Type_traits<mi::IBoolean_2_2>
 {
-  static const char* get_type_name() { return "Boolean<2,2>"; }
-  typedef mi::math::Matrix<bool, 2, 2> Primitive_type;
+    static const char* get_type_name() { return "Boolean<2,2>"; }
+    typedef mi::math::Matrix<bool,2,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IBoolean_2_3>
+template<> struct Type_traits<mi::IBoolean_2_3>
 {
-  static const char* get_type_name() { return "Boolean<2,3>"; }
-  typedef mi::math::Matrix<bool, 2, 3> Primitive_type;
+    static const char* get_type_name() { return "Boolean<2,3>"; }
+    typedef mi::math::Matrix<bool,2,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IBoolean_2_4>
+template<> struct Type_traits<mi::IBoolean_2_4>
 {
-  static const char* get_type_name() { return "Boolean<2,4>"; }
-  typedef mi::math::Matrix<bool, 2, 4> Primitive_type;
+    static const char* get_type_name() { return "Boolean<2,4>"; }
+    typedef mi::math::Matrix<bool,2,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IBoolean_3_2>
+template<> struct Type_traits<mi::IBoolean_3_2>
 {
-  static const char* get_type_name() { return "Boolean<3,2>"; }
-  typedef mi::math::Matrix<bool, 3, 2> Primitive_type;
+    static const char* get_type_name() { return "Boolean<3,2>"; }
+    typedef mi::math::Matrix<bool,3,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IBoolean_3_3>
+template<> struct Type_traits<mi::IBoolean_3_3>
 {
-  static const char* get_type_name() { return "Boolean<3,3>"; }
-  typedef mi::math::Matrix<bool, 3, 3> Primitive_type;
+    static const char* get_type_name() { return "Boolean<3,3>"; }
+    typedef mi::math::Matrix<bool,3,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IBoolean_3_4>
+template<> struct Type_traits<mi::IBoolean_3_4>
 {
-  static const char* get_type_name() { return "Boolean<3,4>"; }
-  typedef mi::math::Matrix<bool, 3, 4> Primitive_type;
+    static const char* get_type_name() { return "Boolean<3,4>"; }
+    typedef mi::math::Matrix<bool,3,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IBoolean_4_2>
+template<> struct Type_traits<mi::IBoolean_4_2>
 {
-  static const char* get_type_name() { return "Boolean<4,2>"; }
-  typedef mi::math::Matrix<bool, 4, 2> Primitive_type;
+    static const char* get_type_name() { return "Boolean<4,2>"; }
+    typedef mi::math::Matrix<bool,4,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IBoolean_4_3>
+template<> struct Type_traits<mi::IBoolean_4_3>
 {
-  static const char* get_type_name() { return "Boolean<4,3>"; }
-  typedef mi::math::Matrix<bool, 4, 3> Primitive_type;
+    static const char* get_type_name() { return "Boolean<4,3>"; }
+    typedef mi::math::Matrix<bool,4,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IBoolean_4_4>
+template<> struct Type_traits<mi::IBoolean_4_4>
 {
-  static const char* get_type_name() { return "Boolean<4,4>"; }
-  typedef mi::math::Matrix<bool, 4, 4> Primitive_type;
+    static const char* get_type_name() { return "Boolean<4,4>"; }
+    typedef mi::math::Matrix<bool,4,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::ISint32_2_2>
+template<> struct Type_traits<mi::ISint32_2_2>
 {
-  static const char* get_type_name() { return "Sint32<2,2>"; }
-  typedef mi::math::Matrix<mi::Sint32, 2, 2> Primitive_type;
+    static const char* get_type_name() { return "Sint32<2,2>"; }
+    typedef mi::math::Matrix<mi::Sint32,2,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::ISint32_2_3>
+template<> struct Type_traits<mi::ISint32_2_3>
 {
-  static const char* get_type_name() { return "Sint32<2,3>"; }
-  typedef mi::math::Matrix<mi::Sint32, 2, 3> Primitive_type;
+    static const char* get_type_name() { return "Sint32<2,3>"; }
+    typedef mi::math::Matrix<mi::Sint32,2,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::ISint32_2_4>
+template<> struct Type_traits<mi::ISint32_2_4>
 {
-  static const char* get_type_name() { return "Sint32<2,4>"; }
-  typedef mi::math::Matrix<mi::Sint32, 2, 4> Primitive_type;
+    static const char* get_type_name() { return "Sint32<2,4>"; }
+    typedef mi::math::Matrix<mi::Sint32,2,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::ISint32_3_2>
+template<> struct Type_traits<mi::ISint32_3_2>
 {
-  static const char* get_type_name() { return "Sint32<3,2>"; }
-  typedef mi::math::Matrix<mi::Sint32, 3, 2> Primitive_type;
+    static const char* get_type_name() { return "Sint32<3,2>"; }
+    typedef mi::math::Matrix<mi::Sint32,3,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::ISint32_3_3>
+template<> struct Type_traits<mi::ISint32_3_3>
 {
-  static const char* get_type_name() { return "Sint32<3,3>"; }
-  typedef mi::math::Matrix<mi::Sint32, 3, 3> Primitive_type;
+    static const char* get_type_name() { return "Sint32<3,3>"; }
+    typedef mi::math::Matrix<mi::Sint32,3,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::ISint32_3_4>
+template<> struct Type_traits<mi::ISint32_3_4>
 {
-  static const char* get_type_name() { return "Sint32<3,4>"; }
-  typedef mi::math::Matrix<mi::Sint32, 3, 4> Primitive_type;
+    static const char* get_type_name() { return "Sint32<3,4>"; }
+    typedef mi::math::Matrix<mi::Sint32,3,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::ISint32_4_2>
+template<> struct Type_traits<mi::ISint32_4_2>
 {
-  static const char* get_type_name() { return "Sint32<4,2>"; }
-  typedef mi::math::Matrix<mi::Sint32, 4, 2> Primitive_type;
+    static const char* get_type_name() { return "Sint32<4,2>"; }
+    typedef mi::math::Matrix<mi::Sint32,4,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::ISint32_4_3>
+template<> struct Type_traits<mi::ISint32_4_3>
 {
-  static const char* get_type_name() { return "Sint32<4,3>"; }
-  typedef mi::math::Matrix<mi::Sint32, 4, 3> Primitive_type;
+    static const char* get_type_name() { return "Sint32<4,3>"; }
+    typedef mi::math::Matrix<mi::Sint32,4,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::ISint32_4_4>
+template<> struct Type_traits<mi::ISint32_4_4>
 {
-  static const char* get_type_name() { return "Sint32<4,4>"; }
-  typedef mi::math::Matrix<mi::Sint32, 4, 4> Primitive_type;
+    static const char* get_type_name() { return "Sint32<4,4>"; }
+    typedef mi::math::Matrix<mi::Sint32,4,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IUint32_2_2>
+template<> struct Type_traits<mi::IUint32_2_2>
 {
-  static const char* get_type_name() { return "Uint32<2,2>"; }
-  typedef mi::math::Matrix<mi::Uint32, 2, 2> Primitive_type;
+    static const char* get_type_name() { return "Uint32<2,2>"; }
+    typedef mi::math::Matrix<mi::Uint32,2,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IUint32_2_3>
+template<> struct Type_traits<mi::IUint32_2_3>
 {
-  static const char* get_type_name() { return "Uint32<2,3>"; }
-  typedef mi::math::Matrix<mi::Uint32, 2, 3> Primitive_type;
+    static const char* get_type_name() { return "Uint32<2,3>"; }
+    typedef mi::math::Matrix<mi::Uint32,2,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IUint32_2_4>
+template<> struct Type_traits<mi::IUint32_2_4>
 {
-  static const char* get_type_name() { return "Uint32<2,4>"; }
-  typedef mi::math::Matrix<mi::Uint32, 2, 4> Primitive_type;
+    static const char* get_type_name() { return "Uint32<2,4>"; }
+    typedef mi::math::Matrix<mi::Uint32,2,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IUint32_3_2>
+template<> struct Type_traits<mi::IUint32_3_2>
 {
-  static const char* get_type_name() { return "Uint32<3,2>"; }
-  typedef mi::math::Matrix<mi::Uint32, 3, 2> Primitive_type;
+    static const char* get_type_name() { return "Uint32<3,2>"; }
+    typedef mi::math::Matrix<mi::Uint32,3,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IUint32_3_3>
+template<> struct Type_traits<mi::IUint32_3_3>
 {
-  static const char* get_type_name() { return "Uint32<3,3>"; }
-  typedef mi::math::Matrix<mi::Uint32, 3, 3> Primitive_type;
+    static const char* get_type_name() { return "Uint32<3,3>"; }
+    typedef mi::math::Matrix<mi::Uint32,3,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IUint32_3_4>
+template<> struct Type_traits<mi::IUint32_3_4>
 {
-  static const char* get_type_name() { return "Uint32<3,4>"; }
-  typedef mi::math::Matrix<mi::Uint32, 3, 4> Primitive_type;
+    static const char* get_type_name() { return "Uint32<3,4>"; }
+    typedef mi::math::Matrix<mi::Uint32,3,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IUint32_4_2>
+template<> struct Type_traits<mi::IUint32_4_2>
 {
-  static const char* get_type_name() { return "Uint32<4,2>"; }
-  typedef mi::math::Matrix<mi::Uint32, 4, 2> Primitive_type;
+    static const char* get_type_name() { return "Uint32<4,2>"; }
+    typedef mi::math::Matrix<mi::Uint32,4,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IUint32_4_3>
+template<> struct Type_traits<mi::IUint32_4_3>
 {
-  static const char* get_type_name() { return "Uint32<4,3>"; }
-  typedef mi::math::Matrix<mi::Uint32, 4, 3> Primitive_type;
+    static const char* get_type_name() { return "Uint32<4,3>"; }
+    typedef mi::math::Matrix<mi::Uint32,4,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IUint32_4_4>
+template<> struct Type_traits<mi::IUint32_4_4>
 {
-  static const char* get_type_name() { return "Uint32<4,4>"; }
-  typedef mi::math::Matrix<mi::Uint32, 4, 4> Primitive_type;
+    static const char* get_type_name() { return "Uint32<4,4>"; }
+    typedef mi::math::Matrix<mi::Uint32,4,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat32_2_2>
+template<> struct Type_traits<mi::IFloat32_2_2>
 {
-  static const char* get_type_name() { return "Float32<2,2>"; }
-  typedef mi::math::Matrix<mi::Float32, 2, 2> Primitive_type;
+    static const char* get_type_name() { return "Float32<2,2>"; }
+    typedef mi::math::Matrix<mi::Float32,2,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat32_2_3>
+template<> struct Type_traits<mi::IFloat32_2_3>
 {
-  static const char* get_type_name() { return "Float32<2,3>"; }
-  typedef mi::math::Matrix<mi::Float32, 2, 3> Primitive_type;
+    static const char* get_type_name() { return "Float32<2,3>"; }
+    typedef mi::math::Matrix<mi::Float32,2,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat32_2_4>
+template<> struct Type_traits<mi::IFloat32_2_4>
 {
-  static const char* get_type_name() { return "Float32<2,4>"; }
-  typedef mi::math::Matrix<mi::Float32, 2, 4> Primitive_type;
+    static const char* get_type_name() { return "Float32<2,4>"; }
+    typedef mi::math::Matrix<mi::Float32,2,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat32_3_2>
+template<> struct Type_traits<mi::IFloat32_3_2>
 {
-  static const char* get_type_name() { return "Float32<3,2>"; }
-  typedef mi::math::Matrix<mi::Float32, 3, 2> Primitive_type;
+    static const char* get_type_name() { return "Float32<3,2>"; }
+    typedef mi::math::Matrix<mi::Float32,3,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat32_3_3>
+template<> struct Type_traits<mi::IFloat32_3_3>
 {
-  static const char* get_type_name() { return "Float32<3,3>"; }
-  typedef mi::math::Matrix<mi::Float32, 3, 3> Primitive_type;
+    static const char* get_type_name() { return "Float32<3,3>"; }
+    typedef mi::math::Matrix<mi::Float32,3,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat32_3_4>
+template<> struct Type_traits<mi::IFloat32_3_4>
 {
-  static const char* get_type_name() { return "Float32<3,4>"; }
-  typedef mi::math::Matrix<mi::Float32, 3, 4> Primitive_type;
+    static const char* get_type_name() { return "Float32<3,4>"; }
+    typedef mi::math::Matrix<mi::Float32,3,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat32_4_2>
+template<> struct Type_traits<mi::IFloat32_4_2>
 {
-  static const char* get_type_name() { return "Float32<4,2>"; }
-  typedef mi::math::Matrix<mi::Float32, 4, 2> Primitive_type;
+    static const char* get_type_name() { return "Float32<4,2>"; }
+    typedef mi::math::Matrix<mi::Float32,4,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat32_4_3>
+template<> struct Type_traits<mi::IFloat32_4_3>
 {
-  static const char* get_type_name() { return "Float32<4,3>"; }
-  typedef mi::math::Matrix<mi::Float32, 4, 3> Primitive_type;
+    static const char* get_type_name() { return "Float32<4,3>"; }
+    typedef mi::math::Matrix<mi::Float32,4,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat32_4_4>
+template<> struct Type_traits<mi::IFloat32_4_4>
 {
-  static const char* get_type_name() { return "Float32<4,4>"; }
-  typedef mi::math::Matrix<mi::Float32, 4, 4> Primitive_type;
+    static const char* get_type_name() { return "Float32<4,4>"; }
+    typedef mi::math::Matrix<mi::Float32,4,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat64_2_2>
+template<> struct Type_traits<mi::IFloat64_2_2>
 {
-  static const char* get_type_name() { return "Float64<2,2>"; }
-  typedef mi::math::Matrix<mi::Float64, 2, 2> Primitive_type;
+    static const char* get_type_name() { return "Float64<2,2>"; }
+    typedef mi::math::Matrix<mi::Float64,2,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat64_2_3>
+template<> struct Type_traits<mi::IFloat64_2_3>
 {
-  static const char* get_type_name() { return "Float64<2,3>"; }
-  typedef mi::math::Matrix<mi::Float64, 2, 3> Primitive_type;
+    static const char* get_type_name() { return "Float64<2,3>"; }
+    typedef mi::math::Matrix<mi::Float64,2,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat64_2_4>
+template<> struct Type_traits<mi::IFloat64_2_4>
 {
-  static const char* get_type_name() { return "Float64<2,4>"; }
-  typedef mi::math::Matrix<mi::Float64, 2, 4> Primitive_type;
+    static const char* get_type_name() { return "Float64<2,4>"; }
+    typedef mi::math::Matrix<mi::Float64,2,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat64_3_2>
+template<> struct Type_traits<mi::IFloat64_3_2>
 {
-  static const char* get_type_name() { return "Float64<3,2>"; }
-  typedef mi::math::Matrix<mi::Float64, 3, 2> Primitive_type;
+    static const char* get_type_name() { return "Float64<3,2>"; }
+    typedef mi::math::Matrix<mi::Float64,3,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat64_3_3>
+template<> struct Type_traits<mi::IFloat64_3_3>
 {
-  static const char* get_type_name() { return "Float64<3,3>"; }
-  typedef mi::math::Matrix<mi::Float64, 3, 3> Primitive_type;
+    static const char* get_type_name() { return "Float64<3,3>"; }
+    typedef mi::math::Matrix<mi::Float64,3,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat64_3_4>
+template<> struct Type_traits<mi::IFloat64_3_4>
 {
-  static const char* get_type_name() { return "Float64<3,4>"; }
-  typedef mi::math::Matrix<mi::Float64, 3, 4> Primitive_type;
+    static const char* get_type_name() { return "Float64<3,4>"; }
+    typedef mi::math::Matrix<mi::Float64,3,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat64_4_2>
+template<> struct Type_traits<mi::IFloat64_4_2>
 {
-  static const char* get_type_name() { return "Float64<4,2>"; }
-  typedef mi::math::Matrix<mi::Float64, 4, 2> Primitive_type;
+    static const char* get_type_name() { return "Float64<4,2>"; }
+    typedef mi::math::Matrix<mi::Float64,4,2> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat64_4_3>
+template<> struct Type_traits<mi::IFloat64_4_3>
 {
-  static const char* get_type_name() { return "Float64<4,3>"; }
-  typedef mi::math::Matrix<mi::Float64, 4, 3> Primitive_type;
+    static const char* get_type_name() { return "Float64<4,3>"; }
+    typedef mi::math::Matrix<mi::Float64,4,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IFloat64_4_4>
+template<> struct Type_traits<mi::IFloat64_4_4>
 {
-  static const char* get_type_name() { return "Float64<4,4>"; }
-  typedef mi::math::Matrix<mi::Float64, 4, 4> Primitive_type;
+    static const char* get_type_name() { return "Float64<4,4>"; }
+    typedef mi::math::Matrix<mi::Float64,4,4> Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IColor>
+template<> struct Type_traits<mi::IColor>
 {
-  static const char* get_type_name() { return "Color"; }
-  typedef mi::math::Color Primitive_type;
+    static const char* get_type_name() { return "Color"; }
+    typedef mi::math::Color Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IColor3>
+template<> struct Type_traits<mi::IColor3>
 {
-  static const char* get_type_name() { return "Color3"; }
-  typedef mi::math::Color Primitive_type;
+    static const char* get_type_name() { return "Color3"; }
+    typedef mi::math::Color Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::ISpectrum>
+template<> struct Type_traits<mi::ISpectrum>
 {
-  static const char* get_type_name() { return "Spectrum"; }
-  typedef mi::math::Spectrum Primitive_type;
+    static const char* get_type_name() { return "Spectrum"; }
+    typedef mi::math::Spectrum Primitive_type;
 };
 
-template <>
-struct Type_traits<mi::IBbox3>
+template<> struct Type_traits<mi::IBbox3>
 {
-  static const char* get_type_name() { return "Bbox3"; }
-  typedef mi::math::Bbox<mi::Float32, 3> Primitive_type;
+    static const char* get_type_name() { return "Bbox3"; }
+    typedef mi::math::Bbox<mi::Float32,3> Primitive_type;
 };
 
-template <>
-struct Type_traits<bool>
-{
-  static const char* get_type_name() { return "Boolean"; };
-  typedef mi::IBoolean Interface_type;
-};
 
-template <>
-struct Type_traits<mi::Sint8>
+template<> struct Type_traits<bool>
 {
-  static const char* get_type_name() { return "Sint8"; };
-  typedef mi::ISint8 Interface_type;
+    static const char* get_type_name() { return "Boolean"; };
+    typedef mi::IBoolean Interface_type;
 };
 
-template <>
-struct Type_traits<mi::Sint16>
+template<> struct Type_traits<mi::Sint8>
 {
-  static const char* get_type_name() { return "Sint16"; };
-  typedef mi::ISint16 Interface_type;
+    static const char* get_type_name() { return "Sint8"; };
+    typedef mi::ISint8 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::Sint32>
+template<> struct Type_traits<mi::Sint16>
 {
-  static const char* get_type_name() { return "Sint32"; };
-  typedef mi::ISint32 Interface_type;
+    static const char* get_type_name() { return "Sint16"; };
+    typedef mi::ISint16 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::Sint64>
+template<> struct Type_traits<mi::Sint32>
 {
-  static const char* get_type_name() { return "Sint64"; };
-  typedef mi::ISint64 Interface_type;
+    static const char* get_type_name() { return "Sint32"; };
+    typedef mi::ISint32 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::Uint8>
+template<> struct Type_traits<mi::Sint64>
 {
-  static const char* get_type_name() { return "Uint8"; };
-  typedef mi::IUint8 Interface_type;
+    static const char* get_type_name() { return "Sint64"; };
+    typedef mi::ISint64 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::Uint16>
+template<> struct Type_traits<mi::Uint8>
 {
-  static const char* get_type_name() { return "Uint16"; };
-  typedef mi::IUint16 Interface_type;
+    static const char* get_type_name() { return "Uint8"; };
+    typedef mi::IUint8 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::Uint32>
+template<> struct Type_traits<mi::Uint16>
 {
-  static const char* get_type_name() { return "Uint32"; };
-  typedef mi::IUint32 Interface_type;
+    static const char* get_type_name() { return "Uint16"; };
+    typedef mi::IUint16 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::Uint64>
+template<> struct Type_traits<mi::Uint32>
 {
-  static const char* get_type_name() { return "Uint64"; };
-  typedef mi::IUint64 Interface_type;
+    static const char* get_type_name() { return "Uint32"; };
+    typedef mi::IUint32 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::Float32>
+template<> struct Type_traits<mi::Uint64>
 {
-  static const char* get_type_name() { return "Float32"; };
-  typedef mi::IFloat32 Interface_type;
+    static const char* get_type_name() { return "Uint64"; };
+    typedef mi::IUint64 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::Float64>
+template<> struct Type_traits<mi::Float32>
 {
-  static const char* get_type_name() { return "Float64"; };
-  typedef mi::IFloat64 Interface_type;
+    static const char* get_type_name() { return "Float32"; };
+    typedef mi::IFloat32 Interface_type;
 };
 
-template <>
-struct Type_traits<const char*>
+template<> struct Type_traits<mi::Float64>
 {
-  static const char* get_type_name() { return "String"; };
-  typedef mi::IString Interface_type;
+    static const char* get_type_name() { return "Float64"; };
+    typedef mi::IFloat64 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::base::Uuid>
+template<> struct Type_traits<const char*>
 {
-  static const char* get_type_name() { return "Uuid"; };
-  typedef mi::IUuid Interface_type;
+    static const char* get_type_name() { return "String"; };
+    typedef mi::IString Interface_type;
 };
 
-template <>
-struct Type_traits<void>
+template<> struct Type_traits<mi::base::Uuid>
 {
-  static const char* get_type_name() { return "Void"; };
-  typedef mi::IVoid Interface_type;
+    static const char* get_type_name() { return "Uuid"; };
+    typedef mi::IUuid Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Vector<bool, 2> >
+template<> struct Type_traits<void>
 {
-  static const char* get_type_name() { return "Boolean<2>"; };
-  typedef mi::IBoolean_2 Interface_type;
+    static const char* get_type_name() { return "Void"; };
+    typedef mi::IVoid Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Vector<bool, 3> >
+template<> struct Type_traits<mi::math::Vector<bool,2> >
 {
-  static const char* get_type_name() { return "Boolean<3>"; };
-  typedef mi::IBoolean_3 Interface_type;
+    static const char* get_type_name() { return "Boolean<2>"; };
+    typedef mi::IBoolean_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Vector<bool, 4> >
+template<> struct Type_traits<mi::math::Vector<bool,3> >
 {
-  static const char* get_type_name() { return "Boolean<4>"; };
-  typedef mi::IBoolean_4 Interface_type;
+    static const char* get_type_name() { return "Boolean<3>"; };
+    typedef mi::IBoolean_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Vector<mi::Sint32, 2> >
+template<> struct Type_traits<mi::math::Vector<bool,4> >
 {
-  static const char* get_type_name() { return "Sint32<2>"; };
-  typedef mi::ISint32_2 Interface_type;
+    static const char* get_type_name() { return "Boolean<4>"; };
+    typedef mi::IBoolean_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Vector<mi::Sint32, 3> >
+template<> struct Type_traits<mi::math::Vector<mi::Sint32,2> >
 {
-  static const char* get_type_name() { return "Sint32<3>"; };
-  typedef mi::ISint32_3 Interface_type;
+    static const char* get_type_name() { return "Sint32<2>"; };
+    typedef mi::ISint32_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Vector<mi::Sint32, 4> >
+template<> struct Type_traits<mi::math::Vector<mi::Sint32,3> >
 {
-  static const char* get_type_name() { return "Sint32<4>"; };
-  typedef mi::ISint32_4 Interface_type;
+    static const char* get_type_name() { return "Sint32<3>"; };
+    typedef mi::ISint32_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Vector<mi::Uint32, 2> >
+template<> struct Type_traits<mi::math::Vector<mi::Sint32,4> >
 {
-  static const char* get_type_name() { return "Uint32<2>"; };
-  typedef mi::IUint32_2 Interface_type;
+    static const char* get_type_name() { return "Sint32<4>"; };
+    typedef mi::ISint32_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Vector<mi::Uint32, 3> >
+template<> struct Type_traits<mi::math::Vector<mi::Uint32,2> >
 {
-  static const char* get_type_name() { return "Uint32<3>"; };
-  typedef mi::IUint32_3 Interface_type;
+    static const char* get_type_name() { return "Uint32<2>"; };
+    typedef mi::IUint32_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Vector<mi::Uint32, 4> >
+template<> struct Type_traits<mi::math::Vector<mi::Uint32,3> >
 {
-  static const char* get_type_name() { return "Uint32<4>"; };
-  typedef mi::IUint32_4 Interface_type;
+    static const char* get_type_name() { return "Uint32<3>"; };
+    typedef mi::IUint32_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Vector<mi::Float32, 2> >
+template<> struct Type_traits<mi::math::Vector<mi::Uint32,4> >
 {
-  static const char* get_type_name() { return "Float32<2>"; };
-  typedef mi::IFloat32_2 Interface_type;
+    static const char* get_type_name() { return "Uint32<4>"; };
+    typedef mi::IUint32_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Vector<mi::Float32, 3> >
+template<> struct Type_traits<mi::math::Vector<mi::Float32,2> >
 {
-  static const char* get_type_name() { return "Float32<3>"; };
-  typedef mi::IFloat32_3 Interface_type;
+    static const char* get_type_name() { return "Float32<2>"; };
+    typedef mi::IFloat32_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Vector<mi::Float32, 4> >
+template<> struct Type_traits<mi::math::Vector<mi::Float32,3> >
 {
-  static const char* get_type_name() { return "Float32<4>"; };
-  typedef mi::IFloat32_4 Interface_type;
+    static const char* get_type_name() { return "Float32<3>"; };
+    typedef mi::IFloat32_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Vector<mi::Float64, 2> >
+template<> struct Type_traits<mi::math::Vector<mi::Float32,4> >
 {
-  static const char* get_type_name() { return "Float64<2>"; };
-  typedef mi::IFloat64_2 Interface_type;
+    static const char* get_type_name() { return "Float32<4>"; };
+    typedef mi::IFloat32_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Vector<mi::Float64, 3> >
+template<> struct Type_traits<mi::math::Vector<mi::Float64,2> >
 {
-  static const char* get_type_name() { return "Float64<3>"; };
-  typedef mi::IFloat64_3 Interface_type;
+    static const char* get_type_name() { return "Float64<2>"; };
+    typedef mi::IFloat64_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Vector<mi::Float64, 4> >
+template<> struct Type_traits<mi::math::Vector<mi::Float64,3> >
 {
-  static const char* get_type_name() { return "Float64<4>"; };
-  typedef mi::IFloat64_4 Interface_type;
+    static const char* get_type_name() { return "Float64<3>"; };
+    typedef mi::IFloat64_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<bool, 2, 2> >
+template<> struct Type_traits<mi::math::Vector<mi::Float64,4> >
 {
-  static const char* get_type_name() { return "Boolean<2,2>"; };
-  typedef mi::IBoolean_2_2 Interface_type;
+    static const char* get_type_name() { return "Float64<4>"; };
+    typedef mi::IFloat64_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<bool, 2, 3> >
+template<> struct Type_traits<mi::math::Matrix<bool,2,2> >
 {
-  static const char* get_type_name() { return "Boolean<2,3>"; };
-  typedef mi::IBoolean_2_3 Interface_type;
+    static const char* get_type_name() { return "Boolean<2,2>"; };
+    typedef mi::IBoolean_2_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<bool, 2, 4> >
+template<> struct Type_traits<mi::math::Matrix<bool,2,3> >
 {
-  static const char* get_type_name() { return "Boolean<2,4>"; };
-  typedef mi::IBoolean_2_4 Interface_type;
+    static const char* get_type_name() { return "Boolean<2,3>"; };
+    typedef mi::IBoolean_2_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<bool, 3, 2> >
+template<> struct Type_traits<mi::math::Matrix<bool,2,4> >
 {
-  static const char* get_type_name() { return "Boolean<3,2>"; };
-  typedef mi::IBoolean_3_2 Interface_type;
+    static const char* get_type_name() { return "Boolean<2,4>"; };
+    typedef mi::IBoolean_2_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<bool, 3, 3> >
+template<> struct Type_traits<mi::math::Matrix<bool,3,2> >
 {
-  static const char* get_type_name() { return "Boolean<3,3>"; };
-  typedef mi::IBoolean_3_3 Interface_type;
+    static const char* get_type_name() { return "Boolean<3,2>"; };
+    typedef mi::IBoolean_3_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<bool, 3, 4> >
+template<> struct Type_traits<mi::math::Matrix<bool,3,3> >
 {
-  static const char* get_type_name() { return "Boolean<3,4>"; };
-  typedef mi::IBoolean_3_4 Interface_type;
+    static const char* get_type_name() { return "Boolean<3,3>"; };
+    typedef mi::IBoolean_3_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<bool, 4, 2> >
+template<> struct Type_traits<mi::math::Matrix<bool,3,4> >
 {
-  static const char* get_type_name() { return "Boolean<4,2>"; };
-  typedef mi::IBoolean_4_2 Interface_type;
+    static const char* get_type_name() { return "Boolean<3,4>"; };
+    typedef mi::IBoolean_3_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<bool, 4, 3> >
+template<> struct Type_traits<mi::math::Matrix<bool,4,2> >
 {
-  static const char* get_type_name() { return "Boolean<4,3>"; };
-  typedef mi::IBoolean_4_3 Interface_type;
+    static const char* get_type_name() { return "Boolean<4,2>"; };
+    typedef mi::IBoolean_4_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<bool, 4, 4> >
+template<> struct Type_traits<mi::math::Matrix<bool,4,3> >
 {
-  static const char* get_type_name() { return "Boolean<4,4>"; };
-  typedef mi::IBoolean_4_4 Interface_type;
+    static const char* get_type_name() { return "Boolean<4,3>"; };
+    typedef mi::IBoolean_4_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Sint32, 2, 2> >
+template<> struct Type_traits<mi::math::Matrix<bool,4,4> >
 {
-  static const char* get_type_name() { return "Sint32<2,2>"; };
-  typedef mi::ISint32_2_2 Interface_type;
+    static const char* get_type_name() { return "Boolean<4,4>"; };
+    typedef mi::IBoolean_4_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Sint32, 2, 3> >
+template<> struct Type_traits<mi::math::Matrix<mi::Sint32,2,2> >
 {
-  static const char* get_type_name() { return "Sint32<2,3>"; };
-  typedef mi::ISint32_2_3 Interface_type;
+    static const char* get_type_name() { return "Sint32<2,2>"; };
+    typedef mi::ISint32_2_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Sint32, 2, 4> >
+template<> struct Type_traits<mi::math::Matrix<mi::Sint32,2,3> >
 {
-  static const char* get_type_name() { return "Sint32<2,4>"; };
-  typedef mi::ISint32_2_4 Interface_type;
+    static const char* get_type_name() { return "Sint32<2,3>"; };
+    typedef mi::ISint32_2_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Sint32, 3, 2> >
+template<> struct Type_traits<mi::math::Matrix<mi::Sint32,2,4> >
 {
-  static const char* get_type_name() { return "Sint32<3,2>"; };
-  typedef mi::ISint32_3_2 Interface_type;
+    static const char* get_type_name() { return "Sint32<2,4>"; };
+    typedef mi::ISint32_2_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Sint32, 3, 3> >
+template<> struct Type_traits<mi::math::Matrix<mi::Sint32,3,2> >
 {
-  static const char* get_type_name() { return "Sint32<3,3>"; };
-  typedef mi::ISint32_3_3 Interface_type;
+    static const char* get_type_name() { return "Sint32<3,2>"; };
+    typedef mi::ISint32_3_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Sint32, 3, 4> >
+template<> struct Type_traits<mi::math::Matrix<mi::Sint32,3,3> >
 {
-  static const char* get_type_name() { return "Sint32<3,4>"; };
-  typedef mi::ISint32_3_4 Interface_type;
+    static const char* get_type_name() { return "Sint32<3,3>"; };
+    typedef mi::ISint32_3_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Sint32, 4, 2> >
+template<> struct Type_traits<mi::math::Matrix<mi::Sint32,3,4> >
 {
-  static const char* get_type_name() { return "Sint32<4,2>"; };
-  typedef mi::ISint32_4_2 Interface_type;
+    static const char* get_type_name() { return "Sint32<3,4>"; };
+    typedef mi::ISint32_3_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Sint32, 4, 3> >
+template<> struct Type_traits<mi::math::Matrix<mi::Sint32,4,2> >
 {
-  static const char* get_type_name() { return "Sint32<4,3>"; };
-  typedef mi::ISint32_4_3 Interface_type;
+    static const char* get_type_name() { return "Sint32<4,2>"; };
+    typedef mi::ISint32_4_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Sint32, 4, 4> >
+template<> struct Type_traits<mi::math::Matrix<mi::Sint32,4,3> >
 {
-  static const char* get_type_name() { return "Sint32<4,4>"; };
-  typedef mi::ISint32_4_4 Interface_type;
+    static const char* get_type_name() { return "Sint32<4,3>"; };
+    typedef mi::ISint32_4_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Uint32, 2, 2> >
+template<> struct Type_traits<mi::math::Matrix<mi::Sint32,4,4> >
 {
-  static const char* get_type_name() { return "Uint32<2,2>"; };
-  typedef mi::IUint32_2_2 Interface_type;
+    static const char* get_type_name() { return "Sint32<4,4>"; };
+    typedef mi::ISint32_4_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Uint32, 2, 3> >
+template<> struct Type_traits<mi::math::Matrix<mi::Uint32,2,2> >
 {
-  static const char* get_type_name() { return "Uint32<2,3>"; };
-  typedef mi::IUint32_2_3 Interface_type;
+    static const char* get_type_name() { return "Uint32<2,2>"; };
+    typedef mi::IUint32_2_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Uint32, 2, 4> >
+template<> struct Type_traits<mi::math::Matrix<mi::Uint32,2,3> >
 {
-  static const char* get_type_name() { return "Uint32<2,4>"; };
-  typedef mi::IUint32_2_4 Interface_type;
+    static const char* get_type_name() { return "Uint32<2,3>"; };
+    typedef mi::IUint32_2_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Uint32, 3, 2> >
+template<> struct Type_traits<mi::math::Matrix<mi::Uint32,2,4> >
 {
-  static const char* get_type_name() { return "Uint32<3,2>"; };
-  typedef mi::IUint32_3_2 Interface_type;
+    static const char* get_type_name() { return "Uint32<2,4>"; };
+    typedef mi::IUint32_2_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Uint32, 3, 3> >
+template<> struct Type_traits<mi::math::Matrix<mi::Uint32,3,2> >
 {
-  static const char* get_type_name() { return "Uint32<3,3>"; };
-  typedef mi::IUint32_3_3 Interface_type;
+    static const char* get_type_name() { return "Uint32<3,2>"; };
+    typedef mi::IUint32_3_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Uint32, 3, 4> >
+template<> struct Type_traits<mi::math::Matrix<mi::Uint32,3,3> >
 {
-  static const char* get_type_name() { return "Uint32<3,4>"; };
-  typedef mi::IUint32_3_4 Interface_type;
+    static const char* get_type_name() { return "Uint32<3,3>"; };
+    typedef mi::IUint32_3_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Uint32, 4, 2> >
+template<> struct Type_traits<mi::math::Matrix<mi::Uint32,3,4> >
 {
-  static const char* get_type_name() { return "Uint32<4,2>"; };
-  typedef mi::IUint32_4_2 Interface_type;
+    static const char* get_type_name() { return "Uint32<3,4>"; };
+    typedef mi::IUint32_3_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Uint32, 4, 3> >
+template<> struct Type_traits<mi::math::Matrix<mi::Uint32,4,2> >
 {
-  static const char* get_type_name() { return "Uint32<4,3>"; };
-  typedef mi::IUint32_4_3 Interface_type;
+    static const char* get_type_name() { return "Uint32<4,2>"; };
+    typedef mi::IUint32_4_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Uint32, 4, 4> >
+template<> struct Type_traits<mi::math::Matrix<mi::Uint32,4,3> >
 {
-  static const char* get_type_name() { return "Uint32<4,4>"; };
-  typedef mi::IUint32_4_4 Interface_type;
+    static const char* get_type_name() { return "Uint32<4,3>"; };
+    typedef mi::IUint32_4_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Float32, 2, 2> >
+template<> struct Type_traits<mi::math::Matrix<mi::Uint32,4,4> >
 {
-  static const char* get_type_name() { return "Float32<2,2>"; };
-  typedef mi::IFloat32_2_2 Interface_type;
+    static const char* get_type_name() { return "Uint32<4,4>"; };
+    typedef mi::IUint32_4_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Float32, 2, 3> >
+template<> struct Type_traits<mi::math::Matrix<mi::Float32,2,2> >
 {
-  static const char* get_type_name() { return "Float32<2,3>"; };
-  typedef mi::IFloat32_2_3 Interface_type;
+    static const char* get_type_name() { return "Float32<2,2>"; };
+    typedef mi::IFloat32_2_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Float32, 2, 4> >
+template<> struct Type_traits<mi::math::Matrix<mi::Float32,2,3> >
 {
-  static const char* get_type_name() { return "Float32<2,4>"; };
-  typedef mi::IFloat32_2_4 Interface_type;
+    static const char* get_type_name() { return "Float32<2,3>"; };
+    typedef mi::IFloat32_2_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Float32, 3, 2> >
+template<> struct Type_traits<mi::math::Matrix<mi::Float32,2,4> >
 {
-  static const char* get_type_name() { return "Float32<3,2>"; };
-  typedef mi::IFloat32_3_2 Interface_type;
+    static const char* get_type_name() { return "Float32<2,4>"; };
+    typedef mi::IFloat32_2_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Float32, 3, 3> >
+template<> struct Type_traits<mi::math::Matrix<mi::Float32,3,2> >
 {
-  static const char* get_type_name() { return "Float32<3,3>"; };
-  typedef mi::IFloat32_3_3 Interface_type;
+    static const char* get_type_name() { return "Float32<3,2>"; };
+    typedef mi::IFloat32_3_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Float32, 3, 4> >
+template<> struct Type_traits<mi::math::Matrix<mi::Float32,3,3> >
 {
-  static const char* get_type_name() { return "Float32<3,4>"; };
-  typedef mi::IFloat32_3_4 Interface_type;
+    static const char* get_type_name() { return "Float32<3,3>"; };
+    typedef mi::IFloat32_3_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Float32, 4, 2> >
+template<> struct Type_traits<mi::math::Matrix<mi::Float32,3,4> >
 {
-  static const char* get_type_name() { return "Float32<4,2>"; };
-  typedef mi::IFloat32_4_2 Interface_type;
+    static const char* get_type_name() { return "Float32<3,4>"; };
+    typedef mi::IFloat32_3_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Float32, 4, 3> >
+template<> struct Type_traits<mi::math::Matrix<mi::Float32,4,2> >
 {
-  static const char* get_type_name() { return "Float32<4,3>"; };
-  typedef mi::IFloat32_4_3 Interface_type;
+    static const char* get_type_name() { return "Float32<4,2>"; };
+    typedef mi::IFloat32_4_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Float32, 4, 4> >
+template<> struct Type_traits<mi::math::Matrix<mi::Float32,4,3> >
 {
-  static const char* get_type_name() { return "Float32<4,4>"; };
-  typedef mi::IFloat32_4_4 Interface_type;
+    static const char* get_type_name() { return "Float32<4,3>"; };
+    typedef mi::IFloat32_4_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Float64, 2, 2> >
+template<> struct Type_traits<mi::math::Matrix<mi::Float32,4,4> >
 {
-  static const char* get_type_name() { return "Float64<2,2>"; };
-  typedef mi::IFloat64_2_2 Interface_type;
+    static const char* get_type_name() { return "Float32<4,4>"; };
+    typedef mi::IFloat32_4_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Float64, 2, 3> >
+template<> struct Type_traits<mi::math::Matrix<mi::Float64,2,2> >
 {
-  static const char* get_type_name() { return "Float64<2,3>"; };
-  typedef mi::IFloat64_2_3 Interface_type;
+    static const char* get_type_name() { return "Float64<2,2>"; };
+    typedef mi::IFloat64_2_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Float64, 2, 4> >
+template<> struct Type_traits<mi::math::Matrix<mi::Float64,2,3> >
 {
-  static const char* get_type_name() { return "Float64<2,4>"; };
-  typedef mi::IFloat64_2_4 Interface_type;
+    static const char* get_type_name() { return "Float64<2,3>"; };
+    typedef mi::IFloat64_2_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Float64, 3, 2> >
+template<> struct Type_traits<mi::math::Matrix<mi::Float64,2,4> >
 {
-  static const char* get_type_name() { return "Float64<3,2>"; };
-  typedef mi::IFloat64_3_2 Interface_type;
+    static const char* get_type_name() { return "Float64<2,4>"; };
+    typedef mi::IFloat64_2_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Float64, 3, 3> >
+template<> struct Type_traits<mi::math::Matrix<mi::Float64,3,2> >
 {
-  static const char* get_type_name() { return "Float64<3,3>"; };
-  typedef mi::IFloat64_3_3 Interface_type;
+    static const char* get_type_name() { return "Float64<3,2>"; };
+    typedef mi::IFloat64_3_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Float64, 3, 4> >
+template<> struct Type_traits<mi::math::Matrix<mi::Float64,3,3> >
 {
-  static const char* get_type_name() { return "Float64<3,4>"; };
-  typedef mi::IFloat64_3_4 Interface_type;
+    static const char* get_type_name() { return "Float64<3,3>"; };
+    typedef mi::IFloat64_3_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Float64, 4, 2> >
+template<> struct Type_traits<mi::math::Matrix<mi::Float64,3,4> >
 {
-  static const char* get_type_name() { return "Float64<4,2>"; };
-  typedef mi::IFloat64_4_2 Interface_type;
+    static const char* get_type_name() { return "Float64<3,4>"; };
+    typedef mi::IFloat64_3_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Float64, 4, 3> >
+template<> struct Type_traits<mi::math::Matrix<mi::Float64,4,2> >
 {
-  static const char* get_type_name() { return "Float64<4,3>"; };
-  typedef mi::IFloat64_4_3 Interface_type;
+    static const char* get_type_name() { return "Float64<4,2>"; };
+    typedef mi::IFloat64_4_2 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Matrix<mi::Float64, 4, 4> >
+template<> struct Type_traits<mi::math::Matrix<mi::Float64,4,3> >
 {
-  static const char* get_type_name() { return "Float64<4,4>"; };
-  typedef mi::IFloat64_4_4 Interface_type;
+    static const char* get_type_name() { return "Float64<4,3>"; };
+    typedef mi::IFloat64_4_3 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Color>
+template<> struct Type_traits<mi::math::Matrix<mi::Float64,4,4> >
 {
-  static const char* get_type_name() { return "Color"; };
-  typedef mi::IColor Interface_type;
+    static const char* get_type_name() { return "Float64<4,4>"; };
+    typedef mi::IFloat64_4_4 Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Spectrum>
+template<> struct Type_traits<mi::math::Color>
 {
-  static const char* get_type_name() { return "Spectrum"; };
-  typedef mi::ISpectrum Interface_type;
+    static const char* get_type_name() { return "Color"; };
+    typedef mi::IColor Interface_type;
 };
 
-template <>
-struct Type_traits<mi::math::Bbox<mi::Float32, 3> >
+template<> struct Type_traits<mi::math::Spectrum>
 {
-  static const char* get_type_name() { return "Bbox3"; };
-  typedef mi::IBbox3 Interface_type;
+    static const char* get_type_name() { return "Spectrum"; };
+    typedef mi::ISpectrum Interface_type;
 };
 
-template <typename I, Size DIM>
-struct Vector_type_traits
+template<> struct Type_traits<mi::math::Bbox<mi::Float32,3> >
 {
+    static const char* get_type_name() { return "Bbox3"; };
+    typedef mi::IBbox3 Interface_type;
 };
 
-template <>
-struct Vector_type_traits<bool, 2>
-{
-  typedef mi::IBoolean_2 Interface_type;
-};
 
-template <>
-struct Vector_type_traits<bool, 3>
-{
-  typedef mi::IBoolean_3 Interface_type;
-};
+template<typename I, Size DIM> struct Vector_type_traits {};
 
-template <>
-struct Vector_type_traits<bool, 4>
-{
-  typedef mi::IBoolean_4 Interface_type;
-};
+template<> struct Vector_type_traits<bool, 2>
+{ typedef mi::IBoolean_2 Interface_type; };
 
-template <>
-struct Vector_type_traits<mi::Sint32, 2>
-{
-  typedef mi::ISint32_2 Interface_type;
-};
+template<> struct Vector_type_traits<bool, 3>
+{ typedef mi::IBoolean_3 Interface_type; };
 
-template <>
-struct Vector_type_traits<mi::Sint32, 3>
-{
-  typedef mi::ISint32_3 Interface_type;
-};
+template<> struct Vector_type_traits<bool, 4>
+{ typedef mi::IBoolean_4 Interface_type; };
 
-template <>
-struct Vector_type_traits<mi::Sint32, 4>
-{
-  typedef mi::ISint32_4 Interface_type;
-};
+template<> struct Vector_type_traits<mi::Sint32, 2>
+{ typedef mi::ISint32_2 Interface_type; };
 
-template <>
-struct Vector_type_traits<mi::Float32, 2>
-{
-  typedef mi::IFloat32_2 Interface_type;
-};
+template<> struct Vector_type_traits<mi::Sint32, 3>
+{ typedef mi::ISint32_3 Interface_type; };
 
-template <>
-struct Vector_type_traits<mi::Float32, 3>
-{
-  typedef mi::IFloat32_3 Interface_type;
-};
+template<> struct Vector_type_traits<mi::Sint32, 4>
+{ typedef mi::ISint32_4 Interface_type; };
 
-template <>
-struct Vector_type_traits<mi::Float32, 4>
-{
-  typedef mi::IFloat32_4 Interface_type;
-};
+template<> struct Vector_type_traits<mi::Float32, 2>
+{ typedef mi::IFloat32_2 Interface_type; };
 
-template <>
-struct Vector_type_traits<mi::Float64, 2>
-{
-  typedef mi::IFloat64_2 Interface_type;
-};
+template<> struct Vector_type_traits<mi::Float32, 3>
+{ typedef mi::IFloat32_3 Interface_type; };
 
-template <>
-struct Vector_type_traits<mi::Float64, 3>
-{
-  typedef mi::IFloat64_3 Interface_type;
-};
+template<> struct Vector_type_traits<mi::Float32, 4>
+{ typedef mi::IFloat32_4 Interface_type; };
 
-template <>
-struct Vector_type_traits<mi::Float64, 4>
-{
-  typedef mi::IFloat64_4 Interface_type;
-};
+template<> struct Vector_type_traits<mi::Float64, 2>
+{ typedef mi::IFloat64_2 Interface_type; };
 
-template <typename I, Size ROW, Size COL>
-struct Matrix_type_traits
-{
-};
+template<> struct Vector_type_traits<mi::Float64, 3>
+{ typedef mi::IFloat64_3 Interface_type; };
 
-template <>
-struct Matrix_type_traits<bool, 2, 2>
-{
-  typedef mi::IBoolean_2_2 Interface_type;
-};
+template<> struct Vector_type_traits<mi::Float64, 4>
+{ typedef mi::IFloat64_4 Interface_type; };
 
-template <>
-struct Matrix_type_traits<bool, 2, 3>
-{
-  typedef mi::IBoolean_2_3 Interface_type;
-};
 
-template <>
-struct Matrix_type_traits<bool, 2, 4>
-{
-  typedef mi::IBoolean_2_4 Interface_type;
-};
+template<typename I, Size ROW, Size COL> struct Matrix_type_traits {};
 
-template <>
-struct Matrix_type_traits<bool, 3, 2>
-{
-  typedef mi::IBoolean_3_2 Interface_type;
-};
+template<> struct Matrix_type_traits<bool, 2, 2>
+{ typedef mi::IBoolean_2_2 Interface_type; };
 
-template <>
-struct Matrix_type_traits<bool, 3, 3>
-{
-  typedef mi::IBoolean_3_3 Interface_type;
-};
+template<> struct Matrix_type_traits<bool, 2, 3>
+{ typedef mi::IBoolean_2_3 Interface_type; };
 
-template <>
-struct Matrix_type_traits<bool, 3, 4>
-{
-  typedef mi::IBoolean_3_4 Interface_type;
-};
+template<> struct Matrix_type_traits<bool, 2, 4>
+{ typedef mi::IBoolean_2_4 Interface_type; };
 
-template <>
-struct Matrix_type_traits<bool, 4, 2>
-{
-  typedef mi::IBoolean_4_2 Interface_type;
-};
+template<> struct Matrix_type_traits<bool, 3, 2>
+{ typedef mi::IBoolean_3_2 Interface_type; };
 
-template <>
-struct Matrix_type_traits<bool, 4, 3>
-{
-  typedef mi::IBoolean_4_3 Interface_type;
-};
+template<> struct Matrix_type_traits<bool, 3, 3>
+{ typedef mi::IBoolean_3_3 Interface_type; };
 
-template <>
-struct Matrix_type_traits<bool, 4, 4>
-{
-  typedef mi::IBoolean_4_4 Interface_type;
-};
+template<> struct Matrix_type_traits<bool, 3, 4>
+{ typedef mi::IBoolean_3_4 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Sint32, 2, 2>
-{
-  typedef mi::ISint32_2_2 Interface_type;
-};
+template<> struct Matrix_type_traits<bool, 4, 2>
+{ typedef mi::IBoolean_4_2 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Sint32, 2, 3>
-{
-  typedef mi::ISint32_2_3 Interface_type;
-};
+template<> struct Matrix_type_traits<bool, 4, 3>
+{ typedef mi::IBoolean_4_3 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Sint32, 2, 4>
-{
-  typedef mi::ISint32_2_4 Interface_type;
-};
+template<> struct Matrix_type_traits<bool, 4, 4>
+{ typedef mi::IBoolean_4_4 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Sint32, 3, 2>
-{
-  typedef mi::ISint32_3_2 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Sint32, 2, 2>
+{ typedef mi::ISint32_2_2 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Sint32, 3, 3>
-{
-  typedef mi::ISint32_3_3 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Sint32, 2, 3>
+{ typedef mi::ISint32_2_3 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Sint32, 3, 4>
-{
-  typedef mi::ISint32_3_4 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Sint32, 2, 4>
+{ typedef mi::ISint32_2_4 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Sint32, 4, 2>
-{
-  typedef mi::ISint32_4_2 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Sint32, 3, 2>
+{ typedef mi::ISint32_3_2 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Sint32, 4, 3>
-{
-  typedef mi::ISint32_4_3 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Sint32, 3, 3>
+{ typedef mi::ISint32_3_3 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Sint32, 4, 4>
-{
-  typedef mi::ISint32_4_4 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Sint32, 3, 4>
+{ typedef mi::ISint32_3_4 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Float32, 2, 2>
-{
-  typedef mi::IFloat32_2_2 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Sint32, 4, 2>
+{ typedef mi::ISint32_4_2 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Float32, 2, 3>
-{
-  typedef mi::IFloat32_2_3 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Sint32, 4, 3>
+{ typedef mi::ISint32_4_3 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Float32, 2, 4>
-{
-  typedef mi::IFloat32_2_4 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Sint32, 4, 4>
+{ typedef mi::ISint32_4_4 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Float32, 3, 2>
-{
-  typedef mi::IFloat32_3_2 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Float32, 2, 2>
+{ typedef mi::IFloat32_2_2 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Float32, 3, 3>
-{
-  typedef mi::IFloat32_3_3 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Float32, 2, 3>
+{ typedef mi::IFloat32_2_3 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Float32, 3, 4>
-{
-  typedef mi::IFloat32_3_4 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Float32, 2, 4>
+{ typedef mi::IFloat32_2_4 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Float32, 4, 2>
-{
-  typedef mi::IFloat32_4_2 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Float32, 3, 2>
+{ typedef mi::IFloat32_3_2 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Float32, 4, 3>
-{
-  typedef mi::IFloat32_4_3 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Float32, 3, 3>
+{ typedef mi::IFloat32_3_3 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Float32, 4, 4>
-{
-  typedef mi::IFloat32_4_4 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Float32, 3, 4>
+{ typedef mi::IFloat32_3_4 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Float64, 2, 2>
-{
-  typedef mi::IFloat64_2_2 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Float32, 4, 2>
+{ typedef mi::IFloat32_4_2 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Float64, 2, 3>
-{
-  typedef mi::IFloat64_2_3 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Float32, 4, 3>
+{ typedef mi::IFloat32_4_3 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Float64, 2, 4>
-{
-  typedef mi::IFloat64_2_4 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Float32, 4, 4>
+{ typedef mi::IFloat32_4_4 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Float64, 3, 2>
-{
-  typedef mi::IFloat64_3_2 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Float64, 2, 2>
+{ typedef mi::IFloat64_2_2 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Float64, 3, 3>
-{
-  typedef mi::IFloat64_3_3 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Float64, 2, 3>
+{ typedef mi::IFloat64_2_3 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Float64, 3, 4>
-{
-  typedef mi::IFloat64_3_4 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Float64, 2, 4>
+{ typedef mi::IFloat64_2_4 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Float64, 4, 2>
-{
-  typedef mi::IFloat64_4_2 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Float64, 3, 2>
+{ typedef mi::IFloat64_3_2 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Float64, 4, 3>
-{
-  typedef mi::IFloat64_4_3 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Float64, 3, 3>
+{ typedef mi::IFloat64_3_3 Interface_type; };
 
-template <>
-struct Matrix_type_traits<mi::Float64, 4, 4>
-{
-  typedef mi::IFloat64_4_4 Interface_type;
-};
+template<> struct Matrix_type_traits<mi::Float64, 3, 4>
+{ typedef mi::IFloat64_3_4 Interface_type; };
+
+template<> struct Matrix_type_traits<mi::Float64, 4, 2>
+{ typedef mi::IFloat64_4_2 Interface_type; };
+
+template<> struct Matrix_type_traits<mi::Float64, 4, 3>
+{ typedef mi::IFloat64_4_3 Interface_type; };
+
+template<> struct Matrix_type_traits<mi::Float64, 4, 4>
+{ typedef mi::IFloat64_4_4 Interface_type; };
 
 /*@}*/ // end group mi_neuray_types
 

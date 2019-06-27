@@ -9,14 +9,12 @@
 #ifndef MI_MATH_ASSERT_H
 #define MI_MATH_ASSERT_H
 
-#include <mi/base/assert.h>
 #include <mi/base/config.h>
+#include <mi/base/assert.h>
 
-namespace mi
-{
+namespace mi {
 
-namespace math
-{
+namespace math {
 
 /** \defgroup mi_math_assert \MathApiName Assertions
     \ingroup mi_math
@@ -41,8 +39,8 @@ namespace math
     @{
 */
 
-#if defined(mi_math_assert) && !defined(mi_math_assert_msg) ||                                     \
-  !defined(mi_math_assert) && defined(mi_math_assert_msg)
+#if       defined( mi_math_assert) && ! defined( mi_math_assert_msg) \
+     || ! defined( mi_math_assert) &&   defined( mi_math_assert_msg)
 error "Only one of mi_math_assert and mi_math_assert_msg has been defined. Please define both."
 #else
 #ifndef mi_math_assert
@@ -103,6 +101,7 @@ error "Only one of mi_math_assert and mi_math_assert_msg has been defined. Pleas
 
 #endif // mi_math_assert
 #endif // mi_math_assert xor mi_math_assert_msg
+
 
 /*@}*/ // end group mi_math_assert
 

@@ -11,11 +11,9 @@
 
 #include <mi/base/config.h>
 
-namespace mi
-{
+namespace mi {
 
-namespace base
-{
+namespace base {
 
 /** \defgroup mi_base_assert \BaseApiName Assertions
     \ingroup mi_base
@@ -54,37 +52,30 @@ namespace base
 #ifndef mi_static_assert
 #ifdef _MSC_VER
 // Special case for Visual Studio 7.1, since __LINE__ would not work.
-#define mi_static_assert(expr)                                                                     \
-  typedef mi::base::static_assert_test<static_cast<int>(                                           \
-    sizeof(mi::base::static_assert_failure<static_cast<bool>((expr))>))>                           \
-    MI_BASE_JOIN(static_assert_instance, __COUNTER__)
+#define mi_static_assert(expr)                                               \
+    typedef mi::base::static_assert_test<static_cast<int>(                   \
+        sizeof(mi::base::static_assert_failure<static_cast<bool>((expr))>))> \
+            MI_BASE_JOIN(static_assert_instance, __COUNTER__)
 #else // _MSC_VER
 #ifdef MI_COMPILER_GCC
 #define mi_static_assert_attribute __attribute__((unused))
 #else
 #define mi_static_assert_attribute
 #endif
-#define mi_static_assert(expr)                                                                     \
-  typedef mi::base::static_assert_test<static_cast<int>(                                           \
-    sizeof(mi::base::static_assert_failure<static_cast<bool>((expr))>))>                           \
-    MI_BASE_JOIN(static_assert_instance, __LINE__) mi_static_assert_attribute
+#define mi_static_assert(expr)                                               \
+    typedef mi::base::static_assert_test<static_cast<int>(                   \
+        sizeof(mi::base::static_assert_failure<static_cast<bool>((expr))>))> \
+            MI_BASE_JOIN(static_assert_instance, __LINE__) mi_static_assert_attribute
 #endif // _MSC_VER
 #endif // mi_static_assert
 
 // helper definitions for the mi_static_assert above.
-template <bool>
-struct static_assert_failure;
-template <>
-struct static_assert_failure<true>
-{
-};
-template <int>
-struct static_assert_test
-{
-};
+template <bool> struct static_assert_failure;
+template <>     struct static_assert_failure<true> {};
+template <int>  struct static_assert_test {};
 
-#if defined(mi_base_assert) && !defined(mi_base_assert_msg) ||                                     \
-  !defined(mi_base_assert) && defined(mi_base_assert_msg)
+#if       defined( mi_base_assert) && ! defined( mi_base_assert_msg) \
+     || ! defined( mi_base_assert) &&   defined( mi_base_assert_msg)
 error "Only one of mi_base_assert and mi_base_assert_msg has been defined. Please define both."
 #else
 #ifndef mi_base_assert
@@ -100,7 +91,7 @@ error "Only one of mi_base_assert and mi_base_assert_msg has been defined. Pleas
 /// and diagnostics within the specification given in the previous paragraph.
 ///
 /// \see \ref mi_base_intro_assert
-#define mi_base_assert(expr) (static_cast<void>(0))          // valid but void null stmt
+#define mi_base_assert(expr) (static_cast<void>(0)) // valid but void null stmt
 
 /// Base API assertion macro (with message).
 ///
@@ -147,16 +138,16 @@ error "Only one of mi_base_assert and mi_base_assert_msg has been defined. Pleas
 ///
 /// If possible, lets the asserts support function names in their message.
 #if defined(__FUNCSIG__)
-#define MI_BASE_ASSERT_FUNCTION __FUNCSIG__
-#elif defined(__cplusplus) && defined(__GNUC__) && defined(__GNUC_MINOR__) &&                      \
-  ((__GNUC__ << 16) + __GNUC_MINOR__ >= (2 << 16) + 6)
-#define MI_BASE_ASSERT_FUNCTION __PRETTY_FUNCTION__
+#  define MI_BASE_ASSERT_FUNCTION __FUNCSIG__
+#elif defined( __cplusplus) && defined(__GNUC__) && defined(__GNUC_MINOR__) \
+        && ((__GNUC__ << 16) + __GNUC_MINOR__ >= (2 << 16) + 6)
+#  define MI_BASE_ASSERT_FUNCTION    __PRETTY_FUNCTION__
 #else
-#if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
-#define MI_BASE_ASSERT_FUNCTION __func__
-#else
-#define MI_BASE_ASSERT_FUNCTION ("unknown")
-#endif
+#  if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
+#    define MI_BASE_ASSERT_FUNCTION    __func__
+#  else
+#    define MI_BASE_ASSERT_FUNCTION    ("unknown")
+#  endif
 #endif
 
 /*@}*/ // end group mi_base_assert

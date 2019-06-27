@@ -9,10 +9,8 @@
 
 #include <mi/base/iinterface.h>
 
-namespace mi
-{
-namespace base
-{
+namespace mi {
+namespace base {
 
 /** \addtogroup mi_base_iinterface
 @{
@@ -53,112 +51,123 @@ namespace base
 /// \tparam MAJOR   the implementation %base class
 /// \tparam MINOR   the interface %base class
 template <typename MAJOR, typename MINOR>
-class Interface_merger : public MAJOR, public MINOR
+class Interface_merger
+  : public MAJOR,
+    public MINOR
 {
 public:
-  /// Typedef for the MAJOR %base class
-  typedef MAJOR MAJOR_BASE;
+    /// Typedef for the MAJOR %base class
+    typedef MAJOR MAJOR_BASE;
+    
+    /// Typedef for the MINOR %base class
+    typedef MINOR MINOR_BASE;
 
-  /// Typedef for the MINOR %base class
-  typedef MINOR MINOR_BASE;
+    /// Reimplements #mi::base::IInterface::compare_iid().
+    ///
+    /// Forwards the call to the MAJOR %base class, and then, in case of failure, to the
+    /// MINOR %base class.
+    static bool compare_iid( const Uuid& iid) {
+        if( MAJOR::compare_iid( iid))
+            return true;
+        return MINOR::compare_iid( iid);
+    }
 
-  /// Reimplements #mi::base::IInterface::compare_iid().
-  ///
-  /// Forwards the call to the MAJOR %base class, and then, in case of failure, to the
-  /// MINOR %base class.
-  static bool compare_iid(const Uuid& iid)
-  {
-    if (MAJOR::compare_iid(iid))
-      return true;
-    return MINOR::compare_iid(iid);
-  }
+    /// Reimplements #mi::base::IInterface::get_interface(const Uuid&) const.
+    ///
+    /// Forwards the call to the MAJOR %base class, and then, in case of failure, to the
+    /// MINOR %base class.
+    const IInterface* get_interface( const Uuid& interface_id) const;
 
-  /// Reimplements #mi::base::IInterface::get_interface(const Uuid&) const.
-  ///
-  /// Forwards the call to the MAJOR %base class, and then, in case of failure, to the
-  /// MINOR %base class.
-  const IInterface* get_interface(const Uuid& interface_id) const;
+    /// Reimplements #mi::base::IInterface::get_interface() const.
+    ///
+    /// The implementation is identical, but needed for visibility reasons.
+    template <class T>
+    const T* get_interface() const {
+        return static_cast<const T*>( get_interface( typename T::IID()));
+    }
 
-  /// Reimplements #mi::base::IInterface::get_interface() const.
-  ///
-  /// The implementation is identical, but needed for visibility reasons.
-  template <class T>
-  const T* get_interface() const
-  {
-    return static_cast<const T*>(get_interface(typename T::IID()));
-  }
+    /// Reimplements #mi::base::IInterface::get_interface(const Uuid&).
+    ///
+    /// Forwards the call to the MAJOR %base class, and then, in case of failure, to the
+    /// MINOR %base class.
+    IInterface* get_interface( const Uuid& interface_id);
 
-  /// Reimplements #mi::base::IInterface::get_interface(const Uuid&).
-  ///
-  /// Forwards the call to the MAJOR %base class, and then, in case of failure, to the
-  /// MINOR %base class.
-  IInterface* get_interface(const Uuid& interface_id);
+    /// Reimplements #mi::base::IInterface::get_interface().
+    ///
+    /// The implementation is identical, but needed for visibility reasons.
+    template <class T>
+    T* get_interface() {
+        return static_cast<T*>( get_interface( typename T::IID()));
+    }
 
-  /// Reimplements #mi::base::IInterface::get_interface().
-  ///
-  /// The implementation is identical, but needed for visibility reasons.
-  template <class T>
-  T* get_interface()
-  {
-    return static_cast<T*>(get_interface(typename T::IID()));
-  }
+    /// Reimplements #mi::base::IInterface::get_iid().
+    ///
+    /// Forwards the call to the MAJOR %base class.
+    Uuid get_iid() const {
+        return MAJOR::get_iid();
+    }
 
-  /// Reimplements #mi::base::IInterface::get_iid().
-  ///
-  /// Forwards the call to the MAJOR %base class.
-  Uuid get_iid() const { return MAJOR::get_iid(); }
+    /// Reimplements #mi::base::IInterface::retain().
+    ///
+    /// Forwards the call to the MAJOR %base class.
+    mi::Uint32 retain() const {
+        return MAJOR::retain();
+    }
 
-  /// Reimplements #mi::base::IInterface::retain().
-  ///
-  /// Forwards the call to the MAJOR %base class.
-  mi::Uint32 retain() const { return MAJOR::retain(); }
+    /// Reimplements #mi::base::IInterface::release().
+    ///
+    /// Forwards the call to the MAJOR %base class.
+    mi::Uint32 release() const {
+        return MAJOR::release();
+    }
 
-  /// Reimplements #mi::base::IInterface::release().
-  ///
-  /// Forwards the call to the MAJOR %base class.
-  mi::Uint32 release() const { return MAJOR::release(); }
+    /// Returns a pointer to the MAJOR %base class.
+    ///
+    /// Note that #mi::base::IInterface is an ambiguous %base class. Often you just need a pointer
+    /// to #mi::base::IInterface but do not really care to which %base class it actually points to.
+    /// This method is intended to be used in these cases. It returns the pointer to the MAJOR
+    /// %base class, which can then be statically casted to #mi::base::IInterface (unless
+    /// Interface_merger is nested).
+    ///
+    /// \note The name \c cast_to_major() of this method emphasizes that it behaves similar to a
+    ///       static cast, in particular, it does not increase the reference count.
+    const MAJOR* cast_to_major() const {
+        return static_cast<const MAJOR*>( this);
+    }
 
-  /// Returns a pointer to the MAJOR %base class.
-  ///
-  /// Note that #mi::base::IInterface is an ambiguous %base class. Often you just need a pointer
-  /// to #mi::base::IInterface but do not really care to which %base class it actually points to.
-  /// This method is intended to be used in these cases. It returns the pointer to the MAJOR
-  /// %base class, which can then be statically casted to #mi::base::IInterface (unless
-  /// Interface_merger is nested).
-  ///
-  /// \note The name \c cast_to_major() of this method emphasizes that it behaves similar to a
-  ///       static cast, in particular, it does not increase the reference count.
-  const MAJOR* cast_to_major() const { return static_cast<const MAJOR*>(this); }
-
-  /// Returns a pointer to the MAJOR %base class.
-  ///
-  /// Note that #mi::base::IInterface is an ambiguous %base class. Often you just need a pointer
-  /// to #mi::base::IInterface but do not really care to which %base class it actually points to.
-  /// This method is intended to be used in these cases. It returns the pointer to the MAJOR
-  /// %base class, which can then be statically casted to #mi::base::IInterface (unless
-  /// Interface_merger is nested).
-  ///
-  /// \note The name \c cast_to_major() of this method emphasizes that it behaves similar to a
-  ///       static cast, in particular, it does not increase the reference count.
-  MAJOR* cast_to_major() { return static_cast<MAJOR*>(this); }
+    /// Returns a pointer to the MAJOR %base class.
+    ///
+    /// Note that #mi::base::IInterface is an ambiguous %base class. Often you just need a pointer
+    /// to #mi::base::IInterface but do not really care to which %base class it actually points to.
+    /// This method is intended to be used in these cases. It returns the pointer to the MAJOR
+    /// %base class, which can then be statically casted to #mi::base::IInterface (unless
+    /// Interface_merger is nested).
+    ///
+    /// \note The name \c cast_to_major() of this method emphasizes that it behaves similar to a
+    ///       static cast, in particular, it does not increase the reference count.
+    MAJOR* cast_to_major() {
+        return static_cast<MAJOR*>( this);
+    }
 };
 
 template <typename MAJOR, typename MINOR>
-const IInterface* Interface_merger<MAJOR, MINOR>::get_interface(const Uuid& interface_id) const
+const IInterface* Interface_merger<MAJOR,MINOR>::get_interface(
+    const Uuid& interface_id) const
 {
-  const IInterface* iinterface = MAJOR::get_interface(interface_id);
-  if (iinterface)
-    return iinterface;
-  return MINOR::get_interface_static(static_cast<const MINOR*>(this), interface_id);
+    const IInterface* iinterface = MAJOR::get_interface( interface_id);
+    if( iinterface)
+        return iinterface;
+    return MINOR::get_interface_static( static_cast<const MINOR*>( this), interface_id);
 }
 
 template <typename MAJOR, typename MINOR>
-IInterface* Interface_merger<MAJOR, MINOR>::get_interface(const Uuid& interface_id)
+IInterface* Interface_merger<MAJOR,MINOR>::get_interface(
+    const Uuid& interface_id)
 {
-  IInterface* iinterface = MAJOR::get_interface(interface_id);
-  if (iinterface)
-    return iinterface;
-  return MINOR::get_interface_static(static_cast<MINOR*>(this), interface_id);
+    IInterface* iinterface = MAJOR::get_interface( interface_id);
+    if( iinterface)
+        return iinterface;
+    return MINOR::get_interface_static( static_cast<MINOR*>( this), interface_id);
 }
 
 /*@}*/ // end group mi_base_iinterface

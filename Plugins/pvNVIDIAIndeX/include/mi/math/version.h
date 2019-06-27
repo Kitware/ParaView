@@ -31,7 +31,8 @@
 //
 // A change in this version number indicates that the binary compatibility of the interfaces offered
 // through the shared library have changed. Older versions can then explicitly asked for.
-#define MI_MATH_API_VERSION 0
+#define MI_MATH_API_VERSION  0
+
 
 // The following three to four macros define the API version. The macros thereafter are defined in
 // terms of the first four.
@@ -39,12 +40,12 @@
 /// Math API major version number
 ///
 /// \see   \ref mi_math_intro_versioning
-#define MI_MATH_VERSION_MAJOR 1
+#define MI_MATH_VERSION_MAJOR  1
 
 /// Math API minor version number
 ///
 /// \see   \ref mi_math_intro_versioning
-#define MI_MATH_VERSION_MINOR 1
+#define MI_MATH_VERSION_MINOR  1
 
 /// Math API version qualifier
 ///
@@ -53,23 +54,23 @@
 /// \c MI_MATH_VERSION_QUALIFIER_EMPTY is defined as well.
 ///
 /// \see \ref mi_math_intro_versioning
-#define MI_MATH_VERSION_QUALIFIER ""
+#define MI_MATH_VERSION_QUALIFIER  ""
 
 // This macro is defined if #MI_MATH_VERSION_QUALIFIER is the empty string \c "".
 #define MI_MATH_VERSION_QUALIFIER_EMPTY
 
 /// Math API major and minor version number without qualifier in a string representation, such as
 /// \c "1.1".
-#define MI_MATH_VERSION_STRING                                                                     \
-  MI_BASE_STRINGIZE(MI_MATH_VERSION_MAJOR) "." MI_BASE_STRINGIZE(MI_MATH_VERSION_MINOR)
+#define MI_MATH_VERSION_STRING  MI_BASE_STRINGIZE(MI_MATH_VERSION_MAJOR) "." \
+                                MI_BASE_STRINGIZE(MI_MATH_VERSION_MINOR)
 
 /// \def MI_MATH_VERSION_QUALIFIED_STRING
 /// Math API major and minor version number and qualifier in a string representation, such as
 /// \c "1.1" or \c "1.2-beta2".
 #ifdef MI_MATH_VERSION_QUALIFIER_EMPTY
-#define MI_MATH_VERSION_QUALIFIED_STRING MI_MATH_VERSION_STRING
+#define MI_MATH_VERSION_QUALIFIED_STRING  MI_MATH_VERSION_STRING
 #else
-#define MI_MATH_VERSION_QUALIFIED_STRING MI_MATH_VERSION_STRING "-" MI_MATH_VERSION_QUALIFIER
+#define MI_MATH_VERSION_QUALIFIED_STRING  MI_MATH_VERSION_STRING "-" MI_MATH_VERSION_QUALIFIER
 #endif // MI_MATH_VERSION_QUALIFIER_EMPTY
 
 /*@}*/ // end group mi_math_version
