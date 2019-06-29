@@ -1871,10 +1871,9 @@
       selection used to select blocks from a composite dataset.</Documentation>
       <IdTypeVectorProperty clean_command="RemoveAllBlocks"
                             command="AddBlock"
-                            default_values="0"
                             label="Blocks"
                             name="Blocks"
-                            number_of_elements="1"
+                            number_of_elements="0"
                             number_of_elements_per_command="1"
                             repeat_command="1">
         <Documentation>The list of blocks that will be added to the selection
@@ -1917,10 +1916,9 @@
       based selection.</Documentation>
       <IdTypeVectorProperty clean_command="RemoveAllGlobalIDs"
                             command="AddGlobalID"
-                            default_values="0"
                             label="Global IDs"
                             name="IDs"
-                            number_of_elements="1"
+                            number_of_elements="0"
                             number_of_elements_per_command="1"
                             repeat_command="1">
         <Documentation>The list of IDs that will be added to the selection
@@ -1973,9 +1971,8 @@
       datasets.</Documentation>
       <IdTypeVectorProperty clean_command="RemoveAllIDs"
                             command="AddID"
-                            default_values="0 0"
                             name="IDs"
-                            number_of_elements="2"
+                            number_of_elements="0"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <Documentation>The list of IDs that will be added to the selection
@@ -1994,9 +1991,8 @@
       dataset).</Documentation>
       <IdTypeVectorProperty clean_command="RemoveAllCompositeIDs"
                             command="AddCompositeID"
-                            default_values="0 0 0"
                             name="IDs"
-                            number_of_elements="3"
+                            number_of_elements="0"
                             number_of_elements_per_command="3"
                             repeat_command="1">
         <Documentation>The list of IDs that will be added to the selection
@@ -2014,9 +2010,8 @@
       based selection for HierarchicalBox datasets.</Documentation>
       <IdTypeVectorProperty clean_command="RemoveAllHierarchicalIDs"
                             command="AddHierarhicalID"
-                            default_values="0 0 0"
                             name="IDs"
-                            number_of_elements="3"
+                            number_of_elements="0"
                             number_of_elements_per_command="3"
                             repeat_command="1">
         <Documentation>The list of IDs that will be added to the selection
@@ -2060,9 +2055,8 @@
       selection.</Documentation>
       <DoubleVectorProperty clean_command="RemoveAllLocations"
                             command="AddLocation"
-                            default_values="0 0 0"
                             name="Locations"
-                            number_of_elements="3"
+                            number_of_elements="0"
                             number_of_elements_per_command="3"
                             repeat_command="1">
         <Documentation>The list of locations that will be added to the
