@@ -227,7 +227,7 @@ protected:
   int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   virtual int RequestAMRData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
-  virtual int RequestCompositeData(vtkInformation* request, vtkInformationVector** inputVector,
+  virtual int RequestDataObjectTree(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
@@ -344,7 +344,7 @@ private:
    * dataset. The array has one value set to
    * (blockIndex % BlockColorsDistinctValues)
    */
-  void AddBlockColors(vtkPolyData* pd, unsigned int index);
+  void AddBlockColors(vtkDataObject* pd, unsigned int index);
   void AddHierarchicalIndex(vtkPolyData* pd, unsigned int level, unsigned int index);
   class BoundsReductionOperation;
   //@}
