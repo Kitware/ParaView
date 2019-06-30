@@ -304,6 +304,11 @@ bool vtkSMLoadStateOptionsProxy::LocateFilesInDirectory(
   std::vector<std::string>::iterator fIter;
   for (fIter = filepaths.begin(); fIter != filepaths.end(); ++fIter)
   {
+    if (fIter->empty())
+    {
+      // don't attempt to fix empty strings (see paraview/paraview#19137).
+      continue;
+    }
     // TODO: Inefficient - need vtkPVInfomation class to bundle file paths
     if (numOfPathMatches < this->PathMatchingThreshold)
     {
