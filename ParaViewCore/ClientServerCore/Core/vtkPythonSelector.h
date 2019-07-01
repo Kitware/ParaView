@@ -35,7 +35,7 @@ public:
   /**
    * Overridden to delegate the selection to the Python expression.
    */
-  bool ComputeSelectedElements(vtkDataObject* input, vtkDataObject* output) override;
+  void Execute(vtkDataObject* input, vtkDataObject* output) override;
 
 protected:
   vtkPythonSelector();
@@ -44,12 +44,7 @@ protected:
   /**
    * Implementing this is required by the superclass.
    */
-  virtual bool ComputeSelectedElementsForBlock(vtkDataObject* vtkNotUsed(input),
-    vtkSignedCharArray* vtkNotUsed(insidednessArray), unsigned int vtkNotUsed(compositeIndex),
-    unsigned int vtkNotUsed(amrLevel), unsigned int vtkNotUsed(amrIndex)) override
-  {
-    return false;
-  }
+  bool ComputeSelectedElements(vtkDataObject*, vtkSignedCharArray*) override { return false; }
 
 private:
   vtkPythonSelector(const vtkPythonSelector&) = delete;

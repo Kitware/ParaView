@@ -39,7 +39,7 @@ vtkPythonSelector::~vtkPythonSelector()
 }
 
 //----------------------------------------------------------------------------
-bool vtkPythonSelector::ComputeSelectedElements(vtkDataObject* input, vtkDataObject* output)
+void vtkPythonSelector::Execute(vtkDataObject* input, vtkDataObject* output)
 {
   assert(input != nullptr);
   assert(output != nullptr);
@@ -58,7 +58,7 @@ bool vtkPythonSelector::ComputeSelectedElements(vtkDataObject* input, vtkDataObj
     {
       PyErr_Print();
       PyErr_Clear();
-      return false;
+      return;
     }
   }
 
@@ -78,11 +78,8 @@ bool vtkPythonSelector::ComputeSelectedElements(vtkDataObject* input, vtkDataObj
     {
       PyErr_Print();
       PyErr_Clear();
-      return false;
     }
   }
-
-  return true;
 }
 
 //----------------------------------------------------------------------------

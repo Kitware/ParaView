@@ -82,7 +82,8 @@ def pointIsNear(locations, distance, inputs):
 
     from paraview.vtk.vtkFiltersExtraction import vtkLocationSelector
     selector = vtkLocationSelector()
-    selector.Initialize(node, "vtkInsidedness")
+    selector.SetInsidednessArrayName("vtkInsidedness")
+    selector.Initialize(node)
 
     inputDO = inputs[0].VTKObject
     outputDO = inputDO.NewInstance()
@@ -95,7 +96,7 @@ def pointIsNear(locations, distance, inputs):
         while not it.IsDoneWithTraversal():
             outputDO.SetDataSet(it, inputDO.GetDataSet(it).NewInstance())
             it.GoToNextItem()
-    selector.ComputeSelectedElements(inputDO, outputDO)
+    selector.Execute(inputDO, outputDO)
 
     return output.PointData.GetArray('vtkInsidedness')
 
@@ -112,7 +113,8 @@ def cellContainsPoint(inputs, locations):
 
     from paraview.vtk.vtkFiltersExtraction import vtkLocationSelector
     selector = vtkLocationSelector()
-    selector.Initialize(node, "vtkInsidedness")
+    selector.SetInsidednessArrayName("vtkInsidedness")
+    selector.Initialize(node)
 
     inputDO = inputs[0].VTKObject
     outputDO = inputDO.NewInstance()
@@ -125,7 +127,7 @@ def cellContainsPoint(inputs, locations):
         while not it.IsDoneWithTraversal():
             outputDO.SetDataSet(it, inputDO.GetDataSet(it).NewInstance())
             it.GoToNextItem()
-    selector.ComputeSelectedElements(inputDO, outputDO)
+    selector.Execute(inputDO, outputDO)
 
     return output.CellData.GetArray('vtkInsidedness')
 
