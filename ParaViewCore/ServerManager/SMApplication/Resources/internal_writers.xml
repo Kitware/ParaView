@@ -81,9 +81,9 @@
         <Documentation>Sets the lower bound for timesteps to write.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="EnableWidgetDecorator">
-	    <Property name="WriteTimeSteps" function="boolean" />
-	  </PropertyWidgetDecorator>
-	</Hints>
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetMaxTimeStep"
                          default_values="-1"
@@ -94,9 +94,9 @@
         less than min, the last time step is used.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="EnableWidgetDecorator">
-	    <Property name="WriteTimeSteps" function="boolean" />
-	  </PropertyWidgetDecorator>
-	</Hints>
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetTimeStepStride"
                          default_values="1"
@@ -108,33 +108,33 @@
         <Documentation>Sets the stride to go through the time steps.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="EnableWidgetDecorator">
-	    <Property name="WriteTimeSteps" function="boolean" />
-	  </PropertyWidgetDecorator>
-	</Hints>
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
       </IntVectorProperty>
 
       <StringVectorProperty command="SetFileNameSuffix"
-			    default_values="_%d"
-		            label = "File name suffix"
+                            default_values="_%d"
+                            label = "File name suffix"
                             name="FileNameSuffix"
                             number_of_elements="1">
         <Documentation>
-	  The suffix to append to the file name when writing files at different timesteps.
-	  (File extensions such as .vtk should be excluded.)
-          The % format specifiers are used. For example, _%d will write files as FileName_0,
-	  FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
-          FileName_001, FileName_002 etc.
+        The suffix to append to the file name when writing files at different timesteps.
+        File extensions such as .vtk should be excluded.
+        The `%` format specifiers are used. For example, _%d will write files as FileName_0,
+        FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
+        FileName_001, FileName_002 etc.
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="EnableWidgetDecorator">
-	    <Property name="WriteTimeSteps" function="boolean" />
-	  </PropertyWidgetDecorator>
-	</Hints>
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
       </StringVectorProperty>
 
       <PropertyGroup label="File Series">
         <Property name="WriteTimeSteps" />
-	<Property name="FileNameSuffix"/>
+        <Property name="FileNameSuffix"/>
         <Property name="MinTimeStep" />
         <Property name="MaxTimeStep" />
         <Property name="TimeStepStride" />
@@ -174,9 +174,9 @@
         <Documentation>Sets the lower bound for timesteps to write.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="EnableWidgetDecorator">
-	    <Property name="WriteTimeSteps" function="boolean" />
-	  </PropertyWidgetDecorator>
-	</Hints>
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetMaxTimeStep"
                          default_values="-1"
@@ -187,9 +187,9 @@
         less than min, the last time step is used.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="EnableWidgetDecorator">
-	    <Property name="WriteTimeSteps" function="boolean" />
-	  </PropertyWidgetDecorator>
-	</Hints>
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetTimeStepStride"
                          default_values="1"
@@ -201,28 +201,28 @@
         <Documentation>Sets the stride to go through the time steps.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="EnableWidgetDecorator">
-	    <Property name="WriteTimeSteps" function="boolean" />
-	  </PropertyWidgetDecorator>
-	</Hints>
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
       </IntVectorProperty>
 
       <StringVectorProperty command="SetFileNameSuffix"
-			    default_values="_%d"
-		            label = "File name suffix"
+                            default_values="_%d"
+                            label = "File name suffix"
                             name="FileNameSuffix"
                             number_of_elements="1">
         <Documentation>
-	  The suffix to append to the file name when writing files at different timesteps.
-	  (File extensions such as .vtk should be excluded.)
+          The suffix to append to the file name when writing files at different timesteps.
+          File extensions such as .vtk should be excluded.
           The % format specifiers are used. For example, _%d will write files as FileName_0,
-	  FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
+          FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
           FileName_001, FileName_002 etc.
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="EnableWidgetDecorator">
-	    <Property name="WriteTimeSteps" function="boolean" />
-	  </PropertyWidgetDecorator>
-	</Hints>
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
       </StringVectorProperty>
 
       <PropertyGroup label="File Series">
@@ -232,6 +232,7 @@
         <Property name="MaxTimeStep" />
         <Property name="TimeStepStride" />
       </PropertyGroup>
+
 
       <!-- End of ParallelFileSeriesWriter -->
     </Proxy>
