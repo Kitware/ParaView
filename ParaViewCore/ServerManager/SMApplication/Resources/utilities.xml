@@ -3818,8 +3818,12 @@
       </IntVectorProperty>
 
       <StringVectorProperty name="RootDirectory"
-                         number_of_elements="1"
-                         default_values="">
+                            number_of_elements="1"
+                            default_values="">
+        <FileListDomain name="directory" />
+        <Hints>
+          <UseDirectoryName/>
+        </Hints>
         <Documentation>
           Defines a top level directory where Catalyst output files are placed under.
         </Documentation>
