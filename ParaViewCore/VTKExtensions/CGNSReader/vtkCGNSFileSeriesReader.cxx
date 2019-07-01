@@ -375,12 +375,16 @@ struct ANode
   bool SyncMetadata(vtkMultiProcessController* controller)
   {
     // note: this is not optimized to deep trees.
-    const unsigned int counts[2] = { static_cast<unsigned int>(this->Children.size()),
-      static_cast<unsigned int>(this->Datasets.size()) };
-    unsigned int max_counts[2];
-    controller->AllReduce(counts, max_counts, 2, vtkCommunicator::MAX_OP);
-    assert(max_counts[0] == 0 || max_counts[1] == 0);
-    if (max_counts[0] > 0)
+    const unsigned int child_count = static_cast<unsigned int>(this->Children.size());
+    unsigned int max_child_count;
+    controller->AllReduce(&child_count, &max_child_count, 1, vtkCommunicator::MAX_OP);
+
+    unsigned int ds_count = static_cast<unsigned int>(this->Datasets.size());
+    unsigned int total_ds_count;
+    controller->AllReduce(&ds_count, &total_ds_count, 1, vtkCommunicator::SUM_OP);
+
+    assert(max_child_count == 0 || total_ds_count == 0); // one of two must be 0.
+    if (max_child_count > 0)
     {
       std::set<std::string> cnames;
       for (auto citer = this->Children.begin(); citer != this->Children.end(); ++citer)
@@ -402,9 +406,9 @@ struct ANode
         citer->second->SyncMetadata(controller);
       }
     }
-    else if (max_counts[1] > 0)
+    else if (total_ds_count > 0)
     {
-      this->Datasets.resize(max_counts[1]);
+      this->Datasets.resize(total_ds_count);
     }
     return true;
   }
