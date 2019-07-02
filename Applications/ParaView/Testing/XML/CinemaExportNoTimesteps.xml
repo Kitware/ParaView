@@ -2,7 +2,7 @@
 <pqevents>
   <!-- load state -->
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileLoadServerState" />
-  <pqevent object="pqClientMainWindow/FileLoadServerStateDialog" command="filesSelected" arguments="/Users/stam/GitParaVTK/david-paraview-import-catalyst_tests/build/ExternalData/Testing/Data/time_source.pvsm" />
+  <pqevent object="pqClientMainWindow/FileLoadServerStateDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/time_source.pvsm" />
   <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/LoadStateDataFileOptions/ComboBox" command="activated" arguments="Search files under specified directory" />
   <pqevent object="LoadStateOptionsDialog/widget/OKButton" command="activate" arguments="$PARAVIEW_TEST_ROOT" />
 
