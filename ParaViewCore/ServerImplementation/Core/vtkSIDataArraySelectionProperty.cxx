@@ -17,6 +17,7 @@
 #include "vtkClientServerStream.h"
 #include "vtkDataArraySelection.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
 
 #include <string>
@@ -25,6 +26,7 @@ vtkStandardNewMacro(vtkSIDataArraySelectionProperty);
 //----------------------------------------------------------------------------
 vtkSIDataArraySelectionProperty::vtkSIDataArraySelectionProperty()
 {
+  this->NumberOfElementsPerCommand = 2;
 }
 
 //----------------------------------------------------------------------------
@@ -63,6 +65,33 @@ vtkDataArraySelection* vtkSIDataArraySelectionProperty::GetSelection()
 }
 
 //----------------------------------------------------------------------------
+bool vtkSIDataArraySelectionProperty::ReadXMLAttributes(
+  vtkSIProxy* proxyhelper, vtkPVXMLElement* element)
+{
+  if (!this->Superclass::ReadXMLAttributes(proxyhelper, element))
+  {
+    return false;
+  }
+
+  int number_of_elements_per_command = 0;
+  if (element->GetScalarAttribute(
+        "number_of_elements_per_command", &number_of_elements_per_command))
+  {
+    if (number_of_elements_per_command != 1 && number_of_elements_per_command != 2)
+    {
+      vtkErrorMacro("`number_of_elements_per_command` must be 1 or 2, if specified");
+      return false;
+    }
+    this->NumberOfElementsPerCommand = number_of_elements_per_command;
+  }
+  else
+  {
+    this->NumberOfElementsPerCommand = 2;
+  }
+  return true;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSIDataArraySelectionProperty::Push(vtkSMMessage* message, int offset)
 {
   if (this->InformationOnly)
@@ -77,11 +106,23 @@ bool vtkSIDataArraySelectionProperty::Push(vtkSMMessage* message, int offset)
 
     const Variant& variant = prop->value();
     const int num_elems = variant.txt_size();
-    for (int cc = 0; cc < num_elems; cc += 2)
+
+    if (this->NumberOfElementsPerCommand == 2)
     {
-      const auto name = variant.txt(cc);
-      const int status = variant.txt(cc + 1) == "0" ? 0 : 1;
-      selection->SetArraySetting(name.c_str(), status);
+      for (int cc = 0; (cc + 1) < num_elems; cc += 2)
+      {
+        const auto name = variant.txt(cc);
+        const int status = variant.txt(cc + 1) == "0" ? 0 : 1;
+        selection->SetArraySetting(name.c_str(), status);
+      }
+    }
+    else if (this->NumberOfElementsPerCommand == 1)
+    {
+      selection->RemoveAllArrays();
+      for (int cc = 0; cc < num_elems; ++cc)
+      {
+        selection->EnableArray(variant.txt(cc).c_str());
+      }
     }
     return true;
   }
