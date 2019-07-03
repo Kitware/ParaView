@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqArraySelectionWidget.h"
 #include "pqTreeViewSelectionHelper.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMProxy.h"
@@ -64,6 +65,12 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
     if (prop && prop->GetInformationOnly() == 0)
     {
       const char* property_name = smproxy->GetPropertyName(prop);
+      if (auto hints = prop->GetHints()
+          ? prop->GetHints()->FindNestedElementByName("ArraySelectionWidget")
+          : nullptr)
+      {
+        selectorWidget->setIconType(property_name, hints->GetAttribute("icon_type"));
+      }
       this->addPropertyLink(selectorWidget, property_name, SIGNAL(widgetModified()), prop);
     }
   }
@@ -89,6 +96,14 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
   hbox->setSpacing(4);
 
   const char* property_name = smproxy->GetPropertyName(smproperty);
+
+  if (auto hints = smproperty->GetHints()
+      ? smproperty->GetHints()->FindNestedElementByName("ArraySelectionWidget")
+      : nullptr)
+  {
+    selectorWidget->setIconType(property_name, hints->GetAttribute("icon_type"));
+  }
+
   this->addPropertyLink(selectorWidget, property_name, SIGNAL(widgetModified()), smproperty);
 
   // don't show label

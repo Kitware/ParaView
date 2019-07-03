@@ -261,8 +261,13 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     new pqArrayListDomain(
       selectorWidget, smProxy->GetPropertyName(smProperty), smProxy, smProperty, arrayListDomain);
 
-    this->addPropertyLink(
-      selectorWidget, smProxy->GetPropertyName(smProperty), SIGNAL(widgetModified()), smProperty);
+    const char* property_name = smProxy->GetPropertyName(smProperty);
+    // pass icon hints, if provided.
+    if (auto aswhints = hints ? hints->FindNestedElementByName("ArraySelectionWidget") : nullptr)
+    {
+      selectorWidget->setIconType(property_name, aswhints->GetAttribute("icon_type"));
+    }
+    this->addPropertyLink(selectorWidget, property_name, SIGNAL(widgetModified()), smProperty);
     this->setChangeAvailableAsChangeFinished(true);
   }
   else if (silDomain)

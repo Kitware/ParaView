@@ -15677,6 +15677,9 @@ Every Nth Point.
           <Documentation>
             Select the point data arrays to pass through
           </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="point"/>
+          </Hints>
       </StringVectorProperty>
       <StringVectorProperty
           name="CellDataArrays"
@@ -15692,6 +15695,9 @@ Every Nth Point.
           <Documentation>
             Select the cell data arrays to pass through
           </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="cell"/>
+          </Hints>
       </StringVectorProperty>
       <StringVectorProperty
           name="FieldDataArrays"
@@ -15707,6 +15713,9 @@ Every Nth Point.
           <Documentation>
             Select the field data arrays to pass through
           </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="field"/>
+          </Hints>
       </StringVectorProperty>
       <StringVectorProperty
           name="VertexDataArrays"
@@ -15722,6 +15731,9 @@ Every Nth Point.
           <Documentation>
             Select the vertex data arrays to pass through
           </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="vertex"/>
+          </Hints>
       </StringVectorProperty>
       <StringVectorProperty
           name="EdgeDataArrays"
@@ -15737,6 +15749,9 @@ Every Nth Point.
           <Documentation>
             Select the edge data arrays to pass through
           </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="edge"/>
+          </Hints>
       </StringVectorProperty>
       <StringVectorProperty
           name="RowDataArrays"
@@ -15752,6 +15767,9 @@ Every Nth Point.
           <Documentation>
             Select the row data arrays to pass through
           </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="row"/>
+          </Hints>
       </StringVectorProperty>
     </SourceProxy>
 

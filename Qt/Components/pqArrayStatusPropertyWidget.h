@@ -47,8 +47,6 @@ public:
   pqArrayStatusPropertyWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
   ~pqArrayStatusPropertyWidget() override;
 
-  virtual bool showLabel() const { return false; }
-
 private:
   Q_DISABLE_COPY(pqArrayStatusPropertyWidget)
 };

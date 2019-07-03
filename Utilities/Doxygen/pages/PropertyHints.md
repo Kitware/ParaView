@@ -211,3 +211,31 @@ add `enabled="0"` attribute.
            <ProxySelectionWidget enabled="0" />
          </Hints>
     </ProxyProperty>
+
+
+ArraySelectionWidget
+---------------------
+
+For a property that uses `pqArraySelectionWidget`, one can specify the icon to
+use for the arrays listed using this hint. See
+`pqArraySelectionWidget::setIconType` for supported icon types.
+
+    <StringVectorProperty
+          name="RowDataArrays"
+          command="GetRowDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the row data arrays to pass through
+          </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="row"/>
+          </Hints>
+      </StringVectorProperty>
+    </SourceProxy>
