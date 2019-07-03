@@ -53,7 +53,7 @@ git tag -a -m 'ParaView VERSION' vVERSION HEAD
     - [ ] Update kwrobot with the new `paraview/release` branch rules
   - Integrate changes to `release` branch
     - [ ] `git config -f .gitmodules submodule.VTK.branch paraview/release`
-    - [ ] `git commit -m 'release: follow VTK's paraview/release branch' .gitmodules`
+    - [ ] `git commit -m "release: follow VTK's paraview/release branch" .gitmodules`
     - [ ] `git push origin update-to-vVERSION:release vVERSION`
     - [ ] Update kwrobot with the new `release` branch rules
 
@@ -87,7 +87,6 @@ If making a non-RC release, additionally:
 
   - Create tarballs
     - [ ] ParaView (`Utilities/Maintenance/create_tarballs.bash --txz --tgz --zip -v vVERSION`)
-    - [ ] Catalyst (`Catalyst/generate-tarballs.sh vVERSION`)
   - Upload tarballs to `paraview.org`
     - [ ] `rsync -rptv $tarballs paraview.release:ParaView_Release/vMAJOR.MINOR/`
 
