@@ -1445,7 +1445,8 @@ void vtkSMProxy::LinkProperty(vtkSMProperty* input, vtkSMProperty* output)
 {
   if (input == output || input == NULL || output == NULL)
   {
-    vtkErrorMacro("Invalid call to vtkSMProxy::LinkProperty. Check arguments.");
+    vtkErrorMacro(
+      "Invalid call to vtkSMProxy::LinkProperty. Check arguments." << this->GetXMLName());
     return;
   }
 

@@ -15639,17 +15639,15 @@ Every Nth Point.
       <!-- End of YoungsMaterialInterface -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPassArrays"
-                 label="Pass Arrays"
-                 name="PassArrays">
+    <SourceProxy class="vtkPassSelectedArrays" name="PassArrays">
       <Documentation long_help="Pass specified point and cell data arrays."
                      short_help="Pass specified point and cell data arrays.">
                      The Pass Arrays filter makes a shallow copy of the output
                      data object from the input data object except for passing
                      only the arrays specified to the output from the
-                     input.</Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
+                     input.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
         <ProxyGroupDomain name="groups">
           <Group name="sources" />
           <Group name="filters" />
@@ -15657,71 +15655,104 @@ Every Nth Point.
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataObject" />
         </DataTypeDomain>
-        <InputArrayDomain attribute_type="cell"
-                          name="input_array_cell"
-                          optional="1"></InputArrayDomain>
-        <InputArrayDomain attribute_type="point"
-                          name="input_array_point"
-                          optional="1"></InputArrayDomain>
-        <InputArrayDomain name="input_field_array" attribute_type="field" optional="1" />
+        <InputArrayDomain name="point_arrays" attribute_type="point" optional="1" />
+        <InputArrayDomain name="cell_arrays" attribute_type="cell" optional="1" />
+        <InputArrayDomain name="field_arrays" attribute_type="field" optional="1" />
+        <InputArrayDomain name="vertex_arrays" attribute_type="vertex" optional="1" />
+        <InputArrayDomain name="edge_arrays" attribute_type="edge" optional="1" />
+        <InputArrayDomain name="row_arrays" attribute_type="row" optional="1" />
       </InputProperty>
-      <StringVectorProperty clean_command="ClearPointDataArrays"
-                            command="AddPointDataArray"
-                            name="PointDataArrays"
-                            number_of_elements_per_command="1"
-                            repeat_command="1">
-        <Documentation>Add a point array by name to be passed.</Documentation>
-        <ArrayListDomain input_domain_name="input_array_point" name="array_list">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </ArrayListDomain>
+
+      <StringVectorProperty
+          name="PointDataArrays"
+          command="GetPointDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="point_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the point data arrays to pass through
+          </Documentation>
       </StringVectorProperty>
-      <StringVectorProperty clean_command="ClearCellDataArrays"
-                            command="AddCellDataArray"
-                            name="CellDataArrays"
-                            number_of_elements_per_command="1"
-                            repeat_command="1">
-        <Documentation>Add a cell array by name to be passed.</Documentation>
-        <ArrayListDomain input_domain_name="input_array_cell" name="array_list">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </ArrayListDomain>
+      <StringVectorProperty
+          name="CellDataArrays"
+          command="GetCellDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="cell_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the cell data arrays to pass through
+          </Documentation>
       </StringVectorProperty>
-      <StringVectorProperty clean_command="ClearFieldDataArrays"
-                            command="AddFieldDataArray"
-                            name="FieldDataArrays"
-                            number_of_elements_per_command="1"
-                            repeat_command="1">
-        <Documentation>Add a field array by name to be passed.</Documentation>
-        <ArrayListDomain name="array_list" input_domain_name="input_field_array">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </ArrayListDomain>
+      <StringVectorProperty
+          name="FieldDataArrays"
+          command="GetFieldDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="field_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the field data arrays to pass through
+          </Documentation>
       </StringVectorProperty>
-      <IntVectorProperty command="SetUseFieldTypes"
-                         default_values="1"
-                         name="UseFieldTypes"
-                         number_of_elements="1"
-                         panel_visibility="never">
-        <BooleanDomain name="bool" />
-        <Documentation>This hidden property must always be set to 1 for this
-        proxy to work.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="AddFieldType"
-                         default_values="0 1 2"
-                         name="SelectedFieldTypes"
-                         number_of_elements="3"
-                         repeat_command="1"
-                         number_of_elements_per_command="1"
-                         panel_visibility="never">
-        <BooleanDomain name="bool" />
-        <Documentation>This hidden property must always be set to 0 for this
-        proxy to work.</Documentation>
-      </IntVectorProperty>
-      <!-- End PassArrays -->
+      <StringVectorProperty
+          name="VertexDataArrays"
+          command="GetVertexDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="vertex_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the vertex data arrays to pass through
+          </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty
+          name="EdgeDataArrays"
+          command="GetEdgeDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="edge_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the edge data arrays to pass through
+          </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty
+          name="RowDataArrays"
+          command="GetRowDataArraySelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the row data arrays to pass through
+          </Documentation>
+      </StringVectorProperty>
     </SourceProxy>
 
     <SourceProxy class="vtkImageToAMR"

@@ -14,9 +14,9 @@
 =========================================================================*/
 #include "vtkSIWriterProxy.h"
 
+#include "vtkAlgorithm.h"
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
-#include "vtkCompleteArrays.h"
 #include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -26,6 +26,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <cassert>
+#include <vector>
 
 vtkStandardNewMacro(vtkSIWriterProxy);
 //----------------------------------------------------------------------------
@@ -126,13 +127,25 @@ void vtkSIWriterProxy::OnCreateVTKObjects()
 //----------------------------------------------------------------------------
 void vtkSIWriterProxy::AddInput(int input_port, vtkAlgorithmOutput* connection, const char* method)
 {
-  vtkSIProxy* completeArraysSI = this->GetSubSIProxy("CompleteArrays");
-  vtkCompleteArrays* completeArrays =
-    completeArraysSI ? vtkCompleteArrays::SafeDownCast(completeArraysSI->GetVTKObject()) : NULL;
-  if (completeArrays)
+  std::vector<vtkAlgorithm*> pipeline;
+  if (auto passArrays = this->GetSubSIProxy("PassArrays"))
   {
-    completeArrays->SetInputConnection(connection);
-    this->Superclass::AddInput(input_port, completeArrays->GetOutputPort(), method);
+    pipeline.push_back(vtkAlgorithm::SafeDownCast(passArrays->GetVTKObject()));
+  }
+  if (auto completeArrays = this->GetSubSIProxy("CompleteArrays"))
+  {
+    pipeline.push_back(vtkAlgorithm::SafeDownCast(completeArrays->GetVTKObject()));
+  }
+
+  if (pipeline.size() == 2)
+  {
+    pipeline.back()->SetInputConnection(pipeline.front()->GetOutputPort());
+  }
+
+  if (pipeline.size() > 0)
+  {
+    pipeline.front()->SetInputConnection(connection);
+    this->Superclass::AddInput(input_port, pipeline.back()->GetOutputPort(), method);
   }
   else
   {
@@ -143,13 +156,22 @@ void vtkSIWriterProxy::AddInput(int input_port, vtkAlgorithmOutput* connection, 
 //----------------------------------------------------------------------------
 void vtkSIWriterProxy::CleanInputs(const char* method)
 {
-  vtkSIProxy* completeArraysSI = this->GetSubSIProxy("CompleteArrays");
-  vtkCompleteArrays* completeArrays =
-    completeArraysSI ? vtkCompleteArrays::SafeDownCast(completeArraysSI->GetVTKObject()) : NULL;
-  if (completeArrays)
+  std::vector<vtkAlgorithm*> pipeline;
+  if (auto passArrays = this->GetSubSIProxy("PassArrays"))
   {
-    completeArrays->SetInputConnection(NULL);
+    pipeline.push_back(vtkAlgorithm::SafeDownCast(passArrays->GetVTKObject()));
   }
+  if (auto completeArrays = this->GetSubSIProxy("CompleteArrays"))
+  {
+    pipeline.push_back(vtkAlgorithm::SafeDownCast(completeArrays->GetVTKObject()));
+  }
+
+  if (pipeline.size() > 0)
+  {
+    pipeline.front()->SetInputConnection(nullptr);
+    pipeline.back()->SetInputConnection(nullptr);
+  }
+
   this->Superclass::CleanInputs(method);
 }
 

@@ -5,6 +5,20 @@
       These are proxies used by meta-writers defined in writers.xml
       *****************************************************************
     -->
+    <SourceProxy class="vtkPassSelectedArrays" name="PassArrays"
+      base_proxygroup="filters" base_proxyname="PassArrays">
+      <!-- extends `PassArrays` to add the ChooseArraysToWrite property -->
+      <IntVectorProperty name="ChooseArraysToWrite"
+        command="SetEnabled"
+        default_values="0"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Explicitly choose which arrays to write.
+        </Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+
     <!-- ================================================================= -->
     <Proxy name="DataWriterBase">
       <!-- Base for non-xml data writers -->
@@ -28,9 +42,34 @@
     <!-- ================================================================= -->
     <Proxy class="not-used"
            name="ParallelWriterBase">
-      <Documentation>This defines the interface for the parallel
-      writers.</Documentation>
+      <Documentation>This defines the interface for the parallel writers.</Documentation>
       <!-- Base for parallel writers -->
+
+      <SubProxy>
+        <Proxy name="PassArrays" proxygroup="internal_writers" proxyname="PassArrays" />
+        <ExposedProperties>
+          <Property name="ChooseArraysToWrite"/>
+          <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
+            <Property name="PointDataArrays" />
+            <Property name="CellDataArrays" />
+            <Property name="FieldDataArrays" />
+            <Property name="VertexDataArrays" />
+            <Property name="EdgeDataArrays" />
+            <Property name="RowDataArrays" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ChooseArraysToWrite"
+                                       value="1" />
+              <!-- show this widget when ChooseArraysToWrite==1 -->
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <LinkProperties>
+          <Property name="Input" with_property="Input" />
+        </LinkProperties>
+      </SubProxy>
+
       <StringVectorProperty command="SetFileName"
                             name="FileName"
                             number_of_elements="1">
@@ -59,6 +98,32 @@
                             number_of_elements="1">
         <Documentation>The name of the file to be written.</Documentation>
       </StringVectorProperty>
+
+      <SubProxy>
+        <Proxy name="PassArrays" proxygroup="internal_writers" proxyname="PassArrays" />
+        <ExposedProperties>
+          <Property name="ChooseArraysToWrite"/>
+          <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
+            <Property name="PointDataArrays" />
+            <Property name="CellDataArrays" />
+            <Property name="FieldDataArrays" />
+            <Property name="VertexDataArrays" />
+            <Property name="EdgeDataArrays" />
+            <Property name="RowDataArrays" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ChooseArraysToWrite"
+                                       value="1" />
+              <!-- show this widget when ChooseArraysToWrite==1 -->
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <LinkProperties>
+          <Property name="Input" with_property="Input" />
+        </LinkProperties>
+      </SubProxy>
+
       <IntVectorProperty command="SetWriteAllTimeSteps"
                          default_values="0"
                          label="Write timesteps as file-series"
@@ -144,6 +209,32 @@
     </Proxy>
     <!-- ================================================================= -->
     <Proxy name="ParallelFileSeriesWriter">
+
+      <SubProxy>
+        <Proxy name="PassArrays" proxygroup="internal_writers" proxyname="PassArrays" />
+        <ExposedProperties>
+          <Property name="ChooseArraysToWrite"/>
+          <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
+            <Property name="PointDataArrays" />
+            <Property name="CellDataArrays" />
+            <Property name="FieldDataArrays" />
+            <Property name="VertexDataArrays" />
+            <Property name="EdgeDataArrays" />
+            <Property name="RowDataArrays" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ChooseArraysToWrite"
+                                       value="1" />
+              <!-- show this widget when ChooseArraysToWrite==1 -->
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <LinkProperties>
+          <Property name="Input" with_property="Input" />
+        </LinkProperties>
+      </SubProxy>
+
       <StringVectorProperty command="SetFileName"
                             name="FileName"
                             number_of_elements="1">
@@ -239,6 +330,31 @@
 
     <!-- ================================================================= -->
     <Proxy name="ParallelSerialWriter">
+
+      <SubProxy>
+        <Proxy name="PassArrays" proxygroup="internal_writers" proxyname="PassArrays" />
+        <ExposedProperties>
+          <Property name="ChooseArraysToWrite"/>
+          <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
+            <Property name="PointDataArrays" />
+            <Property name="CellDataArrays" />
+            <Property name="FieldDataArrays" />
+            <Property name="VertexDataArrays" />
+            <Property name="EdgeDataArrays" />
+            <Property name="RowDataArrays" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ChooseArraysToWrite"
+                                       value="1" />
+              <!-- show this widget when ChooseArraysToWrite==1 -->
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <LinkProperties>
+          <Property name="Input" with_property="Input" />
+        </LinkProperties>
+      </SubProxy>
 
       <IntVectorProperty command="SetWriteAllTimeSteps"
                          default_values="0"
@@ -791,5 +907,28 @@
           phtg file without its extension</Documentation>
       </IntVectorProperty>
     </PWriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="FileSeriesWriter"
+                 name="XMLDataObjectWriterBase">
+      <Documentation>Base for all XML-based file-series
+      writers.</Documentation>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="XMLDataObjectWriterCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+            <Property name="CompressionLevel" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of XMLDataObjectWriterBase -->
+    </WriterProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>
