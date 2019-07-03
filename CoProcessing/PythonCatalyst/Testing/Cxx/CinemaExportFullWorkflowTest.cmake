@@ -56,13 +56,17 @@ if("${TEST_NAME}" STREQUAL "ExportNow" )
   #is handy
   set(rv 0)
 elseif("${TEST_NAME}" MATCHES "CinemaExport" )
+  if(WIN32)
+  # prepping the output python script
+  execute_process_with_echo(COMMAND
+    @powershell -Command get-content ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT} | %{$_ -replace \"'can.ex2'\",\"'input'\"}
+    )
+  else()
   # prepping the output python script
   execute_process_with_echo(COMMAND
     perl -i -pe "s/'can.ex2'/'input'/g" ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}
     )
-  execute_process_with_echo(COMMAND
-    perl -i -pe "s/Input=can.ex2/Input=canex2/g" ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}
-    )
+  endif()
 
   # run the batch script 
   execute_process_with_echo(COMMAND
