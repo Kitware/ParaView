@@ -628,7 +628,7 @@ struct Process_5_6_to_5_7
   {
     return ConvertResampleWithDataset(document) && ConvertIdsFilter(document) &&
       ConvertOSPRayNames(document) && ConvertBox(document) &&
-      ConvertExodusLegacyBlockNamesWithElementTypes(document);
+      ConvertExodusLegacyBlockNamesWithElementTypes(document) && RemoveColorPropertyLinks(document);
   }
 
   static bool ConvertResampleWithDataset(xml_document& document)
@@ -748,6 +748,16 @@ struct Process_5_6_to_5_7
       elem.append_attribute("index").set_value("0");
       elem.append_attribute("value").set_value("1");
     }
+
+    return true;
+  }
+
+  static bool RemoveColorPropertyLinks(xml_document& document)
+  {
+    pugi::xpath_node_set elements =
+      document.select_nodes("//ServerManagerState/Links/GlobalPropertyLink"
+                            "[@property='Color']");
+    PurgeElements(elements);
 
     return true;
   }
