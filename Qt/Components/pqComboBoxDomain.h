@@ -41,7 +41,7 @@ class vtkSMProperty;
 class vtkSMDomain;
 /**
 * combo box domain
-* observers the domain for a combo box and updates accordingly
+* observes the domain for a combo box and updates accordingly.
 * the list of values in the combo box is automatically
 * updated when the domain changes
 */
@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pqComboBoxDomain : public QObject
 public:
   /**
   * constructor requires a QComboBox,
-  * and the property with the domain to observe
+  * and the property with the domain to observe.
   * optionally pass in a domain if a specific one
   * needs to be watched
   */
