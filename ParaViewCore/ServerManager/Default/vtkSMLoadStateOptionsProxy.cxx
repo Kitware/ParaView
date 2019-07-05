@@ -83,6 +83,12 @@ public:
       return;
     }
 
+    // Skip the filename domains from non-sources groups
+    if (strcmp(group.value(), "sources") != 0)
+    {
+      return;
+    }
+
     vtkSMProxy* prototype =
       vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()->GetPrototypeProxy(
         group.value(), type.value());
