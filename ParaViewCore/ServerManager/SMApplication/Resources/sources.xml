@@ -2201,6 +2201,15 @@
         <Documentation>Property used to reference the parametric function as
         data generator.</Documentation>
       </ProxyProperty>
+      <IntVectorProperty name="Resolution"
+        command="SetUResolution"
+        number_of_elements="1"
+        default_values="50">
+        <IntRangeDomain name="range" min="2" />
+        <Documentation>
+          Set the spline resolution.
+        </Documentation>
+      </IntVectorProperty>
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkTrivialProducer"

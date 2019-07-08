@@ -6,108 +6,132 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>283</width>
-    <height>353</height>
+    <width>286</width>
+    <height>299</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout">
-   <property name="margin">
-    <number>0</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
     <number>2</number>
    </property>
-   <item row="0" column="0">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
     <widget class="QCheckBox" name="show3DWidget">
      <property name="text">
-      <string>Show Widget</string>
+      <string>Show Spline</string>
      </property>
      <property name="checked">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
-    <widget class="pqTreeWidget" name="handlePositions">
-     <property name="rootIsDecorated">
-      <bool>false</bool>
-     </property>
-     <attribute name="headerStretchLastSection">
-      <bool>true</bool>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>X</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Y</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Z</string>
-      </property>
-     </column>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <layout class="QVBoxLayout" name="vboxLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <property name="spacing">
       <number>2</number>
      </property>
      <item>
-      <spacer name="spacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
+      <widget class="pqExpandableTableView" name="PointsTable">
+       <property name="alternatingRowColors">
+        <bool>true</bool>
        </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QToolButton" name="addPoint">
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
-         <normaloff>:/QtWidgets/Icons/pqPlus16.png</normaloff>:/QtWidgets/Icons/pqPlus16.png</iconset>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectRows</enum>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="removePoints">
-       <property name="text">
-        <string>...</string>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>2</number>
        </property>
-       <property name="icon">
-        <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
-         <normaloff>:/QtWidgets/Icons/pqDelete16.png</normaloff>:/QtWidgets/Icons/pqDelete16.png</iconset>
-       </property>
-      </widget>
+       <item>
+        <widget class="QToolButton" name="Add">
+         <property name="toolTip">
+          <string>Add new point</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+           <normaloff>:/QtWidgets/Icons/pqPlus16.png</normaloff>:/QtWidgets/Icons/pqPlus16.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="Remove">
+         <property name="toolTip">
+          <string>Remove selected point(s)</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+           <normaloff>:/QtWidgets/Icons/pqMinus16.png</normaloff>:/QtWidgets/Icons/pqMinus16.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QToolButton" name="DeleteAll">
+         <property name="toolTip">
+          <string>Remove all points</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+           <normaloff>:/QtWidgets/Icons/pqDelete16.png</normaloff>:/QtWidgets/Icons/pqDelete16.png</iconset>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
-   <item row="3" column="0" colspan="2">
-    <widget class="QCheckBox" name="closed">
+   <item>
+    <widget class="QLabel" name="Hints">
      <property name="text">
-      <string>Closed Spline</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use &lt;span style=&quot; font-weight:600;&quot;&gt;P&lt;/span&gt; to place selected point on mesh or &lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+P&lt;/span&gt; to snap the selected point to closest mesh point. Use &lt;span style=&quot; font-weight:600;&quot;&gt;1 &lt;/span&gt;/ &lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+1&lt;/span&gt; for first point and &lt;span style=&quot; font-weight:600;&quot;&gt;2 &lt;/span&gt;/ &lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+2&lt;/span&gt; for the last point.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="3">
-    <widget class="QLabel" name="label">
+   <item>
+    <widget class="QCheckBox" name="Closed">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Drag control points to change point locations.&lt;br/&gt;Use Ctrl + Left Click to insert a new point on the line at mouse position.&lt;br/&gt;Use Shift + Left Click to remove the point at mouse position.&lt;br/&gt;Use Alt + Left Click to add a new point anywhere at mouse position&lt;br/&gt;at the end of the polyline or at the beginning if the first point is selected.&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Closed Spline</string>
      </property>
     </widget>
    </item>
@@ -115,14 +139,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqTreeWidget</class>
-   <extends>QTreeWidget</extends>
-   <header>pqTreeWidget.h</header>
+   <class>pqExpandableTableView</class>
+   <extends>QTableView</extends>
+   <header>pqExpandableTableView.h</header>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../Components/Resources/pqComponents.qrc"/>
   <include location="../../../Widgets/Resources/QtWidgets.qrc"/>
+  <include location="../../../Components/Resources/pqComponents.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -55,7 +55,9 @@ class QColor;
 */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSplinePropertyWidget : public pqInteractivePropertyWidget
 {
-  Q_OBJECT
+  Q_OBJECT;
+  Q_PROPERTY(QList<QVariant> points READ points WRITE setPoints NOTIFY pointsChanged);
+  Q_PROPERTY(int currentRow READ currentRow WRITE setCurrentRow NOTIFY currentRowChanged);
   typedef pqInteractivePropertyWidget Superclass;
 
 public:
@@ -69,6 +71,29 @@ public:
     vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, ModeTypes mode = SPLINE, QWidget* parent = 0);
   ~pqSplinePropertyWidget() override;
 
+  //@{
+  /**
+   * Get/Set the points that form the spline.
+   */
+  QList<QVariant> points() const;
+  void setPoints(const QList<QVariant>& points);
+  //@}
+
+  //@{
+  int currentRow() const;
+  void setCurrentRow(int idx);
+  //@}
+signals:
+  /**
+   * Signal fired whenever the points are changed.
+   */
+  void pointsChanged();
+
+  /**
+   * Signal fired when the current row selected in the widget is changed.
+   */
+  void currentRowChanged();
+
 public slots:
   /**
   * Set the color to use for the spline.
@@ -77,11 +102,6 @@ public slots:
 
 protected slots:
   void placeWidget() override;
-
-private slots:
-  void addPoint();
-  void removePoints();
-  void pick(double x, double y, double z);
 
 private:
   Q_DISABLE_COPY(pqSplinePropertyWidget)

@@ -345,6 +345,8 @@
           <Property name="HandlePositionsInfo" />
           <Property name="Closed" />
           <Property name="LineColor" />
+          <Property name="CurrentHandleIndex" />
+          <Property name="CurrentHandleIndexInfo" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -378,6 +380,8 @@
           <Property name="HandlePositionsInfo" />
           <Property name="Closed" />
           <Property name="LineColor" />
+          <Property name="CurrentHandleIndex" />
+          <Property name="CurrentHandleIndexInfo" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -862,6 +866,16 @@
                            min="0 0 0"
                            name="range" />
       </DoubleVectorProperty>
+      <IntVectorProperty name="CurrentHandleIndexInfo"
+        command="GetCurrentHandleIndex"
+        information_only="1"/>
+      <IntVectorProperty name="CurrentHandleIndex"
+        number_of_elements="1"
+        default_values="-1"
+        command="SetCurrentHandleIndex"
+        information_property="CurrentHandleIndexInfo"
+        panel_visibility="never">
+      </IntVectorProperty>
       <!-- End of SplineRepresentation -->
     </Proxy>
     <!-- ================================================================== -->
@@ -917,6 +931,16 @@
                            min="0 0 0"
                            name="range" />
       </DoubleVectorProperty>
+      <IntVectorProperty name="CurrentHandleIndexInfo"
+        command="GetCurrentHandleIndex"
+        information_only="1"/>
+      <IntVectorProperty name="CurrentHandleIndex"
+        number_of_elements="1"
+        default_values="-1"
+        command="SetCurrentHandleIndex"
+        information_property="CurrentHandleIndexInfo"
+        panel_visibility="never">
+      </IntVectorProperty>
     </Proxy>
     <!-- ================================================================== -->
     <Proxy class="vtkSliderRepresentation3D"

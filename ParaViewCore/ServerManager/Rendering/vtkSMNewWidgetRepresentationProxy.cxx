@@ -210,6 +210,9 @@ void vtkSMNewWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
 
   if (event == vtkCommand::StartInteractionEvent)
   {
+    this->RepresentationProxy->UpdatePropertyInformation();
+    this->UpdateVTKObjects();
+
     if (vtkRenderWindowInteractor* iren = this->Widget->GetInteractor())
     {
       iren->InvokeEvent(event);
@@ -241,6 +244,9 @@ void vtkSMNewWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
       sizeHandles->Modified();
       this->RepresentationProxy->UpdateProperty("SizeHandles");
     }
+
+    this->RepresentationProxy->UpdatePropertyInformation();
+    this->UpdateVTKObjects();
 
     if (widgetRepresentation)
     {
