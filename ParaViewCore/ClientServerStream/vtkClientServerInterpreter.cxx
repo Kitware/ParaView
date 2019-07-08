@@ -837,14 +837,7 @@ void vtkClientServerInterpreter::AddNewInstanceFunction(const char* name,
 //----------------------------------------------------------------------------
 int vtkClientServerInterpreter::Load(const char* moduleName)
 {
-  int ret = LoadImpl(moduleName);
-
-  if (ret)
-  {
-    ret = this->Load(moduleName, 0);
-  }
-
-  return ret;
+  return this->Load(moduleName, 0);
 }
 
 //----------------------------------------------------------------------------
