@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSortFilterProxyModel>
 #include <QStandardItem>
 #include <QStandardItemModel>
+#include <QtDebug>
 
 #include <cassert>
 #include <map>
@@ -100,6 +101,8 @@ class pqArraySelectionWidget::Model : public QStandardItemModel
   QPointer<pqArraySelectionWidget> Widget;
   PixmapMap Pixmaps;
 
+  QMap<QString, QString> IconTypeMap;
+
 public:
   Model(int rs, int cs, pqArraySelectionWidget* parentObject)
     : Superclass(rs, cs, parentObject)
@@ -108,6 +111,11 @@ public:
   }
 
   ~Model() override {}
+
+  void addPixmap(const QString& key, QPixmap&& pixmap)
+  {
+    this->Pixmaps.insert(key, std::move(pixmap));
+  }
 
   // Here, `key` is the dynamic property name,
   //       `label` is the array name (or label e.g. Object Ids)
@@ -376,6 +384,76 @@ pqArraySelectionWidget::pqArraySelectionWidget(QWidget* parentObject)
 //-----------------------------------------------------------------------------
 pqArraySelectionWidget::~pqArraySelectionWidget()
 {
+}
+
+//-----------------------------------------------------------------------------
+void pqArraySelectionWidget::setIconType(const QString& pname, const QString& icon_type)
+{
+  auto model = this->realModel();
+  if (icon_type == "point")
+  {
+    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqNodalData16.png"));
+  }
+  else if (icon_type == "cell")
+  {
+    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqCellCenterData16.png"));
+  }
+  else if (icon_type == "field")
+  {
+    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqGlobalData16.png"));
+  }
+  else if (icon_type == "vertex")
+  {
+    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqNodalData16.png"));
+  }
+  else if (icon_type == "edge")
+  {
+    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqEdgeCenterData16.png"));
+  }
+  else if (icon_type == "face")
+  {
+    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqFaceCenterData16.png"));
+  }
+  else if (icon_type == "row")
+  {
+    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqSpreadsheet16.png"));
+  }
+  else if (icon_type == "side-set")
+  {
+    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqSideSetData16.png"));
+  }
+  else if (icon_type == "node-set")
+  {
+    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqNodeSetData16.png"));
+  }
+  else if (icon_type == "face-set")
+  {
+    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqFaceSetData16.png"));
+  }
+  else if (icon_type == "edge-set")
+  {
+    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqEdgeSetData16.png"));
+  }
+  else if (icon_type == "cell-set")
+  {
+    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqElemSetData16.png"));
+  }
+  else if (icon_type == "node-map")
+  {
+    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqNodeMapData16.png"));
+  }
+  else if (icon_type == "edge-map")
+  {
+    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqEdgeMapData16.png"));
+  }
+  else if (icon_type == "face-map")
+  {
+    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqFaceMapData16.png"));
+  }
+  else
+  {
+    qCritical() << "Invalid icon type: " << icon_type;
+  }
 }
 
 //-----------------------------------------------------------------------------

@@ -61,6 +61,31 @@
  *     ...
  *  </SourceProxy>
  * @endcode
+ *
+ * vtkSIDataArraySelectionProperty can also be used for filters that use
+ * vtkDataArraySelection.
+ *
+ * @code{xml}
+ *   <SourceProxy class="vtkPassSelectedArrays" name="PassArrays">
+ *      ...
+ *      <InputProperty name="Input" >
+ *        <InputArrayDomain name="point_arrays" attribute_type="point" optional="1" />
+ *      </InputProperty>
+ *      <StringVectorProperty
+ *          name="PointDataArraySelection"
+ *          command="GetPointDataArraySelection"
+ *          number_of_elements_per_command="1"
+ *          repeat_command="1"
+ *          si_class="vtkSIDataArraySelectionProperty">
+ *          <ArrayListDomain name="array_list" input_domain_name="point_arrays">
+ *            <RequiredProperties>
+ *              <Property name="Input" function="Input" />
+ *            </RequiredProperties>
+ *          </ArrayListDomain>
+ *      </StringVectorProperty>
+ *      ...
+ *   </SourceProxy>
+ * @endcode
  */
 
 #ifndef vtkSIDataArraySelectionProperty_h
@@ -81,6 +106,7 @@ protected:
   vtkSIDataArraySelectionProperty();
   ~vtkSIDataArraySelectionProperty();
 
+  bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) override;
   bool Push(vtkSMMessage*, int) override;
   bool Pull(vtkSMMessage*) override;
 
@@ -89,6 +115,7 @@ protected:
 private:
   vtkSIDataArraySelectionProperty(const vtkSIDataArraySelectionProperty&) = delete;
   void operator=(const vtkSIDataArraySelectionProperty&) = delete;
+  int NumberOfElementsPerCommand;
 };
 
 #endif

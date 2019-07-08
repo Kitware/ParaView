@@ -141,27 +141,6 @@
     </PWriterProxy>
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="internal_writers"
-                 base_proxyname="FileSeriesWriter"
-                 name="XMLDataObjectWriterBase">
-      <Documentation>Base for all XML-based file-series
-      writers.</Documentation>
-      <SubProxy>
-        <Proxy name="Writer"
-               proxygroup="internal_writers"
-               proxyname="XMLDataObjectWriterCore"></Proxy>
-        <ExposedProperties>
-          <PropertyGroup label="XML Writer Parameters">
-            <Property name="DataMode" />
-            <Property name="EncodeAppendedData" />
-            <Property name="CompressorType" />
-            <Property name="CompressionLevel" />
-          </PropertyGroup>
-        </ExposedProperties>
-      </SubProxy>
-      <!-- End of XMLDataObjectWriterBase -->
-    </WriterProxy>
-    <!-- ================================================================= -->
-    <WriterProxy base_proxygroup="writers"
                  base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
@@ -175,9 +154,11 @@
                         name="input_type">
           <DataType value="vtkPolyData" />
         </DataTypeDomain>
+        <InputArrayDomain name="point_arrays" attribute_type="point" optional="1" />
         <Documentation>The input filter/source whose output dataset is to
         written to the file.</Documentation>
       </InputProperty>
+
       <Hints>
         <Property name="Input"
                   show="0" />
@@ -191,7 +172,7 @@
       <!-- End of XMLPolyDataWriter -->
     </WriterProxy>
     <!-- ================================================================= -->
-    <WriterProxy base_proxygroup="writers"
+    <WriterProxy base_proxygroup="internal_writers"
                  base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
@@ -221,7 +202,7 @@
       <!-- End of XMLUnstructuredGridWriter -->
     </WriterProxy>
     <!-- ================================================================= -->
-    <WriterProxy base_proxygroup="writers"
+    <WriterProxy base_proxygroup="internal_writers"
                  base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
@@ -251,7 +232,7 @@
       <!-- End of XMLStructuredGridWriter -->
     </WriterProxy>
     <!-- ================================================================= -->
-    <WriterProxy base_proxygroup="writers"
+    <WriterProxy base_proxygroup="internal_writers"
                  base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
@@ -281,7 +262,7 @@
       <!-- End of XMLRectilinearGridWriter -->
     </WriterProxy>
     <!-- ================================================================= -->
-    <WriterProxy base_proxygroup="writers"
+    <WriterProxy base_proxygroup="internal_writers"
                  base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
@@ -311,7 +292,7 @@
       <!-- End of XMLImageDataWriter -->
     </WriterProxy>
     <!-- ================================================================= -->
-    <WriterProxy base_proxygroup="writers"
+    <WriterProxy base_proxygroup="internal_writers"
                  base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
