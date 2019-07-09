@@ -286,7 +286,10 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(const char* filenam
   return canRead;
 }
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkSMReaderFactory);
+// Use VTK's object factory to construct new instances. This allows derived
+// applications to derive from vtkSMReaderFactory and implement changes to its
+// functionality.
+vtkObjectFactoryNewMacro(vtkSMReaderFactory);
 //----------------------------------------------------------------------------
 vtkSMReaderFactory::vtkSMReaderFactory()
 {
