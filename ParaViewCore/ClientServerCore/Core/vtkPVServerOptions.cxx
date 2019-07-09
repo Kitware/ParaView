@@ -126,7 +126,7 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
         if (matches != 4)
         {
           vtkErrorMacro("Malformed geometry specification: "
-            << value.c_str() << " (expected <X>x<Y>+<width>+<height>).");
+            << value.c_str() << " (expected <width>x<height>+<X>+<Y>).");
           info.Geometry[0] = 0;
           info.Geometry[1] = 0;
           info.Geometry[2] = 0;
