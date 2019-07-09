@@ -48,7 +48,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWelcomeDialog.h"
 #include "vtkCommand.h"
 #include "vtkPVGeneralSettings.h"
-#include "vtkPVPlugin.h"
 #include "vtkProcessModule.h"
 #include "vtkSMSettings.h"
 #include "vtksys/SystemTools.hxx"
