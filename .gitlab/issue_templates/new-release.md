@@ -54,7 +54,10 @@ git tag -a -m 'ParaView VERSION' vVERSION HEAD
   - Integrate changes to `release` branch
     - [ ] `git config -f .gitmodules submodule.VTK.branch paraview/release`
     - [ ] `git commit -m "release: follow VTK's paraview/release branch" .gitmodules`
-    - [ ] `git push origin update-to-vVERSION:release vVERSION`
+    - [ ] Merge new `release` branch into `master` using `-s ours`
+      - `git checkout master`
+      - `git merge --no-ff -s ours -m "Merge branch 'release'" update-to-vVERSION`
+    - [ ] `git push origin master update-to-vVERSION:release vVERSION`
     - [ ] Update kwrobot with the new `release` branch rules
 
 If making a release from the `release` branch, e.g., `vMAJOR.MINOR.0-RC2 or above`:
