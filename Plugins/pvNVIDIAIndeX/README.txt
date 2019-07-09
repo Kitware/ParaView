@@ -136,4 +136,4 @@ forum for further assistance: https://devtalk.nvidia.com/default/board/323/index
 
 Support mailing list: paraview-plugin-support@nvidia.com
 
-Copyright 2018 NVIDIA Corporation. All rights reserved.
+Copyright 2019 NVIDIA Corporation. All rights reserved.

@@ -10,11 +10,9 @@
 #include <mi/base/types.h>
 #include <mi/base/uuid.h>
 
-namespace mi
-{
+namespace mi {
 
-namespace base
-{
+namespace base {
 
 /** \defgroup mi_base_iinterface Interface Framework Technology
     \ingroup mi_base
@@ -55,7 +53,7 @@ class IInterface;
     to the #mi::base::IInterface::get_interface(const Uuid&) methods, introduced below, and this is
     the mode in which it is normally used.
 
-    \see
+    \see 
       - #mi::base::Handle for a smart-pointer class automating the reference counting
       - #mi::base::Interface_declare for a helper class for deriving new interfaces
       - #mi::base::Interface_implement for a helper class for implementing interfaces
@@ -86,10 +84,10 @@ class IInterface;
             allocator->release();
         }
     \endcode
-
-    Alternatively, you can use the more convenient and type-safe template version
+   
+    Alternatively, you can use the more convenient and type-safe template version 
     that eliminates the need for the subsequent \c static_cast.
-
+   
     \code
         mi::base::IInterface* iptr = ...;
         mi::base::IAllocator* allocator = iptr->get_interface<mi::base::IAllocator>();
@@ -104,144 +102,148 @@ class IInterface;
 class IInterface
 {
 public:
-  /// Declares the interface ID (IID) of this interface.
-  ///
-  /// A local type in each interface type, which is distinct and unique for each interface. The
-  /// type has a default constructor and the constructed value represents the universally unique
-  /// identifier (UUID) for this interface. The local type is readily convertible to a
-  /// #mi::base::Uuid.
-  typedef Uuid_t<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0> IID;
 
-  /// Compares the interface ID \p iid against the interface ID of this interface.
-  ///
-  /// \return   \c true if \p iid == #mi::base::IInterface::IID(), and \c false otherwise.
-  static bool compare_iid(const Uuid& iid) { return (iid == IID()); }
+    /// Declares the interface ID (IID) of this interface.
+    ///
+    /// A local type in each interface type, which is distinct and unique for each interface. The
+    /// type has a default constructor and the constructed value represents the universally unique
+    /// identifier (UUID) for this interface. The local type is readily convertible to a
+    /// #mi::base::Uuid.
+    typedef Uuid_t<0,0,0,0,0,0,0,0,0,0,0> IID;
 
-  /// Increments the reference count.
-  ///
-  /// Increments the reference count of the object referenced through this interface and returns
-  /// the new reference count. The operation is thread-safe.
-  ///
-  /// \return   The new, incremented reference count.
-  virtual Uint32 retain() const = 0;
+    /// Compares the interface ID \p iid against the interface ID of this interface.
+    ///
+    /// \return   \c true if \p iid == #mi::base::IInterface::IID(), and \c false otherwise.
+    static bool compare_iid( const Uuid& iid)
+    {
+        return ( iid == IID());
+    }
 
-  /// Decrements the reference count.
-  ///
-  /// Decrements the reference count of the object referenced through this interface and returns
-  /// the new reference count. If the reference count dropped to zero, the object will be deleted.
-  /// The operation is thread-safe.
-  ///
-  /// \return   The new, decremented reference count.
-  virtual Uint32 release() const = 0;
+    /// Increments the reference count.
+    ///
+    /// Increments the reference count of the object referenced through this interface and returns
+    /// the new reference count. The operation is thread-safe.
+    ///
+    /// \return   The new, incremented reference count.
+    virtual Uint32 retain() const = 0;
 
-  /// Acquires a const interface from another.
-  ///
-  /// If this interface supports the interface with the passed \p interface_id, then the method
-  /// returns a non-\c NULL \c const #mi::base::IInterface* that can be casted via \c static_cast
-  /// to an interface pointer of the interface type corresponding to the passed \p interface_id.
-  /// Otherwise, the method returns \c NULL.
-  ///
-  /// In the case of a non-\c NULL return value, the caller receives ownership of the new
-  /// interface pointer, whose reference count has been retained once. The caller must release the
-  /// returned interface pointer at the end to prevent a memory leak.
-  ///
-  /// \param interface_id   Interface ID of the interface to acquire.
-  virtual const IInterface* get_interface(const Uuid& interface_id) const = 0;
+    /// Decrements the reference count.
+    ///
+    /// Decrements the reference count of the object referenced through this interface and returns
+    /// the new reference count. If the reference count dropped to zero, the object will be deleted.
+    /// The operation is thread-safe.
+    ///
+    /// \return   The new, decremented reference count.
+    virtual Uint32 release() const = 0;
 
-  /// Acquires a const interface from another.
-  ///
-  /// If this interface supports the interface \c T, then the method returns a non-\c NULL
-  /// \c const pointer to the interface \c T. Otherwise, the method returns \c NULL.
-  ///
-  /// In the case of a non-\c NULL return value, the caller receives ownership of the new
-  /// interface pointer, whose reference count has been retained once. The caller must release the
-  /// returned interface pointer at the end to prevent a memory leak.
-  ///
-  /// This templated member function is a wrapper of the non-template variant for the user's
-  /// convenience. It eliminates the need to apply \c static_cast to the returned pointer, since
-  /// the return type already is a const pointer to the type \p T specified as template parameter.
-  ///
-  /// \tparam T     The requested interface type.
-  ///
-  template <class T>
-  const T* get_interface() const
-  {
-    return static_cast<const T*>(get_interface(typename T::IID()));
-  }
+    /// Acquires a const interface from another.
+    ///
+    /// If this interface supports the interface with the passed \p interface_id, then the method
+    /// returns a non-\c NULL \c const #mi::base::IInterface* that can be casted via \c static_cast
+    /// to an interface pointer of the interface type corresponding to the passed \p interface_id.
+    /// Otherwise, the method returns \c NULL.
+    ///
+    /// In the case of a non-\c NULL return value, the caller receives ownership of the new
+    /// interface pointer, whose reference count has been retained once. The caller must release the
+    /// returned interface pointer at the end to prevent a memory leak.
+    ///
+    /// \param interface_id   Interface ID of the interface to acquire.
+    virtual const IInterface* get_interface( const Uuid& interface_id ) const = 0;
 
-  /// Acquires a mutable interface from another.
-  ///
-  /// If this interface supports the interface with the passed \p interface_id, then the methods
-  /// returns a non-\c NULL #mi::base::IInterface* that can be casted via \c static_cast to an
-  /// interface pointer of the interface type corresponding to the passed \p interface_id.
-  /// Otherwise, the method returns \c NULL.
-  ///
-  /// In the case of a non-\c NULL return value, the caller receives ownership of the new
-  /// interface pointer, whose reference count has been retained once. The caller must release the
-  /// returned interface pointer at the end to prevent a memory leak.
-  ///
-  /// \param interface_id   Interface ID of the interface to acquire.
-  virtual IInterface* get_interface(const Uuid& interface_id) = 0;
+    /// Acquires a const interface from another.
+    ///
+    /// If this interface supports the interface \c T, then the method returns a non-\c NULL
+    /// \c const pointer to the interface \c T. Otherwise, the method returns \c NULL.
+    ///
+    /// In the case of a non-\c NULL return value, the caller receives ownership of the new
+    /// interface pointer, whose reference count has been retained once. The caller must release the
+    /// returned interface pointer at the end to prevent a memory leak.
+    ///
+    /// This templated member function is a wrapper of the non-template variant for the user's
+    /// convenience. It eliminates the need to apply \c static_cast to the returned pointer, since
+    /// the return type already is a const pointer to the type \p T specified as template parameter.
+    ///
+    /// \tparam T     The requested interface type.
+    ///
+    template <class T>
+    const T* get_interface() const
+    {
+        return static_cast<const T*>( get_interface( typename T::IID()));
+    }
 
-  /// Acquires a mutable interface from another.
-  ///
-  /// If this interface supports the interface \c T, then the method returns a non-\c NULL pointer
-  /// to the interface \c T. Otherwise, the method returns \c NULL.
-  ///
-  /// In the case of a non-\c NULL return value, the caller receives ownership of the new
-  /// interface pointer, whose reference count has been retained once. The caller must release the
-  /// returned interface pointer at the end to prevent a memory leak.
-  ///
-  /// This templated member function is a wrapper of the non-template variant for the user's
-  /// convenience. It eliminates the need to apply \c static_cast to the returned pointer, since
-  /// the return type already is a pointer to the type \p T specified as template parameter.
-  ///
-  /// \tparam T     The requested interface type.
-  ///
-  template <class T>
-  T* get_interface()
-  {
-    return static_cast<T*>(get_interface(typename T::IID()));
-  }
+    /// Acquires a mutable interface from another.
+    ///
+    /// If this interface supports the interface with the passed \p interface_id, then the methods
+    /// returns a non-\c NULL #mi::base::IInterface* that can be casted via \c static_cast to an
+    /// interface pointer of the interface type corresponding to the passed \p interface_id.
+    /// Otherwise, the method returns \c NULL.
+    ///
+    /// In the case of a non-\c NULL return value, the caller receives ownership of the new
+    /// interface pointer, whose reference count has been retained once. The caller must release the
+    /// returned interface pointer at the end to prevent a memory leak.
+    ///
+    /// \param interface_id   Interface ID of the interface to acquire.
+    virtual IInterface* get_interface( const Uuid& interface_id ) = 0;
 
-  /// Returns the interface ID of the most derived interface.
-  virtual Uuid get_iid() const = 0;
+    /// Acquires a mutable interface from another.
+    ///
+    /// If this interface supports the interface \c T, then the method returns a non-\c NULL pointer
+    /// to the interface \c T. Otherwise, the method returns \c NULL.
+    ///
+    /// In the case of a non-\c NULL return value, the caller receives ownership of the new
+    /// interface pointer, whose reference count has been retained once. The caller must release the
+    /// returned interface pointer at the end to prevent a memory leak.
+    ///
+    /// This templated member function is a wrapper of the non-template variant for the user's
+    /// convenience. It eliminates the need to apply \c static_cast to the returned pointer, since
+    /// the return type already is a pointer to the type \p T specified as template parameter.
+    ///
+    /// \tparam T     The requested interface type.
+    ///
+    template <class T>
+    T* get_interface()
+    {
+        return static_cast<T*>( get_interface( typename T::IID()));
+    }
+
+    /// Returns the interface ID of the most derived interface.
+    virtual Uuid get_iid() const = 0;
 
 protected:
-  // Acquires a const interface.
-  //
-  // Static helper function for implementing #get_interface(const Uuid&). On #IInterface, the
-  // method terminates the recursive call chain.
-  //
-  // \param iinterface     The interface to act on.
-  // \param interface_id   Interface ID of the interface to acquire.
-  static const IInterface* get_interface_static(
-    const IInterface* iinterface, const Uuid& interface_id)
-  {
-    if (interface_id == IID())
+    // Acquires a const interface.
+    //
+    // Static helper function for implementing #get_interface(const Uuid&). On #IInterface, the
+    // method terminates the recursive call chain.
+    //
+    // \param iinterface     The interface to act on.
+    // \param interface_id   Interface ID of the interface to acquire.
+    static const IInterface* get_interface_static(
+        const IInterface* iinterface, const Uuid& interface_id)
     {
-      iinterface->retain();
-      return iinterface;
+        if( interface_id == IID()) {
+            iinterface->retain();
+            return iinterface;
+        }
+        return 0;
     }
-    return 0;
-  }
 
-  // Acquires a mutable interface.
-  //
-  // Static helper function for implementing #get_interface(const Uuid&). On #IInterface, the
-  // method terminates the recursive call chain.
-  //
-  // \param iinterface     The interface to act on.
-  // \param interface_id   Interface ID of the interface to acquire.
-  static IInterface* get_interface_static(IInterface* iinterface, const Uuid& interface_id)
-  {
-    if (interface_id == IID())
+    // Acquires a mutable interface.
+    //
+    // Static helper function for implementing #get_interface(const Uuid&). On #IInterface, the
+    // method terminates the recursive call chain.
+    //
+    // \param iinterface     The interface to act on.
+    // \param interface_id   Interface ID of the interface to acquire.
+    static IInterface* get_interface_static(
+        IInterface* iinterface, const Uuid& interface_id)
     {
-      iinterface->retain();
-      return iinterface;
+        if( interface_id == IID()) {
+            iinterface->retain();
+            return iinterface;
+        }
+        return 0;
     }
-    return 0;
-  }
+
 };
 
 /*@}*/ // end group mi_base_iinterface

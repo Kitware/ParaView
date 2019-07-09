@@ -130,10 +130,10 @@ void vtknvindex_opengl_canvas::receive_tile(
 {
   m_vtk_renderer->GetRenderWindow()->MakeCurrent();
 
-  const mi::Uint32 x_range = area.max.x - area.min.x;
-  const mi::Uint32 y_range = area.max.y - area.min.y;
+  const mi::Uint32 src_width = area.max.x - area.min.x;
+  const mi::Uint32 src_height = area.max.y - area.min.y;
 
-  if (x_range == 0 || y_range == 0)
+  if (src_width == 0 || src_height == 0)
   {
     return;
   }
@@ -144,10 +144,33 @@ void vtknvindex_opengl_canvas::receive_tile(
     return;
   }
 
+  vtkWindow* win = m_vtk_renderer->GetVTKWindow();
+  double* tvp = win->GetTileViewport();
+  int* img_size = win->GetSize();
+
+  const mi::math::Bbox_struct<mi::Uint32, 2> tile = { static_cast<mi::Uint32>(tvp[0] * img_size[0]),
+    static_cast<mi::Uint32>(tvp[1] * img_size[1]), static_cast<mi::Uint32>(tvp[2] * img_size[0]),
+    static_cast<mi::Uint32>(tvp[3] * img_size[1]) };
+
+  mi::math::Bbox_struct<mi::Uint32, 2> src_tile = { area.min.x < tile.min.x ? tile.min.x
+                                                                            : area.min.x,
+    area.min.y < tile.min.y ? tile.min.y : area.min.y,
+    area.max.x > tile.max.x ? tile.max.x : area.max.x,
+    area.max.y > tile.max.y ? tile.max.y : area.max.y };
+
+  const mi::math::Bbox_struct<mi::Uint32, 2> dst_tile = { src_tile.min.x - tile.min.x,
+    src_tile.min.y - tile.min.y, src_tile.max.x - tile.min.x, src_tile.max.y - tile.min.y };
+
+  src_tile.min.x -= area.min.x;
+  src_tile.min.y -= area.min.y;
+  src_tile.max.x -= area.min.x;
+  src_tile.max.y -= area.min.y;
+
   vtkOpenGLClearErrorMacro();
 
-  m_vtk_ogl_render_window->DrawPixels(area.min.x, area.min.y, area.max.x - 1, area.max.y - 1, 0, 0,
-    x_range - 1, y_range - 1, x_range, y_range, 4, VTK_UNSIGNED_CHAR, buffer);
+  m_vtk_ogl_render_window->DrawPixels(dst_tile.min.x, dst_tile.min.y, dst_tile.max.x - 1,
+    dst_tile.max.y - 1, src_tile.min.x, src_tile.min.y, src_tile.max.x - 1, src_tile.max.y - 1,
+    src_width, src_height, 4, VTK_UNSIGNED_CHAR, buffer);
 
   vtkOpenGLStaticCheckErrorMacro("Failed after vtknvindex_opengl_canvas::receive_tile.");
 }
@@ -185,7 +208,11 @@ void vtknvindex_opengl_canvas::set_buffer_resolution(
   const mi::math::Vector_struct<mi::Sint32, 2>& main_window_resolution)
 {
   m_main_window_size = main_window_resolution;
-  glViewport(0, 0, main_window_resolution.x, main_window_resolution.y);
+
+  vtkWindow* win = m_vtk_renderer->GetVTKWindow();
+  mi::Sint32* window_size = win->GetActualSize();
+
+  glViewport(0, 0, window_size[0], window_size[1]);
 }
 
 //-------------------------------------------------------------------------------------------------

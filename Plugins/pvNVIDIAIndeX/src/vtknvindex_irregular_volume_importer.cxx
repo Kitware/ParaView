@@ -100,7 +100,7 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
   std::string shm_memory_name;
   mi::math::Bbox<mi::Float32, 3> shm_bbox;
   mi::Uint64 shm_size = 0;
-  void* raw_mem_pointer = NULL;
+  void* subset_ptr = NULL;
   mi::Uint32 time_step = 0;
 
   mi::math::Bbox<mi::Float32, 3> query_bbox(bounding_box);
@@ -108,7 +108,7 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
   query_bbox.min = query_bbox.max = center;
 
   if (!m_cluster_properties->get_host_properties(rank_id)->get_shminfo(
-        query_bbox, shm_memory_name, shm_bbox, shm_size, &raw_mem_pointer, time_step))
+        query_bbox, shm_memory_name, shm_bbox, shm_size, &subset_ptr, time_step))
   {
     ERROR_LOG << "Failed to get the shared memory information for the subregion: " << query_bbox
               << ".";
@@ -134,10 +134,10 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
 
   INFO_LOG << "The bounding box requested by NVIDIA IndeX: " << bounding_box << ".";
 
-  if (raw_mem_pointer) // The volume data is available in local memory.
+  if (subset_ptr) // The volume data is available in local memory.
   {
     vtknvindex_irregular_volume_data* ivol_data =
-      static_cast<vtknvindex_irregular_volume_data*>(raw_mem_pointer);
+      static_cast<vtknvindex_irregular_volume_data*>(subset_ptr);
 
     pv_ugrid = ivol_data->pv_unstructured_grid;
     scalars = ivol_data->scalars;
@@ -291,14 +291,27 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
   // Build subset vertex list and remap indices.
   nb_subset_tetrahedrons = subset_tetrahedrons.size();
 
-  // if no tetrahedrons in this subregion then return.
+  // if no tetrahedrons in this subregion then return an empty subset.
   if (nb_subset_tetrahedrons == 0)
   {
+    mi::base::Handle<nv::index::IIrregular_volume_subset> irregular_volume_subset(
+      factory->create_data_subset<nv::index::IIrregular_volume_subset>());
+
+    if (!irregular_volume_subset.is_valid_interface())
+    {
+      ERROR_LOG << "The importer cannot create an irregular volume subset.";
+      return NULL;
+    }
+
     // free memory space linked to shared memory
     if (shm_ivol)
       vtknvindex::util::unmap_shm(shm_ivol, shm_size);
 
-    return NULL;
+    irregular_volume_subset->retain();
+
+    vtkTimerLog::MarkEndEvent("NVIDIA-IndeX: Importing");
+
+    return irregular_volume_subset.get();
   }
 
   for (mi::Uint32 t = 0u; t < nb_subset_tetrahedrons; ++t)

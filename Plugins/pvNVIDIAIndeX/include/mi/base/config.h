@@ -26,11 +26,14 @@
 #define MI_COPYRIGHT_COMPANY_STRING "NVIDIA Corporation"
 
 // The NVIDIA copyright string.
-#define MI_COPYRIGHT_COPYRIGHT_STRING                                                              \
-  "Copyright " MI_COPYRIGHT_YEARS_STRING " " MI_COPYRIGHT_COMPANY_STRING ". All rights reserved."
+#define MI_COPYRIGHT_COPYRIGHT_STRING \
+"Copyright " MI_COPYRIGHT_YEARS_STRING \
+" " MI_COPYRIGHT_COMPANY_STRING ". All rights reserved."
 
 // The NVIDIA copyright string if only portions are covered.
-#define MI_COPYRIGHT_PORTIONS_STRING "Portions " MI_COPYRIGHT_COPYRIGHT_STRING
+#define MI_COPYRIGHT_PORTIONS_STRING \
+"Portions " MI_COPYRIGHT_COPYRIGHT_STRING
+
 
 // The preprocessor defines MI_DLL_EXPORT and MI_DLL_LOCAL provide access to
 // the compiler-dependent declaration directives for managing symbol
@@ -63,30 +66,30 @@
 // the GCC web site <http://gcc.gnu.org/wiki/Visibility>.
 
 #ifdef _WIN32
-#ifdef MI_DLL_BUILD
-#define MI_DLL_EXPORT __declspec(dllexport)
-#else
-#define MI_DLL_EXPORT __declspec(dllimport)
-#endif
-#define MI_DLL_LOCAL
+#  ifdef MI_DLL_BUILD
+#    define MI_DLL_EXPORT __declspec(dllexport)
+#  else
+#    define MI_DLL_EXPORT __declspec(dllimport)
+#  endif
+#  define MI_DLL_LOCAL
 #elif defined(__GNUC__) && !defined(__ICC)
-#define MI_DLL_EXPORT __attribute__((visibility("default")))
-#define MI_DLL_LOCAL __attribute__((visibility("hidden")))
+#  define MI_DLL_EXPORT __attribute__ ((visibility("default")))
+#  define MI_DLL_LOCAL  __attribute__ ((visibility("hidden")))
 #else
-#define MI_DLL_EXPORT
-#define MI_DLL_LOCAL
+#  define MI_DLL_EXPORT
+#  define MI_DLL_LOCAL
 #endif
 
 /// Creates an identifier from concatenating the values of \p X and \p Y,
 /// possibly expanding macros in \p X and \p Y.
-#define MI_BASE_JOIN(X, Y) MI_BASE_DO_JOIN(X, Y)
-#define MI_BASE_DO_JOIN(X, Y) MI_BASE_DO_JOIN2(X, Y)
-#define MI_BASE_DO_JOIN2(X, Y) X##Y
+#define MI_BASE_JOIN( X, Y ) MI_BASE_DO_JOIN( X, Y )
+#define MI_BASE_DO_JOIN( X, Y ) MI_BASE_DO_JOIN2(X,Y)
+#define MI_BASE_DO_JOIN2( X, Y ) X##Y
 
 /// Creates a string from the value of \p X, possibly expanding macros in \p X.
-#define MI_BASE_STRINGIZE(X) MI_BASE_DO_STRINGIZE(X)
-#define MI_BASE_DO_STRINGIZE(X) MI_BASE_DO_STRINGIZE2(X)
-#define MI_BASE_DO_STRINGIZE2(X) #X
+#define MI_BASE_STRINGIZE( X ) MI_BASE_DO_STRINGIZE( X )
+#define MI_BASE_DO_STRINGIZE( X ) MI_BASE_DO_STRINGIZE2(X)
+#define MI_BASE_DO_STRINGIZE2( X ) #X
 
 /// Empty macro that can be used after function names to prevent
 /// macro expansion that happen to have the same name, for example,
@@ -121,7 +124,7 @@
 #define MI_PLATFORM_MACOSX
 #endif // !defined(MI_PLATFORM_MACOSX)
 
-#elif defined(__unix__) // defined(__APPLE__)
+#elif defined(__unix__)  // defined(__APPLE__)
 
 #if !defined(MI_PLATFORM_UNIX)
 #define MI_PLATFORM_UNIX
@@ -207,7 +210,7 @@
 #define MI_ARCH_X86
 #endif // !defined(MI_ARCH_X86)
 
-#if (defined(__x86_64__) || defined(_M_X64)) && !defined(MI_ARCH_X86_64)
+#if (defined(__x86_64__) || defined(_M_X64) ) && !defined(MI_ARCH_X86_64)
 #define MI_ARCH_X86_64
 #endif // defined(__x86_64__) && !defined(MI_ARCH_X86_64)
 
@@ -217,7 +220,7 @@
 
 #elif defined(__sparcv9) // defined(_M_IX86) || defined(__i386__)
 
-#if !defined(MI_ARCH_SPARC_64)
+#if ! defined( MI_ARCH_SPARC_64)
 #define MI_ARCH_SPARC_64
 #endif // !defined( MI_ARCH_SPARC_64)
 
@@ -246,7 +249,7 @@
 #endif // defined(MI_ARCH_X86_64) ...
 
 // Check that we detected one architecture
-#if !defined(MI_ARCH_BIG_ENDIAN) && !defined(MI_ARCH_LITTLE_ENDIAN)
+#if ! defined(MI_ARCH_BIG_ENDIAN) && ! defined(MI_ARCH_LITTLE_ENDIAN)
 #error Architecture unknown, neither big-endian nor little-endian detected.
 #endif
 
@@ -264,21 +267,22 @@
     Pre-define \c MI_FORCE_INLINE to override the setting in this file.
  */
 #if defined(__cplusplus) && !defined(MI_FORCE_INLINE)
-#if defined(_MSC_VER) /* Microsoft Visual C++ */
-#define MI_FORCE_INLINE __forceinline
-#elif defined(__GNUC__) /* GNU C/C++ Compiler */
-#if defined(DEBUG)
-/* Known bug in some g++ compiler versions: forced inlining produces
- * buggy code when compiling without optimization.
- */
-#define MI_FORCE_INLINE inline
-#else
-#define MI_FORCE_INLINE __attribute__((always_inline)) inline
+#  if   defined(_MSC_VER)               /* Microsoft Visual C++ */
+#    define MI_FORCE_INLINE __forceinline
+#  elif defined(__GNUC__)               /* GNU C/C++ Compiler */
+#    if defined(DEBUG)
+       /* Known bug in some g++ compiler versions: forced inlining produces
+        * buggy code when compiling without optimization.
+        */
+#      define MI_FORCE_INLINE inline
+#    else
+#      define MI_FORCE_INLINE __attribute__ ((always_inline)) inline
+#    endif
+#  else
+#    define MI_FORCE_INLINE inline
+#  endif
 #endif
-#else
-#define MI_FORCE_INLINE inline
-#endif
-#endif
+
 
 #ifdef MI_PLATFORM_WINDOWS
 /// The operating system specific default filename extension for shared libraries (DLLs)

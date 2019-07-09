@@ -145,6 +145,7 @@ private:
   vtknvindex_performance_values m_performance_values;  // Performance values logger.
   vtkMultiProcessController* m_controller;             // MPI controller from ParaView.
   vtkDataArray* m_scalar_array;                        // Scalar array containing actual data.
+  std::vector<void*> m_subset_ptrs; // Array with pointers to scalars data for all time steps.
 
   mi::Float64 m_whole_bounds[6]; // Whole volume bounds.
 

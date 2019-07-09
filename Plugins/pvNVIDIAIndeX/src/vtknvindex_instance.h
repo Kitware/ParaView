@@ -51,7 +51,9 @@ public:
   bool is_index_rank() const;
   mi::Sint32 get_cur_local_rank_id() const;
 
+  // Initialize IndeX
   void init_index();
+  bool is_index_initialized() const;
 
   // Cameras
   mi::neuraylib::Tag get_perspective_camera() const;
@@ -66,6 +68,9 @@ public:
 
   // Get the NVIDIA IndeX interface handle.
   mi::base::Handle<nv::index::IIndex>& get_interface();
+
+  // Plug-in version
+  const char* get_version() const;
 
 public:
   // DiCE database

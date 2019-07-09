@@ -9,277 +9,281 @@
 #ifndef NVIDIA_INDEX_SAMPLING_RAYS_H
 #define NVIDIA_INDEX_SAMPLING_RAYS_H
 
-#include <mi/base/interface_declare.h>
-#include <mi/math/color.h>
 #include <mi/math/vector.h>
-#include <mi/neuraylib/iserializer.h> // Tag_struct
+#include <mi/math/color.h>
+#include <mi/base/interface_declare.h>
+#include <mi/neuraylib/iserializer.h>    // Tag_struct
 
-namespace mi
-{
-namespace neuraylib
-{
+namespace mi {
+namespace neuraylib {
 
 class IDice_transaction;
-}
-}
 
-namespace nv
-{
-namespace index
-{
+}}
+
+
+
+namespace nv {
+namespace index {
 
 // forward declarations
-class IScene_path; // see iscene_query_result.h
+class IScene_path;  // see iscene_query_result.h
 class IIndex_rendering;
 class IRay_sampling_value_format;
 class IRay_sampling_query;
 class IRay_sampling_result;
 class IPerformance_values;
 
+
+
 /// Interface to perform ray sampling.
 ///
-class IRay_sampling : public mi::base::Interface_declare<0xa9c602d, 0x3869, 0x4a42, 0x94, 0x9d,
-                        0x57, 0x33, 0x4b, 0xa0, 0x5a, 0x4b>
+class IRay_sampling
+    : public mi::base::Interface_declare<0xa9c602d,0x3869,0x4a42,0x94,0x9d,0x57,0x33,0x4b,0xa0,0x5a,0x4b>
 {
 public:
-  /// Limits for ray sampling.
-  enum Limit
-  {
-    MAX_RAYS,           ///< maximum number of rays to be sampled at once, at least 4
-    MAX_USER_VALUES,    ///< maximum number of user defined sample values, in range [4,32]
-    MAX_USER_VALUE_SIZE ///< maximum byte size of one sample value, at least 64
-  };
+    /// Limits for ray sampling.
+    enum Limit {
+        MAX_RAYS,               ///< maximum number of rays to be sampled at once, at least 4
+        MAX_USER_VALUES,        ///< maximum number of user defined sample values, in range [4,32]
+        MAX_USER_VALUE_SIZE     ///< maximum byte size of one sample value, at least 64
+    };
 
-  /// Returns the value for \param limit
-  virtual mi::Uint32 get_limit(Limit limit) const = 0;
+    /// Returns the value for \param limit
+    virtual mi::Uint32  get_limit(Limit limit) const = 0;
 
-  /// Create object to specify a user value format for ray samples, \see IRay_sampling_value_format.
-  virtual IRay_sampling_value_format* create_sampling_value_format() = 0;
+    /// Create object to specify a user value format for ray samples, \see IRay_sampling_value_format.
+    virtual IRay_sampling_value_format* create_sampling_value_format() = 0;
 
-  /// Create object to specify a ray sampling query, \see IRay_sampling_query.
-  virtual IRay_sampling_query* create_sampling_query() = 0;
+    /// Create object to specify a ray sampling query, \see IRay_sampling_query.
+    virtual IRay_sampling_query* create_sampling_query() = 0;
 
-  /// Perform ray sampling on the scene.
-  /// \param[in]  sampling_query      The sampling query specifying the ray(s) and sampling limits.
-  /// \param[in]  user_value_format   Specification of the user value format, can be \c NULL.
-  /// \param[in]  index_rendering     Instance of the rendering interface
-  /// \param[in]  session_tag         The \c ISession tag.
-  /// \param[in]  transaction         DiCE transaction.
-  /// \return The sampling result, \see IRay_sampling_result.
-  ///
-  virtual const IRay_sampling_result* sample_scene(const IRay_sampling_query* sampling_query,
-    const IRay_sampling_value_format* user_value_format, IIndex_rendering* index_rendering,
-    mi::neuraylib::Tag_struct session_tag, mi::neuraylib::IDice_transaction* transaction) = 0;
+    /// Perform ray sampling on the scene.
+    /// \param[in]  sampling_query      The sampling query specifying the ray(s) and sampling limits.
+    /// \param[in]  user_value_format   Specification of the user value format, can be \c NULL.
+    /// \param[in]  index_rendering     Instance of the rendering interface
+    /// \param[in]  session_tag         The \c ISession tag.
+    /// \param[in]  transaction         DiCE transaction.
+    /// \return The sampling result, \see IRay_sampling_result.
+    /// 
+    virtual const IRay_sampling_result* sample_scene(
+        const IRay_sampling_query*        sampling_query,
+        const IRay_sampling_value_format* user_value_format,
+        IIndex_rendering*                 index_rendering,
+        mi::neuraylib::Tag_struct         session_tag,
+        mi::neuraylib::IDice_transaction* transaction) = 0;
 };
 
+
+
 /// Interface to define user values for ray sampling the scene's contents.
-///
+/// 
 /// User sample values are generated in the inquire() method of the CUDA sampling program.
 /// The IndeX library will provide device storage for all specified user values,
 /// and an interface to write user values in the CUDA sampling program.
-///
+/// 
 /// A user value can be a struct (with a size up to IRay_sampling::get_limit(MAX_USER_VALUE_SIZE)),
 /// the members of the struct should be aligned (using padding) correctly to avoid kernel failures.
 /// For instance, the CUDA types float2 and float4 have to be aligned to 8 or 16 bytes respectively.
 /// The IndeX library will align all user value arrays to 16 bytes.
 ///
-class IRay_sampling_value_format : public mi::base::Interface_declare<0x2c848141, 0xb2de, 0x46db,
-                                     0x92, 0xaa, 0xc7, 0x66, 0x7e, 0xdb, 0xeb, 0xfe>
+class IRay_sampling_value_format
+    : public mi::base::Interface_declare<0x2c848141,0xb2de,0x46db,0x92,0xaa,0xc7,0x66,0x7e,0xdb,0xeb,0xfe>
 {
 public:
-  /// Set number of user sample values and the byte size per value.
-  ///
-  ///
-  /// \param[in] value_sizes  Size of user sample values (in bytes) for nb_values, \see
-  /// get_limit(MAX_USER_VALUES).
-  /// \param[in] nb_values    Number of user sample values, \see get_limit(MAX_USER_VALUE_SIZE).
-  /// \return false if number of user values is too large or if any of the value sizes is invalid.
-  ///
-  virtual bool set_value_sizes(const mi::Uint32* value_sizes, mi::Uint32 nb_values) = 0;
+    /// Set number of user sample values and the byte size per value.
+    /// 
+    /// 
+    /// \param[in] value_sizes  Size of user sample values (in bytes) for nb_values, \see get_limit(MAX_USER_VALUES).
+    /// \param[in] nb_values    Number of user sample values, \see get_limit(MAX_USER_VALUE_SIZE).
+    /// \return false if number of user values is too large or if any of the value sizes is invalid.
+    /// 
+    virtual bool set_value_sizes(const mi::Uint32* value_sizes, mi::Uint32 nb_values) = 0;
 
-  /// Get the number of user values specified.
-  virtual mi::Uint32 get_nb_values() const = 0;
+    /// Get the number of user values specified.
+    virtual mi::Uint32 get_nb_values() const = 0;
 
-  /// Get the byte size of user value \param i
-  virtual mi::Uint32 get_value_size(mi::Uint32 i) const = 0;
+    /// Get the byte size of user value \param i
+    virtual mi::Uint32 get_value_size(mi::Uint32 i) const = 0;
 };
 
+
+
 /// Interface to define a query for ray sampling the scene's contents.
-///
+/// 
 /// A ray sampling query contains one or more rays, which are used to sample scene elements.
-/// When a ray intersects a volume or surface, one ore more samples are taken. The distance of the
-/// samples
-/// along the ray is defined by the sampling step size (similar to rendering) and by surface
-/// intersections.
+/// When a ray intersects a volume or surface, one ore more samples are taken. The distance of the samples
+/// along the ray is defined by the sampling step size (similar to rendering) and by surface intersections.
 /// All samples are sorted by distance from the ray origin.
-///
+/// 
 /// The sampling is based on user defined CUDA programs. By default, the sample color is generated
 /// using the CUDA program for rendering. Additional sample values can be generated by providing
 /// a CUDA program for ray sampling.
-///
-class IRay_sampling_query : public mi::base::Interface_declare<0xd2f21a06, 0xb509, 0x40df, 0x82,
-                              0xd1, 0x91, 0xc1, 0x1c, 0xe4, 0xc3, 0xf>
+/// 
+class IRay_sampling_query
+    : public mi::base::Interface_declare<0xd2f21a06,0xb509,0x40df,0x82,0xd1,0x91,0xc1,0x1c,0xe4,0xc3,0xf>
 {
 public:
-  /// Returns true if this query is valid.
-  virtual bool is_valid() const = 0;
+    /// Returns true if this query is valid.
+    virtual bool is_valid() const = 0;
 
-  /// Set maximum number of samples to be taken per ray.
-  virtual void set_max_samples(mi::Uint32 num) = 0;
 
-  /// Get maximum number of samples to be taken per ray.
-  virtual mi::Uint32 get_max_samples() const = 0;
+    /// Set maximum number of samples to be taken per ray.
+    virtual void set_max_samples(mi::Uint32 num) = 0;
 
-  /// Ray to be sampled. Defined in world space and restricted by a range for the t-parameter.
-  struct Ray
-  {
-    mi::math::Vector_struct<mi::Float32, 3> origin;
-    mi::math::Vector_struct<mi::Float32, 3> direction; ///< ray direction, normalized
-    mi::math::Vector_struct<mi::Float32, 2> range;     ///< min/max range of the ray t-parameter
-  };
+    /// Get maximum number of samples to be taken per ray.
+    virtual mi::Uint32 get_max_samples() const = 0;
 
-  /// Set rays to be sampled in this query.
-  ///
-  /// \param[in] rays     World space rays, up to get_limit(MAX_RAYS).
-  /// \param[in] nb_rays  Number of rays provided, less or equal get_limit(MAX_RAYS).
-  /// \return false if rays are invalid or too many.
-  ///
-  virtual bool set_rays(const Ray* rays, mi::Uint32 nb_rays) = 0;
 
-  /// Returns number of rays in this query.
-  virtual mi::Uint32 get_nb_rays() const = 0;
+    /// Ray to be sampled. Defined in world space and restricted by a range for the t-parameter.
+    struct Ray {
+        mi::math::Vector_struct<mi::Float32, 3>   origin;
+        mi::math::Vector_struct<mi::Float32, 3>   direction;   ///< ray direction, normalized
+        mi::math::Vector_struct<mi::Float32, 2>   range;       ///< min/max range of the ray t-parameter
+    };
 
-  /// Get ray of index \c i.
-  virtual const Ray* get_ray(mi::Uint32 i) const = 0;
+
+    /// Set rays to be sampled in this query.
+    /// 
+    /// \param[in] rays     World space rays, up to get_limit(MAX_RAYS).
+    /// \param[in] nb_rays  Number of rays provided, less or equal get_limit(MAX_RAYS).
+    /// \return false if rays are invalid or too many.
+    /// 
+    virtual bool set_rays(const Ray* rays, mi::Uint32 nb_rays) = 0;
+     
+    /// Returns number of rays in this query.
+    virtual mi::Uint32  get_nb_rays() const = 0;
+
+    /// Get ray of index \c i.
+    virtual const Ray*  get_ray(mi::Uint32 i) const = 0;
 };
+
+
 
 /// Interface to access information about the sampled object.
 ///
-/// This interface provides information to identify the scene object, from which ray samples were
-/// taken.
+/// This interface provides information to identify the scene object, from which ray samples were taken.
 /// Use the IRay_sampling_result interface to get this information for a certain sample.
-///
-class IRay_sampling_object_info : public mi::base::Interface_declare<0xb8a4ffbd, 0x5f8b, 0x4785,
-                                    0x8a, 0x95, 0xa6, 0xe1, 0xb5, 0xfc, 0x97, 0x78>
+/// 
+class IRay_sampling_object_info
+    : public mi::base::Interface_declare<0xb8a4ffbd,0x5f8b,0x4785,0x8a,0x95,0xa6,0xe1,0xb5,0xfc,0x97,0x78>
 {
 public:
-  /// Returns the intersected scene element's tag.
-  virtual mi::neuraylib::Tag_struct get_scene_element() const = 0;
+    /// Returns the intersected scene element's tag.
+    virtual mi::neuraylib::Tag_struct get_scene_element() const = 0;
 
-  /// Returns the scene path from the scene root to the intersected scene element.
-  virtual const IScene_path* get_scene_path() const = 0;
+    /// Returns the scene path from the scene root to the intersected scene element.
+    virtual const IScene_path* get_scene_path() const = 0;
 };
+
+
 
 /// Interface to access result of ray sampling the scene's contents.
 ///
-///
-class IRay_sampling_result : public mi::base::Interface_declare<0x1560b720, 0xe3c7, 0x4356, 0x92,
-                               0x29, 0xd8, 0x41, 0xef, 0x4d, 0xb3, 0xe6>
+/// 
+class IRay_sampling_result
+    : public mi::base::Interface_declare<0x1560b720,0xe3c7,0x4356,0x92,0x29,0xd8,0x41,0xef,0x4d,0xb3,0xe6>
 {
 public:
-  /// Get the query associated with this result.
-  virtual const IRay_sampling_query* get_query() const = 0;
 
-  /// Get the user value format definition associated with this result.
-  virtual const IRay_sampling_value_format* get_value_format() const = 0;
+    /// Get the query associated with this result.
+    virtual const IRay_sampling_query*          get_query() const = 0;
 
-  /// Return true if sampling result is valid.
-  /// Note that the number of samples can still be 0.
-  virtual bool is_valid() const = 0;
+    /// Get the user value format definition associated with this result.
+    virtual const IRay_sampling_value_format*   get_value_format() const = 0;
 
-  /// Get the number of samples.
-  virtual mi::Uint32 get_nb_samples(mi::Uint32 ray_index) const = 0;
+    /// Return true if sampling result is valid. 
+    /// Note that the number of samples can still be 0.
+    virtual bool        is_valid() const = 0;
 
-  //////////////////////////////////////////////////////////////////////////
-  /// \name Getting per sample data
-  ///
-  /// @{
+    /// Get the number of samples.
+    virtual mi::Uint32  get_nb_samples(mi::Uint32 ray_index) const = 0;
 
-  /// Selector for a range of samples of a certain ray.
-  struct Sample_range
-  {
-    mi::Uint32 ray_index;    ///< ray index of the sampling query
-    mi::Uint32 first_sample; ///< index of first sample
-    mi::Uint32 nb_samples;   ///< number of samples
-  };
+    //////////////////////////////////////////////////////////////////////////
+    /// \name Getting per sample data
+    /// 
+    /// @{
 
-  /// Get sample distance from the ray origin. Samples are sorted by ascending distance.
-  /// \param[in] sample_range     Range of samples to access.
-  /// \param[out] data            Pointer to memory receiving sample data.
-  /// \return true if sample range was valid.
-  virtual bool get_distances(const Sample_range& sample_range, mi::Float32* data) const = 0;
+    /// Selector for a range of samples of a certain ray.
+    struct Sample_range {
+        mi::Uint32  ray_index;      ///< ray index of the sampling query
+        mi::Uint32  first_sample;   ///< index of first sample
+        mi::Uint32  nb_samples;     ///< number of samples
+    };
 
-  /// Get sample color.
-  /// \param[in] sample_range     Range of samples to access.
-  /// \param[out] data            Pointer to memory receiving sample data.
-  /// \return true if sample range was valid.
-  virtual bool get_colors(const Sample_range& sample_range, mi::math::Color_struct* data) const = 0;
+    /// Get sample distance from the ray origin. Samples are sorted by ascending distance.
+    /// \param[in] sample_range     Range of samples to access.
+    /// \param[out] data            Pointer to memory receiving sample data.
+    /// \return true if sample range was valid.
+    virtual bool get_distances(const Sample_range& sample_range, mi::Float32* data) const = 0;
+    
+    /// Get sample color.
+    /// \param[in] sample_range     Range of samples to access.
+    /// \param[out] data            Pointer to memory receiving sample data.
+    /// \return true if sample range was valid.
+    virtual bool get_colors(const Sample_range& sample_range, mi::math::Color_struct* data) const = 0;
+    
+    /// Get sample flags. Flags tell if a sample was a surface front/back hit or inside a volume, and more.
+    /// \param[in] sample_range     Range of samples to access.
+    /// \param[out] data            Pointer to memory receiving sample data.
+    /// \return true if sample range was valid.
+    virtual bool get_flags(const Sample_range& sample_range, mi::Uint32* data) const = 0;
+    
+    /// Get sample element index. The meaning of the element index depends on the object type
+    /// from which the sample was taken, e.g. for triangle meshes it is the triangle index.
+    /// \param[in] sample_range     Range of samples to access.
+    /// \param[out] data            Pointer to memory receiving sample data.
+    /// \return true if sample range was valid.
+    virtual bool get_element_indices(const Sample_range& sample_range, mi::Uint64* data) const = 0;
 
-  /// Get sample flags. Flags tell if a sample was a surface front/back hit or inside a volume, and
-  /// more.
-  /// \param[in] sample_range     Range of samples to access.
-  /// \param[out] data            Pointer to memory receiving sample data.
-  /// \return true if sample range was valid.
-  virtual bool get_flags(const Sample_range& sample_range, mi::Uint32* data) const = 0;
+    /// Get user value.
+    /// A user value can be written in the CUDA sampling program. 
+    /// The value might be invalid, if no CUDA sampling program wrote to it. To check this, use
+    /// get_user_value_masks().
+    /// 
+    /// \param[in] sample_range     Range of samples to access.
+    /// \param[in] value_index      Index of user value, \see get_limit(MAX_USER_VALUES).
+    /// \param[out] data            Pointer to buffer to receive values. Must be sized according to the configured value size,
+    ///                             \see IRay_sampling_value_format.
+    /// \return true if sample range and value_index was valid.
+    virtual bool get_user_values(const Sample_range& sample_range, mi::Uint32 value_index, void* data) const = 0;
 
-  /// Get sample element index. The meaning of the element index depends on the object type
-  /// from which the sample was taken, e.g. for triangle meshes it is the triangle index.
-  /// \param[in] sample_range     Range of samples to access.
-  /// \param[out] data            Pointer to memory receiving sample data.
-  /// \return true if sample range was valid.
-  virtual bool get_element_indices(const Sample_range& sample_range, mi::Uint64* data) const = 0;
+    /// Get value mask. The bits of a value mask tell if a user value was written in the CUDA sampling program.
+    /// If the bit is 0, then the value at the value index is not valid.
+    /// \param[in] sample_range     Range of samples to access.
+    /// \param[out] data            Pointer to memory receiving sample data.
+    /// \return true if sample range was valid.
+    virtual bool get_user_value_masks(const Sample_range& sample_range, mi::Uint32* data) const = 0;
 
-  /// Get user value.
-  /// A user value can be written in the CUDA sampling program.
-  /// The value might be invalid, if no CUDA sampling program wrote to it. To check this, use
-  /// get_user_value_masks().
-  ///
-  /// \param[in] sample_range     Range of samples to access.
-  /// \param value_index          Index of user value, \see get_limit(MAX_USER_VALUES).
-  /// \param[out] data            Pointer to buffer to receive values. Must be sized according to
-  /// the configured value size,
-  ///                             \see IRay_sampling_value_format.
-  /// \return true if sample range and value_index was valid.
-  virtual bool get_user_values(
-    const Sample_range& sample_range, mi::Uint32 value_index, void* data) const = 0;
+    /// Get the object id. The object id can be used to access detailed information about the scene object,
+    /// from which the ray samples were taken. \see get_object_info().
+    /// \note The object id is only unique and valid for one IRay_sampling_result.
+    /// 
+    /// \param[in] sample_range     Range of samples to access.
+    /// \param[out] data            Pointer to memory receiving sample data.
+    /// \return true if sample range was valid.
+    virtual bool get_object_ids(const Sample_range& sample_range, mi::Uint32* data) const = 0;
 
-  /// Get value mask. The bits of a value mask tell if a user value was written in the CUDA sampling
-  /// program.
-  /// If the bit is 0, then the value at the value index is not valid.
-  /// \param[in] sample_range     Range of samples to access.
-  /// \param[out] data            Pointer to memory receiving sample data.
-  /// \return true if sample range was valid.
-  virtual bool get_user_value_masks(const Sample_range& sample_range, mi::Uint32* data) const = 0;
+    /// @}
 
-  /// Get the object id. The object id can be used to access detailed information about the scene
-  /// object,
-  /// from which the ray samples were taken. \see get_object_info().
-  /// \note The object id is only unique and valid for one IRay_sampling_result.
-  ///
-  /// \param[in] sample_range     Range of samples to access.
-  /// \param[out] data            Pointer to memory receiving sample data.
-  /// \return true if sample range was valid.
-  virtual bool get_object_ids(const Sample_range& sample_range, mi::Uint32* data) const = 0;
 
-  /// @}
+    /// Access detailed information of a scene object.
+    /// 
+    /// \param object_id    One of the object ids returned from get_object_ids().
+    /// \return Interface to object information, or 0 if the object id was not valid.
+    /// 
+    virtual const IRay_sampling_object_info* get_object_info(mi::Uint32 object_id) const = 0;
 
-  /// Access detailed information of a scene object.
-  ///
-  /// \param object_id    One of the object ids returned from get_object_ids().
-  /// \return Interface to object information, or 0 if the object id was not valid.
-  ///
-  virtual const IRay_sampling_object_info* get_object_info(mi::Uint32 object_id) const = 0;
+    /// Get number of object infos. Use this to enumerate all IRay_sampling_object_infos with get_object_info().
+    virtual mi::Uint32 get_nb_object_infos() const = 0;
 
-  /// Get number of object infos. Use this to enumerate all IRay_sampling_object_infos with
-  /// get_object_info().
-  virtual mi::Uint32 get_nb_object_infos() const = 0;
 
-  /// Returns an instance of the interface \c IPerformance_values containing
-  /// detailed performance information gathered during the sampling process.
-  ///
-  virtual const IPerformance_values* get_performance_values() const = 0;
+    /// Returns an instance of the interface \c IPerformance_values containing
+    /// detailed performance information gathered during the sampling process.
+    /// 
+    virtual const IPerformance_values* get_performance_values() const = 0;
 };
-}
-} // nv::index
 
-#endif // NVIDIA_INDEX_SAMPLING_RAYS_H
+}} // nv::index
+
+#endif //NVIDIA_INDEX_SAMPLING_RAYS_H

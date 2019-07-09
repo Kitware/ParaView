@@ -9,8 +9,7 @@
 
 #include <mi/neuraylib/idata.h>
 
-namespace mi
-{
+namespace mi {
 
 /** \defgroup mi_neuray_compounds Compounds
     \ingroup mi_neuray_collections
@@ -58,150 +57,151 @@ namespace mi
 ///   Currently the element type is restricted to be either \c bool, #mi::Sint32, #mi::Float32, or
 ///   #mi::Float64. If used as an attribute, matrices are restricted to #mi::Float32 as element type
 ///   with the exception of 4 x 4 matrices of elements of type #mi::Float64.
-class ICompound : public base::Interface_declare<0x65437cd6, 0x9727, 0x488c, 0xa9, 0xc5, 0x92, 0x42,
-                    0x43, 0xf5, 0x5b, 0xa0, IData_collection>
+class ICompound : public
+    base::Interface_declare<0x65437cd6,0x9727,0x488c,0xa9,0xc5,0x92,0x42,0x43,0xf5,0x5b,0xa0,
+                            IData_collection>
 {
 public:
-  /// Returns the number of rows of the represented matrix or vector.
-  virtual Size get_number_of_rows() const = 0;
+    /// Returns the number of rows of the represented matrix or vector.
+    virtual Size get_number_of_rows() const = 0;
 
-  /// Returns the number of columns of the represented matrix.
-  ///
-  /// Always returns 1 in case of vectors.
-  virtual Size get_number_of_columns() const = 0;
+    /// Returns the number of columns of the represented matrix.
+    ///
+    /// Always returns 1 in case of vectors.
+    virtual Size get_number_of_columns() const = 0;
 
-  /// Returns the total number of elements.
-  ///
-  /// This value is the product of #get_number_of_rows() and #get_number_of_columns().
-  virtual Size get_length() const = 0;
+    /// Returns the total number of elements.
+    ///
+    /// This value is the product of #get_number_of_rows() and #get_number_of_columns().
+    virtual Size get_length() const = 0;
 
-  /// Returns the type name of elements of the compound.
-  virtual const char* get_element_type_name() const = 0;
+    /// Returns the type name of elements of the compound.
+    virtual const char* get_element_type_name() const = 0;
 
-  /// Accesses the (\p row, \p column)-th element.
-  ///
-  /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
-  virtual bool get_value(Size row, Size column, bool& value) const = 0;
+    /// Accesses the (\p row, \p column)-th element.
+    ///
+    /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
+    virtual bool get_value( Size row, Size column, bool& value) const = 0;
 
-  /// Accesses the (\p row, \p column)-th element.
-  ///
-  /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
-  virtual bool get_value(Size row, Size column, Sint32& value) const = 0;
+    /// Accesses the (\p row, \p column)-th element.
+    ///
+    /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
+    virtual bool get_value( Size row, Size column, Sint32& value) const = 0;
 
-  /// Accesses the (\p row, \p column)-th element.
-  ///
-  /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
-  virtual bool get_value(Size row, Size column, Uint32& value) const = 0;
+    /// Accesses the (\p row, \p column)-th element.
+    ///
+    /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
+    virtual bool get_value( Size row, Size column, Uint32& value) const = 0;
 
-  /// Accesses the (\p row, \p column)-th element.
-  ///
-  /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
-  virtual bool get_value(Size row, Size column, Float32& value) const = 0;
+    /// Accesses the (\p row, \p column)-th element.
+    ///
+    /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
+    virtual bool get_value( Size row, Size column, Float32& value) const = 0;
 
-  /// Accesses the (\p row, \p column)-th element.
-  ///
-  /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
-  virtual bool get_value(Size row, Size column, Float64& value) const = 0;
+    /// Accesses the (\p row, \p column)-th element.
+    ///
+    /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
+    virtual bool get_value( Size row, Size column, Float64& value) const = 0;
 
-  /// Accesses the (\p row, \p column)-th element.
-  ///
-  /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
-  template <class T>
-  T get_value(Size row, Size column) const
-  {
-    T value;
-    bool result = get_value(row, column, value);
-    return result ? value : static_cast<T>(0);
-  }
+    /// Accesses the (\p row, \p column)-th element.
+    ///
+    /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
+    template<class T>
+    T get_value( Size row, Size column) const
+    {
+        T value;
+        bool result = get_value( row, column, value);
+        return result ? value : static_cast<T>( 0);
+    }
 
-  /// Sets the (\p row, \p column)-th element to \p value.
-  ///
-  /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
-  virtual bool set_value(Size row, Size column, bool value) = 0;
+    /// Sets the (\p row, \p column)-th element to \p value.
+    ///
+    /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
+    virtual bool set_value( Size row, Size column, bool value) = 0;
 
-  /// Sets the (\p row, \p column)-th element to \p value.
-  ///
-  /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
-  virtual bool set_value(Size row, Size column, Sint32 value) = 0;
+    /// Sets the (\p row, \p column)-th element to \p value.
+    ///
+    /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
+    virtual bool set_value( Size row, Size column, Sint32 value) = 0;
 
-  /// Sets the (\p row, \p column)-th element to \p value.
-  ///
-  /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
-  virtual bool set_value(Size row, Size column, Uint32 value) = 0;
+    /// Sets the (\p row, \p column)-th element to \p value.
+    ///
+    /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
+    virtual bool set_value( Size row, Size column, Uint32 value) = 0;
 
-  /// Sets the (\p row, \p column)-th element to \p value.
-  ///
-  /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
-  virtual bool set_value(Size row, Size column, Float32 value) = 0;
+    /// Sets the (\p row, \p column)-th element to \p value.
+    ///
+    /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
+    virtual bool set_value( Size row, Size column, Float32 value) = 0;
 
-  /// Sets the (\p row, \p column)-th element to \p value.
-  ///
-  /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
-  virtual bool set_value(Size row, Size column, Float64 value) = 0;
+    /// Sets the (\p row, \p column)-th element to \p value.
+    ///
+    /// \pre \p row < #get_number_of_rows(), \p column < #get_number_of_columns()
+    virtual bool set_value( Size row, Size column, Float64 value) = 0;
 
-  /// Accesses the elements of the compound.
-  ///
-  /// \param values   The values of the compound elements are written to this buffer. The size of
-  ///                 the buffer has to be at least #get_length() times \c sizeof(bool).
-  virtual void get_values(bool* values) const = 0;
+    /// Accesses the elements of the compound.
+    ///
+    /// \param values   The values of the compound elements are written to this buffer. The size of
+    ///                 the buffer has to be at least #get_length() times \c sizeof(bool).
+    virtual void get_values( bool* values) const = 0;
 
-  /// Accesses the elements of the compound.
-  ///
-  /// \param values   The values of the compound elements are written to this buffer. The size of
-  ///                 the buffer has to be at least #get_length() times \c sizeof(Sint32).
-  virtual void get_values(Sint32* values) const = 0;
+    /// Accesses the elements of the compound.
+    ///
+    /// \param values   The values of the compound elements are written to this buffer. The size of
+    ///                 the buffer has to be at least #get_length() times \c sizeof(Sint32).
+    virtual void get_values( Sint32* values) const = 0;
 
-  /// Accesses the elements of the compound.
-  ///
-  /// \param values   The values of the compound elements are written to this buffer. The size of
-  ///                 the buffer has to be at least #get_length() times \c sizeof(Uint32).
-  virtual void get_values(Uint32* values) const = 0;
+    /// Accesses the elements of the compound.
+    ///
+    /// \param values   The values of the compound elements are written to this buffer. The size of
+    ///                 the buffer has to be at least #get_length() times \c sizeof(Uint32).
+    virtual void get_values( Uint32* values) const = 0;
 
-  /// Accesses the elements of the compound.
-  ///
-  /// \param values   The values of the compound elements are written to this buffer. The size of
-  ///                 the buffer has to be at least #get_length() times \c sizeof(Float32).
-  virtual void get_values(Float32* values) const = 0;
+    /// Accesses the elements of the compound.
+    ///
+    /// \param values   The values of the compound elements are written to this buffer. The size of
+    ///                 the buffer has to be at least #get_length() times \c sizeof(Float32).
+    virtual void get_values( Float32* values) const = 0;
 
-  /// Accesses the elements of the compound.
-  ///
-  /// \param values   The values of the compound elements are written to this buffer. The size of
-  ///                 the buffer has to be at least #get_length() times \c sizeof(Float64).
-  virtual void get_values(Float64* values) const = 0;
+    /// Accesses the elements of the compound.
+    ///
+    /// \param values   The values of the compound elements are written to this buffer. The size of
+    ///                 the buffer has to be at least #get_length() times \c sizeof(Float64).
+    virtual void get_values( Float64* values) const = 0;
 
-  /// Sets the elements of the compound.
-  ///
-  /// \param values   The new values of the compound elements are read to this buffer. The size of
-  ///                 the buffer has to be at least #get_length() times \c sizeof(bool).
-  virtual void set_values(const bool* values) = 0;
+    /// Sets the elements of the compound.
+    ///
+    /// \param values   The new values of the compound elements are read to this buffer. The size of
+    ///                 the buffer has to be at least #get_length() times \c sizeof(bool).
+    virtual void set_values( const bool* values) = 0;
 
-  /// Sets the elements of the compound.
-  ///
-  /// \param values   The new values of the compound elements are read to this buffer. The size of
-  ///                 the buffer has to be at least #get_length() times \c sizeof(Sint32).
-  virtual void set_values(const Sint32* values) = 0;
+    /// Sets the elements of the compound.
+    ///
+    /// \param values   The new values of the compound elements are read to this buffer. The size of
+    ///                 the buffer has to be at least #get_length() times \c sizeof(Sint32).
+    virtual void set_values( const Sint32* values) = 0;
 
-  /// Sets the elements of the compound.
-  ///
-  /// \param values   The new values of the compound elements are read to this buffer. The size of
-  ///                 the buffer has to be at least #get_length() times \c sizeof(Uint32).
-  virtual void set_values(const Uint32* values) = 0;
+    /// Sets the elements of the compound.
+    ///
+    /// \param values   The new values of the compound elements are read to this buffer. The size of
+    ///                 the buffer has to be at least #get_length() times \c sizeof(Uint32).
+    virtual void set_values( const Uint32* values) = 0;
 
-  /// Sets the elements of the compound.
-  ///
-  /// \param values   The new values of the compound elements are read to this buffer. The size of
-  ///                 the buffer has to be at least #get_length() times \c sizeof(Float32).
-  virtual void set_values(const Float32* values) = 0;
+    /// Sets the elements of the compound.
+    ///
+    /// \param values   The new values of the compound elements are read to this buffer. The size of
+    ///                 the buffer has to be at least #get_length() times \c sizeof(Float32).
+    virtual void set_values( const Float32* values) = 0;
 
-  /// Sets the elements of the compound.
-  ///
-  /// \param values   The new values of the compound elements are read to this buffer. The size of
-  ///                 the buffer has to be at least #get_length() times \c sizeof(Float64).
-  virtual void set_values(const Float64* values) = 0;
+    /// Sets the elements of the compound.
+    ///
+    /// \param values   The new values of the compound elements are read to this buffer. The size of
+    ///                 the buffer has to be at least #get_length() times \c sizeof(Float64).
+    virtual void set_values( const Float64* values) = 0;
 
-  using IData_collection::get_value;
+    using IData_collection::get_value;
 
-  using IData_collection::set_value;
+    using IData_collection::set_value;
 };
 
 /*@}*/ // end group mi_neuray_compounds

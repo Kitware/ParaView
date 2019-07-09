@@ -27,7 +27,7 @@
 ///
 /// A change in this version number indicates that the binary compatibility
 /// of the interfaces offered through the shared library have changed.
-#define MI_NEURAYLIB_API_VERSION 35
+#define MI_NEURAYLIB_API_VERSION  35
 
 // The following three to four macros define the API version.
 // The macros thereafter are defined in terms of the first four.
@@ -35,12 +35,12 @@
 /// \NeurayApiName major version number
 ///
 /// \see \ref mi_base_intro_versioning
-#define MI_NEURAYLIB_VERSION_MAJOR 4
+#define MI_NEURAYLIB_VERSION_MAJOR  4
 
 /// \NeurayApiName minor version number
 ///
 /// \see \ref mi_base_intro_versioning
-#define MI_NEURAYLIB_VERSION_MINOR 0
+#define MI_NEURAYLIB_VERSION_MINOR  0
 
 /// \NeurayApiName version qualifier
 ///
@@ -50,28 +50,28 @@
 /// is defined as well.
 ///
 /// \see \ref mi_base_intro_versioning
-#define MI_NEURAYLIB_VERSION_QUALIFIER ""
+#define MI_NEURAYLIB_VERSION_QUALIFIER  ""
 
 // This macro is defined if #MI_NEURAYLIB_VERSION_QUALIFIER is the empty string \c "".
 #define MI_NEURAYLIB_VERSION_QUALIFIER_EMPTY
 
 /// \NeurayApiName major and minor version number without qualifier in a
 /// string representation, such as \c "2.0".
-#define MI_NEURAYLIB_VERSION_STRING                                                                \
-  MI_BASE_STRINGIZE(MI_NEURAYLIB_VERSION_MAJOR) "." MI_BASE_STRINGIZE(MI_NEURAYLIB_VERSION_MINOR)
+#define MI_NEURAYLIB_VERSION_STRING  MI_BASE_STRINGIZE(MI_NEURAYLIB_VERSION_MAJOR) "." \
+                                     MI_BASE_STRINGIZE(MI_NEURAYLIB_VERSION_MINOR)
 
 /// \def MI_NEURAYLIB_VERSION_QUALIFIED_STRING
 /// \NeurayApiName major and minor version number and qualifier in a
 /// string representation, such as \c "2.0" or \c "2.0-beta2".
 #ifdef MI_NEURAYLIB_VERSION_QUALIFIER_EMPTY
-#define MI_NEURAYLIB_VERSION_QUALIFIED_STRING MI_NEURAYLIB_VERSION_STRING
+#define MI_NEURAYLIB_VERSION_QUALIFIED_STRING  MI_NEURAYLIB_VERSION_STRING
 #else
-#define MI_NEURAYLIB_VERSION_QUALIFIED_STRING                                                      \
-  MI_NEURAYLIB_VERSION_STRING "-" MI_NEURAYLIB_VERSION_QUALIFIER
+#define MI_NEURAYLIB_VERSION_QUALIFIED_STRING  MI_NEURAYLIB_VERSION_STRING "-" \
+                                               MI_NEURAYLIB_VERSION_QUALIFIER
 #endif // MI_NEURAYLIB_VERSION_QUALIFIER_EMPTY
 
 /// \NeurayProductName product version number in a string representation, such as \c "2.0".
-#define MI_NEURAYLIB_PRODUCT_VERSION_STRING "trunk"
+#define MI_NEURAYLIB_PRODUCT_VERSION_STRING  "trunk"
 
 /// Type of plugins for the \NeurayApiName.
 /// \see #mi::base::Plugin::get_type().
