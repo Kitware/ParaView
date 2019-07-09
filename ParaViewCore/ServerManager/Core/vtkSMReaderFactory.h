@@ -128,7 +128,7 @@ public:
    * "Supported Files (*.vtk *.pvd);;PVD Files (*.pvd);;VTK Files (*.vtk)"
    * \endverbatim
    */
-  const char* GetSupportedFileTypes(vtkSMSession* session);
+  virtual const char* GetSupportedFileTypes(vtkSMSession* session);
 
   //@{
   /**
@@ -151,7 +151,7 @@ public:
    * Every time a new proxy definition is added we check to see if it is
    * a reader and then we add it to the list of available readers.
    */
-  void UpdateAvailableReaders();
+  virtual void UpdateAvailableReaders();
 
   //@{
   /**
