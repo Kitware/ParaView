@@ -147,8 +147,6 @@ function (_vtk_module_wrap_client_server_library name)
     return ()
   endif ()
 
-  # TODO: Support unified bindings?
-
   set(_vtk_client_server_declarations)
   set(_vtk_client_server_calls)
   foreach (_vtk_client_server_class IN LISTS _vtk_client_server_library_classes)
