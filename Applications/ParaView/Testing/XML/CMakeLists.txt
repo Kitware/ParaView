@@ -1019,6 +1019,7 @@ if(PARAVIEW_ENABLE_PYTHON)
   if (numpy_found)
     list(APPEND TESTS_WITH_BASELINES
       ExodusModeShapes.xml
+      FindDataPartialArrays.xml
       FindDataSelectLocation.xml # find data needs python/numpy
       FindDataSelectLocationMultiblock.xml # find data needs python/numpy
       ForceTimeDiamond.xml
