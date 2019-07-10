@@ -98,10 +98,10 @@ def execute(inputDO, selectionNode, insidednessArrayName, outputDO):
     # be ignored by the freeze selection operation
     from paraview.vtk.util import numpy_support
     output = dsa.WrapDataObject(outputDO)
-    if type(maskArray) is not dsa.VTKNoneArray:
+    if maskArray is not dsa.NoneArray:
         if isinstance(maskArray, dsa.VTKCompositeDataArray):
             for ds, array in izip(output, maskArray.Arrays):
-                if array is not None:
+                if array is not dsa.NoneArray:
                     insidedness = numpy_support.numpy_to_vtk(array, deep=1, array_type=vtkConstants.VTK_SIGNED_CHAR)
                     insidedness.SetName(insidednessArrayName)
                     ds.GetAttributes(attributeType).VTKObject.AddArray(insidedness)
