@@ -177,6 +177,8 @@ endif ()
 option(PARAVIEW_USE_RAYTRACING "Build ParaView with OSPRay and/or OptiX ray Traced rendering" ${raytracing_default})
 option(PARAVIEW_ENABLE_LOGGING "Enable logging support." ON)
 mark_as_advanced(PARAVIEW_ENABLE_LOGGING)
+option(PARAVIEW_INSTALL_DEVELOPMENT_FILES "Install development files to the install tree" ON)
+mark_as_advanced(PARAVIEW_INSTALL_DEVELOPMENT_FILES)
 
 option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
 

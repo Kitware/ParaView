@@ -273,6 +273,8 @@ More advanced options:
   * `PARAVIEW_PLUGINS_DEFAULT` (default `ON`): The state for ParaView's set of
     enabled-by-default plugins. Note that this variable only really has an
     effect on initial configures or newly added plugins.
+  * `PARAVIEW_INSTALL_DEVELOPMENT_FILES` (default `ON`): If set, ParaView will
+    install its headers, CMake API, etc. into its install tree for use.
 
 <!--
 These variables should be documented once they're effective again.
