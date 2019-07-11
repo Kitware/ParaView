@@ -179,6 +179,8 @@ option(PARAVIEW_ENABLE_LOGGING "Enable logging support." ON)
 mark_as_advanced(PARAVIEW_ENABLE_LOGGING)
 option(PARAVIEW_INSTALL_DEVELOPMENT_FILES "Install development files to the install tree" ON)
 mark_as_advanced(PARAVIEW_INSTALL_DEVELOPMENT_FILES)
+option(PARAVIEW_RELOCATABLE_INSTALL "Do not embed hard-coded paths into the install" ON)
+mark_as_advanced(PARAVIEW_RELOCATABLE_INSTALL)
 
 option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
 
@@ -849,6 +851,8 @@ else ()
       "${paraview_cmake_destination}/vtk")
     set(vtk_cmake_build_dir
       "${CMAKE_CURRENT_BINARY_DIR}/${vtk_cmake_destination}")
+    set(VTK_RELOCATABLE_INSTALL
+      "${PARAVIEW_RELOCATABLE_INSTALL}")
     include("${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake/vtkInstallCMakePackage.cmake")
   endif ()
 endif ()

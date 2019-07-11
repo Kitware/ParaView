@@ -275,6 +275,11 @@ More advanced options:
     effect on initial configures or newly added plugins.
   * `PARAVIEW_INSTALL_DEVELOPMENT_FILES` (default `ON`): If set, ParaView will
     install its headers, CMake API, etc. into its install tree for use.
+  * `PARAVIEW_RELOCATABLE_INSTALL` (default `ON`): If set, the install tree
+    will be relocatable to another path. If unset, the install tree may be tied
+    to the build machine with absolute paths, but finding dependencies in
+    non-standard locations may require work without passing extra information
+    when consuming ParaView.
 
 <!--
 These variables should be documented once they're effective again.
