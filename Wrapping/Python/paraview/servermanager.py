@@ -2511,6 +2511,10 @@ def _getPyProxy(smproxy, outputPort=0):
     first checks if there is already such an object by looking in the
     _pyproxies group and returns it if found. Otherwise, it creates a
     new one. Proxies register themselves in _pyproxies upon creation."""
+    if isinstance(smproxy, Proxy):
+        # if already a pyproxy, do nothing.
+        return smproxy
+
     if not smproxy:
         return None
     try:
@@ -2698,11 +2702,13 @@ class PVModule(object):
 def _make_name_valid(name):
     return paraview.make_name_valid(name)
 
-def _createClass(groupName, proxyName, apxm=None):
+def _createClass(groupName, proxyName, apxm=None, prototype=None):
     """Defines a new class type for the proxy."""
-    global ActiveConnection
-    pxm = ProxyManager() if not apxm else apxm
-    proto = pxm.GetPrototypeProxy(groupName, proxyName)
+    if prototype is None:
+        pxm = ProxyManager() if not apxm else apxm
+        proto = pxm.GetPrototypeProxy(groupName, proxyName)
+    else:
+        proto = prototype
     if not proto:
        paraview.print_error("Error while loading %s %s"%(groupName, proxyName))
        return None

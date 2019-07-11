@@ -443,14 +443,20 @@ def LoadState(filename, connection=None, **extraArgs):
     RemoveViewsAndLayouts()
 
     pxm = servermanager.ProxyManager()
-    proxy = pxm.NewProxy('options', 'LoadStateOptions')
+    smproxy = pxm.SMProxyManager.NewProxy('options', 'LoadStateOptions')
+    smproxy.UnRegister(None)
 
-    if ((proxy is not None) & proxy.PrepareToLoad(filename)):
-        if (proxy.HasDataFiles() and (extraArgs is not None)):
-            pyproxy = servermanager._getPyProxy(proxy)
+    if (smproxy is not None) and smproxy.PrepareToLoad(filename):
+        if smproxy.HasDataFiles() and (extraArgs is not None):
+            # always create a brand new class since the properties
+            # may change based on the state file being loaded.
+            customclass = servermanager._createClass(smproxy.GetXMLGroup(),
+                    smproxy.GetXMLName(), prototype=smproxy)
+            pyproxy = customclass(proxy=smproxy)
             SetProperties(pyproxy, **extraArgs)
-
-        proxy.Load()
+            del pyproxy
+            del customclass
+        smproxy.Load()
 
     # Try to set the new view active
     if len(GetRenderViews()) > 0:
