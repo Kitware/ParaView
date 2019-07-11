@@ -14,14 +14,26 @@
 =========================================================================*/
 /**
  * @class vtkSMLoadStateOptionsProxy
- * @brief proxy for managing data files when loading a state file.
+ * @brief proxy for state loading options
  *
+ * vtkSMLoadStateOptionsProxy is the proxy used to setup options when loading a
+ * state file. These including choosing how to handle data files referenced in
+ * the state. This proxy supports multiple ways to let the user update the files
+ * being loaded in the state file.
  *
- * vtkSMLoadStateOptionsProxy provides a dialog to allow a user to change the
- * locations of data files when loading a state file. The user can give a directory
- * where the data files reside or explicitly change the path for each data file.
+ * To use this, create the `("options", "LoadStateOptions")` proxy using the
+ * session's proxy manager and call `PrepareToLoad` with the state file to load.
+ * This will parse the state file and setup internal data structures. At this
+ * point, you can call `HasDataFiles` method to determine if the state file has
+ * any data files. This can be used to determine if the application should
+ * prompt the user with options, for example. One can change options using
+ * properties on the options proxy itself. Following `PrepareToLoad`, the proxy
+ * will present additional properties that allows the user to pick filenames for
+ * readers in the state file. Call `Load` to load the state file.
+ *
+ * This proxy is not intended for reuse. Simply create a new one for each state
+ * to load.
  */
-
 #ifndef vtkSMLoadStateOptionsProxy_h
 #define vtkSMLoadStateOptionsProxy_h
 
@@ -50,7 +62,8 @@ public:
   virtual bool HasDataFiles();
 
   /**
-   * Do the state loading.
+   * Do the state loading using the values for properties on this proxy to
+   * configure the state loading i.e. update data files, etc.
    */
   virtual bool Load();
 
@@ -60,10 +73,6 @@ public:
     USE_DATA_DIRECTORY = 1,
     CHOOSE_FILES_EXPLICITLY = 2
   };
-
-  vtkSetClampMacro(DataFileOptions, int, USE_FILES_FROM_STATE, CHOOSE_FILES_EXPLICITLY);
-
-  vtkSetMacro(OnlyUseFilesInDataDirectory, bool);
 
 protected:
   vtkSMLoadStateOptionsProxy();
