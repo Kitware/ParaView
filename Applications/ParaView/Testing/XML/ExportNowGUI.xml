@@ -31,7 +31,7 @@
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterExtract" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewExtract" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/scrollArea_2/qt_scrollarea_viewport/container/1pqProxyWidget0/SaveDTable/CheckBox" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/scrollArea_2/qt_scrollarea_viewport/container/1pqProxyWidget0/RootDirectory/RootDirectory" command="set_string" arguments="CinD" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/scrollArea_2/qt_scrollarea_viewport/container/1pqProxyWidget0/RootDirectory/FileChooser/FileLineEdit" command="set_string" arguments="CinD" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
   <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionExportImmediate" />
 </pqevents>
