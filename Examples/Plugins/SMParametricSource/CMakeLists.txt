@@ -3,6 +3,8 @@ project(SMParametricSource)
 
 find_package(ParaView REQUIRED)
 
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+
 include(GNUInstallDirs)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
