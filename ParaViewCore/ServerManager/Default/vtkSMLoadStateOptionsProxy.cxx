@@ -145,15 +145,10 @@ public:
     for (piter->Begin(); !piter->IsAtEnd(); piter->Next())
     {
       vtkSMProperty* property = piter->GetProperty();
-      vtkSMDomainIterator* diter = property->NewDomainIterator();
-      for (diter->Begin(); !diter->IsAtEnd(); diter->Next())
+      if (property->FindDomain<vtkSMFileListDomain>() != nullptr)
       {
-        if (vtkSMFileListDomain::SafeDownCast(diter->GetDomain()))
-        {
-          fileNameProperties.insert(piter->GetKey());
-        }
+        fileNameProperties.insert(piter->GetKey());
       }
-      diter->Delete();
     }
     piter->Delete();
     return fileNameProperties;
@@ -363,10 +358,9 @@ bool vtkSMLoadStateOptionsProxy::LocateFilesInDirectory(
 bool vtkSMLoadStateOptionsProxy::Load()
 {
   SM_SCOPED_TRACE(LoadState).arg("filename", this->StateFileName).arg("options", this);
-
-  this->SetDataFileOptions(vtkSMPropertyHelper(this, "LoadStateDataFileOptions").GetAsInt());
-  this->SetOnlyUseFilesInDataDirectory(
-    vtkSMPropertyHelper(this, "OnlyUseFilesInDataDirectory").GetAsInt() == 1);
+  this->DataFileOptions = vtkSMPropertyHelper(this, "LoadStateDataFileOptions").GetAsInt();
+  this->OnlyUseFilesInDataDirectory =
+    (vtkSMPropertyHelper(this, "OnlyUseFilesInDataDirectory").GetAsInt() == 1);
   switch (this->DataFileOptions)
   {
     case USE_FILES_FROM_STATE:
