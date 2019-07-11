@@ -1,0 +1,22 @@
+<ParaView>
+  <ServerManagerState version="5.7.0">
+    <Proxy group="sources" type="LegacyVTKFileReader" id="8168" servers="1">
+      <Property name="FileNames" id="8168.FileNames" number_of_elements="1">
+        <Element index="0" value="/foo/blow.vtk"/>
+        <Domain name="files" id="8168.FileNames.files"/>
+      </Property>
+      <Property name="TimestepValues" id="8168.TimestepValues"/>
+    </Proxy>
+    <Proxy group="misc" type="TimeKeeper" id="259" servers="16">
+      <Property name="TimeSources" id="259.TimeSources" number_of_elements="1">
+        <Proxy value="8168"/>
+      </Property>
+    </Proxy>
+    <ProxyCollection name="sources">
+      <Item id="8168" name="blow.vtk" logname="blow.vtk"/>
+    </ProxyCollection>
+    <ProxyCollection name="timekeeper">
+      <Item id="259" name="TimeKeeper1"/>
+    </ProxyCollection>
+  </ServerManagerState>
+</ParaView>
