@@ -212,6 +212,13 @@ void vtknvindex_scene::set_visibility(bool visibility)
       // Update scene transformation
       if (visibility)
       {
+        // Reset the affinity information to IndeX in case it changed. Otherwise it will be ignored.
+        mi::base::Handle<vtknvindex_affinity> affinity = m_cluster_properties->get_affinity();
+
+        // NVIDIA IndeX session will take ownership of the affinity.
+        affinity->retain();
+        m_index_instance->m_iindex_session->set_affinity_information(affinity.get());
+
         // Access the session instance from the database.
         mi::base::Handle<const nv::index::ISession> session(
           dice_transaction->access<const nv::index::ISession>(m_index_instance->m_session_tag));

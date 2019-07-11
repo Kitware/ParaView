@@ -768,19 +768,47 @@ mi::Uint32 vtknvindex_instance::setup_nvindex()
       m_nvindex_interface->get_api_component<nv::index::IIndex_debug_configuration>());
     assert(idebug_configuration.is_valid_interface());
 
+    // Don't pre-allocate buffers for rasterizer
+    std::string rasterizer_memory_allocation = "rasterizer_memory_allocation=-1";
+    idebug_configuration->set_option(rasterizer_memory_allocation.c_str());
+
+    // Disable timeseries data prefetch.
     std::string disable_timeseries_data_prefetch =
       std::string("timeseries_data_prefetch_disable=1");
     idebug_configuration->set_option(disable_timeseries_data_prefetch.c_str());
 
-    // Temporarily disabling parallel importer
+    // Temporarily disabling parallel importer.
     std::string async_subset_load = std::string("async_subset_load=0");
     idebug_configuration->set_option(async_subset_load.c_str());
 
-    // use strict domain subdivision only with multiples ranks.
+    // Use strict domain subdivision only with multiples ranks.
     if (vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() > 1)
     {
       std::string use_strict_domain_subdivision = std::string("use_strict_domain_subdivision=1");
       idebug_configuration->set_option(use_strict_domain_subdivision.c_str());
+    }
+
+    // Use pinned memory for staging buffer (enabled by default).
+    if (use_config_file)
+    {
+      std::map<std::string, std::string> index_params;
+      if (xml_parser.get_section_settings(index_params, "index"))
+      {
+        std::map<std::string, std::string>::iterator it;
+
+        it = index_params.find("use_pinned_staging_buffer");
+        if (it != index_params.end())
+        {
+          std::string use_pinned_staging_buffer("svol_disable_pinned_staging_buffer=");
+
+          if (it->second == std::string("1") || it->second == std::string("yes"))
+            use_pinned_staging_buffer += std::string("1");
+          else
+            use_pinned_staging_buffer += std::string("0");
+
+          idebug_configuration->set_option(use_pinned_staging_buffer.c_str());
+        }
+      }
     }
   }
 
