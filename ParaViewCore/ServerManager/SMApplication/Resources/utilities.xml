@@ -3198,7 +3198,7 @@
       </StringVectorProperty>
       <IntVectorProperty command="SetInlineData"
                          default_values="0"
-                         name="Binary"
+                         name="InlineData"
                          panel_visibility="never"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
