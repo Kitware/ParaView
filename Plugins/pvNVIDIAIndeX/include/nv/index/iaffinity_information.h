@@ -82,8 +82,8 @@ public:
 ///
 /// The application-domain is expected to generate 3D spatial regions. These regions 
 /// are supposed to be disjoint. In case of an hierarchical decomposition scheme, such as a
-/// kd-tree based spatial decomposition, these regions typically represent the tress, leaf
-/// nodes. The interface class shall provide the regions as 3D bounding boxes so that
+/// kd-tree based spatial decomposition, these regions typically represent the leaf
+/// nodes of the tree. The interface class shall provide the regions as 3D bounding boxes so that
 /// NVIDIA IndeX can align its internal representation.
 ///
 /// This interface class also extents the affinity class that is the application is
@@ -120,6 +120,55 @@ public:
     /// \return Returns the spatial regions as bounding box.
     ///
     virtual mi::math::Bbox_struct<mi::Float32, 3> get_subregion(mi::Uint32 index) const = 0;
+};
+
+
+
+/// Domain specific subdivision with topology information.
+///
+/// This interface extends IDomain_specific_subdivision by providing topology information
+/// for efficient subregion sorting.
+///
+/// @ingroup nv_index_data_storage
+///
+class IDomain_specific_subdivision_topology :
+    public mi::base::Interface_declare<0x25d72982,0x3cff,0x4f72,0x99,0x72,0x41,0x95,0xec,0x06,0x16,0x12,
+                                       nv::index::IDomain_specific_subdivision>
+{
+public:
+    enum Topology_type 
+    {
+        TOPO_KD_TREE,
+        TOPO_OCTREE
+    };
+
+    /// Get type of topology, \see Topology_type. If not supported, topology will be ignored.
+    virtual mi::Uint32 get_topology_type() const = 0;
+
+    /// Get the total number of nodes of the topology.
+    /// It is assumed that the first node is the root node.
+    virtual mi::Uint32 get_nb_nodes() const = 0;
+
+    /// Get the bounding box of the node \c inode.
+    /// \param inode Index of node.
+    virtual mi::math::Bbox_struct<mi::Float32, 3> get_node_box(mi::Uint32 inode) const = 0;
+
+    /// Get the number of children of node \c inode.
+    /// Note that this expresses the number of available child slots, 
+    /// but not the number of valid children.
+    /// This means for a Kd-tree, you can always return 2, and for an Octree 8.
+    /// \param inode Index of node.
+    virtual mi::Uint32 get_node_child_count(mi::Uint32 inode) const = 0;
+
+    /// Get a child index of the node \c inode. Return -1 if no child at given \c ichild slot.
+    /// \param inode Index of node.
+    /// \param ichild Index of child slot.
+    virtual mi::Sint32 get_node_child(mi::Uint32 inode, mi::Uint32 ichild) const = 0;
+
+    /// Get index of subregion associated with node \c inode (or -1, if no subregion).
+    /// The subregions are provided by the IDomain_specific_subdivision interface.
+    /// \param inode Index of node.
+    virtual mi::Sint32 get_node_subregion_index(mi::Uint32 inode) const = 0;
 };
 
 } // namespace index
