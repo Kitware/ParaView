@@ -10,10 +10,10 @@
 #include <mi/base/interface_declare.h>
 #include <mi/base/types.h>
 #include <mi/base/uuid.h>
-#include <mi/dice.h>
 #include <mi/math/color.h>
 #include <mi/math/matrix.h>
 #include <mi/math/vector.h>
+#include <mi/dice.h>
 
 #include <nv/index/idata_sample.h>
 
@@ -33,34 +33,34 @@ namespace index
 /// through the scene description to a chosen scene element
 /// instance, traversing from the scene root through all other
 /// ancestors to the actual instance.
-class IScene_path : public mi::base::Interface_declare<0xce092e73, 0x46c6, 0x492f, 0x87, 0x9b, 0x6e,
-                      0x14, 0x23, 0x07, 0x33, 0x26>
+class IScene_path :
+    public mi::base::Interface_declare<0xce092e73,0x46c6,0x492f,0x87,0x9b,0x6e,0x14,0x23,0x07,0x33,0x26>
 {
 public:
-  /// Returns the number of nodes in the path from the scene root
-  /// to the chosen scene element instance.
-  ///
-  /// \return     The number of nodes in the path, including
-  ///             the chosen element and the scene root.
-  virtual mi::Uint32 get_length() const = 0;
+    /// Returns the number of nodes in the path from the scene root
+    /// to the chosen scene element instance.
+    ///
+    /// \return     The number of nodes in the path, including
+    ///             the chosen element and the scene root.
+    virtual mi::Uint32 get_length() const = 0;
 
-  /// Returns a node in the path from the scene root to the
-  /// chosen scene element instance.
-  ///
-  /// The first node of the path is the scene root, i.e. an \c
-  /// IScene, followed by other ancestors, with the last node
-  /// being the chosen scene element instance.
-  ///
-  /// The path can be used to distinguish multiple instances of
-  /// the same scene element, i.e. when the same scene element is
-  /// referenced by multiple scene groups. Since all instances use
-  /// the same tag, it is necessary to look at the path to
-  /// determine which instance was meant.
-  ///
-  /// \param[in] index    Selects the node in the path, must be in the
-  ///                     range [0, get_length() - 1].
-  /// \return             Tag of the selected node
-  virtual mi::neuraylib::Tag_struct get_node(mi::Uint32 index) const = 0;
+    /// Returns a node in the path from the scene root to the
+    /// chosen scene element instance.
+    ///
+    /// The first node of the path is the scene root, i.e. an \c
+    /// IScene, followed by other ancestors, with the last node
+    /// being the chosen scene element instance.
+    ///
+    /// The path can be used to distinguish multiple instances of
+    /// the same scene element, i.e. when the same scene element is
+    /// referenced by multiple scene groups. Since all instances use
+    /// the same tag, it is necessary to look at the path to
+    /// determine which instance was meant.
+    ///
+    /// \param[in] index    Selects the node in the path, must be in the
+    ///                     range [0, get_length() - 1].
+    /// \return             Tag of the selected node
+    virtual mi::neuraylib::Tag_struct get_node(mi::Uint32 index) const = 0;
 };
 
 /// Interface class that returns the result of a pick operation.
@@ -72,115 +72,115 @@ public:
 /// information includes, for instance, the scene element's \c tag to clearly identify it
 /// and the intersection point in the scene element's IJK space.
 ///
-class IScene_pick_result : public mi::base::Interface_declare<0x0e201838, 0xf0e5, 0x41f7, 0xa4,
-                             0xe0, 0xfc, 0x02, 0x43, 0xe6, 0x06, 0xce>
+class IScene_pick_result :
+    public mi::base::Interface_declare<0x0e201838,0xf0e5,0x41f7,0xa4,0xe0,0xfc,0x02,0x43,0xe6,0x06,0xce>
 {
 public:
-  /// Represents the interface class of the intersection info result.
-  /// Typically, an intersection result including its intersection information are
-  /// highly dependent on the intersected shape class. For instance, intersecting
-  /// (1) a line segments part of a set of line segments should return the index that
-  /// that line segment in the line set, or intersecting (2) a triangular mesh should
-  /// expose not only the index of the intersected triangle but also the adjacent vertices
-  /// and possibly the according per-vertex attributes.
-  /// The intersection result interfaces class \c IScene_pick_result provides just
-  /// very basic intersection information such as the \c tag of the intersected shape,
-  /// the intersection point in local space, and distance from the camera position in world space.
-  /// Additional shape-specific intersection information are supposed to be provided
-  /// derived (interface) classes. The UUID returned by \c get_intersection_info_class provides
-  /// the application with the necessary interface class id required for proper casting the
-  /// general intersection information interface class to the shape-specific intersection
-  /// information interface class if additional shape-specific details for the intersection are
-  /// required.
-  ///
-  /// \return     Unique UUID of the shape-specific intersection result interface class.
-  ///             By default, the UUID refers to this default intersection info interface.
-  ///
-  virtual mi::base::Uuid get_intersection_info_class() const = 0;
+    /// Represents the interface class of the intersection info result.
+    /// Typically, an intersection result including its intersection information are
+    /// highly dependent on the intersected shape class. For instance, intersecting
+    /// (1) a line segments part of a set of line segments should return the index that
+    /// that line segment in the line set, or intersecting (2) a triangular mesh should
+    /// expose not only the index of the intersected triangle but also the adjacent vertices
+    /// and possibly the according per-vertex attributes.
+    /// The intersection result interfaces class \c IScene_pick_result provides just
+    /// very basic intersection information such as the \c tag of the intersected shape,
+    /// the intersection point in local space, and distance from the camera position in world space.
+    /// Additional shape-specific intersection information are supposed to be provided
+    /// derived (interface) classes. The UUID returned by \c get_intersection_info_class provides
+    /// the application with the necessary interface class id required for proper casting the
+    /// general intersection information interface class to the shape-specific intersection
+    /// information interface class if additional shape-specific details for the intersection are
+    /// required.
+    ///
+    /// \return     Unique UUID of the shape-specific intersection result interface class.
+    ///             By default, the UUID refers to this default intersection info interface.
+    ///
+    virtual mi::base::Uuid get_intersection_info_class() const = 0;
 
-  /// Returns the intersected scene element's tag.
-  /// Each scene element is clearly defined by its unique tag. Thus, the tag
-  /// returned by the query result unambiguously defines which scene element
-  /// has been hit by the cast ray.
-  /// \return     The tag of the hit scene element. The returned
-  ///             tag shall be always valid.
-  ///
-  virtual mi::neuraylib::Tag_struct get_scene_element() const = 0;
+    /// Returns the intersected scene element's tag.
+    /// Each scene element is clearly defined by its unique tag. Thus, the tag
+    /// returned by the query result unambiguously defines which scene element
+    /// has been hit by the cast ray.
+    /// \return     The tag of the hit scene element. The returned
+    ///             tag shall be always valid.
+    ///
+    virtual mi::neuraylib::Tag_struct get_scene_element() const = 0;
 
-  /// Returns the sub index that specifies which of the sub elements was hit, if any.
-  /// Some scene elements such as point geometry consist of multiple sub elements (i.e. individual
-  /// points).
-  ///
-  /// \deprecated Use the methods provided by specializations of
-  ///             this class, e.g. \c IPoint_set_pick_result.
-  ///
-  /// \return     The index of the hit sub element, or -1 if the scene element has not sub elements.
-  ///
-  virtual mi::Sint32 get_scene_element_sub_index() const = 0;
+    /// Returns the sub index that specifies which of the sub elements was hit, if any.
+    /// Some scene elements such as point geometry consist of multiple sub elements (i.e. individual
+    /// points).
+    ///
+    /// \deprecated Use the methods provided by specializations of
+    ///             this class, e.g. \c IPoint_set_pick_result.
+    ///
+    /// \return     The index of the hit sub element, or -1 if the scene element has not sub elements.
+    ///
+    virtual mi::Sint32 get_scene_element_sub_index() const = 0;
 
-  /// The hit point of the ray with the scene element may be
-  /// associated with a regular volume sample value. For instance,
-  /// a plane may visualize the voxel data values that the plane
-  /// passes through. The ray-plane intersection then determines
-  /// the regular voxel value of the dataset at the very position.
-  /// Similarly, the data value of a heightfield surface that is
-  /// textured based on the data values of an associated regular
-  /// volume can also be determined.
-  ///
-  /// \return     Interface pointer to an \c IData_volume_sample instance representing,
-  ///             for example, a regular volume sample value related to the ray-element
-  ///             intersection. If the intersection is not related to any data value,
-  ///             then the returned pointer is 0.
-  ///
-  virtual const IData_sample* get_data_sample() const = 0;
+    /// The hit point of the ray with the scene element may be
+    /// associated with a regular volume sample value. For instance,
+    /// a plane may visualize the voxel data values that the plane
+    /// passes through. The ray-plane intersection then determines
+    /// the regular voxel value of the dataset at the very position.
+    /// Similarly, the data value of a heightfield surface that is
+    /// textured based on the data values of an associated regular
+    /// volume can also be determined.
+    ///
+    /// \return     Interface pointer to an \c IData_volume_sample instance representing,
+    ///             for example, a regular volume sample value related to the ray-element
+    ///             intersection. If the intersection is not related to any data value,
+    ///             then the returned pointer is 0.
+    ///
+    virtual const IData_sample* get_data_sample() const = 0;
 
-  /// The hit point of the ray with the scene element may be associated
-  /// with a color value. For instance, a heightfield surface is typically rendered
-  /// using a solid color that will be returned. In case of a slice scene element
-  /// the ray-slice intersection determines a color value based on the
-  /// voxel value and the colormap associated to the slice.
-  ///
-  /// \return     The color at the intersection point.
-  ///
-  virtual const mi::math::Color_struct& get_color() const = 0;
+    /// The hit point of the ray with the scene element may be associated
+    /// with a color value. For instance, a heightfield surface is typically rendered
+    /// using a solid color that will be returned. In case of a slice scene element
+    /// the ray-slice intersection determines a color value based on the
+    /// voxel value and the colormap associated to the slice.
+    ///
+    /// \return     The color at the intersection point.
+    ///
+    virtual const mi::math::Color_struct& get_color() const = 0;
 
-  /// Returns the intersection between the scene element and the ray.
-  /// The intersection between the scene element and the ray cast from the
-  /// camera through the scene is given as a 3D point in the IJK space
-  /// of the scene element.
-  ///
-  /// \return     The intersection between the scene element and
-  ///             the ray cast from the camera in IJK space.
-  ///
-  virtual const mi::math::Vector_struct<mi::Float32, 3>& get_intersection() const = 0;
+    /// Returns the intersection between the scene element and the ray.
+    /// The intersection between the scene element and the ray cast from the
+    /// camera through the scene is given as a 3D point in the IJK space
+    /// of the scene element.
+    ///
+    /// \return     The intersection between the scene element and
+    ///             the ray cast from the camera in IJK space.
+    ///
+    virtual const mi::math::Vector_struct<mi::Float32, 3>& get_intersection() const = 0;
 
-  /// Returns the distance of the intersection from the camera position.
-  /// The distance from the camera's eye position to the intersection between
-  /// the scene element and the cast ray.
-  ///
-  /// \return     The distance of the intersection point to the
-  ///             camera position in XYZ space.
-  ///
-  virtual mi::Float32 get_distance() const = 0;
+    /// Returns the distance of the intersection from the camera position.
+    /// The distance from the camera's eye position to the intersection between
+    /// the scene element and the cast ray.
+    ///
+    /// \return     The distance of the intersection point to the
+    ///             camera position in XYZ space.
+    ///
+    virtual mi::Float32 get_distance() const = 0;
 
-  /// Returns the transformation matrix of the intersected scene
-  /// element. This is the transformation that needs to be applied
-  /// to the intersection point (as returned by \c
-  /// get_intersection()) to transform from IJK to XYZ space.
-  ///
-  /// \note The name of this method is subject to change!
-  ///
-  /// \return     Transformation matrix.
-  virtual const mi::math::Matrix_struct<mi::Float32, 4, 4>& get_transform() const = 0;
+    /// Returns the transformation matrix of the intersected scene
+    /// element. This is the transformation that needs to be applied
+    /// to the intersection point (as returned by \c
+    /// get_intersection()) to transform from IJK to XYZ space.
+    ///
+    /// \note The name of this method is subject to change!
+    ///
+    /// \return     Transformation matrix.
+    virtual const mi::math::Matrix_struct<mi::Float32, 4, 4>& get_transform() const = 0;
 
-  /// Returns the scene path from the scene root to the
-  /// intersected scene element.
-  ///
-  /// \note Use the \c mi::base::Handle template to store the returned interface pointer in order
-  ///       to guarantee the correct destruction of the returned interface.
-  ///
-  /// \return     Scene path to intersected scene element.
-  virtual const IScene_path* get_scene_path() const = 0;
+    /// Returns the scene path from the scene root to the
+    /// intersected scene element.
+    ///
+    /// \note Use the \c mi::base::Handle template to store the returned interface pointer in order
+    ///       to guarantee the correct destruction of the returned interface.
+    ///
+    /// \return     Scene path to intersected scene element.
+    virtual const IScene_path* get_scene_path() const = 0;
 };
 
 /// Interface class that returns all results of a pick operation in front-to-back order.
@@ -189,53 +189,53 @@ public:
 /// of the cast ray with the scene elements and all query results are sorted in front to
 /// depth order in accordance to the camera position.
 ///
-class IScene_pick_results : public mi::base::Interface_declare<0xe39d04d8, 0x1176, 0x44c5, 0xb0,
-                              0xc9, 0xd3, 0xff, 0xf5, 0x79, 0x04, 0xba>
+class IScene_pick_results :
+    public mi::base::Interface_declare<0xe39d04d8,0x1176,0x44c5,0xb0,0xc9,0xd3,0xff,0xf5,0x79,0x04,0xba>
 {
 public:
-  /// Returns the number of intersections between the scene elements in the
-  /// scene and the cast ray.
-  ///
-  /// \return     The number of query results. If the cast ray hasn't hit any
-  ///             scene element in the scene then 0 is returned.
-  virtual mi::Uint32 get_nb_results() const = 0;
+    /// Returns the number of intersections between the scene elements in the
+    /// scene and the cast ray.
+    ///
+    /// \return     The number of query results. If the cast ray hasn't hit any
+    ///             scene element in the scene then 0 is returned.
+    virtual mi::Uint32 get_nb_results() const = 0;
 
-  /// Returns a single pick result determined by the given index
-  /// that corresponds to the depth ordering.
-  ///
-  /// \param[in] index    The index enables indexing the query results in
-  ///                     depth sorted order. That is, the
-  ///                     index 0 accesses the front most query result
-  ///                     and the index [0, get_nb_results()-1] accesses
-  ///                     the back most query result.
-  /// \return             The query result associated with the index value.
-  virtual IScene_pick_result* get_result(mi::Uint32 index) const = 0;
+    /// Returns a single pick result determined by the given index
+    /// that corresponds to the depth ordering.
+    ///
+    /// \param[in] index    The index enables indexing the query results in
+    ///                     depth sorted order. That is, the
+    ///                     index 0 accesses the front most query result
+    ///                     and the index [0, get_nb_results()-1] accesses
+    ///                     the back most query result.
+    /// \return             The query result associated with the index value.
+    virtual IScene_pick_result* get_result(mi::Uint32 index) const = 0;
 
-  /// Returns which viewport the pick results come from. The
-  /// returned value is the index in the \c IViewport_list that
-  /// was passed to \c IIndex_scene_query::pick().
-  ///
-  /// \return index into the list, will be 0 if only a single viewport is used.
-  virtual mi::Size get_viewport_index() const = 0;
+    /// Returns which viewport the pick results come from. The
+    /// returned value is the index in the \c IViewport_list that
+    /// was passed to \c IIndex_scene_query::pick().
+    ///
+    /// \return index into the list, will be 0 if only a single viewport is used.
+    virtual mi::Size get_viewport_index() const = 0;
 };
 
 /// Defines a list of pick results. Each of these pick results
 /// can store multiple intersections.
 ///
-class IScene_pick_results_list : public mi::base::Interface_declare<0x7e0c9571, 0xf362, 0x4f78,
-                                   0x88, 0x2f, 0x12, 0x88, 0x71, 0xa7, 0xa7, 0x61>
+class IScene_pick_results_list :
+        public mi::base::Interface_declare<0x7e0c9571,0xf362,0x4f78,0x88,0x2f,0x12,0x88,0x71,0xa7,0xa7,0x61>
 {
 public:
-  /// Returns the number of pick results in this list.
-  ///
-  /// \return number of pick results
-  virtual mi::Size size() const = 0;
+    /// Returns the number of pick results in this list.
+    ///
+    /// \return number of pick results
+    virtual mi::Size size() const = 0;
 
-  /// Returns the pick results at the given position in the list.
-  ///
-  /// \param[in] index Position in the list.
-  /// \return selected Pick results, or 0 when \c index is invalid.
-  virtual nv::index::IScene_pick_results* get(mi::Size index) const = 0;
+    /// Returns the pick results at the given position in the list.
+    ///
+    /// \param[in] index Position in the list.
+    /// \return selected Pick results, or 0 when \c index is invalid.
+    virtual nv::index::IScene_pick_results* get(mi::Size index) const = 0;
 };
 
 /// Interface class that returns the result of a entry lookup operation.
@@ -247,30 +247,30 @@ public:
 /// information includes, for instance, the scene element's \c tag to clearly identify it
 /// and the intersection point in the scene element's IJK space.
 ///
-class IScene_lookup_result : public mi::base::Interface_declare<0x8832eb30, 0x1c5e, 0x4ab8, 0x90,
-                               0x77, 0xca, 0x62, 0x07, 0xdb, 0x3c, 0x5c>
+class IScene_lookup_result :
+    public mi::base::Interface_declare<0x8832eb30,0x1c5e,0x4ab8,0x90,0x77,0xca,0x62,0x07,0xdb,0x3c,0x5c>
 {
 public:
-  /// Represents the interface class of the entry lookup result.
-  /// The entry lookup results usually dependent on the scene element class.
-  /// For instance, the lookup of an entry of a triangle mesh returns a single
-  /// triangle including its per-vertex information such as the vertices, normals,
-  /// colors, etc.
-  /// The lookup result interfaces class \c IScene_lookup_result provides
-  /// just basic information.
-  /// Any shape-specific information are supposed to be provided
-  /// derived (interface) classes. The UUID returned by \c get_intersection_info_class provides
-  /// the application with the necessary interface class id required for proper casting the
-  /// general intersection information interface class to the shape-specific intersection
-  /// information interface class if additional shape-specific details for the intersection are
-  /// required.
-  ///
-  /// \return     Returns the UUID of the shape-specific lookup result interface class.
-  ///             By default, the UUID refers to this default lookup interface.
-  ///
-  virtual mi::base::Uuid get_intersection_info_class() const = 0;
+    /// Represents the interface class of the entry lookup result.
+    /// The entry lookup results usually dependent on the scene element class.
+    /// For instance, the lookup of an entry of a triangle mesh returns a single
+    /// triangle including its per-vertex information such as the vertices, normals,
+    /// colors, etc.
+    /// The lookup result interfaces class \c IScene_lookup_result provides
+    /// just basic information.
+    /// Any shape-specific information are supposed to be provided
+    /// derived (interface) classes. The UUID returned by \c get_intersection_info_class provides
+    /// the application with the necessary interface class id required for proper casting the
+    /// general intersection information interface class to the shape-specific intersection
+    /// information interface class if additional shape-specific details for the intersection are
+    /// required.
+    ///
+    /// \return     Returns the UUID of the shape-specific lookup result interface class.
+    ///             By default, the UUID refers to this default lookup interface.
+    ///
+    virtual mi::base::Uuid get_intersection_info_class() const = 0;
 };
-}
-} // namespace index / nv
+
+}} // namespace index / nv
 
 #endif // NVIDIA_INDEX_ISCENE_QUERY_RESULTS_H

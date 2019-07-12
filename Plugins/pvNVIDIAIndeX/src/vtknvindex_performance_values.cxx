@@ -51,7 +51,7 @@ vtknvindex_performance_values::~vtknvindex_performance_values()
 
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_performance_values::print_perf_values(
-  mi::base::Handle<nv::index::IFrame_results> frame_results)
+  mi::base::Handle<nv::index::IFrame_results> frame_results, mi::Uint32 time_step)
 {
   // Prints only a subset of the full performance values that NVIDIA IndeX provides.
   // Additional fields can be added as and when required.
@@ -63,6 +63,12 @@ void vtknvindex_performance_values::print_perf_values(
 
   if (m_print_header)
   {
+    std::vector<std::string> path_components;
+    path_components.push_back(vtksys::SystemTools::GetCurrentWorkingDirectory() + "/");
+    path_components.push_back(m_performance_log_file);
+    INFO_LOG << "Writing performance values to '" << vtksys::SystemTools::JoinPath(path_components)
+             << "'";
+
     std::ostringstream header_str;
 
     // Prepare header report with current time, OS, SW/HW info.
@@ -70,36 +76,48 @@ void vtknvindex_performance_values::print_perf_values(
     sys_info.RunOSCheck();
     sys_info.RunCPUCheck();
 
+    vtknvindex_instance* index_instance = vtknvindex_instance::get();
+
     header_str << "--------------------------------------------------------------------------------"
-                  "------------------------------------------------------------------------"
+                  "--------------------------------------------------------------------------------"
                << "\n";
     header_str << "IndeX Performance Values: " << vtksys::SystemTools::GetCurrentDateTime("%c")
                << "\n";
     header_str << "--------------------------------------------------------------------------------"
-                  "------------------------------------------------------------------------"
+                  "--------------------------------------------------------------------------------"
                << "\n";
 
     header_str << "Host name        : " << sys_info.GetHostname() << "\n";
     header_str << "OS               : " << sys_info.GetOSDescription() << "\n";
     header_str << "CPU Description  : " << sys_info.GetCPUDescription() << "\n";
+    header_str << "Number of hosts  : "
+               << index_instance->m_icluster_configuration->get_number_of_hosts() << "\n";
+    header_str << "Number of GPUs   : "
+               << index_instance->m_icluster_configuration->get_number_of_GPUs() << "\n";
 
     header_str << "--------------------------------------------------------------------------------"
-                  "------------------------------------------------------------------------"
+                  "--------------------------------------------------------------------------------"
                << "\n";
-    const mi::base::Handle<nv::index::IIndex>& index = vtknvindex_instance::get()->get_interface();
 
-    header_str << "NVIDIA IndeX version               : " << index->get_version() << ", "
+    header_str << "NVIDIA IndeX ParaView plug-in version : " << index_instance->get_version()
+               << "\n";
+
+    const mi::base::Handle<nv::index::IIndex>& index = index_instance->get_interface();
+
+    header_str << "NVIDIA IndeX version                  : " << index->get_version() << ", "
                << index->get_revision() << "\n";
-    header_str << "DiCE library API interface version : " << index->get_dice_interface_version()
+    header_str << "DiCE library API interface version    : " << index->get_dice_interface_version()
                << "\n";
-    header_str << "DiCE header  API version           : " << MI_NEURAYLIB_VERSION_QUALIFIED_STRING
-               << "\n";
-    header_str << "DiCE library build version         : " << index->get_dice_version() << "\n";
-    header_str << "NVIDIA driver version              : " << index->get_nvidia_driver_version()
+    header_str << "DiCE header  API version              : "
+               << MI_NEURAYLIB_VERSION_QUALIFIED_STRING << "\n";
+    header_str << "DiCE library build version            : " << index->get_dice_version() << "\n";
+    header_str << "NVIDIA driver version                 : " << index->get_nvidia_driver_version()
                << "\n";
 
     header_str << "--------------------------------------------------------------------------------"
-                  "------------------------------------------------------------------------"
+                  "--------------------------------------------------------------------------------"
+               << "\n";
+    header_str << "TSTEP    : Time step number"
                << "\n";
     header_str << "T_REND   : Time total rendering [ms]"
                << "\n";
@@ -132,17 +150,17 @@ void vtknvindex_performance_values::print_perf_values(
     header_str << "N_SPANS  : Number horizontal spans"
                << "\n";
     header_str << "--------------------------------------------------------------------------------"
-                  "------------------------------------------------------------------------"
+                  "--------------------------------------------------------------------------------"
                << "\n";
 
-    header_str << std::setw(ssize_time) << "T_REND" << std::setw(ssize_time) << "T_COMP"
-               << std::setw(ssize_time) << "T_FCOMP" << std::setw(ssize_time) << "T_FRAME"
-               << std::setw(ssize_time) << "FPS" << std::setw(ssize_time) << "NSCUBES"
-               << std::setw(ssize_time) << "S_VOLDAT" << std::setw(ssize_time) << "T_GPU_UP"
-               << std::setw(ssize_time) << "T_GPU_DN" << std::setw(ssize_time) << "S_VOL_UP"
-               << std::setw(ssize_time) << "S_PIN_M" << std::setw(ssize_time) << "S_UPIN_M"
-               << std::setw(ssize_time) << "S_SYS_M" << std::setw(ssize_time) << "S_GPU_M"
-               << std::setw(ssize_time) << "N_SPANS"
+    header_str << std::setw(5) << "TSTEP" << std::setw(ssize_time) << "T_REND"
+               << std::setw(ssize_time) << "T_COMP" << std::setw(ssize_time) << "T_FCOMP"
+               << std::setw(ssize_time) << "T_FRAME" << std::setw(ssize_time) << "FPS"
+               << std::setw(ssize_time) << "NSCUBES" << std::setw(ssize_time) << "S_VOLDAT"
+               << std::setw(ssize_time) << "T_GPU_UP" << std::setw(ssize_time) << "T_GPU_DN"
+               << std::setw(ssize_time) << "S_VOL_UP" << std::setw(ssize_time) << "S_PIN_M"
+               << std::setw(ssize_time) << "S_UPIN_M" << std::setw(ssize_time) << "S_SYS_M"
+               << std::setw(ssize_time) << "S_GPU_M" << std::setw(ssize_time) << "N_SPANS"
                << "\n";
 
     file_handler << header_str.str();
@@ -150,11 +168,12 @@ void vtknvindex_performance_values::print_perf_values(
   }
   const mi::base::Handle<nv::index::IPerformance_values> perf_values(
     frame_results->get_performance_values());
-  s << std::setw(ssize_time) << perf_values->get_time("time_total_rendering")
-    << std::setw(ssize_time) << perf_values->get_time("time_total_compositing")
-    << std::setw(ssize_time) << perf_values->get_time("time_total_final_compositing")
-    << std::setw(ssize_time) << perf_values->get_time("time_complete_frame")
-    << std::setw(ssize_time) << perf_values->get_time("frames_per_second") << std::setw(ssize_time)
+  s << std::setw(5) << time_step << std::setw(ssize_time)
+    << perf_values->get_time("time_total_rendering") << std::setw(ssize_time)
+    << perf_values->get_time("time_total_compositing") << std::setw(ssize_time)
+    << perf_values->get_time("time_total_final_compositing") << std::setw(ssize_time)
+    << perf_values->get_time("time_complete_frame") << std::setw(ssize_time)
+    << perf_values->get_time("frames_per_second") << std::setw(ssize_time)
     << perf_values->get("nb_subcubes_rendered") << std::setw(ssize_time)
     << to_string(perf_values->get("size_volume_data_rendered")) << std::setw(ssize_time)
     << perf_values->get_time("time_gpu_upload") << std::setw(ssize_time)

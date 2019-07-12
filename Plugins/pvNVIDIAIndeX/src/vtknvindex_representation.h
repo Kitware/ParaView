@@ -91,6 +91,9 @@ public:
   // Get/Set the visibility for this representation. When the visibility of
   void SetVisibility(bool val) override;
 
+  // Forwarded to vtkProperty (when applicable).
+  void SetScalarOpacityUnitDistance(double val);
+
   //
   // Configuration options set by ParaView GUI.
   // These values are stored in an instance of the vtknvindex_config_settings class.

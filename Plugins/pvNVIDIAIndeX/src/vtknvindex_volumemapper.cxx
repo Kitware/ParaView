@@ -71,17 +71,6 @@
 #include "vtknvindex_utilities.h"
 #include "vtknvindex_volumemapper.h"
 
-#ifdef NVINDEX_INTERNAL_BUILD
-#include "version.h"
-#endif
-
-#if defined(MI_VERSION_STRING) && defined(MI_DATE_STRING)
-// Embed version string in output binary.
-const static volatile std::string NVINDEX_VERSION_STRING(
-  "==@@== NVIDIA IndeX for ParaView Plug-In, "
-  "r" MI_VERSION_STRING ", " MI_DATE_STRING "\n");
-#endif
-
 vtkStandardNewMacro(vtknvindex_volumemapper);
 
 //----------------------------------------------------------------------------
@@ -182,6 +171,8 @@ bool vtknvindex_volumemapper::prepare_data(mi::Sint32 time_step, vtkVolume* /*vo
     scalar_array = this->GetScalars(image_piece, this->ScalarMode, this->ArrayAccessMode,
       this->ArrayId, this->ArrayName,
       use_cell_colors); // CellFlag
+
+    m_subset_ptrs[time_step] = scalar_array->GetVoidPointer(0);
   }
 
   // Write volume data to shared memory.
@@ -204,16 +195,21 @@ bool vtknvindex_volumemapper::prepare_data(mi::Sint32 time_step, vtkVolume* /*vo
 //-------------------------------------------------------------------------------------------------
 bool vtknvindex_volumemapper::initialize_mapper(vtkRenderer* /*ren*/, vtkVolume* vol)
 {
-
-#if defined(MI_VERSION_STRING) && defined(MI_DATE_STRING)
-  INFO_LOG << "NVIDIA IndeX for ParaView Plug-In "
-           << "(build " << MI_VERSION_STRING << ", " << MI_DATE_STRING ").";
-#endif
-
   vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Initialization");
 
   bool is_MPI = (m_controller->GetNumberOfProcesses() > 1);
   const mi::Sint32 cur_global_rank = is_MPI ? m_controller->GetLocalProcessId() : 0;
+
+  // Init scalar pointers array
+  if (m_cluster_properties->get_regular_volume_properties()->is_timeseries_data())
+  {
+    m_subset_ptrs.resize(
+      m_cluster_properties->get_regular_volume_properties()->get_nb_time_steps());
+  }
+  else
+  {
+    m_subset_ptrs.resize(1);
+  }
 
   // Update in_volume first to make sure states are current.
   vol->Update();
@@ -246,9 +242,18 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkRenderer* /*ren*/, vtkVolume*
     ERROR_LOG << "The scalar type: " << scalar_type << " is not supported by NVIDIA IndeX.";
     return false;
   }
+  else if (scalar_type == "double")
+  {
+    WARN_LOG
+      << "Datasets with scalar values in double precision are not natively supported by IndeX.";
+    WARN_LOG << "The plug-in will proceed to convert those values from double to float with the "
+                "corresponding overhead.";
+  }
+
+  m_subset_ptrs[0] = m_scalar_array->GetVoidPointer(0);
 
   vtknvindex_regular_volume_data volume_data;
-  volume_data.scalars = m_scalar_array->GetVoidPointer(0);
+  volume_data.scalars = &m_subset_ptrs[0];
 
   int extent[6];
   image_piece->GetExtent(extent);
@@ -331,20 +336,20 @@ void vtknvindex_volumemapper::set_cluster_properties(
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_volumemapper::update_canvas(vtkRenderer* ren)
 {
-  mi::Sint32* window_size = ren->GetVTKWindow()->GetActualSize();
+  vtkWindow* win = ren->GetVTKWindow();
+  int* window_size = win->GetSize();
 
   const mi::math::Vector_struct<mi::Sint32, 2> main_window_resolution = { window_size[0],
     window_size[1] };
 
-  m_index_instance->m_opengl_canvas.set_buffer_resolution(main_window_resolution);
   m_index_instance->m_opengl_canvas.set_vtk_renderer(ren);
+  m_index_instance->m_opengl_canvas.set_buffer_resolution(main_window_resolution);
 
   if (ren->GetNumberOfPropsRendered())
   {
     m_index_instance->m_opengl_app_buffer.resize_buffer(main_window_resolution);
 
-    vtkOpenGLRenderWindow* vtk_gl_render_window =
-      vtkOpenGLRenderWindow::SafeDownCast(ren->GetVTKWindow());
+    vtkOpenGLRenderWindow* vtk_gl_render_window = vtkOpenGLRenderWindow::SafeDownCast(win);
     mi::Sint32 depth_bits = vtk_gl_render_window->GetDepthBufferSize();
     m_index_instance->m_opengl_app_buffer.set_z_buffer_precision(depth_bits);
 
@@ -445,7 +450,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
   // Wait all ranks finish to write volume data before the render starts.
   m_controller->Barrier();
 
-  if (m_index_instance->is_index_viewer())
+  if (m_index_instance->is_index_viewer() && m_index_instance->is_index_initialized())
   {
     vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Rendering");
 
@@ -539,7 +544,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
 
         // log performance values if requested
         if (m_cluster_properties->get_config_settings()->is_log_performance())
-          m_performance_values.print_perf_values(frame_results);
+          m_performance_values.print_perf_values(frame_results, cur_time_step);
       }
 
       dice_transaction->commit();

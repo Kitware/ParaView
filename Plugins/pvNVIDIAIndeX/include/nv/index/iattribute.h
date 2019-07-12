@@ -47,45 +47,46 @@ namespace index
 ///      rendering. For example, multiple light sources specified in the scene
 ///      should be used in rendering a shape.
 ///
-class IAttribute : public mi::base::Interface_declare<0xfb32338f, 0xca95, 0x49ce, 0x80, 0xdf, 0x9c,
-                     0x1e, 0x5a, 0x25, 0x7e, 0x0f, nv::index::IScene_element>
+class IAttribute :
+        public mi::base::Interface_declare<0xfb32338f,0xca95,0x49ce,0x80,0xdf,0x9c,0x1e,0x5a,0x25,0x7e,0x0f,
+                                           nv::index::IScene_element>
 {
 public:
-  /// Represents the category or the attribute class that a concrete attribute
-  /// implements.  For instance, a directional light implements the \c ILight
-  /// category and a simple OpenGL-like Phong material implements the \c
-  /// IMaterial category.  A category enables the implementation of
-  /// specialized attributes for certain classes and can thereby extend the
-  /// number of variants for that category.  The evaluation strategies for
-  /// attribute classes are determined by the category. For example, point
-  /// lights, directional lights (\c IDirectional_light) and directional head
-  /// lights (\c IDirectional_headlight) implement the \c ILight category and
-  /// can all be active at a time.  In contrast, a Cook-Torrance surface
-  /// material and an OpenGL-like Phong material implement the \c IMaterial
-  /// category but only one instance of the material attributes is active when
-  /// shading a shapes surface.
-  ///
-  /// \return     Returns the UUID of the base attribute category.
-  ///
-  virtual mi::base::Uuid get_attribute_class() const = 0;
+    /// Represents the category or the attribute class that a concrete attribute
+    /// implements.  For instance, a directional light implements the \c ILight
+    /// category and a simple OpenGL-like Phong material implements the \c
+    /// IMaterial category.  A category enables the implementation of
+    /// specialized attributes for certain classes and can thereby extend the
+    /// number of variants for that category.  The evaluation strategies for
+    /// attribute classes are determined by the category. For example, point
+    /// lights, directional lights (\c IDirectional_light) and directional head
+    /// lights (\c IDirectional_headlight) implement the \c ILight category and
+    /// can all be active at a time.  In contrast, a Cook-Torrance surface
+    /// material and an OpenGL-like Phong material implement the \c IMaterial
+    /// category but only one instance of the material attributes is active when
+    /// shading a shapes surface.
+    ///
+    /// \return     Returns the UUID of the base attribute category.
+    ///
+    virtual mi::base::Uuid get_attribute_class() const = 0;
 
-  /// The attributes that implement a category or an attribute class are
-  /// evaluated in exclusive or integrative fashion (for example, multiple
-  /// light source affect the shading of surfaces while only one material
-  /// defines the surface's reflectance properties). To control the attribute
-  /// evaluation, an attribute class (that defines a category for derived
-  /// attributes) must define whether one or multiple instances of the
-  /// attribute can be active at the same time when evaluating a shape or
-  /// dataset.
-  ///
-  /// \return     Returns \c true if multiple instances of an attribute that
-  ///             influences a shape's appearance may be active
-  ///             simultaneously. Returns \c false if only one attribute can
-  ///             be active at a time.
-  ///
-  virtual bool multiple_active_instances() const = 0;
+    /// The attributes that implement a category or an attribute class are
+    /// evaluated in exclusive or integrative fashion (for example, multiple
+    /// light source affect the shading of surfaces while only one material
+    /// defines the surface's reflectance properties). To control the attribute
+    /// evaluation, an attribute class (that defines a category for derived
+    /// attributes) must define whether one or multiple instances of the
+    /// attribute can be active at the same time when evaluating a shape or
+    /// dataset.
+    ///
+    /// \return     Returns \c true if multiple instances of an attribute that
+    ///             influences a shape's appearance may be active
+    ///             simultaneously. Returns \c false if only one attribute can
+    ///             be active at a time.
+    ///
+    virtual bool multiple_active_instances() const = 0;
 };
-}
-} // namespace index / nv
+
+}} // namespace index / nv
 
 #endif // NVIDIA_INDEX_IATTRIBUTE_H

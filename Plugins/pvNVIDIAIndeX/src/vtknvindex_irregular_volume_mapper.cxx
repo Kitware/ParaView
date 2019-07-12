@@ -70,17 +70,6 @@
 #include "vtknvindex_irregular_volume_mapper.h"
 #include "vtknvindex_utilities.h"
 
-#ifdef NVINDEX_INTERNAL_BUILD
-#include "version.h"
-#endif
-
-#if defined(MI_VERSION_STRING) && defined(MI_DATE_STRING)
-// Embed version string in output binary.
-const static volatile std::string NVINDEX_VERSION_STRING(
-  "==@@== NVIDIA IndeX for ParaView Plug-In, "
-  "r" MI_VERSION_STRING ", " MI_DATE_STRING "\n");
-#endif
-
 static const int TET_EDGES[6][2] = { { 0, 1 }, { 1, 2 }, { 2, 0 }, { 0, 3 }, { 1, 3 }, { 2, 3 } };
 
 vtkStandardNewMacro(vtknvindex_irregular_volume_mapper);
@@ -226,6 +215,13 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
   {
     ERROR_LOG << "The scalar type: " << scalar_type << " is not supported by NVIDIA IndeX.";
     return false;
+  }
+  else if (scalar_type == "double")
+  {
+    WARN_LOG
+      << "Datasets with scalar values in double precision are not natively supported by IndeX.";
+    WARN_LOG << "The plug-in will proceed to convert those values from double to float with the "
+                "corresponding overhead.";
   }
 
   if (true) //   (this->InputAnalyzedTime < this->MTime) || (this->InputAnalyzedTime <
@@ -474,13 +470,14 @@ void vtknvindex_irregular_volume_mapper::set_domain_kdtree(vtkPKdTree* kd_tree)
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_irregular_volume_mapper::update_canvas(vtkRenderer* ren)
 {
-  mi::Sint32* window_size = ren->GetVTKWindow()->GetActualSize();
+  vtkWindow* win = ren->GetVTKWindow();
+  int* window_size = win->GetSize();
 
   const mi::math::Vector_struct<mi::Sint32, 2> main_window_resolution = { window_size[0],
     window_size[1] };
 
-  m_index_instance->m_opengl_canvas.set_buffer_resolution(main_window_resolution);
   m_index_instance->m_opengl_canvas.set_vtk_renderer(ren);
+  m_index_instance->m_opengl_canvas.set_buffer_resolution(main_window_resolution);
 
   if (ren->GetNumberOfPropsRendered())
   {
@@ -575,7 +572,7 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
   // Wait all ranks finish to write volume data before the render starts.
   m_controller->Barrier();
 
-  if (m_index_instance->is_index_viewer())
+  if (m_index_instance->is_index_viewer() && m_index_instance->is_index_initialized())
   {
     vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Rendering");
 

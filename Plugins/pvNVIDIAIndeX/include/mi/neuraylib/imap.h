@@ -9,13 +9,9 @@
 
 #include <mi/neuraylib/idata.h>
 
-namespace mi
-{
+namespace mi {
 
-namespace neuraylib
-{
-class IFactory;
-}
+namespace neuraylib { class IFactory; }
 
 /** \addtogroup mi_neuray_collections
 @{
@@ -39,39 +35,40 @@ class IFactory;
 /// patterns). As an exception, accessing the indices in sequence from 0 to #get_length()-1
 /// requires only constant time per access (provided the structure of the map is not changed,
 /// the values of the keys may change). The mapping of indices to keys is unspecified.
-class IMap : public base::Interface_declare<0xca097e3a, 0x2621, 0x41e7, 0x80, 0xa3, 0x97, 0x2f,
-               0x0d, 0x56, 0xf8, 0x47, IData_collection>
+class IMap :
+    public base::Interface_declare<0xca097e3a,0x2621,0x41e7,0x80,0xa3,0x97,0x2f,0x0d,0x56,0xf8,0x47,
+                                   IData_collection>
 {
 public:
-  /// Returns the size of the map.
-  ///
-  /// The size of a map is the number of keys in the map.
-  virtual Size get_length() const = 0;
+    /// Returns the size of the map.
+    ///
+    /// The size of a map is the number of keys in the map.
+    virtual Size get_length() const = 0;
 
-  /// Checks whether the map is empty.
-  ///
-  /// Equivalent to #get_length() == 0.
-  virtual bool empty() const = 0;
+    /// Checks whether the map is empty.
+    ///
+    /// Equivalent to #get_length() == 0.
+    virtual bool empty() const = 0;
 
-  /// Removes all keys and their associated values from the map.
-  virtual void clear() = 0;
+    /// Removes all keys and their associated values from the map.
+    virtual void clear() = 0;
 
-  /// Inserts a new key including its value into the map.
-  ///
-  /// \return
-  ///                -  0: Success.
-  ///                - -1: Invalid parameters (\c NULL pointer).
-  ///                - -2: \p key exists already.
-  ///                - -3: \p value has the wrong type.
-  virtual Sint32 insert(const char* key, base::IInterface* value) = 0;
+    /// Inserts a new key including its value into the map.
+    ///
+    /// \return
+    ///                -  0: Success.
+    ///                - -1: Invalid parameters (\c NULL pointer).
+    ///                - -2: \p key exists already.
+    ///                - -3: \p value has the wrong type.
+    virtual Sint32 insert( const char* key, base::IInterface* value) = 0;
 
-  /// Removes a key and its value from the map.
-  ///
-  /// \return
-  ///                -  0: Success.
-  ///                - -1: Invalid parameters (\c NULL pointer).
-  ///                - -2: \p key does not exist
-  virtual Sint32 erase(const char* key) = 0;
+    /// Removes a key and its value from the map.
+    ///
+    /// \return
+    ///                -  0: Success.
+    ///                - -1: Invalid parameters (\c NULL pointer).
+    ///                - -2: \p key does not exist
+    virtual Sint32 erase( const char* key) = 0;
 };
 
 /*@}*/ // end group mi_neuray_collections

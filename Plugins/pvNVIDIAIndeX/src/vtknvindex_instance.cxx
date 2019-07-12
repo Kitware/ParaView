@@ -52,6 +52,7 @@
 #include "vtknvindex_receiving_logger.h"
 #include "vtknvindex_regular_volume_properties.h"
 #include "vtknvindex_sparse_volume_importer.h"
+#include "vtknvindex_version.h"
 #include "vtknvindex_volume_compute.h"
 
 #ifdef _WIN32
@@ -135,7 +136,7 @@ vtknvindex_instance::vtknvindex_instance()
 //-------------------------------------------------------------------------------------------------
 vtknvindex_instance::~vtknvindex_instance()
 {
-  if (is_index_rank())
+  if (is_index_rank() && m_nvindex_interface)
   {
     // Shut down forwarding logger.
     vtknvindex::logger::vtknvindex_forwarding_logger_factory::delete_instance();
@@ -204,8 +205,9 @@ vtknvindex_instance* vtknvindex_instance::create()
 void vtknvindex_instance::init_index()
 {
   // Start one IndeX instane per host (on local rank == 0)
-  if (!m_is_index_initialized && is_index_rank())
+  if (m_nvindex_interface && !is_index_initialized() && is_index_rank())
   {
+    INFO_LOG << "NVIDIA IndeX ParaView plug-in " << get_version() << ".";
 
     // Setup NVIDIA IndeX
     mi::Uint32 setup_result = 0;
@@ -224,6 +226,12 @@ void vtknvindex_instance::init_index()
 
     m_is_index_initialized = true;
   }
+}
+
+//-------------------------------------------------------------------------------------------------
+bool vtknvindex_instance::is_index_initialized() const
+{
+  return m_is_index_initialized;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -360,7 +368,7 @@ bool vtknvindex_instance::load_nvindex()
 
     ERROR_LOG << "Failed to load the NVIDIA IndeX library.";
     ERROR_LOG << error_str;
-    ERROR_LOG << "Please verify that the LD_LIBRARY environemnt contains"
+    ERROR_LOG << "Please verify that the LD_LIBRARY_PATH environemnt contains"
                  " the location of the NVIDIA IndeX libraries.";
 #endif
     return false;
@@ -377,6 +385,31 @@ bool vtknvindex_instance::load_nvindex()
     ERROR_LOG << "Failed to Initialize NVIDIA IndeX library.";
     // TODO: Is it possible to know the reason?
     return false;
+  }
+
+  // Check if this IndeX library is compatible with this plug-in version
+  if (VTKNVINDEX_PLUGIN_REVISION_BASE != 0)
+  {
+    const std::string plugin_revision_base = std::to_string(VTKNVINDEX_PLUGIN_REVISION_BASE);
+    const std::string index_revision_base = m_nvindex_interface->get_revision();
+
+    if (index_revision_base.substr(0, 6) != plugin_revision_base)
+    {
+      ERROR_LOG << "The IndeX libraries '" << index_revision_base
+                << "' are not compatible with this plug-in version '" << get_version() << "'";
+      ERROR_LOG << "Please get the matching IndeX libraries from ParaView dependencies repository:";
+      ERROR_LOG << "https://www.paraview.org/files/dependencies/";
+
+      // Unload incompatible IndeX libs
+      INFO_LOG << "IndeX is shuting down...";
+      m_nvindex_interface->shutdown();
+      m_nvindex_interface = 0;
+
+      // Unload the libraries.
+      unload_nvindex();
+
+      return false;
+    }
   }
 
   // Check for license and authenticate.
@@ -995,6 +1028,12 @@ void vtknvindex_instance::init_scene_graph()
     m_nvindex_colormaps = new vtknvindex_colormap(m_volume_colormap_tag, m_slice_colormap_tag);
 
   dice_transaction->commit();
+}
+
+//-------------------------------------------------------------------------------------------------
+const char* vtknvindex_instance::get_version() const
+{
+  return "2.3-beta";
 }
 
 //-------------------------------------------------------------------------------------------------

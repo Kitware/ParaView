@@ -9,8 +9,7 @@
 
 #include <mi/base/interface_declare.h>
 
-namespace mi
-{
+namespace mi {
 
 /** \defgroup mi_neuray_types Types
     \ingroup mi_neuray
@@ -293,12 +292,12 @@ namespace mi
 ///
 /// This %base interface provides a single method #get_type_name() to allow dynamic inspection of
 /// type names. See \ref mi_neuray_types for possible type names.
-class IData : public base::Interface_declare<0x2e5f84bc, 0x783a, 0x4551, 0x9f, 0xca, 0x72, 0x2f,
-                0xb8, 0x38, 0xc4, 0x7c>
+class IData :
+    public base::Interface_declare<0x2e5f84bc,0x783a,0x4551,0x9f,0xca,0x72,0x2f,0xb8,0x38,0xc4,0x7c>
 {
 public:
-  /// Returns the type name.
-  virtual const char* get_type_name() const = 0;
+    /// Returns the type name.
+    virtual const char* get_type_name() const = 0;
 };
 
 /*@}*/ // end group mi_neuray_types
@@ -316,8 +315,9 @@ public:
 /// See \ref mi_neuray_types for description of the type system.
 ///
 /// \see #mi::IData_collection
-class IData_simple : public base::Interface_declare<0xc33c5a05, 0xe7a5, 0x4154, 0xb8, 0x87, 0xee,
-                       0x1f, 0x4d, 0x5b, 0x02, 0x02, IData>
+class IData_simple :
+    public base::Interface_declare<0xc33c5a05,0xe7a5,0x4154,0xb8,0x87,0xee,0x1f,0x4d,0x5b,0x02,0x02,
+                                   IData>
 {
 };
 
@@ -344,164 +344,165 @@ class IData_simple : public base::Interface_declare<0xc33c5a05, 0xe7a5, 0x4154, 
 /// argument or not.
 ///
 /// \see #mi::IData_simple
-class IData_collection : public base::Interface_declare<0x1bb2be0f, 0x0dc6, 0x44b2, 0x93, 0xb9,
-                           0xd1, 0xba, 0x6a, 0x31, 0x88, 0x1c, IData>
+class IData_collection :
+    public base::Interface_declare<0x1bb2be0f,0x0dc6,0x44b2,0x93,0xb9,0xd1,0xba,0x6a,0x31,0x88,0x1c,
+                                   IData>
 {
 public:
-  /// Returns the number of values.
-  virtual Size get_length() const = 0;
+    /// Returns the number of values.
+    virtual Size get_length() const = 0;
 
-  /// Returns the key corresponding to \p index.
-  ///
-  /// \return    The key, or \c NULL in case of failure.
-  virtual const char* get_key(Size index) const = 0;
+    /// Returns the key corresponding to \p index.
+    ///
+    /// \return    The key, or \c NULL in case of failure.
+    virtual const char* get_key( Size index) const = 0;
 
-  /// Indicates whether the key \p key exists or not.
-  virtual bool has_key(const char* key) const = 0;
+    /// Indicates whether the key \p key exists or not.
+    virtual bool has_key( const char* key) const = 0;
 
-  /// Returns the value for key \p key.
-  ///
-  /// \note     If a literal \c 0 is passed for \p key, the call is ambiguous. You need to
-  ///           explicitly cast the argument to \c const \c char*.
-  virtual const base::IInterface* get_value(const char* key) const = 0;
+    /// Returns the value for key \p key.
+    ///
+    /// \note     If a literal \c 0 is passed for \p key, the call is ambiguous. You need to
+    ///           explicitly cast the argument to \c const \c char*.
+    virtual const base::IInterface* get_value( const char* key) const = 0;
 
-  /// Returns the value for key \p key.
-  ///
-  /// \note     If a literal \c 0 is passed for \p key, the call is ambiguous. You need to
-  ///           explicitly cast the argument to \c const \c char*.
-  ///
-  /// This templated member function is a wrapper of the non-template variant for the user's
-  /// convenience. It eliminates the need to call
-  /// #mi::base::IInterface::get_interface(const Uuid&)
-  /// on the returned pointer, since the return type already is a pointer to the type \p T
-  /// specified as template parameter.
-  ///
-  /// \tparam T     The interface type of the element to return.
-  template <class T>
-  const T* get_value(const char* key) const
-  {
-    const base::IInterface* ptr_iinterface = get_value(key);
-    if (!ptr_iinterface)
-      return 0;
-    const T* ptr_T = static_cast<const T*>(ptr_iinterface->get_interface(typename T::IID()));
-    ptr_iinterface->release();
-    return ptr_T;
-  }
+    /// Returns the value for key \p key.
+    ///
+    /// \note     If a literal \c 0 is passed for \p key, the call is ambiguous. You need to
+    ///           explicitly cast the argument to \c const \c char*.
+    ///
+    /// This templated member function is a wrapper of the non-template variant for the user's
+    /// convenience. It eliminates the need to call
+    /// #mi::base::IInterface::get_interface(const Uuid&)
+    /// on the returned pointer, since the return type already is a pointer to the type \p T
+    /// specified as template parameter.
+    ///
+    /// \tparam T     The interface type of the element to return.
+    template<class T>
+    const T* get_value( const char* key) const
+    {
+        const base::IInterface* ptr_iinterface = get_value( key);
+        if ( !ptr_iinterface)
+            return 0;
+        const T* ptr_T = static_cast<const T*>( ptr_iinterface->get_interface( typename T::IID()));
+        ptr_iinterface->release();
+        return ptr_T;
+    }
 
-  /// Returns the value for key \p key.
-  ///
-  /// \note     If a literal \c 0 is passed for \p key, the call is ambiguous. You need to
-  ///           explicitly cast the argument to \c const \c char*.
-  virtual base::IInterface* get_value(const char* key) = 0;
+    /// Returns the value for key \p key.
+    ///
+    /// \note     If a literal \c 0 is passed for \p key, the call is ambiguous. You need to
+    ///           explicitly cast the argument to \c const \c char*.
+    virtual base::IInterface* get_value( const char* key) = 0;
 
-  /// Returns the value for key \p key.
-  ///
-  /// \note     If a literal \c 0 is passed for \p key, the call is ambiguous. You need to
-  ///           explicitly cast the argument to \c const \c char*.
-  ///
-  /// This templated member function is a wrapper of the non-template variant for the user's
-  /// convenience. It eliminates the need to call
-  /// #mi::base::IInterface::get_interface(const Uuid&)
-  /// on the returned pointer, since the return type already is a pointer to the type \p T
-  /// specified as template parameter.
-  ///
-  /// \tparam T     The interface type of the element to return.
-  template <class T>
-  T* get_value(const char* key)
-  {
-    base::IInterface* ptr_iinterface = get_value(key);
-    if (!ptr_iinterface)
-      return 0;
-    T* ptr_T = static_cast<T*>(ptr_iinterface->get_interface(typename T::IID()));
-    ptr_iinterface->release();
-    return ptr_T;
-  }
+    /// Returns the value for key \p key.
+    ///
+    /// \note     If a literal \c 0 is passed for \p key, the call is ambiguous. You need to
+    ///           explicitly cast the argument to \c const \c char*.
+    ///
+    /// This templated member function is a wrapper of the non-template variant for the user's
+    /// convenience. It eliminates the need to call
+    /// #mi::base::IInterface::get_interface(const Uuid&)
+    /// on the returned pointer, since the return type already is a pointer to the type \p T
+    /// specified as template parameter.
+    ///
+    /// \tparam T     The interface type of the element to return.
+    template<class T>
+    T* get_value( const char* key)
+    {
+        base::IInterface* ptr_iinterface = get_value( key);
+        if ( !ptr_iinterface)
+            return 0;
+        T* ptr_T = static_cast<T*>( ptr_iinterface->get_interface( typename T::IID()));
+        ptr_iinterface->release();
+        return ptr_T;
+    }
 
-  /// Returns the value for index \p index.
-  ///
-  /// \note     If a literal \c 0 is passed for \p index, the call is ambiguous. You need to
-  ///           explicitly cast the argument to #mi::Size.
-  virtual const base::IInterface* get_value(Size index) const = 0;
+    /// Returns the value for index \p index.
+    ///
+    /// \note     If a literal \c 0 is passed for \p index, the call is ambiguous. You need to
+    ///           explicitly cast the argument to #mi::Size.
+    virtual const base::IInterface* get_value( Size index) const = 0;
 
-  /// Returns the value for index \p index.
-  ///
-  /// \note     If a literal \c 0 is passed for \p index, the call is ambiguous. You need to
-  ///           explicitly cast the argument to #mi::Size.
-  ///
-  /// This templated member function is a wrapper of the non-template variant for the user's
-  /// convenience. It eliminates the need to call
-  /// #mi::base::IInterface::get_interface(const Uuid&)
-  /// on the returned pointer, since the return type already is a pointer to the type \p T
-  /// specified as template parameter.
-  ///
-  /// \tparam T     The interface type of the element to return.
-  template <class T>
-  const T* get_value(Size index) const
-  {
-    const base::IInterface* ptr_iinterface = get_value(index);
-    if (!ptr_iinterface)
-      return 0;
-    const T* ptr_T = static_cast<const T*>(ptr_iinterface->get_interface(typename T::IID()));
-    ptr_iinterface->release();
-    return ptr_T;
-  }
+    /// Returns the value for index \p index.
+    ///
+    /// \note     If a literal \c 0 is passed for \p index, the call is ambiguous. You need to
+    ///           explicitly cast the argument to #mi::Size.
+    ///
+    /// This templated member function is a wrapper of the non-template variant for the user's
+    /// convenience. It eliminates the need to call
+    /// #mi::base::IInterface::get_interface(const Uuid&)
+    /// on the returned pointer, since the return type already is a pointer to the type \p T
+    /// specified as template parameter.
+    ///
+    /// \tparam T     The interface type of the element to return.
+    template<class T>
+    const T* get_value( Size index) const
+    {
+        const base::IInterface* ptr_iinterface = get_value( index);
+        if ( !ptr_iinterface)
+            return 0;
+        const T* ptr_T = static_cast<const T*>( ptr_iinterface->get_interface( typename T::IID()));
+        ptr_iinterface->release();
+        return ptr_T;
+    }
 
-  /// Returns the value for index \p index.
-  ///
-  /// \note     If a literal \c 0 is passed for \p index, the call is ambiguous. You need to
-  ///           explicitly cast the argument to #mi::Size.
-  virtual base::IInterface* get_value(Size index) = 0;
+    /// Returns the value for index \p index.
+    ///
+    /// \note     If a literal \c 0 is passed for \p index, the call is ambiguous. You need to
+    ///           explicitly cast the argument to #mi::Size.
+    virtual base::IInterface* get_value( Size index) = 0;
 
-  /// Returns the value for index \p index.
-  ///
-  /// \note     If a literal \c 0 is passed for \p index, the call is ambiguous. You need to
-  ///           explicitly cast the argument to #mi::Size.
-  ///
-  /// This templated member function is a wrapper of the non-template variant for the user's
-  /// convenience. It eliminates the need to call
-  /// #mi::base::IInterface::get_interface(const Uuid&)
-  /// on the returned pointer, since the return type already is a pointer to the type \p T
-  /// specified as template parameter.
-  ///
-  /// \tparam T     The interface type of the element to return.
-  template <class T>
-  T* get_value(Size index)
-  {
-    base::IInterface* ptr_iinterface = get_value(index);
-    if (!ptr_iinterface)
-      return 0;
-    T* ptr_T = static_cast<T*>(ptr_iinterface->get_interface(typename T::IID()));
-    ptr_iinterface->release();
-    return ptr_T;
-  }
+    /// Returns the value for index \p index.
+    ///
+    /// \note     If a literal \c 0 is passed for \p index, the call is ambiguous. You need to
+    ///           explicitly cast the argument to #mi::Size.
+    ///
+    /// This templated member function is a wrapper of the non-template variant for the user's
+    /// convenience. It eliminates the need to call
+    /// #mi::base::IInterface::get_interface(const Uuid&)
+    /// on the returned pointer, since the return type already is a pointer to the type \p T
+    /// specified as template parameter.
+    ///
+    /// \tparam T     The interface type of the element to return.
+    template<class T>
+    T* get_value( Size index)
+    {
+        base::IInterface* ptr_iinterface = get_value( index);
+        if ( !ptr_iinterface)
+            return 0;
+        T* ptr_T = static_cast<T*>( ptr_iinterface->get_interface( typename T::IID()));
+        ptr_iinterface->release();
+        return ptr_T;
+    }
 
-  /// Stores the value for key \p key.
-  ///
-  /// Note that it is not possible to create new keys.
-  ///
-  /// \note     If a literal \c 0 is passed for \p key, the call is ambiguous. You need to
-  ///           explicitly cast the argument to \c const \c char*.
-  ///
-  /// \return
-  ///           -  0: Success.
-  ///           - -1: Invalid parameters (\c NULL pointer).
-  ///           - -2: Invalid key.
-  ///           - -3: \p value has the wrong type.
-  virtual Sint32 set_value(const char* key, base::IInterface* value) = 0;
+    /// Stores the value for key \p key.
+    ///
+    /// Note that it is not possible to create new keys.
+    ///
+    /// \note     If a literal \c 0 is passed for \p key, the call is ambiguous. You need to
+    ///           explicitly cast the argument to \c const \c char*.
+    ///
+    /// \return
+    ///           -  0: Success.
+    ///           - -1: Invalid parameters (\c NULL pointer).
+    ///           - -2: Invalid key.
+    ///           - -3: \p value has the wrong type.
+    virtual Sint32 set_value( const char* key, base::IInterface* value) = 0;
 
-  /// Stores the value for index \p index.
-  ///
-  /// Note that it is not possible to create new indices.
-  ///
-  /// \note     If a literal \c 0 is passed for \p index, the call is ambiguous. You need to
-  ///           explicitly cast the argument to #mi::Size.
-  ///
-  /// \return
-  ///           -  0: Success.
-  ///           - -1: Invalid parameters (\c NULL pointer).
-  ///           - -2: Invalid index.
-  ///           - -3: \p value has the wrong type.
-  virtual Sint32 set_value(Size index, base::IInterface* value) = 0;
+    /// Stores the value for index \p index.
+    ///
+    /// Note that it is not possible to create new indices.
+    ///
+    /// \note     If a literal \c 0 is passed for \p index, the call is ambiguous. You need to
+    ///           explicitly cast the argument to #mi::Size.
+    ///
+    /// \return
+    ///           -  0: Success.
+    ///           - -1: Invalid parameters (\c NULL pointer).
+    ///           - -2: Invalid index.
+    ///           - -3: \p value has the wrong type.
+    virtual Sint32 set_value( Size index, base::IInterface* value) = 0;
 };
 
 /*@}*/ // end group mi_neuray_collections
@@ -516,8 +517,9 @@ public:
 /// completeness to express common C++ types as interfaces. For example, if types derived from
 /// #mi::IData are used to represent function or method signatures, this type can be used to
 /// represent functions or methods that return \c void.
-class IVoid : public base::Interface_declare<0x3142c0a4, 0xa138, 0x472f, 0x85, 0xe5, 0xc0, 0x13,
-                0xfc, 0xd1, 0x04, 0x6a, IData_simple>
+class IVoid :
+    public base::Interface_declare<0x3142c0a4,0xa138,0x472f,0x85,0xe5,0xc0,0x13,0xfc,0xd1,0x04,0x6a,
+                                   IData_simple>
 {
 };
 

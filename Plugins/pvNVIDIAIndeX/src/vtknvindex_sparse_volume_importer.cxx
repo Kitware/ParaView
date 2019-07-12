@@ -351,16 +351,24 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
   mi::math::Bbox<mi::Float32, 3> shm_bbox_flt;
   mi::Uint64 shmsize = 0;
   void* pv_subdivision_ptr = NULL;
+  void* shm_ptr = NULL;
 
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
   mi::Sint32 rankid = controller ? controller->GetLocalProcessId() : 0;
 
   if (!m_cluster_properties->get_host_properties(rankid)->get_shminfo(
-        request_bbox, shm_memory_name, shm_bbox_flt, shmsize, &pv_subdivision_ptr, time_step))
+        request_bbox, shm_memory_name, shm_bbox_flt, shmsize, &shm_ptr, time_step))
   {
     ERROR_LOG << "Failed to get shared memory information in regular volume importer for rank: "
               << rankid << ".";
     return 0;
+  }
+
+  // retrieve subset scalars for the currrent time step from the subset scalars array
+  if (shm_ptr != NULL)
+  {
+    void** pv_subdivision_pointers = static_cast<void**>(shm_ptr);
+    pv_subdivision_ptr = pv_subdivision_pointers[time_step];
   }
 
   const Bbox3i shm_bbox(static_cast<mi::Sint32>(shm_bbox_flt.min.x),
@@ -395,9 +403,6 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
     // Convert double scalar data to float.
     if (m_scalar_type == "double")
     {
-      WARN_LOG << "Datasets in double format are not natively supported by IndeX.";
-      WARN_LOG << "Converting scalar values to float format...";
-
       mi::Size nb_voxels = shmsize / sizeof(mi::Float64);
       void* subdivison_ptr_flt = malloc(nb_voxels * sizeof(mi::Float32));
 
