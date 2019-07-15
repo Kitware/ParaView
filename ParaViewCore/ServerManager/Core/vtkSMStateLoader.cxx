@@ -167,6 +167,17 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy(
       return materiallibrary;
     }
   }
+  else if (xml_group && xml_name && strcmp(xml_group, "coprocessing") == 0 &&
+    strcmp(xml_name, "CatalystGlobalOptions") == 0)
+  {
+    // If a Catalyst export options already exists, we use that.
+    vtkSMProxy* exporter = pxm->FindProxy("export_global", "coprocessing", "CatalystGlobalOptions");
+    if (exporter)
+    {
+      exporter->Register(this);
+      return exporter;
+    }
+  }
 
   //**************************************************************************
 
