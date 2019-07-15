@@ -145,7 +145,13 @@ pqProxySelectionWidget::pqProxySelectionWidget(
     int enabled = 1;
     if (hints2->GetScalarAttribute("enabled", &enabled))
     {
-      this->Internal->Ui.comboBox->setEnabled(false);
+      this->Internal->Ui.comboBox->setEnabled(enabled != 0);
+    }
+    int visibility = 1;
+    if (hints2->GetScalarAttribute("visibility", &visibility))
+    {
+      this->Internal->Ui.comboBox->setVisible(visibility != 0);
+      this->Internal->Ui.label->setVisible(visibility != 0);
     }
   }
 }
