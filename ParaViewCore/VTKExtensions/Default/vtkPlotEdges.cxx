@@ -724,7 +724,7 @@ void vtkPlotEdges::ExtractSegments(
       continue;
     }
 
-    short unsigned int numPtCells;
+    vtkIdType numPtCells;
     vtkIdType* cellIds;
 
     // A point can be used by many cells, we get them all
@@ -813,7 +813,7 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData, vtkCollec
   visitedCells[cellId] = 1;
 
   // Get all the cells associated with the point2
-  short unsigned int numPtCells;
+  vtkIdType numPtCells;
   vtkIdType* cellIds;
 
   polyData->GetPointCells(pointId2, numPtCells, cellIds);
