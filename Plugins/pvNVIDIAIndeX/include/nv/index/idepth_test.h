@@ -25,34 +25,35 @@ namespace index
 /// and has an effect on all the shapes that are defined subsequently
 /// in the hierarchical description of the scene.
 ///
-class IDepth_test : public mi::base::Interface_declare<0xa8a4d29c, 0x4a2d, 0x456a, 0xa2, 0x73, 0x4d,
-                      0x5e, 0x3b, 0x27, 0x31, 0xd5, nv::index::IAttribute>
+class IDepth_test :
+        public mi::base::Interface_declare<0xa8a4d29c,0x4a2d,0x456a,0xa2,0x73,0x4d,0x5e,0x3b,0x27,0x31,0xd5,
+                                           nv::index::IAttribute>
 {
 public:
-  /// Depth test modes that are supported by NVIDIA IndeX.
-  enum Depth_test_mode
-  {
-    /// z-test less operator (<)
-    TEST_LESS = 0,
-    /// z-test less than or equal operator (<=)
-    TEST_LESS_EQUAL = 1
-  };
+    /// Depth test modes that are supported by NVIDIA IndeX.
+    enum Depth_test_mode
+    {
+        /// z-test less operator (<)
+        TEST_LESS       = 0,
+        /// z-test less than or equal operator (<=)
+        TEST_LESS_EQUAL = 1
+    };
 
 public:
-  /// Set depth test operator of this attribute.
-  /// The default depth test operation is TEST_LESS_EQUAL.
-  ///
-  /// \param[in] test     The parameter defines the depth test operator.
-  ///
-  virtual void set_depth_test(Depth_test_mode test) = 0;
+    /// Set depth test operator of this attribute.
+    /// The default depth test operation is TEST_LESS_EQUAL.
+    ///
+    /// \param[in] test     The parameter defines the depth test operator.
+    ///
+    virtual void set_depth_test(Depth_test_mode test) = 0;
 
-  /// Get current depth test operator of this attribute.
-  ///
-  /// \return   Returns the current depth test operator.
-  ///
-  virtual Depth_test_mode get_depth_test() const = 0;
+    /// Get current depth test operator of this attribute.
+    ///
+    /// \return   Returns the current depth test operator.
+    ///
+    virtual Depth_test_mode get_depth_test() const = 0;
 };
-}
-} // namespace index / nv
+
+}} // namespace index / nv
 
 #endif // NVIDIA_INDEX_IDEPTH_TEST_H

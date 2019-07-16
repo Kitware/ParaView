@@ -33,28 +33,28 @@ namespace index
 /// on the same plane. The ordering of the \c IIntersection_highlight_pick_result instances is
 /// top-most to bottom-most intersection highlight as defined by the order of the
 /// \c IIntersection_highlighting attributes given through the scene description.
-///
-class IIntersection_highlight_pick_result
-  : public mi::base::Interface_declare<0xec5d55c0, 0x3bb0, 0x41f6, 0x93, 0xd2, 0x2a, 0x4e, 0xa4,
-      0x55, 0xb6, 0x6a, nv::index::IScene_pick_result>
+/// 
+class IIntersection_highlight_pick_result :
+    public mi::base::Interface_declare<0xec5d55c0,0x3bb0,0x41f6,0x93,0xd2,0x2a,0x4e,0xa4,0x55,0xb6,0x6a,
+                                        nv::index::IScene_pick_result>
 {
 public:
-  /// Returns the reference to the shape used for intersection highlighting.
-  ///
-  /// The intersection highlights on a plane are caused by an intersection of
-  /// a shape in the scene and the plane. The pick query provides the reference
-  /// to the shape if a pick operation hits the intersection highlight.
-  /// The reference represents an additional query result. The pick position,
-  /// color, reference to the plane, etc. are provided by the super class'
-  /// interface methods.
-  ///
-  /// \return     Returns the reference to the shape that intersects with the
-  ///             plane and causes an intersection highlight on the plane's
-  ///             surface.
-  ///
-  virtual mi::neuraylib::Tag_struct get_intersection_shape() const = 0;
+    /// Returns the reference to the shape used for intersection highlighting.
+    ///
+    /// The intersection highlights on a plane are caused by an intersection of
+    /// a shape in the scene and the plane. The pick query provides the reference
+    /// to the shape if a pick operation hits the intersection highlight.
+    /// The reference represents an additional query result. The pick position,
+    /// color, reference to the plane, etc. are provided by the super class' 
+    /// interface methods.
+    ///
+    /// \return     Returns the reference to the shape that intersects with the
+    ///             plane and causes an intersection highlight on the plane's 
+    ///             surface.
+    ///
+    virtual mi::neuraylib::Tag_struct get_intersection_shape() const = 0;
 };
-}
-} // namespace index / nv
+
+}} // namespace index / nv
 
 #endif // NVIDIA_INDEX_IINTERSECTION_HIGHLIGHT_PICK_RESULT_H

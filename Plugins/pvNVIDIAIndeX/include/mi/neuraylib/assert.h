@@ -9,14 +9,12 @@
 #ifndef MI_NEURAYLIB_ASSERT_H
 #define MI_NEURAYLIB_ASSERT_H
 
-#include <mi/base/assert.h>
 #include <mi/base/config.h>
+#include <mi/base/assert.h>
 
-namespace mi
-{
+namespace mi  {
 
-namespace neuraylib
-{
+namespace neuraylib {
 
 // --------------------------------------------------------------------
 //
@@ -45,15 +43,16 @@ namespace neuraylib
     @{
  */
 
-#if defined(mi_neuray_assert) && !defined(mi_neuray_assert_msg) ||                                 \
-  !defined(mi_neuray_assert) && defined(mi_neuray_assert_msg)
+
+#if       defined( mi_neuray_assert) && ! defined( mi_neuray_assert_msg) \
+     || ! defined( mi_neuray_assert) &&   defined( mi_neuray_assert_msg)
 error "Only one of mi_neuray_assert and mi_neuray_assert_msg has been defined. Please define both."
 #else
 #ifndef mi_neuray_assert
 
-/// If \c expr evaluates to \c true this macro shall have no effect.
-/// If \c expr evaluates to \c false this macro may print a diagnostic
-/// message and change the control flow of the program, such as aborting
+/// If \c expr evaluates to \c true this macro shall have no effect. 
+/// If \c expr evaluates to \c false this macro may print a diagnostic 
+/// message and change the control flow of the program, such as aborting 
 /// the program or throwing an exception. But it may also have no
 /// effect at all, for example if assertions are configured to
 /// be disabled.
@@ -67,9 +66,9 @@ error "Only one of mi_neuray_assert and mi_neuray_assert_msg has been defined. P
 
 #define mi_neuray_assert(expr) mi_base_assert(expr)
 
-/// If \c expr evaluates to \c true this macro shall have no effect.
-/// If \c expr evaluates to \c false this macro may print a diagnostic
-/// message and change the control flow of the program, such as aborting
+/// If \c expr evaluates to \c true this macro shall have no effect. 
+/// If \c expr evaluates to \c false this macro may print a diagnostic 
+/// message and change the control flow of the program, such as aborting 
 /// the program or throwing an exception. But it may also have no
 /// effect at all, for example if assertions are configured to
 /// be disabled.
@@ -90,9 +89,11 @@ error "Only one of mi_neuray_assert and mi_neuray_assert_msg has been defined. P
 #endif // mi_neuray_assert
 #endif // mi_neuray_assert xor mi_neuray_assert_msg
 
+
 /*@}*/ // end group mi_neuray_assert
 
 } // namespace neuraylib
 } // namespace mi
+
 
 #endif // MI_NEURAYLIB_ASSERT_H

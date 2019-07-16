@@ -28,6 +28,7 @@
 #include <cassert>
 
 #include "vtksys/SystemInformation.hxx"
+#include "vtksys/SystemTools.hxx"
 
 #include "vtknvindex_scene.h"
 
@@ -211,6 +212,13 @@ void vtknvindex_scene::set_visibility(bool visibility)
       // Update scene transformation
       if (visibility)
       {
+        // Reset the affinity information to IndeX in case it changed. Otherwise it will be ignored.
+        mi::base::Handle<vtknvindex_affinity> affinity = m_cluster_properties->get_affinity();
+
+        // NVIDIA IndeX session will take ownership of the affinity.
+        affinity->retain();
+        m_index_instance->m_iindex_session->set_affinity_information(affinity.get());
+
         // Access the session instance from the database.
         mi::base::Handle<const nv::index::ISession> session(
           dice_transaction->access<const nv::index::ISession>(m_index_instance->m_session_tag));
@@ -541,20 +549,11 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
       m_rtc_program_tag = dice_transaction->store_for_reference_counting(rtc_program.get());
       assert(m_rtc_program_tag.is_valid());
 
+      static_group->append(m_rtc_program_params_tag, dice_transaction.get());
+      static_group->append(m_rtc_program_tag, dice_transaction.get());
+
       // Create scene volume properties attribute.
-      if (volume_type == VOLUME_TYPE_REGULAR)
-      {
-        mi::base::Handle<nv::index::IRegular_volume_rendering_properties> vol_render_properties(
-          scene->create_attribute<nv::index::IRegular_volume_rendering_properties>());
-        assert(vol_render_properties.is_valid_interface());
-
-        vol_render_properties->set_reference_step_size(calculate_volume_reference_step_size(vol,
-          pv_config_settings->get_opacity_mode(), pv_config_settings->get_opacity_reference()));
-
-        m_vol_properties_tag =
-          dice_transaction->store_for_reference_counting(vol_render_properties.get());
-      }
-      else // irregular volume properties
+      if (volume_type == VOLUME_TYPE_IRREGULAR)
       {
         mi::base::Handle<nv::index::IIrregular_volume_rendering_properties> vol_render_properties(
           scene->create_attribute<nv::index::IIrregular_volume_rendering_properties>());
@@ -577,10 +576,12 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
 
         m_vol_properties_tag =
           dice_transaction->store_for_reference_counting(vol_render_properties.get());
-      }
-      assert(m_vol_properties_tag.is_valid());
 
-      if (volume_type == VOLUME_TYPE_REGULAR)
+        assert(m_vol_properties_tag.is_valid());
+
+        static_group->append(m_vol_properties_tag, dice_transaction.get());
+      }
+      else // (volume_type == VOLUME_TYPE_REGULAR)
       {
         // Volume compute attribute
         mi::math::Vector_struct<mi::Uint32, 3> volume_size;
@@ -595,45 +596,41 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
         m_volume_compute_attrib_tag =
           dice_transaction->store_for_reference_counting(vol_compute.get());
         assert(m_volume_compute_attrib_tag.is_valid());
-      }
 
-      // Filter mode attribute
-      mi::base::Handle<nv::index::ISparse_volume_rendering_properties>
-        sparse_volume_render_properties(
-          scene->create_attribute<nv::index::ISparse_volume_rendering_properties>());
+        // Filter mode attribute
+        mi::base::Handle<nv::index::ISparse_volume_rendering_properties>
+          sparse_volume_render_properties(
+            scene->create_attribute<nv::index::ISparse_volume_rendering_properties>());
 
-      assert(sparse_volume_render_properties.is_valid_interface());
+        assert(sparse_volume_render_properties.is_valid_interface());
 
-      // filter mode
-      const nv::index::Sparse_volume_filter_mode filter_mode =
-        static_cast<nv::index::Sparse_volume_filter_mode>(pv_config_settings->get_filter_mode());
+        // filter mode
+        const nv::index::Sparse_volume_filter_mode filter_mode =
+          static_cast<nv::index::Sparse_volume_filter_mode>(pv_config_settings->get_filter_mode());
 
-      sparse_volume_render_properties->set_filter_mode(filter_mode);
+        sparse_volume_render_properties->set_filter_mode(filter_mode);
 
-      // use pre-integration
-      const vtknvindex_rtc_kernels rtc_kernel = pv_config_settings->get_rtc_kernel();
-      bool use_preintegration =
-        rtc_kernel == RTC_KERNELS_NONE && pv_config_settings->is_preintegration();
-      sparse_volume_render_properties->set_preintegrated_volume_rendering(use_preintegration);
+        // use pre-integration
+        const vtknvindex_rtc_kernels rtc_kernel = pv_config_settings->get_rtc_kernel();
+        bool use_preintegration =
+          rtc_kernel == RTC_KERNELS_NONE && pv_config_settings->is_preintegration();
+        sparse_volume_render_properties->set_preintegrated_volume_rendering(use_preintegration);
 
-      // sampling distance
-      sparse_volume_render_properties->set_sampling_distance(pv_config_settings->get_step_size());
+        // sampling distance
+        sparse_volume_render_properties->set_sampling_distance(pv_config_settings->get_step_size());
 
-      // set reference sampling distance
-      sparse_volume_render_properties->set_reference_sampling_distance(
-        calculate_volume_reference_step_size(vol, pv_config_settings->get_opacity_mode(),
-          pv_config_settings->get_opacity_reference()));
+        // set reference sampling distance
+        sparse_volume_render_properties->set_reference_sampling_distance(
+          calculate_volume_reference_step_size(vol, pv_config_settings->get_opacity_mode(),
+            pv_config_settings->get_opacity_reference()));
 
-      // sparse volume render properties tag
-      m_sparse_volume_render_properties_tag =
-        dice_transaction->store_for_reference_counting(sparse_volume_render_properties.get());
-      assert(m_sparse_volume_render_properties_tag.is_valid());
+        // sparse volume render properties tag
+        m_sparse_volume_render_properties_tag =
+          dice_transaction->store_for_reference_counting(sparse_volume_render_properties.get());
+        assert(m_sparse_volume_render_properties_tag.is_valid());
 
-      static_group->append(m_sparse_volume_render_properties_tag, dice_transaction.get());
+        static_group->append(m_sparse_volume_render_properties_tag, dice_transaction.get());
 
-      // Volume properties.
-      if (volume_type == VOLUME_TYPE_REGULAR)
-      {
         // Append the static scene group to the hierarchical scene description.
         if (m_cluster_properties->get_regular_volume_properties()->is_timeseries_data())
           static_group->append(m_timeseries_tag, dice_transaction.get());
@@ -641,9 +638,6 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
         static_group->append(m_volume_compute_attrib_tag, dice_transaction.get());
       }
 
-      static_group->append(m_rtc_program_params_tag, dice_transaction.get());
-      static_group->append(m_rtc_program_tag, dice_transaction.get());
-      static_group->append(m_vol_properties_tag, dice_transaction.get());
       static_group->append(m_volume_tag, dice_transaction.get());
 
       // Slice properties, only for regular volumes.
@@ -1267,30 +1261,34 @@ void vtknvindex_scene::update_config_settings(
 
   // CUDA shader mode.
   const vtknvindex_rtc_kernels rtc_kernel = pv_config_settings->get_rtc_kernel();
-  assert(m_sparse_volume_render_properties_tag.is_valid());
 
-  mi::base::Handle<nv::index::ISparse_volume_rendering_properties> sparse_volume_render_properties(
-    dice_transaction->edit<nv::index::ISparse_volume_rendering_properties>(
-      m_sparse_volume_render_properties_tag));
+  if (m_sparse_volume_render_properties_tag.is_valid())
+  {
+    mi::base::Handle<nv::index::ISparse_volume_rendering_properties>
+      sparse_volume_render_properties(
+        dice_transaction->edit<nv::index::ISparse_volume_rendering_properties>(
+          m_sparse_volume_render_properties_tag));
 
-  assert(sparse_volume_render_properties.is_valid_interface());
+    assert(sparse_volume_render_properties.is_valid_interface());
 
-  // filter mode
-  const nv::index::Sparse_volume_filter_mode filter_mode =
-    static_cast<nv::index::Sparse_volume_filter_mode>(pv_config_settings->get_filter_mode());
+    // filter mode
+    const nv::index::Sparse_volume_filter_mode filter_mode =
+      static_cast<nv::index::Sparse_volume_filter_mode>(pv_config_settings->get_filter_mode());
 
-  sparse_volume_render_properties->set_filter_mode(filter_mode);
+    sparse_volume_render_properties->set_filter_mode(filter_mode);
 
-  // use pre-integration
-  bool use_preintegration = rtc_kernel == RTC_KERNELS_NONE &&
-    !m_index_instance->get_index_colormaps()->changed() && pv_config_settings->is_preintegration();
-  sparse_volume_render_properties->set_preintegrated_volume_rendering(use_preintegration);
+    // use pre-integration
+    bool use_preintegration = rtc_kernel == RTC_KERNELS_NONE &&
+      !m_index_instance->get_index_colormaps()->changed() &&
+      pv_config_settings->is_preintegration();
+    sparse_volume_render_properties->set_preintegrated_volume_rendering(use_preintegration);
 
-  // sampling distance
-  sparse_volume_render_properties->set_sampling_distance(pv_config_settings->get_step_size());
+    // sampling distance
+    sparse_volume_render_properties->set_sampling_distance(pv_config_settings->get_step_size());
 
-  // set voxel offset
-  sparse_volume_render_properties->set_voxel_offsets(mi::math::Vector<mi::Float32, 3>(0.5f));
+    // set voxel offset
+    sparse_volume_render_properties->set_voxel_offsets(mi::math::Vector<mi::Float32, 3>(0.5f));
+  }
 
   // Set sparse volume brick size and border size.
   // For performance reasons is best to have (BD + 2*BS) to be power of 2.
@@ -1390,8 +1388,6 @@ void vtknvindex_scene::update_config_settings(
 void vtknvindex_scene::update_volume_opacity(
   vtkVolume* vol, const mi::base::Handle<mi::neuraylib::IDice_transaction>& dice_transaction)
 {
-  assert(m_vol_properties_tag.is_valid());
-
   mi::base::Handle<const mi::neuraylib::IElement> vol_elem(
     dice_transaction->access<mi::neuraylib::IElement>(m_volume_tag));
 
@@ -1399,20 +1395,27 @@ void vtknvindex_scene::update_volume_opacity(
     vol_elem->get_interface<nv::index::ISparse_volume_scene_element>());
 
   // Is regular volume?
+  vtknvindex_config_settings* pv_config_settings = m_cluster_properties->get_config_settings();
+
   if (sparse_vol_elem.is_valid_interface())
   {
-    mi::base::Handle<nv::index::IRegular_volume_rendering_properties> vol_properties(
-      dice_transaction->edit<nv::index::IRegular_volume_rendering_properties>(
-        m_vol_properties_tag));
-    assert(vol_properties.is_valid_interface());
+    assert(m_sparse_volume_render_properties_tag.is_valid());
 
-    vtknvindex_config_settings* pv_config_settings = m_cluster_properties->get_config_settings();
+    mi::base::Handle<nv::index::ISparse_volume_rendering_properties>
+      sparse_volume_render_properties(
+        dice_transaction->edit<nv::index::ISparse_volume_rendering_properties>(
+          m_sparse_volume_render_properties_tag));
+    assert(sparse_volume_render_properties.is_valid_interface());
 
-    vol_properties->set_reference_step_size(calculate_volume_reference_step_size(
-      vol, pv_config_settings->get_opacity_mode(), pv_config_settings->get_opacity_reference()));
+    // set reference sampling distance
+    sparse_volume_render_properties->set_reference_sampling_distance(
+      calculate_volume_reference_step_size(
+        vol, pv_config_settings->get_opacity_mode(), pv_config_settings->get_opacity_reference()));
   }
   else // It's irregular volume
   {
+    assert(m_vol_properties_tag.is_valid());
+
     mi::base::Handle<nv::index::IIrregular_volume_rendering_properties> vol_render_properties(
       dice_transaction->edit<nv::index::IIrregular_volume_rendering_properties>(
         m_vol_properties_tag));
@@ -1424,6 +1427,9 @@ void vtknvindex_scene::update_volume_opacity(
     render_properties.sampling_segment_length =
       m_cluster_properties->get_config_settings()->get_ivol_step_size() *
       m_cluster_properties->get_config_settings()->get_step_size();
+
+    render_properties.sampling_reference_segment_length = calculate_volume_reference_step_size(
+      vol, pv_config_settings->get_opacity_mode(), pv_config_settings->get_opacity_reference());
 
     vol_render_properties->set_rendering(render_properties);
   }
@@ -1516,7 +1522,13 @@ void vtknvindex_scene::export_session()
     }
     else
     {
-      INFO_LOG << "Writing export to file '" << output_filename << "'";
+      std::vector<std::string> path_components;
+      path_components.push_back(vtksys::SystemTools::GetCurrentWorkingDirectory() + "/");
+      path_components.push_back(output_filename);
+
+      INFO_LOG << "Writing export session to file '"
+               << vtksys::SystemTools::JoinPath(path_components) << "'";
+
       std::ofstream f(output_filename.c_str());
       f << s.str();
       std::ostringstream af;

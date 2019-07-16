@@ -48,6 +48,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkProcessModule.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkVolumeProperty.h"
 
 #include "vtknvindex_cluster_properties.h"
 #include "vtknvindex_config_settings.h"
@@ -686,6 +687,13 @@ void vtknvindex_representation::SetVisibility(bool val)
   update_index_roi();
 
   this->Superclass::SetVisibility(val);
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_representation::SetScalarOpacityUnitDistance(double val)
+{
+  static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)->opacity_changed();
+  this->Property->SetScalarOpacityUnitDistance(val);
 }
 
 //-------------------------------------------------------------------------------------------------

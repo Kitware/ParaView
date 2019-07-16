@@ -84,18 +84,18 @@ void vtknvindex_host_properties::shm_cleanup(bool reset)
 
 // ------------------------------------------------------------------------------------------------
 void vtknvindex_host_properties::set_shminfo(mi::Uint32 time_step, std::string shmname,
-  mi::math::Bbox<mi::Float32, 3> shmbbox, mi::Uint64 shmsize, void* raw_mem_pointer)
+  mi::math::Bbox<mi::Float32, 3> shmbbox, mi::Uint64 shmsize, void* subset_ptr)
 {
   std::map<mi::Uint32, std::vector<shm_info> >::iterator shmit = m_shmlist.find(time_step);
   if (shmit == m_shmlist.end())
   {
     std::vector<shm_info> shmlist;
-    shmlist.push_back(shm_info(shmname, shmbbox, shmsize, raw_mem_pointer));
+    shmlist.push_back(shm_info(shmname, shmbbox, shmsize, subset_ptr));
     m_shmlist[time_step] = shmlist;
   }
   else
   {
-    shmit->second.push_back(shm_info(shmname, shmbbox, shmsize, raw_mem_pointer));
+    shmit->second.push_back(shm_info(shmname, shmbbox, shmsize, subset_ptr));
   }
 
   // TODO : Change this to reflect the actual subcube size.
@@ -108,25 +108,6 @@ void vtknvindex_host_properties::set_shminfo(mi::Uint32 time_step, std::string s
     ceil((shmvolume.y / subcube_size)) * ceil((shmvolume.z / subcube_size));
 
   m_shmref[shmname] = static_cast<mi::Uint32>(shm_reference_count);
-}
-
-void vtknvindex_host_properties::free_shm_pointer(mi::Uint32 time_step)
-{
-  std::map<mi::Uint32, std::vector<shm_info> >::iterator shmit = m_shmlist.find(time_step);
-  if (shmit != m_shmlist.end())
-  {
-    std::vector<shm_info>& shmlist = shmit->second;
-    for (mi::Uint32 i = 0; i < shmlist.size(); i++)
-    {
-      mi::base::Lock::Block block(&s_ptr_lock);
-
-      if (shmlist[i].m_raw_mem_pointer != NULL)
-      {
-        free(shmlist[i].m_raw_mem_pointer);
-        shmlist[i].m_raw_mem_pointer = NULL;
-      }
-    }
-  }
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -149,7 +130,7 @@ bool contains(const mi::math::Bbox<mi::Float32, 3>& bb, const mi::math::Vector<m
 // ------------------------------------------------------------------------------------------------
 bool vtknvindex_host_properties::get_shminfo(const mi::math::Bbox<mi::Float32, 3>& bbox,
   std::string& shmname, mi::math::Bbox<mi::Float32, 3>& shmbbox, mi::Uint64& shmsize,
-  void** raw_mem_pointer, mi::Uint32 time_step)
+  void** subset_ptr, mi::Uint32 time_step)
 {
   std::map<mi::Uint32, std::vector<shm_info> >::iterator shmit = m_shmlist.find(time_step);
   if (shmit == m_shmlist.end())
@@ -169,14 +150,15 @@ bool vtknvindex_host_properties::get_shminfo(const mi::math::Bbox<mi::Float32, 3
 
   for (mi::Uint32 i = 0; i < shmlist.size(); ++i)
   {
-    shm_info current_shm = shmlist[i];
+    const shm_info& current_shm = shmlist[i];
 
     if (contains(current_shm.m_shm_bbox, bbox.min) && contains(current_shm.m_shm_bbox, bbox.max))
     {
       shmname = current_shm.m_shm_name;
       shmbbox = current_shm.m_shm_bbox;
       shmsize = current_shm.m_size;
-      *raw_mem_pointer = current_shm.m_raw_mem_pointer;
+      *subset_ptr = current_shm.m_subset_ptr;
+
       return true;
     }
   }
@@ -186,7 +168,7 @@ bool vtknvindex_host_properties::get_shminfo(const mi::math::Bbox<mi::Float32, 3
 // ------------------------------------------------------------------------------------------------
 bool vtknvindex_host_properties::get_shminfo_isect(const mi::math::Bbox<mi::Float32, 3>& bbox,
   std::string& shmname, mi::math::Bbox<mi::Float32, 3>& shmbbox, mi::Uint64& shmsize,
-  void** raw_mem_pointer, mi::Uint32 time_step)
+  void** subset_ptr, mi::Uint32 time_step)
 {
   std::map<mi::Uint32, std::vector<shm_info> >::iterator shmit = m_shmlist.find(time_step);
   if (shmit == m_shmlist.end())
@@ -206,14 +188,15 @@ bool vtknvindex_host_properties::get_shminfo_isect(const mi::math::Bbox<mi::Floa
 
   for (mi::Uint32 i = 0; i < shmlist.size(); ++i)
   {
-    shm_info current_shm = shmlist[i];
+    const shm_info& current_shm = shmlist[i];
 
     if (current_shm.m_shm_bbox.intersects(bbox))
     {
       shmname = current_shm.m_shm_name;
       shmbbox = current_shm.m_shm_bbox;
       shmsize = current_shm.m_size;
-      *raw_mem_pointer = current_shm.m_raw_mem_pointer;
+      *subset_ptr = current_shm.m_subset_ptr;
+
       return true;
     }
   }
@@ -379,8 +362,7 @@ void vtknvindex_host_properties::serialize(mi::neuraylib::ISerializer* serialize
         // shm raw pointer
         mi::Uint32 shm_ptr_size = sizeof(void*);
         serializer->write(&shm_ptr_size, 1);
-        serializer->write(
-          reinterpret_cast<const mi::Uint8*>(&(shm.m_raw_mem_pointer)), shm_ptr_size);
+        serializer->write(reinterpret_cast<const mi::Uint8*>(&(shm.m_subset_ptr)), shm_ptr_size);
       }
 
       // Serialize the time step.
@@ -454,7 +436,7 @@ void vtknvindex_host_properties::deserialize(mi::neuraylib::IDeserializer* deser
         // shm raw pointer
         mi::Uint32 shm_ptr_size = 0;
         deserializer->read(&shm_ptr_size, 1);
-        deserializer->read(reinterpret_cast<mi::Uint8*>(&shm.m_raw_mem_pointer), shm_ptr_size);
+        deserializer->read(reinterpret_cast<mi::Uint8*>(&shm.m_subset_ptr), shm_ptr_size);
 
         shmlist.push_back(shm);
       }
