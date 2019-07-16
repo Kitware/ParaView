@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
+#include "pqPlotMatrixView.h"
 #include "pqServer.h"
 #include "pqServerConfiguration.h"
 #include "pqServerManagerModel.h"
@@ -92,6 +93,7 @@ static const QString BARCHART = pqXYBarChartView::XYBarChartViewType();
 static const QString BOXCHART = pqBoxChartView::chartViewType();
 static const QString HISTOGRAMCHART = pqXYHistogramChartView::XYHistogramChartViewType();
 static const QString LINECHART = pqXYChartView::XYChartViewType();
+static const QString PLOTMATRIX = pqPlotMatrixView::viewType();
 static const QString TABLE = pqSpreadSheetView::spreadsheetViewType();
 static const QString INDETERMINATE = "INDETERMINATE";
 static const QString NONE = "None";
@@ -457,6 +459,7 @@ void pqPipelineModel::constructor()
   this->PixmapMap[PipelineModelIconType::HISTOGRAMCHART].load(
     ":/pqWidgets/Icons/pqHistogram16.png");
   this->PixmapMap[PipelineModelIconType::LINECHART].load(":/pqWidgets/Icons/pqLineChart16.png");
+  this->PixmapMap[PipelineModelIconType::PLOTMATRIX].load(":/pqWidgets/Icons/pqLineChart16.png");
   this->PixmapMap[PipelineModelIconType::TABLE].load(":/pqWidgets/Icons/pqSpreadsheet16.png");
   this->PixmapMap[PipelineModelIconType::INDETERMINATE].load(":/pqWidgets/Icons/pq3DView16.png");
   this->PixmapMap[PipelineModelIconType::NONE].load(":/pqWidgets/Icons/pq3DView16.png");
