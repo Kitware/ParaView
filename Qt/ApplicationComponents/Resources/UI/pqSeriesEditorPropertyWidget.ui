@@ -15,9 +15,12 @@
   </property>
   <layout class="QGridLayout" name="wdgLayout" columnstretch="0,0">
    <item row="1" column="1">
-    <widget class="QSpinBox" name="Thickness">
+    <widget class="QDoubleSpinBox" name="Thickness">
      <property name="enabled">
       <bool>false</bool>
+     </property>
+     <property name="decimals">
+      <number>1</number>
      </property>
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -30,9 +33,6 @@
      </property>
      <property name="minimum">
       <number>1</number>
-     </property>
-     <property name="maximum">
-      <number>10</number>
      </property>
      <property name="value">
       <number>1</number>
@@ -149,14 +149,46 @@
      </item>
     </widget>
    </item>
+   <item row="4" column="1">
+    <widget class="QDoubleSpinBox" name="MarkerSize">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="whatsThis">
+      <string>Enter the size for the marker.</string>
+     </property>
+     <property name="decimals">
+      <number>1</number>
+     </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="value">
+      <number>1</number>
+     </property>
+    </widget>
+   </item>
    <item row="4" column="0">
+    <widget class="QLabel" name="MarkerSizeLabel">
+     <property name="text">
+      <string>Marker Size</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
     <widget class="QLabel" name="AxisListLabel">
      <property name="text">
       <string>Chart Axes</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="5" column="1">
     <widget class="QComboBox" name="AxisList">
      <property name="enabled">
       <bool>false</bool>

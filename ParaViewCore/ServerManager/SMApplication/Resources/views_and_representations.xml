@@ -7925,7 +7925,7 @@
       </StringVectorProperty>
       <StringVectorProperty command="SetLineThickness"
                             clean_command="ClearLineThicknesses"
-                            element_types="2 0"
+                            element_types="str int"
                             name="SeriesLineThickness"
                             number_of_elements_per_command="2"
                             repeat_command="1">
@@ -7959,6 +7959,24 @@
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
       </StringVectorProperty>
+      <StringVectorProperty command="SetMarkerSize"
+                            clean_command="ClearMarkerSizes"
+                            element_types="str double"
+                            name="SeriesMarkerSize"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <Documentation>Set the series marker size.</Documentation>
+        <ChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
+                                    default_mode="value"
+                                    default_value="2">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </ChartSeriesSelectionDomain>
+      </StringVectorProperty>
 
       <PropertyGroup label="Series Parameters"
                      panel_widget="SeriesEditor"
@@ -7973,6 +7991,8 @@
                   function="SeriesLineStyle" />
         <Property name="SeriesLabel"
                   function="SeriesLabel" />
+        <Property name="SeriesMarkerSize"
+                  function="SeriesMarkerSize" />
         <Property name="SeriesMarkerStyle"
                   function="SeriesMarkerStyle" />
         <Property name="SeriesPlotCorner"
@@ -8011,7 +8031,7 @@
       </StringVectorProperty>
       <StringVectorProperty command="SetLineThickness"
                             clean_command="ClearLineThicknesses"
-                            element_types="2 0"
+                            element_types="str double"
                             name="SeriesLineThickness"
                             number_of_elements_per_command="2"
                             repeat_command="1">
@@ -8043,6 +8063,23 @@
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
       </StringVectorProperty>
+      <StringVectorProperty command="SetMarkerSize"
+                            clean_command="ClearMarkerSizes"
+                            element_types="str double"
+                            name="SeriesMarkerSize"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <Documentation>Set the series marker size.</Documentation>
+        <ChartSeriesSelectionDomain name="array_list"
+                                    default_mode="value"
+                                    default_value="2">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </ChartSeriesSelectionDomain>
+      </StringVectorProperty>
 
       <PropertyGroup label="Series Parameters"
                      panel_widget="SeriesEditor"
@@ -8059,6 +8096,8 @@
                   function="SeriesLabel" />
         <Property name="SeriesMarkerStyle"
                   function="SeriesMarkerStyle" />
+        <Property name="SeriesMarkerSize"
+                  function="SeriesMarkerSize" />
         <Property name="SeriesPlotCorner"
                   function="SeriesPlotCorner"/>
       </PropertyGroup>
