@@ -335,7 +335,7 @@ if (PARAVIEW_BUILD_QT_GUI)
       -DCOPROCESSING_DATA_DIR:PATH=${paraview_test_data_directory_output}
       -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_SOURCE_DIR}/Examples/Catalyst/SampleScripts/filedriver.py
       -DCINEMA_DATABASE_TESTER:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/CinemaExportCheck.py
-      -DCINEMA_INPUT_DATA:FILEPATH=${CMAKE_BINARY_DIR}/ExternalData/Testing/Data/can.ex2
+      -DCINEMA_INPUT_DATA:FILEPATH=${CMAKE_BINARY_DIR}/ExternalData/Testing/Data/cube.vtu
       -DCINEMA_BATCH_SCRIPT:FILEPATH=cinema/CinemaExportNoTimesteps.py
       -DTEST_NAME:STRING=CinemaExportNoTimesteps
       -P ${CMAKE_CURRENT_SOURCE_DIR}/CinemaExportFullWorkflowTest.cmake)
