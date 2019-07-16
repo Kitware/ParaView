@@ -1,21 +1,17 @@
 <?xml version="1.0" ?>
 <pqevents>
   <!-- load state -->
-  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileLoadServerState" />
-  <pqevent object="pqClientMainWindow/FileLoadServerStateDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/time_source.pvsm" />
-  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/LoadStateDataFileOptions/ComboBox" command="activated" arguments="Search files under specified directory" />
-  <pqevent object="LoadStateOptionsDialog/widget/OKButton" command="activate" arguments="$PARAVIEW_TEST_ROOT" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/cube.vtu" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
-  <!-- select element in pipeline browser -->
+  <!-- select element in pipeline browser and color -->
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,50,11,/0:0/0:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,50,11,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="f1" />
 
   <!-- turn off the scalar bar -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/ColorEditor/ShowScalarBar" command="set_boolean" arguments="false" />
-
-  <!-- Extract 0th timestep -->
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ExtractTimeSteps" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
   <!-- activate catalyst export window -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
@@ -29,7 +25,7 @@
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/scrollArea_2/qt_scrollarea_viewport/container/1pqProxyWidget0/RequestSpecificArrays/CheckBox" command="set_boolean" arguments="true" />
 
   <!-- export geometry -->
-  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterFormat" command="activated" arguments="XMLMultiBlockDataWriter" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterFormat" command="activated" arguments="XMLPUnstructuredGridWriter" />
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterExtract" command="set_boolean" arguments="true" />
 
   <!-- set root directory for interactive export -->
