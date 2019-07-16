@@ -200,6 +200,7 @@ ProxySelectionWidget
 Specify options to configure `pqProxySelectionWidget`, typically used for
 proxy-properties with a proxy-list domain.
 
+To hide the combo-box widget, add `visibility="0"` attribute.
 To disable the combo-box widget, so that the user cannot change the selection,
 add `enabled="0"` attribute.
 
