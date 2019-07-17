@@ -3199,7 +3199,6 @@
       <IntVectorProperty command="SetInlineData"
                          default_values="0"
                          name="InlineData"
-                         panel_visibility="never"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>Turn on inlining of buffer data.</Documentation>
