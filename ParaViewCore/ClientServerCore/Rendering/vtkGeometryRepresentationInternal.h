@@ -26,6 +26,7 @@
 #endif
 
 #if defined(VTKM_ENABLE_TBB) && VTK_MODULE_ENABLE_VTK_AcceleratorsVTKm
+#include "vtkCellArray.h"
 #include "vtkQuadricClustering.h"
 #include "vtkmLevelOfDetail.h"
 namespace vtkGeometryRepresentation_detail
@@ -60,17 +61,34 @@ protected:
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override
   {
-    if (this->Superclass::RequestData(request, inputVector, outputVector))
+    // The accelerated implementation only supports triangle meshes. Fallback to
+    // vtkQuadricClustering if needed:
+    vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+    vtkPolyData* input = vtkPolyData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+    if (!input)
     {
-      return 1;
+      vtkErrorMacro("Expected polydata.");
+      return 0;
     }
 
-    // The accelerated implementation returns 0 when the input contains cells
-    // that aren't triangles. Handle this by falling back to
-    // vtkQuadricClustering:
-    vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-    vtkDataSet* input = vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+    // This filter only handles triangles. This code to detect all triangles is
+    // adapted from tovtkm::Convert for vtkPolyData:
+    vtkCellArray* polys = input->GetPolys();
+    const int maxPolySize = polys->GetMaxCellSize();
+    const vtkIdType numCells = input->GetNumberOfCells();
+    // deduce if we only have triangles. We use maxCellSize+1 so
+    // that we handle the length entry in the cell array for each cell
+    polys->Squeeze();
+    const bool allSameType = ((numCells * (maxPolySize + 1)) == polys->GetSize());
+    if (allSameType && maxPolySize == 3)
+    { // All triangles. Try the accelerated implementation:
+      if (this->Superclass::RequestData(request, inputVector, outputVector))
+      {
+        return 1;
+      }
+    }
 
+    // Otherwise fallback to quadric clustering:
     vtkInformation* outInfo = outputVector->GetInformationObject(0);
     vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
