@@ -60,7 +60,7 @@ elseif("${TEST_NAME}" MATCHES "CinemaExport" )
     if(WIN32)
     # prepping the output python script
     execute_process_with_echo(COMMAND
-      @powershell -Command get-content ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT} | %{$_ -replace \"'cube.vtu'\",\"'input'\"}
+      @powershell -Command "(get-content ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}).replace(\"'cube.vtu'\",\"'input'\") | set-content -Path ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}"
       )
     else()
     # prepping the output python script
@@ -72,7 +72,7 @@ elseif("${TEST_NAME}" MATCHES "CinemaExport" )
     if(WIN32)
     # prepping the output python script
     execute_process_with_echo(COMMAND
-      @powershell -Command get-content ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT} | %{$_ -replace \"'can.ex2'\",\"'input'\"}
+      @powershell -Command "(get-content ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}).replace(\"'can.ex2'\",\"'input'\") | set-content -Path ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}"
       )
     else()
     # prepping the output python script
