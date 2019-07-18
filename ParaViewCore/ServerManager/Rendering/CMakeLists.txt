@@ -57,6 +57,7 @@ set(classes
   vtkSMPlotMatrixViewProxy
   vtkSMRangedTransferFunctionDomain
   vtkSMRenderViewProxy
+  vtkSMRendererDomain
   vtkSMRepresentationProxy
   vtkSMRepresentationTypeDomain
   vtkSMRepresentedArrayListDomain
