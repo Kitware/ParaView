@@ -53,6 +53,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-vtk-module-find-pa
 include("${CMAKE_CURRENT_LIST_DIR}/ParaViewClient.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/ParaViewPlugin.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/ParaViewServerManager.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/ParaViewTesting.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/vtkModuleWrapClientServer.cmake")
 
 set(PARAVIEW_BUILD_QT_GUI "@PARAVIEW_BUILD_QT_GUI@")
