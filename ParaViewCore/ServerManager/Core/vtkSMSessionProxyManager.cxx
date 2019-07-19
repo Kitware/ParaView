@@ -672,11 +672,14 @@ const char* vtkSMSessionProxyManager::GetProxyName(const char* groupname, unsign
     vtkSMProxyManagerProxyMapType::iterator it2 = it->second.begin();
     for (; it2 != it->second.end(); it2++)
     {
-      if (counter == idx)
+      if (idx < counter + it2->second.size())
       {
+        // idx is between counter and the size of the next vector of
+        // proxies, so return the current proxy map key
         return it2->first.c_str();
       }
-      counter++;
+
+      counter += it2->second.size();
     }
   }
 
