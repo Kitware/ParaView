@@ -100,7 +100,7 @@ bool vtkSIStringVectorProperty::Pull(vtkSMMessage* message)
     return true;
   }
 
-  int numArgs = res.GetNumberOfArguments(0);
+  const int numArgs = res.GetNumberOfArguments(0);
   if (numArgs < 1)
   {
     return true;
@@ -112,26 +112,35 @@ bool vtkSIStringVectorProperty::Pull(vtkSMMessage* message)
   Variant* var = prop->mutable_value();
   var->set_type(Variant_Type_STRING);
 
-  const char* arg = NULL;
-  int retVal = res.GetArgument(0, 0, &arg);
-  if (!arg)
+  for (int argIdx = 0; argIdx < numArgs; ++argIdx)
   {
-    var->add_txt(std::string());
-  }
-  else
-  {
-    if (this->NeedReencoding)
+    const char* arg = NULL;
+    int retVal = res.GetArgument(0, argIdx, &arg);
+    if (retVal == 0)
     {
-      // certain type of string needs to be converted to utf8
-      // to be sent back to client
-      var->add_txt(vtkPVFileInformationHelper::LocalToUtf8Win32(arg).c_str());
+      // failed to parse as string.
+      return false;
+    }
+
+    if (!arg)
+    {
+      var->add_txt(std::string());
     }
     else
     {
-      var->add_txt(arg);
+      if (this->NeedReencoding)
+      {
+        // certain type of string needs to be converted to utf8
+        // to be sent back to client
+        var->add_txt(vtkPVFileInformationHelper::LocalToUtf8Win32(arg).c_str());
+      }
+      else
+      {
+        var->add_txt(arg);
+      }
     }
   }
-  return (retVal != 0);
+  return true;
 }
 
 //---------------------------------------------------------------------------
