@@ -2612,11 +2612,8 @@
           label="Back End"
           default_values="scivis"
           number_of_elements="1">
-        <StringListDomain name="list">
-          <String value="OSPRay raycaster" />
-          <String value="OSPRay pathtracer" />
-          <String value="OptiX pathtracer" />
-        </StringListDomain>
+        <RendererDomain name="list">
+        </RendererDomain>
         <Documentation>Set the OSPRay renderer to use.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
