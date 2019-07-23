@@ -60,7 +60,7 @@ elseif("${TEST_NAME}" MATCHES "CinemaExport" )
     if(WIN32)
     # prepping the output python script
     execute_process_with_echo(COMMAND
-      @powershell -Command "(get-content ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}).replace(\"'cube.vtu'\",\"'input'\") | set-content -Path ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}"
+      powershell.exe -Command "(get-content ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}).replace(\"'cube.vtu'\",\"'input'\") | set-content -Path ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}"
       )
     else()
     # prepping the output python script
@@ -72,7 +72,7 @@ elseif("${TEST_NAME}" MATCHES "CinemaExport" )
     if(WIN32)
     # prepping the output python script
     execute_process_with_echo(COMMAND
-      @powershell -Command "(get-content ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}).replace(\"'can.ex2'\",\"'input'\") | set-content -Path ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}"
+      powershell.exe -Command "(get-content ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}).replace(\"'can.ex2'\",\"'input'\") | set-content -Path ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}"
       )
     else()
     # prepping the output python script
@@ -97,32 +97,23 @@ if(rv)
   message(FATAL_ERROR "pvbatch return value was = '${rv}' ")
 endif()
 
-if("${TEST_NAME}" STREQUAL "CinemaExportGeometry")
+if(WIN32)
   message("${CINEMA_DATABASE_TESTER}")
-  execute_process_with_echo(COMMAND 
+  execute_process_with_echo(COMMAND
+    python.exe
     ${CINEMA_DATABASE_TESTER} 
-    --interactive ${COPROCESSING_TEST_DIR}/cinema/interactive/CinemaExportGeometry.cdb
-    --batch ${COPROCESSING_TEST_DIR}/cinema/batch/CinemaExportGeometry.cdb
+    --interactive ${COPROCESSING_TEST_DIR}/cinema/interactive/${TEST_NAME}.cdb
+    --batch ${COPROCESSING_TEST_DIR}/cinema/batch/${TEST_NAME}.cdb
     RESULT_VARIABLE rv)
   if(rv)
     message(FATAL_ERROR "CoProcessingCompareImageTester second image return value was = '${rv}' ")
   endif()
-elseif("${TEST_NAME}" STREQUAL "CinemaExportGeometryAndImages")
+else()
   message("${CINEMA_DATABASE_TESTER}")
-  execute_process_with_echo(COMMAND 
+  execute_process_with_echo(COMMAND
     ${CINEMA_DATABASE_TESTER} 
-    --interactive ${COPROCESSING_TEST_DIR}/cinema/interactive/CinemaExportGeometryAndImages.cdb
-    --batch ${COPROCESSING_TEST_DIR}/cinema/batch/CinemaExportGeometryAndImages.cdb
-    RESULT_VARIABLE rv)
-  if(rv)
-    message(FATAL_ERROR "CoProcessingCompareImageTester second image return value was = '${rv}' ")
-  endif()
-elseif("${TEST_NAME}" STREQUAL "CinemaExportNoTimesteps")
-  message("${CINEMA_DATABASE_TESTER}")
-  execute_process_with_echo(COMMAND 
-    ${CINEMA_DATABASE_TESTER} 
-    --interactive ${COPROCESSING_TEST_DIR}/cinema/interactive/CinemaExportNoTimesteps.cdb
-    --batch ${COPROCESSING_TEST_DIR}/cinema/batch/CinemaExportNoTimesteps.cdb
+    --interactive ${COPROCESSING_TEST_DIR}/cinema/interactive/${TEST_NAME}.cdb
+    --batch ${COPROCESSING_TEST_DIR}/cinema/batch/${TEST_NAME}.cdb
     RESULT_VARIABLE rv)
   if(rv)
     message(FATAL_ERROR "CoProcessingCompareImageTester second image return value was = '${rv}' ")
@@ -143,30 +134,32 @@ endif()
 
 if("${TEST_NAME}" MATCHES "CinemaExportGeometry")
   if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/interactive/${TEST_NAME}.cdb/can.ex2_0.vtm") 
-    message(FATAL_ERROR "Geometry did not export during interactive (can.ex2_*.vtm)")
+    message(FATAL_ERROR "Geometry did not export interactively (can.ex2_*.vtm)")
   endif()
   if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/batch/${TEST_NAME}.cdb/can.ex2_0.vtm") 
     message(FATAL_ERROR "Geometry did not export during batch (can.ex2_*.vtm)")
   endif()
-  return()
+  if(NOT "${TEST_NAME}" MATCHES "CinemaExportGeometryAndImages")
+    return()
+  endif()
 elseif("${TEST_NAME}" MATCHES "CinemaExportNoTime")
   if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/interactive/${TEST_NAME}.cdb/cube.vtu_0.pvtu") 
-    message(FATAL_ERROR "Geometry did not export during interactive (cube.vtu_*.pvtu)")
+    message(FATAL_ERROR "Geometry did not export interactively (cube.vtu_*.pvtu)")
   endif()
   if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/batch/${TEST_NAME}.cdb/cube.vtu_0.pvtu") 
     message(FATAL_ERROR "Geometry did not export during batch (cube.vtu_*.pvtu)")
   endif()
-  return()
 endif()
 
-# There is an extra cinema directory for the batch use-case
-if("${TEST_NAME}" MATCHES "CinemaExportGeometryAndImages")
-  if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/batch/${TEST_NAME}.cdb/cinema/RenderView1/info.json") 
-    message(FATAL_ERROR "Cinema images did not export during batch")
+if("${TEST_NAME}" MATCHES "CinemaExportNoTime" OR "${TEST_NAME}" MATCHES "CinemaExportGeometryAnd")
+  if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/interactive/${TEST_NAME}.cdb/Renderview1/info.json") 
+    message(FATAL_ERROR "Image database did not export interactively (RenderView*)")
   endif()
-  if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/interactive/${TEST_NAME}.cdb/RenderView1/info.json") 
-    message(FATAL_ERROR "Cinema images did not export during batch")
+  # There is an extra cinema directory for the batch use-case
+  if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/batch/${TEST_NAME}.cdb/cinema/RenderView1/info.json")
+    message(FATAL_ERROR "Image database did not export during batch (RenderView*)")
   endif()
+  return()
 endif()
 
 if("${TEST_NAME}" STREQUAL "ExportNow")
