@@ -28,6 +28,10 @@
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterFormat" command="activated" arguments="XMLPUnstructuredGridWriter" />
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterExtract" command="set_boolean" arguments="true" />
 
+  <!-- export cinema image database -->
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewFormat" command="activated" arguments="Cinema image database (*.cdb)" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewExtract" command="set_boolean" arguments="true" />
+
   <!-- set root directory for interactive export -->
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/scrollArea_2/qt_scrollarea_viewport/container/1pqProxyWidget0/RootDirectory/RootDirectory" command="set_string" arguments="$PARAVIEW_TEST_ROOT/cinema/interactive/CinemaExportNoTimesteps.cdb" />
 
