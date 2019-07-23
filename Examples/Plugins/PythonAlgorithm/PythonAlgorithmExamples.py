@@ -90,6 +90,25 @@ class PythonSuperquadricSource(VTKPythonAlgorithmBase):
     def SetValue(self, val):
         print("settings value:", val)
 
+    # "StringInfo" and "String" demonstrate how one can add a selection widget
+    # that lets user choose a string from the list of strings.
+    @smproperty.stringvector(name="StringInfo", information_only="1")
+    def GetStrings(self):
+        return ["one", "two", "three"]
+
+    @smproperty.stringvector(name="String", number_of_elements="1")
+    @smdomain.xml(\
+        """<StringListDomain name="list">
+                <RequiredProperties>
+                    <Property name="StringInfo" function="StringInfo"/>
+                </RequiredProperties>
+            </StringListDomain>
+        """)
+    def SetString(self, value):
+        print("Setting ", value)
+
+
+
 
 #------------------------------------------------------------------------------
 # A reader example.
