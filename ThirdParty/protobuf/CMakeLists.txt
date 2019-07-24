@@ -45,6 +45,8 @@ vtk_module_third_party(
     STANDARD_INCLUDE_DIRS)
 
 if (VTK_MODULE_USE_EXTERNAL_ParaView_protobuf)
+  # promote protobuf::protoc to GLOBAL to allow to call protobuf_generate from other directories
+  set_target_properties (protobuf::protoc PROPERTIES IMPORTED_GLOBAL TRUE)
   set(protobuf_function_file "${CMAKE_CURRENT_SOURCE_DIR}/protobuf-function.cmake")
 else ()
   set(protobuf_function_file "${CMAKE_CURRENT_SOURCE_DIR}/vtkprotobuf/cmake/protobuf-function.cmake")
