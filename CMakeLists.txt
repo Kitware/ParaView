@@ -919,6 +919,7 @@ if (PARAVIEW_ENABLE_PYTHON)
       PYTHON_PACKAGE  "vtkmodules"
       MODULE_DESTINATION  "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}"
       CMAKE_DESTINATION   "${paraview_cmake_destination}/vtk"
+      LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
       WRAPPED_MODULES vtk_python_wrapped_modules
       TARGET          VTK::vtkpythonmodules)
 
@@ -940,6 +941,7 @@ if (PARAVIEW_ENABLE_PYTHON)
     PYTHON_PACKAGE  "paraview.modules"
     MODULE_DESTINATION  "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}"
     CMAKE_DESTINATION   "${paraview_cmake_destination}"
+    LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     WRAPPED_MODULES paraview_python_wrapped_modules
     TARGET          ParaView::pvpythonmodules)
 endif ()
