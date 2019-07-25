@@ -368,6 +368,8 @@ function (paraview_plugin_build)
         "#ifndef ${_paraview_build_TARGET}_h
 #define ${_paraview_build_TARGET}_h
 
+#define PARAVIEW_BUILDING_PLUGIN
+#define PARAVIEW_PLUGIN_BUILT_SHARED 0
 #include \"vtkPVPlugin.h\"
 #include \"vtkPVPluginLoader.h\"
 #include \"vtkPVPluginTracker.h\"
