@@ -17,7 +17,7 @@ paraview_client_add(
   [MAIN_WINDOW_CLASS    <class>]
   [MAIN_WINDOW_INCLUDE  <include>]
 
-  [PLUGINS_TARGET   <target>]
+  [PLUGINS_TARGETS  <target>...]
   [REQUIRED_PLUGINS <plugin>...]
   [OPTIONAL_PLUGINS <plugin>...]
 
@@ -38,6 +38,8 @@ paraview_client_add(
   [BUNDLE_DESTINATION   <directory>]
   [RUNTIME_DESTINATION  <directory>]
   [LIBRARY_DESTINATION  <directory>]
+
+  [PLUGINS_TARGET   <target>])
 ```
 
   * `NAME`: (Required) The name of the application. This is used as the target
@@ -51,7 +53,9 @@ paraview_client_add(
   * `MAIN_WINDOW_INCLUDE`: (Defaults to `QMainWindow` or
     `<MAIN_WINDOW_CLASS>.h` if it is specified) The include file for the main
     window.
-  * `PLUGINS_TARGET`: The target for static plugins. The associated function
+  * `PLUGINS_TARGET`: (Deprecated for `PLUGINS_TARGETS`.) The target for static
+    plugins. The associated function will be called upon startup.
+  * `PLUGINS_TARGETS`: The targets for plugins. The associated functions
     will be called upon startup.
   * `REQUIRED_PLUGINS`: Plugins to load upon startup.
   * `OPTIONAL_PLUGINS`: Plugins to load upon startup if available.
@@ -84,7 +88,7 @@ function (paraview_client_add)
   cmake_parse_arguments(_paraview_client
     ""
     "NAME;APPLICATION_NAME;ORGANIZATION;TITLE;SPLASH_IMAGE;BUNDLE_DESTINATION;BUNDLE_ICON;BUNDLE_PLIST;APPLICATION_ICON;MAIN_WINDOW_CLASS;MAIN_WINDOW_INCLUDE;VERSION;FORCE_UNIX_LAYOUT;PLUGINS_TARGET;DEFAULT_STYLE;RUNTIME_DESTINATION;LIBRARY_DESTINATION;NAMESPACE;EXPORT"
-    "REQUIRED_PLUGINS;OPTIONAL_PLUGINS;APPLICATION_XMLS;SOURCES;QCH_FILE"
+    "REQUIRED_PLUGINS;OPTIONAL_PLUGINS;APPLICATION_XMLS;SOURCES;QCH_FILE;PLUGINS_TARGETS"
     ${ARGN})
 
   if (_paraview_client_UNPARSED_ARGUMENTS)
@@ -94,6 +98,20 @@ function (paraview_client_add)
   endif ()
 
   # TODO: Installation.
+
+  if (DEFINED _paraview_client_PLUGINS_TARGET)
+    if (DEFINED _paraview_client_PLUGINS_TARGETS)
+      message(FATAL_ERROR
+        "The `paraview_client_add(PLUGINS_TARGET)` argument is incompatible "
+        "with `PLUGINS_TARGETS`.")
+    else ()
+      message(DEPRECATION
+        "The `paraview_client_add(PLUGINS_TARGET)` argument is deprecated in "
+        "favor of `PLUGINS_TARGETS`.")
+      set(_paraview_client_PLUGINS_TARGETS
+        "${_paraview_client_PLUGINS_TARGET}")
+    endif ()
+  endif ()
 
   if (NOT DEFINED _paraview_client_NAME)
     message(FATAL_ERROR
@@ -286,6 +304,19 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
     set(_paraview_client_built_shared 1)
   endif ()
 
+  set(_paraview_client_have_plugins 0)
+  set(_paraview_client_plugins_includes)
+  set(_paraview_client_plugins_calls)
+  if (_paraview_client_PLUGINS_TARGETS)
+    set(_paraview_client_have_plugins 1)
+    foreach (_paraview_client_plugin_target IN LISTS _paraview_client_PLUGINS_TARGETS)
+      string(APPEND _paraview_client_plugins_includes
+        "#include \"${_paraview_client_plugin_target}.h\"\n")
+      string(APPEND _paraview_client_plugins_calls
+        "  ${_paraview_client_plugin_target}_initialize();\n")
+    endforeach ()
+  endif ()
+
   set(_paraview_client_source_files
     "${CMAKE_CURRENT_BINARY_DIR}/${_paraview_client_NAME}_main.cxx"
     "${CMAKE_CURRENT_BINARY_DIR}/pq${_paraview_client_NAME}Initializer.cxx"
@@ -341,10 +372,10 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
       ParaView::pqApplicationComponents
       VTK::vtksys)
 
-  if (DEFINED _paraview_client_PLUGINS_TARGET)
+  if (DEFINED _paraview_client_PLUGINS_TARGETS)
     target_link_libraries("${_paraview_client_NAME}"
       PRIVATE
-        "${_paraview_client_PLUGINS_TARGET}")
+        ${_paraview_client_PLUGINS_TARGETS})
   endif ()
 
   set(_paraview_client_export)
