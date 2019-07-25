@@ -133,6 +133,7 @@ void vtkPVLODActor::Render(vtkRenderer* ren, vtkMapper* vtkNotUsed(m))
   // We might want to estimate time from the number of polygons in mapper.
   vtkInformation* info = this->GetPropertyKeys();
   this->Device->SetPropertyKeys(info);
+  this->Device->SetMapper(mapper);
   this->Device->Render(ren, mapper);
   if (this->Texture)
   {
