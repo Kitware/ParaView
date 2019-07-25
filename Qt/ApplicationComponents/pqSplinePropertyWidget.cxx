@@ -140,8 +140,8 @@ public:
       return false;
     }
 
-    const int cursize = this->Points.size();
-    const int newsize = pts.size();
+    const int cursize = static_cast<int>(this->Points.size());
+    const int newsize = static_cast<int>(pts.size());
     if (newsize > cursize)
     {
       emit this->beginInsertRows(QModelIndex(), cursize, newsize - 1);
@@ -273,7 +273,7 @@ pqSplinePropertyWidget::pqSplinePropertyWidget(vtkSMProxy* smproxy, vtkSMPropert
     const size_t loc =
       cidx.isValid() ? static_cast<size_t>(cidx.row() + 1) : internals.Model.points().size();
     internals.Model.insertPoint(loc);
-    ui.PointsTable->setCurrentIndex(internals.Model.index(loc, 0));
+    ui.PointsTable->setCurrentIndex(internals.Model.index(static_cast<int>(loc), 0));
   });
 
   this->connect(ui.PointsTable, &pqExpandableTableView::editPastLastRow,
