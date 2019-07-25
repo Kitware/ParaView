@@ -62,6 +62,7 @@ protected:
   int Index;
   unsigned long ObserverId;
   bool BoolProperty;
+  QString Value;
 
 private:
   Q_DISABLE_COPY(pqBoolPropertyWidgetDecorator)
