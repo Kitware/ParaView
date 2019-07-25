@@ -57,29 +57,13 @@ if("${TEST_NAME}" STREQUAL "ExportNow" )
   set(rv 0)
 elseif("${TEST_NAME}" MATCHES "CinemaExport" )
   if("${TEST_NAME}" MATCHES "NoTimesteps" )
-    if(WIN32)
-    # prepping the output python script
-    execute_process_with_echo(COMMAND
-      powershell.exe -Command "(get-content ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}).replace(\"'cube.vtu'\",\"'input'\") | set-content -Path ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}"
-      )
-    else()
-    # prepping the output python script
-    execute_process_with_echo(COMMAND
-      perl -i -pe "s/'cube.vtu'/'input'/g" ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}
-      )
-    endif()
+    file(READ "${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}" batch_script_data)
+    string(REGEX REPLACE "'cube.vtu'" "'input'" batch_script_data "${batch_script_data}")
+    file(WRITE "${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}" "${batch_script_data}")
   else()
-    if(WIN32)
-    # prepping the output python script
-    execute_process_with_echo(COMMAND
-      powershell.exe -Command "(get-content ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}).replace(\"'can.ex2'\",\"'input'\") | set-content -Path ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}"
-      )
-    else()
-    # prepping the output python script
-    execute_process_with_echo(COMMAND
-      perl -i -pe "s/'can.ex2'/'input'/g" ${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}
-      )
-    endif()
+    file(READ "${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}" batch_script_data)
+    string(REGEX REPLACE "'can.ex2'" "'input'" batch_script_data "${batch_script_data}")
+    file(WRITE "${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}" "${batch_script_data}")
   endif()
 
 
