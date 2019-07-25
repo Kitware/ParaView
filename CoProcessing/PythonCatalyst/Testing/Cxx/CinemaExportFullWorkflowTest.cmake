@@ -136,7 +136,7 @@ elseif("${TEST_NAME}" MATCHES "CinemaExportNoTime")
 endif()
 
 if("${TEST_NAME}" MATCHES "CinemaExportNoTime" OR "${TEST_NAME}" MATCHES "CinemaExportGeometryAnd")
-  if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/interactive/${TEST_NAME}.cdb/Renderview1/info.json") 
+  if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/interactive/${TEST_NAME}.cdb/RenderView1/info.json") 
     message(FATAL_ERROR "Image database did not export interactively (RenderView*)")
   endif()
   # There is an extra cinema directory for the batch use-case
