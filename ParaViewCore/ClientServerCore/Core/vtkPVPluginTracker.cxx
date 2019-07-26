@@ -99,8 +99,7 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, bool isPlugin)
     return std::string();
   }
 
-#if !BUILD_SHARED_LIBS
-  bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
+  // First search in the static lookup tables.
   if (isPlugin)
   {
     for (auto searchFunction : RegisteredPluginSearchFunctions)
@@ -112,7 +111,6 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, bool isPlugin)
       }
     }
   }
-#endif
 
   const std::string exe_dir = pm->GetSelfDir();
   const std::string vtklib = vtkGetLibraryPathForSymbol(GetVTKVersion);
