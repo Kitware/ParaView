@@ -116,7 +116,10 @@ public:
   /**
    * Sets the function used to load static plugins.
    */
-  static void SetStaticPluginSearchFunction(vtkPluginSearchFunction function);
+  static void RegisterStaticPluginSearchFunction(vtkPluginSearchFunction function);
+#ifndef VTK_LEGACY_REMOVE
+  static VTK_LEGACY(void SetStaticPluginSearchFunction(vtkPluginSearchFunction function));
+#endif
 
 protected:
   vtkPVPluginTracker();

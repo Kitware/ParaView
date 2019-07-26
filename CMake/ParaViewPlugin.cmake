@@ -382,7 +382,7 @@ static bool ${_paraview_build_TARGET}_static_plugins_search(const char* name);
 void ${_paraview_build_TARGET}_initialize()
 {
   vtkPVPluginLoader::RegisterLoadPluginCallback(${_paraview_build_TARGET}_static_plugins_load);
-  vtkPVPluginTracker::SetStaticPluginSearchFunction(${_paraview_build_TARGET}_static_plugins_search);
+  vtkPVPluginTracker::RegisterStaticPluginSearchFunction(${_paraview_build_TARGET}_static_plugins_search);
 }
 
 static bool ${_paraview_build_TARGET}_static_plugins_func(const char* name, bool load);

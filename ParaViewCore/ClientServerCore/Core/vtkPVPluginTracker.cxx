@@ -80,16 +80,17 @@ std::string vtkGetPluginFileNameFromName(const std::string& pluginname)
 #endif
 }
 
+using VectorOfSearchFunctions = std::vector<vtkPluginSearchFunction>;
+static VectorOfSearchFunctions RegisteredPluginSearchFunctions;
+
 /**
  * Locate a plugin library or a config file anchored at standard locations
  * for locating plugins.
  */
-std::string vtkLocatePluginOrConfigFile(
-  const char* plugin, bool isPlugin, vtkPluginSearchFunction searchFunction)
+std::string vtkLocatePluginOrConfigFile(const char* plugin, bool isPlugin)
 {
   vtkVLogScopeF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "looking for plugin '%s'", plugin);
 
-  (void)searchFunction;
   auto pm = vtkProcessModule::GetProcessModule();
   // Make sure we can get the options before going further
   if (pm == NULL)
@@ -102,16 +103,13 @@ std::string vtkLocatePluginOrConfigFile(
   bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
   if (isPlugin)
   {
-    if (searchFunction && searchFunction(plugin))
+    for (auto searchFunction : RegisteredPluginSearchFunctions)
     {
-      vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
-        "looking for static plugin since `BUILD_SHARED_LIBS` is OFF -- success!");
-      return plugin;
-    }
-    else
-    {
-      vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
-        "looking for static plugin since `BUILD_SHARED_LIBS` is OFF -- failed!");
+      if (searchFunction && searchFunction(plugin))
+      {
+        vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "found plugin linked in statically!");
+        return plugin;
+      }
     }
   }
 #endif
@@ -227,8 +225,6 @@ public:
   }
 };
 
-vtkPluginSearchFunction vtkPVPluginTracker::StaticPluginSearchFunction = 0;
-
 vtkStandardNewMacro(vtkPVPluginTracker);
 //----------------------------------------------------------------------------
 vtkPVPluginTracker::vtkPVPluginTracker()
@@ -265,8 +261,7 @@ vtkPVPluginTracker* vtkPVPluginTracker::GetInstance()
     // Locate ".plugins" file and process it.
     // This will setup the distributed-list of plugins. Also it will load any
     // auto-load plugins.
-    std::string _plugins =
-      vtkLocatePluginOrConfigFile(".plugins", false, StaticPluginSearchFunction);
+    std::string _plugins = vtkLocatePluginOrConfigFile(".plugins", false);
     if (!_plugins.empty())
     {
       mgr->LoadPluginConfigurationXML(_plugins.c_str());
@@ -364,8 +359,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root, bool 
       }
       else
       {
-        plugin_filename =
-          vtkLocatePluginOrConfigFile(name.c_str(), true, StaticPluginSearchFunction);
+        plugin_filename = vtkLocatePluginOrConfigFile(name.c_str(), true);
       }
       if (plugin_filename.empty())
       {
@@ -547,10 +541,17 @@ bool vtkPVPluginTracker::GetPluginAutoLoad(unsigned int index)
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVPluginTracker::RegisterStaticPluginSearchFunction(vtkPluginSearchFunction function)
+{
+  RegisteredPluginSearchFunctions.push_back(function);
+}
+
+#ifndef VTK_LEGACY_REMOVE
+//-----------------------------------------------------------------------------
 void vtkPVPluginTracker::SetStaticPluginSearchFunction(vtkPluginSearchFunction function)
 {
-  if (!StaticPluginSearchFunction)
-  {
-    StaticPluginSearchFunction = function;
-  }
+  VTK_LEGACY_BODY(vtkPVPluginTracker::SetStaticPluginSearchFunction, "ParaView 5.7");
+  vtkPVPluginTracker::RegisterStaticPluginSearchFunction(function);
 }
+
+#endif
