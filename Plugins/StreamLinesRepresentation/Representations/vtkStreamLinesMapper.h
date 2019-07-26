@@ -96,15 +96,15 @@ public:
   vtkGetMacro(NumberOfAnimationSteps, int);
   //@}
 
+  //@{
   /**
-   * Returns if the mapper does not expect to have translucent geometry. This
-   * may happen when using ColorMode is set to not map scalars i.e. render the
-   * scalar array directly as colors and the scalar array has opacity i.e. alpha
-   * component.  Default implementation simply returns true. Note that even if
-   * this method returns true, an actor may treat the geometry as translucent
-   * since a constant translucency is set on the property, for example.
+   * Some introspection on the type of data the mapper will render
+   * used by props to determine if they should invoke the mapper
+   * on a specific rendering pass.
    */
-  bool GetIsOpaque() override { return true; }
+  bool HasOpaqueGeometry() override { return true; }
+  bool HasTranslucentPolygonalGeometry() override { return false; }
+  //@}
 
   /**
    * WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE
