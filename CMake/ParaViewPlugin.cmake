@@ -244,6 +244,7 @@ paraview_plugin_build(
   PLUGINS <plugin>...
   [TARGET <target>]
   [AUTOLOAD <plugin>...]
+  [PLUGINS_COMPONENT <component>]
 
   [RUNTIME_DESTINATION <destination>]
   [LIBRARY_DESTINATION <destination>]
@@ -254,6 +255,8 @@ paraview_plugin_build(
 
   * `PLUGINS`: (Required) The list of plugins to build. May be empty.
   * `AUTOLOAD`: A list of plugins to mark for autoloading.
+  * `PLUGINS_COMPONENT`: (Defaults to `paraview_plugins`) The installation
+    component to use for installed plugins.
   * `TARGET`: (Recommended) The name of an interface target to generate. This
     provides. an initialization function `<TARGET>_initialize` which
     initializes static plugins. The function is provided, but is a no-op for
@@ -274,7 +277,7 @@ paraview_plugin_build(
 function (paraview_plugin_build)
   cmake_parse_arguments(_paraview_build
     ""
-    "RUNTIME_DESTINATION;LIBRARY_DESTINATION;LIBRARY_SUBDIRECTORY;TARGET;PLUGINS_FILE_NAME"
+    "RUNTIME_DESTINATION;LIBRARY_DESTINATION;LIBRARY_SUBDIRECTORY;TARGET;PLUGINS_FILE_NAME;PLUGINS_COMPONENT"
     "PLUGINS;AUTOLOAD"
     ${ARGN})
 
@@ -606,6 +609,7 @@ function (paraview_add_plugin name)
       MODULES             ${plugin_modules}
       PACKAGE             "${_paraview_build_plugin}"
       INSTALL_HEADERS     OFF
+      TARGETS_COMPONENT   "${_paraview_build_PLUGINS_COMPONENT}"
       ARCHIVE_DESTINATION "${_paraview_plugin_subdir}"
       LIBRARY_DESTINATION "${_paraview_plugin_subdir}"
       RUNTIME_DESTINATION "${_paraview_plugin_subdir}"
@@ -962,7 +966,7 @@ function (paraview_add_plugin name)
     "${_paraview_build_plugin_destination}/${_paraview_build_plugin}")
   install(
     TARGETS "${_paraview_build_plugin}"
-    COMPONENT "plugin"
+    COMPONENT "${_paraview_build_PLUGINS_COMPONENT}"
     ARCHIVE DESTINATION "${_paraview_add_plugin_destination}"
     LIBRARY DESTINATION "${_paraview_add_plugin_destination}")
 endfunction ()
