@@ -33,6 +33,7 @@
 #include "vtkVersion.h"
 
 #include <assert.h>
+#include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -87,7 +88,7 @@ static VectorOfSearchFunctions RegisteredPluginSearchFunctions;
  * Locate a plugin library or a config file anchored at standard locations
  * for locating plugins.
  */
-std::string vtkLocatePluginOrConfigFile(const char* plugin, bool isPlugin)
+std::string vtkLocatePluginOrConfigFile(const char* plugin, const char* hint, bool isPlugin)
 {
   vtkVLogScopeF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "looking for plugin '%s'", plugin);
 
@@ -141,6 +142,16 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, bool isPlugin)
 
   vtkNew<vtkPResourceFileLocator> locator;
   locator->SetLogVerbosity(PARAVIEW_LOG_PLUGIN_VERBOSITY());
+
+  if (hint && *hint)
+  {
+    const std::string hintdir = vtksys::SystemTools::GetFilenamePath(hint);
+    auto path = locator->Locate(hintdir + "/" + plugin, landmark);
+    if (!path.empty())
+    {
+      return path + "/" + landmark;
+    }
+  }
 
   // First try the test plugin path, if it exists.
   vtkPVOptions* options = pm->GetOptions();
@@ -280,6 +291,40 @@ void vtkPVPluginTracker::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVPluginTracker::LoadPluginConfigurationXMLs(const char* appname)
+{
+  if (!appname || !*appname)
+  {
+    return;
+  }
+
+  auto pm = vtkProcessModule::GetProcessModule();
+  if (!pm)
+  {
+    return;
+  }
+
+  const std::string exe_dir = pm->GetSelfDir();
+
+  if (!exe_dir.empty())
+  {
+    auto plugin_conf = exe_dir + "/" + appname + ".conf";
+    std::ifstream fin(plugin_conf.c_str());
+    std::string line;
+    // TODO: Replace with a JSON parser.
+    while (std::getline(fin, line))
+    {
+      if (!vtksys::SystemTools::FileIsFullPath(line))
+      {
+        line = exe_dir + "/" + line;
+      }
+
+      this->LoadPluginConfigurationXML(line.c_str(), false);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVPluginTracker::LoadPluginConfigurationXML(const char* filename, bool forceLoad)
 {
   if (!vtkPSystemTools::FileExists(filename, true))
@@ -300,7 +345,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(const char* filename, bool f
   }
 
   vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "Loading plugin configuration xml `%s`.", filename);
-  this->LoadPluginConfigurationXML(parser->GetRootElement(), forceLoad);
+  this->LoadPluginConfigurationXMLHinted(parser->GetRootElement(), filename, forceLoad);
 }
 
 //----------------------------------------------------------------------------
@@ -320,6 +365,13 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLFromString(
 
 //----------------------------------------------------------------------------
 void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root, bool forceLoad)
+{
+  this->LoadPluginConfigurationXMLHinted(root, nullptr, forceLoad);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPluginTracker::LoadPluginConfigurationXMLHinted(
+  vtkPVXMLElement* root, char const* hint, bool forceLoad)
 {
   if (root == NULL)
   {
@@ -357,7 +409,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root, bool 
       }
       else
       {
-        plugin_filename = vtkLocatePluginOrConfigFile(name.c_str(), true);
+        plugin_filename = vtkLocatePluginOrConfigFile(name.c_str(), hint, true);
       }
       if (plugin_filename.empty())
       {

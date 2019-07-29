@@ -85,6 +85,7 @@ public:
    * different place to find the plugin, eg. paraview lib dir. It will NOT look
    * in PV_PLUGIN_PATH.
    */
+  void LoadPluginConfigurationXMLs(const char* appname);
   void LoadPluginConfigurationXML(const char* filename, bool forceLoad = false);
   void LoadPluginConfigurationXML(vtkPVXMLElement*, bool forceLoad = false);
   void LoadPluginConfigurationXMLFromString(const char* xmlcontents, bool forceLoad = false);
@@ -132,7 +133,7 @@ private:
   class vtkPluginsList;
   vtkPluginsList* PluginsList;
 
-  static vtkPluginSearchFunction StaticPluginSearchFunction;
+  void LoadPluginConfigurationXMLHinted(vtkPVXMLElement*, const char* hint, bool forceLoad);
 };
 
 #endif
