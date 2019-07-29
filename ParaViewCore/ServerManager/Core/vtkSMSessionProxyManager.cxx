@@ -679,7 +679,7 @@ const char* vtkSMSessionProxyManager::GetProxyName(const char* groupname, unsign
         return it2->first.c_str();
       }
 
-      counter += it2->second.size();
+      counter += static_cast<unsigned int>(it2->second.size());
     }
   }
 
