@@ -4,6 +4,7 @@
 # COPROCESSING_TEST_DIR    -- path to temporary dir
 # PARAVIEW_TEST_XML -- xml to run
 # PVBATCH_EXECUTABLE -- path to pvbatch
+# PVPYTHON_EXECUTABLE -- path to pvpython
 # COPROCESSING_DRIVER_SCRIPT -- driver py script
 # COPROCESSING_IMAGE_TESTER -- path to CoProcessingCompareImagesTester
 # COPROCESSING_DATA_DIR     -- path to data dir for baselines
@@ -66,7 +67,6 @@ elseif("${TEST_NAME}" MATCHES "CinemaExport" )
     file(WRITE "${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}" "${batch_script_data}")
   endif()
 
-
   # run the batch script 
   execute_process_with_echo(COMMAND
     ${PVBATCH_EXECUTABLE} -sym -dr
@@ -81,10 +81,14 @@ if(rv)
   message(FATAL_ERROR "pvbatch return value was = '${rv}' ")
 endif()
 
+if(NOT EXISTS "${PVPYTHON_EXECUTABLE}")
+  message(FATAL_ERROR "'${PVPYTHON_EXECUTABLE}' does not exist")
+endif()
+
 if(WIN32)
   message("${CINEMA_DATABASE_TESTER}")
   execute_process_with_echo(COMMAND
-    python.exe
+    ${PVPYTHON_EXECUTABLE}
     ${CINEMA_DATABASE_TESTER} 
     --interactive ${COPROCESSING_TEST_DIR}/cinema/interactive/${TEST_NAME}.cdb
     --batch ${COPROCESSING_TEST_DIR}/cinema/batch/${TEST_NAME}.cdb
@@ -95,6 +99,7 @@ if(WIN32)
 else()
   message("${CINEMA_DATABASE_TESTER}")
   execute_process_with_echo(COMMAND
+    ${PVPYTHON_EXECUTABLE}
     ${CINEMA_DATABASE_TESTER} 
     --interactive ${COPROCESSING_TEST_DIR}/cinema/interactive/${TEST_NAME}.cdb
     --batch ${COPROCESSING_TEST_DIR}/cinema/batch/${TEST_NAME}.cdb
