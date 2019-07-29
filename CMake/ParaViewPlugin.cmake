@@ -469,6 +469,7 @@ paraview_add_plugin(<name>
   [MODULES <module>...]
   [SOURCES <source>...]
   [SERVER_MANAGER_XML <xml>...]
+  [MODULE_INSTALL_EXPORT <export>]
 
   [UI_INTERFACES <interface>...]
   [UI_RESOURCES <resource>...]
@@ -501,6 +502,8 @@ paraview_add_plugin(<name>
   * `SERVER_MANAGER_XML`: Server manager XML files for the plugin.
   * `UI_INTERFACES`: Interfaces to initialize. See the plugin interfaces
     section for more details.
+  * `MODULE_INSTALL_EXPORT`: If provided, any modules will be added to the
+    given export set.
   * `UI_RESOURCES`: Qt resource files to include with the plugin.
   * `UI_FILES`: Qt `.ui` files to include with the plugin.
   * `PYTHON_MODULES`: Python modules to embed into the plugin.
@@ -527,7 +530,7 @@ function (paraview_add_plugin name)
 
   cmake_parse_arguments(_paraview_add_plugin
     "REQUIRED_ON_SERVER;REQUIRED_ON_CLIENT"
-    "VERSION;EULA;EXPORT;XML_DOCUMENTATION;DOCUMENTATION_DIR;FORCE_STATIC"
+    "VERSION;EULA;EXPORT;MODULE_INSTALL_EXPORT;XML_DOCUMENTATION;DOCUMENTATION_DIR;FORCE_STATIC"
     "REQUIRED_PLUGINS;SERVER_MANAGER_XML;SOURCES;MODULES;UI_INTERFACES;UI_RESOURCES;UI_FILES;PYTHON_MODULES;MODULE_FILES;MODULE_ARGS"
     ${ARGN})
 
@@ -571,6 +574,12 @@ function (paraview_add_plugin name)
         "The `MODULE_FILES` argument requires `MODULES` to be provided.")
     endif ()
 
+    set(_paraview_add_plugin_module_install_export_args)
+    if (DEFINED _paraview_add_plugin_MODULE_INSTALL_EXPORT)
+      list(APPEND _paraview_add_plugin_module_install_export_args
+        EXPORT "${_paraview_add_plugin_MODULE_INSTALL_EXPORT}")
+    endif ()
+
     vtk_module_scan(
       MODULE_FILES      ${_paraview_add_plugin_MODULE_FILES}
       REQUEST_MODULES   ${_paraview_add_plugin_MODULES}
@@ -608,6 +617,7 @@ function (paraview_add_plugin name)
     vtk_module_build(
       MODULES             ${plugin_modules}
       PACKAGE             "${_paraview_build_plugin}"
+      ${_paraview_add_plugin_module_install_export_args}
       INSTALL_HEADERS     OFF
       TARGETS_COMPONENT   "${_paraview_build_PLUGINS_COMPONENT}"
       ARCHIVE_DESTINATION "${_paraview_plugin_subdir}"
