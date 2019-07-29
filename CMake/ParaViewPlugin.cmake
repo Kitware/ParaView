@@ -253,11 +253,11 @@ paraview_plugin_build(
 ```
 
   * `PLUGINS`: (Required) The list of plugins to build. May be empty.
+  * `AUTOLOAD`: A list of plugins to mark for autoloading.
   * `TARGET`: (Recommended) The name of an interface target to generate. This
     provides. an initialization function `<TARGET>_initialize` which
     initializes static plugins. The function is provided, but is a no-op for
     shared plugin builds.
-  * `AUTOLOAD`: A list of plugins to mark for autoloading.
   * `RUNTIME_DESTINATION`: (Defaults to `${CMAKE_INSTALL_BINDIR}`) Where to
     install runtime files.
   * `LIBRARY_DESTINATION`: (Defaults to `${CMAKE_INSTALL_LIBDIR}`) Where to
