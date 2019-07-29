@@ -94,6 +94,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/testxmlpartds.vtpd}"
   "DATA{${paraview_test_data_directory_input}/Data/testxmlpartds/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/timestep_0_15.vts}"
+  "DATA{${paraview_test_data_directory_input}/Data/time_source.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/tube.exo}"
   "DATA{${paraview_test_data_directory_input}/Data/vehicle_data.csv}"
   "DATA{${paraview_test_data_directory_input}/Data/viscoplastic-ring.h5}"

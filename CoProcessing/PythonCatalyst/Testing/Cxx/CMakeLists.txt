@@ -300,6 +300,7 @@ if (PARAVIEW_BUILD_QT_GUI)
       -DCOPROCESSING_TEST_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
       -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/CinemaExportGeometry.xml
       -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::pvbatch>
+      -DPVPYTHON_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::pvpython>
       -DCOPROCESSING_DATA_DIR:PATH=${paraview_test_data_directory_output}
       -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_SOURCE_DIR}/Examples/Catalyst/SampleScripts/filedriver.py
       -DCINEMA_DATABASE_TESTER:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/CinemaExportCheck.py
@@ -317,6 +318,7 @@ if (PARAVIEW_BUILD_QT_GUI)
         -DCOPROCESSING_TEST_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
         -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/CinemaExportGeometryAndImages.xml
         -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::pvbatch>
+        -DPVPYTHON_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::pvpython>
         -DCOPROCESSING_DATA_DIR:PATH=${paraview_test_data_directory_output}
         -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_SOURCE_DIR}/Examples/Catalyst/SampleScripts/filedriver.py
         -DCINEMA_DATABASE_TESTER:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/CinemaExportCheck.py
@@ -333,6 +335,7 @@ if (PARAVIEW_BUILD_QT_GUI)
         -DCOPROCESSING_TEST_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
         -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/CinemaExportNoTimesteps.xml
         -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::pvbatch>
+        -DPVPYTHON_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::pvpython>
         -DCOPROCESSING_DATA_DIR:PATH=${paraview_test_data_directory_output}
         -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_SOURCE_DIR}/Examples/Catalyst/SampleScripts/filedriver.py
         -DCINEMA_DATABASE_TESTER:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/CinemaExportCheck.py
