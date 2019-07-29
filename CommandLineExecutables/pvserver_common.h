@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkInitializationHelper.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNetworkAccessManager.h"
+#include "vtkPVPluginTracker.h"
 #include "vtkPVServerOptions.h"
 #include "vtkPVSessionServer.h"
 #include "vtkProcessModule.h"
@@ -52,6 +53,8 @@ static bool RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type
 
   // load static plugins
   ParaView_paraview_plugins_initialize();
+
+  vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLs("paraview");
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkMultiProcessController* controller = pm->GetGlobalController();
