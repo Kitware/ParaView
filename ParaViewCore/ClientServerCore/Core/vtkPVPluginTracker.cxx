@@ -250,23 +250,6 @@ vtkPVPluginTracker* vtkPVPluginTracker::GetInstance()
     vtkPVPluginTracker* mgr = vtkPVPluginTracker::New();
     Instance = mgr;
     mgr->FastDelete();
-
-    vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
-      "Locate and load distributed plugin list when creating vtkPVPluginTracker.");
-
-    // Locate ".plugins" file and process it.
-    // This will setup the distributed-list of plugins. Also it will load any
-    // auto-load plugins.
-    std::string _plugins = vtkLocatePluginOrConfigFile(".plugins", false);
-    if (!_plugins.empty())
-    {
-      mgr->LoadPluginConfigurationXML(_plugins.c_str());
-    }
-    else
-    {
-      vtkVLogF(
-        PARAVIEW_LOG_PLUGIN_VERBOSITY(), "Could not find `.plugins` file for distributed plugins.");
-    }
   }
   return Instance;
 }
