@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "pvpythonmodules.h"
 #endif
 
-#include "paraview_plugins.h"
+#include "ParaView_paraview_plugins.h"
 
 static bool RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type)
 {
@@ -51,7 +51,7 @@ static bool RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type
 #endif
 
   // load static plugins
-  paraview_plugins_initialize();
+  ParaView_paraview_plugins_initialize();
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkMultiProcessController* controller = pm->GetGlobalController();

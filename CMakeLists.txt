@@ -898,11 +898,16 @@ vtk_module_json(
   OUTPUT "paraview-modules.json")
 
 paraview_plugin_build(
+  HEADERS_DESTINATION   "${CMAKE_INSTALL_INCLUDEDIR}/paraview${paraview_version_suffix}"
   RUNTIME_DESTINATION   "${CMAKE_INSTALL_BINDIR}"
   LIBRARY_DESTINATION   "${CMAKE_INSTALL_LIBDIR}"
   LIBRARY_SUBDIRECTORY  "paraview${paraview_version_suffix}/plugins"
+  CMAKE_DESTINATION     "${paraview_cmake_destination}"
   PLUGINS_FILE_NAME ".plugins"
-  TARGET  paraview_plugins
+  TARGET            ParaView::paraview_plugins
+  INSTALL_EXPORT    ParaViewPlugins
+  TARGET_COMPONENT  "development"
+  PLUGINS_COMPONENT "plugins"
   PLUGINS ${paraview_plugins})
 
 set(CMAKE_INSTALL_RPATH
