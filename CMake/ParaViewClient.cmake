@@ -311,10 +311,11 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
   if (_paraview_client_PLUGINS_TARGETS)
     set(_paraview_client_have_plugins 1)
     foreach (_paraview_client_plugin_target IN LISTS _paraview_client_PLUGINS_TARGETS)
+      string(REPLACE "::" "_" _paraview_client_plugin_target_safe "${_paraview_client_plugin_target}")
       string(APPEND _paraview_client_plugins_includes
-        "#include \"${_paraview_client_plugin_target}.h\"\n")
+        "#include \"${_paraview_client_plugin_target_safe}.h\"\n")
       string(APPEND _paraview_client_plugins_calls
-        "  ${_paraview_client_plugin_target}_initialize();\n")
+        "  ${_paraview_client_plugin_target_safe}_initialize();\n")
     endforeach ()
   endif ()
 
