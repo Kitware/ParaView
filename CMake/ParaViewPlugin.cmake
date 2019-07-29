@@ -536,6 +536,52 @@ void ${_paraview_build_target_safe}_initialize()
       FILES       "${_paraview_build_xml_file}"
       DESTINATION "${_paraview_build_plugin_destination}"
       COMPONENT   "${_paraview_build_TARGET_COMPONENT}")
+
+    if (DEFINED _paraview_build_INSTALL_EXPORT)
+      set_property(TARGET "${_paraview_build_TARGET_NAME}"
+        PROPERTY
+          "INTERFACE_paraview_plugin_plugins_file" "${_paraview_build_xml_file}")
+
+     if (DEFINED _paraview_build_RUNTIME_DESTINATION)
+       file(RELATIVE_PATH _paraview_build_relpath
+          "/prefix/${_paraview_build_RUNTIME_DESTINATION}"
+          "/prefix/${_paraview_build_plugin_destination}")
+        set_property(TARGET "${_paraview_build_TARGET_NAME}"
+          PROPERTY
+            "INTERFACE_paraview_plugin_plugins_file_install" "${_paraview_build_relpath}/${_paraview_build_PLUGINS_FILE_NAME}")
+      endif ()
+
+      if (DEFINED _paraview_build_CMAKE_DESTINATION)
+        set(_paraview_build_properties_filename "${_paraview_build_INSTALL_EXPORT}-paraview-plugin-properties.cmake")
+        set(_paraview_build_properties_build_file
+          "${CMAKE_BINARY_DIR}/${_paraview_build_CMAKE_DESTINATION}/${_paraview_build_properties_filename}")
+        set(_paraview_build_properties_install_file
+          "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_paraview_build_properties_filename}.install")
+
+        file(WRITE "${_paraview_build_properties_build_file}")
+        file(WRITE "${_paraview_build_properties_install_file}")
+
+        _vtk_module_write_import_prefix(
+          "${_paraview_build_properties_install_file}"
+          "${_paraview_build_CMAKE_DESTINATION}")
+
+        file(APPEND "${_paraview_build_properties_build_file}"
+          "set_property(TARGET \"${_paraview_build_TARGET}\"
+  PROPERTY
+    INTERFACE_paraview_plugin_plugins_file \"${_paraview_build_xml_file}\")\n")
+        file(APPEND "${_paraview_build_properties_install_file}"
+          "set_property(TARGET \"${_paraview_build_TARGET}\"
+  PROPERTY
+    INTERFACE_paraview_plugin_plugins_file \"\${_vtk_module_write_import_prefix}/${_paraview_build_plugin_destination}/${_paraview_build_PLUGINS_FILE_NAME}\")
+unset(_vtk_module_write_import_prefix)\n")
+
+        install(
+          FILES       "${_paraview_build_properties_install_file}"
+          DESTINATION "${_paraview_build_CMAKE_DESTINATION}"
+          RENAME      "${_paraview_build_properties_filename}"
+          COMPONENT   "${_paraview_build_TARGET_COMPONENT}")
+      endif ()
+    endif ()
   endif ()
 endfunction ()
 
