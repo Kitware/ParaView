@@ -114,8 +114,6 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, const char* hint, bo
   }
 
   const std::string exe_dir = pm->GetSelfDir();
-  const std::string vtklib = vtkGetLibraryPathForSymbol(GetVTKVersion);
-  vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "VTK libraries location is '%s'", vtklib.c_str());
 
   std::vector<std::string> prefixes = {
 #if BUILD_SHARED_LIBS
@@ -165,17 +163,6 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, const char* hint, bo
     }
   }
 
-  // Now, try the prefixes we so carefully put together.
-  if (!vtklib.empty())
-  {
-    vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "check various prefixes relative to VTK libraries");
-    auto pluginpath =
-      locator->Locate(vtksys::SystemTools::GetFilenamePath(vtklib), prefixes, landmark);
-    if (!pluginpath.empty())
-    {
-      return pluginpath + "/" + landmark;
-    }
-  }
   if (!exe_dir.empty())
   {
     vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
