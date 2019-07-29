@@ -515,7 +515,7 @@
       </IntVectorProperty>
       <IntVectorProperty command="SetMaximumLevel"
                          default_values="1"
-                         name="MaximumLevel"
+                         name="MaxDepth"
                          number_of_elements="1">
         <IntRangeDomain min="1"
                         name="range" />
