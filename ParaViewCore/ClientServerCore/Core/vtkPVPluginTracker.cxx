@@ -374,8 +374,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root, bool 
         if (required)
         {
           vtkErrorMacro("Failed to locate required plugin: "
-            << name.c_str() << "\n"
-                               "Application may not work exactly as expected.");
+            << name << "\nApplication may not work exactly as expected.");
         }
         vtkVLogF(
           PARAVIEW_LOG_PLUGIN_VERBOSITY(), "Failed to locate file plugin `%s`", name.c_str());
