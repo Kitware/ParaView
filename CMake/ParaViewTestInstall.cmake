@@ -48,6 +48,7 @@ if (WIN32 AND IS_ABSOLUTE "${PARAVIEW_INSTALL_DIR}")
 endif ()
 set (ParaView_DIR
   $ENV{DESTDIR}${PARAVIEW_INSTALL_DIR}/${PARAVIEW_CMAKE_DESTINATION})
+message(STATUS "ParaView_DIR: ${ParaView_DIR}")
 
 # Build target "INSTALL" for paraview
 if (MSVC)
