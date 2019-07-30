@@ -404,6 +404,21 @@ class NewStyleWriters(object):
                 varname = self.__make_name(xmlname)
             else:
                 varname = self.__make_name(prototype.GetXMLLabel())
+            # Write pass array proxy
+            if pxy.GetProperty("ChooseArraysToWrite").GetElement(0) == 1:
+                point_arrays = []
+                cell_arrays = []
+                arrays_property = pxy.GetProperty("PointDataArrays")
+                for i in range(arrays_property.GetNumberOfElements()):
+                    point_arrays.append(arrays_property.GetElement(i))
+                arrays_property = pxy.GetProperty("CellDataArrays")
+                for i in range(arrays_property.GetNumberOfElements()):
+                    cell_arrays.append(arrays_property.GetElement(i))
+                f = "%s_arrays = PassArrays(Input=%s, PointDataArrays=%s, CellDataArrays=%s)" % \
+                    (inputname, inputname, str(point_arrays), str(cell_arrays))
+                inputname = "%s_arrays" % inputname
+                res.append(f)
+            # Actual writer
             f = "%s = servermanager.writers.%s(Input=%s)" % (varname, writername, inputname)
             res.append(f)
             if self.__make_temporal_script:
@@ -513,33 +528,15 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
                 cpstate_globals.channels_needed.append(sim_input_name)
 
     pxm = servermanager.ProxyManager()
-    arrays = dict()
+    arrays = {}
     for channel_name in cpstate_globals.channels_needed:
         arrays[channel_name] = []
-        ed = pxm.GetExportDepot()
-        ed.InitNextWriterProxy()
-        nextWriter = ed.GetNextWriterProxy()
-        while nextWriter:
-            if nextWriter.GetXMLName() == "Cinema image options":
-                nextWriter = ed.GetNextWriterProxy()
-                continue
-            hashname = pxm.GetProxyName("export_writers", nextWriter)
-            if hashname.split('|')[0] == channel_name:
-                if nextWriter.GetProperty("ChooseArraysToWrite").GetElement(0) == 1:
-                    arrays_property = nextWriter.GetProperty("PointDataArrays")
-                    for i in range(arrays_property.GetNumberOfElements()):
-                        arrays[channel_name].append([arrays_property.GetElement(i), 0])
-                    arrays_property = nextWriter.GetProperty("CellDataArrays")
-                    for i in range(arrays_property.GetNumberOfElements()):
-                        arrays[channel_name].append([arrays_property.GetElement(i), 1])
-                else:
-                    p = pxm.GetProxy("sources", channel_name)
-                    if p:
-                        for i in range(p.GetPointDataInformation().GetNumberOfArrays()):
-                            arrays[channel_name].append([p.GetPointDataInformation().GetArray(i).GetName(), 0])
-                        for i in range(p.GetCellDataInformation().GetNumberOfArrays()):
-                            arrays[channel_name].append([p.GetCellDataInformation().GetArray(i).GetName(), 1])
-            nextWriter = ed.GetNextWriterProxy()
+        p = pxm.GetProxy("sources", channel_name)
+        if p:
+            for i in range(p.GetPointDataInformation().GetNumberOfArrays()):
+                arrays[channel_name].append([p.GetPointDataInformation().GetArray(i).GetName(), 0])
+            for i in range(p.GetCellDataInformation().GetNumberOfArrays()):
+                arrays[channel_name].append([p.GetCellDataInformation().GetArray(i).GetName(), 1])
 
     # Create global fields values
     pipelineClassDef = "\n"

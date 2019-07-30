@@ -175,11 +175,6 @@ void pqCatalystExportReaction::onTriggered()
     if (strcmp(nextWriter->GetXMLName(), "Cinema image options") != 0)
     {
       exported_any_writers = true;
-      if (vtkSMPropertyHelper(nextWriter, "ChooseArraysToWrite").GetAsInt(0) != 0)
-      {
-        // Override request specific arrays settings
-        request_specific_arrays = "True";
-      }
       continue;
     }
 
