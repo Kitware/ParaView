@@ -41,6 +41,11 @@
 # PARAVIEW_VERSION : ParaView version string used when creating the installtree
 
 message (STATUS "Building Examples against ParaView install tree")
+# Remove the drive letter from `PARAVIEW_INSTALL_DIR` so we can append it to
+# DESTDIR safely.
+if (WIN32 AND IS_ABSOLUTE "${PARAVIEW_INSTALL_DIR}")
+  string(REGEX REPLACE "^.:" "" PARAVIEW_INSTALL_DIR "${PARAVIEW_INSTALL_DIR}")
+endif ()
 set (ParaView_DIR
   $ENV{DESTDIR}${PARAVIEW_INSTALL_DIR}/${PARAVIEW_CMAKE_DESTINATION})
 
