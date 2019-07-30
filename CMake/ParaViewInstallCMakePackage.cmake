@@ -80,6 +80,12 @@ foreach (paraview_cmake_module_file IN LISTS paraview_cmake_module_files)
     "${paraview_cmake_module_file}")
 endforeach ()
 
+include(ParaViewInstallCMakePackageHelpers)
+if (NOT PARAVIEW_RELOCATABLE_INSTALL)
+  list(APPEND paraview_cmake_files_to_install
+    "${paraview_cmake_build_dir}/paraview-find-package-helpers.cmake")
+endif ()
+
 foreach (paraview_cmake_file IN LISTS paraview_cmake_files_to_install)
   get_filename_component(subdir "${paraview_cmake_file}" DIRECTORY)
   install(
