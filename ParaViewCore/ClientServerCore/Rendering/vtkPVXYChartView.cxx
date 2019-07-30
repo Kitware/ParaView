@@ -425,6 +425,15 @@ void vtkPVXYChartView::SetLegendPosition(int x, int y)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXYChartView::SetLegendSymbolWidth(int width)
+{
+  if (this->Chart)
+  {
+    this->Chart->GetLegend()->SetSymbolWidth(width);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVXYChartView::SetGridVisibility(int index, bool visible)
 {
   if (this->Chart)
