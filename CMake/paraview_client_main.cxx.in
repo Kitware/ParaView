@@ -40,9 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pq@_paraview_client_NAME@Initializer.h"
 #include "vtkPVConfig.h"
 // See Applications/ParaView/CMakeLists.txt for why this is necessary.
-#cmakedefine01 _paraview_client_PLUGINS_TARGET
-#if _paraview_client_PLUGINS_TARGET
-#include "@_paraview_client_PLUGINS_TARGET@.h"
+#cmakedefine01 _paraview_client_have_plugins
+#if _paraview_client_have_plugins
+@_paraview_client_plugins_includes@
 #endif
 
 #include <vtksys/SystemTools.hxx>
@@ -74,8 +74,8 @@ int main(int argc, char* argv[])
   // supports HDPI
   QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
-#if _paraview_client_PLUGINS_TARGET
-  @_paraview_client_PLUGINS_TARGET@_initialize();
+#if _paraview_client_have_plugins
+@_paraview_client_plugins_calls@
 #endif
 
   // always request a non-stereo format; when using quadbuffer stereo, we

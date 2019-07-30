@@ -368,6 +368,8 @@ function (paraview_plugin_build)
         "#ifndef ${_paraview_build_TARGET}_h
 #define ${_paraview_build_TARGET}_h
 
+#define PARAVIEW_BUILDING_PLUGIN
+#define PARAVIEW_PLUGIN_BUILT_SHARED 0
 #include \"vtkPVPlugin.h\"
 #include \"vtkPVPluginLoader.h\"
 #include \"vtkPVPluginTracker.h\"
@@ -397,7 +399,7 @@ bool ${_paraview_build_TARGET}_static_plugins_search(const char* name)
 
 bool ${_paraview_build_TARGET}_static_plugins_func(const char* name, bool load)
 {
-  std::string sname = name;
+  std::string const sname = name;
 
   ${_paraview_build_calls}
   return false;

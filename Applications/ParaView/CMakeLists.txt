@@ -58,7 +58,7 @@ paraview_client_add(
   BUNDLE_PLIST      "${CMAKE_CURRENT_BINARY_DIR}/MacOSXBundleInfo.plist.in"
   APPLICATION_ICON  "${CMAKE_CURRENT_SOURCE_DIR}/pvIcon.ico"
   SOURCES           ${sources}
-  PLUGINS_TARGET    paraview_plugins
+  PLUGINS_TARGETS   paraview_plugins
   APPLICATION_XMLS  ${xmls})
 
 find_package(Qt5 REQUIRED QUIET COMPONENTS Widgets)
