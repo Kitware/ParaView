@@ -48,7 +48,17 @@ unset(_paraview_use_external_vtk)
 
 include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-targets.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-vtk-module-properties.cmake")
+
+set(_paraview_find_package_variables)
+include("${CMAKE_CURRENT_LIST_DIR}/paraview-find-package-helpers.cmake" OPTIONAL)
+
 include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-vtk-module-find-packages.cmake")
+
+foreach (_paraview_find_package_variable IN LISTS _paraview_find_package_variables)
+  unset("${_paraview_find_package_variable}")
+endforeach ()
+unset(_paraview_find_package_variable)
+unset(_paraview_find_package_variables)
 
 include("${CMAKE_CURRENT_LIST_DIR}/ParaViewClient.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/ParaViewPlugin.cmake")
