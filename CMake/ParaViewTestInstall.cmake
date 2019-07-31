@@ -68,6 +68,20 @@ if (NOT irv EQUAL 0)
   message(FATAL_ERROR "Could not build target 'install' for ParaView")
 endif ()
 
+set(generator_args)
+if (CMAKE_GENERATOR)
+  list(APPEND generator_args
+    -G "${CMAKE_GENERATOR}")
+endif ()
+if (CMAKE_GENERATOR_PLATFORM)
+  list(APPEND generator_args
+    -A "${CMAKE_GENERATOR_PLATFORM}")
+endif ()
+if (CMAKE_GENERATOR_TOOLSET)
+  list(APPEND generator_args
+    -T "${CMAKE_GENERATOR_TOOLSET}")
+endif ()
+
 set (INSTALL_TEST_BUILD_DIR ${PARAVIEW_TEST_DIR}/Examples-bld)
 if (NOT EXISTS ${INSTALL_TEST_BUILD_DIR})
   execute_process(COMMAND ${CMAKE_COMMAND} -E
@@ -75,6 +89,7 @@ if (NOT EXISTS ${INSTALL_TEST_BUILD_DIR})
 endif ()
 execute_process (
   COMMAND ${CMAKE_COMMAND}
+  ${generator_args}
   -DParaView_DIR:PATH=${ParaView_DIR}
   ${PARAVIEW_SOURCE_DIR}/Examples
   WORKING_DIRECTORY ${INSTALL_TEST_BUILD_DIR}
