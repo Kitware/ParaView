@@ -32,6 +32,34 @@
                             information_property="CameraFocalPointInfo"
                             name="CameraFocalPoint"
                             number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetFocalDisk"
+                            default_values="1"
+                            information_only="1"
+                            name="CameraFocalDiskInfo"
+                            number_of_elements="1">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFocalDisk"
+                            default_values="0"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraFocalDiskInfo"
+                            name="CameraFocalDisk"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetFocalDistance"
+                            default_values="0"
+                            information_only="1"
+                            name="CameraFocalDistanceInfo"
+                            number_of_elements="1">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFocalDistance"
+                            default_values="0"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraFocalDistanceInfo"
+                            name="CameraFocalDistance"
+                            number_of_elements="1"></DoubleVectorProperty>
       <DoubleVectorProperty command="GetViewUp"
                             default_values="0 1 0"
                             information_only="1"
