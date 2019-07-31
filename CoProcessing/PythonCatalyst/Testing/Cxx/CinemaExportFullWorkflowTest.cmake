@@ -11,6 +11,12 @@
 # COPROCESSING_OUTPUTCHECK_SCRIPT -- path to outputcheck.py
 # TEST_NAME -- a string to specify which results to test
 
+# USE_MPI
+# MPIEXEC
+# MPIEXEC_NUMPROC_FLAG
+# MPIEXEC_NUMPROCS
+# MPIEXEC_PREFLAGS
+
 macro(execute_process_with_echo)
   set (_cmd)
   foreach (arg ${ARGV})
@@ -85,9 +91,10 @@ if(NOT EXISTS "${PVPYTHON_EXECUTABLE}")
   message(FATAL_ERROR "'${PVPYTHON_EXECUTABLE}' does not exist")
 endif()
 
-if(WIN32)
+if(USE_MPI)
   message("${CINEMA_DATABASE_TESTER}")
   execute_process_with_echo(COMMAND
+    ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_NUMPROCS} ${MPIEXEC_PREFLAGS}
     ${PVPYTHON_EXECUTABLE}
     ${CINEMA_DATABASE_TESTER} 
     --interactive ${COPROCESSING_TEST_DIR}/cinema/interactive/${TEST_NAME}.cdb
@@ -97,7 +104,6 @@ if(WIN32)
     message(FATAL_ERROR "CoProcessingCompareImageTester second image return value was = '${rv}' ")
   endif()
 else()
-  message("${CINEMA_DATABASE_TESTER}")
   execute_process_with_echo(COMMAND
     ${PVPYTHON_EXECUTABLE}
     ${CINEMA_DATABASE_TESTER} 
