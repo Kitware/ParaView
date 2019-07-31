@@ -259,6 +259,23 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetColorMode"
+                         default_values="2"
+                         name="ColorMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Default"
+                 value="0" />
+          <Entry text="Map Scalars"
+                 value="1" />
+          <Entry text="Direct Scalars"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>When color mode is Default, 8-bits textures is equivalent to Direct Scalars,
+        while equivalent to Map Scalars for 16-bits textures. In the case of Map Scalars, all the
+        values are mapped to a generic color map.</Documentation>
+      </IntVectorProperty>
     </Proxy>
   </ProxyGroup>
   <ProxyGroup name="props">
