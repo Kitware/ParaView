@@ -218,6 +218,7 @@ option(PARAVIEW_ENABLE_VISITBRIDGE "Enable VisIt readers." OFF)
 option(PARAVIEW_ENABLE_XDMF2 "Enable Xdmf2 support." ON)
 mark_as_advanced(PARAVIEW_ENABLE_XDMF2)
 option(PARAVIEW_ENABLE_XDMF3 "Enable Xdmf3 support." OFF)
+option(PARAVIEW_ENABLE_ADIOS2 "Enable ADIOS 2.x support." OFF)
 
 set(PARAVIEW_BUILD_TESTING "OFF"
   CACHE STRING "Build module testing directories")
