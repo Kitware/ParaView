@@ -84,8 +84,8 @@ endif ()
 
 set (INSTALL_TEST_BUILD_DIR ${PARAVIEW_TEST_DIR}/Examples-bld)
 if (NOT EXISTS ${INSTALL_TEST_BUILD_DIR})
-  execute_process(COMMAND ${CMAKE_COMMAND} -E
-    make_directory ${INSTALL_TEST_BUILD_DIR})
+  file(MAKE_DIRECTORY
+    ${INSTALL_TEST_BUILD_DIR})
 endif ()
 execute_process (
   COMMAND ${CMAKE_COMMAND}
