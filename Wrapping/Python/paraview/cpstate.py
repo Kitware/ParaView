@@ -345,9 +345,6 @@ class NewStyleWriters(object):
     def make_trace(self):
         """gather trace for the writer proxies that are not in the trace pipeline but
         rather in the new export state.
-
-        aDIOSWriter1 = servermanager.writers.ADIOSWriter(Input=wavelet1)
-        coprocessor.RegisterWriter(aDIOSWriter1, filename='filename.vta', freq=1, paddingamount=0)
         """
         res = []
         res.append("")
