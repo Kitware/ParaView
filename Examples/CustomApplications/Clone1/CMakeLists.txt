@@ -30,7 +30,7 @@ set(xml_files
   ParaViewSources.xml)
 
 paraview_client_add(
-  NAME paraview_revised
+  NAME paraview_clone1
   VERSION "1.1.1"
   SOURCES ${sources} ${ui_files}
   APPLICATION_XMLS ${xml_files}
