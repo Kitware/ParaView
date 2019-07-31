@@ -68,7 +68,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/vtkModuleWrapClientServer.cmake")
 set(PARAVIEW_BUILD_QT_GUI "@PARAVIEW_BUILD_QT_GUI@")
 set(PARAVIEW_USE_MPI "@PARAVIEW_USE_MPI@")
 set(PARAVIEW_ENABLE_PYTHON "@PARAVIEW_ENABLE_PYTHON@")
-set(PARAVIEW_PLUGIN_SUBDIR "paraview-@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@/plugins")
+set(PARAVIEW_PLUGIN_SUBDIR "paraview@paraview_version_suffix@/plugins")
 
 set(_paraview_components_to_check)
 foreach (_paraview_component IN LISTS "${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS")
