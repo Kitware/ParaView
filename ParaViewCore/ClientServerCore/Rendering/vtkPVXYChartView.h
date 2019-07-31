@@ -169,6 +169,11 @@ public:
    */
   void SetLegendItalic(bool italic);
 
+  /**
+   * Set the legend symbol width (default is 25)
+   */
+  void SetLegendSymbolWidth(int width);
+
   //@{
   /**
    * Sets whether or not the grid for the given axis is visible.

@@ -216,6 +216,13 @@
                  value="8" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <IntVectorProperty command="SetLegendSymbolWidth"
+                         default_values="25"
+                         name="LegendSymbolWidth"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>Set the legend symbol width.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetSortByXAxis"
                          default_values="0"
                          name="SortByXAxis"
@@ -328,7 +335,8 @@
         <Property name="ShowLegend"/>
         <Property name="LegendLocation"/>
         <Property name="LegendPosition"/>
-        <Property name="HideTimeMarker" />
+        <Property name="HideTimeMarker"/>
+        <Property name="LegendSymbolWidth"/>
       </PropertyGroup>
       <PropertyGroup label="Tooltip"
                      panel_visibility="advanced">
@@ -902,7 +910,6 @@
       </PropertyGroup>
       <!-- end bottom axis -->
     </ContextViewProxy>
-
     <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="internal_views"
                       base_proxyname="XYChartViewBase"
@@ -2986,6 +2993,12 @@
                          name="ShowLegend"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLegendSymbolWidth"
+                         default_values="25"
+                         name="LegendSymbolWidth"
+                         number_of_elements="1"
+                         panel_visibility="never">
       </IntVectorProperty>
     </ContextViewProxy>
     <!-- ================================================================== -->
@@ -9853,6 +9866,7 @@ Select how you want the text to be represented in the view.
             <Property name="ShowLegend"/>
             <Property name="LegendLocation"/>
             <Property name="LegendPosition"/>
+            <Property name="LegendSymbolWidth"/>
           </PropertyGroup>
           <PropertyGroup label="Legend Properties"
                          panel_widget="FontEditor"
@@ -10072,6 +10086,7 @@ Select how you want the text to be represented in the view.
             <Property name="ShowLegend"/>
             <Property name="LegendLocation"/>
             <Property name="LegendPosition"/>
+            <Property name="LegendSymbolWidth"/>
           </PropertyGroup>
           <PropertyGroup label="Legend Properties"
                          panel_widget="FontEditor"
