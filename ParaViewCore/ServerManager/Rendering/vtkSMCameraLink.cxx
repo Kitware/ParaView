@@ -107,7 +107,8 @@ const char* vtkSMCameraLink::vtkInternals::LinkedPropertyNames[] = {
   "CameraPositionInfo", "CameraPosition", "CameraViewAngleInfo", "CameraViewAngle",
   "CameraFocalPointInfo", "CameraFocalPoint", "CameraViewUpInfo", "CameraViewUp",
   "CenterOfRotation", "CenterOfRotation", "CameraParallelScaleInfo", "CameraParallelScale",
-  "RotationFactor", "RotationFactor", "CameraParallelProjection", "CameraParallelProjection", 0
+  "RotationFactor", "RotationFactor", "CameraParallelProjection", "CameraParallelProjection",
+  "CameraFocalDisk", "CameraFocalDiskInfo", "CameraFocalDistance", "CameraFocalDistanceInfo", 0
 };
 
 //---------------------------------------------------------------------------

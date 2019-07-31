@@ -1,3 +1,4 @@
+
 /*=========================================================================
 
   Program:   ParaView
@@ -469,7 +470,8 @@ public:
       "ViewSize", "ViewTime", "CacheKey", "UseCache", "ViewPosition",
       // Camera is linked via CameraLink.
       "CameraPositionInfo", "CameraPosition", "CameraFocalPointInfo", "CameraFocalPoint",
-      "CameraViewUpInfo", "CameraViewUp", "CameraViewAngleInfo", "CameraViewAngle"
+      "CameraViewUpInfo", "CameraViewUp", "CameraViewAngleInfo", "CameraViewAngle",
+      "CameraFocalDiskInfo", "CameraFocalDisk", "CameraFocalDistanceInfo", "CameraFocalDistance"
     };
 
     this->Setup(root, exceptions);

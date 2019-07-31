@@ -1,3 +1,4 @@
+
 /*=========================================================================
 
   Program:   ParaView
@@ -17,6 +18,7 @@
 #include "vtkCamera.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMCameraProxy);
 //-----------------------------------------------------------------------------
@@ -59,6 +61,12 @@ void vtkSMCameraProxy::UpdatePropertyInformation()
 
   dvp = vtkSMDoubleVectorProperty::SafeDownCast(this->GetProperty("CameraViewAngleInfo"));
   dvp->SetElement(0, camera->GetViewAngle());
+
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(this->GetProperty("CameraFocalDiskInfo"));
+  dvp->SetElement(0, camera->GetFocalDisk());
+
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(this->GetProperty("CameraFocalDistanceInfo"));
+  dvp->SetElement(0, camera->GetFocalDistance());
 }
 
 //-----------------------------------------------------------------------------
