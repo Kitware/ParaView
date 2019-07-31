@@ -337,9 +337,8 @@ void pqCameraDialog::setupGUI()
 
     this->Internal->CameraLinks.addPropertyLink(this->Internal->focalDisk, "value",
       SIGNAL(valueChanged(double)), proxy, proxy->GetProperty("CameraFocalDisk"), 0);
-
-    this->Internal->CameraLinks.addPropertyLink(this->Internal->depthOfFieldCheckBox, "checked",
-      SIGNAL(clicked(bool)), proxy, proxy->GetProperty("CameraDepthOfField"), 0);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->focalDistance, "value",
+      SIGNAL(valueChanged(double)), proxy, proxy->GetProperty("CameraFocalDistance"), 0);
 
     QObject::connect(&this->Internal->CameraLinks, SIGNAL(qtWidgetChanged()),
       this->Internal->RenderModule, SLOT(render()));

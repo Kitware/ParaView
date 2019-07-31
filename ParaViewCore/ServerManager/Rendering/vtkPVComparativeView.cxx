@@ -1,3 +1,4 @@
+
 /*=========================================================================
 
   Program:   ParaView
@@ -470,7 +471,7 @@ public:
       // Camera is linked via CameraLink.
       "CameraPositionInfo", "CameraPosition", "CameraFocalPointInfo", "CameraFocalPoint",
       "CameraViewUpInfo", "CameraViewUp", "CameraViewAngleInfo", "CameraViewAngle",
-      "CameraFocalDiskInfo", "CameraFocalDisk", "CameraDepthOfFieldInfo", "CameraDepthOfField"
+      "CameraFocalDiskInfo", "CameraFocalDisk", "CameraFocalDistanceInfo", "CameraFocalDistance"
     };
 
     this->Setup(root, exceptions);

@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>422</width>
-    <height>741</height>
+    <height>781</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -35,9 +35,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-11</y>
         <width>390</width>
-        <height>712</height>
+        <height>704</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -465,15 +465,37 @@
        </item>
        <item>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_8">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_22">
            <property name="text">
-            <string>Focal Disk</string>
+            <string>Position</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
-          <widget class="pqDoubleLineEdit" name="viewUp0"/>
+         <item row="0" column="1">
+          <widget class="pqDoubleLineEdit" name="position0"/>
+         </item>
+         <item row="0" column="2">
+          <widget class="pqDoubleLineEdit" name="position1"/>
+         </item>
+         <item row="0" column="3">
+          <widget class="pqDoubleLineEdit" name="position2"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_17">
+           <property name="text">
+            <string>Focal Point</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="pqDoubleLineEdit" name="focalPoint0"/>
+         </item>
+         <item row="1" column="2">
+          <widget class="pqDoubleLineEdit" name="focalPoint1"/>
+         </item>
+         <item row="1" column="3">
+          <widget class="pqDoubleLineEdit" name="focalPoint2"/>
          </item>
          <item row="2" column="0">
           <widget class="QLabel" name="label_14">
@@ -482,34 +504,14 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="pqDoubleLineEdit" name="focalPoint0"/>
+         <item row="2" column="1">
+          <widget class="pqDoubleLineEdit" name="viewUp0"/>
          </item>
-         <item row="1" column="3">
-          <widget class="pqDoubleLineEdit" name="focalPoint2"/>
+         <item row="2" column="2">
+          <widget class="pqDoubleLineEdit" name="viewUp1"/>
          </item>
-         <item row="0" column="1">
-          <widget class="pqDoubleLineEdit" name="position0"/>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_22">
-           <property name="text">
-            <string>Position</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="3">
-          <widget class="pqDoubleLineEdit" name="position2"/>
-         </item>
-         <item row="3" column="2">
-          <widget class="QPushButton" name="loadCameraConfiguration">
-           <property name="toolTip">
-            <string>Load camera properties.</string>
-           </property>
-           <property name="text">
-            <string>Load</string>
-           </property>
-          </widget>
+         <item row="2" column="3">
+          <widget class="pqDoubleLineEdit" name="viewUp2"/>
          </item>
          <item row="3" column="0">
           <widget class="QLabel" name="label_23">
@@ -528,26 +530,60 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
-          <widget class="QDoubleSpinBox" name="focalDisk">
-           <property name="decimals">
-            <number>2</number>
-           </property>
-           <property name="maximum">
-            <double>999998.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.100000000000000</double>
+         <item row="3" column="2">
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>Eye Angle</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="3">
-          <widget class="pqDoubleLineEdit" name="viewUp2"/>
-         </item>
-         <item row="1" column="2">
-          <widget class="pqDoubleLineEdit" name="focalPoint1"/>
-         </item>
          <item row="3" column="3">
+          <widget class="QDoubleSpinBox" name="eyeAngle">
+           <property name="toolTip">
+            <string>The separation between eyes (in degrees). This is used when rendering in stereo mode.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>Focal Disk</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QDoubleSpinBox" name="focalDisk">
+           <property name="toolTip">
+             <string> The size of the camera's lens in world coordinates. Affects ray traced depth of field rendering.
+             </string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="2">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>Focal Distance</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="3">
+          <widget class="QDoubleSpinBox" name="focalDistance">
+           <property name="toolTip">
+             <string>Depth of field rendering focus distance. Only affects ray traced renderers. 0 (default) disables it.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QPushButton" name="loadCameraConfiguration">
+           <property name="toolTip">
+            <string>Load camera properties.</string>
+           </property>
+           <property name="text">
+            <string>Load</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
           <widget class="QPushButton" name="saveCameraConfiguration">
            <property name="toolTip">
             <string>Save camera properties.</string>
@@ -557,28 +593,7 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_8">
-           <property name="text">
-            <string>Eye Angle</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QDoubleSpinBox" name="eyeAngle">
-           <property name="toolTip">
-            <string>The separation between eyes (in degrees). This is used when rendering in stereo mode.</string>
-           </property>
-          </widget>
-         </item>
         </layout>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="depthOfFieldCheckBox">
-         <property name="text">
-          <string>Enable Depth of Field</string>
-         </property>
-        </widget>
        </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_9">

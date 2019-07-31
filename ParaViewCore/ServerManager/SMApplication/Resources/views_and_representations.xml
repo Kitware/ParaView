@@ -2379,8 +2379,8 @@
           <Property name="CameraViewAngle" panel_visibility="never"/>
           <Property name="CameraFocalDiskInfo" panel_visibility="never"/>
           <Property name="CameraFocalDisk" panel_visibility="never"/>
-          <Property name="CameraDepthOfFieldInfo" panel_visibility="never"/>
-          <Property name="CameraDepthOfField" panel_visibility="never"/>
+          <Property name="CameraFocalDistanceInfo" panel_visibility="never"/>
+          <Property name="CameraFocalDistance" panel_visibility="never"/>
           <Property name="CameraParallelScale" panel_visibility="never"/>
           <Property name="CameraParallelScaleInfo" panel_visibility="never"/>
           <Property name="EyeAngle" panel_visibility="never"/>
@@ -9783,8 +9783,8 @@ Select how you want the text to be represented in the view.
           <Property name="CameraViewAngle" panel_visibility="never"/>
           <Property name="CameraFocalDiskInfo" panel_visibility="never"/>
           <Property name="CameraFocalDisk" panel_visibility="never"/>
-          <Property name="CameraDepthOfFieldInfo" panel_visibility="never"/>
-          <Property name="CameraDepthOfField" panel_visibility="never"/>
+          <Property name="CameraFocalDistanceInfo" panel_visibility="never"/>
+          <Property name="CameraFocalDistance" panel_visibility="never"/>
           <Property name="CameraParallelScale" panel_visibility="never"/>
           <Property name="CameraParallelScaleInfo" panel_visibility="never"/>
           <Property name="CameraParallelProjection"
