@@ -107,6 +107,7 @@ set(classes
   pqImportCinemaReaction
   pqInputDataTypeDecorator
   pqInteractivePropertyWidget
+  pqLightPropertyWidget
   pqLinePropertyWidget
   pqLinkSelectionReaction
   pqListPropertyWidget
@@ -239,6 +240,7 @@ set(ui_files
   Resources/UI/pqHandlePropertyWidget.ui
   Resources/UI/pqImageCompressorWidget.ui
   Resources/UI/pqImplicitPlanePropertyWidget.ui
+  Resources/UI/pqLightPropertyWidget.ui
   Resources/UI/pqLinePropertyWidget.ui
   Resources/UI/pqMainControlsToolbar.ui
   Resources/UI/pqMoleculePropertyWidget.ui

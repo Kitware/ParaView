@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Light Inspector" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Surface" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="PlaneSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Origin/DoubleLineEdit0" command="set_string" arguments="-50" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Origin/DoubleLineEdit1" command="set_string" arguments="-50" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Point1/DoubleLineEdit0" command="set_string" arguments="50" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Point1/DoubleLineEdit1" command="set_string" arguments="-50" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Point2/DoubleLineEdit0" command="set_string" arguments="-50" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Point2/DoubleLineEdit1" command="set_string" arguments="50" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/addLight" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/InteractiveLight/colorButton" command="setChosenColor" arguments="0,255,0" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/addLight" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer1/1pqProxyWidget0/LightType/ComboBox" command="activated" arguments="Scene" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer1/1pqProxyWidget0/InteractiveLight/positionalComboBox" command="activated" arguments="Positional" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/LightIntensity/DoubleLineEdit0" command="set_string" arguments="0.5" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/InteractiveLight/worldPositionX" command="set_string" arguments="17.3" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/InteractiveLight/worldPositionY" command="set_string" arguments="-74.66" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/InteractiveLight/worldPositionZ" command="set_string" arguments="-122.7" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/InteractiveLight/focalPointX" command="set_string" arguments="-12.2" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/InteractiveLight/focalPointY" command="set_string" arguments="-34.41" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/InteractiveLight/focalPointZ" command="set_string" arguments="-52.73" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer1/1pqProxyWidget0/InteractiveLight/worldPositionX" command="set_string" arguments="-49.1" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer1/1pqProxyWidget0/InteractiveLight/worldPositionY" command="set_string" arguments="-45.2" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer1/1pqProxyWidget0/InteractiveLight/worldPositionZ" command="set_string" arguments="-18.58" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer1/1pqProxyWidget0/InteractiveLight/coneAngle/DoubleLineEdit" command="set_string" arguments="25" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/InteractiveLight/show3DWidget" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer1/1pqProxyWidget0/InteractiveLight/show3DWidget" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveZ" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/actionAdjustCamera" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/position0" command="set_string" arguments="-2.34781" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/position1" command="set_string" arguments="-14.6126" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/position2" command="set_string" arguments="-378.519" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/focalPoint0" command="set_string" arguments="-2.34781" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/focalPoint1" command="set_string" arguments="-14.6126" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/focalPoint2" command="set_string" arguments="156.059" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+</pqevents>

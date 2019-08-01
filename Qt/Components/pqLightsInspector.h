@@ -61,6 +61,7 @@ public slots:
   void addLight();
   void removeLight(vtkSMProxy* = nullptr);
   void syncLightToCamera(vtkSMProxy* = nullptr);
+  void resetLight(vtkSMProxy* = nullptr);
   void setActiveView(pqView*);
   void render();
   void updateAndRender();

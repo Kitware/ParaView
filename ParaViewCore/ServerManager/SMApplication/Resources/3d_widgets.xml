@@ -29,6 +29,39 @@
     </NewWidgetRepresentationProxy>
     <!-- ================================================================== -->
     <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                  name="LightWidgetRepresentation">
+      <IntVectorProperty command="SetEnabled"
+                         default_values="0"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Prop"
+               proxygroup="3d_widget_representations"
+               proxyname="LightRepresentation"></Proxy>
+        <ExposedProperties>
+          <Property name="Positional" />
+          <Property name="Visibility" />
+          <Property name="WorldPositionInfo" />
+          <Property name="WorldPosition" />
+          <Property name="FocalPointInfo" />
+          <Property name="FocalPoint" />
+          <Property name="ConeAngleInfo" />
+          <Property name="ConeAngle" />
+          <Property name="LightColorInfo" />
+          <Property name="LightColor" />
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Widget"
+               proxygroup="3d_widgets"
+               proxyname="LightWidget"></Proxy>
+      </SubProxy>
+    </NewWidgetRepresentationProxy>
+    <!-- ================================================================== -->
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
                                   name="LineWidgetRepresentation">
       <IntVectorProperty command="SetEnabled"
                          default_values="0"
@@ -1472,6 +1505,75 @@
       </DoubleVectorProperty>
     </Proxy>
     <!-- ================================================================== -->
+    <Proxy class="vtkLightRepresentation"
+           name="LightRepresentation">
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetPositional"
+                         default_values="0"
+                         name="Positional"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetLightPosition"
+                            default_values="0 0 1"
+                            information_property="WorldPositionInfo"
+                            name="WorldPosition"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetLightPosition"
+                            information_only="1"
+                            name="WorldPositionInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetFocalPoint"
+                            default_values="0 0 0"
+                            information_property="FocalPointInfo"
+                            name="FocalPoint"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetFocalPoint"
+                            information_only="1"
+                            name="FocalPointInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetConeAngle"
+                            default_values="30"
+                            information_property="ConeAngleInfo"
+                            name="ConeAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" min="0" max="180"/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetConeAngle"
+                            information_only="1"
+                            name="ConeAngleInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetLightColor"
+                            default_values="1.0 1.0 1.0"
+                            information_property="LightColorInfo"
+                            name="LightColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetLightColor"
+                            information_only="1"
+                            name="LightColorInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+    </Proxy>
+    <!-- ================================================================== -->
     <Proxy class="vtkPVScalarBarRepresentation"
            name="ScalarBarRepresentation">
       <IntVectorProperty animateable="1"
@@ -1789,6 +1891,10 @@
            base_proxyname="WidgetBase"
            class="vtkHandleWidget"
            name="HandleWidget"></Proxy>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkLightWidget"
+           name="LightWidget"></Proxy>
     <Proxy base_proxygroup="3d_widgets"
            base_proxyname="WidgetBase"
            class="vtkLineWidget2"
