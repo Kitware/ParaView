@@ -95,7 +95,7 @@ if(USE_MPI)
   message("${CINEMA_DATABASE_TESTER}")
   execute_process_with_echo(COMMAND
     ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_NUMPROCS} ${MPIEXEC_PREFLAGS}
-    ${PVPYTHON_EXECUTABLE}
+    ${PVPBATCH_EXECUTABLE}
     ${CINEMA_DATABASE_TESTER} 
     --interactive ${COPROCESSING_TEST_DIR}/cinema/interactive/${TEST_NAME}.cdb
     --batch ${COPROCESSING_TEST_DIR}/cinema/batch/${TEST_NAME}.cdb
@@ -105,7 +105,7 @@ if(USE_MPI)
   endif()
 else()
   execute_process_with_echo(COMMAND
-    ${PVPYTHON_EXECUTABLE}
+    ${PVBATCH_EXECUTABLE}
     ${CINEMA_DATABASE_TESTER} 
     --interactive ${COPROCESSING_TEST_DIR}/cinema/interactive/${TEST_NAME}.cdb
     --batch ${COPROCESSING_TEST_DIR}/cinema/batch/${TEST_NAME}.cdb
