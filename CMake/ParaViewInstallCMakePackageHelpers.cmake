@@ -28,11 +28,11 @@ set(paraview_find_package_code)
 foreach (_paraview_package IN LISTS _paraview_packages)
   _paraview_package_append_variables(
     # Standard CMake `find_package` mechanisms.
-    "${package}_DIR"
-    "${package}_ROOT"
+    "${_paraview_package}_DIR"
+    "${_paraview_package}_ROOT"
 
     # Per-package custom variables.
-    ${${package}_find_package_vars})
+    ${${_paraview_package}_find_package_vars})
 endforeach ()
 
 file(GENERATE
