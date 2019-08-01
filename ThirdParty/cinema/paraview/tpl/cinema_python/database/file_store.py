@@ -197,8 +197,6 @@ class FileStore(store.Store):
         super(FileStore, self).insert(document)
 
         fname = self._get_filename(document.descriptor, readingFile=False)
-        if not os.path.exists(fname):
-            self.__new_files.append((document.descriptor,fname))
 
         dirname = os.path.dirname(fname)
         if not os.path.exists(dirname):
@@ -212,6 +210,8 @@ class FileStore(store.Store):
                 pass
 
         if document.data is not None:
+            adjustedfname = None
+
             for parname, parvalue in py23iteritems(document.descriptor):
                 params = self.get_parameter(parname)
                 if 'role' in params:
@@ -223,7 +223,7 @@ class FileStore(store.Store):
 
             doctype = self.determine_type(document.descriptor)
             if doctype == 'RGB' or doctype == 'LUMINANCE':
-                self.raster_wrangler.rgbwriter(document.data, fname)
+                adjustedfname = self.raster_wrangler.rgbwriter(document.data, fname)
             elif doctype == 'VALUE':
                 # find the range for the value that this raster shows
                 vrange = [0, 1]
@@ -235,13 +235,16 @@ class FileStore(store.Store):
                         vr = param['valueRanges']
                         if parvalue in vr:
                             vrange = vr[parvalue]
-                self.raster_wrangler.valuewriter(document.data, fname, vrange)
+                adjustedfname = self.raster_wrangler.valuewriter(document.data, fname, vrange)
             elif doctype == 'Z':
-                self.raster_wrangler.zwriter(document.data, fname)
+                adjustedfname = self.raster_wrangler.zwriter(document.data, fname)
             elif doctype == 'MAGNITUDE':
                 pass
             else:
-                self.raster_wrangler.genericwriter(document.data, fname)
+                adjustedfname = self.raster_wrangler.genericwriter(document.data, fname)
+            if adjustedfname is not None:
+                self.__new_files.append((document.descriptor,adjustedfname))
+
 
     def _load_data(self, descriptor):
         doctype = self.determine_type(descriptor)
