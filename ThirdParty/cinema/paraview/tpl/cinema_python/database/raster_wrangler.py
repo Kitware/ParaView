@@ -177,6 +177,7 @@ class RasterWrangler(object):
         else:
             with open(fname, "w") as file:
                 file.write(imageslice)
+        return fname
 
     def rgbreader(self, fname):
         """opens a color image file and returns it as a color buffer"""
@@ -224,14 +225,16 @@ class RasterWrangler(object):
                 writer.SetInputData(id)
                 writer.SetFileName(fname)
                 writer.Write()
+            return fname
 
         elif "PIL" in self.backends:
             imageslice = numpy.flipud(imageslice)
             pimg = PIL.Image.fromarray(imageslice)
             pimg.save(fname)
+            return fname
 
         else:
-            print("Warning: need PIL or VTK to write to " + fname)
+            raise ValueError("Warning: need PIL or VTK to write to " + fname)
 
     def valuewriter(self, imageSlice, fname, vrange):
         """ Takes in either a (1C) float or a RGB (3C) buffer and writes it as
@@ -244,7 +247,7 @@ class RasterWrangler(object):
         dimensions = imageSlice.shape
         if len(dimensions) == 2 and imageSlice.dtype == numpy.float32:
             # Given as single channel floating point buffer.
-            self.zwriter(imageSlice, adjustedName)
+            return self.zwriter(imageSlice, adjustedName)
 
         elif (len(dimensions) > 2) and (dimensions[2] == 3):
             # if self.dontConvertValsToFloat
@@ -263,10 +266,11 @@ class RasterWrangler(object):
             value = value.astype(numpy.float32)
             adjusted_val = numpy.divide(value, float(0xFFFFFE))
 
-            self.zwriter(adjusted_val, adjustedName)
+            return self.zwriter(adjusted_val, adjustedName)
 
         else:
             raise ValueError("Invalid dimensions for a value raster.")
+
 
     def valuereader(self, fname, shape=None):
         """ Opens a value image file and returns it as either a color buffer
@@ -333,7 +337,7 @@ class RasterWrangler(object):
         if "OpenEXR" in self.backends:
             imageslice = numpy.flipud(imageslice)
             exr.save_depth(imageslice, fname)
-            return
+            return fname
 
         # if self.dontCompressFloatVals:
         #     if "VTK" in self.backends:
@@ -377,6 +381,7 @@ class RasterWrangler(object):
         else:
             with open(adjustedName, mode='wb') as file:
                 file.write(zlib.compress(numpy.array(imageslice)))
+        return adjustedName
 
     def assertvalidimage(self, filename):
         """tests that a given file is syntactically correct"""
