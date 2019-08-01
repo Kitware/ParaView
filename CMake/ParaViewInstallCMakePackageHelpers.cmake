@@ -19,7 +19,7 @@ endif ()
 endfunction ()
 
 get_property(_paraview_packages GLOBAL
-  PROPERTY _vtk_module_find_packages_paraview)
+  PROPERTY _vtk_module_find_packages_ParaView)
 if (_paraview_packages)
   list(REMOVE_DUPLICATES _paraview_packages)
 endif ()
