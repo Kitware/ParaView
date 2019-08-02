@@ -41,8 +41,14 @@
 # PARAVIEW_VERSION : ParaView version string used when creating the installtree
 
 message (STATUS "Building Examples against ParaView install tree")
+# Remove the drive letter from `PARAVIEW_INSTALL_DIR` so we can append it to
+# DESTDIR safely.
+if (WIN32 AND IS_ABSOLUTE "${PARAVIEW_INSTALL_DIR}")
+  string(REGEX REPLACE "^.:" "" PARAVIEW_INSTALL_DIR "${PARAVIEW_INSTALL_DIR}")
+endif ()
 set (ParaView_DIR
-  $ENV{DESTDIR}${PARAVIEW_INSTALL_DIR}/lib/cmake/paraview-${PARAVIEW_VERSION})
+  $ENV{DESTDIR}${PARAVIEW_INSTALL_DIR}/${PARAVIEW_CMAKE_DESTINATION})
+message(STATUS "ParaView_DIR: ${ParaView_DIR}")
 
 # Build target "INSTALL" for paraview
 if (MSVC)
@@ -62,13 +68,28 @@ if (NOT irv EQUAL 0)
   message(FATAL_ERROR "Could not build target 'install' for ParaView")
 endif ()
 
+set(generator_args)
+if (CMAKE_GENERATOR)
+  list(APPEND generator_args
+    -G "${CMAKE_GENERATOR}")
+endif ()
+if (CMAKE_GENERATOR_PLATFORM)
+  list(APPEND generator_args
+    -A "${CMAKE_GENERATOR_PLATFORM}")
+endif ()
+if (CMAKE_GENERATOR_TOOLSET)
+  list(APPEND generator_args
+    -T "${CMAKE_GENERATOR_TOOLSET}")
+endif ()
+
 set (INSTALL_TEST_BUILD_DIR ${PARAVIEW_TEST_DIR}/Examples-bld)
 if (NOT EXISTS ${INSTALL_TEST_BUILD_DIR})
-  execute_process(COMMAND ${CMAKE_COMMAND} -E
-    make_directory ${INSTALL_TEST_BUILD_DIR})
+  file(MAKE_DIRECTORY
+    ${INSTALL_TEST_BUILD_DIR})
 endif ()
 execute_process (
   COMMAND ${CMAKE_COMMAND}
+  ${generator_args}
   -DParaView_DIR:PATH=${ParaView_DIR}
   ${PARAVIEW_SOURCE_DIR}/Examples
   WORKING_DIRECTORY ${INSTALL_TEST_BUILD_DIR}
