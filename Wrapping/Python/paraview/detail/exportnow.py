@@ -259,10 +259,10 @@ def ExportNow(root_directory,
                 SaveData(fnamefilled, inputproxy, DataMode=DataMode, HeaderType=HeaderType, EncodeAppendedData=EncodeAppendedData, CompressorType=CompressorType, CompressionLevel=CompressionLevel)
                 # don't forget to tell cinema D about it
                 CIND.AppendToCinemaDTable(tnow, "writer_%s" % writercnt, fnamefilled)
+                if wp.GetProperty("ChooseArraysToWrite").GetElement(0) == 1:
+                    Delete(inputproxy)
             wp = ed.GetNextWriterProxy()
             writercnt = writercnt + 1
-            if pass_arrays:
-                Delete(pass_arrays)
 
         # loop through the configured screenshots and export at the requested times
         ed.InitNextScreenshotProxy()
