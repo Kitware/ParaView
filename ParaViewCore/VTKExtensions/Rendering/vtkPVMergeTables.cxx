@@ -16,13 +16,13 @@
 
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
+#include "vtkDataSetAttributes.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
-#include "vtkVariant.h"
 
 vtkStandardNewMacro(vtkPVMergeTables);
 //----------------------------------------------------------------------------
@@ -53,7 +53,23 @@ vtkExecutive* vtkPVMergeTables::CreateDefaultExecutive()
 //----------------------------------------------------------------------------
 static void vtkPVMergeTablesMerge(vtkTable* output, vtkTable* inputs[], int num_inputs)
 {
+  vtkDataSetAttributes::FieldList fields;
   for (int idx = 0; idx < num_inputs; ++idx)
+  {
+    vtkTable* curTable = inputs[idx];
+    if (curTable && curTable->GetNumberOfRows() > 0 && curTable->GetNumberOfColumns() > 0)
+    {
+      fields.IntersectFieldList(curTable->GetRowData());
+    }
+  }
+
+  auto outRD = output->GetRowData();
+  // passing sz=0 ensures that fields simply uses the accumulated counts for
+  // number of rows.
+  fields.CopyAllocate(outRD, vtkDataSetAttributes::PASSDATA, /*sz=*/0, /*ext=*/0);
+
+  vtkIdType outStartRow = 0;
+  for (int idx = 0, fieldsInputIdx = 0; idx < num_inputs; ++idx)
   {
     vtkTable* curTable = inputs[idx];
     if (!curTable || curTable->GetNumberOfRows() == 0 || curTable->GetNumberOfColumns() == 0)
@@ -61,23 +77,11 @@ static void vtkPVMergeTablesMerge(vtkTable* output, vtkTable* inputs[], int num_
       continue;
     }
 
-    if (output->GetNumberOfRows() == 0)
-    {
-      // Copy output structure from the first non-empty input.
-      output->DeepCopy(curTable);
-      continue;
-    }
-
-    vtkIdType numRows = curTable->GetNumberOfRows();
-    vtkIdType numCols = curTable->GetNumberOfColumns();
-    for (vtkIdType i = 0; i < numRows; i++)
-    {
-      vtkIdType curRow = output->InsertNextBlankRow();
-      for (vtkIdType j = 0; j < numCols; j++)
-      {
-        output->SetValue(curRow, j, curTable->GetValue(i, j));
-      }
-    }
+    auto inRD = curTable->GetRowData();
+    const auto inNumRows = inRD->GetNumberOfTuples();
+    fields.CopyData(fieldsInputIdx, inRD, 0, inNumRows, outRD, outStartRow);
+    outStartRow += inNumRows;
+    ++fieldsInputIdx;
   }
 }
 
