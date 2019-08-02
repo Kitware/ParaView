@@ -262,6 +262,7 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
     set(CMAKE_AUTORCC 1)
   endif ()
 
+  include("${CMAKE_CURRENT_LIST_DIR}/paraview-find-package-helpers.cmake" OPTIONAL)
   find_package(Qt5 REQUIRED QUIET COMPONENTS Core Widgets)
 
   # CMake 3.13 started using Qt5's version variables to detect what version
