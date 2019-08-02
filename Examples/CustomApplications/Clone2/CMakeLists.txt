@@ -30,7 +30,7 @@ set(xml_files
   ParaViewSources.xml)
 
 paraview_client_add(
-  NAME paraview_revised
+  NAME paraview_clone2
   VERSION "1.1.1"
   SOURCES ${sources} ${ui_files}
   APPLICATION_XMLS ${xml_files}
@@ -39,6 +39,6 @@ paraview_client_add(
 
   ORGANIZATION "Kitware, Inc."
   TITLE "ParaView (ReVisEd)")
-target_link_libraries(paraview_revised
+target_link_libraries(paraview_clone2
   PRIVATE
     ParaView::pqApplicationComponents)

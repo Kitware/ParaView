@@ -27,7 +27,13 @@ if (USE_CATALYST)
   # FIXME: This should really be fixed to instead be done per-target.
   add_definitions(-DUSE_CATALYST)
 else ()
-  find_package(MPI REQUIRED COMPONENTS C)
+  find_package(MPI COMPONENTS C)
+  if (NOT MPI_FOUND)
+    message(STATUS
+      "${CMAKE_PROJECT_NAME} requires MPI support, but none was found. "
+      "Skipping ${CMAKE_PROJECT_NAME} examples.")
+    return ()
+  endif ()
 endif ()
 
 option(BUILD_TESTING "Build Testing" OFF)

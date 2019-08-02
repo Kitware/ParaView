@@ -9,6 +9,8 @@ function (_paraview_package_append_variables)
       "if (NOT DEFINED \"${var}\")
   set(\"${var}\" \"${${var}}\")
   list(APPEND _paraview_find_package_variables \"${var}\")
+elseif (NOT ${var})
+  set(\"${var}\" \"${${var}}\")
 endif ()
 ")
   endforeach ()
@@ -19,7 +21,7 @@ endif ()
 endfunction ()
 
 get_property(_paraview_packages GLOBAL
-  PROPERTY _vtk_module_find_packages_paraview)
+  PROPERTY _vtk_module_find_packages_ParaView)
 if (_paraview_packages)
   list(REMOVE_DUPLICATES _paraview_packages)
 endif ()
@@ -28,11 +30,11 @@ set(paraview_find_package_code)
 foreach (_paraview_package IN LISTS _paraview_packages)
   _paraview_package_append_variables(
     # Standard CMake `find_package` mechanisms.
-    "${package}_DIR"
-    "${package}_ROOT"
+    "${_paraview_package}_DIR"
+    "${_paraview_package}_ROOT"
 
     # Per-package custom variables.
-    ${${package}_find_package_vars})
+    ${${_paraview_package}_find_package_vars})
 endforeach ()
 
 file(GENERATE
