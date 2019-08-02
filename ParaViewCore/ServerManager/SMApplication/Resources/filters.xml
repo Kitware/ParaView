@@ -2571,9 +2571,10 @@ being of a vtkDoubleArray.</Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
           <DataType value="vtkGraph"/>
+          <DataType value="vtkTable"/>
         </DataTypeDomain>
         <InputArrayDomain name="input_array" optional="1"/>
-        <Documentation>This property specifies the input dataset (vtkDataSet or vtkGraph) to the
+        <Documentation>This property specifies the input dataset (vtkDataSet, vtkTable or vtkGraph) to the
         Calculator filter. The scalar and vector variables may be chosen from
         this dataset's arrays.</Documentation>
       </InputProperty>
