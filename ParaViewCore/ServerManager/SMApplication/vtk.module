@@ -6,5 +6,22 @@ DEPENDS
   ParaView::ServerManagerCore
 PRIVATE_DEPENDS
   VTK::vtksys
+OPTIONAL_DEPENDS
+  # These correspond to the optional XML files included when enabling certain
+  # features
+  VTK::FiltersOpenTURNS
+  VTK::IOADIOS2
+  VTK::IOCityGML
+  VTK::IOGDAL
+  VTK::IOLAS
+  VTK::IOMotionFX
+  VTK::IOPDAL
+  VTK::IOSegY
+  VTK::IOXdmf2
+  VTK::IOXdmf3
+  VTK::MomentInvariants
+  VTK::ParallelMomentInvariants
+  VTK::PythonInterpreter
+  VTK::mpi
 TEST_LABELS
   ParaView

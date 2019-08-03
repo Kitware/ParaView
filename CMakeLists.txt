@@ -477,6 +477,11 @@ if (PARAVIEW_ENABLE_XDMF3)
     VTK::IOXdmf3)
 endif ()
 
+if (PARAVIEW_ENABLE_ADIOS2)
+  list(APPEND paraview_requested_modules
+    VTK::IOADIOS2)
+endif ()
+
 if (PARAVIEW_ENABLE_FFMPEG)
   list(APPEND paraview_requested_modules
     VTK::IOFFMPEG)
