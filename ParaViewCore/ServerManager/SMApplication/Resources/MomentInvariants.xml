@@ -71,7 +71,7 @@
         short_help="MomentInvariants vtkMomentInvariants">
      </Documentation>
      <InputProperty
-        name="Input"
+        name="InputComputedMoments"
         port_index="0"
         command="SetInputConnection">
            <ProxyGroupDomain name="groups">
@@ -82,11 +82,11 @@
              <DataType value="vtkImageData"/>
            </DataTypeDomain>
            <Documentation>
-             The pattern, of scalar, vector, or matrix type
+             The output of computeMoments, which is vtkImageData.
            </Documentation>
       </InputProperty>
      <InputProperty
-        name="InputComputedMoments"
+        name="InputPattern"
         port_index="1"
         command="SetInputConnection">
            <ProxyGroupDomain name="groups">
@@ -97,7 +97,7 @@
              <DataType value="vtkImageData"/>
            </DataTypeDomain>
            <Documentation>
-             The output of computeMoments, which is vtkImageData.
+             The pattern, of scalar, vector, or matrix type
            </Documentation>
       </InputProperty>
       <StringVectorProperty name="NameOfPointData"
