@@ -32,6 +32,7 @@ PRIVATE_DEPENDS
   VTK::CommonColor
   VTK::glew
   VTK::lz4
+  VTK::opengl
   VTK::zlib
 OPTIONAL_DEPENDS
   ParaView::ClientServerCoreCore

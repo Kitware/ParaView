@@ -25,3 +25,4 @@ PRIVATE_DEPENDS
   VTK::FiltersParallel
   VTK::FiltersSources
   VTK::IOXML
+  VTK::opengl
