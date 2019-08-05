@@ -513,9 +513,9 @@
         <Documentation>This property specifies the subdivision scheme
         (binary or ternary) of the hyper tree grid.</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetMaximumLevel"
+      <IntVectorProperty command="SetMaxDepth"
                          default_values="1"
-                         name="MaximumLevel"
+                         name="MaxDepth"
                          number_of_elements="1">
         <IntRangeDomain min="1"
                         name="range" />
