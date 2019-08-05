@@ -1,0 +1,38 @@
+<ServerManagerConfiguration>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+    <SourceProxy name="ADIOS2VTXReader"
+                 label="ADIOS2VTXReader"
+                 class="vtkADIOS2VTXReader" >
+      <Documentation short_help="VTK XML based ADIOS2 Reader">
+        Read an ADIOS2 BP file with embeded VTK XML Schema for vti and vtu
+        types either as an attribute or as a subfile.
+      </Documentation>
+      <StringVectorProperty
+            name="FileName"
+            animateable="0"
+            command="SetFileName"
+            number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property sets the file name
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+            name="TimestepValues"
+            information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <Hints>
+        <ReaderFactory
+            extensions="bp"
+            file_description="ADIOS2 bp file"/>
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

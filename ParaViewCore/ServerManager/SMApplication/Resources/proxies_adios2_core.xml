@@ -1,0 +1,104 @@
+<ServerManagerConfiguration>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+    <SourceProxy name="ADIOS2CoreImageReader"
+                 label="ADIOS2CoreImageReader"
+                 class="vtkADIOS2CoreImageReader">
+      <Documentation short_help="Read ADIOS2 BP files as vtkImageData.">
+        Reader to read ADIOS2 BP files as vtkImageData.
+      </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          This property specifies the ADIOS2 filename.
+        </Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <StringVectorProperty command="GetAllDimensionArrays"
+                            information_only="1"
+                            name="DimensionArrayList">
+        <StringArrayHelper />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetDimensionArray"
+                            name="DimensionArray"
+                            label="Image Dimension"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <property function="ArrayList"
+                            name="DimensionArrayList" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation short_help="Array used for dimension calculation">
+          Use the dimension info of the array to populate image dimension.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty name="Use dimension array as cell data"
+                     command="SetDimensionArrayAsCell"
+                     number_of_elements="1"
+                     default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation short_help="Image dim is 1 larger than cell array dim">
+          The dimension of image data is 1 larger than its cell data's
+          dimension.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="GetAllTimeStepArrays"
+                            information_only="1"
+                            name="TimeStepArrayList">
+        <StringArrayHelper />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetTimeStepArray"
+                            name="TimeStepArray"
+                            label="Time step array"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <property function="ArrayList"
+                            name="TimeStepArrayList" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation short_help="Array used for time steps">
+          Use the array to populate time steps info.
+        </Documentation>
+      </StringVectorProperty>
+       <!--  -->
+      <StringVectorProperty information_only="1"
+                            name="ArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetArrayStatus"
+                            element_types="2 0"
+                            information_property="ArrayInfo"
+                            label="Arrays"
+                            name="ArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            panel_visibility="default"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="ArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property lists all adios2 arrays that can be read. Based on
+          the dimension info, arrays will be parsed as point or cell data.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="bp"
+                       file_description="ADIOS2 bp File" />
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
