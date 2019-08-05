@@ -807,6 +807,7 @@ function (paraview_add_plugin name)
   endif ()
 
   if (_paraview_add_plugin_with_ui OR _paraview_add_plugin_with_resources)
+    include("${CMAKE_CURRENT_LIST_DIR}/paraview-find-package-helpers.cmake" OPTIONAL)
     find_package(Qt5 QUIET REQUIRED COMPONENTS Core ${_paraview_add_plugin_qt_extra_components})
     list(APPEND _paraview_add_plugin_required_libraries
       Qt5::Core)
