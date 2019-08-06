@@ -401,7 +401,7 @@ void vtkSMArrayListDomain::Update(vtkSMProperty*)
   vtkSMProperty* fieldDataSelection = this->GetRequiredProperty("FieldDataSelection");
   vtkSMInputArrayDomain* iad = this->InputDomainName
     ? vtkSMInputArrayDomain::SafeDownCast(input->GetDomain(this->InputDomainName))
-    : vtkSMInputArrayDomain::SafeDownCast(input->FindDomain<vtkSMInputArrayDomain>());
+    : input->FindDomain<vtkSMInputArrayDomain>();
 
   // we use a set so that the list gets sorted as well as helps us
   // avoid duplicates esp. when processing two datainformation objects.
