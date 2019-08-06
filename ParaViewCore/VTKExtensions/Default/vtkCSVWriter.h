@@ -24,6 +24,7 @@
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkWriter.h"
 
+class vtkMultiProcessController;
 class vtkStdString;
 class vtkTable;
 
@@ -33,6 +34,15 @@ public:
   static vtkCSVWriter* New();
   vtkTypeMacro(vtkCSVWriter, vtkWriter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
+
+  //@{
+  /**
+   * Get/Set the controller to use. By default,
+   * `vtkMultiProcessController::GetGlobalController` will be used.
+   */
+  void SetController(vtkMultiProcessController*);
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  //@}
 
   //@{
   /**
@@ -121,14 +131,7 @@ protected:
   vtkCSVWriter();
   ~vtkCSVWriter() override;
 
-  /**
-   * Open the file. If append is true then the file will be appended. Otherwise the file
-   * will be overwritten.
-   */
-  bool OpenFile(bool append);
-
   void WriteData() override;
-  virtual void WriteTable(vtkTable* table);
 
   // see algorithm for more info.
   // This writer takes in vtkTable, vtkDataSet or vtkCompositeDataSet.
@@ -147,11 +150,13 @@ protected:
   int FieldAssociation;
   bool AddMetaData;
 
-  ofstream* Stream;
+  vtkMultiProcessController* Controller;
 
 private:
   vtkCSVWriter(const vtkCSVWriter&) = delete;
   void operator=(const vtkCSVWriter&) = delete;
+
+  class CSVFile;
 };
 
 #endif
