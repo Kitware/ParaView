@@ -25,6 +25,7 @@
     <Proxy group="sources" name="ConeSource" />
     <Proxy group="sources" name="CylinderSource" />
     <Proxy group="sources" name="DiskSource" />
+    <Proxy group="sources" name="EllipseSource" />
     <Proxy group="sources" name="LineSource" />
     <Proxy group="sources" name="OutlineSource" />
     <Proxy group="sources" name="PlaneSource" />
