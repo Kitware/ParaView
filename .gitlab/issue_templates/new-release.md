@@ -37,6 +37,7 @@ If making a first release candidate from master, i.e., `v@MAJOR@.@MINOR@.0-RC1`:
 git fetch origin
 git checkout master
 git merge --ff-only origin/master
+git submodule update --recursive --init
 ```
   - [ ] Update `version.txt` and tag the commit
 ```
@@ -68,6 +69,7 @@ If making a release from the `release` branch, e.g., `v@MAJOR@.@MINOR@.0-RC2 or 
 git fetch origin
 git checkout release
 git merge --ff-only origin/release
+git submodule update --recursive --init
 ```
   - [ ] Update `version.txt` and tag the commit
 ```
