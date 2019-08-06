@@ -242,8 +242,9 @@ void vtkExodusFileSeriesReader::FindRestartedResults()
   // numbering).
   //
   // The `e` in the above pattern can be any of exodus supported extensions e.g.
-  // exo, ex2, etc. Hence we keep the regex generic (ref: paraview/paraview#19056).
-  vtksys::RegularExpression regEx("^(.*\\.[a-zA-Z0-9]+)(-s.[0-9]+)?(\\.[0-9]+\\.[0-9]+)?$");
+  // exo, ex2, etc. Hence we keep the regex generic (ref: paraview/paraview#19056,
+  // paraview/paraview#19202).
+  vtksys::RegularExpression regEx("^([^\\.]*\\.[a-zA-Z0-9]+)(-s.[0-9]+)?(\\.[0-9]+\\.[0-9]+)?$");
   if (!regEx.find(baseName))
   {
     // Filename does not follow convention.  Just use it.
