@@ -203,6 +203,10 @@ void pqCalculatorWidget::updateVariables(const QString& mode)
   {
     fdi = input->GetDataInformation(0)->GetEdgeDataInformation();
   }
+  else if (mode == "Row Data")
+  {
+    fdi = input->GetDataInformation(0)->GetRowDataInformation();
+  }
 
   if (!fdi)
   {
