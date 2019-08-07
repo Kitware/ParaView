@@ -62,14 +62,21 @@ pqViewMenuManager::pqViewMenuManager(QMainWindow* mainWindow, QMenu* menu)
 
 namespace
 {
+QString trimShortcut(QString s)
+{
+  return s.remove('&');
+}
+
 bool toolbarLessThan(const QToolBar* tb1, const QToolBar* tb2)
 {
-  return tb1->toggleViewAction()->text() < tb2->toggleViewAction()->text();
+  return trimShortcut(tb1->toggleViewAction()->text()) <
+    trimShortcut(tb2->toggleViewAction()->text());
 }
 
 bool dockWidgetLessThan(const QDockWidget* tb1, const QDockWidget* tb2)
 {
-  return tb1->toggleViewAction()->text() < tb2->toggleViewAction()->text();
+  return trimShortcut(tb1->toggleViewAction()->text()) <
+    trimShortcut(tb2->toggleViewAction()->text());
 }
 }
 
