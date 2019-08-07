@@ -108,6 +108,8 @@ If making a first release candidate from master, i.e., `v@MAJOR@.@MINOR@.0-RC1`:
 git fetch origin
 git checkout master
 git merge --ff-only origin/master
+git submodule update
+git checkout -b update-to-v@VERSION@@RC@
 ```
   - Update `CMakeLists.txt`
     - [ ] `git checkout -b update-to-v@VERSION@@RC@`
@@ -119,14 +121,14 @@ git merge --ff-only origin/master
 set(paraview_SOURCE_SELECTION "@VERSION@@RC@" CACHE STRING "Force version to @VERSION@@RC@" FORCE)
 set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
 ```
-  - Update `versions.cmake`
+  - Update versions
     - [ ] Guide selections in `versions.cmake`
-    - [ ] `git add versions.cmake CMakeLists.txt`
+    - [ ] Docker: update default tag strings (in `Scripts/docker/ubuntu/Dockerfile`)
+    - [ ] ARG PARAVIEW_TAG=v@VERSION@@RC@
+    - [ ] ARG SUPERBUILD_TAG=v@VERSION@@RC@
+    - [ ] `git add versions.cmake CMakeLists.txt Scripts/docker/ubuntu/Dockerfile`
     - [ ] `git commit -m "Update the default version to @VERSION@@RC@"`
-  - Update default versions in container build recipes
-    - Docker: update default tag strings (in `Scripts/docker/ubuntu/Dockerfile`)
-      - [ ] ARG PARAVIEW_TAG=v@VERSION@@RC@
-      - [ ] ARG SUPERBUILD_TAG=v@VERSION@@RC@
+    - [ ] `git gitlab-push`
   - Integrate changes to `master` branch
     - [ ] Create a merge request targeting `master`, title beginning with WIP (do *not* add `Backport: release` to description)
     - [ ] Build binaries (`Do: test`)
@@ -148,11 +150,13 @@ git gitlab-push -f
 
 If making a release from the `release` branch, e.g., `v@MAJOR@.@MINOR@.0-RC2 or above`:
 
-  - Update `release` branch for **paraview/paraview-superbuild**
+  - [ ] Update `release` branch for **paraview/paraview-superbuild**
 ```
 git fetch origin
 git checkout release
 git merge --ff-only origin/release
+git submodule update
+git checkout -b update-to-v@VERSION@@RC@
 ```
   - Update `CMakeLists.txt`
     - [ ] Set ParaView source selections in `CMakeLists.txt` and force explicit
@@ -162,10 +166,14 @@ git merge --ff-only origin/release
 set(paraview_SOURCE_SELECTION "@VERSION@@RC@" CACHE STRING "Force version to @VERSION@@RC@" FORCE)
 set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
 ```
-  - Update `versions.cmake`
+  - Update versions
     - [ ] Guide selections in `versions.cmake`
-    - [ ] `git add versions.cmake CMakeLists.txt`
+    - [ ] Docker: update default tag strings (in `Scripts/docker/ubuntu/Dockerfile`)
+    - [ ] ARG PARAVIEW_TAG=v@VERSION@@RC@
+    - [ ] ARG SUPERBUILD_TAG=v@VERSION@@RC@
+    - [ ] `git add versions.cmake CMakeLists.txt Scripts/docker/ubuntu/Dockerfile`
     - [ ] `git commit -m "Update the default version to @VERSION@@RC@"`
+    - [ ] `git gitlab-push`
   - Integrate changes to `master` branch
     - [ ] Create a merge request targeting `master`, title beginning with WIP (do *not* add `Backport: release` to description)
     - [ ] Build binaries (`Do: test`)
