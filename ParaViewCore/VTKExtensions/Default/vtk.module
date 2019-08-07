@@ -30,6 +30,10 @@ OPTIONAL_DEPENDS
   VTK::FiltersParallelMPI
   VTK::ParallelMPI
 TEST_DEPENDS
+  VTK::IOInfovis
   VTK::TestingCore
+  VTK::TestingRendering
+TEST_OPTIONAL_DEPENDS
+  VTK::ParallelMPI
 TEST_LABELS
   ParaView
