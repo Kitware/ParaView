@@ -19,9 +19,25 @@
 #include "vtkObjectFactory.h"
 #include "vtkPythonInterpreter.h"
 
+#include <algorithm>
+#include <random>
 #include <sstream>
 #include <string>
 #include <vtksys/SystemTools.hxx>
+
+//----------------------------------------------------------------------------
+namespace
+{
+// Generate a random module name for the python script
+std::string random_string()
+{
+  std::string str("abcdefghijklmnopqrstuvwxyz");
+  std::random_device rd;
+  std::mt19937 generator(rd());
+  std::shuffle(str.begin(), str.end(), generator);
+  return str.substr(0, 10);
+}
+}
 
 vtkStandardNewMacro(vtkCPPythonScriptPipeline);
 //----------------------------------------------------------------------------
@@ -60,8 +76,10 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
   std::string fileNamePath = vtksys::SystemTools::GetFilenamePath(fileName);
   std::string fileNameName = vtksys::SystemTools::GetFilenameWithoutExtension(
     vtksys::SystemTools::GetFilenameName(fileName));
+  // Replace the module name with a random string to avoid illegal syntax
+  std::string moduleName(::random_string());
   // need to save the script name as it is used as the name of the module
-  this->SetPythonScriptName(fileNameName.c_str());
+  this->SetPythonScriptName(moduleName.c_str());
 
   // only process 0 reads the actual script and then broadcasts it out
   char* scriptText = nullptr;
@@ -127,13 +145,12 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
   // import foo
   std::ostringstream loadPythonModules;
   loadPythonModules << "import types" << std::endl;
-  loadPythonModules << "_" << fileNameName << " = types.ModuleType('" << fileNameName << "')"
+  loadPythonModules << "_" << moduleName << " = types.ModuleType('" << moduleName << "')"
                     << std::endl;
-  loadPythonModules << "_" << fileNameName << ".__file__ = '" << fileNameName << ".pyc'"
-                    << std::endl;
+  loadPythonModules << "_" << moduleName << ".__file__ = '" << moduleName << ".pyc'" << std::endl;
 
   loadPythonModules << "import sys" << std::endl;
-  loadPythonModules << "sys.modules['" << fileNameName << "'] = _" << fileNameName << std::endl;
+  loadPythonModules << "sys.modules['" << moduleName << "'] = _" << moduleName << std::endl;
 
   loadPythonModules << "_source = \"\"\"" << std::endl;
   loadPythonModules << scriptText;
@@ -141,10 +158,11 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
 
   loadPythonModules << "_code = compile(_source, \"" << fileNameName << ".py\", \"exec\")"
                     << std::endl;
-  loadPythonModules << "exec(_code, _" << fileNameName << ".__dict__)" << std::endl;
+  loadPythonModules << "exec(_code, _" << moduleName << ".__dict__)" << std::endl;
   loadPythonModules << "del _source" << std::endl;
   loadPythonModules << "del _code" << std::endl;
-  loadPythonModules << "import " << fileNameName << std::endl;
+  loadPythonModules << moduleName << " = ";
+  loadPythonModules << "__import__('" << fileNameName << "')" << std::endl;
 
   delete[] scriptPath;
   delete[] scriptText;
