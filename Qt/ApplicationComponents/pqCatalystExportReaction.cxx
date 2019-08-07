@@ -197,33 +197,29 @@ void pqCatalystExportReaction::onTriggered()
       cinema_tracks += thisTrack;
     }
 
-    QString theseArrays = QString("'");
-    theseArrays += QString(filterName.c_str());
-    theseArrays += QString("':[");
-
-    // TODO: there isn't an API to distinguish cell and point arrays or the same name
-    bool hasArrays = false;
-    int nelems;
-    nelems = vtkSMPropertyHelper(nextWriter, "Cell Arrays").GetNumberOfElements();
-    for (int i = 0; i < nelems; ++i)
-    {
-      hasArrays = true;
-      theseArrays += "'";
-      theseArrays += vtkSMPropertyHelper(nextWriter, "Cell Arrays").GetAsString(i);
-      theseArrays += "',";
-    }
-
-    nelems = vtkSMPropertyHelper(nextWriter, "Point Arrays").GetNumberOfElements();
-    for (int i = 0; i < nelems; ++i)
-    {
-      hasArrays = true;
-      theseArrays += "'";
-      theseArrays += vtkSMPropertyHelper(nextWriter, "Point Arrays").GetAsString(i);
-      theseArrays += "',";
-    }
-    if (hasArrays)
+    if (vtkSMPropertyHelper(nextWriter, "ChooseArraysToWrite").GetAsInt(0) == 1)
     {
       hasArraySets = true;
+      QString theseArrays = QString("'");
+      theseArrays += QString(filterName.c_str());
+      theseArrays += QString("':[");
+      // TODO: there isn't an API to distinguish cell and point arrays or the same name
+      int nelems;
+      nelems = vtkSMPropertyHelper(nextWriter, "CellDataArrays").GetNumberOfElements();
+      for (int i = 0; i < nelems; ++i)
+      {
+        theseArrays += "'";
+        theseArrays += vtkSMPropertyHelper(nextWriter, "CellDataArrays").GetAsString(i);
+        theseArrays += "',";
+      }
+
+      nelems = vtkSMPropertyHelper(nextWriter, "PointDataArrays").GetNumberOfElements();
+      for (int i = 0; i < nelems; ++i)
+      {
+        theseArrays += "'";
+        theseArrays += vtkSMPropertyHelper(nextWriter, "PointDataArrays").GetAsString(i);
+        theseArrays += "',";
+      }
       theseArrays.chop(1);
       theseArrays += "],";
       cinema_arrays += theseArrays;

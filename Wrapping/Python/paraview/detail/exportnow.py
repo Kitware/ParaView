@@ -217,6 +217,22 @@ def ExportNow(root_directory,
                 proxyname = spm.GetProxyName("export_writers", wp)
                 inputname = proxyname[0:proxyname.find("|")]
                 inputproxy = FindSource(inputname)
+                if wp.GetProperty("ChooseArraysToWrite").GetElement(0) == 1:
+                    point_arrays = []
+                    cell_arrays = []
+                    arrays_property = wp.GetProperty("PointDataArrays")
+                    for i in range(arrays_property.GetNumberOfElements()):
+                        point_arrays.append(arrays_property.GetElement(i))
+                    arrays_property = wp.GetProperty("CellDataArrays")
+                    for i in range(arrays_property.GetNumberOfElements()):
+                        cell_arrays.append(arrays_property.GetElement(i))
+                    if not point_arrays:
+                        point_arrays = [' ']
+                    if not cell_arrays:
+                        cell_arrays = [' ']
+                    pass_arrays = PassArrays(Input=inputproxy, \
+                        PointDataArrays=point_arrays, CellDataArrays=cell_arrays)
+                    inputproxy = pass_arrays
                 fname = wp.GetProperty("CatalystFilePattern").GetElement(0)
                 if wp.GetXMLName() == "ExodusIIWriter":
                     fnamefilled = root_directory+fname+padded_tstep
@@ -243,6 +259,8 @@ def ExportNow(root_directory,
                 SaveData(fnamefilled, inputproxy, DataMode=DataMode, HeaderType=HeaderType, EncodeAppendedData=EncodeAppendedData, CompressorType=CompressorType, CompressionLevel=CompressionLevel)
                 # don't forget to tell cinema D about it
                 CIND.AppendToCinemaDTable(tnow, "writer_%s" % writercnt, fnamefilled)
+                if wp.GetProperty("ChooseArraysToWrite").GetElement(0) == 1:
+                    Delete(inputproxy)
             wp = ed.GetNextWriterProxy()
             writercnt = writercnt + 1
 

@@ -2001,54 +2001,30 @@
                          >
         <Documentation>Non user facing property exists only to constrain the cell array UI.</Documentation>
       </IntVectorProperty>
-      <StringVectorProperty clean_command="SetCellArrayNames"
-                            label="Cell Arrays"
-                            name="Cell Arrays"
-                            number_of_elements_per_command="1"
-                            repeat_command="1"
-                            immediate_update="1"
-                            >
-        <Documentation>This property specifies the name(s) of the cell aligned array(s) to export.</Documentation>
-        <ArrayListDomain name="array_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input"/>
-            <Property function="FieldDataSelection"
-                      name="CellAttributes"/>
-          </RequiredProperties>
-        </ArrayListDomain>
-        <Hints>
-          <NoDefault />
-        </Hints>
-      </StringVectorProperty>
-      <IntVectorProperty default_values="0"
-                         name="PointAttributes"
-                         number_of_elements="1"
-                         panel_visibility="never"
-                         immediate_update="1"
-                         >
-        <Documentation>Non user facing property exists only to constrain the point array UI.</Documentation>
-      </IntVectorProperty>
-      <StringVectorProperty clean_command="SetPointArrayNames"
-                            label="Point Arrays"
-                            name="Point Arrays"
-                            number_of_elements_per_command="1"
-                            repeat_command="1"
-                            immediate_update="1"
-                            >
-        <Documentation>This property specifies the name(s) of the point aligned array(s) to export.</Documentation>
-        <ArrayListDomain name="array_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input"/>
-            <Property function="FieldDataSelection"
-                      name="PointAttributes"/>
-          </RequiredProperties>
-        </ArrayListDomain>
-        <Hints>
-          <NoDefault />
-        </Hints>
-      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="PassArrays" proxygroup="internal_writers" proxyname="PassArrays" />
+        <ExposedProperties>
+          <Property name="ChooseArraysToWrite"/>
+          <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
+            <Property name="PointDataArrays" />
+            <Property name="CellDataArrays" />
+            <Property name="FieldDataArrays" />
+            <Property name="VertexDataArrays" />
+            <Property name="EdgeDataArrays" />
+            <Property name="RowDataArrays" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ChooseArraysToWrite"
+                                       value="1" />
+              <!-- show this widget when ChooseArraysToWrite==1 -->
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <LinkProperties>
+          <Property name="Input" with_property="Input" />
+        </LinkProperties>
+      </SubProxy>
       <StringVectorProperty name="Cinema Parameters"
                             number_of_elements="1"
                             default_values=""

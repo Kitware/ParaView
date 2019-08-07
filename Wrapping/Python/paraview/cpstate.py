@@ -401,6 +401,21 @@ class NewStyleWriters(object):
                 varname = self.__make_name(xmlname)
             else:
                 varname = self.__make_name(prototype.GetXMLLabel())
+            # Write pass array proxy
+            if pxy.GetProperty("ChooseArraysToWrite").GetElement(0) == 1:
+                point_arrays = []
+                cell_arrays = []
+                arrays_property = pxy.GetProperty("PointDataArrays")
+                for i in range(arrays_property.GetNumberOfElements()):
+                    point_arrays.append(arrays_property.GetElement(i))
+                arrays_property = pxy.GetProperty("CellDataArrays")
+                for i in range(arrays_property.GetNumberOfElements()):
+                    cell_arrays.append(arrays_property.GetElement(i))
+                f = "%s_arrays = PassArrays(Input=%s, PointDataArrays=%s, CellDataArrays=%s)" % \
+                    (inputname, inputname, str(point_arrays), str(cell_arrays))
+                inputname = "%s_arrays" % inputname
+                res.append(f)
+            # Actual writer
             f = "%s = servermanager.writers.%s(Input=%s)" % (varname, writername, inputname)
             res.append(f)
             if self.__make_temporal_script:
