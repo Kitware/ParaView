@@ -1425,6 +1425,87 @@
       <!-- End DiscSource -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkEllipseArcSource"
+                 label="Ellipse"
+                 name="EllipseSource">
+      <Documentation short_help="Create an elliptical arc">
+        Source that creates an elliptical arc
+        defined by a normal, a center, a major radius vector (the direction in
+        which the ellipse is longest), and a ratio defined as the minor radius over
+        the major radius. A starting angle and segment angle control the starting
+        and ending points on the ellipse perimeter, enabling creation of only a
+        section of the ellipse. The number of segments in the polyline is controlled
+        by setting the object resolution.
+      </Documentation>
+      <DoubleVectorProperty command="SetCenter"
+                            default_values="0.0 0.0 0.0"
+                            name="Center"
+                            number_of_elements="3" >
+        <DoubleRangeDomain name="range" />
+        <Documentation>The center of the ellipse.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetNormal"
+                            default_values="0.0 0.0 1.0"
+                            name="Normal"
+                            number_of_elements="3" >
+        <DoubleRangeDomain name="range" />
+        <Documentation>The normal of the plane containing the ellipse.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetResolution"
+                         default_values="100"
+                         name="Resolution"
+                         number_of_elements="1" >
+        <IntRangeDomain max="1024" min="8" name="range" />
+        <Documentation>Number of line segments in the polyline defining the ellipse edge.</Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetMajorRadiusVector"
+                            default_values="1.0 0.0 0.0"
+                            name="MajorRadiusVector"
+                            number_of_elements="3" >
+        <DoubleRangeDomain name="range" />
+        <Documentation>The origin of polar angle and the major radius size.</Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetRatio"
+                            default_values="1.0"
+                            name="Ratio"
+                            number_of_elements="1" >
+        <DoubleRangeDomain name="range" min="0.001" max="1.0" />
+        <Documentation>Ratio of the ellipse defined as minor radius / major radius. Valid
+        values are in the range [0.001, 1.0].</Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetStartAngle"
+                            default_values="0.0"
+                            name="StartAngle"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="-360.0" max="360.0" />
+        <Documentation>The angle (in degrees) where the ellipse begins relative to the
+        **Major Radius Vector**.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetSegmentAngle"
+                            default_values="360.0"
+                            name="SectorAngle"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="0" max="360.0" />
+        <Documentation>The angular sector occupied by the arc, measured in degrees from
+        the **Start Angle**.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetClose"
+                         default_values="1"
+                         name="Close"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>When on, closes the elliptical arc by adding a line segment between
+        the last point and the first point.</Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkSuperquadricSource"
                  label="Superquadric"
                  name="SuperquadricSource">
