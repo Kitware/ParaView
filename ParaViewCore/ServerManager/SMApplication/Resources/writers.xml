@@ -2025,14 +2025,21 @@
           <Property name="Input" with_property="Input" />
         </LinkProperties>
       </SubProxy>
-      <StringVectorProperty name="Cinema Parameters"
-                            number_of_elements="1"
-                            default_values=""
-                            immediate_update="1">
+      <DoubleVectorProperty label="Cinema Parameters"
+                            name="Cinema Parameters"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1">
         <Documentation>A set of values to explore inside the cinema database. Empty means use only the default value from pipeline.
-        A comma separated list of values for a contour, slice or clip filter will cause the filter to iterate through the set.
+          The list of values for a contour, slice or clip filter will cause the filter to iterate through the set.
         </Documentation>
-      </StringVectorProperty>
+        <Hints>
+          <ShowComponentLabels>
+            <ComponentLabel component="0" label="Contour/Slice/Clip Values"/>
+          </ShowComponentLabels>
+        </Hints>
+      </DoubleVectorProperty>
       <SubProxy>
         <Proxy name="CatalystOptions"
                proxygroup="misc"

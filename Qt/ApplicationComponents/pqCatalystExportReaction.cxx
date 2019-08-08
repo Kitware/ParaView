@@ -185,14 +185,22 @@ void pqCatalystExportReaction::onTriggered()
     std::string filterName = formatS.substr(0, underP);
     filterName[0] = tolower(filterName[0]);
 
-    std::string track = vtkSMPropertyHelper(nextWriter, "Cinema Parameters").GetAsString(0);
-    if (track.size())
+    int nelems;
+    nelems = vtkSMPropertyHelper(nextWriter, "Cinema Parameters").GetNumberOfElements();
+    if (nelems > 0)
     {
       hasTrackSets = true;
       QString thisTrack = QString("'");
       thisTrack += QString(filterName.c_str());
       thisTrack += QString("':[");
-      thisTrack += QString(track.c_str());
+      std::stringstream track_cache;
+      for (int i = 0; i < nelems; ++i)
+      {
+        track_cache << vtkSMPropertyHelper(nextWriter, "Cinema Parameters").GetAsDouble(i);
+        track_cache << ", ";
+      }
+      thisTrack += QString(track_cache.str().c_str());
+      thisTrack.chop(1);
       thisTrack += QString("],");
       cinema_tracks += thisTrack;
     }
@@ -204,7 +212,6 @@ void pqCatalystExportReaction::onTriggered()
       theseArrays += QString(filterName.c_str());
       theseArrays += QString("':[");
       // TODO: there isn't an API to distinguish cell and point arrays or the same name
-      int nelems;
       nelems = vtkSMPropertyHelper(nextWriter, "CellDataArrays").GetNumberOfElements();
       for (int i = 0; i < nelems; ++i)
       {
