@@ -13,6 +13,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/particles/Level_0/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/3GQP.pdb}"
   "DATA{${paraview_test_data_directory_input}/Data/can-restarts/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/cloud_layers_1k.jpg}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphInput.vtp}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphTree.vtm}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphTree/,REGEX:.*}"
@@ -75,6 +76,9 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/multicomb_2.vts}"
   "DATA{${paraview_test_data_directory_input}/Data/non_convex_polygon.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/office.binary.vtk}"
+  "DATA{${paraview_test_data_directory_input}/Data/pbrSpheres.vtp}"
+  "DATA{${paraview_test_data_directory_input}/Data/pbrSpheresAlbedo.jpg}"
+  "DATA{${paraview_test_data_directory_input}/Data/pbrSpheresORM.jpg}"
   "DATA{${paraview_test_data_directory_input}/Data/pointSet.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/ParaView_Mark.png}"
   "DATA{${paraview_test_data_directory_input}/Data/ParaView_Logo.png}"
@@ -261,6 +265,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSet_Surface.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSetCollection_Slice.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSetCollection_Surface.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PBRSpheres.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PLYWriter.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PointGaussianScaleOpacityArrayA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PointGaussianScaleOpacityArrayA.png}"
@@ -758,6 +763,7 @@ list(APPEND TESTS_WITH_BASELINES
   OrderedGroupDatasets.xml
   OrthographicView.xml
   OutOfRangeColors.xml
+  PBRSpheres.xml
   PlotDataOverTime-NonDistributed.xml
   PlotEdges2.xml
   PlotEdges.xml

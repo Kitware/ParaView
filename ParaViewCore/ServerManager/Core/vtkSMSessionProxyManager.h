@@ -52,7 +52,7 @@
  *                                    and vtkSI + DoubleVectorProperty class by
  *                                    default.
  *         name="Center"           => Name of the property:
- *                                    Example usage: vtkPropertyHelper(proxy, "Center").Set(0,1,2)
+ *                                    Example usage: vtkSMPropertyHelper(proxy, "Center").Set(0,1,2)
  *         command="SetCenter"     => Real method name that will be called on
  *                                    vtkObject when the property is updated.
  *         number_of_elements="3"  => Size of the vector.

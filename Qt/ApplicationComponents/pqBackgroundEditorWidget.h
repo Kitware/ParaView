@@ -50,10 +50,16 @@ public:
   void setGradientBackground(bool gradientBackground);
   bool imageBackground() const;
   void setImageBackground(bool imageBackground);
+  bool skyboxBackground() const;
+  void setSkyboxBackground(bool skyboxBackground);
+  bool environmentLighting() const;
+  void setEnvironmentLighting(bool envLighting);
 
 signals:
   void gradientBackgroundChanged();
   void imageBackgroundChanged();
+  void skyboxBackgroundChanged();
+  void environmentLightingChanged();
 
 protected slots:
   void currentIndexChangedBackgroundType(int type);
@@ -71,6 +77,8 @@ private:
   Q_OBJECT
   Q_PROPERTY(bool gradientBackground READ gradientBackground WRITE setGradientBackground)
   Q_PROPERTY(bool imageBackground READ imageBackground WRITE setImageBackground)
+  Q_PROPERTY(bool skyboxBackground READ skyboxBackground WRITE setSkyboxBackground)
+  Q_PROPERTY(bool environmentLighting READ environmentLighting WRITE setEnvironmentLighting)
 
   class pqInternal;
   pqInternal* Internal;

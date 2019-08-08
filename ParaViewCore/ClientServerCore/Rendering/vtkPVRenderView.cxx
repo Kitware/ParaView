@@ -27,6 +27,7 @@
 #include "vtkCommunicator.h"
 #include "vtkCuller.h"
 #include "vtkDataRepresentation.h"
+#include "vtkEquirectangularToCubemapTexture.h"
 #include "vtkFXAAOptions.h"
 #include "vtkFloatArray.h"
 #include "vtkInformation.h"
@@ -83,6 +84,7 @@
 #include "vtkRenderer.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
+#include "vtkSkybox.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTextActor.h"
@@ -503,6 +505,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
   this->SynchronizedRenderers->Initialize(this->GetSession());
   this->SynchronizedRenderers->SetRenderer(this->RenderView->GetRenderer());
+
+  this->Skybox->SetTexture(this->CubeMap);
 }
 
 //----------------------------------------------------------------------------
@@ -2441,9 +2445,10 @@ void vtkPVRenderView::SetBackground2(double r, double g, double b)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetBackgroundTexture(vtkTexture* val)
+void vtkPVRenderView::SetBackgroundTexture(vtkTexture* texture)
 {
-  this->GetRenderer()->SetBackgroundTexture(val);
+  this->GetRenderer()->SetBackgroundTexture(texture);
+  this->UpdateSkybox();
 }
 
 //----------------------------------------------------------------------------
@@ -2456,6 +2461,39 @@ void vtkPVRenderView::SetGradientBackground(int val)
 void vtkPVRenderView::SetTexturedBackground(int val)
 {
   this->GetRenderer()->SetTexturedBackground(val ? true : false);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetSkyboxBackground(int val)
+{
+  this->NeedSkybox = val != 0;
+  this->UpdateSkybox();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::UpdateSkybox()
+{
+  // remove existing skybox
+  this->GetRenderer()->RemoveActor(this->Skybox);
+
+  vtkTexture* texture = this->GetRenderer()->GetBackgroundTexture();
+
+  if (this->NeedSkybox && texture != nullptr)
+  {
+    this->CubeMap->SetInputTexture(vtkOpenGLTexture::SafeDownCast(texture));
+    this->GetRenderer()->AddActor(this->Skybox);
+    this->GetRenderer()->SetEnvironmentCubeMap(this->CubeMap, true);
+  }
+  else
+  {
+    this->GetRenderer()->SetEnvironmentCubeMap(nullptr);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetUseEnvironmentLighting(bool val)
+{
+  this->GetRenderer()->SetUseImageBasedLighting(val);
 }
 
 //*****************************************************************
@@ -3407,5 +3445,15 @@ void vtkPVRenderView::SynchronizeMaximumIds(vtkIdType* maxPointId, vtkIdType* ma
 
     *maxPointId = static_cast<vtkIdType>(ptid);
     *maxCellId = static_cast<vtkIdType>(cellid);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetSkyboxResolution(int resolution)
+{
+  if (this->CubeMap->GetCubemapSize() != static_cast<unsigned int>(resolution))
+  {
+    this->CubeMap->SetCubemapSize(resolution);
+    this->Modified();
   }
 }

@@ -2,14 +2,6 @@
 <ui version="4.0">
  <class>BackgroundEditorWidget</class>
  <widget class="QWidget" name="BackgroundEditorWidget">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>231</width>
-    <height>135</height>
-   </rect>
-  </property>
   <property name="sizePolicy">
    <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
     <horstretch>0</horstretch>
@@ -32,6 +24,11 @@
      <item>
       <property name="text">
        <string>Image</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Skybox</string>
       </property>
      </item>
     </widget>
@@ -131,6 +128,13 @@
      <widget class="QWidget" name="page_3">
       <layout class="QVBoxLayout" name="page3Layout">
        <item>
+        <widget class="QCheckBox" name="EnvLighting">
+         <property name="text">
+          <string>Use As Environment Lighting</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -158,11 +162,6 @@
    <extends>QToolButton</extends>
    <header>pqColorChooserButtonWithPalettes.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>pqTextureComboBox</class>
-   <extends>QComboBox</extends>
-   <header>pqTextureComboBox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

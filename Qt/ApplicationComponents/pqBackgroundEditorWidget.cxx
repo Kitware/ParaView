@@ -50,21 +50,17 @@ const char* COLOR_PROPERTY = "Background";
 const char* COLOR2_PROPERTY = "Background2";
 const char* GRADIENT_BACKGROUND_PROPERTY = "UseGradientBackground";
 const char* IMAGE_BACKGROUND_PROPERTY = "UseTexturedBackground";
+const char* SKYBOX_BACKGROUND_PROPERTY = "UseSkyboxBackground";
 const char* IMAGE_PROPERTY = "BackgroundTexture";
+const char* ENV_LIGHTING_PROPERTY = "UseEnvironmentLighting";
 
 enum BackgroundType
 {
   SINGLE_COLOR_TYPE,
   GRADIENT_TYPE,
   IMAGE_TYPE,
+  SKYBOX_TYPE,
   TYPE_COUNT
-};
-
-enum BackgroundTypeEncoding
-{
-  GRADIENT_TYPE_ENCODING,
-  IMAGE_TYPE_ENCODING,
-  TYPE_ENCODING_COUNT
 };
 
 class pqBackgroundEditorWidget::pqInternal : public Ui::BackgroundEditorWidget
@@ -121,6 +117,31 @@ pqBackgroundEditorWidget::pqBackgroundEditorWidget(
   {
     ui.BackgroundType->hide();
   }
+
+  smProperty = smGroup->GetProperty(SKYBOX_BACKGROUND_PROPERTY);
+  if (smProperty)
+  {
+    this->addPropertyLink(this, "skyboxBackground", SIGNAL(skyboxBackgroundChanged()), smProperty);
+  }
+  else
+  {
+    ui.BackgroundType->hide();
+  }
+
+  smProperty = smGroup->GetProperty(ENV_LIGHTING_PROPERTY);
+  if (smProperty)
+  {
+    this->addPropertyLink(
+      this, "environmentLighting", SIGNAL(environmentLightingChanged()), smProperty);
+  }
+  else
+  {
+    ui.BackgroundType->hide();
+  }
+
+  QObject::connect(this->Internal->EnvLighting, SIGNAL(stateChanged(int)), this,
+    SIGNAL(environmentLightingChanged()));
+
   currentIndexChangedBackgroundType(this->Internal->PreviousType);
 
   smProperty = smGroup->GetProperty(IMAGE_PROPERTY);
@@ -145,15 +166,16 @@ pqBackgroundEditorWidget::~pqBackgroundEditorWidget()
 
 void pqBackgroundEditorWidget::currentIndexChangedBackgroundType(int type)
 {
-  const int ROWS = 3;
+  const int ROWS = 4;
   const int COLS = 2;
   Ui::BackgroundEditorWidget& ui = *this->Internal;
-  const char* colorButtonName[TYPE_COUNT] = { "Color", "Color 1", "Color" };
-  int currentPage[TYPE_COUNT] = { 0, 0, 1 };
-  bool visibleControls[TYPE_COUNT][ROWS] = { { true, false, false }, { true, true, false },
-    { false, false, true } };
+  const char* colorButtonName[TYPE_COUNT] = { "Color", "Color 1", "Color", "Color" };
+  int currentPage[TYPE_COUNT] = { 0, 0, 1, 1 };
+  bool visibleControls[TYPE_COUNT][ROWS] = { { true, false, false, false },
+    { true, true, false, false }, { false, false, true, false }, { false, false, true, true } };
   QWidget* controls[ROWS][COLS] = { { ui.Color, ui.RestoreDefaultColor },
-    { ui.Color2, ui.RestoreDefaultColor2 }, { this->Internal->TextureSelector, 0 } };
+    { ui.Color2, ui.RestoreDefaultColor2 }, { this->Internal->TextureSelector, nullptr },
+    { ui.EnvLighting, nullptr } };
   for (int i = 0; i < ROWS; ++i)
   {
     for (int j = 0; j < COLS; ++j)
@@ -179,8 +201,8 @@ bool pqBackgroundEditorWidget::gradientBackground() const
 void pqBackgroundEditorWidget::setGradientBackground(bool gradientValue)
 {
   enum BackgroundType typeFunction[TYPE_COUNT][2] = { { SINGLE_COLOR_TYPE, GRADIENT_TYPE },
-    { SINGLE_COLOR_TYPE, GRADIENT_TYPE },
-    { IMAGE_TYPE, GRADIENT_TYPE } }; // gradient has precendece over image
+    { SINGLE_COLOR_TYPE, GRADIENT_TYPE }, { IMAGE_TYPE, GRADIENT_TYPE },
+    { SKYBOX_TYPE, GRADIENT_TYPE } };
   int newType = typeFunction[this->Internal->PreviousType][gradientValue];
   fireGradientAndImageChanged(this->Internal->PreviousType, newType);
   this->Internal->BackgroundType->setCurrentIndex(newType);
@@ -194,26 +216,55 @@ bool pqBackgroundEditorWidget::imageBackground() const
 void pqBackgroundEditorWidget::setImageBackground(bool imageValue)
 {
   enum BackgroundType typeFunction[TYPE_COUNT][2] = { { SINGLE_COLOR_TYPE, IMAGE_TYPE },
-    { GRADIENT_TYPE, GRADIENT_TYPE }, // gradient has precendece over image
-    { SINGLE_COLOR_TYPE, IMAGE_TYPE } };
+    { GRADIENT_TYPE, GRADIENT_TYPE }, // gradient has precedence over image
+    { SINGLE_COLOR_TYPE, IMAGE_TYPE }, { SKYBOX_TYPE, IMAGE_TYPE } };
   enum BackgroundType newType = typeFunction[this->Internal->PreviousType][imageValue];
   fireGradientAndImageChanged(this->Internal->PreviousType, newType);
   this->Internal->BackgroundType->setCurrentIndex(newType);
 }
 
+bool pqBackgroundEditorWidget::skyboxBackground() const
+{
+  return this->Internal->BackgroundType->currentIndex() == SKYBOX_TYPE;
+}
+
+void pqBackgroundEditorWidget::setSkyboxBackground(bool skyboxValue)
+{
+  enum BackgroundType typeFunction[TYPE_COUNT][2] = { { SINGLE_COLOR_TYPE, SKYBOX_TYPE },
+    { GRADIENT_TYPE, GRADIENT_TYPE }, // gradient has precedence over skybox
+    { IMAGE_TYPE, IMAGE_TYPE },       // image has precedence over skybox
+    { SINGLE_COLOR_TYPE, SKYBOX_TYPE } };
+  enum BackgroundType newType = typeFunction[this->Internal->PreviousType][skyboxValue];
+  fireGradientAndImageChanged(this->Internal->PreviousType, newType);
+  this->Internal->BackgroundType->setCurrentIndex(newType);
+}
+
+bool pqBackgroundEditorWidget::environmentLighting() const
+{
+  return this->Internal->EnvLighting->isChecked();
+}
+
+void pqBackgroundEditorWidget::setEnvironmentLighting(bool envValue)
+{
+  this->Internal->EnvLighting->setChecked(envValue);
+}
+
 void pqBackgroundEditorWidget::fireGradientAndImageChanged(int oldType, int newType)
 {
-  bool gradientChanged[TYPE_COUNT][TYPE_COUNT] = { { false, true, false }, { true, false, true },
-    { false, true, false } };
-  bool imageChanged[TYPE_COUNT][TYPE_COUNT] = { { false, false, true }, { false, false, true },
-    { true, true, false } };
-  if (gradientChanged[oldType][newType])
+  if (oldType != newType)
   {
-    emit gradientBackgroundChanged();
-  }
-  if (imageChanged[oldType][newType])
-  {
-    emit imageBackgroundChanged();
+    if (oldType == GRADIENT_TYPE || newType == GRADIENT_TYPE)
+    {
+      emit gradientBackgroundChanged();
+    }
+    if (oldType == IMAGE_TYPE || newType == IMAGE_TYPE)
+    {
+      emit imageBackgroundChanged();
+    }
+    if (oldType == SKYBOX_TYPE || newType == SKYBOX_TYPE)
+    {
+      emit skyboxBackgroundChanged();
+    }
   }
 }
 

@@ -853,6 +853,80 @@ void vtkGeometryRepresentation::SetRenderLinesAsTubes(bool val)
 }
 
 //----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetRoughness(double val)
+{
+  this->Property->SetRoughness(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetMetallic(double val)
+{
+  this->Property->SetMetallic(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetBaseColorTexture(vtkTexture* tex)
+{
+  if (tex)
+  {
+    tex->UseSRGBColorSpaceOn();
+    tex->InterpolateOn();
+  }
+  this->Property->SetBaseColorTexture(tex);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetMaterialTexture(vtkTexture* tex)
+{
+  if (tex)
+  {
+    tex->UseSRGBColorSpaceOff();
+    tex->InterpolateOn();
+  }
+  this->Property->SetORMTexture(tex);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetNormalTexture(vtkTexture* tex)
+{
+  if (tex)
+  {
+    tex->UseSRGBColorSpaceOff();
+    tex->InterpolateOn();
+  }
+  this->Property->SetNormalTexture(tex);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetEmissiveTexture(vtkTexture* tex)
+{
+  if (tex)
+  {
+    tex->UseSRGBColorSpaceOn();
+    tex->InterpolateOn();
+  }
+  this->Property->SetEmissiveTexture(tex);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetNormalScale(double val)
+{
+  this->Property->SetNormalScale(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetOcclusionStrength(double val)
+{
+  this->Property->SetOcclusionStrength(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetEmissiveFactor(double rval, double gval, double bval)
+{
+  this->Property->SetEmissiveFactor(rval, gval, bval);
+}
+
+//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetPointSize(double val)
 {
   this->Property->SetPointSize(val);
@@ -930,6 +1004,19 @@ void vtkGeometryRepresentation::SetUserTransform(const double matrix[16])
   vtkNew<vtkTransform> transform;
   transform->SetMatrix(matrix);
   this->Actor->SetUserTransform(transform.GetPointer());
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetFlipTextures(bool flip)
+{
+  vtkInformation* info = this->Actor->GetPropertyKeys();
+  info->Remove(vtkProp::GeneralTextureTransform());
+  if (flip)
+  {
+    double mat[] = { 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+    info->Set(vtkProp::GeneralTextureTransform(), mat, 16);
+  }
+  this->Actor->Modified();
 }
 
 //----------------------------------------------------------------------------
