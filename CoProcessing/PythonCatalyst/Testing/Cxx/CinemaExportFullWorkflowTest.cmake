@@ -63,7 +63,7 @@ if("${TEST_NAME}" STREQUAL "ExportNow" )
   #is handy
   set(rv 0)
 elseif("${TEST_NAME}" MATCHES "CinemaExport" )
-  if("${TEST_NAME}" MATCHES "NoTimesteps" )
+  if("${TEST_NAME}" MATCHES "NoTimesteps" OR "${TEST_NAME}" MATCHES "FloatFiles")
     file(READ "${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}" batch_script_data)
     string(REGEX REPLACE "'cube.vtu'" "'input'" batch_script_data "${batch_script_data}")
     file(WRITE "${COPROCESSING_TEST_DIR}/${CINEMA_BATCH_SCRIPT}" "${batch_script_data}")
@@ -153,6 +153,18 @@ if("${TEST_NAME}" MATCHES "CinemaExportNoTime" OR "${TEST_NAME}" MATCHES "Cinema
   # There is an extra cinema directory for the batch use-case
   if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/batch/${TEST_NAME}.cdb/cinema/RenderView1/info.json")
     message(FATAL_ERROR "Image database did not export during batch (RenderView*)")
+  endif()
+  return()
+endif()
+
+if("${TEST_NAME}" MATCHES "CinemaExportFloatFiles")
+  if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/interactive/${TEST_NAME}.cdb/RenderView1/time=0/vis=0/colorcube.vtu=0.Z") 
+    message(FATAL_ERROR "Float files did not export interactively (*.Z)")
+  endif()
+  # There is an extra cinema directory for the batch use-case
+  # colorinput instead of colorcube.vtu because of the way filedriver.py works
+  if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/batch/${TEST_NAME}.cdb/cinema/RenderView1/time=0/vis=0/colorinput=0.Z") 
+    message(FATAL_ERROR "Float files did not export during batch (*.Z)")
   endif()
   return()
 endif()
