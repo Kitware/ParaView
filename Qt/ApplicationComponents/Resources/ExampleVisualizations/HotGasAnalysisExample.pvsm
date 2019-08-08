@@ -12179,7 +12179,7 @@
         <Domain name="range" id="43669.CacheKey.range"/>
       </Property>
       <Property name="ChartTitle" id="43669.ChartTitle" number_of_elements="1">
-        <Element index="0" value="Tempurature and Pressure changes in a gas"/>
+        <Element index="0" value="Temperature and Pressure changes in a gas"/>
       </Property>
       <Property name="ChartTitleAlignment" id="43669.ChartTitleAlignment" number_of_elements="1">
         <Element index="0" value="1"/>
