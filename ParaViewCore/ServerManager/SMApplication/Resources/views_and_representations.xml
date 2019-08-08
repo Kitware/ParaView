@@ -3988,7 +3988,7 @@
           <ProxyEditorPropertyWidget property="GridAxesVisibility" />
         </Hints>
       </ProxyProperty>
-      <SubProxy>
+      <SubProxy command="SetSelectionRepresentation">
         <Proxy name="SelectionRepresentation"
                proxygroup="representations"
                proxyname="SelectionRepresentation" />
