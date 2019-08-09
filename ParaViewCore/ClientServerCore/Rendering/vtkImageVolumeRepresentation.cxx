@@ -343,6 +343,16 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
   // this is necessary since volume mappers don't like empty arrays.
   this->Actor->SetVisibility(colorArrayName != NULL && colorArrayName[0] != 0);
 
+  if (this->VolumeMapper->GetCropping())
+  {
+    double planes[6];
+    for (int i = 0; i < 6; i++)
+    {
+      planes[i] = this->CroppingOrigin[i / 2] + this->DataBounds[i] * this->CroppingScale[i / 2];
+    }
+    this->VolumeMapper->SetCroppingRegionPlanes(planes);
+  }
+
   if (this->Property)
   {
     if (this->MapScalars)
@@ -382,6 +392,10 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
 void vtkImageVolumeRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Cropping Origin: " << this->CroppingOrigin[0] << ", " << this->CroppingOrigin[1]
+     << ", " << this->CroppingOrigin[2] << endl;
+  os << indent << "Cropping Scale: " << this->CroppingScale[0] << ", " << this->CroppingScale[1]
+     << ", " << this->CroppingScale[2] << endl;
 }
 
 //***************************************************************************
@@ -507,6 +521,12 @@ void vtkImageVolumeRepresentation::SetShowIsosurfaces(int show)
 {
   this->VolumeMapper->SetBlendMode(
     show ? vtkVolumeMapper::ISOSURFACE_BLEND : vtkVolumeMapper::COMPOSITE_BLEND);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetCropping(int crop)
+{
+  this->VolumeMapper->SetCropping(crop != 0);
 }
 
 //----------------------------------------------------------------------------
