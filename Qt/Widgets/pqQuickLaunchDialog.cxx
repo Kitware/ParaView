@@ -174,7 +174,7 @@ void pqQuickLaunchDialog::addActions(const QList<QAction*>& actns)
   {
     if (!action->menu())
     {
-      QListWidgetItem item(action->icon(), action->text());
+      QListWidgetItem item(action->icon(), action->text().remove('&'));
       item.setData(Qt::UserRole, action->objectName());
       this->Internal->Items[action->text()] = item;
       this->Internal->Actions[action->objectName()] = action;
