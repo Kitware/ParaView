@@ -203,10 +203,13 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridAxisCut.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridAxisReflection.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridCellCenters.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridContour.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridDepthLimiter.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridPlaneCutter.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridThreshold-DepthOne.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridThreshold-DepthTwo.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridThreshold.png}"
+  # Unused test images
+  #"DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridThreshold-DepthOne.png}"
+  #"DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridThreshold-DepthTwo.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ImportCinema.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ImportCinemaSpecA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/IndexedLookupInitialization.png}"
@@ -454,10 +457,12 @@ SET (TESTS_WITH_INLINE_COMPARES
   FileSeries.xml
   #HyperTreeGridAxisClip.xml
   #HyperTreeGridAxisCut.xml
-  #HyperTreeGridAxisReflection.xml
-  #HyperTreeGridCellCenters.xml
-  #HyperTreeGridContour.xml
+  HyperTreeGridAxisReflection.xml
+  HyperTreeGridCellCenters.xml
+  HyperTreeGridContour.xml
+  HyperTreeGridDepthLimiter.xml
   #HyperTreeGridPlaneCutter.xml
+  HyperTreeGridThreshold.xml
   LightAddRemove.xml
   LineChartSelection.xml
   LoadStateMultiView.xml
@@ -488,17 +493,6 @@ SET (TESTS_WITH_INLINE_COMPARES
   XYHistogram.xml
 )
 
-# These tests do not work in parallel due to issues with
-# partitioned vtkHyperTreeGrids. When those issues are fixed
-# these tests should be enabled in parallel again by adding
-# them back to TESTS_WITH_INLINE_COMPARES
-SET (HTG_TESTS_WITH_INLINE_COMPARES
-  HyperTreeGridDepthLimiter.xml
-  HyperTreeGridThreshold.xml
-)
-paraview_add_client_tests(
-  TEST_SCRIPTS ${HTG_TESTS_WITH_INLINE_COMPARES}
-)
 
 if(NOT APPLE)
   # Workaround to avoid testing failures on high-res Retina displays on Macs
