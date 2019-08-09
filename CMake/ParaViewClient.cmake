@@ -362,9 +362,10 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
 
   if (APPLE)
     if (DEFINED _paraview_client_BUNDLE_ICON)
+      get_filename_component(_paraview_client_bundle_icon_file "${_paraview_client_BUNDLE_ICON}" NAME)
       set_property(TARGET "${_paraview_client_NAME}"
         PROPERTY
-          MACOSX_BUNDLE_ICON_FILE "${_paraview_client_BUNDLE_ICON}")
+          MACOSX_BUNDLE_ICON_FILE "${_paraview_client_bundle_icon_file}")
       install(
         FILES       "${_paraview_client_BUNDLE_ICON}"
         DESTINATION "${_paraview_client_BUNDLE_DESTINATION}/${_paraview_client_APPLICATION_NAME}.app/Contents/Resources")
