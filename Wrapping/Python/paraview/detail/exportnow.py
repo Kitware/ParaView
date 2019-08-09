@@ -270,6 +270,9 @@ def ExportNow(root_directory,
         ssp = ed.GetNextScreenshotProxy()
         viewcnt = 0
         while ssp:
+            if not ssp.HasAnnotation("enabled") or not (ssp.GetAnnotation("enabled") is '1'):
+                ssp= ed.GetNextScreenshotProxy()
+                continue
             freq = ssp.GetProperty("WriteFrequency").GetElement(0)
             if tstep % freq==0:
                 fname = ssp.GetProperty("CatalystFilePattern").GetElement(0)
