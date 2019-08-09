@@ -116,22 +116,13 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, const char* hint, bo
   const std::string exe_dir = pm->GetSelfDir();
 
   std::vector<std::string> prefixes = {
-#if BUILD_SHARED_LIBS
-    std::string("paraview-" PARAVIEW_VERSION "/plugins/") + plugin,
-    std::string("paraview-" PARAVIEW_VERSION "/plugins/"),
-#else
-    // for static builds, we need to add "lib"
-    std::string("lib/paraview-" PARAVIEW_VERSION "/plugins/") + plugin,
-    std::string("lib/paraview-" PARAVIEW_VERSION "/plugins/"),
-#endif
+    std::string(PARAVIEW_RELATIVE_LIBPATH "/" PARAVIEW_SUBDIR "/") + plugin,
+    std::string(PARAVIEW_RELATIVE_LIBPATH "/" PARAVIEW_SUBDIR "/"),
 
+// .app bundles
 #if defined(__APPLE__)
-    // needed for Apps
-    std::string("Plugins/") + plugin,
-    std::string("Plugins/"),
-#elif defined(_WIN32)
-    std::string("plugins/") + plugin,
-    std::string("plugins/"),
+    std::string("../Plugins/") + plugin,
+    std::string("../Plugins/"),
 #endif
     std::string()
   };
