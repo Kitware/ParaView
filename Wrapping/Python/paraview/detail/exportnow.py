@@ -201,6 +201,7 @@ def ExportNow(root_directory,
     # export loop
     for tstep in timesteps:
         padded_tstep = str(tstep).rjust(file_name_padding, '0')
+        helpers = []
 
         # loop through the configured writers and export at the requested times
         ed.InitNextWriterProxy()
@@ -230,9 +231,11 @@ def ExportNow(root_directory,
                         point_arrays = [' ']
                     if not cell_arrays:
                         cell_arrays = [' ']
+                    # create a temporary array culling filter
                     pass_arrays = PassArrays(Input=inputproxy, \
                         PointDataArrays=point_arrays, CellDataArrays=cell_arrays)
                     inputproxy = pass_arrays
+                    helpers.append(inputproxy)
                 fname = wp.GetProperty("CatalystFilePattern").GetElement(0)
                 if wp.GetXMLName() == "ExodusIIWriter":
                     fnamefilled = root_directory+fname+padded_tstep
@@ -259,8 +262,6 @@ def ExportNow(root_directory,
                 SaveData(fnamefilled, inputproxy, DataMode=DataMode, HeaderType=HeaderType, EncodeAppendedData=EncodeAppendedData, CompressorType=CompressorType, CompressionLevel=CompressionLevel)
                 # don't forget to tell cinema D about it
                 CIND.AppendToCinemaDTable(tnow, "writer_%s" % writercnt, fnamefilled)
-                if wp.GetProperty("ChooseArraysToWrite").GetElement(0) == 1:
-                    Delete(inputproxy)
             wp = ed.GetNextWriterProxy()
             writercnt = writercnt + 1
 
@@ -292,6 +293,10 @@ def ExportNow(root_directory,
         tstep = tstep + 1
         s.GoToNext()
         tnow = s.AnimationTime
+
+        # destroy array culling filters
+        for x in helpers:
+          Delete(x)
 
     # defer actual cinema D output until the end because we only know now what the full set of cinema D columns actually are
     CIND.Finalize()
