@@ -28,6 +28,11 @@
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterFormat" command="activated" arguments="XMLMultiBlockDataWriter" />
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterExtract" command="set_boolean" arguments="true" />
 
+  <!-- skip timesteps to make test faster and exercise the feature-->
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterConfigure" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/SaveDataDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/WriteFrequency/LineEdit0" command="set_string" arguments="10" />
+  <pqevent object="pqClientMainWindow/SaveDataDialog/widget/OKButton" command="activate" arguments="" />
+
   <!-- set root directory for interactive export -->
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/scrollArea_2/qt_scrollarea_viewport/container/1pqProxyWidget0/RootDirectory/FileChooser/FileLineEdit" command="set_string" arguments="$PARAVIEW_TEST_ROOT/cinema/interactive/CinemaExportGeometry.cdb" />
 
