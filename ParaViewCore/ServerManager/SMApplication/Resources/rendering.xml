@@ -650,12 +650,12 @@
                             default_values="30.0"
                             name="ConeAngle"
                             number_of_elements="1">
-        <DoubleRangeDomain max="180.0"
+        <DoubleRangeDomain max="90.0"
                            min="0.0"
                            name="range" />
         <Documentation>
         For a **Positional** light, limit the light to a cone around its direction, creating a "spot-light" effect.
-        Set to 180 to light all directions. In degrees.
+        Set to 90 to light all directions. In degrees.
         </Documentation>
         <Hints>
           <!-- display when light type is not Ambient, and when Positional -->
@@ -691,6 +691,13 @@
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
         </Hints>
       </DoubleVectorProperty>
+      <PropertyGroup panel_widget="InteractiveLight">
+        <Property function="Positional" name="Positional" />
+        <Property function="WorldPosition" name="LightPosition" />
+        <Property function="FocalPoint" name="FocalPoint" />
+        <Property function="ConeAngle" name="ConeAngle" />
+        <Property function="LightColor" name="DiffuseColor" />
+      </PropertyGroup>
     </LightProxy>
     <!-- End of additional_lights -->
   </ProxyGroup>

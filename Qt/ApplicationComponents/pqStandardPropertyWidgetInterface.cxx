@@ -62,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqInputDataTypeDecorator.h"
 #include "pqInputSelectorWidget.h"
 #include "pqIntMaskPropertyWidget.h"
+#include "pqLightPropertyWidget.h"
 #include "pqLinePropertyWidget.h"
 #include "pqListPropertyWidget.h"
 #include "pqMoleculePropertyWidget.h"
@@ -292,6 +293,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   else if (panelWidget == "InteractiveCylinder")
   {
     return new pqCylinderPropertyWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "InteractiveLight")
+  {
+    return new pqLightPropertyWidget(proxy, group, parentWidget);
   }
   else if (panelWidget == "cinema_export_selector")
   {

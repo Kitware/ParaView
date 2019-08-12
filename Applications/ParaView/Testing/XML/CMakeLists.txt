@@ -216,6 +216,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/IndexedLookupInitialization_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LightAddRemove1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LightAddRemove2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LightWidget.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LineChartSelection1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LineChartSelection1_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LineChartSelection2.png}"
@@ -736,6 +737,7 @@ list(APPEND TESTS_WITH_BASELINES
   InteractiveViewLinkOffscreen.xml
   InteractiveViewLinkOnscreen.xml
   InteractiveViewLinkState.xml
+  LightWidget.xml
   LinesAsTubes.xml
   LoadPartiallyUpdatedStateFiles.xml
   LoadSaveStateAnimation.xml

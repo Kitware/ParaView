@@ -652,7 +652,7 @@ void AddLightActors(vtkRenderer* r)
   while (l != 0)
   {
     double angle = l->GetConeAngle();
-    if (l->LightTypeIsSceneLight() && l->GetPositional() && angle < 180.0) // spotlight
+    if (l->LightTypeIsSceneLight() && l->GetPositional() && angle < 90.0) // spotlight
     {
       vtkLightActor* la = vtkLightActor::New();
       la->SetLight(l);

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LightPropertyWidget</class>
+ <widget class="QWidget" name="LightPropertyWidget">
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0" colspan="2">
+    <widget class="QCheckBox" name="show3DWidget">
+     <property name="text">
+      <string>Show Light</string>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="positionalLabel">
+     <property name="text">
+      <string>Type</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="3">
+    <widget class="QComboBox" name="positionalComboBox"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="lightPositionLabel">
+     <property name="text">
+      <string>Light Position</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="pqDoubleLineEdit" name="worldPositionX"/>
+   </item>
+   <item row="2" column="2">
+    <widget class="pqDoubleLineEdit" name="worldPositionY"/>
+   </item>
+   <item row="2" column="3">
+    <widget class="pqDoubleLineEdit" name="worldPositionZ"/>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="focalPointLabel">
+     <property name="text">
+      <string>FocalPoint</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="pqDoubleLineEdit" name="focalPointX"/>
+   </item>
+   <item row="3" column="2">
+    <widget class="pqDoubleLineEdit" name="focalPointY"/>
+   </item>
+   <item row="3" column="3">
+    <widget class="pqDoubleLineEdit" name="focalPointZ"/>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="coneAngleLabel">
+     <property name="text">
+      <string>ConeAngle</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" colspan="3">
+    <widget class="pqDoubleRangeWidget" name="coneAngle"/>
+   </item>
+   <item row="5" column="0" colspan="4">
+    <widget class="pqColorChooserButton" name="colorButton"/>
+   </item>
+
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqDoubleLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqDoubleLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqDoubleRangeWidget</class>
+   <extends>QWidget</extends>
+   <header>pqDoubleRangeWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqColorChooserButton</class>
+   <extends>QWidget</extends>
+   <header>pqColorChooserButton.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
