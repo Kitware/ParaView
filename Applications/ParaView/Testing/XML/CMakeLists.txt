@@ -467,8 +467,8 @@ SET (TESTS_WITH_INLINE_COMPARES
   HyperTreeGridCellCenters.xml
   HyperTreeGridContour.xml
   HyperTreeGridDepthLimiter.xml
-  #HyperTreeGridPlaneCutter.xml
-  #HyperTreeGridThreshold.xml
+  HyperTreeGridPlaneCutter.xml
+  HyperTreeGridThreshold.xml
   LightAddRemove.xml
   LineChartSelection.xml
   LoadStateMultiView.xml
