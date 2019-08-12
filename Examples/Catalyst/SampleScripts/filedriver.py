@@ -88,7 +88,7 @@ if rank == 0:
 if hasattr(reader, "TimestepValues"):
     timesteps = reader.TimestepValues
     if not timesteps:
-	timesteps = [0]
+        timesteps = [0]
 else:
     timesteps = [0]
 

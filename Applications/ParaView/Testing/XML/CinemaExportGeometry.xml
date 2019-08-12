@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- load state -->
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileLoadServerState" />
+  <pqevent object="pqClientMainWindow/FileLoadServerStateDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/time_source.pvsm" />
+  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/LoadStateDataFileOptions/ComboBox" command="activated" arguments="Search files under specified directory" />
+  <pqevent object="LoadStateOptionsDialog/widget/OKButton" command="activate" arguments="$PARAVIEW_TEST_ROOT" />
+
+  <!-- select element in pipeline browser -->
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,50,11,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,50,11,/0:0/0:0" />
+
+  <!-- turn off the scalar bar -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/ColorEditor/ShowScalarBar" command="set_boolean" arguments="false" />
+
+  <!-- activate catalyst export window -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionCatalystConfigure" />
+
+  <!-- export spec d table -->
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/advanced" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/scrollArea_2/qt_scrollarea_viewport/container/1pqProxyWidget0/SaveDTable/CheckBox" command="set_boolean" arguments="true" />
+
+  <!-- export specific arrays -->
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/scrollArea_2/qt_scrollarea_viewport/container/1pqProxyWidget0/RequestSpecificArrays/CheckBox" command="set_boolean" arguments="true" />
+
+  <!-- export geometry -->
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterFormat" command="activated" arguments="XMLMultiBlockDataWriter" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterExtract" command="set_boolean" arguments="true" />
+
+  <!-- skip timesteps to make test faster and exercise the feature-->
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterConfigure" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/SaveDataDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/WriteFrequency/LineEdit0" command="set_string" arguments="10" />
+  <pqevent object="pqClientMainWindow/SaveDataDialog/widget/OKButton" command="activate" arguments="" />
+
+  <!-- set root directory for interactive export -->
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/scrollArea_2/qt_scrollarea_viewport/container/1pqProxyWidget0/RootDirectory/FileChooser/FileLineEdit" command="set_string" arguments="$PARAVIEW_TEST_ROOT/cinema/interactive/CinemaExportGeometry.cdb" />
+
+  <!-- export cinema database -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionExportImmediate" />
+
+  <!-- set root directory for batch export -->
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/scrollArea_2/qt_scrollarea_viewport/container/1pqProxyWidget0/RootDirectory/FileChooser/FileLineEdit" command="set_string" arguments="$PARAVIEW_TEST_ROOT/cinema/batch/CinemaExportGeometry.cdb" />
+
+  <!-- export catalyst script -->
+  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionExportCatalyst" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst/ExportCoprocessingStateFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/cinema/CinemaExportGeometry.py" />
+</pqevents>
