@@ -31,22 +31,6 @@
    <item row="0" column="0" colspan="7">
     <widget class="pqDisplayColorWidget" name="DisplayColorWidget" native="true"/>
    </item>
-   <item row="2" column="5">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::MinimumExpanding</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item row="1" column="0">
     <widget class="QPushButton" name="EditColorMap">
      <property name="toolTip">
