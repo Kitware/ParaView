@@ -314,3 +314,19 @@ true if the algorithm needs update.
 
 The `interval` attribute is optional (defaults to 100) and can be used to
 provide a refresh rate in milliseconds.
+
+ConnectToPortIndex
+--------------------------
+Connect to a specific port index.
+
+This is used to connect a representation to an output port of a filter
+other than the default (index = 0). Currently, this is only used to
+modify the input port for the selection representation subproxy in
+vtkSMPVRepresentationProxy.
+
+    <RepresentationProxy ...>
+      ...
+      <Hints>
+        <ConnectToPortIndex value="2" />
+      </Hints>
+    </RepresentationProxy>

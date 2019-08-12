@@ -122,7 +122,15 @@ void vtkSMPVRepresentationProxy::SetPropertyModifiedFlag(const char* name, int f
         }
         else
         {
-          vtkSMPropertyHelper(selectionRepr, "Input").Set(esProxy);
+          int port = 0;
+          if (vtkPVXMLElement* hints = selectionRepr->GetHints()
+              ? selectionRepr->GetHints()->FindNestedElementByName("ConnectToPortIndex")
+              : nullptr)
+          {
+            hints->GetScalarAttribute("value", &port);
+          }
+
+          vtkSMPropertyHelper(selectionRepr, "Input").Set(esProxy, port);
           selectionRepr->UpdateVTKObjects();
         }
       }
