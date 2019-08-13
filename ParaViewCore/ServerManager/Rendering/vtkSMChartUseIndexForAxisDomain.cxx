@@ -58,7 +58,7 @@ int vtkSMChartUseIndexForAxisDomain::SetDefaultValues(
     const char** known_names = vtkSMChartSeriesListDomain::GetKnownSeriesNames();
     for (int cc = 0; known_names[cc] != NULL && value != NULL; cc++)
     {
-      if (strcmp(known_names[cc], value) == 0)
+      if (strstr(value, known_names[cc]) != nullptr)
       {
         helper2.Set(0);
         return 1;
