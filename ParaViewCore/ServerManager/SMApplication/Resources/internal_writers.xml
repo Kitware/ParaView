@@ -463,8 +463,7 @@
       <!-- End of STLWriter -->
     </Proxy>
     <!-- ================================================================= -->
-    <Proxy base_proxygroup="internal_writers"
-           class="vtkCSVWriter"
+    <Proxy class="vtkCSVWriter"
            name="CSVWriter">
       <Documentation short_help="Writer to write CSV files">Writer to write comma or tab
       delimited files from a table. If the file extension is tsv it uses the tab character
@@ -520,6 +519,7 @@
         this flag on.</Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+
       <!-- End of CSVWriter -->
     </Proxy>
     <!-- ================================================================= -->
