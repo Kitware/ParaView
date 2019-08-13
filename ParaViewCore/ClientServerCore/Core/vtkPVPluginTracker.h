@@ -133,6 +133,7 @@ private:
   class vtkPluginsList;
   vtkPluginsList* PluginsList;
 
+  void LoadPluginConfigurationXMLConf(std::string const& exe_dir, std::string const& conf);
   void LoadPluginConfigurationXMLHinted(vtkPVXMLElement*, const char* hint, bool forceLoad);
 };
 

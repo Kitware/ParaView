@@ -270,22 +270,43 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLs(const char* appname)
   if (!exe_dir.empty())
   {
 #if defined(__APPLE__)
-    auto plugin_conf = exe_dir + "/../Resources/" + appname + ".conf";
-#else
-    auto plugin_conf = exe_dir + "/" + appname + ".conf";
-#endif
-    std::ifstream fin(plugin_conf.c_str());
-    std::string line;
-    // TODO: Replace with a JSON parser.
-    while (std::getline(fin, line))
+    // Try it as a bundle.
     {
-      if (!vtksys::SystemTools::FileIsFullPath(line))
+      auto conf = exe_dir + "/../Resources/" + appname + ".conf";
+      if (vtksys::SystemTools::FileExists(conf))
       {
-        line = exe_dir + "/" + line;
+        this->LoadPluginConfigurationXMLConf(exe_dir, conf);
+        return;
       }
-
-      this->LoadPluginConfigurationXML(line.c_str(), false);
     }
+#endif
+
+    // Load it from beside the executable.
+    {
+      auto conf = exe_dir + "/" + appname + ".conf";
+      if (vtksys::SystemTools::FileExists(conf))
+      {
+        this->LoadPluginConfigurationXMLConf(exe_dir, conf);
+        return;
+      }
+    }
+  }
+}
+
+void vtkPVPluginTracker::LoadPluginConfigurationXMLConf(
+  std::string const& exe_dir, std::string const& conf)
+{
+  std::ifstream fin(conf.c_str());
+  std::string line;
+  // TODO: Replace with a JSON parser.
+  while (std::getline(fin, line))
+  {
+    if (!vtksys::SystemTools::FileIsFullPath(line))
+    {
+      line = exe_dir + "/" + line;
+    }
+
+    this->LoadPluginConfigurationXML(line.c_str(), false);
   }
 }
 
