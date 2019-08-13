@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSelectionNode.h"
 #include <QWidget>
 
+class pqMultiQueryClauseWidget;
 class pqOutputPort;
 class vtkPVDataSetAttributesInformation;
 class vtkSMProxy;
@@ -90,30 +91,17 @@ public:
     LOCATION
   };
 
+  enum class DataSetType
+  {
+    STANDARD,
+    AMR,
+    MULTIBLOCK
+  };
+
 public:
-  pqQueryClauseWidget(QWidget* parent = 0, Qt::WindowFlags flags = 0);
+  pqQueryClauseWidget(
+    pqMultiQueryClauseWidget* multiQueryWidget, QWidget* parent = 0, Qt::WindowFlags flags = 0);
   ~pqQueryClauseWidget() override;
-
-  /**
-  * Set/Get the data producer.
-  */
-  void setProducer(pqOutputPort* p) { this->Producer = p; }
-  pqOutputPort* producer() const { return this->Producer; }
-
-  /**
-  * Set the attribute type. This determine what arrays are listed in the
-  * selection criteria.
-  * Valid values are from the enum vtkDataObject::AttributeTypes.
-  */
-  void setAttributeType(int attrType) { this->AttributeType = attrType; }
-  int attributeType() const { return this->AttributeType; }
-
-  /**
-  * Creates a new selection source proxy based on the query.
-  * Note that this does not register the proxy, it merely creates the
-  * selection source and returns it.
-  */
-  vtkSMProxy* newSelectionSource();
 
 public slots:
   /**
@@ -137,6 +125,32 @@ public slots:
   */
   void initialize(CriteriaTypes type_flags, bool qualifier_mode = false);
 
+  /**
+   * Updates the selection source proxy with the criteria in the clause.
+   */
+  void addSelectionQualifiers(vtkSMProxy*);
+
+  /**
+   * Set the Add button visibility.
+   */
+  void setAddButtonVisible(bool show);
+
+  /**
+   * Set the Remove button visibility.
+   */
+  void setRemoveButtonVisible(bool show);
+
+  /**
+   * Set the `And` label visibility.
+   */
+  void setAndLabelVisible(bool show);
+
+signals:
+
+  /**
+   * Emited when user ask for a new query.
+   */
+  void addQueryRequested();
 protected slots:
   /**
   * Based on the selection criteria, populate the options in the selection
@@ -151,25 +165,16 @@ protected slots:
   void updateValueWidget();
 
   /**
-  * Some query clauses under certain conditions require additional options
-  * from the user. These are managed using more instances of
-  * pqQueryClauseWidget internally. This method creates these new instances if
-  * needed.
-  */
-  void updateDependentClauseWidgets();
-
-  /**
   * Pops up a dialog showing the composite data structure for the data.
   */
   void showCompositeTree();
 
-protected:
   /**
-  * Returns the attribute info for the attribute chosen in the "Selection
-  * Type" combo box.
-  */
-  vtkPVDataSetAttributesInformation* getChosenAttributeInfo() const;
+   * Deletes this widget and notifies parent.
+   */
+  void deleteQuery();
 
+protected:
   /**
   * Based on the selection type and data information from the producer,
   * populate the "criteria" combo box.
@@ -177,21 +182,20 @@ protected:
   void populateSelectionCriteria(CriteriaTypes type = ANY);
 
   /**
-  * Returns the current criteria type.
-  */
+   * Returns the current criteria type.
+   */
   CriteriaType currentCriteriaType() const;
 
+  /**
+   * Returns the current condition type.
+   */
   ConditionMode currentConditionType() const;
 
-  /**
-  * Updates the selection source proxy with the criteria in the clause.
-  */
-  void addSelectionQualifiers(vtkSMProxy*);
-
-  pqOutputPort* Producer;
   int AttributeType;
   bool AsQualifier;
   QString LastQuery;
+
+  pqMultiQueryClauseWidget* MultiQueryWidget;
 
 private:
   Q_DISABLE_COPY(pqQueryClauseWidget)

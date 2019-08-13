@@ -34,10 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqMultiQueryClauseWidget.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqPropertiesPanel.h"
-#include "pqQueryClauseWidget.h"
 #include "pqSelectionManager.h"
 #include "vtkDataObject.h"
 #include "vtkPVDataInformation.h"

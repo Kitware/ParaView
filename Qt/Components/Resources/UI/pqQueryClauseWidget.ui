@@ -20,6 +20,13 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,1,0">
      <item>
+      <widget class="QLabel" name="andLabel">
+       <property name="text">
+        <string>And</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QComboBox" name="criteria">
        <property name="sizeAdjustPolicy">
         <enum>QComboBox::AdjustToContents</enum>
@@ -60,12 +67,6 @@
      </item>
      <item>
       <widget class="QStackedWidget" name="valueStackedWidget">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
        <property name="currentIndex">
         <number>5</number>
        </property>
@@ -193,14 +194,27 @@
        </widget>
       </widget>
      </item>
+     <item>
+      <widget class="QToolButton" name="addQuery">
+       <property name="text">
+        <string>+</string>
+       </property>
+       <property name="toolTip">
+        <string>Add query</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="removeQuery">
+       <property name="text">
+        <string>-</string>
+       </property>
+       <property name="toolTip">
+        <string>Remove query</string>
+       </property>
+      </widget>
+     </item>
     </layout>
-   </item>
-   <item>
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>
