@@ -109,6 +109,23 @@ public:
   // Forwarded to vtkSmartVolumeMapper.
   void SetRequestedRenderMode(int);
   void SetShowIsosurfaces(int);
+  void SetCropping(int);
+
+  //@{
+  /**
+   * Get/Set the cropping origin.
+   */
+  vtkSetVector3Macro(CroppingOrigin, double);
+  vtkGetVector3Macro(CroppingOrigin, double);
+  //@}
+
+  //@{
+  /**
+   * Get/Set the cropping scale.
+   */
+  vtkSetVector3Macro(CroppingScale, double);
+  vtkGetVector3Macro(CroppingScale, double);
+  //@}
 
   /**
    * Provides access to the actor used by this representation.
@@ -163,7 +180,6 @@ protected:
 
   vtkOutlineSource* OutlineSource;
   vtkPolyDataMapper* OutlineMapper;
-  ;
 
   unsigned long DataSize;
   double DataBounds[6];
@@ -177,6 +193,9 @@ protected:
 
   bool MapScalars;
   bool MultiComponentsMapping;
+
+  double CroppingOrigin[3] = { 0, 0, 0 };
+  double CroppingScale[3] = { 1, 1, 1 };
 
 private:
   vtkImageVolumeRepresentation(const vtkImageVolumeRepresentation&) = delete;

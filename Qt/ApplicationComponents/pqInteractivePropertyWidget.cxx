@@ -332,3 +332,16 @@ void pqInteractivePropertyWidget::handleUserEvent(
     this->setWidgetVisible(true);
   }
 }
+
+//-----------------------------------------------------------------------------
+void pqInteractivePropertyWidget::hideEvent(QHideEvent*)
+{
+  this->VisibleState = vtkSMPropertyHelper(this->widgetProxy(), "Visibility").GetAsInt() != 0;
+  this->setWidgetVisible(false);
+}
+
+//-----------------------------------------------------------------------------
+void pqInteractivePropertyWidget::showEvent(QShowEvent*)
+{
+  this->setWidgetVisible(this->VisibleState);
+}

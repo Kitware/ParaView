@@ -218,6 +218,7 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
     }
     wdgProxy->UpdateVTKObjects();
     emit this->changeAvailable();
+    this->placeWidget();
     this->render();
   });
 }

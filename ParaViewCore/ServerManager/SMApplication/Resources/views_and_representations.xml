@@ -4285,6 +4285,7 @@
                       panel_visibility="never" />
             <Property name="ShowIsosurfaces" />
             <Property name="IsosurfaceValues" />
+            <Property name="UseCropping" />
             <Hints>
               <PropertyWidgetDecorator type="CompositeDecorator">
                 <Expression type="or">
@@ -4300,7 +4301,35 @@
               </PropertyWidgetDecorator>
             </Hints>
           </PropertyGroup>
+          <PropertyGroup label="Cropping Parameters" panel_widget="InteractiveBox">
+            <Property function="Position" name="CroppingOrigin" />
+            <Property function="Scale" name="CroppingScale" />
+            <Property function="Input" name="DummyInput" />
+            <Hints>
+              <PropertyWidgetDecorator type="CompositeDecorator">
+                <Expression type="and">
+                  <Expression type="or">
+                    <PropertyWidgetDecorator type="GenericDecorator"
+                                             mode="visibility"
+                                             property="Representation"
+                                             value="Volume" />
+                    <PropertyWidgetDecorator type="GenericDecorator"
+                                             mode="visibility"
+                                             property="Representation"
+                                             value="NVIDIA IndeX" />
+                  </Expression>
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="UseCropping"
+                                           value="1" />
+                </Expression>
+              </PropertyWidgetDecorator>
+            </Hints>
+          </PropertyGroup>
         </ExposedProperties>
+        <LinkProperties>
+          <Property name="DummyInput" with_property="Input" />
+        </LinkProperties>
       </SubProxy>
       <SubProxy>
         <Proxy name="SliceRepresentation"
@@ -4667,6 +4696,36 @@
           <!-- enable this widget when ShowIsosurfaces==1 -->
         </Hints>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetCropping"
+                         default_values="0"
+                         name="UseCropping"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>This property specifies if the cropping is enabled.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetCroppingOrigin"
+                            name="CroppingOrigin"
+                            number_of_elements="3"
+                            argument_is_array="1"
+                            default_values="0 0 0">
+        <Documentation>This property specifies the cropping origin.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetCroppingScale"
+                            name="CroppingScale"
+                            number_of_elements="3"
+                            argument_is_array="1"
+                            default_values="1 1 1">
+        <Documentation>This property specifies the cropping scale.</Documentation>
+      </DoubleVectorProperty>
+      <InputProperty is_internal="1" name="DummyInput" />
+      <Hints>
+        <ProxyList>
+          <Link name="DummyInput"
+                with_property="Input" />
+        </ProxyList>
+      </Hints>
 
       <!-- end of UniformGridVolumeRepresentation -->
     </RepresentationProxy>
