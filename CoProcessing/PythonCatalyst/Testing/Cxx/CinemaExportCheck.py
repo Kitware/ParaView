@@ -40,8 +40,6 @@ args = parser.parse_args()
 
 
 
-result = 0
-
 print("----------------------------------------------------------")
 print("Running CinemaExportCheck")
 
@@ -54,9 +52,7 @@ if ((args.interactive != None) and (args.batch != None)):
     #   - Create a baseline data.csv that we know works and check against that?
 else:
     print("  ERROR: incorrect number of arguments")
-    result = 1
+    exit(1)
 
 print("Completed CinemaExportCheck")
 print("----------------------------------------------------------")
-
-exit(result)
