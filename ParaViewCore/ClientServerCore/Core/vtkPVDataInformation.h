@@ -134,7 +134,7 @@ public:
   vtkGetMacro(NumberOfEdges, vtkTypeInt64);
   vtkGetMacro(NumberOfLeaves, vtkTypeInt64);
   vtkGetMacro(MemorySize, int);
-  vtkGetMacro(PolygonCount, int);
+  vtkGetMacro(PolygonCount, vtkIdType);
   vtkGetMacro(NumberOfDataSets, int);
   vtkGetVector6Macro(Bounds, double);
   //@}
