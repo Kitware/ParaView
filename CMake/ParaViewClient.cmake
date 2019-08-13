@@ -374,59 +374,28 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
       ParaView::pqApplicationComponents
       VTK::vtksys)
 
-  set(_paraview_client_binary_destination
-    "${_paraview_client_RUNTIME_DESTINATION}")
-  set(_paraview_client_conf_destination
-    "${_paraview_client_binary_destination}")
-  if (APPLE)
-    set(_paraview_client_binary_destination
-      "${_paraview_client_RUNTIME_DESTINATION}/${_paraview_client_NAME}.app/Contents/Resources")
-    set(_paraview_client_conf_destination
-      "${_paraview_client_BUNDLE_DESTINATION}/${_paraview_client_NAME}.app/Contents/Resources")
-  endif ()
-
-  set(_paraview_client_plugin_xmls_file_name
-    "${_paraview_client_NAME}.conf")
-  set(_paraview_client_plugin_xmls_build_file
-    "${CMAKE_BINARY_DIR}/${_paraview_client_binary_destination}/${_paraview_client_plugin_xmls_file_name}")
-  set(_paraview_client_plugin_xmls_install_file
-    "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_paraview_client_plugin_xmls_file_name}.install")
-  set(_paraview_client_plugin_xmls_build_contents)
-  set(_paraview_client_plugin_xmls_install_contents)
   if (DEFINED _paraview_client_PLUGINS_TARGETS)
     target_link_libraries("${_paraview_client_NAME}"
       PRIVATE
         ${_paraview_client_PLUGINS_TARGETS})
 
-    foreach (_paraview_client_plugins_target IN LISTS _paraview_client_PLUGINS_TARGETS)
-      get_property(_paraview_client_plugins_target_is_alias
-        TARGET    "${_paraview_client_plugins_target}"
-        PROPERTY  ALIASED_TARGET
-        SET)
-      if (_paraview_client_plugins_target_is_alias)
-        get_property(_paraview_client_plugins_target_alias_target
-          TARGET    "${_paraview_client_plugins_target}"
-          PROPERTY  ALIASED_TARGET)
-        get_property(_paraview_client_plugins_target_xml_build
-          TARGET    "${_paraview_client_plugins_target_alias_target}"
-          PROPERTY  "INTERFACE_paraview_plugin_plugins_file")
-        get_property(_paraview_client_plugins_target_xml_install
-          TARGET    "${_paraview_client_plugins_target_alias_target}"
-          PROPERTY  "INTERFACE_paraview_plugin_plugins_file_install")
-      else ()
-        get_property(_paraview_client_plugins_target_xml_build
-          TARGET    "${_paraview_client_plugins_target}"
-          PROPERTY  "INTERFACE_paraview_plugin_plugins_file")
-        set(_paraview_client_plugins_target_xml_install
-          "${_paraview_client_plugins_target_xml_build}")
-      endif ()
+    set(_paraview_client_binary_destination
+      "${_paraview_client_RUNTIME_DESTINATION}")
+    set(_paraview_client_conf_destination
+      "${_paraview_client_binary_destination}")
+    if (APPLE)
+      set(_paraview_client_binary_destination
+        "${_paraview_client_RUNTIME_DESTINATION}/${_paraview_client_NAME}.app/Contents/Resources")
+      set(_paraview_client_conf_destination
+        "${_paraview_client_BUNDLE_DESTINATION}/${_paraview_client_NAME}.app/Contents/Resources")
+    endif ()
 
-      # TODO: Write out in JSON instead.
-      string(APPEND _paraview_client_plugin_xmls_build_contents
-        "${_paraview_client_plugins_target_xml_build}\n")
-      string(APPEND _paraview_client_plugin_xmls_install_contents
-        "${_paraview_client_plugins_target_xml_install}\n")
-    endforeach ()
+    paraview_plugin_write_conf(
+      NAME            "${_paraview_client_NAME}"
+      PLUGINS_TARGETS ${_paraview_client_PLUGINS_TARGETS}
+      BUILD_DESTINATION   "${_paraview_client_binary_destination}"
+      INSTALL_DESTINATION "${_paraview_client_conf_destination}"
+      COMPONENT "runtime")
   endif ()
 
   set(_paraview_client_export)
@@ -435,24 +404,12 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
       EXPORT "${_paraview_client_EXPORT}")
   endif ()
 
-  file(GENERATE
-    OUTPUT  "${_paraview_client_plugin_xmls_build_file}"
-    CONTENT "${_paraview_client_plugin_xmls_build_contents}")
-  file(GENERATE
-    OUTPUT  "${_paraview_client_plugin_xmls_install_file}"
-    CONTENT "${_paraview_client_plugin_xmls_install_contents}")
-
   install(
     TARGETS "${_paraview_client_NAME}"
     ${_paraview_client_export}
     ${_paraview_client_bundle_args}
     RUNTIME DESTINATION "${_paraview_client_RUNTIME_DESTINATION}"
     COMPONENT "runtime")
-  install(
-    FILES       "${_paraview_client_plugin_xmls_install_file}"
-    DESTINATION "${_paraview_client_conf_destination}"
-    RENAME      "${_paraview_client_plugin_xmls_file_name}"
-    COMPONENT   "runtime")
 
   if (APPLE)
     if (DEFINED _paraview_client_BUNDLE_ICON)

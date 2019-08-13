@@ -585,6 +585,121 @@ unset(_vtk_module_write_import_prefix)\n")
   endif ()
 endfunction ()
 
+#[==[.md
+## Plugin configuration files
+
+Applications will want to consume plugin targets by discovering their locations
+at runtime. In order to facilitate this, ParaView supports loading a `conf`
+file which contains the locations of plugin targets' XML files. The plugins
+specified in that file is then
+
+```
+paraview_plugin_write_conf(
+  NAME <name>
+  PLUGINS_TARGETS <target>...
+  BUILD_DESTINATION <destination>
+
+  [INSTALL_DESTINATION <destination>]
+  [COMPONENT <component>])
+```
+
+  * `NAME`: (Required) The base name of the configuration file.
+  * `PLUGINS_TARGETS`: (Required) The list of plugin targets to add to the
+    configuration file.
+  * `BUILD_DESTINATION`: (Required) Where to place the configuration file in
+    the build tree.
+  * `INSTALL_DESTINATION`: Where to install the configuration file in the
+    install tree. If not provided, the configuration file will not be
+    installed.
+  * `COMPONENT`: (Defaults to `runtime`) The component to use when installing
+    the configuration file.
+#]==]
+function (paraview_plugin_write_conf)
+  cmake_parse_arguments(_paraview_plugin_conf
+    ""
+    "NAME;BUILD_DESTINATION;INSTALL_DESTINATION;COMPONENT"
+    "PLUGINS_TARGETS"
+    ${ARGN})
+
+  if (_paraview_plugin_conf_UNPARSED_ARGUMENTS)
+    message(FATAL_ERROR
+      "Unparsed arguments for paraview_plugin_write_conf: "
+      "${_paraview_plugin_conf_UNPARSED_ARGUMENTS}")
+  endif ()
+
+  if (NOT _paraview_plugin_conf_NAME)
+    message(FATAL_ERROR
+      "The `NAME` must not be empty.")
+  endif ()
+
+  if (NOT DEFINED _paraview_plugin_conf_BUILD_DESTINATION)
+    message(FATAL_ERROR
+      "The `BUILD_DESTINATION` argument is required.")
+  endif ()
+
+  if (NOT DEFINED _paraview_plugin_conf_PLUGINS_TARGETS)
+    message(FATAL_ERROR
+      "The `PLUGINS_TARGETS` argument is required.")
+  endif ()
+
+  if (NOT DEFINED _paraview_plugin_conf_COMPONENT)
+    set(_paraview_plugin_conf_COMPONENT "runtime")
+  endif ()
+
+  set(_paraview_plugin_conf_file_name
+    "${_paraview_plugin_conf_NAME}.conf")
+  set(_paraview_plugin_conf_build_file
+    "${CMAKE_BINARY_DIR}/${_paraview_plugin_conf_BUILD_DESTINATION}/${_paraview_plugin_conf_file_name}")
+  set(_paraview_plugin_conf_install_file
+    "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_paraview_plugin_conf_file_name}.install")
+  set(_paraview_plugin_conf_build_contents)
+  set(_paraview_plugin_conf_install_contents)
+  foreach (_paraview_plugin_conf_target IN LISTS _paraview_plugin_conf_PLUGINS_TARGETS)
+    get_property(_paraview_plugin_conf_plugins_target_is_alias
+      TARGET    "${_paraview_plugin_conf_target}"
+      PROPERTY  ALIASED_TARGET
+      SET)
+    if (_paraview_plugin_conf_plugins_target_is_alias)
+      get_property(_paraview_plugin_conf_plugins_target_alias_target
+        TARGET    "${_paraview_plugin_conf_target}"
+        PROPERTY  ALIASED_TARGET)
+      get_property(_paraview_plugin_conf_plugins_target_xml_build
+        TARGET    "${_paraview_plugin_conf_plugins_target_alias_target}"
+        PROPERTY  "INTERFACE_paraview_plugin_plugins_file")
+      get_property(_paraview_plugin_conf_plugins_target_xml_install
+        TARGET    "${_paraview_plugin_conf_plugins_target_alias_target}"
+        PROPERTY  "INTERFACE_paraview_plugin_plugins_file_install")
+    else ()
+      get_property(_paraview_plugin_conf_plugins_target_xml_build
+        TARGET    "${_paraview_plugin_conf_target}"
+        PROPERTY  "INTERFACE_paraview_plugin_plugins_file")
+      set(_paraview_plugin_conf_plugins_target_xml_install
+        "${_paraview_plugin_conf_plugins_target_xml_build}")
+    endif ()
+
+    # TODO: Write out in JSON instead.
+    string(APPEND _paraview_plugin_conf_build_contents
+      "${_paraview_plugin_conf_plugins_target_xml_build}\n")
+    string(APPEND _paraview_plugin_conf_install_contents
+      "${_paraview_plugin_conf_plugins_target_xml_install}\n")
+  endforeach ()
+
+  file(GENERATE
+    OUTPUT  "${_paraview_plugin_conf_build_file}"
+    CONTENT "${_paraview_plugin_conf_build_contents}")
+
+  if (_paraview_plugin_conf_INSTALL_DESTINATION)
+    file(GENERATE
+      OUTPUT  "${_paraview_plugin_conf_install_file}"
+      CONTENT "${_paraview_plugin_conf_install_contents}")
+    install(
+      FILES       "${_paraview_plugin_conf_install_file}"
+      DESTINATION "${_paraview_plugin_conf_INSTALL_DESTINATION}"
+      RENAME      "${_paraview_plugin_conf_file_name}"
+      COMPONENT   "${_paraview_plugin_conf_COMPONENT}")
+  endif ()
+endfunction ()
+
 set(_paraview_plugin_source_dir "${CMAKE_CURRENT_LIST_DIR}")
 
 #[==[.md
