@@ -131,6 +131,29 @@ tabular/tree widget.
       </Hints>
     </IntVectorProperty>
 
+Expansion
+---------
+Expands all expandable items to the given depth in a tree widget.
+
+Certain widgets that show a tree widget -ie. any property widget
+that uses a `pqTreeWidget` including the ones for  `ArrayListDomain`, `ArraySelectionDomain`,
+`EnumerationDomain`, `CompositeTreeDomain`- respect this hint to setup the default expansion depth
+for the tree widget.
+
+0 is the minimal expansion, -1 is expand all.
+
+    <IntVectorProperty command="..." name="...">
+      <CompositeTreeDomain mode="all" name="tree">
+        <RequiredProperties>
+          <Property function="Input" name="Input" />
+        </RequiredProperties>
+      </CompositeTreeDomain>
+      <Hints>
+        <!-- This tag sets the expansion depth of the CompositeTreeDomain -->
+        <Expansion depth="3" />
+      </Hints>
+    </IntVectorProperty>
+
 FileChooser
 ------------
 Specify supported extensions to list for `pqFileChooserWidget` dialog.

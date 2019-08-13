@@ -91,6 +91,7 @@ private:
   vtkWeakPointer<vtkSMIntVectorProperty> Property;
   QPointer<pqCompositeDataInformationTreeModel> Model;
   QPointer<pqTreeView> TreeView;
+  int DepthExpansion = 2;
 };
 
 #endif
