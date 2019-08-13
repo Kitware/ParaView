@@ -269,7 +269,11 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLs(const char* appname)
 
   if (!exe_dir.empty())
   {
+#if defined(__APPLE__)
+    auto plugin_conf = exe_dir + "/../Resources/" + appname + ".conf";
+#else
     auto plugin_conf = exe_dir + "/" + appname + ".conf";
+#endif
     std::ifstream fin(plugin_conf.c_str());
     std::string line;
     // TODO: Replace with a JSON parser.

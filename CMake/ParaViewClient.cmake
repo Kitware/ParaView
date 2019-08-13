@@ -374,10 +374,21 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
       ParaView::pqApplicationComponents
       VTK::vtksys)
 
+  set(_paraview_client_binary_destination
+    "${_paraview_client_RUNTIME_DESTINATION}")
+  set(_paraview_client_conf_destination
+    "${_paraview_client_binary_destination}")
+  if (APPLE)
+    set(_paraview_client_binary_destination
+      "${_paraview_client_RUNTIME_DESTINATION}/${_paraview_client_NAME}.app/Contents/Resources")
+    set(_paraview_client_conf_destination
+      "${_paraview_client_BUNDLE_DESTINATION}/${_paraview_client_NAME}.app/Contents/Resources")
+  endif ()
+
   set(_paraview_client_plugin_xmls_file_name
     "${_paraview_client_NAME}.conf")
   set(_paraview_client_plugin_xmls_build_file
-    "${CMAKE_BINARY_DIR}/${_paraview_client_RUNTIME_DESTINATION}/${_paraview_client_plugin_xmls_file_name}")
+    "${CMAKE_BINARY_DIR}/${_paraview_client_binary_destination}/${_paraview_client_plugin_xmls_file_name}")
   set(_paraview_client_plugin_xmls_install_file
     "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_paraview_client_plugin_xmls_file_name}.install")
   set(_paraview_client_plugin_xmls_build_contents)
@@ -439,7 +450,7 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
     COMPONENT "runtime")
   install(
     FILES       "${_paraview_client_plugin_xmls_install_file}"
-    DESTINATION "${_paraview_client_RUNTIME_DESTINATION}"
+    DESTINATION "${_paraview_client_conf_destination}"
     RENAME      "${_paraview_client_plugin_xmls_file_name}"
     COMPONENT   "runtime")
 
