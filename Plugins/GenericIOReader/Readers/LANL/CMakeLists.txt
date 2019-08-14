@@ -23,3 +23,6 @@ target_compile_definitions(LANL_GenericIO
 set_property(TARGET LANL_GenericIO
   PROPERTY
     POSITION_INDEPENDENT_CODE ON)
+
+_vtk_module_apply_properties(LANL_GenericIO)
+_vtk_module_install(LANL_GenericIO)

@@ -253,11 +253,11 @@ paraview_plugin_build(
 ```
 
   * `PLUGINS`: (Required) The list of plugins to build. May be empty.
+  * `AUTOLOAD`: A list of plugins to mark for autoloading.
   * `TARGET`: (Recommended) The name of an interface target to generate. This
     provides. an initialization function `<TARGET>_initialize` which
     initializes static plugins. The function is provided, but is a no-op for
     shared plugin builds.
-  * `AUTOLOAD`: A list of plugins to mark for autoloading.
   * `RUNTIME_DESTINATION`: (Defaults to `${CMAKE_INSTALL_BINDIR}`) Where to
     install runtime files.
   * `LIBRARY_DESTINATION`: (Defaults to `${CMAKE_INSTALL_LIBDIR}`) Where to
@@ -399,7 +399,7 @@ bool ${_paraview_build_TARGET}_static_plugins_func(const char* name, bool load)
 {
   std::string sname = name;
 
-  ${_paraview_build_calls}
+${_paraview_build_calls}
   return false;
 }
 
@@ -805,7 +805,7 @@ function (paraview_add_plugin name)
   endif ()
 
   if (_paraview_add_plugin_with_ui OR _paraview_add_plugin_with_resources)
-    include("${CMAKE_CURRENT_LIST_DIR}/paraview-find-package-helpers.cmake" OPTIONAL)
+    include("${_ParaViewPlugin_cmake_dir}/paraview-find-package-helpers.cmake" OPTIONAL)
     find_package(Qt5 QUIET REQUIRED COMPONENTS Core ${_paraview_add_plugin_qt_extra_components})
     list(APPEND _paraview_add_plugin_required_libraries
       Qt5::Core)

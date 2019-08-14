@@ -70,7 +70,7 @@ smtesting.ProcessCommandLineArguments()
 RenderAllViews()
 # alternatively, if you want to write images, you can use SaveScreenshot(...).
 imageFile = os.path.splitext(os.path.basename(smtesting.StateXMLFileName))[0]
-SaveScreenshot('%s/../../%s.png' % (smtesting.TempDir, imageFile))
+SaveScreenshot('%s/%s.png' % (smtesting.TempDir, imageFile))
 
 if not smtesting.DoRegressionTesting(renderView1.SMProxy):
     raise smtesting.TestError('Test failed')

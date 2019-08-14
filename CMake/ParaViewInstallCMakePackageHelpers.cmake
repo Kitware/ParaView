@@ -8,7 +8,6 @@ function (_paraview_package_append_variables)
     string(APPEND _paraview_package_variables
       "if (NOT DEFINED \"${var}\")
   set(\"${var}\" \"${${var}}\")
-  list(APPEND _paraview_find_package_variables \"${var}\")
 elseif (NOT ${var})
   set(\"${var}\" \"${${var}}\")
 endif ()
