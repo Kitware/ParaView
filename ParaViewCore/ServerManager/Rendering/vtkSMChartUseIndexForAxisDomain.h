@@ -20,7 +20,7 @@
  *
  * vtkSMChartUseIndexForAxisDomain extends vtkSMBooleanDomain to add logic to
  * pick an appropriate default e.g. UseIndexForXAxis for bar and line charts
- * needs to be set to 0 by default, if the XArrayName is one of the known arrays
+ * needs to be set to 0 by default, if the XArrayName contains one of the known arrays
  * such as "bin_extents", "arc_length", and set to 1 otherwise. This class
  * encapsulates that logic.
  *
