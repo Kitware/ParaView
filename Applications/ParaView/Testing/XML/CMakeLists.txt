@@ -469,7 +469,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   HyperTreeGridContour.xml
   HyperTreeGridDepthLimiter.xml
   #HyperTreeGridPlaneCutter.xml
-  HyperTreeGridThreshold.xml
+  #HyperTreeGridThreshold.xml
   LightAddRemove.xml
   LineChartSelection.xml
   LoadStateMultiView.xml
