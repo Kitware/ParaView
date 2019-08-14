@@ -146,7 +146,6 @@ pqCompositeTreePropertyWidget::pqCompositeTreePropertyWidget(
   treeView->header()->setStretchLastSection(true);
   treeView->setRootIsDecorated(true);
   treeView->setModel(dmodel);
-  treeView->expandToDepth(2);
 
   if (vtkPVXMLElement* hints = smproperty->GetHints())
   {
@@ -160,7 +159,12 @@ pqCompositeTreePropertyWidget::pqCompositeTreePropertyWidget(
           "widget height limited to %d rows using `WidgetHeight` hint.", row_count);
       }
     }
+    if (vtkPVXMLElement* elem = hints->FindNestedElementByName("Expansion"))
+    {
+      elem->GetScalarAttribute("depth", &this->DepthExpansion);
+    }
   }
+  treeView->expandToDepth(this->DepthExpansion);
 
   pqTreeViewSelectionHelper* helper = new pqTreeViewSelectionHelper(treeView);
   helper->setObjectName("CompositeTreeSelectionHelper");
@@ -188,7 +192,7 @@ void pqCompositeTreePropertyWidget::domainModified()
     QList<QVariant> oldValue = this->values();
     bool isComposite = this->Model->reset(this->Domain->GetInformation());
     this->setValues(oldValue);
-    this->TreeView->expandToDepth(2);
+    this->TreeView->expandToDepth(this->DepthExpansion);
 
     // this ensures that the widget is hidden if the data is not a composite
     // dataset.
