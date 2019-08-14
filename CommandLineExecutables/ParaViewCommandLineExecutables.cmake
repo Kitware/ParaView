@@ -21,7 +21,7 @@ function (paraview_add_executable name)
 
   target_link_libraries("${name}"
     PRIVATE
-      paraview_plugins)
+      ParaView::paraview_plugins)
 
   if (PARAVIEW_ENABLE_PYTHON)
     target_compile_definitions("${name}"

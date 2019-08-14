@@ -46,6 +46,20 @@ if (UNIX AND NOT APPLE)
     "${_paraview_client_origin_rpath}")
 endif()
 
+# A plugin configuration file is required if either the GUI
+# application is not built (the configuration file is provided
+# there if so) or we're on macOS where the configuration file is
+# then stored under the bundle for the application. Instead,
+# provide our own configuration file instead.
+if (APPLE OR NOT PARAVIEW_BUILD_QT_GUI)
+  paraview_plugin_write_conf(
+    NAME "paraview"
+    PLUGINS_TARGETS ParaView::paraview_plugins
+    BUILD_DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    COMPONENT "runtime")
+endif ()
+
 include("${CMAKE_CURRENT_SOURCE_DIR}/ParaViewCommandLineExecutables.cmake")
 
 set(paraview_tools)

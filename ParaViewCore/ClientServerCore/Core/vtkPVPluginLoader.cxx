@@ -203,20 +203,18 @@ vtkPVPluginLoaderCleaner* vtkPVPluginLoaderCleaner::LibCleaner = NULL;
 //=============================================================================
 using VectorOfCallbacks = std::vector<vtkPVPluginLoader::PluginLoaderCallback>;
 static VectorOfCallbacks* RegisteredPluginLoaderCallbacks = nullptr;
-static int nifty_counter = 0;
+static vtkAtomicInt64 nifty_counter = 0;
 vtkPVPluginLoaderCleanerInitializer::vtkPVPluginLoaderCleanerInitializer()
 {
-  if (nifty_counter == 0)
+  if (nifty_counter++ == 0)
   {
     ::RegisteredPluginLoaderCallbacks = new VectorOfCallbacks();
   }
-  nifty_counter++;
 }
 
 vtkPVPluginLoaderCleanerInitializer::~vtkPVPluginLoaderCleanerInitializer()
 {
-  nifty_counter--;
-  if (nifty_counter == 0)
+  if (--nifty_counter == 0)
   {
     vtkPVPluginLoaderCleaner::FinalizeInstance();
     delete ::RegisteredPluginLoaderCallbacks;

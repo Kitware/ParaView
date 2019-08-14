@@ -83,12 +83,22 @@ set(built_shared 0)
 if (BUILD_SHARED_LIBS)
   set(built_shared 1)
 endif ()
-set_property(SOURCE
-  vtkPVPluginLoader.cxx
-  vtkPVPluginTracker.cxx
-  APPEND
+set_property(SOURCE vtkPVPluginLoader.cxx APPEND
   PROPERTY
     COMPILE_DEFINITIONS "BUILD_SHARED_LIBS=${built_shared}")
+
+if (WIN32)
+  set(libdir_relpath ".")
+else ()
+  file(RELATIVE_PATH libdir_relpath
+    "/prefix/${_vtk_build_RUNTIME_DESTINATION}"
+    "/prefix/${_vtk_build_LIBRARY_DESTINATION}")
+endif ()
+set_property(SOURCE vtkPVPluginTracker.cxx APPEND
+  PROPERTY
+    COMPILE_DEFINITIONS
+      "PARAVIEW_RELATIVE_LIBPATH=\"${libdir_relpath}\""
+      "PARAVIEW_SUBDIR=\"paraview${paraview_version_suffix}/plugins\"")
 
 if (TARGET VTK::PythonInterpreter)
   # TODO: Split these into a separate module so that there isn't a public

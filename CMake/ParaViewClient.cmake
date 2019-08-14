@@ -311,10 +311,11 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
   if (_paraview_client_PLUGINS_TARGETS)
     set(_paraview_client_have_plugins 1)
     foreach (_paraview_client_plugin_target IN LISTS _paraview_client_PLUGINS_TARGETS)
+      string(REPLACE "::" "_" _paraview_client_plugin_target_safe "${_paraview_client_plugin_target}")
       string(APPEND _paraview_client_plugins_includes
-        "#include \"${_paraview_client_plugin_target}.h\"\n")
+        "#include \"${_paraview_client_plugin_target_safe}.h\"\n")
       string(APPEND _paraview_client_plugins_calls
-        "  ${_paraview_client_plugin_target}_initialize();\n")
+        "  ${_paraview_client_plugin_target_safe}_initialize();\n")
     endforeach ()
   endif ()
 
@@ -377,6 +378,24 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
     target_link_libraries("${_paraview_client_NAME}"
       PRIVATE
         ${_paraview_client_PLUGINS_TARGETS})
+
+    set(_paraview_client_binary_destination
+      "${_paraview_client_RUNTIME_DESTINATION}")
+    set(_paraview_client_conf_destination
+      "${_paraview_client_binary_destination}")
+    if (APPLE)
+      set(_paraview_client_binary_destination
+        "${_paraview_client_RUNTIME_DESTINATION}/${_paraview_client_NAME}.app/Contents/Resources")
+      set(_paraview_client_conf_destination
+        "${_paraview_client_BUNDLE_DESTINATION}/${_paraview_client_NAME}.app/Contents/Resources")
+    endif ()
+
+    paraview_plugin_write_conf(
+      NAME            "${_paraview_client_NAME}"
+      PLUGINS_TARGETS ${_paraview_client_PLUGINS_TARGETS}
+      BUILD_DESTINATION   "${_paraview_client_binary_destination}"
+      INSTALL_DESTINATION "${_paraview_client_conf_destination}"
+      COMPONENT "runtime")
   endif ()
 
   set(_paraview_client_export)
@@ -389,7 +408,8 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
     TARGETS "${_paraview_client_NAME}"
     ${_paraview_client_export}
     ${_paraview_client_bundle_args}
-    RUNTIME DESTINATION "${_paraview_client_RUNTIME_DESTINATION}")
+    RUNTIME DESTINATION "${_paraview_client_RUNTIME_DESTINATION}"
+    COMPONENT "runtime")
 
   if (APPLE)
     if (DEFINED _paraview_client_BUNDLE_ICON)

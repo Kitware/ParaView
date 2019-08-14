@@ -21,6 +21,7 @@ void vtkPVInitializePythonModules();
 #include "vtkInitializationHelper.h"
 #include "vtkLogger.h"
 #include "vtkMultiProcessController.h"
+#include "vtkPVPluginTracker.h"
 #include "vtkPVPythonOptions.h"
 #include "vtkProcessModule.h"
 #include "vtkPythonInterpreter.h"
@@ -84,6 +85,8 @@ int Run(int processType, int argc, char* argv[])
   // register callback to initialize modules statically. The callback is
   // empty when BUILD_SHARED_LIBS is ON.
   vtkPVInitializePythonModules();
+
+  vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLs("paraview");
 
   int ret_val = 0;
   if (pm->GetSymmetricMPIMode() == false && pm->GetPartitionId() > 0)
