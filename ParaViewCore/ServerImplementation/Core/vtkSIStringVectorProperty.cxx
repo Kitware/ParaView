@@ -21,6 +21,8 @@
 #include "vtkSISourceProxy.h"
 #include "vtkSMMessage.h"
 
+#include <vtksys/SystemTools.hxx>
+
 #include <assert.h>
 #include <string>
 #include <vector>
@@ -161,8 +163,33 @@ bool vtkSIStringVectorProperty::ReadXMLAttributes(vtkSIProxy* proxy, vtkPVXMLEle
   }
   this->ElementTypes->resize(number_of_elements_per_command, STRING);
 
-  element->GetVectorAttribute(
-    "element_types", number_of_elements_per_command, &(*this->ElementTypes)[0]);
+  const std::map<std::string, int> elementTypesStrMap = { { std::string("int"), INT },
+    { std::string("double"), DOUBLE }, { std::string("str"), STRING } };
+
+  // This fails if attributes are strings
+  // In this case, we treat them by their name
+  if (!element->GetVectorAttribute(
+        "element_types", number_of_elements_per_command, &(*this->ElementTypes)[0]) &&
+    element->GetAttribute("element_types") != nullptr)
+  {
+    std::string element_types = element->GetAttribute("element_types");
+    std::vector<std::string> parts = vtksys::SystemTools::SplitString(element_types, ' ');
+    if (parts.size() == this->ElementTypes->size())
+    {
+      for (std::size_t i = 0; i < parts.size(); ++i)
+      {
+        auto element_iter = elementTypesStrMap.find(parts[i]);
+        if (element_iter == elementTypesStrMap.end())
+        {
+          vtkGenericWarningMacro("Element type " << parts[i] << " does not exists");
+        }
+        else
+        {
+          (*this->ElementTypes)[i] = element_iter->second;
+        }
+      }
+    }
+  }
   vtkVectorOfStrings values;
   bool hasDefaultValues = false;
   if (number_of_elements > 0)

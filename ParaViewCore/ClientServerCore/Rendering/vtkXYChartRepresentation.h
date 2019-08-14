@@ -107,11 +107,12 @@ public:
    * Set/Clear the properties for Y series/columns.
    */
   void SetSeriesVisibility(const char* seriesname, bool visible);
-  void SetLineThickness(const char* name, int value);
+  void SetLineThickness(const char* name, double value);
   void SetLineStyle(const char* name, int value);
   void SetColor(const char* name, double r, double g, double b);
   void SetAxisCorner(const char* name, int corner);
   void SetMarkerStyle(const char* name, int style);
+  void SetMarkerSize(const char* name, double value);
   void SetLabel(const char* name, const char* label);
   void SetUseColorMapping(const char* name, bool useColorMapping);
   void SetLookupTable(const char* name, vtkScalarsToColors* lut);
@@ -123,6 +124,7 @@ public:
   void ClearLineStyles();
   void ClearColors();
   void ClearAxisCorners();
+  void ClearMarkerSizes();
   void ClearMarkerStyles();
   void ClearLabels();
 

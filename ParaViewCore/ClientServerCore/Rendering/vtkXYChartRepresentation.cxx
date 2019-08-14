@@ -167,7 +167,7 @@ void vtkXYChartRepresentation::SetSeriesVisibility(const char* seriesname, bool 
 }
 
 //----------------------------------------------------------------------------
-void vtkXYChartRepresentation::SetLineThickness(const char* seriesname, int value)
+void vtkXYChartRepresentation::SetLineThickness(const char* seriesname, double value)
 {
   assert(seriesname != NULL);
   this->Internals->LineThicknesses[seriesname] = value;
@@ -219,6 +219,14 @@ void vtkXYChartRepresentation::SetMarkerStyle(const char* seriesname, int style)
 {
   assert(seriesname != NULL);
   this->Internals->MarkerStyles[seriesname] = style;
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkXYChartRepresentation::SetMarkerSize(const char* seriesname, double value)
+{
+  assert(seriesname != NULL);
+  this->Internals->MarkerSizes[seriesname] = value;
   this->Modified();
 }
 
@@ -279,6 +287,13 @@ void vtkXYChartRepresentation::ClearAxisCorners()
 void vtkXYChartRepresentation::ClearMarkerStyles()
 {
   this->Internals->MarkerStyles.clear();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkXYChartRepresentation::ClearMarkerSizes()
+{
+  this->Internals->MarkerSizes.clear();
   this->Modified();
 }
 

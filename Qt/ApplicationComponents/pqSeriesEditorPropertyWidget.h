@@ -69,6 +69,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSeriesEditorPropertyWidget : public pqPro
   Q_PROPERTY(QList<QVariant> seriesMarkerStyle READ seriesMarkerStyle WRITE setSeriesMarkerStyle
       NOTIFY seriesMarkerStyleChanged)
 
+  Q_PROPERTY(QList<QVariant> seriesMarkerSize READ seriesMarkerSize WRITE setSeriesMarkerSize NOTIFY
+      seriesMarkerSizeChanged)
+
   Q_PROPERTY(QList<QVariant> seriesPlotCorner READ seriesPlotCorner WRITE setSeriesPlotCorner NOTIFY
       seriesPlotCornerChanged)
 
@@ -78,111 +81,164 @@ public:
   pqSeriesEditorPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   ~pqSeriesEditorPropertyWidget() override;
 
+  //@{
   /**
   * Get/Set the visibility for series.
   */
   QList<QVariant> seriesVisibility() const;
   void setSeriesVisibility(const QList<QVariant>&);
+  //@}
 
+  //@{
   /**
   * Get/Set the color for each of the series.
   */
   QList<QVariant> seriesColor() const;
   void setSeriesColor(const QList<QVariant>&);
+  //@}
 
+  //@{
   /**
   * Get/Set the label for each of the series.
   */
   QList<QVariant> seriesLabel() const;
   void setSeriesLabel(const QList<QVariant>&);
+  //@}
 
+  //@{
   /**
   * Get/Set the line-thickness for each of the series.
   */
   QList<QVariant> seriesLineThickness() const;
   void setSeriesLineThickness(const QList<QVariant>&);
+  //@}
 
+  //@{
   /**
   * Get/Set the line-style for each of the series.
   */
   QList<QVariant> seriesLineStyle() const;
   void setSeriesLineStyle(const QList<QVariant>&);
+  //@}
 
+  //@{
   /**
   * Get/Set the marker-style for each of the series.
   */
   QList<QVariant> seriesMarkerStyle() const;
   void setSeriesMarkerStyle(const QList<QVariant>&);
+  //@}
 
+  //@{
+  /**
+  * Get/Set the marker-size for each of the series.
+  */
+  QList<QVariant> seriesMarkerSize() const;
+  void setSeriesMarkerSize(const QList<QVariant>&);
+  //@}
+
+  //@{
   /**
   * Get/Set the plot-corner for each of the series.
   */
   QList<QVariant> seriesPlotCorner() const;
   void setSeriesPlotCorner(const QList<QVariant>&);
+  //@}
 
 signals:
+  //@{
   /**
   * Fired when the series visibility changes.
   */
   void seriesVisibilityChanged();
+  //@}
 
+  //@{
   /**
   * Fired when the series labels change.
   */
   void seriesLabelChanged();
+  //@}
 
+  //@{
   /**
   * Fired when the series colors change.
   */
   void seriesColorChanged();
+  //@}
 
+  //@{
   /**
   * Fired when the series line thickness changes
   */
   void seriesLineThicknessChanged();
+  //@}
 
+  //@{
   /**
   * Fired when the series line style changes
   */
   void seriesLineStyleChanged();
+  //@}
 
+  //@{
   /**
   * Fired when the series marker style changes
   */
   void seriesMarkerStyleChanged();
+  //@}
 
+  //@{
+  /**
+  * Fired when the series marker size changes
+  */
+  void seriesMarkerSizeChanged();
+  //@}
+
+  //@{
   /**
   * Fired when the series plot corners change
   */
   void seriesPlotCornerChanged();
+  //@}
 
 private slots:
+  //@{
   /**
   * called whenever the internal model's data changes. We fire
   * seriesVisibilityChanged() signals appropriately.
   */
   void onDataChanged(const QModelIndex& topleft, const QModelIndex& btmright);
+  //@}
 
+  //@{
   /**
   * called when user double-clicks on an item. If the double click is on the
   * 1st column, we show the color editor to allow editing of the series color.
   */
   void onDoubleClicked(const QModelIndex& idx);
+  //@}
 
+  //@{
   /**
   * update all series-properties widgets using the "current" series.
   */
   void refreshPropertiesWidgets();
+  //@}
 
+  //@{
   /**
   * update all selected series with the value from the sender widget.
   */
   void savePropertiesWidgets();
+  //@}
 
+  //@{
   /**
   * called when the vtkSMProperty fires a vtkCommand::DomainModifiedEvent.
   */
   void domainModified(vtkObject* sender);
+  //@}
 
 private:
   Q_DISABLE_COPY(pqSeriesEditorPropertyWidget)

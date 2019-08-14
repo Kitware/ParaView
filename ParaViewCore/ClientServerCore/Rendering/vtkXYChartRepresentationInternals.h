@@ -201,6 +201,7 @@ public:
   std::map<std::string, vtkColor3d> Colors;
   std::map<std::string, int> AxisCorners;
   std::map<std::string, int> MarkerStyles;
+  std::map<std::string, double> MarkerSizes;
   std::map<std::string, std::string> Labels;
   std::map<std::string, bool> UseColorMapping;
   std::map<std::string, vtkScalarsToColors*> Lut;
@@ -442,6 +443,8 @@ protected:
     {
       plotPoints->SetMarkerStyle(this->GetSeriesParameter(self, tableName, columnName, role,
         this->MarkerStyles, static_cast<int>(vtkPlotPoints::NONE)));
+      plotPoints->SetMarkerSize(
+        this->GetSeriesParameter(self, tableName, columnName, role, this->MarkerSizes, 1.0));
       // the vtkValidPointMask array is used by some filters (like plot
       // over line) to indicate invalid points. this instructs the line
       // plot to not render those points

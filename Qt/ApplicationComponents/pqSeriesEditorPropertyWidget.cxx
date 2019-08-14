@@ -58,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVector>
 
 #include <cassert>
+#include <limits>
 
 //=============================================================================
 // QAbstractTableModel for showing the series properties. Since series
@@ -506,9 +507,10 @@ public:
   vtkSmartPointer<vtkSMPropertyGroup> PropertyGroup;
   vtkNew<vtkEventQtSlotConnect> VTKConnector;
   pqSeriesParametersModel Model;
-  QMap<QString, int> Thickness;
+  QMap<QString, double> Thickness;
   QMap<QString, int> Style;
   QMap<QString, int> MarkerStyle;
+  QMap<QString, double> MarkerSize;
   QMap<QString, int> PlotCorner;
   bool RefreshingWidgets;
 
@@ -520,6 +522,10 @@ public:
     this->Ui.wdgLayout->setMargin(pqPropertiesPanel::suggestedMargin());
     this->Ui.wdgLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
     this->Ui.wdgLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
+
+    // give infinite maximum to line thickness and marker size
+    this->Ui.MarkerSize->setMaximum(std::numeric_limits<double>::infinity());
+    this->Ui.Thickness->setMaximum(std::numeric_limits<double>::infinity());
 
     this->Ui.SeriesTable->setDragEnabled(supportsReorder);
     this->Ui.SeriesTable->setDragDropMode(
@@ -671,6 +677,17 @@ pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
     ui.MarkerStyleList->hide();
   }
 
+  if (smgroup->GetProperty("SeriesMarkerSize"))
+  {
+    this->addPropertyLink(this, "seriesMarkerSize", SIGNAL(seriesMarkerSizeChanged()),
+      smgroup->GetProperty("SeriesMarkerSize"));
+  }
+  else
+  {
+    ui.MarkerSizeLabel->hide();
+    ui.MarkerSize->hide();
+  }
+
   if (smgroup->GetProperty("SeriesPlotCorner"))
   {
     this->addPropertyLink(this, "seriesPlotCorner", SIGNAL(seriesPlotCornerChanged()),
@@ -693,10 +710,11 @@ pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
     SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
     SLOT(refreshPropertiesWidgets()));
 
-  this->connect(ui.Thickness, SIGNAL(valueChanged(int)), SLOT(savePropertiesWidgets()));
+  this->connect(ui.Thickness, SIGNAL(valueChanged(double)), SLOT(savePropertiesWidgets()));
   this->connect(ui.StyleList, SIGNAL(currentIndexChanged(int)), SLOT(savePropertiesWidgets()));
   this->connect(
     ui.MarkerStyleList, SIGNAL(currentIndexChanged(int)), SLOT(savePropertiesWidgets()));
+  this->connect(ui.MarkerSize, SIGNAL(valueChanged(double)), SLOT(savePropertiesWidgets()));
   this->connect(ui.AxisList, SIGNAL(currentIndexChanged(int)), SLOT(savePropertiesWidgets()));
 }
 
@@ -846,7 +864,7 @@ void setSeriesValues(QMap<QString, T>& data, const QList<QVariant>& values)
 template <class T>
 void getSeriesValues(const QMap<QString, T>& data, QList<QVariant>& reply)
 {
-  QMap<QString, int>::const_iterator iter = data.constBegin();
+  typename QMap<QString, T>::const_iterator iter = data.constBegin();
   for (; iter != data.constEnd(); ++iter)
   {
     reply.push_back(iter.key());
@@ -858,7 +876,7 @@ void getSeriesValues(const QMap<QString, T>& data, QList<QVariant>& reply)
 //-----------------------------------------------------------------------------
 void pqSeriesEditorPropertyWidget::setSeriesLineThickness(const QList<QVariant>& values)
 {
-  setSeriesValues<int>(this->Internals->Thickness, values);
+  setSeriesValues<double>(this->Internals->Thickness, values);
   this->refreshPropertiesWidgets();
 }
 
@@ -866,7 +884,7 @@ void pqSeriesEditorPropertyWidget::setSeriesLineThickness(const QList<QVariant>&
 QList<QVariant> pqSeriesEditorPropertyWidget::seriesLineThickness() const
 {
   QList<QVariant> reply;
-  getSeriesValues(this->Internals->Thickness, reply);
+  getSeriesValues<double>(this->Internals->Thickness, reply);
   return reply;
 }
 
@@ -901,6 +919,21 @@ QList<QVariant> pqSeriesEditorPropertyWidget::seriesMarkerStyle() const
 }
 
 //-----------------------------------------------------------------------------
+void pqSeriesEditorPropertyWidget::setSeriesMarkerSize(const QList<QVariant>& values)
+{
+  setSeriesValues<double>(this->Internals->MarkerSize, values);
+  this->refreshPropertiesWidgets();
+}
+
+//-----------------------------------------------------------------------------
+QList<QVariant> pqSeriesEditorPropertyWidget::seriesMarkerSize() const
+{
+  QList<QVariant> reply;
+  getSeriesValues<double>(this->Internals->MarkerSize, reply);
+  return reply;
+}
+
+//-----------------------------------------------------------------------------
 void pqSeriesEditorPropertyWidget::setSeriesPlotCorner(const QList<QVariant>& values)
 {
   setSeriesValues<int>(this->Internals->PlotCorner, values);
@@ -928,6 +961,7 @@ void pqSeriesEditorPropertyWidget::refreshPropertiesWidgets()
     // nothing is selected, disable all properties widgets.
     ui.AxisList->setEnabled(false);
     ui.MarkerStyleList->setEnabled(false);
+    ui.MarkerSize->setEnabled(false);
     ui.StyleList->setEnabled(false);
     ui.Thickness->setEnabled(false);
     return;
@@ -942,6 +976,9 @@ void pqSeriesEditorPropertyWidget::refreshPropertiesWidgets()
 
   ui.MarkerStyleList->setCurrentIndex(this->Internals->MarkerStyle[key]);
   ui.MarkerStyleList->setEnabled(true);
+
+  ui.MarkerSize->setValue(this->Internals->MarkerSize[key]);
+  ui.MarkerSize->setEnabled(true);
 
   ui.AxisList->setCurrentIndex(this->Internals->PlotCorner[key]);
   ui.AxisList->setEnabled(true);
@@ -989,6 +1026,12 @@ void pqSeriesEditorPropertyWidget::savePropertiesWidgets()
     {
       this->Internals->MarkerStyle[key] = ui.MarkerStyleList->currentIndex();
       emit this->seriesMarkerStyleChanged();
+    }
+    else if (ui.MarkerSize == senderWidget &&
+      this->Internals->MarkerSize[key] != ui.MarkerSize->value())
+    {
+      this->Internals->MarkerSize[key] = ui.MarkerSize->value();
+      emit this->seriesMarkerSizeChanged();
     }
     else if (ui.AxisList == senderWidget &&
       this->Internals->PlotCorner[key] != ui.AxisList->currentIndex())
