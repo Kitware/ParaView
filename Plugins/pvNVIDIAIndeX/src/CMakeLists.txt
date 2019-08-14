@@ -71,7 +71,7 @@ vtk_module_add_module(pvNVIDIAIndeX::IndeXRepresentations
   PRIVATE_HEADERS ${private_headers})
 vtk_module_include(pvNVIDIAIndeX::IndeXRepresentations
   PUBLIC
-    ${NVINDEX_INCLUDE_DIRS})
+    $<BUILD_INTERFACE:${NVINDEX_INCLUDE_DIRS}>)
 
 if (NVINDEX_SKIP_BUILD_RPATH)
   vtk_module_set_properties(pvNVIDIAIndeX::IndeXRepresentations

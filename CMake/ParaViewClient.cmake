@@ -280,7 +280,7 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
     set(CMAKE_AUTORCC 1)
   endif ()
 
-  include("${CMAKE_CURRENT_LIST_DIR}/paraview-find-package-helpers.cmake" OPTIONAL)
+  include("${_ParaViewClient_cmake_dir}/paraview-find-package-helpers.cmake" OPTIONAL)
   find_package(Qt5 REQUIRED QUIET COMPONENTS Core Widgets)
 
   # CMake 3.13 started using Qt5's version variables to detect what version
@@ -486,9 +486,11 @@ function (paraview_client_documentation)
       "The `XMLS` argument is required.")
   endif ()
 
+  include("${_ParaViewClient_cmake_dir}/paraview-find-package-helpers.cmake" OPTIONAL)
   find_program(qt_xmlpatterns_executable
     NAMES xmlpatterns-qt5 xmlpatterns
     HINTS "${Qt5_DIR}/../../../bin"
+          "${Qt5_DIR}/../../../libexec/qt5/bin"
     DOC   "Path to xmlpatterns")
   mark_as_advanced(qt_xmlpatterns_executable)
 
@@ -764,6 +766,7 @@ function (paraview_client_generate_help)
       "*.*")
   endif ()
 
+  include("${_ParaViewClient_cmake_dir}/paraview-find-package-helpers.cmake" OPTIONAL)
   find_package(Qt5 QUIET REQUIRED COMPONENTS Help)
 
   set(_paraview_client_help_copy_sources)
