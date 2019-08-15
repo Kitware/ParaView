@@ -130,10 +130,10 @@ void vtknvindex_opengl_canvas::receive_tile(
 {
   m_vtk_renderer->GetRenderWindow()->MakeCurrent();
 
-  const mi::Uint32 src_width = area.max.x - area.min.x;
-  const mi::Uint32 src_height = area.max.y - area.min.y;
+  const mi::Sint32 src_width = area.max.x - area.min.x;
+  const mi::Sint32 src_height = area.max.y - area.min.y;
 
-  if (src_width == 0 || src_height == 0)
+  if (src_width <= 0 || src_height <= 0)
   {
     return;
   }
@@ -157,6 +157,9 @@ void vtknvindex_opengl_canvas::receive_tile(
     area.min.y < tile.min.y ? tile.min.y : area.min.y,
     area.max.x > tile.max.x ? tile.max.x : area.max.x,
     area.max.y > tile.max.y ? tile.max.y : area.max.y };
+
+  if (src_tile.min.x >= src_tile.max.x || src_tile.min.y >= src_tile.max.y)
+    return;
 
   const mi::math::Bbox_struct<mi::Uint32, 2> dst_tile = { src_tile.min.x - tile.min.x,
     src_tile.min.y - tile.min.y, src_tile.max.x - tile.min.x, src_tile.max.y - tile.min.y };

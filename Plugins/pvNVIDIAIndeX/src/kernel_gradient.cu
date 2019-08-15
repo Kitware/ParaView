@@ -12,7 +12,7 @@ NV_IDX_XAC_VERSION_1_0
 
 struct Gradient_params
 {
-    float gradient; // [0.1, 1] gradient value
+    float gradient; // [0.01, 1] gradient value
     float grad_max; // 20.0f maximum gradient scale
     float dummy1;
     float dummy2;
@@ -73,9 +73,6 @@ public:
 
         // check if sample can be skipped
         if (sample_color.w < min_alpha) return NV_IDX_PROG_DISCARD_SAMPLE;
-
-        // compute volume gradient (local version)
-        //const float3 vol_grad = get_gradient(sampler, sample_position, dh);
 
         // compute volume gradient (use trilinear filter for gradients)
         const float3 vol_grad = volume_gradient<Volume_filter_mode::TRILINEAR>(
