@@ -4,6 +4,7 @@
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqEventDispatcher.h"
+#include "pqLoadStateReaction.h"
 #include "vtkPVConfig.h"
 #include "vtkPVFileInformation.h"
 
@@ -106,6 +107,9 @@ void pqExampleVisualizationsDialog::onButtonPressed()
       xmldata.replace("$PARAVIEW_EXAMPLES_DATA", dataPath);
       pqApplicationCore::instance()->loadStateFromString(
         xmldata.toUtf8().data(), pqActiveObjects::instance().activeServer());
+
+      // This is needed since XML state currently does not save active view.
+      pqLoadStateReaction::activateView();
     }
     else
     {
