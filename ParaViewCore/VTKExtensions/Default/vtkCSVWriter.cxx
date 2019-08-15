@@ -193,6 +193,8 @@ class vtkCSVWriter::CSVFile
   std::vector<std::pair<std::string, int> > ColumnInfo;
 
 public:
+  CSVFile() = default;
+
   int Open(const char* filename)
   {
     if (!filename)
@@ -200,7 +202,7 @@ public:
       return vtkErrorCode::NoFileNameError;
     }
 
-    this->Stream = ofstream(filename, ios::out);
+    this->Stream.open(filename, ios::out);
     if (this->Stream.fail())
     {
       return vtkErrorCode::CannotOpenFileError;
@@ -286,6 +288,10 @@ public:
       this->Stream << "\n";
     }
   }
+
+private:
+  CSVFile(const CSVFile&) = delete;
+  void operator=(const CSVFile&) = delete;
 };
 
 //-----------------------------------------------------------------------------
