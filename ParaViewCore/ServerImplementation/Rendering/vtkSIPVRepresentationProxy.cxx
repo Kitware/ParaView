@@ -59,17 +59,6 @@ vtkSIPVRepresentationProxy::~vtkSIPVRepresentationProxy()
 //----------------------------------------------------------------------------
 bool vtkSIPVRepresentationProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 {
-  vtkPVCompositeRepresentation* pvrepresentation =
-    vtkPVCompositeRepresentation::SafeDownCast(this->GetVTKObject());
-
-  // Pass on the selection-representation
-  if (vtkSIProxy* siProxy = this->GetSubSIProxy("SelectionRepresentation"))
-  {
-    vtkSelectionRepresentation* selection =
-      vtkSelectionRepresentation::SafeDownCast(siProxy->GetVTKObject());
-    pvrepresentation->SetSelectionRepresentation(selection);
-  }
-
   // Update internal data-structures for the types of representations provided
   // by this instance.
 
@@ -98,8 +87,11 @@ bool vtkSIPVRepresentationProxy::ReadXMLAttributes(vtkPVXMLElement* element)
       }
 
       // Add each of the sub-representations to the composite representation.
-      pvrepresentation->AddRepresentation(
-        text, vtkPVDataRepresentation::SafeDownCast(subproxy->GetVTKObject()));
+      vtkClientServerStream stream;
+      stream << vtkClientServerStream::Invoke << this->GetVTKObject() << "AddRepresentation" << text
+             << vtkPVDataRepresentation::SafeDownCast(subproxy->GetVTKObject())
+             << vtkClientServerStream::End;
+      this->Interpreter->ProcessStream(stream);
 
       //// read optional subtype.
       const char* sub_text = child->GetAttribute("subtype");
@@ -123,8 +115,14 @@ bool vtkSIPVRepresentationProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 //----------------------------------------------------------------------------
 void vtkSIPVRepresentationProxy::OnVTKObjectModified()
 {
-  vtkCompositeRepresentation* repr = vtkCompositeRepresentation::SafeDownCast(this->GetVTKObject());
-  const char* key = repr->GetActiveRepresentationKey();
+  const char* key;
+  {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke << this->GetVTKObject() << "GetActiveRepresentationKey"
+           << vtkClientServerStream::End;
+    this->Interpreter->ProcessStream(stream);
+    this->Interpreter->GetLastResult().GetArgument(0, 0, &key);
+  }
   vtkInternals::RepresentationProxiesType::iterator iter = key
     ? this->Internals->RepresentationProxies.find(key)
     : this->Internals->RepresentationProxies.end();
