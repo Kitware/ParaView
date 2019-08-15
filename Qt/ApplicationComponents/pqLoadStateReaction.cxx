@@ -116,15 +116,9 @@ void pqLoadStateReaction::loadState(const QString& filename, bool dialogBlocked,
           server, filename);
       }
       pqPVApplicationCore::instance()->setLoadingState(false);
-      // activate a view in the state.
-      // this is needed since XML state currently does not save active view.
 
-      auto smmodel = pqApplicationCore::instance()->getServerManagerModel();
-      auto views = smmodel->findItems<pqView*>(server);
-      if (views.size())
-      {
-        pqActiveObjects::instance().setActiveView(views[0]);
-      }
+      // This is needed since XML state currently does not save active view.
+      pqLoadStateReaction::activateView();
     }
   }
   else
@@ -154,5 +148,17 @@ void pqLoadStateReaction::loadState()
   {
     QString selectedFile = fileDialog.getSelectedFiles()[0];
     pqLoadStateReaction::loadState(selectedFile);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqLoadStateReaction::activateView()
+{
+  auto server = pqActiveObjects::instance().activeServer();
+  auto smmodel = pqApplicationCore::instance()->getServerManagerModel();
+  auto views = smmodel->findItems<pqView*>(server);
+  if (views.size())
+  {
+    pqActiveObjects::instance().setActiveView(views[0]);
   }
 }

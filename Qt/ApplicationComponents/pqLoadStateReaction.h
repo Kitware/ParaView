@@ -62,6 +62,11 @@ public:
     const QString& filename, bool dialogBlocked = false, pqServer* server = NULL);
   static void loadState();
 
+  /**
+   * Set default active view after state is loaded. Make the first view active.
+   */
+  static void activateView();
+
 public slots:
   /**
   * Updates the enabled state. Applications need not explicitly call
