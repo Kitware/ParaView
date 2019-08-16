@@ -47,6 +47,8 @@ public:
    */
   static vtkPointHandleRepresentationSphere* New();
 
+  using SuperClass::Translate;
+
   //@{
   /**
    * Standard methods for instances of this class.
