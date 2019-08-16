@@ -467,7 +467,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   FastUniformGridSource.xml
   FileSeries.xml
   HyperTreeGridAxisClip.xml
-  #HyperTreeGridAxisCut.xml
+  HyperTreeGridAxisCut.xml
   HyperTreeGridAxisReflection.xml
   HyperTreeGridCellCenters.xml
   HyperTreeGridContour.xml
