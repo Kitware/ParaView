@@ -92,6 +92,7 @@ set(classes
   vtkPVClipDataSet
   vtkPVConnectivityFilter
   vtkPVContourFilter
+  vtkPVCutter
   vtkPVCylinder
   vtkPVDReader
   vtkPVDataSetAlgorithmSelectorFilter
@@ -112,6 +113,7 @@ set(classes
   vtkPVPlane
   vtkPVSelectionSource
   vtkPVTextSource
+  vtkPVThreshold
   vtkPVTransposeTable
   vtkPhastaReader
   vtkPlotEdges

@@ -45,6 +45,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 
+#include <vtksys/SystemTools.hxx>
+
+#include <string>
+#include <vector>
+
 //-----------------------------------------------------------------------------
 pqInputDataTypeDecorator::pqInputDataTypeDecorator(
   vtkPVXMLElement* config, pqPropertyWidget* parentObject)
@@ -77,6 +82,36 @@ pqInputDataTypeDecorator::~pqInputDataTypeDecorator()
 //-----------------------------------------------------------------------------
 bool pqInputDataTypeDecorator::enableWidget() const
 {
+  const char* enableWidgetActive = this->xml()->GetAttribute("mode");
+  // By default, if enable_toggle is not set, we go through
+  if (!enableWidgetActive || !strcmp(enableWidgetActive, "enabled_state"))
+  {
+    if (!this->processState())
+    {
+      return false;
+    }
+  }
+  return this->Superclass::enableWidget();
+}
+
+//-----------------------------------------------------------------------------
+bool pqInputDataTypeDecorator::canShowWidget(bool show_advanced) const
+{
+  const char* showWidgetActive = this->xml()->GetAttribute("mode");
+  // By default, if show_toggle is not set, we DO NOT go through
+  if (showWidgetActive && !strcmp(showWidgetActive, "visibility"))
+  {
+    if (!this->processState())
+    {
+      return false;
+    }
+  }
+  return this->Superclass::canShowWidget(show_advanced);
+}
+
+//-----------------------------------------------------------------------------
+bool pqInputDataTypeDecorator::processState() const
+{
   pqPropertyWidget* parentObject = this->parentWidget();
   vtkSMProxy* proxy = parentObject->proxy();
   vtkSMProperty* prop = proxy ? proxy->GetProperty("Input") : NULL;
@@ -94,33 +129,27 @@ bool pqInputDataTypeDecorator::enableWidget() const
     QList<pqOutputPort*> ports = source->getOutputPorts();
     cur_input = ports.size() > 0 ? ports[0] : NULL;
     int exclude = 0;
-    if (!this->xml()->GetScalarAttribute("exclude", &exclude))
-    {
-      exclude = 0;
-    }
-    const char* dataname = this->xml()->GetAttribute("name");
-    if (cur_input && dataname)
+    this->xml()->GetScalarAttribute("exclude", &exclude);
+    std::string dataname = this->xml()->GetAttribute("name");
+    std::vector<std::string> parts = vtksys::SystemTools::SplitString(dataname, ' ');
+    if (cur_input && parts.size())
     {
       vtkPVDataInformation* dataInfo = cur_input->getDataInformation();
-      bool match = (dataInfo->IsDataStructured() && !strcmp(dataname, "Structured")) ||
-        (dataInfo->DataSetTypeIsA(dataname));
-      if (exclude)
+      for (std::size_t i = 0; i < parts.size(); ++i)
       {
+        bool match = (dataInfo->IsDataStructured() && !strcmp(parts[i].c_str(), "Structured")) ||
+          (dataInfo->DataSetTypeIsA(parts[i].c_str()));
         if (match)
         {
-          return false;
+          return !exclude;
         }
       }
-      else if (!match)
-      {
-        return false;
-      }
+      return exclude;
     }
     else
     {
       return false;
     }
   }
-
-  return this->Superclass::enableWidget();
+  return true;
 }

@@ -6785,7 +6785,7 @@ array.
                      short_help="Slice datasets with planes.">This filter
                      extracts the portion of the input dataset that lies along
                      the specified plane. The Slice filter takes any type of
-                     dataset as input. The output of this filter is polygonal
+                     dataset or hyper tree grid as input. The output of this filter is polygonal
                      data.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -6795,13 +6795,20 @@ array.
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to the Slice
         filter.</Documentation>
       </InputProperty>
-      <ProxyProperty command="SetCutFunction"
+      <ProxyProperty command="SetDataSetCutFunction"
                      label="Slice Type"
                      name="CutFunction">
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   exclude="1"
+                                   mode="visibility"/>
+        </Hints>
         <ProxyGroupDomain name="groups">
           <Group name="implicit_functions" />
         </ProxyGroupDomain>
@@ -6818,6 +6825,26 @@ array.
         <Documentation>This property sets the parameters of the slice
         function.</Documentation>
       </ProxyProperty>
+      <ProxyProperty command="SetHyperTreeGridCutFunction"
+                     label="Hyper Tree Grid Slicer"
+                     name="HyperTreeGridImplicitFunction">
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"/>
+        </Hints>
+        <ProxyGroupDomain name="groups">
+          <Group name="implicit_functions" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="implicit_functions"
+                 name="Plane" />
+          <Proxy group="implicit_functions"
+                 name="Axis Aligned Plane" />
+        </ProxyListDomain>
+        <Documentation>This property sets the parameters of the slice
+        function.</Documentation>
+      </ProxyProperty>
       <DoubleVectorProperty information_only="1"
                             name="InputBounds">
         <BoundsDomain name="bounds">
@@ -6827,11 +6854,38 @@ array.
           </RequiredProperties>
         </BoundsDomain>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetDual"
+                         default_values="0"
+                         label="Use Dual"
+                         name="SetDual"
+                         number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="HyperTreeGridImplicitFunction"
+                                       value="Plane"/>
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                       mode="visibility"
+                                       name="vtkHyperTreeGrid"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+        <BooleanDomain name="bool" />
+        <Documentation>If checked, uses the dual of the hyper tree grid.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="PreserveInputCells"
                          default_values="0"
                          label="Crinkle slice"
                          name="PreserveInputCells"
                          number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   exclude="1"
+                                   mode="visibility" />
+        </Hints>
         <BooleanDomain name="bool" />
         <Documentation>This parameter controls whether to extract the entire
         cells that are sliced by the region or just extract a triangulated
@@ -6844,8 +6898,16 @@ array.
         <BooleanDomain name="bool" />
         <Documentation>This parameter controls whether to produce triangles in the output.</Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PreserveInputCells" function="boolean_invert" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                       name="vtkHyperTreeGrid"
+                                       mode="visibility"
+                                       exclude="1" />
+              <PropertyWidgetDecorator type="ShowWidgetDecorator">
+                <Property name="PreserveInputCells" function="boolean_invert" />
+              </PropertyWidgetDecorator>
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
@@ -6857,8 +6919,16 @@ array.
         <BooleanDomain name="bool" />
         <Documentation>This parameter controls whether to merge duplicated points in the slice.</Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="ShowWidgetDecorator">
-            <Property name="PreserveInputCells" function="boolean_invert" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                       name="vtkHyperTreeGrid"
+                                       exclude="1"
+                                       mode="visibility"/>
+              <PropertyWidgetDecorator type="ShowWidgetDecorator">
+                <Property name="PreserveInputCells" function="boolean_invert" />
+              </PropertyWidgetDecorator>
+            </Expression>
           </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
@@ -6871,6 +6941,9 @@ array.
                             set_number_command="SetNumberOfContours"
                             use_index="1"
                             panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator" name="vtkHyperTreeGrid" exclude="1" />
+        </Hints>
         <BoundsDomain mode="magnitude"
                       name="bounds">
           <RequiredProperties>
@@ -7172,6 +7245,7 @@ array.
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <InputArrayDomain name="input_array"
                           number_of_components="1"
@@ -7179,7 +7253,7 @@ array.
         <Documentation>This property specifies the dataset on which the Clip
         filter will operate.</Documentation>
       </InputProperty>
-      <ProxyProperty command="SetClipFunction"
+      <ProxyProperty command="SetDataSetClipFunction"
                      label="Clip Type"
                      name="ClipFunction">
         <ProxyGroupDomain name="groups">
@@ -7197,8 +7271,40 @@ array.
           <Proxy group="implicit_functions"
                  name="Scalar" />
         </ProxyListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   exclude="1"
+                                   mode="visibility"/>
+        </Hints>
         <Documentation>This property specifies the parameters of the clip
         function (an implicit description) used to clip the dataset.</Documentation>
+      </ProxyProperty>
+      <ProxyProperty command="SetHyperTreeGridClipFunction"
+                     label="Hyper Tree Grid Clipper"
+                     name="HyperTreeGridClipFunction">
+        <ProxyGroupDomain name="groups">
+          <Group name="implicit_functions" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="implicit_functions"
+                 name="Axis Aligned Plane" />
+          <Proxy group="implicit_functions"
+                 name="Axis Aligned Box" />
+          <Proxy group="implicit_functions"
+                 name="Sphere" />
+          <Proxy group="implicit_functions"
+                 name="Quadric" />
+          <Proxy group="implicit_functions"
+                 name="Scalar" />
+        </ProxyListDomain>
+        <Documentation>This property specifies the parameters of the clip
+        function (an implicit description) used to clip the hyper tree grid.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   mode="visibility"/>
+        </Hints>
       </ProxyProperty>
       <DoubleVectorProperty information_only="1"
                             name="InputBounds">
@@ -7226,10 +7332,18 @@ array.
         name of the scalar array on which to perform the clip
         operation.</Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="ClipFunction"
-                                   value="Scalar" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ClipFunction"
+                                       value="Scalar" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="HyperTreeGridClipFunction"
+                                       value="Scalar" />
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </StringVectorProperty>
       <DoubleVectorProperty command="SetValue"
@@ -7251,10 +7365,18 @@ array.
         clipping operation. Neither functionality is currently available in
         ParaView's user interface.</Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="ClipFunction"
-                                   value="Scalar" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ClipFunction"
+                                       value="Scalar" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="HyperTreeGridClipFunction"
+                                       value="Scalar" />
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetInsideOut"
@@ -7280,6 +7402,12 @@ array.
                          name="PreserveInputCells"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   mode="visibility"
+                                   exclude="1"
+                                   name="vtkHyperTreeGrid" />
+        </Hints>
         <Documentation>This parameter controls whether to extract entire cells
         in the given region or clip those cells so all of the output will stay
         only on that side of region.</Documentation>
@@ -7428,7 +7556,7 @@ array.
       <!-- End Clip -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkThreshold"
+    <SourceProxy class="vtkPVThreshold"
                  name="Threshold">
       <Documentation long_help="This filter extracts cells that have point or cell scalars in the specified range."
                      short_help="Extract cells that satisfy a threshold criterion.">
@@ -7459,6 +7587,7 @@ array.
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <InputArrayDomain name="input_array"
                           number_of_components="1">
@@ -7502,6 +7631,12 @@ array.
                          default_values="1"
                          name="AllScalars"
                          number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                         name="vtkHyperTreeGrid"
+                                         exclude="1"
+                                         mode="enabled_state" />
+        </Hints>
         <BooleanDomain name="bool" />
         <Documentation>If the value of this property is 1, then a cell is only
         included in the output if the value of the selected array for all its
@@ -7512,6 +7647,12 @@ array.
                          default_values="0"
                          name="UseContinuousCellRange"
                          number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   exclude="1"
+                                   mode="enabled_state" />
+        </Hints>
         <BooleanDomain name="bool" />
         <Documentation>
           If off, the vertex scalars are treated as a discrete set. If on, they
@@ -7527,6 +7668,12 @@ array.
                          default_values="0"
                          name="Invert"
                          number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   exclude="1"
+                                   mode="enabled_state"/>
+        </Hints>
         <BooleanDomain name="bool" />
         <Documentation>Invert the threshold results. That is, cells that would have been in the
           output with this option off are excluded, while cells that would have been excluded from
@@ -7618,6 +7765,7 @@ array.
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="point"
                           name="input_array"
@@ -7649,7 +7797,10 @@ array.
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Hints>
-          <PropertyWidgetDecorator type="InputDataTypeDecorator" name="vtkPolyData"  exclude="1"/>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkPolyData vtkHyperTreeGrid"
+                                   exclude="1"
+                                   mode="enabled_state" />
         </Hints>
         <Documentation>If this property is set to 1, a scalar array containing
         a normal value at each point in the isosurface or isoline will be
@@ -7667,7 +7818,17 @@ array.
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Hints>
-          <PropertyWidgetDecorator type="InputDataTypeDecorator" name="Structured" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                       name="Structured"
+                                       mode="enabled_state"/>
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                       name="vtkHyperTreeGrid"
+                                       mode="enabled_state"
+                                       exclude="1"/>
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
         <Documentation>If this property is set to 1, a scalar array containing
         a gradient value at each point in the isosurface or isoline will be
@@ -7686,6 +7847,12 @@ array.
                          name="ComputeScalars"
                          number_of_elements="1"
                          panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   exclude="1"
+                                   mode="enabled_state"/>
+        </Hints>
         <BooleanDomain name="bool" />
         <Documentation>If this property is set to 1, an array of scalars
         (containing the contour value) will be added to the output dataset. If
@@ -7697,6 +7864,12 @@ array.
                          name="OutputPointsPrecision"
                          number_of_elements="1"
                          panel_visibility="advanced" >
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   exclude="1"
+                                   mode="enabled_state"/>
+        </Hints>
         <EnumerationDomain name="enum">
           <Entry text="Single"
                  value="0" />
@@ -7718,6 +7891,12 @@ points in the input. Defaults to ***Single***.
                          default_values="1"
                          name="GenerateTriangles"
                          number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkHyperTreeGrid"
+                                   exclude="1"
+                                   mode="enabled_state"/>
+        </Hints>
         <BooleanDomain name="bool" />
         <Documentation>This parameter controls whether to produce triangles in the output.
         Warning: Many filters do not properly handle non-triangular polygons.
@@ -11167,6 +11346,7 @@ Every Nth Point.
         <Hints>
           <PropertyWidgetDecorator type="InputDataTypeDecorator"
                                    name="vtkPolyData"
+                                   mode="enabled_state"
                                    exclude="1" />
         </Hints>
         <Documentation>Select whether to compute normals.</Documentation>
@@ -16938,262 +17118,6 @@ Every Nth Point.
       </InputProperty>
       <!-- End vtkHyperTreeGridToDualGrid -->
     </SourceProxy>
-    <!-- ==================================================================== -->
-    <SourceProxy class="vtkHyperTreeGridContour"
-                 label="Hyper Tree Grid - Contour"
-                 name="HyperTreeGridContour">
-      <Documentation long_help="Specialized Contour filter for HyperTreeGrid."
-                     short_help="Contour filter for HyperTreeGrid.">
-                     This filter extracts isocontours directly from HyperTreeGrid input datasets.
-      </Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkHyperTreeGrid" />
-        </DataTypeDomain>
-        <Documentation>This property specifies the input to the converter.</Documentation>
-      </InputProperty>
-      <StringVectorProperty animateable="0"
-                            command="SetInputArrayToProcess"
-                            element_types="0 0 0 0 2"
-                            label="Contour By"
-                            name="SelectInputScalars"
-                            number_of_elements="5">
-        <ArrayListDomain attribute_type="Scalars"
-                         name="array_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </ArrayListDomain>
-        <Documentation>This property specifies the name of the scalar array
-        from which the contour filter will compute isolines and/or
-        isosurfaces.</Documentation>
-      </StringVectorProperty>
-      <DoubleVectorProperty animateable="1"
-                            command="SetValue"
-                            label="Isosurfaces"
-                            name="ContourValues"
-                            number_of_elements="0"
-                            number_of_elements_per_command="1"
-                            repeat_command="1"
-                            set_number_command="SetNumberOfContours"
-                            use_index="1">
-        <ArrayRangeDomain name="scalar_range">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-            <Property function="ArraySelection"
-                      name="SelectInputScalars" />
-          </RequiredProperties>
-        </ArrayRangeDomain>
-        <Documentation>This property specifies the values at which to compute
-        isosurfaces/isolines and also the number of such
-        values.</Documentation>
-      </DoubleVectorProperty>
-      <!-- End vtkHyperTreeGridContour -->
-    </SourceProxy>
-    <!-- ==================================================================== -->
-    <SourceProxy class="vtkHyperTreeGridThreshold"
-                 label="Hyper Tree Grid - Threshold"
-                 name="HyperTreeGridThreshold">
-      <Documentation long_help="Specialized Threshold filter for HyperTreeGrid."
-                     short_help="Threshold filter for HyperTreeGrid.">
-                     This filter thresholds directly from HyperTreeGrid input datasets.
-      </Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkHyperTreeGrid" />
-        </DataTypeDomain>
-        <Documentation>This property specifies the input to the converter.</Documentation>
-      </InputProperty>
-      <StringVectorProperty animateable="0"
-                            command="SetInputArrayToProcess"
-                            element_types="0 0 0 0 2"
-                            label="Contour By"
-                            name="SelectInputScalars"
-                            number_of_elements="5">
-        <ArrayListDomain attribute_type="Scalars"
-                         name="array_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </ArrayListDomain>
-        <Documentation>This property specifies the name of the scalar array
-        from which the contour filter will compute isolines and/or
-        isosurfaces.</Documentation>
-      </StringVectorProperty>
-      <DoubleVectorProperty command="ThresholdBetween"
-                            default_values="0 0"
-                            label="Threshold Range"
-                            name="ThresholdBetween"
-                            number_of_elements="2"
-                            panel_widget="double_range">
-        <ArrayRangeDomain name="range">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-            <Property function="ArraySelection"
-                      name="SelectInputScalars" />
-          </RequiredProperties>
-        </ArrayRangeDomain>
-        <Documentation>The values of this property specify the upper and lower
-        bounds of the thresholding operation.</Documentation>
-      </DoubleVectorProperty>
-      <!-- End vtkHyperTreeGridThreshold -->
-    </SourceProxy>
-    <!-- ==================================================================== -->
-    <SourceProxy class="vtkHyperTreeGridAxisClip"
-                 name="HyperTreeGridAxisClip"
-                 label="Hyper Tree Grid - Axis Clip">
-      <Documentation short_help="Clip a HTG along an axis-aligned plane or box.">
-        Clip an hyper tree grid along an axis aligned plane or box and output
-        a hyper tree grid with same dimensionality.
-      </Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-
-          <ProxyGroupDomain name="groups">
-            <Group name="sources" />
-            <Group name="filters" />
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-          <DataType value="vtkHyperTreeGrid" />
-        </DataTypeDomain>
-      </InputProperty>
-      <IntVectorProperty command="SetClipType"
-                         default_values="0"
-                         name="ClipType"
-                         number_of_elements="1">
-          <EnumerationDomain name="enum">
-            <Entry text="Plane"   value="0" />
-            <Entry text="Box"     value="1" />
-            <Entry text="Quadric" value="2" />
-          </EnumerationDomain>
-        <Documentation>Type of clip operation to use.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty name="PlaneNormal"
-                         command="SetPlaneNormalAxis"
-                         number_of_elements="1"
-                         default_values="0">
-          <EnumerationDomain name="enum">
-            <Entry text="X Axis" value="0" />
-            <Entry text="Y Axis" value="1" />
-            <Entry text="Z Axis" value="2" />
-          </EnumerationDomain>
-        <Documentation>Axis to use as the normal to the clip plane.</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="ClipType"
-                                   value="0" />
-        </Hints>
-      </IntVectorProperty>
-      <DoubleVectorProperty name="PlanePosition"
-                            command="SetPlanePosition"
-                            number_of_elements="1"
-                            default_values="0.0">
-        <Documentation>Position of the clip plane along the normal axis.</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="ClipType"
-                                   value="0" />
-        </Hints>
-      </DoubleVectorProperty>
-      <IntVectorProperty name="ClipBelowPlane"
-                         command="SetInsideOut"
-                         default_values="0"
-                         number_of_elements="1">
-        <Documentation>
-          By default, the portion of the dataset above the clip plane is kept.
-          Enabling this option will keep the portion below the plane.
-        </Documentation>
-        <BooleanDomain name="bool" />
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="ClipType"
-                                   value="0" />
-        </Hints>
-      </IntVectorProperty>
-      <DoubleVectorProperty name="Bounds"
-                            command="SetBounds"
-                            number_of_elements="6"
-                            default_values="-0.5 0.5 -0.5 0.5 -0.5 0.5">
-        <Documentation>
-          Defines the bounds (minX, maxX, minY, maxY, minZ, maxZ) of the clip box.
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="ClipType"
-                                   value="1" />
-        </Hints>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty name="QuadricCoefficients"
-                            command="SetQuadricCoefficients"
-                            number_of_elements="10"
-                            default_values="1 1 1 0 0 0 0 0 0 -1">
-        <Documentation>
-          Coefficients of the quadric function, defined as the 'a' values in:
-          F(x,y,z) = a0*x^2 + a1*y^2 + a2*z^2 + a3*x*y + a4*y*z + a5*x*z + a6*x + a7*y + a8*z + a9
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="ClipType"
-                                   value="2" />
-        </Hints>
-      </DoubleVectorProperty>
-    <!-- End vtkHyperTreeGridAxisClip -->
-    </SourceProxy>
-    <SourceProxy class="vtkHyperTreeGridAxisCut"
-                 name="HyperTreeGridAxisCut"
-                 label="Hyper Tree Grid - Axis Cut">
-      <Documentation short_help="Cut a 3D HTG along an axis-aligned plane.">
-        Cut a hyper tree grid along an axis-aligned plane and output a new hyper
-        tree grid. Only works for 3D grids.
-      </Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkHyperTreeGrid" />
-        </DataTypeDomain>
-      </InputProperty>
-      <IntVectorProperty name="PlaneNormal"
-                         command="SetPlaneNormalAxis"
-                         number_of_elements="1"
-                         default_values="0">
-          <EnumerationDomain name="enum">
-            <Entry text="X Axis" value="0" />
-            <Entry text="Y Axis" value="1" />
-            <Entry text="Z Axis" value="2" />
-          </EnumerationDomain>
-        <Documentation>Axis to use as the normal to the cut plane.</Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty name="PlanePosition"
-                            command="SetPlanePosition"
-                            number_of_elements="1"
-                            default_values="0.0">
-        <Documentation>Position of the cut plane along the normal axis.</Documentation>
-      </DoubleVectorProperty>
-      <!-- End vtkHyperTreeGridAxisClut -->
-    </SourceProxy>
     <SourceProxy class="vtkHyperTreeGridAxisReflection"
                  name="HyperTreeGridAxisReflection"
                  label="Hyper Tree Grid - Axis Reflection">
@@ -17313,47 +17237,6 @@ Every Nth Point.
         </DataTypeDomain>
       </InputProperty>
       <!-- End vtkHyperTreeGridGeometry -->
-    </SourceProxy>
-    <SourceProxy class="vtkHyperTreeGridPlaneCutter"
-                 name="HyperTreeGridSliceWithPlane"
-                 label="Hyper Tree Grid - Slice With Plane">
-      <Documentation short_help="Produce polydata describing a plane in the HTG.">
-        Takes as input an hyper tree grid and a single plane and generates the
-        polygonal data intersection surface.
-      </Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkHyperTreeGrid" />
-        </DataTypeDomain>
-      </InputProperty>
-      <DoubleVectorProperty
-        command="SetPlane"
-        name="Plane"
-        number_of_elements="4"
-        default_values="1 0 0 0">
-        <Documentation>
-          This property sets the parameters of the plane function.
-          Specify the plane with its [a,b,c,d] Cartesian coefficients a.x + b.y + c.z = d
-        </Documentation>
-      </DoubleVectorProperty>
-      <IntVectorProperty name="UseDualGrid"
-                         command="SetDual"
-                         default_values="0"
-                         number_of_elements="1">
-        <Documentation>
-          If enabled, the output plane is computed using the dual grid, providing
-          perfect connectivity at the cost of speed. If disabled, the AMR mesh
-          is used directly, and the output is obtained faster and is more useful
-          for rendering.
-        </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <!-- End vtkHyperTreeGridPlaneCutter-->
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPointSetToMoleculeFilter"

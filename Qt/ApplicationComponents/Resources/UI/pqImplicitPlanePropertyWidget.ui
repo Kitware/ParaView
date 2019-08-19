@@ -148,8 +148,8 @@
         <string>Reset to Data Bounds</string>
        </property>
       </widget>
-     </item>
-     <item row="5" column="0" colspan="2">
+    </item>
+    <item row="5" column="0" colspan="2">
       <widget class="QPushButton" name="resetCameraToNormal">
        <property name="toolTip">
         <string>Reset the camera to look along the normal.</string>

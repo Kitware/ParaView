@@ -43,6 +43,20 @@ public:
   vtkGetMacro(Offset, double);
   //@}
 
+  //@{
+  /**
+   * If AxisAligned is true, sets axis to the nearest canonical axis.
+   */
+  virtual void SetNormal(double x, double y, double z) override;
+  virtual void SetNormal(double* x) override;
+  //@}
+
+  /**
+   * Accessors for AxisAligned, which locks normal to plane to be aligned with x, y, or z axis.
+   */
+  vtkSetMacro(AxisAligned, bool);
+  vtkGetMacro(AxisAligned, bool);
+
   /**
    * Set/Get a transformation to apply to input points before
    * executing the implicit function.
@@ -76,6 +90,8 @@ protected:
 
   double Offset;
   vtkPlane* Plane;
+
+  bool AxisAligned;
 
 private:
   vtkPVPlane(const vtkPVPlane&) = delete;

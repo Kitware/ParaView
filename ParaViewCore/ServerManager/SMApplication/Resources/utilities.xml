@@ -713,6 +713,68 @@
         </ProxyList>
       </Hints>
     </Proxy>
+    <Proxy class="vtkPVPlane"
+           name="Axis Aligned Plane">
+      <InputProperty is_internal="1"
+                     name="Input"></InputProperty>
+      <DoubleVectorProperty command="SetOrigin"
+                            default_values="0.0 0.0 0.0"
+                            name="Origin"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="mid"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          Set the origin of the plane.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetNormal"
+                            default_values="1.0 0.0 0.0"
+                            name="Normal"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the normal of the plane.  For many filters this also sets the side
+          of the plane that is of interest.  The normal points towards the
+          "outside" of the plane.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetOffset"
+                            default_values="0.0"
+                            name="Offset"
+                            number_of_elements="1">
+        <Documentation>
+          Set the value to offset the origin by. The origin is translated along the normal
+          direction by the number specified.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetAxisAligned"
+                         default_values="1"
+                         name="AlwaysSnapToNearestAxis"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <PropertyGroup label="Plane Parameters" panel_widget="InteractivePlane">
+        <Property function="Origin" name="Origin" />
+        <Property function="Normal" name="Normal" />
+        <Property function="Input" name="Input" />
+        <Property function="AlwaysSnapToNearestAxis" name="AlwaysSnapToNearestAxis" />
+      </PropertyGroup>
+
+      <Hints>
+        <ProxyList>
+          <Link name="Input"
+                with_property="Input" />
+        </ProxyList>
+      </Hints>
+      <!-- End of Axis Aligned Plane -->
+    </Proxy>
     <Proxy class="vtkPlanes"
            name="Planes">
       <ProxyProperty command="SetPoints"
@@ -727,6 +789,79 @@
           <Group name="data_arrays" />
         </ProxyGroupDomain>
       </ProxyProperty>
+    </Proxy>
+    <Proxy class="vtkPVBox" name="Axis Aligned Box">
+      <InputProperty is_internal="1" name="Input" />
+      <IntVectorProperty name="UseReferenceBounds"
+        command="SetUseReferenceBounds"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetReferenceBounds"
+                            default_values="0 1 0 1 0 1"
+                            name="Bounds"
+                            number_of_elements="6">
+        <BoundsDomain mode="data_bounds" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPosition"
+                            default_values="0.0 0.0 0.0"
+                            name="Position"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="min" mode="normal" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          Set the position of the box.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetRotation"
+                            default_values="0.0 0.0 0.0"
+                            name="Rotation"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the orientation of the box.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetScale"
+                            default_values="1.0 1.0 1.0"
+                            name="Length"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="max" mode="component_magnitude" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          Set the size of the box via a scale factor.
+        </Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Box Parameters" panel_widget="InteractiveBox">
+        <Property function="Position" name="Position" />
+        <Property function="Scale" name="Length" />
+        <Property function="Input" name="Input" />
+        <Property function="UseReferenceBounds" name="UseReferenceBounds" />
+        <Property function="ReferenceBounds" name="Bounds" />
+      </PropertyGroup>
+      <Hints>
+        <ProxyList>
+          <Link name="Input" with_property="Input" />
+        </ProxyList>
+      </Hints>
+      <!-- End of Axis Aligned Box -->
     </Proxy>
     <Proxy class="vtkPVBox" name="Box">
       <InputProperty is_internal="1" name="Input" />
@@ -801,6 +936,18 @@
         </ProxyList>
       </Hints>
       <!-- End of Box -->
+    </Proxy>
+    <Proxy class="vtkQuadric" name="Quadric">
+      <InputProperty is_internal="1" name="Input" />
+      <DoubleVectorProperty name="QuadricCoefficients"
+                            command="SetCoefficients"
+                            number_of_elements="10"
+                            default_values="1 1 1 0 0 0 0 0 0 -1">
+        <Documentation>
+          Coefficients of the quadric function, defined as the 'a' values in:
+          F(x,y,z) = a0*x^2 + a1*y^2 + a2*z^2 + a3*x*y + a4*y*z + a5*x*z + a6*x + a7*y + a8*z + a9
+        </Documentation>
+      </DoubleVectorProperty>
     </Proxy>
     <Proxy class="vtkSphere" name="Sphere">
       <InputProperty is_internal="1" name="Input" />

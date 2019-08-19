@@ -27,11 +27,14 @@
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkEventForwarderCommand.h"
 #include "vtkHierarchicalBoxDataSet.h"
+#include "vtkHyperTreeGrid.h"
+#include "vtkHyperTreeGridContour.h"
 #include "vtkInformation.h"
 #include "vtkInformationStringVectorKey.h"
 #include "vtkInformationVector.h"
 #include "vtkLogger.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkSMPTools.h"
@@ -145,6 +148,33 @@ int vtkPVContourFilter::RequestData(
       }
       return 1;
     }
+  }
+
+  // Check if input is hyper tree grid
+  if (vtkHyperTreeGrid::SafeDownCast(inDataObj))
+  {
+    vtkInformation* inArrayInfo = this->GetInputArrayInformation(0);
+    if (!inArrayInfo)
+    {
+      vtkErrorMacro("Problem getting name of array to process.");
+      return 0;
+    }
+
+    // WARNING
+    // Compute Normals and Generate Triangles do not apply to Hyper Tree Grids
+
+    vtkNew<vtkHyperTreeGridContour> contourFilter;
+    contourFilter->SetInputData(0, inDataObj);
+    contourFilter->SetInputArrayToProcess(0, inArrayInfo);
+    for (vtkIdType i = 0; i < this->GetNumberOfContours(); ++i)
+    {
+      contourFilter->SetValue(i, this->GetValue(i));
+    }
+
+    contourFilter->Update();
+    vtkPolyData::SafeDownCast(outDataObj)->ShallowCopy(contourFilter->GetOutput(0));
+
+    return 1;
   }
 
   vtkDataArray* array = this->GetInputArrayToProcess(0, inputVector);
@@ -299,6 +329,7 @@ int vtkPVContourFilter::FillInputPortInformation(int port, vtkInformation* info)
   // According to the documentation this is the way to append additional
   // input data set type since VTK 5.2.
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHierarchicalBoxDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
   return 1;
 }
 

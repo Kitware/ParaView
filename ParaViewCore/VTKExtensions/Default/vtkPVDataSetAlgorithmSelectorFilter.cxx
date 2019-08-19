@@ -16,12 +16,24 @@
 
 #include "vtkAlgorithm.h"
 #include "vtkCallbackCommand.h"
+#include "vtkCutter.h"
 #include "vtkDataSet.h"
+#include "vtkHyperTreeGrid.h"
+#include "vtkHyperTreeGridAxisClip.h"
+#include "vtkHyperTreeGridAxisCut.h"
+#include "vtkHyperTreeGridPlaneCutter.h"
+#include "vtkImplicitFunction.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVBox.h"
+#include "vtkPVClipDataSet.h"
+#include "vtkPVMetaSliceDataSet.h"
+#include "vtkPVPlane.h"
 #include "vtkPolyDataAlgorithm.h"
+#include "vtkQuadric.h"
 #include "vtkSmartPointer.h"
+#include "vtkSphere.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkUnstructuredGridAlgorithm.h"
@@ -68,6 +80,7 @@ vtkPVDataSetAlgorithmSelectorFilter::~vtkPVDataSetAlgorithmSelectorFilter()
   delete this->Internal;
   this->Internal = NULL;
 }
+
 //----------------------------------------------------------------------------
 int vtkPVDataSetAlgorithmSelectorFilter::ProcessRequest(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
@@ -75,14 +88,13 @@ int vtkPVDataSetAlgorithmSelectorFilter::ProcessRequest(
   // Make sure the output object is created with the correct type
   if (request->Has(vtkStreamingDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
   {
-    return this->RequestDataObject(NULL, NULL, outputVector);
+    return this->RequestDataObject(request, inputVector, outputVector);
   }
   else
   {
     // Use the real filter to process the input
     vtkAlgorithm* activeFilterToUse = this->GetActiveFilter();
     vtkDebugMacro("Executing: " << activeFilterToUse->GetClassName());
-
     if (activeFilterToUse)
     {
       return activeFilterToUse->ProcessRequest(request, inputVector, outputVector);
@@ -95,6 +107,7 @@ int vtkPVDataSetAlgorithmSelectorFilter::ProcessRequest(
     return 1;
   }
 }
+
 //----------------------------------------------------------------------------
 int vtkPVDataSetAlgorithmSelectorFilter::ProcessRequest(
   vtkInformation* request, vtkCollection* inputVector, vtkInformationVector* outputVector)
@@ -102,7 +115,7 @@ int vtkPVDataSetAlgorithmSelectorFilter::ProcessRequest(
   // Make sure the output object is created with the correct type
   if (request->Has(vtkStreamingDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
   {
-    this->RequestDataObject(NULL, NULL, outputVector);
+    this->RequestDataObject(nullptr, nullptr, outputVector);
   }
   else
   {
@@ -262,10 +275,12 @@ vtkMTimeType vtkPVDataSetAlgorithmSelectorFilter::GetMTime()
 
   return maxMTime;
 }
+
 //----------------------------------------------------------------------------
 int vtkPVDataSetAlgorithmSelectorFilter::FillInputPortInformation(int, vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
   return 1;
 }
 
@@ -274,11 +289,11 @@ int vtkPVDataSetAlgorithmSelectorFilter::FillOutputPortInformation(
   int vtkNotUsed(port), vtkInformation* info)
 {
   // now add our info
-  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataSet");
+  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
   return 1;
 }
-//----------------------------------------------------------------------------
 
+//----------------------------------------------------------------------------
 int vtkPVDataSetAlgorithmSelectorFilter::RequestDataObject(
   vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
@@ -310,6 +325,21 @@ int vtkPVDataSetAlgorithmSelectorFilter::RequestDataObject(
       else
       {
         vtkUnstructuredGrid* output = vtkUnstructuredGrid::New();
+        this->GetExecutive()->SetOutputData(0, output);
+        output->FastDelete();
+        this->GetOutputPortInformation(0)->Set(
+          vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
+      }
+      break;
+    case VTK_HYPER_TREE_GRID:
+      if (vtkHyperTreeGrid::SafeDownCast(info->Get(vtkDataObject::DATA_OBJECT())))
+      {
+        // The output is already created
+        return 1;
+      }
+      else
+      {
+        vtkHyperTreeGrid* output = vtkHyperTreeGrid::New();
         this->GetExecutive()->SetOutputData(0, output);
         output->FastDelete();
         this->GetOutputPortInformation(0)->Set(

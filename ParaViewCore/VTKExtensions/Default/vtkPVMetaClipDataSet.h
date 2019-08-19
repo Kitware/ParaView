@@ -35,6 +35,9 @@ public:
 
   static vtkPVMetaClipDataSet* New();
 
+  static const unsigned METACLIP_DATASET = 0;
+  static const unsigned METACLIP_HYPERTREEGRID = 1;
+
   /**
    * Enable or disable the Extract Cells By Regions.
    */
@@ -50,6 +53,16 @@ public:
    * Expose method from vtkCutter
    */
   void SetClipFunction(vtkImplicitFunction* func) { this->SetImplicitFunction(func); };
+
+  /**
+   * Sets the clip function for vtkDataSet inputs
+   */
+  void SetDataSetClipFunction(vtkImplicitFunction* func);
+
+  /**
+   * Sets the clip function for vtkHyperTreeGrid inputs
+   */
+  void SetHyperTreeGridClipFunction(vtkImplicitFunction* func);
 
   /**
    * Expose method from vtkClip
@@ -94,6 +107,9 @@ public:
   int ProcessRequest(
     vtkInformation* request, vtkCollection* inInfo, vtkInformationVector* outInfo) override;
 
+  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
+
 protected:
   vtkPVMetaClipDataSet();
   ~vtkPVMetaClipDataSet() override;
@@ -101,6 +117,8 @@ protected:
   // Check to see if this filter can do crinkle, return true if
   // we need to switch active filter, so that we can switch back after.
   bool SwitchFilterForCrinkle();
+
+  vtkImplicitFunction* ImplicitFunctions[2];
 
 private:
   vtkPVMetaClipDataSet(const vtkPVMetaClipDataSet&) = delete;
