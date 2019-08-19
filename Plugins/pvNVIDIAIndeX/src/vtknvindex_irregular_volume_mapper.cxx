@@ -90,6 +90,8 @@ vtknvindex_irregular_volume_mapper::vtknvindex_irregular_volume_mapper()
   m_kd_tree = NULL;
   m_prev_property = "";
   m_last_MTime = 0;
+
+  vtkMath::UninitializeBounds(m_whole_bounds);
 }
 
 //----------------------------------------------------------------------------

@@ -767,7 +767,7 @@
           </IntVectorProperty>
 
           <DoubleVectorProperty
-              label="Level"
+              label="Gradient Level"
               name="gradient_level"
               command="set_gradient_level"
               number_of_elements="1"
@@ -787,7 +787,7 @@
           </DoubleVectorProperty>
 
           <DoubleVectorProperty
-              label="Scale"
+              label="Gradient Scale"
               name="gradient_scale"
               command="set_gradient_scale"
               number_of_elements="1"
