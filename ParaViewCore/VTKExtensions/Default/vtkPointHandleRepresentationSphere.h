@@ -47,6 +47,8 @@ public:
    */
   static vtkPointHandleRepresentationSphere* New();
 
+  using vtkHandleRepresentation::Translate;
+
   //@{
   /**
    * Standard methods for instances of this class.
@@ -127,6 +129,10 @@ public:
    */
   void Highlight(int highlight) override;
 
+  // Methods to manipulate the cursor
+  void Translate(const double* eventPos) override;
+  void Scale(const double eventPos[2]);
+
 protected:
   vtkPointHandleRepresentationSphere();
   ~vtkPointHandleRepresentationSphere() override;
@@ -139,14 +145,11 @@ protected:
   vtkPolyData* FocalData;
   vtkPoints* FocalPoint;
 
+  int ConstraintAxis;
+
   // Support picking
   double LastPickPosition[3];
   double LastEventPosition[2];
-
-  // Methods to manipulate the cursor
-  int ConstraintAxis;
-  void Translate(double eventPos[2]);
-  void Scale(double eventPos[2]);
 
   // A flag to use the disk source
   int AddCircleAroundSphere;

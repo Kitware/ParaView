@@ -263,7 +263,7 @@ void vtkPointHandleRepresentationSphere::WidgetInteraction(double eventPos[2])
 
 //----------------------------------------------------------------------
 // Translate everything
-void vtkPointHandleRepresentationSphere::Translate(double eventPos[2])
+void vtkPointHandleRepresentationSphere::Translate(const double* eventPos)
 {
   double pos[3], dpos[2];
   this->FocalPoint->GetPoint(0, pos);
@@ -283,7 +283,7 @@ void vtkPointHandleRepresentationSphere::Translate(double eventPos[2])
 }
 
 //----------------------------------------------------------------------
-void vtkPointHandleRepresentationSphere::Scale(double eventPos[2])
+void vtkPointHandleRepresentationSphere::Scale(const double eventPos[2])
 {
   // Get the current scale factor
   double sf = this->Glypher->GetScaleFactor();
