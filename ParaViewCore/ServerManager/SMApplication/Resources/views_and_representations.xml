@@ -7969,7 +7969,7 @@
         <ChartSeriesSelectionDomain name="array_list"
                                     hide_partial_arrays="0"
                                     default_mode="value"
-                                    default_value="2">
+                                    default_value="4">
           <RequiredProperties>
             <Property function="Input" name="Input" />
             <Property function="FieldDataSelection" name="AttributeType" />
@@ -8072,7 +8072,7 @@
         <Documentation>Set the series marker size.</Documentation>
         <ChartSeriesSelectionDomain name="array_list"
                                     default_mode="value"
-                                    default_value="2">
+                                    default_value="4">
           <RequiredProperties>
             <Property function="Input" name="Input" />
             <Property function="FieldDataSelection" name="AttributeType" />
