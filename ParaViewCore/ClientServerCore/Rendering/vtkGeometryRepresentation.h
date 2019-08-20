@@ -175,6 +175,15 @@ public:
   virtual void SetLuminosity(double val);
   virtual void SetRenderPointsAsSpheres(bool);
   virtual void SetRenderLinesAsTubes(bool);
+  virtual void SetRoughness(double val);
+  virtual void SetMetallic(double val);
+  virtual void SetBaseColorTexture(vtkTexture* tex);
+  virtual void SetMaterialTexture(vtkTexture* tex);
+  virtual void SetNormalTexture(vtkTexture* tex);
+  virtual void SetEmissiveTexture(vtkTexture* tex);
+  virtual void SetNormalScale(double val);
+  virtual void SetOcclusionStrength(double val);
+  virtual void SetEmissiveFactor(double rval, double gval, double bval);
 
   //***************************************************************************
   // Forwarded to Actor.
@@ -185,6 +194,7 @@ public:
   virtual void SetScale(double, double, double);
   virtual void SetTexture(vtkTexture*);
   virtual void SetUserTransform(const double[16]);
+  virtual void SetFlipTextures(bool);
 
   //***************************************************************************
   // Forwarded to Mapper and LODMapper.

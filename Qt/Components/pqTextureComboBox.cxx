@@ -102,6 +102,9 @@ void pqTextureComboBox::proxyUnRegistered(
 void pqTextureComboBox::updateTextures()
 {
   this->blockSignals(true);
+
+  vtkSMProxy* currentTexture = reinterpret_cast<vtkSMProxy*>(this->currentData().value<void*>());
+
   this->clear();
   this->addItem("None", QVariant("NONE"));
   this->addItem("Load ...", QVariant("LOAD"));
@@ -112,6 +115,7 @@ void pqTextureComboBox::updateTextures()
     QVariant proxyVar = QVariant::fromValue<void*>(this->Domain->GetProxy(proxyName));
     this->addItem(QString(proxyName), proxyVar);
   }
+  this->updateFromTexture(currentTexture);
   this->blockSignals(false);
 }
 

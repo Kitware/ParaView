@@ -2443,6 +2443,32 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty command="SetSkyboxBackground"
+                         default_values="0"
+                         name="UseSkyboxBackground"
+                         number_of_elements="1">
+        <Documentation>
+          Enable skybox texture.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseEnvironmentLighting"
+                         default_values="0"
+                         name="UseEnvironmentLighting"
+                         number_of_elements="1">
+        <Documentation>
+          Enable skybox light contribution. This feature is only compatible with PBR interpolation.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetSkyboxResolution"
+                         default_values="1000"
+                         name="SkyboxResolution"
+                         number_of_elements="1">
+        <Documentation>
+          Set the resolution of the skybox.
+        </Documentation>
+      </IntVectorProperty>
       <ProxyProperty command="SetBackgroundTexture"
                      name="BackgroundTexture" panel_widget="texture_selector">
         <ProxyGroupDomain name="groups">
@@ -2759,7 +2785,7 @@
       <DoubleVectorProperty
           name="BackgroundNorth"
           command="SetBackgroundNorth"
-          default_values="1.0 0.0 0.0"
+          default_values="0.0 1.0 0.0"
           animateable="0"
           number_of_elements="3">
         <Documentation>Sets north pole for gradient and image background in OSPRay path tracer.</Documentation>
@@ -2774,7 +2800,7 @@
       <DoubleVectorProperty
           name="BackgroundEast"
           command="SetBackgroundEast"
-          default_values="0.0 1.0 0.0"
+          default_values="1.0 0.0 0.0"
           animateable="0"
           number_of_elements="3">
         <Documentation>Sets east direction for image background in OSPRay path tracer.</Documentation>
@@ -2837,6 +2863,9 @@
         <Property name="Background2"/>
         <Property name="UseGradientBackground"/>
         <Property name="UseTexturedBackground"/>
+        <Property name="UseSkyboxBackground"/>
+        <Property name="UseEnvironmentLighting"/>
+        <Property name="SkyboxResolution"/>
         <Property name="BackgroundTexture"/>
       </PropertyGroup>
       <PropertyGroup label="Stereo">
@@ -3796,6 +3825,17 @@
                       panel_visibility="advanced" />
             <Property name="Ambient" panel_visibility="advanced"/>
             <Property name="Diffuse" panel_visibility="advanced"/>
+            <Property name="Roughness" panel_visibility="advanced"/>
+            <Property name="Metallic" panel_visibility="advanced"/>
+            <Property name="Texture" panel_visibility="advanced"/>
+            <Property name="BaseColorTexture" panel_visibility="advanced"/>
+            <Property name="NormalTexture" panel_visibility="advanced"/>
+            <Property name="NormalScale" panel_visibility="advanced"/>
+            <Property name="MaterialTexture" panel_visibility="advanced"/>
+            <Property name="OcclusionStrength" panel_visibility="advanced"/>
+            <Property name="EmissiveTexture" panel_visibility="advanced"/>
+            <Property name="EmissiveFactor" panel_visibility="advanced"/>
+            <Property name="FlipTextures" panel_visibility="advanced"/>
           </PropertyGroup>
 
           <PropertyGroup label="Edge Styling">
@@ -3836,8 +3876,6 @@
                       panel_visibility="never" />
             <Property name="SuppressLOD"
                       panel_visibility="never" />
-            <Property name="Texture"
-                      panel_visibility="advanced" />
             <Property name="UserTransform"
                       panel_visibility="never" />
             <Property name="Triangulate"
@@ -9914,6 +9952,9 @@ Select how you want the text to be represented in the view.
             <Property name="Background2"/>
             <Property name="UseGradientBackground"/>
             <Property name="UseTexturedBackground"/>
+            <Property name="UseSkyboxBackground"/>
+            <Property name="UseEnvironmentLighting"/>
+            <Property name="SkyboxResolution"/>
             <Property name="BackgroundTexture"/>
           </PropertyGroup>
 
@@ -10781,6 +10822,13 @@ Select how you want the text to be represented in the view.
         <DoubleRangeDomain max="1"
                            min="0"
                            name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3"
+                                   inverse="1" />
+        </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetDiffuse"
                             default_values="1.0"
@@ -10797,7 +10845,211 @@ Select how you want the text to be represented in the view.
         <DoubleRangeDomain max="1"
                            min="0"
                            name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3"
+                                   inverse="1" />
+        </Hints>
       </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetRoughness"
+                            default_values="0.3"
+                            name="Roughness"
+                            number_of_elements="1">
+        <Documentation>
+          Set how rough is the surface
+        </Documentation>
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetMetallic"
+                            default_values="0.0"
+                            name="Metallic"
+                            number_of_elements="1">
+        <Documentation>
+          Set metalness of the surface. It is usually either 0 or 1 but any value is valid.
+        </Documentation>
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3" />
+        </Hints>
+      </DoubleVectorProperty>
+      <ProxyProperty command="SetTexture"
+                     name="Texture"
+                     panel_widget="texture_selector"
+                     null_on_empty="1" >
+        <Documentation>
+          Set the diffuse color texture.
+        </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3"
+                                   inverse="1" />
+          <TextureSelectorWidget check_tcoords="1" />
+          <!-- enable the texture selector only when tcoords is available. -->
+        </Hints>
+      </ProxyProperty>
+      <ProxyProperty command="SetBaseColorTexture"
+                     name="BaseColorTexture"
+                     panel_widget="texture_selector"
+                     null_on_empty="1" >
+        <Documentation>
+          Set the base color (also called albedo) texture. It will define the diffuse color for a
+          non metallic surface or the specular color for a metallic surface.
+        </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3" />
+          <TextureSelectorWidget check_tcoords="1" />
+          <!-- enable the texture selector only when tcoords is available. -->
+        </Hints>
+      </ProxyProperty>
+      <ProxyProperty command="SetMaterialTexture"
+                     name="MaterialTexture"
+                     panel_widget="texture_selector"
+                     null_on_empty="1" >
+        <Documentation>
+          Set the material texture. This texture encodes occlusion, roughness and metalness
+          on the red, green, blue channel respectively.
+        </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3" />
+          <TextureSelectorWidget check_tcoords="1" />
+          <!-- enable the texture selector only when tcoords is available. -->
+        </Hints>
+      </ProxyProperty>
+      <DoubleVectorProperty command="SetOcclusionStrength"
+                            default_values="1.0"
+                            name="OcclusionStrength"
+                            number_of_elements="1">
+        <Documentation>
+          Set the ambient occlusion strength of the material texture.
+        </Documentation>
+        <DoubleRangeDomain max="5"
+                           min="0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="MaterialTexture"
+                                   value="null"
+                                   inverse="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <ProxyProperty command="SetNormalTexture"
+                     name="NormalTexture"
+                     panel_widget="texture_selector"
+                     null_on_empty="1" >
+        <Documentation>
+          Set the normal mapping texture.
+        </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="0"
+                                   inverse="1" />
+          <TextureSelectorWidget check_tcoords="1" check_tangents="1" />
+          <!-- enable the texture selector only when tcoords is available. -->
+        </Hints>
+      </ProxyProperty>
+      <DoubleVectorProperty command="SetNormalScale"
+                            default_values="1.0"
+                            name="NormalScale"
+                            number_of_elements="1">
+        <Documentation>
+          Set the scale of normal mapping deviation.
+        </Documentation>
+        <DoubleRangeDomain max="5"
+                           min="0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="NormalTexture"
+                                   value="null"
+                                   inverse="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <ProxyProperty command="SetEmissiveTexture"
+                     name="EmissiveTexture"
+                     panel_widget="texture_selector"
+                     null_on_empty="1" >
+        <Documentation>
+          Set the emissive texture.
+        </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3" />
+          <TextureSelectorWidget check_tcoords="1" />
+          <!-- enable the texture selector only when tcoords is available. -->
+        </Hints>
+      </ProxyProperty>
+      <DoubleVectorProperty command="SetEmissiveFactor"
+                            default_values="1.0 1.0 1.0"
+                            name="EmissiveFactor"
+                            number_of_elements="3">
+        <Documentation>
+          Set the factor of the red, green, blue channels of the emissive texture.
+        </Documentation>
+        <DoubleRangeDomain max="10"
+                           min="0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EmissiveTexture"
+                                   value="null"
+                                   inverse="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetFlipTextures"
+                         default_values="0"
+                         name="FlipTextures"
+                         number_of_elements="1">
+        <Documentation>
+          Enable texture coordinate flip on Y axis. Depending on some format specification, the
+          origin of the texture could be either at the bottom left or the top left of the image.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <IntVectorProperty command="SetSuppressLOD"
                          default_values="0"
                          name="SuppressLOD"
@@ -10834,6 +11086,13 @@ Select how you want the text to be represented in the view.
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3"
+                                   inverse="1" />
+        </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetLineWidth"
                             default_values="1.0"
@@ -10878,7 +11137,8 @@ Select how you want the text to be represented in the view.
                  value="0" />
           <Entry text="Gouraud"
                  value="1" />
-          <!--<Entry value="2" text="Phong" />-->
+          <Entry text="PBR"
+                 value="3" />
         </EnumerationDomain>
       </IntVectorProperty>
       <IntVectorProperty command="SetTriangulate"
@@ -10954,6 +11214,13 @@ Select how you want the text to be represented in the view.
         <DoubleRangeDomain max="100"
                            min="0"
                            name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3"
+                                   inverse="1" />
+        </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetLuminosity"
                             default_values="0.0"
@@ -11036,18 +11303,6 @@ Select how you want the text to be represented in the view.
         </Hints>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <ProxyProperty command="SetTexture"
-                     name="Texture"
-                     panel_widget="texture_selector"
-                     null_on_empty="1" >
-        <ProxyGroupDomain name="groups">
-          <Group name="textures" />
-        </ProxyGroupDomain>
-        <Hints>
-          <TextureSelectorWidget check_tcoords="1" />
-          <!-- enable the texture selector only when tcoords is available. -->
-        </Hints>
-      </ProxyProperty>
       <ProxyProperty command="SetLookupTable"
                      name="LookupTable" >
         <Documentation>Set the lookup-table to use to map data array to colors.

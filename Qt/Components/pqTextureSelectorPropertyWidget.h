@@ -58,7 +58,7 @@ public:
 protected slots:
   void onTextureChanged(vtkSMProxy* texture);
   void onPropertyChanged();
-  void checkTCoords();
+  void checkAttributes(bool tcoords, bool tangents);
 
 private:
   vtkNew<vtkEventQtSlotConnect> VTKConnector;

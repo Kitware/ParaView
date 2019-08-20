@@ -37,6 +37,7 @@
 class vtkAlgorithmOutput;
 class vtkCamera;
 class vtkCuller;
+class vtkEquirectangularToCubemapTexture;
 class vtkExtentTranslator;
 class vtkFloatArray;
 class vtkFXAAOptions;
@@ -65,6 +66,7 @@ class vtkRenderer;
 class vtkRenderViewBase;
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
+class vtkSkybox;
 class vtkTextRepresentation;
 class vtkTexture;
 class vtkTimerLog;
@@ -622,6 +624,8 @@ public:
   virtual void SetBackgroundTexture(vtkTexture* val);
   virtual void SetGradientBackground(int val);
   virtual void SetTexturedBackground(int val);
+  virtual void SetSkyboxBackground(int val);
+  virtual void SetUseEnvironmentLighting(bool val);
 
   //*****************************************************************
   // Entry point for dynamic lights
@@ -959,6 +963,12 @@ public:
    */
   void SynchronizeMaximumIds(vtkIdType* maxPointId, vtkIdType* maxCellId);
 
+  /**
+   * Set skybox cubemap resolution in pixel.
+   * Each face (which is a square) of the skybox will have this resolution.
+   */
+  void SetSkyboxResolution(int resolution);
+
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView() override;
@@ -1073,6 +1083,11 @@ protected:
    */
   void PostSelect(vtkSelection* sel);
 
+  /**
+   * Update skybox actor
+   */
+  void UpdateSkybox();
+
   vtkLightKit* LightKit;
   vtkRenderViewBase* RenderView;
   vtkRenderer* NonCompositedRenderer;
@@ -1086,6 +1101,9 @@ protected:
   vtkPVHardwareSelector* Selector;
   vtkSelection* LastSelection;
   vtkSmartPointer<vtkPVGridAxes3DActor> GridAxes3DActor;
+  vtkNew<vtkSkybox> Skybox;
+  bool NeedSkybox = false;
+  vtkNew<vtkEquirectangularToCubemapTexture> CubeMap;
 
   int StillRenderImageReductionFactor;
   int InteractiveRenderImageReductionFactor;

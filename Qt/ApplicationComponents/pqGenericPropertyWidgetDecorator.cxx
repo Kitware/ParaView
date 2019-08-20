@@ -82,7 +82,7 @@ public:
     if (helper.GetNumberOfElements() == 0)
     {
       // if there is no proxy, 'its value' does not match this->Value.
-      bool status = false;
+      bool status = this->Values.size() == 1 && this->Values[0] == "null";
       return this->Inverse ? !status : status;
     }
 

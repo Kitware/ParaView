@@ -4729,6 +4729,40 @@ array.
       <!-- End  PolyDataNormals -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkPolyDataTangents"
+                 label="Generate Surface Tangents"
+                 name="PolyDataTangents">
+      <Documentation long_help="This filter will produce surface tangents used for normal mapping."
+                     short_help="Produce surface point tangents.">This filter
+                     generates surface tangents at the points of the input
+                     polygonal dataset based on the normals and the texture coordinates.
+                     The resulting dataset is also polygonal. The tangents are required when using
+                     a normal texture.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Tangents
+        Generation filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetComputeCellTangents"
+                         default_values="0"
+                         name="ComputeCellTangents"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This filter computes the tangents at the points in the
+        data set. In the process of doing this it computes polygon tangents too.
+        If you want these normals to be passed to the output of this filter,
+        set the value of this property to 1.</Documentation>
+      </IntVectorProperty>
+      <!-- End  PolyDataTangents -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkPOutlineFilter"
                  label="Outline"
                  name="OutlineFilter">
