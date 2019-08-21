@@ -84,6 +84,8 @@ public:
     virtual Line_type get_line_type() const = 0;
 
     /// Set the line type. look Line_style enum for details.
+    /// The application needs to call this once for initialization.
+    /// Once a line_type was set, a change is not supported.
     ///
     /// \param[in] type  The line type.
     ///
