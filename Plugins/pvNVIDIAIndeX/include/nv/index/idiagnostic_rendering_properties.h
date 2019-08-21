@@ -1,17 +1,13 @@
 /******************************************************************************
  * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
-/**
-   \file
-   \brief        Scene attribute controlling diagnostic rendering.
-*/
+/// \file
+/// \brief Scene attribute controlling diagnostic rendering.
 
 #ifndef NVIDIA_INDEX_IDIAGNOSTIC_RENDERING_PROPERTIES_H
 #define NVIDIA_INDEX_IDIAGNOSTIC_RENDERING_PROPERTIES_H
 
-#include <mi/dice.h>
 #include <nv/index/iattribute.h>
-
 
 namespace nv {
 namespace index {
@@ -22,8 +18,9 @@ class IDiagnostic_rendering_properties :
                                        nv::index::IAttribute>
 {
 public:
-    /// Property idendifiers.
-    enum Property {
+    /// Property identifiers.
+    enum Property
+    {
         MODE,               ///< [uint]     (0)     Render mode 0:off, 1:subregions + scene, 2:subregions only
         OPACITY,            ///< [float]    (0.25)  Opacity of surfaces of subregion boxes.
         OPACITY_FRONT,      ///< [float]    (1)     Opacity factor of front (near) surfaces of subregion boxes.
@@ -39,20 +36,21 @@ public:
     };
 
     /// Underlying datatype of a property.
-    enum Property_type {
+    enum Property_type
+    {
         INVALID_TYPE,
         SIGNED_INT32,
         UNSIGNED_INT32,
         FLOAT32
     };
 
-    virtual bool            set_property(int prop, double value) = 0;
-    virtual double          get_property(int prop) const = 0;
+    virtual bool            set_property(mi::Sint32 prop, mi::Float64 value) = 0;
+    virtual mi::Float64     get_property(mi::Sint32 prop) const = 0;
     virtual mi::Uint32      get_propert_count() const = 0;
-    virtual Property_type   get_property_type(int prop) const = 0;
-    virtual const char*     get_property_name(int prop) const = 0;
+    virtual Property_type   get_property_type(mi::Sint32 prop) const = 0;
+    virtual const char*     get_property_name(mi::Sint32 prop) const = 0;
 };
 
-}} //nv::index
+}} // namespace index / nv
 
-#endif
+#endif // NVIDIA_INDEX_IDIAGNOSTIC_RENDERING_PROPERTIES_H

@@ -48,14 +48,15 @@ class IDistributed_data_import_callback :
                                        mi::neuraylib::ISerializable>
 {
 public:
-    /// Shall provide the memory size of the dataset that is contained in the given bounding box.
+    /// Shall provide the size of the dataset that is contained in the given bounding box.
+    /// The size should approximate the number of primary items in the bounding box (e.g. voxels, cells, pixels).
+    /// If the size is zero, the bounding box region will be seen as empty, and not considered for further processing.
     ///
     /// \param[in] bounding_box             The bounding box of the subset in the dataset's local space.
     /// \param[in] dice_transaction         The DiCE database transaction that the
     ///                                     operation runs in.
     ///
-    /// \return                             Returns the estimated size of the memory allocated
-    ///                                     for the dataset subset, which is contained in the given 3D area.
+    /// \return                             Returns the approximate number of items contained in the given 3D area.
     ///
     virtual mi::Size estimate(
         const mi::math::Bbox_struct<mi::Float32, 3>&    bounding_box,
@@ -142,14 +143,15 @@ class Distributed_discrete_data_import_callback :
     public mi::neuraylib::Base<id1,id2,id3,id4,id5,id6,id7,id8,id9,id10,id11,I>
 {
 public:
-    /// Shall provide the memory size of the dataset that is contained in the given bounding box.
+    /// Shall provide the size of the dataset that is contained in the given bounding box.
+    /// The size should approximate the number of primary items in the bounding box (e.g. voxels, cells, pixels).
+    /// If the size is zero, the bounding box region will be seen as empty, and not considered for further processing.
     ///
     /// \param[in] bounding_box             The bounding box of the subset in the dataset's local space.
     /// \param[in] dice_transaction         The DiCE database transaction that the
     ///                                     operation runs in.
     ///
-    /// \return                             Returns the estimated size of the memory allocated
-    ///                                     for the dataset subset, which is contained in the given 3D area.
+    /// \return                             Returns the approximate number of items contained in the given 3D area.
     ///
     virtual mi::Size estimate(
         const mi::math::Bbox_struct<mi::Sint32, 3>&     bounding_box,
@@ -162,8 +164,7 @@ public:
     /// \param[in] dice_transaction         he DiCE database transaction that the
     ///                                     operation runs in.
     ///
-    /// \return                             Returns the estimated size of the memory allocated
-    ///                                     for the dataset subset, which is contained in the given 3D area.
+    /// \return                             Returns the approximate number of items contained in the given 3D area.
     ///
     virtual mi::Size estimate(
         const mi::math::Bbox_struct<mi::Float32, 3>&    bounding_box,
