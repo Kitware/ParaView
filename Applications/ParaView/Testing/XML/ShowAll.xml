@@ -14,8 +14,9 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,11,15,/0:0/0:1" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,11,15,/0:0/0:1" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
-    <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionHide_All" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionHide_All" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionShow_All" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,15,10,/0:0/2:1" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,15,10,/0:0/2:1" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
 </pqevents>

@@ -251,6 +251,7 @@ function (paraview_add_multi_client_tests)
   _paraview_add_tests("paraview_add_multi_client_tests"
     PREFIX "pvcs-multi-clients"
     _ENABLE_SUFFIX "_ENABLE_MULTI_CLIENT"
+    FORCE_SERIAL
     _COMMAND_PATTERN
       --test-multi-clients
       --server "$<TARGET_FILE:ParaView::pvserver>"

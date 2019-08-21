@@ -1250,8 +1250,12 @@ set (ChartAxisRangeAndLabels_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (ComparativeViewOverlay_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (CategoricalAutomaticAnnotations_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (CategoricalOpacities_FORCE_SERIAL TRUE) # Seems to works better in serial
-
 set (LoadSaveStateVolume_FORCE_SERIAL TRUE)
+set (ShaderReplacements_FORCE_SERIAL TRUE)
+set (CustomViewpoints_FORCE_SERIAL TRUE)
+set (ExodusModeShapes_FORCE_SERIAL TRUE)
+set (LoadSaveStateAnimation_FORCE_SERIAL TRUE)
+
 # We don't support volume rendering of image data in data server & render server mode
 set(LoadSaveStateVolume_DISABLE_CRS TRUE)
 set(SeparatedColorMapOpacity_DISABLE_CRS TRUE)
