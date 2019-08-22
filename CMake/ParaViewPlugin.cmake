@@ -667,6 +667,17 @@ function (paraview_plugin_write_conf)
         PROPERTY  "INTERFACE_paraview_plugin_plugins_file")
       set(_paraview_plugin_conf_plugins_target_xml_install
         "${_paraview_plugin_conf_plugins_target_xml_build}")
+
+      file(RELATIVE_PATH _paraview_plugin_conf_rel_path
+        "/prefix/${CMAKE_INSTALL_PREFIX}"
+        "/prefix/${_paraview_plugin_conf_plugins_target_xml_install}")
+      # If the external plugins XML file is under our installation destination,
+      # use a relative path to it, otherwise keep the absolute path.
+      if (NOT _paraview_plugin_conf_rel_path MATCHES "^\.\./")
+        file(RELATIVE_PATH _paraview_plugin_conf_plugins_target_xml_install
+          "/prefix/${CMAKE_INSTALL_PREFIX}/${_paraview_plugin_conf_INSTALL_DESTINATION}"
+          "/prefix/${_paraview_plugin_conf_plugins_target_xml_install}")
+      endif ()
     else ()
       get_property(_paraview_plugin_conf_plugins_target_is_alias
         TARGET    "${_paraview_plugin_conf_target}"
