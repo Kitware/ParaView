@@ -572,8 +572,8 @@ void ${_paraview_build_target_safe}_initialize()
         file(APPEND "${_paraview_build_properties_install_file}"
           "set_property(TARGET \"${_paraview_build_TARGET}\"
   PROPERTY
-    INTERFACE_paraview_plugin_plugins_file \"\${_vtk_module_write_import_prefix}/${_paraview_build_plugin_destination}/${_paraview_build_PLUGINS_FILE_NAME}\")
-unset(_vtk_module_write_import_prefix)\n")
+    INTERFACE_paraview_plugin_plugins_file \"\${_vtk_module_import_prefix}/${_paraview_build_plugin_destination}/${_paraview_build_PLUGINS_FILE_NAME}\")
+unset(_vtk_module_import_prefix)\n")
 
         install(
           FILES       "${_paraview_build_properties_install_file}"
