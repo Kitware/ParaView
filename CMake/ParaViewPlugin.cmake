@@ -323,6 +323,12 @@ function (paraview_plugin_build)
       "The `INSTALL_EXPORT` argument requires the `TARGET` argument.")
   endif ()
 
+  if (DEFINED _paraview_build_INSTALL_EXPORT
+      AND NOT DEFINED _paraview_build_CMAKE_DESTINATION)
+    message(FATAL_ERROR
+      "The `INSTALL_EXPORT` argument requires the `CMAKE_DESTINATION` argument.")
+  endif ()
+
   if (DEFINED _paraview_build_CMAKE_DESTINATION
       AND NOT DEFINED _paraview_build_TARGET)
     message(FATAL_ERROR
