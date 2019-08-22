@@ -658,19 +658,30 @@ function (paraview_plugin_write_conf)
   set(_paraview_plugin_conf_build_contents)
   set(_paraview_plugin_conf_install_contents)
   foreach (_paraview_plugin_conf_target IN LISTS _paraview_plugin_conf_PLUGINS_TARGETS)
-    get_property(_paraview_plugin_conf_plugins_target_is_alias
+    get_property(_paraview_plugin_conf_plugins_target_is_imported
       TARGET    "${_paraview_plugin_conf_target}"
-      PROPERTY  ALIASED_TARGET
-      SET)
-    if (_paraview_plugin_conf_plugins_target_is_alias)
-      get_property(_paraview_plugin_conf_plugins_target_alias_target
-        TARGET    "${_paraview_plugin_conf_target}"
-        PROPERTY  ALIASED_TARGET)
+      PROPERTY  IMPORTED)
+    if (_paraview_plugin_conf_plugins_target_is_imported)
       get_property(_paraview_plugin_conf_plugins_target_xml_build
-        TARGET    "${_paraview_plugin_conf_plugins_target_alias_target}"
+        TARGET    "${_paraview_plugin_conf_target}"
+        PROPERTY  "INTERFACE_paraview_plugin_plugins_file")
+      set(_paraview_plugin_conf_plugins_target_xml_install
+        "${_paraview_plugin_conf_plugins_target_xml_build}")
+    else ()
+      get_property(_paraview_plugin_conf_plugins_target_is_alias
+        TARGET    "${_paraview_plugin_conf_target}"
+        PROPERTY  ALIASED_TARGET
+        SET)
+      if (_paraview_plugin_conf_plugins_target_is_alias)
+        get_property(_paraview_plugin_conf_target
+          TARGET    "${_paraview_plugin_conf_target}"
+          PROPERTY  ALIASED_TARGET)
+      endif ()
+      get_property(_paraview_plugin_conf_plugins_target_xml_build
+        TARGET    "${_paraview_plugin_conf_target}"
         PROPERTY  "INTERFACE_paraview_plugin_plugins_file")
       get_property(_paraview_plugin_conf_plugins_target_xml_install
-        TARGET    "${_paraview_plugin_conf_plugins_target_alias_target}"
+        TARGET    "${_paraview_plugin_conf_target}"
         PROPERTY  "INTERFACE_paraview_plugin_plugins_file_install")
 
       if (_paraview_plugin_conf_plugins_target_xml_install)
@@ -679,12 +690,6 @@ function (paraview_plugin_write_conf)
           "/prefix/${_paraview_plugin_conf_INSTALL_DESTINATION}"
           "/prefix/${_paraview_plugin_conf_plugins_target_xml_install}")
       endif ()
-    else ()
-      get_property(_paraview_plugin_conf_plugins_target_xml_build
-        TARGET    "${_paraview_plugin_conf_target}"
-        PROPERTY  "INTERFACE_paraview_plugin_plugins_file")
-      set(_paraview_plugin_conf_plugins_target_xml_install
-        "${_paraview_plugin_conf_plugins_target_xml_build}")
     endif ()
 
     # TODO: Write out in JSON instead.
