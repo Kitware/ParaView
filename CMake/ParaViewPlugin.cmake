@@ -549,12 +549,9 @@ void ${_paraview_build_target_safe}_initialize()
           "INTERFACE_paraview_plugin_plugins_file" "${_paraview_build_xml_file}")
 
      if (DEFINED _paraview_build_RUNTIME_DESTINATION)
-       file(RELATIVE_PATH _paraview_build_relpath
-          "/prefix/${_paraview_build_RUNTIME_DESTINATION}"
-          "/prefix/${_paraview_build_plugin_destination}")
         set_property(TARGET "${_paraview_build_TARGET_NAME}"
           PROPERTY
-            "INTERFACE_paraview_plugin_plugins_file_install" "${_paraview_build_relpath}/${_paraview_build_PLUGINS_FILE_NAME}")
+            "INTERFACE_paraview_plugin_plugins_file_install" "${_paraview_build_plugin_destination}/${_paraview_build_PLUGINS_FILE_NAME}")
       endif ()
 
       if (DEFINED _paraview_build_CMAKE_DESTINATION)
@@ -675,6 +672,13 @@ function (paraview_plugin_write_conf)
       get_property(_paraview_plugin_conf_plugins_target_xml_install
         TARGET    "${_paraview_plugin_conf_plugins_target_alias_target}"
         PROPERTY  "INTERFACE_paraview_plugin_plugins_file_install")
+
+      if (_paraview_plugin_conf_plugins_target_xml_install)
+        # Compute the relative path within the install tree.
+        file(RELATIVE_PATH _paraview_plugin_conf_plugins_target_xml_install
+          "/prefix/${_paraview_plugin_conf_INSTALL_DESTINATION}"
+          "/prefix/${_paraview_plugin_conf_plugins_target_xml_install}")
+      endif ()
     else ()
       get_property(_paraview_plugin_conf_plugins_target_xml_build
         TARGET    "${_paraview_plugin_conf_target}"
