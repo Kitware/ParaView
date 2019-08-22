@@ -684,10 +684,14 @@ function (paraview_plugin_write_conf)
     endif ()
 
     # TODO: Write out in JSON instead.
-    string(APPEND _paraview_plugin_conf_build_contents
-      "${_paraview_plugin_conf_plugins_target_xml_build}\n")
-    string(APPEND _paraview_plugin_conf_install_contents
-      "${_paraview_plugin_conf_plugins_target_xml_install}\n")
+    if (_paraview_plugin_conf_plugins_target_xml_build)
+      string(APPEND _paraview_plugin_conf_build_contents
+        "${_paraview_plugin_conf_plugins_target_xml_build}\n")
+    endif ()
+    if (_paraview_plugin_conf_plugins_target_xml_install)
+      string(APPEND _paraview_plugin_conf_install_contents
+        "${_paraview_plugin_conf_plugins_target_xml_install}\n")
+    endif ()
   endforeach ()
 
   file(GENERATE
