@@ -166,6 +166,13 @@ option(PARAVIEW_ENABLE_EXAMPLES "Enable ParaView examples" "${examples_default}"
 option(PARAVIEW_BUILD_DEVELOPER_DOCUMENTATION "Build ParaView C++/Python docs" OFF)
 option(PARAVIEW_BUILD_QT_GUI "Enable ParaView Qt-based client" ON)
 option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
+option(PARAVIEW_USE_CUDA "Support CUDA compilation" OFF)
+if(PARAVIEW_USE_CUDA)
+  # This needs to be a top level flag as enable_language needs
+  # to be called from CMake entry point for variables to have
+  # the correct scope.
+  enable_language(CUDA)
+endif()
 option(PARAVIEW_USE_VTKM "Enable VTK-m accelerated algorithms" ON)
 set(raytracing_default OFF)
 if (DEFINED PARAVIEW_USE_OSPRAY)
@@ -774,6 +781,8 @@ else ()
 
   # Forward MPI option to VTK.
   set(VTK_USE_MPI "${PARAVIEW_USE_MPI}")
+  # Forward CUDA option to VTK
+  set(VTK_USE_CUDA "${PARAVIEW_USE_CUDA}")
 
   # Forward logging option to VTK.
   set(VTK_ENABLE_LOGGING "${PARAVIEW_ENABLE_LOGGING}")
