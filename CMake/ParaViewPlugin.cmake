@@ -248,6 +248,7 @@ paraview_plugin_build(
   [RUNTIME_DESTINATION <destination>]
   [LIBRARY_DESTINATION <destination>]
   [LIBRARY_SUBDIRECTORY <subdirectory>]
+  [ADD_INSTALL_RPATHS <ON|OFF>]
 
   [PLUGINS_FILE_NAME <filename>])
 ```
@@ -277,6 +278,9 @@ paraview_plugin_build(
     themselves. Each plugin lives in a directory of its name in
     `<RUNTIME_DESTINATION>/<LIBRARY_SUBDIRECTORY>` (for Windows) or
     `<LIBRARY_DESTINATION>/<LIBRARY_SUBDIRECTORY>` for other platforms.
+  * `ADD_INSTALL_RPATHS`: (Defaults to `OFF`) If specified, an RPATH to load
+    dependent libraries from the `LIBRARY_DESTINATION` from the plugins will be
+    added.
   * `PLUGINS_FILE_NAME`: The name of the XML plugin file to generate for the
     built plugins. This file will be placed under
     `<LIBRARY_DESTINATION>/<LIBRARY_SUBDIRECTORY>`. It will be installed with
@@ -285,7 +289,7 @@ paraview_plugin_build(
 function (paraview_plugin_build)
   cmake_parse_arguments(_paraview_build
     ""
-    "HEADERS_DESTINATION;RUNTIME_DESTINATION;LIBRARY_DESTINATION;LIBRARY_SUBDIRECTORY;TARGET;PLUGINS_FILE_NAME;INSTALL_EXPORT;CMAKE_DESTINATION;PLUGINS_COMPONENT;TARGET_COMPONENT"
+    "HEADERS_DESTINATION;RUNTIME_DESTINATION;LIBRARY_DESTINATION;LIBRARY_SUBDIRECTORY;TARGET;PLUGINS_FILE_NAME;INSTALL_EXPORT;CMAKE_DESTINATION;PLUGINS_COMPONENT;TARGET_COMPONENT;ADD_INSTALL_RPATHS"
     "PLUGINS;AUTOLOAD"
     ${ARGN})
 
@@ -309,6 +313,22 @@ function (paraview_plugin_build)
 
   if (NOT DEFINED _paraview_build_LIBRARY_SUBDIRECTORY)
     set(_paraview_build_LIBRARY_SUBDIRECTORY "")
+  endif ()
+
+  if (NOT DEFINED _paraview_build_ADD_INSTALL_RPATHS)
+    set(_paraview_build_ADD_INSTALL_RPATHS OFF)
+  endif ()
+  if (_paraview_build_ADD_INSTALL_RPATHS)
+    file(RELATIVE_PATH _paraview_build_relpath
+      "/prefix/${_paraview_build_LIBRARY_DESTINATION}/${_paraview_build_LIBRARY_SUBDIRECTORY}/plugin"
+      "/prefix/${_paraview_build_LIBRARY_DESTINATION}")
+    if (APPLE)
+      list(APPEND CMAKE_INSTALL_RPATH
+        "@loader_path/${_paraview_build_relpath}")
+    elseif (UNIX)
+      list(APPEND CMAKE_INSTALL_RPATH
+        "$ORIGIN/${_paraview_build_relpath}")
+    endif ()
   endif ()
 
   if (DEFINED _paraview_build_INSTALL_EXPORT
