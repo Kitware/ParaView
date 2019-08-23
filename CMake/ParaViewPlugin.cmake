@@ -188,12 +188,6 @@ function (paraview_plugin_scan)
       PROPERTY
         TYPE "${_paraview_scan_option_default_type}")
 
-    if (NOT ${_paraview_scan_plugin_name}_REQUIRES_MODULES)
-      message(WARNING
-        "The ${_paraview_scan_plugin_name} plugin claims that it does not "
-        "require any modules. This is probably an oversight.")
-    endif ()
-
     if (DEFINED ${_paraview_scan_plugin_name}_CONDITION)
       if (NOT (${${_paraview_scan_plugin_name}_CONDITION}))
         if (DEFINED "PARAVIEW_PLUGIN_ENABLE_${_paraview_scan_plugin_name}")
