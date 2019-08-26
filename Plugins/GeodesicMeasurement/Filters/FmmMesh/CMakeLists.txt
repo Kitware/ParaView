@@ -44,6 +44,8 @@ set( ${PROJECT_NAME}_HDRS
 add_library( ${PROJECT_NAME} STATIC
   ${${PROJECT_NAME}_SRCS}
   ${${PROJECT_NAME}_HDRS} )
+_vtk_module_apply_properties(${PROJECT_NAME})
+_vtk_module_install(${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME}
   PUBLIC
