@@ -6033,6 +6033,64 @@
       </Hints>
       <!-- End TIFFSeriesReader -->
     </SourceProxy>
+
+    <SourceProxy class="vtkOMETIFFReader"
+                 label="OME TIFF Reader"
+                 name="OMETIFFReader">
+      <Documentation long_help="Reads an OME-TIFF file."
+        short_help="Reads an OME-TIFF file.">
+        Supports reading OME-TIFF files.
+      </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the OME-TIFF reader.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty name="UseCustomDataSpacing"
+                         command="SetSpacingSpecifiedFlag"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          To manually specify a custom spacing using **CustomDataSpacing**, set this property to 1 (checked).
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="CustomDataSpacing"
+                            command="SetDataSpacing"
+                            information_property="CustomDataSpacingInfo"
+                            number_of_elements="3"
+                            default_values="1 1 1">
+        <DoubleRangeDomain name="range" min="0 0 0" />
+        <Documentation>
+          Set the spacing to use for the image output by this reader. This is used only when
+          **UseCustomDataSpacing** is set to 1.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseCustomDataSpacing" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="CustomDataSpacingInfo"
+                            command="GetDataSpacing"
+                            information_only="1">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="ome.tif ome.tiff"
+                       file_description="OME TIFF Files" />
+      </Hints>
+      <!-- End OMETIFFReader -->
+    </SourceProxy>
     <SourceProxy class="vtkRawImageFileSeriesReader"
                  file_name_method="SetFileName"
                  label="Image Reader"
