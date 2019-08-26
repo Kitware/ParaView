@@ -923,7 +923,7 @@ if (PARAVIEW_ENABLE_PYTHON)
   else ()
     vtk_module_wrap_python(
       MODULES         ${vtk_modules}
-      INSTALL_EXPORT  VTK
+      INSTALL_EXPORT  VTKPython
       PYTHON_PACKAGE  "vtkmodules"
       MODULE_DESTINATION  "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}"
       CMAKE_DESTINATION   "${paraview_cmake_destination}/vtk"
@@ -932,6 +932,17 @@ if (PARAVIEW_ENABLE_PYTHON)
       TARGET          VTK::vtkpythonmodules)
 
     add_subdirectory(VTK/Wrapping/Python)
+
+    export(
+      EXPORT    VTKPython
+      NAMESPACE VTK::
+      FILE      "${CMAKE_BINARY_DIR}/${paraview_cmake_destination}/vtk/VTKPython-targets.cmake")
+    install(
+      EXPORT      VTKPython
+      NAMESPACE   VTK::
+      FILE        VTKPython-targets.cmake
+      DESTINATION "${paraview_cmake_destination}/vtk"
+      COMPONENT   "development")
   endif ()
 
   get_property(vtk_required_python_modules GLOBAL
