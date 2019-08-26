@@ -52,6 +52,8 @@ include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-vtk-module-propert
 include("${CMAKE_CURRENT_LIST_DIR}/paraview-find-package-helpers.cmake" OPTIONAL)
 include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-vtk-module-find-packages.cmake")
 
+include("${CMAKE_CURRENT_LIST_DIR}/ParaViewTools-targets.cmake" OPTIONAL)
+
 include("${CMAKE_CURRENT_LIST_DIR}/ParaViewClient.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/ParaViewPlugin.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/ParaViewServerManager.cmake")
