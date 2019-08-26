@@ -956,13 +956,24 @@ if (PARAVIEW_ENABLE_PYTHON)
 
   vtk_module_wrap_python(
     MODULES         ${paraview_modules}
-    INSTALL_EXPORT  ParaView
+    INSTALL_EXPORT  ParaViewPython
     PYTHON_PACKAGE  "paraview.modules"
     MODULE_DESTINATION  "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}"
     CMAKE_DESTINATION   "${paraview_cmake_destination}"
     LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     WRAPPED_MODULES paraview_python_wrapped_modules
     TARGET          ParaView::pvpythonmodules)
+
+  export(
+    EXPORT    ParaViewPython
+    NAMESPACE ParaView::
+    FILE      "${CMAKE_BINARY_DIR}/${paraview_cmake_destination}/ParaViewPython-targets.cmake")
+  install(
+    EXPORT      ParaViewPython
+    NAMESPACE   ParaView::
+    FILE        ParaViewPython-targets.cmake
+    DESTINATION "${paraview_cmake_destination}"
+    COMPONENT   "development")
 endif ()
 
 if (PARAVIEW_ENABLE_WEB)
