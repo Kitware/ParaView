@@ -59,21 +59,6 @@ if (NOT CMAKE_BUILD_TYPE AND NOT generator_is_multi_config)
       STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif ()
 
-#------------------------------------------------------------------------------
-# Choose static or shared libraries.
-option(PARAVIEW_BUILD_SHARED_LIBS "Build ParaView with shared libraries" ON)
-set(BUILD_SHARED_LIBS "${PARAVIEW_BUILD_SHARED_LIBS}")
-set(CMAKE_CXX_VISIBILITY_PRESET "hidden")
-set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
-
-#------------------------------------------------------------------------------
-# Protect against a stampede of static links at the same time.
-if (NOT BUILD_SHARED_LIBS)
-  set(pv_exe_job_link_pool static_exe_link)
-  set_property(GLOBAL APPEND PROPERTY
-    JOB_POOLS static_exe_link=1)
-endif ()
-
 # Set up our directory structure for output libraries and binaries
 include(GNUInstallDirs)
 if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
@@ -107,6 +92,22 @@ include(vtkCompilerExtraFlags)
 include(vtkInitializeBuildType)
 include(vtkSupportMacros)
 include(vtkDirectories)
+
+#------------------------------------------------------------------------------
+# Choose static or shared libraries.
+vtk_deprecated_setting(shared_default PARAVIEW_BUILD_SHARED_LIBS BUILD_SHARED_LIBS "ON")
+option(PARAVIEW_BUILD_SHARED_LIBS "Build ParaView with shared libraries" "${shared_default}")
+set(BUILD_SHARED_LIBS "${PARAVIEW_BUILD_SHARED_LIBS}")
+set(CMAKE_CXX_VISIBILITY_PRESET "hidden")
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+
+#------------------------------------------------------------------------------
+# Protect against a stampede of static links at the same time.
+if (NOT PARAVIEW_BUILD_SHARED_LIBS)
+  set(pv_exe_job_link_pool static_exe_link)
+  set_property(GLOBAL APPEND PROPERTY
+    JOB_POOLS static_exe_link=1)
+endif ()
 
 #-----------------------------------------------------------------------------
 # Does VTK require support for 64 bit file systems
