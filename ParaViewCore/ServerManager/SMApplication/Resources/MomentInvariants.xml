@@ -59,6 +59,34 @@
                      number_of_elements="10"
                      default_values="1 0 0 0 0 0 0 0 0 0">
       </DoubleVectorProperty>
+      <IntVectorProperty name="UseFFT"
+                         command="SetUseFFT"
+                         default_values="1"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+There are 4 possibilities:
+ - UseFFT and UseGPU: Use CUDA FFT as backend to FFTLIB
+ - UseFFT and not UseGPU: Use DFFTLIB’s internal distributed FFT logic.
+ - not UseFFT and UseGPU: Use vtk-m convolution
+ - not UseFFT and not UseGPU: Use vtk convolution
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="UseGPU"
+                         command="SetUseGPU"
+                         default_values="0"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+There are 4 possibilities:
+ - UseFFT and UseGPU: Use CUDA FFT as backend to FFTLIB
+ - UseFFT and not UseGPU: Use DFFTLIB’s internal distributed FFT logic.
+ - not UseFFT and UseGPU: Use vtk-m convolution
+ - not UseFFT and not UseGPU: Use vtk convolution
+        </Documentation>
+      </IntVectorProperty>
 
       <Hints>
         <ShowInMenu category="Moment Invariants" />
