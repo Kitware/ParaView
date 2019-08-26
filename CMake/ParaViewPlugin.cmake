@@ -337,6 +337,12 @@ function (paraview_plugin_build)
       "The `INSTALL_EXPORT` argument requires the `TARGET` argument.")
   endif ()
 
+  if (DEFINED _paraview_build_INSTALL_EXPORT
+      AND NOT DEFINED _paraview_build_CMAKE_DESTINATION)
+    message(FATAL_ERROR
+      "The `INSTALL_EXPORT` argument requires the `CMAKE_DESTINATION` argument.")
+  endif ()
+
   if (DEFINED _paraview_build_CMAKE_DESTINATION
       AND NOT DEFINED _paraview_build_TARGET)
     message(FATAL_ERROR
@@ -557,12 +563,9 @@ void ${_paraview_build_target_safe}_initialize()
           "INTERFACE_paraview_plugin_plugins_file" "${_paraview_build_xml_file}")
 
      if (DEFINED _paraview_build_RUNTIME_DESTINATION)
-       file(RELATIVE_PATH _paraview_build_relpath
-          "/prefix/${_paraview_build_RUNTIME_DESTINATION}"
-          "/prefix/${_paraview_build_plugin_destination}")
         set_property(TARGET "${_paraview_build_TARGET_NAME}"
           PROPERTY
-            "INTERFACE_paraview_plugin_plugins_file_install" "${_paraview_build_relpath}/${_paraview_build_PLUGINS_FILE_NAME}")
+            "INTERFACE_paraview_plugin_plugins_file_install" "${_paraview_build_plugin_destination}/${_paraview_build_PLUGINS_FILE_NAME}")
       endif ()
 
       if (DEFINED _paraview_build_CMAKE_DESTINATION)
@@ -669,33 +672,60 @@ function (paraview_plugin_write_conf)
   set(_paraview_plugin_conf_build_contents)
   set(_paraview_plugin_conf_install_contents)
   foreach (_paraview_plugin_conf_target IN LISTS _paraview_plugin_conf_PLUGINS_TARGETS)
-    get_property(_paraview_plugin_conf_plugins_target_is_alias
+    get_property(_paraview_plugin_conf_plugins_target_is_imported
       TARGET    "${_paraview_plugin_conf_target}"
-      PROPERTY  ALIASED_TARGET
-      SET)
-    if (_paraview_plugin_conf_plugins_target_is_alias)
-      get_property(_paraview_plugin_conf_plugins_target_alias_target
-        TARGET    "${_paraview_plugin_conf_target}"
-        PROPERTY  ALIASED_TARGET)
-      get_property(_paraview_plugin_conf_plugins_target_xml_build
-        TARGET    "${_paraview_plugin_conf_plugins_target_alias_target}"
-        PROPERTY  "INTERFACE_paraview_plugin_plugins_file")
-      get_property(_paraview_plugin_conf_plugins_target_xml_install
-        TARGET    "${_paraview_plugin_conf_plugins_target_alias_target}"
-        PROPERTY  "INTERFACE_paraview_plugin_plugins_file_install")
-    else ()
+      PROPERTY  IMPORTED)
+    if (_paraview_plugin_conf_plugins_target_is_imported)
       get_property(_paraview_plugin_conf_plugins_target_xml_build
         TARGET    "${_paraview_plugin_conf_target}"
         PROPERTY  "INTERFACE_paraview_plugin_plugins_file")
       set(_paraview_plugin_conf_plugins_target_xml_install
         "${_paraview_plugin_conf_plugins_target_xml_build}")
+
+      file(RELATIVE_PATH _paraview_plugin_conf_rel_path
+        "/prefix/${CMAKE_INSTALL_PREFIX}"
+        "/prefix/${_paraview_plugin_conf_plugins_target_xml_install}")
+      # If the external plugins XML file is under our installation destination,
+      # use a relative path to it, otherwise keep the absolute path.
+      if (NOT _paraview_plugin_conf_rel_path MATCHES "^\.\./")
+        file(RELATIVE_PATH _paraview_plugin_conf_plugins_target_xml_install
+          "/prefix/${CMAKE_INSTALL_PREFIX}/${_paraview_plugin_conf_INSTALL_DESTINATION}"
+          "/prefix/${_paraview_plugin_conf_plugins_target_xml_install}")
+      endif ()
+    else ()
+      get_property(_paraview_plugin_conf_plugins_target_is_alias
+        TARGET    "${_paraview_plugin_conf_target}"
+        PROPERTY  ALIASED_TARGET
+        SET)
+      if (_paraview_plugin_conf_plugins_target_is_alias)
+        get_property(_paraview_plugin_conf_target
+          TARGET    "${_paraview_plugin_conf_target}"
+          PROPERTY  ALIASED_TARGET)
+      endif ()
+      get_property(_paraview_plugin_conf_plugins_target_xml_build
+        TARGET    "${_paraview_plugin_conf_target}"
+        PROPERTY  "INTERFACE_paraview_plugin_plugins_file")
+      get_property(_paraview_plugin_conf_plugins_target_xml_install
+        TARGET    "${_paraview_plugin_conf_target}"
+        PROPERTY  "INTERFACE_paraview_plugin_plugins_file_install")
+
+      if (_paraview_plugin_conf_plugins_target_xml_install)
+        # Compute the relative path within the install tree.
+        file(RELATIVE_PATH _paraview_plugin_conf_plugins_target_xml_install
+          "/prefix/${_paraview_plugin_conf_INSTALL_DESTINATION}"
+          "/prefix/${_paraview_plugin_conf_plugins_target_xml_install}")
+      endif ()
     endif ()
 
     # TODO: Write out in JSON instead.
-    string(APPEND _paraview_plugin_conf_build_contents
-      "${_paraview_plugin_conf_plugins_target_xml_build}\n")
-    string(APPEND _paraview_plugin_conf_install_contents
-      "${_paraview_plugin_conf_plugins_target_xml_install}\n")
+    if (_paraview_plugin_conf_plugins_target_xml_build)
+      string(APPEND _paraview_plugin_conf_build_contents
+        "${_paraview_plugin_conf_plugins_target_xml_build}\n")
+    endif ()
+    if (_paraview_plugin_conf_plugins_target_xml_install)
+      string(APPEND _paraview_plugin_conf_install_contents
+        "${_paraview_plugin_conf_plugins_target_xml_install}\n")
+    endif ()
   endforeach ()
 
   file(GENERATE
