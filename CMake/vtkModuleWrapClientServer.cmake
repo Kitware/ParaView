@@ -187,7 +187,6 @@ ${_vtk_client_server_calls}}\n")
   set(_vtk_build_LIBRARY_NAME_SUFFIX "${_vtk_client_server_LIBRARY_NAME_SUFFIX}")
   set(_vtk_build_ARCHIVE_DESTINATION "${_vtk_client_server_DESTINATION}")
   _vtk_module_apply_properties("${name}")
-  _vtk_module_install("${name}")
 
   vtk_module_autoinit(
     MODULES ${ARGN}
