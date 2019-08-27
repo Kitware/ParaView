@@ -59,21 +59,6 @@ if (NOT CMAKE_BUILD_TYPE AND NOT generator_is_multi_config)
       STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif ()
 
-#------------------------------------------------------------------------------
-# Choose static or shared libraries.
-option(PARAVIEW_BUILD_SHARED_LIBS "Build ParaView with shared libraries" ON)
-set(BUILD_SHARED_LIBS "${PARAVIEW_BUILD_SHARED_LIBS}")
-set(CMAKE_CXX_VISIBILITY_PRESET "hidden")
-set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
-
-#------------------------------------------------------------------------------
-# Protect against a stampede of static links at the same time.
-if (NOT BUILD_SHARED_LIBS)
-  set(pv_exe_job_link_pool static_exe_link)
-  set_property(GLOBAL APPEND PROPERTY
-    JOB_POOLS static_exe_link=1)
-endif ()
-
 # Set up our directory structure for output libraries and binaries
 include(GNUInstallDirs)
 if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
@@ -107,6 +92,22 @@ include(vtkCompilerExtraFlags)
 include(vtkInitializeBuildType)
 include(vtkSupportMacros)
 include(vtkDirectories)
+
+#------------------------------------------------------------------------------
+# Choose static or shared libraries.
+vtk_deprecated_setting(shared_default PARAVIEW_BUILD_SHARED_LIBS BUILD_SHARED_LIBS "ON")
+option(PARAVIEW_BUILD_SHARED_LIBS "Build ParaView with shared libraries" "${shared_default}")
+set(BUILD_SHARED_LIBS "${PARAVIEW_BUILD_SHARED_LIBS}")
+set(CMAKE_CXX_VISIBILITY_PRESET "hidden")
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+
+#------------------------------------------------------------------------------
+# Protect against a stampede of static links at the same time.
+if (NOT PARAVIEW_BUILD_SHARED_LIBS)
+  set(pv_exe_job_link_pool static_exe_link)
+  set_property(GLOBAL APPEND PROPERTY
+    JOB_POOLS static_exe_link=1)
+endif ()
 
 #-----------------------------------------------------------------------------
 # Does VTK require support for 64 bit file systems
@@ -933,7 +934,7 @@ if (PARAVIEW_ENABLE_PYTHON)
   else ()
     vtk_module_wrap_python(
       MODULES         ${vtk_modules}
-      INSTALL_EXPORT  VTK
+      INSTALL_EXPORT  VTKPython
       PYTHON_PACKAGE  "vtkmodules"
       MODULE_DESTINATION  "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}"
       CMAKE_DESTINATION   "${paraview_cmake_destination}/vtk"
@@ -942,6 +943,17 @@ if (PARAVIEW_ENABLE_PYTHON)
       TARGET          VTK::vtkpythonmodules)
 
     add_subdirectory(VTK/Wrapping/Python)
+
+    export(
+      EXPORT    VTKPython
+      NAMESPACE VTK::
+      FILE      "${CMAKE_BINARY_DIR}/${paraview_cmake_destination}/vtk/VTKPython-targets.cmake")
+    install(
+      EXPORT      VTKPython
+      NAMESPACE   VTK::
+      FILE        VTKPython-targets.cmake
+      DESTINATION "${paraview_cmake_destination}/vtk"
+      COMPONENT   "development")
   endif ()
 
   get_property(vtk_required_python_modules GLOBAL
@@ -955,13 +967,24 @@ if (PARAVIEW_ENABLE_PYTHON)
 
   vtk_module_wrap_python(
     MODULES         ${paraview_modules}
-    INSTALL_EXPORT  ParaView
+    INSTALL_EXPORT  ParaViewPython
     PYTHON_PACKAGE  "paraview.modules"
     MODULE_DESTINATION  "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}"
     CMAKE_DESTINATION   "${paraview_cmake_destination}"
     LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     WRAPPED_MODULES paraview_python_wrapped_modules
     TARGET          ParaView::pvpythonmodules)
+
+  export(
+    EXPORT    ParaViewPython
+    NAMESPACE ParaView::
+    FILE      "${CMAKE_BINARY_DIR}/${paraview_cmake_destination}/ParaViewPython-targets.cmake")
+  install(
+    EXPORT      ParaViewPython
+    NAMESPACE   ParaView::
+    FILE        ParaViewPython-targets.cmake
+    DESTINATION "${paraview_cmake_destination}"
+    COMPONENT   "development")
 endif ()
 
 if (PARAVIEW_ENABLE_WEB)
