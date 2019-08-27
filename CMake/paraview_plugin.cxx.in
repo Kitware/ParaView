@@ -9,6 +9,11 @@
 #cmakedefine01 _paraview_add_plugin_UI_INTERFACES
 #cmakedefine01 _paraview_add_plugin_with_resources
 
+#if !_paraview_add_plugin_built_shared && _paraview_add_plugin_with_resources
+// For Q_INIT_RESOURCE
+#include <QtCore/QtGlobal>
+#endif
+
 #if _paraview_add_plugin_EULA
 #include "@_paraview_add_plugin_eula_header@"
 #endif

@@ -983,6 +983,7 @@ function (paraview_add_plugin name)
     paraview_server_manager_process(
       MODULES   ${_paraview_add_plugin_MODULES}
       TARGET    "${_paraview_build_plugin}_server_manager_modules"
+      ${_paraview_add_plugin_install_export_args}
       XML_FILES _paraview_add_plugin_module_xmls)
 
     list(APPEND _paraview_add_plugin_required_libraries
@@ -1007,6 +1008,7 @@ function (paraview_add_plugin name)
 
     paraview_server_manager_process_files(
       TARGET    "${_paraview_build_plugin}_server_manager"
+      ${_paraview_add_plugin_install_export_args}
       FILES     ${_paraview_add_plugin_xmls})
     list(APPEND _paraview_add_plugin_required_libraries
       "${_paraview_build_plugin}_server_manager")
