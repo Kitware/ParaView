@@ -40,9 +40,6 @@ bool vtkPVXYChartView::IgnoreNegativeLogAxisWarning = false;
 class vtkPVXYChartView::vtkInternals
 {
 public:
-  // Keeps track of custom labels for each of the axis.
-  vtkNew<vtkDoubleArray> CustomLabelPositions[4];
-  bool UseCustomLabels[4];
   vtkInternals()
   {
     this->UseCustomLabels[0] = this->UseCustomLabels[1] = this->UseCustomLabels[2] =
@@ -53,6 +50,11 @@ public:
     this->AxisRanges[0][1] = this->AxisRanges[1][1] = this->AxisRanges[2][1] =
       this->AxisRanges[3][1] = 6.66;
   }
+
+  // Keeps track of custom labels for each of the axis.
+  vtkNew<vtkDoubleArray> CustomLabelPositions[4];
+  vtkNew<vtkStringArray> CustomLabelTexts[4];
+  bool UseCustomLabels[4];
 
   double AxisRanges[4][2];
 };
@@ -731,15 +733,34 @@ void vtkPVXYChartView::SetAxisLabelsNumber(int axis, int n)
   if (axis >= 0 && axis < 4)
   {
     this->Internals->CustomLabelPositions[axis]->SetNumberOfTuples(n);
+    this->Internals->CustomLabelTexts[axis]->SetNumberOfTuples(n);
   }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXYChartView::SetAxisLabels(int axis, int i, double value)
+void vtkPVXYChartView::SetAxisLabels(
+  int axis, int i, const std::string& value, const std::string& label)
 {
   if (axis >= 0 && axis < 4)
   {
-    this->Internals->CustomLabelPositions[axis]->SetValue(i, value);
+    double dv = 0.;
+    bool conversionStatus = false;
+    try
+    {
+      dv = std::stod(value);
+      conversionStatus = true;
+    }
+    catch (const std::invalid_argument&)
+    {
+    }
+    catch (const std::out_of_range&)
+    {
+    }
+
+    this->Internals->CustomLabelPositions[axis]->SetValue(i, conversionStatus ? dv : 0.);
+
+    std::string text = label.empty() ? value : label;
+    this->Internals->CustomLabelTexts[axis]->SetValue(i, text);
   }
 }
 
@@ -845,7 +866,11 @@ void vtkPVXYChartView::Update()
         }
         ticks = logTicks.GetPointer();
       }
-      chartAxis->SetCustomTickPositions(ticks.GetPointer());
+      vtkStringArray* labels = this->Internals->UseCustomLabels[axis]
+        ? this->Internals->CustomLabelTexts[axis].GetPointer()
+        : nullptr;
+
+      chartAxis->SetCustomTickPositions(ticks, labels);
     }
     else
     {

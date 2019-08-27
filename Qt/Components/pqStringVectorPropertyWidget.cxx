@@ -422,7 +422,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smProperty);
       this->setChangeAvailableAsChangeFinished(true);
       vbox->addWidget(widget);
-      this->setShowLabel(true);
+      this->setShowLabel(false);
     }
     else
     {
