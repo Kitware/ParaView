@@ -29,6 +29,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
+#ifdef PARAVIEW_ENABLE_PYTHON
+#include "pvpythonmodules.h"
+#endif
+
 #include "vtkPVConfig.h"
 
 #include "ParaViewMainWindow.h"
@@ -52,10 +56,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkSMSettings.h"
 #include "vtksys/SystemTools.hxx"
-
-#ifdef PARAVIEW_ENABLE_PYTHON
-#include "pvpythonmodules.h"
-#endif
 
 #ifdef PARAVIEW_USE_QTHELP
 #include "pqHelpReaction.h"

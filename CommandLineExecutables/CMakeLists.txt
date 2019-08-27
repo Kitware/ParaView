@@ -105,7 +105,7 @@ if (PARAVIEW_BUILD_MESA_LAUNCHER)
     TARGETS     "paraview-mesa"
     DESTINATION "${CMAKE_INSTALL_BINDIR}"
     COMPONENT   runtime
-    EXPORT      ParaView)
+    EXPORT      ParaViewTools)
 endif ()
 
 configure_file(
@@ -116,3 +116,14 @@ install(
   PROGRAMS    "${CMAKE_CURRENT_SOURCE_DIR}/paraview-config"
   DESTINATION "${CMAKE_INSTALL_BINDIR}"
   COMPONENT   development)
+
+export(
+  EXPORT      ParaViewTools
+  NAMESPACE   ParaView::
+  FILE        "${CMAKE_BINARY_DIR}/${paraview_cmake_destination}/ParaViewTools-targets.cmake")
+install(
+  EXPORT      ParaViewTools
+  NAMESPACE   ParaView::
+  FILE        "ParaViewTools-targets.cmake"
+  DESTINATION "${paraview_cmake_destination}"
+  COMPONENT   "development")

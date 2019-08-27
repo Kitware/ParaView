@@ -43,5 +43,5 @@ function (paraview_add_executable name)
     TARGETS     "${name}"
     DESTINATION "${CMAKE_INSTALL_BINDIR}"
     COMPONENT   runtime
-    EXPORT      ParaView)
+    EXPORT      ParaViewTools)
 endfunction ()
