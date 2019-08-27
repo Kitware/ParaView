@@ -1,5 +1,7 @@
 <?xml version="1.0" ?>
 <pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
 
   <!-- Create testing HTG: -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
