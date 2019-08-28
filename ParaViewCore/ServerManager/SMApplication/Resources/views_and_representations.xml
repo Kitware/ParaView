@@ -3828,6 +3828,7 @@
             <Property name="Roughness" panel_visibility="advanced"/>
             <Property name="Metallic" panel_visibility="advanced"/>
             <Property name="Texture" panel_visibility="advanced"/>
+            <Property name="RepeatTextures" panel_visibility="advanced"/>
             <Property name="BaseColorTexture" panel_visibility="advanced"/>
             <Property name="NormalTexture" panel_visibility="advanced"/>
             <Property name="NormalScale" panel_visibility="advanced"/>
@@ -10907,6 +10908,16 @@ Select how you want the text to be represented in the view.
           <!-- enable the texture selector only when tcoords is available. -->
         </Hints>
       </ProxyProperty>
+      <IntVectorProperty command="SetRepeatTextures"
+                         default_values="1"
+                         name="RepeatTextures"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Should textures be clamped or repeated when texture coordinates go
+          outside the range of 0 to 1.
+        </Documentation>
+      </IntVectorProperty>
       <ProxyProperty command="SetBaseColorTexture"
                      name="BaseColorTexture"
                      panel_widget="texture_selector"
