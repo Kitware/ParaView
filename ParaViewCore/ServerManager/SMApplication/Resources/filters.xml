@@ -17474,5 +17474,64 @@ Every Nth Point.
       </InputProperty>
     </SourceProxy>
     <!-- End DistributePointCloud -->
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkExtractSubsetWithSeed"
+      name="ExtractSubsetWithSeed"
+      label="Extract Subset With Seed">
+      <Documentation
+        long_help="Extract a subset from a structured-grid starting with a seed point.">
+        Extract a subset (line or plane) from a structured-grid starting with a seed point.
+        The filter supports cases where the structured grid is split up into multiple blocks
+        (across multiple ranks). It also handles cases were the ijk origin for each the
+        blocks is not aligned.
+      </Documentation>
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkStructuredGrid"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <DoubleVectorProperty name="Seed"
+        command="SetSeed"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <Documentation>
+          Specify the seed point in x-y-z coordinates to initiate in the slice extraction.
+        </Documentation>
+        <BoundsDomain default_mode="mid" mode="normal" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetDirection"
+                         default_values="0"
+                         name="Direction"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="I" info="line" />
+          <Entry value="1" text="J" info="line" />
+          <Entry value="2" text="K" info="line" />
+          <Entry value="3" text="IJ" info="plane" />
+          <Entry value="4" text="JK" info="plane" />
+          <Entry value="5" text="KI" info="plane" />
+        </EnumerationDomain>
+        <Documentation>
+          Specify the direction in which to extract the slice starting with the **Seed**.
+        </Documentation>
+      </IntVectorProperty>
+      <PropertyGroup label="Seed Parameters" panel_widget="InteractiveHandle">
+        <Property function="WorldPosition" name="Seed" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
+      <Hints>
+        <Visibility replace_input="2" />
+      </Hints>
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

@@ -387,10 +387,6 @@ if (PARAVIEW_USE_MPI)
     VTK::ParallelMPI
     ParaView::VTKExtensionsDefaultParallel
     ParaView::icet)
-  if (NOT WIN32)
-    list(APPEND paraview_requested_modules
-      VTK::FiltersParallelDIY2)
-  endif()
 else ()
   list(APPEND paraview_rejected_modules
     VTK::mpi)
@@ -545,6 +541,7 @@ list(APPEND paraview_requested_modules
   ParaView::VTKExtensionsPoints
   ParaView::WrapClientServer
   VTK::FiltersFlowPaths
+  VTK::FiltersParallelDIY2
   VTK::FiltersTexture
   VTK::FiltersVerdict
   VTK::IOAMR

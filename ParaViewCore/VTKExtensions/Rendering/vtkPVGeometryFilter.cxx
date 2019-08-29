@@ -79,6 +79,19 @@
 #include <string>
 #include <vector>
 
+template <typename T>
+void GetValidWholeExtent(T* ds, const int wholeExt[6], int validWholeExt[6])
+{
+  if (wholeExt[0] <= wholeExt[1] && wholeExt[2] <= wholeExt[3] && wholeExt[4] <= wholeExt[5])
+  {
+    std::copy(wholeExt, wholeExt + 6, validWholeExt);
+  }
+  else
+  {
+    ds->GetExtent(validWholeExt);
+  }
+}
+
 vtkStandardNewMacro(vtkPVGeometryFilter);
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
 vtkInformationKeyMacro(vtkPVGeometryFilter, POINT_OFFSETS, IntegerVector);
@@ -1314,8 +1327,11 @@ void vtkPVGeometryFilter::ImageDataExecute(
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid* input, vtkPolyData* output,
-  int updatePiece, int updateNumPieces, int updateGhosts, const int* wholeExtent)
+  int updatePiece, int updateNumPieces, int updateGhosts, const int* wholeExtentArg)
 {
+  int wholeExtent[6];
+  ::GetValidWholeExtent(input, wholeExtentArg, wholeExtent);
+
   if (!this->UseOutline)
   {
     if (input->GetNumberOfCells() > 0)
@@ -1327,7 +1343,7 @@ void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid* input, vtkPol
       else
       {
         this->DataSetSurfaceFilter->StructuredExecute(
-          input, output, input->GetExtent(), const_cast<int*>(wholeExtent));
+          input, output, input->GetExtent(), wholeExtent);
       }
     }
     this->OutlineFlag = 0;
