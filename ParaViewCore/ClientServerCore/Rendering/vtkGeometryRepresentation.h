@@ -197,6 +197,11 @@ public:
   virtual void SetFlipTextures(bool);
 
   //***************************************************************************
+  // Forwarded to all textures
+  virtual void SetRepeatTextures(bool);
+  vtkGetMacro(RepeatTextures, bool);
+
+  //***************************************************************************
   // Forwarded to Mapper and LODMapper.
   virtual void SetInterpolateScalarsBeforeMapping(int val);
   virtual void SetLookupTable(vtkScalarsToColors* val);
@@ -411,6 +416,7 @@ protected:
   vtkPVLODActor* Actor;
   vtkProperty* Property;
 
+  bool RepeatTextures;
   double Ambient;
   double Specular;
   double Diffuse;

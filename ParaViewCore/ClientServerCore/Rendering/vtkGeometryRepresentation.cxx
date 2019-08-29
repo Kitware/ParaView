@@ -189,6 +189,7 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   compositeAttributes->Delete();
 
   this->RequestGhostCellsIfNeeded = true;
+  this->RepeatTextures = true;
   this->Ambient = 0.0;
   this->Diffuse = 1.0;
   this->Specular = 0.0;
@@ -871,6 +872,7 @@ void vtkGeometryRepresentation::SetBaseColorTexture(vtkTexture* tex)
   {
     tex->UseSRGBColorSpaceOn();
     tex->InterpolateOn();
+    tex->SetRepeat(this->RepeatTextures);
   }
   this->Property->SetBaseColorTexture(tex);
 }
@@ -882,6 +884,7 @@ void vtkGeometryRepresentation::SetMaterialTexture(vtkTexture* tex)
   {
     tex->UseSRGBColorSpaceOff();
     tex->InterpolateOn();
+    tex->SetRepeat(this->RepeatTextures);
   }
   this->Property->SetORMTexture(tex);
 }
@@ -893,6 +896,7 @@ void vtkGeometryRepresentation::SetNormalTexture(vtkTexture* tex)
   {
     tex->UseSRGBColorSpaceOff();
     tex->InterpolateOn();
+    tex->SetRepeat(this->RepeatTextures);
   }
   this->Property->SetNormalTexture(tex);
 }
@@ -904,6 +908,7 @@ void vtkGeometryRepresentation::SetEmissiveTexture(vtkTexture* tex)
   {
     tex->UseSRGBColorSpaceOn();
     tex->InterpolateOn();
+    tex->SetRepeat(this->RepeatTextures);
   }
   this->Property->SetEmissiveTexture(tex);
 }
@@ -1023,6 +1028,25 @@ void vtkGeometryRepresentation::SetFlipTextures(bool flip)
 void vtkGeometryRepresentation::SetTexture(vtkTexture* val)
 {
   this->Actor->SetTexture(val);
+  if (val)
+  {
+    val->SetRepeat(this->RepeatTextures);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetRepeatTextures(bool rep)
+{
+  if (this->Actor->GetTexture())
+  {
+    this->Actor->GetTexture()->SetRepeat(rep);
+  }
+  std::map<std::string, vtkTexture*>& tex = this->Actor->GetProperty()->GetAllTextures();
+  for (auto t : tex)
+  {
+    t.second->SetRepeat(rep);
+  }
+  this->RepeatTextures = rep;
 }
 
 //----------------------------------------------------------------------------
