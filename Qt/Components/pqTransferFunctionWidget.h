@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkScalarsToColors;
 class vtkPiecewiseFunction;
+class vtkTable;
 
 /**
 * pqTransferFunctionWidget provides a widget that can edit the control points
@@ -98,6 +99,12 @@ public slots:
   */
   void render();
 
+  /**
+   * Set the histogram table to display as a plot bar.
+   * If set to nullptr, a simple color texture is used, the default.
+   */
+  void setHistogramTable(vtkTable* table);
+
 signals:
   /**
   * signal fired when the \c current selected control point changes.
@@ -110,13 +117,10 @@ signals:
   */
   void controlPointsModified();
 
-  //@{
   /**
-   * internal signals, do not use.
+   * signal fired when the chart range is modified.
    */
-  void pwfModified();
-  void ctfModified();
-  //@}
+  void chartRangeModified();
 
 protected slots:
   /**
