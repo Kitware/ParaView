@@ -72,6 +72,11 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorOpacityEditorWidget : public pqPrope
   Q_OBJECT
   Q_PROPERTY(QList<QVariant> xrgbPoints READ xrgbPoints WRITE setXrgbPoints)
   Q_PROPERTY(QList<QVariant> xvmsPoints READ xvmsPoints WRITE setXvmsPoints)
+  Q_PROPERTY(bool showDataHistogram READ showDataHistogram WRITE setShowDataHistogram)
+  Q_PROPERTY(bool automaticDataHistogramComputation READ automaticDataHistogramComputation WRITE
+      setAutomaticDataHistogramComputation)
+  Q_PROPERTY(
+    int dataHistogramNumberOfBins READ dataHistogramNumberOfBins WRITE setDataHistogramNumberOfBins)
   Q_PROPERTY(bool useLogScale READ useLogScale WRITE setUseLogScale)
   Q_PROPERTY(bool useLogScaleOpacity READ useLogScaleOpacity WRITE setUseLogScaleOpacity)
   Q_PROPERTY(pqSMProxy scalarOpacityFunctionProxy READ scalarOpacityFunctionProxy WRITE
@@ -105,6 +110,21 @@ public:
   bool useLogScaleOpacity() const;
 
   /**
+  * Returns the value for showDataHistogram
+  */
+  bool showDataHistogram() const;
+
+  /**
+  * Returns the value for automaticDataHistogramComputation
+  */
+  bool automaticDataHistogramComputation() const;
+
+  /**
+  * Returns the value for dataHistogramNumberOfBins
+  */
+  int dataHistogramNumberOfBins() const;
+
+  /**
   * Returns the scalar opacity function (i.e. PiecewiseFunction) proxy
   * used, if any.
   */
@@ -130,6 +150,21 @@ public slots:
   * Set whether to use-log scale.
   */
   void setUseLogScaleOpacity(bool value);
+
+  /**
+  * Set whether to show data histogram.
+  */
+  void setShowDataHistogram(bool value);
+
+  /**
+  * Set whether to automatically compute data histogram.
+  */
+  void setAutomaticDataHistogramComputation(bool value);
+
+  /**
+  * Set the number of bins to use for the data histogram.
+  */
+  void setDataHistogramNumberOfBins(int value);
 
   /**
   * Set the scalar opacity function (or PiecewiseFunction) proxy to use.
@@ -195,6 +230,21 @@ signals:
   void useLogScaleOpacityChanged();
 
   /**
+  * Signal fired when showDataHistogram changes.
+  */
+  void showDataHistogramChanged();
+
+  /**
+  * Signal fired when automaticDataHistogramComputation changes.
+  */
+  void automaticDataHistogramComputationChanged();
+
+  /**
+  * Signal fired when dataHistogramNumberOfBins changes.
+  */
+  void dataHistogramNumberOfBinsEdited();
+
+  /**
   * This signal is never really fired since this
   * widget doesn't have any UI to allow users to changes the
   * ScalarOpacityFunction proxy used.
@@ -253,12 +303,54 @@ protected slots:
   void useLogScaleOpacityClicked(bool);
 
   /**
+  * Called when the showDataHistogram checkbox is clicked by the user. We then add
+  * extra logic to compute and update the histogram and enable to update histogram button.
+  * This uses the histogram table cache if it is up to date.
+  * This can be called manually to show/hide the histogram
+  */
+  void showDataHistogramClicked(bool show = true);
+
+  /**
+  * Called when the automaticDataHistogramComputation checkbox is clicked by the user.
+  * We then add extra logic to show the histogram and update the UI.
+  */
+  void automaticDataHistogramComputationClicked(bool val);
+
+  /**
+   * Called when the  dataHistogramNumberOfBins is changed by the user.
+   * We then add extra logic to set the histogram outdated
+  */
+  void dataHistogramNumberOfBinsEdited(int val);
+
+  /**
+   * Update the enable state of different data histogram related widgets
+   */
+  void updateDataHistogramEnableState();
+
+  /**
   * called when the active representation or view changes.  We then change the
   * enabled/disabled state of the buttons. Some actions require a valid
   * representation or view, so disable them if there isn't one.
   * We also update the opacity editor.
   */
   void representationOrViewChanged();
+
+  /**
+   * Called when the histogram should be considered outdated, which includes :
+   * When the range of the transfer function is changed, either from a custom range or from an
+   * updated range
+   * When the vector mode or vector component is changed
+   * When the visibility of a consumer is changed
+   * When the number of bins is changed
+   */
+  void setHistogramOutdated();
+
+  /**
+   * Slot called by a timer which is triggered in showDataHistogramClicked
+   * This method actually setup the histogram
+   * but should not be used directly
+   */
+  void realShowDataHistogram();
 
 protected:
   /**

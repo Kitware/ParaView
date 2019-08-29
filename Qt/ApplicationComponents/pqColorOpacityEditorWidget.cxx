@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyWidgetDecorator.h"
 #include "pqResetScalarRangeReaction.h"
 #include "pqSettings.h"
+#include "pqTimer.h"
 #include "pqTransferFunctionWidget.h"
 #include "pqUndoStack.h"
 #include "vtkCommand.h"
@@ -61,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTransferFunctionPresets.h"
 #include "vtkSMTransferFunctionProxy.h"
+#include "vtkTable.h"
 #include "vtkVector.h"
 #include "vtkWeakPointer.h"
 #include "vtk_jsoncpp.h"
@@ -73,6 +75,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cassert>
 #include <cmath>
+#include <set>
 
 namespace
 {
@@ -126,8 +129,12 @@ public:
 
   // We use this pqPropertyLinks instance to simply monitor smproperty changes.
   pqPropertyLinks LinksForMonitoringChanges;
-  vtkNew<vtkEventQtSlotConnect> IndexedLookupConnector;
+  vtkNew<vtkEventQtSlotConnect> TransferFunctionConnector;
   vtkNew<vtkEventQtSlotConnect> RangeConnector;
+  vtkNew<vtkEventQtSlotConnect> ConsumerConnector;
+
+  pqTimer HistogramTimer;
+  bool HistogramOutdated = true;
 
   pqInternals(pqColorOpacityEditorWidget* self, vtkSMPropertyGroup* group)
     : ColorTableModel(self)
@@ -155,6 +162,10 @@ public:
 
     QObject::connect(
       this->ChoosePresetReaction.data(), SIGNAL(presetApplied()), self, SLOT(presetApplied()));
+
+    this->HistogramTimer.setSingleShot(true);
+    this->HistogramTimer.setInterval(1);
+    QObject::connect(&this->HistogramTimer, SIGNAL(timeout()), self, SLOT(realShowDataHistogram()));
   }
 
   void render()
@@ -199,6 +210,11 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this,
     SLOT(representationOrViewChanged()));
 
+  // To avoid color editor widget movement when hidden
+  QSizePolicy sp_retain = ui.OpacityEditor->sizePolicy();
+  sp_retain.setRetainSizeWhenHidden(true);
+  ui.OpacityEditor->setSizePolicy(sp_retain);
+
   QObject::connect(ui.OpacityEditor, SIGNAL(currentPointChanged(vtkIdType)), this,
     SLOT(opacityCurrentChanged(vtkIdType)));
   QObject::connect(ui.ColorEditor, SIGNAL(currentPointChanged(vtkIdType)), this,
@@ -229,7 +245,12 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
 
   QObject::connect(ui.ChoosePreset, SIGNAL(clicked()), this, SLOT(choosePreset()));
   QObject::connect(ui.SaveAsPreset, SIGNAL(clicked()), this, SLOT(saveAsPreset()));
+  QObject::connect(
+    ui.ComputeDataHistogram, SIGNAL(clicked()), this, SLOT(showDataHistogramClicked()));
   QObject::connect(ui.AdvancedButton, SIGNAL(clicked()), this, SLOT(updatePanel()));
+
+  QObject::connect(
+    ui.OpacityEditor, SIGNAL(chartRangeModified()), this, SLOT(setHistogramOutdated()));
 
   this->connect(
     ui.UseLogScaleOpacity, SIGNAL(clicked(bool)), SLOT(useLogScaleOpacityClicked(bool)));
@@ -271,13 +292,58 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   {
     this->addPropertyLink(this, "useLogScale", SIGNAL(useLogScaleChanged()), smproperty);
     QObject::connect(ui.UseLogScale, SIGNAL(clicked(bool)), this, SLOT(useLogScaleClicked(bool)));
-    // QObject::connect(ui.UseLogScale, SIGNAL(toggled(bool)),
-    //  this, SIGNAL(useLogScaleChanged()));
   }
   else
   {
     ui.UseLogScale->hide();
   }
+
+  smproperty = smgroup->GetProperty("ShowDataHistogram");
+  if (smproperty)
+  {
+    this->addPropertyLink(
+      this, "showDataHistogram", SIGNAL(showDataHistogramChanged()), smproperty);
+    QObject::connect(
+      ui.ShowDataHistogram, SIGNAL(clicked(bool)), this, SLOT(showDataHistogramClicked(bool)));
+  }
+  else
+  {
+    ui.ShowDataHistogram->hide();
+  }
+
+  smproperty = smgroup->GetProperty("AutomaticDataHistogramComputation");
+  if (smproperty)
+  {
+    this->addPropertyLink(this, "automaticDataHistogramComputation",
+      SIGNAL(automaticDataHistogramComputationChanged()), smproperty);
+    QObject::connect(ui.AutomaticDataHistogramComputation, SIGNAL(clicked(bool)), this,
+      SLOT(automaticDataHistogramComputationClicked(bool)));
+  }
+  else
+  {
+    ui.AutomaticDataHistogramComputation->hide();
+  }
+
+  smproperty = smgroup->GetProperty("DataHistogramNumberOfBins");
+  if (smproperty)
+  {
+    this->addPropertyLink(
+      this, "dataHistogramNumberOfBins", SIGNAL(dataHistogramNumberOfBinsEdited()), smproperty);
+    QObject::connect(ui.DataHistogramNumberOfBins, SIGNAL(valueEdited(int)), this,
+      SLOT(dataHistogramNumberOfBinsEdited(int)));
+  }
+  else
+  {
+    ui.DataHistogramNumberOfBins->hide();
+  }
+
+  // Manage histogram computation if enabled
+  // When creating the widget, we consider that the cost of recomputing the histogram table
+  // can be paid systematically
+  // We hide it to avoid seeing it before the timer ends and triggers the actual computation
+  this->updateDataHistogramEnableState();
+  this->Internals->Ui.OpacityEditor->setVisible(!ui.ShowDataHistogram->isChecked());
+  this->showDataHistogramClicked(ui.ShowDataHistogram->isChecked());
 
   // if proxy has a property named IndexedLookup, we hide this entire widget
   // when IndexedLookup is ON.
@@ -286,12 +352,23 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     // we are not controlling the IndexedLookup property, we are merely
     // observing it to ensure the UI is updated correctly. Hence we don't fire
     // any signal to update the smproperty.
-    this->Internals->IndexedLookupConnector->Connect(smproxy->GetProperty("IndexedLookup"),
+    this->Internals->TransferFunctionConnector->Connect(smproxy->GetProperty("IndexedLookup"),
       vtkCommand::ModifiedEvent, this, SLOT(updateIndexedLookupState()));
     this->updateIndexedLookupState();
 
     // Add decorator so the widget can be hidden when IndexedLookup is ON.
     this->addDecorator(this->Internals->Decorator);
+  }
+
+  if (smproxy->GetProperty("VectorMode"))
+  {
+    this->Internals->TransferFunctionConnector->Connect(smproxy->GetProperty("VectorMode"),
+      vtkCommand::ModifiedEvent, this, SLOT(setHistogramOutdated()));
+  }
+  if (smproxy->GetProperty("VectorComponent"))
+  {
+    this->Internals->TransferFunctionConnector->Connect(smproxy->GetProperty("VectorComponent"),
+      vtkCommand::ModifiedEvent, this, SLOT(setHistogramOutdated()));
   }
 
   pqSettings* settings = pqApplicationCore::instance()->settings();
@@ -365,10 +442,10 @@ void pqColorOpacityEditorWidget::setScalarOpacityFunctionProxy(pqSMProxy sofProx
 
       this->Internals->RangeConnector->Connect(mcmProp, vtkCommand::ModifiedEvent, this,
         SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
-
-      // FIXME: need to verify that repeated initializations are okay.
-      this->initializeOpacityEditor(pwf);
     }
+
+    // FIXME: need to verify that repeated initializations are okay.
+    this->initializeOpacityEditor(pwf);
 
     // add new property links.
     this->links().addPropertyLink(this, "xvmsPoints", SIGNAL(xvmsPointsChanged()),
@@ -437,6 +514,9 @@ void pqColorOpacityEditorWidget::initializeOpacityEditor(vtkPiecewiseFunction* p
     stc = vtkScalarsToColors::SafeDownCast(this->proxy()->GetClientSideObject());
   }
   ui.OpacityEditor->initialize(stc, false, pwf, true);
+
+  // The opacity editor has been initialized, set the data histogram table if needed
+  this->showDataHistogramClicked(this->Internals->Ui.ShowDataHistogram->isChecked());
 }
 
 //-----------------------------------------------------------------------------
@@ -689,9 +769,8 @@ void pqColorOpacityEditorWidget::representationOrViewChanged()
 
     this->Internals->RangeConnector->Connect(mcmProp, vtkCommand::ModifiedEvent, this,
       SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
-
-    this->initializeOpacityEditor(pwf);
   }
+  this->initializeOpacityEditor(pwf);
 }
 
 //-----------------------------------------------------------------------------
@@ -853,4 +932,138 @@ void pqColorOpacityEditorWidget::saveAsPreset()
     presetName = presets->AddUniquePreset(preset);
   }
   this->choosePreset(presetName);
+}
+
+//-----------------------------------------------------------------------------
+bool pqColorOpacityEditorWidget::showDataHistogram() const
+{
+  return this->Internals->Ui.ShowDataHistogram->isChecked();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::setShowDataHistogram(bool val)
+{
+  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+  ui.ShowDataHistogram->setChecked(val);
+}
+
+//-----------------------------------------------------------------------------
+bool pqColorOpacityEditorWidget::automaticDataHistogramComputation() const
+{
+  return this->Internals->Ui.AutomaticDataHistogramComputation->isChecked();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::setAutomaticDataHistogramComputation(bool val)
+{
+  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+  ui.AutomaticDataHistogramComputation->setChecked(val);
+}
+
+//-----------------------------------------------------------------------------
+int pqColorOpacityEditorWidget::dataHistogramNumberOfBins() const
+{
+  return this->Internals->Ui.DataHistogramNumberOfBins->value();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::setDataHistogramNumberOfBins(int val)
+{
+  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+  ui.DataHistogramNumberOfBins->setValue(val);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::showDataHistogramClicked(bool showDataHistogram)
+{
+  this->updateDataHistogramEnableState();
+  if (showDataHistogram)
+  {
+    // Defer the histogram computation for later to ensure all visible consumer
+    // have their data available
+    this->Internals->HistogramTimer.start();
+  }
+  else
+  {
+    this->Internals->Ui.OpacityEditor->setHistogramTable(nullptr);
+  }
+  emit this->showDataHistogramChanged();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::realShowDataHistogram()
+{
+  // the opacity editor may have been hidden before this call, make sure it is visible.
+  this->Internals->Ui.OpacityEditor->show();
+
+  vtkTable* histoTable = vtkSMTransferFunctionProxy::GetHistogramTableCache(this->proxy());
+  if (!histoTable || this->Internals->HistogramOutdated)
+  {
+    // No cache or we are outdated, compute the histogram
+    this->Internals->Ui.ComputeDataHistogram->clear();
+    vtkSMTransferFunctionProxy* tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(this->proxy());
+    histoTable =
+      tfProxy->ComputeDataHistogramTable(this->Internals->Ui.DataHistogramNumberOfBins->value());
+    this->Internals->Ui.OpacityEditor->setHistogramTable(histoTable);
+
+    // Add all consumers, even non-visible, to the consumer connnector
+    // so the histogram can be set outdated correctly
+    this->Internals->ConsumerConnector->Disconnect();
+    std::set<vtkSMProxy*> usedProxy;
+    for (unsigned int cc = 0, max = tfProxy->GetNumberOfConsumers(); cc < max; ++cc)
+    {
+      vtkSMProxy* proxy = tfProxy->GetConsumerProxy(cc);
+      proxy = proxy ? proxy->GetTrueParentProxy() : nullptr;
+      vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+      if (consumer && usedProxy.find(consumer) == usedProxy.end())
+      {
+        this->Internals->ConsumerConnector->Connect(consumer->GetProperty("Visibility"),
+          vtkCommand::ModifiedEvent, this, SLOT(setHistogramOutdated()));
+        usedProxy.insert(consumer);
+      }
+    }
+  }
+  this->Internals->Ui.OpacityEditor->setHistogramTable(histoTable);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::automaticDataHistogramComputationClicked(bool val)
+{
+  if (val)
+  {
+    this->showDataHistogramClicked(true);
+  }
+  this->updateDataHistogramEnableState();
+  emit this->automaticDataHistogramComputationChanged();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::dataHistogramNumberOfBinsEdited(int vtkNotUsed(val))
+{
+  this->setHistogramOutdated();
+  emit this->dataHistogramNumberOfBinsEdited();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::setHistogramOutdated()
+{
+  this->Internals->HistogramOutdated = true;
+  if (this->Internals->Ui.AutomaticDataHistogramComputation->isChecked())
+  {
+    this->showDataHistogramClicked(true);
+  }
+  else
+  {
+    this->Internals->Ui.ComputeDataHistogram->highlight();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::updateDataHistogramEnableState()
+{
+  bool showDataHistogram = this->Internals->Ui.ShowDataHistogram->isChecked();
+  this->Internals->Ui.AutomaticDataHistogramComputation->setEnabled(showDataHistogram);
+  this->Internals->Ui.DataHistogramNumberOfBins->setEnabled(showDataHistogram);
+  this->Internals->Ui.ComputeDataHistogram->setEnabled(
+    showDataHistogram && !this->Internals->Ui.AutomaticDataHistogramComputation->isChecked());
 }
