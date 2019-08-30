@@ -204,7 +204,7 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
     set(_paraview_client_splash_image_name
       "${_paraview_client_splash_base_name}.img")
     set(_paraview_client_splash_resource
-      ":/${_paraview_client_NAME}/${_paraview_client_splash_image_name}")
+      ":/${_paraview_client_NAME}/${_paraview_client_splash_base_name}")
 
     set(_paraview_client_splash_resource_file
       "${CMAKE_CURRENT_BINARY_DIR}/${_paraview_client_splash_base_name}.qrc")
