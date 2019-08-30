@@ -40,6 +40,7 @@ set(classes
   vtkSMDirectoryProxy
   vtkSMEnsembleDataReaderProxy
   vtkSMExporterProxy
+  vtkSMExtractSelectionProxyInitializationHelper
   vtkSMGL2PSExporterProxy
   vtkSMInteractionUndoStackBuilder
   vtkSMInteractiveSelectionPipeline

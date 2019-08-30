@@ -150,7 +150,7 @@ public:
 
   /**
    * Set/Get the selection input. This is used to set the selection input to the
-   * extarction proxy for the output port identified by \c portIndex.
+   * extraction proxy for the output port identified by \c portIndex.
    * If no extraction proxies are present, this method has no effect.
    */
   void SetSelectionInput(unsigned int portIndex, vtkSMSourceProxy* input, unsigned int outputPort);

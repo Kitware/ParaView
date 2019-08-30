@@ -47,6 +47,32 @@
 #define MAX_NUMBER_OF_PORTS 10
 
 //---------------------------------------------------------------------------
+class vtkSelectionForwarderCommand : public vtkCommand
+{
+public:
+  vtkTypeMacro(vtkSelectionForwarderCommand, vtkCommand);
+
+  static vtkSelectionForwarderCommand* New() { return new vtkSelectionForwarderCommand; }
+
+  vtkSelectionForwarderCommand()
+    : PortIndex(0)
+    , Proxy(nullptr)
+  {
+  }
+
+  void Execute(vtkObject*, unsigned long, void*) override
+  {
+    if (this->Proxy)
+    {
+      this->Proxy->InvokeEvent(vtkCommand::SelectionChangedEvent, &this->PortIndex);
+    }
+  }
+
+  int PortIndex;
+  vtkSMSourceProxy* Proxy;
+};
+
+//---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSourceProxy);
 
 // This struct will keep all information associated with the output port.
@@ -62,6 +88,7 @@ struct vtkSMSourceProxyInternals
   typedef std::vector<vtkSMSourceProxyOutputPort> VectorOfPorts;
   VectorOfPorts OutputPorts;
   std::vector<vtkSmartPointer<vtkSMSourceProxy> > SelectionProxies;
+  std::vector<unsigned long> SelectionObservers;
 
   // Resizes output ports and ensures that Name for each port is initialized to
   // the default.
@@ -456,15 +483,29 @@ void vtkSMSourceProxy::SetExtractSelectionProxy(unsigned int index, vtkSMSourceP
   if (this->PInternals->SelectionProxies.size() <= index + 1)
   {
     this->PInternals->SelectionProxies.resize(index + 1);
+    this->PInternals->SelectionObservers.resize(index + 1);
   }
 
   this->PInternals->SelectionProxies[index] = proxy;
+
+  // Set up observer on the "Selection" property's ModifiedEvent and invoke
+  // a SelectionChangedEvent from this proxy.
+  vtkNew<vtkSelectionForwarderCommand> selectionCommand;
+  selectionCommand->PortIndex = index;
+  selectionCommand->Proxy = this;
+  this->PInternals->SelectionObservers[index] =
+    proxy->AddObserver(vtkCommand::ModifiedEvent, selectionCommand);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSourceProxy::RemoveAllExtractSelectionProxies()
 {
+  for (size_t i = 0; i < this->PInternals->SelectionObservers.size(); ++i)
+  {
+    this->PInternals->SelectionProxies[i]->RemoveObserver(this->PInternals->SelectionObservers[i]);
+  }
   this->PInternals->SelectionProxies.clear();
+  this->PInternals->SelectionObservers.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -540,6 +581,7 @@ void vtkSMSourceProxy::CreateSelectionProxies()
     abort();
   }
   this->PInternals->SelectionProxies.resize(numOutputs);
+  this->PInternals->SelectionObservers.resize(numOutputs);
 
   vtkClientServerStream stream;
   assert("Session should be valid" && this->Session);
@@ -574,7 +616,7 @@ void vtkSMSourceProxy::CreateSelectionProxies()
       sstream << this->GetLogNameOrDefault() << "(ExtractSelection:" << j << ")";
       esProxy->SetLogName(sstream.str().c_str());
 
-      this->PInternals->SelectionProxies[j] = esProxy;
+      this->SetExtractSelectionProxy(j, esProxy);
 
       // We don't use input property since that leads to reference loop cycles
       // and I don't feel like doing the garbage collection thing right now.
@@ -652,6 +694,7 @@ void vtkSMSourceProxy::CleanSelectionInputs(unsigned int portIndex)
   vtkSMSourceProxy* esProxy = this->PInternals->SelectionProxies[portIndex];
   if (esProxy)
   {
+    esProxy->RemoveObserver(this->PInternals->SelectionObservers[portIndex]);
     vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(esProxy->GetProperty("Selection"));
     pp->RemoveAllProxies();
     esProxy->UpdateVTKObjects();

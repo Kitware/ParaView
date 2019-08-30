@@ -240,6 +240,8 @@ void pqFindDataCreateSelectionFrame::runQuery()
 
   pqOutputPort* port = ui.source->currentPort();
 
+  this->Internals->CreatingSelection = true;
+
   vtkSmartPointer<vtkSMProxy> selectionSource;
   selectionSource.TakeReference(ui.queryClauseWidget->newSelectionSource());
   if (!selectionSource)
@@ -258,10 +260,9 @@ void pqFindDataCreateSelectionFrame::runQuery()
   // application's requirements.
   if (this->Internals->SelectionManager)
   {
-    this->Internals->CreatingSelection = true;
     this->Internals->SelectionManager->select(port);
-    this->Internals->CreatingSelection = false;
   }
+  this->Internals->CreatingSelection = false;
   port->renderAllViews();
 }
 
