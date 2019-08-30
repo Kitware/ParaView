@@ -830,6 +830,7 @@
           available in your dataset and can potentially take a long time to complete.
           Do you want to continue?
         </WarnOnCreate>
+        <InitializationHelper class="vtkSMExtractSelectionProxyInitializationHelper" />
       </Hints>
       <!-- End of ExtractSelectionOverTime -->
     </SourceProxy>
@@ -859,6 +860,7 @@
         <!-- View can be used to specify the preferred view for the proxy -->
         <View type="XYChartView" />
         <Plotable />
+        <InitializationHelper class="vtkSMExtractSelectionProxyInitializationHelper" />
       </Hints>
       <!-- End ExtractFieldDatasOverTime -->
     </SourceProxy>
@@ -13170,6 +13172,9 @@ Every Nth Point.
         are inside or out. If 0 then the output is an unstructured grid which
         contains only the subset of cells that are inside.</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <InitializationHelper class="vtkSMExtractSelectionProxyInitializationHelper" />
+      </Hints>
       <!-- End of ExtractSelection -->
     </SourceProxy>
     <!-- ==================================================================== -->
