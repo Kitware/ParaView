@@ -140,6 +140,22 @@ void pqSelectionManager::onItemRemoved(pqServerManagerModelItem* item)
 }
 
 //-----------------------------------------------------------------------------
+void pqSelectionManager::expandSelection(int layers)
+{
+  for (auto port : this->Implementation->SelectedPorts)
+  {
+    if (auto selsource = port->getSelectionInput())
+    {
+      vtkSMPropertyHelper helper(selsource, "NumberOfLayers");
+      helper.Set(helper.GetAsInt() + layers);
+      selsource->UpdateVTKObjects();
+    }
+    port->renderAllViews();
+    emit this->selectionChanged(port);
+  }
+}
+
+//-----------------------------------------------------------------------------
 void pqSelectionManager::clearSelection(pqOutputPort* outputPort)
 {
   if (outputPort == NULL)

@@ -709,6 +709,7 @@ list(APPEND TESTS_WITH_BASELINES
   EnSightTensorInversionBin.xml
   ExodusXML.xml
   ExodusGlobalDataWithRestarts.xml
+  ExpandSelection.xml
   ExportLinePlotToCSV.xml
   ExportLinePlotToTSV.xml
   ExportSceneSpreadSheetView2.xml
@@ -1228,6 +1229,7 @@ set(SelectionLinkInitial_DISABLE_CRS TRUE)
 set(SelectionLinkMultiple_DISABLE_CRS TRUE)
 set(SelectionLinkRemove_DISABLE_CRS TRUE)
 set(SelectionLinkReaction_DISABLE_CRS TRUE)
+set(ExpandSelection_DISABLE_CRS TRUE)
 set(ExportSelectionToCSV_DISABLE_CRS TRUE)
 set(BlockOpacities_DISABLE_CRS TRUE)
 

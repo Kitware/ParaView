@@ -124,6 +124,11 @@ public slots:
    */
   void onSourceRemoved(pqPipelineSource*);
 
+  /**
+   * Expand/contract selection to include additional layers.
+   */
+  void expandSelection(int layers);
+
 private slots:
   /**
   * Called when pqLinkModel creates a link,

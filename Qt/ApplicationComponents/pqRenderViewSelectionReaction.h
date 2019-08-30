@@ -70,6 +70,8 @@ public:
     SELECT_CUSTOM_POLYGON,
     ZOOM_TO_BOX,
     CLEAR_SELECTION,
+    GROW_SELECTION,
+    SHRINK_SELECTION,
     SELECT_SURFACE_CELLS_INTERACTIVELY,
     SELECT_SURFACE_POINTS_INTERACTIVELY,
     SELECT_SURFACE_POINTS_TOOLTIP,
@@ -99,8 +101,9 @@ private slots:
   virtual void actionTriggered(bool val);
 
   /**
-  * Handles enable state for the "CLEAR_SELECTION" mode.
-  */
+   * Handles enable state for the `CLEAR_SELECTION`, `GROW_SELECTION`, and
+   * `SHRINK_SELECTION` modes.
+   */
   void updateEnableState() override;
 
   /**

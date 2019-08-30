@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
+#include "pqOutputPort.h"
 #include "pqPVApplicationCore.h"
 #include "pqRenderView.h"
 #include "pqSelectionManager.h"
@@ -50,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTooltipSelectionPipeline.h"
 
+#include <QSet>
 #include <QToolTip>
 
 #include <cassert>
@@ -87,7 +89,8 @@ pqRenderViewSelectionReaction::pqRenderViewSelectionReaction(
     this->setView(NULL);
   }
 
-  if (this->Mode == CLEAR_SELECTION)
+  if (this->Mode == CLEAR_SELECTION || this->Mode == GROW_SELECTION ||
+    this->Mode == SHRINK_SELECTION)
   {
     if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
     {
@@ -156,15 +159,43 @@ void pqRenderViewSelectionReaction::actionTriggered(bool val)
 //-----------------------------------------------------------------------------
 void pqRenderViewSelectionReaction::updateEnableState()
 {
-  bool enabled = true;
-  if (this->Mode == CLEAR_SELECTION)
+  auto paction = this->parentAction();
+  switch (this->Mode)
   {
-    if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
-    {
-      enabled = core->selectionManager()->hasActiveSelection();
-    }
+    case CLEAR_SELECTION:
+    case GROW_SELECTION:
+      if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
+      {
+        paction->setEnabled(core->selectionManager()->hasActiveSelection());
+      }
+      else
+      {
+        paction->setEnabled(false);
+      }
+      break;
+    case SHRINK_SELECTION:
+      if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
+      {
+        bool can_shrink = false;
+        for (auto port : core->selectionManager()->getSelectedPorts())
+        {
+          if (auto selsource = port->getSelectionInput())
+          {
+            vtkSMPropertyHelper helper(selsource, "NumberOfLayers");
+            can_shrink |= (helper.GetAsInt() >= 1);
+          }
+        }
+        paction->setEnabled(can_shrink);
+      }
+      else
+      {
+        paction->setEnabled(false);
+      }
+      break;
+    default:
+      paction->setEnabled(true);
+      break;
   }
-  this->parentAction()->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
@@ -295,6 +326,14 @@ void pqRenderViewSelectionReaction::beginSelection()
       if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
       {
         core->selectionManager()->clearSelection();
+      }
+      break;
+
+    case GROW_SELECTION:
+    case SHRINK_SELECTION:
+      if (pqPVApplicationCore* core = pqPVApplicationCore::instance())
+      {
+        core->selectionManager()->expandSelection(this->Mode == GROW_SELECTION ? 1 : -1);
       }
       break;
 

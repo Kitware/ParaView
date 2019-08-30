@@ -47,6 +47,7 @@ vtkQuerySelectionSource::vtkQuerySelectionSource()
   this->HierarchicalLevel = -1;
   this->ProcessID = -1;
   this->Inverse = 0;
+  this->NumberOfLayers = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -108,6 +109,7 @@ int vtkQuerySelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
   props->Set(vtkSelectionNode::FIELD_TYPE(), this->FieldType);
   props->Set(vtkSelectionNode::CONTENT_TYPE(), vtkSelectionNode::QUERY);
   props->Set(vtkSelectionNode::INVERSE(), this->Inverse);
+  props->Set(vtkSelectionNode::CONNECTED_LAYERS(), this->NumberOfLayers);
 
   selNode->SetQueryString(this->QueryString);
 
