@@ -33,6 +33,7 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVEncodeSelectionForServer.h"
 #include "vtkPVLastSelectionInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVRenderView.h"
@@ -871,55 +872,6 @@ bool vtkSMRenderViewProxy::SelectSurfacePoints(const int region[4],
     stream, selectedRepresentations, selectionSources, multiple_selections);
 }
 
-namespace
-{
-//-----------------------------------------------------------------------------
-static void vtkShrinkSelection(vtkSelection* sel)
-{
-  std::map<void*, int> pixelCounts;
-  unsigned int numNodes = sel->GetNumberOfNodes();
-  void* chosen = NULL;
-  int maxPixels = -1;
-  for (unsigned int cc = 0; cc < numNodes; cc++)
-  {
-    vtkSelectionNode* node = sel->GetNode(cc);
-    vtkInformation* properties = node->GetProperties();
-    if (properties->Has(vtkSelectionNode::PIXEL_COUNT()) &&
-      properties->Has(vtkSelectionNode::SOURCE()))
-    {
-      int numPixels = properties->Get(vtkSelectionNode::PIXEL_COUNT());
-      void* source = properties->Get(vtkSelectionNode::SOURCE());
-      pixelCounts[source] += numPixels;
-      if (pixelCounts[source] > maxPixels)
-      {
-        maxPixels = numPixels;
-        chosen = source;
-      }
-    }
-  }
-
-  std::vector<vtkSmartPointer<vtkSelectionNode> > chosenNodes;
-  if (chosen != NULL)
-  {
-    for (unsigned int cc = 0; cc < numNodes; cc++)
-    {
-      vtkSelectionNode* node = sel->GetNode(cc);
-      vtkInformation* properties = node->GetProperties();
-      if (properties->Has(vtkSelectionNode::SOURCE()) &&
-        properties->Get(vtkSelectionNode::SOURCE()) == chosen)
-      {
-        chosenNodes.push_back(node);
-      }
-    }
-  }
-  sel->RemoveAllNodes();
-  for (unsigned int cc = 0; cc < chosenNodes.size(); cc++)
-  {
-    sel->AddNode(chosenNodes[cc]);
-  }
-}
-}
-
 //----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::FetchLastSelection(
   bool multiple_selections, vtkCollection* selectedRepresentations, vtkCollection* selectionSources)
@@ -927,15 +879,11 @@ bool vtkSMRenderViewProxy::FetchLastSelection(
   if (selectionSources && selectedRepresentations)
   {
     vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
-    vtkSelection* selection = rv->GetLastSelection();
-    if (!multiple_selections)
-    {
-      // only pass through selection over a single representation.
-      vtkShrinkSelection(selection);
-    }
-    vtkSMSelectionHelper::NewSelectionSourcesFromSelection(
-      selection, this, selectionSources, selectedRepresentations);
-    return (selectionSources->GetNumberOfItems() > 0);
+    vtkSelection* rawSelection = rv->GetLastSelection();
+
+    vtkNew<vtkPVEncodeSelectionForServer> helper;
+    return helper->ProcessSelection(
+      rawSelection, this, multiple_selections, selectedRepresentations, selectionSources);
   }
   return false;
 }
