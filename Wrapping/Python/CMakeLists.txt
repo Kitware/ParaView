@@ -28,6 +28,7 @@ set(python_files
   paraview/numpy_support.py
   paraview/pv-vtk-all.py
   paraview/python_view.py
+  paraview/selection.py
   paraview/servermanager.py
   paraview/simple.py
   paraview/smstate.py
