@@ -75,6 +75,11 @@ pqSelectionManager::pqSelectionManager(QObject* _parent /*=null*/)
   QObject::connect(model, SIGNAL(aboutToRemoveServer(pqServer*)), this, SLOT(clearSelection()));
   QObject::connect(model, SIGNAL(serverRemoved(pqServer*)), this, SLOT(clearSelection()));
 
+  QObject::connect(
+    model, SIGNAL(sourceAdded(pqPipelineSource*)), this, SLOT(onSourceAdded(pqPipelineSource*)));
+  QObject::connect(model, SIGNAL(sourceRemoved(pqPipelineSource*)), this,
+    SLOT(onSourceRemoved(pqPipelineSource*)));
+
   pqApplicationCore::instance()->registerManager("SelectionManager", this);
 
   QObject::connect(
@@ -82,7 +87,7 @@ pqSelectionManager::pqSelectionManager(QObject* _parent /*=null*/)
   this->setActiveView(pqActiveObjects::instance().activeView());
 
   // When a selection link is added or removed, we need to update the pqSelectionManager
-  // So it keed the SelectedPorts sets up to date and render any selection that
+  // So it keeps the SelectedPorts up to date and render any selection that
   // may have been updated
   QObject::connect(pqApplicationCore::instance()->getLinksModel(), SIGNAL(linkAdded(int)), this,
     SLOT(onLinkAdded(int)));
@@ -106,6 +111,7 @@ void pqSelectionManager::setActiveView(pqView* view)
     QObject::disconnect(this->Implementation->ActiveView, 0, this, 0);
   }
   this->Implementation->ActiveView = view;
+
   if (view)
   {
     QObject::connect(view, SIGNAL(selected(pqOutputPort*)), this, SLOT(select(pqOutputPort*)));
@@ -205,7 +211,7 @@ bool pqSelectionManager::hasActiveSelection() const
 //-----------------------------------------------------------------------------
 void pqSelectionManager::select(pqOutputPort* selectedPort)
 {
-  // The active view is reporting that it made a selection, we update our state.
+  // The port has a selection change, so update our state.
 
   // If current selected output ports does NOT contain new selected port,
   // we need to clear it.
@@ -266,7 +272,7 @@ void pqSelectionManager::select(pqOutputPort* selectedPort)
           {
             vtkSMProxy* proxy = selectionLink->GetLinkedProxy(j);
 
-            // if the output proxy as not been checked
+            // if the output proxy has not been checked
             // look for links containing this proxy as an input
             // and add the result to the link collection
             if (!checkedInputProxy.contains(proxy))
@@ -303,6 +309,20 @@ void pqSelectionManager::select(pqOutputPort* selectedPort)
 
   // Inform about the selection
   emit this->selectionChanged(selectedPort);
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionManager::onSourceAdded(pqPipelineSource* source)
+{
+  QObject::connect(
+    source, SIGNAL(selectionChanged(pqOutputPort*)), this, SIGNAL(selectionChanged(pqOutputPort*)));
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionManager::onSourceRemoved(pqPipelineSource* source)
+{
+  QObject::disconnect(
+    source, SIGNAL(selectionChanged(pqOutputPort*)), this, SIGNAL(selectionChanged(pqOutputPort*)));
 }
 
 //-----------------------------------------------------------------------------

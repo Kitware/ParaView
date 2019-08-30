@@ -125,6 +125,8 @@ pqPipelineSource::pqPipelineSource(
       this->Internal->OutputPorts.push_back(op);
     }
     this->getConnector()->Connect(source, vtkCommand::UpdateDataEvent, this, SLOT(dataUpdated()));
+    this->getConnector()->Connect(source, vtkCommand::SelectionChangedEvent, this,
+      SLOT(onSelectionChanged(vtkObject*, unsigned long, void*, void*, vtkCommand*)));
   }
 }
 
@@ -156,6 +158,21 @@ void pqPipelineSource::updatePipeline()
 void pqPipelineSource::dataUpdated()
 {
   emit this->dataUpdated(this);
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineSource::onSelectionChanged(
+  vtkObject*, unsigned long, void* vtkNotUsed(client_data), void* call_data, vtkCommand*)
+{
+  unsigned int portIndex = *reinterpret_cast<unsigned int*>(call_data);
+  if (this->getSourceProxy())
+  {
+    auto port = this->getOutputPort(static_cast<int>(portIndex));
+    if (port)
+    {
+      emit selectionChanged(port);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
