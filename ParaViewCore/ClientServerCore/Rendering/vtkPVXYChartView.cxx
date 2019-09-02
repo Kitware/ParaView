@@ -427,7 +427,7 @@ void vtkPVXYChartView::SetLegendPosition(int x, int y)
 //----------------------------------------------------------------------------
 void vtkPVXYChartView::SetLegendSymbolWidth(int width)
 {
-  if (this->Chart)
+  if (this->Chart && this->Chart->GetLegend())
   {
     this->Chart->GetLegend()->SetSymbolWidth(width);
   }
