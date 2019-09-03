@@ -571,12 +571,6 @@
         </ArraySelectionDomain>
         <Documentation>Select the cell arrays to read load.</Documentation>
       </StringVectorProperty>
-      <Hints>
-        <ReaderFactory
-          filename_patterns="plt*"
-          file_description="AMReX plotfiles (grids)"
-          is_directory="1" />
-      </Hints>
     </Proxy>
     <!-- END AMReX AMR Core Reader definition -->
     <Proxy class="vtkAVSucdReader"
@@ -3620,7 +3614,7 @@
     <!--  AMReX Reader -->
     <SourceProxy class="vtkFileSeriesReader"
                  file_name_method="SetFileName"
-                 label="AMReX Grid Reader"
+                 label="AMReX/BoxLib Grid Reader"
                  name="AMReXGridReader"
                  si_class="vtkSIMetaReaderProxy">
       <Documentation
@@ -3667,7 +3661,7 @@
       <Hints>
         <ReaderFactory
           filename_patterns="plt*"
-          file_description="AMReX plotfiles (grids)"
+          file_description="AMReX/BoxLib plotfiles (grids)"
           is_directory="1"
         />
       </Hints>
@@ -8752,7 +8746,7 @@ series.
     <SourceProxy name="AMReXParticlesReader"
       class="vtkFileSeriesReader"
       file_name_method="SetPlotFileName"
-      label="AMReX Particles Reader"
+      label="AMReX/BoxLib Particles Reader"
       si_class="vtkSIMetaReaderProxy">
       <Documentation short_help="Reader for AMReX particle data">
         Reads particle data from AMReX plotfiles.
@@ -8788,7 +8782,7 @@ series.
       <Hints>
         <ReaderFactory
           filename_patterns="plt*"
-          file_description="AMReX plotfiles (particles)"
+          file_description="AMReX/BoxLib plotfiles (particles)"
           is_directory="1" />
       </Hints>
       <!-- end AMReXParticlesReader -->
