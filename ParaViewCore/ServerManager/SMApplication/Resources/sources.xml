@@ -1896,6 +1896,14 @@
         everything that should be extracted. When this is true the selection
         describes everything that should NOT be extracted.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetNumberOfLayers"
+                         default_values="0"
+                         name="NumberOfLayers"
+                         number_of_elements="1">
+        <Documentation>Specify the number of layers of connected elements
+          to include in the selection.</Documentation>
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
       <!-- end of SelectionQuerySource -->
     </SourceProxy>
     <!-- ==================================================================== -->
@@ -1941,6 +1949,14 @@
         <Documentation>When this property is false the selection describes
         everything that should be extracted. When this is true the selection
         describes everything that should NOT be extracted.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetNumberOfLayers"
+                         default_values="0"
+                         name="NumberOfLayers"
+                         number_of_elements="1">
+        <Documentation>Specify the number of layers of connected elements
+          to include in the selection.</Documentation>
+        <IntRangeDomain name="range" min="0" />
       </IntVectorProperty>
     </Proxy>
     <!-- ==================================================================== -->

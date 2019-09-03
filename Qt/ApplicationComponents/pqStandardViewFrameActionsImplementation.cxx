@@ -91,6 +91,26 @@ T findParent(QObject* obj)
   }
   return nullptr;
 }
+
+QAction* findActiveAction(const QString& name)
+{
+  pqView* activeView = pqActiveObjects::instance().activeView();
+  if (activeView && activeView->widget() && activeView->widget()->parentWidget() &&
+    activeView->widget()->parentWidget()->parentWidget())
+  {
+    return activeView->widget()->parentWidget()->parentWidget()->findChild<QAction*>(name);
+  }
+  return NULL;
+}
+
+void triggerAction(const QString& name)
+{
+  QAction* atcn = findActiveAction(name);
+  if (atcn)
+  {
+    atcn->trigger();
+  }
+}
 }
 
 //-----------------------------------------------------------------------------
@@ -104,6 +124,8 @@ pqStandardViewFrameActionsImplementation::pqStandardViewFrameActionsImplementati
   this->ShortCutFrustumCells = new QShortcut(QKeySequence(tr("f")), mainWindow);
   this->ShortCutFrustumPoints = new QShortcut(QKeySequence(tr("g")), mainWindow);
   this->ShortCutBlocks = new QShortcut(QKeySequence("b"), mainWindow);
+  this->ShortCutGrow = new QShortcut(QKeySequence("+"), mainWindow);
+  this->ShortCutShrink = new QShortcut(QKeySequence("-"), mainWindow);
 
   QObject::connect(
     this->ShortCutSurfaceCells, SIGNAL(activated()), this, SLOT(selectSurfaceCellsTriggered()));
@@ -114,6 +136,10 @@ pqStandardViewFrameActionsImplementation::pqStandardViewFrameActionsImplementati
   QObject::connect(
     this->ShortCutFrustumPoints, SIGNAL(activated()), this, SLOT(selectFrustumPointsTriggered()));
   QObject::connect(this->ShortCutBlocks, SIGNAL(activated()), this, SLOT(selectBlocksTriggered()));
+  QObject::connect(
+    this->ShortCutGrow, &QShortcut::activated, []() { triggerAction("actionGrowSelection"); });
+  QObject::connect(
+    this->ShortCutShrink, &QShortcut::activated, []() { triggerAction("actionShrinkSelection"); });
 
   this->ShortCutEsc = new QShortcut(QKeySequence(Qt::Key_Escape), mainWindow);
   this->ShortCutEsc->setEnabled(false);
@@ -502,6 +528,24 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
       hoveringSurfaceCellsAction, SIGNAL(toggled(bool)), SLOT(interactiveSelectionToggled(bool)));
   }
 
+  if (this->isButtonVisible("Grow Selection", renderView))
+  {
+    QAction* growAction =
+      frame->addTitleBarAction(QIcon(":/QtWidgets/Icons/pqPlus16.png"), "Grow selection");
+    growAction->setObjectName("actionGrowSelection");
+    new pqRenderViewSelectionReaction(
+      growAction, renderView, pqRenderViewSelectionReaction::GROW_SELECTION);
+  }
+
+  if (this->isButtonVisible("Shrink Selection", renderView))
+  {
+    auto shrinkAction =
+      frame->addTitleBarAction(QIcon(":/QtWidgets/Icons/pqMinus16.png"), "Shrink selection");
+    shrinkAction->setObjectName("actionShrinkSelection");
+    new pqRenderViewSelectionReaction(
+      shrinkAction, renderView, pqRenderViewSelectionReaction::SHRINK_SELECTION);
+  }
+
   if (this->isButtonVisible("ClearSelection", renderView))
   {
     QStyle* style = qApp->style();
@@ -695,30 +739,6 @@ pqView* pqStandardViewFrameActionsImplementation::handleCreateView(
     return builder->createView(viewType.Name, pqActiveObjects::instance().activeServer());
   }
   return nullptr;
-}
-
-//-----------------------------------------------------------------------------
-namespace
-{
-QAction* findActiveAction(const QString& name)
-{
-  pqView* activeView = pqActiveObjects::instance().activeView();
-  if (activeView && activeView->widget() && activeView->widget()->parentWidget() &&
-    activeView->widget()->parentWidget()->parentWidget())
-  {
-    return activeView->widget()->parentWidget()->parentWidget()->findChild<QAction*>(name);
-  }
-  return NULL;
-}
-
-void triggerAction(const QString& name)
-{
-  QAction* atcn = findActiveAction(name);
-  if (atcn)
-  {
-    atcn->trigger();
-  }
-}
 }
 
 //-----------------------------------------------------------------------------

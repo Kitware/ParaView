@@ -157,6 +157,13 @@ public:
   vtkGetStringMacro(QueryString);
   //@}
 
+  //@{
+  /**
+   * Specify number of layers to extract connected to the selected elements.
+   */
+  vtkSetClampMacro(NumberOfLayers, int, 0, VTK_INT_MAX);
+  vtkGetMacro(NumberOfLayers, int);
+  //@}
 protected:
   vtkPVSelectionSource();
   ~vtkPVSelectionSource() override;
@@ -187,6 +194,7 @@ protected:
   double Frustum[32];
   char* ArrayName;
   char* QueryString;
+  int NumberOfLayers;
 
 private:
   vtkPVSelectionSource(const vtkPVSelectionSource&) = delete;

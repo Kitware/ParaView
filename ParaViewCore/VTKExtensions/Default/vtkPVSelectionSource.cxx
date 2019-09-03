@@ -173,6 +173,7 @@ vtkPVSelectionSource::vtkPVSelectionSource()
     this->Frustum[cc] = 0;
   }
   this->FieldType = vtkSelectionNode::CELL;
+  this->NumberOfLayers = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -410,6 +411,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
   source->SetFieldType(this->FieldType);
   source->SetContainingCells(this->ContainingCells);
   source->SetInverse(this->Inverse);
+  source->SetNumberOfLayers(this->NumberOfLayers);
 
   switch (this->Mode)
   {
@@ -662,4 +664,5 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
 void vtkPVSelectionSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "NumberOfLayers: " << this->NumberOfLayers << endl;
 }

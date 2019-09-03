@@ -82,6 +82,13 @@ public:
   vtkGetMacro(Inverse, int);
   //@}
 
+  //@{
+  /**
+   * Specify number of layers to extract connected to the selected elements.
+   */
+  vtkSetClampMacro(NumberOfLayers, int, 0, VTK_INT_MAX);
+  vtkGetMacro(NumberOfLayers, int);
+  //@}
 protected:
   vtkQuerySelectionSource();
   ~vtkQuerySelectionSource() override;
@@ -100,6 +107,7 @@ protected:
   int HierarchicalIndex;
   int HierarchicalLevel;
   int ProcessID;
+  int NumberOfLayers;
 
 private:
   vtkQuerySelectionSource(const vtkQuerySelectionSource&) = delete;
