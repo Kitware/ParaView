@@ -30,6 +30,7 @@
 #include "vtkCollection.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
+#include "vtkPVDataInformation.h"
 #include "vtkProcessModule.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -360,4 +361,17 @@ void pqSelectionManager::onLinkRemoved()
       }
     }
   }
+}
+
+//-----------------------------------------------------------------------------
+vtkBoundingBox pqSelectionManager::selectedDataBounds() const
+{
+  vtkBoundingBox bbox;
+  foreach (pqOutputPort* port, this->Implementation->SelectedPorts)
+  {
+    double bds[6] = { 0, -1, 0, -1, 0, -1 };
+    port->getSelectedDataInformation()->GetBounds(bds);
+    bbox.AddBounds(bds);
+  }
+  return bbox;
 }

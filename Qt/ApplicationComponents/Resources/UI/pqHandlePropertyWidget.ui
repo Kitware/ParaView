@@ -6,20 +6,32 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>429</width>
-    <height>97</height>
+    <width>412</width>
+    <height>127</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <property name="spacing">
     <number>2</number>
    </property>
+   <item row="1" column="2">
+    <widget class="pqDoubleLineEdit" name="worldPositionY"/>
+   </item>
    <item row="0" column="0" colspan="2">
     <widget class="QCheckBox" name="show3DWidget">
      <property name="text">
@@ -30,21 +42,15 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="pointLabel">
-     <property name="text">
-      <string>Point</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="pqDoubleLineEdit" name="worldPositionX"/>
-   </item>
-   <item row="1" column="2">
-    <widget class="pqDoubleLineEdit" name="worldPositionY"/>
-   </item>
    <item row="1" column="3">
     <widget class="pqDoubleLineEdit" name="worldPositionZ"/>
+   </item>
+   <item row="3" column="0" colspan="4">
+    <widget class="QPushButton" name="useCenterBounds">
+     <property name="text">
+      <string>Center on Bounds</string>
+     </property>
+    </widget>
    </item>
    <item row="2" column="0" colspan="4">
     <widget class="QLabel" name="pickLabel">
@@ -65,12 +71,22 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="4">
-    <widget class="QPushButton" name="useCenterBounds">
+   <item row="4" column="0" colspan="4">
+    <widget class="QPushButton" name="useSelectionCenter">
      <property name="text">
-      <string>Center on Bounds</string>
+      <string>Center on Selection</string>
      </property>
     </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="pointLabel">
+     <property name="text">
+      <string>Point</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="pqDoubleLineEdit" name="worldPositionX"/>
    </item>
   </layout>
  </widget>

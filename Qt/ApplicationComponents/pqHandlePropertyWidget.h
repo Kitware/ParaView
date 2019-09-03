@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqInteractivePropertyWidget.h"
 
+class QPushButton;
+
 /**
 * pqHandlePropertyWidget is a custom property widget that uses
 * "HandleWidgetRepresentation" to help users interactively set a 3D point in
@@ -69,9 +71,11 @@ protected slots:
 
 private slots:
   void setWorldPosition(double x, double y, double z);
+  void selectionChanged();
 
 private:
-  Q_DISABLE_COPY(pqHandlePropertyWidget)
+  Q_DISABLE_COPY(pqHandlePropertyWidget);
+  QPushButton* UseSelectionCenterButton = nullptr;
 };
 
 #endif

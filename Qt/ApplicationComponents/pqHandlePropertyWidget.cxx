@@ -32,7 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHandlePropertyWidget.h"
 #include "ui_pqHandlePropertyWidget.h"
 
+#include "pqOutputPort.h"
+#include "pqPVApplicationCore.h"
 #include "pqPointPickingHelper.h"
+#include "pqSelectionManager.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
@@ -72,6 +75,21 @@ pqHandlePropertyWidget::pqHandlePropertyWidget(
     ui.useCenterBounds->hide();
   }
 
+  this->UseSelectionCenterButton = ui.useSelectionCenter;
+  this->connect(pqPVApplicationCore::instance()->selectionManager(),
+    SIGNAL(selectionChanged(pqOutputPort*)), SLOT(selectionChanged()));
+  this->selectionChanged();
+  QObject::connect(ui.useSelectionCenter, &QPushButton::clicked, [this]() {
+    auto selMgr = pqPVApplicationCore::instance()->selectionManager();
+    auto bbox = selMgr->selectedDataBounds();
+    if (bbox.IsValid())
+    {
+      double center[3];
+      bbox.GetCenter(center);
+      this->setWorldPosition(center[0], center[1], center[2]);
+    }
+  });
+
   // link show3DWidget checkbox
   this->connect(ui.show3DWidget, SIGNAL(toggled(bool)), SLOT(setWidgetVisible(bool)));
   ui.show3DWidget->connect(this, SIGNAL(widgetVisibilityToggled(bool)), SLOT(setChecked(bool)));
@@ -94,6 +112,16 @@ pqHandlePropertyWidget::pqHandlePropertyWidget(
 //-----------------------------------------------------------------------------
 pqHandlePropertyWidget::~pqHandlePropertyWidget()
 {
+}
+
+//-----------------------------------------------------------------------------
+void pqHandlePropertyWidget::selectionChanged()
+{
+  if (this->UseSelectionCenterButton)
+  {
+    auto selMgr = pqPVApplicationCore::instance()->selectionManager();
+    this->UseSelectionCenterButton->setEnabled(selMgr->hasActiveSelection());
+  }
 }
 
 //-----------------------------------------------------------------------------

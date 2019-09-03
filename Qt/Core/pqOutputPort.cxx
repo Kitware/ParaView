@@ -115,6 +115,15 @@ vtkPVTemporalDataInformation* pqOutputPort::getTemporalDataInformation()
 }
 
 //-----------------------------------------------------------------------------
+vtkPVDataInformation* pqOutputPort::getSelectedDataInformation(int es_port) const
+{
+  auto source = vtkSMSourceProxy::SafeDownCast(this->getSource()->getProxy());
+  source->CreateSelectionProxies();
+  auto esfilter = source->GetSelectionOutput(this->PortNumber);
+  return esfilter->GetDataInformation(es_port);
+}
+
+//-----------------------------------------------------------------------------
 const char* pqOutputPort::getDataClassName() const
 {
   vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(this->getSource()->getProxy());
