@@ -1,3 +1,18 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkArithmeticAccumulator.cxx
+
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
 #include "vtkArithmeticAccumulator.h"
 
 #include "vtkObjectFactory.h"
@@ -17,7 +32,7 @@ void vtkArithmeticAccumulator::Add(vtkAbstractAccumulator* accumulator)
 {
   assert(vtkArithmeticAccumulator::SafeDownCast(accumulator) &&
     "Cannot accumulate different accumulators");
-  this->Add(accumulator->GetValue());
+  this->Value += accumulator->GetValue();
 }
 
 //----------------------------------------------------------------------------

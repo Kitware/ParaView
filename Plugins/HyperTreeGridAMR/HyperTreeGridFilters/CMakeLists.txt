@@ -8,11 +8,11 @@ set(classes
   vtkGeometricAccumulator
   vtkGeometricMeanArrayMeasurement
   vtkHarmonicMeanArrayMeasurement
-  vtkHyperTreeGridBox
-  vtkHyperTreeGridPlane
+  vtkHyperTreeGridAnalysisDrivenRefinement
   vtkInversedArithmeticAccumulator
   vtkMedianAccumulator
   vtkMedianArrayMeasurement
+  vtkPVHyperTreeGridAnalysisDrivenRefinement
   vtkSquaredArithmeticAccumulator
   vtkStandardDeviationArrayMeasurement)
 

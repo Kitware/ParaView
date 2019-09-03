@@ -1,3 +1,28 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkGeometricAccumulator.h
+
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+/**
+ * @class   vtkGeometricAccumulator
+ * @brief   accumulates input data geometrically
+ *
+ * Accumulator for adding geometrically data.
+ * The resulting accumulated value is the product of all the inputs.
+ *
+ * @warning One cannot geometrically accumulate zero or negative data.
+ */
+
 #ifndef vtkGeometricAccumulator_h
 #define vtkGeometricAccumulator_h
 

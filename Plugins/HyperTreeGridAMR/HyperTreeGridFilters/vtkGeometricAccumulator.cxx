@@ -1,6 +1,22 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkGeometricAccumulator.cxx
+
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
 #include "vtkGeometricAccumulator.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkSetGet.h"
 
 #include <cassert>
 
@@ -23,7 +39,11 @@ void vtkGeometricAccumulator::Add(vtkAbstractAccumulator* accumulator)
 //----------------------------------------------------------------------------
 void vtkGeometricAccumulator::Add(double value)
 {
-  assert(value > 0 && "Cannot add null or negative values into a geometric accumulator");
+  if (value <= 0)
+  {
+    vtkErrorMacro(
+      "Cannot add null or negative values into a geometric accumulator: value " << value);
+  }
   this->Value *= value;
 }
 

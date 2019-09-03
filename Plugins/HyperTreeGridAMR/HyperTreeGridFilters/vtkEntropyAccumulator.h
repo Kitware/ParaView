@@ -1,3 +1,26 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkEntropyAccumulator.h
+
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+/**
+ * @class   vtkEntropyAccumulator
+ * @brief   accumulates input data by summing the input elements times their logarithm
+ *
+ * Accumulator for computing the entropy of the input data.
+ * The resulting accumulated value is the sum of the input element weighted by their logarithm.
+ */
+
 #ifndef vtkEntropyAccumulator_h
 #define vtkEntropyAccumulator_h
 

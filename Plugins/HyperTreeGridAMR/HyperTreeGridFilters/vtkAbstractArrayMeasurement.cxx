@@ -1,3 +1,18 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkAbstractArrayMeasurement.cxx
+
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
 #include "vtkAbstractArrayMeasurement.h"
 
 #include "vtkAbstractAccumulator.h"
@@ -11,12 +26,12 @@ vtkAbstractArrayMeasurement::vtkAbstractArrayMeasurement()
 //----------------------------------------------------------------------------
 vtkAbstractArrayMeasurement::~vtkAbstractArrayMeasurement()
 {
-  if (this->Accumulators.size())
+  for (std::size_t i = 0; i < this->Accumulators.size(); ++i)
   {
-    if (this->Accumulators[0])
+    if (this->Accumulators[i])
     {
-      this->Accumulators[0]->Delete();
-      this->Accumulators[0] = nullptr;
+      this->Accumulators[i]->Delete();
+      this->Accumulators[i] = nullptr;
     }
   }
 }
@@ -49,6 +64,12 @@ void vtkAbstractArrayMeasurement::Add(vtkAbstractArrayMeasurement* arrayMeasurem
     this->Accumulators[i]->Add(arrayMeasurement->GetAccumulators()[i]);
   }
   this->NumberOfAccumulatedData += arrayMeasurement->GetNumberOfAccumulatedData();
+}
+
+//----------------------------------------------------------------------------
+bool vtkAbstractArrayMeasurement::CanMeasure() const
+{
+  return this->NumberOfAccumulatedData;
 }
 
 //----------------------------------------------------------------------------

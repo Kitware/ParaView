@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkExtractCellsByType.h
+  Module:    vtkHyperTreeGridAnalysisDrivenRefinement.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -14,7 +14,7 @@
 =========================================================================*/
 
 /**
- * @class   vtkHyperTreeGridPlane
+ * @class   vtkHyperTreeGridAnalysisDrivenRefinement
  * @brief   converts vtkDataSet to vtkHyperTreeGrid
  *
  * Given an input vtkDataSet and a subdivision strategy, given an input
@@ -41,28 +41,33 @@
  *
  */
 
-#ifndef vtkHyperTreeGridPlane_h
-#define vtkHyperTreeGridPlane_h
+#ifndef vtkHyperTreeGridAnalysisDrivenRefinement_h
+#define vtkHyperTreeGridAnalysisDrivenRefinement_h
 
-#include <functional>
-#include <vector>
-
-#include "vtkAbstractArrayMeasurement.h"
 #include "vtkAlgorithm.h"
-#include "vtkCell.h"
 #include "vtkFiltersGeneralModule.h" // For export macro
-#include "vtkHyperTreeGridNonOrientedCursor.h"
 #include "vtkTuple.h"
 
-#include <limits>
 #include <unordered_map>
 #include <vector>
 
-class VTKFILTERSGENERAL_EXPORT vtkHyperTreeGridPlane : public vtkAlgorithm
+class vtkAbstractArrayMeasurement;
+class vtkBitArray;
+class vtkCell;
+class vtkDataArray;
+class vtkDataSet;
+class vtkDoubleArray;
+class vtkHyperTreeGrid;
+class vtkHyperTreeGridNonOrientedCursor;
+class vtkInformation;
+class vtkInformationVector;
+class vtkLongArray;
+
+class VTKFILTERSGENERAL_EXPORT vtkHyperTreeGridAnalysisDrivenRefinement : public vtkAlgorithm
 {
 public:
-  static vtkHyperTreeGridPlane* New();
-  vtkTypeMacro(vtkHyperTreeGridPlane, vtkAlgorithm);
+  static vtkHyperTreeGridAnalysisDrivenRefinement* New();
+  vtkTypeMacro(vtkHyperTreeGridAnalysisDrivenRefinement, vtkAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
@@ -131,7 +136,7 @@ public:
   /**
    * Sets Max to infinity. Call this method to annihilate the upper bound.
    */
-  void SetMaxToInfinity() { this->Max = std::numeric_limits<double>::infinity(); }
+  void SetMaxToInfinity();
   //@}
 
   //@{
@@ -147,7 +152,7 @@ public:
   /**
    * Sets Min to minus infinity. Call this method to annihilate the lower bound.
    */
-  void SetMinToInfinity() { this->Min = -std::numeric_limits<double>::infinity(); }
+  void SetMinToInfinity();
   //@}
 
   //@{
@@ -156,11 +161,20 @@ public:
    * within
    * the range. Otherwise, we subdivide for values outside of the range.
    */
-  vtkBooleanMacro(InRange, bool);
+  vtkGetMacro(InRange, bool);
+  vtkSetMacro(InRange, bool);
   //@}
 
-  void SetInputData(vtkDataObject*);
-  void SetInputData(int, vtkDataObject*);
+  //@{
+  /**
+   * Accessor for MinimumNumberOfPointsInSubtree, which sets a minimum number of points per leaf.
+   * Note that the minimum number of points can also be set by the vtkAbstractArrayMeasurement*
+   * if it requires a higher minimum number of points that this->MinimumNumberOfPointsInSubtree.
+   * Default value is 1.
+   */
+  vtkGetMacro(MinimumNumberOfPointsInSubtree, vtkIdType);
+  vtkSetMacro(MinimumNumberOfPointsInSubtree, vtkIdType);
+  //@}
 
   virtual int ProcessRequest(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
@@ -171,12 +185,11 @@ public:
   virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
 protected:
-  vtkHyperTreeGridPlane();
-  ~vtkHyperTreeGridPlane() override;
+  vtkHyperTreeGridAnalysisDrivenRefinement();
+  ~vtkHyperTreeGridAnalysisDrivenRefinement() override;
 
-  // Override to specify support for any vtkDataSet input type.
   int FillInputPortInformation(int, vtkInformation*) override;
-  // Override to specify output as vtkHyperTreeGrid.
+
   int FillOutputPortInformation(int, vtkInformation*) override;
 
   int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
@@ -189,6 +202,11 @@ protected:
   unsigned int BranchFactor;
   unsigned int Dimensions[3];
   unsigned int MaxDepth;
+
+  /**
+   * Range values used to decide whether to subdivide a leaf or not
+   */
+  double Min, Max;
 
   /**
    * Decides whether the criteria should be inside [this->Min, this->Max] or outside.
@@ -207,9 +225,24 @@ protected:
    */
   struct GridElement
   {
+    /**
+     * Measure used to decide if the corresponding leaf in the hyper tree should be subdivided.
+     */
     vtkAbstractArrayMeasurement* ArrayMeasurement;
+
+    /**
+     * Measure of the subtree to display. If set to nullptr, this pointer is ignored.
+     */
     vtkAbstractArrayMeasurement* ArrayMeasurementDisplay;
-    vtkIdType SizeOfSubtree;
+
+    vtkIdType NumberOfLeavesInSubtree;
+    vtkIdType NumberOfPointsInSubtree;
+
+    /**
+     * Flag to tell whether it is legit to subdivide the corresponding leaf in the hyper tree.
+     * A leaf cannot be subdivided if there is not enough data in the induced leaves.
+     */
+    bool CanSubdivide;
   };
 
   /**
@@ -220,9 +253,9 @@ protected:
    * Indexing is as follows:
    * elements indexed at (i,j,k) at depth maps to the element indexed at
    * (i/this->BranchFactor, j/this->BranchFactor, k/this->BranchFactor) at depth-1.
-   * Element (i,j,k) bijectively maps to idx = this->CoordinatesToIndex(i,j,k,depth)
-   * idx bijectively maps to element (i,j,k) = this->IndexToCoordinates(idx,depth)
-   * this->CoordinatesToIndex and this->IndexToCoordinates are involutive.
+   * Element (i,j,k) bijectively maps to idx = this->CoordinatesToIndex(i,j,k,depth), and
+   * idx bijectively maps to element (i,j,k) = this->IndexToCoordinates(idx,depth).
+   * this->CoordinatesToIndex is the inverse function of this->IndexToCoordinates.
    */
   typedef std::vector<std::unordered_map<vtkIdType, GridElement> > MultiResolutionGridType;
 
@@ -230,7 +263,7 @@ protected:
    * Method that divides recursively leafs of the output hyper tree grid depending of the
    * subdivision criterion
    * The cursor should correspond with the multiResolutionGrid and (i,j,k) should match the position
-   * of the cursor in the hyper tree grid
+   * of the cursor in the hyper tree grid.
    */
   void SubdivideLeaves(vtkHyperTreeGridNonOrientedCursor* cursor, vtkIdType treeId, std::size_t i,
     std::size_t j, std::size_t k, MultiResolutionGridType& multiResolutionGrid);
@@ -248,36 +281,34 @@ protected:
   void CreateGridOfMultiResolutionGrids(vtkDataSet* dataSet, vtkDataArray* data);
 
   /**
-   * Not sure if we keep those
-   */
-  bool DepthBelowHasNullCell(vtkIdType level, vtkIdType i, vtkIdType j, vtkIdType k) const;
-  bool DepthBelowHasNoCell(vtkIdType level, vtkIdType i, vtkIdType j, vtkIdType k) const;
-  void FillGaps(vtkCell* cell, double bounds[6], vtkIdType i, vtkIdType j, vtkIdType k,
-    vtkIdType imax, vtkIdType jmax, vtkIdType kmax, std::size_t depth,
-    vtkIdType currentResolutionPerTree);
-
-  /**
-   * Helper for easy access to the cells dimensions of the hyper tree grid
+   * Helper for easy access to the cells dimensions of the hyper tree grid.
    */
   unsigned int CellDims[3];
 
   /**
    * Output scalar/vector field
    */
-  vtkDoubleArray *ScalarField, ScalarFieldDisplay;
+  vtkDoubleArray *ScalarField, *DisplayScalarField;
+  vtkLongArray *NumberOfLeavesInSubtreeField, *NumberOfPointsInSubtreeField;
 
   /**
-   * Helper to the maximum resolution in one direction in a hyper tree
+   * Minimum number of points in a leaf for it to be subdivided.
+   */
+  vtkIdType MinimumNumberOfPointsInSubtree;
+
+  /**
+   * Helper to the maximum resolution in one direction in a hyper tree.
    */
   vtkIdType MaxResolutionPerTree;
+
   /**
-   * Helper to the resolution at a certain depth in one direction of a hyper tree
+   * Helper to the resolution at a certain depth in one direction of a hyper tree.
    */
   std::vector<vtkIdType> ResolutionPerTree;
 
   /**
-   * Dummy pointer forcreating at run-time the proper type of ArrayMeasurement or
-   * ArrayMeasurementDisplay
+   * Dummy pointer for creating at run-time the proper type of ArrayMeasurement or
+   * ArrayMeasurementDisplay.
    */
   vtkAbstractArrayMeasurement* ArrayMeasurement;
   vtkAbstractArrayMeasurement* ArrayMeasurementDisplay;
@@ -285,24 +316,14 @@ protected:
   /**
    * Converts indexing at given resolution to a tuple (i,j,k) to navigate in a MultiResolutionGrid.
    */
-  vtkTuple<vtkIdType, 3> IndexToCoordinates(vtkIdType idx, std::size_t depth) const
-  {
-    vtkTuple<vtkIdType, 3> coord;
-    coord[0] = idx % (this->ResolutionPerTree[depth]);
-    coord[1] = (idx / this->ResolutionPerTree[depth]) % this->ResolutionPerTree[depth];
-    coord[2] = idx / (this->ResolutionPerTree[depth] * this->ResolutionPerTree[depth]);
-    return coord;
-  }
+  vtkTuple<vtkIdType, 3> IndexToCoordinates(vtkIdType idx, std::size_t depth) const;
 
   /**
    * Converts (i,j,k) to the corresponding index at a certain depth to navigate in a
    * MultiResolutionGrid.
    */
-  vtkIdType CoordinatesToIndex(std::size_t i, std::size_t j, std::size_t k, std::size_t depth) const
-  {
-    return i + j * this->ResolutionPerTree[depth] +
-      k * this->ResolutionPerTree[depth] * this->ResolutionPerTree[depth];
-  }
+  vtkIdType CoordinatesToIndex(
+    std::size_t i, std::size_t j, std::size_t k, std::size_t depth) const;
 
   /**
    * 3D grid of multi-resolution grids.
@@ -311,8 +332,9 @@ protected:
   std::vector<std::vector<std::vector<MultiResolutionGridType> > > GridOfMultiResolutionGrids;
 
 private:
-  vtkHyperTreeGridPlane(const vtkHyperTreeGridPlane&) = delete;
-  void operator=(const vtkHyperTreeGridPlane&) = delete;
+  vtkHyperTreeGridAnalysisDrivenRefinement(
+    const vtkHyperTreeGridAnalysisDrivenRefinement&) = delete;
+  void operator=(const vtkHyperTreeGridAnalysisDrivenRefinement&) = delete;
 };
 
 #endif

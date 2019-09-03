@@ -1,3 +1,29 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkMedianAccumulator.h
+
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+/**
+ * @class   vtkMedianAccumulator
+ * @brief   accumulates input data in a sorted array
+ *
+ * Accumulator for computing the median of the input data.
+ * Inserting data is logarithmic in function of the input size,
+ * while merging has a linear complexity.
+ * Accessing the median from accumulated data has constant complexity
+ *
+ */
+
 #ifndef vtkMedianAccumulator_h
 #define vtkMedianAccumulator_h
 

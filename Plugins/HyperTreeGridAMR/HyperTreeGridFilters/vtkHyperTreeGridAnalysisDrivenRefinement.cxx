@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkHyperTreeGridPlane.cxx
+  Module:    vtkHyperTreeGridAnalysisDrivenRefinement.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -12,26 +12,35 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkHyperTreeGridPlane.h"
 
-#include "vtkArithmeticMeanArrayMeasurement.h"
+#include "vtkHyperTreeGridAnalysisDrivenRefinement.h"
+
+#include "vtkAbstractArrayMeasurement.h"
 #include "vtkBitArray.h"
+#include "vtkDataArray.h"
 #include "vtkDataSet.h"
+#include "vtkDemandDrivenPipeline.h"
 #include "vtkDoubleArray.h"
+#include "vtkHyperTree.h"
 #include "vtkHyperTreeGrid.h"
+#include "vtkHyperTreeGridNonOrientedCursor.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkLongArray.h"
 #include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkTuple.h"
 
 #include <cmath>
 #include <cstring>
 #include <limits>
 #include <unordered_map>
 
-vtkStandardNewMacro(vtkHyperTreeGridPlane);
+vtkStandardNewMacro(vtkHyperTreeGridAnalysisDrivenRefinement);
 
 //----------------------------------------------------------------------------
-vtkHyperTreeGridPlane::vtkHyperTreeGridPlane()
+vtkHyperTreeGridAnalysisDrivenRefinement::vtkHyperTreeGridAnalysisDrivenRefinement()
 {
   // This a source: no input ports
   this->SetNumberOfInputPorts(1);
@@ -39,25 +48,26 @@ vtkHyperTreeGridPlane::vtkHyperTreeGridPlane()
 
   this->BranchFactor = 2;
   this->MaxDepth = 1;
-  this->ArrayMeasurement = vtkArithmeticMeanArrayMeasurement::New();
+  this->ArrayMeasurement = nullptr;
   this->ArrayMeasurementDisplay = nullptr;
-  this->ScalarFieldDisplay = nullptr;
+  this->DisplayScalarField = nullptr;
   this->Min = -std::numeric_limits<double>::infinity();
   this->Max = std::numeric_limits<double>::infinity();
+  this->MinimumNumberOfPointsInSubtree = 1;
   this->InRange = true;
 }
 
 //----------------------------------------------------------------------------
-vtkHyperTreeGridPlane::~vtkHyperTreeGridPlane() = default;
+vtkHyperTreeGridAnalysisDrivenRefinement::~vtkHyperTreeGridAnalysisDrivenRefinement() = default;
 
 //----------------------------------------------------------------------------
-void vtkHyperTreeGridPlane::PrintSelf(ostream& os, vtkIndent indent)
+void vtkHyperTreeGridAnalysisDrivenRefinement::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 
 //----------------------------------------------------------------------------
-int vtkHyperTreeGridPlane::FillInputPortInformation(int, vtkInformation* info)
+int vtkHyperTreeGridAnalysisDrivenRefinement::FillInputPortInformation(int, vtkInformation* info)
 {
   // This filter uses the vtkDataSet cell traversal methods so it
   // suppors any data set type as input.
@@ -65,13 +75,13 @@ int vtkHyperTreeGridPlane::FillInputPortInformation(int, vtkInformation* info)
   return 1;
 }
 
-int vtkHyperTreeGridPlane::FillOutputPortInformation(int, vtkInformation* info)
+int vtkHyperTreeGridAnalysisDrivenRefinement::FillOutputPortInformation(int, vtkInformation* info)
 {
   info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkHyperTreeGrid");
   return 1;
 }
 
-int vtkHyperTreeGridPlane::RequestInformation(
+int vtkHyperTreeGridAnalysisDrivenRefinement::RequestInformation(
   vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // Get the information objects
@@ -88,7 +98,7 @@ int vtkHyperTreeGridPlane::RequestInformation(
 }
 
 //----------------------------------------------------------------------------
-int vtkHyperTreeGridPlane::RequestData(
+int vtkHyperTreeGridAnalysisDrivenRefinement::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   this->UpdateProgress(0.0);
@@ -137,6 +147,8 @@ int vtkHyperTreeGridPlane::RequestData(
     }
   }
 
+  double* bounds = input->GetBounds();
+
   // Setting the point locations for the hyper tree grid
   {
     vtkNew<vtkDoubleArray> coords;
@@ -178,10 +190,10 @@ int vtkHyperTreeGridPlane::RequestData(
 
   this->Mask = vtkBitArray::New();
 
-  // Linking input scalar field
+  // Linking input scalar fields
   vtkSmartPointer<vtkDataArray> data = this->GetInputArrayToProcess(0, inputVector);
   vtkNew<vtkDoubleArray> scalarField;
-  scalarField->SetName(std::string(data->GetName()) + std::string("_measure"));
+  scalarField->SetName((std::string(data->GetName()) + std::string("_measure")).c_str());
   output->GetPointData()->AddArray(scalarField);
   this->ScalarField = scalarField;
 
@@ -190,17 +202,26 @@ int vtkHyperTreeGridPlane::RequestData(
     vtkNew<vtkDoubleArray> scalarFieldDisplay;
     scalarFieldDisplay->SetName(data->GetName());
     output->GetPointData()->AddArray(scalarFieldDisplay);
-    this->ScalarFieldDisplay = scalarFieldDisplay;
+    this->DisplayScalarField = scalarFieldDisplay;
   }
 
-  this->Output = output;
+  vtkNew<vtkLongArray> numberOfLeavesInSubtreeField;
+  numberOfLeavesInSubtreeField->SetName("Number of leaves");
+  output->GetPointData()->AddArray(numberOfLeavesInSubtreeField);
+  this->NumberOfLeavesInSubtreeField = numberOfLeavesInSubtreeField;
+
+  vtkNew<vtkLongArray> numberOfPointsInSubtreeField;
+  numberOfPointsInSubtreeField->SetName("Number of points");
+  output->GetPointData()->AddArray(numberOfPointsInSubtreeField);
+  this->NumberOfPointsInSubtreeField = numberOfPointsInSubtreeField;
+
   output->GetCellDims(this->CellDims);
 
   // Creating multi resolution grids used to construct the hyper tree grid
   // This multi resolution grid has the inner structure of the hyper tree grid
   // without its indexing. This is a bottom-up algorithm, which would be impossible
   // to process directly using a hyper tree grid because of its top-down structure.
-  this->CreateGridOfMultiResolutionGrids(this->Input, data);
+  this->CreateGridOfMultiResolutionGrids(input, data);
 
   if (!this->GenerateTrees(output))
   {
@@ -221,7 +242,8 @@ int vtkHyperTreeGridPlane::RequestData(
   return 1;
 }
 
-void vtkHyperTreeGridPlane::DeleteGridOfMultiResolutionGrids()
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridAnalysisDrivenRefinement::DeleteGridOfMultiResolutionGrids()
 {
   for (std::size_t i = 0; i < this->GridOfMultiResolutionGrids.size(); ++i)
   {
@@ -232,11 +254,15 @@ void vtkHyperTreeGridPlane::DeleteGridOfMultiResolutionGrids()
         for (std::size_t depth = 0; depth < this->GridOfMultiResolutionGrids[i][j][k].size();
              ++depth)
         {
-          for (auto& map_element : this->GridOfMultiResolutionGrids[i][j][k][depth])
+          for (auto& mapElement : this->GridOfMultiResolutionGrids[i][j][k][depth])
           {
-            if (map_element.second.ArrayMeasurement)
+            if (mapElement.second.ArrayMeasurement)
             {
-              map_element.second.ArrayMeasurement->FastDelete();
+              mapElement.second.ArrayMeasurement->FastDelete();
+            }
+            if (mapElement.second.ArrayMeasurementDisplay)
+            {
+              mapElement.second.ArrayMeasurementDisplay->FastDelete();
             }
           }
         }
@@ -246,7 +272,8 @@ void vtkHyperTreeGridPlane::DeleteGridOfMultiResolutionGrids()
   this->GridOfMultiResolutionGrids.clear();
 }
 
-void vtkHyperTreeGridPlane::CreateGridOfMultiResolutionGrids(
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridAnalysisDrivenRefinement::CreateGridOfMultiResolutionGrids(
   vtkDataSet* dataSet, vtkDataArray* data)
 {
   double* bounds = dataSet->GetBounds();
@@ -267,9 +294,9 @@ void vtkHyperTreeGridPlane::CreateGridOfMultiResolutionGrids(
   }
 
   // First pass, we fill the highest resolution grid with input values
-  for (vtkIdType idx = 0; idx < dataSet->GetNumberOfPoints(); ++idx)
+  for (vtkIdType pointId = 0; pointId < dataSet->GetNumberOfPoints(); ++pointId)
   {
-    double* point = dataSet->GetPoint(idx);
+    double* point = dataSet->GetPoint(pointId);
 
     // (i, j, k) are the coordinates of the corresponding hyper tree
     unsigned int i = std::min(
@@ -299,27 +326,29 @@ void vtkHyperTreeGridPlane::CreateGridOfMultiResolutionGrids(
     auto it = grid.find(idx);
     // if this is the first time we pass by this grid location, we create a new ArrayMeasurement
     // instance
+    // NOTE: GridElement::CanSubdivide does not need to be set at the highest resolution
     if (it == grid.end())
     {
       GridElement& element = grid[idx];
-      element.SizeOfSubtree = 1;
+      element.NumberOfLeavesInSubtree = 1;
+      element.NumberOfPointsInSubtree = 1;
       element.ArrayMeasurement = this->ArrayMeasurement->NewInstance();
-      element.ArrayMeasurement->Add(data->GetTuple(idx));
+      element.ArrayMeasurement->Add(data->GetTuple(pointId));
       if (this->ArrayMeasurementDisplay)
       {
         element.ArrayMeasurementDisplay = this->ArrayMeasurementDisplay->NewInstance();
-        element.ArrayMeasurementDisplay->Add(data->GetTuple(idx));
+        element.ArrayMeasurementDisplay->Add(data->GetTuple(pointId));
       }
     }
     // if not, then the grid location is already created, just need to add the element into it
     else
     {
-      it->second.ArrayMeasurement->Add(data->GetTuple(idx));
+      it->second.ArrayMeasurement->Add(data->GetTuple(pointId));
       if (this->ArrayMeasurementDisplay)
       {
-        it->second.ArrayMeasurementDisplay->Add(data->GetTuple(idx));
+        it->second.ArrayMeasurementDisplay->Add(data->GetTuple(pointId));
       }
-      ++(it->SizeOfSubtree);
+      ++(it->second.NumberOfPointsInSubtree);
     }
   }
 
@@ -337,9 +366,9 @@ void vtkHyperTreeGridPlane::CreateGridOfMultiResolutionGrids(
           // Given an iterator on the elements of the grid at resolution depth,
           // we propagate the accumulated values to the lower resolution depth-1
           // using correct indexing
-          for (const auto& map_element : multiResolutionGrid[depth])
+          for (const auto& mapElement : multiResolutionGrid[depth])
           {
-            vtkTuple<vtkIdType, 3> coord = this->IndexToCoordinates(map_element.first, depth);
+            vtkTuple<vtkIdType, 3> coord = this->IndexToCoordinates(mapElement.first, depth);
             coord[0] /= this->BranchFactor;
             coord[1] /= this->BranchFactor;
             coord[2] /= this->BranchFactor;
@@ -351,22 +380,32 @@ void vtkHyperTreeGridPlane::CreateGridOfMultiResolutionGrids(
             if (it == multiResolutionGrid[depth - 1].end())
             {
               GridElement& element = multiResolutionGrid[depth - 1][idx];
-              element.SizeOfSubtree = map_element.second.SizeOfSubtree;
+              element.NumberOfLeavesInSubtree = mapElement.second.NumberOfLeavesInSubtree;
+              element.NumberOfPointsInSubtree = mapElement.second.NumberOfPointsInSubtree;
+              element.CanSubdivide = mapElement.second.ArrayMeasurement->CanMeasure() &&
+                this->MinimumNumberOfPointsInSubtree <= mapElement.second.NumberOfPointsInSubtree &&
+                (!this->ArrayMeasurementDisplay ||
+                                       mapElement.second.ArrayMeasurementDisplay->CanMeasure());
               element.ArrayMeasurement = this->ArrayMeasurement->NewInstance();
-              element.ArrayMeasurement->Add(map_element.second.ArrayMeasurement);
+              element.ArrayMeasurement->Add(mapElement.second.ArrayMeasurement);
               if (this->ArrayMeasurementDisplay)
               {
                 element.ArrayMeasurementDisplay = this->ArrayMeasurementDisplay->NewInstance();
-                element.ArrayMeasurementDisplay->Add(map_element.second.ArrayMeasurement);
+                element.ArrayMeasurementDisplay->Add(mapElement.second.ArrayMeasurementDisplay);
               }
             }
             else
             {
-              it->second.SizeOfSubtree += map_element.second.SizeOfSubtree;
-              it->second.ArrayMeasurement->Add(map_element.second.ArrayMeasurement);
+              it->second.NumberOfLeavesInSubtree += mapElement.second.NumberOfLeavesInSubtree;
+              it->second.NumberOfPointsInSubtree += mapElement.second.NumberOfPointsInSubtree;
+              it->second.CanSubdivide &= mapElement.second.ArrayMeasurement->CanMeasure() &&
+                this->MinimumNumberOfPointsInSubtree <= mapElement.second.NumberOfPointsInSubtree &&
+                (!this->ArrayMeasurementDisplay ||
+                                           mapElement.second.ArrayMeasurementDisplay->CanMeasure());
+              it->second.ArrayMeasurement->Add(mapElement.second.ArrayMeasurement);
               if (this->ArrayMeasurementDisplay)
               {
-                it->second.ArrayMeasurementDisplay->Add(map_element.second.ArrayMeasurementDisplay);
+                it->second.ArrayMeasurementDisplay->Add(mapElement.second.ArrayMeasurementDisplay);
               }
             }
           }
@@ -374,114 +413,12 @@ void vtkHyperTreeGridPlane::CreateGridOfMultiResolutionGrids(
       }
     }
   }
-
-  // TODO: keep that or get rid of it
-  /*
-    for (vtkIdType idx = 0; idx < dataSet->GetNumberOfCells(); ++idx)
-    {
-      vtkCell* cell = dataSet->GetCell(idx);
-      double* cellBounds = cell->GetBounds();
-      vtkIdType i = (cellBounds[0] - bounds[0]) / (bounds[1] - bounds[0])
-          * this->CellDims[0] * this->MaxResolutionPerTree,
-                j = (cellBounds[2] - bounds[2]) / (bounds[3] - bounds[2])
-          * this->CellDims[1] * this->MaxResolutionPerTree,
-                k = (cellBounds[4] - bounds[4]) / (bounds[5] - bounds[4])
-          * this->CellDims[2] * this->MaxResolutionPerTree;
-      const vtkIdType imax = std::min(static_cast<vtkIdType>
-          ((cellBounds[1] - bounds[0]) / (bounds[3] - bounds[2])
-          * this->CellDims[0] * this->MaxResolutionPerTree), this->CellDims[0] *
-  this->MaxResolutionPerTree-1),
-                      jmax = std::min(static_cast<vtkIdType>
-          ((cellBounds[3] - bounds[2]) / (bounds[3] - bounds[2])
-          * this->CellDims[1] * this->MaxResolutionPerTree), this->CellDims[1] *
-  this->MaxResolutionPerTree-1),
-                      kmax = std::min(static_cast<vtkIdType>
-          ((cellBounds[5] - bounds[4]) / (bounds[5] - bounds[4])
-          * this->CellDims[2] * this->MaxResolutionPerTree), this->CellDims[2] *
-  this->MaxResolutionPerTree-1);
-
-  //    this->FillGaps(cell, bounds, i, j, k, imax, jmax, kmax, 0, this->MaxResolutionPerTree);
-    }
-  */
 }
 
-// TODO: not sure if we need that
-void vtkHyperTreeGridPlane::FillGaps(vtkCell* cell, double bounds[6], vtkIdType i, vtkIdType j,
-  vtkIdType k, vtkIdType imax, vtkIdType jmax, vtkIdType kmax, const std::size_t depth,
-  const vtkIdType currentResolutionPerTree)
-{
-  /* if (depth == this->MaxDepth)
-    {
-
-      return;
-    }
-    double point[3], closestPoint[3], pcoords[3], *weights;
-    weights = new double[cell->GetNumberOfPoints()];
-    double dist2;
-    int subId;
-    for (i -= i % currentResolutionPerTree; i <= imax - imax % currentResolutionPerTree; i +=
-  currentResolutionPerTree)
-    {
-      point[0] = bounds[0] + i*this->Step[0];
-      for (j -= j % currentResolutionPerTree; j <= jmax - jmax % currentResolutionPerTree; j +=
-  currentResolutionPerTree)
-      {
-        point[1] = bounds[2] + j*this->Step[1];
-        for (k -= k % currentResolutionPerTree; k <= kmax - kmax % currentResolutionPerTree; k +=
-  currentResolutionPerTree)
-        {
-          point[2] = bounds[4] + k*this->Step[2];
-          int evaluated = cell->EvaluatePosition (point, closestPoint, subId, pcoords, dist2,
-  weights);
-          vtkIdType idx = this->CoordinatesToIndex(i, j, k, depth);
-          if (this->GridOfMultiResolutionGrids[depth].find(idx) ==
-  this->GridOfMultiResolutionGrids[depth].end()
-              && evaluated != -1 && dist2 < this->Step[0]*this->Step[0] +
-  this->Step[1]*this->Step[1] + this->Step[2]*this->Step[2])
-          {
-            if (depth == 1)
-            {
-              if (this->DepthBelowHasNoCell (depth, i, j, k))
-              {
-                std::cout << "Depth below has no cell, normal behavior" << std::endl;
-              }
-              std::cout << std::endl;
-              std::cout << "setting nullptr at depth " << depth << " and coordinate (" << i << ", "
-  << j <<", " << k << ")" << ", currentResolution: " << currentResolutionPerTree << std::endl;
-              std::cout << "step " << Step[0] << ", " << Step[1] << ", " << Step[2] << std::endl;
-
-            }
-  for (unsigned ii = 0; ii < cell->GetNumberOfPoints(); ++ii)
-              {
-                std::cout << "point " << ii << ": " <<
-                cell->GetPoints()->GetPoint(ii)[0] << ", " << cell->GetPoints()->GetPoint(ii)[1] <<
-  ", " << cell->GetPoints()->GetPoint(ii)[2] << std::endl;
-              }
-              std::cout << "point " << point[0] << ", " << point[1] << ", " << point[2] <<
-  std::endl;
-              std::cout << "closestPoint " << closestPoint[0] << ", " << closestPoint[1] << ", " <<
-  closestPoint[2] << std::endl;
-              std::cout << "dist2 " << dist2 << std::endl;
-            std::cout << std::endl;
-            this->GridOfMultiResolutionGrids[depth][idx].ArrayMeasurement = nullptr;
-            delete weights;
-            return;
-          }
-          else
-          {
-            this->FillGaps(cell, bounds, i, j, k, imax, jmax, kmax, depth+1,
-  currentResolutionPerTree / this->BranchFactor);
-          }
-        }
-      }
-    }
-    delete weights;*/
-}
-
-int vtkHyperTreeGridPlane::GenerateTrees(vtkHyperTreeGrid* htg)
+//----------------------------------------------------------------------------
+int vtkHyperTreeGridAnalysisDrivenRefinement::GenerateTrees(vtkHyperTreeGrid* htg)
 {
   // Iterate over all hyper trees
-  this->OffsetIndex = 0;
   this->Progress = 0.;
 
   vtkIdType treeOffset = 0;
@@ -510,15 +447,12 @@ int vtkHyperTreeGridPlane::GenerateTrees(vtkHyperTreeGrid* htg)
   return 1;
 }
 
-void vtkHyperTreeGridPlane::SubdivideLeaves(vtkHyperTreeGridNonOrientedCursor* cursor,
-  vtkIdType treeId, std::size_t i, std::size_t j, std::size_t k,
-  MultiResolutionGridType& multiResolutionGrid)
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridAnalysisDrivenRefinement::SubdivideLeaves(
+  vtkHyperTreeGridNonOrientedCursor* cursor, vtkIdType treeId, std::size_t i, std::size_t j,
+  std::size_t k, MultiResolutionGridType& multiResolutionGrid)
 {
   vtkIdType level = cursor->GetLevel();
-  if (level == this->MaxDepth - 1)
-  {
-    return;
-  }
   vtkIdType vertexId = cursor->GetVertexId();
   vtkHyperTree* tree = cursor->GetTree();
   vtkIdType idx = tree->GetGlobalIndexFromLocal(vertexId);
@@ -526,10 +460,18 @@ void vtkHyperTreeGridPlane::SubdivideLeaves(vtkHyperTreeGridNonOrientedCursor* c
   auto it = multiResolutionGrid[level].find(this->CoordinatesToIndex(i, j, k, level));
   double value =
     it != multiResolutionGrid[level].end() ? it->second.ArrayMeasurement->Measure() : 0;
-  bool mask = it != multiResolutionGrid[level].end();
 
+  if (this->ArrayMeasurementDisplay)
+  {
+    this->DisplayScalarField->InsertValue(idx,
+      it != multiResolutionGrid[level].end() ? it->second.ArrayMeasurementDisplay->Measure() : 0);
+  }
   this->ScalarField->InsertValue(idx, value);
-  this->Mask->InsertTuple1(idx, !mask);
+  this->NumberOfLeavesInSubtreeField->InsertValue(
+    idx, it != multiResolutionGrid[level].end() ? it->second.NumberOfLeavesInSubtree : 0);
+  this->NumberOfPointsInSubtreeField->InsertValue(
+    idx, it != multiResolutionGrid[level].end() ? it->second.NumberOfPointsInSubtree : 0);
+  this->Mask->InsertValue(idx, it == multiResolutionGrid[level].end());
 
   if (cursor->IsLeaf())
   {
@@ -537,9 +479,9 @@ void vtkHyperTreeGridPlane::SubdivideLeaves(vtkHyperTreeGridNonOrientedCursor* c
     // Also: if the subtrees have only one element, it is useless to subdivide, we already are at
     // the finest
     // possible resolution given input data
-    if (it->second.SizeOfSubtree > 1 && mask &&
-        (this->InRange && value > this->Min && value < this->Max
-        || !this->InRange && !(value > this->Min && value < this->Max)
+    if (level < this->MaxDepth && it != multiResolutionGrid[level].end() &&
+      it->second.CanSubdivide && (this->InRange && value > this->Min && value < this->Max ||
+                                   !this->InRange && !(value > this->Min && value < this->Max)))
     {
       cursor->SubdivideLeaf();
     }
@@ -570,86 +512,8 @@ void vtkHyperTreeGridPlane::SubdivideLeaves(vtkHyperTreeGridNonOrientedCursor* c
   }
 }
 
-// TODO: not sure if we need that
-bool vtkHyperTreeGridPlane::DepthBelowHasNullCell(
-  vtkIdType level, vtkIdType i, vtkIdType j, vtkIdType k) const
-{
-  /*  vtkIdType step = std::pow (this->BranchFactor, this->MaxDepth - level - 2);
-    for (vtkIdType ii = 0; ii < this->BranchFactor; ++ii)
-    {
-      for (vtkIdType jj = 0; jj < this->BranchFactor; ++jj)
-      {
-        for (vtkIdType kk = 0; kk < this->BranchFactor; ++kk)
-        {
-          auto it = this->GridOfMultiResolutionGrids[level+1].find
-    (this->CoordinatesToIndex(i+ii*step, j+jj*step, k+kk*step));
-          if (it != this->GridOfMultiResolutionGrids[level+1].end() && it->second.ArrayMeasurement
-    == nullptr)
-          {
-            return true;
-          }
-        }
-      }
-    }
-    return false;*/
-}
-
-// TODO: not sure if we need that
-bool vtkHyperTreeGridPlane::DepthBelowHasNoCell(
-  vtkIdType level, vtkIdType i, vtkIdType j, vtkIdType k) const
-{
-  /*  vtkIdType step = std::pow (this->BranchFactor, this->MaxDepth - level - 2);
-    for (vtkIdType ii = 0; ii < this->BranchFactor; ++ii)
-    {
-      for (vtkIdType jj = 0; jj < this->BranchFactor; ++jj)
-      {
-        for (vtkIdType kk = 0; kk < this->BranchFactor; ++kk)
-        {
-          if (this->GridOfMultiResolutionGrids[level+1].find (this->CoordinatesToIndex(i+ii*step,
-    j+jj*step, k+kk*step))
-              != this->GridOfMultiResolutionGrids[level+1].end())
-          {
-            return false;
-          }
-        }
-      }
-    }
-    return true;*/
-}
-
-// TODO do we use that?
-vtkSmartPointer<vtkDataArray> vtkHyperTreeGridPlane::GetDataObject(
-  vtkDataSet* dataSet, vtkIdType idx)
-{
-  this->PointDataToCellDataConverter->SetInputData(dataSet);
-  this->PointDataToCellDataConverter->Update();
-  vtkSmartPointer<vtkDataArray> data =
-    this->PointDataToCellDataConverter->GetOutput()->GetCellData()->GetArray(idx);
-
-  if (data.GetPointer() == nullptr)
-  {
-    vtkNew<vtkDoubleArray> emptyResult;
-    emptyResult->SetNumberOfTuples(0);
-    return emptyResult;
-  }
-  return data;
-}
-
-// TODO do we use that?
 //----------------------------------------------------------------------------
-void vtkHyperTreeGridPlane::SetInputData(vtkDataObject* input)
-{
-  this->SetInputData(0, input);
-}
-
-// TODO do we use that?
-//----------------------------------------------------------------------------
-void vtkHyperTreeGridPlane::SetInputData(int index, vtkDataObject* input)
-{
-  this->SetInputDataInternal(index, input);
-}
-
-int vtkHyperTreeGridPlane::ProcessRequest(
+int vtkHyperTreeGridAnalysisDrivenRefinement::ProcessRequest(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // create the output
@@ -678,7 +542,7 @@ int vtkHyperTreeGridPlane::ProcessRequest(
   return this->Superclass::ProcessRequest(request, inputVector, outputVector);
 }
 
-int vtkHyperTreeGridPlane::RequestDataObject(
+int vtkHyperTreeGridAnalysisDrivenRefinement::RequestDataObject(
   vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   if (this->GetNumberOfInputPorts() == 0 || this->GetNumberOfOutputPorts() == 0)
@@ -712,7 +576,8 @@ int vtkHyperTreeGridPlane::RequestDataObject(
   return 1;
 }
 
-int vtkHyperTreeGridPlane::RequestUpdateExtent(
+//----------------------------------------------------------------------------
+int vtkHyperTreeGridAnalysisDrivenRefinement::RequestUpdateExtent(
   vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector*)
 {
   int numInputPorts = this->GetNumberOfInputPorts();
@@ -726,4 +591,35 @@ int vtkHyperTreeGridPlane::RequestUpdateExtent(
     }
   }
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridAnalysisDrivenRefinement::SetMaxToInfinity()
+{
+  this->SetMax(std::numeric_limits<double>::infinity());
+}
+
+//----------------------------------------------------------------------------
+void vtkHyperTreeGridAnalysisDrivenRefinement::SetMinToInfinity()
+{
+  this->SetMin(-std::numeric_limits<double>::infinity());
+}
+
+//----------------------------------------------------------------------------
+vtkTuple<vtkIdType, 3> vtkHyperTreeGridAnalysisDrivenRefinement::IndexToCoordinates(
+  vtkIdType idx, std::size_t depth) const
+{
+  vtkTuple<vtkIdType, 3> coord;
+  coord[0] = idx % (this->ResolutionPerTree[depth]);
+  coord[1] = (idx / this->ResolutionPerTree[depth]) % this->ResolutionPerTree[depth];
+  coord[2] = idx / (this->ResolutionPerTree[depth] * this->ResolutionPerTree[depth]);
+  return coord;
+}
+
+//----------------------------------------------------------------------------
+vtkIdType vtkHyperTreeGridAnalysisDrivenRefinement::CoordinatesToIndex(
+  std::size_t i, std::size_t j, std::size_t k, std::size_t depth) const
+{
+  return i + j * this->ResolutionPerTree[depth] +
+    k * this->ResolutionPerTree[depth] * this->ResolutionPerTree[depth];
 }

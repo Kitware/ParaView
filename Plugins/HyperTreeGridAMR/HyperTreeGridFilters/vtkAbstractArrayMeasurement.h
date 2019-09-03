@@ -1,3 +1,34 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkAbstractArrayMeasurement.h
+
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+/**
+ * @class   vtkAbstractArrayMeasurement
+ * @brief   measures quantities on arrays of values
+ *
+ * Given an array of data, it computes the wanted quantity over the array.
+ * Data can be fed using the whole array as input, or value by value,
+ * or by merging two vtkAbstractArrayMeasurement*.
+ * The complexity depends on the array of vtkAbstractAccumulator*
+ * used to compute the measurement. Given n inputs, if f(n) is the
+ * worst complexity given used accumulators, the complexity of inserting
+ * data is O(n f(n)), and the complexity for measuring already
+ * inserted data is O(1), unless said otherwise.
+ * Merging complexity depends on the vtkAbstractAccumulator* used.
+ *
+ */
+
 #ifndef vtkAbstractArrayMeasurement_h
 #define vtkAbstractArrayMeasurement_h
 
@@ -9,7 +40,7 @@
 
 #include <vector>
 
-class vtkAbstractArrayMeasurement : public vtkObject
+class VTKCOMMONCORE_EXPORT vtkAbstractArrayMeasurement : public vtkObject
 {
 public:
   static vtkAbstractArrayMeasurement* New();
@@ -24,6 +55,14 @@ public:
   virtual void Add(vtkDataArray* data);
   virtual void Add(double* data, vtkIdType numberOfComponents = 1);
   virtual void Add(vtkAbstractArrayMeasurement* arrayMeasurement);
+  //@}
+
+  //@{
+  /**
+   * Returns true if the array has enough data to be measured. Default minimum is 1,
+   * it should be overloaded if more is needed
+   */
+  virtual bool CanMeasure() const;
   //@}
 
   //@{
