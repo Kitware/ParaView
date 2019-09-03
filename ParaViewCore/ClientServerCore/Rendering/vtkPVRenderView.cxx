@@ -616,10 +616,11 @@ void vtkPVRenderView::RemoveRepresentationInternal(vtkDataRepresentation* rep)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::RegisterPropForHardwareSelection(vtkPVDataRepresentation* repr, vtkProp* prop)
+int vtkPVRenderView::RegisterPropForHardwareSelection(vtkPVDataRepresentation* repr, vtkProp* prop)
 {
   int id = this->Selector->AssignUniqueId(prop);
   this->Internals->RegisterSelectionProp(id, prop, repr);
+  return id;
 }
 
 //----------------------------------------------------------------------------

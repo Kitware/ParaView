@@ -31,6 +31,7 @@
 set(classes
   vtkPVComparativeAnimationCue
   vtkPVComparativeView
+  vtkPVEncodeSelectionForServer
   vtkPVRepresentedArrayListSettings
   vtkSMBoxRepresentationProxy
   vtkSMCameraLink

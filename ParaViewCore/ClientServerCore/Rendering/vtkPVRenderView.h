@@ -556,7 +556,7 @@ public:
    * should register the prop that they use for selection rendering. They can do
    * that in the vtkPVDataRepresentation::AddToView() implementation.
    */
-  void RegisterPropForHardwareSelection(vtkPVDataRepresentation* repr, vtkProp* prop);
+  int RegisterPropForHardwareSelection(vtkPVDataRepresentation* repr, vtkProp* prop);
   void UnRegisterPropForHardwareSelection(vtkPVDataRepresentation* repr, vtkProp* prop);
   //@}
 
