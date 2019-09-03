@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMCoreUtilities.h"
 #include "vtkSMPropertyHelper.h"
-
 #include <QMap>
 
 #include <cassert>

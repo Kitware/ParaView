@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMTrace.h"
 
 #include <QPushButton>
 #include <QScrollArea>
@@ -147,6 +148,38 @@ vtkSMProxy* pqMultiQueryClauseWidget::newSelectionSource()
   {
     child->addSelectionQualifiers(selSource);
   }
+
+  std::string fieldTypeString;
+  switch (field_type)
+  {
+    case vtkSelectionNode::CELL:
+      fieldTypeString = "CELL";
+      break;
+    case vtkSelectionNode::POINT:
+      fieldTypeString = "POINT";
+      break;
+    case vtkSelectionNode::FIELD:
+      fieldTypeString = "FIELD";
+      break;
+    case vtkSelectionNode::VERTEX:
+      fieldTypeString = "VERTEX";
+      break;
+    case vtkSelectionNode::EDGE:
+      fieldTypeString = "EDGE";
+      break;
+    case vtkSelectionNode::ROW:
+      fieldTypeString = "ROW";
+      break;
+    default:
+      break;
+  }
+
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("QuerySelect")
+    .arg("QueryString", vtkSMPropertyHelper(selSource, "QueryString").GetAsString())
+    .arg("FieldType", fieldTypeString.c_str())
+    .arg("InsideOut", vtkSMPropertyHelper(selSource, "InsideOut").GetAsInt())
+    .arg("comment", "create a query selection");
 
   selSource->UpdateVTKObjects();
   return selSource;
