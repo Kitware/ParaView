@@ -64,6 +64,8 @@
 #include "vtkSmartPointer.h" // needed for iVar
 #include "vtkStdString.h"    // needed for ivar
 
+#include <vector>
+
 class vtkSMProxy;
 class vtkSmartPyObject;
 
@@ -170,6 +172,8 @@ public:
     TraceItemArgs& arg(const char* key, int val);
     TraceItemArgs& arg(const char* key, double val);
     TraceItemArgs& arg(const char* key, bool val);
+    TraceItemArgs& arg(const char* key, const std::vector<int>& val);
+    TraceItemArgs& arg(const char* key, const std::vector<double>& val);
 
     // Overloads for positional arguments.
     TraceItemArgs& arg(vtkObject* val);
