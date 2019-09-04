@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsModule.h"
 
+#include "vtkBoundingBox.h"
 #include "vtkType.h"
 #include <QObject>
 #include <QPair>
@@ -88,6 +89,11 @@ public:
   * false otherwise
   */
   bool hasActiveSelection() const;
+
+  /**
+   * Returns the bounding box for all the selected data.
+   */
+  vtkBoundingBox selectedDataBounds() const;
 
 signals:
   /**

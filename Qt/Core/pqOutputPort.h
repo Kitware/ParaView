@@ -140,6 +140,16 @@ public:
   vtkPVTemporalDataInformation* getTemporalDataInformation();
 
   /**
+   * Returns the current data information for the selected data from this
+   * output port.
+   *
+   * \c es_port is the output port from the internal vtkPVExtractSelection
+   * proxy.
+   *
+   */
+  vtkPVDataInformation* getSelectedDataInformation(int es_port = 0) const;
+
+  /**
   * Returns the class name of the output data.
   */
   const char* getDataClassName() const;
