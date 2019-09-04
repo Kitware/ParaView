@@ -1042,6 +1042,7 @@ if(PARAVIEW_ENABLE_PYTHON)
   find_python_module(numpy numpy_found)
   if (numpy_found)
     list(APPEND TESTS_WITH_BASELINES
+      ContextViewSelectionTrace.xml
       ExodusModeShapes.xml
       FindDataPartialArrays.xml
       FindDataSelectLocation.xml # find data needs python/numpy
