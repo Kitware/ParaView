@@ -49,7 +49,6 @@ void vtkInversedArithmeticAccumulator::Add(double value)
 //----------------------------------------------------------------------------
 void vtkInversedArithmeticAccumulator::Initialize()
 {
-  this->Superclass::Initialize();
   this->Value = 0.0;
 }
 

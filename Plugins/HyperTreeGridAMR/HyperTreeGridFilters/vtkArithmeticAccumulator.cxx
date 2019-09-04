@@ -44,7 +44,6 @@ void vtkArithmeticAccumulator::Add(double value)
 //----------------------------------------------------------------------------
 void vtkArithmeticAccumulator::Initialize()
 {
-  this->Superclass::Initialize();
   this->Value = 0.0;
 }
 

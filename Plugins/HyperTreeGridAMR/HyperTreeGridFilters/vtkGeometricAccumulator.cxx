@@ -50,7 +50,6 @@ void vtkGeometricAccumulator::Add(double value)
 //----------------------------------------------------------------------------
 void vtkGeometricAccumulator::Initialize()
 {
-  this->Superclass::Initialize();
   this->Value = 1.0;
 }
 

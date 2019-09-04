@@ -17,6 +17,8 @@
 
 #include "vtkAbstractAccumulator.h"
 
+#include <cassert>
+
 //----------------------------------------------------------------------------
 vtkAbstractArrayMeasurement::vtkAbstractArrayMeasurement()
 {
@@ -64,12 +66,6 @@ void vtkAbstractArrayMeasurement::Add(vtkAbstractArrayMeasurement* arrayMeasurem
     this->Accumulators[i]->Add(arrayMeasurement->GetAccumulators()[i]);
   }
   this->NumberOfAccumulatedData += arrayMeasurement->GetNumberOfAccumulatedData();
-}
-
-//----------------------------------------------------------------------------
-bool vtkAbstractArrayMeasurement::CanMeasure() const
-{
-  return this->NumberOfAccumulatedData;
 }
 
 //----------------------------------------------------------------------------

@@ -59,10 +59,9 @@ public:
 
   //@{
   /**
-   * Returns true if the array has enough data to be measured. Default minimum is 1,
-   * it should be overloaded if more is needed
+   * Returns true if the array has enough data to be measured.
    */
-  virtual bool CanMeasure() const;
+  virtual bool CanMeasure() const = 0;
   //@}
 
   //@{
@@ -70,6 +69,28 @@ public:
    * Returns the measure of input data.
    */
   virtual double Measure() const = 0;
+  //@}
+
+  //@{
+  /**
+   * Returns a vector filled with one pointer of each needed accumulator for measuring.
+   */
+  virtual std::vector<vtkAbstractAccumulator*> NewAccumulatorInstances() const = 0;
+  //@}
+
+  //@{
+  /**
+   * Method for measuring any set of accumulators.
+   */
+  virtual double Measure(
+    const std::vector<vtkAbstractAccumulator*>&, vtkIdType numberOfAccumulatedData) const = 0;
+  //@}
+
+  //@{
+  /**
+   * Accessor for the minimum number of accumulated data necessary for computing the measure
+   */
+  virtual vtkIdType GetMinimumNumberOfAccumulatedData() const = 0;
   //@}
 
   //@{
@@ -96,10 +117,11 @@ public:
   /**
    * Accessor for accumulators
    */
-  virtual std::vector<vtkAbstractAccumulator*> GetAccumulators() const
+  virtual const std::vector<vtkAbstractAccumulator*>& GetAccumulators() const
   {
     return this->Accumulators;
   }
+  virtual std::vector<vtkAbstractAccumulator*>& GetAccumulators() { return this->Accumulators; }
   //@}
 
 protected:
@@ -123,6 +145,7 @@ protected:
    * Amount of data already fed to accumulators.
    */
   vtkIdType NumberOfAccumulatedData;
+  //@}
 
 private:
   vtkAbstractArrayMeasurement(const vtkAbstractArrayMeasurement&) = delete;

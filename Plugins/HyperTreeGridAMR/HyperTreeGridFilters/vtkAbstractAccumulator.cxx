@@ -15,6 +15,8 @@
 
 #include "vtkAbstractAccumulator.h"
 
+#include "vtkDataArray.h"
+
 #include <cmath>
 
 //----------------------------------------------------------------------------

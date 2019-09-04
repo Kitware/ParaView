@@ -45,7 +45,6 @@ void vtkEntropyAccumulator::Add(double value)
 //----------------------------------------------------------------------------
 void vtkEntropyAccumulator::Initialize()
 {
-  this->Superclass::Initialize();
   this->Value = 0.0;
 }
 

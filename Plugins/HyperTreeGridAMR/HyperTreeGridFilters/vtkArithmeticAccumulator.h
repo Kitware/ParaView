@@ -27,7 +27,7 @@
 
 #include "vtkAbstractAccumulator.h"
 
-class vtkArithmeticAccumulator : public vtkAbstractAccumulator
+class VTKCOMMONCORE_EXPORT vtkArithmeticAccumulator : public vtkAbstractAccumulator
 {
 public:
   static vtkArithmeticAccumulator* New();

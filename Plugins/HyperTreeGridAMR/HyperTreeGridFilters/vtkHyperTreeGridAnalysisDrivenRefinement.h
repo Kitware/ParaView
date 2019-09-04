@@ -52,6 +52,7 @@
 #include <vector>
 
 class vtkAbstractArrayMeasurement;
+class vtkAbstractAccumulator;
 class vtkBitArray;
 class vtkCell;
 class vtkDataArray;
@@ -226,14 +227,9 @@ protected:
   struct GridElement
   {
     /**
-     * Measure used to decide if the corresponding leaf in the hyper tree should be subdivided.
+     * Accumulators used for measuring quantities on subtrees
      */
-    vtkAbstractArrayMeasurement* ArrayMeasurement;
-
-    /**
-     * Measure of the subtree to display. If set to nullptr, this pointer is ignored.
-     */
-    vtkAbstractArrayMeasurement* ArrayMeasurementDisplay;
+    std::vector<vtkAbstractAccumulator*> Accumulators;
 
     vtkIdType NumberOfLeavesInSubtree;
     vtkIdType NumberOfPointsInSubtree;
@@ -330,6 +326,25 @@ protected:
    * this->GridOfMultiResolutionGrids[i][j][k][depth][idx] is a GridElement.
    */
   std::vector<std::vector<std::vector<MultiResolutionGridType> > > GridOfMultiResolutionGrids;
+
+  /**
+   * Maps from the vector of vtkAbstractAccumulator* of GridElement to their position
+   * in the accumulator needed by either this->ArrayMeasurementDisplay.
+   */
+  std::vector<std::size_t> ArrayMeasurementDisplayAccumulatorMap;
+
+  /**
+   * Accumulators needed to compute the measures. They are used as dummy pointers
+   * to create the correct instances when creating the grid of multi-resolution grids.
+   */
+  std::vector<vtkAbstractAccumulator*> Accumulators;
+
+  /**
+   * Buffer to store the pointers of the correct accumulator when measuring.
+   * We only use them if this->ArrayMeasurementDisplay != nullptr
+   */
+  std::vector<vtkAbstractAccumulator *> ArrayMeasurementAccumulators,
+    ArrayMeasurementDisplayAccumulators;
 
 private:
   vtkHyperTreeGridAnalysisDrivenRefinement(

@@ -51,7 +51,7 @@ void vtkMedianAccumulator::Add(double value)
 //----------------------------------------------------------------------------
 void vtkMedianAccumulator::Initialize()
 {
-  this->Superclass::Initialize();
+  this->SortedList.clear();
 }
 
 //----------------------------------------------------------------------------

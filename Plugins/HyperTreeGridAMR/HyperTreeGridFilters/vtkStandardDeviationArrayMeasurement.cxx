@@ -25,32 +25,75 @@ vtkStandardNewMacro(vtkStandardDeviationArrayMeasurement);
 //----------------------------------------------------------------------------
 vtkStandardDeviationArrayMeasurement::vtkStandardDeviationArrayMeasurement()
 {
-  this->Accumulators.resize(2);
-  this->Accumulators[0] = vtkArithmeticAccumulator::New();
-  this->Accumulators[1] = vtkSquaredArithmeticAccumulator::New();
+  this->Accumulators = this->NewAccumulatorInstances();
 }
 
 //----------------------------------------------------------------------------
 bool vtkStandardDeviationArrayMeasurement::CanMeasure() const
 {
-  return this->NumberOfAccumulatedData > 1;
+  return this->NumberOfAccumulatedData >=
+    vtkStandardDeviationArrayMeasurement::MinimumNumberOfAccumulatedData;
+}
+
+//----------------------------------------------------------------------------
+vtkIdType vtkStandardDeviationArrayMeasurement::GetMinimumNumberOfAccumulatedData() const
+{
+  return vtkStandardDeviationArrayMeasurement::MinimumNumberOfAccumulatedData;
 }
 
 //----------------------------------------------------------------------------
 double vtkStandardDeviationArrayMeasurement::Measure() const
 {
-  assert(this->Accumulators.size() > 1 && "No accumulator, cannot measure");
-  double mean = this->Accumulators[0]->GetValue() / this->NumberOfAccumulatedData;
+  return this->Measure(this->Accumulators, this->NumberOfAccumulatedData);
+}
+
+//----------------------------------------------------------------------------
+double vtkStandardDeviationArrayMeasurement::Measure(
+  const std::vector<vtkAbstractAccumulator*>& accumulators, vtkIdType numberOfAccumulatedData) const
+{
+  assert(accumulators.size() == 2 && accumulators[0] && accumulators[1] &&
+    "input accumulator is not allocated");
+  vtkArithmeticAccumulator* arithmeticAccumulator =
+    vtkArithmeticAccumulator::SafeDownCast(accumulators[0]);
+  vtkSquaredArithmeticAccumulator* squaredArithmeticAccumulator =
+    vtkSquaredArithmeticAccumulator::SafeDownCast(accumulators[1]);
+  assert(arithmeticAccumulator && squaredArithmeticAccumulator &&
+    "input accumulators have the wrong type. One should be of type vtkArithmeticAccumulator and "
+    "the other of type vtkSquaredArithmeticAccumulator");
+
+  double mean = arithmeticAccumulator->GetValue() / numberOfAccumulatedData;
   // std = sqrt(sum_i (x_i - mean)^2 / (n-1))
   //     = sqrt(sum_i (x_i^2  - 2*x_i*mean + n*mean^2) / (n-1))
   return std::sqrt(
-    (this->Accumulators[1]->GetValue() - 2 * this->Accumulators[0]->GetValue() * mean +
-      mean * mean * this->NumberOfAccumulatedData) /
-    (this->NumberOfAccumulatedData - 1));
+    (squaredArithmeticAccumulator->GetValue() - 2 * arithmeticAccumulator->GetValue() * mean +
+      mean * mean * numberOfAccumulatedData) /
+    (numberOfAccumulatedData - 1));
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkAbstractAccumulator*> vtkStandardDeviationArrayMeasurement::NewAccumulatorInstances()
+  const
+{
+  std::vector<vtkAbstractAccumulator*> accumulators(
+    vtkStandardDeviationArrayMeasurement::NumberOfAccumulators);
+  accumulators[0] = vtkArithmeticAccumulator::New();
+  accumulators[1] = vtkSquaredArithmeticAccumulator::New();
+  return accumulators;
 }
 
 //----------------------------------------------------------------------------
 void vtkStandardDeviationArrayMeasurement::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  if (this->Accumulators.size() == vtkStandardDeviationArrayMeasurement::NumberOfAccumulators &&
+    this->Accumulators[0] && this->Accumulators[1])
+  {
+    os << indent << *(this->Accumulators[0]) << std::endl;
+    os << indent << *(this->Accumulators[1]) << std::endl;
+  }
+  else
+  {
+    os << indent << "Missing vtkArithmeticAccumulator or vtkSquaredArithmeticAccumulator"
+       << std::endl;
+  }
 }

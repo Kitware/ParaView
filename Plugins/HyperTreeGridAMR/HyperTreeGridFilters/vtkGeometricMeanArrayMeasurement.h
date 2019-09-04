@@ -45,6 +45,52 @@ public:
   virtual double Measure() const override;
   //@}
 
+  //@{
+  /**
+   * Returns true if there is more than
+   * vtkGeometricMeanArrayMeasurement::MinimumNumberOfAccumulatedData accumulated data
+   */
+  virtual bool CanMeasure() const override;
+  //@}
+
+  //@{
+  /**
+   * Accessor for the minimum number of accumulated data necessary for computing the measure
+   */
+  virtual vtkIdType GetMinimumNumberOfAccumulatedData() const override;
+  //@}
+
+  //@{
+  /**
+   * Minimum number of accumulated data necessary to measure.
+   */
+  static const unsigned MinimumNumberOfAccumulatedData = 1;
+  //@}
+
+  //@{
+  /**
+   * Method for creating a vector composed of one vtkGeometricAccumulator*.
+   */
+  virtual std::vector<vtkAbstractAccumulator*> NewAccumulatorInstances() const override;
+  //@}
+
+  //@{
+  /**
+   * Number of accumulators needed for measuring.
+   */
+  static const unsigned NumberOfAccumulators = 1;
+  //@}
+
+  //@{
+  /**
+   * Method for measuring geometric mean using a vector of of accumulators.
+   * The array should have the same dynamic types and size as the one returned by
+   * vtkGeometricMeanArrayMeasurement::NewAccumulatorInstances().
+   */
+  virtual double Measure(
+    const std::vector<vtkAbstractAccumulator*>&, vtkIdType numberOfAccumulatedData) const override;
+  //@}
+
 protected:
   //@{
   /**

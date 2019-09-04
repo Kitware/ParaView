@@ -44,6 +44,52 @@ public:
   virtual double Measure() const override;
   //@}
 
+  //@{
+  /**
+   * Returns true if there is more than
+   * vtkEntropyArrayMeasurement::MinimumNumberOfAccumulatedData accumulated data
+   */
+  virtual bool CanMeasure() const override;
+  //@}
+
+  //@{
+  /**
+   * Accessor for the minimum number of accumulated data necessary for computing the measure
+   */
+  virtual vtkIdType GetMinimumNumberOfAccumulatedData() const override;
+  //@}
+
+  //@{
+  /**
+   * Minimum number of accumulated data necessary to measure.
+   */
+  static const vtkIdType MinimumNumberOfAccumulatedData = 1;
+  //@}
+
+  //@{
+  /**
+   * Number of accumulators needed for measuring.
+   */
+  static const std::size_t NumberOfAccumulators = 2;
+  //@}
+
+  //@{
+  /**
+   * Method for creating a vector composed of one vtkMedianAccumulator*.
+   */
+  virtual std::vector<vtkAbstractAccumulator*> NewAccumulatorInstances() const override;
+  //@}
+
+  //@{
+  /**
+   * Method for measuring median using a vector of of accumulators.
+   * The array should have the same dynamic types and size as the one returned by
+   * vtkMedianArrayMeasurement::NewAccumulatorInstances().
+   */
+  virtual double Measure(
+    const std::vector<vtkAbstractAccumulator*>&, vtkIdType numberOfAccumulatedData) const override;
+  //@}
+
 protected:
   //@{
   /**

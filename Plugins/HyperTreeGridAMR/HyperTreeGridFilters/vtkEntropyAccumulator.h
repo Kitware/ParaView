@@ -26,7 +26,7 @@
 
 #include "vtkAbstractAccumulator.h"
 
-class vtkEntropyAccumulator : public vtkAbstractAccumulator
+class VTKCOMMONCORE_EXPORT vtkEntropyAccumulator : public vtkAbstractAccumulator
 {
 public:
   static vtkEntropyAccumulator* New();

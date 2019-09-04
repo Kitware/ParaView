@@ -28,7 +28,7 @@
 
 #include "vtkAbstractAccumulator.h"
 
-class vtkGeometricAccumulator : public vtkAbstractAccumulator
+class VTKCOMMONCORE_EXPORT vtkGeometricAccumulator : public vtkAbstractAccumulator
 {
 public:
   static vtkGeometricAccumulator* New();

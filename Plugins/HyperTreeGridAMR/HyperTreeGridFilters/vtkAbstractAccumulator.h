@@ -32,12 +32,13 @@
 #ifndef vtkAbstractAccumulator_h
 #define vtkAbstractAccumulator_h
 
-#include "vtkDataArray.h"
 #include "vtkObject.h"
 
 #include <functional>
 
-class vtkAbstractAccumulator : public vtkObject
+class vtkDataArray;
+
+class VTKCOMMONCORE_EXPORT vtkAbstractAccumulator : public vtkObject
 {
 public:
   static vtkAbstractAccumulator* New();

@@ -44,7 +44,6 @@ void vtkSquaredArithmeticAccumulator::Add(double value)
 //----------------------------------------------------------------------------
 void vtkSquaredArithmeticAccumulator::Initialize()
 {
-  this->Superclass::Initialize();
   this->Value = 0.0;
 }
 

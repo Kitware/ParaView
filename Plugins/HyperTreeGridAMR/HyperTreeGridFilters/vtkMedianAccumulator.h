@@ -29,6 +29,8 @@
 
 #include "vtkAbstractAccumulator.h"
 
+#include <vector>
+
 class vtkMedianAccumulator : public vtkAbstractAccumulator
 {
 public:

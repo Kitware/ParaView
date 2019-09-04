@@ -15,6 +15,7 @@
 
 #include "vtkHyperTreeGridAnalysisDrivenRefinement.h"
 
+#include "vtkAbstractAccumulator.h"
 #include "vtkAbstractArrayMeasurement.h"
 #include "vtkBitArray.h"
 #include "vtkDataArray.h"
@@ -36,6 +37,9 @@
 #include <cstring>
 #include <limits>
 #include <unordered_map>
+#include <vector>
+
+#include "vtkStandardDeviationArrayMeasurement.h"
 
 vtkStandardNewMacro(vtkHyperTreeGridAnalysisDrivenRefinement);
 
@@ -217,6 +221,42 @@ int vtkHyperTreeGridAnalysisDrivenRefinement::RequestData(
 
   output->GetCellDims(this->CellDims);
 
+  this->Accumulators = this->ArrayMeasurement->NewAccumulatorInstances();
+
+  // If we have two array measurements to compute,
+  // we create a vector a needed accumulator for both
+  // measurement methods. This avoid computing the same
+  // quantity several times
+  if (this->ArrayMeasurementDisplay)
+  {
+    this->ArrayMeasurementAccumulators.resize(this->Accumulators.size(), nullptr);
+    std::vector<vtkAbstractAccumulator*> accumulators =
+      this->ArrayMeasurementDisplay->NewAccumulatorInstances();
+    this->ArrayMeasurementDisplayAccumulators.resize(accumulators.size());
+    std::size_t size = this->Accumulators.size();
+    for (auto& accumulator : accumulators)
+    {
+      std::size_t i = 0;
+      for (; i < size; ++i)
+      {
+        if (!strcmp(accumulator->GetClassName(), this->Accumulators[i]->GetClassName()))
+        {
+          break;
+        }
+      }
+      if (i == size)
+      {
+        this->ArrayMeasurementDisplayAccumulatorMap.push_back(this->Accumulators.size());
+        this->Accumulators.push_back(accumulator);
+      }
+      else
+      {
+        this->ArrayMeasurementDisplayAccumulatorMap.push_back(i);
+        accumulator->FastDelete();
+      }
+    }
+  }
+
   // Creating multi resolution grids used to construct the hyper tree grid
   // This multi resolution grid has the inner structure of the hyper tree grid
   // without its indexing. This is a bottom-up algorithm, which would be impossible
@@ -230,6 +270,15 @@ int vtkHyperTreeGridAnalysisDrivenRefinement::RequestData(
 
   // Cleaning our mess
   this->DeleteGridOfMultiResolutionGrids();
+  for (std::size_t i = 0; i < this->Accumulators.size(); ++i)
+  {
+    this->Accumulators[i]->FastDelete();
+    this->Accumulators[i] = nullptr;
+  }
+  this->Accumulators.clear();
+  this->ArrayMeasurementDisplayAccumulators.clear();
+  this->ArrayMeasurementAccumulators.clear();
+  this->ArrayMeasurementDisplayAccumulatorMap.clear();
 
   output->SetMask(this->Mask);
   this->Mask->FastDelete();
@@ -256,13 +305,12 @@ void vtkHyperTreeGridAnalysisDrivenRefinement::DeleteGridOfMultiResolutionGrids(
         {
           for (auto& mapElement : this->GridOfMultiResolutionGrids[i][j][k][depth])
           {
-            if (mapElement.second.ArrayMeasurement)
+            for (auto& accumulator : mapElement.second.Accumulators)
             {
-              mapElement.second.ArrayMeasurement->FastDelete();
-            }
-            if (mapElement.second.ArrayMeasurementDisplay)
-            {
-              mapElement.second.ArrayMeasurementDisplay->FastDelete();
+              if (accumulator)
+              {
+                accumulator->FastDelete();
+              }
             }
           }
         }
@@ -332,21 +380,19 @@ void vtkHyperTreeGridAnalysisDrivenRefinement::CreateGridOfMultiResolutionGrids(
       GridElement& element = grid[idx];
       element.NumberOfLeavesInSubtree = 1;
       element.NumberOfPointsInSubtree = 1;
-      element.ArrayMeasurement = this->ArrayMeasurement->NewInstance();
-      element.ArrayMeasurement->Add(data->GetTuple(pointId));
-      if (this->ArrayMeasurementDisplay)
+      element.Accumulators.resize(this->Accumulators.size());
+      for (std::size_t l = 0; l < this->Accumulators.size(); ++l)
       {
-        element.ArrayMeasurementDisplay = this->ArrayMeasurementDisplay->NewInstance();
-        element.ArrayMeasurementDisplay->Add(data->GetTuple(pointId));
+        element.Accumulators[l] = this->Accumulators[l]->NewInstance();
+        element.Accumulators[l]->Add(data->GetTuple(pointId), data->GetNumberOfComponents());
       }
     }
     // if not, then the grid location is already created, just need to add the element into it
     else
     {
-      it->second.ArrayMeasurement->Add(data->GetTuple(pointId));
-      if (this->ArrayMeasurementDisplay)
+      for (auto& accumulator : it->second.Accumulators)
       {
-        it->second.ArrayMeasurementDisplay->Add(data->GetTuple(pointId));
+        accumulator->Add(data->GetTuple(pointId), data->GetNumberOfComponents());
       }
       ++(it->second.NumberOfPointsInSubtree);
     }
@@ -382,30 +428,34 @@ void vtkHyperTreeGridAnalysisDrivenRefinement::CreateGridOfMultiResolutionGrids(
               GridElement& element = multiResolutionGrid[depth - 1][idx];
               element.NumberOfLeavesInSubtree = mapElement.second.NumberOfLeavesInSubtree;
               element.NumberOfPointsInSubtree = mapElement.second.NumberOfPointsInSubtree;
-              element.CanSubdivide = mapElement.second.ArrayMeasurement->CanMeasure() &&
-                this->MinimumNumberOfPointsInSubtree <= mapElement.second.NumberOfPointsInSubtree &&
+              element.CanSubdivide =
+                mapElement.second.NumberOfPointsInSubtree >= this->MinimumNumberOfPointsInSubtree &&
+                mapElement.second.NumberOfPointsInSubtree >=
+                  this->ArrayMeasurement->GetMinimumNumberOfAccumulatedData() &&
                 (!this->ArrayMeasurementDisplay ||
-                                       mapElement.second.ArrayMeasurementDisplay->CanMeasure());
-              element.ArrayMeasurement = this->ArrayMeasurement->NewInstance();
-              element.ArrayMeasurement->Add(mapElement.second.ArrayMeasurement);
-              if (this->ArrayMeasurementDisplay)
+                  mapElement.second.NumberOfPointsInSubtree >=
+                    this->ArrayMeasurementDisplay->GetMinimumNumberOfAccumulatedData());
+              element.Accumulators.resize(this->Accumulators.size());
+              for (std::size_t l = 0; l < this->Accumulators.size(); ++l)
               {
-                element.ArrayMeasurementDisplay = this->ArrayMeasurementDisplay->NewInstance();
-                element.ArrayMeasurementDisplay->Add(mapElement.second.ArrayMeasurementDisplay);
+                element.Accumulators[l] = this->Accumulators[l]->NewInstance();
+                element.Accumulators[l]->Add(mapElement.second.Accumulators[l]);
               }
             }
             else
             {
               it->second.NumberOfLeavesInSubtree += mapElement.second.NumberOfLeavesInSubtree;
               it->second.NumberOfPointsInSubtree += mapElement.second.NumberOfPointsInSubtree;
-              it->second.CanSubdivide &= mapElement.second.ArrayMeasurement->CanMeasure() &&
-                this->MinimumNumberOfPointsInSubtree <= mapElement.second.NumberOfPointsInSubtree &&
+              it->second.CanSubdivide &=
+                it->second.NumberOfPointsInSubtree >= this->MinimumNumberOfPointsInSubtree &&
+                mapElement.second.NumberOfPointsInSubtree >=
+                  this->ArrayMeasurement->GetMinimumNumberOfAccumulatedData() &&
                 (!this->ArrayMeasurementDisplay ||
-                                           mapElement.second.ArrayMeasurementDisplay->CanMeasure());
-              it->second.ArrayMeasurement->Add(mapElement.second.ArrayMeasurement);
-              if (this->ArrayMeasurementDisplay)
+                  mapElement.second.NumberOfPointsInSubtree >=
+                    this->ArrayMeasurementDisplay->GetMinimumNumberOfAccumulatedData());
+              for (std::size_t l = 0; l < this->Accumulators.size(); ++l)
               {
-                it->second.ArrayMeasurementDisplay->Add(mapElement.second.ArrayMeasurementDisplay);
+                it->second.Accumulators[l]->Add(mapElement.second.Accumulators[l]);
               }
             }
           }
@@ -458,15 +508,42 @@ void vtkHyperTreeGridAnalysisDrivenRefinement::SubdivideLeaves(
   vtkIdType idx = tree->GetGlobalIndexFromLocal(vertexId);
 
   auto it = multiResolutionGrid[level].find(this->CoordinatesToIndex(i, j, k, level));
-  double value =
-    it != multiResolutionGrid[level].end() ? it->second.ArrayMeasurement->Measure() : 0;
+  double value = 0, valueDisplay = 0;
 
+  if (it != multiResolutionGrid[level].end())
+  {
+    // If we use this->ArrayMeasurementDisplay, we need to put the right accumulators
+    // in the right place and then measure
+    if (this->ArrayMeasurementDisplay)
+    {
+      for (std::size_t l = 0; l < this->ArrayMeasurementAccumulators.size(); ++l)
+      {
+        this->ArrayMeasurementAccumulators[l] = it->second.Accumulators[l];
+      }
+      value = this->ArrayMeasurement->Measure(
+        this->ArrayMeasurementAccumulators, it->second.NumberOfPointsInSubtree);
+
+      for (std::size_t l = 0; l < this->ArrayMeasurementDisplayAccumulators.size(); ++l)
+      {
+        this->ArrayMeasurementDisplayAccumulators[l] =
+          it->second.Accumulators[this->ArrayMeasurementDisplayAccumulatorMap[l]];
+      }
+      valueDisplay = this->ArrayMeasurementDisplay->Measure(
+        this->ArrayMeasurementDisplayAccumulators, it->second.NumberOfPointsInSubtree);
+    }
+    // Else, we just measure
+    else
+    {
+      value = this->ArrayMeasurement->Measure(
+        it->second.Accumulators, it->second.NumberOfPointsInSubtree);
+    }
+  }
+
+  this->ScalarField->InsertValue(idx, value);
   if (this->ArrayMeasurementDisplay)
   {
-    this->DisplayScalarField->InsertValue(idx,
-      it != multiResolutionGrid[level].end() ? it->second.ArrayMeasurementDisplay->Measure() : 0);
+    this->DisplayScalarField->InsertValue(idx, valueDisplay);
   }
-  this->ScalarField->InsertValue(idx, value);
   this->NumberOfLeavesInSubtreeField->InsertValue(
     idx, it != multiResolutionGrid[level].end() ? it->second.NumberOfLeavesInSubtree : 0);
   this->NumberOfPointsInSubtreeField->InsertValue(
@@ -477,11 +554,11 @@ void vtkHyperTreeGridAnalysisDrivenRefinement::SubdivideLeaves(
   {
     // If we match the criterion, we subdivide
     // Also: if the subtrees have only one element, it is useless to subdivide, we already are at
-    // the finest
-    // possible resolution given input data
+    // the finest possible resolution given input data
     if (level < this->MaxDepth && it != multiResolutionGrid[level].end() &&
-      it->second.CanSubdivide && (this->InRange && value > this->Min && value < this->Max ||
-                                   !this->InRange && !(value > this->Min && value < this->Max)))
+      it->second.NumberOfLeavesInSubtreeField > 1 && it->second.CanSubdivide &&
+      (this->InRange && value > this->Min && value < this->Max ||
+          !this->InRange && !(value > this->Min && value < this->Max)))
     {
       cursor->SubdivideLeaf();
     }
