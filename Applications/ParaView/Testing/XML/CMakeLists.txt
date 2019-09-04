@@ -1049,6 +1049,7 @@ if(PARAVIEW_ENABLE_PYTHON)
       ForceTimeDiamond.xml
       FreezeQueryMultiblock.xml
       IndexedLookupInitialization.xml # needs Python Calculator/numpy
+      SpreadSheetSelectionTrace.xml
       StructuredGridCellBlanking.xml
       TestFindDataMax.xml
       VolumeNoMapScalars.xml # needs programmable filter + numpy
