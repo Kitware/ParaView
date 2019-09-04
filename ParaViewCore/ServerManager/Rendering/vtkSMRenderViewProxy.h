@@ -49,9 +49,11 @@ public:
    * Makes a new selection source proxy.
    */
   bool SelectSurfaceCells(const int region[4], vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources, bool multiple_selections = false);
+    vtkCollection* selectionSources, bool multiple_selections = false,
+    int modifier = /* replace */ 0, bool select_blocks = false);
   bool SelectSurfacePoints(const int region[4], vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources, bool multiple_selections = false);
+    vtkCollection* selectionSources, bool multiple_selections = false,
+    int modifier = /* replace */ 0, bool select_blocks = false);
   bool SelectFrustumCells(const int region[4], vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources, bool multiple_selections = false);
   bool SelectFrustumPoints(const int region[4], vtkCollection* selectedRepresentations,
@@ -247,7 +249,7 @@ protected:
   bool SelectFrustumInternal(const int region[4], vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources, bool multiple_selections, int fieldAssociation);
   bool SelectPolygonInternal(vtkIntArray* polygon, vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources, bool multiple_selections, const char* method);
+    vtkCollection* selectionSources, bool multiple_selections, int fieldAssociation);
 
   vtkTypeUInt32 PreRender(bool interactive) override;
   void PostRender(bool interactive) override;
@@ -257,7 +259,7 @@ protected:
    * selection source proxy and returns that.
    */
   bool FetchLastSelection(bool multiple_selections, vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources);
+    vtkCollection* selectionSources, int modifier, bool selectBlocks);
 
   /**
    * Called at the end of CreateVTKObjects().
@@ -291,7 +293,8 @@ private:
    * for selection.
    */
   bool SelectInternal(const vtkClientServerStream& cmd, vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources, bool multiple_selections);
+    vtkCollection* selectionSources, bool multiple_selections, int modifier = /* replace */ 0,
+    bool selectBlocks = false);
 
   vtkNew<vtkSMViewProxyInteractorHelper> InteractorHelper;
 };

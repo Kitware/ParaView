@@ -60,10 +60,17 @@ public:
    * to create a selection-source object from the selection.
    * Subclasses may override this method and register themselves with
    * the object factory to change the behavior at runtime.
+   *
+   * The last 2 arguments are not used by the default implementation but
+   * are passed for subclasses;
+   * + \a modifier may be any value in pqView::SelectionModifier but defaults
+   *   to 0 (which is used when the selection should replace any prior selection).
+   * + \a selectBlocks indicates whether the selected entities themselves
+   *   or the blocks containing them should be selected.
    */
   virtual bool ProcessSelection(vtkSelection* rawSelection, vtkSMRenderViewProxy* viewProxy,
     bool multipleSelectionsAllowed, vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources);
+    vtkCollection* selectionSources, int modifier, bool selectBlocks);
   //@}
 
 protected:

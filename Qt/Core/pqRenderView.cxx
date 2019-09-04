@@ -657,7 +657,7 @@ void pqRenderView::selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>& pq
   if (select_points)
   {
     if (!renderModuleP->SelectSurfacePoints(rect, selectedRepresentations, selectionSources,
-          this->UseMultipleRepresentationSelection))
+          this->UseMultipleRepresentationSelection, selectionModifier, select_blocks))
     {
       END_UNDO_EXCLUDE();
       return;
@@ -666,7 +666,7 @@ void pqRenderView::selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>& pq
   else
   {
     if (!renderModuleP->SelectSurfaceCells(rect, selectedRepresentations, selectionSources,
-          this->UseMultipleRepresentationSelection))
+          this->UseMultipleRepresentationSelection, selectionModifier, select_blocks))
     {
       END_UNDO_EXCLUDE();
       return;
