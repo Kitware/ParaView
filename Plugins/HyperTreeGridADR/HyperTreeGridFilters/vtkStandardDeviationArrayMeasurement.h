@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkMedianArrayMeasurement.h
+  Module:    vtkStandardDeviationArrayMeasurement.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -14,27 +14,29 @@
 =========================================================================*/
 
 /**
- * @class   vtkMedianArrayMeasurement
- * @brief   measures the median of an array
+ * @class   vtkStandardDeviationArrayMeasurement
+ * @brief   measures the standard deviation of an array
  *
- * Measures the entropy of an array, either by giving the full array,
+ * Measures the standard deviation of an array, either by giving the full array,
  * or by feeding value per value.
- * Merging complexity is logarithmic as well as inserting, and overall algorithm is O(n*log(n)),
- * where n is the input size.
+ * Merging complexity is constant, and overall algorithm is linear in function
+ * of the input size.
  *
  */
 
-#ifndef vtkMedianArrayMeasurement_h
-#define vtkMedianArrayMeasurement_h
+#ifndef vtkStandardDeviationArrayMeasurement_h
+#define vtkStandardDeviationArrayMeasurement_h
 
 #include "vtkAbstractArrayMeasurement.h"
+#include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 
-class VTKCOMMONCORE_EXPORT vtkMedianArrayMeasurement : public vtkAbstractArrayMeasurement
+class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkStandardDeviationArrayMeasurement
+  : public vtkAbstractArrayMeasurement
 {
 public:
-  static vtkMedianArrayMeasurement* New();
+  static vtkStandardDeviationArrayMeasurement* New();
 
-  vtkTypeMacro(vtkMedianArrayMeasurement, vtkAbstractArrayMeasurement);
+  vtkTypeMacro(vtkStandardDeviationArrayMeasurement, vtkAbstractArrayMeasurement);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
@@ -47,7 +49,7 @@ public:
   //@{
   /**
    * Returns true if there is more than
-   * vtkHarmonicMeanArrayMeasurement::MinimumNumberOfAccumulatedData accumulated data
+   * vtkStandardDeviationArrayMeasurement::MinimumNumberOfAccumulatedData accumulated data
    */
   virtual bool CanMeasure() const override;
   //@}
@@ -57,24 +59,26 @@ public:
    * Accessor for the minimum number of accumulated data necessary for computing the measure
    */
   virtual vtkIdType GetMinimumNumberOfAccumulatedData() const override;
+  //@}
 
   //@{
   /**
    * Minimum number of accumulated data necessary to measure.
    */
-  static const unsigned MinimumNumberOfAccumulatedData = 1;
+  static const unsigned MinimumNumberOfAccumulatedData = 2;
   //@}
 
   //@{
   /**
    * Number of accumulators needed for measuring.
    */
-  static const unsigned NumberOfAccumulators = 1;
+  static const unsigned NumberOfAccumulators = 2;
   //@}
 
   //@{
   /**
-   * Method for creating a vector composed of one vtkMedianAccumulator*.
+   * Method for creating a vector composed of one vtkArithmeticAccumulator* followed
+   * by one vtkSquaredArithmeticAccumulator*.
    */
   virtual std::vector<vtkAbstractAccumulator*> NewAccumulatorInstances() const override;
   //@}
@@ -83,7 +87,7 @@ public:
   /**
    * Method for measuring median using a vector of of accumulators.
    * The array should have the same dynamic types and size as the one returned by
-   * vtkMedianArrayMeasurement::NewAccumulatorInstances().
+   * vtkStandardDeviationArrayMeasurement::NewAccumulatorInstances().
    */
   virtual double Measure(
     const std::vector<vtkAbstractAccumulator*>&, vtkIdType numberOfAccumulatedData) const override;
@@ -94,13 +98,13 @@ protected:
   /**
    * Default constructors and destructors
    */
-  vtkMedianArrayMeasurement();
-  virtual ~vtkMedianArrayMeasurement() override = default;
+  vtkStandardDeviationArrayMeasurement();
+  virtual ~vtkStandardDeviationArrayMeasurement() override = default;
   //@}
 
 private:
-  vtkMedianArrayMeasurement(const vtkMedianArrayMeasurement&) = delete;
-  void operator=(const vtkMedianArrayMeasurement&) = delete;
+  vtkStandardDeviationArrayMeasurement(const vtkStandardDeviationArrayMeasurement&) = delete;
+  void operator=(const vtkStandardDeviationArrayMeasurement&) = delete;
 };
 
 #endif

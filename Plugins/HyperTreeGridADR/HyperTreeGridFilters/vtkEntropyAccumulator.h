@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkSquaredArithmeticAccumulator.h
+  Module:    vtkEntropyAccumulator.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -14,24 +14,25 @@
 =========================================================================*/
 
 /**
- * @class   vtkSquaredArithmeticAccumulator
- * @brief   accumulates input data by summing the squared input
+ * @class   vtkEntropyAccumulator
+ * @brief   accumulates input data by summing the input elements times their logarithm
  *
- * Accumulator for adding arithmetically the squared input.
- * The resulting accumulated value is the sum of the squared value of each input element.
+ * Accumulator for computing the entropy of the input data.
+ * The resulting accumulated value is the sum of the input element weighted by their logarithm.
  */
 
-#ifndef vtkSquaredArithmeticAccumulator_h
-#define vtkSquaredArithmeticAccumulator_h
+#ifndef vtkEntropyAccumulator_h
+#define vtkEntropyAccumulator_h
 
 #include "vtkAbstractAccumulator.h"
+#include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 
-class VTKCOMMONCORE_EXPORT vtkSquaredArithmeticAccumulator : public vtkAbstractAccumulator
+class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkEntropyAccumulator : public vtkAbstractAccumulator
 {
 public:
-  static vtkSquaredArithmeticAccumulator* New();
+  static vtkEntropyAccumulator* New();
 
-  vtkTypeMacro(vtkSquaredArithmeticAccumulator, vtkAbstractAccumulator);
+  vtkTypeMacro(vtkEntropyAccumulator, vtkAbstractAccumulator);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   using Superclass::Add;
@@ -40,8 +41,8 @@ public:
   /**
    * Methods for adding data to the accumulator.
    */
-  virtual void Add(vtkAbstractAccumulator* accumulator);
-  virtual void Add(double value);
+  virtual void Add(vtkAbstractAccumulator* accumulator) override;
+  virtual void Add(double value) override;
   //@}
 
   //@{
@@ -63,8 +64,8 @@ protected:
   /**
    * Default constructor and destructor.
    */
-  vtkSquaredArithmeticAccumulator();
-  virtual ~vtkSquaredArithmeticAccumulator() override = default;
+  vtkEntropyAccumulator();
+  virtual ~vtkEntropyAccumulator() override = default;
   //@}
 
   //@{
@@ -75,8 +76,8 @@ protected:
   //@}
 
 private:
-  vtkSquaredArithmeticAccumulator(const vtkSquaredArithmeticAccumulator&) = delete;
-  void operator=(const vtkSquaredArithmeticAccumulator&) = delete;
+  vtkEntropyAccumulator(const vtkEntropyAccumulator&) = delete;
+  void operator=(const vtkEntropyAccumulator&) = delete;
 };
 
 #endif

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkEntropyAccumulator.h
+  Module:    vtkGeometricAccumulator.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -14,24 +14,27 @@
 =========================================================================*/
 
 /**
- * @class   vtkEntropyAccumulator
- * @brief   accumulates input data by summing the input elements times their logarithm
+ * @class   vtkGeometricAccumulator
+ * @brief   accumulates input data geometrically
  *
- * Accumulator for computing the entropy of the input data.
- * The resulting accumulated value is the sum of the input element weighted by their logarithm.
+ * Accumulator for adding geometrically data.
+ * The resulting accumulated value is the product of all the inputs.
+ *
+ * @warning One cannot geometrically accumulate zero or negative data.
  */
 
-#ifndef vtkEntropyAccumulator_h
-#define vtkEntropyAccumulator_h
+#ifndef vtkGeometricAccumulator_h
+#define vtkGeometricAccumulator_h
 
 #include "vtkAbstractAccumulator.h"
+#include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 
-class VTKCOMMONCORE_EXPORT vtkEntropyAccumulator : public vtkAbstractAccumulator
+class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkGeometricAccumulator : public vtkAbstractAccumulator
 {
 public:
-  static vtkEntropyAccumulator* New();
+  static vtkGeometricAccumulator* New();
 
-  vtkTypeMacro(vtkEntropyAccumulator, vtkAbstractAccumulator);
+  vtkTypeMacro(vtkGeometricAccumulator, vtkAbstractAccumulator);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   using Superclass::Add;
@@ -40,8 +43,8 @@ public:
   /**
    * Methods for adding data to the accumulator.
    */
-  virtual void Add(vtkAbstractAccumulator* accumulator);
-  virtual void Add(double value);
+  virtual void Add(vtkAbstractAccumulator* accumulator) override;
+  virtual void Add(double value) override;
   //@}
 
   //@{
@@ -63,8 +66,8 @@ protected:
   /**
    * Default constructor and destructor.
    */
-  vtkEntropyAccumulator();
-  virtual ~vtkEntropyAccumulator() override = default;
+  vtkGeometricAccumulator();
+  virtual ~vtkGeometricAccumulator() override = default;
   //@}
 
   //@{
@@ -75,8 +78,8 @@ protected:
   //@}
 
 private:
-  vtkEntropyAccumulator(const vtkEntropyAccumulator&) = delete;
-  void operator=(const vtkEntropyAccumulator&) = delete;
+  vtkGeometricAccumulator(const vtkGeometricAccumulator&) = delete;
+  void operator=(const vtkGeometricAccumulator&) = delete;
 };
 
 #endif

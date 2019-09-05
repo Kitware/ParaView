@@ -41,7 +41,7 @@ vtkAbstractArrayMeasurement::~vtkAbstractArrayMeasurement()
 //----------------------------------------------------------------------------
 void vtkAbstractArrayMeasurement::Add(double* data, vtkIdType numberOfComponents)
 {
-  for (vtkIdType i = 0; i < this->Accumulators.size(); ++i)
+  for (std::size_t i = 0; i < this->Accumulators.size(); ++i)
   {
     this->Accumulators[i]->Add(data, numberOfComponents);
   }
@@ -51,7 +51,7 @@ void vtkAbstractArrayMeasurement::Add(double* data, vtkIdType numberOfComponents
 //----------------------------------------------------------------------------
 void vtkAbstractArrayMeasurement::Add(vtkDataArray* data)
 {
-  for (vtkIdType i = 0; i < this->Accumulators.size(); ++i)
+  for (std::size_t i = 0; i < this->Accumulators.size(); ++i)
   {
     this->Accumulators[i]->Add(data);
   }
@@ -61,7 +61,7 @@ void vtkAbstractArrayMeasurement::Add(vtkDataArray* data)
 //----------------------------------------------------------------------------
 void vtkAbstractArrayMeasurement::Add(vtkAbstractArrayMeasurement* arrayMeasurement)
 {
-  for (vtkIdType i = 0; i < this->Accumulators.size(); ++i)
+  for (std::size_t i = 0; i < this->Accumulators.size(); ++i)
   {
     this->Accumulators[i]->Add(arrayMeasurement->GetAccumulators()[i]);
   }
@@ -72,7 +72,7 @@ void vtkAbstractArrayMeasurement::Add(vtkAbstractArrayMeasurement* arrayMeasurem
 void vtkAbstractArrayMeasurement::Initialize()
 {
   this->NumberOfAccumulatedData = 0;
-  for (vtkIdType i = 0; i < this->Accumulators.size(); ++i)
+  for (std::size_t i = 0; i < this->Accumulators.size(); ++i)
   {
     this->Accumulators[i]->Initialize();
   }
@@ -84,7 +84,7 @@ void vtkAbstractArrayMeasurement::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "NumberOfAccumulatedData : " << this->NumberOfAccumulatedData << std::endl;
   os << indent << "NumberOfAccumulators : " << this->Accumulators.size() << std::endl;
-  for (vtkIdType i = 0; i < this->Accumulators.size(); ++i)
+  for (std::size_t i = 0; i < this->Accumulators.size(); ++i)
   {
     os << indent << "Accumulator " << i << ": " << std::endl;
     os << indent << *(this->Accumulators[i]) << std::endl;

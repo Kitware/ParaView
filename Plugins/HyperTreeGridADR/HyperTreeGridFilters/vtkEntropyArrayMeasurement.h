@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkArithmeticMeanArrayMeasurement.h
+  Module:    vtkEntropyArrayMeasurement.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -14,31 +14,29 @@
 =========================================================================*/
 
 /**
- * @class   vtkArithmeticMeanArrayMeasurement
- * @brief   measures the arithmetic mean of an array
+ * @class   vtkEntropyArrayMeasurement
+ * @brief   measures the entropy of an array
  *
- * Measures the arithmetic mean of an array, either by giving the full array,
+ * Measures the entropy of an array, either by giving the full array,
  * or by feeding value per value.
  * Merging complexity is constant, and overall algorithm is linear in function
  * of the input size.
  *
  */
 
-#ifndef vtkArithmeticMeanArrayMeasurement_h
-#define vtkArithmeticMeanArrayMeasurement_h
+#ifndef vtkEntropyArrayMeasurement_h
+#define vtkEntropyArrayMeasurement_h
 
 #include "vtkAbstractArrayMeasurement.h"
+#include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 
-#include <vector>
-
-class vtkAbstractAccumulator;
-
-class VTKCOMMONCORE_EXPORT vtkArithmeticMeanArrayMeasurement : public vtkAbstractArrayMeasurement
+class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkEntropyArrayMeasurement
+  : public vtkAbstractArrayMeasurement
 {
 public:
-  static vtkArithmeticMeanArrayMeasurement* New();
+  static vtkEntropyArrayMeasurement* New();
 
-  vtkTypeMacro(vtkArithmeticMeanArrayMeasurement, vtkAbstractArrayMeasurement);
+  vtkTypeMacro(vtkEntropyArrayMeasurement, vtkAbstractArrayMeasurement);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
@@ -51,7 +49,7 @@ public:
   //@{
   /**
    * Returns true if there is more than
-   * vtkArithmeticMeanArrayMeasurement::MinimumNumberOfAccumulatedData accumulated data
+   * vtkEntropyArrayMeasurement::MinimumNumberOfAccumulatedData accumulated data
    */
   virtual bool CanMeasure() const override;
   //@}
@@ -67,28 +65,28 @@ public:
   /**
    * Minimum number of accumulated data necessary to measure.
    */
-  static const unsigned MinimumNumberOfAccumulatedData = 1;
+  static const vtkIdType MinimumNumberOfAccumulatedData = 1;
   //@}
 
   //@{
   /**
    * Number of accumulators needed for measuring.
    */
-  static const unsigned NumberOfAccumulators = 1;
+  static const std::size_t NumberOfAccumulators = 2;
   //@}
 
   //@{
   /**
-   * Method for creating a vector composed of one vtkArithmeticAccumulator*.
+   * Method for creating a vector composed of one vtkMedianAccumulator*.
    */
   virtual std::vector<vtkAbstractAccumulator*> NewAccumulatorInstances() const override;
   //@}
 
   //@{
   /**
-   * Method for measuring arithmetic mean using a vector of of accumulators.
+   * Method for measuring median using a vector of of accumulators.
    * The array should have the same dynamic types and size as the one returned by
-   * vtkArithmeticMeanArrayMeasurement::NewAccumulatorInstances().
+   * vtkMedianArrayMeasurement::NewAccumulatorInstances().
    */
   virtual double Measure(
     const std::vector<vtkAbstractAccumulator*>&, vtkIdType numberOfAccumulatedData) const override;
@@ -99,13 +97,13 @@ protected:
   /**
    * Default constructors and destructors
    */
-  vtkArithmeticMeanArrayMeasurement();
-  virtual ~vtkArithmeticMeanArrayMeasurement() override = default;
+  vtkEntropyArrayMeasurement();
+  virtual ~vtkEntropyArrayMeasurement() override = default;
   //@}
 
 private:
-  vtkArithmeticMeanArrayMeasurement(const vtkArithmeticMeanArrayMeasurement&) = delete;
-  void operator=(const vtkArithmeticMeanArrayMeasurement&) = delete;
+  vtkEntropyArrayMeasurement(const vtkEntropyArrayMeasurement&) = delete;
+  void operator=(const vtkEntropyArrayMeasurement&) = delete;
 };
 
 #endif

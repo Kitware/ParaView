@@ -32,17 +32,16 @@
 #ifndef vtkAbstractAccumulator_h
 #define vtkAbstractAccumulator_h
 
+#include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 #include "vtkObject.h"
 
 #include <functional>
 
 class vtkDataArray;
 
-class VTKCOMMONCORE_EXPORT vtkAbstractAccumulator : public vtkObject
+class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkAbstractAccumulator : public vtkObject
 {
 public:
-  static vtkAbstractAccumulator* New();
-
   vtkAbstractTypeMacro(vtkAbstractAccumulator, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 

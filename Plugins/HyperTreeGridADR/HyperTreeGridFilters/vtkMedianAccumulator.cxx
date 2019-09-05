@@ -19,6 +19,8 @@
 
 #include <algorithm>
 #include <cassert>
+#include <iterator>
+#include <vector>
 
 vtkStandardNewMacro(vtkMedianAccumulator);
 

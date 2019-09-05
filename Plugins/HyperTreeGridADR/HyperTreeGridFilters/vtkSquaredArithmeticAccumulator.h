@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkArithmeticAccumulator.h
+  Module:    vtkSquaredArithmeticAccumulator.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -14,25 +14,26 @@
 =========================================================================*/
 
 /**
- * @class   vtkArithmeticAccumulator
- * @brief   accumulates input data arithmetically
+ * @class   vtkSquaredArithmeticAccumulator
+ * @brief   accumulates input data by summing the squared input
  *
- * Accumulator for adding arithmetically data.
- * The resulting accumulated value is the sum of all the inputs.
- *
+ * Accumulator for adding arithmetically the squared input.
+ * The resulting accumulated value is the sum of the squared value of each input element.
  */
 
-#ifndef vtkArithmeticAccumulator_h
-#define vtkArithmeticAccumulator_h
+#ifndef vtkSquaredArithmeticAccumulator_h
+#define vtkSquaredArithmeticAccumulator_h
 
 #include "vtkAbstractAccumulator.h"
+#include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 
-class VTKCOMMONCORE_EXPORT vtkArithmeticAccumulator : public vtkAbstractAccumulator
+class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkSquaredArithmeticAccumulator
+  : public vtkAbstractAccumulator
 {
 public:
-  static vtkArithmeticAccumulator* New();
+  static vtkSquaredArithmeticAccumulator* New();
 
-  vtkTypeMacro(vtkArithmeticAccumulator, vtkAbstractAccumulator);
+  vtkTypeMacro(vtkSquaredArithmeticAccumulator, vtkAbstractAccumulator);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   using Superclass::Add;
@@ -41,8 +42,8 @@ public:
   /**
    * Methods for adding data to the accumulator.
    */
-  virtual void Add(vtkAbstractAccumulator* accumulator);
-  virtual void Add(double value);
+  virtual void Add(vtkAbstractAccumulator* accumulator) override;
+  virtual void Add(double value) override;
   //@}
 
   //@{
@@ -64,8 +65,8 @@ protected:
   /**
    * Default constructor and destructor.
    */
-  vtkArithmeticAccumulator();
-  virtual ~vtkArithmeticAccumulator() override = default;
+  vtkSquaredArithmeticAccumulator();
+  virtual ~vtkSquaredArithmeticAccumulator() override = default;
   //@}
 
   //@{
@@ -76,8 +77,8 @@ protected:
   //@}
 
 private:
-  vtkArithmeticAccumulator(const vtkArithmeticAccumulator&) = delete;
-  void operator=(const vtkArithmeticAccumulator&) = delete;
+  vtkSquaredArithmeticAccumulator(const vtkSquaredArithmeticAccumulator&) = delete;
+  void operator=(const vtkSquaredArithmeticAccumulator&) = delete;
 };
 
 #endif

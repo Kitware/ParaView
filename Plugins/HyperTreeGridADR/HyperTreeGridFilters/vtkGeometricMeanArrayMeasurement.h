@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkHarmonicMeanArrayMeasurement.h
+  Module:    vtkGeometricMeanArrayMeasurement.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -14,28 +14,30 @@
 =========================================================================*/
 
 /**
- * @class   vtkHarmonicMeanArrayMeasurement
- * @brief   measures the harmonic mean of an array
+ * @class   vtkGeometricMeanArrayMeasurement
+ * @brief   measures the geometric mean of an array
  *
- * Measures the harmonic mean of an array, either by giving the full array,
+ * Measures the geometric mean of an array, either by giving the full array,
  * or by feeding value per value.
  * Merging complexity is constant, and overall algorithm is linear in function
  * of the input size.
  *
- * @warning The harmonic mean of data with zero values is undefined
+ * @warning The geometric mean of data with negative or zero values is undefined
  */
 
-#ifndef vtkHarmonicMeanArrayMeasurement_h
-#define vtkHarmonicMeanArrayMeasurement_h
+#ifndef vtkGeometricMeanArrayMeasurement_h
+#define vtkGeometricMeanArrayMeasurement_h
 
 #include "vtkAbstractArrayMeasurement.h"
+#include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 
-class VTKCOMMONCORE_EXPORT vtkHarmonicMeanArrayMeasurement : public vtkAbstractArrayMeasurement
+class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkGeometricMeanArrayMeasurement
+  : public vtkAbstractArrayMeasurement
 {
 public:
-  static vtkHarmonicMeanArrayMeasurement* New();
+  static vtkGeometricMeanArrayMeasurement* New();
 
-  vtkTypeMacro(vtkHarmonicMeanArrayMeasurement, vtkAbstractArrayMeasurement);
+  vtkTypeMacro(vtkGeometricMeanArrayMeasurement, vtkAbstractArrayMeasurement);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
@@ -48,7 +50,7 @@ public:
   //@{
   /**
    * Returns true if there is more than
-   * vtkHarmonicMeanArrayMeasurement::MinimumNumberOfAccumulatedData accumulated data
+   * vtkGeometricMeanArrayMeasurement::MinimumNumberOfAccumulatedData accumulated data
    */
   virtual bool CanMeasure() const override;
   //@}
@@ -69,6 +71,13 @@ public:
 
   //@{
   /**
+   * Method for creating a vector composed of one vtkGeometricAccumulator*.
+   */
+  virtual std::vector<vtkAbstractAccumulator*> NewAccumulatorInstances() const override;
+  //@}
+
+  //@{
+  /**
    * Number of accumulators needed for measuring.
    */
   static const unsigned NumberOfAccumulators = 1;
@@ -76,16 +85,9 @@ public:
 
   //@{
   /**
-   * Method for creating a vector composed of one vtkInversedArithmeticAccumulator*.
-   */
-  virtual std::vector<vtkAbstractAccumulator*> NewAccumulatorInstances() const override;
-  //@}
-
-  //@{
-  /**
-   * Method for measuring harmonic mean using a vector of of accumulators.
+   * Method for measuring geometric mean using a vector of of accumulators.
    * The array should have the same dynamic types and size as the one returned by
-   * vtkHarmonicMeanArrayMeasurement::NewAccumulatorInstances().
+   * vtkGeometricMeanArrayMeasurement::NewAccumulatorInstances().
    */
   virtual double Measure(
     const std::vector<vtkAbstractAccumulator*>&, vtkIdType numberOfAccumulatedData) const override;
@@ -96,13 +98,13 @@ protected:
   /**
    * Default constructors and destructors
    */
-  vtkHarmonicMeanArrayMeasurement();
-  virtual ~vtkHarmonicMeanArrayMeasurement() override = default;
+  vtkGeometricMeanArrayMeasurement();
+  virtual ~vtkGeometricMeanArrayMeasurement() override = default;
   //@}
 
 private:
-  vtkHarmonicMeanArrayMeasurement(const vtkHarmonicMeanArrayMeasurement&) = delete;
-  void operator=(const vtkHarmonicMeanArrayMeasurement&) = delete;
+  vtkGeometricMeanArrayMeasurement(const vtkGeometricMeanArrayMeasurement&) = delete;
+  void operator=(const vtkGeometricMeanArrayMeasurement&) = delete;
 };
 
 #endif

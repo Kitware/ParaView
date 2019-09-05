@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkEntropyArrayMeasurement.h
+  Module:    vtkMedianArrayMeasurement.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -14,27 +14,29 @@
 =========================================================================*/
 
 /**
- * @class   vtkEntropyArrayMeasurement
- * @brief   measures the entropy of an array
+ * @class   vtkMedianArrayMeasurement
+ * @brief   measures the median of an array
  *
  * Measures the entropy of an array, either by giving the full array,
  * or by feeding value per value.
- * Merging complexity is constant, and overall algorithm is linear in function
- * of the input size.
+ * Merging complexity is logarithmic as well as inserting, and overall algorithm is O(n*log(n)),
+ * where n is the input size.
  *
  */
 
-#ifndef vtkEntropyArrayMeasurement_h
-#define vtkEntropyArrayMeasurement_h
+#ifndef vtkMedianArrayMeasurement_h
+#define vtkMedianArrayMeasurement_h
 
 #include "vtkAbstractArrayMeasurement.h"
+#include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 
-class VTKCOMMONCORE_EXPORT vtkEntropyArrayMeasurement : public vtkAbstractArrayMeasurement
+class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkMedianArrayMeasurement
+  : public vtkAbstractArrayMeasurement
 {
 public:
-  static vtkEntropyArrayMeasurement* New();
+  static vtkMedianArrayMeasurement* New();
 
-  vtkTypeMacro(vtkEntropyArrayMeasurement, vtkAbstractArrayMeasurement);
+  vtkTypeMacro(vtkMedianArrayMeasurement, vtkAbstractArrayMeasurement);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
@@ -47,7 +49,7 @@ public:
   //@{
   /**
    * Returns true if there is more than
-   * vtkEntropyArrayMeasurement::MinimumNumberOfAccumulatedData accumulated data
+   * vtkHarmonicMeanArrayMeasurement::MinimumNumberOfAccumulatedData accumulated data
    */
   virtual bool CanMeasure() const override;
   //@}
@@ -57,20 +59,19 @@ public:
    * Accessor for the minimum number of accumulated data necessary for computing the measure
    */
   virtual vtkIdType GetMinimumNumberOfAccumulatedData() const override;
-  //@}
 
   //@{
   /**
    * Minimum number of accumulated data necessary to measure.
    */
-  static const vtkIdType MinimumNumberOfAccumulatedData = 1;
+  static const unsigned MinimumNumberOfAccumulatedData = 1;
   //@}
 
   //@{
   /**
    * Number of accumulators needed for measuring.
    */
-  static const std::size_t NumberOfAccumulators = 2;
+  static const unsigned NumberOfAccumulators = 1;
   //@}
 
   //@{
@@ -95,13 +96,13 @@ protected:
   /**
    * Default constructors and destructors
    */
-  vtkEntropyArrayMeasurement();
-  virtual ~vtkEntropyArrayMeasurement() override = default;
+  vtkMedianArrayMeasurement();
+  virtual ~vtkMedianArrayMeasurement() override = default;
   //@}
 
 private:
-  vtkEntropyArrayMeasurement(const vtkEntropyArrayMeasurement&) = delete;
-  void operator=(const vtkEntropyArrayMeasurement&) = delete;
+  vtkMedianArrayMeasurement(const vtkMedianArrayMeasurement&) = delete;
+  void operator=(const vtkMedianArrayMeasurement&) = delete;
 };
 
 #endif

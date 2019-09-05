@@ -28,10 +28,11 @@
 #define vtkMedianAccumulator_h
 
 #include "vtkAbstractAccumulator.h"
+#include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 
 #include <vector>
 
-class vtkMedianAccumulator : public vtkAbstractAccumulator
+class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkMedianAccumulator : public vtkAbstractAccumulator
 {
 public:
   static vtkMedianAccumulator* New();
@@ -45,8 +46,8 @@ public:
   /**
    * Methods for adding data to the accumulator.
    */
-  virtual void Add(vtkAbstractAccumulator* accumulator);
-  virtual void Add(double value);
+  virtual void Add(vtkAbstractAccumulator* accumulator) override;
+  virtual void Add(double value) override;
   //@}
 
   //@{

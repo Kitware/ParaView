@@ -1,0 +1,9 @@
+NAME
+  HyperTreeGridADR
+DESCRIPTION
+  This is a filter resampling data sets to hyper tree grids.
+  The hyper tree grid is subdivded following a criterion set by the user.
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::FiltersCore
+  ParaView::VTKExtensionsDefault

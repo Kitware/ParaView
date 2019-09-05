@@ -47,7 +47,7 @@ double vtkMedianArrayMeasurement::Measure() const
 
 //----------------------------------------------------------------------------
 double vtkMedianArrayMeasurement::Measure(
-  const std::vector<vtkAbstractAccumulator*>& accumulators, vtkIdType numberOfAccumulatedData) const
+  const std::vector<vtkAbstractAccumulator*>& accumulators, vtkIdType) const
 {
   assert(accumulators.size() && accumulators[0] && "input accumulator is not allocated");
   vtkMedianAccumulator* medianAccumulator = vtkMedianAccumulator::SafeDownCast(accumulators[0]);

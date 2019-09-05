@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkStandardDeviationArrayMeasurement.h
+  Module:    vtkArithmeticMeanArrayMeasurement.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -14,27 +14,33 @@
 =========================================================================*/
 
 /**
- * @class   vtkStandardDeviationArrayMeasurement
- * @brief   measures the standard deviation of an array
+ * @class   vtkArithmeticMeanArrayMeasurement
+ * @brief   measures the arithmetic mean of an array
  *
- * Measures the standard deviation of an array, either by giving the full array,
+ * Measures the arithmetic mean of an array, either by giving the full array,
  * or by feeding value per value.
  * Merging complexity is constant, and overall algorithm is linear in function
  * of the input size.
  *
  */
 
-#ifndef vtkStandardDeviationArrayMeasurement_h
-#define vtkStandardDeviationArrayMeasurement_h
+#ifndef vtkArithmeticMeanArrayMeasurement_h
+#define vtkArithmeticMeanArrayMeasurement_h
 
 #include "vtkAbstractArrayMeasurement.h"
+#include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 
-class VTKCOMMONCORE_EXPORT vtkStandardDeviationArrayMeasurement : public vtkAbstractArrayMeasurement
+#include <vector>
+
+class vtkAbstractAccumulator;
+
+class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkArithmeticMeanArrayMeasurement
+  : public vtkAbstractArrayMeasurement
 {
 public:
-  static vtkStandardDeviationArrayMeasurement* New();
+  static vtkArithmeticMeanArrayMeasurement* New();
 
-  vtkTypeMacro(vtkStandardDeviationArrayMeasurement, vtkAbstractArrayMeasurement);
+  vtkTypeMacro(vtkArithmeticMeanArrayMeasurement, vtkAbstractArrayMeasurement);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
@@ -47,7 +53,7 @@ public:
   //@{
   /**
    * Returns true if there is more than
-   * vtkStandardDeviationArrayMeasurement::MinimumNumberOfAccumulatedData accumulated data
+   * vtkArithmeticMeanArrayMeasurement::MinimumNumberOfAccumulatedData accumulated data
    */
   virtual bool CanMeasure() const override;
   //@}
@@ -63,29 +69,28 @@ public:
   /**
    * Minimum number of accumulated data necessary to measure.
    */
-  static const unsigned MinimumNumberOfAccumulatedData = 2;
+  static const unsigned MinimumNumberOfAccumulatedData = 1;
   //@}
 
   //@{
   /**
    * Number of accumulators needed for measuring.
    */
-  static const unsigned NumberOfAccumulators = 2;
+  static const unsigned NumberOfAccumulators = 1;
   //@}
 
   //@{
   /**
-   * Method for creating a vector composed of one vtkArithmeticAccumulator* followed
-   * by one vtkSquaredArithmeticAccumulator*.
+   * Method for creating a vector composed of one vtkArithmeticAccumulator*.
    */
   virtual std::vector<vtkAbstractAccumulator*> NewAccumulatorInstances() const override;
   //@}
 
   //@{
   /**
-   * Method for measuring median using a vector of of accumulators.
+   * Method for measuring arithmetic mean using a vector of of accumulators.
    * The array should have the same dynamic types and size as the one returned by
-   * vtkStandardDeviationArrayMeasurement::NewAccumulatorInstances().
+   * vtkArithmeticMeanArrayMeasurement::NewAccumulatorInstances().
    */
   virtual double Measure(
     const std::vector<vtkAbstractAccumulator*>&, vtkIdType numberOfAccumulatedData) const override;
@@ -96,13 +101,13 @@ protected:
   /**
    * Default constructors and destructors
    */
-  vtkStandardDeviationArrayMeasurement();
-  virtual ~vtkStandardDeviationArrayMeasurement() override = default;
+  vtkArithmeticMeanArrayMeasurement();
+  virtual ~vtkArithmeticMeanArrayMeasurement() override = default;
   //@}
 
 private:
-  vtkStandardDeviationArrayMeasurement(const vtkStandardDeviationArrayMeasurement&) = delete;
-  void operator=(const vtkStandardDeviationArrayMeasurement&) = delete;
+  vtkArithmeticMeanArrayMeasurement(const vtkArithmeticMeanArrayMeasurement&) = delete;
+  void operator=(const vtkArithmeticMeanArrayMeasurement&) = delete;
 };
 
 #endif

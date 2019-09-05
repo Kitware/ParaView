@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkGeometricAccumulator.h
+  Module:    vtkArithmeticAccumulator.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -14,26 +14,26 @@
 =========================================================================*/
 
 /**
- * @class   vtkGeometricAccumulator
- * @brief   accumulates input data geometrically
+ * @class   vtkArithmeticAccumulator
+ * @brief   accumulates input data arithmetically
  *
- * Accumulator for adding geometrically data.
- * The resulting accumulated value is the product of all the inputs.
+ * Accumulator for adding arithmetically data.
+ * The resulting accumulated value is the sum of all the inputs.
  *
- * @warning One cannot geometrically accumulate zero or negative data.
  */
 
-#ifndef vtkGeometricAccumulator_h
-#define vtkGeometricAccumulator_h
+#ifndef vtkArithmeticAccumulator_h
+#define vtkArithmeticAccumulator_h
 
 #include "vtkAbstractAccumulator.h"
+#include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 
-class VTKCOMMONCORE_EXPORT vtkGeometricAccumulator : public vtkAbstractAccumulator
+class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkArithmeticAccumulator : public vtkAbstractAccumulator
 {
 public:
-  static vtkGeometricAccumulator* New();
+  static vtkArithmeticAccumulator* New();
 
-  vtkTypeMacro(vtkGeometricAccumulator, vtkAbstractAccumulator);
+  vtkTypeMacro(vtkArithmeticAccumulator, vtkAbstractAccumulator);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   using Superclass::Add;
@@ -42,8 +42,8 @@ public:
   /**
    * Methods for adding data to the accumulator.
    */
-  virtual void Add(vtkAbstractAccumulator* accumulator);
-  virtual void Add(double value);
+  virtual void Add(vtkAbstractAccumulator* accumulator) override;
+  virtual void Add(double value) override;
   //@}
 
   //@{
@@ -65,8 +65,8 @@ protected:
   /**
    * Default constructor and destructor.
    */
-  vtkGeometricAccumulator();
-  virtual ~vtkGeometricAccumulator() override = default;
+  vtkArithmeticAccumulator();
+  virtual ~vtkArithmeticAccumulator() override = default;
   //@}
 
   //@{
@@ -77,8 +77,8 @@ protected:
   //@}
 
 private:
-  vtkGeometricAccumulator(const vtkGeometricAccumulator&) = delete;
-  void operator=(const vtkGeometricAccumulator&) = delete;
+  vtkArithmeticAccumulator(const vtkArithmeticAccumulator&) = delete;
+  void operator=(const vtkArithmeticAccumulator&) = delete;
 };
 
 #endif

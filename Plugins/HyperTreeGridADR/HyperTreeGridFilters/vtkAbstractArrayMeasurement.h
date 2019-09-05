@@ -34,17 +34,16 @@
 
 #include "vtkAbstractAccumulator.h"
 #include "vtkDataArray.h"
+#include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
 #include "vtkIdTypeArray.h"
 #include "vtkObject.h"
 #include "vtkSetGet.h"
 
 #include <vector>
 
-class VTKCOMMONCORE_EXPORT vtkAbstractArrayMeasurement : public vtkObject
+class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkAbstractArrayMeasurement : public vtkObject
 {
 public:
-  static vtkAbstractArrayMeasurement* New();
-
   vtkAbstractTypeMacro(vtkAbstractArrayMeasurement, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
