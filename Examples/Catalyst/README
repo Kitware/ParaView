@@ -1,10 +1,11 @@
-This repository gives examples of how to use ParaView Catalyst (catalyst.paraview.org)
-for in situ analysis and visualization. For assistance, please email the ParaView
-mailing list at paraview@paraview.org. The examples show how to create VTK data
+This repository gives examples of how to use ParaView Catalyst (www.paraview.org/in-situ)
+for in situ analysis and visualization. For assistance, please visit the Discourse page
+at discourse.paraview.org. The examples show how to create VTK data
 structures from native simulation code data structures, how to interface to ParaView
-Catalyst and how to set up several different types of pipelines. The examples can
-either be built individually or as a group. Many work in parallel as well. The tests
-are very simple and just verify that the examples run -- they don't not verify
+Catalyst and how to set up several different types of pipelines. As of ParaView 5.7
+the examples must be built as a group. Users should point CMake to this directory in
+order to build. Many of the examples work in parallel as well. The tests
+are very simple and just verify that the examples run -- they do not verify
 correctness of outputs. A description of the examples are:
 * FortranPoissonSolver -- An example of a parallel, finite difference discretization of the Poisson equation
                           implemented in Fortran using a Conjugate Gradient solver. Instead of co-processing
