@@ -583,6 +583,9 @@ bool vtkProcessModule::InitializePythonEnvironment()
     vtkProcessModule::FinalizePython = true;
   }
 
+  // For static builds, help with finding `vtk` (and `paraview`) packages.
+  vtkPythonInterpreter::PrependPythonPath(this->GetSelfDir().c_str(), "vtkmodules/__init__.py");
+
 #if defined(_WIN32)
   // ParaView executables generally link with all modules built except a few
   // such as the Catalyst libraries e.g. vtkPVCatalyst.dll. Now, when importing its
