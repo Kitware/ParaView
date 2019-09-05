@@ -28,6 +28,7 @@
 #include "vtkPVDataRepresentation.h"
 
 class vtk3DWidgetRepresentation;
+class vtkBillboardTextActor3D;
 class vtkFlagpoleLabel;
 class vtkPolyData;
 class vtkPVCacheKeeper;
@@ -73,6 +74,14 @@ public:
    */
   void SetFlagpoleLabel(vtkFlagpoleLabel* val);
   vtkGetObjectMacro(FlagpoleLabel, vtkFlagpoleLabel);
+  //@}
+
+  //@{
+  /**
+   * Set the BillboardTextActor
+   */
+  void SetBillboardTextActor(vtkBillboardTextActor3D* val);
+  vtkGetObjectMacro(BillboardTextActor, vtkBillboardTextActor3D);
   //@}
 
   /**
@@ -121,6 +130,7 @@ protected:
   vtkPolyData* DummyPolyData;
   vtk3DWidgetRepresentation* TextWidgetRepresentation;
   vtkFlagpoleLabel* FlagpoleLabel;
+  vtkBillboardTextActor3D* BillboardTextActor;
   int TextPropMode;
 
 private:

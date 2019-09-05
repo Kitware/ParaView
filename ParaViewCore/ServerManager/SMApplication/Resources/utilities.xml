@@ -1373,6 +1373,52 @@
       <!-- End of FlagpoleLabel -->
     </Proxy>
 
+    <Proxy class="vtkBillboardTextActor3D"
+           name="BillboardTextActor3D"
+           processes="client|dataserver|renderserver"
+           >
+      <Documentation>BillboardTextActor3D is a 3D representation for a text
+     source.</Documentation>
+      <DoubleVectorProperty name="BillboardPosition"
+                            command="SetPosition"
+                            number_of_elements="3"
+                            default_values="0.0 0.0 0.0"
+                            >
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          The world coordinate position of the anchor point of the text billboard.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="DisplayOffset"
+                         command="SetDisplayOffset"
+                         number_of_elements="2"
+                         default_values="0 0"
+                         panel_visibility="advanced">
+        <Documentation>
+          Fixed offset from the anchor point in display coordinated to be used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <SubProxy command="SetTextProperty">
+        <Proxy name="TextProperty"
+               proxygroup="properties"
+               proxyname="TextProperty"></Proxy>
+        <ExposedProperties>
+          <Property name="Color"/>
+          <Property name="Opacity"/>
+          <Property name="FontFamily"/>
+          <Property name="FontFile"/>
+          <Property name="Bold"/>
+          <Property name="Italic"/>
+          <Property name="Shadow"/>
+          <Property name="FontSize"/>
+          <Property name="Justification"/>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of BillboardTextActor3D -->
+    </Proxy>
+
     <!-- ================================================================== -->
     <Proxy name="GridAxes3DActor"
            class="vtkPVGridAxes3DActor"

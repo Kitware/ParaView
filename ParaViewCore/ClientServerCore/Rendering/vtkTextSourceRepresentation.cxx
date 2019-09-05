@@ -18,7 +18,9 @@
 #include "vtkAbstractArray.h"
 #include "vtkAbstractWidget.h"
 #include "vtkAlgorithmOutput.h"
+#include "vtkBillboardTextActor3D.h"
 #include "vtkDataSetAttributes.h"
+#include "vtkDoubleArray.h"
 #include "vtkFlagpoleLabel.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -51,14 +53,15 @@ vtkStandardNewMacro(vtkTextSourceRepresentation);
 vtkCxxSetObjectMacro(
   vtkTextSourceRepresentation, TextWidgetRepresentation, vtk3DWidgetRepresentation);
 vtkCxxSetObjectMacro(vtkTextSourceRepresentation, FlagpoleLabel, vtkFlagpoleLabel);
+vtkCxxSetObjectMacro(vtkTextSourceRepresentation, BillboardTextActor, vtkBillboardTextActor3D);
 
 //----------------------------------------------------------------------------
 vtkTextSourceRepresentation::vtkTextSourceRepresentation()
 {
   this->TextPropMode = 0;
   this->TextWidgetRepresentation = nullptr;
-  // this->FlagpoleLabel = vtkFlagpoleLabel::New();
   this->FlagpoleLabel = nullptr;
+  this->BillboardTextActor = nullptr;
 
   this->CacheKeeper = vtkPVCacheKeeper::New();
 
@@ -77,6 +80,7 @@ vtkTextSourceRepresentation::~vtkTextSourceRepresentation()
 {
   this->SetFlagpoleLabel(nullptr);
   this->SetTextWidgetRepresentation(nullptr);
+  this->SetBillboardTextActor(nullptr);
   this->DummyPolyData->Delete();
   this->CacheKeeper->Delete();
 }
@@ -94,6 +98,11 @@ void vtkTextSourceRepresentation::SetVisibility(bool val)
   if (this->FlagpoleLabel && this->TextPropMode == 1)
   {
     this->FlagpoleLabel->SetVisibility(val);
+  }
+
+  if (this->BillboardTextActor && this->TextPropMode == 2)
+  {
+    this->BillboardTextActor->SetVisibility(val);
   }
 }
 
@@ -117,17 +126,21 @@ int vtkTextSourceRepresentation::FillInputPortInformation(int, vtkInformation* i
 //----------------------------------------------------------------------------
 bool vtkTextSourceRepresentation::AddToView(vtkView* view)
 {
-  if (this->TextWidgetRepresentation /*&& this->TextPropMode == 0*/)
+  if (this->TextWidgetRepresentation)
   {
     view->AddRepresentation(this->TextWidgetRepresentation);
   }
-  if (this->FlagpoleLabel /*&& this->TextPropMode == 1*/)
+  vtkPVRenderView* pvview = vtkPVRenderView::SafeDownCast(view);
+  if (pvview)
   {
-    vtkPVRenderView* pvview = vtkPVRenderView::SafeDownCast(view);
-    if (pvview)
+    vtkRenderer* activeRenderer = pvview->GetRenderer();
+    if (this->FlagpoleLabel)
     {
-      vtkRenderer* activeRenderer = pvview->GetRenderer();
       activeRenderer->AddActor(this->FlagpoleLabel);
+    }
+    if (this->BillboardTextActor)
+    {
+      activeRenderer->AddActor(this->BillboardTextActor);
     }
   }
   return this->Superclass::AddToView(view);
@@ -140,13 +153,17 @@ bool vtkTextSourceRepresentation::RemoveFromView(vtkView* view)
   {
     view->RemoveRepresentation(this->TextWidgetRepresentation);
   }
-  if (this->FlagpoleLabel)
+  vtkPVRenderView* pvview = vtkPVRenderView::SafeDownCast(view);
+  if (pvview)
   {
-    vtkPVRenderView* pvview = vtkPVRenderView::SafeDownCast(view);
-    if (pvview)
+    vtkRenderer* activeRenderer = pvview->GetRenderer();
+    if (this->FlagpoleLabel)
     {
-      vtkRenderer* activeRenderer = pvview->GetRenderer();
       activeRenderer->RemoveActor(this->FlagpoleLabel);
+    }
+    if (this->BillboardTextActor)
+    {
+      activeRenderer->RemoveActor(this->BillboardTextActor);
     }
   }
   return this->Superclass::RemoveFromView(view);
@@ -221,13 +238,18 @@ int vtkTextSourceRepresentation::ProcessViewRequest(
 
     std::string text =
       vtkExtractString(producerPort->GetProducer()->GetOutputDataObject(producerPort->GetIndex()));
-    vtkTextRepresentation* repr = vtkTextRepresentation::SafeDownCast(this->TextWidgetRepresentation
-        ? this->TextWidgetRepresentation->GetRepresentation()
-        : nullptr);
+    vtkTextRepresentation* repr = this->TextWidgetRepresentation
+      ? vtkTextRepresentation::SafeDownCast(this->TextWidgetRepresentation->GetRepresentation())
+      : nullptr;
     if (repr)
     {
       repr->SetText(text.c_str());
       repr->SetVisibility(text.empty() ? 0 : this->TextPropMode == 0);
+    }
+    if (this->BillboardTextActor)
+    {
+      this->BillboardTextActor->SetInput(text.c_str());
+      this->BillboardTextActor->SetVisibility(text.empty() ? 0 : this->TextPropMode == 2);
     }
     if (this->FlagpoleLabel)
     {

@@ -844,6 +844,8 @@ list(APPEND TESTS_WITH_BASELINES
   TimeInspector.xml
   TimeStepProgressBar.xml
   Tessellate.xml
+  Text2D.xml
+  TextBillboard3D.xml
   TextureUsages.xml
   UndoRedo.xml
   UndoRedo1.xml

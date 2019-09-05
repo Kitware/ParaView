@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
+  <pqevent object="pqClientMainWindow/axesToolbar/actionShowOrientationAxes" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="TextSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Text/Text" command="set_string" arguments="This is a test for the&#xA;Text Source shown in 2D." />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/TextPropMode/ComboBox" command="activated" arguments="2D Text Widget" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/FontEditor/FontSize" command="set_int" arguments="30" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/FontEditor/Bold" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/FontEditor/Italics" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/TextLocationEditor/groupBoxLocation/toolButtonLC" command="set_boolean" arguments="true" />
+</pqevents>
