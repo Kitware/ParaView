@@ -35,6 +35,7 @@ set(classes
   pqAnimationShortcutDecorator
   pqAnimationShortcutWidget
   pqAnimationTimeToolbar
+  pqAnnotationsModel
   pqApplicationComponentsInit
   pqApplicationSettingsReaction
   pqApplyBehavior
