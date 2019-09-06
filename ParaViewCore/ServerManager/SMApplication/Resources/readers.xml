@@ -6073,6 +6073,17 @@
                             information_only="1">
         <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
+      <IntVectorProperty name="IgnoreColorMap"
+                         command="SetIgnoreColorMap"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When checked, data values in the TIFF file will not be mapped to colors using the
+          color map specified in the TIFF, if any. This is useful for files where the
+          color map may be incorrectly specified.
+        </Documentation>
+      </IntVectorProperty>
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues"
                             repeatable="1">
