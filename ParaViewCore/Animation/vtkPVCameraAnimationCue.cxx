@@ -52,6 +52,12 @@ void vtkPVCameraAnimationCue::SetMode(int mode)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVCameraAnimationCue::SetInterpolationMode(int mode)
+{
+  vtkPVCameraCueManipulator::SafeDownCast(this->Manipulator)->SetInterpolationMode(mode);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVCameraAnimationCue::EndUpdateAnimationValues()
 {
   if (this->View)
