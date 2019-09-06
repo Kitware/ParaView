@@ -58,6 +58,14 @@ Major highlights/changes are as follows:
    before, but not longer supported since `RequestData` will not get called
    when cache data is being used.
 
+###Plugin loading (including auto loaded plugins)###
+
+With this version, ParaView is now formalizing that all plugins, including the
+ones that are flagged as "auto-load" are loaded **after** the main window has
+been instantiated. This ensures that plugin developers can assume existence of a
+main window irrespective of whether the plugin was auto-loaded or loaded after
+the application has started.
+
 Changes in 5.7
 --------------
 

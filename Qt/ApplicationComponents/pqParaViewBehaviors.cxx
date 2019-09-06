@@ -186,9 +186,6 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
     pgm->addInterface(new pqStandardRecentlyUsedResourceLoaderImplementation(pgm));
   }
 
-  // Load plugins distributed with application.
-  pqApplicationCore::instance()->loadDistributedPlugins();
-
   // Define application behaviors.
   if (PQ_IS_BEHAVIOR_ENABLED(DataTimeStepBehavior))
   {

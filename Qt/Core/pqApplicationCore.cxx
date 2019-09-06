@@ -190,7 +190,6 @@ void pqApplicationCore::constructor()
   // the plugin initialization code itself may request access to  the interface
   // tracker.
   this->InterfaceTracker->initialize();
-  this->PluginManager->loadPluginsFromSettings();
 
   if (auto pvsettings = vtkPVGeneralSettings::GetInstance())
   {
@@ -712,11 +711,6 @@ void pqApplicationCore::registerDocumentation(const QString& filename)
     engine->registerDocumentation(filename);
   }
 #endif
-}
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::loadDistributedPlugins(const char* vtkNotUsed(filename))
-{
 }
 
 //-----------------------------------------------------------------------------
