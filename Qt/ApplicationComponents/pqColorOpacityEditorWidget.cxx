@@ -145,10 +145,8 @@ public:
   {
     this->Ui.setupUi(self);
     this->Ui.mainLayout->setMargin(pqPropertiesPanel::suggestedMargin());
-    // this->Ui.mainLayout->setSpacing(
-    //  pqPropertiesPanel::suggestedVerticalSpacing());
 
-    this->Decorator = new pqColorOpacityEditorWidgetDecorator(NULL, self);
+    this->Decorator = new pqColorOpacityEditorWidgetDecorator(nullptr, self);
 
     this->Ui.ColorTable->setModel(&this->ColorTableModel);
     this->Ui.ColorTable->horizontalHeader()->setHighlightSections(false);
@@ -197,7 +195,7 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     vtkDiscretizableColorTransferFunction::SafeDownCast(this->proxy()->GetClientSideObject());
   if (stc)
   {
-    ui.ColorEditor->initialize(stc, true, NULL, false);
+    ui.ColorEditor->initialize(stc, true, nullptr, false);
     QObject::connect(&this->Internals->ColorTableModel,
       SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
       SIGNAL(xrgbPointsChanged()));
@@ -394,7 +392,7 @@ pqColorOpacityEditorWidget::~pqColorOpacityEditorWidget()
   }
 
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -403,12 +401,12 @@ void pqColorOpacityEditorWidget::setScalarOpacityFunctionProxy(pqSMProxy sofProx
   pqInternals& internals = (*this->Internals);
   Ui::ColorOpacityEditorWidget& ui = internals.Ui;
 
-  vtkSMProxy* newSofProxy = NULL;
+  vtkSMProxy* newSofProxy = nullptr;
   vtkPiecewiseFunction* pwf =
-    sofProxy ? vtkPiecewiseFunction::SafeDownCast(sofProxy->GetClientSideObject()) : NULL;
+    sofProxy ? vtkPiecewiseFunction::SafeDownCast(sofProxy->GetClientSideObject()) : nullptr;
   if (sofProxy && sofProxy->GetProperty("Points") && pwf)
   {
-    newSofProxy = sofProxy.GetPointer();
+    newSofProxy = sofProxy;
   }
   if (internals.ScalarOpacityFunctionProxy == newSofProxy)
   {
@@ -444,7 +442,6 @@ void pqColorOpacityEditorWidget::setScalarOpacityFunctionProxy(pqSMProxy sofProx
         SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
     }
 
-    // FIXME: need to verify that repeated initializations are okay.
     this->initializeOpacityEditor(pwf);
 
     // add new property links.
@@ -455,7 +452,7 @@ void pqColorOpacityEditorWidget::setScalarOpacityFunctionProxy(pqSMProxy sofProx
       internals.ScalarOpacityFunctionProxy,
       internals.ScalarOpacityFunctionProxy->GetProperty("UseLogScale"));
   }
-  ui.OpacityEditor->setVisible(newSofProxy != NULL);
+  ui.OpacityEditor->setVisible(newSofProxy != nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -561,7 +558,7 @@ void pqColorOpacityEditorWidget::updateCurrentData()
     vtkDiscretizableColorTransferFunction::SafeDownCast(this->proxy()->GetClientSideObject());
   vtkSMProxy* pwfProxy = this->scalarOpacityFunctionProxy();
   vtkPiecewiseFunction* pwf =
-    pwfProxy ? vtkPiecewiseFunction::SafeDownCast(pwfProxy->GetClientSideObject()) : NULL;
+    pwfProxy ? vtkPiecewiseFunction::SafeDownCast(pwfProxy->GetClientSideObject()) : nullptr;
 
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
   if (ui.ColorEditor->currentPoint() >= 0 && stc)
@@ -601,7 +598,7 @@ QList<QVariant> pqColorOpacityEditorWidget::xrgbPoints() const
   vtkDiscretizableColorTransferFunction* stc =
     vtkDiscretizableColorTransferFunction::SafeDownCast(this->proxy()->GetClientSideObject());
   QList<QVariant> values;
-  for (int cc = 0; stc != NULL && cc < stc->GetSize(); cc++)
+  for (int cc = 0; stc != nullptr && cc < stc->GetSize(); cc++)
   {
     double xrgbms[6];
     stc->GetNodeValue(cc, xrgbms);
@@ -620,10 +617,10 @@ QList<QVariant> pqColorOpacityEditorWidget::xvmsPoints() const
 {
   vtkSMProxy* pwfProxy = this->scalarOpacityFunctionProxy();
   vtkPiecewiseFunction* pwf =
-    pwfProxy ? vtkPiecewiseFunction::SafeDownCast(pwfProxy->GetClientSideObject()) : NULL;
+    pwfProxy ? vtkPiecewiseFunction::SafeDownCast(pwfProxy->GetClientSideObject()) : nullptr;
 
   QList<QVariant> values;
-  for (int cc = 0; pwf != NULL && cc < pwf->GetSize(); cc++)
+  for (int cc = 0; pwf != nullptr && cc < pwf->GetSize(); cc++)
   {
     double xvms[4];
     pwf->GetNodeValue(cc, xvms);
@@ -725,7 +722,7 @@ void pqColorOpacityEditorWidget::currentDataEdited()
     vtkDiscretizableColorTransferFunction::SafeDownCast(this->proxy()->GetClientSideObject());
   vtkSMProxy* pwfProxy = this->scalarOpacityFunctionProxy();
   vtkPiecewiseFunction* pwf =
-    pwfProxy ? vtkPiecewiseFunction::SafeDownCast(pwfProxy->GetClientSideObject()) : NULL;
+    pwfProxy ? vtkPiecewiseFunction::SafeDownCast(pwfProxy->GetClientSideObject()) : nullptr;
 
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
   if (ui.ColorEditor->currentPoint() >= 0 && stc)
@@ -744,9 +741,9 @@ void pqColorOpacityEditorWidget::currentDataEdited()
 void pqColorOpacityEditorWidget::representationOrViewChanged()
 {
   pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
-  bool hasRepresentation = repr != NULL;
+  bool hasRepresentation = repr != nullptr;
   pqView* activeView = pqActiveObjects::instance().activeView();
-  bool hasView = activeView != NULL;
+  bool hasView = activeView != nullptr;
 
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
   ui.ResetRangeToData->setEnabled(hasRepresentation);
@@ -796,8 +793,8 @@ void pqColorOpacityEditorWidget::prepareRangeForLogScaling()
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::resetRangeToData()
 {
-  // passing in NULL ensure pqResetScalarRangeReaction simply uses active representation.
-  if (pqResetScalarRangeReaction::resetScalarRangeToData(NULL))
+  // passing in nullptr ensure pqResetScalarRangeReaction simply uses active representation.
+  if (pqResetScalarRangeReaction::resetScalarRangeToData(nullptr))
   {
     this->Internals->render();
     emit this->changeFinished();
@@ -807,8 +804,8 @@ void pqColorOpacityEditorWidget::resetRangeToData()
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::resetRangeToDataOverTime()
 {
-  // passing in NULL ensure pqResetScalarRangeReaction simply uses active representation.
-  if (pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(NULL))
+  // passing in nullptr ensure pqResetScalarRangeReaction simply uses active representation.
+  if (pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(nullptr))
   {
     this->Internals->render();
     emit this->changeFinished();
@@ -895,7 +892,7 @@ void pqColorOpacityEditorWidget::saveAsPreset()
   QDialog dialog(this);
   Ui::SavePresetOptions ui;
   ui.setupUi(&dialog);
-  ui.saveOpacities->setEnabled(this->scalarOpacityFunctionProxy() != NULL);
+  ui.saveOpacities->setEnabled(this->scalarOpacityFunctionProxy() != nullptr);
   ui.saveOpacities->setChecked(ui.saveOpacities->isEnabled());
   ui.saveAnnotations->setVisible(false);
 

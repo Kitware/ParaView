@@ -71,7 +71,7 @@ inline vtkSMProperty* GetControlPointsProperty(vtkSMProxy* self)
   if (!controlPointsProperty)
   {
     vtkGenericWarningMacro("'RGBPoints' or 'Points' property is required.");
-    return NULL;
+    return nullptr;
   }
 
   vtkSMPropertyHelper cntrlPoints(controlPointsProperty);
@@ -93,7 +93,7 @@ inline vtkSMProperty* GetControlPointsProperty(vtkSMProxy* self)
 // originalRange is filled with the original range of the cntrlPoints before
 // rescaling.
 bool vtkNormalize(std::vector<vtkTuple<double, 4> >& cntrlPoints, bool log_space,
-  vtkTuple<double, 2>* originalRange = NULL)
+  vtkTuple<double, 2>* originalRange = nullptr)
 {
   if (cntrlPoints.size() == 0)
   {
@@ -206,15 +206,6 @@ bool vtkRescaleNormalizedControlPoints(
 }
 
 vtkStandardNewMacro(vtkSMTransferFunctionProxy);
-//----------------------------------------------------------------------------
-vtkSMTransferFunctionProxy::vtkSMTransferFunctionProxy()
-{
-}
-
-//----------------------------------------------------------------------------
-vtkSMTransferFunctionProxy::~vtkSMTransferFunctionProxy()
-{
-}
 
 //----------------------------------------------------------------------------
 bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
@@ -349,7 +340,7 @@ bool vtkSMTransferFunctionProxy::ComputeDataRange(double range[2])
     vtkSMProxy* proxy = this->GetConsumerProxy(cc);
     // consumers could be subproxy of something; so, we locate the true-parent
     // proxy for a proxy.
-    proxy = proxy ? proxy->GetTrueParentProxy() : NULL;
+    proxy = proxy ? proxy->GetTrueParentProxy() : nullptr;
     vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     if (consumer &&
       // consumer is visible.
@@ -393,11 +384,9 @@ bool vtkSMTransferFunctionProxy::ComputeAvailableAnnotations(bool extend)
 
   vtkSMStringVectorProperty* allAnnotations =
     vtkSMStringVectorProperty::SafeDownCast(this->GetProperty("Annotations"));
-  vtkSmartPointer<vtkStringList> activeAnnotations = vtkSmartPointer<vtkStringList>::New();
-  vtkSmartPointer<vtkDoubleArray> activeIndexedColors = vtkSmartPointer<vtkDoubleArray>::New();
   vtkSMStringVectorProperty* activeAnnotatedValuesProperty =
     vtkSMStringVectorProperty::SafeDownCast(this->GetProperty("ActiveAnnotatedValues"));
-  vtkSmartPointer<vtkStringList> activeAnnotatedValues = vtkSmartPointer<vtkStringList>::New();
+  vtkNew<vtkStringList> activeAnnotatedValues;
 
   if (!allAnnotations || !activeAnnotatedValuesProperty)
   {
@@ -415,7 +404,7 @@ bool vtkSMTransferFunctionProxy::ComputeAvailableAnnotations(bool extend)
     vtkSMProxy* proxy = this->GetConsumerProxy(cc);
     // consumers could be subproxy of something; so, we locate the true-parent
     // proxy for a proxy.
-    proxy = proxy ? proxy->GetTrueParentProxy() : NULL;
+    proxy = proxy ? proxy->GetTrueParentProxy() : nullptr;
     vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     if (consumer &&
       // consumer is visible.
@@ -490,7 +479,7 @@ vtkTable* vtkSMTransferFunctionProxy::ComputeDataHistogramTable(int numberOfBins
     vtkSMProxy* proxy = this->GetConsumerProxy(cc);
     // consumers could be subproxy of something; so, we locate the true-parent
     // proxy for a proxy.
-    proxy = proxy ? proxy->GetTrueParentProxy() : NULL;
+    proxy = proxy ? proxy->GetTrueParentProxy() : nullptr;
     vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     if (consumer &&
       // consumer is visible.
@@ -891,8 +880,8 @@ Json::Value vtkSMTransferFunctionProxy::GetStateAsPreset()
 
   vtkNew<vtkSMNamedPropertyIterator> iter;
   iter->SetProxy(this);
-  iter->SetPropertyNames(toSave.GetPointer());
-  return vtkSMSettings::SerializeAsJSON(this, iter.GetPointer());
+  iter->SetPropertyNames(toSave);
+  return vtkSMSettings::SerializeAsJSON(this, iter);
 }
 
 //----------------------------------------------------------------------------
@@ -907,7 +896,7 @@ bool vtkSMTransferFunctionProxy::SaveColorMap(vtkPVXMLElement* xml)
 {
   if (!xml)
   {
-    vtkWarningMacro("'xml' cannot be NULL");
+    vtkWarningMacro("'xml' cannot be nullptr");
     return false;
   }
 
@@ -956,7 +945,7 @@ bool vtkSMTransferFunctionProxy::SaveColorMap(vtkPVXMLElement* xml)
         child->AddAttribute("g", points[cc].GetData()[2]);
         child->AddAttribute("b", points[cc].GetData()[3]);
         child->AddAttribute("o", 1.0);
-        xml->AddNestedElement(child.GetPointer());
+        xml->AddNestedElement(child);
       }
     }
     else
@@ -978,7 +967,7 @@ bool vtkSMTransferFunctionProxy::SaveColorMap(vtkPVXMLElement* xml)
         child->AddAttribute("g", points[cc].GetData()[2]);
         child->AddAttribute("b", points[cc].GetData()[3]);
         child->AddAttribute("o", "1");
-        xml->AddNestedElement(child.GetPointer());
+        xml->AddNestedElement(child);
       }
     }
   }
@@ -990,7 +979,7 @@ bool vtkSMTransferFunctionProxy::SaveColorMap(vtkPVXMLElement* xml)
   nan->AddAttribute("r", nanProperty.GetAsDouble(0));
   nan->AddAttribute("g", nanProperty.GetAsDouble(1));
   nan->AddAttribute("b", nanProperty.GetAsDouble(2));
-  xml->AddNestedElement(nan.GetPointer());
+  xml->AddNestedElement(nan);
 
   return true;
 }
@@ -1014,7 +1003,7 @@ vtkSMProxy* vtkSMTransferFunctionProxy::FindScalarBarRepresentation(vtkSMProxy* 
 {
   if (!view || !view->GetProperty("Representations"))
   {
-    return NULL;
+    return nullptr;
   }
 
   vtkSMPropertyHelper reprHelper(view, "Representations");
@@ -1031,7 +1020,7 @@ vtkSMProxy* vtkSMTransferFunctionProxy::FindScalarBarRepresentation(vtkSMProxy* 
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

@@ -215,13 +215,13 @@ public:
 
     this->Widget->setEnableHiDPI(true);
     this->Widget->setObjectName("1QVTKWidget0");
-    this->Widget->setRenderWindow(this->Window.Get());
-    this->ContextView->SetRenderWindow(this->Window.Get());
+    this->Widget->setRenderWindow(this->Window);
+    this->ContextView->SetRenderWindow(this->Window);
 
     this->ChartXY->SetAutoSize(true);
     this->ChartXY->SetShowLegend(false);
     this->ChartXY->SetZoomWithMouseWheel(false);
-    this->ContextView->GetScene()->AddItem(this->ChartXY.GetPointer());
+    this->ContextView->GetScene()->AddItem(this->ChartXY);
     this->ContextView->SetInteractor(this->Widget->interactor());
     this->ContextView->GetRenderWindow()->SetLineSmoothing(true);
 
@@ -255,8 +255,8 @@ public:
       this->ControlPointsItem->RemoveObserver(this->CurrentPointEditEventId);
       this->CurrentPointEditEventId = 0;
     }
-    this->TransferFunctionItem = NULL;
-    this->ControlPointsItem = NULL;
+    this->TransferFunctionItem = nullptr;
+    this->ControlPointsItem = nullptr;
   }
 };
 
@@ -279,7 +279,7 @@ pqTransferFunctionWidget::pqTransferFunctionWidget(QWidget* parentObject)
 pqTransferFunctionWidget::~pqTransferFunctionWidget()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -291,12 +291,12 @@ void pqTransferFunctionWidget::initialize(
   // TODO: If needed, we can support vtkLookupTable.
   vtkColorTransferFunction* ctf = vtkColorTransferFunction::SafeDownCast(stc);
 
-  if (ctf != NULL && pwf == NULL)
+  if (ctf != nullptr && pwf == nullptr)
   {
     vtkNew<vtkColorTransferFunctionItem> item;
     item->SetColorTransferFunction(ctf);
 
-    this->Internals->TransferFunctionItem = item.GetPointer();
+    this->Internals->TransferFunctionItem = item;
 
     if (stc_editable)
     {
@@ -306,19 +306,19 @@ void pqTransferFunctionWidget::initialize(
       cpItem->SetEndPointsXMovable(false);
       cpItem->SetEndPointsYMovable(false);
       cpItem->SetLabelFormat("%.3f");
-      this->Internals->ControlPointsItem = cpItem.GetPointer();
+      this->Internals->ControlPointsItem = cpItem;
 
       this->Internals->CurrentPointEditEventId =
         cpItem->AddObserver(vtkControlPointsItem::CurrentPointEditEvent, this,
           &pqTransferFunctionWidget::onCurrentPointEditEvent);
     }
   }
-  else if (ctf == NULL && pwf != NULL)
+  else if (ctf == nullptr && pwf != nullptr)
   {
     vtkNew<vtkPiecewiseFunctionItem> item;
     item->SetPiecewiseFunction(pwf);
 
-    this->Internals->TransferFunctionItem = item.GetPointer();
+    this->Internals->TransferFunctionItem = item;
 
     if (pwf_editable)
     {
@@ -327,17 +327,17 @@ void pqTransferFunctionWidget::initialize(
       cpItem->SetEndPointsXMovable(false);
       cpItem->SetEndPointsYMovable(true);
       cpItem->SetLabelFormat("%.3f: %.3f");
-      this->Internals->ControlPointsItem = cpItem.GetPointer();
+      this->Internals->ControlPointsItem = cpItem;
     }
   }
-  else if (ctf != NULL && pwf != NULL)
+  else if (ctf != nullptr && pwf != nullptr)
   {
     vtkNew<vtkCompositeTransferFunctionItem> item;
     item->SetOpacityFunction(pwf);
     item->SetColorTransferFunction(ctf);
     item->SetMaskAboveCurve(true);
 
-    this->Internals->TransferFunctionItem = item.GetPointer();
+    this->Internals->TransferFunctionItem = item;
     if (pwf_editable && stc_editable)
     {
       // NOTE: this hasn't been tested yet.
@@ -349,7 +349,7 @@ void pqTransferFunctionWidget::initialize(
       cpItem->SetEndPointsYMovable(true);
       cpItem->SetUseOpacityPointHandles(true);
       cpItem->SetLabelFormat("%.3f: %.3f");
-      this->Internals->ControlPointsItem = cpItem.GetPointer();
+      this->Internals->ControlPointsItem = cpItem;
     }
     else if (pwf_editable)
     {
@@ -361,7 +361,7 @@ void pqTransferFunctionWidget::initialize(
       cpItem->SetEndPointsYMovable(true);
       cpItem->SetUseOpacityPointHandles(true);
       cpItem->SetLabelFormat("%.3f: %.3f");
-      this->Internals->ControlPointsItem = cpItem.GetPointer();
+      this->Internals->ControlPointsItem = cpItem;
     }
   }
   else
@@ -424,7 +424,7 @@ void pqTransferFunctionWidget::onCurrentPointEditEvent()
 {
   vtkColorTransferControlPointsItem* cpitem =
     vtkColorTransferControlPointsItem::SafeDownCast(this->Internals->ControlPointsItem);
-  if (cpitem == NULL)
+  if (cpitem == nullptr)
   {
     return;
   }
@@ -436,7 +436,7 @@ void pqTransferFunctionWidget::onCurrentPointEditEvent()
   }
 
   vtkColorTransferFunction* ctf = cpitem->GetColorTransferFunction();
-  assert(ctf != NULL);
+  assert(ctf != nullptr);
 
   double xrgbms[6];
   ctf->GetNodeValue(currentIdx, xrgbms);

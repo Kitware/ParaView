@@ -372,8 +372,8 @@ public:
   //@}
 
 protected:
-  vtkSMTransferFunctionProxy();
-  ~vtkSMTransferFunctionProxy() override;
+  vtkSMTransferFunctionProxy() = default;
+  ~vtkSMTransferFunctionProxy() override = default;
 
   /**
    * Attempt to reset transfer function to site settings. If site settings are not
