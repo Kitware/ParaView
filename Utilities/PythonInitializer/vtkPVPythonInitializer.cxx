@@ -18,6 +18,7 @@
 
 #include "pvpythonmodules.h"
 #include "vtkUtilitiesPythonInitializerModule.h"
+#include "vtkpythonmodules.h"
 
 #ifdef PARAVIEW_FREEZE_PYTHON
 #include "vtkFrozenParaViewPython.h"
@@ -39,6 +40,7 @@ void VTKUTILITIESPYTHONINITIALIZER_EXPORT vtkPVInitializePythonModules()
 
   vtkFrozenParaViewPython();
 #endif
+  vtkpythonmodules_load();
   pvpythonmodules_load();
 }
 }

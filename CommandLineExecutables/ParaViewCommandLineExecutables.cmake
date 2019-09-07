@@ -29,7 +29,7 @@ function (paraview_add_executable name)
         PARAVIEW_ENABLE_PYTHON)
     target_link_libraries("${name}"
       PRIVATE
-        ParaView::pvpythonmodules
+        VTK::PythonInterpreter
         ParaView::PythonInitializer)
   endif ()
 

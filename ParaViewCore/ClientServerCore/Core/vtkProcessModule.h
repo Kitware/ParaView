@@ -258,11 +258,11 @@ public:
   /**
    * The full path to the current executable that is running (or empty if unknown).
    */
-  std::string GetProgramPath() const { return this->ProgramPath; }
+  const std::string& GetProgramPath() const { return this->ProgramPath; }
   /**
    * The directory containing the current executable (or empty if unknown).
    */
-  std::string GetSelfDir() const { return this->SelfDir; }
+  const std::string& GetSelfDir() const { return this->SelfDir; }
 
   //@{
   /**

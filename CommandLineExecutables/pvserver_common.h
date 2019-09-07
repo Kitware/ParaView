@@ -23,7 +23,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkProcessModule.h"
 
 #ifdef PARAVIEW_ENABLE_PYTHON
-#include "pvpythonmodules.h"
+extern "C" {
+void vtkPVInitializePythonModules();
+}
 #endif
 
 #include "ParaView_paraview_plugins.h"
@@ -48,7 +50,7 @@ static bool RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type
 #ifdef PARAVIEW_ENABLE_PYTHON
   // register callback to initialize modules statically. The callback is
   // empty when BUILD_SHARED_LIBS is ON.
-  pvpythonmodules_load();
+  vtkPVInitializePythonModules();
 #endif
 
   // load static plugins
