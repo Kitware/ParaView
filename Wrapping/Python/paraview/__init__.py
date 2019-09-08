@@ -16,6 +16,7 @@ ParaView modules to force backwards compatibility to an older version::
   # Now, import the modules of interest.
   from paraview.simple import *
 """
+from __future__ import absolute_import
 
 #==============================================================================
 #
@@ -163,3 +164,15 @@ Qt-based application. Modules within the 'paraview' package often use this to
 taylor their behaviour based on whether the Python environment is embedded
 within an application or not."""
 fromGUI = False
+
+
+#------------------------------------------------------------------------------
+# this little trick is for static builds of ParaView. In such builds, if
+# the user imports this Python package in a non-statically linked Python
+# interpreter i.e. not of the of the ParaView-python executables, then we import the
+# static components importer module.
+try:
+    import vtkmodules_vtkCommonCorePython
+except ImportError:
+    from .modules import _pvpythonmodules_importer
+#------------------------------------------------------------------------------
