@@ -1027,6 +1027,9 @@ if(PARAVIEW_ENABLE_PYTHON)
     TraceMultiViews.xml
     SplitViewTrace.xml
   )
+  set(SelectCellsTrace_DISABLE_CRS TRUE)
+  set(SelectPointsTrace_DISABLE_CRS TRUE)
+
   list(APPEND TESTS_WITHOUT_BASELINES
     PythonCalculator.xml
     TraceIntegrateVariables.xml
@@ -1055,6 +1058,9 @@ if(PARAVIEW_ENABLE_PYTHON)
       TestFindDataMax.xml
       VolumeNoMapScalars.xml # needs programmable filter + numpy
       )
+    set(SpreadSheetSelectionTrace_DISABLE_CS TRUE)
+    set(SpreadSheetSelectionTrace_DISABLE_CRS TRUE)
+
     list(APPEND TESTS_WITH_INLINE_COMPARES
       FindDataDialog.xml)
 
