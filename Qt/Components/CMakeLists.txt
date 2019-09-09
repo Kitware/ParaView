@@ -101,6 +101,7 @@ set(classes
   pqLockViewSizeCustomDialog
   pqMemoryInspectorPanel
   pqMultiBlockInspectorWidget
+  pqMultiQueryClauseWidget
   pqMultiViewWidget
   pqOrbitCreatorDialog
   pqOutputPortComboBox

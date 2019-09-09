@@ -10,32 +10,32 @@
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionQuery" />
   <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/selectionType" command="activated" arguments="Point(s)" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/criteria" command="activated" arguments="Point" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/condition" command="activated" arguments="nearest to" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/locationWithTolerance/location_x" command="set_string" arguments="1" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/locationWithTolerance/location_y" command="key" arguments="16777217" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/locationWithTolerance/location_y" command="set_string" arguments="1" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/locationWithTolerance/location_z" command="key" arguments="16777217" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/locationWithTolerance/location_z" command="set_string" arguments="4" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/locationWithTolerance/location_tolerance" command="key" arguments="16777217" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/locationWithTolerance/location_tolerance" command="set_string" arguments="0" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/locationWithTolerance/location_tolerance" command="set_string" arguments="0." />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/locationWithTolerance/location_tolerance" command="set_string" arguments="0.5" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/criteria" command="activated" arguments="Point" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/condition" command="activated" arguments="nearest to" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/locationWithTolerance/location_x" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/locationWithTolerance/location_y" command="key" arguments="16777217" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/locationWithTolerance/location_y" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/locationWithTolerance/location_z" command="key" arguments="16777217" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/locationWithTolerance/location_z" command="set_string" arguments="4" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/locationWithTolerance/location_tolerance" command="key" arguments="16777217" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/locationWithTolerance/location_tolerance" command="set_string" arguments="0" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/locationWithTolerance/location_tolerance" command="set_string" arguments="0." />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/locationWithTolerance/location_tolerance" command="set_string" arguments="0.5" />
   <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/runQuery" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/locationWithTolerance/label" command="mousePress" arguments="1,1,0,76,7" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/locationWithTolerance/label" command="mouseRelease" arguments="1,0,0,76,7" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/locationWithTolerance/label" command="mousePress" arguments="1,1,0,76,7" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/locationWithTolerance/label" command="mouseRelease" arguments="1,0,0,76,7" />
   <pqevent object="pqClientMainWindow/FindDataDialog/extractSelection" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/criteria" command="activated" arguments="Point" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/criteria" command="activated" arguments="Point" />
   <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/selectionType" command="activated" arguments="Cell(s)" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/criteria" command="activated" arguments="Cell" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/location/value_x" command="set_string" arguments="1" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/location/value_x" command="key" arguments="16777217" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/location/value_y" command="set_string" arguments="1" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/location/value_y" command="key" arguments="16777217" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/location/value_z" command="set_string" arguments="" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/location/value_z" command="key" arguments="16777217" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/location/value_z" command="set_string" arguments="3" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/criteria" command="activated" arguments="Cell" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/location/value_x" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/location/value_x" command="key" arguments="16777217" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/location/value_y" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/location/value_y" command="key" arguments="16777217" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/location/value_z" command="set_string" arguments="" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/location/value_z" command="key" arguments="16777217" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/location/value_z" command="set_string" arguments="3" />
   <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/runQuery" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FindDataDialog/currentSelectionFrame/showTypeComboBox" command="activated" arguments="Cell(s)" />
   <pqevent object="pqClientMainWindow/FindDataDialog/extractSelection" command="activate" arguments="" />

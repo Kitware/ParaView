@@ -50,15 +50,9 @@
     </layout>
    </item>
    <item>
-    <widget class="pqQueryClauseWidget" name="queryClauseWidget" native="true">
+    <widget class="pqMultiQueryClauseWidget" name="queryClauseWidget" native="true">
      <property name="enabled">
       <bool>false</bool>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
      </property>
     </widget>
    </item>
@@ -81,9 +75,9 @@
    <header>pqOutputPortComboBox.h</header>
   </customwidget>
   <customwidget>
-   <class>pqQueryClauseWidget</class>
+   <class>pqMultiQueryClauseWidget</class>
    <extends>QWidget</extends>
-   <header>pqQueryClauseWidget.h</header>
+   <header>pqMultiQueryClauseWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
