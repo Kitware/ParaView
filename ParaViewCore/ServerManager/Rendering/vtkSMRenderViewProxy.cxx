@@ -715,8 +715,8 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(int x, int y, unsigned
       vtkSelectionNode::BLOCKS, selectionSource, reprInput, inputHelper.GetOutputPort());
 
     // set block index
-    flatIndex = vtkSMPropertyHelper(blockSelection, "Blocks").GetAsInt();
-
+    vtkSMPropertyHelper helper(blockSelection, "Blocks");
+    flatIndex = (helper.GetNumberOfElements() > 0) ? helper.GetAsInt() : 0;
     blockSelection->Delete();
   }
 
