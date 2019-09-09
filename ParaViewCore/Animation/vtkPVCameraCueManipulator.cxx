@@ -47,7 +47,8 @@ void vtkPVCameraCueManipulator::Initialize(vtkPVAnimationCue* cue)
   this->Superclass::Initialize(cue);
   int nos = this->GetNumberOfKeyFrames();
   this->CameraInterpolator->Initialize();
-  this->CameraInterpolator->SetInterpolationTypeToSpline();
+  this->CameraInterpolator->SetInterpolationType(this->InterpolationMode);
+
   if (nos < 2)
   {
     vtkErrorMacro("Too few keyframes to animate.");

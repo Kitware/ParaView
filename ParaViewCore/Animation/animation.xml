@@ -122,6 +122,15 @@
           <Entry text="Follow-data" value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <IntVectorProperty command="SetInterpolationMode"
+                         default_values="1"
+                         name="Interpolation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Linear" value="0" />
+          <Entry text="Spline" value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
       <ProxyProperty command="AddKeyFrame"
                      name="KeyFrames"
                      remove_command="RemoveKeyFrame"

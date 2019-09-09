@@ -23,15 +23,15 @@
  * vtkSMCameraManipulatorProxy must be vtkSMCameraKeyFrameProxy.
  * Like all animation proxies, this is a client side only proxy with no
  * VTK objects created on the server side.
-*/
+ */
 
 #ifndef vtkPVCameraCueManipulator_h
 #define vtkPVCameraCueManipulator_h
 
-#include "vtkPVAnimationModule.h" //needed for exports
+#include "vtkCameraInterpolator.h" // needed for interpolation enum
+#include "vtkPVAnimationModule.h"  //needed for exports
 #include "vtkPVKeyFrameCueManipulator.h"
 
-class vtkCameraInterpolator;
 class vtkSMProxy;
 
 class VTKPVANIMATION_EXPORT vtkPVCameraCueManipulator : public vtkPVKeyFrameCueManipulator
@@ -65,6 +65,15 @@ public:
   vtkGetMacro(Mode, int);
   //@}
 
+  //@{
+  /**
+   * Set the interpolation mode for the CAMERA mode.
+   */
+  vtkSetClampMacro(InterpolationMode, int, vtkCameraInterpolator::INTERPOLATION_TYPE_LINEAR,
+    vtkCameraInterpolator::INTERPOLATION_TYPE_SPLINE);
+  vtkGetMacro(InterpolationMode, int);
+  //@}
+
   /**
    * Set the data source proxy. This is used when in the FOLLOW_DATA mode. The
    * camera will track the data referred to by the data source proxy.
@@ -76,6 +85,7 @@ protected:
   ~vtkPVCameraCueManipulator() override;
 
   int Mode;
+  int InterpolationMode;
 
   void Initialize(vtkPVAnimationCue*) override;
   void Finalize(vtkPVAnimationCue*) override;

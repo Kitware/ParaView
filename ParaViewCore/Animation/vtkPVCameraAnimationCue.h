@@ -50,10 +50,13 @@ public:
    */
   vtkCamera* GetCamera();
 
+  //@{
   /**
    * Forwarded to vtkPVCameraCueManipulator.
    */
   void SetMode(int mode);
+  void SetInterpolationMode(int mode);
+  //@}
 
   //@{
   /**
