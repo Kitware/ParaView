@@ -8335,9 +8335,10 @@
         <EnumerationDomain name="enum">
           <Entry text="2D Text Widget" value="0" />
           <Entry text="Flagpole Actor" value="1" />
+          <Entry text="Billboard 3D Text" value="2" />
         </EnumerationDomain>
         <Documentation>
-Select how you want the text to be represented in the view.
+          Select how you want the text to be represented in the view.
         </Documentation>
       </IntVectorProperty>
 
@@ -8417,9 +8418,9 @@ Select how you want the text to be represented in the view.
             <Property name="Position2Info" />
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
-                                      mode="visibility"
-                                      property="TextPropMode"
-                                      value="0" />
+                                       mode="visibility"
+                                       property="TextPropMode"
+                                       value="0" />
             </Hints>
           </PropertyGroup>
           <Property name="TextScaleMode" panel_visibility="never"/>
@@ -8449,9 +8450,46 @@ Select how you want the text to be represented in the view.
             <Property name="FlagSize" />
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
-                                      mode="visibility"
-                                      property="TextPropMode"
-                                      value="1" />
+                                       mode="visibility"
+                                       property="TextPropMode"
+                                       value="1" />
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy command="SetBillboardTextActor">
+        <Proxy name="BillboardTextActor3D"
+               proxygroup="annotations"
+               proxyname="BillboardTextActor3D"></Proxy>
+         <ShareProperties subproxy="TextWidgetRepresentation">
+           <Exception name="Orientation" />
+           <Exception name="WindowLocation" />
+           <Exception name="Position" />
+           <Exception name="Position2" />
+           <Exception name="PositionInfo" />
+           <Exception name="Position2Info" />
+           <Exception name="TextScaleMode" />
+           <Exception name="Resizable" />
+         </ShareProperties>
+        <ExposedProperties>
+          <!-- properties for Text -->
+          <PropertyGroup label="Billboard Position" panel_widget="InteractiveHandle">
+            <Property function="WorldPosition" name="BillboardPosition" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="TextPropMode"
+                                       value="2" />
+            </Hints>
+          </PropertyGroup>
+          <PropertyGroup label="Billboard Properties">
+            <Property name="DisplayOffset" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="TextPropMode"
+                                       value="2" />
             </Hints>
           </PropertyGroup>
         </ExposedProperties>
