@@ -202,8 +202,10 @@ vtkPVPluginLoaderCleaner* vtkPVPluginLoaderCleaner::LibCleaner = NULL;
 
 //=============================================================================
 using VectorOfCallbacks = std::vector<vtkPVPluginLoader::PluginLoaderCallback>;
+// variables used by the Initializer should be only primitive types
+// cannot be objects or their constructor will interfere with the Initializer
 static VectorOfCallbacks* RegisteredPluginLoaderCallbacks = nullptr;
-static vtkAtomicInt64 nifty_counter = 0;
+static int nifty_counter = 0;
 vtkPVPluginLoaderCleanerInitializer::vtkPVPluginLoaderCleanerInitializer()
 {
   if (nifty_counter++ == 0)

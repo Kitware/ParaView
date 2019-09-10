@@ -27,6 +27,8 @@
 #include <stdexcept>
 
 //============================================================================
+// variables used by the Initializer should be only primitive types
+// cannot be objects or their constructor will interfere with the Initializer
 static int nifty_counter = 0;
 vtkPVPythonAlgorithmPluginLoaderInitializer::vtkPVPythonAlgorithmPluginLoaderInitializer()
 {
