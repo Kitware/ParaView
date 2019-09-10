@@ -23,7 +23,7 @@
  * @par Thanks:
  * The addition of a transformation matrix was supported by CEA/DIF
  * Commissariat a l'Energie Atomique, Centre DAM Ile-De-France, Arpajon, France.
-*/
+ */
 
 #ifndef vtkGeometryRepresentation_h
 #define vtkGeometryRepresentation_h
@@ -200,6 +200,10 @@ public:
   // Forwarded to all textures
   virtual void SetRepeatTextures(bool);
   vtkGetMacro(RepeatTextures, bool);
+  virtual void SetInterpolateTextures(bool);
+  vtkGetMacro(InterpolateTextures, bool);
+  virtual void SetUseMipmapTextures(bool);
+  vtkGetMacro(UseMipmapTextures, bool);
 
   //***************************************************************************
   // Forwarded to Mapper and LODMapper.
@@ -417,6 +421,8 @@ protected:
   vtkProperty* Property;
 
   bool RepeatTextures;
+  bool InterpolateTextures;
+  bool UseMipmapTextures;
   double Ambient;
   double Specular;
   double Diffuse;
