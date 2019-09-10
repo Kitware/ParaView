@@ -253,6 +253,7 @@
   <Proxy group="filters" name="QuadricClustering" />
   <Proxy group="filters" name="RectilinearGridConnectivity" />
   <Proxy group="filters" name="RectilinearGridToPointSet" />
+  <Proxy group="filters" name="RedistributeDataSet" />
   <Proxy group="filters" name="ReflectionFilter" />
   <Proxy group="filters" name="RemoveGhostInformation" />
   <Proxy group="filters" name="ResampleToImage" />

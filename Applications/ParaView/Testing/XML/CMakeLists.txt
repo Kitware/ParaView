@@ -805,6 +805,7 @@ list(APPEND TESTS_WITH_BASELINES
   PropertyLink.xml
   QuadraticGhostCells.xml
   ReadXMLPolyDataFileSeries.xml
+  RedistributeDataSetFilter.xml
   RepresentationSelector.xml
   ResampleWithDataset.xml
   RescaleToTemporal.xml
