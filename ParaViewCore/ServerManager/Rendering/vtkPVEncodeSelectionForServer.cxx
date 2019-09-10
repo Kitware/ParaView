@@ -91,7 +91,8 @@ void vtkPVEncodeSelectionForServer::PrintSelf(ostream& os, vtkIndent indent)
 
 bool vtkPVEncodeSelectionForServer::ProcessSelection(vtkSelection* rawSelection,
   vtkSMRenderViewProxy* viewProxy, bool multipleSelectionsAllowed,
-  vtkCollection* selectedRepresentations, vtkCollection* selectionSources)
+  vtkCollection* selectedRepresentations, vtkCollection* selectionSources, int vtkNotUsed(modifier),
+  bool vtkNotUsed(selectBlocks))
 {
   if (!multipleSelectionsAllowed)
   {
