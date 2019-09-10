@@ -26,6 +26,9 @@
 
 #include "vtkPVServerManagerRenderingModule.h" // needed for export macro
 #include "vtkSMProxy.h"
+#include "vtkSmartPointer.h"
+#include "vtkTable.h"
+
 #include <vtk_jsoncpp_fwd.h> // for forward declarations
 
 class vtkPVArrayInformation;
@@ -268,6 +271,35 @@ public:
   }
   //@}
 
+  //@{
+  /**
+   * Helper method used to compute a histogram with provided number of bins based on the data
+   * from all the visible representations using the transfer function.
+   * If successful, returns the histogram as a vtkTable containing two columns of double,
+   * the first one being the indexes, the second one the number of values.
+   * If not, returns nullptr.
+   */
+  virtual vtkTable* ComputeDataHistogramTable(int numberOfBins);
+  static vtkTable* ComputeDataHistogramTable(vtkSMProxy* proxy, int numberOfBins)
+  {
+    vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self ? self->ComputeDataHistogramTable(numberOfBins) : nullptr;
+  }
+  //@}
+
+  //@{
+  /**
+   * Helper method used to recover the last histogram computed by ComputeDataHistogram
+   * Returns the histogram as a vtkTable if available, nullptr otherwise.
+   */
+  virtual vtkTable* GetHistogramTableCache() { return this->HistogramTableCache; }
+  static vtkTable* GetHistogramTableCache(vtkSMProxy* proxy)
+  {
+    vtkSMTransferFunctionProxy* self = vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self ? self->GetHistogramTableCache() : nullptr;
+  }
+  //@}
+
   // Helper method to compute the active annotated values in visible
   // representations that use the transfer function.
   virtual bool ComputeAvailableAnnotations(bool extend = false);
@@ -340,14 +372,25 @@ public:
   //@}
 
 protected:
-  vtkSMTransferFunctionProxy();
-  ~vtkSMTransferFunctionProxy() override;
+  vtkSMTransferFunctionProxy() = default;
+  ~vtkSMTransferFunctionProxy() override = default;
 
   /**
    * Attempt to reset transfer function to site settings. If site settings are not
    * available, then the application XML defaults are used.
    */
   void RestoreFromSiteSettingsOrXML(const char* arrayName);
+
+  /*
+   * Stores the last range used to rescale to transfer function
+   * Used by ComputeDataHistogram
+   */
+  double LastRange[2] = { 0, 1 };
+
+  /*
+   * Cache for the histogram table
+   */
+  vtkSmartPointer<vtkTable> HistogramTableCache;
 
 private:
   vtkSMTransferFunctionProxy(const vtkSMTransferFunctionProxy&) = delete;

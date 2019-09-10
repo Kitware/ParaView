@@ -14,7 +14,9 @@
 =========================================================================*/
 #include "vtkSMTransferFunctionProxy.h"
 
+#include "vtkAlgorithm.h"
 #include "vtkDoubleArray.h"
+#include "vtkIntArray.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
@@ -35,11 +37,13 @@
 #include "vtkSMTransferFunctionPresets.h"
 #include "vtkScalarsToColors.h"
 #include "vtkStringList.h"
+#include "vtkTable.h"
 #include "vtkTuple.h"
 #include "vtk_jsoncpp.h"
 
 #include <algorithm>
 #include <cmath>
+#include <set>
 #include <sstream>
 #include <vector>
 
@@ -67,7 +71,7 @@ inline vtkSMProperty* GetControlPointsProperty(vtkSMProxy* self)
   if (!controlPointsProperty)
   {
     vtkGenericWarningMacro("'RGBPoints' or 'Points' property is required.");
-    return NULL;
+    return nullptr;
   }
 
   vtkSMPropertyHelper cntrlPoints(controlPointsProperty);
@@ -89,7 +93,7 @@ inline vtkSMProperty* GetControlPointsProperty(vtkSMProxy* self)
 // originalRange is filled with the original range of the cntrlPoints before
 // rescaling.
 bool vtkNormalize(std::vector<vtkTuple<double, 4> >& cntrlPoints, bool log_space,
-  vtkTuple<double, 2>* originalRange = NULL)
+  vtkTuple<double, 2>* originalRange = nullptr)
 {
   if (cntrlPoints.size() == 0)
   {
@@ -202,15 +206,6 @@ bool vtkRescaleNormalizedControlPoints(
 }
 
 vtkStandardNewMacro(vtkSMTransferFunctionProxy);
-//----------------------------------------------------------------------------
-vtkSMTransferFunctionProxy::vtkSMTransferFunctionProxy()
-{
-}
-
-//----------------------------------------------------------------------------
-vtkSMTransferFunctionProxy::~vtkSMTransferFunctionProxy()
-{
-}
 
 //----------------------------------------------------------------------------
 bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
@@ -315,6 +310,8 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
     return true;
   }
 
+  this->LastRange[0] = rangeMin;
+  this->LastRange[1] = rangeMax;
   vtkRescaleNormalizedControlPoints(points, rangeMin, rangeMax, log_space);
   SM_SCOPED_TRACE(CallMethod)
     .arg(this)
@@ -343,7 +340,7 @@ bool vtkSMTransferFunctionProxy::ComputeDataRange(double range[2])
     vtkSMProxy* proxy = this->GetConsumerProxy(cc);
     // consumers could be subproxy of something; so, we locate the true-parent
     // proxy for a proxy.
-    proxy = proxy ? proxy->GetTrueParentProxy() : NULL;
+    proxy = proxy ? proxy->GetTrueParentProxy() : nullptr;
     vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     if (consumer &&
       // consumer is visible.
@@ -387,11 +384,9 @@ bool vtkSMTransferFunctionProxy::ComputeAvailableAnnotations(bool extend)
 
   vtkSMStringVectorProperty* allAnnotations =
     vtkSMStringVectorProperty::SafeDownCast(this->GetProperty("Annotations"));
-  vtkSmartPointer<vtkStringList> activeAnnotations = vtkSmartPointer<vtkStringList>::New();
-  vtkSmartPointer<vtkDoubleArray> activeIndexedColors = vtkSmartPointer<vtkDoubleArray>::New();
   vtkSMStringVectorProperty* activeAnnotatedValuesProperty =
     vtkSMStringVectorProperty::SafeDownCast(this->GetProperty("ActiveAnnotatedValues"));
-  vtkSmartPointer<vtkStringList> activeAnnotatedValues = vtkSmartPointer<vtkStringList>::New();
+  vtkNew<vtkStringList> activeAnnotatedValues;
 
   if (!allAnnotations || !activeAnnotatedValuesProperty)
   {
@@ -409,7 +404,7 @@ bool vtkSMTransferFunctionProxy::ComputeAvailableAnnotations(bool extend)
     vtkSMProxy* proxy = this->GetConsumerProxy(cc);
     // consumers could be subproxy of something; so, we locate the true-parent
     // proxy for a proxy.
-    proxy = proxy ? proxy->GetTrueParentProxy() : NULL;
+    proxy = proxy ? proxy->GetTrueParentProxy() : nullptr;
     vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     if (consumer &&
       // consumer is visible.
@@ -449,6 +444,184 @@ bool vtkSMTransferFunctionProxy::ComputeAvailableAnnotations(bool extend)
   this->UpdateVTKObjects();
 
   return true;
+}
+
+//----------------------------------------------------------------------------
+vtkTable* vtkSMTransferFunctionProxy::ComputeDataHistogramTable(int numberOfBins)
+{
+  if (!this->HistogramTableCache)
+  {
+    this->HistogramTableCache = vtkSmartPointer<vtkTable>::New();
+  }
+  this->HistogramTableCache->Initialize();
+
+  // Recover component property
+  int component = -1;
+  if (vtkSMPropertyHelper(this, "VectorMode").GetAsInt() == vtkScalarsToColors::COMPONENT)
+  {
+    component = vtkSMPropertyHelper(this, "VectorComponent").GetAsInt();
+  }
+
+  // Create a GroupDataSet filter
+  vtkSMSessionProxyManager* pxm =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+  vtkSmartPointer<vtkSMSourceProxy> group;
+  group.TakeReference(vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters", "GroupDataSets")));
+
+  // Group all visible consumers using the transfer function proxy
+  vtkPVArrayInformation* arrayInfo = nullptr;
+  std::string arrayName;
+  int arrayAsso = -1;
+  bool hasData = false;
+  std::set<vtkSMProxy*> usedProxy;
+  for (unsigned int cc = 0, max = this->GetNumberOfConsumers(); cc < max; ++cc)
+  {
+    vtkSMProxy* proxy = this->GetConsumerProxy(cc);
+    // consumers could be subproxy of something; so, we locate the true-parent
+    // proxy for a proxy.
+    proxy = proxy ? proxy->GetTrueParentProxy() : nullptr;
+    vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    if (consumer &&
+      // consumer is visible.
+      vtkSMPropertyHelper(consumer, "Visibility", true).GetAsInt() == 1 &&
+      // consumer is using scalar coloring.
+      consumer->GetUsingScalarColoring() &&
+      // do not count proxy multiples times
+      usedProxy.find(consumer) == usedProxy.end())
+    {
+      // Recover consumer color array
+      vtkPVArrayInformation* tmpArrayInfo = consumer->GetArrayInformationForColorArray(false);
+      if (!tmpArrayInfo)
+      {
+        continue;
+      }
+
+      // We suppose that the first consumer array info is valid
+      if (!arrayInfo)
+      {
+        arrayInfo = tmpArrayInfo;
+        if (arrayInfo->GetNumberOfComponents() == 1)
+        {
+          // Set the right component value for single component array
+          component = 0;
+        }
+        if (component == -1)
+        {
+          // Set the right component value for magnitude component
+          component = arrayInfo->GetNumberOfComponents();
+        }
+        if (component > arrayInfo->GetNumberOfComponents())
+        {
+          vtkErrorMacro("Invalid component requested by the transfer function");
+          this->HistogramTableCache = nullptr;
+          return this->HistogramTableCache;
+        }
+
+        vtkSMPropertyHelper colorArrayHelper(consumer, "ColorArrayName");
+        arrayAsso = colorArrayHelper.GetInputArrayAssociation();
+        arrayName = colorArrayHelper.GetInputArrayNameToProcess();
+      }
+      else
+      {
+        // Check other consumers array infos against the first one
+        if (arrayInfo->GetNumberOfComponents() != tmpArrayInfo->GetNumberOfComponents())
+        {
+          vtkWarningMacro("A transfer function consumer is not providing an array with the right "
+                          "number of components. Ignored.");
+          continue;
+        }
+
+        vtkSMPropertyHelper colorArrayHelper(consumer, "ColorArrayName");
+        if (arrayAsso != colorArrayHelper.GetInputArrayAssociation())
+        {
+          vtkWarningMacro("A transfer function consumer is not providing an array with the right "
+                          "array association. Ignored");
+          continue;
+        }
+        if (arrayName != std::string(colorArrayHelper.GetInputArrayNameToProcess()))
+        {
+          vtkWarningMacro(
+            "A transfer function consumer is not providing an array with the right name. Ignored.");
+          continue;
+        }
+      }
+
+      // Add consumer to group filter
+      vtkSMSourceProxy* input =
+        vtkSMSourceProxy::SafeDownCast(vtkSMPropertyHelper(consumer, "Input").GetAsProxy());
+      vtkSMPropertyHelper(group, "Input").Add(input);
+      group->UpdateVTKObjects();
+      hasData = true;
+      usedProxy.insert(consumer);
+    }
+  }
+
+  // No valid consumer
+  if (!hasData)
+  {
+    this->HistogramTableCache = nullptr;
+    return this->HistogramTableCache;
+  }
+
+  // Compute the histogram
+  vtkSmartPointer<vtkSMSourceProxy> histo;
+  histo.TakeReference(vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters", "ExtractHistogram")));
+  vtkSMPropertyHelper(histo, "Input").Set(group);
+  vtkSMPropertyHelper(histo, "SelectInputArray")
+    .SetInputArrayToProcess(arrayAsso, arrayName.c_str());
+  vtkSMPropertyHelper(histo, "Component").Set(component);
+  vtkSMPropertyHelper(histo, "BinCount").Set(numberOfBins);
+  vtkSMPropertyHelper(histo, "UseCustomBinRanges").Set(true);
+  vtkSMPropertyHelper(histo, "CustomBinRanges").Set(this->LastRange, 2);
+  histo->UpdateVTKObjects();
+
+  // Reduce it
+  vtkSmartPointer<vtkSMSourceProxy> reducer;
+  reducer.TakeReference(
+    vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters", "ReductionFilter")));
+  vtkSMPropertyHelper(reducer, "Input").Set(histo);
+  vtkSMPropertyHelper(reducer, "PostGatherHelperName").Set("vtkPVMergeTables");
+  reducer->UpdateVTKObjects();
+
+  // Move it from server to client and save it to the case
+  vtkSmartPointer<vtkSMSourceProxy> mover;
+  mover.TakeReference(
+    vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("filters", "ClientServerMoveData")));
+  vtkSMPropertyHelper(mover, "Input").Set(reducer);
+  vtkSMPropertyHelper(mover, "OutputDataType").Set(VTK_TABLE);
+  mover->UpdateVTKObjects();
+  mover->UpdatePipeline();
+  vtkTable* histoTable = vtkTable::SafeDownCast(
+    vtkAlgorithm::SafeDownCast(mover->GetClientSideObject())->GetOutputDataObject(0));
+  this->HistogramTableCache->ShallowCopy(histoTable);
+
+  // Sanity check of the histogram table
+  if (this->HistogramTableCache->GetNumberOfColumns() < 2)
+  {
+    vtkErrorMacro("Histogram is not producing enough data");
+    this->HistogramTableCache = nullptr;
+    return this->HistogramTableCache;
+  }
+  vtkIntArray* valueArray = vtkIntArray::SafeDownCast(this->HistogramTableCache->GetColumn(1));
+  if (!valueArray)
+  {
+    vtkErrorMacro("Histogram is not producing integer data as expected");
+    this->HistogramTableCache = nullptr;
+    return this->HistogramTableCache;
+  }
+
+  // Copy histogram values, currently stored in an int array,
+  // into a double array in order to be able to use shift scale in the related plots
+  vtkIdType nValue = valueArray->GetNumberOfTuples();
+  int* valuePointer = static_cast<int*>(valueArray->GetPointer(0));
+  vtkNew<vtkDoubleArray> doubleValueArray;
+  doubleValueArray->SetName(valueArray->GetName());
+  doubleValueArray->SetNumberOfTuples(valueArray->GetNumberOfTuples());
+  std::copy(
+    valuePointer, valuePointer + nValue, static_cast<double*>(doubleValueArray->GetVoidPointer(0)));
+  this->HistogramTableCache->RemoveColumn(1);
+  this->HistogramTableCache->AddColumn(doubleValueArray);
+  return this->HistogramTableCache;
 }
 
 //----------------------------------------------------------------------------
@@ -508,6 +681,8 @@ bool vtkSMTransferFunctionProxy::InvertTransferFunction()
   // sort again to ensure that the property value is set as min->max.
   std::sort(points.begin(), points.end(), StrictWeakOrdering());
   vtkRescaleNormalizedControlPoints(points, range[0], range[1], log_space);
+  this->LastRange[0] = range[0];
+  this->LastRange[1] = range[1];
 
   cntrlPoints.Set(points[0].GetData(), num_elements);
   this->UpdateVTKObjects();
@@ -548,6 +723,8 @@ bool vtkSMTransferFunctionProxy::MapControlPointsToLogSpace(bool inverse /*=fals
     return false;
   }
   vtkRescaleNormalizedControlPoints(points, range[0], range[1], !inverse);
+  this->LastRange[0] = range[0];
+  this->LastRange[1] = range[1];
   cntrlPoints.Set(points[0].GetData(), num_elements);
   this->UpdateVTKObjects();
   return true;
@@ -631,6 +808,8 @@ bool vtkSMTransferFunctionProxy::ApplyPreset(const Json::Value& arg, bool rescal
 
     bool proxyIsLog = (vtkSMPropertyHelper(this, "UseLogScale", true).GetAsInt() == 1);
     vtkRescaleNormalizedControlPoints(cntrlPoints, range[0], range[1], proxyIsLog);
+    this->LastRange[0] = range[0];
+    this->LastRange[1] = range[1];
 
     pointsValue.resize(static_cast<Json::ArrayIndex>(cntrlPoints.size() * 4));
     for (size_t cc = 0; cc < cntrlPoints.size(); cc++)
@@ -701,8 +880,8 @@ Json::Value vtkSMTransferFunctionProxy::GetStateAsPreset()
 
   vtkNew<vtkSMNamedPropertyIterator> iter;
   iter->SetProxy(this);
-  iter->SetPropertyNames(toSave.GetPointer());
-  return vtkSMSettings::SerializeAsJSON(this, iter.GetPointer());
+  iter->SetPropertyNames(toSave);
+  return vtkSMSettings::SerializeAsJSON(this, iter);
 }
 
 //----------------------------------------------------------------------------
@@ -717,7 +896,7 @@ bool vtkSMTransferFunctionProxy::SaveColorMap(vtkPVXMLElement* xml)
 {
   if (!xml)
   {
-    vtkWarningMacro("'xml' cannot be NULL");
+    vtkWarningMacro("'xml' cannot be nullptr");
     return false;
   }
 
@@ -766,7 +945,7 @@ bool vtkSMTransferFunctionProxy::SaveColorMap(vtkPVXMLElement* xml)
         child->AddAttribute("g", points[cc].GetData()[2]);
         child->AddAttribute("b", points[cc].GetData()[3]);
         child->AddAttribute("o", 1.0);
-        xml->AddNestedElement(child.GetPointer());
+        xml->AddNestedElement(child);
       }
     }
     else
@@ -788,7 +967,7 @@ bool vtkSMTransferFunctionProxy::SaveColorMap(vtkPVXMLElement* xml)
         child->AddAttribute("g", points[cc].GetData()[2]);
         child->AddAttribute("b", points[cc].GetData()[3]);
         child->AddAttribute("o", "1");
-        xml->AddNestedElement(child.GetPointer());
+        xml->AddNestedElement(child);
       }
     }
   }
@@ -800,7 +979,7 @@ bool vtkSMTransferFunctionProxy::SaveColorMap(vtkPVXMLElement* xml)
   nan->AddAttribute("r", nanProperty.GetAsDouble(0));
   nan->AddAttribute("g", nanProperty.GetAsDouble(1));
   nan->AddAttribute("b", nanProperty.GetAsDouble(2));
-  xml->AddNestedElement(nan.GetPointer());
+  xml->AddNestedElement(nan);
 
   return true;
 }
@@ -824,7 +1003,7 @@ vtkSMProxy* vtkSMTransferFunctionProxy::FindScalarBarRepresentation(vtkSMProxy* 
 {
   if (!view || !view->GetProperty("Representations"))
   {
-    return NULL;
+    return nullptr;
   }
 
   vtkSMPropertyHelper reprHelper(view, "Representations");
@@ -841,7 +1020,7 @@ vtkSMProxy* vtkSMTransferFunctionProxy::FindScalarBarRepresentation(vtkSMProxy* 
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -1173,4 +1352,14 @@ bool vtkSMTransferFunctionProxy::ConvertLegacyColorMapsToJSON(
 void vtkSMTransferFunctionProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "LastRange: " << this->LastRange[0] << " " << this->LastRange[1] << endl;
+  if (this->HistogramTableCache)
+  {
+    os << indent << "HistogramTableCache: " << endl;
+    this->HistogramTableCache->PrintSelf(os, indent.GetNextIndent());
+  }
+  else
+  {
+    os << indent << "HistogramTableCache: " << this->HistogramTableCache << endl;
+  }
 }

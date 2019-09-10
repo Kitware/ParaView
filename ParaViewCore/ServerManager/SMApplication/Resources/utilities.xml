@@ -120,6 +120,26 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="ShowDataHistogram"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation> Proxy only property used by the ColorOpacityWidget to know if the data histogram should be shown
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="AutomaticDataHistogramComputation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation> Proxy only property used by the ColorOpacityWidget to know if the data histogram should be automatically computed
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty default_values="10"
+                         name="DataHistogramNumberOfBins"
+                         number_of_elements="1">
+        <Documentation> Proxy only property used by the ColorOpacityWidget to know the number of bin to use to compute the data histogram
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetColorSpace"
                          default_values="3"
                          name="ColorSpace"
@@ -337,6 +357,9 @@
         <Property name="RGBPoints" function="XRGBPoints" />
         <Property name="ScalarOpacityFunction" function="ScalarOpacityFunction" />
         <Property name="UseLogScale" function="UseLogScale" />
+        <Property name="ShowDataHistogram" function="ShowDataHistogram" />
+        <Property name="AutomaticDataHistogramComputation" function="AutomaticDataHistogramComputation" />
+        <Property name="DataHistogramNumberOfBins" function="DataHistogramNumberOfBins" />
       </PropertyGroup>
 
       <PropertyGroup label="Color Mapping Parameters">
