@@ -46,7 +46,7 @@ from __future__ import absolute_import, division, print_function
 
 import paraview
 from paraview import servermanager as sm
-from paraview import simple as ps
+import paraview.simple
 
 import sys
 
@@ -441,6 +441,6 @@ def ClearSelection(Source=None):
         or the active source if no source is provided.
     """
     if Source == None:
-        Source = ps.GetActiveSource()
+        Source = paraview.simple.GetActiveSource()
 
     Source.SMProxy.SetSelectionInput(0, None, 0)
