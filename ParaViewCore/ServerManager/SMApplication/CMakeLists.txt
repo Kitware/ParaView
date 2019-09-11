@@ -97,10 +97,10 @@ endif ()
 if (TARGET VTK::IOADIOS2)
   list(APPEND xml_files
     Resources/proxies_adios2_core.xml)
-  #if(PARAVIEW_USE_MPI)
-  #  list(APPEND xml_files
-  #    Resources/proxies_adios2_vtx.xml)
-  #endif()
+  if(PARAVIEW_USE_MPI)
+    list(APPEND xml_files
+      Resources/proxies_adios2_vtx.xml)
+  endif()
 endif ()
 
 if (TARGET VTK::IOMotionFX)
