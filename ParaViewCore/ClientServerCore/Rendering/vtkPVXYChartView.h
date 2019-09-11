@@ -420,7 +420,7 @@ public:
 
   //@{
   /**
-   * Set whether the chart uses custom labels or if the labels/ticks are placed
+   * Set whether the chart uses custom labels or if the labels are placed
    * automatically.
    */
   void SetAxisUseCustomLabels(int index, bool useCustomLabels);
@@ -437,10 +437,10 @@ public:
 
   //@{
   /**
-   * Set the axis label positions for the supplied axis at the given index.
+   * Set the axis labels and positions for the supplied axis at the given index.
    */
-  void SetAxisLabels(int axis, int index, double value);
-  GENERATE_AXIS_FUNCTIONS2(AxisLabels, int, double);
+  void SetAxisLabels(int axis, int index, const std::string& value, const std::string& label);
+  GENERATE_AXIS_FUNCTIONS3(AxisLabels, int, const std::string&, const std::string&);
   //@}
 
   void SetTooltipNotation(int notation);

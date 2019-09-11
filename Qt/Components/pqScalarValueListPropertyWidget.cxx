@@ -137,29 +137,28 @@ public:
   bool setData(const QModelIndex& idx, const QVariant& aValue, int role = Qt::EditRole) override
   {
     Q_UNUSED(role);
-    if (!aValue.toString().isEmpty())
+    int offset = this->computeOffset(idx);
+    if (offset >= this->Values.size())
     {
-      int offset = this->computeOffset(idx);
-      if (offset >= this->Values.size())
-      {
-        // we don't need to fire this->beginInsertRows
-        // since this typically happens for setting a non-existent
-        // column value.
-        this->Values.resize(offset + 1);
-      }
-      if (this->Values[offset] != aValue)
-      {
-        if (this->AllowIntegralValuesOnly)
-        {
-          this->Values[offset] = aValue.toInt();
-        }
-        else
-        {
-          this->Values[offset] = aValue;
-        }
-        emit this->dataChanged(idx, idx);
-      }
+      // we don't need to fire this->beginInsertRows
+      // since this typically happens for setting a non-existent
+      // column value.
+      this->Values.resize(offset + 1);
     }
+    if (this->Values[offset] != aValue)
+    {
+      if (this->AllowIntegralValuesOnly)
+      {
+        this->Values[offset] = aValue.toInt();
+      }
+      else
+      {
+        this->Values[offset] = aValue;
+      }
+      emit this->dataChanged(idx, idx);
+      return true;
+    }
+
     return false;
   }
 

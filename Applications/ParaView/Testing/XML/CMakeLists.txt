@@ -1314,7 +1314,7 @@ SET (CheckableHeader_THRESHOLD 150)
 set(XYChart_DISABLE_CRS TRUE)
 
 SET (XYHistogram_THRESHOLD 150)
-set (ChartAxisRangeAndLabels_THRESHOLD 60)
+set (ChartAxisRangeAndLabels_THRESHOLD 5)
 
 # The color and opacity are often different on different machines.
 SET (ColorEditorControls_THRESHOLD 60)

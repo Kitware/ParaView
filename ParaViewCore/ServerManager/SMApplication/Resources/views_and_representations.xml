@@ -511,24 +511,28 @@
           the corresponding AxisUseCustomLabels flag is set to 1.
         </Documentation>
       </IntVectorProperty>
-      <DoubleVectorProperty command="SetLeftAxisLabels"
-                            name="LeftAxisLabels"
+
+      <StringVectorProperty name="LeftAxisLabels"
+                            command="SetLeftAxisLabels"
                             panel_visibility="advanced"
                             animateable="1"
                             number_of_elements="0"
-                            number_of_elements_per_command="1"
+                            number_of_elements_per_command="2"
                             repeat_command="1"
                             use_index="1"
                             set_number_command="SetLeftAxisLabelsNumber">
-        <!-- used to trigger the display pqScalarValueListPropertyWidget -->
-        <ArrayRangeDomain name="scalar_range"/>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
             <Property name="LeftAxisUseCustomLabels"
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
-      </DoubleVectorProperty>
+        <Documentation>
+          Specify list of ticks and the associated labels to display. If the label is empty,
+          the value of the tick will be used for display.
+        </Documentation>
+      </StringVectorProperty>
+
       <StringVectorProperty command="SetLeftAxisLabelFontFamily"
                             default_values="Arial"
                             name="LeftAxisLabelFontFamily"
@@ -794,12 +798,12 @@
           the corresponding AxisUseCustomLabels flag is set to 1.
         </Documentation>
       </IntVectorProperty>
-      <DoubleVectorProperty command="SetBottomAxisLabels"
+      <StringVectorProperty command="SetBottomAxisLabels"
                             name="BottomAxisLabels"
                             panel_visibility="advanced"
                             animateable="1"
                             number_of_elements="0"
-                            number_of_elements_per_command="1"
+                            number_of_elements_per_command="2"
                             repeat_command="1"
                             use_index="1"
                             set_number_command="SetBottomAxisLabelsNumber">
@@ -811,7 +815,11 @@
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
-      </DoubleVectorProperty>
+        <Documentation>
+          Specify list of ticks and the associated labels to display. If the label is empty,
+          the value of the tick will be used for display.
+        </Documentation>
+      </StringVectorProperty>
       <StringVectorProperty command="SetBottomAxisLabelFontFamily"
                             default_values="Arial"
                             name="BottomAxisLabelFontFamily"
@@ -1092,12 +1100,12 @@
           the corresponding AxisUseCustomLabels flag is set to 1.
         </Documentation>
       </IntVectorProperty>
-      <DoubleVectorProperty command="SetRightAxisLabels"
+      <StringVectorProperty command="SetRightAxisLabels"
                             name="RightAxisLabels"
                             panel_visibility="advanced"
                             animateable="1"
                             number_of_elements="0"
-                            number_of_elements_per_command="1"
+                            number_of_elements_per_command="2"
                             repeat_command="1"
                             use_index="1"
                             set_number_command="SetRightAxisLabelsNumber">
@@ -1109,7 +1117,11 @@
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
-      </DoubleVectorProperty>
+        <Documentation>
+          Specify list of ticks and the associated labels to display. If the label is empty,
+          the value of the tick will be used for display.
+        </Documentation>
+      </StringVectorProperty>
       <StringVectorProperty command="SetRightAxisLabelFontFamily"
                             default_values="Arial"
                             name="RightAxisLabelFontFamily"
@@ -1380,12 +1392,12 @@
           the corresponding AxisUseCustomLabels flag is set to 1.
         </Documentation>
       </IntVectorProperty>
-      <DoubleVectorProperty command="SetTopAxisLabels"
+      <StringVectorProperty command="SetTopAxisLabels"
                             name="TopAxisLabels"
                             panel_visibility="advanced"
                             animateable="1"
                             number_of_elements="0"
-                            number_of_elements_per_command="1"
+                            number_of_elements_per_command="2"
                             repeat_command="1"
                             use_index="1"
                             set_number_command="SetTopAxisLabelsNumber">
@@ -1397,7 +1409,11 @@
                       function="boolean" />
           </PropertyWidgetDecorator>
         </Hints>
-      </DoubleVectorProperty>
+        <Documentation>
+          Specify list of ticks and the associated labels to display. If the label is empty,
+          the value of the tick will be used for display.
+        </Documentation>
+      </StringVectorProperty>
       <StringVectorProperty command="SetTopAxisLabelFontFamily"
                             default_values="Arial"
                             name="TopAxisLabelFontFamily"
