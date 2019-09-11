@@ -190,6 +190,8 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
 
   this->RequestGhostCellsIfNeeded = true;
   this->RepeatTextures = true;
+  this->InterpolateTextures = false;
+  this->UseMipmapTextures = false;
   this->Ambient = 0.0;
   this->Diffuse = 1.0;
   this->Specular = 0.0;
@@ -871,8 +873,9 @@ void vtkGeometryRepresentation::SetBaseColorTexture(vtkTexture* tex)
   if (tex)
   {
     tex->UseSRGBColorSpaceOn();
-    tex->InterpolateOn();
+    tex->SetInterpolate(this->InterpolateTextures);
     tex->SetRepeat(this->RepeatTextures);
+    tex->SetMipmap(this->UseMipmapTextures);
   }
   this->Property->SetBaseColorTexture(tex);
 }
@@ -883,8 +886,9 @@ void vtkGeometryRepresentation::SetMaterialTexture(vtkTexture* tex)
   if (tex)
   {
     tex->UseSRGBColorSpaceOff();
-    tex->InterpolateOn();
+    tex->SetInterpolate(this->InterpolateTextures);
     tex->SetRepeat(this->RepeatTextures);
+    tex->SetMipmap(this->UseMipmapTextures);
   }
   this->Property->SetORMTexture(tex);
 }
@@ -895,8 +899,9 @@ void vtkGeometryRepresentation::SetNormalTexture(vtkTexture* tex)
   if (tex)
   {
     tex->UseSRGBColorSpaceOff();
-    tex->InterpolateOn();
+    tex->SetInterpolate(this->InterpolateTextures);
     tex->SetRepeat(this->RepeatTextures);
+    tex->SetMipmap(this->UseMipmapTextures);
   }
   this->Property->SetNormalTexture(tex);
 }
@@ -907,8 +912,9 @@ void vtkGeometryRepresentation::SetEmissiveTexture(vtkTexture* tex)
   if (tex)
   {
     tex->UseSRGBColorSpaceOn();
-    tex->InterpolateOn();
+    tex->SetInterpolate(this->InterpolateTextures);
     tex->SetRepeat(this->RepeatTextures);
+    tex->SetMipmap(this->UseMipmapTextures);
   }
   this->Property->SetEmissiveTexture(tex);
 }
@@ -1031,6 +1037,8 @@ void vtkGeometryRepresentation::SetTexture(vtkTexture* val)
   if (val)
   {
     val->SetRepeat(this->RepeatTextures);
+    val->SetInterpolate(this->InterpolateTextures);
+    val->SetMipmap(this->UseMipmapTextures);
   }
 }
 
@@ -1047,6 +1055,34 @@ void vtkGeometryRepresentation::SetRepeatTextures(bool rep)
     t.second->SetRepeat(rep);
   }
   this->RepeatTextures = rep;
+}
+
+void vtkGeometryRepresentation::SetInterpolateTextures(bool rep)
+{
+  if (this->Actor->GetTexture())
+  {
+    this->Actor->GetTexture()->SetInterpolate(rep);
+  }
+  std::map<std::string, vtkTexture*>& tex = this->Actor->GetProperty()->GetAllTextures();
+  for (auto t : tex)
+  {
+    t.second->SetInterpolate(rep);
+  }
+  this->InterpolateTextures = rep;
+}
+
+void vtkGeometryRepresentation::SetUseMipmapTextures(bool rep)
+{
+  if (this->Actor->GetTexture())
+  {
+    this->Actor->GetTexture()->SetMipmap(rep);
+  }
+  std::map<std::string, vtkTexture*>& tex = this->Actor->GetProperty()->GetAllTextures();
+  for (auto t : tex)
+  {
+    t.second->SetMipmap(rep);
+  }
+  this->UseMipmapTextures = rep;
 }
 
 //----------------------------------------------------------------------------

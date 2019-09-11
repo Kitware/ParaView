@@ -3845,6 +3845,8 @@
             <Property name="Metallic" panel_visibility="advanced"/>
             <Property name="Texture" panel_visibility="advanced"/>
             <Property name="RepeatTextures" panel_visibility="advanced"/>
+            <Property name="InterpolateTextures" panel_visibility="advanced"/>
+            <Property name="UseMipmapTextures" panel_visibility="advanced"/>
             <Property name="BaseColorTexture" panel_visibility="advanced"/>
             <Property name="NormalTexture" panel_visibility="advanced"/>
             <Property name="NormalScale" panel_visibility="advanced"/>
@@ -10971,6 +10973,33 @@
           Should textures be clamped or repeated when texture coordinates go
           outside the range of 0 to 1.
         </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetInterpolateTextures"
+                         default_values="0"
+                         name="InterpolateTextures"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When sampling a texture should linear interpolations be used. If false
+          then nearest neighbor sampling will be used.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseMipmapTextures"
+                         default_values="0"
+                         name="UseMipmapTextures"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Should mipmaps be used for textures. Mipmaps are espcially useful when
+          working with large detailed textures or situations where you might be
+          viewing a texture map from far away.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="InterpolateTextures"
+                                   value="1" />
+        </Hints>
       </IntVectorProperty>
       <ProxyProperty command="SetBaseColorTexture"
                      name="BaseColorTexture"
