@@ -27,7 +27,7 @@
 #include "vtkCommunicator.h"
 #include "vtkCuller.h"
 #include "vtkDataRepresentation.h"
-#include "vtkEquirectangularToCubemapTexture.h"
+#include "vtkEquirectangularToCubeMapTexture.h"
 #include "vtkFXAAOptions.h"
 #include "vtkFloatArray.h"
 #include "vtkInformation.h"
@@ -3452,9 +3452,9 @@ void vtkPVRenderView::SynchronizeMaximumIds(vtkIdType* maxPointId, vtkIdType* ma
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetSkyboxResolution(int resolution)
 {
-  if (this->CubeMap->GetCubemapSize() != static_cast<unsigned int>(resolution))
+  if (this->CubeMap->GetCubeMapSize() != static_cast<unsigned int>(resolution))
   {
-    this->CubeMap->SetCubemapSize(resolution);
+    this->CubeMap->SetCubeMapSize(resolution);
     this->Modified();
   }
 }

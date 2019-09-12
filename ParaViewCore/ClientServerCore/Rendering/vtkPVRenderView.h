@@ -37,7 +37,7 @@
 class vtkAlgorithmOutput;
 class vtkCamera;
 class vtkCuller;
-class vtkEquirectangularToCubemapTexture;
+class vtkEquirectangularToCubeMapTexture;
 class vtkExtentTranslator;
 class vtkFloatArray;
 class vtkFXAAOptions;
@@ -1103,7 +1103,7 @@ protected:
   vtkSmartPointer<vtkPVGridAxes3DActor> GridAxes3DActor;
   vtkNew<vtkSkybox> Skybox;
   bool NeedSkybox = false;
-  vtkNew<vtkEquirectangularToCubemapTexture> CubeMap;
+  vtkNew<vtkEquirectangularToCubeMapTexture> CubeMap;
 
   int StillRenderImageReductionFactor;
   int InteractiveRenderImageReductionFactor;
