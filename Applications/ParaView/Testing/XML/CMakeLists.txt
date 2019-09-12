@@ -339,6 +339,14 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SaveLargeScreenshot_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SaveSmallScreenshot.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SaveSmallScreenshot_1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectCellsTrace.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectCellsTrace_1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectCellsInteractiveTrace.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectCellsFrustumTrace.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectCellsFrustumTrace_1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectPointsTrace.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectPointsInteractiveTrace.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectPointsFrustumTrace.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SeparatedColorMapA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SeparatedColorMapB.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Slice.png}"
@@ -1029,9 +1037,14 @@ if(PARAVIEW_ENABLE_PYTHON)
   list(APPEND TESTS_WITH_INLINE_COMPARES
     RestoreArrayDefaultTransferFunction.xml
     RestoreDefaultTransferFunction.xml
+    SelectCellsTrace.xml
+    SelectPointsTrace.xml
     TraceMultiViews.xml
     SplitViewTrace.xml
   )
+  set(SelectCellsTrace_DISABLE_CRS TRUE)
+  set(SelectPointsTrace_DISABLE_CRS TRUE)
+
   list(APPEND TESTS_WITHOUT_BASELINES
     PythonCalculator.xml
     TraceIntegrateVariables.xml
@@ -1047,6 +1060,7 @@ if(PARAVIEW_ENABLE_PYTHON)
   find_python_module(numpy numpy_found)
   if (numpy_found)
     list(APPEND TESTS_WITH_BASELINES
+      ContextViewSelectionTrace.xml
       ExodusModeShapes.xml
       FindDataPartialArrays.xml
       FindDataSelectLocation.xml # find data needs python/numpy
@@ -1054,10 +1068,14 @@ if(PARAVIEW_ENABLE_PYTHON)
       ForceTimeDiamond.xml
       FreezeQueryMultiblock.xml
       IndexedLookupInitialization.xml # needs Python Calculator/numpy
+      SpreadSheetSelectionTrace.xml
       StructuredGridCellBlanking.xml
       TestFindDataMax.xml
       VolumeNoMapScalars.xml # needs programmable filter + numpy
       )
+    set(SpreadSheetSelectionTrace_DISABLE_CS TRUE)
+    set(SpreadSheetSelectionTrace_DISABLE_CRS TRUE)
+
     list(APPEND TESTS_WITH_INLINE_COMPARES
       FindDataDialog.xml)
 

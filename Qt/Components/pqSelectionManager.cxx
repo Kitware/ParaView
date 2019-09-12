@@ -41,6 +41,7 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMTrace.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
@@ -179,6 +180,8 @@ void pqSelectionManager::clearSelection(pqOutputPort* outputPort)
       // Clear the selectedPorts set
       this->Implementation->SelectedPorts.clear();
 
+      SM_SCOPED_TRACE(CallFunction).arg("ClearSelection").arg("comment", "clear all selections");
+
       // inform selection have changed
       emit this->selectionChanged(static_cast<pqOutputPort*>(0));
     }
@@ -191,6 +194,11 @@ void pqSelectionManager::clearSelection(pqOutputPort* outputPort)
 
     // Remove output port from set
     this->Implementation->SelectedPorts.remove(outputPort);
+
+    SM_SCOPED_TRACE(CallFunction)
+      .arg("ClearSelection")
+      .arg("Source", outputPort->getSourceProxy())
+      .arg("comment", "clear selection for source");
 
     // Render cleaned output port
     outputPort->renderAllViews(false);

@@ -44,6 +44,9 @@ import paraview._backwardscompatibilityhelper
 # Bring OutputPort in our namespace.
 from paraview.servermanager import OutputPort
 
+# Bring in selection
+from .selection import *
+
 import sys
 import warnings
 

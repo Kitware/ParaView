@@ -46,7 +46,7 @@ from __future__ import absolute_import, division, print_function
 
 import paraview
 from paraview import servermanager as sm
-from paraview import simple as ps
+import paraview.simple
 
 import sys
 
@@ -420,16 +420,18 @@ def SelectLocation(Locations=[], Source=None):
         Source.SMProxy.SetSelectionInput(0, selection.SMProxy, 0)
     Source.UpdateVTKObjects()
 
-def QuerySelect(QueryString='', FieldType='POINT', Source=None):
+def QuerySelect(QueryString='', FieldType='POINT', Source=None, InsideOut=False):
     """Selection by query expression.
     - QueryString - string with NumPy-like boolean expression defining which attributes are selected
     - FieldType - atttribute to select, e.g., 'POINT' or 'CELL'
     - Source - if not set, then the selection will be on the active source
+    - InsideOut - Invert the selection so that attributes that do not satisfy the expression are
+      selected instead of elements that do
     """
     if not Source:
         Source = paraview.simple.GetActiveSource()
 
-    selection = _createSelection('SelectionQuerySource', FieldType=FieldType, QueryString=QueryString)
+    selection = _createSelection('SelectionQuerySource', FieldType=FieldType, QueryString=QueryString, InsideOut=InsideOut)
     if selection:
         Source.SMProxy.SetSelectionInput(0, selection.SMProxy, 0)
     Source.UpdateVTKObjects()
@@ -439,6 +441,6 @@ def ClearSelection(Source=None):
         or the active source if no source is provided.
     """
     if Source == None:
-        Source = ps.GetActiveSource()
+        Source = paraview.simple.GetActiveSource()
 
     Source.SMProxy.SetSelectionInput(0, None, 0)
