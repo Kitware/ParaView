@@ -100,6 +100,7 @@ option(PARAVIEW_BUILD_SHARED_LIBS "Build ParaView with shared libraries" "${shar
 set(BUILD_SHARED_LIBS "${PARAVIEW_BUILD_SHARED_LIBS}")
 set(CMAKE_CXX_VISIBILITY_PRESET "hidden")
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 
 #------------------------------------------------------------------------------
 # Protect against a stampede of static links at the same time.
@@ -983,7 +984,8 @@ if (PARAVIEW_ENABLE_PYTHON)
     CMAKE_DESTINATION   "${paraview_cmake_destination}"
     LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     WRAPPED_MODULES paraview_python_wrapped_modules
-    TARGET          ParaView::pvpythonmodules)
+    TARGET          ParaView::pvpythonmodules
+    DEPENDS         VTK::vtkpythonmodules)
 
   export(
     EXPORT    ParaViewPython

@@ -46,7 +46,7 @@ A simple example::
 #
 #==============================================================================
 from __future__ import print_function
-import paraview, re, os, os.path, types, sys, atexit
+import paraview, re, os, os.path, types, sys
 
 # prefer `vtk` from `paraview` since it doesn't import all
 # vtk modules.
@@ -3232,6 +3232,10 @@ if not vtkProcessModule.GetProcessModule():
       pvoptions.SetForceNoMPIInitOnClient(1)
       vtkInitializationHelper.Initialize(sys.executable,
           vtkProcessModule.PROCESS_CLIENT, pvoptions)
+
+    # since we initialized paraview, lets ensure that we finalize it too
+    import atexit
+    atexit.register(Finalize)
 
 # Initialize progress printing. Can be turned off by calling
 # ToggleProgressPrinting() again.
