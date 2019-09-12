@@ -17538,5 +17538,88 @@ Every Nth Point.
         <Visibility replace_input="2" />
       </Hints>
     </SourceProxy>
+    <!-- End ExtractSubsetWithSeed -->
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkRedistributeDataSetFilter"
+                 name="RedistributeDataSet"
+                 label="Redistribute DataSet">
+      <Documentation
+        long_help="Redistribute dataset into requested number of partitions.">
+        Redistribute data for load balancing. The filter either computes the bounding
+        boxes, or uses a provided collection of bounding boxes, for distributing the
+        data. Cells along partition boundaries can be uniquely assigned to a partition,
+        duplicated among partitions, or split among the partitions. The output
+        is an unstructured grid.
+      </Documentation>
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty name="BoundaryMode"
+        number_of_elements="1"
+        default_values="0"
+        command="SetBoundaryMode">
+        <EnumerationDomain name="enum">
+          <Entry text="Assign to one region" value="0" />
+          <Entry text="Assign to all regions" value="1" />
+          <Entry text="Split cells" value="2" />
+        </EnumerationDomain>
+        <Documentation>This property determines how cells that lie on processor
+        boundaries are handled. The "Assign to one region" option assigns each
+        boundary cell to exactly one process, which is useful for isosurfacing.
+        Selecting "Assign to all regions" causes the cells on the boundaries to be
+        copied to each process that shares that boundary. The "Split cells"
+        option breaks cells across process boundary lines so that pieces of the
+        cell lie in different processes. This option is useful for volume
+        rendering.</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="NumberOfPartitions"
+        command="SetNumberOfPartitions"
+        number_of_elements="1"
+        default_values="-1">
+        <IntRangeDomain min="-1"
+                        name="range" />
+        <Documentation>Specify the number of partitions to split the dataset into.
+          Set to 0 to indicate that the partitions should match the number of ranks.
+          The value provided is a hint and the actual number of partitions will be
+        equal to the power of 2 greater than or equal to the chosen value.</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PreservePartitionsInOutput"
+        command="SetPreservePartitionsInOutput"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>When unchecked, ranks with more than one partition will merge
+          the partitions into a single vtkUnstructuredGrid. When checked, the partitions
+          are preserved and the output is a vtkPartitionedDataSet.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="GenerateGlobalCellIds"
+        command="SetGenerateGlobalCellIds"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>Generate global Ids for all cells across partitions.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="EnableDebugging"
+        command="SetEnableDebugging"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>Retains some helper arrays created for generating
+        global cell Ids and ghost cells that are useful for debugging.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </SourceProxy>
+    <!-- End RedistributeDataSetFilter -->
   </ProxyGroup>
 </ServerManagerConfiguration>
