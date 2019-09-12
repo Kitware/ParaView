@@ -228,7 +228,7 @@ protected:
 
   void OnRepresentationUpdated();
 
-  vtkTable* FetchBlock(vtkIdType blockindex);
+  virtual vtkTable* FetchBlock(vtkIdType blockindex);
 
   bool ShowExtractedSelection;
   bool GenerateCellConnectivity;
@@ -237,6 +237,10 @@ protected:
   vtkReductionFilter* ReductionFilter;
   vtkClientServerMoveData* DeliveryFilter;
   vtkIdType NumberOfRows;
+
+  unsigned long CRMICallbackTag;
+  unsigned long PRMICallbackTag;
+  vtkTypeUInt32 Identifier;
 
   enum
   {
@@ -251,11 +255,8 @@ private:
   friend class vtkInternals;
   vtkInternals* Internals;
   bool SomethingUpdated;
-  unsigned long CRMICallbackTag;
-  unsigned long PRMICallbackTag;
 
   int FieldAssociation;
-  vtkTypeUInt32 Identifier;
 };
 
 #endif
