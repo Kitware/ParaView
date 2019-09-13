@@ -20,6 +20,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVCameraAnimationCue.h"
 #include "vtkPVGeneralSettings.h"
+#include "vtkPVLogger.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMTransferFunctionManager.h"
@@ -54,6 +55,8 @@ public:
       return;
     }
 
+    vtkVLogScopeF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "update-all-views for animation");
+
     vtkSMSessionProxyManager* pxm = NULL;
     for (VectorOfViews::iterator iter = this->ViewModules.begin(); iter != this->ViewModules.end();
          ++iter)
@@ -70,12 +73,15 @@ public:
       iter->GetPointer()->Update();
     }
 
+    vtkVLogStartScope(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "reset transfer functions");
     this->TransferFunctionManager->ResetAllTransferFunctionRangesUsingCurrentData(
       pxm, true /*animating*/);
+    vtkLogEndScope("reset transfer functions");
   }
 
   void StillRenderAllViews()
   {
+    vtkVLogScopeF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "still-render-all-views for animation");
     for (VectorOfViews::iterator iter = this->ViewModules.begin(); iter != this->ViewModules.end();
          ++iter)
     {
