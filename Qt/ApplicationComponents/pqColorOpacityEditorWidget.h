@@ -208,6 +208,8 @@ public slots:
   */
   void saveAsPreset();
 
+  void onRangeHandlesRangeChanged(double rangeMin, double rangeMax);
+
 signals:
   /**
   * Signal fired when the xrgbPoints change.

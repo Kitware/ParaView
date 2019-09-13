@@ -53,12 +53,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPiecewiseControlPointsItem.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkPiecewiseFunctionItem.h"
+#include "vtkRangeHandlesItem.h"
 #include "vtkSMCoreUtilities.h"
 #include "vtkSmartPointer.h"
 #include "vtkVector.h"
 
 #include <QColorDialog>
+#include <QMainWindow>
 #include <QPointer>
+#include <QStatusBar>
 #include <QSurfaceFormat>
 #include <QVBoxLayout>
 
@@ -197,6 +200,7 @@ public:
   pqTimer Timer;
   pqTimer RangeTimer;
 
+  vtkSmartPointer<vtkRangeHandlesItem> RangeHandlesItem;
   vtkSmartPointer<vtkScalarsToColorsItem> TransferFunctionItem;
   vtkSmartPointer<vtkControlPointsItem> ControlPointsItem;
   unsigned long CurrentPointEditEventId;
@@ -256,6 +260,7 @@ public:
       this->CurrentPointEditEventId = 0;
     }
     this->TransferFunctionItem = nullptr;
+    this->RangeHandlesItem = nullptr;
     this->ControlPointsItem = nullptr;
   }
 };
@@ -295,8 +300,12 @@ void pqTransferFunctionWidget::initialize(
   {
     vtkNew<vtkColorTransferFunctionItem> item;
     item->SetColorTransferFunction(ctf);
-
     this->Internals->TransferFunctionItem = item;
+
+    vtkNew<vtkRangeHandlesItem> handlesItem;
+    handlesItem->SetColorTransferFunction(ctf);
+    handlesItem->SetHandleWidth(4.0);
+    this->Internals->RangeHandlesItem = handlesItem;
 
     if (stc_editable)
     {
@@ -336,8 +345,12 @@ void pqTransferFunctionWidget::initialize(
     item->SetOpacityFunction(pwf);
     item->SetColorTransferFunction(ctf);
     item->SetMaskAboveCurve(true);
-
     this->Internals->TransferFunctionItem = item;
+
+    vtkNew<vtkRangeHandlesItem> handlesItem;
+    handlesItem->SetColorTransferFunction(ctf);
+    this->Internals->RangeHandlesItem = handlesItem;
+
     if (pwf_editable && stc_editable)
     {
       // NOTE: this hasn't been tested yet.
@@ -370,6 +383,23 @@ void pqTransferFunctionWidget::initialize(
   }
 
   this->Internals->ChartXY->AddPlot(this->Internals->TransferFunctionItem);
+
+  if (this->Internals->ControlPointsItem)
+  {
+    this->Internals->ControlPointsItem->UseAddPointItemOn();
+    this->Internals->ChartXY->AddPlot(this->Internals->ControlPointsItem->GetAddPointItem());
+  }
+
+  if (this->Internals->RangeHandlesItem)
+  {
+    pqCoreUtilities::connect(this->Internals->RangeHandlesItem, vtkCommand::EndInteractionEvent,
+      this, SLOT(onRangeHandlesRangeChanged()));
+    pqCoreUtilities::connect(this->Internals->RangeHandlesItem,
+      vtkCommand::LeftButtonDoubleClickEvent, this, SIGNAL(rangeHandlesDoubleClicked()));
+    pqCoreUtilities::connect(
+      this->Internals->RangeHandlesItem, vtkCommand::HighlightEvent, this, SLOT(showUsageStatus()));
+    this->Internals->ChartXY->AddPlot(this->Internals->RangeHandlesItem);
+  }
 
   if (this->Internals->ControlPointsItem)
   {
@@ -417,6 +447,9 @@ void pqTransferFunctionWidget::initialize(
     });
     this->Internals->ChartXY->SetTFRange(vtkVector2d(ctf->GetRange()));
   }
+
+  pqCoreUtilities::connect(
+    this->Internals->ChartXY, vtkCommand::MouseMoveEvent, this, SLOT(showUsageStatus()));
 }
 
 //-----------------------------------------------------------------------------
@@ -549,4 +582,27 @@ void pqTransferFunctionWidget::setHistogramTable(vtkTable* table)
 {
   this->Internals->TransferFunctionItem->SetHistogramTable(table);
   this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqTransferFunctionWidget::onRangeHandlesRangeChanged()
+{
+  if (this->Internals->RangeHandlesItem)
+  {
+    double range[2];
+    this->Internals->RangeHandlesItem->GetHandlesRange(range);
+    emit this->rangeHandlesRangeChanged(range[0], range[1]);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqTransferFunctionWidget::showUsageStatus()
+{
+  QMainWindow* mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
+  if (mainWindow)
+  {
+    mainWindow->statusBar()->showMessage(tr("Grab and move a handle to interactively change the "
+                                            "range. Double click on it to set custom range."),
+      2000);
+  }
 }
