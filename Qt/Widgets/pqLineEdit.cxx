@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Server Manager Includes.
 
 // Qt Includes.
+#include <QTimer>
 
 // ParaView Includes.
 
@@ -101,4 +102,14 @@ void pqLineEdit::triggerTextChangedAndEditingFinished()
   // issue, the playback manually calls this method.
   this->onTextEdited();
   this->onEditingFinished();
+}
+
+//-----------------------------------------------------------------------------
+void pqLineEdit::focusInEvent(QFocusEvent* event)
+{
+  // First let the base class process the event
+  QLineEdit::focusInEvent(event);
+  // Then select the text by a single shot timer, so that everything will
+  // be processed before (calling selectAll() directly won't work)
+  QTimer::singleShot(0, this, &QLineEdit::selectAll);
 }
