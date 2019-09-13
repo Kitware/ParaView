@@ -293,6 +293,14 @@ These variables should be documented once they're effective again.
     test suite.
 -->
 
+## Building documentation
+
+The following targets are used to build documentation for ParaView:
+
+  * `ParaViewDoxygenDoc` - build the doxygen documentation from ParaView's C++ source files.
+  * `ParaViewPythonDoc` - build the documentation from ParaView's Python source files.
+  * `ParaViewDoc-TGZ` - build a gzipped tarball of ParaView documentation.
+
 [cmake]: https://cmake.org
 [cmake-download]: https://cmake.org/download
 [ffmpeg]: https://ffmpeg.org
