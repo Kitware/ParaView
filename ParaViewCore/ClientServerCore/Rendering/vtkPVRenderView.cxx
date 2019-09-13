@@ -714,8 +714,8 @@ void vtkPVRenderView::SetInteractionMode(int mode)
     this->InteractionMode = mode;
     this->Modified();
 
-    // If we're in a situation where we don't have an interactor (e.g. pvbatch or Catalyst)
-    // we still want to set the other properties on the camera.
+    // If we're in a situation where we don't have an interactor (e.g. pvbatch
+    // or Catalyst) we still want to set the other properties on the camera.
     switch (this->InteractionMode)
     {
       case INTERACTION_MODE_3D:
@@ -787,9 +787,9 @@ void vtkPVRenderView::OnSelectionChangedEvent()
   this->RubberBandStyle->GetStartPosition(&region[0]);
   this->RubberBandStyle->GetEndPosition(&region[2]);
 
-  // NOTE: This gets called on the driver i.e. client or root-node in batch mode.
-  // That's not necessarily the node on which the selection can be made, since
-  // data may not be on this process.
+  // NOTE: This gets called on the driver i.e. client or root-node in batch
+  // mode. That's not necessarily the node on which the selection can be
+  // made, since data may not be on this process.
 
   // selection is a data-selection (not geometry selection).
   int ordered_region[4];
@@ -804,10 +804,10 @@ void vtkPVRenderView::OnSelectionChangedEvent()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::OnPolygonSelectionEvent()
 {
-  // NOTE: This gets called on the driver i.e. client or root-node in batch mode.
-  // That's not necessarily the node on which the selection can be made, since
-  // data may not be on this process.
-  // selection is a data-selection (not geometry selection).
+  // NOTE: This gets called on the driver i.e. client or root-node in batch
+  // mode. That's not necessarily the node on which the selection can be
+  // made, since data may not be on this process. selection is a
+  // data-selection (not geometry selection).
   std::vector<vtkVector2i> points = this->PolygonStyle->GetPolygonPoints();
   if (points.size() >= 3)
   {
@@ -1001,7 +1001,8 @@ void vtkPVRenderView::SynchronizeGeometryBounds()
   vtkBoundingBox bbox;
   bbox.AddBox(this->GeometryBounds);
 
-  if (this->GetLocalProcessDoesRendering(/*using_distributed_rendering*/ false))
+  if (this->GetLocalProcessDoesRendering(
+        /*using_distributed_rendering*/ false))
   {
     // get local bounds to consider 3D widgets correctly.
     // if ComputeVisiblePropBounds is called when there's no real window on the
@@ -1465,8 +1466,8 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 
   const bool use_ordered_compositing = this->GetUseOrderedCompositing();
 
-  vtkTimerLog::FormatAndMarkEvent(
-    "Render (use_lod: %d), (use_distributed_rendering: %d), (use_ordered_compositing: %d)",
+  vtkTimerLog::FormatAndMarkEvent("Render (use_lod: %d), (use_distributed_rendering: %d), "
+                                  "(use_ordered_compositing: %d)",
     use_lod_rendering, use_distributed_rendering, use_ordered_compositing);
 
   vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(),
@@ -1474,10 +1475,11 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     use_distributed_rendering, use_ordered_compositing);
 
   // If ordered compositing is needed, we have two options: either we're
-  // supposed to (i) build a KdTree and redistribute data or we are expected to (ii) use
-  // a custom partition provided via `vtkPartitionOrder` built using local data
-  // bounds and not bother redistributing data at all. Let's determine which
-  // path we're expected to take and do work accordingly.
+  // supposed to (i) build a KdTree and redistribute data or we are expected
+  // to (ii) use a custom partition provided via `vtkPartitionOrder` built
+  // using local data bounds and not bother redistributing data at all.
+  // Let's determine which path we're expected to take and do work
+  // accordingly.
   if (use_ordered_compositing)
   {
     auto poImpl = this->PartitionOrdering->GetImplementation();
@@ -1963,7 +1965,8 @@ bool vtkPVRenderView::ShouldUseDistributedRendering(double geometry_size, bool u
     if (distributedRenderingRequired == true && remote_rendering_available == false)
     {
       vtkErrorMacro("Some of the representations in this view require remote rendering "
-                    "which, however, is not available. Rendering may not work as expected.");
+                    "which, however, is not available. Rendering may not work as "
+                    "expected.");
     }
     else if (distributedRenderingRequired || nonDistributedRenderingRequired)
     {
@@ -1988,15 +1991,15 @@ bool vtkPVRenderView::ShouldUseDistributedRendering(double geometry_size, bool u
   {
     //----------------------------------------------------------------------------
     // This helps us further condition the "ShouldUseDistributedRendering"
-    // response based on whether distributed rendering makes sense in the current
-    // configuration e.g. it doesn't make sense in builtin mode, or in batch mode
-    // with 1 process.
+    // response based on whether distributed rendering makes sense in the
+    // current configuration e.g. it doesn't make sense in builtin mode, or
+    // in batch mode with 1 process.
     //----------------------------------------------------------------------------
     if (val)
     {
-      // distributed rendering is requested. ensure that we're running in a mode
-      // where distributed rendering has any effect i.e client-server or parallel
-      // batch.
+      // distributed rendering is requested. ensure that we're running in a
+      // mode where distributed rendering has any effect i.e client-server
+      // or parallel batch.
       auto pm = vtkProcessModule::GetProcessModule();
       switch (pm->GetProcessType())
       {
@@ -2204,9 +2207,10 @@ void vtkPVRenderView::StreamingUpdate(const double view_planes[24])
   this->RequestInformation->Set(
     vtkPVRenderView::VIEW_PLANES(), const_cast<double*>(view_planes), 24);
 
-  // Now call REQUEST_STREAMING_UPDATE() on all representations. Most representations
-  // simply ignore it, but those that support streaming update the pipeline to
-  // get the "next phase" of the data from the input pipeline.
+  // Now call REQUEST_STREAMING_UPDATE() on all representations. Most
+  // representations simply ignore it, but those that support streaming
+  // update the pipeline to get the "next phase" of the data from the input
+  // pipeline.
   this->CallProcessViewRequest(vtkPVRenderView::REQUEST_STREAMING_UPDATE(),
     this->RequestInformation, this->ReplyInformationVector);
 
@@ -2482,6 +2486,7 @@ void vtkPVRenderView::UpdateSkybox()
   if (this->NeedSkybox && texture != nullptr)
   {
     this->CubeMap->SetInputTexture(vtkOpenGLTexture::SafeDownCast(texture));
+    this->CubeMap->InterpolateOn();
     this->GetRenderer()->AddActor(this->Skybox);
     this->GetRenderer()->SetEnvironmentCubeMap(this->CubeMap, true);
   }
@@ -2884,9 +2889,9 @@ void vtkPVRenderView::SetArrayNumberToDraw(int fieldAttributeType)
 // ----------------------------------------------------------------------------
 void vtkPVRenderView::SetValueRenderingModeCommand(int mode)
 {
-  // Fixes issue with the background (black) when coming back from FLOATING_POINT
-  // mode. FLOATING_POINT mode is only supported in BATCH mode and single process
-  // CLIENT.
+  // Fixes issue with the background (black) when coming back from
+  // FLOATING_POINT mode. FLOATING_POINT mode is only supported in BATCH
+  // mode and single process CLIENT.
   if (this->GetUseDistributedRenderingForRender() &&
     vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_CLIENT)
   {
@@ -2895,7 +2900,8 @@ void vtkPVRenderView::SetValueRenderingModeCommand(int mode)
     return;
   }
 
-  // Rendering mode can only be changed while capturing. TODO while in client mode?
+  // Rendering mode can only be changed while capturing. TODO while in client
+  // mode?
   if (!this->Internals->IsInCapture)
   {
     return;
@@ -3104,9 +3110,9 @@ void vtkPVRenderView::CaptureValuesFloat()
 
   if (values)
   {
-    // IceT requires the image format to be RGBA (R32F not supported). Component 0 is
-    // enough from here on so a single component is exposed (components 1-3 hold the same
-    // data).
+    // IceT requires the image format to be RGBA (R32F not supported).
+    // Component 0 is enough from here on so a single component is exposed
+    // (components 1-3 hold the same data).
     this->Internals->ArrayHolder->SetNumberOfComponents(1);
     this->Internals->ArrayHolder->SetNumberOfTuples(values->GetNumberOfTuples());
     this->Internals->ArrayHolder->CopyComponent(0, values, 0);
@@ -3154,8 +3160,8 @@ void vtkPVRenderView::SetEnableOSPRay(bool v)
 #else
   if (v)
   {
-    vtkWarningMacro(
-      "Refusing to enable OSPRay since either the client or server does not have it.");
+    vtkWarningMacro("Refusing to enable OSPRay since either the client or "
+                    "server does not have it.");
   }
 #endif
 }
@@ -3441,8 +3447,10 @@ void vtkPVRenderView::SynchronizeMaximumIds(vtkIdType* maxPointId, vtkIdType* ma
 
     // skip data server since this method is only called on processes involved
     // in rendering.
-    this->AllReduce(ptid, ptid, vtkCommunicator::MAX_OP, /*skip_data_server=*/true);
-    this->AllReduce(cellid, cellid, vtkCommunicator::MAX_OP, /*skip_data_server=*/true);
+    this->AllReduce(ptid, ptid, vtkCommunicator::MAX_OP,
+      /*skip_data_server=*/true);
+    this->AllReduce(cellid, cellid, vtkCommunicator::MAX_OP,
+      /*skip_data_server=*/true);
 
     *maxPointId = static_cast<vtkIdType>(ptid);
     *maxCellId = static_cast<vtkIdType>(cellid);
