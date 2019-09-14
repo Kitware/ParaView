@@ -115,6 +115,9 @@ protected:
   */
   void triggerTextChangedAndEditingFinished();
 
+  // Override to select all text in the widget when it gains focus
+  void focusInEvent(QFocusEvent* event) override;
+
 private:
   Q_DISABLE_COPY(pqLineEdit)
 
