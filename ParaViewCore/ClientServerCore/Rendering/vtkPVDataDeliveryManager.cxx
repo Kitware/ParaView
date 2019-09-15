@@ -68,33 +68,6 @@ class vtkPVDataDeliveryManager::vtkInternals
   }
 
 public:
-  class vtkPriorityQueueItem
-  {
-  public:
-    unsigned int RepresentationId;
-    unsigned int BlockId;
-    unsigned int Level;
-    unsigned int Index;
-    double Priority;
-
-    vtkPriorityQueueItem()
-      : RepresentationId(0)
-      , BlockId(0)
-      , Level(0)
-      , Index(0)
-      , Priority(0)
-    {
-    }
-
-    bool operator<(const vtkPriorityQueueItem& other) const
-    {
-      return this->Priority < other.Priority;
-    }
-  };
-
-  typedef std::priority_queue<vtkPriorityQueueItem> PriorityQueueType;
-  PriorityQueueType PriorityQueue;
-
   class vtkOrderedCompositingInfo
   {
   public:
