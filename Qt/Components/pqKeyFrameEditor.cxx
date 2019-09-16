@@ -59,6 +59,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSignalAdaptorKeyFrameType.h"
 #include "pqUndoStack.h"
 
+#include <algorithm>
+
 //-----------------------------------------------------------------------------
 // editor dialog that comes and goes for editing a single key frame
 // interpolation type
@@ -557,7 +559,7 @@ void pqKeyFrameEditor::writeKeyFrameData()
     double nTime = this->Internal->normalizedTime(newData.toDouble());
     sortedKeyFrames.append(QPair<int, double>(i, nTime));
   }
-  qSort(sortedKeyFrames.begin(), sortedKeyFrames.end(), timeSort);
+  std::sort(sortedKeyFrames.begin(), sortedKeyFrames.end(), timeSort);
 
   for (int i = 0; i < newNumber; i++)
   {

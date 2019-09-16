@@ -59,6 +59,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include <QtDebug>
 
+#include <algorithm>
+
 class pqProxyGroupMenuManager::pqInternal
 {
 public:
@@ -595,7 +597,7 @@ void pqProxyGroupMenuManager::populateMenu()
   }
 
   // Now sort all actions added in temp based on their texts.
-  qSort(someActions.begin(), someActions.end(), ::actionTextSort);
+  std::sort(someActions.begin(), someActions.end(), ::actionTextSort);
   foreach (QAction* action, someActions)
   {
     alphabeticalMenu->addAction(action);
@@ -849,7 +851,7 @@ QList<QAction*> pqProxyGroupMenuManager::actions(const QString& category)
   {
     // sort unless the XML overrode the sorting using the "preserve_order"
     // attribute.
-    qSort(category_actions.begin(), category_actions.end(), ::actionTextSort);
+    std::sort(category_actions.begin(), category_actions.end(), ::actionTextSort);
   }
   return category_actions;
 }

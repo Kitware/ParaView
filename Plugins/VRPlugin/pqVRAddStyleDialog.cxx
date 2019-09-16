@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtCore/QDebug>
 #include <QtCore/QStringList>
 
+#include <algorithm>
 #include <map>
 #include <string>
 
@@ -150,9 +151,9 @@ pqVRAddStyleDialog::pqVRAddStyleDialog(QWidget* parentObject, Qt::WindowFlags f)
     }
   }
 
-  qSort(this->Internals->AnalogNames);
-  qSort(this->Internals->ButtonNames);
-  qSort(this->Internals->TrackerNames);
+  std::sort(this->Internals->AnalogNames);
+  std::sort(this->Internals->ButtonNames);
+  std::sort(this->Internals->TrackerNames);
 }
 
 //-----------------------------------------------------------------------------

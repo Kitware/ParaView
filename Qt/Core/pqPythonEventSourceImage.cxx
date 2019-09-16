@@ -108,7 +108,7 @@ static PyObject* QtTestingImage_compareImage(PyObject* /*self*/, PyObject* args)
   // pqThreadedEventSource::waitForGUI(). We should deprecate that.
   // Qt::BlockingQueuedConnection will "block until the slot returns".
 
-  if (!image_image_compare && SnapshotWidget == QString::null)
+  if (!image_image_compare && SnapshotWidget.isNull())
   {
     PyErr_SetString(PyExc_ValueError, "object not found");
     return NULL;
@@ -174,12 +174,12 @@ void pqPythonEventSourceImage::doComparison()
   int threshold = options->GetCurrentImageThreshold();
 
   QString test_directory = pqCoreTestUtility::TestDirectory();
-  if (test_directory == QString::null)
+  if (test_directory.isNull())
   {
     test_directory = ".";
   }
 
-  if (SnapshotWidget != QString::null)
+  if (!SnapshotWidget.isNull())
   {
     QWidget* widget = qobject_cast<QWidget*>(pqObjectNaming::GetObject(SnapshotWidget));
     if (widget)
@@ -189,7 +189,7 @@ void pqPythonEventSourceImage::doComparison()
         std::cerr, test_directory, QSize(SnapshotWidth, SnapshotHeight));
     }
   }
-  else if (SnapshotTestImage != QString::null)
+  else if (!SnapshotTestImage.isNull())
   {
     SnapshotTestImage = SnapshotTestImage.replace("$PARAVIEW_TEST_ROOT", test_directory);
     SnapshotTestImage =
