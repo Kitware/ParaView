@@ -640,6 +640,7 @@ set(paraview_default_plugins
   GeodesicMeasurement
   GLTFReader
   GMVReader
+  HyperTreeGridADR
   LagrangianParticleTracker
   Moments
   MooseXfemClip
