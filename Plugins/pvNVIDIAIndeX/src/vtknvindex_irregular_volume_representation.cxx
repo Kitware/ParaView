@@ -39,11 +39,10 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPKdTree.h"
-#include "vtkPVCacheKeeper.h"
-#include "vtkPVDataDeliveryManager.h"
 #include "vtkPVGeometryFilter.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVRenderViewDataDeliveryManager.h"
 #include "vtkPVUpdateSuppressor.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
@@ -89,14 +88,10 @@ vtknvindex_irregular_volume_representation::vtknvindex_irregular_volume_represen
   this->Preprocessor = vtkVolumeRepresentationPreprocessor::New();
   this->Preprocessor->SetTetrahedraOnly(1);
 
-  this->CacheKeeper = vtkPVCacheKeeper::New();
-
   // Change the default mapper to NVIDIA IndeX irregular volume mapper.
   this->DefaultMapper = vtknvindex_irregular_volume_mapper::New();
   this->Property = vtkVolumeProperty::New();
   this->Actor = vtkPVLODVolume::New();
-
-  this->CacheKeeper->SetInputConnection(this->Preprocessor->GetOutputPort());
 
   this->Actor->SetProperty(this->Property);
   this->Actor->SetMapper(this->DefaultMapper);
@@ -124,7 +119,6 @@ vtknvindex_irregular_volume_representation::vtknvindex_irregular_volume_represen
 vtknvindex_irregular_volume_representation::~vtknvindex_irregular_volume_representation()
 {
   this->Preprocessor->Delete();
-  this->CacheKeeper->Delete();
 
   this->DefaultMapper->shutdown();
   this->DefaultMapper->Delete();
@@ -169,17 +163,6 @@ vtkUnstructuredGridVolumeMapper* vtknvindex_irregular_volume_representation::Get
 }
 
 //----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::MarkModified()
-{
-  if (!this->GetUseCache())
-  {
-    // Cleanup caches when not using cache.
-    this->CacheKeeper->RemoveAllCaches();
-  }
-  this->Superclass::MarkModified();
-}
-
-//----------------------------------------------------------------------------
 int vtknvindex_irregular_volume_representation::FillInputPortInformation(int, vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkUnstructuredGridBase");
@@ -195,16 +178,10 @@ int vtknvindex_irregular_volume_representation::RequestData(
 {
   vtkMath::UninitializeBounds(this->DataBounds);
 
-  // Pass caching information to the cache keeper.
-  this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
-  this->CacheKeeper->SetCacheTime(this->GetCacheKey());
-
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     this->Preprocessor->SetInputConnection(this->GetInternalOutputPort());
-
     this->Preprocessor->Update();
-    this->CacheKeeper->Update();
 
     // Check for time series data info.
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
@@ -231,7 +208,7 @@ int vtknvindex_irregular_volume_representation::RequestData(
       }
     }
 
-    vtkDataSet* ds = vtkDataSet::SafeDownCast(this->CacheKeeper->GetOutputDataObject(0));
+    vtkDataSet* ds = vtkDataSet::SafeDownCast(this->Preprocessor->GetOutputDataObject(0));
     if (ds)
     {
       ds->GetBounds(this->DataBounds);
@@ -280,18 +257,12 @@ int vtknvindex_irregular_volume_representation::RequestData(
     this->Preprocessor->RemoveAllInputs();
     vtkNew<vtkUnstructuredGrid> placeholder;
     this->Preprocessor->SetInputData(0, placeholder.GetPointer());
-    this->CacheKeeper->Update();
+    this->Preprocessor->Update();
   }
 
   m_controller->Barrier();
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
-}
-
-//----------------------------------------------------------------------------
-bool vtknvindex_irregular_volume_representation::IsCached(double cache_key)
-{
-  return this->CacheKeeper->IsCached(cache_key);
 }
 
 //----------------------------------------------------------------------------
@@ -307,19 +278,19 @@ int vtknvindex_irregular_volume_representation::ProcessViewRequest(
   {
     outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
 
-    vtkPVRenderView::SetPiece(inInfo, this, this->CacheKeeper->GetOutputDataObject(0));
+    vtkPVRenderView::SetPiece(inInfo, this, this->Preprocessor->GetOutputDataObject(0));
     vtkPVRenderView::MarkAsRedistributable(inInfo, this);
     vtkPVRenderView::SetRedistributionModeToDuplicateBoundaryCells(inInfo, this);
 
     vtkNew<vtkMatrix4x4> matrix;
     this->Actor->GetMatrix(matrix.GetPointer());
-    vtkPVRenderView::SetGeometryBounds(inInfo, this->DataBounds, matrix.GetPointer());
+    vtkPVRenderView::SetGeometryBounds(inInfo, this, this->DataBounds, matrix.GetPointer());
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
 
     vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(inInfo->Get(vtkPVRenderView::VIEW()));
-    vtkPVDataDeliveryManager* ddm = view->GetDeliveryManager();
+    auto ddm = vtkPVRenderViewDataDeliveryManager::SafeDownCast(view->GetDeliveryManager());
     vtkPKdTree* kd_tree = ddm->GetKdTree();
 
     // Retrieve ParaView's KdTree in order to obtain domain subdivision bounding boxes.

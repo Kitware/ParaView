@@ -57,7 +57,6 @@
 #include "vtkPVCameraCollection.h"
 #include "vtkPVCenterAxesActor.h"
 #include "vtkPVClientServerSynchronizedRenderers.h"
-#include "vtkPVDataDeliveryManager.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVGridAxes3DActor.h"
 #include "vtkPVHardwareSelector.h"
@@ -65,6 +64,7 @@
 #include "vtkPVLogger.h"
 #include "vtkPVMaterialLibrary.h"
 #include "vtkPVOptions.h"
+#include "vtkPVRenderViewDataDeliveryManager.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
 #include "vtkPVStreamingMacros.h"
@@ -144,8 +144,6 @@ public:
   int OSPRayCount;
   vtkNew<vtkFloatArray> ArrayHolder;
   vtkNew<vtkWindowToImageFilter> ZGrabber;
-
-  vtkNew<vtkPVDataDeliveryManager> DeliveryManager;
 
   void RegisterSelectionProp(int id, vtkProp*, vtkPVDataRepresentation* rep)
   {
@@ -319,6 +317,7 @@ vtkInformationKeyMacro(vtkPVRenderView, RENDER_EMPTY_IMAGES, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, REQUEST_STREAMING_UPDATE, Request);
 vtkInformationKeyMacro(vtkPVRenderView, REQUEST_PROCESS_STREAMED_PIECE, Request);
 vtkInformationKeyRestrictedMacro(vtkPVRenderView, VIEW_PLANES, DoubleVector, 24);
+vtkInformationKeyRestrictedMacro(vtkPVRenderView, GEOMETRY_BOUNDS, DoubleVector, 6);
 
 vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 
@@ -343,9 +342,6 @@ vtkPVRenderView::vtkPVRenderView()
   this->Internals->OSPRayShadows = false;
   this->Internals->OSPRayDenoise = true;
   this->Internals->OSPRayCount = 0;
-
-  // non-reference counted, so no worries about reference loops.
-  this->Internals->DeliveryManager->SetRenderView(this);
 
   this->RemoteRenderingAvailable = true;
 
@@ -574,12 +570,6 @@ vtkPVRenderView::~vtkPVRenderView()
 }
 
 //----------------------------------------------------------------------------
-vtkPVDataDeliveryManager* vtkPVRenderView::GetDeliveryManager()
-{
-  return this->Internals->DeliveryManager.GetPointer();
-}
-
-//----------------------------------------------------------------------------
 void vtkPVRenderView::NVPipeAvailableOn()
 {
   this->SynchronizedRenderers->SetNVPipeSupport(true);
@@ -589,30 +579,6 @@ void vtkPVRenderView::NVPipeAvailableOn()
 void vtkPVRenderView::NVPipeAvailableOff()
 {
   this->SynchronizedRenderers->SetNVPipeSupport(false);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::AddRepresentationInternal(vtkDataRepresentation* rep)
-{
-  vtkPVDataRepresentation* dataRep = vtkPVDataRepresentation::SafeDownCast(rep);
-  if (dataRep != NULL)
-  {
-    this->Internals->DeliveryManager->RegisterRepresentation(dataRep);
-  }
-
-  this->Superclass::AddRepresentationInternal(rep);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::RemoveRepresentationInternal(vtkDataRepresentation* rep)
-{
-  vtkPVDataRepresentation* dataRep = vtkPVDataRepresentation::SafeDownCast(rep);
-  if (dataRep != NULL)
-  {
-    this->Internals->DeliveryManager->UnRegisterRepresentation(dataRep);
-  }
-
-  this->Superclass::RemoveRepresentationInternal(rep);
 }
 
 //----------------------------------------------------------------------------
@@ -999,10 +965,7 @@ void vtkPVRenderView::ResetCameraClippingRange()
 void vtkPVRenderView::SynchronizeGeometryBounds()
 {
   vtkBoundingBox bbox;
-  bbox.AddBox(this->GeometryBounds);
-
-  if (this->GetLocalProcessDoesRendering(
-        /*using_distributed_rendering*/ false))
+  if (this->GetLocalProcessDoesRendering(/*using_distributed_rendering*/ false))
   {
     // get local bounds to consider 3D widgets correctly.
     // if ComputeVisiblePropBounds is called when there's no real window on the
@@ -1025,7 +988,34 @@ void vtkPVRenderView::SynchronizeGeometryBounds()
     bbox.AddBounds(prop_bounds);
   }
 
+  // accumulate visible geometry bounds reported by representations.
+  auto deliveryManager =
+    vtkPVRenderViewDataDeliveryManager::SafeDownCast(this->GetDeliveryManager());
+  for (int cc = 0, num_reprs = this->GetNumberOfRepresentations(); cc < num_reprs; ++cc)
+  {
+    if (auto pvrepr = vtkPVDataRepresentation::SafeDownCast(this->GetRepresentation(cc)))
+    {
+      if (!pvrepr->GetVisibility())
+      {
+        continue;
+      }
+
+      for (int port = 0, num_ports = deliveryManager->GetNumberOfPorts(pvrepr); port < num_ports;
+           ++port)
+      {
+        auto info = deliveryManager->GetPieceInformation(pvrepr, /*low_res=*/false, port);
+        if (info->Has(GEOMETRY_BOUNDS()) && info->Length(GEOMETRY_BOUNDS()) == 6)
+        {
+          double gbds[6];
+          info->Get(GEOMETRY_BOUNDS(), gbds);
+          bbox.AddBounds(gbds);
+        }
+      }
+    }
+  }
+
   // sync up bounds across all processes when doing distributed rendering.
+  this->GeometryBounds.Reset();
   this->AllReduce(bbox, this->GeometryBounds);
   if (!this->GeometryBounds.IsValid())
   {
@@ -1217,10 +1207,6 @@ void vtkPVRenderView::Update()
 
   vtkTimerLog::MarkStartEvent("RenderView::Update");
 
-  // reset the bounds, so that representations can provide us with bounds
-  // information during update.
-  this->GeometryBounds.Reset();
-
   // reset flags that representations set in REQUEST_UPDATE() pass.
   this->DistributedRenderingRequired = false;
   this->NonDistributedRenderingRequired = false;
@@ -1294,8 +1280,6 @@ void vtkPVRenderView::Update()
   this->SynchronizeGeometryBounds();
 
   vtkTimerLog::MarkEndEvent("RenderView::Update");
-
-  this->UpdateTimeStamp.Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -1480,6 +1464,8 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   // using local data bounds and not bother redistributing data at all.
   // Let's determine which path we're expected to take and do work
   // accordingly.
+  auto deliveryManager =
+    vtkPVRenderViewDataDeliveryManager::SafeDownCast(this->GetDeliveryManager());
   if (use_ordered_compositing)
   {
     auto poImpl = this->PartitionOrdering->GetImplementation();
@@ -1491,8 +1477,10 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
         "Using ordered compositing w/ data redistribution, if needed");
       // not using a custom (bounds-based ordering) i.e. we use in path (i). Let
       // the delivery manager redistrbute data as it deems necessary.
-      this->Internals->DeliveryManager->RedistributeDataForOrderedCompositing(use_lod_rendering);
-      this->PartitionOrdering->SetImplementation(this->Internals->DeliveryManager->GetKdTree());
+      deliveryManager->RedistributeDataForOrderedCompositing(use_lod_rendering);
+      this->PartitionOrdering->SetImplementation(deliveryManager->GetKdTree());
+
+      deliveryManager->SetUseRedistributedDataAsDeliveredData(true);
     }
     else
     {
@@ -1503,7 +1491,9 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
       // path (ii).
 
       // clear off redistributed data.
-      this->Internals->DeliveryManager->ClearRedistributedData(use_lod_rendering);
+      deliveryManager->ClearRedistributedData(use_lod_rendering);
+
+      deliveryManager->SetUseRedistributedDataAsDeliveredData(false);
     }
     // tell `this->SynchronizedRenderers` who to order the ranks when doing
     // parallel rendering.
@@ -1512,6 +1502,7 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   else
   {
     this->SynchronizedRenderers->SetPartitionOrdering(nullptr);
+    deliveryManager->SetUseRedistributedDataAsDeliveredData(false);
   }
 
   // enable render empty images if it was requested
@@ -1620,17 +1611,20 @@ void vtkPVRenderView::Deliver(int use_lod, unsigned int size, unsigned int* repr
   // remote-rendering related ivars from the client.
   this->SynchronizeForCollaboration();
 
-  this->GetDeliveryManager()->Deliver(use_lod, size, representation_ids);
+  this->Superclass::Deliver(use_lod, size, representation_ids);
 }
 
 //----------------------------------------------------------------------------
-int vtkPVRenderView::GetDataDistributionMode(bool use_remote_rendering)
+int vtkPVRenderView::GetDataDistributionMode(bool low_res)
 {
   if (this->ForceDataDistributionMode >= 0)
   {
     // data-distribution mode is being overridden (experimental)
     return this->ForceDataDistributionMode;
   }
+
+  const bool use_remote_rendering = low_res ? this->GetUseDistributedRenderingForLODRender()
+                                            : this->GetUseDistributedRenderingForRender();
 
   bool in_tile_display_mode = this->InTileDisplayMode();
   bool in_cave_mode = this->InCaveDisplayMode();
@@ -1649,20 +1643,6 @@ int vtkPVRenderView::GetDataDistributionMode(bool use_remote_rendering)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetPiece(vtkInformation* info, vtkPVDataRepresentation* repr,
-  vtkDataObject* data, unsigned long trueSize /*=0*/, int port)
-{
-  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
-  if (!view)
-  {
-    vtkGenericWarningMacro("Missing VIEW().");
-    return;
-  }
-
-  view->GetDeliveryManager()->SetPiece(repr, data, false, trueSize, port);
-}
-
-//----------------------------------------------------------------------------
 vtkAlgorithmOutput* vtkPVRenderView::GetPieceProducer(
   vtkInformation* info, vtkPVDataRepresentation* repr, int port)
 {
@@ -1674,20 +1654,6 @@ vtkAlgorithmOutput* vtkPVRenderView::GetPieceProducer(
   }
 
   return view->GetDeliveryManager()->GetProducer(repr, false, port);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetPieceLOD(
-  vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* data, int port)
-{
-  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
-  if (!view)
-  {
-    vtkGenericWarningMacro("Missing VIEW().");
-    return;
-  }
-
-  view->GetDeliveryManager()->SetPiece(repr, data, true, port);
 }
 
 //----------------------------------------------------------------------------
@@ -1715,7 +1681,8 @@ void vtkPVRenderView::MarkAsRedistributable(
     return;
   }
 
-  view->GetDeliveryManager()->MarkAsRedistributable(repr, value, port);
+  vtkPVRenderViewDataDeliveryManager::SafeDownCast(view->GetDeliveryManager())
+    ->MarkAsRedistributable(repr, value, port);
 }
 
 //----------------------------------------------------------------------------
@@ -1729,7 +1696,8 @@ void vtkPVRenderView::SetRedistributionMode(
     return;
   }
 
-  view->GetDeliveryManager()->SetRedistributionMode(repr, mode, port);
+  vtkPVRenderViewDataDeliveryManager::SafeDownCast(view->GetDeliveryManager())
+    ->SetRedistributionMode(repr, mode, port);
 }
 
 //----------------------------------------------------------------------------
@@ -1743,7 +1711,8 @@ void vtkPVRenderView::SetRedistributionModeToSplitBoundaryCells(
     return;
   }
 
-  view->GetDeliveryManager()->SetRedistributionModeToSplitBoundaryCells(repr, port);
+  vtkPVRenderViewDataDeliveryManager::SafeDownCast(view->GetDeliveryManager())
+    ->SetRedistributionModeToSplitBoundaryCells(repr, port);
 }
 
 //----------------------------------------------------------------------------
@@ -1757,7 +1726,8 @@ void vtkPVRenderView::SetRedistributionModeToDuplicateBoundaryCells(
     return;
   }
 
-  view->GetDeliveryManager()->SetRedistributionModeToDuplicateBoundaryCells(repr, port);
+  vtkPVRenderViewDataDeliveryManager::SafeDownCast(view->GetDeliveryManager())
+    ->SetRedistributionModeToDuplicateBoundaryCells(repr, port);
 }
 
 //----------------------------------------------------------------------------
@@ -1770,7 +1740,8 @@ void vtkPVRenderView::SetStreamable(vtkInformation* info, vtkPVDataRepresentatio
     return;
   }
 
-  view->GetDeliveryManager()->SetStreamable(repr, val);
+  vtkPVRenderViewDataDeliveryManager::SafeDownCast(view->GetDeliveryManager())
+    ->SetStreamable(repr, val);
 }
 
 //----------------------------------------------------------------------------
@@ -1784,8 +1755,8 @@ void vtkPVRenderView::SetOrderedCompositingInformation(vtkInformation* info,
     vtkGenericWarningMacro("Missing VIEW().");
     return;
   }
-  view->GetDeliveryManager()->SetOrderedCompositingInformation(
-    repr, translator, whole_extents, origin, spacing);
+  vtkPVRenderViewDataDeliveryManager::SafeDownCast(view->GetDeliveryManager())
+    ->SetOrderedCompositingInformation(repr, translator, whole_extents, origin, spacing);
 }
 
 //----------------------------------------------------------------------------
@@ -1813,7 +1784,8 @@ void vtkPVRenderView::SetDeliverToAllProcesses(
     return;
   }
 
-  view->GetDeliveryManager()->SetDeliverToAllProcesses(repr, clone, false);
+  vtkPVRenderViewDataDeliveryManager::SafeDownCast(view->GetDeliveryManager())
+    ->SetDeliverToAllProcesses(repr, clone, false);
 }
 
 //----------------------------------------------------------------------------
@@ -1827,13 +1799,14 @@ void vtkPVRenderView::SetDeliverToClientAndRenderingProcesses(vtkInformation* in
     return;
   }
 
-  view->GetDeliveryManager()->SetDeliverToClientAndRenderingProcesses(
-    repr, deliver_to_client, gather_before_delivery, false, port);
+  vtkPVRenderViewDataDeliveryManager::SafeDownCast(view->GetDeliveryManager())
+    ->SetDeliverToClientAndRenderingProcesses(
+      repr, deliver_to_client, gather_before_delivery, false, port);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetGeometryBounds(
-  vtkInformation* info, double bounds[6], vtkMatrix4x4* matrix /*=NULL*/)
+void vtkPVRenderView::SetGeometryBounds(vtkInformation* info, vtkPVDataRepresentation* repr,
+  const double bounds[6], vtkMatrix4x4* matrix /*=nullptr*/, int port /*=0*/)
 {
   vtkPVRenderView* self = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
   if (!self)
@@ -1842,28 +1815,29 @@ void vtkPVRenderView::SetGeometryBounds(
     return;
   }
 
-  if (self)
+  vtkBoundingBox bbox(bounds);
+  if (matrix && bbox.IsValid())
   {
-    if (matrix && vtkMath::AreBoundsInitialized(bounds))
-    {
-      double min_point[4] = { bounds[0], bounds[2], bounds[4], 1 };
-      double max_point[4] = { bounds[1], bounds[3], bounds[5], 1 };
-      matrix->MultiplyPoint(min_point, min_point);
-      matrix->MultiplyPoint(max_point, max_point);
-      double transformed_bounds[6];
-      transformed_bounds[0] = min_point[0] / min_point[3];
-      transformed_bounds[2] = min_point[1] / min_point[3];
-      transformed_bounds[4] = min_point[2] / min_point[3];
-      transformed_bounds[1] = max_point[0] / max_point[3];
-      transformed_bounds[3] = max_point[1] / max_point[3];
-      transformed_bounds[5] = max_point[2] / max_point[3];
-      self->GeometryBounds.AddBounds(transformed_bounds);
-    }
-    else
-    {
-      self->GeometryBounds.AddBounds(bounds);
-    }
+    double min_point[4] = { bounds[0], bounds[2], bounds[4], 1 };
+    double max_point[4] = { bounds[1], bounds[3], bounds[5], 1 };
+    matrix->MultiplyPoint(min_point, min_point);
+    matrix->MultiplyPoint(max_point, max_point);
+    double transformed_bounds[6];
+    transformed_bounds[0] = min_point[0] / min_point[3];
+    transformed_bounds[2] = min_point[1] / min_point[3];
+    transformed_bounds[4] = min_point[2] / min_point[3];
+    transformed_bounds[1] = max_point[0] / max_point[3];
+    transformed_bounds[3] = max_point[1] / max_point[3];
+    transformed_bounds[5] = max_point[2] / max_point[3];
+    bbox.SetBounds(transformed_bounds);
   }
+
+  auto pinfo = self->GetDeliveryManager()->GetPieceInformation(repr, /*low_res=*/false, port);
+  assert(pinfo != nullptr);
+
+  double tbds[6];
+  bbox.GetBounds(tbds);
+  pinfo->Set(GEOMETRY_BOUNDS(), tbds, 6);
 }
 
 //----------------------------------------------------------------------------
@@ -1877,7 +1851,8 @@ void vtkPVRenderView::SetNextStreamedPiece(
     return;
   }
   vtkStreamingStatusMacro(<< repr << " streamed piece of size: "
-                          << (piece ? piece->GetActualMemorySize() : 0)) self->GetDeliveryManager()
+                          << (piece ? piece->GetActualMemorySize() : 0));
+  vtkPVRenderViewDataDeliveryManager::SafeDownCast(self->GetDeliveryManager())
     ->SetNextStreamedPiece(repr, piece);
 }
 
@@ -1892,7 +1867,8 @@ vtkDataObject* vtkPVRenderView::GetCurrentStreamedPiece(
     return NULL;
   }
 
-  return self->GetDeliveryManager()->GetCurrentStreamedPiece(repr);
+  return vtkPVRenderViewDataDeliveryManager::SafeDownCast(self->GetDeliveryManager())
+    ->GetCurrentStreamedPiece(repr);
 }
 
 //----------------------------------------------------------------------------
@@ -2227,7 +2203,8 @@ void vtkPVRenderView::DeliverStreamedPieces(unsigned int size, unsigned int* rep
   // representation as "next piece". Representation can decide what to do with
   // it, including adding to the existing datastructure.
   vtkTimerLog::MarkStartEvent("vtkPVRenderView::DeliverStreamedPieces");
-  this->Internals->DeliveryManager->DeliverStreamedPieces(size, representation_ids);
+  vtkPVRenderViewDataDeliveryManager::SafeDownCast(this->GetDeliveryManager())
+    ->DeliverStreamedPieces(size, representation_ids);
 
   if (this->GetLocalProcessDoesRendering(this->GetUseDistributedRenderingForRender()))
   {
@@ -2237,8 +2214,9 @@ void vtkPVRenderView::DeliverStreamedPieces(unsigned int size, unsigned int* rep
       this->RequestInformation, this->ReplyInformationVector);
   }
 
-  this->Internals->DeliveryManager->ClearStreamedPieces();
-  //                                  ^--- the most dubious part of this code.
+  vtkPVRenderViewDataDeliveryManager::SafeDownCast(this->GetDeliveryManager())
+    ->ClearStreamedPieces();
+  //                          ^--- the most dubious part of this code.
 
   vtkTimerLog::MarkEndEvent("vtkPVRenderView::DeliverStreamedPieces");
 }

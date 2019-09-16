@@ -55,7 +55,6 @@ class vtkProp;
 class vtkPVAxesWidget;
 class vtkPVCameraCollection;
 class vtkPVCenterAxesActor;
-class vtkPVDataDeliveryManager;
 class vtkPVDataRepresentation;
 class vtkPVGridAxes3DActor;
 class vtkPVHardwareSelector;
@@ -442,12 +441,8 @@ public:
    * If trueSize is non-zero, then that's the size used in making decisions
    * about LOD/remote rendering etc and not the actual size of the dataset.
    */
-  static void SetPiece(vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* data,
-    unsigned long trueSize = 0, int port = 0);
   static vtkAlgorithmOutput* GetPieceProducer(
     vtkInformation* info, vtkPVDataRepresentation* repr, int port = 0);
-  static void SetPieceLOD(
-    vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* data, int port = 0);
   static vtkAlgorithmOutput* GetPieceProducerLOD(
     vtkInformation* info, vtkPVDataRepresentation* repr, int port = 0);
   static void MarkAsRedistributable(
@@ -458,8 +453,8 @@ public:
     vtkInformation* info, vtkPVDataRepresentation* repr, int port = 0);
   static void SetRedistributionModeToDuplicateBoundaryCells(
     vtkInformation* info, vtkPVDataRepresentation* repr, int port = 0);
-  static void SetGeometryBounds(
-    vtkInformation* info, double bounds[6], vtkMatrix4x4* transform = NULL);
+  static void SetGeometryBounds(vtkInformation* info, vtkPVDataRepresentation* repr,
+    const double bounds[6], vtkMatrix4x4* transform = nullptr, int port = 0);
   static void SetStreamable(vtkInformation* info, vtkPVDataRepresentation* repr, bool streamable);
   static void SetNextStreamedPiece(
     vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* piece);
@@ -716,19 +711,14 @@ public:
   /**
    * Returns the data distribution mode to use.
    */
-  int GetDataDistributionMode(bool use_remote_rendering);
-
-  /**
-   * Provides access to the geometry storage for this view.
-   */
-  vtkPVDataDeliveryManager* GetDeliveryManager();
+  int GetDataDistributionMode(bool low_res);
 
   /**
    * Called on all processes to request data-delivery for the list of
    * representations. Note this method has to be called on all processes or it
    * may lead to deadlock.
    */
-  void Deliver(int use_lod, unsigned int size, unsigned int* representation_ids);
+  void Deliver(int use_lod, unsigned int size, unsigned int* representation_ids) override;
 
   /**
    * Returns true when ordered compositing is needed on the current group of
@@ -750,25 +740,21 @@ public:
   /**
    * Enable/disable FXAA antialiasing.
    */
-  vtkSetMacro(UseFXAA, bool) vtkGetMacro(UseFXAA, bool)
-    //@}
+  vtkSetMacro(UseFXAA, bool);
+  vtkGetMacro(UseFXAA, bool);
+  //@}
 
-    //@{
-    /**
-     * FXAA tunable parameters. See vtkFXAAOptions for details.
-     */
-    void SetFXAARelativeContrastThreshold(double val);
+  //@{
+  /**
+   * FXAA tunable parameters. See vtkFXAAOptions for details.
+   */
+  void SetFXAARelativeContrastThreshold(double val);
   void SetFXAAHardContrastThreshold(double val);
   void SetFXAASubpixelBlendLimit(double val);
   void SetFXAASubpixelContrastThreshold(double val);
   void SetFXAAUseHighQualityEndpoints(bool val);
   void SetFXAAEndpointSearchIterations(int val);
   //@}
-
-  /**
-   * Provides access to the time when Update() was last called.
-   */
-  vtkMTimeType GetUpdateTimeStamp() { return this->UpdateTimeStamp; }
 
   /**
    * Copy internal fields that are used for rendering decision such as
@@ -973,18 +959,7 @@ protected:
   vtkPVRenderView();
   ~vtkPVRenderView() override;
 
-  //@{
-  /**
-   * Overridden to assign IDs to each representation. This assumes that
-   * representations will be added/removed in a consistent fashion across
-   * processes even in multi-client modes. The only exception is
-   * vtk3DWidgetRepresentation. However, since vtk3DWidgetRepresentation never
-   * does any data-delivery, we don't assign IDs for these, nor affect the ID
-   * uniquifier when a vtk3DWidgetRepresentation is added.
-   */
-  void AddRepresentationInternal(vtkDataRepresentation* rep) override;
-  void RemoveRepresentationInternal(vtkDataRepresentation* rep) override;
-  //@}
+  static vtkInformationDoubleVectorKey* GEOMETRY_BOUNDS();
 
   /**
    * Actual render method.
@@ -1156,11 +1131,6 @@ protected:
 
   vtkTypeUInt32 StillRenderProcesses;
   vtkTypeUInt32 InteractiveRenderProcesses;
-
-  /**
-   * Keeps track of the time when vtkPVRenderView::Update() was called.
-   */
-  vtkTimeStamp UpdateTimeStamp;
 
   /**
    * Keeps track of the time when the priority-queue for streaming was

@@ -1,7 +1,7 @@
 /*=========================================================================
 
-  Program:   ParaView
-  Module:    $RCSfile$
+  Program: ParaView
+  Module:  vtkPVDataDeliveryManager
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -13,16 +13,18 @@
 
 =========================================================================*/
 /**
- * @class   vtkPVDataDeliveryManager
- * @brief   manager for data-delivery.
+ * @class vtkPVDataDeliveryManager
+ * @brief manager for data-delivery.
  *
- * vtkPVDataDeliveryManager manages geometry delivering for rendering. It is
- * used by vtkPVRenderView to manage the delivery of geometry to the nodes where
- * rendering is happening. This class helps us consolidate all the code for
- * delivering different types of geometries to all the nodes involved as well we
- * a managing idiosyncrasies like requiring delivering to all nodes,
- * redistributing for ordered compositing, etc.
-*/
+ * ParaView's multi-configuration / multi-process modes pose a challenge for
+ * views. At runtime, the current configuration will determine which processes
+ * have what parts of data and which processes are expected to "render" that data.
+ * While views and their representations may add certain qualifiers to this
+ * statement, generally speaking, all views have to support taking the data from
+ * the data-processing nodes and delivering it to the rendering nodes. This is
+ * where vtkPVDataDeliveryManager comes in play. It helps views (viz. vtkPVView
+ * subclasses) move the data.
+ */
 
 #ifndef vtkPVDataDeliveryManager_h
 #define vtkPVDataDeliveryManager_h
@@ -30,23 +32,32 @@
 #include "vtkObject.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkSmartPointer.h"                      // needed for iVar.
+#include "vtkTuple.h"                             // needed for vtkTuple.
 #include "vtkWeakPointer.h"                       // needed for iVar.
 
 class vtkAlgorithmOutput;
 class vtkDataObject;
 class vtkExtentTranslator;
+class vtkInformation;
 class vtkPKdTree;
 class vtkPVDataRepresentation;
-class vtkPVRenderView;
+class vtkPVView;
 
 #include <vector>
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVDataDeliveryManager : public vtkObject
 {
 public:
-  static vtkPVDataDeliveryManager* New();
   vtkTypeMacro(vtkPVDataDeliveryManager, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
+
+  //@{
+  /**
+   * Get/Set the render-view. The view is not reference counted.
+   */
+  void SetView(vtkPVView*);
+  vtkPVView* GetView() const;
+  //@}
 
   /**
    * Returned a hash number that can be used to verify that both client and
@@ -75,8 +86,27 @@ public:
    */
   void SetPiece(vtkPVDataRepresentation* repr, vtkDataObject* data, bool low_res,
     unsigned long trueSize = 0, int port = 0);
-  void SetPiece(unsigned int repr_id, vtkDataObject* data, bool low_res, int port = 0);
   //@}
+
+  //@{
+  bool HasPiece(vtkPVDataRepresentation* repr, bool low_res = false, int port = 0);
+  //@}
+
+  /**
+   * Returns the local data object set by calling `SetPiece` (or from the
+   * cache). This is the data object pre-delivery.
+   */
+  vtkDataObject* GetPiece(vtkPVDataRepresentation* repr, bool low_res, int port = 0);
+
+  /**
+   * Returns the data object post-delivery.
+   */
+  vtkDataObject* GetDeliveredPiece(vtkPVDataRepresentation* repr, bool low_res, int port = 0);
+
+  /**
+   * Clear all cached data objects for the given representation.
+   */
+  void ClearCache(vtkPVDataRepresentation* repr);
 
   //@{
   /**
@@ -86,53 +116,21 @@ public:
    * the geometry producer for the geometry to be rendered.
    */
   vtkAlgorithmOutput* GetProducer(vtkPVDataRepresentation*, bool low_res, int port = 0);
-  vtkAlgorithmOutput* GetProducer(unsigned int, bool low_res, int port = 0);
   //@}
-
-  /**
-   * By default, this class only delivers geometries to nodes that are doing the
-   * rendering at a given stage. However, certain representations, such as
-   * data-label representation, or cube-axes representation, need to the
-   * geometry to be delivered to all nodes always. That can be done by using
-   * this method (via vtkPVRenderView::SetDeliverToAllProcesses()).
-   */
-  void SetDeliverToAllProcesses(vtkPVDataRepresentation*, bool flag, bool low_res, int port = 0);
-
-  /**
-   * By default, this class only delivers geometries to nodes that are doing the
-   * rendering at a given stage. However, certain representations, such as
-   * text-source representation, need to the geometry to be delivered to  the
-   * client as well.  That can be done by using this method (via
-   * vtkPVRenderView::SetDeliverToAllProcesses()). The different between
-   * SetDeliverToAllProcesses() and this is that the former gather-and-scatters
-   * the data on the server nodes, while the latter will optionally gather the data to
-   * deliver to the client and never scatter.
-   */
-  void SetDeliverToClientAndRenderingProcesses(vtkPVDataRepresentation*, bool deliver_to_client,
-    bool gather_before_delivery, bool low_res, int port = 0);
-
-  /**
-   * Under certain cases, e.g. when remote rendering in parallel with
-   * translucent geometry, the geometry may need to be redistributed to ensure
-   * ordered compositing can be employed correctly. Marking geometry provided by
-   * a representation as redistributable makes it possible for this class to
-   * redistribute the geometry as needed. Only vtkPolyData, vtkUnstructuredGrid
-   * or a multi-block comprising of vtkPolyData is currently supported.
-   */
-  void MarkAsRedistributable(vtkPVDataRepresentation*, bool value = true, int port = 0);
 
   //@{
   /**
-   * For representations that have indicated that the data is redistributable
-   * (using MarkAsRedistributable), this control the mode for redistribution.
-   * Specifically, it indicates how to handle cells that are on the boundary of
-   * the redistribution KdTree. Default is to split the cells, one can change it
-   * to duplicate cells instead by using mode as
-   * `vtkDistributedDataFilter::ASSIGN_TO_ALL_INTERSECTING_REGIONS`.
+   * Set/Get meta-data container for the specific piece. Views can use it to
+   * store arbitrary metadata for each piece.
    */
-  void SetRedistributionMode(vtkPVDataRepresentation*, int mode, int port = 0);
-  void SetRedistributionModeToSplitBoundaryCells(vtkPVDataRepresentation* repr, int port = 0);
-  void SetRedistributionModeToDuplicateBoundaryCells(vtkPVDataRepresentation* repr, int port = 0);
+  vtkInformation* GetPieceInformation(vtkPVDataRepresentation* repr, bool low_res, int port = 0);
+  //@}
+
+  //@{
+  /**
+   * Returns number of known port for the representation.
+   */
+  int GetNumberOfPorts(vtkPVDataRepresentation* repr);
   //@}
 
   /**
@@ -144,112 +142,54 @@ public:
   unsigned long GetVisibleDataSize(bool low_res);
 
   /**
-   * Provides access to the partitioning kd-tree that was generated using the
-   * data provided by the representations. The view uses this kd-tree to decide
-   * on the compositing order when ordered compositing is being used.
-   */
-  vtkPKdTree* GetKdTree();
-
-  //@{
-  /**
-   * Get/Set the render-view. The view is not reference counted.
-   */
-  void SetRenderView(vtkPVRenderView*);
-  vtkPVRenderView* GetRenderView();
-  //@}
-
-  /**
-   * Called by the view on every render when ordered compositing is to be used to
-   * ensure that the geometries are redistributed, as needed.
-   */
-  void RedistributeDataForOrderedCompositing(bool use_lod);
-
-  /**
-   * Removes all redistributed data that may have been redistributed for ordered compositing
-   * earlier when using KdTree based redistribution.
-   */
-  void ClearRedistributedData(bool use_load);
-
-  /**
-   * Pass the structured-meta-data for determining rendering order for ordered
-   * compositing.
-   */
-  void SetOrderedCompositingInformation(vtkPVDataRepresentation* repr,
-    vtkExtentTranslator* translator, const int whole_extents[6], const double origin[3],
-    const double spacing[3], int port = 0);
-
-  /**
    * Internal method used to determine the list of representations that need
    * their geometry delivered. This is done on the "client" side, with the
    * client decide what geometries it needs and then requests those from the
    * server-sides using Deliver().
    */
   bool NeedsDelivery(
-    vtkMTimeType timestamp, std::vector<unsigned int>& keys_to_deliver, bool interactive);
+    vtkMTimeType timestamp, std::vector<unsigned int>& keys_to_deliver, bool use_lod);
 
   /**
    * Triggers delivery for the geometries of indicated representations.
    */
   void Deliver(int use_low_res, unsigned int size, unsigned int* keys);
 
-  // *******************************************************************
-  // UNDER CONSTRUCTION STREAMING API
-  // *******************************************************************
-
   /**
-   * Mark a representation as streamable. Any representation can indicate that
-   * it is streamable i.e. the view can call streaming passses on it and it will
-   * deliver data incrementally.
+   * Views that support changing of which ranks do the rendering at runtime
+   * based on things like data sizes, etc. may override this method to provide a
+   * unique key for each different mode. This makes it possible to keep
+   * delivered data object for each mode separate and thus avoid transfers if
+   * the mode is changed on the fly.
+   *
+   * Default implementation simply returns 0.
    */
-  void SetStreamable(vtkPVDataRepresentation*, bool, int port = 0);
-
-  //@{
-  /**
-   * Passes the current streamed piece. This is the piece that will be delivered
-   * to the rendering node.
-   */
-  void SetNextStreamedPiece(vtkPVDataRepresentation* repr, vtkDataObject* piece, int port = 0);
-  vtkDataObject* GetCurrentStreamedPiece(vtkPVDataRepresentation* repr, int port = 0);
-  void ClearStreamedPieces();
-  //@}
-
-  /**
-   * Deliver streamed pieces. Unlike regular data, streamed pieces are delivered
-   * and released. Representations are expected to manage the pieces once they
-   * are delivered to them.
-   */
-  void DeliverStreamedPieces(unsigned int size, unsigned int* keys);
-
-  /**
-   * Fills up the vector with the keys for representations that have non-null
-   * streaming pieces.
-   */
-  bool GetRepresentationsReadyToStreamPieces(std::vector<unsigned int>& keys);
-
-  // *******************************************************************
+  virtual int GetDeliveredDataKey(bool low_res) const
+  {
+    (void)low_res;
+    return 0;
+  }
 
 protected:
   vtkPVDataDeliveryManager();
   ~vtkPVDataDeliveryManager() override;
 
+  double GetCacheKey(vtkPVDataRepresentation* repr) const;
+
   /**
-   * Helper method to return the current data distribution mode by querying the
-   * vtkPVRenderView.
+   * This method is called to request that the subclass do appropriate transfer
+   * for the indicated representation.
    */
-  int GetViewDataDistributionMode(bool use_lod);
+  virtual void MoveData(vtkPVDataRepresentation* repr, bool low_res, int port) = 0;
 
-  vtkWeakPointer<vtkPVRenderView> RenderView;
-  vtkSmartPointer<vtkPKdTree> KdTree;
-
-  vtkTimeStamp RedistributionTimeStamp;
-  std::string LastCutsGeneratorToken;
+  class vtkInternals;
+  vtkInternals* Internals;
 
 private:
   vtkPVDataDeliveryManager(const vtkPVDataDeliveryManager&) = delete;
   void operator=(const vtkPVDataDeliveryManager&) = delete;
 
-  class vtkInternals;
-  vtkInternals* Internals;
+  vtkWeakPointer<vtkPVView> View;
 };
 
 #endif

@@ -34,7 +34,6 @@
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVCacheKeeper.h"
 #include "vtkPVContextView.h"
 #include "vtkPVXYChartView.h"
 #include "vtkPen.h"
@@ -157,6 +156,17 @@ vtkChartXY* vtkPVBagChartRepresentation::GetChart()
 void vtkPVBagChartRepresentation::PrepareForRendering()
 {
   this->Superclass::PrepareForRendering();
+
+  if (this->LocalOutput)
+  {
+    this->LocalGrid = vtkImageData::SafeDownCast(this->LocalOutput->GetBlock(2));
+    this->LocalThreshold = vtkTable::SafeDownCast(this->LocalOutput->GetBlock(3));
+  }
+  else
+  {
+    this->LocalGrid = nullptr;
+    this->LocalThreshold = nullptr;
+  }
 
   vtkChartXY* chart = this->GetChart();
   vtkPlotBag* bagPlot = 0;
@@ -378,118 +388,13 @@ void vtkPVBagChartRepresentation::SetPolyLineToTable(vtkPolyData* polyline, vtkT
 }
 
 //----------------------------------------------------------------------------
-int vtkPVBagChartRepresentation::RequestData(
-  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+vtkSmartPointer<vtkDataObject> vtkPVBagChartRepresentation::ReduceDataToRoot(vtkDataObject* data)
 {
-  if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_RENDER_SERVER)
-  {
-    return this->Superclass::RequestData(request, inputVector, outputVector);
-  }
-
-  // remove the "cached" delivered data.
-  this->LocalOutput = NULL;
-
-  // Pass caching information to the cache keeper.
-  this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
-  this->CacheKeeper->SetCacheTime(this->GetCacheKey());
-
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  int myId = pm->GetPartitionId();
-  int numProcs = pm->GetNumberOfLocalPartitions();
-
-  if (inputVector[0]->GetNumberOfInformationObjects() == 1)
-  {
-    vtkSmartPointer<vtkDataObject> data;
-
-    // don't process data is the cachekeeper has already cached the result.
-    if (!this->CacheKeeper->IsCached())
-    {
-      data = vtkDataObject::GetData(inputVector[0], 0);
-      data = this->TransformInputData(inputVector, data);
-      if (!data)
-      {
-        return 0;
-      }
-
-      // Prune input dataset to only process blocks on interest.
-      // If input is not a multiblock dataset, we make it one so the rest of the
-      // pipeline is simple.
-      if (data->IsA("vtkMultiBlockDataSet"))
-      {
-        vtkNew<vtkExtractBlock> extractBlock;
-        extractBlock->SetInputData(data);
-        extractBlock->PruneOutputOff();
-        int i = 0;
-        for (std::set<unsigned int>::const_iterator iter = this->CompositeIndices.begin();
-             iter != this->CompositeIndices.end(); ++iter, ++i)
-        {
-          extractBlock->AddIndex(*iter);
-        }
-
-        extractBlock->Update();
-        data = extractBlock->GetOutputDataObject(0);
-      }
-      else
-      {
-        vtkNew<vtkMultiBlockDataSet> mbdata;
-        mbdata->SetNumberOfBlocks(1);
-        mbdata->SetBlock(0, data);
-        data = mbdata.GetPointer();
-      }
-
-      // data must be a multiblock dataset, no matter what.
-      assert(data->IsA("vtkMultiBlockDataSet"));
-
-      // now deliver data to the rendering sides:
-      // first, reduce it to root node.
-      vtkNew<vtkReductionFilter> reductionFilter;
-      // For now we do not support parallel servers
-      // vtkNew<vtkPVMergeTablesMultiBlock> algo;
-      // reductionFilter->SetPostGatherHelper(algo.GetPointer());
-      reductionFilter->SetController(pm->GetGlobalController());
-      reductionFilter->SetInputData(data);
-      reductionFilter->Update();
-
-      data = reductionFilter->GetOutputDataObject(0);
-
-      if (this->EnableServerSideRendering && numProcs > 1)
-      {
-        // share the reduction result will all satellites.
-        pm->GetGlobalController()->Broadcast(data.GetPointer(), 0);
-      }
-      this->CacheKeeper->SetInputData(data);
-    }
-    // here the cachekeeper will either give us the cached result of the result
-    // we just processed.
-    this->CacheKeeper->Update();
-    data = this->CacheKeeper->GetOutputDataObject(0);
-
-    if (myId == 0)
-    {
-      // send data to client.
-      vtkNew<vtkClientServerMoveData> deliver;
-      deliver->SetInputData(data);
-      deliver->Update();
-    }
-
-    this->LocalOutput = vtkMultiBlockDataSet::SafeDownCast(data);
-  }
-  else
-  {
-    // receive data on client.
-    vtkNew<vtkClientServerMoveData> deliver;
-    deliver->Update();
-    this->LocalOutput = vtkMultiBlockDataSet::SafeDownCast(deliver->GetOutputDataObject(0));
-  }
-
-  this->LocalGrid = NULL;
-  this->LocalThreshold = NULL;
-
-  if (this->LocalOutput)
-  {
-    this->LocalGrid = vtkImageData::SafeDownCast(this->LocalOutput->GetBlock(2));
-    this->LocalThreshold = vtkTable::SafeDownCast(this->LocalOutput->GetBlock(3));
-  }
-
-  return vtkPVDataRepresentation::RequestData(request, inputVector, outputVector);
+  vtkNew<vtkReductionFilter> reductionFilter;
+  // For now we do not support parallel servers
+  // vtkNew<vtkPVMergeTablesMultiBlock> algo;
+  // reductionFilter->SetPostGatherHelper(algo.GetPointer());
+  reductionFilter->SetInputData(data);
+  reductionFilter->Update();
+  return reductionFilter->GetOutputDataObject(0);
 }

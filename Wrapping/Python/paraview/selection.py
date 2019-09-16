@@ -261,6 +261,10 @@ def SelectSurfaceBlocks(Rectangle=[], View=None, Modifier=None):
         # to add blocks.
         ClearSelection()
 
+        # need to trigger render since otherwise the representation for the
+        # selection that was just cleared may not have updated.
+        paraview.simple.Render(View)
+
     return _surfaceSelectionHelper(Rectangle, View, 'BLOCK', Modifier)
 
 def SelectPointsThrough(Rectangle=[], View=None):

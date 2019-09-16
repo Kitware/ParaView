@@ -25,7 +25,6 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVCacheKeeper.h"
 #include "vtkPVRenderView.h"
 #include "vtkPointSource.h"
 #include "vtkPolyData.h"
@@ -63,16 +62,12 @@ vtkTextSourceRepresentation::vtkTextSourceRepresentation()
   this->FlagpoleLabel = nullptr;
   this->BillboardTextActor = nullptr;
 
-  this->CacheKeeper = vtkPVCacheKeeper::New();
-
   vtkPointSource* source = vtkPointSource::New();
   source->SetNumberOfPoints(1);
   source->Update();
   this->DummyPolyData = vtkPolyData::New();
   this->DummyPolyData->ShallowCopy(source->GetOutputDataObject(0));
   source->Delete();
-
-  this->CacheKeeper->SetInputData(this->DummyPolyData);
 }
 
 //----------------------------------------------------------------------------
@@ -82,7 +77,6 @@ vtkTextSourceRepresentation::~vtkTextSourceRepresentation()
   this->SetTextWidgetRepresentation(nullptr);
   this->SetBillboardTextActor(nullptr);
   this->DummyPolyData->Delete();
-  this->CacheKeeper->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -170,30 +164,9 @@ bool vtkTextSourceRepresentation::RemoveFromView(vtkView* view)
 }
 
 //----------------------------------------------------------------------------
-void vtkTextSourceRepresentation::MarkModified()
-{
-  if (!this->GetUseCache())
-  {
-    // Cleanup caches when not using cache.
-    this->CacheKeeper->RemoveAllCaches();
-  }
-  this->Superclass::MarkModified();
-}
-
-//----------------------------------------------------------------------------
-bool vtkTextSourceRepresentation::IsCached(double cache_key)
-{
-  return this->CacheKeeper->IsCached(cache_key);
-}
-
-//----------------------------------------------------------------------------
 int vtkTextSourceRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  // Pass caching information to the cache keeper.
-  this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
-  this->CacheKeeper->SetCacheTime(this->GetCacheKey());
-
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     vtkTable* input = vtkTable::GetData(inputVector[0], 0);
@@ -202,14 +175,11 @@ int vtkTextSourceRepresentation::RequestData(
       this->DummyPolyData->GetFieldData()->ShallowCopy(input->GetRowData());
     }
   }
+  else
+  {
+    this->DummyPolyData->Initialize();
+  }
   this->DummyPolyData->Modified();
-  this->CacheKeeper->Update();
-
-  // It is tempting to try to do the data delivery in RequestData() itself.
-  // However, whenever a representation updates, ParaView GUI may have some
-  // GatherInformation() requests that happen. That messes up with any
-  // data-delivery code placed here. So we leave the data delivery to the
-  // REQUEST_PREPARE_FOR_RENDER() pass.
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 
@@ -225,7 +195,7 @@ int vtkTextSourceRepresentation::ProcessViewRequest(
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
   {
-    vtkPVRenderView::SetPiece(inInfo, this, this->CacheKeeper->GetOutputDataObject(0));
+    vtkPVRenderView::SetPiece(inInfo, this, this->DummyPolyData);
     vtkPVRenderView::SetDeliverToClientAndRenderingProcesses(inInfo, this,
       /*deliver_to_client=*/true, /*gather_before_delivery=*/false);
   }

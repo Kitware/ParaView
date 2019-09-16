@@ -26,7 +26,6 @@
 #include "vtkMaskPoints.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVCacheKeeper.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
 #include "vtkTextProperty.h"
@@ -42,7 +41,6 @@ vtkDataLabelRepresentation::vtkDataLabelRepresentation()
   this->MaximumNumberOfLabels = 100;
 
   this->MergeBlocks = vtkCompositeDataToUnstructuredGridFilter::New();
-  this->CacheKeeper = vtkPVCacheKeeper::New();
 
   this->PointMask = vtkSmartPointer<vtkMaskPoints>::New();
   this->PointMask->SetOnRatio(1);
@@ -59,8 +57,6 @@ vtkDataLabelRepresentation::vtkDataLabelRepresentation()
   this->CellLabelMapper = vtkLabeledDataMapper::New();
   this->CellLabelActor = vtkActor2D::New();
   this->CellLabelProperty = vtkTextProperty::New();
-
-  this->CacheKeeper->SetInputConnection(this->MergeBlocks->GetOutputPort());
 
   this->PointMask->SetMaximumNumberOfPoints(this->MaximumNumberOfLabels);
   this->PointMask->RandomModeOn();
@@ -107,7 +103,6 @@ vtkDataLabelRepresentation::~vtkDataLabelRepresentation()
   this->CellLabelProperty->Delete();
   this->Transform->Delete();
   this->TransformHelperProp->Delete();
-  this->CacheKeeper->Delete();
   this->WarningObserver->Delete();
 }
 
@@ -313,23 +308,6 @@ void vtkDataLabelRepresentation::SetCellLabelFormat(const char* format)
 }
 
 //----------------------------------------------------------------------------
-void vtkDataLabelRepresentation::MarkModified()
-{
-  if (!this->GetUseCache())
-  {
-    // Cleanup caches when not using cache.
-    this->CacheKeeper->RemoveAllCaches();
-  }
-  this->Superclass::MarkModified();
-}
-
-//----------------------------------------------------------------------------
-bool vtkDataLabelRepresentation::IsCached(double cache_key)
-{
-  return this->CacheKeeper->IsCached(cache_key);
-}
-
-//----------------------------------------------------------------------------
 int vtkDataLabelRepresentation::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
@@ -368,16 +346,12 @@ bool vtkDataLabelRepresentation::RemoveFromView(vtkView* view)
 int vtkDataLabelRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  // Pass caching information to the cache keeper.
-  this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
-  this->CacheKeeper->SetCacheTime(this->GetCacheKey());
-
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     this->MergeBlocks->SetInputConnection(this->GetInternalOutputPort());
-    this->CacheKeeper->Update();
-
-    this->Dataset = this->CacheKeeper->GetOutputDataObject(0);
+    this->MergeBlocks->Modified();
+    this->MergeBlocks->Update();
+    this->Dataset = this->MergeBlocks->GetOutputDataObject(0);
   }
   else
   {
@@ -400,7 +374,7 @@ int vtkDataLabelRepresentation::ProcessViewRequest(
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
   {
-    vtkPVRenderView::SetPiece(inInfo, this, this->Dataset);
+    vtkPVView::SetPiece(inInfo, this, this->Dataset);
     vtkPVRenderView::SetDeliverToAllProcesses(inInfo, this, true);
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())

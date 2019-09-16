@@ -45,6 +45,9 @@ public:
   vtkTypeMacro(vtkCompositeRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+    vtkInformation* outInfo) override;
+
   /**
    * Methods overridden to propagate to the active representation.
    */

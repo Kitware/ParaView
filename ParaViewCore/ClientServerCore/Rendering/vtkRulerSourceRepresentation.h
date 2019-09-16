@@ -22,14 +22,13 @@
 #ifndef vtkRulerSourceRepresentation_h
 #define vtkRulerSourceRepresentation_h
 
-#include "vtkNew.h" //needed for instances of vtkPVCacheKeeper, vtkPolyData
+#include "vtkNew.h"                               //needed for instances of vtkPolyData
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 
 class vtkDistanceRepresentation2D;
 class vtkPolyData;
 class vtkProperty2D;
-class vtkPVCacheKeeper;
 class vtkTextProperty;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkRulerSourceRepresentation
@@ -62,8 +61,6 @@ public:
    * Set the color for the displayed axis.
    */
   void SetAxisColor(double red, double green, double blue);
-
-  void MarkModified() override;
 
   /**
    * Set the visibility.
@@ -150,13 +147,7 @@ protected:
    */
   bool RemoveFromView(vtkView* view) override;
 
-  /**
-   * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
-   */
-  bool IsCached(double cache_key) override;
-
   vtkDistanceRepresentation2D* DistanceRepresentation;
-  vtkNew<vtkPVCacheKeeper> CacheKeeper;
   vtkNew<vtkPolyData> Clone;
 
 private:

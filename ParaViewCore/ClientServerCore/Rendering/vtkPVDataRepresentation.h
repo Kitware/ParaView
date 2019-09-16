@@ -42,7 +42,10 @@ public:
    * typically called by the vtkView to request meta-data from the
    * representations or ask them to perform certain tasks e.g.
    * PrepareForRendering.
-   * Overridden to skip processing when visibility if off.
+   *
+   * @note Starting with ParaView 5.8, this method is no longer called for
+   * hidden representation i.e. representations for which
+   * `vtkDataRepresentation::GetVisibility()` returns false.
    */
   virtual int ProcessViewRequest(
     vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
@@ -120,35 +123,19 @@ public:
   vtkGetMacro(UpdateTimeValid, bool);
   //@}
 
+  //@{
   /**
-   * Typically a representation decides whether to use cache based on the view's
-   * values for UseCache and CacheKey.
-   * However in some cases we may want to
-   * force a representation to cache irrespective of the view (e.g. comparative
-   * views). In which case these ivars can up set. If ForcedCacheKey is true, it
-   * overrides UseCache and CacheKey. Instead, ForcedCacheKey is used.
+   * Generally, caching is within the purview of the vtkPVView (and subclasses).
+   * However, a representation may choose to override that caching by forcing
+   * specific caching parameters. This is primarily intended for views like
+   * comparative view that rely on caching to show multiple frames from the same
+   * pipeline at a time.
    */
   virtual void SetForcedCacheKey(double val) { this->ForcedCacheKey = val; }
   virtual void SetForceUseCache(bool val) { this->ForceUseCache = val; }
-
-  //@{
-  /**
-   * Returns whether caching is used and what key to use when caching is
-   * enabled.
-   */
-  virtual double GetCacheKey();
-  virtual bool GetUseCache();
+  vtkGetMacro(ForcedCacheKey, double);
+  vtkGetMacro(ForceUseCache, bool);
   //@}
-
-  /**
-   * Called by vtkPVDataRepresentationPipeline to see if using cache is valid
-   * and will be used for the update. If so, it bypasses all pipeline passes.
-   * Subclasses should override IsCached(double) to indicate if a particular
-   * entry is cached.
-   */
-  bool GetUsingCacheForUpdate();
-
-  vtkGetMacro(NeedUpdate, bool);
 
   //@{
   /**
@@ -197,16 +184,6 @@ protected:
   ~vtkPVDataRepresentation() override;
 
   /**
-   * Subclasses should override this method when they support caching to
-   * indicate if the particular key is cached. Default returns false.
-   */
-  virtual bool IsCached(double cache_key)
-  {
-    (void)cache_key;
-    return false;
-  }
-
-  /**
    * Create a default executive.
    */
   vtkExecutive* CreateDefaultExecutive() override;
@@ -232,7 +209,6 @@ private:
   bool Visibility;
   bool ForceUseCache;
   double ForcedCacheKey;
-  bool NeedUpdate;
 
   class Internals;
   Internals* Implementation;

@@ -40,6 +40,7 @@ class vtkImageData;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
+class vtkSMDataDeliveryManagerProxy;
 class vtkSMRepresentationProxy;
 class vtkSMSourceProxy;
 class vtkView;
@@ -320,6 +321,11 @@ protected:
    */
   bool GetLocalProcessSupportsInteraction();
 
+  /**
+   * Provides access to the delivery manager proxy, if any.
+   */
+  vtkGetObjectMacro(DeliveryManager, vtkSMDataDeliveryManagerProxy);
+
   vtkSetStringMacro(DefaultRepresentationName);
   char* DefaultRepresentationName;
 
@@ -329,6 +335,7 @@ private:
   vtkSMViewProxy(const vtkSMViewProxy&) = delete;
   void operator=(const vtkSMViewProxy&) = delete;
 
+  vtkSMDataDeliveryManagerProxy* DeliveryManager;
   static bool TransparentBackground;
 
   // When view's time changes, there's no way for the client-side proxies to

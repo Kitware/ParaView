@@ -22,8 +22,10 @@
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkInformationRequestKey.h"
 #include "vtkInformationVector.h"
+#include "vtkMPIMoveData.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVDataDeliveryManager.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVLogger.h"
 #include "vtkPVOptions.h"
@@ -211,11 +213,14 @@ vtkPVView::vtkPVView(bool create_render_window)
     this->RenderWindow->SetPosition(this->Position);
     this->RenderWindow->SetDPI(this->PPI);
   }
+
+  this->DeliveryManager = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkPVView::~vtkPVView()
 {
+  this->SetDeliveryManager(nullptr);
   this->RequestInformation->Delete();
   this->ReplyInformationVector->Delete();
   this->SetRenderWindow(nullptr);
@@ -441,6 +446,8 @@ void vtkPVView::Update()
   this->CallProcessViewRequest(
     vtkPVView::REQUEST_UPDATE(), this->RequestInformation, this->ReplyInformationVector);
   vtkTimerLog::MarkEndEvent("vtkPVView::Update");
+
+  this->UpdateTimeStamp.Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -481,7 +488,12 @@ void vtkPVView::CallProcessViewRequest(
     vtkPVDataRepresentation* pvrepr = vtkPVDataRepresentation::SafeDownCast(repr);
     if (pvrepr)
     {
-      pvrepr->ProcessViewRequest(type, inInfo, outInfo);
+      if (pvrepr->GetVisibility() &&
+        // skip update passes, if requested.
+        (type != REQUEST_UPDATE() || this->SkipUpdateRepresentation(pvrepr) == false))
+      {
+        pvrepr->ProcessViewRequest(type, inInfo, outInfo);
+      }
     }
     else if (repr && type == REQUEST_UPDATE())
     {
@@ -506,8 +518,26 @@ void vtkPVView::AddRepresentationInternal(vtkDataRepresentation* rep)
                     << "AddToView implementation. Please fix that. "
                     << "Also check the same for RemoveFromView(..).");
     }
+
+    if (this->DeliveryManager)
+    {
+      this->DeliveryManager->RegisterRepresentation(drep);
+    }
   }
   this->Superclass::AddRepresentationInternal(rep);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVView::RemoveRepresentationInternal(vtkDataRepresentation* rep)
+{
+  if (auto dataRep = vtkPVDataRepresentation::SafeDownCast(rep))
+  {
+    if (this->DeliveryManager)
+    {
+      this->DeliveryManager->UnRegisterRepresentation(dataRep);
+    }
+  }
+  this->Superclass::RemoveRepresentationInternal(rep);
 }
 
 //-----------------------------------------------------------------------------
@@ -741,4 +771,126 @@ void vtkPVView::SetTileViewport(double x0, double y0, double x1, double y1)
 vtkPVSession* vtkPVView::GetSession()
 {
   return this->Session;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVView::SkipUpdateRepresentation(vtkPVDataRepresentation* repr)
+{
+  if ((this->GetUseCache() || repr->GetForceUseCache()) && this->DeliveryManager &&
+    this->DeliveryManager->HasPiece(repr))
+  {
+    vtkLogF(TRACE, "skipping %s", repr->GetLogName().c_str());
+    return true;
+  }
+
+  return false;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVView::RepresentationModified(vtkPVDataRepresentation* repr)
+{
+  assert(repr != nullptr);
+  if (!this->GetUseCache() && !repr->GetForceUseCache() && this->DeliveryManager != nullptr)
+  {
+    vtkLogF(TRACE, "clear cache %s", repr->GetLogName().c_str());
+    this->DeliveryManager->ClearCache(repr);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVView::SetDeliveryManager(vtkPVDataDeliveryManager* manager)
+{
+  if (this->DeliveryManager)
+  {
+    this->DeliveryManager->SetView(nullptr);
+  }
+  vtkSetObjectBodyMacro(DeliveryManager, vtkPVDataDeliveryManager, manager);
+  if (this->DeliveryManager)
+  {
+    // not reference counted.
+    this->DeliveryManager->SetView(this);
+  }
+}
+
+//-----------------------------------------------------------------------------
+vtkPVDataDeliveryManager* vtkPVView::GetDeliveryManager(vtkInformation* info)
+{
+  auto* view = info ? vtkPVView::SafeDownCast(info->Get(VIEW())) : nullptr;
+  if (!view)
+  {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return nullptr;
+  }
+  return view->GetDeliveryManager();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVView::SetPiece(vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* data,
+  unsigned long trueSize, int port)
+{
+  if (auto dm = vtkPVView::GetDeliveryManager(info))
+  {
+    dm->SetPiece(repr, data, false, trueSize, port);
+  }
+}
+
+//-----------------------------------------------------------------------------
+vtkDataObject* vtkPVView::GetPiece(vtkInformation* info, vtkPVDataRepresentation* repr, int port)
+{
+  if (auto dm = vtkPVView::GetDeliveryManager(info))
+  {
+    return dm->GetPiece(repr, false, port);
+  }
+  return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+vtkDataObject* vtkPVView::GetDeliveredPiece(
+  vtkInformation* info, vtkPVDataRepresentation* repr, int port)
+{
+  if (auto dm = vtkPVView::GetDeliveryManager(info))
+  {
+    return dm->GetDeliveredPiece(repr, false, port);
+  }
+  return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVView::SetPieceLOD(vtkInformation* info, vtkPVDataRepresentation* repr,
+  vtkDataObject* data, unsigned long trueSize, int port)
+{
+  if (auto dm = vtkPVView::GetDeliveryManager(info))
+  {
+    dm->SetPiece(repr, data, true, trueSize, port);
+  }
+}
+
+//-----------------------------------------------------------------------------
+vtkDataObject* vtkPVView::GetPieceLOD(vtkInformation* info, vtkPVDataRepresentation* repr, int port)
+{
+  if (auto dm = vtkPVView::GetDeliveryManager(info))
+  {
+    return dm->GetPiece(repr, true, port);
+  }
+  return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+vtkDataObject* vtkPVView::GetDeliveredPieceLOD(
+  vtkInformation* info, vtkPVDataRepresentation* repr, int port)
+{
+  if (auto dm = vtkPVView::GetDeliveryManager(info))
+  {
+    return dm->GetDeliveredPiece(repr, true, port);
+  }
+  return nullptr;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVView::Deliver(int use_lod, unsigned int size, unsigned int* representation_ids)
+{
+  if (auto dm = this->GetDeliveryManager())
+  {
+    dm->Deliver(use_lod, size, representation_ids);
+  }
 }

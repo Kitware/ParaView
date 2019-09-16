@@ -20,7 +20,7 @@
 #include "vtkLabeledDataMapper.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkView.h"
+#include "vtkPVView.h"
 
 vtkStandardNewMacro(vtkSelectionRepresentation);
 vtkCxxSetObjectMacro(vtkSelectionRepresentation, LabelRepresentation, vtkDataLabelRepresentation);
@@ -47,6 +47,20 @@ vtkSelectionRepresentation::~vtkSelectionRepresentation()
 {
   this->GeometryRepresentation->Delete();
   this->LabelRepresentation->Delete();
+}
+
+//----------------------------------------------------------------------------
+int vtkSelectionRepresentation::ProcessViewRequest(
+  vtkInformationRequestKey* request, vtkInformation* inInfo, vtkInformation* outInfo)
+{
+  if (request == vtkPVView::REQUEST_UPDATE())
+  {
+    // skip update requests since this representation doesn't really do anything
+    // by itself.
+    return 0;
+  }
+
+  return this->Superclass::ProcessViewRequest(request, inInfo, outInfo);
 }
 
 //----------------------------------------------------------------------------

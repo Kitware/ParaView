@@ -18,9 +18,9 @@
 #include "vtkInformationVector.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVView.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringArray.h"
-#include "vtkView.h"
 #include "vtkWeakPointer.h"
 
 #include <map>
@@ -57,6 +57,20 @@ vtkCompositeRepresentation::~vtkCompositeRepresentation()
   this->Internals = 0;
   this->Observer->Delete();
   this->Observer = 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkCompositeRepresentation::ProcessViewRequest(
+  vtkInformationRequestKey* request, vtkInformation* inInfo, vtkInformation* outInfo)
+{
+  if (request == vtkPVView::REQUEST_UPDATE())
+  {
+    // skip update requests since this representation doesn't really do anything
+    // by itself.
+    return 0;
+  }
+
+  return this->Superclass::ProcessViewRequest(request, inInfo, outInfo);
 }
 
 //----------------------------------------------------------------------------

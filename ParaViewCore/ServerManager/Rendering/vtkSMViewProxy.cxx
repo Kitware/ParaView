@@ -31,6 +31,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
+#include "vtkSMDataDeliveryManagerProxy.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyIterator.h"
@@ -333,6 +334,7 @@ vtkSMViewProxy::vtkSMViewProxy()
   this->SetLocation(vtkProcessModule::CLIENT_AND_SERVERS);
   this->DefaultRepresentationName = 0;
   this->Enable = true;
+  this->DeliveryManager = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -370,6 +372,14 @@ void vtkSMViewProxy::CreateVTKObjects()
   if (auto object = vtkObject::SafeDownCast(this->GetClientSideObject()))
   {
     object->AddObserver(vtkPVView::ViewTimeChangedEvent, this, &vtkSMViewProxy::ViewTimeChanged);
+  }
+
+  // Setup data-delivery manager.
+  this->DeliveryManager =
+    vtkSMDataDeliveryManagerProxy::SafeDownCast(this->GetSubProxy("DeliveryManager"));
+  if (this->DeliveryManager)
+  {
+    this->DeliveryManager->SetViewProxy(this);
   }
 }
 
@@ -419,6 +429,11 @@ void vtkSMViewProxy::StillRender()
   this->Update();
 
   vtkTypeUInt32 render_location = this->PreRender(interactive == 1);
+  if (this->DeliveryManager)
+  {
+    // Do data delivery if needed.
+    this->DeliveryManager->Deliver(/*interactive=*/false);
+  }
 
   if (this->ObjectsCreated)
   {
@@ -460,7 +475,11 @@ void vtkSMViewProxy::InteractiveRender()
   this->Update();
 
   vtkTypeUInt32 render_location = this->PreRender(interactive == 1);
-
+  if (this->DeliveryManager)
+  {
+    // Do data delivery if needed.
+    this->DeliveryManager->Deliver(/*interactive=*/true);
+  }
   if (this->ObjectsCreated)
   {
     vtkClientServerStream stream;

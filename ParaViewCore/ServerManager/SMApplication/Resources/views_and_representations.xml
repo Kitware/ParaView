@@ -1,7 +1,15 @@
 <ServerManagerConfiguration>
   <!-- ******************************************************************** -->
+  <ProxyGroup name="delivery_managers">
+    <DataDeliveryManagerProxy name="RenderViewDeliveryManager" class="vtkPVRenderViewDataDeliveryManager">
+    </DataDeliveryManagerProxy>
+    <DataDeliveryManagerProxy name="ContextViewDeliveryManager" class="vtkPVContextViewDataDeliveryManager">
+    </DataDeliveryManagerProxy>
+  </ProxyGroup>
+
   <ProxyGroup name="internal_views">
     <!-- ================================================================== -->
+
     <Proxy class="vtkPVView"
            name="ViewBase"
            processes="client|renderserver|dataserver">
@@ -92,6 +100,13 @@
            name="XYChartViewTitle"
            processes="client|renderserver|dataserver">
       <Documentation>This is the base proxy for XY chart views.</Documentation>
+
+      <SubProxy command="SetDeliveryManager">
+        <Proxy name="DeliveryManager"
+          proxygroup="delivery_managers"
+          proxyname="ContextViewDeliveryManager"/>
+      </SubProxy>
+
       <StringVectorProperty command="SetTitle"
                             name="ChartTitle"
                             number_of_elements="1"
@@ -2918,8 +2933,14 @@
         <Property name="MaxFrames"/>
         <Property name="Denoise"/>
         <Property name="LightScale"/>
-	<Property name="OSPRayTemporalCacheSize"/>
+        <Property name="OSPRayTemporalCacheSize"/>
       </PropertyGroup>
+
+      <SubProxy command="SetDeliveryManager">
+        <Proxy name="DeliveryManager"
+          proxygroup="delivery_managers"
+          proxyname="RenderViewDeliveryManager"/>
+      </SubProxy>
     </RenderViewProxy>
 
     <!-- ================================================================== -->

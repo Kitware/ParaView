@@ -32,10 +32,10 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVCacheKeeper.h"
 #include "vtkPVConfig.h"
 #include "vtkPVGeometryFilter.h"
 #include "vtkPVLODActor.h"
+#include "vtkPVLogger.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVTrivialProducer.h"
 #include "vtkPVUpdateSuppressor.h"
@@ -127,13 +127,9 @@ void vtkGeometryRepresentation::HandleGeometryRepresentationProgress(
       {
         this->UpdateProgress(0.8 + progress * 0.05);
       }
-      else if (algorithm == this->CacheKeeper)
-      {
-        this->UpdateProgress(0.85 + progress * 0.05);
-      }
       else if (algorithm == this->Decimator)
       {
-        this->UpdateProgress(0.90 + progress * 0.05);
+        this->UpdateProgress(0.85 + progress * 0.10);
       }
       else if (algorithm == this->LODOutlineFilter)
       {
@@ -150,15 +146,12 @@ void vtkGeometryRepresentation::HandleGeometryRepresentationProgress(
 vtkGeometryRepresentation::vtkGeometryRepresentation()
 {
   this->GeometryFilter = vtkPVGeometryFilter::New();
-  this->CacheKeeper = vtkPVCacheKeeper::New();
   this->MultiBlockMaker = vtkGeometryRepresentationMultiBlockMaker::New();
   this->Decimator = vtkGeometryRepresentation_detail::DecimationFilterType::New();
   this->LODOutlineFilter = vtkPVGeometryFilter::New();
 
   // connect progress bar
   this->GeometryFilter->AddObserver(vtkCommand::ProgressEvent, this,
-    &vtkGeometryRepresentation::HandleGeometryRepresentationProgress);
-  this->CacheKeeper->AddObserver(vtkCommand::ProgressEvent, this,
     &vtkGeometryRepresentation::HandleGeometryRepresentationProgress);
   this->MultiBlockMaker->AddObserver(vtkCommand::ProgressEvent, this,
     &vtkGeometryRepresentation::HandleGeometryRepresentationProgress);
@@ -214,7 +207,6 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
 //----------------------------------------------------------------------------
 vtkGeometryRepresentation::~vtkGeometryRepresentation()
 {
-  this->CacheKeeper->Delete();
   this->GeometryFilter->Delete();
   this->MultiBlockMaker->Delete();
   this->Decimator->Delete();
@@ -243,9 +235,6 @@ void vtkGeometryRepresentation::SetupDefaults()
   }
 
   this->MultiBlockMaker->SetInputConnection(this->GeometryFilter->GetOutputPort());
-  this->CacheKeeper->SetInputConnection(this->MultiBlockMaker->GetOutputPort());
-  this->Decimator->SetInputConnection(this->CacheKeeper->GetOutputPort());
-  this->LODOutlineFilter->SetInputConnection(this->CacheKeeper->GetOutputPort());
 
   this->Actor->SetMapper(this->Mapper);
   this->Actor->SetLODMapper(this->LODMapper);
@@ -309,11 +298,7 @@ int vtkGeometryRepresentation::ProcessViewRequest(
   {
     // provide the "geometry" to the view so the view can delivery it to the
     // rendering nodes as and when needed.
-    // When this process doesn't have any valid input, the cache-keeper is setup
-    // to provide a place-holder dataset of the right type. This is essential
-    // since the vtkPVRenderView uses the type specified to decide on the
-    // delivery mechanism, among other things.
-    vtkPVRenderView::SetPiece(inInfo, this, this->CacheKeeper->GetOutputDataObject(0));
+    vtkPVView::SetPiece(inInfo, this, this->MultiBlockMaker->GetOutputDataObject(0));
 
     // Since we are rendering polydata, it can be redistributed when ordered
     // compositing is needed. So let the view know that it can feel free to
@@ -341,32 +326,26 @@ int vtkGeometryRepresentation::ProcessViewRequest(
 
     vtkNew<vtkMatrix4x4> matrix;
     this->Actor->GetMatrix(matrix.GetPointer());
-    vtkPVRenderView::SetGeometryBounds(inInfo, this->VisibleDataBounds, matrix.GetPointer());
+    vtkPVRenderView::SetGeometryBounds(inInfo, this, this->VisibleDataBounds, matrix.GetPointer());
   }
   else if (request_type == vtkPVView::REQUEST_UPDATE_LOD())
   {
     // Called to generate and provide the LOD data to the view.
     // If SuppressLOD is true, we tell the view we have no LOD data to provide,
     // otherwise we provide the decimated data.
-    if (!this->SuppressLOD)
+    auto data = vtkPVView::GetPiece(inInfo, this);
+    if (data != nullptr && !this->SuppressLOD)
     {
       if (inInfo->Has(vtkPVRenderView::USE_OUTLINE_FOR_LOD()))
       {
-        // HACK to ensure that when Decimator is next employed, it delivers a
-        // new geometry.
-        this->Decimator->Modified();
-
+        this->LODOutlineFilter->SetInputDataObject(data);
         this->LODOutlineFilter->Update();
         // Pass along the LOD geometry to the view so that it can deliver it to
         // the rendering node as and when needed.
-        vtkPVRenderView::SetPieceLOD(inInfo, this, this->LODOutlineFilter->GetOutputDataObject(0));
+        vtkPVView::SetPieceLOD(inInfo, this, this->LODOutlineFilter->GetOutputDataObject(0));
       }
       else
       {
-        // HACK to ensure that when Decimator is next employed, it delivers a
-        // new geometry.
-        this->LODOutlineFilter->Modified();
-
         if (inInfo->Has(vtkPVRenderView::LOD_RESOLUTION()))
         {
           // We handle this number differently depending on decimator
@@ -375,20 +354,21 @@ int vtkGeometryRepresentation::ProcessViewRequest(
           this->Decimator->SetLODFactor(factor);
         }
 
+        this->Decimator->SetInputDataObject(data);
         this->Decimator->Update();
 
         // Pass along the LOD geometry to the view so that it can deliver it to
         // the rendering node as and when needed.
-        vtkPVRenderView::SetPieceLOD(inInfo, this, this->Decimator->GetOutputDataObject(0));
+        vtkPVView::SetPieceLOD(inInfo, this, this->Decimator->GetOutputDataObject(0));
       }
     }
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
-    vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
-    vtkAlgorithmOutput* producerPortLOD = vtkPVRenderView::GetPieceProducerLOD(inInfo, this);
-    this->Mapper->SetInputConnection(0, producerPort);
-    this->LODMapper->SetInputConnection(0, producerPortLOD);
+    auto data = vtkPVView::GetDeliveredPiece(inInfo, this);
+    auto dataLOD = vtkPVView::GetDeliveredPieceLOD(inInfo, this);
+    this->Mapper->SetInputDataObject(data);
+    this->LODMapper->SetInputDataObject(dataLOD);
 
     // This is called just before the vtk-level render. In this pass, we simply
     // pick the correct rendering mode and rendering parameters.
@@ -396,7 +376,6 @@ int vtkGeometryRepresentation::ProcessViewRequest(
     this->Actor->SetEnableLOD(lod ? 1 : 0);
     this->UpdateColoringParameters();
 
-    auto data = producerPort->GetProducer()->GetOutputDataObject(0);
     if (this->BlockAttributeTime < data->GetMTime() || this->BlockAttrChanged)
     {
       this->UpdateBlockAttributes(this->Mapper);
@@ -449,13 +428,6 @@ int vtkGeometryRepresentation::RequestUpdateExtent(
 int vtkGeometryRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-
-  // Pass caching information to the cache keeper.
-  this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
-  this->CacheKeeper->SetCacheTime(this->GetCacheKey());
-  // cout << this << ": Using Cache (" << this->GetCacheKey() << ") : is_cached = " <<
-  //  this->IsCached(this->GetCacheKey()) << " && use_cache = " <<  this->GetUseCache() << endl;
-
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
@@ -475,13 +447,9 @@ int vtkGeometryRepresentation::RequestData(
     vtkNew<vtkMultiBlockDataSet> placeholder;
     this->GeometryFilter->SetInputDataObject(0, placeholder.GetPointer());
   }
-  this->CacheKeeper->Update();
 
-  // HACK: To overcome issue with PolyDataMapper (OpenGL2). It doesn't recreate
-  // VBO/IBOs when using data from cache. I suspect it's because the blocks in
-  // the MB dataset have older MTime.
-  this->Mapper->Modified();
-
+  this->MultiBlockMaker->Modified();
+  this->MultiBlockMaker->Update();
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 
@@ -513,31 +481,14 @@ bool vtkGeometryRepresentation::GetBounds(
 }
 
 //----------------------------------------------------------------------------
-bool vtkGeometryRepresentation::IsCached(double cache_key)
-{
-  return this->CacheKeeper->IsCached(cache_key);
-}
-
-//----------------------------------------------------------------------------
 vtkDataObject* vtkGeometryRepresentation::GetRenderedDataObject(int port)
 {
   (void)port;
   if (this->GeometryFilter->GetNumberOfInputConnections(0) > 0)
   {
-    return this->CacheKeeper->GetOutputDataObject(0);
+    return this->MultiBlockMaker->GetOutputDataObject(0);
   }
   return NULL;
-}
-
-//----------------------------------------------------------------------------
-void vtkGeometryRepresentation::MarkModified()
-{
-  if (!this->GetUseCache())
-  {
-    // Cleanup caches when not using cache.
-    this->CacheKeeper->RemoveAllCaches();
-  }
-  this->Superclass::MarkModified();
 }
 
 //----------------------------------------------------------------------------
@@ -1351,7 +1302,7 @@ void vtkGeometryRepresentation::ComputeVisibleDataBounds()
   if (this->VisibleDataBoundsTime < this->GetPipelineDataTime() ||
     (this->BlockAttrChanged && this->VisibleDataBoundsTime < this->BlockAttributeTime))
   {
-    vtkDataObject* dataObject = this->CacheKeeper->GetOutputDataObject(0);
+    vtkDataObject* dataObject = this->MultiBlockMaker->GetOutputDataObject(0);
     vtkNew<vtkCompositeDataDisplayAttributes> cdAttributes;
     // If the input data is a composite dataset, use the currently set values for block
     // visibility rather than the cached ones from the last render.  This must be computed

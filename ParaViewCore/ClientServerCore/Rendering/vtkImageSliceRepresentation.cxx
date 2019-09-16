@@ -24,7 +24,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPExtentTranslator.h"
-#include "vtkPVCacheKeeper.h"
 #include "vtkPVImageSliceMapper.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
@@ -41,22 +40,17 @@ vtkImageSliceRepresentation::vtkImageSliceRepresentation()
 {
   this->Slice = 0;
   this->SliceMode = XY_PLANE;
-
-  this->SliceData = vtkImageData::New();
-  this->CacheKeeper = vtkPVCacheKeeper::New();
-  this->CacheKeeper->SetInputData(this->SliceData);
-
   this->SliceMapper = vtkPVImageSliceMapper::New();
   this->Actor = vtkPVLODActor::New();
   this->Actor->SetMapper(this->SliceMapper);
   this->Actor->GetProperty()->LightingOff();
+  this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
+  this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
 }
 
 //----------------------------------------------------------------------------
 vtkImageSliceRepresentation::~vtkImageSliceRepresentation()
 {
-  this->SliceData->Delete();
-  this->CacheKeeper->Delete();
   this->SliceMapper->SetInputData(0);
   this->SliceMapper->Delete();
   this->Actor->Delete();
@@ -128,29 +122,18 @@ int vtkImageSliceRepresentation::ProcessViewRequest(
   {
     // provide the "geometry" to the view so the view can delivery it to the
     // rendering nodes as and when needed.
-
-    // When this process doesn't have any valid input, the cache-keeper is setup
-    // to provide a place-holder dataset of the right type.
-    vtkPVRenderView::SetPiece(inInfo, this, this->CacheKeeper->GetOutputDataObject(0));
-
-    vtkImageData* img = vtkImageData::SafeDownCast(this->CacheKeeper->GetOutputDataObject(0));
-    if (img)
-    {
-      vtkPVRenderView::SetGeometryBounds(inInfo, img->GetBounds());
-    }
+    vtkPVView::SetPiece(inInfo, this, this->SliceData);
+    vtkPVRenderView::SetGeometryBounds(inInfo, this, this->SliceData->GetBounds());
 
     // BUG #14253: support translucent rendering.
     if (this->Actor->HasTranslucentPolygonalGeometry())
     {
       outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
-      if (img)
-      {
-        // Pass on the partitioning information to the view. This logic is similar
-        // to what we do in vtkImageVolumeRepresentation.
-        vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this,
-          this->PExtentTranslator.GetPointer(), this->WholeExtent, img->GetOrigin(),
-          img->GetSpacing());
-      }
+      // Pass on the partitioning information to the view. This logic is similar
+      // to what we do in vtkImageVolumeRepresentation.
+      vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this,
+        this->PExtentTranslator.GetPointer(), this->WholeExtent, this->SliceData->GetOrigin(),
+        this->SliceData->GetSpacing());
     }
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())
@@ -171,44 +154,20 @@ int vtkImageSliceRepresentation::ProcessViewRequest(
 int vtkImageSliceRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  // Pass caching information to the cache keeper.
-  this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
-  this->CacheKeeper->SetCacheTime(this->GetCacheKey());
-
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     this->UpdateSliceData(inputVector);
   }
   else
   {
-    // This happens on the client in client-server mode. We simply mark the data
-    // dirty so that the "delivery" code can fetch new data.
-    if (!this->GetUsingCacheForUpdate())
-    {
-      this->SliceData->Modified();
-    }
+    this->SliceData->Initialize();
   }
-  this->CacheKeeper->Update();
-
   return this->Superclass::RequestData(request, inputVector, outputVector);
-}
-
-//----------------------------------------------------------------------------
-bool vtkImageSliceRepresentation::IsCached(double cache_key)
-{
-  return this->CacheKeeper->IsCached(cache_key);
 }
 
 //----------------------------------------------------------------------------
 void vtkImageSliceRepresentation::UpdateSliceData(vtkInformationVector** inputVector)
 {
-  if (this->GetUsingCacheForUpdate())
-  {
-    // FIXME: When using cache we're really using obsolete WholeExtent. We
-    // really need to cache WholeExtent information as well. See BUG 15899.
-    return;
-  }
-
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkImageData* input = vtkImageData::GetData(inputVector[0], 0);
 
@@ -297,17 +256,6 @@ bool vtkImageSliceRepresentation::RemoveFromView(vtkView* view)
     return this->Superclass::RemoveFromView(rview);
   }
   return false;
-}
-
-//----------------------------------------------------------------------------
-void vtkImageSliceRepresentation::MarkModified()
-{
-  if (!this->GetUseCache())
-  {
-    // Cleanup caches when not using cache.
-    this->CacheKeeper->RemoveAllCaches();
-  }
-  this->Superclass::MarkModified();
 }
 
 //----------------------------------------------------------------------------

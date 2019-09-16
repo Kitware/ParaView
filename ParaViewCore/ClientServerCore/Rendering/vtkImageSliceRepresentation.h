@@ -32,7 +32,6 @@
 
 class vtkImageData;
 class vtkPExtentTranslator;
-class vtkPVCacheKeeper;
 class vtkPVImageSliceMapper;
 class vtkPVLODActor;
 class vtkScalarsToColors;
@@ -78,14 +77,6 @@ public:
    */
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) override;
-
-  /**
-   * This needs to be called on all instances of vtkImageSliceRepresentation when
-   * the input is modified. This is essential since the geometry filter does not
-   * have any real-input on the client side which messes with the Update
-   * requests.
-   */
-  void MarkModified() override;
 
   /**
    * Get/Set the visibility for this representation. When the visibility of
@@ -180,18 +171,12 @@ protected:
    */
   bool RemoveFromView(vtkView* view) override;
 
-  /**
-   * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
-   */
-  bool IsCached(double cache_key) override;
-
   int SliceMode;
   unsigned int Slice;
 
-  vtkPVCacheKeeper* CacheKeeper;
   vtkPVImageSliceMapper* SliceMapper;
   vtkPVLODActor* Actor;
-  vtkImageData* SliceData;
+  vtkNew<vtkImageData> SliceData;
 
   // meta-data about the input image to pass on to render view for hints
   // when redistributing data.

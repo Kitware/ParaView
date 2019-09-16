@@ -44,7 +44,7 @@ set(classes
   vtkSMComparativeAnimationCueUndoElement
   vtkSMComparativeViewProxy
   vtkSMContextViewProxy
-  vtkSMDataDeliveryManager
+  vtkSMDataDeliveryManagerProxy
   vtkSMImplicitPlaneRepresentationProxy
   vtkSMLightProxy
   vtkSMMaterialDomain

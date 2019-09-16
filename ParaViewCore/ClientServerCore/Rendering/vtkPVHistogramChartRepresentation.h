@@ -108,8 +108,7 @@ public:
   /**
    * Method to be overridden to transform input data to a vtkTable.
    */
-  vtkDataObject* TransformInputData(
-    vtkInformationVector** inputVector, vtkDataObject* data) override;
+  vtkSmartPointer<vtkDataObject> TransformInputData(vtkDataObject* data) override;
 
   //@{
   /**

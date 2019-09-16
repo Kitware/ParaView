@@ -184,8 +184,8 @@ void vtkPVHistogramChartRepresentation::SetHistogramLineStyle(int val)
 }
 
 //----------------------------------------------------------------------------
-vtkDataObject* vtkPVHistogramChartRepresentation::TransformInputData(
-  vtkInformationVector** vtkNotUsed(inputVector), vtkDataObject* data)
+vtkSmartPointer<vtkDataObject> vtkPVHistogramChartRepresentation::TransformInputData(
+  vtkDataObject* data)
 {
   // NOTE: This method gets called in RequestData() and only on
   // the server-side, so avoid doing anything that modifies the MTime.
@@ -200,7 +200,7 @@ vtkDataObject* vtkPVHistogramChartRepresentation::TransformInputData(
   this->ExtractHistogram->SetInputData(data);
   this->ExtractHistogram->Update();
 
-  return this->ExtractHistogram->GetOutputDataObject(0);
+  return this->Superclass::TransformInputData(this->ExtractHistogram->GetOutputDataObject(0));
 }
 
 //----------------------------------------------------------------------------
@@ -299,7 +299,9 @@ bool vtkPVHistogramChartRepresentation::MapSelectionToView(vtkSelection* sel)
   }
 
   // now, check if the thresholds are applicable to the histogram being shown.
-  vtkTable* table = this->GetLocalOutput();
+  // since this method is called in `RequestData` we need to use the
+  // `pre_delivery` data.
+  vtkTable* table = this->GetLocalOutput(/*pre_delivery = */ true);
   vtkDoubleArray* binExtents =
     table ? vtkDoubleArray::SafeDownCast(table->GetColumnByName(BIN_EXTENTS)) : NULL;
   if (binExtents == NULL)

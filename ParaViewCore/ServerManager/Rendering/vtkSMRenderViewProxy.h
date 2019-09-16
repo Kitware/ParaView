@@ -34,7 +34,6 @@ class vtkIntArray;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkRenderWinwInteractor;
-class vtkSMDataDeliveryManager;
 class vtkSMViewProxyInteractorHelper;
 
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMRenderViewProxy : public vtkSMViewProxy
@@ -281,7 +280,6 @@ protected:
   unsigned long NewMasterObserverId;
   void NewMasterCallback(vtkObject* src, unsigned long event, void* data);
 
-  vtkSMDataDeliveryManager* DeliveryManager;
   bool NeedsUpdateLOD;
 
 private:

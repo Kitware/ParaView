@@ -24,7 +24,6 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVCacheKeeper.h"
 #include "vtkPVCameraCollection.h"
 #include "vtkPVRenderView.h"
 #include "vtkPointData.h"
@@ -45,8 +44,6 @@ vtkCinemaLayerRepresentation::vtkCinemaLayerRepresentation()
   this->MapperA->SetColorLevel(127.5);
 
   this->Actor->SetMapper(this->MapperA.Get());
-  vtkNew<vtkPolyData> pd;
-  this->CacheKeeper->SetInputData(pd.Get());
   this->Actor->SetDisplayPosition(0, 0);
   this->Actor->SetWidth(1.0);
   this->Actor->SetHeight(1.0);
@@ -76,7 +73,7 @@ int vtkCinemaLayerRepresentation::ProcessViewRequest(
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
   {
-    vtkPVRenderView::SetPiece(inInfo, this, this->CacheKeeper->GetOutputDataObject(0));
+    vtkPVRenderView::SetPiece(inInfo, this, this->Data);
     vtkPVRenderView::SetRequiresDistributedRendering(inInfo, this, true);
     if (vtkPVRenderView::GetDiscreteCameras(inInfo, this) == NULL)
     {
@@ -98,22 +95,6 @@ int vtkCinemaLayerRepresentation::FillInputPortInformation(
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPolyData");
   info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
   return 1;
-}
-
-//----------------------------------------------------------------------------
-void vtkCinemaLayerRepresentation::MarkModified()
-{
-  if (!this->GetUseCache())
-  {
-    this->CacheKeeper->RemoveAllCaches();
-  }
-  this->Superclass::MarkModified();
-}
-
-//----------------------------------------------------------------------------
-bool vtkCinemaLayerRepresentation::IsCached(double cache_key)
-{
-  return this->CacheKeeper->IsCached(cache_key);
 }
 
 //----------------------------------------------------------------------------
@@ -156,10 +137,6 @@ void vtkCinemaLayerRepresentation::SetLookupTable(vtkScalarsToColors* lut)
 int vtkCinemaLayerRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  // Pass caching information to the cache keeper.
-  this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
-  this->CacheKeeper->SetCacheTime(this->GetCacheKey());
-
   this->CinemaDatabasePath = std::string();
   this->PipelineObject = std::string();
   this->BaseQueryJSON = std::string();
@@ -174,12 +151,9 @@ int vtkCinemaLayerRepresentation::RequestData(
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     vtkPolyData* input = vtkPolyData::GetData(inputVector[0], 0);
-    this->CacheKeeper->SetInputData(input);
-    this->CacheKeeper->Update();
-
+    this->Data->ShallowCopy(input);
     vtkStringArray* metaData = vtkStringArray::SafeDownCast(
-      this->CacheKeeper->GetOutputDataObject(0)->GetFieldData()->GetAbstractArray(
-        "CinemaDatabaseMetaData"));
+      input->GetFieldData()->GetAbstractArray("CinemaDatabaseMetaData"));
     if (metaData && metaData->GetNumberOfTuples() == 4)
     {
       this->CinemaDatabasePath = metaData->GetValue(0);
@@ -224,7 +198,7 @@ int vtkCinemaLayerRepresentation::RequestData(
   }
   else
   {
-    this->CacheKeeper->Update();
+    this->Data->Initialize();
   }
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }

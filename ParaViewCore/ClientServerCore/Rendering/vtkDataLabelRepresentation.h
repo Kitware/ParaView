@@ -42,7 +42,6 @@ class vtkCompositeDataToUnstructuredGridFilter;
 class vtkLabeledDataMapper;
 class vtkMaskPoints;
 class vtkProp3D;
-class vtkPVCacheKeeper;
 class vtkTextProperty;
 class vtkTransform;
 
@@ -53,14 +52,6 @@ public:
   static vtkDataLabelRepresentation* New();
   vtkTypeMacro(vtkDataLabelRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-
-  /**
-   * This needs to be called on all instances of vtkGeometryRepresentation when
-   * the input is modified. This is essential since the geometry filter does not
-   * have any real-input on the client side which messes with the Update
-   * requests.
-   */
-  void MarkModified() override;
 
   //@{
   /**
@@ -165,15 +156,9 @@ protected:
    */
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  /**
-   * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
-   */
-  bool IsCached(double cache_key) override;
-
   void UpdateTransform();
 
   vtkCompositeDataToUnstructuredGridFilter* MergeBlocks;
-  vtkPVCacheKeeper* CacheKeeper;
 
   vtkSmartPointer<vtkMaskPoints> PointMask;
   vtkLabeledDataMapper* PointLabelMapper;

@@ -16,8 +16,8 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVDataDeliveryManager.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVRenderViewDataDeliveryManager.h"
 
 #include <algorithm>
 #include <set>
@@ -54,13 +54,15 @@ void vtkPVStreamingPiecesInformation::CopyFromObject(vtkObject* object)
 
   this->Internals->clear();
 
-  vtkPVDataDeliveryManager* mgr = view->GetDeliveryManager();
-  std::vector<unsigned int> keys;
-  mgr->GetRepresentationsReadyToStreamPieces(keys);
-
-  for (size_t cc = 0, max = keys.size(); (cc + 1) < max; cc += 2)
+  if (auto mgr = vtkPVRenderViewDataDeliveryManager::SafeDownCast(view->GetDeliveryManager()))
   {
-    this->Internals->insert(std::pair<unsigned int, unsigned int>(keys[cc], keys[cc + 1]));
+    std::vector<unsigned int> keys;
+    mgr->GetRepresentationsReadyToStreamPieces(keys);
+
+    for (size_t cc = 0, max = keys.size(); (cc + 1) < max; cc += 2)
+    {
+      this->Internals->insert(std::pair<unsigned int, unsigned int>(keys[cc], keys[cc + 1]));
+    }
   }
 }
 

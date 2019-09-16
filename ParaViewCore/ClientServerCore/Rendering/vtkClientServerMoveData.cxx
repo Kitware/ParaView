@@ -148,6 +148,7 @@ int vtkClientServerMoveData::RequestData(
     if (is_server)
     {
       vtkDebugMacro("Server Root: Send input data to client.");
+      output->ShallowCopy(input);
       return this->SendData(input, controller);
     }
     else if (is_client)

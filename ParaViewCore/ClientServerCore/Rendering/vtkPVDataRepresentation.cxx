@@ -44,8 +44,6 @@ vtkPVDataRepresentation::vtkPVDataRepresentation()
   this->ForceUseCache = false;
   this->ForcedCacheKey = 0.0;
 
-  this->NeedUpdate = true;
-
   this->UniqueIdentifier = 0;
 }
 
@@ -75,14 +73,11 @@ vtkExecutive* vtkPVDataRepresentation::CreateDefaultExecutive()
 
 //----------------------------------------------------------------------------
 int vtkPVDataRepresentation::ProcessViewRequest(
-  vtkInformationRequestKey* request, vtkInformation*, vtkInformation*)
+  vtkInformationRequestKey* request, vtkInformation* inInfo, vtkInformation*)
 {
   assert("We must have an ID at that time" && this->UniqueIdentifier);
   assert(this->GetExecutive()->IsA("vtkPVDataRepresentationPipeline"));
-  if (this->GetVisibility() == false)
-  {
-    return 0;
-  }
+  assert(this->GetVisibility());
 
   if (request == vtkPVView::REQUEST_UPDATE())
   {
@@ -96,7 +91,20 @@ int vtkPVDataRepresentation::ProcessViewRequest(
 void vtkPVDataRepresentation::MarkModified()
 {
   this->Modified();
-  this->NeedUpdate = true;
+
+  if (this->HasExecutive())
+  {
+    auto executive = vtkPVDataRepresentationPipeline::SafeDownCast(this->GetExecutive());
+    executive->MarkModified();
+  }
+
+  // let the view know that representation has been modified;
+  // the view may use this information to determine if cache keeps to be cleared
+  // for the representation.
+  if (auto pvview = vtkPVView::SafeDownCast(this->View))
+  {
+    pvview->RepresentationModified(this);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -121,13 +129,6 @@ unsigned int vtkPVDataRepresentation::Initialize(
 int vtkPVDataRepresentation::RequestData(
   vtkInformation*, vtkInformationVector**, vtkInformationVector*)
 {
-  // We fire UpdateDataEvent to notify the representation proxy that the
-  // representation was updated. The representation proxty will then call
-  // PostUpdateData(). We do this since now representations are not updated at
-  // the proxy level.
-  this->InvokeEvent(vtkCommand::UpdateDataEvent);
-  this->NeedUpdate = false;
-
   // cout << "Updated: " << this->LogName << endl;
   return 1;
 }
@@ -178,17 +179,6 @@ int vtkPVDataRepresentation::RequestUpdateExtent(
   }
 
   return 1;
-}
-
-//----------------------------------------------------------------------------
-bool vtkPVDataRepresentation::GetUsingCacheForUpdate()
-{
-  if (this->GetUseCache())
-  {
-    return this->IsCached(this->GetCacheKey());
-  }
-
-  return false;
 }
 
 //----------------------------------------------------------------------------
@@ -248,35 +238,6 @@ bool vtkPVDataRepresentation::RemoveFromView(vtkView* view)
 vtkView* vtkPVDataRepresentation::GetView() const
 {
   return this->View;
-}
-
-//----------------------------------------------------------------------------
-double vtkPVDataRepresentation::GetCacheKey()
-{
-  if (this->ForceUseCache)
-  {
-    return this->ForcedCacheKey;
-  }
-  if (vtkPVView* pvview = vtkPVView::SafeDownCast(this->View))
-  {
-    return pvview->GetCacheKey();
-  }
-  return 0.0;
-}
-
-//----------------------------------------------------------------------------
-bool vtkPVDataRepresentation::GetUseCache()
-{
-  if (this->ForceUseCache)
-  {
-    return true;
-  }
-
-  if (vtkPVView* pvview = vtkPVView::SafeDownCast(this->View))
-  {
-    return pvview->GetUseCache();
-  }
-  return false;
 }
 
 //----------------------------------------------------------------------------

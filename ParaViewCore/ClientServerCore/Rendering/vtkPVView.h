@@ -35,9 +35,11 @@ class vtkInformation;
 class vtkInformationObjectBaseKey;
 class vtkInformationRequestKey;
 class vtkInformationVector;
+class vtkPVDataDeliveryManager;
+class vtkPVDataRepresentation;
+class vtkPVSession;
 class vtkRenderWindow;
 class vtkViewLayout;
-class vtkPVSession;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVView : public vtkView
 {
@@ -244,6 +246,46 @@ public:
    */
   virtual void ScaleRendererViewports(const double viewport[4]);
 
+  /**
+   * Called by `vtkPVDataRepresentation` whenever
+   * `vtkPVDataRepresentation::MarkModified` is called. Subclasses may use this
+   * method to clear internal caches, if needed.
+   */
+  virtual void RepresentationModified(vtkPVDataRepresentation*);
+
+  /**
+   * Provides access to the time when Update() was last called.
+   */
+  vtkMTimeType GetUpdateTimeStamp() { return this->UpdateTimeStamp; }
+
+  //@{
+  /**
+   * Provides access to data delivery & cache manager for this view.
+   */
+  void SetDeliveryManager(vtkPVDataDeliveryManager*);
+  vtkGetObjectMacro(DeliveryManager, vtkPVDataDeliveryManager);
+  //@}
+
+  static void SetPiece(vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* data,
+    unsigned long trueSize = 0, int port = 0);
+  static vtkDataObject* GetPiece(vtkInformation* info, vtkPVDataRepresentation* repr, int port = 0);
+  static vtkDataObject* GetDeliveredPiece(
+    vtkInformation* info, vtkPVDataRepresentation* repr, int port = 0);
+
+  static void SetPieceLOD(vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* data,
+    unsigned long trueSize = 0, int port = 0);
+  static vtkDataObject* GetPieceLOD(
+    vtkInformation* info, vtkPVDataRepresentation* repr, int port = 0);
+  static vtkDataObject* GetDeliveredPieceLOD(
+    vtkInformation* info, vtkPVDataRepresentation* repr, int port = 0);
+
+  /**
+   * Called on all processes to request data-delivery for the list of
+   * representations. Note this method has to be called on all processes or it
+   * may lead to deadlock.
+   */
+  virtual void Deliver(int use_lod, unsigned int size, unsigned int* representation_ids);
+
 protected:
   vtkPVView(bool create_render_window = true);
   ~vtkPVView() override;
@@ -274,13 +316,18 @@ protected:
   void AllReduce(
     const vtkTypeUInt64 source, vtkTypeUInt64& dest, int operation, bool skip_data_server = false);
 
+  //@{
   /**
-   * Overridden to check that the representation has View setup properly. Older
-   * implementations of vtkPVDataRepresentations::AddToView() subclasses didn't
-   * call the superclass implementations. We check that that's not the case and
-   * warn.
+   * Overridden to assign IDs to each representation. This assumes that
+   * representations will be added/removed in a consistent fashion across
+   * processes even in multi-client modes. The only exception is
+   * vtk3DWidgetRepresentation. However, since vtk3DWidgetRepresentation never
+   * does any data-delivery, we don't assign IDs for these, nor affect the ID
+   * uniquifier when a vtk3DWidgetRepresentation is added.
    */
   void AddRepresentationInternal(vtkDataRepresentation* rep) override;
+  void RemoveRepresentationInternal(vtkDataRepresentation* rep) override;
+  //@}
 
   //@{
   /**
@@ -301,6 +348,14 @@ protected:
   double ViewTime;
   //@}
 
+  /**
+   * Subclasses can override this method to indicate if the representation
+   * update must be skipped. Default implementation checks with the
+   * `DeliveryManager` if any and skips updates if the representation's data has
+   * already been cached.
+   */
+  virtual bool SkipUpdateRepresentation(vtkPVDataRepresentation*);
+
   vtkPVSession* GetSession();
 
   /**
@@ -316,6 +371,13 @@ protected:
   int Position[2];
   int PPI;
 
+  /**
+   * Keeps track of the time when vtkPVRenderView::Update() was called.
+   */
+  vtkTimeStamp UpdateTimeStamp;
+
+  static vtkPVDataDeliveryManager* GetDeliveryManager(vtkInformation* info);
+
 private:
   vtkPVView(const vtkPVView&) = delete;
   void operator=(const vtkPVView&) = delete;
@@ -329,6 +391,8 @@ private:
   static bool UseGenericOpenGLRenderWindow;
 
   bool InCaptureScreenshot;
+
+  vtkPVDataDeliveryManager* DeliveryManager;
 };
 
 #endif

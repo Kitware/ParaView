@@ -26,7 +26,6 @@
 
 class vtkOutlineFilter;
 class vtkPolyData;
-class vtkPVCacheKeeper;
 class vtkPVGridAxes3DActor;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVGridAxes3DRepresentation
@@ -38,9 +37,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   void SetGridAxes(vtkPVGridAxes3DActor* gridAxes);
-  vtkGetObjectMacro(GridAxes, vtkPVGridAxes3DActor)
+  vtkGetObjectMacro(GridAxes, vtkPVGridAxes3DActor);
 
-    void MarkModified() override;
   void SetVisibility(bool) override;
   void SetGridAxesVisibility(bool);
   void SetPosition(double pos[3]);
@@ -60,7 +58,6 @@ protected:
     vtkInformationVector* outInfoVec) override;
   bool AddToView(vtkView* view) override;
   bool RemoveFromView(vtkView* view) override;
-  bool IsCached(double cache_key) override;
   void UpdateVisibility();
 
   bool GridAxesVisibility;
@@ -70,7 +67,6 @@ protected:
   double Scale[3];
 
   vtkNew<vtkPolyData> DummyPolyData;
-  vtkNew<vtkPVCacheKeeper> CacheKeeper;
   vtkPVGridAxes3DActor* GridAxes;
 
 private:
