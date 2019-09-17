@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqMultiQueryClauseWidget.h"
 
+#include "pqEventDispatcher.h"
 #include "pqOutputPort.h"
 #include "pqQueryClauseWidget.h"
 #include "pqServer.h"
@@ -205,8 +206,9 @@ void pqMultiQueryClauseWidget::addQueryClauseWidget(int type, bool qualifier_mod
   this->connect(queryWidget, SIGNAL(addQueryRequested()), SLOT(addQueryClauseWidget()));
 
   this->onChildrenChanged();
+  pqEventDispatcher::processEventsAndWait(1);
 
-  this->ScrollArea->ensureVisible(0, this->ScrollArea->height(), 0, 0);
+  this->ScrollArea->ensureWidgetVisible(queryWidget);
 }
 
 //-----------------------------------------------------------------------------
