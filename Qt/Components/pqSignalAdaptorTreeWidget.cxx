@@ -214,7 +214,7 @@ void pqSignalAdaptorTreeWidget::sort(int column)
   if (!this->TreeWidget->isSortingEnabled())
   {
     this->TreeWidget->setSortingEnabled(this->Sortable);
-    this->TreeWidget->sortByColumn(column);
+    this->TreeWidget->sortByColumn(column, Qt::AscendingOrder);
   }
 }
 

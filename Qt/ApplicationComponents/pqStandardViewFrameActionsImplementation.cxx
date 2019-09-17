@@ -74,6 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QShortcut>
 #include <QStyle>
 
+#include <algorithm>
 #include <cassert>
 
 namespace
@@ -647,7 +648,8 @@ pqStandardViewFrameActionsImplementation::availableViewTypes()
       views.push_back(info);
     }
   }
-  qSort(views.begin(), views.end(), pqStandardViewFrameActionsImplementation::ViewTypeComparator);
+  std::sort(
+    views.begin(), views.end(), pqStandardViewFrameActionsImplementation::ViewTypeComparator);
   return views;
 }
 

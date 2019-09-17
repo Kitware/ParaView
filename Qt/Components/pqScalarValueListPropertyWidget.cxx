@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarValueListPropertyWidget.h"
 #include "ui_pqScalarValueListPropertyWidget.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 
@@ -264,7 +265,7 @@ public:
         rows.push_back((*iter).row());
       }
     }
-    qSort(rows.begin(), rows.end());
+    std::sort(rows.begin(), rows.end());
     result.resize(1);
     result[0].push_back(rows[0]);
     for (int i = 1; i < rows.size(); ++i)

@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QToolBar>
 
+#include <algorithm>
 #include <cassert>
 
 //-----------------------------------------------------------------------------
@@ -131,7 +132,7 @@ void pqViewMenuManager::updateMenu()
 
   this->ToolbarsMenu->clear();
   QList<QToolBar*> all_toolbars = this->Window->findChildren<QToolBar*>();
-  qSort(all_toolbars.begin(), all_toolbars.end(), toolbarLessThan);
+  std::sort(all_toolbars.begin(), all_toolbars.end(), toolbarLessThan);
 
   foreach (QToolBar* toolbar, all_toolbars)
   {
@@ -155,7 +156,7 @@ void pqViewMenuManager::updateMenu()
   }
 
   QList<QDockWidget*> all_docks = this->Window->findChildren<QDockWidget*>();
-  qSort(all_docks.begin(), all_docks.end(), dockWidgetLessThan);
+  std::sort(all_docks.begin(), all_docks.end(), dockWidgetLessThan);
   foreach (QDockWidget* dock_widget, all_docks)
   {
     this->Menu->insertAction(

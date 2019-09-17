@@ -265,7 +265,7 @@ void pqPluginDialog::setupTreeWidget(QTreeWidget* pluginTree)
   pluginTree->setHeaderLabels(QStringList() << tr("Name") << tr("Property"));
 
   pluginTree->setSortingEnabled(true);
-  pluginTree->sortByColumn(-1);
+  pluginTree->sortByColumn(-1, Qt::AscendingOrder);
 
   QObject::connect(pluginTree, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this,
     SLOT(onPluginItemChanged(QTreeWidgetItem*, int)) /*, Qt::QueuedConnection*/);

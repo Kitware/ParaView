@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QtDebug>
 
+#include <algorithm>
 #include <cassert>
 
 // ----------------------------------------------------------------------------
@@ -203,7 +204,7 @@ QList<QString> pqVRConnectionManager::connectionNames() const
     }
   }
 #endif
-  qSort(result);
+  std::sort(result);
   return result;
 }
 

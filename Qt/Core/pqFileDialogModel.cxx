@@ -457,8 +457,8 @@ public:
       }
     }
 
-    qSort(dirs.begin(), dirs.end(), CaseInsensitiveSort);
-    qSort(files.begin(), files.end(), CaseInsensitiveSort);
+    std::sort(dirs.begin(), dirs.end(), CaseInsensitiveSort);
+    std::sort(files.begin(), files.end(), CaseInsensitiveSort);
 
     for (int i = 0; i != dirs.size(); ++i)
     {

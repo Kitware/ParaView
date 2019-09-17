@@ -628,7 +628,7 @@ void pqObjectBuilder::destroyProxyInternal(pqProxy* proxy)
 QString pqObjectBuilder::getFileNamePropertyName(vtkSMProxy* proxy)
 {
   const char* fname = vtkSMCoreUtilities::GetFileNameProperty(proxy);
-  return fname ? QString(fname) : QString::Null();
+  return fname ? QString(fname) : QString();
 }
 
 //-----------------------------------------------------------------------------

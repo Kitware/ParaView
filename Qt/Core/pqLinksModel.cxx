@@ -377,7 +377,7 @@ QVariant pqLinksModel::data(const QModelIndex& idx, int role) const
 
     if (idx.column() == 0)
     {
-      return name == QString::null ? "Unknown" : name;
+      return name.isNull() ? "Unknown" : name;
     }
     else if (idx.column() == 1)
     {
@@ -719,7 +719,7 @@ void pqLinksModel::removeLink(const QModelIndex& idx)
 
 void pqLinksModel::removeLink(const QString& name)
 {
-  if (name != QString::null)
+  if (!name.isNull())
   {
     vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
     pxm->UnRegisterLink(name.toLocal8Bit().data());
