@@ -2,7 +2,7 @@
 This template is for tracking a release of ParaView. Please replace the
 following strings with the associated values:
 
-  - `@VERSION@` - replace with base version, e.g., v5.7.0
+  - `@VERSION@` - replace with base version, e.g., 5.7.0
   - `@RC@` - for release candidates, replace with "-RC?". For final, replace with "".
   - `@MAJOR@` - replace with major version number
   - `@MINOR@` - replace with minor version number
@@ -124,11 +124,14 @@ set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
   - Update versions
     - [ ] Guide selections in `versions.cmake`
     - [ ] Docker: update default tag strings (in `Scripts/docker/ubuntu/Dockerfile`)
-    - [ ] ARG PARAVIEW_TAG=v@VERSION@@RC@
-    - [ ] ARG SUPERBUILD_TAG=v@VERSION@@RC@
-    - [ ] `git add versions.cmake CMakeLists.txt Scripts/docker/ubuntu/Dockerfile`
-    - [ ] `git commit -m "Update the default version to @VERSION@@RC@"`
-    - [ ] `git gitlab-push`
+      - [ ] ARG PARAVIEW_TAG=v@VERSION@@RC@
+      - [ ] ARG SUPERBUILD_TAG=v@VERSION@@RC@
+    - [ ] Commit changes and push to GitLab
+```
+git add versions.cmake CMakeLists.txt Scripts/docker/ubuntu/Dockerfile
+git commit -m "Update the default version to @VERSION@@RC@"
+git gitlab-push
+```
   - Integrate changes to `master` branch
     - [ ] Create a merge request targeting `master`, title beginning with WIP (do *not* add `Backport: release` to description)
     - [ ] Build binaries (`Do: test`)
@@ -169,11 +172,14 @@ set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
   - Update versions
     - [ ] Guide selections in `versions.cmake`
     - [ ] Docker: update default tag strings (in `Scripts/docker/ubuntu/Dockerfile`)
-    - [ ] ARG PARAVIEW_TAG=v@VERSION@@RC@
-    - [ ] ARG SUPERBUILD_TAG=v@VERSION@@RC@
-    - [ ] `git add versions.cmake CMakeLists.txt Scripts/docker/ubuntu/Dockerfile`
-    - [ ] `git commit -m "Update the default version to @VERSION@@RC@"`
-    - [ ] `git gitlab-push`
+      - [ ] ARG PARAVIEW_TAG=v@VERSION@@RC@
+      - [ ] ARG SUPERBUILD_TAG=v@VERSION@@RC@
+    - [ ] Commit changes and push to GitLab
+```
+git add versions.cmake CMakeLists.txt Scripts/docker/ubuntu/Dockerfile
+git commit -m "Update the default version to @VERSION@@RC@"
+git gitlab-push
+```
   - Integrate changes to `master` branch
     - [ ] Create a merge request targeting `master`, title beginning with WIP (do *not* add `Backport: release` to description)
     - [ ] Build binaries (`Do: test`)
@@ -193,6 +199,12 @@ git gitlab-push -f
     - [ ] `git push origin update-to-v@VERSION@@RC@:release v@VERSION@@RC@`
 -->
 
+# Sign macOS binaries
+
+  - [ ] Upload to signing server, run script, download resulting .pkg and .dmg files
+  - [ ] Install from .pkg and verify that it is signed with `codesign -dvvv /Applications/ParaView-@VERSION@@RC@.app/`
+  - [ ] Install from .dmg and verify that it is signed with `codesign -dvvv /Applications/ParaView-@VERSION@@RC@.app/`
+
 # Validating binaries
 
   - For each binary, check
@@ -202,13 +214,15 @@ git gitlab-push -f
     - [ ] `import numpy`
     - [ ] Plugins are present and load properly
     - [ ] Text source LaTeX `$A^2$`
-    - [ ] OSPRay
+    - [ ] OSPRay raycasting and pathtracing runs
+    - [ ] OptiX pathtracing runs
     - [ ] IndeX runs
     - [ ] AutoMPI
 
   - Binary checklist
     - [ ] macOS
     - [ ] Linux
+    - [ ] Linux osmesa
     - [ ] Windows MPI (.exe)
     - [ ] Windows MPI (.zip)
     - [ ] Windows no-MPI (.exe)
@@ -216,9 +230,8 @@ git gitlab-push -f
 
 # Upload binaries
 
-  - Upload binaries to `paraview.org` (`rsync -rptv $binaries paraview.release:ParaView_Release/v@MAJOR@.@MINOR@/`)
-  - [ ] Ask @chuck.atkins to sign macOS binary
-  - [ ] Regenerate `https://www.paraview.org/files/listing.txt` and `md5sum.txt`
+  - [ ] Upload binaries to `paraview.org` (`rsync -rptv $binaries paraview.release:ParaView_Release/v@MAJOR@.@MINOR@/`)
+  - [ ] Ask @utkarsh.ayachit to regenerate `https://www.paraview.org/files/listing.txt` and `md5sum.txt` on the website
 
 ```
 buildListing.sh
@@ -230,22 +243,22 @@ updateMD5sum.sh v@MAJOR@.@MINOR@
 <!--
 If making a non-RC release:
 
-# Upload documentation
+# Update documentation
 
   - [ ] Upload versioned documentation to `https://github.com/kitware/paraview-docs`
+  - [ ] Write and publish blog post with release notes.
+  - [ ] Update release notes
+    (https://www.paraview.org/Wiki/ParaView_Release_Notes)
 -->
 
 # Post-release
 
-  - [ ] Write and publish blog post with release notes.
   - [ ] Post an announcement in the Announcements category on
         [discourse.paraview.org](https://discourse.paraview.org/).
 <!--
 If making a non-RC release:
 
   - [ ] Update link to ParaView Guide PDF at https://www.paraview.org/paraview-guide/
-  - [ ] Update release notes
-    (https://www.paraview.org/Wiki/ParaView_Release_Notes)
   - [ ] Move unclosed issues to next release milestone in GitLab
 -->
 
