@@ -212,9 +212,21 @@ public:
         {
           this->Location = CGNS_ENUMV(Vertex);
         }
-        else if (location == "CellCenter")
+        else if (location == "IFaceCenter")
         {
-          this->Location = CGNS_ENUMV(CellCenter);
+          this->Location = CGNS_ENUMV(IFaceCenter);
+        }
+        else if (location == "JFaceCenter")
+        {
+          this->Location = CGNS_ENUMV(JFaceCenter);
+        }
+        else if (location == "KFaceCenter")
+        {
+          this->Location = CGNS_ENUMV(KFaceCenter);
+        }
+        else if (location == "FaceCenter")
+        {
+          this->Location = CGNS_ENUMV(FaceCenter);
         }
         else
         {
@@ -257,7 +269,7 @@ public:
     }
 
     // It's a little unclear to me if PointRange is always a range of points,
-    // irrespective of whether the this->Location is CellCenter or Vertex. I am
+    // irrespective of whether the this->Location is Vertex or FaceCenter. I am
     // assuming it as so since that works of the sample data I have.
     for (int cc = 0; cc < cellDim; ++cc)
     {
@@ -270,6 +282,102 @@ public:
 private:
   BCInformation(const BCInformation&) = delete;
   BCInformation& operator=(const BCInformation&) = delete;
+};
+
+//------------------------------------------------------------------------------
+/**
+ * Class to encapsulate information provided by a BC_t node.
+ * This is only useful for the Unstructured I/O code.
+ */
+class BCInformationUns
+{
+public:
+  char Name[CGIO_MAX_NAME_LENGTH + 1];
+  std::string FamilyName;
+  CGNS_ENUMT(GridLocation_t) Location;
+  std::vector<vtkTypeInt64> BCElementList;
+  std::vector<vtkTypeInt64> BCElementRange;
+
+  /**
+   * Reads info from a BC_t node to initialize the instance.
+   *
+   * @param[in] cgioNum Database identifier.
+   * @param[in] nodeId Node identifier. Must point to a BC_t node.
+   * @param[in] cellDim 2 for 2D case and then Edge location is valid
+   *                    3 for 3D case and then FaceCenter location is valid
+   */
+  BCInformationUns(int cgioNum, double nodeId, int cellDim)
+  {
+    CGIOErrorSafe(cgio_get_name(cgioNum, nodeId, this->Name));
+
+    char dtype[CGIO_MAX_DATATYPE_LENGTH + 1];
+    CGIOErrorSafe(cgio_get_data_type(cgioNum, nodeId, dtype));
+    dtype[CGIO_MAX_DATATYPE_LENGTH] = 0;
+    if (strcmp(dtype, "C1") != 0)
+    {
+      throw CGIOError("Invalid data type for `BC_t` node.");
+    }
+
+    std::string bctype;
+    CGNSRead::readNodeStringData(cgioNum, nodeId, bctype);
+    if (bctype != "FamilySpecified")
+    {
+      throw CGIOUnsupported(
+        std::string("BC_t type '") + bctype + std::string("' not supported yet."));
+    }
+
+    std::vector<double> childrenIds;
+    CGNSRead::getNodeChildrenId(cgioNum, nodeId, childrenIds);
+
+    for (auto iter = childrenIds.begin(); iter != childrenIds.end(); ++iter)
+    {
+      char nodeName[CGIO_MAX_NAME_LENGTH + 1];
+      char nodeLabel[CGIO_MAX_LABEL_LENGTH + 1];
+      CGIOErrorSafe(cgio_get_name(cgioNum, *iter, nodeName));
+      CGIOErrorSafe(cgio_get_label(cgioNum, *iter, nodeLabel));
+      if (strcmp(nodeName, "PointList") == 0)
+      {
+        CGNSRead::readNodeDataAs<vtkTypeInt64>(cgioNum, *iter, this->BCElementList);
+      }
+      else if (strcmp(nodeName, "PointRange") == 0)
+      {
+
+        CGNSRead::readNodeDataAs<vtkTypeInt64>(cgioNum, *iter, this->BCElementRange);
+      }
+      else if (strcmp(nodeLabel, "FamilyName_t") == 0)
+      {
+        CGNSRead::readNodeStringData(cgioNum, *iter, this->FamilyName);
+      }
+      else if (strcmp(nodeLabel, "GridLocation_t") == 0)
+      {
+        std::string location;
+        CGNSRead::readNodeStringData(cgioNum, *iter, location);
+        if (location == "Vertex")
+        {
+          this->Location = CGNS_ENUMV(Vertex);
+        }
+        else if (location == "FaceCenter" && 3 == cellDim)
+        {
+          this->Location = CGNS_ENUMV(FaceCenter);
+        }
+        else if (location == "EdgeCenter" && 2 == cellDim)
+        {
+          this->Location = CGNS_ENUMV(EdgeCenter);
+        }
+        else
+        {
+          throw CGIOUnsupported("Unsupported unstrured grid location" + location);
+        }
+      }
+    }
+    CGNSRead::releaseIds(cgioNum, childrenIds);
+  }
+
+  ~BCInformationUns() {}
+
+private:
+  BCInformationUns(const BCInformationUns&) = delete;
+  BCInformationUns& operator=(const BCInformationUns&) = delete;
 };
 }
 
@@ -2452,6 +2560,7 @@ int vtkCGNSReader::GetUnstructuredZone(
   //
   const auto sil = this->GetSIL();
   const char* basename = this->Internal->GetBase(base).name;
+  const char* zonename = this->Internal->GetBase(base).zones[zone].name;
   const bool requiredPatch = sil->ReadPatchesForBase(basename);
 
   // SetUp zone Blocks
@@ -2488,7 +2597,345 @@ int vtkCGNSReader::GetUnstructuredZone(
   // Iterate over bnd sections.
   vtkPrivate::AddIsPatchArray(ugrid.Get(), false);
 
-  if (bndSec.size() > 0 && requiredPatch)
+  if (hasNFace && requiredPatch)
+  {
+    //----------------------------------------------------------------------------
+    // Handle boundary conditions (BC) patches for polyhedral grid
+    //----------------------------------------------------------------------------
+    mzone->SetBlock(0u, ugrid.Get());
+    mzone->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "Internal");
+    //
+    vtkNew<vtkMultiBlockDataSet> patchesMB;
+    mzone->SetBlock(1, patchesMB.Get());
+    mzone->GetMetaData(1)->Set(vtkCompositeDataSet::NAME(), "Patches");
+    // multi patch build
+    //
+    std::vector<double> zoneChildren;
+    CGNSRead::getNodeChildrenId(this->cgioNum, this->currentId, zoneChildren);
+    for (auto iter = zoneChildren.begin(); iter != zoneChildren.end(); ++iter)
+    {
+      CGNSRead::char_33 nodeLabel;
+      cgio_get_label(cgioNum, (*iter), nodeLabel);
+      if (strcmp(nodeLabel, "ZoneBC_t") != 0)
+      {
+        continue;
+      }
+
+      const double zoneBCId = (*iter);
+
+      // iterate over all children and read supported BC_t nodes.
+      std::vector<double> zoneBCChildren;
+      CGNSRead::getNodeChildrenId(this->cgioNum, zoneBCId, zoneBCChildren);
+      for (auto bciter = zoneBCChildren.begin(); bciter != zoneBCChildren.end(); ++bciter)
+      {
+        char label[CGIO_MAX_LABEL_LENGTH + 1];
+        cgio_get_label(this->cgioNum, *bciter, label);
+        if (strcmp(label, "BC_t") == 0)
+        {
+          try
+          {
+            BCInformationUns binfo(this->cgioNum, *bciter, cellDim);
+            if (sil->ReadPatch(basename, zonename, binfo.Name))
+            {
+              std::vector<vtkIdList*> bndFaceList;
+              //
+              // Read Polygons ...
+              //------------------
+              if (binfo.BCElementRange.size() == 2)
+              {
+                vtkIdType bcStartFaceId = binfo.BCElementRange[0];
+                vtkIdType bcEndFaceId = binfo.BCElementRange[1];
+                vtkIdType residualNumFacesToRead = bcEndFaceId - bcStartFaceId + 1;
+
+                bndFaceList.resize(residualNumFacesToRead, nullptr);
+                for (vtkIdType faceId = 0; faceId < residualNumFacesToRead; faceId++)
+                {
+                  bndFaceList[faceId] = vtkIdList::New();
+                }
+
+                for (std::size_t sec = 0; sec < ngonSec.size(); sec++)
+                {
+                  int curSec = ngonSec[sec];
+                  //
+                  // Compute range intersection with current section
+                  //------------------------------------------------
+                  cgsize_t startFaceId = std::max(sectionInfoList[curSec].range[0],
+                    static_cast<cgsize_t>(binfo.BCElementRange[0]));
+                  cgsize_t endFaceId = std::min(sectionInfoList[curSec].range[1],
+                    static_cast<cgsize_t>(binfo.BCElementRange[1]));
+                  cgsize_t numFacesToRead = endFaceId - startFaceId + 1;
+
+                  if (numFacesToRead <= 0)
+                    continue;
+
+                  // Do a partial read of Faces in current Section
+                  //----------------------------------------------
+                  std::vector<vtkIdType> bcFaceElementsIdx;
+                  std::vector<vtkIdType> bcFaceElementsArr;
+                  bcFaceElementsIdx.resize(numFacesToRead + 1);
+
+                  cgsize_t memDim[2];
+
+                  srcStart[0] = startFaceId - sectionInfoList[curSec].range[0] + 1;
+                  srcEnd[0] = srcStart[0] + numFacesToRead;
+                  srcStride[0] = 1;
+
+                  memStart[0] = 1;
+                  memStart[1] = 1;
+                  memEnd[0] = numFacesToRead + 1;
+                  memEnd[1] = 1;
+                  memStride[0] = 1;
+                  memStride[1] = 1;
+                  memDim[0] = numFacesToRead + 1;
+                  memDim[1] = 1;
+
+                  if (0 != CGNSRead::get_section_start_offset(this->cgioNum, elemIdList[curSec], 1,
+                             srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDim,
+                             bcFaceElementsIdx.data()))
+                  {
+                    vtkErrorMacro(
+                      << "Partial read of NGON_n ElementStartOffset array for BC FAILED.");
+                    return 1;
+                  }
+
+                  bcFaceElementsArr.resize(
+                    bcFaceElementsIdx[numFacesToRead] - bcFaceElementsIdx[0]);
+
+                  srcStart[0] = bcFaceElementsIdx[0] + 1;
+                  srcEnd[0] = bcFaceElementsIdx[numFacesToRead];
+                  srcStride[0] = 1;
+
+                  memStart[0] = 1;
+                  memStart[1] = 1;
+                  memEnd[0] = bcFaceElementsIdx[numFacesToRead] - bcFaceElementsIdx[0];
+                  memEnd[1] = 1;
+                  memStride[0] = 1;
+                  memStride[1] = 1;
+                  memDim[0] = bcFaceElementsIdx[numFacesToRead] - bcFaceElementsIdx[0];
+                  memDim[1] = 1;
+
+                  if (0 != CGNSRead::get_section_connectivity(this->cgioNum, elemIdList[curSec], 1,
+                             srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDim,
+                             bcFaceElementsArr.data()))
+                  {
+                    vtkErrorMacro(<< "Partial read of BC NGON_n faces FAILED\n");
+                    return 1;
+                  }
+
+                  // Prepare nodes to generate polygons
+                  for (vtkIdType nf = 0; nf < numFacesToRead; ++nf)
+                  {
+                    vtkIdType startNode = bcFaceElementsIdx[nf] - bcFaceElementsIdx[0];
+                    vtkIdType numNodes = bcFaceElementsIdx[nf + 1] - bcFaceElementsIdx[nf];
+                    vtkIdList* nodes = bndFaceList[nf + startFaceId - bcStartFaceId];
+                    // nodes->InsertNextId(numNodes);
+                    for (vtkIdType nn = 0; nn < numNodes; ++nn)
+                    {
+                      vtkIdType nodeID = bcFaceElementsArr[startNode + nn] - 1;
+                      nodes->InsertNextId(nodeID);
+                    }
+                  }
+
+                  residualNumFacesToRead -= numFacesToRead;
+                  if (residualNumFacesToRead <= 0)
+                    break;
+                }
+              }
+              else if (binfo.BCElementList.size() > 0)
+              {
+                vtkIdType residualNumFacesToRead = binfo.BCElementList.size();
+
+                std::vector<bool> BCElementRead(binfo.BCElementList.size(), false);
+
+                const auto bcminmax = std::minmax_element(
+                  std::begin(binfo.BCElementList), std::end(binfo.BCElementList));
+
+                bndFaceList.resize(residualNumFacesToRead, nullptr);
+                for (vtkIdType faceId = 0; faceId < residualNumFacesToRead; faceId++)
+                {
+                  bndFaceList[faceId] = vtkIdList::New();
+                }
+
+                for (std::size_t sec = 0; sec < ngonSec.size(); sec++)
+                {
+                  int curSec = ngonSec[sec];
+                  std::vector<std::pair<vtkIdType, vtkIdType> > faceElemToRead;
+                  //
+                  // Compute list of face in current section
+                  //------------------------------------------------
+                  // Quick skip useless section
+                  if ((*bcminmax.first > sectionInfoList[curSec].range[1]) ||
+                    (*bcminmax.second < sectionInfoList[curSec].range[0]))
+                  {
+                    continue;
+                  }
+
+                  for (vtkIdType idx = 0; idx < BCElementRead.size(); idx++)
+                  {
+                    if (BCElementRead[idx] == true)
+                    {
+                      continue;
+                    }
+                    if (binfo.BCElementList[idx] >= sectionInfoList[curSec].range[0] &&
+                      binfo.BCElementList[idx] <= sectionInfoList[curSec].range[1])
+                    {
+                      faceElemToRead.push_back(std::make_pair(binfo.BCElementList[idx], idx));
+                      BCElementRead[idx] = true;
+                    }
+                  }
+                  //  Nothing to read in this section
+                  if (faceElemToRead.size() == 0)
+                  {
+                    continue;
+                  }
+
+                  // sort face Bnd Element to Read
+                  std::sort(faceElemToRead.begin(), faceElemToRead.end());
+                  // Generate partial contiguous chuncks to read
+                  vtkIdType curFaceId = faceElemToRead[0].first;
+                  std::vector<vtkIdType> rangeIdx;
+                  rangeIdx.push_back(0);
+                  for (size_t ii = 1; ii < faceElemToRead.size(); ii++)
+                  {
+                    if (faceElemToRead[ii].first != curFaceId + 1)
+                    {
+                      rangeIdx.push_back(ii);
+                    }
+                    curFaceId = faceElemToRead[ii].first;
+                  }
+                  rangeIdx.push_back(faceElemToRead.size());
+
+                  // Do each partial range read
+                  for (size_t ii = 1; ii < rangeIdx.size(); ii++)
+                  {
+                    vtkIdType startFaceId = faceElemToRead[rangeIdx[ii - 1]].first;
+                    vtkIdType endFaceId = faceElemToRead[rangeIdx[ii] - 1].first;
+                    vtkIdType numFacesToRead = endFaceId - startFaceId + 1;
+                    // do partial read
+                    //----------------
+                    std::vector<vtkIdType> bcFaceElementsIdx;
+                    std::vector<vtkIdType> bcFaceElementsArr;
+                    bcFaceElementsIdx.resize(numFacesToRead + 1);
+
+                    cgsize_t memDim[2];
+
+                    srcStart[0] = startFaceId - sectionInfoList[curSec].range[0] + 1;
+                    srcEnd[0] = endFaceId - sectionInfoList[curSec].range[0] + 2;
+                    srcStride[0] = 1;
+
+                    memStart[0] = 1;
+                    memStart[1] = 1;
+                    memEnd[0] = numFacesToRead + 1;
+                    memEnd[1] = 1;
+                    memStride[0] = 1;
+                    memStride[1] = 1;
+                    memDim[0] = numFacesToRead + 1;
+                    memDim[1] = 1;
+
+                    if (0 != CGNSRead::get_section_start_offset(this->cgioNum, elemIdList[curSec],
+                               1, srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDim,
+                               bcFaceElementsIdx.data()))
+                    {
+                      vtkErrorMacro(
+                        << "Partial read of NGON_n ElementStartOffset array for BC FAILED.");
+                      return 1;
+                    }
+
+                    bcFaceElementsArr.resize(
+                      bcFaceElementsIdx[numFacesToRead] - bcFaceElementsIdx[0]);
+
+                    srcStart[0] = bcFaceElementsIdx[0] + 1;
+                    srcEnd[0] = bcFaceElementsIdx[numFacesToRead];
+                    srcStride[0] = 1;
+
+                    memStart[0] = 1;
+                    memStart[1] = 1;
+                    memEnd[0] = bcFaceElementsIdx[numFacesToRead] - bcFaceElementsIdx[0];
+                    memEnd[1] = 1;
+                    memStride[0] = 1;
+                    memStride[1] = 1;
+                    memDim[0] = bcFaceElementsIdx[numFacesToRead] - bcFaceElementsIdx[0];
+                    memDim[1] = 1;
+
+                    if (0 != CGNSRead::get_section_connectivity(this->cgioNum, elemIdList[curSec],
+                               1, srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDim,
+                               bcFaceElementsArr.data()))
+                    {
+                      vtkErrorMacro(<< "Partial read of BC NGON_n faces FAILED\n");
+                      return 1;
+                    }
+
+                    // Now append
+                    for (vtkIdType nf = 0; nf < numFacesToRead; ++nf)
+                    {
+                      vtkIdType startNode = bcFaceElementsIdx[nf] - bcFaceElementsIdx[0];
+                      vtkIdType numNodes = bcFaceElementsIdx[nf + 1] - bcFaceElementsIdx[nf];
+
+                      vtkIdList* nodes = bndFaceList[faceElemToRead[rangeIdx[ii - 1] + nf].second];
+                      // nodes->InsertNextId(numNodes);
+                      for (vtkIdType nn = 0; nn < numNodes; ++nn)
+                      {
+                        vtkIdType nodeID = bcFaceElementsArr[startNode + nn] - 1;
+                        nodes->InsertNextId(nodeID);
+                      }
+                    }
+                  }
+
+                  residualNumFacesToRead -= faceElemToRead.size();
+                  if (residualNumFacesToRead <= 0)
+                    break;
+                }
+              }
+              else
+              {
+                continue;
+              }
+              // Generate support unstructured grid
+              // TODO: Maybe removing unneeded points and renumbering should be done here
+              vtkSmartPointer<vtkUnstructuredGrid> bcGrid =
+                vtkSmartPointer<vtkUnstructuredGrid>::New();
+              bcGrid->SetPoints(points.Get());
+
+              // Now transfer bndFaceList to the VTK POLYGONS
+              for (auto nodes : bndFaceList)
+              {
+                bcGrid->InsertNextCell(VTK_POLYGON, nodes);
+                nodes->Delete();
+              }
+              //
+              // Parse BCDataSet CGNS arrays
+              //
+              // TODO: Read here BCDataSet_t nodes to get DirichletData, NeumannData arrays
+              // and fill the bcGrid with these boundary values.
+              //
+              const unsigned int idx = patchesMB->GetNumberOfBlocks();
+              vtkPrivate::AddIsPatchArray(bcGrid, true);
+              patchesMB->SetBlock(idx, bcGrid.Get());
+
+              if (!binfo.FamilyName.empty())
+              {
+                vtkInformationStringKey* bcfamily =
+                  new vtkInformationStringKey("FAMILY", "vtkCompositeDataSet");
+                patchesMB->GetMetaData(idx)->Set(bcfamily, binfo.FamilyName.c_str());
+              }
+              patchesMB->GetMetaData(idx)->Set(vtkCompositeDataSet::NAME(), binfo.Name);
+            }
+          }
+          catch (const CGIOUnsupported& ue)
+          {
+            vtkWarningMacro("Skipping BC_t node: " << ue.what());
+          }
+          catch (const CGIOError& e)
+          {
+            vtkErrorMacro("Failed to read BC_t node: " << e.what());
+          }
+        }
+      }
+    }
+    CGNSRead::releaseIds(this->cgioNum, zoneChildren);
+    zoneChildren.clear();
+  }
+  else if (bndSec.size() > 0 && requiredPatch)
   {
     // mzone Set Blocks
     mzone->SetBlock(0, ugrid.Get());
@@ -2703,7 +3150,7 @@ int vtkCGNSReader::GetUnstructuredZone(
     mzone->GetMetaData((unsigned int)1)->Set(vtkCompositeDataSet::NAME(), "Patches");
   }
   //
-  if (bndSec.size() > 0 && requiredPatch)
+  if ((bndSec.size() > 0 || hasNFace) && requiredPatch)
   {
     mbase->SetBlock(zone, mzone);
   }
