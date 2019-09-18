@@ -249,6 +249,10 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
 
   QObject::connect(
     ui.OpacityEditor, SIGNAL(chartRangeModified()), this, SLOT(setHistogramOutdated()));
+  QObject::connect(ui.OpacityEditor, SIGNAL(chartRangeModified()), ui.OpacityEditor,
+    SIGNAL(controlPointsModified()));
+  QObject::connect(
+    ui.ColorEditor, SIGNAL(chartRangeModified()), ui.ColorEditor, SIGNAL(controlPointsModified()));
 
   this->connect(
     ui.UseLogScaleOpacity, SIGNAL(clicked(bool)), SLOT(useLogScaleOpacityClicked(bool)));
