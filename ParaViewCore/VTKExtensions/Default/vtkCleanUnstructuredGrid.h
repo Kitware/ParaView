@@ -33,7 +33,8 @@
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkUnstructuredGridAlgorithm.h"
 
-class vtkPointLocator;
+class vtkIncrementalPointLocator;
+class vtkDataSet;
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkCleanUnstructuredGrid
   : public vtkUnstructuredGridAlgorithm
@@ -43,13 +44,59 @@ public:
 
   vtkTypeMacro(vtkCleanUnstructuredGrid, vtkUnstructuredGridAlgorithm);
 
+  // By default ToleranceIsAbsolute is false and Tolerance is
+  // a fraction of Bounding box diagonal, if true, AbsoluteTolerance is
+  // used when adding points to locator (merging)
+  vtkSetMacro(ToleranceIsAbsolute, bool);
+  vtkBooleanMacro(ToleranceIsAbsolute, bool);
+  vtkGetMacro(ToleranceIsAbsolute, bool);
+
+  // Specify tolerance in terms of fraction of bounding box length.
+  // Default is 0.0.
+  vtkSetClampMacro(Tolerance, double, 0.0, 1.0);
+  vtkGetMacro(Tolerance, double);
+
+  // Specify tolerance in absolute terms. Default is 1.0.
+  vtkSetClampMacro(AbsoluteTolerance, double, 0.0, VTK_DOUBLE_MAX);
+  vtkGetMacro(AbsoluteTolerance, double);
+
+  //@{
+  /**
+   * Set/Get a spatial locator for speeding the search process. By
+   * default an instance of vtkMergePoints is used.
+   */
+  virtual void SetLocator(vtkIncrementalPointLocator* locator);
+  vtkGetObjectMacro(Locator, vtkIncrementalPointLocator);
+  //@}
+
+  // Create default locator. Used to create one when none is specified.
+  void CreateDefaultLocator(vtkDataSet* input = nullptr);
+
+  // Release locator
+  void ReleaseLocator() { this->SetLocator(nullptr); }
+
+  //@{
+  /**
+   * Set/get the desired precision for the output types. See the documentation
+   * for the vtkAlgorithm::DesiredOutputPrecision enum for an explanation of
+   * the available precision settings.
+   */
+  vtkSetMacro(OutputPointsPrecision, int);
+  vtkGetMacro(OutputPointsPrecision, int);
+  //@}
+
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
-  vtkCleanUnstructuredGrid();
+  vtkCleanUnstructuredGrid() = default;
   ~vtkCleanUnstructuredGrid() override;
 
-  vtkPointLocator* Locator;
+  // options for managing point merging tolerance
+  bool ToleranceIsAbsolute = false;
+  double Tolerance = 0.0;
+  double AbsoluteTolerance = 1.0;
+  vtkIncrementalPointLocator* Locator = nullptr;
+  int OutputPointsPrecision = vtkAlgorithm::DEFAULT_PRECISION;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int FillInputPortInformation(int port, vtkInformation* info) override;
