@@ -31,7 +31,7 @@
       <Hints>
         <ReaderFactory
             extensions="bp"
-            file_description="ADIOS2 bp file"/>
+            file_description="ADIOS2 BP3 File (VTX)" />
       </Hints>
     </SourceProxy>
   </ProxyGroup>
