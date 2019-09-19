@@ -2891,10 +2891,42 @@ int vtkCGNSReader::GetUnstructuredZone(
                 continue;
               }
               // Generate support unstructured grid
-              // TODO: Maybe removing unneeded points and renumbering should be done here
               vtkSmartPointer<vtkUnstructuredGrid> bcGrid =
                 vtkSmartPointer<vtkUnstructuredGrid>::New();
-              bcGrid->SetPoints(points.Get());
+              vtkNew<vtkIdList> sortedBCPtIds;
+              for (auto nodes : bndFaceList)
+              {
+                for (vtkIdType ii = 0; ii < nodes->GetNumberOfIds(); ii++)
+                {
+                  sortedBCPtIds->InsertUniqueId(nodes->GetId(ii));
+                }
+              }
+
+              sortedBCPtIds->Sort();
+              // Renumbering //
+              std::unordered_map<vtkIdType, vtkIdType> translateIds;
+              for (vtkIdType newId = 0; newId < sortedBCPtIds->GetNumberOfIds(); newId++)
+              {
+                vtkIdType oldId = sortedBCPtIds->GetId(newId);
+                translateIds[oldId] = newId;
+              }
+
+              // Create dedicated vtkPoints for BC
+              vtkSmartPointer<vtkPoints> bcPoints = vtkSmartPointer<vtkPoints>::New();
+              bcPoints->SetDataType(points->GetDataType());
+              bcPoints->SetNumberOfPoints(sortedBCPtIds->GetNumberOfIds());
+              points->GetPoints(sortedBCPtIds, bcPoints.Get());
+              bcGrid->SetPoints(bcPoints.Get());
+
+              // set new ids in bndFaceList
+              for (auto nodes : bndFaceList)
+              {
+                for (vtkIdType ii = 0; ii < nodes->GetNumberOfIds(); ii++)
+                {
+                  vtkIdType curId = nodes->GetId(ii);
+                  nodes->SetId(ii, translateIds[curId]);
+                }
+              }
 
               // Now transfer bndFaceList to the VTK POLYGONS
               for (auto nodes : bndFaceList)
@@ -2905,8 +2937,10 @@ int vtkCGNSReader::GetUnstructuredZone(
               //
               // Parse BCDataSet CGNS arrays
               //
-              // TODO: Read here BCDataSet_t nodes to get DirichletData, NeumannData arrays
+              // TODO: Read here BCDataSet_t nodes to get DirichletData, NeumannData arrays at
+              // FaceCenter
               // and fill the bcGrid with these boundary values.
+              // For Pointdata, it can be extracted from the unstructured Volume.
               //
               const unsigned int idx = patchesMB->GetNumberOfBlocks();
               vtkPrivate::AddIsPatchArray(bcGrid, true);
