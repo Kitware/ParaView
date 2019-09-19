@@ -27,6 +27,7 @@
 #include "vtkDataSet.h"
 #include "vtkDistanceRepresentation3D.h"
 #include "vtkDistanceWidget.h"
+#include "vtkEquirectangularToCubeMapTexture.h"
 #include "vtkFlagpoleLabel.h"
 #include "vtkGeometryRepresentation.h"
 #include "vtkIdTypeArray.h"
@@ -73,8 +74,7 @@
 #include "vtkWidgetEvent.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkXMLDataElement.h"
-#include "vtkXMLImageDataWriter.h"
-#include "vtkXMLPolyDataWriter.h"
+#include "vtkXMLDataObjectWriter.h"
 #include "vtkXMLUtilities.h"
 #include "vtksys/SystemTools.hxx"
 
@@ -1208,7 +1208,8 @@ void vtkPVOpenVRHelper::ApplyState()
 {
   // apply crop snapping setting first
   // this->CropMenu->RenameMenuItem(
-  //   "togglesnapping", (this->CropSnapping ? "Turn Snap to Axes Off" : "Turn Snap to Axes On"));
+  //   "togglesnapping", (this->CropSnapping ? "Turn Snap to Axes Off" : "Turn
+  //   Snap to Axes On"));
 
   // set camera poses
   this->RenderWindow->GetDashboardOverlay()->GetSavedCameraPoses().clear();
@@ -1264,8 +1265,8 @@ bool vtkPVOpenVRHelper::EventCallback(vtkObject* caller, unsigned long eventID, 
       // next two lines are debugging code to mark what actor was picked
       // by changing its color. Useful to track down picking errors.
       // double *color = static_cast<vtkActor*>(prop)->GetProperty()->GetColor();
-      // static_cast<vtkActor*>(prop)->GetProperty()->SetColor(color[0] > 0.0 ? 0.0 : 1.0, 0.5,
-      // 0.5);
+      // static_cast<vtkActor*>(prop)->GetProperty()->SetColor(color[0] > 0.0 ?
+      // 0.0 : 1.0, 0.5, 0.5);
       vtkDataObject* dobj = repr->GetInput();
       node->GetProperties()->Set(vtkSelectionNode::SOURCE(), repr);
 
@@ -1777,7 +1778,8 @@ void vtkPVOpenVRHelper::ExportLocationsAsSkyboxes(vtkSMViewProxy* smview)
   }
 
   json << "], \"name\": \"poseIndex\" }, "
-          "\"orientation\": { \"values\": [\"right\", \"left\", \"up\", \"down\", \"back\", "
+          "\"orientation\": { \"values\": [\"right\", \"left\", \"up\", "
+          "\"down\", \"back\", "
           "\"front\"], "
           "  \"name\": \"orientation\" } }, "
           "\"arguments_order\": [\"orientation\", \"poseIndex\"], "
@@ -1829,6 +1831,15 @@ void setVectorAttribute(vtkXMLDataElement* el, const char* name, int count, T* d
   }
   el->SetAttribute(name, o.str().c_str());
 }
+
+void writeTextureReference(vtkXMLDataElement* adatael, vtkTexture* texture, const char* tname,
+  std::map<vtkTexture*, size_t>& textures)
+{
+  if (texture)
+  {
+    adatael->SetIntAttribute(tname, static_cast<int>(textures[texture]));
+  }
+}
 }
 
 void vtkPVOpenVRHelper::ExportLocationsAsView(vtkSMViewProxy* smview)
@@ -1852,18 +1863,26 @@ void vtkPVOpenVRHelper::ExportLocationsAsView(vtkSMViewProxy* smview)
   std::string dir = "pv-view/";
   vtksys::SystemTools::MakeDirectory(dir);
 
+  std::map<vtkActor*, size_t> actors;
+  std::map<vtkDataObject*, size_t> dataobjects;
+  std::map<vtkTexture*, size_t> textures;
+
   vtkNew<vtkXMLDataElement> topel;
   topel->SetName("View");
+  topel->SetIntAttribute("Version", 2);
+  topel->SetIntAttribute("UseImageBasedLighting", pvRenderer->GetUseImageBasedLighting());
+  if (pvRenderer->GetEnvironmentCubeMap())
+  {
+    vtkTexture* cubetex = pvRenderer->GetEnvironmentCubeMap();
+    if (textures.find(cubetex) == textures.end())
+    {
+      textures[cubetex] = textures.size();
+    }
+    topel->SetIntAttribute("EnvironmentCubeMap", static_cast<int>(textures[cubetex]));
+  }
 
-  std::vector<vtkActor*> actors;
-  std::vector<vtkPolyData*> datas;
-  std::vector<vtkImageData*> textures;
-
-  vtkNew<vtkXMLDataElement> actorsel;
-  actorsel->SetName("Actors");
   vtkNew<vtkXMLDataElement> posesel;
   posesel->SetName("CameraPoses");
-
   int count = 0;
   for (auto& loci : this->Locations)
   {
@@ -1895,7 +1914,6 @@ void vtkPVOpenVRHelper::ExportLocationsAsView(vtkSMViewProxy* smview)
     vtkCollectionSimpleIterator pit;
     vtkActorCollection* acol = pvRenderer->GetActors();
     vtkActor* actor;
-    int acount = 0;
     for (acol->InitTraversal(pit); (actor = acol->GetNextActor(pit));)
     {
       vtkNew<vtkXMLDataElement> actorel;
@@ -1921,152 +1939,197 @@ void vtkPVOpenVRHelper::ExportLocationsAsView(vtkSMViewProxy* smview)
         continue;
       }
 
-      // record the polydata if not already done
-      int dcount;
-      int pdfound = -1;
-      for (dcount = 0; dcount < datas.size(); ++dcount)
+      if (actors.find(actor) == actors.end())
       {
-        if (datas[dcount] == pd)
-        {
-          pdfound = dcount;
-          break;
-        }
-      }
-      if (pdfound == -1)
-      {
-        pdfound = static_cast<int>(datas.size());
-        datas.push_back(pd);
+        actors[actor] = actors.size();
       }
 
-      // record the texture if there is one
-      int tfound = -1;
-      if (actor->GetTexture() && actor->GetTexture()->GetInput())
-      {
-        vtkImageData* idata = actor->GetTexture()->GetInput();
-        for (dcount = 0; dcount < textures.size(); ++dcount)
-        {
-          if (textures[dcount] == idata)
-          {
-            tfound = dcount;
-            break;
-          }
-        }
-        if (tfound == -1)
-        {
-          tfound = static_cast<int>(textures.size());
-          textures.push_back(idata);
-          actor->GetTexture()->Update();
-        }
-      }
-
-      // record the actor id
-      int found = -1;
-      for (dcount = 0; dcount < actors.size(); ++dcount)
-      {
-        if (actors[dcount] == actor)
-        {
-          found = dcount;
-          break;
-        }
-      }
-      if (found == -1)
-      {
-        found = static_cast<int>(actors.size());
-        actors.push_back(actor);
-
-        // record actor properties
-        vtkNew<vtkXMLDataElement> adatael;
-        adatael->SetName("ActorData");
-
-        adatael->SetIntAttribute("PolyData", pdfound);
-        adatael->SetIntAttribute("PolyDataSize", pd->GetActualMemorySize());
-
-        if (tfound != -1)
-        {
-          adatael->SetIntAttribute("TextureData", tfound);
-          adatael->SetIntAttribute(
-            "TextureSize", actor->GetTexture()->GetInput()->GetActualMemorySize());
-        }
-
-        adatael->SetIntAttribute("ActorID", found);
-        adatael->SetVectorAttribute("DiffuseColor", 3, actor->GetProperty()->GetDiffuseColor());
-        adatael->SetDoubleAttribute("Diffuse", actor->GetProperty()->GetDiffuse());
-        adatael->SetVectorAttribute("AmbientColor", 3, actor->GetProperty()->GetAmbientColor());
-        adatael->SetDoubleAttribute("Ambient", actor->GetProperty()->GetAmbient());
-        adatael->SetVectorAttribute("SpecularColor", 3, actor->GetProperty()->GetSpecularColor());
-        adatael->SetDoubleAttribute("Specular", actor->GetProperty()->GetSpecular());
-        adatael->SetDoubleAttribute("SpecularPower", actor->GetProperty()->GetSpecularPower());
-        adatael->SetDoubleAttribute("Opacity", actor->GetProperty()->GetOpacity());
-        adatael->SetDoubleAttribute("LineWidth", actor->GetProperty()->GetLineWidth());
-
-        adatael->SetVectorAttribute("Scale", 3, actor->GetScale());
-        setVectorAttribute(adatael, "Position", 3, actor->GetPosition());
-        setVectorAttribute(adatael, "Origin", 3, actor->GetOrigin());
-        setVectorAttribute(adatael, "Orientation", 3, actor->GetOrientation());
-
-        // scalar visibility
-        adatael->SetIntAttribute("ScalarVisibility", actor->GetMapper()->GetScalarVisibility());
-        adatael->SetIntAttribute("ScalarMode", actor->GetMapper()->GetScalarMode());
-
-        if (actor->GetMapper()->GetUseLookupTableScalarRange())
-        {
-          adatael->SetVectorAttribute(
-            "ScalarRange", 2, actor->GetMapper()->GetLookupTable()->GetRange());
-        }
-        else
-        {
-          setVectorAttribute(adatael, "ScalarRange", 2, actor->GetMapper()->GetScalarRange());
-        }
-        adatael->SetIntAttribute("ScalarArrayId", actor->GetMapper()->GetArrayId());
-        adatael->SetIntAttribute("ScalarArrayAccessMode", actor->GetMapper()->GetArrayAccessMode());
-        adatael->SetIntAttribute("ScalarArrayComponent", actor->GetMapper()->GetArrayComponent());
-        adatael->SetAttribute("ScalarArrayName", actor->GetMapper()->GetArrayName());
-
-        actorsel->AddNestedElement(adatael);
-      }
-
-      actorel->SetIntAttribute("ActorID", found);
+      actorel->SetIntAttribute("ActorID", static_cast<int>(actors[actor]));
       poseel->AddNestedElement(actorel);
-      acount++;
     }
 
     posesel->AddNestedElement(poseel);
     count++;
   }
-
   topel->AddNestedElement(posesel);
+
+  // export the actors
+  vtkNew<vtkXMLDataElement> actorsel;
+  actorsel->SetName("Actors");
+  for (auto& ait : actors)
+  {
+    auto& actor = ait.first;
+
+    // record the textures if there are any
+    if (actor->GetTexture() && actor->GetTexture()->GetInput())
+    {
+      vtkTexture* texture = actor->GetTexture();
+      if (textures.find(texture) == textures.end())
+      {
+        textures[texture] = textures.size();
+      }
+    }
+
+    // record the property textures if any
+    std::map<std::string, vtkTexture*>& tex = actor->GetProperty()->GetAllTextures();
+    for (auto& t : tex)
+    {
+      vtkTexture* texture = t.second;
+      if (textures.find(texture) == textures.end())
+      {
+        textures[texture] = textures.size();
+      }
+    }
+
+    // record actor properties
+    vtkNew<vtkXMLDataElement> adatael;
+    adatael->SetName("ActorData");
+
+    // write out texture references
+    writeTextureReference(adatael, actor->GetTexture(), "TextureID", textures);
+    for (auto& t : tex)
+    {
+      writeTextureReference(adatael, t.second, t.first.c_str(), textures);
+    }
+
+    vtkPolyData* pd = findPolyData(actor->GetMapper()->GetInputDataObject(0, 0));
+    // record the polydata if not already done
+    if (dataobjects.find(pd) == dataobjects.end())
+    {
+      dataobjects[pd] = dataobjects.size();
+    }
+    adatael->SetIntAttribute("PolyDataID", static_cast<int>(dataobjects[pd]));
+
+    adatael->SetIntAttribute("ActorID", static_cast<int>(ait.second));
+    adatael->SetAttribute("ClassName", actor->GetClassName());
+    adatael->SetVectorAttribute("DiffuseColor", 3, actor->GetProperty()->GetDiffuseColor());
+    adatael->SetDoubleAttribute("Diffuse", actor->GetProperty()->GetDiffuse());
+    adatael->SetVectorAttribute("AmbientColor", 3, actor->GetProperty()->GetAmbientColor());
+    adatael->SetDoubleAttribute("Ambient", actor->GetProperty()->GetAmbient());
+    adatael->SetVectorAttribute("SpecularColor", 3, actor->GetProperty()->GetSpecularColor());
+    adatael->SetDoubleAttribute("Specular", actor->GetProperty()->GetSpecular());
+    adatael->SetDoubleAttribute("SpecularPower", actor->GetProperty()->GetSpecularPower());
+    adatael->SetDoubleAttribute("Opacity", actor->GetProperty()->GetOpacity());
+    adatael->SetDoubleAttribute("LineWidth", actor->GetProperty()->GetLineWidth());
+
+    adatael->SetIntAttribute("Interpolation", actor->GetProperty()->GetInterpolation());
+    adatael->SetDoubleAttribute("Metallic", actor->GetProperty()->GetMetallic());
+    adatael->SetDoubleAttribute("Roughness", actor->GetProperty()->GetRoughness());
+    adatael->SetDoubleAttribute("NormalScale", actor->GetProperty()->GetNormalScale());
+    adatael->SetDoubleAttribute("OcclusionStrength", actor->GetProperty()->GetOcclusionStrength());
+    adatael->SetVectorAttribute("EmissiveFactor", 3, actor->GetProperty()->GetEmissiveFactor());
+
+    adatael->SetVectorAttribute("Scale", 3, actor->GetScale());
+    setVectorAttribute(adatael, "Position", 3, actor->GetPosition());
+    setVectorAttribute(adatael, "Origin", 3, actor->GetOrigin());
+    setVectorAttribute(adatael, "Orientation", 3, actor->GetOrientation());
+
+    // scalar visibility
+    adatael->SetIntAttribute("ScalarVisibility", actor->GetMapper()->GetScalarVisibility());
+    adatael->SetIntAttribute("ScalarMode", actor->GetMapper()->GetScalarMode());
+
+    if (actor->GetMapper()->GetUseLookupTableScalarRange())
+    {
+      adatael->SetVectorAttribute(
+        "ScalarRange", 2, actor->GetMapper()->GetLookupTable()->GetRange());
+    }
+    else
+    {
+      setVectorAttribute(adatael, "ScalarRange", 2, actor->GetMapper()->GetScalarRange());
+    }
+    adatael->SetIntAttribute("ScalarArrayId", actor->GetMapper()->GetArrayId());
+    adatael->SetIntAttribute("ScalarArrayAccessMode", actor->GetMapper()->GetArrayAccessMode());
+    adatael->SetIntAttribute("ScalarArrayComponent", actor->GetMapper()->GetArrayComponent());
+    adatael->SetAttribute("ScalarArrayName", actor->GetMapper()->GetArrayName());
+
+    actorsel->AddNestedElement(adatael);
+  }
   topel->AddNestedElement(actorsel);
+
+  // now write the textures
+  vtkNew<vtkXMLDataElement> texturesel;
+  texturesel->SetName("Textures");
+  for (auto const& t : textures)
+  {
+    vtkNew<vtkXMLDataElement> texel;
+    texel->SetName("Texture");
+    texel->SetAttribute("ClassName", t.first->GetClassName());
+    texel->SetIntAttribute("Repeat", t.first->GetRepeat());
+    texel->SetIntAttribute("Interpolate", t.first->GetInterpolate());
+    texel->SetIntAttribute("Mipmap", t.first->GetMipmap());
+    texel->SetIntAttribute("UseSRGBColorSpace", t.first->GetUseSRGBColorSpace() ? 1 : 0);
+    texel->SetDoubleAttribute(
+      "MaximumAnisotropicFiltering", t.first->GetMaximumAnisotropicFiltering());
+    texel->SetIntAttribute("TextureID", static_cast<int>(t.second));
+
+    vtkImageData* idata = nullptr;
+    if (t.first->GetCubeMap())
+    {
+      vtkEquirectangularToCubeMapTexture* cubetex =
+        vtkEquirectangularToCubeMapTexture::SafeDownCast(t.first);
+      if (cubetex)
+      {
+        cubetex->GetInputTexture()->Update();
+        idata = cubetex->GetInputTexture()->GetInput();
+      }
+    }
+    else
+    {
+      t.first->Update();
+      idata = vtkImageData::SafeDownCast(t.first->GetInputDataObject(0, 0));
+    }
+
+    if (dataobjects.find(idata) == dataobjects.end())
+    {
+      dataobjects[idata] = dataobjects.size();
+    }
+
+    texel->SetIntAttribute("ImageDataID", static_cast<int>(dataobjects[idata]));
+    texturesel->AddNestedElement(texel);
+  }
+  topel->AddNestedElement(texturesel);
 
   // create subdir for the data
   std::string datadir = dir;
   datadir += "data/";
   vtksys::SystemTools::MakeDirectory(datadir);
 
-  // now write the polydata
-  for (int dcount = 0; dcount < datas.size(); ++dcount)
+  // now write the dataobjects
+  vtkNew<vtkXMLDataElement> datasel;
+  datasel->SetName("DataObjects");
+  for (auto const& dit : dataobjects)
   {
-    std::ostringstream sdir;
-    sdir << datadir << "pdata" << dcount << ".vtp";
-    vtkNew<vtkXMLPolyDataWriter> writer;
-    writer->SetDataModeToAppended();
-    writer->SetCompressorTypeToLZ4();
-    writer->SetFileName(sdir.str().c_str());
-    writer->SetInputData(datas[dcount]);
-    writer->Write();
-  }
+    vtkDataObject* data = dit.first;
+    vtkNew<vtkXMLDataElement> datael;
+    datael->SetName("DataObject");
+    datael->SetIntAttribute("DataObjectType", data->GetDataObjectType());
+    datael->SetIntAttribute("MemorySize", data->GetActualMemorySize());
+    datael->SetIntAttribute("DataObjectID", static_cast<int>(dit.second));
+    datasel->AddNestedElement(datael);
 
-  // now write the textures
-  for (int dcount = 0; dcount < textures.size(); ++dcount)
-  {
     std::ostringstream sdir;
-    sdir << datadir << "tdata" << dcount << ".vti";
-    vtkNew<vtkXMLImageDataWriter> writer;
+    sdir << "data" << dit.second;
+    switch (data->GetDataObjectType())
+    {
+      case VTK_IMAGE_DATA:
+        sdir << ".vti";
+        break;
+      case VTK_POLY_DATA:
+        sdir << ".vtp";
+        break;
+    }
+    std::string fileName = "data/" + sdir.str();
+    datael->SetAttribute("FileName", fileName.c_str());
+    vtkNew<vtkXMLDataObjectWriter> writer;
     writer->SetDataModeToAppended();
     writer->SetCompressorTypeToLZ4();
-    writer->SetFileName(sdir.str().c_str());
-    writer->SetInputData(textures[dcount]);
+    writer->EncodeAppendedDataOff();
+    fileName = datadir + sdir.str();
+    writer->SetFileName(fileName.c_str());
+    writer->SetInputData(data);
     writer->Write();
   }
+  topel->AddNestedElement(datasel);
 
   vtkIndent indent;
   vtkXMLUtilities::WriteElementToFile(topel, "pv-view/index.mvx", &indent);
@@ -2148,6 +2211,9 @@ void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
   this->Interactor = vtkOpenVRRenderWindowInteractor::New();
   this->RenderWindow->SetInteractor(this->Interactor);
 
+  this->Renderer->SetUseImageBasedLighting(pvRenderer->GetUseImageBasedLighting());
+  this->Renderer->SetEnvironmentCubeMap(pvRenderer->GetEnvironmentCubeMap());
+
   // required for LOD volume rendering
   // iren->SetDesiredUpdateRate(220.0);
   // iren->SetStillUpdateRate(220.0);
@@ -2228,8 +2294,6 @@ void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
     light->Delete();
   }
 
-// send the first renderer to openVR
-
 #if 1
   vtkNew<vtkCamera> zcam;
   double fp[3];
@@ -2247,6 +2311,9 @@ void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
   this->RenderWindow->SetMultiSamples(this->MultiSample ? 8 : 0);
 
   this->RenderWindow->Initialize();
+
+  this->SetRightTriggerMode("Probe");
+  this->OpenVRControls->SetRightTriggerMode("Probe");
 
   if (this->RenderWindow->GetHMD())
   {
@@ -2335,17 +2402,6 @@ void vtkPVOpenVRHelper::UpdateProps()
         {
           actor->ForceOpaqueOff();
         }
-        if (actor->GetTexture())
-        {
-          // release graphics resources
-          actor->GetTexture()->InterpolateOn();
-          if (!actor->GetTexture()->GetMipmap())
-          {
-            actor->GetTexture()->MipmapOn();
-            actor->GetTexture()->ReleaseGraphicsResources(this->RenderWindow);
-          }
-          // mipmap on
-        }
       }
       this->Renderer->AddViewProp(prop);
     }
@@ -2359,45 +2415,6 @@ void vtkPVOpenVRHelper::UpdateProps()
 
     this->PropUpdateTime.Modified();
   }
-
-  //   vtkActorCollection* acol = pvRenderer->GetActors();
-  //   vtkActor* actor;
-  //   this->AddedProps->RemoveAllItems();
-  //   for (acol->InitTraversal(pit); (actor = acol->GetNextActor(pit));)
-  //   {
-  //     this->AddedProps->AddItem(actor);
-  //     // force opaque is opacity is 1.0
-  //     if (actor->GetProperty()->GetOpacity() >= 1.0)
-  //     {
-  //       actor->ForceOpaqueOn();
-  //     }
-  //     else
-  //     {
-  //       actor->ForceOpaqueOff();
-  //     }
-  //     this->Renderer->AddActor(actor);
-  //     if (actor->GetTexture())
-  //     {
-  //       // release graphics resources
-  //       actor->GetTexture()->InterpolateOn();
-  //       if (!actor->GetTexture()->GetMipmap())
-  //       {
-  //         actor->GetTexture()->MipmapOn();
-  //         actor->GetTexture()->ReleaseGraphicsResources(this->RenderWindow);
-  //       }
-  //       // mipmap on
-  //     }
-  //   }
-  //   vtkVolumeCollection* avol = pvRenderer->GetVolumes();
-  //   vtkVolume* volume;
-  //   for (avol->InitTraversal(pit); (volume = avol->GetNextVolume(pit));)
-  //   {
-  //     this->AddedProps->AddItem(volume);
-  //     this->Renderer->AddVolume(volume);
-  //   }
-
-  //   this->PropUpdateTime.Modified();
-  // }
 
   this->Interactor->DoOneEvent(this->RenderWindow, this->Renderer);
 }

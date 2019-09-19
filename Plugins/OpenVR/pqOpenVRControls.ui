@@ -100,10 +100,10 @@
          </size>
         </property>
         <property name="currentText">
-         <string>Grab</string>
+         <string>Probe</string>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>3</number>
         </property>
         <item>
          <property name="text">
@@ -171,7 +171,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Exit</string>
+         <string>Exit VR</string>
         </property>
        </widget>
       </item>
@@ -236,8 +236,8 @@ font: 75 12pt &quot;Arial&quot;;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>698</width>
-            <height>645</height>
+            <width>98</width>
+            <height>28</height>
            </rect>
           </property>
          </widget>
