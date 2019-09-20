@@ -216,6 +216,7 @@ void pqVRDockPanel::editConnection(QListWidgetItem* item)
   // Lookup connection
   QString connName = item->text();
   pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
+  (void)mgr;
 
   pqVRAddConnectionDialog dialog(this);
   bool set = false;
@@ -268,6 +269,7 @@ void pqVRDockPanel::addConnection()
   if (dialog.exec() == QDialog::Accepted)
   {
     pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
+    (void)mgr;
     dialog.updateConnection();
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
     if (dialog.isVRPN())
@@ -296,6 +298,7 @@ void pqVRDockPanel::removeConnection()
   }
   QString name = item->text();
   pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
+  (void)mgr;
 
   pqVRAddConnectionDialog dialog(this);
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
