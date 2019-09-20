@@ -54,14 +54,6 @@
                 with_property="Input" />
         </ProxyList>
       </Hints>
-      <DoubleVectorProperty command="SetDiscretizationStep"
-                            default_values="0.1"
-                            name="Bin width"
-                            number_of_elements="1">
-        <Documentation>
-          Set the width of the bins used to compute the entropy.
-        </Documentation>
-      </DoubleVectorProperty>
     </Proxy>
     <Proxy class="vtkStandardDeviationArrayMeasurement"
            name="Standard Deviation">
@@ -75,7 +67,7 @@
   </ProxyGroup>
   <ProxyGroup name="filters" >
     <SourceProxy name="ResampleToHyperTreeGrid" class="vtkResampleToHyperTreeGrid" label="Resample To Hyper Tree Grid" >
-      <Documentation long_help="Adaptive Mesh Refinement using a Hyper Tree Grid. The output is a Hyper Tree grid such that its leaves store a value measuring some property of the set of points inside them. Leaves are subdivided given some user defined heuristic."
+      <Documentation long_help="Warning: this plugin is a beta. Adaptive Mesh Refinement using a Hyper Tree Grid. The output is a Hyper Tree grid such that its leaves store a value measuring some property of the set of points inside them. Leaves are subdivided given some user defined heuristic."
                      short_help="Adaptive Mesh Refinement using a Hyper Tree Grid." >
           This Filter generates a Hyper Tree Grid from any input data set which has point data.
           Leaves of the Hyper Tree Grid are subdivided if the subset of points inside that leave
@@ -212,7 +204,23 @@
                          default_values="0" >
         <BooleanDomain name="bool" />
         <Documentation>
-          Forces the output hyper tree grid to not produce empty cells. Algorithm will be slightly slower if activated.
+          Forces the output hyper tree grid to not produce empty cells by limiting subdivisions.
+          When producing the Hyper Tree Grid output, if any of the potential leaves of a node
+          don't have point data but intersect with the geometry of the input, the node is not
+          subdivided, and thus becomes a leaf. This parameter is trumped by Extrapolate Point Data
+          parameter.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="ExtrapolatePointData"
+                         command="SetExtrapolate"
+                         number_of_elements="1"
+                         default_values="0" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Forces the output hyper tree grid to not produce empty cells by extrapolation.
+          Leaves intersecting the input geometry but not having any point data are
+          extrapolated by averaging. The averages are computed from the Hyper Tree Grid
+          that would be produced if this parameter was off, using Von Neumann super cursors.
         </Documentation>
       </IntVectorProperty>
       <ProxyProperty command="SetArrayMeasurement"

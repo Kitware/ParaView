@@ -16,7 +16,7 @@
 #include "vtkHarmonicMeanArrayMeasurement.h"
 
 #include "vtkArithmeticAccumulator.h"
-#include "vtkFunctionOfXList.h"
+#include "vtkFunctor.h"
 #include "vtkObjectFactory.h"
 
 #include <cassert>
@@ -41,7 +41,8 @@ bool vtkHarmonicMeanArrayMeasurement::Measure(vtkAbstractAccumulator** accumulat
 
   assert(accumulators && "input accumulator is not allocated");
 
-  vtkArithmeticAccumulator* acc = vtkArithmeticAccumulator::SafeDownCast(accumulators[0]);
+  vtkArithmeticAccumulator<vtkInverseFunctor>* acc =
+    vtkArithmeticAccumulator<vtkInverseFunctor>::SafeDownCast(accumulators[0]);
 
   assert(this->Accumulators[0]->HasSameParameters(acc) &&
     "input accumulators are of wrong type or have wrong parameters");
@@ -53,8 +54,5 @@ bool vtkHarmonicMeanArrayMeasurement::Measure(vtkAbstractAccumulator** accumulat
 //----------------------------------------------------------------------------
 std::vector<vtkAbstractAccumulator*> vtkHarmonicMeanArrayMeasurement::NewAccumulators()
 {
-  vtkArithmeticAccumulator* acc = vtkArithmeticAccumulator::New();
-  acc->SetFunctionOfX(vtkValueComaNameMacro(VTK_FUNC_1_X));
-  std::vector<vtkAbstractAccumulator*> accumulators{ acc };
-  return accumulators;
+  return { vtkArithmeticAccumulator<vtkInverseFunctor>::New() };
 }

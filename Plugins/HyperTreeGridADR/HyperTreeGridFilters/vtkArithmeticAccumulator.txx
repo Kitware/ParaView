@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkArithmeticAccumulator.cxx
+  Module:    vtkArithmeticAccumulator.txx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -13,88 +13,89 @@
 
 =========================================================================*/
 
+#ifndef vtkArithmeticAccumulator_txx
+#define vtkArithmeticAccumulator_txx
+
 #include "vtkArithmeticAccumulator.h"
 
-#include "vtkFunctionOfXList.h"
+#include "vtkFunctor.h"
 #include "vtkObjectFactory.h"
 
 #include <functional>
 
-vtkStandardNewMacro(vtkArithmeticAccumulator);
+template <typename FunctorT>
+vtkStandardNewMacro(vtkArithmeticAccumulator<FunctorT>);
 
 //----------------------------------------------------------------------------
-std::unordered_map<double (*)(double), std::string> vtkArithmeticAccumulator::FunctionName;
-
-//----------------------------------------------------------------------------
-vtkArithmeticAccumulator::vtkArithmeticAccumulator()
+template <typename FunctorT>
+vtkArithmeticAccumulator<FunctorT>::vtkArithmeticAccumulator()
   : Value(0.0)
-  , FunctionOfX(VTK_FUNC_X)
 {
 }
 
 //----------------------------------------------------------------------------
-void vtkArithmeticAccumulator::Add(vtkAbstractAccumulator* accumulator)
+template <typename FunctorT>
+void vtkArithmeticAccumulator<FunctorT>::Add(vtkAbstractAccumulator* accumulator)
 {
-  vtkArithmeticAccumulator* arithmeticAccumulator =
-    vtkArithmeticAccumulator::SafeDownCast(accumulator);
+  vtkArithmeticAccumulator<FunctorT>* arithmeticAccumulator =
+    vtkArithmeticAccumulator<FunctorT>::SafeDownCast(accumulator);
   assert(arithmeticAccumulator && "Cannot accumulate different accumulators");
   this->Value += arithmeticAccumulator->GetValue();
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkArithmeticAccumulator::Add(double value, double weight)
+template <typename FunctorT>
+void vtkArithmeticAccumulator<FunctorT>::Add(double value, double weight)
 {
-  this->Value += weight * this->FunctionOfX(value);
+  this->Value += weight * this->Functor(value);
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkArithmeticAccumulator::Initialize()
+template <typename FunctorT>
+void vtkArithmeticAccumulator<FunctorT>::Initialize()
 {
   this->Value = 0.0;
+  this->Functor = FunctorType();
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
-double vtkArithmeticAccumulator::GetValue() const
+template <typename FunctorT>
+double vtkArithmeticAccumulator<FunctorT>::GetValue() const
 {
   return this->Value;
 }
 
 //----------------------------------------------------------------------------
-const std::function<double(double)>& vtkArithmeticAccumulator::GetFunctionOfX() const
+template <typename FunctorT>
+const FunctorT& vtkArithmeticAccumulator<FunctorT>::GetFunctor() const
 {
-  return this->FunctionOfX;
+  return this->Functor;
 }
 
 //----------------------------------------------------------------------------
-void vtkArithmeticAccumulator::SetFunctionOfX(double (*const f)(double), const std::string& name)
+template <typename FunctorT>
+void vtkArithmeticAccumulator<FunctorT>::SetFunctor(const FunctorT&& f)
 {
-  this->FunctionOfX = f;
-  vtkArithmeticAccumulator::FunctionName[f] = std::move(name);
+  this->Functor = f;
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkArithmeticAccumulator::SetFunctionOfX(
-  const std::function<double(double)>& f, const std::string& name)
+template <typename FunctorT>
+bool vtkArithmeticAccumulator<FunctorT>::HasSameParameters(
+  vtkAbstractAccumulator* accumulator) const
 {
-  this->SetFunctionOfX(*(f.target<double (*)(double)>()), name);
-}
-
-//----------------------------------------------------------------------------
-bool vtkArithmeticAccumulator::HasSameParameters(vtkAbstractAccumulator* accumulator) const
-{
-  vtkArithmeticAccumulator* acc = vtkArithmeticAccumulator::SafeDownCast(accumulator);
+  vtkArithmeticAccumulator<FunctorT>* acc = vtkArithmeticAccumulator::SafeDownCast(accumulator);
   // We compare the pointer on the function used.
-  return acc &&
-    *(this->FunctionOfX.target<double (*)(double)>()) ==
-    *(acc->GetFunctionOfX().target<double (*)(double)>());
+  return acc && this->Functor == acc->GetFunctor();
 }
 
 //----------------------------------------------------------------------------
-void vtkArithmeticAccumulator::ShallowCopy(vtkDataObject* accumulator)
+template <typename FunctorT>
+void vtkArithmeticAccumulator<FunctorT>::ShallowCopy(vtkDataObject* accumulator)
 {
   this->Superclass::ShallowCopy(accumulator);
   vtkArithmeticAccumulator* arithmeticAccumulator =
@@ -102,7 +103,7 @@ void vtkArithmeticAccumulator::ShallowCopy(vtkDataObject* accumulator)
   if (arithmeticAccumulator)
   {
     this->Value = arithmeticAccumulator->GetValue();
-    this->FunctionOfX = arithmeticAccumulator->GetFunctionOfX();
+    this->Functor = arithmeticAccumulator->GetFunctor();
   }
   else
   {
@@ -112,7 +113,8 @@ void vtkArithmeticAccumulator::ShallowCopy(vtkDataObject* accumulator)
 }
 
 //----------------------------------------------------------------------------
-void vtkArithmeticAccumulator::DeepCopy(vtkDataObject* accumulator)
+template <typename FunctorT>
+void vtkArithmeticAccumulator<FunctorT>::DeepCopy(vtkDataObject* accumulator)
 {
   this->Superclass::DeepCopy(accumulator);
   vtkArithmeticAccumulator* arithmeticAccumulator =
@@ -120,7 +122,7 @@ void vtkArithmeticAccumulator::DeepCopy(vtkDataObject* accumulator)
   if (arithmeticAccumulator)
   {
     this->Value = arithmeticAccumulator->GetValue();
-    this->FunctionOfX = arithmeticAccumulator->GetFunctionOfX();
+    this->Functor = arithmeticAccumulator->GetFunctor();
   }
   else
   {
@@ -130,10 +132,11 @@ void vtkArithmeticAccumulator::DeepCopy(vtkDataObject* accumulator)
 }
 
 //----------------------------------------------------------------------------
-void vtkArithmeticAccumulator::PrintSelf(ostream& os, vtkIndent indent)
+template <typename FunctorT>
+void vtkArithmeticAccumulator<FunctorT>::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "FunctionOfX: "
-     << vtkArithmeticAccumulator::FunctionName[*(this->FunctionOfX.target<double (*)(double)>())]
-     << std::endl;
+  os << indent << "Functor: " << typeid(this->Functor).name() << std::endl;
 }
+
+#endif

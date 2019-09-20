@@ -94,10 +94,10 @@ public:
   /**
    * See the vtkAbstractArrayMeasurement API for description of this method.
    */
-  bool CanMeasure(vtkIdType numberOfAccumulatedData, double totalWeight) const override;
-  std::vector<vtkAbstractAccumulator*> NewAccumulatorInstances() const override;
-  vtkIdType GetMinimumNumberOfAccumulatedData() const override;
-  vtkIdType GetNumberOfAccumulators() const override;
+  bool CanMeasure(vtkIdType numberOfAccumulatedData, double totalWeight) const;
+  std::vector<vtkAbstractAccumulator*> NewAccumulatorInstances() const;
+  vtkIdType GetMinimumNumberOfAccumulatedData() const;
+  vtkIdType GetNumberOfAccumulators() const;
   //@}
 
 protected:
@@ -106,7 +106,7 @@ protected:
    * Default constructor and destructor
    */
   vtkGeometricMeanArrayMeasurement();
-  virtual ~vtkGeometricMeanArrayMeasurement() override = default;
+  ~vtkGeometricMeanArrayMeasurement() override = default;
   //@}
 
 private:
