@@ -151,9 +151,9 @@ pqVRAddStyleDialog::pqVRAddStyleDialog(QWidget* parentObject, Qt::WindowFlags f)
     }
   }
 
-  std::sort(this->Internals->AnalogNames);
-  std::sort(this->Internals->ButtonNames);
-  std::sort(this->Internals->TrackerNames);
+  std::sort(this->Internals->AnalogNames.begin(), this->Internals->AnalogNames.end());
+  std::sort(this->Internals->ButtonNames.begin(), this->Internals->ButtonNames.end());
+  std::sort(this->Internals->TrackerNames.begin(), this->Internals->TrackerNames.end());
 }
 
 //-----------------------------------------------------------------------------
