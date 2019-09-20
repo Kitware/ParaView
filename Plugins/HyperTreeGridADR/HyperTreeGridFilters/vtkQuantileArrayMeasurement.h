@@ -97,21 +97,21 @@ public:
   /**
    * See the vtkAbstractArrayMeasurement API for description of this method.
    */
-  bool CanMeasure(vtkIdType numberOfAccumulatedData, double totalWeight) const override;
-  std::vector<vtkAbstractAccumulator*> NewAccumulatorInstances() const override;
-  vtkIdType GetMinimumNumberOfAccumulatedData() const override;
-  vtkIdType GetNumberOfAccumulators() const override;
+  bool CanMeasure(vtkIdType numberOfAccumulatedData, double totalWeight) const;
+  std::vector<vtkAbstractAccumulator*> NewAccumulatorInstances() const;
+  vtkIdType GetMinimumNumberOfAccumulatedData() const;
+  vtkIdType GetNumberOfAccumulators() const;
   //@}
 
   /**
    * ShallowCopy implementation.
    */
-  virtual void ShallowCopy(vtkDataObject* o) override;
+  void ShallowCopy(vtkDataObject* o) override;
 
   /**
    * DeepCopy implementation.
    */
-  virtual void DeepCopy(vtkDataObject* o) override;
+  void DeepCopy(vtkDataObject* o) override;
 
   //@{
   /**
@@ -129,7 +129,7 @@ protected:
    * Default constructors and destructors
    */
   vtkQuantileArrayMeasurement();
-  virtual ~vtkQuantileArrayMeasurement() override = default;
+  ~vtkQuantileArrayMeasurement() override = default;
   //@}
 
 private:

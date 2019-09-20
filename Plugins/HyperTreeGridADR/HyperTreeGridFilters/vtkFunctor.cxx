@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkFunctionOfXList.h
+  Module:    vtkFunctor.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -13,24 +13,10 @@
 
 =========================================================================*/
 
-/**
- * @class   vtkFunctionList
- * @brief   Function implementations of possible FunctionOfX.
- *
- */
+#include "vtkFunctor.h"
 
-#ifndef vtkFunctionOfXList_h
-#define vtkFunctionOfXList_h
-
-#include "vtkSetGet.h"
-
-#include <cmath>
-
-double VTK_FUNC_X(double x);
-double VTK_FUNC_X2(double x);
-double VTK_FUNC_NXLOGX(double x);
-double VTK_FUNC_1_X(double x);
-double VTK_FUNC_NULL(double vtkNotUsed(x));
-double VTK_FUNC_1(double vtkNotUsed(x));
-
-#endif
+vtkDefaultSpecializationFunctorCompMacro(vtkIdentityFunctor);
+vtkDefaultSpecializationFunctorCompMacro(vtkSquareFunctor);
+vtkDefaultSpecializationFunctorCompMacro(vtkLogFunctor);
+vtkDefaultSpecializationFunctorCompMacro(vtkInverseFunctor);
+vtkDefaultSpecializationFunctorCompMacro(vtkEntropyFunctor);
