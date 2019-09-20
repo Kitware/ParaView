@@ -32,42 +32,45 @@
 #ifndef vtkAbstractAccumulator_h
 #define vtkAbstractAccumulator_h
 
+#include "vtkDataObject.h"
 #include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
-#include "vtkObject.h"
 
 #include <functional>
 
 class vtkDataArray;
+class vtkDoubleArray;
 
-class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkAbstractAccumulator : public vtkObject
+#define vtkValueComaNameMacro(value) value, #value
+
+class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkAbstractAccumulator : public vtkDataObject
 {
 public:
   vtkAbstractTypeMacro(vtkAbstractAccumulator, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  static vtkAbstractAccumulator* New();
+
   //@{
   /**
    * Methods for adding data to the accumulator.
    */
-  virtual void Add(vtkDataArray* data);
-  virtual void Add(const double* data, vtkIdType numberOfElements = 1);
+  virtual void Add(vtkDataArray* data, vtkDoubleArray* weights = nullptr);
+  virtual void Add(const double* data, vtkIdType numberOfElements = 1, double weight = 1.0);
   virtual void Add(vtkAbstractAccumulator* accumulator) = 0;
-  virtual void Add(double value) = 0;
+  virtual void Add(double value, double weight) = 0;
   //@}
 
   //@{
   /**
-   * Accessor to the accumulated value.
+   * Returns true if the parameters of accumulator is the same as the ones of this
+   */
+  virtual bool HasSameParameters(vtkAbstractAccumulator* accumulator) const = 0;
+  //@}
+
+  /**
+   * Accessor on the accumulated value.
    */
   virtual double GetValue() const = 0;
-  //@}
-
-  //@{
-  /**
-   * Set object into initial state
-   */
-  virtual void Initialize() = 0;
-  //@}
 
 protected:
   //@{
@@ -78,16 +81,14 @@ protected:
   virtual ~vtkAbstractAccumulator() override = default;
   //@}
 
-  //@{
   /**
    * Lambda expression converting vectors to scalars. Default function is regular L2 norm.
    */
   std::function<double(const double*, vtkIdType)> ConvertVectorToScalar;
-  //@}
 
 private:
-  vtkAbstractAccumulator(const vtkAbstractAccumulator&) = delete;
-  void operator=(const vtkAbstractAccumulator&) = delete;
+  vtkAbstractAccumulator(vtkAbstractAccumulator&) = delete;
+  void operator=(vtkAbstractAccumulator&) = delete;
 };
 
 #endif

@@ -49,6 +49,7 @@ class vtkAbstractArrayMeasurement;
 class vtkAbstractAccumulator;
 class vtkBitArray;
 class vtkCell;
+class vtkCell3D;
 class vtkDataArray;
 class vtkDataSet;
 class vtkDoubleArray;
@@ -57,6 +58,7 @@ class vtkHyperTreeGridNonOrientedCursor;
 class vtkInformation;
 class vtkInformationVector;
 class vtkLongArray;
+class vtkVoxel;
 
 class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkResampleToHyperTreeGrid : public vtkAlgorithm
 {
@@ -64,6 +66,7 @@ public:
   static vtkResampleToHyperTreeGrid* New();
   vtkTypeMacro(vtkResampleToHyperTreeGrid, vtkAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
+  virtual vtkMTimeType GetMTime() override;
 
   //@{
   /**
@@ -246,6 +249,7 @@ protected:
       : NumberOfLeavesInSubtree(0)
       , NumberOfPointsInSubtree(0)
       , NumberOfNonMaskedChildren(0)
+      , AccumulatedWeight(0.0)
       , UnmaskedChildrenHaveNoMaskedLeaves(true)
       , CanSubdivide(false)
     {
@@ -260,6 +264,7 @@ protected:
     vtkIdType NumberOfLeavesInSubtree;
     vtkIdType NumberOfPointsInSubtree;
     vtkIdType NumberOfNonMaskedChildren;
+    double AccumulatedWeight;
 
     /**
      * Boolean used to avoid searching for masked children in a full subtree
@@ -274,7 +279,7 @@ protected:
   };
 
   /**
-   * Only needed internally. This draws a multi resolution grid that should have this->MaxDepth
+   * Only needed internally. This draws a multi resolution grid that should have this->MaxDepth+1
    * grids.
    * The resolution of each grid depends on the branch factor and the depth.
    * There should be, in a given direction, this->BranchFactor ^ depth elements.
@@ -293,15 +298,16 @@ protected:
    * The cursor should correspond with the multiResolutionGrid and (i,j,k) should match the position
    * of the cursor in the hyper tree grid.
    */
-  void SubdivideLeaves(vtkHyperTreeGridNonOrientedCursor* cursor, vtkIdType treeId, std::size_t i,
-    std::size_t j, std::size_t k, MultiResGridType& multiResolutionGrid);
+  void SubdivideLeaves(vtkHyperTreeGridNonOrientedCursor* cursor, vtkIdType treeId, vtkIdType i,
+    vtkIdType j, vtkIdType k, MultiResGridType& multiResolutionGrid);
 
   /**
    * Given an input dataSet and its corresponding scalar field data, fills a grid of multi
    * resolution grids
    * matching the subdivision scheme of the output hyper tree grid.
    */
-  void CreateGridOfMultiResolutionGrids(vtkDataSet* dataSet, vtkDataArray* data);
+  void CreateGridOfMultiResolutionGrids(
+    vtkDataSet* dataSet, vtkDataArray* data, int fieldAssociation);
 
   /**
    * Helper for easy access to the cells dimensions of the hyper tree grid.
@@ -333,7 +339,7 @@ protected:
    * Helper to the resolution at a certain depth in one direction of a hyper tree.
    */
   std::vector<vtkIdType> ResolutionPerTree;
-  std::vector<double> SquaredDiagonal;
+  std::vector<double> Diagonal;
 
   /**
    * Dummy pointer for creating at run-time the proper type of ArrayMeasurement or
@@ -350,21 +356,22 @@ protected:
   /**
    * Converts indexing to coordinates for this->GridOfMultiResolutionGrids.
    */
-  vtkTuple<std::size_t, 3> IndexToGridCoordinates(std::size_t idx) const;
+  vtkTuple<vtkIdType, 3> IndexToGridCoordinates(std::size_t idx) const;
 
   /**
    * Converts (i,j,k) to the corresponding index at a certain depth to navigate in a
    * MultiResolutionGrid.
    */
   vtkIdType MultiResGridCoordinatesToIndex(
-    std::size_t i, std::size_t j, std::size_t k, std::size_t depth) const;
+    vtkIdType i, vtkIdType j, vtkIdType k, std::size_t depth) const;
 
   /**
    * Converts (i,j,k) to the corresponding MultiResGrid location in
    * this->GridOfMultiResolutionGrids.
    */
-  std::size_t GridCoordinatesToIndex(std::size_t i, std::size_t j, std::size_t k) const;
+  std::size_t GridCoordinatesToIndex(vtkIdType i, vtkIdType j, vtkIdType k) const;
 
+  //@{
   /**
    * 3D grid of multi-resolution grids.
    * this->GridOfMultiResolutionGrids[this->GridCoordinatesToIndex(i,j,k)][depth][idx] is a
@@ -373,6 +380,7 @@ protected:
    */
   typedef std::vector<MultiResGridType> GridOfMultiResGridsType;
   GridOfMultiResGridsType GridOfMultiResolutionGrids;
+  //@}
 
   /**
    * Maps from the vector of vtkAbstractAccumulator* of GridElement to their position
@@ -386,12 +394,14 @@ protected:
    */
   std::vector<vtkAbstractAccumulator*> Accumulators;
 
+  //@{
   /**
    * Buffer to store the pointers of the correct accumulator when measuring.
    * We only use them if this->ArrayMeasurementDisplay != nullptr
    */
-  std::vector<vtkAbstractAccumulator *> ArrayMeasurementAccumulators,
-    ArrayMeasurementDisplayAccumulators;
+  std::vector<vtkAbstractAccumulator*> ArrayMeasurementAccumulators;
+  std::vector<vtkAbstractAccumulator*> ArrayMeasurementDisplayAccumulators;
+  //@}
 
   /**
    * Method which will forbid subdividing cells if they have an empty children intersecting
@@ -405,10 +415,9 @@ protected:
    *
    * bounds are the input data set bounds (not the cell's bounds).
    */
-  bool RecursivelyFillGaps(vtkCell* cell, double bounds[6], double cellBounds[6], std::size_t i,
-    std::size_t j, std::size_t k, double x[3], double closestPoint[3], double pcoords[3],
-    double* weights, std::size_t ii = 0, std::size_t jj = 0, std::size_t kk = 0,
-    std::size_t depth = 0);
+  bool RecursivelyFillGaps(vtkCell* cell, const double bounds[6], const double cellBounds[6],
+    vtkIdType i, vtkIdType j, vtkIdType k, double x[3], double closestPoint[3], double pcoords[3],
+    double* weights, vtkIdType ii = 0, vtkIdType jj = 0, vtkIdType kk = 0, std::size_t depth = 0);
 
   /**
    * Cache used to handle SetMaxState(bool) and SetMinState(bool)
@@ -422,8 +431,8 @@ protected:
   bool NoEmptyCells;
 
 private:
-  vtkResampleToHyperTreeGrid(const vtkResampleToHyperTreeGrid&) = delete;
-  void operator=(const vtkResampleToHyperTreeGrid&) = delete;
+  vtkResampleToHyperTreeGrid(vtkResampleToHyperTreeGrid&) = delete;
+  void operator=(vtkResampleToHyperTreeGrid&) = delete;
 };
 
 #endif

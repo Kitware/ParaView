@@ -38,73 +38,80 @@ public:
   static vtkGeometricMeanArrayMeasurement* New();
 
   vtkTypeMacro(vtkGeometricMeanArrayMeasurement, vtkAbstractArrayMeasurement);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+
+  using Superclass::Add;
+  using Superclass::CanMeasure;
+  using Superclass::Measure;
+
+  /**
+   * Minimum times the function Add should be called on accumulators or this class
+   * in order to measure something.
+   */
+  static constexpr vtkIdType MinimumNumberOfAccumulatedData = 1;
+
+  /**
+   * Number of accumulators required for measuring.
+   */
+  static constexpr vtkIdType NumberOfAccumulators = 1;
+
+  /**
+   * Notifies if the geometric mean can be measured given the amount of input data.
+   * The geometric mean needs at least one accumulated data with non-zero weight.
+   *
+   * @param numberOfAccumulatedData is the number of times Add was called in the accumulators / this
+   * class
+   * @param totalWeight is the accumulated weight while accumulated. If weights were not set when
+   * accumulated, it should be equal to numberOfAccumulatedData.
+   * @return true if there is enough data and if totalWeight != 0, false otherwise.
+   */
+  static bool IsMeasurable(vtkIdType numberOfAccumulatedData, double totalWeight);
+
+  /**
+   * Instantiates needed accumulators for measurement, i.e. one vtkLogArithmeticAccumulator* in our
+   * case.
+   *
+   * @return the array {vtkLogArithmeticAccumulator::New()}.
+   */
+  static std::vector<vtkAbstractAccumulator*> NewAccumulators();
+
+  /**
+   * Computes the geometric mean of the set of accumulators needed (i.e. one
+   * vtkLogArithmeticAccumulator*).
+   *
+   * @param accumulators is an array of accumulators. It should be composed of a
+   * single vtkLogArithmeticAccumulator*.
+   * @param numberOfAccumulatedData is the number of times the method Add was called in the
+   * accumulators.
+   * @param totalWeight is the cumulated weight when adding data. If weight was not set while
+   * accumulating. it should equal numberOfAccumulatedData.
+   * @param value is where the geometric mean measurement is written into.
+   * @return true if the data is measurable, i.e. there is not enough data or a null totalWeight.
+   */
+  bool Measure(vtkAbstractAccumulator** accumulators, vtkIdType numberOfAccumulatedData,
+    double totalWeight, double& value) override;
 
   //@{
   /**
-   * Returns the measure of input data.
+   * See the vtkAbstractArrayMeasurement API for description of this method.
    */
-  virtual double Measure() const override;
-  //@}
-
-  //@{
-  /**
-   * Returns true if there is more than
-   * vtkGeometricMeanArrayMeasurement::MinimumNumberOfAccumulatedData accumulated data
-   */
-  virtual bool CanMeasure() const override;
-  //@}
-
-  //@{
-  /**
-   * Accessor for the minimum number of accumulated data necessary for computing the measure
-   */
-  virtual vtkIdType GetMinimumNumberOfAccumulatedData() const override;
-  //@}
-
-  //@{
-  /**
-   * Minimum number of accumulated data necessary to measure.
-   */
-  static const unsigned MinimumNumberOfAccumulatedData = 1;
-  //@}
-
-  //@{
-  /**
-   * Method for creating a vector composed of one vtkGeometricAccumulator*.
-   */
-  virtual std::vector<vtkAbstractAccumulator*> NewAccumulatorInstances() const override;
-  //@}
-
-  //@{
-  /**
-   * Number of accumulators needed for measuring.
-   */
-  static const unsigned NumberOfAccumulators = 1;
-  //@}
-
-  //@{
-  /**
-   * Method for measuring geometric mean using a vector of of accumulators.
-   * The array should have the same dynamic types and size as the one returned by
-   * vtkGeometricMeanArrayMeasurement::NewAccumulatorInstances().
-   */
-  virtual double Measure(
-    const std::vector<vtkAbstractAccumulator*>&, vtkIdType numberOfAccumulatedData) const override;
+  bool CanMeasure(vtkIdType numberOfAccumulatedData, double totalWeight) const override;
+  std::vector<vtkAbstractAccumulator*> NewAccumulatorInstances() const override;
+  vtkIdType GetMinimumNumberOfAccumulatedData() const override;
+  vtkIdType GetNumberOfAccumulators() const override;
   //@}
 
 protected:
   //@{
   /**
-   * Default constructors and destructors
+   * Default constructor and destructor
    */
   vtkGeometricMeanArrayMeasurement();
   virtual ~vtkGeometricMeanArrayMeasurement() override = default;
   //@}
 
 private:
-  vtkGeometricMeanArrayMeasurement(const vtkGeometricMeanArrayMeasurement&) = delete;
-  void operator=(const vtkGeometricMeanArrayMeasurement&) = delete;
+  vtkGeometricMeanArrayMeasurement(vtkGeometricMeanArrayMeasurement&) = delete;
+  void operator=(vtkGeometricMeanArrayMeasurement&) = delete;
 };
 
 #endif

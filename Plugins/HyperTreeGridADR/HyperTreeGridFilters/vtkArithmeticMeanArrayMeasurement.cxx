@@ -16,68 +16,44 @@
 #include "vtkArithmeticMeanArrayMeasurement.h"
 
 #include "vtkArithmeticAccumulator.h"
+#include "vtkFunctionOfXList.h"
+#include "vtkObjectFactory.h"
 
 #include <cassert>
 
 vtkStandardNewMacro(vtkArithmeticMeanArrayMeasurement);
+vtkArrayMeasurementMacro(vtkArithmeticMeanArrayMeasurement);
 
 //----------------------------------------------------------------------------
 vtkArithmeticMeanArrayMeasurement::vtkArithmeticMeanArrayMeasurement()
 {
-  this->Accumulators = this->NewAccumulatorInstances();
+  this->Accumulators = vtkArithmeticMeanArrayMeasurement::NewAccumulators();
 }
 
 //----------------------------------------------------------------------------
-bool vtkArithmeticMeanArrayMeasurement::CanMeasure() const
+bool vtkArithmeticMeanArrayMeasurement::Measure(vtkAbstractAccumulator** accumulators,
+  vtkIdType numberOfAccumulatedData, double totalWeight, double& value)
 {
-  return this->NumberOfAccumulatedData >=
-    vtkArithmeticMeanArrayMeasurement::MinimumNumberOfAccumulatedData;
+  if (!this->CanMeasure(numberOfAccumulatedData, totalWeight))
+  {
+    return false;
+  }
+  assert(accumulators && "input accumulator is not allocated");
+
+  vtkArithmeticAccumulator* acc = vtkArithmeticAccumulator::SafeDownCast(accumulators[0]);
+
+  assert(this->Accumulators[0]->HasSameParameters(acc) &&
+    "input accumulators are of wrong type or have wrong parameters");
+
+  value = acc->GetValue() / totalWeight;
+  return true;
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkArithmeticMeanArrayMeasurement::GetMinimumNumberOfAccumulatedData() const
+std::vector<vtkAbstractAccumulator*> vtkArithmeticMeanArrayMeasurement::NewAccumulators()
 {
-  return vtkArithmeticMeanArrayMeasurement::MinimumNumberOfAccumulatedData;
-}
-
-//----------------------------------------------------------------------------
-double vtkArithmeticMeanArrayMeasurement::Measure() const
-{
-  return this->Measure(this->Accumulators, this->NumberOfAccumulatedData);
-}
-
-//----------------------------------------------------------------------------
-double vtkArithmeticMeanArrayMeasurement::Measure(
-  const std::vector<vtkAbstractAccumulator*>& accumulators, vtkIdType numberOfAccumulatedData) const
-{
-  assert(accumulators.size() && accumulators[0] && "input accumulator is not allocated");
-  vtkArithmeticAccumulator* arithmeticAccumulator =
-    vtkArithmeticAccumulator::SafeDownCast(accumulators[0]);
-  assert(arithmeticAccumulator &&
-    "input accumulator has the wrong type. It should be of type vtkArithmeticAccumulator");
-  return arithmeticAccumulator->GetValue() / numberOfAccumulatedData;
-}
-
-//----------------------------------------------------------------------------
-std::vector<vtkAbstractAccumulator*> vtkArithmeticMeanArrayMeasurement::NewAccumulatorInstances()
-  const
-{
-  std::vector<vtkAbstractAccumulator*> accumulators(
-    vtkArithmeticMeanArrayMeasurement::NumberOfAccumulators);
-  accumulators[0] = vtkArithmeticAccumulator::New();
+  vtkArithmeticAccumulator* acc = vtkArithmeticAccumulator::New();
+  acc->SetFunctionOfX(vtkValueComaNameMacro(VTK_FUNC_X));
+  std::vector<vtkAbstractAccumulator*> accumulators{ acc };
   return accumulators;
-}
-
-//----------------------------------------------------------------------------
-void vtkArithmeticMeanArrayMeasurement::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-  if (this->Accumulators.size() && this->Accumulators[0])
-  {
-    os << indent << *(this->Accumulators[0]) << std::endl;
-  }
-  else
-  {
-    os << indent << "Missing vtkArithmeticAccumulator" << std::endl;
-  }
 }

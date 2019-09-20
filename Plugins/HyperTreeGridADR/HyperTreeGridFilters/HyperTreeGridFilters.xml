@@ -28,14 +28,23 @@
         </ProxyList>
       </Hints>
     </Proxy>
-    <Proxy class="vtkMedianArrayMeasurement"
-           name="Median">
+    <Proxy class="vtkQuantileArrayMeasurement"
+           name="Quantile">
       <Hints>
         <ProxyList>
           <Link name="Input"
                 with_property="Input" />
         </ProxyList>
       </Hints>
+      <DoubleVectorProperty command="SetPercentile"
+                            default_values="50.0"
+                            name="Percentile"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+           Set the percentile for measurement. Setting is to 50.0 is equivalent with computing the median.
+        </Documentation>
+      </DoubleVectorProperty>
     </Proxy>
     <Proxy class="vtkEntropyArrayMeasurement"
            name="Entropy">
@@ -45,6 +54,14 @@
                 with_property="Input" />
         </ProxyList>
       </Hints>
+      <DoubleVectorProperty command="SetDiscretizationStep"
+                            default_values="0.1"
+                            name="Bin width"
+                            number_of_elements="1">
+        <Documentation>
+          Set the width of the bins used to compute the entropy.
+        </Documentation>
+      </DoubleVectorProperty>
     </Proxy>
     <Proxy class="vtkStandardDeviationArrayMeasurement"
            name="Standard Deviation">
@@ -212,7 +229,7 @@
           <Proxy group="array_measurement"
                  name="Harmonic Mean" />
           <Proxy group="array_measurement"
-                 name="Median" />
+                 name="Quantile" />
           <Proxy group="array_measurement"
                  name="Standard Deviation" />
           <Proxy group="array_measurement"
@@ -239,7 +256,7 @@
           <Proxy group="array_measurement"
                  name="Harmonic Mean" />
           <Proxy group="array_measurement"
-                 name="Median" />
+                 name="Quantile" />
           <Proxy group="array_measurement"
                  name="Standard Deviation" />
           <Proxy group="array_measurement"
