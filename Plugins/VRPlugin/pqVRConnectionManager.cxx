@@ -204,7 +204,7 @@ QList<QString> pqVRConnectionManager::connectionNames() const
     }
   }
 #endif
-  std::sort(result);
+  std::sort(result.begin(), result.end());
   return result;
 }
 
