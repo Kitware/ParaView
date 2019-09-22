@@ -773,11 +773,31 @@ vtkPVArrayInformation* vtkSMPVRepresentationProxy::GetArrayInformationForColorAr
   unsigned int port = inputHelper.GetOutputPort();
   if (input)
   {
-    vtkPVArrayInformation* arrayInfoFromData = input->GetDataInformation(port)->GetArrayInformation(
+    vtkPVArrayInformation* arrayInfoFromData = nullptr;
+    arrayInfoFromData = input->GetDataInformation(port)->GetArrayInformation(
       colorArrayHelper.GetInputArrayNameToProcess(), colorArrayHelper.GetInputArrayAssociation());
     if (arrayInfoFromData)
     {
       return arrayInfoFromData;
+    }
+
+    if (colorArrayHelper.GetInputArrayAssociation() == vtkDataObject::POINT_THEN_CELL)
+    {
+      // Try points...
+      arrayInfoFromData = input->GetDataInformation(port)->GetArrayInformation(
+        colorArrayHelper.GetInputArrayNameToProcess(), vtkDataObject::POINT);
+      if (arrayInfoFromData)
+      {
+        return arrayInfoFromData;
+      }
+
+      // ... then cells
+      arrayInfoFromData = input->GetDataInformation(port)->GetArrayInformation(
+        colorArrayHelper.GetInputArrayNameToProcess(), vtkDataObject::CELL);
+      if (arrayInfoFromData)
+      {
+        return arrayInfoFromData;
+      }
     }
   }
 
