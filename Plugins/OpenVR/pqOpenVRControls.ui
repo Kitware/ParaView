@@ -66,6 +66,18 @@
       </property>
       <item>
        <widget class="pqPipelineBrowserWidget" name="pipelineBrowser" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>1</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>400</height>
+         </size>
+        </property>
         <property name="contextMenuPolicy">
          <enum>Qt::DefaultContextMenu</enum>
         </property>
@@ -236,8 +248,8 @@ font: 75 12pt &quot;Arial&quot;;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>98</width>
-            <height>28</height>
+            <width>698</width>
+            <height>645</height>
            </rect>
           </property>
          </widget>
