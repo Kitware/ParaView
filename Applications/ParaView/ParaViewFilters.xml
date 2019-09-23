@@ -220,6 +220,7 @@
   <Proxy group="filters" name="GroupDataSets" />
   <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="ImageDataToPointSet" />
+  <Proxy group="filters" name="ImageDataToUniformGrid" />
   <Proxy group="filters" name="IntegrateAttributes" />
   <Proxy group="filters" name="IntegrateFlowThroughSurface" />
   <!--  <Proxy group="filters" name="LevelIdScalars" /> -->
