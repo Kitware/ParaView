@@ -760,6 +760,7 @@ list(APPEND TESTS_WITH_BASELINES
   HideAll.xml
   HorizontalColorLegendTitle.xml
   IgnoreLogAxisWarning.xml
+  ImageDataToUniformGrid.xml
   ImageVolumeRendering.xml
   InteractiveSelection.xml
   InteractiveViewLinkOffscreen.xml
