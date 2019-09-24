@@ -299,6 +299,8 @@ void pqVRConnectionManager::configureConnections(vtkPVXMLElement* xml, vtkSMProx
         {
           const char* name = child->GetAttributeOrEmpty("name");
           const char* address = child->GetAttributeOrEmpty("address");
+          (void)name;
+          (void)address;
 // TODO: Need to throw some warning if VRPN is used when not
 // compiled. For now we will simply ignore VRPN configuration
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
