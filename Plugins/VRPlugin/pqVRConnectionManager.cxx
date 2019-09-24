@@ -69,8 +69,9 @@ pqVRConnectionManager* pqVRConnectionManager::instance()
 // IMPORTANT: Make sure that this struct has no pointers.  All pointers should
 // be put in the class declaration. For all newly defined pointers make sure to
 // update constructor and destructor methods.
-struct pqVRConnectionManager::pqInternals
+class pqVRConnectionManager::pqInternals
 {
+public:
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
   QList<QPointer<pqVRPNConnection> > VRPNConnections;
 #endif
