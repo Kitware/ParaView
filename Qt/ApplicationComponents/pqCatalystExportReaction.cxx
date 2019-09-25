@@ -210,6 +210,10 @@ void pqCatalystExportReaction::onTriggered()
     {
       hasArraySets = true;
       QString theseArrays = QString("'");
+      // Remove "." and "*" from the filterName. We know we are going to do this later for the
+      // actual catalyst input name, and it needs to match
+      filterName.erase(std::remove(filterName.begin(), filterName.end(), '.'), filterName.end());
+      filterName.erase(std::remove(filterName.begin(), filterName.end(), '*'), filterName.end());
       theseArrays += QString(filterName.c_str());
       theseArrays += QString("':[");
       // TODO: there isn't an API to distinguish cell and point arrays or the same name
