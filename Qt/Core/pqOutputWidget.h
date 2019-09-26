@@ -150,6 +150,11 @@ public slots:
   void showFullMessages(bool val);
 
   /**
+   * Saves output text to a file.
+   */
+  void saveToFile();
+
+  /**
    * Clears the console.
    */
   void clear();
