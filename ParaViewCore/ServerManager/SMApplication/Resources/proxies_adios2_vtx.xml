@@ -15,7 +15,7 @@
             number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          This property sets the file name
+          This property sets the file or directory name.
         </Documentation>
       </StringVectorProperty>
 
@@ -29,10 +29,13 @@
       </DoubleVectorProperty>
 
       <Hints>
-        <ReaderFactory
-            extensions="bp"
-            file_description="ADIOS2 BP3 File (VTX)" />
+        <ReaderFactory extensions="bp"
+                       file_description="ADIOS2 BP3 File (must have .bp.dir)" />
+        <ReaderFactory extensions="bp bp4"
+                       is_directory="1"
+                       file_description="ADIOS2 BP4 Directory" />
       </Hints>
+
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
