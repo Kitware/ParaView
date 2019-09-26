@@ -152,7 +152,6 @@ int vtkStreamLinesRepresentation::ProcessViewRequest(
 {
   if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
   {
-    this->MarkModified();
     return 0;
   }
   if (request_type == vtkPVView::REQUEST_UPDATE())
@@ -178,12 +177,9 @@ int vtkStreamLinesRepresentation::ProcessViewRequest(
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
-    this->StreamLinesMapper->SetInputDataObject(vtkPVView::GetPiece(inInfo, this));
+    this->StreamLinesMapper->SetInputDataObject(vtkPVView::GetDeliveredPiece(inInfo, this));
     this->UpdateMapperParameters();
   }
-
-  this->MarkModified();
-
   return 1;
 }
 
@@ -240,12 +236,6 @@ int vtkStreamLinesRepresentation::RequestData(
       this->Cache->ShallowCopy(this->MBMerger->GetOutputDataObject(0));
     }
     this->DataSize = this->Cache->GetActualMemorySize();
-  }
-  else
-  {
-    // when no input is present, it implies that this processes is on a node
-    // without the data input i.e. either client or render-server.
-    this->StreamLinesMapper->RemoveAllInputs();
   }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
