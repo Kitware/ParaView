@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqOutputWidget.h"
 
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
+#include "pqFileDialog.h"
 #include "pqSettings.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -44,6 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStandardItemModel>
 #include <QStringList>
 #include <QStyle>
+
+#include <fstream>
 
 namespace OutputWidgetInternals
 {
@@ -399,6 +403,7 @@ pqOutputWidget::pqOutputWidget(QWidget* parentObject, Qt::WindowFlags f)
 
   this->connect(
     internals.Ui.showFullMessagesCheckBox, SIGNAL(toggled(bool)), SLOT(showFullMessages(bool)));
+  this->connect(internals.Ui.saveButton, SIGNAL(clicked()), SLOT(saveToFile()));
 
   // Tell VTK to forward all messages.
   vtkOutputWindow::SetInstance(internals.VTKOutputWindow.Get());
@@ -422,6 +427,30 @@ pqOutputWidget::~pqOutputWidget()
 void pqOutputWidget::suppress(const QStringList& substrs)
 {
   this->Internals->suppress(substrs);
+}
+
+//-----------------------------------------------------------------------------
+void pqOutputWidget::saveToFile()
+{
+  QString text = this->Internals->Ui.consoleWidget->text();
+  pqFileDialog fileDialog(NULL, pqCoreUtilities::mainWidget(), "Save output", QString(),
+    "Text Files (*.txt);;All Files (*)");
+  fileDialog.setFileMode(pqFileDialog::AnyFile);
+  if (fileDialog.exec() != pqFileDialog::Accepted)
+  {
+    // Canceled
+    return;
+  }
+
+  QString filename = fileDialog.getSelectedFiles().first();
+  QByteArray filename_ba = filename.toLocal8Bit();
+  std::ofstream fileStream;
+  fileStream.open(filename_ba.data());
+  if (fileStream.is_open())
+  {
+    fileStream << text.toStdString();
+    fileStream.close();
+  }
 }
 
 //-----------------------------------------------------------------------------

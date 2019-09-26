@@ -101,6 +101,11 @@ public slots:
   void printCommand(const QString& cmd);
 
   /**
+   * Get the text in the console.
+   */
+  QString text();
+
+  /**
   * Clears the contents of the console
   */
   void clear();

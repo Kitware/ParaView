@@ -527,6 +527,12 @@ void pqConsoleWidget::printCommand(const QString& cmd)
 }
 
 //-----------------------------------------------------------------------------
+QString pqConsoleWidget::text()
+{
+  return this->Implementation->toPlainText();
+}
+
+//-----------------------------------------------------------------------------
 void pqConsoleWidget::printAndExecuteCommand(const QString& text)
 {
   this->printCommand(text);
