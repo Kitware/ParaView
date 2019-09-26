@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkPVGeneralSettings.h"
 
-#include "vtkCacheSizeKeeper.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXYChartView.h"
 #include "vtkProcessModuleAutoMPI.h"
@@ -134,7 +133,6 @@ int vtkPVGeneralSettings::GetAutoMPILimit()
 //----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetCacheGeometryForAnimation(bool val)
 {
-  vtkCacheSizeKeeper::GetInstance()->SetCacheLimit(val ? this->AnimationGeometryCacheLimit : 0);
   if (this->CacheGeometryForAnimation != val)
   {
     this->CacheGeometryForAnimation = val;
@@ -145,7 +143,6 @@ void vtkPVGeneralSettings::SetCacheGeometryForAnimation(bool val)
 //----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetAnimationGeometryCacheLimit(unsigned long val)
 {
-  vtkCacheSizeKeeper::GetInstance()->SetCacheLimit(this->CacheGeometryForAnimation ? val : 0);
   if (this->AnimationGeometryCacheLimit != val)
   {
     this->AnimationGeometryCacheLimit = val;

@@ -33,7 +33,6 @@ set(classes
   vtkAMROutlineRepresentation
   vtkAMRStreamingPriorityQueue
   vtkAMRStreamingVolumeRepresentation
-  vtkCacheSizeKeeper
   vtkCaveSynchronizedRenderers
   vtkChartRepresentation
   vtkChartSelectionRepresentation
@@ -57,7 +56,6 @@ set(classes
   vtkPolarAxesRepresentation
   vtkProgressBarSourceRepresentation
   vtkPVBoxChartRepresentation
-  vtkPVCacheSizeInformation
   vtkPVClientServerSynchronizedRenderers
   vtkPVCompositeOrthographicSliceRepresentation
   vtkPVCompositeRepresentation

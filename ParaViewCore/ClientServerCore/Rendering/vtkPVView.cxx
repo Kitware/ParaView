@@ -15,7 +15,6 @@
 #include "vtkPVView.h"
 
 #include "vtkBoundingBox.h"
-#include "vtkCacheSizeKeeper.h"
 #include "vtkCommunicator.h"
 #include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkInformation.h"
@@ -430,19 +429,6 @@ void vtkPVView::Update()
   vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "%s: update view", this->GetLogName().c_str());
 
   vtkTimerLog::MarkStartEvent("vtkPVView::Update");
-  // Ensure that cache size if synchronized among the processes.
-  if (this->GetUseCache())
-  {
-    vtkCacheSizeKeeper* cacheSizeKeeper = vtkCacheSizeKeeper::GetInstance();
-    vtkTypeUInt64 cache_full = 0;
-    if (cacheSizeKeeper->GetCacheSize() > cacheSizeKeeper->GetCacheLimit())
-    {
-      cache_full = 1;
-    }
-    this->AllReduce(cache_full, cache_full, vtkCommunicator::MAX_OP);
-    cacheSizeKeeper->SetCacheFull(cache_full > 0);
-  }
-
   this->CallProcessViewRequest(
     vtkPVView::REQUEST_UPDATE(), this->RequestInformation, this->ReplyInformationVector);
   vtkTimerLog::MarkEndEvent("vtkPVView::Update");
