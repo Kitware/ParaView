@@ -652,6 +652,53 @@
                  base_proxyname="FileSeriesWriter"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
+                 name="SerialHTGMultiBlock"
+                 supports_parallel="1">
+      <Documentation short_help="Write a multiblock in a xml-based vtk data file.">
+      Writer to write a multiblock dataset in a xml-based vtk data file. Can be
+      used for parallel writing as well as serial writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        composite_data_required="1"
+                        name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="XMLPMultiBlockDataWriterCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+            <Property name="CompressionLevel" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+        <Property name="HeaderType"
+                  show="0" />
+        <WriterFactory extensions="vtm"
+                       file_description="VTK Multi Block Files" />
+      </Hints>
+      <!-- End of XMLMultiBlockDataWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="FileSeriesWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
                  name="XMLPartitionedDataSetWriter"
                  supports_parallel="1">
       <Documentation>

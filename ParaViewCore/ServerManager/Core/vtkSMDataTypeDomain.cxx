@@ -99,6 +99,7 @@ vtkSMDataTypeDomain::vtkSMDataTypeDomain()
 {
   this->DTInternals = new vtkSMDataTypeDomainInternals;
   this->CompositeDataSupported = 1;
+  this->CompositeDataRequired = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -179,6 +180,10 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy, int outputport /*=0
   {
     return 0;
   }
+  if (!info->GetCompositeDataClassName() && this->CompositeDataRequired)
+  {
+    return 0;
+  }
 
   // Get an actual instance of the same type as the data represented
   // by the information object. This is later used to check match
@@ -201,7 +206,8 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy, int outputport /*=0
   {
     for (unsigned int i = 0; i < numTypes; i++)
     {
-      if (strcmp(this->GetDataType(i), "vtkHyperTreeGrid") == 0)
+      if (strcmp(this->GetDataType(i), "vtkHyperTreeGrid") == 0 ||
+        strcmp(this->GetDataType(i), "vtkMultiBlockDataSet") == 0)
       {
         return 1;
       }
@@ -268,7 +274,6 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy, int outputport /*=0
       }
     }
   }
-
   return 0;
 }
 
@@ -281,6 +286,12 @@ int vtkSMDataTypeDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement*
   if (element->GetScalarAttribute("composite_data_supported", &compositeDataSupported))
   {
     this->SetCompositeDataSupported(compositeDataSupported);
+  }
+
+  int compositeDataRequired;
+  if (element->GetScalarAttribute("composite_data_required", &compositeDataRequired))
+  {
+    this->SetCompositeDataRequired(compositeDataRequired);
   }
 
   // Loop over the top-level elements.
