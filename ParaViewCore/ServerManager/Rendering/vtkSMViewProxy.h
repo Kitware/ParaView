@@ -338,11 +338,6 @@ private:
   vtkSMDataDeliveryManagerProxy* DeliveryManager;
   static bool TransparentBackground;
 
-  // When view's time changes, there's no way for the client-side proxies to
-  // know that they may re-execute and their data info is invalid. So mark those
-  // dirty explicitly.
-  void ViewTimeChanged();
-
   // Actual logic for taking a screenshot.
   vtkImageData* CaptureWindowSingle(int magnificationX, int magnificationY);
 

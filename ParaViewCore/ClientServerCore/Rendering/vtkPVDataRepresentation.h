@@ -24,6 +24,7 @@
 #ifndef vtkPVDataRepresentation_h
 #define vtkPVDataRepresentation_h
 
+#include "vtkCommand.h" // needed for vtkCommand
 #include "vtkDataRepresentation.h"
 #include "vtkPVClientServerCoreRenderingModule.h" // needed for exports
 #include "vtkWeakPointer.h"                       // needed for vtkWeakPointer
@@ -118,9 +119,11 @@ public:
 
   //@{
   /**
-   * Set whether the UpdateTime is valid.
+   * Get whether the UpdateTime is valid. `ResetUpdateTime` can be used to clear
+   * the UpdateTimeValid flag.
    */
   vtkGetMacro(UpdateTimeValid, bool);
+  void ResetUpdateTime();
   //@}
 
   //@{
@@ -136,6 +139,12 @@ public:
   vtkGetMacro(ForcedCacheKey, double);
   vtkGetMacro(ForceUseCache, bool);
   //@}
+
+  /**
+   * Returns the cache-key the representation is currently using. This takes
+   * into consideration whether ForcedCacheKey is to be used.
+   */
+  double GetCacheKey() const;
 
   //@{
   /**
@@ -179,6 +188,49 @@ public:
   const std::string& GetLogName() const { return this->LogName; }
   //@}
 
+  //@{
+  /**
+   * This flag indicates if the representation is for a temporal pipeline. If
+   * true, then calling `SetUpdateTime` will result in calling
+   * `this->MarkModified()` i.e. will cause the representation to update on
+   * subsequent update request. Otherwise, the subsequent update request will be
+   * a no-op (unless the representation ended up calling MarkModified due to
+   * other changes i.e. change in input pipeline). `HasTemporalPipeline` gets
+   * set in the first update on the representation, however, only on the
+   * data-server side. vtkPVView ensures that the flag is synced up among all
+   * ranks at the end of each `vtkPVView::Update` call.
+   */
+  vtkGetMacro(HasTemporalPipeline, bool);
+  vtkSetMacro(HasTemporalPipeline, bool);
+  //@}
+
+  /**
+   * Returns true if the representation needs an update.
+   */
+  bool GetNeedsUpdate();
+
+  enum
+  {
+    /**
+     * This event is fired in `ProcessViewRequest` when `REQUEST_UPDATE` was
+     * requested and the representation needed an update (i.e.
+     * this->GetNeedsUpdate() == true), however was skipped since the data
+     * is already cached by the view.
+     */
+    SkippedUpdateDataEvent = vtkCommand::UserEvent + 91,
+    UpdateTimeChangedEvent,
+  };
+
+  //@{
+  /**
+   * Overridden to ensure that `MarkModified` is called.
+   */
+  void SetInputConnection(int port, vtkAlgorithmOutput* input) override;
+  using Superclass::SetInputConnection;
+  void AddInputConnection(int port, vtkAlgorithmOutput* input) override;
+  using Superclass::AddInputConnection;
+  //@}
+
 protected:
   vtkPVDataRepresentation();
   ~vtkPVDataRepresentation() override;
@@ -209,6 +261,9 @@ private:
   bool Visibility;
   bool ForceUseCache;
   double ForcedCacheKey;
+  double CacheKey;
+
+  bool HasTemporalPipeline;
 
   class Internals;
   Internals* Implementation;

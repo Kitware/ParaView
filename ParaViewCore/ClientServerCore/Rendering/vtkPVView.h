@@ -50,11 +50,6 @@ public:
   static void SetEnableStreaming(bool);
   static bool GetEnableStreaming();
 
-  enum
-  {
-    ViewTimeChangedEvent = 9000
-  };
-
   //@{
   /**
    * Set the position on this view in the multiview configuration.
@@ -96,8 +91,8 @@ public:
 
   //@{
   /**
-   * Get/Set the time this view is showing. Whenever time is changed, this fires
-   * a ViewTimeChangedEvent event.
+   * Get/Set the time this view is showing.
+   *
    * \note CallOnAllProcesses
    */
   virtual void SetViewTime(double value);
@@ -247,13 +242,6 @@ public:
   virtual void ScaleRendererViewports(const double viewport[4]);
 
   /**
-   * Called by `vtkPVDataRepresentation` whenever
-   * `vtkPVDataRepresentation::MarkModified` is called. Subclasses may use this
-   * method to clear internal caches, if needed.
-   */
-  virtual void RepresentationModified(vtkPVDataRepresentation*);
-
-  /**
    * Provides access to the time when Update() was last called.
    */
   vtkMTimeType GetUpdateTimeStamp() { return this->UpdateTimeStamp; }
@@ -285,6 +273,20 @@ public:
    * may lead to deadlock.
    */
   virtual void Deliver(int use_lod, unsigned int size, unsigned int* representation_ids);
+
+  /**
+   * Called in `vtkPVDataRepresentation::ProcessViewRequest` to check if the
+   * representation already has cached data. If so, the representation may
+   * choose to not update itself.
+   */
+  virtual bool IsCached(vtkPVDataRepresentation*);
+
+  /**
+   * Called by `vtkPVDataRepresentation` whenever
+   * `vtkPVDataRepresentation::MarkModified` is called. Subclasses may use this
+   * method to clear internal caches, if needed.
+   */
+  virtual void ClearCache(vtkPVDataRepresentation*);
 
 protected:
   vtkPVView(bool create_render_window = true);
@@ -342,19 +344,12 @@ protected:
   //@{
   /**
    * Subclasses can use this method to trigger a pass on all representations.
+   * @returns the count for representations that processed the call and returned
+   * success.
    */
-  void CallProcessViewRequest(
+  int CallProcessViewRequest(
     vtkInformationRequestKey* passType, vtkInformation* request, vtkInformationVector* reply);
-  double ViewTime;
   //@}
-
-  /**
-   * Subclasses can override this method to indicate if the representation
-   * update must be skipped. Default implementation checks with the
-   * `DeliveryManager` if any and skips updates if the representation's data has
-   * already been cached.
-   */
-  virtual bool SkipUpdateRepresentation(vtkPVDataRepresentation*);
 
   vtkPVSession* GetSession();
 
@@ -364,6 +359,7 @@ protected:
    */
   vtkGetMacro(InCaptureScreenshot, bool);
 
+  double ViewTime;
   double CacheKey;
   bool UseCache;
 
@@ -381,6 +377,12 @@ protected:
 private:
   vtkPVView(const vtkPVView&) = delete;
   void operator=(const vtkPVView&) = delete;
+
+  /**
+   * Called in Update() to sync HasTemporalPipeline flags between
+   * representations on all processes.
+   */
+  void SynchronizeRepresentationTemporalPipelineStates();
 
   vtkRenderWindow* RenderWindow;
   bool ViewTimeValid;

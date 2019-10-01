@@ -54,7 +54,7 @@ vtkPVView* vtkPVDataDeliveryManager::GetView() const
 //----------------------------------------------------------------------------
 unsigned long vtkPVDataDeliveryManager::GetVisibleDataSize(bool low_res)
 {
-  return this->Internals->GetVisibleDataSize(low_res, this->GetCacheKey(nullptr));
+  return this->Internals->GetVisibleDataSize(low_res, this);
 }
 
 //----------------------------------------------------------------------------
@@ -207,7 +207,6 @@ bool vtkPVDataDeliveryManager::NeedsDelivery(
     if (this->Internals->IsRepresentationVisible(iter->first.first))
     {
       auto repr = this->GetRepresentation(iter->first.first);
-      const int port = iter->first.second;
       const auto cacheKey = this->GetCacheKey(repr);
       const int dataKey = this->GetDeliveredDataKey(low_res);
       vtkInternals::vtkItem& item = low_res ? iter->second.second : iter->second.first;
@@ -288,18 +287,8 @@ int vtkPVDataDeliveryManager::GetSynchronizationMagicNumber()
 //----------------------------------------------------------------------------
 double vtkPVDataDeliveryManager::GetCacheKey(vtkPVDataRepresentation* repr) const
 {
-  if (repr && repr->GetForceUseCache())
-  {
-    return repr->GetForcedCacheKey();
-  }
-
-  auto view = this->GetView();
-  if (view && view->GetUseCache())
-  {
-    return view->GetCacheKey();
-  }
-
-  return view->GetCacheKey();
+  assert(repr != nullptr);
+  return repr->GetCacheKey();
 }
 
 //----------------------------------------------------------------------------

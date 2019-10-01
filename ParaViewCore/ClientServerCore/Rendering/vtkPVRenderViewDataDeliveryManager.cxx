@@ -210,7 +210,6 @@ void vtkPVRenderViewDataDeliveryManager::RedistributeDataForOrderedCompositing(b
          ++iter)
     {
       auto repr = this->GetRepresentation(iter->first.first);
-      const int port = iter->first.second;
       const auto cacheKey = this->GetCacheKey(repr);
       vtkInternals::vtkItem& item = iter->second.first;
       auto info = item.GetPieceInformation(cacheKey);
@@ -275,7 +274,6 @@ void vtkPVRenderViewDataDeliveryManager::RedistributeDataForOrderedCompositing(b
   for (iter = this->Internals->ItemsMap.begin(); iter != this->Internals->ItemsMap.end(); ++iter)
   {
     const auto id = iter->first.first;
-    const int port = iter->first.second;
     vtkInternals::vtkItem& item = low_res ? iter->second.second : iter->second.first;
 
     if (!this->Internals->IsRepresentationVisible(id))

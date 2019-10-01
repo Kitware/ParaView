@@ -164,10 +164,6 @@ int vtkChartRepresentation::RequestData(
   this->LocalOutputRequestData = nullptr;
   this->LocalOutput = nullptr;
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  int myId = pm->GetPartitionId();
-  int numProcs = pm->GetNumberOfLocalPartitions();
-
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     vtkSmartPointer<vtkDataObject> data = vtkDataObject::GetData(inputVector[0], 0);

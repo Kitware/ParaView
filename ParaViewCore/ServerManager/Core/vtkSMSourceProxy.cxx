@@ -341,7 +341,7 @@ void vtkSMSourceProxy::UpdatePipeline()
     this->GetOutputPort(i)->UpdatePipeline();
   }
 
-  this->PostUpdateData();
+  this->PostUpdateData(false);
   // this->InvalidateDataInformation();
 }
 
@@ -368,7 +368,7 @@ void vtkSMSourceProxy::UpdatePipeline(double time)
   // #12571).
   this->NeedsUpdate = true;
 
-  this->PostUpdateData();
+  this->PostUpdateData(false);
   // this->InvalidateDataInformation();
 }
 
@@ -509,10 +509,13 @@ void vtkSMSourceProxy::RemoveAllExtractSelectionProxies()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSourceProxy::PostUpdateData()
+void vtkSMSourceProxy::PostUpdateData(bool using_cache)
 {
-  this->InvalidateDataInformation();
-  this->Superclass::PostUpdateData();
+  if (!using_cache)
+  {
+    this->InvalidateDataInformation();
+  }
+  this->Superclass::PostUpdateData(using_cache);
 }
 
 //----------------------------------------------------------------------------

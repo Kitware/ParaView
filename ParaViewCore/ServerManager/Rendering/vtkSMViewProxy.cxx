@@ -369,41 +369,12 @@ void vtkSMViewProxy::CreateVTKObjects()
     return;
   }
 
-  if (auto object = vtkObject::SafeDownCast(this->GetClientSideObject()))
-  {
-    object->AddObserver(vtkPVView::ViewTimeChangedEvent, this, &vtkSMViewProxy::ViewTimeChanged);
-  }
-
   // Setup data-delivery manager.
   this->DeliveryManager =
     vtkSMDataDeliveryManagerProxy::SafeDownCast(this->GetSubProxy("DeliveryManager"));
   if (this->DeliveryManager)
   {
     this->DeliveryManager->SetViewProxy(this);
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMViewProxy::ViewTimeChanged()
-{
-  vtkSMPropertyHelper helper1(this, "Representations");
-  for (unsigned int cc = 0; cc < helper1.GetNumberOfElements(); cc++)
-  {
-    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(helper1.GetAsProxy(cc));
-    if (repr)
-    {
-      repr->ViewTimeChanged();
-    }
-  }
-
-  vtkSMPropertyHelper helper2(this, "HiddenRepresentations", true);
-  for (unsigned int cc = 0; cc < helper2.GetNumberOfElements(); cc++)
-  {
-    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(helper2.GetAsProxy(cc));
-    if (repr)
-    {
-      repr->ViewTimeChanged();
-    }
   }
 }
 
@@ -534,7 +505,7 @@ void vtkSMViewProxy::Update()
       }
     }
 
-    this->PostUpdateData();
+    this->PostUpdateData(false);
   }
 }
 

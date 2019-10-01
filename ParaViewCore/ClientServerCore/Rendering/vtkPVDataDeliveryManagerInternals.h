@@ -160,7 +160,6 @@ public:
 
     vtkPVTrivialProducer* GetProducer(int dataKey, double cacheKey)
     {
-      auto& store = this->Data[cacheKey];
       vtkDataObject* prev = this->Producer->GetOutputDataObject(0);
       vtkDataObject* cur = this->GetDeliveredDataObject(dataKey, cacheKey);
       this->Producer->SetOutput(cur);
@@ -244,7 +243,7 @@ public:
       });
   }
 
-  unsigned long GetVisibleDataSize(bool use_second_if_available, double cacheKey)
+  unsigned long GetVisibleDataSize(bool use_second_if_available, vtkPVDataDeliveryManager* dmgr)
   {
     unsigned long size = 0;
     ItemsMapType::iterator iter;
@@ -256,6 +255,10 @@ public:
         // skip hidden representations.
         continue;
       }
+
+      auto repr = this->RepresentationsMap[key.first];
+      assert(repr != nullptr);
+      const double cacheKey = dmgr->GetCacheKey(repr);
 
       if (use_second_if_available && iter->second.second.GetDataObject(cacheKey))
       {

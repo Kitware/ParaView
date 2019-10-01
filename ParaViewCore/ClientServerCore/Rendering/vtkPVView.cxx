@@ -21,8 +21,10 @@
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkInformationRequestKey.h"
 #include "vtkInformationVector.h"
+#include "vtkLogger.h"
 #include "vtkMPIMoveData.h"
 #include "vtkMultiProcessController.h"
+#include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataDeliveryManager.h"
 #include "vtkPVDataRepresentation.h"
@@ -362,7 +364,6 @@ void vtkPVView::SetViewTime(double time)
   {
     this->ViewTime = time;
     this->ViewTimeValid = true;
-    this->InvokeEvent(ViewTimeChangedEvent);
     this->Modified();
   }
 }
@@ -428,38 +429,125 @@ void vtkPVView::Update()
 {
   vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "%s: update view", this->GetLogName().c_str());
 
+  // Propagate update time.
+  const int num_reprs = this->GetNumberOfRepresentations();
+  const auto view_time = this->GetViewTime();
+  for (int cc = 0; cc < num_reprs; cc++)
+  {
+    if (auto pvrepr = vtkPVDataRepresentation::SafeDownCast(this->GetRepresentation(cc)))
+    {
+      // Pass the view time information to the representation
+      if (this->ViewTimeValid)
+      {
+        pvrepr->SetUpdateTime(view_time);
+      }
+      else
+      {
+        pvrepr->ResetUpdateTime();
+      }
+    }
+  }
+
   vtkTimerLog::MarkStartEvent("vtkPVView::Update");
-  this->CallProcessViewRequest(
+  const int count = this->CallProcessViewRequest(
     vtkPVView::REQUEST_UPDATE(), this->RequestInformation, this->ReplyInformationVector);
   vtkTimerLog::MarkEndEvent("vtkPVView::Update");
+
+  // exchange information about representations that are time-dependent.
+  // this goes from data-server-root to client and render-server.
+  if (count)
+  {
+    this->SynchronizeRepresentationTemporalPipelineStates();
+  }
 
   this->UpdateTimeStamp.Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVView::CallProcessViewRequest(
-  vtkInformationRequestKey* type, vtkInformation* inInfo, vtkInformationVector* outVec)
+void vtkPVView::SynchronizeRepresentationTemporalPipelineStates()
 {
-  int num_reprs = this->GetNumberOfRepresentations();
-  outVec->SetNumberOfInformationObjects(num_reprs);
+  vtkVLogScopeF(
+    PARAVIEW_LOG_RENDERING_VERBOSITY(), "%s: sync temporal states", this->GetLogName().c_str());
 
-  if (type == REQUEST_UPDATE())
+  std::map<unsigned int, vtkPVDataRepresentation*> repr_map;
+  const int num_reprs = this->GetNumberOfRepresentations();
+  for (int cc = 0; cc < num_reprs; cc++)
   {
-    // Pass the view time before updating the representations.
-    for (int cc = 0; cc < num_reprs; cc++)
+    if (auto pvrepr = vtkPVDataRepresentation::SafeDownCast(this->GetRepresentation(cc)))
     {
-      vtkDataRepresentation* repr = this->GetRepresentation(cc);
-      vtkPVDataRepresentation* pvrepr = vtkPVDataRepresentation::SafeDownCast(repr);
-      if (pvrepr)
+      repr_map[pvrepr->GetUniqueIdentifier()] = pvrepr;
+    }
+  }
+
+  vtkMultiProcessStream stream;
+  auto ptype = vtkProcessModule::GetProcessType();
+  if (ptype == vtkProcessModule::PROCESS_DATA_SERVER || ptype == vtkProcessModule::PROCESS_SERVER)
+  {
+    stream << static_cast<int>(repr_map.size());
+    for (const auto& apair : repr_map)
+    {
+      auto pvrepr = apair.second;
+      stream << pvrepr->GetUniqueIdentifier() << (pvrepr->GetHasTemporalPipeline() ? 1 : 0);
+    }
+    if (auto cController = this->Session->GetController(vtkPVSession::CLIENT))
+    {
+      cController->Send(stream, 1, 102290);
+    }
+    stream.Reset();
+  }
+  else if (ptype == vtkProcessModule::PROCESS_CLIENT)
+  {
+    auto crController = this->Session->GetController(vtkPVSession::RENDER_SERVER_ROOT);
+    auto cdController = this->Session->GetController(vtkPVSession::DATA_SERVER_ROOT);
+    if (crController == cdController)
+    {
+      crController = nullptr;
+    }
+    if (cdController)
+    {
+      cdController->Receive(stream, 1, 102290);
+    }
+    if (crController)
+    {
+      crController->Send(stream, 1, 102290);
+    }
+  }
+  else if (ptype == vtkProcessModule::PROCESS_RENDER_SERVER)
+  {
+    if (auto cController = this->Session->GetController(vtkPVSession::CLIENT))
+    {
+      cController->Receive(stream, 1, 102290);
+    }
+    if (auto pController = vtkMultiProcessController::GetGlobalController())
+    {
+      pController->Broadcast(stream, 0);
+    }
+  }
+
+  if (stream.Size() > 0)
+  {
+    int count;
+    stream >> count;
+    for (int cc = 0; cc < count; ++cc)
+    {
+      unsigned int id;
+      int status;
+      stream >> id >> status;
+      if (auto repr = repr_map[id])
       {
-        // Pass the view time information to the representation
-        if (this->ViewTimeValid)
-        {
-          pvrepr->SetUpdateTime(this->GetViewTime());
-        }
+        repr->SetHasTemporalPipeline(status == 1);
       }
     }
   }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVView::CallProcessViewRequest(
+  vtkInformationRequestKey* type, vtkInformation* inInfo, vtkInformationVector* outVec)
+{
+  int count = 0;
+  int num_reprs = this->GetNumberOfRepresentations();
+  outVec->SetNumberOfInformationObjects(num_reprs);
 
   // NOTE: This will create a reference loop (depending on what inInfo is). If
   // it's this->RequestInformation, then we have a loop and hence it's
@@ -474,11 +562,12 @@ void vtkPVView::CallProcessViewRequest(
     vtkPVDataRepresentation* pvrepr = vtkPVDataRepresentation::SafeDownCast(repr);
     if (pvrepr)
     {
-      if (pvrepr->GetVisibility() &&
-        // skip update passes, if requested.
-        (type != REQUEST_UPDATE() || this->SkipUpdateRepresentation(pvrepr) == false))
+      if (pvrepr->GetVisibility())
       {
-        pvrepr->ProcessViewRequest(type, inInfo, outInfo);
+        if (pvrepr->ProcessViewRequest(type, inInfo, outInfo))
+        {
+          ++count;
+        }
       }
     }
     else if (repr && type == REQUEST_UPDATE())
@@ -490,6 +579,7 @@ void vtkPVView::CallProcessViewRequest(
   // Clear input information since we are done with the pass. This avoids any
   // need for garbage collection.
   inInfo->Clear();
+  return count;
 }
 
 //-----------------------------------------------------------------------------
@@ -760,20 +850,18 @@ vtkPVSession* vtkPVView::GetSession()
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVView::SkipUpdateRepresentation(vtkPVDataRepresentation* repr)
+bool vtkPVView::IsCached(vtkPVDataRepresentation* repr)
 {
-  if ((this->GetUseCache() || repr->GetForceUseCache()) && this->DeliveryManager &&
-    this->DeliveryManager->HasPiece(repr))
+  if (this->DeliveryManager && this->DeliveryManager->HasPiece(repr))
   {
-    vtkLogF(TRACE, "skipping %s", repr->GetLogName().c_str());
+    vtkLogF(TRACE, "cached %s", repr->GetLogName().c_str());
     return true;
   }
-
   return false;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVView::RepresentationModified(vtkPVDataRepresentation* repr)
+void vtkPVView::ClearCache(vtkPVDataRepresentation* repr)
 {
   assert(repr != nullptr);
   if (!this->GetUseCache() && !repr->GetForceUseCache() && this->DeliveryManager != nullptr)

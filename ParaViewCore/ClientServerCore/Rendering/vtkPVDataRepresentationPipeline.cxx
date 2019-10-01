@@ -33,15 +33,9 @@ vtkPVDataRepresentationPipeline::~vtkPVDataRepresentationPipeline()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataRepresentationPipeline::MarkModified()
-{
-  this->NeedUpdate = true;
-}
-
-//----------------------------------------------------------------------------
 int vtkPVDataRepresentationPipeline::ForwardUpstream(int i, int j, vtkInformation* request)
 {
-  if (!this->NeedUpdate)
+  if (!this->NeedsUpdate)
   {
     // shunt upstream updates unless explicitly requested.
     return 1;
@@ -53,7 +47,7 @@ int vtkPVDataRepresentationPipeline::ForwardUpstream(int i, int j, vtkInformatio
 //----------------------------------------------------------------------------
 int vtkPVDataRepresentationPipeline::ForwardUpstream(vtkInformation* request)
 {
-  if (!this->NeedUpdate)
+  if (!this->NeedsUpdate)
   {
     // shunt upstream updates unless explicitly requested.
     return 1;
@@ -68,7 +62,7 @@ int vtkPVDataRepresentationPipeline::ProcessRequest(
 {
   if (request->Has(REQUEST_DATA()) || request->Has(REQUEST_UPDATE_EXTENT()))
   {
-    if (!this->NeedUpdate)
+    if (!this->NeedsUpdate)
     {
       // shunt upstream updates when using cache.
       return 1;
@@ -88,8 +82,6 @@ void vtkPVDataRepresentationPipeline::ExecuteDataEnd(
   // PostUpdateData(). We do this since now representations are not updated at
   // the proxy level.
   this->Algorithm->InvokeEvent(vtkCommand::UpdateDataEvent);
-
-  this->NeedUpdate = false;
 }
 
 //----------------------------------------------------------------------------

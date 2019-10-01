@@ -662,6 +662,18 @@ protected:
   virtual void MarkDirtyFromProducer(
     vtkSMProxy* modifiedProxy, vtkSMProxy* producer, vtkSMProperty* property);
 
+  /**
+   * This method is called by vtkSMRepresentationProxy whenever the time request
+   * for the pipeline may have potentially changed. While this does not mean
+   * that the pipeline will re-execute, it does indicate that the pipeline could
+   * execute and hence to ensure we update data information (and other state)
+   * correctly when PostUpdateData gets called, need to ensure the upstream
+   * pipeline on the proxy side realizes it may need update. This method simply
+   * toggles NeedsUpdate flag and propagate up the producer chain through input
+   * properties.
+   */
+  void MarkInputsAsDirty();
+
   //@{
   /**
    * These classes have been declared as friends to minimize the
@@ -837,8 +849,12 @@ protected:
    * This method is called after the algorithm(s) (if any) associated
    * with this proxy execute. Subclasses overwrite this method to
    * add necessary functionality.
+   *
+   * `using_cache` is set to true when the pipeline update was requested but
+   * skipped because the result was previously generated. This happens when
+   * using playing animations with cache enabled.
    */
-  virtual void PostUpdateData();
+  virtual void PostUpdateData(bool using_cache);
 
   /**
    * If a proxy is deprecated, prints a warning.

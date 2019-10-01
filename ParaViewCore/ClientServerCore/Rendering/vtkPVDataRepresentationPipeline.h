@@ -19,7 +19,7 @@
  * vtkPVDataRepresentationPipeline is an executive for vtkPVDataRepresentation.
  * Unlike other algorithms, vtkPVDataRepresentation does not use MTime as the
  * indication that the pipeline needs to be updated, but instead uses the
- * `vtkPVDataRepresentation::NeedUpdate` flag. This mechanism, historically
+ * `vtkPVDataRepresentation::NeedsUpdate` flag. This mechanism, historically
  * referenced as update-suppressor, is implemented by this class. It bypasses
  * pipeline passes unless the representation explicitly indicates it needs an
  * update.
@@ -52,7 +52,8 @@ public:
    * should no longer suppress the pipeline passes since the pipeline has been
    * invalidated.
    */
-  void MarkModified();
+  vtkSetMacro(NeedsUpdate, bool);
+  vtkGetMacro(NeedsUpdate, bool);
 
 protected:
   vtkPVDataRepresentationPipeline();
@@ -69,7 +70,7 @@ private:
   vtkPVDataRepresentationPipeline(const vtkPVDataRepresentationPipeline&) = delete;
   void operator=(const vtkPVDataRepresentationPipeline&) = delete;
 
-  bool NeedUpdate = true;
+  bool NeedsUpdate = true;
 };
 
 #endif

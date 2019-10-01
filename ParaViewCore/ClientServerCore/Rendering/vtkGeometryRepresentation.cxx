@@ -366,6 +366,7 @@ int vtkGeometryRepresentation::ProcessViewRequest(
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
     auto data = vtkPVView::GetDeliveredPiece(inInfo, this);
+    // vtkLogF(INFO, "%p: %s", (void*)data, this->GetLogName().c_str());
     auto dataLOD = vtkPVView::GetDeliveredPieceLOD(inInfo, this);
     this->Mapper->SetInputDataObject(data);
     this->LODMapper->SetInputDataObject(dataLOD);
@@ -430,6 +431,7 @@ int vtkGeometryRepresentation::RequestData(
 {
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
+    // vtkLogF(INFO, "%s->RequestData", this->GetLogName().c_str());
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
     if (inInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()))
     {

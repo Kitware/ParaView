@@ -19,6 +19,7 @@
 #include "vtkDataObject.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkLogger.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVCompositeDataPipeline.h"
@@ -43,13 +44,30 @@ vtkPVDataRepresentation::vtkPVDataRepresentation()
 
   this->ForceUseCache = false;
   this->ForcedCacheKey = 0.0;
+  this->CacheKey = 0.0;
 
   this->UniqueIdentifier = 0;
+
+  this->HasTemporalPipeline = false;
 }
 
 //----------------------------------------------------------------------------
 vtkPVDataRepresentation::~vtkPVDataRepresentation()
 {
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataRepresentation::SetInputConnection(int port, vtkAlgorithmOutput* input)
+{
+  this->Superclass::SetInputConnection(port, input);
+  this->MarkModified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataRepresentation::AddInputConnection(int port, vtkAlgorithmOutput* input)
+{
+  this->Superclass::AddInputConnection(port, input);
+  this->MarkModified();
 }
 
 //----------------------------------------------------------------------------
@@ -61,7 +79,25 @@ void vtkPVDataRepresentation::SetUpdateTime(double time)
     this->UpdateTimeValid = true;
 
     // Call MarkModified() only when the timestep has indeed changed.
-    this->MarkModified();
+    if (this->HasTemporalPipeline && !this->GetNeedsUpdate())
+    {
+      // UpdateTimeChangedEvent is fired to let the proxy know that the pipeline
+      // will be executed due to time change. This helps the proxy layer updated
+      // state up the pipeline to note the potential re-execution of the
+      // upstream pipeline, which otherwise it has no clue since the pipeline
+      // isn't being executed due to explicit property modification.
+      this->InvokeEvent(vtkPVDataRepresentation::UpdateTimeChangedEvent);
+      this->MarkModified();
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataRepresentation::ResetUpdateTime()
+{
+  if (this->UpdateTimeValid)
+  {
+    this->UpdateTimeValid = false;
   }
 }
 
@@ -72,8 +108,14 @@ vtkExecutive* vtkPVDataRepresentation::CreateDefaultExecutive()
 }
 
 //----------------------------------------------------------------------------
+double vtkPVDataRepresentation::GetCacheKey() const
+{
+  return this->ForceUseCache ? this->ForcedCacheKey : this->CacheKey;
+}
+
+//----------------------------------------------------------------------------
 int vtkPVDataRepresentation::ProcessViewRequest(
-  vtkInformationRequestKey* request, vtkInformation* inInfo, vtkInformation*)
+  vtkInformationRequestKey* request, vtkInformation*, vtkInformation*)
 {
   assert("We must have an ID at that time" && this->UniqueIdentifier);
   assert(this->GetExecutive()->IsA("vtkPVDataRepresentationPipeline"));
@@ -81,9 +123,42 @@ int vtkPVDataRepresentation::ProcessViewRequest(
 
   if (request == vtkPVView::REQUEST_UPDATE())
   {
-    this->Update();
-  }
+    auto executive = vtkPVDataRepresentationPipeline::SafeDownCast(this->GetExecutive());
+    assert(executive);
 
+    // The representation hasn't been marked modified since last update. In that
+    // case, we skip the update entirely since there's nothing to update.
+    if (!executive->GetNeedsUpdate())
+    {
+      return 1;
+    }
+
+    auto pvview = vtkPVView::SafeDownCast(this->View);
+    assert(pvview);
+
+    // The representation needs to update. To support caching for playing
+    // animation, we need to save the data we'll prepare in this update request
+    // using a cache-key. That key is simply the view's current key. If nothing
+    // was changed in the representation's input since last update, then we
+    // won't get here and in that case we will continue to use the old
+    // cache-key. This neat little trick is crucial to ensure that we don't
+    // update representations that are not affected by the animation.
+    this->CacheKey = pvview->GetCacheKey();
+
+    // Now, check with the view, if the data was already cached. If so, we don't
+    // need to update and can skip it.
+    if (pvview->IsCached(this))
+    {
+      // update is needed, but we're skipping it since we have already cached
+      // the update result.
+      this->InvokeEvent(vtkPVDataRepresentation::SkippedUpdateDataEvent);
+      executive->SetNeedsUpdate(false);
+      return 1;
+    }
+
+    this->Update();
+    executive->SetNeedsUpdate(false);
+  }
   return 1;
 }
 
@@ -95,7 +170,11 @@ void vtkPVDataRepresentation::MarkModified()
   if (this->HasExecutive())
   {
     auto executive = vtkPVDataRepresentationPipeline::SafeDownCast(this->GetExecutive());
-    executive->MarkModified();
+    if (!executive->GetNeedsUpdate())
+    {
+      executive->SetNeedsUpdate(true);
+      vtkLogF(TRACE, "MarkModified %s", this->LogName.c_str());
+    }
   }
 
   // let the view know that representation has been modified;
@@ -103,7 +182,7 @@ void vtkPVDataRepresentation::MarkModified()
   // for the representation.
   if (auto pvview = vtkPVView::SafeDownCast(this->View))
   {
-    pvview->RepresentationModified(this);
+    pvview->ClearCache(this);
   }
 }
 
@@ -127,9 +206,22 @@ unsigned int vtkPVDataRepresentation::Initialize(
 
 //----------------------------------------------------------------------------
 int vtkPVDataRepresentation::RequestData(
-  vtkInformation*, vtkInformationVector**, vtkInformationVector*)
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector*)
 {
   // cout << "Updated: " << this->LogName << endl;
+  bool is_temporal = false;
+  for (int cc = 0; cc < this->GetNumberOfInputPorts(); cc++)
+  {
+    for (int kk = 0; kk < inputVector[cc]->GetNumberOfInformationObjects(); kk++)
+    {
+      auto inInfo = inputVector[cc]->GetInformationObject(kk);
+      using SDDP = vtkStreamingDemandDrivenPipeline;
+      is_temporal =
+        is_temporal || inInfo->Has(SDDP::TIME_STEPS()) || inInfo->Has(SDDP::TIME_RANGE());
+    }
+  }
+  this->HasTemporalPipeline = is_temporal;
+
   return 1;
 }
 
@@ -253,6 +345,15 @@ vtkMTimeType vtkPVDataRepresentation::GetPipelineDataTime()
 }
 
 //----------------------------------------------------------------------------
+bool vtkPVDataRepresentation::GetNeedsUpdate()
+{
+  auto executive = this->HasExecutive()
+    ? vtkPVDataRepresentationPipeline::SafeDownCast(this->GetExecutive())
+    : nullptr;
+  return executive ? executive->GetNeedsUpdate() : false;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVDataRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -261,4 +362,5 @@ void vtkPVDataRepresentation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UpdateTime: " << this->UpdateTime << endl;
   os << indent << "ForceUseCache: " << this->ForceUseCache << endl;
   os << indent << "ForcedCacheKey: " << this->ForcedCacheKey << endl;
+  os << indent << "CacheKey: " << this->CacheKey << endl;
 }

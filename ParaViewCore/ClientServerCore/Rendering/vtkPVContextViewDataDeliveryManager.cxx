@@ -53,7 +53,6 @@ void vtkPVContextViewDataDeliveryManager::MoveData(
 
   vtkInternals::vtkItem* item = this->Internals->GetItem(repr, low_res, port);
   const auto cacheKey = this->GetCacheKey(repr);
-  auto info = item->GetPieceInformation(cacheKey);
 
   const bool in_tile_display_mode = this->GetView()->InTileDisplayMode();
   auto pm = vtkProcessModule::GetProcessModule();

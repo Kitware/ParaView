@@ -271,7 +271,7 @@ protected:
   /**
    * Overwritten from superclass to invoke
    */
-  void PostUpdateData() override;
+  void PostUpdateData(bool) override;
 
   /**
    * Overridden to pass the logname to the internal ExtractSelection proxies.

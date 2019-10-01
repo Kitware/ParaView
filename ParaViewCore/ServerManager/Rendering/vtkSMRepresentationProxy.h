@@ -132,7 +132,7 @@ public:
   /**
    * Overridden to reset this->MarkedModified flag.
    */
-  void PostUpdateData() override;
+  void PostUpdateData(bool) override;
 
   /**
    * Called after the view updates.
@@ -196,6 +196,8 @@ protected:
 
   void CreateVTKObjects() override;
   void OnVTKRepresentationUpdated();
+  void OnVTKRepresentationUpdateSkipped();
+  void OnVTKRepresentationUpdateTimeChanged();
 
   virtual void UpdatePipelineInternal(double time, bool doTime);
 
@@ -221,19 +223,12 @@ private:
   double ProminentValuesFraction;
   double ProminentValuesUncertainty;
 
-  //@{
-  /**
-   * When ViewTime changes, we mark all inputs modified so that they fetch the
-   * updated data information.
-   */
-  void ViewTimeChanged();
-  friend class vtkSMViewProxy;
-  //@}
-
   friend class vtkPVComparativeViewNS::vtkCloningVectorOfRepresentations;
   void ClearMarkedModified() { this->MarkedModified = false; }
   bool MarkedModified;
   bool VTKRepresentationUpdated;
+  bool VTKRepresentationUpdateSkipped;
+  bool VTKRepresentationUpdateTimeChanged;
 
   std::string DebugName;
 };
