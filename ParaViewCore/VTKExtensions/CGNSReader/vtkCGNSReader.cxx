@@ -466,6 +466,9 @@ public:
     return vtkDataSet::SafeDownCast(zoneDO);
   }
 
+  static int readBCData(const double nodeId, const int cellDim, const int physicalDim,
+    vtkDataSet* dataset, vtkCGNSReader* self);
+
   static std::string GenerateMeshKey(const char* basename, const char* zonename);
 };
 
@@ -1181,6 +1184,107 @@ int vtkCGNSReader::vtkPrivate::readSolution(const std::string& solutionNameStr, 
   }
 
   return CG_OK;
+}
+
+//------------------------------------------------------------------------------
+int vtkCGNSReader::vtkPrivate::readBCData(const double nodeId, const int cellDim,
+  const int physicalDim, vtkDataSet* dataset, vtkCGNSReader* self)
+{
+  std::vector<double> childrenIds;
+  CGNSRead::getNodeChildrenId(self->cgioNum, nodeId, childrenIds);
+
+  for (auto iter = childrenIds.begin(); iter != childrenIds.end(); ++iter)
+  {
+    char nodeName[CGIO_MAX_NAME_LENGTH + 1];
+    char nodeLabel[CGIO_MAX_LABEL_LENGTH + 1];
+    CGIOErrorSafe(cgio_get_name(self->cgioNum, *iter, nodeName));
+    CGIOErrorSafe(cgio_get_label(self->cgioNum, *iter, nodeLabel));
+    if (strcmp(nodeLabel, "BCDataSet_t") == 0)
+    {
+      // Found a BCDataset_t and now load its data
+      CGNS_ENUMT(GridLocation_t) varCentering = CGNS_ENUMV(Vertex);
+      std::vector<double> BCDataSetChildrens;
+      std::vector<double> BCDataChildList; // Neumann and Dirichlet data node
+      CGNSRead::getNodeChildrenId(self->cgioNum, *iter, BCDataSetChildrens);
+      for (auto iterBCDataSet = BCDataSetChildrens.begin();
+           iterBCDataSet != BCDataSetChildrens.end(); ++iterBCDataSet)
+      {
+        CGIOErrorSafe(cgio_get_label(self->cgioNum, *iterBCDataSet, nodeLabel));
+        if (strcmp(nodeLabel, "BCData_t"))
+        {
+          BCDataChildList.push_back(*iterBCDataSet);
+        }
+        else if (strcmp(nodeLabel, "GridLocation_t"))
+        {
+          std::string location;
+          CGNSRead::readNodeStringData(self->cgioNum, *iter, location);
+          if (location == "FaceCenter")
+          {
+            varCentering = CGNS_ENUMV(FaceCenter);
+          }
+          else if (location == "Vertex")
+          {
+            varCentering = CGNS_ENUMV(Vertex);
+          }
+        }
+      }
+      // Now read Neumann and Dirichlet arrays
+      for (auto iterBCData = BCDataChildList.begin(); iterBCData != BCDataChildList.end();
+           ++iterBCData)
+      {
+        std::vector<double> BCDataArrayIds;
+        CGNSRead::getNodeChildrenId(self->cgioNum, *iterBCData, BCDataArrayIds);
+        // TODO: parse list array and detect vector before loading data
+        // TODO: Adapt type of array to handle R4/R8 and not force R8
+        // number Of Values to load per Array for the BCData
+        vtkIdType numValues = dataset->GetNumberOfCells();
+        if (varCentering == CGNS_ENUMV(Vertex))
+        {
+          numValues = dataset->GetNumberOfPoints();
+        }
+        // Array loading
+        for (auto iterArray = BCDataArrayIds.begin(); iterArray != BCDataArrayIds.end();
+             ++iterArray)
+        {
+          std::vector<double> data;
+          CGIOErrorSafe(cgio_get_name(self->cgioNum, *iterArray, nodeName));
+          CGNSRead::readNodeDataAs<double>(self->cgioNum, *iterArray, data);
+          // Create vtk
+          vtkNew<vtkDoubleArray> vtkBCdata;
+          vtkBCdata->SetName(nodeName);
+          vtkBCdata->SetNumberOfComponents(1);
+          vtkBCdata->SetNumberOfTuples(numValues);
+          if (data.size() == 1)
+          {
+            // This is an uniform boundary condition value
+            for (vtkIdType idx = 0; idx < numValues; ++idx)
+            {
+              vtkBCdata->SetTuple(idx, &data[0]);
+            }
+          }
+          else if (data.size() == numValues)
+          {
+            for (vtkIdType idx = 0; idx < numValues; ++idx)
+            {
+              vtkBCdata->SetTuple(idx, &data[idx]);
+            }
+          }
+          if (varCentering == CGNS_ENUMV(FaceCenter))
+          {
+            dataset->GetCellData()->AddArray(vtkBCdata.Get());
+          }
+          else if (varCentering == CGNS_ENUMV(Vertex))
+          {
+            dataset->GetPointData()->AddArray(vtkBCdata.Get());
+          }
+        }
+        CGNSRead::releaseIds(self->cgioNum, BCDataArrayIds);
+      }
+      CGNSRead::releaseIds(self->cgioNum, BCDataSetChildrens);
+    }
+  }
+  CGNSRead::releaseIds(self->cgioNum, childrenIds);
+  return 0;
 }
 
 //------------------------------------------------------------------------------
@@ -2937,9 +3041,12 @@ int vtkCGNSReader::GetUnstructuredZone(
               //
               // Parse BCDataSet CGNS arrays
               //
-              // TODO: Read here BCDataSet_t nodes to get DirichletData, NeumannData arrays at
+              // TODO: Improve read of BCDataSet_t nodes to get DirichletData, NeumannData arrays at
               // FaceCenter
-              // and fill the bcGrid with these boundary values.
+              // Inherit Centering from BC_t node
+              // Fill the bcGrid with these boundary values.
+              vtkCGNSReader::vtkPrivate::readBCData(
+                *bciter, cellDim, physicalDim, bcGrid.Get(), this);
               // For Pointdata, it can be extracted from the unstructured Volume.
               //
               const unsigned int idx = patchesMB->GetNumberOfBlocks();
