@@ -34,6 +34,7 @@
 #include "vtkImplicitPlaneRepresentation.h"
 #include "vtkImplicitPlaneWidget2.h"
 #include "vtkInformation.h"
+#include "vtkJPEGReader.h"
 #include "vtkJPEGWriter.h"
 #include "vtkLight.h"
 #include "vtkLightCollection.h"
@@ -137,6 +138,12 @@ vtkPVOpenVRHelper::vtkPVOpenVRHelper()
   this->CollaborationClient->SetHelper(this);
 
   this->QWidgetWidget = nullptr;
+
+  vtkNew<vtkPolyDataMapper> mapper;
+  mapper->SetInputConnection(this->ImagePlane->GetOutputPort());
+  this->ImageActor->GetProperty()->SetAmbient(1.0);
+  this->ImageActor->GetProperty()->SetDiffuse(0.0);
+  this->ImageActor->SetMapper(mapper);
 }
 
 //----------------------------------------------------------------------------
@@ -1219,6 +1226,337 @@ void vtkPVOpenVRHelper::ApplyState()
   }
 }
 
+void vtkPVOpenVRHelper::ShowBillboard(const std::string& text, vtkTexture* texture)
+{
+  vtkOpenVRRenderWindow* renWin =
+    vtkOpenVRRenderWindow::SafeDownCast(this->Interactor->GetRenderWindow());
+  vtkRenderer* ren = this->Renderer;
+  if (!renWin || !ren)
+  {
+    return;
+  }
+
+  renWin->UpdateHMDMatrixPose();
+  double dop[3];
+  ren->GetActiveCamera()->GetDirectionOfProjection(dop);
+  double vr[3];
+  double* vup = renWin->GetPhysicalViewUp();
+  double dtmp[3];
+  double vupdot = vtkMath::Dot(dop, vup);
+  if (fabs(vupdot) < 0.999)
+  {
+    dtmp[0] = dop[0] - vup[0] * vupdot;
+    dtmp[1] = dop[1] - vup[1] * vupdot;
+    dtmp[2] = dop[2] - vup[2] * vupdot;
+    vtkMath::Normalize(dtmp);
+  }
+  else
+  {
+    renWin->GetPhysicalViewDirection(dtmp);
+  }
+  vtkMath::Cross(dtmp, vup, vr);
+  vtkNew<vtkMatrix4x4> rot;
+  for (int i = 0; i < 3; ++i)
+  {
+    rot->SetElement(0, i, vr[i]);
+    rot->SetElement(1, i, vup[i]);
+    rot->SetElement(2, i, -dtmp[i]);
+  }
+  rot->Transpose();
+  double orient[3];
+  vtkTransform::GetOrientation(orient, rot);
+  vtkTextProperty* prop = this->TextActor3D->GetTextProperty();
+  this->TextActor3D->SetOrientation(orient);
+  this->TextActor3D->RotateX(-30.0);
+
+  double tpos[3];
+  double scale = renWin->GetPhysicalScale();
+  ren->GetActiveCamera()->GetPosition(tpos);
+  tpos[0] += (0.7 * scale * dop[0] - 0.1 * scale * vr[0] - 0.4 * scale * vup[0]);
+  tpos[1] += (0.7 * scale * dop[1] - 0.1 * scale * vr[1] - 0.4 * scale * vup[1]);
+  tpos[2] += (0.7 * scale * dop[2] - 0.1 * scale * vr[2] - 0.4 * scale * vup[2]);
+  this->TextActor3D->SetPosition(tpos);
+  // scale should cover 10% of FOV
+  double fov = ren->GetActiveCamera()->GetViewAngle();
+  double tsize = 0.1 * 2.0 * atan(fov * 0.5); // 10% of fov
+  tsize /= 200.0;                             // about 200 pixel texture map
+  scale *= tsize;
+  this->TextActor3D->SetScale(scale, scale, scale);
+  this->TextActor3D->SetInput(text.c_str());
+  this->Renderer->AddActor(this->TextActor3D);
+
+  prop->SetFrame(1);
+  prop->SetFrameColor(1.0, 1.0, 1.0);
+  prop->SetBackgroundOpacity(1.0);
+  prop->SetBackgroundColor(0.0, 0.0, 0.0);
+  prop->SetFontSize(14);
+
+  if (texture)
+  {
+    texture->Update();
+    int* dims = texture->GetInput()->GetDimensions();
+    double aspect = static_cast<double>(dims[1]) / dims[0];
+    this->ImagePlane->SetOrigin(-1.0, 0.0, 0.0);
+    this->ImagePlane->SetPoint1(0.0, 0.0, 0.0);
+    this->ImagePlane->SetPoint2(-1.0, aspect, 0.0);
+
+    this->ImageActor->SetOrientation(orient);
+    this->ImageActor->RotateX(-30.0);
+    scale = renWin->GetPhysicalScale();
+
+    ren->GetActiveCamera()->GetPosition(tpos);
+    tpos[0] += (0.7 * scale * dop[0] - 0.1 * scale * vr[0] - 0.4 * scale * vup[0]);
+    tpos[1] += (0.7 * scale * dop[1] - 0.1 * scale * vr[1] - 0.4 * scale * vup[1]);
+    tpos[2] += (0.7 * scale * dop[2] - 0.1 * scale * vr[2] - 0.4 * scale * vup[2]);
+    this->ImageActor->SetPosition(tpos);
+    // scale should cover 10% of FOV
+    // double tsize = 0.1*2.0*atan(fov*0.5); // 10% of fov
+    // scale *= tsize;
+    this->ImageActor->SetScale(scale, scale, scale);
+    this->ImageActor->SetTexture(texture);
+
+    this->Renderer->AddActor(this->ImageActor);
+    texture->Delete();
+  }
+}
+
+void vtkPVOpenVRHelper::HideBillboard()
+{
+  this->Renderer->RemoveActor(this->TextActor3D);
+  this->Renderer->RemoveActor(this->ImageActor);
+}
+
+void vtkPVOpenVRHelper::HandlePickEvent(vtkObject* caller, void* calldata)
+{
+  this->SelectedCells.clear();
+  this->HideBillboard();
+
+  vtkSelection* sel = vtkSelection::SafeDownCast(reinterpret_cast<vtkObjectBase*>(calldata));
+
+  if (!sel || sel->GetNumberOfNodes() == 0)
+  {
+    this->PreviousPickedRepresentation = nullptr;
+    this->PreviousPickedDataSet = nullptr;
+    return;
+  }
+
+  vtkOpenVRInteractorStyle* is =
+    vtkOpenVRInteractorStyle::SafeDownCast(reinterpret_cast<vtkObjectBase*>(caller));
+
+  // for multiple nodes which one do we use?
+  vtkSelectionNode* node = sel->GetNode(0);
+  vtkProp3D* prop = vtkProp3D::SafeDownCast(node->GetProperties()->Get(vtkSelectionNode::PROP()));
+  vtkPVDataRepresentation* repr = FindRepresentation(prop, this->View);
+  if (!repr)
+  {
+    return;
+  }
+  this->PreviousPickedRepresentation = this->LastPickedRepresentation;
+  this->LastPickedRepresentation = repr;
+
+  // next two lines are debugging code to mark what actor was picked
+  // by changing its color. Useful to track down picking errors.
+  // double *color = static_cast<vtkActor*>(prop)->GetProperty()->GetColor();
+  // static_cast<vtkActor*>(prop)->GetProperty()->SetColor(color[0] > 0.0 ?
+  // 0.0 : 1.0, 0.5, 0.5);
+  vtkDataObject* dobj = repr->GetInput();
+  node->GetProperties()->Set(vtkSelectionNode::SOURCE(), repr);
+
+  vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(dobj);
+  vtkDataSet* ds = NULL;
+  // handle composite datasets
+  if (cds)
+  {
+    vtkIdType cid = node->GetProperties()->Get(vtkSelectionNode::COMPOSITE_INDEX());
+    vtkNew<vtkDataObjectTreeIterator> iter;
+    iter->SetDataSet(cds);
+    iter->SkipEmptyNodesOn();
+    iter->SetVisitOnlyLeaves(1);
+    iter->InitTraversal();
+    while (iter->GetCurrentFlatIndex() != cid && !iter->IsDoneWithTraversal())
+    {
+      iter->GoToNextItem();
+    }
+    if (iter->GetCurrentFlatIndex() == cid)
+    {
+      ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+    }
+  }
+  else
+  {
+    ds = vtkDataSet::SafeDownCast(dobj);
+  }
+  if (!ds)
+  {
+    return;
+  }
+
+  // get the picked cell
+  vtkIdTypeArray* ids = vtkArrayDownCast<vtkIdTypeArray>(node->GetSelectionList());
+  if (ids == 0)
+  {
+    return;
+  }
+  vtkIdType aid = ids->GetComponent(0, 0);
+  vtkCell* cell = ds->GetCell(aid);
+
+  this->PreviousPickedDataSet = this->LastPickedDataSet;
+  this->LastPickedDataSet = ds;
+  this->PreviousPickedCellId = this->LastPickedCellId;
+  this->LastPickedCellId = aid;
+  this->SelectedCells.push_back(aid);
+
+  vtkCellData* celld = ds->GetCellData();
+
+  // update the billboard with information about this data
+  std::ostringstream toString;
+  double p1[6];
+  cell->GetBounds(p1);
+  double pos[3] = { 0.5 * (p1[1] + p1[0]), 0.5 * (p1[3] + p1[2]), 0.5 * (p1[5] + p1[4]) };
+  toString << "\n Cell Center (DC): " << pos[0] << ", " << pos[1] << ", " << pos[2] << " \n";
+  vtkMatrix4x4* pmat = prop->GetMatrix();
+  double wpos[4];
+  wpos[0] = pos[0];
+  wpos[1] = pos[1];
+  wpos[2] = pos[2];
+  wpos[3] = 1.0;
+  pmat->MultiplyPoint(wpos, wpos);
+  toString << " Cell Center (WC): " << wpos[0] << ", " << wpos[1] << ", " << wpos[2] << " \n";
+
+  vtkTexture* texture = nullptr;
+
+  vtkIdType numcd = celld->GetNumberOfArrays();
+  for (vtkIdType i = 0; i < numcd; ++i)
+  {
+    vtkAbstractArray* aa = celld->GetAbstractArray(i);
+    if (aa && aa->GetName())
+    {
+      toString << " " << aa->GetName() << ": ";
+      vtkStringArray* sa = vtkStringArray::SafeDownCast(aa);
+      if (sa)
+      {
+        // watch for image file names
+        std::string value = sa->GetValue(aid);
+        if (!strncmp(value.c_str(), "file://", 7))
+        {
+          vtkNew<vtkJPEGReader> rdr;
+          if (rdr->CanReadFile(value.c_str() + 7))
+          {
+            rdr->SetFileName(value.c_str() + 7);
+            if (!texture)
+            {
+              texture = vtkTexture::New();
+            }
+            texture->SetInputConnection(rdr->GetOutputPort());
+          }
+        }
+        toString << value << " \n";
+      }
+      vtkDataArray* da = vtkDataArray::SafeDownCast(aa);
+      if (da)
+      {
+        int nc = da->GetNumberOfComponents();
+        for (int ci = 0; ci < nc; ++ci)
+        {
+          toString << da->GetComponent(aid, ci) << " ";
+        }
+        toString << "\n";
+      }
+    }
+  }
+
+  // check to see if we have selected a range of data from
+  // the same dataset.
+  vtkAbstractArray* holeid = celld->GetAbstractArray("Hole_ID");
+  vtkDataArray* fromArray = celld->GetArray("from");
+  vtkDataArray* toArray = celld->GetArray("to");
+  vtkDataArray* validArray1 = celld->GetArray("vtkCompositingValid");
+  vtkDataArray* validArray2 = celld->GetArray("vtkConversionValid");
+  if (holeid && fromArray && toArray && validArray1 && validArray2 &&
+    this->PreviousPickedRepresentation == this->LastPickedRepresentation &&
+    this->PreviousPickedDataSet == this->LastPickedDataSet)
+  {
+    // ok same dataset, lets see if we have composite results
+    vtkVariant hid1 = holeid->GetVariantValue(aid);
+    vtkVariant hid2 = holeid->GetVariantValue(this->PreviousPickedCellId);
+    if (hid1 == hid2)
+    {
+      toString << "\n Composite results:\n";
+      double totDist = 0;
+      double fromEnd = fromArray->GetTuple1(aid);
+      double toEnd = toArray->GetTuple1(aid);
+      double fromEnd2 = fromArray->GetTuple1(this->PreviousPickedCellId);
+      double toEnd2 = toArray->GetTuple1(this->PreviousPickedCellId);
+      if (fromEnd2 < fromEnd)
+      {
+        fromEnd = fromEnd2;
+      }
+      if (toEnd2 > toEnd)
+      {
+        toEnd = toEnd2;
+      }
+      toString << " From: " << fromEnd << " To: " << toEnd << " \n";
+
+      // OK for each cell that is between from and to
+      // and part of the same hid, accumulate the numeric data
+      for (vtkIdType i = 0; i < numcd; ++i)
+      {
+        bool insertedCells = false;
+        vtkDataArray* da = vtkDataArray::SafeDownCast(celld->GetAbstractArray(i));
+        if (da && da->GetName() && strcmp("vtkCompositingValid", da->GetName()) != 0 &&
+          strcmp("vtkConversionValid", da->GetName()) != 0 && da != fromArray && da != toArray)
+        {
+          // for each cell
+          totDist = 0;
+          int nc = da->GetNumberOfComponents();
+          double* result = new double[nc];
+          for (int ci = 0; ci < nc; ++ci)
+          {
+            result[ci] = 0.0;
+          }
+          for (vtkIdType cidx = 0; cidx < da->GetNumberOfTuples(); ++cidx)
+          {
+            vtkVariant hid3 = holeid->GetVariantValue(cidx);
+            double fromV = fromArray->GetTuple1(cidx);
+            double toV = toArray->GetTuple1(cidx);
+            double valid1 = validArray1->GetTuple1(cidx);
+            double valid2 = validArray2->GetTuple1(cidx);
+            if (hid3 == hid1 && fromV >= fromEnd && toV <= toEnd)
+            {
+              if (!insertedCells)
+              {
+                this->SelectedCells.push_back(cidx);
+              }
+              if (valid1 != 0 && valid2 != 0)
+              {
+                double dist = toV - fromV;
+                for (int ci = 0; ci < nc; ++ci)
+                {
+                  result[ci] += dist * da->GetComponent(cidx, ci);
+                }
+                totDist += dist;
+              }
+            }
+          }
+          insertedCells = true;
+          toString << " " << da->GetName() << ": ";
+          for (int ci = 0; ci < nc; ++ci)
+          {
+            toString << result[ci] / totDist << " \n";
+          }
+        }
+      }
+      toString << " TotalDistance: " << totDist << " \n";
+    }
+  }
+
+  toString << "\n";
+
+  this->CollaborationClient->ShowBillboard(toString.str());
+  this->ShowBillboard(toString.str(), texture);
+  is->ShowPickCell(cell, vtkProp3D::SafeDownCast(prop));
+}
+
 bool vtkPVOpenVRHelper::EventCallback(vtkObject* caller, unsigned long eventID, void* calldata)
 {
   // handle different events
@@ -1236,216 +1574,7 @@ bool vtkPVOpenVRHelper::EventCallback(vtkObject* caller, unsigned long eventID, 
     break;
     case vtkCommand::EndPickEvent:
     {
-      this->SelectedCells.clear();
-
-      vtkSelection* sel = vtkSelection::SafeDownCast(reinterpret_cast<vtkObjectBase*>(calldata));
-
-      if (!sel || sel->GetNumberOfNodes() == 0)
-      {
-        this->PreviousPickedRepresentation = nullptr;
-        this->PreviousPickedDataSet = nullptr;
-        return false;
-      }
-
-      vtkOpenVRInteractorStyle* is =
-        vtkOpenVRInteractorStyle::SafeDownCast(reinterpret_cast<vtkObjectBase*>(caller));
-
-      // for multiple nodes which one do we use?
-      vtkSelectionNode* node = sel->GetNode(0);
-      vtkProp3D* prop =
-        vtkProp3D::SafeDownCast(node->GetProperties()->Get(vtkSelectionNode::PROP()));
-      vtkPVDataRepresentation* repr = FindRepresentation(prop, this->View);
-      if (!repr)
-      {
-        return false;
-      }
-      this->PreviousPickedRepresentation = this->LastPickedRepresentation;
-      this->LastPickedRepresentation = repr;
-
-      // next two lines are debugging code to mark what actor was picked
-      // by changing its color. Useful to track down picking errors.
-      // double *color = static_cast<vtkActor*>(prop)->GetProperty()->GetColor();
-      // static_cast<vtkActor*>(prop)->GetProperty()->SetColor(color[0] > 0.0 ?
-      // 0.0 : 1.0, 0.5, 0.5);
-      vtkDataObject* dobj = repr->GetInput();
-      node->GetProperties()->Set(vtkSelectionNode::SOURCE(), repr);
-
-      vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(dobj);
-      vtkDataSet* ds = NULL;
-      // handle composite datasets
-      if (cds)
-      {
-        vtkIdType cid = node->GetProperties()->Get(vtkSelectionNode::COMPOSITE_INDEX());
-        vtkNew<vtkDataObjectTreeIterator> iter;
-        iter->SetDataSet(cds);
-        iter->SkipEmptyNodesOn();
-        iter->SetVisitOnlyLeaves(1);
-        iter->InitTraversal();
-        while (iter->GetCurrentFlatIndex() != cid && !iter->IsDoneWithTraversal())
-        {
-          iter->GoToNextItem();
-        }
-        if (iter->GetCurrentFlatIndex() == cid)
-        {
-          ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
-        }
-      }
-      else
-      {
-        ds = vtkDataSet::SafeDownCast(dobj);
-      }
-      if (!ds)
-      {
-        return false;
-      }
-
-      // get the picked cell
-      vtkIdTypeArray* ids = vtkArrayDownCast<vtkIdTypeArray>(node->GetSelectionList());
-      if (ids == 0)
-      {
-        return false;
-      }
-      vtkIdType aid = ids->GetComponent(0, 0);
-      vtkCell* cell = ds->GetCell(aid);
-
-      this->PreviousPickedDataSet = this->LastPickedDataSet;
-      this->LastPickedDataSet = ds;
-      this->PreviousPickedCellId = this->LastPickedCellId;
-      this->LastPickedCellId = aid;
-      this->SelectedCells.push_back(aid);
-
-      vtkCellData* celld = ds->GetCellData();
-
-      // update the billboard with information about this data
-      std::ostringstream toString;
-      double p1[6];
-      cell->GetBounds(p1);
-      double pos[3] = { 0.5 * (p1[1] + p1[0]), 0.5 * (p1[3] + p1[2]), 0.5 * (p1[5] + p1[4]) };
-      toString << "\n Cell Center (DC): " << pos[0] << ", " << pos[1] << ", " << pos[2] << " \n";
-      vtkMatrix4x4* pmat = prop->GetMatrix();
-      double wpos[4];
-      wpos[0] = pos[0];
-      wpos[1] = pos[1];
-      wpos[2] = pos[2];
-      wpos[3] = 1.0;
-      pmat->MultiplyPoint(wpos, wpos);
-      toString << " Cell Center (WC): " << wpos[0] << ", " << wpos[1] << ", " << wpos[2] << " \n";
-
-      vtkIdType numcd = celld->GetNumberOfArrays();
-      for (vtkIdType i = 0; i < numcd; ++i)
-      {
-        vtkAbstractArray* aa = celld->GetAbstractArray(i);
-        if (aa && aa->GetName())
-        {
-          toString << " " << aa->GetName() << ": ";
-          vtkStringArray* sa = vtkStringArray::SafeDownCast(aa);
-          if (sa)
-          {
-            toString << sa->GetValue(aid) << " \n";
-          }
-          vtkDataArray* da = vtkDataArray::SafeDownCast(aa);
-          if (da)
-          {
-            int nc = da->GetNumberOfComponents();
-            for (int ci = 0; ci < nc; ++ci)
-            {
-              toString << da->GetComponent(aid, ci) << " ";
-            }
-            toString << "\n";
-          }
-        }
-      }
-
-      // check to see if we have selected a range of data from
-      // the same dataset.
-      vtkAbstractArray* holeid = celld->GetAbstractArray("Hole_ID");
-      vtkDataArray* fromArray = celld->GetArray("from");
-      vtkDataArray* toArray = celld->GetArray("to");
-      vtkDataArray* validArray1 = celld->GetArray("vtkCompositingValid");
-      vtkDataArray* validArray2 = celld->GetArray("vtkConversionValid");
-      if (holeid && fromArray && toArray && validArray1 && validArray2 &&
-        this->PreviousPickedRepresentation == this->LastPickedRepresentation &&
-        this->PreviousPickedDataSet == this->LastPickedDataSet)
-      {
-        // ok same dataset, lets see if we have composite results
-        vtkVariant hid1 = holeid->GetVariantValue(aid);
-        vtkVariant hid2 = holeid->GetVariantValue(this->PreviousPickedCellId);
-        if (hid1 == hid2)
-        {
-          toString << "\n Composite results:\n";
-          double totDist = 0;
-          double fromEnd = fromArray->GetTuple1(aid);
-          double toEnd = toArray->GetTuple1(aid);
-          double fromEnd2 = fromArray->GetTuple1(this->PreviousPickedCellId);
-          double toEnd2 = toArray->GetTuple1(this->PreviousPickedCellId);
-          if (fromEnd2 < fromEnd)
-          {
-            fromEnd = fromEnd2;
-          }
-          if (toEnd2 > toEnd)
-          {
-            toEnd = toEnd2;
-          }
-          toString << " From: " << fromEnd << " To: " << toEnd << " \n";
-
-          // OK for each cell that is between from and to
-          // and part of the same hid, accumulate the numeric data
-          for (vtkIdType i = 0; i < numcd; ++i)
-          {
-            bool insertedCells = false;
-            vtkDataArray* da = vtkDataArray::SafeDownCast(celld->GetAbstractArray(i));
-            if (da && da->GetName() && strcmp("vtkCompositingValid", da->GetName()) != 0 &&
-              strcmp("vtkConversionValid", da->GetName()) != 0 && da != fromArray && da != toArray)
-            {
-              // for each cell
-              totDist = 0;
-              int nc = da->GetNumberOfComponents();
-              double* result = new double[nc];
-              for (int ci = 0; ci < nc; ++ci)
-              {
-                result[ci] = 0.0;
-              }
-              for (vtkIdType cidx = 0; cidx < da->GetNumberOfTuples(); ++cidx)
-              {
-                vtkVariant hid3 = holeid->GetVariantValue(cidx);
-                double fromV = fromArray->GetTuple1(cidx);
-                double toV = toArray->GetTuple1(cidx);
-                double valid1 = validArray1->GetTuple1(cidx);
-                double valid2 = validArray2->GetTuple1(cidx);
-                if (hid3 == hid1 && fromV >= fromEnd && toV <= toEnd)
-                {
-                  if (!insertedCells)
-                  {
-                    this->SelectedCells.push_back(cidx);
-                  }
-                  if (valid1 != 0 && valid2 != 0)
-                  {
-                    double dist = toV - fromV;
-                    for (int ci = 0; ci < nc; ++ci)
-                    {
-                      result[ci] += dist * da->GetComponent(cidx, ci);
-                    }
-                    totDist += dist;
-                  }
-                }
-              }
-              insertedCells = true;
-              toString << " " << da->GetName() << ": ";
-              for (int ci = 0; ci < nc; ++ci)
-              {
-                toString << result[ci] / totDist << " \n";
-              }
-            }
-          }
-          toString << " TotalDistance: " << totDist << " \n";
-        }
-      }
-
-      toString << "\n";
-
-      this->CollaborationClient->ShowBillboard(toString.str());
-      is->ShowBillboard(toString.str());
-      is->ShowPickCell(cell, vtkProp3D::SafeDownCast(prop));
+      this->HandlePickEvent(caller, calldata);
     }
     break;
     case vtkCommand::InteractionEvent:
@@ -1481,11 +1610,6 @@ bool vtkPVOpenVRHelper::EventCallback(vtkObject* caller, unsigned long eventID, 
     break;
   }
   return false;
-}
-
-void vtkPVOpenVRHelper::ShowBillboard(std::string const& text)
-{
-  this->Style->ShowBillboard(text);
 }
 
 void vtkPVOpenVRHelper::GoToSavedLocation(int pos, double* collabTrans, double* collabDir)
