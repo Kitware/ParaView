@@ -1193,6 +1193,12 @@ int vtkCGNSReader::vtkPrivate::readBCData(const double nodeId, const int cellDim
   std::vector<double> childrenIds;
   CGNSRead::getNodeChildrenId(self->cgioNum, nodeId, childrenIds);
 
+  if (cellDim == 0 || physicalDim == 0)
+  {
+    return 1; // fake usage of cellDim and physicalDim that will be needed for vector detection
+              // later
+  }
+
   for (auto iter = childrenIds.begin(); iter != childrenIds.end(); ++iter)
   {
     char nodeName[CGIO_MAX_NAME_LENGTH + 1];
@@ -1249,12 +1255,13 @@ int vtkCGNSReader::vtkPrivate::readBCData(const double nodeId, const int cellDim
           std::vector<double> data;
           CGIOErrorSafe(cgio_get_name(self->cgioNum, *iterArray, nodeName));
           CGNSRead::readNodeDataAs<double>(self->cgioNum, *iterArray, data);
+          vtkIdType dataSize = std::static_cast<vtkIdType>(data.size());
           // Create vtk
           vtkNew<vtkDoubleArray> vtkBCdata;
           vtkBCdata->SetName(nodeName);
           vtkBCdata->SetNumberOfComponents(1);
           vtkBCdata->SetNumberOfTuples(numValues);
-          if (data.size() == 1)
+          if (dataSize == 1)
           {
             // This is an uniform boundary condition value
             for (vtkIdType idx = 0; idx < numValues; ++idx)
@@ -1262,7 +1269,7 @@ int vtkCGNSReader::vtkPrivate::readBCData(const double nodeId, const int cellDim
               vtkBCdata->SetTuple(idx, &data[0]);
             }
           }
-          else if (data.size() == numValues)
+          else if (dataSize == numValues)
           {
             for (vtkIdType idx = 0; idx < numValues; ++idx)
             {
@@ -1872,7 +1879,6 @@ int vtkCGNSReader::GetUnstructuredZone(
   //----------------------
   // Read List of zone children ids
   // and Get connectivities and solutions
-  char nodeLabel[CGIO_MAX_NAME_LENGTH + 1];
   std::vector<double> zoneChildId;
   CGNSRead::getNodeChildrenId(this->cgioNum, this->currentId, zoneChildId);
   //
@@ -1880,6 +1886,7 @@ int vtkCGNSReader::GetUnstructuredZone(
 
   for (std::size_t nn = 0; nn < zoneChildId.size(); nn++)
   {
+    char nodeLabel[CGIO_MAX_NAME_LENGTH + 1];
     cgio_get_label(cgioNum, zoneChildId[nn], nodeLabel);
     if (strcmp(nodeLabel, "Elements_t") == 0)
     {
@@ -2874,7 +2881,7 @@ int vtkCGNSReader::GetUnstructuredZone(
                     continue;
                   }
 
-                  for (vtkIdType idx = 0; idx < BCElementRead.size(); idx++)
+                  for (std::size_t idx = 0; idx < BCElementRead.size(); idx++)
                   {
                     if (BCElementRead[idx] == true)
                     {
