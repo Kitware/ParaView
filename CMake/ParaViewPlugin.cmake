@@ -555,7 +555,7 @@ function (paraview_add_plugin name)
   endif ()
 
   if (_paraview_add_plugin_MODULE_ARGS)
-    if (NOT _paraview_add_plugin_MODULES_FILES OR
+    if (NOT _paraview_add_plugin_MODULE_FILES OR
         NOT _paraview_add_plugin_MODULES)
       message(FATAL_ERROR
         "The `MODULE_ARGS` argument requires `MODULE_FILES` and `MODULES` to be provided.")
