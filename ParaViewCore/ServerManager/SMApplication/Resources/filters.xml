@@ -1516,6 +1516,40 @@
         <Documentation>This property specifies the input to the Clean to Grid
         filter.</Documentation>
       </InputProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetTolerance"
+                            default_values="0.0"
+                            name="Tolerance"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Documentation>When merging nearby points and
+        not using absolute tolerance (see ToleranceIsAbsolute property), this
+        property specifies the tolerance for performing merging as a fraction
+        of the length of the diagonal of the bounding box of the input data
+        set.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAbsoluteTolerance"
+                            default_values="1.0"
+                            name="AbsoluteTolerance"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>When merging nearby points and
+        using absolute tolerance (see ToleranceIsAbsolute property), this
+        property specifies the tolerance for performing merging in the spatial
+        units of the input data set.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetToleranceIsAbsolute"
+                         default_values="0"
+                         name="ToleranceIsAbsolute"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property determines whether to use absolute or
+        relative (a percentage of the bounding box) tolerance when performing
+        point merging.</Documentation>
+      </IntVectorProperty>
       <!-- End CleanUnstructuredGrid -->
     </SourceProxy>
     <!-- ==================================================================== -->

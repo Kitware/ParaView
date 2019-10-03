@@ -17,28 +17,26 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkCell.h"
 #include "vtkCellData.h"
 #include "vtkCollection.h"
+#include "vtkDataSet.h"
+#include "vtkIncrementalPointLocator.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkIntArray.h"
 #include "vtkMergePoints.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkPointSet.h"
 #include "vtkPoints.h"
+#include "vtkRectilinearGrid.h"
 #include "vtkUnstructuredGrid.h"
 
 vtkStandardNewMacro(vtkCleanUnstructuredGrid);
-
-//----------------------------------------------------------------------------
-vtkCleanUnstructuredGrid::vtkCleanUnstructuredGrid()
-{
-  this->Locator = vtkMergePoints::New();
-}
+vtkCxxSetObjectMacro(vtkCleanUnstructuredGrid, Locator, vtkIncrementalPointLocator);
 
 //----------------------------------------------------------------------------
 vtkCleanUnstructuredGrid::~vtkCleanUnstructuredGrid()
 {
-  this->Locator->Delete();
-  this->Locator = NULL;
+  this->SetLocator(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -77,13 +75,49 @@ int vtkCleanUnstructuredGrid::RequestData(vtkInformation* vtkNotUsed(request),
   // First, create a new points array that eliminate duplicate points.
   // Also create a mapping from the old point id to the new.
   vtkPoints* newPts = vtkPoints::New();
+
+  // Set the desired precision for the points in the output.
+  if (this->OutputPointsPrecision == vtkAlgorithm::DEFAULT_PRECISION)
+  {
+    // The logical behaviour would be to use the data type from the input.
+    // However, input is a vtkDataSet, which has no point data type; only the
+    // derived class vtkPointSet has a vtkPoints attribute, so only for that
+    // the logical practice can be applied, while for others (currently
+    // vtkImageData and vtkRectilinearGrid) the data type is the default
+    // for vtkPoints - which is VTK_FLOAT.
+    vtkPointSet* ps = vtkPointSet::SafeDownCast(input);
+    if (ps)
+    {
+      newPts->SetDataType(ps->GetPoints()->GetDataType());
+    }
+  }
+  else if (this->OutputPointsPrecision == vtkAlgorithm::SINGLE_PRECISION)
+  {
+    newPts->SetDataType(VTK_FLOAT);
+  }
+  else if (this->OutputPointsPrecision == vtkAlgorithm::DOUBLE_PRECISION)
+  {
+    newPts->SetDataType(VTK_DOUBLE);
+  }
+
   vtkIdType num = input->GetNumberOfPoints();
   vtkIdType id;
   vtkIdType newId;
   vtkIdType* ptMap = new vtkIdType[num];
   double pt[3];
 
-  this->Locator->InitPointInsertion(newPts, input->GetBounds(), num);
+  this->CreateDefaultLocator(input);
+  if (this->ToleranceIsAbsolute)
+  {
+    this->Locator->SetTolerance(this->AbsoluteTolerance);
+  }
+  else
+  {
+    this->Locator->SetTolerance(this->Tolerance * input->GetLength());
+  }
+  double bounds[6];
+  input->GetBounds(bounds);
+  this->Locator->InitPointInsertion(newPts, bounds);
 
   vtkIdType progressStep = num / 100;
   if (progressStep == 0)
@@ -142,8 +176,57 @@ int vtkCleanUnstructuredGrid::RequestData(vtkInformation* vtkNotUsed(request),
   return 1;
 }
 
+//----------------------------------------------------------------------------
 int vtkCleanUnstructuredGrid::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkCleanUnstructuredGrid::CreateDefaultLocator(vtkDataSet* input)
+{
+  double tol;
+  if (this->ToleranceIsAbsolute)
+  {
+    tol = this->AbsoluteTolerance;
+  }
+  else
+  {
+    if (input)
+    {
+      tol = this->Tolerance * input->GetLength();
+    }
+    else
+    {
+      tol = this->Tolerance;
+    }
+  }
+
+  if (this->Locator == nullptr)
+  {
+    if (tol == 0.0)
+    {
+      this->Locator = vtkMergePoints::New();
+      this->Locator->Register(this);
+      this->Locator->Delete();
+    }
+    else
+    {
+      this->Locator = vtkPointLocator::New();
+      this->Locator->Register(this);
+      this->Locator->Delete();
+    }
+  }
+  else
+  {
+    // check that the tolerance wasn't changed from zero to non-zero
+    if ((tol > 0.0) && (this->GetLocator()->GetTolerance() == 0.0))
+    {
+      this->SetLocator(nullptr);
+      this->Locator = vtkPointLocator::New();
+      this->Locator->Register(this);
+      this->Locator->Delete();
+    }
+  }
 }
