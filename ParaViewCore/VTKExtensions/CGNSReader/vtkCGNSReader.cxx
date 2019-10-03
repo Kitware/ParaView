@@ -228,9 +228,13 @@ public:
         {
           this->Location = CGNS_ENUMV(FaceCenter);
         }
+        else if (location == "CellCenter")
+        {
+          this->Location = CGNS_ENUMV(CellCenter); // Volumic Boundary Condition
+        }
         else
         {
-          throw CGIOUnsupported("Unsupported location" + location);
+          throw CGIOUnsupported("Unsupported location " + location);
         }
       }
     }
@@ -366,7 +370,7 @@ public:
         }
         else
         {
-          throw CGIOUnsupported("Unsupported unstrured grid location" + location);
+          throw CGIOUnsupported("Unsupported unstrured grid location " + location);
         }
       }
     }
