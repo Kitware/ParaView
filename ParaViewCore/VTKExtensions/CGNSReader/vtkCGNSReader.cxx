@@ -1259,7 +1259,7 @@ int vtkCGNSReader::vtkPrivate::readBCData(const double nodeId, const int cellDim
           std::vector<double> data;
           CGIOErrorSafe(cgio_get_name(self->cgioNum, *iterArray, nodeName));
           CGNSRead::readNodeDataAs<double>(self->cgioNum, *iterArray, data);
-          vtkIdType dataSize = std::static_cast<vtkIdType>(data.size());
+          vtkIdType dataSize = static_cast<vtkIdType>(data.size());
           // Create vtk
           vtkNew<vtkDoubleArray> vtkBCdata;
           vtkBCdata->SetName(nodeName);
