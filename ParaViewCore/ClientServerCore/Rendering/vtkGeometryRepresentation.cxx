@@ -377,7 +377,7 @@ int vtkGeometryRepresentation::ProcessViewRequest(
     this->Actor->SetEnableLOD(lod ? 1 : 0);
     this->UpdateColoringParameters();
 
-    if (this->BlockAttributeTime < data->GetMTime() || this->BlockAttrChanged)
+    if (data && (this->BlockAttributeTime < data->GetMTime() || this->BlockAttrChanged))
     {
       this->UpdateBlockAttributes(this->Mapper);
       this->BlockAttributeTime.Modified();
