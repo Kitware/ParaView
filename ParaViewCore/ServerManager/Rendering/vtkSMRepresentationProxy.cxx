@@ -356,7 +356,7 @@ vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetProminentValuesInf
   bool largerFractionOrLessCertain = this->ProminentValuesFraction < fraction ||
     this->ProminentValuesUncertainty > uncertaintyAllowed;
   if (!this->ProminentValuesInformationValid || differentAttribute || invalid ||
-    largerFractionOrLessCertain || force)
+    largerFractionOrLessCertain || this->ProminentValuesInformation->GetForce() != force)
   {
     vtkTimerLog::MarkStartEvent("vtkSMRepresentationProxy::GetProminentValues");
     this->CreateVTKObjects();
