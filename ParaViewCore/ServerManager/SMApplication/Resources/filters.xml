@@ -13518,7 +13518,7 @@ Every Nth Point.
              group="filters"
              id="2429"
              servers="1"
-             type="GlyphLegacy">
+             type="Glyph">
         <Property id="2429.Input"
                   name="Input"
                   number_of_elements="1">
@@ -13549,8 +13549,8 @@ Every Nth Point.
                   number_of_elements="1">
           <Element index="0" value="0"/>
         </Property>
-        <Property id="2429.Scalars"
-                  name="Scalars"
+        <Property id="2429.ScaleArray"
+                  name="ScalarArray"
                   number_of_elements="5">
           <Element index="0"
                    value="" />
@@ -13563,8 +13563,8 @@ Every Nth Point.
           <Element index="4"
                    value="" />
         </Property>
-        <Property id="2429.Vectors"
-                  name="Vectors"
+        <Property id="2429.OrientationArray"
+                  name="OrientationArray"
                   number_of_elements="5">
           <Element index="0"
                    value="1" />
@@ -13577,26 +13577,20 @@ Every Nth Point.
           <Element index="4"
                    value="Normals" />
         </Property>
-        <Property id="2429.SetOrient"
-                  name="SetOrient"
-                  number_of_elements="1">
-          <Element index="0"
-                   value="1" />
-          <Domain id="2429.SetOrient.bool"
-                  name="bool" />
-        </Property>
         <Property id="2429.SetScaleFactor"
                   name="SetScaleFactor"
                   number_of_elements="1">
           <Element index="0"
                    value="1.0" />
         </Property>
+        <!--
         <Property id="2429.ScaleMode"
                   name="ScaleMode"
                   number_of_elements="1">
           <Element index="0"
                    value="3" />
         </Property>
+        -->
         <Property id="2429.Source"
                   name="Source"
                   number_of_elements="1">
