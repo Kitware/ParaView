@@ -31,6 +31,7 @@
 #include <vector> // for ivar
 
 class pqOpenVRControls;
+class vtkActor;
 class vtkBoxWidget2;
 class vtkCallbackCommand;
 class vtkDataSet;
@@ -43,6 +44,7 @@ class vtkOpenVRPanelRepresentation;
 class vtkOpenVRRenderWindowInteractor;
 class vtkOpenVRRenderer;
 class vtkOpenVRRenderWindow;
+class vtkPlaneSource;
 class vtkPropCollection;
 class vtkPVOpenVRCollaborationClient;
 class vtkPVDataRepresentation;
@@ -52,6 +54,8 @@ class vtkQWidgetWidget;
 class vtkSMProxy;
 class vtkSMProxyLocator;
 class vtkSMViewProxy;
+class vtkTextActor3D;
+class vtkTexture;
 class vtkTransform;
 
 // helper class to store information per location
@@ -138,7 +142,7 @@ public:
   //@}
 
   // show the billboard with the provided text
-  void ShowBillboard(std::string const& text);
+  void ShowBillboard(std::string const& text, vtkTexture* t = nullptr);
 
   // add a point to the currently selected source in PV
   // if it accepts points
@@ -190,6 +194,9 @@ protected:
 
   vtkNew<vtkOpenVRPanelWidget> NavWidget;
   vtkNew<vtkOpenVRPanelRepresentation> NavRepresentation;
+  vtkNew<vtkTextActor3D> TextActor3D;
+  vtkNew<vtkPlaneSource> ImagePlane;
+  vtkNew<vtkActor> ImageActor;
 
   std::set<vtkImplicitPlaneWidget2*> CropPlanes;
   std::set<vtkBoxWidget2*> ThickCrops;
@@ -198,6 +205,9 @@ protected:
   vtkOpenVRRenderWindowInteractor* Interactor;
   bool InteractorEventCallback(vtkObject* object, unsigned long event, void* calldata);
   bool EventCallback(vtkObject* object, unsigned long event, void* calldata);
+
+  void HideBillboard();
+  void HandlePickEvent(vtkObject* caller, void* calldata);
 
   vtkDistanceWidget* DistanceWidget;
   vtkPVRenderView* View;
