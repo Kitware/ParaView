@@ -30,133 +30,13 @@
 #include "vtkSetGet.h"
 #include "vtkUnstructuredGrid.h"
 
+#include <limits>
+
 vtkStandardNewMacro(vtkPVThreshold);
 
 //----------------------------------------------------------------------------
-vtkPVThreshold::vtkPVThreshold()
-{
-  this->LowerThreshold = 0.0;
-  this->UpperThreshold = 1.0;
-  this->ThresholdMethod = THRESHOLD_BETWEEN;
-  this->AllScalars = 1;
-  this->AttributeMode = -1;
-  this->ComponentMode = VTK_COMPONENT_MODE_USE_SELECTED;
-  this->SelectedComponent = 0;
-  this->OutputPointsPrecision = DEFAULT_PRECISION;
-
-  // by default process active point scalars
-  this->SetInputArrayToProcess(
-    0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS, vtkDataSetAttributes::SCALARS);
-
-  this->UseContinuousCellRange = 0;
-  this->Invert = false;
-
-  this->SetNumberOfInputPorts(1);
-  this->SetNumberOfOutputPorts(1);
-}
-
-//----------------------------------------------------------------------------
-vtkPVThreshold::~vtkPVThreshold()
-{
-}
-
-//----------------------------------------------------------------------------
-void vtkPVThreshold::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-  os << indent << "Attribute Mode: " << this->GetAttributeModeAsString() << endl;
-  os << indent << "Component Mode: " << this->GetComponentModeAsString() << endl;
-  os << indent << "Selected Component: " << this->SelectedComponent << endl;
-
-  os << indent << "All Scalars: " << this->AllScalars << "\n";
-
-  os << indent << "Lower Threshold: " << this->LowerThreshold << "\n";
-  os << indent << "Upper Threshold: " << this->UpperThreshold << "\n";
-  os << indent << "Precision of the output points: " << this->OutputPointsPrecision << "\n";
-  os << indent << "Use Continuous Cell Range: " << this->UseContinuousCellRange << endl;
-}
-
-//----------------------------------------------------------------------------
-const char* vtkPVThreshold::GetAttributeModeAsString()
-{
-  if (this->AttributeMode == VTK_ATTRIBUTE_MODE_DEFAULT)
-  {
-    return "Default";
-  }
-  else if (this->AttributeMode == VTK_ATTRIBUTE_MODE_USE_POINT_DATA)
-  {
-    return "UsePointData";
-  }
-  else
-  {
-    return "UseCellData";
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVThreshold::SetInputData(vtkDataObject* input)
-{
-  this->SetInputDataInternal(0, input);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVThreshold::ThresholdByUpper(double upper)
-{
-  if (this->LowerThreshold != -std::numeric_limits<double>::infinity() ||
-    this->UpperThreshold != upper)
-  {
-    this->LowerThreshold = -std::numeric_limits<double>::infinity();
-    this->UpperThreshold = upper;
-    this->Modified();
-  }
-  this->ThresholdMethod = THRESHOLD_BY_UPPER;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVThreshold::ThresholdByLower(double lower)
-{
-  if (this->LowerThreshold != lower ||
-    this->UpperThreshold != std::numeric_limits<double>::infinity())
-  {
-    this->LowerThreshold = lower;
-    this->UpperThreshold = std::numeric_limits<double>::infinity();
-    this->Modified();
-  }
-  this->ThresholdMethod = THRESHOLD_BY_LOWER;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVThreshold::ThresholdBetween(double lower, double upper)
-{
-  if (this->LowerThreshold != lower || this->UpperThreshold != upper)
-  {
-    this->LowerThreshold = lower;
-    this->UpperThreshold = upper;
-    this->Modified();
-  }
-  this->ThresholdMethod = THRESHOLD_BETWEEN;
-}
-
-//----------------------------------------------------------------------------
-const char* vtkPVThreshold::GetComponentModeAsString()
-{
-  if (this->ComponentMode == VTK_COMPONENT_MODE_USE_SELECTED)
-  {
-    return "UseSelected";
-  }
-  else if (this->ComponentMode == VTK_COMPONENT_MODE_USE_ANY)
-  {
-    return "UseAny";
-  }
-  else
-  {
-    return "UseAll";
-  }
-}
-
-//----------------------------------------------------------------------------
 int vtkPVThreshold::RequestData(
-  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
 
@@ -186,44 +66,7 @@ int vtkPVThreshold::RequestData(
     vtkErrorMacro(<< "Failed to get output data object.");
   }
 
-  if (vtkDataSet::SafeDownCast(inDataObj))
-  {
-    vtkNew<vtkThreshold> thresholdFilter;
-    thresholdFilter->SetSelectedComponent(this->SelectedComponent);
-    switch (this->ThresholdMethod)
-    {
-      case THRESHOLD_BY_LOWER:
-        thresholdFilter->ThresholdByLower(this->LowerThreshold);
-        break;
-      case THRESHOLD_BY_UPPER:
-        thresholdFilter->ThresholdByUpper(this->UpperThreshold);
-        break;
-      case THRESHOLD_BETWEEN:
-        thresholdFilter->ThresholdBetween(this->LowerThreshold, this->UpperThreshold);
-        break;
-      default:
-        vtkErrorMacro(<< "Could not find threshold method");
-        return 0;
-    }
-    thresholdFilter->SetAttributeMode(this->AttributeMode);
-    thresholdFilter->SetComponentMode(this->ComponentMode);
-    thresholdFilter->SetAllScalars(this->AllScalars);
-    thresholdFilter->SetUseContinuousCellRange(this->UseContinuousCellRange);
-    thresholdFilter->SetInvert(this->Invert);
-    thresholdFilter->SetOutputPointsPrecision(this->OutputPointsPrecision);
-
-    vtkDataObject* inputClone = inDataObj->NewInstance();
-    inputClone->ShallowCopy(inDataObj);
-    thresholdFilter->SetInputData(0, inputClone);
-    inputClone->FastDelete();
-
-    thresholdFilter->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
-    thresholdFilter->Update();
-    vtkUnstructuredGrid::SafeDownCast(outDataObj)->ShallowCopy(thresholdFilter->GetOutput(0));
-
-    return 1;
-  }
-  else if (vtkHyperTreeGrid::SafeDownCast(inDataObj))
+  if (vtkHyperTreeGrid::SafeDownCast(inDataObj))
   {
     vtkNew<vtkHyperTreeGridThreshold> thresholdFilter;
     thresholdFilter->ThresholdBetween(this->LowerThreshold, this->UpperThreshold);
@@ -239,11 +82,7 @@ int vtkPVThreshold::RequestData(
 
     return 1;
   }
-  else
-  {
-    vtkErrorMacro(<< "Failed to process data: needs to be vtkHyperTreeGrid or vtkDataSet");
-  }
-  return 0;
+  return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 
 //----------------------------------------------------------------------------
@@ -273,10 +112,9 @@ int vtkPVThreshold::RequestDataObject(vtkInformation* vtkNotUsed(request),
     return 0;
   }
 
-  vtkHyperTreeGrid* input = vtkHyperTreeGrid::GetData(inInfo);
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  if (input)
+  if (vtkHyperTreeGrid::GetData(inInfo))
   {
     vtkHyperTreeGrid* output = vtkHyperTreeGrid::GetData(outInfo);
     if (!output)
@@ -289,7 +127,7 @@ int vtkPVThreshold::RequestDataObject(vtkInformation* vtkNotUsed(request),
     }
     return 1;
   }
-  else
+  else if (vtkDataSet::GetData(inInfo))
   {
     vtkDataSet* output = vtkDataSet::GetData(outInfo);
     if (!output)
@@ -302,14 +140,13 @@ int vtkPVThreshold::RequestDataObject(vtkInformation* vtkNotUsed(request),
     }
     return 1;
   }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
-int vtkPVThreshold::FillInputPortInformation(int, vtkInformation* info)
+int vtkPVThreshold::FillInputPortInformation(int port, vtkInformation* info)
 {
-  vtkInformationStringVectorKey::SafeDownCast(
-    info->GetKey(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE()))
-    ->Append(info, "vtkDataSet");
+  this->Superclass::FillInputPortInformation(port, info);
   vtkInformationStringVectorKey::SafeDownCast(
     info->GetKey(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE()))
     ->Append(info, "vtkHyperTreeGrid");
@@ -321,9 +158,4 @@ int vtkPVThreshold::FillOutputPortInformation(int vtkNotUsed(port), vtkInformati
 {
   info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
   return 1;
-}
-
-int vtkPVThreshold::GetOutputPointsPrecision() const
-{
-  return this->OutputPointsPrecision;
 }
