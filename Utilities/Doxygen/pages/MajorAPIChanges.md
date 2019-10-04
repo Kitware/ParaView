@@ -4,6 +4,60 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
+Changes in 5.8
+---------------
+
+###Changes to caching in representation###
+
+Previously, caching for animation playback was handled by representations using
+`vtkPVCacheKeeper` filter in the representation pipelines. This had several
+issues:
+
+1. Each representations had to explicitly handle it, which was error-prone and
+   often ended up not being used correctly.
+2. Caching happened on the pre-data-movement i.e. during animation playback, the
+   geometry still needed to be delivered to the rendering nodes.
+3. Cache was incapable of distinguishing between pipelines that were modified
+   during animation playback and those that weren't. Consequently, animations
+   that simply moved the camera still ended up executing the representation
+   pipelines for each time step.
+4. Not all views / representations participated in caching, only render view
+   did. Thus, if you had an animation that used a Spreadsheet view, for example,
+   you'd get no benefit from caching.
+5. Even with caching enabled, animation playback was slow.
+
+
+With 5.8, we have refactored handling of caches in views and representations.
+Major highlights/changes are as follows:
+
+1. Caching is now the responsibility of the view. vtkPVDataDeliveryManager
+   handles caching along with data movement for views. All views, not just
+   render views, use vtkPVDataDeliveryManager (or subclass) to handle data
+   movement from data-processing nodes to rendering nodes. Representations
+   like `vtkChartRepresentation`, `vtkSpreadSheetRepresentation` can no longer
+   do data movement in `RequestData` but instead have to follow the same pattern
+   as `vtkGeometryRepresentation` and other render view representations to let
+   the view (using vtkPVDataDeliveryManager) handle data movement.
+   Consequently, if your `vtkPVDataRepresentation` subclass used a
+   `vtkPVCacheKeeper` in your representation pipeline, you can simply remove it.
+   Representation provide prepared data to the view using `vtkPVView::SetPiece`
+   in `vtkPVView::REQUEST_UPDATE` pass, and obtain delivered data for rendering
+   using `vtkPVView::GetDeliveredPiece` in `vtkPVView::REQUEST_RENDER`
+   (`vtkPVRenderView::GetPieceProducer` is still supported, but we encourage developers
+   to prefer the new `GetDeliveredPiece` API instead).
+2. When cached data is available, `REQUEST_UPDATE` request will no longer result
+   in a call to `vtkPVDataRepresentation::RequestData`. The representation will
+   be provided the cached data during `REQUEST_RENDER` pass. Note, if using
+   cache, you may get data that has older `MTime`, thus representation should
+   not assume monotonically increasing m-times for delivered data. Rendering
+   pipelines in representations can thus rely on the mtime and data pointer to
+   build their own rendering objects cache, if needed.
+3. Representations always have to let the view do data transfer and obtain the
+   data to render from the view and never simply connect the data prepared in
+   `RequestData` to mappers, for example. This was acceptable in certain cases
+   before, but not longer supported since `RequestData` will not get called
+   when cache data is being used.
+
 Changes in 5.7
 --------------
 
