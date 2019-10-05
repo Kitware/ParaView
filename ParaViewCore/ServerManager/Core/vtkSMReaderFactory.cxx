@@ -1,5 +1,4 @@
 /*=========================================================================
-
   Program:   ParaView
   Module:    vtkSMReaderFactory.cxx
 
@@ -16,6 +15,7 @@
 
 #include "vtkCallbackCommand.h"
 #include "vtkClientServerStream.h"
+#include "vtkCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
@@ -31,6 +31,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkStringList.h"
 
+#include <algorithm>
 #include <assert.h>
 #include <list>
 #include <set>
@@ -60,16 +61,17 @@ public:
     std::string Group;
     std::string Name;
     std::string Label;
-    std::vector<std::string> Extensions;
-    std::vector<vtksys::RegularExpression> FilenameRegExs;
-    std::vector<std::string> FilenamePatterns;
-    std::string Description;
-    bool IsDirectory;
-
-    vtkValue()
-      : IsDirectory(false)
+    struct FileEntryHint
     {
-    }
+      std::vector<std::string> Extensions;
+      std::vector<vtksys::RegularExpression> FilenameRegExs;
+      std::vector<std::string> FilenamePatterns;
+      std::string Description;
+      bool IsDirectory = false;
+    };
+    std::vector<FileEntryHint> FileEntryHints;
+
+    vtkValue() {}
 
     vtkSMSessionProxyManager* GetProxyManager(vtkSMSession* session)
     {
@@ -90,46 +92,57 @@ public:
       {
         return;
       }
-      vtkPVXMLElement* rfHint = prototype->GetHints()->FindNestedElementByName("ReaderFactory");
-      if (!rfHint)
-      {
-        return;
-      }
-
-      this->Extensions.clear();
-      this->FilenamePatterns.clear();
-      this->FilenameRegExs.clear();
-      const char* exts = rfHint->GetAttribute("extensions");
-      if (exts)
-      {
-        vtksys::SystemTools::Split(exts, this->Extensions, ' ');
-      }
-      const char* filename_patterns = rfHint->GetAttribute("filename_patterns");
-      if (filename_patterns)
-      {
-        vtksys::SystemTools::Split(filename_patterns, this->FilenamePatterns, ' ');
-        std::vector<std::string>::iterator iter;
-        // convert the wild-card based patterns to regular expressions.
-        for (iter = this->FilenamePatterns.begin(); iter != this->FilenamePatterns.end(); iter++)
-        {
-          std::string regex = *iter;
-          ::string_replace(regex, '.', "\\.");
-          ::string_replace(regex, '?', ".");
-          ::string_replace(regex, '*', ".?");
-          this->FilenameRegExs.push_back(vtksys::RegularExpression(regex.c_str()));
-        }
-      }
       this->Label = prototype->GetXMLLabel();
-      this->Description = rfHint->GetAttribute("file_description");
 
-      int is_directory = 0;
-      if (rfHint->GetScalarAttribute("is_directory", &is_directory))
+      vtkNew<vtkCollection> rfHints;
+      prototype->GetHints()->FindNestedElementByName("ReaderFactory", rfHints.GetPointer());
+      int size = rfHints->GetNumberOfItems();
+      this->FileEntryHints.clear();
+      this->FileEntryHints.reserve(size);
+      for (int idx = 0; idx < size; ++idx)
       {
-        this->IsDirectory = (is_directory == 1);
-      }
-      else
-      {
-        this->IsDirectory = false;
+        vtkPVXMLElement* rfHint = vtkPVXMLElement::SafeDownCast(rfHints->GetItemAsObject(idx));
+
+        FileEntryHint hint;
+
+        // Description
+        hint.Description = rfHint->GetAttribute("file_description");
+
+        // Extensions
+        const char* exts = rfHint->GetAttribute("extensions");
+        if (exts)
+        {
+          vtksys::SystemTools::Split(exts, hint.Extensions, ' ');
+        }
+
+        // Patterns
+        const char* filename_patterns = rfHint->GetAttribute("filename_patterns");
+        if (filename_patterns)
+        {
+          vtksys::SystemTools::Split(filename_patterns, hint.FilenamePatterns, ' ');
+          // convert the wild-card based patterns to regular expressions.
+          for (auto item : hint.FilenamePatterns)
+          {
+            ::string_replace(item, '.', "\\.");
+            ::string_replace(item, '?', ".");
+            ::string_replace(item, '*', ".?");
+            hint.FilenameRegExs.emplace_back(vtksys::RegularExpression(item.c_str()));
+          }
+        }
+
+        // Directory
+        int is_directory = 0;
+        if (rfHint->GetScalarAttribute("is_directory", &is_directory))
+        {
+          hint.IsDirectory = (is_directory == 1);
+        }
+        else
+        {
+          hint.IsDirectory = false;
+        }
+
+        // Add the completed hint
+        this->FileEntryHints.emplace_back(std::move(hint));
       }
     }
 
@@ -149,10 +162,10 @@ public:
 
     // Tests if 'any' of the strings in extensions is contained in
     // this->Extensions.
-    bool ExtensionTest(const std::vector<std::string>& extensions);
+    bool ExtensionTest(const std::vector<std::string>& extensions) const;
 
     // Tests if the FilenameRegEx matches the filename.
-    bool FilenameRegExTest(const char* filename);
+    bool FilenameRegExTest(const char* filename) const;
   };
 
   void BuildExtensions(const char* filename, std::vector<std::string>& extensions)
@@ -209,22 +222,18 @@ std::set<std::pair<std::string, std::string> > vtkSMReaderFactory::vtkInternals:
 
 //----------------------------------------------------------------------------
 bool vtkSMReaderFactory::vtkInternals::vtkValue::ExtensionTest(
-  const std::vector<std::string>& extensions)
+  const std::vector<std::string>& extensions) const
 {
-  if (this->Extensions.size() == 0)
+  for (auto& hint : this->FileEntryHints)
   {
-    return false;
-  }
-
-  std::vector<std::string>::const_iterator iter1;
-  for (iter1 = extensions.begin(); iter1 != extensions.end(); ++iter1)
-  {
-    std::vector<std::string>::const_iterator iter2;
-    for (iter2 = this->Extensions.begin(); iter2 != this->Extensions.end(); ++iter2)
+    for (auto& hint_ext : hint.Extensions)
     {
-      if (*iter1 == *iter2)
+      for (auto& ext : extensions)
       {
-        return true;
+        if (ext == hint_ext)
+        {
+          return true;
+        }
       }
     }
   }
@@ -232,19 +241,17 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::ExtensionTest(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMReaderFactory::vtkInternals::vtkValue::FilenameRegExTest(const char* filename)
+bool vtkSMReaderFactory::vtkInternals::vtkValue::FilenameRegExTest(const char* filename) const
 {
-  if (this->FilenameRegExs.size() == 0)
+  for (auto& hint : this->FileEntryHints)
   {
-    return false;
-  }
-
-  std::vector<vtksys::RegularExpression>::iterator iter;
-  for (iter = this->FilenameRegExs.begin(); iter != this->FilenameRegExs.end(); ++iter)
-  {
-    if (iter->find(filename))
+    for (auto& hint_regex : hint.FilenameRegExs)
     {
-      return true;
+      vtksys::RegularExpressionMatch match;
+      if (hint_regex.find(filename, match))
+      {
+        return true;
+      }
     }
   }
   return false;
@@ -262,14 +269,16 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(const char* filenam
     return false;
   }
 
-  if (is_dir != this->IsDirectory)
+  this->FillInformation(session);
+
+  if (std::none_of(this->FileEntryHints.begin(), this->FileEntryHints.end(),
+        [is_dir](const FileEntryHint& hint) -> bool { return hint.IsDirectory == is_dir; }))
   {
     return false;
   }
 
   if (!skip_filename_test)
   {
-    this->FillInformation(session);
     if (!this->ExtensionTest(extensions) && !this->FilenameRegExTest(filename))
     {
       return false;
@@ -285,6 +294,7 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(const char* filenam
   proxy->Delete();
   return canRead;
 }
+
 //----------------------------------------------------------------------------
 // Use VTK's object factory to construct new instances. This allows derived
 // applications to derive from vtkSMReaderFactory and implement changes to its
@@ -335,10 +345,9 @@ void vtkSMReaderFactory::UpdateAvailableReaders()
     vtkSMSessionProxyManager* sessionProxyManager = session->GetSessionProxyManager();
     vtkSMProxyDefinitionManager* pdm = sessionProxyManager->GetProxyDefinitionManager();
 
-    for (std::set<std::string>::iterator group = this->Internals->Groups.begin();
-         group != this->Internals->Groups.end(); group++)
+    for (auto& group : this->Internals->Groups)
     {
-      vtkPVProxyDefinitionIterator* iter = pdm->NewSingleGroupIterator(group->c_str());
+      vtkPVProxyDefinitionIterator* iter = pdm->NewSingleGroupIterator(group.c_str());
       for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
       {
         vtkPVXMLElement* hints =
@@ -385,13 +394,13 @@ void vtkSMReaderFactory::GetGroups(vtkStringList* groups)
   if (groups)
   {
     groups->RemoveAllItems();
-    for (std::set<std::string>::iterator group = this->Internals->Groups.begin();
-         group != this->Internals->Groups.end(); group++)
+    for (auto& group : this->Internals->Groups)
     {
-      groups->AddString(group->c_str());
+      groups->AddString(group.c_str());
     }
   }
 }
+
 //----------------------------------------------------------------------------
 void vtkSMReaderFactory::RegisterPrototype(const char* xmlgroup, const char* xmlname)
 {
@@ -423,17 +432,17 @@ vtkStringList* vtkSMReaderFactory::GetReaders(const char* filename, vtkSMSession
   this->Internals->BuildExtensions(filename, extensions);
 
   const bool is_dir = vtkSMReaderFactory::GetFilenameIsDirectory(filename, session);
-  vtkInternals::PrototypesType::iterator iter;
-  for (iter = this->Internals->Prototypes.begin(); iter != this->Internals->Prototypes.end();
-       ++iter)
+  for (auto& proto : this->Internals->Prototypes)
   {
-    if (iter->second.CanCreatePrototype(session) &&
-      iter->second.CanReadFile(filename, is_dir, extensions, session))
+    if (proto.second.CanCreatePrototype(session))
     {
-      iter->second.FillInformation(session);
-      this->Readers->AddString(iter->second.Group.c_str());
-      this->Readers->AddString(iter->second.Name.c_str());
-      this->Readers->AddString(iter->second.Label.c_str());
+      proto.second.FillInformation(session);
+      if (proto.second.CanReadFile(filename, is_dir, extensions, session))
+      {
+        this->Readers->AddString(proto.second.Group.c_str());
+        this->Readers->AddString(proto.second.Name.c_str());
+        this->Readers->AddString(proto.second.Label.c_str());
+      }
     }
   }
 
@@ -454,17 +463,17 @@ vtkStringList* vtkSMReaderFactory::GetPossibleReaders(const char* filename, vtkS
   // purposefully set the extensions to empty, since we don't want the extension
   // test to be used for this case.
 
-  vtkInternals::PrototypesType::iterator iter;
-  for (iter = this->Internals->Prototypes.begin(); iter != this->Internals->Prototypes.end();
-       ++iter)
+  for (auto& proto : this->Internals->Prototypes)
   {
-    if (iter->second.CanCreatePrototype(session) &&
-      (empty_filename || iter->second.CanReadFile(filename, is_dir, extensions, session, true)))
+    if (proto.second.CanCreatePrototype(session))
     {
-      iter->second.FillInformation(session);
-      this->Readers->AddString(iter->second.Group.c_str());
-      this->Readers->AddString(iter->second.Name.c_str());
-      this->Readers->AddString(iter->second.Label.c_str());
+      proto.second.FillInformation(session);
+      if (empty_filename || proto.second.CanReadFile(filename, is_dir, extensions, session, true))
+      {
+        this->Readers->AddString(proto.second.Group.c_str());
+        this->Readers->AddString(proto.second.Name.c_str());
+        this->Readers->AddString(proto.second.Label.c_str());
+      }
     }
   }
 
@@ -487,16 +496,17 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMSession* session
   std::vector<std::string> extensions;
   this->Internals->BuildExtensions(filename, extensions);
 
-  vtkInternals::PrototypesType::iterator iter;
-  for (iter = this->Internals->Prototypes.begin(); iter != this->Internals->Prototypes.end();
-       ++iter)
+  for (auto& proto : this->Internals->Prototypes)
   {
-    if (iter->second.CanCreatePrototype(session) &&
-      iter->second.CanReadFile(filename, is_dir, extensions, session))
+    if (proto.second.CanCreatePrototype(session))
     {
-      this->SetReaderGroup(iter->second.Group.c_str());
-      this->SetReaderName(iter->second.Name.c_str());
-      return true;
+      proto.second.FillInformation(session);
+      if (proto.second.CanReadFile(filename, is_dir, extensions, session))
+      {
+        this->SetReaderGroup(proto.second.Group.c_str());
+        this->SetReaderName(proto.second.Name.c_str());
+        return true;
+      }
     }
   }
   return false;
@@ -524,48 +534,47 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
 
   std::set<std::string> sorted_types;
 
-  vtkInternals::PrototypesType::iterator iter;
-  for (iter = this->Internals->Prototypes.begin(); iter != this->Internals->Prototypes.end();
-       ++iter)
+  for (auto& proto : this->Internals->Prototypes)
   {
-    if (iter->second.CanCreatePrototype(session))
+    if (proto.second.CanCreatePrototype(session))
     {
-      iter->second.FillInformation(session);
-      std::string ext_list;
-      if (iter->second.Extensions.size() > 0)
+      proto.second.FillInformation(session);
+      for (auto& hint : proto.second.FileEntryHints)
       {
-        ext_list = ::vtkJoin(iter->second.Extensions, "*.", " ");
-      }
+        std::string ext_list;
+        if (hint.Extensions.size() > 0)
+        {
+          ext_list = ::vtkJoin(hint.Extensions, "*.", " ");
+        }
 
-      if (iter->second.FilenameRegExs.size() > 0)
-      {
-        std::string ext_join = ::vtkJoin(iter->second.FilenamePatterns, "", " ");
+        if (hint.FilenameRegExs.size() > 0)
+        {
+          std::string ext_join = ::vtkJoin(hint.FilenamePatterns, "", " ");
+          if (ext_list.size() > 0)
+          {
+            ext_list += " ";
+            ext_list += ext_join;
+          }
+          else
+          {
+            ext_list = ext_join;
+          }
+        }
         if (ext_list.size() > 0)
         {
-          ext_list += " ";
-          ext_list += ext_join;
+          std::ostringstream stream;
+          stream << hint.Description << " (" << ext_list << ")";
+          sorted_types.insert(stream.str());
+          all_types << ext_list << " ";
         }
-        else
-        {
-          ext_list = ext_join;
-        }
-      }
-
-      if (ext_list.size() > 0)
-      {
-        std::ostringstream stream;
-        stream << iter->second.Description << " (" << ext_list << ")";
-        sorted_types.insert(stream.str());
-        all_types << ext_list << " ";
       }
     }
   }
   all_types << ")";
 
-  std::set<std::string>::iterator iter2;
-  for (iter2 = sorted_types.begin(); iter2 != sorted_types.end(); ++iter2)
+  for (auto types : sorted_types)
   {
-    all_types << ";;" << (*iter2);
+    all_types << ";;" << types;
   }
   this->Internals->SupportedFileTypes = all_types.str();
   return this->Internals->SupportedFileTypes.c_str();
