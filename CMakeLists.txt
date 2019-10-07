@@ -816,8 +816,7 @@ else ()
     REQUIRES_MODULES    vtk_required_modules
     UNRECOGNIZED_MODULES vtk_unrecognized_modules
     WANT_BY_DEFAULT     OFF
-    ENABLE_TESTS        "${vtk_enable_tests}"
-    HIDE_MODULES_FROM_CACHE ON)
+    ENABLE_TESTS        "${vtk_enable_tests}")
 
   if (vtk_required_modules OR vtk_unrecognized_modules)
     message(FATAL_ERROR
