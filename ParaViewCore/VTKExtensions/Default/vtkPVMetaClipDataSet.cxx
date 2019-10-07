@@ -113,7 +113,10 @@ void vtkPVMetaClipDataSet::SetUseValueAsOffset(int value)
 //----------------------------------------------------------------------------
 void vtkPVMetaClipDataSet::PreserveInputCells(int keepCellAsIs)
 {
-  this->SetActiveFilter(keepCellAsIs);
+  if (this->Internal->Clip->GetClipFunction() == this->ImplicitFunctions[METACLIP_DATASET])
+  {
+    this->SetActiveFilter(keepCellAsIs);
+  }
 }
 //----------------------------------------------------------------------------
 void vtkPVMetaClipDataSet::SetInputArrayToProcess(
@@ -172,7 +175,8 @@ bool vtkPVMetaClipDataSet::SwitchFilterForCrinkle()
 int vtkPVMetaClipDataSet::ProcessRequest(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  bool needSwitch = this->SwitchFilterForCrinkle();
+  vtkHyperTreeGrid* htg = vtkHyperTreeGrid::GetData(inputVector[0], 0);
+  bool needSwitch = htg ? false : this->SwitchFilterForCrinkle();
   this->Internal->Clip->SetExactBoxClip(this->ExactBoxClip);
   int res = this->Superclass::ProcessRequest(request, inputVector, outputVector);
   if (needSwitch)

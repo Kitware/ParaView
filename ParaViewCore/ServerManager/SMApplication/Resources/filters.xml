@@ -7402,21 +7402,23 @@ array.
                          name="PreserveInputCells"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Hints>
-          <PropertyWidgetDecorator type="InputDataTypeDecorator"
-                                   mode="visibility"
-                                   exclude="1"
-                                   name="vtkHyperTreeGrid" />
-        </Hints>
         <Documentation>This parameter controls whether to extract entire cells
         in the given region or clip those cells so all of the output will stay
         only on that side of region.</Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="ClipFunction"
-                                   value="Scalar"
-                                   inverse="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                       mode="visibility"
+                                       exclude="1"
+                                       name="vtkHyperTreeGrid" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ClipFunction"
+                                       value="Scalar"
+                                       inverse="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetExactBoxClip"
