@@ -16,18 +16,39 @@
 
 #include "vtkObjectFactory.h"
 
+#include <cmath>
+
 vtkStandardNewMacro(vtkPVPlane);
 //----------------------------------------------------------------------------
 vtkPVPlane::vtkPVPlane()
 {
   this->Plane = vtkPlane::New();
   this->Offset = 0;
+  this->AxisAligned = false;
 }
 
 //----------------------------------------------------------------------------
 vtkPVPlane::~vtkPVPlane()
 {
   this->Plane->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlane::SetNormal(double* x)
+{
+  this->SetNormal(x[0], x[1], x[2]);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlane::SetNormal(double x, double y, double z)
+{
+  if (this->AxisAligned)
+  {
+    x = std::fabs(x) >= std::fabs(y) && std::fabs(x) >= std::fabs(z) ? 1 : 0;
+    y = std::fabs(y) >= std::fabs(x) && std::fabs(y) >= std::fabs(z) ? 1 : 0;
+    z = std::fabs(z) >= std::fabs(x) && std::fabs(z) >= std::fabs(y) ? 1 : 0;
+  }
+  this->Superclass::SetNormal(x, y, z);
 }
 
 //----------------------------------------------------------------------------

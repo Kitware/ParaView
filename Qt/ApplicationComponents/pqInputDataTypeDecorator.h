@@ -60,6 +60,14 @@ public:
   */
   bool enableWidget() const override;
 
+  /**
+   * Overriden to show or not the widget based on input data type.
+   */
+  bool canShowWidget(bool show_advanced) const override;
+
+protected:
+  virtual bool processState() const;
+
 private:
   Q_DISABLE_COPY(pqInputDataTypeDecorator)
 

@@ -24,7 +24,11 @@
 #include "vtkPVDataSetAlgorithmSelectorFilter.h"
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
+#include <iostream>
+
 class vtkImplicitFunction;
+class vtkInformation;
+class vtkInformationVector;
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVMetaSliceDataSet
   : public vtkPVDataSetAlgorithmSelectorFilter
@@ -34,6 +38,9 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtkPVMetaSliceDataSet* New();
+
+  static const unsigned METASLICE_DATASET = 0;
+  static const unsigned METASLICE_HYPERTREEGRID = 1;
 
   /**
    * Enable or disable the Extract Cells By Regions.
@@ -47,36 +54,58 @@ public:
 
   void SetImplicitFunction(vtkImplicitFunction* func);
 
+  /**
+   * Sets the cut function for vtkDataSet inputs
+   */
+  void SetDataSetCutFunction(vtkImplicitFunction* func);
+
+  /**
+   * Sets the cut function for vtkHyperTreeGrid inputs
+   */
+  void SetHyperTreeGridCutFunction(vtkImplicitFunction* func);
+
   // Only available for cut -------------
 
   /**
-   * Expose method from vtkCutter
+   * Expose method from vtkPVCutter
    */
   void SetCutFunction(vtkImplicitFunction* func) { this->SetImplicitFunction(func); };
 
   /**
-   * Expose method from vtkCutter
+   * Expose method from vtkPVCutter
    */
   void SetNumberOfContours(int nbContours);
 
   /**
-   * Expose method from vtkCutter
+   * Expose method from vtkPVCutter
    */
   void SetValue(int index, double value);
 
   /**
-   * Expose method from vtkCutter
+   * Expose method from vtkPVCutter
    */
   void SetGenerateTriangles(int status);
 
   /**
-   * Expose method from vtkCutter
+   * Expose method from vtkPVCutter
    */
   void SetMergePoints(bool status);
+
+  /**
+   * Method used for vtkHyperTreeGridPlaneCutter
+   */
+  void SetDual(bool dual);
+
+  virtual int RequestDataObject(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 protected:
   vtkPVMetaSliceDataSet();
   ~vtkPVMetaSliceDataSet() override;
+
+  bool AxisCut;
+
+  vtkImplicitFunction* ImplicitFunctions[2];
 
 private:
   vtkPVMetaSliceDataSet(const vtkPVMetaSliceDataSet&) = delete;

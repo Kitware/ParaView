@@ -135,6 +135,8 @@
           <Property name="Visibility" />
           <Property name="PlaceFactor" />
           <Property name="Reset" />
+          <Property name="AlwaysSnapToNearestAxis" />
+          <Property name="AlwaysSnapToNearestAxisInfo" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -1401,6 +1403,21 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty command="SetAlwaysSnapToNearestAxis"
+                         default_values="0"
+                         information_property="AlwaysSnapToNearestAxisInfo"
+                         name="AlwaysSnapToNearestAxis"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="GetAlwaysSnapToNearestAxis"
+                         information_only="1"
+                         default_values="0"
+                         name="AlwaysSnapToNearestAxisInfo"
+                         number_of_elements="1">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+
       <Property command="Reset"
                 name="Reset"></Property>
       <DoubleVectorProperty command="SetOrigin"

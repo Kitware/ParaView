@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPointPickingHelper.h"
 #include "pqRenderView.h"
 #include "vtkCamera.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
@@ -111,6 +112,17 @@ pqImplicitPlanePropertyWidget::pqImplicitPlanePropertyWidget(
   else
   {
     qCritical("Missing required property for function 'Normal'.");
+  }
+
+  if (vtkSMIntVectorProperty* alwaysSnapToNearestAxis =
+        vtkSMIntVectorProperty::SafeDownCast(smgroup->GetProperty("AlwaysSnapToNearestAxis")))
+  {
+    if (alwaysSnapToNearestAxis->GetNumberOfElements())
+    {
+      vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
+      vtkSMPropertyHelper(wdgProxy, "AlwaysSnapToNearestAxis")
+        .Set(alwaysSnapToNearestAxis->GetElements()[0]);
+    }
   }
 
   // link a few buttons

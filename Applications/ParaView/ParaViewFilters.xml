@@ -52,14 +52,14 @@
   </Category>
 
   <Category name="Hyper Tree Grid" menu_label="&amp;Hyper Tree Grid">
-    <Proxy group="filters" name="HyperTreeGridAxisClip" />
-    <Proxy group="filters" name="HyperTreeGridAxisCut" />
+    <Proxy group="filters" name="Clip" icon=":/pqWidgets/Icons/pqClip24.png"/>
+    <Proxy group="filters" name="Cut" icon=":/pqWidgets/Icons/pqSlice24.png"/>
     <Proxy group="filters" name="HyperTreeGridAxisReflection" />
     <Proxy group="filters" name="HyperTreeGridCellCenters" />
-    <Proxy group="filters" name="HyperTreeGridContour" />
+    <Proxy group="filters" name="Contour" icon=":/pqWidgets/Icons/pqIsosurface24.png"/>
     <Proxy group="filters" name="HyperTreeGridDepthLimiter" />
-    <Proxy group="filters" name="HyperTreeGridSliceWithPlane" />
-    <Proxy group="filters" name="HyperTreeGridThreshold" />
+    <Proxy group="filters" name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup24.png"/>
+    <Proxy group="filters" name="Threshold" icon=":/pqWidgets/Icons/pqThreshold24.png"/>
     <Proxy group="filters" name="HyperTreeGridToDualGrid" />
     <Proxy group="filters" name="HyperTreeGridToUnstructuredGrid" />
   </Category>

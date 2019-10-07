@@ -1207,7 +1207,7 @@ bool vtkPVDataInformation::DataSetTypeIsA(const char* type)
       this->DataSetType == VTK_UNSTRUCTURED_GRID || this->DataSetType == VTK_IMAGE_DATA ||
       this->DataSetType == VTK_RECTILINEAR_GRID ||
       this->DataSetType == VTK_EXPLICIT_STRUCTURED_GRID ||
-      this->DataSetType == VTK_HYPER_TREE_GRID || this->DataSetType == VTK_STRUCTURED_POINTS)
+      this->DataSetType == VTK_STRUCTURED_POINTS)
     {
       return true;
     }
@@ -1215,6 +1215,14 @@ bool vtkPVDataInformation::DataSetTypeIsA(const char* type)
   if (strcmp(type, this->GetDataSetTypeAsString()) == 0)
   { // If class names are the same, then they are of the same type.
     return true;
+  }
+  if (strcmp(type, "vtkHyperTreeGrid") == 0)
+  {
+    if (this->DataSetType == VTK_HYPER_TREE_GRID ||
+      this->DataSetType == VTK_UNIFORM_HYPER_TREE_GRID)
+    {
+      return true;
+    }
   }
   if (strcmp(type, "vtkPointSet") == 0)
   {
