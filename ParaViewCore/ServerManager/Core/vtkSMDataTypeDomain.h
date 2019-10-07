@@ -85,6 +85,10 @@ protected:
   vtkSetMacro(CompositeDataSupported, int);
   vtkGetMacro(CompositeDataSupported, int);
 
+  int CompositeDataRequired;
+  vtkSetMacro(CompositeDataRequired, int);
+  vtkGetMacro(CompositeDataRequired, int);
+
 private:
   vtkSMDataTypeDomain(const vtkSMDataTypeDomain&) = delete;
   void operator=(const vtkSMDataTypeDomain&) = delete;
