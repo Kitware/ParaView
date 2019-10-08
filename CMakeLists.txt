@@ -557,6 +557,7 @@ list(APPEND paraview_requested_modules
   VTK::IOH5part
   VTK::IOParallelLSDyna
   VTK::IOSegY
+  VTK::IOCityGML
   VTK::IOTecplotTable
   VTK::IOTRUCHAS
   VTK::IOVeraOut
