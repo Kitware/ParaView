@@ -30,7 +30,6 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVCacheKeeper.h"
 #include "vtkPVContextView.h"
 #include "vtkPVMergeTablesMultiBlock.h"
 #include "vtkPlot.h"
@@ -50,13 +49,12 @@ vtkStandardNewMacro(vtkChartRepresentation);
 //----------------------------------------------------------------------------
 vtkChartRepresentation::vtkChartRepresentation()
 {
+  this->LastLocalOutputMTime = 0;
   this->DummyRepresentation = vtkSmartPointer<vtkChartSelectionRepresentation>::New();
 
   this->SelectionRepresentation = 0;
   this->SetSelectionRepresentation(this->DummyRepresentation);
 
-  this->CacheKeeper = vtkPVCacheKeeper::New();
-  this->EnableServerSideRendering = false;
   this->FlattenTable = 1;
   this->FieldAssociation = vtkDataObject::FIELD_ASSOCIATION_ROWS;
 }
@@ -64,7 +62,6 @@ vtkChartRepresentation::vtkChartRepresentation()
 //----------------------------------------------------------------------------
 vtkChartRepresentation::~vtkChartRepresentation()
 {
-  this->CacheKeeper->Delete();
   this->SetSelectionRepresentation(NULL);
 }
 
@@ -91,20 +88,25 @@ int vtkChartRepresentation::ProcessViewRequest(
     return 0;
   }
 
-  if (request == vtkPVView::REQUEST_RENDER())
+  if (request == vtkPVView::REQUEST_UPDATE())
+  {
+    vtkPVView::SetPiece(ininfo, this, this->LocalOutputRequestData);
+  }
+  else if (request == vtkPVView::REQUEST_RENDER())
   {
     assert(this->ContextView != NULL);
     // this is called before every render, so don't do expensive things here.
     // Hence, we'll use this check to avoid work unless really needed.
-    if (this->GetMTime() > this->PrepareForRenderingTime)
+    auto deliveredData =
+      vtkMultiBlockDataSet::SafeDownCast(vtkPVView::GetDeliveredPiece(ininfo, this));
+    if ((this->LocalOutput != deliveredData) ||
+      (deliveredData && deliveredData->GetMTime() != this->LastLocalOutputMTime) ||
+      (this->PrepareForRenderingTime < this->GetMTime()))
     {
-      // NOTE: despite the fact that we're only looking at this->MTime,
-      // this->PrepareForRendering() will get called even when the
-      // representation's upstream pipeline has changed. This is because for
-      // representations, when upstream changes, the ServerManager ensures that
-      // vtkPVDataRepresentation::MarkModified() gets called.
-
+      // anytime different data is available for rendering, we prep it.
+      this->LocalOutput = deliveredData;
       this->PrepareForRendering();
+      this->LastLocalOutputMTime = deliveredData ? this->LocalOutput->GetMTime() : 0;
       this->PrepareForRenderingTime.Modified();
     }
   }
@@ -127,7 +129,6 @@ bool vtkChartRepresentation::AddToView(vtkView* view)
   }
 
   this->ContextView = chartView;
-  this->EnableServerSideRendering = (chartView && chartView->InTileDisplayMode());
   view->AddRepresentation(this->SelectionRepresentation);
   return this->Superclass::AddToView(view);
 }
@@ -160,127 +161,82 @@ int vtkChartRepresentation::FillInputPortInformation(int port, vtkInformation* i
 int vtkChartRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_RENDER_SERVER)
-  {
-    return this->Superclass::RequestData(request, inputVector, outputVector);
-  }
-
-  // remove the "cached" delivered data.
-  this->LocalOutput = NULL;
-
-  // Pass caching information to the cache keeper.
-  this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
-  this->CacheKeeper->SetCacheTime(this->GetCacheKey());
-
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  int myId = pm->GetPartitionId();
-  int numProcs = pm->GetNumberOfLocalPartitions();
+  this->LocalOutputRequestData = nullptr;
+  this->LocalOutput = nullptr;
 
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
-    vtkSmartPointer<vtkDataObject> data;
-
-    // don't process data is the cachekeeper has already cached the result.
-    if (!this->CacheKeeper->IsCached())
+    vtkSmartPointer<vtkDataObject> data = vtkDataObject::GetData(inputVector[0], 0);
+    data = this->TransformInputData(data);
+    if (!data)
     {
-      data = vtkDataObject::GetData(inputVector[0], 0);
-      data = this->TransformInputData(inputVector, data);
-      if (!data)
-      {
-        return 0;
-      }
-
-      // Prune input dataset to only process blocks on interest.
-      // If input is not a multiblock dataset, we make it one so the rest of the
-      // pipeline is simple.
-      if (data->IsA("vtkMultiBlockDataSet"))
-      {
-        vtkNew<vtkExtractBlock> extractBlock;
-        extractBlock->SetInputData(data);
-        extractBlock->PruneOutputOff();
-        for (std::set<unsigned int>::const_iterator iter = this->CompositeIndices.begin();
-             iter != this->CompositeIndices.end(); ++iter)
-        {
-          extractBlock->AddIndex(*iter);
-        }
-        extractBlock->Update();
-        data = extractBlock->GetOutputDataObject(0);
-      }
-      else
-      {
-        vtkNew<vtkMultiBlockDataSet> mbdata;
-        mbdata->SetNumberOfBlocks(1);
-        mbdata->SetBlock(0, data);
-        data = mbdata.GetPointer();
-      }
-
-      // Convert input dataset to vtkTable (rather, multiblock of vtkTable). We
-      // can only plot vtkTable.
-      vtkNew<vtkBlockDeliveryPreprocessor> preprocessor;
-      // tell the preprocessor to flatten multicomponent arrays i.e. extract each
-      // component into a separate array.
-      preprocessor->SetFlattenTable(this->FlattenTable);
-      preprocessor->SetFieldAssociation(this->FieldAssociation);
-      preprocessor->SetInputData(data);
-      preprocessor->Update();
-
-      data = preprocessor->GetOutputDataObject(0);
-
-      // data must be a multiblock dataset, no matter what.
-      assert(data->IsA("vtkMultiBlockDataSet"));
-
-      // now deliver data to the rendering sides:
-      // first, reduce it to root node.
-      vtkNew<vtkReductionFilter> reductionFilter;
-      vtkNew<vtkPVMergeTablesMultiBlock> algo;
-      reductionFilter->SetPostGatherHelper(algo.GetPointer());
-      reductionFilter->SetController(pm->GetGlobalController());
-      reductionFilter->SetInputData(data);
-      reductionFilter->Update();
-
-      data = reductionFilter->GetOutputDataObject(0);
-      data = this->TransformTable(data);
-
-      if (this->EnableServerSideRendering && numProcs > 1)
-      {
-        // share the reduction result will all satellites.
-        pm->GetGlobalController()->Broadcast(data.GetPointer(), 0);
-      }
-      this->CacheKeeper->SetInputData(data);
-    }
-    // here the cachekeeper will either give us the cached result of the result
-    // we just processed.
-    this->CacheKeeper->Update();
-    data = this->CacheKeeper->GetOutputDataObject(0);
-
-    if (myId == 0)
-    {
-      // send data to client.
-      vtkNew<vtkClientServerMoveData> deliver;
-      deliver->SetInputData(data);
-      deliver->Update();
+      return 0;
     }
 
-    this->LocalOutput = vtkMultiBlockDataSet::SafeDownCast(data);
+    // Prune input dataset to only process blocks on interest.
+    // If input is not a multiblock dataset, we make it one so the rest of the
+    // pipeline is simple.
+    if (data->IsA("vtkMultiBlockDataSet"))
+    {
+      vtkNew<vtkExtractBlock> extractBlock;
+      extractBlock->SetInputData(data);
+      extractBlock->PruneOutputOff();
+      for (std::set<unsigned int>::const_iterator iter = this->CompositeIndices.begin();
+           iter != this->CompositeIndices.end(); ++iter)
+      {
+        extractBlock->AddIndex(*iter);
+      }
+      extractBlock->Update();
+      data = extractBlock->GetOutputDataObject(0);
+    }
+    else
+    {
+      vtkNew<vtkMultiBlockDataSet> mbdata;
+      mbdata->SetNumberOfBlocks(1);
+      mbdata->SetBlock(0, data);
+      data = mbdata.GetPointer();
+    }
+
+    // data must be a multiblock dataset, no matter what
+    assert(data->IsA("vtkMultiBlockDataSet"));
+
+    data = this->ReduceDataToRoot(data);
+    data = this->TransformTable(data);
+    this->LocalOutputRequestData = vtkMultiBlockDataSet::SafeDownCast(data);
   }
   else
   {
-    // receive data on client.
-    vtkNew<vtkClientServerMoveData> deliver;
-    deliver->Update();
-    this->LocalOutput = vtkMultiBlockDataSet::SafeDownCast(deliver->GetOutputDataObject(0));
+    this->LocalOutputRequestData = vtkSmartPointer<vtkMultiBlockDataSet>::New();
   }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 
 //----------------------------------------------------------------------------
-vtkDataObject* vtkChartRepresentation::TransformInputData(
-  vtkInformationVector** inputVector, vtkDataObject* data)
+vtkSmartPointer<vtkDataObject> vtkChartRepresentation::TransformInputData(vtkDataObject* data)
 {
-  (void)inputVector;
-  // Default representation does not transform anything
   return data;
+}
+
+//----------------------------------------------------------------------------
+vtkSmartPointer<vtkDataObject> vtkChartRepresentation::ReduceDataToRoot(vtkDataObject* data)
+{
+  // Convert input dataset to vtkTable (rather, multiblock of vtkTable). We
+  // can only plot vtkTable.
+  vtkNew<vtkBlockDeliveryPreprocessor> preprocessor;
+  // tell the preprocessor to flatten multicomponent arrays i.e. extract each
+  // component into a separate array.
+  preprocessor->SetFlattenTable(this->FlattenTable);
+  preprocessor->SetFieldAssociation(this->FieldAssociation);
+  preprocessor->SetInputData(data);
+
+  vtkNew<vtkReductionFilter> reductionFilter;
+  vtkNew<vtkPVMergeTablesMultiBlock> algo;
+  reductionFilter->SetPostGatherHelper(algo.GetPointer());
+  reductionFilter->SetInputConnection(preprocessor->GetOutputPort());
+  reductionFilter->Update();
+
+  return reductionFilter->GetOutputDataObject(0);
 }
 
 //----------------------------------------------------------------------------
@@ -289,20 +245,10 @@ vtkSmartPointer<vtkDataObject> vtkChartRepresentation::TransformTable(
 {
   return data;
 }
-//----------------------------------------------------------------------------
-bool vtkChartRepresentation::IsCached(double cache_key)
-{
-  return this->CacheKeeper->IsCached(cache_key);
-}
 
 //----------------------------------------------------------------------------
 void vtkChartRepresentation::MarkModified()
 {
-  if (!this->GetUseCache())
-  {
-    // Cleanup caches when not using cache.
-    this->CacheKeeper->RemoveAllCaches();
-  }
   this->SelectionRepresentation->MarkModified();
   this->Superclass::MarkModified();
 }
@@ -362,15 +308,16 @@ unsigned int vtkChartRepresentation::Initialize(unsigned int minId, unsigned int
 }
 
 //----------------------------------------------------------------------------
-vtkTable* vtkChartRepresentation::GetLocalOutput()
+vtkTable* vtkChartRepresentation::GetLocalOutput(bool pre_delivery)
 {
-  if (!this->LocalOutput)
+  auto mb = pre_delivery ? this->LocalOutputRequestData : this->LocalOutput;
+  if (!mb)
   {
     return NULL;
   }
 
   vtkSmartPointer<vtkCompositeDataIterator> iter;
-  iter.TakeReference(this->LocalOutput->NewIterator());
+  iter.TakeReference(mb->NewIterator());
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
     vtkTable* table = vtkTable::SafeDownCast(iter->GetCurrentDataObject());

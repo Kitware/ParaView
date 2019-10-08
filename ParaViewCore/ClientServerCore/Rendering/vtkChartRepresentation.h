@@ -39,7 +39,6 @@
 class vtkChartSelectionRepresentation;
 class vtkCSVExporter;
 class vtkMultiBlockDataSet;
-class vtkPVCacheKeeper;
 class vtkPVContextView;
 class vtkSelectionDeliveryFilter;
 class vtkTable;
@@ -204,21 +203,27 @@ protected:
   bool RemoveFromView(vtkView* view) override;
 
   /**
-   * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
-   */
-  bool IsCached(double cache_key) override;
-
-  /**
    * Convenience method to get the first vtkTable from LocalOutput, if any.
+   * If pre_delivery is true (default is false), then the data from most-recent
+   * `REQUEST_UPDATE` pass is used otherwise the delivered data object from most recent
+   * `REQUEST_RENDER` pass is used.
    */
-  vtkTable* GetLocalOutput();
+  vtkTable* GetLocalOutput(bool pre_delivery = false);
 
   /**
-   * Method to be overridden to transform input data to a vtkTable.
+   * Method to be overridden to transform input data.
    * The default implementation just returns the data object provided in parameter.
    */
-  virtual vtkDataObject* TransformInputData(
-    vtkInformationVector** inputVector, vtkDataObject* data);
+  virtual vtkSmartPointer<vtkDataObject> TransformInputData(vtkDataObject* data);
+
+  /**
+   * Chart representation/views expect that the data is reduced to root node and
+   * then passed on the rendering nodes. This method may be overridden to
+   * customize the reduction. The default implementation uses
+   * vtkBlockDeliveryPreprocessor to convert to tables and then use
+   * vtkPVMergeTablesMultiBlock as the reduction algorithm.
+   */
+  virtual vtkSmartPointer<vtkDataObject> ReduceDataToRoot(vtkDataObject* data);
 
   /**
    * Method to be overridden to apply an operation of the table after it is
@@ -236,9 +241,7 @@ protected:
   bool GetLocalOutput(MapOfTables& tables);
 
   int FieldAssociation;
-  vtkPVCacheKeeper* CacheKeeper;
   vtkWeakPointer<vtkPVContextView> ContextView;
-  bool EnableServerSideRendering;
   int FlattenTable;
 
   vtkSmartPointer<vtkMultiBlockDataSet> LocalOutput;
@@ -251,7 +254,9 @@ private:
   void operator=(const vtkChartRepresentation&) = delete;
 
   vtkTimeStamp PrepareForRenderingTime;
+  vtkMTimeType LastLocalOutputMTime;
   vtkSmartPointer<vtkChartSelectionRepresentation> DummyRepresentation;
+  vtkSmartPointer<vtkMultiBlockDataSet> LocalOutputRequestData;
 };
 
 #endif

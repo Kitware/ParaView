@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVCompositeRepresentation.h"
 
+#include "vtkGarbageCollector.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVGridAxes3DRepresentation.h"

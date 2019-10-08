@@ -18,6 +18,8 @@
 #include "vtkCommand.h"
 #include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVDataRepresentation.h"
+#include "vtkPVLogger.h"
 #include "vtkPVProminentValuesInformation.h"
 #include "vtkPVRepresentedDataInformation.h"
 #include "vtkSMInputProperty.h"
@@ -47,6 +49,8 @@ vtkSMRepresentationProxy::vtkSMRepresentationProxy()
 
   this->MarkedModified = false;
   this->VTKRepresentationUpdated = false;
+  this->VTKRepresentationUpdateSkipped = false;
+  this->VTKRepresentationUpdateTimeChanged = false;
 }
 
 //----------------------------------------------------------------------------
@@ -104,6 +108,10 @@ void vtkSMRepresentationProxy::CreateVTKObjects()
   {
     obj->AddObserver(
       vtkCommand::UpdateDataEvent, this, &vtkSMRepresentationProxy::OnVTKRepresentationUpdated);
+    obj->AddObserver(vtkPVDataRepresentation::SkippedUpdateDataEvent, this,
+      &vtkSMRepresentationProxy::OnVTKRepresentationUpdateSkipped);
+    obj->AddObserver(vtkPVDataRepresentation::UpdateTimeChangedEvent, this,
+      &vtkSMRepresentationProxy::OnVTKRepresentationUpdateTimeChanged);
   }
 }
 
@@ -224,6 +232,8 @@ void vtkSMRepresentationProxy::MarkDirtyFromProducer(
     {
       this->MarkedModified = true;
       this->VTKRepresentationUpdated = false;
+      this->VTKRepresentationUpdateSkipped = false;
+      this->VTKRepresentationUpdateTimeChanged = false;
       vtkClientServerStream stream;
       stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "MarkModified"
              << vtkClientServerStream::End;
@@ -251,14 +261,43 @@ void vtkSMRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 //----------------------------------------------------------------------------
 void vtkSMRepresentationProxy::OnVTKRepresentationUpdated()
 {
-  this->MarkedModified = false;
+  this->VTKRepresentationUpdateSkipped = false;
   this->VTKRepresentationUpdated = true;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationProxy::OnVTKRepresentationUpdateSkipped()
+{
+  this->VTKRepresentationUpdated = false;
+  this->VTKRepresentationUpdateSkipped = true;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationProxy::OnVTKRepresentationUpdateTimeChanged()
+{
+  this->VTKRepresentationUpdateTimeChanged = true;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMRepresentationProxy::ViewUpdated(vtkSMProxy* view)
 {
-  this->PostUpdateData();
+  if (this->VTKRepresentationUpdated || this->VTKRepresentationUpdateSkipped)
+  {
+    if (this->VTKRepresentationUpdateTimeChanged)
+    {
+      // This implies that the representation was updated due to time request
+      // changes. In that case, we mark inputs dirty so the `PostUpdateData` call
+      // propagates all the way up the pipeline. Otherwise, the data information
+      // will not be invalidated.
+      this->MarkInputsAsDirty();
+    }
+
+    const bool using_cache = this->VTKRepresentationUpdateSkipped;
+    this->VTKRepresentationUpdateSkipped = false;
+    this->VTKRepresentationUpdated = false;
+    this->VTKRepresentationUpdateTimeChanged = false;
+    this->PostUpdateData(using_cache);
+  }
 
   // If this class has sub-representations, we need to tell those that the view
   // has updated as well.
@@ -273,18 +312,10 @@ void vtkSMRepresentationProxy::ViewUpdated(vtkSMProxy* view)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRepresentationProxy::PostUpdateData()
+void vtkSMRepresentationProxy::PostUpdateData(bool using_cache)
 {
-  // PostUpdateData may get called on all representations on the client side
-  // whenever the view updates. However, the underlying vtkPVDataRepresentation
-  // object may not have updated (possibly because of visibility being false).
-  // In that case, we should not let PostUpdateData() happen. The following
-  // check ensures that PostUpdateData() call has any effect only after the VTK
-  // representation has updated as well.
-  if (this->MarkedModified == false && this->VTKRepresentationUpdated == true)
-  {
-    this->Superclass::PostUpdateData();
-  }
+  this->MarkedModified = false;
+  this->Superclass::PostUpdateData(using_cache);
 }
 
 //----------------------------------------------------------------------------
@@ -325,7 +356,7 @@ vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetProminentValuesInf
   bool largerFractionOrLessCertain = this->ProminentValuesFraction < fraction ||
     this->ProminentValuesUncertainty > uncertaintyAllowed;
   if (!this->ProminentValuesInformationValid || differentAttribute || invalid ||
-    largerFractionOrLessCertain || force)
+    largerFractionOrLessCertain || this->ProminentValuesInformation->GetForce() != force)
   {
     vtkTimerLog::MarkStartEvent("vtkSMRepresentationProxy::GetProminentValues");
     this->CreateVTKObjects();
@@ -367,22 +398,6 @@ vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetProminentValuesInf
   return this->ProminentValuesInformation;
 }
 
-//-----------------------------------------------------------------------------
-void vtkSMRepresentationProxy::ViewTimeChanged()
-{
-  vtkSMProxy* current = this;
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(current->GetProperty("Input"));
-  while (current && pp && pp->GetNumberOfProxies() > 0)
-  {
-    current = pp->GetProxy(0);
-    pp = vtkSMProxyProperty::SafeDownCast(current->GetProperty("Input"));
-  }
-
-  if (current)
-  {
-    current->MarkModified(current);
-  }
-}
 //----------------------------------------------------------------------------
 void vtkSMRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {

@@ -30,7 +30,6 @@
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVCacheKeeper.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
@@ -85,9 +84,6 @@ vtkGlyph3DRepresentation::vtkGlyph3DRepresentation()
   this->SetNumberOfInputPorts(2);
 
   this->GlyphMultiBlockMaker = vtkGlyphRepresentationMultiBlockMaker::New();
-  this->GlyphCacheKeeper = vtkPVCacheKeeper::New();
-
-  this->GlyphCacheKeeper->SetInputConnection(this->GlyphMultiBlockMaker->GetOutputPort());
 
   this->GlyphMapper = vtkGlyph3DMapper::New();
   this->LODGlyphMapper = vtkGlyph3DMapper::New();
@@ -115,7 +111,6 @@ vtkGlyph3DRepresentation::vtkGlyph3DRepresentation()
 vtkGlyph3DRepresentation::~vtkGlyph3DRepresentation()
 {
   this->GlyphMultiBlockMaker->Delete();
-  this->GlyphCacheKeeper->Delete();
   this->GlyphMapper->Delete();
   this->LODGlyphMapper->Delete();
   this->GlyphActor->Delete();
@@ -192,10 +187,7 @@ int vtkGlyph3DRepresentation::RequestData(
   // the client. That's throws of all logic to determine if data needs to be
   // delivered etc.
   this->GlyphMultiBlockMaker->Modified();
-
-  this->GlyphCacheKeeper->SetCachingEnabled(this->GetUseCache());
-  this->GlyphCacheKeeper->SetCacheTime(this->GetCacheKey());
-  this->GlyphCacheKeeper->Update();
+  this->GlyphMultiBlockMaker->Update();
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
@@ -250,12 +242,14 @@ int vtkGlyph3DRepresentation::ProcessViewRequest(
 
     vtkNew<vtkMatrix4x4> matrix;
     this->GlyphActor->GetMatrix(matrix.GetPointer());
-    vtkPVRenderView::SetGeometryBounds(inInfo, bounds, matrix.GetPointer());
-    vtkPVRenderView::SetPiece(inInfo, this, this->GlyphCacheKeeper->GetOutput(), 0, 1);
+    vtkPVRenderView::SetGeometryBounds(inInfo, this, bounds, matrix.GetPointer(), /*port=*/1);
+    vtkPVRenderView::SetPiece(
+      inInfo, this, this->GlyphMultiBlockMaker->GetOutputDataObject(0), 0, 1);
   }
   else if (request_type == vtkPVView::REQUEST_UPDATE_LOD())
   {
-    vtkPVRenderView::SetPieceLOD(inInfo, this, this->GlyphCacheKeeper->GetOutput(), 1);
+    vtkPVRenderView::SetPieceLOD(
+      inInfo, this, this->GlyphMultiBlockMaker->GetOutputDataObject(0), 1);
   }
 
   if (request_type == vtkPVView::REQUEST_RENDER())
@@ -337,16 +331,6 @@ int vtkGlyph3DRepresentation::ProcessViewRequest(
 }
 
 //----------------------------------------------------------------------------
-void vtkGlyph3DRepresentation::MarkModified()
-{
-  if (!this->GetUseCache())
-  {
-    this->GlyphCacheKeeper->RemoveAllCaches();
-  }
-  this->Superclass::MarkModified();
-}
-
-//----------------------------------------------------------------------------
 void vtkGlyph3DRepresentation::UpdateColoringParameters()
 {
   this->Superclass::UpdateColoringParameters();
@@ -384,15 +368,9 @@ void vtkGlyph3DRepresentation::ComputeGlyphBounds(double bounds[6])
     port = this->GlyphMapper->GetInputConnection(0, 0);
   }
 
-  this->GlyphMapper->SetInputConnection(this->CacheKeeper->GetOutputPort());
+  this->GlyphMapper->SetInputConnection(this->MultiBlockMaker->GetOutputPort());
   this->GlyphMapper->GetBounds(bounds);
   this->GlyphMapper->SetInputConnection(port);
-}
-
-//----------------------------------------------------------------------------
-bool vtkGlyph3DRepresentation::IsCached(double cache_key)
-{
-  return this->GlyphCacheKeeper->IsCached(cache_key) && this->Superclass::IsCached(cache_key);
 }
 
 //----------------------------------------------------------------------------

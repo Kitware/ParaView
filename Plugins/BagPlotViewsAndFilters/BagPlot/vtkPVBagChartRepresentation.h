@@ -205,8 +205,7 @@ protected:
    */
   bool RemoveFromView(vtkView* view) override;
 
-  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) override;
+  vtkSmartPointer<vtkDataObject> ReduceDataToRoot(vtkDataObject* data) override;
 
 private:
   vtkPVBagChartRepresentation(const vtkPVBagChartRepresentation&) = delete;

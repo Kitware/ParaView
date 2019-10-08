@@ -31,7 +31,6 @@ class vtk3DWidgetRepresentation;
 class vtkBillboardTextActor3D;
 class vtkFlagpoleLabel;
 class vtkPolyData;
-class vtkPVCacheKeeper;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkTextSourceRepresentation
   : public vtkPVDataRepresentation
@@ -48,8 +47,6 @@ public:
   void SetTextWidgetRepresentation(vtk3DWidgetRepresentation* widget);
   vtkGetObjectMacro(TextWidgetRepresentation, vtk3DWidgetRepresentation);
   //@}
-
-  void MarkModified() override;
 
   /**
    * Set the visibility.
@@ -121,12 +118,6 @@ protected:
    */
   bool RemoveFromView(vtkView* view) override;
 
-  /**
-   * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
-   */
-  bool IsCached(double cache_key) override;
-
-  vtkPVCacheKeeper* CacheKeeper;
   vtkPolyData* DummyPolyData;
   vtk3DWidgetRepresentation* TextWidgetRepresentation;
   vtkFlagpoleLabel* FlagpoleLabel;

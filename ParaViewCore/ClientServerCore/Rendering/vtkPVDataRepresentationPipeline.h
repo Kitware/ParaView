@@ -13,15 +13,17 @@
 
 =========================================================================*/
 /**
- * @class   vtkPVDataRepresentationPipeline
- * @brief   executive for
- * vtkPVDataRepresentation.
+ * @class vtkPVDataRepresentationPipeline
+ * @brief executive for vtkPVDataRepresentation.
  *
  * vtkPVDataRepresentationPipeline is an executive for vtkPVDataRepresentation.
- * In works in collaboration with the vtkPVView and vtkPVDataRepresentation to
- * ensure appropriate time/piece is requested from the upstream. This also helps
- * when caching is employed by the view.
-*/
+ * Unlike other algorithms, vtkPVDataRepresentation does not use MTime as the
+ * indication that the pipeline needs to be updated, but instead uses the
+ * `vtkPVDataRepresentation::NeedsUpdate` flag. This mechanism, historically
+ * referenced as update-suppressor, is implemented by this class. It bypasses
+ * pipeline passes unless the representation explicitly indicates it needs an
+ * update.
+ */
 
 #ifndef vtkPVDataRepresentationPipeline_h
 #define vtkPVDataRepresentationPipeline_h
@@ -44,26 +46,31 @@ public:
    */
   vtkGetMacro(DataTime, vtkMTimeType);
 
+  /**
+   * vtkPVDataRepresentation calls this in
+   * `vtkPVDataRepresentation::MarkModified` to let the executive know that it
+   * should no longer suppress the pipeline passes since the pipeline has been
+   * invalidated.
+   */
+  vtkSetMacro(NeedsUpdate, bool);
+  vtkGetMacro(NeedsUpdate, bool);
+
 protected:
   vtkPVDataRepresentationPipeline();
   ~vtkPVDataRepresentationPipeline() override;
 
   int ForwardUpstream(int i, int j, vtkInformation* request) override;
   int ForwardUpstream(vtkInformation* request) override;
-
-  void ExecuteDataEnd(vtkInformation* request, vtkInformationVector** inInfoVec,
-    vtkInformationVector* outInfoVec) override;
-
-  // Override this check to account for update extent.
-  int NeedToExecuteData(
-    int outputPort, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec) override;
-
   int ProcessRequest(vtkInformation* request, vtkInformationVector** inInfoVec,
+    vtkInformationVector* outInfoVec) override;
+  void ExecuteDataEnd(vtkInformation* request, vtkInformationVector** inInfoVec,
     vtkInformationVector* outInfoVec) override;
 
 private:
   vtkPVDataRepresentationPipeline(const vtkPVDataRepresentationPipeline&) = delete;
   void operator=(const vtkPVDataRepresentationPipeline&) = delete;
+
+  bool NeedsUpdate = true;
 };
 
 #endif

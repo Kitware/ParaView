@@ -22,7 +22,6 @@
 #include "vtkMolecule.h"
 #include "vtkMoleculeMapper.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVCacheKeeper.h"
 #include "vtkPVRenderView.h"
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
@@ -43,9 +42,6 @@ vtkStandardNewMacro(vtkMoleculeRepresentation)
   // setup actor
   this->Actor = vtkActor::New();
   this->Actor->SetMapper(this->Mapper);
-
-  // initialize cache:
-  this->CacheKeeper->SetInputData(this->DummyMolecule.Get());
 
   static const char* defaultRadiiArrayName = "radii";
   this->SetAtomicRadiusArray(defaultRadiiArrayName);
@@ -101,20 +97,9 @@ vtkDataObject* vtkMoleculeRepresentation::GetRenderedDataObject(int)
   // returning cached object.
   if (vtkMath::AreBoundsInitialized(this->DataBounds))
   {
-    return this->CacheKeeper->GetOutputDataObject(0);
+    return this->Molecule;
   }
   return NULL;
-}
-
-//------------------------------------------------------------------------------
-void vtkMoleculeRepresentation::MarkModified()
-{
-  if (!this->GetUseCache())
-  {
-    // Clear cache when caching is turned off:
-    this->CacheKeeper->RemoveAllCaches();
-  }
-  this->Superclass::MarkModified();
 }
 
 //------------------------------------------------------------------------------
@@ -128,14 +113,13 @@ int vtkMoleculeRepresentation::ProcessViewRequest(
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
   {
-    vtkPVRenderView::SetGeometryBounds(inInfo, this->DataBounds, this->Actor->GetMatrix());
-    vtkPVRenderView::SetPiece(inInfo, this, this->CacheKeeper->GetOutput());
+    vtkPVRenderView::SetGeometryBounds(inInfo, this, this->DataBounds, this->Actor->GetMatrix());
+    vtkPVRenderView::SetPiece(inInfo, this, this->Molecule);
     vtkPVRenderView::SetDeliverToClientAndRenderingProcesses(inInfo, this, true, true);
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
     vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
-
     this->Mapper->SetInputConnection(producerPort);
     this->UpdateColoringParameters();
   }
@@ -168,20 +152,18 @@ int vtkMoleculeRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkMath::UninitializeBounds(this->DataBounds);
-  this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
-  this->CacheKeeper->SetCacheTime(this->GetCacheKey());
-
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
     vtkMolecule* input = vtkMolecule::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
-    this->DummyMolecule->ShallowCopy(input);
-    this->DummyMolecule->GetBounds(this->DataBounds);
+    this->Molecule->ShallowCopy(input);
+    this->Molecule->GetBounds(this->DataBounds);
   }
-
-  this->DummyMolecule->Modified();
-  this->CacheKeeper->Update();
-
+  else
+  {
+    this->Molecule->Initialize();
+  }
+  this->Molecule->Modified();
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 
@@ -207,12 +189,6 @@ bool vtkMoleculeRepresentation::RemoveFromView(vtkView* view)
     return this->Superclass::RemoveFromView(view);
   }
   return false;
-}
-
-//------------------------------------------------------------------------------
-bool vtkMoleculeRepresentation::IsCached(double cache_key)
-{
-  return this->CacheKeeper->IsCached(cache_key);
 }
 
 //------------------------------------------------------------------------------

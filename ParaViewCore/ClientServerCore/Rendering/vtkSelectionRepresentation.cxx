@@ -20,7 +20,7 @@
 #include "vtkLabeledDataMapper.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkView.h"
+#include "vtkPVView.h"
 
 vtkStandardNewMacro(vtkSelectionRepresentation);
 vtkCxxSetObjectMacro(vtkSelectionRepresentation, LabelRepresentation, vtkDataLabelRepresentation);
@@ -47,6 +47,20 @@ vtkSelectionRepresentation::~vtkSelectionRepresentation()
 {
   this->GeometryRepresentation->Delete();
   this->LabelRepresentation->Delete();
+}
+
+//----------------------------------------------------------------------------
+int vtkSelectionRepresentation::ProcessViewRequest(
+  vtkInformationRequestKey* request, vtkInformation* inInfo, vtkInformation* outInfo)
+{
+  if (request == vtkPVView::REQUEST_UPDATE())
+  {
+    // skip update requests since this representation doesn't really do anything
+    // by itself.
+    return 0;
+  }
+
+  return this->Superclass::ProcessViewRequest(request, inInfo, outInfo);
 }
 
 //----------------------------------------------------------------------------
@@ -150,13 +164,6 @@ void vtkSelectionRepresentation::MarkModified()
 //----------------------------------------------------------------------------
 void vtkSelectionRepresentation::TriggerUpdateDataEvent()
 {
-  // we need to mark the geometry as always needing to be moved. The reason
-  // is that in client server mode and the first interaction with the renderer
-  // is a selection the geometryrepr is properly marked for modification.
-  // this shouldn't degrade performance as the geometryRepr in most other
-  // cases is already dirty ( Bug #11587)
-  this->GeometryRepresentation->MarkModified();
-
   // We fire UpdateDataEvent to notify the representation proxy that the
   // representation was updated. The representation proxty will then call
   // PostUpdateData(). We do this since now representations are not updated at

@@ -28,7 +28,6 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineFilter.h"
-#include "vtkPVCacheKeeper.h"
 #include "vtkPVConfig.h"
 #include "vtkPVGridAxes3DActor.h"
 #include "vtkPVRenderView.h"
@@ -79,16 +78,6 @@ void vtkPVGridAxes3DRepresentation::SetGridAxes(vtkPVGridAxes3DActor* gridAxes)
   this->UpdateVisibility();
 
   this->MarkModified();
-}
-
-//------------------------------------------------------------------------------
-void vtkPVGridAxes3DRepresentation::MarkModified()
-{
-  if (!this->GetUseCache())
-  {
-    this->CacheKeeper->RemoveAllCaches();
-  }
-  this->Superclass::MarkModified();
 }
 
 //------------------------------------------------------------------------------
@@ -154,7 +143,7 @@ int vtkPVGridAxes3DRepresentation::ProcessViewRequest(
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
   {
-    vtkPVRenderView::SetPiece(inInfo, this, this->CacheKeeper->GetOutputDataObject(0));
+    vtkPVRenderView::SetPiece(inInfo, this, this->DummyPolyData);
     vtkPVRenderView::SetDeliverToClientAndRenderingProcesses(inInfo, this,
       /* deliver_to_client */ true, /* gather_before_delivery */ false);
   }
@@ -202,7 +191,6 @@ vtkPVGridAxes3DRepresentation::vtkPVGridAxes3DRepresentation()
   : GridAxesVisibility(false)
   , GridAxes(NULL)
 {
-  this->CacheKeeper->SetInputData(this->DummyPolyData.Get());
   std::fill(this->Position, this->Position + 3, 0.);
   std::fill(this->Scale, this->Scale + 3, 1.);
 }
@@ -228,9 +216,6 @@ int vtkPVGridAxes3DRepresentation::FillInputPortInformation(int, vtkInformation*
 int vtkPVGridAxes3DRepresentation::RequestData(
   vtkInformation* req, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec)
 {
-  this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
-  this->CacheKeeper->SetCacheTime(this->GetCacheKey());
-
   this->DummyPolyData->Initialize();
 
   if (inInfoVec[0]->GetNumberOfInformationObjects() == 1)
@@ -331,7 +316,6 @@ int vtkPVGridAxes3DRepresentation::RequestData(
   }
 
   this->DummyPolyData->Modified();
-  this->CacheKeeper->Update();
 
   return this->Superclass::RequestData(req, inInfoVec, outInfoVec);
 }
@@ -362,12 +346,6 @@ bool vtkPVGridAxes3DRepresentation::RemoveFromView(vtkView* view)
     }
   }
   return this->Superclass::RemoveFromView(view);
-}
-
-//------------------------------------------------------------------------------
-bool vtkPVGridAxes3DRepresentation::IsCached(double cache_key)
-{
-  return this->CacheKeeper->IsCached(cache_key);
 }
 
 //------------------------------------------------------------------------------

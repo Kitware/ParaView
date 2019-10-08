@@ -47,8 +47,6 @@ public:
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) override;
 
-  void MarkModified() override;
-
   /**
    * Toggle the visibility of the original mesh.
    * If this->GetVisibility() is false, then this has no effect.
@@ -144,10 +142,7 @@ protected:
    */
   void ComputeGlyphBounds(double bounds[6]);
 
-  bool IsCached(double cache_key) override;
-
   vtkAlgorithm* GlyphMultiBlockMaker;
-  vtkPVCacheKeeper* GlyphCacheKeeper;
 
   vtkGlyph3DMapper* GlyphMapper;
   vtkGlyph3DMapper* LODGlyphMapper;

@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMDataDeliveryManager.h"
+#include "vtkSMDataDeliveryManagerProxy.h"
 
 #include "vtkCamera.h"
 #include "vtkClientServerStream.h"
@@ -28,20 +28,20 @@
 
 #include <cassert>
 
-vtkStandardNewMacro(vtkSMDataDeliveryManager);
+vtkStandardNewMacro(vtkSMDataDeliveryManagerProxy);
 //----------------------------------------------------------------------------
-vtkSMDataDeliveryManager::vtkSMDataDeliveryManager()
+vtkSMDataDeliveryManagerProxy::vtkSMDataDeliveryManagerProxy()
+{
+  this->SetLocation(vtkPVSession::CLIENT_AND_SERVERS);
+}
 
+//----------------------------------------------------------------------------
+vtkSMDataDeliveryManagerProxy::~vtkSMDataDeliveryManagerProxy()
 {
 }
 
 //----------------------------------------------------------------------------
-vtkSMDataDeliveryManager::~vtkSMDataDeliveryManager()
-{
-}
-
-//----------------------------------------------------------------------------
-void vtkSMDataDeliveryManager::SetViewProxy(vtkSMViewProxy* viewproxy)
+void vtkSMDataDeliveryManagerProxy::SetViewProxy(vtkSMViewProxy* viewproxy)
 {
   if (viewproxy != this->ViewProxy)
   {
@@ -51,21 +51,24 @@ void vtkSMDataDeliveryManager::SetViewProxy(vtkSMViewProxy* viewproxy)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMDataDeliveryManager::Deliver(bool interactive)
+void vtkSMDataDeliveryManagerProxy::Deliver(bool interactive)
 {
+  this->CreateVTKObjects();
+
   assert(this->ViewProxy != NULL);
 
-  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(this->ViewProxy->GetClientSideObject());
-  const bool use_lod = interactive && view->GetUseLODForInteractiveRender();
-  const bool use_distributed_rendering = use_lod ? view->GetUseDistributedRenderingForLODRender()
-                                                 : view->GetUseDistributedRenderingForRender();
+  auto view = vtkPVView::SafeDownCast(this->ViewProxy->GetClientSideObject());
+  auto renderview = vtkPVRenderView::SafeDownCast(view);
+  const bool use_lod = interactive && renderview && renderview->GetUseLODForInteractiveRender();
 
-  const int data_distribution_mode = view->GetDataDistributionMode(use_distributed_rendering);
+  auto dmanager = vtkPVDataDeliveryManager::SafeDownCast(this->GetClientSideObject());
+  const int dataKey = dmanager->GetDeliveredDataKey(use_lod);
+
   vtkMTimeType update_ts = view->GetUpdateTimeStamp();
 
   // note: this will create new vtkTimeStamp, if needed.
-  vtkTimeStamp& timeStamp = use_lod ? this->DeliveryTimestampsLOD[data_distribution_mode]
-                                    : this->DeliveryTimestamps[data_distribution_mode];
+  vtkTimeStamp& timeStamp =
+    use_lod ? this->DeliveryTimestampsLOD[dataKey] : this->DeliveryTimestamps[dataKey];
 
   if (timeStamp > update_ts)
   {
@@ -76,7 +79,7 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
 
   // Get a list of representations for which we need to delivery data.
   std::vector<unsigned int> keys_to_deliver;
-  if (!view->GetDeliveryManager()->NeedsDelivery(timeStamp, keys_to_deliver, interactive))
+  if (!view->GetDeliveryManager()->NeedsDelivery(timeStamp, keys_to_deliver, use_lod))
   {
     timeStamp.Modified();
     return;
@@ -93,8 +96,10 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMDataDeliveryManager::DeliverStreamedPieces()
+bool vtkSMDataDeliveryManagerProxy::DeliverStreamedPieces()
 {
+  this->CreateVTKObjects();
+
   // Deliver() relies on the client telling the server about the representation
   // that need data from the server-side. Deliver() can reliably determine that
   // since representation objects on client side are indeed updated correctly
@@ -131,7 +136,7 @@ bool vtkSMDataDeliveryManager::DeliverStreamedPieces()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMDataDeliveryManager::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMDataDeliveryManagerProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

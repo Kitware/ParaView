@@ -41,7 +41,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
 #include "vtkPExtentTranslator.h"
-#include "vtkPVCacheKeeper.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
@@ -179,41 +178,42 @@ vtknvindex_cached_bounds::vtknvindex_cached_bounds(const double _data_bounds[6],
     spacing[i] = _spacing[i];
 }
 
-// The class vtknvindex_cache_keeper is an derived class of the original vtkPVCacheKeeper
-// which it's used for datasets with time series to avoid data to be loaded again
-// when some time steps were already cached by NVIDIA IndeX.
-
-//----------------------------------------------------------------------------
-class vtknvindex_cache_keeper : public vtkPVCacheKeeper
-{
-public:
-  static vtknvindex_cache_keeper* New();
-  vtkTypeMacro(vtknvindex_cache_keeper, vtkPVCacheKeeper);
-
-protected:
-  vtknvindex_cache_keeper()
-  {
-    // This avoids the code that keeps track of memory used by the cache since
-    // this is not applicable in our case.
-    this->SetCacheSizeKeeper(NULL);
-  }
-  ~vtknvindex_cache_keeper() {}
-  // Overridden to avoid caching the data object. We don't cache in
-  // ParaView because NVIDIA IndeX will cache the data internally.
-  bool SaveData(vtkDataObject* dobj) override
-  {
-    vtkDataObject* dNew = dobj->NewInstance();
-    this->Superclass::SaveData(dNew);
-    dNew->Delete();
-    return true;
-  }
-  void RemoveAllCaches() override
-  {
-    // We never clear cache in our demo.
-  }
-};
-
-vtkStandardNewMacro(vtknvindex_cache_keeper);
+// This should not be needed anymore.
+//// The class vtknvindex_cache_keeper is an derived class of the original vtkPVCacheKeeper
+//// which it's used for datasets with time series to avoid data to be loaded again
+//// when some time steps were already cached by NVIDIA IndeX.
+//
+////----------------------------------------------------------------------------
+// class vtknvindex_cache_keeper : public vtkPVCacheKeeper
+//{
+// public:
+//  static vtknvindex_cache_keeper* New();
+//  vtkTypeMacro(vtknvindex_cache_keeper, vtkPVCacheKeeper);
+//
+// protected:
+//  vtknvindex_cache_keeper()
+//  {
+//    // This avoids the code that keeps track of memory used by the cache since
+//    // this is not applicable in our case.
+//    this->SetCacheSizeKeeper(NULL);
+//  }
+//  ~vtknvindex_cache_keeper() {}
+//  // Overridden to avoid caching the data object. We don't cache in
+//  // ParaView because NVIDIA IndeX will cache the data internally.
+//  bool SaveData(vtkDataObject* dobj) override
+//  {
+//    vtkDataObject* dNew = dobj->NewInstance();
+//    this->Superclass::SaveData(dNew);
+//    dNew->Delete();
+//    return true;
+//  }
+//  void RemoveAllCaches() override
+//  {
+//    // We never clear cache in our demo.
+//  }
+//};
+//
+// vtkStandardNewMacro(vtknvindex_cache_keeper);
 
 //----------------------------------------------------------------------------
 class vtknvindex_lod_volume : public vtkPVLODVolume
@@ -256,11 +256,6 @@ vtknvindex_representation::vtknvindex_representation()
   // Replace default volume mapper with vtknvindex_volumemapper.
   this->VolumeMapper->Delete();
   this->VolumeMapper = vtknvindex_volumemapper::New();
-
-  // Replace default cache keeper.
-  this->CacheKeeper->Delete();
-  this->CacheKeeper = vtknvindex_cache_keeper::New();
-  this->CacheKeeper->SetInputData(this->Cache);
 
   // Replace default Actor.
   this->Actor->Delete();
@@ -342,7 +337,7 @@ int vtknvindex_representation::ProcessViewRequest(
 
     outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
 
-    vtkPVRenderView::SetGeometryBounds(inInfo, this->DataBounds);
+    vtkPVRenderView::SetGeometryBounds(inInfo, this, this->DataBounds);
 
     // Pass partitioning information to the render view.
     vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this,
@@ -408,23 +403,15 @@ int vtknvindex_representation::RequestDataBase(
   this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
   this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
 
-  // Pass caching information to the cache keeper.
-  this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
-  this->CacheKeeper->SetCacheTime(this->GetCacheKey());
-
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     vtkImageData* input = vtkImageData::GetData(inputVector[0], 0);
-    if (!this->GetUsingCacheForUpdate())
-    {
-      this->Cache->ShallowCopy(input);
-    }
-    this->CacheKeeper->Update();
+    this->Cache->ShallowCopy(input);
 
     this->Actor->SetEnableLOD(0);
-    this->VolumeMapper->SetInputConnection(this->CacheKeeper->GetOutputPort());
+    this->VolumeMapper->SetInputData(this->Cache);
 
-    vtkImageData* output = vtkImageData::SafeDownCast(this->CacheKeeper->GetOutputDataObject(0));
+    vtkImageData* output = vtkImageData::SafeDownCast(this->Cache);
 
     // Check if a dataset has time steps and skip initialization if bounds data are already cached.
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
@@ -537,8 +524,6 @@ int vtknvindex_representation::RequestData(
   (void)input;
   assert(input != NULL);
 
-  this->CacheKeeper->Update();
-
   vtknvindex_cached_bounds* cached_bounds =
     has_time_steps ? get_cached_bounds(cur_time_step) : NULL;
 
@@ -547,7 +532,7 @@ int vtknvindex_representation::RequestData(
   static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)->is_caching(using_cache);
   static_cast<vtknvindex_lod_volume*>(this->Actor)->set_caching_pass(using_cache);
 
-  vtkDataSet* ds = vtkDataSet::SafeDownCast(this->CacheKeeper->GetOutputDataObject(0));
+  vtkDataSet* ds = vtkDataSet::SafeDownCast(this->Cache);
   if (ds)
   {
     mi::Sint32 extent[6] = { 0, 0, 0, 0, 0, 0 };

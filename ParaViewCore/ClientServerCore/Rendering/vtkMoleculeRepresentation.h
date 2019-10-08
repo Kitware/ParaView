@@ -28,7 +28,6 @@
 class vtkActor;
 class vtkMolecule;
 class vtkMoleculeMapper;
-class vtkPVCacheKeeper;
 class vtkScalarsToColors;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkMoleculeRepresentation
@@ -72,8 +71,6 @@ public:
    */
   vtkDataObject* GetRenderedDataObject(int port) override;
 
-  void MarkModified() override;
-
   //@{
   /**
    * Forward custom atom/bonds rendering parameters to the mapper.
@@ -99,16 +96,13 @@ protected:
   bool AddToView(vtkView* view) override;
   bool RemoveFromView(vtkView* view) override;
 
-  bool IsCached(double cache_key) override;
-
   void SyncMapper();
   void UpdateColoringParameters();
 
   vtkActor* Actor;
   vtkMoleculeMapper* Mapper;
 
-  vtkNew<vtkPVCacheKeeper> CacheKeeper;
-  vtkNew<vtkMolecule> DummyMolecule;
+  vtkNew<vtkMolecule> Molecule;
 
   int MoleculeRenderMode;
   bool UseCustomRadii;

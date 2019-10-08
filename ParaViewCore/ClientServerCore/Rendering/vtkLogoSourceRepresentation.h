@@ -27,7 +27,6 @@
 #include "vtkPVDataRepresentation.h"
 
 class vtk3DWidgetRepresentation;
-class vtkPVCacheKeeper;
 class vtkImageData;
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkLogoSourceRepresentation
   : public vtkPVDataRepresentation
@@ -44,11 +43,6 @@ public:
   void SetLogoWidgetRepresentation(vtk3DWidgetRepresentation* widget);
   vtkGetObjectMacro(LogoWidgetRepresentation, vtk3DWidgetRepresentation);
   //@}
-
-  /**
-   * Remove all cache when marking modified
-   */
-  void MarkModified() override;
 
   /**
    * Set the visibility.
@@ -105,12 +99,6 @@ protected:
    */
   bool RemoveFromView(vtkView* view) override;
 
-  /**
-   * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
-   */
-  bool IsCached(double cache_key) override;
-
-  vtkNew<vtkPVCacheKeeper> CacheKeeper;
   vtkNew<vtkImageData> ImageCache;
   vtk3DWidgetRepresentation* LogoWidgetRepresentation = nullptr;
   double Opacity = 1.0;

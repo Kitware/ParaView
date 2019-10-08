@@ -24,7 +24,6 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVCacheKeeper.h"
 #include "vtkPVRenderView.h"
 #include "vtkPointHandleRepresentation2D.h"
 #include "vtkPointSource.h"
@@ -47,8 +46,6 @@ vtkRulerSourceRepresentation::vtkRulerSourceRepresentation()
   this->DistanceRepresentation->SetHandleRepresentation(handle);
   this->DistanceRepresentation->InstantiateHandleRepresentation();
   this->DistanceRepresentation->GetAxis()->UseFontSizeFromPropertyOn();
-
-  this->CacheKeeper->SetInputData(this->Clone.Get());
 }
 
 //----------------------------------------------------------------------------
@@ -97,23 +94,6 @@ bool vtkRulerSourceRepresentation::RemoveFromView(vtkView* view)
       ->RemoveActor(this->DistanceRepresentation);
   }
   return this->Superclass::RemoveFromView(view);
-}
-
-//----------------------------------------------------------------------------
-void vtkRulerSourceRepresentation::MarkModified()
-{
-  if (!this->GetUseCache())
-  {
-    // Cleanup caches when not using cache.
-    this->CacheKeeper->RemoveAllCaches();
-  }
-  this->Superclass::MarkModified();
-}
-
-//----------------------------------------------------------------------------
-bool vtkRulerSourceRepresentation::IsCached(double cache_key)
-{
-  return this->CacheKeeper->IsCached(cache_key);
 }
 
 //----------------------------------------------------------------------------
@@ -211,17 +191,11 @@ void vtkRulerSourceRepresentation::SetNumberOfRulerTicks(int n)
 int vtkRulerSourceRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  // Pass caching information to the cache keeper.
-  this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
-  this->CacheKeeper->SetCacheTime(this->GetCacheKey());
-
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     this->Clone->ShallowCopy(vtkPolyData::GetData(inputVector[0], 0));
   }
   this->Clone->Modified();
-  this->CacheKeeper->Update();
-
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 
@@ -237,7 +211,7 @@ int vtkRulerSourceRepresentation::ProcessViewRequest(
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
   {
-    vtkPVRenderView::SetPiece(inInfo, this, this->CacheKeeper->GetOutputDataObject(0));
+    vtkPVRenderView::SetPiece(inInfo, this, this->Clone);
     // `gather_before_delivery` is true, since vtkLineSource (which is the
     // source for the ruler) doesn't produce any data on ranks except the root.
     vtkPVRenderView::SetDeliverToAllProcesses(inInfo, this, true);

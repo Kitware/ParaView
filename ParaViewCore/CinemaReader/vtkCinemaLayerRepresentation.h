@@ -52,7 +52,6 @@ class vtkCinemaLayerMapper;
 class vtkImageMapper;
 class vtkImageData;
 class vtkImageReslice;
-class vtkPVCacheKeeper;
 class vtkPVCameraCollection;
 class vtkScalarsToColors;
 
@@ -64,7 +63,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   void SetVisibility(bool) override;
-  void MarkModified() override;
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) override;
 
@@ -82,7 +80,6 @@ protected:
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   bool AddToView(vtkView* view) override;
   bool RemoveFromView(vtkView* view) override;
-  bool IsCached(double cache_key) override;
 
   /**
    * Updates the Mapper. First, it creates a cinema query. Then, it sets
@@ -100,8 +97,8 @@ private:
   vtkCinemaLayerRepresentation(const vtkCinemaLayerRepresentation&) = delete;
   void operator=(const vtkCinemaLayerRepresentation&) = delete;
 
+  vtkNew<vtkPolyData> Data;
   vtkNew<vtkCinemaDatabase> CinemaDatabase;
-  vtkNew<vtkPVCacheKeeper> CacheKeeper;
   vtkNew<vtkImageMapper> MapperA;
   vtkNew<vtkCinemaLayerMapper> MapperC;
   vtkNew<vtkActor2D> Actor;

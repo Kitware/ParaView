@@ -45,7 +45,6 @@ class vtkMultiProcessController;
 class vtkOrderedCompositeDistributor;
 class vtkPiecewiseFunction;
 class vtkPolyDataMapper;
-class vtkPVCacheKeeper;
 class vtkPVGeometryFilter;
 class vtkPVLODVolume;
 class vtkPVUpdateSuppressor;
@@ -84,12 +83,6 @@ public:
   // PrepareForRendering.
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) override;
-
-  // This needs to be called on all instances of vtkGeometryRepresentation when
-  // the input is modified. This is essential since the geometry filter does not
-  // have any real-input on the client side which messes with the Update
-  // requests.
-  void MarkModified() override;
 
   // Get/Set the visibility for this representation. When the visibility of
   // representation of false, all view passes are ignored.
@@ -227,14 +220,10 @@ protected:
   // Returns true if the removal succeeds.
   bool RemoveFromView(vtkView* view) override;
 
-  // Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
-  bool IsCached(double cache_key) override;
-
   // Passes on parameters to the active volume mapper.
   virtual void UpdateMapperParameters();
 
   vtkVolumeRepresentationPreprocessor* Preprocessor;
-  vtkPVCacheKeeper* CacheKeeper;
 
   vtknvindex_irregular_volume_mapper* DefaultMapper;
 

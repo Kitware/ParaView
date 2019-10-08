@@ -24,6 +24,7 @@
 #ifndef vtkPVDataRepresentation_h
 #define vtkPVDataRepresentation_h
 
+#include "vtkCommand.h" // needed for vtkCommand
 #include "vtkDataRepresentation.h"
 #include "vtkPVClientServerCoreRenderingModule.h" // needed for exports
 #include "vtkWeakPointer.h"                       // needed for vtkWeakPointer
@@ -42,7 +43,10 @@ public:
    * typically called by the vtkView to request meta-data from the
    * representations or ask them to perform certain tasks e.g.
    * PrepareForRendering.
-   * Overridden to skip processing when visibility if off.
+   *
+   * @note Starting with ParaView 5.8, this method is no longer called for
+   * hidden representation i.e. representations for which
+   * `vtkDataRepresentation::GetVisibility()` returns false.
    */
   virtual int ProcessViewRequest(
     vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
@@ -115,40 +119,32 @@ public:
 
   //@{
   /**
-   * Set whether the UpdateTime is valid.
+   * Get whether the UpdateTime is valid. `ResetUpdateTime` can be used to clear
+   * the UpdateTimeValid flag.
    */
   vtkGetMacro(UpdateTimeValid, bool);
+  void ResetUpdateTime();
   //@}
-
-  /**
-   * Typically a representation decides whether to use cache based on the view's
-   * values for UseCache and CacheKey.
-   * However in some cases we may want to
-   * force a representation to cache irrespective of the view (e.g. comparative
-   * views). In which case these ivars can up set. If ForcedCacheKey is true, it
-   * overrides UseCache and CacheKey. Instead, ForcedCacheKey is used.
-   */
-  virtual void SetForcedCacheKey(double val) { this->ForcedCacheKey = val; }
-  virtual void SetForceUseCache(bool val) { this->ForceUseCache = val; }
 
   //@{
   /**
-   * Returns whether caching is used and what key to use when caching is
-   * enabled.
+   * Generally, caching is within the purview of the vtkPVView (and subclasses).
+   * However, a representation may choose to override that caching by forcing
+   * specific caching parameters. This is primarily intended for views like
+   * comparative view that rely on caching to show multiple frames from the same
+   * pipeline at a time.
    */
-  virtual double GetCacheKey();
-  virtual bool GetUseCache();
+  virtual void SetForcedCacheKey(double val) { this->ForcedCacheKey = val; }
+  virtual void SetForceUseCache(bool val) { this->ForceUseCache = val; }
+  vtkGetMacro(ForcedCacheKey, double);
+  vtkGetMacro(ForceUseCache, bool);
   //@}
 
   /**
-   * Called by vtkPVDataRepresentationPipeline to see if using cache is valid
-   * and will be used for the update. If so, it bypasses all pipeline passes.
-   * Subclasses should override IsCached(double) to indicate if a particular
-   * entry is cached.
+   * Returns the cache-key the representation is currently using. This takes
+   * into consideration whether ForcedCacheKey is to be used.
    */
-  bool GetUsingCacheForUpdate();
-
-  vtkGetMacro(NeedUpdate, bool);
+  double GetCacheKey() const;
 
   //@{
   /**
@@ -192,19 +188,52 @@ public:
   const std::string& GetLogName() const { return this->LogName; }
   //@}
 
+  //@{
+  /**
+   * This flag indicates if the representation is for a temporal pipeline. If
+   * true, then calling `SetUpdateTime` will result in calling
+   * `this->MarkModified()` i.e. will cause the representation to update on
+   * subsequent update request. Otherwise, the subsequent update request will be
+   * a no-op (unless the representation ended up calling MarkModified due to
+   * other changes i.e. change in input pipeline). `HasTemporalPipeline` gets
+   * set in the first update on the representation, however, only on the
+   * data-server side. vtkPVView ensures that the flag is synced up among all
+   * ranks at the end of each `vtkPVView::Update` call.
+   */
+  vtkGetMacro(HasTemporalPipeline, bool);
+  vtkSetMacro(HasTemporalPipeline, bool);
+  //@}
+
+  /**
+   * Returns true if the representation needs an update.
+   */
+  bool GetNeedsUpdate();
+
+  enum
+  {
+    /**
+     * This event is fired in `ProcessViewRequest` when `REQUEST_UPDATE` was
+     * requested and the representation needed an update (i.e.
+     * this->GetNeedsUpdate() == true), however was skipped since the data
+     * is already cached by the view.
+     */
+    SkippedUpdateDataEvent = vtkCommand::UserEvent + 91,
+    UpdateTimeChangedEvent,
+  };
+
+  //@{
+  /**
+   * Overridden to ensure that `MarkModified` is called.
+   */
+  void SetInputConnection(int port, vtkAlgorithmOutput* input) override;
+  using Superclass::SetInputConnection;
+  void AddInputConnection(int port, vtkAlgorithmOutput* input) override;
+  using Superclass::AddInputConnection;
+  //@}
+
 protected:
   vtkPVDataRepresentation();
   ~vtkPVDataRepresentation() override;
-
-  /**
-   * Subclasses should override this method when they support caching to
-   * indicate if the particular key is cached. Default returns false.
-   */
-  virtual bool IsCached(double cache_key)
-  {
-    (void)cache_key;
-    return false;
-  }
 
   /**
    * Create a default executive.
@@ -232,7 +261,9 @@ private:
   bool Visibility;
   bool ForceUseCache;
   double ForcedCacheKey;
-  bool NeedUpdate;
+  double CacheKey;
+
+  bool HasTemporalPipeline;
 
   class Internals;
   Internals* Implementation;

@@ -15,15 +15,18 @@
 #include "vtkPVView.h"
 
 #include "vtkBoundingBox.h"
-#include "vtkCacheSizeKeeper.h"
 #include "vtkCommunicator.h"
 #include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkInformation.h"
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkInformationRequestKey.h"
 #include "vtkInformationVector.h"
+#include "vtkLogger.h"
+#include "vtkMPIMoveData.h"
 #include "vtkMultiProcessController.h"
+#include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVDataDeliveryManager.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVLogger.h"
 #include "vtkPVOptions.h"
@@ -211,11 +214,14 @@ vtkPVView::vtkPVView(bool create_render_window)
     this->RenderWindow->SetPosition(this->Position);
     this->RenderWindow->SetDPI(this->PPI);
   }
+
+  this->DeliveryManager = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkPVView::~vtkPVView()
 {
+  this->SetDeliveryManager(nullptr);
   this->RequestInformation->Delete();
   this->ReplyInformationVector->Delete();
   this->SetRenderWindow(nullptr);
@@ -358,7 +364,6 @@ void vtkPVView::SetViewTime(double time)
   {
     this->ViewTime = time;
     this->ViewTimeValid = true;
-    this->InvokeEvent(ViewTimeChangedEvent);
     this->Modified();
   }
 }
@@ -424,49 +429,125 @@ void vtkPVView::Update()
 {
   vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "%s: update view", this->GetLogName().c_str());
 
-  vtkTimerLog::MarkStartEvent("vtkPVView::Update");
-  // Ensure that cache size if synchronized among the processes.
-  if (this->GetUseCache())
+  // Propagate update time.
+  const int num_reprs = this->GetNumberOfRepresentations();
+  const auto view_time = this->GetViewTime();
+  for (int cc = 0; cc < num_reprs; cc++)
   {
-    vtkCacheSizeKeeper* cacheSizeKeeper = vtkCacheSizeKeeper::GetInstance();
-    vtkTypeUInt64 cache_full = 0;
-    if (cacheSizeKeeper->GetCacheSize() > cacheSizeKeeper->GetCacheLimit())
+    if (auto pvrepr = vtkPVDataRepresentation::SafeDownCast(this->GetRepresentation(cc)))
     {
-      cache_full = 1;
-    }
-    this->AllReduce(cache_full, cache_full, vtkCommunicator::MAX_OP);
-    cacheSizeKeeper->SetCacheFull(cache_full > 0);
-  }
-
-  this->CallProcessViewRequest(
-    vtkPVView::REQUEST_UPDATE(), this->RequestInformation, this->ReplyInformationVector);
-  vtkTimerLog::MarkEndEvent("vtkPVView::Update");
-}
-
-//----------------------------------------------------------------------------
-void vtkPVView::CallProcessViewRequest(
-  vtkInformationRequestKey* type, vtkInformation* inInfo, vtkInformationVector* outVec)
-{
-  int num_reprs = this->GetNumberOfRepresentations();
-  outVec->SetNumberOfInformationObjects(num_reprs);
-
-  if (type == REQUEST_UPDATE())
-  {
-    // Pass the view time before updating the representations.
-    for (int cc = 0; cc < num_reprs; cc++)
-    {
-      vtkDataRepresentation* repr = this->GetRepresentation(cc);
-      vtkPVDataRepresentation* pvrepr = vtkPVDataRepresentation::SafeDownCast(repr);
-      if (pvrepr)
+      // Pass the view time information to the representation
+      if (this->ViewTimeValid)
       {
-        // Pass the view time information to the representation
-        if (this->ViewTimeValid)
-        {
-          pvrepr->SetUpdateTime(this->GetViewTime());
-        }
+        pvrepr->SetUpdateTime(view_time);
+      }
+      else
+      {
+        pvrepr->ResetUpdateTime();
       }
     }
   }
+
+  vtkTimerLog::MarkStartEvent("vtkPVView::Update");
+  const int count = this->CallProcessViewRequest(
+    vtkPVView::REQUEST_UPDATE(), this->RequestInformation, this->ReplyInformationVector);
+  vtkTimerLog::MarkEndEvent("vtkPVView::Update");
+
+  // exchange information about representations that are time-dependent.
+  // this goes from data-server-root to client and render-server.
+  if (count)
+  {
+    this->SynchronizeRepresentationTemporalPipelineStates();
+  }
+
+  this->UpdateTimeStamp.Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVView::SynchronizeRepresentationTemporalPipelineStates()
+{
+  vtkVLogScopeF(
+    PARAVIEW_LOG_RENDERING_VERBOSITY(), "%s: sync temporal states", this->GetLogName().c_str());
+
+  std::map<unsigned int, vtkPVDataRepresentation*> repr_map;
+  const int num_reprs = this->GetNumberOfRepresentations();
+  for (int cc = 0; cc < num_reprs; cc++)
+  {
+    if (auto pvrepr = vtkPVDataRepresentation::SafeDownCast(this->GetRepresentation(cc)))
+    {
+      repr_map[pvrepr->GetUniqueIdentifier()] = pvrepr;
+    }
+  }
+
+  vtkMultiProcessStream stream;
+  auto ptype = vtkProcessModule::GetProcessType();
+  if (ptype == vtkProcessModule::PROCESS_DATA_SERVER || ptype == vtkProcessModule::PROCESS_SERVER)
+  {
+    stream << static_cast<int>(repr_map.size());
+    for (const auto& apair : repr_map)
+    {
+      auto pvrepr = apair.second;
+      stream << pvrepr->GetUniqueIdentifier() << (pvrepr->GetHasTemporalPipeline() ? 1 : 0);
+    }
+    if (auto cController = this->Session->GetController(vtkPVSession::CLIENT))
+    {
+      cController->Send(stream, 1, 102290);
+    }
+    stream.Reset();
+  }
+  else if (ptype == vtkProcessModule::PROCESS_CLIENT)
+  {
+    auto crController = this->Session->GetController(vtkPVSession::RENDER_SERVER_ROOT);
+    auto cdController = this->Session->GetController(vtkPVSession::DATA_SERVER_ROOT);
+    if (crController == cdController)
+    {
+      crController = nullptr;
+    }
+    if (cdController)
+    {
+      cdController->Receive(stream, 1, 102290);
+    }
+    if (crController)
+    {
+      crController->Send(stream, 1, 102290);
+    }
+  }
+  else if (ptype == vtkProcessModule::PROCESS_RENDER_SERVER)
+  {
+    if (auto cController = this->Session->GetController(vtkPVSession::CLIENT))
+    {
+      cController->Receive(stream, 1, 102290);
+    }
+    if (auto pController = vtkMultiProcessController::GetGlobalController())
+    {
+      pController->Broadcast(stream, 0);
+    }
+  }
+
+  if (stream.Size() > 0)
+  {
+    int count;
+    stream >> count;
+    for (int cc = 0; cc < count; ++cc)
+    {
+      unsigned int id;
+      int status;
+      stream >> id >> status;
+      if (auto repr = repr_map[id])
+      {
+        repr->SetHasTemporalPipeline(status == 1);
+      }
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVView::CallProcessViewRequest(
+  vtkInformationRequestKey* type, vtkInformation* inInfo, vtkInformationVector* outVec)
+{
+  int count = 0;
+  int num_reprs = this->GetNumberOfRepresentations();
+  outVec->SetNumberOfInformationObjects(num_reprs);
 
   // NOTE: This will create a reference loop (depending on what inInfo is). If
   // it's this->RequestInformation, then we have a loop and hence it's
@@ -481,7 +562,13 @@ void vtkPVView::CallProcessViewRequest(
     vtkPVDataRepresentation* pvrepr = vtkPVDataRepresentation::SafeDownCast(repr);
     if (pvrepr)
     {
-      pvrepr->ProcessViewRequest(type, inInfo, outInfo);
+      if (pvrepr->GetVisibility())
+      {
+        if (pvrepr->ProcessViewRequest(type, inInfo, outInfo))
+        {
+          ++count;
+        }
+      }
     }
     else if (repr && type == REQUEST_UPDATE())
     {
@@ -492,6 +579,7 @@ void vtkPVView::CallProcessViewRequest(
   // Clear input information since we are done with the pass. This avoids any
   // need for garbage collection.
   inInfo->Clear();
+  return count;
 }
 
 //-----------------------------------------------------------------------------
@@ -506,8 +594,26 @@ void vtkPVView::AddRepresentationInternal(vtkDataRepresentation* rep)
                     << "AddToView implementation. Please fix that. "
                     << "Also check the same for RemoveFromView(..).");
     }
+
+    if (this->DeliveryManager)
+    {
+      this->DeliveryManager->RegisterRepresentation(drep);
+    }
   }
   this->Superclass::AddRepresentationInternal(rep);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVView::RemoveRepresentationInternal(vtkDataRepresentation* rep)
+{
+  if (auto dataRep = vtkPVDataRepresentation::SafeDownCast(rep))
+  {
+    if (this->DeliveryManager)
+    {
+      this->DeliveryManager->UnRegisterRepresentation(dataRep);
+    }
+  }
+  this->Superclass::RemoveRepresentationInternal(rep);
 }
 
 //-----------------------------------------------------------------------------
@@ -741,4 +847,124 @@ void vtkPVView::SetTileViewport(double x0, double y0, double x1, double y1)
 vtkPVSession* vtkPVView::GetSession()
 {
   return this->Session;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVView::IsCached(vtkPVDataRepresentation* repr)
+{
+  if (this->DeliveryManager && this->DeliveryManager->HasPiece(repr))
+  {
+    vtkLogF(TRACE, "cached %s", repr->GetLogName().c_str());
+    return true;
+  }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVView::ClearCache(vtkPVDataRepresentation* repr)
+{
+  assert(repr != nullptr);
+  if (!this->GetUseCache() && !repr->GetForceUseCache() && this->DeliveryManager != nullptr)
+  {
+    vtkLogF(TRACE, "clear cache %s", repr->GetLogName().c_str());
+    this->DeliveryManager->ClearCache(repr);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVView::SetDeliveryManager(vtkPVDataDeliveryManager* manager)
+{
+  if (this->DeliveryManager)
+  {
+    this->DeliveryManager->SetView(nullptr);
+  }
+  vtkSetObjectBodyMacro(DeliveryManager, vtkPVDataDeliveryManager, manager);
+  if (this->DeliveryManager)
+  {
+    // not reference counted.
+    this->DeliveryManager->SetView(this);
+  }
+}
+
+//-----------------------------------------------------------------------------
+vtkPVDataDeliveryManager* vtkPVView::GetDeliveryManager(vtkInformation* info)
+{
+  auto* view = info ? vtkPVView::SafeDownCast(info->Get(VIEW())) : nullptr;
+  if (!view)
+  {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return nullptr;
+  }
+  return view->GetDeliveryManager();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVView::SetPiece(vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* data,
+  unsigned long trueSize, int port)
+{
+  if (auto dm = vtkPVView::GetDeliveryManager(info))
+  {
+    dm->SetPiece(repr, data, false, trueSize, port);
+  }
+}
+
+//-----------------------------------------------------------------------------
+vtkDataObject* vtkPVView::GetPiece(vtkInformation* info, vtkPVDataRepresentation* repr, int port)
+{
+  if (auto dm = vtkPVView::GetDeliveryManager(info))
+  {
+    return dm->GetPiece(repr, false, port);
+  }
+  return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+vtkDataObject* vtkPVView::GetDeliveredPiece(
+  vtkInformation* info, vtkPVDataRepresentation* repr, int port)
+{
+  if (auto dm = vtkPVView::GetDeliveryManager(info))
+  {
+    return dm->GetDeliveredPiece(repr, false, port);
+  }
+  return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVView::SetPieceLOD(vtkInformation* info, vtkPVDataRepresentation* repr,
+  vtkDataObject* data, unsigned long trueSize, int port)
+{
+  if (auto dm = vtkPVView::GetDeliveryManager(info))
+  {
+    dm->SetPiece(repr, data, true, trueSize, port);
+  }
+}
+
+//-----------------------------------------------------------------------------
+vtkDataObject* vtkPVView::GetPieceLOD(vtkInformation* info, vtkPVDataRepresentation* repr, int port)
+{
+  if (auto dm = vtkPVView::GetDeliveryManager(info))
+  {
+    return dm->GetPiece(repr, true, port);
+  }
+  return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+vtkDataObject* vtkPVView::GetDeliveredPieceLOD(
+  vtkInformation* info, vtkPVDataRepresentation* repr, int port)
+{
+  if (auto dm = vtkPVView::GetDeliveryManager(info))
+  {
+    return dm->GetDeliveredPiece(repr, true, port);
+  }
+  return nullptr;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVView::Deliver(int use_lod, unsigned int size, unsigned int* representation_ids)
+{
+  if (auto dm = this->GetDeliveryManager())
+  {
+    dm->Deliver(use_lod, size, representation_ids);
+  }
 }

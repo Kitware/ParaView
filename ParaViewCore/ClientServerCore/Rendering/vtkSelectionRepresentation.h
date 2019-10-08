@@ -40,6 +40,9 @@ public:
   vtkTypeMacro(vtkSelectionRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+    vtkInformation* outInfo) override;
+
   /**
    * One must change the internal representations only before the representation
    * is added to a view, after that it should not be touched.

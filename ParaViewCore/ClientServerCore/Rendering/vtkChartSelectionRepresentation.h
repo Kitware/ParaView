@@ -36,6 +36,7 @@
 
 class vtkChartRepresentation;
 class vtkPVContextView;
+class vtkSelection;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkChartSelectionRepresentation
   : public vtkPVDataRepresentation
@@ -61,6 +62,9 @@ public:
    * representation. This is not reference counted.
    */
   void SetChartRepresentation(vtkChartRepresentation* repr);
+
+  int ProcessViewRequest(
+    vtkInformationRequestKey* request, vtkInformation* ininfo, vtkInformation* outinfo) override;
 
 protected:
   vtkChartSelectionRepresentation();
@@ -90,6 +94,8 @@ protected:
   // Flag updated in AddToView to indicate if the configuration requires
   // server-side rendering.
   bool EnableServerSideRendering;
+
+  vtkSmartPointer<vtkSelection> Cache;
 
 private:
   vtkChartSelectionRepresentation(const vtkChartSelectionRepresentation&) = delete;

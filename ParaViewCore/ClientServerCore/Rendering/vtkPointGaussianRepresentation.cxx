@@ -290,7 +290,7 @@ int vtkPointGaussianRepresentation::ProcessViewRequest(
     // 2. Provide the bounds.
     vtkNew<vtkMatrix4x4> matrix;
     this->Actor->GetMatrix(matrix.GetPointer());
-    vtkPVRenderView::SetGeometryBounds(inInfo, bounds, matrix.GetPointer());
+    vtkPVRenderView::SetGeometryBounds(inInfo, this, bounds, matrix.GetPointer());
     outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())

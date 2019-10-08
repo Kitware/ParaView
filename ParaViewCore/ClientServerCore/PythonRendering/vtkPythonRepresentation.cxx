@@ -12,7 +12,6 @@
 #include "vtkMultiBlockDataGroupFilter.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVCacheKeeper.h"
 #include "vtkPVMergeTables.h"
 #include "vtkPVSession.h"
 #include "vtkPassArrays.h"

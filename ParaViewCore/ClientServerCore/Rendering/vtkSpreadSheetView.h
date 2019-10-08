@@ -210,6 +210,7 @@ public:
    * Allow user to clear the cache if he needs to.
    */
   void ClearCache();
+  using Superclass::ClearCache;
 
   // INTERNAL METHOD. Don't call directly.
   vtkTable* FetchBlockCallback(vtkIdType blockindex);

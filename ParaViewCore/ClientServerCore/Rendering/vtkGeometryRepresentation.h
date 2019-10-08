@@ -39,7 +39,6 @@ class vtkCompositeDataDisplayAttributes;
 class vtkCompositePolyDataMapper2;
 class vtkMapper;
 class vtkPiecewiseFunction;
-class vtkPVCacheKeeper;
 class vtkPVGeometryFilter;
 class vtkPVLODActor;
 class vtkScalarsToColors;
@@ -69,14 +68,6 @@ public:
    */
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) override;
-
-  /**
-   * This needs to be called on all instances of vtkGeometryRepresentation when
-   * the input is modified. This is essential since the geometry filter does not
-   * have any real-input on the client side which messes with the Update
-   * requests.
-   */
-  void MarkModified() override;
 
   /**
    * Get/Set the visibility for this representation. When the visibility of
@@ -373,11 +364,6 @@ protected:
    */
   virtual vtkPVLODActor* GetRenderedProp() { return this->Actor; }
 
-  /**
-   * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
-   */
-  bool IsCached(double cache_key) override;
-
   // Progress Callback
   void HandleGeometryRepresentationProgress(vtkObject* caller, unsigned long, void*);
 
@@ -411,7 +397,6 @@ protected:
 
   vtkAlgorithm* GeometryFilter;
   vtkAlgorithm* MultiBlockMaker;
-  vtkPVCacheKeeper* CacheKeeper;
   vtkGeometryRepresentation_detail::DecimationFilterType* Decimator;
   vtkPVGeometryFilter* LODOutlineFilter;
 

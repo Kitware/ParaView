@@ -28,7 +28,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPExtentTranslator.h"
-#include "vtkPVCacheKeeper.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
 #include "vtkPolyDataMapper.h"
@@ -118,13 +117,7 @@ vtkStreamLinesRepresentation::vtkStreamLinesRepresentation()
   this->Actor->SetProperty(this->Property);
   this->Actor->SetEnableLOD(0);
 
-  this->CacheKeeper = vtkPVCacheKeeper::New();
-
-  this->Cache = vtkImageData::New();
-
   this->MBMerger = vtkCompositeDataToUnstructuredGridFilter::New();
-
-  this->CacheKeeper->SetInputData(this->Cache);
 
   vtkMath::UninitializeBounds(this->DataBounds);
   this->DataSize = 0;
@@ -141,8 +134,6 @@ vtkStreamLinesRepresentation::~vtkStreamLinesRepresentation()
   this->StreamLinesMapper->Delete();
   this->Property->Delete();
   this->Actor->Delete();
-  this->CacheKeeper->Delete();
-  this->Cache->Delete();
   this->MBMerger->Delete();
 }
 
@@ -161,19 +152,18 @@ int vtkStreamLinesRepresentation::ProcessViewRequest(
 {
   if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
   {
-    this->MarkModified();
     return 0;
   }
   if (request_type == vtkPVView::REQUEST_UPDATE())
   {
-    vtkPVRenderView::SetPiece(inInfo, this, this->CacheKeeper->GetOutputDataObject(0));
+    vtkPVRenderView::SetPiece(inInfo, this, this->Cache);
     // BUG #14792.
     // We report this->DataSize explicitly since the data being "delivered" is
     // not the data that should be used to make rendering decisions based on
     // data size.
     outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
 
-    vtkPVRenderView::SetGeometryBounds(inInfo, this->DataBounds);
+    vtkPVRenderView::SetGeometryBounds(inInfo, this, this->DataBounds);
 
     // Pass partitioning information to the render view.
     vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this,
@@ -187,11 +177,9 @@ int vtkStreamLinesRepresentation::ProcessViewRequest(
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
+    this->StreamLinesMapper->SetInputDataObject(vtkPVView::GetDeliveredPiece(inInfo, this));
     this->UpdateMapperParameters();
   }
-
-  this->MarkModified();
-
   return 1;
 }
 
@@ -206,10 +194,6 @@ int vtkStreamLinesRepresentation::RequestData(
   this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
   this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
 
-  // Pass caching information to the cache keeper.
-  this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
-  this->CacheKeeper->SetCacheTime(this->GetCacheKey());
-
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
@@ -218,20 +202,19 @@ int vtkStreamLinesRepresentation::RequestData(
     vtkMultiBlockDataSet* inputMB = vtkMultiBlockDataSet::SafeDownCast(inputDO);
     if (inputImage)
     {
-      if (!this->GetUsingCacheForUpdate())
+      vtkImageData* clone = inputImage->NewInstance();
+      clone->ShallowCopy(inputImage);
+      if (inputImage->HasAnyGhostCells())
       {
-        this->Cache->ShallowCopy(inputImage);
-        if (inputImage->HasAnyGhostCells())
-        {
-          int ext[6];
-          vtkGetNonGhostExtent(ext, this->Cache);
-          // Yup, this will modify the "input", but that okay for now. Ultimately,
-          // we will teach the volume mapper to handle ghost cells and this won't
-          // be needed. Once that's done, we'll need to teach the KdTree
-          // generation code to handle overlap in extents, however.
-          this->Cache->Crop(ext);
-        }
+        int ext[6];
+        vtkGetNonGhostExtent(ext, clone);
+        // Yup, this will modify the "input", but that okay for now. Ultimately,
+        // we will teach the volume mapper to handle ghost cells and this won't
+        // be needed. Once that's done, we'll need to teach the KdTree
+        // generation code to handle overlap in extents, however.
+        clone->Crop(ext);
       }
+      this->Cache.TakeReference(clone);
       // Collect information about volume that is needed for data redistribution
       // later.
       this->PExtentTranslator->GatherExtents(inputImage);
@@ -242,51 +225,20 @@ int vtkStreamLinesRepresentation::RequestData(
     }
     else if (inputDS)
     {
-      if (!this->GetUsingCacheForUpdate())
-      {
-        this->CacheKeeper->SetInputData(inputDS);
-      }
+      this->Cache.TakeReference(inputDS->NewInstance());
+      this->Cache->ShallowCopy(inputDS);
     }
     else if (inputMB)
     {
-      vtkCompositeDataToUnstructuredGridFilter::SafeDownCast(this->MBMerger)->SetInputData(inputMB);
-      if (!this->GetUsingCacheForUpdate())
-      {
-        this->CacheKeeper->SetInputConnection(this->MBMerger->GetOutputPort());
-      }
+      this->MBMerger->SetInputDataObject(inputMB);
+      this->MBMerger->Update();
+      this->Cache.TakeReference(this->MBMerger->GetOutputDataObject(0)->NewInstance());
+      this->Cache->ShallowCopy(this->MBMerger->GetOutputDataObject(0));
     }
-
-    this->CacheKeeper->Update();
-    this->StreamLinesMapper->SetInputConnection(this->CacheKeeper->GetOutputPort());
-
-    vtkDataSet* output = vtkDataSet::SafeDownCast(this->CacheKeeper->GetOutputDataObject(0));
-    this->DataSize = output->GetActualMemorySize();
-  }
-  else
-  {
-    // when no input is present, it implies that this processes is on a node
-    // without the data input i.e. either client or render-server.
-    this->StreamLinesMapper->RemoveAllInputs();
+    this->DataSize = this->Cache->GetActualMemorySize();
   }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
-}
-
-//----------------------------------------------------------------------------
-bool vtkStreamLinesRepresentation::IsCached(double cache_key)
-{
-  return this->CacheKeeper->IsCached(cache_key);
-}
-
-//----------------------------------------------------------------------------
-void vtkStreamLinesRepresentation::MarkModified()
-{
-  if (!this->GetUseCache())
-  {
-    // Cleanup caches when not using cache.
-    this->CacheKeeper->RemoveAllCaches();
-  }
-  this->Superclass::MarkModified();
 }
 
 //----------------------------------------------------------------------------

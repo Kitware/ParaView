@@ -28,7 +28,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
-#include "vtkPVCacheKeeper.h"
 #include "vtkPVChangeOfBasisHelper.h"
 #include "vtkPVGeometryFilter.h"
 #include "vtkPVLODActor.h"
@@ -332,7 +331,7 @@ int vtkGeometrySliceRepresentation::RequestData(
     // If data-bounds are provided in the meta-data, we will report those to the
     // slice view so that the slice view shows the data bounds to the user when
     // setting up slices.
-    vtkDataObject* localData = this->CacheKeeper->GetOutputDataObject(0);
+    vtkDataObject* localData = this->MultiBlockMaker->GetOutputDataObject(0);
     vtkGSRGeometryFilter::ExtractCachedBounds(localData, this->Internals->OriginalDataBounds);
 
     return 1;

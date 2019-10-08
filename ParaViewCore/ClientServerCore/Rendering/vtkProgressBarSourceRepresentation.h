@@ -30,7 +30,6 @@
 
 class vtk3DWidgetRepresentation;
 class vtkPolyData;
-class vtkPVCacheKeeper;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkProgressBarSourceRepresentation
   : public vtkPVDataRepresentation
@@ -47,8 +46,6 @@ public:
   void SetProgressBarWidgetRepresentation(vtk3DWidgetRepresentation* widget);
   vtkGetObjectMacro(ProgressBarWidgetRepresentation, vtk3DWidgetRepresentation);
   //@}
-
-  void MarkModified() override;
 
   /**
    * Set the visibility.
@@ -97,12 +94,6 @@ protected:
    */
   bool RemoveFromView(vtkView* view) override;
 
-  /**
-   * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
-   */
-  bool IsCached(double cache_key) override;
-
-  vtkPVCacheKeeper* CacheKeeper;
   vtkSmartPointer<vtkPolyData> DummyPolyData;
   vtk3DWidgetRepresentation* ProgressBarWidgetRepresentation;
 

@@ -46,7 +46,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 #include "vtkSMCollaborationManager.h"
-#include "vtkSMDataDeliveryManager.h"
+#include "vtkSMDataDeliveryManagerProxy.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMMaterialLibraryProxy.h"
@@ -78,7 +78,6 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
 {
   this->IsSelectionCached = false;
   this->NewMasterObserverId = 0;
-  this->DeliveryManager = NULL;
   this->NeedsUpdateLOD = true;
   this->InteractorHelper->SetViewProxy(this);
 }
@@ -93,12 +92,6 @@ vtkSMRenderViewProxy::~vtkSMRenderViewProxy()
   {
     this->Session->GetCollaborationManager()->RemoveObserver(this->NewMasterObserverId);
     this->NewMasterObserverId = 0;
-  }
-
-  if (this->DeliveryManager)
-  {
-    this->DeliveryManager->Delete();
-    this->DeliveryManager = NULL;
   }
 }
 
@@ -225,7 +218,7 @@ bool vtkSMRenderViewProxy::StreamingUpdate(bool render_if_needed)
   this->ExecuteStream(stream);
 
   // Now fetch any pieces that the server streamed back to the client.
-  bool something_delivered = this->DeliveryManager->DeliverStreamedPieces();
+  bool something_delivered = this->GetDeliveryManager()->DeliverStreamedPieces();
   bool OSPRayNotDone = view->GetOSPRayContinueStreaming();
   if (render_if_needed && (something_delivered || OSPRayNotDone))
   {
@@ -243,14 +236,13 @@ vtkTypeUInt32 vtkSMRenderViewProxy::PreRender(bool interactive)
 
   vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
   assert(rv != NULL);
-
   if (interactive && rv->GetUseLODForInteractiveRender())
   {
     // for interactive renders, we need to determine if we are going to use LOD.
     // If so, we may need to update the LOD geometries.
     this->UpdateLOD();
   }
-  this->DeliveryManager->Deliver(interactive);
+
   return interactive ? rv->GetInteractiveRenderProcesses() : rv->GetStillRenderProcesses();
 }
 
@@ -442,10 +434,6 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
     this->NewMasterObserverId = this->Session->GetCollaborationManager()->AddObserver(
       vtkSMCollaborationManager::UpdateMasterUser, this, &vtkSMRenderViewProxy::NewMasterCallback);
   }
-
-  // Setup data-delivery manager.
-  this->DeliveryManager = vtkSMDataDeliveryManager::New();
-  this->DeliveryManager->SetViewProxy(this);
 }
 
 //----------------------------------------------------------------------------

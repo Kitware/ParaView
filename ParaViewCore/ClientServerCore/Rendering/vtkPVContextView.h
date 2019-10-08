@@ -80,12 +80,6 @@ public:
   //@}
 
   /**
-   * Overridden to ensure that in multi-client configurations, same set of
-   * representations are "dirty" on all processes to avoid race conditions.
-   */
-  void Update() override;
-
-  /**
    * Representations can use this method to set the selection for a particular
    * representation. Subclasses override this method to pass on the selection to
    * the chart using annotation link. Note this is meant to pass selection for

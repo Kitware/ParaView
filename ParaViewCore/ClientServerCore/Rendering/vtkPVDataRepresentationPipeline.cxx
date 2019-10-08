@@ -16,10 +16,10 @@
 
 #include "vtkAlgorithm.h"
 #include "vtkAlgorithmOutput.h"
+#include "vtkCommand.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVDataRepresentation.h"
 
 vtkStandardNewMacro(vtkPVDataRepresentationPipeline);
 //----------------------------------------------------------------------------
@@ -35,16 +35,9 @@ vtkPVDataRepresentationPipeline::~vtkPVDataRepresentationPipeline()
 //----------------------------------------------------------------------------
 int vtkPVDataRepresentationPipeline::ForwardUpstream(int i, int j, vtkInformation* request)
 {
-  vtkPVDataRepresentation* representation = vtkPVDataRepresentation::SafeDownCast(this->Algorithm);
-  if (representation && representation->GetUsingCacheForUpdate())
+  if (!this->NeedsUpdate)
   {
-    // shunt upstream updates when using cache.
-    return 1;
-  }
-
-  if (representation && !representation->GetNeedUpdate())
-  {
-    // shunt upstream updates when using cache.
+    // shunt upstream updates unless explicitly requested.
     return 1;
   }
 
@@ -54,16 +47,9 @@ int vtkPVDataRepresentationPipeline::ForwardUpstream(int i, int j, vtkInformatio
 //----------------------------------------------------------------------------
 int vtkPVDataRepresentationPipeline::ForwardUpstream(vtkInformation* request)
 {
-  vtkPVDataRepresentation* representation = vtkPVDataRepresentation::SafeDownCast(this->Algorithm);
-  if (representation && representation->GetUsingCacheForUpdate())
+  if (!this->NeedsUpdate)
   {
-    // shunt upstream updates when using cache.
-    return 1;
-  }
-
-  if (representation && !representation->GetNeedUpdate())
-  {
-    // shunt upstream updates when using cache.
+    // shunt upstream updates unless explicitly requested.
     return 1;
   }
 
@@ -76,18 +62,7 @@ int vtkPVDataRepresentationPipeline::ProcessRequest(
 {
   if (request->Has(REQUEST_DATA()) || request->Has(REQUEST_UPDATE_EXTENT()))
   {
-    vtkPVDataRepresentation* representation =
-      vtkPVDataRepresentation::SafeDownCast(this->Algorithm);
-    // This check doesn't make sense. We need to call RequestData() whenever
-    // needed even when using cache. How else is the cache-keeper going to
-    // produce a new timestep? (BUG #11321).
-    // if (representation && representation->GetUsingCacheForUpdate())
-    //  {
-    //  // shunt upstream updates when using cache.
-    //  return 1;
-    //  }
-
-    if (representation && !representation->GetNeedUpdate())
+    if (!this->NeedsUpdate)
     {
       // shunt upstream updates when using cache.
       return 1;
@@ -102,13 +77,11 @@ void vtkPVDataRepresentationPipeline::ExecuteDataEnd(
   vtkInformation* request, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec)
 {
   this->Superclass::ExecuteDataEnd(request, inInfoVec, outInfoVec);
-}
-
-//----------------------------------------------------------------------------
-int vtkPVDataRepresentationPipeline::NeedToExecuteData(
-  int outputPort, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec)
-{
-  return this->Superclass::NeedToExecuteData(outputPort, inInfoVec, outInfoVec);
+  // We fire UpdateDataEvent to notify the representation proxy that the
+  // representation was updated. The representation proxty will then call
+  // PostUpdateData(). We do this since now representations are not updated at
+  // the proxy level.
+  this->Algorithm->InvokeEvent(vtkCommand::UpdateDataEvent);
 }
 
 //----------------------------------------------------------------------------

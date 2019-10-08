@@ -21,9 +21,6 @@
 #include "vtkOutlineRepresentation.h"
 #include "vtkPVAlgorithmPortsInformation.h"
 #include "vtkPVArrayInformation.h"
-#include "vtkPVCacheKeeper.h"
-#include "vtkPVCacheKeeperPipeline.h"
-#include "vtkPVCacheSizeInformation.h"
 #include "vtkPVClassNameInformation.h"
 #include "vtkPVClientServerSynchronizedRenderers.h"
 #include "vtkPVCompositeDataInformation.h"
@@ -115,9 +112,6 @@ int ParaViewCoreClientServerCorePrintSelf(int, char* [])
   PRINT_SELF(vtkOutlineRepresentation);
   PRINT_SELF(vtkPVAlgorithmPortsInformation);
   PRINT_SELF(vtkPVArrayInformation);
-  PRINT_SELF(vtkPVCacheKeeper);
-  PRINT_SELF(vtkPVCacheKeeperPipeline);
-  PRINT_SELF(vtkPVCacheSizeInformation);
   PRINT_SELF(vtkPVClassNameInformation);
   PRINT_SELF(vtkPVClientServerSynchronizedRenderers);
   PRINT_SELF(vtkPVCompositeDataInformation);

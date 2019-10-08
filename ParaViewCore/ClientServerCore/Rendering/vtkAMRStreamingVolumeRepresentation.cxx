@@ -126,7 +126,7 @@ int vtkAMRStreamingVolumeRepresentation::ProcessViewRequest(
     this->DataBounds.GetBounds(bounds);
 
     // Just let the view know of out data bounds.
-    vtkPVRenderView::SetGeometryBounds(inInfo, bounds);
+    vtkPVRenderView::SetGeometryBounds(inInfo, this, bounds);
 
     // The only thing extra we need to do here is that we need to let the view
     // know that this representation is streaming capable (or not).
