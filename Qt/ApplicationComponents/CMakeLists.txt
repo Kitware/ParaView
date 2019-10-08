@@ -55,7 +55,6 @@ set(classes
   pqCatalystExportReaction
   pqCatalystPauseSimulationReaction
   pqCatalystRemoveBreakpointReaction
-  pqCatalystScriptGeneratorReaction
   pqCatalystSetBreakpointReaction
   pqCategoryToolbarsBehavior
   pqChangePipelineInputReaction
