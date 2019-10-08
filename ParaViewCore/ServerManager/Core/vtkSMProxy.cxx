@@ -22,7 +22,9 @@
 #include "vtkLogger.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVInformation.h"
 #include "vtkPVInstantiator.h"
+#include "vtkPVLogger.h"
 #include "vtkPVOptions.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
@@ -844,6 +846,10 @@ void vtkSMProxy::RebuildStateForProperties()
 bool vtkSMProxy::GatherInformation(vtkPVInformation* information)
 {
   assert(information);
+
+  vtkVLogScopeF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "%s: gather information %s",
+    this->GetLogNameOrDefault(), information->GetClassName());
+
   if (this->GetSession() && this->Location != 0)
   {
     // ensure that the proxy is created.
@@ -858,6 +864,10 @@ bool vtkSMProxy::GatherInformation(vtkPVInformation* information)
 bool vtkSMProxy::GatherInformation(vtkPVInformation* information, vtkTypeUInt32 location)
 {
   assert(information);
+
+  vtkVLogScopeF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "%s: gather information %s",
+    this->GetLogNameOrDefault(), information->GetClassName());
+
   vtkTypeUInt32 realLocation = (this->Location & location);
   if (this->GetSession() && realLocation != 0)
   {

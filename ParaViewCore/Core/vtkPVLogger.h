@@ -74,7 +74,7 @@ public:
    * about algorithm execution.
    *
    * Default level is `vtkLogger::VERBOSITY_TRACE` unless overridden by calling
-   * `SetPipelineVerbosity` or by setting the environment variable
+   * `SetExecutionVerbosity` or by setting the environment variable
    * `PARAVIEW_LOG_EXECUTION_VERBOSITY` to the expected verbosity level.
    */
   static Verbosity GetExecutionVerbosity();
@@ -125,7 +125,7 @@ public:
    * similar components.
    *
    * Default level is `vtkLogger::VERBOSITY_TRACE` unless overridden by calling
-   * `SetRenderingVerbosity` or by setting the environment variable
+   * `SetApplicationVerbosity` or by setting the environment variable
    * `PARAVIEW_LOG_APPLICATION_VERBOSITY` to the expected verbosity level.
    */
   static Verbosity GetApplicationVerbosity();
