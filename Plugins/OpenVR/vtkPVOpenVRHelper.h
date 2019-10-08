@@ -36,6 +36,7 @@ class vtkBoxWidget2;
 class vtkCallbackCommand;
 class vtkDataSet;
 class vtkDistanceWidget;
+class vtkEventData;
 class vtkImplicitPlaneWidget2;
 class vtkOpenVRCameraPose;
 class vtkOpenVRInteractorStyle;
@@ -45,6 +46,7 @@ class vtkOpenVRRenderWindowInteractor;
 class vtkOpenVRRenderer;
 class vtkOpenVRRenderWindow;
 class vtkPlaneSource;
+class vtkProp;
 class vtkPropCollection;
 class vtkPVOpenVRCollaborationClient;
 class vtkPVDataRepresentation;
@@ -142,7 +144,7 @@ public:
   //@}
 
   // show the billboard with the provided text
-  void ShowBillboard(std::string const& text, vtkTexture* t = nullptr);
+  void ShowBillboard(std::string const& text, bool updatePosition, vtkTexture* t = nullptr);
 
   // add a point to the currently selected source in PV
   // if it accepts points
@@ -187,6 +189,7 @@ protected:
   vtkDataSet* LastPickedDataSet;
   vtkIdType LastPickedCellId;
   vtkPVDataRepresentation* LastPickedRepresentation;
+  vtkProp* LastPickedProp;
   vtkDataSet* PreviousPickedDataSet;
   vtkIdType PreviousPickedCellId;
   vtkPVDataRepresentation* PreviousPickedRepresentation;
@@ -208,6 +211,9 @@ protected:
 
   void HideBillboard();
   void HandlePickEvent(vtkObject* caller, void* calldata);
+  void MoveToNextImage();
+  void MoveToNextCell();
+  void UpdateBillboard(bool updatePosition);
 
   vtkDistanceWidget* DistanceWidget;
   vtkPVRenderView* View;
@@ -224,6 +230,8 @@ protected:
   int LoadLocationValue;
 
   std::map<int, vtkPVOpenVRHelperLocation> Locations;
+
+  vtkEventData* LastEventData;
 
 private:
   vtkPVOpenVRHelper(const vtkPVOpenVRHelper&) = delete;
