@@ -1194,40 +1194,37 @@ int vtkCGNSReader::vtkPrivate::readSolution(const std::string& solutionNameStr, 
 int vtkCGNSReader::vtkPrivate::readBCData(const double nodeId, const int cellDim,
   const int physicalDim, vtkDataSet* dataset, vtkCGNSReader* self)
 {
+  if (cellDim == 0 || physicalDim == 0)
+  {
+    return 1;
+  }
   std::vector<double> childrenIds;
   CGNSRead::getNodeChildrenId(self->cgioNum, nodeId, childrenIds);
 
-  if (cellDim == 0 || physicalDim == 0)
-  {
-    return 1; // fake usage of cellDim and physicalDim that will be needed for vector detection
-              // later
-  }
-
-  for (auto iter = childrenIds.begin(); iter != childrenIds.end(); ++iter)
+  for (auto& childrenId : childrenIds)
   {
     char nodeName[CGIO_MAX_NAME_LENGTH + 1];
     char nodeLabel[CGIO_MAX_LABEL_LENGTH + 1];
-    CGIOErrorSafe(cgio_get_name(self->cgioNum, *iter, nodeName));
-    CGIOErrorSafe(cgio_get_label(self->cgioNum, *iter, nodeLabel));
+    CGIOErrorSafe(cgio_get_name(self->cgioNum, childrenId, nodeName));
+    CGIOErrorSafe(cgio_get_label(self->cgioNum, childrenId, nodeLabel));
     if (strcmp(nodeLabel, "BCDataSet_t") == 0)
     {
       // Found a BCDataset_t and now load its data
       CGNS_ENUMT(GridLocation_t) varCentering = CGNS_ENUMV(Vertex);
       std::vector<double> BCDataSetChildrens;
       std::vector<double> BCDataChildList; // Neumann and Dirichlet data node
-      CGNSRead::getNodeChildrenId(self->cgioNum, *iter, BCDataSetChildrens);
-      for (auto iterBCDataSet = BCDataSetChildrens.begin();
-           iterBCDataSet != BCDataSetChildrens.end(); ++iterBCDataSet)
+      CGNSRead::getNodeChildrenId(self->cgioNum, childrenId, BCDataSetChildrens);
+      for (auto& BCDataSetChild : BCDataSetChildrens)
       {
-        CGIOErrorSafe(cgio_get_label(self->cgioNum, *iterBCDataSet, nodeLabel));
+        CGIOErrorSafe(cgio_get_label(self->cgioNum, BCDataSetChild, nodeLabel));
         if (strcmp(nodeLabel, "BCData_t"))
         {
-          BCDataChildList.push_back(*iterBCDataSet);
+          BCDataChildList.push_back(BCDataSetChild);
         }
         else if (strcmp(nodeLabel, "GridLocation_t"))
         {
           std::string location;
-          CGNSRead::readNodeStringData(self->cgioNum, *iter, location);
+          CGNSRead::readNodeStringData(self->cgioNum, BCDataSetChild, location);
           if (location == "FaceCenter")
           {
             varCentering = CGNS_ENUMV(FaceCenter);
@@ -1239,11 +1236,10 @@ int vtkCGNSReader::vtkPrivate::readBCData(const double nodeId, const int cellDim
         }
       }
       // Now read Neumann and Dirichlet arrays
-      for (auto iterBCData = BCDataChildList.begin(); iterBCData != BCDataChildList.end();
-           ++iterBCData)
+      for (auto& BCDataChild : BCDataChildList)
       {
         std::vector<double> BCDataArrayIds;
-        CGNSRead::getNodeChildrenId(self->cgioNum, *iterBCData, BCDataArrayIds);
+        CGNSRead::getNodeChildrenId(self->cgioNum, BCDataChild, BCDataArrayIds);
         // TODO: parse list array and detect vector before loading data
         // TODO: Adapt type of array to handle R4/R8 and not force R8
         // number Of Values to load per Array for the BCData
@@ -1253,12 +1249,11 @@ int vtkCGNSReader::vtkPrivate::readBCData(const double nodeId, const int cellDim
           numValues = dataset->GetNumberOfPoints();
         }
         // Array loading
-        for (auto iterArray = BCDataArrayIds.begin(); iterArray != BCDataArrayIds.end();
-             ++iterArray)
+        for (auto& ArrayId : BCDataArrayIds)
         {
           std::vector<double> data;
-          CGIOErrorSafe(cgio_get_name(self->cgioNum, *iterArray, nodeName));
-          CGNSRead::readNodeDataAs<double>(self->cgioNum, *iterArray, data);
+          CGIOErrorSafe(cgio_get_name(self->cgioNum, ArrayId, nodeName));
+          CGNSRead::readNodeDataAs<double>(self->cgioNum, ArrayId, data);
           vtkIdType dataSize = static_cast<vtkIdType>(data.size());
           // Create vtk
           vtkNew<vtkDoubleArray> vtkBCdata;
@@ -2156,12 +2151,11 @@ int vtkCGNSReader::GetUnstructuredZone(
         startRangeSec[sec] = curRangeStart;
         faceElementsSize += sectionInfoList[curSec].eDataSize;
       }
-      //
+
       std::vector<vtkIdType> faceElementsIdx;
       std::vector<vtkIdType> faceElementsArr;
       bool old_polygonal_layout = false;
-      //
-      //
+
       faceElementsArr.resize(faceElementsSize);
       faceElementsIdx.resize(numFaces + 1);
       faceElementsIdx[0] = 0;
@@ -2195,8 +2189,8 @@ int vtkCGNSReader::GetUnstructuredZone(
         if (0 != CGNSRead::get_section_start_offset(this->cgioNum, elemIdList[osec], 1, srcStart,
                    srcEnd, srcStride, memStart, memEnd, memStride, memDim, localFaceElementsIdx))
         {
-          vtkWarningMacro(<< "FAILED to read NGON_n ElementStartOffset array."
-                             " Trying a fallback solution for CGNS previous to 3.4\n");
+          vtkWarningMacro("FAILED to read NGON_n ElementStartOffset array."
+                          " Trying a fallback solution for CGNS previous to 3.4\n");
           old_polygonal_layout = true;
         }
 
@@ -2225,7 +2219,7 @@ int vtkCGNSReader::GetUnstructuredZone(
         if (0 != CGNSRead::get_section_connectivity(this->cgioNum, elemIdList[osec], 1, srcStart,
                    srcEnd, srcStride, memStart, memEnd, memStride, memDim, localFaceElementsArr))
         {
-          vtkErrorMacro(<< "FAILED to read NGON_n cells\n");
+          vtkErrorMacro("FAILED to read NGON_n cells\n");
           return 1;
         }
       }
@@ -2290,7 +2284,7 @@ int vtkCGNSReader::GetUnstructuredZone(
 
       if (hasNFace && numCells < zsize[1])
       {
-        vtkErrorMacro(<< "number of NFACE_n cells is not coherent with Zone_t declaration \n");
+        vtkErrorMacro("number of NFACE_n cells is not coherent with Zone_t declaration \n");
         return 1;
       }
       // Load NFace_n connectivities
@@ -2324,8 +2318,8 @@ int vtkCGNSReader::GetUnstructuredZone(
         if (0 != CGNSRead::get_section_start_offset(this->cgioNum, cgioSectionId, 1, srcStart,
                    srcEnd, srcStride, memStart, memEnd, memStride, memDim, localCellElementsIdx))
         {
-          vtkWarningMacro(<< "FAILED to read NFACE_n ElementStartOffset array."
-                             " Trying a fallback solution for CGNS previous to 3.4\n");
+          vtkWarningMacro("FAILED to read NFACE_n ElementStartOffset array."
+                          " Trying a fallback solution for CGNS previous to 3.4\n");
           old_polygonal_layout = true;
         }
         if (startNFaceArraySec[sec] != 0)
@@ -2353,7 +2347,7 @@ int vtkCGNSReader::GetUnstructuredZone(
         if (0 != CGNSRead::get_section_connectivity(this->cgioNum, cgioSectionId, 1, srcStart,
                    srcEnd, srcStride, memStart, memEnd, memStride, memDim, localCellElementsArr))
         {
-          vtkErrorMacro(<< "FAILED to read NFACE_n cells\n");
+          vtkErrorMacro("FAILED to read NFACE_n cells\n");
           return 1;
         }
         cgio_release_id(this->cgioNum, cgioSectionId);
@@ -2808,8 +2802,7 @@ int vtkCGNSReader::GetUnstructuredZone(
                              srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDim,
                              bcFaceElementsIdx.data()))
                   {
-                    vtkErrorMacro(
-                      << "Partial read of NGON_n ElementStartOffset array for BC FAILED.");
+                    vtkErrorMacro("Partial read of NGON_n ElementStartOffset array for BC FAILED.");
                     return 1;
                   }
 
@@ -2833,7 +2826,7 @@ int vtkCGNSReader::GetUnstructuredZone(
                              srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDim,
                              bcFaceElementsArr.data()))
                   {
-                    vtkErrorMacro(<< "Partial read of BC NGON_n faces FAILED\n");
+                    vtkErrorMacro("Partial read of BC NGON_n faces FAILED\n");
                     return 1;
                   }
 
@@ -2952,7 +2945,7 @@ int vtkCGNSReader::GetUnstructuredZone(
                                bcFaceElementsIdx.data()))
                     {
                       vtkErrorMacro(
-                        << "Partial read of NGON_n ElementStartOffset array for BC FAILED.");
+                        "Partial read of NGON_n ElementStartOffset array for BC FAILED.");
                       return 1;
                     }
 
@@ -2976,7 +2969,7 @@ int vtkCGNSReader::GetUnstructuredZone(
                                1, srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDim,
                                bcFaceElementsArr.data()))
                     {
-                      vtkErrorMacro(<< "Partial read of BC NGON_n faces FAILED\n");
+                      vtkErrorMacro("Partial read of BC NGON_n faces FAILED\n");
                       return 1;
                     }
 
