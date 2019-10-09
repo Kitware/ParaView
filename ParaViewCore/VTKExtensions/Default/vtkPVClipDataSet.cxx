@@ -265,7 +265,6 @@ int vtkPVClipDataSet::RequestData(
 int vtkPVClipDataSet::ClipUsingThreshold(
   vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  std::cout << "ClipUsingThreshold" << std::endl;
   vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
   vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
 
