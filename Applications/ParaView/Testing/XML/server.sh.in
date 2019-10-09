@@ -1,1 +1,4 @@
-DISPLAY=:0 @ParaView_BINARY_DIR@/bin/pvserver -sp=$1 2>&1 | tee sshServer.log
+#make sure no pvserver are running
+killall pvserver
+
+DISPLAY=:0 @ParaView_BINARY_DIR@/bin/pvserver -sp=$1 --timeout=1 2>&1 | tee sshServer.log
