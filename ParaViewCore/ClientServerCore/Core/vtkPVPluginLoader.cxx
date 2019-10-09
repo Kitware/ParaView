@@ -377,7 +377,7 @@ bool vtkPVPluginLoader::LoadPluginByName(const char* name)
 
     if (!strcmp(name, plugin_name))
     {
-      const char* filename = tracker->GetPluginFileName();
+      const char* filename = tracker->GetPluginFileName(i);
       if (!filename)
       {
         vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
@@ -385,9 +385,11 @@ bool vtkPVPluginLoader::LoadPluginByName(const char* name)
         return false;
       }
 
-      this->LoadPlugin(filename);
+      return this->LoadPlugin(filename);
     }
   }
+
+  return false;
 }
 
 //-----------------------------------------------------------------------------
