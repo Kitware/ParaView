@@ -241,18 +241,6 @@ if (PARAVIEW_BUILD_QT_GUI)
       set_tests_properties(CoProcessingFullWorkflowCinemaComposite PROPERTIES RUN_SERIAL ON)
       _set_standard_test_properties(CoProcessingFullWorkflowCinemaComposite)
 
-      add_test(NAME CoProcessingFullWorkflowCinemaCompositeFloat
-        COMMAND ${CMAKE_COMMAND}
-        -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::paraview>
-        -DCOPROCESSING_TEST_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
-        -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/CatalystCinemaCompositeFloatGUI.xml
-        -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::pvbatch>
-        -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
-        -DTEST_NAME:STRING=CoProcessingFullWorkflowCinemaCompositeFloat
-        -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
-      set_tests_properties(CoProcessingFullWorkflowCinemaCompositeFloat PROPERTIES RUN_SERIAL ON)
-      _set_standard_test_properties(CoProcessingFullWorkflowCinemaCompositeFloat)
-
     endif()
 
     add_test(NAME TemporalScriptFullWorkflow
