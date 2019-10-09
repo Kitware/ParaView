@@ -362,6 +362,35 @@ void vtkPVPluginLoader::LoadPluginsFromPath(const char* path)
 }
 
 //-----------------------------------------------------------------------------
+bool vtkPVPluginLoader::LoadPluginByName(const char* name)
+{
+  vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
+  unsigned int nplugins = tracker->GetNumberOfPlugins();
+
+  for (unsigned int i = 0; i < nplugins; ++i)
+  {
+    const char* plugin_name = tracker->GetPluginName(i);
+    if (!plugin_name)
+    {
+      continue;
+    }
+
+    if (!strcmp(name, plugin_name))
+    {
+      const char* filename = tracker->GetPluginFileName();
+      if (!filename)
+      {
+        vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
+          "Found the %s plugin, but no file associated with it?", name);
+        return false;
+      }
+
+      this->LoadPlugin(filename);
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
 bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
 {
   this->Loaded = false;

@@ -47,6 +47,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
+   * Tries to the load the plugin by name using tracked plugins.
+   */
+  bool LoadPluginByName(const char* name);
+
+  /**
    * Tries to the load the plugin given the path to the plugin file.
    */
   bool LoadPlugin(const char* filename) { return this->LoadPluginInternal(filename, false); }
