@@ -34,7 +34,8 @@
 #ifndef vtkViewLayout_h
 #define vtkViewLayout_h
 
-#include "vtkNew.h" // for vtkNew
+#include "vtkCommand.h" // for vtkCommand
+#include "vtkNew.h"     // for vtkNew
 #include "vtkObject.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkVector.h"                            // for vtkVector2i
@@ -93,6 +94,21 @@ public:
   vtkSetClampMacro(SeparatorWidth, int, 0, VTK_INT_MAX);
   vtkGetMacro(SeparatorWidth, int);
   //@}
+
+  enum
+  {
+    /**
+     * Event fired by vtkPVView's internal render window to request update of
+     * the layout before a window is rendered.
+     */
+    RequestUpdateLayoutEvent = vtkCommand::UserEvent + 1,
+
+    /**
+     * Event fired by vtkPVView's internal render window to request update of
+     * the layout after a window is rendered.
+     */
+    RequestUpdateDisplayEvent,
+  };
 
 protected:
   vtkViewLayout();
