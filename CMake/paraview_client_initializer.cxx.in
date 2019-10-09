@@ -171,6 +171,9 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
     this->MainWindow->setWindowTitle(newWindowTitle);
   }
 
+  // Fire the signal that the initialization is complete.
+  this->PVApp->_paraview_client_environment_complete();
+
   // We used to call processEvents() here. We removed it, since that results in
   // timers (esp. pqCommandLineOptionsBehavior::playTests(), or
   // pqServer::processServerNotification()) timers could timeout here and that
