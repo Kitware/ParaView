@@ -167,21 +167,6 @@ if (PARAVIEW_BUILD_QT_GUI)
     set_tests_properties(CoProcessingFullWorkflow PROPERTIES RUN_SERIAL ON)
     _set_standard_test_properties(CoProcessingFullWorkflow)
 
-    add_test(NAME CoProcessingFullWorkflowNewUI
-      COMMAND ${CMAKE_COMMAND}
-      -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::paraview>
-      -DCOPROCESSING_TEST_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
-      -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/CatalystExporterGUI.xml
-      -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::pvbatch>
-      -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
-      -DCOPROCESSING_IMAGE_TESTER:FILEPATH=$<TARGET_FILE:CoProcessingCompareImagesTester>
-      -DCOPROCESSING_DATA_DIR:PATH=${paraview_test_data_directory_output}/Testing/Data/Baseline
-      -DCOPROCESSING_OUTPUTCHECK_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/outputcheck.py
-      -DTEST_NAME:STRING=CoProcessingFullWorkflowNewUI
-      -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
-    set_tests_properties(CoProcessingFullWorkflowNewUI PROPERTIES RUN_SERIAL ON)
-    _set_standard_test_properties(CoProcessingFullWorkflowNewUI)
-
     add_test(NAME CoProcessingFullWorkflowWithOnlyExtracts
       COMMAND ${CMAKE_COMMAND}
       -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::paraview>
