@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLineEdit>
 #include <QPointer>
 #include <QPushButton>
-#include <QSignalMapper>
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <QtDebug>
@@ -117,7 +116,6 @@ public:
   QPointer<pqAnimationScene> Scene;
   pqAnimationWidget* AnimationWidget;
   pqAnimationTimeWidget* AnimationTimeWidget;
-  QSignalMapper KeyFramesChanged;
   typedef QMap<QPointer<pqAnimationCue>, pqAnimationTrack*> TrackMapType;
   TrackMapType TrackMap;
   QPointer<QDialog> Editor;
@@ -340,8 +338,6 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent)
   l->addWidget(this->Internal->CreateProperty);
   l->addStretch();
 
-  QObject::connect(&this->Internal->KeyFramesChanged, SIGNAL(mapped(QObject*)), this,
-    SLOT(keyFramesChanged(QObject*)));
   QObject::connect(this->Internal->AnimationWidget, SIGNAL(trackSelected(pqAnimationTrack*)), this,
     SLOT(trackSelected(pqAnimationTrack*)));
   QObject::connect(this->Internal->AnimationWidget, SIGNAL(deleteTrackClicked(pqAnimationTrack*)),
@@ -480,9 +476,8 @@ void pqAnimationViewWidget::onSceneCuesChanged()
       }
       this->Internal->TrackMap.insert(cue, track);
       track->setProperty(completeName);
-      this->Internal->KeyFramesChanged.setMapping(cue, cue);
       QObject::connect(
-        cue, SIGNAL(keyframesModified()), &this->Internal->KeyFramesChanged, SLOT(map()));
+        cue, &pqAnimationCue::keyframesModified, this, [=]() { this->keyFramesChanged(cue); });
       QObject::connect(cue, SIGNAL(enabled(bool)), track, SLOT(setEnabled(bool)));
       track->setEnabled(cue->isEnabled());
 
@@ -503,8 +498,7 @@ void pqAnimationViewWidget::onSceneCuesChanged()
     this->Internal->TrackMap.remove(iter.key());
     if (iter.key())
     {
-      QObject::disconnect(
-        iter.key(), SIGNAL(keyframesModified()), &this->Internal->KeyFramesChanged, SLOT(map()));
+      QObject::disconnect(iter.key(), &pqAnimationCue::keyframesModified, nullptr, nullptr);
     }
   }
 }

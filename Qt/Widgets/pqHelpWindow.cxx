@@ -148,7 +148,7 @@ void pqHelpWindow::showPage(const QUrl& url)
 //-----------------------------------------------------------------------------
 void pqHelpWindow::search()
 {
-  QList<QHelpSearchQuery> query = this->HelpEngine->searchEngine()->queryWidget()->query();
+  QString query = this->HelpEngine->searchEngine()->queryWidget()->searchInput();
   this->HelpEngine->searchEngine()->search(query);
 }
 

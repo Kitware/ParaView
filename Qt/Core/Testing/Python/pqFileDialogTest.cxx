@@ -208,7 +208,7 @@ void pqFileDialogTestWidget::emittedFiles(const QList<QStringList>& files)
 void pqFileDialogTestWidget::record()
 {
   QString file = QFileDialog::getSaveFileName();
-  if (file != QString::null)
+  if (!file.isNull())
   {
     this->TestUtility.recordTests(file);
   }

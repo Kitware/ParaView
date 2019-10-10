@@ -698,7 +698,7 @@ void pqApplicationCore::registerDocumentation(const QString& filename)
 
   // QHelpEngine doesn't like files from resource space. So we create a local
   // file and use that.
-  QTemporaryFile* localFile = QTemporaryFile::createLocalFile(filename);
+  QTemporaryFile* localFile = QTemporaryFile::createNativeFile(filename);
   if (localFile)
   {
     // localFile has autoRemove ON by default, so the file will be deleted with

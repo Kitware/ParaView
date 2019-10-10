@@ -36,7 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 #include <QDockWidget>
 #include <QFile>
+#include <QGuiApplication>
 #include <QMainWindow>
+#include <QScreen>
 
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -181,8 +183,7 @@ void pqSettings::saveInQSettings(const char* key, vtkSMProperty* smproperty)
 void pqSettings::sanityCheckDock(QDockWidget* dock_widget)
 {
   QDesktopWidget desktop;
-  int screen = -1;
-  if (NULL == dock_widget)
+  if (nullptr == dock_widget)
   {
     return;
   }
@@ -193,14 +194,9 @@ void pqSettings::sanityCheckDock(QDockWidget* dock_widget)
   QRect geometry = QRect(dockTopLeft, dock_widget->frameSize());
   int titleBarHeight = geometry.height() - dockRect.height();
 
-  screen = desktop.screenNumber(dock_widget);
-  if (screen == -1) // Dock is at least partially on a screen
-  {
-    screen = desktop.screenNumber(dockTopLeft);
-  }
-
-  QRect screenRect = desktop.availableGeometry(screen);
-  QRect desktopRect = desktop.availableGeometry(); // SHould give us the entire Desktop geometry
+  QRect screenRect = desktop.availableGeometry(dock_widget);
+  QRect desktopRect = QGuiApplication::primaryScreen()
+                        ->availableGeometry(); // Should give us the entire Desktop geometry
   // Ensure the top left corner of the window is on the screen
   if (!screenRect.contains(dockTopLeft))
   {

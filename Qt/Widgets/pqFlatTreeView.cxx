@@ -3138,8 +3138,12 @@ int pqFlatTreeView::getDataWidth(const QModelIndex& index, const QFontMetrics& f
   }
   else
   {
-    // Find the font width for the string.
+// Find the font width for the string.
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+    return fm.horizontalAdvance(indexData.toString());
+#else
     return fm.width(indexData.toString());
+#endif
   }
 }
 
@@ -3764,8 +3768,7 @@ void pqFlatTreeView::drawData(QPainter& painter, int px, int py, const QModelInd
       // so it fits. Use the text elide style from the options.
       if (itemWidth > columnWidth)
       {
-        text = QAbstractItemDelegate::elidedText(
-          options.fontMetrics, columnWidth, options.textElideMode, text);
+        text = options.fontMetrics.elidedText(text, options.textElideMode, columnWidth);
       }
 
       painter.drawText(px, py + fontAscent, text);

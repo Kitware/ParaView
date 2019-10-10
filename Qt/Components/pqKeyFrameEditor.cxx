@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QItemDelegate>
 #include <QLineEdit>
 #include <QPointer>
-#include <QSignalMapper>
 #include <QStandardItem>
 #include <QStandardItemModel>
 #include <QVBoxLayout>
@@ -247,8 +246,6 @@ public:
   pqInternal(pqKeyFrameEditor* editor)
     : Editor(editor)
   {
-    QObject::connect(
-      &this->CameraMapper, SIGNAL(mapped(QObject*)), editor, SLOT(useCurrentCamera(QObject*)));
   }
   pqKeyFrameEditor* const Editor;
   Ui::pqKeyFrameEditor Ui;
@@ -258,7 +255,6 @@ public:
   QPair<double, double> TimeRange;
   QPair<QVariant, QVariant> ValueRange;
   pqKeyFrameEditorDelegate* EditorDelegate;
-  QSignalMapper CameraMapper;
 
   double normalizedTime(double t)
   {
@@ -325,9 +321,8 @@ public:
     pqCameraKeyFrameItem* item = NULL;
     item = new pqCameraKeyFrameItem();
 
-    QObject::connect(
-      &item->CamWidget, SIGNAL(useCurrentCamera()), &this->CameraMapper, SLOT(map()));
-    this->CameraMapper.setMapping(&item->CamWidget, item);
+    QObject::connect(&item->CamWidget, &pqCameraKeyFrameWidget::useCurrentCamera, this->Editor,
+      [=]() { this->Editor->useCurrentCamera(item); });
     // default to current view
     this->Editor->useCurrentCamera(item);
     item->CamWidget.setUsePathBasedMode(
@@ -486,9 +481,8 @@ void pqKeyFrameEditor::readKeyFrameData()
       if ((i < numberKeyFrames - 1) || !path_based)
       {
         pqCameraKeyFrameItem* item = new pqCameraKeyFrameItem();
-        QObject::connect(
-          &item->CamWidget, SIGNAL(useCurrentCamera()), &this->Internal->CameraMapper, SLOT(map()));
-        this->Internal->CameraMapper.setMapping(&item->CamWidget, item);
+        QObject::connect(&item->CamWidget, &pqCameraKeyFrameWidget::useCurrentCamera, this,
+          [=]() { this->Internal->Editor->useCurrentCamera(item); });
         item->CamWidget.setUsePathBasedMode(path_based);
         item->CamWidget.initializeUsingKeyFrame(keyFrame);
         this->Internal->Model.setItem(i, 1, item);

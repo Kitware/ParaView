@@ -177,13 +177,25 @@ void pqAnimationKeyFrame::paint(QPainter* painter, const QStyleOptionGraphicsIte
   QPointF pt(keyFrameRect.left() + 3.0,
     keyFrameRect.top() + 0.5 * keyFrameRect.height() + metrics.height() / 2.0 - 1.0);
   painter->drawText(pt, label);
-  iconWidth -= metrics.width(label);
+
+  double hAdvance;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+  hAdvance = metrics.horizontalAdvance(label);
+#else
+  hAdvance = metrics.width(label);
+#endif
+  iconWidth -= hAdvance;
 
   label = metrics.elidedText(endValue().toString(), Qt::ElideRight, qRound(halfWidth));
-  pt = QPointF(keyFrameRect.right() - metrics.width(label) - 3.0,
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+  hAdvance = metrics.horizontalAdvance(label);
+#else
+  hAdvance = metrics.width(label);
+#endif
+  pt = QPointF(keyFrameRect.right() - hAdvance - 3.0,
     keyFrameRect.top() + 0.5 * keyFrameRect.height() + metrics.height() / 2.0 - 1.0);
   painter->drawText(pt, label);
-  iconWidth -= metrics.width(label);
+  iconWidth -= hAdvance;
 
   if (iconWidth >= 16)
   {
