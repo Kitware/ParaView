@@ -4,7 +4,6 @@
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size_Custom" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Width" command="set_string" arguments="400" />
-  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Height" command="key" arguments="16777217" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Height" command="set_string" arguments="400" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/ButtonBox/1QPushButton2" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/ButtonBox/1QPushButton0" command="activate" arguments="" />
@@ -29,11 +28,11 @@
   <pqevent object="pqClientMainWindow/1QTabBar0" command="set_tab_with_text" arguments="Properties" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
-  <!-- Open the export inspector." -->
+  <!-- Open the export inspector. -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
   <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionCatalystConfigure" />
 
-  <!-- Choose arrays to export here.. -->
+  <!-- Choose arrays to export. -->
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/advanced" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterFormat" command="activated" arguments="Cinema image options" />
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterExtract" command="set_boolean" arguments="true" />
@@ -41,20 +40,18 @@
   <pqevent object="pqClientMainWindow/SaveDataDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ChooseArraysToWrite/CheckBox" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/SaveDataDialog/widget/OKButton" command="activate" arguments="" />
 
-  <!-- Request a Cinema Image extract." -->
+  <!-- Request a Cinema Image extract. -->
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewFormat" command="activated" arguments="Cinema image database (*.cdb)" />
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewExtract" command="set_boolean" arguments="true" />
   <!-- Spec C, i.e. dynamically recolormappable. -->
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewConfigure" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Format/ProxySelectionWidget/frame/ChosenProxyWidget/DeferredRendering/ComboBox" command="activated" arguments="Composable+Recolorable" />
   <!-- A name for this View/RenderWindow. -->
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CatalystFilePattern/CatalystFilePattern" command="set_string" arguments="cinema_recolorable_%t.cdb" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CatalystFilePattern/CatalystFilePattern" command="set_string" arguments="recolorable_%t.cdb" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
 
-  <!-- Write out the script." -->
+  <!-- Write out the script. -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
   <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionExportCatalyst" />
   <pqevent object="pqClientMainWindow/menubar/menu_Catalyst/ExportCoprocessingStateFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/cptest.py" />
-
 </pqevents>

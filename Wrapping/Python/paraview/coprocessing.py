@@ -358,7 +358,8 @@ class CoProcessor(object):
 
                     if fname.endswith('png') and view.cpCompression is not None and view.cpCompression != -1 :
                         simple.SaveScreenshot(fname, view,
-                            CompressionLevel=view.cpCompression)
+                                              CompressionLevel=view.cpCompression,
+                                              ImageResolution=view.ViewSize)
                     else:
                         simple.SaveScreenshot(fname, view,
                                               magnification=view.cpMagnification,

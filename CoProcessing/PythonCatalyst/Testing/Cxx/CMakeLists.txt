@@ -208,7 +208,7 @@ if (PARAVIEW_BUILD_QT_GUI)
         -DTEST_NAME:STRING=CoProcessingFullWorkflowCinemaFilters
         -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
       set_tests_properties(CoProcessingFullWorkflowCinemaFilters PROPERTIES RUN_SERIAL ON)
-      _set_standard_test_properties(CoProcessingFullWorkflowCinema)
+      _set_standard_test_properties(CoProcessingFullWorkflowCinemaFilters)
 
       add_test(NAME CoProcessingFullWorkflowCinemaComposite
         COMMAND ${CMAKE_COMMAND}
@@ -222,29 +222,29 @@ if (PARAVIEW_BUILD_QT_GUI)
       set_tests_properties(CoProcessingFullWorkflowCinemaComposite PROPERTIES RUN_SERIAL ON)
       _set_standard_test_properties(CoProcessingFullWorkflowCinemaComposite)
 
-      add_test(NAME CoProcessingFullWorkflowCinemaCompositeRecolorable
+      add_test(NAME CoProcessingFullWorkflowCinemaRecolorable
         COMMAND ${CMAKE_COMMAND}
         -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::paraview>
         -DCOPROCESSING_TEST_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
-        -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/CatalystCinemaCompositeRecolorableGUI.xml
+        -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/CatalystCinemaRecolorableGUI.xml
         -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::pvbatch>
         -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
-        -DTEST_NAME:STRING=CoProcessingFullWorkflowCinemaCompositeRecolorable
+        -DTEST_NAME:STRING=CoProcessingFullWorkflowCinemaRecolorable
         -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
-      set_tests_properties(CoProcessingFullWorkflowCinemaCompositeRecolorable PROPERTIES RUN_SERIAL ON)
-      _set_standard_test_properties(CoProcessingFullWorkflowCinemaComposite)
+      set_tests_properties(CoProcessingFullWorkflowCinemaRecolorable PROPERTIES RUN_SERIAL ON)
+      _set_standard_test_properties(CoProcessingFullWorkflowCinemaRecolorable)
 
       add_test(NAME CoProcessingFullWorkflowCinemaPose
         COMMAND ${CMAKE_COMMAND}
         -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::paraview>
         -DCOPROCESSING_TEST_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
-        -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/CatalystCinemaPoseCameraGUI.xml
+        -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/CatalystCinemaPoseGUI.xml
         -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::pvbatch>
         -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
-        -DTEST_NAME:STRING=CoProcessingFullWorkflowCinemaPoseCamera
+        -DTEST_NAME:STRING=CoProcessingFullWorkflowCinemaPose
         -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
       set_tests_properties(CoProcessingFullWorkflowCinemaPose PROPERTIES RUN_SERIAL ON)
-      _set_standard_test_properties(CoProcessingFullWorkflowCinemaComposite)
+      _set_standard_test_properties(CoProcessingFullWorkflowCinemaPose)
 
     endif()
 

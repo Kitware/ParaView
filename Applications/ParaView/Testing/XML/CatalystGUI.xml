@@ -4,7 +4,6 @@
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size_Custom" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Width" command="set_string" arguments="400" />
-  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Height" command="key" arguments="16777217" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Height" command="set_string" arguments="400" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/ButtonBox/1QPushButton2" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/ButtonBox/1QPushButton0" command="activate" arguments="" />
@@ -29,17 +28,29 @@
   <pqevent object="pqClientMainWindow/1QTabBar0" command="set_tab_with_text" arguments="Properties" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
-  <!-- Open the export inspector." -->
+  <!-- Open the export inspector. -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
   <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionCatalystConfigure" />
 
-  <!-- Request a data extract." -->
+  <!-- Request a data extract. -->
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterChoice" command="activated" arguments="Slice1" />
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterFormat" command="activated" arguments="XMLPPolyDataWriter" />
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterExtract" command="set_boolean" arguments="true" />
+  <!-- A specific name for this file. -->
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterConfigure" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/SaveDataDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CatalystFilePattern/CatalystFilePattern" command="set_string" arguments="filename_%t.pvtp" />
+  <pqevent object="pqClientMainWindow/SaveDataDialog/widget/OKButton" command="activate" arguments="" />
 
-  <!-- Request a screen shot extract." -->
+  <!-- Request a screen shot extract. -->
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewExtract" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewConfigure" command="activate" arguments="" />
+  <!-- A specific name for this View/RenderWindow. -->
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CatalystFilePattern/CatalystFilePattern" command="set_string" arguments="image_%t.png" />
+  <!-- Choose a specific size for the image. -->
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/width" command="set_string" arguments="400" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/height" command="set_string" arguments="400" />
+  <!-- Make it so. -->
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
 
   <!-- Write out the script." -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
