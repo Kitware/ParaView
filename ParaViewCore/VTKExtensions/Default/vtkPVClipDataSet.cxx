@@ -30,6 +30,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVBox.h"
+#include "vtkPVCylinder.h"
 #include "vtkPVPlane.h"
 #include "vtkPVThreshold.h"
 #include "vtkPlane.h"
@@ -201,27 +202,34 @@ int vtkPVClipDataSet::RequestData(
     vtkPVBox* box = vtkPVBox::SafeDownCast(this->ClipFunction);
     vtkSphere* sphere = vtkSphere::SafeDownCast(this->ClipFunction);
     vtkQuadric* quadric = vtkQuadric::SafeDownCast(this->ClipFunction);
+    vtkPVCylinder* cylinder = vtkPVCylinder::SafeDownCast(this->ClipFunction);
     vtkNew<vtkHyperTreeGridAxisClip> htgClip;
     if (plane)
     {
       if (!plane->GetAxisAligned())
       {
-        vtkWarningMacro(<< "Plane should be axis aligned to clip a vtkHyperTreeGrid");
+        double* normal = plane->GetNormal();
+        htgClip->SetClipTypeToQuadric();
+        htgClip->SetQuadricCoefficients(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, normal[0], normal[1],
+          normal[2], plane->EvaluateFunction(0.0, 0.0, 0.0));
       }
-      htgClip->SetClipTypeToPlane();
-      double* normal = plane->GetNormal();
-      htgClip->SetPlanePosition(-plane->EvaluateFunction(0, 0, 0));
-      int planeNormalAxis = 0;
-      if (normal[1] > normal[0])
+      else
       {
-        planeNormalAxis = 1;
+        htgClip->SetClipTypeToPlane();
+        double* normal = plane->GetNormal();
+        htgClip->SetPlanePosition(-plane->EvaluateFunction(0, 0, 0));
+        int planeNormalAxis = 0;
+        if (normal[1] > normal[0])
+        {
+          planeNormalAxis = 1;
+        }
+        if (normal[2] > normal[0])
+        {
+          planeNormalAxis = 2;
+        }
+        htgClip->SetPlanePosition(-plane->EvaluateFunction(0, 0, 0));
+        htgClip->SetPlaneNormalAxis(planeNormalAxis);
       }
-      if (normal[2] > normal[0])
-      {
-        planeNormalAxis = 2;
-      }
-      htgClip->SetPlanePosition(-plane->EvaluateFunction(0, 0, 0));
-      htgClip->SetPlaneNormalAxis(planeNormalAxis);
     }
     else if (box)
     {
@@ -241,6 +249,28 @@ int vtkPVClipDataSet::RequestData(
       htgClip->SetQuadricCoefficients(1.0, 1.0, 1.0, 0.0, 0.0, 0.0, -2.0 * center[0],
         -2.0 * center[1], -2.0 * center[2],
         -radius * radius + center[0] * center[0] + center[1] * center[1] + center[2] * center[2]);
+    }
+    else if (cylinder)
+    {
+      htgClip->SetClipTypeToQuadric();
+      double* axis = cylinder->GetOrientedAxis();
+      double radius = cylinder->GetRadius();
+      double* center = cylinder->GetCenter();
+      htgClip->SetQuadricCoefficients(axis[1] * axis[1] + axis[2] * axis[2],
+        axis[0] * axis[0] + axis[2] * axis[2], axis[0] * axis[0] + axis[1] * axis[1],
+        -2.0 * axis[0] * axis[1], -2.0 * axis[1] * axis[2], -2.0 * axis[0] * axis[2],
+        -2.0 * center[0] * (axis[1] * axis[1] + axis[2] * axis[2]) +
+          2 * center[1] * axis[0] * axis[1] + 2 * center[2] * axis[0] * axis[2],
+        -2.0 * center[1] * (axis[0] * axis[0] + axis[2] * axis[2]) +
+          2 * center[0] * axis[0] * axis[1] + 2 * center[2] * axis[1] * axis[2],
+        -2.0 * center[2] * (axis[0] * axis[0] + axis[1] * axis[1]) +
+          2 * center[1] * axis[2] * axis[1] + 2 * center[0] * axis[0] * axis[2],
+        -radius * radius + center[0] * center[0] * (axis[1] * axis[1] + axis[2] * axis[2]) +
+          center[1] * center[1] * (axis[0] * axis[0] + axis[2] * axis[2]) +
+          center[2] * center[2] * (axis[0] * axis[0] + axis[1] * axis[1]) -
+          2.0 *
+            (axis[0] * axis[1] * center[0] * center[1] + axis[1] * axis[2] * center[1] * center[2] +
+              axis[0] * axis[2] * center[0] * center[2]));
     }
     else if (quadric)
     {

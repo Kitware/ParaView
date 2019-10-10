@@ -7290,9 +7290,13 @@ array.
           <Proxy group="implicit_functions"
                  name="Axis Aligned Plane" />
           <Proxy group="implicit_functions"
+                 name="Plane" />
+          <Proxy group="implicit_functions"
                  name="Axis Aligned Box" />
           <Proxy group="implicit_functions"
                  name="Sphere" />
+          <Proxy group="implicit_functions"
+                 name="Cylinder" />
           <Proxy group="implicit_functions"
                  name="Quadric" />
           <Proxy group="implicit_functions"
