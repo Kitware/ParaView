@@ -5015,7 +5015,7 @@
         number_of_elements="1"
         default_values="0">
         <Documentation>
-          Deferred rendering cabability level of this database. None means that static images are created at each viewpoint (aka 'SpecA'). Composeable (aka 'SpecC') adds ability to hide/show individual objects. Recolorable adds colormap editability.
+          Deferred rendering cabability level for the database. None means that static images are created at each viewpoint (aka 'SpecA'). Composeable (aka 'SpecB') adds ability to hide/show individual objects. Recolorable (aka 'Spec C') adds colormap editability.
         </Documentation>
         <EnumerationDomain name="enum">
           <Entry text="None" value="0" />
@@ -5027,20 +5027,19 @@
         number_of_elements="1"
         default_values="0">
         <Documentation>
-          Specify camera capability level for this database. Static means the camera is fixed, phi-theta is an inward facing rectilinear sampling of the sphere, the pose cameras sparsely sample and maintain an orientation matrix.
+          Camera capability level for the database. Static means the camera is fixed, phi-theta is an inward facing rectilinear sampling over a sphere, inward pose is similar but maintains samples more sparsely.
         </Documentation>
         <EnumerationDomain name="enum">
           <Entry text="Static" value="0" />
           <Entry text="Phi-Theta" value="1" />
           <Entry text="Inward Pose" value="2" />
-          <Entry text="Outward Pose" value="3" />
         </EnumerationDomain>
       </IntVectorProperty>
       <StringVectorProperty name="TrackObject"
         number_of_elements="1"
         default_values="None">
         <Documentation>
-          Name of a pipeline object to orient the camera with. Only meaningful for Inward and Outward Pose Cameras.
+          Name of a pipeline object to orient the camera with. Only meaningful for Pose camera.
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
@@ -5061,7 +5060,7 @@
         number_of_elements="1"
         default_values="12">
         <Documentation>
-          Specify number of longitudinal divisions. Only meaningful for Phi-Theta and Pose Cameras.
+          Specify number of longitudinal divisions. Only meaningful for Phi-Theta and Pose cameras.
         </Documentation>
         <IntRangeDomain name="range" min="1" max="64" />
       </IntVectorProperty>
@@ -5069,7 +5068,7 @@
         number_of_elements="1"
         default_values="7">
         <Documentation>
-          Specify number of latitudinal divisions. Only meaningful for Phi-Theta and Pose Cameras.
+          Specify number of latitudinal divisions. Only meaningful for Phi-Theta and Pose cameras.
         </Documentation>
         <IntRangeDomain name="range" min="1" max="32" />
       </IntVectorProperty>
@@ -5077,7 +5076,7 @@
         number_of_elements="1"
         default_values="1">
         <Documentation>
-          Specify number of roll divisions. Only meaningful for Inward and Outward Pose Cameras.
+          Specify number of roll divisions. Only meaningful for Pose camera.
         </Documentation>
         <IntRangeDomain name="range" min="1" max="64" />
         <Hints>
