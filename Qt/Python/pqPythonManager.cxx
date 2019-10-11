@@ -146,6 +146,12 @@ pqPythonManager::~pqPythonManager()
 }
 
 //-----------------------------------------------------------------------------
+bool pqPythonManager::initializeInterpreter()
+{
+  return vtkPythonInterpreter::Initialize();
+}
+
+//-----------------------------------------------------------------------------
 bool pqPythonManager::interpreterIsInitialized()
 {
   return vtkPythonInterpreter::IsInitialized();
