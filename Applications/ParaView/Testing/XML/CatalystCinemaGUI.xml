@@ -1,39 +1,51 @@
 <?xml version="1.0" ?>
 <pqevents>
+  <!-- This test validates that we can make a catalyst script that produces a Cinema Image database. -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size_Custom" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Width" command="set_string" arguments="400" />
-  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Height" command="key" arguments="16777217" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Height" command="set_string" arguments="400" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/ButtonBox/1QPushButton2" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/ButtonBox/1QPushButton0" command="activate" arguments="" />
+
+  <!-- Make a dataset to mimic what the simulation will make. -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,56,10,/0:0/0:0" />
+
+  <!-- Name it 'input' to establish correspondance with a particular simulation output -->
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="input" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+
+  <!-- Slice the dataset. -->
   <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Cut" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/useZNormal" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,7,4,/0:0/0:1" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,7,4,/0:0/0:1" />
-  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
-  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst/Writers" command="activate" arguments="Parallel PolyData Writer" />
+  <pqevent object="pqClientMainWindow/1QTabBar0" command="set_tab_with_text" arguments="Properties" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Open the export inspector. -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
-  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="Export State" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/__qt__passive_wizardbutton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage2/showAllSources" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage2/allInputs" command="mousePress" arguments="1,1,0,11,11,/0:0" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage2/allInputs" command="mouseRelease" arguments="1,0,0,11,11,/0:0" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage2/addButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/__qt__passive_wizardbutton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/__qt__passive_wizardbutton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage_2/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/outputCinema" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage_2/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/wViewSelection/groupBox/swViews/ImageOutputInfo/gbCinemaOptions/composite" command="set_boolean" arguments="false" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage_2/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/wViewSelection/groupBox/swViews/ImageOutputInfo/gbCinemaOptions/cinemaExport" command="set_string" arguments="phi-theta" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage_2/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/wViewSelection/groupBox/swViews/ImageOutputInfo/gbCinemaOptions/wCameraOptions/phiResolution" command="set_int" arguments="3" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage_2/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/wViewSelection/groupBox/swViews/ImageOutputInfo/gbCinemaOptions/wCameraOptions/thetaResolution" command="set_int" arguments="3" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/finishButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/ExportCoprocessingStateFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/cptest.py" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionCatalystConfigure" />
+
+  <!-- Request a Cinema Image extract. -->
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewFormat" command="activated" arguments="Cinema image database (*.cdb)" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewExtract" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewConfigure" command="activate" arguments="" />
+  <!-- Set a name for the view export. -->
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CatalystFilePattern/CatalystFilePattern" command="set_string" arguments="image_%t.cdb" />
+  <!-- Make a small camera sampling. -->
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Format/ProxySelectionWidget/frame/ChosenProxyWidget/CameraModel/ComboBox" command="activated" arguments="Phi-Theta" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Format/ProxySelectionWidget/frame/ChosenProxyWidget/CameraPhiDivisions/IntRangeWidget/LineEdit" command="set_string" arguments="3" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Format/ProxySelectionWidget/frame/ChosenProxyWidget/CameraThetaDivisions/IntRangeWidget/LineEdit" command="set_string" arguments="3" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
+
+  <!-- Write out the script." -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionExportCatalyst" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst/ExportCoprocessingStateFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/cptest.py" />
 </pqevents>

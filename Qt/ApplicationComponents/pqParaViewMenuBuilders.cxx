@@ -49,7 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCatalystExportReaction.h"
 #include "pqCatalystPauseSimulationReaction.h"
 #include "pqCatalystRemoveBreakpointReaction.h"
-#include "pqCatalystScriptGeneratorReaction.h"
 #include "pqCatalystSetBreakpointReaction.h"
 #include "pqCategoryToolbarsBehavior.h"
 #include "pqChangePipelineInputReaction.h"
@@ -108,7 +107,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if VTK_MODULE_ENABLE_ParaView_pqPython
 #include "pqMacroReaction.h"
 #include "pqPythonManager.h"
-#include "pqSGWritersMenuManager.h"
 #include "pqTraceReaction.h"
 #endif
 
@@ -687,8 +685,6 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu, QWidget* exportConfi
     menu.addAction("Remove Breakpoint") << pqSetName("actionCatalystRemoveBreakpoint"));
 
 #if VTK_MODULE_ENABLE_ParaView_pqPython
-#define SHOWNEWCATALYSTGUI 1
-#if SHOWNEWCATALYSTGUI
   menu.addSeparator(); // --------------------------------------------------
   // QAction* cexport = menu.addAction("Configure Exports"); //WTH won't this show up on mac?
   // QAction* cexport = menu.addAction("Setup Exports"); //or this on mac?
@@ -705,20 +701,6 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu, QWidget* exportConfi
     << pqSetName("actionExportTemporal");
   new pqTemporalExportReaction(gtemporal);
 
-#else
-  (void)exportConfiguration; // avoid unreferenced parameter comp warning
-#endif
-
-#define SHOWOLDCATALYSTGUI 1
-#if SHOWOLDCATALYSTGUI
-  menu.addSeparator(); // --------------------------------------------------
-  QAction* csg = menu.addAction("Generate Script -deprecated") << pqSetName("Export State");
-  new pqCatalystScriptGeneratorReaction(csg);
-
-  pqSGWritersMenuManager* menuMgr =
-    new pqSGWritersMenuManager(&menu, "&Writers", "CatalystWritersMenu", nullptr);
-  menuMgr->createMenu();
-#endif
 #else
   (void)exportConfiguration; // avoid unreferenced parameter comp warning
 #endif

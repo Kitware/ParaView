@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <!-- This test validates that we can make catalyst scripts via the Export Inspector. -->
+  <!-- This test validates that we can make a catalyst script that produces a Cinema Image database with a pose camera. -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size_Custom" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Width" command="set_string" arguments="400" />
@@ -32,27 +32,20 @@
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
   <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionCatalystConfigure" />
 
-  <!-- Request a data extract. -->
-  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterChoice" command="activated" arguments="Slice1" />
-  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterFormat" command="activated" arguments="XMLPPolyDataWriter" />
-  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterExtract" command="set_boolean" arguments="true" />
-  <!-- A specific name for this file. -->
-  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/filterConfigure" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/SaveDataDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CatalystFilePattern/CatalystFilePattern" command="set_string" arguments="filename_%t.pvtp" />
-  <pqevent object="pqClientMainWindow/SaveDataDialog/widget/OKButton" command="activate" arguments="" />
-
-  <!-- Request a screen shot extract. -->
+  <!-- Request a Cinema Image extract. -->
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewFormat" command="activated" arguments="Cinema image database (*.cdb)" />
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewExtract" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewConfigure" command="activate" arguments="" />
-  <!-- A specific name for this View/RenderWindow. -->
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CatalystFilePattern/CatalystFilePattern" command="set_string" arguments="image_%t.png" />
-  <!-- Choose a specific size for the image. -->
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/width" command="set_string" arguments="400" />
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/height" command="set_string" arguments="400" />
-  <!-- Make it so. -->
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Format/ProxySelectionWidget/frame/ChosenProxyWidget/DeferredRendering/ComboBox" command="activated" arguments="Composable" />
+  <!-- Spec C, i.e. pose camera. -->
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Format/ProxySelectionWidget/frame/ChosenProxyWidget/CameraModel/ComboBox" command="activated" arguments="Inward Pose" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Format/ProxySelectionWidget/frame/ChosenProxyWidget/CameraPhiDivisions/IntRangeWidget/LineEdit" command="set_string" arguments="3" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Format/ProxySelectionWidget/frame/ChosenProxyWidget/CameraThetaDivisions/IntRangeWidget/LineEdit" command="set_string" arguments="3" />
+  <!-- A name for this View/RenderWindow. -->
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CatalystFilePattern/CatalystFilePattern" command="set_string" arguments="pose_%t.cdb" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
 
-  <!-- Write out the script." -->
+  <!-- Write out the script. -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
   <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionExportCatalyst" />
   <pqevent object="pqClientMainWindow/menubar/menu_Catalyst/ExportCoprocessingStateFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/cptest.py" />

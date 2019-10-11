@@ -85,10 +85,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
 
-#if VTK_MODULE_ENABLE_ParaView_pqPython
-#include "pqCinemaConfiguration.h"
-#endif
-
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------
@@ -297,14 +293,6 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   else if (panelWidget == "InteractiveLight")
   {
     return new pqLightPropertyWidget(proxy, group, parentWidget);
-  }
-  else if (panelWidget == "cinema_export_selector")
-  {
-#if VTK_MODULE_ENABLE_ParaView_pqPython
-    return new pqCinemaConfiguration(proxy, group, parentWidget);
-#else
-    return NULL;
-#endif
   }
   // *** NOTE: When adding new types, please update the header documentation ***
 

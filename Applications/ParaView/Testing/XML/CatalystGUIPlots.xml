@@ -1,35 +1,58 @@
 <?xml version="1.0" ?>
 <pqevents>
+  <!-- This test validates that we can make catalyst scripts that contain plot type views. -->
+  <!-- It also validates that we can export multiple views simultaneously. -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size_Custom" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Width" command="set_string" arguments="300" />
-  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Height" command="key" arguments="16777217" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Height" command="set_string" arguments="300" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/ButtonBox/1QPushButton2" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/ButtonBox/1QPushButton0" command="activate" arguments="" />
+
+  <!-- Make a dataset to mimic what the simulation will make. -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,56,10,/0:0/0:0" />
+
+  <!-- Name it 'input' to establish correspondance with a particular simulation output -->
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="input" />
-  <!-- made the wavelet source successfully so far -->
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+
+  <!-- Make a plot of the dataset -->
   <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/ProbeLine" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <!-- made the plot over line successfully so far -->
+
+  <!-- Open the export inspector. -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
-  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="Export State" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/__qt__passive_wizardbutton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage2/showAllSources" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage2/allInputs" command="mousePress" arguments="1,1,0,11,11,/0:0" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage2/allInputs" command="mouseRelease" arguments="1,0,0,11,11,/0:0" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage2/addButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/__qt__passive_wizardbutton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage/nameWidget" command="setCheckState" arguments="0.1,0" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage/nameWidget" command="edit" arguments="0.1" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage/nameWidget/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="input" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/__qt__passive_wizardbutton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/__qt__passive_wizardbutton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage_2/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/outputRendering" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/finishButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ExportStateWizard/ExportCoprocessingStateFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/cptest.py" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionCatalystConfigure" />
+
+  <!-- Make the 3d view active. -->
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.45977,0.220046,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.45977,0.220046,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.45977,0.220046,1,0,0)" />
+  <!-- Request a screen shot extract for the 3d view. -->
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewExtract" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewConfigure" command="activate" arguments="" />
+  <!-- A specific name for this View/RenderWindow. -->
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CatalystFilePattern/CatalystFilePattern" command="set_string" arguments="image_0_%t.png" />
+  <!-- Make it so. -->
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
+
+  <!-- Make the plot view active. -->
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.324713,0.24424,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.324713,0.24424,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.324713,0.24424,1,0,0)" />
+  <!-- Request a screen shot extract for the plot view. -->
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewExtract" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewConfigure" command="activate" arguments="" />
+  <!-- A specific name for this View/RenderWindow. -->
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CatalystFilePattern/CatalystFilePattern" command="set_string" arguments="image_1_%t.png" />
+  <!-- Make it so. -->
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
+
+  <!-- Write out the script. -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionExportCatalyst" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst/ExportCoprocessingStateFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/cptest.py" />
 </pqevents>

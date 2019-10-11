@@ -634,36 +634,6 @@ macro(ADD_CATALYST_LIVE_TEST test_name duration command_line_connect_command)
 
 endmacro(ADD_CATALYST_LIVE_TEST)
 
-# Catalyst tests
-# ----------------------------------------------------------------------
-if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
-
-  paraview_add_client_tests(
-    FORCE_SERIAL
-    TEST_SCRIPTS CatalystGUI.xml )
-
-  if (TARGET ParaView::CinemaPython)
-    paraview_add_client_tests(
-      FORCE_SERIAL
-      TEST_SCRIPTS CatalystCinemaGUI.xml )
-  endif ()
-
-  #add_catalyst_live_test(CatalystLiveSetBreakpoint 222 "")
-  # the CatalystLivePause test uses the --live=22222 command line option to automatically
-  # connect to a running simulation on port 22222
-  #add_catalyst_live_test(CatalystLivePause 80  "--live=22222")
-
-  # tests for the new export inspector panel
-  paraview_add_client_tests(
-    FORCE_SERIAL
-    TEST_SCRIPTS CatalystExporterGUI.xml )
-  paraview_add_client_tests(
-    FORCE_SERIAL
-    DATA_DIRECTORY "${paraview_test_data_directory_output}"
-    TEST_SCRIPTS TemporalExporterGUI.xml )
-
-endif()
-
 if (PARAVIEW_ENABLE_XDMF2 AND NOT PARAVIEW_ENABLE_XDMF3)
   # Xdmf2 is optional.
   # And when both Xdmf2 and Xdmf3 are enabled, the SelectReader dialog
