@@ -216,8 +216,13 @@ bool vtkCGNSWriter::vtkPrivate::WritePolygonalZone(
 
   // if a cell is not a volume cell, write it as an NGON_n entry only.
 
-  vector<cgsize_t> cellData;
-  vector<cgsize_t> faceData;
+  vector<cgsize_t> cellDataArr;
+  vector<cgsize_t> faceDataArr;
+  vector<cgsize_t> cellDataIdx;
+  vector<cgsize_t> faceDataIdx;
+  cellDataIdx.push_back(0);
+  faceDataIdx.push_back(0);
+
   cgsize_t ngons(0), ncells(0);
   for (vtkIdType i = 0; i < grid->GetNumberOfCells(); ++i)
   {
@@ -227,45 +232,80 @@ bool vtkCGNSWriter::vtkPrivate::WritePolygonalZone(
                      // are reported.
     {
       cgsize_t nPts = static_cast<cgsize_t>(cell->GetNumberOfPoints());
-      faceData.push_back(nPts);
+#if CGNS_VERSION >= 3400
+      faceDataIdx.push_back(nPts);
+#else
+      faceDataArr.push_back(nPts);
+#endif
       for (int p = 0; p < nPts; ++p)
       {
-        faceData.push_back(static_cast<cgsize_t>(CGNS_COUNTING_OFFSET + cell->GetPointId(p)));
+        faceDataArr.push_back(static_cast<cgsize_t>(CGNS_COUNTING_OFFSET + cell->GetPointId(p)));
       }
       ++ngons;
       continue;
     }
 
-    cellData.push_back(nFaces);
+#if CGNS_VERSION >= 3400
+    cellDataIdx.push_back(nFaces);
+#else
+    cellDataArr.push_back(nFaces);
+#endif
     for (int f = 0; f < nFaces; ++f)
     {
       vtkCell* face = cell->GetFace(f);
       cgsize_t nPts = static_cast<cgsize_t>(face->GetNumberOfPoints());
 
       // NFACE_n references an ngon in the NGON_n array
-      cellData.push_back(CGNS_COUNTING_OFFSET + ngons); // ngons start counting at 0
-      faceData.push_back(nPts);
+      cellDataArr.push_back(CGNS_COUNTING_OFFSET + ngons); // ngons start counting at 0
+#if CGNS_VERSION >= 3400
+      faceDataIdx.push_back(nPts);
+#else
+      faceDataArr.push_back(nPts);
+#endif
       for (int p = 0; p < nPts; ++p)
       {
-        faceData.push_back(static_cast<cgsize_t>(CGNS_COUNTING_OFFSET + face->GetPointId(p)));
+        faceDataArr.push_back(static_cast<cgsize_t>(CGNS_COUNTING_OFFSET + face->GetPointId(p)));
       }
       ++ngons;
     }
     ++ncells;
   }
 
+#if CGNS_VERSION >= 3400
+  // update offsets for faces and cells
+  for (size_t idx = 1; idx < faceDataIdx.size(); ++idx)
+  {
+    faceDataIdx[idx] += faceDataIdx[idx - 1];
+  }
+  for (size_t idx = 1; idx < cellDataIdx.size(); ++idx)
+  {
+    cellDataIdx[idx] += cellDataIdx[idx - 1];
+  }
+#endif
+
   int dummy(0);
   int nBoundary(0);
   if (ncells > 0)
   {
+#if CGNS_VERSION >= 3400
+    cg_check_operation(
+      cg_poly_section_write(info.F, info.B, info.Z, "Elem_NFACE_n", CGNS_ENUMV(NFACE_n), 1 + ngons,
+        ncells + ngons, nBoundary, cellDataArr.data(), cellDataIdx.data(), &dummy));
+#else
     cg_check_operation(cg_section_write(info.F, info.B, info.Z, "Elem_NFACE_n", CGNS_ENUMV(NFACE_n),
-      1 + ngons, ncells + ngons, nBoundary, cellData.data(), &dummy));
+      1 + ngons, ncells + ngons, nBoundary, cellDataArr.data(), &dummy));
+#endif
   }
 
   if (ngons > 0)
   {
+#if CGNS_VERSION >= 3400
+    cg_check_operation(cg_poly_section_write(info.F, info.B, info.Z, "Elem_NGON_n",
+      CGNS_ENUMV(NGON_n), 1, ngons, nBoundary, faceDataArr.data(), faceDataIdx.data(), &dummy));
+#else
     cg_check_operation(cg_section_write(info.F, info.B, info.Z, "Elem_NGON_n", CGNS_ENUMV(NGON_n),
-      1, ngons, nBoundary, faceData.data(), &dummy));
+      1, ngons, nBoundary, faceDataArr.data(), &dummy));
+#endif
   }
 
   return true;

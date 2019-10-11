@@ -225,6 +225,108 @@ int get_section_connectivity(const int cgioNum, const double cgioSectionId, cons
 }
 
 //------------------------------------------------------------------------------
+int get_section_start_offset(const int cgioNum, const double cgioSectionId, const int dim,
+  const cgsize_t* srcStart, const cgsize_t* srcEnd, const cgsize_t* srcStride,
+  const cgsize_t* memStart, const cgsize_t* memEnd, const cgsize_t* memStride,
+  const cgsize_t* memDim, vtkIdType* localElementsIdx)
+{
+  const char* offsetPath = "ElementStartOffset";
+  double cgioElemOffsetId;
+  char dataType[3];
+  std::size_t sizeOfCnt = 0;
+
+  if (cgio_get_node_id(cgioNum, cgioSectionId, offsetPath, &cgioElemOffsetId) != CG_OK)
+  {
+    // std::cerr << "ElementStartOffset not found\n";
+    return 1;
+  }
+
+  cgio_get_data_type(cgioNum, cgioElemOffsetId, dataType);
+
+  if (strcmp(dataType, "I4") == 0)
+  {
+    sizeOfCnt = sizeof(int);
+  }
+  else if (strcmp(dataType, "I8") == 0)
+  {
+    sizeOfCnt = sizeof(cglong_t);
+  }
+  else
+  {
+    std::cerr << "ElementStartOffset data_type unknown\n";
+  }
+
+  if (sizeOfCnt == sizeof(vtkIdType))
+  {
+    if (cgio_read_data(cgioNum, cgioElemOffsetId, srcStart, srcEnd, srcStride, dim, memDim,
+          memStart, memEnd, memStride, (void*)localElementsIdx) != CG_OK)
+    {
+      char message[81];
+      cgio_error_message(message);
+      std::cerr << "cgio_read_data :" << message;
+      return 1;
+    }
+  }
+  else
+  {
+    // Need to read into temp array to convert data
+    cgsize_t nn = 1;
+    for (int ii = 0; ii < dim; ii++)
+    {
+      nn *= memDim[ii];
+    }
+    if (sizeOfCnt == sizeof(int))
+    {
+      int* data = new int[nn];
+      if (data == 0)
+      {
+        std::cerr << "Allocation failed for temporary connectivity offset array\n";
+      }
+
+      if (cgio_read_data(cgioNum, cgioElemOffsetId, srcStart, srcEnd, srcStride, dim, memDim,
+            memStart, memEnd, memStride, (void*)data) != CG_OK)
+      {
+        delete[] data;
+        char message[81];
+        cgio_error_message(message);
+        std::cerr << "cgio_read_data :" << message;
+        return 1;
+      }
+      for (cgsize_t n = 0; n < nn; n++)
+      {
+        localElementsIdx[n] = static_cast<vtkIdType>(data[n]);
+      }
+      delete[] data;
+    }
+    else if (sizeOfCnt == sizeof(cglong_t))
+    {
+      cglong_t* data = new cglong_t[nn];
+      if (data == 0)
+      {
+        std::cerr << "Allocation failed for temporary connectivity array\n";
+        return 1;
+      }
+      if (cgio_read_data(cgioNum, cgioElemOffsetId, srcStart, srcEnd, srcStride, dim, memDim,
+            memStart, memEnd, memStride, (void*)data) != CG_OK)
+      {
+        delete[] data;
+        char message[81];
+        cgio_error_message(message);
+        std::cerr << "cgio_read_data :" << message;
+        return 1;
+      }
+      for (cgsize_t n = 0; n < nn; n++)
+      {
+        localElementsIdx[n] = static_cast<vtkIdType>(data[n]);
+      }
+      delete[] data;
+    }
+  }
+  cgio_release_id(cgioNum, cgioElemOffsetId);
+  return 0;
+}
+
+//------------------------------------------------------------------------------
 int GetVTKElemType(
   CGNS_ENUMT(ElementType_t) elemType, bool& higherOrderWarning, bool& cgnsOrderFlag)
 {
