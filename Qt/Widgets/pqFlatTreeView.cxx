@@ -495,13 +495,8 @@ void pqFlatTreeView::setHeader(QHeaderView* headerView)
     // Set up the default header view.
     this->HeaderView = new QHeaderView(Qt::Horizontal, this->viewport());
     this->HeaderView->setSortIndicatorShown(false);
-#if QT_VERSION >= 0x050000
     this->HeaderView->setSectionsClickable(false);
     this->HeaderView->setSectionResizeMode(QHeaderView::Interactive);
-#else
-    this->HeaderView->setClickable(false);
-    this->HeaderView->setResizeMode(QHeaderView::Interactive);
-#endif
     this->HeaderOwned = true;
   }
 

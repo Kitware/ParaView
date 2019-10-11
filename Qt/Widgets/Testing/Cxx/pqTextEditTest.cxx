@@ -102,16 +102,12 @@ void pqTextEditTester::testTypeText()
   QFETCH(bool, focus);
 
   this->TextEdit->show();
-#if QT_VERSION >= 0x050000
   bool active = QTest::qWaitForWindowActive(this->TextEdit);
   if (!active)
   {
     qCritical() << "Window did not become active. Skipping testTypeText.";
     return;
   }
-#else
-  QTest::qWaitForWindowShown(this->TextEdit);
-#endif
   this->TextEdit->setFocus();
 
   QTest::keyClicks(this->TextEdit, text);
@@ -205,16 +201,12 @@ void pqTextEditTester::testFocus()
   QFETCH(bool, focus);
 
   this->TextEdit->show();
-#if QT_VERSION >= 0x050000
   bool active = QTest::qWaitForWindowActive(this->TextEdit);
   if (!active)
   {
     qCritical() << "Window did not become active. Skipping testFocus.";
     return;
   }
-#else
-  QTest::qWaitForWindowShown(this->TextEdit);
-#endif
   this->TextEdit->setFocus();
 
   QTest::keyClick(this->TextEdit, static_cast<Qt::Key>(focusOutKey),
@@ -298,16 +290,12 @@ void pqTextEditTester::testReTypeText()
   this->spy(spyType)->clear();  // Reset spy
 
   this->TextEdit->show();
-#if QT_VERSION >= 0x050000
   bool active = QTest::qWaitForWindowActive(this->TextEdit);
   if (!active)
   {
     qCritical() << "Window did not become active. Skipping testReTypeText.";
     return;
   }
-#else
-  QTest::qWaitForWindowShown(this->TextEdit);
-#endif
   this->TextEdit->setFocus();
 
   for (int i = 0; i < text.length(); ++i) // Remove previous text

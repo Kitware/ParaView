@@ -349,11 +349,7 @@ public:
   {
     this->Ui.setupUi(self);
     this->Ui.Table->setModel(&this->Model);
-#if QT_VERSION >= 0x050000
     this->Ui.Table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-#else
-    this->Ui.Table->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
-#endif
     this->Ui.Table->horizontalHeader()->setStretchLastSection(true);
     this->Ui.Table->horizontalHeader()->hide();
 

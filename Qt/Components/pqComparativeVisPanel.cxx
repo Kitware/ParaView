@@ -210,13 +210,8 @@ pqComparativeVisPanel::pqComparativeVisPanel(QWidget* p)
 
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
-#if QT_VERSION >= 0x050000
   this->Internal->activeParameters->horizontalHeader()->setSectionResizeMode(
     QHeaderView::ResizeToContents);
-#else
-  this->Internal->activeParameters->horizontalHeader()->setResizeMode(
-    QHeaderView::ResizeToContents);
-#endif
 
   QObject::connect(
     &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this, SLOT(setView(pqView*)));

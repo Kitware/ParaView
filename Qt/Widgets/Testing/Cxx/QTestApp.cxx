@@ -13,11 +13,7 @@ int QTestApp::Error = 0;
 
 QTestApp::QTestApp(int _argc, char** _argv)
 {
-#if QT_VERSION >= 0x050000
   qInstallMessageHandler(QTestApp::messageHandler);
-#else
-  qInstallMsgHandler(QTestApp::messageHandler);
-#endif
 
   // CMake generated driver removes argv[0],
   // so let's put a dummy back in
@@ -37,11 +33,7 @@ QTestApp::QTestApp(int _argc, char** _argv)
 QTestApp::~QTestApp()
 {
   delete App;
-#if QT_VERSION >= 0x050000
   qInstallMessageHandler(0);
-#else
-  qInstallMsgHandler(0);
-#endif
 }
 
 int QTestApp::exec()
@@ -52,8 +44,6 @@ int QTestApp::exec()
   }
   return Error + QApplication::exec();
 }
-
-#if QT_VERSION >= 0x050000
 
 void QTestApp::messageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
@@ -84,31 +74,6 @@ void QTestApp::messageHandler(QtMsgType type, const QMessageLogContext& context,
       abort();
   }
 }
-
-#else
-
-void QTestApp::messageHandler(QtMsgType type, const char* msg)
-{
-  switch (type)
-  {
-    case QtDebugMsg:
-      fprintf(stderr, "Debug: %s\n", msg);
-      break;
-    case QtWarningMsg:
-      fprintf(stderr, "Warning: %s\n", msg);
-      Error++;
-      break;
-    case QtCriticalMsg:
-      fprintf(stderr, "Critical: %s\n", msg);
-      Error++;
-      break;
-    case QtFatalMsg:
-      fprintf(stderr, "Fatal: %s\n", msg);
-      abort();
-  }
-}
-
-#endif
 
 void QTestApp::delay(int ms)
 {

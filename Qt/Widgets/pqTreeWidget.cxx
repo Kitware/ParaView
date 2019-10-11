@@ -106,11 +106,7 @@ pqTreeWidget::pqTreeWidget(QWidget* p)
   QObject::connect(
     this->header(), SIGNAL(sectionClicked(int)), this, SLOT(doToggle(int)), Qt::QueuedConnection);
 
-#if QT_VERSION >= 0x050000
   this->header()->setSectionsClickable(true);
-#else
-  this->header()->setClickable(true);
-#endif
 
   QObject::connect(
     this->model(), SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(updateCheckState()));
