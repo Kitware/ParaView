@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // pqCore
 #include "pqApplicationCore.h"
+#include "pqDataRepresentation.h"
 #include "pqPipelineSource.h"
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
@@ -195,7 +196,7 @@ public:
   {
     if (!idx.isValid())
     {
-      return 2;
+      return 3;
     }
     QModelIndex pidx = this->parent(idx);
     pqServerManagerModel* smModel;
@@ -207,12 +208,16 @@ public:
       {
         return smModel->getNumberOfItems<pqRenderView*>();
       }
-      else if (idx.row() == 1)
+      if (idx.row() == 1)
+      {
+        return smModel->getNumberOfItems<pqDataRepresentation*>();
+      }
+      else if (idx.row() == 2)
       {
         return smModel->getNumberOfItems<pqPipelineSource*>();
       }
     }
-    if (pidx.isValid() && pidx.row() == 1)
+    if (pidx.isValid() && pidx.row() == 2)
     {
       vtkSMProxyListDomain* pxyDomain = this->proxyListDomain(idx);
       if (pxyDomain)
@@ -243,7 +248,11 @@ public:
         }
         else if (idx.row() == 1)
         {
-          return "Objects";
+          return "Representations";
+        }
+        else if (idx.row() == 2)
+        {
+          return "Sources";
         }
       }
 
@@ -265,6 +274,32 @@ public:
         if (domain && (int)domain->GetNumberOfProxies() > idx.row())
         {
           return domain->GetProxyName(idx.row());
+        }
+      }
+    }
+    else if (role == Qt::ToolTipRole)
+    {
+      QModelIndex pidx = idx.parent();
+      if (pidx.isValid() && pidx.row() == 1)
+      {
+        RowIndex ri = this->decodeIndex(idx.internalPointer());
+        if (!ri.u.idx.hasIndex)
+        {
+          vtkSMProxy* pxy = this->getProxy(idx);
+          pqServerManagerModel* m;
+          m = pqApplicationCore::instance()->getServerManagerModel();
+          if (pxy)
+          {
+            pqDataRepresentation* repr = m->findItem<pqDataRepresentation*>(pxy);
+            pqPipelineSource* source = repr ? repr->getInput() : nullptr;
+            pqView* view = repr ? repr->getView() : nullptr;
+            if (source && view)
+            {
+              return QString(tr("Source <b>%1</b><br/>View <b>%2</b>"))
+                .arg(source->getSMName())
+                .arg(view->getSMName());
+            }
+          }
         }
       }
     }
@@ -348,6 +383,10 @@ public:
       }
       else if (ri.u.idx.type == 1)
       {
+        return m->getItemAtIndex<pqDataRepresentation*>(idx.row())->getProxy();
+      }
+      else if (ri.u.idx.type == 2)
+      {
         if (!ri.u.idx.hasIndex)
         {
           return m->getItemAtIndex<pqPipelineSource*>(idx.row())->getProxy();
@@ -385,9 +424,11 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
   this->Ui->ObjectTreeSelection1->setModel(this->Proxy1Model);
   this->Ui->ObjectTreeSelection2->setModel(this->Proxy2Model);
 
-  // Hiding views items
+  // Hiding views and representations items
   this->Ui->ObjectTreeSelection1->setRowHidden(0, QModelIndex(), true);
   this->Ui->ObjectTreeSelection2->setRowHidden(0, QModelIndex(), true);
+  this->Ui->ObjectTreeSelection1->setRowHidden(1, QModelIndex(), true);
+  this->Ui->ObjectTreeSelection2->setRowHidden(1, QModelIndex(), true);
 
   QObject::connect(this->Ui->ObjectTreeProxy1->selectionModel(),
     SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this,
@@ -413,10 +454,12 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
     SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this,
     SLOT(currentProxy2Changed(const QModelIndex&, const QModelIndex&)));
 
-  QObject::connect(this->Ui->Property1List, SIGNAL(itemPressed(QListWidgetItem*)), this,
+  QObject::connect(this->Ui->Property1List,
+    SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this,
     SLOT(currentProperty1Changed(QListWidgetItem*)));
 
-  QObject::connect(this->Ui->Property2List, SIGNAL(itemPressed(QListWidgetItem*)), this,
+  QObject::connect(this->Ui->Property2List,
+    SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this,
     SLOT(currentProperty2Changed(QListWidgetItem*)));
 
   QObject::connect(this->Ui->lineEdit, SIGNAL(textChanged(const QString&)), this,
