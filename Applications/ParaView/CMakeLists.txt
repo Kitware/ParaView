@@ -114,3 +114,17 @@ if (UNIX AND NOT APPLE)
     DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/metainfo"
     COMPONENT   runtime)
 endif ()
+
+set(paraview_xml_destination
+  "${CMAKE_INSTALL_DATAROOTDIR}/paraview${paraview_version_suffix}/xmls")
+install(
+  FILES       ${xmls}
+  DESTINATION "${paraview_xml_destination}"
+  COMPONENT   "development")
+
+set_property(GLOBAL APPEND
+  PROPERTY
+    paraview_client_xml_files "${xmls}")
+set_property(GLOBAL
+  PROPERTY
+    paraview_client_xml_destination "${paraview_xml_destination}")

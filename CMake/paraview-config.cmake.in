@@ -13,6 +13,9 @@ The following variables are provided by this module:
     Python is not available.
   * `PARAVIEW_PLUGIN_SUBDIR`: The subdirectory under the library directory for
     plugins.
+  * `ParaView_CLIENT_XML_FILES`: XML files for client applications to use to
+    reproduce ParaView's menu items. Only provided if `PARAVIEW_BUILD_QT_GUI`
+    is set.
   * `ParaView_LIBRARIES`: The list of modules specified by `COMPONENTS` and
     `OPTIONAL_COMPONENTS`. This may be used in `MODULES` arguments in the API
     (e.g., `vtk_module_autoinit`). All modules are also targets and may be
@@ -72,6 +75,10 @@ set(PARAVIEW_PLUGIN_SUBDIR "paraview@paraview_version_suffix@/plugins")
 if (PARAVIEW_ENABLE_PYTHON)
   include("${CMAKE_CURRENT_LIST_DIR}/ParaViewPython-targets.cmake")
   include("${CMAKE_CURRENT_LIST_DIR}/paraview.modules-vtk-python-module-properties.cmake")
+endif ()
+
+if (PARAVIEW_BUILD_QT_GUI)
+  include("${CMAKE_CURRENT_LIST_DIR}/ParaView-client-xml.cmake")
 endif ()
 
 set(_paraview_components_to_check)
