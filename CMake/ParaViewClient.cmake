@@ -374,6 +374,19 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
       ParaView::pqApplicationComponents
       VTK::vtksys)
 
+  set(_paraview_client_export)
+  if (DEFINED _paraview_client_EXPORT)
+    set(_paraview_client_export
+      EXPORT "${_paraview_client_EXPORT}")
+  endif ()
+
+  install(
+    TARGETS "${_paraview_client_NAME}"
+    ${_paraview_client_export}
+    COMPONENT "runtime"
+    ${_paraview_client_bundle_args}
+    RUNTIME DESTINATION "${_paraview_client_RUNTIME_DESTINATION}")
+
   if (DEFINED _paraview_client_PLUGINS_TARGETS)
     target_link_libraries("${_paraview_client_NAME}"
       PRIVATE
@@ -397,19 +410,6 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
       INSTALL_DESTINATION "${_paraview_client_conf_destination}"
       COMPONENT "runtime")
   endif ()
-
-  set(_paraview_client_export)
-  if (DEFINED _paraview_client_EXPORT)
-    set(_paraview_client_export
-      EXPORT "${_paraview_client_EXPORT}")
-  endif ()
-
-  install(
-    TARGETS "${_paraview_client_NAME}"
-    ${_paraview_client_export}
-    COMPONENT "runtime"
-    ${_paraview_client_bundle_args}
-    RUNTIME DESTINATION "${_paraview_client_RUNTIME_DESTINATION}")
 
   if (APPLE)
     if (DEFINED _paraview_client_BUNDLE_ICON)
