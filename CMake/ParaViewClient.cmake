@@ -407,9 +407,9 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
   install(
     TARGETS "${_paraview_client_NAME}"
     ${_paraview_client_export}
+    COMPONENT "runtime"
     ${_paraview_client_bundle_args}
-    RUNTIME DESTINATION "${_paraview_client_RUNTIME_DESTINATION}"
-    COMPONENT "runtime")
+    RUNTIME DESTINATION "${_paraview_client_RUNTIME_DESTINATION}")
 
   if (APPLE)
     if (DEFINED _paraview_client_BUNDLE_ICON)
@@ -419,7 +419,8 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
           MACOSX_BUNDLE_ICON_FILE "${_paraview_client_bundle_icon_file}")
       install(
         FILES       "${_paraview_client_BUNDLE_ICON}"
-        DESTINATION "${_paraview_client_BUNDLE_DESTINATION}/${_paraview_client_APPLICATION_NAME}.app/Contents/Resources")
+        DESTINATION "${_paraview_client_BUNDLE_DESTINATION}/${_paraview_client_APPLICATION_NAME}.app/Contents/Resources"
+        COMPONENT   "runtime")
     endif ()
     if (DEFINED _paraview_client_BUNDLE_PLIST)
       set_property(TARGET "${_paraview_client_NAME}"
