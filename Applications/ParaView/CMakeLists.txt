@@ -100,17 +100,17 @@ if (UNIX AND NOT APPLE)
     @ONLY)
   install(
     FILES       "${CMAKE_CURRENT_BINARY_DIR}/org.paraview.ParaView.desktop"
-    DESTINATION share/applications
+    DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/applications"
     COMPONENT   runtime)
   foreach (iconsize IN ITEMS 22x22 32x32 96x96)
     install(
       FILES       "pvIcon-${iconsize}.png"
-      DESTINATION "share/icons/hicolor/${iconsize}/apps"
+      DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/${iconsize}/apps"
       RENAME      paraview.png
       COMPONENT   runtime)
   endforeach ()
   install(
     FILES       org.paraview.ParaView.appdata.xml
-    DESTINATION share/metainfo
+    DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/metainfo"
     COMPONENT   runtime)
 endif ()
