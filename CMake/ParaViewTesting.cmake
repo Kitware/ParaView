@@ -61,16 +61,6 @@ function (_paraview_add_tests function)
       "The `_COMMAND_PATTERN` argument is required.")
   endif ()
 
-  if (NOT DEFINED _paraview_add_tests_TEST_DATA_TARGET)
-    if (DEFINED _paraview_add_tests_default_test_data_target)
-      set(_paraview_add_tests_TEST_DATA_TARGET
-        "${_paraview_add_tests_default_test_data_target}")
-    else ()
-      message(FATAL_ERROR
-        "The `TEST_DATA_TARGET` argument is required.")
-    endif ()
-  endif ()
-
   if (NOT DEFINED _paraview_add_tests_CLIENT)
     set(_paraview_add_tests_CLIENT
       "$<TARGET_FILE:ParaView::paraview>")
@@ -127,20 +117,43 @@ function (_paraview_add_tests function)
       continue ()
     endif ()
 
+    if (NOT DEFINED _paraview_add_tests_TEST_DATA_TARGET)
+      if (DEFINED _paraview_add_tests_default_test_data_target)
+        set(_paraview_add_tests_TEST_DATA_TARGET
+          "${_paraview_add_tests_default_test_data_target}")
+      else()
+        if (NOT DEFINED "${_paraview_add_tests_name}_USES_DIRECT_DATA")
+          message(FATAL_ERROR "The `TEST_DATA_TARGET` argument is required.")
+        endif()
+      endif ()
+    endif ()
+
     # Build arguments to pass to the clients.
     set(_paraview_add_tests_client_args
       "--test-directory=${_paraview_add_tests_TEST_DIRECTORY}"
       ${_paraview_add_tests_CLIENT_ARGS})
     if (DEFINED _paraview_add_tests_BASELINE_DIR)
       if (DEFINED "${_paraview_add_tests_name}_BASELINE")
-        list(APPEND _paraview_add_tests_client_args
-          "--test-baseline=DATA{${_paraview_add_tests_BASELINE_DIR}/${${_paraview_add_tests_name_base}_BASELINE}}")
+        if (DEFINED "${_paraview_add_tests_name}_USES_DIRECT_DATA")
+          list(APPEND _paraview_add_tests_client_args
+            "--test-baseline=${_paraview_add_tests_BASELINE_DIR}/${${_paraview_add_tests_name_base}_BASELINE}")
+        else()
+          list(APPEND _paraview_add_tests_client_args
+            "--test-baseline=DATA{${_paraview_add_tests_BASELINE_DIR}/${${_paraview_add_tests_name_base}_BASELINE}}")
+        endif ()
       else ()
-        list(APPEND _paraview_add_tests_client_args
-          "--test-baseline=DATA{${_paraview_add_tests_BASELINE_DIR}/${_paraview_add_tests_name_base}.png}")
+        if (DEFINED "${_paraview_add_tests_name}_USES_DIRECT_DATA")
+          list(APPEND _paraview_add_tests_client_args
+            "--test-baseline=${_paraview_add_tests_BASELINE_DIR}/${_paraview_add_tests_name_base}.png")
+        else()
+          list(APPEND _paraview_add_tests_client_args
+            "--test-baseline=DATA{${_paraview_add_tests_BASELINE_DIR}/${_paraview_add_tests_name_base}.png}")
+        endif ()
       endif ()
-      ExternalData_Expand_Arguments("${_paraview_add_tests_TEST_DATA_TARGET}" _
-        "DATA{${_paraview_add_tests_BASELINE_DIR}/,REGEX:${_paraview_add_tests_name_base}(-.*)?(_[0-9]+)?.png}")
+      if (NOT DEFINED "${_paraview_add_tests_name}_USES_DIRECT_DATA")
+        ExternalData_Expand_Arguments("${_paraview_add_tests_TEST_DATA_TARGET}" _
+          "DATA{${_paraview_add_tests_BASELINE_DIR}/,REGEX:${_paraview_add_tests_name_base}(-.*)?(_[0-9]+)?.png}")
+      endif()
     endif ()
     if (DEFINED "${_paraview_add_tests_name}_THRESHOLD")
       list(APPEND _paraview_add_tests_client_args
@@ -161,11 +174,19 @@ function (_paraview_add_tests function)
       _paraview_add_tests_script_args
       "${_paraview_add_tests_script_args}")
 
-    ExternalData_add_test("${_paraview_add_tests_TEST_DATA_TARGET}"
-      NAME    "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
-      COMMAND ParaView::smTestDriver
-              --enable-bt
-              ${_paraview_add_tests_script_args})
+    if (DEFINED "${_paraview_add_tests_name}_USES_DIRECT_DATA")
+      add_test(
+        NAME    "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
+        COMMAND ParaView::smTestDriver
+                --enable-bt
+                ${_paraview_add_tests_script_args})
+    else()
+      ExternalData_add_test("${_paraview_add_tests_TEST_DATA_TARGET}"
+        NAME    "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
+        COMMAND ParaView::smTestDriver
+                --enable-bt
+                ${_paraview_add_tests_script_args})
+    endif()
     set_property(TEST "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
       PROPERTY
         LABELS ParaView)
