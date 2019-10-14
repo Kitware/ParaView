@@ -46,6 +46,7 @@ set(classes
   vtkSMInteractiveSelectionPipeline
   vtkSMLoadStateOptionsProxy
   vtkSMMultiServerSourceProxy
+  vtkSMOMETIFFChannelCalculatorInitializationHelper
   vtkSMPLYWriterProxyInitializationHelper
   vtkSMPSWriterProxy
   vtkSMPreselectionPipeline

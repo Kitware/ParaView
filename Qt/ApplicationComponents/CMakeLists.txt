@@ -128,9 +128,10 @@ set(classes
   pqModelTransformSupportBehavior
   pqMoleculePropertyWidget
   pqMultiComponentsDecorator
-  pqOSPRayHidingDecorator
   pqObjectPickingBehavior
+  pqOMETransferFunctionsPropertyWidget
   pqOpacityTableModel
+  pqOSPRayHidingDecorator
   pqPVAnimationWidget
   pqPVApplicationCore
   pqParaViewBehaviors
@@ -243,6 +244,8 @@ set(ui_files
   Resources/UI/pqLinePropertyWidget.ui
   Resources/UI/pqMainControlsToolbar.ui
   Resources/UI/pqMoleculePropertyWidget.ui
+  Resources/UI/pqOMETransferFunctionsPropertyWidget.ui
+  Resources/UI/pqOMETransferFunctionsPropertyWidgetPage.ui
   Resources/UI/pqResetScalarRangeToDataOverTime.ui
   Resources/UI/pqSavePresetOptions.ui
   Resources/UI/pqSeriesEditorPropertyWidget.ui

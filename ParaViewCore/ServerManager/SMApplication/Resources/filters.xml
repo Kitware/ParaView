@@ -17639,5 +17639,156 @@ Every Nth Point.
       </IntVectorProperty>
     </SourceProxy>
     <!-- End RedistributeDataSetFilter -->
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkOMETIFFChannelCalculator" name="OMETIFFChannelCalculator"
+      label="OME TIFF Channel Calculator">
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <InputArrayDomain name="point_arrays" attribute_type="point" optional="1" />
+      </InputProperty>
+
+      <StringVectorProperty
+          name="ChannelVisibilities"
+          command="GetChannelSelection"
+          number_of_elements_per_command="1"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+          <ArrayListDomain name="array_list" input_domain_name="point_arrays">
+            <RequiredProperties>
+              <Property name="Input" function="Input" />
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            Select the point data arrays to pass through
+          </Documentation>
+          <Hints>
+            <ArraySelectionWidget icon_type="point"/>
+          </Hints>
+      </StringVectorProperty>
+
+      <ProxyProperty command="SetChannel1LUT" name="Channel1LUT" >
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty command="SetChannel2LUT" name="Channel2LUT" >
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty command="SetChannel3LUT" name="Channel3LUT" >
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty command="SetChannel4LUT" name="Channel4LUT" >
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty command="SetChannel5LUT" name="Channel5LUT" >
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty command="SetChannel6LUT" name="Channel6LUT" >
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty command="SetChannel7LUT" name="Channel7LUT" >
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty command="SetChannel8LUT" name="Channel8LUT" >
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty command="SetChannel9LUT" name="Channel9LUT" >
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty command="SetChannel10LUT" name="Channel10LUT" >
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <DoubleVectorProperty name="Channel1Weight"
+        command="SetChannel1Weight"
+        number_of_elements="1"
+        default_values="1.0" />
+      <DoubleVectorProperty name="Channel2Weight"
+        command="SetChannel2Weight"
+        number_of_elements="1"
+        default_values="1.0" />
+      <DoubleVectorProperty name="Channel3Weight"
+        command="SetChannel3Weight"
+        number_of_elements="1"
+        default_values="1.0" />
+      <DoubleVectorProperty name="Channel4Weight"
+        command="SetChannel4Weight"
+        number_of_elements="1"
+        default_values="1.0" />
+      <DoubleVectorProperty name="Channel5Weight"
+        command="SetChannel5Weight"
+        number_of_elements="1"
+        default_values="1.0" />
+      <DoubleVectorProperty name="Channel6Weight"
+        command="SetChannel6Weight"
+        number_of_elements="1"
+        default_values="1.0" />
+      <DoubleVectorProperty name="Channel7Weight"
+        command="SetChannel7Weight"
+        number_of_elements="1"
+        default_values="1.0" />
+      <DoubleVectorProperty name="Channel8Weight"
+        command="SetChannel8Weight"
+        number_of_elements="1"
+        default_values="1.0" />
+      <DoubleVectorProperty name="Channel9Weight"
+        command="SetChannel9Weight"
+        number_of_elements="1"
+        default_values="1.0" />
+      <DoubleVectorProperty name="Channel10Weight"
+        command="SetChannel10Weight"
+        number_of_elements="1"
+        default_values="1.0" />
+
+      <PropertyGroup label="Color + Opacity Settings" panel_widget="OMETransferFunctions">
+        <Property name="Channel1LUT"    function="Channel_1" />
+        <Property name="Channel2LUT"    function="Channel_2" />
+        <Property name="Channel3LUT"    function="Channel_3" />
+        <Property name="Channel4LUT"    function="Channel_4" />
+        <Property name="Channel5LUT"    function="Channel_5" />
+        <Property name="Channel6LUT"    function="Channel_6" />
+        <Property name="Channel7LUT"    function="Channel_7" />
+        <Property name="Channel8LUT"    function="Channel_8" />
+        <Property name="Channel9LUT"    function="Channel_9" />
+        <Property name="Channel10LUT"   function="Channel_10" />
+        <Property name="Channel1Weight" function="Channel_1Weight" />
+        <Property name="Channel2Weight" function="Channel_2Weight" />
+        <Property name="Channel3Weight" function="Channel_3Weight" />
+        <Property name="Channel4Weight" function="Channel_4Weight" />
+        <Property name="Channel5Weight" function="Channel_5Weight" />
+        <Property name="Channel6Weight" function="Channel_6Weight" />
+        <Property name="Channel7Weight" function="Channel_7Weight" />
+        <Property name="Channel8Weight" function="Channel_8Weight" />
+        <Property name="Channel9Weight" function="Channel_9Weight" />
+        <Property name="Channel10Weight" function="Channel_10Weight" />
+      </PropertyGroup>
+      <Hints>
+        <InitializationHelper class="vtkSMOMETIFFChannelCalculatorInitializationHelper" />
+      </Hints>
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

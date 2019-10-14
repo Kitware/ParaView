@@ -101,6 +101,7 @@ public:
    * \li \c InteractivePolyLine: pqSplinePropertyWidget (with mode==POLYLINE)
    * \li \c InteractiveCylinder: pqCylinderPropertyWidget
    * \li \c YoungsMaterial: pqYoungsMaterialPropertyWidget
+   * \li \c OMETransferFunctions : pqOMETransferFunctionsPropertyWidget
    */
   pqPropertyWidget* createWidgetForPropertyGroup(
     vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parentWidget) override;

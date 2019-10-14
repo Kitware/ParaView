@@ -82,6 +82,15 @@ public:
   bool GetLogScaleXAxis() const;
   //@}
 
+  //@{
+  /**
+   * Provides access to vtkScalarsToColors and vtkPiecewiseFunction passed to
+   * `initialize`.
+   */
+  vtkScalarsToColors* scalarsToColors() const;
+  vtkPiecewiseFunction* piecewiseFunction() const;
+  //@}
+
 public slots:
   /**
   * Set the current point. Set to -1 clear the current point.

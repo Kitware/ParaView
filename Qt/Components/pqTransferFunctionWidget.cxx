@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMCoreUtilities.h"
 #include "vtkSmartPointer.h"
 #include "vtkVector.h"
+#include "vtkWeakPointer.h"
 
 #include <QColorDialog>
 #include <QMainWindow>
@@ -205,6 +206,9 @@ public:
   vtkSmartPointer<vtkControlPointsItem> ControlPointsItem;
   unsigned long CurrentPointEditEventId;
 
+  vtkWeakPointer<vtkScalarsToColors> ScalarsToColors;
+  vtkWeakPointer<vtkPiecewiseFunction> PiecewiseFunction;
+
   pqInternals(pqTransferFunctionWidget* editor)
     : Widget(new QVTKOpenGLNativeWidget(editor))
     , CurrentPointEditEventId(0)
@@ -288,10 +292,24 @@ pqTransferFunctionWidget::~pqTransferFunctionWidget()
 }
 
 //-----------------------------------------------------------------------------
+vtkScalarsToColors* pqTransferFunctionWidget::scalarsToColors() const
+{
+  return this->Internals->ScalarsToColors;
+}
+
+//-----------------------------------------------------------------------------
+vtkPiecewiseFunction* pqTransferFunctionWidget::piecewiseFunction() const
+{
+  return this->Internals->PiecewiseFunction;
+}
+
+//-----------------------------------------------------------------------------
 void pqTransferFunctionWidget::initialize(
   vtkScalarsToColors* stc, bool stc_editable, vtkPiecewiseFunction* pwf, bool pwf_editable)
 {
   this->Internals->cleanup();
+  this->Internals->ScalarsToColors = stc;
+  this->Internals->PiecewiseFunction = pwf;
 
   // TODO: If needed, we can support vtkLookupTable.
   vtkColorTransferFunction* ctf = vtkColorTransferFunction::SafeDownCast(stc);

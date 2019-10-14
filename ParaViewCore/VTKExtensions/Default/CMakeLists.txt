@@ -72,6 +72,7 @@ set(classes
   vtkMergeArrays
   vtkMergeCompositeDataSet
   vtkMinMax
+  vtkOMETIFFChannelCalculator
   vtkPEnSightGoldBinaryReader
   vtkPEnSightGoldReader
   vtkPEnSightReader

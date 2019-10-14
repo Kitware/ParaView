@@ -31,6 +31,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/MultiBlockWithPieces_0_0.vtp}"
   "DATA{${paraview_test_data_directory_input}/Data/MultiBlockWithPieces_1_0.vtp}"
   "DATA{${paraview_test_data_directory_input}/Data/NE2_ps_bath.png}"
+  "DATA{${paraview_test_data_directory_input}/Data/OMETIFF/multi-channel-time-series.ome.tif}"
   "DATA{${paraview_test_data_directory_input}/Data/PropertyLink.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/RectGrid2.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/RodPlate/,REGEX:.*}"
@@ -773,6 +774,7 @@ list(APPEND TESTS_WITH_BASELINES
   NormalGlyphs.xml
   NumberOfComponentsDomain.xml
   NonConvexPolygon.xml
+  OMETIFFChannelCalculator.xml
   OpenSaveData.xml
   OrderedGroupDatasets.xml
   OrthographicView.xml
