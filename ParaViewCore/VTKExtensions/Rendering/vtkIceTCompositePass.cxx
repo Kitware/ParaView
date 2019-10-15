@@ -227,18 +227,6 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
     this->PartitionOrdering->GetNumberOfRegions() >=
       this->IceTContext->GetController()->GetNumberOfProcesses());
 
-  // First ensure the context supports floating point textures
-  if (this->EnableFloatValuePass)
-  {
-    vtkValuePass* valuePass = vtkValuePass::SafeDownCast(this->RenderPass);
-    bool supported = valuePass->IsFloatingPointModeSupported();
-    if (!supported)
-    {
-      vtkWarningMacro("Disabling FloatValuePass!");
-      this->EnableFloatValuePass = supported;
-    }
-  }
-
   IceTEnum const format =
     this->EnableFloatValuePass ? ICET_IMAGE_COLOR_RGBA_FLOAT : ICET_IMAGE_COLOR_RGBA_UBYTE;
 

@@ -2865,8 +2865,11 @@ void vtkPVRenderView::SetArrayNumberToDraw(int fieldAttributeType)
 }
 
 // ----------------------------------------------------------------------------
-void vtkPVRenderView::SetValueRenderingModeCommand(int mode)
+void vtkPVRenderView::SetValueRenderingModeCommand(int vtkNotUsed(mode))
 {
+  // The VTK level INVERTIBLE_LUT mode is deprecated, this method will be
+  // removed shortly.
+
   // Fixes issue with the background (black) when coming back from
   // FLOATING_POINT mode. FLOATING_POINT mode is only supported in BATCH
   // mode and single process CLIENT.
@@ -2885,27 +2888,10 @@ void vtkPVRenderView::SetValueRenderingModeCommand(int mode)
     return;
   }
 
-  switch (mode)
-  {
-    case vtkValuePass::FLOATING_POINT:
-    {
 #if VTK_MODULE_ENABLE_ParaView_icet
-      IceTPassEnableFloatPass(true, this->SynchronizedRenderers);
+  IceTPassEnableFloatPass(true, this->SynchronizedRenderers);
 #endif
-      this->Internals->ValuePasses->SetRenderingMode(mode);
-    }
-    break;
-
-    case vtkValuePass::INVERTIBLE_LUT:
-    default:
-    {
-#if VTK_MODULE_ENABLE_ParaView_icet
-      IceTPassEnableFloatPass(false, this->SynchronizedRenderers);
-#endif
-      this->Internals->ValuePasses->SetRenderingMode(mode);
-    }
-    break;
-  }
+  // deprecated - this->Internals->ValuePasses->SetRenderingMode(mode);
 
   this->Modified();
 }
@@ -2913,7 +2899,7 @@ void vtkPVRenderView::SetValueRenderingModeCommand(int mode)
 //-----------------------------------------------------------------------------
 int vtkPVRenderView::GetValueRenderingModeCommand()
 {
-  return this->Internals->ValuePasses->GetRenderingMode();
+  return vtkValuePass::FLOATING_POINT;
 }
 
 // ----------------------------------------------------------------------------
@@ -2934,7 +2920,7 @@ void vtkPVRenderView::SetScalarRange(double min, double max)
   {
     this->Internals->ScalarRange[0] = min;
     this->Internals->ScalarRange[1] = max;
-    this->Internals->ValuePasses->SetScalarRange(min, max);
+    // deprecated - this->Internals->ValuePasses->SetScalarRange(min, max);
     this->Modified();
   }
 }
@@ -2945,11 +2931,8 @@ void vtkPVRenderView::BeginValueCapture()
   if (!this->Internals->IsInCapture)
   {
 #if VTK_MODULE_ENABLE_ParaView_icet
-    if (vtkValuePass::FLOATING_POINT == this->Internals->ValuePasses->GetRenderingMode())
-    {
-      // Let the IceTPass know FLOATING_POINT is already enabled.
-      IceTPassEnableFloatPass(true, this->SynchronizedRenderers);
-    }
+    // Let the IceTPass know FLOATING_POINT is already enabled.
+    IceTPassEnableFloatPass(true, this->SynchronizedRenderers);
 #endif
 
     this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
@@ -2978,11 +2961,8 @@ void vtkPVRenderView::BeginValueCapture()
 void vtkPVRenderView::EndValueCapture()
 {
 #if VTK_MODULE_ENABLE_ParaView_icet
-  if (vtkValuePass::FLOATING_POINT == this->Internals->ValuePasses->GetRenderingMode())
-  {
-    // Let the IceTPass know vtkValuePass will be removed.
-    IceTPassEnableFloatPass(false, this->SynchronizedRenderers);
-  }
+  // Let the IceTPass know vtkValuePass will be removed.
+  IceTPassEnableFloatPass(false, this->SynchronizedRenderers);
 #endif
 
   this->Internals->IsInCapture = false;
