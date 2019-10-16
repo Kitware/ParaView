@@ -53,6 +53,9 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   , UseDepthBuffer(false)
   , RenderEmptyImages(false)
   , DataReplicatedOnAllProcesses(false)
+  , RayTracing(false)
+  , PathTracing(false)
+  , RayTraceMode(0)
 {
   this->DisableIceT = vtkPVRenderViewSettings::GetInstance()->GetDisableIceT();
 }
@@ -85,6 +88,7 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
   switch (pm->GetProcessType())
   {
     case vtkProcessModule::PROCESS_CLIENT:
+
       if (auto cs_controller = session->GetController(vtkPVSession::RENDER_SERVER_ROOT))
       {
         // in client-server mode.
@@ -97,6 +101,7 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
         {
           this->CSSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
           this->CSSynchronizer->WriteBackImagesOn();
+          this->RayTraceMode = 1; // remember that we may have to turn bg OFF
         }
         this->CSSynchronizer->SetRootProcessId(0);
         this->CSSynchronizer->SetParallelController(cs_controller);
@@ -110,6 +115,7 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
     case vtkProcessModule::PROCESS_SERVER:
     case vtkProcessModule::PROCESS_RENDER_SERVER:
     case vtkProcessModule::PROCESS_BATCH:
+
       if (in_cave_mode)
       {
         this->ParallelSynchronizer = vtkCaveSynchronizedRenderers::New();
@@ -193,6 +199,7 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
           // explicitly or via IceT.
           this->CSSynchronizer->FixBackgroundOn();
         }
+        this->RayTraceMode = 2; // remember that we may have to turn bg ON
       }
       break;
 
@@ -460,4 +467,42 @@ void vtkPVSynchronizedRenderer::SetPartitionOrdering(
 void vtkPVSynchronizedRenderer::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderer::SetRayTracingState(int RTorPT, bool value)
+{
+  if (RTorPT == 0) // using this flag to avoid having two methods
+  {
+    this->RayTracing = value;
+  }
+  else
+  {
+    this->PathTracing = value;
+  }
+  if (!value && this->RayTraceMode)
+  {
+    // whenever you turn off ray or path tracing restore standard behavior
+    if (this->RayTraceMode == 1)
+    {
+      this->CSSynchronizer->FixBackgroundOff();
+    }
+    if (this->RayTraceMode == 2)
+    {
+      this->CSSynchronizer->FixBackgroundOn();
+    }
+  }
+  if (value && this->RayTraceMode && (RTorPT == 0 ? this->PathTracing : this->RayTracing))
+  {
+    // when both ray and path tracing are on, and if this process's role needs it, then then turn on
+    // non-standard behavior to get environment on server
+    if (this->RayTraceMode == 1)
+    {
+      this->CSSynchronizer->FixBackgroundOn();
+    }
+    if (this->RayTraceMode == 2)
+    {
+      this->CSSynchronizer->FixBackgroundOff();
+    }
+  }
 }
