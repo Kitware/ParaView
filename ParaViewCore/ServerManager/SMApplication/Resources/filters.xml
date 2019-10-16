@@ -17154,6 +17154,27 @@ Every Nth Point.
       </IntVectorProperty>
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkHyperTreeGridGhostCellsGenerator"
+                 label="Hyper Tree Grid Ghost Cells Generator"
+                 name="HyperTreeGridGhostCellsGenerator">
+      <Documentation long_help="Generate Ghost Cells for HyperTreeGrid."
+                     short_help="Generate Ghost Cells for HyperTreeGrid.">
+                     This filter generates ghost cells for hyper tree grid for multi processing purposes.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_types">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+        <Documentation>This property specified the input to the ghost cell generator.</Documentation>
+      </InputProperty>
+      <!-- End vtkHyperTreeGridGhostCellsGenerator -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkHyperTreeGridToUnstructuredGrid"
                  label="HyperTreeGrid To UnstructuredGrid"
                  name="HyperTreeGridToUnstructuredGrid">

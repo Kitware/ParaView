@@ -59,6 +59,7 @@
     <Proxy group="filters" name="Contour" icon=":/pqWidgets/Icons/pqIsosurface24.png"/>
     <Proxy group="filters" name="HyperTreeGridDepthLimiter" />
     <Proxy group="filters" name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup24.png"/>
+    <Proxy group="filters" name="HyperTreeGridGhostCellsGenerator" />
     <Proxy group="filters" name="Threshold" icon=":/pqWidgets/Icons/pqThreshold24.png"/>
     <Proxy group="filters" name="HyperTreeGridToDualGrid" />
     <Proxy group="filters" name="HyperTreeGridToUnstructuredGrid" />
