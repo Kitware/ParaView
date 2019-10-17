@@ -790,6 +790,7 @@ public:
   //@{
   /**
    * Current rendering mode of vtkValuePass (float or invertible RGB).
+   * @deprecation Invertible is deprecated, so this currently does nothing and will be removed.
    */
   void SetValueRenderingModeCommand(int mode);
   int GetValueRenderingModeCommand();
