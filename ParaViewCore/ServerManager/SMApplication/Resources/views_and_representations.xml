@@ -4362,8 +4362,9 @@
                       panel_visibility_default_for_representation="volume" />
             <Property name="InterpolationType"
                       panel_visibility="never" />
-            <Property name="ShowIsosurfaces" />
+            <Property name="BlendMode" />
             <Property name="IsosurfaceValues" />
+            <Property name="SliceFunction" />
             <Property name="UseCropping" />
             <Hints>
               <PropertyWidgetDecorator type="CompositeDecorator">
@@ -4739,14 +4740,28 @@
                       name="Input" />
           </RequiredProperties>
         </BoundsDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="BlendMode"
+                                   value="6"
+                                   inverse="1" />
+        </Hints>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetShowIsosurfaces"
+      <IntVectorProperty command="SetBlendMode"
                          default_values="0"
-                         name="ShowIsosurfaces"
+                         name="BlendMode"
                          number_of_elements="1">
-        <BooleanDomain name="bool"/>
-        <Documentation>This property specifies if the rendering of isosurfaces
-          is enabled.</Documentation>
+        <EnumerationDomain name="enum">
+          <!-- See vtkVolumeMapper::BlendModes -->
+          <Entry text="Composite"
+                 value="0" />
+          <Entry text="Isosurface"
+                 value="5" />
+          <Entry text="Slice"
+                 value="6" />
+        </EnumerationDomain>
+        <Documentation>This property specifies how the samples should be blended</Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetIsosurfaceValue"
@@ -4770,11 +4785,31 @@
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
-                                   property="ShowIsosurfaces"
-                                   value="1" />
-          <!-- enable this widget when ShowIsosurfaces==1 -->
+                                   property="BlendMode"
+                                   value="5" />
+          <!-- enable this widget when BlendMode==Isosurface -->
         </Hints>
       </DoubleVectorProperty>
+      <ProxyProperty command="SetSliceFunction"
+                     label="Slice Type"
+                     name="SliceFunction">
+        <ProxyGroupDomain name="groups">
+          <Group name="implicit_functions" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="implicit_functions"
+                 name="Plane" />
+        </ProxyListDomain>
+        <Documentation>This property sets the parameters of the slice
+        function.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="BlendMode"
+                                   value="6" />
+          <!-- enable this widget when BlendMode==Slice -->
+        </Hints>
+      </ProxyProperty>
       <IntVectorProperty command="SetCropping"
                          default_values="0"
                          name="UseCropping"

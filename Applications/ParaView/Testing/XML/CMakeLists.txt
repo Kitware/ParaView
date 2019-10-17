@@ -429,7 +429,9 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/UseDataPartitions4.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeCellSelection.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeCrop.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeIsosurfaceBlendMode.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeNoMapScalars.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeSliceBlendMode.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/XYChart_ChangeParameters.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/XYChart_Default.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/XYChart_DisableBlocks.png}"
@@ -864,8 +866,10 @@ list(APPEND TESTS_WITH_BASELINES
   UniformInverseTransformSamplingGlyph.xml
   VectorComponentHistogram.xml
   VolumeCrop.xml
+  VolumeIsosurfaceBlendMode.xml
   VolumeRenderingWithContour.xml
   VolumeReprTwoIndepComp.xml
+  VolumeSliceBlendMode.xml
   VariableSelector.xml
   VariableSelector1.xml
   ViewSettingsDialog.xml
@@ -1286,6 +1290,8 @@ set(LoadSaveStateVolume_DISABLE_CRS TRUE)
 set(SeparatedColorMapOpacity_DISABLE_CRS TRUE)
 set(VolumeReprTwoIndepComp_DISABLE_CRS TRUE)
 set(VolumeCrop_DISABLE_CRS TRUE)
+set(VolumeSliceBlendMode_DISABLE_CRS TRUE)
+set(VolumeIsosurfaceBlendMode_DISABLE_CRS TRUE)
 
 # Set properties for CTH tests
 set(CTHAMRContour_DISABLE_CS TRUE)

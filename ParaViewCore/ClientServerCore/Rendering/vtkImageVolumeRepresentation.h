@@ -35,6 +35,7 @@ class vtkColorTransferFunction;
 class vtkExtentTranslator;
 class vtkFixedPointVolumeRayCastMapper;
 class vtkImageData;
+class vtkImplicitFunction;
 class vtkOutlineSource;
 class vtkPExtentTranslator;
 class vtkPiecewiseFunction;
@@ -87,6 +88,7 @@ public:
   void SetShade(bool);
   void SetMapScalars(bool);
   void SetMultiComponentsMapping(bool);
+  void SetSliceFunction(vtkImplicitFunction* slice);
 
   //@{
   /**
@@ -99,7 +101,7 @@ public:
   //***************************************************************************
   // Forwarded to vtkSmartVolumeMapper.
   void SetRequestedRenderMode(int);
-  void SetShowIsosurfaces(int);
+  void SetBlendMode(int);
   void SetCropping(int);
 
   //@{

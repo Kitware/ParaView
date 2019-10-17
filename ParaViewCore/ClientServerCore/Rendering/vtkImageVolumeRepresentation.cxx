@@ -481,6 +481,11 @@ void vtkImageVolumeRepresentation::SetMultiComponentsMapping(bool val)
   // vtkVolumeProperty ivar i.e. IndependentComponents.
 }
 
+void vtkImageVolumeRepresentation::SetSliceFunction(vtkImplicitFunction* slice)
+{
+  this->Property->SetSliceFunction(slice);
+}
+
 //----------------------------------------------------------------------------
 void vtkImageVolumeRepresentation::SetRequestedRenderMode(int mode)
 {
@@ -488,10 +493,9 @@ void vtkImageVolumeRepresentation::SetRequestedRenderMode(int mode)
 }
 
 //----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::SetShowIsosurfaces(int show)
+void vtkImageVolumeRepresentation::SetBlendMode(int blend)
 {
-  this->VolumeMapper->SetBlendMode(
-    show ? vtkVolumeMapper::ISOSURFACE_BLEND : vtkVolumeMapper::COMPOSITE_BLEND);
+  this->VolumeMapper->SetBlendMode(static_cast<vtkVolumeMapper::BlendModes>(blend));
 }
 
 //----------------------------------------------------------------------------
