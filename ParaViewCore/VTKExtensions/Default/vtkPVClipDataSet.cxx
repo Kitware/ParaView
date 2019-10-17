@@ -26,6 +26,7 @@
 #include "vtkHyperTreeGridAxisClip.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMathUtilities.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -206,9 +207,11 @@ int vtkPVClipDataSet::RequestData(
     vtkNew<vtkHyperTreeGridAxisClip> htgClip;
     if (plane)
     {
-      if (!plane->GetAxisAligned())
+      double* normal = plane->GetNormal();
+      if (!vtkMathUtilities::NearlyEqual(normal[0], 1.0) &&
+        !vtkMathUtilities::NearlyEqual(normal[1], 1.0) &&
+        !vtkMathUtilities::NearlyEqual(normal[2], 1.0))
       {
-        double* normal = plane->GetNormal();
         htgClip->SetClipTypeToQuadric();
         htgClip->SetQuadricCoefficients(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, normal[0], normal[1],
           normal[2], plane->EvaluateFunction(0.0, 0.0, 0.0));
@@ -216,8 +219,7 @@ int vtkPVClipDataSet::RequestData(
       else
       {
         htgClip->SetClipTypeToPlane();
-        double* normal = plane->GetNormal();
-        htgClip->SetPlanePosition(-plane->EvaluateFunction(0, 0, 0));
+        htgClip->SetPlanePosition(-plane->EvaluateFunction(0.0, 0.0, 0.0));
         int planeNormalAxis = 0;
         if (normal[1] > normal[0])
         {
@@ -227,7 +229,7 @@ int vtkPVClipDataSet::RequestData(
         {
           planeNormalAxis = 2;
         }
-        htgClip->SetPlanePosition(-plane->EvaluateFunction(0, 0, 0));
+        htgClip->SetPlanePosition(-plane->EvaluateFunction(0.0, 0.0, 0.0));
         htgClip->SetPlaneNormalAxis(planeNormalAxis);
       }
     }
@@ -282,7 +284,7 @@ int vtkPVClipDataSet::RequestData(
       vtkErrorMacro(<< "Clipping function not supported");
       return 0;
     }
-    htgClip->SetInsideOut(this->GetInsideOut());
+    htgClip->SetInsideOut(this->GetInsideOut() != 0);
     htgClip->SetInputData(0, vtkHyperTreeGrid::SafeDownCast(inDataObj));
     htgClip->Update();
     outDataObj->ShallowCopy(htgClip->GetOutput(0));
