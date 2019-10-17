@@ -1,11 +1,8 @@
 # Find PythonQt
 #
-# You can pass PYTHONQT_DIR to set the root directory that
-# contains lib/ and include/PythonQt where PythonQt is installed.
+# Sets PythonQt_FOUND, PythonQt_INCLUDE_DIRS, PythonQt_LIBRARIES
 #
-# Sets PYTHONQT_FOUND, PYTHONQT_INCLUDE_DIRS, PYTHONQT_LIBRARIES
-#
-# The cache variables are PYTHON_QT_INCLUDE_DIR AND PYTHONQT_LIBRARY.
+# The cache variables are PythonQt_INCLUDE_DIR AND PythonQt_LIBRARY.
 #
 
 find_path(PythonQt_INCLUDE_DIR
@@ -19,19 +16,31 @@ find_library(PythonQt_LIBRARY
   DOC   "The PythonQt library")
 mark_as_advanced(PythonQt_LIBRARY)
 
+find_library(PythonQt_QtAll_LIBRARY
+  NAMES PythonQt_QtAll
+  DOC   "The PythonQt_QtAll library")
+mark_as_advanced(PythonQt_QtAll_LIBRARY)
+
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(PythonQt
   REQUIRED_VARS PythonQt_INCLUDE_DIR PythonQt_LIBRARY)
 
 if (PythonQt_FOUND)
   set(PythonQt_INCLUDE_DIRS "${PythonQt_INCLUDE_DIR}")
-  set(PythonQt_LIBRARIES "${PythonQt_LIBRARY}")
+  set(PythonQt_LIBRARIES "${PythonQt_LIBRARY};${PythonQt_QtAll_LIBRARY}")
+  # TODO: Add interface for Python and Qt dependencies.
   if (NOT TARGET PythonQt::PythonQt)
-    # TODO: Add interface for Python and Qt dependencies.
     add_library(PythonQt::PythonQt UNKNOWN IMPORTED)
     set_target_properties(PythonQt::PythonQt
       PROPERTIES
-        IMPORTED_LOCATION "${QtTesting_LIBRARY}"
+        IMPORTED_LOCATION "${PythonQt_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${PythonQt_INCLUDE_DIR}")
+  endif ()
+  if (NOT TARGET PythonQt::PythonQt_QtAll)
+    add_library(PythonQt::PythonQt_QtAll UNKNOWN IMPORTED)
+    set_target_properties(PythonQt::PythonQt_QtAll
+      PROPERTIES
+        IMPORTED_LOCATION "${PythonQt_QtAll_LIBRARY}"
         INTERFACE_INCLUDE_DIRECTORIES "${PythonQt_INCLUDE_DIR}")
   endif ()
 endif ()

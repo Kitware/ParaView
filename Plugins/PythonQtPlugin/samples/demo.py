@@ -18,7 +18,7 @@ def getServerManagerModel():
 
 
 def getPQView(view):
-    model = app.getServerManagerModel()
+    model = getPVApplicationCore().getServerManagerModel()
     return PythonQt.paraview.pqPythonQtMethodHelpers.findProxyItem(model, view.SMProxy)
 
 
@@ -58,13 +58,13 @@ def testButton():
 
 
 def sayHello():
-    QtGui.QMessageBox.information(getMainWindow(), 'Hello PythonQt!')
+    QtGui.QMessageBox.information(getMainWindow(), 'Hello', 'Hello PythonQt!')
 
 
 def testUserInput():
-    fileName = QtGui.QFileDialog.getOpenFileName(getMainWindow(), 'Open file',)
+    fileName = QtGui.QFileDialog.getOpenFileName(getMainWindow(), 'Open file')
     if fileName:
-        smp.OpenDataFile(fileName, guiName=os.path.basename(fileName))
+        smp.OpenDataFile(fileName, guiName = os.path.basename(fileName))
         smp.Show()
         smp.ResetCamera()
         smp.Render()

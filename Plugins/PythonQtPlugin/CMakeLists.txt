@@ -5,13 +5,16 @@ list(INSERT CMAKE_MODULE_PATH 0
 
 find_package(PythonQt QUIET REQUIRED)
 
+set(decorator_file "${CMAKE_CURRENT_BINARY_DIR}/pqPluginDecorators.h")
+
 set(sources
   pqPythonEventFilter.h
   pqPythonQtMethodHelpers.h
   pqPythonQtPlugin.cxx
   pqPythonQtPlugin.h
   pqPythonQtWrapperFactory.cxx
-  pqPythonQtWrapperFactory.h)
+  pqPythonQtWrapperFactory.h
+  ${decorator_file})
 
 set(interfaces)
 paraview_plugin_add_auto_start(
@@ -34,9 +37,25 @@ target_link_libraries(PythonQtPlugin
     VTK::CommonCore
     VTK::Python
     VTK::PythonInterpreter
-    VTK::WrappingPythonCore)
-target_compile_definitions(PythonQtPlugin PRIVATE QT_NO_KEYWORDS)
+    VTK::WrappingPythonCore
+    ParaView::pqApplicationComponents
+    ParaView::pqPython
+    PythonQt::PythonQt
+    PythonQt::PythonQt_QtAll)
 
-if (BUILD_TESTING)
-  add_subdirectory(Testing)
-endif ()
+target_include_directories(PythonQtPlugin
+  PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+
+find_package("Python3" QUIET REQUIRED COMPONENTS Interpreter)
+
+add_custom_command(
+  OUTPUT ${decorator_file}
+  COMMAND "Python3::Interpreter"
+          "${CMAKE_CURRENT_SOURCE_DIR}/WrapPythonQt.py"
+          -i "${CMAKE_CURRENT_SOURCE_DIR}/wrapped_methods.txt"
+          -o "${decorator_file}"
+          --class-prefixes vtk pq
+          --qt-class-prefixes pq
+          --module-name paraview
+  DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/wrapped_methods.txt"
+          "${CMAKE_CURRENT_SOURCE_DIR}/WrapPythonQt.py")
