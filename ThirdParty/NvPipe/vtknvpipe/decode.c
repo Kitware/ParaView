@@ -41,13 +41,174 @@
 #include <string.h>
 
 #include <cuda_runtime_api.h>
+#if (CUDART_VERSION < 9000)
 #include <nvcuvid.h>
+#else
+#include <dynlink_nvcuvid.h>
+#endif
 #include <nvToolsExt.h>
 #include "config.nvp.h"
 #include "debug.h"
 #include "internal-api.h"
 #include "nvpipe.h"
 #include "yuv.h"
+
+#if (CUDART_VERSION >= 9000)
+
+tcuvidCreateVideoSource               *cuvidCreateVideoSource;
+tcuvidCreateVideoSourceW              *cuvidCreateVideoSourceW;
+tcuvidDestroyVideoSource              *cuvidDestroyVideoSource;
+tcuvidSetVideoSourceState             *cuvidSetVideoSourceState;
+tcuvidGetVideoSourceState             *cuvidGetVideoSourceState;
+tcuvidGetSourceVideoFormat            *cuvidGetSourceVideoFormat;
+tcuvidGetSourceAudioFormat            *cuvidGetSourceAudioFormat;
+
+tcuvidCreateVideoParser               *cuvidCreateVideoParser;
+tcuvidParseVideoData                  *cuvidParseVideoData;
+tcuvidDestroyVideoParser              *cuvidDestroyVideoParser;
+
+tcuvidGetDecoderCaps                  *cuvidGetDecoderCaps;
+tcuvidCreateDecoder                   *cuvidCreateDecoder;
+tcuvidDestroyDecoder                  *cuvidDestroyDecoder;
+tcuvidDecodePicture                   *cuvidDecodePicture;
+
+tcuvidMapVideoFrame                   *cuvidMapVideoFrame;
+tcuvidUnmapVideoFrame                 *cuvidUnmapVideoFrame;
+
+#if defined(WIN64) || defined(_WIN64) || defined(__x86_64) || defined(AMD64) || defined(_M_AMD64)
+tcuvidMapVideoFrame64                 *cuvidMapVideoFrame64;
+tcuvidUnmapVideoFrame64               *cuvidUnmapVideoFrame64;
+#endif
+
+//tcuvidGetVideoFrameSurface            *cuvidGetVideoFrameSurface;
+tcuvidCtxLockCreate                   *cuvidCtxLockCreate;
+tcuvidCtxLockDestroy                  *cuvidCtxLockDestroy;
+tcuvidCtxLock                         *cuvidCtxLock;
+tcuvidCtxUnlock                       *cuvidCtxUnlock;
+
+#define STRINGIFY(X) #X
+
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
+#include <Windows.h>
+
+#ifdef UNICODE
+   static LPCWSTR __DriverLibName = L"nvcuvid.dll";
+#else
+   static LPCSTR __DriverLibName = "nvcuvid.dll";
+#endif
+
+
+typedef HMODULE DLLDRIVER;
+
+static CUresult LOAD_LIBRARY(DLLDRIVER *pInstance)
+{
+    *pInstance = LoadLibrary(__DriverLibName);
+
+    if (*pInstance == NULL)
+    {
+        printf("LoadLibrary \"%s\" failed!\n", __DriverLibName);
+        return CUDA_ERROR_UNKNOWN;
+    }
+
+    return CUDA_SUCCESS;
+}
+
+#define GET_PROC_EX(name, alias, required)                     \
+    alias = (t##name *)GetProcAddress(DriverLib, #name);               \
+    if (alias == NULL && required) {                                    \
+        printf("Failed to find required function \"%s\" in %s\n",       \
+               #name, __DriverLibName);                                  \
+        return CUDA_ERROR_UNKNOWN;                                      \
+    }
+
+#elif defined(__unix__) || defined(__APPLE__) || defined(__MACOSX)
+
+#include <dlfcn.h>
+
+static char __DriverLibName[] = "libnvcuvid.so";
+
+typedef void *DLLDRIVER;
+
+static CUresult LOAD_LIBRARY(DLLDRIVER *pInstance)
+{
+    *pInstance = dlopen(__DriverLibName, RTLD_NOW);
+
+    if (*pInstance == NULL)
+    {
+        printf("dlopen \"%s\" failed!\n", __DriverLibName);
+        return CUDA_ERROR_UNKNOWN;
+    }
+
+    return CUDA_SUCCESS;
+}
+
+#define GET_PROC_EX(name, alias, required)                              \
+    alias = (t##name *)dlsym(DriverLib, #name);                        \
+    if (alias == NULL && required) {                                    \
+        printf("Failed to find required function \"%s\" in %s\n",       \
+               #name, __DriverLibName);                                  \
+        return CUDA_ERROR_UNKNOWN;                                      \
+    }
+
+#else
+#error unsupported platform
+#endif
+
+#define CHECKED_CALL(call)              \
+    do {                                \
+        CUresult result = (call);       \
+        if (CUDA_SUCCESS != result) {   \
+            return result;              \
+        }                               \
+    } while(0)
+
+
+#define GET_PROC_REQUIRED(name) GET_PROC_EX(name,name,1)
+#define GET_PROC(name)          GET_PROC_REQUIRED(name)
+
+CUresult CUDAAPI cuvidInit(unsigned int Flags)
+{
+    DLLDRIVER DriverLib;
+
+    CHECKED_CALL(LOAD_LIBRARY(&DriverLib));
+
+    // fetch all function pointers
+    GET_PROC(cuvidCreateVideoSource);
+    GET_PROC(cuvidCreateVideoSourceW);
+    GET_PROC(cuvidDestroyVideoSource);
+    GET_PROC(cuvidSetVideoSourceState);
+    GET_PROC(cuvidGetVideoSourceState);
+    GET_PROC(cuvidGetSourceVideoFormat);
+    GET_PROC(cuvidGetSourceAudioFormat);
+
+    GET_PROC(cuvidCreateVideoParser);
+    GET_PROC(cuvidParseVideoData);
+    GET_PROC(cuvidDestroyVideoParser);
+
+    GET_PROC(cuvidGetDecoderCaps);
+    GET_PROC(cuvidCreateDecoder);
+    GET_PROC(cuvidDestroyDecoder);
+    GET_PROC(cuvidDecodePicture);
+
+#if defined(WIN64) || defined(_WIN64) || defined(__x86_64) || defined(AMD64) || defined(_M_AMD64)
+    GET_PROC(cuvidMapVideoFrame64);
+    GET_PROC(cuvidUnmapVideoFrame64);
+    cuvidMapVideoFrame   = cuvidMapVideoFrame64;
+    cuvidUnmapVideoFrame = cuvidUnmapVideoFrame64;
+#else
+    GET_PROC(cuvidMapVideoFrame);
+    GET_PROC(cuvidUnmapVideoFrame);
+#endif
+
+//    GET_PROC(cuvidGetVideoFrameSurface);
+    GET_PROC(cuvidCtxLockCreate);
+    GET_PROC(cuvidCtxLockDestroy);
+    GET_PROC(cuvidCtxLock);
+    GET_PROC(cuvidCtxUnlock);
+
+    return CUDA_SUCCESS;
+}
+#endif
 
 /* NvDec can actually do 8kx8k for HEVC, but this library does not yet
  * support that codec anyway. */
@@ -258,6 +419,11 @@ dec_display(void* cdc, CUVIDPARSERDISPINFO *dinfo) {
 
 static nvp_err_t
 initialize_parser(struct nvp_decoder* nvp) {
+#if (CUDART_VERSION >= 9000)
+    cuvidInit(0); // Assuming the parser is always initialized first
+    assert(cuvidCreateVideoParser != NULL);
+#endif
+
     CUVIDPARSERPARAMS prs = {0};
     prs.CodecType = cudaVideoCodec_H264;
     prs.ulMaxNumDecodeSurfaces = 2;
