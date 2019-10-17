@@ -84,7 +84,6 @@ mark_as_advanced(
 )
 
 include_directories(${PROJECT_SOURCE_DIR} ${CUDA_SDK_ROOT_DIR}/common/inc)
-link_directories("${CUDA_TOOLKIT_ROOT_DIR}/lib64")
 link_directories("${CMAKE_INSTALL_PREFIX}/lib")
 
 
@@ -98,11 +97,13 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W2")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W2")
   include_directories($ENV{NVTOOLSEXT_PATH}/include)
+  link_directories("${CUDA_TOOLKIT_ROOT_DIR}/lib/x64")
   link_directories($ENV{NVTOOLSEXT_PATH}/lib/x64)
   link_directories($ENV{CUDA_PATH}/lib/x64)
   # "nvToolsExt" naming differs on windows.
   set(nvpipe_libs ${nvpipe_libs} nvToolsExt64_1)
 else()
+  link_directories("${CUDA_TOOLKIT_ROOT_DIR}/lib64")
   # "dl" and "pthread" only needed on Unix platforms.
   set(nvpipe_libs ${nvpipe_libs} nvToolsExt dl pthread)
 endif(MSVC)
