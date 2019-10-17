@@ -8,7 +8,7 @@ readonly name="NvPipe"
 readonly ownership="nvpipe Upstream <kwrobot@kitware.com>"
 readonly subtree="ThirdParty/${name}/vtknvpipe"
 readonly repo="https://gitlab.kitware.com/third-party/nvpipe.git"
-readonly tag="for/paraview"
+readonly tag="for/paraview-master-20180312"
 
 readonly paths="
 .gitattributes
