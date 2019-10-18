@@ -262,3 +262,16 @@ void pqPVApplicationCore::loadStateFromPythonFile(const QString& filename, pqSer
   qCritical() << "Cannot load a python state file since ParaView was not built with Python.";
 #endif
 }
+
+//-----------------------------------------------------------------------------
+void pqPVApplicationCore::_paraview_client_environment_complete()
+{
+  static bool Initialized = false;
+  if (Initialized)
+  {
+    return;
+  }
+
+  Initialized = true;
+  emit this->clientEnvironmentDone();
+}

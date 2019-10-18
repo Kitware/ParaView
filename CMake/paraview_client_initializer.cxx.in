@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 
 #include "vtkPVConfig.h"
+#include "vtkPVPluginLoader.h"
 #include "vtkPVPluginTracker.h"
 
 #include "vtkPVConfig.h"
@@ -120,31 +121,31 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
   // Create main window.
   this->MainWindow = new @_paraview_client_MAIN_WINDOW_CLASS@();
 
+  vtkNew<vtkPVPluginLoader> loader;
+
   // Load required application plugins.
   QString plugin_string = "@_paraview_client_REQUIRED_PLUGINS@";
   QStringList plugin_list = plugin_string.split(';',QString::SkipEmptyParts);
-  QString plugin_xml = "<Plugins>";
   foreach (const QString plugin_name, plugin_list)
   {
-    plugin_xml.append(
-      QString("<Plugin name=\"%1\" auto_load=\"1\" />\n").arg(plugin_name));
+    if (!loader->LoadPluginByName(plugin_name.toLatin1().data()))
+    {
+      std::cerr << "warning: failed to load required plugin "
+        << plugin_name.toLatin1().data() << std::endl;
+    }
   }
-  plugin_xml.append("</Plugins>\n");
-  vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLFromString(
-    plugin_xml.toLatin1().data());
 
   // Load optional plugins.
   plugin_string = "@_paraview_client_OPTIONAL_PLUGINS@";
   plugin_list = plugin_string.split(';',QString::SkipEmptyParts);
-  plugin_xml = "<Plugins>";
   foreach (const QString plugin_name, plugin_list)
   {
-    plugin_xml.append(
-      QString("<Plugin name=\"%1\" auto_load=\"1\" />\n").arg(plugin_name));
+    if (!loader->LoadPluginByName(plugin_name.toLatin1().data()))
+    {
+      std::cerr << "info: failed to load optional plugin "
+        << plugin_name.toLatin1().data() << std::endl;
+    }
   }
-  plugin_xml.append("</Plugins>\n");
-  vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLFromString(
-    plugin_xml.toLatin1().data());
 
 #if _paraview_client_APPLICATION_XMLS
   // Load configuration xmls after all components have been instantiated.
@@ -169,6 +170,9 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
   {
     this->MainWindow->setWindowTitle(newWindowTitle);
   }
+
+  // Fire the signal that the initialization is complete.
+  this->PVApp->_paraview_client_environment_complete();
 
   // We used to call processEvents() here. We removed it, since that results in
   // timers (esp. pqCommandLineOptionsBehavior::playTests(), or
