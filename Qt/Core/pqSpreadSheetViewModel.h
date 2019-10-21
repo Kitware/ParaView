@@ -182,6 +182,12 @@ public:
     SectionVisible,
   };
 
+  /**
+   * Returns the current rows as a CSV-formatted string, including header with column names.
+   * Uses the vtkCSVExporter.
+   */
+  QString GetRowsAsString() const;
+
 public slots:
   /**
   * resets the model.

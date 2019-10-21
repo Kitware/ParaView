@@ -55,7 +55,7 @@ public:
     stream << value.c_str();
     item.first = stream.str();
   }
-  void DumpLines(const char* delim, ofstream& ofs)
+  void DumpLines(const char* delim, ostream& ofs)
   {
     ofs << (this->XColumnName.empty() ? "X" : this->XColumnName.c_str()) << delim
         << this->Header.c_str() << endl;
@@ -76,25 +76,26 @@ vtkStandardNewMacro(vtkCSVExporter);
 //----------------------------------------------------------------------------
 vtkCSVExporter::vtkCSVExporter()
 {
-  this->FileStream = 0;
+  this->OutputStream = 0;
   this->FileName = 0;
   this->FieldDelimiter = 0;
   this->SetFieldDelimiter(",");
   this->Internals = new vtkInternals();
   this->Mode = STREAM_ROWS;
+  this->WriteToOutputString = false;
 }
 
 //----------------------------------------------------------------------------
 vtkCSVExporter::~vtkCSVExporter()
 {
-  if (this->FileStream)
+  if (this->OutputStream)
   {
     this->Close();
   }
   delete this->Internals;
   this->Internals = NULL;
-  delete this->FileStream;
-  this->FileStream = 0;
+  delete this->OutputStream;
+  this->OutputStream = 0;
   this->SetFieldDelimiter(0);
   this->SetFileName(0);
 }
@@ -134,18 +135,33 @@ const char* vtkCSVExporter::GetColumnLabel(const char* name)
 //----------------------------------------------------------------------------
 bool vtkCSVExporter::Open(vtkCSVExporter::ExporterModes mode)
 {
-  delete this->FileStream;
-  this->FileStream = 0;
-  this->FileStream = new ofstream(this->FileName);
-  if (!this->FileStream || !(*this->FileStream))
+  delete this->OutputStream;
+  this->OutputString.clear();
+
+  if (this->WriteToOutputString)
+  {
+    this->OutputStream = new std::ostringstream();
+  }
+  else
+  {
+    this->OutputStream = new std::ofstream(this->FileName);
+  }
+
+  if (!this->OutputStream || !(*this->OutputStream))
   {
     vtkErrorMacro("Failed to open for writing: " << this->FileName);
-    delete this->FileStream;
-    this->FileStream = 0;
+    delete this->OutputStream;
+    this->OutputStream = 0;
     return false;
   }
   this->Mode = mode;
   return true;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkCSVExporter::GetOutputString()
+{
+  return this->OutputString;
 }
 
 //----------------------------------------------------------------------------
@@ -180,7 +196,7 @@ void vtkCSVExporter::AddColumn(
 //----------------------------------------------------------------------------
 void vtkCSVExporter::WriteHeader(vtkFieldData* data)
 {
-  if (!this->FileStream)
+  if (!this->OutputStream)
   {
     vtkErrorMacro("Please call Open(STREAM_ROWS)");
     return;
@@ -208,23 +224,23 @@ void vtkCSVExporter::WriteHeader(vtkFieldData* data)
     {
       if (!first)
       {
-        (*this->FileStream) << this->FieldDelimiter;
+        (*this->OutputStream) << this->FieldDelimiter;
       }
-      (*this->FileStream) << label;
+      (*this->OutputStream) << label;
       if (numComps > 1)
       {
-        (*this->FileStream) << ":" << comp;
+        (*this->OutputStream) << ":" << comp;
       }
       first = false;
     }
   }
-  (*this->FileStream) << "\n";
+  (*this->OutputStream) << "\n";
 }
 
 //----------------------------------------------------------------------------
 void vtkCSVExporter::WriteData(vtkFieldData* data)
 {
-  if (!this->FileStream)
+  if (!this->OutputStream)
   {
     vtkErrorMacro("Please call Open()");
     return;
@@ -257,7 +273,7 @@ void vtkCSVExporter::WriteData(vtkFieldData* data)
       {
         if (!first)
         {
-          (*this->FileStream) << this->FieldDelimiter;
+          (*this->OutputStream) << this->FieldDelimiter;
         }
         vtkVariant value = array->GetVariantValue(tuple * numComps + comp);
 
@@ -267,34 +283,45 @@ void vtkCSVExporter::WriteData(vtkFieldData* data)
           ? vtkVariant(value.ToInt())
           : value;
 
-        (*this->FileStream) << value.ToString().c_str();
+        (*this->OutputStream) << value.ToString().c_str();
         first = false;
       }
     }
-    (*this->FileStream) << "\n";
+    (*this->OutputStream) << "\n";
   }
 }
 
 //----------------------------------------------------------------------------
 void vtkCSVExporter::Close()
 {
-  if (!this->FileStream)
+  if (!this->OutputStream)
   {
     return;
   }
   if (this->Mode == STREAM_COLUMNS)
   {
-    this->Internals->DumpLines(this->FieldDelimiter, *this->FileStream);
+    this->Internals->DumpLines(this->FieldDelimiter, *this->OutputStream);
   }
-  this->FileStream->close();
-  delete this->FileStream;
-  this->FileStream = 0;
+
+  auto fileStream = dynamic_cast<std::ofstream*>(this->OutputStream);
+  if (fileStream)
+  {
+    fileStream->close();
+  }
+  else if (this->WriteToOutputString)
+  {
+    auto ss = dynamic_cast<std::ostringstream*>(OutputStream);
+    this->OutputString = ss->str();
+  }
+
+  delete this->OutputStream;
+  this->OutputStream = 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkCSVExporter::Abort()
 {
-  if (this->FileStream)
+  if (this->OutputStream)
   {
     this->Close();
     vtksys::SystemTools::RemoveFile(this->FileName);
