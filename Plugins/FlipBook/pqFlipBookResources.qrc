@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/pqFlipBook">
+        <file>Icons/pqFlipBook.png</file>
+        <file>Icons/pqFlipBook@2x.png</file>
+        <file>Icons/pqFlipBookPause.png</file>
+        <file>Icons/pqFlipBookPause@2x.png</file>
+        <file>Icons/pqFlipBookPlay.png</file>
+        <file>Icons/pqFlipBookPlay@2x.png</file>
+        <file>Icons/pqFlipBookForward.png</file>
+        <file>Icons/pqFlipBookForward@2x.png</file>
+    </qresource>
+</RCC>
