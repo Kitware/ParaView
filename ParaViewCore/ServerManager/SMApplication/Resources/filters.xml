@@ -16190,9 +16190,6 @@ Every Nth Point.
     <SourceProxy class="vtkAngularPeriodicFilter"
                  label="Angular Periodic Filter"
                  name="AngularPeriodicFilter">
-      <Hints>
-        <Representation type="Outline" />
-      </Hints>
       <Documentation long_help="This filter generate a periodic multiblock dataset."
                      short_help="Periodic Filter.">This filter generate a periodic
                      multiblock dataset</Documentation>
@@ -16338,7 +16335,9 @@ Every Nth Point.
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
+      <Hints>
+        <RepresentationType view="RenderView" type="Outline" />
+      </Hints>
       <!-- End AngularPeriodicFilter -->
     </SourceProxy>
     <!-- ==================================================================== -->
