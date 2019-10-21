@@ -124,7 +124,7 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
   vtkPoints* cellPts;
   double s;
   vtkIdType npts;
-  vtkIdType* pts;
+  const vtkIdType* pts;
   int cellType = 0;
   vtkIdType i;
   int j;

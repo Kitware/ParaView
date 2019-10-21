@@ -87,18 +87,19 @@ public:
 class EdgeInformation
 {
 public:
+  vtkIdType OriginalCellId;
   vtkIdType OriginalFaceId;
-  vtkIdType* StartPointIdP;
+  vtkIdType StartPointId;
 };
 
 // Description:
 // A map from edge endpoints to the information about that edge.
 typedef std::unordered_map<EdgeEndpoints, EdgeInformation, EdgeEndpointsHash> EdgeMapType;
 
-void RecordEdgeFlag(vtkPolyData* output, const EdgeInformation& edgeInfo,
+void RecordEdgeFlag(vtkPolyData* output, EdgeInformation& edgeInfo,
   vtkUnsignedCharArray* edgeFlagArray, unsigned char flag, vtkIdType* duplicatePointMap)
 {
-  vtkIdType pt = edgeInfo.StartPointIdP[0];
+  vtkIdType pt = edgeInfo.StartPointId;
   if (edgeFlagArray->GetValue(pt) == flag)
   {
     // Edge flag already set correctly.  Nothing to do.
@@ -127,7 +128,8 @@ void RecordEdgeFlag(vtkPolyData* output, const EdgeInformation& edgeInfo,
     pd->CopyData(pd, pt, newPt);
     edgeFlagArray->InsertValue(newPt, flag);
   }
-  edgeInfo.StartPointIdP[0] = duplicatePointMap[pt];
+  output->ReplaceCellPoint(edgeInfo.OriginalCellId, edgeInfo.StartPointId, duplicatePointMap[pt]);
+  edgeInfo.StartPointId = duplicatePointMap[pt];
 }
 }
 using namespace vtkPVRecoverGeometryWireframeNamespace;
@@ -156,7 +158,8 @@ int vtkPVRecoverGeometryWireframe::RequestData(vtkInformation* vtkNotUsed(reques
   vtkPolyData* input = vtkPolyData::GetData(inputVector[0]);
   vtkPolyData* output = vtkPolyData::GetData(outputVector);
 
-  vtkIdType npts, *pts;
+  vtkIdType npts;
+  const vtkIdType* pts;
   std::vector<vtkIdType> originalPts;
 
   if (!input->GetCellData()->HasArray(ORIGINAL_FACE_IDS()))
@@ -271,8 +274,9 @@ int vtkPVRecoverGeometryWireframe::RequestData(vtkInformation* vtkNotUsed(reques
     {
       EdgeEndpoints edge(originalPts[i], originalPts[(i + 1) % npts]);
       EdgeInformation edgeInfo;
+      edgeInfo.OriginalCellId = inputCellId;
       edgeInfo.OriginalFaceId = originalFace;
-      edgeInfo.StartPointIdP = &pts[i];
+      edgeInfo.StartPointId = pts[i];
 
       EdgeMapType::iterator edgeMatch = edgeMap.find(edge);
       if (edgeMatch == edgeMap.end())

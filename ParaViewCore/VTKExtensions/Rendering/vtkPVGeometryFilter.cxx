@@ -19,6 +19,7 @@
 #include "vtkAppendPolyData.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCellArray.h"
+#include "vtkCellArrayIterator.h"
 #include "vtkCellData.h"
 #include "vtkCellIterator.h"
 #include "vtkCellTypes.h"
@@ -1115,10 +1116,6 @@ void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData* output, int doCommunic
     return;
   }
 
-  vtkIdType* endCellPtr;
-  vtkIdType* cellPtr;
-  vtkIdType* pts = 0;
-  vtkIdType npts = 0;
   double polyNorm[3];
   vtkFloatArray* cellNormals = vtkFloatArray::New();
   cellNormals->SetName("cellNormals");
@@ -1130,16 +1127,12 @@ void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData* output, int doCommunic
   {
     vtkPoints* p = output->GetPoints();
 
-    cellPtr = aPrim->GetPointer();
-    endCellPtr = cellPtr + aPrim->GetNumberOfConnectivityEntries();
-
-    while (cellPtr < endCellPtr)
+    auto cellIter = vtk::TakeSmartPointer(aPrim->NewIterator());
+    for (cellIter->GoToFirstCell(); !cellIter->IsDoneWithTraversal(); cellIter->GoToNextCell())
     {
-      npts = *cellPtr++;
-      pts = cellPtr;
-      cellPtr += npts;
-
-      vtkPolygon::ComputeNormal(p, npts, pts, polyNorm);
+      vtkIdList* cell = cellIter->GetCurrentCell();
+      vtkPolygon::ComputeNormal(
+        p, static_cast<int>(cell->GetNumberOfIds()), cell->GetPointer(0), polyNorm);
       cellNormals->InsertNextTuple(polyNorm);
     }
   }

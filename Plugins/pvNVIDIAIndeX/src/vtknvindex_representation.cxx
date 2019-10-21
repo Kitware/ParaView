@@ -47,6 +47,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkProcessModule.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkUnsignedCharArray.h"
 #include "vtkVolumeProperty.h"
 
 #include "vtknvindex_cluster_properties.h"

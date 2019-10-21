@@ -731,8 +731,10 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
                   {
                     pointIds[k] = *auxIt;
                   }
+                  vtkNew<vtkIdTypeArray> faceData;
+                  faces->ExportLegacyFormat(faceData);
                   ugrid->InsertNextCell(VTK_POLYHEDRON, numPts, pointIds, faces->GetNumberOfCells(),
-                    faces->GetPointer());
+                    faceData->GetPointer(0));
                   delete[] pointIds;
                   pointIds = NULL;
                   faces->Delete();

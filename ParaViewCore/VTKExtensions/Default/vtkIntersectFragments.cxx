@@ -35,6 +35,7 @@
 #include "vtkDataObject.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
+#include "vtkIdTypeArray.h"
 #include "vtkIntArray.h"
 #include "vtkMaterialInterfaceIdList.h"
 #include "vtkMaterialInterfacePieceLoading.h"

@@ -713,7 +713,7 @@ void vtkPlotEdges::ExtractSegments(
     }
 
     vtkIdType numCellPts;
-    vtkIdType* cellPts;
+    const vtkIdType* cellPts;
 
     // We take the first point from a cell and start to track
     // all the branches from it.
@@ -776,7 +776,7 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData, vtkCollec
 
   // Get all the points from the cell
   vtkIdType numCellPts;
-  vtkIdType* cellPts;
+  const vtkIdType* cellPts;
 
   polyData->GetCellPoints(cellId, numCellPts, cellPts);
 
@@ -868,7 +868,7 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData, vtkCollec
         break;
       }
       vtkIdType numCell2Pts;
-      vtkIdType* cell2Pts;
+      const vtkIdType* cell2Pts;
       polyData->GetCellPoints(cellId2, numCell2Pts, cell2Pts);
 
       if (numCell2Pts != 2)

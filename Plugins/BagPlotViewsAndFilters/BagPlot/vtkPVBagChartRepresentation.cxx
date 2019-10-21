@@ -372,9 +372,10 @@ void vtkPVBagChartRepresentation::SetPolyLineToTable(vtkPolyData* polyline, vtkT
   vtkNew<vtkDoubleArray> y;
   y->SetName("Y");
 
+  vtkIdType nbpts;
+  const vtkIdType* pts;
   vtkCellArray* lines = polyline->GetLines();
-  lines->InitTraversal();
-  for (vtkIdType nbpts, *pts; lines->GetNextCell(nbpts, pts);)
+  for (lines->InitTraversal(); lines->GetNextCell(nbpts, pts);)
   {
     for (vtkIdType i = 0; i < nbpts; ++i)
     {

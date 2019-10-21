@@ -27,6 +27,7 @@
 #include "vtkInformationVector.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
+#include "vtkUnsignedCharArray.h"
 
 #include "vtkMultiProcessController.h"
 

@@ -97,7 +97,7 @@ int vtkPolyLineToRectilinearGridFilter::RequestData(vtkInformation* vtkNotUsed(r
   }
 
   vtkIdType number_of_points = 0;
-  vtkIdType* points;
+  const vtkIdType* points;
   vtkIdType cc;
   lines->GetCell(0, number_of_points, points);
 
