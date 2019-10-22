@@ -262,10 +262,13 @@ into into a shared library. To do this, we can use the following top-level:
 cmake_minimum_required(VERSION 3.8)
 project(sharedlibrary)
 
-# These two lines are required in order to set up installation directories
+# These five lines are required in order to set up installation directories
 # (which also control build directory locations) and enable shared builds
 # (CMake's default is for a static build).
 include(GNUInstallDirs)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 set(BUILD_SHARED_LIBS ON)
 
 # Find ParaView. This will bring in ParaView's CMake API and imported targets.
