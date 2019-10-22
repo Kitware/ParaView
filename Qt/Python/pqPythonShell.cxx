@@ -616,7 +616,11 @@ void pqPythonShell::runScript()
       QFile file(filename);
       if (file.open(QIODevice::ReadOnly))
       {
-        QByteArray code = file.readAll();
+        QByteArray code;
+        // First inject code to let the script know its own path
+        code.append(QString("__file__ = '%1'\n").arg(filename));
+        // Then append the file content
+        code.append(file.readAll());
         this->executeScript(code.data());
       }
       else
