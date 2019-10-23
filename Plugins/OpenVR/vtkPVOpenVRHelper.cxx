@@ -724,6 +724,7 @@ void vtkPVOpenVRHelper::SetRightTriggerMode(std::string const& text)
 bool vtkPVOpenVRHelper::InteractorEventCallback(vtkObject*, unsigned long eventID, void* calldata)
 {
   vtkEventData* edata = static_cast<vtkEventData*>(calldata);
+  this->LastEventData = edata;
   vtkEventDataDevice3D* edd = edata->GetAsEventDataDevice3D();
 
   if (edd && edd->GetDevice() == vtkEventDataDevice::LeftController &&
@@ -825,6 +826,7 @@ bool vtkPVOpenVRHelper::InteractorEventCallback(vtkObject*, unsigned long eventI
     for (vtkBoxWidget2* iter : this->ThickCrops)
     {
       vtkBoxRepresentation* rep = static_cast<vtkBoxRepresentation*>(iter->GetRepresentation());
+      vtkErrorMacro("tpad " << tpos[0] << " " << tpos[1]);
       if (tpos[0] + tpos[1] > 0)
       {
         rep->StepForward();
@@ -1226,7 +1228,8 @@ void vtkPVOpenVRHelper::ApplyState()
   }
 }
 
-void vtkPVOpenVRHelper::ShowBillboard(const std::string& text, vtkTexture* texture)
+void vtkPVOpenVRHelper::ShowBillboard(
+  const std::string& text, bool updatePosition, vtkTexture* texture)
 {
   vtkOpenVRRenderWindow* renWin =
     vtkOpenVRRenderWindow::SafeDownCast(this->Interactor->GetRenderWindow());
@@ -1236,55 +1239,60 @@ void vtkPVOpenVRHelper::ShowBillboard(const std::string& text, vtkTexture* textu
     return;
   }
 
-  renWin->UpdateHMDMatrixPose();
-  double dop[3];
-  ren->GetActiveCamera()->GetDirectionOfProjection(dop);
-  double vr[3];
-  double* vup = renWin->GetPhysicalViewUp();
-  double dtmp[3];
-  double vupdot = vtkMath::Dot(dop, vup);
-  if (fabs(vupdot) < 0.999)
-  {
-    dtmp[0] = dop[0] - vup[0] * vupdot;
-    dtmp[1] = dop[1] - vup[1] * vupdot;
-    dtmp[2] = dop[2] - vup[2] * vupdot;
-    vtkMath::Normalize(dtmp);
-  }
-  else
-  {
-    renWin->GetPhysicalViewDirection(dtmp);
-  }
-  vtkMath::Cross(dtmp, vup, vr);
-  vtkNew<vtkMatrix4x4> rot;
-  for (int i = 0; i < 3; ++i)
-  {
-    rot->SetElement(0, i, vr[i]);
-    rot->SetElement(1, i, vup[i]);
-    rot->SetElement(2, i, -dtmp[i]);
-  }
-  rot->Transpose();
   double orient[3];
-  vtkTransform::GetOrientation(orient, rot);
-  vtkTextProperty* prop = this->TextActor3D->GetTextProperty();
-  this->TextActor3D->SetOrientation(orient);
-  this->TextActor3D->RotateX(-30.0);
-
   double tpos[3];
-  double scale = renWin->GetPhysicalScale();
-  ren->GetActiveCamera()->GetPosition(tpos);
-  tpos[0] += (0.7 * scale * dop[0] - 0.1 * scale * vr[0] - 0.4 * scale * vup[0]);
-  tpos[1] += (0.7 * scale * dop[1] - 0.1 * scale * vr[1] - 0.4 * scale * vup[1]);
-  tpos[2] += (0.7 * scale * dop[2] - 0.1 * scale * vr[2] - 0.4 * scale * vup[2]);
-  this->TextActor3D->SetPosition(tpos);
-  // scale should cover 10% of FOV
-  double fov = ren->GetActiveCamera()->GetViewAngle();
-  double tsize = 0.1 * 2.0 * atan(fov * 0.5); // 10% of fov
-  tsize /= 200.0;                             // about 200 pixel texture map
-  scale *= tsize;
-  this->TextActor3D->SetScale(scale, scale, scale);
+  if (updatePosition)
+  {
+    renWin->UpdateHMDMatrixPose();
+    double dop[3];
+    ren->GetActiveCamera()->GetDirectionOfProjection(dop);
+    double vr[3];
+    double* vup = renWin->GetPhysicalViewUp();
+    double dtmp[3];
+    double vupdot = vtkMath::Dot(dop, vup);
+    if (fabs(vupdot) < 0.999)
+    {
+      dtmp[0] = dop[0] - vup[0] * vupdot;
+      dtmp[1] = dop[1] - vup[1] * vupdot;
+      dtmp[2] = dop[2] - vup[2] * vupdot;
+      vtkMath::Normalize(dtmp);
+    }
+    else
+    {
+      renWin->GetPhysicalViewDirection(dtmp);
+    }
+    vtkMath::Cross(dtmp, vup, vr);
+    vtkNew<vtkMatrix4x4> rot;
+    for (int i = 0; i < 3; ++i)
+    {
+      rot->SetElement(0, i, vr[i]);
+      rot->SetElement(1, i, vup[i]);
+      rot->SetElement(2, i, -dtmp[i]);
+    }
+    rot->Transpose();
+    vtkTransform::GetOrientation(orient, rot);
+    this->TextActor3D->SetOrientation(orient);
+    this->TextActor3D->RotateX(-30.0);
+
+    double scale = renWin->GetPhysicalScale();
+    ren->GetActiveCamera()->GetPosition(tpos);
+    tpos[0] += (0.7 * scale * dop[0] - 0.1 * scale * vr[0] - 0.4 * scale * vup[0]);
+    tpos[1] += (0.7 * scale * dop[1] - 0.1 * scale * vr[1] - 0.4 * scale * vup[1]);
+    tpos[2] += (0.7 * scale * dop[2] - 0.1 * scale * vr[2] - 0.4 * scale * vup[2]);
+    this->TextActor3D->SetPosition(tpos);
+    // scale should cover 10% of FOV
+    double fov = ren->GetActiveCamera()->GetViewAngle();
+    double tsize = 0.1 * 2.0 * atan(fov * 0.5); // 10% of fov
+    tsize /= 200.0;                             // about 200 pixel texture map
+    scale *= tsize;
+    this->TextActor3D->SetScale(scale, scale, scale);
+  }
+
   this->TextActor3D->SetInput(text.c_str());
   this->Renderer->AddActor(this->TextActor3D);
 
+  this->TextActor3D->ForceOpaqueOn();
+  vtkTextProperty* prop = this->TextActor3D->GetTextProperty();
   prop->SetFrame(1);
   prop->SetFrameColor(1.0, 1.0, 1.0);
   prop->SetBackgroundOpacity(1.0);
@@ -1300,19 +1308,14 @@ void vtkPVOpenVRHelper::ShowBillboard(const std::string& text, vtkTexture* textu
     this->ImagePlane->SetPoint1(0.0, 0.0, 0.0);
     this->ImagePlane->SetPoint2(-1.0, aspect, 0.0);
 
-    this->ImageActor->SetOrientation(orient);
-    this->ImageActor->RotateX(-30.0);
-    scale = renWin->GetPhysicalScale();
-
-    ren->GetActiveCamera()->GetPosition(tpos);
-    tpos[0] += (0.7 * scale * dop[0] - 0.1 * scale * vr[0] - 0.4 * scale * vup[0]);
-    tpos[1] += (0.7 * scale * dop[1] - 0.1 * scale * vr[1] - 0.4 * scale * vup[1]);
-    tpos[2] += (0.7 * scale * dop[2] - 0.1 * scale * vr[2] - 0.4 * scale * vup[2]);
-    this->ImageActor->SetPosition(tpos);
-    // scale should cover 10% of FOV
-    // double tsize = 0.1*2.0*atan(fov*0.5); // 10% of fov
-    // scale *= tsize;
-    this->ImageActor->SetScale(scale, scale, scale);
+    if (updatePosition)
+    {
+      this->ImageActor->SetOrientation(orient);
+      this->ImageActor->RotateX(-30.0);
+      double scale = renWin->GetPhysicalScale();
+      this->ImageActor->SetPosition(tpos);
+      this->ImageActor->SetScale(scale, scale, scale);
+    }
     this->ImageActor->SetTexture(texture);
 
     this->Renderer->AddActor(this->ImageActor);
@@ -1326,7 +1329,194 @@ void vtkPVOpenVRHelper::HideBillboard()
   this->Renderer->RemoveActor(this->ImageActor);
 }
 
-void vtkPVOpenVRHelper::HandlePickEvent(vtkObject* caller, void* calldata)
+void vtkPVOpenVRHelper::MoveToNextImage()
+{
+  // find the intersection with the image actor
+  vtkEventDataDevice3D* edd = this->LastEventData->GetAsEventDataDevice3D();
+  if (!edd)
+  {
+    this->PreviousPickedRepresentation = nullptr;
+    this->PreviousPickedDataSet = nullptr;
+    return;
+  }
+
+  vtkVector3d rpos;
+  edd->GetWorldPosition(rpos.GetData());
+  vtkVector3d rdir;
+  edd->GetWorldDirection(rdir.GetData());
+
+  vtkNew<vtkMatrix4x4> mat4;
+  this->ImageActor->GetMatrix(mat4);
+
+  // compute plane basis
+  double origin[4]{ -1.0, 0.0, 0.0, 1.0 };
+  double originWC[4];
+  double point1[4]{ 0.0, 0.0, 0.0, 1.0 };
+  double point1WC[4];
+  mat4->MultiplyPoint(origin, originWC);
+  mat4->MultiplyPoint(point1, point1WC);
+
+  // now we have the points all in WC create a coord system
+  // with X being along the X axis of the plane
+  // XZ containing the ray position and Y perp
+  vtkVector3d ipos(originWC);
+  vtkVector3d idir(point1WC);
+
+  vtkVector3d dirx = idir - ipos;
+  dirx.Normalize();
+  vtkVector3d dirz = rpos - ipos;
+  dirz.Normalize();
+
+  vtkVector3d plane = dirz.Cross(dirx);
+  plane.Normalize();
+  dirz = dirx.Cross(plane);
+  dirz.Normalize();
+
+  // remove the Y axis from the ray dir
+  rdir = rdir - plane * rdir.Dot(plane);
+  rdir.Normalize();
+
+  // compute the intersection point
+  double t = -dirz.Dot(rpos - ipos) / rdir.Dot(dirz);
+  vtkVector3d intersect = rpos + rdir * t;
+
+  double value = (intersect - ipos).Norm() / (idir - ipos).Norm();
+
+  // now move up or down the list of cells to the next different image
+  // this only works for polylines, find the line with the cell, then navigate up or down
+  vtkPolyData* pd = vtkPolyData::SafeDownCast(this->LastPickedDataSet);
+  if (!pd)
+  {
+    return;
+  }
+
+  std::string lastImage;
+  vtkDataSetAttributes* celld = pd->GetCellData();
+  vtkIdType cid = this->LastPickedCellId;
+
+  vtkIdType numCells = pd->GetNumberOfCells();
+  vtkIdType currCell = cid;
+  bool found = false;
+
+  vtkStringArray* sa = nullptr;
+  vtkIdType numcd = celld->GetNumberOfArrays();
+  for (vtkIdType i = 0; i < numcd; ++i)
+  {
+    vtkAbstractArray* aa = celld->GetAbstractArray(i);
+    if (aa && aa->GetName())
+    {
+      sa = vtkStringArray::SafeDownCast(aa);
+      if (sa)
+      {
+        // watch for image file names
+        std::string svalue = sa->GetValue(currCell);
+        if (!strncmp(svalue.c_str(), "file://", 7))
+        {
+          lastImage = svalue;
+          break;
+        }
+      }
+    }
+  }
+
+  // now move forward or back to find the next new image
+  int step = (value < 0.5 ? -1 : 1);
+  while (!found && currCell < numCells && currCell >= 0)
+  {
+    currCell += step;
+    std::string svalue = sa->GetValue(currCell);
+    if (!strncmp(svalue.c_str(), "file://", 7) && svalue != lastImage)
+    {
+      found = true;
+    }
+  }
+
+  if (!found)
+  {
+    return;
+  }
+
+  this->LastPickedCellId = currCell;
+  this->UpdateBillboard(false);
+}
+
+void vtkPVOpenVRHelper::MoveToNextCell()
+{
+  // find the intersection with the image actor
+  vtkEventDataDevice3D* edd = this->LastEventData->GetAsEventDataDevice3D();
+  if (!edd)
+  {
+    this->PreviousPickedRepresentation = nullptr;
+    this->PreviousPickedDataSet = nullptr;
+    return;
+  }
+
+  vtkVector3d rpos;
+  edd->GetWorldPosition(rpos.GetData());
+  vtkVector3d rdir;
+  edd->GetWorldDirection(rdir.GetData());
+
+  vtkNew<vtkMatrix4x4> mat4;
+  this->TextActor3D->GetMatrix(mat4);
+
+  // compute plane basis
+  double origin[4]{ 0.0, 0.0, 0.0, 1.0 };
+  double originWC[4];
+  double point1[4]{ 200.0, 0.0, 0.0, 1.0 };
+  double point1WC[4];
+  mat4->MultiplyPoint(origin, originWC);
+  mat4->MultiplyPoint(point1, point1WC);
+
+  // now we have the points all in WC create a coord system
+  // with X being along the X axis of the plane
+  // XZ containing the ray position and Y perp
+  vtkVector3d ipos(originWC);
+  vtkVector3d idir(point1WC);
+
+  vtkVector3d dirx = idir - ipos;
+  dirx.Normalize();
+  vtkVector3d dirz = rpos - ipos;
+  dirz.Normalize();
+
+  vtkVector3d plane = dirz.Cross(dirx);
+  plane.Normalize();
+  dirz = dirx.Cross(plane);
+  dirz.Normalize();
+
+  // remove the Y axis from the ray dir
+  rdir = rdir - plane * rdir.Dot(plane);
+  rdir.Normalize();
+
+  // compute the intersection point
+  double t = -dirz.Dot(rpos - ipos) / rdir.Dot(dirz);
+  vtkVector3d intersect = rpos + rdir * t;
+
+  double value = (intersect - ipos).Norm() / (idir - ipos).Norm();
+
+  // now move up or down the list of cells to the next different image
+  // this only works for polylines, find the line with the cell, then navigate up or down
+  vtkPolyData* pd = vtkPolyData::SafeDownCast(this->LastPickedDataSet);
+  if (!pd)
+  {
+    return;
+  }
+
+  vtkIdType cid = this->LastPickedCellId;
+  vtkIdType numCells = pd->GetNumberOfCells();
+  vtkIdType currCell = cid;
+
+  // now move forward or back to find the next new image
+  int step = (value < 0.5 ? -1 : 1);
+  if (currCell + step >= numCells || currCell + step < 0)
+  {
+    return;
+  }
+
+  this->LastPickedCellId = currCell + step;
+  this->UpdateBillboard(false);
+}
+
+void vtkPVOpenVRHelper::HandlePickEvent(vtkObject*, void* calldata)
 {
   this->SelectedCells.clear();
   this->HideBillboard();
@@ -1340,12 +1530,23 @@ void vtkPVOpenVRHelper::HandlePickEvent(vtkObject* caller, void* calldata)
     return;
   }
 
-  vtkOpenVRInteractorStyle* is =
-    vtkOpenVRInteractorStyle::SafeDownCast(reinterpret_cast<vtkObjectBase*>(caller));
-
   // for multiple nodes which one do we use?
   vtkSelectionNode* node = sel->GetNode(0);
   vtkProp3D* prop = vtkProp3D::SafeDownCast(node->GetProperties()->Get(vtkSelectionNode::PROP()));
+
+  // if the selection is the image actor?
+  if (prop == this->ImageActor)
+  {
+    this->MoveToNextImage();
+    return;
+  }
+
+  if (prop == this->TextActor3D)
+  {
+    this->MoveToNextCell();
+    return;
+  }
+
   vtkPVDataRepresentation* repr = FindRepresentation(prop, this->View);
   if (!repr)
   {
@@ -1398,15 +1599,21 @@ void vtkPVOpenVRHelper::HandlePickEvent(vtkObject* caller, void* calldata)
     return;
   }
   vtkIdType aid = ids->GetComponent(0, 0);
-  vtkCell* cell = ds->GetCell(aid);
 
   this->PreviousPickedDataSet = this->LastPickedDataSet;
   this->LastPickedDataSet = ds;
   this->PreviousPickedCellId = this->LastPickedCellId;
   this->LastPickedCellId = aid;
   this->SelectedCells.push_back(aid);
+  this->LastPickedProp = prop;
+  this->UpdateBillboard(true);
+}
 
-  vtkCellData* celld = ds->GetCellData();
+void vtkPVOpenVRHelper::UpdateBillboard(bool updatePosition)
+{
+  vtkCellData* celld = this->LastPickedDataSet->GetCellData();
+  vtkIdType aid = this->LastPickedCellId;
+  vtkCell* cell = this->LastPickedDataSet->GetCell(aid);
 
   // update the billboard with information about this data
   std::ostringstream toString;
@@ -1414,7 +1621,7 @@ void vtkPVOpenVRHelper::HandlePickEvent(vtkObject* caller, void* calldata)
   cell->GetBounds(p1);
   double pos[3] = { 0.5 * (p1[1] + p1[0]), 0.5 * (p1[3] + p1[2]), 0.5 * (p1[5] + p1[4]) };
   toString << "\n Cell Center (DC): " << pos[0] << ", " << pos[1] << ", " << pos[2] << " \n";
-  vtkMatrix4x4* pmat = prop->GetMatrix();
+  vtkMatrix4x4* pmat = this->LastPickedProp->GetMatrix();
   double wpos[4];
   wpos[0] = pos[0];
   wpos[1] = pos[1];
@@ -1553,8 +1760,8 @@ void vtkPVOpenVRHelper::HandlePickEvent(vtkObject* caller, void* calldata)
   toString << "\n";
 
   this->CollaborationClient->ShowBillboard(toString.str());
-  this->ShowBillboard(toString.str(), texture);
-  is->ShowPickCell(cell, vtkProp3D::SafeDownCast(prop));
+  this->ShowBillboard(toString.str(), updatePosition, texture);
+  this->Style->ShowPickCell(cell, vtkProp3D::SafeDownCast(this->LastPickedProp));
 }
 
 bool vtkPVOpenVRHelper::EventCallback(vtkObject* caller, unsigned long eventID, void* calldata)

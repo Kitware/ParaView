@@ -144,7 +144,7 @@ protected:
       // only want to change if it's from someone else.
       if (otherID != this->CollabID)
       {
-        this->Helper->ShowBillboard(text);
+        this->Helper->ShowBillboard(text, true);
       }
     }
     else
