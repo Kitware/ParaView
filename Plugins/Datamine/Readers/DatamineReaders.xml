@@ -1,0 +1,261 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy name="DataMineWireFrameReader"
+      class="vtkDataMineWireFrameReader">
+      <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1"
+        panel_visibility="never">
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="TopoFileName"
+        command="SetTopoFileName"
+        number_of_elements="1"
+        label="Topo File Name">
+        <FileListDomain name="default_value" optional="1">
+          <RequiredProperties>
+            <Property name="TopoFileNameInfo" function="TopoFileName"/>
+          </RequiredProperties>
+        </FileListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="TopoFileNameInfo"
+        command="GetTopoFileName"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="PointFileName"
+        command="SetPointFileName"
+        number_of_elements="1"
+        label="Point File Name">
+        <FileListDomain name="default_value" optional="1">
+          <RequiredProperties>
+            <Property name="PointFileNameInfo" function="PointFileName"/>
+          </RequiredProperties>
+        </FileListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="PointFileNameInfo"
+        command="GetPointFileName"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="CellArrayInfo"
+        information_only="1"
+        default = "0">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+      </StringVectorProperty>
+      <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="CellArrayInfo"
+        label="Properties">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property lists which cell-centered arrays to read.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="dm DM Dm"
+          file_description="Datamine wireframe" />
+      </Hints>
+    </SourceProxy>
+    <!-- End of DataMineWireFrame Reader -->
+
+    <SourceProxy name="DataMineBlockModelReader"
+      class="vtkDataMineBlockReader">
+      <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1"
+        panel_visibility="never">
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="CellArrayInfo"
+        label="Point Arrays">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property lists which cell-centered arrays to read.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="dm DM Dm"
+          file_description="Datamine block model" />
+      </Hints>
+    </SourceProxy>
+    <!-- End of DataMineBlockModel Reader -->
+
+    <SourceProxy name="DataMineDrillHoleReader"
+      class="vtkDataMineDrillHoleReader">
+      <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1"
+        panel_visibility="never">
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="CellArrayInfo"
+        label="Point Arrays">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property lists which cell-centered arrays to read.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="dm DM Dm"
+          file_description="Datamine drill hole" />
+      </Hints>
+    </SourceProxy>
+    <!-- End of DataMine  Drill Hole Reader -->
+    <SourceProxy name="DataMinePerimeterReader"
+      class="vtkDataMinePerimeterReader">
+      <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1"
+        panel_visibility="never">
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="CellArrayInfo"
+        label="Properties">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property lists which cell-centered arrays to read.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="dm DM Dm"
+          file_description="Datamine perimeter" />
+      </Hints>
+    </SourceProxy>
+    <!-- End of DataMine Perim Reader -->
+
+    <SourceProxy name="DataMinePointReader"
+      class="vtkDataMinePointReader">
+      <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1"
+        panel_visibility="never">
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="CellArrayInfo"
+        label="Properties">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property lists which cell-centered arrays to read.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="dm DM Dm"
+          file_description="Datamine point" />
+      </Hints>
+    </SourceProxy>
+    <!-- End of DataMine Point Reader -->
+    <SourceProxy name="DataMineDummyReader"
+      class="vtkDataMineDummyReader">
+      <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1"
+        panel_visibility="never">
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="dm DM Dm"
+          file_description="Datamine dummy" />
+      </Hints>
+    </SourceProxy>
+    <!-- End of DataMine Dummy Reader -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

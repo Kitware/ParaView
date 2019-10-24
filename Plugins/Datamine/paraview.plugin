@@ -1,0 +1,10 @@
+NAME
+  Datamine
+DESCRIPTION
+  Readers for Datamine datasets
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::CommonTransforms
+  VTK::FiltersCore
