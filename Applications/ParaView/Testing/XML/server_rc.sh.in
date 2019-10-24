@@ -1,1 +1,8 @@
-DISPLAY=:0 @ParaView_BINARY_DIR@/bin/pvserver -rc -ch=$1 -sp=$2 | tee sshServer.log
+DISPLAY=:0 @ParaView_BINARY_DIR@/bin/pvserver -rc -ch=$1 -sp=$2 2>&1 | tee sshServer.log &
+
+# DIRTY FIX
+# Wait 120s for all the SSH test to run, then make sure that all remaining instance of x-terminal-emulator are killed
+# TODO : A better and cleaner solution
+sleep 120&
+wait $!
+kill $(ps aux | grep 'x-terminal-emulator' | awk '{print $2}')

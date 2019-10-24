@@ -1172,7 +1172,7 @@ mark_as_advanced(PARAVIEW_SSH_SERVERS_TESTING)
 
 if(PARAVIEW_SSH_SERVERS_TESTING)
   message(STATUS
-    "With PARAVIEW_SSH_SERVERS_TESTING, to have the SSH Server tests pass, make sure that this machine has its own ssh public key as an authorized_keys and that 127.0.0.1 is in the known_hosts file, /usr/bin/xterm is available. In case of failing tests, pvserver logs are available in ${CMAKE_CURRENT_BINARY_DIR}")
+    "With PARAVIEW_SSH_SERVERS_TESTING, to have the SSH Server tests pass, make sure that this machine has its own ssh public key as an authorized_keys and that 127.0.0.1 is in the known_hosts file, /usr/bin/xterm is available. In case of failing tests, pvserver logs are available in ${CMAKE_CURRENT_BINARY_DIR}/sshServer.log")
 
   configure_file (
     "${CMAKE_CURRENT_SOURCE_DIR}/server.sh.in"
