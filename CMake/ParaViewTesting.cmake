@@ -1,33 +1,25 @@
 function (paraview_add_test_python)
-  set(_vtk_testing_python_exe
-    "$<TARGET_FILE:ParaView::pvpython>"
-    -dr
-    ${paraview_python_args})
+  set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::pvpython>")
+  set(_vtk_test_python_args -dr ${paraview_python_args})
   vtk_add_test_python(${ARGN})
 endfunction ()
 
 function (paraview_add_test_python_mpi)
-  set(_vtk_testing_python_exe
-    "$<TARGET_FILE:ParaView::pvpython>"
-    -dr
-    ${paraview_python_args})
+  set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::pvpython>")
+  set(_vtk_test_python_args -dr ${paraview_python_args})
   vtk_add_test_python_mpi(${ARGN})
 endfunction ()
 
 function (paraview_add_test_pvbatch)
-  set(_vtk_testing_python_exe
-    "$<TARGET_FILE:ParaView::pvbatch>"
-    -dr
-    ${paraview_pvbatch_args})
+  set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::pvbatch>")
+  set(_vtk_test_python_args -dr ${paraview_pvbatch_args})
   set(vtk_test_prefix "Batch-${vtk_test_prefix}")
   vtk_add_test_python(${ARGN})
 endfunction ()
 
 function (paraview_add_test_pvbatch_mpi)
-  set(_vtk_testing_python_exe
-    "$<TARGET_FILE:ParaView::pvbatch>"
-    -dr
-    ${paraview_pvbatch_args})
+  set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::pvbatch>")
+  set(_vtk_test_python_args -dr ${paraview_pvbatch_args})
   set(vtk_test_prefix "Batch-${vtk_test_prefix}")
   vtk_add_test_python_mpi(${ARGN})
 endfunction ()
@@ -37,7 +29,7 @@ function(paraview_add_test_driven)
     return()
   endif ()
   set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::smTestDriver>")
-  list(APPEND VTK_PYTHON_ARGS
+  set(_vtk_test_python_args
     --server $<TARGET_FILE:ParaView::pvserver>
     --client $<TARGET_FILE:ParaView::pvpython> -dr)
   vtk_add_test_python(${ARGN})
