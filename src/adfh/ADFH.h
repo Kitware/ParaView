@@ -33,7 +33,6 @@
 #ifndef _ADFH_H_
 #define _ADFH_H_
 
-#include "cgnsconfig.h"
 #include "cgnstypes.h"
 
 /* some stuff needed from standard ADF.h */
@@ -361,6 +360,7 @@ EXTERN	void	ADFH_Put_Name(
 
 EXTERN	void	ADFH_Read_All_Data(
 			const double ID,
+                        const char *m_data_type,
 			char *data,
 			int *error_return ) ;
 
@@ -376,6 +376,7 @@ EXTERN	void	ADFH_Read_Data(
 			const cgsize_t s_start[],
 			const cgsize_t s_end[],
 			const cgsize_t s_stride[],
+                        const char *m_data_type,
 			const int m_num_dims,
 			const cgsize_t m_dims[],
 			const cgsize_t m_start[],
@@ -394,9 +395,10 @@ EXTERN	void	ADFH_Set_Label(
 			int *error_return ) ;
 
 EXTERN	void	ADFH_Write_All_Data(
-			const double ID,
-			const char *data,
-			int *error_return ) ;
+                        const double ID,
+                        const char *m_data_type,
+                        const char *data,
+                        int *error_return ) ;
 
 EXTERN	void	ADFH_Write_Block_Data(
 			const double ID,
@@ -406,17 +408,18 @@ EXTERN	void	ADFH_Write_Block_Data(
 			int *error_return ) ;
 
 EXTERN	void	ADFH_Write_Data(
-			const double ID,
-			const cgsize_t s_start[],
-			const cgsize_t s_end[],
-			const cgsize_t s_stride[],
-			const int m_num_dims,
-			const cgsize_t m_dims[],
-			const cgsize_t m_start[],
-			const cgsize_t m_end[],
-			const cgsize_t m_stride[],
-			const char *data,
-			int *error_return ) ;
+                        const double ID,
+                        const cgsize_t s_start[],
+                        const cgsize_t s_end[],
+                        const cgsize_t s_stride[],
+                        const char *m_data_type,
+                        const int m_num_dims,
+                        const cgsize_t m_dims[],
+                        const cgsize_t m_start[],
+                        const cgsize_t m_end[],
+                        const cgsize_t m_stride[],
+                        const char *data,
+                        int *error_return ) ;
 
 #define HAS_ADF_RELEASE_ID
 
