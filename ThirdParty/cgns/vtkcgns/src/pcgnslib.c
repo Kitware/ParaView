@@ -45,9 +45,10 @@ extern char hdf5_access[64];
 /* flag indicating if mpi_initialized was called */
 extern int pcg_mpi_initialized;
 
-static hid_t default_pio_mode = H5FD_MPIO_COLLECTIVE;
+hid_t default_pio_mode = H5FD_MPIO_COLLECTIVE;
 
 extern int cgns_filetype;
+extern void* cgns_rindindex;
 
 typedef struct cg_rw_t {
   union {
@@ -69,7 +70,7 @@ static int readwrite_data_parallel(hid_t group_id, CGNS_ENUMT(DataType_t) type,
 {
   int k;
   hid_t data_id, mem_shape_id, data_shape_id;
-  hsize_t start[ndims], dims[ndims];
+  hsize_t start[CGIO_MAX_DIMENSIONS], dims[CGIO_MAX_DIMENSIONS];
   herr_t herr, herr1;
   hid_t type_id, plist_id;
 
@@ -193,6 +194,157 @@ static int readwrite_data_parallel(hid_t group_id, CGNS_ENUMT(DataType_t) type,
   return herr < 0 ? CG_ERROR : CG_OK;
 }
 
+/* Note: if dataset[0] == NULL, meaning this processor writes no data, then
+ * m_numdim must be valid and m_dimvals[:] = 0 */
+static int readwrite_shaped_data_parallel(
+    hid_t group_id,
+    const cgsize_t *s_start, const cgsize_t *s_end, const cgsize_t *s_stride,
+    CGNS_ENUMT(DataType_t) m_type, int m_numdim, const cgsize_t *m_dimvals,
+    const cgsize_t *m_start, const cgsize_t *m_end, const cgsize_t *m_stride,
+    void **dataset, enum cg_par_rw rw_mode)
+{
+    hid_t data_id, mem_shape_id, data_shape_id;
+    hid_t type_id, plist_id;
+    hsize_t dimvals[CGIO_MAX_DIMENSIONS];
+    hsize_t start[CGIO_MAX_DIMENSIONS];
+    hsize_t stride[CGIO_MAX_DIMENSIONS];
+    hsize_t count[CGIO_MAX_DIMENSIONS];
+    herr_t herr;
+    int n;
+
+     /* convert from CGNS to HDF5 data type */
+    switch (m_type) {
+    case CGNS_ENUMV(Character):
+        type_id = H5T_NATIVE_CHAR;
+        break;
+    case CGNS_ENUMV(Integer):
+        type_id = H5T_NATIVE_INT32;
+        break;
+    case CGNS_ENUMV(LongInteger):
+        type_id = H5T_NATIVE_INT64;
+        break;
+    case CGNS_ENUMV(RealSingle):
+        type_id = H5T_NATIVE_FLOAT;
+        break;
+    case CGNS_ENUMV(RealDouble):
+        type_id = H5T_NATIVE_DOUBLE;
+        break;
+    default:
+        cgi_error("Unhandled data type %d\n", m_type);
+        herr = -1;
+        goto error_0;
+    }
+
+     /* Open the data */
+    data_id = H5Dopen2(group_id, " data", H5P_DEFAULT);
+    if (data_id < 0) {
+        cgi_error("H5Dopen2() failed");
+        herr = -1;
+        goto error_0;
+    }
+
+     /* Get file dataspace extents */
+    data_shape_id = H5Dget_space(data_id);
+    if (data_shape_id < 0) {
+        cgi_error("H5Dget_space() failed");
+        herr = -1;
+        goto error_1df;
+    }
+    const int s_numdim = H5Sget_simple_extent_ndims(data_shape_id);
+
+    /* Create file hyperslab (shape for data in the file) */
+    if (dataset[0]) {
+        /* Reverse unit stride dimension (because of Fortran ordering) */
+        for (n = 0; n < s_numdim; n++) {
+            start [s_numdim-1-n] = s_start[n] - 1;
+            stride[s_numdim-1-n] = s_stride[n];
+            count [s_numdim-1-n] = (s_end[n] - s_start[n] + 1) / s_stride[n];
+        }
+        herr = H5Sselect_hyperslab(data_shape_id, H5S_SELECT_SET,
+                                   start, stride, count, NULL);
+    } else {
+        herr = H5Sselect_none(data_shape_id);
+    }
+    if (herr < 0) {
+        cgi_error("H5Sselect_hyperslab() for file data failed");
+        goto error_2ds;
+    }
+
+    /* Create memory hyperslab (shape for data in memory) */
+    if (dataset[0]) {
+        /* Reverse unit stride dimension (because of Fortran ordering) */
+        for (n = 0; n < m_numdim; n++) {
+            dimvals  [m_numdim-1-n] = m_dimvals[n];
+            start    [m_numdim-1-n] = m_start[n] - 1;
+            stride   [m_numdim-1-n] = m_stride[n];
+            count    [m_numdim-1-n] = (m_end[n] - m_start[n] + 1) / m_stride[n];
+        }
+        mem_shape_id = H5Screate_simple(m_numdim, dimvals, NULL);
+        if (mem_shape_id < 0) {
+            cgi_error("H5Screate_simple() for memory space failed");
+            herr = -1;
+            goto error_2ds;
+        }
+        herr = H5Sselect_hyperslab(mem_shape_id, H5S_SELECT_SET,
+                                   start, stride, count, NULL);
+    } else {  /* m_numdim should be valid and m_dimvals[:] should be 0 */
+        mem_shape_id = H5Screate_simple(m_numdim, dimvals, NULL);
+        if (mem_shape_id < 0) {
+            cgi_error("H5Screate_simple() for null memory space failed");
+            herr = -1;
+            goto error_2ds;
+        }
+        herr = H5Sselect_none(mem_shape_id);
+    }
+    if (herr < 0) {
+        cgi_error("H5Sselect_hyperslab() for memory data failed");
+        goto error_3ms;
+    }
+
+    /* Make sure memory space and file space have same number of points */
+    if (H5Sget_select_npoints(mem_shape_id) !=
+        H5Sget_select_npoints(data_shape_id)) {
+        cgi_error("Unequal points in memory and file space");
+        herr = -1;
+        goto error_3ms;
+    }
+
+    /* Set the access property list for data transfer */
+    plist_id = H5Pcreate(H5P_DATASET_XFER);
+    if (plist_id < 0) {
+        cgi_error("H5Pcreate() failed");
+        herr = -1;
+        goto error_3ms;
+    }
+
+    /* Set MPI-IO independent or collective communication */
+    herr = H5Pset_dxpl_mpio(plist_id, default_pio_mode);
+    if (herr < 0) {
+        cgi_error("H5Pset_dxpl_mpio() failed");
+        goto error_4pl;
+    }
+
+    /* Read/write the data in parallel I/O */
+    if (rw_mode == CG_PAR_READ) {
+        herr = H5Dread(data_id, type_id, mem_shape_id,
+                       data_shape_id, plist_id, dataset[0]);
+        if (herr < 0)
+            cgi_error("H5Dread() failed");
+    } else {
+        herr = H5Dwrite(data_id, type_id, mem_shape_id,
+                        data_shape_id, plist_id, dataset[0]);
+        if (herr < 0)
+            cgi_error("H5Dwrite() failed");
+    }
+
+error_4pl: H5Pclose(plist_id);
+error_3ms: H5Sclose(mem_shape_id);
+error_2ds: H5Sclose(data_shape_id);
+error_1df: H5Dclose(data_id);
+error_0: ;
+    return herr < 0 ? CG_ERROR : CG_OK;
+}
+
 /*---------------------------------------------------------*/
 
 static int check_parallel(cgns_file *cgfile)
@@ -215,7 +367,10 @@ static int check_parallel(cgns_file *cgfile)
 int cgp_mpi_comm(MPI_Comm comm)
 {
     pcg_mpi_comm=comm;
-    return cgio_configure(CG_CONFIG_HDF5_MPI_COMM, (void *)(comm));
+    if( cgio_configure(CG_CONFIG_HDF5_MPI_COMM, &comm) != -1) {
+      return CG_ERROR;
+    }
+    return CG_OK;
 }
 
 int cgp_mpi_info(MPI_Info info)
@@ -352,6 +507,95 @@ int cgp_coord_write_data(int fn, int B, int Z, int C,
 
 /*---------------------------------------------------------*/
 
+/* Note: if data == NULL, meaning this processor reads no data, then
+   only fn, B, Z, and C need be set.  In this case, Z and C are "representative"
+   and can point to any valid zone */
+int cgp_coord_general_write_data(int fn, int B, int Z, int C,
+                                 const cgsize_t *rmin, const cgsize_t *rmax,
+                                 CGNS_ENUMT(DataType_t) m_type,
+                                 int m_numdim, const cgsize_t *m_arg_dimvals,
+                                 const cgsize_t *m_rmin, const cgsize_t *m_rmax,
+                                 const void *coords)
+{
+    int n, ier;
+    hid_t hid;
+    cgns_zone *zone;
+    cgns_zcoor *zcoor;
+
+     /* get memory addresses */
+    cg = cgi_get_file(fn);
+    if (check_parallel(cg)) return CG_ERROR;
+
+    if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_WRITE)) return CG_ERROR;
+
+    zone = cgi_get_zone(cg, B, Z);
+    if (zone == 0) return CG_ERROR;
+
+     /* Get memory address for node "GridCoordinates" */
+    zcoor = cgi_get_zcoorGC(cg, B, Z);
+    if (zcoor == 0) return CG_ERROR;
+
+    if (C > zcoor->ncoords || C <= 0) {
+        cgi_error("coord number %d invalid",C);
+        return CG_ERROR;
+    }
+
+     /* get file-space rank.  Dimensions already set by previous null
+      * call to cgp_coord_write*/
+    const int s_numdim = zone->index_dim;
+
+     /* we may modify m_arg_dimvals but do not want to change user assignments
+        so m_arg_dimvals will be copied */
+    cgsize_t m_dimvals[CGIO_MAX_DIMENSIONS];
+    cgsize_t s_rmin[CGIO_MAX_DIMENSIONS], s_rmax[CGIO_MAX_DIMENSIONS];
+    cgsize_t stride[CGIO_MAX_DIMENSIONS];
+    if (coords) {
+        cgsize_t s_dimvals[CGIO_MAX_DIMENSIONS];
+        for (n=0; n<s_numdim; n++) {
+            s_dimvals[n] = zcoor->coord[C-1].dim_vals[n];
+        }
+        for (n=0; n<m_numdim; n++) {
+            m_dimvals[n] = m_arg_dimvals[n];
+        }
+         /* verify the ranges provided and set s_rmin and s_rmax giving internal
+            file-space ranges */
+        int s_write_full_range; /* unused */
+        int m_read_full_range;  /* unused */
+        cgsize_t numpt;         /* unused */
+        ier = cgi_array_general_verify_range(
+            CGI_Write, cgns_rindindex, zcoor->rind_planes,
+            s_numdim, s_dimvals, rmin, rmax,
+            m_numdim, m_dimvals, m_rmin, m_rmax,
+            s_rmin, s_rmax, stride,
+            &s_write_full_range, &m_read_full_range, &numpt);
+        if (ier != CG_OK) return ier;
+    }
+    else {
+         /* Note: all data unused except m_type, m_numdim and m_dimvals. */
+         /* If null data, set memory rank to same as file and memory dimensions
+            to 0 */
+        m_type = cgi_datatype(zcoor->coord[C-1].data_type);
+        m_numdim = s_numdim;
+        for (n=0; n<m_numdim; n++) {
+            m_dimvals[n] = 0;
+        }
+    }
+
+     /* fn, B, Z, and C arguments are needed to get hid */
+    to_HDF_ID(zcoor->coord[C-1].id, hid);
+
+    void* dataset[1];
+    dataset[0] = (void*)coords;
+
+    return readwrite_shaped_data_parallel(
+        hid,
+        s_rmin, s_rmax, stride,
+        m_type, m_numdim, m_dimvals, m_rmin, m_rmax, stride,
+        dataset, CG_PAR_WRITE);
+}
+
+/*---------------------------------------------------------*/
+
 int cgp_coord_read_data(int fn, int B, int Z, int C,
     const cgsize_t *rmin, const cgsize_t *rmax, void *coords)
 {
@@ -397,6 +641,95 @@ int cgp_coord_read_data(int fn, int B, int Z, int C,
     Data.u.rbuf = coords;
     return readwrite_data_parallel(hid, type,
 			      zone->index_dim, rmin, rmax, &Data, CG_PAR_READ);
+}
+
+/*---------------------------------------------------------*/
+
+/* Note: if data == NULL, meaning this processor reads no data, then
+   only fn, B, Z, and C need be set.  In this case, Z and C are "representative"
+   and can point to any valid zone */
+int cgp_coord_general_read_data(int fn, int B, int Z, int C,
+                                const cgsize_t *rmin, const cgsize_t *rmax,
+                                CGNS_ENUMT(DataType_t) m_type,
+                                int m_numdim, const cgsize_t *m_arg_dimvals,
+                                const cgsize_t *m_rmin, const cgsize_t *m_rmax,
+                                void *coords)
+{
+    int n, ier;
+    hid_t hid;
+    cgns_zone *zone;
+    cgns_zcoor *zcoor;
+
+     /* get memory addresses */
+    cg = cgi_get_file(fn);
+    if (check_parallel(cg)) return CG_ERROR;
+
+    if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_READ)) return CG_ERROR;
+
+    zone = cgi_get_zone(cg, B, Z);
+    if (zone == 0) return CG_ERROR;
+
+     /* Get memory address for node "GridCoordinates" */
+    zcoor = cgi_get_zcoorGC(cg, B, Z);
+    if (zcoor == 0) return CG_ERROR;
+
+    if (C > zcoor->ncoords || C <= 0) {
+        cgi_error("coord number %d invalid",C);
+        return CG_ERROR;
+    }
+
+     /* get file-space dimensions.  Dimensions already set by previous null
+      * call to cgp_coord_write*/
+    const int s_numdim = zone->index_dim;
+
+     /* we may modify m_arg_dimvals but do not want to change user assignments
+        so m_arg_dimvals will be copied */
+    cgsize_t m_dimvals[CGIO_MAX_DIMENSIONS];
+    cgsize_t s_rmin[CGIO_MAX_DIMENSIONS], s_rmax[CGIO_MAX_DIMENSIONS];
+    cgsize_t stride[CGIO_MAX_DIMENSIONS];
+    if (coords) {
+        cgsize_t s_dimvals[CGIO_MAX_DIMENSIONS];
+        for (n=0; n<s_numdim; n++) {
+            s_dimvals[n] = zcoor->coord[C-1].dim_vals[n];
+        }
+        for (n=0; n<m_numdim; n++) {
+            m_dimvals[n] = m_arg_dimvals[n];
+        }
+         /* verify the ranges provided and set s_rmin and s_rmax giving internal
+            file-space ranges */
+        int s_read_full_range;  /* unused */
+        int m_write_full_range; /* unused */
+        cgsize_t numpt;         /* unused */
+        ier = cgi_array_general_verify_range(
+            CGI_Read, cgns_rindindex, zcoor->rind_planes,
+            s_numdim, s_dimvals, rmin, rmax,
+            m_numdim, m_dimvals, m_rmin, m_rmax,
+            s_rmin, s_rmax, stride,
+            &s_read_full_range, &m_write_full_range, &numpt);
+        if (ier != CG_OK) return ier;
+    }
+    else {
+         /* Note: all data unused except m_type, m_numdim and m_dimvals. */
+         /* If null data, set memory rank to same as file and memory dimensions
+            to 0 */
+        m_type = cgi_datatype(zcoor->coord[C-1].data_type);
+        m_numdim = s_numdim;
+        for (n=0; n<m_numdim; n++) {
+            m_dimvals[n] = 0;
+        }
+    }
+
+     /* fn, B, Z, and C arguments are needed to get hid */
+    to_HDF_ID(zcoor->coord[C-1].id, hid);
+
+    void* dataset[1];
+    dataset[0] = coords;
+
+    return readwrite_shaped_data_parallel(
+        hid,
+        s_rmin, s_rmax, stride,
+        m_type, m_numdim, m_dimvals, m_rmin, m_rmax, stride,
+        dataset, CG_PAR_READ);
 }
 
 /*===== Elements IO Prototypes ============================*/
@@ -514,7 +847,6 @@ int cgp_parent_data_write(int fn, int B, int Z, int S,
 			  const cgsize_t *parent_data)
 {
     cgns_section *section;
-    cgsize_t *data, i, j, n;
     hid_t hid;
     cgsize_t rmin[2], rmax[2];
     CGNS_ENUMT(DataType_t) type;
@@ -537,6 +869,8 @@ int cgp_parent_data_write(int fn, int B, int Z, int S,
 	cgi_error("Error in requested element data range.");
 	return CG_ERROR;
       }    
+    } else {
+        start = end = 0;
     }
 
     if (!IS_FIXED_SIZE(section->el_type)) {
@@ -675,6 +1009,91 @@ int cgp_field_write_data(int fn, int B, int Z, int S, int F,
 
 /*---------------------------------------------------------*/
 
+/* Note: if data == NULL, meaning this processor reads no data, then
+   only fn, B, Z, S, and F need be set.  In this case, Z, S, and F are
+   "representative" and can point to any valid zone */
+int cgp_field_general_write_data(int fn, int B, int Z, int S, int F,
+                                 const cgsize_t *rmin, const cgsize_t *rmax,
+                                 CGNS_ENUMT(DataType_t) m_type,
+                                 int m_numdim, const cgsize_t *m_arg_dimvals,
+                                 const cgsize_t *m_rmin, const cgsize_t *m_rmax,
+                                 const void *data)
+{
+    int n, ier;
+    hid_t hid;
+    cgns_sol *sol;
+    cgns_array *field;
+
+     /* get memory addresses */
+    cg = cgi_get_file(fn);
+    if (check_parallel(cg)) return CG_ERROR;
+
+    if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_WRITE)) return CG_ERROR;
+
+     /* get memory address for solution */
+    sol = cgi_get_sol(cg, B, Z, S);
+    if (sol == 0) return CG_ERROR;
+
+     /* get memory address for field */
+    field = cgi_get_field(cg, B, Z, S, F);
+    if (field == 0) return CG_ERROR;
+
+     /* get file-space rank.  Dimensions already set by previous null
+        call to cgp_field_write */
+    const int s_numdim = field->data_dim;
+
+     /* we may modify m_arg_dimvals but do not want to change user assignments
+        so m_arg_dimvals will be copied */
+    cgsize_t m_dimvals[CGIO_MAX_DIMENSIONS];
+    cgsize_t s_rmin[CGIO_MAX_DIMENSIONS], s_rmax[CGIO_MAX_DIMENSIONS];
+    cgsize_t stride[CGIO_MAX_DIMENSIONS];
+    if (data) {
+        cgsize_t s_dimvals[CGIO_MAX_DIMENSIONS];
+        for (n=0; n<s_numdim; n++) {
+            s_dimvals[n] = field->dim_vals[n];
+        }
+        for (n=0; n<m_numdim; n++) {
+            m_dimvals[n] = m_arg_dimvals[n];
+        }
+         /* verify the ranges provided and set s_rmin and s_rmax giving internal
+            file-space ranges */
+        int s_write_full_range; /* unused */
+        int m_read_full_range;  /* unused */
+        cgsize_t numpt;         /* unused */
+        ier = cgi_array_general_verify_range(
+            CGI_Write, cgns_rindindex, sol->rind_planes,
+            s_numdim, s_dimvals, rmin, rmax,
+            m_numdim, m_dimvals, m_rmin, m_rmax,
+            s_rmin, s_rmax, stride,
+            &s_write_full_range, &m_read_full_range, &numpt);
+        if (ier != CG_OK) return ier;
+    }
+    else {
+         /* Note: all data unused except m_type, m_numdim and m_dimvals. */
+         /* If null data, set memory rank to same as file and memory dimensions
+            to 0 */
+        m_type = cgi_datatype(field->data_type);
+        m_numdim = s_numdim;
+        for (n=0; n<m_numdim; n++) {
+            m_dimvals[n] = 0;
+        }
+    }
+
+     /* fn, B, Z, F, and S arguments are needed to get hid */
+    to_HDF_ID(field->id, hid);
+
+    void* dataset[1];
+    dataset[0] = (void*)data;
+
+    return readwrite_shaped_data_parallel(
+        hid,
+        s_rmin, s_rmax, stride,
+        m_type, m_numdim, m_dimvals, m_rmin, m_rmax, stride,
+        dataset, CG_PAR_WRITE);
+}
+
+/*---------------------------------------------------------*/
+
 int cgp_field_read_data(int fn, int B, int Z, int S, int F,
     const cgsize_t *rmin, const cgsize_t *rmax, void *data)
 {
@@ -712,6 +1131,90 @@ int cgp_field_read_data(int fn, int B, int Z, int S, int F,
 			      field->data_dim, rmin, rmax, &Data, CG_PAR_READ);
 }
 
+/*---------------------------------------------------------*/
+
+/* Note: if data == NULL, meaning this processor reads no data, then
+   only fn, B, Z, S, and F need be set.  In this case, Z, S, and F are
+   "representative" and can point to any valid zone */
+int cgp_field_general_read_data(int fn, int B, int Z, int S, int F,
+                                const cgsize_t *rmin, const cgsize_t *rmax,
+                                CGNS_ENUMT(DataType_t) m_type,
+                                int m_numdim, const cgsize_t *m_arg_dimvals,
+                                const cgsize_t *m_rmin, const cgsize_t *m_rmax,
+                                void *data)
+{
+    int n, ier;
+    hid_t hid;
+    cgns_sol *sol;
+    cgns_array *field;
+
+     /* get memory addresses */
+    cg = cgi_get_file(fn);
+    if (check_parallel(cg)) return CG_ERROR;
+
+    if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_READ)) return CG_ERROR;
+
+     /* get memory address for solution */
+    sol = cgi_get_sol(cg, B, Z, S);
+    if (sol == 0) return CG_ERROR;
+
+     /* get memory address for field */
+    field = cgi_get_field(cg, B, Z, S, F);
+    if (field == 0) return CG_ERROR;
+
+     /* get file-space rank */
+    const int s_numdim = field->data_dim;
+
+     /* we may modify m_arg_dimvals but do not want to change user assignments
+        m_arg_dimvals will be copied */
+    cgsize_t m_dimvals[CGIO_MAX_DIMENSIONS];
+    cgsize_t s_rmin[CGIO_MAX_DIMENSIONS], s_rmax[CGIO_MAX_DIMENSIONS];
+    cgsize_t stride[CGIO_MAX_DIMENSIONS];
+    if (data) {
+        cgsize_t s_dimvals[CGIO_MAX_DIMENSIONS];
+        for (n=0; n<s_numdim; n++) {
+            s_dimvals[n] = field->dim_vals[n];
+        }
+        for (n=0; n<m_numdim; n++) {
+            m_dimvals[n] = m_arg_dimvals[n];
+        }
+         /* verify the ranges provided and set s_rmin and s_rmax giving internal
+            file-space ranges */
+        int s_read_full_range;  /* unused */
+        int m_write_full_range; /* unused */
+        cgsize_t numpt;         /* unused */
+        ier = cgi_array_general_verify_range(
+            CGI_Read, cgns_rindindex, sol->rind_planes,
+            s_numdim, s_dimvals, rmin, rmax,
+            m_numdim, m_dimvals, m_rmin, m_rmax,
+            s_rmin, s_rmax, stride,
+            &s_read_full_range, &m_write_full_range, &numpt);
+        if (ier != CG_OK) return ier;
+    }
+    else {
+         /* Note: all data unused except m_type, m_numdim and m_dimvals. */
+         /* If null data, set memory rank to same as file and memory dimensions
+            to 0 */
+        m_type = cgi_datatype(field->data_type);
+        m_numdim = s_numdim;
+        for (n=0; n<m_numdim; n++) {
+            m_dimvals[n] = 0;
+        }
+    }
+
+     /* fn, B, Z, F, and S arguments are needed to get hid */
+    to_HDF_ID(field->id, hid);
+
+    void* dataset[1];
+    dataset[0] = data;
+
+    return readwrite_shaped_data_parallel(
+        hid,
+        s_rmin, s_rmax, stride,
+        m_type, m_numdim, m_dimvals, m_rmin, m_rmax, stride,
+        dataset, CG_PAR_READ);
+}
+
 /*===== Array IO Prototypes ===============================*/
 
 int cgp_array_write(const char *ArrayName, CGNS_ENUMT(DataType_t) DataType,
@@ -729,7 +1232,8 @@ int cgp_array_write(const char *ArrayName, CGNS_ENUMT(DataType_t) DataType,
     ierr = cg_array_write(ArrayName, DataType, DataDimension,
                           DimensionVector, NULL);
     if (ierr) return ierr;
-    array = cgi_array_address(CG_MODE_READ, 1, "dummy", &ierr);
+    int have_dup = 0;
+    array = cgi_array_address(CG_MODE_READ, 0, 1, "dummy", &have_dup, &ierr);
     if (array == NULL) return ierr;
     ierr = cg_narrays(&na);
     if (ierr) return ierr;
@@ -755,7 +1259,8 @@ int cgp_array_write_data(int A, const cgsize_t *rmin,
     cgns_array *array;
     CGNS_ENUMT(DataType_t) type;
 
-    array = cgi_array_address(CG_MODE_READ, A, "dummy", &ierr);
+    int have_dup = 0;
+    array = cgi_array_address(CG_MODE_READ, 0, A, "dummy", &have_dup, &ierr);
     if (array == NULL) return ierr;
 
     if (data) {
@@ -780,6 +1285,85 @@ int cgp_array_write_data(int A, const cgsize_t *rmin,
 
 /*---------------------------------------------------------*/
 
+/* Note: if data == NULL, meaning this processor reads no data, then
+   only A need be set.  In this case, A is "representative" and can point to
+   any valid array being written by another processor */
+int cgp_array_general_write_data(int A,
+                                 const cgsize_t *rmin, const cgsize_t *rmax,
+                                 CGNS_ENUMT(DataType_t) m_type,
+                                 int m_numdim, const cgsize_t *m_arg_dimvals,
+                                 const cgsize_t *m_rmin, const cgsize_t *m_rmax,
+                                 const void *data)
+{
+    int n, ier;
+    hid_t hid;
+    cgns_array *array;
+
+    int have_dup = 0;
+    array = cgi_array_address(CG_MODE_READ, 0, A, "dummy", &have_dup, &ier);
+    if (array == 0) return ier;
+
+     /* get file-space rank.  Dimensions already set by previous null
+        call to cgp_array_write */
+    const int s_numdim = array->data_dim;
+
+     /* we may modify m_arg_dimvals but do not want to change user assignments
+        so m_arg_dimvals will be copied */
+    cgsize_t m_dimvals[CGIO_MAX_DIMENSIONS];
+    cgsize_t s_rmin[CGIO_MAX_DIMENSIONS], s_rmax[CGIO_MAX_DIMENSIONS];
+    cgsize_t stride[CGIO_MAX_DIMENSIONS];
+    if (data) {
+        cgsize_t s_dimvals[CGIO_MAX_DIMENSIONS];
+        for (n=0; n<s_numdim; n++) {
+            s_dimvals[n] = array->dim_vals[n];
+        }
+        for (n=0; n<m_numdim; n++) {
+            m_dimvals[n] = m_arg_dimvals[n];
+        }
+
+         /* do we have rind planes? */
+        int *rind_planes = cgi_rind_address(CG_MODE_READ, &ier);
+        if (ier != CG_OK) rind_planes = NULL;
+
+         /* verify the ranges provided and set s_rmin and s_rmax giving internal
+            file-space ranges */
+        int s_write_full_range; /* unused */
+        int m_read_full_range;  /* unused */
+        cgsize_t numpt;         /* unused */
+        ier = cgi_array_general_verify_range(
+            CGI_Write, cgns_rindindex, rind_planes,
+            s_numdim, s_dimvals, rmin, rmax,
+            m_numdim, m_dimvals, m_rmin, m_rmax,
+            s_rmin, s_rmax, stride,
+            &s_write_full_range, &m_read_full_range, &numpt);
+        if (ier != CG_OK) return ier;
+    }
+    else {
+         /* Note: all data unused except m_type, m_numdim and m_dimvals. */
+         /* If null data, set memory rank to same as file and memory dimensions
+            to 0 */
+        m_type = cgi_datatype(array->data_type);
+        m_numdim = s_numdim;
+        for (n=0; n<m_numdim; n++) {
+            m_dimvals[n] = 0;
+        }
+    }
+
+     /* A argument is needed to get hid */
+    to_HDF_ID(array->id, hid);
+
+    void* dataset[1];
+    dataset[0] = (void*)data;
+
+    return readwrite_shaped_data_parallel(
+        hid,
+        s_rmin, s_rmax, stride,
+        m_type, m_numdim, m_dimvals, m_rmin, m_rmax, stride,
+        dataset, CG_PAR_WRITE);
+}
+
+/*---------------------------------------------------------*/
+
 int cgp_array_read_data(int A, const cgsize_t *rmin,
     const cgsize_t *rmax, void *data)
 {
@@ -788,7 +1372,8 @@ int cgp_array_read_data(int A, const cgsize_t *rmin,
     cgns_array *array;
     CGNS_ENUMT(DataType_t) type;
 
-    array = cgi_array_address(CG_MODE_READ, A, "dummy", &ierr);
+    int have_dup = 0;
+    array = cgi_array_address(CG_MODE_READ, 0, A, "dummy", &have_dup, &ierr);
     if (array == NULL) return ierr;
 
     if (data) {
@@ -809,6 +1394,86 @@ int cgp_array_read_data(int A, const cgsize_t *rmin,
     return readwrite_data_parallel(hid, type,
 				   array->data_dim, rmin, rmax, &Data, CG_PAR_READ);
 }
+
+/*---------------------------------------------------------*/
+
+/* Note: if data == NULL, meaning this processor reads no data, then
+   only A need be set.  In this case, A is "representative" and can point to
+   any valid array being written by another processor */
+int cgp_array_general_read_data(int A,
+                                const cgsize_t *rmin, const cgsize_t *rmax,
+                                CGNS_ENUMT(DataType_t) m_type,
+                                int m_numdim, const cgsize_t *m_arg_dimvals,
+                                const cgsize_t *m_rmin, const cgsize_t *m_rmax,
+                                void *data)
+{
+    int n, ier;
+    hid_t hid;
+    cgns_array *array;
+
+    int have_dup = 0;
+    array = cgi_array_address(CG_MODE_READ, 0, A, "dummy", &have_dup, &ier);
+    if (array == 0) return ier;
+
+     /* get file-space rank.  Dimensions already set by previous null
+        call to cgp_array_write */
+    const int s_numdim = array->data_dim;
+
+     /* we may modify m_arg_dimvals but do not want to change user assignments
+        so m_arg_dimvals will be copied */
+    cgsize_t m_dimvals[CGIO_MAX_DIMENSIONS];
+    cgsize_t s_rmin[CGIO_MAX_DIMENSIONS], s_rmax[CGIO_MAX_DIMENSIONS];
+    cgsize_t stride[CGIO_MAX_DIMENSIONS];
+    if (data) {
+        cgsize_t s_dimvals[CGIO_MAX_DIMENSIONS];
+        for (n=0; n<s_numdim; n++) {
+            s_dimvals[n] = array->dim_vals[n];
+        }
+        for (n=0; n<m_numdim; n++) {
+            m_dimvals[n] = m_arg_dimvals[n];
+        }
+
+         /* do we have rind planes? */
+        int *rind_planes = cgi_rind_address(CG_MODE_READ, &ier);
+        if (ier != CG_OK) rind_planes = NULL;
+
+         /* verify the ranges provided and set s_rmin and s_rmax giving internal
+            file-space ranges */
+        int s_read_full_range;  /* unused */
+        int m_write_full_range; /* unused */
+        cgsize_t numpt;         /* unused */
+        ier = cgi_array_general_verify_range(
+            CGI_Read, cgns_rindindex, rind_planes,
+            s_numdim, s_dimvals, rmin, rmax,
+            m_numdim, m_dimvals, m_rmin, m_rmax,
+            s_rmin, s_rmax, stride,
+            &s_read_full_range, &m_write_full_range, &numpt);
+        if (ier != CG_OK) return ier;
+    }
+    else {
+         /* Note: all data unused except m_type, m_numdim and m_dimvals. */
+         /* If null data, set memory rank to same as file and memory dimensions
+            to 0 */
+        m_type = cgi_datatype(array->data_type);
+        m_numdim = s_numdim;
+        for (n=0; n<m_numdim; n++) {
+            m_dimvals[n] = 0;
+        }
+    }
+
+     /* A argument is needed to get hid */
+    to_HDF_ID(array->id, hid);
+
+    void* dataset[1];
+    dataset[0] = data;
+
+    return readwrite_shaped_data_parallel(
+        hid,
+        s_rmin, s_rmax, stride,
+        m_type, m_numdim, m_dimvals, m_rmin, m_rmax, stride,
+        dataset, CG_PAR_READ);
+}
+
 
 #if HDF5_HAVE_MULTI_DATASETS
 
@@ -1216,7 +1881,8 @@ int vcgp_array_multi_write_data(int fn, int *A, const cgsize_t *rmin,
 
   for (n = 0; n < nsets; n++) {
 
-    array = cgi_array_address(CG_MODE_READ, A[n], "dummy", &ierr);
+    int have_dup = 0;
+    array = cgi_array_address(CG_MODE_READ, 0, A[n], "dummy", &have_dup, &ierr);
     if (array == NULL) goto error;
 
     for (m = 0; m < array->data_dim; m++) {
@@ -1280,7 +1946,8 @@ int vcgp_array_multi_read_data(int fn, int *A, const cgsize_t *rmin,
 
   for (n = 0; n < nsets; n++) {
 
-    array = cgi_array_address(CG_MODE_READ, A[n], "dummy", &ierr);
+    int have_dup = 0;
+    array = cgi_array_address(CG_MODE_READ, 0, A[n], "dummy", &have_dup, &ierr);
     if (array == NULL) goto error;
 
     for (m = 0; m < array->data_dim; m++) {

@@ -43,7 +43,6 @@ File:	ADF.h
 #ifndef ADF_INCLUDE
 #define ADF_INCLUDE
 
-#include "cgnsconfig.h"
 #include "cgnstypes.h"
 
 #if defined(_WIN32) && defined(BUILD_DLL)
