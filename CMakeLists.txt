@@ -550,8 +550,8 @@ list(APPEND paraview_requested_modules
   ParaView::WrapClientServer
   VTK::FiltersFlowPaths
   VTK::FiltersParallelDIY2
+  VTK::FiltersParallelVerdict
   VTK::FiltersTexture
-  VTK::FiltersVerdict
   VTK::IOAMR
   VTK::IOAsynchronous # needed for cinema, but no harm adding always.
   VTK::IOH5part
