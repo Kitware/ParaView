@@ -47,8 +47,8 @@ class pqLinksEditor;
 }
 
 /**
-* a Qt dialog for editing a property/proxy/camera link
-* two proxies can be selected, and if property type is
+* A Qt dialog for editing a property/proxy/camera link.
+* Two proxies can be selected, and if property type is
 * selected, then two properties can be selected as well.
 */
 class PQCOMPONENTS_EXPORT pqLinksEditor : public QDialog
@@ -58,17 +58,18 @@ class PQCOMPONENTS_EXPORT pqLinksEditor : public QDialog
 
 public:
   /**
-  * create a link editor to create/edit a link
-  * initial values are retrieved from the provided vtkSMLink
+  * Create a link editor to create/edit a link.
+  * Initial values are retrieved from the provided vtkSMLink.
   */
   pqLinksEditor(vtkSMLink* link, QWidget* p = 0);
+
   /**
-  * destroy this dialog
+  * Destroy this dialog
   */
   ~pqLinksEditor() override;
 
   /**
-  * get the name of the link
+  * Get the name of the link
   */
   QString linkName();
 
@@ -78,20 +79,22 @@ public:
   pqLinksModel::ItemType linkType();
 
   /**
-  * get the first selected proxy
+  * Get the first selected proxy
   */
   vtkSMProxy* selectedProxy1();
+
   /**
-  * get the second selected proxy;
+  * Get the second selected proxy;
   */
   vtkSMProxy* selectedProxy2();
 
   /**
-  * get the first selected property
+  * Get the first selected property
   */
   QString selectedProperty1();
+
   /**
-  * get the second selected property
+  * Get the second selected property
   */
   QString selectedProperty2();
 
@@ -104,6 +107,7 @@ public:
   * Get the check state of convert to indices check box
   */
   bool convertToIndicesChecked();
+
 private slots:
   void currentProxy1Changed(const QModelIndex& cur, const QModelIndex&);
   void currentProxy2Changed(const QModelIndex& cur, const QModelIndex&);
@@ -120,11 +124,11 @@ private:
 
   QScopedPointer<Ui::pqLinksEditor> Ui;
 
-  pqLinksEditorProxyModel* Proxy1Model;
-  pqLinksEditorProxyModel* Proxy2Model;
+  pqLinksEditorProxyModel* Proxy1Model = nullptr;
+  pqLinksEditorProxyModel* Proxy2Model = nullptr;
 
-  vtkSMProxy* SelectedProxy1;
-  vtkSMProxy* SelectedProxy2;
+  vtkSMProxy* SelectedProxy1 = nullptr;
+  vtkSMProxy* SelectedProxy2 = nullptr;
   QString SelectedProperty1;
   QString SelectedProperty2;
 };
