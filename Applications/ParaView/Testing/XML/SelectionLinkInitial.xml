@@ -18,9 +18,9 @@
   <pqevent object="pqClientMainWindow/pqLinksManager/addButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/comboBox" command="set_string" arguments="Selection Link" />
   <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page_3/ObjectTreeSelection1" command="expand" arguments="1.0" />
-  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page_3/ObjectTreeSelection1" command="setCurrent" arguments="1.0.0.0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page_3/ObjectTreeSelection1" command="setCurrent" arguments="2.0.0.0" />
   <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page_3/ObjectTreeSelection2" command="expand" arguments="1.0" />
-  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page_3/ObjectTreeSelection2" command="setCurrent" arguments="1.0.1.0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page_3/ObjectTreeSelection2" command="setCurrent" arguments="2.0.1.0" />
   <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqLinksManager/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />

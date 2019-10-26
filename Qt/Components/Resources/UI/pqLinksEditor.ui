@@ -49,13 +49,21 @@
         <number>6</number>
        </property>
        <item row="1" column="0" >
-        <widget class="QListWidget" name="Property1List" />
+        <widget class="QListWidget" name="Property1List">
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item row="0" column="0" >
         <widget class="QTreeView" name="ObjectTreeProperty1" />
        </item>
        <item row="1" column="1" >
-        <widget class="QListWidget" name="Property2List" />
+        <widget class="QListWidget" name="Property2List">
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item row="0" column="1" >
         <widget class="QTreeView" name="ObjectTreeProperty2" />

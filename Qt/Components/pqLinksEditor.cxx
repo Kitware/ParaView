@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // pqCore
 #include "pqApplicationCore.h"
+#include "pqDataRepresentation.h"
 #include "pqPipelineSource.h"
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
@@ -68,35 +69,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // std
 #include <cassert>
 
+namespace
+{
 static QString propertyType(vtkSMProperty* p)
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(p);
-  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(p);
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(p);
-  vtkSMIdTypeVectorProperty* idvp = vtkSMIdTypeVectorProperty::SafeDownCast(p);
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(p);
-
   if (ivp)
   {
     return QString("Integer %1").arg(ivp->GetNumberOfElements());
   }
-  else if (dvp)
+
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(p);
+  if (dvp)
   {
     return QString("Real %1").arg(dvp->GetNumberOfElements());
   }
-  else if (svp)
+
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(p);
+  if (svp)
   {
     return QString("String %1").arg(svp->GetNumberOfElements());
   }
-  else if (idvp)
+
+  vtkSMIdTypeVectorProperty* idvp = vtkSMIdTypeVectorProperty::SafeDownCast(p);
+  if (idvp)
   {
     return QString("Id %1").arg(idvp->GetNumberOfElements());
   }
-  else if (pp)
+
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(p);
+  if (pp)
   {
     return QString("Proxy %1").arg(pp->GetNumberOfProxies());
   }
+
   return "Unknown";
+}
 }
 
 class pqLinksEditor::pqLinksEditorProxyModel : public QAbstractItemModel
@@ -107,7 +115,7 @@ public:
   {
     assert(sizeof(RowIndex) == sizeof(void*));
   }
-  ~pqLinksEditorProxyModel() override {}
+  ~pqLinksEditorProxyModel() override = default;
 
   struct RowIndex
   {
@@ -157,7 +165,7 @@ public:
     }
     RowIndex ri(pidx.row(), false, 0);
 
-    if (pidx.internalPointer() != NULL)
+    if (pidx.internalPointer() != nullptr)
     {
       ri = this->decodeIndex(pidx.internalPointer());
       ri.u.idx.hasIndex = true;
@@ -168,13 +176,13 @@ public:
 
   QModelIndex parent(const QModelIndex& idx) const override
   {
-    if (!idx.isValid() || idx.internalPointer() == NULL)
+    if (!idx.isValid() || idx.internalPointer() == nullptr)
     {
       return QModelIndex();
     }
     RowIndex ri = this->decodeIndex(idx.internalPointer());
     int row = ri.u.idx.type;
-    void* p = NULL;
+    void* p = nullptr;
     if (ri.u.idx.hasIndex)
     {
       row = ri.u.idx.index;
@@ -195,24 +203,26 @@ public:
   {
     if (!idx.isValid())
     {
-      return 2;
+      return 3;
     }
     QModelIndex pidx = this->parent(idx);
-    pqServerManagerModel* smModel;
-    smModel = pqApplicationCore::instance()->getServerManagerModel();
+    pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
 
     if (!pidx.isValid())
     {
-      if (idx.row() == 0)
+      switch (idx.row())
       {
-        return smModel->getNumberOfItems<pqRenderView*>();
-      }
-      else if (idx.row() == 1)
-      {
-        return smModel->getNumberOfItems<pqPipelineSource*>();
+        case 0:
+          return smModel->getNumberOfItems<pqRenderView*>();
+        case 1:
+          return smModel->getNumberOfItems<pqDataRepresentation*>();
+        case 2:
+          return smModel->getNumberOfItems<pqPipelineSource*>();
+        default:
+          return 0;
       }
     }
-    if (pidx.isValid() && pidx.row() == 1)
+    if (pidx.isValid() && pidx.row() == 2)
     {
       vtkSMProxyListDomain* pxyDomain = this->proxyListDomain(idx);
       if (pxyDomain)
@@ -235,15 +245,18 @@ public:
     }
     if (role == Qt::DisplayRole)
     {
-      if (idx.internalPointer() == NULL)
+      if (idx.internalPointer() == nullptr)
       {
-        if (idx.row() == 0)
+        switch (idx.row())
         {
-          return "Views";
-        }
-        else if (idx.row() == 1)
-        {
-          return "Objects";
+          case 0:
+            return tr("Views");
+          case 1:
+            return tr("Representations");
+          case 2:
+            return tr("Sources");
+          default:
+            return tr("Unknown");
         }
       }
 
@@ -251,11 +264,12 @@ public:
       if (!ri.u.idx.hasIndex)
       {
         vtkSMProxy* pxy = this->getProxy(idx);
-        pqServerManagerModel* m;
-        m = pqApplicationCore::instance()->getServerManagerModel();
         if (pxy)
         {
-          return m->findItem<pqProxy*>(pxy)->getSMName();
+          return pqApplicationCore::instance()
+            ->getServerManagerModel()
+            ->findItem<pqProxy*>(pxy)
+            ->getSMName();
         }
       }
       else
@@ -265,6 +279,32 @@ public:
         if (domain && (int)domain->GetNumberOfProxies() > idx.row())
         {
           return domain->GetProxyName(idx.row());
+        }
+      }
+    }
+    else if (role == Qt::ToolTipRole)
+    {
+      QModelIndex pidx = idx.parent();
+      if (pidx.isValid() && pidx.row() == 1)
+      {
+        RowIndex ri = this->decodeIndex(idx.internalPointer());
+        if (!ri.u.idx.hasIndex)
+        {
+          vtkSMProxy* pxy = this->getProxy(idx);
+          pqServerManagerModel* m;
+          m = pqApplicationCore::instance()->getServerManagerModel();
+          if (pxy)
+          {
+            pqDataRepresentation* repr = m->findItem<pqDataRepresentation*>(pxy);
+            pqPipelineSource* source = repr ? repr->getInput() : nullptr;
+            pqView* view = repr ? repr->getView() : nullptr;
+            if (source && view)
+            {
+              return QString(tr("Source <b>%1</b><br/>View <b>%2</b>"))
+                .arg(source->getSMName())
+                .arg(view->getSMName());
+            }
+          }
         }
       }
     }
@@ -333,26 +373,25 @@ public:
   {
     if (!idx.isValid())
     {
-      return NULL;
+      return nullptr;
     }
 
     QModelIndex pidx = this->parent(idx);
-    if (pidx.isValid())
+    if (!pidx.isValid())
     {
-      RowIndex ri = this->decodeIndex(idx.internalPointer());
-      pqServerManagerModel* m;
-      m = pqApplicationCore::instance()->getServerManagerModel();
-      if (ri.u.idx.type == 0)
-      {
+      return nullptr;
+    }
+    RowIndex ri = this->decodeIndex(idx.internalPointer());
+    pqServerManagerModel* m;
+    m = pqApplicationCore::instance()->getServerManagerModel();
+    switch (ri.u.idx.type)
+    {
+      case 0:
         return m->getItemAtIndex<pqRenderView*>(idx.row())->getProxy();
-      }
-      else if (ri.u.idx.type == 1)
-      {
-        if (!ri.u.idx.hasIndex)
-        {
-          return m->getItemAtIndex<pqPipelineSource*>(idx.row())->getProxy();
-        }
-        else
+      case 1:
+        return m->getItemAtIndex<pqDataRepresentation*>(idx.row())->getProxy();
+      case 2:
+        if (ri.u.idx.hasIndex)
         {
           vtkSMProxyListDomain* domain = this->proxyListDomain(pidx);
           if (domain && idx.row() < (int)domain->GetNumberOfProxies())
@@ -360,9 +399,10 @@ public:
             return domain->GetProxy(idx.row());
           }
         }
-      }
+        return m->getItemAtIndex<pqPipelineSource*>(idx.row())->getProxy();
+      default:
+        return nullptr;
     }
-    return NULL;
   }
 };
 
@@ -372,22 +412,23 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
 {
   this->Ui->setupUi(this);
 
-  this->SelectedProxy1 = NULL;
-  this->SelectedProxy2 = NULL;
-
   this->Proxy1Model = new pqLinksEditorProxyModel(this);
   this->Proxy2Model = new pqLinksEditorProxyModel(this);
+
   this->Ui->ObjectTreeProxy1->setModel(this->Proxy1Model);
   this->Ui->ObjectTreeProxy2->setModel(this->Proxy2Model);
+
   this->Ui->ObjectTreeProperty1->setModel(this->Proxy1Model);
   this->Ui->ObjectTreeProperty2->setModel(this->Proxy2Model);
 
   this->Ui->ObjectTreeSelection1->setModel(this->Proxy1Model);
   this->Ui->ObjectTreeSelection2->setModel(this->Proxy2Model);
 
-  // Hiding views items
+  // Hiding views and representations items
   this->Ui->ObjectTreeSelection1->setRowHidden(0, QModelIndex(), true);
   this->Ui->ObjectTreeSelection2->setRowHidden(0, QModelIndex(), true);
+  this->Ui->ObjectTreeSelection1->setRowHidden(1, QModelIndex(), true);
+  this->Ui->ObjectTreeSelection2->setRowHidden(1, QModelIndex(), true);
 
   QObject::connect(this->Ui->ObjectTreeProxy1->selectionModel(),
     SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this,
@@ -413,10 +454,12 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
     SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this,
     SLOT(currentProxy2Changed(const QModelIndex&, const QModelIndex&)));
 
-  QObject::connect(this->Ui->Property1List, SIGNAL(itemPressed(QListWidgetItem*)), this,
+  QObject::connect(this->Ui->Property1List,
+    SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this,
     SLOT(currentProperty1Changed(QListWidgetItem*)));
 
-  QObject::connect(this->Ui->Property2List, SIGNAL(itemPressed(QListWidgetItem*)), this,
+  QObject::connect(this->Ui->Property2List,
+    SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this,
     SLOT(currentProperty2Changed(QListWidgetItem*)));
 
   QObject::connect(this->Ui->lineEdit, SIGNAL(textChanged(const QString&)), this,
@@ -438,22 +481,22 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
       QString name = model->getLinkName(idx);
       this->Ui->lineEdit->setText(name);
 
-      if (model->getLinkType(idx) == pqLinksModel::Proxy ||
-        model->getLinkType(idx) == pqLinksModel::Camera)
+      switch (model->getLinkType(idx))
       {
-        this->Ui->comboBox->setCurrentIndex(0);
-      }
-      else if (model->getLinkType(idx) == pqLinksModel::Property)
-      {
-        this->Ui->comboBox->setCurrentIndex(1);
-      }
-      else if (model->getLinkType(idx) == pqLinksModel::Selection)
-      {
-        this->Ui->comboBox->setCurrentIndex(2);
-      }
-      else
-      {
-        qDebug() << "Unknown Link type:" << model->getLinkType(idx) << endl;
+        case pqLinksModel::Proxy:
+        case pqLinksModel::Camera:
+          this->Ui->comboBox->setCurrentIndex(0);
+          break;
+        case pqLinksModel::Property:
+          this->Ui->comboBox->setCurrentIndex(1);
+          break;
+        case pqLinksModel::Selection:
+          this->Ui->comboBox->setCurrentIndex(2);
+          break;
+        case pqLinksModel::Unknown:
+        default:
+          qDebug() << "Unknown Link type:" << model->getLinkType(idx) << endl;
+          break;
       }
 
       vtkSMProxy* inputProxy = model->getProxy1(idx);
@@ -473,43 +516,49 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
       }
 
       // if this is a property link, make the properties current
-      if (model->getLinkType(idx) == pqLinksModel::Property)
+      switch (model->getLinkType(idx))
       {
-        QString prop1 = model->getProperty1(idx);
-        int count = this->Ui->Property1List->count();
-        int i;
-        for (i = 0; i < count; i++)
+        case pqLinksModel::Property:
         {
-          QListWidgetItem* item = this->Ui->Property1List->item(i);
-          QString d = item->data(Qt::UserRole).toString();
-          if (d == prop1)
+          QString prop1 = model->getProperty1(idx);
+          int count = this->Ui->Property1List->count();
+          for (int i = 0; i < count; i++)
           {
-            this->Ui->Property1List->setCurrentItem(item);
-            break;
+            QListWidgetItem* item = this->Ui->Property1List->item(i);
+            QString d = item->data(Qt::UserRole).toString();
+            if (d == prop1)
+            {
+              this->Ui->Property1List->setCurrentItem(item);
+              break;
+            }
           }
-        }
 
-        QString prop2 = model->getProperty2(idx);
-        count = this->Ui->Property2List->count();
-        for (i = 0; i < count; i++)
-        {
-          QListWidgetItem* item = this->Ui->Property2List->item(i);
-          QString d = item->data(Qt::UserRole).toString();
-          if (d == prop2)
+          QString prop2 = model->getProperty2(idx);
+          count = this->Ui->Property2List->count();
+          for (int i = 0; i < count; i++)
           {
-            this->Ui->Property2List->setCurrentItem(item);
-            break;
+            QListWidgetItem* item = this->Ui->Property2List->item(i);
+            QString d = item->data(Qt::UserRole).toString();
+            if (d == prop2)
+            {
+              this->Ui->Property2List->setCurrentItem(item);
+              break;
+            }
           }
+          break;
         }
-      }
-      if (model->getLinkType(idx) == pqLinksModel::Camera && model->hasInteractiveViewLink(name))
-      {
-        this->Ui->interactiveViewLinkCheckBox->setChecked(true);
-      }
-      if (model->getLinkType(idx) == pqLinksModel::Selection)
-      {
-        this->Ui->convertToIndicesCheckBox->setChecked(
-          vtkSMSelectionLink::SafeDownCast(model->getLink(idx))->GetConvertToIndices());
+        case pqLinksModel::Camera:
+          if (model->hasInteractiveViewLink(name))
+          {
+            this->Ui->interactiveViewLinkCheckBox->setChecked(true);
+          }
+          break;
+        case pqLinksModel::Selection:
+          this->Ui->convertToIndicesCheckBox->setChecked(
+            vtkSMSelectionLink::SafeDownCast(model->getLink(idx))->GetConvertToIndices());
+          break;
+        default:
+          break;
       }
     }
   }
@@ -543,17 +592,16 @@ QString pqLinksEditor::linkName()
 
 pqLinksModel::ItemType pqLinksEditor::linkType()
 {
-  if (this->Ui->comboBox->currentIndex() == 0)
+  switch (this->Ui->comboBox->currentIndex())
   {
-    return pqLinksModel::Proxy;
-  }
-  else if (this->Ui->comboBox->currentIndex() == 1)
-  {
-    return pqLinksModel::Property;
-  }
-  else
-  {
-    return pqLinksModel::Selection;
+    case 0:
+      return pqLinksModel::Proxy;
+    case 1:
+      return pqLinksModel::Property;
+    case 2:
+      return pqLinksModel::Selection;
+    default:
+      return pqLinksModel::Unknown;
   }
 }
 
@@ -609,7 +657,7 @@ void pqLinksEditor::updatePropertyList(QListWidget* tw, vtkSMProxy* proxy)
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
   {
     QString name = iter->GetKey();
-    QString type = propertyType(iter->GetProperty());
+    QString type = ::propertyType(iter->GetProperty());
     QString propertyLabel = QString("%1 (%2)").arg(name).arg(type);
     QListWidgetItem* item = new QListWidgetItem(propertyLabel, tw);
     item->setData(Qt::UserRole, name);
@@ -633,8 +681,8 @@ void pqLinksEditor::updateSelectedProxies()
 {
   switch (this->linkType())
   {
-    case (pqLinksModel::Proxy):
-    case (pqLinksModel::Camera):
+    case pqLinksModel::Proxy:
+    case pqLinksModel::Camera:
     {
       this->SelectedProxy1 =
         this->Proxy1Model->getProxy(this->Ui->ObjectTreeProxy1->selectionModel()->currentIndex());
@@ -642,7 +690,7 @@ void pqLinksEditor::updateSelectedProxies()
         this->Proxy2Model->getProxy(this->Ui->ObjectTreeProxy2->selectionModel()->currentIndex());
       break;
     }
-    case (pqLinksModel::Property):
+    case pqLinksModel::Property:
     {
       this->SelectedProxy1 = this->Proxy1Model->getProxy(
         this->Ui->ObjectTreeProperty1->selectionModel()->currentIndex());
@@ -650,7 +698,7 @@ void pqLinksEditor::updateSelectedProxies()
         this->Ui->ObjectTreeProperty2->selectionModel()->currentIndex());
       break;
     }
-    case (pqLinksModel::Selection):
+    case pqLinksModel::Selection:
     {
       this->SelectedProxy1 = this->Proxy1Model->getProxy(
         this->Ui->ObjectTreeSelection1->selectionModel()->currentIndex());
@@ -658,10 +706,10 @@ void pqLinksEditor::updateSelectedProxies()
         this->Ui->ObjectTreeSelection2->selectionModel()->currentIndex());
       break;
     }
-    case (pqLinksModel::Unknown):
+    case pqLinksModel::Unknown:
     {
-      this->SelectedProxy1 = NULL;
-      this->SelectedProxy2 = NULL;
+      this->SelectedProxy1 = nullptr;
+      this->SelectedProxy2 = nullptr;
     }
   }
   this->updateEnabledState();
@@ -687,7 +735,7 @@ void pqLinksEditor::updateEnabledState()
         this->SelectedProxy1->GetProperty(this->SelectedProperty1.toLocal8Bit().data());
       vtkSMProperty* p2 =
         this->SelectedProxy2->GetProperty(this->SelectedProperty2.toLocal8Bit().data());
-      if (!p1 || !p2 || propertyType(p1) != propertyType(p2))
+      if (!p1 || !p2 || ::propertyType(p1) != ::propertyType(p2))
       {
         enabled = false;
       }
@@ -709,13 +757,13 @@ void pqLinksEditor::updateEnabledState()
   this->Ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(enabled);
 
   this->Ui->interactiveViewLinkCheckBox->setVisible(
-    vtkSMViewProxy::SafeDownCast(this->SelectedProxy1) != NULL &&
-    vtkSMViewProxy::SafeDownCast(this->SelectedProxy2) != NULL &&
+    vtkSMViewProxy::SafeDownCast(this->SelectedProxy1) != nullptr &&
+    vtkSMViewProxy::SafeDownCast(this->SelectedProxy2) != nullptr &&
     this->SelectedProxy1 != this->SelectedProxy2 && this->linkType() == pqLinksModel::Proxy);
 
   this->Ui->convertToIndicesCheckBox->setVisible(
-    vtkSMSourceProxy::SafeDownCast(this->SelectedProxy1) != NULL &&
-    vtkSMSourceProxy::SafeDownCast(this->SelectedProxy2) != NULL &&
+    vtkSMSourceProxy::SafeDownCast(this->SelectedProxy1) != nullptr &&
+    vtkSMSourceProxy::SafeDownCast(this->SelectedProxy2) != nullptr &&
     this->SelectedProxy1 != this->SelectedProxy2 && this->linkType() == pqLinksModel::Selection);
 }
 

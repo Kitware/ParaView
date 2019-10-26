@@ -740,6 +740,7 @@ list(APPEND TESTS_WITH_BASELINES
   InteractiveViewLinkState.xml
   LightWidget.xml
   LinesAsTubes.xml
+  LinkRepresentationProperties.xml
   LoadPartiallyUpdatedStateFiles.xml
   LoadSaveStateAnimation.xml
   LoadState.xml
