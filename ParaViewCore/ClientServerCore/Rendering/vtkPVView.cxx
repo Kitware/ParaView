@@ -117,6 +117,13 @@ protected:
     this->Superclass::SetShowWindow(false);
     this->Superclass::SetUseOffScreenBuffers(true);
   }
+  ~vtkOffscreenOpenGLRenderWindow()
+  {
+    // have to finalize here while GetState() will use this classes
+    // vtable. In parent destuctors GetState will return a different
+    // value causing resource/state issues.
+    this->Finalize();
+  }
 
 private:
   vtkOffscreenOpenGLRenderWindow(const vtkOffscreenOpenGLRenderWindow&) = delete;
