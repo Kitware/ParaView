@@ -743,6 +743,13 @@ class ExodusIIReaderFilter(PipelineProxyFilter):
         return prop.get_property_name() in [\
             "FilePrefix", "XMLFileName", "FilePattern", "FileRange"]
 
+class ExtractSelectionFilter(PipelineProxyFilter):
+    def should_never_trace(self, prop):
+        if PipelineProxyFilter.should_never_trace(self, prop): return True
+
+        # Selections are not registered with the proxy manager, so we will not try to trace them.
+        return prop.get_property_name() in ["Selection"]
+
 class RepresentationProxyFilter(PipelineProxyFilter):
     def should_trace_in_ctor(self, prop): return False
 
@@ -870,8 +877,13 @@ class RegisterPipelineProxy(TraceItem):
         ctor = sm._make_name_valid(self.Proxy.GetXMLLabel())
         trace = TraceOutput()
         trace.append("# create a new '%s'" % self.Proxy.GetXMLLabel())
-        filter_type = ExodusIIReaderFilter() \
-            if isinstance(self.Proxy, sm.ExodusIIReaderProxy) else PipelineProxyFilter()
+        if isinstance(self.Proxy, sm.ExodusIIReaderProxy):
+            filter_type = ExodusIIReaderFilter()
+        elif self.Proxy.GetXMLLabel() == "Extract Selection":
+            filter_type = ExtractSelectionFilter()
+        else:
+            filter_type = PipelineProxyFilter()
+
         trace.append(accessor.trace_ctor(ctor, filter_type))
         Trace.Output.append_separated(trace.raw_data())
         TraceItem.finalize(self)
