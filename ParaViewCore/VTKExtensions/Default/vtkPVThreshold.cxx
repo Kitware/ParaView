@@ -69,7 +69,24 @@ int vtkPVThreshold::RequestData(
   if (vtkHyperTreeGrid::SafeDownCast(inDataObj))
   {
     vtkNew<vtkHyperTreeGridThreshold> thresholdFilter;
-    thresholdFilter->ThresholdBetween(this->LowerThreshold, this->UpperThreshold);
+    if (this->ThresholdFunction == &vtkThreshold::Lower)
+    {
+      thresholdFilter->ThresholdBetween(
+        this->LowerThreshold, std::numeric_limits<double>::infinity());
+    }
+    else if (this->ThresholdFunction == &vtkThreshold::Upper)
+    {
+      thresholdFilter->ThresholdBetween(
+        -std::numeric_limits<double>::infinity(), this->UpperThreshold);
+    }
+    else if (this->ThresholdFunction == &vtkThreshold::Between)
+    {
+      thresholdFilter->ThresholdBetween(this->LowerThreshold, this->UpperThreshold);
+    }
+    else
+    {
+      vtkErrorMacro("Threshold function not found");
+    }
 
     vtkDataObject* inputClone = inDataObj->NewInstance();
     inputClone->ShallowCopy(inDataObj);

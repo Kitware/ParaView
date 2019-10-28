@@ -16,7 +16,7 @@
 
   <!-- Test clip plane -->
   <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Clip" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/HyperTreeGridClipFunction/ProxySelectionWidget/comboBox" command="activated" arguments="Axis Aligned Plane" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/HyperTreeGridClipFunction/ProxySelectionWidget/comboBox" command="activated" arguments="Plane" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Invert/CheckBox" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/HyperTreeGridClipFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/originX" command="set_string" arguments="0.6" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/HyperTreeGridClipFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/originY" command="set_string" arguments="0.0" />

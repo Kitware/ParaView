@@ -7288,8 +7288,6 @@ array.
         </ProxyGroupDomain>
         <ProxyListDomain name="proxy_list">
           <Proxy group="implicit_functions"
-                 name="Axis Aligned Plane" />
-          <Proxy group="implicit_functions"
                  name="Plane" />
           <Proxy group="implicit_functions"
                  name="Axis Aligned Box" />
