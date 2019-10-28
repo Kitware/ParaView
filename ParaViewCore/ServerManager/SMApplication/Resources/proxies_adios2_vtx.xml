@@ -4,9 +4,9 @@
     <SourceProxy name="ADIOS2VTXReader"
                  label="ADIOS2VTXReader"
                  class="vtkADIOS2VTXReader" >
-      <Documentation short_help="VTK XML based ADIOS2 Reader">
-        Read an ADIOS2 BP file with embeded VTK XML Schema for vti and vtu
-        types either as an attribute or as a subfile.
+      <Documentation short_help="VTX: VTK-XML schema based ADIOS2 Reader">
+        Read an ADIOS2 BP file with embeded VTK XML Schema for vti (Image) and
+        vtu (UnstructuredGrid) types either as an attribute or as a subfile.
       </Documentation>
       <StringVectorProperty
             name="FileName"
@@ -15,7 +15,7 @@
             number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          This property sets the file name
+          This property sets the file or directory name.
         </Documentation>
       </StringVectorProperty>
 
@@ -29,10 +29,13 @@
       </DoubleVectorProperty>
 
       <Hints>
-        <ReaderFactory
-            extensions="bp"
-            file_description="ADIOS2 BP3 File (VTX)" />
+        <ReaderFactory extensions="bp"
+                       file_description="VTX reader: ADIOS2 BP3 File" />
+        <ReaderFactory extensions="bp bp4"
+                       is_directory="1"
+                       file_description="VTX reader: ADIOS2 BP4 Directory" />
       </Hints>
+
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
