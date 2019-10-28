@@ -4500,7 +4500,7 @@ array.
         </DataTypeDomain>
         <Documentation>This property specifies the input to the Cell Validation filter.</Documentation>
       </InputProperty>
-      <!-- End CellSize -->
+      <!-- End ValidateCells -->
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPCellSizeFilter"
