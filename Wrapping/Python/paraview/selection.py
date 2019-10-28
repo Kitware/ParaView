@@ -160,6 +160,9 @@ def _surfaceSelectionHelper(rectOrPolygon, view, type, Modifier=None):
     if not view.SMProxy.IsA('vtkSMRenderViewProxy'):
         return
 
+    # ensure the view has rendered so that the selection is valid
+    paraview.simple.Render(view)
+
     if len(rectOrPolygon) == 0:
         rectOrPolygon = [0, 0, view.ViewSize[0], view.ViewSize[1]]
 
