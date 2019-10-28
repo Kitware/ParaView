@@ -145,11 +145,13 @@ def _collectSelectionPorts(selectedReps, selectionSources, SelectBlocks=False, M
 
     return outputPorts
 
-def _surfaceSelectionHelper(rect, view, type, Modifier=None):
+def _surfaceSelectionHelper(rectOrPolygon, view, type, Modifier=None):
     """ Selects mesh elements on a surface
 
-    - rect - list containing bottom left (x1, y1) and top right (x2, y2) corner of a
-      rectangle defining the selection region in the format [x1, y1, x2, y2].
+    - rectOrPolygon - represents either a rectangle or polygon. If a rectangle, consists of a list
+      containing the bottom left (x1, y1) and top right (x2, y2) corner of a rectangle defining the
+      selection region in the format [x1, y1, x2, y2]. If a polygon, list of points defining the
+      polygon in x-y pairs (e.g., [x1, y1, x2, y2, x3, y3,...])
     - view - the view in which to make the selection
     - type - the type of mesh element: 'POINT', 'CELL', or 'BLOCK'
     - Modifier - 'ADD', 'SUBTRACT', 'TOGGLE', or None to define whether and how the selection
@@ -158,8 +160,8 @@ def _surfaceSelectionHelper(rect, view, type, Modifier=None):
     if not view.SMProxy.IsA('vtkSMRenderViewProxy'):
         return
 
-    if len(rect) == 0:
-        rect = [0, 0, view.ViewSize[0], view.ViewSize[1]]
+    if len(rectOrPolygon) == 0:
+        rectOrPolygon = [0, 0, view.ViewSize[0], view.ViewSize[1]]
 
     from paraview.vtk import vtkCollection, vtkIntArray
 
@@ -170,17 +172,17 @@ def _surfaceSelectionHelper(rect, view, type, Modifier=None):
         polygon = vtkIntArray()
         polygon.SetNumberOfComponents(2)
 
-        for component in rect:
+        for component in rectOrPolygon:
             polygon.InsertNextValue(component)
 
     if type == 'POINT':
-        view.SelectSurfacePoints(rect, selectedReps, selectionSources, 0)
+        view.SelectSurfacePoints(rectOrPolygon, selectedReps, selectionSources, 0)
     elif type == 'CELL' or type == 'BLOCK':
-        view.SelectSurfaceCells(rect, selectedReps, selectionSources, 0)
+        view.SelectSurfaceCells(rectOrPolygon, selectedReps, selectionSources, 0)
     elif type == 'FRUSTUM_POINTS':
-        view.SelectFrustumPoints(rect, selectedReps, selectionSources, 0)
+        view.SelectFrustumPoints(rectOrPolygon, selectedReps, selectionSources, 0)
     elif type == 'FRUSTUM_CELLS':
-        view.SelectFrustumCells(rect, selectedReps, selectionSources, 0)
+        view.SelectFrustumCells(rectOrPolygon, selectedReps, selectionSources, 0)
     elif type == 'POLYGON_POINTS':
         view.SelectPolygonPoints(polygon, selectedReps, selectionSources, 0)
     elif type == 'POLYGON_CELLS':
