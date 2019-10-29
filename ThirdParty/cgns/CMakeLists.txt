@@ -1,7 +1,7 @@
 vtk_module_third_party(
   INTERNAL
     LICENSE_FILES "vtkcgns/license.txt"
-    VERSION       "3.3.1"
+    VERSION       "3.4.0"
     STANDARD_INCLUDE_DIRS
   EXTERNAL
     PACKAGE CGNS
