@@ -202,6 +202,11 @@ bool vtkPVContextView::Export(vtkCSVExporter* exporter)
 //----------------------------------------------------------------------------
 std::string vtkPVContextView::GetFormattedTitle()
 {
+  if (!this->GetTitle())
+  {
+    return std::string();
+  }
+
   std::string formattedTitle = this->GetTitle();
 
   std::string key = "${TIME}";
