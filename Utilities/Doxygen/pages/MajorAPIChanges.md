@@ -45,14 +45,24 @@ Major highlights/changes are as follows:
    using `vtkPVView::GetDeliveredPiece` in `vtkPVView::REQUEST_RENDER`
    (`vtkPVRenderView::GetPieceProducer` is still supported, but we encourage developers
    to prefer the new `GetDeliveredPiece` API instead).
-2. When cached data is available, `REQUEST_UPDATE` request will no longer result
+2. To ensure that the view creates a delivery manager of appropriate type, you
+   may have to add the delivery manager as a subproxy, as shown in the example
+   below:
+
+    <SubProxy command="SetDeliveryManager">
+       <Proxy name="DeliveryManager"
+         proxygroup="delivery_managers"
+         proxyname="ContextViewDeliveryManager"/>
+     </SubProxy>
+
+3. When cached data is available, `REQUEST_UPDATE` request will no longer result
    in a call to `vtkPVDataRepresentation::RequestData`. The representation will
    be provided the cached data during `REQUEST_RENDER` pass. Note, if using
    cache, you may get data that has older `MTime`, thus representation should
    not assume monotonically increasing m-times for delivered data. Rendering
    pipelines in representations can thus rely on the mtime and data pointer to
    build their own rendering objects cache, if needed.
-3. Representations always have to let the view do data transfer and obtain the
+4. Representations always have to let the view do data transfer and obtain the
    data to render from the view and never simply connect the data prepared in
    `RequestData` to mappers, for example. This was acceptable in certain cases
    before, but not longer supported since `RequestData` will not get called
