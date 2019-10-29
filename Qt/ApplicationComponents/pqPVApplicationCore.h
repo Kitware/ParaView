@@ -102,11 +102,6 @@ public:
 
   void loadStateFromPythonFile(const QString& filename, pqServer* server);
 
-  /**
-   * INTERNAL. Do not use.
-   */
-  void _paraview_client_environment_complete();
-
 public slots:
   /**
   * Pops-up the quick launch dialog.
@@ -125,12 +120,6 @@ signals:
   * dialog.
   */
   void aboutToShowQuickLaunch();
-
-  /**
-   * Fired when the ParaView Client infrastructure has completed setting up the
-   * environment.
-   */
-  void clientEnvironmentDone();
 
 protected:
   /**

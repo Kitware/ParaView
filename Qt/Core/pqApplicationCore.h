@@ -288,6 +288,11 @@ public:
   */
   ~pqApplicationCore() override;
 
+  /**
+   * INTERNAL. Do not use.
+   */
+  void _paraview_client_environment_complete();
+
 public slots:
 
   /**
@@ -357,6 +362,12 @@ signals:
   * Fired when master changed. true if current user is master, false otherwise.
   */
   void updateMasterEnableState(bool);
+
+  /**
+   * Fired when the ParaView Client infrastructure has completed setting up the
+   * environment.
+   */
+  void clientEnvironmentDone();
 
 protected slots:
   void onStateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* locator);

@@ -724,3 +724,17 @@ void pqApplicationCore::generalSettingsChanged()
         pvsettings->GetRealNumberDisplayedNotation()));
   }
 }
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::_paraview_client_environment_complete()
+{
+  static bool Initialized = false;
+  if (Initialized)
+  {
+    return;
+  }
+
+  Initialized = true;
+  vtkVLogScopeF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "clientEnvironmentDone");
+  emit this->clientEnvironmentDone();
+}
