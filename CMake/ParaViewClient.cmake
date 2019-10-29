@@ -12,7 +12,7 @@ paraview_client_add(
   VERSION <version>
   SOURCES <source>...
   [APPLICATION_XMLS <xml>...]
-  [QCH_FILE <file>]
+  [QCH_FILES <file>...]
 
   [MAIN_WINDOW_CLASS    <class>]
   [MAIN_WINDOW_INCLUDE  <include>]
@@ -47,7 +47,7 @@ paraview_client_add(
   * `VERSION`: (Required) The version of the application.
   * `SOURCES`: (Required) Source files for the application.
   * `APPLICATION_XMLS`: Server manager XML files.
-  * `QCH_FILE`: The `.qch` file containing documentation.
+  * `QCH_FILES`: Any `.qch` files containing documentation.
   * `MAIN_WINDOW_CLASS`: (Defaults to `QMainWindow`) The name of the main
     window class.
   * `MAIN_WINDOW_INCLUDE`: (Defaults to `QMainWindow` or
@@ -87,7 +87,7 @@ function (paraview_client_add)
   cmake_parse_arguments(_paraview_client
     ""
     "NAME;APPLICATION_NAME;ORGANIZATION;TITLE;SPLASH_IMAGE;BUNDLE_DESTINATION;BUNDLE_ICON;BUNDLE_PLIST;APPLICATION_ICON;MAIN_WINDOW_CLASS;MAIN_WINDOW_INCLUDE;VERSION;FORCE_UNIX_LAYOUT;PLUGINS_TARGET;DEFAULT_STYLE;RUNTIME_DESTINATION;LIBRARY_DESTINATION;NAMESPACE;EXPORT"
-    "REQUIRED_PLUGINS;OPTIONAL_PLUGINS;APPLICATION_XMLS;SOURCES;QCH_FILE;PLUGINS_TARGETS"
+    "REQUIRED_PLUGINS;OPTIONAL_PLUGINS;APPLICATION_XMLS;SOURCES;QCH_FILES;QCH_FILE;PLUGINS_TARGETS"
     ${ARGN})
 
   if (_paraview_client_UNPARSED_ARGUMENTS)
@@ -155,6 +155,20 @@ function (paraview_client_add)
   if (NOT DEFINED _paraview_client_LIBRARY_DESTINATION)
     set(_paraview_client_LIBRARY_DESTINATION
       "${CMAKE_INSTALL_LIBDIR}")
+  endif ()
+
+  if (DEFINED _paraview_client_QCH_FILE)
+    if (DEFINED _paraview_client_QCH_FILES)
+      message(FATAL_ERROR
+        "The `paraview_client_add(QCH_FILE)` argument is incompatible "
+        "with `QCH_FILES`.")
+    else ()
+      message(DEPRECATION
+        "The `paraview_client_add(QCH_FILE)` argument is deprecated in "
+        "favor of `QCH_FILES`.")
+      set(_paraview_client_QCH_FILES
+        "${_paraview_client_QCH_FILE}")
+    endif ()
   endif ()
 
   if (NOT DEFINED _paraview_client_MAIN_WINDOW_CLASS)
@@ -252,7 +266,7 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
     set(CMAKE_AUTORCC 1)
   endif ()
 
-  if (DEFINED _paraview_client_QCH_FILE)
+  if (DEFINED _paraview_client_QCH_FILES)
     set(_paraview_client_documentation_base_name
       "${_paraview_client_NAME}_documentation")
     set(_paraview_client_documentation_resource_file
@@ -262,10 +276,10 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
       OUTPUT  "${_paraview_client_documentation_resource_file}"
       # This prefix is part of the API.
       PREFIX  "/${_paraview_client_NAME}/Documentation"
-      FILES   "${_paraview_client_QCH_FILE}")
+      FILES   ${_paraview_client_QCH_FILES})
     set_property(SOURCE "${_paraview_client_documentation_resource_file}"
       PROPERTY
-        OBJECT_DEPENDS "${_paraview_client_QCH_FILE}")
+        OBJECT_DEPENDS "${_paraview_client_QCH_FILES}")
 
     list(APPEND _paraview_client_resource_files
       "${_paraview_client_documentation_resource_file}")
