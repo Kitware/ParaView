@@ -321,13 +321,23 @@ public:
     {
       throw CGIOError("Invalid data type for `BC_t` node.");
     }
+    this->Location = CGNS_ENUMV(FaceCenter);
 
     std::string bctype;
     CGNSRead::readNodeStringData(cgioNum, nodeId, bctype);
     if (bctype != "FamilySpecified")
     {
-      throw CGIOUnsupported(
-        std::string("BC_t type '") + bctype + std::string("' not supported yet."));
+      // waiting for c++20 to be replaced by starts_with
+      if (bctype.rfind("BCWall", 0) == 0)
+      {
+        // Temporary Fallback for WALL bcs for old meshes
+        this->FamilyName = "Wall";
+      }
+      else
+      {
+        throw CGIOUnsupported(
+          std::string("BC_t type '") + bctype + std::string("' not supported yet."));
+      }
     }
 
     std::vector<double> childrenIds;
@@ -345,7 +355,11 @@ public:
       }
       else if (strcmp(nodeName, "PointRange") == 0)
       {
-
+        CGNSRead::readNodeDataAs<vtkTypeInt64>(cgioNum, *iter, this->BCElementRange);
+      }
+      else if (strcmp(nodeName, "ElementRange") == 0)
+      {
+        // Usage of ElementRange in BC is deprecated but still found... may be add a warning
         CGNSRead::readNodeDataAs<vtkTypeInt64>(cgioNum, *iter, this->BCElementRange);
       }
       else if (strcmp(nodeLabel, "FamilyName_t") == 0)
@@ -1240,49 +1254,256 @@ int vtkCGNSReader::vtkPrivate::readBCData(const double nodeId, const int cellDim
       {
         std::vector<double> BCDataArrayIds;
         CGNSRead::getNodeChildrenId(self->cgioNum, BCDataChild, BCDataArrayIds);
-        // TODO: parse list array and detect vector before loading data
-        // TODO: Adapt type of array to handle R4/R8 and not force R8
         // number Of Values to load per Array for the BCData
         vtkIdType numValues = dataset->GetNumberOfCells();
         if (varCentering == CGNS_ENUMV(Vertex))
         {
           numValues = dataset->GetNumberOfPoints();
         }
-        // Array loading
+        std::vector<double> varIds;
+        std::vector<CGNSRead::CGNSVariable> cgnsVars;
+        std::vector<CGNSRead::CGNSVector> cgnsVectors;
+        std::vector<vtkDataArray*> vtkVars;
+        // Array Creation
+        // Do not care about IsVarEnable right now
+        // Maybe use AllocateVtkArray later
         for (auto& ArrayId : BCDataArrayIds)
         {
-          std::vector<double> data;
-          CGIOErrorSafe(cgio_get_name(self->cgioNum, ArrayId, nodeName));
-          CGNSRead::readNodeDataAs<double>(self->cgioNum, ArrayId, data);
-          vtkIdType dataSize = static_cast<vtkIdType>(data.size());
-          // Create vtk
-          vtkNew<vtkDoubleArray> vtkBCdata;
-          vtkBCdata->SetName(nodeName);
-          vtkBCdata->SetNumberOfComponents(1);
-          vtkBCdata->SetNumberOfTuples(numValues);
-          if (dataSize == 1)
+          CGIOErrorSafe(cgio_get_label(self->cgioNum, ArrayId, nodeLabel));
+
+          if (strcmp(nodeLabel, "DataArray_t") == 0)
           {
-            // This is an uniform boundary condition value
-            for (vtkIdType idx = 0; idx < numValues; ++idx)
+            CGNSRead::CGNSVariable curVar;
+            CGIOErrorSafe(cgio_get_name(self->cgioNum, ArrayId, curVar.name));
+            curVar.isComponent = false;
+            curVar.xyzIndex = 0;
+
+            // read node data type
+            CGNSRead::char_33 dataType;
+            if (cgio_get_data_type(self->cgioNum, ArrayId, dataType))
             {
-              vtkBCdata->SetTuple(idx, &data[0]);
+              continue;
+            }
+            if (strcmp(dataType, "R8") == 0)
+            {
+              curVar.dt = CGNS_ENUMV(RealDouble);
+            }
+            else if (strcmp(dataType, "R4") == 0)
+            {
+              curVar.dt = CGNS_ENUMV(RealSingle);
+            }
+            else if (strcmp(dataType, "I4") == 0)
+            {
+              curVar.dt = CGNS_ENUMV(Integer);
+            }
+            else if (strcmp(dataType, "I8") == 0)
+            {
+              curVar.dt = CGNS_ENUMV(LongInteger);
+            }
+            else
+            {
+              continue;
+            }
+            cgnsVars.push_back(curVar);
+            varIds.push_back(ArrayId);
+          }
+        }
+        CGNSRead::fillVectorsFromVars(cgnsVars, cgnsVectors, physicalDim);
+        for (std::size_t var = 0; var < cgnsVars.size(); var++)
+        {
+          vtkVars[var] = 0;
+          if (cgnsVars[var].isComponent == false)
+          {
+            switch (cgnsVars[var].dt)
+            {
+              case CGNS_ENUMV(Integer):
+                vtkVars[var] = vtkIntArray::New();
+                break;
+              case CGNS_ENUMV(LongInteger):
+                vtkVars[var] = vtkLongArray::New();
+                break;
+              case CGNS_ENUMV(RealSingle):
+                vtkVars[var] = vtkFloatArray::New();
+                break;
+              case CGNS_ENUMV(RealDouble):
+                vtkVars[var] = vtkDoubleArray::New();
+                break;
+              default:
+                continue;
+            }
+            vtkVars[var]->SetName(cgnsVars[var].name);
+            vtkVars[var]->SetNumberOfComponents(1);
+            vtkVars[var]->SetNumberOfTuples(numValues);
+          }
+        }
+
+        for (std::vector<CGNSRead::CGNSVector>::const_iterator iter = cgnsVectors.begin();
+             iter != cgnsVectors.end(); ++iter)
+        {
+          vtkDataArray* arr = 0;
+
+          if (vtkPrivate::IsVarEnabled(varCentering, iter->name, self) == false)
+          {
+            continue;
+          }
+
+          int nv = iter->xyzIndex[0];
+          switch (cgnsVars[nv].dt)
+          {
+            case CGNS_ENUMV(Integer):
+              arr = vtkIntArray::New();
+              break;
+            case CGNS_ENUMV(LongInteger):
+              arr = vtkLongArray::New();
+              break;
+            case CGNS_ENUMV(RealSingle):
+              arr = vtkFloatArray::New();
+              break;
+            case CGNS_ENUMV(RealDouble):
+              arr = vtkDoubleArray::New();
+              break;
+            default:
+              continue;
+          }
+
+          arr->SetName(iter->name);
+          arr->SetNumberOfComponents(physicalDim);
+          arr->SetNumberOfTuples(numValues);
+
+          for (int dim = 0; dim < physicalDim; ++dim)
+          {
+            arr->SetComponentName(static_cast<vtkIdType>(dim), cgnsVars[iter->xyzIndex[dim]].name);
+            vtkVars[iter->xyzIndex[dim]] = arr;
+          }
+        }
+        // Now Load Boundary Values
+        for (std::size_t ff = 0; ff < cgnsVars.size(); ++ff)
+        {
+          // only read allocated fields
+          if (vtkVars[ff] == 0)
+          {
+            continue;
+          }
+          double cgioVarId = varIds[ff];
+
+          cgsize_t dataSize = 1;
+          cgsize_t dimVals[12];
+          int n, ndim;
+
+          if (cgio_get_dimensions(self->cgioNum, cgioVarId, &ndim, dimVals) != CG_OK)
+          {
+            cgio_error_exit("cgio_get_dimensions");
+            return 1;
+          }
+
+          // allocate data
+          for (n = 0; n < ndim; n++)
+          {
+            dataSize *= dimVals[n];
+          }
+          if (dataSize <= 0)
+          {
+            continue;
+          }
+          //
+          if (dataSize == 1 || dataSize == numValues)
+          {
+            // quick transfer of data because data types is given by cgns database
+            if (cgnsVars[ff].isComponent == false)
+            {
+              if (cgio_read_all_data(
+                    self->cgioNum, cgioVarId, (void*)vtkVars[ff]->GetVoidPointer(0)) != CG_OK)
+              {
+                char message[81];
+                cgio_error_message(message);
+                vtkGenericWarningMacro(<< "cgio_read_data :" << message);
+              }
+              if (dataSize == 1)
+              {
+                // This is an uniform boundary condition value
+                for (vtkIdType idx = 1; idx < numValues; ++idx)
+                {
+                  vtkVars[ff]->SetTuple(idx, vtkVars[ff]->GetTuple(0));
+                }
+              }
+            }
+            else
+            {
+              //
+              // VECTORS aliasing ...
+              // Source
+              cgsize_t fieldSrcStart[3] = { 1, 1, 1 };
+              cgsize_t fieldSrcStride[3] = { 1, 1, 1 };
+              cgsize_t fieldSrcEnd[3];
+
+              // Destination Memory
+              cgsize_t fieldVectMemStart[3] = { 1, 1, 1 };
+              cgsize_t fieldVectMemStride[3] = { 3, 1, 1 };
+              cgsize_t fieldVectMemEnd[3] = { 1, 1, 1 };
+              cgsize_t fieldVectMemDims[3] = { 1, 1, 1 };
+
+              fieldSrcEnd[0] = static_cast<cgsize_t>(dataSize);
+              fieldVectMemStride[0] = static_cast<cgsize_t>(physicalDim);
+              fieldVectMemDims[0] = fieldSrcEnd[0] * fieldVectMemStride[0];
+              fieldVectMemEnd[0] = fieldSrcEnd[0] * fieldVectMemStride[0];
+
+              if (cgio_read_data(self->cgioNum, cgioVarId, fieldSrcStart, fieldSrcEnd,
+                    fieldSrcStride, 1, fieldVectMemDims, fieldVectMemStart, fieldVectMemEnd,
+                    fieldVectMemStride,
+                    (void*)vtkVars[ff]->GetVoidPointer(cgnsVars[ff].xyzIndex - 1)) != CG_OK)
+              {
+                char message[81];
+                cgio_error_message(message);
+                vtkGenericWarningMacro(<< "cgio_read_data :" << message);
+              }
+              if (dataSize == 1)
+              {
+                // This is an uniform boundary condition value
+                for (vtkIdType idx = 1; idx < numValues; ++idx)
+                {
+                  vtkVars[ff]->SetComponent(idx, cgnsVars[ff].xyzIndex - 1,
+                    vtkVars[ff]->GetComponent(0, cgnsVars[ff].xyzIndex - 1));
+                }
+              }
             }
           }
-          else if (dataSize == numValues)
+        }
+
+        // Append data to dataset
+        vtkDataSetAttributes* dsa = 0;
+        if (varCentering == CGNS_ENUMV(Vertex)) // Vertex
+        {
+          dsa = dataset->GetPointData();
+        }
+        if (varCentering == CGNS_ENUMV(FaceCenter)) // Face Center
+        {
+          dsa = dataset->GetCellData();
+        }
+
+        // SetData in zone dataset & clean pointers
+        for (std::size_t nv = 0; nv < vtkVars.size(); ++nv)
+        {
+          // only transfer allocated fields
+          if (vtkVars[nv] == 0)
           {
-            for (vtkIdType idx = 0; idx < numValues; ++idx)
+            continue;
+          }
+
+          if (cgnsVars[nv].isComponent == false)
+          {
+            dsa->AddArray(vtkVars[nv]);
+            vtkVars[nv]->Delete();
+          }
+          else if (cgnsVars[nv].xyzIndex == 1)
+          {
+            dsa->AddArray(vtkVars[nv]);
+            if (!dsa->GetVectors() && physicalDim == 3)
             {
-              vtkBCdata->SetTuple(idx, &data[idx]);
+              dsa->SetVectors(vtkVars[nv]);
             }
+            vtkVars[nv]->Delete();
           }
-          if (varCentering == CGNS_ENUMV(FaceCenter))
-          {
-            dataset->GetCellData()->AddArray(vtkBCdata.Get());
-          }
-          else if (varCentering == CGNS_ENUMV(Vertex))
-          {
-            dataset->GetPointData()->AddArray(vtkBCdata.Get());
-          }
+          vtkVars[nv] = 0;
         }
         CGNSRead::releaseIds(self->cgioNum, BCDataArrayIds);
       }
@@ -1910,6 +2131,7 @@ int vtkCGNSReader::GetUnstructuredZone(
   // Find section layout
   // Section is composed of => 1 Volume + bnd surfaces
   //                        => multi-Volume + Bnd surfaces
+  // bnd surfaces are pointed to by bc_t nodes !
   // determine dim to allocate for connectivity reading
   cgsize_t elementCoreSize = 0;
   vtkIdType numCoreCells = 0;
@@ -3082,217 +3304,751 @@ int vtkCGNSReader::GetUnstructuredZone(
   }
   else if (bndSec.size() > 0 && requiredPatch)
   {
-    // mzone Set Blocks
-    mzone->SetBlock(0, ugrid.Get());
-    vtkMultiBlockDataSet* mpatch = vtkMultiBlockDataSet::New();
-    mpatch->SetNumberOfBlocks(static_cast<unsigned int>(bndSec.size()));
-
-    int bndNum = 0;
-    for (std::vector<int>::iterator iter = bndSec.begin(); iter != bndSec.end(); ++iter)
+    //----------------------------------------------------------------------------
+    // Handle boundary conditions (BC) patches for unstructured grid
+    //----------------------------------------------------------------------------
+    mzone->SetBlock(0u, ugrid.Get());
+    mzone->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "Internal");
+    //
+    vtkNew<vtkMultiBlockDataSet> patchesMB;
+    mzone->SetBlock(1, patchesMB.Get());
+    mzone->GetMetaData(1)->Set(vtkCompositeDataSet::NAME(), "Patches");
+    //
+    // Build Multi Patches
+    //
+    std::vector<double> zoneChildren;
+    CGNSRead::getNodeChildrenId(this->cgioNum, this->currentId, zoneChildren);
+    for (auto iter = zoneChildren.begin(); iter != zoneChildren.end(); ++iter)
     {
-      int sec = *iter;
-      CGNS_ENUMT(ElementType_t) elemType = CGNS_ENUMV(ElementTypeNull);
-      cgsize_t start = 1;
-      cgsize_t end = 1;
-      cgsize_t elementSize = 0;
-
-      start = sectionInfoList[sec].range[0];
-      end = sectionInfoList[sec].range[1];
-      elemType = sectionInfoList[sec].elemType;
-
-      mpatch->GetMetaData(static_cast<unsigned int>(bndNum))
-        ->Set(vtkCompositeDataSet::NAME(), sectionInfoList[sec].name);
-      elementSize = end - start + 1; // Bnd Volume + Bnd
-      if (start < zsize[1])
+      CGNSRead::char_33 nodeLabel;
+      cgio_get_label(cgioNum, (*iter), nodeLabel);
+      if (strcmp(nodeLabel, "ZoneBC_t") != 0)
       {
-        vtkErrorMacro(<< "ERROR:: Internal Section\n");
+        continue;
       }
 
-      int* bndCellsTypes = new int[elementSize];
-      if (bndCellsTypes == 0)
+      const double zoneBCId = (*iter);
+
+      // iterate over all children and read supported BC_t nodes.
+      std::vector<double> zoneBCChildren;
+      CGNSRead::getNodeChildrenId(this->cgioNum, zoneBCId, zoneBCChildren);
+      for (auto bciter = zoneBCChildren.begin(); bciter != zoneBCChildren.end(); ++bciter)
       {
-        vtkErrorMacro(<< "Could not allocate memory for connectivity\n");
-        return 1;
-      }
-
-      cgsize_t eDataSize = 0;
-      cgsize_t EltsEnd = elementSize + start - 1;
-      eDataSize = sectionInfoList[sec].eDataSize;
-
-      vtkDebugMacro(<< "Element data size for sec " << sec << " is: " << eDataSize << "\n");
-      //
-      cgsize_t elementBndSize = 0;
-      elementBndSize = eDataSize;
-      vtkIdTypeArray* IdBndArray_ptr = vtkIdTypeArray::New();
-      vtkIdType* bndElements = NULL;
-
-      double cgioSectionId;
-      cgioSectionId = elemIdList[sec];
-      //
-      if (elemType != CGNS_ENUMV(MIXED) && elemType != CGNS_ENUMV(NGON_n) &&
-        elemType != CGNS_ENUMV(NFACE_n))
-      {
-        // All cells are of the same type.
-        int numPointsPerCell = 0;
-        int cellType;
-        bool higherOrderWarning;
-        bool reOrderElements;
-        //
-        if (cg_npe(elemType, &numPointsPerCell) || numPointsPerCell == 0)
+        char label[CGIO_MAX_LABEL_LENGTH + 1];
+        cgio_get_label(this->cgioNum, *bciter, label);
+        if (strcmp(label, "BC_t") == 0)
         {
-          vtkErrorMacro(<< "Invalid numPointsPerCell\n");
-        }
-
-        cellType = CGNSRead::GetVTKElemType(elemType, higherOrderWarning, reOrderElements);
-        //
-        for (vtkIdType i = 0; i < elementSize; ++i)
-        {
-          bndCellsTypes[i] = cellType;
-        }
-        //
-        elementBndSize = (numPointsPerCell + 1) * elementSize;
-        IdBndArray_ptr->SetNumberOfValues(elementBndSize);
-        bndElements = IdBndArray_ptr->GetPointer(0);
-        if (bndElements == 0)
-        {
-          vtkErrorMacro(<< "Could not allocate memory for bnd connectivity\n");
-          return 1;
-        }
-
-        if (eDataSize != numPointsPerCell * elementSize)
-        {
-          vtkErrorMacro(<< "Wrong elements dimensions\n");
-        }
-
-        // pointer on start !!
-        vtkIdType* locElements = &(bndElements[0]);
-
-        cgsize_t memDim[2];
-        cgsize_t npe = numPointsPerCell;
-
-        srcStart[0] = 1;
-        srcStart[1] = 1;
-
-        srcEnd[0] = (EltsEnd - start + 1) * npe;
-        srcStride[0] = 1;
-
-        memStart[0] = 2;
-        memStart[1] = 1;
-        memEnd[0] = npe + 1;
-        memEnd[1] = EltsEnd - start + 1;
-        memStride[0] = 1;
-        memStride[1] = 1;
-        memDim[0] = npe + 1;
-        memDim[1] = EltsEnd - start + 1;
-
-        CGNSRead::get_section_connectivity(this->cgioNum, cgioSectionId, 2, srcStart, srcEnd,
-          srcStride, memStart, memEnd, memStride, memDim, locElements);
-
-        // Add numptspercell and do -1 on indexes
-        for (vtkIdType icell = 0; icell < elementSize; ++icell)
-        {
-          vtkIdType pos = icell * (numPointsPerCell + 1);
-          locElements[pos] = static_cast<vtkIdType>(numPointsPerCell);
-          for (vtkIdType ip = 0; ip < numPointsPerCell; ip++)
+          try
           {
-            pos++;
-            locElements[pos] = locElements[pos] - 1;
+            BCInformationUns binfo(this->cgioNum, *bciter, cellDim);
+            if (sil->ReadPatch(basename, zonename, binfo.Name))
+            {
+              // Common struct to read from BCElementList or BCElementRange
+              vtkNew<vtkCellArray> bcCells;
+              int* bcCellsTypes = nullptr;
+              // Read unstructured grids ...
+              //------------------------------------
+              if (binfo.BCElementRange.size() == 2)
+              {
+                vtkIdType bcStartElemId = binfo.BCElementRange[0];
+                vtkIdType bcEndElemId = binfo.BCElementRange[1];
+                vtkIdType numElemToRead = bcEndElemId - bcStartElemId + 1;
+                vtkIdType residualNumElemToRead = bcEndElemId - bcStartElemId + 1;
+                //
+                // compute number of bnd section to read to allocate element type array
+                // and connectivity array
+                std::vector<int> bndSecToUse;
+                std::vector<cgsize_t> numElemToReadBndSec;
+                std::vector<cgsize_t> sizeAllocForEachSection;
+                std::vector<cgsize_t> startReadingPos;
+
+                for (std::vector<int>::iterator bndIter = bndSec.begin(); bndIter != bndSec.end();
+                     ++bndIter)
+                {
+                  int curSec = *bndIter;
+                  CGNS_ENUMT(ElementType_t) elemType = CGNS_ENUMV(ElementTypeNull);
+                  // Compute range intersection with current section
+                  //------------------------------------------------
+                  cgsize_t startBndElemId = std::max(sectionInfoList[curSec].range[0],
+                    static_cast<cgsize_t>(binfo.BCElementRange[0]));
+                  cgsize_t endBndElemId = std::min(sectionInfoList[curSec].range[1],
+                    static_cast<cgsize_t>(binfo.BCElementRange[1]));
+                  cgsize_t numBndElemToRead = endBndElemId - startBndElemId + 1;
+
+                  if (numBndElemToRead <= 0)
+                    continue;
+
+                  elemType = sectionInfoList[curSec].elemType;
+
+                  if (numBndElemToRead ==
+                    (sectionInfoList[curSec].range[1] - sectionInfoList[curSec].range[0] + 1))
+                  {
+                    // Read whole section
+                    if (elemType != CGNS_ENUMV(MIXED))
+                    {
+                      sizeAllocForEachSection.push_back(
+                        sectionInfoList[curSec].eDataSize + numBndElemToRead);
+                    }
+                    else
+                    {
+                      sizeAllocForEachSection.push_back(sectionInfoList[curSec].eDataSize);
+                    }
+                    startReadingPos.push_back(0);
+                  }
+                  else
+                  {
+                    // Partial read of section
+                    if (elemType != CGNS_ENUMV(MIXED))
+                    {
+                      // All cells are of the same type.
+                      int numPointsPerCell = 0;
+                      cgsize_t startPosIdx = startBndElemId - sectionInfoList[curSec].range[0];
+                      //
+                      if (cg_npe(elemType, &numPointsPerCell) || numPointsPerCell == 0)
+                      {
+                        vtkErrorMacro(<< "Invalid numPointsPerCell\n");
+                      }
+                      sizeAllocForEachSection.push_back((numPointsPerCell + 1) * numBndElemToRead);
+                      startPosIdx *= static_cast<cgsize_t>(numPointsPerCell);
+                      startReadingPos.push_back(startPosIdx);
+                    }
+                    else if (elemType == CGNS_ENUMV(MIXED))
+                    {
+                      cgsize_t memDim[2];
+                      cgsize_t offsetDataSize(0);
+                      cgsize_t startPosIdx(0);
+                      cgsize_t endPosIdx(0);
+                      // Maybe bndElementsIdx should use cgsize_t but since get_section_start_offset
+                      // already exists and use vtkIdType...
+                      std::vector<vtkIdType> bndElementsIdx;
+                      offsetDataSize =
+                        sectionInfoList[curSec].range[1] - sectionInfoList[curSec].range[0] + 2;
+                      bndElementsIdx.resize(offsetDataSize);
+
+                      srcStart[0] = 1;
+                      srcEnd[0] = offsetDataSize;
+                      srcStride[0] = 1;
+
+                      memStart[0] = 1;
+                      memStart[1] = 1;
+                      memEnd[0] = offsetDataSize;
+                      memEnd[1] = 1;
+                      memStride[0] = 1;
+                      memStride[1] = 1;
+                      memDim[0] = offsetDataSize;
+                      memDim[1] = 1;
+
+                      if (0 != CGNSRead::get_section_start_offset(this->cgioNum, elemIdList[curSec],
+                                 1, srcStart, srcEnd, srcStride, memStart, memEnd, memStride,
+                                 memDim, &(bndElementsIdx[0])))
+                      {
+                        // no bndElementsIdx read so create it
+                        // This is the worst case situation
+                        cgsize_t fDataSize(0);
+                        int numPointsPerCell = 0;
+                        std::vector<vtkIdType> bndElements;
+
+                        fDataSize = sectionInfoList[curSec].eDataSize;
+                        bndElements.resize(fDataSize);
+
+                        srcStart[0] = 1;
+                        srcEnd[0] = fDataSize;
+                        srcStride[0] = 1;
+
+                        memStart[0] = 1;
+                        memStart[1] = 1;
+                        memEnd[0] = fDataSize;
+                        memEnd[1] = 1;
+                        memStride[0] = 1;
+                        memStride[1] = 1;
+
+                        memDim[0] = fDataSize;
+                        memDim[1] = 1;
+
+                        if (0 != CGNSRead::get_section_connectivity(this->cgioNum,
+                                   elemIdList[curSec], 1, srcStart, srcEnd, srcStride, memStart,
+                                   memEnd, memStride, memDim, &(bndElements[0])))
+                        {
+                          vtkErrorMacro("FAILED to read MIXED boundary cells\n");
+                          return 1;
+                        }
+                        bndElementsIdx[0] = 0;
+
+                        for (std::size_t idxElem = 0; idxElem < bndElementsIdx.size(); ++idxElem)
+                        {
+                          vtkIdType pos = bndElementsIdx[idxElem];
+                          elemType = static_cast<CGNS_ENUMT(ElementType_t)>(bndElements[pos]);
+                          cg_npe(elemType, &numPointsPerCell);
+                          bndElementsIdx[idxElem + 1] =
+                            bndElementsIdx[idxElem] + static_cast<vtkIdType>(numPointsPerCell + 1);
+                        }
+                      }
+                      // Partial Size determination through bndElementsIdx
+                      startPosIdx = startBndElemId - sectionInfoList[curSec].range[0];
+                      endPosIdx = startPosIdx + numBndElemToRead;
+                      vtkIdType partialSize =
+                        bndElementsIdx[endPosIdx] - bndElementsIdx[startPosIdx];
+                      startReadingPos.push_back(static_cast<cgsize_t>(bndElementsIdx[startPosIdx]));
+                      sizeAllocForEachSection.push_back(static_cast<cgsize_t>(partialSize));
+                    }
+                    else
+                    {
+                      vtkErrorMacro("Unexpected element type for boundary\n");
+                      return 1;
+                    }
+                  }
+                  bndSecToUse.push_back(curSec);
+                  numElemToReadBndSec.push_back(numBndElemToRead);
+                  residualNumElemToRead -= numBndElemToRead;
+                  if (residualNumElemToRead <= 0)
+                  {
+                    break;
+                  }
+                }
+
+                if (residualNumElemToRead > 0)
+                {
+                  vtkWarningMacro("Not enough elements to generate BC " << binfo.Name);
+                  numElemToRead -= residualNumElemToRead;
+                }
+
+                // Now allocate arrays to read connectivities
+
+                bcCellsTypes = new int[numElemToRead];
+                if (bcCellsTypes == 0)
+                {
+                  vtkErrorMacro("Could not allocate memory for boundary cell types\n");
+                  return 1;
+                }
+
+                cgsize_t elemBcSize = 0;
+                for (cgsize_t& sizeValue : sizeAllocForEachSection)
+                {
+                  elemBcSize += sizeValue;
+                }
+                std::vector<cgsize_t> startArrayBndSec(bndSecToUse.size());
+                std::vector<cgsize_t> startIdBndSec(bndSecToUse.size());
+                for (std::size_t sec = 0; sec < bndSecToUse.size(); sec++)
+                {
+                  cgsize_t curStart = sectionInfoList[bndSecToUse[sec]].range[0];
+                  cgsize_t curArrayStart = 0;
+                  cgsize_t curIdStart = 0;
+                  for (std::size_t lse = 0; lse < bndSecToUse.size(); lse++)
+                  {
+                    if (sectionInfoList[bndSecToUse[sec]].range[0] < curStart)
+                    {
+                      curArrayStart += sizeAllocForEachSection[lse];
+                      curIdStart += numElemToReadBndSec[lse];
+                    }
+                  }
+                  startArrayBndSec[sec] = curArrayStart;
+                  startIdBndSec[sec] = curIdStart;
+                }
+
+                // Create Cell Array
+                vtkNew<vtkIdTypeArray> cellBcLocations;
+                cellBcLocations->SetNumberOfValues(elemBcSize);
+                vtkIdType* bcGlobalElements = cellBcLocations->GetPointer(0);
+
+                if (bcGlobalElements == 0)
+                {
+                  vtkErrorMacro("Could not allocate memory for BC connectivity\n");
+                  return 1;
+                }
+                memset(bcGlobalElements, 0, sizeof(vtkIdType) * elemBcSize);
+                // Memory is ready now load the data
+                for (std::size_t idx = 0; idx < bndSecToUse.size(); ++idx)
+                {
+                  int curSec = bndSecToUse[idx];
+                  CGNS_ENUMT(ElementType_t) elemType = sectionInfoList[curSec].elemType;
+                  vtkIdType* localBndElements = &(bcGlobalElements[startArrayBndSec[idx]]);
+
+                  if (elemType != CGNS_ENUMV(MIXED))
+                  {
+                    int cellType;
+                    bool higherOrderWarning;
+                    bool reOrderElements;
+                    cgsize_t memDim[2];
+                    cgsize_t npe = 0;
+                    int numPointsPerCell(0);
+
+                    cellType =
+                      CGNSRead::GetVTKElemType(elemType, higherOrderWarning, reOrderElements);
+                    if (cellType == VTK_EMPTY_CELL)
+                    {
+                      vtkErrorMacro("Unsupported cell type\n");
+                      return 1;
+                    }
+                    for (cgsize_t ii = 0; ii < numElemToReadBndSec[idx]; ++ii)
+                    {
+                      bcCellsTypes[ii + startIdBndSec[idx]] = cellType;
+                    }
+
+                    cg_npe(elemType, &numPointsPerCell);
+                    npe = static_cast<cgsize_t>(numPointsPerCell);
+
+                    srcStart[0] = 1 + startReadingPos[idx];
+                    srcStart[1] = 1;
+
+                    srcEnd[0] = startReadingPos[idx] + numElemToReadBndSec[idx] * npe;
+                    srcEnd[1] = 1;
+                    srcStride[0] = 1;
+                    srcStride[1] = 1;
+
+                    memStart[0] = 2;
+                    memStart[1] = 1;
+                    memEnd[0] = npe + 1;
+                    memEnd[1] = numElemToReadBndSec[idx];
+                    memStride[0] = 1;
+                    memStride[1] = 1;
+                    memDim[0] = npe + 1;
+                    memDim[1] = numElemToReadBndSec[idx];
+
+                    CGNSRead::get_section_connectivity(this->cgioNum, elemIdList[curSec], 2,
+                      srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDim,
+                      localBndElements);
+                    // Add numptspercell and do -1 on indexes
+                    for (vtkIdType icell = 0; icell < numElemToReadBndSec[idx]; ++icell)
+                    {
+                      vtkIdType pos = icell * (npe + 1);
+                      localBndElements[pos] = static_cast<vtkIdType>(npe);
+                      for (vtkIdType ip = 0; ip < npe; ip++)
+                      {
+                        pos++;
+                        localBndElements[pos] = localBndElements[pos] - 1;
+                      }
+                    }
+                  }
+                  else if (elemType == CGNS_ENUMV(MIXED))
+                  {
+                    cgsize_t memDim[2];
+                    int numPointsPerCell(0);
+                    int cellType;
+                    bool higherOrderWarning;
+                    bool reOrderElements;
+
+                    srcStart[0] = 1 + startReadingPos[idx];
+                    srcEnd[0] = startReadingPos[idx] + sizeAllocForEachSection[idx];
+                    srcStride[0] = 1;
+
+                    memStart[0] = 1;
+                    memStart[1] = 1;
+                    memEnd[0] = sizeAllocForEachSection[idx];
+                    memEnd[1] = 1;
+                    memStride[0] = 1;
+                    memStride[1] = 1;
+                    memDim[0] = sizeAllocForEachSection[idx];
+                    memDim[1] = 1;
+
+                    CGNSRead::get_section_connectivity(this->cgioNum, elemIdList[curSec], 1,
+                      srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDim,
+                      localBndElements);
+                    vtkIdType pos = 0;
+                    for (vtkIdType icell = 0; icell < numElemToReadBndSec[idx]; ++icell)
+                    {
+                      elemType = static_cast<CGNS_ENUMT(ElementType_t)>(localBndElements[pos]);
+                      cg_npe(elemType, &numPointsPerCell);
+                      cellType =
+                        CGNSRead::GetVTKElemType(elemType, higherOrderWarning, reOrderElements);
+                      bcCellsTypes[icell + startIdBndSec[idx]] = cellType;
+                      localBndElements[pos] = static_cast<vtkIdType>(numPointsPerCell);
+                      pos++;
+                      for (vtkIdType ip = 0; ip < numPointsPerCell; ip++)
+                      {
+                        localBndElements[ip + pos] = localBndElements[ip + pos] - 1;
+                      }
+                      pos += numPointsPerCell;
+                    }
+                  }
+                }
+                bcCells->SetCells(numElemToRead, cellBcLocations.GetPointer());
+              }
+              else if (binfo.BCElementList.size() > 0)
+              {
+                // This a bit more tricky to implement because it generate lot of small IO
+
+                vtkIdType residualNumElemToRead = binfo.BCElementList.size();
+                std::vector<bool> BCElementRead(binfo.BCElementList.size(), false);
+
+                const auto bcminmax = std::minmax_element(
+                  std::begin(binfo.BCElementList), std::end(binfo.BCElementList));
+
+                std::vector<vtkIdList*> bndElemList;
+                bndElemList.resize(residualNumElemToRead, nullptr);
+                for (vtkIdType elemId = 0; elemId < residualNumElemToRead; elemId++)
+                {
+                  bndElemList[elemId] = vtkIdList::New();
+                }
+
+                bcCellsTypes = new int[residualNumElemToRead];
+                if (bcCellsTypes == 0)
+                {
+                  vtkErrorMacro("Could not allocate memory for boundary cell types\n");
+                  return 1;
+                }
+
+                for (std::size_t sec = 0; sec < bndSec.size(); sec++)
+                {
+                  int curSec = bndSec[sec];
+                  std::vector<std::pair<vtkIdType, vtkIdType> > elemToRead;
+                  CGNS_ENUMT(ElementType_t) elemType = CGNS_ENUMV(ElementTypeNull);
+                  //
+                  // Compute list of boundary elements in current section
+                  //------------------------------------------------
+                  // Quick skip useless section
+                  if ((*bcminmax.first > sectionInfoList[curSec].range[1]) ||
+                    (*bcminmax.second < sectionInfoList[curSec].range[0]))
+                  {
+                    continue;
+                  }
+
+                  for (std::size_t idx = 0; idx < BCElementRead.size(); idx++)
+                  {
+                    if (BCElementRead[idx] == true)
+                    {
+                      continue;
+                    }
+                    if (binfo.BCElementList[idx] >= sectionInfoList[curSec].range[0] &&
+                      binfo.BCElementList[idx] <= sectionInfoList[curSec].range[1])
+                    {
+                      elemToRead.push_back(std::make_pair(binfo.BCElementList[idx], idx));
+                      BCElementRead[idx] = true;
+                    }
+                  }
+                  //  Nothing to read in this section
+                  if (elemToRead.size() == 0)
+                  {
+                    continue;
+                  }
+                  elemType = sectionInfoList[curSec].elemType;
+
+                  // sort face Bnd Element to Read
+                  std::sort(elemToRead.begin(), elemToRead.end());
+                  // Generate partial contiguous chuncks to read
+                  vtkIdType curElemId = elemToRead[0].first;
+                  std::vector<vtkIdType> rangeIdx;
+                  rangeIdx.push_back(0);
+                  for (size_t ii = 1; ii < elemToRead.size(); ii++)
+                  {
+                    if (elemToRead[ii].first != curElemId + 1)
+                    {
+                      rangeIdx.push_back(ii);
+                    }
+                    curElemId = elemToRead[ii].first;
+                  }
+                  rangeIdx.push_back(elemToRead.size());
+
+                  // Do each partial range read
+                  for (size_t ii = 1; ii < rangeIdx.size(); ii++)
+                  {
+                    vtkIdType startElemId = elemToRead[rangeIdx[ii - 1]].first;
+                    vtkIdType endElemId = elemToRead[rangeIdx[ii] - 1].first;
+                    vtkIdType numElemToRead = endElemId - startElemId + 1;
+                    // do partial read
+                    //----------------
+                    std::vector<vtkIdType> bcElementsArr;
+                    //
+                    // Partial read of section chunck
+                    if (elemType != CGNS_ENUMV(MIXED))
+                    {
+                      // All cells are of the same type.
+                      cgsize_t memDim[2];
+                      cgsize_t startPosIdx = startElemId - sectionInfoList[curSec].range[0];
+                      int numPointsPerCell = 0;
+                      int cellType;
+                      bool higherOrderWarning;
+                      bool reOrderElements;
+
+                      cellType =
+                        CGNSRead::GetVTKElemType(elemType, higherOrderWarning, reOrderElements);
+                      if (cellType == VTK_EMPTY_CELL)
+                      {
+                        vtkErrorMacro("Unsupported cellType found in BC\n");
+                      }
+                      //
+                      if (cg_npe(elemType, &numPointsPerCell) || numPointsPerCell == 0)
+                      {
+                        vtkErrorMacro("Invalid numPointsPerCell\n");
+                      }
+                      bcElementsArr.resize((numPointsPerCell + 1) * numElemToRead);
+                      startPosIdx *= static_cast<cgsize_t>(numPointsPerCell);
+
+                      srcStart[0] = 1 + startPosIdx;
+                      srcStart[1] = 1;
+
+                      srcEnd[0] = startPosIdx + numElemToRead * numPointsPerCell;
+                      srcEnd[1] = 1;
+                      srcStride[0] = 1;
+                      srcStride[1] = 1;
+
+                      memStart[0] = 2;
+                      memStart[1] = 1;
+                      memEnd[0] = numPointsPerCell + 1;
+                      memEnd[1] = numElemToRead;
+                      memStride[0] = 1;
+                      memStride[1] = 1;
+                      memDim[0] = numPointsPerCell + 1;
+                      memDim[1] = numElemToRead;
+
+                      CGNSRead::get_section_connectivity(this->cgioNum, elemIdList[curSec], 2,
+                        srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDim,
+                        &(bcElementsArr[0]));
+                      // Add numptspercell and do -1 on indexes
+                      for (vtkIdType icell = 0; icell < numElemToRead; ++icell)
+                      {
+                        vtkIdType pos = icell * (numPointsPerCell + 1);
+                        bcElementsArr[pos] = static_cast<vtkIdType>(numPointsPerCell);
+                        for (vtkIdType ip = 0; ip < numPointsPerCell; ip++)
+                        {
+                          pos++;
+                          bcElementsArr[pos] = bcElementsArr[pos] - 1;
+                        }
+                      }
+                      // Now append
+                      for (vtkIdType nelem = 0; nelem < numElemToRead; ++nelem)
+                      {
+                        bcCellsTypes[elemToRead[rangeIdx[ii - 1] + nelem].second] = cellType;
+                        vtkIdList* nodes = bndElemList[elemToRead[rangeIdx[ii - 1] + nelem].second];
+
+                        for (vtkIdType nn = 0; nn < numPointsPerCell; ++nn)
+                        {
+                          vtkIdType nodeID = bcElementsArr[nelem * (numPointsPerCell + 1) + 1 + nn];
+                          nodes->InsertNextId(nodeID);
+                        }
+                      }
+                    }
+                    else if (elemType == CGNS_ENUMV(MIXED))
+                    {
+                      cgsize_t memDim[2];
+                      int cellType;
+                      bool higherOrderWarning;
+                      bool reOrderElements;
+
+                      // Maybe bndElementsIdx should use cgsize_t but since get_section_start_offset
+                      // already exists and use vtkIdType...
+                      std::vector<vtkIdType> bndElementsIdx;
+                      bndElementsIdx.resize(numElemToRead + 1);
+
+                      srcStart[0] = startElemId - sectionInfoList[curSec].range[0] + 1;
+                      srcEnd[0] = endElemId - sectionInfoList[curSec].range[0] + 2;
+                      srcStride[0] = 1;
+
+                      memStart[0] = 1;
+                      memStart[1] = 1;
+                      memEnd[0] = numElemToRead + 1;
+                      memEnd[1] = 1;
+                      memStride[0] = 1;
+                      memStride[1] = 1;
+                      memDim[0] = numElemToRead + 1;
+                      memDim[1] = 1;
+
+                      if (0 != CGNSRead::get_section_start_offset(this->cgioNum, elemIdList[curSec],
+                                 1, srcStart, srcEnd, srcStride, memStart, memEnd, memStride,
+                                 memDim, &(bndElementsIdx[0])))
+                      {
+                        // Fallback to old way because no Offset found
+                        cgsize_t fDataSize(0);
+                        int numPointsPerCell = 0;
+
+                        fDataSize = sectionInfoList[curSec].eDataSize;
+                        bcElementsArr.resize(fDataSize);
+
+                        srcStart[0] = 1;
+                        srcEnd[0] = fDataSize;
+                        srcStride[0] = 1;
+
+                        memStart[0] = 1;
+                        memStart[1] = 1;
+                        memEnd[0] = fDataSize;
+                        memEnd[1] = 1;
+                        memStride[0] = 1;
+                        memStride[1] = 1;
+
+                        memDim[0] = fDataSize;
+                        memDim[1] = 1;
+
+                        if (0 != CGNSRead::get_section_connectivity(this->cgioNum,
+                                   elemIdList[curSec], 1, srcStart, srcEnd, srcStride, memStart,
+                                   memEnd, memStride, memDim, &(bcElementsArr[0])))
+                        {
+                          vtkErrorMacro("FAILED to read MIXED boundary cells\n");
+                          return 1;
+                        }
+                        vtkIdType pos = 0;
+                        vtkIdType nelem = 0;
+                        for (vtkIdType idxElem = sectionInfoList[curSec].range[0];
+                             idxElem < sectionInfoList[curSec].range[1] + 1; ++idxElem)
+                        {
+                          CGNS_ENUMT(ElementType_t)
+                          localElemType =
+                            static_cast<CGNS_ENUMT(ElementType_t)>(bcElementsArr[pos]);
+                          cg_npe(localElemType, &numPointsPerCell);
+                          if ((startElemId - idxElem) > 0)
+                          {
+                            pos += numPointsPerCell + 1;
+                            continue;
+                          }
+                          if ((endElemId - idxElem) < 0)
+                          {
+                            break;
+                          }
+                          vtkIdType numNodes = static_cast<vtkIdType>(numPointsPerCell);
+                          cellType = CGNSRead::GetVTKElemType(
+                            localElemType, higherOrderWarning, reOrderElements);
+                          if (cellType == VTK_EMPTY_CELL)
+                          {
+                            vtkErrorMacro("Unsupported cellType found in BC\n");
+                          }
+                          bcCellsTypes[elemToRead[rangeIdx[ii - 1] + nelem].second] = cellType;
+                          vtkIdList* nodes =
+                            bndElemList[elemToRead[rangeIdx[ii - 1] + nelem].second];
+                          pos++;
+                          for (vtkIdType nn = 0; nn < numNodes; ++nn)
+                          {
+                            vtkIdType nodeID = bcElementsArr[pos] - 1;
+                            nodes->InsertNextId(nodeID);
+                            pos++;
+                          }
+                          nelem++;
+                        }
+                        // end old way
+                      }
+                      else
+                      {
+                        // modern way
+                        bcElementsArr.resize(bndElementsIdx[numElemToRead] - bndElementsIdx[0]);
+
+                        srcStart[0] = bndElementsIdx[0] + 1;
+                        srcEnd[0] = bndElementsIdx[numElemToRead];
+                        srcStride[0] = 1;
+
+                        memStart[0] = 1;
+                        memStart[1] = 1;
+                        memEnd[0] = bndElementsIdx[numElemToRead] - bndElementsIdx[0];
+                        memEnd[1] = 1;
+                        memStride[0] = 1;
+                        memStride[1] = 1;
+                        memDim[0] = bndElementsIdx[numElemToRead] - bndElementsIdx[0];
+                        memDim[1] = 1;
+
+                        if (0 != CGNSRead::get_section_connectivity(this->cgioNum,
+                                   elemIdList[curSec], 1, srcStart, srcEnd, srcStride, memStart,
+                                   memEnd, memStride, memDim, bcElementsArr.data()))
+                        {
+                          vtkErrorMacro("Partial read of MIXED elements FAILED\n");
+                          return 1;
+                        }
+
+                        // Now append
+                        for (vtkIdType nelem = 0; nelem < numElemToRead; ++nelem)
+                        {
+                          vtkIdType startNode = bndElementsIdx[nelem] - bndElementsIdx[0];
+                          vtkIdType numNodes =
+                            bndElementsIdx[nelem + 1] - bndElementsIdx[nelem] - 1;
+                          CGNS_ENUMT(ElementType_t)
+                          localElemType =
+                            static_cast<CGNS_ENUMT(ElementType_t)>(bcElementsArr[startNode]);
+                          cellType = CGNSRead::GetVTKElemType(
+                            localElemType, higherOrderWarning, reOrderElements);
+                          if (cellType == VTK_EMPTY_CELL)
+                          {
+                            vtkErrorMacro("Unsupported cellType found in BC\n");
+                          }
+                          bcCellsTypes[elemToRead[rangeIdx[ii - 1] + nelem].second] = cellType;
+                          vtkIdList* nodes =
+                            bndElemList[elemToRead[rangeIdx[ii - 1] + nelem].second];
+
+                          for (vtkIdType nn = 0; nn < numNodes; ++nn)
+                          {
+                            vtkIdType nodeID = bcElementsArr[startNode + nn + 1] - 1;
+                            nodes->InsertNextId(nodeID);
+                          }
+                        }
+                      }
+                    }
+                  }
+
+                  residualNumElemToRead -= elemToRead.size();
+                  if (residualNumElemToRead <= 0)
+                    break;
+                }
+                // Transfer to bcCells
+                for (std::size_t bcCellId = 0; bcCellId < bndElemList.size(); ++bcCellId)
+                {
+                  if (bndElemList[bcCellId]->GetNumberOfIds() > 0)
+                  {
+                    bcCells->InsertNextCell(bndElemList[bcCellId]);
+                  }
+                }
+              }
+              else
+              {
+                continue;
+              }
+              // Set up ugrid
+              // Create an unstructured grid to contain the points.
+              // Generate support unstructured grid
+              vtkSmartPointer<vtkUnstructuredGrid> bcGrid =
+                vtkSmartPointer<vtkUnstructuredGrid>::New();
+              // Directly use Global Volume points
+              // Renumbering and reducing of points should theoretically be done
+              bcGrid->SetPoints(points);
+              bcGrid->SetCells(bcCellsTypes, bcCells.GetPointer());
+              if (bcCellsTypes != nullptr)
+                delete[] bcCellsTypes;
+
+              //
+              // Add ispatch 0=false/1=true as field data
+              //
+              vtkPrivate::AddIsPatchArray(bcGrid, true);
+
+              // Handle Ref Values
+              vtkPrivate::AttachReferenceValue(base, bcGrid, this);
+
+              // Copy PointData if exists
+              // Dirty way to get data
+              vtkPointData* temp = ugrid->GetPointData();
+              if (temp != NULL)
+              {
+                int NumArray = temp->GetNumberOfArrays();
+                for (int i = 0; i < NumArray; ++i)
+                {
+                  vtkDataArray* dataTmp = temp->GetArray(i);
+                  bcGrid->GetPointData()->AddArray(dataTmp);
+                }
+              }
+              // At least should read from Neumann and Dirichlet nodes
+              // for face centered values
+              //
+              // Try to Parse BCDataSet CGNS arrays
+              //
+              vtkCGNSReader::vtkPrivate::readBCData(
+                *bciter, cellDim, physicalDim, bcGrid.Get(), this);
+              //
+              const unsigned int idx = patchesMB->GetNumberOfBlocks();
+              patchesMB->SetBlock(idx, bcGrid.Get());
+              if (!binfo.FamilyName.empty())
+              {
+                vtkInformationStringKey* bcfamily =
+                  new vtkInformationStringKey("FAMILY", "vtkCompositeDataSet");
+                patchesMB->GetMetaData(idx)->Set(bcfamily, binfo.FamilyName.c_str());
+              }
+              patchesMB->GetMetaData(idx)->Set(vtkCompositeDataSet::NAME(), binfo.Name);
+            }
+          }
+          catch (const CGIOUnsupported& ue)
+          {
+            vtkWarningMacro("Skipping BC_t node: " << ue.what());
+          }
+          catch (const CGIOError& e)
+          {
+            vtkErrorMacro("Failed to read BC_t node: " << e.what());
           }
         }
       }
-      else if (elemType == CGNS_ENUMV(MIXED))
-      {
-        //
-        // all cells are of the same type.
-        int numPointsPerCell = 0;
-        int cellType;
-        bool higherOrderWarning;
-        bool reOrderElements;
-        // pointer on start !!
-
-        IdBndArray_ptr->SetNumberOfValues(elementBndSize);
-        bndElements = IdBndArray_ptr->GetPointer(0);
-
-        if (bndElements == 0)
-        {
-          vtkErrorMacro(<< "Could not allocate memory for bnd connectivity\n");
-          return 1;
-        }
-        //
-        vtkIdType* localElements = &(bndElements[0]);
-
-        cgsize_t memDim[2];
-
-        srcStart[0] = 1;
-        srcEnd[0] = eDataSize;
-        srcStride[0] = 1;
-
-        memStart[0] = 1;
-        memStart[1] = 1;
-        memEnd[0] = eDataSize;
-        memEnd[1] = 1;
-        memStride[0] = 1;
-        memStride[1] = 1;
-        memDim[0] = eDataSize;
-        memDim[1] = 1;
-
-        CGNSRead::get_section_connectivity(this->cgioNum, cgioSectionId, 1, srcStart, srcEnd,
-          srcStride, memStart, memEnd, memStride, memDim, localElements);
-        vtkIdType pos = 0;
-        for (vtkIdType icell = 0; icell < elementSize; ++icell)
-        {
-          elemType = static_cast<CGNS_ENUMT(ElementType_t)>(localElements[pos]);
-          cg_npe(elemType, &numPointsPerCell);
-          cellType = CGNSRead::GetVTKElemType(elemType, higherOrderWarning, reOrderElements);
-          bndCellsTypes[icell] = cellType;
-          localElements[pos] = static_cast<vtkIdType>(numPointsPerCell);
-          pos++;
-          for (vtkIdType ip = 0; ip < numPointsPerCell; ip++)
-          {
-            localElements[ip + pos] = localElements[ip + pos] - 1;
-          }
-          pos += numPointsPerCell;
-        }
-      }
-
-      // Create Cell Array
-      vtkCellArray* bndCells = vtkCellArray::New();
-      bndCells->SetCells(elementSize, IdBndArray_ptr);
-      IdBndArray_ptr->Delete();
-      // Set up ugrid
-      // Create an unstructured grid to contain the points.
-      vtkUnstructuredGrid* bndugrid = vtkUnstructuredGrid::New();
-      bndugrid->SetPoints(points);
-      bndugrid->SetCells(bndCellsTypes, bndCells);
-      bndCells->Delete();
-      delete[] bndCellsTypes;
-
-      //
-      // Add ispatch 0=false/1=true as field data
-      //
-      vtkPrivate::AddIsPatchArray(bndugrid, true);
-
-      // Handle Ref Values
-      vtkPrivate::AttachReferenceValue(base, bndugrid, this);
-
-      // Copy PointData if exists
-      vtkPointData* temp = ugrid->GetPointData();
-      if (temp != NULL)
-      {
-        int NumArray = temp->GetNumberOfArrays();
-        for (int i = 0; i < NumArray; ++i)
-        {
-          vtkDataArray* dataTmp = temp->GetArray(i);
-          bndugrid->GetPointData()->AddArray(dataTmp);
-        }
-      }
-      mpatch->SetBlock(bndNum, bndugrid);
-      bndugrid->Delete();
-      bndNum++;
     }
-    mzone->SetBlock(1, mpatch);
-    mpatch->Delete();
-    mzone->GetMetaData((unsigned int)1)->Set(vtkCompositeDataSet::NAME(), "Patches");
+    CGNSRead::releaseIds(this->cgioNum, zoneChildren);
+    zoneChildren.clear();
   }
   //
   if ((bndSec.size() > 0 || hasNFace) && requiredPatch)
