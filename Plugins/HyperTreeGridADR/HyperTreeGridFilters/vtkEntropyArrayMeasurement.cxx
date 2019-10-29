@@ -15,83 +15,80 @@
 
 #include "vtkEntropyArrayMeasurement.h"
 
-#include "vtkArithmeticAccumulator.h"
-#include "vtkEntropyAccumulator.h"
+#include "vtkBinsAccumulator.h"
+#include "vtkFunctionOfXList.h"
+#include "vtkObjectFactory.h"
 
 #include <cassert>
 #include <cmath>
 
 vtkStandardNewMacro(vtkEntropyArrayMeasurement);
+vtkArrayMeasurementMacro(vtkEntropyArrayMeasurement);
 
 //----------------------------------------------------------------------------
 vtkEntropyArrayMeasurement::vtkEntropyArrayMeasurement()
 {
-  this->Accumulators = this->NewAccumulatorInstances();
+  this->Accumulators = vtkEntropyArrayMeasurement::NewAccumulators();
 }
 
 //----------------------------------------------------------------------------
-bool vtkEntropyArrayMeasurement::CanMeasure() const
+bool vtkEntropyArrayMeasurement::Measure(vtkAbstractAccumulator** accumulators,
+  vtkIdType numberOfAccumulatedData, double totalWeight, double& value)
 {
-  return this->NumberOfAccumulatedData >=
-    vtkEntropyArrayMeasurement::MinimumNumberOfAccumulatedData;
+  if (!this->CanMeasure(numberOfAccumulatedData, totalWeight))
+  {
+    return false;
+  }
+  assert(accumulators && "input accumulator is not allocated");
+
+  vtkBinsAccumulator* binsAccumulator = vtkBinsAccumulator::SafeDownCast(accumulators[0]);
+
+  assert(binsAccumulator && "input accumulator is of wrong type");
+
+  value = binsAccumulator->GetValue() / totalWeight + std::log(totalWeight);
+
+  return true;
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkEntropyArrayMeasurement::GetMinimumNumberOfAccumulatedData() const
+std::vector<vtkAbstractAccumulator*> vtkEntropyArrayMeasurement::NewAccumulators()
 {
-  return vtkEntropyArrayMeasurement::MinimumNumberOfAccumulatedData;
-}
-
-//----------------------------------------------------------------------------
-double vtkEntropyArrayMeasurement::Measure() const
-{
-  return this->Measure(this->Accumulators, this->NumberOfAccumulatedData);
-}
-
-//----------------------------------------------------------------------------
-double vtkEntropyArrayMeasurement::Measure(
-  const std::vector<vtkAbstractAccumulator*>& accumulators, vtkIdType numberOfAccumulatedData) const
-{
-  assert(accumulators.size() == 2 && accumulators[0] && accumulators[1] &&
-    "input accumulator is not allocated");
-  vtkArithmeticAccumulator* arithmeticAccumulator =
-    vtkArithmeticAccumulator::SafeDownCast(accumulators[0]);
-  vtkEntropyAccumulator* entropyAccumulator = vtkEntropyAccumulator::SafeDownCast(accumulators[1]);
-  assert(arithmeticAccumulator && entropyAccumulator &&
-    "input accumulators have the wrong type. One should be of type vtkArithmeticAccumulator and "
-    "the other of type vtkSquaredArithmeticAccumulator");
-
-  // x_i : input
-  // p_i = f_i / n
-  // entropy = 1/n sum_i (x_i log(x_i) + x_i log(n))
-  return (arithmeticAccumulator->GetValue() * std::log(numberOfAccumulatedData) +
-           entropyAccumulator->GetValue()) /
-    numberOfAccumulatedData;
-}
-
-//----------------------------------------------------------------------------
-std::vector<vtkAbstractAccumulator*> vtkEntropyArrayMeasurement::NewAccumulatorInstances() const
-{
-  std::vector<vtkAbstractAccumulator*> accumulators(
-    vtkEntropyArrayMeasurement::NumberOfAccumulators);
-  accumulators[0] = vtkArithmeticAccumulator::New();
-  accumulators[1] = vtkEntropyAccumulator::New();
+  vtkBinsAccumulator* acc = vtkBinsAccumulator::New();
+  acc->SetFunctionOfW(vtkValueComaNameMacro(VTK_FUNC_NXLOGX));
+  std::vector<vtkAbstractAccumulator*> accumulators{ acc };
   return accumulators;
 }
 
 //----------------------------------------------------------------------------
-void vtkEntropyArrayMeasurement::PrintSelf(ostream& os, vtkIndent indent)
+double vtkEntropyArrayMeasurement::GetDiscretizationStep() const
 {
-  this->Superclass::PrintSelf(os, indent);
-  if (this->Accumulators.size() == vtkEntropyArrayMeasurement::NumberOfAccumulators &&
-    this->Accumulators[0] && this->Accumulators[1])
+  assert(this->Accumulators.size() && "No accumulator in vtkEntropyArrayMeasurement");
+  vtkBinsAccumulator* binsAccumulator = vtkBinsAccumulator::SafeDownCast(this->Accumulators[0]);
+  if (binsAccumulator)
   {
-    os << indent << *(this->Accumulators[0]) << std::endl;
-    os << indent << *(this->Accumulators[1]) << std::endl;
+    return binsAccumulator->GetDiscretizationStep();
   }
   else
   {
-    os << indent << "Missing vtkArithmeticAccumulator or vtkSquaredArithmeticAccumulator"
-       << std::endl;
+    vtkWarningMacro(<< "Wrong type, accumulator " << this->Accumulators[0]->GetClassName()
+                    << " instead of vtkBinsAccumulator in vtkEntropyArrayMeasurement");
+  }
+  return 0.0;
+}
+
+//----------------------------------------------------------------------------
+void vtkEntropyArrayMeasurement::SetDiscretizationStep(double discretizationStep)
+{
+  assert(this->Accumulators.size() && "No accumulator in vtkEntropyArrayMeasurement");
+  vtkBinsAccumulator* binsAccumulator = vtkBinsAccumulator::SafeDownCast(this->Accumulators[0]);
+  if (binsAccumulator)
+  {
+    binsAccumulator->SetDiscretizationStep(discretizationStep);
+    this->Modified();
+  }
+  else
+  {
+    vtkWarningMacro(<< "Wrong type, accumulator " << this->Accumulators[0]->GetClassName()
+                    << " instead of vtkBinsAccumulator in vtkEntropyArrayMeasurement");
   }
 }

@@ -3,20 +3,19 @@ set(classes
   vtkAbstractArrayMeasurement
   vtkArithmeticAccumulator
   vtkArithmeticMeanArrayMeasurement
-  vtkEntropyAccumulator
+  vtkBinsAccumulator
   vtkEntropyArrayMeasurement
-  vtkGeometricAccumulator
   vtkGeometricMeanArrayMeasurement
   vtkHarmonicMeanArrayMeasurement
+  vtkQuantileAccumulator
+  vtkQuantileArrayMeasurement
+  vtkFunctionOfXList
   vtkResampleToHyperTreeGrid
-  vtkInversedArithmeticAccumulator
-  vtkMedianAccumulator
-  vtkMedianArrayMeasurement
-  vtkSquaredArithmeticAccumulator
   vtkStandardDeviationArrayMeasurement)
 
 vtk_module_add_module(HyperTreeGridFilters
-  CLASSES ${classes})
+  CLASSES ${classes}
+  HEADERS ${headers})
 
 paraview_add_server_manager_xmls(
   XMLS  HyperTreeGridFilters.xml)

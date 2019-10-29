@@ -37,74 +37,88 @@ public:
   static vtkStandardDeviationArrayMeasurement* New();
 
   vtkTypeMacro(vtkStandardDeviationArrayMeasurement, vtkAbstractArrayMeasurement);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+
+  using Superclass::Add;
+  using Superclass::CanMeasure;
+  using Superclass::Measure;
 
   //@{
   /**
-   * Returns the measure of input data.
+   * Indexes of identity / squared accumulators in the accumulator array.
    */
-  virtual double Measure() const override;
+  static constexpr std::size_t IdentityId = 0;
+  static constexpr std::size_t SquaredId = 1;
   //@}
 
-  //@{
   /**
-   * Returns true if there is more than
-   * vtkStandardDeviationArrayMeasurement::MinimumNumberOfAccumulatedData accumulated data
+   * Minimum times the function Add should be called on accumulators or this class
+   * in order to measure something.
    */
-  virtual bool CanMeasure() const override;
-  //@}
+  static constexpr vtkIdType MinimumNumberOfAccumulatedData = 2;
+
+  /**
+   * Number of accumulators required for measuring.
+   */
+  static constexpr vtkIdType NumberOfAccumulators = 2;
+
+  /**
+   * Notifies if the arithmetic mean can be measured given the amount of input data.
+   * The arithmetic mean needs at least one accumulated data with non-zero weight.
+   *
+   * @param numberOfAccumulatedData is the number of times Add was called in the accumulators / this
+   * class
+   * @param totalWeight is the accumulated weight while accumulated. If weights were not set when
+   * accumulated, it should be equal to numberOfAccumulatedData.
+   * @return true if there is enough data and if totalWeight != 0, false otherwise.
+   */
+  static bool IsMeasurable(vtkIdType numberOfAccumulatedData, double totalWeight);
+
+  /**
+   * Instantiates needed accumulators for measurement, i.e. one vtkIdentityArithmeticAccumulator* in
+   * our case.
+   *
+   * @return the array {vtkIdentityArithmeticAccumulator::New()}.
+   */
+  static std::vector<vtkAbstractAccumulator*> NewAccumulators();
+
+  /**
+   * Computes the arithmetic mean of the set of accumulators needed (i.e. one
+   * vtkIdentityArithmeticAccumulator*).
+   *
+   * @param accumulators is an array of accumulators. It should be composed of a
+   * single vtkIdentityArithmeticAccumulator*.
+   * @param numberOfAccumulatedData is the number of times the method Add was called in the
+   * accumulators.
+   * @param totalWeight is the cumulated weight when adding data. If weight was not set while
+   * accumulating. it should equal numberOfAccumulatedData.
+   * @param value is where the arithmetic mean measurement is written into.
+   * @return true if the data is measurable, i.e. there is not enough data or a null totalWeight.
+   */
+  bool Measure(vtkAbstractAccumulator** accumulators, vtkIdType numberOfAccumulatedData,
+    double totalWeight, double& value) override;
 
   //@{
   /**
-   * Accessor for the minimum number of accumulated data necessary for computing the measure
+   * See the vtkAbstractArrayMeasurement API for description of this method.
    */
-  virtual vtkIdType GetMinimumNumberOfAccumulatedData() const override;
-  //@}
-
-  //@{
-  /**
-   * Minimum number of accumulated data necessary to measure.
-   */
-  static const unsigned MinimumNumberOfAccumulatedData = 2;
-  //@}
-
-  //@{
-  /**
-   * Number of accumulators needed for measuring.
-   */
-  static const unsigned NumberOfAccumulators = 2;
-  //@}
-
-  //@{
-  /**
-   * Method for creating a vector composed of one vtkArithmeticAccumulator* followed
-   * by one vtkSquaredArithmeticAccumulator*.
-   */
-  virtual std::vector<vtkAbstractAccumulator*> NewAccumulatorInstances() const override;
-  //@}
-
-  //@{
-  /**
-   * Method for measuring median using a vector of of accumulators.
-   * The array should have the same dynamic types and size as the one returned by
-   * vtkStandardDeviationArrayMeasurement::NewAccumulatorInstances().
-   */
-  virtual double Measure(
-    const std::vector<vtkAbstractAccumulator*>&, vtkIdType numberOfAccumulatedData) const override;
+  bool CanMeasure(vtkIdType numberOfAccumulatedData, double totalWeight) const override;
+  std::vector<vtkAbstractAccumulator*> NewAccumulatorInstances() const override;
+  vtkIdType GetMinimumNumberOfAccumulatedData() const override;
+  vtkIdType GetNumberOfAccumulators() const override;
   //@}
 
 protected:
   //@{
   /**
-   * Default constructors and destructors
+   * Default constructor and destructor
    */
   vtkStandardDeviationArrayMeasurement();
   virtual ~vtkStandardDeviationArrayMeasurement() override = default;
   //@}
 
 private:
-  vtkStandardDeviationArrayMeasurement(const vtkStandardDeviationArrayMeasurement&) = delete;
-  void operator=(const vtkStandardDeviationArrayMeasurement&) = delete;
+  vtkStandardDeviationArrayMeasurement(vtkStandardDeviationArrayMeasurement&) = delete;
+  void operator=(vtkStandardDeviationArrayMeasurement&) = delete;
 };
 
 #endif
