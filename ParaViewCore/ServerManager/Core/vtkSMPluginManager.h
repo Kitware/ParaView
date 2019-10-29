@@ -107,6 +107,8 @@ protected:
 
   bool InLoadPlugin;
   void OnPluginRegistered();
+  void OnPluginAvailable();
+  void UpdateLocalPluginInformation();
 
   vtkPVPluginsInformation* LocalInformation;
 

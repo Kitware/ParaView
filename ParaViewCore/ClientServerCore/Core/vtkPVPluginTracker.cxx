@@ -445,11 +445,12 @@ unsigned int vtkPVPluginTracker::RegisterAvailablePlugin(const char* filename)
     item.FileName = filename;
     item.PluginName = defaultname;
     this->PluginsList->push_back(item);
+    this->InvokeEvent(vtkPVPluginTracker::RegisterAvailablePluginEvent);
     return static_cast<unsigned int>(this->PluginsList->size() - 1);
   }
   else
   {
-    // don't update the filename here. This avoids cloberring of paths for
+    // don't update the filename here. This avoids clobbering of paths for
     // distributed plugins between servers that are named the same (as far as
     // the client goes).
     // iter->FileName = filename;
