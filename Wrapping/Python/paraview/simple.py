@@ -808,10 +808,17 @@ def FindView(name):
 def GetActiveViewOrCreate(viewtype):
     """
     Returns the active view, if the active view is of the given type,
-    otherwise creates a new view of the requested type."""
+    otherwise creates a new view of the requested type.
+    Note, if a new view is created, it will be assigned to a layout
+    by calling `AssignViewToLayout`."""
     view = GetActiveView()
     if view is None or view.GetXMLName() != viewtype:
         view = CreateView(viewtype)
+        if view:
+            # if a new view is created, we assign it to a layout.
+            # Since this method gets used when tracing existing views, it makes
+            # sense to assign it to a layout during playback.
+            AssignViewToLayout(view)
     if not view:
         raise RuntimeError ("Failed to create/locate the specified view")
     return view
@@ -819,10 +826,17 @@ def GetActiveViewOrCreate(viewtype):
 def FindViewOrCreate(name, viewtype):
     """
     Returns the view, if a view with the given name exists and is of the
-    the given type, otherwise creates a new view of the requested type."""
+    the given type, otherwise creates a new view of the requested type.
+    Note, if a new view is created, it will be assigned to a layout
+    by calling `AssignViewToLayout`."""
     view = FindView(name)
     if view is None or view.GetXMLName() != viewtype:
         view = CreateView(viewtype)
+        if view:
+            # if a new view is created, we assign it to a layout.
+            # Since this method gets used when tracing existing views, it makes
+            # sense to assign it to a layout during playback.
+            AssignViewToLayout(view)
     if not view:
         raise RuntimeError ("Failed to create/locate the specified view")
     return view
