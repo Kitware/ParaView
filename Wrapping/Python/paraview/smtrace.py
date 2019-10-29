@@ -216,6 +216,11 @@ class Trace(object):
                         "# uncomment following to set a specific view size",
                         "# %s" % viewSizeAccessor.get_property_trace(in_ctor=False)])
                 cls.Output.append_separated(trace.raw_data())
+                # good idea to grab the layout accessor, if any, right now. This avoids the issue
+                # described in BUG #19403.
+                layout = simple.GetLayout(view=obj)
+                if layout:
+                    cls.get_accessor(layout)
                 return True
         if obj.SMProxy.IsA("vtkSMRepresentationProxy"):
             # handle representations.
