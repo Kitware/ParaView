@@ -1554,6 +1554,7 @@
             <Property name="Precision" />
             <Property name="UseScientificNotation" />
             <Property name="FieldDelimiter" />
+            <Property name="AddTime" />
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
@@ -1655,6 +1656,7 @@
             <Property name="UseScientificNotation" />
             <Property name="FieldAssociation" />
             <Property name="AddMetaData" />
+            <Property name="AddTime" />
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>

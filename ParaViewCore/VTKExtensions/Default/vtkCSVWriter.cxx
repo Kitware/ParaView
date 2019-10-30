@@ -51,6 +51,7 @@ vtkCSVWriter::vtkCSVWriter()
   this->UseScientificNotation = true;
   this->FieldAssociation = 0;
   this->AddMetaData = false;
+  this->AddTime = false;
   this->Controller = nullptr;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 }
@@ -191,9 +192,13 @@ class vtkCSVWriter::CSVFile
 {
   ofstream Stream;
   std::vector<std::pair<std::string, int> > ColumnInfo;
+  double Time = vtkMath::Nan();
 
 public:
-  CSVFile() = default;
+  CSVFile(double time)
+    : Time(time)
+  {
+  }
 
   int Open(const char* filename)
   {
@@ -217,6 +222,13 @@ public:
 
   void WriteHeader(vtkDataSetAttributes* dsa, vtkCSVWriter* self)
   {
+    bool add_delimiter = false;
+    if (!vtkMath::IsNan(this->Time))
+    {
+      // add a time column.
+      this->Stream << "Time";
+      add_delimiter = true;
+    }
     for (int cc = 0, numArrays = dsa->GetNumberOfArrays(); cc < numArrays; ++cc)
     {
       auto array = dsa->GetAbstractArray(cc);
@@ -227,11 +239,12 @@ public:
 
       for (int comp = 0; comp < num_comps; ++comp)
       {
-        if (cc > 0 || comp > 0)
+        if (add_delimiter)
         {
           // add separator for all but the very first column
           this->Stream << self->GetFieldDelimiter();
         }
+        add_delimiter = true;
 
         std::ostringstream array_name;
         array_name << array->GetName();
@@ -277,6 +290,13 @@ public:
     for (vtkIdType cc = 0; cc < num_tuples; ++cc)
     {
       bool first_column = true;
+      if (!vtkMath::IsNan(this->Time))
+      {
+        // add a time column.
+        this->Stream << this->Time;
+        first_column = false;
+      }
+
       for (auto& iter : columnsIters)
       {
         switch (iter->GetDataType())
@@ -309,11 +329,19 @@ vtkStdString vtkCSVWriter::GetString(vtkStdString string)
 //-----------------------------------------------------------------------------
 void vtkCSVWriter::WriteData()
 {
-  vtkSmartPointer<vtkTable> table = vtkTable::SafeDownCast(this->GetInput());
+  auto input = this->GetInput();
+
+  double time = vtkMath::Nan();
+  if (this->AddTime && input && input->GetInformation()->Has(vtkDataObject::DATA_TIME_STEP()))
+  {
+    time = input->GetInformation()->Get(vtkDataObject::DATA_TIME_STEP());
+  }
+
+  vtkSmartPointer<vtkTable> table = vtkTable::SafeDownCast(input);
   if (table == nullptr)
   {
     vtkNew<vtkAttributeDataToTableFilter> attributeDataToTableFilter;
-    attributeDataToTableFilter->SetInputDataObject(this->GetInput());
+    attributeDataToTableFilter->SetInputDataObject(input);
     attributeDataToTableFilter->SetFieldAssociation(this->FieldAssociation);
     attributeDataToTableFilter->SetAddMetaData(this->AddMetaData);
     attributeDataToTableFilter->Update();
@@ -332,7 +360,7 @@ void vtkCSVWriter::WriteData()
   if (controller == nullptr ||
     (controller->GetNumberOfProcesses() == 1 && controller->GetLocalProcessId() == 0))
   {
-    vtkCSVWriter::CSVFile file;
+    vtkCSVWriter::CSVFile file(time);
     int error_code = file.Open(this->FileName);
     if (error_code == vtkErrorCode::NoError)
     {
@@ -382,7 +410,7 @@ void vtkCSVWriter::WriteData()
   }
   else
   {
-    vtkCSVWriter::CSVFile file;
+    vtkCSVWriter::CSVFile file(time);
     int error_code = file.Open(this->FileName);
     controller->Broadcast(&error_code, 1, 0);
     if (error_code != vtkErrorCode::NoError)
