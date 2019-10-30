@@ -57,6 +57,21 @@ void vtkPVWebExporter::Write()
   vtkPythonScopeGilEnsurer gilEnsurer;
   try
   {
+    vtkSmartPyObject pvmodule(PyImport_ImportModule("paraview.web.vtkjs_helper"));
+    if (!pvmodule || PyErr_Occurred())
+    {
+      vtkGenericWarningMacro("Failed to import paraview.web.vtkjs_helper module.");
+      throw 1;
+    }
+
+    PyObject_CallMethod(pvmodule, const_cast<char*>("applyParaViewNaming"),
+      const_cast<char*>("(s)"), const_cast<char*>(this->FileName));
+    if (PyErr_Occurred())
+    {
+      vtkGenericWarningMacro("Failed to rename datasets using ParaView proxy name");
+      throw 1;
+    }
+
     vtkSmartPyObject module(PyImport_ImportModule("vtk.web.vtkjs_helper"));
     if (!module || PyErr_Occurred())
     {
