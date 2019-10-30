@@ -233,7 +233,15 @@ bool vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input, vtkInformation* i
   clone->ShallowCopy(input);
 
   vtkPVTrivialProducer* tp = vtkPVTrivialProducer::New();
-  tp->SetOutput(clone);
+  if (input->GetInformation()->Has(vtkDataObject::DATA_TIME_STEP()))
+  {
+    tp->SetOutput(clone, input->GetInformation()->Get(vtkDataObject::DATA_TIME_STEP()));
+  }
+  else
+  {
+    tp->SetOutput(clone);
+  }
+
   if (inInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()))
   {
     int wholeExtent[6];

@@ -121,6 +121,16 @@ public:
 
   //@{
   /**
+   * When set to true (default is false), if the input data set has time, then the
+   * time information will be saved under the column named "Time".
+   */
+  vtkSetMacro(AddTime, bool);
+  vtkGetMacro(AddTime, bool);
+  vtkBooleanMacro(AddTime, bool);
+  //@}
+
+  //@{
+  /**
    * Internal method: decorates the "string" with the "StringDelimiter" if
    * UseStringDelimiter is true.
    */
@@ -149,6 +159,7 @@ protected:
   bool UseScientificNotation;
   int FieldAssociation;
   bool AddMetaData;
+  bool AddTime;
 
   vtkMultiProcessController* Controller;
 

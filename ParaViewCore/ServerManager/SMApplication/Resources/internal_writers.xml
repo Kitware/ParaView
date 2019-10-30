@@ -519,7 +519,15 @@
         this flag on.</Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
+      <IntVectorProperty command="SetAddTime"
+                         default_values="0"
+                         name="AddTime"
+                         number_of_elements="1">
+        <Documentation>When set, the writer will add a "Time" column to the generated
+          file indicating the current dataset time, if any.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <!-- End of CSVWriter -->
     </Proxy>
     <!-- ================================================================= -->
