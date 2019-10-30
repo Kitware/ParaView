@@ -9,7 +9,9 @@ set(files
   paraview/web/helper.py
   paraview/web/protocols.py
   paraview/web/pv_wslink.py
-  paraview/web/test_server.py)
+  paraview/web/test_server.py
+  paraview/web/vtkjs_helper.py
+)
 
 vtk_module_add_python_package(ParaView::PVWebPython
   FILES               ${files}
