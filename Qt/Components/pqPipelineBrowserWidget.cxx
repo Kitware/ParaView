@@ -359,6 +359,12 @@ QMenu* pqPipelineBrowserWidget::contextMenu() const
 }
 
 //----------------------------------------------------------------------------
+void pqPipelineBrowserWidget::setAnnotationFilterMatching(bool matching)
+{
+  this->FilteredPipelineModel->setAnnotationFilterMatching(matching);
+}
+
+//----------------------------------------------------------------------------
 void pqPipelineBrowserWidget::enableAnnotationFilter(const QString& annotationKey)
 {
   this->FilteredPipelineModel->enableAnnotationFilter(annotationKey);

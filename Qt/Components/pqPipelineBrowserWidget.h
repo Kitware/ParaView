@@ -80,6 +80,12 @@ public:
   void disableAnnotationFilter();
 
   /**
+   * Choose wether Annotation filter should display matching or non-matching sources.
+   * Default is matching.
+   */
+  void setAnnotationFilterMatching(bool matching);
+
+  /**
   * Set Session filter to use
   */
   void enableSessionFilter(vtkSession* session);
