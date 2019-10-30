@@ -41,16 +41,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 #include "@_paraview_client_MAIN_WINDOW_INCLUDE@"
+
 #include "pqOptions.h"
+#include "pqPluginManager.h"
 #include "pqPVApplicationCore.h"
 #include "pqSettings.h"
-
 #include "vtkPVConfig.h"
+#include "vtkPVLogger.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVPluginTracker.h"
-
-#include "vtkPVConfig.h"
-
 #include "vtksys/SystemTools.hxx"
 
 #cmakedefine01 _paraview_client_APPLICATION_XMLS
@@ -82,7 +81,9 @@ pq@_paraview_client_NAME@Initializer::~pq@_paraview_client_NAME@Initializer()
 //-----------------------------------------------------------------------------
 pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initializer::Initialize(int argc, char* argv[])
 {
+  vtkVLogStartScopeF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "init-core", "initialize pqPVApplicationCore");
   this->PVApp = new pqPVApplicationCore (argc, argv);
+  vtkLogEndScope("init-core");
 
   // Attach custom event filter
   QApplication::instance()->installEventFilter(this->PVApp);
@@ -116,14 +117,21 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
   }
 #endif
 
-  vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLs("@_paraview_client_NAME@");
-
   // Create main window.
+  vtkVLogStartScopeF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "create-window",
+      "creating main window `@_paraview_client_MAIN_WINDOW_CLASS@`");
   this->MainWindow = new @_paraview_client_MAIN_WINDOW_CLASS@();
+  vtkLogEndScope("create-window");
+
+  // load distributed plugins configuration.
+  vtkVLogStartScopeF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "app-plugins", "load `@_paraview_client_NAME@` plugin conf");
+  vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLs("@_paraview_client_NAME@");
+  vtkLogEndScope("app-plugins");
 
   vtkNew<vtkPVPluginLoader> loader;
 
   // Load required application plugins.
+  vtkVLogStartScopeF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "req-plugins", "load required plugins: `@_paraview_client_REQUIRED_PLUGINS@`");
   QString plugin_string = "@_paraview_client_REQUIRED_PLUGINS@";
   QStringList plugin_list = plugin_string.split(';',QString::SkipEmptyParts);
   foreach (const QString plugin_name, plugin_list)
@@ -134,8 +142,10 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
         << plugin_name.toLatin1().data() << std::endl;
     }
   }
+  vtkLogEndScope("req-plugins");
 
   // Load optional plugins.
+  vtkVLogStartScopeF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "opt-plugins", "load optional plugins: `@_paraview_client_OPTIONAL_PLUGINS@`");
   plugin_string = "@_paraview_client_OPTIONAL_PLUGINS@";
   plugin_list = plugin_string.split(';',QString::SkipEmptyParts);
   foreach (const QString plugin_name, plugin_list)
@@ -146,6 +156,12 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
         << plugin_name.toLatin1().data() << std::endl;
     }
   }
+  vtkLogEndScope("opt-plugins");
+
+  // now load plugins based on user-preferences.
+  vtkVLogStartScopeF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "ini-plugins", "load plugins from settings");
+  this->PVApp->getPluginManager()->loadPluginsFromSettings();
+  vtkLogEndScope("ini-plugins");
 
 #if _paraview_client_APPLICATION_XMLS
   // Load configuration xmls after all components have been instantiated.

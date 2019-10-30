@@ -31,24 +31,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqAlwaysConnectedBehavior.h"
 
-#include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
+#include "pqPVApplicationCore.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "vtkNetworkAccessManager.h"
 #include "vtkProcessModule.h"
+
+#include <cassert>
 
 //-----------------------------------------------------------------------------
 pqAlwaysConnectedBehavior::pqAlwaysConnectedBehavior(QObject* parentObject)
   : Superclass(parentObject)
   , DefaultServer("builtin:")
 {
+  auto core = pqPVApplicationCore::instance();
+  assert(core != nullptr);
+
+  // check for valid server when application becomes ready.
+  this->connect(core, SIGNAL(clientEnvironmentDone()), SLOT(serverCheck()));
+
+  // check for valid server after disconnect.
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
   this->Timer.setSingleShot(true);
   this->Timer.setInterval(0);
-  QObject::connect(&this->Timer, SIGNAL(timeout()), this, SLOT(serverCheck()));
+  this->connect(&this->Timer, SIGNAL(timeout()), SLOT(serverCheck()));
+  this->Timer.connect(smmodel, SIGNAL(finishedRemovingServer()), SLOT(start()));
 
-  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
-  QObject::connect(smmodel, SIGNAL(finishedRemovingServer()), this, SLOT(delayedServerCheck()));
   this->serverCheck();
 }
 
@@ -58,15 +67,9 @@ pqAlwaysConnectedBehavior::~pqAlwaysConnectedBehavior()
 }
 
 //-----------------------------------------------------------------------------
-void pqAlwaysConnectedBehavior::delayedServerCheck()
-{
-  this->Timer.start();
-}
-
-//-----------------------------------------------------------------------------
 void pqAlwaysConnectedBehavior::serverCheck()
 {
-  pqApplicationCore* core = pqApplicationCore::instance();
+  pqPVApplicationCore* core = pqPVApplicationCore::instance();
   if (core->getServerManagerModel()->getNumberOfItems<pqServer*>() != 0)
   {
     return;
@@ -74,7 +77,7 @@ void pqAlwaysConnectedBehavior::serverCheck()
   if (core->getObjectBuilder()->waitingForConnection())
   {
     // Try again later, we are waiting for server to connect.
-    this->delayedServerCheck();
+    this->Timer.start();
     return;
   }
 

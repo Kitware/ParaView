@@ -28,9 +28,10 @@
 #ifndef vtkPVPluginTracker_h
 #define vtkPVPluginTracker_h
 
+#include "vtkCommand.h" // needed for vtkCommand
 #include "vtkObject.h"
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
-#include "vtkSmartPointer.h"                 // needed  for vtkSmartPointer;
+#include "vtkPVClientServerCoreCoreModule.h" // needed for exports
+#include "vtkSmartPointer.h"                 // needed for vtkSmartPointer
 
 class vtkPVPlugin;
 class vtkPVXMLElement;
@@ -65,6 +66,9 @@ public:
   /**
    * This API is used to register available plugins without actually loading
    * them.
+   *
+   * This fires `vtkPVPluginTracker::RegisterAvailablePluginEvent` to notify a
+   * new plugin has been made available.
    */
   unsigned int RegisterAvailablePlugin(const char* filename);
 
@@ -121,6 +125,11 @@ public:
 #ifndef VTK_LEGACY_REMOVE
   static VTK_LEGACY(void SetStaticPluginSearchFunction(vtkPluginSearchFunction function));
 #endif
+
+  enum
+  {
+    RegisterAvailablePluginEvent = vtkCommand::UserEvent + 91
+  };
 
 protected:
   vtkPVPluginTracker();

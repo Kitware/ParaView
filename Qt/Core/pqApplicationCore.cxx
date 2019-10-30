@@ -190,7 +190,6 @@ void pqApplicationCore::constructor()
   // the plugin initialization code itself may request access to  the interface
   // tracker.
   this->InterfaceTracker->initialize();
-  this->PluginManager->loadPluginsFromSettings();
 
   if (auto pvsettings = vtkPVGeneralSettings::GetInstance())
   {
@@ -715,11 +714,6 @@ void pqApplicationCore::registerDocumentation(const QString& filename)
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationCore::loadDistributedPlugins(const char* vtkNotUsed(filename))
-{
-}
-
-//-----------------------------------------------------------------------------
 void pqApplicationCore::generalSettingsChanged()
 {
   if (auto pvsettings = vtkPVGeneralSettings::GetInstance())
@@ -729,4 +723,18 @@ void pqApplicationCore::generalSettingsChanged()
       static_cast<pqDoubleLineEdit::RealNumberNotation>(
         pvsettings->GetRealNumberDisplayedNotation()));
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::_paraview_client_environment_complete()
+{
+  static bool Initialized = false;
+  if (Initialized)
+  {
+    return;
+  }
+
+  Initialized = true;
+  vtkVLogScopeF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "clientEnvironmentDone");
+  emit this->clientEnvironmentDone();
 }

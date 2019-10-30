@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionManager.h"
 #include "pqSetName.h"
 #include "pqSpreadSheetViewModel.h"
+#include "vtkPVLogger.h"
 #include "vtkProcessModule.h"
 
 #if VTK_MODULE_ENABLE_ParaView_pqPython
@@ -261,17 +262,4 @@ void pqPVApplicationCore::loadStateFromPythonFile(const QString& filename, pqSer
   (void)server;
   qCritical() << "Cannot load a python state file since ParaView was not built with Python.";
 #endif
-}
-
-//-----------------------------------------------------------------------------
-void pqPVApplicationCore::_paraview_client_environment_complete()
-{
-  static bool Initialized = false;
-  if (Initialized)
-  {
-    return;
-  }
-
-  Initialized = true;
-  emit this->clientEnvironmentDone();
 }

@@ -78,6 +78,8 @@ vtkSMPluginManager::vtkSMPluginManager()
   // get fired, especially for plugins brought in a buildtime.
   vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
   tracker->AddObserver(vtkCommand::RegisterEvent, this, &vtkSMPluginManager::OnPluginRegistered);
+  tracker->AddObserver(
+    vtkPVPluginTracker::RegisterAvailablePluginEvent, this, &vtkSMPluginManager::OnPluginAvailable);
 }
 
 //----------------------------------------------------------------------------
@@ -239,15 +241,26 @@ void vtkSMPluginManager::OnPluginRegistered()
   {
     return;
   }
+
+  this->UpdateLocalPluginInformation();
+  this->InvokeEvent(vtkSMPluginManager::PluginLoadedEvent);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPluginManager::OnPluginAvailable()
+{
+  this->UpdateLocalPluginInformation();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPluginManager::UpdateLocalPluginInformation()
+{
   // Update local-plugin information.
-  vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
-  temp->CopyFromObject(NULL);
+  vtkNew<vtkPVPluginsInformation> temp;
+  temp->CopyFromObject(nullptr);
   // we use Update so that any auto-load state changes done in
   // this->LocalInformation are preserved.
   this->LocalInformation->Update(temp);
-  temp->Delete();
-
-  this->InvokeEvent(vtkSMPluginManager::PluginLoadedEvent);
 }
 
 //----------------------------------------------------------------------------
