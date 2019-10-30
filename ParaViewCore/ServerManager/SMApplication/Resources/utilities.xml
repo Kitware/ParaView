@@ -1488,6 +1488,18 @@
            >
       <Documentation>FlagpoleLabel is a 3D representation for a text
      source.</Documentation>
+
+      <IntVectorProperty name="Visibility"
+                         command="SetVisibility"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Show/hide the flagpole lable.
+        </Documentation>
+      </IntVectorProperty>
+
       <DoubleVectorProperty name="BasePosition"
                             command="SetBasePosition"
                             number_of_elements="3"
@@ -1549,6 +1561,18 @@
            >
       <Documentation>BillboardTextActor3D is a 3D representation for a text
      source.</Documentation>
+
+      <IntVectorProperty name="Visibility"
+                         command="SetVisibility"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Show/hide the billboard text actor.
+        </Documentation>
+      </IntVectorProperty>
+
       <DoubleVectorProperty name="BillboardPosition"
                             command="SetPosition"
                             number_of_elements="3"
