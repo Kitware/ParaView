@@ -47,7 +47,7 @@ $<$<BOOL:${_vtk_client_server_genex_include_directories}>:\n-I\'$<JOIN:${_vtk_cl
     VARIABLE  _vtk_client_server_hierarchy_file)
 
   get_property(_vtk_client_server_is_imported
-    TARGET    "${module}"
+    TARGET    "${_vtk_client_server_target_name}"
     PROPERTY  "IMPORTED")
   if (_vtk_client_server_is_imported OR CMAKE_GENERATOR MATCHES "Ninja")
     set(_vtk_client_server_command_depend "${_vtk_client_server_hierarchy_file}")
@@ -57,7 +57,8 @@ $<$<BOOL:${_vtk_client_server_genex_include_directories}>:\n-I\'$<JOIN:${_vtk_cl
     else ()
       message(FATAL_ERROR
         "The ${module} hierarchy file is attached to a non-imported target "
-        "and a hierarchy target is missing.")
+        "and a hierarchy target (${_vtk_client_server_target_name}-hierarchy) "
+        "is missing.")
     endif ()
   endif ()
 
