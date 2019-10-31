@@ -179,7 +179,8 @@ function (paraview_server_manager_process_files)
     OUTPUT  "${_paraview_sm_process_files_output}"
     DEPENDS ${_paraview_sm_process_files_FILES}
             "$<TARGET_FILE:ParaView::ProcessXML>"
-    COMMAND ParaView::ProcessXML
+    COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}
+            $<TARGET_FILE:ParaView::ProcessXML>
             "${_paraview_sm_process_files_output}"
             "${_paraview_sm_process_files_TARGET}"
             "Interface"
