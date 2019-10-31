@@ -1,0 +1,39 @@
+#### import the simple module from the paraview
+from paraview.simple import *
+
+# Load the plugin
+LoadPlugin("$<TARGET_FILE:ElevationFilter>", ns=globals())
+
+# Create a new 'Render View'
+renderView1 = CreateView('RenderView')
+SetActiveView(renderView1)
+
+# create a new 'Wavelet'
+wavelet1 = Wavelet()
+
+# create a new 'MyElevation'
+myElevation1 = MyElevation(Input=wavelet1)
+myElevation1.LowPoint = [-10.0, -10.0, -10.0]
+myElevation1.HighPoint = [10.0, 10.0, 10.0]
+
+# show data from myElevation1
+myElevation1Display = Show(myElevation1, renderView1)
+
+# trace defaults for the display properties.
+myElevation1Display.Representation = 'Surface'
+myElevation1Display.ColorArrayName = ['POINTS', 'Elevation']
+Render()
+
+import os
+import sys
+try:
+  baselineIndex = sys.argv.index('-B')+1
+  baselinePath = sys.argv[baselineIndex]
+except:
+  print("Could not get baseline directory. Test failed.")
+baseline_file = os.path.join(baselinePath, "TestPython.png")
+from paraview.vtk.test import Testing
+from paraview.vtk.util.misc import vtkGetTempDir
+Testing.VTK_TEMP_DIR = vtkGetTempDir()
+Testing.compareImage(renderView1.GetRenderWindow(), baseline_file, threshold=40)
+Testing.interact()
