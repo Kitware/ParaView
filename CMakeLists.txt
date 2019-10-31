@@ -340,9 +340,6 @@ if (PARAVIEW_ENABLE_PYTHON)
     VTK::RenderingMatplotlib)
 else ()
   list(APPEND paraview_rejected_modules
-    ParaView::PythonAlgorithm
-    ParaView::PythonInitializer
-    ParaView::ClientServerCorePythonRendering
     VTK::RenderingMatplotlib)
 endif ()
 
@@ -352,7 +349,6 @@ if (PARAVIEW_ENABLE_PYTHON)
     ParaView::CinemaReader)
 else ()
   list(APPEND paraview_rejected_modules
-    ParaView::CinemaPython
     ParaView::CinemaReader)
 endif()
 
@@ -405,7 +401,7 @@ if (PARAVIEW_USE_MPI AND PARAVIEW_ENABLE_PYTHON)
     VTK::ParallelMPI4Py)
 else ()
   list(APPEND paraview_rejected_modules
-    VTK::ParallelMPI4Py)
+    )
 endif()
 
 if (PARAVIEW_USE_VTKM)
@@ -583,12 +579,7 @@ if (PARAVIEW_ENABLE_WEB)
   endif ()
 else()
   list(APPEND paraview_rejected_modules
-    ParaView::PVWebCore
-    ParaView::PVWebPython
-    ParaView::PVWebPython2
-    ParaView::PVWebExporter
     VTK::WebCore
-    VTK::WebPython
   )
 endif ()
 
