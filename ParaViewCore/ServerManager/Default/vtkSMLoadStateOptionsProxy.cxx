@@ -399,17 +399,12 @@ bool vtkSMLoadStateOptionsProxy::Load()
            idIter != this->Internals->PropertiesMap.end(); idIter++)
       {
         std::string primaryFilename = "";
-        bool propertiesModified = false;
         for (auto pIter = idIter->second.begin(); pIter != idIter->second.end(); pIter++)
         {
           vtkInternals::PropertyInfo& info = pIter->second;
           if (!info.Modified)
           {
             continue;
-          }
-          else
-          {
-            propertiesModified = true;
           }
 
           for (auto fIter = info.FilePaths.begin(); fIter != info.FilePaths.end(); ++fIter)
@@ -418,27 +413,24 @@ bool vtkSMLoadStateOptionsProxy::Load()
             info.XMLElement.find_child_by_attribute("Element", "index", idx.c_str())
               .attribute("value")
               .set_value(fIter->c_str());
-
             if (primaryFilename.empty() && fIter->compare(0, 3, "XML") != 0)
             {
               primaryFilename = fIter->c_str();
             }
           }
-        }
 
-        // Also fix up sources proxy collection
-        // Get sequence basename if needed
-        if (propertiesModified)
-        {
-          std::string filename = SystemTools::GetFilenameName(primaryFilename);
-          vtkNew<vtkFileSequenceParser> sequenceParser;
-          if (sequenceParser->ParseFileSequence(filename.c_str()))
+          // Also fix up sources proxy collection. Get file sequence basename if needed.
+          if (!primaryFilename.empty() && info.FilePaths.size() > 1)
           {
-            filename = sequenceParser->GetSequenceName();
+            std::string filename = SystemTools::GetFilenameName(primaryFilename);
+            vtkNew<vtkFileSequenceParser> sequenceParser;
+            if (sequenceParser->ParseFileSequence(filename.c_str()))
+            {
+              filename = sequenceParser->GetSequenceName();
+            }
+            this->Internals->CollectionsMap[idIter->first].attribute("name").set_value(
+              filename.c_str());
           }
-
-          this->Internals->CollectionsMap[idIter->first].attribute("name").set_value(
-            filename.c_str());
         }
       }
 
