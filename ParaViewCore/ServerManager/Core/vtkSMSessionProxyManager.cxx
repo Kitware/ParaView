@@ -1315,6 +1315,7 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement* par
   rootElement->AddAttribute("version", version_string.str().c_str());
 
   std::set<vtkSMProxy*> visited_proxies; // set of proxies already added.
+  std::set<std::pair<std::string, std::string> > visited_proxy_types;
 
   // First save the state of all proxies
   vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
@@ -1358,13 +1359,15 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement* par
       vtkSMProxyManagerProxyListType::iterator it3 = it2->second.begin();
       for (; it3 != it2->second.end(); ++it3)
       {
-        if (visited_proxies.find(it3->GetPointer()->Proxy.GetPointer()) != visited_proxies.end())
+        auto proxy = it3->GetPointer()->Proxy.GetPointer();
+        if (visited_proxies.find(proxy) != visited_proxies.end())
         {
           // proxy has been saved.
           continue;
         }
-        it3->GetPointer()->Proxy.GetPointer()->SaveXMLState(rootElement);
-        visited_proxies.insert(it3->GetPointer()->Proxy.GetPointer());
+        proxy->SaveXMLState(rootElement);
+        visited_proxies.insert(proxy);
+        visited_proxy_types.insert(std::make_pair(proxy->GetXMLGroup(), proxy->GetXMLName()));
       }
     }
   }
@@ -1430,11 +1433,28 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement* par
     }
   }
 
-  // TODO: Save definitions for only referred compound proxy definitions
-  // when saving state for subset of proxies.
   vtkPVXMLElement* defs = vtkPVXMLElement::New();
   defs->SetName("CustomProxyDefinitions");
   this->SaveCustomProxyDefinitions(defs);
+  // remove definitions from defs that are not relevant for the proxies in the
+  // state file.
+  std::vector<vtkPVXMLElement*> to_remove;
+  for (unsigned int cc = 0, max = defs->GetNumberOfNestedElements(); cc < max; ++cc)
+  {
+    auto child = defs->GetNestedElement(cc);
+    auto cgroup = child->GetAttributeOrEmpty("group");
+    auto cname = child->GetAttributeOrEmpty("name");
+    if (child->GetName() && strcmp(child->GetName(), "CustomProxyDefinition") == 0 &&
+      visited_proxy_types.find(std::make_pair(cgroup, cname)) == visited_proxy_types.end())
+    {
+      to_remove.push_back(child);
+    }
+  }
+  for (auto child : to_remove)
+  {
+    defs->RemoveNestedElement(child);
+  }
+  to_remove.clear();
   rootElement->AddNestedElement(defs);
   defs->Delete();
 
