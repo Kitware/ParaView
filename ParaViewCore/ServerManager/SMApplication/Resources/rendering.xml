@@ -367,7 +367,8 @@
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="TextAnnotationColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="TextAnnotationColor"
+            unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty animateable="0"

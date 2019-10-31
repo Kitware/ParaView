@@ -734,7 +734,7 @@ def LoadPalette(paletteName):
     colors used by ParaView views.  The current global palette's colors are set
     to the colors in the loaded palette."""
     pxm = servermanager.ProxyManager()
-    palette = pxm.GetProxy("global_properties", "ColorPalette")
+    palette = pxm.GetProxy("settings", "ColorPalette")
     prototype = pxm.GetPrototypeProxy("palettes", paletteName)
 
     if palette is None or prototype is None:

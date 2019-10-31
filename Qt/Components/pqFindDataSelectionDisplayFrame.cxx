@@ -135,7 +135,7 @@ public:
     // Link the selection color to the global selection color so that it will
     // affect all views, otherwise the user may be get confused.
     vtkSMProxy* colorPalette =
-      this->Port->getServer()->proxyManager()->GetProxy("global_properties", "ColorPalette");
+      this->Port->getServer()->proxyManager()->GetProxy("settings", "ColorPalette");
     if (colorPalette)
     {
       this->Links.addPropertyLink(this->Ui.selectionColor, "chosenColorRgbF",

@@ -25,6 +25,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSettingsProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStateVersionController.h"
 #include "vtkSmartPointer.h"
@@ -668,6 +669,30 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
     if (name && strcmp(name, "Links") == 0)
     {
       this->HandleLinks(currentElement);
+    }
+  }
+
+  // Process settings links.
+  auto pxm = this->GetSessionProxyManager();
+  for (i = 0; i < numElems; i++)
+  {
+    vtkPVXMLElement* currentElement = rootElement->GetNestedElement(i);
+    const char* name = currentElement->GetName();
+    if (name && strcmp(name, "Settings") == 0)
+    {
+      for (int cc = 0, max = currentElement->GetNumberOfNestedElements(); cc < max; ++cc)
+      {
+        auto sproxy = currentElement->GetNestedElement(cc);
+        if (sproxy && sproxy->GetName() && strcmp(sproxy->GetName(), "SettingsProxy") == 0)
+        {
+          auto settingsProxy = vtkSMSettingsProxy::SafeDownCast(
+            pxm->GetProxy(sproxy->GetAttribute("group"), sproxy->GetAttribute("type")));
+          if (settingsProxy)
+          {
+            settingsProxy->LoadLinksState(sproxy, this->ProxyLocator);
+          }
+        }
+      }
     }
   }
 

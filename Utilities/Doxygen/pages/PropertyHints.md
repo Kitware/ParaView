@@ -92,6 +92,21 @@ vtkSMParaViewPipelineController::PostInitializeProxy() looks for (settings, Rend
 proxy, it will find one and then be able to setup a property link to ensure that the property
 on the RenderView proxy is kept in sync with the property on the RenderViewSettings proxy.
 
+The optional attribute `unlink_if_modified` can be set to 1 if the link should
+be broken if the user explicitly modifies the property. This is useful when
+linking color-related properties with the active color palette, for example:
+
+    <DoubleVectorProperty command="SetBackground"
+                          default_values="0.329 0.349 0.427"
+                          name="Background"
+                          panel_widget="color_selector_with_palette"
+                          number_of_elements="3">
+      <Hints>
+        <PropertyLink group="settings" proxy="ColorPalette" property="BackgroundColor" unlink_if_modified="1" />
+      </Hints>
+    </DoubleVectorProperty>
+
+
 SelectionInput
 --------------
 Mark a input as a one that accepts a vtkSelection.

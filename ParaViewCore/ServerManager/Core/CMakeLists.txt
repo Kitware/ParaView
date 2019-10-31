@@ -63,8 +63,6 @@ set(classes
   vtkSMFieldDataDomain
   vtkSMFileListDomain
   vtkSMFixedTypeDomain
-  vtkSMGlobalPropertiesLinkUndoElement
-  vtkSMGlobalPropertiesProxy
   vtkSMIdTypeVectorProperty
   vtkSMIndexSelectionDomain
   vtkSMInputArrayDomain

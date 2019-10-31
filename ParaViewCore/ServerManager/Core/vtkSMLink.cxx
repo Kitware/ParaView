@@ -110,6 +110,7 @@ void vtkSMLink::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Enabled: " << this->Enabled << endl;
   os << indent << "PropagateUpdateVTKObjects: " << this->PropagateUpdateVTKObjects << endl;
 }
+
 //-----------------------------------------------------------------------------
 void vtkSMLink::PushStateToSession()
 {
@@ -121,16 +122,17 @@ void vtkSMLink::PushStateToSession()
     this->PushState(this->State);
   }
 }
+
 //-----------------------------------------------------------------------------
 const vtkSMMessage* vtkSMLink::GetFullState()
 {
   return this->State;
 }
+
 //-----------------------------------------------------------------------------
 void vtkSMLink::LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator)
 {
   this->Superclass::LoadState(msg, locator);
-
   this->SetPropagateUpdateVTKObjects(msg->GetExtension(LinkState::propagate_update) ? 1 : 0);
   this->SetEnabled(msg->GetExtension(LinkState::enabled) ? 1 : 0);
 }

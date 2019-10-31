@@ -670,6 +670,9 @@ class PropertyTraceHelper(object):
         servermanager.Proxy.GetPropertyValue()."""
         return self.ProxyAccessor.get_object().GetPropertyValue(self.get_property_name())
 
+    def get_proxy(self):
+        return self.ProxyAccessor.get_object()
+
     def create_multiline_string(self, astr):
         """helper to convert a string representation into a multiline string"""
         if '\\n' in astr:
@@ -701,9 +704,20 @@ class ProxyFilter(object):
             return True
         # if a property is "linked" to settings, then skip it here too. We
         # should eventually add an option for user to save, yes, save these too.
+        # Note, however, any property that is linked with `unlink_if_modified`
+        # set to 1 should be traced if the link no longer persists -- indicating
+        # the user manually changed it (and hence broke the link).
         if prop.get_object().GetHints():
             plink = prop.get_object().GetHints().FindNestedElementByName("PropertyLink")
-            return True if plink and plink.GetAttribute("group") == "settings" else False
+            if plink and plink.GetAttribute("group") == "settings":
+                if plink.GetAttribute("unlink_if_modified") != "1":
+                    return True
+                proxy = prop.get_proxy()
+                pxm = proxy.GetSessionProxyManager()
+                settings = pxm.GetProxy("settings", plink.GetAttribute("proxy"))
+                if settings and settings.GetSourcePropertyName(proxy.SMProxy, prop.get_property_name()):
+                    # the settings link still exists, skip tracing
+                    return True
         return False
 
     def should_trace_in_create(self, prop, user_can_modify_in_create=True):

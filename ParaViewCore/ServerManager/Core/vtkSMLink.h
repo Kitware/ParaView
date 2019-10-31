@@ -13,13 +13,13 @@
 
 =========================================================================*/
 /**
- * @class   vtkSMLink
- * @brief   Abstract base class for proxy/property links.
+ * @class vtkSMLink
+ * @brief Abstract base class for proxy/property links.
  *
  * Abstract base class for proxy/property links. Links provide a means
- * to connect two properties(or proxies) together, thus when one is updated,
- * the dependent one is also updated accordingly.
-*/
+ * to connect two properties (or proxies) together, thus when one is updated,
+ * the dependent one is updated accordingly.
+ */
 
 #ifndef vtkSMLink_h
 #define vtkSMLink_h

@@ -1659,7 +1659,7 @@
                             panel_visibility="never"
                             number_of_elements="3">
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="TextAnnotationColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="TextAnnotationColor" unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetUseInteractiveRenderingForScreenshots"
@@ -1869,7 +1869,7 @@
                             panel_visibility="advanced"
                             number_of_elements="3">
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="TextAnnotationColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="TextAnnotationColor" unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetOrientationAxesOutlineColor"
@@ -1879,7 +1879,7 @@
                             panel_visibility="advanced"
                             number_of_elements="3">
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="ForegroundColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor" unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
 
@@ -2447,7 +2447,7 @@
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="BackgroundColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="BackgroundColor" unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetBackground2"
@@ -2465,7 +2465,8 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="UseGradientBackground" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="UseGradientBackground"
+            unlink_if_modified="1" />
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetTexturedBackground"
@@ -5166,7 +5167,7 @@
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="EdgeColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="EdgeColor" unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetAmbientColor"
@@ -5177,7 +5178,7 @@
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="ForegroundColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor" unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetDiffuseColor"
@@ -5188,7 +5189,7 @@
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="SurfaceColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="SurfaceColor" unlink_if_modified="1" />
         </Hints>
         <Documentation>
           The diffuse color of the model
@@ -5737,7 +5738,7 @@
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="SurfaceColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="SurfaceColor" unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
     </RepresentationProxy>
@@ -6359,7 +6360,7 @@
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="SelectionColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="SelectionColor" unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetLineWidth"
@@ -7167,7 +7168,7 @@
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="SelectionColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="SelectionColor" unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <SubProxy command="SetSelectionRepresentation">
@@ -8824,7 +8825,7 @@
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="TextAnnotationColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="TextAnnotationColor" unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetLineWidth"
@@ -10566,7 +10567,7 @@
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="ForegroundColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor" unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetDiffuseColor"
@@ -10578,7 +10579,7 @@
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="SurfaceColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="SurfaceColor" unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetSpecularColor"
@@ -11179,7 +11180,7 @@
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="ForegroundColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor" unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetDiffuseColor"
@@ -11191,7 +11192,7 @@
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="SurfaceColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="SurfaceColor" unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetSpecularColor"
@@ -11365,7 +11366,7 @@
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="EdgeColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="EdgeColor" unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetPosition"

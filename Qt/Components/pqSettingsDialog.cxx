@@ -105,13 +105,18 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
     }
   }
 
-  // Add color palette.
-  if (vtkSMProxy* proxy = server->proxyManager()->GetProxy("global_properties", "ColorPalette"))
+  // A hack to move color palette to back of the list of proxies.
+  for (auto piter = proxies_to_show.begin(); piter != proxies_to_show.end(); ++piter)
   {
-    proxies_to_show.push_back(proxy);
+    if (strcmp((*piter)->GetXMLName(), "ColorPalette") == 0)
+    {
+      auto proxy = *piter;
+      proxies_to_show.erase(piter);
+      proxies_to_show.push_back(proxy);
+    }
   }
 
-  foreach (vtkSMProxy* proxy, proxies_to_show)
+  for (auto proxy : proxies_to_show)
   {
     QString proxyName = proxy->GetXMLName();
 
@@ -242,13 +247,6 @@ void pqSettingsDialog::onAccepted()
         qSettings->saveInQSettings(key.toLocal8Bit().data(), smproperty);
       }
     }
-  }
-
-  // Save color palette settings
-  vtkSMProxy* paletteProxy = server->proxyManager()->GetProxy("global_properties", "ColorPalette");
-  if (paletteProxy)
-  {
-    settings->SetProxySettings(paletteProxy);
   }
 
   // Disable buttons

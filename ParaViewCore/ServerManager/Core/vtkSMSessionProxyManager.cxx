@@ -31,7 +31,6 @@
 #include "vtkSMDeserializerProtobuf.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMExportProxyDepot.h"
-#include "vtkSMGlobalPropertiesLinkUndoElement.h"
 #include "vtkSMPipelineState.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
@@ -42,6 +41,7 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMSessionClient.h"
+#include "vtkSMSettingsProxy.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMUndoStack.h"
@@ -1325,10 +1325,9 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement* par
 
     const char* colname = it->first.c_str();
 
-    // Do not save the state of global_properties nor settings.
-    const char* global_properties = "global_properties";
+    // Do not save the state of settings.
     const char* settings = "settings";
-    if (strcmp(global_properties, colname) == 0 || strcmp(settings, colname) == 0)
+    if (strcmp(settings, colname) == 0)
     {
       continue;
     }
@@ -1444,14 +1443,26 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement* par
   links->SetName("Links");
   this->SaveRegisteredLinks(links);
   rootElement->AddNestedElement(links);
-
-  vtkSMProxy* globalPropertiesProxy = this->GetProxy("global_properties", "ColorPalette");
-  if (globalPropertiesProxy)
-  {
-    globalPropertiesProxy->SaveXMLState(links);
-  }
-
   links->Delete();
+
+  // Save information about links with `settings` proxies.
+  auto settingsIter = this->Internals->RegisteredProxyMap.find("settings");
+  if (settingsIter != this->Internals->RegisteredProxyMap.end())
+  {
+    vtkNew<vtkPVXMLElement> settings;
+    settings->SetName("Settings");
+    rootElement->AddNestedElement(settings);
+    for (const auto& pair : settingsIter->second)
+    {
+      for (auto& pxminfo : pair.second)
+      {
+        if (auto settingsProxy = vtkSMSettingsProxy::SafeDownCast(pxminfo->Proxy))
+        {
+          settingsProxy->SaveLinksState(settings);
+        }
+      }
+    }
+  }
 
   if (parentElem)
   {
