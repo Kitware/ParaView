@@ -1,0 +1,18 @@
+NAME
+  HyperTreeGridFilters
+LIBRARY_NAME
+  vtkFiltersHyperTreeGridADR
+DESCRIPTION
+  Hypertree filters and algorithms
+GROUPS
+  StandAlone
+DEPENDS
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::CommonMisc
+  VTK::FiltersCore
+  VTK::FiltersGeneral
+  ParaView::VTKExtensionsDefault
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::CommonSystem

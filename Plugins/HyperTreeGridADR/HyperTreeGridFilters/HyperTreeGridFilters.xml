@@ -1,0 +1,271 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="array_measurement">
+    <NullProxy name="None"></NullProxy>
+    <Proxy class="vtkArithmeticMeanArrayMeasurement"
+           name="Arithmetic Mean">
+      <Hints>
+        <ProxyList>
+          <Link name="Input"
+                with_property="Input" />
+        </ProxyList>
+      </Hints>
+    </Proxy>
+    <Proxy class="vtkGeometricMeanArrayMeasurement"
+           name="Geometric Mean">
+      <Hints>
+        <ProxyList>
+          <Link name="Input"
+                with_property="Input" />
+        </ProxyList>
+      </Hints>
+    </Proxy>
+    <Proxy class="vtkHarmonicMeanArrayMeasurement"
+           name="Harmonic Mean">
+      <Hints>
+        <ProxyList>
+          <Link name="Input"
+                with_property="Input" />
+        </ProxyList>
+      </Hints>
+    </Proxy>
+    <Proxy class="vtkQuantileArrayMeasurement"
+           name="Quantile">
+      <Hints>
+        <ProxyList>
+          <Link name="Input"
+                with_property="Input" />
+        </ProxyList>
+      </Hints>
+      <DoubleVectorProperty command="SetPercentile"
+                            default_values="50.0"
+                            name="Percentile"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+           Set the percentile for measurement. Setting is to 50.0 is equivalent with computing the median.
+        </Documentation>
+      </DoubleVectorProperty>
+    </Proxy>
+    <Proxy class="vtkEntropyArrayMeasurement"
+           name="Entropy">
+      <Hints>
+        <ProxyList>
+          <Link name="Input"
+                with_property="Input" />
+        </ProxyList>
+      </Hints>
+      <DoubleVectorProperty command="SetDiscretizationStep"
+                            default_values="0.1"
+                            name="Bin width"
+                            number_of_elements="1">
+        <Documentation>
+          Set the width of the bins used to compute the entropy.
+        </Documentation>
+      </DoubleVectorProperty>
+    </Proxy>
+    <Proxy class="vtkStandardDeviationArrayMeasurement"
+           name="Standard Deviation">
+      <Hints>
+        <ProxyList>
+          <Link name="Input"
+                with_property="Input" />
+        </ProxyList>
+      </Hints>
+    </Proxy>
+  </ProxyGroup>
+  <ProxyGroup name="filters" >
+    <SourceProxy name="ResampleToHyperTreeGrid" class="vtkResampleToHyperTreeGrid" label="Resample To Hyper Tree Grid" >
+      <Documentation long_help="Adaptive Mesh Refinement using a Hyper Tree Grid. The output is a Hyper Tree grid such that its leaves store a value measuring some property of the set of points inside them. Leaves are subdivided given some user defined heuristic."
+                     short_help="Adaptive Mesh Refinement using a Hyper Tree Grid." >
+          This Filter generates a Hyper Tree Grid from any input data set which has point data.
+          Leaves of the Hyper Tree Grid are subdivided if the subset of points inside that leave
+          match a crietrion set by the user on the input point data. The criterion is displayed, as
+          well as an other way to represent the set of data in the subset.
+      </Documentation>
+      <InputProperty name="Input"
+                     command="SetInputConnection" >
+            <ProxyGroupDomain name="groups" >
+              <Group name="sources" />
+              <Group name="filters" />
+            </ProxyGroupDomain>
+            <DataTypeDomain name="input_type" >
+              <DataType value="vtkDataSet" />
+            </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="Dimensions"
+                         label="Dimensions"
+                         command="SetDimensions"
+                         number_of_elements="3"
+                         animateable="1"
+                         default_values="3 3 3" >
+          <Documentation>
+            Dimensions of the Hyper Tree Grid.
+          </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="BranchFactor"
+                         label="Branch Factor"
+                         command="SetBranchFactor"
+                         number_of_elements="1"
+                         default_values="2" >
+          <EnumerationDomain name="enum" >
+            <Entry value="2" text="2" />
+            <Entry value="3" text="3" />
+          </EnumerationDomain>
+          <Documentation>
+            Branch factor of the output Hyper Tree Grid.
+          </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="MaxDepth"
+                         label="MaxDepth"
+                         command="SetMaxDepth"
+                         number_of_elements="1"
+                         animateable="0"
+                         default_values="1" >
+        <Documentation>
+          Maximum tree depth of output Hyper Tree Grid.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty name="SelectInputScalars"
+                            label="Array"
+                            command="SetInputArrayToProcess"
+                            number_of_elements="5"
+                            element_types="int int int int str"
+                            animateable="0" >
+        <ArrayListDomain name="array_list"
+                         attribute_type="Scalars"
+                         input_domain_name="inputs_array" >
+          <RequiredProperties>
+            <Property name="Input"
+                      function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          Input point data to use for creating the Hyper Tree Grid.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty name="UseMax"
+                         command="SetMaxState"
+                         label="Use Max"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If not checked, Max is set to infinity.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="Max"
+                            command="SetMax"
+                            number_of_elements="1"
+                            default_values="1">
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseMax" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          Leaves are subdivided if the Subdividing Criterion is lower than Max.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="UseMin"
+                         command="SetMinState"
+                         label="Use Min"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If not checked, Min is set to minus infinity.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="Min"
+                            command="SetMin"
+                            number_of_elements="1"
+                            default_values="0" >
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseMin" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          Leaves are subdivided if the Subdividing Criterion is greater than Min.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="MinimumNumberOfPointsInSubtree"
+                         command="SetMinimumNumberOfPointsInSubtree"
+                         number_of_elements="1"
+                         default_values="1" >
+        <Documentation>
+          Nodes are subdivided if an only if their non-empty children have at least this amount of points.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="InsideRange"
+                         command="SetInRange"
+                         number_of_elements="1"
+                         default_values="1" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Inverts the criterion. Leafs are subdivided if the Subdividing Criterion is outside of [Min, Max]
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="NoEmptyCells"
+                         command="SetNoEmptyCells"
+                         number_of_elements="1"
+                         default_values="0" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Forces the output hyper tree grid to not produce empty cells. Algorithm will be slightly slower if activated.
+        </Documentation>
+      </IntVectorProperty>
+      <ProxyProperty command="SetArrayMeasurement"
+                     label="Subdividing Criterion"
+                     name="ArrayMeasurement">
+        <ProxyGroupDomain name="groups">
+          <Group name="array_measurement" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="array_measurement"
+                 name="Arithmetic Mean" />
+          <Proxy group="array_measurement"
+                 name="Geometric Mean" />
+          <Proxy group="array_measurement"
+                 name="Harmonic Mean" />
+          <Proxy group="array_measurement"
+                 name="Quantile" />
+          <Proxy group="array_measurement"
+                 name="Standard Deviation" />
+          <Proxy group="array_measurement"
+                 name="Entropy" />
+          <Proxy group="array_measurement"
+                 name="None" />
+        </ProxyListDomain>
+        <Documentation>This property sets the array measurement method used for
+          subdividing leaves in the hyper tree grid.</Documentation>
+      </ProxyProperty>
+      <ProxyProperty command="SetArrayMeasurementDisplay"
+                     label="Averaging method"
+                     name="ArrayMeasurementDisplay">
+        <ProxyGroupDomain name="groups">
+          <Group name="array_measurement" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="array_measurement"
+                 name="None" />
+          <Proxy group="array_measurement"
+                 name="Arithmetic Mean" />
+          <Proxy group="array_measurement"
+                 name="Geometric Mean" />
+          <Proxy group="array_measurement"
+                 name="Harmonic Mean" />
+          <Proxy group="array_measurement"
+                 name="Quantile" />
+          <Proxy group="array_measurement"
+                 name="Standard Deviation" />
+          <Proxy group="array_measurement"
+                 name="Entropy" />
+        </ProxyListDomain>
+        <Documentation>This property sets an extra array measurement method only for visualization
+          purposes.</Documentation>
+      </ProxyProperty>
+      <!-- End ResampleToHyperTreeGrid -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
