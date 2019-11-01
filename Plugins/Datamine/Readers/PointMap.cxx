@@ -2,6 +2,7 @@
 // to the point ids used in vtkPointData
 
 #include "PointMap.h"
+#include <stdio.h>
 
 // --------------------------------------
 PointMap::PointMap(vtkIdType numPoints)
@@ -42,7 +43,7 @@ void PointMap::SetID(vtkIdType oldID, vtkIdType newId)
   // ideally this should never happen
   if (static_cast<size_t>(oldID) >= this->Map.size())
   {
-    this->Map.resize(this->Map.size() * 1.2);
+    this->Map.resize(static_cast<size_t>(this->Map.size() * 1.2));
   }
 
   this->Map[oldID] = newId;
