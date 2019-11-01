@@ -84,6 +84,7 @@ if (PARAVIEW_ENABLE_PYTHON)
 endif ()
 
 if (PARAVIEW_BUILD_QT_GUI)
+  include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}Client-targets.cmake")
   include("${CMAKE_CURRENT_LIST_DIR}/ParaView-client-xml.cmake")
 endif ()
 

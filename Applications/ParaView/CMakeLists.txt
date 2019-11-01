@@ -48,7 +48,7 @@ endif ()
 paraview_client_add(
   NAME              paraview
   NAMESPACE         "ParaView"
-  EXPORT            "ParaView"
+  EXPORT            "ParaViewClient"
   APPLICATION_NAME  "ParaView"
   TITLE             "ParaView ${paraview_version}"
   ORGANIZATION      "ParaView"
@@ -88,6 +88,17 @@ if (PARAVIEW_ENABLE_PYTHON)
       ParaView::pqPython
       ParaView::PythonInitializer)
 endif ()
+
+export(
+  EXPORT    ParaViewClient
+  NAMESPACE ParaView::
+  FILE      "${CMAKE_BINARY_DIR}/${paraview_cmake_destination}/ParaViewClient-targets.cmake")
+install(
+  EXPORT      ParaViewClient
+  NAMESPACE   ParaView::
+  FILE        ParaViewClient-targets.cmake
+  DESTINATION "${paraview_cmake_destination}"
+  COMPONENT   "development")
 
 if (BUILD_TESTING)
   add_subdirectory(Testing)
