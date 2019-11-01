@@ -21,6 +21,7 @@
 #ifndef vtkCSVWriter_h
 #define vtkCSVWriter_h
 
+#include "vtkDataObject.h"                   // for vtkDataObject::FieldAssociations
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkWriter.h"
 
@@ -103,7 +104,7 @@ public:
    * 1 is for cell data (vtkDataObject::CELL) and 2 is for field data (vtkDataObject::FIELD).
    * Default is 0.
    */
-  vtkSetClampMacro(FieldAssociation, int, 0, 2);
+  vtkSetClampMacro(FieldAssociation, int, 0, vtkDataObject::NUMBER_OF_ASSOCIATIONS - 1);
   vtkGetMacro(FieldAssociation, int);
   //@}
 

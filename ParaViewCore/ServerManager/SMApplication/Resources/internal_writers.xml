@@ -463,11 +463,14 @@
       <!-- End of STLWriter -->
     </Proxy>
     <!-- ================================================================= -->
-    <Proxy class="vtkCSVWriter"
-           name="CSVWriter">
+    <Proxy class="vtkCSVWriter" name="CSVWriter">
       <Documentation short_help="Writer to write CSV files">Writer to write comma or tab
       delimited files from a table. If the file extension is tsv it uses the tab character
       for the delimiter. Otherwise it uses a comma.</Documentation>
+
+      <InputProperty name="DummyInput" panel_visibility="never">
+      </InputProperty>
+
       <IntVectorProperty command="SetPrecision"
                          default_values="5"
                          name="Precision"
@@ -494,19 +497,11 @@
                          name="FieldAssociation"
                          number_of_elements="1">
         <Documentation>Select the attribute data to pass.</Documentation>
-        <EnumerationDomain name="enum">
-          <Entry text="Points"
-                 value="0" />
-          <Entry text="Cells"
-                 value="1" />
-          <Entry text="Field Data"
-                 value="2" />
-          <!-- These values are not applicable for vtkDataSet.
-               <Entry text="Vertices" value="4" />
-               <Entry text="Edges" value="5" />
-               <Entry text="Rows" value="6" />
-          -->
-        </EnumerationDomain>
+        <FieldDataDomain name="enum" enable_field_data="1">
+          <RequiredProperties>
+            <Property function="Input" name="DummyInput" />
+          </RequiredProperties>
+        </FieldDataDomain>
       </IntVectorProperty>
       <IntVectorProperty command="SetAddMetaData"
                          default_values="1"

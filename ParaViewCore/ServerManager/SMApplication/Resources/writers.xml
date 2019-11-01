@@ -1473,108 +1473,9 @@
       </Hints>
       <!-- End of XMLPVAnimationWriter -->
     </SourceProxy>
-    <!-- ================================================================= -->
     <PWriterProxy class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
                  name="CSVWriter">
-      <Documentation short_help="Writer to write CSV files">Writer to write comma or tab
-      delimited files from a table. If the file extension is tsv it uses the tab character
-      for the delimiter. Otherwise it uses a comma.</Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkTable" />
-        </DataTypeDomain>
-        <Documentation>The input filter/source whose output table is to be
-        written to the file.</Documentation>
-      </InputProperty>
-      <StringVectorProperty command="SetFileName"
-                            name="FileName"
-                            number_of_elements="1">
-        <Documentation>The name of the file to be written.</Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty command="SetWriteAllTimeSteps"
-                         default_values="0"
-                         name="WriteTimeSteps"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>When WriteTimeSteps is turned ON, the writer is
-        executed once for each timestep available from its input.</Documentation>
-      </IntVectorProperty>
-      <StringVectorProperty command="SetFileNameSuffix"
-                            default_values="_%d"
-                            label = "File name suffix"
-                            name="FileNameSuffix"
-                            number_of_elements="1">
-        <Documentation>
-        The suffix to append to the file name when writing files at different timesteps.
-        (File extensions such as .csv should be excluded.)
-        The % format specifiers are used. For example, _%d will write files as FileName_0,
-        FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
-        FileName_001, FileName_002 etc.
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="EnableWidgetDecorator">
-            <Property name="WriteTimeSteps" function="boolean" />
-          </PropertyWidgetDecorator>
-        </Hints>
-      </StringVectorProperty>
-
-      <SubProxy>
-        <Proxy name="PassArrays" proxygroup="internal_writers" proxyname="PassArrays" />
-        <ExposedProperties>
-          <Property name="ChooseArraysToWrite"/>
-          <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
-            <Property name="PointDataArrays" />
-            <Property name="CellDataArrays" />
-            <Property name="FieldDataArrays" />
-            <Property name="VertexDataArrays" />
-            <Property name="EdgeDataArrays" />
-            <Property name="RowDataArrays" />
-            <Hints>
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="ChooseArraysToWrite"
-                                       value="1" />
-              <!-- show this widget when ChooseArraysToWrite==1 -->
-            </Hints>
-          </PropertyGroup>
-        </ExposedProperties>
-        <LinkProperties>
-          <Property name="Input" with_property="Input" />
-        </LinkProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="Writer"
-               proxygroup="internal_writers"
-               proxyname="CSVWriter"></Proxy>
-        <ExposedProperties>
-          <PropertyGroup label="CSV Writer Parameters">
-            <Property name="Precision" />
-            <Property name="UseScientificNotation" />
-            <Property name="FieldDelimiter" />
-            <Property name="AddTime" />
-          </PropertyGroup>
-        </ExposedProperties>
-      </SubProxy>
-
-      <Hints>
-        <Property name="Input"
-                  show="0" />
-        <Property name="FileName"
-                  show="0" />
-        <Property name="FieldDelimiter"
-                  show="0"/>
-        <WriterFactory extensions="csv txt tsv"
-                       file_description="Comma or Tab Delimited Files" />
-        <InitializationHelper class="vtkSMCSVProxiesInitializationHelper" />
-      </Hints>
-      <!-- End of CSVWriter -->
-    </PWriterProxy>
-    <PWriterProxy class="vtkFileSeriesWriter"
-                 file_name_method="SetFileName"
-                 name="DataSetCSVWriter">
       <Documentation short_help="Writer to write CSV files">Writer to write comma or tab
       delimited files from any dataset. Set FieldAssociation to choose whether cell
       data/point data needs to be saved. If the file extension is tsv it uses the tab character
@@ -1583,6 +1484,7 @@
                      name="Input">
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkTable" />
         </DataTypeDomain>
         <Documentation>The input filter/source whose output dataset is to be
         written to the file.</Documentation>
@@ -1659,6 +1561,9 @@
             <Property name="AddTime" />
           </PropertyGroup>
         </ExposedProperties>
+        <LinkProperties>
+          <Property name="DummyInput" with_property="Input" />
+        </LinkProperties>
       </SubProxy>
 
       <Hints>
@@ -1672,8 +1577,19 @@
                        file_description="Comma or Tab Delimited Files" />
         <InitializationHelper class="vtkSMCSVProxiesInitializationHelper" />
       </Hints>
-      <!-- End of DataSetCSVWriter -->
+      <!-- End of CSVWriter -->
     </PWriterProxy>
+
+    <!-- ================================================================= -->
+    <PWriterProxy class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="DataSetCSVWriter"
+                 base_proxygroup="writers"
+                 base_proxyname="CSVWriter">
+      <!-- keeping this around for old state files / traces that may be directly
+           using the DataSetCSVWriter -->
+    </PWriterProxy>
+
     <!-- ================================================================= -->
     <WriterProxy class="vtkXMLHyperTreeGridWriter"
                  name="HyperTreeGridWriter">
