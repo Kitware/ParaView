@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 
 class QActionGroup;
-class vtkSMGlobalPropertiesProxy;
+class vtkSMSettingsProxy;
 class vtkSMProxy;
 
 //============================================================================
@@ -87,7 +87,7 @@ private:
   /**
   * Returns the color palette proxy for the active session.
   */
-  vtkSMGlobalPropertiesProxy* colorPalette() const;
+  vtkSMSettingsProxy* colorPalette() const;
   QPointer<QActionGroup> ActionGroup;
   friend class pqColorPaletteLinkHelper;
 };

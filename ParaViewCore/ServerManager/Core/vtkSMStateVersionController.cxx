@@ -763,6 +763,47 @@ struct Process_5_6_to_5_7
   }
 };
 
+//===========================================================================
+struct Process_5_7_to_5_8
+{
+  bool operator()(xml_document& document) { return ConvertGlobalPropertyLinks(document); }
+
+  /*
+   * With 5.8, we no longer save / load "GlobalPropertyLink" which were used to
+   * save links to the global ColorPalette proxy. Update that to the new way
+   * this is handled.
+   */
+  static bool ConvertGlobalPropertyLinks(xml_document& document)
+  {
+    pugi::xpath_node_set elements =
+      document.select_nodes("//ServerManagerState/Links/GlobalPropertyLink");
+    if (elements.size() == 0)
+    {
+      return true;
+    }
+
+    auto node = document.select_node("//ServerManagerState").node();
+    auto settingsNode = node.append_child("Settings");
+    auto colorPaletteNode = settingsNode.append_child("SettingsProxy");
+    colorPaletteNode.append_attribute("group").set_value("settings");
+    colorPaletteNode.append_attribute("type").set_value("ColorPalette");
+    auto linksNode = colorPaletteNode.append_child("Links");
+    for (auto xnode : elements)
+    {
+      auto gpnode = xnode.node();
+      auto pnode = linksNode.append_child("Property");
+      pnode.append_attribute("source_property")
+        .set_value(gpnode.attribute("global_name").as_string());
+      pnode.append_attribute("target_id").set_value(gpnode.attribute("proxy").as_string());
+      pnode.append_attribute("target_property").set_value(gpnode.attribute("property").as_string());
+      pnode.append_attribute("unlink_if_modified").set_value(1);
+    }
+
+    ::PurgeElements(elements);
+    return true;
+  }
+};
+
 } // end of namespace
 
 vtkStandardNewMacro(vtkSMStateVersionController);
@@ -858,6 +899,13 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
     Process_5_6_to_5_7 converter;
     status = converter(document);
     version = vtkSMVersion(5, 7, 0);
+  }
+
+  if (status && (version < vtkSMVersion(5, 8, 0)))
+  {
+    Process_5_7_to_5_8 converter;
+    status = converter(document);
+    version = vtkSMVersion(5, 8, 0);
   }
 
   if (status)

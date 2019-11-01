@@ -28,28 +28,6 @@
 
 vtkStandardNewMacro(vtkSMPropertyLink);
 //-----------------------------------------------------------------------------
-class vtkSMPropertyLinkObserver : public vtkCommand
-{
-public:
-  static vtkSMPropertyLinkObserver* New() { return new vtkSMPropertyLinkObserver; }
-
-  void SetTarget(vtkSMPropertyLink* t) { this->Target = t; }
-  void Execute(vtkObject* c, unsigned long, void*) override
-  {
-    vtkSMProperty* caller = vtkSMProperty::SafeDownCast(c);
-    if (this->Target && caller && this->Target->GetEnabled())
-    {
-      this->Target->PropertyModified(caller);
-    }
-  }
-
-protected:
-  vtkSMPropertyLinkObserver() { this->Target = 0; }
-
-  vtkSMPropertyLink* Target;
-};
-
-//-----------------------------------------------------------------------------
 class vtkSMPropertyLinkInternals
 {
 public:
@@ -60,14 +38,7 @@ public:
       : Proxy(proxy)
       , PropertyName(pname)
       , UpdateDirection(updateDir)
-      , Observer(0)
-    {
-    }
-
-    LinkedProperty(vtkSMProperty* property, int updateDir)
-      : Property(property)
-      , UpdateDirection(updateDir)
-      , Observer(0)
+      , Observer(nullptr)
     {
     }
 
@@ -77,19 +48,13 @@ public:
       {
         this->Proxy.GetPointer()->RemoveObserver(this->Observer);
       }
-
-      if (this->Observer && this->Property && this->Property.GetPointer())
-      {
-        this->Property->RemoveObserver(this->Observer);
-      }
-      this->Observer = 0;
+      this->Observer = nullptr;
     }
 
-    // Either (Proxy, PropertyName) pair is valid or (Property) is valid,
+    // Either (Proxy, PropertyName) pair is valid,
     // depending on the API used to add the link.
     vtkWeakPointer<vtkSMProxy> Proxy;
     vtkStdString PropertyName;
-    vtkWeakPointer<vtkSMProperty> Property;
 
     int UpdateDirection;
     vtkWeakPointer<vtkCommand> Observer;
@@ -97,23 +62,18 @@ public:
 
   typedef std::list<LinkedProperty> LinkedPropertyType;
   LinkedPropertyType LinkedProperties;
-  vtkSMPropertyLinkObserver* PropertyObserver;
 };
 
 //-----------------------------------------------------------------------------
 vtkSMPropertyLink::vtkSMPropertyLink()
 {
   this->Internals = new vtkSMPropertyLinkInternals;
-  this->Internals->PropertyObserver = vtkSMPropertyLinkObserver::New();
-  this->Internals->PropertyObserver->SetTarget(this);
   this->ModifyingProperty = false;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMPropertyLink::~vtkSMPropertyLink()
 {
-  this->Internals->PropertyObserver->SetTarget(0);
-  this->Internals->PropertyObserver->Delete();
   delete this->Internals;
 }
 
@@ -183,11 +143,7 @@ void vtkSMPropertyLink::Synchronize()
   {
     if (iter->UpdateDirection & INPUT)
     {
-      if (iter->Property)
-      {
-        this->PropertyModified(iter->Property);
-      }
-      else if (iter->Proxy)
+      if (iter->Proxy)
       {
         this->PropertyModified(iter->Proxy, iter->PropertyName);
       }
@@ -241,22 +197,6 @@ unsigned int vtkSMPropertyLink::GetNumberOfLinkedProperties()
   vtkWarningMacro("GetNumberOfLinkedProperties() is deprecated, "
                   "please use GetNumberOfLinkedObjects() instead");
   return this->GetNumberOfLinkedObjects();
-}
-
-//-----------------------------------------------------------------------------
-vtkSMProperty* vtkSMPropertyLink::GetLinkedProperty(int index)
-{
-  vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
-    this->Internals->LinkedProperties.begin();
-  for (int i = 0; i < index && iter != this->Internals->LinkedProperties.end(); i++)
-  {
-    iter++;
-  }
-  if (iter == this->Internals->LinkedProperties.end())
-  {
-    return NULL;
-  }
-  return iter->Property;
 }
 
 //-----------------------------------------------------------------------------
@@ -366,62 +306,6 @@ void vtkSMPropertyLink::PropertyModified(vtkSMProxy* fromProxy, const char* pnam
       if (iter->Proxy.GetPointer())
       {
         toProp = iter->Proxy.GetPointer()->GetProperty(iter->PropertyName);
-      }
-      else if (iter->Property.GetPointer())
-      {
-        toProp = iter->Property;
-      }
-      if (toProp && (toProp != fromProp))
-      {
-        toProp->Copy(fromProp);
-      }
-    }
-  }
-  this->ModifyingProperty = false;
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMPropertyLink::PropertyModified(vtkSMProperty* fromProp)
-{
-  if (this->ModifyingProperty)
-  {
-    return;
-  }
-
-  // First verify that the property that triggered this call is indeed
-  // an input property.
-  vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter;
-  int propagate = 0;
-  for (iter = this->Internals->LinkedProperties.begin();
-       iter != this->Internals->LinkedProperties.end(); ++iter)
-  {
-    if (iter->UpdateDirection & INPUT && iter->Property.GetPointer() == fromProp)
-    {
-      propagate = 1;
-      break;
-    }
-  }
-
-  if (!propagate)
-  {
-    return;
-  }
-
-  this->ModifyingProperty = true;
-  // Propagate the changes.
-  for (iter = this->Internals->LinkedProperties.begin();
-       iter != this->Internals->LinkedProperties.end(); ++iter)
-  {
-    if (iter->UpdateDirection & OUTPUT)
-    {
-      vtkSMProperty* toProp = 0;
-      if (iter->Proxy.GetPointer())
-      {
-        toProp = iter->Proxy.GetPointer()->GetProperty(iter->PropertyName);
-      }
-      else if (iter->Property.GetPointer())
-      {
-        toProp = iter->Property;
       }
       if (toProp && (toProp != fromProp))
       {

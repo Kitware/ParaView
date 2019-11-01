@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqSetName.h"
 #include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMGlobalPropertiesProxy.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSettingsProxy.h"
 
 // Qt Includes.
 #include <QAction>
@@ -72,13 +72,12 @@ pqColorChooserButtonWithPalettes::~pqColorChooserButtonWithPalettes()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMGlobalPropertiesProxy* pqColorChooserButtonWithPalettes::colorPalette() const
+vtkSMSettingsProxy* pqColorChooserButtonWithPalettes::colorPalette() const
 {
   pqServer* server = pqActiveObjects::instance().activeServer();
-  vtkSMSessionProxyManager* pxm = server ? server->proxyManager() : NULL;
-  return (pxm
-      ? vtkSMGlobalPropertiesProxy::SafeDownCast(pxm->GetProxy("global_properties", "ColorPalette"))
-      : NULL);
+  auto pxm = server ? server->proxyManager() : nullptr;
+  return (
+    pxm ? vtkSMSettingsProxy::SafeDownCast(pxm->GetProxy("settings", "ColorPalette")) : nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -192,11 +191,18 @@ void pqColorPaletteLinkHelper::setSelectedPaletteColor(const QString& colorName)
     qobject_cast<pqColorChooserButtonWithPalettes*>(this->parent());
   assert(button);
 
-  vtkSMGlobalPropertiesProxy* palette = button->colorPalette();
+  vtkSMSettingsProxy* palette = button->colorPalette();
   if (palette && this->SMProxy)
   {
-    palette->Link(
-      colorName.toLocal8Bit().data(), this->SMProxy, this->SMPropertyName.toLocal8Bit().data());
+    auto oldLink =
+      palette->GetSourcePropertyName(this->SMProxy, this->SMPropertyName.toLocal8Bit().data());
+    if (oldLink)
+    {
+      palette->RemoveLink(oldLink, this->SMProxy, this->SMPropertyName.toLocal8Bit().data());
+    }
+    palette->AddLink(colorName.toLocal8Bit().data(), this->SMProxy,
+      this->SMPropertyName.toLocal8Bit().data(),
+      /*unlink_if_modified=*/true);
   }
 }
 
@@ -207,10 +213,10 @@ QString pqColorPaletteLinkHelper::selectedPaletteColor() const
     qobject_cast<pqColorChooserButtonWithPalettes*>(this->parent());
   assert(button);
 
-  vtkSMGlobalPropertiesProxy* palette = button->colorPalette();
+  vtkSMSettingsProxy* palette = button->colorPalette();
   if (palette && this->SMProxy)
   {
-    return palette->GetLinkedPropertyName(this->SMProxy, this->SMPropertyName.toLocal8Bit().data());
+    return palette->GetSourcePropertyName(this->SMProxy, this->SMPropertyName.toLocal8Bit().data());
   }
 
   return QString();

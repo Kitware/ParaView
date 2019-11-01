@@ -1803,7 +1803,8 @@
             <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
             <Documentation>Color used when coloring the grid wireframe</Documentation>
             <Hints>
-              <GlobalPropertyLink type="ColorPalette" property="ForegroundColor" />
+              <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor"
+                unlink_if_modified="1" />
             </Hints>
           </DoubleVectorProperty>
         </Proxy>
@@ -2935,139 +2936,6 @@
                 name="Update"></Property>
       <!-- End of KdTreeManager -->
     </Proxy>
-    <GlobalPropertiesProxy name="ColorPalette" label="Color Palette">
-      <DoubleVectorProperty default_values="1.0 1.0 1.0"
-                            label="Surface"
-                            name="SurfaceColor"
-                            number_of_elements="3"
-                            panel_widget="color_selector">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Documentation>Color used when solid coloring surfaces and faces.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty default_values="1.0 1.0 1.0"
-                            label="Foreground"
-                            name="ForegroundColor"
-                            number_of_elements="3"
-                            panel_widget="color_selector">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Documentation>Color used for rendering elements like wireframes, points.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty default_values="0.0 0.0 0.5"
-                            label="Edges"
-                            name="EdgeColor"
-                            number_of_elements="3"
-                            panel_widget="color_selector">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Documentation>
-          Color used for the edges when using 'Surface With Edges' representation.
-        </Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty default_values="1.0 1.0 1.0"
-                            label="Text"
-                            name="TextAnnotationColor"
-                            number_of_elements="3"
-                            panel_widget="color_selector">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Documentation>Color used for text and other annotations.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty default_values="1.0 0.0 1.0"
-                            label="Selection"
-                            name="SelectionColor"
-                            number_of_elements="3"
-                            panel_widget="color_selector">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Documentation>Color used for showing selected
-        cells/points.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty default_values="0.5 0.0 1.0"
-                            label="Interactive Selection"
-                            name="InteractiveSelectionColor"
-                            number_of_elements="3"
-                            panel_widget="color_selector">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Documentation>Color used for showing interactive selection.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty default_values="0.0 1.0 0.0"
-                            label="Interactive Widget"
-                            name="InteractiveWidgetColor"
-                            number_of_elements="3"
-                            panel_widget="color_selector">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Documentation>Color used for showing interactive widget.</Documentation>
-      </DoubleVectorProperty>
-      <IntVectorProperty name="UseGradientBackground"
-                         label="Use Gradient Background"
-                         number_of_elements="1"
-                         default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Enable gradient background.
-        </Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty default_values="0.32 0.34 0.43"
-                            label="Background"
-                            name="BackgroundColor"
-                            number_of_elements="3"
-                            panel_widget="color_selector">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Documentation>Color used as background for the view.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty default_values="0.32 0.34 0.43"
-                            label="Background 2"
-                            name="BackgroundColor2"
-                            number_of_elements="3"
-                            panel_widget="color_selector">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Documentation>Color used as the 2nd color for gradient backgrounds.</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="EnableWidgetDecorator">
-            <Property name="UseGradientBackground" function="boolean" />
-          </PropertyWidgetDecorator>
-        </Hints>
-      </DoubleVectorProperty>
-
-      <PropertyGroup label="Selection">
-        <Property name="SelectionColor" />
-        <Property name="InteractiveSelectionColor" />
-      </PropertyGroup>
-
-      <PropertyGroup label="Background">
-        <Property name="UseGradientBackground" />
-        <Property name="BackgroundColor" />
-        <Property name="BackgroundColor2" />
-      </PropertyGroup>
-
-      <Property name="LoadPalette"
-        panel_widget="color_palette_selector">
-        <Documentation>
-          You can explicitly set the colors in the application's color palette
-          above or you can load one of the predefined color palettes to
-          initialize the active palette.
-        </Documentation>
-      </Property>
-      <Hints>
-        <UseDocumentationForLabels />
-      </Hints>
-      <!-- End of ColorPalette -->
-    </GlobalPropertiesProxy>
     <Proxy class="vtkPolyDataMapper"
            name="GlobalMapperProperties"
            processes="client|renderserver">

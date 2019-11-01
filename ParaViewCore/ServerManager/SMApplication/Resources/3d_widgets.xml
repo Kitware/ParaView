@@ -1830,7 +1830,8 @@
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="InteractiveWidgetColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="InteractiveWidgetColor"
+            unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty animateable="0"
@@ -1843,7 +1844,8 @@
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="ForegroundColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor"
+            unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty animateable="1"

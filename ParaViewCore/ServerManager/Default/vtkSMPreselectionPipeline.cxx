@@ -135,7 +135,7 @@ vtkSMProxy* vtkSMPreselectionPipeline::CreateSelectionRepresentation(vtkSMSource
     vtkSMPropertyHelper(representation, "Input").Set(extract);
     vtkSMPropertyHelper(representation, "Visibility").Set(extract != NULL);
     double color[] = { 0.5, 0, 1 };
-    vtkSMProxy* colorPalette = proxyManager->GetProxy("global_properties", "ColorPalette");
+    vtkSMProxy* colorPalette = proxyManager->GetProxy("settings", "ColorPalette");
     if (!this->ColorObserver)
     {
       // setup a callback to set the interactive selection color

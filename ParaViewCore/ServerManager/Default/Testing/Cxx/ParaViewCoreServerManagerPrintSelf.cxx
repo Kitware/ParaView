@@ -56,8 +56,6 @@
 #include "vtkSMFieldDataDomain.h"
 #include "vtkSMFileListDomain.h"
 #include "vtkSMFixedTypeDomain.h"
-#include "vtkSMGlobalPropertiesLinkUndoElement.h"
-#include "vtkSMGlobalPropertiesProxy.h"
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMImplicitPlaneRepresentationProxy.h"
 #include "vtkSMInputArrayDomain.h"
@@ -181,8 +179,6 @@ int ParaViewCoreServerManagerPrintSelf(int, char* [])
   PRINT_SELF(vtkSMFieldDataDomain);
   PRINT_SELF(vtkSMFileListDomain);
   PRINT_SELF(vtkSMFixedTypeDomain);
-  PRINT_SELF(vtkSMGlobalPropertiesLinkUndoElement);
-  PRINT_SELF(vtkSMGlobalPropertiesProxy);
   PRINT_SELF(vtkSMIdTypeVectorProperty);
   PRINT_SELF(vtkSMImplicitPlaneRepresentationProxy);
   PRINT_SELF(vtkSMInputArrayDomain);

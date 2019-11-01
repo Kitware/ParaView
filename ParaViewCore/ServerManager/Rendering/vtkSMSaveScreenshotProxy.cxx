@@ -79,7 +79,7 @@ private:
 
   vtkSMProxy* GetActivePalette() const
   {
-    return this->ProxyManager->FindProxy("global_properties", "misc", "ColorPalette");
+    return this->ProxyManager->FindProxy("settings", "settings", "ColorPalette");
   }
 
   void SaveOriginalPalette()
@@ -90,11 +90,11 @@ private:
       return;
     }
 
-    if (vtkSMProxy* colorPalette = this->GetActivePalette())
+    if (vtkSMProxy* activePalette = this->GetActivePalette())
     {
       this->OriginalColorPalette.TakeReference(
-        this->ProxyManager->NewProxy(colorPalette->GetXMLGroup(), colorPalette->GetXMLName()));
-      this->OriginalColorPalette->Copy(colorPalette);
+        this->ProxyManager->NewProxy(activePalette->GetXMLGroup(), activePalette->GetXMLName()));
+      this->OriginalColorPalette->Copy(activePalette);
     }
   }
 
@@ -102,9 +102,10 @@ private:
   {
     if (this->OriginalColorPalette)
     {
-      if (vtkSMProxy* colorPalette = this->GetActivePalette())
+      if (vtkSMProxy* activePalette = this->GetActivePalette())
       {
-        colorPalette->Copy(this->OriginalColorPalette);
+        activePalette->Copy(this->OriginalColorPalette);
+        activePalette->UpdateVTKObjects();
       }
     }
   }
@@ -163,6 +164,7 @@ public:
     {
       this->SaveOriginalPalette();
       activePalette->Copy(paletteProxy);
+      activePalette->UpdateVTKObjects();
     }
   }
 

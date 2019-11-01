@@ -60,11 +60,6 @@ public:
   //@}
 
   /**
-   * Get a property involved in this link.
-   */
-  vtkSMProperty* GetLinkedProperty(int index);
-
-  /**
    * Get a proxy involved in this link.
    */
   vtkSMProxy* GetLinkedProxy(int index) override;
@@ -121,7 +116,6 @@ protected:
 
   void UpdateVTKObjects(vtkSMProxy* caller) override;
   void PropertyModified(vtkSMProxy* caller, const char* pname) override;
-  virtual void PropertyModified(vtkSMProperty* property);
   void UpdateProperty(vtkSMProxy* caller, const char* pname) override;
 
   /**

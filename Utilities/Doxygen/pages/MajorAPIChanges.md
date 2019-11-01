@@ -76,6 +76,42 @@ been instantiated. This ensures that plugin developers can assume existence of a
 main window irrespective of whether the plugin was auto-loaded or loaded after
 the application has started.
 
+
+###GlobalPropertyLink XML hints###
+
+The implementation for settings proxies and the proxy for color palette has been
+combined thus removing the need for a separate `vtkSMGlobalPropertiesProxy`
+class. The color-palette proxy is now same as other settings proxies and is
+registered under `settings` group and not `global_properties` group. To simply
+XML hints to reflect this change, we have deprecated `GlobalPropertyLink` hint.
+Following XML snippet shows how to change existing `GlobalPropertyLink` element
+to `PropertyLink`.
+
+    <!-- OLD XML -->
+    <DoubleVectorProperty name="GridColor"
+                          number_of_elements="3" ... >
+      ...
+      <Hints>
+        <GlobalPropertyLink type="ColorPalette" property="ForegroundColor" />
+      </Hints>
+    </DoubleVectorProperty>
+
+    <!-- NEW XML -->
+    <DoubleVectorProperty name="GridColor"
+                          number_of_elements="3" ... >
+      ...
+      <Hints>
+        <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor"
+          unlink_if_modified="1" />
+      </Hints>
+    </DoubleVectorProperty>
+
+Note, the `PropertyLink` hint was already present and used in earlier versions
+for linking with properties on other settings proxies. We simply are following
+the same pattern for color palette. The new `unlink_if_modified` attribute
+ensures that the link with the settings proxy is broken if the user explicitly
+modifies the property.
+
 Changes in 5.7
 --------------
 

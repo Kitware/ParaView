@@ -13,22 +13,40 @@
 
 =========================================================================*/
 /**
- * @class   vtkSMSettingsProxy
- * @brief   proxy subclass responsible for linking settings
+ * @class vtkSMSettingsProxy
+ * @brief proxy subclass responsible for linking settings
  * proxies and settings classes on the VTK side.
  *
- * vtkSMSettingsProxy is used as a proxy for settings objects. It listens
- * for changes to the underlying VTK objects and updates the proxy properties
- * whenever the VTK object settings change.
-*/
+ * Settings proxies are session specific singleton proxies designed to track
+ * configuration options. Typically, properties on such settings proxies are
+ * linked to other proxies in the session so that changing a setting property
+ * will result in changing all linked proxies.
+ *
+ * Settings proxies have several unique traits when compared with other
+ * properties:
+ *
+ * 1. In `ReadXMLAttributes`, if for a property an `information_property`
+ *    attribute is specified i.e. `vtkSMProperty::GetInformationProperty` is
+ *    not null, then a link is setup between that information property and the
+ *    original property so that if the information property is modified, the
+ *    original property is updated accordingly.
+ * 2. Settings proxies may have an underlying vtkObject class that they instantiate
+ *    locally. In which case, the proxy observes vtkCommand::ModifiedEvent on that
+ *    VTK object and calls `vtkSMProxy::UpdatePropertyInformation` on itself to
+ *    ensure all information properties are updated if the vtkObject changes.
+ *
+ * `vtkSMSettingsProxy::ProcessPropertyLinks` is called during proxy
+ * initialization (vtkSMParaViewPipelineController::PreInitializeProxy) to setup
+ * links between the proxy being initialized any of the settings proxies for
+ * that session. This is done by processing property hints on the proxy being
+ * initialized.
+ */
 
 #ifndef vtkSMSettingsProxy_h
 #define vtkSMSettingsProxy_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProxy.h"
-
-class vtkSMSettingsObserver;
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSettingsProxy : public vtkSMProxy
 {
@@ -43,6 +61,38 @@ public:
    */
   int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) override;
 
+  //@{
+  /**
+   * Process property link hints on the given proxy.
+   */
+  static void ProcessPropertyLinks(vtkSMProxy* proxy);
+  //@}
+
+  //@{
+  /**
+   * Add/Remove links. If `unlink_if_modified` is true, if a linked property on the target
+   * proxy is modified independently, then the link is broken to avoid
+   * overriding the explicitly selected value.
+   */
+  void AddLink(const char* sourceProperty, vtkSMProxy* target, const char* targetProperty,
+    bool unlink_if_modified);
+  void RemoveLink(const char* sourceProperty, vtkSMProxy* target, const char* targetProperty);
+  //@}
+
+  /**
+   * Returns the name of the sourceProperty, if any, with which the target
+   * property is linked. Returns nullptr if no such link has been added.
+   */
+  const char* GetSourcePropertyName(vtkSMProxy* target, const char* targetProperty);
+
+  //@{
+  /**
+   * Save/Load the state for links registered with this settings proxy.
+   */
+  void SaveLinksState(vtkPVXMLElement* root);
+  void LoadLinksState(vtkPVXMLElement* root, vtkSMProxyLocator* locator);
+  //@}
+
 protected:
   vtkSMSettingsProxy();
   ~vtkSMSettingsProxy() override;
@@ -52,18 +102,22 @@ protected:
    */
   void CreateVTKObjects() override;
 
-  friend class vtkSMSettingsObserver;
-
-  /**
-   * Called whenever the VTK object is modified
-   */
-  void ExecuteEvent(unsigned long eventId);
-
-  vtkSMSettingsObserver* Observer;
+  void SetPropertyModifiedFlag(const char* name, int flag) override;
 
 private:
   vtkSMSettingsProxy(const vtkSMSettingsProxy&) = delete;
   void operator=(const vtkSMSettingsProxy&) = delete;
+
+  /**
+   * Called whenever the VTK object is modified
+   */
+  void VTKObjectModified();
+
+  void AutoBreakMapPropertyLink(vtkObject*, unsigned long, void*);
+
+  unsigned long VTKObjectObserverId = 0;
+  class vtkInternals;
+  vtkInternals* Internals;
 };
 
 #endif
