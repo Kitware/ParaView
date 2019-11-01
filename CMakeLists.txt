@@ -723,8 +723,13 @@ endif ()
 # Search for dependent libraries beside
 set(_paraview_CMAKE_INSTALL_RPATH_save
   "${CMAKE_INSTALL_RPATH}")
-list(APPEND CMAKE_INSTALL_RPATH
-  "$ORIGIN")
+if (APPLE)
+  list(APPEND CMAKE_INSTALL_RPATH
+    "@loader_path")
+elseif (UNIX)
+  list(APPEND CMAKE_INSTALL_RPATH
+    "$ORIGIN")
+endif ()
 
 if (PARAVIEW_USE_EXTERNAL_VTK)
   if (paraview_required_modules OR paraview_unrecognized_modules)
