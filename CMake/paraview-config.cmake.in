@@ -49,6 +49,18 @@ endif ()
 unset(_paraview_find_package_args)
 unset(_paraview_use_external_vtk)
 
+set(PARAVIEW_BUILD_QT_GUI "@PARAVIEW_BUILD_QT_GUI@")
+set(PARAVIEW_USE_MPI "@PARAVIEW_USE_MPI@")
+set(PARAVIEW_ENABLE_PYTHON "@PARAVIEW_ENABLE_PYTHON@")
+set(PARAVIEW_PLUGIN_SUBDIR "paraview@paraview_version_suffix@/plugins")
+
+if (PARAVIEW_ENABLE_PYTHON)
+  include("${CMAKE_CURRENT_LIST_DIR}/ParaViewPython-targets.cmake")
+  # Unset this for now; these targets will be defined later.
+  unset("${CMAKE_FIND_PACKAGE_NAME}_FOUND")
+  unset("${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE")
+endif ()
+
 include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-targets.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-vtk-module-properties.cmake")
 
@@ -67,13 +79,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/ParaViewServerManager.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/ParaViewTesting.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/vtkModuleWrapClientServer.cmake")
 
-set(PARAVIEW_BUILD_QT_GUI "@PARAVIEW_BUILD_QT_GUI@")
-set(PARAVIEW_USE_MPI "@PARAVIEW_USE_MPI@")
-set(PARAVIEW_ENABLE_PYTHON "@PARAVIEW_ENABLE_PYTHON@")
-set(PARAVIEW_PLUGIN_SUBDIR "paraview@paraview_version_suffix@/plugins")
-
 if (PARAVIEW_ENABLE_PYTHON)
-  include("${CMAKE_CURRENT_LIST_DIR}/ParaViewPython-targets.cmake")
   include("${CMAKE_CURRENT_LIST_DIR}/paraview.modules-vtk-python-module-properties.cmake")
 endif ()
 
