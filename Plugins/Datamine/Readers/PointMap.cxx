@@ -1,12 +1,13 @@
-// wrapper for stl map class
 // it is used to keep the id reference for points from a datamine file
 // to the point ids used in vtkPointData
 
 #include "PointMap.h"
 
 // --------------------------------------
-PointMap::PointMap()
+PointMap::PointMap(vtkIdType numPoints)
 {
+  // we add 1 as datamine tends to be one referenced
+  this->Map.resize(numPoints + 1);
 }
 
 // --------------------------------------
@@ -15,23 +16,34 @@ PointMap::~PointMap()
 }
 
 // --------------------------------------
-int PointMap::GetID(int oldID)
+vtkIdType PointMap::GetID(vtkIdType oldID)
 {
-  auto it = this->map.find(oldID);
-  if (it != this->map.end())
+  if (oldID < 0)
   {
-    // id is located
-    return it->second;
-  }
-  else
-  {
-    // return a bad ID
     return -1;
   }
+
+  if (static_cast<size_t>(oldID) >= this->Map.size())
+  {
+    return -1;
+  }
+
+  return this->Map[oldID];
 }
 
 // --------------------------------------
-void PointMap::SetID(int oldID, int newId)
+void PointMap::SetID(vtkIdType oldID, vtkIdType newId)
 {
-  this->map[oldID] = newId;
+  if (oldID < 0)
+  {
+    return;
+  }
+
+  // ideally this should never happen
+  if (static_cast<size_t>(oldID) >= this->Map.size())
+  {
+    this->Map.resize(this->Map.size() * 1.2);
+  }
+
+  this->Map[oldID] = newId;
 }

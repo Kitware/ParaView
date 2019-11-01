@@ -6,7 +6,6 @@
 //     99-04-12: Written by Jeremy Maccelari, visualn@iafrica.com
 
 #include "vtkDataMineDrillHoleReader.h"
-#include "PointMap.h"
 #include "PropertyStorage.h"
 #include "dmfile.h"
 
@@ -44,6 +43,7 @@ void vtkDataMineDrillHoleReader::Read(vtkPoints* points, vtkCellArray* cells)
   TDMFile* file = new TDMFile();
 
   file->LoadFileHeader(this->GetFileName());
+  int numRecords = file->GetNumberOfRecords();
   int recordLength = file->nVars;
 
   // since the binary file will have these fields, but the order of
@@ -77,7 +77,7 @@ void vtkDataMineDrillHoleReader::Read(vtkPoints* points, vtkCellArray* cells)
       IDSize++;
     }
 
-    this->AddProperty(varname, i, file->Vars[i].TypeIsNumerical());
+    this->AddProperty(varname, i, file->Vars[i].TypeIsNumerical(), numRecords);
   }
   delete[] varname;
 

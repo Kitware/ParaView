@@ -11,16 +11,21 @@
 #include "vtkDoubleArray.h"
 #include "vtkPointData.h"
 #include "vtkStringArray.h"
-#include "vtkVariantArray.h"
-
-#include <sstream>
 
 // --------------------------------------
 PropertyItem::PropertyItem(
-  const vtkStdString& aname, const bool& numeric, const int& pos, const int& status)
+  const vtkStdString& aname, const bool& numeric, const int& pos, const int& status, int numRecords)
 {
   this->isNumeric = numeric;
+
   this->name = aname;
+  // right trim the name
+  size_t endpos = this->name.find_last_not_of(" \t");
+  if (std::string::npos != endpos)
+  {
+    this->name = this->name.substr(0, endpos + 1);
+  }
+
   this->startPos = pos;
   this->endPos = pos + 1; // will be updated by AddProperty
 
@@ -28,7 +33,7 @@ PropertyItem::PropertyItem(
   // notice case 2: is a fall through
   this->isSegmentable = false;
   this->isActive = false;
-  this->storage = NULL;
+  this->Storage = nullptr;
   switch (status)
   {
     case 2:
@@ -36,17 +41,20 @@ PropertyItem::PropertyItem(
       VTK_FALLTHROUGH;
     case 1:
       this->isActive = true;
-      this->storage = vtkSmartPointer<vtkVariantArray>::New();
+      if (this->isNumeric)
+      {
+        this->Storage.TakeReference(vtkDoubleArray::New());
+      }
+      else
+      {
+        this->Storage.TakeReference(vtkStringArray::New());
+      }
+      this->Storage->Allocate(numRecords);
+      this->Storage->SetName(this->name);
       break;
     case 0:
     default:
       break;
-  }
-  // right trim the name
-  size_t endpos = this->name.find_last_not_of(" \t");
-  if (std::string::npos != endpos)
-  {
-    this->name = this->name.substr(0, endpos + 1);
   }
 }
 PropertyItem::~PropertyItem()
@@ -57,6 +65,7 @@ PropertyItem::~PropertyItem()
 PropertyStorage::PropertyStorage()
 {
 }
+
 // --------------------------------------
 PropertyStorage::~PropertyStorage()
 {
@@ -64,7 +73,7 @@ PropertyStorage::~PropertyStorage()
 
 // --------------------------------------
 void PropertyStorage::AddProperty(
-  char* name, const bool& numeric, const int& pos, const int& status)
+  char* name, const bool& numeric, const int& pos, const int& status, int numRecords)
 {
   vtkStdString vname(name);
   if (this->properties.size() > 0)
@@ -83,28 +92,35 @@ void PropertyStorage::AddProperty(
   }
 
   // this is hit on the first item, and even new item afterwards
-  this->properties.push_back(PropertyItem(vname, numeric, pos, status));
+  this->properties.push_back(PropertyItem(vname, numeric, pos, status, numRecords));
 }
 
 // --------------------------------------
 void PropertyStorage::AddValues(Data* values)
 {
-  std::stringstream buffer;
-  vtkStdString tempBuf;
   for (auto& item : this->properties)
   {
     if (item.isActive) // ignore non active
     {
-      for (int pos = item.startPos; pos < item.endPos; ++pos)
+      if (item.isNumeric)
       {
-        // only the first 4 characters have valid data in the non numeric use case
-        item.isNumeric ? buffer << values[pos].v : buffer
-            << vtkStdString(values[pos].c).substr(0, 4);
+        static_cast<vtkDoubleArray*>(item.Storage.Get())->InsertNextValue(values[item.startPos].v);
       }
-
-      item.storage->InsertNextValue(vtkVariant(buffer.str()));
-      buffer.str("");
-      buffer.clear();
+      else
+      {
+        char ctmp[5];
+        ctmp[4] = 0;
+        vtkStdString tempBuf;
+        for (int pos = item.startPos; pos < item.endPos; ++pos)
+        {
+          ctmp[0] = values[pos].c[0];
+          ctmp[1] = values[pos].c[1];
+          ctmp[2] = values[pos].c[2];
+          ctmp[3] = values[pos].c[3];
+          tempBuf += ctmp;
+        }
+        static_cast<vtkStringArray*>(item.Storage.Get())->InsertNextValue(tempBuf);
+      }
     }
   }
 }
@@ -119,43 +135,23 @@ void PropertyStorage::Segment(const int& records)
   {
     if (item.isSegmentable && item.isNumeric)
     {
-      end = item.storage->GetNumberOfValues();
+      vtkDoubleArray* da = static_cast<vtkDoubleArray*>(item.Storage.Get());
+      end = da->GetNumberOfValues();
       for (pos = end - records; pos < end; ++pos)
       {
-        value = item.storage->GetValue(pos).ToDouble();
+        value = da->GetValue(pos);
         value /= records;
-        item.storage->SetValue(pos, value);
+        da->SetValue(pos, value);
       }
     }
   }
 }
-
-#define ConvertAndAdd(type, convertCommand)                                                        \
-  {                                                                                                \
-    type* tmp = type::New();                                                                       \
-    tmp->SetName(item.name.c_str());                                                               \
-    tmp->SetNumberOfValues(size);                                                                  \
-    for (vtkIdType i = 0; i < size; ++i)                                                           \
-    {                                                                                              \
-      tmp->SetValue(i, variants->GetValue(i).convertCommand());                                    \
-    }                                                                                              \
-    if (numPoints == size)                                                                         \
-    {                                                                                              \
-      dataSet->GetPointData()->AddArray(tmp);                                                      \
-    }                                                                                              \
-    else                                                                                           \
-    {                                                                                              \
-      dataSet->GetCellData()->AddArray(tmp);                                                       \
-    }                                                                                              \
-    tmp->Delete();                                                                                 \
-  }
 
 // --------------------------------------
 void PropertyStorage::PushToDataSet(vtkDataSet* dataSet)
 {
   // add the properties to the dataset, we detect if the property is point or cell based
   // If both(point&cell) are the same it goes to points
-  vtkVariantArray* variants;
   vtkIdType size;
   vtkIdType numPoints = dataSet->GetNumberOfPoints();
   for (auto& item : this->properties)
@@ -164,33 +160,19 @@ void PropertyStorage::PushToDataSet(vtkDataSet* dataSet)
     {
       continue;
     }
-    variants = item.storage;
-    size = variants->GetNumberOfValues();
-    bool add_array = false;
+    size = item.Storage->GetNumberOfValues();
     if (numPoints == size)
     {
       if (dataSet->GetPointData()->GetAbstractArray(item.name.c_str()) == NULL)
       {
-        add_array = true;
+        dataSet->GetPointData()->AddArray(item.Storage);
       }
     }
     else
     {
       if (dataSet->GetCellData()->GetAbstractArray(item.name.c_str()) == NULL)
       {
-        add_array = true;
-      }
-    }
-
-    if (add_array)
-    {
-      if (item.isNumeric)
-      {
-        ConvertAndAdd(vtkDoubleArray, ToDouble);
-      }
-      else
-      {
-        ConvertAndAdd(vtkStringArray, ToString);
+        dataSet->GetCellData()->AddArray(item.Storage);
       }
     }
   }

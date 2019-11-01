@@ -43,6 +43,7 @@ void vtkDataMineBlockReader::Read(vtkPoints* points, vtkCellArray* cells)
   TDMFile* file = new TDMFile();
 
   file->LoadFileHeader(this->GetFileName());
+  int numRecords = file->GetNumberOfRecords();
   int recordLength = file->nVars;
 
   // since the binary file will have these fields, but the order of
@@ -66,7 +67,7 @@ void vtkDataMineBlockReader::Read(vtkPoints* points, vtkCellArray* cells)
       Z = i;
     }
 
-    this->AddProperty(varname, i, file->Vars[i].TypeIsNumerical());
+    this->AddProperty(varname, i, file->Vars[i].TypeIsNumerical(), numRecords);
   }
   delete[] varname;
 

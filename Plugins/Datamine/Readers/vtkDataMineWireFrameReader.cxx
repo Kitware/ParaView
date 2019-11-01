@@ -135,7 +135,7 @@ int vtkDataMineWireFrameReader::RequestData(
     return 1;
   }
 
-  this->StopeFileMap = new PointMap(); // create
+  this->StopeFileMap = nullptr;
   if (this->UseStopeSummary)
   {
     bool created = this->PopulateStopeMap(); // fill
@@ -185,6 +185,8 @@ bool vtkDataMineWireFrameReader::PopulateStopeMap()
   // populate the map
 
   int numRecords = file->GetNumberOfRecords();
+  this->StopeFileMap = new PointMap(numRecords);
+
   Data* values = new Data[file->nVars];
   file->OpenRecVarFile(this->GetStopeSummaryFileName());
   for (int i = 0; i < numRecords; i++)
@@ -204,7 +206,6 @@ bool vtkDataMineWireFrameReader::PopulateStopeMap()
 // --------------------------------------
 void vtkDataMineWireFrameReader::Read(vtkPoints* points, vtkCellArray* cells)
 {
-
   this->ReadPoints(points);
   this->ReadCells(cells);
 }
@@ -212,7 +213,6 @@ void vtkDataMineWireFrameReader::Read(vtkPoints* points, vtkCellArray* cells)
 // --------------------------------------
 void vtkDataMineWireFrameReader::ReadPoints(vtkPoints* points)
 {
-
   TDMFile* file = new TDMFile();
   file->LoadFileHeader(this->GetPointFileName());
 
@@ -258,6 +258,8 @@ void vtkDataMineWireFrameReader::ParsePoints(
   vtkPoints* points, TDMFile* file, const int& PID, const int& XID, const int& YID, const int& ZID)
 {
   int numRecords = file->GetNumberOfRecords();
+  this->PointMapping = new PointMap(numRecords);
+
   Data* values = new Data[file->nVars];
   file->OpenRecVarFile(this->GetPointFileName());
   for (int i = 0; i < numRecords; i++)
@@ -275,6 +277,7 @@ void vtkDataMineWireFrameReader::ReadCells(vtkCellArray* cells)
 {
   TDMFile* file = new TDMFile();
   file->LoadFileHeader(this->GetTopoFileName());
+  int numRecords = file->GetNumberOfRecords();
   // need to create lookup for point id's 1,2,3
   // since the binary file will have these fields, but the order of
   // them is not known
@@ -301,7 +304,7 @@ void vtkDataMineWireFrameReader::ReadCells(vtkCellArray* cells)
       Stope = i;
     }
 
-    this->AddProperty(varname, i, file->Vars[i].TypeIsNumerical());
+    this->AddProperty(varname, i, file->Vars[i].TypeIsNumerical(), numRecords);
   }
 
   // hackish way of adding stope properties to a cell
@@ -310,11 +313,12 @@ void vtkDataMineWireFrameReader::ReadCells(vtkCellArray* cells)
   {
     TDMFile* stopeFile = new TDMFile();
     stopeFile->LoadFileHeader(this->GetStopeSummaryFileName());
+    numRecords = stopeFile->GetNumberOfRecords();
 
     for (int j = 0; j < stopeFile->nVars; j++)
     {
       stopeFile->Vars[j].GetName(varname);
-      this->AddProperty(varname, file->nVars + j, stopeFile->Vars[j].TypeIsNumerical());
+      this->AddProperty(varname, file->nVars + j, stopeFile->Vars[j].TypeIsNumerical(), numRecords);
     }
 
     this->ParseCellsWithStopes(cells, file, stopeFile, P1, P2, P3, Stope);
@@ -341,6 +345,7 @@ void vtkDataMineWireFrameReader::ParseCells(
   Data* values = new Data[file->nVars];
   file->OpenRecVarFile(this->GetTopoFileName());
   int numRecords = file->GetNumberOfRecords();
+  cells->Allocate(numRecords * 4);
 
   for (int i = 0; i < numRecords; i++)
   {

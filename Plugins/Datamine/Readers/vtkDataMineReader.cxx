@@ -98,12 +98,11 @@ int vtkDataMineReader::RequestInformation(
 int vtkDataMineReader::RequestData(
   vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
-
   // Internal Storage Creation
   // we create it here because we only need these datastores
   // while we create the output data, and we cannot trust them between fires of
   // the pipeline
-  this->PointMapping = new PointMap();
+  this->PointMapping = nullptr;
   this->Properties = new PropertyStorage();
 
   // time to read the point file first, and store it in a vtkPoints object
@@ -140,13 +139,14 @@ int vtkDataMineReader::RequestData(
 
   this->Properties->PushToDataSet(preClean);
 
-  // clean preclean and copy to output
-  this->CleanData(preClean, output);
-  preClean->Delete();
-
   // delete Internal storage used only for creating the output
   delete this->Properties;
   delete this->PointMapping;
+  this->PointMapping = nullptr;
+
+  // clean preclean and copy to output
+  this->CleanData(preClean, output);
+  preClean->Delete();
 
   return 1;
 }
@@ -181,10 +181,11 @@ void vtkDataMineReader::ParseProperties(Data* values)
 }
 
 // --------------------------------------
-bool vtkDataMineReader::AddProperty(char* varname, const int& pos, const bool& numeric)
+bool vtkDataMineReader::AddProperty(
+  char* varname, const int& pos, const bool& numeric, int numRecords)
 {
   int status = this->GetCellArrayStatus(varname);
-  this->Properties->AddProperty(varname, numeric, pos, status);
+  this->Properties->AddProperty(varname, numeric, pos, status, numRecords);
   return (status == 0);
 }
 // --------------------------------------
@@ -303,7 +304,7 @@ int vtkDataMineReader::SetFieldDataInfo(vtkDataArraySelection* CellDAS, int asso
 void vtkDataMineReader::SetupOutputInformation(vtkInformation* outInfo)
 {
   // CellDataArraySelection is already prepared.  Don't need SetDataArraySelection()
-  vtkInformationVector* infoVector = NULL;
+  vtkInformationVector* infoVector = nullptr;
   // Setup the Field Information for the Cell data
   if (!this->SetFieldDataInfo(this->CellDataArraySelection, vtkDataObject::FIELD_ASSOCIATION_CELLS,
         this->PropertyCount, infoVector))

@@ -7,13 +7,14 @@
 #include <vector>
 
 #include "vtkSmartPointer.h"
+class vtkAbstractArray;
 class vtkDataSet;
-class vtkVariantArray;
 
 class PropertyItem
 {
 public:
-  PropertyItem(const vtkStdString& name, const bool& numeric, const int& pos, const int& status);
+  PropertyItem(const vtkStdString& name, const bool& numeric, const int& pos, const int& status,
+    int numRecords);
   ~PropertyItem();
 
   bool isNumeric;
@@ -24,7 +25,7 @@ public:
   int endPos;
 
   vtkStdString name;
-  vtkSmartPointer<vtkVariantArray> storage;
+  vtkSmartPointer<vtkAbstractArray> Storage;
 };
 
 class PropertyStorage
@@ -40,7 +41,8 @@ public:
   };
 
   // method to replace the old add methods
-  void AddProperty(char* name, const bool& numeric, const int& pos, const int& status);
+  void AddProperty(
+    char* name, const bool& numeric, const int& pos, const int& status, int numRecords);
 
   // new method to replace the old get methods
   void AddValues(Data* values);

@@ -3,16 +3,17 @@
 #ifndef vtkDataMinePointMap_h
 #define vtkDataMinePointMap_h
 
-#include <map>
+#include "vtkType.h"
+#include <vector>
 class PointMap
 {
 public:
-  PointMap();
+  PointMap(vtkIdType numPoints);
   ~PointMap();
-  void SetID(int oldID, int newId);
-  int GetID(int oldID);
+  void SetID(vtkIdType oldID, vtkIdType newId);
+  vtkIdType GetID(vtkIdType oldID);
 
 protected:
-  std::map<int, int> map;
+  std::vector<vtkIdType> Map;
 };
 #endif

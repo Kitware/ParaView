@@ -62,11 +62,11 @@ protected:
   virtual int CanRead(const char* fname, FileTypes type);
 
   // DM file reading methods
-  virtual void Read(vtkPoints*, vtkCellArray*){};
+  virtual void Read(vtkPoints* /*points*/, vtkCellArray* /*cells*/){};
   virtual void ParseProperties(Data* values);
 
   // returns true if the property was created
-  virtual bool AddProperty(char* varname, const int& pos, const bool& numeric);
+  virtual bool AddProperty(char* varname, const int& pos, const bool& numeric, int numRecords);
   virtual void SegmentProperties(const int& records);
 
   // internal storage
