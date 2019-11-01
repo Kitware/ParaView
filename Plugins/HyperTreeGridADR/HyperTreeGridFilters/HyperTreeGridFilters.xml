@@ -129,7 +129,7 @@
                             label="Array"
                             command="SetInputArrayToProcess"
                             number_of_elements="5"
-                            element_types="int int int int str"
+                            element_types="0 0 0 0 2"
                             animateable="0" >
         <ArrayListDomain name="array_list"
                          attribute_type="Scalars"
