@@ -771,6 +771,7 @@ list(APPEND TESTS_WITH_BASELINES
   OrthographicView.xml
   OutOfRangeColors.xml
   PBRSpheres.xml
+  ParallelCoordinatesView.xml
   PlotDataOverTime-NonDistributed.xml
   PlotEdges2.xml
   PlotEdges.xml

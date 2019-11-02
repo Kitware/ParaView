@@ -3079,8 +3079,14 @@
                       representation_name="ParallelCoordinatesRepresentation"
                       post_creation="SetChartTypeToParallelCoordinates"
                       skip_plotable_check="1">
-      <Documentation>This is the proxy for parallel coordinates chart
-      view.</Documentation>
+      <Documentation>
+        This is the proxy for parallel coordinates chart view.
+      </Documentation>
+      <SubProxy command="SetDeliveryManager">
+        <Proxy name="DeliveryManager"
+          proxygroup="delivery_managers"
+          proxyname="ContextViewDeliveryManager"/>
+      </SubProxy>
       <Hints>
         <ShowOneRepresentationAtATime />
         <!-- When present, vtkSMParaViewPipelineController::Show() will
