@@ -199,10 +199,10 @@ void vtkViewLayout::AddView(vtkPVView* view, const double* viewport)
     item.Viewport[3] = 1.0 - viewport[1];
     if (auto renWin = view->GetRenderWindow())
     {
-      item.RenderWindowStartEventObserverId =
-        renWin->AddObserver(vtkCommand::StartEvent, this, &vtkViewLayout::UpdateLayout);
-      item.RenderWindowEndEventObserverId =
-        renWin->AddObserver(vtkCommand::EndEvent, this, &vtkViewLayout::UpdateDisplay);
+      item.RenderWindowStartEventObserverId = renWin->AddObserver(
+        vtkViewLayout::RequestUpdateLayoutEvent, this, &vtkViewLayout::UpdateLayout);
+      item.RenderWindowEndEventObserverId = renWin->AddObserver(
+        vtkViewLayout::RequestUpdateDisplayEvent, this, &vtkViewLayout::UpdateDisplay);
       internals.Items.push_back(std::move(item));
       this->Modified();
     }

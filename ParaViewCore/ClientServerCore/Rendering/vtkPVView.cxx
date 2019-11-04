@@ -26,6 +26,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkOpenGLState.h"
 #include "vtkPVDataDeliveryManager.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVLogger.h"
@@ -39,6 +40,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
 #include "vtkTimerLog.h"
+#include "vtkViewLayout.h"
 
 #include <cassert>
 #include <map>
@@ -94,14 +96,25 @@ public:
   {
     if (this->Context && this->GetReadyForRendering())
     {
+      this->InvokeEvent(vtkViewLayout::RequestUpdateLayoutEvent);
       if (!this->Initialized)
       {
         // ensures that context is created.
         vtkPVProcessWindow::PrepareForRendering();
         this->Context->MakeCurrent();
+        this->GetState()->PushFramebufferBindings();
         this->OpenGLInit();
       }
+      else
+      {
+        this->GetState()->PushFramebufferBindings();
+      }
       this->Superclass::Render();
+      if (auto state = this->GetState())
+      {
+        state->PopFramebufferBindings();
+      }
+      this->InvokeEvent(vtkViewLayout::RequestUpdateDisplayEvent);
     }
   }
 
