@@ -1,0 +1,11 @@
+NAME
+  Datamine::DatamineReaders
+LIBRARY_NAME
+  vtkDatamineReaders
+DEPENDS
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonTransforms
+  VTK::FiltersCore

@@ -623,6 +623,7 @@ set(paraview_default_plugins
   ArrowGlyph
   BagPlotViewsAndFilters
   CDIReader
+  Datamine
   DigitalRockPhysics
   EULATestPlugin
   EmbossingRepresentations

@@ -14,6 +14,9 @@ list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION
 
   # Unreachable code in xutility causes C4702 warnings in MSVC.
   "xutility.*unreachable code"
+
+  # exclude warnings from dmfile.cxx
+  "dmfile.*"
   )
 
 # Regular expression for excluding files from coverage testing
