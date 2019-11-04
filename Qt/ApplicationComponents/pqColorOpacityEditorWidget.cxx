@@ -228,6 +228,16 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   QObject::connect(
     ui.OpacityEditor, SIGNAL(controlPointsModified()), this, SLOT(updateCurrentData()));
 
+  QObject::connect(ui.ColorEditor, SIGNAL(rangeHandlesRangeChanged(double, double)), this,
+    SLOT(onRangeHandlesRangeChanged(double, double)));
+  QObject::connect(ui.OpacityEditor, SIGNAL(rangeHandlesRangeChanged(double, double)), this,
+    SLOT(onRangeHandlesRangeChanged(double, double)));
+
+  QObject::connect(
+    ui.ColorEditor, SIGNAL(rangeHandlesDoubleClicked()), this, SLOT(resetRangeToCustom()));
+  QObject::connect(
+    ui.OpacityEditor, SIGNAL(rangeHandlesDoubleClicked()), this, SLOT(resetRangeToCustom()));
+
   QObject::connect(ui.ResetRangeToData, SIGNAL(clicked()), this, SLOT(resetRangeToData()));
 
   QObject::connect(ui.ResetRangeToCustom, SIGNAL(clicked()), this, SLOT(resetRangeToCustom()));
@@ -249,6 +259,10 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
 
   QObject::connect(
     ui.OpacityEditor, SIGNAL(chartRangeModified()), this, SLOT(setHistogramOutdated()));
+  QObject::connect(ui.OpacityEditor, SIGNAL(chartRangeModified()), ui.OpacityEditor,
+    SIGNAL(controlPointsModified()));
+  QObject::connect(
+    ui.ColorEditor, SIGNAL(chartRangeModified()), ui.ColorEditor, SIGNAL(controlPointsModified()));
 
   this->connect(
     ui.UseLogScaleOpacity, SIGNAL(clicked(bool)), SLOT(useLogScaleOpacityClicked(bool)));
@@ -1063,4 +1077,17 @@ void pqColorOpacityEditorWidget::updateDataHistogramEnableState()
   this->Internals->Ui.DataHistogramNumberOfBins->setEnabled(showDataHistogram);
   this->Internals->Ui.ComputeDataHistogram->setEnabled(
     showDataHistogram && !this->Internals->Ui.AutomaticDataHistogramComputation->isChecked());
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::onRangeHandlesRangeChanged(double rangeMin, double rangeMax)
+{
+  vtkSMProxy* colorProxy = this->proxy();
+  vtkSMProxy* opacityProxy = this->Internals->ScalarOpacityFunctionProxy;
+  double range[2] = { rangeMin, rangeMax };
+
+  vtkSMTransferFunctionProxy::RescaleTransferFunction(colorProxy, range);
+  vtkSMTransferFunctionProxy::RescaleTransferFunction(opacityProxy, range);
+  this->Internals->render();
+  emit this->changeFinished();
 }

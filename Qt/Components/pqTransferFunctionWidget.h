@@ -74,11 +74,13 @@ public:
   */
   vtkIdType numberOfControlPoints() const;
 
+  //@{
   /**
    * Switches the chart to use a log scaled X axis.
    */
   void SetLogScaleXAxis(bool logScale);
   bool GetLogScaleXAxis() const;
+  //@}
 
 public slots:
   /**
@@ -122,12 +124,33 @@ signals:
    */
   void chartRangeModified();
 
+  /**
+   * signal fired when the range handles changed the range.
+   */
+  void rangeHandlesRangeChanged(double rangeMin, double rangeMax);
+
+  /**
+   * signal fired when the range handles are double clicked.
+   */
+  void rangeHandlesDoubleClicked();
+
 protected slots:
   /**
   * slot called when the internal vtkControlPointsItem fires
   * vtkControlPointsItem::CurrentPointChangedEvent
   */
   void onCurrentChangedEvent();
+
+  /**
+   * slot called when the internal vtkRangeHandlesItem fires a
+   * vtkRangeHandlesItem::RangeHandlesRangeChanged
+   */
+  void onRangeHandlesRangeChanged();
+
+  /**
+   * Show usage info in the application status bar
+   */
+  void showUsageStatus();
 
 protected:
   /**
