@@ -82,6 +82,8 @@ class ProducerAccessor(smtrace.RealProxyAccessor):
         trace.append("%s = coprocessor.CreateProducer(datadescription, '%s')" % \
             (self, self.SimulationInputName))
 
+        # self.varname has .'s and *'s stripped. Knowing this, the key in cpstate_globals.cinema_arrays
+        # should also be stripped of .'s and *'s. Refers to /Qt/ApplicationComponents/pqExportCatalystScript.cxx
         if self.varname in cpstate_globals.cinema_arrays:
             arrays = cpstate_globals.cinema_arrays[self.varname]
             trace.append_separated(["# define target arrays of filters."])
