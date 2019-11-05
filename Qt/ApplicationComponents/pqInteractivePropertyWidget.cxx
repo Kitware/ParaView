@@ -136,6 +136,8 @@ pqInteractivePropertyWidget::pqInteractivePropertyWidget(const char* widget_smgr
 
   pqCoreUtilities::connect(
     wdgProxy, vtkCommand::StartInteractionEvent, this, SIGNAL(startInteraction()));
+  pqCoreUtilities::connect(
+    wdgProxy, vtkCommand::StartInteractionEvent, this, SIGNAL(changeAvailable()));
   pqCoreUtilities::connect(wdgProxy, vtkCommand::InteractionEvent, this, SIGNAL(interaction()));
   pqCoreUtilities::connect(
     wdgProxy, vtkCommand::EndInteractionEvent, this, SIGNAL(endInteraction()));
