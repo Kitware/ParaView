@@ -6,6 +6,8 @@ if (NOT (DEFINED paraview_cmake_dir AND
     "ParaViewInstallCMakePackage is missing input variables.")
 endif ()
 
+_vtk_module_write_import_prefix("${paraview_cmake_build_dir}/paraview-prefix.cmake" "${paraview_cmake_destination}")
+
 configure_file(
   "${paraview_cmake_dir}/paraview-config.cmake.in"
   "${paraview_cmake_build_dir}/paraview-config.cmake"
@@ -104,6 +106,7 @@ endforeach ()
 install(
   FILES       "${paraview_cmake_build_dir}/paraview-config.cmake"
               "${paraview_cmake_build_dir}/paraview-config-version.cmake"
+              "${paraview_cmake_build_dir}/paraview-prefix.cmake"
   DESTINATION "${paraview_cmake_destination}"
   COMPONENT   "development")
 
