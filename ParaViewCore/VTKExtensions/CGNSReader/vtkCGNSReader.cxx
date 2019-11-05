@@ -3535,7 +3535,7 @@ int vtkCGNSReader::GetUnstructuredZone(
                   cgsize_t curIdStart = 0;
                   for (std::size_t lse = 0; lse < bndSecToUse.size(); lse++)
                   {
-                    if (sectionInfoList[bndSecToUse[sec]].range[0] < curStart)
+                    if (sectionInfoList[bndSecToUse[lse]].range[0] < curStart)
                     {
                       curArrayStart += sizeAllocForEachSection[lse];
                       curIdStart += numElemToReadBndSec[lse];
