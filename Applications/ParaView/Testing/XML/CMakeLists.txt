@@ -113,6 +113,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/AxesGrid7.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/AxesGrid8.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/AxesGrid9.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/AxesGrid10.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BatchAxesGrid.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BoxWidget-Transform.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/BoxWidget-ClipDefault.png}"
