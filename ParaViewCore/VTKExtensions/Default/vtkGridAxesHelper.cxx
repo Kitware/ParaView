@@ -16,6 +16,7 @@
 
 #include "vtkCamera.h"
 #include "vtkCoordinate.h"
+#include "vtkLogger.h"
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 #include "vtkNew.h"
@@ -38,6 +39,27 @@ inline vtkVector3d DoTransform(vtkMatrix4x4* matrix, const vtkVector3d& point)
 
   vtkVector3d result(resultH.GetData());
   return result / vtkVector3d(resultH[3]);
+}
+
+const char* vtkFaceName(int face)
+{
+  switch (face)
+  {
+    case vtkGridAxesHelper::MIN_YZ:
+      return "min-YZ";
+    case vtkGridAxesHelper::MIN_ZX:
+      return "min-ZX";
+    case vtkGridAxesHelper::MIN_XY:
+      return "min-XY";
+    case vtkGridAxesHelper::MAX_YZ:
+      return "max-YZ";
+    case vtkGridAxesHelper::MAX_ZX:
+      return "max-ZX";
+    case vtkGridAxesHelper::MAX_XY:
+      return "max-XY";
+    default:
+      return "invalid";
+  }
 }
 }
 
@@ -282,8 +304,14 @@ bool vtkGridAxesHelper::UpdateForViewport(vtkViewport* viewport)
     ? vtkVector3d(camera->GetFocalPoint()) - vtkVector3d(camera->GetPosition())
     : this->TransformedPoints[0] - vtkVector3d(camera->GetPosition());
   viewdirection.Normalize();
-  this->Backface = (viewdirection.Dot(this->TransformedFaceNormal) >= 0);
-  return true;
+  const auto dotproduct = (viewdirection.Dot(this->TransformedFaceNormal));
+  // if face-normal is almost tangent to view direction, then the face is pretty much
+  // not visible, let's not label it (see paraview/paraview#19182).
+  const bool skip_face = (std::abs(dotproduct) <= 0.087); // i.e. within +/- 5 degrees of 90.
+  vtkLogF(TRACE, "[%s] viewDir . faceNormal = %f, hidden=%d", vtkFaceName(this->Face), dotproduct,
+    skip_face);
+  this->Backface = (dotproduct >= 0);
+  return !skip_face;
 }
 
 //----------------------------------------------------------------------------
