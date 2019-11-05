@@ -80,6 +80,9 @@ void pqVCRToolbar::constructor()
     controller, SIGNAL(timeRanges(double, double)), this, SLOT(setTimeRanges(double, double)));
   QObject::connect(controller, SIGNAL(loop(bool)), ui.actionVCRLoop, SLOT(setChecked(bool)));
   QObject::connect(controller, SIGNAL(playing(bool)), this, SLOT(onPlaying(bool)));
+
+  this->Controller->setAnimationScene(
+    pqPVApplicationCore::instance()->animationManager()->getActiveScene());
 }
 
 //-----------------------------------------------------------------------------
