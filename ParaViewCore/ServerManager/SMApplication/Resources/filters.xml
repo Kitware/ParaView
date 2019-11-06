@@ -16048,6 +16048,45 @@ Every Nth Point.
       </StringVectorProperty>
     </SourceProxy>
 
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkDateToNumeric" name="DateToNumeric">
+      <Documentation long_help="Convert string dates to numeric values."
+                     short_help="Convert dates to numeric values.">
+                     The DateToNumeric filter looks at string arrays in
+                     the input data object and if they contain dates that can be
+                     converted numbers then they are converted to doubles and
+                     added as additional arrays of the same type (point/cell/field).
+                     The format string used to parse dates can be specified by the user.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <InputArrayDomain name="point_arrays" attribute_type="point" optional="1" />
+        <InputArrayDomain name="cell_arrays" attribute_type="cell" optional="1" />
+        <InputArrayDomain name="field_arrays" attribute_type="field" optional="1" />
+        <InputArrayDomain name="vertex_arrays" attribute_type="vertex" optional="1" />
+        <InputArrayDomain name="edge_arrays" attribute_type="edge" optional="1" />
+        <InputArrayDomain name="row_arrays" attribute_type="row" optional="1" />
+      </InputProperty>
+
+      <StringVectorProperty animateable="0"
+                            command="SetDateFormat"
+                            default_values="%Y-%m-%d %H:%M:%S"
+                            name="DateFormat"
+                            number_of_elements="1"
+                            panel_visibility="always">
+        <Documentation>
+          This property specifies the first format to try using to parse dates. It
+          follows the standards of std::get_time.
+        </Documentation>
+      </StringVectorProperty>
+    </SourceProxy>
+
     <SourceProxy class="vtkImageToAMR"
                  label="Image Data To AMR"
                  name="ImageDataToAMR">
