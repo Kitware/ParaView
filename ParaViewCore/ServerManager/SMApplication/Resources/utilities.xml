@@ -644,7 +644,8 @@
     <NullProxy name="None"></NullProxy>
     <NullProxy name="Scalar"></NullProxy>
     <Proxy class="vtkPVPlane"
-           name="Plane">
+           name="Plane"
+           processes="dataserver|renderserver|client">
       <InputProperty is_internal="1"
                      name="Input"></InputProperty>
       <DoubleVectorProperty command="SetOrigin"
