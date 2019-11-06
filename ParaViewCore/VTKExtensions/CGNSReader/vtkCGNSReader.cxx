@@ -1231,11 +1231,11 @@ int vtkCGNSReader::vtkPrivate::readBCData(const double nodeId, const int cellDim
       for (auto& BCDataSetChild : BCDataSetChildrens)
       {
         CGIOErrorSafe(cgio_get_label(self->cgioNum, BCDataSetChild, nodeLabel));
-        if (strcmp(nodeLabel, "BCData_t"))
+        if (strcmp(nodeLabel, "BCData_t") == 0)
         {
           BCDataChildList.push_back(BCDataSetChild);
         }
-        else if (strcmp(nodeLabel, "GridLocation_t"))
+        else if (strcmp(nodeLabel, "GridLocation_t") == 0)
         {
           std::string location;
           CGNSRead::readNodeStringData(self->cgioNum, BCDataSetChild, location);
@@ -1309,6 +1309,7 @@ int vtkCGNSReader::vtkPrivate::readBCData(const double nodeId, const int cellDim
           }
         }
         CGNSRead::fillVectorsFromVars(cgnsVars, cgnsVectors, physicalDim);
+        vtkVars.resize(cgnsVars.size());
         for (std::size_t var = 0; var < cgnsVars.size(); var++)
         {
           vtkVars[var] = 0;
@@ -1341,11 +1342,6 @@ int vtkCGNSReader::vtkPrivate::readBCData(const double nodeId, const int cellDim
              iter != cgnsVectors.end(); ++iter)
         {
           vtkDataArray* arr = 0;
-
-          if (vtkPrivate::IsVarEnabled(varCentering, iter->name, self) == false)
-          {
-            continue;
-          }
 
           int nv = iter->xyzIndex[0];
           switch (cgnsVars[nv].dt)
