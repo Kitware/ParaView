@@ -166,19 +166,17 @@ function (_paraview_add_tests function)
       _paraview_add_tests_script_args
       "${_paraview_add_tests_script_args}")
 
+    set(testArgs 
+        NAME    "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
+        COMMAND ParaView::smTestDriver
+                --enable-bt
+                ${_paraview_add_tests_script_args})
     if (DEFINED "${_paraview_add_tests_name}_USES_DIRECT_DATA")
-      add_test(
-        NAME    "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
-        COMMAND ParaView::smTestDriver
-                --enable-bt
-                ${_paraview_add_tests_script_args})
+      add_test(${testArgs})
     else()
-      ExternalData_add_test("${_paraview_add_tests_TEST_DATA_TARGET}"
-        NAME    "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
-        COMMAND ParaView::smTestDriver
-                --enable-bt
-                ${_paraview_add_tests_script_args})
+      ExternalData_add_test("${_paraview_add_tests_TEST_DATA_TARGET}" ${testArgs})
     endif()
+
     set_property(TEST "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
       PROPERTY
         LABELS ParaView)
