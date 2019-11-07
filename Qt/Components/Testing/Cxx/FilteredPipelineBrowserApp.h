@@ -1,4 +1,5 @@
 
+#include <QCheckBox>
 #include <QComboBox>
 #include <QMainWindow>
 #include <QPointer>
@@ -21,9 +22,11 @@ protected:
   QStringList FilterNames;
   QPointer<QComboBox> FilterSelector;
   QPointer<pqPipelineBrowserWidget> PipelineWidget;
+  QPointer<QCheckBox> InvertMatching;
 
 public slots:
   void processTest();
   void updateSelectedFilter(int);
+  void invertFilterMatching(int);
   void showSettings();
 };

@@ -71,6 +71,17 @@ bool pqPipelineAnnotationFilterModel::lessThan(
 }
 //-----------------------------------------------------------------------------
 
+void pqPipelineAnnotationFilterModel::setAnnotationFilterMatching(bool matching)
+{
+  pqPipelineModel* model = qobject_cast<pqPipelineModel*>(this->sourceModel());
+  if (model)
+  {
+    this->beginResetModel();
+    model->setAnnotationFilterMatching(matching);
+    this->endResetModel();
+  }
+}
+
 void pqPipelineAnnotationFilterModel::enableAnnotationFilter(const QString& annotationKey)
 {
   pqPipelineModel* model = qobject_cast<pqPipelineModel*>(this->sourceModel());

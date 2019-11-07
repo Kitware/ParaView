@@ -485,6 +485,7 @@ void pqPipelineModel::constructor()
 pqPipelineModel::pqPipelineModel(QObject* p)
   : QAbstractItemModel(p)
   , LinkCallback(NULL)
+  , FilterAnnotationMatching(true)
 {
   this->constructor();
 }
@@ -493,6 +494,7 @@ pqPipelineModel::pqPipelineModel(QObject* p)
 pqPipelineModel::pqPipelineModel(const pqPipelineModel& other, QObject* parentObject)
   : QAbstractItemModel(parentObject)
   , LinkCallback(NULL)
+  , FilterAnnotationMatching(true)
 {
   this->constructor();
   this->Internal->Root = other.Internal->Root;
@@ -503,6 +505,7 @@ pqPipelineModel::pqPipelineModel(const pqPipelineModel& other, QObject* parentOb
 pqPipelineModel::pqPipelineModel(const pqServerManagerModel& other, QObject* parentObject)
   : QAbstractItemModel(parentObject)
   , LinkCallback(NULL)
+  , FilterAnnotationMatching(true)
 {
   this->constructor();
 
@@ -830,8 +833,9 @@ QVariant pqPipelineModel::data(const QModelIndex& idx, int role) const
     {
       if (!this->FilterRoleAnnotationKey.isEmpty() && source)
       {
-        return QVariant(
-          source->getProxy()->HasAnnotation(this->FilterRoleAnnotationKey.toLocal8Bit().data()));
+        bool hasAnnotation =
+          source->getProxy()->HasAnnotation(this->FilterRoleAnnotationKey.toLocal8Bit().data());
+        return (this->FilterAnnotationMatching ? hasAnnotation : !hasAnnotation);
       }
       return QVariant(true);
     }
@@ -1410,6 +1414,12 @@ void pqPipelineModel::updateDataServer(pqServer* server)
 void pqPipelineModel::setModifiedFont(const QFont& font)
 {
   this->Internal->ModifiedFont = font;
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineModel::setAnnotationFilterMatching(bool matching)
+{
+  this->FilterAnnotationMatching = matching;
 }
 
 //-----------------------------------------------------------------------------

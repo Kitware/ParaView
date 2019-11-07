@@ -63,6 +63,11 @@ public:
   void enableAnnotationFilter(const QString& annotationKey);
   void disableAnnotationFilter();
 
+  /**
+   * Set wether annotation filter should display matching or non matching sources.
+   */
+  void setAnnotationFilterMatching(bool matching);
+
   void enableSessionFilter(vtkSession* session);
   void disableSessionFilter();
 

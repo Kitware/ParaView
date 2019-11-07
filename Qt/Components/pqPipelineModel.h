@@ -305,6 +305,11 @@ public:
   void disableFilterAnnotationKey();
 
   /**
+   * Set wether annotation filter should display matching or non matching sources.
+   */
+  void setAnnotationFilterMatching(bool matching);
+
+  /**
   * \brief
   *   Store the session key that will be used when
   *   "this->data( ... , pqPipelineMode::SessionFilterRole)"
@@ -432,6 +437,7 @@ private:
   QMap<QString, QPixmap> PixmapMap;  ///< Stores the item icons.
   QPointer<pqView> View;
   bool Editable;
+  bool FilterAnnotationMatching;
   QString FilterRoleAnnotationKey;
   vtkSession* FilterRoleSession;
   ModifiedLiveInsituLink* LinkCallback;

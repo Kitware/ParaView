@@ -43,6 +43,12 @@ MainPipelineWindow::MainPipelineWindow()
   QObject::connect(this->FilterSelector, SIGNAL(currentIndexChanged(int)), this,
     SLOT(updateSelectedFilter(int)), Qt::QueuedConnection);
 
+  this->InvertMatching = new QCheckBox();
+  this->InvertMatching->setText("display matching sources");
+  this->InvertMatching->setChecked(true);
+  QObject::connect(this->InvertMatching, SIGNAL(stateChanged(int)), this,
+    SLOT(invertFilterMatching(int)), Qt::QueuedConnection);
+
   // Set Pipeline Widget
   this->PipelineWidget = new pqPipelineBrowserWidget(NULL);
 
@@ -53,6 +59,7 @@ MainPipelineWindow::MainPipelineWindow()
   QWidget* container = new QWidget(this);
   QVBoxLayout* internalLayout = new QVBoxLayout();
   internalLayout->addWidget(this->FilterSelector);
+  internalLayout->addWidget(this->InvertMatching);
   internalLayout->addWidget(this->PipelineWidget);
   container->setLayout(internalLayout);
   this->setCentralWidget(container);
@@ -67,6 +74,12 @@ MainPipelineWindow::MainPipelineWindow()
 
   QAction* actn = tb->addAction("Settings");
   this->connect(actn, SIGNAL(triggered()), SLOT(showSettings()));
+}
+
+//-----------------------------------------------------------------------------
+void MainPipelineWindow::invertFilterMatching(int newState)
+{
+  this->PipelineWidget->setAnnotationFilterMatching(newState == Qt::Checked);
 }
 
 //-----------------------------------------------------------------------------
