@@ -188,6 +188,7 @@
   <Proxy group="filters" name="DataSetSurfaceFilter" />
   <Proxy group="filters" name="DataSetRegionSurfaceFilter" />
   <Proxy group="filters" name="DataSetTriangleFilter" />
+  <Proxy group="filters" name="DateToNumeric" />
   <Proxy group="filters" name="DecimatePro" />
   <Proxy group="filters" name="DecimatePolyline" />
   <Proxy group="filters" name="Delaunay2D" />
