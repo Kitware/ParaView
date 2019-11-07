@@ -485,7 +485,7 @@ public:
   }
 
   static int readBCData(const double nodeId, const int cellDim, const int physicalDim,
-    vtkDataSet* dataset, vtkCGNSReader* self);
+    const CGNS_ENUMT(GridLocation_t) locationParam, vtkDataSet* dataset, vtkCGNSReader* self);
 
   static std::string GenerateMeshKey(const char* basename, const char* zonename);
 };
@@ -1206,7 +1206,8 @@ int vtkCGNSReader::vtkPrivate::readSolution(const std::string& solutionNameStr, 
 
 //------------------------------------------------------------------------------
 int vtkCGNSReader::vtkPrivate::readBCData(const double nodeId, const int cellDim,
-  const int physicalDim, vtkDataSet* dataset, vtkCGNSReader* self)
+  const int physicalDim, const CGNS_ENUMT(GridLocation_t) locationParam, vtkDataSet* dataset,
+  vtkCGNSReader* self)
 {
   if (cellDim == 0 || physicalDim == 0)
   {
@@ -1224,7 +1225,7 @@ int vtkCGNSReader::vtkPrivate::readBCData(const double nodeId, const int cellDim
     if (strcmp(nodeLabel, "BCDataSet_t") == 0)
     {
       // Found a BCDataset_t and now load its data
-      CGNS_ENUMT(GridLocation_t) varCentering = CGNS_ENUMV(Vertex);
+      CGNS_ENUMT(GridLocation_t) varCentering = locationParam;
       std::vector<double> BCDataSetChildrens;
       std::vector<double> BCDataChildList; // Neumann and Dirichlet data node
       CGNSRead::getNodeChildrenId(self->cgioNum, childrenId, BCDataSetChildrens);
@@ -3268,7 +3269,7 @@ int vtkCGNSReader::GetUnstructuredZone(
               // Inherit Centering from BC_t node
               // Fill the bcGrid with these boundary values.
               vtkCGNSReader::vtkPrivate::readBCData(
-                *bciter, cellDim, physicalDim, bcGrid.Get(), this);
+                *bciter, cellDim, physicalDim, binfo.Location, bcGrid.Get(), this);
               // For Pointdata, it can be extracted from the unstructured Volume.
               //
               const unsigned int idx = patchesMB->GetNumberOfBlocks();
@@ -4019,7 +4020,7 @@ int vtkCGNSReader::GetUnstructuredZone(
               // Try to Parse BCDataSet CGNS arrays
               //
               vtkCGNSReader::vtkPrivate::readBCData(
-                *bciter, cellDim, physicalDim, bcGrid.Get(), this);
+                *bciter, cellDim, physicalDim, binfo.Location, bcGrid.Get(), this);
               //
               const unsigned int idx = patchesMB->GetNumberOfBlocks();
               patchesMB->SetBlock(idx, bcGrid.Get());
