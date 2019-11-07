@@ -3853,6 +3853,45 @@
             <Property name="RenderPointsAsSpheres"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="points"/>
+            <Hints>
+              <!--Hide for volume and slice representation-->
+              <PropertyWidgetDecorator type="CompositeDecorator">
+                <Expression type="or">
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Surface" />
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Surface With Edges" />
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Outline" />
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Points" />
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Wireframe" />
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="3D Glyphs" />
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Point Gaussian" />
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Feature Edges" />
+                </Expression>
+              </PropertyWidgetDecorator>
+            </Hints>
           </PropertyGroup>
 
           <PropertyGroup label="Lighting">
@@ -3883,6 +3922,33 @@
             <Property name="EmissiveTexture" panel_visibility="advanced"/>
             <Property name="EmissiveFactor" panel_visibility="advanced"/>
             <Property name="FlipTextures" panel_visibility="advanced"/>
+            <!--Hide for volumes and non surface representations-->
+            <Hints>
+              <PropertyWidgetDecorator type="CompositeDecorator">
+                <Expression type="or">
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Surface" />
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Surface With Edges" />
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="3D Glyphs" />
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                          mode="visibility"
+                                          property="RenderLinesAsTubes"
+                                          value="1" />
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                          mode="visibility"
+                                          property="RenderPointsAsSpheres"
+                                          value="1" />
+                </Expression>
+              </PropertyWidgetDecorator>
+            </Hints>
           </PropertyGroup>
 
           <PropertyGroup label="Edge Styling">
