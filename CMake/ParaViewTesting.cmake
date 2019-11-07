@@ -1,33 +1,25 @@
 function (paraview_add_test_python)
-  set(_vtk_testing_python_exe
-    "$<TARGET_FILE:ParaView::pvpython>"
-    -dr
-    ${paraview_python_args})
+  set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::pvpython>")
+  set(_vtk_test_python_args -dr ${paraview_python_args})
   vtk_add_test_python(${ARGN})
 endfunction ()
 
 function (paraview_add_test_python_mpi)
-  set(_vtk_testing_python_exe
-    "$<TARGET_FILE:ParaView::pvpython>"
-    -dr
-    ${paraview_python_args})
+  set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::pvpython>")
+  set(_vtk_test_python_args -dr ${paraview_python_args})
   vtk_add_test_python_mpi(${ARGN})
 endfunction ()
 
 function (paraview_add_test_pvbatch)
-  set(_vtk_testing_python_exe
-    "$<TARGET_FILE:ParaView::pvbatch>"
-    -dr
-    ${paraview_pvbatch_args})
+  set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::pvbatch>")
+  set(_vtk_test_python_args -dr ${paraview_pvbatch_args})
   set(vtk_test_prefix "Batch-${vtk_test_prefix}")
   vtk_add_test_python(${ARGN})
 endfunction ()
 
 function (paraview_add_test_pvbatch_mpi)
-  set(_vtk_testing_python_exe
-    "$<TARGET_FILE:ParaView::pvbatch>"
-    -dr
-    ${paraview_pvbatch_args})
+  set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::pvbatch>")
+  set(_vtk_test_python_args -dr ${paraview_pvbatch_args})
   set(vtk_test_prefix "Batch-${vtk_test_prefix}")
   vtk_add_test_python_mpi(${ARGN})
 endfunction ()
@@ -37,7 +29,7 @@ function(paraview_add_test_driven)
     return()
   endif ()
   set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::smTestDriver>")
-  list(APPEND VTK_PYTHON_ARGS
+  set(_vtk_test_python_args
     --server $<TARGET_FILE:ParaView::pvserver>
     --client $<TARGET_FILE:ParaView::pvpython> -dr)
   vtk_add_test_python(${ARGN})
@@ -174,19 +166,17 @@ function (_paraview_add_tests function)
       _paraview_add_tests_script_args
       "${_paraview_add_tests_script_args}")
 
+    set(testArgs 
+        NAME    "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
+        COMMAND ParaView::smTestDriver
+                --enable-bt
+                ${_paraview_add_tests_script_args})
     if (DEFINED "${_paraview_add_tests_name}_USES_DIRECT_DATA")
-      add_test(
-        NAME    "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
-        COMMAND ParaView::smTestDriver
-                --enable-bt
-                ${_paraview_add_tests_script_args})
+      add_test(${testArgs})
     else()
-      ExternalData_add_test("${_paraview_add_tests_TEST_DATA_TARGET}"
-        NAME    "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
-        COMMAND ParaView::smTestDriver
-                --enable-bt
-                ${_paraview_add_tests_script_args})
+      ExternalData_add_test("${_paraview_add_tests_TEST_DATA_TARGET}" ${testArgs})
     endif()
+
     set_property(TEST "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
       PROPERTY
         LABELS ParaView)
