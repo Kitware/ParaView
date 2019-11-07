@@ -331,7 +331,6 @@ def setattr(proxy, pname, value):
             raise NotSupportedException(
                 'The `OSPRayMaterial` control has been renamed in ParaView 5.7 to `Material`.')
 
-
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -349,6 +348,18 @@ def setattr_fix_value(proxy, pname, value, setter_func):
             else:
                 raise NotSupportedException("'Gaussian Blur (Default)' is an obsolete value for ShaderPreset. "\
                     " Use 'Gaussian Blur' instead.")
+
+    if pname == "FieldAssociation" and proxy.SMProxy.GetXMLName() in ["DataSetCSVWriter", "CSVWriter"]:
+        if paraview.compatibility.GetVersion() < 5.8:
+            if value == "Points":
+                value = "Point Data"
+            elif value == "Cells":
+                value = "Cell Data"
+            setter_func(proxy, value)
+            raise Continue()
+        else:
+            raise NotSupportedException("'FieldAssociation' is using an obsolete "\
+                    "value '%s', use `Point Data` or `Cell Data` instead." % value)
     raise ValueError("'%s' is not a valid value for %s!" % (value, pname))
 
 _fgetattr = getattr
