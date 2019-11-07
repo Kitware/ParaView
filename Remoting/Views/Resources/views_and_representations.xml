@@ -2812,13 +2812,40 @@
                                    values="1" />
         </Hints>
       </IntVectorProperty>
+      <IntVectorProperty command="SetBackgroundMode"
+                         label="Background mode"
+                         default_values="2"
+                         name="BackgroundMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <!--<Entry text="None"
+                 value="0" /> Disabled since needs more work. -->
+          <Entry text="Backplate"
+                 value="1" />
+          <Entry text="Environment"
+                 value="2" />
+          <Entry text="Both"
+                 value="3" />
+        </EnumerationDomain>
+        <Documentation>
+          Background behavior for path tracer. Backplate does not move or affect materials. Environment does.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
+      </IntVectorProperty>
       <DoubleVectorProperty
           name="BackgroundNorth"
+          label="Environment North"
           command="SetBackgroundNorth"
           default_values="0.0 1.0 0.0"
           animateable="0"
           number_of_elements="3">
-        <Documentation>Sets north pole for gradient and image background in OSPRay path tracer.</Documentation>
+        <Documentation>Sets north pole for gradient and image environmental background in path tracer.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -2830,10 +2857,11 @@
       <DoubleVectorProperty
           name="BackgroundEast"
           command="SetBackgroundEast"
+          label="Environment East"
           default_values="1.0 0.0 0.0"
           animateable="0"
           number_of_elements="3">
-        <Documentation>Sets east direction for image background in OSPRay path tracer.</Documentation>
+        <Documentation>Sets east direction for image environmental background in path tracer.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -2842,7 +2870,78 @@
                                    values="1" />
         </Hints>
       </DoubleVectorProperty>
-
+      <DoubleVectorProperty command="SetEnvironmentalBG"
+                            default_values="0.329 0.349 0.427"
+                            name="EnvironmentalBG"
+                            panel_widget="color_selector_with_palette"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetEnvironmentalBG2"
+                            default_values="0 0 0.165"
+                            name="EnvironmentalBG2"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetGradientEnvironmentalBG"
+                         default_values="0"
+                         name="UseGradientEnvironmentalBG"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTexturedEnvironmentalBG"
+                         default_values="0"
+                         name="UseTexturedEnvironmentalBG"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
+      </IntVectorProperty>
+      <ProxyProperty command="SetEnvironmentalBGTexture"
+                     name="EnvironmentalBGTexture"
+                     panel_widget="texture_selector">
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
+      </ProxyProperty>
       <ProxyProperty
         name="AdditionalLights"
         command="AddLight"
@@ -2933,6 +3032,23 @@
         <Property name="Denoise"/>
         <Property name="LightScale"/>
         <Property name="OSPRayTemporalCacheSize"/>
+        <Property name="BackgroundNorth"/>
+        <Property name="BackgroundEast"/>
+        <Property name="BackgroundMode"/>
+      </PropertyGroup>
+      <PropertyGroup label="Path Traced Environmental Background" panel_widget="EnvironmentalBGEditor" panel_visibility="advanced">
+        <Property name="EnvironmentalBG"/>
+        <Property name="EnvironmentalBG2"/>
+        <Property name="UseGradientEnvironmentalBG"/>
+        <Property name="UseTexturedEnvironmentalBG"/>
+        <Property name="EnvironmentalBGTexture"/>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
       </PropertyGroup>
 
       <SubProxy command="SetDeliveryManager">

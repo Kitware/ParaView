@@ -2528,6 +2528,47 @@ void vtkPVRenderView::SetUseEnvironmentLighting(bool val)
   this->GetRenderer()->SetUseImageBasedLighting(val);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetBackgroundMode(int val)
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  vtkRenderer* ren = this->GetRenderer();
+  vtkOSPRayRendererNode::SetBackgroundMode(val, ren);
+#else
+  (void)val;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetEnvironmentalBG(double r, double g, double b)
+{
+  this->GetRenderer()->SetEnvironmentalBG(r, g, b);
+}
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetEnvironmentalBG2(double r, double g, double b)
+{
+  this->GetRenderer()->SetEnvironmentalBG2(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetEnvironmentalBGTexture(vtkTexture* texture)
+{
+  cerr << "SET ENV BG TEXT" << endl;
+  this->GetRenderer()->SetEnvironmentalBGTexture(texture);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetGradientEnvironmentalBG(int val)
+{
+  this->GetRenderer()->SetGradientEnvironmentalBG(val ? true : false);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetTexturedEnvironmentalBG(int val)
+{
+  this->GetRenderer()->SetTexturedEnvironmentalBG(val ? true : false);
+}
+
 //*****************************************************************
 // Entry point for dynamic lights
 //----------------------------------------------------------------------------

@@ -623,6 +623,15 @@ public:
   virtual void SetUseEnvironmentLighting(bool val);
 
   //*****************************************************************
+  // Entry point for environmental backgrounds
+  virtual void SetEnvironmentalBG(double r, double g, double b);
+  virtual void SetEnvironmentalBG2(double r, double g, double b);
+  virtual void SetEnvironmentalBGTexture(vtkTexture* val);
+  virtual void SetGradientEnvironmentalBG(int val);
+  virtual void SetTexturedEnvironmentalBG(int val);
+  virtual void SetBackgroundMode(int val);
+
+  //*****************************************************************
   // Entry point for dynamic lights
   void AddLight(vtkLight*);
   void RemoveLight(vtkLight*);
