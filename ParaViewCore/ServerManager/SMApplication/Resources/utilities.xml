@@ -3026,7 +3026,7 @@
         default_values="1">
         <IntRangeDomain name="range" min="0" max="10" />
         <Documentation>
-	  The width of the separator (in pixels) to be displayed in preview mode.
+          The width of the separator (in pixels) to be displayed in preview mode.
         </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty name="SeparatorColor"
@@ -3311,6 +3311,20 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>Turn on inlining of buffer data.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetSaveNormal"
+                         default_values="0"
+                         name="SaveNormal"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Save the NORMAL point array in the GLTF file if found.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetSaveBatchId"
+                         default_values="0"
+                         name="SaveBatchId"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Save the _BATCHID point array in the GLTF file if found.</Documentation>
       </IntVectorProperty>
       <Hints>
         <ExporterFactory extensions="gltf" />
