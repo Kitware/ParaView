@@ -836,7 +836,8 @@ function (paraview_client_generate_help)
             -D_paraview_generate_help_run=ON
             -P "${_ParaViewClient_script_file}"
     VERBATIM
-    COMMAND Qt5::qhelpgenerator
+    COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}
+            $<TARGET_FILE:Qt5::qhelpgenerator>
             "${_paraview_client_help_qhp}"
             -s
             -o "${_paraview_client_help_output}"
