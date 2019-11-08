@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkPMaterialClusterExplodeFilter.h"
 
-#include "vtkAtomicTypes.h"
 #include "vtkBoundingBox.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCell.h"
@@ -39,6 +38,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <array>
+#include <atomic>
 #include <map>
 
 static const int faceIndexes[6][4] = { { 0, 4, 6, 2 }, { 0, 1, 5, 4 }, { 0, 2, 3, 1 },
@@ -262,7 +262,7 @@ struct ExplodeFunctor
 
   //----------------------------------------------------------------------------
   vtkSMPThreadLocal<ExplodeParameters> LocalData;
-  vtkAtomicIdType ProcessedCells;
+  std::atomic<vtkIdType> ProcessedCells;
   vtkPMaterialClusterExplodeFilter* Filter;
   vtkImageData* Input;
   vtkDataArray* LabelArray;
