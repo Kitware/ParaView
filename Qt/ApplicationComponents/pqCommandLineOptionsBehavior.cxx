@@ -65,6 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 #include <QFile>
 #include <QMainWindow>
+#include <QRegExp>
 #include <QString>
 #include <QStringList>
 
@@ -238,23 +239,32 @@ void pqCommandLineOptionsBehavior::playTests()
       }
     }
 
-    // Load the test plugin specified at the command line
-    std::string plugin(options->GetTestPlugin());
-    if (plugin.size())
+    // Load the test plugins specified at the command line
+    QString pluginsArg(options->GetTestPlugins());
+    if (pluginsArg.size())
     {
-      // Make in-code plugin XML
-      std::string plugin_xml;
-      plugin_xml += "<Plugins><Plugin name=\"";
-      plugin_xml += plugin;
-      plugin_xml += "\" auto_load=\"1\" /></Plugins>\n";
+      // RegEx for ','
+      QRegExp rx("(\\,)");
+      QStringList plugins = pluginsArg.split(rx);
 
-      // Load the plugin into the plugin manager. Local and remote
-      // loading is done here.
-      vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-      vtkSMPluginManager* pluginManager = pxm->GetPluginManager();
-      vtkSMSession* activeSession = pxm->GetActiveSession();
-      pluginManager->LoadPluginConfigurationXMLFromString(plugin_xml.c_str(), activeSession, true);
-      pluginManager->LoadPluginConfigurationXMLFromString(plugin_xml.c_str(), activeSession, false);
+      for (const auto& plugin : plugins)
+      {
+        // Make in-code plugin XML
+        std::string plugin_xml;
+        plugin_xml += "<Plugins><Plugin name=\"";
+        plugin_xml += plugin.toStdString();
+        plugin_xml += "\" auto_load=\"1\" /></Plugins>\n";
+
+        // Load the plugin into the plugin manager. Local and remote
+        // loading is done here.
+        vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+        vtkSMPluginManager* pluginManager = pxm->GetPluginManager();
+        vtkSMSession* activeSession = pxm->GetActiveSession();
+        pluginManager->LoadPluginConfigurationXMLFromString(
+          plugin_xml.c_str(), activeSession, true);
+        pluginManager->LoadPluginConfigurationXMLFromString(
+          plugin_xml.c_str(), activeSession, false);
+      }
     }
 
     // Play the test script if specified.

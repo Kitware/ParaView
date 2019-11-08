@@ -201,8 +201,8 @@ public:
   /**
    * Adding ability to test plugins by loading them at command line
    */
-  vtkGetStringMacro(TestPlugin);
-  vtkGetStringMacro(TestPluginPath);
+  vtkGetStringMacro(TestPlugins);
+  vtkGetStringMacro(TestPluginPaths);
   //@}
 
   //@{
@@ -329,8 +329,8 @@ protected:
   int MultiServerMode;
   int SymmetricMPIMode;
   char* ServersFileName;
-  char* TestPlugin; // to load plugins from command line for tests
-  char* TestPluginPath;
+  char* TestPlugins; // to load plugins from command line for tests
+  char* TestPluginPaths;
   int DisableXDisplayTests;
   int
     CatalystLivePort; // currently only set through the GUI but may eventually be set in any client
@@ -339,8 +339,8 @@ protected:
   // inline setters
   vtkSetStringMacro(ServerURL);
   vtkSetStringMacro(ServersFileName);
-  vtkSetStringMacro(TestPlugin);
-  vtkSetStringMacro(TestPluginPath);
+  vtkSetStringMacro(TestPlugins);
+  vtkSetStringMacro(TestPluginPaths);
 
 private:
   int ConnectID;
