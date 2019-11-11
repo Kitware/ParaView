@@ -64,7 +64,7 @@ paraview_client_add(
   * `ORGANIZATION`: (Defaults to `Anonymous`) The organization for the
     application. This is used for the macOS GUI identifier.
   * `TITLE`: The window title for the application.
-  * `DEFAULT_STYLE`: (Defaults to `plastique`) The default Qt style for the
+  * `DEFAULT_STYLE`: (Defaults to `fusion`) The default Qt style for the
     application.
   * `APPLICATION_ICON`: The path to the icon for the Windows application.
   * `BUNDLE_ICON`: The path to the icon for the macOS bundle.
@@ -145,7 +145,7 @@ function (paraview_client_add)
 
   if (NOT DEFINED _paraview_client_DEFAULT_STYLE)
     set(_paraview_client_DEFAULT_STYLE
-      "plastique")
+      "fusion")
   endif ()
 
   if (NOT DEFINED _paraview_client_BUNDLE_DESTINATION)
