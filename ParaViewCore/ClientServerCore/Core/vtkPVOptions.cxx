@@ -43,10 +43,10 @@ vtkPVOptions::vtkPVOptions()
   this->UseRenderingGroup = 0;
   this->ParaViewDataName = 0;
   this->ServersFileName = 0;
-  this->TestPlugin = 0;
-  this->TestPluginPath = 0;
-  this->SetTestPlugin("");
-  this->SetTestPluginPath("");
+  this->TestPlugins = 0;
+  this->TestPluginPaths = 0;
+  this->SetTestPlugins("");
+  this->SetTestPluginPaths("");
   this->TileDimensions[0] = 0;
   this->TileDimensions[1] = 0;
   this->TileMullions[0] = 0;
@@ -101,8 +101,8 @@ vtkPVOptions::~vtkPVOptions()
   this->SetStereoType(0);
   this->SetParaViewDataName(0);
   this->SetServerURL(0);
-  this->SetTestPlugin(0);
-  this->SetTestPluginPath(0);
+  this->SetTestPlugins(0);
+  this->SetTestPluginPaths(0);
 }
 
 //----------------------------------------------------------------------------
@@ -261,11 +261,22 @@ void vtkPVOptions::Initialize()
     "When specified, server side messages shown on client show rank of originating process",
     vtkPVOptions::PVSERVER);
 
-  this->AddArgument("--test-plugin", 0, &this->TestPlugin,
-    "Specify the name of the plugin to load for testing", vtkPVOptions::ALLPROCESS);
+  this->AddArgument("--test-plugin", 0, &this->TestPlugins,
+    "DEPRECATED: Specify the name of the plugin to load for testing."
+    " Use \"--test-plugins\" instead.",
+    vtkPVOptions::ALLPROCESS);
 
-  this->AddArgument("--test-plugin-path", 0, &this->TestPluginPath,
-    "Specify the path where more plugins can be found."
+  this->AddArgument("--test-plugins", 0, &this->TestPlugins,
+    "Specify the names of the plugins as a comma-separated list to load for testing",
+    vtkPVOptions::ALLPROCESS);
+
+  this->AddArgument("--test-plugin-path", 0, &this->TestPluginPaths,
+    "DEPRECATED: Specify the path where more plugins can be found."
+    "This is typically used when testing plugins. Use \"--test-plugin-paths\" instead.",
+    vtkPVOptions::ALLPROCESS);
+
+  this->AddArgument("--test-plugin-paths", 0, &this->TestPluginPaths,
+    "Specify the paths where more plugins can be found as a comma-separated list."
     "This is typically used when testing plugins.",
     vtkPVOptions::ALLPROCESS);
 

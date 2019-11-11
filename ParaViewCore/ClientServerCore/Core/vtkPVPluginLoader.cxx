@@ -408,6 +408,36 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
   std::string defaultname = vtksys::SystemTools::GetFilenameWithoutExtension(file);
   this->SetPluginName(defaultname.c_str());
 
+  // Avoid duplicate loading of the same plugin
+  {
+    vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
+    unsigned int nplugins = tracker->GetNumberOfPlugins();
+
+    for (unsigned int i = 0; i < nplugins; ++i)
+    {
+      const char* filename = tracker->GetPluginFileName(i);
+      if (!filename)
+      {
+        continue;
+      }
+
+      if (strcmp(file, filename))
+      {
+        continue;
+      }
+
+      bool already_loaded = tracker->GetPluginLoaded(i);
+      if (already_loaded)
+      {
+        return true;
+      }
+      else
+      {
+        break;
+      }
+    }
+  }
+
   // first, try the callbacks.
   if (vtkPVPluginLoader::CallPluginLoaderCallbacks(file))
   {

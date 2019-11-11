@@ -39,7 +39,7 @@ function (_paraview_add_tests function)
   cmake_parse_arguments(_paraview_add_tests
     "FORCE_SERIAL;FORCE_LOCK"
     "LOAD_PLUGIN;PLUGIN_PATH;CLIENT;TEST_DIRECTORY;TEST_DATA_TARGET;PREFIX;SUFFIX;_ENABLE_SUFFIX;_DISABLE_SUFFIX;BASELINE_DIR;DATA_DIRECTORY"
-    "_COMMAND_PATTERN;TEST_SCRIPTS;ENVIRONMENT;ARGS;CLIENT_ARGS"
+    "_COMMAND_PATTERN;LOAD_PLUGINS;PLUGIN_PATHS;TEST_SCRIPTS;ENVIRONMENT;ARGS;CLIENT_ARGS"
     ${ARGN})
 
   if (_paraview_add_tests_UNPARSED_ARGUMENTS)
@@ -76,13 +76,35 @@ function (_paraview_add_tests function)
     ${_paraview_add_tests_ARGS})
 
   if (DEFINED _paraview_add_tests_PLUGIN_PATH)
+    if (DEFINED _paraview_add_tests_PLUGIN_PATHS)
+      message(FATAL_ERROR
+        "The `PLUGIN_PATH` argument is incompatible "
+        "with `PLUGIN_PATHS`.")
+    endif ()
     list(APPEND _paraview_add_tests_args
       "--test-plugin-path=${_paraview_add_tests_PLUGIN_PATH}")
   endif ()
 
+  if (DEFINED _paraview_add_tests_PLUGIN_PATHS)
+    string(REPLACE ";" "," _plugin_paths "${_paraview_add_tests_PLUGIN_PATHS}")
+    list(APPEND _paraview_add_tests_args
+      "--test-plugin-paths=${_plugin_paths}")
+  endif ()
+
   if (DEFINED _paraview_add_tests_LOAD_PLUGIN)
+    if (DEFINED _paraview_add_tests_LOAD_PLUGINS)
+      message(FATAL_ERROR
+        "The `LOAD_PLUGIN` argument is incompatible "
+        "with `LOAD_PLUGINS`.")
+    endif ()
     list(APPEND _paraview_add_tests_args
       "--test-plugin=${_paraview_add_tests_LOAD_PLUGIN}")
+  endif ()
+
+  if (DEFINED _paraview_add_tests_LOAD_PLUGINS)
+    string(REPLACE ";" "," _load_plugins "${_paraview_add_tests_LOAD_PLUGINS}")
+    list(APPEND _paraview_add_tests_args
+      "--test-plugins=${_load_plugins}")
   endif ()
 
   string(REPLACE "__paraview_args__" "${_paraview_add_tests_args}"

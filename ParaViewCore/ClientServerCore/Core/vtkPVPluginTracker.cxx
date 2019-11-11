@@ -84,6 +84,18 @@ std::string vtkGetPluginFileNameFromName(const std::string& pluginname)
 using VectorOfSearchFunctions = std::vector<vtkPluginSearchFunction>;
 static VectorOfSearchFunctions RegisteredPluginSearchFunctions;
 
+std::vector<std::string> tokenize(const std::string& input, char delimiter)
+{
+  std::vector<std::string> tokens;
+  std::stringstream ss(input);
+  std::string item;
+  while (std::getline(ss, item, delimiter))
+  {
+    tokens.push_back(std::move(item));
+  }
+  return tokens;
+}
+
 /**
  * Locate a plugin library or a config file anchored at standard locations
  * for locating plugins.
@@ -144,13 +156,17 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, const char* hint, bo
 
   // First try the test plugin path, if it exists.
   vtkPVOptions* options = pm->GetOptions();
-  if (options && options->GetTestPluginPath() && strlen(options->GetTestPluginPath()) > 0)
+  if (options && options->GetTestPluginPaths() && strlen(options->GetTestPluginPaths()) > 0)
   {
-    vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "check `test-plugin-path` first.");
-    auto path = locator->Locate(options->GetTestPluginPath(), landmark);
-    if (!path.empty())
+    std::vector<std::string> testPluginPaths = tokenize(options->GetTestPluginPaths(), ',');
+    for (const auto& testPluginPath : testPluginPaths)
     {
-      return path + "/" + landmark;
+      vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "check `test-plugin-path` first.");
+      auto path = locator->Locate(testPluginPath, landmark);
+      if (!path.empty())
+      {
+        return path + "/" + landmark;
+      }
     }
   }
 
