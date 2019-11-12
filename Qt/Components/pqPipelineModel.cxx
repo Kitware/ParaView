@@ -484,8 +484,8 @@ void pqPipelineModel::constructor()
 //-----------------------------------------------------------------------------
 pqPipelineModel::pqPipelineModel(QObject* p)
   : QAbstractItemModel(p)
-  , LinkCallback(NULL)
   , FilterAnnotationMatching(true)
+  , LinkCallback(NULL)
 {
   this->constructor();
 }
@@ -493,8 +493,8 @@ pqPipelineModel::pqPipelineModel(QObject* p)
 //-----------------------------------------------------------------------------
 pqPipelineModel::pqPipelineModel(const pqPipelineModel& other, QObject* parentObject)
   : QAbstractItemModel(parentObject)
-  , LinkCallback(NULL)
   , FilterAnnotationMatching(true)
+  , LinkCallback(NULL)
 {
   this->constructor();
   this->Internal->Root = other.Internal->Root;
@@ -504,8 +504,8 @@ pqPipelineModel::pqPipelineModel(const pqPipelineModel& other, QObject* parentOb
 //-----------------------------------------------------------------------------
 pqPipelineModel::pqPipelineModel(const pqServerManagerModel& other, QObject* parentObject)
   : QAbstractItemModel(parentObject)
-  , LinkCallback(NULL)
   , FilterAnnotationMatching(true)
+  , LinkCallback(NULL)
 {
   this->constructor();
 
