@@ -45,8 +45,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 @_paraview_client_plugins_includes@
 #endif
 
-#cmakedefine01 _paraview_client_DEFAULT_STYLE
-
 #include <vtksys/SystemTools.hxx>
 #include <QVTKRenderWindowAdapter.h>
 
@@ -55,9 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int main(int argc, char* argv[])
 {
-#if _paraview_client_DEFAULT_STYLE
   QApplication::setStyle(QStyleFactory::create("@_paraview_client_DEFAULT_STYLE@"));
-#endif
 
   // When playing tests, disable all effects.
   if (vtksys::SystemTools::HasEnv("DART_TEST_FROM_DART") ||
