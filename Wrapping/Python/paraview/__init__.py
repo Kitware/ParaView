@@ -172,7 +172,7 @@ fromGUI = False
 # interpreter i.e. not of the of the ParaView-python executables, then we import the
 # static components importer module.
 try:
-    import vtkmodules_vtkCommonCorePython
+    from .modules import vtkClientServer
 except ImportError:
-    from .modules import _pvpythonmodules_importer
+    import _paraview_modules_static
 #------------------------------------------------------------------------------

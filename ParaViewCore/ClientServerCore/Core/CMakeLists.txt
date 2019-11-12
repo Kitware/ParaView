@@ -118,7 +118,7 @@ mark_as_advanced(
   PARAVIEW_INITIALIZE_MPI_ON_CLIENT
   PARAVIEW_USE_MPI_SSEND)
 
-set(vtkProcessModule_defines)
+set(vtkProcessModule_defines "BUILD_SHARED_LIBS=${built_shared}")
 if (PARAVIEW_USE_MPI_SSEND)
   list(APPEND vtkProcessModule_defines
     PARAVIEW_USE_MPI_SSEND)

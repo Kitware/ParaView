@@ -25,21 +25,16 @@ if sys.version_info <= (3,4):
     sys.modules[__name__] = vtk_m
 
 else:
-    import importlib.util
+    import importlib
     # import vtkmodules.all
-    all_spec = importlib.util.find_spec('paraview.pv-vtk-all')
-    all_m = importlib.util.module_from_spec(all_spec)
-    all_spec.loader.exec_module(all_m)
+    all_m = importlib.import_module('paraview.pv-vtk-all')
 
-    # import paraview.pv-vtk-all
-    vtkmodules_spec = importlib.util.find_spec('vtkmodules')
-    vtkmodules_m = importlib.util.module_from_spec(vtkmodules_spec)
-    vtkmodules_spec.loader.exec_module(vtkmodules_m)
+    # import vtkmodules
+    vtkmodules_m = importlib.import_module('vtkmodules')
 
-    # add attributes from pv-vtk-all
-    for key in dir(all_m):
-        if not hasattr(vtkmodules_m, key):
-            setattr(vtkmodules_m, key, getattr(all_m, key))
+    # make vtkmodules.all act as the vtkmodules package to support importing
+    # other modules from vtkmodules package via `vtk`.
+    all_m.__path__ = vtkmodules_m.__path__
 
-    # replace old `vtk` module with the modified `vtkmodules_m` package.
-    sys.modules[__name__] = vtkmodules_m
+    # replace old `vtk` module with the `all` package.
+    sys.modules[__name__] = all_m
