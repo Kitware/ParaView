@@ -4,6 +4,7 @@
 
 #include "QApplication"
 #include "pqPVApplicationCore.h"
+#include "pqPythonManager.h"
 
 #include <iostream>
 
@@ -34,12 +35,29 @@ int main(int argc, char** argv)
 
   // And finally the ParaView part:
   pqPVApplicationCore* myCoreApp = new pqPVApplicationCore(argc, argv);
+
   // Make sure compilation of ParaView was made with Python support:
-  if (!myCoreApp->pythonManager())
+  pqPythonManager* pythonMgr = myCoreApp->pythonManager();
+  if (!pythonMgr)
   {
-    std::cerr << "PV init error" << std::endl;
+    std::cerr << "ParaView was built without python, nothing was tested here" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Initialize Python interpreter
+  if (!pythonMgr->initializeInterpreter())
+  {
+    std::cerr << "The ParaView python interpreter could not be initialized" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Check initalization
+  if (!pythonMgr->interpreterIsInitialized())
+  {
+    std::cerr << "The python interpreter was not initialized" << std::endl;
     return EXIT_FAILURE;
   }
   delete myCoreApp;
+
   return EXIT_SUCCESS;
 }

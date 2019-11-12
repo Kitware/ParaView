@@ -60,6 +60,11 @@ public:
   ~pqPythonManager() override;
 
   /**
+   * Convienience method to call `vtkPythonInterpreter::Initialize()`.
+   */
+  bool initializeInterpreter();
+
+  /**
    * Returns true if the interpreter has been initialized.
    * Same as calling `vtkPythonInterpreter::IsInitialized()`.
    */
