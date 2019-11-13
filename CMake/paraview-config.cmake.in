@@ -33,7 +33,7 @@ set("${CMAKE_FIND_PACKAGE_NAME}_PREFIX_PATH"
   "${_vtk_module_import_prefix}")
 unset(_vtk_module_import_prefix)
 list(INSERT CMAKE_PREFIX_PATH 0
-  ${${CMAKE_FIND_PACKAGE_NAME}_PREFIX_PATH})
+  "${${CMAKE_FIND_PACKAGE_NAME}_PREFIX_PATH}")
 
 set("${CMAKE_FIND_PACKAGE_NAME}_VERSION" "@PARAVIEW_VERSION_FULL@")
 
