@@ -542,6 +542,7 @@ list(APPEND paraview_requested_modules
   ParaView::ServerManagerApplication
   ParaView::ServerManagerDefault
   ParaView::VTKExtensionsCGNSReader
+  ParaView::VTKExtensionsCGNSWriter
   ParaView::VTKExtensionsPoints
   ParaView::WrapClientServer
   VTK::FiltersFlowPaths
