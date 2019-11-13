@@ -79,11 +79,11 @@ include("${CMAKE_CURRENT_LIST_DIR}/ParaViewServerManager.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/ParaViewTesting.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/vtkModuleWrapClientServer.cmake")
 
-if (PARAVIEW_ENABLE_PYTHON)
+if (@PARAVIEW_ENABLE_PYTHON@) # PARAVIEW_ENABLE_PYTHON
   include("${CMAKE_CURRENT_LIST_DIR}/paraview.modules-vtk-python-module-properties.cmake")
 endif ()
 
-if (PARAVIEW_BUILD_QT_GUI)
+if (@PARAVIEW_BUILD_QT_GUI@) # PARAVIEW_BUILD_QT_GUI
   include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}Client-targets.cmake")
   include("${CMAKE_CURRENT_LIST_DIR}/ParaView-client-xml.cmake")
 endif ()
