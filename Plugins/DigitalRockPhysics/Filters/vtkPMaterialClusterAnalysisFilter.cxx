@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkPMaterialClusterAnalysisFilter.h"
 
-#include "vtkAtomicTypes.h"
 #include "vtkDataArray.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDoubleArray.h"
@@ -33,6 +32,7 @@
 #define BROADCAST_VALUES_TAG 621
 
 #include <array>
+#include <atomic>
 #include <map>
 #include <set>
 
@@ -324,7 +324,7 @@ struct AnalysisFunctor
   vtkPMaterialClusterAnalysisFilter* Filter;
   vtkImageData* Input;
   vtkDataArray* Array;
-  vtkAtomicIdType ProcessedPoints;
+  std::atomic<vtkIdType> ProcessedPoints;
   LabelValuesMap OutputLabelMap;
 };
 }

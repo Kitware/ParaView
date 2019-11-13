@@ -22,7 +22,7 @@
 
 int numberOfWrappedFunctions = 0;
 FunctionInfo* wrappedFunctions[1000];
-extern FunctionInfo* currentFunction;
+FunctionInfo* currentFunction;
 HierarchyInfo* hierarchyInfo = NULL;
 
 /* make a guess about whether a class is wrapped */
