@@ -10,8 +10,8 @@ The following variables are provided by this module:
   * `PARAVIEW_BUILD_QT_GUI`: If ParaView's Qt GUI is available.
   * `PARAVIEW_USE_MPI`: If ParaView is built with MPI support.
   * `PARAVIEW_ENABLE_PYTHON`: If ParaView is built with Python support.
-  * `PARAVIEW_PYTHONPATH`: Where ParaView's Python modules live. Unset if
-    Python is not available.
+  * `PARAVIEW_PYTHONPATH`: Where ParaView's Python modules live under the
+    install prefix. Unset if Python is not available.
   * `PARAVIEW_PLUGIN_SUBDIR`: The subdirectory under the library directory for
     plugins.
   * `ParaView_CLIENT_XML_FILES`: XML files for client applications to use to
@@ -64,6 +64,7 @@ set(PARAVIEW_ENABLE_PYTHON "@PARAVIEW_ENABLE_PYTHON@")
 set(PARAVIEW_PLUGIN_SUBDIR "paraview@paraview_version_suffix@/plugins")
 
 if (PARAVIEW_ENABLE_PYTHON)
+  set(PARAVIEW_PYTHONPATH "@PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX@")
   include("${CMAKE_CURRENT_LIST_DIR}/ParaViewPython-targets.cmake")
   # Unset this for now; these targets will be defined later.
   unset("${CMAKE_FIND_PACKAGE_NAME}_FOUND")
