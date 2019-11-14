@@ -45,6 +45,17 @@ if (APPLE)
   unset(high_resolution_capable)
 endif ()
 
+set(default_style)
+if (WIN32)
+  set(default_style "fusion")
+endif ()
+
+set(style_args)
+if (default_style)
+  list(APPEND style_args
+    DEFAULT_STYLE "${default_style}")
+endif ()
+
 paraview_client_add(
   NAME              paraview
   NAMESPACE         "ParaView"
@@ -53,6 +64,7 @@ paraview_client_add(
   TITLE             "ParaView ${paraview_version}"
   ORGANIZATION      "ParaView"
   VERSION           "${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}.${PARAVIEW_VERSION_PATCH}"
+  ${style_args}
   MAIN_WINDOW_CLASS "ParaViewMainWindow"
   BUNDLE_ICON       "${CMAKE_CURRENT_SOURCE_DIR}/pvIcon.icns"
   BUNDLE_PLIST      "${CMAKE_CURRENT_BINARY_DIR}/MacOSXBundleInfo.plist.in"
