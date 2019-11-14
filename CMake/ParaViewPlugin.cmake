@@ -790,8 +790,8 @@ paraview_add_plugin(<name>
     using client server and have their server manager XML files processed.
   * `SOURCES`: Source files for the plugin.
   * `SERVER_MANAGER_XML`: Server manager XML files for the plugin.
-  * `UI_INTERFACES`: Interfaces to initialize. See the plugin interfaces
-    section for more details.
+  * `UI_INTERFACES`: Interfaces to initialize, in the given order. See the
+    plugin interfaces section for more details.
   * `MODULE_INSTALL_EXPORT`: (Defaults to `<name>`) If provided, any modules
     will be added to the given export set.
   * `UI_RESOURCES`: Qt resource files to include with the plugin.

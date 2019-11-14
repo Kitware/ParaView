@@ -20,6 +20,6 @@ add_custom_target(ParaViewDoc-TGZ
   COMMENT "Generate ParaViewGeneratedDocs.tar.gz")
 
 add_dependencies(ParaViewDoc-TGZ ParaViewDoxygenDoc)
-if (PARAVIEW_ENABLE_PYTHON)
+if (TARGET ParaViewPythonDoc)
   add_dependencies(ParaViewDoc-TGZ ParaViewPythonDoc)
 endif ()
