@@ -429,16 +429,34 @@ class Proxy(object):
             return retVal
 
     def __GetActiveCamera(self):
-        """ This method handles GetActiveCamera specially. It adds
-        an observer to the camera such that everytime it is modified
-        the render view updated"""
+        """ This method handles GetActiveCamera specially.
+            We return a decorated vtkCamera object so that whenever
+            the Camera is directly modified using Python API,
+            we ensure that the Camera properties on the corresponding
+            view proxy are synchronized with the underlying vtkCamera.
+        """
         import weakref
-        c = self.SMProxy.GetActiveCamera()
-        if not c.HasObserver("ModifiedEvent"):
-            self.ObserverTag =c.AddObserver("ModifiedEvent", \
-                              _makeUpdateCameraMethod(weakref.ref(self)))
-            self.Observed = c
-        return c
+        camera = self.SMProxy.GetActiveCamera()
+        proxy = weakref.ref(self)
+
+        from functools import wraps
+        def _camera_sync(method):
+            @wraps(method)
+            def newfunc(*args, **kwargs):
+                result = method(*args, **kwargs)
+                if proxy():
+                    proxy().SynchronizeCameraProperties()
+                return result
+            return newfunc
+
+        class _camera_wrapper(object):
+            def __getattribute__(self, s):
+                try:
+                    return super(_camera_wrapper, self).__getattribute__(s)
+                except AttributeError:
+                    return _camera_sync(camera.__getattribute__(s))
+
+        return _camera_wrapper()
 
     def __setattr__(self, name, value):
         try:
@@ -2564,19 +2582,6 @@ def _getPyProxy(smproxy, outputPort=0):
         else:
             retVal = Proxy(proxy=smproxy, port=outputPort)
     return retVal
-
-def _makeUpdateCameraMethod(rv):
-    """ This internal method is used to create observer methods """
-    if not hasattr(rv(), "BlockUpdateCamera"):
-        rv().add_attribute("BlockUpdateCamera", False)
-    def UpdateCamera(obj, string):
-        if not rv().BlockUpdateCamera:
-          # used to avoid some nasty recursion that occurs when interacting in
-          # the GUI.
-          rv().BlockUpdateCamera = True
-          rv().SynchronizeCameraProperties()
-          rv().BlockUpdateCamera = False
-    return UpdateCamera
 
 def _createInitialize(group, name):
     """Internal method to create an Initialize() method for the sub-classes
