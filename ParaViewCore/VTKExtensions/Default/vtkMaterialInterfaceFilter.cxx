@@ -54,6 +54,7 @@
 #include "vtkMaterialInterfaceToProcMap.h"
 #include "vtkPointAccumulator.h"
 #include "vtkPointData.h"
+#include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedIntArray.h"
 // IO & IPC
 #include "vtkDataSetWriter.h"

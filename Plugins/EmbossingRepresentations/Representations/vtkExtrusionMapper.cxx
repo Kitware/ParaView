@@ -15,6 +15,8 @@
 #include "vtkExtrusionMapper.h"
 
 #include "vtkBoundingBox.h"
+#include "vtkCellArray.h"
+#include "vtkCellArrayIterator.h"
 #include "vtkCellData.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataArray.h"
@@ -63,10 +65,12 @@ void GetTrianglesFromPolyData(
 
   for (int typeIdx = 0; typeIdx < 2; typeIdx++)
   {
-    vtkIdType* p = array[typeIdx]->GetPointer();
+    auto cellIter = vtk::TakeSmartPointer(array[typeIdx]->NewIterator());
+    cellIter->GoToFirstCell();
     for (vtkIdType i = 0; i < nbCells[typeIdx]; i++)
     {
-      vtkIdType currentSize = *p++;
+      vtkIdList* cell = cellIter->GetCurrentCell();
+      vtkIdType currentSize = cell->GetNumberOfIds();
 
       // check for duplicates
       bool duplicates = false;
@@ -74,7 +78,7 @@ void GetTrianglesFromPolyData(
       {
         for (vtkIdType k = j + 1; k < currentSize; k++)
         {
-          if (p[j] == p[k])
+          if (cell->GetId(j) == cell->GetId(k))
           {
             duplicates = true;
             break;
@@ -87,7 +91,7 @@ void GetTrianglesFromPolyData(
         triangleArray.insert(
           triangleArray.end(), currentSize - 2, static_cast<float>(data->GetComponent(i, 0)));
       }
-      p += currentSize;
+      cellIter->GoToNextCell();
     }
   }
 }

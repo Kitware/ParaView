@@ -53,6 +53,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkTextureObject.h"
 #include "vtkTextureObjectVS.h" // a pass through shader
+#include "vtkUnsignedCharArray.h"
 
 #include "vtk_glew.h"
 

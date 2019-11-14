@@ -42,6 +42,7 @@
 #include "vtkTriangleFilter.h"
 #include "vtkTuple.h"
 #include "vtkUniformGrid.h"
+#include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
 
 // C/C++ includes
@@ -300,7 +301,7 @@ public:
 
           vtkIdType nPts;
           vtkIdType triangleId = 0;
-          vtkIdType* pts;
+          const vtkIdType* pts;
           for (triangleArray->InitTraversal(); triangleArray->GetNextCell(nPts, pts); triangleId++)
           {
             // Compute and stored in the sampling vector the area of each cell
@@ -335,7 +336,7 @@ public:
 
           vtkIdType nPts;
           vtkIdType tetraId = 0;
-          vtkIdType* pts;
+          const vtkIdType* pts;
           for (tetraArray->InitTraversal(); tetraArray->GetNextCell(nPts, pts); tetraId++)
           {
             // Compute and stored in the sampling vector the volume of each cell

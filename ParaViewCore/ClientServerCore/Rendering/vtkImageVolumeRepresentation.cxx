@@ -36,6 +36,7 @@
 #include "vtkSmartVolumeMapper.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredData.h"
+#include "vtkUnsignedCharArray.h"
 #include "vtkVolumeProperty.h"
 
 #include <algorithm>

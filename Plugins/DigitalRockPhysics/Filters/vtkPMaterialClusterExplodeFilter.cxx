@@ -243,7 +243,8 @@ struct ExplodeFunctor
       }
       // Append cells
       params.Cells->InitTraversal();
-      vtkIdType npts, *pts;
+      vtkIdType npts;
+      const vtkIdType* pts;
       for (vtkIdType i = 0; params.Cells->GetNextCell(npts, pts); i++)
       {
         assert(npts == 4);
