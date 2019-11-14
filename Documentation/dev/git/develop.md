@@ -142,6 +142,7 @@ cases, being your topic name with the issue number.
     * Add it to CMakeLists.txt, probably in a TESTS_WITH_BASELINES section
         * you can manually add `<pqcompareview>` for multiple image comparisons, then add to the TESTS_WITH_INLINE_COMPARES section
     * Follow the [vtk instructions][] to add the baseline images, which live in `Testing/Data/Baseline/`.
+        * Add your new baseline images to the list in `Testing/XML/CMakeLists.txt`
     * Add all testing files to your topic.
 
     Some background is in the [testing design wiki](https://www.paraview.org/Wiki/Testing_design).
