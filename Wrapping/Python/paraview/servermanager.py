@@ -2323,7 +2323,7 @@ if sys.version_info < (3, 3):
                 raise
             return module
 else:
-    import importlib
+    import importlib, importlib.abc
     class ParaViewMetaPathFinder(importlib.abc.MetaPathFinder):
         def __init__(self):
             self._loader = ParaViewLoader()
