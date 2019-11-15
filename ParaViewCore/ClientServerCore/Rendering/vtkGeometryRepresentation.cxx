@@ -1039,6 +1039,36 @@ void vtkGeometryRepresentation::SetUseMipmapTextures(bool rep)
 }
 
 //----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetSeamlessU(bool rep)
+{
+  vtkPolyDataMapper* mapper = vtkPolyDataMapper::SafeDownCast(this->Mapper);
+  if (mapper)
+  {
+    mapper->SetSeamlessU(rep);
+  }
+  vtkPolyDataMapper* lod = vtkPolyDataMapper::SafeDownCast(this->LODMapper);
+  if (lod)
+  {
+    lod->SetSeamlessU(rep);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetSeamlessV(bool rep)
+{
+  vtkPolyDataMapper* mapper = vtkPolyDataMapper::SafeDownCast(this->Mapper);
+  if (mapper)
+  {
+    mapper->SetSeamlessV(rep);
+  }
+  vtkPolyDataMapper* lod = vtkPolyDataMapper::SafeDownCast(this->LODMapper);
+  if (lod)
+  {
+    lod->SetSeamlessV(rep);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetUseOutline(int val)
 {
   if (vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
