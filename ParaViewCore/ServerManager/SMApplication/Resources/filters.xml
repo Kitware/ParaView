@@ -12936,7 +12936,7 @@ Every Nth Point.
       <!-- End TextureMapToPlane -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkTextureMapToSphere"
+    <SourceProxy class="vtkPTextureMapToSphere"
                  label="Texture Map to Sphere"
                  name="TextureMapToSphere">
       <Documentation long_help="Generate texture coordinates by mapping points to sphere."
