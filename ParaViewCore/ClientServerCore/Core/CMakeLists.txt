@@ -97,6 +97,7 @@ endif ()
 set_property(SOURCE vtkPVPluginTracker.cxx APPEND
   PROPERTY
     COMPILE_DEFINITIONS
+      "BUILD_SHARED_LIBS=${built_shared}"
       "PARAVIEW_RELATIVE_LIBPATH=\"${libdir_relpath}\""
       "PARAVIEW_SUBDIR=\"paraview${paraview_version_suffix}/plugins\"")
 
