@@ -54,10 +54,6 @@ int TestCGNSReader(int argc, char* argv[])
   std::string mixed = fname ? fname : "";
   delete[] fname;
 
-  fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/Example_nface_n.cgns");
-  std::string nfacen = fname ? fname : "";
-  delete[] fname;
-
   cout << "Opening " << mixed.c_str() << endl;
   vtkNew<vtkCGNSReader> mixedReader;
   mixedReader->SetFileName(mixed.c_str());
@@ -70,6 +66,10 @@ int TestCGNSReader(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/Example_nface_n.cgns");
+  std::string nfacen = fname ? fname : "";
+  delete[] fname;
+
   cout << "Opening " << nfacen.c_str() << endl;
   vtkNew<vtkCGNSReader> nfacenReader;
   nfacenReader->SetFileName(nfacen.c_str());
@@ -80,6 +80,15 @@ int TestCGNSReader(int argc, char* argv[])
   {
     return EXIT_FAILURE;
   }
+
+  fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/test_cylinder.cgns");
+  std::string bcfile = fname ? fname : "";
+  delete[] fname;
+
+  cout << "Opening " << bcfile << endl;
+  vtkNew<vtkCGNSReader> bcReader;
+  bcReader->SetFileName(bcfile.c_str());
+  bcReader->Update();
 
   cout << __FILE__ << " tests passed." << endl;
   return EXIT_SUCCESS;
