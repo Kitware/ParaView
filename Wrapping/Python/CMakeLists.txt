@@ -53,14 +53,49 @@ foreach (python_file IN LISTS python_files)
             "${CMAKE_CURRENT_SOURCE_DIR}/${python_file}"
             "${output_python_file}"
     COMMENT "Copying ${python_file} to the binary directory")
-  get_filename_component(python_file_directory "${python_file}" DIRECTORY)
-  install(
-    FILES       "${python_file}"
-    DESTINATION "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}/${python_file_directory}"
-    COMPONENT   "python")
+  if (BUILD_SHARED_LIBS)
+    get_filename_component(python_file_directory "${python_file}" DIRECTORY)
+    install(
+      FILES       "${python_file}"
+      DESTINATION "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}/${python_file_directory}"
+      COMPONENT   "python")
+  endif ()
   list(APPEND python_copied_modules
     "${output_python_file}")
 endforeach ()
+
+set(_paraview_python_zip)
+if (NOT BUILD_SHARED_LIBS)
+  # For static builds, we generate a zip file for all ParaView Python modules and packages
+
+  # scan all ParaView modules and collect lists of Python modules they
+  # provide/generate.
+  set(_paraview_python_files)
+  foreach (_paraview_module IN LISTS paraview_modules)
+    vtk_module_get_property("${_paraview_module}"
+      PROPERTY "python_modules"
+      VARIABLE _paraview_module_python_files)
+    list(APPEND _paraview_python_files
+      ${_paraview_module_python_files})
+  endforeach()
+
+  list(APPEND _paraview_python_files
+    ${python_copied_modules})
+
+  set(_paraview_python_zip "${CMAKE_BINARY_DIR}/${VTK_PYTHON_SITE_PACKAGES_SUFFIX}/_paraview.zip")
+  add_custom_command(
+    OUTPUT            "${_paraview_python_zip}"
+    COMMAND           ${CMAKE_COMMAND} -E tar "cfv"
+                      "${_paraview_python_zip}" --format=zip ${_paraview_python_files}
+    DEPENDS           ${_paraview_python_files}
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/${VTK_PYTHON_SITE_PACKAGES_SUFFIX}"
+    COMMENT           "Creating _paraview.zip Python modules archive")
+  install(
+    FILES       "${_paraview_python_zip}"
+    DESTINATION "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}/"
+    COMPONENT   "python")
+endif()
 add_custom_target(paraview_python_copy ALL
   DEPENDS
-    ${python_copied_modules})
+    ${python_copied_modules}
+    ${_paraview_python_zip})
