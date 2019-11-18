@@ -52,7 +52,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtksys/SystemInformation.hxx"
 
-const int ICON_SIZE = 24;
+// Other toolbars are ~24 pixels, set somewhat smaller.
+const int ICON_SIZE = 18;
 
 class pqViewFrame::pqInternals
 {
