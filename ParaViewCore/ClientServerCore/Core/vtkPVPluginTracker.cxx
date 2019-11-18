@@ -124,8 +124,7 @@ std::string vtkLocatePluginOrConfigFile(const char* plugin, const char* hint, bo
       }
     }
 
-#if BUILD_SHARED_LIBS
-#else
+#if !BUILD_SHARED_LIBS
     // in static builds, we don't attempt to locate plugin so's/dll's since we
     // can't load them anyways. This has a design flaw that we are also skipping *.py
     // or *.xml plugins. Since this has been the case historically, we'll leave
