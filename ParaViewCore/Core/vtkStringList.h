@@ -13,18 +13,19 @@
 
 =========================================================================*/
 /**
- * @class   vtkKWAssignment
- * @brief   Manages allocation and freeing for a string list.
+ * @class vtkStringList
+ * @brief Manages allocation and freeing for a string list.
  *
  * A vtkStringList holds a list of strings.
  * We might be able to replace it in the future.
-*/
+ */
 
 #ifndef vtkStringList_h
 #define vtkStringList_h
 
 #include "vtkObject.h"
 #include "vtkPVCoreModule.h" // needed for export macro
+#include <memory>            // for std::unique_ptr
 
 class VTKPVCORE_EXPORT vtkStringList : public vtkObject
 {
@@ -59,7 +60,7 @@ public:
   /**
    * Get the length of the list.
    */
-  int GetLength() { return this->NumberOfStrings; }
+  int GetLength() { return this->GetNumberOfStrings(); }
 
   /**
    * Get the index of a string.
@@ -71,17 +72,18 @@ public:
    */
   const char* GetString(int idx);
 
-  vtkGetMacro(NumberOfStrings, int);
+  /**
+   * Returns the number of strings.
+   */
+  int GetNumberOfStrings();
 
 protected:
   vtkStringList();
   ~vtkStringList() override;
 
-  int NumberOfStrings;
-  int StringArrayLength;
-  char** Strings;
-  void Reallocate(int num);
-  void DeleteStrings();
+private:
+  class vtkInternals;
+  std::unique_ptr<vtkInternals> Internals;
 
   vtkStringList(const vtkStringList&) = delete;
   void operator=(const vtkStringList&) = delete;
