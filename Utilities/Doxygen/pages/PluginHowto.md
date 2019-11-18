@@ -1245,6 +1245,7 @@ The code below shows how the `PV_PLUGIN` macros would be used to statically load
 plugins in custom applications:
 
 ```cpp
+#define PARAVIEW_BUILDING_PLUGIN
 #include "vtkPVPlugin.h"
 
 // Adds required forward declarations.
