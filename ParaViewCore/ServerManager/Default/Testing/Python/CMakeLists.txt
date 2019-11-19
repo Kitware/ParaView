@@ -53,6 +53,11 @@ if (BUILD_SHARED_LIBS
     Plugins.py,NO_VALID)
 endif ()
 
+if (NOT BUILD_SHARED_LIBS)
+  list(APPEND PY_TESTS
+    ZIPImport.py,NO_VALID)
+endif()
+
 set(SMSTATE_FILE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(ParaView::ServerManagerDefault_ARGS
   -S "${SMSTATE_FILE_DIR}")
