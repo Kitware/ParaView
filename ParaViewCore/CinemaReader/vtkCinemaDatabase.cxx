@@ -164,7 +164,7 @@ public:
           vtkGenericWarningMacro("This Cinema store is not supported. "
                                  "Only 'composite-image-stack' aka Spec-C file stores "
                                  "with 'azimuth-elevation-roll' aka inward facing pose cameras "
-                                 "are supported.")
+                                 "are supported.");
         }
         else
         {

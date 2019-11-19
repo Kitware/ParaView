@@ -159,7 +159,8 @@ bool vtkMultiProcessControllerHelper::MergePieces(
   }
   else if (vtkGraph::SafeDownCast(result))
   {
-    vtkGenericWarningMacro("Support for vtkGraph has been depreciated.") return false;
+    vtkGenericWarningMacro("Support for vtkGraph has been depreciated.");
+    return false;
   }
   else if (vtkCompositeDataSet::SafeDownCast(result))
   {

@@ -140,7 +140,7 @@ int vtkSMChartSeriesListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLE
   }
   if (!this->GetRequiredProperty("FieldDataSelection"))
   {
-    vtkWarningMacro("Missing 'FieldDataSelection' property. Domain may not work correctly.")
+    vtkWarningMacro("Missing 'FieldDataSelection' property. Domain may not work correctly.");
   }
 
   return 1;

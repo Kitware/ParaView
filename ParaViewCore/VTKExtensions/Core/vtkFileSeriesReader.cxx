@@ -804,7 +804,8 @@ int vtkFileSeriesReader::ReadMetaDataFile(const char* metafilename, vtkStringArr
       }
       if (!root.isMember("files"))
       {
-        vtkErrorMacro("Syntax error in meta-file. A list of file names is required.") return 0;
+        vtkErrorMacro("Syntax error in meta-file. A list of file names is required.");
+        return 0;
       }
       const Json::Value& filenames = root["files"];
       for (size_t index = 0; index < filenames.size(); ++index)

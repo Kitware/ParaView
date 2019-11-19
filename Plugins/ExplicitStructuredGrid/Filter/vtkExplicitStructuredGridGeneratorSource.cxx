@@ -177,7 +177,8 @@ int vtkExplicitStructuredGridGeneratorSource::RequestData(vtkInformation* vtkNot
     vtkWarningMacro("the UPDATE_EXTENT() requested by the pipeline : "
       << updateExtent[0] << " " << updateExtent[1] << " " << updateExtent[2] << " "
       << updateExtent[3] << " " << updateExtent[4] << " " << updateExtent[5] << " is invalid."
-      << " Using the provided DataExtent instead.") updateExtent = this->DataExtent;
+      << " Using the provided DataExtent instead.");
+    updateExtent = this->DataExtent;
   }
 
   double updateTime = 0;
