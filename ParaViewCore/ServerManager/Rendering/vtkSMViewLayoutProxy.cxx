@@ -421,7 +421,6 @@ void vtkSMViewLayoutProxy::UpdateState()
   }
 
   this->PushState(this->State);
-  this->InvokeEvent(vtkCommand::ConfigureEvent);
   this->UpdateViewPositions();
 
   vtkClientServerStream stream;
@@ -441,6 +440,8 @@ void vtkSMViewLayoutProxy::UpdateState()
     }
   }
   this->ExecuteStream(stream);
+
+  this->InvokeEvent(vtkCommand::ConfigureEvent);
 }
 
 //----------------------------------------------------------------------------

@@ -22,6 +22,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkOpenGLError.h"
 #include "vtkOpenGLFramebufferObject.h"
 #include "vtkOpenGLRenderUtilities.h"
 #include "vtkOpenGLRenderWindow.h"
@@ -476,6 +477,7 @@ void vtkViewLayout::Paint(vtkViewport* vp)
         const int extents[] = { 0, size[0], 0, size[1] };
         fbo->Blit(extents, extents, GL_COLOR_BUFFER_BIT, GL_NEAREST);
         fbo->RestorePreviousBindingsAndBuffers(GL_READ_FRAMEBUFFER);
+        vtkOpenGLCheckErrorMacro("Failed after paste-back");
       }
     }
   }
