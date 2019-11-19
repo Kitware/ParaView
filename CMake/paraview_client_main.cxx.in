@@ -77,6 +77,7 @@ int main(int argc, char* argv[])
 
   // supports HDPI
   QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+  QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 #if _paraview_client_have_plugins
 @_paraview_client_plugins_calls@
