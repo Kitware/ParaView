@@ -98,7 +98,8 @@ void vtkBoundingRectContextDevice2D::DrawMathTextString(float* point, const vtkS
 {
   if (!this->DelegateDevice)
   {
-    vtkWarningMacro(<< "No DelegateDevice defined") return;
+    vtkWarningMacro(<< "No DelegateDevice defined");
+    return;
   }
 
   // Not sure if this will work for math text

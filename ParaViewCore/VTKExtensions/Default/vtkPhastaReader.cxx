@@ -434,7 +434,8 @@ void vtkPhastaReader::readdatablock(int* fileDescriptor, const char keyphrase[],
     vtkGenericWarningMacro(<< "Header not consistent with data block\n"
                            << "Header: " << LastHeaderKey[filePtr] << "\n"
                            << "DataBlock: " << keyphrase << "\n"
-                           << "Please recheck read sequence \n") if (Strict_Error)
+                           << "Please recheck read sequence \n");
+    if (Strict_Error)
     {
       vtkGenericWarningMacro(<< "fatal error: cannot continue, returning out of call\n");
       return;
@@ -725,7 +726,8 @@ void vtkPhastaReader::ReadGeomFile(
         points->InsertNextPoint(coordinates);
         break;
       default:
-        vtkErrorMacro(<< "Unrecognized dimension in " << geomFileName) return;
+        vtkErrorMacro(<< "Unrecognized dimension in " << geomFileName);
+        return;
     }
   }
 
@@ -816,7 +818,8 @@ void vtkPhastaReader::ReadFieldFile(
 
   if (!fieldfile)
   {
-    vtkErrorMacro(<< "Cannot open file " << FieldFileName) return;
+    vtkErrorMacro(<< "Cannot open file " << FieldFileName);
+    return;
   }
   int array[10], expect;
 
@@ -908,7 +911,8 @@ void vtkPhastaReader::ReadFieldFile(
 
   if (!fieldfile)
   {
-    vtkErrorMacro(<< "Cannot open file " << FieldFileName) return;
+    vtkErrorMacro(<< "Cannot open file " << FieldFileName);
+    return;
   }
   int array[10], expect;
 

@@ -61,7 +61,7 @@
 #define vtkSMPropertyHelperWarningMacro(blah)                                                      \
   if (this->Quiet == false)                                                                        \
   {                                                                                                \
-    vtkGenericWarningMacro(blah)                                                                   \
+    vtkGenericWarningMacro(blah);                                                                  \
   }
 
 //----------------------------------------------------------------------------
