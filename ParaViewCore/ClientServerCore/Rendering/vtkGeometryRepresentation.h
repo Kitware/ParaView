@@ -200,6 +200,8 @@ public:
   // Forwarded to Mapper and LODMapper.
   virtual void SetInterpolateScalarsBeforeMapping(int val);
   virtual void SetLookupTable(vtkScalarsToColors* val);
+  virtual void SetSeamlessU(bool);
+  virtual void SetSeamlessV(bool);
   //@{
   /**
    * Sets if scalars are mapped through a color-map or are used

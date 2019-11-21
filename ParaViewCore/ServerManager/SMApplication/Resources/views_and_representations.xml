@@ -3913,6 +3913,8 @@
             <Property name="Texture" panel_visibility="advanced"/>
             <Property name="RepeatTextures" panel_visibility="advanced"/>
             <Property name="InterpolateTextures" panel_visibility="advanced"/>
+            <Property name="SeamlessU" pabel_visibility="advanced"/>
+            <Property name="SeamlessV" pabel_visibility="advanced"/>
             <Property name="UseMipmapTextures" panel_visibility="advanced"/>
             <Property name="BaseColorTexture" panel_visibility="advanced"/>
             <Property name="NormalTexture" panel_visibility="advanced"/>
@@ -11588,6 +11590,26 @@
         equivalent with interpolating scalars and then mapping them to
         obtain colors between points. Otherwise, colors are sent to
         and interpolated by the graphics card.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetSeamlessU"
+                         default_values="0"
+                         name="SeamlessU"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This parameter prevents seams in the U direction in
+          the parameterization space. It should be used when using a cylindrical
+          or toroidal parameterization on the surface.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetSeamlessV"
+                         default_values="0"
+                         name="SeamlessV"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This parameter prevents seams in the V direction in
+          the parameterization space. It should be used when using a cylindrical
+          or toroidal parameterization on the surface.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetStatic"
