@@ -265,7 +265,7 @@ public:
   virtual void UpdatePlots(vtkXYChartRepresentation* self, const MapOfTables& tables)
   {
     PlotsMap newPlots;
-    assert(self != NULL);
+    assert(self != nullptr);
     vtkChartXY* chartXY = self->GetChart();
     this->RemoveAllPlots(chartXY);
     std::multimap<int, std::pair<vtkTable*, std::array<std::string, 3> > > orderMap;
@@ -392,10 +392,10 @@ public:
         const std::string& columnName = plotInfo.ColumnName;
         vtkTable* table = plot->GetInput();
         vtkDataArray* xarray = self->GetUseIndexForXAxis()
-          ? NULL
+          ? nullptr
           : vtkDataArray::SafeDownCast(table->GetColumnByName(self->GetXAxisSeriesName()));
         vtkAbstractArray* yarray = table->GetColumnByName(columnName.c_str());
-        if (yarray != NULL)
+        if (yarray != nullptr)
         {
           exporter->AddColumn(yarray, plot->GetLabel().c_str(), xarray);
         }
@@ -463,7 +463,7 @@ protected:
       plotBar->SetScalarVisibility(colorMapping);
       plotBar->SelectColorArray("bin_extents");
       vtkScalarsToColors* lut = this->GetSeriesParameter(
-        self, tableName, columnName, role, this->Lut, static_cast<vtkScalarsToColors*>(NULL));
+        self, tableName, columnName, role, this->Lut, static_cast<vtkScalarsToColors*>(nullptr));
       if (lut)
       {
         plotBar->SetLookupTable(lut);

@@ -716,7 +716,7 @@ public:
 #endif
     this->Ui.AnnotationsTable->horizontalHeader()->setStretchLastSection(true);
 
-    this->Decorator = new pqColorAnnotationsPropertyWidgetDecorator(NULL, self);
+    this->Decorator = new pqColorAnnotationsPropertyWidgetDecorator(nullptr, self);
 
     QObject::connect(
       this->ChoosePresetReaction.data(), SIGNAL(presetApplied()), self, SIGNAL(changeFinished()));
@@ -849,7 +849,7 @@ pqColorAnnotationsPropertyWidget::pqColorAnnotationsPropertyWidget(
 pqColorAnnotationsPropertyWidget::~pqColorAnnotationsPropertyWidget()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -1190,7 +1190,7 @@ bool pqColorAnnotationsPropertyWidget::addActiveAnnotations(bool force)
 
   vtkSmartPointer<vtkAbstractArray> uniqueValues;
   uniqueValues.TakeReference(info->GetProminentComponentValues(component_no));
-  if (uniqueValues == NULL)
+  if (uniqueValues == nullptr)
   {
     return false;
   }
@@ -1314,7 +1314,7 @@ bool pqColorAnnotationsPropertyWidget::addActiveAnnotationsFromVisibleSources(bo
 
     vtkSmartPointer<vtkAbstractArray> uniqueValues;
     uniqueValues.TakeReference(info->GetProminentComponentValues(component_no));
-    if (uniqueValues == NULL)
+    if (uniqueValues == nullptr)
     {
       missingValues = true;
       continue;

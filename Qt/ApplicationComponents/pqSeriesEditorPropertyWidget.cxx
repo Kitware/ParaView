@@ -100,7 +100,7 @@ class pqSeriesParametersModel : public QAbstractTableModel
       return true;
     }
     // if no domain is present, then the series is treated is always visible.
-    return (this->Domain.GetPointer() != NULL) ? false : true;
+    return (this->Domain.GetPointer() != nullptr) ? false : true;
   }
 
 public:
@@ -593,15 +593,15 @@ public:
 pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
   vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject)
   : Superclass(smproxy, parentObject)
-  , Internals(NULL)
+  , Internals(nullptr)
 {
   if (vtkSMProperty* smproperty = smgroup->GetProperty("SeriesVisibility"))
   {
     vtkPVXMLElement* hints = smproperty->GetHints()
       ? smproperty->GetHints()->FindNestedElementByName("SeriesEditor")
-      : NULL;
+      : nullptr;
     int value = 0;
-    bool supportsReorder = (hints != NULL &&
+    bool supportsReorder = (hints != nullptr &&
       hints->GetScalarAttribute("supports_reordering", &value) != 0 && value == 1);
     this->Internals = new pqInternals(supportsReorder, this);
   }
@@ -722,7 +722,7 @@ pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
 pqSeriesEditorPropertyWidget::~pqSeriesEditorPropertyWidget()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------
