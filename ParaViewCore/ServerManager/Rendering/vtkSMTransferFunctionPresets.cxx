@@ -208,7 +208,7 @@ private:
 
     const char* const settingsKey = "TransferFunctionPresets.CustomPresets";
     vtkSMSettings* settings = vtkSMSettings::GetInstance();
-    if (settings == NULL || !settings->HasSetting(settingsKey))
+    if (settings == nullptr || !settings->HasSetting(settingsKey))
     {
       return;
     }
@@ -247,241 +247,244 @@ vtkSMTransferFunctionPresets::vtkSMTransferFunctionPresets()
 vtkSMTransferFunctionPresets::~vtkSMTransferFunctionPresets()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
+}
 
-  //----------------------------------------------------------------------------
-  vtkSMTransferFunctionPresets* vtkSMTransferFunctionPresets::GetInstance()
+//----------------------------------------------------------------------------
+vtkSMTransferFunctionPresets* vtkSMTransferFunctionPresets::GetInstance()
+{
+  if (vtkSMTransferFunctionPresets::Instance.GetPointer() == nullptr)
   {
-    if (vtkSMTransferFunctionPresets::Instance.GetPointer() == nullptr)
-    {
-      auto presets = new vtkSMTransferFunctionPresets();
-      presets->InitializeObjectBase();
-      vtkSMTransferFunctionPresets::Instance.TakeReference(presets);
-    }
-
-    return Instance;
+    auto presets = new vtkSMTransferFunctionPresets();
+    presets->InitializeObjectBase();
+    vtkSMTransferFunctionPresets::Instance.TakeReference(presets);
   }
 
-  //----------------------------------------------------------------------------
-  vtkStdString vtkSMTransferFunctionPresets::GetPresetAsString(unsigned int index)
-  {
-    const std::vector<Json::Value>& presets = this->Internals->GetPresets();
-    return index < static_cast<unsigned int>(presets.size()) ? presets[index].toStyledString()
-                                                             : vtkStdString();
-  }
+  return Instance;
+}
 
-  //----------------------------------------------------------------------------
-  const Json::Value& vtkSMTransferFunctionPresets::GetPreset(unsigned int index)
-  {
-    static Json::Value nullValue;
-    const std::vector<Json::Value>& presets = this->Internals->GetPresets();
-    return index < static_cast<unsigned int>(presets.size()) ? presets[index] : nullValue;
-  }
+//----------------------------------------------------------------------------
+vtkStdString vtkSMTransferFunctionPresets::GetPresetAsString(unsigned int index)
+{
+  const std::vector<Json::Value>& presets = this->Internals->GetPresets();
+  return index < static_cast<unsigned int>(presets.size()) ? presets[index].toStyledString()
+                                                           : vtkStdString();
+}
 
-  //----------------------------------------------------------------------------
-  const Json::Value& vtkSMTransferFunctionPresets::GetFirstPresetWithName(const char* name)
+//----------------------------------------------------------------------------
+const Json::Value& vtkSMTransferFunctionPresets::GetPreset(unsigned int index)
+{
+  static Json::Value nullValue;
+  const std::vector<Json::Value>& presets = this->Internals->GetPresets();
+  return index < static_cast<unsigned int>(presets.size()) ? presets[index] : nullValue;
+}
+
+//----------------------------------------------------------------------------
+const Json::Value& vtkSMTransferFunctionPresets::GetFirstPresetWithName(const char* name)
+{
+  static Json::Value nullValue;
+  if (name == nullptr)
   {
-    static Json::Value nullValue;
-    if (name == NULL)
-    {
-      return nullValue;
-    }
-    const std::vector<Json::Value>& presets = this->Internals->GetPresets();
-    for (std::vector<Json::Value>::const_iterator iter = presets.begin(); iter != presets.end();
-         ++iter)
-    {
-      if (iter->get("Name", Json::Value()).asString() == name)
-      {
-        return (*iter);
-      }
-    }
     return nullValue;
   }
-
-  //----------------------------------------------------------------------------
-  bool vtkSMTransferFunctionPresets::HasPreset(const char* name)
+  const std::vector<Json::Value>& presets = this->Internals->GetPresets();
+  for (std::vector<Json::Value>::const_iterator iter = presets.begin(); iter != presets.end();
+       ++iter)
   {
-    return !this->GetFirstPresetWithName(name).isNull();
-  }
-
-  //----------------------------------------------------------------------------
-  vtkStdString vtkSMTransferFunctionPresets::GetPresetName(unsigned int index)
-  {
-    const std::vector<Json::Value>& presets = this->Internals->GetPresets();
-    return index < static_cast<unsigned int>(presets.size()) ? presets[index]["Name"].asString()
-                                                             : vtkStdString();
-  }
-
-  //----------------------------------------------------------------------------
-  bool vtkSMTransferFunctionPresets::RenamePreset(unsigned int index, const char* newname)
-  {
-    return this->Internals->RenamePreset(index, newname);
-  }
-
-  //----------------------------------------------------------------------------
-  bool vtkSMTransferFunctionPresets::AddPreset(const char* name, const vtkStdString& preset)
-  {
-    if (!name)
+    if (iter->get("Name", Json::Value()).asString() == name)
     {
-      vtkErrorMacro("Invalid 'name' specified.");
-      return false;
+      return (*iter);
     }
+  }
+  return nullValue;
+}
 
-    Json::Value value;
-    const char* input = preset.c_str();
-    Json::CharReaderBuilder builder;
-    builder["collectComments"] = false;
-    std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
-    std::string formattedErrors;
-    if (!reader->parse(input, input + strlen(input), &value, &formattedErrors))
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionPresets::HasPreset(const char* name)
+{
+  return !this->GetFirstPresetWithName(name).isNull();
+}
+
+//----------------------------------------------------------------------------
+vtkStdString vtkSMTransferFunctionPresets::GetPresetName(unsigned int index)
+{
+  const std::vector<Json::Value>& presets = this->Internals->GetPresets();
+  return index < static_cast<unsigned int>(presets.size()) ? presets[index]["Name"].asString()
+                                                           : vtkStdString();
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionPresets::RenamePreset(unsigned int index, const char* newname)
+{
+  return this->Internals->RenamePreset(index, newname);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionPresets::AddPreset(const char* name, const vtkStdString& preset)
+{
+  if (!name)
+  {
+    vtkErrorMacro("Invalid 'name' specified.");
+    return false;
+  }
+
+  Json::Value value;
+  const char* input = preset.c_str();
+  Json::CharReaderBuilder builder;
+  builder["collectComments"] = false;
+  std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
+  std::string formattedErrors;
+  if (!reader->parse(input, input + strlen(input), &value, &formattedErrors))
+  {
+    vtkErrorMacro("Invalid preset string.");
+    vtkGenericWarningMacro(<< "Failed to parse builtin transfer function presets: "
+                           << formattedErrors);
+    return false;
+  }
+  this->Internals->AddPreset(name, value);
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionPresets::AddPreset(const char* name, const Json::Value& preset)
+{
+  this->Internals->AddPreset(name, preset);
+  return true;
+}
+
+//----------------------------------------------------------------------------
+vtkStdString vtkSMTransferFunctionPresets::AddUniquePreset(
+  const Json::Value& preset, const char* prefix /*=nullptr*/)
+{
+  prefix = prefix ? prefix : "Preset";
+
+  std::set<std::string> names;
+  const std::vector<Json::Value>& presets = this->Internals->GetPresets();
+  for (std::vector<Json::Value>::const_iterator iter = presets.begin(); iter != presets.end();
+       ++iter)
+  {
+    names.insert(iter->get("Name", Json::Value()).asString());
+  }
+
+  std::string name = prefix;
+  std::string separator = name.size() > 0 ? " " : "";
+  int suffix = 0;
+  while (names.find(name) != names.end())
+  {
+    std::ostringstream stream;
+    stream << prefix << separator.c_str() << suffix;
+    name = stream.str();
+    suffix++;
+    if (suffix > 1000)
     {
-      vtkErrorMacro("Invalid preset string.");
-      vtkGenericWarningMacro(<< "Failed to parse builtin transfer function presets: "
-                             << formattedErrors);
-      return false;
+      vtkErrorMacro("Giving up. Cannot find a unique name. Please provide a good prefix.");
+      return vtkStdString();
     }
-    this->Internals->AddPreset(name, value);
-    return true;
+  }
+  this->AddPreset(name.c_str(), preset);
+  return name;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionPresets::RemovePreset(unsigned int index)
+{
+  return this->Internals->RemovePreset(index);
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkSMTransferFunctionPresets::GetNumberOfPresets()
+{
+  return static_cast<unsigned int>(this->Internals->GetPresets().size());
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionPresets::GetPresetHasOpacities(const Json::Value& preset)
+{
+  return (!preset.empty() && preset.isMember("Points"));
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionPresets::GetPresetHasIndexedColors(const Json::Value& preset)
+{
+  return (!preset.empty() && preset.isMember("IndexedColors"));
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionPresets::GetPresetHasAnnotations(const Json::Value& preset)
+{
+  return (!preset.empty() && preset.isMember("Annotations"));
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionPresets::IsPresetDefault(const Json::Value& preset)
+{
+  if (preset.empty() || !preset.isMember("DefaultMap"))
+  {
+    return false;
+  }
+  return preset["DefaultMap"].asBool();
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionPresets::IsPresetBuiltin(unsigned int index)
+{
+  if (index >= this->GetNumberOfPresets())
+  {
+    vtkWarningMacro("Invalid 'index' specified:" << index);
+    return false;
   }
 
-  //----------------------------------------------------------------------------
-  bool vtkSMTransferFunctionPresets::AddPreset(const char* name, const Json::Value& preset)
+  return this->Internals->IsPresetBuiltin(index);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionPresets::ImportPresets(const char* filename)
+{
+  if (!filename)
   {
-    this->Internals->AddPreset(name, preset);
-    return true;
+    vtkErrorMacro("Invalid filename specified.");
+    return false;
   }
 
-  //----------------------------------------------------------------------------
-  vtkStdString vtkSMTransferFunctionPresets::AddUniquePreset(
-    const Json::Value& preset, const char* prefix /*=NULL*/)
+  SM_SCOPED_TRACE(CallFunction).arg("ImportPresets").arg("filename", filename);
+  if (vtksys::SystemTools::LowerCase(vtksys::SystemTools::GetFilenameLastExtension(filename)) ==
+    ".xml")
   {
-    prefix = prefix ? prefix : "Preset";
-
-    std::set<std::string> names;
-    const std::vector<Json::Value>& presets = this->Internals->GetPresets();
-    for (std::vector<Json::Value>::const_iterator iter = presets.begin(); iter != presets.end();
-         ++iter)
+    ifstream in(filename);
+    if (in)
     {
-      names.insert(iter->get("Name", Json::Value()).asString());
-    }
-
-    std::string name = prefix;
-    std::string separator = name.size() > 0 ? " " : "";
-    int suffix = 0;
-    while (names.find(name) != names.end())
-    {
-      std::ostringstream stream;
-      stream << prefix << separator.c_str() << suffix;
-      name = stream.str();
-      suffix++;
-      if (suffix > 1000)
-      {
-        vtkErrorMacro("Giving up. Cannot find a unique name. Please provide a good prefix.");
-        return vtkStdString();
-      }
-    }
-    this->AddPreset(name.c_str(), preset);
-    return name;
-  }
-
-  //----------------------------------------------------------------------------
-  bool vtkSMTransferFunctionPresets::RemovePreset(unsigned int index)
-  {
-    return this->Internals->RemovePreset(index);
-  }
-
-  //----------------------------------------------------------------------------
-  unsigned int vtkSMTransferFunctionPresets::GetNumberOfPresets()
-  {
-    return static_cast<unsigned int>(this->Internals->GetPresets().size());
-  }
-
-  //----------------------------------------------------------------------------
-  bool vtkSMTransferFunctionPresets::GetPresetHasOpacities(const Json::Value& preset)
-  {
-    return (!preset.empty() && preset.isMember("Points"));
-  }
-
-  //----------------------------------------------------------------------------
-  bool vtkSMTransferFunctionPresets::GetPresetHasIndexedColors(const Json::Value& preset)
-  {
-    return (!preset.empty() && preset.isMember("IndexedColors"));
-  }
-
-  //----------------------------------------------------------------------------
-  bool vtkSMTransferFunctionPresets::GetPresetHasAnnotations(const Json::Value& preset)
-  {
-    return (!preset.empty() && preset.isMember("Annotations"));
-  }
-
-  //----------------------------------------------------------------------------
-  bool vtkSMTransferFunctionPresets::IsPresetDefault(const Json::Value& preset)
-  {
-    if (preset.empty() || !preset.isMember("DefaultMap"))
-    {
-      return false;
-    }
-    return preset["DefaultMap"].asBool();
-  }
-
-  //----------------------------------------------------------------------------
-  bool vtkSMTransferFunctionPresets::IsPresetBuiltin(unsigned int index)
-  {
-    if (index >= this->GetNumberOfPresets())
-    {
-      vtkWarningMacro("Invalid 'index' specified:" << index);
-      return false;
-    }
-
-    return this->Internals->IsPresetBuiltin(index);
-  }
-
-  //----------------------------------------------------------------------------
-  bool vtkSMTransferFunctionPresets::ImportPresets(const char* filename)
-  {
-    if (!filename)
-    {
-      vtkErrorMacro("Invalid filename specified.");
-      return false;
-    }
-
-    SM_SCOPED_TRACE(CallFunction).arg("ImportPresets").arg("filename", filename);
-    if (vtksys::SystemTools::LowerCase(vtksys::SystemTools::GetFilenameLastExtension(filename)) ==
-      ".xml")
-    {
-      ifstream in(filename);
-      if (in)
-      {
-        std::ostringstream contents;
-        contents << in.rdbuf();
-        in.close();
-        return this->ImportPresets(
-          vtkSMTransferFunctionProxy::ConvertMultipleLegacyColorMapXMLToJSON(
-            contents.str().c_str()));
-      }
-      else
-      {
-        vtkErrorMacro("Failed to open file: " << filename);
-        return false;
-      }
+      std::ostringstream contents;
+      contents << in.rdbuf();
+      in.close();
+      return this->ImportPresets(
+        vtkSMTransferFunctionProxy::ConvertMultipleLegacyColorMapXMLToJSON(contents.str().c_str()));
     }
     else
     {
-      return this->Internals->ImportPresets(filename);
+      vtkErrorMacro("Failed to open file: " << filename);
+      return false;
     }
   }
-
-  //----------------------------------------------------------------------------
-  bool vtkSMTransferFunctionPresets::ImportPresets(const Json::Value& presets)
+  else
   {
-    return this->Internals->ImportPresets(presets);
+    return this->Internals->ImportPresets(filename);
   }
+}
 
-  //----------------------------------------------------------------------------
-  void vtkSMTransferFunctionPresets::PrintSelf(ostream & os, vtkIndent indent)
-  {
-    this->Superclass::PrintSelf(os, indent);
-  }
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionPresets::ImportPresets(const Json::Value& presets)
+{
+  return this->Internals->ImportPresets(presets);
+}
 
-  //----------------------------------------------------------------------------
-  void vtkSMTransferFunctionPresets::ReloadPresets() { this->Internals->Reload(); }
+//----------------------------------------------------------------------------
+void vtkSMTransferFunctionPresets::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMTransferFunctionPresets::ReloadPresets()
+{
+  this->Internals->Reload();
+}
