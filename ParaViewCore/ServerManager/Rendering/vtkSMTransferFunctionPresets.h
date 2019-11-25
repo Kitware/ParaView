@@ -21,11 +21,11 @@
  * annotation presets. It also uses vtkSMSettings to support persistent
  * customizations besides hard-coded/builtin presets.
  *
- * vtkSMTransferFunctionPresets designed to be instantiated, used and then
- * destroyed. While there is no explicit synchronization between multiple
- * instances of vtkSMTransferFunctionPresets, there should not be any need to
- * have multiple instances alive at the same time.
-*/
+ * vtkSMTransferFunctionPresets is designed as a singleton, accessible through
+ * the `GetInstance()` static method.
+ * Public API ensure that presets are loaded, but a reload can be explictly asked (see
+ * `ReloadPresets()`).
+ */
 
 #ifndef vtkSMTransferFunctionPresets_h
 #define vtkSMTransferFunctionPresets_h
@@ -33,8 +33,9 @@
 #include "vtkSMObject.h"
 
 #include "vtkPVServerManagerRenderingModule.h" // needed for exports
-#include "vtkStdString.h"                      // needed for vtkStdString.
-#include <vtk_jsoncpp_fwd.h>                   // for forward declarations
+#include "vtkSmartPointer.h"
+#include "vtkStdString.h"    // needed for vtkStdString.
+#include <vtk_jsoncpp_fwd.h> // for forward declarations
 
 class vtkPVXMLElement;
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMTransferFunctionPresets : public vtkSMObject
@@ -43,6 +44,11 @@ public:
   static vtkSMTransferFunctionPresets* New();
   vtkTypeMacro(vtkSMTransferFunctionPresets, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
+
+  /**
+   * Get singleton instance.
+   */
+  static vtkSMTransferFunctionPresets* GetInstance();
 
   /**
    * Returns the number of presets current available (including builtin and
@@ -157,6 +163,11 @@ public:
   bool ImportPresets(const Json::Value& presets);
   //@}
 
+  /**
+   * Reload the presets from the configuration file.
+   */
+  void ReloadPresets();
+
 protected:
   vtkSMTransferFunctionPresets();
   ~vtkSMTransferFunctionPresets() override;
@@ -167,6 +178,8 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
+
+  static vtkSmartPointer<vtkSMTransferFunctionPresets> Instance;
 };
 
 #endif

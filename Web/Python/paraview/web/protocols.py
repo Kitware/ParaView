@@ -1114,7 +1114,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
         super(ParaViewWebColorManager, self).__init__()
         if pathToColorMaps:
             simple.ImportPresets(filename=pathToColorMaps)
-        self.presets = servermanager.vtkSMTransferFunctionPresets()
+        self.presets = servermanager.vtkSMTransferFunctionPresets.GetInstance()
         self.colorMapNames = []
         for i in range(self.presets.GetNumberOfPresets()):
             if showBuiltin or not self.presets.IsPresetBuiltin(i):

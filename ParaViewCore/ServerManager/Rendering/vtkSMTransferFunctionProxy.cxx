@@ -838,7 +838,7 @@ bool vtkSMTransferFunctionProxy::ApplyPreset(const Json::Value& arg, bool rescal
 //----------------------------------------------------------------------------
 bool vtkSMTransferFunctionProxy::ApplyPreset(const char* presetname, bool rescale)
 {
-  vtkNew<vtkSMTransferFunctionPresets> presets;
+  auto presets = vtkSMTransferFunctionPresets::GetInstance();
   return this->ApplyPreset(presets->GetFirstPresetWithName(presetname), rescale);
 }
 

@@ -89,7 +89,7 @@ public:
   pqPresetDialogTableModel(QObject* parentObject)
     : Superclass(parentObject)
   {
-    this->Presets = vtkSmartPointer<vtkSMTransferFunctionPresets>::New();
+    this->Presets = vtkSMTransferFunctionPresets::GetInstance();
     this->Pixmaps.reserve(this->Presets->GetNumberOfPresets());
     this->GroupManager = qobject_cast<pqPresetGroupsManager*>(
       pqApplicationCore::instance()->manager("PRESET_GROUP_MANAGER"));
@@ -111,7 +111,7 @@ public:
   void reset()
   {
     this->beginResetModel();
-    this->Presets = vtkSmartPointer<vtkSMTransferFunctionPresets>::New();
+    this->Presets->ReloadPresets();
     this->Pixmaps.clear();
     this->Pixmaps.reserve(this->Presets->GetNumberOfPresets());
     this->endResetModel();
