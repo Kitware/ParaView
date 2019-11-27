@@ -255,23 +255,28 @@ pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
     ui.AxisList->hide();
   }
 
-  this->connect(ui.Thickness, SIGNAL(valueChanged(double)), SLOT(savePropertiesWidgets()));
-  this->connect(ui.StyleList, SIGNAL(currentIndexChanged(int)), SLOT(savePropertiesWidgets()));
-  this->connect(
-    ui.MarkerStyleList, SIGNAL(currentIndexChanged(int)), SLOT(savePropertiesWidgets()));
-  this->connect(ui.MarkerSize, SIGNAL(valueChanged(double)), SLOT(savePropertiesWidgets()));
-  this->connect(ui.AxisList, SIGNAL(currentIndexChanged(int)), SLOT(savePropertiesWidgets()));
+  this->connect(ui.Thickness, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
+    &pqSeriesEditorPropertyWidget::savePropertiesWidgets);
+  this->connect(ui.StyleList, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+    &pqSeriesEditorPropertyWidget::savePropertiesWidgets);
+  this->connect(ui.MarkerStyleList, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+    &pqSeriesEditorPropertyWidget::savePropertiesWidgets);
+  this->connect(ui.MarkerSize, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
+    &pqSeriesEditorPropertyWidget::savePropertiesWidgets);
+  this->connect(ui.AxisList, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+    &pqSeriesEditorPropertyWidget::savePropertiesWidgets);
 
-  this->connect(ui.SeriesTable, SIGNAL(indexedColorsChanged()), this, SIGNAL(seriesColorChanged()));
-  this->connect(ui.SeriesTable, SIGNAL(presetChanged(const QString&)), this,
-    SLOT(onPresetChanged(const QString&)));
-  this->connect(ui.SeriesTable, SIGNAL(annotationsChanged()), this, SIGNAL(seriesLabelChanged()));
-  this->connect(
-    ui.SeriesTable, SIGNAL(visibilitiesChanged()), this, SIGNAL(seriesVisibilityChanged()));
+  this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::indexedColorsChanged, this,
+    &pqSeriesEditorPropertyWidget::seriesColorChanged);
+  this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::presetChanged, this,
+    &pqSeriesEditorPropertyWidget::onPresetChanged);
+  this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::annotationsChanged, this,
+    &pqSeriesEditorPropertyWidget::seriesLabelChanged);
+  this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::visibilitiesChanged, this,
+    &pqSeriesEditorPropertyWidget::seriesVisibilityChanged);
 
-  this->connect(ui.SeriesTable,
-    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-    SLOT(refreshPropertiesWidgets()));
+  this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::selectionChanged, this,
+    &pqSeriesEditorPropertyWidget::refreshPropertiesWidgets);
 
   this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::indexedColorsChanged, this,
     &pqSeriesEditorPropertyWidget::presetColorChanged);

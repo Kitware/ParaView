@@ -211,12 +211,8 @@ public:
     this->Ui.AnnotationsTable->setHorizontalHeader(myheader);
 
     this->Ui.AnnotationsTable->horizontalHeader()->setHighlightSections(false);
-#if QT_VERSION >= 0x050000
     this->Ui.AnnotationsTable->horizontalHeader()->setSectionResizeMode(
       QHeaderView::ResizeToContents);
-#else
-    this->Ui.AnnotationsTable->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
-#endif
     this->Ui.AnnotationsTable->horizontalHeader()->setStretchLastSection(true);
 
     QObject::connect(this->ChoosePresetReaction.data(), SIGNAL(presetApplied(const QString&)), self,

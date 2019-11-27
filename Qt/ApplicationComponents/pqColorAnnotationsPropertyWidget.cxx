@@ -156,16 +156,18 @@ pqColorAnnotationsPropertyWidget::pqColorAnnotationsPropertyWidget(
     this->Internals->AnnotationsWidget->supportsOpacityMapping(false);
   }
 
-  this->connect(
-    this->Internals->AnnotationsWidget, SIGNAL(presetChanged()), this, SIGNAL(changeFinished()));
-  this->connect(this->Internals->AnnotationsWidget, SIGNAL(indexedColorsChanged()), this,
-    SIGNAL(indexedColorsChanged()));
-  this->connect(this->Internals->AnnotationsWidget, SIGNAL(indexedOpacitiesChanged()), this,
-    SIGNAL(indexedOpacitiesChanged()));
-  this->connect(this->Internals->AnnotationsWidget, SIGNAL(annotationsChanged()), this,
-    SIGNAL(annotationsChanged()));
-  this->connect(this->Internals->AnnotationsWidget, SIGNAL(opacityMappingChanged()), this,
-    SIGNAL(opacityMappingChanged()));
+  this->connect(this->Internals->AnnotationsWidget, &pqColorAnnotationsWidget::presetChanged, this,
+    &pqColorAnnotationsPropertyWidget::changeFinished);
+  this->connect(this->Internals->AnnotationsWidget, &pqColorAnnotationsWidget::indexedColorsChanged,
+    this, &pqColorAnnotationsPropertyWidget::indexedColorsChanged);
+  this->connect(this->Internals->AnnotationsWidget,
+    &pqColorAnnotationsWidget::indexedOpacitiesChanged, this,
+    &pqColorAnnotationsPropertyWidget::indexedOpacitiesChanged);
+  this->connect(this->Internals->AnnotationsWidget, &pqColorAnnotationsWidget::annotationsChanged,
+    this, &pqColorAnnotationsPropertyWidget::annotationsChanged);
+  this->connect(this->Internals->AnnotationsWidget,
+    &pqColorAnnotationsWidget::opacityMappingChanged, this,
+    &pqColorAnnotationsPropertyWidget::opacityMappingChanged);
 
   this->Internals->AnnotationsWidget->setColumnVisibility(pqAnnotationsModel::VISIBILITY, false);
 }
