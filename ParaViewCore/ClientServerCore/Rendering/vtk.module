@@ -19,6 +19,7 @@ DEPENDS
   VTK::jsoncpp
 PRIVATE_DEPENDS
   VTK::InfovisCore
+  VTK::opengl
   VTK::vtksys
   VTK::zlib
 OPTIONAL_DEPENDS
