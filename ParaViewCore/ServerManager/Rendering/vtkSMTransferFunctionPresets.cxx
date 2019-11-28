@@ -31,39 +31,43 @@
 #include <set>
 #include <sstream>
 
+vtkSmartPointer<vtkSMTransferFunctionPresets> vtkSMTransferFunctionPresets::Instance;
+
 class vtkSMTransferFunctionPresets::vtkInternals
 {
 public:
   vtkInternals()
-    : Modified(false)
-    , CustomPresetsLoaded(false)
+    : CustomPresetsLoaded(false)
   {
   }
 
-  ~vtkInternals()
+  ~vtkInternals() {}
+
+  void SaveToSettings()
   {
-    if (this->Modified)
+    assert(this->CustomPresetsLoaded);
+    vtkSMSettings* settings = vtkSMSettings::GetInstance();
+    std::ostringstream stream;
+    stream << "[\n";
+    bool not_first = false;
+    for (std::vector<Json::Value>::const_iterator iter = this->CustomPresets.begin();
+         iter != this->CustomPresets.end(); ++iter)
     {
-      assert(this->CustomPresetsLoaded);
-      if (vtkSMSettings* settings = vtkSMSettings::GetInstance())
+      if (not_first)
       {
-        std::ostringstream stream;
-        stream << "[\n";
-        bool not_first = false;
-        for (std::vector<Json::Value>::const_iterator iter = this->CustomPresets.begin();
-             iter != this->CustomPresets.end(); ++iter)
-        {
-          if (not_first)
-          {
-            stream << ",\n";
-          }
-          not_first = true;
-          stream << iter->toStyledString().c_str();
-        }
-        stream << "]";
-        settings->SetSetting("TransferFunctionPresets.CustomPresets", stream.str());
+        stream << ",\n";
       }
+      not_first = true;
+      stream << iter->toStyledString().c_str();
     }
+    stream << "]";
+    settings->SetSetting("TransferFunctionPresets.CustomPresets", stream.str());
+  }
+
+  void Reload()
+  {
+    this->Presets.clear();
+    this->GetPresets();
   }
 
   const std::vector<Json::Value>& GetPresets()
@@ -91,9 +95,9 @@ public:
     this->Presets.erase(this->Presets.begin() + index);
     index = (index - static_cast<unsigned int>(this->BuiltinPresets.size()));
 
-    this->Modified = true;
     assert(this->CustomPresets.size() > index);
     this->CustomPresets.erase(this->CustomPresets.begin() + index);
+    this->SaveToSettings();
     return true;
   }
 
@@ -102,8 +106,8 @@ public:
     this->LoadCustomPresets();
     this->CustomPresets.push_back(value);
     this->CustomPresets.back()["Name"] = name;
-    this->Presets.clear();
-    this->Modified = true;
+    this->SaveToSettings();
+    this->Reload();
   }
 
   bool IsPresetBuiltin(unsigned int index)
@@ -120,12 +124,13 @@ public:
       if (index < static_cast<unsigned int>(presets.size()) &&
         index >= static_cast<unsigned int>(this->BuiltinPresets.size()))
       {
+        this->Presets[index]["Name"] = newname;
+
         index = (index - static_cast<unsigned int>(this->BuiltinPresets.size()));
         assert(this->CustomPresets.size() > index);
 
         this->CustomPresets[index]["Name"] = newname;
-        this->Presets.clear();
-        this->Modified = true;
+        this->SaveToSettings();
         return true;
       }
     }
@@ -161,8 +166,8 @@ public:
   {
     this->LoadCustomPresets();
     this->CustomPresets.insert(this->CustomPresets.end(), root.begin(), root.end());
-    this->Modified = true;
-    this->Presets.clear();
+    this->SaveToSettings();
+    this->Reload();
     return true;
   }
 
@@ -170,7 +175,6 @@ private:
   std::vector<Json::Value> BuiltinPresets;
   std::vector<Json::Value> CustomPresets;
   std::vector<Json::Value> Presets;
-  bool Modified;
   bool CustomPresetsLoaded;
 
   void LoadBuiltinPresets()
@@ -204,7 +208,7 @@ private:
 
     const char* const settingsKey = "TransferFunctionPresets.CustomPresets";
     vtkSMSettings* settings = vtkSMSettings::GetInstance();
-    if (settings == NULL || !settings->HasSetting(settingsKey))
+    if (settings == nullptr || !settings->HasSetting(settingsKey))
     {
       return;
     }
@@ -226,7 +230,13 @@ private:
   }
 };
 
-vtkStandardNewMacro(vtkSMTransferFunctionPresets);
+vtkSMTransferFunctionPresets* vtkSMTransferFunctionPresets::New()
+{
+  auto instance = vtkSMTransferFunctionPresets::GetInstance();
+  instance->Register(nullptr);
+  return instance;
+}
+
 //----------------------------------------------------------------------------
 vtkSMTransferFunctionPresets::vtkSMTransferFunctionPresets()
   : Internals(new vtkSMTransferFunctionPresets::vtkInternals())
@@ -237,7 +247,20 @@ vtkSMTransferFunctionPresets::vtkSMTransferFunctionPresets()
 vtkSMTransferFunctionPresets::~vtkSMTransferFunctionPresets()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
+}
+
+//----------------------------------------------------------------------------
+vtkSMTransferFunctionPresets* vtkSMTransferFunctionPresets::GetInstance()
+{
+  if (vtkSMTransferFunctionPresets::Instance.GetPointer() == nullptr)
+  {
+    auto presets = new vtkSMTransferFunctionPresets();
+    presets->InitializeObjectBase();
+    vtkSMTransferFunctionPresets::Instance.TakeReference(presets);
+  }
+
+  return Instance;
 }
 
 //----------------------------------------------------------------------------
@@ -260,7 +283,7 @@ const Json::Value& vtkSMTransferFunctionPresets::GetPreset(unsigned int index)
 const Json::Value& vtkSMTransferFunctionPresets::GetFirstPresetWithName(const char* name)
 {
   static Json::Value nullValue;
-  if (name == NULL)
+  if (name == nullptr)
   {
     return nullValue;
   }
@@ -331,7 +354,7 @@ bool vtkSMTransferFunctionPresets::AddPreset(const char* name, const Json::Value
 
 //----------------------------------------------------------------------------
 vtkStdString vtkSMTransferFunctionPresets::AddUniquePreset(
-  const Json::Value& preset, const char* prefix /*=NULL*/)
+  const Json::Value& preset, const char* prefix /*=nullptr*/)
 {
   prefix = prefix ? prefix : "Preset";
 
@@ -458,4 +481,10 @@ bool vtkSMTransferFunctionPresets::ImportPresets(const Json::Value& presets)
 void vtkSMTransferFunctionPresets::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMTransferFunctionPresets::ReloadPresets()
+{
+  this->Internals->Reload();
 }

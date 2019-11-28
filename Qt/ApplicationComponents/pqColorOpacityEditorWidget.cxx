@@ -935,13 +935,8 @@ void pqColorOpacityEditorWidget::saveAsPreset()
   }
 
   vtkStdString presetName;
-  {
-    // This scoping is necessary to ensure that the vtkSMTransferFunctionPresets
-    // saves the new preset to the "settings" before the choosePreset dialog is
-    // shown.
-    vtkNew<vtkSMTransferFunctionPresets> presets;
-    presetName = presets->AddUniquePreset(preset);
-  }
+  auto presets = vtkSMTransferFunctionPresets::GetInstance();
+  presetName = presets->AddUniquePreset(preset);
   this->choosePreset(presetName);
 }
 

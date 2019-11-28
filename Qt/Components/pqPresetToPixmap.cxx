@@ -113,8 +113,6 @@ QPixmap pqPresetToPixmap::render(const Json::Value& preset, const QSize& resolut
     return QPixmap();
   }
 
-  vtkNew<vtkSMTransferFunctionPresets> presets;
-
   pqInternals& internals = (*this->Internals);
   vtkSMProxy* lutProxy = internals.lookupTable();
   vtkSMTransferFunctionProxy::ApplyPreset(lutProxy, preset);
@@ -127,6 +125,7 @@ QPixmap pqPresetToPixmap::render(const Json::Value& preset, const QSize& resolut
   else
   {
     vtkPiecewiseFunction* pf = NULL;
+    auto presets = vtkSMTransferFunctionPresets::GetInstance();
     if (presets->GetPresetHasOpacities(preset))
     {
       vtkSMProxy* piecewiseFunctionProxy = internals.piecewiseFunction();

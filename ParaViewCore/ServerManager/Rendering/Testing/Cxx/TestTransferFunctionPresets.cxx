@@ -41,8 +41,7 @@ int TestTransferFunctionPresets(int argc, char* argv[])
 
   vtkInitializationHelper::Initialize(argv[0], vtkProcessModule::PROCESS_CLIENT);
 
-  vtkSmartPointer<vtkSMTransferFunctionPresets> presets =
-    vtkSmartPointer<vtkSMTransferFunctionPresets>::New();
+  auto presets = vtkSMTransferFunctionPresets::GetInstance();
 
   myassert(presets->GetNumberOfPresets() > 0, "Load presets");
   cout << "Number of presets: " << presets->GetNumberOfPresets() << endl;

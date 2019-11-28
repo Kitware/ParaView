@@ -1543,7 +1543,7 @@ def GetOpacityTransferFunction(arrayname, representation=None, separate=False, *
 def ImportPresets(filename):
     """Import presets from a file. The file can be in the legacy color map xml
     format or in the new JSON format. Returns True on success."""
-    presets = servermanager.vtkSMTransferFunctionPresets()
+    presets = servermanager.vtkSMTransferFunctionPresets.GetInstance()
     return presets.ImportPresets(filename)
 
 # -----------------------------------------------------------------------------
@@ -1598,7 +1598,7 @@ def AssignLookupTable(arrayInfo, lutName, rangeOveride=[]):
       AssignLookupTable(arrayInfo, "Cool to Warm")
 
     """
-    presets = servermanager.vtkSMTransferFunctionPresets()
+    presets = servermanager.vtkSMTransferFunctionPresets.GetInstance()
     if not presets.HasPreset(lutName):
         raise RuntimeError("no preset with name `%s` present", lutName)
 
@@ -1614,7 +1614,7 @@ def AssignLookupTable(arrayInfo, lutName, rangeOveride=[]):
 def GetLookupTableNames():
     """Returns a list containing the currently available transfer function
     presets."""
-    presets = servermanager.vtkSMTransferFunctionPresets()
+    presets = servermanager.vtkSMTransferFunctionPresets.GetInstance()
     return [presets.GetPresetName(index) for index in range(presets.GetNumberOfPresets())]
 
 # -----------------------------------------------------------------------------
@@ -1625,7 +1625,7 @@ def LoadLookupTable(fileName):
     If the filename ends with a .xml, it's assumed to be a legacy color map XML
     and will be converted to the new format before processing.
     """
-    presets = servermanager.vtkSMTransferFunctionPresets()
+    presets = servermanager.vtkSMTransferFunctionPresets.GetInstance()
     return presets.ImportPresets(fileName)
 
 # -----------------------------------------------------------------------------

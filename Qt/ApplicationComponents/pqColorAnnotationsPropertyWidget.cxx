@@ -855,7 +855,7 @@ pqColorAnnotationsPropertyWidget::~pqColorAnnotationsPropertyWidget()
 //-----------------------------------------------------------------------------
 void pqColorAnnotationsPropertyWidget::applyPreset(const char* presetName)
 {
-  vtkNew<vtkSMTransferFunctionPresets> presets;
+  auto presets = vtkSMTransferFunctionPresets::GetInstance();
   const Json::Value& preset = presets->GetFirstPresetWithName(presetName);
   const Json::Value& indexedColors = preset["IndexedColors"];
   if (indexedColors.isNull() || !indexedColors.isArray() || (indexedColors.size() % 4) != 0 ||
@@ -1386,10 +1386,7 @@ void pqColorAnnotationsPropertyWidget::saveAsPreset()
   vtkStdString presetName;
   if (!cpreset.isNull())
   {
-    // This scoping is necessary to ensure that the vtkSMTransferFunctionPresets
-    // saves the new preset to the "settings" before the choosePreset dialog is
-    // shown.
-    vtkNew<vtkSMTransferFunctionPresets> presets;
+    auto presets = vtkSMTransferFunctionPresets::GetInstance();
     presetName = presets->AddUniquePreset(cpreset);
   }
   this->choosePreset(presetName);
