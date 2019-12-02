@@ -204,6 +204,16 @@ public:
   vtkBooleanMacro(IgnoreFlowSolutionPointers, bool);
 
   /**
+   * When set to true (default is false), the reader will try
+   * to determine to determine FlowSolution_t nodes to read with a pattern matching
+   * This can be useful for unsteady solutions when `FlowSolutionPointers` are not
+   * reliable
+   */
+  vtkSetMacro(UseUnsteadyPattern, bool);
+  vtkGetMacro(UseUnsteadyPattern, bool);
+  vtkBooleanMacro(UseUnsteadyPattern, bool);
+
+  /**
    * This reader can support piece requests by distributing each block in each
    * zone across ranks (default). To make the reader disregard piece request and
    * read all blocks in the zone, set this to false (default is true).
@@ -304,6 +314,7 @@ private:
   int DoublePrecisionMesh;       // option to set mesh loading to double precision
   int CreateEachSolutionAsBlock; // debug option to create
   bool IgnoreFlowSolutionPointers;
+  bool UseUnsteadyPattern;
   bool DistributeBlocks;
   bool CacheMesh;
   bool CacheConnectivity;

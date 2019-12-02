@@ -490,6 +490,39 @@ public:
   static std::string GenerateMeshKey(const char* basename, const char* zonename);
 };
 
+// Helpers for FlowSolutionxxxPointers
+int EndsWithPointers(const char* s)
+{
+  int ret = 0;
+
+  if (s != NULL)
+  {
+    size_t size = strlen(s);
+    if (size > 8 && (strncmp(s + size - 8, "Pointers", 8) == 0))
+    {
+      ret = 1;
+    }
+  }
+
+  return ret;
+}
+
+int StartsWithFlowSolution(const char* s)
+{
+  int ret = 0;
+
+  if (s != NULL)
+  {
+    size_t size = strlen(s);
+    if (size > 12 && (strncmp(s, "FlowSolution", 12) == 0))
+    {
+      ret = 1;
+    }
+  }
+
+  return ret;
+}
+
 //----------------------------------------------------------------------------
 vtkCGNSReader::vtkCGNSReader()
   : PointDataArraySelection()
@@ -675,7 +708,7 @@ int vtkCGNSReader::vtkPrivate::getGridAndSolutionNames(int base, std::string& gr
   // Next let's determine the solution nodes.
 
   bool ignoreFlowSolutionPointers = self->IgnoreFlowSolutionPointers;
-
+  bool useUnsteadyPattern = self->UseUnsteadyPattern;
   // if ZoneIterativeData_t/FlowSolutionPointers is present, they may provide us
   // some of the solution nodes for current timestep (not all).
   if (hasZoneIterativeData && baseInfo.useFlowPointers && !ignoreFlowSolutionPointers)
@@ -690,7 +723,8 @@ int vtkCGNSReader::vtkPrivate::getGridAndSolutionNames(int base, std::string& gr
       CGNSRead::char_33 nodeName;
       if (cgio_get_name(self->cgioNum, iterChildId[cc], nodeName) == CG_OK &&
         cgio_get_label(self->cgioNum, iterChildId[cc], nodeLabel) == CG_OK &&
-        strcmp(nodeLabel, "DataArray_t") == 0 && strcmp(nodeName, "FlowSolutionPointers") == 0)
+        strcmp(nodeLabel, "DataArray_t") == 0 && StartsWithFlowSolution(nodeName) &&
+        EndsWithPointers(nodeName))
       {
         CGNSRead::char_33 gname;
         cgio_read_block_data(self->cgioNum, iterChildId[cc],
@@ -698,7 +732,11 @@ int vtkCGNSReader::vtkPrivate::getGridAndSolutionNames(int base, std::string& gr
           (void*)gname);
         gname[32] = '\0';
         CGNSRead::removeTrailingWhiteSpaces(gname);
-        unvalidatedSolutionNames.push_back(std::string(gname));
+        std::string tmpStr = std::string(gname);
+        if (tmpStr != "Null" && tmpStr != "")
+        {
+          unvalidatedSolutionNames.push_back(tmpStr);
+        }
       }
       cgio_release_id(self->cgioNum, iterChildId[cc]);
     }
@@ -718,7 +756,8 @@ int vtkCGNSReader::vtkPrivate::getGridAndSolutionNames(int base, std::string& gr
     // should assume that FlowSolutionPointers are invalid, and we use the some
     // heuristics to decide which FlowSolution_t nodes correspond to current
     // timestep.
-    ignoreFlowSolutionPointers = (solutionNames.size() == 0);
+    ignoreFlowSolutionPointers =
+      (solutionNames.size() == 0 && unvalidatedSolutionNames.size() != 0);
     if (ignoreFlowSolutionPointers)
     {
       vtkGenericWarningMacro("`FlowSolutionPointers` in the CGNS file '"
@@ -727,59 +766,77 @@ int vtkCGNSReader::vtkPrivate::getGridAndSolutionNames(int base, std::string& gr
     }
   }
 
-  // Ideally ZoneIterativeData_t/FlowSolutionPointers tell us all solution grids
-  // for current timestep, but that may not be the case. Sometimes
-  // ZoneIterativeData_t is missing or incomplete. So let's handle that next.
-
-  // If we processed at least 1 FlowSolutionPointers, then we can form a pattern
-  // for the names for solutions to match the current timestep.
-  std::set<int> stepNumbers;
-  vtksys::RegularExpression stepRe("^[^0-9]+([0-9]+)$");
-  if (hasZoneIterativeData && baseInfo.useFlowPointers && !ignoreFlowSolutionPointers)
+  // Case where everything is OK with standard FlowSolutionPointers
+  if (hasZoneIterativeData && baseInfo.useFlowPointers && !ignoreFlowSolutionPointers &&
+    !useUnsteadyPattern)
   {
-    std::ostringstream str;
-    for (size_t cc = 0; cc < solutionNames.size(); ++cc)
-    {
-      if (stepRe.find(solutionNames[cc]))
-      {
-        stepNumbers.insert(atoi(stepRe.match(1).c_str()));
-      }
-    }
-  }
-  else if (baseInfo.times.size() > 0)
-  {
-    // we don't have FlowSolutionPointers in the dataset, then we may still have
-    // temporal grid with nodes named as "...StepAt00001" etc.
-    stepNumbers.insert(self->ActualTimeStep + 1);
+    // Since we are not too careful about avoiding duplicates in solutionNames
+    // array, let's clean it up here.
+    std::sort(solutionNames.begin(), solutionNames.end());
+    std::vector<std::string>::iterator last =
+      std::unique(solutionNames.begin(), solutionNames.end());
+    solutionNames.erase(last, solutionNames.end());
+    cgio_release_id(self->cgioNum, ziterId);
+    ziterId = 0;
+    return CG_OK;
   }
 
-  // For that, we first collect a list of names for all FlowSolution_t nodes in
-  // this zone.
   std::vector<double> childId;
-  CGNSRead::getNodeChildrenId(self->cgioNum, self->currentId, childId);
-  for (size_t cc = 0; cc < childId.size(); ++cc)
+  // Case where FlowSolutionPointers where not enough but there is a pattern in nodeName.
+  if (useUnsteadyPattern)
   {
-    CGNSRead::char_33 nodeLabel;
-    CGNSRead::char_33 nodeName;
-    if (cgio_get_name(self->cgioNum, childId[cc], nodeName) == CG_OK &&
-      cgio_get_label(self->cgioNum, childId[cc], nodeLabel) == CG_OK &&
-      strcmp(nodeLabel, "FlowSolution_t") == 0)
+    // Ideally ZoneIterativeData_t/FlowSolutionPointers tell us all solution grids
+    // for current timestep, but that may not be the case. Sometimes
+    // ZoneIterativeData_t is missing or incomplete. So let's handle that next.
+
+    // If we processed at least 1 FlowSolutionPointers, then we can form a pattern
+    // for the names for solutions to match the current timestep.
+    std::set<int> stepNumbers;
+    vtksys::RegularExpression stepRe("^[^0-9]+([0-9]+)$");
+    if (hasZoneIterativeData && baseInfo.useFlowPointers && !ignoreFlowSolutionPointers)
     {
-      if (stepNumbers.size() > 0)
+      std::ostringstream str;
+      for (size_t cc = 0; cc < solutionNames.size(); ++cc)
       {
-        if (stepRe.find(nodeName) == true &&
-          stepNumbers.find(atoi(stepRe.match(1).c_str())) != stepNumbers.end())
+        if (stepRe.find(solutionNames[cc]))
         {
-          // the current nodeName ends with a number that matches the current timestep
-          // or timestep indicated at end of an existing nodeName.
-          solutionNames.push_back(nodeName);
+          stepNumbers.insert(atoi(stepRe.match(1).c_str()));
         }
       }
-      else
+    }
+    else if (baseInfo.times.size() > 0)
+    {
+      // we don't have FlowSolutionPointers in the dataset
+      stepNumbers.insert(self->ActualTimeStep + 1);
+    }
+
+    //  For that, we first collect a list of names for all FlowSolution_t nodes in
+    // this zone.
+    CGNSRead::getNodeChildrenId(self->cgioNum, self->currentId, childId);
+    for (size_t cc = 0; cc < childId.size(); ++cc)
+    {
+      CGNSRead::char_33 nodeLabel;
+      CGNSRead::char_33 nodeName;
+      if (cgio_get_name(self->cgioNum, childId[cc], nodeName) == CG_OK &&
+        cgio_get_label(self->cgioNum, childId[cc], nodeLabel) == CG_OK &&
+        strcmp(nodeLabel, "FlowSolution_t") == 0)
       {
-        // is stepNumbers is empty, it means the data was not temporal at all,
-        // so just read all solution nodes.
-        solutionNames.push_back(nodeName);
+        if (stepNumbers.size() > 0)
+        {
+          if (stepRe.find(nodeName) == true &&
+            stepNumbers.find(atoi(stepRe.match(1).c_str())) != stepNumbers.end())
+          {
+            // the current nodeName ends with a number that matches the current timestep
+            // or timestep indicated at end of an existing nodeName.
+            solutionNames.push_back(nodeName);
+          }
+        }
+        else
+        {
+          // is stepNumbers is empty, it means the data was not temporal at all,
+          // so just read all solution nodes.
+          solutionNames.push_back(nodeName);
+        }
       }
     }
   }
