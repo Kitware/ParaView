@@ -1,17 +1,24 @@
 #include "pqOpenVRControls.h"
+#include "pqAnimationManager.h"
 #include "pqPVApplicationCore.h"
 #include "pqParaViewMenuBuilders.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
+#include "pqSetName.h"
+#include "pqVCRController.h"
 #include "ui_pqOpenVRControls.h"
 #include "vtkEventData.h"
+#include "vtkOpenVRDefaultOverlay.h"
 #include "vtkOpenVRInteractorStyle.h"
+#include "vtkOpenVRRenderer.h"
 #include "vtkPVOpenVRHelper.h"
+#include "vtkRenderWindowInteractor.h"
 
 #include <QItemSelectionModel>
 #include <QMenu>
+#include <QStringList>
 #include <QTabWidget>
 
 #include <functional>
@@ -23,6 +30,7 @@ class pqOpenVRControls::pqInternals : public Ui::pqOpenVRControls
 void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
 {
   this->Helper = val;
+  this->NoForward = false;
 
   this->setWindowTitle("pqOpenVRControls");
   this->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
@@ -33,8 +41,8 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
   // this->setWidget(t_widget);
   // this->hide();
 
-  QObject::connect(
-    this->Internals->exitButton, &QPushButton::clicked, this, &pqOpenVRControls::exit);
+  QObject::connect(this->Internals->exitButton, &QPushButton::clicked,
+    std::bind(&vtkPVOpenVRHelper::Quit, this->Helper));
 
   QObject::connect(this->Internals->measurement, &QPushButton::clicked,
     std::bind(&vtkPVOpenVRHelper::TakeMeasurement, this->Helper));
@@ -42,13 +50,17 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
   QObject::connect(this->Internals->removeMeasurement, &QPushButton::clicked,
     std::bind(&vtkPVOpenVRHelper::RemoveMeasurement, this->Helper));
 
-  QObject::connect(this->Internals->controllerLabels, &QCheckBox::stateChanged, this,
-    &pqOpenVRControls::controllerLabelsChanged);
-  QObject::connect(this->Internals->navigationPanel, &QCheckBox::stateChanged, this,
-    &pqOpenVRControls::navigationPanelChanged);
+  QObject::connect(this->Internals->controllerLabels, &QCheckBox::stateChanged,
+    [=](int state) { this->Helper->SetDrawControls(state == Qt::Checked); });
 
-  QObject::connect(this->Internals->rightTrigger, &QComboBox::currentTextChanged, this,
-    &pqOpenVRControls::rightTriggerChanged);
+  QObject::connect(this->Internals->navigationPanel, &QCheckBox::stateChanged,
+    [=](int state) { this->Helper->SetShowNavigationPanel(state == Qt::Checked); });
+
+  QObject::connect(
+    this->Internals->rightTrigger, &QComboBox::currentTextChanged, [=](QString const& text) {
+      std::string mode = text.toLocal8Bit().constData();
+      this->Helper->SetRightTriggerMode(mode);
+    });
 
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   QList<pqRenderViewBase*> views = smmodel->findItems<pqRenderViewBase*>();
@@ -67,6 +79,41 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
   QObject::connect(this->Internals->cropSnapping, &QCheckBox::stateChanged,
     std::bind(&vtkPVOpenVRHelper::SetCropSnapping, this->Helper, std::placeholders::_1));
 
+  QObject::connect(this->Internals->showFloorCheckbox, &QCheckBox::stateChanged,
+    [=](int state) { this->Helper->GetRenderer()->SetShowFloor(state == Qt::Checked); });
+
+  QObject::connect(this->Internals->scaleFactorCombo,
+    QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
+      if (!this->NoForward && text.length())
+      {
+        this->Helper->SetScaleFactor(std::stof(text.toLocal8Bit().constData()));
+      }
+    });
+
+  QObject::connect(this->Internals->motionFactorCombo,
+    QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
+      if (!this->NoForward && text.length())
+      {
+        this->Helper->SetMotionFactor(std::stof(text.toLocal8Bit().constData()));
+      }
+    });
+
+  QObject::connect(this->Internals->loadCameraCombo,
+    QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
+      if (!this->NoForward && text.length())
+      {
+        this->Helper->LoadCameraPose(std::stoi(text.toLocal8Bit().constData()));
+      }
+    });
+
+  QObject::connect(this->Internals->saveCameraCombo,
+    QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
+      if (text.length())
+      {
+        this->Helper->SaveCameraPose(std::stoi(text.toLocal8Bit().constData()));
+      }
+    });
+
   // Populate sources menu.
   // QMenu *menu = new QMenu();
   // pqParaViewMenuBuilders::buildSourcesMenu(*menu, nullptr);
@@ -76,11 +123,6 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
 pqOpenVRControls::~pqOpenVRControls()
 {
   delete this->Internals;
-}
-
-void pqOpenVRControls::exit()
-{
-  this->Helper->Quit();
 }
 
 void pqOpenVRControls::SetRightTriggerMode(std::string const& text)
@@ -106,24 +148,41 @@ pqPipelineSource* pqOpenVRControls::GetSelectedPipelineSource()
   return qobject_cast<pqPipelineSource*>(smModelItem);
 }
 
-void pqOpenVRControls::controllerLabelsChanged(int state)
+void pqOpenVRControls::SetAvailablePositions(std::vector<int> const& vals)
 {
-  this->Helper->SetDrawControls(state == Qt::Checked);
+  this->Internals->loadCameraCombo->clear();
+  QStringList list;
+
+  for (auto s : vals)
+  {
+    list << QString::number(s);
+  }
+  this->Internals->loadCameraCombo->addItems(list);
 }
 
-void pqOpenVRControls::navigationPanelChanged(int state)
+void pqOpenVRControls::SetCurrentPosition(int val)
 {
-  this->Helper->SetShowNavigationPanel(state == Qt::Checked);
+  this->NoForward = true;
+
+  auto idx = this->Internals->loadCameraCombo->findText(QString::number(val));
+  this->Internals->loadCameraCombo->setCurrentIndex(idx);
+  this->NoForward = false;
 }
 
-void pqOpenVRControls::rightTriggerChanged(QString const& text)
+void pqOpenVRControls::SetCurrentScaleFactor(double val)
 {
-  std::string mode = text.toLocal8Bit().constData();
-  this->Helper->SetRightTriggerMode(mode);
+  this->NoForward = true;
+
+  auto idx = this->Internals->scaleFactorCombo->findText(QString::number(val));
+  this->Internals->scaleFactorCombo->setCurrentIndex(idx);
+  this->NoForward = false;
 }
 
-//-----------------------------------------------------------------------------
-// void pqOpenVRControls::setActiveView(pqView* view)
-// {
-//   this->Internals->pipelineBrowser->SetActiveView(view);
-// }
+void pqOpenVRControls::SetCurrentMotionFactor(double val)
+{
+  this->NoForward = true;
+
+  auto idx = this->Internals->motionFactorCombo->findText(QString::number(val));
+  this->Internals->motionFactorCombo->setCurrentIndex(idx);
+  this->NoForward = false;
+}

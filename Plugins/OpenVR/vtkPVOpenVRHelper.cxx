@@ -214,6 +214,42 @@ vtkPVDataRepresentation* FindRepresentation(vtkProp* prop, vtkView* view)
 }
 }
 
+void vtkPVOpenVRHelper::LoadCameraPose(int slot)
+{
+  if (this->RenderWindow)
+  {
+    this->RenderWindow->GetDashboardOverlay()->LoadCameraPose(slot);
+    this->ToggleShowControls();
+  }
+}
+
+void vtkPVOpenVRHelper::SaveCameraPose(int slot)
+{
+  if (this->RenderWindow)
+  {
+    this->RenderWindow->GetDashboardOverlay()->SaveCameraPose(slot);
+    this->SaveLocationState(slot);
+  }
+}
+
+void vtkPVOpenVRHelper::SetScaleFactor(float val)
+{
+  if (this->Style)
+  {
+    this->Style->SetScale(this->Renderer->GetActiveCamera(), 1.0 / val);
+    this->Renderer->ResetCameraClippingRange();
+    this->ToggleShowControls();
+  }
+}
+
+void vtkPVOpenVRHelper::SetMotionFactor(float val)
+{
+  if (this->Style)
+  {
+    this->Style->SetDollyPhysicalSpeed(val);
+  }
+}
+
 void vtkPVOpenVRHelper::ToggleShowControls()
 {
   if (!this->QWidgetWidget)
@@ -826,7 +862,6 @@ bool vtkPVOpenVRHelper::InteractorEventCallback(vtkObject*, unsigned long eventI
     for (vtkBoxWidget2* iter : this->ThickCrops)
     {
       vtkBoxRepresentation* rep = static_cast<vtkBoxRepresentation*>(iter->GetRepresentation());
-      vtkErrorMacro("tpad " << tpos[0] << " " << tpos[1]);
       if (tpos[0] + tpos[1] > 0)
       {
         rep->StepForward();
@@ -858,6 +893,32 @@ void addVectorAttribute(vtkPVXMLElement* el, const char* name, T* data, int coun
   }
   el->AddAttribute(name, o.str().c_str());
 }
+}
+
+void vtkPVOpenVRHelper::HandleDeleteEvent(vtkObject* caller)
+{
+  vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(caller);
+  if (!proxy)
+  {
+    return;
+  }
+
+  // remove the proxy from all visibility lists
+  for (auto& loci : this->Locations)
+  {
+    auto& loc = loci.second;
+    for (auto it = loc.Visibility.begin(); it != loc.Visibility.end();)
+    {
+      if (it->first == proxy)
+      {
+        it = loc.Visibility.erase(it);
+      }
+      else
+      {
+        ++it;
+      }
+    }
+  }
 }
 
 void vtkPVOpenVRHelper::SaveState(vtkPVXMLElement* root)
@@ -1031,6 +1092,7 @@ void vtkPVOpenVRHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* locator
           else
           {
             loc.Visibility[proxy] = (vis != 0 ? true : false);
+            proxy->AddObserver(vtkCommand::DeleteEvent, this, &vtkPVOpenVRHelper::EventCallback);
           }
         }
       }
@@ -1083,6 +1145,14 @@ void vtkPVOpenVRHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* locator
     {
       this->ApplyState();
     }
+
+    // update the lost of locations in the GUI
+    std::vector<int> locs;
+    for (auto& l : this->Locations)
+    {
+      locs.push_back(l.first);
+    }
+    this->OpenVRControls->SetAvailablePositions(locs);
 
     return;
   }
@@ -1177,6 +1247,14 @@ void vtkPVOpenVRHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* locator
         }
       }
     }
+
+    // update the lost of locations in the GUI
+    std::vector<int> locs;
+    for (auto& l : this->Locations)
+    {
+      locs.push_back(l.first);
+    }
+    this->OpenVRControls->SetAvailablePositions(locs);
 
     // load thick crops
     {
@@ -1769,6 +1847,11 @@ bool vtkPVOpenVRHelper::EventCallback(vtkObject* caller, unsigned long eventID, 
   // handle different events
   switch (eventID)
   {
+    case vtkCommand::DeleteEvent:
+    {
+      this->HandleDeleteEvent(caller);
+    }
+    break;
     case vtkCommand::SaveStateEvent:
     {
       this->SaveLocationState(reinterpret_cast<vtkTypeInt64>(calldata));
@@ -1881,6 +1964,10 @@ void vtkPVOpenVRHelper::LoadLocationState()
       }
     }
   }
+
+  this->OpenVRControls->SetCurrentPosition(slot);
+  this->OpenVRControls->SetCurrentScaleFactor(loc.Pose->Distance);
+  this->OpenVRControls->SetCurrentMotionFactor(loc.Pose->MotionFactor);
 }
 
 void vtkPVOpenVRHelper::SaveLocationState(int slot)
@@ -1933,6 +2020,14 @@ void vtkPVOpenVRHelper::SaveLocationState(int slot)
         (vtkSMPropertyHelper(repr, "Visibility").GetAsInt() != 0 ? true : false);
     }
   }
+
+  // update the lost of locations in the GUI
+  std::vector<int> locs;
+  for (auto& l : this->Locations)
+  {
+    locs.push_back(l.first);
+  }
+  this->OpenVRControls->SetAvailablePositions(locs);
 }
 
 void vtkPVOpenVRHelper::ViewRemoved(vtkSMViewProxy* smview)
@@ -2655,8 +2750,8 @@ void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
     this->ApplyState();
     while (this->Interactor && !this->Interactor->GetDone())
     {
-      auto state = this->RenderWindow->GetState();
-      state->Initialize(this->RenderWindow);
+      this->RenderWindow->MakeCurrent();
+      this->RenderWindow->GetState()->ResetFramebufferBindings();
       this->Interactor->DoOneEvent(this->RenderWindow, this->Renderer);
       this->CollaborationClient->Render();
       QCoreApplication::processEvents();
@@ -2716,24 +2811,10 @@ void vtkPVOpenVRHelper::UpdateProps()
     }
 
     vtkPropCollection* pcol = pvRenderer->GetViewProps();
-    vtkActor* actor;
     this->AddedProps->RemoveAllItems();
     for (pcol->InitTraversal(pit); (prop = pcol->GetNextProp(pit));)
     {
       this->AddedProps->AddItem(prop);
-      actor = vtkActor::SafeDownCast(prop);
-      if (actor)
-      {
-        // force opaque is opacity is 1.0
-        if (actor->GetProperty()->GetOpacity() >= 1.0)
-        {
-          actor->ForceOpaqueOn();
-        }
-        else
-        {
-          actor->ForceOpaqueOff();
-        }
-      }
       this->Renderer->AddViewProp(prop);
     }
     // vtkVolumeCollection* avol = pvRenderer->GetVolumes();

@@ -167,6 +167,13 @@ public:
   // set what the right trigger will do when pressed
   void SetRightTriggerMode(std::string const& mode);
 
+  vtkGetObjectMacro(Renderer, vtkOpenVRRenderer);
+
+  void SaveCameraPose(int loc);
+  void LoadCameraPose(int loc);
+  void SetScaleFactor(float val);
+  void SetMotionFactor(float val);
+
 protected:
   vtkPVOpenVRHelper();
   ~vtkPVOpenVRHelper();
@@ -210,6 +217,7 @@ protected:
   bool EventCallback(vtkObject* object, unsigned long event, void* calldata);
 
   void HideBillboard();
+  void HandleDeleteEvent(vtkObject* caller);
   void HandlePickEvent(vtkObject* caller, void* calldata);
   void MoveToNextImage();
   void MoveToNextCell();

@@ -25,7 +25,7 @@
 class pqPipelineSource;
 class pqView;
 class vtkPVOpenVRHelper;
-
+class pqVCRController;
 class pqOpenVRControls : public QWidget
 {
   Q_OBJECT
@@ -46,18 +46,21 @@ public:
   // the mode
   void SetRightTriggerMode(std::string const& text);
 
+  void SetAvailablePositions(std::vector<int> const& slots);
+
+  void SetCurrentPosition(int val);
+  void SetCurrentMotionFactor(double val);
+  void SetCurrentScaleFactor(double val);
+
 protected:
   vtkPVOpenVRHelper* Helper;
-
-protected slots:
-  void rightTriggerChanged(QString const& text);
-  void controllerLabelsChanged(int);
-  void navigationPanelChanged(int);
-  void exit();
+  bool NoForward;
 
 private:
   void constructor(vtkPVOpenVRHelper* val);
 
   class pqInternals;
   pqInternals* Internals;
+
+  pqVCRController* Controller;
 };
