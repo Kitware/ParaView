@@ -71,7 +71,7 @@
 ** This test only builds if MPI is in use
 */
 #include "vtkMPICommunicator.h"
-#include <mpi.h>
+#include <vtk_mpi.h>
 
 #include "vtkProcess.h"
 

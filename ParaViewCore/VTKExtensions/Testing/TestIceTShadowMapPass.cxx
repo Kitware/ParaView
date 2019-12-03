@@ -82,8 +82,8 @@
 */
 #include "vtkMPICommunicator.h"
 
-#include "mpi.h"
 #include "vtkProcess.h"
+#include "vtk_mpi.h"
 
 #include <vtksys/CommandLineArguments.hxx>
 

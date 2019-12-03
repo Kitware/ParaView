@@ -26,7 +26,7 @@
 #include "vtkSynchronizedRenderers.h"
 #include "vtkTesting.h"
 
-#include "mpi.h"
+#include "vtk_mpi.h"
 
 int main(int argc, char** argv)
 {

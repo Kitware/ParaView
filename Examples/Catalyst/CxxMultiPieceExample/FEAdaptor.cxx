@@ -19,7 +19,7 @@
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 
-#include <mpi.h>
+#include <vtk_mpi.h>
 
 namespace
 {
