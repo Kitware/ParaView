@@ -514,14 +514,28 @@ int vtkSciVizStatistics::PrepareFullDataTable(vtkTable* inTable, vtkFieldData* d
         // Create a column in the table for each component of non-scalar arrays requested.
         // FIXME: Should we add a "norm" column when arr is a vtkDataArray? It would make sense.
         std::vector<vtkAbstractArray*> comps;
-        int i;
         const char* compName;
-        for (i = 0; i < ncomp; ++i)
+
+        // Check component names can be used
+        std::set<std::string> compCheckSet;
+        bool useCompNames = true;
+        for (int i = 0; i < ncomp; ++i)
+        {
+          compName = arr->GetComponentName(i);
+          if (!compName || compCheckSet.count(compName) > 0)
+          {
+            useCompNames = false;
+            break;
+          }
+          compCheckSet.emplace(compName);
+        }
+
+        for (int i = 0; i < ncomp; ++i)
         {
           std::ostringstream os;
           compName = arr->GetComponentName(i);
           os << arr->GetName() << "_";
-          (compName) ? os << compName : os << i;
+          useCompNames ? os << compName : os << i;
 
           vtkAbstractArray* arrCol = vtkAbstractArray::CreateArray(arr->GetDataType());
           arrCol->SetName(os.str().c_str());
@@ -536,7 +550,7 @@ int vtkSciVizStatistics::PrepareFullDataTable(vtkTable* inTable, vtkFieldData* d
         vtkStringArray* sarr = vtkStringArray::SafeDownCast(arr);
         if (darr)
         {
-          for (i = 0; i < ncomp; ++i)
+          for (int i = 0; i < ncomp; ++i)
           {
             vtkDataArray::SafeDownCast(comps[i])->CopyComponent(0, darr, i);
           }
@@ -544,13 +558,13 @@ int vtkSciVizStatistics::PrepareFullDataTable(vtkTable* inTable, vtkFieldData* d
         else if (sarr)
         {
           std::vector<vtkStringArray*> scomps;
-          for (i = 0; i < ncomp; ++i, ++vidx)
+          for (int i = 0; i < ncomp; ++i, ++vidx)
           {
             scomps[i] = vtkStringArray::SafeDownCast(comps[i]);
           }
           for (vtkIdType j = 0; j < ntup; ++j)
           {
-            for (i = 0; i < ncomp; ++i, ++vidx)
+            for (int i = 0; i < ncomp; ++i, ++vidx)
             {
               scomps[i]->SetValue(j, sarr->GetValue(vidx));
             }
@@ -561,7 +575,7 @@ int vtkSciVizStatistics::PrepareFullDataTable(vtkTable* inTable, vtkFieldData* d
           // Inefficient, but works for any array type.
           for (vtkIdType j = 0; j < ntup; ++j)
           {
-            for (i = 0; i < ncomp; ++i, ++vidx)
+            for (int i = 0; i < ncomp; ++i, ++vidx)
             {
               comps[i]->InsertVariantValue(j, arr->GetVariantValue(vidx));
             }
