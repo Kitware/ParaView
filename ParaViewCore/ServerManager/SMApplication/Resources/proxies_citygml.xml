@@ -29,8 +29,7 @@ tran:Road, bldg:Building, gen:GenericCityObject, luse:LandUse
       <IntVectorProperty command="SetLOD"
                          default_values="3"
                          name="LOD"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
+                         number_of_elements="1">
         <IntRangeDomain min="0" max="4"
                         name="range" />
         <Documentation>Specify the level of detail (LOD) to
