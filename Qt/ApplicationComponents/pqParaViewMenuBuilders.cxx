@@ -117,9 +117,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLayout>
 #include <QMainWindow>
 #include <QMenu>
+#include <QProxyStyle>
 
 #include "vtkPVFileInformation.h"
 #include "vtkSMProxyManager.h"
+
+//-----------------------------------------------------------------------------
+class pqActiveDisabledStyle : public QProxyStyle
+{
+public:
+  int styleHint(StyleHint hint, const QStyleOption* option = 0, const QWidget* widget = 0,
+    QStyleHintReturn* returnData = 0) const override
+  {
+    return hint == QStyle::SH_Menu_AllowActiveAndDisabled ? 1 : QProxyStyle::styleHint(
+                                                                  hint, option, widget, returnData);
+  }
+};
 
 //-----------------------------------------------------------------------------
 void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
@@ -221,6 +234,9 @@ void pqParaViewMenuBuilders::buildSourcesMenu(QMenu& menu, QMainWindow* mainWind
 void pqParaViewMenuBuilders::buildFiltersMenu(
   QMenu& menu, QMainWindow* mainWindow, bool hideDisabled, bool quickLaunchable)
 {
+  // Make sure disabled actions are still considered active
+  menu.setStyle(new pqActiveDisabledStyle);
+
   pqProxyGroupMenuManager* mgr =
     new pqProxyGroupMenuManager(&menu, "ParaViewFilters", quickLaunchable);
   mgr->addProxyDefinitionUpdateListener("filters");
