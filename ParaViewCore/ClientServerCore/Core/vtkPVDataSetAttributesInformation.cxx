@@ -36,8 +36,8 @@ namespace
 {
 bool vtkSkipArray(const char* aname)
 {
-  return (aname == NULL || strcmp(aname, vtkDataSetAttributes::GhostArrayName()) == 0 ||
-    strcmp(aname, "vtkOriginalCellIds") == 0 || strcmp(aname, "vtkOriginalPointIds") == 0);
+  return (aname == NULL || strcmp(aname, "vtkOriginalCellIds") == 0 ||
+    strcmp(aname, "vtkOriginalPointIds") == 0);
 }
 }
 

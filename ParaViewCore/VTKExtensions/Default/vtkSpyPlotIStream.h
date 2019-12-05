@@ -49,7 +49,8 @@ protected:
   istream* IStream;
 
 private:
-  void operator=(const vtkSpyPlotIStream&);
+  vtkSpyPlotIStream(const vtkSpyPlotIStream&) = delete;
+  void operator=(const vtkSpyPlotIStream&) = delete;
 };
 
 inline istream* vtkSpyPlotIStream::GetStream()
