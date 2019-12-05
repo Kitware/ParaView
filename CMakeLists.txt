@@ -343,6 +343,9 @@ else ()
     VTK::RenderingMatplotlib)
 endif ()
 
+list(APPEND paraview_requested_modules
+  VTK::IOPIO)
+
 if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND paraview_requested_modules
     ParaView::CinemaPython
