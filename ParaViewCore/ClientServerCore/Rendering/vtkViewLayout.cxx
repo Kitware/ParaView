@@ -417,7 +417,6 @@ void vtkViewLayout::Paint(vtkViewport* vp)
   auto& internals = (*this->Internals);
   vtkOpenGLRenderUtilities::MarkDebugEvent("vtkViewLayout::Paint Start");
   auto renderer = vtkOpenGLRenderer::SafeDownCast(vp);
-  auto camera = renderer->GetActiveCamera();
 
   assert(renderer != nullptr);
   auto window = vtkOpenGLRenderWindow::SafeDownCast(renderer->GetRenderWindow());
@@ -460,24 +459,16 @@ void vtkViewLayout::Paint(vtkViewport* vp)
         {
           ostate->vtkglScissor(0, 0, size[0], size[1]);
         }
-        fbo->SaveCurrentBindingsAndBuffers(GL_READ_FRAMEBUFFER);
-        fbo->Bind(GL_READ_FRAMEBUFFER);
-        // if rendering active-stereo, make sure we grab from the appropriate color
-        // buffer.
-        if (camera->GetLeftEye() == 0 && renWin->GetStereoRender() &&
-          renWin->GetStereoType() == VTK_STEREO_CRYSTAL_EYES &&
-          fbo->GetNumberOfColorAttachments() == 2)
+        // only blit if the FBO has been created and initialized
+        if (fbo->GetFBOIndex())
         {
-          fbo->ActivateReadBuffer(1);
+          fbo->SaveCurrentBindingsAndBuffers(GL_READ_FRAMEBUFFER);
+          fbo->Bind(GL_READ_FRAMEBUFFER);
+          const int extents[] = { 0, size[0], 0, size[1] };
+          fbo->Blit(extents, extents, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+          fbo->RestorePreviousBindingsAndBuffers(GL_READ_FRAMEBUFFER);
+          vtkOpenGLCheckErrorMacro("Failed after paste-back");
         }
-        else
-        {
-          fbo->ActivateReadBuffer(0);
-        }
-        const int extents[] = { 0, size[0], 0, size[1] };
-        fbo->Blit(extents, extents, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-        fbo->RestorePreviousBindingsAndBuffers(GL_READ_FRAMEBUFFER);
-        vtkOpenGLCheckErrorMacro("Failed after paste-back");
       }
     }
   }
