@@ -1258,12 +1258,17 @@ void vtkSMSessionProxyManager::LoadXMLState(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMSessionProxyManager::SaveXMLState(const char* filename)
+bool vtkSMSessionProxyManager::SaveXMLState(const char* filename)
 {
   vtkPVXMLElement* rootElement = this->SaveXMLState();
   ofstream os(filename, ios::out);
+  if (!os.is_open())
+  {
+    return false;
+  }
   rootElement->PrintXML(os, vtkIndent());
   rootElement->Delete();
+  return true;
 }
 
 //---------------------------------------------------------------------------
