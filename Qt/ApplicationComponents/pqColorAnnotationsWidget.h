@@ -229,6 +229,7 @@ private slots:
   /**
    * save current transfer function as preset.
    */
+  void saveAsNewPreset();
   void saveAsPreset(const char* name, bool removeAnnotations, bool allowOverride);
 
   /**

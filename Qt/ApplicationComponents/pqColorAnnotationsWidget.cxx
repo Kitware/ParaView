@@ -284,6 +284,8 @@ pqColorAnnotationsWidget::pqColorAnnotationsWidget(QWidget* parentObject)
   QObject::connect(ui.Remove, SIGNAL(clicked()), this, SLOT(removeAnnotation()));
   QObject::connect(ui.DeleteAll, SIGNAL(clicked()), this, SLOT(removeAllAnnotations()));
   QObject::connect(ui.ChoosePreset, SIGNAL(clicked()), this, SLOT(choosePreset()));
+  QObject::connect(
+    ui.SaveAsNewPreset, &QToolButton::clicked, this, [&]() { this->saveAsNewPreset(); });
   QObject::connect(ui.SaveAsPreset, &QToolButton::clicked, this,
     [&]() { this->saveAsPreset(this->Internals->CurrentPresetName, false, true); });
 
@@ -373,6 +375,7 @@ void pqColorAnnotationsWidget::indexedLookupStateUpdated(bool indexed)
   this->setColumnVisibility(pqAnnotationsModel::COLOR, indexed);
   this->Internals->Ui.ChoosePreset->setVisible(indexed);
   this->Internals->Ui.SaveAsPreset->setVisible(indexed);
+  this->Internals->Ui.SaveAsNewPreset->setVisible(indexed);
 }
 
 //-----------------------------------------------------------------------------
@@ -824,6 +827,37 @@ void pqColorAnnotationsWidget::choosePreset(const char* presetName)
 {
   this->Internals->ChoosePresetReaction->setTransferFunction(this->Internals->LookupTableProxy);
   this->Internals->ChoosePresetReaction->choosePreset(presetName);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorAnnotationsWidget::saveAsNewPreset()
+{
+  QDialog dialog(this);
+  Ui::SavePresetOptions ui;
+  ui.setupUi(&dialog);
+  ui.saveOpacities->setVisible(false);
+  auto name =
+    this->Internals->Model->headerData(pqAnnotationsModel::LABEL, Qt::Horizontal, Qt::DisplayRole)
+      .toString();
+  ui.saveAnnotations->setText(QString("Save %1").arg(name));
+  // ui.saveAnnotations->setEnabled(
+  //   vtkSMPropertyHelper(this->Internals->LookupTableProxy, "Annotations", true)
+  //     .GetNumberOfElements() > 0);
+
+  // For now, let's not provide an option to not save colors. We'll need to fix
+  // the pqPresetToPixmap to support rendering only opacities.
+  ui.saveColors->setChecked(true);
+  ui.saveColors->setEnabled(false);
+  ui.saveColors->hide();
+  ui.presetName->setText("Preset");
+
+  if (dialog.exec() != QDialog::Accepted)
+  {
+    return;
+  }
+
+  this->saveAsPreset(
+    ui.presetName->text().toStdString().c_str(), !ui.saveAnnotations->isChecked(), false);
 }
 
 //-----------------------------------------------------------------------------

@@ -104,9 +104,9 @@ public slots:
 
 signals:
   /**
-  * fired every time a preset is applied.
-  */
-  void presetApplied();
+   * fired every time a preset is applied.
+   */
+  void presetApplied(const QString&);
 
 private slots:
   void applyCurrentPreset();

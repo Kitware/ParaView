@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMTransferFunctionProxy.h"
 
+#include "vtk_jsoncpp.h"
+
 #include <cassert>
 
 QPointer<pqPresetDialog> pqChooseColorPresetReaction::PresetDialog;
@@ -215,5 +217,7 @@ void pqChooseColorPresetReaction::applyCurrentPreset()
       lut, dialog->currentPreset(), !dialog->loadAnnotations());
   }
   END_UNDO_SET();
-  emit this->presetApplied();
+
+  emit this->presetApplied(
+    QString(dialog->currentPreset().get("Name", "Preset").asString().c_str()));
 }
