@@ -66,6 +66,7 @@ add_example(CustomApplications/Clone2)
 add_example(CustomApplications/Demo0)
 add_example(CustomApplications/Demo1)
 add_example(CustomApplications/MultiServerClient)
+add_example(CustomApplications/SimpleParaView)
 # TODO Update this custom application to load only specific data types.
 # add_example(CustomApplications/Spreadsheet)
 
