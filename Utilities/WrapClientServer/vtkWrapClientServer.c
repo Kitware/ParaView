@@ -467,7 +467,15 @@ void outputFunction(FILE* fp, ClassInfo* data)
     }
     else
     {
-      fprintf(fp, "      temp%i = (op)->%s(", MAX_ARGS, currentFunction->Name);
+      if (currentFunction->IsStatic)
+      {
+        fprintf(
+          fp, "      temp%i = %s::%s(", MAX_ARGS, currentFunction->Class, currentFunction->Name);
+      }
+      else
+      {
+        fprintf(fp, "      temp%i = (op)->%s(", MAX_ARGS, currentFunction->Name);
+      }
     }
 
     for (i = 0; i < currentFunction->NumberOfArguments; i++)
@@ -1141,7 +1149,7 @@ void output_InitFunction(FILE* fp, NewClassInfo* data)
               "//-------------------------------------------------------------------------auto\n"
               "void VTK_EXPORT %s_Init(vtkClientServerInterpreter* csi)\n"
               "{\n"
-              "  static vtkClientServerInterpreter* last = NULL;\n"
+              "  static vtkClientServerInterpreter* last = nullptr;\n"
               "  if(last != csi)\n"
               "    {\n"
               "    last = csi;\n",

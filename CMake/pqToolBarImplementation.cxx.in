@@ -40,9 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 {
 }
 
-@_paraview_toolbar_CLASS_NAME@Implementation::~@_paraview_toolbar_CLASS_NAME@Implementation()
-{
-}
+@_paraview_toolbar_CLASS_NAME@Implementation::~@_paraview_toolbar_CLASS_NAME@Implementation() = default;
 
 QToolBar* @_paraview_toolbar_CLASS_NAME@Implementation::toolBar(QWidget* parentWdg)
 {

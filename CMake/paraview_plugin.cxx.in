@@ -26,12 +26,10 @@ namespace
   // so it does not double-dlclose() an already unloaded plugin.
   // This does not affect static builds and hence we don't need to worry about
   // making sure this instance gets created in static builds.
-  static class @_paraview_build_plugin@PluginCleaner
+  class @_paraview_build_plugin@PluginCleaner
   {
   public:
-    @_paraview_build_plugin@PluginCleaner()
-    {
-    }
+    @_paraview_build_plugin@PluginCleaner() = default;
     ~@_paraview_build_plugin@PluginCleaner()
     {
       // The plugin library is being unloaded.
