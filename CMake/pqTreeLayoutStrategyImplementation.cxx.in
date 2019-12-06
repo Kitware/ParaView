@@ -52,5 +52,5 @@ vtkAreaLayoutStrategy* @_paraview_tree_layout_strategy_STRATEGY_TYPE@Implementat
   {
     return this->@_paraview_tree_layout_strategy_STRATEGY_TYPE@;
   }
-  return NULL;
+  return nullptr;
 }

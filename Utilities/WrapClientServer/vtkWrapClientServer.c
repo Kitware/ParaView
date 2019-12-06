@@ -1141,7 +1141,7 @@ void output_InitFunction(FILE* fp, NewClassInfo* data)
               "//-------------------------------------------------------------------------auto\n"
               "void VTK_EXPORT %s_Init(vtkClientServerInterpreter* csi)\n"
               "{\n"
-              "  static vtkClientServerInterpreter* last = NULL;\n"
+              "  static vtkClientServerInterpreter* last = nullptr;\n"
               "  if(last != csi)\n"
               "    {\n"
               "    last = csi;\n",
