@@ -10,9 +10,7 @@
 }
 
 //-----------------------------------------------------------------------------
-@_paraview_proxy_NAME@ServerManagerModelImplementation::~@_paraview_proxy_NAME@ServerManagerModelImplementation()
-{
-}
+@_paraview_proxy_NAME@ServerManagerModelImplementation::~@_paraview_proxy_NAME@ServerManagerModelImplementation() = default;
 
 //-----------------------------------------------------------------------------
 pqProxy* @_paraview_proxy_NAME@ServerManagerModelImplementation::createPQProxy(

@@ -41,9 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   this->ActionGroup = new @_paraview_action_group_CLASS_NAME@(this);
 }
 
-@_paraview_action_group_CLASS_NAME@Implementation::~@_paraview_action_group_CLASS_NAME@Implementation()
-{
-}
+@_paraview_action_group_CLASS_NAME@Implementation::~@_paraview_action_group_CLASS_NAME@Implementation() = default;
 
 QString @_paraview_action_group_CLASS_NAME@Implementation::groupName()
 {

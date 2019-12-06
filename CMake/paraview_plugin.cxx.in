@@ -29,9 +29,7 @@ namespace
   class @_paraview_build_plugin@PluginCleaner
   {
   public:
-    @_paraview_build_plugin@PluginCleaner()
-    {
-    }
+    @_paraview_build_plugin@PluginCleaner() = default;
     ~@_paraview_build_plugin@PluginCleaner()
     {
       // The plugin library is being unloaded.
