@@ -1,20 +1,20 @@
 /*=========================================================================
 
-Program: ParaView
-Module:  pqAnnotationsModel.cxx
+   Program: ParaView
+   Module:  pqAnnotationsModel.cxx
 
-Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
-All rights reserved.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
 
-ParaView is a free software; you can redistribute it and/or modify it
-under the terms of the ParaView license version 1.2.
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.2.
 
-See License_v1.2.txt for the full ParaView license.
-A copy of this license can be obtained by contacting
-Kitware Inc.
-28 Corporate Drive
-Clifton Park, NY 12065
-USA
+   See License_v1.2.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -37,41 +37,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <set>
 
+static const int SWATCH_RADIUS = 17;
 namespace
 {
+// Create a disk filled with the given color
 QPixmap createSwatch(QColor& color)
 {
-  int radius = 17;
-
-  QPixmap pix(radius, radius);
+  QPixmap pix(SWATCH_RADIUS, SWATCH_RADIUS);
   pix.fill(QColor(0, 0, 0, 0));
 
   QPainter painter(&pix);
   painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setBrush(QBrush(color));
-  painter.drawEllipse(1, 1, radius - 2, radius - 2);
+  painter.drawEllipse(1, 1, SWATCH_RADIUS - 2, SWATCH_RADIUS - 2);
   painter.end();
   return pix;
 }
 
+// Create a truncated disk. Remaining angle is given by opacity (1 is full disk, 0 is no disk).
 QPixmap createOpacitySwatch(double opacity)
 {
-  int radius = 17;
-
-  QPixmap pix(radius, radius);
+  QPixmap pix(SWATCH_RADIUS, SWATCH_RADIUS);
   pix.fill(QColor(0, 0, 0, 0));
 
   QPainter painter(&pix);
   painter.setRenderHint(QPainter::Antialiasing, true);
-  const int delta = 3 * radius / 4;
+  const int delta = 3 * SWATCH_RADIUS / 4;
   QRect rect(0, 0, delta, delta);
-  rect.moveCenter(QPoint(radius / 2, radius / 2));
+  rect.moveCenter(QPoint(SWATCH_RADIUS / 2, SWATCH_RADIUS / 2));
+  // angle is given in 1/16 th of a degree, so a whole is 16 * 360 = 5760.
   painter.drawPie(rect, 0, 5760 * opacity);
   painter.end();
   return pix;
 }
 }
 
+// Handle the content of a row.
 class AnnotationItem
 {
 public:
@@ -82,71 +83,107 @@ public:
   QString Value;
   QString Annotation;
 
-  AnnotationItem() { this->Opacity = -1; }
+  AnnotationItem()
+    : Opacity(-1)
+    , Value("")
+    , Annotation("")
+  {
+  }
 
+  /**
+   * Set the underlying data for the given column.
+   */
   bool setData(int index, const QVariant& value)
   {
-    if (index == 0 && value.canConvert(QVariant::Color))
+    switch (index)
     {
-      if (this->Color != value.value<QColor>())
+      case pqAnnotationsModel::COLOR:
+        if (value.canConvert(QVariant::Color))
+        {
+          if (this->Color != value.value<QColor>())
+          {
+            this->Color = value.value<QColor>();
+            this->Swatch = createSwatch(this->Color);
+            return true;
+          }
+        }
+        break;
+      case pqAnnotationsModel::OPACITY:
       {
-        this->Color = value.value<QColor>();
-        this->Swatch = createSwatch(this->Color);
-        return true;
+        if (this->Opacity != value.toDouble())
+        {
+          this->Opacity = value.toDouble();
+          this->OpacitySwatch = createOpacitySwatch(this->Opacity);
+          return true;
+        }
       }
-    }
-    else if (index == 1)
-    {
-      if (this->Opacity != value.toDouble())
+      break;
+      case pqAnnotationsModel::VALUE:
       {
-        this->Opacity = value.toDouble();
-        this->OpacitySwatch = createOpacitySwatch(this->Opacity);
-        return true;
+        if (this->Value != value.toString())
+        {
+          this->Value = value.toString();
+          return true;
+        }
       }
-    }
-    else if (index == 2)
-    {
-      if (this->Value != value.toString())
+      break;
+      case pqAnnotationsModel::LABEL:
       {
-        this->Value = value.toString();
-        return true;
+        if (this->Annotation != value.toString())
+        {
+          this->Annotation = value.toString();
+          return true;
+        }
       }
-    }
-    else if (index == 3)
-    {
-      if (this->Annotation != value.toString())
-      {
-        this->Annotation = value.toString();
-        return true;
-      }
+        {
+        }
+        break;
+      default:
+        break;
     }
     return false;
   }
+
+  /**
+   * Get the underlying data to display for the given column.
+   */
   QVariant data(int index) const
   {
-    if (index == 0 && this->Color.isValid())
+    switch (index)
     {
-      return this->Swatch;
-    }
-    else if (index == 1)
-    {
-      return this->OpacitySwatch;
-    }
-    else if (index == 2)
-    {
-      return this->Value;
-    }
-    else if (index == 3)
-    {
-      return this->Annotation;
-    }
-    else if (index == 4 && this->Color.isValid())
-    {
-      return this->Color;
-    }
-    else if (index == 5)
-    {
-      return this->Opacity;
+      case pqAnnotationsModel::COLOR:
+        if (this->Color.isValid())
+        {
+          return this->Swatch;
+        }
+      case pqAnnotationsModel::OPACITY:
+      {
+        return this->OpacitySwatch;
+      }
+      break;
+      case pqAnnotationsModel::VALUE:
+      {
+        return this->Value;
+      }
+      break;
+      case pqAnnotationsModel::LABEL:
+      {
+        return this->Annotation;
+      }
+      break;
+      case pqAnnotationsModel::COLOR_DATA:
+        if (this->Color.isValid())
+        {
+          return this->Color;
+        }
+        break;
+      case pqAnnotationsModel::OPACITY_DATA:
+      {
+        return this->Opacity;
+      }
+      break;
+      default:
+        break;
     }
     return QVariant();
   }

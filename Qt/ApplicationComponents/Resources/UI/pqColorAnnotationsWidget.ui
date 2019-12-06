@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ColorAnnotationsPropertyWidget</class>
- <widget class="QWidget" name="ColorAnnotationsPropertyWidget">
+ <class>ColorAnnotationsWidget</class>
+ <widget class="QWidget" name="ColorAnnotationsWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -98,7 +98,7 @@
         <iconset resource="../../../Components/Resources/pqComponents.qrc">
          <normaloff>:/pqWidgets/Icons/pqSave.svg</normaloff>:/pqWidgets/Icons/pqSave.svg</iconset>
        </property>
-      </widget>
+       </widget>
      </item>
      <item>
       <spacer name="verticalSpacer">

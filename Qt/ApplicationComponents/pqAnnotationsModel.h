@@ -51,6 +51,17 @@ public:
   pqAnnotationsModel(QObject* parentObject = nullptr);
   ~pqAnnotationsModel() override;
 
+  enum ColumnRoles
+  {
+    COLOR = 0,
+    OPACITY,
+    VALUE,
+    LABEL,
+    NUMBER_OF_COLUMNS,
+    COLOR_DATA = NUMBER_OF_COLUMNS,
+    OPACITY_DATA
+  };
+
   //@{
   /**
    * Reimplements QAbstractTableModel
