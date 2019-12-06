@@ -1093,6 +1093,47 @@
       <!-- End AppendAttributes -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkAppendLocationAttributes"
+                 label="Append Location Attributes"
+                 name="AppendLocationAttributes">
+      <Documentation long_help="Adds points and/or cell centers as point and/or cell data arrays."
+                     short_help="Optionally add point and cell centers as point and cell data arrays.">
+                    This filter optionally adds point locations and cell centers to point and cell
+                    data, respectively. Point locations are added in an array named `PointLocations`.
+                    Cell centers are added in an array named `CellCenters`.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Append Location Attributes
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetAppendPointLocations"
+                         default_values="1"
+                         number_of_elements="1"
+                         name="AppendPointLocations"
+                         panel_visibility="default">
+        <BooleanDomain name="bool" />
+        <Documentation>Adds a point data array named `PointLocations` that is a copy of the point
+        locations in the input.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAppendCellCenters"
+                         default_values="1"
+                         number_of_elements="1"
+                         name="AppendCellCenters"
+                         panel_visibility="default">
+        <BooleanDomain name="bool" />
+        <Documentation>Adds a cell data array named `CellCenters` that is stores the centers
+        of cells in the input.</Documentation>
+      </IntVectorProperty>
+      <!-- End AppendLocationAttributes -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkAppendPolyData"
                  label="Append Geometry"
                  name="AppendPolyData">
