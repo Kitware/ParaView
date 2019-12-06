@@ -61,15 +61,17 @@ public:
   * Saves the state file.
   * Note that this method is static. Applications can simply use this without
   * having to create a reaction instance.
+  * Return true if the operation succeeded otherwise return false.
   */
-  static void saveState(const QString& filename);
+  static bool saveState(const QString& filename);
 
   /**
   * Saves the state file as a python state.
   * Note that this method is static. Applications can simply use this without
   * having to create a reaction instance.
+  * Return true if the operation succeeded otherwise return false.
   */
-  static void savePythonState(const QString& filename);
+  static bool savePythonState(const QString& filename);
 
 public slots:
   /**

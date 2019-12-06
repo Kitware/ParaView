@@ -430,8 +430,9 @@ public:
   /**
    * Save the state of the server manager in XML format in a file.
    * This saves the state of all proxies and properties.
+   * Return true if the operation succeeded otherwise return false.
    */
-  void SaveXMLState(const char* filename);
+  bool SaveXMLState(const char* filename);
 
   /**
    * Saves the state of the server manager as XML, and returns the

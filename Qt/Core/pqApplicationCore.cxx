@@ -314,13 +314,13 @@ QObject* pqApplicationCore::manager(const QString& function)
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationCore::saveState(const QString& filename)
+bool pqApplicationCore::saveState(const QString& filename)
 {
   // * Save the Proxy Manager state.
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
-  pxm->SaveXMLState(filename.toLocal8Bit().data());
+  return pxm->SaveXMLState(filename.toLocal8Bit().data());
 }
 
 //-----------------------------------------------------------------------------

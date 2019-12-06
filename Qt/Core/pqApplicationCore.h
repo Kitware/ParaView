@@ -231,10 +231,15 @@ public:
   void clearSettings();
 
   /**
-  * Save the ServerManager state.
+  * Save the ServerManager state to a XML element.
   */
   vtkPVXMLElement* saveState();
-  void saveState(const QString& filename);
+
+  /**
+  * Save the ServerManager state to a file.
+  * Return true if the operation succeeded otherwise return false.
+  */
+  bool saveState(const QString& filename);
 
   /**
   * Loads the ServerManager state. Emits the signal
