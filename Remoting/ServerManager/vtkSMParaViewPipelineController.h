@@ -209,6 +209,13 @@ public:
     return this->RegisterLightProxy(proxy, view, NULL);
   }
 
+  /**
+   * Use this method after PreInitializeProxy() and PostInitializeProxy() to
+   * register a texture proxy with the proxy manager. This will also perform
+   * needed python tracing.
+   */
+  virtual bool RegisterTextureProxy(vtkSMProxy* proxy, const char* filename);
+
   //---------------------------------------------------------------------------
   // *******  Methods for Animation   *********
 

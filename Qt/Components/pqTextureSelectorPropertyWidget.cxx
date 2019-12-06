@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyGroupDomain.h"
+#include "vtkSMTrace.h"
 
 // Qt Includes
 #include <QVBoxLayout>
@@ -107,6 +108,7 @@ pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(
 //-----------------------------------------------------------------------------
 void pqTextureSelectorPropertyWidget::onTextureChanged(vtkSMProxy* texture)
 {
+  SM_SCOPED_TRACE(ChooseTexture).arg(this->proxy()).arg(texture).arg(this->property());
   BEGIN_UNDO_SET("Texture Change");
   vtkSMPropertyHelper(this->property()).Set(texture);
   this->proxy()->UpdateVTKObjects();
