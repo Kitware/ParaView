@@ -31,11 +31,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqAnnotationsModel.h"
 
+#include <QMimeData>
 #include <QPainter>
 #include <QPixmap>
 
+#include "vtkSMStringListDomain.h"
+
 #include <cassert>
 #include <set>
+
+#include <cassert>
 
 static const int SWATCH_RADIUS = 17;
 namespace
@@ -82,11 +87,13 @@ public:
   QPixmap OpacitySwatch;
   QString Value;
   QString Annotation;
+  Qt::CheckState Visibility;
 
   AnnotationItem()
     : Opacity(-1)
     , Value("")
     , Annotation("")
+    , Visibility(Qt::Unchecked)
   {
   }
 
@@ -135,9 +142,16 @@ public:
           return true;
         }
       }
+      break;
+      case pqAnnotationsModel::VISIBILITY:
+      {
+        if (this->Visibility != Qt::CheckState(value.toInt()))
         {
+          this->Visibility = Qt::CheckState(value.toInt());
+          return true;
         }
-        break;
+      }
+      break;
       default:
         break;
     }
@@ -156,6 +170,7 @@ public:
         {
           return this->Swatch;
         }
+        break;
       case pqAnnotationsModel::OPACITY:
       {
         return this->OpacitySwatch;
@@ -182,6 +197,8 @@ public:
         return this->Opacity;
       }
       break;
+      case pqAnnotationsModel::VISIBILITY:
+      //  handled by CheckStateRole, nothing to return in DisplayRole.
       default:
         break;
     }
@@ -196,14 +213,16 @@ public:
 class pqAnnotationsModel::pqInternals
 {
 public:
-  QVector<AnnotationItem> Items;
-  QVector<QColor> Colors;
+  std::vector<AnnotationItem> Items;
+  std::vector<QColor> Colors;
 };
 
+//=============================================================================
 pqAnnotationsModel::pqAnnotationsModel(QObject* parentObject)
   : Superclass(parentObject)
   , MissingColorIcon(":/pqWidgets/Icons/pqUnknownData16.png")
   , GlobalOpacity(1.0)
+  , SupportsReorder(false)
   , Internals(new pqInternals())
 {
 }
@@ -215,27 +234,51 @@ pqAnnotationsModel::~pqAnnotationsModel()
   this->Internals = nullptr;
 }
 
-/// Columns 2,3 are editable. 0,1 are not (since we show swatches). We
-/// hookup double-click event on the view to allow the user to edit the color.
+//-----------------------------------------------------------------------------
 Qt::ItemFlags pqAnnotationsModel::flags(const QModelIndex& idx) const
 {
-  return idx.column() > 1 ? this->Superclass::flags(idx) | Qt::ItemIsEditable
-                          : this->Superclass::flags(idx);
+  auto value = this->Superclass::flags(idx);
+  if (this->SupportsReorder)
+  {
+    value |= Qt::ItemIsDropEnabled;
+  }
+  if (idx.isValid())
+  {
+    value |= Qt::ItemIsDragEnabled;
+    switch (idx.column())
+    {
+      case VISIBILITY:
+        return value | Qt::ItemIsUserCheckable;
+      case VALUE:
+      case LABEL:
+        return value | Qt::ItemIsEditable;
+      default:
+        break;
+    }
+  }
+
+  return value;
 }
 
+//-----------------------------------------------------------------------------
 int pqAnnotationsModel::rowCount(const QModelIndex& prnt) const
 {
   Q_UNUSED(prnt);
-  return this->Internals->Items.size();
+  return static_cast<int>(this->Internals->Items.size());
 }
 
-int pqAnnotationsModel::columnCount(const QModelIndex& /*parent*/) const
+//-----------------------------------------------------------------------------
+int pqAnnotationsModel::columnCount(const QModelIndex& prnt) const
 {
-  return 4;
+  Q_UNUSED(prnt);
+  return this->columnCount();
 }
 
+//-----------------------------------------------------------------------------
 bool pqAnnotationsModel::setData(const QModelIndex& idx, const QVariant& value, int role)
 {
+  if (!idx.isValid())
+    return false;
   Q_UNUSED(role);
   assert(idx.row() < this->rowCount());
   assert(idx.column() >= 0 && idx.column() < this->columnCount(idx));
@@ -248,6 +291,7 @@ bool pqAnnotationsModel::setData(const QModelIndex& idx, const QVariant& value, 
   return false;
 }
 
+//-----------------------------------------------------------------------------
 QVariant pqAnnotationsModel::data(const QModelIndex& idx, int role) const
 {
   if (role == Qt::DecorationRole || role == Qt::DisplayRole)
@@ -257,9 +301,13 @@ QVariant pqAnnotationsModel::data(const QModelIndex& idx, int role) const
   else if (role == Qt::EditRole)
   {
     int col = idx.column();
-    if (col == 0 || col == 1)
+    if (col == COLOR)
     {
-      col += 4;
+      col = COLOR_DATA;
+    }
+    else if (col == OPACITY)
+    {
+      col = OPACITY_DATA;
     }
     return this->Internals->Items[idx.row()].data(col);
   }
@@ -267,45 +315,236 @@ QVariant pqAnnotationsModel::data(const QModelIndex& idx, int role) const
   {
     switch (idx.column())
     {
-      case 0:
-        return "Color";
-      case 1:
-        return "Opacity";
-      case 2:
-        return "Data Value";
-      case 3:
-        return "Annotation Text";
+      case COLOR:
+        return tr("Color");
+      case OPACITY:
+        return tr("Opacity");
+      case VALUE:
+      case LABEL:
+        return this->Internals->Items[idx.row()].data(idx.column());
+      default:
+        return QVariant();
     }
   }
+  else if (role == Qt::UserRole && idx.column() == VISIBILITY)
+  {
+    // hide only if domain says so.
+    bool res = true;
+    if (this->VisibilityDomain)
+    {
+      auto value = this->Internals->Items[idx.row()].Value;
+      unsigned int unused = 0;
+      res = this->VisibilityDomain->IsInDomain(value.toLocal8Bit().data(), unused) != 0;
+    }
+
+    return res ? "1" : "0";
+  }
+  else if (role == Qt::CheckStateRole && idx.column() == VISIBILITY)
+  {
+    return this->Internals->Items[idx.row()].Visibility;
+  }
+
   return QVariant();
 }
 
+//-----------------------------------------------------------------------------
 QVariant pqAnnotationsModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
   if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
   {
     switch (section)
     {
-      case 0:
+      case VISIBILITY:
         return "";
-      case 1:
+      case COLOR:
         return "";
-      case 2:
-        return "Value";
-      case 3:
-        return "Annotation";
+      case OPACITY:
+        return "";
+      case VALUE:
+        return tr("Value");
+      case LABEL:
+        return tr("Annotation");
     }
   }
-  if (orientation == Qt::Horizontal && role == Qt::DecorationRole && section == 1)
+  else if (orientation == Qt::Horizontal && role == Qt::DecorationRole && section == OPACITY)
   {
     return createOpacitySwatch(this->GlobalOpacity);
+  }
+  else if (orientation == Qt::Horizontal && role == Qt::CheckStateRole && section == VISIBILITY)
+  {
+    if (this->Internals->Items.size() == 0)
+    {
+      return Qt::Unchecked;
+    }
+    Qt::CheckState ret = this->Internals->Items[0].Visibility;
+    for (const auto item : this->Internals->Items)
+    {
+      if (item.Visibility != ret)
+      {
+        ret = Qt::PartiallyChecked;
+        break;
+      }
+    }
+    return ret;
   }
 
   return this->Superclass::headerData(section, orientation, role);
 }
 
-// Add a new annotation text-pair after the given index. Returns the inserted
-// index.
+//-----------------------------------------------------------------------------
+bool pqAnnotationsModel::setHeaderData(
+  int section, Qt::Orientation orientation, const QVariant& value, int role)
+{
+  if (orientation == Qt::Horizontal && role == Qt::CheckStateRole && section == VISIBILITY)
+  {
+    for (int row = 0; row < this->rowCount(); row++)
+    {
+      this->setData(this->index(row, VISIBILITY), value, role);
+    }
+
+    return true;
+  }
+
+  return this->Superclass::setHeaderData(section, orientation, value, role);
+}
+
+//--------- Drag-N-Drop support when enabled --------
+Qt::DropActions pqAnnotationsModel::supportedDropActions() const
+{
+  return this->SupportsReorder ? (Qt::CopyAction | Qt::MoveAction)
+                               : this->Superclass::supportedDropActions();
+}
+
+//-----------------------------------------------------------------------------
+QStringList pqAnnotationsModel::mimeTypes() const
+{
+  if (this->SupportsReorder)
+  {
+    QStringList types;
+    types << "application/paraview.series.list";
+    return types;
+  }
+
+  return this->Superclass::mimeTypes();
+}
+
+//-----------------------------------------------------------------------------
+QMimeData* pqAnnotationsModel::mimeData(const QModelIndexList& indexes) const
+{
+  if (!this->SupportsReorder)
+  {
+    return this->Superclass::mimeData(indexes);
+  }
+  QMimeData* mime_data = new QMimeData();
+  QByteArray encodedData;
+
+  QDataStream stream(&encodedData, QIODevice::WriteOnly);
+  QList<int> keys;
+  for (const QModelIndex& idx : indexes)
+  {
+    if (idx.isValid() && !keys.contains(idx.row()))
+    {
+      keys << idx.row();
+      stream << idx.row();
+    }
+  }
+
+  mime_data->setData("application/paraview.series.list", encodedData);
+  return mime_data;
+}
+
+//-----------------------------------------------------------------------------
+bool pqAnnotationsModel::dropMimeData(const QMimeData* mime_data, Qt::DropAction action, int row,
+  int column, const QModelIndex& parentIdx)
+{
+  if (!this->SupportsReorder)
+  {
+    return this->Superclass::dropMimeData(mime_data, action, row, column, parentIdx);
+  }
+  if (action == Qt::IgnoreAction)
+  {
+    return true;
+  }
+  if (!mime_data->hasFormat("application/paraview.series.list"))
+  {
+    return false;
+  }
+
+  int beginRow = -1;
+  if (row != -1)
+  {
+    beginRow = row;
+  }
+  else if (parentIdx.isValid())
+  {
+    beginRow = parentIdx.row();
+  }
+  else
+  {
+    beginRow = this->rowCount();
+  }
+  if (beginRow < 0)
+  {
+    return false;
+  }
+
+  QByteArray encodedData = mime_data->data("application/paraview.series.list");
+  QDataStream stream(&encodedData, QIODevice::ReadOnly);
+  QList<int> movingItems;
+  while (!stream.atEnd())
+  {
+    int value;
+    stream >> value;
+    movingItems << value;
+  }
+
+  // now re-order the item list.
+  std::vector<AnnotationItem> newItems;
+
+  // create list without the moving items
+  int realBeginRow = -1;
+  for (int cc = 0; cc < static_cast<int>(this->Internals->Items.size()); cc++)
+  {
+    if (cc == beginRow)
+    {
+      realBeginRow = static_cast<int>(newItems.size());
+    }
+    if (!movingItems.contains(cc))
+    {
+      newItems.push_back(this->Internals->Items[cc]);
+    }
+  }
+  if (realBeginRow == -1)
+  {
+    realBeginRow = static_cast<int>(newItems.size());
+  }
+
+  // insert moving items
+  newItems.reserve(this->Internals->Items.size());
+  auto beginIt = newItems.begin() + realBeginRow;
+  for (double item : movingItems)
+  {
+    newItems.insert(beginIt, this->Internals->Items[item]);
+    beginIt++;
+  }
+
+  // set new list
+  this->beginResetModel();
+  this->Internals->Items = newItems;
+
+  // reset color cache
+  this->Internals->Colors.clear();
+  for (const AnnotationItem& item : this->Internals->Items)
+  {
+    this->Internals->Colors.push_back(item.Color);
+  }
+  this->endResetModel();
+
+  emit this->dataChanged(
+    this->index(0, 0), this->index(this->rowCount() - 1, this->columnCount(parentIdx) - 1));
+  return true;
+}
+//-----------------------------------------------------------------------------
 QModelIndex pqAnnotationsModel::addAnnotation(const QModelIndex& after)
 {
   int row = after.isValid() ? after.row() : (this->rowCount(QModelIndex()) - 1);
@@ -316,44 +555,46 @@ QModelIndex pqAnnotationsModel::addAnnotation(const QModelIndex& after)
   auto it = this->Internals->Items.begin();
   this->Internals->Items.insert(it + row, AnnotationItem());
   emit this->endInsertRows();
-  if (this->Internals->Colors.size() > 0)
+  if (this->hasColors())
   {
     this->Internals->Items[row].setData(
-      0, this->Internals->Colors[row % this->Internals->Colors.size()]);
+      COLOR, this->Internals->Colors[row % this->Internals->Colors.size()]);
   }
-  this->Internals->Items[row].setData(1, this->globalOpacity());
+  this->Internals->Items[row].setData(OPACITY, this->globalOpacity());
   return this->index(row, 0);
 }
 
-// Remove the given annotation indexes. Returns item before or after the removed
-// item, if any.
+//-----------------------------------------------------------------------------
 QModelIndex pqAnnotationsModel::removeAnnotations(const QModelIndexList& toRemove)
 {
   std::set<int> rowsToRemove;
-  foreach (const QModelIndex& idx, toRemove)
+  for (const QModelIndex& idx : toRemove)
   {
     rowsToRemove.insert(idx.row());
   }
 
+  auto startItemIter = this->Internals->Items.begin();
   for (auto riter = rowsToRemove.rbegin(); riter != rowsToRemove.rend(); ++riter)
   {
     emit this->beginRemoveRows(QModelIndex(), *riter, *riter);
-    this->Internals->Items.remove(*riter);
+    this->Internals->Items.erase(startItemIter + *riter);
     emit this->endRemoveRows();
   }
 
-  if (rowsToRemove.size() > 0 && *rowsToRemove.begin() > this->Internals->Items.size())
+  if (rowsToRemove.size() > 0 &&
+    *rowsToRemove.begin() > static_cast<int>(this->Internals->Items.size()))
   {
     return this->index(*rowsToRemove.begin(), 0);
   }
 
   if (this->Internals->Items.size() > 0)
   {
-    return this->index(this->Internals->Items.size() - 1, 0);
+    return this->index(static_cast<int>(this->Internals->Items.size()) - 1, 0);
   }
   return QModelIndex();
 }
 
+//-----------------------------------------------------------------------------
 void pqAnnotationsModel::removeAllAnnotations()
 {
   emit this->beginResetModel();
@@ -361,7 +602,9 @@ void pqAnnotationsModel::removeAllAnnotations()
   emit this->endResetModel();
 }
 
-void pqAnnotationsModel::setAnnotations(const QVector<std::pair<QString, QString> >& newAnnotations)
+//-----------------------------------------------------------------------------
+void pqAnnotationsModel::setAnnotations(
+  const std::vector<std::pair<QString, QString> >& newAnnotations)
 {
   if (newAnnotations.size() == 0)
   {
@@ -369,8 +612,13 @@ void pqAnnotationsModel::setAnnotations(const QVector<std::pair<QString, QString
   }
   else
   {
-    int size = this->Internals->Items.size();
-    int annotationSize = newAnnotations.size();
+    int size = static_cast<int>(this->Internals->Items.size());
+    int annotationSize = static_cast<int>(newAnnotations.size());
+    if (annotationSize < size)
+    {
+      this->removeAllAnnotations();
+      size = 0;
+    }
     if (annotationSize > size)
     {
       // rows are added.
@@ -397,159 +645,260 @@ void pqAnnotationsModel::setAnnotations(const QVector<std::pair<QString, QString
         annotationFlag = true;
       }
 
-      if (this->Internals->Colors.size() > 0)
+      if (this->hasColors())
       {
         if (!this->Internals->Items[cc].Color.isValid())
         {
           // Copy color, using modulo if annotation are bigger than current number of colors
           // and color is not yet defined for this item
           this->Internals->Items[cc].setData(
-            0, this->Internals->Colors[cc % this->Internals->Colors.size()]);
+            COLOR, this->Internals->Colors[cc % this->Internals->Colors.size()]);
           colorFlag = true;
         }
         // Initialize Opacities if not defined
         if (this->Internals->Items[cc].Opacity == -1)
         {
-          this->Internals->Items[cc].setData(1, 1.0);
+          this->Internals->Items[cc].setData(OPACITY, 1.0);
           opacityFlag = true;
         }
       }
     }
     if (colorFlag)
     {
-      emit this->dataChanged(this->index(0, 0), this->index(this->Internals->Items.size() - 1, 0));
+      emit this->dataChanged(this->index(0, COLOR),
+        this->index(static_cast<int>(this->Internals->Items.size()) - 1, COLOR));
     }
     if (opacityFlag)
     {
-      emit this->dataChanged(this->index(0, 1), this->index(this->Internals->Items.size() - 1, 1));
+      emit this->dataChanged(this->index(0, OPACITY),
+        this->index(static_cast<int>(this->Internals->Items.size()) - 1, OPACITY));
     }
     if (valueFlag)
     {
-      emit this->dataChanged(this->index(0, 2), this->index(this->Internals->Items.size() - 1, 2));
+      emit this->dataChanged(this->index(0, VALUE),
+        this->index(static_cast<int>(this->Internals->Items.size()) - 1, VALUE));
     }
     if (annotationFlag)
     {
-      emit this->dataChanged(this->index(0, 3), this->index(this->Internals->Items.size() - 1, 3));
+      emit this->dataChanged(this->index(0, LABEL),
+        this->index(static_cast<int>(this->Internals->Items.size()) - 1, LABEL));
     }
   }
 }
 
-QVector<std::pair<QString, QString> > pqAnnotationsModel::annotations() const
+//-----------------------------------------------------------------------------
+std::vector<std::pair<QString, QString> > pqAnnotationsModel::annotations() const
 {
-  QVector<std::pair<QString, QString> > theAnnotations(this->Internals->Items.size());
-  int cc = 0;
-  foreach (const AnnotationItem& item, this->Internals->Items)
+  std::vector<std::pair<QString, QString> > strAnnotations;
+  strAnnotations.reserve(this->Internals->Items.size());
+  for (const AnnotationItem& item : this->Internals->Items)
   {
-    theAnnotations[cc] = std::make_pair(item.Value, item.Annotation);
-    cc++;
+    strAnnotations.push_back(std::make_pair(item.Value, item.Annotation));
   }
-  return theAnnotations;
+  return strAnnotations;
 }
 
-void pqAnnotationsModel::setIndexedColors(const QVector<QColor>& newColors)
+//-----------------------------------------------------------------------------
+void pqAnnotationsModel::setVisibilities(
+  const std::vector<std::pair<QString, int> >& newVisibilities)
+{
+  bool visibilityFlag = false;
+
+  for (auto vis : newVisibilities)
+  {
+    auto name = vis.first;
+    auto foundItem = std::find_if(this->Internals->Items.begin(), this->Internals->Items.end(),
+      [name](const AnnotationItem& item) { return name == item.Value; });
+    if (foundItem == this->Internals->Items.end())
+    {
+      this->beginResetModel();
+      foundItem = this->Internals->Items.emplace(this->Internals->Items.end());
+      foundItem->setData(VALUE, name);
+      this->endResetModel();
+    }
+    if (foundItem->setData(VISIBILITY, vis.second))
+    {
+      visibilityFlag = true;
+    }
+  }
+
+  if (visibilityFlag)
+  {
+    emit this->dataChanged(this->index(0, VISIBILITY),
+      this->index(static_cast<int>(this->Internals->Items.size()) - 1, VISIBILITY));
+  }
+}
+
+//-----------------------------------------------------------------------------
+std::vector<std::pair<QString, int> > pqAnnotationsModel::visibilities() const
+{
+  std::vector<std::pair<QString, int> > visibilities;
+  for (const AnnotationItem& item : this->Internals->Items)
+  {
+    visibilities.push_back(std::make_pair(item.Value, item.Visibility));
+  }
+
+  return visibilities;
+}
+
+//-----------------------------------------------------------------------------
+void pqAnnotationsModel::setIndexedColors(const std::vector<QColor>& newColors)
 {
   this->Internals->Colors = newColors;
-  int colorSize = newColors.size();
+  auto colorSize = newColors.size();
 
   // now check for data changes.
   if (colorSize > 0)
   {
     bool colorFlag = false;
-    for (int cc = 0; cc < this->Internals->Items.size(); cc++)
+    for (std::size_t cc = 0; cc < this->Internals->Items.size(); cc++)
     {
       if (!this->Internals->Items[cc].Color.isValid() ||
         this->Internals->Items[cc].Color != newColors[cc % colorSize])
       {
         // Add color with a modulo so all values have colors
-        this->Internals->Items[cc].setData(0, newColors[cc % colorSize]);
+        this->Internals->Items[cc].setData(COLOR, newColors[cc % colorSize]);
         colorFlag = true;
       }
     }
     if (colorFlag)
     {
-      emit this->dataChanged(this->index(0, 0), this->index(this->Internals->Items.size() - 1, 0));
+      emit this->dataChanged(this->index(0, COLOR),
+        this->index(static_cast<int>(this->Internals->Items.size()) - 1, COLOR));
     }
   }
 }
 
-QVector<QColor> pqAnnotationsModel::indexedColors() const
+//-----------------------------------------------------------------------------
+std::vector<QColor> pqAnnotationsModel::indexedColors() const
 {
-  QVector<QColor> icolors(this->Internals->Items.size());
-  int cc = 0;
-  foreach (const AnnotationItem& item, this->Internals->Items)
+  std::vector<QColor> icolors;
+  icolors.reserve(this->Internals->Items.size());
+  for (const AnnotationItem& item : this->Internals->Items)
   {
-    icolors[cc] = item.Color;
-    cc++;
+    icolors.push_back(item.Color);
   }
   return icolors;
 }
 
+//-----------------------------------------------------------------------------
 bool pqAnnotationsModel::hasColors() const
 {
   return this->Internals->Colors.size() != 0;
 }
 
-void pqAnnotationsModel::setIndexedOpacities(const QVector<double>& newOpacities)
+//-----------------------------------------------------------------------------
+void pqAnnotationsModel::setIndexedOpacities(const std::vector<double>& newOpacities)
 {
   bool opacityFlag = false;
-  for (int cc = 0; cc < this->Internals->Items.size() && cc < newOpacities.size(); cc++)
+  for (std::size_t cc = 0; cc < this->Internals->Items.size() && cc < newOpacities.size(); cc++)
   {
     if (this->Internals->Items[cc].Opacity == -1 ||
       this->Internals->Items[cc].Opacity != newOpacities[cc])
     {
-      this->Internals->Items[cc].setData(1, newOpacities[cc]);
+      this->Internals->Items[cc].setData(OPACITY, newOpacities[cc]);
       opacityFlag = true;
     }
   }
   if (opacityFlag)
   {
-    emit this->dataChanged(this->index(0, 1), this->index(this->Internals->Items.size() - 1, 1));
+    emit this->dataChanged(this->index(0, OPACITY),
+      this->index(static_cast<int>(this->Internals->Items.size()) - 1, OPACITY));
   }
 }
 
-QVector<double> pqAnnotationsModel::indexedOpacities() const
+//-----------------------------------------------------------------------------
+std::vector<double> pqAnnotationsModel::indexedOpacities() const
 {
-  QVector<double> opacities(this->Internals->Items.size());
-  int cc = 0;
-  foreach (const AnnotationItem& item, this->Internals->Items)
+  std::vector<double> opacities;
+  opacities.reserve(this->Internals->Items.size());
+  for (const AnnotationItem& item : this->Internals->Items)
   {
-    opacities[cc] = item.Opacity;
-    cc++;
+    opacities.push_back(item.Opacity);
   }
   return opacities;
 }
 
+//-----------------------------------------------------------------------------
 void pqAnnotationsModel::setGlobalOpacity(double opacity)
 {
   this->GlobalOpacity = opacity;
   bool opacityFlag = false;
-  for (int cc = 0; cc < this->Internals->Items.size(); cc++)
+  for (std::size_t cc = 0; cc < this->Internals->Items.size(); cc++)
   {
     if (this->Internals->Items[cc].Opacity == -1 || this->Internals->Items[cc].Opacity != opacity)
     {
-      this->Internals->Items[cc].setData(1, opacity);
+      this->Internals->Items[cc].setData(OPACITY, opacity);
       opacityFlag = true;
     }
   }
   if (opacityFlag)
   {
-    emit this->dataChanged(this->index(0, 1), this->index(this->Internals->Items.size() - 1, 1));
+    emit this->dataChanged(this->index(0, OPACITY),
+      this->index(static_cast<int>(this->Internals->Items.size()) - 1, OPACITY));
   }
 }
 
+//-----------------------------------------------------------------------------
 void pqAnnotationsModel::setSelectedOpacity(QList<int> rows, double opacity)
 {
   bool opacityFlag = false;
-  foreach (int cc, rows)
+  for (int cc : rows)
   {
     if (this->Internals->Items[cc].Opacity == -1 || this->Internals->Items[cc].Opacity != opacity)
     {
-      this->Internals->Items[cc].setData(1, opacity);
+      this->Internals->Items[cc].setData(OPACITY, opacity);
       opacityFlag = true;
     }
   }
   if (opacityFlag)
   {
-    emit this->dataChanged(this->index(0, 1), this->index(this->Internals->Items.size() - 1, 1));
+    emit this->dataChanged(this->index(0, OPACITY),
+      this->index(static_cast<int>(this->Internals->Items.size()) - 1, OPACITY));
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqAnnotationsModel::setSupportsReorder(bool reorder)
+{
+  this->SupportsReorder = reorder;
+}
+
+//-----------------------------------------------------------------------------
+bool pqAnnotationsModel::supportsReorder() const
+{
+  return this->SupportsReorder;
+}
+
+//-----------------------------------------------------------------------------
+void pqAnnotationsModel::reorder(std::vector<int> oldOrder)
+{
+  if (oldOrder.size() != this->Internals->Items.size())
+  {
+    return;
+  }
+
+  std::vector<AnnotationItem> newItems;
+  for (auto previousIndex : oldOrder)
+  {
+    if (previousIndex >= 0 && previousIndex < static_cast<int>(this->Internals->Items.size()))
+    {
+      newItems.push_back(this->Internals->Items[previousIndex]);
+    }
+  }
+
+  assert(oldOrder.size() == this->Internals->Items.size());
+
+  this->beginResetModel();
+  this->Internals->Items = newItems;
+  this->endResetModel();
+  this->setIndexedColors(this->Internals->Colors);
+  emit this->dataChanged(
+    this->index(0, 0), this->index(this->rowCount() - 1, this->columnCount() - 1));
+}
+
+//-----------------------------------------------------------------------------
+void pqAnnotationsModel::setVisibilityDomain(vtkSMStringListDomain* domain)
+{
+  this->VisibilityDomain = domain;
 }

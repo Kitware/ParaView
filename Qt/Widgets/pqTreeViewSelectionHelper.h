@@ -33,19 +33,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqTreeViewSelectionHelper_h
 
 #include "pqWidgetsModule.h"
+#include <QAbstractItemView>
 #include <QItemSelection>
 #include <QObject>
-#include <QTreeView>
 
 /**
  * @class pqTreeViewSelectionHelper
- * @brief helper class to add selection/sort/filter context menu to QTreeView.
+ * @brief helper class to add selection/sort/filter context menu to QAbstractItemView.
  *
- * pqTreeViewSelectionHelper is used to add a custom context menu to QTreeView
+ * pqTreeViewSelectionHelper is used to add a custom context menu to QAbstractItemView
  * to do common actions such as checking/unchecking highlighted items,
  * sorting, and filtering.
  *
- * If the QTreeView has a pqHeaderView as the header then this class calls
+ * If the QAbstractItemView has a pqHeaderView as the header then this class calls
  * `pqHeaderView::setCustomIndicatorIcon` and also shows the context menu when the
  * custom indicator icon is clicked in the header.
  *
@@ -68,7 +68,7 @@ class PQWIDGETS_EXPORT pqTreeViewSelectionHelper : public QObject
   Q_PROPERTY(bool filterable READ isFilterable WRITE setFilterable);
 
 public:
-  pqTreeViewSelectionHelper(QTreeView* view);
+  pqTreeViewSelectionHelper(QAbstractItemView* view, bool customIndicator = true);
   ~pqTreeViewSelectionHelper() override;
 
   //@{
@@ -87,7 +87,7 @@ private:
   Q_DISABLE_COPY(pqTreeViewSelectionHelper);
 
   void setSelectedItemsCheckState(Qt::CheckState state);
-  QTreeView* TreeView;
+  QAbstractItemView* TreeView;
   bool Filterable;
 };
 

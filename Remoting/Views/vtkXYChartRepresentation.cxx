@@ -15,9 +15,6 @@
 #include "vtkXYChartRepresentation.h"
 #include "vtkXYChartRepresentationInternals.h"
 
-#include "vtkCommand.h"
-#include "vtkCompositeDataIterator.h"
-#include "vtkContextView.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkInformation.h"
 #include "vtkMultiBlockDataSet.h"
@@ -29,10 +26,6 @@
 #include "vtkSmartPointer.h"
 #include "vtkSortFieldData.h"
 #include "vtkTableAlgorithm.h"
-#include "vtkWeakPointer.h"
-
-#include <map>
-#include <string>
 
 class vtkXYChartRepresentation::SortTableFilter : public vtkTableAlgorithm
 {

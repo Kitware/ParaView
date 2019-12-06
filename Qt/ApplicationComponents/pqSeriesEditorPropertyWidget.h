@@ -55,10 +55,16 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSeriesEditorPropertyWidget : public pqPro
       seriesVisibilityChanged)
 
   Q_PROPERTY(
+    QList<QVariant> presetLabel READ presetLabel WRITE setPresetLabel NOTIFY presetLabelChanged)
+
+  Q_PROPERTY(
     QList<QVariant> seriesLabel READ seriesLabel WRITE setSeriesLabel NOTIFY seriesLabelChanged)
 
   Q_PROPERTY(
     QList<QVariant> seriesColor READ seriesColor WRITE setSeriesColor NOTIFY seriesColorChanged)
+
+  Q_PROPERTY(
+    QList<QVariant> presetColor READ presetColor WRITE setPresetColor NOTIFY presetColorChanged)
 
   Q_PROPERTY(QList<QVariant> seriesLineThickness READ seriesLineThickness WRITE
       setSeriesLineThickness NOTIFY seriesLineThicknessChanged)
@@ -97,6 +103,8 @@ public:
   void setSeriesColor(const QList<QVariant>&);
   //@}
 
+  QList<QVariant> presetColor() const;
+  void setPresetColor(const QList<QVariant>&);
   //@{
   /**
    * Get/Set the label for each of the series.
@@ -104,6 +112,9 @@ public:
   QList<QVariant> seriesLabel() const;
   void setSeriesLabel(const QList<QVariant>&);
   //@}
+
+  QList<QVariant> presetLabel() const;
+  void setPresetLabel(const QList<QVariant>&);
 
   //@{
   /**
@@ -160,12 +171,16 @@ signals:
   void seriesLabelChanged();
   //@}
 
+  void presetLabelChanged();
+
   //@{
   /**
    * Fired when the series colors change.
    */
   void seriesColorChanged();
   //@}
+
+  void presetColorChanged();
 
   //@{
   /**
@@ -205,22 +220,6 @@ signals:
 private slots:
   //@{
   /**
-   * called whenever the internal model's data changes. We fire
-   * seriesVisibilityChanged() signals appropriately.
-   */
-  void onDataChanged(const QModelIndex& topleft, const QModelIndex& btmright);
-  //@}
-
-  //@{
-  /**
-   * called when user double-clicks on an item. If the double click is on the
-   * 1st column, we show the color editor to allow editing of the series color.
-   */
-  void onDoubleClicked(const QModelIndex& idx);
-  //@}
-
-  //@{
-  /**
    * update all series-properties widgets using the "current" series.
    */
   void refreshPropertiesWidgets();
@@ -239,6 +238,11 @@ private slots:
    */
   void domainModified(vtkObject* sender);
   //@}
+
+  /**
+   * called when the color preset is modified.
+   */
+  void onPresetChanged(const QString& name);
 
 private:
   Q_DISABLE_COPY(pqSeriesEditorPropertyWidget)

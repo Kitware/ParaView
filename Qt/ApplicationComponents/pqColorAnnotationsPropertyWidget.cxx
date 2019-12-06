@@ -45,7 +45,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMVectorProperty.h"
 
-#include <QItemSelection>
 #include <QMessageBox>
 #include <QPointer>
 #include <QString>
@@ -113,9 +112,16 @@ pqColorAnnotationsPropertyWidget::pqColorAnnotationsPropertyWidget(
   : Superclass(smproxy, parentObject)
   , Internals(new pqInternals(this))
 {
-  Q_UNUSED(smgroup);
   this->addPropertyLink(
     this, "annotations", SIGNAL(annotationsChanged()), smproxy->GetProperty("Annotations"));
+
+  auto presetProp = this->proxy()->GetProperty("LastPresetName");
+  const char* name = "KAAMS";
+  if (presetProp)
+  {
+    name = vtkSMPropertyHelper(presetProp).GetAsString();
+  }
+  this->Internals->AnnotationsWidget->applyPreset(name);
 
   this->addPropertyLink(
     this, "indexedColors", SIGNAL(indexedColorsChanged()), smproxy->GetProperty("IndexedColors"));
@@ -138,8 +144,6 @@ pqColorAnnotationsPropertyWidget::pqColorAnnotationsPropertyWidget(
     // Add decorator so the widget can be marked as advanced when IndexedLookup
     // is OFF.
     this->addDecorator(this->Internals->Decorator);
-
-    this->Internals->AnnotationsWidget->applyPreset("KAAMS");
   }
 
   if (smgroup->GetProperty("EnableOpacityMapping"))
@@ -162,6 +166,8 @@ pqColorAnnotationsPropertyWidget::pqColorAnnotationsPropertyWidget(
     SIGNAL(annotationsChanged()));
   this->connect(this->Internals->AnnotationsWidget, SIGNAL(opacityMappingChanged()), this,
     SIGNAL(opacityMappingChanged()));
+
+  this->Internals->AnnotationsWidget->setColumnVisibility(pqAnnotationsModel::VISIBILITY, false);
 }
 
 //-----------------------------------------------------------------------------

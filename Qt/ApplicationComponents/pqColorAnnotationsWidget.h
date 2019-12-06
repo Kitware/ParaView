@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationComponentsModule.h"
 
-#include "pqAnnotationsModel.h"
+#include "pqAnnotationsModel.h" // for pqAnnotationsModel::ColumnRoles
 
 #include <QWidget>
 
@@ -86,6 +86,14 @@ public:
 
   //@{
   /**
+   * Get/Set the indexed visibilities.
+   */
+  QList<QVariant> visibilities() const;
+  void setVisibilities(const QList<QVariant>&);
+  //@}
+
+  //@{
+  /**
    * Get/Set the opacity mapping status.
    */
   QVariant opacityMapping() const;
@@ -109,9 +117,10 @@ public:
   bool addActiveAnnotations(bool force);
 
   /**
-   * Return the index of the current selected row of the underlying table.
+   * Return current model index from table.
+   * Uses QSortFilterProxyModel if exists.
    */
-  int currentRow();
+  QModelIndex currentIndex();
 
   /**
    * Return the selected indexes.
@@ -122,21 +131,48 @@ public:
    * Set the annotionModel on the underlying table.
    */
   void setAnnotationsModel(pqAnnotationsModel* model);
-
+  /**
+   * Set reordering support on the table.
+   */
+  void setSupportsReorder(bool reorder);
   /**
    * Show/Hide relevant widgets.
    * If allow is false, hide the buttons that add/remove lines.
    */
   void allowsUserDefinedValues(bool allow);
-
+  /**
+   * Show/Hide relevant widgets.
+   * If enable is false, hide the buttons that save / load presets.
+   */
+  void enablePresets(bool enable);
+  /**
+   * Show/Hide the Visibility column.
+   */
+  void supportsVisibilityCheck(bool val);
   /**
    * Show/Hide the EnableOpacityMapping button.
    */
   void supportsOpacityMapping(bool val);
 
+  /**
+   * Show/Hide given column.
+   */
+  void setColumnVisibility(pqAnnotationsModel::ColumnRoles col, bool visible);
+
+  /**
+   * Get the name of the current preset in use.
+   */
   const char* currentPresetName();
 
-  void setColumnVisibility(pqAnnotationsModel::ColumnRoles col, bool visible);
+  /**
+   * Get the current annotation value.
+   */
+  QString currentAnnotationValue();
+
+  /**
+   * Get the selected annotations values.
+   */
+  QStringList selectedAnnotations();
 
 signals:
   /**
@@ -153,6 +189,11 @@ signals:
    * Fired when the indexed opacities are changed.
    */
   void indexedOpacitiesChanged();
+
+  /**
+   * Fired when the visibilities are changed.
+   */
+  void visibilitiesChanged();
 
   /**
    * Fired when the opacity mapping status is changed.

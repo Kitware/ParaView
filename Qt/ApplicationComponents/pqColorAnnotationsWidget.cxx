@@ -42,10 +42,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHeaderView.h"
 #include "pqPropertiesPanel.h"
 #include "pqScalarBarVisibilityReaction.h"
+#include "pqTreeViewSelectionHelper.h"
 
 #include "vtkAbstractArray.h"
 #include "vtkCollection.h"
-#include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkNumberToString.h"
 #include "vtkPVArrayInformation.h"
@@ -67,11 +67,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include <QMenu>
 #include <QMessageBox>
-#include <QPointer>
 #include <QSortFilterProxyModel>
 #include <QString>
 #include <QTextStream>
 
+#include <cassert>
 #include <set>
 #include <sstream>
 #include <vector>
@@ -86,9 +86,9 @@ namespace
 // annotations list, then they are added to the end.
 // Arguments are vectors of pairs where the pair.first is the annotated value
 // while the pair.second is the label/text for the value.
-QVector<std::pair<QString, QString> > MergeAnnotations(
-  const QVector<std::pair<QString, QString> >& current_pairs,
-  const QVector<std::pair<QString, QString> >& new_pairs)
+std::vector<std::pair<QString, QString> > MergeAnnotations(
+  const std::vector<std::pair<QString, QString> >& current_pairs,
+  const std::vector<std::pair<QString, QString> >& new_pairs)
 {
   QMap<QString, QString> old_values;
   for (const auto& pair : current_pairs)
@@ -99,7 +99,7 @@ QVector<std::pair<QString, QString> > MergeAnnotations(
   // Subset candidate annotations to only those not in existing annotations.
   // At the same time, update old_values map to have better annotation
   // text/labels, if present in the new values.
-  QVector<std::pair<QString, QString> > real_new_pairs;
+  std::vector<std::pair<QString, QString> > real_new_pairs;
   for (const auto& pair : new_pairs)
   {
     auto iter = old_values.find(pair.first);
@@ -116,7 +116,7 @@ QVector<std::pair<QString, QString> > MergeAnnotations(
 
   // Iterate over existing annotations, backfilling annotation texts/labels
   // from the new_pairs, if old texts were empty.
-  QVector<std::pair<QString, QString> > merged_pairs;
+  std::vector<std::pair<QString, QString> > merged_pairs;
   for (const auto& pair : current_pairs)
   {
     // using old_values to get updated annotation texts, if any.
@@ -189,11 +189,13 @@ public:
   vtkSmartPointer<vtkSMTransferFunctionProxy> LookupTableProxy;
   vtkStdString CurrentPresetName;
 
+  void SetCurrentPresetName(std::string newName) { this->CurrentPresetName = newName; }
+
   pqInternals(pqColorAnnotationsWidget* self)
     : TempAction(new QAction(self))
     , ChoosePresetReaction(new pqChooseColorPresetReaction(this->TempAction.data(), false))
   {
-    this->CurrentPresetName = "";
+    this->SetCurrentPresetName("");
     this->Ui.setupUi(self);
     this->Ui.gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
     this->Ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
@@ -230,7 +232,7 @@ public:
 //-----------------------------------------------------------------------------
 bool pqColorAnnotationsWidget::pqInternals::updateAnnotations(vtkAbstractArray* values, bool extend)
 {
-  QVector<std::pair<QString, QString> > candidate_tuples;
+  std::vector<std::pair<QString, QString> > candidate_tuples;
   for (vtkIdType idx = 0; idx < values->GetNumberOfTuples(); idx++)
   {
     const auto val = values->GetVariantValue(idx);
@@ -283,7 +285,8 @@ pqColorAnnotationsWidget::pqColorAnnotationsWidget(QWidget* parentObject)
     SLOT(addActiveAnnotationsFromVisibleSources()));
   QObject::connect(ui.Remove, SIGNAL(clicked()), this, SLOT(removeAnnotation()));
   QObject::connect(ui.DeleteAll, SIGNAL(clicked()), this, SLOT(removeAllAnnotations()));
-  QObject::connect(ui.ChoosePreset, SIGNAL(clicked()), this, SLOT(choosePreset()));
+  QObject::connect(ui.ChoosePreset, &QToolButton::clicked, this,
+    [&]() { choosePreset(this->Internals->CurrentPresetName.c_str()); });
   QObject::connect(
     ui.SaveAsNewPreset, &QToolButton::clicked, this, [&]() { this->saveAsNewPreset(); });
   QObject::connect(ui.SaveAsPreset, &QToolButton::clicked, this,
@@ -311,6 +314,8 @@ pqColorAnnotationsWidget::pqColorAnnotationsWidget(QWidget* parentObject)
   this->connect(ui.EnableOpacityMapping, SIGNAL(clicked()), SIGNAL(opacityMappingChanged()));
 
   this->updateOpacityColumnState();
+
+  this->setSupportsReorder(false);
 
   QSortFilterProxyModel* proxyModel = new QSortFilterProxyModel(this);
   proxyModel->setSourceModel(this->Internals->Model);
@@ -345,7 +350,7 @@ void pqColorAnnotationsWidget::setLookupTableProxy(vtkSMProxy* proxy)
 //-----------------------------------------------------------------------------
 void pqColorAnnotationsWidget::applyPreset(const char* presetName)
 {
-  vtkNew<vtkSMTransferFunctionPresets> presets;
+  auto presets = vtkSMTransferFunctionPresets::GetInstance();
   const Json::Value& preset = presets->GetFirstPresetWithName(presetName);
   const Json::Value& indexedColors = preset["IndexedColors"];
   if (indexedColors.isNull() || !indexedColors.isArray() || (indexedColors.size() % 3) != 0 ||
@@ -359,12 +364,13 @@ void pqColorAnnotationsWidget::applyPreset(const char* presetName)
   }
   else
   {
-    this->Internals->CurrentPresetName = vtkStdString(presetName);
+    this->Internals->SetCurrentPresetName(presetName);
     QList<QVariant> defaultPresetVariant;
     for (Json::ArrayIndex cc = 0; cc < indexedColors.size(); cc++)
     {
       defaultPresetVariant.append(indexedColors[cc].asDouble());
     }
+
     this->setIndexedColors(defaultPresetVariant);
   }
 }
@@ -389,6 +395,10 @@ void pqColorAnnotationsWidget::updateOpacityColumnState()
 void pqColorAnnotationsWidget::onDataChanged(
   const QModelIndex& topleft, const QModelIndex& btmright)
 {
+  if (topleft.column() <= pqAnnotationsModel::VISIBILITY)
+  {
+    emit this->visibilitiesChanged();
+  }
   if (topleft.column() == pqAnnotationsModel::COLOR)
   {
     emit this->indexedColorsChanged();
@@ -433,8 +443,12 @@ void pqColorAnnotationsWidget::execGlobalOpacityDialog()
 }
 
 //-----------------------------------------------------------------------------
-void pqColorAnnotationsWidget::onDoubleClicked(const QModelIndex& idx)
+void pqColorAnnotationsWidget::onDoubleClicked(const QModelIndex& index)
 {
+  auto model = this->Internals->Ui.AnnotationsTable->model();
+  auto proxyModel = dynamic_cast<QSortFilterProxyModel*>(model);
+  auto idx = proxyModel ? proxyModel->mapToSource(index) : index;
+
   if (idx.column() == pqAnnotationsModel::COLOR)
   {
     QColor color = this->Internals->Model->data(idx, Qt::EditRole).value<QColor>();
@@ -476,7 +490,7 @@ QList<QVariant> pqColorAnnotationsWidget::annotations() const
 //-----------------------------------------------------------------------------
 void pqColorAnnotationsWidget::setAnnotations(const QList<QVariant>& value)
 {
-  QVector<std::pair<QString, QString> > annotationsData;
+  std::vector<std::pair<QString, QString> > annotationsData;
   annotationsData.reserve(value.size() / 2);
 
   for (int cc = 0; (cc + 1) < value.size(); cc += 2)
@@ -493,7 +507,7 @@ void pqColorAnnotationsWidget::setAnnotations(const QList<QVariant>& value)
 QList<QVariant> pqColorAnnotationsWidget::indexedColors() const
 {
   QList<QVariant> reply;
-  QVector<QColor> colors = this->Internals->Model->indexedColors();
+  std::vector<QColor> colors = this->Internals->Model->indexedColors();
   for (const QColor& color : colors)
   {
     reply.push_back(color.redF());
@@ -507,7 +521,7 @@ QList<QVariant> pqColorAnnotationsWidget::indexedColors() const
 void pqColorAnnotationsWidget::setIndexedColors(const QList<QVariant>& value)
 {
   int nbEntry = value.size() / 3;
-  QVector<QColor> colors;
+  std::vector<QColor> colors;
   colors.resize(nbEntry);
 
   for (int cc = 0; cc < nbEntry; cc++)
@@ -523,10 +537,42 @@ void pqColorAnnotationsWidget::setIndexedColors(const QList<QVariant>& value)
 }
 
 //-----------------------------------------------------------------------------
+QList<QVariant> pqColorAnnotationsWidget::visibilities() const
+{
+  QList<QVariant> reply;
+  auto visibilities = this->Internals->Model->visibilities();
+  std::sort(visibilities.begin(), visibilities.end(),
+    [](std::pair<QString, int> a, std::pair<QString, int> b) {
+      return a.first.compare(b.first, Qt::CaseInsensitive) < 0;
+    });
+  for (const auto& vis : visibilities)
+  {
+    reply.push_back(vis.first);
+    reply.push_back(vis.second == Qt::Checked ? "1" : "0");
+  }
+  return reply;
+}
+
+//-----------------------------------------------------------------------------
+void pqColorAnnotationsWidget::setVisibilities(const QList<QVariant>& values)
+{
+  std::vector<std::pair<QString, int> > visibilities;
+
+  for (int cc = 0; (cc + 1) < values.size(); cc += 2)
+  {
+    visibilities.push_back(std::make_pair(
+      values[cc].toString(), values[cc + 1].toString() == "1" ? Qt::Checked : Qt::Unchecked));
+  }
+
+  this->Internals->Model->setVisibilities(visibilities);
+  emit this->visibilitiesChanged();
+}
+
+//-----------------------------------------------------------------------------
 QList<QVariant> pqColorAnnotationsWidget::indexedOpacities() const
 {
   QList<QVariant> reply;
-  QVector<double> opacities = this->Internals->Model->indexedOpacities();
+  std::vector<double> opacities = this->Internals->Model->indexedOpacities();
   for (const auto& opac : opacities)
   {
     reply.push_back(opac);
@@ -537,7 +583,7 @@ QList<QVariant> pqColorAnnotationsWidget::indexedOpacities() const
 //-----------------------------------------------------------------------------
 void pqColorAnnotationsWidget::setIndexedOpacities(const QList<QVariant>& values)
 {
-  QVector<double> opacities;
+  std::vector<double> opacities;
   opacities.reserve(values.size());
   for (const auto& val : values)
   {
@@ -839,10 +885,7 @@ void pqColorAnnotationsWidget::saveAsNewPreset()
   auto name =
     this->Internals->Model->headerData(pqAnnotationsModel::LABEL, Qt::Horizontal, Qt::DisplayRole)
       .toString();
-  ui.saveAnnotations->setText(QString("Save %1").arg(name));
-  // ui.saveAnnotations->setEnabled(
-  //   vtkSMPropertyHelper(this->Internals->LookupTableProxy, "Annotations", true)
-  //     .GetNumberOfElements() > 0);
+  ui.saveAnnotations->setText(QString("Save %1s").arg(name));
 
   // For now, let's not provide an option to not save colors. We'll need to fix
   // the pqPresetToPixmap to support rendering only opacities.
@@ -867,6 +910,12 @@ void pqColorAnnotationsWidget::saveAsPreset(
   Json::Value cpreset =
     vtkSMTransferFunctionProxy::GetStateAsPreset(this->Internals->LookupTableProxy);
 
+  if (!cpreset["IndexedColors"].size())
+  {
+    qWarning("Cannot save an empty preset");
+    return;
+  }
+
   if (removeAnnotations)
   {
     cpreset.removeMember("Annotations");
@@ -878,13 +927,14 @@ void pqColorAnnotationsWidget::saveAsPreset(
     // This scoping is necessary to ensure that the vtkSMTransferFunctionPresets
     // saves the new preset to the "settings" before the choosePreset dialog is
     // shown.
-    vtkNew<vtkSMTransferFunctionPresets> presets;
+    auto presets = vtkSMTransferFunctionPresets::GetInstance();
     if (!allowOverride || !presets->SetPreset(presetName, cpreset))
     {
       presetName = presets->AddUniquePreset(cpreset, presetName.c_str());
     }
   }
 
+  this->applyPreset(presetName.c_str());
   this->onPresetApplied(QString(presetName.c_str()));
   this->choosePreset(presetName);
 }
@@ -903,15 +953,42 @@ void pqColorAnnotationsWidget::customMenuRequested(QPoint pos)
 }
 
 //-----------------------------------------------------------------------------
-int pqColorAnnotationsWidget::currentRow()
+QModelIndex pqColorAnnotationsWidget::currentIndex()
 {
   auto table = this->Internals->Ui.AnnotationsTable;
   auto idx = table->currentIndex();
-  // when clicking outside the table, there is still a `currentIndex` but only on one cell.
-  // Check that a whole row is selected
+
+  const auto proxyModel = qobject_cast<const QSortFilterProxyModel*>(this->Internals->Model);
+  idx = proxyModel ? proxyModel->mapToSource(idx) : idx;
+
   return idx.isValid() && table->selectionModel()->isRowSelected(idx.row(), idx.parent())
-    ? idx.row()
-    : -1;
+    ? idx
+    : QModelIndex();
+}
+
+//-----------------------------------------------------------------------------
+QString pqColorAnnotationsWidget::currentAnnotationValue()
+{
+  auto idx = this->currentIndex();
+  QModelIndex valueIdx = idx.sibling(idx.row(), pqAnnotationsModel::VALUE);
+  auto value = valueIdx.data();
+  return value.toString();
+}
+
+//-----------------------------------------------------------------------------
+QStringList pqColorAnnotationsWidget::selectedAnnotations()
+{
+  auto selection = this->selectedIndexes();
+  QStringList selectedAnnotations;
+  for (auto idx : selection)
+  {
+    QModelIndex valueIdx = idx.sibling(idx.row(), pqAnnotationsModel::VALUE);
+    selectedAnnotations << valueIdx.data().toString();
+  }
+
+  selectedAnnotations.removeDuplicates();
+
+  return selectedAnnotations;
 }
 
 //-----------------------------------------------------------------------------
@@ -927,8 +1004,18 @@ void pqColorAnnotationsWidget::setAnnotationsModel(pqAnnotationsModel* model)
   {
     delete this->Internals->Model;
   }
+
+  auto previousModel = this->Internals->Ui.AnnotationsTable->model();
+  auto proxyModel = dynamic_cast<QSortFilterProxyModel*>(previousModel);
   this->Internals->Model = model;
-  this->Internals->Ui.AnnotationsTable->setModel(this->Internals->Model);
+  if (proxyModel)
+  {
+    proxyModel->setSourceModel(this->Internals->Model);
+  }
+  else
+  {
+    this->Internals->Ui.AnnotationsTable->setModel(this->Internals->Model);
+  }
 
   QObject::connect(this->Internals->Model,
     SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
@@ -937,6 +1024,22 @@ void pqColorAnnotationsWidget::setAnnotationsModel(pqAnnotationsModel* model)
   this->connect(this->Internals->Ui.AnnotationsTable->selectionModel(),
     SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this,
     SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)));
+}
+
+//-----------------------------------------------------------------------------
+void pqColorAnnotationsWidget::setSupportsReorder(bool reorder)
+{
+  if (!reorder)
+  {
+    this->Internals->Ui.AnnotationsTable->sortByColumn(
+      pqAnnotationsModel::VALUE, Qt::AscendingOrder);
+  }
+
+  this->Internals->Model->setSupportsReorder(reorder);
+
+  this->Internals->Ui.AnnotationsTable->setDragEnabled(reorder);
+  this->Internals->Ui.AnnotationsTable->setDragDropMode(
+    reorder ? QAbstractItemView::InternalMove : QAbstractItemView::NoDragDrop);
 }
 
 //-----------------------------------------------------------------------------
@@ -960,16 +1063,42 @@ void pqColorAnnotationsWidget::allowsUserDefinedValues(bool allow)
 }
 
 //-----------------------------------------------------------------------------
+void pqColorAnnotationsWidget::enablePresets(bool enable)
+{
+  Ui::ColorAnnotationsWidget& ui = this->Internals->Ui;
+  ui.SaveAsPreset->setVisible(enable);
+  ui.SaveAsNewPreset->setVisible(enable);
+  ui.ChoosePreset->setVisible(enable);
+}
+
+//-----------------------------------------------------------------------------
 void pqColorAnnotationsWidget::supportsOpacityMapping(bool val)
 {
-  this->Internals->Ui.EnableOpacityMapping->setVisible(val);
-  this->Internals->Ui.EnableOpacityMapping->setChecked(val);
+  Ui::ColorAnnotationsWidget& ui = this->Internals->Ui;
+  ui.EnableOpacityMapping->setVisible(val);
+  ui.EnableOpacityMapping->setChecked(val);
+
+  if (!val)
+  {
+    ui.AnnotationsTable->disconnect(SIGNAL(customContextMenuRequested(QPoint)));
+    new pqTreeViewSelectionHelper(ui.AnnotationsTable, false);
+  }
+  else
+  {
+    auto selectionHelper = this->findChild<pqTreeViewSelectionHelper*>();
+    if (selectionHelper)
+    {
+      selectionHelper->deleteLater();
+    }
+    QObject::connect(ui.AnnotationsTable, SIGNAL(customContextMenuRequested(QPoint)), this,
+      SLOT(customMenuRequested(QPoint)));
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqColorAnnotationsWidget::onPresetApplied(const QString& name)
 {
-  this->Internals->CurrentPresetName = name.toStdString();
+  this->Internals->SetCurrentPresetName(name.toStdString());
   emit this->presetChanged(name);
 }
 

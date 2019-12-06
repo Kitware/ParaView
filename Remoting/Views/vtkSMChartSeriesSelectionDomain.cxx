@@ -15,7 +15,6 @@
 #include "vtkSMChartSeriesSelectionDomain.h"
 
 #include "vtkChartRepresentation.h"
-#include "vtkColorSeries.h"
 #include "vtkCommand.h"
 #include "vtkDataObject.h"
 #include "vtkNew.h"
@@ -26,11 +25,16 @@
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
+#include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMTransferFunctionPresets.h"
+#include "vtkSMTransferFunctionProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
+
+#include <vtk_jsoncpp.h>
 
 #include <algorithm>
 #include <assert.h>
@@ -91,8 +95,7 @@ static bool GetSeriesVisibilityDefault(const char* regex, bool& value)
 
 class vtkSMChartSeriesSelectionDomain::vtkInternals
 {
-  int ColorCounter;
-  vtkNew<vtkColorSeries> Colors;
+  unsigned int ColorCounter;
 
 public:
   std::map<std::string, bool> VisibilityOverrides;
@@ -102,7 +105,25 @@ public:
   {
   }
 
-  vtkColor3ub GetNextColor() { return this->Colors->GetColorRepeating(this->ColorCounter++); }
+  void GetNextColor(const char* presetName, double rgb[3])
+  {
+    auto presets = vtkSMTransferFunctionPresets::GetInstance();
+    const char* name = presetName ? presetName : "";
+    if (!presets->HasPreset(name))
+    {
+      vtkWarningWithObjectMacro(
+        nullptr, "No preset with this name (" << name << "). Fall back to Spectrum.");
+      name = "Spectrum";
+    }
+    const Json::Value& preset = presets->GetFirstPresetWithName(name);
+    const Json::Value& indexedColors = preset["IndexedColors"];
+    auto nbOfColors = indexedColors.size() / 3;
+    int idx = this->ColorCounter % nbOfColors;
+    rgb[0] = indexedColors[3 * idx].asDouble();
+    rgb[1] = indexedColors[3 * idx + 1].asDouble();
+    rgb[2] = indexedColors[3 * idx + 2].asDouble();
+    this->ColorCounter++;
+  }
 };
 
 //---------------------------------------------------------------------------
@@ -383,11 +404,13 @@ std::vector<vtkStdString> vtkSMChartSeriesSelectionDomain::GetDefaultValue(const
   }
   else if (this->DefaultMode == COLOR)
   {
-    vtkColor3ub color = this->Internals->GetNextColor();
+    double rgb[3];
+    auto presetProp = this->GetProperty()->GetParent()->GetProperty("LastPresetName");
+    this->Internals->GetNextColor(vtkSMPropertyHelper(presetProp).GetAsString(), rgb);
     for (int kk = 0; kk < 3; kk++)
     {
       std::ostringstream stream;
-      stream << std::setprecision(2) << color.GetData()[kk] / 255.0;
+      stream << std::setprecision(2) << rgb[kk];
       values.push_back(stream.str());
     }
   }

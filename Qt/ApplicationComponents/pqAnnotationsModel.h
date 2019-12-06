@@ -38,7 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QColor>
 #include <QIcon>
 
+#include <vector>
+
+#include "vtkSmartPointer.h"
+
 class QModelIndex;
+
+class vtkSMStringListDomain;
 
 //-----------------------------------------------------------------------------
 // QAbstractTableModel subclass for keeping track of the annotations and their properties (color,
@@ -53,7 +59,8 @@ public:
 
   enum ColumnRoles
   {
-    COLOR = 0,
+    VISIBILITY = 0,
+    COLOR,
     OPACITY,
     VALUE,
     LABEL,
@@ -71,8 +78,22 @@ public:
   int columnCount(const QModelIndex& /*parent*/) const override;
   bool setData(const QModelIndex& idx, const QVariant& value, int role = Qt::EditRole) override;
   QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const override;
+  bool setHeaderData(
+    int section, Qt::Orientation orientation, const QVariant& value, int role) override;
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+  Qt::DropActions supportedDropActions() const override;
+  QStringList mimeTypes() const override;
+  QMimeData* mimeData(const QModelIndexList& indexes) const override;
+  bool dropMimeData(const QMimeData* mime_data, Qt::DropAction action, int row, int column,
+    const QModelIndex& parentIdx) override;
   //@}
+
+  /**
+   * Return the number of columns.
+   */
+  int columnCount() const { return NUMBER_OF_COLUMNS; }
+
+  void setVisibilityDomain(vtkSMStringListDomain* domain);
 
   //@{
   /**
@@ -87,16 +108,24 @@ public:
   /**
    * Set/Get the value-annotation pairs.
    */
-  void setAnnotations(const QVector<std::pair<QString, QString> >& newAnnotations);
-  QVector<std::pair<QString, QString> > annotations() const;
+  void setAnnotations(const std::vector<std::pair<QString, QString> >& newAnnotations);
+  std::vector<std::pair<QString, QString> > annotations() const;
+  //@}
+
+  //@{
+  /**
+   * Set/Get the visibilities.
+   */
+  void setVisibilities(const std::vector<std::pair<QString, int> >& newVisibilities);
+  std::vector<std::pair<QString, int> > visibilities() const;
   //@}
 
   //@{
   /**
    * Set/Get the colors.
    */
-  void setIndexedColors(const QVector<QColor>& newColors);
-  QVector<QColor> indexedColors() const;
+  void setIndexedColors(const std::vector<QColor>& newColors);
+  std::vector<QColor> indexedColors() const;
   //@}
 
   bool hasColors() const;
@@ -105,8 +134,8 @@ public:
   /**
    * Set/Get IndexedOpacities.
    */
-  void setIndexedOpacities(const QVector<double>& newOpacities);
-  QVector<double> indexedOpacities() const;
+  void setIndexedOpacities(const std::vector<double>& newOpacities);
+  std::vector<double> indexedOpacities() const;
   //@}
 
   //@{
@@ -119,9 +148,24 @@ public:
 
   void setSelectedOpacity(QList<int> rows, double opacity);
 
+  //@{
+  /**
+   * Set/Get SupportsReorder.
+   */
+  void setSupportsReorder(bool reorder);
+  bool supportsReorder() const;
+  //@}
+
+  /**
+   * Reorders the list of annotations, following the indexes given by newOrder.
+   */
+  void reorder(std::vector<int> newOrder);
+
 protected:
   QIcon MissingColorIcon;
   double GlobalOpacity;
+  vtkSmartPointer<vtkSMStringListDomain> VisibilityDomain;
+  bool SupportsReorder;
 
 private:
   Q_DISABLE_COPY(pqAnnotationsModel)
