@@ -467,7 +467,15 @@ void outputFunction(FILE* fp, ClassInfo* data)
     }
     else
     {
-      fprintf(fp, "      temp%i = (op)->%s(", MAX_ARGS, currentFunction->Name);
+      if (currentFunction->IsStatic)
+      {
+        fprintf(
+          fp, "      temp%i = %s::%s(", MAX_ARGS, currentFunction->Class, currentFunction->Name);
+      }
+      else
+      {
+        fprintf(fp, "      temp%i = (op)->%s(", MAX_ARGS, currentFunction->Name);
+      }
     }
 
     for (i = 0; i < currentFunction->NumberOfArguments; i++)
