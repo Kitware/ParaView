@@ -3,18 +3,18 @@ coProcessor = None
 def initialize():
     global coProcessor
     import paraview
-    import vtkParallelCorePython
+    import vtkParallelCore
     import vtk
     from mpi4py import MPI
     import os, sys
 
     paraview.options.batch = True
     paraview.options.symmetric = True
-    import vtkPVClientServerCoreCorePython as CorePython
+    import vtkPVClientServerCoreCore as CorePython
     try:
-        import vtkPVServerManagerApplicationPython as ApplicationPython
+        import vtkPVServerManagerApplication as ApplicationPython
     except:
-        paraview.print_error("Error: Cannot import vtkPVServerManagerApplicationPython")
+        paraview.print_error("Error: Cannot import vtkPVServerManagerApplication")
 
     if not CorePython.vtkProcessModule.GetProcessModule():
         pvoptions = None
@@ -27,14 +27,14 @@ def initialize():
 
     import paraview.servermanager as pvsm
     # we need ParaView 4.2 since ParaView 4.1 doesn't properly wrap
-    # vtkPVPythonCatalystPython
+    # vtkPVPythonCatalyst
     if pvsm.vtkSMProxyManager.GetVersionMajor() < 4 or (pvsm.vtkSMProxyManager.GetVersionMajor() == 4 and pvsm.vtkSMProxyManager.GetVersionMinor() < 2):
         print 'Must use ParaView v4.2 or greater'
         sys.exit(0)
 
     import numpy
     from paraview.modules import vtkPVCatalyst as catalyst
-    import vtkPVPythonCatalystPython as pythoncatalyst
+    import vtkPVPythonCatalyst as pythoncatalyst
     import paraview.simple
     import paraview.vtk as vtk
     from paraview.vtk.util import numpy_support
@@ -52,12 +52,12 @@ def finalize():
     # to avoid memory leak messages.
     import sys, ntpath
     if ntpath.basename(sys.executable) == 'python':
-        import vtkPVServerManagerApplicationPython as ApplicationPython
+        import vtkPVServerManagerApplication as ApplicationPython
         ApplicationPython.vtkInitializationHelper.Finalize()
 
 def addscript(name):
     global coProcessor
-    import vtkPVPythonCatalystPython as pythoncatalyst
+    import vtkPVPythonCatalyst as pythoncatalyst
     pipeline = pythoncatalyst.vtkCPPythonScriptPipeline()
     pipeline.Initialize(name)
     coProcessor.AddPipeline(pipeline)

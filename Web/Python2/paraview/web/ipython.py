@@ -126,8 +126,8 @@ class ParaViewIPython(object):
             ParaViewIPython.globalController = ParaViewIPython.processModule.GetGlobalController()
 
             if MPI.COMM_WORLD.Get_size() > 1 and (ParaViewIPython.globalController is None or ParaViewIPython.globalController.IsA("vtkDummyController") == True):
-                import vtkParallelMPIPython
-                ParaViewIPython.globalController = vtkParallelMPIPython.vtkMPIController()
+                import vtkParallelMPI
+                ParaViewIPython.globalController = vtkParallelMPI.vtkMPIController()
                 ParaViewIPython.globalController.Initialize()
                 ParaViewIPython.globalController.SetGlobalController(ParaViewIPython.globalController)
 

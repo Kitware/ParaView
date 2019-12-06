@@ -31,7 +31,7 @@ paraview.options.batch = True
 paraview.options.symmetric = True
 
 import paraview.simple as pvsimple
-from paraview.modules import vtkPVCatalyst, vtkPVCatalystPython, vtkPVPythonCatalystPython
+from paraview.modules import vtkPVCatalyst, vtkPVPythonCatalyst
 pm = pvsimple.servermanager.vtkProcessModule.GetProcessModule()
 rank = pm.GetPartitionId()
 nranks = pm.GetNumberOfLocalPartitions()
@@ -64,7 +64,7 @@ catalyst = vtkPVCatalyst.vtkCPProcessor()
 #catalyst.Initialize()
 
 for script in sys.argv[2:]:
-    pipeline = vtkPVPythonCatalystPython.vtkCPPythonScriptPipeline()
+    pipeline = vtkPVPythonCatalyst.vtkCPPythonScriptPipeline()
     if rank == 0:
         print("Adding script ", script)
     pipeline.Initialize(script)
