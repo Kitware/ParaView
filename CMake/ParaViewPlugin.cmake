@@ -1069,7 +1069,7 @@ function (paraview_add_plugin name)
     string(APPEND _paraview_add_plugin_binary_resources
       "  {
     const char *text = ${_paraview_build_plugin}_qch();
-    resources.push_back(text);
+    resources.emplace_back(text);
     delete [] text;
   }\n")
   endif ()
