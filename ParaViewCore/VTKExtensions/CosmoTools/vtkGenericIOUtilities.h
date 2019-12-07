@@ -29,7 +29,7 @@
 #include <functional>
 #include <string>
 
-#include "mpi.h"
+#include "vtk_mpi.h"
 
 class vtkMultiProcessController;
 class vtkDataArray;

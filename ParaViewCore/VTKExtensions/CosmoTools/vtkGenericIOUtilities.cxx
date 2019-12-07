@@ -16,7 +16,7 @@
 #include <cassert>
 
 // MPI
-#include <mpi.h>
+#include <vtk_mpi.h>
 
 namespace vtkGenericIOUtilities
 {
