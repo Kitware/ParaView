@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 @_paraview_auto_start_CLASS_NAME@Implementation::~@_paraview_auto_start_CLASS_NAME@Implementation()
 {
   delete this->UserImplementation;
-  this->UserImplementation = 0;
+  this->UserImplementation = nullptr;
 }
 
 //-----------------------------------------------------------------------------

@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 @_paraview_dock_window_CLASS_NAME@Implementation::@_paraview_dock_window_CLASS_NAME@Implementation(QObject* p)
   : QObject(p)
 {
-  this->MyDock = 0;
+  this->MyDock = nullptr;
 }
 
 QString @_paraview_dock_window_CLASS_NAME@Implementation::dockArea() const
