@@ -459,7 +459,14 @@ void outputFunction(FILE* fp, ClassInfo* data)
 
     if ((currentFunction->ReturnType & VTK_PARSE_UNQUALIFIED_TYPE) == VTK_PARSE_VOID)
     {
-      fprintf(fp, "      op->%s(", currentFunction->Name);
+      if (currentFunction->IsStatic)
+      {
+        fprintf(fp, "      %s::%s(", currentFunction->Class, currentFunction->Name);
+      }
+      else
+      {
+        fprintf(fp, "      op->%s(", currentFunction->Name);
+      }
     }
     else if ((currentFunction->ReturnType & VTK_PARSE_INDIRECT) == VTK_PARSE_REF)
     {
