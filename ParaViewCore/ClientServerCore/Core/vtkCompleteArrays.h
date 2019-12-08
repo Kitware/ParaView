@@ -71,6 +71,13 @@ protected:
     vtkInformationVector* outputVector) override;
   vtkMultiProcessController* Controller;
 
+  /**
+   * Complete the arrays on one block. outputDS is a pointer to a pointer
+   * as the output vtkDataSet may need to be allocated if it is null on
+   * process 0.
+   */
+  void CompleteArraysOnBlock(vtkDataSet* inputDS, vtkDataSet*& outputDS);
+
 private:
   vtkCompleteArrays(const vtkCompleteArrays&) = delete;
   void operator=(const vtkCompleteArrays&) = delete;
