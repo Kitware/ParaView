@@ -1069,7 +1069,7 @@ function (paraview_add_plugin name)
     string(APPEND _paraview_add_plugin_binary_resources
       "  {
     const char *text = ${_paraview_build_plugin}_qch();
-    resources.push_back(text);
+    resources.emplace_back(text);
     delete [] text;
   }\n")
   endif ()
@@ -1097,7 +1097,7 @@ function (paraview_add_plugin name)
 
     foreach (_paraview_add_plugin_ui_interface IN LISTS _paraview_add_plugin_UI_INTERFACES)
       string(APPEND _paraview_add_plugin_push_back_interfaces
-        "  arg.push_back(new ${_paraview_add_plugin_ui_interface}(this)); \\\n")
+        "  (arg).push_back(new ${_paraview_add_plugin_ui_interface}(this)); \\\n")
       string(APPEND _paraview_add_plugin_include_interfaces
         "#include \"${_paraview_add_plugin_ui_interface}.h\"\n")
     endforeach ()
