@@ -131,9 +131,7 @@ void @_paraview_build_plugin@Plugin::GetPythonSourceList(std::vector<std::string
 #endif
 
 //-----------------------------------------------------------------------------
-namespace
-{
-void initialize_plugin_qt_resources()
+static void initialize_@_paraview_build_plugin@_plugin_qt_resources()
 {
 #if !_paraview_add_plugin_built_shared && _paraview_add_plugin_with_resources
   // For static builds, initialize the Qt resources.
@@ -144,12 +142,11 @@ void initialize_plugin_qt_resources()
   Q_IMPORT_PLUGIN(@_paraview_build_plugin@Plugin)
 #endif
 }
-}
 
 //-----------------------------------------------------------------------------
 @_paraview_build_plugin@Plugin::@_paraview_build_plugin@Plugin()
 {
-  initialize_plugin_qt_resources();
+  initialize_@_paraview_build_plugin@_plugin_qt_resources();
 }
 
 //-----------------------------------------------------------------------------
