@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
   // always request a non-stereo format; when using quadbuffer stereo, we
   // request stereo capable format for the individual `QVTKOpenGLWindow`
   // instance.
-  QSurfaceFormat::setDefaultFormat(QVTKRenderWindowAdapter::defaultFormat(/*supports_stereo=*/false));
+  QSurfaceFormat::setDefaultFormat(QVTKRenderWindowAdapter::defaultFormat(/*stereo_capable=*/false));
 
   QApplication qtapp(argc, argv);
   // QApplication docs suggest resetting to "C" after the QApplication is
@@ -107,6 +107,6 @@ int main(int argc, char* argv[])
     case InitializerT::ExitFailure:
       return EXIT_FAILURE;
     case InitializerT::RunApplication:
-      return qtapp.exec();
+      return QApplication::exec();
   }
 }
