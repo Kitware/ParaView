@@ -532,6 +532,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   RenderNan.xml
   ResetToVisibleRange.xml
   Ruler.xml
+  SaveExodus.xml
   SelectionLinkParallelCoordinatesView.xml
   SaveLargeScreenshot.xml
   Slice.xml

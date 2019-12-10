@@ -17,6 +17,10 @@
 #include "vtkAbstractArray.h"
 #include "vtkCellData.h"
 #include "vtkClientServerStream.h"
+#include "vtkDataObjectTree.h"
+#include "vtkDataObjectTreeIterator.h"
+#include "vtkDataObjectTreeRange.h"
+#include "vtkDataObjectTypes.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -153,6 +157,7 @@ int vtkCompleteArrays::FillInputPortInformation(int port, vtkInformation* info)
   {
     info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
     info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObjectTree");
   }
   return 1;
 }
@@ -202,11 +207,9 @@ int vtkCompleteArrays::RequestData(
 {
   vtkInformation* info = outputVector->GetInformationObject(0);
   vtkDataObject* output = info->Get(vtkDataObject::DATA_OBJECT());
-  vtkDataSet* outputDS = vtkDataSet::SafeDownCast(output);
 
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
-  vtkDataSet* inputDS = vtkDataSet::SafeDownCast(input);
 
   vtkTable* inputTable = vtkTable::SafeDownCast(input);
   // let vtkTable pass-through this filter
@@ -226,18 +229,75 @@ int vtkCompleteArrays::RequestData(
     return 1;
   }
 
+  vtkDataSet* outputDS = vtkDataSet::SafeDownCast(output);
+  vtkDataSet* inputDS = vtkDataSet::SafeDownCast(input);
+  if (inputDS && outputDS)
+  {
+    this->CompleteArraysOnBlock(inputDS, outputDS);
+    return 1;
+  }
+
+  // Iterate over composite datasets and complete arrays
+  vtkDataObjectTree* outputDOT = vtkDataObjectTree::SafeDownCast(output);
+  vtkDataObjectTree* inputDOT = vtkDataObjectTree::SafeDownCast(input);
+  if (inputDOT && outputDOT)
+  {
+    outputDOT->CopyStructure(inputDOT);
+
+    using Opts = vtk::DataObjectTreeOptions;
+    auto inIter = vtk::Range(inputDOT, Opts::TraverseSubTree);
+    auto outIter = vtk::Range(outputDOT, Opts::TraverseSubTree);
+
+    auto inNode = inIter.begin();
+    auto outNode = outIter.begin();
+    for (; inNode != inIter.end(); ++inNode, ++outNode)
+    {
+      vtkDataObject* inputDO = *inNode;
+      if (inputDO && inputDO->IsA("vtkDataObjectTree"))
+      {
+        // Skip interior nodes
+        continue;
+      }
+      if (inputDO)
+      {
+        *outNode = inputDO->NewInstance();
+        outNode->ShallowCopy(inputDO);
+        outNode->FastDelete();
+      }
+      vtkDataSet* dataSetIn = vtkDataSet::SafeDownCast(inputDO);
+      vtkDataSet* dataSetOut = vtkDataSet::SafeDownCast(*outNode);
+      this->CompleteArraysOnBlock(dataSetIn, dataSetOut);
+
+      // Set the block in the output if it was instantiated in the call above.
+      if (!dataSetIn && dataSetOut)
+      {
+        *outNode = dataSetOut;
+        outNode->FastDelete();
+      }
+    }
+  }
+
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkCompleteArrays::CompleteArraysOnBlock(vtkDataSet* inputDS, vtkDataSet*& outputDS)
+{
   // Initialize
   //
   vtkDebugMacro(<< "Completing array");
 
-  outputDS->CopyStructure(inputDS);
-  outputDS->GetFieldData()->PassData(inputDS->GetFieldData());
-  outputDS->GetPointData()->PassData(inputDS->GetPointData());
-  outputDS->GetCellData()->PassData(inputDS->GetCellData());
+  if (inputDS && outputDS)
+  {
+    outputDS->CopyStructure(inputDS);
+    outputDS->GetFieldData()->PassData(inputDS->GetFieldData());
+    outputDS->GetPointData()->PassData(inputDS->GetPointData());
+    outputDS->GetCellData()->PassData(inputDS->GetCellData());
+  }
 
   if (this->Controller->GetNumberOfProcesses() <= 1)
   {
-    return 1;
+    return;
   }
   int myProcId = this->Controller->GetLocalProcessId();
 
@@ -246,20 +306,24 @@ int vtkCompleteArrays::RequestData(
   //           proc id if this process has point,
   //           proc id if this process has cells]
 
-  vtkIdType localInfo[6] = { -1, -1, inputDS->GetNumberOfPoints(), inputDS->GetNumberOfCells(), -1,
-    -1 };
-  if (myProcId == 0)
+  vtkIdType localInfo[6] = { -1, -1, 0, 0, -1, -1 };
+  if (inputDS)
   {
-    localInfo[0] = inputDS->GetNumberOfPoints();
-    localInfo[1] = inputDS->GetNumberOfCells();
-  }
-  if (inputDS->GetNumberOfPoints() > 0)
-  {
-    localInfo[4] = myProcId;
-  }
-  if (inputDS->GetNumberOfCells() > 0)
-  {
-    localInfo[5] = myProcId;
+    if (myProcId == 0)
+    {
+      localInfo[0] = inputDS->GetNumberOfPoints();
+      localInfo[1] = inputDS->GetNumberOfCells();
+    }
+    localInfo[2] = inputDS->GetNumberOfPoints();
+    localInfo[3] = inputDS->GetNumberOfCells();
+    if (inputDS->GetNumberOfPoints() > 0)
+    {
+      localInfo[4] = myProcId;
+    }
+    if (inputDS->GetNumberOfCells() > 0)
+    {
+      localInfo[5] = myProcId;
+    }
   }
   vtkIdType globalInfo[6];
   this->Controller->AllReduce(localInfo, globalInfo, 6, vtkCommunicator::MAX_OP);
@@ -273,27 +337,36 @@ int vtkCompleteArrays::RequestData(
   {
     // process 0 has all of the needed information already (globalInfo[2] == 0
     // means there is no information at all)
-    return 1;
+    return;
   }
 
-  int infoProc = globalInfo[5]; // a process that has the information proc 0 needs
+  int infoProc = static_cast<int>(globalInfo[5]); // a process that has the information proc 0 needs
   if (globalInfo[3] == 0)
   { // there are no cells so we find a process with points
-    infoProc = globalInfo[4];
+    infoProc = static_cast<int>(globalInfo[4]);
   }
 
   if (myProcId == 0)
   {
-    // Receive and collected information from the remote processes.
+    // Collected information from the remote processes.
 
-    int length = 0;
-    this->Controller->Receive(&length, 1, infoProc, 389002);
+    // Process 0 may have a null block - get the data type from the process
+    // that has the data information and instantiate a placeholder block.
+    int typeAndLength[2];
+    this->Controller->Receive(typeAndLength, 2, infoProc, 389002);
 
-    std::vector<unsigned char> data(length);
+    if (!outputDS)
+    {
+      int dataSetType = typeAndLength[0];
+      outputDS = vtkDataSet::SafeDownCast(vtkDataObjectTypes::NewDataObject(dataSetType));
+    }
+
+    int length = typeAndLength[1];
+    std::vector<unsigned char> data(static_cast<size_t>(length));
     this->Controller->Receive(&data[0], length, infoProc, 389003);
 
     vtkClientServerStream css;
-    css.SetData(&data[0], length);
+    css.SetData(&data[0], static_cast<size_t>(length));
 
     vtkDeserialize(css, 0, outputDS->GetPointData());
     vtkDeserialize(css, 1, outputDS->GetCellData());
@@ -361,14 +434,16 @@ int vtkCompleteArrays::RequestData(
           << vtkClientServerStream::End;
     }
 
+    int dataSetType = inputDS->GetDataObjectType();
     size_t length;
     const unsigned char* data;
     css.GetData(&data, &length);
-    int len = static_cast<int>(length);
-    this->Controller->Send(&len, 1, 0, 389002);
-    this->Controller->Send(const_cast<unsigned char*>(data), len, 0, 389003);
+    // Bundle data set type and length into a single message for efficiency
+    int typeAndLength[2] = { dataSetType, static_cast<int>(length) };
+    this->Controller->Send(typeAndLength, 2, 0, 389002);
+    this->Controller->Send(const_cast<unsigned char*>(data), typeAndLength[1], 0, 389003);
   }
-  return 1;
+  return;
 }
 
 //-----------------------------------------------------------------------------
