@@ -96,8 +96,10 @@ pqProxyInformationWidget::pqProxyInformationWidget(QWidget* p)
   this->VTKConnect = vtkEventQtSlotConnect::New();
   this->Ui = new pqUi(this);
   this->Ui->setupUi(this);
-  this->Ui->compositeTree->setModel(this->Ui->compositeTreeModel);
+  this->Ui->dataArrays->setItemDelegate(new pqNonEditableStyledItemDelegate(this));
+  this->Ui->timeValues->setItemDelegate(new pqNonEditableStyledItemDelegate(this));
   this->Ui->compositeTree->setItemDelegate(new pqNonEditableStyledItemDelegate(this));
+  this->Ui->compositeTree->setModel(this->Ui->compositeTreeModel);
   this->connect(this->Ui->compositeTree->selectionModel(),
     SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
     SLOT(onCurrentChanged(const QModelIndex&)));
@@ -243,7 +245,6 @@ void pqProxyInformationWidget::updateInformation()
   vtkSMDoubleVectorProperty* tsv =
     vtkSMDoubleVectorProperty::SafeDownCast(source->getProxy()->GetProperty("TimestepValues"));
   this->Ui->timeValues->clear();
-  this->Ui->timeValues->setItemDelegate(new pqNonEditableStyledItemDelegate(this));
   //
   QAbstractItemModel* pModel = this->Ui->timeValues->model();
   pModel->blockSignals(true);
@@ -460,7 +461,6 @@ void pqProxyInformationWidget::fillDataInformation(vtkPVDataInformation* dataInf
     }
   }
   this->Ui->dataArrays->header()->resizeSections(QHeaderView::ResizeToContents);
-  this->Ui->dataArrays->setItemDelegate(new pqNonEditableStyledItemDelegate(this));
 
   double bounds[6];
   dataInformation->GetBounds(bounds);
