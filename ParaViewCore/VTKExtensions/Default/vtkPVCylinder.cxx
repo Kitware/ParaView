@@ -66,7 +66,7 @@ void vtkPVCylinder::SetCenter(double x, double y, double z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCylinder::SetCenter(double xyz[3])
+void vtkPVCylinder::SetCenter(const double xyz[3])
 {
   this->Superclass::SetCenter(xyz);
   this->UpdateTransform();

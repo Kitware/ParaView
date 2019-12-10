@@ -34,7 +34,7 @@ vtkPVPlane::~vtkPVPlane()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPlane::SetNormal(double* x)
+void vtkPVPlane::SetNormal(const double* x)
 {
   this->SetNormal(x[0], x[1], x[2]);
 }

@@ -47,8 +47,8 @@ public:
   /**
    * If AxisAligned is true, sets axis to the nearest canonical axis.
    */
-  virtual void SetNormal(double x, double y, double z) override;
-  virtual void SetNormal(double* x) override;
+  void SetNormal(double x, double y, double z) override;
+  void SetNormal(const double* x) override;
   //@}
 
   /**
