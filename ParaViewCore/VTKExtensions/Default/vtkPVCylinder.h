@@ -44,7 +44,7 @@ public:
 
   // Reimplemented to update transform on change:
   void SetCenter(double x, double y, double z) override;
-  void SetCenter(double xyz[3]) override;
+  void SetCenter(const double xyz[3]) override;
 
 protected:
   vtkPVCylinder();
