@@ -37,6 +37,7 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN 0)
 # initializing Python.
 set(QT_TESTING_WITH_PYTHON FALSE)
 
+set(BUILD_EXAMPLES OFF)
 set(QtTesting_QT_VERSION 5)
 set(QtTesting_INSTALL_BIN_DIR "${_vtk_build_RUNTIME_DESTINATION}")
 set(QtTesting_INSTALL_INCLUDE_DIR "${_vtk_build_HEADERS_DESTINATION}/vtkqttesting")
