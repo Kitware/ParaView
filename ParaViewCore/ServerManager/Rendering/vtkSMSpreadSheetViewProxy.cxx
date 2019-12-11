@@ -70,12 +70,18 @@ void vtkSMSpreadSheetViewProxy::RepresentationVisibilityChanged(
       vtkSMPropertyHelper fieldAssociationHelper(this, "FieldAssociation");
       if (dataInfo->GetNumberOfElements(fieldAssociationHelper.GetAsInt()) == 0)
       {
+        // we define a list of attribute type in a different order than
+        // the one described in vtkDataObject as we want the field data
+        // to be considered if no other attribute is available.
+        const std::vector<int> attributes = { vtkDataObject::POINT, vtkDataObject::CELL,
+          vtkDataObject::VERTEX, vtkDataObject::EDGE, vtkDataObject::ROW, vtkDataObject::FIELD };
+
         // let's try to pick as association with non-empty tuples.
-        for (int cc = vtkDataObject::POINT; cc < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; ++cc)
+        for (int att : attributes)
         {
-          if (dataInfo->GetNumberOfElements(cc) > 0)
+          if (dataInfo->GetNumberOfElements(att) > 0)
           {
-            fieldAssociationHelper.Set(cc);
+            fieldAssociationHelper.Set(att);
             this->UpdateVTKObjects();
             break;
           }
