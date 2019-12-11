@@ -27,6 +27,10 @@ set (paraview_paths
     '${CMAKE_LIBRARY_OUTPUT_DIRECTORY}']")
 configure_file(config/conf.py.in config/conf.py @ONLY)
 
+# Copy sphinx-build to rename the file to have .py extension
+# since pvpython expects Python scripts to have .py extensions.
+configure_file("${sphinx-build}" sphinx-build.py COPYONLY)
+
 # This depends on the python modules being placed at the appropriate locations.
 # Since all python files are copies to lib/site-packages at configure time and
 # since this CMakeLists.txt file is added at the end of the top-level
@@ -36,11 +40,13 @@ add_custom_target(ParaViewPythonDoc
           "${CMAKE_CURRENT_SOURCE_DIR}/sphinx_apidoc.py"
           -o "${CMAKE_CURRENT_BINARY_DIR}/config"
           "${ParaView_BINARY_DIR}/${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}/paraview"
-  COMMAND ${sphinx-build}
+  COMMAND $<TARGET_FILE:pvpython>
+          "${CMAKE_CURRENT_BINARY_DIR}/sphinx-build.py"
           -b html "${CMAKE_CURRENT_BINARY_DIR}/config"
           "${PARAVIEW_GENERATED_DOCUMENTATION_OUTPUT_DIRECTORY}/python"
   SOURCES sphinx_apidoc.py
           config/index.rst
           config/quick-start.rst
           config/api-changes.rst
-          config/conf.py.in)
+          config/conf.py.in
+          "${CMAKE_CURRENT_BINARY_DIR}/sphinx-build.py")
