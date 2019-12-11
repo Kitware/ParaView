@@ -62,7 +62,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../../Components/Resources/pqComponents.qrc">
-         <normaloff>:/pqWidgets/Icons/pqEditScalarBar16.png</normaloff>:/pqWidgets/Icons/pqEditScalarBar16.png</iconset>
+         <normaloff>:/pqWidgets/Icons/pqEditScalarBar.svg</normaloff>:/pqWidgets/Icons/pqEditScalarBar.svg</iconset>
        </property>
       </widget>
      </item>

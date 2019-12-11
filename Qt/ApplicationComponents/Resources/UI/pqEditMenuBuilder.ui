@@ -41,7 +41,7 @@
   <action name="actionEditCameraUndo">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqUndoCamera24.png</normaloff>:/pqWidgets/Icons/pqUndoCamera24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqUndoCamera.svg</normaloff>:/pqWidgets/Icons/pqUndoCamera.svg</iconset>
    </property>
    <property name="text">
     <string>Camera Undo</string>
@@ -53,7 +53,7 @@
   <action name="actionEditCameraRedo">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqRedoCamera24.png</normaloff>:/pqWidgets/Icons/pqRedoCamera24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqRedoCamera.svg</normaloff>:/pqWidgets/Icons/pqRedoCamera.svg</iconset>
    </property>
    <property name="text">
     <string>Camera Redo</string>
