@@ -321,7 +321,7 @@ vtkRenderWindowInteractor* vtkSMRenderViewProxy::GetInteractor()
 //----------------------------------------------------------------------------
 vtkSMViewProxyInteractorHelper* vtkSMRenderViewProxy::GetInteractorHelper()
 {
-  return this->InteractorHelper.GetPointer();
+  return this->InteractorHelper;
 }
 
 //----------------------------------------------------------------------------
@@ -671,7 +671,7 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(int x, int y, unsigned
   vtkSmartPointer<vtkCollection> reprs = vtkSmartPointer<vtkCollection>::New();
   vtkSmartPointer<vtkCollection> sources = vtkSmartPointer<vtkCollection>::New();
   int region[4] = { x, y, x, y };
-  if (this->SelectSurfaceCells(region, reprs.GetPointer(), sources.GetPointer(), false))
+  if (this->SelectSurfaceCells(region, reprs, sources, false))
   {
     if (reprs->GetNumberOfItems() > 0)
     {
@@ -726,11 +726,11 @@ bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(
 
   if (snapOnMeshPoint)
   {
-    this->SelectSurfacePoints(region, representations.GetPointer(), sources.GetPointer(), false);
+    this->SelectSurfacePoints(region, representations, sources, false);
   }
   else
   {
-    this->SelectSurfaceCells(region, representations.GetPointer(), sources.GetPointer(), false);
+    this->SelectSurfaceCells(region, representations, sources, false);
   }
 
   if (representations->GetNumberOfItems() > 0 && sources->GetNumberOfItems() > 0)
@@ -842,11 +842,11 @@ bool vtkSMRenderViewProxy::SelectInternal(const vtkClientServerStream& csstream,
 //----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::SelectSurfaceCells(const int region[4],
   vtkCollection* selectedRepresentations, vtkCollection* selectionSources, bool multiple_selections,
-  int modifier, bool select_blocks)
+  int modifier, bool select_blocks, const char* arrayName)
 {
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "SelectCells" << region[0]
-         << region[1] << region[2] << region[3] << vtkClientServerStream::End;
+         << region[1] << region[2] << region[3] << arrayName << vtkClientServerStream::End;
   return this->SelectInternal(stream, selectedRepresentations, selectionSources,
     multiple_selections, modifier, select_blocks);
 }
@@ -854,11 +854,11 @@ bool vtkSMRenderViewProxy::SelectSurfaceCells(const int region[4],
 //----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::SelectSurfacePoints(const int region[4],
   vtkCollection* selectedRepresentations, vtkCollection* selectionSources, bool multiple_selections,
-  int modifier, bool select_blocks)
+  int modifier, bool select_blocks, const char* arrayName)
 {
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "SelectPoints" << region[0]
-         << region[1] << region[2] << region[3] << vtkClientServerStream::End;
+         << region[1] << region[2] << region[3] << arrayName << vtkClientServerStream::End;
   return this->SelectInternal(stream, selectedRepresentations, selectionSources,
     multiple_selections, modifier, select_blocks);
 }
@@ -913,12 +913,12 @@ bool vtkSMRenderViewProxy::ComputeVisibleScalarRange(
   if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
   {
     this->SelectSurfacePoints(
-      region, selectedRepresentations.Get(), selectionSources.Get(), multiple_selections);
+      region, selectedRepresentations, selectionSources, multiple_selections);
   }
   else if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
   {
     this->SelectSurfaceCells(
-      region, selectedRepresentations.Get(), selectionSources.Get(), multiple_selections);
+      region, selectedRepresentations, selectionSources, multiple_selections);
   }
   else
   {

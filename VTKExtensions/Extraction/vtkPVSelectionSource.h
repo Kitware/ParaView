@@ -76,6 +76,16 @@ public:
 
   //@{
   /**
+   * Add a (piece, value) to the selection set. The source will generate
+   * only the values for which piece == UPDATE_PIECE_NUMBER.
+   * If piece == -1, the id applies to all pieces.
+   */
+  void AddValue(vtkIdType piece, vtkIdType value);
+  void RemoveAllValues();
+  //@}
+
+  //@{
+  /**
    * Add IDs that will be added to the selection produced by the
    * selection source.
    * The source will generate
@@ -184,7 +194,8 @@ protected:
     LOCATIONS,
     BLOCKS,
     PEDIGREEIDS,
-    QUERY
+    QUERY,
+    VALUES
   };
 
   Modes Mode;

@@ -30,6 +30,7 @@
 #include "vtkEquirectangularToCubeMapTexture.h"
 #include "vtkFXAAOptions.h"
 #include "vtkFloatArray.h"
+#include "vtkGeometryRepresentation.h"
 #include "vtkInformation.h"
 #include "vtkInformationDoubleKey.h"
 #include "vtkInformationDoubleVectorKey.h"
@@ -376,7 +377,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->CenterAxes->SetScale(0.25, 0.25, 0.25);
   this->OrientationWidget = vtkPVAxesWidget::New();
   this->InteractionMode = INTERACTION_MODE_UNINTIALIZED;
-  this->LastSelection = NULL;
+  this->LastSelection = nullptr;
   this->UseInteractiveRenderingForScreenshots = false;
   this->Selector = vtkPVHardwareSelector::New();
   this->Selector->SetView(this); // not reference counted.
@@ -521,7 +522,7 @@ vtkPVRenderView::~vtkPVRenderView()
   this->GetNonCompositedRenderer()->SetRenderWindow(0);
   this->GetRenderer()->SetRenderWindow(0);
 
-  this->SetLastSelection(NULL);
+  this->SetLastSelection(nullptr);
   this->Selector->Delete();
   this->SynchronizedRenderers->Delete();
   this->NonCompositedRenderer->Delete();
@@ -792,19 +793,19 @@ void vtkPVRenderView::OnPolygonSelectionEvent()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SelectPoints(int region[4])
+void vtkPVRenderView::SelectPoints(int region[4], const char* array)
 {
-  this->Select(vtkDataObject::FIELD_ASSOCIATION_POINTS, region);
+  this->Select(vtkDataObject::FIELD_ASSOCIATION_POINTS, region, array);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SelectCells(int region[4])
+void vtkPVRenderView::SelectCells(int region[4], const char* array)
 {
-  this->Select(vtkDataObject::FIELD_ASSOCIATION_CELLS, region);
+  this->Select(vtkDataObject::FIELD_ASSOCIATION_CELLS, region, array);
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVRenderView::PrepareSelect(int fieldAssociation)
+bool vtkPVRenderView::PrepareSelect(int fieldAssociation, const char* array)
 {
   // NOTE: selection is only supported in builtin or client-server mode. Not
   // supported in tile-display or batch modes.
@@ -827,22 +828,47 @@ bool vtkPVRenderView::PrepareSelect(int fieldAssociation)
   // representation pipelines correctly.
   this->Render(/*interactive*/ false, /*skip-rendering*/ false);
 
-  this->SetLastSelection(NULL);
+  this->SetLastSelection(nullptr);
 
   this->Selector->SetRenderer(this->GetRenderer());
   this->Selector->SetFieldAssociation(fieldAssociation);
+
+  if (array)
+  {
+    for (int i = 0; i < this->GetNumberOfRepresentations(); i++)
+    {
+      vtkGeometryRepresentation* geom =
+        vtkGeometryRepresentation::SafeDownCast(this->GetRepresentation(i));
+      if (geom)
+      {
+        const char* pointIdArray = nullptr;
+        const char* cellIdArray = nullptr;
+        if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+        {
+          pointIdArray = array;
+        }
+        else
+        {
+          cellIdArray = array;
+        }
+        // any existing custom array id names are overwritten
+        geom->SetArrayIdNames(pointIdArray, cellIdArray);
+      }
+    }
+  }
+
   return true;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::Select(int fieldAssociation, int region[4])
+void vtkPVRenderView::Select(int fieldAssociation, int region[4], const char* array)
 {
   // This gets called only the processes that are doing rendering i.e. it won't
   // be called on data server or if doing local rendering in client-server mode,
   // this won't be called on the remote processes.
   assert(this->GetLocalProcessDoesRendering(this->GetUseDistributedRenderingForRender()));
 
-  if (!this->PrepareSelect(fieldAssociation))
+  if (!this->PrepareSelect(fieldAssociation, array))
   {
     return;
   }
@@ -852,21 +878,33 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
   this->NonCompositedRenderer->SetDraw(false);
   sel.TakeReference(this->Selector->Select(region));
   this->NonCompositedRenderer->SetDraw(true);
-  this->PostSelect(sel);
+  this->PostSelect(sel, array);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::PostSelect(vtkSelection* sel)
+void vtkPVRenderView::PostSelect(vtkSelection* sel, const char* array)
 {
   if (sel)
   {
     // valid selection is only generated on the driver process. Other's are
     // merely rendering the passes so that the result is composited correctly.
-    this->FinishSelection(sel);
+    this->FinishSelection(sel, array);
   }
   // look at ::Render(..,..). We need to disable these once we are done with
   // rendering.
   this->SynchronizedRenderers->SetEnabled(false);
+
+  // restore ids
+  for (int i = 0; i < this->GetNumberOfRepresentations(); i++)
+  {
+    vtkGeometryRepresentation* geom =
+      vtkGeometryRepresentation::SafeDownCast(this->GetRepresentation(i));
+    if (geom)
+    {
+      // restore the array id names to the original ones
+      geom->SetArrayIdNames(nullptr, nullptr);
+    }
+  }
 
   this->MakingSelection = false;
   this->GetRenderWindow()->SetSwapBuffers(this->PreviousSwapBuffers);
@@ -906,9 +944,9 @@ void vtkPVRenderView::SelectPolygon(int fieldAssociation, int* polygonPoints, vt
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::FinishSelection(vtkSelection* sel)
+void vtkPVRenderView::FinishSelection(vtkSelection* sel, const char* array)
 {
-  assert(sel != NULL);
+  assert(sel != nullptr);
 
   // first, convert local-prop ids to ids that the data-server can understand if
   // the selection was done without compositing, i.e. rendering happened on the
@@ -923,6 +961,16 @@ void vtkPVRenderView::FinishSelection(vtkSelection* sel)
       if (repr)
       {
         node->GetProperties()->Set(vtkSelectionNode::SOURCE(), repr);
+      }
+    }
+    if (array)
+    {
+      // rename selection arrays
+      node->SetContentType(vtkSelectionNode::VALUES);
+      auto selectionData = node->GetSelectionData();
+      for (int i = 0; i < selectionData->GetNumberOfArrays(); i++)
+      {
+        node->GetSelectionData()->GetArray(i)->SetName(array);
       }
     }
   }

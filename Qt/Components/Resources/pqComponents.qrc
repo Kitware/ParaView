@@ -240,7 +240,9 @@
         <file>Icons/pqSurfaceHoveringCell.png</file>
         <file>Icons/pqSurfaceHoveringCell@2x.png</file>
         <file>Icons/pqSurfaceSelectionCell24.png</file>
+        <file>Icons/pqSurfaceSelectionCellDataInteractive.png</file>
         <file>Icons/pqSurfaceSelectionCellInteractive.png</file>
+        <file>Icons/pqSurfaceSelectionPointDataInteractive.png</file>
         <file>Icons/pqSurfaceSelectionPointInteractive.png</file>
         <file>Icons/pqSurfaceSelectionPoint24.png</file>
         <file>Icons/pqThreshold24.png</file>

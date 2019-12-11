@@ -500,6 +500,31 @@
     <SourceProxy base_proxygroup="sources"
                  base_proxyname="SelectionSourceBase"
                  class="vtkPVSelectionSource"
+                 name="ValueSelectionSource">
+      <Documentation>ValueSelectionSource is a source producing a value based
+      selection. This cannot be used for selecting composite
+      datasets.</Documentation>
+      <IdTypeVectorProperty clean_command="RemoveAllValues"
+                            command="AddValue"
+                            name="Values"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <Documentation>The list of Values that will be added to the selection
+        produced by the selection source. This takes pairs of values as
+        (process number, value).</Documentation>
+      </IdTypeVectorProperty>
+      <StringVectorProperty command="SetArrayName"
+                            name="ArrayName"
+                            number_of_elements="1">
+      </StringVectorProperty>
+      <!-- End of ValueSelectionSource -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+
+    <SourceProxy base_proxygroup="sources"
+                 base_proxyname="SelectionSourceBase"
+                 class="vtkPVSelectionSource"
                  name="CompositeDataIDSelectionSource">
       <Documentation>CompositeDataIDSelectionSource used to create an ID based
       selection for composite datasets (Multiblock or HierarchicalBox

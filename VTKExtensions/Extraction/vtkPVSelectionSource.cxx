@@ -148,6 +148,7 @@ public:
   SetOfIDs GlobalIDs;
   SetOfIDs Blocks;
   SetOfIDType IDs;
+  SetOfIDType Values;
   SetOfCompositeIDType CompositeIDs;
   SetOfHierarchicalIDType HierarchicalIDs;
   SetOfPedigreeIDType PedigreeIDs;
@@ -256,6 +257,26 @@ void vtkPVSelectionSource::RemoveAllIDs()
 {
   this->Mode = ID;
   this->Internal->IDs.clear();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectionSource::AddValue(vtkIdType piece, vtkIdType value)
+{
+  if (piece < -1)
+  {
+    piece = -1;
+  }
+  this->Mode = VALUES;
+  this->Internal->Values.insert(vtkInternal::IDType(piece, value));
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectionSource::RemoveAllValues()
+{
+  this->Mode = VALUES;
+  this->Internal->Values.clear();
   this->Modified();
 }
 
@@ -636,6 +657,21 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
     {
       source->SetContentType(vtkSelectionNode::QUERY);
       source->SetQueryString(this->QueryString);
+      source->UpdatePiece(piece, npieces, 0);
+      output->ShallowCopy(source->GetOutput());
+    }
+    break;
+
+    case VALUES:
+    {
+      source->SetContentType(vtkSelectionNode::VALUES);
+      source->SetArrayName(this->ArrayName);
+      source->RemoveAllIDs();
+      vtkInternal::SetOfIDType::iterator iter;
+      for (iter = this->Internal->Values.begin(); iter != this->Internal->Values.end(); ++iter)
+      {
+        source->AddID(iter->Piece, iter->ID);
+      }
       source->UpdatePiece(piece, npieces, 0);
       output->ShallowCopy(source->GetOutput());
     }

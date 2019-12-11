@@ -306,6 +306,12 @@ public:
    */
   virtual void SetShaderReplacements(const char*);
 
+  /**
+   * Specify the array names used for the selection.
+   * Use nullptr to use default ones. ("vtkOriginalPointIds" and "vtkOriginalCellIds")
+   */
+  virtual void SetArrayIdNames(const char* pointArray, const char* cellArray);
+
 protected:
   vtkGeometryRepresentation();
   ~vtkGeometryRepresentation() override;
