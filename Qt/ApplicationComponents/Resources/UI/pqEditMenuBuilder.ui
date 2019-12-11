@@ -79,7 +79,7 @@
   <action name="actionCopyScreenshotToClipboard">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqCaptureScreenshot24.png</normaloff>:/pqWidgets/Icons/pqCaptureScreenshot24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqCaptureScreenshot.svg</normaloff>:/pqWidgets/Icons/pqCaptureScreenshot.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Copy Screenshot to Clipboard</string>
