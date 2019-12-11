@@ -543,6 +543,7 @@ vtkCGNSReader::vtkCGNSReader()
   this->DoublePrecisionMesh = 1;
   this->CreateEachSolutionAsBlock = 0;
   this->IgnoreFlowSolutionPointers = false;
+  this->UseUnsteadyPattern = false;
   this->DistributeBlocks = true;
   this->IgnoreSILChangeEvents = false;
   this->CacheMesh = false;
