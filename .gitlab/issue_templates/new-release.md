@@ -88,7 +88,7 @@ git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ HEAD
 If making a non-RC release, additionally:
 
   - Update documentation page
-    - [ ] See `https://github.com/Kitware/paraview-docs/blob/gh-pages/versions.json`
+    - [ ] See `https://github.com/Kitware/paraview-docs/blob/master/README.md`
 -->
 
   - Create tarballs
