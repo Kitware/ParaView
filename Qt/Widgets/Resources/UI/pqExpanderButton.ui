@@ -44,7 +44,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../QtWidgets.qrc">:/QtWidgets/Icons/pqPlus16.png</pixmap>
+      <pixmap resource="../QtWidgets.qrc">:/QtWidgets/Icons/pqPlus.svg</pixmap>
      </property>
     </widget>
    </item>

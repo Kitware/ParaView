@@ -254,25 +254,6 @@
         <file>Icons/pqUpdate16.png</file>
         <file>Icons/pqUpdate24.png</file>
         <file>Icons/pqUpdate32.png</file>
-        <file>Icons/pqVcrBack16.png</file>
-        <file>Icons/pqVcrBack24.png</file>
-        <file>Icons/pqVcrBack32.png</file>
-        <file>Icons/pqVcrFirst16.png</file>
-        <file>Icons/pqVcrFirst24.png</file>
-        <file>Icons/pqVcrFirst32.png</file>
-        <file>Icons/pqVcrForward16.png</file>
-        <file>Icons/pqVcrForward24.png</file>
-        <file>Icons/pqVcrForward32.png</file>
-        <file>Icons/pqVcrLast16.png</file>
-        <file>Icons/pqVcrLast24.png</file>
-        <file>Icons/pqVcrLast32.png</file>
-        <file>Icons/pqVcrLoop24.png</file>
-        <file>Icons/pqVcrPause16.png</file>
-        <file>Icons/pqVcrPause24.png</file>
-        <file>Icons/pqVcrPause32.png</file>
-        <file>Icons/pqVcrPlay16.png</file>
-        <file>Icons/pqVcrPlay24.png</file>
-        <file>Icons/pqVcrPlay32.png</file>
         <file>Icons/pqVcrBack.png</file>
         <file>Icons/pqVcrBack@2x.png</file>
         <file>Icons/pqVcrFirst.png</file>
@@ -297,34 +278,16 @@
         <file>Icons/pqWindowd22.png</file>
         <file>Icons/pqWindowd32.png</file>
         <file>Icons/pqWindowh16.png</file>
-        <file>Icons/pqXMinus16.png</file>
-        <file>Icons/pqXMinus24.png</file>
-        <file>Icons/pqXMinus32.png</file>
         <file>Icons/pqXMinus.png</file>
         <file>Icons/pqXMinus@2x.png</file>
-        <file>Icons/pqXPlus16.png</file>
-        <file>Icons/pqXPlus24.png</file>
-        <file>Icons/pqXPlus32.png</file>
         <file>Icons/pqXPlus.png</file>
         <file>Icons/pqXPlus@2x.png</file>
-        <file>Icons/pqYMinus16.png</file>
-        <file>Icons/pqYMinus24.png</file>
-        <file>Icons/pqYMinus32.png</file>
         <file>Icons/pqYMinus.png</file>
         <file>Icons/pqYMinus@2x.png</file>
-        <file>Icons/pqYPlus16.png</file>
-        <file>Icons/pqYPlus24.png</file>
-        <file>Icons/pqYPlus32.png</file>
         <file>Icons/pqYPlus.png</file>
         <file>Icons/pqYPlus@2x.png</file>
-        <file>Icons/pqZMinus16.png</file>
-        <file>Icons/pqZMinus24.png</file>
-        <file>Icons/pqZMinus32.png</file>
         <file>Icons/pqZMinus.png</file>
         <file>Icons/pqZMinus@2x.png</file>
-        <file>Icons/pqZPlus16.png</file>
-        <file>Icons/pqZPlus24.png</file>
-        <file>Icons/pqZPlus32.png</file>
         <file>Icons/pqZPlus.png</file>
         <file>Icons/pqZPlus@2x.png</file>
         <file>Icons/pqZoomToData24.png</file>

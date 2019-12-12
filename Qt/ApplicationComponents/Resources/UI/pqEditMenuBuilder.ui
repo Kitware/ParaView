@@ -115,7 +115,7 @@
   <action name="actionDelete">
    <property name="icon">
     <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
-     <normaloff>:/QtWidgets/Icons/pqDelete24.png</normaloff>:/QtWidgets/Icons/pqDelete24.png</iconset>
+     <normaloff>:/QtWidgets/Icons/pqDelete.png</normaloff>:/QtWidgets/Icons/pqDelete.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Delete</string>
