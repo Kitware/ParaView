@@ -783,6 +783,7 @@ int vtkCGNSReader::vtkPrivate::getGridAndSolutionNames(int base, std::string& gr
   }
 
   std::vector<double> childId;
+  CGNSRead::getNodeChildrenId(self->cgioNum, self->currentId, childId);
   // Case where FlowSolutionPointers where not enough but there is a pattern in nodeName.
   if (useUnsteadyPattern)
   {
@@ -813,7 +814,6 @@ int vtkCGNSReader::vtkPrivate::getGridAndSolutionNames(int base, std::string& gr
 
     //  For that, we first collect a list of names for all FlowSolution_t nodes in
     // this zone.
-    CGNSRead::getNodeChildrenId(self->cgioNum, self->currentId, childId);
     for (size_t cc = 0; cc < childId.size(); ++cc)
     {
       CGNSRead::char_33 nodeLabel;
@@ -841,7 +841,6 @@ int vtkCGNSReader::vtkPrivate::getGridAndSolutionNames(int base, std::string& gr
       }
     }
   }
-
   if (solutionNames.empty())
   {
     // if we still have no solution nodes discovered, then we read the 1st solution node for
