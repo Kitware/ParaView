@@ -505,9 +505,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   HyperTreeGridAxisCut.xml
   HyperTreeGridAxisReflection.xml
   HyperTreeGridCellCenters.xml
-  #  Does not work with MPI
-  #  Loaded only if MPI is not used
-  #  HyperTreeGridContour.xml
+  HyperTreeGridContour.xml
   HyperTreeGridDepthLimiter.xml
   HyperTreeGridObliquePlaneCutter.xml
   HyperTreeGridPlaneCutter.xml
@@ -1010,10 +1008,6 @@ if (PARAVIEW_USE_MPI)
   # PointInterpolator only works in non-distributed modes.
   set(PointInterpolator_DISABLE_CRS TRUE)
   set(PointInterpolator_DISABLE_CS TRUE)
-else()
-  # The test is broken in parallel, it has to be fixed
-  list (APPEND TESTS_WITH_BASELINES
-    HyperTreeGridContour.xml)
 endif()
 if(PARAVIEW_ENABLE_PYTHON)
   list(APPEND TESTS_WITH_BASELINES
