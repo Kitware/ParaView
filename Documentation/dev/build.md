@@ -381,14 +381,9 @@ More advanced options:
     Ice-T for parallel rendering.
   * `PARAVIEW_INITIALIZE_MPI_ON_CLIENT` (default `ON`; requires
     `PARAVIEW_USE_MPI`): Initialize MPI on client processes by default.
-  * `PARAVIEW_ENABLE_QT_SUPPORT` (default `OFF`; implied by
-    `PARAVIEW_USE_QT`): Enable Qt support.
   * `PARAVIEW_USE_QTHELP` (default `ON`; requires
-    `PARAVIEW_ENABLE_QT_SUPPORT`): Use Qt's help infrastructure for runtime
+    `PARAVIEW_USE_QT`): Use Qt's help infrastructure for runtime
     documentation.
-  * `PARAVIEW_ENABLE_COMMANDLINE_TOOLS` (default `ON`; implied by
-    `PARAVIEW_USE_QT`): Build command line tools such as `pvserver` and
-    `pvrenderserver`.
   * `PARAVIEW_USE_EXTERNAL` (default `OFF`): Whether to prefer external third
     party libraries or the versions ParaView's source contains.
   * `PARAVIEW_VERSIONED_INSTALL` (default `ON`): Whether to add version numbers
