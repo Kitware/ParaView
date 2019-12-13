@@ -134,8 +134,22 @@
         <BooleanDomain name="bool" />
         <Documentation>
           When checked, the reader will simply ignore **FlowSolutionPointers** in the
-          CGNS file since they are either incomplete or invalid and instead will rely
-          on **FlowSolution_t** nodes being labelled as **...AtStep[tsindex]** to locate
+          CGNS file since they are either incomplete or invalid. To locate unsteady
+          solution, the **UseUnsteadyPattern** option should then be activated.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="UseUnsteadyPattern"
+                         command="SetUseUnsteadyPattern"
+                         number_of_elements="1"
+                         default_values="0"
+                         label="Use Unsteady Pattern on FlowSolution_t"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When checked, the reader will use pattern matching to detect FlowSolution_t
+          that are relevant for the current timestep. It rely on **FlowSolution_t**
+          nodes being labelled as **...AtStep[tsindex]** to locate
           solution nodes for a specific timestep. Note, ***tsindex*** starts with 1.
         </Documentation>
       </IntVectorProperty>
@@ -229,6 +243,7 @@
           <Property name="CacheConnectivity" />
           <Property name="CreateEachSolutionAsBlock" />
           <Property name="IgnoreFlowSolutionPointers" />
+          <Property name="UseUnsteadyPattern" />
         </ExposedProperties>
       </SubProxy>
 
