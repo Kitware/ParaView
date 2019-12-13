@@ -1,5 +1,5 @@
 # Build Sphinx documentation for Python modules.
-if (NOT PARAVIEW_ENABLE_PYTHON)
+if (NOT PARAVIEW_USE_PYTHON)
   return()
 endif()
 

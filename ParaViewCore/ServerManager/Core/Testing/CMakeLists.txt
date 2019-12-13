@@ -3,6 +3,6 @@ vtk_module_test_data(
 
 add_subdirectory(Cxx)
 
-if (PARAVIEW_ENABLE_PYTHON)
+if (PARAVIEW_USE_PYTHON)
   add_subdirectory(Python)
 endif ()

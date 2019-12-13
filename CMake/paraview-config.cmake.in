@@ -9,7 +9,7 @@ The following variables are provided by this module:
   * `ParaView_PREFIX_PATH`: Install prefix for ParaView.
   * `PARAVIEW_BUILD_QT_GUI`: If ParaView's Qt GUI is available.
   * `PARAVIEW_USE_MPI`: If ParaView is built with MPI support.
-  * `PARAVIEW_ENABLE_PYTHON`: If ParaView is built with Python support.
+  * `PARAVIEW_USE_PYTHON`: If ParaView is built with Python support.
   * `PARAVIEW_PYTHONPATH`: Where ParaView's Python modules live under the
     install prefix. Unset if Python is not available.
   * `PARAVIEW_PLUGIN_SUBDIR`: The subdirectory under the library directory for
@@ -60,10 +60,10 @@ unset(_paraview_use_external_vtk)
 
 set(PARAVIEW_BUILD_QT_GUI "@PARAVIEW_BUILD_QT_GUI@")
 set(PARAVIEW_USE_MPI "@PARAVIEW_USE_MPI@")
-set(PARAVIEW_ENABLE_PYTHON "@PARAVIEW_ENABLE_PYTHON@")
+set(PARAVIEW_USE_PYTHON "@PARAVIEW_USE_PYTHON@")
 set(PARAVIEW_PLUGIN_SUBDIR "paraview@paraview_version_suffix@/plugins")
 
-if (PARAVIEW_ENABLE_PYTHON)
+if (PARAVIEW_USE_PYTHON)
   set(PARAVIEW_PYTHONPATH "@PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX@")
   include("${CMAKE_CURRENT_LIST_DIR}/ParaViewPython-targets.cmake")
   # Unset this for now; these targets will be defined later.
@@ -89,7 +89,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/ParaViewServerManager.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/ParaViewTesting.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/vtkModuleWrapClientServer.cmake")
 
-if (@PARAVIEW_ENABLE_PYTHON@) # PARAVIEW_ENABLE_PYTHON
+if (@PARAVIEW_USE_PYTHON@) # PARAVIEW_USE_PYTHON
   include("${CMAKE_CURRENT_LIST_DIR}/paraview.modules-vtk-python-module-properties.cmake")
 endif ()
 

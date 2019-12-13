@@ -12,7 +12,7 @@ if (USE_CATALYST)
       "${CMAKE_PROJECT_NAME} requires ParaView to be built with Catalyst and "
       "Python support enabled. Please rebuild ParaView (or point to a "
       "different build of ParaView) with PARAVIEW_ENABLE_CATALYST and "
-      "PARAVIEW_ENABLE_PYTHON set to TRUE")
+      "PARAVIEW_USE_PYTHON set to TRUE")
     return ()
   endif()
 

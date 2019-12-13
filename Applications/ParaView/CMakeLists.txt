@@ -90,10 +90,10 @@ if (PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
       vtkParaViewDocumentation)
 endif ()
 
-if (PARAVIEW_ENABLE_PYTHON)
+if (PARAVIEW_USE_PYTHON)
   target_compile_definitions(paraview
     PRIVATE
-      PARAVIEW_ENABLE_PYTHON)
+      PARAVIEW_USE_PYTHON)
   target_link_libraries(paraview
     PRIVATE
       ParaView::pvpythonmodules

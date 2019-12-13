@@ -288,9 +288,9 @@ to modify include:
     or not.
   * `PARAVIEW_USE_OSPRAY` (default `OFF`): Whether OSPRay ray-tracing support
     will be available or not.
-  * `PARAVIEW_ENABLE_PYTHON` (default `OFF`): Whether Python
+  * `PARAVIEW_USE_PYTHON` (default `OFF`): Whether Python
     support will be available or not.
-  * `PARAVIEW_ENABLE_WEB` (default `OFF`; requires `PARAVIEW_ENABLE_PYTHON`):
+  * `PARAVIEW_ENABLE_WEB` (default `OFF`; requires `PARAVIEW_USE_PYTHON`):
     Whether ParaViewWeb support will be available or not.
   * `PARAVIEW_PLUGIN_ENABLE_<name>` (default varies): Whether to enable a
     plugin or not.

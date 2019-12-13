@@ -3,7 +3,7 @@ set(classes
 set(server_manager_files
   ExplicitStructuredGrid.xml)
 
-if (PARAVIEW_ENABLE_PYTHON)
+if (PARAVIEW_USE_PYTHON)
   list(APPEND classes
     vtkExplicitStructuredGridPythonExtractor)
   list(APPEND server_manager_files

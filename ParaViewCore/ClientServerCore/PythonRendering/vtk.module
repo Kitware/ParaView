@@ -3,7 +3,7 @@ NAME
 LIBRARY_NAME
   vtkPVClientServerCorePythonRendering
 CONDITION
-  PARAVIEW_ENABLE_PYTHON
+  PARAVIEW_USE_PYTHON
 KIT
   ParaView::ClientServerKit
 DEPENDS

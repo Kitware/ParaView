@@ -3,7 +3,7 @@ NAME
 LIBRARY_NAME
   pqPython
 CONDITION
-  PARAVIEW_ENABLE_PYTHON
+  PARAVIEW_USE_PYTHON
 DEPENDS
   ParaView::pqCore
   VTK::PythonInterpreter

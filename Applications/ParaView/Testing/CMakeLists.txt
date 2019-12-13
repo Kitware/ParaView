@@ -10,6 +10,6 @@ set(_vtk_build_TEST_DATA_TARGET "ParaViewData")
 set(PARAVIEW_TEST_BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline")
 
 add_subdirectory(XML)
-if (PARAVIEW_ENABLE_PYTHON)
+if (PARAVIEW_USE_PYTHON)
   add_subdirectory(Python)
 endif ()

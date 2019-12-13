@@ -68,7 +68,7 @@ foreach (exe IN ITEMS pvserver pvdataserver pvrenderserver)
     "${exe}")
 endforeach ()
 
-if (PARAVIEW_ENABLE_PYTHON)
+if (PARAVIEW_USE_PYTHON)
   foreach (exe IN ITEMS pvbatch pvpython)
     paraview_add_executable("${exe}" "${exe}.cxx")
     list(APPEND paraview_tools

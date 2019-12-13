@@ -23,10 +23,10 @@ function (paraview_add_executable name)
     PRIVATE
       ParaView::paraview_plugins)
 
-  if (PARAVIEW_ENABLE_PYTHON)
+  if (PARAVIEW_USE_PYTHON)
     target_compile_definitions("${name}"
       PRIVATE
-        PARAVIEW_ENABLE_PYTHON)
+        PARAVIEW_USE_PYTHON)
     target_link_libraries("${name}"
       PRIVATE
         VTK::PythonInterpreter

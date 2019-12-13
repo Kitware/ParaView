@@ -421,7 +421,7 @@ void pqImmediateExportReaction::onTriggered()
     vtkPythonInterpreter::Initialize();
     vtkPythonInterpreter::RunSimpleString(command.toLocal8Bit().data());
 #else
-    qWarning("Export Now requires PARAVIEW_ENABLE_PYTHON");
+    qWarning("Export Now requires PARAVIEW_USE_PYTHON");
 #endif
   }
 }

@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifdef PARAVIEW_ENABLE_PYTHON
+#ifdef PARAVIEW_USE_PYTHON
 #include "pvpythonmodules.h"
 #endif
 
@@ -70,7 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ParaViewDocumentationInitializer.h"
 #endif
 
-#ifdef PARAVIEW_ENABLE_PYTHON
+#ifdef PARAVIEW_USE_PYTHON
 #include "pqExportInspector.h"
 #include "pqPythonDebugLeaksView.h"
 #include "pqPythonShell.h"
@@ -109,7 +109,7 @@ ParaViewMainWindow::ParaViewMainWindow()
     leaksView->show();
   }
 
-#ifdef PARAVIEW_ENABLE_PYTHON
+#ifdef PARAVIEW_USE_PYTHON
   pvpythonmodules_load();
 #endif
 
@@ -122,7 +122,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->Internals->setupUi(this);
   this->Internals->outputWidgetDock->hide();
   this->Internals->pythonShellDock->hide();
-#ifdef PARAVIEW_ENABLE_PYTHON
+#ifdef PARAVIEW_USE_PYTHON
   pqPythonShell* shell = new pqPythonShell(this);
   shell->setObjectName("pythonShell");
   this->Internals->pythonShellDock->setWidget(shell);
@@ -132,7 +132,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   }
 #endif
 
-#ifdef PARAVIEW_ENABLE_PYTHON
+#ifdef PARAVIEW_USE_PYTHON
   pqExportInspector* catalystInspector = new pqExportInspector(this);
   this->Internals->catalystInspectorDock->setWidget(catalystInspector);
   this->Internals->catalystInspectorDock->hide();
@@ -376,7 +376,7 @@ void ParaViewMainWindow::updateFontSize()
   }
 
 // Console font size
-#ifdef PARAVIEW_ENABLE_PYTHON
+#ifdef PARAVIEW_USE_PYTHON
   pqPythonShell* shell = qobject_cast<pqPythonShell*>(this->Internals->pythonShellDock->widget());
   shell->setFontSize(fontSize);
 #endif

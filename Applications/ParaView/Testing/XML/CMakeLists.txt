@@ -477,7 +477,7 @@ if (PARAVIEW_PLUGIN_ENABLE_EULATestPlugin)
     PluginEULA.xml)
 endif ()
 
-if (PARAVIEW_ENABLE_PYTHON)
+if (PARAVIEW_USE_PYTHON)
   list(APPEND TESTS_WITHOUT_BASELINES
     TestPythonConsole.xml
     TestPopOutWidget.xml # needs programmable filter
@@ -1013,7 +1013,7 @@ if (PARAVIEW_USE_MPI)
   set(PointInterpolator_DISABLE_CRS TRUE)
   set(PointInterpolator_DISABLE_CS TRUE)
 endif()
-if(PARAVIEW_ENABLE_PYTHON)
+if(PARAVIEW_USE_PYTHON)
   list(APPEND TESTS_WITH_BASELINES
     ColorByComponentNames.xml # needs programmable filter
     LiveProgrammableSource.xml
@@ -1394,7 +1394,7 @@ IF (PARAVIEW_USE_MPI)
   set(SelectionLinkRemove_DISABLE_CS TRUE)
   set(SelectionLinkReaction_DISABLE_CS TRUE)
 
-  if (PARAVIEW_ENABLE_PYTHON)
+  if (PARAVIEW_USE_PYTHON)
     set (TraceStatisticsFilter_DISABLE_CS TRUE)
     set (TraceStatisticsFilter_DISABLE_CRS TRUE)
   endif()
@@ -1668,7 +1668,7 @@ if (TARGET paraview)
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS BoxClipStateBackwardsCompatibility.xml)
 
-  if (PARAVIEW_ENABLE_PYTHON)
+  if (PARAVIEW_USE_PYTHON)
     # Test whether or not we can load a Python state file with the --state
     # command line option as well as loading a Python state file that was
     # generated with PV 5.4.1. Loading the 5.4.1 Python state file checks
@@ -1731,7 +1731,7 @@ set(paraview_python_verify_tests
   ExportSceneSpreadSheetView
 )
 
-if (PARAVIEW_ENABLE_PYTHON)
+if (PARAVIEW_USE_PYTHON)
   foreach(test_name ${paraview_python_verify_tests})
     set(tname "ParaView::Applications::${test_name}")
     add_test(NAME ${tname}

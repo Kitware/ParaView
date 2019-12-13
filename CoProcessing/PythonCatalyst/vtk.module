@@ -3,7 +3,7 @@ NAME
 LIBRARY_NAME
   vtkPVPythonCatalyst
 CONDITION
-  PARAVIEW_ENABLE_PYTHON
+  PARAVIEW_USE_PYTHON
 DEPENDS
   ParaView::Catalyst
   VTK::PythonInterpreter
