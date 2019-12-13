@@ -373,8 +373,6 @@ More advanced options:
   * `PARAVIEW_ENABLE_COSMOTOOLS` (default `OFF`; requires `PARAVIEW_USE_MPI`
     and not available on Windows): Enable support for CosmoTools which includes
     GenericIO readers and writers as well as some point cloud algorithms.
-  * `PARAVIEW_USE_ICE_T` (default `OFF`; requires `PARAVIEW_USE_MPI`): Use
-    Ice-T for parallel rendering.
   * `PARAVIEW_INITIALIZE_MPI_ON_CLIENT` (default `ON`; requires
     `PARAVIEW_USE_MPI`): Initialize MPI on client processes by default.
   * `PARAVIEW_USE_QTHELP` (default `ON`; requires

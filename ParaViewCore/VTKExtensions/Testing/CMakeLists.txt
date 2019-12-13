@@ -22,13 +22,8 @@ vtk_add_test_cxx(${vtk-modules}ServerFilterTests tests
 if (PARAVIEW_USE_MPI)
   set_property(SOURCE ParaViewCoreVTKExtensionsPrintSelf.cxx APPEND
     PROPERTY
-      COMPILE_DEFINITIONS PARAVIEW_USE_MPI)
-endif ()
-
-if (PARAVIEW_USE_ICE_T)
-  set_property(SOURCE ParaViewCoreVTKExtensionsPrintSelf.cxx APPEND
-    PROPERTY
-      COMPILE_DEFINITIONS PARAVIEW_USE_ICE_T)
+      COMPILE_DEFINITIONS PARAVIEW_USE_MPI
+                          PARAVIEW_USE_ICE_T)
 endif ()
 
 vtk_test_cxx_executable(${vtk-modules}ServerFilterTests tests)
@@ -46,7 +41,7 @@ set (_MPI_TEST_PATH ${CXX_TEST_PATH}/\${CTEST_CONFIGURATION_TYPE})
 endif ()
 
 
-IF(PARAVIEW_USE_ICE_T AND PARAVIEW_USE_MPI)
+IF(PARAVIEW_USE_MPI)
   ADD_EXECUTABLE(TestIceTCompositePass TestIceTCompositePass.cxx)
   TARGET_LINK_LIBRARIES(TestIceTCompositePass vtkPVVTKExtensions)
 
