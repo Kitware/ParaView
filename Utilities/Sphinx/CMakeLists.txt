@@ -37,10 +37,12 @@ configure_file("${sphinx-build}" sphinx-build.py COPYONLY)
 # CMakeLists.txt file, that indeed is true.
 add_custom_target(ParaViewPythonDoc
   COMMAND $<TARGET_FILE:pvpython>
+          --no-mpi
           "${CMAKE_CURRENT_SOURCE_DIR}/sphinx_apidoc.py"
           -o "${CMAKE_CURRENT_BINARY_DIR}/config"
           "${ParaView_BINARY_DIR}/${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}/paraview"
   COMMAND $<TARGET_FILE:pvpython>
+          --no-mpi
           "${CMAKE_CURRENT_BINARY_DIR}/sphinx-build.py"
           -b html "${CMAKE_CURRENT_BINARY_DIR}/config"
           "${PARAVIEW_GENERATED_DOCUMENTATION_OUTPUT_DIRECTORY}/python"
