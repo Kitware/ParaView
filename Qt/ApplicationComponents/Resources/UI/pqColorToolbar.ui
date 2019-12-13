@@ -119,7 +119,7 @@
      <bool>false</bool>
     </property>
     <property name="icon" >
-     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqResetToVisibleRange32.png</iconset>
+     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqResetToVisibleRange.svg</iconset>
     </property>
     <property name="text" >
      <string>Rescale Visible Range</string>

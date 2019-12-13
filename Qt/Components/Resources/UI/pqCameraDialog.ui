@@ -107,7 +107,7 @@
            </property>
            <property name="icon">
             <iconset resource="../pqComponents.qrc">
-             <normaloff>:/pqWidgets/Icons/pqXPlus24.png</normaloff>:/pqWidgets/Icons/pqXPlus24.png</iconset>
+             <normaloff>:/pqWidgets/Icons/pqXPlus.png</normaloff>:/pqWidgets/Icons/pqXPlus.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -127,7 +127,7 @@
            </property>
            <property name="icon">
             <iconset resource="../pqComponents.qrc">
-             <normaloff>:/pqWidgets/Icons/pqXMinus24.png</normaloff>:/pqWidgets/Icons/pqXMinus24.png</iconset>
+             <normaloff>:/pqWidgets/Icons/pqXMinus.png</normaloff>:/pqWidgets/Icons/pqXMinus.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -147,7 +147,7 @@
            </property>
            <property name="icon">
             <iconset resource="../pqComponents.qrc">
-             <normaloff>:/pqWidgets/Icons/pqYPlus24.png</normaloff>:/pqWidgets/Icons/pqYPlus24.png</iconset>
+             <normaloff>:/pqWidgets/Icons/pqYPlus.png</normaloff>:/pqWidgets/Icons/pqYPlus.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -167,7 +167,7 @@
            </property>
            <property name="icon">
             <iconset resource="../pqComponents.qrc">
-             <normaloff>:/pqWidgets/Icons/pqYMinus24.png</normaloff>:/pqWidgets/Icons/pqYMinus24.png</iconset>
+             <normaloff>:/pqWidgets/Icons/pqYMinus.png</normaloff>:/pqWidgets/Icons/pqYMinus.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -187,7 +187,7 @@
            </property>
            <property name="icon">
             <iconset resource="../pqComponents.qrc">
-             <normaloff>:/pqWidgets/Icons/pqZPlus24.png</normaloff>:/pqWidgets/Icons/pqZPlus24.png</iconset>
+             <normaloff>:/pqWidgets/Icons/pqZPlus.png</normaloff>:/pqWidgets/Icons/pqZPlus.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -207,7 +207,7 @@
            </property>
            <property name="icon">
             <iconset resource="../pqComponents.qrc">
-             <normaloff>:/pqWidgets/Icons/pqZMinus24.png</normaloff>:/pqWidgets/Icons/pqZMinus24.png</iconset>
+             <normaloff>:/pqWidgets/Icons/pqZMinus.png</normaloff>:/pqWidgets/Icons/pqZMinus.png</iconset>
            </property>
            <property name="iconSize">
             <size>
