@@ -1751,6 +1751,10 @@ vtkSmartPointer<vtkDataObject> vtkCGNSReader::vtkPrivate::readCurvilinearZone(in
   vtkSmartPointer<vtkPoints> points;
 
   vtkPrivate::getGridAndSolutionNames(base, gridCoordName, solutionNames, self);
+  if (gridCoordName == "Null")
+  {
+    return vtkSmartPointer<vtkDataObject>();
+  }
 
   // If it is not a deforming mesh, gridCoordName keep the standard name
   // Only Volume mesh points, not subset are cached
@@ -2061,6 +2065,11 @@ int vtkCGNSReader::GetUnstructuredZone(
   std::size_t nCoordsArray = 0;
 
   vtkPrivate::getGridAndSolutionNames(base, gridCoordName, solutionNames, this);
+  if (gridCoordName == "Null")
+  {
+    mbase->SetBlock(zone, vtkSmartPointer<vtkDataObject>());
+    return 0;
+  }
 
   vtkPrivate::getCoordsIdAndFillRind(
     gridCoordName, physicalDim, nCoordsArray, gridChildId, rind, this);
