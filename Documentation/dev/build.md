@@ -324,7 +324,7 @@ Less common, but variables which may be of interest to some:
 
   * `PARAVIEW_BUILD_DEVELOPER_DOCUMENTATION` (default `OFF`): If set, the HTML
     documentation for ParaView's C++, Python, and proxies will be generated.
-  * `PARAVIEW_ENABLE_EXAMPLES` (default `OFF`): If set, ParaView's example code
+  * `PARAVIEW_BUILD_EXAMPLES` (default `OFF`): If set, ParaView's example code
     will be added as tests to the ParaView test suite.
   * `PARAVIEW_ENABLE_LOGGING` (default `ON`): If set, enhanced logging will be
     enabled.

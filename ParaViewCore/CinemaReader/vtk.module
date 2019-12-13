@@ -2,6 +2,8 @@ NAME
   ParaView::CinemaReader
 LIBRARY_NAME
   vtkPVCinemaReader
+CONDITION
+  PARAVIEW_USE_PYTHON
 DEPENDS
   ParaView::ClientServerCoreRendering
   ParaView::ServerManagerCore
@@ -9,10 +11,11 @@ DEPENDS
   VTK::RenderingCore
 PRIVATE_DEPENDS
   ParaView::Animation
+  ParaView::CinemaPython
   ParaView::ServerManagerRendering
+  VTK::opengl
   VTK::PythonInterpreter
   VTK::RenderingOpenGL2
   VTK::WrappingPythonCore
-  VTK::opengl
 TEST_LABELS
   ParaView
