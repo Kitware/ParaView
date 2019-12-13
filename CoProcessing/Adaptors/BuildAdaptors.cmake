@@ -4,11 +4,6 @@
 # open-adaptors in one place, we place them under this directory and build them
 # using a pattern similar to the ParaView/Examples so that each one of the
 # adaptors can be built separately if the user wants.
-if (NOT PARAVIEW_ENABLE_CATALYST)
-  # sanity check.
-  return()
-endif()
-
 #------------------------------------------------------------------------------
 # Make sure it uses the same build configuration as ParaView.
 if (CMAKE_CONFIGURATION_TYPES)

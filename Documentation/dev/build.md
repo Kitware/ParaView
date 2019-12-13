@@ -338,8 +338,6 @@ Less common, but variables which may be of interest to some:
   * `PARAVIEW_ENABLE_KITS` (default `OFF`; requires CMake 3.12+): Compile
     ParaView into a smaller set of libraries. Can be useful on platforms where
     ParaView takes a long time to launch due to expensive disk access.
-  * `PARAVIEW_ENABLE_CATALYST` (default `ON`): Whether to build Catalyst
-    CoProcessing support or not.
 
 <!--
 These variables should be documented once they're effective again.
@@ -407,8 +405,8 @@ These variables should be documented once they're effective again.
   * `PARAVIEW_USE_EXTERNAL_VTK` (default `OFF`): Use an externally provided
     VTK. Note that ParaView has fairly narrow requirements for the VTK it can
     use, so only very recent versions are likely to work.
-  * `PARAVIEW_BUILD_CATALYST_ADAPTORS` (default `OFF`; requires
-    `PARAVIEW_ENABLE_CATALYST` and not available on Windows): If set,
+  * `PARAVIEW_BUILD_CATALYST_ADAPTORS` (default `OFF`;
+    not available on Windows): If set,
     ParaView's example Catalyst adaptors will be added as tests to the ParaView
     test suite.
 -->
