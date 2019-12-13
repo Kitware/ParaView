@@ -252,8 +252,11 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int& argc, char**& argv)
   // we turn off prompts all together.
   vtkOutputWindow::GetInstance()->PromptUserOff();
 
-#ifdef PARAVIEW_USE_MPI_SSEND
-  vtkMPIController::SetUseSsendForRMI(1);
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
+  if (vtksys::SystemTools::GetEnv("PARAVIEW_USE_MPI_SSEND"))
+  {
+    vtkMPIController::SetUseSsendForRMI(1);
+  }
 #endif
 
   vtkMultiThreader::SetGlobalMaximumNumberOfThreads(1);
