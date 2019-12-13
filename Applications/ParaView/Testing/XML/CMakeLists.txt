@@ -585,7 +585,7 @@ else()
     TruchasReader.xml)
 endif()
 
-if(PARAVIEW_USE_RAYTRACING)
+if(PARAVIEW_ENABLE_RAYTRACING)
   list(APPEND TESTS_WITH_BASELINES
     OSPRay.xml)
 endif()
