@@ -109,12 +109,6 @@ if (TARGET VTK::PythonInterpreter)
     vtkPythonSelector)
 endif ()
 
-cmake_dependent_option(PARAVIEW_INITIALIZE_MPI_ON_CLIENT
-  "Initialize MPI on client-processes by default. Can be overridden using command line arguments" ON
-  "PARAVIEW_USE_MPI" OFF)
-mark_as_advanced(
-  PARAVIEW_INITIALIZE_MPI_ON_CLIENT)
-
 set(vtkProcessModule_defines "BUILD_SHARED_LIBS=${built_shared}")
 if (PARAVIEW_INITIALIZE_MPI_ON_CLIENT)
   list(APPEND vtkProcessModule_defines
