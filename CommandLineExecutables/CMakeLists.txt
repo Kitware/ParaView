@@ -50,7 +50,7 @@ endif()
 # there if so) or we're on macOS where the configuration file is
 # then stored under the bundle for the application. Instead,
 # provide our own configuration file instead.
-if (APPLE OR NOT PARAVIEW_BUILD_QT_GUI)
+if (APPLE OR NOT PARAVIEW_USE_QT)
   paraview_plugin_write_conf(
     NAME "paraview"
     PLUGINS_TARGETS ParaView::paraview_plugins
@@ -76,7 +76,7 @@ if (PARAVIEW_USE_PYTHON)
   endforeach ()
 endif ()
 
-if (PARAVIEW_BUILD_QT_GUI)
+if (PARAVIEW_USE_QT)
   list(APPEND paraview_tools
     paraview)
 endif ()

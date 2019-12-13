@@ -1,4 +1,4 @@
-if (PARAVIEW_BUILD_QT_GUI)
+if (PARAVIEW_USE_QT)
   set(tests
     EyeDomeLighting.xml)
 
@@ -22,7 +22,7 @@ if (PARAVIEW_BUILD_QT_GUI)
   )
 endif ()
 
-if (PARAVIEW_BUILD_QT_GUI AND PARAVIEW_USE_MPI)
+if (PARAVIEW_USE_QT AND PARAVIEW_USE_MPI)
   set(tests
     EDLWithSubsampling.xml)
 

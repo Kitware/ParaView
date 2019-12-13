@@ -1,4 +1,4 @@
-if (PARAVIEW_BUILD_QT_GUI)
+if (PARAVIEW_USE_QT)
   set(_paraview_add_tests_default_test_data_target DigitalRockPhysicsData)
   ExternalData_Expand_Arguments("${_paraview_add_tests_default_test_data_target}" _
     "DATA{Data/rocksample.vti}")

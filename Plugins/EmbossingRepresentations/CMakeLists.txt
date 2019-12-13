@@ -1,6 +1,6 @@
 set(interfaces)
 set(sources)
-if (PARAVIEW_BUILD_QT_GUI)
+if (PARAVIEW_USE_QT)
   paraview_plugin_add_property_widget(
     KIND        WIDGET_DECORATOR
     TYPE        ExtrusionPropertyWidgetDecorator

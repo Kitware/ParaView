@@ -1,6 +1,6 @@
 cmake_dependent_option(PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
   "Build the ParaView help menu documentation for ParaView and its plugins" ON
-  "PARAVIEW_BUILD_QT_GUI" ON)
+  "PARAVIEW_USE_QT" ON)
 mark_as_advanced(PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
 
 set(xmls

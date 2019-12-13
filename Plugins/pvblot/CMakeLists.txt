@@ -15,7 +15,7 @@ set(ui_files)
 set(qrc_files)
 set(sources)
 
-if (PARAVIEW_BUILD_QT_GUI)
+if (PARAVIEW_USE_QT)
   list(APPEND ui_files
     pqBlotDialog.ui)
   list(APPEND qrc_files
@@ -49,7 +49,7 @@ paraview_add_plugin(pvblot
   UI_FILES ${ui_files}
   SOURCES ${sources})
 
-if (PARAVIEW_BUILD_QT_GUI)
+if (PARAVIEW_USE_QT)
   target_link_libraries(pvblot
     PRIVATE
       ParaView::ClientServerCoreCore

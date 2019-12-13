@@ -1031,7 +1031,7 @@ function (paraview_add_plugin name)
   endif ()
 
   if ((_paraview_add_plugin_module_xmls OR _paraview_add_plugin_xmls) AND
-      PARAVIEW_BUILD_QT_GUI AND _paraview_add_plugin_XML_DOCUMENTATION)
+      PARAVIEW_USE_QT AND _paraview_add_plugin_XML_DOCUMENTATION)
     set(_paraview_build_plugin_docdir
       "${CMAKE_CURRENT_BINARY_DIR}/paraview_help")
 

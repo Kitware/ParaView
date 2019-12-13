@@ -187,7 +187,7 @@ set(paraview_python_state_tests
   ScalarOpacityFunctionPythonState
 )
 foreach(python_state_test ${paraview_python_state_tests})
-  if (PARAVIEW_BUILD_QT_GUI)
+  if (PARAVIEW_USE_QT)
     set(tname "ParaView::ServerManagerDefaultPython-${python_state_test}")
     ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}" NAME ${tname}
       COMMAND ${CMAKE_COMMAND}

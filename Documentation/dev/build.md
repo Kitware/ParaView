@@ -282,7 +282,7 @@ to modify include:
 
   * `PARAVIEW_BUILD_SHARED_LIBS` (default `ON`): If set, shared libraries will
     be built. This is usually what is wanted.
-  * `PARAVIEW_BUILD_QT_GUI` (default `ON`): Builds the `paraview` GUI
+  * `PARAVIEW_USE_QT` (default `ON`): Builds the `paraview` GUI
     application.
   * `PARAVIEW_USE_MPI` (default `OFF`): Whether MPI support will be available
     or not.
@@ -382,12 +382,12 @@ More advanced options:
   * `PARAVIEW_INITIALIZE_MPI_ON_CLIENT` (default `ON`; requires
     `PARAVIEW_USE_MPI`): Initialize MPI on client processes by default.
   * `PARAVIEW_ENABLE_QT_SUPPORT` (default `OFF`; implied by
-    `PARAVIEW_BUILD_QT_GUI`): Enable Qt support.
+    `PARAVIEW_USE_QT`): Enable Qt support.
   * `PARAVIEW_USE_QTHELP` (default `ON`; requires
     `PARAVIEW_ENABLE_QT_SUPPORT`): Use Qt's help infrastructure for runtime
     documentation.
   * `PARAVIEW_ENABLE_COMMANDLINE_TOOLS` (default `ON`; implied by
-    `PARAVIEW_BUILD_QT_GUI`): Build command line tools such as `pvserver` and
+    `PARAVIEW_USE_QT`): Build command line tools such as `pvserver` and
     `pvrenderserver`.
   * `PARAVIEW_USE_EXTERNAL` (default `OFF`): Whether to prefer external third
     party libraries or the versions ParaView's source contains.

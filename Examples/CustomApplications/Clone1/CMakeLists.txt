@@ -3,11 +3,11 @@ project(Clone1)
 
 find_package(ParaView REQUIRED)
 
-if (NOT PARAVIEW_BUILD_QT_GUI)
+if (NOT PARAVIEW_USE_QT)
   message(STATUS
-    "${CMAKE_PROJECT_NAME} example requires PARAVIEW_BUILD_QT_GUI to be "
+    "${CMAKE_PROJECT_NAME} example requires PARAVIEW_USE_QT to be "
     "enabled. Please rebuild ParaView (or point to a different build of "
-    "ParaView) with PARAVIEW_BUILD_QT_GUI set to TRUE")
+    "ParaView) with PARAVIEW_USE_QT set to TRUE")
   return ()
 endif()
 

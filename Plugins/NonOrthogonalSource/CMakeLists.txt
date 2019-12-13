@@ -1,6 +1,6 @@
 set(interfaces)
 set(sources)
-if (PARAVIEW_BUILD_QT_GUI)
+if (PARAVIEW_USE_QT)
   list(APPEND sources
     pqNonOrthogonalAutoStart.cxx
     pqNonOrthogonalAutoStart.h
@@ -23,7 +23,7 @@ paraview_add_plugin(NonOrthogonalSource
   MODULES       NonOrthogonalSource::vtkNonOrthogonalSources
   MODULE_FILES  "${CMAKE_CURRENT_SOURCE_DIR}/Sources/vtk.module")
 
-if (PARAVIEW_BUILD_QT_GUI)
+if (PARAVIEW_USE_QT)
   target_link_libraries(NonOrthogonalSource
     PRIVATE
       ParaView::pqApplicationComponents)

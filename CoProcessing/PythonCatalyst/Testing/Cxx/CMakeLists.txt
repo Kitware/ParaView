@@ -144,7 +144,7 @@ if (PARAVIEW_USE_MPI)
   _set_standard_test_properties(PCoProcessingTestPythonScript)
 endif()
 
-if (PARAVIEW_BUILD_QT_GUI)
+if (PARAVIEW_USE_QT)
   # for now the full workflow test only works with the shared lib builds of
   # paraview since the static build will load all of the plugins automatically
   # which will add in extra properties to objects in the created script
