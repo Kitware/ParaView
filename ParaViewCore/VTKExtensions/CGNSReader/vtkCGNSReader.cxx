@@ -1297,13 +1297,18 @@ int vtkCGNSReader::vtkPrivate::readBCData(const double nodeId, const int cellDim
         {
           std::string location;
           CGNSRead::readNodeStringData(self->cgioNum, BCDataSetChild, location);
-          if (location == "FaceCenter")
+          if (location == "FaceCenter" || location == "IFaceCenter" || location == "JFaceCenter" ||
+            location == "KFaceCenter")
           {
             varCentering = CGNS_ENUMV(FaceCenter);
           }
           else if (location == "Vertex")
           {
             varCentering = CGNS_ENUMV(Vertex);
+          }
+          else
+          {
+            return 1;
           }
         }
       }
@@ -1983,6 +1988,8 @@ int vtkCGNSReader::GetCurvilinearZone(
                 ? binfo.CreateDataSet(cellDim, zoneGrid)
                 : vtkPrivate::readBCDataSet(binfo, base, zone, cellDim, physicalDim, zsize, this);
               vtkPrivate::AddIsPatchArray(ds, true);
+              vtkCGNSReader::vtkPrivate::readBCData(
+                *bciter, cellDim, physicalDim, binfo.Location, ds.Get(), this);
               patchesMB->SetBlock(idx, ds);
 
               if (!binfo.FamilyName.empty())
