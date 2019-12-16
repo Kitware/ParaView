@@ -53,6 +53,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <clocale>
 #include <cstdlib>
 
+#if !defined(__APPLE__) && !defined(_WIN32)
+#include <cstring>
+#endif
+
 int main(int argc, char* argv[])
 {
 #if _paraview_client_DEFAULT_STYLE
@@ -88,6 +92,23 @@ int main(int argc, char* argv[])
   // instance.
   QSurfaceFormat::setDefaultFormat(QVTKRenderWindowAdapter::defaultFormat(/*stereo_capable=*/false));
 
+#if !defined(__APPLE__) && !defined(_WIN32)
+  // On non-Apple and non-Windows platforms, ParaView only works with X11, so
+  // prefer it to Wayland on those platforms.
+  std::string platform_args_data[] = { "-platform", "xcb" };
+  char* platform_args[] = {
+    // XXX(c++17): platform_args_data[n].data()
+    &platform_args_data[0].front(),
+    &platform_args_data[1].front(),
+  };
+  std::vector<char*> new_argc(argc + 2 + 1);
+  std::memcpy(new_argc.data(), argv, argc * sizeof(char*));
+  new_argc[argc] = platform_args[0];
+  new_argc[argc + 1] = platform_args[1];
+  new_argc[argc + 2] = nullptr;
+  argc += 2;
+  argv = new_argc.data();
+#endif
   QApplication qtapp(argc, argv);
   // QApplication docs suggest resetting to "C" after the QApplication is
   // initialized.
