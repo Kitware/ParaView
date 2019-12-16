@@ -29,23 +29,11 @@ list(APPEND interfaces
 list(APPEND sources
   ${dock_sources})
 
-# paraview_plugin_add_dock_window(
-#   CLASS_NAME pqOpenVRControls
-#   DOCK_AREA Right
-#   INTERFACES main_interfaces
-#   SOURCES main_sources)
-# list(APPEND interfaces
-#   ${main_interfaces})
-# list(APPEND sources
-#   ${main_sources})
-
   paraview_add_plugin(OpenVR
   VERSION "1.2"
   UI_FILES pqOpenVRDockPanel.ui pqOpenVRControls.ui
   UI_INTERFACES ${interfaces}
-  SERVER_MANAGER_XML OpenVRPointSource.xml
   SOURCES ${sources}
-#  MODULES ExplicitStructuredGrid::vtkExplicitStructuredGrid
   )
 
 

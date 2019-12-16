@@ -1231,6 +1231,25 @@
       <!-- End PointSource -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkPolyPointSource"
+                 label="Poly Point Source"
+                 name="PolyPointSource">
+      <Documentation long_help="Create polydata from one or more points."
+                     short_help="Create polydata from one or more points.">
+        The Poly Point Source creates a poly data of points from an arbitrary
+        number of specified points.
+      </Documentation>
+      <DoubleVectorProperty command="SetPoint"
+                            default_values="0 0 0"
+                            name="Points"
+                            number_of_elements="3"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfPoints"
+                            use_index="1">
+      </DoubleVectorProperty>
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkPolyLineSource"
                  label="Poly Line Source"
                  name="PolyLineSource">

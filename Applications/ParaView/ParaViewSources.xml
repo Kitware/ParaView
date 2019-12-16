@@ -31,6 +31,7 @@
     <Proxy group="sources" name="PlaneSource" />
     <Proxy group="sources" name="PointSource" />
     <Proxy group="sources" name="PolyLineSource" />
+    <Proxy group="sources" name="PolyPointSource" />
     <Proxy group="sources" name="SphereSource" />
     <Proxy group="sources" name="SplineSource" />
     <Proxy group="sources" name="SuperquadricSource" />
