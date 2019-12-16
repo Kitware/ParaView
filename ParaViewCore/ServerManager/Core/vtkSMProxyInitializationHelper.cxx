@@ -27,6 +27,11 @@ vtkSMProxyInitializationHelper::~vtkSMProxyInitializationHelper()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMProxyInitializationHelper::RegisterProxy(vtkSMProxy*, vtkPVXMLElement*)
+{
+}
+
+//----------------------------------------------------------------------------
 void vtkSMProxyInitializationHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

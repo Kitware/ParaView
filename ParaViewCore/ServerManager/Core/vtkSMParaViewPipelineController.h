@@ -327,6 +327,13 @@ protected:
    * calls those initialization helpers, if any.
    */
   void ProcessInitializationHelper(vtkSMProxy*, vtkMTimeType initializationTimeStamp);
+  //@}
+
+  /**
+   * If the proxy has initialization helpers, let those classes also handle
+   * registration tasks, if any. This is called in `RegisterProxy`.
+   */
+  void ProcessInitializationHelperRegistration(vtkSMProxy*);
 
   /**
    * An entry point to load a catalog of OSPRay rendering materials.
