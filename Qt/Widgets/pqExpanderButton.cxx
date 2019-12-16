@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExpanderButton.h"
 #include "ui_pqExpanderButton.h"
 
-#include <QIcon>
 #include <QMouseEvent>
 
 class pqExpanderButton::pqInternals : public Ui::pqExpanderButton
@@ -40,8 +39,8 @@ class pqExpanderButton::pqInternals : public Ui::pqExpanderButton
 public:
   pqInternals()
     : Pressed(false)
-    , CheckedPixmap(QIcon(":/QtWidgets/Icons/pqMinus.svg").pixmap(QSize(16, 16)))
-    , UncheckedPixmap(QIcon(":/QtWidgets/Icons/pqPlus.svg").pixmap(QSize(16, 16)))
+    , CheckedPixmap(":/QtWidgets/Icons/pqMinus16.png")
+    , UncheckedPixmap(":/QtWidgets/Icons/pqPlus16.png")
   {
   }
 

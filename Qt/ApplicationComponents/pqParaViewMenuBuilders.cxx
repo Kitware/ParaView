@@ -439,7 +439,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu)
   actionPBDelete->setObjectName(QStringLiteral("actionPBDelete"));
   QIcon icon;
   icon.addFile(
-    QStringLiteral(":/QtWidgets/Icons/pqDelete.png"), QSize(), QIcon::Normal, QIcon::Off);
+    QStringLiteral(":/QtWidgets/Icons/pqDelete24.png"), QSize(), QIcon::Normal, QIcon::Off);
   actionPBDelete->setIcon(icon);
   actionPBDelete->setText(
     QApplication::translate("pqPipelineBrowserContextMenu", "&Delete", Q_NULLPTR));

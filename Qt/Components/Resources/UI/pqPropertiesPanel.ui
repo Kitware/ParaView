@@ -54,7 +54,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
-         <normaloff>:/QtWidgets/Icons/pqDelete.png</normaloff>:/QtWidgets/Icons/pqDelete.png</iconset>
+         <normaloff>:/QtWidgets/Icons/pqDelete16.png</normaloff>:/QtWidgets/Icons/pqDelete16.png</iconset>
        </property>
       </widget>
      </item>

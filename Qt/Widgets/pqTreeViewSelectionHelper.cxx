@@ -63,7 +63,7 @@ void updateFilter(QTreeView* tree, int section, const QString& txt)
     }
     else
     {
-      pqheader->addCustomIndicatorIcon(QIcon(":/QtWidgets/Icons/pqDelete.png"), "remove-filter");
+      pqheader->addCustomIndicatorIcon(QIcon(":/QtWidgets/Icons/pqDelete24.png"), "remove-filter");
     }
   }
 }
