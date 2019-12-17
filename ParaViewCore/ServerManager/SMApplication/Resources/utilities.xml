@@ -2937,53 +2937,6 @@
                 name="Update"></Property>
       <!-- End of KdTreeManager -->
     </Proxy>
-    <Proxy class="vtkPolyDataMapper"
-           name="GlobalMapperProperties"
-           processes="client|renderserver">
-      <Documentation>This proxy is useful for changing global mapper settings
-      such as the coincident topology resolution setting on all rendering
-      processes.</Documentation>
-      <IntVectorProperty command="SetResolveCoincidentTopology"
-                         default_values="none"
-                         name="Mode"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="Off"
-                 value="0" />
-          <Entry text="PolygonOffset"
-                 value="1" />
-          <Entry text="ShiftZBuffer"
-                 value="2" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetResolveCoincidentTopologyPolygonOffsetParameters"
-                            default_values="none"
-                            name="PolygonOffsetParameters"
-                            number_of_elements="2">
-        <Documentation>Used to set the polygon offset scale factor and units.
-        Used when ResolveCoincidentTopology is set to PolygonOffset. These are
-        global variables.</Documentation>
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetResolveCoincidentTopologyPolygonOffsetFaces"
-                         default_values="none"
-                         name="PolygonOffsetFaces"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Used when ResolveCoincidentTopology is set to
-        PolygonOffset. The polygon offset can be applied either to the solid
-        polygonal faces or the lines/vertices. When set (default), the offset
-        is applied to the faces otherwise it is applied to lines and vertices.
-        This is a global variable.</Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetResolveCoincidentTopologyZShift"
-                            default_values="none"
-                            name="ZShift"
-                            number_of_elements="1">
-        <Documentation>Used to set the z-shift if ResolveCoincidentTopology is
-        set to ShiftZBuffer. This is a global variable.</Documentation>
-      </DoubleVectorProperty>
-      <!-- End of GlobalMapperProperties -->
-    </Proxy>
     <Proxy class="vtkTimerLog"
            name="TimerLog"
            processes="client|dataserver|renderserver">

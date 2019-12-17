@@ -201,25 +201,6 @@ void vtkSMSession::Initialize()
 
   // Initialize the plugin manager.
   vtkSMProxyManager::GetProxyManager()->GetPluginManager()->RegisterSession(this);
-
-  // Setup default mapper parameters.
-  const char* group = "misc";
-  const char* name = "GlobalMapperProperties";
-
-  // First try and get the prototype, if its NULL then the proxy is not
-  // available.
-  vtkSMProxy* prototype = this->SessionProxyManager->GetPrototypeProxy(group, name);
-  if (!prototype)
-    return;
-
-  vtkSMProxy* globalMapperProperties = this->SessionProxyManager->NewProxy(group, name);
-  if (globalMapperProperties)
-  {
-    vtkSMPropertyHelper(globalMapperProperties, "Mode").Set("ShiftZBuffer");
-    vtkSMPropertyHelper(globalMapperProperties, "ZShift").Set(2.0e-3);
-    globalMapperProperties->UpdateVTKObjects();
-    globalMapperProperties->Delete();
-  }
 }
 
 //----------------------------------------------------------------------------
