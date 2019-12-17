@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="PointDataToCellData" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="DataSetSurfaceFilter" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="LinearCellExtrusionFilter" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ScaleFactor/DoubleLineEdit0" command="set_string" arguments="0.05" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/OrientationAxesVisibility/CheckBox" command="set_boolean" arguments="false" />
+</pqevents>
