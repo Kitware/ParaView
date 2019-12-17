@@ -368,7 +368,7 @@
                 <string/>
                </property>
                <property name="icon" >
-                <iconset resource="../../../Widgets/Resources/QtWidgets.qrc" >:/QtWidgets/Icons/pqPlus.svg</iconset>
+                <iconset resource="../../../Widgets/Resources/QtWidgets.qrc" >:/QtWidgets/Icons/pqPlus16.png</iconset>
                </property>
               </widget>
              </item>
@@ -381,7 +381,7 @@
                 <string/>
                </property>
                <property name="icon" >
-                <iconset resource="../../../Widgets/Resources/QtWidgets.qrc" >:/QtWidgets/Icons/pqMinus.svg</iconset>
+                <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqMinus16.png</iconset>
                </property>
               </widget>
              </item>
@@ -464,7 +464,7 @@
                 <string/>
                </property>
                <property name="icon" >
-                <iconset resource="../../../Widgets/Resources/QtWidgets.qrc" >:/QtWidgets/Icons/pqPlus.svg</iconset>
+                <iconset resource="../../../Widgets/Resources/QtWidgets.qrc" >:/QtWidgets/Icons/pqPlus16.png</iconset>
                </property>
               </widget>
              </item>
@@ -477,7 +477,7 @@
                 <string/>
                </property>
                <property name="icon" >
-                <iconset resource="../../../Widgets/Resources/QtWidgets.qrc" >:/QtWidgets/Icons/pqMinus.svg</iconset>
+                <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqMinus16.png</iconset>
                </property>
               </widget>
              </item>
@@ -651,7 +651,7 @@
                 <string/>
                </property>
                <property name="icon" >
-                <iconset resource="../../../Widgets/Resources/QtWidgets.qrc" >:/QtWidgets/Icons/pqPlus.svg</iconset>
+                <iconset resource="../../../Widgets/Resources/QtWidgets.qrc" >:/QtWidgets/Icons/pqPlus16.png</iconset>
                </property>
               </widget>
              </item>
@@ -664,7 +664,7 @@
                 <string/>
                </property>
                <property name="icon" >
-                <iconset resource="../../../Widgets/Resources/QtWidgets.qrc" >:/QtWidgets/Icons/pqMinus.svg</iconset>
+                <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqMinus16.png</iconset>
                </property>
               </widget>
              </item>

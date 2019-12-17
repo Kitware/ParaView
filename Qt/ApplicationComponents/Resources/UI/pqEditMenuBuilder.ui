@@ -41,7 +41,7 @@
   <action name="actionEditCameraUndo">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqUndoCamera.svg</normaloff>:/pqWidgets/Icons/pqUndoCamera.svg</iconset>
+     <normaloff>:/pqWidgets/Icons/pqUndoCamera24.png</normaloff>:/pqWidgets/Icons/pqUndoCamera24.png</iconset>
    </property>
    <property name="text">
     <string>Camera Undo</string>
@@ -53,7 +53,7 @@
   <action name="actionEditCameraRedo">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqRedoCamera.svg</normaloff>:/pqWidgets/Icons/pqRedoCamera.svg</iconset>
+     <normaloff>:/pqWidgets/Icons/pqRedoCamera24.png</normaloff>:/pqWidgets/Icons/pqRedoCamera24.png</iconset>
    </property>
    <property name="text">
     <string>Camera Redo</string>
@@ -79,7 +79,7 @@
   <action name="actionCopyScreenshotToClipboard">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqCaptureScreenshot.svg</normaloff>:/pqWidgets/Icons/pqCaptureScreenshot.svg</iconset>
+     <normaloff>:/pqWidgets/Icons/pqCaptureScreenshot24.png</normaloff>:/pqWidgets/Icons/pqCaptureScreenshot24.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Copy Screenshot to Clipboard</string>
@@ -115,7 +115,7 @@
   <action name="actionDelete">
    <property name="icon">
     <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
-     <normaloff>:/QtWidgets/Icons/pqDelete.png</normaloff>:/QtWidgets/Icons/pqDelete.png</iconset>
+     <normaloff>:/QtWidgets/Icons/pqDelete24.png</normaloff>:/QtWidgets/Icons/pqDelete24.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Delete</string>
