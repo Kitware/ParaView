@@ -4,6 +4,8 @@ LIBRARY_NAME
   vtkUtilitiesPythonInitializer
 CONDITION
   PARAVIEW_USE_PYTHON
+GROUPS
+  PARAVIEW_CORE
 PRIVATE_DEPENDS
   VTK::WrappingPythonCore
   VTK::CommonCore

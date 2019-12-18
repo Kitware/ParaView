@@ -83,11 +83,11 @@ from vtkmodules.vtkCommonDataModel import *
 from vtkmodules.vtkCommonExecutionModel import *
 from vtkmodules.vtkFiltersSources import *
 from vtkmodules.vtkParallelCore import *
-from vtkmodules.vtkParaViewWebCore import *
-from vtkmodules.vtkPVClientServerCoreCore import *
-from vtkmodules.vtkPVServerManagerApplication import *
-from vtkmodules.vtkPVServerManagerCore import *
-from vtkmodules.vtkPVVTKExtensionsCore import *
+from vtkmodules.vtkPVClientWeb import *
+from vtkmodules.vtkRemotingCore import *
+from vtkmodules.vtkRemotingApplication import *
+from vtkmodules.vtkRemotingServerManager import *
+from vtkmodules.vtkRemotingViews import *
 from vtkmodules.vtkWebCore import *
 from paraview.web import wamp as pv_wamp
 

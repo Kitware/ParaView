@@ -3,7 +3,9 @@
 import os
 import re
 import sys
-from paraview.modules.vtkPVServerManagerDefault import *
+from paraview.modules.vtkRemotingServerManager import *
+from paraview.modules.vtkRemotingApplication import *
+from paraview.modules.vtkRemotingMisc import *
 
 # we get different behavior based on how we import servermanager
 # so we want to import servermanager the same way in this module

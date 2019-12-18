@@ -1,0 +1,18 @@
+NAME
+  ParaView::VTKExtensionsFiltersMaterialInterface
+LIBRARY_NAME
+  vtkPVVTKExtensionsFiltersMaterialInterface
+GROUPS
+  PARAVIEW_CANONICAL
+KIT
+  ParaView::CoreKit
+DEPENDS
+  VTK::CommonExecutionModel
+  VTK::CommonSystem
+  VTK::ParallelCore
+PRIVATE_DEPENDS
+  VTK::FiltersCore
+  VTK::FiltersGeneral
+  VTK::FiltersGeometry
+  VTK::IOLegacy
+  VTK::IOXML

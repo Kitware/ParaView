@@ -1,4 +1,3 @@
-# Note: this actually only requires ParaView::Catalyst.
 if (USE_CATALYST)
   add_library(CxxVTKPipelineExampleAdaptor
     FEAdaptor.cxx
@@ -8,9 +7,13 @@ if (USE_CATALYST)
   target_link_libraries(CxxVTKPipelineExampleAdaptor
     PRIVATE
       ParaView::Catalyst
-      ParaView::ClientServerCoreCore
-      ParaView::VTKExtensionsDefault
-      ParaView::ServerManagerCore)
+      ParaView::RemotingServerManager
+      ParaView::VTKExtensionsCore
+      ParaView::VTKExtensionsFiltersGeneral
+      ParaView::VTKExtensionsMisc
+      VTK::CommonDataModel
+      VTK::IOParallelXML
+      VTK::ParallelCore)
   if (TARGET VTK::PythonUsed)
     target_link_libraries(CxxVTKPipelineExampleAdaptor
       INTERFACE

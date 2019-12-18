@@ -1,0 +1,2 @@
+# The data tables here cause clang-format to take 10+ minutes.
+vtkRectilinearGridConnectivityCases.cxx -format.clang-format

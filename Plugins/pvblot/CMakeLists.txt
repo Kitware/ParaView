@@ -52,7 +52,7 @@ paraview_add_plugin(pvblot
 if (PARAVIEW_USE_QT)
   target_link_libraries(pvblot
     PRIVATE
-      ParaView::ClientServerCoreCore
+      ParaView::RemotingCore
       VTK::GUISupportQt
       VTK::Python)
 endif ()

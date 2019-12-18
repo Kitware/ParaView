@@ -1,0 +1,13 @@
+NAME
+  ParaView::VTKExtensionsFiltersStatistics
+LIBRARY_NAME
+  vtkPVVTKExtensionsFiltersStatistics
+GROUPS
+  PARAVIEW_CANONICAL
+KIT
+  ParaView::CoreKit
+DEPENDS
+  VTK::CommonExecutionModel
+  VTK::FiltersParallelStatistics
+PRIVATE_DEPENDS
+  VTK::ParallelCore

@@ -3,6 +3,6 @@ NAME
 DESCRIPTION
   An example plugin which creates custom bounds domains.
 REQUIRES_MODULES
-  ParaView::ClientServerCoreCore
-  ParaView::ServerManagerCore
+  ParaView::RemotingCore
+  ParaView::RemotingServerManager
   VTK::CommonCore

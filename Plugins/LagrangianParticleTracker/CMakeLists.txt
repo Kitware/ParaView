@@ -40,8 +40,7 @@ paraview_add_plugin(LagrangianParticleTracker
 
 target_link_libraries(LagrangianParticleTracker
   PRIVATE
-    ParaView::ClientServerCoreCore
-    ParaView::ServerManagerCore
+    ParaView::RemotingServerManager
     VTK::CommonCore
     VTK::GUISupportQt)
 

@@ -26,9 +26,9 @@ from . import calculator
 from vtkmodules.vtkCommonDataModel import vtkDataObject
 from vtkmodules.numpy_interface import dataset_adapter as dsa
 
-# import vtkPVClientServerCorePython so vtkAnnotateAttributeDataFilter wrapping
+# import vtkPVVTKExtensionsFiltersPython so vtkAnnotateAttributeDataFilter wrapping
 # is registered.
-import paraview.modules.vtkPVClientServerCorePython
+import paraview.modules.vtkPVVTKExtensionsFiltersPython
 
 import sys # also for sys.stderr
 if sys.version_info >= (3,):

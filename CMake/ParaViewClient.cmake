@@ -378,8 +378,8 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
       "$<TARGET_PROPERTY:VTK::vtksys,INTERFACE_INCLUDE_DIRECTORIES>")
   target_link_libraries("${_paraview_client_NAME}"
     PRIVATE
-      Qt5::Widgets
       ParaView::pqApplicationComponents
+      Qt5::Widgets
       VTK::vtksys)
 
   set(_paraview_client_export)

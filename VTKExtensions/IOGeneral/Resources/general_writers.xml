@@ -1,0 +1,148 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="internal_writers">
+    <!-- ================================================================= -->
+    <Proxy base_proxygroup="internal_writers"
+           base_proxyname="DataWriterBase"
+           class="vtkPVPLYWriter"
+           name="PLYWriter">
+      <Documentation short_help="Write polygonal data in Stanford University PLY format.">
+      </Documentation>
+      <InputProperty name="DummyInput" panel_visibility="never">
+        <InputArrayDomain attribute_type="any" name="input_array" />
+      </InputProperty>
+
+      <IntVectorProperty name="EnableColoring"
+                         command="SetEnableColoring"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether color information should be saved in the PLY file.
+          If enabled, the data source's array to color with from the active view will be used.
+        </Documentation>
+        <Hints>
+        <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="LookupTable"
+                                   inverse="1"
+                                   value="null" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty name="EnableAlpha"
+                         command="SetEnableAlpha"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether alpha channel information should be saved in the PLY file.
+          If enabled, the data source's transfer function from the active view will be used.
+          This property is disabled if EnableColoring isn't enabled.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="EnableColoring"
+                                   value="1" />
+        </Hints>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="ColorArrayName"
+                            no_custom_default="1"
+                            number_of_elements="5">
+        <Documentation>
+          The array that will be used for saving color information when
+          **Enable Coloring** is ON.
+        </Documentation>
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="DummyInput" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableColoring"
+                                   value="-1" />
+          <!-- I am keeping this widget always hidden since I don't want the
+               user to be able to change the array in the Writer's dialog.
+               User should change the data's coloring properties in the active view
+               instead -->
+        </Hints>
+      </StringVectorProperty>
+      <ProxyProperty command="SetLookupTable" name="LookupTable" >
+        <Documentation>Set the lookup table to use for scalar
+        mapping.</Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <!-- End of PLYWriter -->
+    </Proxy>
+  </ProxyGroup>
+   <ProxyGroup name="writers">
+    <!-- ================================================================= -->
+    <PSWriterProxy class="vtkParallelSerialWriter"
+                   file_name_method="SetFileName"
+                   name="PPLYWriter"
+                   base_proxygroup="internal_writers"
+                   base_proxyname="ParallelSerialWriter">
+      <Documentation short_help="Write polygonal data in Stanford University PLY format.">
+      Writer to write polygonal data in Stanford University PLY format. The
+      data can be written in either binary (little or big endian) or ASCII
+      representation. As for PointData and CellData, vtkPLYWriter cannot handle
+      normals or vectors. It only handles RGB PointData and CellData. This
+      version is used when running in parallel. It gathers data to first node
+      and saves one file.</Documentation>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="PLYWriter"></Proxy>
+        <ExposedProperties>
+          <Property name="FileType" />
+          <Property name="EnableColoring" />
+          <Property name="EnableAlpha" />
+          <Property name="ColorArrayName" />
+          <Property name="LookupTable" />
+        </ExposedProperties>
+        <LinkProperties>
+          <Property name="DummyInput" with_property="Input" />
+        </LinkProperties>
+      </SubProxy>
+      <PropertyGroup label="Color Properties">
+        <Property name="EnableColoring" />
+        <Property name="EnableAlpha" />
+        <Property name="ColorArrayName" />
+        <Property name="LookupTable" />
+      </PropertyGroup>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="PostGatherHelper"
+               proxygroup="filters"
+               proxyname="AppendPolyData" />
+      </SubProxy>
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+        <WriterFactory extensions="ply" file_description="PLY Polygonal File Format" />
+        <InitializationHelper class="vtkSMPLYWriterProxyInitializationHelper" />
+        <UseDocumentationForLabels />
+      </Hints>
+      <!-- End of PLYWriter -->
+    </PSWriterProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

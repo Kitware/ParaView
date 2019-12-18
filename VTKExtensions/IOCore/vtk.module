@@ -1,0 +1,33 @@
+NAME
+  ParaView::VTKExtensionsIOCore
+LIBRARY_NAME
+  vtkPVVTKExtensionsIOCore
+GROUPS
+  PARAVIEW_CANONICAL
+KIT
+  ParaView::CoreKit
+DEPENDS
+  VTK::CommonExecutionModel
+  VTK::IOCore
+  VTK::IOXML
+PRIVATE_DEPENDS
+  ParaView::RemotingClientServerStream
+  ParaView::VTKExtensionsCore
+  ParaView::VTKExtensionsMisc
+  VTK::CommonMisc
+  VTK::IOImage
+  VTK::IOInfovis
+  VTK::IOLegacy
+  VTK::IOParallel
+  VTK::IOParallelXML
+  VTK::jsoncpp
+  VTK::ParallelCore
+  VTK::vtksys
+TEST_DEPENDS
+  VTK::IOInfovis
+  VTK::TestingCore
+  VTK::TestingRendering
+TEST_OPTIONAL_DEPENDS
+  VTK::ParallelMPI
+TEST_LABELS
+  ParaView

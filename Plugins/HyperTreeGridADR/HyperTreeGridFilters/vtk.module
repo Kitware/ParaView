@@ -12,7 +12,6 @@ DEPENDS
   VTK::CommonMisc
   VTK::FiltersCore
   VTK::FiltersGeneral
-  ParaView::VTKExtensionsDefault
 PRIVATE_DEPENDS
   VTK::CommonCore
   VTK::CommonSystem

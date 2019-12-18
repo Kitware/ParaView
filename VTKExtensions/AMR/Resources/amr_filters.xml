@@ -1,0 +1,725 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVAMRDualClip"
+                 label="AMR Dual Clip"
+                 name="AMRDualClip">
+      <Documentation long_help="Clip with scalars.  Tetrahedra."
+                     short_help="Clip with decimation."></Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input of the
+        filter.</Documentation>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array"
+                          number_of_components="1" />
+      </InputProperty>
+      <StringVectorProperty clean_command="ClearInputCellArrayToProcess"
+                            command="AddInputCellArrayToProcess"
+                            name="SelectMaterialArrays"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         data_type="VTK_UNSIGNED_CHAR"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>This property specifies the cell arrays from which the
+        clip filter will compute clipped cells.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty command="SetVolumeFractionSurfaceValue"
+                            default_values="0.1"
+                            label="Volume Fraction Value"
+                            name="VolumeFractionSurfaceValue"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1.0"
+                           min="0.0"
+                           name="scalar_range" />
+        <!--<RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="AddInputCellArrayToProcess" function="ArraySelection"/>
+          </RequiredProperties>
+        </ArrayRangeDomain>-->
+        <Documentation>This property specifies the values at which to compute
+        the isosurface.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetEnableInternalDecimation"
+                         default_values="1"
+                         name="InternalDecimation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is on, internal tetrahedra are
+        decimation</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetEnableMultiProcessCommunication"
+                         default_values="1"
+                         name="MultiprocessCommunication"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is off, each process executes
+        independently.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetEnableMergePoints"
+                         default_values="1"
+                         name="MergePoints"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Use more memory to merge points on the boundaries of
+        blocks.</Documentation>
+      </IntVectorProperty>
+      <!-- End PV AMR Dual Clip -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVAMRDualContour"
+                 label="AMR Contour"
+                 name="AMRDualContour">
+      <Documentation short_help="Iso surface cell array."></Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <Documentation>This property specifies the input of the
+        filter.</Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkNonOverlappingAMR" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array"
+                          number_of_components="1" />
+      </InputProperty>
+      <StringVectorProperty clean_command="ClearInputCellArrayToProcess"
+                            command="AddInputCellArrayToProcess"
+                            name="SelectMaterialArrays"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         data_type="VTK_UNSIGNED_CHAR VTK_INT"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>This property specifies the cell arrays from which the
+        contour filter will compute contour cells.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty command="SetVolumeFractionSurfaceValue"
+                            default_values="0.1"
+                            label="Volume Fraction Value"
+                            name="VolumeFractionSurfaceValue"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1.0"
+                           min="0.0"
+                           name="scalar_range" />
+        <!--<RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="AddInputCellArrayToProcess" function="ArraySelection"/>
+          </RequiredProperties>
+        </ArrayRangeDomain>-->
+        <Documentation>This property specifies the values at which to compute
+        the isosurface.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetEnableCapping"
+                         default_values="1"
+                         name="Capping"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is on, the the boundary of the data set
+        is capped.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetEnableDegenerateCells"
+                         default_values="1"
+                         name="DegenerateCells"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is on, a transition mesh between levels
+        is created.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetEnableMultiProcessCommunication"
+                         default_values="1"
+                         name="MultiprocessCommunication"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is off, each process executes
+        independently.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetSkipGhostCopy"
+                         default_values="1"
+                         name="SkipGhostCopy"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>A simple test to see if ghost values are already set
+        properly.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetTriangulateCap"
+                         default_values="1"
+                         name="Triangulate"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Use triangles instead of quads on capping
+        surfaces.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetEnableMergePoints"
+                         default_values="1"
+                         name="MergePoints"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Use more memory to merge points on the boundaries of
+        blocks.</Documentation>
+      </IntVectorProperty>
+      <!-- End AMR Dual Contour -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVAMRFragmentIntegration"
+                 label="AMR Fragment Integration"
+                 name="AMRFragmentIntegration">
+      <Documentation short_help="Fragment Integration"></Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <Documentation>This property specifies the volume input of the
+        filter.</Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkNonOverlappingAMR" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array"
+                          number_of_components="1" />
+      </InputProperty>
+      <StringVectorProperty clean_command="ClearInputVolumeArrayToProcess"
+                            command="AddInputVolumeArrayToProcess"
+                            name="SelectMaterialArrays"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         data_type="VTK_UNSIGNED_CHAR VTK_INT"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>This property specifies the cell arrays from which the
+        analysis will determine fragments</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty clean_command="ClearInputMassArrayToProcess"
+                            command="AddInputMassArrayToProcess"
+                            name="SelectMassArrays"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         data_type="VTK_DOUBLE VTK_FLOAT"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>This property specifies the cell arrays from which the
+        analysis will determine fragment mass</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty clean_command="ClearInputVolumeWeightedArrayToProcess"
+                            command="AddInputVolumeWeightedArrayToProcess"
+                            name="SelectVolumeWeightedArrays"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         data_type="VTK_DOUBLE VTK_FLOAT"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>This property specifies the cell arrays from which the
+        analysis will determine volume weighted average values</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty clean_command="ClearInputMassWeightedArrayToProcess"
+                            command="AddInputMassWeightedArrayToProcess"
+                            name="SelectMassWeightedArrays"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         data_type="VTK_DOUBLE VTK_FLOAT"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>This property specifies the cell arrays from which the
+        analysis will determine mass weighted average values</Documentation>
+      </StringVectorProperty>
+      <!-- End AMR Fragment Integration -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAMRConnectivity"
+                 label="AMR Connectivity"
+                 name="AMRConnectivity">
+      <Documentation short_help="Fragment Identification"></Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <Documentation>This property specifies the volume input of the
+        filter.</Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkNonOverlappingAMR" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array"
+                          number_of_components="1" />
+      </InputProperty>
+      <StringVectorProperty clean_command="ClearInputVolumeArrayToProcess"
+                            command="AddInputVolumeArrayToProcess"
+                            name="SelectMaterialArrays"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         data_type="VTK_UNSIGNED_CHAR VTK_INT"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>This property specifies the cell arrays from which the
+        analysis will determine fragments</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty command="SetVolumeFractionSurfaceValue"
+                            default_values="0.1"
+                            label="Volume Fraction Value"
+                            name="VolumeFractionSurfaceValue"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1.0"
+                           min="0.0"
+                           name="scalar_range" />
+        <!--<RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="AddInputCellArrayToProcess" function="ArraySelection"/>
+          </RequiredProperties>
+        </ArrayRangeDomain>-->
+        <Documentation>This property specifies the values at which to compute
+        the isosurface.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetResolveBlocks"
+                         default_values="1"
+                         name="Resolve Blocks"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Resolve the fragments between blocks.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPropagateGhosts"
+                         default_values="0"
+                         name="Propagate Ghosts"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Propagate regionIds into the ghosts.</Documentation>
+      </IntVectorProperty>
+      <!-- End AMR Fragment Integration -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAMRToMultiBlockFilter"
+                 label="Convert AMR dataset to Multi-block"
+                 name="AMRToMultiBlock">
+      <Documentation long_help="Convert AMR to Multiblock"
+                     short_help="Convert AMR to Multiblock"></Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkOverlappingAMR" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input for this
+        filter.</Documentation>
+      </InputProperty>
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAMRCutPlane"
+                 label="AMR CutPlane"
+                 name="AMRCutPlane">
+      <Documentation long_help="Planar Cut of an AMR grid dataset"
+                     short_help="Planar Cut of an AMR grid dataset">This filter
+                     creates a cut-plane of the</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkOverlappingAMR" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input for this
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetUseNativeCutter"
+                         default_values="0"
+                         name="UseNativeCutter"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property specifies whether the ParaView's generic
+        dataset cutter is used instead of the specialized AMR
+        cutter.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLevelOfResolution"
+                         default_values="0"
+                         name="LevelOfResolution"
+                         number_of_elements="1">
+        <IntRangeDomain max="100"
+                        min="0"
+                        name="range" />
+        <Documentation>Set maximum slice resolution.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetCenter"
+                            default_values="0.5 0.5 0.5"
+                            label="Center"
+                            name="Center"
+                            number_of_elements="3"
+                            panel_visibility="never">
+        <BoundsDomain default_mode="mid" mode="normal" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetNormal"
+                            default_values="0 0 1"
+                            label="Normal"
+                            name="Normal"
+                            number_of_elements="3"
+                            panel_visibility="never"></DoubleVectorProperty>
+      <PropertyGroup label="Plane Parameters" panel_widget="InteractivePlane">
+        <Property function="Origin" name="Center" />
+        <Property function="Normal" name="Normal" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAMRResampleFilter"
+                 label="Resample AMR"
+                 name="AMRResampleFilter">
+      <Documentation long_help="Converts AMR data to a uniform grid"
+                    short_help="Converts AMR data to a uniform grid">This
+                    filter allows the user to specify a Region of Interest(ROI)
+                    within the AMR data-set and extract it as a uniform
+                    grid.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkOverlappingAMR" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input for this
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetDemandDrivenMode"
+                         default_values="1"
+                         name="Demand-Driven Mode"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property specifies whether the resampling filter
+        will operate in demand-driven mode or not.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTransferToNodes"
+                         default_values="1"
+                         name="TransferToNodes"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property specifies whether the solution will be
+        transferred to the nodes of the extracted region or the
+        cells.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetNumberOfPartitions"
+                         default_values="1"
+                         name="NumberOfPartitions"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" />
+        <Documentation>Set the number of subdivisions for recursive coordinate
+        bisection.</Documentation>
+      </IntVectorProperty>
+      <!--
+     <IntVectorProperty
+        name="LevelOfResolution"
+        command="SetLevelOfResolution"
+        number_of_elements="1"
+        default_values="0" >
+        <IntRangeDomain name="range" min="0" max="100" />
+        <Documentation>
+          Set maximum slice resolution.
+        </Documentation>
+      </IntVectorProperty>
+
+      -->
+      <IntVectorProperty animateable="1"
+                         command="SetNumberOfSamples"
+                         default_values="10 10 10"
+                         name="Number of Samples"
+                         number_of_elements="3">
+        <IntRangeDomain name="range" />
+        <Documentation>Sets the number of samples in each
+        dimension</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetMin"
+                            default_values="0.0 0.0 0.0"
+                            name="Min"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property sets the minimum 3-D coordinate location
+        by which the particles will be filtered out.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetMax"
+                            default_values="0.0 0.0 0.0"
+                            name="Max"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property sets the minimum 3-D coordinate location
+        by which the particles will be filtered out.</Documentation>
+      </DoubleVectorProperty>
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAMRSliceFilter"
+                 label="Slice AMR data"
+                 name="AMRSlice">
+      <Documentation long_help="Slices AMR Data"
+                     short_help="Slices AMR Data">This filter slices AMR
+                     data.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkOverlappingAMR" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input for this
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetMaxResolution"
+                         default_values="0"
+                         name="Level"
+                         number_of_elements="1">
+        <AMRLevelsDomain default_mode="max"
+                         name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </AMRLevelsDomain>
+        <Documentation>Set maximum slice resolution.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetOffsetFromOrigin"
+                            default_values="0.0"
+                            name="OffSet"
+                            number_of_elements="1">
+        <BoundsDomain default_mode="mid"
+                      mode="extents"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="AxisFlags"
+                      name="Normal" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>Set's the offset from the origin of the
+        data-set</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetNormal"
+                         default_values="1"
+                         name="Normal"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="X-Normal"
+                 value="1" />
+          <Entry text="Y-Normal"
+                 value="2" />
+          <Entry text="Z-Normal"
+                 value="4" />
+        </EnumerationDomain>
+        <Documentation>This property sets the normal of the
+        slice.</Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAMRFragmentsFilter"
+                 label="AMR Fragments Filter"
+                 name="AMRFragmentsFilter">
+      <Documentation short_help="Meta Fragment filter">Combines the running of
+      AMRContour, AMRFragmentIntegration, AMRDualContour and ExtractCTHParts</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <Documentation>This property specifies the volume input of the
+        filter.</Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkNonOverlappingAMR" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array"
+                          number_of_components="1" />
+      </InputProperty>
+      <StringVectorProperty clean_command="ClearInputVolumeArrayToProcess"
+                            command="AddInputVolumeArrayToProcess"
+                            name="SelectMaterialArrays"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         data_type="VTK_UNSIGNED_CHAR VTK_INT"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>This property specifies the cell arrays from which the
+        analysis will determine fragments</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty clean_command="ClearInputMassArrayToProcess"
+                            command="AddInputMassArrayToProcess"
+                            name="SelectMassArrays"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         data_type="VTK_DOUBLE VTK_FLOAT"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>This property specifies the cell arrays from which the
+        analysis will determine fragment mass</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty clean_command="ClearInputVolumeWeightedArrayToProcess"
+                            command="AddInputVolumeWeightedArrayToProcess"
+                            name="SelectVolumeWeightedArrays"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         data_type="VTK_DOUBLE VTK_FLOAT"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>This property specifies the cell arrays from which the
+        analysis will determine volume weighted average values</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty clean_command="ClearInputMassWeightedArrayToProcess"
+                            command="AddInputMassWeightedArrayToProcess"
+                            name="SelectMassWeightedArrays"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         data_type="VTK_DOUBLE VTK_FLOAT"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>This property specifies the cell arrays from which the
+        analysis will determine mass weighted average values</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty command="SetVolumeFractionSurfaceValue"
+                            default_values="0.1"
+                            label="Volume Fraction Value"
+                            name="VolumeFractionSurfaceValue"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1.0"
+                           min="0.0"
+                           name="scalar_range" />
+        <Documentation>This property specifies the values at which to compute
+        the isosurface.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetExtractSurface"
+                         default_values="0"
+                         name="Extract Surface"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Whether or not to extract a surface from this data</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseWatertightSurface"
+                         default_values="0"
+                         name="Use Watertight Surface"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Whether the extracted surface should be watertight or not</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetIntegrateFragments"
+                         default_values="1"
+                         name="Integrate Fragments"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Whether or not to integrate fragments in this data</Documentation>
+      </IntVectorProperty>
+      <!-- End AMR Fragments Filter -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

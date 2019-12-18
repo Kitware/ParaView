@@ -1,0 +1,19 @@
+NAME
+  ParaView::RemotingServerManagerPython
+LIBRARY_NAME
+  vtkRemotingServerManagerPython
+CONDITION
+  PARAVIEW_USE_PYTHON
+GROUPS
+  PARAVIEW_CORE
+KIT
+  ParaView::ServerManagerKit
+DEPENDS
+  ParaView::RemotingClientServerStream
+  ParaView::RemotingServerManager
+PRIVATE_DEPENDS
+  VTK::CommonExecutionModel
+  VTK::FiltersPython
+  VTK::Python
+  VTK::PythonInterpreter
+  VTK::WrappingPythonCore

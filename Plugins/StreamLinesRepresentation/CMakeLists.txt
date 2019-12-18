@@ -29,8 +29,7 @@ paraview_add_plugin(StreamLinesRepresentation
 if (PARAVIEW_USE_QT)
   target_link_libraries(StreamLinesRepresentation
     PRIVATE
-      ParaView::ServerManagerCore
-      ParaView::ServerManagerRendering)
+      ParaView::RemotingViews)
 endif ()
 
 if (BUILD_TESTING)

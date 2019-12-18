@@ -1,0 +1,16 @@
+NAME
+  ParaView::CatalystTestDriver
+LIBRARY_NAME
+  vtkPVCatalystTestDriver
+CONDITION
+  PARAVIEW_BUILD_TESTING
+GROUPS
+  PARAVIEW_CORE
+DEPENDS
+  ParaView::Catalyst
+PRIVATE_DEPENDS
+  VTK::CommonDataModel
+  VTK::ParallelCore
+TEST_LABELS
+  Catalyst
+  ParaView

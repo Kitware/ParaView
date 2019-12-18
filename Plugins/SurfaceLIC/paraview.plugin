@@ -3,7 +3,7 @@ NAME
 DESCRIPTION
   Add Surface-LIC vector visualization support
 REQUIRES_MODULES
-  ParaView::ClientServerCoreRendering
+  ParaView::RemotingViews
   VTK::CommonCore
   VTK::RenderingCore
   VTK::RenderingLICOpenGL2

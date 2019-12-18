@@ -1,0 +1,14 @@
+NAME
+  ParaView::RemotingLive
+LIBRARY_NAME
+  vtkRemotingLive
+DESCRIPTION
+  Catalyst LIVE
+GROUPS
+  PARAVIEW_CANONICAL
+KIT
+  ParaView::ServerManagerKit
+DEPENDS
+  ParaView::RemotingServerManager
+TEST_LABELS
+  ParaView

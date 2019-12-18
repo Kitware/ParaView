@@ -19,7 +19,7 @@ from vtkmodules.util import vtkConstants
 from . import calculator
 
 # import wrapping module for `vtkPythonSelector`
-from paraview.modules import vtkPVClientServerCoreCore
+from paraview.modules import vtkPVVTKExtensionsExtractionPython
 
 import sys
 if sys.hexversion < 0x03000000:

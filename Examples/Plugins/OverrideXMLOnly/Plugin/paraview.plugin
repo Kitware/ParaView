@@ -4,4 +4,4 @@ DESCRIPTION
   An example plugin which can be loaded directly as the XML or compiled into a
   binary and then the binary can be loaded in ParaView.
 REQUIRES_MODULES
-  ParaView::ClientServerCoreRendering
+  ParaView::RemotingViews

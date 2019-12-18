@@ -1,0 +1,31 @@
+NAME
+  ParaView::RemotingCore
+LIBRARY_NAME
+  vtkRemotingCore
+GROUPS
+  PARAVIEW_CORE
+KIT
+  ParaView::CoreKit
+DEPENDS
+  ParaView::RemotingClientServerStream
+  ParaView::VTKExtensionsCore
+  VTK::CommonCore
+  VTK::CommonMisc
+  VTK::ParallelCore
+PRIVATE_DEPENDS
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::CommonSystem
+  VTK::IOLegacy # for vtkGraphReader/vtkGraphWriter
+  VTK::vtksys
+OPTIONAL_DEPENDS
+  ParaView::nvpipe
+  VTK::IOFFMPEG
+  VTK::ParallelMPI
+  VTK::PythonInterpreter
+  VTK::WrappingPythonCore
+TEST_DEPENDS
+  VTK::FiltersSources
+  VTK::TestingCore
+TEST_LABELS
+  ParaView

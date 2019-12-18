@@ -5,7 +5,7 @@ LIBRARY_NAME
 DEPENDS
   VTK::CommonExecutionModel
 PRIVATE_DEPENDS
-  ParaView::VTKExtensionsCore
+  ParaView::VTKExtensionsMisc
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::CommonMath

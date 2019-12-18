@@ -138,7 +138,7 @@ cases, being your topic name with the issue number.
     * Choose `Tools .. Record Test` to start.
     * Choose `Tools .. Lock View Size Custom...` - a 400x400 window works well.
     * Perform actions in the GUI that exercise your feature. Stop recording.
-    * Put the resulting XML file into `Applications/ParaView/Testing/XML`
+    * Put the resulting XML file into `Clients/ParaView/Testing/XML`
     * Add it to CMakeLists.txt, probably in a TESTS_WITH_BASELINES section
         * you can manually add `<pqcompareview>` for multiple image comparisons, then add to the TESTS_WITH_INLINE_COMPARES section
     * Follow the [vtk instructions][] to add the baseline images, which live in `Testing/Data/Baseline/`.

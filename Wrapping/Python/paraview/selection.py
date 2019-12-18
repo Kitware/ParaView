@@ -115,7 +115,7 @@ def _collectSelectionPorts(selectedReps, selectionSources, SelectBlocks=False, M
         outputProxy = outputPort.GetSourceProxy()
 
         # Convert block selection from index-based selection
-        from paraview.modules.vtkPVServerManagerRendering import vtkSMSelectionHelper
+        from paraview.modules.vtkRemotingViews import vtkSMSelectionHelper
         import paraview.vtk as vtk
         if SelectBlocks:
             selectionSource = vtkSMSelectionHelper.ConvertSelection(

@@ -1,0 +1,14 @@
+NAME
+  ParaView::VTKExtensionsIOSPCTH
+LIBRARY_NAME
+  vtkPVVTKExtensionsIOSPCTH
+GROUPS
+  PARAVIEW_CANONICAL
+KIT
+  ParaView::CoreKit
+DEPENDS
+  ParaView::VTKExtensionsIOCore
+PRIVATE_DEPENDS
+  VTK::ParallelCore
+TEST_LABELS
+  ParaView

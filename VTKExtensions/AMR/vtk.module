@@ -1,0 +1,18 @@
+NAME
+  ParaView::VTKExtensionsAMR
+LIBRARY_NAME
+  vtkPVVTKExtensionsAMR
+KIT
+  ParaView::CoreKit
+GROUPS
+  PARAVIEW_CANONICAL
+DEPENDS
+  VTK::CommonSystem
+  VTK::FiltersAMR
+  VTK::FiltersParallel
+PRIVATE_DEPENDS
+  VTK::ParallelCore
+OPTIONAL_DEPENDS
+  VTK::ParallelMPI
+TEST_LABELS
+  ParaView

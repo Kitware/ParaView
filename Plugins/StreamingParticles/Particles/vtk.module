@@ -3,14 +3,12 @@ NAME
 LIBRARY_NAME
   vtkStreamingParticles
 DEPENDS
-  ParaView::ClientServerCoreRendering
+  ParaView::VTKExtensionsFiltersRendering
+  ParaView::RemotingViews
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::CommonExecutionModel
 PRIVATE_DEPENDS
-  ParaView::ClientServerCoreRendering
-  ParaView::VTKExtensionsCore
-  ParaView::VTKExtensionsRendering
   VTK::FiltersCore
   VTK::ParallelCore
   VTK::RenderingCore

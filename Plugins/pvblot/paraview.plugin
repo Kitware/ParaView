@@ -9,4 +9,4 @@ CONDITION
   # `vtkPythonInterpreter` provides today.
   FALSE AND PARAVIEW_USE_PYTHON
 REQUIRES_MODULES
-  ParaView::ClientServerCoreCore
+  ParaView::RemotingCore

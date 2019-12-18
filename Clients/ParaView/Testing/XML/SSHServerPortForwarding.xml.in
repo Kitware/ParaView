@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionServerConnect" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/load" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/LoadServerConfigurationDialog" command="filesSelected" arguments="@ParaView_BINARY_DIR@/Clients/ParaView/Testing/XML/sshServers.pvsc" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="setCurrent" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="setCheckState" arguments="1.0,0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/connect" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/can.ex2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionServerDisconnect" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+</pqevents>

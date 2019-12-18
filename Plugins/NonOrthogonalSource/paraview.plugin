@@ -3,8 +3,7 @@ NAME
 DESCRIPTION
   Non Orthogonal Source code sample
 REQUIRES_MODULES
-  ParaView::VTKExtensionsCore
-  ParaView::pqApplicationComponents
+  ParaView::VTKExtensionsMisc
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::CommonExecutionModel

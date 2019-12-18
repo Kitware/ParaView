@@ -7,8 +7,7 @@ CONDITION
   # this? The plugin was behind this conditional previously.
   PARAVIEW_USE_QT
 REQUIRES_MODULES
-  ParaView::ClientServerCoreCore
-  ParaView::ServerManagerCore
+  ParaView::RemotingServerManager
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::CommonExecutionModel

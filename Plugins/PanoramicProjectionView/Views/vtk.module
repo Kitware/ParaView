@@ -3,7 +3,7 @@ NAME
 LIBRARY_NAME
   vtkPanoramicProjectionViews
 DEPENDS
-  ParaView::ClientServerCoreRendering
+  ParaView::RemotingViews
   VTK::CommonCore
 PRIVATE_DEPENDS
   VTK::RenderingCore

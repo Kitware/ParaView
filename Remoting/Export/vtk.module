@@ -1,0 +1,24 @@
+NAME
+  ParaView::RemotingExport
+LIBRARY_NAME
+  vtkRemotingExport
+CONDITION
+  PARAVIEW_ENABLE_EXPORTERS AND PARAVIEW_BUILD_RENDERING
+GROUPS
+  PARAVIEW_RENDERING
+KIT
+  ParaView::ServerManagerKit
+DEPENDS
+  ParaView::RemotingServerManager
+  VTK::IOExportGL2PS
+PRIVATE_DEPENDS
+  ParaView::VTKExtensionsFiltersRendering
+  ParaView::RemotingViews
+  VTK::ImagingCore
+OPTIONAL_DEPENDS
+  VTK::Python
+  VTK::PythonInterpreter
+  VTK::WebPython
+  VTK::WrappingPythonCore
+TEST_LABELS
+  ParaView

@@ -1,0 +1,34 @@
+NAME
+  ParaView::RemotingApplication
+GROUPS
+  PARAVIEW_CORE
+LIBRARY_NAME
+  vtkRemotingApplication
+DEPENDS
+  ParaView::RemotingCore
+  ParaView::RemotingServerManager
+KIT
+  ParaView::ServerManagerKit
+PRIVATE_DEPENDS
+  ParaView::RemotingSettings
+  VTK::vtksys
+OPTIONAL_DEPENDS
+  ParaView::RemotingViews
+  # These correspond to the optional XML files included when enabling certain
+  # features
+  VTK::FiltersOpenTURNS
+  VTK::IOADIOS2
+  VTK::IOCityGML
+  VTK::IOGDAL
+  VTK::IOLAS
+  VTK::IOMotionFX
+  VTK::IOPDAL
+  VTK::IOSegY
+  VTK::IOXdmf2
+  VTK::IOXdmf3
+  VTK::MomentInvariants
+  VTK::ParallelMomentInvariants
+  VTK::PythonInterpreter
+  VTK::mpi
+TEST_LABELS
+  ParaView

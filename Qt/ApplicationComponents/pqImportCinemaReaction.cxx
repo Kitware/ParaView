@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "vtkNew.h"
 
-#if VTK_MODULE_ENABLE_ParaView_CinemaReader
+#if VTK_MODULE_ENABLE_ParaView_RemotingCinema
 #include "vtkSMCinemaDatabaseImporter.h"
 #endif
 
@@ -65,7 +65,7 @@ pqImportCinemaReaction::~pqImportCinemaReaction()
 //-----------------------------------------------------------------------------
 void pqImportCinemaReaction::updateEnableState()
 {
-#if VTK_MODULE_ENABLE_ParaView_CinemaReader
+#if VTK_MODULE_ENABLE_ParaView_RemotingCinema
   bool enable_state = false;
   pqActiveObjects& activeObjects = pqActiveObjects::instance();
   vtkSMSession* session =
@@ -84,7 +84,7 @@ void pqImportCinemaReaction::updateEnableState()
 //-----------------------------------------------------------------------------
 bool pqImportCinemaReaction::loadCinemaDatabase()
 {
-#if VTK_MODULE_ENABLE_ParaView_CinemaReader
+#if VTK_MODULE_ENABLE_ParaView_RemotingCinema
   pqServer* server = pqActiveObjects::instance().activeServer();
   pqFileDialog fileDialog(server, pqCoreUtilities::mainWidget(), tr("Open Cinema Database:"),
     QString(), "Cinema Database Files (info.json);;All files(*)");
@@ -107,7 +107,7 @@ bool pqImportCinemaReaction::loadCinemaDatabase()
 //-----------------------------------------------------------------------------
 bool pqImportCinemaReaction::loadCinemaDatabase(const QString& dbase, pqServer* server)
 {
-#if VTK_MODULE_ENABLE_ParaView_CinemaReader
+#if VTK_MODULE_ENABLE_ParaView_RemotingCinema
   CLEAR_UNDO_STACK();
 
   server = (server != NULL) ? server : pqActiveObjects::instance().activeServer();

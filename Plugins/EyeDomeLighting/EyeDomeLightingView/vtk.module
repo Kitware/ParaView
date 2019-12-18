@@ -3,7 +3,7 @@ NAME
 LIBRARY_NAME
   vtkEyeDomeLightingView
 DEPENDS
-  ParaView::ClientServerCoreRendering
+  ParaView::RemotingViews
 PRIVATE_DEPENDS
   VTK::CommonCore
   VTK::RenderingOpenGL2

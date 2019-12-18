@@ -1,0 +1,17 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkNetworkImageSource"
+                 name="NetworkImageSource"
+                 post_push="UpdateImage"
+                 processes="client|renderserver">
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>Set the name of image file to load.</Documentation>
+        <FileListDomain name="files" />
+      </StringVectorProperty>
+      <!-- End of NetworkImageSource -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

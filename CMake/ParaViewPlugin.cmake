@@ -409,7 +409,7 @@ function (paraview_plugin_build)
     if (_paraview_static_plugins)
       target_link_libraries("${_paraview_build_TARGET_NAME}"
         INTERFACE
-          ParaView::ClientServerCoreCore
+          ParaView::RemotingCore
           ${_paraview_static_plugins})
 
       set(_paraview_build_declarations)
@@ -1292,7 +1292,7 @@ function (paraview_add_plugin name)
   endif ()
   target_link_libraries("${_paraview_build_plugin}"
     PRIVATE
-      ParaView::ClientServerCoreCore
+      ParaView::RemotingCore
       ${_paraview_add_plugin_required_libraries})
   target_include_directories("${_paraview_build_plugin}"
     PRIVATE

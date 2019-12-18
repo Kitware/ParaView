@@ -64,12 +64,10 @@ endif()
 
 target_link_libraries(OpenVR
   PRIVATE
-    ParaView::ClientServerCoreRendering
-    ParaView::Core
-    ParaView::ServerManagerCore
-    ParaView::ServerManagerRendering
-    ParaView::VTKExtensionsRendering
     ParaView::pqApplicationComponents
+    ParaView::RemotingCore
+    ParaView::RemotingServerManager
+    ParaView::RemotingViews
     VTK::CommonCore
     VTK::CommonDataModel
     VTK::IOCore

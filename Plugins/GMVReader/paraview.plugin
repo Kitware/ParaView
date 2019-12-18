@@ -4,8 +4,8 @@ DESCRIPTION
   Reader for binary or ASCII files stored in General Mesh Viewer file format
 REQUIRES_MODULES
   # See CMakeLists.txt.
-  #ParaView::Core
-  #ParaView::ServerManagerCore
+  #ParaView::RemotingCore
+  #ParaView::RemotingServerManager
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::CommonExecutionModel

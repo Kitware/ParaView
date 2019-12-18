@@ -5,4 +5,4 @@ DESCRIPTION
 CONDITION
   PARAVIEW_USE_PYTHON
 REQUIRES_MODULES
-  ParaView::ClientServerCorePython
+  ParaView::VTKExtensionsFiltersPython

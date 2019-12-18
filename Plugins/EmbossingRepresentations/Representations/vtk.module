@@ -3,7 +3,7 @@ NAME
 LIBRARY_NAME
   vtkEmbossingRepresentations
 DEPENDS
-  ParaView::ClientServerCoreRendering
+  ParaView::RemotingViews
   VTK::RenderingOpenGL2
 PRIVATE_DEPENDS
   VTK::CommonCore

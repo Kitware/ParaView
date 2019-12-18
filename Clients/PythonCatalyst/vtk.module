@@ -1,0 +1,26 @@
+NAME
+  ParaView::PythonCatalyst
+LIBRARY_NAME
+  vtkPVPythonCatalyst
+CONDITION
+  PARAVIEW_USE_PYTHON
+GROUPS
+  PARAVIEW_CORE
+KIT
+  ParaView::ServerManagerKit
+DEPENDS
+  ParaView::Catalyst
+  VTK::PythonInterpreter
+PRIVATE_DEPENDS
+  ParaView::PythonInitializer
+  VTK::ParallelCore
+TEST_DEPENDS
+  ParaView::CatalystTestDriver
+  VTK::IOImage
+  VTK::ParallelCore
+  VTK::TestingRendering
+TEST_OPTIONAL_DEPENDS
+  VTK::ParallelMPI
+TEST_LABELS
+  Catalyst
+  ParaView

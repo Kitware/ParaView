@@ -199,7 +199,7 @@ ${_vtk_client_server_calls}}\n")
   target_link_libraries("${name}"
     PRIVATE
       ${ARGN}
-      ParaView::ClientServer
+      ParaView::RemotingClientServerStream
       VTK::CommonCore)
 
   set(_vtk_client_server_export)

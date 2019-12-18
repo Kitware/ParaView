@@ -1,0 +1,19 @@
+NAME
+  ParaView::RemotingMisc
+LIBRARY_NAME
+  vtkRemotingMisc
+KIT
+  ParaView::ServerManagerKit
+DEPENDS
+  ParaView::RemotingServerManager
+GROUPS
+  PARAVIEW_CANONICAL
+PRIVATE_DEPENDS
+  ParaView::VTKExtensionsExtraction
+  ParaView::VTKExtensionsMisc
+  ParaView::VTKExtensionsIOCore
+  ParaView::RemotingViews
+  VTK::pugixml
+  VTK::TestingRendering
+TEST_LABELS
+  ParaView

@@ -2,18 +2,23 @@ NAME
   ParaView::pqComponents
 LIBRARY_NAME
   pqComponents
+CONDITION
+  PARAVIEW_USE_QT
 GROUPS
-  ParaViewQt
+  PARAVIEW_CANONICAL
 DEPENDS
   ParaView::pqCore
   ParaView::qttesting
   VTK::jsoncpp
 PRIVATE_DEPENDS
-  ParaView::Animation
-  ParaView::ClientServerCoreDefault
-  ParaView::ServerManagerDefault
-  ParaView::ServerManagerRendering
+  ParaView::RemotingAnimation
+  ParaView::RemotingApplication
+  ParaView::RemotingLive
+  ParaView::RemotingMisc
+  ParaView::RemotingSettings
+  ParaView::RemotingViews
   VTK::ChartsCore
+  VTK::CommonSystem
   VTK::IOImage
   VTK::pugixml
   VTK::vtksys

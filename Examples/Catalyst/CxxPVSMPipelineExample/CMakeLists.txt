@@ -8,8 +8,8 @@ if (USE_CATALYST)
   target_link_libraries(CxxPVSMPipelineExampleAdaptor
     PRIVATE
       ParaView::Catalyst
-      ParaView::VTKExtensionsDefault
-      ParaView::ServerManagerCore)
+      ParaView::RemotingServerManager
+      VTK::CommonDataModel)
   if (TARGET VTK::PythonUsed)
     target_link_libraries(CxxPVSMPipelineExampleAdaptor
       INTERFACE

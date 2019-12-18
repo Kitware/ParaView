@@ -3,11 +3,9 @@ NAME
 DESCRIPTION
   Plugin for NVIDIA IndeX
 REQUIRES_MODULES
-  ParaView::ClientServerCoreCore
-  ParaView::ClientServerCoreRendering
-  ParaView::Core
-  ParaView::ServerManagerDefault
-  ParaView::VTKExtensionsRendering
+  ParaView::RemotingCore
+  ParaView::RemotingServerManager
+  ParaView::RemotingViews
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::CommonExecutionModel

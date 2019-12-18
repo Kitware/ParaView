@@ -1,0 +1,19 @@
+NAME
+  ParaView::VTKExtensionsExtraction
+LIBRARY_NAME
+  vtkPVVTKExtensionsExtraction
+DESCRIPTION
+  Extraction filters
+GROUPS
+  PARAVIEW_CORE
+KIT
+  ParaView::CoreKit
+DEPENDS
+  VTK::FiltersExtraction
+  VTK::FiltersSources
+PRIVATE_DEPENDS
+  VTK::ParallelCore
+OPTIONAL_DEPENDS
+  ParaView::VTKExtensionsExtractionPython
+TEST_LABELS
+  ParaView

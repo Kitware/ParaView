@@ -2,21 +2,33 @@ NAME
   ParaView::pqCore
 LIBRARY_NAME
   pqCore
+CONDITION
+  PARAVIEW_USE_QT
 GROUPS
-  ParaViewQt
+  PARAVIEW_CANONICAL
 DEPENDS
-  ParaView::ClientServerCoreDefault
   ParaView::pqWidgets
   ParaView::qttesting
+  ParaView::RemotingCore
+  ParaView::RemotingServerManager
   VTK::GUISupportQt
 PRIVATE_DEPENDS
-  ParaView::Animation
-  ParaView::ServerManagerApplication
-  ParaView::ServerManagerDefault
+  ParaView::RemotingAnimation
+  ParaView::RemotingApplication
+  ParaView::RemotingMisc
+  ParaView::RemotingSettings
+  ParaView::RemotingViews
+  ParaView::VTKExtensionsFiltersRendering
+  VTK::CommonSystem
+  VTK::ImagingCore
+  VTK::IOImage
   VTK::TestingRendering
   VTK::vtksys
+OPTIONAL_DEPENDS
+  # fixme: affects public API
+  ParaView::RemotingViewsPython
 TEST_DEPENDS
-  ParaView::ServerManagerRendering
+  ParaView::RemotingViews
 TEST_LABELS
   ParaView
 EXCLUDE_WRAP

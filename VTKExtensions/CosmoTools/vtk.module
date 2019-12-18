@@ -1,0 +1,32 @@
+NAME
+  ParaView::VTKExtensionsCosmoTools
+LIBRARY_NAME
+  vtkPVVTKExtensionsCosmoTools
+CONDITION
+  PARAVIEW_ENABLE_COSMOTOOLS
+GROUPS
+  PARAVIEW_CORE
+KIT
+  ParaView::CoreKit
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonExecutionModel
+  VTK::IOCore
+  VTK::mpi
+PRIVATE_DEPENDS
+  ParaView::cosmohalofinder
+  ParaView::VTKExtensionsCore
+  ParaView::VTKExtensionsIOCore
+  VTK::CommonDataModel
+  VTK::CommonMisc
+  VTK::jsoncpp
+  VTK::ParallelCore
+  VTK::ParallelMPI
+TEST_DEPENDS
+  VTK::InteractionStyle
+  VTK::ParallelMPI
+  VTK::RenderingOpenGL2
+  VTK::TestingCore
+  VTK::TestingRendering
+TEST_LABELS
+  ParaView

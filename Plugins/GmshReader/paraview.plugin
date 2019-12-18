@@ -3,7 +3,7 @@ NAME
 DESCRIPTION
   Reader for visualization of high-order polynomial solutions under the Gmsh format
 REQUIRES_MODULES
-  ParaView::Core
+  ParaView::VTKExtensionsCore
   VTK::CommonCore
   VTK::CommonExecutionModel
   VTK::vtksys

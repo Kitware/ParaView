@@ -8,7 +8,6 @@ appropriate for co-processing.
 # for Python2 print statmements to output like Python3 print statements
 from __future__ import print_function
 from paraview import simple, servermanager
-from paraview.modules.vtkPVVTKExtensionsCore import *
 from paraview.detail import exportnow
 
 import math

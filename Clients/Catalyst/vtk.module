@@ -1,0 +1,26 @@
+NAME
+  ParaView::Catalyst
+LIBRARY_NAME
+  vtkPVCatalyst
+DEPENDS
+  VTK::CommonCore
+KIT
+  ParaView::ServerManagerKit
+GROUPS
+  PARAVIEW_CORE
+PRIVATE_DEPENDS
+  ParaView::RemotingApplication
+  VTK::FiltersGeneral
+  VTK::vtksys
+OPTIONAL_DEPENDS
+  VTK::ParallelMPI
+TEST_DEPENDS
+  ParaView::CatalystTestDriver
+  VTK::FiltersSources
+  VTK::IOXML
+  VTK::TestingCore
+TEST_OPTIONAL_DEPENDS
+  VTK::ParallelMPI
+TEST_LABELS
+  Catalyst
+  ParaView

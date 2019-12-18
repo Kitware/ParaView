@@ -44,9 +44,7 @@ paraview_add_plugin(SLACTools
 if (PARAVIEW_USE_QT)
   target_link_libraries(SLACTools
     PRIVATE
-      ParaView::ClientServerCoreCore
-      ParaView::ServerManagerCore
-      ParaView::ServerManagerRendering
+      ParaView::RemotingViews
       VTK::CommonCore
       VTK::CommonDataModel
       VTK::CommonExecutionModel)

@@ -6,7 +6,6 @@ DEPENDS
   VTK::CommonExecutionModel
   VTK::FiltersCore
 PRIVATE_DEPENDS
-  ParaView::Core
   VTK::CommonDataModel
   VTK::CommonCore
   VTK::ParallelCore

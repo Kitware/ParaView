@@ -1,0 +1,139 @@
+<ServerManagerConfiguration>
+  <!-- =================================================================== -->
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkPythonProgrammableFilter"
+                 label="Programmable Source"
+                 name="ProgrammableSource">
+      <Documentation long_help="Executes a user supplied python script to produce an output dataset."
+                     short_help="Executes a python script to produce data.">
+                     This source will execute a python script to produce an
+                     output dataset. The source keeps a copy of the python
+                     script in Script, and creates Interpretor, a python
+                     interpretor to run the script upon the first
+                     execution. To execute external python scripts on the ParaView server, use:
+                     execfile('full_path/script_name.py'). Documentation is found in the Programmable Filter
+                     chapter of the ParaView Guide.</Documentation>
+      <IntVectorProperty command="SetOutputDataSetType"
+                         default_values="0"
+                         name="OutputDataSetType"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <EnumerationDomain name="enum">
+          <!-- Values come from vtkType.h-->
+          <!-- <Entry value="8" text="Same as Input"/> -->
+          <!-- text="vtkDataSet" -->
+          <Entry text="vtkPolyData"
+                 value="0" />
+          <!-- <Entry value="1" text="vtkStructuredPoints"/> -->
+          <Entry text="vtkStructuredGrid"
+                 value="2" />
+          <Entry text="vtkRectilinearGrid"
+                 value="3" />
+          <Entry text="vtkUnstructuredGrid"
+                 value="4" />
+          <!-- <Entry value="5" text="vtkPiecewiseFunction"/> -->
+          <Entry text="vtkImageData"
+                 value="6" />
+          <!-- <Entry value="7" text="vtkDataObject"/> -->
+          <!-- <Entry value="9" text="vtkPointSet"/> -->
+          <!-- <Entry value="10" text="vtkUniformGrid"/> -->
+          <!-- <Entry value="11" text="vtkCompositeDataSet"/> -->
+          <!-- <Entry value="12" text="vtkMultigroupDataSet"/> -->
+          <Entry text="vtkMultiblockDataSet"
+                 value="13" />
+          <!-- <Entry value="14" text="vtkHierarchicalDataSet"/> -->
+          <Entry text="vtkHierarchicalBoxDataSet"
+                 value="15" />
+          <!-- <Entry value="16" text="vtkGenericDataSet"/> -->
+          <!-- <Entry value="17" text="vtkHyperOctree"/> -->
+          <!-- <Entry value="18" text="vtkTemporalDataSet"/> -->
+          <Entry text="vtkTable"
+                 value="19" />
+          <!-- <Entry value="20" text="vtkGraph"/> -->
+          <!-- <Entry value="21" text="vtkTree"/> -->
+          <Entry text="vtkMolecule"
+                 value="33" />
+        </EnumerationDomain>
+        <Documentation>The value of this property determines the dataset type
+        for the output of the programmable source.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetScript"
+                            name="Script"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <Hints>
+          <Widget type="multi_line" syntax="python" />
+        </Hints>
+        <Documentation>This property contains the text of a python program that
+        the programmable source runs. To execute external python scripts on the ParaView server, use:
+        execfile('full_path/script_name.py'). Documentation is found in the Programmable Filter
+        chapter of the ParaView Guide.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetInformationScript"
+                            label="Script (RequestInformation)"
+                            name="InformationScript"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Hints>
+          <Widget type="multi_line" syntax="python" />
+        </Hints>
+        <Documentation>This property is a python script that is executed during
+        the RequestInformation pipeline pass. Use this to provide information
+        such as WHOLE_EXTENT to the pipeline downstream.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="ClearParameters"
+                            command="SetParameterInternal"
+                            is_internal="1"
+                            name="Parameters"
+                            number_of_elements_per_command="2"
+                            repeat_command="1"></StringVectorProperty>
+      <StringVectorProperty command="SetPythonPath"
+                            name="PythonPath"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Documentation>A semi-colon (;) separated list of directories to add to
+        the python library search path.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <!-- End ProgrammableSource -->
+    </SourceProxy>
+
+    <SourceProxy class="vtkPythonProgrammableFilter"
+                 label="Live Programmable Source"
+                 name="LiveProgrammableSource"
+                 base_proxygroup="sources"
+                 base_proxyname="ProgrammableSource">
+      <Documentation>
+        A programmable source that can produce new data autonomously.
+      </Documentation>
+      <StringVectorProperty command="SetCheckNeedsUpdateScript"
+                            label="Script (CheckNeedsUpdate)"
+                            name="CheckNeedsUpdateScript"
+                            number_of_elements="1">
+        <Hints>
+          <Widget type="multi_line" syntax="python" />
+        </Hints>
+        <Documentation>
+          Specify the script to use to check if the filter/source has new data.
+          This is only needed for "live" sources, that can cause data to be available
+          outside of ParaView.
+        </Documentation>
+      </StringVectorProperty>
+
+      <Property name="PauseLiveSource" panel_widget="pause_livesource">
+        <Documentation>
+          Pause live source.
+        </Documentation>
+      </Property>
+      <Hints>
+        <LiveSource />
+      </Hints>
+   </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

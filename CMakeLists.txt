@@ -191,6 +191,7 @@ if (PARAVIEW_USE_PYTHON AND PARAVIEW_BUILD_TESTING)
   # will fail. We find it here.
   find_package(PythonInterp "${PARAVIEW_PYTHON_VERSION}" QUIET)
   mark_as_advanced(PYTHON_EXECUTABLE)
+  include(FindPythonModules)
 endif()
 
 set(use_vtk_remote_modules OFF)
@@ -286,12 +287,15 @@ paraview_plugin_scan(
   REQUIRES_MODULES  paraview_plugin_required_modules)
 
 set(paraview_source_directories
-  "${CMAKE_CURRENT_SOURCE_DIR}/CoProcessing"
-  "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewCore"
+  "${CMAKE_CURRENT_SOURCE_DIR}/Kits"
+  "${CMAKE_CURRENT_SOURCE_DIR}/Clients"
   "${CMAKE_CURRENT_SOURCE_DIR}/Qt"
+  "${CMAKE_CURRENT_SOURCE_DIR}/VTKExtensions"
+  "${CMAKE_CURRENT_SOURCE_DIR}/Web"
+  "${CMAKE_CURRENT_SOURCE_DIR}/Remoting"
   "${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty"
-  "${CMAKE_CURRENT_SOURCE_DIR}/Utilities"
-  "${CMAKE_CURRENT_SOURCE_DIR}/Web")
+  "${CMAKE_CURRENT_SOURCE_DIR}/Utilities")
+
 vtk_module_find_modules(paraview_module_files ${paraview_source_directories})
 vtk_module_find_kits(paraview_kit_files ${paraview_source_directories})
 vtk_module_scan(
@@ -315,7 +319,10 @@ foreach (paraview_module IN LISTS paraview_unrecognized_modules)
   endif ()
 endforeach ()
 
-list(REMOVE_ITEM paraview_unrecognized_paraview_modules ${paraview_rejected_modules})
+if (paraview_unrecognized_paraview_modules)
+  list(REMOVE_ITEM paraview_unrecognized_paraview_modules ${paraview_rejected_modules})
+endif()
+
 if (paraview_unrecognized_paraview_modules)
   message(FATAL_ERROR
     "The following modules were requested or required, but not found: "
@@ -407,7 +414,7 @@ else ()
   set(VTK_USE_CUDA "${PARAVIEW_USE_CUDA}")
 
   # Forward logging option to VTK.
-  set(VTK_ENABLE_LOGGING "${PARAVIEW_ENABLE_LOGGING}")
+  set(VTK_ENABLE_LOGGING ON)
 
   if (use_vtk_remote_modules)
     if (PARAVIEW_ENABLE_MOMENTINVARIANTS)
@@ -643,8 +650,7 @@ if (PARAVIEW_ENABLE_WEB)
     @ONLY)
 endif ()
 
-add_subdirectory(CommandLineExecutables)
-add_subdirectory(Applications)
+add_subdirectory(Clients)
 
 if (PARAVIEW_USE_PYTHON)
   add_subdirectory(Wrapping/Python)

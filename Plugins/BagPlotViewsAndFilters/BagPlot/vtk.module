@@ -3,10 +3,12 @@ NAME
 LIBRARY_NAME
   vtkBagPlotViewsAndFiltersBagPlot
 DEPENDS
-  ParaView::ServerManagerRendering
-  ParaView::ClientServerCoreRendering
+  ParaView::RemotingViews
   VTK::CommonExecutionModel
 PRIVATE_DEPENDS
-  ParaView::VTKExtensionsDefault
+  ParaView::VTKExtensionsFiltersRendering
+  ParaView::VTKExtensionsFiltersStatistics
+  ParaView::VTKExtensionsMisc
+  VTK::FiltersExtraction
   VTK::FiltersStatistics
   VTK::InfovisCore

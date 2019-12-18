@@ -1,0 +1,24 @@
+NAME
+  ParaView::RemotingCinema
+LIBRARY_NAME
+  vtkRemotingCinema
+CONDITION
+  PARAVIEW_USE_PYTHON
+GROUPS
+  PARAVIEW_CANONICAL
+KIT
+  ParaView::ServerManagerKit
+DEPENDS
+  ParaView::RemotingServerManager
+  ParaView::RemotingViews
+  VTK::RenderingCore
+PRIVATE_DEPENDS
+  ParaView::CinemaPython
+  ParaView::RemotingAnimation
+  VTK::ImagingCore
+  VTK::opengl
+  VTK::PythonInterpreter
+  VTK::RenderingOpenGL2
+  VTK::WrappingPythonCore
+TEST_LABELS
+  ParaView
