@@ -41,6 +41,7 @@
 #undef PROTOBUF_NOINLINE
 #undef PROTOBUF_SECTION_VARIABLE
 #undef PROTOBUF_DEPRECATED
+#undef PROTOBUF_DEPRECATED_ENUM
 #undef PROTOBUF_DEPRECATED_MSG
 #undef PROTOBUF_FUNC_ALIGN
 #undef PROTOBUF_RETURNS_NONNULL
@@ -64,10 +65,17 @@
 #undef PROTOBUF_NAMESPACE_OPEN
 #undef PROTOBUF_NAMESPACE_CLOSE
 #undef PROTOBUF_UNUSED
+#undef PROTOBUF_ASSUME
+#undef PROTOBUF_EXPORT_TEMPLATE_DECLARE
+#undef PROTOBUF_EXPORT_TEMPLATE_DEFINE
 
 // Restore macro that may have been #undef'd in port_def.inc.
 #ifdef _MSC_VER
 #pragma pop_macro("GetMessage")
+#pragma pop_macro("IGNORE")
+#pragma pop_macro("IN")
+#pragma pop_macro("min")
+#pragma pop_macro("max")
 #endif
 
 #if defined(__clang__)

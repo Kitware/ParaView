@@ -63,11 +63,9 @@ class MapFieldLite {
   typedef Map<Key, T> MapType;
   typedef EntryType EntryTypeTrait;
 
-  MapFieldLite() : arena_(NULL) { SetDefaultEnumValue(); }
+  MapFieldLite() { SetDefaultEnumValue(); }
 
-  explicit MapFieldLite(Arena* arena) : arena_(arena), map_(arena) {
-    SetDefaultEnumValue();
-  }
+  explicit MapFieldLite(Arena* arena) : map_(arena) { SetDefaultEnumValue(); }
 
   // Accessors
   const Map<Key, T>& GetMap() const { return map_; }
@@ -92,21 +90,17 @@ class MapFieldLite {
   // Used in the implementation of parsing. Caller should take the ownership iff
   // arena_ is NULL.
   EntryType* NewEntry() const {
-    if (arena_ == NULL) {
-      return new EntryType();
-    } else {
-      return Arena::CreateMessage<EntryType>(arena_);
-    }
+    return Arena::CreateMessage<EntryType>(map_.arena_);
   }
   // Used in the implementation of serializing enum value type. Caller should
   // take the ownership iff arena_ is NULL.
   EntryType* NewEnumEntryWrapper(const Key& key, const T t) const {
-    return EntryType::EnumWrap(key, t, arena_);
+    return EntryType::EnumWrap(key, t, map_.arena_);
   }
   // Used in the implementation of serializing other value types. Caller should
   // take the ownership iff arena_ is NULL.
   EntryType* NewEntryWrapper(const Key& key, const T& t) const {
-    return EntryType::Wrap(key, t, arena_);
+    return EntryType::Wrap(key, t, map_.arena_);
   }
 
   const char* _InternalParse(const char* ptr, ParseContext* ctx) {
@@ -126,7 +120,6 @@ class MapFieldLite {
  private:
   typedef void DestructorSkippable_;
 
-  Arena* arena_;
   Map<Key, T> map_;
 
   friend class ::PROTOBUF_NAMESPACE_ID::Arena;
@@ -160,8 +153,13 @@ EnumParseWrapper<T, Metadata> InitEnumParseWrapper(T* map_field,
 // expected to be message.  It's useful to have this helper here to keep the
 // protobuf compiler from ever having to emit loops in IsInitialized() methods.
 // We want the C++ compiler to inline this or not as it sees fit.
-template <typename Key, typename T>
-bool AllAreInitialized(const Map<Key, T>& t) {
+template <typename Derived, typename Key, typename T,
+          WireFormatLite::FieldType key_wire_type,
+          WireFormatLite::FieldType value_wire_type, int default_enum_value>
+bool AllAreInitialized(
+    const MapFieldLite<Derived, Key, T, key_wire_type, value_wire_type,
+                       default_enum_value>& field) {
+  const auto& t = field.GetMap();
   for (typename Map<Key, T>::const_iterator it = t.begin(); it != t.end();
        ++it) {
     if (!it->second.IsInitialized()) return false;
