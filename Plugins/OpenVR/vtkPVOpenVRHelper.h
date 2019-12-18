@@ -144,7 +144,7 @@ public:
   //@}
 
   // show the billboard with the provided text
-  void ShowBillboard(std::string const& text, bool updatePosition, vtkTexture* t = nullptr);
+  void ShowBillboard(std::string const& text, bool updatePosition, std::string const& tfile);
 
   // add a point to the currently selected source in PV
   // if it accepts points

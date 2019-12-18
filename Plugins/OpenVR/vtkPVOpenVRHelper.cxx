@@ -68,6 +68,7 @@
 #include "vtkScalarsToColors.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
+#include "vtkShaderProperty.h"
 #include "vtkStringArray.h"
 #include "vtkTextActor3D.h"
 #include "vtkTextProperty.h"
@@ -1307,7 +1308,7 @@ void vtkPVOpenVRHelper::ApplyState()
 }
 
 void vtkPVOpenVRHelper::ShowBillboard(
-  const std::string& text, bool updatePosition, vtkTexture* texture)
+  const std::string& text, bool updatePosition, std::string const& textureFile)
 {
   vtkOpenVRRenderWindow* renWin =
     vtkOpenVRRenderWindow::SafeDownCast(this->Interactor->GetRenderWindow());
@@ -1362,8 +1363,13 @@ void vtkPVOpenVRHelper::ShowBillboard(
     double fov = ren->GetActiveCamera()->GetViewAngle();
     double tsize = 0.1 * 2.0 * atan(fov * 0.5); // 10% of fov
     tsize /= 200.0;                             // about 200 pixel texture map
-    scale *= tsize;
-    this->TextActor3D->SetScale(scale, scale, scale);
+    tsize *= scale;
+    this->TextActor3D->SetScale(tsize, tsize, tsize);
+
+    this->ImageActor->SetOrientation(orient);
+    this->ImageActor->RotateX(-30.0);
+    this->ImageActor->SetPosition(tpos);
+    this->ImageActor->SetScale(scale, scale, scale);
   }
 
   this->TextActor3D->SetInput(text.c_str());
@@ -1377,27 +1383,23 @@ void vtkPVOpenVRHelper::ShowBillboard(
   prop->SetBackgroundColor(0.0, 0.0, 0.0);
   prop->SetFontSize(14);
 
-  if (texture)
+  if (textureFile.size())
   {
-    texture->Update();
+    vtkNew<vtkJPEGReader> rdr;
+    rdr->SetFileName(textureFile.c_str());
+    vtkNew<vtkTexture> texture;
+    texture->SetInputConnection(rdr->GetOutputPort());
+    rdr->Update();
+
     int* dims = texture->GetInput()->GetDimensions();
     double aspect = static_cast<double>(dims[1]) / dims[0];
     this->ImagePlane->SetOrigin(-1.0, 0.0, 0.0);
     this->ImagePlane->SetPoint1(0.0, 0.0, 0.0);
     this->ImagePlane->SetPoint2(-1.0, aspect, 0.0);
 
-    if (updatePosition)
-    {
-      this->ImageActor->SetOrientation(orient);
-      this->ImageActor->RotateX(-30.0);
-      double scale = renWin->GetPhysicalScale();
-      this->ImageActor->SetPosition(tpos);
-      this->ImageActor->SetScale(scale, scale, scale);
-    }
     this->ImageActor->SetTexture(texture);
 
     this->Renderer->AddActor(this->ImageActor);
-    texture->Delete();
   }
 }
 
@@ -1499,7 +1501,7 @@ void vtkPVOpenVRHelper::MoveToNextImage()
 
   // now move forward or back to find the next new image
   int step = (value < 0.5 ? -1 : 1);
-  while (!found && currCell < numCells && currCell >= 0)
+  while (!found && currCell + step < numCells && currCell + step >= 0)
   {
     currCell += step;
     std::string svalue = sa->GetValue(currCell);
@@ -1708,7 +1710,7 @@ void vtkPVOpenVRHelper::UpdateBillboard(bool updatePosition)
   pmat->MultiplyPoint(wpos, wpos);
   toString << " Cell Center (WC): " << wpos[0] << ", " << wpos[1] << ", " << wpos[2] << " \n";
 
-  vtkTexture* texture = nullptr;
+  std::string textureFile;
 
   vtkIdType numcd = celld->GetNumberOfArrays();
   for (vtkIdType i = 0; i < numcd; ++i)
@@ -1727,12 +1729,7 @@ void vtkPVOpenVRHelper::UpdateBillboard(bool updatePosition)
           vtkNew<vtkJPEGReader> rdr;
           if (rdr->CanReadFile(value.c_str() + 7))
           {
-            rdr->SetFileName(value.c_str() + 7);
-            if (!texture)
-            {
-              texture = vtkTexture::New();
-            }
-            texture->SetInputConnection(rdr->GetOutputPort());
+            textureFile = (value.c_str() + 7);
           }
         }
         toString << value << " \n";
@@ -1837,8 +1834,12 @@ void vtkPVOpenVRHelper::UpdateBillboard(bool updatePosition)
 
   toString << "\n";
 
-  this->CollaborationClient->ShowBillboard(toString.str());
-  this->ShowBillboard(toString.str(), updatePosition, texture);
+  std::vector<std::string> cvals;
+  cvals.push_back(toString.str());
+  cvals.push_back(updatePosition ? "true" : "false");
+  cvals.push_back(textureFile);
+  this->CollaborationClient->ShowBillboard(cvals);
+  this->ShowBillboard(toString.str(), updatePosition, textureFile);
   this->Style->ShowPickCell(cell, vtkProp3D::SafeDownCast(this->LastPickedProp));
 }
 
@@ -2453,6 +2454,33 @@ void vtkPVOpenVRHelper::ExportLocationsAsView(vtkSMViewProxy* smview)
     // scalar visibility
     adatael->SetIntAttribute("ScalarVisibility", actor->GetMapper()->GetScalarVisibility());
     adatael->SetIntAttribute("ScalarMode", actor->GetMapper()->GetScalarMode());
+
+    // shader replacements
+    auto shaderp = actor->GetShaderProperty();
+    if (shaderp && shaderp->GetNumberOfShaderReplacements())
+    {
+      // export the actors
+      vtkNew<vtkXMLDataElement> shadersel;
+      shadersel->SetName("Shaders");
+      int num = shaderp->GetNumberOfShaderReplacements();
+      for (int i = 0; i < num; ++i)
+      {
+        vtkNew<vtkXMLDataElement> shaderel;
+        shaderel->SetName("Shader");
+        shaderel->SetAttribute("Type", shaderp->GetNthShaderReplacementTypeAsString(i).c_str());
+        std::string name;
+        std::string repValue;
+        bool first;
+        bool all;
+        shaderp->GetNthShaderReplacement(i, name, first, repValue, all);
+        shaderel->SetAttribute("Name", name.c_str());
+        shaderel->SetAttribute("Replacement", repValue.c_str());
+        shaderel->SetIntAttribute("First", first ? 1 : 0);
+        shaderel->SetIntAttribute("All", all ? 1 : 0);
+        shadersel->AddNestedElement(shaderel);
+      }
+      adatael->AddNestedElement(shadersel);
+    }
 
     if (actor->GetMapper()->GetUseLookupTableScalarRange())
     {
