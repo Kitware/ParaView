@@ -24,6 +24,7 @@
 #include "vtkObject.h"
 #include <functional> // for method
 #include <set>        // for ivar
+#include <vector>     // for sig
 
 class vtkImplicitPlaneWidget2;
 class vtkOpenVRRenderer;
@@ -60,7 +61,7 @@ public:
 
   void UpdateRay(vtkOpenVRModel*, vtkEventDataDevice);
 
-  void ShowBillboard(std::string const& text);
+  void ShowBillboard(std::vector<std::string> const& vals);
 
   void AddPointToSource(double const* pt);
   void ClearPointSource();

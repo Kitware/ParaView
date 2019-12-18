@@ -140,11 +140,14 @@ protected:
     else if (type == "SB")
     {
       std::string text = s_recv(this->Subscriber);
+      std::string update = s_recv(this->Subscriber);
+      std::string file = s_recv(this->Subscriber);
+      std::string end = s_recv(this->Subscriber);
 
       // only want to change if it's from someone else.
       if (otherID != this->CollabID)
       {
-        this->Helper->ShowBillboard(text, true);
+        this->Helper->ShowBillboard(text, update == "true", file);
       }
     }
     else
@@ -240,8 +243,8 @@ void vtkPVOpenVRCollaborationClient::GoToSavedLocation(int index)
   {
     if (this->Internal->GetConnected())
     {
-      vtkOpenVRRenderer* ren = this->Internal->GetRenderer();
-      vtkOpenVRRenderWindow* renWin = static_cast<vtkOpenVRRenderWindow*>(ren->GetVTKWindow());
+      vtkOpenVRRenderWindow* renWin =
+        static_cast<vtkOpenVRRenderWindow*>(this->Internal->GetRenderer()->GetVTKWindow());
       this->Internal->SendMessage(
         "P", index, renWin->GetPhysicalTranslation(), renWin->GetPhysicalViewDirection());
     }
@@ -291,9 +294,10 @@ void vtkPVOpenVRCollaborationClient::UpdateRay(vtkOpenVRModel* model, vtkEventDa
     this->Internal->SendMessage(model->GetRay()->GetShow() ? "SR" : "HR", static_cast<int>(dev));
   }
 }
-void vtkPVOpenVRCollaborationClient::ShowBillboard(std::string const& text)
+
+void vtkPVOpenVRCollaborationClient::ShowBillboard(std::vector<std::string> const& vals)
 {
-  this->Internal->SendMessage("SB", text);
+  this->Internal->SendMessage("SB", vals);
 }
 
 void vtkPVOpenVRCollaborationClient::AddPointToSource(double const* pt)
@@ -342,7 +346,7 @@ void vtkPVOpenVRCollaborationClient::UpdateCropPlanes(std::set<vtkImplicitPlaneW
 void vtkPVOpenVRCollaborationClient::UpdateRay(vtkOpenVRModel*, vtkEventDataDevice)
 {
 }
-void vtkPVOpenVRCollaborationClient::ShowBillboard(std::string const&)
+void vtkPVOpenVRCollaborationClient::ShowBillboard(std::vector<std::string> const&)
 {
 }
 void vtkPVOpenVRCollaborationClient::AddPointToSource(double const*)
