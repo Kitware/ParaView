@@ -42,8 +42,9 @@ if(STANDALONE_BUILD)
 #    FILE ${PagosaAdaptor_BINARY_DIR}/PagosaAdaptorTargets.cmake)
 elseif(PARAVIEW_INSTALL_DEVELOPMENT_FILES)
   install(TARGETS PagosaAdaptor EXPORT ${PV_INSTALL_EXPORT_NAME}
-    DESTINATION lib
-    COMPONENT Development)
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    COMPONENT development)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/PagosaAdaptorAPIMangling.h
-    DESTINATION ${VTK_INSTALL_INCLUDE_DIR})
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/paraview${paraview_version_suffix}"
+    COMPONENT development)
 endif()
