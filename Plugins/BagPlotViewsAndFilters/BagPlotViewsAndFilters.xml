@@ -426,7 +426,8 @@
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="SelectionColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="SelectionColor"
+            unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <SubProxy command="SetSelectionRepresentation">
@@ -543,7 +544,7 @@
         <Documentation>Set the array to use on X axis. This is used only when
         UseIndexForXAxis is set to 0.</Documentation>
         <ChartSeriesListDomain name="array_list"
-                              hide_partial_arrays="1">
+                               hide_partial_arrays="0">
           <RequiredProperties>
             <Property function="Input" name="Input" />
             <Property function="FieldDataSelection" name="AttributeType" />
@@ -666,7 +667,8 @@
                            min="0 0 0"
                            name="range" />
         <Hints>
-          <GlobalPropertyLink type="ColorPalette" property="SelectionColor" />
+          <PropertyLink group="settings" proxy="ColorPalette" property="SelectionColor"
+            unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <SubProxy command="SetSelectionRepresentation">
