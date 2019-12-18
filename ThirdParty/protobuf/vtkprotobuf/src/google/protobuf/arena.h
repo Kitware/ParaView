@@ -33,6 +33,7 @@
 #ifndef GOOGLE_PROTOBUF_ARENA_H__
 #define GOOGLE_PROTOBUF_ARENA_H__
 
+
 #include <limits>
 #include <type_traits>
 #include <utility>
@@ -50,9 +51,9 @@ using type_info = ::type_info;
 #include <typeinfo>
 #endif
 
+#include <type_traits>
 #include <google/protobuf/arena_impl.h>
 #include <google/protobuf/port.h>
-#include <type_traits>
 
 #include <google/protobuf/port_def.inc>
 
@@ -68,13 +69,14 @@ struct ArenaOptions;  // defined below
 }  // namespace protobuf
 }  // namespace google
 
-
 namespace google {
 namespace protobuf {
 
 class Arena;    // defined below
 class Message;  // defined in message.h
 class MessageLite;
+template <typename Key, typename T>
+class Map;
 
 namespace arena_metrics {
 
@@ -86,6 +88,7 @@ namespace internal {
 
 struct ArenaStringPtr;  // defined in arenastring.h
 class LazyField;        // defined in lazy_field.h
+class EpsCopyInputStream;  // defined in parse_context.h
 
 template <typename Type>
 class GenericTypeHandler;  // defined in repeated_field.h
@@ -357,14 +360,6 @@ class PROTOBUF_EXPORT Arena final {
   // may not include space used by other threads executing concurrently with
   // the call to this method.
   uint64 SpaceUsed() const { return impl_.SpaceUsed(); }
-  // DEPRECATED. Please use SpaceAllocated() and SpaceUsed().
-  //
-  // Combines SpaceAllocated and SpaceUsed. Returns a pair of
-  // <space_allocated, space_used>.
-  PROTOBUF_DEPRECATED_MSG("Please use SpaceAllocated() and SpaceUsed()")
-  std::pair<uint64, uint64> SpaceAllocatedAndUsed() const {
-    return std::make_pair(SpaceAllocated(), SpaceUsed());
-  }
 
   // Frees all storage allocated by this arena after calling destructors
   // registered with OwnDestructor() and freeing objects registered with Own().
@@ -541,7 +536,7 @@ class PROTOBUF_EXPORT Arena final {
     AllocHook(RTTI_TYPE_ID(T), n);
     // Monitor allocation if needed.
     if (skip_explicit_ownership) {
-      return impl_.AllocateAligned(n);
+      return AllocateAlignedNoHook(n);
     } else {
       return impl_.AllocateAlignedAndAddCleanup(
           n, &internal::arena_destruct_object<T>);
@@ -602,7 +597,7 @@ class PROTOBUF_EXPORT Arena final {
     const size_t n = internal::AlignUpTo8(sizeof(T) * num_elements);
     // Monitor allocation if needed.
     AllocHook(RTTI_TYPE_ID(T), n);
-    return static_cast<T*>(impl_.AllocateAligned(n));
+    return static_cast<T*>(AllocateAlignedNoHook(n));
   }
 
   template <typename T, typename... Args>
@@ -688,14 +683,17 @@ class PROTOBUF_EXPORT Arena final {
                                         !has_get_arena<T>::value,
                                     int>::type = 0>
   PROTOBUF_ALWAYS_INLINE static Arena* GetArenaInternal(const T* value) {
+    (void)value;
     return nullptr;
   }
 
   // For friends of arena.
   void* AllocateAligned(size_t n) {
     AllocHook(NULL, n);
-    return impl_.AllocateAligned(internal::AlignUpTo8(n));
+    return AllocateAlignedNoHook(internal::AlignUpTo8(n));
   }
+
+  void* AllocateAlignedNoHook(size_t n);
 
   internal::ArenaImpl impl_;
 
@@ -712,6 +710,7 @@ class PROTOBUF_EXPORT Arena final {
   friend class internal::GenericTypeHandler;
   friend struct internal::ArenaStringPtr;  // For AllocateAligned.
   friend class internal::LazyField;        // For CreateMaybeMessage.
+  friend class internal::EpsCopyInputStream;  // For parser performance
   friend class MessageLite;
   template <typename Key, typename T>
   friend class Map;

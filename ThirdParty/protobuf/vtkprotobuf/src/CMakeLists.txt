@@ -22,7 +22,6 @@ add_library(protobuf
   google/protobuf/stubs/bytestream.cc
   google/protobuf/stubs/common.cc
   google/protobuf/stubs/int128.cc
-  google/protobuf/stubs/mathlimits.cc
   google/protobuf/stubs/status.cc
   google/protobuf/stubs/statusor.cc
   google/protobuf/stubs/stringpiece.cc
@@ -194,7 +193,6 @@ set(compiler_headers
 
 set(io_headers
   google/protobuf/io/coded_stream.h
-  google/protobuf/io/coded_stream_inl.h
   google/protobuf/io/gzip_stream.h
   google/protobuf/io/io_win32.h
   google/protobuf/io/package_info.h
@@ -216,7 +214,6 @@ set(stubs_headers
   google/protobuf/stubs/logging.h
   google/protobuf/stubs/macros.h
   google/protobuf/stubs/map_util.h
-  google/protobuf/stubs/mathlimits.h
   google/protobuf/stubs/mathutil.h
   google/protobuf/stubs/mutex.h
   google/protobuf/stubs/once.h

@@ -37,14 +37,16 @@
 #include <stack>
 #include <string>
 #include <vector>
+
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/stringprintf.h>
-#include <google/protobuf/io/coded_stream_inl.h>
+#include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
-#include <google/protobuf/port_def.inc>
 
+
+#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -290,25 +292,6 @@ void CodedOutputStreamFieldSkipper::SkipUnknownEnum(int field_number,
   unknown_fields_->WriteVarint64(value);
 }
 
-bool WireFormatLite::ReadPackedEnumNoInline(io::CodedInputStream* input,
-                                            bool (*is_valid)(int),
-                                            RepeatedField<int>* values) {
-  uint32 length;
-  if (!input->ReadVarint32(&length)) return false;
-  io::CodedInputStream::Limit limit = input->PushLimit(length);
-  while (input->BytesUntilLimit() > 0) {
-    int value;
-    if (!ReadPrimitive<int, WireFormatLite::TYPE_ENUM>(input, &value)) {
-      return false;
-    }
-    if (is_valid == NULL || is_valid(value)) {
-      values->Add(value);
-    }
-  }
-  input->PopLimit(limit);
-  return true;
-}
-
 bool WireFormatLite::ReadPackedEnumPreserveUnknowns(
     io::CodedInputStream* input, int field_number, bool (*is_valid)(int),
     io::CodedOutputStream* unknown_fields_stream, RepeatedField<int>* values) {
@@ -543,15 +526,7 @@ void WireFormatLite::WriteMessage(int field_number, const MessageLite& value,
 
 void WireFormatLite::WriteSubMessageMaybeToArray(
     int size, const MessageLite& value, io::CodedOutputStream* output) {
-  if (!output->IsSerializationDeterministic()) {
-    uint8* target = output->GetDirectBufferForNBytesAndAdvance(size);
-    if (target != nullptr) {
-      uint8* end = value.InternalSerializeWithCachedSizesToArray(target);
-      GOOGLE_DCHECK_EQ(end - target, size);
-      return;
-    }
-  }
-  value.SerializeWithCachedSizes(output);
+  output->SetCur(value._InternalSerialize(output->Cur(), output->EpsCopy()));
 }
 
 void WireFormatLite::WriteGroupMaybeToArray(int field_number,
@@ -577,8 +552,7 @@ PROTOBUF_ALWAYS_INLINE static bool ReadBytesToString(
 inline static bool ReadBytesToString(io::CodedInputStream* input,
                                      std::string* value) {
   uint32 length;
-  return input->ReadVarint32(&length) &&
-         input->InternalReadStringInline(value, length);
+  return input->ReadVarint32(&length) && input->ReadString(value, length);
 }
 
 bool WireFormatLite::ReadBytes(io::CodedInputStream* input,
