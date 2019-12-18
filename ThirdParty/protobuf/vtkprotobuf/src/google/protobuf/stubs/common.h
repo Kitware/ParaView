@@ -83,7 +83,7 @@ namespace internal {
 
 // The current version, represented as a single integer to make comparison
 // easier:  major * 10^6 + minor * 10^3 + micro
-#define GOOGLE_PROTOBUF_VERSION 3008000
+#define GOOGLE_PROTOBUF_VERSION 3011002
 
 // A suffix string for alpha, beta or rc releases. Empty for stable releases.
 #define GOOGLE_PROTOBUF_VERSION_SUFFIX ""
@@ -91,15 +91,15 @@ namespace internal {
 // The minimum header version which works with the current version of
 // the library.  This constant should only be used by protoc's C++ code
 // generator.
-static const int kMinHeaderVersionForLibrary = 3008000;
+static const int kMinHeaderVersionForLibrary = 3011000;
 
 // The minimum protoc version which works with the current version of the
 // headers.
-#define GOOGLE_PROTOBUF_MIN_PROTOC_VERSION 3008000
+#define GOOGLE_PROTOBUF_MIN_PROTOC_VERSION 3011000
 
 // The minimum header version which works with the current version of
 // protoc.  This constant should only be used in VerifyVersion().
-static const int kMinHeaderVersionForProtoc = 3008000;
+static const int kMinHeaderVersionForProtoc = 3011000;
 
 // Verifies that the headers and libraries are compatible.  Use the macro
 // below to call this.
@@ -156,37 +156,18 @@ PROTOBUF_EXPORT char* UTF8CoerceToStructurallyValid(const StringPiece& str,
 
 }  // namespace internal
 
-
-// ===================================================================
-// Shutdown support.
-
-// Shut down the entire protocol buffers library, deleting all static-duration
-// objects allocated by the library or by generated .pb.cc files.
-//
-// There are two reasons you might want to call this:
-// * You use a draconian definition of "memory leak" in which you expect
-//   every single malloc() to have a corresponding free(), even for objects
-//   which live until program exit.
-// * You are writing a dynamically-loaded library which needs to clean up
-//   after itself when the library is unloaded.
-//
-// It is safe to call this multiple times.  However, it is not safe to use
-// any other part of the protocol buffers library after
-// ShutdownProtobufLibrary() has been called. Furthermore this call is not
-// thread safe, user needs to synchronize multiple calls.
+// This lives in message_lite.h now, but we leave this here for any users that
+// #include common.h and not message_lite.h.
 PROTOBUF_EXPORT void ShutdownProtobufLibrary();
 
 namespace internal {
 
-// Register a function to be called when ShutdownProtocolBuffers() is called.
-PROTOBUF_EXPORT void OnShutdown(void (*func)());
-// Run an arbitrary function on an arg
-PROTOBUF_EXPORT void OnShutdownRun(void (*f)(const void*), const void* arg);
-
+// Strongly references the given variable such that the linker will be forced
+// to pull in this variable's translation unit.
 template <typename T>
-T* OnShutdownDelete(T* p) {
-  OnShutdownRun([](const void* pp) { delete static_cast<const T*>(pp); }, p);
-  return p;
+void StrongReference(const T& var) {
+  auto volatile unused = &var;
+  (void)&unused;  // Use address to avoid an extra load of "unused".
 }
 
 }  // namespace internal

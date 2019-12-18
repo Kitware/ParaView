@@ -8,7 +8,7 @@ readonly name="protobuf"
 readonly ownership="protobuf Upstream <kwrobot@kitware.com>"
 readonly subtree="ThirdParty/$name/vtk$name"
 readonly repo="https://gitlab.kitware.com/third-party/protobuf.git"
-readonly tag="for/paraview-20190827.1-3.8.0"
+readonly tag="for/paraview-20191217.2-3.11.2"
 
 readonly paths="
 CMakeLists.txt

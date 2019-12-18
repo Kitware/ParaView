@@ -398,7 +398,7 @@ vtkObject* vtkPVSessionCore::GetRemoteObject(vtkTypeUInt32 globalid)
 void vtkPVSessionCore::PushStateInternal(vtkSMMessage* message)
 {
   LOG(<< "----------------------------------------------------------------\n"
-      << "Push State ( " << message->ByteSize() << " bytes )\n"
+      << "Push State ( " << message->ByteSizeLong() << " bytes )\n"
       << "----------------------------------------------------------------\n"
       << message->DebugString().c_str());
 
@@ -490,7 +490,7 @@ void vtkPVSessionCore::PushState(vtkSMMessage* message)
       unsigned char type = PUSH_STATE;
       this->ParallelController->TriggerRMIOnAllChildren(&type, 1, ROOT_SATELLITE_RMI_TAG);
 
-      int byte_size = message->ByteSize();
+      vtkIdType byte_size = static_cast<vtkIdType>(message->ByteSizeLong());
       unsigned char* raw_data = new unsigned char[byte_size + 1];
       message->SerializeToArray(raw_data, byte_size);
       this->ParallelController->Broadcast(&byte_size, 1, 0);
@@ -507,7 +507,7 @@ void vtkPVSessionCore::PushState(vtkSMMessage* message)
 //----------------------------------------------------------------------------
 void vtkPVSessionCore::PushStateSatelliteCallback()
 {
-  int byte_size = 0;
+  vtkIdType byte_size = 0;
   this->ParallelController->Broadcast(&byte_size, 1, 0);
 
   unsigned char* raw_data = new unsigned char[byte_size + 1];
@@ -535,7 +535,7 @@ void vtkPVSessionCore::PrintSelf(ostream& os, vtkIndent indent)
 void vtkPVSessionCore::PullState(vtkSMMessage* message)
 {
   LOG(<< "----------------------------------------------------------------\n"
-      << "Pull State ( " << message->ByteSize() << " bytes )\n"
+      << "Pull State ( " << message->ByteSizeLong() << " bytes )\n"
       << "----------------------------------------------------------------\n"
       << message->DebugString().c_str());
 
@@ -557,7 +557,7 @@ void vtkPVSessionCore::PullState(vtkSMMessage* message)
   }
 
   LOG(<< "----------------------------------------------------------------\n"
-      << "Pull State Reply ( " << message->ByteSize() << " bytes )\n"
+      << "Pull State Reply ( " << message->ByteSizeLong() << " bytes )\n"
       << "----------------------------------------------------------------\n"
       << message->DebugString().c_str());
 }
@@ -664,7 +664,7 @@ void vtkPVSessionCore::RegisterSIObject(vtkSMMessage* message)
       unsigned char type = REGISTER_SI;
       this->ParallelController->TriggerRMIOnAllChildren(&type, 1, ROOT_SATELLITE_RMI_TAG);
 
-      int byte_size = message->ByteSize();
+      vtkIdType byte_size = static_cast<vtkIdType>(message->ByteSizeLong());
       unsigned char* raw_data = new unsigned char[byte_size + 1];
       message->SerializeToArray(raw_data, byte_size);
       this->ParallelController->Broadcast(&byte_size, 1, 0);
@@ -702,7 +702,7 @@ void vtkPVSessionCore::UnRegisterSIObject(vtkSMMessage* message)
       unsigned char type = UNREGISTER_SI;
       this->ParallelController->TriggerRMIOnAllChildren(&type, 1, ROOT_SATELLITE_RMI_TAG);
 
-      int byte_size = message->ByteSize();
+      vtkIdType byte_size = static_cast<vtkIdType>(message->ByteSizeLong());
       unsigned char* raw_data = new unsigned char[byte_size + 1];
       message->SerializeToArray(raw_data, byte_size);
       this->ParallelController->Broadcast(&byte_size, 1, 0);
@@ -717,7 +717,7 @@ void vtkPVSessionCore::UnRegisterSIObject(vtkSMMessage* message)
 //----------------------------------------------------------------------------
 void vtkPVSessionCore::UnRegisterSIObjectSatelliteCallback()
 {
-  int byte_size = 0;
+  vtkIdType byte_size = 0;
   this->ParallelController->Broadcast(&byte_size, 1, 0);
 
   unsigned char* raw_data = new unsigned char[byte_size + 1];
@@ -737,7 +737,7 @@ void vtkPVSessionCore::UnRegisterSIObjectSatelliteCallback()
 //----------------------------------------------------------------------------
 void vtkPVSessionCore::RegisterSIObjectSatelliteCallback()
 {
-  int byte_size = 0;
+  vtkIdType byte_size = 0;
   this->ParallelController->Broadcast(&byte_size, 1, 0);
 
   unsigned char* raw_data = new unsigned char[byte_size + 1];
@@ -759,7 +759,7 @@ void vtkPVSessionCore::RegisterSIObjectSatelliteCallback()
 void vtkPVSessionCore::UnRegisterSIObjectInternal(vtkSMMessage* message)
 {
   LOG(<< "----------------------------------------------------------------\n"
-      << "UnRegister ( " << message->ByteSize() << " bytes )\n"
+      << "UnRegister ( " << message->ByteSizeLong() << " bytes )\n"
       << "----------------------------------------------------------------\n"
       << message->DebugString().c_str());
   this->Internals->UnRegisterSI(message->global_id(), message->client_id());
@@ -768,7 +768,7 @@ void vtkPVSessionCore::UnRegisterSIObjectInternal(vtkSMMessage* message)
 void vtkPVSessionCore::RegisterSIObjectInternal(vtkSMMessage* message)
 {
   LOG(<< "----------------------------------------------------------------\n"
-      << "Register ( " << message->ByteSize() << " bytes )\n"
+      << "Register ( " << message->ByteSizeLong() << " bytes )\n"
       << "----------------------------------------------------------------\n"
       << message->DebugString().c_str());
   this->Internals->RegisterSI(message->global_id(), message->client_id());

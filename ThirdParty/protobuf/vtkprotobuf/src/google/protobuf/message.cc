@@ -56,7 +56,6 @@
 #include <google/protobuf/wire_format.h>
 #include <google/protobuf/wire_format_lite.h>
 #include <google/protobuf/stubs/strutil.h>
-
 #include <google/protobuf/stubs/map_util.h>
 #include <google/protobuf/stubs/stl_util.h>
 #include <google/protobuf/stubs/hash.h>
@@ -137,63 +136,24 @@ void Message::DiscardUnknownFields() {
   return ReflectionOps::DiscardUnknownFields(this);
 }
 
-#if !GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool Message::MergePartialFromCodedStream(io::CodedInputStream* input) {
-  return WireFormat::ParseAndMergePartial(input, this);
-}
-#endif
-
-bool Message::ParseFromFileDescriptor(int file_descriptor) {
-  io::FileInputStream input(file_descriptor);
-  return ParseFromZeroCopyStream(&input) && input.GetErrno() == 0;
-}
-
-bool Message::ParsePartialFromFileDescriptor(int file_descriptor) {
-  io::FileInputStream input(file_descriptor);
-  return ParsePartialFromZeroCopyStream(&input) && input.GetErrno() == 0;
-}
-
-bool Message::ParseFromIstream(std::istream* input) {
-  io::IstreamInputStream zero_copy_input(input);
-  return ParseFromZeroCopyStream(&zero_copy_input) && input->eof();
-}
-
-bool Message::ParsePartialFromIstream(std::istream* input) {
-  io::IstreamInputStream zero_copy_input(input);
-  return ParsePartialFromZeroCopyStream(&zero_copy_input) && input->eof();
-}
-
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 namespace internal {
 
 class ReflectionAccessor {
  public:
   static void* GetOffset(void* msg, const google::protobuf::FieldDescriptor* f,
                          const google::protobuf::Reflection* r) {
-    return static_cast<char*>(msg) + CheckedCast(r)->schema_.GetFieldOffset(f);
+    return static_cast<char*>(msg) + r->schema_.GetFieldOffset(f);
   }
 
-  static ExtensionSet* GetExtensionSet(void* msg, const google::protobuf::Reflection* r) {
-    return reinterpret_cast<ExtensionSet*>(
-        static_cast<char*>(msg) +
-        CheckedCast(r)->schema_.GetExtensionSetOffset());
-  }
-  static InternalMetadataWithArena* GetMetadata(void* msg,
-                                                const google::protobuf::Reflection* r) {
-    return reinterpret_cast<InternalMetadataWithArena*>(
-        static_cast<char*>(msg) + CheckedCast(r)->schema_.GetMetadataOffset());
-  }
   static void* GetRepeatedEnum(const Reflection* reflection,
                                const FieldDescriptor* field, Message* msg) {
     return reflection->MutableRawRepeatedField(
         msg, field, FieldDescriptor::CPPTYPE_ENUM, 0, nullptr);
   }
 
- private:
-  static const GeneratedMessageReflection* CheckedCast(const Reflection* r) {
-    auto gr = dynamic_cast<const GeneratedMessageReflection*>(r);
-    GOOGLE_CHECK(gr != nullptr);
-    return gr;
+  static InternalMetadataWithArena* MutableInternalMetadataWithArena(
+      const Reflection* reflection, Message* msg) {
+    return reflection->MutableInternalMetadataWithArena(msg);
   }
 };
 
@@ -281,10 +241,11 @@ const char* ParsePackedField(const FieldDescriptor* field, Message* msg,
                              const Reflection* reflection, const char* ptr,
                              internal::ParseContext* ctx) {
   switch (field->type()) {
-#define HANDLE_PACKED_TYPE(TYPE, CPPTYPE, METHOD_NAME) \
-  case FieldDescriptor::TYPE_##TYPE:                   \
-    return internal::Packed##METHOD_NAME##Parser(      \
-        reflection->MutableRepeatedField<CPPTYPE>(msg, field), ptr, ctx)
+#define HANDLE_PACKED_TYPE(TYPE, CPPTYPE, METHOD_NAME)                      \
+  case FieldDescriptor::TYPE_##TYPE:                                        \
+    return internal::Packed##METHOD_NAME##Parser(                           \
+        reflection->MutableRepeatedFieldInternal<CPPTYPE>(msg, field), ptr, \
+        ctx)
     HANDLE_PACKED_TYPE(INT32, int32, Int32);
     HANDLE_PACKED_TYPE(INT64, int64, Int64);
     HANDLE_PACKED_TYPE(SINT32, int32, SInt32);
@@ -300,7 +261,9 @@ const char* ParsePackedField(const FieldDescriptor* field, Message* msg,
       } else {
         return internal::PackedEnumParserArg(
             object, ptr, ctx, ReflectiveValidator, field->enum_type(),
-            reflection->MutableUnknownFields(msg), field->number());
+            internal::ReflectionAccessor::MutableInternalMetadataWithArena(
+                reflection, msg),
+            field->number());
       }
     }
       HANDLE_PACKED_TYPE(FIXED32, uint32, Fixed32);
@@ -327,16 +290,15 @@ const char* ParseLenDelim(int field_number, const FieldDescriptor* field,
   }
   enum { kNone = 0, kVerify, kStrict } utf8_level = kNone;
   const char* field_name = nullptr;
-  auto parse_string = [ptr, ctx, &utf8_level, &field_name](std::string* s) {
-    switch (utf8_level) {
-      case kNone:
-        return internal::InlineGreedyStringParser(s, ptr, ctx);
-      case kVerify:
-        return internal::InlineGreedyStringParserUTF8Verify(s, ptr, ctx,
-                                                            field_name);
-      case kStrict:
-        return internal::InlineGreedyStringParserUTF8(s, ptr, ctx, field_name);
+  auto parse_string = [ptr, ctx, &utf8_level,
+                       &field_name](std::string* s) -> const char* {
+    auto res = internal::InlineGreedyStringParser(s, ptr, ctx);
+    if (utf8_level != kNone) {
+      if (!internal::VerifyUTF8(s, field_name) && utf8_level == kStrict) {
+        return nullptr;
+      }
     }
+    return res;
   };
   switch (field->type()) {
     case FieldDescriptor::TYPE_STRING: {
@@ -359,12 +321,14 @@ const char* ParseLenDelim(int field_number, const FieldDescriptor* field,
         if (field->options().ctype() == FieldOptions::STRING ||
             field->is_extension()) {
           auto object =
-              reflection->MutableRepeatedPtrField<std::string>(msg, field)
+              reflection
+                  ->MutableRepeatedPtrFieldInternal<std::string>(msg, field)
                   ->Mutable(index);
           return parse_string(object);
         } else {
           auto object =
-              reflection->MutableRepeatedPtrField<std::string>(msg, field)
+              reflection
+                  ->MutableRepeatedPtrFieldInternal<std::string>(msg, field)
                   ->Mutable(index);
           return parse_string(object);
         }
@@ -525,7 +489,7 @@ const char* Message::_InternalParse(const char* ptr,
       // If that failed, check if the field is an extension.
       if (field == nullptr && descriptor_->IsExtensionNumber(num)) {
         const DescriptorPool* pool = ctx_->data().pool;
-        if (pool == NULL) {
+        if (pool == nullptr) {
           field = reflection_->FindKnownExtensionByNumber(num);
         } else {
           field = pool->FindExtensionByNumber(descriptor_, num);
@@ -555,17 +519,10 @@ const char* Message::_InternalParse(const char* ptr,
   ReflectiveFieldParser field_parser(this, ctx);
   return internal::WireFormatParser(field_parser, ptr, ctx);
 }
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
-
-void Message::SerializeWithCachedSizes(io::CodedOutputStream* output) const {
-  const internal::SerializationTable* table =
-      static_cast<const internal::SerializationTable*>(InternalGetTable());
-  if (table == 0) {
-    WireFormat::SerializeWithCachedSizes(*this, GetCachedSize(), output);
-  } else {
-    internal::TableSerialize(*this, table, output);
-  }
+uint8* Message::_InternalSerialize(uint8* target,
+                                   io::EpsCopyOutputStream* stream) const {
+  return WireFormat::_InternalSerialize(*this, target, stream);
 }
 
 size_t Message::ByteSizeLong() const {
@@ -584,88 +541,6 @@ size_t Message::SpaceUsedLong() const {
   return GetReflection()->SpaceUsedLong(*this);
 }
 
-bool Message::SerializeToFileDescriptor(int file_descriptor) const {
-  io::FileOutputStream output(file_descriptor);
-  return SerializeToZeroCopyStream(&output) && output.Flush();
-}
-
-bool Message::SerializePartialToFileDescriptor(int file_descriptor) const {
-  io::FileOutputStream output(file_descriptor);
-  return SerializePartialToZeroCopyStream(&output) && output.Flush();
-}
-
-bool Message::SerializeToOstream(std::ostream* output) const {
-  {
-    io::OstreamOutputStream zero_copy_output(output);
-    if (!SerializeToZeroCopyStream(&zero_copy_output)) return false;
-  }
-  return output->good();
-}
-
-bool Message::SerializePartialToOstream(std::ostream* output) const {
-  io::OstreamOutputStream zero_copy_output(output);
-  return SerializePartialToZeroCopyStream(&zero_copy_output);
-}
-
-
-// =============================================================================
-// Reflection and associated Template Specializations
-
-Reflection::~Reflection() {}
-
-void Reflection::AddAllocatedMessage(Message* /* message */,
-                                     const FieldDescriptor* /*field */,
-                                     Message* /* new_entry */) const {}
-
-#define HANDLE_TYPE(TYPE, CPPTYPE, CTYPE)                               \
-  template <>                                                           \
-  const RepeatedField<TYPE>& Reflection::GetRepeatedField<TYPE>(        \
-      const Message& message, const FieldDescriptor* field) const {     \
-    return *static_cast<RepeatedField<TYPE>*>(MutableRawRepeatedField(  \
-        const_cast<Message*>(&message), field, CPPTYPE, CTYPE, NULL));  \
-  }                                                                     \
-                                                                        \
-  template <>                                                           \
-  RepeatedField<TYPE>* Reflection::MutableRepeatedField<TYPE>(          \
-      Message * message, const FieldDescriptor* field) const {          \
-    return static_cast<RepeatedField<TYPE>*>(                           \
-        MutableRawRepeatedField(message, field, CPPTYPE, CTYPE, NULL)); \
-  }
-
-HANDLE_TYPE(int32, FieldDescriptor::CPPTYPE_INT32, -1);
-HANDLE_TYPE(int64, FieldDescriptor::CPPTYPE_INT64, -1);
-HANDLE_TYPE(uint32, FieldDescriptor::CPPTYPE_UINT32, -1);
-HANDLE_TYPE(uint64, FieldDescriptor::CPPTYPE_UINT64, -1);
-HANDLE_TYPE(float, FieldDescriptor::CPPTYPE_FLOAT, -1);
-HANDLE_TYPE(double, FieldDescriptor::CPPTYPE_DOUBLE, -1);
-HANDLE_TYPE(bool, FieldDescriptor::CPPTYPE_BOOL, -1);
-
-
-#undef HANDLE_TYPE
-
-void* Reflection::MutableRawRepeatedString(Message* message,
-                                           const FieldDescriptor* field,
-                                           bool is_string) const {
-  return MutableRawRepeatedField(message, field,
-                                 FieldDescriptor::CPPTYPE_STRING,
-                                 FieldOptions::STRING, NULL);
-}
-
-
-MapIterator Reflection::MapBegin(Message* message,
-                                 const FieldDescriptor* field) const {
-  GOOGLE_LOG(FATAL) << "Unimplemented Map Reflection API.";
-  MapIterator iter(message, field);
-  return iter;
-}
-
-MapIterator Reflection::MapEnd(Message* message,
-                               const FieldDescriptor* field) const {
-  GOOGLE_LOG(FATAL) << "Unimplemented Map Reflection API.";
-  MapIterator iter(message, field);
-  return iter;
-}
-
 // =============================================================================
 // MessageFactory
 
@@ -676,11 +551,6 @@ namespace {
 class GeneratedMessageFactory : public MessageFactory {
  public:
   static GeneratedMessageFactory* singleton();
-
-  struct RegistrationData {
-    const Metadata* file_level_metadata;
-    int size;
-  };
 
   void RegisterFile(const google::protobuf::internal::DescriptorTable* table);
   void RegisterType(const Descriptor* descriptor, const Message* prototype);
@@ -784,19 +654,6 @@ void MessageFactory::InternalRegisterGeneratedMessage(
   GeneratedMessageFactory::singleton()->RegisterType(descriptor, prototype);
 }
 
-
-MessageFactory* Reflection::GetMessageFactory() const {
-  GOOGLE_LOG(FATAL) << "Not implemented.";
-  return NULL;
-}
-
-void* Reflection::RepeatedFieldData(Message* message,
-                                    const FieldDescriptor* field,
-                                    FieldDescriptor::CppType cpp_type,
-                                    const Descriptor* message_type) const {
-  GOOGLE_LOG(FATAL) << "Not implemented.";
-  return NULL;
-}
 
 namespace {
 template <typename T>

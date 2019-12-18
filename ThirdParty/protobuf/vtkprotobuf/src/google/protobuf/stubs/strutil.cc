@@ -42,7 +42,6 @@
 
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/stl_util.h>
-#include <google/protobuf/io/strtod.h>
 
 #ifdef _WIN32
 // MSVC has only _snprintf, not snprintf.
@@ -78,21 +77,6 @@ inline bool isxdigit(char c) {
 
 inline bool isprint(char c) {
   return c >= 0x20 && c <= 0x7E;
-}
-
-// ----------------------------------------------------------------------
-// StripString
-//    Replaces any occurrence of the character 'remove' (or the characters
-//    in 'remove') with the character 'replacewith'.
-// ----------------------------------------------------------------------
-void StripString(string* s, const char* remove, char replacewith) {
-  const char * str_start = s->c_str();
-  const char * str = str_start;
-  for (str = strpbrk(str, remove);
-       str != nullptr;
-       str = strpbrk(str + 1, remove)) {
-    (*s)[str - str_start] = replacewith;
-  }
 }
 
 // ----------------------------------------------------------------------
@@ -1065,10 +1049,12 @@ done:
 }
 
 char* FastInt32ToBufferLeft(int32 i, char* buffer) {
-  uint32 u = i;
+  uint32 u = 0;
   if (i < 0) {
     *buffer++ = '-';
-    u = -i;
+    u -= i;
+  } else {
+    u = i;
   }
   return FastUInt32ToBufferLeft(u, buffer);
 }
@@ -1290,7 +1276,7 @@ char* DoubleToBuffer(double value, char* buffer) {
   // of a double.  This long double may have extra bits that make it compare
   // unequal to "value" even though it would be exactly equal if it were
   // truncated to a double.
-  volatile double parsed_value = io::NoLocaleStrtod(buffer, nullptr);
+  volatile double parsed_value = internal::NoLocaleStrtod(buffer, nullptr);
   if (parsed_value != value) {
     int snprintf_result =
       snprintf(buffer, kDoubleToBufferSize, "%.*g", DBL_DIG+2, value);
@@ -1342,7 +1328,7 @@ bool safe_strtof(const char* str, float* value) {
   char* endptr;
   errno = 0;  // errno only gets set on errors
 #if defined(_WIN32) || defined (__hpux)  // has no strtof()
-  *value = io::NoLocaleStrtod(str, &endptr);
+  *value = internal::NoLocaleStrtod(str, &endptr);
 #else
   *value = strtof(str, &endptr);
 #endif
@@ -1351,7 +1337,7 @@ bool safe_strtof(const char* str, float* value) {
 
 bool safe_strtod(const char* str, double* value) {
   char* endptr;
-  *value = io::NoLocaleStrtod(str, &endptr);
+  *value = internal::NoLocaleStrtod(str, &endptr);
   if (endptr != str) {
     while (ascii_isspace(*endptr)) ++endptr;
   }
@@ -2409,6 +2395,77 @@ void CleanStringLineEndings(string *str, bool auto_end_last_line) {
     str->resize(output_pos);
   }
 }
+
+namespace internal {
+
+// ----------------------------------------------------------------------
+// NoLocaleStrtod()
+//   This code will make you cry.
+// ----------------------------------------------------------------------
+
+namespace {
+
+// Returns a string identical to *input except that the character pointed to
+// by radix_pos (which should be '.') is replaced with the locale-specific
+// radix character.
+std::string LocalizeRadix(const char *input, const char *radix_pos) {
+  // Determine the locale-specific radix character by calling sprintf() to
+  // print the number 1.5, then stripping off the digits.  As far as I can
+  // tell, this is the only portable, thread-safe way to get the C library
+  // to divuldge the locale's radix character.  No, localeconv() is NOT
+  // thread-safe.
+  char temp[16];
+  int size = snprintf(temp, sizeof(temp), "%.1f", 1.5);
+  GOOGLE_CHECK_EQ(temp[0], '1');
+  GOOGLE_CHECK_EQ(temp[size - 1], '5');
+  GOOGLE_CHECK_LE(size, 6);
+
+  // Now replace the '.' in the input with it.
+  std::string result;
+  result.reserve(strlen(input) + size - 3);
+  result.append(input, radix_pos);
+  result.append(temp + 1, size - 2);
+  result.append(radix_pos + 1);
+  return result;
+}
+
+}  // namespace
+
+double NoLocaleStrtod(const char *str, char **endptr) {
+  // We cannot simply set the locale to "C" temporarily with setlocale()
+  // as this is not thread-safe.  Instead, we try to parse in the current
+  // locale first.  If parsing stops at a '.' character, then this is a
+  // pretty good hint that we're actually in some other locale in which
+  // '.' is not the radix character.
+
+  char *temp_endptr;
+  double result = strtod(str, &temp_endptr);
+  if (endptr != NULL) *endptr = temp_endptr;
+  if (*temp_endptr != '.') return result;
+
+  // Parsing halted on a '.'.  Perhaps we're in a different locale?  Let's
+  // try to replace the '.' with a locale-specific radix character and
+  // try again.
+  std::string localized = LocalizeRadix(str, temp_endptr);
+  const char *localized_cstr = localized.c_str();
+  char *localized_endptr;
+  result = strtod(localized_cstr, &localized_endptr);
+  if ((localized_endptr - localized_cstr) > (temp_endptr - str)) {
+    // This attempt got further, so replacing the decimal must have helped.
+    // Update endptr to point at the right location.
+    if (endptr != NULL) {
+      // size_diff is non-zero if the localized radix has multiple bytes.
+      int size_diff = localized.size() - strlen(str);
+      // const_cast is necessary to match the strtod() interface.
+      *endptr = const_cast<char *>(
+          str + (localized_endptr - localized_cstr - size_diff));
+    }
+  }
+
+  return result;
+}
+
+}  // namespace internal
 
 }  // namespace protobuf
 }  // namespace google
