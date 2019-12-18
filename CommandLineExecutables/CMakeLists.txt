@@ -126,13 +126,15 @@ install(
   DESTINATION "${CMAKE_INSTALL_BINDIR}"
   COMPONENT   development)
 
-export(
-  EXPORT      ParaViewTools
-  NAMESPACE   ParaView::
-  FILE        "${CMAKE_BINARY_DIR}/${paraview_cmake_destination}/ParaViewTools-targets.cmake")
-install(
-  EXPORT      ParaViewTools
-  NAMESPACE   ParaView::
-  FILE        "ParaViewTools-targets.cmake"
-  DESTINATION "${paraview_cmake_destination}"
-  COMPONENT   "development")
+if (PARAVIEW_INSTALL_DEVELOPMENT_FILES)
+  export(
+    EXPORT      ParaViewTools
+    NAMESPACE   ParaView::
+    FILE        "${CMAKE_BINARY_DIR}/${paraview_cmake_destination}/ParaViewTools-targets.cmake")
+  install(
+    EXPORT      ParaViewTools
+    NAMESPACE   ParaView::
+    FILE        "ParaViewTools-targets.cmake"
+    DESTINATION "${paraview_cmake_destination}"
+    COMPONENT   "development")
+endif ()
