@@ -6,9 +6,7 @@ function (_paraview_package_append_variables)
     endif ()
 
     string(APPEND _paraview_package_variables
-      "if (NOT DEFINED \"${var}\")
-  set(\"${var}\" \"${${var}}\")
-elseif (NOT ${var})
+      "if (NOT DEFINED \"${var}\" OR NOT ${var})
   set(\"${var}\" \"${${var}}\")
 endif ()
 ")
