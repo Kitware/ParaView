@@ -34,19 +34,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt Includes.
 #include <QCheckBox>
+#include <QClipboard>
 #include <QDebug>
 #include <QHBoxLayout>
+#include <QKeyEvent>
 #include <QMenu>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QWidgetAction>
 
 #include "pqDataRepresentation.h"
+#include "pqEventDispatcher.h"
 #include "pqExportReaction.h"
 #include "pqOutputPort.h"
 #include "pqPropertyLinks.h"
 #include "pqSpreadSheetView.h"
 #include "pqSpreadSheetViewModel.h"
+#include "pqSpreadSheetViewWidget.h"
 #include "pqUndoStack.h"
 #include "vtkNew.h"
 #include "vtkSMEnumerationDomain.h"
@@ -357,6 +361,12 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view)
 
   // get the actual repr currently shown by the view.
   this->showing(this->Spreadsheet->activeRepresentation());
+
+  // install event filter from the main widget of the spreadsheet to catch the shortcut
+  if (view->widget()->parentWidget() && view->widget()->parentWidget()->parentWidget())
+  {
+    view->widget()->parentWidget()->parentWidget()->installEventFilter(this);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -487,4 +497,34 @@ void pqSpreadSheetViewDecorator::setAllowChangeOfSource(bool val)
   this->Internal->Source->setEnabled(val);
   this->Internal->Source->setVisible(val);
   this->Internal->label->setVisible(val);
+}
+
+//-----------------------------------------------------------------------------
+bool pqSpreadSheetViewDecorator::eventFilter(QObject* object, QEvent* e)
+{
+  if (e->type() == QEvent::KeyPress)
+  {
+    auto kev = static_cast<QKeyEvent*>(e);
+    if (kev->matches(QKeySequence::Copy))
+    {
+      this->copyToClipboard();
+      return true;
+    }
+  }
+
+  return Superclass::eventFilter(object, e);
+}
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetViewDecorator::copyToClipboard()
+{
+  bool wasChecked = this->Internal->SelectionOnly->isChecked();
+  this->Internal->SelectionOnly->setChecked(true);
+
+  pqEventDispatcher::processEventsAndWait(100);
+  auto table = this->Spreadsheet->getViewModel()->GetRowsAsString();
+
+  QApplication::clipboard()->setText(table);
+
+  this->Internal->SelectionOnly->setChecked(wasChecked);
 }

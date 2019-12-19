@@ -42,6 +42,8 @@
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
+#include <string>
+
 class vtkAbstractArray;
 class vtkDataArray;
 class vtkFieldData;
@@ -122,14 +124,33 @@ public:
   void AddColumn(
     vtkAbstractArray* yarray, const char* yarrayname = NULL, vtkDataArray* xarray = NULL);
 
+  //@{
+  /**
+   * Whether to output to a string instead of to a file, which is the default.
+   */
+  vtkSetMacro(WriteToOutputString, bool);
+  vtkGetMacro(WriteToOutputString, bool);
+  vtkBooleanMacro(WriteToOutputString, bool);
+  //@}
+
+  /**
+   * Get the exported data as string.
+   * If WriteToOutputString is OFF, returned string is empty.
+   * If Close() was not called, returned string is empty.
+   */
+  std::string GetOutputString();
+
 protected:
   vtkCSVExporter();
   ~vtkCSVExporter() override;
 
   char* FileName;
   char* FieldDelimiter;
-  ofstream* FileStream;
+  std::ostream* OutputStream;
   ExporterModes Mode;
+
+  bool WriteToOutputString;
+  std::string OutputString;
 
 private:
   vtkCSVExporter(const vtkCSVExporter&) = delete;
