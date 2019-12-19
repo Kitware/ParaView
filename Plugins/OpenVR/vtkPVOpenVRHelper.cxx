@@ -38,6 +38,7 @@
 #include "vtkJPEGWriter.h"
 #include "vtkLight.h"
 #include "vtkLightCollection.h"
+#include "vtkMatrixToLinearTransform.h"
 #include "vtkNumberToString.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLPolyDataMapper.h"
@@ -307,7 +308,9 @@ void vtkPVOpenVRHelper::ToggleShowControls()
     this->QWidgetWidget->SetEnabled(0);
     vtkOpenVRModel* ovrmodel =
       this->RenderWindow->GetTrackedDeviceModel(vtkEventDataDevice::RightController);
-    ovrmodel->SetShowRay(false);
+
+    ovrmodel->SetShowRay(this->RightTriggerMode == "Grab");
+
     this->NeedStillRender = true;
   }
 }
@@ -734,6 +737,17 @@ void vtkPVOpenVRHelper::RemoveMeasurement()
 
 void vtkPVOpenVRHelper::SetRightTriggerMode(std::string const& text)
 {
+  this->Style->HidePickActor();
+  this->HideBillboard();
+
+  vtkOpenVRModel* ovrmodel =
+    this->RenderWindow->GetTrackedDeviceModel(vtkEventDataDevice::RightController);
+
+  if (ovrmodel)
+  {
+    ovrmodel->SetShowRay(this->QWidgetWidget->GetEnabled() || text == "Grab");
+  }
+
   this->RightTriggerMode = text;
   // if (text == "Manipulate Widgets")
   // {
@@ -2816,6 +2830,34 @@ void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
   this->RenderWindow->SetHelperWindow(nullptr);
   this->RenderWindow->Delete();
   this->RenderWindow = nullptr;
+}
+
+void vtkPVOpenVRHelper::ResetPositions()
+{
+  if (!this->Renderer)
+  {
+    return;
+  }
+
+  this->RenderWindow->MakeCurrent();
+
+  vtkCollectionSimpleIterator pit;
+  vtkProp* prop;
+  for (this->AddedProps->InitTraversal(pit); (prop = this->AddedProps->GetNextProp(pit));)
+  {
+    vtkProp3D* prop3d = vtkProp3D::SafeDownCast(prop);
+    if (prop3d)
+    {
+      vtkMatrixToLinearTransform* trans =
+        vtkMatrixToLinearTransform::SafeDownCast(prop3d->GetUserTransform());
+      if (trans)
+      {
+        prop3d->GetUserMatrix()->Identity();
+      }
+    }
+  }
+
+  this->Interactor->DoOneEvent(this->RenderWindow, this->Renderer);
 }
 
 void vtkPVOpenVRHelper::UpdateProps()

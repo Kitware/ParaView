@@ -92,6 +92,9 @@ public:
   // if in VR close out the event loop
   void Quit();
 
+  // reset all prop positions
+  void ResetPositions();
+
   // if running update the props to the current props
   // on the View
   void UpdateProps();
