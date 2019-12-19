@@ -56,6 +56,9 @@ protected:
   vtkPVOpenVRHelper* Helper;
   bool NoForward;
 
+protected slots:
+  void resetPositions();
+
 private:
   void constructor(vtkPVOpenVRHelper* val);
 

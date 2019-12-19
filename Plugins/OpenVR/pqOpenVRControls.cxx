@@ -44,6 +44,9 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
   QObject::connect(this->Internals->exitButton, &QPushButton::clicked,
     std::bind(&vtkPVOpenVRHelper::Quit, this->Helper));
 
+  QObject::connect(this->Internals->resetPositionsButton, &QPushButton::clicked, this,
+    &pqOpenVRControls::resetPositions);
+
   QObject::connect(this->Internals->measurement, &QPushButton::clicked,
     std::bind(&vtkPVOpenVRHelper::TakeMeasurement, this->Helper));
 
@@ -123,6 +126,11 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
 pqOpenVRControls::~pqOpenVRControls()
 {
   delete this->Internals;
+}
+
+void pqOpenVRControls::resetPositions()
+{
+  this->Helper->ResetPositions();
 }
 
 void pqOpenVRControls::SetRightTriggerMode(std::string const& text)
