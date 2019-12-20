@@ -309,7 +309,7 @@ void vtkPVOpenVRHelper::ToggleShowControls()
     vtkOpenVRModel* ovrmodel =
       this->RenderWindow->GetTrackedDeviceModel(vtkEventDataDevice::RightController);
 
-    ovrmodel->SetShowRay(this->RightTriggerMode == "Grab");
+    ovrmodel->SetShowRay(this->RightTriggerMode == "Pick");
 
     this->NeedStillRender = true;
   }
@@ -745,7 +745,7 @@ void vtkPVOpenVRHelper::SetRightTriggerMode(std::string const& text)
 
   if (ovrmodel)
   {
-    ovrmodel->SetShowRay(this->QWidgetWidget->GetEnabled() || text == "Grab");
+    ovrmodel->SetShowRay(this->QWidgetWidget->GetEnabled() || text == "Pick");
   }
 
   this->RightTriggerMode = text;
@@ -755,17 +755,26 @@ void vtkPVOpenVRHelper::SetRightTriggerMode(std::string const& text)
   //     vtkEventDataDevice::RightController,
   //     vtkEventDataDeviceInput::Trigger, VTKIS_NONE);
   // }
+
+  this->GetStyle()->GrabWithRayOff();
+
   if (text == "Grab")
   {
     this->GetStyle()->MapInputToAction(
       vtkEventDataDevice::RightController, vtkEventDataDeviceInput::Trigger, VTKIS_POSITION_PROP);
   }
-  if (text == "Interactive Crop")
+  else if (text == "Pick")
+  {
+    this->GetStyle()->MapInputToAction(
+      vtkEventDataDevice::RightController, vtkEventDataDeviceInput::Trigger, VTKIS_POSITION_PROP);
+    this->GetStyle()->GrabWithRayOn();
+  }
+  else if (text == "Interactive Crop")
   {
     this->GetStyle()->MapInputToAction(
       vtkEventDataDevice::RightController, vtkEventDataDeviceInput::Trigger, VTKIS_CLIP);
   }
-  if (text == "Probe")
+  else if (text == "Probe")
   {
     this->GetStyle()->MapInputToAction(
       vtkEventDataDevice::RightController, vtkEventDataDeviceInput::Trigger, VTKIS_PICK);

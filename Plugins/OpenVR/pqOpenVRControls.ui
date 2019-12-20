@@ -129,6 +129,11 @@
         </item>
         <item>
          <property name="text">
+          <string>Pick</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
           <string>Interactive Crop</string>
          </property>
         </item>
@@ -149,6 +154,19 @@
         </property>
         <property name="text">
          <string>Reset all positions</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="interactiveRay">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Interactive Ray</string>
         </property>
        </widget>
       </item>

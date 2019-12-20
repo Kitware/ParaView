@@ -59,6 +59,9 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
   QObject::connect(this->Internals->navigationPanel, &QCheckBox::stateChanged,
     [=](int state) { this->Helper->SetShowNavigationPanel(state == Qt::Checked); });
 
+  QObject::connect(this->Internals->interactiveRay, &QCheckBox::stateChanged,
+    [=](int state) { this->Helper->GetStyle()->SetHoverPick(state == Qt::Checked); });
+
   QObject::connect(
     this->Internals->rightTrigger, &QComboBox::currentTextChanged, [=](QString const& text) {
       std::string mode = text.toLocal8Bit().constData();

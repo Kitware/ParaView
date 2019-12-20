@@ -93,17 +93,20 @@ void pqOpenVRDockPanel::sendToOpenVR()
 {
   pqView* view = pqActiveObjects::instance().activeView();
 
-  vtkSMViewProxy* smview = view->getViewProxy();
-  this->Internals->cConnectButton->setEnabled(true);
-  if (this->Internals->cConnectButton->text() != "Connect")
+  if (view)
   {
-    this->Internals->cConnectButton->setText("Connect");
-  }
-  this->Helper->SendToOpenVR(smview);
+    vtkSMViewProxy* smview = view->getViewProxy();
+    this->Internals->cConnectButton->setEnabled(true);
+    if (this->Internals->cConnectButton->text() != "Connect")
+    {
+      this->Internals->cConnectButton->setText("Connect");
+    }
+    this->Helper->SendToOpenVR(smview);
 
-  if (!this->Helper->InVR())
-  {
-    this->Internals->cConnectButton->setEnabled(false);
+    if (!this->Helper->InVR())
+    {
+      this->Internals->cConnectButton->setEnabled(false);
+    }
   }
 }
 
