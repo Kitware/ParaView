@@ -5,11 +5,18 @@ function (_paraview_package_append_variables)
       continue ()
     endif ()
 
+    get_property(type_is_set CACHE "${var}"
+      PROPERTY TYPE SET)
+    if (type_is_set)
+      get_property(type CACHE "${var}"
+        PROPERTY TYPE)
+    else ()
+      set(type UNINITIALIZED)
+    endif ()
+
     string(APPEND _paraview_package_variables
-      "if (NOT DEFINED \"${var}\")
-  set(\"${var}\" \"${${var}}\")
-elseif (NOT ${var})
-  set(\"${var}\" \"${${var}}\")
+      "if (NOT DEFINED \"${var}\" OR NOT ${var})
+  set(\"${var}\" \"${${var}}\" CACHE ${type} \"Third-party helper setting from \${CMAKE_FIND_PACKAGE_NAME}\")
 endif ()
 ")
   endforeach ()
