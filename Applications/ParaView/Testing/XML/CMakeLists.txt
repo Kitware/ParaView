@@ -1407,6 +1407,10 @@ IF (PARAVIEW_USE_MPI)
   set(ManyTypesXMLWriterReader_DISABLE_CS TRUE)
   set(ManyTypesXMLWriterReader_DISABLE_CRS TRUE)
   set(ManyTypesXMLWriterReaderMPI_DISABLE_C TRUE)
+
+  # CGNS BC patches not supported in parallel
+  set(ReadCGNSBCDataset_DISABLE_CS TRUE)
+  set(ReadCGNSBCDataset_DISABLE_CRS TRUE)
 ENDIF ()
 
 # Composite Surface Selection is currently broken in everything but builtin
