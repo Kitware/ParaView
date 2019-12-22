@@ -14,7 +14,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the
         SEG-Y reader.</Documentation>
@@ -22,8 +23,8 @@
       <IntVectorProperty command="SetXYCoordMode"
                          default_values="0"
                          name="XYCoordMode"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
+                         label="XY Coord Mode"
+                         number_of_elements="1" >
         <EnumerationDomain name="enum">
           <Entry text="Source"
                  value="0" />
@@ -46,8 +47,7 @@ As per SEG-Y rev 2.0 specification:
       <IntVectorProperty command="SetXCoordByte"
                          default_values="73"
                          name="XCoordByte"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
+                         number_of_elements="1">
         <IntRangeDomain name="range" />
         <Documentation>
           Specify X and Y byte positions for custom XYCoordinateMode.
@@ -57,8 +57,7 @@ As per SEG-Y rev 2.0 specification:
       <IntVectorProperty command="SetYCoordByte"
                          default_values="76"
                          name="YCoordByte"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
+                         number_of_elements="1">
         <IntRangeDomain name="range" />
         <Documentation>
           Specify X and Y byte positions for custom XYCoordinateMode.
@@ -68,8 +67,7 @@ As per SEG-Y rev 2.0 specification:
       <IntVectorProperty command="SetVerticalCRS"
                          default_values="0"
                          name="VerticalCRS"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
+                         number_of_elements="1">
         <EnumerationDomain name="enum">
           <Entry text="Heights"
                  value="0" />
@@ -91,8 +89,7 @@ textual header.
                          command="SetStructuredGrid"
                          name="StructuredGrid"
                          number_of_elements="1"
-                         default_values="1"
-                         panel_visibility="advanced">
+                         default_values="1">
         <BooleanDomain name="bool" />
         <Documentation>
           Specify if we create a Structured Grid even when the data is
@@ -100,6 +97,25 @@ textual header.
           precise location for each point and the correct shape of the
           data. The default value is true. If we set this option to
           false we create an Image Data for a SEG-Y 3D dataset.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="Force2D"
+                         label="Force 2D"
+                         command="SetForce2D"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify if we create a Structured Grid even when the data is
+          SEG-Y 3D. Note this consumes more memory but it shows the
+          precise location for each point and the correct shape of the
+          data. The default value is true. If we set this option to
+          false we create an Image Data for a SEG-Y 3D dataset.
+          Specify if we should we force the data to be interpreted as a 2D dataset.
+          It may be a 2D sheet through 3D space. When this is turned on we ignore the cross
+          line and line values and instead build a 2D data by processing and
+          connecting the traces in order from first to last. The output will be a
+          Structured Grid.
         </Documentation>
       </IntVectorProperty>
       <Hints>
