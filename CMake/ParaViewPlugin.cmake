@@ -939,8 +939,9 @@ function (paraview_add_plugin name)
       MODULES             ${plugin_modules}
       PACKAGE             "${_paraview_build_plugin}"
       ${_paraview_add_plugin_module_install_export_args}
-      INSTALL_HEADERS     OFF
+      INSTALL_HEADERS     "${_paraview_build_INSTALL_HEADERS}"
       TARGETS_COMPONENT   "${_paraview_build_PLUGINS_COMPONENT}"
+      HEADERS_DESTINATION "${_paraview_build_HEADERS_DESTINATION}/${_paraview_build_target_safe}"
       ARCHIVE_DESTINATION "${_paraview_plugin_subdir}"
       LIBRARY_DESTINATION "${_paraview_plugin_subdir}"
       RUNTIME_DESTINATION "${_paraview_plugin_subdir}"
