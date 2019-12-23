@@ -958,6 +958,7 @@ function (paraview_add_plugin name)
   endif ()
 
   set(_paraview_add_plugin_export_args)
+  set(_paraview_add_plugin_install_export_args)
   if (DEFINED _paraview_build_INSTALL_EXPORT)
     list(APPEND _paraview_add_plugin_export_args
       EXPORT "${_paraview_build_INSTALL_EXPORT}")
