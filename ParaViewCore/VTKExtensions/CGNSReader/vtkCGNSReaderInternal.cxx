@@ -346,10 +346,10 @@ int GetVTKElemType(
       cellType = VTK_QUADRATIC_EDGE;
       higherOrderWarning = true;
       break;
-    // case CGNS_ENUMV(BAR_4):
-    //  cellType = VTK_CUBIC_LINE;
-    //  higherOrderWarning = true;
-    //  break;
+    case CGNS_ENUMV(BAR_4):
+      cellType = VTK_CUBIC_LINE;
+      higherOrderWarning = true;
+      break;
     case CGNS_ENUMV(TRI_3):
       cellType = VTK_TRIANGLE;
       break;
@@ -408,6 +408,34 @@ int GetVTKElemType(
       higherOrderWarning = true;
       cgnsOrderFlag = true;
       break;
+    case CGNS_ENUMV(TRI_10):
+      cellType = VTK_LAGRANGE_TRIANGLE;
+      higherOrderWarning = true;
+      break;
+    case CGNS_ENUMV(QUAD_16):
+      cellType = VTK_LAGRANGE_QUADRILATERAL;
+      higherOrderWarning = true;
+      cgnsOrderFlag = true;
+      break;
+    case CGNS_ENUMV(TETRA_20):
+      cellType = VTK_LAGRANGE_TETRAHEDRON;
+      higherOrderWarning = true;
+      cgnsOrderFlag = true;
+      break;
+    case CGNS_ENUMV(PYRA_30):
+      cellType = VTK_LAGRANGE_PYRAMID;
+      higherOrderWarning = true;
+      break;
+    case CGNS_ENUMV(PENTA_40):
+      cellType = VTK_LAGRANGE_WEDGE;
+      higherOrderWarning = true;
+      cgnsOrderFlag = true;
+      break;
+    case CGNS_ENUMV(HEXA_64):
+      cellType = VTK_LAGRANGE_HEXAHEDRON;
+      higherOrderWarning = true;
+      cgnsOrderFlag = true;
+      break;
     default:
       cellType = VTK_EMPTY_CELL;
       break;
@@ -459,6 +487,22 @@ static const int HEXA_20_ToVTK[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 16,
 
 static const int HEXA_27_ToVTK[27] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 16, 17, 18, 19, 12, 13,
   14, 15, 24, 22, 21, 23, 20, 25, 26 };
+
+static const int TETRA_20_ToVTK[20] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17,
+  18, 19, 16 };
+
+static const int PENTA_40_ToVTK[40] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 18, 19, 20, 21, 22,
+  23, 12, 13, 14, 15, 16, 17, 24, 37, 25, 26, 28, 27, 29, 30, 32, 31, 34, 33, 35, 36, 38, 39 };
+
+static const int HEXA_64_ToVTK[64] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 12, 15, 14, 24, 25,
+  26, 27, 29, 28, 31, 30, 16, 17, 18, 19, 22, 23, 20, 21, 49, 48, 50, 51, 40, 41, 43, 42, 36, 37,
+  39, 38, 45, 44, 46, 47, 32, 33, 35, 34, 52, 53, 55, 54, 56, 57, 59, 58, 60, 61, 63, 62 };
+
+static const int PYRA_30_ToVTK[30] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 9, 12, 11, 13, 14, 15, 16, 17,
+  18, 19, 20, 25, 26, 27, 28, 21, 22, 24, 23, 29 };
+
+static const int QUAD_16_ToVTK[16] = { 0, 1, 2, 3, 4, 5, 6, 7, 9, 8, 11, 10, 12, 13, 15, 14 };
+
 //------------------------------------------------------------------------------
 inline const int* getTranslator(const int cellType)
 {
@@ -489,6 +533,16 @@ inline const int* getTranslator(const int cellType)
       return CGNSRead::HEXA_20_ToVTK;
     case VTK_TRIQUADRATIC_HEXAHEDRON:
       return CGNSRead::HEXA_27_ToVTK;
+    case VTK_LAGRANGE_QUADRILATERAL:
+      return CGNSRead::QUAD_16_ToVTK;
+    case VTK_LAGRANGE_TETRAHEDRON:
+      return CGNSRead::TETRA_20_ToVTK;
+    case VTK_LAGRANGE_WEDGE:
+      return CGNSRead::PENTA_40_ToVTK;
+    case VTK_LAGRANGE_HEXAHEDRON:
+      return CGNSRead::HEXA_64_ToVTK;
+    case VTK_LAGRANGE_PYRAMID:
+      return CGNSRead::PYRA_30_ToVTK;
     default:
       return NULL;
   }
@@ -497,7 +551,7 @@ inline const int* getTranslator(const int cellType)
 //------------------------------------------------------------------------------
 void CGNS2VTKorder(const vtkIdType size, const int* cells_types, vtkIdType* elements)
 {
-  const int maxPointsPerCells = 27;
+  const int maxPointsPerCells = 64;
   int tmp[maxPointsPerCells];
   const int* translator;
   vtkIdType pos = 0;
@@ -524,7 +578,7 @@ void CGNS2VTKorder(const vtkIdType size, const int* cells_types, vtkIdType* elem
 //------------------------------------------------------------------------------
 void CGNS2VTKorderMonoElem(const vtkIdType size, const int cell_type, vtkIdType* elements)
 {
-  const int maxPointsPerCells = 27;
+  const int maxPointsPerCells = 64;
 
   int tmp[maxPointsPerCells];
   const int* translator;
