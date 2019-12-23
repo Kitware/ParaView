@@ -877,6 +877,11 @@ else ()
       "${PARAVIEW_RELOCATABLE_INSTALL}")
     include("${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake/vtkInstallCMakePackage.cmake")
   endif ()
+
+  install(
+    FILES       "${CMAKE_CURRENT_SOURCE_DIR}/VTK/Copyright.txt"
+    DESTINATION "${CMAKE_INSTALL_DOCDIR}/VTK"
+    COMPONENT   "license")
 endif ()
 
 set(paraview_test_data_directory_input
@@ -1140,6 +1145,12 @@ if (PARAVIEW_BUILD_CATALYST_ADAPTORS)
   include(${CMAKE_CURRENT_SOURCE_DIR}/CoProcessing/Adaptors/BuildAdaptors.cmake
           OPTIONAL)
 endif()
+
+install(
+  FILES       "${CMAKE_CURRENT_SOURCE_DIR}/Copyright.txt"
+              "${CMAKE_CURRENT_SOURCE_DIR}/License_v1.2.txt"
+  DESTINATION "${CMAKE_INSTALL_DOCDIR}"
+  COMPONENT   "license")
 
 #-----------------------------------------------------------------------------
 if (PARAVIEW_ENABLE_EXAMPLES)
