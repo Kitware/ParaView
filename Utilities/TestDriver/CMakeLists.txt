@@ -56,6 +56,7 @@ configure_file(
   @ONLY)
 
 vtk_module_add_executable(ParaView::smTestDriver
+  DEVELOPMENT
   vtkSMTestDriver.cxx
   vtkSMTestDriver.h
   "${CMAKE_CURRENT_BINARY_DIR}/vtkSMTestDriverConfig.h")

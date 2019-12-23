@@ -30,5 +30,7 @@
 #==========================================================================
 
 if (NOT TARGET ParaView::WrapClientServer)
-  vtk_module_add_executable(ParaView::WrapClientServer vtkWrapClientServer.c)
+  vtk_module_add_executable(ParaView::WrapClientServer
+    DEVELOPMENT
+    vtkWrapClientServer.c)
 endif ()
