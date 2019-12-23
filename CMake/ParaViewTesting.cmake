@@ -188,7 +188,7 @@ function (_paraview_add_tests function)
       _paraview_add_tests_script_args
       "${_paraview_add_tests_script_args}")
 
-    set(testArgs 
+    set(testArgs
         NAME    "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
         COMMAND ParaView::smTestDriver
                 --enable-bt
