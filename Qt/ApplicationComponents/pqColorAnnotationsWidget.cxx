@@ -187,7 +187,7 @@ public:
   QScopedPointer<QAction> TempAction;
   QScopedPointer<pqChooseColorPresetReaction> ChoosePresetReaction;
   vtkSmartPointer<vtkSMTransferFunctionProxy> LookupTableProxy;
-  vtkStdString CurrentPresetName;
+  std::string CurrentPresetName;
 
   void SetCurrentPresetName(std::string newName) { this->CurrentPresetName = newName; }
 
@@ -286,7 +286,7 @@ pqColorAnnotationsWidget::pqColorAnnotationsWidget(QWidget* parentObject)
   QObject::connect(
     ui.SaveAsNewPreset, &QToolButton::clicked, this, [&]() { this->saveAsNewPreset(); });
   QObject::connect(ui.SaveAsPreset, &QToolButton::clicked, this,
-    [&]() { this->saveAsPreset(this->Internals->CurrentPresetName, false, true); });
+    [&]() { this->saveAsPreset(this->Internals->CurrentPresetName.c_str(), false, true); });
 
   QObject::connect(this->Internals->Model,
     SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
@@ -917,14 +917,14 @@ void pqColorAnnotationsWidget::saveAsPreset(
     cpreset.removeMember("Annotations");
   }
 
-  vtkStdString presetName = defaultName;
+  std::string presetName = defaultName;
   if (!cpreset.isNull())
   {
     // This scoping is necessary to ensure that the vtkSMTransferFunctionPresets
     // saves the new preset to the "settings" before the choosePreset dialog is
     // shown.
     auto presets = vtkSMTransferFunctionPresets::GetInstance();
-    if (!allowOverride || !presets->SetPreset(presetName, cpreset))
+    if (!allowOverride || !presets->SetPreset(presetName.c_str(), cpreset))
     {
       presetName = presets->AddUniquePreset(cpreset, presetName.c_str());
     }
@@ -932,7 +932,7 @@ void pqColorAnnotationsWidget::saveAsPreset(
 
   this->applyPreset(presetName.c_str());
   this->onPresetApplied(QString(presetName.c_str()));
-  this->choosePreset(presetName);
+  this->choosePreset(presetName.c_str());
 }
 
 //-----------------------------------------------------------------------------
@@ -1101,7 +1101,7 @@ void pqColorAnnotationsWidget::onPresetApplied(const QString& name)
 //-----------------------------------------------------------------------------
 const char* pqColorAnnotationsWidget::currentPresetName()
 {
-  return this->Internals->CurrentPresetName;
+  return this->Internals->CurrentPresetName.c_str();
 }
 
 //-----------------------------------------------------------------------------
