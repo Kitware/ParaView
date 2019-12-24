@@ -776,6 +776,9 @@ else ()
     set(VTK_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/VTK")
   endif ()
 
+  # Forward shared library setting to VTK.
+  set(VTK_BUILD_SHARED_LIBS "${PARAVIEW_BUILD_SHARED_LIBS}")
+
   # Forward Python option to VTK.
   set(VTK_WRAP_PYTHON "${PARAVIEW_ENABLE_PYTHON}")
 
