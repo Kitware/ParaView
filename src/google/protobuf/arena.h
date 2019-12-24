@@ -338,8 +338,17 @@ class PROTOBUF_EXPORT Arena final {
   template <typename T>
   PROTOBUF_ALWAYS_INLINE static T* CreateArray(Arena* arena,
                                                size_t num_elements) {
+#if !defined(__INTEL_COMPILER)
     static_assert(std::is_pod<T>::value,
                   "CreateArray requires a trivially constructible type");
+#else
+    // Intel seems to choke on `is_pod`, so instead do two different static
+    // asserts for what `is_pod` actually means. This seems to work.
+    static_assert(std::is_trivial<T>::value,
+                  "CreateArray requires a trivially constructible type (trivial)");
+    static_assert(std::is_standard_layout<T>::value,
+                  "CreateArray requires a trivially constructible type (stdlayout)");
+#endif
     static_assert(std::is_trivially_destructible<T>::value,
                   "CreateArray requires a trivially destructible type");
     GOOGLE_CHECK_LE(num_elements, std::numeric_limits<size_t>::max() / sizeof(T))
