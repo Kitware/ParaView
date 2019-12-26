@@ -295,6 +295,7 @@ set_target_properties(vtklibprotoc
 find_package(Threads REQUIRED)
 
 vtk_module_add_executable(vtkprotoc
+  DEVELOPMENT
   google/protobuf/compiler/main.cc)
 
 set(vtkprotoc_no_as_needed)

@@ -101,16 +101,18 @@ if (PARAVIEW_ENABLE_PYTHON)
       ParaView::PythonInitializer)
 endif ()
 
-export(
-  EXPORT    ParaViewClient
-  NAMESPACE ParaView::
-  FILE      "${CMAKE_BINARY_DIR}/${paraview_cmake_destination}/ParaViewClient-targets.cmake")
-install(
-  EXPORT      ParaViewClient
-  NAMESPACE   ParaView::
-  FILE        ParaViewClient-targets.cmake
-  DESTINATION "${paraview_cmake_destination}"
-  COMPONENT   "development")
+if (PARAVIEW_INSTALL_DEVELOPMENT_FILES)
+  export(
+    EXPORT    ParaViewClient
+    NAMESPACE ParaView::
+    FILE      "${CMAKE_BINARY_DIR}/${paraview_cmake_destination}/ParaViewClient-targets.cmake")
+  install(
+    EXPORT      ParaViewClient
+    NAMESPACE   ParaView::
+    FILE        ParaViewClient-targets.cmake
+    DESTINATION "${paraview_cmake_destination}"
+    COMPONENT   "development")
+endif ()
 
 if (BUILD_TESTING)
   add_subdirectory(Testing)

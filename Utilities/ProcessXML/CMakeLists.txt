@@ -42,5 +42,7 @@ if (NOT TARGET ParaView::ProcessXML)
       "${_paraview_client_origin_rpath}")
   endif()
 
-  vtk_module_add_executable(ParaView::ProcessXML ProcessXML.cxx)
+  vtk_module_add_executable(ParaView::ProcessXML
+    DEVELOPMENT
+    ProcessXML.cxx)
 endif ()

@@ -252,7 +252,6 @@ struct ExplodeFunctor
         {
           newPts[j] = pts[j] + cntPts;
         }
-        params.FacePointIds[i];
         vtkIdType cid = outCells->InsertNextCell(npts, newPts);
         outCellData->CopyData(inPointData, params.FacePointIds[i], cid);
       }
