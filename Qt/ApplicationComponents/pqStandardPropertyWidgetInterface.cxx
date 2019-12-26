@@ -67,6 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqListPropertyWidget.h"
 #include "pqMoleculePropertyWidget.h"
 #include "pqMultiComponentsDecorator.h"
+#include "pqOMETransferFunctionsPropertyWidget.h"
 #include "pqOSPRayHidingDecorator.h"
 #include "pqPauseLiveSourcePropertyWidget.h"
 #include "pqPropertyGroupButton.h"
@@ -293,6 +294,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   else if (panelWidget == "InteractiveLight")
   {
     return new pqLightPropertyWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "OMETransferFunctions")
+  {
+    return new pqOMETransferFunctionsPropertyWidget(proxy, group, parentWidget);
   }
   // *** NOTE: When adding new types, please update the header documentation ***
 

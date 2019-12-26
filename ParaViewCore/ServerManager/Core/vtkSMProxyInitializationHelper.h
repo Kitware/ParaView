@@ -63,6 +63,13 @@ public:
   virtual void PostInitializeProxy(
     vtkSMProxy* proxy, vtkPVXMLElement* xml, vtkMTimeType initializationTimeStamp) = 0;
 
+  /**
+   * Called during vtkSMParaViewPipelineController::Register.*Proxy to register
+   * any helper proxies created during by this helper. Default implementation
+   * does nothing.
+   */
+  virtual void RegisterProxy(vtkSMProxy* proxy, vtkPVXMLElement* xml);
+
 protected:
   vtkSMProxyInitializationHelper();
   ~vtkSMProxyInitializationHelper() override;

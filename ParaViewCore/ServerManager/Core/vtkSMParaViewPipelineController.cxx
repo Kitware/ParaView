@@ -510,6 +510,9 @@ bool vtkSMParaViewPipelineController::RegisterPipelineProxy(
   // Create animation helpers for this proxy.
   this->CreateAnimationHelpers(proxy);
 
+  // Handle initialization helpers.
+  this->ProcessInitializationHelperRegistration(proxy);
+
   // Now register the proxy itself.
   // If proxyname is nullptr, the proxy manager makes up a name.
   if (proxyname == nullptr)
@@ -595,6 +598,9 @@ bool vtkSMParaViewPipelineController::RegisterViewProxy(vtkSMProxy* proxy, const
 
   // Register proxies created for proxy list domains.
   this->RegisterProxiesForProxyListDomains(proxy);
+
+  // Handle initialization helpers.
+  this->ProcessInitializationHelperRegistration(proxy);
 
   // Now register the proxy itself.
   if (proxyname == nullptr)
@@ -729,6 +735,9 @@ bool vtkSMParaViewPipelineController::RegisterRepresentationProxy(vtkSMProxy* pr
   // Register proxies created for proxy list domains.
   this->RegisterProxiesForProxyListDomains(proxy);
 
+  // Handle initialization helpers.
+  this->ProcessInitializationHelperRegistration(proxy);
+
   // Register the proxy itself.
   proxy->GetSessionProxyManager()->RegisterProxy("representations", proxy);
   return true;
@@ -799,6 +808,9 @@ bool vtkSMParaViewPipelineController::RegisterColorTransferFunctionProxy(
   // Register proxies created for proxy list domains.
   this->RegisterProxiesForProxyListDomains(proxy);
 
+  // Handle initialization helpers.
+  this->ProcessInitializationHelperRegistration(proxy);
+
   proxy->GetSessionProxyManager()->RegisterProxy("lookup_tables", proxyname, proxy);
   return true;
 }
@@ -815,6 +827,9 @@ bool vtkSMParaViewPipelineController::RegisterOpacityTransferFunction(
   // Register proxies created for proxy list domains.
   this->RegisterProxiesForProxyListDomains(proxy);
 
+  // Handle initialization helpers.
+  this->ProcessInitializationHelperRegistration(proxy);
+
   proxy->GetSessionProxyManager()->RegisterProxy("piecewise_functions", proxyname, proxy);
   return true;
 }
@@ -829,6 +844,9 @@ bool vtkSMParaViewPipelineController::RegisterAnimationProxy(vtkSMProxy* proxy)
 
   // Register proxies created for proxy list domains.
   this->RegisterProxiesForProxyListDomains(proxy);
+
+  // Handle initialization helpers.
+  this->ProcessInitializationHelperRegistration(proxy);
 
   proxy->GetSessionProxyManager()->RegisterProxy("animation", proxy);
   return true;
@@ -920,6 +938,9 @@ bool vtkSMParaViewPipelineController::RegisterLightProxy(
 
   // Register proxies created for proxy list domains.
   this->RegisterProxiesForProxyListDomains(proxy);
+
+  // Handle initialization helpers.
+  this->ProcessInitializationHelperRegistration(proxy);
 
   // we would like the light to be a child of the view, but lights need to be created
   // and registered independently, before the view is created in python state files.
@@ -1263,6 +1284,28 @@ void vtkSMParaViewPipelineController::ProcessInitializationHelper(
             vtkSMProxyInitializationHelper::SafeDownCast(obj))
       {
         helper->PostInitializeProxy(proxy, child, initializationTimeStamp);
+      }
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMParaViewPipelineController::ProcessInitializationHelperRegistration(vtkSMProxy* proxy)
+{
+  vtkPVXMLElement* hints = proxy->GetHints();
+  for (unsigned int cc = 0, max = (hints ? hints->GetNumberOfNestedElements() : 0); cc < max; ++cc)
+  {
+    vtkPVXMLElement* child = hints->GetNestedElement(cc);
+    if (child && strcmp(child->GetName(), "InitializationHelper") == 0 &&
+      child->GetAttribute("class") != NULL)
+    {
+      const char* className = child->GetAttribute("class");
+      vtkSmartPointer<vtkObject> obj;
+      obj.TakeReference(vtkPVInstantiator::CreateInstance(className));
+      if (vtkSMProxyInitializationHelper* helper =
+            vtkSMProxyInitializationHelper::SafeDownCast(obj))
+      {
+        helper->RegisterProxy(proxy, child);
       }
     }
   }
