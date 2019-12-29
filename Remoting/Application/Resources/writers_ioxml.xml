@@ -1,0 +1,1230 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="internal_writers">
+    <!-- ================================================================= -->
+    <Proxy class="vtkXMLDataObjectWriter" name="XMLDataObjectWriterCore">
+      <Documentation>Internal writer for writing xml-based vtk
+      files.</Documentation>
+      <IntVectorProperty command="SetDataMode"
+                         default_values="2"
+                         name="DataMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Ascii" value="0" />
+          <Entry text="Binary" value="1" />
+          <Entry text="Appended" value="2" />
+        </EnumerationDomain>
+        <Documentation>The mode uses for writing the file's data i.e. ascii,
+        binary, appended binary.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHeaderType"
+                         default_values="64"
+                         name="HeaderType"
+                         number_of_elements="1"
+                         panel_widget="never">
+        <EnumerationDomain name="enum">
+          <Entry text="UInt32" value="32" />
+          <Entry text="UInt64" value="64" />
+        </EnumerationDomain>
+        <Documentation>Set the binary data header word type.  The default is
+        UInt32. Set to UInt64 when storing arrays requiring 64-bit indexing.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetEncodeAppendedData"
+                         default_values="0"
+                         name="EncodeAppendedData"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When EncodeAppendedData is turned ON, the writer uses
+        base64 encoding when writing binary data (only if appended mode is
+        selected).</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCompressorType"
+                         default_values="0"
+                         name="CompressorType"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" info="fastest write" />
+          <Entry text="LZ4" value="2" info="fastest compressed write" />
+          <Entry text="ZLib" value="1" info="balanced performance" />
+          <Entry text="LZMA" value="3" info="smallest filesize" />
+        </EnumerationDomain>
+        <Documentation>The compression algorithm used to compress binary data
+        (appended mode only). None offers fastest write, LZ4 offers fastest
+        compressed write, ZLib offers balanced performance, LZMA offers
+        smallest compressed filesize.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCompressionLevel"
+                         default_values="6"
+                         name="CompressionLevel"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="1" value="1" info="fastest write" />
+          <Entry text="2" value="2" />
+          <Entry text="3" value="3" />
+          <Entry text="4" value="4" />
+          <Entry text="5" value="5" info="balanced performance" />
+          <Entry text="6" value="6" />
+          <Entry text="7" value="7" />
+          <Entry text="8" value="8" />
+          <Entry text="9" value="9" info="smallest filesize" />
+        </EnumerationDomain>
+        <Documentation>A compression performance parameter from 1 (faster/larger
+         compressed filesize) to 9 (slower/smaller compressed filesize).</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="CompressorType"
+                                   value="0"
+                                   inverse="1" />
+        </Hints>
+      </IntVectorProperty>
+      <!-- End of XMLDataSetWriterCore -->
+    </Proxy>
+
+    <!-- ================================================================= -->
+    <PWriterProxy base_proxygroup="internal_writers"
+                  base_proxyname="XMLDataObjectWriterCore"
+                  class="vtkXMLPMultiBlockDataWriter"
+                  name="XMLPMultiBlockDataWriterCore">
+      <Documentation>Internal proxy used by
+      XMLMultiBlockDataWriter.</Documentation>
+      <!-- End of XMLPMultiBlockDataWriterCore -->
+    </PWriterProxy>
+
+    <!-- ================================================================= -->
+    <PWriterProxy base_proxygroup="internal_writers"
+                  base_proxyname="XMLDataObjectWriterCore"
+                  class="vtkXMLPartitionedDataSetWriter"
+                  name="XMLPartitionedDataSetWriterCore">
+      <Documentation>Internal proxy used by XMLPartitionedDataSetWriter.</Documentation>
+      <!-- End of XMLPartitionedDataSetWriterCore -->
+    </PWriterProxy>
+
+    <!-- ================================================================= -->
+    <PWriterProxy base_proxygroup="internal_writers"
+                  base_proxyname="XMLDataObjectWriterCore"
+                  class="vtkXMLPartitionedDataSetCollectionWriter"
+                  name="XMLPartitionedDataSetCollectionWriterCore">
+      <Documentation>Internal proxy used by
+      XMLPartitionedDataSetCollectionWriter.</Documentation>
+      <!-- End of XMLPartitionedDataSetCollectionWriterCore -->
+    </PWriterProxy>
+
+    <!-- ================================================================= -->
+    <PWriterProxy base_proxygroup="internal_writers"
+                  base_proxyname="XMLDataObjectWriterCore"
+                  class="vtkXMLPUniformGridAMRWriter"
+                  name="XMLPUniformGridAMRWriter">
+      <Documentation>
+        Internal proxy used by XMLUniformGridAMRWriter
+      </Documentation>
+      <!-- End of XMLPUniformGridAMRWriter-->
+    </PWriterProxy>
+
+    <!-- ================================================================= -->
+    <PWriterProxy base_proxygroup="internal_writers"
+                  base_proxyname="XMLDataObjectWriterCore"
+                  class="vtkXMLPPolyDataWriter"
+                  name="XMLPPolyDataWriterCore">
+      <Documentation>Internal writer used to write XML poly data in
+      parallel.</Documentation>
+      <IntVectorProperty command="SetGhostLevel"
+                         default_values="1"
+                         panel_visibility="never"
+                         name="GhostLevel"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        name="range" />
+        <Documentation>The number of ghost levels to include in the output
+        file(s).</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseSubdirectory"
+                         name="UseSubdirectory"
+                         label="Store Data in Subdirectory"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>This property controls whether the writer puts the files for each piece
+          in the same directory as the pvt* file or in a subdirectory named the same as the
+          pvt* file without its extension</Documentation>
+      </IntVectorProperty>
+    </PWriterProxy>
+    <!-- ================================================================= -->
+    <PWriterProxy base_proxygroup="internal_writers"
+                  base_proxyname="XMLDataObjectWriterCore"
+                  class="vtkXMLPUnstructuredGridWriter"
+                  name="XMLPUnstructuredGridWriterCore">
+      <Documentation>Internal writer used to write XML poly data in
+      parallel.</Documentation>
+      <IntVectorProperty command="SetGhostLevel"
+                         default_values="1"
+                         name="GhostLevel"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        name="range" />
+        <Documentation>The number of ghost levels to include in the output
+        file(s).</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseSubdirectory"
+                         name="UseSubdirectory"
+                         label="Store Data in Subdirectory"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>This property controls whether the writer puts the files for each piece
+          in the same directory as the pvt* file or in a subdirectory named the same as the
+          pvt* file without its extension</Documentation>
+      </IntVectorProperty>
+    </PWriterProxy>
+    <!-- ================================================================= -->
+    <PWriterProxy base_proxygroup="internal_writers"
+                  base_proxyname="XMLDataObjectWriterCore"
+                  class="vtkXMLPTableWriter"
+                  name="XMLPTableCore">
+      <Documentation>Internal writer used to write XML poly data in
+      parallel.</Documentation>
+      <IntVectorProperty command="SetUseSubdirectory"
+                         name="UseSubdirectory"
+                         label="Store Data in Subdirectory"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>This property controls whether the writer puts the files for each piece
+          in the same directory as the pvt* file or in a subdirectory named the same as the
+          pvt* file without its extension</Documentation>
+      </IntVectorProperty>
+    </PWriterProxy>
+    <!-- ================================================================= -->
+    <PWriterProxy base_proxygroup="internal_writers"
+                  base_proxyname="XMLDataObjectWriterCore"
+                  class="vtkXMLPStructuredGridWriter"
+                  name="XMLPStructuredGridWriterCore">
+      <Documentation>Internal writer used to write XML poly data in
+      parallel.</Documentation>
+      <IntVectorProperty command="SetUseSubdirectory"
+                         name="UseSubdirectory"
+                         label="Store Data in Subdirectory"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>This property controls whether the writer puts the files for each piece
+          in the same directory as the pvt* file or in a subdirectory named the same as the
+          pvt* file without its extension</Documentation>
+      </IntVectorProperty>
+    </PWriterProxy>
+    <!-- ================================================================= -->
+    <PWriterProxy base_proxygroup="internal_writers"
+                  base_proxyname="XMLDataObjectWriterCore"
+                  class="vtkXMLPRectilinearGridWriter"
+                  name="XMLPRectilinearGridWriterCore">
+      <Documentation>Writer to write rectilinear grid in a xml-based vtk data
+      file. Can be used for parallel writing.</Documentation>
+      <IntVectorProperty command="SetUseSubdirectory"
+                         name="UseSubdirectory"
+                         label="Store Data in Subdirectory"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>This property controls whether the writer puts the files for each piece
+          in the same directory as the pvt* file or in a subdirectory named the same as the
+          pvt* file without its extension</Documentation>
+      </IntVectorProperty>
+    </PWriterProxy>
+    <!-- ================================================================= -->
+    <PWriterProxy base_proxygroup="internal_writers"
+                  base_proxyname="XMLDataObjectWriterCore"
+                  class="vtkXMLPImageDataWriter"
+                  name="XMLPImageDataWriterCore"
+                  parallel_only="1">
+      <Documentation>Writer to write image data in a xml-based vtk data file.
+      Can be used for parallel writing.</Documentation>
+      <IntVectorProperty command="SetUseSubdirectory"
+                         name="UseSubdirectory"
+                         label="Store Data in Subdirectory"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>This property controls whether the writer puts the files for each piece
+          in the same directory as the pvt* file or in a subdirectory named the same as the
+          pvt* file without its extension</Documentation>
+      </IntVectorProperty>
+    </PWriterProxy>
+    <!-- ================================================================= -->
+    <PWriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="XMLDataObjectWriterCore"
+                 class="vtkXMLPHyperTreeGridWriter"
+                 name="XMLPHyperTreeGridWriterCore">
+      <Documentation>Internal writer used to write XML hyper tree grid data in parallel</Documentation>
+      <IntVectorProperty command="SetUseSubdirectory"
+                         name="UseSubdirectory"
+                         label="Store Data in Subdirectory"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>This property controls whether the writer puts the files for each piece
+          in the same directory as the phtg file or in a subdirectory named the same as the
+          phtg file without its extension</Documentation>
+      </IntVectorProperty>
+    </PWriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="FileSeriesWriter"
+                 name="XMLDataObjectWriterBase">
+      <Documentation>Base for all XML-based file-series
+      writers.</Documentation>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="XMLDataObjectWriterCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+            <Property name="CompressionLevel" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of XMLDataObjectWriterBase -->
+    </WriterProxy>
+    <!-- End of internal_writers -->
+  </ProxyGroup>
+
+  <!-- =================================================================== -->
+  <ProxyGroup name="writers">
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="XMLDataObjectWriterBase"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLPolyDataWriter">
+      <Documentation short_help="Write poly data in a xml-based vtk data file.">
+      Writer to write poly data in a xml-based vtk data file. Cannot be used
+      for parallel writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input"
+                     panel_visibility="never">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <InputArrayDomain name="point_arrays" attribute_type="point" optional="1" />
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+
+      <Hints>
+        <WriterFactory extensions="vtp"
+                       file_description="VTK PolyData Files" />
+      </Hints>
+      <!-- End of XMLPolyDataWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="XMLDataObjectWriterBase"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLUnstructuredGridWriter">
+      <Documentation short_help="Write unstructured grid in a xml-based vtk data file.">
+      Writer to write unstructured grid in a xml-based vtk data file. Cannot be
+      used for parallel writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <Hints>
+        <WriterFactory extensions="vtu"
+                       file_description="VTK UnstructuredGrid Files" />
+      </Hints>
+      <!-- End of XMLUnstructuredGridWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="XMLDataObjectWriterBase"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLStructuredGridWriter">
+      <Documentation short_help="Write structured grid in a xml-based vtk data file.">
+      Writer to write structured grid in a xml-based vtk data file. Cannot be
+      used for parallel writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkStructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <Hints>
+        <WriterFactory extensions="vts"
+                       file_description="VTK StructuredGrid Files" />
+      </Hints>
+      <!-- End of XMLStructuredGridWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="XMLDataObjectWriterBase"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLRectilinearGridWriter">
+      <Documentation short_help="Write rectilinear grid in a xml-based vtk data file.">
+      Writer to write rectilinear grid in a xml-based vtk data file. Cannot be
+      used for parallel writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkRectilinearGrid" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <Hints>
+        <WriterFactory extensions="vtr"
+                       file_description="VTK RectilinearGrid Files" />
+      </Hints>
+      <!-- End of XMLRectilinearGridWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="XMLDataObjectWriterBase"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLImageDataWriter">
+      <Documentation short_help="Write image data in a xml-based vtk data file.">
+      Writer to write image data in a xml-based vtk data file. Cannot be used
+      for parallel writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <Hints>
+        <WriterFactory extensions="vti"
+                       file_description="VTK ImageData Files" />
+      </Hints>
+      <!-- End of XMLImageDataWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="XMLDataObjectWriterBase"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLTableWriter">
+      <Documentation short_help="Write a table in a xml-based vtk data file.">
+      Writer to write a table in a xml-based vtk data file. Cannot be used
+      for parallel writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkTable" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <Hints>
+        <WriterFactory extensions="vtt"
+                       file_description="VTK Table Files" />
+      </Hints>
+      <!-- End of XMLImageDataWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="ParallelFileSeriesWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLPPolyDataWriter"
+                 supports_parallel="1">
+      <Documentation short_help="Write polydata in a xml-based vtk data file.">
+      Writer to write polydata in a xml-based vtk data file. Can be used for
+      parallel writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="XMLPPolyDataWriterCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="GhostLevel" />
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+            <Property name="CompressionLevel" />
+            <Property name="UseSubdirectory" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <WriterFactory extensions="pvtp"
+                       file_description="PVTK PolyData Files" />
+      </Hints>
+      <!-- End of XMLPPolyDataWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="ParallelFileSeriesWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLPUnstructuredGridWriter"
+                 supports_parallel="1">
+      <Documentation short_help="Write unstructured grid in a xml-based vtk data file.">
+      Writer to write unstructured grid in a xml-based vtk data file. Can be
+      used for parallel writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="XMLPUnstructuredGridWriterCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="GhostLevel" />
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+            <Property name="CompressionLevel" />
+            <Property name="UseSubdirectory" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <WriterFactory extensions="pvtu"
+                       file_description="PVTK UnstructuredGrid Files" />
+      </Hints>
+      <!-- End of XMLPUnstructuredGridWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="ParallelFileSeriesWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLPTableWriter"
+                 supports_parallel="1">
+      <Documentation short_help="Write table in a xml-based vtk data file.">
+      Writer to write table in a xml-based vtk data file. Can be
+      used for parallel writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkTable" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="XMLPTableCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="XML Writer Parameters">
+            <!-- <Property name="GhostLevel" /> -->
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+            <Property name="CompressionLevel" />
+            <Property name="UseSubdirectory" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <WriterFactory extensions="pvtt"
+                       file_description="PVTK Table Files" />
+      </Hints>
+      <!-- End of XMLPUnstructuredGridWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="ParallelFileSeriesWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLPStructuredGridWriter"
+                 supports_parallel="1">
+      <Documentation short_help="Write structured grid in a xml-based vtk data file.">
+      Writer to write structured grid in a xml-based vtk data file. Can be used
+      for parallel writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkStructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="XMLPStructuredGridWriterCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+            <Property name="CompressionLevel" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <WriterFactory extensions="pvts"
+                       file_description="PVTK StructuredGrid Files" />
+      </Hints>
+      <!-- End of XMLPStructuredGridWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="ParallelFileSeriesWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLPRectilinearGridWriter"
+                 supports_parallel="1">
+      <Documentation short_help="Write rectilinear grid in a xml-based vtk data file.">
+      Writer to write rectilinear grid in a xml-based vtk data file. Can be
+      used for parallel writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkRectilinearGrid" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="XMLPRectilinearGridWriterCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+            <Property name="CompressionLevel" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <WriterFactory extensions="pvtr"
+                       file_description="PVTK RectilinearGrid Files" />
+      </Hints>
+      <!-- End of XMLPRectilinearGridWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="ParallelFileSeriesWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLPImageDataWriter"
+                 supports_parallel="1">
+      <Documentation short_help="Write image data in a xml-based vtk data file.">
+      Writer to write image data in a xml-based vtk data file. Can be used for
+      parallel writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="XMLPImageDataWriterCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+            <Property name="CompressionLevel" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <WriterFactory extensions="pvti"
+                       file_description="PVTK ImageData Files" />
+      </Hints>
+      <!-- End of XMLPImageDataWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="FileSeriesWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLMultiBlockDataWriter"
+                 supports_parallel="1">
+      <Documentation short_help="Write a multiblock in a xml-based vtk data file.">
+      Writer to write a multiblock dataset in a xml-based vtk data file. Can be
+      used for parallel writing as well as serial writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkMultiBlockDataSet" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="XMLPMultiBlockDataWriterCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+            <Property name="CompressionLevel" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <WriterFactory extensions="vtm"
+                       file_description="VTK Multi Block Files" />
+      </Hints>
+      <!-- End of XMLMultiBlockDataWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="FileSeriesWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="SerialHTGMultiBlock"
+                 supports_parallel="1">
+      <Documentation short_help="Write a multiblock in a xml-based vtk data file.">
+      Writer to write a multiblock dataset in a xml-based vtk data file. Can be
+      used for parallel writing as well as serial writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        composite_data_required="1"
+                        name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="XMLPMultiBlockDataWriterCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+            <Property name="CompressionLevel" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <WriterFactory extensions="vtm"
+                       file_description="VTK Multi Block Files" />
+      </Hints>
+      <!-- End of XMLMultiBlockDataWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="FileSeriesWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLPartitionedDataSetWriter"
+                 supports_parallel="1">
+      <Documentation>
+        Write a vtkPartitionedDataSet to a xml-based vtk data file.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkPartitionedDataSet" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="XMLPartitionedDataSetWriterCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+            <Property name="CompressionLevel" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <WriterFactory extensions="vtpd"
+                       file_description="VTK PartitionedDataSet Files" />
+      </Hints>
+      <!-- End of XMLPartitionedDataSetWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="FileSeriesWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLPartitionedDataSetCollectionWriter"
+                 supports_parallel="1">
+      <Documentation>
+        Write a vtkPartitionedDataSetCollection to a xml-based vtk data file.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkPartitionedDataSetCollection" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="XMLPartitionedDataSetCollectionWriterCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+            <Property name="CompressionLevel" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <WriterFactory extensions="vtpc"
+                       file_description="VTK PartitionedDataSetCollection Files" />
+      </Hints>
+      <!-- End of XMLPartitionedDataSetCollectionWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="FileSeriesWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLUniformGridAMRWriter"
+                 supports_parallel="1">
+      <Documentation short_help="Write a amr dataset in a xml-based vtk data file.">
+      Writer to write an AMR data-set (overlapping/non-overlapping)
+      in a xml-based vtk data file. Can be used for parallel writing as well as
+      serial writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUniformGridAMR" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="XMLPUniformGridAMRWriter"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+            <Property name="CompressionLevel" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <WriterFactory extensions="vthb"
+                       file_description="VTK AMR Files" />
+      </Hints>
+      <!-- End of XMLUniformGridAMRWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="writers"
+                 base_proxyname="XMLUniformGridAMRWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLHierarchicalBoxDataWriter"
+                 supports_parallel="1">
+      <Documentation short_help="(DEPRECATED) Write a hierarchical box dataset in a xml-based vtk data file.">
+      (DEPRECATED) Writer to write a hierarchical box in a xml-based vtk data file. Can be
+      used for parallel writing as well as serial writing. This is deprecated.
+      Use XMLUniformGridAMRWriter instead.
+      </Documentation>
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy class="vtkXMLHyperTreeGridWriter"
+                 name="HyperTreeGridWriter">
+      <Documentation short_help="Write HyperTree data as a HyperTreeGrid file.">
+        Writer to write hypertree data as a HyperTreeGrid file.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to be
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetDataMode"
+                         default_values="2"
+                         name="DataMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Ascii"
+                 value="0" />
+          <Entry text="Binary"
+                 value="1" />
+          <Entry text="Appended"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>The mode uses for writing the file's data i.e. ascii,
+        binary, appended binary.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetEncodeAppendedData"
+                         default_values="0"
+                         name="EncodeAppendedData"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When EncodeAppendedData is turned ON, the writer uses
+        base64 encoding when writing binary data (only if appended mode is
+        selected).</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCompressorType"
+                         default_values="0"
+                         name="CompressorType"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" info="fastest write"/>
+          <Entry text="LZ4" value="2" info="fastest compressed write" />
+          <Entry text="ZLib" value="1" info="balanced performance" />
+          <Entry text="LZMA" value="3" info="smallest filesize" />
+        </EnumerationDomain>
+        <Documentation>The compression algorithm used to compress binary data
+        (appended mode only). None offers fastest write, LZ4 offers fastest
+        compressed write, ZLib offers balanced performance, LZMA offers
+        smallest compressed filesize.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCompressionLevel"
+                         default_values="6"
+                         name="CompressionLevel"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="1" value="1" info="fastest write"/>
+          <Entry text="2" value="2" />
+          <Entry text="3" value="3" />
+          <Entry text="4" value="4" />
+          <Entry text="5" value="5" info="balanced performance" />
+          <Entry text="6" value="6" />
+          <Entry text="7" value="7" />
+          <Entry text="8" value="8" />
+          <Entry text="9" value="9" info="smallest filesize"/>
+        </EnumerationDomain>
+        <Documentation>A compression performance parameter from 1 (faster/larger
+         compressed filesize) to 9 (slower/smaller compressed filesize).</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="CompressorType"
+                                   value="0"
+                                   inverse="1" />
+        </Hints>
+      </IntVectorProperty>
+      <Hints>
+        <WriterFactory extensions="htg"
+                       file_description="HyperTreeGrid Files" />
+      </Hints>
+      <!-- End of HyperTreeGridWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="ParallelFileSeriesWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLPHyperTreeGridWriter"
+                 supports_parallel="1">
+      <Documentation short_help="Write hyper tree grid in a xml-based vtk data file.">
+      Writer to write hyper tree grid in a xml-based vtk data file. Can be
+      used for parallel writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="XMLPHyperTreeGridWriterCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+            <Property name="CompressionLevel" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <WriterFactory extensions="phtg"
+                       file_description="PVTK Hyper Tree Grid Files" />
+      </Hints>
+      <!-- End of XMLPHyperTreeGridWriter -->
+    </WriterProxy>
+
+    <!-- End of "writers" -->
+  </ProxyGroup>
+
+  <ProxyGroup name="insitu2_writer_parameters">
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="writers"
+                 base_proxyname="XMLPPolyDataWriter"
+                 class="vtkFileSeriesWriter"
+                 name="XMLPPolyDataWriter"
+                 supports_parallel="1">
+      <Documentation short_help="Expose a writer for catalyst.">
+        Variation with catalyst specific extensions.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of XMLPPolyDataWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="writers"
+                 base_proxyname="XMLPUnstructuredGridWriter"
+                 class="vtkFileSeriesWriter"
+                 name="XMLPUnstructuredGridWriter"
+                 supports_parallel="1">
+      <Documentation short_help="Expose a writer for catalyst.">
+        Variation with catalyst specific extensions.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of XMLPUnstructuredGridWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="writers"
+                 base_proxyname="XMLPHyperTreeGridWriter"
+                 class="vtkFileSeriesWriter"
+                 name="XMLPHyperTreeGridWriter"
+                 supports_parallel="1">
+      <Documentation short_help="Expose a writer for catalyst.">
+        Variation with catalyst specific extensions.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of XMLPHyperTreeGridWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="writers"
+                 base_proxyname="XMLPStructuredGridWriter"
+                 class="vtkFileSeriesWriter"
+                 name="XMLPStructuredGridWriter"
+                 supports_parallel="1">
+      <Documentation short_help="Expose a writer for catalyst.">
+        Variation with catalyst specific extensions.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of XMLPStructuredGridWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="writers"
+                 base_proxyname="XMLPRectilinearGridWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLPRectilinearGridWriter"
+                 supports_parallel="1">
+      <Documentation short_help="Expose a writer for catalyst.">
+        Variation with catalyst specific extensions.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of XMLPRectilinearGridWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="writers"
+               base_proxyname="XMLPImageDataWriter"
+               class="vtkFileSeriesWriter"
+               name="XMLPImageDataWriter"
+               supports_parallel="1">
+      <Documentation short_help="Expose a writer for catalyst.">
+        Variation with catalyst specific extensions.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of XMLPImageDataWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="writers"
+                 base_proxyname="XMLMultiBlockDataWriter"
+                 class="vtkFileSeriesWriter"
+                 name="XMLMultiBlockDataWriter"
+                 supports_parallel="1">
+      <Documentation short_help="Expose a writer for catalyst.">
+        Variation with catalyst specific extensions.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of XMLMultiBlockDataWriter -->
+    </WriterProxy>
+    <!-- end of "insitu2_writer_parameters" -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

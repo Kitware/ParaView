@@ -1,0 +1,59 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkTecplotTableReader"
+                 label="Tecplot Table Reader"
+                 name="TecplotTableReaderCore">
+      <Documentation>The Tecplot
+                     table reader reads a .DAT file containing tabular
+                     data into a spreadsheet view.</Documentation>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            >
+        <FileListDomain name="files" />
+        <Documentation>The name of the file to read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="GetFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <IntVectorProperty command="SetMaxRecords"
+                         default_values="0"
+                         name="Max. Number of Records"
+                         number_of_elements="1">
+        <Documentation>The maximum number of records to read.
+                       Use this to preview a file.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHeaderLines"
+                         default_values="2"
+                         name="Number of header lines"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>The number of lines that form the header.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetColumnNamesOnLine"
+                         default_values="1"
+                         name="Line with column names"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>The line that contains the column names.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetSkipColumnNames"
+                         default_values="1"
+                         name="Skip #column name fields"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>Number of fields to skip while reading column names.</Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <View type="SpreadSheetView" />
+        <ReaderFactory extensions="dat DAT"
+                       file_description="Tecplot Table" />
+      </Hints>
+      <!-- End of TecplotTableReader -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

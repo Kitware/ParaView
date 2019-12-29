@@ -1,0 +1,147 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="internal_sources">
+    <!-- ================================================================== -->
+    <Proxy class="vtkDelimitedTextReader"
+                 label="CSV Reader"
+                 name="CSVReaderCore">
+      <Documentation long_help="Reads a comma-separated values file into a 1D rectilinear grid."
+                     short_help="Read a comma-separated values file.">The CSV
+                     reader reads a comma-separated values file into a 1D
+                     rectilinear grid. If the file was saved using the
+                     CSVWriter, then the rectilinear grid's points and point
+                     data can be restored as well as the cell data. Otherwise
+                     all the data in the CSV file is treated as cell data. The
+                     default file extension is .csv.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the CSV
+        (Command Separated Values) reader.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetDetectNumericColumns"
+                         default_values="1"
+                         name="DetectNumericColumns"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When set to true, the reader will detect numeric columns
+        and create vtkDoubleArray or vtkIntArray for those instead of
+        vtkStringArray.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseStringDelimiter"
+                         default_values="1"
+                         name="UseStringDelimiter"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property indicates whether to use the string
+        delimiter.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAddTabFieldDelimiter"
+                         default_values="0"
+                         name="AddTabFieldDelimiter"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property indicates whether to add the tab character as a
+        field delimiter to the list of other delimiter characters. This is needed
+        since in the GUI the user can't enter a tab character.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHaveHeaders"
+                         default_values="1"
+                         name="HaveHeaders"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the value of this property is 1, treat the first line
+        of the file as headers.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetFieldDelimiterCharacters"
+                            default_values=","
+                            name="FieldDelimiterCharacters"
+                            number_of_elements="1">
+        <Documentation>This property lists the characters that may be used to
+        separate fields. For example, a value of "," indicates a
+        comma-separated value file. A value of ".:;" indicates that columns may
+        be separated by a period, colon or semicolon. The order of the
+        characters in the text string does not matter.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetMergeConsecutiveDelimiters"
+                         default_values="0"
+                         name="MergeConsecutiveDelimiters"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Whether to merge successive delimiters. Use this if (for
+        example) your fields are separated by spaces but you don't know exactly
+        how many.</Documentation>
+      </IntVectorProperty>
+      <!-- End of CSVReaderCore -->
+    </Proxy>
+    <!-- end of "internal_sources" -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="CSV Reader"
+                 name="CSVReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads a Delimited Text values file into a 1D rectilinear grid."
+                     short_help="Read a Delimited Text values file.">The CSV
+                     reader reads a Delimited Text values file into a 1D
+                     rectilinear grid. If the file was saved using the
+                     CSVWriter, then the rectilinear grid's points and point
+                     data can be restored as well as the cell data. Otherwise
+                     all the data in the CSV file is treated as cell data. The
+                     default file extension is .csv as well as .txt.
+                     This can read file series as well.</Documentation>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader. Each file is
+        expected to be a csv file. If more than one file is specified, the
+        reader will switch to file series mode in which it will pretend that it
+        can support time and provide one file per time step.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="CSVReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="DetectNumericColumns" />
+          <Property name="UseStringDelimiter" />
+          <Property name="HaveHeaders" />
+          <Property name="FieldDelimiterCharacters" />
+          <Property name="AddTabFieldDelimiter" />
+          <Property name="MergeConsecutiveDelimiters" />
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <View type="SpreadSheetView" />
+        <ReaderFactory extensions="csv tsv txt CSV TSV TXT"
+                       file_description="Delimited Text" />
+        <InitializationHelper class="vtkSMCSVProxiesInitializationHelper" />
+      </Hints>
+      <!-- End of CSVReader -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

@@ -1,0 +1,538 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="settings">
+    <!-- ================================================================== -->
+    <SettingsProxy name="GeneralSettings" label="General"
+      processes="client|dataserver|renderserver"
+      class="vtkPVGeneralSettings">
+      <Documentation>
+        Collection of general setting for ParaView.
+      </Documentation>
+
+      <IntVectorProperty name="ShowWelcomeDialog"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="advanced">
+        <Documentation>
+          Show welcome screen at startup.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <SaveInQSettings />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ShowSaveStateOnExit"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>
+          Prompt to save state when exiting ParaView.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <SaveInQSettings />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="CrashRecovery"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>
+          On a crash, attempt to save a state file to potentially restore
+          the application state to that before the crash.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <SaveInQSettings />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ForceSingleColumnMenus"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>
+          Force the sources/filters menus to be presented as a single
+          scrollable column to ensure that all the filters are selectable
+          on low resolution screens.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <SaveInQSettings />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="GUIOverrideFont"
+        label="Override Font"
+        command="SetGUIOverrideFont"
+        default_values="0"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Override the GUI font size. Uncheck to use system default.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="GUIFontSize"
+        label="Font Size"
+        command="SetGUIFontSize"
+        number_of_elements="1"
+        default_values="8">
+        <Documentation>
+          Specify the font size in points.
+        </Documentation>
+        <IntRangeDomain name="range" min="8" max="32" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="GUIOverrideFont" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="DefaultViewType"
+        number_of_elements="1"
+        default_values="RenderView"
+        command="SetDefaultViewType"
+        panel_widget="viewtype_selector"
+        panel_visibility="advanced">
+        <Documentation>
+          Set the view to create when ParaView starts up.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="ScreenPixelsPerInch"
+        number_of_elements="1"
+        default_values="96"
+        panel_visibility="advanced">
+        <IntRangeDomain name="range" min="80" />
+        <Documentation>
+          Set pixels per inch on the current screen/monitor. This is used for determining
+          pixel sizes for fonts and other 2D annotations.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="AutoApply"
+        number_of_elements="1"
+        default_values="0"
+        command="SetAutoApply"
+        information_property="AutoApplyInfo">
+        <Documentation>
+          Automatically apply changes in the 'Properties' panel.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty name="AutoApplyInfo"
+                         command="GetAutoApply"
+                         information_only="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="AutoApplyActiveOnly"
+        number_of_elements="1"
+        default_values="0"
+        command="SetAutoApplyActiveOnly"
+        panel_visibility="advanced">
+        <Documentation>
+          Limit automatic accepting of changes on the 'Properties'
+          panel to the active panel alone.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="LoadAllVariables"
+        number_of_elements="1"
+        default_values="0"
+        command="SetLoadAllVariables">
+        <Documentation>
+          Load all variables when loading a data set.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="LoadNoChartVariables"
+        number_of_elements="1"
+        default_values="0"
+        command="SetLoadNoChartVariables">
+        <Documentation>
+          Do not load any variables when loading a 2D chart.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PropertiesPanelMode"
+        command="SetPropertiesPanelMode"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>
+          You can choose to show source, display and view properties in a single
+          'Properties' panel, or place them in separate dock panels.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Combined Properties panel" value="0" />
+          <Entry text="Display Properties in a separate panel" value="1" />
+          <Entry text="View Properties in a separate panel" value="2" />
+          <Entry text="Separate panels for each type of properties" value="3" />
+        </EnumerationDomain>
+        <Hints>
+          <RestartRequired />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="LockPanels"
+        command="SetLockPanels"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>
+          Prevent movement of dockable control panels to other positions.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <SaveInQSettings/>
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="AutoConvertProperties"
+        number_of_elements="1"
+        default_values="0"
+        command="SetAutoConvertProperties">
+        <Documentation>
+          Automatically convert data arrays as needed by filters including converting
+          cell arrays to point arrays, or vice versa, and extracting single components
+          from multi-component arrays.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="BlockColorsDistinctValues"
+                         number_of_elements="1"
+                         default_values="12"
+                         command="SetBlockColorsDistinctValues"
+                         panel_visibility="advanced">
+        <Documentation>
+          Determines the number of distinct values in
+          vtkBlockColors. This array is added to each block if
+          the dataset is a composite dataset. The array has one value
+          set to the reminder of blockIndex divided by
+          BlockColorsDistinctValues (blockIndex mod
+          BlockColorsDistinctValues).
+        </Documentation>
+        <IntRangeDomain min="2" name="range" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="TransferFunctionResetMode"
+        number_of_elements="1"
+        default_values="0"
+        command="SetTransferFunctionResetMode">
+        <Documentation>
+          Color transfer functions (or color maps) are used to map data values to colors
+          for pseudo coloring. Set the default way ParaView decides to update the data
+          range used for this mapping. Newly created transfer functions will update
+          the range according to this setting, but it can later be changed per
+          transfer function via the transfer function's 'Automatic Rescale Range Mode'
+          setting.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Grow and update on 'Apply'" value="0" />
+          <Entry text="Grow and update every timestep" value="1" />
+          <Entry text="Update on 'Apply'" value="2" />
+          <Entry text="Clamp and update every timestep" value="3" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ScalarBarMode"
+        command="SetScalarBarMode"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Set how ParaView manages showing of color legend bars (or scalar bars) in render views.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Automatically show and/or hide color bars" value="0" />
+          <Entry text="Automatically hide unused color bars" value="1" />
+          <Entry text="Manual (not recommended)" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="EnableAutoMPI"
+        number_of_elements="1"
+        default_values="0"
+        command="SetEnableAutoMPI"
+        panel_visibility="advanced">
+        <Documentation>
+          Enable multicore support for data processing.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <SaveInQSettings both="1" />
+          <RestartRequired />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="AutoMPILimit"
+        number_of_elements="1"
+        default_values="2"
+        command="SetAutoMPILimit"
+        panel_visibility="advanced">
+        <Documentation>
+          Limit maximum number of cores to
+        </Documentation>
+        <IntRangeDomain min="1" max="64" />
+        <Hints>
+          <SaveInQSettings both="1" />
+          <RestartRequired />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="CacheGeometryForAnimation"
+        command="SetCacheGeometryForAnimation"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          <!--
+          When playing an animation, ParaView can attempt to cache processed geometries
+          to attempt to speed up animation play back in a loop by avoiding I/O and data
+          processing. Set whether caching should be use, when possible.
+          -->
+          Enable caching of geometry in an attempt to speed up animation playback in a loop.
+        </Documentation>
+      </IntVectorProperty>
+
+      <!--
+        Disabling for now. We need a more complex implementation if we need to truly support
+        cache limits correctly. For now, we'll disable cache-limits.
+      <IntVectorProperty name="AnimationGeometryCacheLimit"
+        command="SetAnimationGeometryCacheLimit"
+        number_of_elements="1"
+        default_values="102400"
+        panel_visibility="advanced">
+        <IntRangeDomain name="range" min="0" />
+        <Documentation>
+          When caching of geometry for animations is enabled, limit the maximum cache size
+          for the geometry on any rank. Caching will automatically be disabled if the cache
+          exceed this limit on any rank, specified in kilobytes (KB).
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="CacheGeometryForAnimation" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      -->
+
+      <IntVectorProperty name="AnimationTimeNotation"
+        number_of_elements="1"
+        default_values="0"
+        command="SetAnimationTimeNotation"
+        panel_visibility="advanced">
+        <Documentation>
+          Set the display notation for the time in the animation toolbar. 'Mixed' will automatically
+          choose the shortest display.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed" value="0" />
+          <Entry text="Scientific" value="1" />
+          <Entry text="Fixed" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="AnimationTimePrecision"
+        number_of_elements="1"
+        default_values="6"
+        command="SetAnimationTimePrecision"
+        panel_visibility="advanced">
+        <Documentation>
+          Set the number of significant digits displayed for the time in the animation
+          toolbar. Should be in the range [1,17].
+        </Documentation>
+        <IntRangeDomain min="1" max="17" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ShowAnimationShortcuts"
+        number_of_elements="1"
+        default_values="0"
+        command="SetShowAnimationShortcuts"
+        panel_visibility="advanced">
+        <Documentation>
+          Set whether to show or not an animation shortcut button
+          on ranged scalar property.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ResetDisplayEmptyViews"
+        number_of_elements="1"
+        default_values="1"
+        command="SetResetDisplayEmptyViews"
+        panel_visibility="advanced">
+        <Documentation>
+          When showing a representation in an empty view, set whether or not to reset
+          the view display.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="RealNumberDisplayedNotation"
+        number_of_elements="1"
+        default_values="0"
+        command="SetRealNumberDisplayedNotation"
+        panel_visibility="advanced">
+        <Documentation>
+          Set the notation used to display real numbers.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed" value="0" />
+          <Entry text="Scientific" value="1" />
+          <Entry text="Fixed" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="RealNumberDisplayedPrecision"
+        number_of_elements="1"
+        default_values="6"
+        command="SetRealNumberDisplayedPrecision"
+        panel_visibility="advanced">
+        <Documentation>
+          Set the number of significant digits to display in real numbers.
+          This does NOT affect the values used in computation.
+        </Documentation>
+        <IntRangeDomain min="1" max="17" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="InheritRepresentationProperties"
+        command="SetInheritRepresentationProperties"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+           Set whether representations try to maintain properties from an input
+           representation, if present. e.g. if you "Transform" the representation for
+           a source, then any filter that you connect to it and show in the same view
+           should be transformed using the same transformation as well.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="DefaultTimeStep"
+        number_of_elements="1"
+        default_values="1">
+        <Documentation>
+          Any time a new dataset with timesteps is opened,
+          set the timestep the application should go to
+          by default.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Leave current time unchanged, if possible" value="0" />
+          <Entry text="Go to first timestep" value="1" />
+          <Entry text="Go to last timestep" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="MaximumNumberOfDataRepresentationLabels"
+        number_of_elements="1"
+        default_values="100"
+        panel_visibility="advanced">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>
+          Set how many points should be labeled when labeling points with data.  If there
+          are more point than this then only a subset will be labeled.  This helps when many
+          points are selected and the number of labels would make then unreadable.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ColorByBlockColorsOnApply"
+        command="SetColorByBlockColorsOnApply"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Internal setting: automatically color by **vtkBlockColors** if array is present.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="IgnoreNegativeLogAxisWarning"
+        command="SetIgnoreNegativeLogAxisWarning"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When plotting data with nonpositive values using logarithmic axes, ignore the
+	  standard warning and draw only the data with positive values. Changes will take
+	  effect for all charts created after this option is changed.
+        </Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="General Options">
+        <Property name="ShowWelcomeDialog" />
+        <Property name="ShowSaveStateOnExit" />
+        <Property name="CrashRecovery" />
+        <Property name="ForceSingleColumnMenus" />
+      </PropertyGroup>
+
+      <PropertyGroup label="GUI Font">
+        <Property name="GUIOverrideFont"/>
+        <Property name="GUIFontSize" />
+      </PropertyGroup>
+
+      <PropertyGroup label="View Options">
+        <Property name="DefaultViewType" />
+        <Property name="ScreenPixelsPerInch" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Properties Panel Options">
+        <Property name="AutoApply" />
+        <Property name="AutoApplyActiveOnly" />
+        <Property name="LoadAllVariables" />
+        <Property name="LoadNoChartVariables" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Color/Opacity Map Range Options">
+        <Property name="TransferFunctionResetMode" />
+        <Property name="ScalarBarMode" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Data Processing Options">
+        <Property name="AutoConvertProperties" />
+        <Property name="BlockColorsDistinctValues" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Multicore Support">
+        <Documentation>
+          On multicore systems, ParaView can run parallel pvserver processes automatically,
+          without you having to launch them manually for processing data in parallel.
+        </Documentation>
+        <Property name="EnableAutoMPI" />
+        <Property name="AutoMPILimit" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Animation">
+        <Property name="CacheGeometryForAnimation" />
+        <!--
+        <Property name="AnimationGeometryCacheLimit" />
+        -->
+        <Property name="AnimationTimePrecision" />
+        <Property name="AnimationTimeNotation" />
+        <Property name="ShowAnimationShortcuts" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Miscellaneous">
+        <Property name="ResetDisplayEmptyViews" />
+        <Property name="RealNumberDisplayedNotation" />
+        <Property name="RealNumberDisplayedPrecision" />
+        <Property name="InheritRepresentationProperties" />
+        <Property name="DefaultTimeStep" />
+        <Property name="MaximumNumberOfDataRepresentationLabels" />
+        <Property name="IgnoreNegativeLogAxisWarning" />
+      </PropertyGroup>
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
+    </SettingsProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

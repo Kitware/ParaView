@@ -1,7 +1,8 @@
 <ServerManagerConfiguration>
+  <!-- ==================================================================== -->
   <ProxyGroup name="extended_sources">
-        <Proxy class="vtkPVTransform"
-           name="Transform2">
+    <!-- ================================================================== -->
+    <Proxy class="vtkPVTransform" name="Transform2">
       <!--Transform proxy with unconventional interface, used by BoxWidget -->
       <DoubleVectorProperty command="SetAbsolutePosition"
                             default_values="0.0 0.0 0.0"
@@ -47,9 +48,9 @@
                             name="ScaleInfo"
                             number_of_elements="3" />
     </Proxy>
-    <Proxy class="vtkPVTransform"
-           label="Transform"
-           name="Transform3">
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkPVTransform" label="Transform" name="Transform3">
       <DoubleVectorProperty command="SetAbsolutePosition"
                             default_values="0.0 0.0 0.0"
                             information_property="PositionInfo"
@@ -102,12 +103,15 @@
          </ProxyList>
       </Hints>
     </Proxy>
+
+    <!-- ================================================================== -->
   </ProxyGroup>
 
+  <!-- ==================================================================== -->
   <ProxyGroup name="implicit_functions">
-    <Proxy class="vtkPVPlane"
-           name="Plane"
-           processes="dataserver|renderserver|client">
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkPVPlane" name="Plane" processes="dataserver|renderserver|client">
       <InputProperty is_internal="1"
                      name="Input"></InputProperty>
       <DoubleVectorProperty command="SetOrigin"
@@ -176,6 +180,8 @@
         </ProxyList>
       </Hints>
     </Proxy>
+
+    <!-- ================================================================== -->
     <Proxy class="vtkPVPlane"
            name="Axis Aligned Plane">
       <InputProperty is_internal="1"
@@ -238,6 +244,8 @@
       </Hints>
       <!-- End of Axis Aligned Plane -->
     </Proxy>
+
+    <!-- ================================================================== -->
     <Proxy class="vtkPVBox" name="Axis Aligned Box">
       <InputProperty is_internal="1" name="Input" />
       <IntVectorProperty name="UseReferenceBounds"
@@ -311,6 +319,8 @@
       </Hints>
       <!-- End of Axis Aligned Box -->
     </Proxy>
+
+    <!-- ================================================================== -->
     <Proxy class="vtkPVBox" name="Box">
       <InputProperty is_internal="1" name="Input" />
       <IntVectorProperty name="UseReferenceBounds"
@@ -386,6 +396,7 @@
       <!-- End of Box -->
     </Proxy>
 
+    <!-- ================================================================== -->
     <Proxy class="vtkPVCylinder" name="Cylinder">
       <InputProperty is_internal="1" name="Input" />
       <DoubleVectorProperty command="SetCenter"
@@ -437,5 +448,7 @@
       </Hints>
       <!-- End of Cylinder -->
     </Proxy>
+
+    <!-- ================================================================== -->
   </ProxyGroup>
 </ServerManagerConfiguration>

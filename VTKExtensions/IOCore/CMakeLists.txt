@@ -45,3 +45,8 @@ set(classes
 
 vtk_module_add_module(ParaView::VTKExtensionsIOCore
   CLASSES ${classes})
+
+paraview_add_server_manager_xmls(
+  XMLS Resources/filters_pv_iocore.xml
+       Resources/readers_pv_iocore.xml
+       Resources/writers_pv_iocore.xml)

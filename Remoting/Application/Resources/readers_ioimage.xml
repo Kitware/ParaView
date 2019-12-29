@@ -1,0 +1,838 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="internal_sources">
+    <!-- ================================================================== -->
+    <Proxy label="Image Reader Core" name="ImageReaderCore" class="vtkImageReader">
+      <Documentation long_help="Reads raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified."
+                     short_help="Read raw regular rectilinear grid data from a file.">
+                     The Image reader reads raw, regular, rectilinear grid
+                     (image/volume) data from a file. Because no metadata is
+                     provided, the user must specify information about the
+                     size, spacing, dimensionality, etc. about the
+                     dataset.</Documentation>
+      <IntVectorProperty command="SetDataScalarType"
+                         default_values="4"
+                         name="DataScalarType"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="char"
+                 value="2" />
+          <Entry text="unsigned char"
+                 value="3" />
+          <Entry text="short"
+                 value="4" />
+          <Entry text="unsigned short"
+                 value="5" />
+          <Entry text="int"
+                 value="6" />
+          <Entry text="unsigned int"
+                 value="7" />
+          <Entry text="long"
+                 value="8" />
+          <Entry text="unsigned long"
+                 value="9" />
+          <Entry text="float"
+                 value="10" />
+          <Entry text="double"
+                 value="11" />
+        </EnumerationDomain>
+        <Documentation>The value of this property indicates the scalar type of
+        the pixels/voxels in the file(s): short, int, float ...</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDataByteOrder"
+                         default_values="0"
+                         name="DataByteOrder"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="BigEndian"
+                 value="0" />
+          <Entry text="LittleEndian"
+                 value="1" />
+        </EnumerationDomain>
+        <Documentation>This property indicates the byte order of the binary
+        file(s).</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetDataOrigin"
+                            default_values="0.0 0.0 0.0"
+                            name="DataOrigin"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The coordinate contained in this property specifies the
+        position of the point with index (0,0,0).</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetDataSpacing"
+                            default_values="1.0 1.0 1.0"
+                            name="DataSpacing"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the size of a voxel in each
+        dimension.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetNumberOfScalarComponents"
+                         default_values="1"
+                         name="NumberOfScalarComponents"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" />
+        <Documentation>This property specifies the number of components the
+        scalar value at each pixel or voxel has (e.g., RGB - 3 scalar
+        components).</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetScalarArrayName"
+                            default_values="ImageFile"
+                            name="ScalarArrayName"
+                            number_of_elements="1">
+        <Documentation>This property contains a text string listing a name to
+        assign to the point-centered data array read.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetFileLowerLeft"
+                         default_values="1"
+                         name="FileLowerLeft"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property determines whether the data originates in
+        the lower left corner (on) or the upper left corner (off). Most
+        scientific data is written with a right-handed axes that originates in
+        the lower left corner. However, several 2D image file formats write the
+        image from the upper left corner.</Documentation>
+      </IntVectorProperty>
+      <!-- End ImageReaderCore -->
+    </Proxy>
+
+    <!-- ============================================================= -->
+    <Proxy class="vtkPNGReader"
+                 label="PNG Reader"
+                 name="PNGReader">
+      <Documentation long_help="Reads a PNG file into an image data."
+                     short_help="Read a PNG file.">The PNG reader reads PNG
+                     (Portable Network Graphics) files, and the output is a
+                     uniform rectilinear (image/volume) dataset. The default
+                     file extension is .png.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the PNG
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty name="DataSpacing"
+                            command="SetDataSpacing"
+                            number_of_elements="3"
+                            default_values="1 1 1">
+        <DoubleRangeDomain name="range" min="0 0 0" />
+        <Documentation>
+          Set the spacing to use for the image output by this reader.
+        </Documentation>
+      </DoubleVectorProperty>
+      <!-- End PNGReader -->
+    </Proxy>
+
+    <!-- ============================================================= -->
+    <Proxy class="vtkJPEGReader"
+                 label="JPEG Reader"
+                 name="JPEGReader">
+      <Documentation long_help="Reads a JPEG file into an image data."
+                     short_help="Read a JPEG file.">The JPEG reader reads JPEG
+                     files, and the output is a uniform rectilinear
+                     (image/volume) dataset. The default file extension is .jpg
+                     or .jpeg.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the PNG
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty name="DataSpacing"
+                            command="SetDataSpacing"
+                            number_of_elements="3"
+                            default_values="1 1 1">
+        <DoubleRangeDomain name="range" min="0 0 0" />
+        <Documentation>
+          Set the spacing to use for the image output by this reader.
+        </Documentation>
+      </DoubleVectorProperty>
+      <!-- End JPEGReader -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkMRCReader" label="MRC Reader" name="MRCReader">
+      <Documentation long_help="Reads a MRC file into an image data."
+                     short_help="Read a MRC file.">The MRC reader reads MRC
+                     (Medical Research Council) image files, and the output is a
+                     uniform rectilinear (image/volume) dataset. The default
+                     file extension is .mrc but .st, .rec and .ali extensions
+                     are known to be commonly used as well.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>The name of the file to load.</Documentation>
+      </StringVectorProperty>
+      <!-- End MRCReader -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkTIFFReader" label="TIFF Reader" name="TIFFReader">
+      <Documentation long_help="Reads a TIFF file into an image data."
+                     short_help="Read a TIFF file.">The TIFF reader reads TIFF
+                     (Tagged Image File Format) files, and the output is a
+                     uniform rectilinear (image/volume) dataset. The default
+                     file extension is .tiff.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the TIFF
+        reader.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty name="UseCustomDataSpacing"
+                         command="SetSpacingSpecifiedFlag"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          To manually specify a custom spacing using **CustomDataSpacing**, set this property to 1 (checked).
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="CustomDataSpacing"
+                            command="SetDataSpacing"
+                            information_property="CustomDataSpacingInfo"
+                            number_of_elements="3"
+                            default_values="1 1 1">
+        <DoubleRangeDomain name="range" min="0 0 0" />
+        <Documentation>
+          Set the spacing to use for the image output by this reader. This is used only when
+          **UseCustomDataSpacing** is set to true.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseCustomDataSpacing" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="CustomDataSpacingInfo"
+                            command="GetDataSpacing"
+                            information_only="1">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <!-- End TIFFReader -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkMetaImageReader"
+                 label="Meta Image reader"
+                 name="MetaImageReaderCore">
+      <Documentation long_help="Reads binary UNC meta image data."
+                     short_help="Read UNC meta image data.">The Meta Image
+                     Reader reads binary UNC meta image data, and produces
+                     uniform rectilinear (image/volume) data. The default file
+                     extensions are .mhd and .mha.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the Meta Image
+        reader.</Documentation>
+      </StringVectorProperty>
+      <!-- End Meta Image Reader -->
+    </Proxy>
+
+    <!-- end of "internal_sources" -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkRawImageFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="Image Reader"
+                 name="ImageReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads a series of raw files into an time sequence of image datas."
+                     short_help="Read a series of raw files.">The raw series
+                     reader reads raw files. The output is a time sequence of
+                     uniform rectilinear (image/volume) dataset. The default
+                     file extension is .raw.</Documentation>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader. If more than
+        one file is specified, the reader will switch to file series mode in
+        which it will pretend that it can support time and provide one file per
+        time step.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ReadAsImageStack"
+                         command="SetReadAsImageStack"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the reader will read the set of files as an image stack, rather than
+          a temporal file series.
+        </Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="ImageReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="DataScalarType" />
+          <Property name="DataByteOrder" />
+          <Property name="DataOrigin" />
+          <Property name="DataSpacing" />
+          <Property name="NumberOfScalarComponents" />
+          <Property name="FileLowerLeft" />
+          <Property name="ScalarArrayName" />
+        </ExposedProperties>
+      </SubProxy>
+      <IntVectorProperty command="SetFileDimensionality"
+                         default_values="3"
+                         name="FileDimensionality"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="2"
+                 value="2" />
+          <Entry text="3"
+                 value="3" />
+        </EnumerationDomain>
+        <Documentation>This property indicates whether the file(s) in this
+        dataset contain slices (2D) or volumes (3D).</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDataExtent"
+                         default_values="0 0 0 0 0 0"
+                         name="DataExtent"
+                         number_of_elements="6">
+        <IntRangeDomain name="range" />
+        <Documentation>This property specifies the minimum and maximum index
+        values of the data in each dimension (xmin, xmax, ymin, ymax, zmin,
+        zmax).</Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="raw"
+                       file_description="Raw (binary) Files" />
+      </Hints>
+      <!-- End RAWSeriesReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkOMETIFFReader"
+                 label="OME TIFF Reader"
+                 name="OMETIFFReader">
+      <Documentation long_help="Reads an OME-TIFF file."
+        short_help="Reads an OME-TIFF file.">
+        Supports reading OME-TIFF files.
+      </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the OME-TIFF reader.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty name="UseCustomDataSpacing"
+                         command="SetSpacingSpecifiedFlag"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          To manually specify a custom spacing using **CustomDataSpacing**, set this property to 1 (checked).
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="CustomDataSpacing"
+                            command="SetDataSpacing"
+                            information_property="CustomDataSpacingInfo"
+                            number_of_elements="3"
+                            default_values="1 1 1">
+        <DoubleRangeDomain name="range" min="0 0 0" />
+        <Documentation>
+          Set the spacing to use for the image output by this reader. This is used only when
+          **UseCustomDataSpacing** is set to 1.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseCustomDataSpacing" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="CustomDataSpacingInfo"
+                            command="GetDataSpacing"
+                            information_only="1">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <IntVectorProperty name="IgnoreColorMap"
+                         command="SetIgnoreColorMap"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When checked, data values in the TIFF file will not be mapped to colors using the
+          color map specified in the TIFF, if any. This is useful for files where the
+          color map may be incorrectly specified.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="ome.tif ome.tiff"
+                       file_description="OME TIFF Files" />
+      </Hints>
+      <!-- End OMETIFFReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkImageFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="PNG Series Reader"
+                 name="PNGSeriesReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads a PNG file into an image data."
+                     short_help="Read a PNG file.">The PNG reader reads PNG
+                     (Portable Network Graphics) files, and the output is a
+                     uniform rectilinear (image/volume) dataset. The default
+                     file extension is .png.</Documentation>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader. If more than
+        one file is specified, the reader will switch to file series mode in
+        which it will pretend that it can support time and provide one file per
+        time step.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ReadAsImageStack"
+                         command="SetReadAsImageStack"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the reader will read the set of files as an image stack, rather than
+          a temporal file series.
+        </Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="PNGReader"></Proxy>
+        <ExposedProperties>
+          <Property name="DataSpacing" />
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <ReaderFactory extensions="png"
+                       file_description="PNG Image Files" />
+      </Hints>
+      <!-- End PNGSeriesReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkImageFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="JPEG Series Reader"
+                 name="JPEGSeriesReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads a series of JPEG files into an time sequence of image datas."
+                     short_help="Read a series of JPEG files.">The JPEG series
+                     reader reads JPEG files. The output is a time sequence of
+                     uniform rectilinear (image/volume) dataset. The default
+                     file extension is .jpg or .jpeg.</Documentation>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader. If more than
+        one file is specified, the reader will switch to file series mode in
+        which it will pretend that it can support time and provide one file per
+        time step.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ReadAsImageStack"
+                         command="SetReadAsImageStack"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the reader will read the set of files as an image stack, rather than
+          a temporal file series.
+        </Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="JPEGReader"></Proxy>
+        <ExposedProperties>
+          <Property name="DataSpacing" />
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <ReaderFactory extensions="jpg jpeg"
+                       file_description="JPEG Image Files" />
+      </Hints>
+      <!-- End JPEGSeriesReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkImageFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="MRC Series Reader"
+                 name="MRCSeriesReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads a series of MRC files into an time sequence of image datas."
+                     short_help="Read a series of MRC files.">The MRC series
+                     reader reads MRC files. The output is a time sequence of
+                     uniform rectilinear (image/volume) dataset. The default
+                     file extension is .mrc but .ali, .st and .rec are also
+                     recognized.</Documentation>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader. If more than
+        one file is specified, the reader will switch to file series mode in
+        which it will pretend that it can support time and provide one file per
+        time step.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="MRCReader"></Proxy>
+      </SubProxy>
+      <Hints>
+        <ReaderFactory extensions="mrc ali st rec"
+                       file_description="MRC Image Files" />
+      </Hints>
+      <!-- End MRCSeriesReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkImageFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="TIFF Series Reader"
+                 name="TIFFSeriesReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads a series of TIFF files into an time sequence of image datas."
+                     short_help="Read a series of TIFF files.">The TIFF series
+                     reader reads TIFF files. The output is a time sequence of
+                     uniform rectilinear (image/volume) dataset. The default
+                     file extension is .tif or .tiff.</Documentation>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader. If more than
+        one file is specified, the reader will switch to file series mode in
+        which it will pretend that it can support time and provide one file per
+        time step.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ReadAsImageStack"
+                         command="SetReadAsImageStack"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the reader will read the set of files as an image stack, rather than
+          a temporal file series.
+        </Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="TIFFReader"></Proxy>
+        <ExposedProperties>
+          <Property name="UseCustomDataSpacing" />
+          <Property name="CustomDataSpacing" />
+          <Property name="CustomDataSpacingInfo" />
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <ReaderFactory extensions="tif tiff"
+                       file_description="TIFF Image Files" />
+      </Hints>
+      <!-- End TIFFSeriesReader -->
+    </SourceProxy>
+
+    <!-- ============================================================= -->
+    <SourceProxy class="vtkTIFFReader"
+                 label="TIFF Reader"
+                 name="TIFFReader">
+      <Documentation long_help="Reads a TIFF file into an image data."
+                     short_help="Read a TIFF file.">The TIFF reader reads TIFF
+                     (Tagged Image File Format) files, and the output is a
+                     uniform rectilinear (image/volume) dataset. The default
+                     file extension is .tiff.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the TIFF
+        reader.</Documentation>
+      </StringVectorProperty>
+      <!-- this deliberately doesn't have ReaderFactory hints
+           TIFFSeriesReader can actually read whatever this reader reads. This is here
+           only for backward compatibility.  -->
+      <!-- End TIFFReader -->
+    </SourceProxy>
+
+    <!-- ============================================================= -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="Meta File Series Reader"
+                 name="MetaImageReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads a series of meta images."
+                     short_help="Read a series of meta images.">Read a series
+                     of meta images. The file extension is .mhd</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="MetaImageReaderCore"></Proxy>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader. Each file is
+        expected to be in the meta format. The standard extension is .mhd. If
+        more than one file is specified, the reader will switch to file series
+        mode in which it will pretend that it can support time and provide one
+        file per time step.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="mhd mha"
+                       file_description="Meta Image Files" />
+      </Hints>
+      <!-- end of MetaFileSeriesReader -->
+    </SourceProxy>
+
+    <!-- ============================================================= -->
+    <SourceProxy class="vtkDEMReader"
+                 label="DEM Reader"
+                 name="DEMReader">
+      <Documentation long_help="Reads a DEM (Digital Elevation Model) file."
+                     short_help="Read a dataset in DEM format">The DEM reader
+                     reads Digital Elevation Model files containing elevation
+                     values derived from the U. S. Geologic Survey. The default
+                     file extension is .dem. This reader produces uniform
+                     rectilinear (image/volume) data output.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the DEM
+        (Digital Elevation Map) reader.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="dem"
+                       file_description="Digital Elevation Map Files" />
+      </Hints>
+      <!-- End DEMReader -->
+    </SourceProxy>
+
+    <!-- ============================================================= -->
+    <SourceProxy class="vtkNrrdReader"
+                 label="Nrrd Reader"
+                 name="NrrdReader">
+      <Documentation long_help="Reads raw image files with Nrrd meta data."
+                     short_help="Read raw image files with Nrrd meta data.">The
+                     Nrrd reader reads raw image data much like the Raw Image
+                     Reader except that it will also read metadata information
+                     in the Nrrd format. This means that the reader will
+                     automatically set information like file dimensions. There
+                     are several limitations on what type of nrrd files we can
+                     read. This reader only supports nrrd files in raw format.
+                     Other encodings like ascii and hex will result in errors.
+                     When reading in detached headers, this only supports
+                     reading one file that is detached.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>The name of the file to read (or the meta data file that
+        will point to the actual file).</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetDataVOI"
+                         default_values="0 0 0 0 0 0"
+                         label="Data VOI"
+                         name="DataVOI"
+                         number_of_elements="6">
+        <Documentation>The data volume of interest (VOI). The VOI is a
+        sub-extent of the data that you want loaded. Setting a VOI is useful
+        when reading from a large data set and you are only interested in a
+        small portion of the data. If left containing all 0's, then the reader
+        will load in the entire data set.</Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="nrrd nhdr"
+                       file_description="Nrrd Raw Image Files" />
+      </Hints>
+      <!-- NrrdReader -->
+    </SourceProxy>
+
+    <!-- ============================================================= -->
+    <SourceProxy label="DICOM Reader (Single File)"
+                 name="DICOMReaderSingle"
+                 class="vtkDICOMImageReader">
+      <Documentation long_help="Reads DICOM regular rectilinear grid data from a lone file."
+                     short_help="Reads DICOM file">
+        DICOM is a file format often used in medical imaging. This version
+        of the reader reads a single file (as opposed to a collection of
+        files). The DICOM reader currently only supports uncompressed
+        files.
+      </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>
+          DICOM file to load. This version of the reader only supports
+          loading one file at a time.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="dcm"
+                       file_description="DICOM Files (single)" />
+      </Hints>
+      <!-- End DICOMReaderSingle -->
+    </SourceProxy>
+
+    <!-- ============================================================= -->
+    <SourceProxy label="DICOM Reader (directory)"
+                 name="DICOMReader"
+                 class="vtkDICOMImageReader">
+      <Documentation long_help="Reads DICOM regular rectilinear grid data from a directory containing a file."
+                     short_help="Reads DICOM files.">
+        DICOM is a file format often used in medical imaging. This version
+        of the reader will look at all files in the same directory of the
+        selected file and load them as planes of the same data set. It is
+        typically for 3D medical scanners to store planes as set of files
+        in a directory.
+      </Documentation>
+      <Hints>
+        <ReaderFactory extensions="dcm"
+                       file_description="DICOM Files (directory)" />
+      </Hints>
+      <StringVectorProperty animateable="0"
+                            command="SetDirectoryName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>
+          A file in the directory of files to be loaded. The DICOM reader
+          will actually load all valid DICOM files in the same directory as
+          this file as part of the same dataset. This is typical of how
+          DICOM files are often stored.
+        </Documentation>
+        <Hints>
+          <UseDirectoryName />
+        </Hints>
+      </StringVectorProperty>
+      <!-- End DICOMReaderDirectory -->
+    </SourceProxy>
+
+    <!-- ============================================================= -->
+    <SourceProxy name="SEPReader" class="vtkSEPReader" label="SEP Reader">
+      <Documentation
+        short_help="Stanford Exploration Project files reader."
+        long_help="This reader takes a .H file that points to a .H@ file and contains all the information to interpret the raw data in the .H@ file.">
+      </Documentation>
+       <Hints>
+          <ReaderFactory extensions="H" file_description="SEP file (Plugin)"/>
+       </Hints>
+       <StringVectorProperty name="FileName" command="SetFileName" animateable="0" number_of_elements="1">
+           <FileListDomain name="files"/>
+       </StringVectorProperty>
+    </SourceProxy>
+
+    <!-- ============================================================= -->
+
+    <!-- end of "readers" -->
+  </ProxyGroup>
+
+</ServerManagerConfiguration>

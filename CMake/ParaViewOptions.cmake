@@ -266,11 +266,6 @@ paraview_require_module(
   MODULES   VTK::RenderingMatplotlib)
 
 paraview_require_module(
-  CONDITION PARAVIEW_USE_MPI AND PARAVIEW_BUILD_CANONICAL
-  MODULES   VTK::IOMPIImage
-            VTK::IOParallelNetCDF)
-
-paraview_require_module(
   CONDITION PARAVIEW_USE_MPI AND PARAVIEW_USE_PYTHON
   MODULES   VTK::ParallelMPI4Py)
 
@@ -352,9 +347,11 @@ paraview_require_module(
           VTK::FiltersOpenTURNS
           VTK::FiltersParallel
           VTK::FiltersParallelDIY2
+          VTK::FiltersParallelGeometry
           VTK::FiltersParallelVerdict
           VTK::FiltersSources
           VTK::FiltersStatistics
+          VTK::FiltersTexture
           VTK::FiltersVerdict
           VTK::ImagingCore
           VTK::ImagingFourier
@@ -364,23 +361,37 @@ paraview_require_module(
           VTK::IOAMR
           VTK::IOAsynchronous # needed for cinema
           VTK::IOCityGML
+          VTK::IOGeometry
           VTK::IOH5part
+          VTK::IOImage
+          VTK::IOInfovis
+          VTK::IOLegacy
+          VTK::IONetCDF
           VTK::IOOggTheora
+          VTK::IOParallel
+          VTK::IOParallelExodus
           VTK::IOParallelLSDyna
+          VTK::IOParallelXML
           VTK::IOPIO
           VTK::IOSegY
           VTK::IOTecplotTable
           VTK::IOTRUCHAS
           VTK::IOVeraOut
-          VTK::IOVPIC)
+          VTK::IOVPIC
+          VTK::IOXML)
 
 paraview_require_module(
   CONDITION PARAVIEW_BUILD_RENDERING
-  MODULES   VTK::FiltersTexture)
+  MODULES   VTK::FiltersTexture
+            VTK::RenderingFreeType)
 
 paraview_require_module(
   CONDITION PARAVIEW_USE_MPI AND PARAVIEW_BUILD_CANONICAL
-  MODULES   VTK::FiltersParallelFlowPaths)
+  MODULES   VTK::FiltersParallelFlowPaths
+            VTK::FiltersParallelGeometry
+            VTK::FiltersParallelMPI
+            VTK::IOMPIImage
+            VTK::IOParallelNetCDF)
 
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_WEB

@@ -1,0 +1,1572 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkArrowSource"
+                 label="Arrow"
+                 name="ArrowSource">
+      <Documentation long_help="3D arrow with a long cylindrical shaft and a cone for the tip"
+                     short_help="Create a 3D arrow">The Arrow source appends a
+                     cylinder to a cone to form a 3D arrow. The length of the
+                     whole arrow is 1.0 unit. The output of the Arrow source is
+                     polygonal data. This polygonal data will not contain
+                     normals, so rendering of the arrow will be performed using
+                     flat shading. The appearance of the arrow can be improved
+                     without significantly increasing the resolution of the tip
+                     and shaft by generating normals. (Use Normals Generation
+                     filter).</Documentation>
+      <IntVectorProperty command="SetTipResolution"
+                         default_values="6"
+                         name="TipResolution"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain max="128"
+                        min="1"
+                        name="range" />
+        <Documentation>This property specifies the number of faces in the
+        representation of the tip of the arrow (the cone). As the resolution
+        increases, the cone will become smoother.</Documentation>
+      </IntVectorProperty>
+      <!-- These arbitrary ranges come from the header file for vtkArrowSource.-->
+      <DoubleVectorProperty command="SetTipRadius"
+                            default_values="0.1"
+                            name="TipRadius"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain max="10"
+                           min="0"
+                           name="range" />
+        <Documentation>This property specifies the radius of the widest part of
+        the tip of the arrow (the cone).</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetTipLength"
+                            default_values="0.35"
+                            name="TipLength"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Documentation>This property specifies the length of the
+        tip.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetShaftResolution"
+                         default_values="6"
+                         name="ShaftResolution"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain max="128"
+                        min="0"
+                        name="range" />
+        <Documentation>This property specifies the number of faces of the shaft
+        of the arrow (the cylinder). As the resolution increases, the cylinder
+        will become smoother.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetShaftRadius"
+                            default_values="0.03"
+                            name="ShaftRadius"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain max="5"
+                           min="0"
+                           name="range" />
+        <Documentation>This property specifies the radius of the shaft of the
+        arrow (the cylinder).</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetInvert"
+                         default_values="0"
+                         name="Invert"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <BooleanDomain name="bool" />
+        <Documentation>Inverts the arrow direction.</Documentation>
+      </IntVectorProperty>
+      <!-- End Arrow -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkCellTypeSource"
+                 label="Unstructured Cell Types"
+                 name="UnstructuredCellTypes">
+      <Documentation long_help="Generates cells of the specified type."
+                     short_help="Generate cells of the specified type">
+        Generate cells of the specified type. If a 1D cell type is chosen then
+        only the first value of BlocksDimension is used. If a 2D cell type is chosen
+        then only the first and second value of BlocksDimension is used. A cell block
+        may be divided into multiple cells (e.g. 6 pyramids will be in a cell block).
+
+        Note that not all meshes generated for Lagrange cells (particularly tetrahedra)
+        will be conformal; their boundaries will not meet exactly at block boundaries.
+      </Documentation>
+      <IntVectorProperty command="SetCellType"
+                         default_values="12"
+                         name="CellType"
+                         number_of_elements="1">
+        <Documentation>This property specifies the type of cells to generate.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Line"
+                 value="3" />
+          <Entry text="Quadratic Line"
+                 value="21" />
+          <Entry text="Cubic Line"
+                 value="35" />
+          <Entry text="Triangle"
+                 value="5" />
+          <Entry text="Quad"
+                 value="9" />
+          <Entry text="Quadratic Triangle"
+                 value="22" />
+          <Entry text="Quadratic Quad"
+                 value="23" />
+          <Entry text="Tet"
+                 value="10" />
+          <Entry text="Hex"
+                 value="12" />
+          <Entry text="Wedge"
+                 value="13" />
+          <Entry text="Pyramid"
+                 value="14" />
+          <Entry text="Quadratic Tet"
+                 value="24" />
+          <Entry text="Quadratic Hex"
+                 value="25" />
+          <Entry text="Quadratic Wedge"
+                 value="26" />
+          <Entry text="Quadratic Pyramid"
+                 value="27" />
+          <Entry text="Lagrange Curve"
+                 value="68" />
+          <Entry text="Lagrange Triangle"
+                 value="69" />
+          <Entry text="Lagrange Quadrilateral"
+                 value="70" />
+          <Entry text="Lagrange Tetrahedron"
+                 value="71" />
+          <Entry text="Lagrange Hexahedron"
+                 value="72" />
+          <Entry text="Lagrange Wedge"
+                 value="73" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOutputPrecision"
+                         default_values="0"
+                         name="OutputPrecision"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>This property specifies the precision of point locations and fields.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Single"
+                 value="0" />
+          <Entry text="Double"
+                 value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPolynomialFieldOrder"
+                         default_values="1"
+                         name="PolynomialFieldOrder"
+                         number_of_elements="1">
+        <Documentation>This property specifies the order for the "Polynomial" point data field.
+        </Documentation>
+        <IntRangeDomain min="0"
+                        name="range" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBlocksDimensions"
+                         default_values="10 10 10"
+                         name="BlocksDimensions"
+                         number_of_elements="3">
+        <IntRangeDomain min="1 1 1"
+                        name="range" />
+        <Documentation>Sets the number of blocks of cells in each direction.
+        A cell block may be divided into multiple cells (e.g. there will be
+        6 pyramid cells in a cell block). If a 1D cell type is chosen only
+        the first blocks dimension will be used. If a 2D cell type is chosen the
+        first and second blocks dimensions will be used.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCellOrder"
+                         default_values="3"
+                         name="CellOrder"
+                         number_of_elements="1">
+        <Documentation>This property specifies the interpolation order for Lagrange cell types.
+        </Documentation>
+        <IntRangeDomain min="1" max="10" name="range" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCompleteQuadraticSimplicialElements"
+                         default_values="0"
+                         name="CompleteQuadraticSimplicialElements"
+                         label="Add nodes to complete polynomial basis"
+                         number_of_elements="1">
+        <Documentation>When true, some quadratic Lagrange cell types will have additional nodes.
+
+        Specifically,
+        triangles will have 7 points instead of 6;
+        tetrahedra will have 15 points instead of 10; and
+        wedges will have 21 points instead of 18.
+        These additional points increase the number of polynomial terms
+        in each element so that the shape functions can span a larger
+        space of polynomial functions.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- End of CellTypeSource -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkConeSource"
+                 name="Test3DWidget">
+      <IntVectorProperty command="SetResolution"
+                         default_values="6"
+                         name="Resolution"
+                         number_of_elements="1">
+        <IntRangeDomain max="128"
+                        min="1"
+                        name="range" />
+        <Documentation>Set the number of faces used to generate the
+        cone.</Documentation>
+      </IntVectorProperty>
+      <!-- End Test3DWidget -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkConeSource"
+                 label="Cone"
+                 name="ConeSource">
+      <Documentation long_help="Create a 3D cone of a given radius and height."
+                     short_help="3D cone of a given radius and height">The Cone
+                     source can be used to add a polygonal cone to the 3D
+                     scene. The output of the Cone source is polygonal
+                     data.</Documentation>
+      <IntVectorProperty animateable="1"
+                         command="SetResolution"
+                         default_values="6"
+                         name="Resolution"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <IntRangeDomain max="512"
+                        min="0"
+                        name="range" />
+        <Documentation>This property indicates the number of divisions around
+        the cone. The higher this number, the closer the polygonal
+        approximation will come to representing a cone, and the more polygons
+        it will contain.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetRadius"
+                            default_values="0.5"
+                            name="Radius"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>This property specifies the radius of the base of the
+        cone.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetHeight"
+                            default_values="1.0"
+                            name="Height"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>This property specifies the height of the
+        cone.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetCenter"
+                            default_values="0.0 0.0 0.0"
+                            name="Center"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the center of the
+        cone.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetDirection"
+                            default_values="1.0 0.0 0.0"
+                            name="Direction"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Set the orientation vector of the cone. The vector does
+        not have to be normalized. The cone will point in the direction
+        specified.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetCapping"
+                         default_values="1"
+                         name="Capping"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, the base of the cone will
+        be capped with a filled polygon. Otherwise, the base of the cone will
+        be open.</Documentation>
+      </IntVectorProperty>
+      <!-- End Cone -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkCubeSource"
+                 label="Box"
+                 name="CubeSource">
+      <Documentation long_help="Create a box with specified X, Y, and Z lengths."
+                     short_help="3D box with specified X, Y, and Z lengths">The
+                     Box source can be used to add a box to the 3D scene. The
+                     output of the Box source is polygonal data containing both
+                     normals and texture coordinates.</Documentation>
+      <DoubleVectorProperty animateable="1"
+                            command="SetXLength"
+                            default_values="1.0"
+                            name="XLength"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>This property specifies the length of the box in the X
+        direction.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetYLength"
+                            default_values="1.0"
+                            name="YLength"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>This property specifies the length of the box in the Y
+        direction.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetZLength"
+                            default_values="1.0"
+                            name="ZLength"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>This property specifies the length of the box in the Z
+        direction.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetCenter"
+                            default_values="0.0 0.0 0.0"
+                            name="Center"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the center of the
+        box.</Documentation>
+      </DoubleVectorProperty>
+      <!-- End Box -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkCylinderSource"
+                 label="Cylinder"
+                 name="CylinderSource">
+      <Documentation long_help="Create a 3D cylinder of a given radius and height."
+                     short_help="3D cylinder of a given radius and height">The
+                     Cylinder source can be used to add a polygonal cylinder to
+                     the 3D scene. The output of the Cylinder source is
+                     polygonal data containing both normals and texture
+                     coordinates.</Documentation>
+      <IntVectorProperty command="SetResolution"
+                         default_values="6"
+                         name="Resolution"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <IntRangeDomain max="512"
+                        min="2"
+                        name="range" />
+        <Documentation>This property indicates the number of divisions around
+        the cylinder. The higher this number, the closer the polygonal
+        approximation will come to representing a cylinder, and the more
+        polygons it will contain.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetHeight"
+                            default_values="1.0"
+                            name="Height"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>This property specifies the height of the cylinder
+        (along the y axis).</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetRadius"
+                            default_values="0.5"
+                            name="Radius"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>This property specifies the radius of the
+        cylinder.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetCenter"
+                            default_values="0.0 0.0 0.0"
+                            name="Center"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the coordinate value at the
+        center of the cylinder.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetCapping"
+                         default_values="1"
+                         name="Capping"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, the ends of the cylinder
+        will each be capped with a closed polygon. Otherwise, the ends of the
+        cylinder will be open.</Documentation>
+      </IntVectorProperty>
+      <!-- End Cylinder -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkDiskSource"
+                 label="Disk"
+                 name="DiskSource">
+      <Documentation long_help="Create a 3D disk with a specified inner and outer radius."
+                     short_help="Create a 3D disk">The Disk source can be used
+                     to add a polygonal disk to the 3D scene. The output of the
+                     Disk source is polygonal data.</Documentation>
+      <DoubleVectorProperty animateable="1"
+                            command="SetInnerRadius"
+                            default_values="0.5"
+                            name="InnerRadius"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>Specify inner radius of hole in disc.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetOuterRadius"
+                            default_values="1.0"
+                            name="OuterRadius"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>Specify outer radius of disc.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetRadialResolution"
+                         default_values="8"
+                         name="RadialResolution"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain max="1024"
+                        min="3"
+                        name="range" />
+        <Documentation>Set the number of points in radial
+        direction.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCircumferentialResolution"
+                         default_values="8"
+                         name="CircumferentialResolution"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain max="1024"
+                        min="3"
+                        name="range" />
+        <Documentation>Set the number of points in circumferential
+        direction.</Documentation>
+      </IntVectorProperty>
+      <!-- End DiscSource -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkEllipseArcSource"
+                 label="Ellipse"
+                 name="EllipseSource">
+      <Documentation short_help="Create an elliptical arc">
+        Source that creates an elliptical arc
+        defined by a normal, a center, a major radius vector (the direction in
+        which the ellipse is longest), and a ratio defined as the minor radius over
+        the major radius. A starting angle and segment angle control the starting
+        and ending points on the ellipse perimeter, enabling creation of only a
+        section of the ellipse. The number of segments in the polyline is controlled
+        by setting the object resolution.
+      </Documentation>
+      <DoubleVectorProperty command="SetCenter"
+                            default_values="0.0 0.0 0.0"
+                            name="Center"
+                            number_of_elements="3" >
+        <DoubleRangeDomain name="range" />
+        <Documentation>The center of the ellipse.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetNormal"
+                            default_values="0.0 0.0 1.0"
+                            name="Normal"
+                            number_of_elements="3" >
+        <DoubleRangeDomain name="range" />
+        <Documentation>The normal of the plane containing the ellipse.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetResolution"
+                         default_values="100"
+                         name="Resolution"
+                         number_of_elements="1" >
+        <IntRangeDomain max="1024" min="8" name="range" />
+        <Documentation>Number of line segments in the polyline defining the ellipse edge.</Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetMajorRadiusVector"
+                            default_values="1.0 0.0 0.0"
+                            name="MajorRadiusVector"
+                            number_of_elements="3" >
+        <DoubleRangeDomain name="range" />
+        <Documentation>The origin of polar angle and the major radius size.</Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetRatio"
+                            default_values="1.0"
+                            name="Ratio"
+                            number_of_elements="1" >
+        <DoubleRangeDomain name="range" min="0.001" max="1.0" />
+        <Documentation>Ratio of the ellipse defined as minor radius / major radius. Valid
+        values are in the range [0.001, 1.0].</Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetStartAngle"
+                            default_values="0.0"
+                            name="StartAngle"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="-360.0" max="360.0" />
+        <Documentation>The angle (in degrees) where the ellipse begins relative to the
+        **Major Radius Vector**.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetSegmentAngle"
+                            default_values="360.0"
+                            name="SectorAngle"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="0" max="360.0" />
+        <Documentation>The angular sector occupied by the arc, measured in degrees from
+        the **Start Angle**.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetClose"
+                         default_values="1"
+                         name="Close"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>When on, closes the elliptical arc by adding a line segment between
+        the last point and the first point.</Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkGlyphSource2D"
+                 label="2D Glyph"
+                 name="GlyphSource2D">
+      <Documentation long_help="Create a 2D glyph (e.g., arrow, cross, dash, etc.)"
+                     short_help="Create a 2D glyph">The 2D Glyph source is used
+                     for generating a family of 2D glyphs, each of which lies
+                     in the x-y plane. The output of the 2D Glyph source is
+                     polygonal data.</Documentation>
+      <IntVectorProperty command="SetGlyphType"
+                         default_values="9"
+                         name="GlyphType"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Vertex"
+                 value="1" />
+          <Entry text="Dash"
+                 value="2" />
+          <Entry text="Cross"
+                 value="3" />
+          <Entry text="ThickCross"
+                 value="4" />
+          <Entry text="Triangle"
+                 value="5" />
+          <Entry text="Square"
+                 value="6" />
+          <Entry text="Circle"
+                 value="7" />
+          <Entry text="Diamond"
+                 value="8" />
+          <Entry text="Arrow"
+                 value="9" />
+          <Entry text="ThickArrow"
+                 value="10" />
+          <Entry text="HookedArrow"
+                 value="11" />
+          <Entry text="EdgeArrow"
+                 value="12" />
+        </EnumerationDomain>
+        <Documentation>This property specifies the type of the 2D
+        glyph.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFilled"
+                         default_values="0"
+                         name="Filled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the value of this property is 1, the 2D glyph will be
+        a filled polygon; otherwise, only the edges (line segments) will be
+        included in the output. This only applies to closed 2D
+        glyphs.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetCenter"
+                            default_values="0.0 0.0 0.0"
+                            name="Center"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Set the x, y, z coordinates of the origin of the 2D
+        glyph.</Documentation>
+      </DoubleVectorProperty>
+      <!-- End 2DGlyph -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkHyperTreeGridSource"
+                 label="Hyper Tree Grid"
+                 name="HyperTreeGridSource">
+      <Documentation long_help="Hyper tree grid representing a tree-based AMR data set"
+                     short_help="Create a hyper tree grid">This source uses input parameters,
+                     most notably a string descriptor, to generate a vtkHyperTreeGrid instance
+                     representing the corresponding a tree-based AMR grid with arbitrary rectilinear
+                     geometry and either binary or ternary subdivision.</Documentation>
+      <IntVectorProperty command="SetDimensions"
+                         default_values="2 2 2"
+                         name="Dimensions"
+                         number_of_elements="3">
+        <IntRangeDomain name="range" />
+        <Documentation>The three values in this property specify the number
+        of points in each dimension of the hyper tree grid.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetGridScale"
+                         default_values="1 1 1"
+                         name="GridScale"
+                         number_of_elements="3">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>The three values in this property specify the scale
+        of the root cells in each dimension of the hyper tree grid.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetBranchFactor"
+                         default_values="2"
+                         name="BranchFactor"
+                         number_of_elements="1">
+        <IntRangeDomain max="3"
+                        min="2"
+                        name="range" />
+        <Documentation>This property specifies the subdivision scheme
+        (binary or ternary) of the hyper tree grid.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMaxDepth"
+                         default_values="1"
+                         name="MaxDepth"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>The value of this property specifies the maximum
+        number of levels in the hyper tree grid.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetDescriptor"
+                            default_values="."
+                            name="Descriptor"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <Hints>
+          <Widget type="multi_line" />
+        </Hints>
+        <Documentation>This property specifies the string used to describe
+        the hyper tree grid.</Documentation>
+      </StringVectorProperty>
+      <!-- End Hyper Tree Grid -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkLineSource"
+                 label="Line"
+                 name="LineSource">
+      <Documentation long_help="This source creates a line between two points. The resolution indicates how many segments are in the line."
+                     short_help="Create a line between two points">The Line
+                     source can be used to interactively (using a 3D widget) or
+                     manually (using the entries on the user interface) add a
+                     line to the 3D scene. The output of the Line source is
+                     polygonal data.</Documentation>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint1"
+                            default_values="-0.5 0.0 0.0"
+                            name="Point1"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property controls the coordinates of the first
+        endpoint of the line.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint2"
+                            default_values="0.5 0.0 0.0"
+                            name="Point2"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property controls the coordinates of the second
+        endpoint of the line.</Documentation>
+       </DoubleVectorProperty>
+      <IntVectorProperty name="UseRegularRefinement"
+                         command="SetUseRegularRefinement"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If set, the line segment will be generated with regular subdivisions (specified
+          by **Resolution**), else the subdivisions must be explicitly specified.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetResolution"
+                         default_values="6"
+                         name="Resolution"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>This property specifies the number of pieces into which
+          to divide the line.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseRegularRefinement"
+                                   value="1" />
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="RefinementRatios"
+                            repeat_command="1"
+                            number_of_elements_per_command="1"
+                            use_index="1"
+                            command="SetRefinementRatio"
+                            set_number_command="SetNumberOfRefinementRatios"
+                            number_of_elements="2"
+                            default_values="0.0 1.0">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+        <Documentation>
+          Specify refinements ration in the range [0.0, 1.0] where to add points
+          along the line segment. 0.0 and 1.0 must be added to add the start and end points,
+          if needed.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseRegularRefinement"
+                                   value="0" />
+        </Hints>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Line Parameters" panel_widget="InteractiveLine">
+          <Property function="Point1WorldPosition" name="Point1" />
+          <Property function="Point2WorldPosition" name="Point2" />
+      </PropertyGroup>
+      <!-- End Line -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkLineSource"
+                 label="Ruler"
+                 name="Ruler">
+      <Documentation long_help="This is a line source that can be used to measure distance between two points"
+                     short_help="Create a ruler">The ruler can be used to
+                     interactively (using a 3D widget) or manually (using the
+                     entries on the user interface) specify two points and then
+                     determine the distance between the two points. To place
+                     points on the surface of any dataset, one can use the 'p'
+                     key shortcut.</Documentation>
+      <DoubleVectorProperty default_values="-0.5 0.0 0.0"
+                            name="Point1"
+                            number_of_elements="3"
+                            command="SetPoint1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property controls the coordinates of the first
+        endpoint of the line.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.5 0.0 0.0"
+                            name="Point2"
+                            number_of_elements="3"
+                            command="SetPoint2">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property controls the coordinates of the second
+        endpoint of the line.</Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Distance" panel_widget="InteractiveLine">
+        <Property function="Point1WorldPosition" name="Point1" />
+        <Property function="Point2WorldPosition" name="Point2" />
+      </PropertyGroup>
+      <Hints>
+        <Representation view="RenderView" type="RulerSourceRepresentation" />
+      </Hints>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkOutlineSource"
+                 label="Outline"
+                 name="OutlineSource">
+      <Documentation long_help="3D outline of the specified bounds."
+                     short_help="Create an outline from the bounds">The Outline
+                     source creates an axis aligned bounding box given the
+                     user-specified minimum and maximum coordinates for each
+                     axis.</Documentation>
+      <DoubleVectorProperty command="SetBounds"
+                            default_values="0 1 0 1 0 1"
+                            name="Bounds"
+                            number_of_elements="6"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The values of this property specify the minimum and
+        maximum X, Y, and Z coordinates (X min, X max, Y min, Y max, Z min, Z
+        max) for drawing the outline.</Documentation>
+      </DoubleVectorProperty>
+      <!-- End OutlineSource -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkParametricFunctionSource"
+                 name="SplineSource">
+      <Documentation long_help="Tessellate parametric functions."
+                     short_help="Tessellate parametric functions.">This class
+                     tessellates parametric functions. The user must specify
+                     how many points in the parametric coordinate directions
+                     are required (i.e., the resolution), and the mode to use
+                     to generate scalars.</Documentation>
+      <ProxyProperty command="SetParametricFunction"
+                     label="Parametric Function"
+                     name="ParametricFunction">
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="parametric_functions"
+                 name="Spline" />
+        </ProxyListDomain>
+        <Documentation>Property used to reference the parametric function as
+        data generator.</Documentation>
+      </ProxyProperty>
+      <IntVectorProperty name="Resolution"
+        command="SetUResolution"
+        number_of_elements="1"
+        default_values="50">
+        <IntRangeDomain name="range" min="2" />
+        <Documentation>
+          Set the spline resolution.
+        </Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPlaneSource"
+                 label="Plane"
+                 name="PlaneSource">
+      <Documentation long_help="Create a parallelogram given an origin and two points. The resolution indicates the number of division along each axis of the plane."
+                     short_help="Create a parallelogram from an origin and two points">
+                     The Plane source can be used to add a polygonal
+                     parallelogram to the 3D scene. Unlike the sphere, cone,
+                     and cylinder sources, the parallelogram is exactly
+                     represented at the lowest resolution, but higher
+                     resolutions may be desired if this plane is to be used as
+                     an input to a filter. The output of the Plane source is
+                     polygonal data.</Documentation>
+      <DoubleVectorProperty animateable="1"
+                            command="SetOrigin"
+                            default_values="-0.5 -0.5 0.0"
+                            name="Origin"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the 3D coordinate of the origin
+        (one corner) of the plane.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint1"
+                            default_values="0.5 -0.5 0.0"
+                            name="Point1"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the 3D coordinate a second
+        corner of the parallelogram. The line connecting this point and that
+        specified by the Origin property define one edge of the parallelogram
+        (its X axis).</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint2"
+                            default_values="-0.5 0.5 0.0"
+                            name="Point2"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the 3D coordinate a third corner
+        of the parallelogram. The line connecting this point and that specified
+        by the Origin property define a second edge of the parallelogram (its Y
+        axis).</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetXResolution"
+                         default_values="1"
+                         name="XResolution"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>This property specifies the number of divisions along
+        the X axis of the parallelogram.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetYResolution"
+                         default_values="1"
+                         name="YResolution"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>This property specifies the number of divisions along
+        the Y axis of the parallelogram.</Documentation>
+      </IntVectorProperty>
+      <!-- End Plane -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPointSource"
+                 label="Point Source"
+                 name="PointSource">
+      <Documentation long_help="Create a point cloud of a certain size, radius, and center."
+                     short_help="Create a point cloud">The point source creates
+                     a specified number of points within a given radius about a
+                     specified center point.</Documentation>
+      <DoubleVectorProperty animateable="1"
+                            command="SetCenter"
+                            default_values="0.0 0.0 0.0"
+                            name="Center"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the 3D coordinates of the center
+        of the point cloud.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetNumberOfPoints"
+                         default_values="1"
+                         name="NumberOfPoints"
+                         number_of_elements="1" >
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>This property specifies the number of points in the
+        point cloud.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetRadius"
+                            default_values="0.0"
+                            name="Radius"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>This property specifies the radius of the point cloud,
+        measured from the value of the Center property.</Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Point Parameters" panel_widget="InteractiveHandle">
+        <Property function="WorldPosition" name="Center" />
+      </PropertyGroup>
+      <!-- End PointSource -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPolyLineSource"
+                 label="Poly Line Source"
+                 name="PolyLineSource">
+      <Documentation long_help="Create a poly line from one or more points."
+                     short_help="Create a poly line from one or more points.">
+        The Poly Line Source creates a poly line from an arbitrary
+        number of specified points.
+      </Documentation>
+      <DoubleVectorProperty command="SetPoint"
+                            default_values="0 0 0 1 0 0"
+                            name="Points"
+                            number_of_elements="6"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfPoints"
+                            use_index="1">
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetClosed"
+                         default_values="0"
+                         name="Closed"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <PropertyGroup label="Poly-line Parameters" panel_widget="InteractivePolyLine">
+        <Property function="HandlePositions" name="Points" />
+        <Property function="Closed" name="Closed" />
+      </PropertyGroup>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPolyPointSource"
+                 label="Poly Point Source"
+                 name="PolyPointSource">
+      <Documentation long_help="Create polydata from one or more points."
+                     short_help="Create polydata from one or more points.">
+        The Poly Point Source creates a poly data of points from an arbitrary
+        number of specified points.
+      </Documentation>
+      <DoubleVectorProperty command="SetPoint"
+                            default_values="0 0 0"
+                            name="Points"
+                            number_of_elements="3"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfPoints"
+                            use_index="1">
+      </DoubleVectorProperty>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkRandomHyperTreeGridSource"
+                 label="Hyper Tree Grid (Random)"
+                 name="RandomHyperTreeGridSource">
+      <Documentation long_help="Construct a HyperTreeGrid from a random seed."
+                     short_help="Create a random hyper tree grid">This source uses input parameters,
+                     most notably a seed value, to generate a vtkHyperTreeGrid instance for testing.
+      </Documentation>
+      <IntVectorProperty command="SetSeed"
+                         default_values="0"
+                         name="Seed"
+                         number_of_elements="1">
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDimensions"
+                         default_values="6 6 3"
+                         name="Dimensions"
+                         number_of_elements="3">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>The three values in this property specify the number
+        of root cells in each dimension of the hyper tree grid.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetOutputBounds"
+                         default_values="-10 10 -10 10 -10 10"
+                         name="OutputBounds"
+                         number_of_elements="6">
+        <Documentation>The bounds of the resulting dataset.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetSplitFraction"
+                            default_values="0.5"
+                            name="SplitFraction"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           max="1"
+                           name="range" />
+        <Documentation>The chance that a given node will be split during
+        construction. Higher values mean more splits.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetMaxDepth"
+                         default_values="5"
+                         name="MaxDepth"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>The value of this property specifies the maximum
+        number of levels in the hyper tree grid.</Documentation>
+      </IntVectorProperty>
+      <!-- End Random Hyper Tree Grid -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkSphereSource"
+                 label="Sphere"
+                 name="SphereSource">
+      <Documentation long_help="Create a 3D sphere given a center and radius."
+                     short_help="Create a 3D sphere">The Sphere source can be
+                     used to add a polygonal sphere to the 3D scene. The output
+                     of the Sphere source is polygonal data with point normals
+                     defined.</Documentation>
+      <DoubleVectorProperty animateable="1"
+                            command="SetCenter"
+                            default_values="0.0 0.0 0.0"
+                            name="Center"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the 3D coordinates for the
+        center of the sphere.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetRadius"
+                            default_values="0.5"
+                            name="Radius"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>This property specifies the radius of the
+        sphere.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetThetaResolution"
+                         default_values="8"
+                         name="ThetaResolution"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <IntRangeDomain min="3"
+                        name="range" />
+        <Documentation>The value of this property represents the number of
+        divisions between Start Theta and End Theta around the sphere. (See the
+        Start Theta and End Theta properties.) The theta divisions are similar
+        to longitude lines on the earth. The higher the resolution, the closer
+        the approximation will come to a sphere, and the more polygons there
+        will be.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetStartTheta"
+                            default_values="0"
+                            name="StartTheta"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain max="360"
+                           min="0"
+                           name="range" />
+        <Documentation>To form a complete sphere, the value of this property
+        should be 0 degrees, and the value of the End Theta property should be
+        360 degrees. The value of this property can be adjusted to form only a
+        portion of a sphere.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetEndTheta"
+                            default_values="360"
+                            name="EndTheta"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain max="360"
+                           min="0"
+                           name="range" />
+        <Documentation>The value of this property can be adjusted to form only
+        a portion of a sphere. This value is measured in
+        degrees.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetPhiResolution"
+                         default_values="8"
+                         name="PhiResolution"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <IntRangeDomain min="3"
+                        name="range" />
+        <Documentation>The value of this property represents the number of
+        divisions between Start Phi and End Phi on the sphere. (See the Start
+        Phi and End Phi properties.) The phi divisions are similar to latitude
+        lines on the earth.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetStartPhi"
+                            default_values="0"
+                            name="StartPhi"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain max="180"
+                           min="0"
+                           name="range" />
+        <Documentation>To form a complete sphere, the value of this property
+        should be 0 degrees, and the value of the End Phi property should be
+        180 degrees. The value of this property can be adjusted to form only a
+        portion of a sphere. Set the starting angle (in degrees) in the
+        latitudinal direction.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetEndPhi"
+                            default_values="180"
+                            name="EndPhi"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain max="180"
+                           min="0"
+                           name="range" />
+        <Documentation>The value of this property can be adjusted to form only
+        a portion of a sphere. The value is measured in
+        degrees.</Documentation>
+      </DoubleVectorProperty>
+      <!-- End Sphere -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkSuperquadricSource"
+                 label="Superquadric"
+                 name="SuperquadricSource">
+      <Documentation long_help="Create a superquadric according to the theta and phi roundness parameters. This one source can generate a wide variety of 3D objects including a box, a sphere, or a torus."
+                     short_help="Create a superquadric according to the theta and phi roundness parameters">
+      The Superquadric source can be used to add a polygonal superquadric to
+      the 3D scene. This source can be used to create a wide variety of shapes
+      (e.g., a sphere, a box, or a torus) by adjusting the roundness
+      parameters. The output of the Superquadric source is polygonal data with
+      point normals and texture coordinates defined.</Documentation>
+      <DoubleVectorProperty animateable="1"
+                            command="SetCenter"
+                            default_values="0.0 0.0 0.0"
+                            name="Center"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the 3D coordinates of the center
+        of the superquadric.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetScale"
+                            default_values="1.0 1.0 1.0"
+                            name="Scale"
+                            number_of_elements="3"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The three values in this property are used to scale the
+        superquadric in X, Y, and Z. The surface normals will be computed
+        correctly even with anisotropic scaling.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetThetaResolution"
+                         default_values="16"
+                         name="ThetaResolution"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain max="1024"
+                        min="8"
+                        name="range" />
+        <Documentation>The value of this property represents the number of
+        divisions in the theta (longitudinal) direction. This value will be
+        rounded to the nearest multiple of 8.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPhiResolution"
+                         default_values="16"
+                         name="PhiResolution"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain max="1024"
+                        min="4"
+                        name="range" />
+        <Documentation>The value of this property represents the number of
+        divisions in the phi (latitudinal) direction. This number will be
+        rounded to the nearest multiple of 4.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetThickness"
+                            default_values="0.3333"
+                            name="Thickness"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain max="1"
+                           min="0.0001"
+                           name="range" />
+        <Documentation>If the value of the Toroidal property is 1, this value
+        represents the thickness of the superquadric as a value between 0 and
+        1. A value close to 0 leads to a thin object with a large hole, and a
+        value near 1 leads to a thick object with a very small hole. Changing
+        the thickness does not change the outer radius of the
+        superquadric.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetThetaRoundness"
+                            default_values="1"
+                            name="ThetaRoundness"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain min="0.01"
+                           name="range" />
+        <Documentation>This property defines the roundness of the superquadric
+        in the theta (longitudinal) direction. A value of 0 represents a
+        rectangular shape, a value of 1 represents a circular shape, and values
+        greater than 1 produce higher order shapes.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPhiRoundness"
+                            default_values="1"
+                            name="PhiRoundness"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain min="0.01"
+                           name="range" />
+        <Documentation>This property defines the roundness in the phi
+        (latitudinal) direction. A value of 0 represents a rectangular shape, a
+        value of 1 represents a circular shape, and values greater than 1
+        produce higher order shapes.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetSize"
+                            default_values="0.5"
+                            name="Size"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The value of this property represents the isotropic size
+        of the superquadric. Note that both the Size and Thickness properties
+        control coefficients of superquadric generation, so the value of this
+        property may not exactly describe the size of the
+        superquadric.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetToroidal"
+                         default_values="1"
+                         name="Toroidal"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <BooleanDomain name="bool" />
+        <Documentation>If the value of this property is 0, the generated
+        superquadric will not contain a hole (i.e., the superquadric will be
+        ellipsoidal). Otherwise, a toroidal object is
+        generated.</Documentation>
+      </IntVectorProperty>
+      <!-- End SuperQuadric -->
+    </SourceProxy>
+
+    <!-- end of "sources" -->
+  </ProxyGroup>
+
+  <ProxyGroup name="extended_sources">
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkLineSource"
+                 label="Line Source"
+                 name="LineSource">
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint1"
+                            default_values="0.0 0.0 0.0"
+                            name="Point1"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="min"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummyInput" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint2"
+                            default_values="0.0 0.0 0.0"
+                            name="Point2"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="max"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummyInput" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetResolution"
+                         default_values="6"
+                         name="Resolution"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+      </IntVectorProperty>
+      <InputProperty is_internal="1"
+                     name="DummyInput">
+        <!-- Used when this source is added to a proxy list domain. -->
+      </InputProperty>
+     <PropertyGroup label="Line Parameters" panel_widget="InteractiveLine">
+          <Property function="Point1WorldPosition" name="Point1" />
+          <Property function="Point2WorldPosition" name="Point2" />
+          <Property function="Input" name="DummyInput" />
+      </PropertyGroup>
+      <Hints>
+        <ProxyList>
+          <Link name="DummyInput" with_property="Input" />
+        </ProxyList>
+      </Hints>
+      <!-- End LineSource -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkLineSource"
+                 label="High Resolution Line Source"
+                 name="HighResLineSource">
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint1"
+                            default_values="0.0 0.0 0.0"
+                            name="Point1"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="min"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummyInput" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint2"
+                            default_values="0.0 0.0 0.0"
+                            name="Point2"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="max"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummyInput" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetResolution"
+                         default_values="1000"
+                         name="Resolution"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+      </IntVectorProperty>
+      <InputProperty is_internal="1" name="DummyInput">
+        <!-- Used when this source is added to a proxy list domain. -->
+      </InputProperty>
+      <PropertyGroup label="Line Parameters" panel_widget="InteractiveLine">
+          <Property function="Point1WorldPosition" name="Point1" />
+          <Property function="Point2WorldPosition" name="Point2" />
+          <Property function="Input" name="DummyInput" />
+      </PropertyGroup>
+      <Hints>
+        <ProxyList>
+          <Link name="DummyInput" with_property="Input" />
+        </ProxyList>
+      </Hints>
+      <!-- End HighResLineSource -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPolyLineSource"
+                 label="Poly Line Source"
+                 name="PolyLineSource">
+      <DoubleVectorProperty command="SetPoint"
+                            default_values="0 0 0 1 0 0"
+                            name="Points"
+                            number_of_elements="6"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfPoints"
+                            use_index="1">
+        <BoundsDomain default_mode="min,min,min,max,max,max"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummyInput" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetClosed"
+                         default_values="0"
+                         name="Closed"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <InputProperty is_internal="1" name="DummyInput">
+        <!-- Used when this source is added to a proxy list domain. -->
+      </InputProperty>
+      <PropertyGroup label="Poly-line Parameters" panel_widget="InteractivePolyLine">
+        <Property function="HandlePositions" name="Points" />
+        <Property function="Closed" name="Closed" />
+      </PropertyGroup>
+      <Hints>
+        <ProxyList>
+          <Link name="DummyInput" with_property="Input" />
+        </ProxyList>
+      </Hints>
+      <!-- End PolyLineSource -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPointSource"
+                 label="Point Source"
+                 name="PointSource">
+      <DoubleVectorProperty animateable="1"
+                            command="SetCenter"
+                            default_values="0.0 0.0 0.0"
+                            name="Center"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="mid"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummyInput" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetNumberOfPoints"
+                         default_values="100"
+                         name="NumberOfPoints"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetRadius"
+                            default_values="1.0"
+                            name="Radius"
+                            number_of_elements="1">
+        <BoundsDomain mode="scaled_extent"
+                      name="range"
+                      scale_factor="0.1">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummyInput" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+      <InputProperty is_internal="1"
+                     name="DummyInput">
+        <!-- Used when this source is added to a proxy list domain. -->
+      </InputProperty>
+      <PropertyGroup label="Sphere Parameters" panel_widget="InteractiveSphere">
+        <Property function="Center" name="Center" />
+        <Property function="Radius" name="Radius" />
+        <Property function="Input" name="DummyInput" />
+      </PropertyGroup>
+      <Hints>
+        <ProxyList>
+          <Link name="DummyInput" with_property="Input" />
+        </ProxyList>
+      </Hints>
+      <!-- End PointSource -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPointSource"
+                 label="Fixed Radius Point Source"
+                 name="FixedRadiusPointSource">
+      <DoubleVectorProperty animateable="1"
+                            command="SetCenter"
+                            default_values="0.0 0.0 0.0"
+                            name="Center"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="mid"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummyInput" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetNumberOfPoints"
+                         default_values="1"
+                         name="NumberOfPoints"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetRadius"
+                            default_values="0.0"
+                            name="Radius"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <InputProperty is_internal="1"
+                     name="DummyInput">
+        <!-- Used when this source is added to a proxy list domain. -->
+      </InputProperty>
+      <PropertyGroup label="Sphere Parameters" panel_widget="InteractiveSphere">
+        <Property function="Center" name="Center" />
+        <Property function="Radius" name="Radius" />
+        <Property function="Input" name="DummyInput" />
+      </PropertyGroup>
+      <Hints>
+        <ProxyList>
+          <Link name="DummyInput" with_property="Input" />
+        </ProxyList>
+      </Hints>
+      <!-- End PointSource -->
+    </SourceProxy>
+
+    <!-- end of "extended_sources" -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

@@ -233,3 +233,10 @@ vtk_module_add_module(ParaView::RemotingViews
   HEADERS ${headers}
   SOURCES ${vtk_object_factory_source} ${sources}
   PRIVATE_HEADERS ${vtk_object_factory_header} ${private_headers})
+
+paraview_add_server_manager_xmls(
+  XMLS Resources/3dwidgets_remotingviews.xml
+       Resources/rendering.xml
+       Resources/sources_remotingviews.xml
+       Resources/utilities_remotingviews.xml
+       Resources/views_and_representations.xml)

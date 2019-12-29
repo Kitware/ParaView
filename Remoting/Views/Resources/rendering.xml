@@ -479,28 +479,6 @@
       <!-- End of TextProperty -->
     </Proxy>
   </ProxyGroup>
-  <ProxyGroup name="PropPickers">
-    <Proxy class="vtkRenderedAreaPicker"
-           name="AreaPicker">
-      <ProxyProperty command="SetRenderer"
-                     name="SetRenderer">
-        <ProxyGroupDomain name="groups">
-          <Group name="renderers" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
-      <DoubleVectorProperty command="SetPickCoords"
-                            default_values="0.0 0.0 0.0 0.0"
-                            name="SetPickCoords"
-                            number_of_elements="4">
-        <DoubleRangeDomain min="0.0 0.0 0.0 0.0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <Property command="Pick"
-                is_internal="1"
-                name="Pick"></Property>
-    </Proxy>
-    <!-- End of PropPickers -->
-  </ProxyGroup>
 
   <ProxyGroup name="additional_lights" label="Lights">
     <LightProxy name="Light"
@@ -702,6 +680,7 @@
     </LightProxy>
     <!-- End of additional_lights -->
   </ProxyGroup>
+
   <ProxyGroup name="materials">
     <MaterialLibraryProxy class="vtkPVMaterialLibrary"
                  name="MaterialLibrary"
@@ -715,5 +694,4 @@
       </StringVectorProperty>
     </MaterialLibraryProxy>
   </ProxyGroup>
-
 </ServerManagerConfiguration>

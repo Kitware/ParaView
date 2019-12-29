@@ -39,3 +39,6 @@ set(classes
 
 vtk_module_add_module(ParaView::VTKExtensionsIOEnSight
   CLASSES ${classes})
+
+paraview_add_server_manager_xmls(
+  XMLS Resources/readers_pv_ioensight.xml)

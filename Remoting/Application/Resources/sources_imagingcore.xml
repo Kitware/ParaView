@@ -1,0 +1,152 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkRTAnalyticSource"
+                 label="Wavelet"
+                 name="RTAnalyticSource">
+      <Documentation long_help="Create a regular rectilinear grid in up to three dimensions with values varying according to a periodic function."
+                     short_help="Create a rectilinear grid containing a wavelet">
+                     The Wavelet source can be used to create a uniform
+                     rectilinear grid in up to three dimensions with values
+                     varying according to the following periodic function. OS =
+                     M * G * (XM * sin(XF * x) + YM * sin(YF * y) + ZM * cos(ZF
+                     * z)) OS is the output scalar; M represents the maximum
+                     value; G represents the Gaussian; XM, YM, and ZM are the
+                     X, Y, and Z magnitude values; and XF, YF, and ZF are the
+                     X, Y, and Z frequency values. If a two-dimensional extent
+                     is specified, the resulting image will be displayed. If a
+                     three-dimensional extent is used, then the bounding box of
+                     the volume will be displayed.</Documentation>
+      <IntVectorProperty command="SetWholeExtent"
+                         default_values="-10 10 -10 10 -10 10"
+                         label="Whole Extent"
+                         name="WholeExtent"
+                         number_of_elements="6"
+                         panel_visibility="default">
+        <IntRangeDomain name="range" />
+        <Documentation>The six values in this property indicate the X, Y, and Z
+        extent of the output data. The first two values represent the minimum
+        and maximum X indices, the next two are the minimum and maximum Y
+        indices, and the last two are the minimum and maximum Z
+        indices.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetCenter"
+                            default_values="0.0 0.0 0.0"
+                            name="Center"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the 3D coordinates of the center of
+        the periodic function (x, y and z in the equation).</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetMaximum"
+                            default_values="255.0"
+                            name="Maximum"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This parameter specifies the maximum value (M) of the
+        function.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetXFreq"
+                            default_values="60.0"
+                            name="XFreq"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the natural frequency in X (XF
+        in the equation).</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetYFreq"
+                            default_values="30.0"
+                            name="YFreq"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the natural frequency in Y (YF
+        in the equation).</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetZFreq"
+                            default_values="40.0"
+                            name="ZFreq"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the natural frequency in Z (ZF
+        in the equation).</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetXMag"
+                            default_values="10.0"
+                            name="XMag"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the wave amplitude in X (XM in
+        the equation).</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetYMag"
+                            default_values="18.0"
+                            name="YMag"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the wave amplitude in Y (YM in
+        the equation).</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetZMag"
+                            default_values="5.0"
+                            name="ZMag"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the wave amplitude in Z (ZM in
+        the equation).</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetStandardDeviation"
+                            default_values="0.5"
+                            name="StandardDeviation"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the standard deviation of the
+        Gaussian used in computing this function.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetSubsampleRate"
+                         default_values="1"
+                         name="SubsampleRate"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>This property specifies the rate at which to subsample
+        the volume. The extent of the dataset in each dimension will be divided
+        by this value. (See the Whole Extent property.)</Documentation>
+      </IntVectorProperty>
+
+      <!-- Define property groups for better readability of panels -->
+      <PropertyGroup label="Frequency">
+        <Property name="XFreq" />
+        <Property name="YFreq" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Amplitude">
+        <Property name="XMag" />
+        <Property name="YMag" />
+        <Property name="ZMag" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Frequency">
+        <!-- this is added separately just to demonstrate that
+             this group will automatically get merged with the previous
+             one with the same name! -->
+        <Property name="ZFreq" />
+      </PropertyGroup>
+
+      <!-- End Wavelet -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

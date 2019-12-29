@@ -1,0 +1,57 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkPIOReader"
+                 label="PIO Reader"
+                 name="PIOReader">
+      <Documentation long_help="Reads PIO dump files into an unstructured or hypertree grid."
+                     short_help="Read PIO dump files.">PIO is a file format
+                     in support of XRAGE. The input file
+                     (.pio) opened by the PIO reader is an ASCII description
+                     of the data files within a dump directory numbered by cycle.
+                     The reader uses a PIOData class to read the file and a PIOAdaptor
+                     to build an unstructured or hypertree grid from the data.  Requested
+                     data is filled into the structures. </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>ASCII .pio file describes locations of data files,
+        type and order of data written to the files.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Variables written to the data files are described in the
+        .pio file and are presented for selection. Only selected variables are
+        loaded for a time step.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="pio"
+                       file_description="PIO Dump Files" />
+      </Hints>
+      <!-- End vtkPIOReader -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

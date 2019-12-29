@@ -1,0 +1,29 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFacetReader"
+                 name="FacetReader">
+      <Documentation long_help="Reads ASCII files stored in Facet format."
+                     short_help="Read a dataset in Facet format.">The Facet
+                     Reader reads files in Facet format: a simple ASCII file
+                     format listing point coordinates and connectivity between
+                     these points. The default file extension is .facet. The
+                     output of the Facet Reader is polygonal.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the Facet
+        reader.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="facet"
+                       file_description="Facet Polygonal Data Files" />
+      </Hints>
+      <!-- End Facet Reader -->
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

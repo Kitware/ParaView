@@ -1,0 +1,50 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="writers">
+    <!-- ================================================================= -->
+    <SourceProxy class="vtkXMLPVAnimationWriter"
+                 name="XMLPVAnimationWriter">
+      <Documentation>Internal writer proxy used when saving animation geometry
+      to save all parts of the current source to the file with pieces spread
+      across the server processes.</Documentation>
+      <InputProperty clean_command="RemoveAllRepresentations"
+                     command="AddRepresentation"
+                     name="Representations"
+                     repeat_command="1"
+                     si_class="vtkSIXMLAnimationWriterRepresentationProperty">
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName">
+        <Documentation>Name of the file to write.</Documentation>
+      </StringVectorProperty>
+      <Property command="Start"
+                name="Start">
+        <Documentation>Used to begin writing of the animation</Documentation>
+      </Property>
+      <DoubleVectorProperty command="WriteTime"
+                            default_values="0.0"
+                            is_internal="1"
+                            name="WriteTime"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>Write each time step in the animation</Documentation>
+      </DoubleVectorProperty>
+      <Property command="Finish"
+                name="Finish">
+        <Documentation>Finish writing animation</Documentation>
+      </Property>
+      <IntVectorProperty command="GetErrorCode"
+                         information_only="1"
+                         name="ErrorCode"></IntVectorProperty>
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+      </Hints>
+      <!-- End of XMLPVAnimationWriter -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

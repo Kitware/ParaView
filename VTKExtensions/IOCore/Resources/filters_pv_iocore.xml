@@ -1,0 +1,41 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAdditionalFieldReader"
+                 label="Add Field Arrays"
+                 name="AddFieldArrays">
+      <Documentation long_help="Reads arrays from a file and adds them to the input data object."
+                     short_help="Adds arrays to a data object.">
+                     Takes in an input data object and a filename. Opens the file
+                     and adds any arrays it sees there to the input data.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+                <Documentation>The input.</Documentation>
+      </InputProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="always">
+        <FileListDomain name="files" />
+        <Documentation>
+          This property specifies the file to read to get arrays
+        </Documentation>
+      </StringVectorProperty>
+      <Property command="Modified"
+                label="Reload"
+                name="Reload"
+                panel_widget="command_button"
+                panel_visibility="always">
+        <Documentation> A convenient way to reload the data file </Documentation>
+      </Property>
+      <!-- End of AdditionalFieldReader -->
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

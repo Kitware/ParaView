@@ -1,6 +1,62 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
 
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkAttributeDataToTableFilter"
+                 label="Extract Attributes"
+                 name="AttributeDataToTableFilter">
+      <Documentation long_help="Extract attribute data as a table."
+                     short_help="Extract attribute data as a table.">This is a
+                     filter that produces a vtkTable from the chosen attribute
+                     in the input data object. This filter can accept composite
+                     datasets. If the input is a composite dataset, the output
+                     is a multiblock with vtkTable leaves.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input of the
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetFieldAssociation"
+                         default_values="0"
+                         name="FieldAssociation"
+                         number_of_elements="1">
+        <Documentation>Select the attribute data to pass.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Points"
+                 value="0" />
+          <Entry text="Cells"
+                 value="1" />
+          <Entry text="Field Data"
+                 value="2" />
+          <Entry text="Vertices"
+                 value="4" />
+          <Entry text="Edges"
+                 value="5" />
+          <Entry text="Rows"
+                 value="6" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAddMetaData"
+                         default_values="0"
+                         name="AddMetaData"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>It is possible for this filter to add additional
+        meta-data to the field data such as point coordinates (when point
+        attributes are selected and input is pointset) or structured
+        coordinates etc. To enable this addition of extra information, turn
+        this flag on. Off by default.</Documentation>
+      </IntVectorProperty>
+      <!-- End of AttributeDataToTableFilter -->
+    </SourceProxy>
+
     <!-- ==================================================================== -->
     <SourceProxy class="vtkDataObjectTreeToPointSetFilter"
                  label="Merge Blocks"
@@ -196,6 +252,34 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkMinMax" name="MinMax">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the Min Max filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetOperation"
+                            default_values="MIN"
+                            name="Operation"
+                            number_of_elements="1">
+        <StringListDomain name="operation">
+          <String value="MIN" />
+          <String value="MAX" />
+          <String value="SUM" />
+        </StringListDomain>
+        <Documentation>Select whether to perform a min, max, or sum operation
+        on the data.</Documentation>
+      </StringVectorProperty>
+      <!-- End MinMax -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkPExtractHistogram"
                  label="Histogram"
                  name="ExtractHistogram">
@@ -319,6 +403,152 @@
         <Plotable />
       </Hints>
       <!-- End ExtractHistogram -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkReductionFilter"
+                 name="AppendReductionFilter"
+                 label="Append Reduce">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the Reduction filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetPostGatherHelperName"
+                            name="PostGatherHelperName"
+                            panel_visibility="never"
+                            default_values="vtkAppendFilter"
+                            number_of_elements="1">
+        <Documentation>Set the algorithm that takes multiple inputs and
+        produces a single reduced output.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetReductionMode"
+                         default_values="2"
+                         name="ReductionMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Reduce all data to one processor"
+                 value="0" />
+          <Entry text="Move all data to one processor"
+                 value="1" />
+          <Entry text="Reduce all data to all processors"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>Set the reduction mode. Reducing all data to one
+        processor means that the destination process will have all data while
+        each other process will still have it's own data. Moving all to one processor means
+        that the destination process will have all data while other process have no data
+        anymore. Reduce all data to all processors is self explanatory.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetReductionProcessId"
+                         default_values="0"
+                         name="ReduceTo"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ReductionMode"
+                                   value="2"
+                                   inverse="1"/>
+          <!-- show this widget when ReductionMode is not 2 -->
+        </Hints>
+        <Documentation>Set the process to reduce to.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPassThrough"
+                         default_values="-1"
+                         name="OnlyFrom"
+                         number_of_elements="1">
+        <IntRangeDomain min="-1"
+                        name="range" />
+        <Documentation>If set to a non-negative value, then produce results
+        using only the node Id specified.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateProcessIds"
+                         default_values="0"
+                         name="GenerateProcessIds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If true, the filter will generate vtkOriginalProcessIds
+        arrays indicating the process id on which the cell/point was
+        generated.</Documentation>
+      </IntVectorProperty>
+      <!-- End ReductionFilter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkReductionFilter"
+                 name="ReductionFilter">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <Documentation>Set the input to the Reduction filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetReductionMode"
+                         default_values="0"
+                         name="ReductionMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Move all data to one processor"
+                 value="0" />
+          <Entry text="Reduce all data to one processor"
+                 value="1" />
+          <Entry text="Reduce all data to all processors"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetReductionProcessId"
+                         default_values="0"
+                         name="ReduceTo"
+                         number_of_elements="1">
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetPreGatherHelperName"
+                            name="PreGatherHelperName"
+                            number_of_elements="1">
+        <Documentation>Set the algorithm that runs on each node in
+        parallel.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPostGatherHelperName"
+                            name="PostGatherHelperName"
+                            number_of_elements="1">
+        <Documentation>Set the algorithm that takes multiple inputs and
+        produces a single reduced output.</Documentation>
+      </StringVectorProperty>
+      <ProxyProperty command="SetPostGatherHelper"
+                     name="PostGatherHelper" />
+      <ProxyProperty command="SetPreGatherHelper"
+                     name="PreGatherHelper" />
+      <IntVectorProperty command="SetPassThrough"
+                         default_values="-1"
+                         name="PassThrough"
+                         number_of_elements="1">
+        <IntRangeDomain min="-1"
+                        name="range" />
+        <Documentation>If set to a non-negative value, then produce results
+        using only the node Id specified.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateProcessIds"
+                         default_values="0"
+                         name="GenerateProcessIds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If true, the filter will generate vtkOriginalProcessIds
+        arrays indicating the process id on which the cell/point was
+        generated.</Documentation>
+      </IntVectorProperty>
+      <!-- End ReductionFilter -->
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

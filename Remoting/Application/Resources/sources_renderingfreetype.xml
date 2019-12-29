@@ -1,0 +1,23 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkVectorText"
+                 label="3D Text"
+                 name="VectorText">
+      <Documentation long_help="3D geometric representation of a text string"
+                     short_help="Create a 3D text object">The 3D Text source
+                     displays a text string as polygonal data.</Documentation>
+      <StringVectorProperty command="SetText"
+                            default_values="3D Text"
+                            name="Text"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <Documentation>This property contains the text string to be displayed.
+        The ASCII alphanumeric characters a-z, A-Z, and 0-9 are supported; so
+        are ASCII punctuation marks. The only supported control character is
+        "\n", which inserts a new line in the text string.</Documentation>
+      </StringVectorProperty>
+      <!-- End 3DText -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

@@ -1,0 +1,90 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="writers">
+    <!-- ================================================================= -->
+    <PWriterProxy base_proxygroup="internal_writers"
+                  base_proxyname="ParallelWriterBase"
+                  class="vtkExodusIIWriter"
+                  name="ExodusIIWriter">
+      <Documentation short_help="Write Exodus II files.">Writer to write Exodus
+      II files. Refere to http://endo.sandia.gov/SEACAS/ for more information
+      about the Exodus II format.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkCompositeDataSet" />
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetWriteAllTimeSteps"
+                         default_values="0"
+                         name="WriteAllTimeSteps"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
+        executed once for each time step available from its input.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetIgnoreMetaDataWarning"
+                         default_values="0"
+                         name="IgnoreMetaDataWarning"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>In certain cases like Catalyst we know that metadata doesn't exist and
+        we want to ignore that warning.</Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+        <Property name="GhostLevel"
+                  show="0" />
+        <Property name="IgnoreMetaDataWarning"
+                  show="0" />
+        <WriterFactory extensions="g e ex2 ex2v2 exo gen exoII exoii"
+                       file_description="Exodus II File" />
+      </Hints>
+      <!-- End of ExodusIIWriter -->
+    </PWriterProxy>
+    <!-- end of  "writers" -->
+  </ProxyGroup>
+
+  <!-- =================================================================== -->
+  <ProxyGroup name="insitu2_writer_parameters">
+    <!-- ================================================================= -->
+    <PWriterProxy base_proxygroup="writers"
+                  base_proxyname="ExodusIIWriter"
+                  class="vtkExodusIIWriter"
+                  name="ExodusIIWriter"
+                  supports_parallel="1">
+      <Documentation short_help="Expose a writer for catalyst.">
+        Variation with catalyst specific extensions.
+      </Documentation>
+      <IntVectorProperty name="WriteFrequency"
+                       label="Catalyst Write Frequency"
+                       default_values="1"
+                       number_of_elements="1">
+        <Documentation>Set how often Catalyst runs will export this data product. Zero is OK and means only when output is forced by the simulation.
+        </Documentation>
+        <IntRangeDomain min="0"
+                        name="range" />
+      </IntVectorProperty>
+      <StringVectorProperty name="CatalystFilePattern"
+                          default_values="filename.e-s"
+                          number_of_elements="1">
+        <Documentation>Set the filename pattern Catalyst runs will use to export this data product.
+        </Documentation>
+      </StringVectorProperty>
+      <PropertyGroup label="Catalyst Options">
+        <Property name="CatalystFilePattern" />
+        <Property name="WriteFrequency" />
+      </PropertyGroup>
+      <!-- End of ExodusIIWriter -->
+    </PWriterProxy>
+
+    <!-- end of "insitu2_writer_parameters" -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

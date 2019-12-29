@@ -69,4 +69,5 @@ vtk_module_add_module(ParaView::VTKExtensionsFiltersRendering
   CLASSES ${classes})
 
 paraview_add_server_manager_xmls(
-  XMLS  Resources/rendering_sources.xml)
+  XMLS  Resources/rendering_sources.xml
+        Resources/filters_filtersrendering.xml)

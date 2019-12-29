@@ -16,19 +16,63 @@ OPTIONAL_DEPENDS
   ParaView::RemotingViews
   # These correspond to the optional XML files included when enabling certain
   # features
+  ParaView::VTKExtensionsFiltersGeneral
+  VTK::CommonComputationalGeometry
+  VTK::DomainsChemistry
+  VTK::FiltersAMR
+  VTK::FiltersCore
+  VTK::FiltersExtraction
+  VTK::FiltersFlowPaths
+  VTK::FiltersGeneral
+  VTK::FiltersGeneric
+  VTK::FiltersGeometry
+  VTK::FiltersHybrid
+  VTK::FiltersHyperTree
+  VTK::FiltersModeling
   VTK::FiltersOpenTURNS
+  VTK::FiltersParallel
+  VTK::FiltersParallelDIY2
+  VTK::FiltersParallelGeometry
+  VTK::FiltersParallelMPI
+  VTK::FiltersParallelVerdict
+  VTK::FiltersSources
+  VTK::FiltersStatistics
+  VTK::FiltersTexture
+  VTK::FiltersVerdict
+  VTK::ImagingCore
+  VTK::ImagingFourier
+  VTK::ImagingGeneral
+  VTK::ImagingHybrid
+  VTK::ImagingSources
   VTK::IOADIOS2
+  VTK::IOAMR
   VTK::IOCityGML
   VTK::IOGDAL
+  VTK::IOGeometry
+  VTK::IOH5part
+  VTK::IOImage
+  VTK::IOInfovis
   VTK::IOLAS
+  VTK::IOLegacy
   VTK::IOMotionFX
+  VTK::IONetCDF
+  VTK::IOParallel
+  VTK::IOParallelLSDyna
+  VTK::IOParallelXML
   VTK::IOPDAL
+  VTK::IOPIO
   VTK::IOSegY
+  VTK::IOTecplotTable
+  VTK::IOTRUCHAS
+  VTK::IOVeraOut
+  VTK::IOVPIC
   VTK::IOXdmf2
   VTK::IOXdmf3
+  VTK::IOXML
   VTK::MomentInvariants
+  VTK::mpi
   VTK::ParallelMomentInvariants
   VTK::PythonInterpreter
-  VTK::mpi
+  VTK::RenderingFreeType
 TEST_LABELS
   ParaView

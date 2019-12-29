@@ -1,0 +1,26 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="parametric_functions">
+    <Proxy class="vtkParametricSpline"
+           name="Spline">
+      <DoubleVectorProperty command="SetPoint"
+                            default_values="0 0 0 1 0 0"
+                            name="Points"
+                            number_of_elements="6"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfPoints"
+                            use_index="1"></DoubleVectorProperty>
+      <IntVectorProperty command="SetClosed"
+                         default_values="0"
+                         name="Closed"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <PropertyGroup label="Spline Parameters" panel_widget="InteractiveSpline">
+        <Property function="HandlePositions" name="Points" />
+        <Property function="Closed" name="Closed" />
+      </PropertyGroup>
+      <!-- end of Spline -->
+    </Proxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

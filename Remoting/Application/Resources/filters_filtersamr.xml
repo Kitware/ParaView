@@ -1,0 +1,64 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy class="vtkImageToAMR"
+                 label="Image Data To AMR"
+                 name="ImageDataToAMR">
+      <Documentation long_help="Converts certain images to AMR."
+                     short_help="Convert ImageData to AMR. ">
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input to the Cell Data to
+          Point Data filter.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty command="SetNumberOfLevels"
+                         default_values="2"
+                         label="Number of levels"
+                         name="NumberOfLevels"
+                         number_of_elements="1">
+        <IntRangeDomain max="20"
+                        min="1"
+                        name="range" />
+        <Documentation>
+          This property specifies the number of levels in the AMR data structure.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMaximumNumberOfBlocks"
+                         default_values="100"
+                         label="Maximum Number of Blocks"
+                         name="MaximumNumberOfLevels"
+                         number_of_elements="1">
+        <IntRangeDomain max="100000"
+                        min="1"
+                        name="range" />
+        <Documentation>
+          This property specifies the maximum number of blocks in the output
+          AMR data structure.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRefinementRatio"
+                         default_values="2"
+                         label="Refinement Ratio"
+                         name="RefinementRatio"
+                         number_of_elements="1">
+        <IntRangeDomain max="16"
+                        min="1"
+                        name="range" />
+        <Documentation>
+          This property specifies the refinement ratio between levels.
+        </Documentation>
+      </IntVectorProperty>
+    <!-- End of ImageDataToAMR -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

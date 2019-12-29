@@ -1,0 +1,102 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkImageMandelbrotSource"
+                 label="Mandelbrot"
+                 name="ImageMandelbrotSource">
+      <Documentation long_help="Representation (unsigned char) of the Mandlebrot set in up to 3 dimensions"
+                     short_help="Create a Mandelbrot representation">The
+                     Mandelbrot source can be used to add a uniform rectilinear
+                     grid with scalar values derived from the Mandelbrot set to
+                     the 3D scene. The equation used is z = z^2 + C (where z
+                     and C are complex, and C is a constant). The scalar values
+                     in the grid are the number of iterations of the equation
+                     it takes for the magnitude of the value to become greater
+                     than 2. In the equation, the initial value of z is 0. By
+                     default, the real component of C is mapped onto the X
+                     axis; the imaginary component of C is mapped onto the Y
+                     axis; and the imaginary component of the initial value is
+                     mapped onto the Z axis. If a two-dimensional extent is
+                     specified, the resulting image will be displayed. If a
+                     three-dimensional extent is used, then the bounding box of
+                     the volume will be displayed. The output of the Mandelbrot
+                     source is image (uniform rectilinear)
+                     data.</Documentation>
+      <IntVectorProperty command="SetWholeExtent"
+                         default_values="0 250 0 250 0 0"
+                         name="WholeExtent"
+                         number_of_elements="6"
+                         panel_visibility="advanced">
+        <IntRangeDomain name="range" />
+        <Documentation>The six values in the property indicate the X, Y, and Z
+        extent of the output data. The first two numbers are the minimum and
+        maximum X extent; the next two are the minimum and maximum Y extent;
+        and the final two are the minimum and maximum Z extent. The numbers are
+        inclusive, so values of 0, 250, 0, 250, 0, 0 indicate that the
+        dimensions of the output will be 251 x 251 x 1.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetProjectionAxes"
+                         default_values="0 1 2"
+                         name="ProjectionAxes"
+                         number_of_elements="3">
+        <IntRangeDomain name="range" />
+        <Documentation>The three values in this property allow you to specify
+        the projection from the 4D space used by the Mandelbrot set to the axes
+        of the 3D volume. By default, the real component of C (represented by
+        0) is mapped to the X axis; the imaginary component of C (represented
+        by 1) is mapped to the Y axis; and the real component of X, the initial
+        value (represented by 2) is mapped to the Z axis. The imaginary
+        component of X is represented by 3. All values entered must be between
+        0 and 3, inclusive.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetOriginCX"
+                            default_values="-1.75 -1.25 0.0 0.0"
+                            name="OriginCX"
+                            number_of_elements="4">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The four values of this property indicate (in order) the
+        components of C (real and imaginary) and the components of the initial
+        value, X (real and imaginary).</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetSizeCX"
+                            default_values="2.5 2.5 2.0 1.5"
+                            name="SizeCX"
+                            number_of_elements="4">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The four values of this property indicate the length of
+        the output in each of the four dimensions (the real and imaginary
+        components of C and the real and imaginary components of X). The three
+        dimensions specified in the Projection Axes property will determine
+        which of these values specify the length of the axes in the
+        output.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetMaximumNumberOfIterations"
+                         default_values="100"
+                         label="Maximum Number of Iterations"
+                         name="MaximumNumberOfIterations"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <IntRangeDomain max="5000"
+                        min="1"
+                        name="range" />
+        <Documentation>The value of this property specifies the limit on
+        computational iterations (i.e., the maximum number of iterations to
+        perform to determine if the value will go above 2). Values less than
+        2.0 after the specified number of iterations are considered in the
+        fractal set.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetSubsampleRate"
+                         default_values="1"
+                         name="SubsampleRate"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>This property specifies the rate at which to subsample
+        the volume. The extent of the dataset in each dimension will be divided
+        by this value.</Documentation>
+      </IntVectorProperty>
+      <!-- End Mandelbrot -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

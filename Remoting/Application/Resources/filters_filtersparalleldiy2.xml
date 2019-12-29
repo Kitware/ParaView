@@ -1,0 +1,171 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkExtractSubsetWithSeed"
+      name="ExtractSubsetWithSeed"
+      label="Extract Subset With Seed">
+      <Documentation
+        long_help="Extract a subset from a structured-grid starting with a seed point.">
+        Extract a subset (line or plane) from a structured-grid starting with a seed point.
+        The filter supports cases where the structured grid is split up into multiple blocks
+        (across multiple ranks). It also handles cases were the ijk origin for each the
+        blocks is not aligned.
+      </Documentation>
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkStructuredGrid"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <DoubleVectorProperty name="Seed"
+        command="SetSeed"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <Documentation>
+          Specify the seed point in x-y-z coordinates to initiate in the slice extraction.
+        </Documentation>
+        <BoundsDomain default_mode="mid" mode="normal" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetDirection"
+                         default_values="0"
+                         name="Direction"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="I" info="line" />
+          <Entry value="1" text="J" info="line" />
+          <Entry value="2" text="K" info="line" />
+          <Entry value="3" text="IJ" info="plane" />
+          <Entry value="4" text="JK" info="plane" />
+          <Entry value="5" text="KI" info="plane" />
+        </EnumerationDomain>
+        <Documentation>
+          Specify the direction in which to extract the slice starting with the **Seed**.
+        </Documentation>
+      </IntVectorProperty>
+      <PropertyGroup label="Seed Parameters" panel_widget="InteractiveHandle">
+        <Property function="WorldPosition" name="Seed" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
+      <Hints>
+        <Visibility replace_input="2" />
+      </Hints>
+      <!-- End ExtractSubsetWithSeed -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkGenerateGlobalIds"
+                 label="Generate Global Ids"
+                 name="GenerateGlobalIds">
+      <Documentation short_help="Generate global point and cell ids.">
+        Generate global point and cell ids. Global ids are unique ids where the same point
+        (or cell) will be assigned the same id even if the point (or cell) is duplicated among
+        multiple blocks or ranks. This filter also flags duplicated points as ghost points.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input.</Documentation>
+      </InputProperty>
+      <!-- End GenerateGlobalIds -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkRedistributeDataSetFilter"
+                 name="RedistributeDataSet"
+                 label="Redistribute DataSet">
+      <Documentation
+        long_help="Redistribute dataset into requested number of partitions.">
+        Redistribute data for load balancing. The filter either computes the bounding
+        boxes, or uses a provided collection of bounding boxes, for distributing the
+        data. Cells along partition boundaries can be uniquely assigned to a partition,
+        duplicated among partitions, or split among the partitions. The output
+        is an unstructured grid.
+      </Documentation>
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty name="BoundaryMode"
+        number_of_elements="1"
+        default_values="0"
+        command="SetBoundaryMode">
+        <EnumerationDomain name="enum">
+          <Entry text="Assign to one region" value="0" />
+          <Entry text="Assign to all regions" value="1" />
+          <Entry text="Split cells" value="2" />
+        </EnumerationDomain>
+        <Documentation>This property determines how cells that lie on processor
+        boundaries are handled. The "Assign to one region" option assigns each
+        boundary cell to exactly one process, which is useful for isosurfacing.
+        Selecting "Assign to all regions" causes the cells on the boundaries to be
+        copied to each process that shares that boundary. The "Split cells"
+        option breaks cells across process boundary lines so that pieces of the
+        cell lie in different processes. This option is useful for volume
+        rendering.</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="NumberOfPartitions"
+        command="SetNumberOfPartitions"
+        number_of_elements="1"
+        default_values="-1">
+        <IntRangeDomain min="-1"
+                        name="range" />
+        <Documentation>Specify the number of partitions to split the dataset into.
+          Set to 0 to indicate that the partitions should match the number of ranks.
+          The value provided is a hint and the actual number of partitions will be
+        equal to the power of 2 greater than or equal to the chosen value.</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PreservePartitionsInOutput"
+        command="SetPreservePartitionsInOutput"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>When unchecked, ranks with more than one partition will merge
+          the partitions into a single vtkUnstructuredGrid. When checked, the partitions
+          are preserved and the output is a vtkPartitionedDataSet.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="GenerateGlobalCellIds"
+        command="SetGenerateGlobalCellIds"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>Generate global Ids for all cells across partitions.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="EnableDebugging"
+        command="SetEnableDebugging"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>Retains some helper arrays created for generating
+        global cell Ids and ghost cells that are useful for debugging.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- End RedistributeDataSetFilter -->
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

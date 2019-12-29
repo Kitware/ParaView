@@ -1,0 +1,27 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkDistributedPointCloudFilter"
+                 name="DistributePoints"
+                 label="Distribute Points">
+      <Documentation long_help="Fairly distribute points over processors into spatially contiguous regions."
+                     short_help="Distribute points over processors.">
+           This filter fairly distributes points over processors into contiguous spatial regions.
+           The output is a PolyData which does not contain any cell.
+           Distribution is done using a Kd-tree.
+      </Documentation>
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPointSet"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <!-- End DistributePointCloud -->
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

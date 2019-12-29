@@ -1,0 +1,167 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="internal_writers">
+    <!-- ================================================================= -->
+    <Proxy class="vtkOBJWriter"
+           name="OBJWriter">
+      <Documentation short_help="Write polygonal data in Wavefront OBJ format.">
+      </Documentation>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <InputProperty name="DummyInput" panel_visibility="never">
+        <InputArrayDomain attribute_type="any" name="input_array" />
+      </InputProperty>
+      <!-- End of OBJWriter -->
+    </Proxy>
+
+    <!-- ================================================================= -->
+    <Proxy base_proxygroup="internal_writers"
+           base_proxyname="DataWriterBase"
+           class="vtkSTLWriter"
+           name="STLWriter">
+      <Documentation short_help="Write stereo lithography files.">
+      </Documentation>
+      <!-- End of STLWriter -->
+    </Proxy>
+
+  </ProxyGroup>
+
+  <ProxyGroup name="writers">
+    <!-- ================================================================= -->
+    <PSWriterProxy class="vtkParallelSerialWriter"
+                   file_name_method="SetFileName"
+                   name="POBJWriter"
+                   base_proxygroup="internal_writers"
+                   base_proxyname="ParallelSerialWriter">
+      <Documentation short_help="Write polygonal data in Wavefront OBJ format.">
+      Writer to write polygonal data in Wavefront OBJ format.
+      Written files contain the geometry including lines, triangles and polygons.
+      Normals and texture coordinates on points are also written if they exist.
+      This version is used when running in parallel. It gathers data to first node
+      and saves one file.</Documentation>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="OBJWriter"></Proxy>
+        <LinkProperties>
+          <Property name="DummyInput" with_property="Input" />
+        </LinkProperties>
+      </SubProxy>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="PostGatherHelper"
+               proxygroup="filters"
+               proxyname="AppendPolyData" />
+      </SubProxy>
+      <Hints>
+        <WriterFactory extensions="obj" file_description="Wavefront OBJ File Format" />
+        <UseDocumentationForLabels />
+      </Hints>
+      <!-- End of OBJWriter -->
+    </PSWriterProxy>
+
+    <!-- ================================================================= -->
+    <PSWriterProxy class="vtkParallelSerialWriter"
+                   file_name_method="SetFileName"
+                   name="PSTLWriter"
+                   base_proxygroup="internal_writers"
+                   base_proxyname="ParallelSerialWriter">
+      <Documentation short_help="Write stereo lithography files.">STLWriter
+      writes stereo lithography (.stl) files in either ASCII or binary form.
+      Stereo lithography files only contain triangles. If polygons with more
+      than 3 vertices are present, only the first 3 vertices are written. Use
+      TriangleFilter to convert polygons to triangles. This version of the
+      reader is used when running in parallel. It gathers all the geometry to
+      first node and saves 1 file.</Documentation>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="STLWriter"></Proxy>
+        <ExposedProperties>
+          <Property name="FileType" />
+        </ExposedProperties>
+      </SubProxy>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="PostGatherHelper"
+               proxygroup="filters"
+               proxyname="AppendPolyData" />
+      </SubProxy>
+      <Hints>
+        <WriterFactory extensions="stl"
+                       file_description="Stereo Lithography File Format" />
+      </Hints>
+      <!-- End of PSTLWriter -->
+    </PSWriterProxy>
+
+    <!-- ================================================================= -->
+    <PSWriterProxy class="vtkParallelSerialWriter"
+                   file_name_method="SetFileName"
+                   name="HoudiniWriter"
+                   base_proxygroup="internal_writers"
+                   base_proxyname="ParallelSerialWriter">
+      <Documentation short_help="Write polygonal data in Houdini .geo format.">
+      Writer to write polygonal data in ASCII Houdini .geo (pre-v12.0)
+      format. </Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="PostGatherHelper"
+               proxygroup="filters"
+               proxyname="AppendPolyData" />
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Writer" class="vtkHoudiniPolyDataWriter" />
+      </SubProxy>
+      <Hints>
+        <WriterFactory extensions="geo"
+                       file_description="Houdini File Format" />
+        <UseDocumentationForLabels />
+      </Hints>
+      <!-- End of HoudiniWriter -->
+    </PSWriterProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

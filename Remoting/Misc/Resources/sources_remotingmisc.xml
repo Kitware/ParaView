@@ -1,0 +1,14 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <MultiServerSourceProxy class="vtkPVMultiServerDataSource"
+                            label="Remote Source Proxy"
+                            name="MultiServerProxy"
+                            processes="client">
+      <Documentation long_help="This proxy allow the user to automatically embed inside a built-in session data objects that belong to other servers"
+                     short_help="This proxy allow the user to automatically embed inside a built-in session data objects that belong to other servers">
+      </Documentation>
+      <Property name="DependencyLink" />
+    </MultiServerSourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

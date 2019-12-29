@@ -1,6 +1,69 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkIntersectFragments"
+                 label="Intersect Fragments"
+                 name="IntersectFragments">
+      <Documentation long_help="The Intersect Fragments filter perform geometric intersections on sets of fragments."
+                     short_help="The Intersect Fragments filter perform geometric intersections on sets of fragments.">
+      The Intersect Fragments filter perform geometric intersections on sets of
+      fragments. The filter takes two inputs, the first containing fragment
+      geometry and the second containing fragment centers. The filter has two
+      outputs. The first is geometry that results from the intersection. The
+      second is a set of points that is an approximation of the center of where
+      each fragment has been intersected.</Documentation>
+      <!-- Out -->
+      <OutputPort index="0"
+                  name="geometry" />
+      <OutputPort index="1"
+                  name="statistics" />
+      <!-- In -->
+      <InputProperty command="SetGeometryInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMultiBlockDataSet" />
+        </DataTypeDomain>
+        <Documentation>This input must contain fragment
+        geometry.</Documentation>
+      </InputProperty>
+      <InputProperty command="SetStatisticsInputConnection"
+                     name="Source">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMultiBlockDataSet" />
+        </DataTypeDomain>
+        <Documentation>This input must contain fragment
+        centers.</Documentation>
+      </InputProperty>
+      <!-- Cut functuion -->
+      <ProxyProperty command="SetCutFunction"
+                     label="Slice Type"
+                     name="CutFunction">
+        <ProxyGroupDomain name="groups">
+          <Group name="implicit_functions" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="implicit_functions"
+                 name="Plane" />
+          <Proxy group="implicit_functions"
+                 name="Box" />
+          <Proxy group="implicit_functions"
+                 name="Sphere" />
+        </ProxyListDomain>
+        <Documentation>This property sets the type of intersecting geometry,
+        and associated parameters.</Documentation>
+      </ProxyProperty>
+      <!-- End IntersectFragments -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkMaterialInterfaceFilter"
                  label="Material Interface Filter"
                  name="MaterialInterfaceFilter">

@@ -1,0 +1,841 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="internal_sources">
+    <!-- ================================================================== -->
+    <Proxy class="vtkAMRFlashParticlesReader"
+                 label="FLASH Particles AMR Reader"
+                 name="FlashParticlesReaderCore">
+      <Documentation long_help="Reads AMR particles from FLASH dataset"
+                     short_help="Reads AMR particles from FLASH dataset">The
+                     Flash particles reader loads particle simulation data
+                     stored in Flash format. The output of this reader is a
+                     MultiBlock dataset where each block is vtkPolyData that
+                     holds the particles and corresponding particle
+                     data.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the Enzo file
+        name</Documentation>
+      </StringVectorProperty>
+      <!-- Display the number of Particles -->
+      <IntVectorProperty command="GetTotalNumberOfParticles"
+                         information_only="1"
+                         name="NumParticles">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFrequency"
+                         default_values="1"
+                         name="Frequency"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" />
+        <Documentation>This property sets the frequency interval for loading
+        particles.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFilterLocation"
+                         default_values="0"
+                         name="FilterLocation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Turns on filtering of particles by
+        location</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetMinLocation"
+                            default_values="0.0 0.0 0.0"
+                            name="MinLocation"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property sets the minimum 3-D coordinate location
+        by which the particles will be filtered out.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetMaxLocation"
+                            default_values="0.0 0.0 0.0"
+                            name="MaxLocation"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property sets the minimum 3-D coordinate location
+        by which the particles will be filtered out.</Documentation>
+      </DoubleVectorProperty>
+      <!--  Array Selection GUI Component -->
+      <StringVectorProperty information_only="1"
+                            name="ParticleArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Particle" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetParticleArrayStatus"
+                            element_types="2 0"
+                            information_property="ParticleArrayInfo"
+                            label="Particle Arrays"
+                            name="ParticleArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="ParticleArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which particle arrays to read.</Documentation>
+      </StringVectorProperty>
+      <!-- end of "FlashParticlesReaderCore" -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkAMREnzoParticlesReader"
+                 label="Enzo Particles AMR Reader"
+                 name="EnzoParticlesReaderCore">
+      <Documentation long_help="Reads AMR particles from an ENZO dataset"
+                     short_help="Reads AMR particles from an ENZO dataset">The
+                     Enzo particles reader loads particle simulation data
+                     stored in Enzo HDF5 format. The output of this reader is
+                     MultiBlock dataset where each block is a vtkPolyData that
+                     holds the particles (points) and corresponding particle
+                     data.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the Enzo file
+        name</Documentation>
+      </StringVectorProperty>
+      <!-- Display the number of Particles -->
+      <IntVectorProperty command="GetTotalNumberOfParticles"
+                         information_only="1"
+                         name="NumParticles">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFrequency"
+                         default_values="1"
+                         name="Frequency"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" />
+        <Documentation>This property sets the frequency interval for loading
+        particles.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFilterLocation"
+                         default_values="0"
+                         name="FilterLocation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Turns on filtering of particles by
+        location</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetMinLocation"
+                            default_values="0.0 0.0 0.0"
+                            name="MinLocation"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property sets the minimum 3-D coordinate location
+        by which the particles will be filtered out.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetMaxLocation"
+                            default_values="0.0 0.0 0.0"
+                            name="MaxLocation"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property sets the minimum 3-D coordinate location
+        by which the particles will be filtered out.</Documentation>
+      </DoubleVectorProperty>
+      <!--  Array Selection GUI Component -->
+      <StringVectorProperty information_only="1"
+                            name="ParticleArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Particle" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetParticleArrayStatus"
+                            element_types="2 0"
+                            information_property="ParticleArrayInfo"
+                            label="Particle Arrays"
+                            name="ParticleArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="ParticleArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which particle arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetParticleType"
+                         default_values="0"
+                         name="ParticleType"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="All Particles"
+                 value="0" />
+          <Entry text="Dark Matter"
+                 value="1" />
+          <Entry text="Active (Star)"
+                 value="2" />
+          <Entry text="Passive (Tracer)"
+                 value="3" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <!-- end of "EnzoParticlesReaderCore" -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkAMRFlashReader"
+                 label="Flash AMR Reader"
+                 name="FlashReaderCore">
+      <Documentation long_help="Read hierarchical box dataset from a Flash dataset."
+                     short_help="Read hierarchical box dataset from a Flash dataset.">
+                     This Flash reader loads data stored in Flash format. The
+                     output of this reader is a hierarchical-box
+                     dataset.</Documentation>
+      <!-- Define Flas Filename -->
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the Flash file
+        name</Documentation>
+      </StringVectorProperty>
+      <!-- Display the number of levels -->
+      <IntVectorProperty command="GetNumberOfLevels"
+                         information_only="1"
+                         name="NumLevels">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <!--  Display the number of blocks -->
+      <IntVectorProperty command="GetNumberOfBlocks"
+                         information_only="1"
+                         name="NumBlocks">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetEnableCaching"
+                         default_values="0"
+                         name="EnableCaching"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Turn caching on/off</Documentation>
+      </IntVectorProperty>
+      <!--  Define MaxLevel property -->
+      <IntVectorProperty command="SetMaxLevel"
+                         default_values="1"
+                         name="Level"
+                         number_of_elements="1">
+        <IntRangeDomain max="100"
+                        min="0"
+                        name="range" />
+        <Documentation>This property specifies the desired level of resolution
+        that will be visible.</Documentation>
+      </IntVectorProperty>
+      <!--  Array Selection GUI Component -->
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="PointArrays"
+                            name="PointArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which point-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkAMREnzoReader"
+                 label="Enzo AMR Reader"
+                 name="EnzoReaderCore">
+      <Documentation long_help="Read hierarchical box dataset from an Enzo file."
+                     short_help="Read hierarchical box dataset from an Enzo file.">
+                     This Enzo reader loads data stored in Enzo format. The
+                     output of this reader is a hierarchical-box
+                     dataset.</Documentation>
+      <!-- Define Enzo Filename -->
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the Enzo file
+        name</Documentation>
+      </StringVectorProperty>
+      <!-- Display the number of levels -->
+      <IntVectorProperty command="GetNumberOfLevels"
+                         information_only="1"
+                         name="NumLevels">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <!--  Display the number of blocks -->
+      <IntVectorProperty command="GetNumberOfBlocks"
+                         information_only="1"
+                         name="NumBlocks">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetEnableCaching"
+                         default_values="0"
+                         name="EnableCaching"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Turn caching on/off</Documentation>
+      </IntVectorProperty>
+      <!--  Define MaxLevel property -->
+      <IntVectorProperty command="SetMaxLevel"
+                         default_values="1"
+                         name="Level"
+                         number_of_elements="1">
+        <IntRangeDomain max="100"
+                        min="0"
+                        name="range" />
+        <Documentation>This property specifies the desired level of resolution
+        that will be visible.</Documentation>
+      </IntVectorProperty>
+      <!-- Set Conversion to CGS -->
+      <IntVectorProperty command="SetConvertToCGS"
+                         default_values="0"
+                         name="ConvertToCGS"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property specifies whether or not units will be
+        converted to CGS.</Documentation>
+      </IntVectorProperty>
+      <!--  Array Selection GUI Component -->
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="PointArrays"
+                            name="PointArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which point-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy name="vtkAMReXGridReaderCore" class="vtkAMReXGridReader" label="AMReX Grid Reader">
+      <Documentation
+        long_help="Reads AMReX plotfiles (grids) data."
+        short_help="Reads AMReX plotfiles (grids) data.">
+                     This AMReX reader loads data stored in AMReX's plt flie format. The
+                     output of this reader is a hierarchical-box dataset.</Documentation>
+      <!-- Define Flas FileName -->
+      <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1"
+        panel_visibility="never"
+      >
+        <FileListDomain name="files" />
+      </StringVectorProperty>
+      <!-- Display the number of levels -->
+      <IntVectorProperty command="GetNumberOfLevels"
+                         information_only="1"
+                         name="NumLevels">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <!--  Display the number of blocks -->
+      <IntVectorProperty command="GetNumberOfBlocks"
+                         information_only="1"
+                         name="NumBlocks">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <!--  Define EnableCaching property -->
+      <IntVectorProperty command="SetEnableCaching"
+                         default_values="0"
+                         name="EnableCaching"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Turn caching on/off</Documentation>
+      </IntVectorProperty>
+      <!--  Define MaxLevel property -->
+      <IntVectorProperty command="SetMaxLevel"
+                         default_values="1"
+                         name="Level"
+                         number_of_elements="1">
+        <IntRangeDomain max="100"
+                        min="0"
+                        name="range" />
+        <Documentation>This property specifies the desired level of resolution
+        that will be visible.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty name="PointArrayInfo"
+        command="GetPointDataArraySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="PointArrayStatus"
+        command="GetPointDataArraySelection"
+        information_property="PointArrayInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the point arrays to read load.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="CellArrayInfo"
+        command="GetCellDataArraySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="CellArrayStatus"
+        command="GetCellDataArraySelection"
+        information_property="CellArrayInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the cell arrays to read load.</Documentation>
+      </StringVectorProperty>
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy name="AMReXParticlesReaderCore"
+      class="vtkAMReXParticlesReader">
+      <Documentation short_help="Reader for AMReX particle data">
+        Internal reader proxy for AMReX particles.
+      </Documentation>
+
+      <StringVectorProperty name="ParticleType"
+        command="SetParticleType"
+        number_of_elements="1"
+        default_values="particles">
+        <Documentation>
+          Set the type of particles to read.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="PointArrayInfo"
+        command="GetPointDataArraySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="PointArrayStatus"
+        command="GetPointDataArraySelection"
+        information_property="PointArrayInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the point arrays to read load.</Documentation>
+      </StringVectorProperty>
+      <!-- End AMReXParticlesReaderCore -->
+    </SourceProxy>
+
+    <!-- end of "internal_sources" -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="FLASH AMR Particles Reader"
+                 name="FlashParticlesReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads AMR particles from FLASH dataset"
+                     short_help="Reads AMR particles from FLASH dataset">The
+                     Flash particles reader loads particle simulation data
+                     stored in Flash format. The output of this reader is a
+                     MultiBlock dataset where each block is vtkPolyData that
+                     holds the particles and corresponding particle
+                     data.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="FlashParticlesReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="NumParticles" />
+          <Property name="Frequency" />
+          <Property name="FilterLocation" />
+          <Property name="MinLocation" />
+          <Property name="MaxLocation" />
+          <Property name="ParticleArrayStatus" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="0"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="Flash flash"
+                       file_description="FLASH AMR Particles Reader" />
+      </Hints>
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="ENZO AMR Particles Reader"
+                 name="EnzoParticlesReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads AMR particles from an ENZO dataset"
+                     short_help="Reads AMR particles from an ENZO dataset">The
+                     Enzo particles reader loads particle simulation data
+                     stored in Enzo HDF5 format. The output of this reader is
+                     MultiBlock dataset where each block is a vtkPolyData that
+                     holds the particles (points) and corresponding particle
+                     data.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="EnzoParticlesReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="NumParticles" />
+          <Property name="Frequency" />
+          <Property name="FilterLocation" />
+          <Property name="MinLocation" />
+          <Property name="MaxLocation" />
+          <Property name="ParticleArrayStatus" />
+          <Property name="ParticleType" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="0"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="boundary hierarchy"
+                       file_description="ENZO AMR Particles Reader" />
+      </Hints>
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="Flash Reader"
+                 name="FlashReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Read hierarchical box dataset from a Flash dataset."
+                     short_help="Read hierarchical box dataset from a Flash dataset.">
+                     This Flash reader loads data stored in Enzo format. The
+                     output of this reader is a hierarchical-box
+                     dataset.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="FlashReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="NumLevels" />
+          <Property name="NumBlocks" />
+          <Property name="EnableCaching" />
+          <Property name="Level" />
+          <PropertyGroup label="Cell/Point Array Status"
+                         name="CellPointArrayStatus"
+                         panel_visibility="default"
+                         panel_widget="ArrayStatus">
+            <Property name="PointArrayStatus" />
+            <Property name="CellArrayStatus" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="0"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="Flash flash"
+                       file_description="AMR Flash Files" />
+      </Hints>
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkAMRFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="Enzo Reader"
+                 name="EnzoReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Read hierarchical box dataset from an Enzo file."
+                     short_help="Read hierarchical box dataset from an Enzo file.">
+                     This Enzo reader loads data stored in Enzo format. The
+                     output of this reader is a hierarchical-box
+                     dataset.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="EnzoReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="NumLevels" />
+          <Property name="NumBlocks" />
+          <Property name="EnableCaching" />
+          <Property name="ConvertToCGS" />
+          <Property name="Level" />
+          <Property name="PointArrayStatus" />
+          <Property name="CellArrayStatus" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="0"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="boundary hierarchy"
+                       file_description="AMR Enzo Files" />
+      </Hints>
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="AMReX/BoxLib Grid Reader"
+                 name="AMReXGridReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation
+        long_help="Reads AMReX plotfiles (grids) data."
+        short_help="Reads AMReX plotfiles (grids) data.">
+                     This AMReX reader loads data stored in AMReX plt file format. The
+                     output of this reader is a hierarchical-box dataset.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="vtkAMReXGridReaderCore">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="NumLevels" />
+          <Property name="NumBlocks" />
+          <Property name="EnableCaching" />
+          <Property name="Level" />
+          <Property name="PointArrayStatus" />
+          <Property name="CellArrayStatus" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="0"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory
+          filename_patterns="plt*"
+          file_description="AMReX/BoxLib plotfiles (grids)"
+          is_directory="1"
+        />
+      </Hints>
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy name="AMReXParticlesReader"
+      class="vtkFileSeriesReader"
+      file_name_method="SetPlotFileName"
+      label="AMReX/BoxLib Particles Reader"
+      si_class="vtkSIMetaReaderProxy">
+      <Documentation short_help="Reader for AMReX particle data">
+        Reads particle data from AMReX plotfiles.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="Reader" proxygroup="internal_sources" proxyname="AMReXParticlesReaderCore" />
+        <ExposedProperties>
+          <Property name="ParticleType" />
+          <Property name="PointArrayInfo" />
+          <Property name="PointArrayStatus" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="0"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of plotfiles to be read by the reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1" name="TimestepValues" repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory
+          filename_patterns="plt*"
+          file_description="AMReX/BoxLib plotfiles (particles)"
+          is_directory="1" />
+      </Hints>
+      <!-- end AMReXParticlesReader -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

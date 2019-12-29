@@ -1,4 +1,82 @@
 <ServerManagerConfiguration>
+  <ProxyGroup name="internal_filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkExtractSelectionRange"
+                 label="Extract Selection Range (internal)"
+                 name="ExtractSelectionRange">
+      <Documentation>
+        This filter extracts the range of a given set of cells or points given
+        a selection. The selection can be obtained from a rubber-band selection
+        (either point, cell, visible or in a frustum) and passed to the filter or
+        specified by providing an ID list. This is an internal filter.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input"
+                     port_index="0">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>
+          The input from which the selection is
+          extracted.
+        </Documentation>
+      </InputProperty>
+      <InputProperty command="SetInputConnection"
+                     name="Selection"
+                     port_index="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkSelection" />
+        </DataTypeDomain>
+        <Documentation>
+          The input that provides the selection
+          object.
+        </Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetArrayName"
+                            name="ArrayName"
+                            number_of_elements="1">
+        <Documentation>
+          This property indicates the name of the scalar array
+          used to compute the range.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetFieldType"
+                         default_values="0"
+                         is_internal="1"
+                         name="FieldType"
+                         number_of_elements="1">
+        <Documentation>
+          Set the field type of the selection.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetComponent"
+                         default_values="0"
+                         is_internal="1"
+                         name="Component"
+                         number_of_elements="1">
+        <Documentation>
+          Select the component of the selection.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="GetRange"
+                            default_values="0 0"
+                            information_only="1"
+                            name="Range"
+                            number_of_elements="2">
+      </DoubleVectorProperty>
+      <!-- End ExtractSelectionRange -->
+    </SourceProxy>
+    <!-- end of internal_filters -->
+  </ProxyGroup>
+
   <ProxyGroup name="filters">
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPExtractExodusGlobalTemporalVariables"
@@ -336,80 +414,7 @@
       <!-- End of ExtractSelection -->
     </SourceProxy>
 
-    <!-- ==================================================================== -->
-    <SourceProxy class="vtkExtractSelectionRange"
-                 label="Extract Selection Range (internal)"
-                 name="ExtractSelectionRange">
-      <Documentation>
-        This filter extracts the range of a given set of cells or points given
-        a selection. The selection can be obtained from a rubber-band selection
-        (either point, cell, visible or in a frustum) and passed to the filter or
-        specified by providing an ID list. This is an internal filter.
-      </Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input"
-                     port_index="0">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataObject" />
-        </DataTypeDomain>
-        <Documentation>
-          The input from which the selection is
-          extracted.
-        </Documentation>
-      </InputProperty>
-      <InputProperty command="SetInputConnection"
-                     name="Selection"
-                     port_index="1">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkSelection" />
-        </DataTypeDomain>
-        <Documentation>
-          The input that provides the selection
-          object.
-        </Documentation>
-      </InputProperty>
-      <StringVectorProperty command="SetArrayName"
-                            name="ArrayName"
-                            number_of_elements="1">
-        <Documentation>
-          This property indicates the name of the scalar array
-          used to compute the range.
-        </Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty command="SetFieldType"
-                         default_values="0"
-                         is_internal="1"
-                         name="FieldType"
-                         number_of_elements="1">
-        <Documentation>
-          Set the field type of the selection.
-        </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetComponent"
-                         default_values="0"
-                         is_internal="1"
-                         name="Component"
-                         number_of_elements="1">
-        <Documentation>
-          Select the component of the selection.
-        </Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="GetRange"
-                            default_values="0 0"
-                            information_only="1"
-                            name="Range"
-                            number_of_elements="2">
-      </DoubleVectorProperty>
-      <!-- End ExtractSelectionRange -->
-    </SourceProxy>
+    <!-- end of filters -->
   </ProxyGroup>
 
   <ProxyGroup name="sources">

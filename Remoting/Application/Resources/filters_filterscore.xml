@@ -1,0 +1,2096 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAppendArcLength"
+                 label="Append Arc-Length"
+                 name="AppendArcLength">
+      <Documentation long_help="Appends Arc length for input poly lines."
+                     short_help="Appends Arc length for input poly lines.">
+                     vtkAppendArcLength is used for filter such as
+                     plot-over-line. In such cases, we need to add an attribute
+                     array that is the arc_length over the length of the probed
+                     line. That's when vtkAppendArcLength can be used. It adds
+                     a new point-data array named "arc_length" with the
+                     computed arc length for each of the polylines in the
+                     input. For all other cell types, the arc length is set to
+                     0.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>The input.</Documentation>
+      </InputProperty>
+      <!-- End of AppendArcLength -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAppendDataSets"
+                 label="Append Datasets"
+                 name="Append">
+      <Documentation long_help="Takes an input of multiple datasets and output has only one unstructured grid or polydata."
+                     short_help="Append multiple datasets into one.">The Append
+                     Datasets filter operates on multiple data sets of any type
+                     (polygonal, structured, etc.). It merges their meshes
+                     into a single dataset. If all inputs are polydata, the output
+                     is a polydata, otherwise it is an unstructured grid.
+                     Only the point and cell attributes that all of the input
+                     datasets have in common will appear in the output.</Documentation>
+      <InputProperty clean_command="RemoveAllInputs"
+                     command="AddInputConnection"
+                     multiple_input="1"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the datasets to be merged into a
+        single dataset by the Append Datasets filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetOutputDataSetType"
+                         default_values="4"
+                         number_of_elements="1"
+                         name="OutputDataSetType"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Polygonal Mesh"
+                 value="0" />
+          <Entry text="Unstructured Grid"
+                 value="4" />
+        </EnumerationDomain>
+        <Documentation>Determines the output type produced by this filter. Only input datasets compatible
+        with the output type will be merged in the output. For example, if the output type is
+        "Polygonal Mesh", then inputs of type "Image Data", "StructuredGrid", etc. will not be merged.
+        On the other hand, if the output type is "Unstructured Grid", then inputs of almost any type
+        will be merged in the output. Defaults to "Unstructured Grid".
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End AppendDataSet -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAppendPolyData"
+                 label="Append Geometry"
+                 name="AppendPolyData">
+      <Documentation long_help="Takes an input of multiple poly data parts and output has only one part."
+                     short_help="Append multiple parts into one.">The Append
+                     Geometry filter operates on multiple polygonal data sets.
+                     It merges their geometry into a single data set. Only the
+                     point and cell attributes that all of the input data sets
+                     have in common will appear in the output.</Documentation>
+      <InputProperty clean_command="RemoveAllInputs"
+                     command="AddInputConnection"
+                     multiple_input="1"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the Append Geometry
+        filter.</Documentation>
+      </InputProperty>
+      <!-- End AppendPolyData -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkCleanPolyData"
+                 label="Clean"
+                 name="CleanPolyData">
+      <Documentation long_help="Merge coincident points if they do not meet a feature edge criteria."
+                     short_help="Merge coincident points.">The Clean filter
+                     takes polygonal data as input and generates polygonal data
+                     as output. This filter can merge duplicate points, remove
+                     unused points, and transform degenerate cells into their
+                     appropriate forms (e.g., a triangle is converted into a
+                     line if two of its points are merged).</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the Clean filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetPieceInvariant"
+                         default_values="1"
+                         name="PieceInvariant"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, the whole data set will be
+        processed at once so that cleaning the data set always produces the
+        same results. If it is set to 0, the data set can be processed one
+        piece at a time, so it is not necessary for the entire data set to fit
+        into memory; however the results are not guaranteed to be the same as
+        they would be if the Piece invariant option was on. Setting this option
+        to 0 may produce seams in the output dataset when ParaView is run in
+        parallel.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetTolerance"
+                            default_values="0.0"
+                            name="Tolerance"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Documentation>If merging nearby points (see PointMerging property) and
+        not using absolute tolerance (see ToleranceIsAbsolute property), this
+        property specifies the tolerance for performing merging as a fraction
+        of the length of the diagonal of the bounding box of the input data
+        set.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAbsoluteTolerance"
+                            default_values="1.0"
+                            name="AbsoluteTolerance"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>If merging nearby points (see PointMerging property) and
+        using absolute tolerance (see ToleranceIsAbsolute property), this
+        property specifies the tolerance for performing merging in the spatial
+        units of the input data set.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetToleranceIsAbsolute"
+                         default_values="0"
+                         name="ToleranceIsAbsolute"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property determines whether to use absolute or
+        relative (a percentage of the bounding box) tolerance when performing
+        point merging.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetConvertLinesToPoints"
+                         default_values="1"
+                         name="ConvertLinesToPoints"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, degenerate lines (a "line"
+        whose endpoints are at the same spatial location) will be converted to
+        points.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetConvertPolysToLines"
+                         default_values="1"
+                         name="ConvertPolysToLines"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, degenerate polygons (a
+        "polygon" with only two distinct point coordinates) will be converted
+        to lines.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetConvertStripsToPolys"
+                         default_values="1"
+                         name="ConvertStripsToPolys"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, degenerate triangle strips
+        (a triangle "strip" containing only one triangle) will be converted to
+        triangles.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPointMerging"
+                         default_values="1"
+                         name="PointMerging"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, then points will be merged
+        if they are within the specified Tolerance or AbsoluteTolerance (see
+        the Tolerance and AbsoluteTolerance properties), depending on the value
+        of the ToleranceIsAbsolute property. (See the ToleranceIsAbsolute
+        property.) If this property is set to 0, points will not be
+        merged.</Documentation>
+      </IntVectorProperty>
+      <!-- End CleanPolyData -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkCompositeCutter"
+                 label="Slice (demand-driven-composite)"
+                 name="CutEverything">
+      <Documentation long_help="This filter slices a data set with a plane. Slicing is similar to a contour. It creates surfaces from volumes and lines from surfaces."
+                     short_help="Slice datasets with planes.">This filter
+                     extracts the portion of the input dataset that lies along
+                     the specified plane. The Slice filter takes any type of
+                     dataset as input. The output of this filter is polygonal
+                     data.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Slice
+        filter.</Documentation>
+      </InputProperty>
+      <ProxyProperty command="SetCutFunction"
+                     label="Slice Type"
+                     name="CutFunction">
+        <ProxyGroupDomain name="groups">
+          <Group name="implicit_functions" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="implicit_functions"
+                 name="Plane" />
+          <Proxy group="implicit_functions"
+                 name="Box" />
+          <Proxy group="implicit_functions"
+                 name="Sphere" />
+        </ProxyListDomain>
+        <Documentation>This property sets the parameters of the slice
+        function.</Documentation>
+      </ProxyProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="InputBounds">
+        <BoundsDomain name="bounds">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetValue"
+                            label="Slice Offset Values"
+                            name="ContourValues"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfContours"
+                            use_index="1"
+                            panel_visibility="advanced">
+        <BoundsDomain mode="magnitude"
+                      name="bounds">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>The values in this property specify a list of current
+        offset values. This can be used to create multiple slices with
+        different centers. Each entry represents a new slice with its center
+        shifted by the offset value.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <Visibility replace_input="2" />
+      </Hints>
+      <!-- End Cut -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkConnectivityFilter"
+                 label="Connectivity"
+                 name="PVConnectivityFilter">
+      <Documentation long_help="Mark connected components with integer point attribute array."
+                     short_help="Find connected components.">The Connectivity
+                     filter assigns a region id to connected components of the
+                     input data set. (The region id is assigned as a point
+                     scalar value.) This filter takes any data set type as
+                     input and produces unstructured grid
+                     output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Connectivity
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetExtractionMode"
+                         default_values="5"
+                         name="ExtractionMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Extract Largest Region"
+                 value="4" />
+          <Entry text="Extract All Regions"
+                 value="5" />
+          <Entry text="Extract Closest Point Region"
+                 value="6" />
+        </EnumerationDomain>
+        <Documentation>Controls the extraction of connected
+        surfaces.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetColorRegions"
+                         default_values="1"
+                         name="ColorRegions"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Controls the coloring of the connected
+        regions.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRegionIdAssignmentMode"
+                         default_values="0"
+                         name="RegionIdAssignmentMode"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+          Specifies how regions IDs are assigned to the connected components. **Unspecified** means
+          regions will have no particular order, **Cell Count Descending** assigns increasing region
+          IDs to connected components with progressively smaller cell counts, and **Cell Count Ascending**
+          assigns increasing region IDs to connected components with progressively larger cell counts.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Unspecified"
+                 value="0" />
+          <Entry text="Cell Count Descending"
+                 value="1" />
+          <Entry text="Cell Count Ascending"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <DoubleVectorProperty
+        name="ClosestPoint"
+        command="SetClosestPoint"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <Documentation>Specifies the point to use in closest point mode.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ExtractionMode"
+                                   value="6" />
+          <!-- show this widget when ExtractionMode==6 -->
+        </Hints>
+      </DoubleVectorProperty>
+
+      <!-- End PVConnectivityFilter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkDecimatePolylineFilter"
+                 label="Decimate Polyline"
+                 name="DecimatePolyline">
+      <Documentation long_help="Reduce the number of lines in a polyline by evaluating an error metric for each vertex and removing the vertices with smaller errors first."
+                     short_help="Reduce the number of lines in a polyline.">
+        Decimate Polyline is a filter to reduce the number of lines in a
+        polyline. The algorithm functions by evaluating an error metric for each
+        vertex (i.e., the distance of the vertex to a line defined from the two
+        vertices on either side of the vertex). Then, these vertices are placed
+        into a priority queue, and those with smaller errors are deleted first.
+        The decimation continues until the target reduction is reached. While the
+        filter will not delete end points, it will decimate closed loops down to a
+        single line, thereby changing topology.
+
+        As this filter works on polylines, you may need to call Triangle Strips before calling
+        this filter.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Decimate Polyline
+        filter.</Documentation>
+      </InputProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetTargetReduction"
+                            default_values="0.9"
+                            name="TargetReduction"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Documentation>This property specifies the desired reduction in the
+        total number of lines in the output dataset. For example, if the
+        TargetReduction value is 0.9, the Decimate Polyline filter will attempt to
+        produce an output dataset that is 10% the size of the
+        input.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetMaximumError"
+                            default_values="1.79769e+308"
+                            name="MaximumError"
+                            number_of_elements="1"
+                            panel_visibility="advanced" >
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the largest decimation error that is allowed during the decimation
+          process. This may limit the maximum reduction that may be achieved. The
+          maximum error is specified as a fraction of the maximum length of
+          the input data bounding box.
+        </Documentation>
+      </DoubleVectorProperty>
+      <!-- End DecimatePolyline -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkDecimatePro"
+                 label="Decimate"
+                 name="DecimatePro">
+      <Documentation long_help="Simplify a polygonal model using an adaptive edge collapse algorithm.  This filter works with triangles only."
+                     short_help="Reduce the number of triangles in a model.">
+                     The Decimate filter reduces the number of triangles in a
+                     polygonal data set. Because this filter only operates on
+                     triangles, first run the Triangulate filter on a dataset
+                     that contains polygons other than
+                     triangles.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Decimate
+        filter.</Documentation>
+      </InputProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetTargetReduction"
+                            default_values="0.9"
+                            name="TargetReduction"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Documentation>This property specifies the desired reduction in the
+        total number of polygons in the output dataset. For example, if the
+        TargetReduction value is 0.9, the Decimate filter will attempt to
+        produce an output dataset that is 10% the size of the
+        input.)</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetPreserveTopology"
+                         default_values="0"
+                         name="PreserveTopology"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, decimation will not split
+        the dataset or produce holes, but it may keep the filter from reaching
+        the reduction target. If it is set to 0, better reduction can occur
+        (reaching the reduction target), but holes in the model may be
+        produced.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetFeatureAngle"
+                            default_values="15.0"
+                            name="FeatureAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="180"
+                           min="0"
+                           name="range" />
+        <Documentation>The value of this property is used in determining where
+        the data set may be split. If the angle between two adjacent triangles
+        is greater than or equal to the FeatureAngle value, then their boundary
+        is considered a feature edge where the dataset can be
+        split.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetBoundaryVertexDeletion"
+                         default_values="1"
+                         name="BoundaryVertexDeletion"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, then vertices on the
+        boundary of the dataset can be removed. Setting the value of this
+        property to 0 preserves the boundary of the dataset, but it may cause
+        the filter not to reach its reduction target.</Documentation>
+      </IntVectorProperty>
+      <!-- End DecimatePro -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkDelaunay2D"
+                 label="Delaunay 2D"
+                 name="Delaunay2D">
+      <Documentation long_help="Create 2D Delaunay triangulation of input points.
+It expects a vtkPointSet as input and produces vtkPolyData as output.
+The points are expected to be in a mostly planar distribution."
+                     short_help="Create 2D Delaunay triangulation of input points.">
+                     Delaunay2D is a filter that constructs a 2D Delaunay
+                     triangulation from a list of input points. These points
+                     may be represented by any dataset of type vtkPointSet and
+                     subclasses. The output of the filter is a polygonal
+                     dataset containing a triangle mesh. The 2D Delaunay
+                     triangulation is defined as the triangulation that
+                     satisfies the Delaunay criterion for n-dimensional
+                     simplexes (in this case n=2 and the simplexes are
+                     triangles). This criterion states that a circumsphere of
+                     each simplex in a triangulation contains only the n+1
+                     defining points of the simplex. In two dimensions, this
+                     translates into an optimal triangulation. That is, the
+                     maximum interior angle of any triangle is less than or
+                     equal to that of any possible triangulation. Delaunay
+                     triangulations are used to build topological structures
+                     from unorganized (or unstructured) points. The input to
+                     this filter is a list of points specified in 3D, even
+                     though the triangulation is 2D. Thus the triangulation is
+                     constructed in the x-y plane, and the z coordinate is
+                     ignored (although carried through to the output). You can
+                     use the option ProjectionPlaneMode in order to compute the
+                     best-fitting plane to the set of points, project the
+                     points and that plane and then perform the triangulation
+                     using their projected positions and then use it as the
+                     plane in which the triangulation is performed. The
+                     Delaunay triangulation can be numerically sensitive in
+                     some cases. To prevent problems, try to avoid injecting
+                     points that will result in triangles with bad aspect
+                     ratios (1000:1 or greater). In practice this means
+                     inserting points that are "widely dispersed", and enables
+                     smooth transition of triangle sizes throughout the mesh.
+                     (You may even want to add extra points to create a better
+                     point distribution.) If numerical problems are present,
+                     you will see a warning message to this effect at the end
+                     of the triangulation process. Warning: Points arranged on
+                     a regular lattice (termed degenerate cases) can be
+                     triangulated in more than one way (at least according to
+                     the Delaunay criterion). The choice of triangulation (as
+                     implemented by this algorithm) depends on the order of the
+                     input points. The first three points will form a triangle;
+                     other degenerate points will not break this triangle.
+                     Points that are coincident (or nearly so) may be discarded
+                     by the algorithm. This is because the Delaunay
+                     triangulation requires unique input points. The output of
+                     the Delaunay triangulation is supposedly a convex hull. In
+                     certain cases this implementation may not generate the
+                     convex hull.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPointSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input dataset to the
+        Delaunay 2D filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetProjectionPlaneMode"
+                         default_values="0"
+                         name="ProjectionPlaneMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="XY Plane"
+                 value="0" />
+          <!--         <Entry value="1" text="Perpendicular"/> -->
+          <Entry text="Best-Fitting Plane"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>This property determines type of projection plane to use
+        in performing the triangulation.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetAlpha"
+                            default_values="0.0"
+                            name="Alpha"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>The value of this property controls the output of this
+        filter. For a non-zero alpha value, only edges or triangles contained
+        within a sphere centered at mesh vertices will be output. Otherwise,
+        only triangles will be output.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetTolerance"
+                            default_values="0.00001"
+                            name="Tolerance"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1.0"
+                           min="0"
+                           name="range" />
+        <Documentation>This property specifies a tolerance to control
+        discarding of closely spaced points. This tolerance is specified as a
+        fraction of the diagonal length of the bounding box of the
+        points.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetOffset"
+                            default_values="1.0"
+                            name="Offset"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.75"
+                           name="range" />
+        <Documentation>This property is a multiplier to control the size of the
+        initial, bounding Delaunay triangulation.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetBoundingTriangulation"
+                         default_values="0"
+                         name="BoundingTriangulation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, bounding triangulation
+        points (and associated triangles) are included in the output. These are
+        introduced as an initial triangulation to begin the triangulation
+        process. This feature is nice for debugging output.</Documentation>
+      </IntVectorProperty>
+      <!-- End Delaunay2D -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkDelaunay3D"
+                 label="Delaunay 3D"
+                 name="Delaunay3D">
+      <Documentation long_help="Create a 3D Delaunay triangulation of input
+                               points.  It expects a vtkPointSet as input and
+                               produces vtkUnstructuredGrid as output."
+                     short_help="Create a 3D Delaunay triangulation of input
+                                points.">Delaunay3D is a filter that constructs
+a 3D Delaunay triangulation from a list of input points. These points may be
+represented by any dataset of type vtkPointSet and subclasses. The output of
+the filter is an unstructured grid dataset. Usually the output is a tetrahedral
+mesh, but if a non-zero alpha distance value is specified (called the "alpha"
+value), then only tetrahedra, triangles, edges, and vertices lying within the
+alpha radius are output. In other words, non-zero alpha values may result in
+arbitrary combinations of tetrahedra, triangles, lines, and vertices. (The
+notion of alpha value is derived from Edelsbrunner's work on "alpha shapes".)
+The 3D Delaunay triangulation is defined as the triangulation that satisfies
+the Delaunay criterion for n-dimensional simplexes (in this case n=3 and the
+simplexes are tetrahedra). This criterion states that a circumsphere of each
+simplex in a triangulation contains only the n+1 defining points of the
+simplex. (See text for more information.) While in two dimensions this
+translates into an "optimal" triangulation, this is not true in 3D, since a
+measurement for optimality in 3D is not agreed on. Delaunay triangulations are
+used to build topological structures from unorganized (or unstructured) points.
+The input to this filter is a list of points specified in 3D. (If you wish to
+create 2D triangulations see Delaunay2D.) The output is an unstructured grid.
+The Delaunay triangulation can be numerically sensitive. To prevent problems,
+try to avoid injecting points that will result in triangles with bad aspect
+ratios (1000:1 or greater). In practice this means inserting points that are
+"widely dispersed", and enables smooth transition of triangle sizes throughout
+the mesh. (You may even want to add extra points to create a better point
+distribution.) If numerical problems are present, you will see a warning
+message to this effect at the end of the triangulation process. Warning: Points
+arranged on a regular lattice (termed degenerate cases) can be triangulated in
+more than one way (at least according to the Delaunay criterion). The choice of
+triangulation (as implemented by this algorithm) depends on the order of the
+input points. The first four points will form a tetrahedron; other degenerate
+points (relative to this initial tetrahedron) will not break it. Points that
+are coincident (or nearly so) may be discarded by the algorithm. This is
+because the Delaunay triangulation requires unique input points. You can
+control the definition of coincidence with the "Tolerance" instance variable.
+The output of the Delaunay triangulation is supposedly a convex hull. In
+certain cases this implementation may not generate the convex hull. This
+behavior can be controlled by the Offset instance variable. Offset is a
+multiplier used to control the size of the initial triangulation. The larger
+the offset value, the more likely you will generate a convex hull; and the more
+likely you are to see numerical problems. The implementation of this algorithm
+varies from the 2D Delaunay algorithm (i.e., Delaunay2D) in an important way.
+When points are injected into the triangulation, the search for the enclosing
+tetrahedron is quite different. In the 3D case, the closest previously inserted
+point point is found, and then the connected tetrahedra are searched to find
+the containing one. (In 2D, a "walk" towards the enclosing triangle is
+performed.) If the triangulation is Delaunay, then an enclosing tetrahedron
+will be found. However, in degenerate cases an enclosing tetrahedron may not be
+found and the point will be rejected.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPointSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input dataset to the
+        Delaunay 3D filter.</Documentation>
+      </InputProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetAlpha"
+                            default_values="0.0"
+                            name="Alpha"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>This property specifies the alpha (or distance) value to
+        control the output of this filter. For a non-zero alpha value, only
+        edges, faces, or tetra contained within the circumsphere (of radius
+        alpha) will be output. Otherwise, only tetrahedra will be
+        output.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetTolerance"
+                            default_values="0.001"
+                            name="Tolerance"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1.0"
+                           min="0"
+                           name="range" />
+        <Documentation>This property specifies a tolerance to control
+        discarding of closely spaced points. This tolerance is specified as a
+        fraction of the diagonal length of the bounding box of the
+        points.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetOffset"
+                            default_values="2.5"
+                            name="Offset"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="2.5"
+                           name="range" />
+        <Documentation>This property specifies a multiplier to control the size
+        of the initial, bounding Delaunay triangulation.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetBoundingTriangulation"
+                         default_values="0"
+                         name="BoundingTriangulation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This boolean controls whether bounding triangulation
+        points (and associated triangles) are included in the output. (These
+        are introduced as an initial triangulation to begin the triangulation
+        process. This feature is nice for debugging output.)</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetAlphaTets"
+                         default_values="1"
+                         name="AlphaTets"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>This boolean controls whether tetrahedrons which satisfy
+        the alpha criterion output when alpha is non-zero.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetAlphaTris"
+                         default_values="1"
+                         name="AlphaTris"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>This boolean controls whether triangles which satisfy
+        the alpha criterion output when alpha is non-zero.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetAlphaLines"
+                         default_values="0"
+                         name="AlphaLines"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>This boolean controls whether lines which satisfy the
+        alpha criterion output when alpha is non-zero.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetAlphaVerts"
+                         default_values="0"
+                         name="AlphaVerts"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>This boolean controls whether vertices which satisfy the
+        alpha criterion are output when alpha is non-zero.</Documentation>
+      </IntVectorProperty>
+      <!-- End Delaunay3d -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkElevationFilter"
+                 label="Elevation"
+                 name="ElevationFilter">
+      <Documentation long_help="Create point attribute array by projecting points onto an elevation vector."
+                     short_help="Create a point array representing elevation.">
+                     The Elevation filter generates point scalar values for an
+                     input dataset along a specified direction vector. The
+                     Input menu allows the user to select the data set to which
+                     this filter will be applied. Use the Scalar range entry
+                     boxes to specify the minimum and maximum scalar value to
+                     be generated. The Low Point and High Point define a line
+                     onto which each point of the data set is projected. The
+                     minimum scalar value is associated with the Low Point, and
+                     the maximum scalar value is associated with the High
+                     Point. The scalar value for each point in the data set is
+                     determined by the location along the line to which that
+                     point projects.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input dataset to the
+        Elevation filter.</Documentation>
+      </InputProperty>
+      <DoubleVectorProperty command="SetScalarRange"
+                            default_values="0 1"
+                            name="ScalarRange"
+                            number_of_elements="2">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property determines the range into which scalars
+        will be mapped.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetLowPoint"
+                            default_values="0 0 0"
+                            label="Low Point"
+                            name="LowPoint"
+                            number_of_elements="3" >
+        <BoundsDomain default_mode="min"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>This property defines one end of the direction vector
+        (small scalar values).</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetHighPoint"
+                            default_values="0 0 1"
+                            label="High Point"
+                            name="HighPoint"
+                            number_of_elements="3" >
+        <BoundsDomain default_mode="max"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>This property defines the other end of the direction
+        vector (large scalar values).</Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup panel_widget="InteractiveLine">
+        <Property function="Point1WorldPosition" name="LowPoint" />
+        <Property function="Point2WorldPosition" name="HighPoint" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
+
+      <!-- End ElevationFilter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkFeatureEdges"
+                 label="Feature Edges"
+                 name="FeatureEdges">
+      <Documentation long_help="This filter will extract edges along sharp edges of surfaces or boundaries of surfaces."
+                     short_help="Extract edges that meet the feature criteria.">
+                     The Feature Edges filter extracts various subsets of edges
+                     from the input data set. This filter operates on polygonal
+                     data and produces polygonal output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Feature Edges
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetBoundaryEdges"
+                         default_values="1"
+                         name="BoundaryEdges"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the value of this property is set to 1, boundary
+        edges will be extracted. Boundary edges are defined as lines cells or
+        edges that are used by only one polygon.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFeatureEdges"
+                         default_values="1"
+                         name="FeatureEdges"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the value of this property is set to 1, feature edges
+        will be extracted. Feature edges are defined as edges that are used by
+        two polygons whose dihedral angle is greater than the feature angle.
+        (See the FeatureAngle property.) Toggle whether to extract feature
+        edges.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetNonManifoldEdges"
+                         default_values="1"
+                         label="Non-Manifold Edges"
+                         name="NonManifoldEdges"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the value of this property is set to 1, non-manifold
+        edges will be extracted. Non-manifold edges are defined as edges that
+        are use by three or more polygons.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetManifoldEdges"
+                         default_values="0"
+                         name="ManifoldEdges"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the value of this property is set to 1, manifold
+        edges will be extracted. Manifold edges are defined as edges that are
+        used by exactly two polygons.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetColoring"
+                         default_values="0"
+                         name="Coloring"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the value of this property is set to 1, then the
+        extracted edges are assigned a scalar value based on the type of the
+        edge.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetFeatureAngle"
+                            default_values="30.0"
+                            name="FeatureAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="180"
+                           min="0"
+                           name="range" />
+        <Documentation>The value of this property is used to define a feature
+        edge. If the surface normal between two adjacent triangles is at least
+        as large as this Feature Angle, a feature edge exists. (See the
+        FeatureEdges property.)</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <Visibility replace_input="0" />
+      </Hints>
+      <!-- End FeatureEdges -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkIdFilter"
+                 label="Generate Ids"
+                 name="GenerateIdScalars">
+      <Documentation long_help="Generate scalars from point and cell ids."
+                     short_help="Generate scalars from point and cell ids.">
+                     This filter generates scalars using cell and point ids.
+                     That is, the point attribute data scalars are generated
+                     from the point ids, and the cell attribute data scalars or
+                     field data are generated from the the cell
+                     ids.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Cell Data to
+        Point Data filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty name="GeneratePointIds"
+                         command="SetPointIds"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable generation of point ids.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetPointIdsArrayName"
+                            default_values="PointIds"
+                            name="PointIdsArrayName"
+                            number_of_elements="1">
+        <Documentation>The name of the point ids array.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="GeneratePointIds"
+                                   value="1" />
+        </Hints>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="GenerateCellIds"
+                         command="SetCellIds"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable generation of cell ids.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetCellIdsArrayName"
+                            default_values="CellIds"
+                            name="CellIdsArrayName"
+                            number_of_elements="1">
+        <Documentation>The name of the cell ids array.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="GenerateCellIds"
+                                   value="1" />
+        </Hints>
+      </StringVectorProperty>
+      <PropertyGroup label="Point Ids">
+        <Property name="GeneratePointIds" />
+        <Property name="PointIdsArrayName" />
+      </PropertyGroup>
+      <PropertyGroup label="Cell Ids">
+        <Property name="GenerateCellIds" />
+        <Property name="CellIdsArrayName" />
+      </PropertyGroup>
+
+      <!-- End GenerateIdScalars -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkMoleculeAppend"
+                 name="AppendMolecule"
+                 label="Append Molecule">
+      <Documentation long_help="Appends one or more molecules into a single molecule."
+                     short_help="Append molecules into a single molecule.">
+        Appends one or more molecules into a single molecule. It also appends  the associated atom data and edge data.
+        Note that input data arrays should match (same number of arrays with same names in each input)
+      </Documentation>
+      <InputProperty clean_command="RemoveAllInputs"
+                     command="AddInputConnection"
+                     multiple_input="1"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMolecule"/>
+        </DataTypeDomain>
+      </InputProperty>
+    <!-- End AppendMolecule -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPlaneCutter"
+                 name="SliceWithPlane"
+                 label="Slice With Plane">
+      <Documentation long_help="This filter slices a data set with a plane. Slicing is similar to a contour. It creates surfaces from volumes and lines from surfaces. This filter is faster than the standard Slice filter."
+                     short_help="Slice datasets with a plane.">This filter
+                     extracts the portion of the input dataset that lies along
+                     the specified plane. The Slice filter takes any type of
+                     dataset as input. The output of this filter is a multiblock of multipiece
+                     polygonal data. This is a multithreaded implementation.
+                     </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input of the slice
+        filter.</Documentation>
+      </InputProperty>
+      <ProxyProperty command="SetPlane"
+                     name="Plane">
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="implicit_functions"
+                 name="Plane" />
+        </ProxyListDomain>
+        <Documentation>This property sets the parameters of the plane
+        function.</Documentation>
+      </ProxyProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetBuildTree"
+                         default_values="1"
+                         name="BuildTree"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+       <BooleanDomain name="bool" />
+       <Documentation>
+        If enabled and input is not an Image Data, Sphere Tree will be computed, for a faster slice computation.
+       </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetBuildHierarchy"
+                         default_values="1"
+                         name="BuildHierarchy"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+       <BooleanDomain name="bool" />
+       <Documentation>
+        If enabled and input is not an Image Data, Tree hierarchy will be computed, for a faster slice computation.
+       </Documentation>
+       <Hints>
+         <PropertyWidgetDecorator type="ShowWidgetDecorator">
+           <Property name="BuildTree" function="boolean" />
+         </PropertyWidgetDecorator>
+       </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetComputeNormals"
+                         default_values="0"
+                         name="ComputeNormals"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+       <BooleanDomain name="bool" />
+       <Documentation>
+        If enabled, compute the normal on each cell. Since all output cells are coplanar,
+        the normal generated is simply the normal of the plane used to slice with.
+        By default computing of normals is disabled.
+       </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetInterpolateAttributes"
+                         default_values="1"
+                         name="InterpolateAttributes"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+       <BooleanDomain name="bool" />
+       <Documentation>
+        If enabled, interpolate attribute data. By default this is
+        enabled. Point data is always interpolated. Cell data is transferred
+        unless input is an image data.
+       </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetGeneratePolygons"
+                         default_values="1"
+                         name="GeneratePolygons"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+       <BooleanDomain name="bool" />
+       <Documentation>
+        If enabled and input is a Structured Grid or a Rectilinear Grid,
+        output slice will consist of polygons instead of only triangles.
+       </Documentation>
+      </IntVectorProperty>
+
+      <!-- End SliceWithPlane -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPointDataToCellData"
+                 label="Point Data to Cell Data"
+                 name="PointDataToCellData">
+      <Documentation long_help="Create cell attributes by averaging point attributes."
+                     short_help="Convert point data to cell data.">The Point
+                     Data to Cell Data filter averages the values of the point
+                     attributes of the points of a cell to compute cell
+                     attributes. This filter operates on any type of dataset,
+                     and the output dataset is the same type as the
+                     input.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array" />
+        <FixedTypeDomain name="fixed_type" />
+        <Documentation>This property specifies the input to the Point Data to
+        Cell Data filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetProcessAllArrays"
+                         default_values="1"
+                         name="ProcessAllArrays"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>The value of this property controls whether all input
+        point arrays will be processed and converted into cell arrays.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty clean_command="ClearPointDataArrays"
+                            command="AddPointDataArray"
+                            name="PointDataArrays"
+                            label="Point Data Array to process"
+                            number_of_elements_per_command="1"
+                            repeat_command="1">
+        <Documentation>Add a point array by name to be converted to cell array.</Documentation>
+        <ArrayListDomain input_domain_name="input_array" name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="ProcessAllArrays" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetPassPointData"
+                         default_values="0"
+                         name="PassPointData"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>The value of this property controls whether the input
+        point data will be passed to the output. If set to 1, then the input
+        point data is passed through to the output; otherwise, only generated
+        cell data is placed into the output.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCategoricalData"
+                         default_values="0"
+                         name="CategoricalData"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>Control whether the input point data is to be
+        treated as categorical. If  the data is categorical, then the
+        resultant cell data will be determined by  a majority rules
+        vote, with ties going to the smaller value.</Documentation>
+      </IntVectorProperty>
+      <!-- End PointDataToCellData -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPolyDataTangents"
+                 label="Generate Surface Tangents"
+                 name="PolyDataTangents">
+      <Documentation long_help="This filter will produce surface tangents used for normal mapping."
+                     short_help="Produce surface point tangents.">This filter
+                     generates surface tangents at the points of the input
+                     polygonal dataset based on the normals and the texture coordinates.
+                     The resulting dataset is also polygonal. The tangents are required when using
+                     a normal texture.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Tangents
+        Generation filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetComputeCellTangents"
+                         default_values="0"
+                         name="ComputeCellTangents"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This filter computes the tangents at the points in the
+        data set. In the process of doing this it computes polygon tangents too.
+        If you want these normals to be passed to the output of this filter,
+        set the value of this property to 1.</Documentation>
+      </IntVectorProperty>
+      <!-- End  PolyDataTangents -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkQuadricClustering"
+                 label="Quadric Clustering"
+                 name="QuadricClustering">
+      <Documentation long_help="This filter is the same filter used to generate level of detail for ParaView.  It uses a structured grid of bins and merges all points contained in each bin."
+                     short_help="Simplify polygonal models.">The Quadric
+                     Clustering filter produces a reduced-resolution polygonal
+                     approximation of the input polygonal dataset. This filter
+                     is the one used by ParaView for computing LODs. It uses
+                     spatial binning to reduce the number of points in the data
+                     set; points that lie within the same spatial bin are
+                     collapsed into one representative point.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Quadric
+        Clustering filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetNumberOfDivisions"
+                         default_values="50 50 50"
+                         label="Number of Dimensions"
+                         name="NumberOfDivisions"
+                         number_of_elements="3">
+        <IntRangeDomain name="range" />
+        <Documentation>This property specifies the number of bins along the X,
+        Y, and Z axes of the data set.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseInputPoints"
+                         default_values="1"
+                         name="UseInputPoints"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the value of this property is set to 1, the
+        representative point for each bin is selected from one of the input
+        points that lies in that bin; the input point that produces the least
+        error is chosen. If the value of this property is 0, the location of
+        the representative point is calculated to produce the least error
+        possible for that bin, but the point will most likely not be one of the
+        input points.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseFeatureEdges"
+                         default_values="0"
+                         name="UseFeatureEdges"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, feature edge quadrics will
+        be used to maintain the boundary edges along processor
+        divisions.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseFeaturePoints"
+                         default_values="0"
+                         name="UseFeaturePoints"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, feature point quadrics
+        will be used to maintain the boundary points along processor
+        divisions.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCopyCellData"
+                         default_values="1"
+                         name="CopyCellData"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, the cell data from the
+        input will be copied to the output.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseInternalTriangles"
+                         default_values="0"
+                         name="UseInternalTriangles"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, triangles completely
+        contained in a spatial bin will be included in the computation of the
+        bin's quadrics. When this property is set to 0, the filters operates
+        faster, but the resulting surface may not be as
+        well-behaved.</Documentation>
+      </IntVectorProperty>
+      <!-- End QuadricClustering -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkResampleToImage"
+                 label="Resample To Image"
+                 name="ResampleToImage">
+      <Documentation long_help="Sample attributes using a 3D image as probing mesh."
+                     short_help="Sample attributes using a 3D image."/>
+
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the dataset whose data will
+        be probed</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetUseInputBounds"
+                         default_values="1"
+                         name="UseInputBounds"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <Documentation>
+        Use input bounds or custom ones?
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetSamplingDimensions"
+                         default_values="100 100 100"
+                         name="SamplingDimensions"
+                         number_of_elements="3"
+                         panel_visibility="default">
+                         <IntRangeDomain name="range" min="1 1 1"/>
+        <Documentation>
+        How many linear samples we want along each axis
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetSamplingBounds"
+                         default_values="0 1 0 1 0 1"
+                         name="SamplingBounds"
+                         number_of_elements="6"
+                         panel_visibility="default">
+        <BoundsDomain name="bounds">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+        Custom probing bounds
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseInputBounds"
+                                   value="0" />
+        </Hints>
+      </DoubleVectorProperty>
+      <!-- End vtkResampleToImage -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkResampleWithDataSet"
+                 label="Resample With Dataset"
+                 name="ResampleWithDataset">
+      <Documentation short_help="Sample data attributes at the points of a dataset.">
+          This filter takes two inputs - **Source Data Arrays**, and samples the
+          point and cell values of this input onto the point locations of the
+          **Destination Geometry** input. The output has the same structure as the
+          **Destination Geometry** input, but its point data has the resampled values from
+          the **Source Data Arrays**."
+      </Documentation>
+      <InputProperty command="SetSourceConnection" name="SourceDataArrays">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the dataset from which to obtain
+        probe values. The data attributes come from this dataset.</Documentation>
+      </InputProperty>
+      <InputProperty command="SetInputConnection" name="DestinationMesh">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the dataset whose geometry will
+        be used in determining positions to probe. The mesh comes from this
+        dataset.</Documentation>
+      </InputProperty>
+
+      <IntVectorProperty command="SetCategoricalData"
+                         default_values="0"
+                         name="CategoricalData"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>Control whether the source point data is to be
+        treated as categorical. If the data is categorical, then the
+        resultant data will be determined by a nearest neighbor
+        interpolation scheme rather than by linear interpolation.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPassCellArrays"
+                         default_values="0"
+                         name="PassCellArrays"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        When set the input's cell data arrays are shallow copied to the output.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPassPointArrays"
+                         default_values="0"
+                         name="PassPointArrays"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        When set the input's point data arrays are shallow copied to the output.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetPassFieldArrays"
+                         default_values="1"
+                         name="PassFieldArrays"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Set whether to pass the field-data arrays from the Input i.e. the input
+        providing the geometry to the output. On by default.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetComputeTolerance"
+                         default_values="1"
+                         name="ComputeTolerance"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Set whether to compute the tolerance or to use a user provided
+        value. On by default.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetTolerance"
+                            default_values="2.2204460492503131e-16"
+                            name="Tolerance"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain min="2.2204460492503131e-16"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="ComputeTolerance" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the tolerance to use for
+        vtkDataSet::FindCell</Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetMarkBlankPointsAndCells"
+                         default_values="0"
+                         name="MarkBlankPointsAndCells"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        When set, points that did not get valid values during resampling, and
+        cells containing such points, are marked as blank.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- cell locator begin -->
+      <ProxyProperty command="SetCellLocatorPrototype"
+                     label="Cell Locator"
+                     name="CellLocator"
+                     panel_visibility="advanced">
+        <ProxyGroupDomain name="groups">
+          <Group name="cell_locators" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="cell_locators"
+                 name="StaticCellLocator" />
+          <Proxy group="cell_locators"
+                 name="CellTreeLocator" />
+          <Proxy group="cell_locators"
+                 name="CellLocator" />
+        </ProxyListDomain>
+        <Documentation>The cell locator to use for finding cells for probing.
+        </Documentation>
+      </ProxyProperty>
+      <!-- cell locator end -->
+
+      <!-- End vtkResampleToImage -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkSmoothPolyDataFilter"
+                 label="Smooth"
+                 name="SmoothPolyDataFilter">
+      <Documentation long_help="This filter smooths a polygonal surface by iteratively moving points toward their neighbors."
+                     short_help="Smooth a polygonal surface without adding more points.">
+                     The Smooth filter operates on a polygonal data set by
+                     iteratively adjusting the position of the points using
+                     Laplacian smoothing. (Because this filter only adjusts
+                     point positions, the output data set is also polygonal.)
+                     This results in better-shaped cells and more evenly
+                     distributed points. The Convergence slider limits the
+                     maximum motion of any point. It is expressed as a fraction
+                     of the length of the diagonal of the bounding box of the
+                     data set. If the maximum point motion during a smoothing
+                     iteration is less than the Convergence value, the
+                     smoothing operation terminates.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Smooth
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetNumberOfIterations"
+                         default_values="20"
+                         label="Number of Iterations"
+                         name="NumberOfIterations"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        name="range" />
+        <Documentation>This property sets the maximum number of smoothing
+        iterations to perform. More iterations produce better
+        smoothing.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetConvergence"
+                            default_values="0.0"
+                            name="Convergence"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Documentation>The value of this property limits the maximum motion of
+        any point. It is expressed as a fraction of the length of the diagonal
+        of the bounding box of the input dataset. If the maximum point motion
+        during a smoothing iteration is less than the value of this property,
+        the smoothing operation terminates.</Documentation>
+      </DoubleVectorProperty>
+      <!-- End SmoothPolyDataFilter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkStripper"
+                 label="Triangle Strips"
+                 name="Stripper">
+      <Documentation long_help="This filter uses a greedy algorithm to convert triangles into triangle strips"
+                     short_help="Convert triangles into triangle strips.">The
+                     Triangle Strips filter converts triangles into triangle
+                     strips and lines into polylines. This filter operates on
+                     polygonal data sets and produces polygonal
+                     output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Triangle Strips
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetMaximumLength"
+                         default_values="1000"
+                         name="MaximumLength"
+                         number_of_elements="1">
+        <IntRangeDomain max="100000"
+                        min="4"
+                        name="range" />
+        <Documentation>This property specifies the maximum number of
+        triangles/lines to include in a triangle strip or
+        polyline.</Documentation>
+      </IntVectorProperty>
+      <!-- End Stripper -->
+    </SourceProxy>
+
+   <!-- ==================================================================== -->
+   <SourceProxy class="vtkStructuredGridOutlineFilter"
+                 label="Outline Curvilinear DataSet"
+                 name="StructuredGridOutlineFilter">
+      <Documentation long_help="This filter generates an outline representation of the input."
+                     short_help="Generates an outline.">The Outline filter
+                     generates an outline of the outside edges of the input
+                     dataset, rather than the dataset's bounding box. This
+                     filter operates on structured grid datasets and produces
+                     polygonal output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkStructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the outline
+        (curvilinear) filter.</Documentation>
+      </InputProperty>
+      <!-- End StructuredGridOutlineFilter -->
+   </SourceProxy>
+
+   <!-- ==================================================================== -->
+   <SourceProxy name="TensorGlyph" class="vtkTensorGlyph" label="Tensor Glyph">
+
+     <Documentation
+       long_help="This filter generates an ellipsoid, cuboid, cylinder or superquadric glyph at
+       each point of the input data set. The glyphs are oriented and scaled according
+       to eigenvalues and eigenvectors of tensor point data of the input data set.
+       This filter supports symmetric tensors. Symmetric tensor are expected to have
+       the following order: XX, YY, ZZ, XY, YZ, XZ"
+       short_help="This filter generates an ellipsoid, cuboid, cylinder or superquadric glyph at each
+       point of the input data set. The glyphs are oriented and scaled according to eigenvalues
+       and eigenvectors of tensor point data of the input data set.
+       This filter supports symmetric tensors. Symmetric tensor components are expected to have
+       the following order: XX, YY, ZZ, XY, YZ, XZ">
+
+       The Tensor Glyph filter generates an ellipsoid, cuboid, cylinder or superquadric glyph at every point in
+       the input data set. The glyphs are oriented and scaled according to eigenvalues and eigenvectors of tensor
+       point data of the input data set. The Tensor Glyph filter operates on any type of data set. Its output is
+       polygonal. This filter supports symmetric tensors. Symmetric tensor components are expected to have the
+       following order: XX, YY, ZZ, XY, YZ, XZ"
+     </Documentation>
+
+     <InputProperty name="Input"
+       command="SetInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources" />
+         <Group name="filters" />
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet" />
+       </DataTypeDomain>
+       <InputArrayDomain name="input_array1" attribute_type="point" number_of_components="6,9" />
+       <InputArrayDomain name="input_array2" attribute_type="point" number_of_components="1" optional="1" />
+       <Documentation>
+         This property specifies the input to the Glyph filter.
+       </Documentation>
+     </InputProperty>
+
+     <StringVectorProperty name="SelectInputTensors"
+       command="SetInputArrayToProcess"
+       number_of_elements="5"
+       element_types="0 0 0 0 2"
+       label="Tensors" >
+       <ArrayListDomain name="array_list" attribute_type="Tensors"
+         input_domain_name="input_array1">
+         <RequiredProperties>
+           <Property name="Input" function="Input" />
+         </RequiredProperties>
+       </ArrayListDomain>
+       <Documentation>
+         This property indicates the name of the tensor array on which to operate. The indicated array's
+         eigenvalues and eigenvectors are used for scaling and orienting the glyphs.
+       </Documentation>
+     </StringVectorProperty>
+
+     <InputProperty name="Source"
+       command="SetSourceConnection"
+       label="Glyph Type">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources" />
+         <Group name="glyph_sources" />
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkPolyData" />
+       </DataTypeDomain>
+       <ProxyListDomain name="proxy_list">
+         <Proxy group="sources" name="SphereSource" />
+         <Proxy group="sources" name="CylinderSource" />
+         <Proxy group="sources" name="CubeSource" />
+         <Proxy group="sources" name="SuperquadricSource" />
+       </ProxyListDomain>
+       <Documentation>
+         This property determines which type of glyph will be placed at the points in the input dataset.
+       </Documentation>
+     </InputProperty>
+
+     <IntVectorProperty
+       name="ExtractEigenvalues"
+       command="SetExtractEigenvalues"
+       number_of_elements="1"
+       default_values="1"
+       >
+       <BooleanDomain name="bool" />
+       <Documentation>
+         Toggle whether to extract eigenvalues from tensor. If false, eigenvalues/eigenvectors are not extracted and
+         the columns of the tensor are taken as the eigenvectors (the norm of column, always positive, is the eigenvalue).
+         If true, the glyph is scaled and oriented according to eigenvalues and eigenvectors; additionally, eigenvalues
+         are provided as new data array.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+       name="ColorGlyphs"
+       command="SetColorGlyphs"
+       number_of_elements="1"
+       default_values="1"
+       >
+       <BooleanDomain name="bool" />
+       <Documentation>
+         This property determines whether or not to color the glyphs.
+       </Documentation>
+     </IntVectorProperty>
+
+     <StringVectorProperty name="SelectInputScalars"
+       command="SetInputArrayToProcess"
+       number_of_elements="5"
+       element_types="0 0 0 0 2"
+       default_values="1"
+       label="Scalars" >
+       <!-- default_values=1 is important to set here and not in Tensors
+                previously. Omitting the setting here would mess up changed
+                tensor input being recognized as tensor input and not as
+                scalar input and vice versa. -->
+        <ArrayListDomain name="array_list" attribute_type="Scalars"
+          input_domain_name="input_array2">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property indicates the name of the scalar array to use for coloring
+        </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty
+       name="ColorMode"
+       command="SetColorMode"
+       number_of_elements="1"
+       default_values="0"
+       label="Color by" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="input scalars" />
+         <Entry value="1" text="eigenvalues" />
+       </EnumerationDomain>
+       <Documentation>
+         This property determines whether input scalars or computed eigenvalues at the point should be used
+         to color the glyphs. If ThreeGlyphs is set and the eigenvalues are chosen for coloring then each glyph
+         is colored by the corresponding eigenvalue and if not set the color corresponding to the largest
+         eigenvalue is chosen.
+       </Documentation>
+     </IntVectorProperty>
+
+     <!-- Disabled as vtkTensorGlyph.cxx does not respect this parameter currently. -->
+     <!--
+      <IntVectorProperty
+          name="Scaling"
+          command="SetScaling"
+          number_of_elements="1"
+          default_values="1"
+          >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property determines whether or not to scale glyphs with eigenvalues.
+        </Documentation>
+      </IntVectorProperty>
+      -->
+
+      <DoubleVectorProperty name="ScaleFactor"
+        command="SetScaleFactor"
+        number_of_elements="1"
+        default_values="1" >
+        <BoundsDomain name="range" mode="array_scaled_extent">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ArraySelection" name="SelectInputTensors" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          This property specifies the scale factor to scale every glyph by.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="LimitScalingByEigenvalues"
+        command="SetClampScaling"
+        number_of_elements="1"
+        default_values="0" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property determines whether scaling of glyphs by ScaleFactor times eigenvalue should be limited.
+          This is useful to prevent uncontrolled scaling near singularities.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="MaxScaleFactor"
+        command="SetMaxScaleFactor"
+        number_of_elements="1"
+        default_values="10" >
+        <Documentation>
+          If scaling by eigenvalues should be limited, this value sets an upper limit for scale factor times
+          eigenvalue.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Symmetric"
+        command="SetSymmetric"
+        number_of_elements="1"
+        default_values="0" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property determines whether or not to draw a mirror of each glyph.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ThreeGlyphs"
+        command="SetThreeGlyphs"
+        number_of_elements="1"
+        default_values="0" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle whether to produce three glyphs, each of which oriented along an eigenvector and scaled according
+          to the corresponding eigenvector.
+        </Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkTriangleFilter"
+                 label="Triangulate"
+                 name="TriangleFilter">
+      <Documentation long_help="This filter converts polygons and triangle strips to basic triangles."
+                     short_help="Convert polygonal data to triangles.">The
+                     Triangulate filter decomposes polygonal data into only
+                     triangles, points, and lines. It separates triangle strips
+                     and polylines into individual triangles and lines,
+                     respectively. The output is polygonal data. Some filters
+                     that take polygonal data as input require that the data be
+                     composed of triangles rather than other polygons, so
+                     passing your data through this filter first is useful in
+                     such situations. You should use this filter in these cases
+                     rather than the Tetrahedralize filter because they produce
+                     different output dataset types. The filters referenced
+                     require polygonal input, and the Tetrahedralize filter
+                     produces unstructured grid output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Triangulate
+        filter.</Documentation>
+      </InputProperty>
+      <!-- End TriangleFilter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkTubeFilter"
+                 label="Tube"
+                 name="TubeFilter">
+      <Documentation long_help="Convert lines into tubes. Normals are used to avoid cracks between tube segments."
+                     short_help="Convert lines into tubes.">The Tube filter
+                     creates tubes around the lines in the input polygonal
+                     dataset. The output is also polygonal.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array1"
+                          number_of_components="1"
+                          optional="1" />
+        <InputArrayDomain attribute_type="point"
+                          name="input_array2"
+                          number_of_components="3"
+                          optional="1" />
+        <Documentation>This property specifies the input to the Tube
+        filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Scalars"
+                            name="SelectInputScalars"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         input_domain_name="input_array1"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property indicates the name of the scalar array on
+        which to operate. The indicated array may be used for scaling the
+        tubes. (See the VaryRadius property.)</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            default_values="1"
+                            element_types="0 0 0 0 2"
+                            label="Vectors"
+                            name="SelectInputVectors"
+                            number_of_elements="5">
+        <!-- default value=1 so normals go to the right place -->
+        <ArrayListDomain attribute_type="Vectors"
+                         input_domain_name="input_array2"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property indicates the name of the vector array on
+        which to operate. The indicated array may be used for scaling and/or
+        orienting the tubes. (See the VaryRadius property.)</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetNumberOfSides"
+                         default_values="6"
+                         label="Number of Sides"
+                         name="NumberOfSides"
+                         number_of_elements="1">
+        <IntRangeDomain min="3"
+                        name="range" />
+        <Documentation>The value of this property indicates the number of faces
+        around the circumference of the tube.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCapping"
+                         default_values="1"
+                         name="Capping"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, endcaps will be drawn on
+        the tube. Otherwise the ends of the tube will be open.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetRadius"
+                            default_values="1.0"
+                            name="Radius"
+                            number_of_elements="1">
+        <BoundsDomain mode="scaled_extent"
+                      name="bounds"
+                      scale_factor="0.01">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>The value of this property sets the radius of the tube.
+        If the radius is varying (VaryRadius property), then this value is the
+        minimum radius.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetVaryRadius"
+                         default_values="0"
+                         name="VaryRadius"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Off"
+                 value="0" />
+          <Entry text="By Scalar"
+                 value="1" />
+          <Entry text="By Vector"
+                 value="2" />
+          <Entry text="By Absolute Scalar"
+                 value="3" />
+        </EnumerationDomain>
+        <Documentation>The property determines whether/how to vary the radius
+        of the tube. If varying by scalar (1), the tube radius is based on the
+        point-based scalar values in the dataset. If it is varied by vector,
+        the vector magnitude is used in varying the radius.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetRadiusFactor"
+                            default_values="10"
+                            name="RadiusFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>If varying the radius (VaryRadius property), the
+        property sets the maximum tube radius in terms of a multiple of the
+        minimum radius. If not varying the radius, this value has no
+        effect.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseDefaultNormal"
+                         default_values="0"
+                         name="UseDefaultNormal"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 0, and the input contains no
+        vector array, then default ribbon normals will be generated
+        (DefaultNormal property); if a vector array has been set
+        (SelectInputVectors property), the ribbon normals will be set from the
+        specified array. If this property is set to 1, the default normal
+        (DefaultNormal property) will be used, regardless of whether the
+        SelectInputVectors property has been set.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetDefaultNormal"
+                            default_values="0 0 1"
+                            name="DefaultNormal"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The value of this property specifies the normal to use
+        when the UseDefaultNormal property is set to 1 or the input contains no
+        vector array (SelectInputVectors property).</Documentation>
+      </DoubleVectorProperty>
+      <!-- End TubeFilter -->
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

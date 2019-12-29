@@ -70,7 +70,8 @@ vtk_module_add_module(ParaView::RemotingAnimation
   CLASSES ${classes})
 
 set(xml_files
-  animation.xml)
+  animation.xml
+  writers_animation.xml)
 
 if (WIN32)
   list(APPEND xml_files

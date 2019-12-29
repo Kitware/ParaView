@@ -1,0 +1,404 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy name="ForceTime"
+                 class="vtkForceTime"
+                 label="Force Time">
+      <Documentation>
+        Filter used to explicitly request a specific time from the pipeline.
+      </Documentation>
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input to the ForceTime filter.
+        </Documentation>
+      </InputProperty>
+      <IntVectorProperty name="IgnorePipelineTime"
+                         command="SetIgnorePipelineTime"
+                         number_of_elements="1"
+                         animatable="1"
+                         default_values="1">
+        <BooleanDomain  name="bool"/>
+        <Documentation>
+          If set to 0, this filter will do nothing, only shallow copy the
+          input to the output. If set to 1, this filter will always request the
+          ForcedTime to the pipeline, ignoring time requests.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty
+        name="ForcedTime"
+        command="SetForcedTime"
+        number_of_elements="1"
+        animatable="1"
+        default_values="0.0">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the time to request.
+          If the IgnorePipelineTime property is set, then this value will override any time request in the VTK pipeline.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="IgnorePipelineTime"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <Hints>
+        <ShowInMenu category="Temporal" />
+      </Hints>
+      <!-- End ForceTime -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy name="TemporalArrayOperator"
+                 label="Temporal Array Operator"
+                 class="vtkTemporalArrayOperatorFilter">
+      <Documentation>
+        Filter used to perform an operation on a data array at 2 different timesteps.
+      </Documentation>
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="any"
+                          name="input_array"/>
+        <Documentation>
+          This property specifies the input to the TemporalArrayOperator filter.
+        </Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputArray"
+                            number_of_elements="5">
+        <ArrayListDomain name="array_list"
+                         input_domain_name="input_array">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property lists the name of the array from which to
+        use.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty
+        name="FirstTimeStepIndex"
+        command="SetFirstTimeStepIndex"
+        number_of_elements="1"
+        animatable="1"
+        default_values="0">
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the timestep index to use in the first part of the comparison computation
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOperator"
+                         default_values="0"
+                         name="Operator"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="+"
+                 value="0" />
+          <Entry text="-"
+                 value="1" />
+          <Entry text="*"
+                 value="2" />
+          <Entry text="/"
+                 value="3" />
+        </EnumerationDomain>
+        <Documentation>The property determines the operation to compute
+        between the first and second timestep data.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="SecondTimeStepIndex"
+        command="SetSecondTimeStepIndex"
+        number_of_elements="1"
+        animatable="1"
+        default_values="0">
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the timestep index to use in the second part of the comparison computation
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetOutputArrayNameSuffix"
+                            name="OutputArrayNameSuffix"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Documentation>This property set the suffix to be append to the output array name.
+        If empty, output will be suffixed with '_' and the operation type.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ShowInMenu category="Temporal" />
+      </Hints>
+      <!-- End TemporalArrayOperator -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkTemporalDataSetCache"
+                 label="Temporal Cache"
+                 name="TemporalCache">
+      <Documentation long_help="Saves a copy of the data set for a fixed number of time steps."
+                     short_help="Caches data per time step.">The Temporal Cache
+                     can be used to save multiple copies of a data set at
+                     different time steps to prevent thrashing in the pipeline
+                     caused by downstream filters that adjust the requested
+                     time step. For example, assume that there is a downstream
+                     Temporal Interpolator filter. This filter will (usually)
+                     request two time steps from the upstream filters, which in
+                     turn (usually) causes the upstream filters to run twice,
+                     once for each time step. The next time the interpolator
+                     requests the same two time steps, they might force the
+                     upstream filters to re-evaluate the same two time steps.
+                     The Temporal Cache can keep copies of both of these time
+                     steps and provide the requested data without having to run
+                     upstream filters.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input of the Temporal Cache
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetCacheSize"
+                         default_values="2"
+                         name="CacheSize"
+                         number_of_elements="1">
+        <IntRangeDomain max="10"
+                        min="2"
+                        name="range" />
+        <Documentation>The cache size determines the number of time steps that
+        can be cached at one time. The maximum number is 10. The minimum is 2
+        (since it makes little sense to cache less than that).</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <!-- End TemporalCache -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkTemporalInterpolator"
+                 label="Temporal Interpolator"
+                 name="TemporalInterpolator">
+      <Documentation long_help="Interpolate between time steps."
+                     short_help="Interpolate between time steps.">The Temporal
+                     Interpolator converts data that is defined at discrete
+                     time steps to one that is defined over a continuum of time
+                     by linearly interpolating the data's field data between
+                     two adjacent time steps. The interpolated values are a
+                     simple approximation and should not be interpreted as
+                     anything more. The Temporal Interpolator assumes that the
+                     topology between adjacent time steps does not
+                     change.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input of the Temporal
+        Interpolator.</Documentation>
+      </InputProperty>
+      <DoubleVectorProperty command="SetDiscreteTimeStepInterval"
+                            default_values="0.0"
+                            name="DiscreteTimeStepInterval"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>If Discrete Time Step Interval is set to 0, then the
+        Temporal Interpolator will provide a continuous region of time on its
+        output. If set to anything else, then the output will define a finite
+        set of time points on its output, each spaced by the Discrete Time Step
+        Interval. The output will have (time range)/(discrete time step
+        interval) time steps. (Note that the time range is defined by the time
+        range of the data of the input filter, which may be different from
+        other pipeline objects or the range defined in the animation
+        inspector.) This is a useful option to use if you have a dataset with
+        one missing time step and wish to 'fill in' the missing data with an
+        interpolated value from the steps on either side.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimeRange">
+        <TimeRangeInformationHelper />
+      </DoubleVectorProperty>
+      <!-- End TemporalInterpolator -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkTemporalShiftScale"
+                 label="Temporal Shift Scale"
+                 name="TemporalShiftScale">
+      <Documentation long_help="Shift and scale time values."
+                     short_help="Shift and scale time values.">The Temporal
+                     Shift Scale filter linearly transforms the time values of
+                     a pipeline object by applying a shift and then scale.
+                     Given a data at time t on the input, it will be
+                     transformed to time t*Shift + Scale on the output.
+                     Inversely, if this filter has a request for time t, it
+                     will request time (t-Shift)/Scale on its
+                     input.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>The input to the Temporal Shift Scale
+        filter.</Documentation>
+      </InputProperty>
+      <DoubleVectorProperty command="SetPreShift"
+                            default_values="0.0"
+                            name="PreShift"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Apply a translation to the data before scaling. To
+        convert T{5,100} to T{0,1} use Preshift=-5, Scale=1/95, PostShift=0 To
+        convert T{5,105} to T{5,10} use Preshift=-5, Scale=5/100,
+        PostShift=5</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPostShift"
+                            default_values="0.0"
+                            name="PostShift"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The amount of time the input is shifted.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetScale"
+                            default_values="1.0"
+                            name="Scale"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The factor by which the input time is
+        scaled.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetPeriodic"
+                         default_values="0"
+                         name="Periodic"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If Periodic is true, requests for time will be wrapped
+        around so that the source appears to be a periodic time source. If data
+        exists for times {0,N-1}, setting periodic to true will cause time 0 to
+        be produced when time N, 2N, 2N etc is requested. This effectively
+        gives the source the ability to generate time data indefinitely in a
+        loop. When combined with Shift/Scale, the time becomes periodic in the
+        shifted and scaled time frame of reference. Note: Since the input time
+        may not start at zero, the wrapping of time from the end of one period
+        to the start of the next, will subtract the initial time - a source
+        with T{5..6} repeated periodically will have output time {5..6..7..8}
+        etc.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPeriodicEndCorrection"
+                         default_values="1"
+                         name="PeriodicEndCorrection"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If Periodic time is enabled, this flag determines if the
+        last time step is the same as the first. If PeriodicEndCorrection is
+        true, then it is assumed that the input data goes from 0-1 (or whatever
+        scaled/shifted actual time) and time 1 is the same as time 0 so that
+        steps will be 0,1,2,3...N,1,2,3...N,1,2,3 where step N is the same as 0
+        and step 0 is not repeated. When this flag is false the data is assumed
+        to be literal and output is of the form 0,1,2,3...N,0,1,2,3... By
+        default this flag is ON</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetMaximumNumberOfPeriods"
+                            default_values="1.0"
+                            name="MaximumNumberOfPeriods"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="100"
+                           min="0"
+                           name="range" />
+        <Documentation>If Periodic time is enabled, this controls how many time
+        periods time is reported for. A filter cannot output an infinite number
+        of time steps and therefore a finite number of periods is generated
+        when reporting time.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <!-- End TemporalShiftScale -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkTemporalSnapToTimeStep"
+                 label="Temporal Snap-to-Time-Step"
+                 name="TemporalSnapToTimeStep">
+      <Documentation long_help="Modifies the time range/steps of temporal data."
+                     short_help="Modifies the time range/steps of temporal data.">
+                     This file modifies the time range or time steps of the
+                     data without changing the data itself. The data is not
+                     resampled by this filter, only the information
+                     accompanying the data is modified.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input of the
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetSnapMode"
+                         default_values="0"
+                         name="SnapMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Nearest"
+                 value="0" />
+          <Entry text="NextBelowOrEqual"
+                 value="1" />
+          <Entry text="NextAboveOrEqual"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>Determine which time step to snap to.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <!-- End TemporalSnapToTimeStep -->
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>
