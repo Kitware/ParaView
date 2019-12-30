@@ -264,7 +264,8 @@ set(resource_files
   Resources/pqApplicationComponents.qrc)
 
 set(qt_components
-  Widgets)
+  Widgets
+  Svg)
 
 if (PARAVIEW_USE_QTHELP)
   list(APPEND qt_components
@@ -297,7 +298,8 @@ vtk_module_add_module(ParaView::pqApplicationComponents
           ${resource_files})
 vtk_module_link(ParaView::pqApplicationComponents
   PRIVATE
-    Qt5::Widgets)
+    Qt5::Widgets
+    Qt5::Svg)
 if (PARAVIEW_USE_QTHELP)
   vtk_module_link(ParaView::pqApplicationComponents
     PRIVATE

@@ -176,7 +176,7 @@
          </property>
          <property name="icon">
           <iconset resource="../../../Components/Resources/pqComponents.qrc">
-           <normaloff>:/pqWidgets/Icons/pqSave16.png</normaloff>:/pqWidgets/Icons/pqSave16.png</iconset>
+           <normaloff>:/pqWidgets/Icons/pqSave.svg</normaloff>:/pqWidgets/Icons/pqSave.svg</iconset>
          </property>
         </widget>
        </item>

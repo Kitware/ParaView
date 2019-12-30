@@ -415,7 +415,7 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   if (this->isButtonVisible("SelectFrustumCells", renderView))
   {
     QAction* selectFrustumCellsAction = frame->addTitleBarAction(
-      QIcon(":/pqWidgets/Icons/pqFrustumSelectionCell24.png"), "Select Cells Through (f)");
+      QIcon(":/pqWidgets/Icons/pqFrustumSelectionCell.svg"), "Select Cells Through (f)");
     selectFrustumCellsAction->setObjectName("actionSelectFrustumCells");
     selectFrustumCellsAction->setCheckable(true);
     new pqRenderViewSelectionReaction(selectFrustumCellsAction, renderView,
@@ -427,7 +427,7 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   if (this->isButtonVisible("SelectFrustumPoints", renderView))
   {
     QAction* selectFrustumPointsAction = frame->addTitleBarAction(
-      QIcon(":/pqWidgets/Icons/pqFrustumSelectionPoint24.png"), "Select Points Through (g)");
+      QIcon(":/pqWidgets/Icons/pqFrustumSelectionPoint.svg"), "Select Points Through (g)");
     selectFrustumPointsAction->setObjectName("actionSelectFrustumPoints");
     selectFrustumPointsAction->setCheckable(true);
     new pqRenderViewSelectionReaction(selectFrustumPointsAction, renderView,

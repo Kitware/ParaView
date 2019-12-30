@@ -94,7 +94,7 @@ pqShaderReplacementsSelectorPropertyWidget::pqShaderReplacementsSelectorProperty
   QToolButton* loadButton = new QToolButton(this);
   loadButton->setText(tr("Load"));
   loadButton->setToolTip(tr("Load a Json preset file"));
-  loadButton->setIcon(QIcon(":/pqWidgets/Icons/pqFolderNew16.png"));
+  loadButton->setIcon(QIcon(":/pqWidgets/Icons/pqNewFolder.svg"));
   QObject::connect(loadButton, SIGNAL(clicked()), this, SLOT(onLoad()));
   gridLayout->addWidget(loadButton, 0, 1);
 

@@ -226,7 +226,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqZoomToData.png</normaloff>:/pqWidgets/Icons/pqZoomToData.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqZoomToData.svg</normaloff>:/pqWidgets/Icons/pqZoomToData.svg</iconset>
    </property>
   </action>
   <addaction name="actionResetCamera"/>

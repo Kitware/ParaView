@@ -101,7 +101,7 @@ QIcon pqStandardRecentlyUsedResourceLoaderImplementation::icon(const pqServerRes
   }
   else if (resource.hasData("PARAVIEW_CINEMA_DATABASE"))
   {
-    return QIcon(":/pqWidgets/Icons/cinemascience_mark.png");
+    return QIcon(":/pqWidgets/Icons/pqCinemaScience.svg");
   }
   return QIcon();
 }

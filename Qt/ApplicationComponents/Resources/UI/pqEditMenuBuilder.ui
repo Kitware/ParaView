@@ -14,7 +14,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqUndo24.png</normaloff>:/pqWidgets/Icons/pqUndo24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqUndo32.png</normaloff>:/pqWidgets/Icons/pqUndo32.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Undo</string>
@@ -127,7 +127,7 @@
   <action name="actionDelete_All">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqReset24.png</normaloff>:/pqWidgets/Icons/pqReset24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqReset.svg</normaloff>:/pqWidgets/Icons/pqReset.svg</iconset>
    </property>
    <property name="text">
     <string>Reset Session</string>
@@ -188,7 +188,7 @@
   <action name="actionQuery">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqFindData32.png</normaloff>:/pqWidgets/Icons/pqFindData32.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqFindData.svg</normaloff>:/pqWidgets/Icons/pqFindData.svg</iconset>
    </property>
    <property name="text">
     <string>Find Data...</string>

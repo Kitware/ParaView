@@ -477,9 +477,8 @@ void pqPipelineModel::constructor()
   this->PixmapMap[PipelineModelIconType::INSITU_BREAKPOINT].load(
     ":/pqWidgets/Icons/pqInsituBreakpoint16.png");
   this->PixmapMap[PipelineModelIconType::INSITU_WRITER_PARAMETERS].load(
-    ":/pqWidgets/Icons/pqSave32.png");
-  this->PixmapMap[PipelineModelIconType::CINEMA_MARK].load(
-    ":/pqWidgets/Icons/cinemascience_mark.png");
+    ":/pqWidgets/Icons/pqSave.svg");
+  this->PixmapMap[PipelineModelIconType::CINEMA_MARK].load(":/pqWidgets/Icons/pqCinemaScience.svg");
 }
 
 //-----------------------------------------------------------------------------

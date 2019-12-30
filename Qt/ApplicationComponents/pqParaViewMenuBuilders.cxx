@@ -328,8 +328,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu)
   QAction* actionPBOpen = new QAction(menu.parent());
   actionPBOpen->setObjectName(QStringLiteral("actionPBOpen"));
   QIcon icon4;
-  icon4.addFile(
-    QStringLiteral(":/pqWidgets/Icons/pqOpen24.png"), QSize(), QIcon::Normal, QIcon::Off);
+  icon4.addFile(QStringLiteral(":/pqWidgets/Icons/pqOpen.svg"), QSize(), QIcon::Normal, QIcon::Off);
   actionPBOpen->setIcon(icon4);
   actionPBOpen->setShortcutContext(Qt::WidgetShortcut);
   actionPBOpen->setText(
