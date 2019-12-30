@@ -74,7 +74,7 @@ $<$<BOOL:${_vtk_client_server_genex_include_directories}>:\n-I\'$<JOIN:${_vtk_cl
       "${_vtk_client_server_basename}")
 
     set(_vtk_client_server_source_output
-      "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_vtk_client_server_basename}ClientServer.cxx")
+      "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_vtk_client_server_library_name}CS/${_vtk_client_server_basename}ClientServer.cxx")
     list(APPEND _vtk_client_server_sources
       "${_vtk_client_server_source_output}")
 
