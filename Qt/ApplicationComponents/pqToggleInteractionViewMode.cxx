@@ -88,10 +88,10 @@ void pqToggleInteractionViewMode::updateInteractionLabel(int mode)
   switch (mode)
   {
     case vtkPVRenderView::INTERACTION_MODE_2D:
-      this->parentAction()->setIcon(QIcon(":/pqWidgets/Icons/pqInteractionMode2D16.png"));
+      this->parentAction()->setIcon(QIcon(":/pqWidgets/Icons/pqInteractionMode2D.svg"));
       break;
     case vtkPVRenderView::INTERACTION_MODE_3D:
-      this->parentAction()->setIcon(QIcon(":/pqWidgets/Icons/pqInteractionMode3D16.png"));
+      this->parentAction()->setIcon(QIcon(":/pqWidgets/Icons/pqInteractionMode3D.svg"));
       break;
   }
 }
