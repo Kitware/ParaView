@@ -253,6 +253,39 @@ bool vtkSMTransferFunctionProxy::GetRange(double range[2])
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMTransferFunctionProxy::ExportTransferFunction(
+  vtkSMTransferFunctionProxy* colorTransferFunction,
+  vtkSMTransferFunctionProxy* opacityTransferFunction, const char* tfname, const char* filename)
+{
+  Json::Value exportCollection(Json::arrayValue);
+  Json::Value transferFunction =
+    vtkSMTransferFunctionProxy::GetStateAsPreset(colorTransferFunction);
+  transferFunction["Name"] = tfname;
+
+  if (opacityTransferFunction)
+  {
+    Json::Value opacities = vtkSMTransferFunctionProxy::GetStateAsPreset(opacityTransferFunction);
+    if (opacities.isMember("Points"))
+    {
+      transferFunction["Points"] = opacities["Points"];
+    }
+  }
+
+  exportCollection.append(transferFunction);
+
+  ofstream outfs;
+  outfs.open(filename);
+  if (!outfs.is_open())
+  {
+    std::cerr << "Failed to open file for writing: " << filename;
+    return false;
+  }
+  outfs << exportCollection.toStyledString().c_str() << endl;
+  outfs.close();
+  return true;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
   double rangeMin, double rangeMax, bool extend)
 {

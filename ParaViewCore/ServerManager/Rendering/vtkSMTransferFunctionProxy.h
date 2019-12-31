@@ -371,6 +371,14 @@ public:
   }
   //@}
 
+  /**
+   * Export a transfer function to a json file. opacityTransferFunction can be null but
+   * colorTransferFunction must not be null. The tfname will be the preset name
+   * upon importing the transfer function back into ParaView.
+   */
+  static bool ExportTransferFunction(vtkSMTransferFunctionProxy* colorTransferFunction,
+    vtkSMTransferFunctionProxy* opacityTransferFunction, const char* tfname, const char* filename);
+
 protected:
   vtkSMTransferFunctionProxy() = default;
   ~vtkSMTransferFunctionProxy() override = default;
