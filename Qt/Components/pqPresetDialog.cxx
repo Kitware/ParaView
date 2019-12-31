@@ -813,8 +813,10 @@ void pqPresetDialog::triggerApply(const QModelIndex& _proxyIndex)
   QModelIndex idx = internals.ReflowModel->mapToSource(proxyIndex);
   idx = internals.ProxyModel->mapToSource(idx);
   const Json::Value& preset = internals.Model->Presets->GetPreset(idx.row());
-  assert(preset.empty() == false);
-  emit this->applyPreset(preset);
+  if (preset.empty() == false)
+  {
+    emit this->applyPreset(preset);
+  }
 }
 
 //-----------------------------------------------------------------------------
