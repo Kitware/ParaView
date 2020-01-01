@@ -725,7 +725,7 @@ pqMemoryInspectorPanel::pqMemoryInspectorPanel(QWidget* pWidget, Qt::WindowFlags
   // Construct Qt form.
   this->Ui = new pqMemoryInspectorPanelUI;
   this->Ui->setupUi(this);
-  this->Ui->updateMemUse->setIcon(QPixmap(":/pqWidgets/Icons/pqRedo24.png"));
+  this->Ui->updateMemUse->setIcon(QPixmap(":/pqWidgets/Icons/pqRedo.svg"));
 
   // attempt initialization here before we begin to listen
   // for event's that could trigger and update.

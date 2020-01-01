@@ -107,7 +107,7 @@
          </property>
          <property name="icon">
           <iconset resource="../../../Components/Resources/pqComponents.qrc">
-           <normaloff>:/pqWidgets/Icons/pqInvert24.png</normaloff>:/pqWidgets/Icons/pqInvert24.png</iconset>
+           <normaloff>:/pqWidgets/Icons/pqInvert.svg</normaloff>:/pqWidgets/Icons/pqInvert.svg</iconset>
          </property>
         </widget>
        </item>

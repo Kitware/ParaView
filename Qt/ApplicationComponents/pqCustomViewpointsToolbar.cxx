@@ -46,7 +46,7 @@ void pqCustomViewpointsToolbar::constructor()
   // Create base pixmap
   this->BasePixmap.fill(QColor(0, 0, 0, 0));
   QPainter pixPaint(&this->BasePixmap);
-  pixPaint.drawPixmap(0, 0, 48, 48, QPixmap(":/pqWidgets/Icons/pqCaptureScreenshot.svg"));
+  pixPaint.drawPixmap(0, 0, 48, 48, QPixmap(":/pqWidgets/Icons/pqCamera.svg"));
 
   // Create plus pixmap
   this->PlusPixmap = this->BasePixmap.copy();
@@ -54,7 +54,7 @@ void pqCustomViewpointsToolbar::constructor()
   pixWithPlusPaint.drawPixmap(32, 32, 32, 32, QPixmap(":/QtWidgets/Icons/pqPlus.svg"));
   this->ConfigPixmap = this->BasePixmap.copy();
   QPainter pixWithConfigPaint(&this->ConfigPixmap);
-  pixWithConfigPaint.drawPixmap(32, 32, 32, 32, QPixmap(":/pqWidgets/Icons/pqConfig16.png"));
+  pixWithConfigPaint.drawPixmap(32, 32, 32, 32, QPixmap(":/pqWidgets/Icons/pqWrench.svg"));
 
   this->PlusAction = this->ConfigAction = nullptr;
 

@@ -70,7 +70,7 @@
   <action name="actionUndo">
    <property name="icon">
     <iconset>
-     <normaloff>:pqWidgets/Icons/pqUndo32.png</normaloff>:pqWidgets/Icons/pqUndo32.png</iconset>
+     <normaloff>:pqWidgets/Icons/pqUndo.svg</normaloff>:pqWidgets/Icons/pqUndo.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Undo</string>
@@ -79,7 +79,7 @@
   <action name="actionRedo">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqRedo24.png</normaloff>:/pqWidgets/Icons/pqRedo24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqRedo.svg</normaloff>:/pqWidgets/Icons/pqRedo.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Redo</string>

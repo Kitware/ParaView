@@ -14,7 +14,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqUndo32.png</normaloff>:/pqWidgets/Icons/pqUndo32.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqUndo.svg</normaloff>:/pqWidgets/Icons/pqUndo.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Undo</string>
@@ -29,7 +29,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqRedo24.png</normaloff>:/pqWidgets/Icons/pqRedo24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqRedo.svg</normaloff>:/pqWidgets/Icons/pqRedo.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Redo</string>
@@ -63,6 +63,10 @@
    </property>
   </action>
   <action name="actionChangeInput">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqChangeInput.svg</normaloff>:/pqWidgets/Icons/pqChangeInput.svg</iconset>
+   </property>
    <property name="text">
     <string>Change &amp;Input...</string>
    </property>
@@ -91,7 +95,7 @@
   <action name="actionCopy">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqCopy22.png</normaloff>:/pqWidgets/Icons/pqCopy22.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqCopy.svg</normaloff>:/pqWidgets/Icons/pqCopy.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Copy</string>
@@ -103,7 +107,7 @@
   <action name="actionPaste">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqPaste22.png</normaloff>:/pqWidgets/Icons/pqPaste22.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqPaste.svg</normaloff>:/pqWidgets/Icons/pqPaste.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Paste</string>
@@ -115,7 +119,7 @@
   <action name="actionDelete">
    <property name="icon">
     <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
-     <normaloff>:/QtWidgets/Icons/pqDelete.png</normaloff>:/QtWidgets/Icons/pqDelete.png</iconset>
+     <normaloff>:/QtWidgets/Icons/pqDelete.svg</normaloff>:/QtWidgets/Icons/pqDelete.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Delete</string>
@@ -139,7 +143,7 @@
   <action name="actionShow_All">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqEyeball.png</normaloff>:/pqWidgets/Icons/pqEyeball.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqEyeball.svg</normaloff>:/pqWidgets/Icons/pqEyeball.svg</iconset>
    </property>
    <property name="text">
     <string>Show All</string>
@@ -151,7 +155,7 @@
   <action name="actionHide_All">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqEyeballClosed.png</normaloff>:/pqWidgets/Icons/pqEyeballClosed.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqEyeballClosed.svg</normaloff>:/pqWidgets/Icons/pqEyeballClosed.svg</iconset>
    </property>
    <property name="text">
     <string>Hide All</string>
@@ -175,6 +179,10 @@
    </property>
   </action>
   <action name="actionEditSettings">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqSettings.svg</normaloff>:/pqWidgets/Icons/pqSettings.svg</iconset>
+   </property>
    <property name="text">
     <string>Settings...</string>
    </property>
@@ -204,6 +212,10 @@
    </property>
   </action>
   <action name="actionResetDefaultSettings">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqResetSettings.svg</normaloff>:/pqWidgets/Icons/pqResetSettings.svg</iconset>
+   </property>
    <property name="text">
     <string>Reset to Default Settings</string>
    </property>
@@ -215,6 +227,10 @@
    </property>
   </action>
   <action name="actionSetMainWindowTitle">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqRenameWindow.svg</normaloff>:/pqWidgets/Icons/pqRenameWindow.svg</iconset>
+   </property>
    <property name="text">
     <string>Rename Window</string>
    </property>

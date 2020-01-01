@@ -1,8 +1,7 @@
 <RCC>
     <qresource prefix="/QtWidgets" >
         <file>Icons/pqCollapsedGroup22.png</file>
-        <file>Icons/pqDelete.png</file>
-        <file>Icons/pqDelete@2x.png</file>
+        <file>Icons/pqDelete.svg</file>
         <file>Icons/pqMinus.svg</file>
         <file>Icons/pqMultiply@2x.png</file>
         <file>Icons/pqMultiply.png</file>

@@ -205,7 +205,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu, pqPropertiesPanel* prope
 
   if (propertiesPanel)
   {
-    QAction* applyAction = new QAction(QIcon(":/pqWidgets/Icons/pqUpdate16.png"), "Apply", &menu);
+    QAction* applyAction = new QAction(QIcon(":/pqWidgets/Icons/pqApply.svg"), "Apply", &menu);
     applyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_A));
     QAction* resetAction = new QAction(QIcon(":/pqWidgets/Icons/pqCancel16.png"), "Reset", &menu);
     resetAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_R));
@@ -346,7 +346,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu)
   actionPBShowAll->setObjectName(QStringLiteral("actionPBShowAll"));
   QIcon showAllIcon;
   showAllIcon.addFile(
-    QStringLiteral(":/pqWidgets/Icons/pqEyeball.png"), QSize(), QIcon::Normal, QIcon::Off);
+    QStringLiteral(":/pqWidgets/Icons/pqEyeball.svg"), QSize(), QIcon::Normal, QIcon::Off);
   actionPBShowAll->setIcon(showAllIcon);
   actionPBShowAll->setText(
     QApplication::translate("pqPipelineBrowserContextMenu", "&Show All", Q_NULLPTR));
@@ -359,7 +359,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu)
   actionPBHideAll->setObjectName(QStringLiteral("actionPBHideAll"));
   QIcon hideAllIcon;
   hideAllIcon.addFile(
-    QStringLiteral(":/pqWidgets/Icons/pqEyeballClosed.png"), QSize(), QIcon::Normal, QIcon::Off);
+    QStringLiteral(":/pqWidgets/Icons/pqEyeballClosed.svg"), QSize(), QIcon::Normal, QIcon::Off);
   actionPBHideAll->setIcon(hideAllIcon);
   actionPBHideAll->setText(
     QApplication::translate("pqPipelineBrowserContextMenu", "&Hide All", Q_NULLPTR));
@@ -371,8 +371,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu)
   QAction* actionPBCopy = new QAction(menu.parent());
   actionPBCopy->setObjectName(QStringLiteral("actionPBCopy"));
   QIcon icon2;
-  icon2.addFile(
-    QStringLiteral(":/pqWidgets/Icons/pqCopy22.png"), QSize(), QIcon::Normal, QIcon::Off);
+  icon2.addFile(QStringLiteral(":/pqWidgets/Icons/pqCopy.svg"), QSize(), QIcon::Normal, QIcon::Off);
   actionPBCopy->setIcon(icon2);
   actionPBCopy->setText(
     QApplication::translate("pqPipelineBrowserContextMenu", "&Copy", Q_NULLPTR));
@@ -385,7 +384,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu)
   actionPBPaste->setObjectName(QStringLiteral("actionPBPaste"));
   QIcon icon3;
   icon3.addFile(
-    QStringLiteral(":/pqWidgets/Icons/pqPaste22.png"), QSize(), QIcon::Normal, QIcon::Off);
+    QStringLiteral(":/pqWidgets/Icons/pqPaste.svg"), QSize(), QIcon::Normal, QIcon::Off);
   actionPBPaste->setIcon(icon3);
   actionPBPaste->setText(
     QApplication::translate("pqPipelineBrowserContextMenu", "&Paste", Q_NULLPTR));
@@ -438,7 +437,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu)
   actionPBDelete->setObjectName(QStringLiteral("actionPBDelete"));
   QIcon icon;
   icon.addFile(
-    QStringLiteral(":/QtWidgets/Icons/pqDelete.png"), QSize(), QIcon::Normal, QIcon::Off);
+    QStringLiteral(":/QtWidgets/Icons/pqDelete.svg"), QSize(), QIcon::Normal, QIcon::Off);
   actionPBDelete->setIcon(icon);
   actionPBDelete->setText(
     QApplication::translate("pqPipelineBrowserContextMenu", "&Delete", Q_NULLPTR));

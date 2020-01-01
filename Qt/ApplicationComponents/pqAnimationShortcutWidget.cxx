@@ -128,7 +128,7 @@ void pqAnimationShortcutWidget::updateMenu()
     editAction->setData(QVariant(1));
     popupMenu->addAction(editAction);
     QAction* deleteAction =
-      new QAction(QIcon(":/QtWidgets/Icons/pqDelete.png"), tr("Remove the animation track"), this);
+      new QAction(QIcon(":/QtWidgets/Icons/pqDelete.svg"), tr("Remove the animation track"), this);
     deleteAction->setData(QVariant(2));
     popupMenu->addAction(deleteAction);
     this->setIcon(QIcon(":/pqWidgets/Icons/pqRamp24.png"));
