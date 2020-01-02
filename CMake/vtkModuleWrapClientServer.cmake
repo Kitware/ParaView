@@ -62,6 +62,9 @@ $<$<BOOL:${_vtk_client_server_genex_include_directories}>:\n-I\'$<JOIN:${_vtk_cl
     endif ()
   endif ()
 
+  # create directory for wrapped source files
+  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_vtk_client_server_library_name}CS")
+
   set(_vtk_client_server_sources)
 
   _vtk_module_get_module_property("${module}"
