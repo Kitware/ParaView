@@ -15,6 +15,8 @@ DEPENDS
   VTK::RenderingVolume
   VTK::RenderingVolumeOpenGL2
 PRIVATE_DEPENDS
+  ParaView::RemotingSettings
+  ParaView::VTKExtensionsFiltersRendering
   VTK::CommonDataModel
   VTK::CommonExecutionModel
   VTK::CommonMath
