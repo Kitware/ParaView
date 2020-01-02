@@ -191,11 +191,6 @@ if (TARGET VTK::FiltersVerdict)
     Resources/filters_filtersverdict.xml)
 endif ()
 
-if (TARGET VTK::IOAMR)
-  list(APPEND xml_files
-    Resources/readers_ioamr.xml)
-endif ()
-
 if (TARGET VTK::IOXML AND TARGET VTK::IOParallelXML)
   list(APPEND xml_files
     Resources/readers_ioxml.xml
@@ -205,11 +200,6 @@ endif ()
 if (TARGET VTK::IONetCDF)
   list(APPEND xml_files
     Resources/readers_ionetcdf.xml)
-endif ()
-
-if (TARGET VTK::mpi)
-  list(APPEND xml_files
-    Resources/proxies_mpi.xml)
 endif ()
 
 if (TARGET VTK::IOXdmf2)
@@ -270,12 +260,6 @@ if (TARGET VTK::IOGeometry)
   list(APPEND xml_files
     Resources/readers_iogeometry.xml
     Resources/writers_iogeometry.xml)
-endif()
-
-if (TARGET VTK::IOImage)
-  list(APPEND xml_files
-    Resources/readers_ioimage.xml
-    Resources/writers_ioimage.xml)
 endif()
 
 if (TARGET VTK::IOParallel)
@@ -344,9 +328,6 @@ if (TARGET VTK::PythonInterpreter)
   _vtk_module_set_module_property(ParaView::RemotingApplication APPEND
     PROPERTY  "forward_link"
     VALUE     VTK::PythonUsed)
-  list(APPEND xml_files
-    Resources/pythonfilter.xml
-    Resources/pythonviews.xml)
 endif ()
 
 if (TARGET VTK::RenderingFreeType)

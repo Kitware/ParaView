@@ -25,8 +25,9 @@
 #define vtkRawImageFileSeriesReader_h
 
 #include "vtkImageFileSeriesReader.h"
+#include "vtkPVVTKExtensionsIOImageModule.h" //needed for exports
 
-class VTKPVVTKEXTENSIONSIOCORE_EXPORT vtkRawImageFileSeriesReader : public vtkImageFileSeriesReader
+class VTKPVVTKEXTENSIONSIOIMAGE_EXPORT vtkRawImageFileSeriesReader : public vtkImageFileSeriesReader
 {
 public:
   static vtkRawImageFileSeriesReader* New();

@@ -45,12 +45,10 @@ OPTIONAL_DEPENDS
   VTK::ImagingHybrid
   VTK::ImagingSources
   VTK::IOADIOS2
-  VTK::IOAMR
   VTK::IOCityGML
   VTK::IOGDAL
   VTK::IOGeometry
   VTK::IOH5part
-  VTK::IOImage
   VTK::IOInfovis
   VTK::IOLAS
   VTK::IOLegacy

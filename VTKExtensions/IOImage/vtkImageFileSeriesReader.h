@@ -29,8 +29,9 @@
 #define vtkImageFileSeriesReader_h
 
 #include "vtkFileSeriesReader.h"
+#include "vtkPVVTKExtensionsIOImageModule.h" //needed for exports
 
-class VTKPVVTKEXTENSIONSIOCORE_EXPORT vtkImageFileSeriesReader : public vtkFileSeriesReader
+class VTKPVVTKEXTENSIONSIOIMAGE_EXPORT vtkImageFileSeriesReader : public vtkFileSeriesReader
 {
 public:
   static vtkImageFileSeriesReader* New();

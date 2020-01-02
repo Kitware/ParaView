@@ -29,16 +29,10 @@
 #
 #==========================================================================
 set(classes
-  vtkEnsembleDataReader
-  vtkPhastaReader
-  vtkPPhastaReader
-  vtkPVPLYWriter
-  vtkUnstructuredPOPReader
-  vtkVRMLSource)
+  vtkAMRFileSeriesReader)
 
-vtk_module_add_module(ParaView::VTKExtensionsIOGeneral
+vtk_module_add_module(ParaView::VTKExtensionsIOAMR
   CLASSES ${classes})
 
 paraview_add_server_manager_xmls(
-  XMLS  Resources/general_readers.xml
-        Resources/general_writers.xml)
+  XMLS Resources/readers_pv_ioamr.xml)

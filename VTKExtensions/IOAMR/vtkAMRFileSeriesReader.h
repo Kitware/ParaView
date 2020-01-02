@@ -17,9 +17,9 @@
 #define vtkAMRFileSeriesReader_h
 
 #include "vtkFileSeriesReader.h"
-#include "vtkPVVTKExtensionsIOCoreModule.h" //needed for exports
+#include "vtkPVVTKExtensionsIOAMRModule.h" //needed for exports
 
-class VTKPVVTKEXTENSIONSIOCORE_EXPORT vtkAMRFileSeriesReader : public vtkFileSeriesReader
+class VTKPVVTKEXTENSIONSIOAMR_EXPORT vtkAMRFileSeriesReader : public vtkFileSeriesReader
 {
 public:
   static vtkAMRFileSeriesReader* New();

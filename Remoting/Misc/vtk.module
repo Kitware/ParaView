@@ -11,7 +11,7 @@ GROUPS
 PRIVATE_DEPENDS
   ParaView::VTKExtensionsExtraction
   ParaView::VTKExtensionsMisc
-  ParaView::VTKExtensionsIOCore
+  ParaView::VTKExtensionsIOGeneral
   ParaView::RemotingViews
   VTK::pugixml
   VTK::TestingRendering

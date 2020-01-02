@@ -443,7 +443,9 @@ else ()
     WANT_BY_DEFAULT     OFF
     ENABLE_TESTS        "${vtk_enable_tests}")
 
-  list(REMOVE_ITEM vtk_unrecognized_modules ${vtk_rejected_modules})
+  if (vtk_unrecognized_modules AND vtk_rejected_modules)
+    list(REMOVE_ITEM vtk_unrecognized_modules ${vtk_rejected_modules})
+  endif()
   if (vtk_required_modules OR vtk_unrecognized_modules)
     message(FATAL_ERROR
       "The following modules were requested or required, but not found: "

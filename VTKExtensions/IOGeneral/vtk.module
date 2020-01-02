@@ -16,6 +16,8 @@ PRIVATE_DEPENDS
   ParaView::VTKExtensionsCore
   ParaView::VTKExtensionsFiltersGeneral
   VTK::IOImport
+  VTK::IOInfovis
+  VTK::IOParallel
   VTK::IOPLY
   VTK::netcdf
   VTK::ParallelCore

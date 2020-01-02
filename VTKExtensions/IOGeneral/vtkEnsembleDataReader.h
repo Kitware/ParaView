@@ -26,9 +26,9 @@
 #define vtkEnsembleDataReader_h
 
 #include "vtkDataObjectAlgorithm.h"
-#include "vtkPVVTKExtensionsIOCoreModule.h" //needed for exports
+#include "vtkPVVTKExtensionsIOGeneralModule.h" //needed for exports
 
-class VTKPVVTKEXTENSIONSIOCORE_EXPORT vtkEnsembleDataReader : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSIOGENERAL_EXPORT vtkEnsembleDataReader : public vtkDataObjectAlgorithm
 {
 public:
   static vtkEnsembleDataReader* New();

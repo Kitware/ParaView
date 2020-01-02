@@ -59,33 +59,36 @@ set(classes
   vtkTimestepsAnimationPlayer
   vtkXMLPVAnimationWriter)
 
+set(xml_files
+  Resources/animation.xml
+  Resources/writers_animation.xml)
+
 if (TARGET VTK::PythonInterpreter)
   # TODO: Split these into a separate module so that there isn't a public
   # optional dependency.
   list(APPEND classes
     vtkPythonAnimationCue)
+  list(APPEND xml_files
+    Resources/animation_python.xml)
 endif ()
 
 vtk_module_add_module(ParaView::RemotingAnimation
   CLASSES ${classes})
 
-set(xml_files
-  animation.xml
-  writers_animation.xml)
 
 if (WIN32)
   list(APPEND xml_files
-    animation_win.xml)
+    Resources/animation_win.xml)
 endif ()
 
 if (TARGET VTK::IOFFMPEG)
   list(APPEND xml_files
-    animation_ffmpeg.xml)
+    Resources/animation_ffmpeg.xml)
 endif ()
 
 if (TARGET VTK::IOOggTheora)
   list(APPEND xml_files
-    animation_oggtheora.xml)
+    Resources/animation_oggtheora.xml)
 endif ()
 
 paraview_add_server_manager_xmls(

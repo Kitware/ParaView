@@ -3,7 +3,7 @@ NAME
 LIBRARY_NAME
   vtkPVVTKExtensionsIOCore
 GROUPS
-  PARAVIEW_CANONICAL
+  PARAVIEW_CORE
 KIT
   ParaView::CoreKit
 DEPENDS
@@ -15,10 +15,7 @@ PRIVATE_DEPENDS
   ParaView::VTKExtensionsCore
   ParaView::VTKExtensionsMisc
   VTK::CommonMisc
-  VTK::IOImage
-  VTK::IOInfovis
   VTK::IOLegacy
-  VTK::IOParallel
   VTK::IOParallelXML
   VTK::jsoncpp
   VTK::ParallelCore

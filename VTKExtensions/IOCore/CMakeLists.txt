@@ -30,16 +30,12 @@
 #==========================================================================
 set(classes
   vtkAdditionalFieldReader
-  vtkAMRFileSeriesReader
   vtkCSVWriter
-  vtkEnsembleDataReader
   vtkFileSeriesReader
   vtkFileSeriesWriter
-  vtkImageFileSeriesReader
   vtkMetaReader
   vtkParallelSerialWriter
   vtkPVDReader
-  vtkRawImageFileSeriesReader
   vtkXMLCollectionReader
   vtkXMLPVDWriter)
 

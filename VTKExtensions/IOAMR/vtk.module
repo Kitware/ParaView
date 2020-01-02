@@ -1,0 +1,17 @@
+NAME
+  ParaView::VTKExtensionsIOAMR
+LIBRARY_NAME
+  vtkPVVTKExtensionsIOAMR
+GROUPS
+  PARAVIEW_CANONICAL
+KIT
+  ParaView::CoreKit
+DEPENDS
+  ParaView::VTKExtensionsIOCore
+PRIVATE_DEPENDS
+  ParaView::RemotingClientServerStream
+  VTK::IOAMR
+  VTK::ParallelCore
+  VTK::vtksys
+TEST_LABELS
+  ParaView

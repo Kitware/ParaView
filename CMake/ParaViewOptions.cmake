@@ -214,17 +214,20 @@ Use this macro to conditionally require (or reject) modules.
 paraview_require_module(
   MODULES             <module>...
   [CONDITION          <condition>]
+  [EXCLUSIVE]
 ~~~
 
 The arguments are as follows:
 
   * `MODULES`: (Required) The list of modules.
   * `CONDITION`: (Defaults to `TRUE`) The condition under which the modules
-    specified are added to the requested list or rejected list.
+    specified are added to the requested list.
+  * `EXCLUSIVE`: When sepcified, if `CONDITION` is false, the module will be
+    added to the rejected modules list.
 #]==]
 macro (paraview_require_module)
   cmake_parse_arguments(pem
-    ""
+    "EXCLUSIVE"
     ""
     "CONDITION;MODULES"
     ${ARGN})
@@ -242,10 +245,11 @@ macro (paraview_require_module)
   if (${pem_CONDITION})
     # message("${pem_CONDITION} == TRUE")
     list(APPEND paraview_requested_modules ${pem_MODULES})
-  else ()
+  elseif (pem_EXCLUSIVE)
     # message("${pem_CONDITION} == FALSE")
     list(APPEND paraview_rejected_modules ${pem_MODULES})
   endif()
+  unset(pem_EXCLUSIVE)
   unset(pem_CONDITION)
   unset(pem_MODULES)
   unset(pem_UNPARSED_ARGUMENTS)
@@ -254,81 +258,101 @@ endmacro()
 # ensures that VTK::mpi module is rejected when MPI is not enabled.
 paraview_require_module(
   CONDITION PARAVIEW_USE_MPI
-  MODULES   VTK::mpi)
+  MODULES   VTK::mpi
+  EXCLUSIVE)
 
 # ensures VTK::Python module is rejected when Python is not enabled.
 paraview_require_module(
   CONDITION PARAVIEW_USE_PYTHON
-  MODULES   VTK::Python)
+  MODULES   VTK::Python
+            VTK::PythonInterpreter
+  EXCLUSIVE)
 
 paraview_require_module(
   CONDITION PARAVIEW_USE_PYTHON AND PARAVIEW_BUILD_RENDERING
   MODULES   VTK::RenderingMatplotlib)
 
 paraview_require_module(
-  CONDITION PARAVIEW_USE_MPI AND PARAVIEW_USE_PYTHON
-  MODULES   VTK::ParallelMPI4Py)
-
-paraview_require_module(
   CONDITION PARAVIEW_USE_VTKM
-  MODULES   VTK::AcceleratorsVTKm)
+  MODULES   VTK::AcceleratorsVTKm
+  EXCLUSIVE)
 
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_RAYTRACING AND PARAVIEW_BUILD_RENDERING
-  MODULES   VTK::RenderingRayTracing)
+  MODULES   VTK::RenderingRayTracing
+  EXCLUSIVE)
 
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_NVPIPE
-  MODULES   ParaView::nvpipe)
+  MODULES   ParaView::nvpipe
+  EXCLUSIVE)
 
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_GDAL
-  MODULES   VTK::IOGDAL)
+  MODULES   VTK::IOGDAL
+  EXCLUSIVE)
 
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_LAS
-  MODULES   VTK::IOLAS)
+  MODULES   VTK::IOLAS
+  EXCLUSIVE)
 
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_OPENTURNS
-  MODULES   VTK::FiltersOpenTURNS)
+  MODULES   VTK::FiltersOpenTURNS
+  EXCLUSIVE)
 
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_PDAL
-  MODULES   VTK::IOPDAL)
+  MODULES   VTK::IOPDAL
+  EXCLUSIVE)
 
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_MOTIONFX
-  MODULES   VTK::IOMotionFX)
+  MODULES   VTK::IOMotionFX
+  EXCLUSIVE)
 
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_MOMENTINVARIANTS
-  MODULES   VTK::MomentInvariants)
+  MODULES   VTK::MomentInvariants
+  EXCLUSIVE)
 
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_MOMENTINVARIANTS AND PARAVIEW_USE_MPI
-  MODULES   VTK::ParallelMomentInvariants)
+  MODULES   VTK::ParallelMomentInvariants
+  EXCLUSIVE)
 
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_VISITBRIDGE
   MODULES   ParaView::IOVisItBridge
-            ParaView::VisItLib)
+            ParaView::VisItLib
+  EXCLUSIVE)
 
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_XDMF2
-  MODULES   VTK::IOXdmf2)
+  MODULES   VTK::IOXdmf2
+  EXCLUSIVE)
 
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_XDMF3
-  MODULES   VTK::IOXdmf3)
+  MODULES   VTK::IOXdmf3
+  EXCLUSIVE)
 
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_ADIOS2
-  MODULES   VTK::IOADIOS2)
+  MODULES   VTK::IOADIOS2
+  EXCLUSIVE)
 
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_FFMPEG
-  MODULES   VTK::IOFFMPEG)
+  MODULES   VTK::IOFFMPEG
+  EXCLUSIVE)
+
+paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_WEB AND PARAVIEW_USE_PYTHON
+  MODULES   VTK::WebCore
+            VTK::WebPython
+  EXCLUSIVE)
 
 paraview_require_module(
   CONDITION PARAVIEW_BUILD_CANONICAL
@@ -386,17 +410,16 @@ paraview_require_module(
             VTK::RenderingFreeType)
 
 paraview_require_module(
+  CONDITION PARAVIEW_USE_MPI AND PARAVIEW_USE_PYTHON
+  MODULES   VTK::ParallelMPI4Py)
+
+paraview_require_module(
   CONDITION PARAVIEW_USE_MPI AND PARAVIEW_BUILD_CANONICAL
   MODULES   VTK::FiltersParallelFlowPaths
             VTK::FiltersParallelGeometry
             VTK::FiltersParallelMPI
             VTK::IOMPIImage
             VTK::IOParallelNetCDF)
-
-paraview_require_module(
-  CONDITION PARAVIEW_ENABLE_WEB
-  MODULES   VTK::WebCore
-            VTK::WebPython)
 
 if (paraview_requested_modules)
   list(REMOVE_DUPLICATES paraview_requested_modules)
@@ -406,5 +429,5 @@ if (paraview_rejected_modules)
   list(REMOVE_DUPLICATES paraview_rejected_modules)
 endif()
 
-# message(STATUS "REQUESTED: ${paraview_requested_modules}")
-# message(STATUS "REJECTED: ${paraview_rejected_modules}")
+message(STATUS "REQUESTED: ${paraview_requested_modules}")
+message(STATUS "REJECTED: ${paraview_rejected_modules}")
