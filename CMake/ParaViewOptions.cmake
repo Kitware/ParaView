@@ -371,7 +371,6 @@ paraview_require_module(
           VTK::FiltersOpenTURNS
           VTK::FiltersParallel
           VTK::FiltersParallelDIY2
-          VTK::FiltersParallelGeometry
           VTK::FiltersParallelVerdict
           VTK::FiltersSources
           VTK::FiltersStatistics
