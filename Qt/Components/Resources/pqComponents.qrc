@@ -1,5 +1,12 @@
 <RCC>
     <qresource prefix="/pqWidgets">
+        <file>Icons/explicit_color.png</file>
+        <file>Icons/explicit_opacity.png</file>
+        <file>Icons/inherited_color.png</file>
+        <file>Icons/inherited_opacity.png</file>
+        <file>Icons/no_color.png</file>
+        <file>Icons/no_opacity.png</file>
+        <file>Icons/pdf.png</file>
         <file>Icons/PVSplashScreen.png</file>
         <file>Icons/pq3DView16.png</file>
         <file>Icons/pqAdvanced.svg</file>
@@ -9,6 +16,7 @@
         <file>Icons/pqArrowUp16.png</file>
         <file>Icons/pqAutoApply.svg</file>
         <file>Icons/pqAxes.png</file>
+        <file>Icons/pqBold24.png</file>
         <file>Icons/pqBottomCenter32.png</file>
         <file>Icons/pqBottomLeftCorner32.png</file>
         <file>Icons/pqBottomRightCorner32.png</file>
@@ -75,6 +83,7 @@
         <file>Icons/pqInteractionMode3D.svg</file>
         <file>Icons/pqInvert.svg</file>
         <file>Icons/pqIsosurface24.png</file>
+        <file>Icons/pqItalics24.png</file>
         <file>Icons/pqLineChart16.png</file>
         <file>Icons/pqLinkBack16.png</file>
         <file>Icons/pqLinkIn16.png</file>
@@ -115,13 +124,8 @@
         <file>Icons/pqRedoCamera.svg</file>
         <file>Icons/pqReloadFile.svg</file>
         <file>Icons/pqReset.svg</file>
-        <file>Icons/pqResetCamera16.png</file>
-        <file>Icons/pqResetCamera24.png</file>
-        <file>Icons/pqResetCamera32.png</file>
         <file>Icons/pqResetCamera.png</file>
         <file>Icons/pqResetCamera@2x.png</file>
-        <file>Icons/pqResetCenter24.png</file>
-        <file>Icons/pqResetCenter32.png</file>
         <file>Icons/pqResetCenter.png</file>
         <file>Icons/pqResetCenter@2x.png</file>
         <file>Icons/pqResetRange24.png</file>
@@ -129,13 +133,8 @@
         <file>Icons/pqResetRangeTemporal24.png</file>
         <file>Icons/pqResetSettings.svg</file>
         <file>Icons/pqResetToVisibleRange.svg</file>
-        <file>Icons/pqRotate16.png</file>
-        <file>Icons/pqRotate24.png</file>
-        <file>Icons/pqRotate32.png</file>
-        <file>Icons/pqRotateCameraCCW24.png</file>
         <file>Icons/pqRotateCameraCCW.png</file>
         <file>Icons/pqRotateCameraCCW@2x.png</file>
-        <file>Icons/pqRotateCameraCW24.png</file>
         <file>Icons/pqRotateCameraCW.png</file>
         <file>Icons/pqRotateCameraCW@2x.png</file>
         <file>Icons/pqRuler.png</file>
@@ -149,11 +148,10 @@
         <file>Icons/pqSaveWindow.svg</file>
         <file>Icons/pqScalarBar16.png</file>
         <file>Icons/pqScalarBar24.png</file>
-        <file>Icons/pqScalarBar32.png</file>
+        <file>Icons/pqScalarBar16@2x.png</file>
         <file>Icons/pqSecureServer16.png</file>
         <file>Icons/pqSelect16.png</file>
-        <file>Icons/pqSelect24.png</file>
-        <file>Icons/pqSelect32.png</file>
+        <file>Icons/pqSelect16@2x.png</file>
         <file>Icons/pqSelectBlock.svg</file>
         <file>Icons/pqSelectChart.svg</file>
         <file>Icons/pqSelectChartPolygon.svg</file>
@@ -162,31 +160,22 @@
         <file>Icons/pqSelectToggle.svg</file>
         <file>Icons/pqSeparateColorMap24.png</file>
         <file>Icons/pqServer16.png</file>
-        <file>Icons/pqServer22.png</file>
-        <file>Icons/pqServer32.png</file>
+        <file>Icons/pqServer16@2x.png</file>
         <file>Icons/pqSettings.svg</file>
-        <file>Icons/pqShowCenterAxes24.png</file>
-        <file>Icons/pqShowCenterAxes32.png</file>
+        <file>Icons/pqShadow24.png</file>
         <file>Icons/pqShowCenterAxes.png</file>
         <file>Icons/pqShowCenterAxes@2x.png</file>
-        <file>Icons/pqShowOrientationAxes24.png</file>
-        <file>Icons/pqShowOrientationAxes32.png</file>
         <file>Icons/pqShowOrientationAxes.png</file>
         <file>Icons/pqShowOrientationAxes@2x.png</file>
         <file>Icons/pqSideSetData16.png</file>
-        <file>Icons/pqSinusoidal16.png</file>
         <file>Icons/pqSinusoidal24.png</file>
         <file>Icons/pqSlice24.png</file>
         <file>Icons/pqSolidColor16.png</file>
         <file>Icons/pqSource16.png</file>
-        <file>Icons/pqSource22.png</file>
-        <file>Icons/pqSource32.png</file>
-        <file>Icons/pqSplitViewH12.png</file>
-        <file>Icons/pqSplitViewV12.png</file>
+        <file>Icons/pqSource16@2x.png</file>
         <file>Icons/pqSplitViewH24.png</file>
         <file>Icons/pqSplitViewV24.png</file>
         <file>Icons/pqSpreadsheet16.png</file>
-        <file>Icons/pqStep16.png</file>
         <file>Icons/pqStep24.png</file>
         <file>Icons/pqStreamTracer24.png</file>
         <file>Icons/pqStructuredGrid16.png</file>
@@ -198,6 +187,10 @@
         <file>Icons/pqSurfaceSelectionPointDataInteractive.png</file>
         <file>Icons/pqSurfaceSelectionPointInteractive.svg</file>
         <file>Icons/pqSurfaceSelectionPoint.svg</file>
+        <file>Icons/pqTextAlignRight16.png</file>
+        <file>Icons/pqTextAlignLeft16.png</file>
+        <file>Icons/pqTextAlignCenter16.png</file>
+        <file>Icons/pqTextAlignJustified16.png</file>
         <file>Icons/pqThreshold24.png</file>
         <file>Icons/pqToggleLock.svg</file>
         <file>Icons/pqToolbar.svg</file>
@@ -206,7 +199,6 @@
         <file>Icons/pqTopRightCorner32.png</file>
         <file>Icons/pqUndo.svg</file>
         <file>Icons/pqUndoCamera.svg</file>
-        <file>Icons/pqUniformData16.png</file>
         <file>Icons/pqUnknownData16.png</file>
         <file>Icons/pqUnstructuredGrid16.png</file>
         <file>Icons/pqVcrBack.png</file>
@@ -223,16 +215,9 @@
         <file>Icons/pqVcrPause@2x.png</file>
         <file>Icons/pqVcrPlay.png</file>
         <file>Icons/pqVcrPlay@2x.png</file>
-        <file>Icons/pqView22.png</file>
-        <file>Icons/pqVolumeData16.png</file>
         <file>Icons/pqWarp24.png</file>
         <file>Icons/pqWindow16.png</file>
-        <file>Icons/pqWindow22.png</file>
-        <file>Icons/pqWindow32.png</file>
-        <file>Icons/pqWindowd16.png</file>
-        <file>Icons/pqWindowd22.png</file>
-        <file>Icons/pqWindowd32.png</file>
-        <file>Icons/pqWindowh16.png</file>
+        <file>Icons/pqWindow16@2x.png</file>
         <file>Icons/pqWrench.svg</file>
         <file>Icons/pqXMinus.png</file>
         <file>Icons/pqXMinus@2x.png</file>
@@ -247,35 +232,11 @@
         <file>Icons/pqZPlus.png</file>
         <file>Icons/pqZPlus@2x.png</file>
         <file>Icons/pqZoomToData.svg</file>
-        <file>Icons/pqZoomToSelection24.png</file>
         <file>Icons/pqZoomToSelection.png</file>
         <file>Icons/pqZoomToSelection@2x.png</file>
-        <file>Icons/SplitViewHorizontal.png</file>
-        <file>Icons/SplitViewVertical.png</file>
         <file>Icons/warning.png</file>
-        <file>Icons/pqBold16.png</file>
-        <file>Icons/pqBold24.png</file>
-        <file>Icons/pqItalics16.png</file>
-        <file>Icons/pqItalics24.png</file>
-        <file>Icons/pqShadow16.png</file>
-        <file>Icons/pqShadow24.png</file>
-        <file>Icons/pqTextAlignRight16.png</file>
-        <file>Icons/pqTextAlignLeft16.png</file>
-        <file>Icons/pqTextAlignCenter16.png</file>
-        <file>Icons/pqTextAlignJustified16.png</file>
-        <file>Icons/pvIcon16.png</file>
-        <file>Icons/pvIcon22.png</file>
-        <file>Icons/pvIcon32.png</file>
-        <file>Icons/pvIcon64.png</file>
-        <file>Icons/pvIcon96.png</file>
+        <file>Icons/pvIcon.svg</file>
         <file>Icons/pvIcon512.png</file>
-        <file>Icons/pdf.png</file>
-        <file>Icons/explicit_color.png</file>
-        <file>Icons/explicit_opacity.png</file>
-        <file>Icons/inherited_color.png</file>
-        <file>Icons/inherited_opacity.png</file>
-        <file>Icons/no_color.png</file>
-        <file>Icons/no_opacity.png</file>
         <file>pqPresetGroups.json</file>
     </qresource>
 </RCC>

@@ -93,7 +93,7 @@ QIcon pqStandardRecentlyUsedResourceLoaderImplementation::icon(const pqServerRes
 {
   if (resource.hasData("PARAVIEW_STATE"))
   {
-    return QIcon(":/pqWidgets/Icons/pvIcon32.png");
+    return QIcon(":/pqWidgets/Icons/pvIcon.svg");
   }
   else if (resource.hasData("PARAVIEW_DATA"))
   {
