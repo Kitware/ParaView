@@ -1044,11 +1044,13 @@ class Show(TraceItem):
         else:
             output.append("# show data in view")
         if port > 0:
-            output.append("%s = Show(OutputPort(%s, %d), %s)" % \
-                (str(accessor), str(self.ProducerAccessor), port, str(self.ViewAccessor)))
+            output.append("%s = Show(OutputPort(%s, %d), %s, '%s')" % \
+                (str(accessor), str(self.ProducerAccessor), port, str(self.ViewAccessor), \
+                str(display.GetXMLName())))
         else:
-            output.append("%s = Show(%s, %s)" % \
-                (str(accessor), str(self.ProducerAccessor), str(self.ViewAccessor)))
+            output.append("%s = Show(%s, %s, '%s')" % \
+                (str(accessor), str(self.ProducerAccessor), str(self.ViewAccessor), \
+                str(display.GetXMLName())))
         Trace.Output.append_separated(output.raw_data())
 
         output = TraceOutput()
