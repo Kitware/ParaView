@@ -133,7 +133,7 @@
   <action name="actionDelete">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqReset.svg</normaloff>:/pqWidgets/Icons/pqReset.svg</iconset>
+     <normaloff>:/pqWidgets/Icons/pqResetSession.svg</normaloff>:/pqWidgets/Icons/pqResetSession.svg</iconset>
    </property>
    <property name="text">
     <string>ResetSession</string>

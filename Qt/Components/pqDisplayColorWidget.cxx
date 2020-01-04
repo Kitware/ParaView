@@ -240,10 +240,10 @@ pqDisplayColorWidget::pqDisplayColorWidget(QWidget* parentObject)
   , CachedRepresentation(NULL)
   , Internals(new pqDisplayColorWidget::pqInternals())
 {
-  this->CellDataIcon = new QIcon(":/pqWidgets/Icons/pqCellData16.png");
-  this->PointDataIcon = new QIcon(":/pqWidgets/Icons/pqPointData16.png");
-  this->FieldDataIcon = new QIcon(":/pqWidgets/Icons/pqGlobalData16.png");
-  this->SolidColorIcon = new QIcon(":/pqWidgets/Icons/pqSolidColor16.png");
+  this->CellDataIcon = new QIcon(":/pqWidgets/Icons/pqCellData.svg");
+  this->PointDataIcon = new QIcon(":/pqWidgets/Icons/pqPointData.svg");
+  this->FieldDataIcon = new QIcon(":/pqWidgets/Icons/pqGlobalData.svg");
+  this->SolidColorIcon = new QIcon(":/pqWidgets/Icons/pqSolidColor.svg");
 
   QHBoxLayout* hbox = new QHBoxLayout(this);
   hbox->setMargin(0);

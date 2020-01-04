@@ -186,8 +186,8 @@ void pqIntegrationModelSeedHelperWidget::resetSeedWidget(bool force)
           vtkPVDataSetAttributesInformation* cellDataInfo =
             flowProxy->GetDataInformation()->GetAttributeInformation(
               vtkDataObject::FIELD_ASSOCIATION_CELLS);
-          QPixmap cellPixmap(":/pqWidgets/Icons/pqCellData16.png");
-          QPixmap pointPixmap(":/pqWidgets/Icons/pqPointData16.png");
+          QPixmap cellPixmap(":/pqWidgets/Icons/pqCellData.svg");
+          QPixmap pointPixmap(":/pqWidgets/Icons/pqPointData.svg");
 
           for (int ipd = 0; ipd < pointDataInfo->GetNumberOfArrays(); ipd++)
           {

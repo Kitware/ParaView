@@ -461,7 +461,7 @@ void pqPipelineModel::constructor()
     ":/pqWidgets/Icons/pqHistogram16.png");
   this->PixmapMap[PipelineModelIconType::LINECHART].load(":/pqWidgets/Icons/pqLineChart16.png");
   this->PixmapMap[PipelineModelIconType::PLOTMATRIX].load(":/pqWidgets/Icons/pqLineChart16.png");
-  this->PixmapMap[PipelineModelIconType::TABLE].load(":/pqWidgets/Icons/pqSpreadsheet16.png");
+  this->PixmapMap[PipelineModelIconType::TABLE].load(":/pqWidgets/Icons/pqSpreadsheet.svg");
   this->PixmapMap[PipelineModelIconType::INDETERMINATE].load(":/pqWidgets/Icons/pq3DView16.png");
   this->PixmapMap[PipelineModelIconType::NONE].load(":/pqWidgets/Icons/pq3DView16.png");
   this->PixmapMap[PipelineModelIconType::EYEBALL].load(":/pqWidgets/Icons/pqEyeball.svg");

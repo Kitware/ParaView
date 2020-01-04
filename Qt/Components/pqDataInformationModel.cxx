@@ -367,7 +367,7 @@ QVariant pqDataInformationModel::data(const QModelIndex& idx, int role /*= Qt::D
           return info.getNumberOfCells();
 
         case Qt::DecorationRole:
-          return QVariant(QIcon(":/pqWidgets/Icons/pqCellData16.png"));
+          return QVariant(QIcon(":/pqWidgets/Icons/pqCellData.svg"));
       }
       break;
 
@@ -380,7 +380,7 @@ QVariant pqDataInformationModel::data(const QModelIndex& idx, int role /*= Qt::D
           return info.getNumberOfPoints();
 
         case Qt::DecorationRole:
-          return QVariant(QIcon(":/pqWidgets/Icons/pqPointData16.png"));
+          return QVariant(QIcon(":/pqWidgets/Icons/pqPointData.svg"));
       }
       break;
 

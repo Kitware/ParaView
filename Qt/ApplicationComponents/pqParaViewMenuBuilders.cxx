@@ -207,7 +207,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu, pqPropertiesPanel* prope
   {
     QAction* applyAction = new QAction(QIcon(":/pqWidgets/Icons/pqApply.svg"), "Apply", &menu);
     applyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_A));
-    QAction* resetAction = new QAction(QIcon(":/pqWidgets/Icons/pqCancel16.png"), "Reset", &menu);
+    QAction* resetAction = new QAction(QIcon(":/pqWidgets/Icons/pqReset.svg"), "Reset", &menu);
     resetAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_R));
     menu.insertAction(ui.actionDelete, applyAction);
     menu.insertAction(ui.actionDelete, resetAction);

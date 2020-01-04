@@ -385,10 +385,10 @@ void pqProxyInformationWidget::fillDataInformation(vtkPVDataInformation* dataInf
   info[4] = dataInformation->GetRowDataInformation();
   info[5] = dataInformation->GetFieldDataInformation();
 
-  QPixmap pixmaps[6] = { QPixmap(":/pqWidgets/Icons/pqPointData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqCellData16.png"), QPixmap(":/pqWidgets/Icons/pqPointData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqCellData16.png"), QPixmap(":/pqWidgets/Icons/pqSpreadsheet16.png"),
-    QPixmap(":/pqWidgets/Icons/pqGlobalData16.png") };
+  QPixmap pixmaps[6] = { QPixmap(":/pqWidgets/Icons/pqPointData.svg"),
+    QPixmap(":/pqWidgets/Icons/pqCellData.svg"), QPixmap(":/pqWidgets/Icons/pqPointData.svg"),
+    QPixmap(":/pqWidgets/Icons/pqCellData.svg"), QPixmap(":/pqWidgets/Icons/pqSpreadsheet.svg"),
+    QPixmap(":/pqWidgets/Icons/pqGlobalData.svg") };
 
   if (dataInformation->IsDataStructured())
   {
