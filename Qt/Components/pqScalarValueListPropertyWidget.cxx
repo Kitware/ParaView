@@ -42,8 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCollapsedGroup.h"
 #include "pqSMAdaptor.h"
-#include "pqSampleScalarAddRangeDialog.h"
-
+#include "pqSeriesGeneratorDialog.h"
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
@@ -498,15 +497,17 @@ void pqScalarValueListPropertyWidget::addRange()
       range_max = 10.0;
     }
 
-    pqSampleScalarAddRangeDialog dialog(range_min, range_max, 10, false);
+    pqSeriesGeneratorDialog dialog(range_min, range_max, this);
     if (dialog.exec() != QDialog::Accepted)
     {
       return;
     }
 
     QVariantList value = this->Internals->Model.value().toList();
-    value += dialog.getRange();
-
+    for (const auto& newvalue : dialog.series())
+    {
+      value.push_back(QVariant(newvalue));
+    }
     this->Internals->Model.setValue(value);
     emit this->scalarsChanged();
   }
@@ -519,19 +520,16 @@ void pqScalarValueListPropertyWidget::addRange()
       range_max = 10;
     }
 
-    pqSampleScalarAddRangeDialog dialog(range_min, range_max, 10, false);
+    pqSeriesGeneratorDialog dialog(range_min, range_max, this);
     if (dialog.exec() != QDialog::Accepted)
     {
       return;
     }
 
-    QVariantList range = dialog.getRange();
     QVariantList intRange;
-    for (QVariantList::iterator i = range.begin(); i != range.end(); ++i)
+    for (const auto& newvalue : dialog.series())
     {
-      double val = i->toDouble();
-      int ival =
-        static_cast<int>(((val - std::floor(val)) < 0.5) ? std::floor(val) : std::ceil(val));
+      const int ival = static_cast<int>(std::floor(newvalue + 0.5));
       if (intRange.empty() || (intRange.back().toInt() != ival))
       {
         intRange.push_back(ival);
@@ -540,7 +538,6 @@ void pqScalarValueListPropertyWidget::addRange()
 
     QVariantList value = this->Internals->Model.value().toList();
     value += intRange;
-
     this->Internals->Model.setValue(value);
     emit this->scalarsChanged();
   }
