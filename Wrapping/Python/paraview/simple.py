@@ -1547,6 +1547,15 @@ def ImportPresets(filename):
     return presets.ImportPresets(filename)
 
 # -----------------------------------------------------------------------------
+def ExportTransferFunction(colortransferfunction, opacitytransferfunction, tfname, filename):
+    """Export transfer function to a file. The file will be saved in the new JSON format.
+    Note that opacitytransferfunction can be None. The tfname is the name that will be
+    given to the transfer function preset when imported back into ParaView.
+    Returns True on success."""
+    return servermanager.vtkSMTransferFunctionProxy.ExportTransferFunction(\
+             colortransferfunction.SMProxy, opacitytransferfunction.SMProxy, tfname, filename)
+
+# -----------------------------------------------------------------------------
 def CreateLookupTable(**params):
     """Create and return a lookup table.  Optionally, parameters can be given
     to assign to the lookup table.
