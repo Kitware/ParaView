@@ -113,6 +113,7 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
       auto proxy = *piter;
       proxies_to_show.erase(piter);
       proxies_to_show.push_back(proxy);
+      break;
     }
   }
 
