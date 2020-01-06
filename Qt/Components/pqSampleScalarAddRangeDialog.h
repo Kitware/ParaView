@@ -33,13 +33,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqSampleScalarAddRangeDialog_h
 
 #include "pqComponentsModule.h"
+#include "vtkSetGet.h" // for VTK_LEGACY_REMOVE
 
+#if !defined(VTK_LEGACY_REMOVE)
 #include <QDialog>
 #include <QVariant>
 
 /**
-* Provides a dialog for specifying a range of scalar samples, used
-* by pqSampleScalarWidget
+ * @class pqSampleScalarAddRangeDialog
+ *
+ * @deprecated in ParaView 5.8. Use `pqSeriesGeneratorDialog` instead.
+ *
+ * Provides a dialog for specifying a range of scalar samples, used
+ * by pqSampleScalarWidget
 */
 class PQCOMPONENTS_EXPORT pqSampleScalarAddRangeDialog : public QDialog
 {
@@ -76,4 +82,5 @@ private:
   pqImplementation* const Implementation;
 };
 
+#endif // !defined(VTK_LEGACY_REMOVE)
 #endif // !_pqSampleScalarAddRangeDialog_h

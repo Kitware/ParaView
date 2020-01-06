@@ -139,8 +139,6 @@ set(classes
   pqSILModel
   pqSILWidget
   pqSMSignalAdaptors
-  pqSampleScalarAddRangeDialog
-  pqSampleScalarWidget
   pqScalarSetModel
   pqScalarValueListPropertyWidget
   pqSearchBox
@@ -235,8 +233,6 @@ set(ui_files
   Resources/UI/pqRemoteCommandDialogForm.ui
   Resources/UI/pqRemoteCommandTemplateDialogForm.ui
   Resources/UI/pqRescaleRangeDialog.ui
-  Resources/UI/pqSampleScalarAddRangeDialog.ui
-  Resources/UI/pqSampleScalarWidget.ui
   Resources/UI/pqScalarValueListPropertyWidget.ui
   Resources/UI/pqSearchBox.ui
   Resources/UI/pqSelectReaderDialog.ui
@@ -251,6 +247,15 @@ set(ui_files
 
 set(resource_files
   Resources/pqComponents.qrc)
+
+if (NOT VTK_LEGACY_REMOVE)
+  list(APPEND classes
+    pqSampleScalarAddRangeDialog
+    pqSampleScalarWidget)
+  list(APPEND ui_files
+    Resources/UI/pqSampleScalarAddRangeDialog.ui
+    Resources/UI/pqSampleScalarWidget.ui)
+endif()
 
 vtk_module_find_package(
   PACKAGE     Qt5

@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqSampleScalarAddRangeDialog.h"
 
 #include "pqCoreUtilities.h"
+#include "vtkObject.h"
 
 #include <QIntValidator>
 
@@ -57,6 +58,8 @@ pqSampleScalarAddRangeDialog::pqSampleScalarAddRangeDialog(double default_from, 
   : Superclass(Parent)
   , Implementation(new pqImplementation())
 {
+  VTK_LEGACY_REPLACED_BODY(pqSampleScalarAddRangeDialog, "ParaView 5.8", pqSeriesGeneratorDialog);
+
   this->Implementation->StrictLog = false;
   this->Implementation->Ui.setupUi(this);
 
