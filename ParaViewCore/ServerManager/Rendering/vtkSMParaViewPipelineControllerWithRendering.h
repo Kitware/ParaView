@@ -56,6 +56,15 @@ public:
   virtual vtkSMProxy* Show(vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);
 
   /**
+   * Show the output data in the view. If data cannot be shown in the view,
+   * returns NULL. If \c view is NULL, this simply calls ShowInPreferredView().
+   * \c representationName specifies which representation should be instantiated -
+   * if null, a default representation will be created based on hints in the XML.
+   */
+  virtual vtkSMProxy* Show(vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view,
+    const char* representationType);
+
+  /**
    * Show all source output ports in provided view.
    */
   void ShowAll(vtkSMViewProxy* view);

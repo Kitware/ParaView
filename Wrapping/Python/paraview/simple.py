@@ -498,7 +498,7 @@ def GetDisplayProperties(proxy=None, view=None):
     return GetRepresentation(proxy, view)
 
 # -----------------------------------------------------------------------------
-def Show(proxy=None, view=None, **params):
+def Show(proxy=None, view=None, representationType=None, **params):
     """Turns the visibility of a given pipeline object on in the given view.
     If pipeline object and/or view are not specified, active objects are used."""
     if proxy == None:
@@ -508,11 +508,11 @@ def Show(proxy=None, view=None, **params):
     if proxy == None:
         raise RuntimeError ("Show() needs a proxy argument or that an active source is set.")
     if not view:
-        # it here's now active view, controller.Show() will create a new preferred view.
+        # If there's no active view, controller.Show() will create a new preferred view.
         # if possible.
         view = active_objects.view
     controller = servermanager.ParaViewPipelineController()
-    rep = controller.Show(proxy, proxy.Port, view)
+    rep = controller.Show(proxy, proxy.Port, view, representationType)
     if rep == None:
         raise RuntimeError ("Could not create a representation object for proxy %s" % proxy.GetXMLLabel())
     for param in params.keys():

@@ -350,7 +350,7 @@ bool vtkSMParaViewPipelineControllerWithRendering::RegisterRepresentationProxy(v
 
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
-  vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view)
+  vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view, const char* representationType)
 {
   vtkTimerLogScope scopeTimer("ParaViewPipelineControllerWithRendering::Show");
   if (producer == nullptr || static_cast<int>(producer->GetNumberOfOutputPorts()) <= outputPort)
@@ -365,7 +365,7 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
     return (view ? view->FindRepresentation(producer, outputPort) : nullptr);
   }
 
-  // find is there's already a representation in this view.
+  // find if there's already a representation in this view.
   if (vtkSMProxy* repr = view->FindRepresentation(producer, outputPort))
   {
     SM_SCOPED_TRACE(Show)
@@ -384,9 +384,32 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
   // update pipeline to create correct representation type.
   this->UpdatePipelineBeforeDisplay(producer, outputPort, view);
 
-  // Since no repr exists, create a new one if possible.
-  if (vtkSMRepresentationProxy* repr = view->CreateDefaultRepresentation(producer, outputPort))
+  vtkSMRepresentationProxy* repr = nullptr;
+
+  // Since no representation exists, create a new one if possible
+  if (representationType)
   {
+    // Explicitly create the representationType specified
+    vtkSMSessionProxyManager* pxm = producer->GetSessionProxyManager();
+    vtkSmartPointer<vtkSMProxy> p;
+    p.TakeReference(pxm->NewProxy("representations", representationType));
+    repr = vtkSMRepresentationProxy::SafeDownCast(p);
+    if (!repr)
+    {
+      vtkWarningMacro("Failed to create requested representation (representations,"
+        << representationType << ").");
+      return nullptr;
+    }
+    repr->Register(view);
+  }
+  else
+  {
+    repr = view->CreateDefaultRepresentation(producer, outputPort);
+  }
+
+  if (repr)
+  {
+    // Default representation was created
     vtkTimerLogScope scopeTimer2(
       "ParaViewPipelineControllerWithRendering::Show::CreatingRepresentation");
     SM_SCOPED_TRACE(Show)
@@ -432,6 +455,13 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
 
   // give up.
   return nullptr;
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
+  vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view)
+{
+  return this->Show(producer, outputPort, view, nullptr);
 }
 
 //----------------------------------------------------------------------------
