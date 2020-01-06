@@ -535,9 +535,12 @@ function (paraview_client_documentation)
       "${_paraview_client_doc_xml}")
   endforeach ()
 
-  # Escaping in order to pass as an argument.
-  set(_paraview_client_doc_xmls_list "${_paraview_client_doc_xmls}")
-  _paraview_client_escape_cmake_list(_paraview_client_doc_xmls)
+  # Save xmls to a temporary file.
+  set (_paraview_client_doc_xmls_file
+    "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_paraview_client_doc_TARGET}-xmls.txt")
+  file(GENERATE
+    OUTPUT "${_paraview_client_doc_xmls_file}"
+    CONTENT "${_paraview_client_doc_xmls}")
 
   add_custom_command(
     OUTPUT  "${_paraview_client_doc_OUTPUT_DIR}/${_paraview_client_doc_TARGET}.xslt"
@@ -546,10 +549,11 @@ function (paraview_client_documentation)
             "-Dxmlpatterns=${qt_xmlpatterns_executable}"
             "-Doutput_dir=${_paraview_client_doc_OUTPUT_DIR}"
             "-Doutput_file=${_paraview_client_doc_OUTPUT_DIR}/${_paraview_client_doc_TARGET}.xslt"
-            "-Dxmls=${_paraview_client_doc_xmls}"
+            "-Dxmls_file=${_paraview_client_doc_xmls_file}"
             -D_paraview_generate_proxy_documentation_run=ON
             -P "${_ParaViewClient_script_file}"
     DEPENDS ${_paraview_client_doc_xmls_list}
+            "${_paraview_client_doc_xmls_file}"
             "${_ParaViewClient_script_file}"
             "${_ParaViewClient_cmake_dir}/paraview_servermanager_convert_xml.xsl"
             "${_ParaViewClient_cmake_dir}/paraview_servermanager_convert_categoryindex.xsl"
@@ -565,7 +569,8 @@ endfunction ()
 
 # Generate proxy documentation.
 if (_paraview_generate_proxy_documentation_run AND CMAKE_SCRIPT_MODE_FILE)
-  _paraview_client_unescape_cmake_list(xmls)
+
+  file(READ "${xmls_file}" xmls)
 
   set(_paraview_gpd_to_xml "${CMAKE_CURRENT_LIST_DIR}/paraview_servermanager_convert_xml.xsl")
   set(_paraview_gpd_to_catindex "${CMAKE_CURRENT_LIST_DIR}/paraview_servermanager_convert_categoryindex.xsl")

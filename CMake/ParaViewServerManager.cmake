@@ -181,14 +181,14 @@ function (paraview_server_manager_process_files)
   string(REPLACE ";" "\n" _paraview_sm_process_files_input_file_content
     "${_paraview_sm_process_files_FILES}")
   file(GENERATE
-    OUTPUT ${_paraview_sm_process_files_response_file}
+    OUTPUT  "${_paraview_sm_process_files_response_file}"
     CONTENT "${_paraview_sm_process_files_input_file_content}")
 
   add_custom_command(
     OUTPUT  "${_paraview_sm_process_files_output}"
     DEPENDS ${_paraview_sm_process_files_FILES}
             "$<TARGET_FILE:ParaView::ProcessXML>"
-            ${_paraview_sm_process_files_response_file}
+            "${_paraview_sm_process_files_response_file}"
     COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}
             $<TARGET_FILE:ParaView::ProcessXML>
             "${_paraview_sm_process_files_output}"
