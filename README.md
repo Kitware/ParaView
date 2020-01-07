@@ -49,12 +49,14 @@ Building
 
 There are two ways to build ParaView:
 
-* Perhaps the easiest method for beginners to build ParaView from source is
-using the [ParaView Superbuild][sbrepo]. The superbuild downloads and builds all
-of ParaView's dependencies as well as ParaView itself.
+* The easiest method for begginners to build ParaView from source is
+by using our [Getting Started compilation guide][build] which includes
+commands to install the needed dependencies for most operating systems.
 
-* It is also possible to [build ParaView][build] without using the superbuild.
-ParaView's dependencies must be available on the system.
+* Another way to build ParaView, quite useful when trying to enable more specific
+options which requires to build dependencies yourself (ie osmesa, raytracing),
+would be the [ParaView Superbuild][sbrepo]. The superbuild downloads and builds all
+of ParaView's dependencies as well as ParaView itself.
 
 [sbrepo]: https://gitlab.kitware.com/paraview/paraview-superbuild
 [build]: Documentation/dev/build.md

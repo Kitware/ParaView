@@ -11,7 +11,134 @@ CGNS, HDF5, etc. Some of these are included in the ParaView source itself
 (e.g., HDF5), while others are expected to be present on the machine on which
 ParaView is being built (e.g., Python, Qt).
 
-## Obtaining the source
+The first chapter is a getting started guide by OS that is very helpful if you have never
+built ParaView before and do not know which options you need.
+If you are looking for the generic help, please start at ## Obtaining the source
+
+## Getting Started Guide
+This is a section intended to help those that have never built ParaView before, are not
+experienced with compilation in general or have no idea which option they may need when building ParaView.
+If you follow this guide, you will be able to compile and run a standard version of ParaView
+for your operating system. It will be built with the python wrapping, MPI capabilities and multithread capabilities.
+
+ * If you are using a Linux distribution, please see [the Linux part](#linux),
+ * If you are using Microsoft Windows, please see [the Windows part](#windows),
+ * If you are using another OS, feel free to provide compilation steps.
+
+### Linux
+
+#### Dependencies
+Please run the command in a terminal to install the following dependencies depending of your linux distribution.
+
+##### Ubuntu 18.04 LTS / Debian 10
+`sudo apt-get install git cmake build-essential libgl1-mesa-dev libxt-dev qt5-default libqt5x11extras5-dev libqt5help5 qttools5-dev qtxmlpatterns5-dev-tools python3-dev libopenmpi-dev libtbb-dev ninja-build`
+
+##### Centos 7
+
+##### CMake
+Download and install [cmake](https://cmake.org/download/) as the packaged version is not enough considering that
+CMake 3.10 or higher is needed.
+
+##### Others
+`sudo yum install python3-devel openmpi-devel mesa-libGL-devel libX11-devel libXt-devel qt5-qtbase-devel qt5-qtx11extras-devel qt5-qttools-devel qt5-qtxmlpatterns-devel tbb-devel ninja-build git`
+
+##### Environement
+```sh
+alias ninja ninja-build
+export PATH=$PATH:/usr/lib64/openmpi/bin/
+```
+
+##### ArchLinux
+`sudo pacman -S base-devel ninja openmpi tbb qt python python-numpy cmake`
+
+##### Other distribution
+If you are using another distribution, please try to adapt the package list.
+Feel free to then provide it so we can integrate it in this guide by creating an [issue][paraview-issues].
+
+#### Build
+
+To build ParaView developement version (usually refered as "master"), please run the following commands in a terminal :
+```sh
+git clone --recursive https://gitlab.kitware.com/paraview/paraview.git
+mkdir paraview_build
+cd paraview_build
+cmake -GNinja -DPARAVIEW_ENABLE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION=TBB -DCMAKE_BUILD_TYPE=Release ../paraview
+ninja
+```
+
+To build a specific ParaView version, eg: v5.6.0 , please run the following commands in a terminal while replacing "tag" by the version you want to build
+```sh
+git clone https://gitlab.kitware.com/paraview/paraview.git
+mkdir paraview_build
+cd paraview
+git checkout tag
+git submodule update --init --recursive
+cd ../paraview_build
+cmake -GNinja -DPARAVIEW_ENABLE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION=TBB -DCMAKE_BUILD_TYPE=Release ../paraview
+ninja
+```
+
+#### Run
+Double click on the paraview executable in the bin directory or run in the previous terminal
+
+```sh
+./bin/paraview
+```
+
+### Windows
+
+#### Dependencies
+ * Download and install [git bash for windows][gitforwindows]
+ * Download and install [cmake][cmake-download]
+ * Download and install [Visual Studio 2015 Community Edition][visual-studio]
+ * Download and install [ninja-build][ninja]
+ * Download and install [Microsoft MPI][msmpi]
+ * Download and install [Intel TBB for windows][tbb]
+ * Download and install [Python for windows][pythonwindows]
+
+#### Recover the source
+ * Open git bash
+ * To build ParaView developement version (usually refered as "master"), run the following commands:
+
+```sh
+cd C:
+mkdir pv
+cd pv
+git clone --recursive https://gitlab.kitware.com/paraview/paraview.git
+mv paraview pv
+mkdir pvb
+```
+
+ * Or, to build a specific ParaView version, eg: v5.6.0 , please run the following commands while replacing "tag" by the version you want to build
+
+```sh
+cd C:
+mkdir pv
+cd pv
+git clone https://gitlab.kitware.com/paraview/paraview.git
+mv paraview pv
+mkdir pvb
+cd pv
+git checkout tag
+git submodule update --init --recursive
+```
+
+#### Build
+
+ * Open VS2015 x64 Native Tools Command Prompt and run the following commands
+```sh
+cd C:\pv\pvb
+cmake -GNinja -DPARAVIEW_ENABLE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION=TBB -DCMAKE_BUILD_TYPE=Release ..\pv
+ninja
+```
+
+#### Run
+
+ * Double click on the `C:\pv\pvb\bin\paraview` executable
+
+## Complete Compilation Guide
+
+### Obtaining the source
 
 To obtain ParaView's sources locally, clone this repository using
 [Git][git].
@@ -20,12 +147,12 @@ To obtain ParaView's sources locally, clone this repository using
 git clone --recursive https://gitlab.kitware.com/paraview/paraview.git
 ```
 
-## Building
+### Building
 
 ParaView supports all of the common generators supported by CMake. The Ninja,
 Makefiles, and Visual Studio generators are the most well-tested however.
 
-### Prerequisites
+#### Prerequisites
 
 ParaView only requires a few packages in order to build in general, however
 specific features may require additional packages to be provided to ParaView's
@@ -49,14 +176,14 @@ Optional dependencies:
   * [Qt5][qt]
     - Version 5.9 or newer
 
-#### Installing CMake
+##### Installing CMake
 
 CMake is a tool that makes cross-platform building simple. On several systems
 it will probably be already installed or available through system package
 management utilities. If it is not, there are precompiled binaries available on
 [CMake's download page][cmake-download].
 
-#### Installing Qt
+##### Installing Qt
 
 ParaView uses Qt as its GUI library. Precompiled binaries are available on
 [Qt's website][qt-download].
@@ -69,16 +196,16 @@ that used by ParaView. If, when running ParaView, error messages about a
 mismatch in protobuf versions appears, moving the `libqgtk3.so` plugin out of
 the `plugins/platformthemes` directory has been sufficient in the past.
 
-### Optional Additions
+#### Optional Additions
 
-#### Download And Install ffmpeg (`.avi`) movie libraries
+##### Download And Install ffmpeg (`.avi`) movie libraries
 
 When the ability to write `.avi` files is desired, and writing these files is
 not supported by the OS, ParaView can use the ffmpeg library. This is generally
 true for Linux. Source code for ffmpeg can be obtained from [the
 website][ffmpeg].
 
-#### MPI
+##### MPI
 
 To run ParaView in parallel, an [MPI][mpi] implementation is required. If an
 MPI implementation that exploits special interconnect hardware is provided on
@@ -86,12 +213,12 @@ your system, we suggest using it for optimal performance. Otherwise, on
 Linux/Mac, we suggest either [OpenMPI][openmpi] or [MPICH][mpich]. On Windows,
 [Microsoft MPI][msmpi] is required.
 
-#### Python
+##### Python
 
 In order to use scripting, [Python][python] is required (versions 2.7 and 3.3).
 Python is also required in order to build ParaViewWeb support.
 
-#### OSMesa
+##### OSMesa
 
 Off-screen Mesa can be used as a software-renderer for running ParaView on a
 server without hardware OpenGL acceleration. This is usually available in
@@ -100,9 +227,9 @@ and Ubuntu. However, for older machines, building a newer version of Mesa is
 likely necessary for bug fixes and support. Its source and build instructions
 can be found on [its website][mesa].
 
-## Creating the Build Environment
+### Creating the Build Environment
 
-### Linux (Ubuntu/Debian)
+#### Linux (Ubuntu/Debian)
 
   * `sudo apt install` the following packages:
     - `build-essential`
@@ -119,14 +246,14 @@ undefined symbol errors related to Python symbols arise, setting
 `vtk_undefined_symbols_allowed=OFF` may resolve the errors. If it does not,
 please file a new issue.
 
-### Windows
+#### Windows
 
-  * [Visual Studio Community Edition][visual-studio]
+  * [Visual Studio 2015 Community Edition][visual-studio]
   * Use "x64 Native Tools Command Prompt" for the installed Visual Studio
     version to configure with CMake and to build with ninja.
   * Get [ninja][ninja]. Unzip the binary and put it in `PATH`.
 
-## Building
+### Building
 
 In order to build, CMake requires two steps, configure and build. ParaView
 itself does not support what are known as in-source builds, so the first step
@@ -148,7 +275,7 @@ CMake's GUI has input entries for the build directory and the generator
 already. Note that on Windows, the GUI must be launched from a "Native Tools
 Command Prompt" available with Visual Studio in the start menu.
 
-### Build Settings
+#### Build Settings
 
 ParaView has a number of settings available for its build. The common variables
 to modify include:
@@ -293,7 +420,7 @@ These variables should be documented once they're effective again.
     test suite.
 -->
 
-## Building documentation
+### Building documentation
 
 The following targets are used to build documentation for ParaView:
 
@@ -301,19 +428,22 @@ The following targets are used to build documentation for ParaView:
   * `ParaViewPythonDoc` - build the documentation from ParaView's Python source files.
   * `ParaViewDoc-TGZ` - build a gzipped tarball of ParaView documentation.
 
-[cmake]: https://cmake.org
 [cmake-download]: https://cmake.org/download
+[cmake]: https://cmake.org
 [ffmpeg]: https://ffmpeg.org
 [git]: https://git-scm.org
+[gitforwindows]: https://gitforwindows.org/
 [mesa]: https://www.mesa3d.org
 [mpi]: https://www.mcs.anl.gov/research/projects/mpi
-[ninja]: https://ninja-build.org
-[msmpi]: https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi
 [mpich]: https://www.mpich.org
+[msmpi]: https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi
+[ninja]: https://github.com/ninja-build/ninja/releases
 [nvpipe]: https://github.com/NVIDIA/NvPipe
 [openmpi]: https://www.open-mpi.org
 [paraview-issues]: https://gitlab.kitware.com/paraview/paraview/issues
 [python]: https://python.org
-[qt]: https://qt.io
+[pythonwindows]: https://www.python.org/downloads/windows/
 [qt-download]: https://download.qt.io/official_releases/qt
-[visual-studio]: https://visualstudio.microsoft.com/vs
+[qt]: https://qt.io
+[tbb]: https://github.com/intel/tbb/releases
+[visual-studio]: https://visualstudio.microsoft.com/vs/older-downloads
