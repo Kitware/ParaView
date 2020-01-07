@@ -1752,12 +1752,10 @@ QVariant pqSMAdaptor::convertToQVariant(const vtkVariant& variant)
     case VTK_UNSIGNED___INT64:
       return variant.ToTypeUInt64();
 #endif
-#ifdef VTK_TYPE_USE_LONG_LONG
     case VTK_LONG_LONG:
       return variant.ToLongLong();
     case VTK_UNSIGNED_LONG_LONG:
       return variant.ToUnsignedLongLong();
-#endif
     case VTK_FLOAT:
       return variant.ToFloat();
     case VTK_DOUBLE:

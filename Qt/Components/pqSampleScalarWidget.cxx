@@ -72,6 +72,8 @@ pqSampleScalarWidget::pqSampleScalarWidget(bool preserveOrder, QWidget* Parent)
   : Superclass(Parent)
   , Implementation(new pqImplementation())
 {
+  VTK_LEGACY_BODY(pqSampleScalarWidget, "ParaView 5.8");
+
   this->Implementation->PropertyObserver.TakeReference(
     vtkMakeMemberFunctionCommand(*this, &pqSampleScalarWidget::onControlledPropertyChanged));
 
