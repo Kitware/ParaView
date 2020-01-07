@@ -293,7 +293,7 @@
     </Proxy>
 
     <!-- =================================================================== -->
-    <Proxy name="GeneralizedKernelBase" class="vtkGeneralizedKernel">
+    <Proxy name="GeneralizedKernelBase">
       <IntVectorProperty name="KernelFootprint"
         command="SetKernelFootprint"
         number_of_elements="1"
@@ -414,7 +414,7 @@
     </Proxy>
 
     <!-- =================================================================== -->
-    <Proxy name="SPHKernelBase" class="vtkSPHKernel">
+    <Proxy name="SPHKernelBase">
       <DoubleVectorProperty name="SpatialStep"
         command="SetSpatialStep"
         number_of_elements="1"

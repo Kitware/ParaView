@@ -156,8 +156,7 @@
       <!-- End of POVExporter -->
     </RenderViewExporterProxy>
     <!-- GL2PS exporter, shared options between render and context views: -->
-    <GL2PSExporterProxy class="not-used"
-                        viewtype="none"
+    <GL2PSExporterProxy viewtype="none"
                         name="GL2PSExporterBase">
       <Documentation>Base API definition for all GL2PS vector graphic exporters.
       </Documentation>
@@ -222,7 +221,6 @@
     <!-- GL2PS exporter, additional render view options added: -->
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSExporterBase"
-                        class="not-used"
                         viewtype="none"
                         name="GL2PSRenderViewExporterBase">
       <Documentation>Base API definition for all GL2PS render view exporters.
@@ -268,7 +266,6 @@
     <!-- GL2PS exporter, additional context view options added: -->
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSExporterBase"
-                        class="not-used"
                         viewtype="none"
                         name="GL2PSContextViewExporterBase">
       <Documentation>Base API definition for all GL2PS context view exporters.
