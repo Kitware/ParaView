@@ -58,6 +58,7 @@ OPTIONAL_DEPENDS
   VTK::IONetCDF
   VTK::IOParallel
   VTK::IOParallelLSDyna
+  VTK::IOParallelNetCDF
   VTK::IOParallelXML
   VTK::IOPDAL
   VTK::IOPIO

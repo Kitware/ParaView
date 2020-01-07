@@ -204,6 +204,11 @@ if (TARGET VTK::IONetCDF)
     Resources/readers_ionetcdf.xml)
 endif ()
 
+if (TARGET VTK::IOParallelNetCDF)
+  list(APPEND xml_files
+    Resources/readers_ioparallelnetcdf.xml)
+endif ()
+
 if (TARGET VTK::IOXdmf2)
   list(APPEND xml_files
     Resources/proxies_xdmf2.xml)
