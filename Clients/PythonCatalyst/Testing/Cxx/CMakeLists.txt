@@ -1,3 +1,8 @@
+if (NOT TARGET VTK::TestingRendering)
+  # these tests need TestingRendering right now.
+  return()
+endif()
+
 include_directories(
   ${TestDriver_SOURCE_DIR})
 

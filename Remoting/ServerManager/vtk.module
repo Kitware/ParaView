@@ -24,7 +24,6 @@ OPTIONAL_DEPENDS
   VTK::WrappingPythonCore
 TEST_DEPENDS
   ParaView::RemotingApplication
-  ParaView::RemotingMisc
   VTK::FiltersSources
   VTK::TestingCore
 TEST_LABELS

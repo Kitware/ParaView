@@ -21,10 +21,10 @@ PRIVATE_DEPENDS
   VTK::ParallelCore
   VTK::vtksys
 TEST_DEPENDS
-  VTK::IOInfovis
   VTK::TestingCore
-  VTK::TestingRendering
 TEST_OPTIONAL_DEPENDS
+  VTK::IOInfovis
   VTK::ParallelMPI
+  VTK::TestingRendering
 TEST_LABELS
   ParaView
