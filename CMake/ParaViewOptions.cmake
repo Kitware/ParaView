@@ -90,8 +90,14 @@ option(PARAVIEW_USE_VTKM "Enable VTK-m accelerated algorithms" ON)
 vtk_deprecated_setting(python_default PARAVIEW_USE_PYTHON PARAVIEW_ENABLE_PYTHON OFF)
 option(PARAVIEW_USE_PYTHON "Enable/Disable Python scripting support" ${python_default})
 
+# Currently, we're making `PARAVIEW_USE_QT` available only when doing CANONICAL
+# builds. This is technically not necessary so we can support that use-case if
+# needed in future but will require some work to make sure the Qt components
+# work correctly with missing proxies.
 vtk_deprecated_setting(qt_gui_default PARAVIEW_USE_QT PARAVIEW_BUILD_QT_GUI "ON")
-option(PARAVIEW_USE_QT "Enable Qt-support needed for graphical UI" ${qt_gui_default})
+cmake_dependent_option(PARAVIEW_USE_QT
+  "Enable Qt-support needed for graphical UI" ${qt_gui_default}
+  "PARAVIEW_BUILD_CANONICAL" OFF)
 
 # Add an option to enable using Qt Webkit for widgets, as needed.
 # Default is OFF. We don't want to depend on WebKit unless absolutely needed.
