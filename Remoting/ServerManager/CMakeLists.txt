@@ -124,6 +124,7 @@ set(classes
   vtkSMPropertyHelper
   vtkSMPropertyIterator
   vtkSMPropertyLink
+  vtkSMPropertyModificationUndoElement
   vtkSMProxy
   vtkSMProxyDefinitionManager
   vtkSMProxyGroupDomain

@@ -41,7 +41,6 @@ set(classes
   vtkSMOMETIFFChannelCalculatorInitializationHelper
   vtkSMPLYWriterProxyInitializationHelper
   vtkSMPreselectionPipeline
-  vtkSMPropertyModificationUndoElement
   vtkSMProxyClipboard
   vtkSMProxyConfigurationReader
   vtkSMProxyConfigurationWriter
