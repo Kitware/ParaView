@@ -10,8 +10,7 @@
   <ProxyGroup name="internal_views">
     <!-- ================================================================== -->
 
-    <Proxy class="vtkPVView"
-           name="ViewBase"
+    <Proxy name="ViewBase"
            processes="client|renderserver|dataserver">
       <DoubleVectorProperty command="SetViewTime"
                             default_values="none"
@@ -195,7 +194,6 @@
     <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="internal_views"
                       base_proxyname="XYChartViewTitle"
-                      class="vtkPVXYChartView"
                       name="XYChartViewBase"
                       processes="client|renderserver|dataserver">
       <Documentation>This is the base proxy for XY chart views.</Documentation>

@@ -87,7 +87,9 @@ if (TARGET VTK::FiltersGeneral)
     Resources/sources_filtersgeneral.xml)
 endif ()
 
-if (TARGET VTK::FiltersGeneral AND TARGET VTK::FiltersGeometry)
+if (TARGET VTK::FiltersGeneral AND
+    TARGET VTK::FiltersGeometry AND
+    TARGET ParaView::VTKExtensionsFiltersGeneral)
   list(APPEND xml_files
     Resources/filters_plotonintersectioncurves.xml)
 endif ()

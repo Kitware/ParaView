@@ -38,6 +38,8 @@ int TestValidateProxies(int argc, char* argv[])
   exceptions.insert(std::pair<std::string, std::string>("internal_writers", "ParallelWriterBase"));
   exceptions.insert(
     std::pair<std::string, std::string>("internal_writers", "XMLDataObjectWriterBase"));
+  exceptions.insert(std::pair<std::string, std::string>("internal_views", "XYChartViewBase"));
+  exceptions.insert(std::pair<std::string, std::string>("internal_views", "XYChartViewBase4Axes"));
 
   (void)argc;
 

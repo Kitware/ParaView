@@ -1,8 +1,7 @@
 <ServerManagerConfiguration>
   <!-- ==================================================================== -->
   <ProxyGroup name="contour_line_interpolators">
-    <Proxy class="not-used"
-           name="ContourLineInterpolatorBase">
+    <Proxy name="ContourLineInterpolatorBase">
       <Documentation>Base API definition for all contour line
       interpolators.</Documentation>
       <!-- End of "ContourLineInterpolatorBase" -->
@@ -11,10 +10,16 @@
            base_proxyname="ContourLineInterpolatorBase"
            class="vtkBezierContourLineInterpolator"
            name="BezierContourLineInterpolator"></Proxy>
+
+    <!--
+      FIXME: vtkPolyDataContourLineInterpolator is an abstract class;
+             how in the world is this expected to work ????
+
     <Proxy base_proxygroup="contour_line_interpolators"
            base_proxyname="ContourLineInterpolatorBase"
            class="vtkPolyDataContourLineInterpolator"
            name="PolyDataContourLineInterpolator"></Proxy>
+    -->
     <Proxy base_proxygroup="contour_line_interpolators"
            base_proxyname="ContourLineInterpolatorBase"
            class="vtkPolygonalSurfaceContourLineInterpolator"
