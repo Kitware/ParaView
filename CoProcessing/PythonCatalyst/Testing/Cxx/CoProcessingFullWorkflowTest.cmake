@@ -19,23 +19,8 @@ macro(execute_process_with_echo)
   execute_process(${ARGV} WORKING_DIRECTORY ${COPROCESSING_TEST_DIR})
 endmacro()
 
-file(REMOVE_RECURSE
-  "${COPROCESSING_TEST_DIR}/cptest.py"
-  "${COPROCESSING_TEST_DIR}/cinema"
-  "${COPROCESSING_TEST_DIR}/image_0.png"
-  "${COPROCESSING_TEST_DIR}/image_0_0.png"
-  "${COPROCESSING_TEST_DIR}/image_1_0.png"
-  "${COPROCESSING_TEST_DIR}/filename_0.pvtp"
-  "${COPROCESSING_TEST_DIR}/filename_0_0.vtp"
-  "${COPROCESSING_TEST_DIR}/file_00.pvtp"
-  "${COPROCESSING_TEST_DIR}/file_00_0.vtp"
-  "${COPROCESSING_TEST_DIR}/Slice1_0"
-  "${COPROCESSING_TEST_DIR}/Slice1_0.pvtp"
-  "${COPROCESSING_TEST_DIR}/Slice1_4"
-  "${COPROCESSING_TEST_DIR}/Slice1_4.pvtp"
-  "${COPROCESSING_TEST_DIR}/RenderView1_4.png"
-  "${COPROCESSING_TEST_DIR}/CinD"
-  )
+file(REMOVE_RECURSE "${COPROCESSING_TEST_DIR}")
+file(MAKE_DIRECTORY "${COPROCESSING_TEST_DIR}")
 
 if (NOT EXISTS "${PARAVIEW_EXECUTABLE}")
   message(FATAL_ERROR "Could not file ParaView '${PARAVIEW_EXECUTABLE}'")

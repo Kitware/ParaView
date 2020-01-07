@@ -26,9 +26,9 @@ macro(execute_process_with_echo)
   execute_process(${ARGV} WORKING_DIRECTORY ${COPROCESSING_TEST_DIR})
 endmacro()
 
-file(REMOVE
-  "${COPROCESSING_TEST_DIR}/cinema"
-  )
+
+file(REMOVE_RECURSE "${COPROCESSING_TEST_DIR}")
+file(MAKE_DIRECTORY "${COPROCESSING_TEST_DIR}")
 
 if (NOT EXISTS "${PARAVIEW_EXECUTABLE}")
   message(FATAL_ERROR "Could not file ParaView '${PARAVIEW_EXECUTABLE}'")

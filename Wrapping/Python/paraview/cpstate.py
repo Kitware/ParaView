@@ -509,7 +509,7 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
             # we update the write_frequencies datastructure accordingly.
             sim_inputs = locate_simulation_inputs_for_view(view)
             for sim_input_name in sim_inputs:
-                if not image_write_frequency in cpstate_globals.write_frequencies:
+                if not image_write_frequency in cpstate_globals.write_frequencies[sim_input_name]:
                     cpstate_globals.write_frequencies[sim_input_name].append(image_write_frequency)
                     cpstate_globals.write_frequencies[sim_input_name].sort()
 
@@ -519,7 +519,7 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
     if enable_live_viz:
         for key in simulation_input_map:
             sim_input_name = simulation_input_map[key]
-            if not live_viz_frequency in cpstate_globals.write_frequencies:
+            if not live_viz_frequency in cpstate_globals.write_frequencies[sim_input_name]:
                 cpstate_globals.write_frequencies[sim_input_name].append(live_viz_frequency)
                 cpstate_globals.write_frequencies[sim_input_name].sort()
 
