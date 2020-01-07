@@ -770,6 +770,8 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <!-- this class is not compiled  in VTK; need to check if it is indeed
+         relevant at all
     <SourceProxy class="vtkNonOverlappingAMRLevelIdScalars"
                  label="Level Scalars(Non-Overlapping AMR)"
                  name="NonOverlappingLevelIdScalars">
@@ -789,8 +791,8 @@
         <Documentation>This property specifies the input to the Level Scalars
         filter.</Documentation>
       </InputProperty>
-      <!-- End GroupIdScalars -->
     </SourceProxy>
+    -->
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkOverlappingAMRLevelIdScalars"

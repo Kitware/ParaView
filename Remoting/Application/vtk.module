@@ -16,6 +16,7 @@ OPTIONAL_DEPENDS
   ParaView::RemotingViews
   # These correspond to the optional XML files included when enabling certain
   # features
+  ParaView::VTKExtensionsExtraction
   ParaView::VTKExtensionsFiltersGeneral
   VTK::CommonComputationalGeometry
   VTK::DomainsChemistry
@@ -44,6 +45,7 @@ OPTIONAL_DEPENDS
   VTK::ImagingGeneral
   VTK::ImagingHybrid
   VTK::ImagingSources
+  VTK::InteractionWidgets
   VTK::IOADIOS2
   VTK::IOCityGML
   VTK::IOGDAL

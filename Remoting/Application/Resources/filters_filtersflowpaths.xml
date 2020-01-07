@@ -1,4 +1,9 @@
 <ServerManagerConfiguration>
+  <ProxyGroup name="cell_locators">
+     <Proxy class="vtkModifiedBSPTree"
+            name="ModifiedBSPTree"
+            label="BSP Tree Cell Locator"/>
+  </ProxyGroup>
   <ProxyGroup name="filters">
     <!-- ==================================================================== -->
     <SourceProxy class="vtkEvenlySpacedStreamlines2D"

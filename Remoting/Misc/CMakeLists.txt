@@ -37,7 +37,6 @@ set(classes
   vtkSMExtractSelectionProxyInitializationHelper
   vtkSMInteractionUndoStackBuilder
   vtkSMInteractiveSelectionPipeline
-  vtkSMLoadStateOptionsProxy
   vtkSMMultiServerSourceProxy
   vtkSMOMETIFFChannelCalculatorInitializationHelper
   vtkSMPLYWriterProxyInitializationHelper

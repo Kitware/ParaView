@@ -2,7 +2,7 @@
   <!-- ================================================================= -->
   <ProxyGroup name="insitu2_writer_parameters">
     <WriterProxy name="Cinema image options"
-                 class="vtkPassThroughFilter"
+                 class="vtkPassThrough"
                  supports_parallel="1">
       <Documentation short_help="Per object setup for Cinema Image Database output."/>
       <InputProperty command="SetInputConnection"

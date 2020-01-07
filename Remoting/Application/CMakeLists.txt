@@ -323,7 +323,6 @@ if (TARGET VTK::ParallelMomentInvariants)
     Resources/ParallelMomentInvariants.xml)
 endif ()
 
-
 if (TARGET VTK::PythonInterpreter)
   _vtk_module_set_module_property(ParaView::RemotingApplication APPEND
     PROPERTY  "forward_link"
@@ -334,6 +333,18 @@ if (TARGET VTK::RenderingFreeType)
   list(APPEND xml_files
     Resources/sources_renderingfreetype.xml)
 endif ()
+
+if (TARGET VTK::InteractionWidgets)
+  list(APPEND xml_files
+    Resources/proxies_interactionwidgets.xml)
+endif()
+
+if (TARGET VTK::FiltersParallel AND
+    TARGET VTK::ImagingFourier AND
+    TARGET ParaView::VTKExtensionsExtraction)
+  list(APPEND xml_files
+    Resources/filters_selectionfftovertime.xml)
+endif()
 
 paraview_add_server_manager_xmls(
   XMLS  ${xml_files})

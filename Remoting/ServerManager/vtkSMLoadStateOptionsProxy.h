@@ -37,12 +37,12 @@
 #ifndef vtkSMLoadStateOptionsProxy_h
 #define vtkSMLoadStateOptionsProxy_h
 
-#include "vtkNew.h"                // for vtkNew
-#include "vtkRemotingMiscModule.h" //needed for exports
+#include "vtkNew.h"                         // for vtkNew
+#include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMProxy.h"
 #include <vector> // needed for std::vector
 
-class VTKREMOTINGMISC_EXPORT vtkSMLoadStateOptionsProxy : public vtkSMProxy
+class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMLoadStateOptionsProxy : public vtkSMProxy
 {
 public:
   static vtkSMLoadStateOptionsProxy* New();

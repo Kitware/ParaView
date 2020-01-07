@@ -223,9 +223,6 @@
      <Proxy class="vtkCellTreeLocator"
             name="CellTreeLocator"
             label="Tree Cell Locator"/>
-     <Proxy class="vtkModifiedBSPTree"
-            name="ModifiedBSPTree"
-            label="BSP Tree Cell Locator"/>
      <Proxy class="vtkOBBTree"
             name="OBBTree"
             label="OBB Tree Cell Locator"/>
@@ -383,41 +380,6 @@
                             set_number_command="SetNumberOfConnections">
                             </StringVectorProperty>
     </Proxy>
-  </ProxyGroup>
-  <ProxyGroup name="piecewise_functions">
-    <TransferFunctionProxy class="vtkPiecewiseFunction"
-           name="PiecewiseFunction"
-           processes="client|renderserver|dataserver">
-      <DoubleVectorProperty clean_command="RemoveAllPoints"
-                            command="AddPoint"
-                            default_values="0.0 0.0 0.5 0.0 1.0 1.0 0.5 0.0"
-                            name="Points"
-                            number_of_elements="8"
-                            number_of_elements_per_command="4"
-                            repeat_command="1"></DoubleVectorProperty>
-      <IntVectorProperty command="SetAllowDuplicateScalars"
-                         default_values="1"
-                         name="AllowDuplicateScalars"
-                         number_of_elements="1"
-                         panel_visibility="never" >
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetUseLogScale"
-                         default_values="0"
-                         name="UseLogScale"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty default_values="0"
-                         name="ScalarRangeInitialized"
-                         number_of_elements="1"
-                         panel_visibility="never" >
-        <Documentation>
-          Set to 1 to indicate that the scalar range has been initialized.
-        </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-    </TransferFunctionProxy>
   </ProxyGroup>
 
   <ProxyGroup name="file_listing">
@@ -856,81 +818,6 @@
     </Proxy>
 
     <!-- End of group "palettes" -->
-  </ProxyGroup>
-
-  <ProxyGroup name="point_placers">
-    <Proxy class="not-used"
-           name="PointPlacerBase">
-      <Documentation>Base API definition for all point placers.</Documentation>
-      <!-- End of "PointPlacerBase" -->
-    </Proxy>
-    <Proxy base_proxygroup="point_placers"
-           base_proxyname="PointPlacerBase"
-           class="vtkFocalPlanePointPlacer"
-           name="FocalPlanePointPlacer"></Proxy>
-    <Proxy base_proxygroup="point_placers"
-           base_proxyname="PointPlacerBase"
-           class="vtkBoundedPlanePointPlacer"
-           name="BoundedPlanePointPlacer">
-      <IntVectorProperty command="SetProjectionNormal"
-                         default_values="2"
-                         name="ProjectionNormal"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="XAxis"
-                 value="0" />
-          <Entry text="YAxis"
-                 value="1" />
-          <Entry text="ZAxis"
-                 value="2" />
-          <Entry text="Oblique"
-                 value="3" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetProjectionPosition"
-                            default_values="0.0"
-                            name="ProjectionPosition"
-                            number_of_elements="1"></DoubleVectorProperty>
-      <ProxyProperty clean_command="RemoveAllBoundingPlanes"
-                     command="AddBoundingPlane"
-                     name="BoundingPlanes"
-                     number_of_elements_per_command="1"
-                     repeat_command="1">
-        <ProxyGroupDomain name="groups">
-          <Group name="implicit_functions" />
-        </ProxyGroupDomain>
-        <ProxyListDomain name="proxy_list">
-          <Proxy group="implicit_functions"
-                 name="Plane" />
-          <Proxy group="implicit_functions"
-                 name="Box" />
-        </ProxyListDomain>
-      </ProxyProperty>
-    </Proxy>
-    <Proxy base_proxygroup="point_placers"
-           base_proxyname="PointPlacerBase"
-           class="vtkPolygonalSurfacePointPlacer"
-           name="PolygonalSurfacePointPlacer"></Proxy>
-  </ProxyGroup>
-  <ProxyGroup name="contour_line_interpolators">
-    <Proxy class="not-used"
-           name="ContourLineInterpolatorBase">
-      <Documentation>Base API definition for all contour line
-      interpolators.</Documentation>
-      <!-- End of "ContourLineInterpolatorBase" -->
-    </Proxy>
-    <Proxy base_proxygroup="contour_line_interpolators"
-           base_proxyname="ContourLineInterpolatorBase"
-           class="vtkBezierContourLineInterpolator"
-           name="BezierContourLineInterpolator"></Proxy>
-    <Proxy base_proxygroup="contour_line_interpolators"
-           base_proxyname="ContourLineInterpolatorBase"
-           class="vtkPolyDataContourLineInterpolator"
-           name="PolyDataContourLineInterpolator"></Proxy>
-    <Proxy base_proxygroup="contour_line_interpolators"
-           base_proxyname="ContourLineInterpolatorBase"
-           class="vtkPolygonalSurfaceContourLineInterpolator"
-           name="PolygonalSurfaceContourLineInterpolator"></Proxy>
   </ProxyGroup>
 
   <ProxyGroup name="coprocessing">
@@ -1738,62 +1625,6 @@
           file_description="Cinema Image Exports" />
       </Hints>
     </Proxy>
-  </ProxyGroup>
-
-  <ProxyGroup name="insitu2_writer_parameters">
-    <SaveScreenshotProxy
-        base_proxygroup="misc"
-        base_proxyname="SaveScreenshotBase"
-        name="SaveScreenshot"
-        processes="client">
-      <Documentation>
-        Variation with catalyst specific extensions.
-      </Documentation>
-
-      <ProxyProperty name="Format">
-        <ProxyListDomain name="proxy_list">
-          <Group name="screenshot_writers" />
-          <Group name="insitu2_misc" />
-        </ProxyListDomain>
-        <Hints>
-          <ProxySelectionWidget enabled="0" />
-        </Hints>
-      </ProxyProperty>
-
-      <PropertyGroup label="Size and Scaling">
-        <Property name="SaveAllViews" />
-        <Property name="ImageResolution" />
-        <Property name="FontScaling" />
-      </PropertyGroup>
-
-      <PropertyGroup label="Separator Options" >
-        <Property name="SeparatorWidth" />
-        <Property name="SeparatorColor" />
-      </PropertyGroup>
-
-      <PropertyGroup label="Coloring">
-        <Property name="OverrideColorPalette" />
-        <Property name="StereoMode" />
-        <Property name="TransparentBackground" />
-      </PropertyGroup>
-
-      <PropertyGroup label="Image Options">
-        <Property name="Format" />
-      </PropertyGroup>
-
-      <SubProxy>
-        <Proxy name="CatalystOptions"
-               proxygroup="misc"
-               proxyname="CatalystOptions"></Proxy>
-        <ExposedProperties>
-           <PropertyGroup label="Catalyst Options">
-             <Property name="WriteFrequency" />
-             <Property name="CatalystFilePattern" />
-             <Property name="CatalystFitToScreen" />
-           </PropertyGroup>
-        </ExposedProperties>
-      </SubProxy>
-    </SaveScreenshotProxy>
   </ProxyGroup>
 
 </ServerManagerConfiguration>

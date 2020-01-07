@@ -106,6 +106,7 @@ set(classes
   vtkSMIntRangeDomain
   vtkSMIntVectorProperty
   vtkSMLink
+  vtkSMLoadStateOptionsProxy
   vtkSMMapProperty
   vtkSMMessage
   vtkSMNamedPropertyIterator

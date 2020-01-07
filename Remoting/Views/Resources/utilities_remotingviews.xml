@@ -1139,6 +1139,46 @@
   </ProxyGroup>
 
   <!-- ==================================================================== -->
+  <ProxyGroup name="piecewise_functions">
+    <!-- ================================================================== -->
+    <TransferFunctionProxy class="vtkPiecewiseFunction"
+           name="PiecewiseFunction"
+           processes="client|renderserver|dataserver">
+      <DoubleVectorProperty clean_command="RemoveAllPoints"
+                            command="AddPoint"
+                            default_values="0.0 0.0 0.5 0.0 1.0 1.0 0.5 0.0"
+                            name="Points"
+                            number_of_elements="8"
+                            number_of_elements_per_command="4"
+                            repeat_command="1"></DoubleVectorProperty>
+      <IntVectorProperty command="SetAllowDuplicateScalars"
+                         default_values="1"
+                         name="AllowDuplicateScalars"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseLogScale"
+                         default_values="0"
+                         name="UseLogScale"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="ScalarRangeInitialized"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <Documentation>
+          Set to 1 to indicate that the scalar range has been initialized.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </TransferFunctionProxy>
+
+    <!-- end of "piecewise_functions" -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
   <ProxyGroup name="annotations">
 
     <!-- ================================================================== -->
@@ -2590,5 +2630,61 @@
     </Proxy>
 
     <!-- end of "screenshot_writers" -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="insitu2_writer_parameters">
+
+    <!-- ================================================================== -->
+    <SaveScreenshotProxy base_proxygroup="misc" base_proxyname="SaveScreenshotBase"
+        name="SaveScreenshot" processes="client">
+      <Documentation>
+        Variation with catalyst specific extensions.
+      </Documentation>
+
+      <ProxyProperty name="Format">
+        <ProxyListDomain name="proxy_list">
+          <Group name="screenshot_writers" />
+          <Group name="insitu2_misc" />
+        </ProxyListDomain>
+        <Hints>
+          <ProxySelectionWidget enabled="0" />
+        </Hints>
+      </ProxyProperty>
+
+      <PropertyGroup label="Size and Scaling">
+        <Property name="SaveAllViews" />
+        <Property name="ImageResolution" />
+        <Property name="FontScaling" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Separator Options" >
+        <Property name="SeparatorWidth" />
+        <Property name="SeparatorColor" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Coloring">
+        <Property name="OverrideColorPalette" />
+        <Property name="StereoMode" />
+        <Property name="TransparentBackground" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Image Options">
+        <Property name="Format" />
+      </PropertyGroup>
+
+      <SubProxy>
+        <Proxy name="CatalystOptions" proxygroup="misc" proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+             <Property name="CatalystFitToScreen" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    </SaveScreenshotProxy>
+
+    <!-- end of "insitu2_writer_parameters" -->
   </ProxyGroup>
 </ServerManagerConfiguration>
