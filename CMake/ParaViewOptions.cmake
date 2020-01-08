@@ -8,11 +8,11 @@ vtk_deprecated_setting(shared_default PARAVIEW_BUILD_SHARED_LIBS BUILD_SHARED_LI
 option(PARAVIEW_BUILD_SHARED_LIBS "Build ParaView with shared libraries" "${shared_default}")
 
 vtk_deprecated_setting(legacy_remove_default PARAVIEW_BUILD_LEGACY_REMOVE VTK_LEGACY_REMOVE "OFF")
-option(PARAVIEW_BUILD_LEGACY_REMOVE "Remove all legacy code completely" ${legacy_remove_default})
+option(PARAVIEW_BUILD_LEGACY_REMOVE "Remove all legacy code completely" "${legacy_remove_default}")
 mark_as_advanced(PARAVIEW_BUILD_LEGACY_REMOVE)
 
 vtk_deprecated_setting(legacy_silent_default PARAVIEW_BUILD_LEGACY_SILENT VTK_LEGACY_SILENT "OFF")
-option(PARAVIEW_BUILD_LEGACY_SILENT "Silence all legacy code messages" ${legacy_silent_default})
+option(PARAVIEW_BUILD_LEGACY_SILENT "Silence all legacy code messages" "${legacy_silent_default}")
 mark_as_advanced(PARAVIEW_BUILD_LEGACY_SILENT)
 
 # Kits bundle multiple modules together into a single library, this
@@ -37,7 +37,7 @@ set_property(CACHE PARAVIEW_BUILD_TESTING
 
 cmake_dependent_option(PARAVIEW_BUILD_VTK_TESTING "Enable VTK testing" OFF
   "PARAVIEW_BUILD_TESTING" OFF)
-option(PARAVIEW_BUILD_DEVELOPER_DOCUMENTATION "Generate ParaView C++/Python docs" ${doc_default})
+option(PARAVIEW_BUILD_DEVELOPER_DOCUMENTATION "Generate ParaView C++/Python docs" "${doc_default}")
 
 set(PARAVIEW_BUILD_ESSENTIALS "CANONICAL"
   CACHE STRING "Enable ParaView components essential for requested capabilities.")
@@ -88,7 +88,7 @@ option(PARAVIEW_USE_CUDA "Support CUDA compilation" OFF)
 option(PARAVIEW_USE_VTKM "Enable VTK-m accelerated algorithms" ON)
 
 vtk_deprecated_setting(python_default PARAVIEW_USE_PYTHON PARAVIEW_ENABLE_PYTHON OFF)
-option(PARAVIEW_USE_PYTHON "Enable/Disable Python scripting support" ${python_default})
+option(PARAVIEW_USE_PYTHON "Enable/Disable Python scripting support" "${python_default}")
 
 # Currently, we're making `PARAVIEW_USE_QT` available only when doing CANONICAL
 # builds. This is technically not necessary so we can support that use-case if
@@ -96,7 +96,7 @@ option(PARAVIEW_USE_PYTHON "Enable/Disable Python scripting support" ${python_de
 # work correctly with missing proxies.
 vtk_deprecated_setting(qt_gui_default PARAVIEW_USE_QT PARAVIEW_BUILD_QT_GUI "ON")
 cmake_dependent_option(PARAVIEW_USE_QT
-  "Enable Qt-support needed for graphical UI" ${qt_gui_default}
+  "Enable Qt-support needed for graphical UI" "${qt_gui_default}"
   "PARAVIEW_BUILD_CANONICAL" OFF)
 
 # Add an option to enable using Qt Webkit for widgets, as needed.
@@ -433,6 +433,3 @@ endif ()
 if (paraview_rejected_modules)
   list(REMOVE_DUPLICATES paraview_rejected_modules)
 endif()
-
-message(STATUS "REQUESTED: ${paraview_requested_modules}")
-message(STATUS "REJECTED: ${paraview_rejected_modules}")
