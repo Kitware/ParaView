@@ -72,14 +72,18 @@ bool pqSeriesGeneratorDialog::pqInternals::validate()
     case LOGARITHMIC: // log
       if (min < 0.0 && max > 0.0)
       {
-        msg = "Error: range cannot include 0 for log.";
+        msg = "Error: range cannot contain 0 for log.";
       }
       break;
 
     case GEOMETRIC_SAMPLES:
-      if (start == 0.0)
+      if (start == 0.0 || end == 0.0)
       {
-        msg = "Error: range cannot begin with 0 for a geometric series.";
+        msg = "Error: range cannot begin or end with 0 for a geometric series.";
+      }
+      else if (min < 0.0 && max > 0.0)
+      {
+        msg = "Error: range cannot contain 0 for a geometric series.";
       }
       break;
 
@@ -126,8 +130,6 @@ QVector<double> pqSeriesGeneratorDialog::pqInternals::values() const
   const int mode = ui.comboBox->currentIndex();
   const double start = ui.min->text().toDouble();
   const double end = ui.max->text().toDouble();
-  const double min = std::min(start, end);
-  const double max = std::max(start, end);
   const int nsamples = ui.nsamples->value();
   const double ratio = ui.ratio->text().toDouble();
 
@@ -177,7 +179,6 @@ QVector<double> pqSeriesGeneratorDialog::pqInternals::values() const
     {
       values[cc] = start * pow(cratio, cc);
     }
-    values[nsamples - 1] = end;
   }
   else if (mode == GEOMETRIC_RATIO)
   {

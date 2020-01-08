@@ -121,6 +121,7 @@ public:
   {
     if (this->InactiveLineEdit)
     {
+      this->InactiveLineEdit->setEnabled(self->isEnabled());
       this->InactiveLineEdit->render(self, self->mapTo(self->window(), QPoint(0, 0)));
     }
   }
