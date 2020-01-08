@@ -130,8 +130,6 @@ QVector<double> pqSeriesGeneratorDialog::pqInternals::values() const
   const int mode = ui.comboBox->currentIndex();
   const double start = ui.min->text().toDouble();
   const double end = ui.max->text().toDouble();
-  const double min = std::min(start, end);
-  const double max = std::max(start, end);
   const int nsamples = ui.nsamples->value();
   const double ratio = ui.ratio->text().toDouble();
 
