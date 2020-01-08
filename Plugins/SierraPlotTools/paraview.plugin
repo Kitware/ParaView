@@ -3,12 +3,10 @@ NAME
 DESCRIPTION
   Sierra Plotting Tools
 CONDITION
-  PARAVIEW_BUILD_QT_GUI
+  PARAVIEW_USE_QT
 REQUIRES_MODULES
-  ParaView::ClientServerCoreCore
-  ParaView::ServerManagerCore
-  ParaView::ServerManagerRendering
-  ParaView::VTKExtensionsDefault
+  ParaView::RemotingViews
+  ParaView::VTKExtensionsIOExodus
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::IOExodus

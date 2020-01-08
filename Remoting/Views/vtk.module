@@ -1,0 +1,57 @@
+NAME
+  ParaView::RemotingViews
+LIBRARY_NAME
+  vtkRemotingViews
+GROUPS
+  PARAVIEW_RENDERING
+KIT
+  ParaView::ServerManagerKit
+IMPLEMENTS
+  ParaView::RemotingServerManager
+DEPENDS
+  ParaView::RemotingCore
+  ParaView::RemotingServerManager
+  VTK::ChartsCore
+  VTK::CommonExecutionModel
+  VTK::RenderingAnnotation
+  VTK::RenderingContext2D
+  VTK::RenderingCore
+  VTK::RenderingParallel
+  VTK::ViewsContext2D
+  VTK::ViewsCore
+PRIVATE_DEPENDS
+  ParaView::VTKExtensionsExtraction
+  ParaView::VTKExtensionsFiltersRendering
+  ParaView::VTKExtensionsInteractionStyle
+  ParaView::VTKExtensionsMisc
+  VTK::CommonColor
+  VTK::CommonSystem
+  VTK::DomainsChemistryOpenGL2
+  VTK::FiltersModeling
+  VTK::FiltersParallel
+  VTK::InteractionStyle
+  VTK::IOImage
+  VTK::IOLegacy
+  VTK::jsoncpp
+  VTK::ParallelCore
+  VTK::RenderingContextOpenGL2
+  VTK::RenderingLabel
+  VTK::RenderingOpenGL2
+  VTK::RenderingVolumeAMR
+  VTK::zlib
+OPTIONAL_DEPENDS
+  ParaView::icet
+  ParaView::nvpipe
+  VTK::AcceleratorsVTKm
+  VTK::FiltersOpenTURNS
+  VTK::ParallelMPI
+  VTK::RenderingRayTracing
+  VTK::vtkm
+TEST_DEPENDS
+  ParaView::RemotingApplication
+  VTK::TestingCore
+TEST_OPTIONAL_DEPENDS
+  VTK::ParallelMPI
+  VTK::Python
+TEST_LABELS
+  ParaView

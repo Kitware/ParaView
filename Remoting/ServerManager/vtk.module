@@ -1,0 +1,30 @@
+NAME
+  ParaView::RemotingServerManager
+LIBRARY_NAME
+  vtkRemotingServerManager
+GROUPS
+  PARAVIEW_CORE
+KIT
+  ParaView::ServerManagerKit
+IMPLEMENTABLE
+DEPENDS
+  ParaView::protobuf
+  ParaView::RemotingClientServerStream
+  ParaView::RemotingCore
+  VTK::jsoncpp
+PRIVATE_DEPENDS
+  VTK::CommonSystem
+  VTK::vtksys
+  VTK::pugixml
+  VTK::doubleconversion
+OPTIONAL_DEPENDS
+  VTK::Python
+  VTK::PythonInterpreter
+  VTK::RenderingRayTracing
+  VTK::WrappingPythonCore
+TEST_DEPENDS
+  ParaView::RemotingApplication
+  VTK::FiltersSources
+  VTK::TestingCore
+TEST_LABELS
+  ParaView

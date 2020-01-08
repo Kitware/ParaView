@@ -1,0 +1,102 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPCellSizeFilter"
+                 label="Cell Size"
+                 name="CellSize">
+      <Documentation long_help="This filter computes sizes for 0D (1 for vertex and number of points in for polyvertex), 1D (length), 2D (area)
+        and 3D (volume) cells. ComputePoint, ComputeLength, ComputeArea and ComputeVolume options can be used to specify what dimension
+        cells to compute for. Alternatively, the ComputeHighestDimension will compute sizes for only the highest dimension cells for
+        the vtkDataSet. The values are placed in a cell data array named ArrayName. The SumSize option will give a summation of the
+        computed cell sizes for a vtkDataSet and for composite datasets will contain a sum of the underlying blocks."
+        short_help="Compute cell sizes.">This filter computes sizes for 0D (1 for vertex and number of points in for polyvertex), 1D (length), 2D (area)
+        and 3D (volume) cells. ComputeVertexCount, ComputeLength, ComputeArea and ComputeVolume options can be used to specify what dimension
+        cells to compute for. The values are placed in a cell data array named ArrayName. The ComputeSum option will give a summation of the
+        computed cell sizes for a vtkDataSet and for composite datasets will contain a sum of the underlying blocks in the top-level block.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Cell Size filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetComputeVertexCount"
+                         default_values="1"
+                         name="ComputeVertexCount"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not to compute the number of points in 0D cells.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetVertexCountArrayName"
+                            default_values="VertexCount"
+                            name="VertexCountArrayName"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Documentation>
+          Specify the name of the array to store the 0D cell vertex count and optionally the field data vertex count sum.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetComputeLength"
+                         default_values="1"
+                         name="ComputeLength"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not to compute the length of 1D cells.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetLengthArrayName"
+                            default_values="Length"
+                            name="LengthArrayName"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Documentation>
+          Specify the name of the array to store the 1D cell length and optionally the field data length sum.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetComputeArea"
+                         default_values="1"
+                         name="ComputeArea"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not to compute the area of 2D cells.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetAreaArrayName"
+                            default_values="Area"
+                            name="AreaArrayName"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Documentation>
+          Specify the name of the array to store 2D cell area and optionally the field data area sum.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetComputeVolume"
+                         default_values="1"
+                         name="ComputeVolume"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not to compute the volume of 3D cells .</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetVolumeArrayName"
+                            default_values="Volume"
+                            name="VolumeArrayName"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Documentation>
+          Specify the name of the array to store 3D cell volume and optionally the field data volume sum.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetComputeSum"
+                         default_values="0"
+                         name="ComputeSum"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not to sum the computed sizes of cells in datasets. The result is stored in field data.</Documentation>
+      </IntVectorProperty>
+      <!-- End CellSize -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

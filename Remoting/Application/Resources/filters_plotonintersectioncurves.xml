@@ -1,0 +1,199 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <CompoundSourceProxy label="Plot On Intersection Curves"
+                         name="PlotOnIntersectionCurves">
+      <Documentation long_help="Extracts the edges in a 2D plane and plots them"
+                     short_help="Extracts the edges in a 2D plane and plots them">
+                     Extracts the surface, intersect it with a 2D plane. Plot
+                     the resulting polylines.</Documentation>
+      <Proxy compound_name="ExtractSurface1"
+             group="filters"
+             id="374"
+             servers="1"
+             type="DataSetSurfaceFilter">
+        <Property id="374.Input"
+                  name="Input"
+                  number_of_elements="1">
+          <Domain id="374.Input.groups"
+                  name="groups">
+            <Group value="sources" />
+            <Group value="filters" />
+          </Domain>
+          <Domain id="374.Input.input_type"
+                  name="input_type">
+            <DataType value="vtkDataSet" />
+          </Domain>
+        </Property>
+        <Property id="374.PieceInvariant"
+                  name="PieceInvariant"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="1" />
+          <Domain id="374.PieceInvariant.bool"
+                  name="bool" />
+        </Property>
+      </Proxy>
+      <Proxy compound_name="PlotEdges1"
+             group="filters"
+             id="971"
+             servers="1"
+             type="PlotOnSortedLines">
+        <Property id="971.Input"
+                  name="Input"
+                  number_of_elements="1">
+          <Proxy output_port="0"
+                 value="667" />
+          <Domain id="971.Input.groups"
+                  name="groups">
+            <Group value="sources" />
+            <Group value="filters" />
+          </Domain>
+          <Domain id="971.Input.input_type"
+                  name="input_type">
+            <DataType value="vtkPolyData" />
+          </Domain>
+        </Property>
+      </Proxy>
+      <Proxy compound_name="Slice1"
+             group="filters"
+             id="667"
+             servers="1"
+             type="Cut">
+        <Property id="667.ContourValues"
+                  name="ContourValues"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="0" />
+          <Domain id="667.ContourValues.bounds"
+                  name="bounds">
+            <Min index="0"
+                 value="-0.718069" />
+            <Max index="0"
+                 value="0.718069" />
+          </Domain>
+        </Property>
+        <Property id="667.CutFunction"
+                  name="CutFunction"
+                  number_of_elements="1">
+          <Proxy value="670" />
+          <Domain id="667.CutFunction.groups"
+                  name="groups">
+            <Group value="implicit_functions" />
+          </Domain>
+          <Domain id="667.CutFunction.proxy_list"
+                  name="proxy_list">
+            <Proxy value="670" />
+            <Proxy value="671" />
+            <Proxy value="672" />
+          </Domain>
+        </Property>
+        <Property id="667.Input"
+                  name="Input"
+                  number_of_elements="1">
+          <Proxy output_port="0"
+                 value="374" />
+          <Domain id="667.Input.groups"
+                  name="groups">
+            <Group value="sources" />
+            <Group value="filters" />
+          </Domain>
+          <Domain id="667.Input.input_type"
+                  name="input_type">
+            <DataType value="vtkDataSet" />
+          </Domain>
+        </Property>
+        <Property id="667.InputBounds"
+                  name="InputBounds">
+          <Domain id="667.InputBounds.bounds"
+                  name="bounds">
+            <Min index="0"
+                 value="-0.5" />
+            <Min index="1"
+                 value="-0.124991" />
+            <Min index="2"
+                 value="-0.5" />
+            <Max index="0"
+                 value="0.5" />
+            <Max index="1"
+                 value="0.124991" />
+            <Max index="2"
+                 value="0.5" />
+          </Domain>
+        </Property>
+      </Proxy>
+      <Proxy compound_name="auto_670"
+             group="implicit_functions"
+             id="670"
+             servers="1"
+             type="Plane">
+        <Property id="670.Normal"
+                  name="Normal"
+                  number_of_elements="3">
+          <Element index="0"
+                   value="1" />
+          <Element index="1"
+                   value="0" />
+          <Element index="2"
+                   value="0" />
+          <Domain id="670.Normal.range"
+                  name="range" />
+        </Property>
+        <Property id="670.Offset"
+                  name="Offset"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="0" />
+          <Domain id="670.Offset.range"
+                  name="range">
+            <Min index="0"
+                 value="0" />
+            <Max index="0"
+                 value="0" />
+          </Domain>
+        </Property>
+        <Property id="670.Origin"
+                  name="Origin"
+                  number_of_elements="3">
+          <Element index="0"
+                   value="0" />
+          <Element index="1"
+                   value="0" />
+          <Element index="2"
+                   value="0" />
+          <Domain id="670.Origin.range"
+                  name="range">
+            <Min index="0"
+                 value="-0.5" />
+            <Min index="1"
+                 value="-0.124991" />
+            <Min index="2"
+                 value="-0.5" />
+            <Max index="0"
+                 value="0.5" />
+            <Max index="1"
+                 value="0.124991" />
+            <Max index="2"
+                 value="0.5" />
+          </Domain>
+        </Property>
+      </Proxy>
+      <ExposedProperties>
+        <Property exposed_name="Input"
+                  name="Input"
+                  proxy_name="ExtractSurface1" />
+        <Property exposed_name="Slice Type"
+                  name="CutFunction"
+                  proxy_name="Slice1" />
+      </ExposedProperties>
+      <OutputPort name="Output"
+                  port_index="0"
+                  proxy="PlotEdges1" />
+      <Hints>
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <View type="XYChartView" />
+        <Plotable />
+      </Hints>
+    </CompoundSourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

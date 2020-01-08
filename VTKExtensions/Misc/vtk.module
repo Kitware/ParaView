@@ -1,0 +1,32 @@
+NAME
+  ParaView::VTKExtensionsMisc
+LIBRARY_NAME
+  vtkPVVTKExtensionsMisc
+DESCRIPTION
+  Miscellaneous filters used by ParaView. These
+  are filters that don't really have any dependencies on other modules
+  and hence can be always enabled although they have very limited use.
+GROUPS
+  PARAVIEW_CORE
+KIT
+  ParaView::CoreKit
+DEPENDS
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::CommonMath
+PRIVATE_DEPENDS
+  ParaView::RemotingClientServerStream
+  ParaView::RemotingCore
+  ParaView::VTKExtensionsCore
+  VTK::FiltersCore # needed for append
+  VTK::IOLegacy
+  VTK::ParallelCore
+  VTK::vtksys
+TEST_DEPENDS
+  VTK::FiltersCore
+  VTK::FiltersSources
+  VTK::IOXML
+  VTK::TestingCore
+  VTK::ParallelCore
+TEST_LABELS
+  ParaView

@@ -3,10 +3,9 @@ NAME
 DESCRIPTION
   Add animated Stream Lines representation for any type of dataset
 REQUIRES_MODULES
-  ParaView::ClientServerCoreRendering
-  ParaView::ServerManagerCore
-  ParaView::ServerManagerRendering
-  ParaView::VTKExtensionsRendering
+  ParaView::RemotingViews
+  ParaView::VTKExtensionsFiltersRendering
+  ParaView::VTKExtensionsMisc
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::CommonExecutionModel

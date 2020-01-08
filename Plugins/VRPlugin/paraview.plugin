@@ -3,12 +3,11 @@ NAME
 DESCRIPTION
   Virtual Reality Devices and Interactor styles
 CONDITION
-  PARAVIEW_BUILD_QT_GUI
+  PARAVIEW_USE_QT
 REQUIRES_MODULES
-  ParaView::ClientServerCoreCore
-  ParaView::Core
-  ParaView::ServerManagerCore
-  ParaView::ServerManagerRendering
+  ParaView::RemotingCore
+  ParaView::RemotingServerManager
+  ParaView::RemotingViews
   ParaView::pqApplicationComponents
   VTK::CommonCore
   VTK::CommonMath

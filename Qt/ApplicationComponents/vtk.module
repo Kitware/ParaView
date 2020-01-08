@@ -2,28 +2,31 @@ NAME
   ParaView::pqApplicationComponents
 LIBRARY_NAME
   pqApplicationComponents
+CONDITION
+  PARAVIEW_USE_QT
 GROUPS
-  ParaViewQt
+  PARAVIEW_CANONICAL
 DEPENDS
   ParaView::pqComponents
   ParaView::qttesting
   VTK::GUISupportQt
 PRIVATE_DEPENDS
-  ParaView::Animation
-  ParaView::ClientServerCoreDefault
-  ParaView::ServerManagerApplication
-  ParaView::ServerManagerDefault
-  ParaView::ServerManagerRendering
-  VTK::jsoncpp
-  VTK::vtksys
+  ParaView::RemotingAnimation
+  ParaView::RemotingApplication
+  ParaView::RemotingExport
+  ParaView::RemotingLive
+  ParaView::RemotingMisc
+  ParaView::RemotingSettings
+  ParaView::RemotingViews
+  ParaView::VTKExtensionsFiltersRendering
+  VTK::IOCore
 OPTIONAL_DEPENDS
-  ParaView::CinemaReader
   ParaView::nvpipe
+  ParaView::RemotingCinema
   VTK::PythonInterpreter
   VTK::RenderingRayTracing
 
   # These affect the public API.
-  #ParaView::pqComponentsPython
   ParaView::pqPython
 TEST_OPTIONAL_DEPENDS
   VTK::Python

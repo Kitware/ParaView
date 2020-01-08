@@ -1,0 +1,83 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy base_proxygroup="filters"
+                 base_proxyname="ParticlePath"
+                 class="vtkInSituPParticlePathFilter"
+                 name="InSituParticlePath">
+      <Documentation long_help="Trace Particle Paths through time in a vector field."
+                     short_help="Trace Particle Paths through time in a vector field.">
+                     The Particle Trace filter generates pathlines in a vector
+                     field from a collection of seed points. The vector field
+                     used is selected from the Vectors menu, so the input data
+                     set is required to have point-centered vectors. The Seed
+                     portion of the interface allows you to select whether the
+                     seed points for this integration lie in a point cloud or
+                     along a line. Depending on which is selected, the
+                     appropriate 3D widget (point or line widget) is displayed
+                     along with traditional user interface controls for
+                     positioning the point cloud or line within the data set.
+                     Instructions for using the 3D widgets and the
+                     corresponding manual controls can be found in section 7.4.
+                     This filter operates on any type of data set, provided it
+                     has point-centered vectors. The output is polygonal data
+                     containing polylines. This filter is available on the
+                     Toolbar.</Documentation>
+      <InputProperty clean_command="RemoveAllRestarts"
+                     command="AddRestartConnection"
+                     label="Restart Source"
+                     multiple_input="0"
+                     name="RestartSource"
+                     panel_visibility="never">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>Specify the restart dataset. This is optional and
+        can be used to have particle histories that were computed
+        previously be included in this filter's computation.</Documentation>
+        <Hints>
+          <Optional />
+        </Hints>
+      </InputProperty>
+      <IntVectorProperty command="SetClearCache"
+                         default_values="0"
+                         name="ClearCache"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Clear the particle cache from previous time steps.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFirstTimeStep"
+                         default_values="0"
+                         name="FirstTimeStep"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <Documentation>Set the first time step. Default is 0.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRestartedSimulation"
+                         default_values="0"
+                         name="RestartedSimulation"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Specify whether or not this is a restarted simulation.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDisableResetCache"
+                         default_values="0"
+                         name="DisableResetCache"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Prevents cache from getting reset so that new computation
+          always start from previous results.</Documentation>
+      </IntVectorProperty>
+      <!-- End vtkInSituPParticlePathFilter -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

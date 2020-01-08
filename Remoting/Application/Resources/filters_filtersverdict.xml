@@ -1,0 +1,216 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkMeshQuality"
+                 label="Mesh Quality"
+                 name="MeshQuality">
+      <Documentation long_help="This filter creates a new cell array containing a geometric measure of each cell's fitness. Different quality measures can be chosen for different cell shapes."
+                     short_help="Evaluate geometric mesh quality.">This filter
+                     creates a new cell array containing a geometric measure of
+                     each cell's fitness. Different quality measures can be
+                     chosen for different cell shapes. Supported shapes include linear
+                     triangles, quadrilaterals, tetrahedra, and hexahedra. For
+                     other shapes, a value of 0 is assigned.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Mesh Quality
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetTriangleQualityMeasure"
+                         default_values="2"
+                         name="TriangleQualityMeasure"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Area"
+                 value="28" />
+          <Entry text="Aspect Ratio"
+                 value="1" />
+          <Entry text="Aspect Frobenius"
+                 value="3" />
+          <Entry text="Condition"
+                 value="9" />
+          <Entry text="Distortion"
+                 value="15" />
+          <Entry text="Edge Ratio"
+                 value="0" />
+          <Entry text="Maximum Angle"
+                 value="8" />
+          <Entry text="Minimum Angle"
+                 value="6" />
+          <Entry text="Scaled Jacobian"
+                 value="10" />
+          <Entry text="Radius Ratio"
+                 value="2" />
+          <Entry text="Relative Size Squared"
+                 value="12" />
+          <Entry text="Shape"
+                 value="13" />
+          <Entry text="Shape and Size"
+                 value="14" />
+        </EnumerationDomain>
+        <Documentation>This property indicates which quality measure will be
+        used to evaluate triangle quality. The radius ratio is the size of a
+        circle circumscribed by a triangle's 3 vertices divided by the size of
+        a circle tangent to a triangle's 3 edges. The edge ratio is the ratio
+        of the longest edge length to the shortest edge length.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetQuadQualityMeasure"
+                         default_values="0"
+                         name="QuadQualityMeasure"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Area"
+                 value="28" />
+          <Entry text="Aspect Ratio"
+                 value="1" />
+          <Entry text="Condition"
+                 value="9" />
+          <Entry text="Distortion"
+                 value="15" />
+          <Entry text="Edge Ratio"
+                 value="0" />
+          <Entry text="Jacobian"
+                 value="25" />
+          <Entry text="Maximum Aspect Frobenius"
+                 value="5" />
+          <Entry text="Maximum Aspect Frobenius"
+                 value="5" />
+          <Entry text="Maximum Edge Ratio"
+                 value="16" />
+          <Entry text="Mean Aspect Frobenius"
+                 value="4" />
+          <Entry text="Minimum Angle"
+                 value="6" />
+          <Entry text="Oddy"
+                 value="23" />
+          <Entry text="Radius Ratio"
+                 value="2" />
+          <Entry text="Relative Size Squared"
+                 value="12" />
+          <Entry text="Scaled Jacobian"
+                 value="10" />
+          <Entry text="Shape"
+                 value="13" />
+          <Entry text="Shape and Size"
+                 value="14" />
+          <Entry text="Shear"
+                 value="11" />
+          <Entry text="Shear and Size"
+                 value="24" />
+          <Entry text="Skew"
+                 value="17" />
+          <Entry text="Stretch"
+                 value="20" />
+          <Entry text="Taper"
+                 value="18" />
+          <Entry text="Warpage"
+                 value="26" />
+        </EnumerationDomain>
+        <Documentation>This property indicates which quality measure will be
+        used to evaluate quadrilateral quality.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTetQualityMeasure"
+                         default_values="2"
+                         name="TetQualityMeasure"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Edge Ratio"
+                 value="0" />
+          <Entry text="Aspect Beta"
+                 value="29" />
+          <Entry text="Aspect Gamma"
+                 value="27" />
+          <Entry text="Aspect Frobenius"
+                 value="3" />
+          <Entry text="Aspect Ratio"
+                 value="1" />
+          <Entry text="Collapse Ratio"
+                 value="7" />
+          <Entry text="Condition"
+                 value="9" />
+          <Entry text="Distortion"
+                 value="15" />
+          <Entry text="Jacobian"
+                 value="25" />
+          <Entry text="Minimum Dihedral Angle"
+                 value="6" />
+          <Entry text="Radius Ratio"
+                 value="2" />
+          <Entry text="Relative Size Squared"
+                 value="12" />
+          <Entry text="Scaled Jacobian"
+                 value="10" />
+          <Entry text="Shape"
+                 value="13" />
+          <Entry text="Shape and Size"
+                 value="14" />
+          <Entry text="Volume"
+                 value="19" />
+        </EnumerationDomain>
+        <Documentation>This property indicates which quality measure will be
+        used to evaluate tetrahedral quality. The radius ratio is the size of a
+        sphere circumscribed by a tetrahedron's 4 vertices divided by the size
+        of a circle tangent to a tetrahedron's 4 faces. The edge ratio is the
+        ratio of the longest edge length to the shortest edge length. The
+        collapse ratio is the minimum ratio of height of a vertex above the
+        triangle opposite it divided by the longest edge of the opposing
+        triangle across all vertex/triangle pairs.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHexQualityMeasure"
+                         default_values="5"
+                         name="HexQualityMeasure"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Diagonal"
+                 value="21" />
+          <Entry text="Dimension"
+                 value="22" />
+          <Entry text="Distortion"
+                 value="15" />
+          <Entry text="Edge Ratio"
+                 value="0" />
+          <Entry text="Jacobian"
+                 value="25" />
+          <Entry text="Maximum Edge Ratio"
+                 value="16" />
+          <Entry text="Maximum Aspect Frobenius"
+                 value="5" />
+          <Entry text="Mean Aspect Frobenius"
+                 value="4" />
+          <Entry text="Oddy"
+                 value="23" />
+          <Entry text="Relative Size Squared"
+                 value="12" />
+          <Entry text="Scaled Jacobian"
+                 value="10" />
+          <Entry text="Shape"
+                 value="13" />
+          <Entry text="Shape and Size"
+                 value="14" />
+          <Entry text="Shear"
+                 value="11" />
+          <Entry text="Shear and Size"
+                 value="24" />
+          <Entry text="Skew"
+                 value="17" />
+          <Entry text="Stretch"
+                 value="20" />
+          <Entry text="Taper"
+                 value="18" />
+          <Entry text="Volume"
+                 value="19" />
+        </EnumerationDomain>
+        <Documentation>This property indicates which quality measure will be
+        used to evaluate hexahedral quality.</Documentation>
+      </IntVectorProperty>
+      <!-- End MeshQuality -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

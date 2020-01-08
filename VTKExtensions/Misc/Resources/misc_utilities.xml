@@ -1,0 +1,454 @@
+<ServerManagerConfiguration>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="extended_sources">
+    <!-- ================================================================== -->
+    <Proxy class="vtkPVTransform" name="Transform2">
+      <!--Transform proxy with unconventional interface, used by BoxWidget -->
+      <DoubleVectorProperty command="SetAbsolutePosition"
+                            default_values="0.0 0.0 0.0"
+                            information_property="PositionInfo"
+                            label="Translate"
+                            name="Position"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPosition"
+                            default_values="0.0 0.0 0.0"
+                            information_only="1"
+                            name="PositionInfo"
+                            number_of_elements="3">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAbsoluteRotation"
+                            default_values="0.0 0.0 0.0"
+                            information_property="RotationInfo"
+                            label="Rotate"
+                            name="Rotation"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetOrientation"
+                            default_values="0.0 0.0 0.0"
+                            information_only="1"
+                            name="RotationInfo"
+                            number_of_elements="3">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAbsoluteScale"
+                            default_values="1.0 1.0 1.0"
+                            information_property="ScaleInfo"
+                            label="Scale"
+                            name="Scale"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetScale"
+                            default_values="1.0 1.0 1.0"
+                            information_only="1"
+                            name="ScaleInfo"
+                            number_of_elements="3" />
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkPVTransform" label="Transform" name="Transform3">
+      <DoubleVectorProperty command="SetAbsolutePosition"
+                            default_values="0.0 0.0 0.0"
+                            information_property="PositionInfo"
+                            label="Translate"
+                            name="Position"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetAbsolutePosition"
+                            default_values="0.0 0.0 0.0"
+                            information_only="1"
+                            name="PositionInfo"
+                            number_of_elements="3" />
+      <DoubleVectorProperty command="SetAbsoluteRotation"
+                            default_values="0.0 0.0 0.0"
+                            information_property="RotationInfo"
+                            label="Rotate"
+                            name="Rotation"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetAbsoluteRotation"
+                            default_values="0.0 0.0 0.0"
+                            information_only="1"
+                            name="RotationInfo"
+                            number_of_elements="3" />
+      <DoubleVectorProperty command="SetAbsoluteScale"
+                            default_values="1.0 1.0 1.0"
+                            information_property="ScaleInfo"
+                            label="Scale"
+                            name="Scale"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetAbsoluteScale"
+                            default_values="1.0 1.0 1.0"
+                            information_only="1"
+                            name="ScaleInfo"
+                            number_of_elements="3" />
+      <InputProperty is_internal="1" name="DummyInput" />
+      <PropertyGroup panel_widget="InteractiveBox">
+        <Property function="Position" name="Position" />
+        <Property function="Rotation" name="Rotation" />
+        <Property function="Scale" name="Scale" />
+        <Property function="Input" name="DummyInput" />
+      </PropertyGroup>
+      <Hints>
+         <ProxyList>
+           <Link name="DummyInput" with_property="Input" />
+         </ProxyList>
+      </Hints>
+    </Proxy>
+
+    <!-- ================================================================== -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="implicit_functions">
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkPVPlane" name="Plane" processes="dataserver|renderserver|client">
+      <InputProperty is_internal="1"
+                     name="Input"></InputProperty>
+      <DoubleVectorProperty command="SetOrigin"
+                            default_values="0.0 0.0 0.0"
+                            name="Origin"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="mid"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          Set the origin of the plane.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetNormal"
+                            default_values="1.0 0.0 0.0"
+                            name="Normal"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the normal of the plane.  For many filters this also sets the side
+          of the plane that is of interest.  The normal points towards the
+          "outside" of the plane.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetOffset"
+                            default_values="0.0"
+                            name="Offset"
+                            number_of_elements="1">
+        <Documentation>
+          Set the value to offset the origin by. The origin is translated along the normal
+          direction by the number specified.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Plane Parameters" panel_widget="InteractivePlane">
+        <Property function="Origin" name="Origin" />
+        <Property function="Normal" name="Normal" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
+
+      <Hints>
+        <!-- Hints are metadata associated with the proxy.
+             As far as the ServerManager is concerned, Hints have no
+             significance. GUI is free to interpret the hints as
+             it chooses. Hints provide a mechanism to add some GUI
+             pertinant information to the server manager XML.
+        -->
+
+        <ProxyList>
+          <!--
+            ProxyList hints are used when this proxy
+            is made a part of a proxy list domain.
+            It provides a mechanism to link certain
+            properties from this proxy with properties
+            from the proxy which has the property
+            with the proxy list domain.
+          -->
+          <Link name="Input"
+                with_property="Input" />
+        </ProxyList>
+      </Hints>
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkPVPlane"
+           name="Axis Aligned Plane">
+      <InputProperty is_internal="1"
+                     name="Input"></InputProperty>
+      <DoubleVectorProperty command="SetOrigin"
+                            default_values="0.0 0.0 0.0"
+                            name="Origin"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="mid"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          Set the origin of the plane.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetNormal"
+                            default_values="1.0 0.0 0.0"
+                            name="Normal"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the normal of the plane.  For many filters this also sets the side
+          of the plane that is of interest.  The normal points towards the
+          "outside" of the plane.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetOffset"
+                            default_values="0.0"
+                            name="Offset"
+                            number_of_elements="1">
+        <Documentation>
+          Set the value to offset the origin by. The origin is translated along the normal
+          direction by the number specified.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetAxisAligned"
+                         default_values="1"
+                         name="AlwaysSnapToNearestAxis"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <PropertyGroup label="Plane Parameters" panel_widget="InteractivePlane">
+        <Property function="Origin" name="Origin" />
+        <Property function="Normal" name="Normal" />
+        <Property function="Input" name="Input" />
+        <Property function="AlwaysSnapToNearestAxis" name="AlwaysSnapToNearestAxis" />
+      </PropertyGroup>
+
+      <Hints>
+        <ProxyList>
+          <Link name="Input"
+                with_property="Input" />
+        </ProxyList>
+      </Hints>
+      <!-- End of Axis Aligned Plane -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkPVBox" name="Axis Aligned Box">
+      <InputProperty is_internal="1" name="Input" />
+      <IntVectorProperty name="UseReferenceBounds"
+        command="SetUseReferenceBounds"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetReferenceBounds"
+                            default_values="0 1 0 1 0 1"
+                            name="Bounds"
+                            number_of_elements="6">
+        <BoundsDomain mode="data_bounds" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPosition"
+                            default_values="0.0 0.0 0.0"
+                            name="Position"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="min" mode="normal" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          Set the position of the box.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetRotation"
+                            default_values="0.0 0.0 0.0"
+                            name="Rotation"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the orientation of the box.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetScale"
+                            default_values="1.0 1.0 1.0"
+                            name="Length"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="max" mode="component_magnitude" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          Set the size of the box via a scale factor.
+        </Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Box Parameters" panel_widget="InteractiveBox">
+        <Property function="Position" name="Position" />
+        <Property function="Scale" name="Length" />
+        <Property function="Input" name="Input" />
+        <Property function="UseReferenceBounds" name="UseReferenceBounds" />
+        <Property function="ReferenceBounds" name="Bounds" />
+      </PropertyGroup>
+      <Hints>
+        <ProxyList>
+          <Link name="Input" with_property="Input" />
+        </ProxyList>
+      </Hints>
+      <!-- End of Axis Aligned Box -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkPVBox" name="Box">
+      <InputProperty is_internal="1" name="Input" />
+      <IntVectorProperty name="UseReferenceBounds"
+        command="SetUseReferenceBounds"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetReferenceBounds"
+                            default_values="0 1 0 1 0 1"
+                            name="Bounds"
+                            number_of_elements="6">
+        <BoundsDomain mode="data_bounds" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPosition"
+                            default_values="0.0 0.0 0.0"
+                            name="Position"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="min" mode="normal" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          Set the position of the box.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetRotation"
+                            default_values="0.0 0.0 0.0"
+                            name="Rotation"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the orientation of the box.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetScale"
+                            default_values="1.0 1.0 1.0"
+                            name="Length"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="max" mode="component_magnitude" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          Set the size of the box via a scale factor.
+        </Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Box Parameters" panel_widget="InteractiveBox">
+        <Property function="Position" name="Position" />
+        <Property function="Rotation" name="Rotation" />
+        <Property function="Scale" name="Length" />
+        <Property function="Input" name="Input" />
+        <Property function="UseReferenceBounds" name="UseReferenceBounds" />
+        <Property function="ReferenceBounds" name="Bounds" />
+      </PropertyGroup>
+      <Hints>
+        <ProxyList>
+          <Link name="Input" with_property="Input" />
+        </ProxyList>
+      </Hints>
+      <!-- End of Box -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkPVCylinder" name="Cylinder">
+      <InputProperty is_internal="1" name="Input" />
+      <DoubleVectorProperty command="SetCenter"
+                            default_values="0 0 0"
+                            name="Center"
+                            number_of_elements="3">
+        <BoundsDomain default_mode="mid" mode="normal" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          Set the center of the cylinder.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOrientedAxis"
+                            default_values="0. 1. 0."
+                            name="Axis"
+                            number_of_elements="3">
+        <Documentation>
+          Set the axis of the cylinder.  This is the direction from the center of one end of
+          the cylinder to the center of the other end.  The cylinder created has infinite length
+          but this direction controls which line through the center point the cylinder is around.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetRadius"
+                            default_values="0.5"
+                            name="Radius"
+                            number_of_elements="1">
+        <BoundsDomain name="range" mode="scaled_extent" scale_factor="0.5" default_mode="max">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          Set the radius of the cylinder.
+        </Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="Cylinder Parameters" panel_widget="InteractiveCylinder">
+        <Property function="Center" name="Center" />
+        <Property function="Axis" name="Axis" />
+        <Property function="Radius" name="Radius" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
+      <Hints>
+        <ProxyList>
+          <Link name="Input" with_property="Input" />
+        </ProxyList>
+      </Hints>
+      <!-- End of Cylinder -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

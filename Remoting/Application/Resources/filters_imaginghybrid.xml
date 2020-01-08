@@ -1,0 +1,189 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkGaussianSplatter"
+                 label="Gaussian Resampling"
+                 name="GaussianSplatter">
+      <Documentation long_help="Splat points into a volume with an elliptical, Gaussian distribution."
+                     short_help="Point to voxel splatter.">vtkGaussianSplatter
+                     is a filter that injects input points into a structured
+                     points (volume) dataset. As each point is injected, it
+                     "splats" or distributes values to nearby voxels. Data is
+                     distributed using an elliptical, Gaussian distribution
+                     function. The distribution function is modified using
+                     scalar values (expands distribution) or normals (creates
+                     ellipsoidal distribution rather than spherical). Warning:
+                     results may be incorrect in parallel as points can't splat
+                     into other processor's cells.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array"
+                          number_of_components="1" />
+        <Documentation>This property specifies the input to the
+        filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Resample Field"
+                            name="SelectInputScalars"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list"
+                         none_string="ignore arrays">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>Choose a scalar array to splat into the output cells. If
+        ignore arrays is chosen, point density will be counted
+        instead.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetSampleDimensions"
+                         default_values="50 50 50"
+                         label="Resampling Grid"
+                         name="SampleDimensions"
+                         number_of_elements="3">
+        <IntRangeDomain name="range" />
+        <Documentation>Set / get the dimensions of the sampling structured
+        point set. Higher values produce better results but are much
+        slower.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetModelBounds"
+                            default_values="0.0 0.0 0.0 0.0 0.0 0.0"
+                            label="Extent to Resample"
+                            name="ModelBounds"
+                            number_of_elements="6">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Set / get the (xmin,xmax, ymin,ymax, zmin,zmax) bounding
+        box in which the sampling is performed. If any of the (min,max) bounds
+        values are min &gt;= max, then the bounds will be computed
+        automatically from the input data. Otherwise, the user-specified bounds
+        will be used.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetRadius"
+                            default_values="0.1"
+                            label="Gaussian Splat Radius"
+                            name="Radius"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Set / get the radius of propagation of the splat. This
+        value is expressed as a percentage of the length of the longest side of
+        the sampling volume. Smaller numbers greatly reduce execution
+        time.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetExponentFactor"
+                            default_values="-5.0"
+                            label="Gaussian Exponent Factor"
+                            name="ExponentFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="0.0"
+                           name="range" />
+        <Documentation>Set / get the sharpness of decay of the splats. This is
+        the exponent constant in the Gaussian equation. Normally this is a
+        negative value.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetScalarWarping"
+                         default_values="1"
+                         label="Scale Splats"
+                         name="ScalarWarping"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Turn on/off the scaling of splats by scalar
+        value.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetScaleFactor"
+                            default_values="1.0"
+                            label="Scale Factor"
+                            name="ScaleFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Multiply Gaussian splat distribution by this value. If
+        ScalarWarping is on, then the Scalar value will be multiplied by the
+        ScaleFactor times the Gaussian function.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetNormalWarping"
+                         default_values="1"
+                         label="Elliptical Splats"
+                         name="NormalWarping"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Turn on/off the generation of elliptical splats. If
+        normal warping is on, then the input normals affect the distribution of
+        the splat. This boolean is used in combination with the Eccentricity
+        ivar.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetEccentricity"
+                            default_values="2.5"
+                            label="Ellipitical Eccentricity"
+                            name="Eccentricity"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Control the shape of elliptical splatting. Eccentricity
+        is the ratio of the major axis (aligned along normal) to the minor
+        (axes) aligned along other two axes. So Eccentricity gt 1 creates
+        needles with the long axis in the direction of the normal; Eccentricity
+        lt 1 creates pancakes perpendicular to the normal
+        vector.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetCapping"
+                         default_values="1"
+                         label="Fill Volume Boundary"
+                         name="Capping"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Turn on/off the capping of the outer boundary of the
+        volume to a specified cap value. This can be used to close surfaces
+        (after isosurfacing) and create other effects.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetCapValue"
+                            default_values="0.0"
+                            label="Fill Value"
+                            name="CapValue"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Specify the cap value to use. (This instance variable
+        only has effect if the ivar Capping is on.)</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetAccumulationMode"
+                         default_values="1"
+                         label="Splat Accumulation Mode"
+                         name="Accumulation Mode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Min"
+                 value="0" />
+          <Entry text="Max"
+                 value="1" />
+          <Entry text="Sum"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>Specify the scalar accumulation mode. This mode
+        expresses how scalar values are combined when splats are overlapped.
+        The Max mode acts like a set union operation and is the most commonly
+        used; the Min mode acts like a set intersection, and the sum is just
+        weird.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetNullValue"
+                            default_values="0.0"
+                            label="Empty Cell Value"
+                            name="NullValue"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Set the Null value for output points not receiving a
+        contribution from the input points. (This is the initial value of the
+        voxel samples.)</Documentation>
+      </DoubleVectorProperty>
+      <!-- End of GaussianSplatter -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

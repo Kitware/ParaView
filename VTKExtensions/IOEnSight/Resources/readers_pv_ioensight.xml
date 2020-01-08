@@ -1,0 +1,171 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkPGenericEnSightReader"
+                 label="EnSight Reader"
+                 name="ensight">
+      <Documentation long_help="Reads EnSight 6 and Gold files."
+                     short_help="Read EnSight files.">The EnSight reader reads
+                     files in the format produced by CEI's EnSight. EnSight 6
+                     and Gold files (both ASCII and binary) are supported. The
+                     default extension is .case. The output of this reader is a
+                     multiblock dataset.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetCaseFileName"
+                            name="CaseFileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the case file name for the
+        EnSight reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="Point Arrays"
+                            name="PointArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which point-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="case CASE Case"
+                       file_description="EnSight Files" />
+      </Hints>
+      <!-- End ensight -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkPVEnSightMasterServerReader2"
+                 label="EnSight Master Server Reader"
+                 name="ensightMS">
+      <Documentation long_help="Reads files in EnSight's Master Server format."
+                     short_help="Read parallel EnSight files.">The EnSight
+                     Master Server reader reads EnSight's parallel files. The
+                     master file usually has a .sos extension and may point to
+                     multiple .case files. The output is a multiblock
+                     dataset.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetCaseFileName"
+                            name="CaseFileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the name of the .sos file for
+        the EnSight Master Server reader.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetByteOrder"
+                         default_values="0"
+                         name="ByteOrder"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="BigEndian"
+                 value="0" />
+          <Entry text="LittleEndian"
+                 value="1" />
+        </EnumerationDomain>
+        <Documentation>This property indicates the byte order of the binary
+        file(s).</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetTimeValue"
+                            default_values="0.0"
+                            name="SetTimeValue"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property indicates which time value to
+        read.</Documentation>
+      </DoubleVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="Point Arrays"
+                            name="PointArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which point-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="sos SOS"
+                       file_description="EnSight Master Server Files" />
+      </Hints>
+      <!-- End ensightMS -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

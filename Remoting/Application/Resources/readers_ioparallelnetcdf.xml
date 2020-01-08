@@ -1,0 +1,113 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="internal_sources">
+    <!-- ================================================================== -->
+    <Proxy class="vtkPNetCDFPOPReader"
+                 label="Parallel NetCDF POP reader"
+                 name="PNetCDFPOPReaderCore">
+      <Documentation>Core for Parallel NetCDF POP reader.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="VariableArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Variable" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetVariableArrayStatus"
+                            element_types="2 0"
+                            information_property="VariableArrayInfo"
+                            label="Variables"
+                            name="VariableArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="VariableArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which NetCDF variables to
+        load.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetStride"
+                         default_values="1 1 1"
+                         name="Stride"
+                         number_of_elements="3">
+        <IntRangeDomain min="1 1 1"
+                        name="range" />
+        <Documentation>This property indicates the number of indices per
+        dimension (i,j,k) to skip between each point included in this
+        output.</Documentation>
+      </IntVectorProperty>
+      <!-- End PNetCDFPOPReaderCore -->
+    </Proxy>
+
+    <!-- end of "internal_sources" -->
+  </ProxyGroup>
+
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="Parallel NetCDF POP reader"
+                 mpi_required="true"
+                 name="PNetCDFPOPReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads rectilinear grid data from a NetCDF POP file in parallel."
+                     short_help="Read rectilinear grid data from a NetCDF file in the POP format in parallel.">
+      The reader reads regular rectilinear grid (image/volume) data from a
+      NetCDF file. Only a subset of the processes actually read the file and
+      these processes communicate the data to other processes.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="PNetCDFPOPReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="VariableArrayInfo" />
+          <Property name="VariableArrayStatus" />
+          <Property name="Stride" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="pop.ncdf pop.nc"
+                       file_description="Parallel POP Ocean NetCDF (Rectilinear)" />
+      </Hints>
+      <!-- End PNetCDFPOPReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+
+    <!-- end of "sources" -->
+  </ProxyGroup>
+
+</ServerManagerConfiguration>

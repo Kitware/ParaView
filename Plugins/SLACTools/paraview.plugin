@@ -3,10 +3,8 @@ NAME
 DESCRIPTION
   SLAC Tools
 REQUIRES_MODULES
-  ParaView::ClientServerCoreCore
-  ParaView::ServerManagerCore
-  ParaView::ServerManagerRendering
-  ParaView::VTKExtensionsCore
+  ParaView::RemotingViews
+  ParaView::VTKExtensionsMisc
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::CommonExecutionModel

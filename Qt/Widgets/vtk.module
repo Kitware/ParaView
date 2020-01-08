@@ -1,12 +1,15 @@
 NAME
   ParaView::pqWidgets
+CONDITION
+  PARAVIEW_USE_QT
 GROUPS
-  ParaViewQt
-  Qt
+  PARAVIEW_CANONICAL
 DEPENDS
-  ParaView::ServerManagerCore
   ParaView::qttesting
   VTK::GUISupportQt
+PRIVATE_DEPENDS
+  ParaView::VTKExtensionsCore
+  ParaView::RemotingServerManager
 TEST_LABELS
   ParaView
 EXCLUDE_WRAP

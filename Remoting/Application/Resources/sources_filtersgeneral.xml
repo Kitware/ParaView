@@ -1,0 +1,100 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAxes"
+                 label="Axes"
+                 name="Axes">
+      <Documentation long_help="Three lines representing the axes - red line along X, green line along Y, and blue line along Z"
+                     short_help="Create three lines representing X, Y and Z axes">
+                     The Axes source can be used to add a representation of the
+                     coordinate system axes to the 3D scene. The X axis will be
+                     drawn as a blue line, the Y axis as a green line, and the
+                     Z axis as a red line. The axes can be drawn either as
+                     three lines drawn in the positive direction from the
+                     origin or as three lines crossing at the origin (drawn in
+                     both the positive and negative directions). The output of
+                     the Axes source is polygonal data. This polygonal data has
+                     a scalar per line so that the lines can be colored. It
+                     also has normals defined.</Documentation>
+      <DoubleVectorProperty command="SetScaleFactor"
+                            default_values="1.0"
+                            name="ScaleFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>By default the axes lines have a length of 1 (or 1 in
+        each direction, for a total length of 2, if value of the Symmetric
+        property is 1). Increasing or decreasing the value of this property
+        will make the axes larger or smaller, respectively.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOrigin"
+                            default_values="0.0 0.0 0.0"
+                            name="Origin"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The values of this property set the X, Y, and Z
+        coordinates of the origin of the axes.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetSymmetric"
+                         default_values="0"
+                         name="Symmetric"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When this property is set to 1, the axes extend along
+        each of the positive and negative directions for a distance equal to
+        the value of the Scale Factor property. When set to 0, the axes extend
+        only in the positive direction.</Documentation>
+      </IntVectorProperty>
+      <!-- End Axes -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkTimeSourceExample"
+                 label="Time Source"
+                 name="TimeSource">
+      <Documentation long_help="Produces a single cell uniform grid with data values that vary over a sin(t) wave from t=0 to t=1 (radian)."
+                     short_help="Produces a sine wave over time">Produces a
+                     single cell uniform grid with data values that vary over a
+                     sin(t) wave from t=0 to t=1 (radian).</Documentation>
+      <IntVectorProperty command="SetAnalytic"
+                         default_values="0"
+                         name="Analytic"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Makes the time source produce discrete steps of or an
+        analytic sin wave.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetXAmplitude"
+                            default_values="0.0"
+                            name="X Amplitude"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Controls how far the data set moves along X over
+        time.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetYAmplitude"
+                            default_values="0.0"
+                            name="Y Amplitude"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Controls how far the data set moves along Y over
+        time.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetGrowing"
+                         default_values="0"
+                         name="Growing"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Makes the time source grow and shrink along Y over
+        time.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <!-- End of TimeSource -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

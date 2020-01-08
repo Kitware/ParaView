@@ -1,0 +1,40 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkDataObjectGenerator"
+                 label="Data Object Generator"
+                 name="DataObjectGenerator">
+      <Documentation long_help="Parses a string to produce composite data objects consisting of simple templated datasets."
+                     short_help="Produces simple (composite or atomic) data sets for testing.">
+      vtkDataObjectGenerator parses a string and produces dataobjects from the
+      dataobject template names it sees in the string. For example, if the
+      string contains &quot;ID1&quot; the generator will create a vtkImageData.
+      &quot;UF1&quot;, &quot;RG1&quot;, &quot;SG1&quot;, &quot;PD1&quot;, and
+      &quot;UG1&quot; will produce vtkUniformGrid, vtkRectilinearGrid,
+      vtkStructuredGrid, vtkPolyData and vtkUnstructuredGrid respectively.
+      &quot;PD2&quot; will produce an alternate vtkPolyData. You can compose
+      composite datasets from the atomic ones listed above - &quot;MB{}&quot;
+      or &quot;HB[]&quot;. &quot;MB{ ID1 PD1 MB{} }&quot; for example will
+      create a vtkMultiBlockDataSet consisting of three blocks: image data,
+      poly data, multiblock (empty). Hierarchical Box data sets additionally
+      require the notion of groups, declared within &quot;()&quot; braces, to
+      specify AMR depth. &quot;HB[ (UF1)(UF1)(UF1) ]&quot; will create a
+      vtkHierarchicalBoxDataSet representing an octree that is three levels
+      deep, in which the first cell in each level is
+      refined.</Documentation>
+      <StringVectorProperty command="SetProgram"
+                            default_values="ID1"
+                            name="Program"
+                            number_of_elements="1">
+        <Hints>
+          <Widget type="multi_line" />
+        </Hints>
+        <Documentation>This property contains the string that is parsed to
+        determine the structured of the output data object to
+        produce.</Documentation>
+      </StringVectorProperty>
+      <!-- End DataObjectGenerator -->
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

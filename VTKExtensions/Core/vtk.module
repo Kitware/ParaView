@@ -1,0 +1,24 @@
+NAME
+  ParaView::VTKExtensionsCore
+LIBRARY_NAME
+  vtkPVVTKExtensionsCore
+GROUPS
+  PARAVIEW_CORE
+KIT
+  ParaView::CoreKit
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::IOXML
+OPTIONAL_DEPENDS
+  VTK::FiltersCore
+PRIVATE_DEPENDS
+  VTK::ParallelCore
+  VTK::pugixml
+  VTK::vtksys
+  VTK::loguru
+TEST_DEPENDS
+  VTK::TestingCore
+TEST_LABELS
+  ParaView

@@ -1,0 +1,27 @@
+NAME
+  ParaView::VTKExtensionsIOGeneral
+LIBRARY_NAME
+  vtkPVVTKExtensionsIOGeneral
+DESCRIPTION
+  Miscellaneous readers/writers.
+GROUPS
+  PARAVIEW_CANONICAL
+KIT
+  ParaView::CoreKit
+DEPENDS
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::IOCore
+PRIVATE_DEPENDS
+  ParaView::VTKExtensionsCore
+  ParaView::VTKExtensionsFiltersGeneral
+  VTK::IOImport
+  VTK::IOInfovis
+  VTK::IOParallel
+  VTK::IOPLY
+  VTK::netcdf
+  VTK::ParallelCore
+OPTIONAL_DEPENDS
+  VTK::ParallelMPI
+TEST_LABELS
+  ParaView

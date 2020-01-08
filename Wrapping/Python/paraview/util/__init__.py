@@ -26,5 +26,5 @@ def IntegrateCell(dataset, cellId):
     polygons, quads and tetrahedra. All other 3D cells are triangulated
     during volume calculation. In such cases, the result may not be exact.
     """
-    from paraview.modules.vtkPVVTKExtensionsDefault import vtkCellIntegrator
+    from paraview.modules.vtkPVVTKExtensionsFiltersGeneral import vtkCellIntegrator
     return vtkCellIntegrator.Integrate(dataset, cellId)

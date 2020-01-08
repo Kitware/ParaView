@@ -6,5 +6,5 @@ DEPENDS
   VTK::CommonCore
   VTK::CommonExecutionModel
 PRIVATE_DEPENDS
-  ParaView::Core
+  ParaView::VTKExtensionsCore
   VTK::vtksys

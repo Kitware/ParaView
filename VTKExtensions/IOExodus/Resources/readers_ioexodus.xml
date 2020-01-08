@@ -1,0 +1,1107 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="internal_sources">
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkPExodusIIReader"
+                 name="ExodusIIReaderCore">
+      <Documentation long_help="Reads an Exodus II file to produce an unstructured grid."
+                     short_help="Read Exodus II files.">The Exodus reader loads
+                     Exodus II files and produces an unstructured grid output.
+                     The default file extensions are .g, .e, .ex2, .ex2v2,
+                     .exo, .gen, .exoII, .exii, .0, .00, .000, and
+                     .0000.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the Exodus
+        reader.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetHasModeShapes"
+                         default_values="0"
+                         name="HasModeShapes"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Some simulations overload the Exodus time steps to
+        represent mode shapes. In this case, it does not make sense to iterate
+        over the "time steps", because they are not meant to be played in
+        order. Rather, each represents the vibration at a different "mode."
+        Setting the value of this property to 1 changes the semantics of the
+        reader to not report the time steps to downstream
+        filters.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetAnimateModeShapes"
+                         default_values="1"
+                         label="Animate Vibrations"
+                         name="AnimateVibrations"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this flag is on and HasModeShapes is also on, then
+        this reader will report a continuous time range [0,1] and animate the
+        displacements in a periodic sinusoid. If this flag is off and
+        HasModeShapes is on, this reader ignores time. This flag has no effect
+        if HasModeShapes is off.</Documentation>
+      </IntVectorProperty>
+      <!-- The following two properties magically send time information -->
+      <!-- to the animation panel. Usually you only need one (the former -->
+      <!-- for discrete time, the latter for continuous time), but changing -->
+      <!-- the HasModeShapes ivar switches between discrete and continuous -->
+      <!-- time. -->
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="GetModeShapesRange"
+                         information_only="1"
+                         name="ModeShapesRangeInfo"></IntVectorProperty>
+      <IntVectorProperty command="SetModeShape"
+                         default_values="1"
+                         name="ModeShape"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" default_mode="min">
+          <RequiredProperties>
+            <Property function="Range"
+                      name="ModeShapesRangeInfo" />
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Documentation>Specify which mode shape to animate when HasModeShapes
+        is on.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetIgnoreFileTime"
+                         animateable="0"
+                         default_values="0"
+                         name="IgnoreFileTime"
+                         label="Ignore File Time"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If on, the reader will ignore the time value reported at
+        each time step, using the index of the time step as the time value. This
+        is useful for Exodus files where different time steps are overloaded to
+        represent different aspects of a data set rather than the data set at
+        different time values.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="EdgeBlocksInfo">
+        <ArraySelectionInformationHelper attribute_name="EdgeBlock" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetEdgeBlockArrayStatus"
+                            element_types="2 0"
+                            information_property="EdgeBlocksInfo"
+                            name="EdgeBlocks"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="EdgeBlocksInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Use this property to select which blocks of edges should
+        be loaded. All edges in the same block will have the same interpolant
+        (linear, quadratic, etc.) and have the same variables defined over
+        them.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="FaceBlocksInfo">
+        <ArraySelectionInformationHelper attribute_name="FaceBlock" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetFaceBlockArrayStatus"
+                            element_types="2 0"
+                            information_property="FaceBlocksInfo"
+                            name="FaceBlocks"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="FaceBlocksInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Use this property to select which blocks of faces should
+        be loaded. All faces in the same block will have the same interpolant
+        (triangular, bilinear quadrilateral, etc.) and have the same variables
+        defined over them.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="GetSILUpdateStamp"
+                         information_only="1"
+                         name="SILUpdateStamp">
+        <SimpleIntInformationHelper />
+        <Documentation>Information property indicating the update stamp of the
+        SIL. Every time the SIL is rebuilt, this time stamp is
+        changed.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="GetSIL"
+                            information_only="1"
+                            name="ElementBlocksInfo"
+                            si_class="vtkSISILProperty"
+                            subtree="Blocks" />
+      <IdTypeVectorProperty command="GetSILUpdateStamp"
+                            default_values="0"
+                            information_only="1"
+                            name="SILTimeStamp"
+                            number_of_elements="1" />
+      <StringVectorProperty command="SetElementBlockArrayStatus"
+                            element_types="2 0"
+                            name="ElementBlocks"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <SILDomain name="array_list"
+                   subtree="Blocks">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="ElementBlocksInfo" />
+            <Property function="TimeStamp"
+                      name="SILTimeStamp" />
+          </RequiredProperties>
+        </SILDomain>
+        <Documentation>Use this property to select which blocks of elements
+        (cells) should be loaded. All elements (cells) in the same block will
+        have the same interpolant (tetrahedral, triangular, trilinear
+        hexahedral, etc.) and have the same variables defined over
+        them.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="GlobalVariablesInfo">
+        <ArraySelectionInformationHelper attribute_name="GlobalResult" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetGlobalResultArrayStatus"
+                            element_types="2 0"
+                            information_property="GlobalVariablesInfo"
+                            name="GlobalVariables"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="GlobalVariablesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Use this property to select which global (i.e.,
+        per-mesh) variables should be loaded. Global variables are stored as
+        arrays in the field data of the reader's output.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointVariablesInfo">
+        <ArraySelectionInformationHelper attribute_name="PointResult" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointResultArrayStatus"
+                            element_types="2 0"
+                            information_property="PointVariablesInfo"
+                            name="PointVariables"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointVariablesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Use this property to select which nodal (i.e.,
+        per-point) variables should be loaded.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="EdgeVariablesInfo">
+        <ArraySelectionInformationHelper attribute_name="EdgeResult" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetEdgeResultArrayStatus"
+                            element_types="2 0"
+                            information_property="EdgeVariablesInfo"
+                            name="EdgeVariables"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="EdgeVariablesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Use this property to select which variables defined over
+        edges should be loaded. Edges are oriented boundaries of one or more
+        higher-dimensional cells also present in the mesh. Edge variables
+        specify a single value per entry in some edge block.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="FaceVariablesInfo">
+        <ArraySelectionInformationHelper attribute_name="FaceResult" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetFaceResultArrayStatus"
+                            element_types="2 0"
+                            information_property="FaceVariablesInfo"
+                            name="FaceVariables"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="FaceVariablesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Use this property to select which variables defined over
+        faces should be loaded. Faces are oriented boundaries of one or more
+        higher-dimensional cells also present in the mesh. Face variables
+        specify a single value per entry in some face block.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="ElementVariablesInfo">
+        <ArraySelectionInformationHelper attribute_name="ElementResult" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetElementResultArrayStatus"
+                            element_types="2 0"
+                            information_property="ElementVariablesInfo"
+                            name="ElementVariables"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="ElementVariablesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Use this property to select which variables defined over
+        elements (cells) should be loaded. Element variables specify a single
+        value per entry in some element block.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="NodeMapInfo">
+        <ArraySelectionInformationHelper attribute_name="NodeMap" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetNodeMapArrayStatus"
+                            element_types="2 0"
+                            information_property="NodeMapInfo"
+                            name="NodeMapArrayStatus"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="NodeMapInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Specify which maps defined over nodes (points) in the
+        mesh should be loaded. A node map is a renumbering of all the points in
+        a file from their offset in the file to some arbitrary integers,
+        usually specifying a unique global ID across a set of files. These are
+        sometimes called new-style maps because they are specified differently
+        than in older Exodus files, which only allowed a single node
+        map.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="EdgeMapInfo">
+        <ArraySelectionInformationHelper attribute_name="EdgeMap" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetEdgeMapArrayStatus"
+                            element_types="2 0"
+                            information_property="EdgeMapInfo"
+                            name="EdgeMapArrayStatus"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="EdgeMapInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Specify which maps defined over edges in the mesh should
+        be loaded. An edge map is a renumbering of all the edges (across all
+        the edge blocks of a file) from their offset in the file to some
+        arbitrary integers, usually specifying a unique global ID across a set
+        of files.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="FaceMapInfo">
+        <ArraySelectionInformationHelper attribute_name="FaceMap" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetFaceMapArrayStatus"
+                            element_types="2 0"
+                            information_property="FaceMapInfo"
+                            name="FaceMapArrayStatus"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="FaceMapInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Specify which maps defined over faces in the mesh should
+        be loaded. A face map is a renumbering of all the faces (across all the
+        face blocks of a file) from their offset in the file to some arbitrary
+        integers, usually specifying a unique global ID across a set of
+        files.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="ElementMapInfo">
+        <ArraySelectionInformationHelper attribute_name="ElementMap" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetElementMapArrayStatus"
+                            element_types="2 0"
+                            information_property="ElementMapInfo"
+                            name="ElementMapArrayStatus"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="ElementMapInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Specify which maps defined over elements (cells) in the
+        mesh should be loaded. An element map is a renumbering of all the
+        elements (across all the element blocks of a file) from their offset in
+        the file to some arbitrary integers, usually specifying a unique global
+        ID across a set of files. These are sometimes called new-style maps
+        because they are specified differently than in older Exodus files,
+        which only allowed a single element map.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="NodeSetInfo">
+        <ArraySelectionInformationHelper attribute_name="NodeSet" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetNodeSetArrayStatus"
+                            element_types="2 0"
+                            information_property="NodeSetInfo"
+                            name="NodeSetArrayStatus"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="NodeSetInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>An Exodus II file may define subsets of all the nodes
+        (points) in a file as sets in their own right. Variables, such as
+        boundary conditions, may then be defined over these sets by specifying
+        a single number per node. This property specifies which of those sets
+        should be loaded. The accompanying NodeSetResultArrayStatus property
+        specifies which variables defined over those sets should be
+        loaded.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="SideSetInfo">
+        <ArraySelectionInformationHelper attribute_name="SideSet" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetSideSetArrayStatus"
+                            element_types="2 0"
+                            information_property="SideSetInfo"
+                            name="SideSetArrayStatus"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="SideSetInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>An Exodus II file may define subsets of all the
+        <i>boundaries</i>of all the elements in a file as sets in their own
+        right. This property specifies which of those sets should be loaded.
+        Variables, such as boundary conditions, may then be defined over these
+        sets by specifying a single number per side. For example, a hexahedron
+        has 18 sides: 6 faces and 12 edges. Any of these sides may be
+        individually called out in a set and assigned a result value. The
+        accompanying SideSetResultArrayStatus property specifies which
+        variables defined over those sets should be loaded.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="FaceSetInfo">
+        <ArraySelectionInformationHelper attribute_name="FaceSet" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetFaceSetArrayStatus"
+                            element_types="2 0"
+                            information_property="FaceSetInfo"
+                            name="FaceSetArrayStatus"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="FaceSetInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>An Exodus II file may define subsets of all the faces
+        (across all face blocks) in a file as sets in their own right. This
+        property specifies which of those sets should be loaded. Variables,
+        such as boundary conditions, may then be defined over these sets by
+        specifying a single number per face. The accompanying
+        FaceSetResultArrayStatus property specifies which variables defined
+        over those sets should be loaded.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="EdgeSetInfo">
+        <ArraySelectionInformationHelper attribute_name="EdgeSet" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetEdgeSetArrayStatus"
+                            element_types="2 0"
+                            information_property="EdgeSetInfo"
+                            name="EdgeSetArrayStatus"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="EdgeSetInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>An Exodus II file may define subsets of all the edges
+        (across all edge blocks) in a file as sets in their own right. This
+        property specifies which of those sets should be loaded. Variables,
+        such as boundary conditions, may then be defined over these sets by
+        specifying a single number per edge. The accompanying
+        EdgeSetResultArrayStatus property specifies which variables defined
+        over those sets should be loaded.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="ElementSetInfo">
+        <ArraySelectionInformationHelper attribute_name="ElementSet" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetElementSetArrayStatus"
+                            element_types="2 0"
+                            information_property="ElementSetInfo"
+                            name="ElementSetArrayStatus"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="ElementSetInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>An Exodus II file may define subsets of all the elements
+        (across all element blocks) in a file as sets in their own right. This
+        property specifies which of those sets should be loaded. Variables,
+        such as feature classifiers, may then be defined over these sets by
+        specifying a single number per element. The accompanying
+        ElementSetResultArrayStatus property specifies which variables defined
+        over those sets should be loaded.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="ElementSetResultArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="ElementSetResult" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetElementSetResultArrayStatus"
+                            element_types="2 0"
+                            information_property="ElementSetResultArrayInfo"
+                            name="ElementSetResultArrayStatus"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="ElementSetResultArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>An Exodus II file may define subsets of all the elements
+        (across all element blocks) in a file as sets in their own right.
+        Variables, such as feature classifiers, may then be defined over these
+        sets by specifying a single number per element. This property specifies
+        which of those variables should be loaded. The corresponding set must
+        also be loaded using the ElementSetArrayStatus property in order for
+        the variable to appear.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="SideSetResultArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="SideSetResult" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetSideSetResultArrayStatus"
+                            element_types="2 0"
+                            information_property="SideSetResultArrayInfo"
+                            name="SideSetResultArrayStatus"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="SideSetResultArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>An Exodus II file may define subsets of all the
+        <i>boundaries</i>of all the elements in a file as sets in their own
+        right. Variables, such as boundary conditions, may then be defined over
+        these sets by specifying a single number per side. For example, a
+        hexahedron has 18 sides: 6 faces and 12 edges. Any of these sides may
+        be individually called out in a set and assigned a result value. This
+        property specifies which of those variables should be loaded. The
+        corresponding set must also be loaded using the SideSetArrayStatus
+        property in order for the variable to appear.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="FaceSetResultArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="FaceSetResult" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetFaceSetResultArrayStatus"
+                            element_types="2 0"
+                            information_property="FaceSetResultArrayInfo"
+                            name="FaceSetResultArrayStatus"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="FaceSetResultArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>An Exodus II file may define subsets of all the faces
+        (across all face blocks) in a file as sets in their own right.
+        Variables, such as boundary conditions, may then be defined over these
+        sets by specifying a single number per face. This property specifies
+        which of those variables should be loaded. The corresponding set must
+        also be loaded using the FaceSetArrayStatus property in order for the
+        variable to appear.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="EdgeSetResultArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="EdgeSetResult" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetEdgeSetResultArrayStatus"
+                            element_types="2 0"
+                            information_property="EdgeSetResultArrayInfo"
+                            name="EdgeSetResultArrayStatus"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="EdgeSetResultArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>An Exodus II file may define subsets of all the edges
+        (across all edge blocks) in a file as sets in their own right.
+        Variables, such as boundary conditions, may then be defined over these
+        sets by specifying a single number per edge. This property specifies
+        which of those variables should be loaded. The corresponding set must
+        also be loaded using the EdgeSetArrayStatus property in order for the
+        variable to appear.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="NodeSetResultArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="NodeSetResult" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetNodeSetResultArrayStatus"
+                            element_types="2 0"
+                            information_property="NodeSetResultArrayInfo"
+                            name="NodeSetResultArrayStatus"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="NodeSetResultArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>An Exodus II file may define subsets of all the nodes
+        (points) in a file as sets in their own right. Variables, such as
+        boundary conditions, may then be defined over these sets by specifying
+        a single number per node. This property specifies which of those
+        variables should be loaded. The corresponding set must also be loaded
+        using the NodeSetArrayStatus property in order for the variable to
+        appear.</Documentation>
+        <Hints>
+          <OmitFromLoadAllVariables />
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetApplyDisplacements"
+                         default_values="1"
+                         name="ApplyDisplacements"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Geometric locations can include displacements. When this
+        option is on, the nodal positions are 'displaced' by the standard
+        exodus displacement vector. If displacements are turned 'off', the user
+        can explicitly add them by applying a warp filter.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetDisplacementMagnitude"
+                            default_values="1"
+                            name="DisplacementMagnitude"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>When displacements are being applied, they are scaled by
+        this amount. Set to 1 for no scaling.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetGenerateObjectIdCellArray"
+                         default_values="1"
+                         name="GenerateObjectIdCellArray"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Specifies whether a variable named "ObjectId" should be
+        created for each entry of each block and set being loaded and assigned
+        the identifying number of the block or set, so that given a cell one
+        can readily identify the block or set it came from. This is useful for
+        coloring a mesh by block ID or set ID.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateGlobalNodeIdArray"
+                         default_values="1"
+                         name="GenerateGlobalNodeIdArray"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Should the reader retrieve the first new-style node map,
+        or if that is not present, the solitary old-style node map (which
+        always exists but may be procedurally generated if it is not stored
+        with the file)?</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateGlobalElementIdArray"
+                         default_values="1"
+                         name="GenerateGlobalElementIdArray"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Should the reader retrieve the first new-style element
+        map, or if that is not present, the solitary old-style element map
+        (which always exists but may be procedurally generated if it is not
+        stored with the file)?</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateImplicitNodeIdArray"
+                         default_values="0"
+                         name="GenerateImplicitNodeIdArray"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Should the reader retrieve the solitary old-style node
+        map (which always exists but may be procedurally generated if it is not
+        stored with the file)?</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateImplicitElementIdArray"
+                         default_values="0"
+                         name="GenerateImplicitElementIdArray"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Should the reader retrieve the solitary old-style
+        element map (which always exists but may be procedurally generated if
+        it is not stored with the file)?</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateFileIdArray"
+                         default_values="0"
+                         name="GenerateFileIdArray"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Should each cell in the mesh be assigned an integer
+        identifying the file it came from? If turned on, a cell variable named
+        "FileId" should be present.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetFilePrefix"
+                            name="FilePrefix"
+                            number_of_elements="1">
+        <FileListDomain name="default_value" optional="1"/>
+        <Documentation>This property specifies the file root used with the file
+        pattern to format a file name. (See the File Pattern
+        property).</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetFilePattern"
+                            name="FilePattern"
+                            number_of_elements="1">
+        <FileListDomain name="default_value" optional="1"/>
+        <Documentation>This property contains a text string specifying the
+        pattern used to load files. There are two parts to it: the prefix (%s)
+        and the file number (%i). The format used is the same as that used for
+        printf.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetFileRange"
+                         default_values="-1 -1"
+                         name="FileRange"
+                         number_of_elements="2">
+        <IntRangeDomain name="range" />
+        <Documentation>This property controls the indices of the first and last
+        files to be read.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="GetXMLFileName"
+                            information_only="1"
+                            name="XMLFileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetXMLFileName"
+                            label="XML File Name"
+                            name="XMLFileName"
+                            number_of_elements="1">
+        <FileListDomain name="default_value"
+                        optional="1">
+          <RequiredProperties>
+            <Property function="XMLFileName"
+                      name="XMLFileNameInfo" />
+          </RequiredProperties>
+        </FileListDomain>
+        <Documentation>This property specifies the name of an XML file
+        containing part and material descriptions and a mapping to element
+        blocks.</Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="UseLegacyBlockNamesWithElementTypes"
+        command="SetUseLegacyBlockNames"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          In previous versions, the reader added the type of elements in the block to
+          the block name when no name was provided for the block. This has issues
+          with consistency when naming blocks across ranks for partitioned files.
+          Hence we no longer do that. For legacy pipelines, one can enable
+          the old behavior by setting this flag to true.
+        </Documentation>
+      </IntVectorProperty>
+
+      <!-- End ExodusIIReaderCore -->
+    </SourceProxy>
+
+    <!-- end of "internal_sources" -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkExodusFileSeriesReader"
+                 file_name_method="SetFileName"
+                 name="ExodusIIReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads an Exodus II file to produce an unstructured grid."
+                     short_help="Read Exodus II files.">The Exodus reader loads
+                     Exodus II files and produces an unstructured grid output.
+                     The default file extensions are .g, .e, .ex2, .ex2v2,
+                     .exo, .gen, .exoII, .exii, .0, .00, .000, and .0000. The
+                     file format is described fully at:
+                     http://endo.sandia.gov/SEACAS/Documentation/exodusII.pdf.
+                     Each Exodus file contains a single set of points with 2-D
+                     or 3-D coordinates plus one or more blocks, sets, and
+                     maps. Block group elements (or their bounding edges or
+                     faces) of the same type together. Sets select subsets
+                     (across all the blocks in a file) of elements, sides of
+                     elements (which may be of mixed dimensionality), bounding
+                     faces of volumetric elements, or bounding edges of
+                     volumetric or areal elements. Each block or set may have
+                     multiple result variables, each of which defines a value
+                     per element, per timestep. The elements (cells), faces of
+                     elements (when enumerated in face blocks), edges of
+                     elements (when enumerated in edge blocks), and nodes
+                     (points) in a file may be assigned an arbitrary integer
+                     number by an element map, face map, edge map, or node map,
+                     respectively. Usually, only a single map of each type
+                     exists and is employed to assign a unique global ID to
+                     entities across multiple files which partition a large
+                     mesh for a distributed-memory calculation. However here
+                     may be multiply maps of each type and there are no
+                     constraints which force the integers to be unique. The
+                     connectivity of elements is constant across all of the
+                     timesteps in any single Exodus II file. However, multiple
+                     files which specify a single time-evolution of a mesh may
+                     be used to represent meshes which exhibit changes in
+                     connectivity infrequently. Field variable mode_shape[0]
+                     represents the time step (t_index) if HasModeShapes is
+                     not set or the ModeShape otherwise.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="ExodusIIReaderCore" />
+        <ExposedProperties>
+          <PropertyGroup label="Variables"
+                         name="Variables"
+                         panel_visibility="default"
+                         panel_widget="ArrayStatus">
+            <Property name="GenerateObjectIdCellArray" />
+            <Property name="GenerateGlobalElementIdArray" />
+            <Property name="ElementVariables" />
+            <Property name="FaceVariables" />
+            <Property name="EdgeVariables" />
+            <Property name="SideSetResultArrayStatus" />
+            <Property name="NodeSetResultArrayStatus" />
+            <Property name="FaceSetResultArrayStatus" />
+            <Property name="EdgeSetResultArrayStatus" />
+            <Property name="GenerateGlobalNodeIdArray" />
+            <Property name="ElementSetResultArrayStatus" />
+            <Property name="PointVariables" />
+            <Property name="GlobalVariables" />
+            <Hints>
+              <WidgetHeight number_of_rows="20" />
+            </Hints>
+          </PropertyGroup>
+          <!-- fixme - need to group these two properties -->
+          <Property name="ApplyDisplacements" />
+          <Property name="DisplacementMagnitude" />
+          <Property name="EdgeBlocks" />
+          <Property name="EdgeBlocksInfo" />
+          <PropertyGroup label="Sets"
+                         name="Sets"
+                         panel_visibility="advanced"
+                         panel_widget="ArrayStatus">
+            <Property name="NodeSetArrayStatus" />
+            <Property name="SideSetArrayStatus" />
+            <Property name="FaceSetArrayStatus" />
+            <Property name="EdgeSetArrayStatus" />
+            <Property name="ElementSetArrayStatus" />
+          </PropertyGroup>
+          <PropertyGroup label="Maps"
+                         name="Maps"
+                         panel_visibility="advanced"
+                         panel_widget="ArrayStatus">
+            <Property name="NodeMapArrayStatus" />
+            <Property name="EdgeMapArrayStatus" />
+            <Property name="FaceMapArrayStatus" />
+            <Property name="ElementMapArrayStatus" />
+          </PropertyGroup>
+          <Property name="EdgeMapInfo" />
+          <Property name="EdgeSetInfo" />
+          <Property name="EdgeSetResultArrayInfo" />
+          <Property name="EdgeVariablesInfo" />
+          <Property name="ElementBlocks" />
+          <Property name="ElementMapInfo" />
+          <Property name="ElementSetInfo" />
+          <Property name="ElementSetResultArrayInfo" />
+          <Property name="ElementVariablesInfo" />
+          <Property name="FaceBlocks" />
+          <Property name="FaceBlocksInfo" />
+          <Property name="FaceMapInfo" />
+          <Property name="FaceSetInfo" />
+          <Property name="FaceSetResultArrayInfo" />
+          <Property name="FaceVariablesInfo" />
+          <Property name="GlobalVariablesInfo" />
+          <Property name="NodeMapInfo" />
+          <Property name="NodeSetInfo" />
+          <Property name="NodeSetResultArrayInfo" />
+          <Property name="PointVariablesInfo" />
+          <Property name="SideSetInfo" />
+          <Property name="SideSetResultArrayInfo" />
+          <Property name="SILUpdateStamp" />
+          <PropertyGroup label="Mode Shapes">
+            <Property name="HasModeShapes" panel_visibility="advanced" />
+            <Property name="ModeShape" panel_visibility="advanced" />
+            <Property name="AnimateVibrations" panel_visibility="advanced" />
+            <Property name="ModeShapesRangeInfo" />
+          </PropertyGroup>
+          <PropertyGroup label="Time">
+            <Property name="IgnoreFileTime" panel_visibility="advanced" />
+          </PropertyGroup>
+          <PropertyGroup label="File Pattern">
+            <Property name="FilePrefix" panel_visibility="advanced" />
+            <Property name="FilePattern" panel_visibility="advanced"/>
+            <Property name="FileRange" panel_visibility="advanced" />
+            <Property name="XMLFileName" panel_visibility="advanced"/>
+            <Property name="XMLFileNameInfo" />
+          </PropertyGroup>
+          <Property name="GenerateFileIdArray" />
+          <Property name="UseLegacyBlockNamesWithElementTypes" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the Exodus
+        reader.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetUseMetaFile"
+                         default_values="0"
+                         name="UseMetaFile"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <BooleanDomain name="bool" />
+        <Documentation>This hidden property must always be set to 1 for this
+        proxy to work.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="g e h gc ex2 ex2v2 exo gen par exoII exii"
+                       file_description="ExodusII"
+                       filename_patterns="*e-s*" />
+      </Hints>
+      <!-- ExodusIIReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkExodusFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="Restarted Sim Exodus Reader"
+                 name="ExodusRestartReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads collections of Exodus output files from simulations that were restarted."
+                     short_help="Read Exodus files from simulation restarts.">
+                     When a simulation that outputs exodus files is restarted,
+                     typically you get a new set of output files. When you read
+                     them in your visualization, you often want to string these
+                     file sets together as if it was one continuous dump of
+                     files. This reader allows you to specify a metadata file
+                     that will implicitly string the files
+                     together.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="ExodusIIReaderCore" />
+        <ExposedProperties>
+          <PropertyGroup label="Variables"
+                         name="Variables"
+                         panel_visibility="default"
+                         panel_widget="ArrayStatus">
+            <Property name="GenerateObjectIdCellArray" />
+            <Property name="GenerateGlobalElementIdArray" />
+            <Property name="ElementVariables" />
+            <Property name="FaceVariables" />
+            <Property name="EdgeVariables" />
+            <Property name="SideSetResultArrayStatus" />
+            <Property name="NodeSetResultArrayStatus" />
+            <Property name="FaceSetResultArrayStatus" />
+            <Property name="EdgeSetResultArrayStatus" />
+            <Property name="GenerateGlobalNodeIdArray" />
+            <Property name="ElementSetResultArrayStatus" />
+            <Property name="PointVariables" />
+            <Property name="GlobalVariables" />
+          </PropertyGroup>
+          <!-- fixme - need to group these two properties -->
+          <Property name="ApplyDisplacements" />
+          <Property name="DisplacementMagnitude" />
+          <Property name="EdgeBlocks" />
+          <Property name="EdgeBlocksInfo" />
+          <PropertyGroup label="Sets"
+                         name="Sets"
+                         panel_visibility="advanced"
+                         panel_widget="ArrayStatus">
+            <Property name="NodeSetArrayStatus" />
+            <Property name="SideSetArrayStatus" />
+            <Property name="FaceSetArrayStatus" />
+            <Property name="EdgeSetArrayStatus" />
+            <Property name="ElementSetArrayStatus" />
+          </PropertyGroup>
+          <PropertyGroup label="Maps"
+                         name="Maps"
+                         panel_visibility="advanced"
+                         panel_widget="ArrayStatus">
+            <Property name="NodeMapArrayStatus" />
+            <Property name="EdgeMapArrayStatus" />
+            <Property name="FaceMapArrayStatus" />
+            <Property name="ElementMapArrayStatus" />
+          </PropertyGroup>
+          <Property name="EdgeMapInfo" />
+          <Property name="EdgeSetInfo" />
+          <Property name="EdgeSetResultArrayInfo" />
+          <Property name="EdgeVariablesInfo" />
+          <Property name="ElementBlocks" />
+          <Property name="ElementMapInfo" />
+          <Property name="ElementSetInfo" />
+          <Property name="ElementSetResultArrayInfo" />
+          <Property name="ElementVariablesInfo" />
+          <Property name="FaceBlocks" />
+          <Property name="FaceBlocksInfo" />
+          <Property name="FaceMapInfo" />
+          <Property name="FaceSetInfo" />
+          <Property name="FaceSetResultArrayInfo" />
+          <Property name="FaceVariablesInfo" />
+          <Property name="GlobalVariablesInfo" />
+          <Property name="NodeMapInfo" />
+          <Property name="NodeSetInfo" />
+          <Property name="NodeSetResultArrayInfo" />
+          <Property name="PointVariablesInfo" />
+          <Property name="SideSetInfo" />
+          <Property name="SideSetResultArrayInfo" />
+          <Property name="SILUpdateStamp" />
+          <PropertyGroup label="Mode Shapes">
+            <Property name="HasModeShapes" panel_visibility="advanced" />
+            <Property name="ModeShape" panel_visibility="advanced" />
+            <Property name="AnimateVibrations" panel_visibility="advanced" />
+            <Property name="ModeShapesRangeInfo" />
+          </PropertyGroup>
+          <PropertyGroup label="File Pattern">
+            <Property name="FilePrefix" panel_visibility="advanced"/>
+            <Property name="FilePattern" panel_visibility="advanced"/>
+            <Property name="FileRange" panel_visibility="advanced"/>
+            <Property name="XMLFileName" panel_visibility="advanced"/>
+            <Property name="XMLFileNameInfo" />
+          </PropertyGroup>
+          <Property name="GenerateFileIdArray" />
+          <Property name="UseLegacyBlockNamesWithElementTypes" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetMetaFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This points to a special metadata file that lists the
+        output files for each restart.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetUseMetaFile"
+                         default_values="1"
+                         name="UseMetaFile"
+                         number_of_elements="1"
+                         panel_visibility="never"
+                         >
+        <BooleanDomain name="bool" />
+        <Documentation>This hidden property must always be set to 1 for this
+        proxy to work.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="ex-timeseries"
+                       file_description="Metafile for restarted exodus outputs" />
+      </Hints>
+      <!-- ExodusRestartReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+
+    <!-- end of "sources" -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

@@ -1,0 +1,457 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="internal_writers">
+    <!--
+      *****************************************************************
+      These are proxies used by meta-writers defined in writers.xml
+      *****************************************************************
+    -->
+    <SourceProxy class="vtkPassSelectedArrays" name="PassArrays"
+      base_proxygroup="filters" base_proxyname="PassArrays">
+      <!-- extends `PassArrays` to add the ChooseArraysToWrite property -->
+      <IntVectorProperty name="ChooseArraysToWrite"
+        command="SetEnabled"
+        default_values="0"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Explicitly choose which arrays to write.
+        </Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+
+    <!-- ================================================================= -->
+    <Proxy name="DataWriterBase">
+      <!-- Base for non-xml data writers -->
+      <Documentation>This defines the interface for legacy vtk data files
+      writer.</Documentation>
+      <IntVectorProperty command="SetFileType"
+                         default_values="2"
+                         name="FileType"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Ascii"
+                 value="1" />
+          <Entry text="Binary"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>The type for the data file (i.e. ascii or
+        binary).</Documentation>
+      </IntVectorProperty>
+      <!-- End of DataWriterBase -->
+    </Proxy>
+    <!-- ================================================================= -->
+    <Proxy name="ParallelWriterBase">
+      <Documentation>This defines the interface for the parallel writers.</Documentation>
+      <!-- Base for parallel writers -->
+
+      <SubProxy>
+        <Proxy name="PassArrays" proxygroup="internal_writers" proxyname="PassArrays" />
+        <ExposedProperties>
+          <Property name="ChooseArraysToWrite"/>
+          <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
+            <Property name="PointDataArrays" />
+            <Property name="CellDataArrays" />
+            <Property name="FieldDataArrays" />
+            <Property name="VertexDataArrays" />
+            <Property name="EdgeDataArrays" />
+            <Property name="RowDataArrays" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ChooseArraysToWrite"
+                                       value="1" />
+              <!-- show this widget when ChooseArraysToWrite==1 -->
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <LinkProperties>
+          <Property name="Input" with_property="Input" />
+        </LinkProperties>
+      </SubProxy>
+
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetGhostLevel"
+                         default_values="0"
+                         name="GhostLevel"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        name="range" />
+        <Documentation>The number of ghost levels to include in the output
+        file(s). Note that some writers (such as ExodusIIWriter) may not
+        support writing ghost levels.</Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <SourceProxy class="vtkCompleteArrays"
+                     name="CompleteArrays"></SourceProxy>
+      </SubProxy>
+      <!-- End of ParallelWriterBase -->
+    </Proxy>
+    <!-- ================================================================= -->
+    <Proxy name="FileSeriesWriter">
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+
+      <SubProxy>
+        <Proxy name="PassArrays" proxygroup="internal_writers" proxyname="PassArrays" />
+        <ExposedProperties>
+          <Property name="ChooseArraysToWrite"/>
+          <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
+            <Property name="PointDataArrays" />
+            <Property name="CellDataArrays" />
+            <Property name="FieldDataArrays" />
+            <Property name="VertexDataArrays" />
+            <Property name="EdgeDataArrays" />
+            <Property name="RowDataArrays" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ChooseArraysToWrite"
+                                       value="1" />
+              <!-- show this widget when ChooseArraysToWrite==1 -->
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <LinkProperties>
+          <Property name="Input" with_property="Input" />
+        </LinkProperties>
+      </SubProxy>
+
+      <IntVectorProperty command="SetWriteAllTimeSteps"
+                         default_values="0"
+                         label="Write timesteps as file-series"
+                         name="WriteTimeSteps"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteTimeSteps is OFF, the writer
+        writes only the current timestep. Otherwise it is called once
+        for each time step within the min and max range. If those are
+        not set, the writer is called for all time steps available in
+        its input.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMinTimeStep"
+                         default_values="0"
+                         label="First time step"
+                         name="MinTimeStep"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        name="range" />
+        <Documentation>Sets the lower bound for timesteps to write.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMaxTimeStep"
+                         default_values="-1"
+                         label="Last time step"
+                         name="MaxTimeStep"
+                         number_of_elements="1">
+        <Documentation>Sets the upper bound for timesteps to write. If
+        less than min, the last time step is used.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTimeStepStride"
+                         default_values="1"
+                         label="Time step stride"
+                         name="TimeStepStride"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>Sets the stride to go through the time steps.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetFileNameSuffix"
+                            default_values="_%d"
+                            label = "File name suffix"
+                            name="FileNameSuffix"
+                            number_of_elements="1">
+        <Documentation>
+        The suffix to append to the file name when writing files at different timesteps.
+        File extensions such as .vtk should be excluded.
+        The `%` format specifiers are used. For example, _%d will write files as FileName_0,
+        FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
+        FileName_001, FileName_002 etc.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+
+      <PropertyGroup label="File Series">
+        <Property name="WriteTimeSteps" />
+        <Property name="FileNameSuffix"/>
+        <Property name="MinTimeStep" />
+        <Property name="MaxTimeStep" />
+        <Property name="TimeStepStride" />
+      </PropertyGroup>
+
+      <!-- End of FileSeriesWriter -->
+    </Proxy>
+    <!-- ================================================================= -->
+    <Proxy name="ParallelFileSeriesWriter">
+
+      <SubProxy>
+        <Proxy name="PassArrays" proxygroup="internal_writers" proxyname="PassArrays" />
+        <ExposedProperties>
+          <Property name="ChooseArraysToWrite"/>
+          <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
+            <Property name="PointDataArrays" />
+            <Property name="CellDataArrays" />
+            <Property name="FieldDataArrays" />
+            <Property name="VertexDataArrays" />
+            <Property name="EdgeDataArrays" />
+            <Property name="RowDataArrays" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ChooseArraysToWrite"
+                                       value="1" />
+              <!-- show this widget when ChooseArraysToWrite==1 -->
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <LinkProperties>
+          <Property name="Input" with_property="Input" />
+        </LinkProperties>
+      </SubProxy>
+
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetWriteAllTimeSteps"
+                         default_values="0"
+                         label="Write all timesteps as file-series"
+                         name="WriteTimeSteps"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteTimeSteps is turned ON, the writer is
+        executed once for each timestep available from its input.</Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <!-- No harm if use vtkCompleteArrays even in serial mode so, we are
+             letting it be -->
+        <SourceProxy class="vtkCompleteArrays"
+                     name="CompleteArrays"></SourceProxy>
+      </SubProxy>
+      <IntVectorProperty command="SetMinTimeStep"
+                         default_values="0"
+                         label="First time step"
+                         name="MinTimeStep"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        name="range" />
+        <Documentation>Sets the lower bound for timesteps to write.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMaxTimeStep"
+                         default_values="-1"
+                         label="Last time step"
+                         name="MaxTimeStep"
+                         number_of_elements="1">
+        <Documentation>Sets the upper bound for timesteps to write. If
+        less than min, the last time step is used.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTimeStepStride"
+                         default_values="1"
+                         label="Time step stride"
+                         name="TimeStepStride"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>Sets the stride to go through the time steps.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetFileNameSuffix"
+                            default_values="_%d"
+                            label = "File name suffix"
+                            name="FileNameSuffix"
+                            number_of_elements="1">
+        <Documentation>
+          The suffix to append to the file name when writing files at different timesteps.
+          File extensions such as .vtk should be excluded.
+          The % format specifiers are used. For example, _%d will write files as FileName_0,
+          FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
+          FileName_001, FileName_002 etc.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+
+      <PropertyGroup label="File Series">
+        <Property name="WriteTimeSteps" />
+        <Property name="FileNameSuffix" />
+        <Property name="MinTimeStep" />
+        <Property name="MaxTimeStep" />
+        <Property name="TimeStepStride" />
+      </PropertyGroup>
+
+
+      <!-- End of ParallelFileSeriesWriter -->
+    </Proxy>
+
+    <!-- ================================================================= -->
+    <Proxy name="ParallelSerialWriter">
+
+      <SubProxy>
+        <Proxy name="PassArrays" proxygroup="internal_writers" proxyname="PassArrays" />
+        <ExposedProperties>
+          <Property name="ChooseArraysToWrite"/>
+          <PropertyGroup label="Array Selection" panel_widget="ArrayStatus">
+            <Property name="PointDataArrays" />
+            <Property name="CellDataArrays" />
+            <Property name="FieldDataArrays" />
+            <Property name="VertexDataArrays" />
+            <Property name="EdgeDataArrays" />
+            <Property name="RowDataArrays" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ChooseArraysToWrite"
+                                       value="1" />
+              <!-- show this widget when ChooseArraysToWrite==1 -->
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <LinkProperties>
+          <Property name="Input" with_property="Input" />
+        </LinkProperties>
+      </SubProxy>
+
+      <IntVectorProperty command="SetWriteAllTimeSteps"
+                         default_values="0"
+                         name="WriteTimeSteps"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteTimeSteps is turned ON, the writer is
+        executed once for each timestep available from its input.</Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetFileNameSuffix"
+                            default_values="_%d"
+                            label = "File name suffix"
+                            name="FileNameSuffix"
+                            number_of_elements="1">
+        <Documentation>
+        The suffix to append to the file name when writing files at different timesteps.
+        (File extensions such as .vtk should be excluded.)
+        The % format specifiers are used. For example, _%d will write files as FileName_0,
+        FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
+        FileName_001, FileName_002 etc.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="NumberOfIORanks"
+                         label="Number Of IO Ranks"
+                         command="SetNumberOfIORanks"
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="0" />
+        <Documentation>
+           In parallel runs, this writer can consolidate output from multiple ranks to
+           a subset of ranks. This specifies the number of ranks that will do the final writing
+           to disk. If **NumberOfIORanks** is 0, then all ranks will save the local data.
+           If set to 1 (default), the root node alone will write to disk. All data from all ranks will
+           be gathered to the root node before being written out.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="RankAssignmentMode"
+                         command="SetRankAssignmentMode"
+                         number_of_elements="1"
+                         default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Contiguous" value="0" />
+          <Entry text="RoundRobin" value="1" />
+        </EnumerationDomain>
+        <Documentation>
+          When **NumberOfIORanks** is greater than 1 and less than the number of MPI ranks,
+          this controls how the ranks that write to disk are determined. This also affects which
+          ranks send data to which rank for IO.
+
+          In **Contiguous** mode (default), all MPI ranks are numerically grouped into **NumberOfIORanks**
+          groups with the first rank in each group acting as the `root` node for that group and is the one that
+          does IO. For example, if there are 16 MPI ranks and NumberOfIORanks is set to 3 then the groups are
+          `[0 - 5], [6 - 10], [11 - 15]` with the first rank in each group 0, 6, and 15 doing the IO.
+
+          In **RoundRobin** mode, the grouping is done in round robin fashion, thus for 16 MPI
+          ranks with NumberOfIORanks set to 3, the groups are
+          `[0, 3, ..., 15], [1, 4, ..., 13], [2, 5, ..., 14]` with 0, 1 and 2 doing the IO.
+        </Documentation>
+        <Hints>
+          <!-- enable this widget when NumberOfIORanks != 0 or 1 -->
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="enabled_state"
+                                       property="NumberOfIORanks"
+                                       value="1"
+                                       inverse="1"/>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="enabled_state"
+                                       property="NumberOfIORanks"
+                                       value="0"
+                                       inverse="1"/>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Time Support">
+        <Property name="WriteTimeSteps" />
+        <Property name="FileNameSuffix" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Parallel I/O Support">
+        <Property name="NumberOfIORanks" />
+        <Property name="RankAssignmentMode" />
+      </PropertyGroup>
+
+      <!-- end of ParallelSerialWriter -->
+    </Proxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

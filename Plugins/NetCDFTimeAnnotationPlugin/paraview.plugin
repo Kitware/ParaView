@@ -3,6 +3,6 @@ NAME
 DESCRIPTION
   Provides NetCDF Time Annotation filter
 CONDITION
-  PARAVIEW_ENABLE_PYTHON
+  PARAVIEW_USE_PYTHON
 REQUIRES_MODULES
-  ParaView::ClientServerCorePython
+  ParaView::VTKExtensionsFiltersPython

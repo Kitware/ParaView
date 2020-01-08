@@ -6,6 +6,7 @@ DEPENDS
   VTK::CommonExecutionModel
   VTK::CommonCore
 PRIVATE_DEPENDS
-  ParaView::ClientServerCoreCore
+  ParaView::RemotingCore
   VTK::CommonDataModel
   VTK::FiltersCore
+  VTK::FiltersSources

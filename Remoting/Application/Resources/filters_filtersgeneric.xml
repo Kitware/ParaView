@@ -1,0 +1,663 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkGenericClip"
+                 label="Clip Generic Dataset"
+                 name="GenericClip">
+      <Documentation long_help="Clip with an implicit plane, sphere or with scalars. Clipping does not reduce the dimensionality of the data set.  This output data type of this filter is always an unstructured grid."
+                     short_help="Clip with an implicit plane, sphere or with scalars.">
+                     The Generic Clip filter cuts away a portion of the input
+                     data set using a plane, a sphere, a box, or a scalar
+                     value. The menu in the Clip Function portion of the
+                     interface allows the user to select which implicit
+                     function to use or whether to clip using a scalar value.
+                     Making this selection loads the appropriate user
+                     interface. For the implicit functions, the appropriate 3D
+                     widget (plane, sphere, or box) is also displayed. The use
+                     of these 3D widgets, including their user interface
+                     components, is discussed in section 7.4. If an implicit
+                     function is selected, the clip filter returns that portion
+                     of the input data set that lies inside the function. If
+                     Scalars is selected, then the user must specify a scalar
+                     array to clip according to. The clip filter will return
+                     the portions of the data set whose value in the selected
+                     Scalars array is larger than the Clip value. Regardless of
+                     the selection from the Clip Function menu, if the Inside
+                     Out option is checked, the opposite portions of the data
+                     set will be returned. This filter operates on all types of
+                     data sets, and it returns unstructured grid data on
+                     output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkGenericDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array"
+                          optional="1" />
+        <Documentation>Set the input to the Generic Clip
+        filter.</Documentation>
+      </InputProperty>
+      <ProxyProperty command="SetClipFunction"
+                     label="Clip Type"
+                     name="ClipFunction">
+        <ProxyGroupDomain name="groups">
+          <Group name="implicit_functions" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="implicit_functions"
+                 name="Plane" />
+          <Proxy group="implicit_functions"
+                 name="Box" />
+          <Proxy group="implicit_functions"
+                 name="Sphere" />
+          <Proxy group="implicit_functions"
+                 name="Scalar" />
+        </ProxyListDomain>
+        <Documentation>Set the parameters of the clip function.</Documentation>
+      </ProxyProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="InputBounds">
+        <BoundsDomain name="bounds">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Scalars"
+                            name="SelectInputScalars"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>If clipping with scalars, this property specifies the
+        name of the scalar array on which to perform the clip
+        operation.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetInsideOut"
+                         default_values="0"
+                         name="InsideOut"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Choose which portion of the dataset should be clipped
+        away.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetValue"
+                            default_values="0.0"
+                            name="Value"
+                            number_of_elements="1">
+        <ArrayRangeDomain name="scalar_range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputScalars" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <DoubleRangeDomain name="range" />
+        <Documentation>If clipping with a scalar array, choose the clipping
+        value.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <Visibility replace_input="2" />
+      </Hints>
+      <!-- End GenericClip -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkGenericContourFilter"
+                 label="Contour Generic Dataset"
+                 name="GenericContour">
+      <Documentation long_help="Generate isolines or isosurfaces using point scalars."
+                     short_help="Generate isolines or isosurfaces.">The Generic
+                     Contour filter computes isolines or isosurfaces using a
+                     selected point-centered scalar array. The available scalar
+                     arrays are listed in the Scalars menu. The scalar range of
+                     the selected array will be displayed. The interface for
+                     adding contour values is very similar to the one for
+                     selecting cut offsets (in the Cut filter). To add a single
+                     contour value, select the value from the New Value slider
+                     in the Add value portion of the interface and click the
+                     Add button, or press Enter. To instead add several evenly
+                     spaced contours, use the controls in the Generate range of
+                     values section. Select the number of contour values to
+                     generate using the Number of Values slider. The Range
+                     slider controls the interval in which to generate the
+                     contour values. Once the number of values and range have
+                     been selected, click the Generate button. The new values
+                     will be added to the Contour Values list. To delete a
+                     value from the Contour Values list, select the value and
+                     click the Delete button. (If no value is selected, the
+                     last value in the list will be removed.) Clicking the
+                     Delete All button removes all the values in the list. If
+                     no values are in the Contour Values list when Accept is
+                     pressed, the current value of the New Value slider will be
+                     used. In addition to selecting contour values, you can
+                     also select additional computations to perform. If any of
+                     Compute Normals, Compute Gradients, or Compute Scalars is
+                     selected, the appropriate computation will be performed,
+                     and a corresponding point-centered array will be added to
+                     the output. The Generic Contour filter operates on a
+                     generic data set, but the input is required to have at
+                     least one point-centered scalar (single-component) array.
+                     The output of this filter is polygonal.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkGenericDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array"
+                          number_of_components="1"
+                          optional="1" />
+        <Documentation>Set the input to the Generic Contour
+        filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Contour By"
+                            name="SelectInputScalars"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property specifies the name of the scalar array
+        from which the contour filter will compute isolines and/or
+        isosurfaces.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetComputeNormals"
+                         default_values="1"
+                         name="ComputeNormals"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkPolyData"
+                                   mode="enabled_state"
+                                   exclude="1" />
+        </Hints>
+        <Documentation>Select whether to compute normals.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetComputeGradients"
+                         default_values="0"
+                         name="ComputeGradients"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="StructuredInputDecorator" />
+        </Hints>
+        <Documentation>Select whether to compute gradients.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetComputeScalars"
+                         default_values="0"
+                         name="ComputeScalars"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Select whether to compute scalars.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetValue"
+                            label="Isosurfaces"
+                            name="ContourValues"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfContours"
+                            use_index="1">
+        <ArrayRangeDomain name="scalar_range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputScalars" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Documentation>This property specifies the values at which to compute
+        isosurfaces/isolines and also the number of such
+        values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <Visibility replace_input="0" />
+      </Hints>
+      <!-- incremental point locator begin -->
+      <ProxyProperty command="SetLocator"
+                     label="Point Merge Method"
+                     name="Locator">
+        <ProxyGroupDomain name="groups">
+          <Group name="incremental_point_locators" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="incremental_point_locators"
+                 name="MergePoints" />
+          <Proxy group="incremental_point_locators"
+                 name="IncrementalOctreeMergePoints" />
+          <Proxy group="incremental_point_locators"
+                 name="NonMergingPointLocator" />
+        </ProxyListDomain>
+        <Documentation>This property specifies an incremental point locator for
+        merging duplicate / coincident points.</Documentation>
+      </ProxyProperty>
+      <!-- incremental point locator end -->
+
+      <PropertyGroup label="Isosurfaces">
+        <Property name="ContourValues" />
+      </PropertyGroup>
+      <PropertyGroup label="Point Locator">
+        <Property name="Locator" />
+      </PropertyGroup>
+
+      <!-- End GenericContour -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkGenericCutter"
+                 label="Slice Generic Dataset"
+                 name="GenericCut">
+      <Documentation long_help="This filter cuts a data set with a plane or sphere.  Cutting is similar to a contour.  It creates surfaces from volumes and lines from surfaces."
+                     short_help="Cut datasets with planes or spheres.">The
+                     Generic Cut filter extracts the portion of the input data
+                     set that lies along the specified plane or sphere. From
+                     the Cut Function menu, you can select whether cutting will
+                     be performed with a plane or a sphere. The appropriate 3D
+                     widget (plane widget or sphere widget) will be displayed.
+                     The parameters of the cut function can be specified
+                     interactively using the 3D widget or manually using the
+                     traditional user interface controls. Instructions for
+                     using these 3D widgets and their corresponding user
+                     interfaces are found in section 7.4. By default, the cut
+                     lies on the specified plane or sphere. Using the Cut
+                     Offset Values portion of the interface, it is also
+                     possible to cut the data set at some offset from the
+                     original cut function. The Cut Offset Values are in the
+                     spatial units of the data set. To add a single offset,
+                     select the value from the New Value slider in the Add
+                     value portion of the interface and click the Add button,
+                     or press Enter. To instead add several evenly spaced
+                     offsets, use the controls in the Generate range of values
+                     section. Select the number of offsets to generate using
+                     the Number of Values slider. The Range slider controls the
+                     interval in which to generate the offsets. Once the number
+                     of values and range have been selected, click the Generate
+                     button. The new offsets will be added to the Offset Values
+                     list. To delete a value from the Cut Offset Values list,
+                     select the value and click the Delete button. (If no value
+                     is selected, the last value in the list will be removed.)
+                     Clicking the Delete All button removes all the values in
+                     the list. The Generic Cut filter takes a generic dataset
+                     as input. Use the Input menu to choose a data set to cut.
+                     The output of this filter is polygonal
+                     data.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkGenericDataSet" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the Generic Cut filter.</Documentation>
+      </InputProperty>
+      <ProxyProperty command="SetCutFunction"
+                     label="Cut Type"
+                     name="CutFunction">
+        <ProxyGroupDomain name="groups">
+          <Group name="implicit_functions" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="implicit_functions"
+                 name="Plane" />
+          <Proxy group="implicit_functions"
+                 name="Box" />
+          <Proxy group="implicit_functions"
+                 name="Sphere" />
+        </ProxyListDomain>
+        <Documentation>Set the parameters to the implicit function used for
+        cutting.</Documentation>
+      </ProxyProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="InputBounds">
+        <BoundsDomain name="bounds">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetValue"
+                            label="Slice Offset Values"
+                            name="ContourValues"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfContours"
+                            use_index="1"
+                            panel_visibility="advanced">
+        <BoundsDomain mode="magnitude"
+                      name="bounds">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>The values in this property specify a list of current
+        offset values. This can be used to create multiple slices with
+        different centers. Each entry represents a new slice with its center
+        shifted by the offset value.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <Visibility replace_input="2" />
+      </Hints>
+      <!-- End GenericCut -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkGenericDataSetTessellator"
+                 label="Tessellate Generic Dataset"
+                 name="GenericTessellator">
+      <Documentation long_help="Tessellate a higher-order dataset"
+                     short_help="Tessellate a higher-order dataset">Tessellate
+                     a higher-order dataset.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkGenericDataSet" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the Generic Tessellator
+        filter.</Documentation>
+      </InputProperty>
+      <!-- End GenericTessellator -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkGenericGeometryFilter"
+                 label="Extract Generic Dataset Surface"
+                 name="GenericGeometryFilter">
+      <Documentation long_help="Extract geometry from a higher-order dataset"
+                     short_help="Extract geometry from a higher-order dataset">
+                     Extract geometry from a higher-order
+                     dataset.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkGenericDataSet" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the Generic Geometry
+        Filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetPassThroughCellIds"
+                         default_values="1"
+                         name="PassThroughCellIds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Select whether to forward original ids.</Documentation>
+      </IntVectorProperty>
+      <!-- End GenericGeometryFilter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkGenericOutlineFilter"
+                 label="Outline Generic DataSet"
+                 name="GenericOutlineFilter">
+      <Documentation long_help="This filter generates a bounding box representation of the input."
+                     short_help="Generates a bounding box.">The Generic Outline
+                     filter generates an axis-aligned bounding box for the
+                     input data set. The Input menu specifies the data set for
+                     which to create a bounding box. This filter operates on
+                     generic data sets and produces polygonal
+                     output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkGenericDataSet" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the Generic Outline
+        filter.</Documentation>
+      </InputProperty>
+      <Hints>
+        <Visibility replace_input="0" />
+      </Hints>
+      <!-- End  GenericOutlineFilter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkGenericStreamTracer"
+                 label="Stream Tracer For Generic Datasets"
+                 name="GenericStreamTracer">
+      <Documentation long_help="Integrate streamlines in a vector field."
+                     short_help="Integrate streamlines in a vector field.">The
+                     Generic Stream Tracer filter generates streamlines in a
+                     vector field from a collection of seed points. The vector
+                     field used is selected from the Vectors menu, so the input
+                     data set is required to have point-centered vectors. The
+                     Seed portion of the interface allows you to select whether
+                     the seed points for this integration lie in a point cloud
+                     or along a line. Depending on which is selected, the
+                     appropriate 3D widget (point or line widget) is displayed
+                     along with traditional user interface controls for
+                     positioning the point cloud or line within the data set.
+                     Instructions for using the 3D widgets and the
+                     corresponding manual controls can be found in section 7.4.
+                     The Max. Propagation entry box allows you to specify the
+                     maximum length of the streamlines. From the Max.
+                     Propagation menu, you can select the units to be either
+                     Time (the time a particle would travel with steady flow)
+                     or Length (in the data set's spatial coordinates). The
+                     Init. Step Len. menu and entry specify the initial step
+                     size for integration. (For non-adaptive integrators,
+                     Runge-Kutta 2 and 4, the initial step size is used
+                     throughout the integration.) The menu allows you to
+                     specify the units. Time and Length have the same meaning
+                     as for Max. Propagation. Cell Length specifies the step
+                     length as a number of cells. The Integration Direction
+                     menu determines in which direction(s) the stream trace
+                     will be generated: FORWARD, BACKWARD, or BOTH. The
+                     Integrator Type section of the interface determines which
+                     calculation to use for integration: Runge-Kutta 2,
+                     Runge-Kutta 4, or Runge-Kutta 4-5. If Runge-Kutta 4-5 is
+                     selected, controls are displayed for specifying the
+                     minimum and maximum step length and the maximum error. The
+                     controls for specifying Min. Step Len. and Max. Step Len.
+                     are the same as those for Init. Step Len. The Runge-Kutta
+                     4-5 integrator tries to choose the step size so that the
+                     estimated error is less than the value of the Maximum
+                     Error entry. If the integration takes more than Max. Steps
+                     to complete, if the speed goes below Term. Speed, if Max.
+                     Propagation is reached, or if a boundary of the input data
+                     set is crossed, integration terminates. This filter
+                     operates on any type of data set, provided it has
+                     point-centered vectors. The output is polygonal data
+                     containing polylines.</Documentation>
+      <InputProperty clean_command="RemoveAllInputs"
+                     command="AddInputConnection"
+                     multiple_input="1"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkGenericDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array"
+                          number_of_components="3" />
+        <Documentation>Set the input to the Generic Stream Tracer
+        filter.</Documentation>
+      </InputProperty>
+      <InputProperty command="SetSourceConnection"
+                     label="Seed Type"
+                     name="Source">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Group name="seed_sources"/>
+        </ProxyListDomain>
+        <Documentation>The value of this property determines how the seeds for
+        the streamlines will be generated.</Documentation>
+      </InputProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Vectors"
+                            name="SelectInputVectors"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Vectors"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property contains the name of the vector array from
+        which to generate streamlines.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty command="SetMaximumPropagation"
+                            default_values="1.0"
+                            name="MaximumPropagation"
+                            number_of_elements="1">
+        <BoundsDomain mode="scaled_extent"
+                      name="bounds"
+                      scale_factor="1.0">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>Specify the maximum streamline length.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetInitialIntegrationStep"
+                            default_values="0.5"
+                            name="InitialIntegrationStep"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Specify the initial integration step.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetIntegrationDirection"
+                         default_values="2"
+                         name="IntegrationDirection"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="FORWARD"
+                 value="0" />
+          <Entry text="BACKWARD"
+                 value="1" />
+          <Entry text="BOTH"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>This property determines in which direction(s) a
+        streamline is generated.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetIntegratorType"
+                         default_values="2"
+                         name="IntegratorType"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Runge-Kutta 2"
+                 value="0" />
+          <Entry text="Runge-Kutta 4"
+                 value="1" />
+          <Entry text="Runge-Kutta 4-5"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>This property determines which integrator (with
+        increasing accuracy) to use for creating streamlines.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetMaximumError"
+                            default_values="0.000001"
+                            name="MaximumError"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Set the maximum error allowed in the integration. The
+        meaning of this value depends on the integrator chosen.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetMinimumIntegrationStep"
+                            default_values="0.01"
+                            name="MinimumIntegrationStep"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Specify the minimum integration step.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetIntegrationStepUnit"
+                         default_values="2"
+                         name="IntegrationStepUnit"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Time"
+                 value="0" />
+          <Entry text="Length"
+                 value="1" />
+          <Entry text="Cell Length"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>Choose the unit to use for the integration
+        step.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetMaximumIntegrationStep"
+                            default_values="0.01"
+                            name="MaximumIntegrationStep"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Specify the maximum integration step.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetMaximumNumberOfSteps"
+                         default_values="2000"
+                         name="MaximumNumberOfSteps"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" />
+        <Documentation>Specify the maximum number of steps used in the
+        integration.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetTerminalSpeed"
+                            default_values="0.000000000001"
+                            name="TerminalSpeed"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>If at any point the speed is below this value, the
+        integration is terminated.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <Visibility replace_input="2" />
+      </Hints>
+      <!-- End GenericStreamTracer -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

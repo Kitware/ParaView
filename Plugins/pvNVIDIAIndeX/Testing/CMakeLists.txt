@@ -1,4 +1,4 @@
-if (PARAVIEW_BUILD_QT_GUI)
+if (PARAVIEW_USE_QT)
   set(test_xmls
     IndeXRepresentation.xml
   )

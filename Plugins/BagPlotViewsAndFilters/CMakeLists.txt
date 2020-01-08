@@ -1,6 +1,6 @@
 set(qrc_files)
 
-if (PARAVIEW_BUILD_QT_GUI)
+if (PARAVIEW_USE_QT)
   list(APPEND qrc_files
     BagPlotViewsAndFilters.qrc)
 endif ()

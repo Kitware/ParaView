@@ -1,0 +1,20 @@
+NAME
+  ParaView::VTKExtensionsExtractionPython
+LIBRARY_NAME
+  vtkPVVTKExtensionsExtractionPython
+DESCRIPTION
+  Extraction filters that require Python
+CONDITION
+  PARAVIEW_USE_PYTHON
+GROUPS
+  PARAVIEW_CORE
+KIT
+  ParaView::CoreKit
+DEPENDS
+  VTK::FiltersExtraction
+PRIVATE_DEPENDS
+  VTK::WrappingPythonCore
+  VTK::PythonInterpreter
+  VTK::vtksys
+TEST_LABELS
+  ParaView

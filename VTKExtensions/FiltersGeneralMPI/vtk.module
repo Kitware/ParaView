@@ -1,0 +1,17 @@
+NAME
+  ParaView::VTKExtensionsFiltersGeneralMPI
+LIBRARY_NAME
+  vtkPVVTKExtensionsFiltersGeneralMPI
+CONDITION
+  PARAVIEW_USE_MPI
+GROUPS
+  PARAVIEW_CANONICAL
+KIT
+  ParaView::CoreKit
+DEPENDS
+  VTK::FiltersParallelFlowPaths
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  VTK::ParallelMPI

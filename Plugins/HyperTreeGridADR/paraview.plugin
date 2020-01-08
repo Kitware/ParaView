@@ -6,4 +6,3 @@ DESCRIPTION
 REQUIRES_MODULES
   VTK::CommonCore
   VTK::FiltersCore
-  ParaView::VTKExtensionsDefault

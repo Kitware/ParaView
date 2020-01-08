@@ -1,6 +1,6 @@
 set(CMAKE_CXX_STANDARD 11)
 
-if (PARAVIEW_ENABLE_PYTHON)
+if (PARAVIEW_USE_PYTHON)
   set(python_modules
     parflow.py
   )
@@ -16,7 +16,7 @@ paraview_add_plugin(
   PYTHON_MODULES ${python_modules}
 )
 
-if (PARAVIEW_ENABLE_PYTHON)
+if (PARAVIEW_USE_PYTHON)
   set(python_copied_modules)
   foreach (python_file IN LISTS python_modules)
     set(output_python_file

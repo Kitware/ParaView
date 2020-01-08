@@ -1,0 +1,29 @@
+NAME
+  ParaView::VTKExtensionsFiltersGeneral
+LIBRARY_NAME
+  vtkPVVTKExtensionsFiltersGeneral
+GROUPS
+  PARAVIEW_CANONICAL
+KIT
+  ParaView::CoreKit
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::FiltersGeneral
+  VTK::FiltersParallel
+PRIVATE_DEPENDS
+  ParaView::VTKExtensionsAMR
+  ParaView::VTKExtensionsCore
+  ParaView::VTKExtensionsFiltersRendering
+  ParaView::VTKExtensionsMisc
+  VTK::FiltersGeneric
+  VTK::FiltersGeometry
+  VTK::FiltersHyperTree
+  VTK::ImagingCore
+  VTK::ImagingSources
+  VTK::ParallelCore
+OPTIONAL_DEPENDS
+  VTK::FiltersParallelFlowPaths
+  VTK::FiltersParallelMPI
+  VTK::ParallelMPI

@@ -1,7 +1,7 @@
 set(sources)
 set(interfaces)
 
-if (PARAVIEW_BUILD_QT_GUI)
+if (PARAVIEW_USE_QT)
   list(APPEND sources
     pqStreamLinesAnimationManager.cxx
     pqStreamLinesAnimationManager.h)
@@ -26,11 +26,10 @@ paraview_add_plugin(StreamLinesRepresentation
   MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Representations/vtk.module"
   XML_DOCUMENTATION OFF)
 
-if (PARAVIEW_BUILD_QT_GUI)
+if (PARAVIEW_USE_QT)
   target_link_libraries(StreamLinesRepresentation
     PRIVATE
-      ParaView::ServerManagerCore
-      ParaView::ServerManagerRendering)
+      ParaView::RemotingViews)
 endif ()
 
 if (BUILD_TESTING)

@@ -1,0 +1,163 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkTextureMapToCylinder"
+                 label="Texture Map to Cylinder"
+                 name="TextureMapToCylinder">
+      <Documentation long_help="Generate texture coordinates by mapping points to cylinder."
+                     short_help="Generate texture coordinates by mapping points to cylinder.">
+                     This is a filter that generates 2D texture coordinates by
+                     mapping input dataset points onto a cylinder. The cylinder
+                     is generated automatically. The cylinder is generated
+                     automatically by computing the axis of the cylinder. Note
+                     that the generated texture coordinates for the
+                     s-coordinate ranges from (0-1) (corresponding to angle of
+                     0-&gt;360 around axis), while the mapping of the
+                     t-coordinate is controlled by the projection of points
+                     along the axis.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the Texture Map to Cylinder
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetPreventSeam"
+                         default_values="1"
+                         name="PreventSeam"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Control how the texture coordinates are generated. If
+        Prevent Seam is set, the s-coordinate ranges from 0-&gt;1 and 1-&gt;0
+        corresponding to the theta angle variation between 0-&gt;180 and
+        180-&gt;0 degrees. Otherwise, the s-coordinate ranges from 0-&gt;1
+        between 0-&gt;360 degrees.</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="GenerateCylinderAutomatically"
+        command="SetAutomaticCylinderGeneration"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the filter will try to determine the size and orientation of the cylinder
+          used for texture mapping using data bounds.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Point1"
+        command="SetPoint1"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <BoundsDomain name="bounds" mode="normal" default_mode="mid,mid,min">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          When **GenerateCylinderAutomatically** is not set, specify the first point defining
+          the axis of the cylinder through its center.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="GenerateCylinderAutomatically"
+                                   value="0" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Point2"
+        command="SetPoint2"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <BoundsDomain name="bounds" mode="normal" default_mode="mid,mid,max">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          When **GenerateCylinderAutomatically** is not set, specify the second point defining
+          the axis of the cylinder through its center.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="GenerateCylinderAutomatically"
+                                   value="0" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <!-- End TextureMapToCylinder -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkTextureMapToPlane"
+                 label="Texture Map to Plane"
+                 name="TextureMapToPlane">
+      <Documentation long_help="Generate texture coordinates by mapping points to plane."
+                     short_help="Generate texture coordinates by mapping points to plane.">
+                     TextureMapToPlane is a filter that generates 2D texture
+                     coordinates by mapping input dataset points onto a plane.
+                     The plane is generated automatically. A least squares
+                     method is used to generate the plane
+                     automatically.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the Texture Map to Plane
+        filter.</Documentation>
+      </InputProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetOrigin"
+                            default_values="0.0 0.0 0.0"
+                            name="Origin"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <Documentation>This property specifies the 3D coordinates for the
+        origin of the plane. Set all to zero if you want to use automatic
+        generation.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint1"
+                            default_values="0.0 0.0 0.0"
+                            name="Point1"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <Documentation>This property specifies the 3D coordinates for
+        Point1 of the plane. Set all to zero if you want to use automatic
+        generation.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetPoint2"
+                            default_values="0.0 0.0 0.0"
+                            name="Point2"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <Documentation>This property specifies the 3D coordinates for
+        Point2 of the plane. Set all to zero if you want to use automatic
+        generation.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetAutomaticPlaneGeneration"
+                         default_values="1"
+                         name="Automatic"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If set the plane values will be automatically generated.
+        Note that for this to work all the Origin, Point1 and Point2 must all
+        be set to zero.</Documentation>
+      </IntVectorProperty>
+      <!-- End TextureMapToPlane -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

@@ -1,5 +1,0 @@
-<ServerManagerConfiguration>
-  <ProxyGroup name="testcase">
-    <NullProxy name="None"></NullProxy>
-  </ProxyGroup>
-</ServerManagerConfiguration>

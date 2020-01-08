@@ -1,0 +1,296 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkLinearSubdivisionFilter"
+                 name="Subdivide">
+      <Documentation long_help="This filter iteratively divide triangles into four smaller triangles.  New points are placed linearly so the output surface matches the input surface."
+                     short_help="Creates a surface with more triangles than the input.">
+                     The Subdivide filter iteratively divides each triangle in
+                     the input dataset into 4 new triangles. Three new points
+                     are added per triangle -- one at the midpoint of each
+                     edge. This filter operates only on polygonal data
+                     containing triangles, so run your polygonal data through
+                     the Triangulate filter first if it is not composed of
+                     triangles. The output of this filter is also
+                     polygonal.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This parameter specifies the input to the Subdivide
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetNumberOfSubdivisions"
+                         default_values="1"
+                         label="Number of Subdivisions"
+                         name="NumberOfSubdivisions"
+                         number_of_elements="1">
+        <IntRangeDomain max="4"
+                        min="1"
+                        name="range" />
+        <Documentation>The value of this property specifies the number of
+        subdivision iterations to perform.</Documentation>
+      </IntVectorProperty>
+      <!-- End Subdivide -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkLoopSubdivisionFilter"
+                 label="Loop Subdivision"
+                 name="LoopSubdivisionFilter">
+      <Documentation long_help="This filter iteratively divides each triangle into four triangles.  New points are placed so the output surface is smooth."
+                     short_help="Create a higher resolution and smoother surface.">
+                     The Loop Subdivision filter increases the granularity of a
+                     polygonal mesh. It works by dividing each triangle in the
+                     input into four new triangles. It is named for Charles
+                     Loop, the person who devised this subdivision scheme. This
+                     filter only operates on triangles, so a data set that
+                     contains other types of polygons should be passed through
+                     the Triangulate filter before applying this filter to it.
+                     This filter only operates on polygonal data (specifically
+                     triangle meshes), and it produces polygonal
+                     output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Loop
+        Subdivision filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetNumberOfSubdivisions"
+                         default_values="1"
+                         label="Number of Subdivisions"
+                         name="NumberOfSubdivisions"
+                         number_of_elements="1">
+        <IntRangeDomain max="4"
+                        min="1"
+                        name="range" />
+        <Documentation>Set the number of subdivision iterations to perform.
+        Each subdivision divides single triangles into four new
+        triangles.</Documentation>
+      </IntVectorProperty>
+      <!-- End LoopSubdivisionFilter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkRibbonFilter"
+                 label="Ribbon"
+                 name="RibbonFilter">
+      <Documentation long_help="This filter generates ribbon surface from lines.  It is useful for displaying streamlines."
+                     short_help="Create ribbon surfaces from lines.">The Ribbon
+                     filter creates ribbons from the lines in the input data
+                     set. This filter is useful for visualizing streamlines.
+                     Both the input and output of this filter are polygonal
+                     data. The input data set must also have at least one
+                     point-centered vector array.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array1"
+                          number_of_components="3"
+                          optional="1" />
+        <InputArrayDomain attribute_type="point"
+                          name="input_array2"
+                          number_of_components="1"
+                          optional="1" />
+        <Documentation>This property specifies the input to the Ribbon
+        filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Scalars"
+                            name="SelectInputScalars"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         input_domain_name="input_array2"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>The value of this property indicates the name of the
+        input scalar array used by this filter. The width of the ribbons will
+        be varied based on the values in the specified array if the value of
+        the Width property is 1.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            default_values="1"
+                            element_types="0 0 0 0 2"
+                            label="Vectors"
+                            name="SelectInputVectors"
+                            number_of_elements="5">
+        <!-- default_values=1, send vectors to the right place -->
+        <ArrayListDomain attribute_type="Vectors"
+                         input_domain_name="input_array1"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>The value of this property indicates the name of the
+        input vector array used by this filter. If the UseDefaultNormal
+        property is set to 0, the normal vectors for the ribbons come from the
+        specified vector array.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty command="SetWidth"
+                            default_values="1"
+                            name="Width"
+                            number_of_elements="1">
+        <BoundsDomain mode="scaled_extent"
+                      name="bounds"
+                      scale_factor="0.01">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>If the VaryWidth property is set to 1, the value of this
+        property is the minimum ribbon width. If the VaryWidth property is set
+        to 0, the value of this property is half the width of the
+        ribbon.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAngle"
+                            default_values="0"
+                            name="Angle"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="360"
+                           min="0"
+                           name="range" />
+        <Documentation>The value of this property specifies the offset angle
+        (in degrees) of the ribbon from the line normal.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseDefaultNormal"
+                         default_values="0"
+                         name="UseDefaultNormal"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 0, and the input contains no
+        vector array, then default ribbon normals will be generated
+        (DefaultNormal property); if a vector array has been set
+        (SelectInputVectors property), the ribbon normals will be set from the
+        specified array. If this property is set to 1, the default normal
+        (DefaultNormal property) will be used, regardless of whether the
+        SelectInputVectors property has been set.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetDefaultNormal"
+                            default_values="0 0 1"
+                            name="DefaultNormal"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The value of this property specifies the normal to use
+        when the UseDefaultNormal property is set to 1 or the input contains no
+        vector array (SelectInputVectors property).</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetVaryWidth"
+                         default_values="0"
+                         name="VaryWidth"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, the ribbon width will be
+        scaled according to the scalar array specified in the
+        SelectInputScalars property. Toggle the variation of ribbon width with
+        scalar value.</Documentation>
+      </IntVectorProperty>
+      <!-- End RibbonFilter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkRotationalExtrusionFilter"
+                 label="Rotational Extrusion"
+                 name="RotationalExtrusionFilter">
+      <Documentation long_help="This filter generates a swept surface while translating the input along a circular path."
+                     short_help="Generates a swept surface using a rotational path.">
+                     The Rotational Extrusion filter forms a surface by
+                     rotating the input about the Z axis. This filter is
+                     intended to operate on 2D polygonal data. It produces
+                     polygonal output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Rotational
+        Extrusion filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetResolution"
+                         default_values="12"
+                         name="Resolution"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>The value of this property controls the number of
+        intermediate node points used in performing the sweep (rotating from 0
+        degrees to the value specified by the Angle property.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCapping"
+                         default_values="1"
+                         name="Capping"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, the open ends of the swept
+        surface will be capped with a copy of the input dataset. This works
+        property if the input is a 2D surface composed of filled polygons. If
+        the input dataset is a closed solid (e.g., a sphere), then either two
+        copies of the dataset will be drawn or no surface will be drawn. No
+        surface is drawn if either this property is set to 0 or if the two
+        surfaces would occupy exactly the same 3D space (i.e., the Angle
+        property's value is a multiple of 360, and the values of the
+        Translation and DeltaRadius properties are 0).</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetAngle"
+                            default_values="360"
+                            name="Angle"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the angle of rotation in
+        degrees. The surface is swept from 0 to the value of this
+        property.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetTranslation"
+                            default_values="0"
+                            name="Translation"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The value of this property specifies the total amount of
+        translation along the Z axis during the sweep process. Specifying a
+        non-zero value for this property allows you to create a corkscrew
+        (value of DeltaRadius &gt; 0) or spring effect.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetDeltaRadius"
+                            default_values="0"
+                            name="DeltaRadius"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The value of this property specifies the change in
+        radius during the sweep process.</Documentation>
+      </DoubleVectorProperty>
+      <!-- End RotationalExtrusionFilter -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

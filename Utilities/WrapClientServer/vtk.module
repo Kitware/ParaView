@@ -2,6 +2,8 @@ NAME
   ParaView::WrapClientServer
 LIBRARY_NAME
   vtkWrapClientServer
+GROUPS
+  PARAVIEW_CORE
 PRIVATE_DEPENDS
   VTK::WrappingTools
 EXCLUDE_WRAP

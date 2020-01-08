@@ -1,0 +1,904 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="internal_sources">
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkAVSucdReader"
+                 label="AVS UCD Reader"
+                 name="AVSucdReader">
+      <Documentation long_help="Reads binary or ASCII files stored in AVS UCD format."
+                     short_help="Read a dataset in AVS UCD format.">The AVS UCD
+                     reader reads binary or ASCII files stored in AVS UCD
+                     format. The default file extension is .inp. The output of
+                     this reader is unstructured grid.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the AVS UCD
+        reader.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property contains a list of the cell-centered
+        arrays to read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="Point Arrays"
+                            name="PointArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property contains a list of the point-centered
+        arrays to read.</Documentation>
+      </StringVectorProperty>
+      <!-- End AVSucdReader -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkSTLReader"
+                 label="STL Reader"
+                 name="stlreadercore">
+      <Documentation long_help="Reads ASCII or binary stereo lithography (STL) files."
+                     short_help="Read STL files.">The STL reader reads ASCII or
+                     binary stereo lithography (STL) files. The expected file
+                     extension is .stl. The output of this reader is a
+                     polygonal dataset.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the STL
+        reader.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetScalarTags"
+                         default_values="1"
+                         name="ScalarTags"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When set to true, the reader will include cell data
+        describing which solid a cell belongs to.</Documentation>
+      </IntVectorProperty>
+      <!-- End stlreader -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkPLYReader" name="PLYReaderCore">
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the PLY
+        reader.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetDuplicatePointsForFaceTexture"
+                         default_values="1"
+                         name="DuplicatePointsForFaceTexture"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>If true (default) and the "face" element has
+        the property "texcoord" duplicate face points if they have 2
+        or more different texture coordinates. Otherwise, each texture
+        coordinate for a face point overwrites previously set texture
+        coordinates for that point.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetFaceTextureTolerance"
+                            default_values="0.000001"
+                            name="FaceTextureTolerance"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Tolerance used to detect different texture
+        coordinates for shared points for faces</Documentation>
+      </DoubleVectorProperty>
+      <!-- End PLYReaderCore -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkFLUENTReader" name="FLUENTReaderCore">
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <!-- FLUENTReaderCore -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkTecplotReader"
+                 label="VTK Tecplot Reader"
+                 name="TecplotReaderCore">
+      <Documentation>Core for TecplotReader</Documentation>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>The name of the file to load</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="DataArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Data" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetDataArrayStatus"
+                            element_types="2 0"
+                            information_property="DataArrayInfo"
+                            label="Data Arrays"
+                            name="DataArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="DataArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists what dataset attribute arrays (point
+        data and cell data) to read.</Documentation>
+      </StringVectorProperty>
+      <!-- End TecplotReaderCore-->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkParticleReader"
+                 label="VTK Particle Reader"
+                 name="ParticleReaderCore">
+      <Documentation>Core for ParticleReader.</Documentation>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>The name of the file to load.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetDataByteOrder"
+                         default_values="0"
+                         name="ByteOrder"
+                         number_of_elements="1">
+        <Documentation>Set/Get the byte ordering of the file you are trying to
+        read in.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="BigEndian"
+                 value="0" />
+          <Entry text="LittleEndian"
+                 value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHasScalar"
+                         default_values="1"
+                         name="HasScalar"
+                         number_of_elements="1">
+        <Documentation>Default: 1. If 1 then each particle has a value
+        associated with it.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFileType"
+                         default_values="0"
+                         name="FileType"
+                         number_of_elements="1">
+        <Documentation>Set the file type. The options are: - Unknown (0)
+        (default) the reader will attempt to determine the file type. If this
+        fails then you should set the file type yourself. - Text (1) the file
+        type is text. - Binary (2) the file type is binary.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Unknown"
+                 value="0" />
+          <Entry text="Text"
+                 value="1" />
+          <Entry text="Binary"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDataType"
+                         default_values="10"
+                         name="DataType"
+                         number_of_elements="1">
+        <Documentation>Get/Set the data type. The options are: - Float (10)
+        (default) single precision floating point. - Double (11) double
+        precision floating point.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Float"
+                 value="10" />
+          <Entry text="Double"
+                 value="11" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <!-- ParticleReaderCore -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <!-- end of "internal_sources" -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="AVS UCD Reader"
+                 name="AVSucdSeriesReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads binary or ASCII files stored in AVS UCD format."
+                     short_help="Read a dataset in AVS UCD format.">The AVS UCD
+                     reader reads binary or ASCII files stored in AVS UCD
+                     format. The default file extension is .inp. The output of
+                     this reader is unstructured grid. This supports reading a
+                     file series.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="AVSucdReader"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="Cell/Point Array Status"
+                         name="CellPointArrayStatus"
+                         panel_visibility="default"
+                         panel_widget="ArrayStatus">
+            <Property name="CellArrayInfo" />
+            <Property name="CellArrayStatus" />
+            <Property name="PointArrayInfo" />
+            <Property name="PointArrayStatus" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileNames"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader. If more than
+        one file is specified, the reader will switch to file series mode in
+        which it will pretend that it can support time and provide one file per
+        time step.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="inp"
+                       file_description="AVS UCD Binary/ASCII Files" />
+      </Hints>
+      <!-- End of AVSucdSeriesReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="STL Reader"
+                 name="stlreader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads ASCII or binary stereo lithography (STL) files."
+                     short_help="Read STL files.">The STL reader reads ASCII or
+                     binary stereo lithography (STL) files. The expected file
+                     extension is .stl. The output of this reader is a
+                     polygonal dataset. This reader also supports file
+                     series.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="stlreadercore"></Proxy>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileNames"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader. If more than
+        one file is specified, the reader will switch to file series mode in
+        which it will pretend that it can support time and provide one file per
+        time step.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="stl stl.series"
+                       file_description="Stereo Lithography" />
+      </Hints>
+      <!-- End stlreader-->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkBYUReader"
+                 label="BYU Reader"
+                 name="byureader">
+      <Documentation long_help="Reads Movie.BYU files to produce polygonal data."
+                     short_help="Read Movie.BYU files.">The BYU reader reads
+                     data stored in Movie.BYU format. The expected file
+                     extension is .g. The datasets resulting from reading these
+                     files are polygonal.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the BYU
+        reader.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="g"
+                       file_description="BYU Files" />
+      </Hints>
+      <!-- End byureader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkOBJReader"
+                 label="Wavefront OBJ Reader"
+                 name="objreader">
+      <Documentation long_help="Reads Wavefront .OBJ files to produce polygonal and line data."
+                     short_help="Read Wavefront .OBJ files.">The OBJ reader
+                     reads data stored in Wavefront .OBJ format. The expected
+                     file extension is .obj, the datasets resulting from
+                     reading these files are polygons and
+                     lines.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the OBJ
+        reader.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="obj"
+                       file_description="Wavefront OBJ Files" />
+      </Hints>
+      <!-- End vtkOBJReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkPDBReader"
+                 label="PDB Reader"
+                 name="pdbreader">
+      <Documentation long_help="Reads PDB molecule files."
+                     short_help="Read PDB files.">The PDB reader reads files in
+                     the format used by the Protein Data Bank (an archive of
+                     experimentally determined three-dimensional structures of
+                     biological macromolecules). The expected file extension is
+                     .pdb. The output datasets are polygonal.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the PDB
+        reader.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="pdb"
+                       file_description="Protein Data Bank Files" />
+      </Hints>
+      <!-- End pdbreader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="PLY Reader"
+                 name="PLYReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads files stored in Stanford University's PLY polygonal file format."
+                     short_help="Read PLY polygonal files.">The PLY reader
+                     reads files stored in the PLY polygonal file format
+                     developed at Stanford University. The PLY files that
+                     ParaView can read must have the elements "vertex" and
+                     "face" defined. The "vertex" elements must have the
+                     properties "x", "y", and "z". The "face" elements must have
+                     the property "vertex_indices" defined. The default file
+                     extension for this reader is .ply.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="PLYReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="DuplicatePointsForFaceTexture" />
+          <Property name="FaceTextureTolerance" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="0"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="ply ply.series"
+                       file_description="PLY Polygonal File Format" />
+      </Hints>
+      <!-- End PLYReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkPLYReader"
+                 name="plyreader"
+                 base_proxygroup="internal_sources"
+                 base_proxyname="PLYReaderCore">
+      <Deprecated deprecated_in="5.3" to_remove_in="5.4">
+          This has been replaced by "PLYReader" which also supports a series of PLY files.
+      </Deprecated>
+      <!-- End plyreader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <!-- Beginning of MFIX Reader -->
+    <SourceProxy class="vtkMFIXReader"
+                 name="MFIXReader">
+      <Documentation long_help="Reads a dataset in MFIX file format."
+                     short_help="Reads a dataset in MFIX file format.">
+                     vtkMFIXReader creates an unstructured grid dataset. It
+                     reads a restart file and a set of sp files. The restart
+                     file contains the mesh information. MFIX meshes are either
+                     cylindrical or rectilinear, but this reader will convert
+                     them to an unstructured grid. The sp files contain
+                     transient data for the cells. Each sp file has one or more
+                     variables stored inside it.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>Set the file name for the MFIX reader.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="RES"
+                       file_description="MFIX Unstructured Grid Files" />
+      </Hints>
+    </SourceProxy>
+    <!-- End of MFIX Reader -->
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="Fluent Case Reader"
+                 name="FLUENTReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads a dataset in Fluent file format."
+                     short_help="Reads a dataset in Fluent file format.">
+                     FLUENTReader creates an unstructured grid dataset. It
+                     reads .cas and .dat files stored in FLUENT native format
+                     (or a file series of the same.</Documentation>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The name of the files to load.</Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="FLUENTReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="CellArrayInfo" />
+          <Property name="CellArrayStatus" />
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <ReaderFactory extensions="cas"
+                       file_description="Fluent Case Files" />
+      </Hints>
+      <!-- FLUENTReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <!-- Beginning of ProStar Reader -->
+    <SourceProxy class="vtkProStarReader"
+                 label="proSTAR (STARCD) Reader"
+                 name="ProStarReader">
+      <Documentation long_help="Reads geometry in proSTAR (STARCD) file format."
+                     short_help="Reads geometry in proSTAR (STARCD) file format.">
+                     ProStarReader creates an unstructured grid dataset. It
+                     reads .cel/.vrt files stored in proSTAR (STARCD) ASCII
+                     format.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>Set the file name for the proSTAR (STARCD)
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetScaleFactor"
+                            default_values="1"
+                            name="ScaleFactor"
+                            number_of_elements="1">
+        <Documentation>Scaling factor for the points</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="cel vrt"
+                       file_description="proSTAR Files" />
+      </Hints>
+    </SourceProxy>
+    <!-- End of ProStar Reader -->
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="Tecplot Reader"
+                 name="TecplotReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads files in the Tecplot ASCII file format."
+                     short_help="Read files in the Tecplot ASCII file format.">
+                     The Tecplot reader extracts multiple zones (blocks) of
+                     data from a Tecplot ASCII file, in which a zone is stored
+                     in either point packing mode (i.e., tuple-based, with only
+                     point data supported) or block packing mode (i.e.,
+                     component-based, with point data and cell data supported).
+                     The output of the reader is a vtkMultiBlockDataset, of
+                     which each block is either a vtkStructuredGrid or a
+                     vtkUnstructuredGrid. This supports reading a file
+                     series.</Documentation>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileNames"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="TecplotReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="DataArrayInfo" />
+          <Property name="DataArrayStatus" />
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <ReaderFactory extensions="tec TEC Tec tp TP dat"
+                       file_description="Tecplot Files" />
+      </Hints>
+      <!-- End TecplotReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <!-- Start WindBladeReader -->
+    <SourceProxy class="vtkWindBladeReader"
+                 label="WindBlade reader"
+                 name="WindBladeReader">
+      <Documentation long_help="Reads WindBlade/Firetec simulation files possibly including wind turbines and topology files."
+                     short_help="Read WindBlade simulation files.">
+                     WindBlade/Firetec is a simulation dealing with the effects
+                     of wind on wind turbines or on the spread of fires. It
+                     produces three outputs - a StructuredGrid for the wind
+                     data fields, a StructuredGrid for the ground topology, and
+                     a PolyData for turning turbine blades. The input file
+                     (.wind) opened by the WindBlade reader is an ASCII
+                     description of the data files expected. Data is
+                     accumulated by the simulation processor and is written one
+                     file per time step. WindBlade can deal with topology if a
+                     flag is turned on and expects (x,y) data for the ground.
+                     It also can deal with turning wind turbines from other
+                     time step data files which gives polygon positions of
+                     segments of the blades and data for each
+                     segment.</Documentation>
+      <OutputPort index="0"
+                  name="Field" />
+      <OutputPort index="1"
+                  name="Blade" />
+      <OutputPort index="2"
+                  name="Ground" />
+      <StringVectorProperty animateable="0"
+                            command="SetFilename"
+                            name="Filename"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>ASCII .wind file describes locations of data files, grid
+        sizes and variable deltas, time step sizes, whether topology is used,
+        whether turbines are used, and type and order of data written to the
+        files.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="Point Arrays"
+                            name="PointArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Variables written to the data files are described in the
+        .wind file and are presented for selection. Only selected variables are
+        loaded for a time step.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="wind"
+                       file_description="WindBlade Data" />
+      </Hints>
+    </SourceProxy>
+    <!-- End WindBladeReader -->
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkPTSReader"
+                 label="PTS Reader"
+                 name="PTSReader">
+      <Documentation long_help="Reads a PTS ASCII Point Cloud file."
+                     short_help="Read a pointset in PTS format">The PTS reader
+                     reads  ASCII PTS Point Cloud files containing
+                     points as well as optional intensity and color information. The default
+                     file extension is .pts. This reader produces a
+                     polydata set of a single vertex cell containing all of
+                     the points.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the PTS
+        (ASCII Point Cloud) reader.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetLimitToMaxNumberOfPoints"
+                         name="LimitNumberOfPointsRead"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Limits the number of points read in from file
+        </Documentation>
+      </IntVectorProperty>
+       <IntVectorProperty command="SetMaxNumberOfPoints"
+                         name="MaxNumberOfPoints"
+                         default_values="100000"
+                         number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LimitNumberOfPointsRead"
+                                   value="1" />
+        </Hints>
+        <Documentation>
+          Specify the max number of point to be read.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLimitReadToBounds"
+                         name="LimitPointCloudToBounds"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Restrict the point to cloud to a specified volume.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetReadBounds"
+                            name="ReadBounds"
+                            number_of_elements="6"
+                            default_values="0 100 0 100 0 100">
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LimitPointCloudToBounds"
+                                   value="1" />
+        </Hints>
+        <Documentation>Define the spatial volume that will restrict the
+        extent of the point cloud [xmin, xmax, ymin, ymax, zmin, zmax]</Documentation>
+
+      </DoubleVectorProperty>
+       <Hints>
+        <ReaderFactory extensions="pts"
+                       file_description="PTS (Point Cloud)  Files" />
+      </Hints>
+      <!-- End PTSReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="Particles Reader"
+                 name="ParticleReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads particle data."
+                     short_help="Read particle data.">vtkParticleReader reads
+                     either a binary or a text file of particles. Each particle
+                     can have associated with it an optional scalar value. So
+                     the format is: x, y, z, scalar (all floats or doubles).
+                     The text file can consist of a comma delimited set of
+                     values. In most cases vtkParticleReader can automatically
+                     determine whether the file is text or binary. The data can
+                     be either float or double. Progress updates are provided.
+                     With respect to binary files, random access into the file
+                     to read pieces is supported.</Documentation>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="ParticleReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="ByteOrder" />
+          <Property name="HasScalar" />
+          <Property name="FileType" />
+          <Property name="DataType" />
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <ReaderFactory extensions="particles"
+                       file_description="VTK Particle Files" />
+      </Hints>
+      <!-- End of ParticleReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <!-- end of "sources" -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

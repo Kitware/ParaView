@@ -1,0 +1,224 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="internal_sources">
+    <Proxy class="vtkUnstructuredPOPReader"
+                 label="Unstructured NetCDF POP reader"
+                 name="UnstructuredPOPReaderCore">
+      <Documentation long_help="Reads rectilinear grid data from a NetCDF POP file and converts it into unstructured data."
+                     short_help="Read rectlinear grid data from a NetCDF file in the POP format and converts it into unstructured data.">
+      The reader reads regular rectilinear grid (image/volume) data from a
+      NetCDF file and turns it into an unstructured spherical
+      grid.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name to
+        read.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetStride"
+                         default_values="1 1 1"
+                         name="Stride"
+                         number_of_elements="3">
+        <IntRangeDomain min="1 1 1"
+                        name="range" />
+        <Documentation>This property indicate the number of indices per
+        dimension (i,j,k) to skip between each point included in this
+        output.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetVOI"
+                         default_values="0 -1 0 -1 0 -1"
+                         label="VOI"
+                         name="VOI"
+                         number_of_elements="6"
+                         panel_visibility="default">
+        <IntRangeDomain name="range" />
+        <Documentation>The data volume of interest (VOI). The VOI is a
+        sub-extent of the data that you want loaded. Setting a VOI is useful
+        when reading from a large data set and you are only interested in a
+        small portion of the data. If left containing all 0's, then the reader
+        will load in the entire data set.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetVerticalVelocity"
+                         default_values="0"
+                         label="VerticalVelocity"
+                         name="VerticalVelocity"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If there is a velocity vector with only 2 components,
+        specify that the reader should compute the third
+        component.</Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="pop.ncdf pop.nc"
+                       file_description="POP Ocean NetCDF (Unstructured)" />
+      </Hints>
+    </Proxy>
+    <!-- End UnstructuredPOPReaderCore -->
+  </ProxyGroup>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkPPhastaReader"
+                 label="Phasta Reader"
+                 name="PhastaReader">
+      <Documentation long_help="Reads the parallel Phasta meta-file and the underlying Phasta files."
+                     short_help="Read datasets stored in the Phasta format.">
+                     This Phasta reader reads files stored in the Phasta (a CFD
+                     package) format. The expected file extension is .pht. The
+                     output of this reader is a multipiece data
+                     set.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the Phasta
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="pht"
+                       file_description="Phasta Files" />
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="Unstructured NetCDF POP reader"
+                 name="UnstructuredPOPReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads rectilinear grid data from a NetCDF POP file and converts it into unstructured data."
+                     short_help="Read rectlinear grid data from a NetCDF file in the POP format and converts it into unstructured data.">
+      The reader reads regular rectilinear grid (image/volume) data from a
+      NetCDF file and turns it into an unstructured spherical
+      grid.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="UnstructuredPOPReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="Stride" />
+          <Property name="VOI" />
+          <Property name="VerticalVelocity" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="pop.ncdf pop.nc"
+                       file_description="POP Ocean NetCDF (Unstructured)" />
+      </Hints>
+    </SourceProxy>
+    <!-- End UnstructuredPOPReader -->
+
+    <SourceProxy class="vtkVRMLSource"
+                 label="VRML Reader"
+                 name="vrmlreader">
+      <Documentation long_help="Load the geometry from a VRML 2.0 file."
+                     short_help="Read VRML 2.0 files.">The VRML reader loads
+                     only the geometry from a VRML (Virtual Reality Modeling
+                     Language) 2.0 file. The expected file extension is .wrl.
+                     The output of this reader is a polygonal
+                     dataset.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the VRML
+        reader.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="wrl vrml"
+                       file_description="VRML 2 Files" />
+      </Hints>
+      <!-- End vrmlreader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <!-- Begin Ensemble Data Reader -->
+    <EnsembleDataReaderProxy class="vtkEnsembleDataReader"
+                             label="Ensemble Data Reader"
+                             name="EnsembleDataReader">
+      <Documentation long_help="Reads ensemble data organized in CSV files."
+                     short_help="Reads ensemble CSV files">
+        Reads CSV files in which each row gives a dataset and the last column of
+        each row specifies the file name for the dataset. The standard extension
+        is .pve.
+      </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the PVE file name
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty name="CurrentEnsembleMember"
+                         command="SetCurrentMember"
+                         animatable="1"
+                         default_values="0"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" default_mode="min">
+          <RequiredProperties>
+            <Property name="EnsembleMemberRange" function="Range" />
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Documentation>
+          The index of the dataset in the ensemble.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="EnsembleMemberRange"
+                         command="GetCurrentMemberRange"
+                         information_only="1"
+                         number_of_elements="2"
+                         default_values="0 0">
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>
+          Reports time values to the GUI.
+        </Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="pve"
+                       file_description="ParaView Ensemble Data" />
+      </Hints>
+    </EnsembleDataReaderProxy>
+    <!-- End Ensemble Data Reader -->
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

@@ -1,0 +1,267 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="internal_sources">
+    <!-- ================================================================== -->
+    <!-- end of "internal_sources" -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkSpyPlotReader"
+                 label="Spy Plot Reader"
+                 name="spcthreader">
+      <Documentation long_help="Reads files in the SPCTH Spy Plot file format."
+                     short_help="Read files in the Spy Plot format.">The Spy
+                     Plot reader loads an ASCII meta-file called the "case"
+                     file (extension .spcth). The case file lists all the
+                     binary files containing the dataset. This reader produces
+                     hierarchical datasets.</Documentation>
+      <OutputPort index="0"
+                  name="Volume Data" />
+      <OutputPort index="1"
+                  name="Tracers" />
+      <OutputPort index="2"
+                  name="Markers" />
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            panel_visibility="default"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the Spy Plot
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetDownConvertVolumeFraction"
+                         default_values="1"
+                         name="DownConvertVolumeFraction"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 0, the type of the volume
+        fraction is float; is set to 1, the type is unsigned
+        char.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetComputeDerivedVariables"
+                         default_values="1"
+                         name="ComputeDerivedVariables"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, the reader will convert
+        derived variables like material density for the materials that the user
+        has selected. For Density the user needs to have selected Material Mass
+        and Material Volume Fraction.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDistributeFiles"
+                         default_values="1"
+                         name="DistributeFiles"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>In parallel mode, if this property is set to 1, the
+        reader will distribute files or blocks.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateLevelArray"
+                         default_values="0"
+                         name="GenerateLevelArray"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, a cell array will be
+        generated that stores the level of each block.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateActiveBlockArray"
+                         default_values="0"
+                         name="GenerateActiveBlockArray"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, a cell array will be
+        generated that stores the active status of a block.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateTracerArray"
+                         default_values="1"
+                         name="GenerateTracers"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, a cell array will be
+        generated that stores the coordinates of any tracers.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateMarkers"
+                         default_values="1"
+                         name="GenerateMarkers"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, a second output will be
+        created using the markers data stored in the file.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateBlockIdArray"
+                         default_values="0"
+                         name="GenerateBlockIdArray"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, a cell array will be
+        generated that stores a unique blockId for each block.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMergeXYZComponents"
+                         default_values="1"
+                         name="MergeXYZComponents"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, cell arrays named (for
+        example) X velocity, Y velocity and Z velocity will be combined into a
+        single vector array named velocity.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="spct*"
+                       file_description="SpyPlot CTH dataset"
+                       filename_patterns="spct*" />
+      </Hints>
+      <!-- End spcthreader-->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkSpyPlotFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="Restarted Sim Spy Plot Reader"
+                 name="SPCTHRestartReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads collections of SPCTH files from simulations that were restarted."
+                     short_help="Read SPCTH files from simulation restarts.">
+                     When a CTH simulation is restarted, typically you get a
+                     new set of output files. When you read them in your
+                     visualization, you often want to string these file sets
+                     together as if it was one continuous dump of files. This
+                     reader allows you to specify a metadata file that will
+                     implicitly string the files together.</Documentation>
+      <OutputPort index="0"
+                  name="Volume Data" />
+      <OutputPort index="1"
+                  name="Tracers" />
+      <OutputPort index="2"
+                  name="Markers" />
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="sources"
+               proxyname="spcthreader" />
+        <ExposedProperties>
+          <Property name="DownConvertVolumeFraction" />
+          <Property name="DistributeFiles" />
+          <Property name="GenerateLevelArray" />
+          <Property name="GenerateActiveBlockArray" />
+          <Property name="GenerateBlockIdArray" />
+          <Property name="GenerateTracers" />
+          <Property name="GenerateMarkers" />
+          <Property name="CellArrayInfo" />
+          <Property name="CellArrayStatus" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty animateable="0"
+                            command="SetMetaFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This points to a special metadata file that lists the
+        output files for each restart.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetUseMetaFile"
+                         default_values="1"
+                         name="UseMetaFile"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <BooleanDomain name="bool" />
+        <Documentation>This hidden property must always be set to 1 for this
+        proxy to work.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="spcth-timeseries"
+                       file_description="Case file for restarted CTH outputs" />
+      </Hints>
+      <!-- SPCTHRestartReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkSpyPlotHistoryReader"
+                 label="spcth history reader"
+                 name="spcthhistoryreader">
+      <Documentation long_help="Reads an spcth history file where each row translates into a single time step
+        and the columns are points, materials and properties."
+                     short_help="Read a comma-separated spctch history file.">
+                     </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the VRML
+        reader.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCommentCharacter"
+                            default_values="%"
+                            name="CommentCharacter"
+                            number_of_elements="1">
+        <Documentation>This property lists the characters that is used as the
+        first character on comment lines</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetDelimeter"
+                            default_values=","
+                            name="Delimeter"
+                            number_of_elements="1">
+        <Documentation>Character that is used as the delimiter.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="hscth"
+                       file_description="Spy Plot History Files"
+                       filename_patterns="*hsct*" />
+      </Hints>
+      <!-- End of SPCTHHistoryReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <!-- end of "sources" -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

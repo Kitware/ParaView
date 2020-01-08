@@ -1,0 +1,19 @@
+NAME
+  ParaView::RemotingClientServerStream
+LIBRARY_NAME
+  vtkRemotingClientServerStream
+KIT
+  ParaView::CoreKit
+DESCRIPTION
+  Client-server stream and interpreter and related classes
+GROUPS
+  PARAVIEW_CORE
+DEPENDS
+  VTK::CommonCore
+PRIVATE_DEPENDS
+  VTK::vtksys
+TEST_DEPENDS
+  VTK::CommonCore
+  VTK::TestingCore
+TEST_LABELS
+  ParaView

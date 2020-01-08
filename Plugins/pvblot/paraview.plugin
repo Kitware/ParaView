@@ -7,6 +7,6 @@ CONDITION
   # For one, it seems to use `vtkPVPythonInterpretor` which, AFAICT, does not
   # and has not existed. Its expected API also doesn't match with what
   # `vtkPythonInterpreter` provides today.
-  FALSE AND PARAVIEW_ENABLE_PYTHON
+  FALSE AND PARAVIEW_USE_PYTHON
 REQUIRES_MODULES
-  ParaView::ClientServerCoreCore
+  ParaView::RemotingCore

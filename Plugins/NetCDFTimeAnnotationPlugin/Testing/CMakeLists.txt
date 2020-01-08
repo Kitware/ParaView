@@ -1,4 +1,4 @@
-if (PARAVIEW_BUILD_QT_GUI AND BUILD_SHARED_LIBS)
+if (PARAVIEW_USE_QT AND BUILD_SHARED_LIBS)
   ExternalData_Expand_Arguments("ParaViewData" _
     "DATA{Data/tos_O1_2001-2002.nc}")
 

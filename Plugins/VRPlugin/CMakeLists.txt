@@ -113,10 +113,9 @@ target_include_directories(VRPlugin
 
 target_link_libraries(VRPlugin
   PRIVATE
-    ParaView::ClientServerCoreCore
-    ParaView::Core
-    ParaView::ServerManagerCore
-    ParaView::ServerManagerRendering
+    ParaView::RemotingCore
+    ParaView::RemotingServerManager
+    ParaView::RemotingViews
     ParaView::pqApplicationComponents
     VTK::CommonCore
     VTK::CommonMath

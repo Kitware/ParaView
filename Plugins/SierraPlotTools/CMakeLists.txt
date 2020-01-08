@@ -63,10 +63,10 @@ paraview_add_plugin(SierraPlotTools
 
 target_link_libraries(SierraPlotTools
   PRIVATE
-    ParaView::ClientServerCoreCore
-    ParaView::ServerManagerCore
-    ParaView::ServerManagerRendering
-    ParaView::VTKExtensionsDefault
+    ParaView::RemotingCore
+    ParaView::RemotingServerManager
+    ParaView::RemotingViews
+    ParaView::VTKExtensionsIOExodus
     VTK::CommonCore
     VTK::CommonDataModel
     VTK::IOExodus)

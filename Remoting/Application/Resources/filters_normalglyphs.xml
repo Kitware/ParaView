@@ -1,0 +1,358 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <CompoundSourceProxy label="Normal Glyphs"
+                         name="NormalGlyphs">
+      <Documentation long_help="Filter computing surface normals."
+                     short_help="Filter computing surface normals.">Filter
+                     computing surface normals.</Documentation>
+      <Proxy compound_name="ExtractSurface2"
+             group="filters"
+             id="1013"
+             servers="1"
+             type="DataSetSurfaceFilter">
+        <Property id="1013.Input"
+                  name="Input"
+                  number_of_elements="1">
+          <Domain id="1013.Input.groups"
+                  name="groups">
+            <Group value="sources" />
+            <Group value="filters" />
+          </Domain>
+          <Domain id="1013.Input.input_type"
+                  name="input_type">
+            <DataType value="vtkDataSet" />
+          </Domain>
+        </Property>
+        <Property id="1013.PieceInvariant"
+                  name="PieceInvariant"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="1" />
+          <Domain id="1013.PieceInvariant.bool"
+                  name="bool" />
+        </Property>
+      </Proxy>
+      <Proxy compound_name="GenerateSurfaceNormals1"
+             group="filters"
+             id="1224"
+             servers="1"
+             type="PolyDataNormals">
+        <Property id="1224.ComputeCellNormals"
+                  name="ComputeCellNormals"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="1" />
+          <Domain id="1224.ComputeCellNormals.bool"
+                  name="bool" />
+        </Property>
+        <Property id="1224.Consistency"
+                  name="Consistency"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="0" />
+          <Domain id="1224.Consistency.bool"
+                  name="bool" />
+        </Property>
+        <Property id="1224.FeatureAngle"
+                  name="FeatureAngle"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="30" />
+          <Domain id="1224.FeatureAngle.range"
+                  name="range">
+            <Min index="0"
+                 value="0" />
+            <Max index="0"
+                 value="180" />
+          </Domain>
+        </Property>
+        <Property id="1224.FlipNormals"
+                  name="FlipNormals"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="0" />
+          <Domain id="1224.FlipNormals.bool"
+                  name="bool" />
+        </Property>
+        <Property id="1224.Input"
+                  name="Input"
+                  number_of_elements="1">
+          <Proxy output_port="0"
+                 value="1013" />
+          <Domain id="1224.Input.groups"
+                  name="groups">
+            <Group value="sources" />
+            <Group value="filters" />
+          </Domain>
+          <Domain id="1224.Input.input_type"
+                  name="input_type">
+            <DataType value="vtkPolyData" />
+          </Domain>
+        </Property>
+        <Property id="1224.NonManifoldTraversal"
+                  name="NonManifoldTraversal"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="1" />
+          <Domain id="1224.NonManifoldTraversal.bool"
+                  name="bool" />
+        </Property>
+        <Property id="1224.PieceInvariant"
+                  name="PieceInvariant"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="1" />
+          <Domain id="1224.PieceInvariant.bool"
+                  name="bool" />
+        </Property>
+        <Property id="1224.Splitting"
+                  name="Splitting"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="0" />
+          <Domain id="1224.Splitting.bool"
+                  name="bool" />
+        </Property>
+      </Proxy>
+      <Proxy compound_name="CellCenters1"
+             group="filters"
+             id="3392"
+             servers="1"
+             type="CellCenters">
+        <Property id="3392.Input"
+                  name="Input"
+                  number_of_elements="1">
+          <Proxy output_port="0"
+                 value="1224" />
+          <Domain id="3392.Input.groups"
+                  name="groups">
+            <Group value="sources" />
+            <Group value="filters" />
+          </Domain>
+          <Domain id="3392.Input.input_type"
+                  name="input_type">
+            <DataType value="vtkDataSet" />
+          </Domain>
+        </Property>
+        <Property id="3392.VertexCells"
+                  name="VertexCells"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="1" />
+          <Domain id="3392.VertexCells.bool"
+                  name="bool" />
+        </Property>
+      </Proxy>
+      <Proxy compound_name="Glyph1"
+             group="filters"
+             id="2429"
+             servers="1"
+             type="Glyph">
+        <Property id="2429.Input"
+                  name="Input"
+                  number_of_elements="1">
+          <Proxy output_port="0"
+                 value="3392" />
+          <Domain id="2429.Input.groups"
+                  name="groups">
+            <Group value="sources" />
+            <Group value="filters" />
+          </Domain>
+          <Domain id="2429.Input.input_array1"
+                  name="input_array1">
+            <InputArray attribute_type="point"
+                        number_of_components="1" />
+          </Domain>
+          <Domain id="2429.Input.input_array2"
+                  name="input_array2">
+            <InputArray attribute_type="point"
+                        number_of_components="3" />
+          </Domain>
+          <Domain id="2429.Input.input_type"
+                  name="input_type">
+            <DataType value="vtkDataSet" />
+          </Domain>
+        </Property>
+        <Property name="GlyphMode"
+                  id="2429.GlyphMode"
+                  number_of_elements="1">
+          <Element index="0" value="0"/>
+        </Property>
+        <Property id="2429.ScaleArray"
+                  name="ScalarArray"
+                  number_of_elements="5">
+          <Element index="0"
+                   value="" />
+          <Element index="1"
+                   value="" />
+          <Element index="2"
+                   value="" />
+          <Element index="3"
+                   value="" />
+          <Element index="4"
+                   value="" />
+        </Property>
+        <Property id="2429.OrientationArray"
+                  name="OrientationArray"
+                  number_of_elements="5">
+          <Element index="0"
+                   value="1" />
+          <Element index="1"
+                   value="" />
+          <Element index="2"
+                   value="" />
+          <Element index="3"
+                   value="" />
+          <Element index="4"
+                   value="Normals" />
+        </Property>
+        <Property id="2429.SetScaleFactor"
+                  name="SetScaleFactor"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="1.0" />
+        </Property>
+        <!--
+        <Property id="2429.ScaleMode"
+                  name="ScaleMode"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="3" />
+        </Property>
+        -->
+        <Property id="2429.Source"
+                  name="Source"
+                  number_of_elements="1">
+          <Proxy output_port="0"
+                 value="2432" />
+          <Domain id="2429.Source.groups"
+                  name="groups">
+            <Group value="sources" />
+            <Group value="glyph_sources" />
+          </Domain>
+          <Domain id="2429.Source.input_type"
+                  name="input_type">
+            <DataType value="vtkPolyData" />
+          </Domain>
+          <Domain id="2429.Source.proxy_list"
+                  name="proxy_list">
+            <Proxy value="2432" />
+          </Domain>
+        </Property>
+      </Proxy>
+      <Proxy compound_name="ArrowSource"
+             group="sources"
+             id="2432"
+             servers="1"
+             type="ArrowSource">
+        <Property id="2432.ShaftRadius"
+                  name="ShaftRadius"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="0.03" />
+          <Domain id="2432.ShaftRadius.range"
+                  name="range">
+            <Min index="0"
+                 value="0" />
+            <Max index="0"
+                 value="5" />
+          </Domain>
+        </Property>
+        <Property id="2432.ShaftResolution"
+                  name="ShaftResolution"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="6" />
+          <Domain id="2432.ShaftResolution.range"
+                  name="range">
+            <Min index="0"
+                 value="0" />
+            <Max index="0"
+                 value="128" />
+          </Domain>
+        </Property>
+        <Property id="2432.TipLength"
+                  name="TipLength"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="0.35" />
+          <Domain id="2432.TipLength.range"
+                  name="range">
+            <Min index="0"
+                 value="0" />
+            <Max index="0"
+                 value="1" />
+          </Domain>
+        </Property>
+        <Property id="2432.TipRadius"
+                  name="TipRadius"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="0.1" />
+          <Domain id="2432.TipRadius.range"
+                  name="range">
+            <Min index="0"
+                 value="0" />
+            <Max index="0"
+                 value="10" />
+          </Domain>
+        </Property>
+        <Property id="2432.TipResolution"
+                  name="TipResolution"
+                  number_of_elements="1">
+          <Element index="0"
+                   value="6" />
+          <Domain id="2432.TipResolution.range"
+                  name="range">
+            <Min index="0"
+                 value="1" />
+            <Max index="0"
+                 value="128" />
+          </Domain>
+        </Property>
+      </Proxy>
+      <ExposedProperties>
+        <Property exposed_name="Consistency"
+                  name="Consistency"
+                  proxy_name="GenerateSurfaceNormals1" />
+        <Property exposed_name="Glyph Max. Points"
+                  name="MaximumNumberOfSamplePoints"
+                  proxy_name="Glyph1" />
+        <Property exposed_name="Glyph Scale Factor"
+                  name="ScaleFactor"
+                  proxy_name="Glyph1" />
+        <Property exposed_name="Input"
+                  name="Input"
+                  proxy_name="ExtractSurface2" />
+        <Property exposed_name="InvertArrow"
+                  name="Invert"
+                  proxy_name="ArrowSource" />
+      </ExposedProperties>
+      <OutputPort name="Output"
+                  port_index="0"
+                  proxy="Glyph1" />
+
+      <!-- FIXME: PropertyGroup doesn't work for compound proxies, it seems.
+      <PropertyGroup label="Normals Generator Parameters">
+        <Property name="Consistency" />
+      </PropertyGroup>
+      <PropertyGroup label="Glyph Parameters">
+        <Property name="Glyph Max. Points" />
+        <Property name="Glyph Scale Factor" />
+      </PropertyGroup>
+      <PropertyGroup label="Arrow Source Parameters">
+        <Property name="InvertArrow" />
+      </PropertyGroup>
+      -->
+      <Hints>
+        <!-- Visibility Element can be used to suggest the GUI about
+             visibility of this filter (or its input) on creation.
+             replace_input="0" implies that the input visibility is not
+             changed on creation of this filter (defaults to "1")
+             -->
+        <Visibility replace_input="0" />
+      </Hints>
+    </CompoundSourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

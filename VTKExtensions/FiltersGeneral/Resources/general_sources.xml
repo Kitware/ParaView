@@ -1,0 +1,222 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkHierarchicalFractal"
+                 label="Hierarchical Fractal"
+                 name="HierarchicalFractal">
+      <Documentation long_help="Test source for AMR with HierarchicalDataSet"
+                     short_help="Hierarchical fractal">The Hierarchical Fractal
+                     source is a collection of uniform grids. All have the same
+                     dimensions. Each block has a different origin and spacing.
+                     This source uses the Mandelbrot source to create cell
+                     data. The fractal array is scaled to look like a volume
+                     fraction.</Documentation>
+      <IntVectorProperty command="SetDimensions"
+                         default_values="10"
+                         name="Dimensions"
+                         number_of_elements="1">
+        <IntRangeDomain max="64"
+                        min="2"
+                        name="range" />
+        <Documentation>This property specifies the X, Y, Z cell dimensions of a
+        block.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetFractalValue"
+                            default_values="9.5"
+                            name="FractalValue"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>The value of this property will be mapped to 0.5 for use
+        as a volume fraction.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetMaximumLevel"
+                         default_values="5"
+                         name="MaximumLevel"
+                         number_of_elements="1">
+        <IntRangeDomain max="10"
+                        min="1"
+                        name="range" />
+        <Documentation>This property specifies how many levels of refinement
+        should be included in this hierarchical dataset.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGhostLevels"
+                         default_values="1"
+                         name="GhostLevels"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property specifies whether ghost levels should be
+        generated at processor boundaries.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTwoDimensional"
+                         default_values="1"
+                         name="TwoDimensional"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, the generated dataset will
+        be 2D; otherwise it will be 3D.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAsymetric"
+                         default_values="0"
+                         name="Asymetric"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 0, all the blocks will be the
+        same size. If it is set to 1, an asymmetric dataset will be created:
+        some blocks will have an X dimension that is larger by 2
+        units.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateRectilinearGrids"
+                         default_values="0"
+                         name="RectilinearGrids"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, the hierarchical dataset
+        will contain rectilinear grids; otherwise it will contain uniform
+        grids.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetTimeStepRange"
+                         information_only="1"
+                         name="TimeStepRangeInfo">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetTimeStep"
+                         default_values="0"
+                         name="TimeStep"
+                         number_of_elements="1" >
+        <IntRangeDomain name="range"
+                        default_mode="min" >
+          <RequiredProperties>
+            <Property function="Range"
+                      name="TimeStepRangeInfo" />
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Documentation>This property specifies the timestep to use for this
+        dataset.</Documentation>
+      </IntVectorProperty>
+      <!-- End HierarchicalFractal -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkImageSimpleSource"
+                 label="Fast Uniform Grid"
+                 name="FastUniformGrid">
+      <Documentation long_help="Create a uniform grid in 3 dimensions with scalar and vector data arrays, consuming minimal computational resources."
+                     short_help="Create a 3D uniform grid with scalar and vector arrays.">The
+                     Fast Uniform Grid source can be used to create a uniform
+                     grid with scalar values derived from relatively light
+                     computations. The active scalar array is named "X", and
+                     is set to the X coordinate for each pixel. There are two
+                     additional point data sets. The data array named
+                     "DistanceSquared" is computed as the squared distance from
+                     each pixel to the origin. The data array named "Swirl"
+                     is a vector field computed as (Y,Z,X) at each pixel.
+                     </Documentation>
+      <IntVectorProperty command="SetWholeExtent"
+                         default_values="-10 10 -10 10 -10 10"
+                         name="WholeExtent"
+                         number_of_elements="6">
+        <IntRangeDomain name="range" />
+        <Documentation>The six values in the property indicate the X, Y, and Z
+        extent of the output data. The first two numbers are the minimum and
+        maximum X extent; the next two are the minimum and maximum Y extent;
+        and the final two are the minimum and maximum Z extent. The numbers are
+        inclusive, so values of -10, 10, -10, 10, =10, 10 indicate that the
+        dimensions of the output will be 21 x 21 x 21.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetEnableDistanceSquaredData"
+                         default_values="1"
+                         name="Generate DistanceSquared Scalars"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Enable/disable DistanceSquared point data scalar array.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetEnableSwirlData"
+                         default_values="1"
+                         name="Generate Swirl Vectors"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Enable/disable Swirl point data vector array.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetEnableSMP"
+                         default_values="0"
+                         name="EnableSMP"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Enable/disable SMP for threading.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDesiredBytesPerPiece"
+                         default_values="65536"
+                         name="DesiredBytesPerPiece"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        The desired bytes per piece when the volume is split for SMP execution.
+        When SMP is enabled, this is used to subdivide the volume into pieces.
+        Smaller pieces allow for better dynamic load balancing, but increase
+        the total overhead.
+        </Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVTextSource"
+                 label="Text"
+                 name="TextSource">
+      <Documentation long_help="The Text source generates a table containing text."
+                     short_help="Display text">The Text source is used to
+                     generate a 1x1 vtkTable with a single text
+                     string.</Documentation>
+      <StringVectorProperty command="SetText"
+                            default_values="Text"
+                            name="Text"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <Hints>
+          <Widget type="multi_line" />
+        </Hints>
+        <Documentation>This property specifies the text to
+        display.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <OutputPort index="0"
+                    name="Output-0"
+                    type="text" />
+      </Hints>
+      <!-- End of TextSource -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkTimeToTextConvertor"
+                 label="Annotate Time"
+                 name="TimeToTextConvertorSource">
+      <Documentation long_help="Shows the animation time as text annnotation in the view."
+                     short_help="Show animation time as text">The Annotate Time
+                     source can be used to show the animation time in text
+                     annotation.</Documentation>
+      <StringVectorProperty command="SetFormat"
+                            default_values="Time: %f"
+                            name="Format"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <Documentation>This property specifies the format used to display the
+        input time (using printf style).</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <OutputPort index="0"
+                    name="Output-0"
+                    type="text" />
+      </Hints>
+      <!-- End of TimeToTextConvertorSource -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

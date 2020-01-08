@@ -43,7 +43,6 @@
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderViewDataDeliveryManager.h"
-#include "vtkPVUpdateSuppressor.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
 #include "vtkResampleToImage.h"

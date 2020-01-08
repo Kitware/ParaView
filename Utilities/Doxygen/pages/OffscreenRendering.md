@@ -115,7 +115,7 @@ summarize relevant CMake options available:
   * `EGL_LIBRARY`: Path to `libEGL.so`.
   * `EGL_opengl_LIBRARY`: Path to `libOpenGL.so`.
 
-* `PARAVIEW_BUILD_QT_GUI` indicates if the desktop Qt client should be built.
+* `PARAVIEW_USE_QT` indicates if the desktop Qt client should be built.
 
 
 All combinations of above options can be turned on or off independently except that
@@ -128,7 +128,7 @@ A few things to note:
   `VTK_USE_X` must be ON and the build does not support headless, but can still support offscreen rendering.
 * If `VTK_USE_X` is OFF, then either `VTK_OPENGL_HAS_OSMESA` or `VTK_OPENGL_HAS_EGL` must be ON. Then the build
   does not support onscreen rendering, but only headless rendering.
-* If `PARAVIEW_BUILD_QT_GUI` is ON and `VTK_USE_X` is ON, while ParaView command line tools won't
+* If `PARAVIEW_USE_QT` is ON and `VTK_USE_X` is ON, while ParaView command line tools won't
   link against or use X calls, Qt will and hence an accessible X server is still needed to run the
   desktop client.
 * If `VTK_OPENGL_HAS_OSMESA` is ON, and `VTK_USE_X` is ON, then all the OpenGL and OSMesa variables

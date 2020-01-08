@@ -277,81 +277,79 @@ Command Prompt" available with Visual Studio in the start menu.
 
 #### Build Settings
 
-ParaView has a number of settings available for its build. The common variables
-to modify include:
+ParaView has a number of settings available for its build. These are categorized
+as build options, capability option, feature options and miscellanoues options.
+
+
+#### Build Options
+
+These options impact the build. These begin with the prefix `PARAVIEW_BUILD_`.
+The common variables to modify include:
 
   * `PARAVIEW_BUILD_SHARED_LIBS` (default `ON`): If set, shared libraries will
     be built. This is usually what is wanted.
-  * `PARAVIEW_BUILD_QT_GUI` (default `ON`): Builds the `paraview` GUI
-    application.
-  * `PARAVIEW_USE_MPI` (default `OFF`): Whether MPI support will be available
-    or not.
-  * `PARAVIEW_USE_OSPRAY` (default `OFF`): Whether OSPRay ray-tracing support
-    will be available or not.
-  * `PARAVIEW_ENABLE_PYTHON` (default `OFF`): Whether Python
-    support will be available or not.
-  * `PARAVIEW_ENABLE_WEB` (default `OFF`; requires `PARAVIEW_ENABLE_PYTHON`):
-    Whether ParaViewWeb support will be available or not.
-  * `PARAVIEW_PLUGIN_ENABLE_<name>` (default varies): Whether to enable a
-    plugin or not.
-
-ParaView uses VTK's module system to control its build. This infrastructure
-provides a number of variables to control modules which are not otherwise
-controlled by the other options provided.
-
-  * `VTK_MODULE_USE_EXTERNAL_<name>` (default depends on
-    `PARAVIEW_USE_EXTERNAL`): Use an external source for the named third-party
-    module rather than the copy contained within the ParaView source tree.
-  * `VTK_MODULE_ENABLE_<name>` (default `DEFAULT`): Change the build settings
-    for the named module. Valid values are those for the module system's build
-    settings (see below).
-  * `VTK_GROUP_ENABLE_<name>` (default `DEFAULT`): Change the default build
-    settings for modules belonging to the named group. Valid values are those
-    for the module system's build settings (see below).
-
-For variables which use the module system's build settings, the valid values are as follows:
-
-  * `YES`: Require the module to be built.
-  * `WANT`: Build the module if possible.
-  * `DEFAULT`: Use the settings by the module's groups and
-    `PARAVIEW_BUILD_ALL_MODULES`.
-  * `DONT_WANT`: Don't build the module unless required as a dependency.
-  * `NO`: Do not build the module.
-
-If any `YES` module requires a `NO` module, an error is raised.
 
 Less common, but variables which may be of interest to some:
 
+  * `PARAVIEW_BUILD_ESSENTIALS` (default `CANONICAL`): Choose which features to
+    enable in this build. This is useful to generate ParaView builds with
+    limited features. More on this later.
+  * `PARAVIEW_BUILD_EXAMPLES` (default `OFF`): If set, ParaView's example code
+    will be added as tests to the ParaView test suite.
   * `PARAVIEW_BUILD_DEVELOPER_DOCUMENTATION` (default `OFF`): If set, the HTML
     documentation for ParaView's C++, Python, and proxies will be generated.
-  * `PARAVIEW_ENABLE_EXAMPLES` (default `OFF`): If set, ParaView's example code
-    will be added as tests to the ParaView test suite.
-  * `PARAVIEW_ENABLE_LOGGING` (default `ON`): If set, enhanced logging will be
-    enabled.
-  * `PARAVIEW_USE_VTKM` (default `ON`): Enable VTK-m accelerated algorithms in ParaView.
-  * `PARAVIEW_ENABLE_VISITBRIDGE` (default `OFF`): Enable support for VisIt
-    readers.
   * `PARAVIEW_BUILD_TESTING` (default `OFF`): Whether to build tests or not.
     Valid values are `OFF` (no testing), `WANT` (enable tests as possible), and
     `ON` (enable all tests; may error out if features otherwise disabled are
     required by test code).
-  * `PARAVIEW_ENABLE_KITS` (default `OFF`; requires CMake 3.12+): Compile
-    ParaView into a smaller set of libraries. Can be useful on platforms where
-    ParaView takes a long time to launch due to expensive disk access.
-  * `PARAVIEW_ENABLE_CATALYST` (default `ON`): Whether to build Catalyst
-    CoProcessing support or not.
+  * `PARAVIEW_BUILD_VTK_TESTING` (default `OFF`): Whether to build tests for the
+    VTK codebase built by ParaView. Valid values are same as
+    `PARAVIEW_BUILD_TESTING`.
 
-<!--
-These variables should be documented once they're effective again.
-
-  * `PARAVIEW_FREEZE_PYTHON` (default `OFF`): Whether Python modules will be
-    frozen into ParaView itself or installed as a normal Python package.
--->
-
-More advanced options:
+More advanced build options are:
 
   * `PARAVIEW_BUILD_ALL_MODULES` (default `OFF`): If set, ParaView will enable
     all modules not disabled by other features.
+  * `PARAVIEW_BUILD_LEGACY_REMOVE` (default `OFF`): Remove legacy / deprecated
+    code.
+  * `PARAVIEW_BUILD_LEGACY_SILENT` (default `OFF`): Silence all legacy
+    / deprecated code messages.
+  * `PARAVIEW_BUILD_WITH_EXTERNAL` (default `OFF`): When set to `ON`, the build
+    will try to use external copies of all included third party libraries unless
+    explicitly overridden.
+  * `PARAVIEW_BUILD_WITH_KITS` (default `OFF`; requires CMake 3.12+): Compile
+    ParaView into a smaller set of libraries. Can be useful on platforms where
+    ParaView takes a long time to launch due to expensive disk access.
+
+#### Capability settings
+
+These settings control capabitities of the build. These begin with the prefix
+`PARAVIEW_USE_`. The common variables to modify include:
+
+  * `PARAVIEW_USE_QT` (default `ON`): Builds the `paraview` GUI application.
+  * `PARAVIEW_USE_MPI` (default `OFF`): Whether MPI support will be available
+    or not.
+  * `PARAVIEW_USE_PYTHON` (default `OFF`): Whether Python
+    support will be available or not.
+
+Less common, but potentially useful variables are:
+
+  * `PARAVIEW_USE_VTKM` (default `ON`): Whether VTK-m based filters are enabled.
+
+#### Feature settings
+
+These settings control optional features. These begin with the prefix
+`PARAVIEW_ENABLE_`. The common variables to modify include:
+
+  * `PARAVIEW_ENABLE_RAYTRACING` (default `OFF`): Enable ray-tracing support
+    with OSPray and/or OptiX. Requires appropriate external libraries.
+  * `PARAVIEW_ENABLE_WEB` (default `OFF`; requires `PARAVIEW_USE_PYTHON`):
+    Whether ParaViewWeb support will be available or not.
+
+More advanced / less common options include:
+
+  * `PARAVIEW_ENABLE_VISITBRIDGE` (default `OFF`): Enable support for VisIt
+    readers.
   * `PARAVIEW_ENABLE_NVPIPE` (default `OFF`): Use [nvpipe][nvpipe] image
     compression when communicating the GPU. Requires CUDA and an NVIDIA GPU.
   * `PARAVIEW_ENABLE_GDAL` (default `OFF`): Enable support for reading GDAL
@@ -375,31 +373,59 @@ More advanced options:
   * `PARAVIEW_ENABLE_COSMOTOOLS` (default `OFF`; requires `PARAVIEW_USE_MPI`
     and not available on Windows): Enable support for CosmoTools which includes
     GenericIO readers and writers as well as some point cloud algorithms.
-  * `PARAVIEW_USE_MPI_SSEND` (default `OFF`; requires `PARAVIEW_USE_MPI`): Use
-    synchronous send commands for communication.
-  * `PARAVIEW_USE_ICE_T` (default `OFF`; requires `PARAVIEW_USE_MPI`): Use
-    Ice-T for parallel rendering.
+
+
+#### Plugin settings
+
+ParaView build includes several plugins. These can be enabled / disabled using the
+following options:
+
+  * `PARAVIEW_PLUGINS_DEFAULT` (default `ON`): Pass this flag to the command
+    line using `-DPARAVIEW_PLUGINS_DEFAULT=OFF` before the first cmake run to
+    disable all plugins by default. Note this has no impact after the first
+    cmake configure and hence must be passed on the command line itself.
+  * `PARAVIEW_PLUGIN_ENABLE_<name>` (default varies): Whether to enable a
+    plugin or not.
+
+#### Miscellaneous settings
+ParaView uses VTK's module system to control its build. This infrastructure
+provides a number of variables to control modules which are not otherwise
+controlled by the other options provided.
+
+  * `VTK_MODULE_USE_EXTERNAL_<name>` (default depends on
+    `PARAVIEW_BUILD_WITH_EXTERNAL`): Use an external source for the named third-party
+    module rather than the copy contained within the ParaView source tree.
+  * `VTK_MODULE_ENABLE_<name>` (default `DEFAULT`): Change the build settings
+    for the named module. Valid values are those for the module system's build
+    settings (see below).
+  * `VTK_GROUP_ENABLE_<name>` (default `DEFAULT`): Change the default build
+    settings for modules belonging to the named group. Valid values are those
+    for the module system's build settings (see below).
+
+For variables which use the module system's build settings, the valid values are as follows:
+
+  * `YES`: Require the module to be built.
+  * `WANT`: Build the module if possible.
+  * `DEFAULT`: Use the settings by the module's groups and
+    `PARAVIEW_BUILD_ALL_MODULES`.
+  * `DONT_WANT`: Don't build the module unless required as a dependency.
+  * `NO`: Do not build the module.
+
+If any `YES` module requires a `NO` module, an error is raised.
+
+More advanced options:
+
   * `PARAVIEW_INITIALIZE_MPI_ON_CLIENT` (default `ON`; requires
     `PARAVIEW_USE_MPI`): Initialize MPI on client processes by default.
-  * `PARAVIEW_ENABLE_QT_SUPPORT` (default `OFF`; implied by
-    `PARAVIEW_BUILD_QT_GUI`): Enable Qt support.
   * `PARAVIEW_USE_QTHELP` (default `ON`; requires
-    `PARAVIEW_ENABLE_QT_SUPPORT`): Use Qt's help infrastructure for runtime
+    `PARAVIEW_USE_QT`): Use Qt's help infrastructure for runtime
     documentation.
-  * `PARAVIEW_ENABLE_COMMANDLINE_TOOLS` (default `ON`; implied by
-    `PARAVIEW_BUILD_QT_GUI`): Build command line tools such as `pvserver` and
-    `pvrenderserver`.
-  * `PARAVIEW_USE_EXTERNAL` (default `OFF`): Whether to prefer external third
-    party libraries or the versions ParaView's source contains.
   * `PARAVIEW_VERSIONED_INSTALL` (default `ON`): Whether to add version numbers
     to ParaView's include and plugin directories in the install tree.
   * `PARAVIEW_CUSTOM_LIBRARY_SUFFIX` (default depends on
     `PARAVIEW_VERSIONED_INSTALL`): The custom suffix for libraries built by
     ParaView. Defaults to either an empty string or `pvX.Y` where `X` and `Y`
     are ParaView's major and minor version components, respectively.
-  * `PARAVIEW_PLUGINS_DEFAULT` (default `ON`): The state for ParaView's set of
-    enabled-by-default plugins. Note that this variable only really has an
-    effect on initial configures or newly added plugins.
   * `PARAVIEW_INSTALL_DEVELOPMENT_FILES` (default `ON`): If set, ParaView will
     install its headers, CMake API, etc. into its install tree for use.
   * `PARAVIEW_RELOCATABLE_INSTALL` (default `ON`): If set, the install tree
@@ -414,11 +440,24 @@ These variables should be documented once they're effective again.
   * `PARAVIEW_USE_EXTERNAL_VTK` (default `OFF`): Use an externally provided
     VTK. Note that ParaView has fairly narrow requirements for the VTK it can
     use, so only very recent versions are likely to work.
-  * `PARAVIEW_BUILD_CATALYST_ADAPTORS` (default `OFF`; requires
-    `PARAVIEW_ENABLE_CATALYST` and not available on Windows): If set,
+  * `PARAVIEW_BUILD_CATALYST_ADAPTORS` (default `OFF`;
+    not available on Windows): If set,
     ParaView's example Catalyst adaptors will be added as tests to the ParaView
     test suite.
 -->
+## Building essentials
+
+A typical ParaView build includes several modules and dependencies. While these
+are necessary for a fully functional application, there are cases (e.g. in situ
+use-cases) where a built with limited set of features is adequate. ParaView build supports
+this using the `PARAVIEW_BUILD_ESSENTIALS` setting. Supported values for this setting are:
+
+* `CORE`: Build modules necessary for core ParaView functionality.
+  This does not include rendering.
+* `RENDERING`: Build modules necessary for supporting rendering including views
+  and representations. This includes everything in `CORE`.
+* `CANONICAL` (default): Build modules necessary for standard ParaView build.
+
 
 ### Building documentation
 

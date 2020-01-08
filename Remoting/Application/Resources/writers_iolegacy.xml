@@ -1,0 +1,145 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="internal_writers">
+    <!-- ================================================================= -->
+    <Proxy base_proxygroup="internal_writers"
+           base_proxyname="DataWriterBase"
+           class="vtkGenericDataObjectWriter"
+           name="DataSetWriterCore">
+      <Documentation>Internal proxy used for writing legacy vtk files.</Documentation>
+    </Proxy>
+    <!-- end of "internal_writers" -->
+  </ProxyGroup>
+
+  <!-- =================================================================== -->
+  <ProxyGroup name="writers">
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="FileSeriesWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="DataSetWriter">
+      <Documentation short_help="Write any type of data object in a legacy vtk data file.">
+      Writer to write any type of data object in a legacy vtk data file. Cannot
+      be used for parallel writing.</Documentation>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="DataSetWriterCore"></Proxy>
+        <ExposedProperties>
+          <Property name="FileType" />
+        </ExposedProperties>
+      </SubProxy>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0" name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <Hints>
+        <WriterFactory extensions="vtk"
+                       file_description="Legacy VTK Files" />
+      </Hints>
+      <!-- End of DataSetWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <PSWriterProxy class="vtkParallelSerialWriter"
+                   file_name_method="SetFileName"
+                   name="PDataSetWriterPolyData"
+                   parallel_only="1"
+                   base_proxygroup="internal_writers"
+                   base_proxyname="ParallelSerialWriter">
+      <Documentation short_help="Writer that writes polydata as legacy vtk files.">
+      Writer to write vtkPolyData in a legacy vtk data file. This
+      version is used when running in parallel. It gathers data to first node
+      and saves one file.</Documentation>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="DataSetWriterCore"></Proxy>
+        <ExposedProperties>
+          <Property name="FileType" />
+        </ExposedProperties>
+      </SubProxy>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="PostGatherHelper"
+               proxygroup="filters"
+               proxyname="AppendPolyData" />
+      </SubProxy>
+      <Hints>
+        <WriterFactory extensions="vtk"
+                       file_description="Legacy VTK Files" />
+      </Hints>
+      <!-- End of PDataSetWriterPolyData -->
+    </PSWriterProxy>
+
+    <!-- ================================================================= -->
+    <PSWriterProxy class="vtkParallelSerialWriter"
+                   file_name_method="SetFileName"
+                   name="PDataSetWriterUnstructuredGrid"
+                   parallel_only="1"
+                   base_proxygroup="internal_writers"
+                   base_proxyname="ParallelSerialWriter">
+      <Documentation short_help="Writer that writes unstructured grid as legacy vtk files.">
+      Writer to write vtkUnstructuredGrid of data object in a legacy vtk data file. This
+      version is used when running in parallel. It gathers data to first node
+      and saves one file.</Documentation>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="DataSetWriterCore"></Proxy>
+        <ExposedProperties>
+          <Property name="FileType" />
+        </ExposedProperties>
+      </SubProxy>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="PostGatherHelper"
+               proxygroup="filters"
+               proxyname="Append" />
+      </SubProxy>
+      <Hints>
+        <WriterFactory extensions="vtk"
+                       file_description="Legacy VTK Files" />
+      </Hints>
+      <!-- End of PDataSetWriterUnstructuredGrid -->
+    </PSWriterProxy>
+
+    <!-- end of "writers" -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

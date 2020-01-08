@@ -5,7 +5,7 @@ set(ui_files)
 set(qrc_files)
 set(sources)
 set(interfaces)
-if (PARAVIEW_BUILD_QT_GUI)
+if (PARAVIEW_USE_QT)
   list(APPEND ui_files
     pqSLACActionHolder.ui
     pqSLACDataLoadManager.ui)
@@ -41,12 +41,10 @@ paraview_add_plugin(SLACTools
   MODULES SLACTools::vtkSLACFilters
   MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Filters/vtk.module")
 
-if (PARAVIEW_BUILD_QT_GUI)
+if (PARAVIEW_USE_QT)
   target_link_libraries(SLACTools
     PRIVATE
-      ParaView::ClientServerCoreCore
-      ParaView::ServerManagerCore
-      ParaView::ServerManagerRendering
+      ParaView::RemotingViews
       VTK::CommonCore
       VTK::CommonDataModel
       VTK::CommonExecutionModel)

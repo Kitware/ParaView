@@ -1,0 +1,194 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkClientServerMoveData"
+                 name="ClientServerMoveData"
+                 processes="client|dataserver">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <Documentation>Set the input to the Client Server Move Data
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetOutputDataType"
+                         default_values="0"
+                         name="OutputDataType"
+                         number_of_elements="1"></IntVectorProperty>
+      <IntVectorProperty command="SetWholeExtent"
+                         default_values="0 -1 0 -1 0 -1"
+                         name="WholeExtent"
+                         number_of_elements="6"></IntVectorProperty>
+      <!-- End ClientServerMoveData -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkOrderedCompositeDistributor"
+                 name="OrderedCompositeDistributor">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <Documentation>Set the input to the Ordered Composite Distributor
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetPassThrough"
+                         default_values="0"
+                         name="PassThrough"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Toggle whether to pass the data through without
+        compositing.</Documentation>
+      </IntVectorProperty>
+      <ProxyProperty command="SetPKdTree"
+                     name="PKdTree">
+        <ProxyGroupDomain name="groups">
+          <Group name="locators" />
+        </ProxyGroupDomain>
+        <Documentation>Set the vtkPKdTree to distribute with.</Documentation>
+      </ProxyProperty>
+      <StringVectorProperty command="SetOutputType"
+                            name="OutputType"
+                            number_of_elements="1">
+        <Documentation>When not empty, the output will be converted to the
+        given type.</Documentation>
+      </StringVectorProperty>
+      <!-- End OrderedCompositeDistributor -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkMPIMoveData"
+                 name="MPIMoveData">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <!-- Does this have any data type domain? -->
+        <Documentation>Set the input to the MPI Move Data
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetMoveMode"
+                         default_values="0"
+                         name="MoveMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="PassThrough"
+                 value="0" />
+          <Entry text="Collect"
+                 value="1" />
+          <Entry text="Clone"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>Specify how the data is to be
+        redistributed.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetOutputDataType"
+                         default_values="none"
+                         name="OutputDataType"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="PolyData"
+                 value="0" />
+          <Entry text="Unstructured Grid"
+                 value="4" />
+          <Entry text="ImageData"
+                 value="6" />
+        </EnumerationDomain>
+        <Documentation>Specify the type of the dataset.</Documentation>
+      </IntVectorProperty>
+      <!-- End MPIMoveData -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVGeometryFilter"
+                 name="GeometryFilter">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <!-- Does this have any data type domain? -->
+        <Documentation>Set the input to the Geometry Filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetUseStrips"
+                         default_values="0"
+                         is_internal="1"
+                         name="UseStrips"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Toggle whether to generate faces containing triangle
+        strips. This should render faster and use less memory, but no cell data
+        is copied.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetForceUseStrips"
+                         default_values="0"
+                         is_internal="1"
+                         name="ForceStrips"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This makes UseStrips call Modified() after changing its
+        setting to ensure that the filter's output is immediately
+        changed.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetUseOutline"
+                         default_values="0"
+                         name="UseOutline"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Toggle whether to generate an outline or a
+        surface.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetNonlinearSubdivisionLevel"
+                         default_values="1"
+                         name="NonlinearSubdivisionLevel"
+                         number_of_elements="1">
+        <IntRangeDomain max="4"
+                        min="0"
+                        name="range" />
+        <Documentation>Nonlinear faces are approximated with flat polygons.
+        This parameter controls how many times to subdivide nonlinear surface
+        cells. Higher subdivisions generate closer approximations but take more
+        memory and rendering time. Subdivision is recursive, so the number of
+        output polygons can grow exponentially with this
+        parameter.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetPassThroughCellIds"
+                         default_values="1"
+                         name="PassThroughIds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If on, the output polygonal dataset will have a cell data
+        array that holds the cell index of the original 3D cell that produced
+        each output cell. This is useful for cell picking.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetPassThroughPointIds"
+                         default_values="1"
+                         name="PassThroughPointIds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If on, the output polygonal dataset will have a
+        point data array that holds the point index of the original 3D vertex
+        that produced each output vertex. This is useful for
+        picking.</Documentation>
+      </IntVectorProperty>
+      <!-- End GeometryFilter -->
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

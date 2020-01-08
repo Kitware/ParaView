@@ -1,0 +1,697 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="camera">
+    <CameraProxy class="vtkCamera"
+                 name="Camera"
+                 processes="client">
+      <!-- |dataserver|renderserver -->
+      <DoubleVectorProperty command="GetPosition"
+                            default_values="0 0 6.69"
+                            information_only="1"
+                            name="CameraPositionInfo"
+                            number_of_elements="3">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0 0 6.69"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraPositionInfo"
+                            name="CameraPosition"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetFocalPoint"
+                            default_values="0 0 0"
+                            information_only="1"
+                            name="CameraFocalPointInfo"
+                            number_of_elements="3">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFocalPoint"
+                            default_values="0 0 0"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraFocalPointInfo"
+                            name="CameraFocalPoint"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetFocalDisk"
+                            default_values="1"
+                            information_only="1"
+                            name="CameraFocalDiskInfo"
+                            number_of_elements="1">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFocalDisk"
+                            default_values="0"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraFocalDiskInfo"
+                            name="CameraFocalDisk"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetFocalDistance"
+                            default_values="0"
+                            information_only="1"
+                            name="CameraFocalDistanceInfo"
+                            number_of_elements="1">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFocalDistance"
+                            default_values="0"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraFocalDistanceInfo"
+                            name="CameraFocalDistance"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetViewUp"
+                            default_values="0 1 0"
+                            information_only="1"
+                            name="CameraViewUpInfo"
+                            number_of_elements="3">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetViewUp"
+                            default_values="0 1 0"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraViewUpInfo"
+                            name="CameraViewUp"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetViewAngle"
+                            information_only="1"
+                            name="CameraViewAngleInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetViewAngle"
+                            default_values="30"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraViewAngleInfo"
+                            name="CameraViewAngle"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetParallelScale"
+                            default_values="1.73"
+                            ignore_synchronization="1"
+                            information_property="CameraParallelScaleInfo"
+                            name="CameraParallelScale"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetParallelScale"
+                            default_values="1.73"
+                            information_only="1"
+                            name="CameraParallelScaleInfo"
+                            number_of_elements="1">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetEyeAngle"
+                            default_values="2.0"
+                            ignore_synchronization="1"
+                            name="EyeAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseOffAxisProjection"
+                         default_values="0"
+                         name="EnableTracking"
+                         number_of_elements="1"></IntVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetEyeTransformMatrix"
+                            default_values="1.0 0.0 0.0 0.0
+                         0.0 1.0 0.0 0.0
+                         0.0 0.0 1.0 0.0
+                         0.0 0.0 0.0 1.0"
+                            immediate_update="1"
+                            is_internal="1"
+                            name="EyeTransformMatrix"
+                            number_of_elements="16"></DoubleVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetModelTransformMatrix"
+                            default_values="1.0 0.0 0.0 0.0
+                         0.0 1.0 0.0 0.0
+                         0.0 0.0 1.0 0.0
+                         0.0 0.0 0.0 1.0"
+                            immediate_update="1"
+                            is_internal="1"
+                            name="ModelTransformMatrix"
+                            number_of_elements="16"></DoubleVectorProperty>
+    </CameraProxy>
+    <!-- end of Camera Proxy -->
+  </ProxyGroup>
+  <ProxyGroup name="mappers">
+    <Proxy class="vtkProjectedTetrahedraMapper"
+           name="ProjectedTetrahedraMapper"
+           processes="client|renderserver|dataserver">
+      <IntVectorProperty name="UseFloatingPointFrameBuffer"
+        command="SetUseFloatingPointFrameBuffer"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable use of floating point frame buffers. If not enabled,
+          you may encounter artifacts when mixing volumes with geometry.
+        </Documentation>
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy name="DummyVolumeMapper">
+      <ProxyProperty command="SetRayCastFunction"
+                     name="RayCastFunction">
+        <ProxyGroupDomain name="groups">
+          <Group name="ugrid_raycast_functions" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+    </Proxy>
+    <Proxy class="vtkUnstructuredGridVolumeRayCastMapper"
+           name="UnstructuredGridVolumeRayCastMapper"
+           processes="client|renderserver|dataserver">
+      <ProxyProperty command="SetRayCastFunction"
+                     name="RayCastFunction">
+        <ProxyGroupDomain name="groups">
+          <Group name="ugrid_raycast_functions" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+    </Proxy>
+    <Proxy class="vtkUnstructuredGridVolumeZSweepMapper"
+           name="UnstructuredGridVolumeZSweepMapper"
+           processes="client|renderserver|dataserver"></Proxy>
+    <Proxy class="vtkGPUVolumeRayCastMapper"
+           name="GPUVolumeRayCastMapper"
+           processes="client|renderserver|dataserver">
+      <Documentation>This is the proxy for GPU based volume
+      rendering.</Documentation>
+      <IntVectorProperty animateable="0"
+                         command="SetBlendMode"
+                         default_values="0"
+                         name="BlendMode"
+                         number_of_elements="1">
+        <Documentation>Set the current blend mode. Default is Composite.
+        MaximumIntensity is also known as MIP rendering.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Composite"
+                 value="0" />
+          <Entry text="MaximumIntensity"
+                 value="1" />
+          <Entry text="MinimumIntensity"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetAutoAdjustSampleDistances"
+                         default_values="1"
+                         name="AutoAdjustSampleDistances"
+                         number_of_elements="1">
+        <Documentation>If AutoAdjustSampleDistances is on, the the
+        ImageSampleDistance will be varied to achieve the allocated render time
+        of this prop (controlled by the desired update rate and any culling in
+        use).</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetSampleDistance"
+                            default_values="1.0"
+                            name="SampleDistance"
+                            number_of_elements="1">
+        <Documentation>Set/Get the distance between samples used for rendering
+        when AutoAdjustSampleDistances is off, or when this mapper has more
+        than 1 second allocated to it for rendering.</Documentation>
+      </DoubleVectorProperty>
+      <!-- End of GPUVolumeRayCastMapper -->
+    </Proxy>
+    <Proxy class="vtkFixedPointVolumeRayCastMapper"
+           name="FixedPointVolumeRayCastMapper"
+           processes="client|renderserver|dataserver">
+      <IntVectorProperty animateable="0"
+                         command="SetBlendMode"
+                         default_values="0"
+                         name="BlendMode"
+                         number_of_elements="1">
+        <Documentation>Set the current blend mode. Default is Composite.
+        MaximumIntensity is also known as MIP rendering.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Composite"
+                 value="0" />
+          <Entry text="MaximumIntensity"
+                 value="1" />
+          <Entry text="MinimumIntensity"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetLockSampleDistanceToInputSpacing"
+                         default_values="1"
+                         name="LockSampleDistanceToInputSpacing"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- End of FixedPointVolumeRayCastMapper -->
+    </Proxy>
+    <Proxy class="vtkSmartVolumeMapper"
+           name="UnstructuredGridResampleToImageMapper"
+           processes="client|renderserver|dataserver"></Proxy>
+    <!-- End of "mappers" -->
+  </ProxyGroup>
+  <ProxyGroup name="ugrid_raycast_functions">
+    <Proxy class="vtkUnstructuredGridBunykRayCastFunction"
+           name="BunykRayCastFunction"></Proxy>
+  </ProxyGroup>
+  <ProxyGroup name="textures">
+    <SourceProxy class="vtkTexture"
+                 name="Texture">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+      </InputProperty>
+    </SourceProxy>
+    <Proxy class="vtkTexture"
+           name="ImageTexture"
+           si_class="vtkSIImageTextureProxy"
+           processes="client|renderserver|dataserver">
+      <Documentation>This is a proxy for a vtkTexture which also includes an
+      image file reader. This reader can read an image of client/data server or
+      render server and then transmit it to the client/render server where it
+      will be used for texturing.</Documentation>
+      <SubProxy>
+        <Proxy name="Source"
+               proxygroup="sources"
+               proxyname="NetworkImageSource" />
+        <ExposedProperties>
+          <Property name="FileName" />
+        </ExposedProperties>
+      </SubProxy>
+      <IntVectorProperty animateable="1"
+                         command="SetRestrictPowerOf2ImageSmaller"
+                         default_values="0"
+                         name="RestrictPowerOf2ImageSmaller"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetColorMode"
+                         default_values="2"
+                         name="ColorMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Default"
+                 value="0" />
+          <Entry text="Map Scalars"
+                 value="1" />
+          <Entry text="Direct Scalars"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>When color mode is Default, 8-bits textures is equivalent to Direct Scalars,
+        while equivalent to Map Scalars for 16-bits textures. In the case of Map Scalars, all the
+        values are mapped to a generic color map.</Documentation>
+      </IntVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+  <ProxyGroup name="props">
+    <Proxy class="vtkTextActor"
+           name="TextActor">
+      <Documentation>Proxy for a text actor. Not to be used
+      directly.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetInput"
+                            name="Text"
+                            number_of_elements="1"></StringVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetPosition"
+                            default_values="0 0"
+                            name="Position"
+                            number_of_elements="2">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetTextScaleMode"
+                         default_values="2"
+                         name="TextScaleMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="None"
+                 value="0" />
+          <Entry text="Prop"
+                 value="1" />
+          <Entry text="Viewport"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <ProxyProperty command="SetTextProperty"
+                     name="TextProperty">
+        <ProxyGroupDomain name="groups">
+          <Group name="properties" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <!-- End of TextActor -->
+    </Proxy>
+    <!-- End of group "props" -->
+  </ProxyGroup>
+  <ProxyGroup name="properties">
+    <Proxy class="vtkTextProperty"
+           name="TextProperty"
+           processes="client|dataserver|renderserver" >
+      <DoubleVectorProperty animateable="0"
+                            argument_is_array="1"
+                            command="SetColor"
+                            default_values="1.0 1.0 1.0"
+                            name="Color"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="TextAnnotationColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetOpacity"
+                            default_values="1.0"
+                            name="Opacity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1.0"
+                           min="0.0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetFontFamily"
+                         default_values="0"
+                         name="FontFamily"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Arial"
+                 value="0" />
+          <Entry text="Courier"
+                 value="1" />
+          <Entry text="Times"
+                 value="2" />
+          <Entry text="File"
+                 value="4" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetFontFile"
+                            label="Name"
+                            name="FontFile"
+                            number_of_elements="1"
+                            default_values="">
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="FontFamily"
+                                   value="4" />
+          <!-- enable this widget when FontFamily==4 -->
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetBold"
+                         default_values="0"
+                         name="Bold"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetItalic"
+                         default_values="0"
+                         name="Italic"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetShadow"
+                         default_values="0"
+                         name="Shadow"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetFontSize"
+                         default_values="18"
+                         name="FontSize"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        name="range" />
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetOrientation"
+                            default_values="0"
+                            name="Orientation"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetLineOffset"
+                            default_values="0"
+                            name="LineOffset"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetJustification"
+                         default_values="0"
+                         name="Justification"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Left"
+                 value="0" />
+          <Entry text="Center"
+                 value="1" />
+          <Entry text="Right"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetVerticalJustification"
+                         default_values="0"
+                         name="VerticalJustification"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Bottom"
+                 value="0" />
+          <Entry text="Center"
+                 value="1" />
+          <Entry text="Top"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <!-- End of TextProperty -->
+    </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="additional_lights" label="Lights">
+    <LightProxy name="Light"
+           class="vtkPVLight"
+           processes="client|dataserver|renderserver">
+      <IntVectorProperty command="SetSwitch"
+                         label="Enable"
+                         name="LightSwitch"
+                         number_of_elements="1"
+                         default_values="1"
+                         >
+        <Documentation>Turn on/off this light in the active view.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetName"
+                            label="Name"
+                            name="LightName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+      </StringVectorProperty>
+
+      <IntVectorProperty command="SetLightType"
+                         label="Coords"
+                         name="LightType"
+                         number_of_elements="1"
+                         default_values="3">
+        <EnumerationDomain name="enum">
+          <Entry text="Headlight"
+                 value="1" />
+          <Entry text="Camera"
+                 value="2" />
+          <Entry text="Scene"
+                 value="3" />
+          <Entry text="Ambient"
+                 value="4" />
+        </EnumerationDomain>
+        <Documentation>
+        Specify how the light is positioned. It can be attached to the eye (**Headlight**), relative to the
+        eye (**Camera**), fixed in world space (**Scene**), or position-less (**Ambient**).
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetIntensity"
+                            label="Intensity"
+                            name="LightIntensity"
+                            default_values="1.0"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range"
+                           resolution="0.01" />
+        <Documentation>
+        Set the light's brightness. Can be greater than 1.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetPositional"
+                         label="Type"
+                         name="Positional"
+                         default_values="0"
+                         number_of_elements="1"
+                         >
+        <Documentation>
+          Set the light's type.
+          A **Positional** light's rays diverge from its position. Use **Cone Angle** to limit them.
+          A **Directional** light's rays come from far away, and are parallel.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Directional"
+                 value="0" />
+          <Entry text="Positional"
+                 value="1" />
+        </EnumerationDomain>
+        <Hints>
+          <!-- display when light type is not Ambient -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LightType"
+                                   inverse="1"
+                                   value="4" />
+        </Hints>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="GetPosition"
+                            name="PositionInfo"
+                            default_values="0 0 1"
+                            information_only="1"
+                            number_of_elements="3">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPosition"
+                            label="Position"
+                            name="LightPosition"
+                            information_property="PositionInfo"
+                            default_values="0 0 1"
+                            number_of_elements="3">
+        <Documentation>
+        Relative position of the light for **Camera Coords** light, world-space position for **Scene Coords** light.
+        </Documentation>
+        <Hints>
+          <!-- display when light type is Scene or Camera -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LightType"
+                                   values="2 3" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="GetFocalPoint"
+                            name="FocalPointInfo"
+                            default_values="0 0 0"
+                            information_only="1"
+                            number_of_elements="3">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFocalPoint"
+                            name="FocalPoint"
+                            information_property="FocalPointInfo"
+                            default_values="0 0 0"
+                            number_of_elements="3">
+        <Documentation>
+        Used with position to compute the light direction, this is a "look-at" point.
+        </Documentation>
+        <Hints>
+          <!-- display when light type is Scene or Camera -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LightType"
+                                   values="2 3" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetColor"
+                            default_values="1 1 1"
+                            name="DiffuseColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain
+            max="1 1 1"
+            min="0 0 0"
+            name="range" />
+        <Documentation>
+        Color of the light.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetConeAngle"
+                            default_values="30.0"
+                            name="ConeAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="90.0"
+                           min="0.0"
+                           name="range" />
+        <Documentation>
+        For a **Positional** light, limit the light to a cone around its direction, creating a "spot-light" effect.
+        Set to 90 to light all directions. In degrees.
+        </Documentation>
+        <Hints>
+          <!-- display when light type is not Ambient, and when Positional -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LightType"
+                                   inverse="1"
+                                   value="4" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Positional"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetRadius"
+                            default_values="0.0"
+                            name="Radius"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>
+        For OSPRay renderer lights, sets the apparent size of the light.
+        In degrees for **Directional**, world space units for **Positional**. Increasing above 0 produces soft shadows.
+        </Documentation>
+        <Hints>
+          <!-- display when light type is not Ambient -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LightType"
+                                   inverse="1"
+                                   value="4" />
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
+      </DoubleVectorProperty>
+      <PropertyGroup panel_widget="InteractiveLight">
+        <Property function="Positional" name="Positional" />
+        <Property function="WorldPosition" name="LightPosition" />
+        <Property function="FocalPoint" name="FocalPoint" />
+        <Property function="ConeAngle" name="ConeAngle" />
+        <Property function="LightColor" name="DiffuseColor" />
+      </PropertyGroup>
+    </LightProxy>
+    <!-- End of additional_lights -->
+  </ProxyGroup>
+
+  <ProxyGroup name="materials">
+    <MaterialLibraryProxy class="vtkPVMaterialLibrary"
+                 name="MaterialLibrary"
+                 processes="client|renderserver|dataserver">
+      <StringVectorProperty
+                 default_values=""
+                 label="Load Materials"
+                 name="LoadMaterials"
+                 number_of_elements="1"
+                 panel_visibility="never">
+      </StringVectorProperty>
+    </MaterialLibraryProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

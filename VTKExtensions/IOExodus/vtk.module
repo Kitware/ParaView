@@ -1,0 +1,15 @@
+NAME
+  ParaView::VTKExtensionsIOExodus
+LIBRARY_NAME
+  vtkPVVTKExtensionsIOExodus
+GROUPS
+  PARAVIEW_CANONICAL
+KIT
+  ParaView::CoreKit
+DEPENDS
+  ParaView::VTKExtensionsIOCore
+PRIVATE_DEPENDS
+  VTK::IOParallelExodus
+  VTK::CommonSystem
+TEST_LABELS
+  ParaView

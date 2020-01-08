@@ -1,0 +1,228 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- Beginning of LSDyna Reader -->
+    <SourceProxy class="vtkPLSDynaReader"
+                 name="LSDynaReader">
+      <Documentation long_help="Read LS-Dyna databases (d3plot)."
+                     short_help="Read LS-Dyna databases (d3plot).">This reader
+                     reads LS-Dyna databases.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>Set the file name for the LSDyna reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="SolidArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Solid" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetSolidArrayStatus"
+                            element_types="2 0"
+                            information_property="SolidArrayInfo"
+                            label="Solid Arrays"
+                            name="SolidArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="SolidArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which solid arrays to read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="ThickShellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="ThickShell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetThickShellArrayStatus"
+                            element_types="2 0"
+                            information_property="ThickShellArrayInfo"
+                            label="Thick Shell Arrays"
+                            name="ThickShellArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="ThickShellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which thick shell arrays to read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="ShellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Shell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetShellArrayStatus"
+                            element_types="2 0"
+                            information_property="ShellArrayInfo"
+                            label="Shell Arrays"
+                            name="ShellArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="ShellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which shell arrays to read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="RigidBodyArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="RigidBody" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetRigidBodyArrayStatus"
+                            element_types="2 0"
+                            information_property="RigidBodyArrayInfo"
+                            label="Rigid Body Arrays"
+                            name="RigidBodyArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="RigidBodyArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which rigid body arrays to load.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="RoadSurfaceArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="RoadSurface" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetRoadSurfaceArrayStatus"
+                            element_types="2 0"
+                            information_property="RoadSurfaceArrayInfo"
+                            label="Road Surface Arrays"
+                            name="RoadSurfaceArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="RoadSurfaceArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which road surface arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="BeamArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Beam" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetBeamArrayStatus"
+                            element_types="2 0"
+                            information_property="BeamArrayInfo"
+                            label="Beam Arrays"
+                            name="BeamArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="BeamArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which beam arrays to read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="ParticleArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Particle" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetParticleArrayStatus"
+                            element_types="2 0"
+                            information_property="ParticleArrayInfo"
+                            label="Particle Arrays"
+                            name="ParticleArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="ParticleArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which particle arrays to read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="Point Arrays"
+                            name="PointArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which point-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PartArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Part" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPartArrayStatus"
+                            element_types="2 0"
+                            information_property="PartArrayInfo"
+                            label="Part Arrays"
+                            name="PartArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PartArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which part arrays to read.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetDeformedMesh"
+                         default_values="1"
+                         name="DeformedMesh"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Should the mesh be deformed over time (if the Deflection
+        node array is set to load)?</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRemoveDeletedCells"
+                         default_values="1"
+                         name="RemoveDeletedCells"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Should cells that have been deleted (failed
+        structurally, for example) be removed from the mesh?</Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="k lsdyna d3plot"
+                       file_description="LSDyna"
+                       filename_patterns="d3plot" />
+      </Hints>
+    </SourceProxy>
+    <!-- End of LSDyna Reader -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

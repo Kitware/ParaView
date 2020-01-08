@@ -1,0 +1,1685 @@
+<ServerManagerConfiguration>
+  <!-- filters in VTK::FiltersParallel module -->
+  <ProxyGroup name="internal_filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPProbeFilter"
+                 name="ProbeLine">
+      <Documentation>Internal filter used by (filters, ProbeLine). The Plot
+      Over Line filter samples the data set attributes of the current data set
+      at the points along a line. The values of the point-centered variables
+      along that line will be displayed in an XY Plot. This filter uses
+      interpolation to determine the values at the selected point, whether or
+      not it lies at an input point. The Probe filter operates on any type of
+      data and produces polygonal output (a line).</Documentation>
+      <InputProperty command="SetSourceConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array" />
+        <Documentation>This property specifies the dataset from which to obtain
+        probe values.</Documentation>
+      </InputProperty>
+      <InputProperty command="SetInputConnection"
+                     label="Probe Type"
+                     name="Source"
+                     panel_visibility="default">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="extended_sources"
+                 name="HighResLineSource" />
+        </ProxyListDomain>
+        <Documentation>This property specifies the dataset whose geometry will
+        be used in determining positions to probe.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetPassPartialArrays"
+                         default_values="1"
+                         name="PassPartialArrays"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>When dealing with composite datasets, partial arrays are
+        common i.e. data-arrays that are not available in all of the blocks. By
+        default, this filter only passes those point and cell data-arrays that
+        are available in all the blocks i.e. partial array are removed. When
+        PassPartialArrays is turned on, this behavior is changed to take a
+        union of all arrays present thus partial arrays are passed as well.
+        However, for composite dataset input, this filter still produces a
+        non-composite output. For all those locations in a block of where a
+        particular data array is missing, this filter uses vtkMath::Nan() for
+        double and float arrays, while 0 for all other types of arrays i.e int,
+        char etc.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPassCellArrays"
+                         default_values="0"
+                         name="PassCellArrays"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        When set the input's cell data arrays are shallow copied to the output.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPassPointArrays"
+                         default_values="0"
+                         name="PassPointArrays"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        When set the input's point data arrays are shallow copied to the output.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetPassFieldArrays"
+                         default_values="1"
+                         name="PassFieldArrays"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Set whether to pass the field-data arrays from the Input i.e. the input
+        providing the geometry to the output. On by default.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetComputeTolerance"
+                         default_values="1"
+                         name="ComputeTolerance"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Set whether to compute the tolerance or to use a user provided
+        value. On by default.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetTolerance"
+                            default_values="2.2204460492503131e-16"
+                            name="Tolerance"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain min="2.2204460492503131e-16"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="ComputeTolerance" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the tolerance to use for
+        vtkDataSet::FindCell</Documentation>
+      </DoubleVectorProperty>
+      <!-- End ProbeLine -->
+    </SourceProxy>
+  </ProxyGroup>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPProbeFilter"
+                 label="Probe Location"
+                 name="ProbePoint">
+      <Documentation long_help="Sample data attributes at the points in a point cloud."
+                     short_help="Sample data values at the points in a point cloud.">
+                     The Probe filter samples the data set attributes of the
+                     current data set at the points in a point cloud. The Probe
+                     filter uses interpolation to determine the values at the
+                     selected point, whether or not it lies at an input point.
+                     The Probe filter operates on any type of data and produces
+                     polygonal output (a point cloud).</Documentation>
+      <InputProperty command="SetSourceConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array" />
+        <Documentation>This property specifies the dataset from which to obtain
+        probe values.</Documentation>
+      </InputProperty>
+      <InputProperty command="SetInputConnection"
+                     label="Probe Type"
+                     name="Source">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="extended_sources"
+                 name="FixedRadiusPointSource" />
+        </ProxyListDomain>
+        <Documentation>This property specifies the dataset whose geometry will
+        be used in determining positions to probe.</Documentation>
+      </InputProperty>
+
+      <IntVectorProperty command="SetPassFieldArrays"
+                         default_values="1"
+                         name="PassFieldArrays"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Set whether to pass the field-data arrays from the Input i.e. the input
+        providing the geometry to the output. On by default.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetComputeTolerance"
+                         default_values="1"
+                         name="ComputeTolerance"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Set whether to compute the tolerance or to use a user provided
+        value. On by default.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetTolerance"
+                            default_values="2.2204460492503131e-16"
+                            name="Tolerance"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain min="2.2204460492503131e-16"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="ComputeTolerance" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the tolerance to use for
+        vtkDataSet::FindCell</Documentation>
+      </DoubleVectorProperty>
+
+      <Hints>
+        <Visibility replace_input="0" />
+        <View type="SpreadSheetView" />
+      </Hints>
+      <!-- End ProbePoint -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <CompoundSourceProxy label="Plot Over Line"
+                         name="ProbeLine">
+      <Documentation long_help="Sample data attributes at the points along a line.  Probed lines will be displayed in a graph of the attributes."
+                     short_help="Sample data values at the points along a line.">
+                     The Plot Over Line filter samples the data set attributes
+                     of the current data set at the points along a line. The
+                     values of the point-centered variables along that line
+                     will be displayed in an XY Plot. This filter uses
+                     interpolation to determine the values at the selected
+                     point, whether or not it lies at an input point. The Probe
+                     filter operates on any type of data and produces polygonal
+                     output (a line).</Documentation>
+      <Proxy compound_name="PlotOverLine1"
+             group="internal_filters"
+             id="491"
+             servers="1"
+             type="ProbeLine" />
+      <Proxy compound_name="AppendArcLength1"
+             group="filters"
+             id="588"
+             servers="1"
+             type="AppendArcLength">
+        <Property id="588.Input"
+                  name="Input"
+                  number_of_elements="1">
+          <Proxy output_port="0"
+                 value="491" />
+        </Property>
+      </Proxy>
+      <ExposedProperties>
+        <Property exposed_name="Input"
+                  name="Input"
+                  proxy_name="PlotOverLine1" />
+        <Property exposed_name="Source"
+                  name="Source"
+                  proxy_name="PlotOverLine1" />
+        <Property exposed_name="PassPartialArrays"
+                  name="PassPartialArrays"
+                  proxy_name="PlotOverLine1" />
+        <Property exposed_name="ComputeTolerance"
+                  name="ComputeTolerance"
+                  proxy_name="PlotOverLine1" />
+        <Property exposed_name="Tolerance"
+                  name="Tolerance"
+                  proxy_name="PlotOverLine1" />
+      </ExposedProperties>
+      <OutputPort name="Output"
+                  port_index="0"
+                  proxy="AppendArcLength1" />
+      <Hints>
+        <Visibility replace_input="0" />
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <View type="XYChartView" also_show_in_current_view="1" />
+        <Plotable />
+      </Hints>
+      <!-- End ProbeLine -->
+    </CompoundSourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPProbeFilter"
+                 label="Legacy Resample With Dataset"
+                 name="Probe">
+      <Documentation long_help="Sample data attributes at the points of a dataset."
+                     short_help="Sample data values at the points of a dataset.">
+                     Probe is a filter that computes point attributes at
+                     specified point positions. The filter has two inputs: the
+                     Input and Source.  The 'Source' geometric structure is passed
+                     through the filter. The point attributes are computed at
+                     the 'Source' point positions by interpolating into the
+                     'Input' data. For example, we can compute data values on a plane
+                     (plane specified as Source) from a volume (Input). The
+                     cell data of the Input data is copied to the output based
+                     on in which Input cell each Source point is. If an array
+                     of the same name exists both in Input's point and cell
+                     data, only the one from the point data is
+                     probed. This is the implementation of the
+                     'Resample With Dataset' filter available in ParaView
+                     version 5.1 and earlier. </Documentation>
+      <Deprecated deprecated_in="5.2" to_remove_in="5.3">
+        This has been replaced by 'Resample With Dataset'. Please consider
+        using that instead.
+      </Deprecated>
+      <InputProperty command="SetSourceConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array" />
+        <Documentation>This property specifies the dataset from which to obtain
+        probe values. The data attributes come from this dataset.</Documentation>
+      </InputProperty>
+      <InputProperty command="SetInputConnection"
+                     name="Source">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the dataset whose geometry will
+        be used in determining positions to probe. The mesh comes from this
+        dataset.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetPassCellArrays"
+                         default_values="0"
+                         name="PassCellArrays"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        When set the input's cell data arrays are shallow copied to the output.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPassPointArrays"
+                         default_values="0"
+                         name="PassPointArrays"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        When set the input's point data arrays are shallow copied to the output.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetPassFieldArrays"
+                         default_values="1"
+                         name="PassFieldArrays"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Set whether to pass the field-data arrays from the Input i.e. the input
+        providing the geometry to the output. On by default.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetComputeTolerance"
+                         default_values="1"
+                         name="ComputeTolerance"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Set whether to compute the tolerance or to use a user provided
+        value. On by default.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetTolerance"
+                            default_values="2.2204460492503131e-16"
+                            name="Tolerance"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain min="2.2204460492503131e-16"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="ComputeTolerance" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>Set the tolerance to use for
+        vtkDataSet::FindCell</Documentation>
+      </DoubleVectorProperty>
+
+      <Hints>
+        <Visibility replace_input="1" />
+      </Hints>
+      <!-- End Probe -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPResampleFilter"
+                 name="ImageResampling">
+      <Documentation long_help="Sample data attributes using a 3D image as probing mesh."
+                     short_help="Sample data values using a 3D image."/>
+      <Deprecated deprecated_in="5.1" to_remove_in="5.2">Please use "Resample To Image" instead instead of "ImageResampling" filter.</Deprecated>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the dataset whose data will
+        be probed</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetSamplingDimension"
+                         default_values="10 10 10"
+                         name="SamplingDimension"
+                         number_of_elements="3"
+                         panel_visibility="default">
+                         <IntRangeDomain name="range" min="2 2 2" max="10000 10000 10000"/>
+        <Documentation>
+        How many linear resampling we want along each axis
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseInputBounds"
+                         default_values="1"
+                         name="UseInputBounds"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <Documentation>
+        Do we use input bounds or custom ones?
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetCustomSamplingBounds"
+                         default_values="0 1 0 1 0 1"
+                         name="CustomSamplingBounds"
+                         number_of_elements="6"
+                         panel_visibility="default">
+        <Documentation>
+        Custom probing bounds if needed
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <!-- End ImageResampling -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAggregateDataSetFilter"
+                 label="Aggregate Dataset"
+                 name="AggregateDataSet">
+      <Documentation long_help="This filter aggregates a dataset onto a subset of processes."
+                     short_help="Aggregate a dataset onto a subset of processes.">
+        This filter aggregates a dataset onto a subset of processes.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the filter.
+        </Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetNumberOfTargetProcesses"
+                         default_values="1"
+                         name="NumberOfTargetProcesses"
+                         number_of_elements="1">
+        <Documentation>This property specifies the number of target processes to
+        aggregate the dataset onto.</Documentation>
+      </IntVectorProperty>
+      <!-- End AggregateDataSet -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkAngularPeriodicFilter"
+                 label="Angular Periodic Filter"
+                 name="AngularPeriodicFilter">
+      <Documentation long_help="This filter generate a periodic multiblock dataset."
+                     short_help="Periodic Filter.">This filter generate a periodic
+                     multiblock dataset</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Periodic filter.
+        </Documentation>
+      </InputProperty>
+      <IntVectorProperty clean_command="RemoveAllIndices"
+                         command="AddIndex"
+                         name="BlockIndices"
+                         number_of_elements_per_command="1"
+                         panel_visibility="default"
+                         repeat_command="1">
+        <CompositeTreeDomain mode="leaves"
+                             name="tree">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </CompositeTreeDomain>
+        <Hints>
+          <WidgetHeight number_of_rows="20" />
+        </Hints>
+        <Documentation>This property lists the ids of the blocks to make periodic
+        from the input multiblock dataset.</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetIterationMode"
+                         default_values="1"
+                         name="IterationMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Manual"
+                 value="0" />
+          <Entry text="Maximum"
+                 value="1" />
+        </EnumerationDomain>
+        <Documentation>This property specifies the mode of iteration, either a user-provided number
+        of periods, or the maximum number of periods to rotate to 360 degrees.</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetNumberOfPeriods"
+                         default_values="3"
+                         name="NumberOfPeriods"
+                         number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="IterationMode"
+                                   value="0" />
+          <!-- show this widget when IterationMode==0 -->
+        </Hints>
+        <Documentation>This property specifies the number of iteration</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetRotationMode"
+                         default_values="0"
+                         name="RotationMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Direct Angle"
+                 value="0" />
+          <Entry text="Array Value"
+                 value="1" />
+        </EnumerationDomain>
+        <Documentation>This property specifies the mode of rotation, either from a user provided
+        angle or from an array in the data.</Documentation>
+
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetRotationAngle"
+                            default_values="10"
+                            name="RotationAngle"
+                            number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="RotationMode"
+                                   value="0" />
+          <!-- show this widget when RotationMode==0 -->
+        </Hints>
+        <Documentation>Rotation angle in degree.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <StringVectorProperty command="SetRotationArrayName"
+                            name="RotationArrayName"
+                            default_values="periodic angle"
+                            number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="RotationMode"
+                                   value="1" />
+          <!-- show this widget when RotationMode==1 -->
+        </Hints>
+        <Documentation>Field array name that contains the rotation angle in radians.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty command="SetRotationAxis"
+                         default_values="0"
+                         name="Axis"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Axis X"
+                 value="0" />
+          <Entry text="Axis Y"
+                 value="1" />
+          <Entry text="Axis Z"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>This property specifies the axis of rotation</Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty animateable="1"
+                            command="SetCenter"
+                            default_values="0.0 0.0 0.0"
+                            name="Center"
+                            number_of_elements="3"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the 3D coordinates for the
+        center of the rotation.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetComputeRotationsOnTheFly"
+                         default_values="1"
+                         name="ComputeRotationsOnTheFly"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <Documentation>
+        Specify whether the rotations should be computed on-the-fly, which is
+        compute intensive, or if the arrays should be explicitly generated and
+        stored, at the cost of using more memory.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <Hints>
+        <RepresentationType view="RenderView" type="Outline" />
+      </Hints>
+      <!-- End AngularPeriodicFilter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkDistributedDataFilter"
+                 label="D3"
+                 name="D3">
+      <Documentation long_help="Repartition a data set into load-balanced spatially convex regions.  Create ghost cells if requested."
+                     short_help="Repartition a data set.">The D3 filter is
+                     available when ParaView is run in parallel. It operates on
+                     any type of data set to evenly divide it across the
+                     processors into spatially contiguous regions. The output
+                     of this filter is of type unstructured
+                     grid.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the D3
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetBoundaryMode"
+                         default_values="0"
+                         name="BoundaryMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Assign cells uniquely"
+                 value="0" />
+          <Entry text="Duplicate cells"
+                 value="1" />
+          <Entry text="Divide cells"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>This property determines how cells that lie on processor
+        boundaries are handled. The "Assign cells uniquely" option assigns each
+        boundary cell to exactly one process, which is useful for isosurfacing.
+        Selecting "Duplicate cells" causes the cells on the boundaries to be
+        copied to each process that shares that boundary. The "Divide cells"
+        option breaks cells across process boundary lines so that pieces of the
+        cell lie in different processes. This option is useful for volume
+        rendering.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseMinimalMemory"
+                         default_values="0"
+                         label="Minimal Memory"
+                         name="UseMinimalMemory"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, the D3 filter requires
+        communication routines to use minimal memory than without this
+        restriction.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMinimumGhostLevel"
+                         default_values="0"
+                         label="Minimum Number Of Ghost Levels"
+                         name="MinimumGhostLevel"
+                         number_of_elements="1">
+        <Documentation>The minimum number of ghost levels to add to each
+        processor's output. If the pipeline also requests ghost levels, the
+        larger value will be used.</Documentation>
+      </IntVectorProperty>
+      <!-- End D3 -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkExtractCTHPart"
+                 label="Extract CTH Parts"
+                 name="CTHPart">
+      <Documentation long_help="Create a surface from a CTH volume fraction."
+                     short_help="Extract a part from a CTH dataset.">Extract
+                     CTH Parts is a specialized filter for visualizing the data
+                     from a CTH simulation. It first converts the selected
+                     cell-centered arrays to point-centered ones. It then
+                     contours each array at a value of 0.5. The user has the
+                     option of clipping the resulting surface(s) with a plane.
+                     This filter only operates on unstructured data. It
+                     produces polygonal output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array"
+                          number_of_components="1" />
+        <Documentation>This property specifies the input to the Extract CTH
+        Parts filter.</Documentation>
+      </InputProperty>
+      <ProxyProperty command="SetClipPlane"
+                     label="Clip Type"
+                     name="ClipPlane">
+        <ProxyGroupDomain name="groups">
+          <Group name="implicit_functions" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="implicit_functions"
+                 name="None" />
+          <Proxy group="implicit_functions"
+                 name="Plane" />
+        </ProxyListDomain>
+        <Documentation>This property specifies whether to clip the dataset, and
+        if so, it also specifies the parameters of the plane with which to
+        clip.</Documentation>
+      </ProxyProperty>
+      <StringVectorProperty clean_command="RemoveVolumeArrayNames"
+                            command="AddVolumeArrayName"
+                            label="Volume Arrays"
+                            name="VolumeArrays"
+                            number_of_elements_per_command="1"
+                            repeat_command="1">
+        <Documentation>This property specifies the name(s) of the volume
+        fraction array(s) for generating parts.</Documentation>
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+      </StringVectorProperty>
+      <DoubleVectorProperty command="SetVolumeFractionSurfaceValue"
+                            default_values="0.1"
+                            label="Volume Fraction Value"
+                            name="VolumeFractionSurfaceValue"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Documentation>The value of this property is the volume fraction value
+        for the surface.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="CapSurfaces"
+                         command="SetCapping"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, volume surfaces are capped to produce visually closed
+          surface.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="RemoveGhostCells"
+                         command="SetRemoveGhostCells"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set to false, the output surfaces will not hide contours
+          extracted from ghost cells. This results in overlapping contours but
+          overcomes holes.  Default is set to true.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="GenerateTriangles"
+                         command="SetGenerateTriangles"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Triangulate results. When set to false, the internal cut and contour filters
+          are told not to triangulate results if possible.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="GenerateSolidGeometry"
+                         command="SetGenerateSolidGeometry"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Generate solid output with 3D cells. When set to false, 2D contours are generated.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End CTHPart -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkHyperTreeGridGhostCellsGenerator"
+                 label="Hyper Tree Grid Ghost Cells Generator"
+                 name="HyperTreeGridGhostCellsGenerator">
+      <Documentation long_help="Generate Ghost Cells for HyperTreeGrid."
+                     short_help="Generate Ghost Cells for HyperTreeGrid.">
+                     This filter generates ghost cells for hyper tree grid for multi processing purposes.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_types">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+        <Documentation>This property specified the input to the ghost cell generator.</Documentation>
+      </InputProperty>
+      <!-- End vtkHyperTreeGridGhostCellsGenerator -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkIntegrateAttributes"
+                 label="Integrate Variables"
+                 name="IntegrateAttributes">
+      <Documentation long_help="This filter integrates cell and point attributes."
+                     short_help="Integrates over lines, surfaces or vectors.">
+                     The Integrate Attributes filter integrates point and cell
+                     data over lines and surfaces. It also computes length of
+                     lines, area of surface, or volume.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Integrate
+        Attributes filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetDivideAllCellDataByVolume"
+                         name="DivideCellDataByVolume"
+                         default_values="0"
+                         number_of_elements="1">
+        <Documentation>
+          This property specifies if the output data will be divided by the
+          volume/area computed for the integrated cells.  If it is on, then each
+          value in the output cell data will be divided by the area/volume.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <Hints>
+        <Visibility replace_input="0" />
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <View type="SpreadSheetView" />
+        <Plotable />
+      </Hints>
+      <!-- End IntegrateAttributes -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPCellDataToPointData"
+                 label="Cell Data to Point Data"
+                 name="CellDataToPointData">
+      <Documentation long_help="Create point attributes by averaging cell attributes."
+                     short_help="Convert cell data to point data.">The Cell
+                     Data to Point Data filter averages the values of the cell
+                     attributes of the cells surrounding a point to compute
+                     point attributes. The Cell Data to Point Data filter
+                     operates on any type of data set, and the output data set
+                     is of the same type as the input.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array" />
+        <Documentation>This property specifies the input to the Cell Data to
+        Point Data filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetProcessAllArrays"
+                         default_values="1"
+                         name="ProcessAllArrays"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>The value of this property controls whether all input
+        cell arrays will be processed and converted into point arrays.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty clean_command="ClearCellDataArrays"
+                            command="AddCellDataArray"
+                            name="CellDataArrays"
+                            label="Cell Data Array to process"
+                            number_of_elements_per_command="1"
+                            repeat_command="1">
+        <Documentation>Add a cell array by name to be converted to point array.</Documentation>
+        <ArrayListDomain input_domain_name="input_array" name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="ProcessAllArrays" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetPassCellData"
+                         default_values="0"
+                         name="PassCellData"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, then the input cell data
+        is passed through to the output; otherwise, only the generated point
+        data will be available in the output.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPieceInvariant"
+                         default_values="0"
+                         name="PieceInvariant"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the value of this property is set to 1, this filter
+        will request ghost levels so that the values at boundary points match
+        across processes. NOTE: Enabling this option might cause multiple
+        executions of the data source because more information is needed to
+        remove internal surfaces.</Documentation>
+      </IntVectorProperty>
+      <!-- End CellDataToPointData -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPMaskPoints"
+                 label="Mask Points"
+                 name="MaskPoints">
+      <Documentation long_help="Reduce the number of points.  This filter is often used before glyphing. Generating vertices is an option."
+                     short_help="Reduce the number of points.">The Mask Points
+                     filter reduces the number of points in the dataset. It
+                     operates on any type of dataset, but produces only points
+                     / vertices as output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Mask Points
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetOnRatio"
+                         default_values="2"
+                         name="OnRatio"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>The value of this property specifies that every
+        OnStride-th points will be retained in the output when not using Random
+        (the skip or stride size for point ids). (For example, if the on ratio
+        is 3, then the output will contain every 3rd point, up to the the
+        maximum number of points.)</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMaximumNumberOfPoints"
+                         default_values="5000"
+                         label="Maximum Number of Points"
+                         name="MaximumNumberOfPoints"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        name="range" />
+        <Documentation>The value of this property indicates the maximum number
+        of points in the output dataset.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetProportionalMaximumNumberOfPoints"
+                         default_values="0"
+                         label="Proportionally Distribute Maximum Number Of Points"
+                         name="ProportionalMaximumNumberOfPoints"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>When this is off, the maximum number of points is taken
+        per processor when running in parallel (total number of points = number
+        of processors * maximum number of points). When this is on, the maximum
+        number of points is proportionally distributed across processors
+        depending on the number of points per processor
+        ("total number of points" is the same as "maximum number of points"
+         maximum number of points per processor = number of points on a processor
+         * maximum number of points / total number of points across all processors
+        ).
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetOffset"
+                         default_values="0"
+                         name="Offset"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="0"
+                        name="range" />
+        <Documentation>The value of this property indicates the starting point
+        id in the ordered list of input points from which to start
+        masking.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRandomMode"
+                         default_values="0"
+                         label="Random Sampling"
+                         name="RandomMode"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>If the value of this property is set to true, then the
+        points in the output will be randomly selected from the input in
+        various ways set by Random Mode; otherwise this filter will subsample
+        point ids regularly.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRandomModeType"
+                         default_values="0"
+                         label="Random Sampling Mode"
+                         name="RandomModeType"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Randomized Id Strides"
+                 value="0" />
+          <Entry text="Random Sampling"
+                 value="1" />
+          <Entry text="Spatially Stratified Random Sampling"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>Randomized Id Strides picks points with random id
+        increments starting at Offset (the output probably isn't a
+        statistically random sample). Random Sampling generates a statistically
+        random sample of the input, ignoring Offset (fast - O(sample size)).
+        Spatially Stratified Random Sampling is a variant of random sampling
+        that splits the points into equal sized spatial strata before randomly
+        sampling (slow - O(N log N)).</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateVertices"
+                         default_values="0"
+                         name="GenerateVertices"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>This property specifies whether to generate vertex cells
+        as the topography of the output. If set to 1, the geometry (vertices)
+        will be displayed in the rendering window; otherwise no geometry will
+        be displayed.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetSingleVertexPerCell"
+                         default_values="0"
+                         name="SingleVertexPerCell"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>Tell filter to only generate one vertex per cell instead
+        of multiple vertices in one cell.</Documentation>
+      </IntVectorProperty>
+      <!-- End MaskPoints -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPOutlineCornerFilter"
+                 label="Outline Corners"
+                 name="OutlineCornerFilter">
+      <Documentation long_help="This filter generates a bounding box representation of the input. It only displays the corners of the bounding box."
+                     short_help="Generates corners of a bounding box.">The
+                     Outline Corners filter generates the corners of a bounding
+                     box for the input dataset. This filter operates on any
+                     type of dataset and produces polygonal
+                     output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Outline Corners
+        filter.</Documentation>
+      </InputProperty>
+      <DoubleVectorProperty command="SetCornerFactor"
+                            default_values="0.2"
+                            name="CornerFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="0.5"
+                           min="0.001"
+                           name="range" />
+        <Documentation>The value of this property sets the size of the corners
+        as a percentage of the length of the corresponding bounding box
+        edge.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <Visibility replace_input="0" />
+      </Hints>
+      <!-- End  OutlineCornerFilter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPOutlineFilter"
+                 label="Outline"
+                 name="OutlineFilter">
+      <Documentation long_help="This filter generates a bounding box representation of the input."
+                     short_help="Generates a bounding box.">The Outline filter
+                     generates an axis-aligned bounding box for the input
+                     dataset. This filter operates on any type of dataset and
+                     produces polygonal output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkGraph" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Outline
+        filter.</Documentation>
+      </InputProperty>
+      <Hints>
+        <Visibility replace_input="0" />
+      </Hints>
+      <!-- End  OutlineFilter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPPolyDataNormals"
+                 label="Generate Surface Normals"
+                 name="PolyDataNormals">
+      <Documentation long_help="This filter will produce surface normals used for smooth shading. Splitting is used to avoid smoothing across feature edges."
+                     short_help="Produce surface point normals.">This filter
+                     generates surface normals at the points of the input
+                     polygonal dataset to provide smooth shading of the
+                     dataset. The resulting dataset is also polygonal. The
+                     filter works by calculating a normal vector for each
+                     polygon in the dataset and then averaging the normals at
+                     the shared points.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Normals
+        Generation filter.</Documentation>
+      </InputProperty>
+      <DoubleVectorProperty command="SetFeatureAngle"
+                            default_values="30"
+                            name="FeatureAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="180"
+                           min="0"
+                           name="range" />
+        <Documentation>The value of this property defines a feature edge. If
+        the surface normal between two adjacent triangles is at least as large
+        as this Feature Angle, a feature edge exists. If Splitting is on,
+        points are duplicated along these feature edges. (See the Splitting
+        property.)</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetSplitting"
+                         default_values="1"
+                         name="Splitting"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property controls the splitting of sharp edges. If
+        sharp edges are split (property value = 1), then points are duplicated
+        along these edges, and separate normals are computed for both sets of
+        points to give crisp (rendered) surface definition.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetConsistency"
+                         default_values="1"
+                         name="Consistency"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>The value of this property controls whether consistent
+        polygon ordering is enforced. Generally the normals for a data set
+        should either all point inward or all point outward. If the value of
+        this property is 1, then this filter will reorder the points of cells
+        that whose normal vectors are oriented the opposite direction from the
+        rest of those in the data set.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFlipNormals"
+                         default_values="0"
+                         name="FlipNormals"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the value of this property is 1, this filter will
+        reverse the normal direction (and reorder the points accordingly) for
+        all polygons in the data set; this changes front-facing polygons to
+        back-facing ones, and vice versa. You might want to do this if your
+        viewing position will be inside the data set instead of outside of
+        it.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetNonManifoldTraversal"
+                         default_values="1"
+                         label="Non-Manifold Traversal"
+                         name="NonManifoldTraversal"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Turn on/off traversal across non-manifold edges. Not
+        traversing non-manifold edges will prevent problems where the
+        consistency of polygonal ordering is corrupted due to topological
+        loops.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetComputeCellNormals"
+                         default_values="0"
+                         name="ComputeCellNormals"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This filter computes the normals at the points in the
+        data set. In the process of doing this it computes polygon normals too.
+        If you want these normals to be passed to the output of this filter,
+        set the value of this property to 1.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPieceInvariant"
+                         default_values="1"
+                         name="PieceInvariant"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Turn this option to to produce the same results
+        regardless of the number of processors used (i.e., avoid seams along
+        processor boundaries). Turn this off if you do want to process ghost
+        levels and do not mind seams.</Documentation>
+      </IntVectorProperty>
+      <!-- End  PolyDataNormals -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPReflectionFilter"
+                 label="Reflect"
+                 name="ReflectionFilter">
+      <Documentation long_help="This filter takes the union of the input and its reflection over an axis-aligned plane."
+                     short_help="Reflect input over an axis aligned plane.">The
+                     Reflect filter reflects the input dataset across the
+                     specified plane. This filter operates on any type of data
+                     set and produces an unstructured grid
+                     output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Reflect
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetPlane"
+                         default_values="0"
+                         name="Plane"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="X Min"
+                 value="0" />
+          <Entry text="Y Min"
+                 value="1" />
+          <Entry text="Z Min"
+                 value="2" />
+          <Entry text="X Max"
+                 value="3" />
+          <Entry text="Y Max"
+                 value="4" />
+          <Entry text="Z Max"
+                 value="5" />
+          <Entry text="X"
+                 value="6" />
+          <Entry text="Y"
+                 value="7" />
+          <Entry text="Z"
+                 value="8" />
+        </EnumerationDomain>
+        <Documentation>The value of this property determines which plane to
+        reflect across. If the value is X, Y, or Z, the value of the Center
+        property determines where the plane is placed along the specified axis.
+        The other six options (X Min, X Max, etc.) place the reflection plane
+        at the specified face of the bounding box of the input
+        dataset.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetCenter"
+                            default_values="0.0"
+                            name="Center"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>If the value of the Plane property is X, Y, or Z, then
+        the value of this property specifies the center of the reflection
+        plane.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetCopyInput"
+                         default_values="1"
+                         name="CopyInput"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, the output will contain
+        the union of the input dataset and its reflection. Otherwise the output
+        will contain only the reflection of the input data.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFlipAllInputArrays"
+                         default_values="1"
+                         name="FlipAllInputArrays"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation> If off, only Vectors, Normals and Tensors will be flipped.
+        If on, all 3-component data arrays ( considered as 3D vectors),
+        6-component data arrays (considered as symmetric tensors),
+        9-component data arrays (considered as tensors ) of signed type will be flipped.
+        All other arrays won't be flipped and will only be copied.</Documentation>
+      </IntVectorProperty>
+      <!-- End ReflectionFilter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkProcessIdScalars"
+                 label="Process Id Scalars"
+                 name="ProcessIdScalars">
+      <Documentation long_help="This filter uses colors to show how data is partitioned across processes."
+                     short_help="Generate point scalars from process id.">The
+                     Process Id Scalars filter assigns a unique scalar value to
+                     each piece of the input according to which processor it
+                     resides on. This filter operates on any type of data when
+                     ParaView is run in parallel. It is useful for determining
+                     whether your data is load-balanced across the processors
+                     being used. The output data set type is the same as that
+                     of the input.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Process Id
+        Scalars filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetRandomMode"
+                         default_values="0"
+                         name="RandomMode"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>The value of this property determines whether to use
+        random id values for the various pieces. If set to 1, the unique value
+        per piece will be chosen at random; otherwise the unique value will
+        match the id of the process.</Documentation>
+      </IntVectorProperty>
+      <!-- End ProcessIdScalars -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPTextureMapToSphere"
+                 label="Texture Map to Sphere"
+                 name="TextureMapToSphere">
+      <Documentation long_help="Generate texture coordinates by mapping points to sphere."
+                     short_help="Generate texture coordinates by mapping points to sphere.">
+                     This is a filter that generates 2D texture coordinates by
+                     mapping input dataset points onto a sphere. The sphere is
+                     generated automatically. The sphere is generated
+                     automatically by computing the center i.e. averaged
+                     coordinates, of the sphere. Note that the generated
+                     texture coordinates range between (0,1). The s-coordinate
+                     lies in the angular direction around the z-axis, measured
+                     counter-clockwise from the x-axis. The t-coordinate lies
+                     in the angular direction measured down from the north pole
+                     towards the south pole.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the Texture Map to Sphere
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetPreventSeam"
+                         default_values="1"
+                         name="PreventSeam"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Control how the texture coordinates are generated. If
+        Prevent Seam is set, the s-coordinate ranges from 0-&gt;1 and 1-&gt;0
+        corresponding to the theta angle variation between 0-&gt;180 and
+        180-&gt;0 degrees. Otherwise, the s-coordinate ranges from 0-&gt;1
+        between 0-&gt;360 degrees.</Documentation>
+      </IntVectorProperty>
+      <!-- End TextureMapToSphere -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkRemoveGhosts"
+                 label="Remove Ghost Information"
+                 name="RemoveGhostInformation">
+      <Documentation long_help="Removes ghost information."
+                     short_help="Removes ghost information.">Removes ghost
+      cells and point data and cell data ghost arrays.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the remove ghost
+        information filter.</Documentation>
+      </InputProperty>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkUnstructuredGridGhostCellsGenerator"
+                 label="Ghost Cells Generator"
+                 name="GhostCellsGenerator">
+      <Documentation long_help="Generate ghost cells for unstructured grids."
+                     short_help="Generate ghost cells for unstructured grids.">
+                     The GhostCellGenerator operates on unstructured grids only.
+                     This filter does not redistribute the input data, it only
+                     generates ghost cells at processor boundaries by fetching
+                     topological and geometrical information of those cells on
+                     neighbor ranks. The filter can take advantage of global point
+                     ids if they are available - if so it will perform faster,
+                     otherwise point coordinates will be exchanged and processed.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the ghost cells
+        generator.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetBuildIfRequired"
+                         default_values="0"
+                         name="BuildIfRequired"
+                         number_of_elements="1">
+        <Documentation>Specify if the filter must generate the ghost cells only
+          if required by the pipeline downstream. To force at least a fixed level
+          of ghosts, this must be set to 0 (unchecked).</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMinimumNumberOfGhostLevels"
+                         number_of_elements="1"
+                         default_values="1"
+                         name="MinimumNumberOfGhostLevels">
+        <IntRangeDomain name="range" min="1" max="10" />
+        <Documentation>
+          When **BuildIfRequired** if off, use this to specify the minimum number of
+          ghost cells to request. The filter may request more ghost levels than indicated if a
+          downstream filter asked for more ghost levels.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="BuildIfRequired"
+                                   value="0" />
+          <!-- if BuildIfRequired !=0 , we disable this property -->
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseGlobalPointIds"
+                         default_values="1"
+                         name="UseGlobalIds"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>Specify if the filter must take benefit of global point
+        ids if they exist or if point coordinates should be used instead.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <StringVectorProperty command="SetGlobalPointIdsArrayName"
+                            default_values="GlobalNodeIds"
+                            name="GlobalPointIdsArrayName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Documentation>This property provides the name for the input array
+        containing the global point ids if the GlobalIds array of the point
+        data if not set. Default is GlobalNodeIds.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseGlobalIds" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <!-- End vtkPUnstructuredGridGhostCellsGenerator -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPExtractExodusGlobalTemporalVariables"
+                 label="Plot Global Variables Over Time"
+                 name="ExtractFieldDataOverTime">
+      <Documentation long_help="Extracts and plots data in field data over time."
+                     short_help="Extracts and plots data in field data over time.">
+          This filter extracts the variables that reside in a
+          dataset's field data and are defined for all timesteps. Such variables
+          are generated by certain readers, like the Exodus reader.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>The input from which the selection is
+        extracted.</Documentation>
+      </InputProperty>
+      <Hints>
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <View type="XYChartView" />
+        <Plotable />
+        <InitializationHelper class="vtkSMExtractSelectionProxyInitializationHelper" />
+      </Hints>
+      <!-- End ExtractFieldDatasOverTime -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPExtractSelectedArraysOverTime"
+                 label="Plot Selection Over Time"
+                 name="ExtractSelectionOverTime">
+      <Documentation long_help="Extracts selection over time and then plots it."
+                     short_help="Extracts selection over time and then plots it.">
+                     This filter extracts the selection over time, i.e. cell
+                     and/or point variables at a cells/point selected are
+                     extracted over time The output multiblock consists of 1D
+                     rectilinear grids where the x coordinate corresponds to
+                     time (the same array is also copied to a point array named
+                     Time or TimeData (if Time exists in the input)). If
+                     selection input is a Location based selection then the
+                     point values are interpolated from the nearby cells, ie
+                     those of the cell the location lies in.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input"
+                     panel_visibility="default">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkTable" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <Documentation>The input from which the selection is
+        extracted.</Documentation>
+      </InputProperty>
+      <InputProperty command="SetSelectionConnection"
+                     name="Selection"
+                     panel_visibility="default">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkSelection" />
+        </DataTypeDomain>
+        <Documentation>The input that provides the selection
+        object.</Documentation>
+        <Hints>
+          <!-- This tag alerts the auto-generated panels and input selection
+              that this input is a selection.  It should use the special
+              selection GUI. -->
+          <SelectionInput />
+        </Hints>
+      </InputProperty>
+      <IntVectorProperty command="SetReportStatisticsOnly"
+                         default_values="1"
+                         name="Only Report Selection Statistics"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, the min, max,
+          inter-quartile ranges, and (for numeric arrays) mean and standard
+          deviation of all the selected points or cells within each time step
+          are reported -- instead of breaking each selected point's or cell's
+          attributes out into separate time history tables.</Documentation>
+      </IntVectorProperty>
+
+      <SubProxy command="SetSelectionExtractor">
+        <Proxy name="SetSelectionExtractor" class="vtkPVExtractSelection" />
+      </SubProxy>
+
+      <Hints>
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <PipelineIcon name="XYChartView" />
+        <View type="QuartileChartView" />
+        <WarnOnCreate title="Potentially slow operation">
+          **Plot Selection Over Time** filter needs to process all timesteps
+          available in your dataset and can potentially take a long time to complete.
+          Do you want to continue?
+        </WarnOnCreate>
+        <InitializationHelper class="vtkSMExtractSelectionProxyInitializationHelper" />
+      </Hints>
+      <!-- End of ExtractSelectionOverTime -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPExtractDataArraysOverTime"
+                 label="Plot Data Over Time"
+                 name="PlotDataOverTime">
+      <InputProperty command="SetInputConnection"
+                     name="Input"
+                     panel_visibility="default">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkTable" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <Documentation>The input from which the selection is
+        extracted.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetFieldAssociation"
+                         default_values="0"
+                         name="FieldAssociation"
+                         number_of_elements="1">
+        <Documentation>Select the attribute data to pass.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Points" value="0" />
+          <Entry text="Cells" value="1" />
+          <Entry text="Vertices" value="4" />
+          <Entry text="Edges" value="5" />
+          <Entry text="Rows" value="6" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetReportStatisticsOnly"
+                         default_values="1"
+                         name="Only Report Selection Statistics"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, the min, max,
+          inter-quartile ranges, and (for numeric arrays) mean and standard
+          deviation of all the selected points or cells within each time step
+          are reported -- instead of breaking each selected point's or cell's
+          attributes out into separate time history tables.</Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <PipelineIcon name="XYChartView" />
+        <View type="QuartileChartView" />
+        <WarnOnCreate title="Potentially slow operation">
+          **Plot Data Over Time** filter needs to process all timesteps
+          available in your dataset and can potentially take a long time to complete.
+          Do you want to continue?
+        </WarnOnCreate>
+      </Hints>
+      <!-- End of PlotDataOverTime -->
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

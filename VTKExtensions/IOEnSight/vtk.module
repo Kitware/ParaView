@@ -1,0 +1,17 @@
+NAME
+  ParaView::VTKExtensionsIOEnSight
+LIBRARY_NAME
+  vtkPVVTKExtensionsIOEnSight
+GROUPS
+  PARAVIEW_CANONICAL
+KIT
+  ParaView::CoreKit
+DEPENDS
+  VTK::CommonExecutionModel
+  VTK::IOEnSight
+PRIVATE_DEPENDS
+  VTK::ParallelCore
+OPTIONAL_DEPENDS
+  VTK::ParallelMPI
+TEST_LABELS
+  ParaView

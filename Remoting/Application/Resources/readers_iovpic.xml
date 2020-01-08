@@ -1,0 +1,164 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- Start vtkVPICReader -->
+    <SourceProxy class="vtkVPICReader"
+                 label="VPIC Reader"
+                 name="VPICReader">
+      <Documentation long_help="Reads distributed VPIC files into an ImageData."
+                     short_help="Read VPIC simulation files.">VPIC is a 3D
+                     kinetic plasma particle-in-cell simulation. The input file
+                     (.vpc) opened by the VPIC reader is an ASCII description
+                     of the data files which are written one file per
+                     processor, per category and per time step. These are
+                     arranged in subdirectories per category (field data and
+                     hydrology data) and then in time step
+                     subdirectories.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>ASCII .vpc file describes locations of data files, grid
+        sizes, time step sizes and type and order of data written to the
+        files.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="Point Arrays"
+                            name="PointArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Variables written to the data files are described in the
+        .vpc file and are presented for selection. Only selected variables are
+        loaded for a time step.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetStride"
+                         default_values="1 1 1"
+                         label="Stride"
+                         name="SetStride"
+                         number_of_elements="3">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>VPIC data may be very large and not all is needed for
+        effective visualization. Setting the stride selects every nth data item
+        within the files for display.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetXLayout"
+                         information_only="1"
+                         name="DefaultXExtent">
+        <SimpleIntInformationHelper />
+        <Documentation>VPIC data is written one file per simulation processor.
+        This coarse map of files is used in partitioning files between
+        visualizing processors so that each ParaView processor has its own set
+        of files to display. Default extent is all files
+        available.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetYLayout"
+                         information_only="1"
+                         name="DefaultYExtent">
+        <SimpleIntInformationHelper />
+        <Documentation>VPIC data is written one file per simulation processor.
+        This coarse map of files is used in partitioning files between
+        visualizing processors so that each ParaView processor has its own set
+        of files to display. Default extent is all files
+        available.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetZLayout"
+                         information_only="1"
+                         name="DefaultZExtent">
+        <SimpleIntInformationHelper />
+        <Documentation>VPIC data is written one file per simulation processor.
+        This coarse map of files is used in partitioning files between
+        visualizing processors so that each ParaView processor has its own set
+        of files to display. Default extent is all files
+        available.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetXExtent"
+                         default_values="-1 -1"
+                         label="X Extent"
+                         name="XExtent"
+                         number_of_elements="2">
+        <IntRangeDomain name="XRange">
+          <RequiredProperties>
+            <Property function="Range"
+                      name="DefaultXExtent" />
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Documentation>VPIC data is written one file per simulation processor.
+        This coarse map of files is used in partitioning files between
+        visualizing processors so that each ParaView processor has its own set
+        of files to display. Ghost cell overlap is handled within the reader.
+        To limit the View of VPIC information the extent in the X dimension of
+        "files" can be specified. Only the files selected will be displayed and
+        they will be partitioned between the visualizing processors, allowing a
+        higher resolution over a smaller area.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetYExtent"
+                         default_values="-1 -1"
+                         label="Y Extent"
+                         name="YExtent"
+                         number_of_elements="2">
+        <IntRangeDomain name="YRange">
+          <RequiredProperties>
+            <Property function="Range"
+                      name="DefaultYExtent" />
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Documentation>VPIC data is written one file per simulation processor.
+        This coarse map of files is used in partitioning files between
+        visualizing processors so that each ParaView processor has its own set
+        of files to display. Ghost cell overlap is handled within the reader.
+        To limit the View of VPIC information the extent in the Y dimension of
+        "files" can be specified. Only the files selected will be displayed and
+        they will be partitioned between the visualizing processors, allowing a
+        higher resolution over a smaller area.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetZExtent"
+                         default_values="-1 -1"
+                         label="Z Extent"
+                         name="ZExtent"
+                         number_of_elements="2">
+        <IntRangeDomain name="ZRange">
+          <RequiredProperties>
+            <Property function="Range"
+                      name="DefaultZExtent" />
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Documentation>VPIC data is written one file per simulation processor.
+        This coarse map of files is used in partitioning files between
+        visualizing processors so that each ParaView processor has its own set
+        of files to display. Ghost cell overlap is handled within the reader.
+        To limit the View of VPIC information the extent in the Z dimension of
+        "files" can be specified. Only the files selected will be displayed and
+        they will be partitioned between the visualizing processors, allowing a
+        higher resolution over a smaller area.</Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="vpc"
+                       file_description="VPIC Files" />
+      </Hints>
+      <!-- End vtkVPICReader -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

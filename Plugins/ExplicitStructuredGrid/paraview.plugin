@@ -3,7 +3,6 @@ NAME
 DESCRIPTION
   ExplicitStructuredGrid filters
 REQUIRES_MODULES
-  ParaView::Core
   VTK::CommonExecutionModel
   VTK::FiltersCore
   VTK::CommonDataModel

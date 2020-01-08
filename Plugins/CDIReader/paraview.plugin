@@ -3,6 +3,7 @@ NAME
 DESCRIPTION
   ICON netCDF/CDI Reader
 REQUIRES_MODULES
+  ParaView::VTKExtensionsIOCore
   VTK::CommonCore
   VTK::CommonExecutionModel
   VTK::netcdf

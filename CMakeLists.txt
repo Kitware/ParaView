@@ -93,10 +93,11 @@ include(vtkInitializeBuildType)
 include(vtkSupportMacros)
 include(vtkDirectories)
 
+include(CMakeDependentOption)
+include(ParaViewOptions)
+
 #------------------------------------------------------------------------------
 # Choose static or shared libraries.
-vtk_deprecated_setting(shared_default PARAVIEW_BUILD_SHARED_LIBS BUILD_SHARED_LIBS "ON")
-option(PARAVIEW_BUILD_SHARED_LIBS "Build ParaView with shared libraries" "${shared_default}")
 set(BUILD_SHARED_LIBS "${PARAVIEW_BUILD_SHARED_LIBS}")
 set(CMAKE_CXX_VISIBILITY_PRESET "hidden")
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
@@ -121,9 +122,8 @@ set(VTK_REQUIRE_LARGE_FILE_SUPPORT ${CMAKE_REQUIRE_LARGE_FILE_SUPPORT})
 
 #-----------------------------------------------------------------------------
 # Provide compatibility options.
-option(VTK_LEGACY_REMOVE "Remove all legacy code completely." OFF)
-option(VTK_LEGACY_SILENT "Silence all legacy code messages." OFF)
-mark_as_advanced(VTK_LEGACY_REMOVE VTK_LEGACY_SILENT)
+set(VTK_LEGACY_REMOVE ${PARAVIEW_BUILD_LEGACY_REMOVE})
+set(VTK_LEGACY_SILENT ${PARAVIEW_BUILD_LEGACY_SILENT})
 
 # Setup external data. this will automatically download the test data and
 # baseline files to the build tree and set PARAVIEW_DATA_ROOT.
@@ -152,175 +152,26 @@ if (NOT DEFINED CMAKE_INSTALL_RPATH_USE_LINK_PATH)
   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 endif ()
 
-include(CMakeDependentOption)
-set(examples_default OFF)
-if (DEFINED PARAVIEW_BUILD_EXAMPLES)
-  message(DEPRECATION
-    "PARAVIEW_BUILD_EXAMPLES has been renamed to PARAVIEW_ENABLE_EXAMPLES.")
-  # Use the old variable as the default for the new variable if present.
-  set(examples_default "${PARAVIEW_BUILD_EXAMPLES}")
-  # Remove the old setting from the cache and local scope.
-  unset(PARAVIEW_BUILD_EXAMPLES)
-  unset(PARAVIEW_BUILD_EXAMPLES CACHE)
-endif ()
-option(PARAVIEW_ENABLE_EXAMPLES "Enable ParaView examples" "${examples_default}")
-option(PARAVIEW_BUILD_DEVELOPER_DOCUMENTATION "Build ParaView C++/Python docs" OFF)
-option(PARAVIEW_BUILD_QT_GUI "Enable ParaView Qt-based client" ON)
-option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
-option(PARAVIEW_USE_CUDA "Support CUDA compilation" OFF)
 if(PARAVIEW_USE_CUDA)
   # This needs to be a top level flag as enable_language needs
   # to be called from CMake entry point for variables to have
   # the correct scope.
   enable_language(CUDA)
 endif()
-option(PARAVIEW_USE_VTKM "Enable VTK-m accelerated algorithms" ON)
-set(raytracing_default OFF)
-if (DEFINED PARAVIEW_USE_OSPRAY)
-  message(DEPRECATION
-    "PARAVIEW_USE_OSPRAY has been renamed to PARAVIEW_USE_RAYTRACING.")
-  set(raytracing_default "${PARAVIEW_USE_OSPRAY}")
-  unset(PARAVIEW_USE_OSPRAY)
-  unset(PARAVIEW_USE_OSPRAY CACHE)
-endif ()
-option(PARAVIEW_USE_RAYTRACING "Build ParaView with OSPRay and/or OptiX ray Traced rendering" ${raytracing_default})
-option(PARAVIEW_ENABLE_LOGGING "Enable logging support." ON)
-mark_as_advanced(PARAVIEW_ENABLE_LOGGING)
-option(PARAVIEW_INSTALL_DEVELOPMENT_FILES "Install development files to the install tree" ON)
-mark_as_advanced(PARAVIEW_INSTALL_DEVELOPMENT_FILES)
-option(PARAVIEW_RELOCATABLE_INSTALL "Do not embed hard-coded paths into the install" ON)
-mark_as_advanced(PARAVIEW_RELOCATABLE_INSTALL)
 
-option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
-
-set(paraview_web_default ON)
-if (PARAVIEW_ENABLE_PYTHON AND WIN32)
-  include("${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake/FindPythonModules.cmake")
-  find_python_module(win32api have_pywin32)
-  set(paraview_web_default "${have_pywin32}")
-endif ()
-# Add ability to freeze Python modules.
-cmake_dependent_option(PARAVIEW_FREEZE_PYTHON
-  "Freeze Python packages/modules into the application." OFF
-  # FIXME(python): Freezing is not yet supported.
-  "PARAVIEW_ENABLE_PYTHON;NOT WIN32;NOT APPLE;FALSE" OFF)
-mark_as_advanced(PARAVIEW_FREEZE_PYTHON)
-cmake_dependent_option(PARAVIEW_ENABLE_WEB "Enable/Disable web support" "${paraview_web_default}"
-  "PARAVIEW_ENABLE_PYTHON" OFF)
-mark_as_advanced(PARAVIEW_ENABLE_WEB)
-
-# NvPipe requires an NVIDIA GPU.
-option(PARAVIEW_ENABLE_NVPIPE "Build ParaView with NvPipe remoting. Requires CUDA and an NVIDIA GPU" OFF)
-
-option(PARAVIEW_ENABLE_GDAL "Enable GDAL support." OFF)
-mark_as_advanced(PARAVIEW_ENABLE_GDAL)
-option(PARAVIEW_ENABLE_LAS "Enable LAS support." OFF)
-mark_as_advanced(PARAVIEW_ENABLE_LAS)
-option(PARAVIEW_ENABLE_OPENTURNS "Enable OpenTURNS support." OFF)
-option(PARAVIEW_ENABLE_PDAL "Enable PDAL support." OFF)
-mark_as_advanced(PARAVIEW_ENABLE_PDAL)
-option(PARAVIEW_ENABLE_MOTIONFX "Enable MotionFX support." OFF)
-mark_as_advanced(PARAVIEW_ENABLE_MOTIONFX)
-option(PARAVIEW_ENABLE_MOMENTINVARIANTS "Enable MomentInvariants filters" OFF)
-mark_as_advanced(PARAVIEW_ENABLE_MOMENTINVARIANTS)
-option(PARAVIEW_ENABLE_VISITBRIDGE "Enable VisIt readers." OFF)
-option(PARAVIEW_ENABLE_XDMF2 "Enable Xdmf2 support." ON)
-mark_as_advanced(PARAVIEW_ENABLE_XDMF2)
-option(PARAVIEW_ENABLE_XDMF3 "Enable Xdmf3 support." OFF)
-option(PARAVIEW_ENABLE_ADIOS2 "Enable ADIOS 2.x support." OFF)
-
-set(PARAVIEW_BUILD_TESTING "OFF"
-  CACHE STRING "Build module testing directories")
-set_property(CACHE PARAVIEW_BUILD_TESTING
-  PROPERTY
-    STRINGS "ON;OFF;WANT")
 set(BUILD_TESTING OFF)
 if (PARAVIEW_BUILD_TESTING)
   set(BUILD_TESTING ON)
 endif ()
 
-cmake_dependent_option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF
-  "UNIX" OFF)
-
-cmake_dependent_option(PARAVIEW_USE_MPI_SSEND
-  "Use MPI synchronous-send commands for communication" OFF
-  "PARAVIEW_USE_MPI" OFF)
-cmake_dependent_option(PARAVIEW_USE_ICE_T
-  "Enable IceT (needed for parallel rendering)" ON
-  "PARAVIEW_USE_MPI" OFF)
-cmake_dependent_option(PARAVIEW_INITIALIZE_MPI_ON_CLIENT
-  "Initialize MPI on client-processes by default. Can be overridden using command line arguments" ON
-  "PARAVIEW_USE_MPI" OFF)
-mark_as_advanced(
-  PARAVIEW_USE_ICE_T
-  PARAVIEW_USE_MPI_SSEND
-  PARAVIEW_INITIALIZE_MPI_ON_CLIENT)
-
-cmake_dependent_option(PARAVIEW_ENABLE_QT_SUPPORT
-  "Build ParaView with Qt support (without GUI)" OFF
-  "NOT PARAVIEW_BUILD_QT_GUI" ON)
-
-# Add an option to enable using Qt Webkit for widgets, as needed.
-# Default is OFF. We don't want to depend on WebKit unless absolutely needed.
-# FIXME: Move this to the module which cares.
-cmake_dependent_option(PARAVIEW_USE_QTWEBENGINE
-  "Use Qt WebKit components as needed." OFF
-  "PARAVIEW_ENABLE_QT_SUPPORT" OFF)
-mark_as_advanced(PARAVIEW_USE_QTWEBENGINE)
-
-# Add an option to enable using Qt Help, as needed.
-# Default is ON to enable integrated help/documentation.
-cmake_dependent_option(PARAVIEW_USE_QTHELP
-  "Use Qt Help infrastructure as needed." ON
-  "PARAVIEW_ENABLE_QT_SUPPORT" OFF)
-mark_as_advanced(PARAVIEW_USE_QTHELP)
-
-# If PARAVIEW_BUILD_QT_GUI is OFF, provide an option to the user to turn other
-# command line executables ON/OFF.
-cmake_dependent_option(PARAVIEW_ENABLE_COMMANDLINE_TOOLS
-  "Build ParaView command-line tools" ON
-  "NOT PARAVIEW_BUILD_QT_GUI" ON)
-
-# If building on Unix with MPI enabled, we will present another option to
-# enable building of CosmoTools VTK extensions. This option is by default
-# OFF and set to OFF if ParaView is not built with MPI.
-cmake_dependent_option(PARAVIEW_ENABLE_COSMOTOOLS
-  "Build ParaView with CosmoTools VTK Extensions" OFF
-  "UNIX;PARAVIEW_USE_MPI" OFF)
-mark_as_advanced(PARAVIEW_ENABLE_COSMOTOOLS)
-
-option(PARAVIEW_ENABLE_CATALYST "Enable Catalyst CoProcessing modules" ON)
 cmake_dependent_option(PARAVIEW_BUILD_CATALYST_ADAPTORS
   "Build Adaptors for various simulation codes" OFF
   # XXX: Adaptors need some work yet.
-  "FALSE;PARAVIEW_ENABLE_CATALYST;NOT WIN32" OFF)
+  "FALSE;NOT WIN32" OFF)
 mark_as_advanced(PARAVIEW_BUILD_CATALYST_ADAPTORS)
 
-# XXX(VTK): External VTK is not yet actually supported.
-if (FALSE)
-option(PARAVIEW_USE_EXTERNAL_VTK "Use an external VTK." OFF)
-mark_as_advanced(PARAVIEW_USE_EXTERNAL_VTK)
-else ()
-set(PARAVIEW_USE_EXTERNAL_VTK OFF)
-endif ()
 
-# Kits bundle multiple modules together into a single library, this
-# is used to dramatically reduce the number of generated libraries.
-option(PARAVIEW_ENABLE_KITS "Build ParaView using kits instead of modules." OFF)
-mark_as_advanced(PARAVIEW_ENABLE_KITS)
-
-option(PARAVIEW_USE_EXTERNAL "Use external copies of third party libraries by default" OFF)
-mark_as_advanced(PARAVIEW_USE_EXTERNAL)
-
-set(paraview_requested_modules)
-set(paraview_rejected_modules)
-
-if (PARAVIEW_ENABLE_COMMANDLINE_TOOLS AND PARAVIEW_ENABLE_PYTHON)
-  list(APPEND paraview_requested_modules
-    VTK::PythonInterpreter)
-endif ()
-
-if (PARAVIEW_ENABLE_PYTHON)
+if (PARAVIEW_USE_PYTHON)
   set(PARAVIEW_PYTHON_VERSION "3"
     CACHE STRING "")
   set_property(CACHE PARAVIEW_PYTHON_VERSION
@@ -332,267 +183,35 @@ if (PARAVIEW_ENABLE_PYTHON)
       "`PARAVIEW_PYTHON_VERSION` must either be 2 or 3.")
   endif ()
   set(VTK_PYTHON_VERSION "${PARAVIEW_PYTHON_VERSION}")
-
-  list(APPEND paraview_requested_modules
-    ParaView::PythonAlgorithm
-    ParaView::PythonInitializer
-    ParaView::ClientServerCorePythonRendering
-    VTK::RenderingMatplotlib)
-else ()
-  list(APPEND paraview_rejected_modules
-    VTK::RenderingMatplotlib)
 endif ()
 
-list(APPEND paraview_requested_modules
-  VTK::IOPIO)
-
-if (PARAVIEW_ENABLE_PYTHON)
-  list(APPEND paraview_requested_modules
-    ParaView::CinemaPython
-    ParaView::CinemaReader)
-else ()
-  list(APPEND paraview_rejected_modules
-    ParaView::CinemaReader)
-endif()
-
-if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_BUILD_TESTING)
+if (PARAVIEW_USE_PYTHON AND PARAVIEW_BUILD_TESTING)
   # testing needs Python interpreter i.e. `PYTHON_EXECUTABLE` without which
   # our `find_python_module` checks to determine which tests to add or exclude
   # will fail. We find it here.
   find_package(PythonInterp "${PARAVIEW_PYTHON_VERSION}" QUIET)
   mark_as_advanced(PYTHON_EXECUTABLE)
+  include(FindPythonModules)
 endif()
-
-if (PARAVIEW_BUILD_QT_GUI)
-  list(APPEND paraview_requested_modules
-    ParaView::pqApplicationComponents
-    ParaView::pqComponents
-    ParaView::pqCore)
-  if (PARAVIEW_ENABLE_PYTHON)
-    list(APPEND paraview_requested_modules
-      ParaView::pqPython)
-  endif ()
-else ()
-  list(APPEND paraview_rejected_modules
-    ParaView::pqApplicationComponents
-    ParaView::pqComponents
-    ParaView::pqCore
-    ParaView::pqWidgets
-    ParaView::qttesting
-    VTK::GUISupportQt)
-endif ()
-
-if (PARAVIEW_USE_MPI)
-  list(APPEND paraview_requested_modules
-    VTK::FiltersParallelFlowPaths
-    VTK::FiltersParallelGeometry
-    VTK::FiltersParallelMPI
-    # Required because of ParaView::VTKExtensionsDefault having an optional dependency.
-    VTK::IOMPIImage
-    VTK::IOParallelLSDyna
-    VTK::IOParallelNetCDF
-    VTK::ParallelMPI
-    ParaView::VTKExtensionsDefaultParallel
-    ParaView::icet)
-else ()
-  list(APPEND paraview_rejected_modules
-    VTK::mpi)
-endif ()
-
-if (PARAVIEW_USE_MPI AND PARAVIEW_ENABLE_PYTHON)
-  list(APPEND paraview_requested_modules
-    VTK::ParallelMPI4Py)
-else ()
-  list(APPEND paraview_rejected_modules
-    )
-endif()
-
-if (PARAVIEW_USE_VTKM)
-  list(APPEND paraview_requested_modules
-    VTK::AcceleratorsVTKm)
-endif ()
-
-if (PARAVIEW_USE_RAYTRACING)
-  list(APPEND paraview_requested_modules
-    VTK::RenderingRayTracing)
-endif ()
-
-if (PARAVIEW_ENABLE_NVPIPE)
-  list(APPEND paraview_requested_modules
-    ParaView::nvpipe)
-else ()
-  list(APPEND paraview_rejected_modules
-    ParaView::nvpipe)
-endif ()
-
-if (PARAVIEW_ENABLE_GDAL)
-  list(APPEND paraview_requested_modules
-    VTK::IOGDAL)
-endif ()
-
-if (PARAVIEW_ENABLE_LAS)
-  list(APPEND paraview_requested_modules
-    VTK::IOLAS)
-endif ()
-
-if (PARAVIEW_ENABLE_OPENTURNS)
-  list(APPEND paraview_requested_modules
-    VTK::FiltersOpenTURNS)
-endif ()
-
-if (PARAVIEW_ENABLE_PDAL)
-  list(APPEND paraview_requested_modules
-    VTK::IOPDAL)
-endif ()
-
-if (PARAVIEW_ENABLE_MOTIONFX)
-  list(APPEND paraview_requested_modules
-    VTK::IOMotionFX)
-endif ()
 
 set(use_vtk_remote_modules OFF)
 if (PARAVIEW_ENABLE_MOMENTINVARIANTS)
-  list(APPEND paraview_requested_modules
-    VTK::MomentInvariants)
-  if (PARAVIEW_USE_MPI)
-    list(APPEND paraview_requested_modules
-      VTK::ParallelMomentInvariants)
-  endif()
   set(use_vtk_remote_modules ON)
 endif ()
 
-if (PARAVIEW_ENABLE_VISITBRIDGE)
-  list(APPEND paraview_requested_modules
-    ParaView::IOVisItBridge
-    ParaView::VisItLib)
-else ()
-  list(APPEND paraview_rejected_modules
-    ParaView::IOVisItBridge
-    ParaView::VisItLib)
-endif ()
-
-if (PARAVIEW_ENABLE_XDMF2)
-  list(APPEND paraview_requested_modules
-    VTK::IOXdmf2)
-endif ()
-
-if (PARAVIEW_ENABLE_XDMF3)
-  list(APPEND paraview_requested_modules
-    VTK::IOXdmf3)
-endif ()
-
-if (PARAVIEW_ENABLE_ADIOS2)
-  list(APPEND paraview_requested_modules
-    VTK::IOADIOS2)
-endif ()
-
-if (PARAVIEW_ENABLE_FFMPEG)
-  list(APPEND paraview_requested_modules
-    VTK::IOFFMPEG)
-endif ()
-
-if (PARAVIEW_USE_ICE_T)
-  list(APPEND paraview_requested_modules
-    ParaView::icet)
-endif ()
-
-if (PARAVIEW_ENABLE_COSMOTOOLS)
-  list(APPEND paraview_requested_modules
-    ParaView::VTKExtensionsCosmoTools)
-else ()
-  list(APPEND paraview_rejected_modules
-    ParaView::VTKExtensionsCosmoTools)
-endif ()
-
-if (PARAVIEW_ENABLE_CATALYST)
-  list(APPEND paraview_requested_modules
-    ParaView::Catalyst)
-
-  if (PARAVIEW_ENABLE_PYTHON)
-    list(APPEND paraview_requested_modules
-      ParaView::PythonCatalyst)
-  endif ()
-
-  if (BUILD_TESTING)
-    list(APPEND paraview_requested_modules
-      ParaView::CatalystTestDriver)
-  endif ()
-
-  # When Catalyst is enabled, Fortran is optionally needed. Hence we enable
-  # Fortran at the top level itself. When individual module called
-  # enable_language(...), it failed during first cmake configure but worked o
-  # subsequent. enable_language(... OPTIONAL) overcomes that issue altogether.
-
-  if (NOT WIN32)
-    # Theoretically, CheckFortran should not be needed, but it
-    # enable_language(OPTIONAL) fails with Ninja generator.
-    include(CheckFortran)
-    check_fortran_support()
-    if (CMAKE_Fortran_COMPILER)
-      enable_language(Fortran OPTIONAL)
-    endif ()
+# For Catalyst, Fortran is optionally needed. Hence we enable
+# Fortran at the top level itself. When individual module called
+# enable_language(...), it failed during first cmake configure but worked o
+# subsequent. enable_language(... OPTIONAL) overcomes that issue altogether.
+if (NOT WIN32)
+  # Theoretically, CheckFortran should not be needed, but it
+  # enable_language(OPTIONAL) fails with Ninja generator.
+  include(CheckFortran)
+  check_fortran_support()
+  if (CMAKE_Fortran_COMPILER)
+    enable_language(Fortran OPTIONAL)
   endif ()
 endif ()
-
-if (PARAVIEW_BUILD_TESTING)
-  list(APPEND paraview_requested_modules
-    ParaView::smTestDriver)
-endif ()
-
-list(APPEND paraview_requested_modules
-  ParaView::Animation
-  ParaView::ProcessXML
-  ParaView::ServerManagerApplication
-  ParaView::ServerManagerDefault
-  ParaView::VTKExtensionsCGNSReader
-  ParaView::VTKExtensionsCGNSWriter
-  ParaView::VTKExtensionsPoints
-  ParaView::WrapClientServer
-  VTK::FiltersFlowPaths
-  VTK::FiltersParallelDIY2
-  VTK::FiltersParallelVerdict
-  VTK::FiltersTexture
-  VTK::IOAMR
-  VTK::IOAsynchronous # needed for cinema, but no harm adding always.
-  VTK::IOH5part
-  VTK::IOParallelLSDyna
-  VTK::IOSegY
-  VTK::IOCityGML
-  VTK::IOTecplotTable
-  VTK::IOTRUCHAS
-  VTK::IOVeraOut
-  VTK::IOVPIC
-  )
-
-if (PARAVIEW_ENABLE_WEB)
-  list(APPEND paraview_requested_modules
-    ParaView::PVWebCore
-    ParaView::PVWebPython
-    ParaView::PVWebExporter
-    VTK::WebCore
-    VTK::WebPython
-  )
-  if (PARAVIEW_PYTHON_VERSION STREQUAL "2")
-    list(APPEND paraview_requested_modules
-      ParaView::PVWebPython2
-    )
-  else ()
-    list(APPEND paraview_rejected_modules
-      ParaView::PVWebPython2
-    )
-  endif ()
-else()
-  list(APPEND paraview_rejected_modules
-    VTK::WebCore
-  )
-endif ()
-
-if (paraview_requested_modules)
-  list(REMOVE_DUPLICATES paraview_requested_modules)
-endif ()
-
-option(PARAVIEW_BUILD_ALL_MODULES "Build all modules by default" OFF)
-mark_as_advanced(PARAVIEW_BUILD_ALL_MODULES)
 
 if (PARAVIEW_USE_EXTERNAL_VTK)
   find_package(VTK REQUIRED)
@@ -601,6 +220,7 @@ else ()
     "${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake")
   include(vtkCMakeBackports)
   include(vtkModule)
+  include(vtkModuleDebugging)
   include(vtkEncodeString)
   include(vtkObjectFactory)
   include(vtkExternalData)
@@ -608,7 +228,7 @@ else ()
   set(VTK_VERSION
       "${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION}")
 
-  if (PARAVIEW_ENABLE_PYTHON)
+  if (PARAVIEW_USE_PYTHON)
     include(vtkModuleWrapPython)
   endif ()
 endif ()
@@ -666,16 +286,16 @@ paraview_plugin_scan(
   PROVIDES_PLUGINS  paraview_plugins
   REQUIRES_MODULES  paraview_plugin_required_modules)
 
-set(_vtk_module_group_default_ParaViewCore "WANT")
-set(_vtk_module_group_default_ParaViewRendering "WANT")
-
 set(paraview_source_directories
-  "${CMAKE_CURRENT_SOURCE_DIR}/CoProcessing"
-  "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewCore"
+  "${CMAKE_CURRENT_SOURCE_DIR}/Kits"
+  "${CMAKE_CURRENT_SOURCE_DIR}/Clients"
   "${CMAKE_CURRENT_SOURCE_DIR}/Qt"
+  "${CMAKE_CURRENT_SOURCE_DIR}/VTKExtensions"
+  "${CMAKE_CURRENT_SOURCE_DIR}/Web"
+  "${CMAKE_CURRENT_SOURCE_DIR}/Remoting"
   "${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty"
-  "${CMAKE_CURRENT_SOURCE_DIR}/Utilities"
-  "${CMAKE_CURRENT_SOURCE_DIR}/Web")
+  "${CMAKE_CURRENT_SOURCE_DIR}/Utilities")
+
 vtk_module_find_modules(paraview_module_files ${paraview_source_directories})
 vtk_module_find_kits(paraview_kit_files ${paraview_source_directories})
 vtk_module_scan(
@@ -698,6 +318,11 @@ foreach (paraview_module IN LISTS paraview_unrecognized_modules)
       "${paraview_module}")
   endif ()
 endforeach ()
+
+if (paraview_unrecognized_paraview_modules)
+  list(REMOVE_ITEM paraview_unrecognized_paraview_modules ${paraview_rejected_modules})
+endif()
+
 if (paraview_unrecognized_paraview_modules)
   message(FATAL_ERROR
     "The following modules were requested or required, but not found: "
@@ -743,7 +368,7 @@ if (PARAVIEW_USE_EXTERNAL_VTK)
       "${paraview_required_modules};${paraview_unrecognized_modules}.")
   endif ()
 
-  if (PARAVIEW_ENABLE_PYTHON)
+  if (PARAVIEW_USE_PYTHON)
     find_package("Python${PARAVIEW_PYTHON_VERSION}" QUIET REQUIRED COMPONENTS Interpreter)
     set(PYTHON_VERSION_MAJOR "${Python${PARAVIEW_PYTHON_VERSION}_VERSION_MAJOR}")
     set(PYTHON_VERSION_MINOR "${Python${PARAVIEW_PYTHON_VERSION}_VERSION_MINOR}")
@@ -769,8 +394,6 @@ else ()
       "${vtk_module}")
   endforeach ()
 
-  cmake_dependent_option(PARAVIEW_BUILD_VTK_TESTING "" OFF
-    "PARAVIEW_BUILD_TESTING" OFF)
   set(vtk_enable_tests "OFF")
   if (PARAVIEW_BUILD_VTK_TESTING)
     set(vtk_enable_tests "${PARAVIEW_BUILD_TESTING}")
@@ -783,7 +406,7 @@ else ()
   set(VTK_BUILD_SHARED_LIBS "${PARAVIEW_BUILD_SHARED_LIBS}")
 
   # Forward Python option to VTK.
-  set(VTK_WRAP_PYTHON "${PARAVIEW_ENABLE_PYTHON}")
+  set(VTK_WRAP_PYTHON "${PARAVIEW_USE_PYTHON}")
 
   # Forward MPI option to VTK.
   set(VTK_USE_MPI "${PARAVIEW_USE_MPI}")
@@ -791,10 +414,7 @@ else ()
   set(VTK_USE_CUDA "${PARAVIEW_USE_CUDA}")
 
   # Forward logging option to VTK.
-  set(VTK_ENABLE_LOGGING "${PARAVIEW_ENABLE_LOGGING}")
-  if (PARAVIEW_ENABLE_LOGGING)
-    list(APPEND vtk_requested_modules VTK::loguru)
-  endif()
+  set(VTK_ENABLE_LOGGING ON)
 
   if (use_vtk_remote_modules)
     if (PARAVIEW_ENABLE_MOMENTINVARIANTS)
@@ -823,13 +443,16 @@ else ()
     WANT_BY_DEFAULT     OFF
     ENABLE_TESTS        "${vtk_enable_tests}")
 
+  if (vtk_unrecognized_modules AND vtk_rejected_modules)
+    list(REMOVE_ITEM vtk_unrecognized_modules ${vtk_rejected_modules})
+  endif()
   if (vtk_required_modules OR vtk_unrecognized_modules)
     message(FATAL_ERROR
       "The following modules were requested or required, but not found: "
       "${vtk_required_modules};${vtk_unrecognized_modules}.")
   endif ()
 
-  if (PARAVIEW_ENABLE_PYTHON)
+  if (PARAVIEW_USE_PYTHON)
     find_package("Python${PARAVIEW_PYTHON_VERSION}" QUIET REQUIRED COMPONENTS Interpreter)
     set(PYTHON_VERSION_MAJOR "${Python${PARAVIEW_PYTHON_VERSION}_VERSION_MAJOR}")
     set(PYTHON_VERSION_MINOR "${Python${PARAVIEW_PYTHON_VERSION}_VERSION_MINOR}")
@@ -843,13 +466,13 @@ else ()
   set(VTK_INSTALL_PYTHON_EXES OFF)
 
   cmake_dependent_option(VTK_NO_PYTHON_THREADS "Disable Python Threads support" ON
-    "PARAVIEW_ENABLE_PYTHON" OFF)
+    "PARAVIEW_USE_PYTHON" OFF)
   mark_as_advanced(VTK_NO_PYTHON_THREADS)
   cmake_dependent_option(VTK_PYTHON_FULL_THREADSAFE "Wrap all Python calls with the GIL" ON
     "NOT VTK_NO_PYTHON_THREADS" OFF)
   mark_as_advanced(VTK_PYTHON_FULL_THREADSAFE)
   cmake_dependent_option(VTK_USE_TK "Build VTK with Tk support" OFF
-    "PARAVIEW_ENABLE_PYTHON" OFF)
+    "PARAVIEW_USE_PYTHON" OFF)
 
   vtk_module_build(
     MODULES             ${vtk_modules}
@@ -864,8 +487,8 @@ else ()
     VERSION             "${PARAVIEW_VERSION}"
     SOVERSION           "1"
     TEST_DATA_TARGET    ParaViewData
-    BUILD_WITH_KITS     "${PARAVIEW_ENABLE_KITS}"
-    USE_EXTERNAL        "${PARAVIEW_USE_EXTERNAL}"
+    BUILD_WITH_KITS     "${PARAVIEW_BUILD_WITH_KITS}"
+    USE_EXTERNAL        "${PARAVIEW_BUILD_WITH_EXTERNAL}"
     TEST_INPUT_DATA_DIRECTORY   "${CMAKE_CURRENT_SOURCE_DIR}/VTK/Testing"
     TEST_OUTPUT_DATA_DIRECTORY  "${CMAKE_CURRENT_BINARY_DIR}/ExternalData/VTK/Testing")
 
@@ -908,8 +531,8 @@ vtk_module_build(
   VERSION             "${PARAVIEW_VERSION}"
   SOVERSION           "1"
   TEST_DATA_TARGET    ParaViewData
-  BUILD_WITH_KITS     "${PARAVIEW_ENABLE_KITS}"
-  USE_EXTERNAL        "${PARAVIEW_USE_EXTERNAL}"
+  BUILD_WITH_KITS     "${PARAVIEW_BUILD_WITH_KITS}"
+  USE_EXTERNAL        "${PARAVIEW_BUILD_WITH_EXTERNAL}"
   TEST_INPUT_DATA_DIRECTORY   "${paraview_test_data_directory_input}"
   TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}")
 
@@ -920,6 +543,10 @@ vtk_module_json(
 vtk_module_json(
   MODULES "${paraview_modules}"
   OUTPUT "paraview-modules.json")
+
+list(LENGTH vtk_modules vtk_modules_len)
+list(LENGTH paraview_modules paraview_modules_len)
+message(STATUS "Enabled modules: VTK(${vtk_modules_len}), ParaView(${paraview_modules_len})")
 
 paraview_plugin_build(
   HEADERS_DESTINATION   "${CMAKE_INSTALL_INCLUDEDIR}/paraview${paraview_version_suffix}"
@@ -951,7 +578,7 @@ paraview_server_manager_process(
   XML_FILES paraview_server_manager_files
   INSTALL_EXPORT ParaView)
 
-if (PARAVIEW_ENABLE_PYTHON)
+if (PARAVIEW_USE_PYTHON)
   if (PARAVIEW_USE_EXTERNAL_VTK)
     # TODO: Check if VTK is already wrapped in Python.
     # Error out?
@@ -1025,12 +652,9 @@ if (PARAVIEW_ENABLE_WEB)
     @ONLY)
 endif ()
 
-if (PARAVIEW_ENABLE_COMMANDLINE_TOOLS)
-  add_subdirectory(CommandLineExecutables)
-endif ()
-add_subdirectory(Applications)
+add_subdirectory(Clients)
 
-if (PARAVIEW_ENABLE_PYTHON)
+if (PARAVIEW_USE_PYTHON)
   add_subdirectory(Wrapping/Python)
 endif ()
 
@@ -1126,7 +750,7 @@ endif()
 #------------------------------------------------------------------------------
 # Test to check that we can process all of the Catalyst editions
 #------------------------------------------------------------------------------
-if (BUILD_TESTING AND PARAVIEW_ENABLE_PYTHON AND UNIX AND NOT APPLE)
+if (BUILD_TESTING AND PARAVIEW_USE_PYTHON AND UNIX AND NOT APPLE)
 if (FALSE) # XXX(FIXME)
   # disabling till we Catalyst editions are fixed post modularization
   add_test( NAME GenerateCatalystEditions
@@ -1156,6 +780,6 @@ install(
   COMPONENT   "license")
 
 #-----------------------------------------------------------------------------
-if (PARAVIEW_ENABLE_EXAMPLES)
+if (PARAVIEW_BUILD_EXAMPLES)
   add_subdirectory(Examples)
 endif ()

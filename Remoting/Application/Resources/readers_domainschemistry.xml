@@ -1,0 +1,151 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkXYZMolReader2"
+                 label="XYZ Reader"
+                 name="xyzreader">
+      <Documentation long_help="Reads XYZ molecular data files into a polygonal dataset."
+                     short_help="Read XYZ molecular data files.">The XYZ reader
+                     reads XYZ molecular data files. The expected file
+                     extension is .xyz. The output of this reader is a
+                     vtkMolecule</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the XYZ
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="xyz"
+                       file_description="XMol Molecule Files" />
+      </Hints>
+      <!-- End xyzreader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkGaussianCubeReader2"
+                 label="Gaussian Cube Reader"
+                 name="gaussiancubereader">
+      <Documentation long_help="Produce a vtkMolecule by reading a Gaussian Cube file."
+                     short_help="Read Gaussian Cube data files.">The Gaussian
+                     Cube reader produces vtkMolecule data by reading data files
+                     produced by the Gaussian software package. The expected
+                     file extension is .cube.</Documentation>
+      <OutputPort index="0"
+                  name="Molecule" />
+      <OutputPort index="1"
+                  name="Gridded Data" />
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the Gaussian
+        Cube reader.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="cube"
+                       file_description="Gaussian Cube Files" />
+      </Hints>
+      <!-- End gaussiancubereader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkCMLMoleculeReader"
+                 label="CML Molecule Reader"
+                 name="CMLMoleculeReader">
+      <Documentation short_help="A reader for Chemical Markup Language (CML)">
+        This is a reader for Chemical Markup Language (CML) which
+        describes chemical information using XML.
+      </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the CML file
+        name</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="cml"
+                       file_description="CML" />
+      </Hints>
+      <!-- End CMLMoleculeReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkVASPAnimationReader"
+                 label="VASP Animation Reader"
+                 name="VASPAnimationReader">
+      <Documentation long_help="Reads a VASP NPT_Z_ANIMATE.out file."
+                     short_help="Read a VASP animation file.">
+      </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>The name of the file to load.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>
+          Reports time values to the GUI.
+        </Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="out"
+                       file_description="VASP Animation Files" />
+      </Hints>
+      <!-- End VASPAnimationReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkVASPTessellationReader"
+                 label="VASP Tessellation Reader"
+                 name="VASPTessellationReader">
+      <Documentation long_help="Reads a VASP NPT_Z_TESSELLATE.out file."
+                     short_help="Read a VASP tessellation file.">
+      </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>The name of the file to load.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>
+          Reports time values to the GUI.
+        </Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="out"
+                       file_description="VASP Tessellation Files" />
+      </Hints>
+      <OutputPort index="0" name="Molecule" />
+      <OutputPort index="1" name="Voronoi Tessellation" />
+      <!-- End VASPTessellationReader -->
+    </SourceProxy>
+
+    <!-- end of "sources" -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

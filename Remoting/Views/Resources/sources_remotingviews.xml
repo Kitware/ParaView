@@ -1,0 +1,23 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVLogoSource" name="LogoSource" label="Logo">
+      <ProxyProperty command="SetTexture"
+                     name="Texture"
+                     panel_widget="texture_selector"
+                     null_on_empty="1" >
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <Hints>
+        <Visibility replace_input="0" />
+        <OutputPort index="0"
+                    name="Output-0"
+                    type="logo" />
+      </Hints>
+      <!-- End of LogoSource -->
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

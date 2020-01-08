@@ -15,7 +15,7 @@ from vtkmodules.numpy_interface.algorithms import *
     # -- this will import vtkMultiProcessController and vtkMPI4PyCommunicator
 
 from paraview.vtk import vtkDoubleArray, vtkSelectionNode, vtkSelection, vtkStreamingDemandDrivenPipeline
-from paraview.modules import vtkPVClientServerCorePython
+from paraview.modules import vtkPVVTKExtensionsFiltersPython
 
 import sys
 if sys.version_info >= (3,):

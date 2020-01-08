@@ -1,0 +1,82 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="source">
+    <!--  VERAout Reader -->
+    <SourceProxy
+      name="vtkVeraOutReader"
+      class="vtkVeraOutReader"
+      label="VERA OUT Reader" >
+      <Documentation
+        long_help="Reads VERA OUT HDF5 data."
+        short_help="Reads VERA OUT HDF5 data."
+      />
+      <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1"
+      >
+        <FileListDomain name="files" />
+        <Documentation>
+          This property specifies the HDF5 file name for the VERA OUT reader.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="CellArrayInfo"
+        command="GetCellDataArraySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="CellArrayStatus"
+        command="GetCellDataArraySelection"
+        information_property="CellArrayInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the cell arrays to read load.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="FieldArrayInfo"
+        command="GetFieldDataArraySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="FieldArrayStatus"
+        command="GetFieldDataArraySelection"
+        information_property="FieldArrayInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="FieldArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the field arrays to read load.</Documentation>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory
+          extensions="h5"
+          file_description="VERA OUT Reader"
+        />
+      </Hints>
+
+      <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1"
+      >
+        <TimeStepsInformationHelper/>
+      </DoubleVectorProperty>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

@@ -1,0 +1,18 @@
+NAME
+  ParaView::RemotingSettings
+GROUPS
+  PARAVIEW_CORE
+LIBRARY_NAME
+  vtkRemotingSettings
+DEPENDS
+  VTK::CommonCore
+KIT
+  ParaView::ServerManagerKit
+PRIVATE_DEPENDS
+  ParaView::RemotingServerManager
+  VTK::vtksys
+OPTIONAL_DEPENDS
+  ParaView::RemotingAnimation
+  ParaView::RemotingViews
+TEST_LABELS
+  ParaView

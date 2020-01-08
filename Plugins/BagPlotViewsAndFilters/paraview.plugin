@@ -3,7 +3,12 @@ NAME
 DESCRIPTION
   Bag Plot related views and filters
 REQUIRES_MODULES
-  VTK::CommonExecutionModel
+  ParaView::RemotingViews
+  ParaView::VTKExtensionsFiltersRendering
+  ParaView::VTKExtensionsFiltersStatistics
+  ParaView::VTKExtensionsMisc
   VTK::CommonCore
   VTK::CommonDataModel
+  VTK::CommonExecutionModel
   VTK::FiltersCore
+  VTK::FiltersExtraction

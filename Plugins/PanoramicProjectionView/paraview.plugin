@@ -3,6 +3,6 @@ NAME
 DESCRIPTION
   Add a panoramic projection 3D view
 REQUIRES_MODULES
-  ParaView::ClientServerCoreRendering
+  ParaView::RemotingViews
   VTK::CommonCore
   VTK::RenderingCore

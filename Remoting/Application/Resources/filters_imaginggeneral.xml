@@ -1,0 +1,158 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkImageGradient"
+                 label="Gradient"
+                 name="Gradient">
+      <Documentation long_help="This filter computes gradient vectors for an image/volume."
+                     short_help="Compute gradient vectors.">The Gradient filter
+                     computes the gradient vector at each point in an image or
+                     volume. This filter uses central differences to compute
+                     the gradients. The Gradient filter operates on uniform
+                     rectilinear (image) data and produces image data
+                     output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array"
+                          number_of_components="1" />
+        <Documentation>This property specifies the input to the Gradient
+        filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputScalars"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property lists the name of the array from which to
+        compute the gradient.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetDimensionality"
+                         default_values="3"
+                         name="Dimensionality"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Two"
+                 value="2" />
+          <Entry text="Three"
+                 value="3" />
+        </EnumerationDomain>
+        <Documentation>This property indicates whether to compute the gradient
+        in two dimensions or in three. If the gradient is being computed in two
+        dimensions, the X and Y dimensions are used.</Documentation>
+      </IntVectorProperty>
+      <!-- End Gradient -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkImageGradientMagnitude"
+                 label="Gradient Magnitude"
+                 name="GradientMagnitude">
+      <Documentation long_help="Compute the magnitude of the gradient vectors for an image/volume."
+                     short_help="Compute the gradient magnitude.">The Gradient
+                     Magnitude filter computes the magnitude of the gradient
+                     vector at each point in an image or volume. This filter
+                     operates on uniform rectilinear (image) data and produces
+                     image data output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array"
+                          number_of_components="1" />
+        <Documentation>This property specifies the input to the Gradient
+        Magnitude filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetDimensionality"
+                         default_values="3"
+                         name="Dimensionality"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Two"
+                 value="2" />
+          <Entry text="Three"
+                 value="3" />
+        </EnumerationDomain>
+        <Documentation>This property indicates whether to compute the gradient
+        magnitude in two or three dimensions. If computing the gradient
+        magnitude in 2D, the gradients in X and Y are used for computing the
+        gradient magnitude.</Documentation>
+      </IntVectorProperty>
+      <!-- End Gradient -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkImageMedian3D"
+                 name="Median">
+      <Documentation long_help="Compute the median scalar values in a specified neighborhood for image/volume datasets."
+                     short_help="Compute median values in a given neighborhood.">
+                     The Median filter operates on uniform rectilinear (image
+                     or volume) data and produces uniform rectilinear output.
+                     It replaces the scalar value at each pixel / voxel with
+                     the median scalar value in the specified surrounding
+                     neighborhood. Since the median operation removes outliers,
+                     this filter is useful for removing high-intensity,
+                     low-probability noise (shot noise).</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array"
+                          number_of_components="1" />
+        <Documentation>This property specifies the input to the Median
+        filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputScalars"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>The value of this property lists the name of the scalar
+        array to use in computing the median.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetKernelSize"
+                         default_values="1 1 1"
+                         name="KernelSize"
+                         number_of_elements="3">
+        <IntRangeDomain name="range" />
+        <Documentation>The value of this property specifies the number of
+        pixels/voxels in each dimension to use in computing the median to
+        assign to each pixel/voxel. If the kernel size in a particular
+        dimension is 1, then the median will not be computed in that
+        direction.</Documentation>
+      </IntVectorProperty>
+      <!-- End Median -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

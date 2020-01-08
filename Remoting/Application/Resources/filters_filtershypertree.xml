@@ -1,0 +1,176 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkHyperTreeGridAxisReflection"
+                 name="HyperTreeGridAxisReflection"
+                 label="Hyper Tree Grid - Axis Reflection">
+      <Documentation short_help="Reflect an HTG across an axis-aligned plane.">
+        This filter reflect the cells of a hyper tree grid with respect to
+        one of the planes parallel to the bounding box of the data set.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="PlaneNormal"
+                         command="SetPlane"
+                         number_of_elements="1"
+                         default_values="0">
+          <EnumerationDomain name="enum">
+            <Entry text="X Axis" value="6" />
+            <Entry text="Y Axis" value="7" />
+            <Entry text="Z Axis" value="8" />
+          </EnumerationDomain>
+        <Documentation>Axis to use as the normal to the reflection plane.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="PlanePosition"
+                            command="SetCenter"
+                            number_of_elements="1"
+                            default_values="0.0">
+        <Documentation>Position of the reflection plane along the normal axis.</Documentation>
+      </DoubleVectorProperty>
+      <!-- End vtkHyperTreeGridAxisReflection -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkHyperTreeGridCellCenters"
+                 name="HyperTreeGridCellCenters"
+                 label="Hyper Tree Grid - Cell Centers">
+      <Documentation short_help="Generate points at leaf node centers.">
+        This filter generates output points at the center of the leaf
+        cells in the hyper tree grid.
+        These points can be used for placing glyphs or labeling.
+        The cell attributes will be associated with the points in the output.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="CreateVertexCells"
+                         command="SetVertexCells"
+                         default_values="0"
+                         number_of_elements="1">
+        <Documentation>
+          If enabled, vertex cells will be added to the output dataset. This
+          is useful for visualizing the output points, which are not rendered
+          otherwise.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- End vtkHyperTreeGridCellCenters -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkHyperTreeGridDepthLimiter"
+                 name="HyperTreeGridDepthLimiter"
+                 label="Hyper Tree Grid - Depth Limiter">
+      <Documentation short_help="Limit HTG nodes to a maximum depth">
+        Extract all levels down to a specified depth from a hyper tree grid.
+        If the required depth is greater or equal to the maximum level of the
+        input grid, then the output is identical.
+        Note that when a material mask is present, the geometry extent of the
+        output grid is guaranteed to contain that of the input tree, but the
+        former might be strictly larger than the latter. This is not a bug
+        but an expected behavior of which the user should be aware.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="SetDepth"
+                         command="SetDepth"
+                         default_values="0"
+                         number_of_elements="1">
+        <Documentation>
+          Maximum depth to which the output grid should be limited.
+        </Documentation>
+        <IntRangeDomain min="0"
+                        name="range" />
+      </IntVectorProperty>
+      <!-- End vtkHyperTreeGridDepthLimiter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkHyperTreeGridGeometry"
+                 name="HyperTreeGridGeometry"
+                 label="Hyper Tree Grid - Geometry Filter">
+      <Documentation short_help="Generate external surface of a HTG.">
+        Generate PolyData representing the external surface of a HTG.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+      <!-- End vtkHyperTreeGridGeometry -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkHyperTreeGridToDualGrid"
+                 label="HyperTreeGrid To Dual Grid"
+                 name="HyperTreeGridToDualGrid">
+      <Documentation long_help="Convert HyperTreeGrid to the dual UnstructuredGrid."
+                     short_help="Convert HyperTreeGrid to the dual UnstructuredGrid.">
+                     This filter converts vtkHyperTreeGrid data to vtkUnstructuredGrid, using the dual grid. The converted output consumes much more memory but is compatible with most of the standard filters.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the converter.</Documentation>
+      </InputProperty>
+      <!-- End vtkHyperTreeGridToDualGrid -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkHyperTreeGridToUnstructuredGrid"
+                 label="HyperTreeGrid To UnstructuredGrid"
+                 name="HyperTreeGridToUnstructuredGrid">
+      <Documentation long_help="Convert HyperTreeGrid to UnstructuredGrid."
+                     short_help="Convert HyperTreeGrid to UnstructuredGrid.">
+                     This filter converts vtkHyperTreeGrid data to vtkUnstructuredGrid. The converted output consumes much more memory but is compatible with most of the standard filters.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the converter.</Documentation>
+      </InputProperty>
+      <!-- End vtkHyperTreeGridToUnstructuredGrid -->
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

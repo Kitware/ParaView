@@ -1,0 +1,170 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="writers">
+
+    <!-- ================================================================= -->
+    <WriterProxy class="vtkMetaImageWriter"
+                 name="MetaImageWriter">
+      <Documentation short_help="Write a binary UNC meta image data.">Writer to
+      write a binary UNC meta image data. This is a fairly simple yet powerful
+      format consisting of a text header and a binary data section. MetaImage
+      headers are expected to have extension: ".mha" or ".mhd"</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <WriterFactory extensions="mhd"
+                       file_description="Meta Image Files" />
+      </Hints>
+      <!-- End of MetaImageWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy class="vtkPNGWriter"
+                 name="PNGWriter">
+      <Documentation short_help="Write image data as a PNG file.">Writer to
+      write image data as a PNG file. It supports 1 to 4 component data of
+      unsigned char or unsigned short.
+      This Writer can also generate a stack of images when the FileName is in
+      the form of /path/file_%03d.png and that the input data is a 3D image
+      data.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFilePattern"
+                            name="FileName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <WriterFactory extensions="png"
+                       file_description="PNG Image Files" />
+      </Hints>
+      <!-- End of PNGWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy class="vtkTIFFWriter"
+                 name="TIFFWriter">
+      <Documentation short_help="Write image data as a TIFF file.">Writer to
+      write image data as a TIFF file.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to be
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFilePattern"
+                            name="FileName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <WriterFactory extensions="tiff"
+                       file_description="TIFF Image Files" />
+      </Hints>
+      <!-- End of TIFFWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy class="vtkJPEGWriter"
+                 name="JPEGWriter">
+      <Documentation short_help="Write image data as a JPEG file.">
+      Writer to write image data as a JPEG file. It supports 1 to 3 component
+      data of unsigned char or unsigned short.
+      This Writer can also generate a stack of images when the FileName is in
+      the form of /path/file_%03d.jpg and that the input data is a 3D image
+      data.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFilePattern"
+                            name="FileName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <WriterFactory extensions="jpg"
+                       file_description="JPEG Image Files" />
+      </Hints>
+      <!-- End of JPEGWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy class="vtkJSONImageWriter"
+                 name="JSONImageWriter">
+      <Documentation short_help="Write image data as a JSON file."/>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetArrayName"
+                            name="ArrayName"
+                            number_of_elements="1">
+        <Documentation>The name of the field to export. If Empty all fields will be saved.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetSlice"
+                            name="Slice"
+                            default_values="-1"
+                            number_of_elements="1">
+        <Documentation>Write only one slice if slice >= 0</Documentation>
+        <IntRangeDomain min="-1"
+                        name="range" />
+      </IntVectorProperty>
+      <Hints>
+        <WriterFactory extensions="json"
+                       file_description="json Image Files" />
+      </Hints>
+      <!-- End of vtkJSONImageWriter -->
+    </WriterProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

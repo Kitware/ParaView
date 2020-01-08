@@ -1,0 +1,30 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkComputeQuartiles"
+                 label="Compute Quartiles"
+                 name="ComputeQuartiles">
+      <Documentation long_help="Compute the quartiles table from a dataset or table."
+                     short_help="Compute the quartiles table from a dataset or table.">
+                     </Documentation>
+      <InputProperty command="SetInputConnection"
+                    name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the
+        filter.</Documentation>
+      </InputProperty>
+      <!-- View can be used to specify the preferred view for the proxy -->
+      <Hints>
+        <View type="BoxChartView" />
+        <Plotable />
+      </Hints>
+      <!-- End ComputeQuartiles -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

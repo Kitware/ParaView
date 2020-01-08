@@ -53,27 +53,31 @@ import paraview, re, os, os.path, types, sys
 from paraview import vtk
 from paraview import _backwardscompatibilityhelper as _bc
 
-from paraview.modules.vtkPVServerImplementationCore import *
-from paraview.modules.vtkPVClientServerCoreCore import *
-from paraview.modules.vtkPVServerManagerCore import *
+from paraview.modules.vtkPVVTKExtensionsCore import *
+from paraview.modules.vtkRemotingCore import *
+from paraview.modules.vtkRemotingServerManager import *
+from paraview.modules.vtkRemotingSettings import *
+from paraview.modules.vtkRemotingApplication import *
 
 try:
-  from paraview.modules.vtkPVServerManagerDefault import *
-except:
-  paraview.print_error("Error: Cannot import vtkPVServerManagerDefault")
+    from paraview.modules.vtkRemotingViews import *
+except ImportError:
+    pass
+
 try:
-  from paraview.modules.vtkPVServerManagerRendering import *
-except:
-  paraview.print_error("Error: Cannot import vtkPVServerManagerRendering")
+    from paraview.modules.vtkRemotingAnimation import *
+except ImportError:
+    pass
+
 try:
-  from paraview.modules.vtkPVServerManagerApplication import *
-except:
-  paraview.print_error("Error: Cannot import vtkPVServerManagerApplication")
+    from paraview.modules.vtkRemotingExport import *
+except ImportError:
+    pass
+
 try:
-  from paraview.modules.vtkPVAnimation import *
-except:
-  paraview.print_error("Error: Cannot import vtkPVAnimation")
-from paraview.modules.vtkPVCore import *
+    from paraview.modules.vtkRemotingMisc import *
+except ImportError:
+    pass
 
 def _wrap_property(proxy, smproperty):
     """ Internal function.

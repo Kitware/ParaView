@@ -1,0 +1,163 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkImageClip"
+                 label="Crop"
+                 name="ImageClip">
+      <Documentation long_help="Efficiently extract an area/volume of interest from a 2-d image or 3-d volume."
+                     short_help="Extract a volume of interest.">The Crop filter
+                     extracts an area/volume of interest from a 2D image or a
+                     3D volume by allowing the user to specify the minimum and
+                     maximum extents of each dimension of the data. Both the
+                     input and output of this filter are uniform rectilinear
+                     data.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Crop
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetOutputWholeExtent"
+                         default_values="0 0 0 0 0 0"
+                         name="OutputWholeExtent"
+                         number_of_elements="6">
+        <ExtentDomain name="extent">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ExtentDomain>
+        <Documentation>This property gives the minimum and maximum point index
+        (extent) in each dimension for the output dataset.</Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <Visibility replace_input="0" />
+      </Hints>
+      <!-- End ImageClip -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkImageMapToColors"
+                 label="Color By Array"
+                 name="ColorByArray">
+      <Documentation long_help="This filter generate a color based image data based on a selected data scalar"
+                     short_help="This filter generate a color based image data based on a selected data scalar"/>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array"
+                          number_of_components="1" />
+      </InputProperty>
+      <ProxyProperty command="SetLookupTable"
+                     name="LookupTable">
+      </ProxyProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Color By"
+                            name="SelectInputScalars"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property specifies the name of the scalar array
+        from which we will color by.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetNaNColor"
+                         name="NaNColor"
+                         label="RGBA NaN Color"
+                         default_values="0 0 0 255"
+                         number_of_elements="4">
+        <IntRangeDomain max="255 255 255 255"
+                        min="0 0 0 0"
+                        name="range" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOutputFormat"
+                         name="OutputFormat"
+                         default_values="3"
+                         number_of_elements="1">
+                         <EnumerationDomain name="enum">
+                           <Entry text="Luminance"
+                                  value="1" />
+                           <Entry text="Luminance Alpha"
+                                  value="2" />
+                           <Entry text="RGB"
+                                  value="3" />
+                           <Entry text="RGBA"
+                                  value="4" />
+                         </EnumerationDomain>
+      </IntVectorProperty>
+      <!-- End ColorByArray -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkImageShrink3D"
+                 label="Image Shrink"
+                 name="ImageShrink">
+      <Documentation long_help="Reduce the size of an image/volume by subsampling."
+                     short_help="Subsample an image/volume.">The Image Shrink
+                     filter reduces the size of an image/volume dataset by
+                     subsampling it (i.e., extracting every nth pixel/voxel in
+                     integer multiples). The subsampling rate can be set
+                     separately for each dimension of the
+                     image/volume.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Image Shrink
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetShrinkFactors"
+                         default_values="1 1 1"
+                         name="ShrinkFactors"
+                         number_of_elements="3">
+        <IntRangeDomain max="100"
+                        min="1"
+                        name="range" />
+        <Documentation>The value of this property indicates the amount by which
+        to shrink along each axis.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAveraging"
+                         default_values="1"
+                         name="Averaging"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the value of this property is 1, an average of
+        neighborhood scalar values will be used as the output scalar value for
+        each output point. If its value is 0, only subsampling will be
+        performed, and the original scalar values at the points will be
+        retained.</Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <View type="XYChartView" />
+        <Plotable />
+      </Hints>
+      <!-- End ImageShrink -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

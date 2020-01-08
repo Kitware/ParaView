@@ -3,14 +3,12 @@ NAME
 DESCRIPTION
   OpenVR Support
 CONDITION
-  PARAVIEW_BUILD_QT_GUI
+  PARAVIEW_USE_QT
 REQUIRES_MODULES
-  ParaView::ClientServerCoreRendering
-  ParaView::Core
-  ParaView::ServerManagerCore
-  ParaView::ServerManagerRendering
-  ParaView::VTKExtensionsRendering
   ParaView::pqApplicationComponents
+  ParaView::RemotingCore
+  ParaView::RemotingServerManager
+  ParaView::RemotingViews
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::IOCore

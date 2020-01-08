@@ -144,7 +144,7 @@ set(ui_files
 set(resource_files
   Resources/pqCore.qrc)
 
-if (PARAVIEW_ENABLE_PYTHON)
+if (PARAVIEW_USE_PYTHON)
   # TODO: Split these into a separate module so that there isn't a public
   # optional dependency.
   list(APPEND classes
@@ -185,7 +185,7 @@ if (PARAVIEW_USE_QTHELP)
       Qt5::Help)
 endif ()
 
-if (PARAVIEW_ENABLE_PYTHON)
+if (PARAVIEW_USE_PYTHON)
   vtk_module_definitions(ParaView::pqCore
     PRIVATE PARAVIEW_PQCORE_ENABLE_PYTHON=1)
 else ()

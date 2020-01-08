@@ -175,17 +175,27 @@ function (paraview_server_manager_process_files)
     "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_paraview_sm_process_files_TARGET}")
   set(_paraview_sm_process_files_output
     "${_paraview_sm_process_files_output_dir}/${_paraview_sm_process_files_TARGET}_data.h")
+  set(_paraview_sm_process_files_response_file
+    "${_paraview_sm_process_files_output_dir}/${_paraview_sm_process_files_TARGET}.args")
+
+  string(REPLACE ";" "\n" _paraview_sm_process_files_input_file_content
+    "${_paraview_sm_process_files_FILES}")
+  file(GENERATE
+    OUTPUT  "${_paraview_sm_process_files_response_file}"
+    CONTENT "${_paraview_sm_process_files_input_file_content}")
+
   add_custom_command(
     OUTPUT  "${_paraview_sm_process_files_output}"
     DEPENDS ${_paraview_sm_process_files_FILES}
             "$<TARGET_FILE:ParaView::ProcessXML>"
+            "${_paraview_sm_process_files_response_file}"
     COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}
             $<TARGET_FILE:ParaView::ProcessXML>
             "${_paraview_sm_process_files_output}"
             "${_paraview_sm_process_files_TARGET}"
             "Interface"
             "GetInterfaces"
-            ${_paraview_sm_process_files_FILES}
+            "@${_paraview_sm_process_files_response_file}"
     COMMENT "Generating server manager headers for ${_paraview_sm_process_files_TARGET}.")
   add_custom_target("${_paraview_sm_process_files_TARGET}_xml_content"
     DEPENDS

@@ -7,7 +7,7 @@ set(module_tests
   VTKmThreshold.xml
 )
 
-if (PARAVIEW_BUILD_QT_GUI AND BUILD_SHARED_LIBS)
+if (PARAVIEW_USE_QT AND BUILD_SHARED_LIBS)
   paraview_add_client_tests(
     LOAD_PLUGIN "VTKmFilters"
     BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"

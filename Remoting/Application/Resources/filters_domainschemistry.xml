@@ -1,0 +1,122 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkMoleculeToLinesFilter"
+      name="MoleculeToLines"
+      label="Molecule To Lines">
+      <Documentation long_help="Convert a molecule into lines."
+        short_help="Convert a molecule into lines.">
+        Convert a molecule into lines. Each atom of the input becomes a point of the output polydata, each bond a line.
+      </Documentation>
+      <InputProperty name="Input"
+        command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMolecule"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <!-- End MoleculeToLines -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPointSetToMoleculeFilter"
+      name="PointSetToMolecule"
+      label="Convert Into Molecule">
+      <Documentation long_help="Convert a point set into a molecule."
+        short_help="Convert a point set into a molecule.">
+        Convert a point set into a molecule. Every point of the input becomes an atom
+        of the output molecule. It needs a point array containing the atomic numbers.
+      </Documentation>
+      <InputProperty name="Input"
+        command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPointSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+          name="input_array"
+          number_of_components="1"/>
+      </InputProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+        element_types="0 0 0 0 2"
+        label="Atomic Numbers"
+        name="SelectInputScalars"
+        number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+          input_domain_name="input_array"
+          name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+              name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property indicates the name of the scalar array
+          corresponding to atomic numbers.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetConvertLinesIntoBonds"
+        default_values="1"
+        name="ConvertLinesIntoBonds"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation short_help="Specify if line cells are converted into bonds."
+          long_help="Specify if line cells are converted into bonds.">
+          This property determines if the lines (cell of type VTK_LINE) are converted into bonds.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End PointSetToMolecule -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkSimpleBondPerceiver"
+                 name="ComputeMoleculeBonds"
+                 label="Compute Molecule Bonds">
+      <Documentation long_help="Compute the bonds of a molecule based on interatomic distance only."
+                     short_help="Compute the bonds of a molecule.">
+        Compute the bonds of a molecule. If the
+        interatomic distance is less than the sum of the two atom's covalent radii
+        (and a tolerance), a single bond is added.
+        This algorithm does not consider valences, hybridization, aromaticity, or
+        anything other than atomic separations. It will not produce anything other
+        than single bonds.
+      </Documentation>
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMolecule"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <DoubleVectorProperty command="SetTolerance"
+                            default_values="0.45"
+                            name="Tolerance"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="scalar_range" />
+        <Documentation short_help="Tolerance on covalent radius size">
+          This property determines the tolerance to apply on covalent radius.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetIsToleranceAbsolute"
+                         default_values="1"
+                         name="IsToleranceAbsolute"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation short_help="Specify if Tolerance is absolute or relative to radius."
+                       long_help="Specify if Tolerance is absolute (addition) or relative (multiplication) to radius.">
+          This property determines if the tolerance is absolute (value is added to radius and should be positive)
+          or not (value multiplied with radius and should be greater than 1).
+        </Documentation>
+      </IntVectorProperty>
+    <!-- End ComputeMoleculeBonds -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

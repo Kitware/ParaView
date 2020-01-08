@@ -1,0 +1,2690 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="settings">
+    <!-- ================================================================== -->
+    <SettingsProxy name="RenderViewSettings" label="Render View"
+      processes="client|dataserver|renderserver"
+      class="vtkPVRenderViewSettings">
+      <Documentation>
+        Application settings for render views.
+      </Documentation>
+
+      <IntVectorProperty name="ResolveCoincidentTopology"
+        command="SetResolveCoincidentTopology"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="advanced">
+        <Documentation>
+          Set the mode to use to overcome the OpenGL rendering issue when faces
+          coincide with lines and points.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Do nothing" value="0" />
+          <Entry text="Offset faces relative to lines and points" value="1" />
+          <Entry text="Offset lines and points relative to faces" value="2" />
+          <Entry text="Shift z-buffer when rendering lines and points" value="3" />
+        </EnumerationDomain>
+        <Hints>
+          <RestartRequired />
+        </Hints>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="PolygonOffsetParameters"
+        command="SetPolygonOffsetParameters"
+        number_of_elements="2"
+        default_values="0.0 0.0"
+        panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the polygon offset parameters to control how polygon depths are shifted
+          in the depth buffer. Change these parameters to change how coincident lines,
+          points, and polygons are resolved when rendering. The first parameter controls
+          how much the angle of the polygon relative to the camera view plane contributes
+          to the depth offset of pixels in the rendered polygon. The second parameter is
+          a constant offset to add to the depth buffer. Refer to the OpenGL manual on
+          glPolygonOffset for further details on these parameters.
+        </Documentation>
+        <Hints>
+          <RestartRequired />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="LineOffsetParameters"
+        command="SetLineOffsetParameters"
+        number_of_elements="2"
+        default_values="0.0 -4"
+        panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Parameters used the same way as the parameters in **Polygon Offset Parameters**,
+          but applied when lines are rendered.
+        </Documentation>
+        <Hints>
+          <RestartRequired />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="PointOffsetParameter"
+        command="SetPointOffsetParameter"
+        number_of_elements="1"
+        default_values="-8"
+        panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+        Specifies a constant depth offset to apply when points are rendered.
+        </Documentation>
+        <Hints>
+          <RestartRequired />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="ZShift"
+        command="SetZShift"
+        number_of_elements="1"
+        default_values="0.002"
+        panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the fraction by which to shift the z-buffer range when rendering
+          lines and points.
+        </Documentation>
+        <Hints>
+          <RestartRequired />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ResolveCoincidentTopology"
+                                   value="3" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="DepthPeeling"
+        default_values="1"
+        number_of_elements="1"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable depth-peeling to correctly render translucent polygons. May slow down
+          rendering performance.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="DepthPeelingForVolumes"
+        default_values="1"
+        number_of_elements="1"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Include volumes in the depth-peeling pass to correctly render intermixed
+          volumes with translucent polygons. May slow down rendering performance.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="DepthPeeling" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="MaximumNumberOfPeels"
+        default_values="4"
+        number_of_elements="1"
+        panel_visibility="advanced">
+        <IntRangeDomain name="range" min="0" max="10" />
+        <Documentation>
+          Set the maximum number of peels to use when depth peeling is employed.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="DepthPeeling" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="UseFXAA"
+                         default_values="1"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable FXAA antialiasing on 3D geometry.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="FXAARelativeContrastThreshold"
+                            default_values="0.125"
+                            label="Relative Contrast Threshold"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <Documentation>
+          Contrast threshold for applying FXAA to a pixel, relative to max
+          luminance. Lower values will affect more edges. Default is 0.125.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0.0625" max="0.333333333" />
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseFXAA" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <!-- The hard contrast threshold is reduced to 0.045 by default. This
+           ensures that the red arrow of the orientation axes is
+           antialiased. -->
+      <DoubleVectorProperty name="FXAAHardContrastThreshold"
+                            default_values="0.045"
+                            label="Hard Contrast Threshold"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <Documentation>
+          Hard contrast threshold for applying FXAA to a pixel. Lower values
+          will affect more edges. Default is 0.045.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0.03125" max="0.08333333" />
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseFXAA" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="FXAASubpixelBlendLimit"
+                            default_values="0.75"
+                            label="Subpixel Blend Limit"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <Documentation>
+          Maximum amount of lowpass filtering to apply to the final pixel color
+          to correct subpixel aliasing. Default value is 0.75.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0." max="1." />
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseFXAA" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="FXAASubpixelContrastThreshold"
+                            default_values="0.25"
+                            label="Subpixel Contrast Threshold"
+                            panel_visibility="advanced"
+                            number_of_elements="1">
+        <Documentation>
+          Contrast threshold for subpixel aliasing detection. Higher values
+          decrease sensitivity to subpixel aliasing. Default value is 0.25.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0." max="0.5" />
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseFXAA" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="FXAAUseHighQualityEndpoints"
+                         default_values="1"
+                         label="Improve Single Pixel Lines"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, a more sensitive endpoint detection method is used.
+          Disabling this will improve performance, but single-pixel lines will
+          have noticeable artifacts. Default is On.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseFXAA" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty name="FXAAEndpointSearchIterations"
+                         default_values="12"
+                         label="Endpoint Search Iterations"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <Documentation>
+          Endpoint detection radius. Higher values will provide higher quality
+          aliasing for long edges, but performance will suffer. Default is 12.
+        </Documentation>
+        <IntRangeDomain name="range" min="0" max="100" />
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseFXAA" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="LODThreshold"
+        label="LOD Threshold"
+        default_values="20.0"
+        number_of_elements="1">
+        <DoubleRangeDomain name="range" min="0.0" max="102400.0" />
+        <Documentation>
+          Set the data size (in megabytes) beyond which to employ decimation,
+          if possible, to speed renders when interacting. 0 implies the use of
+          decimation for all interactive renders.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="LODResolution"
+        label="LOD Resolution"
+        default_values="0.5"
+        number_of_elements="1"
+        panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+        <Documentation>
+          Set the factor used to compute the decimated geometry when employed.
+          This affects the size of the grid used for
+          quadric clustering, for example. 1.0 implies maximum resolution while 0
+          implies minimum resolution.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseOutlineForLODRendering" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="NonInteractiveRenderDelay"
+        default_values="0"
+        number_of_elements="1"
+        panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="0" max="10" />
+        <Documentation>
+          If decimated geometry was used for rendering during interaction, set the delay
+          (in seconds) before doing a full resolution render when the interaction
+          is finished.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="UseOutlineForLODRendering"
+        label="Use Outline For LOD Rendering"
+        default_values="0"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Use outline, instead of decimated geometry when interacting, if applicable.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="RemoteRenderThreshold"
+        default_values="20.0"
+        number_of_elements="1">
+        <DoubleRangeDomain min="0" max="102400" name="range" />
+        <Documentation>
+          Set the data size (in megabytes) beyond which to render data remotely
+          (or in parallel) when connected to parallel rendering capable server. In that case
+          the rendered images are delivered to the client. Otherwise, the geometry is delivered
+          to the client and rendering happens locally.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="StillRenderImageReductionFactor"
+        default_values="1"
+        number_of_elements="1"
+        panel_visibility="advanced" >
+        <IntRangeDomain max="20" min="1" name="range" />
+        <Documentation>
+          Set the sub-sampling factor to use for non-interactive rendering.
+          When rendering on large tiles (or multiple tiles),
+          sub-sampling will help improve image compositing performance. This has no effect
+          if remote/parallel rendering is not being used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ImageReductionFactor"
+        default_values="2"
+        number_of_elements="1"
+        panel_visibility="advanced">
+        <IntRangeDomain max="20" min="1" name="range" />
+        <Documentation>
+          To reduce image compositing costs during interactions, set the
+          image sub-sampling factor. Set to 1 to not use any subsampling.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="CompressorConfig"
+        default_values="vtkLZ4Compressor 0 3"
+        number_of_elements="1"
+        panel_visibility="advanced"
+        panel_widget="image_compressor_config">
+        <Documentation>
+          Set the compression method used when transferring rendered images from
+          the server to the client.
+        </Documentation>
+        <Hints>
+          <SupportsLZ4/>
+        </Hints>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="OutlineThreshold"
+        default_values="250"
+        number_of_elements="1"
+        command="SetOutlineThreshold">
+        <IntRangeDomain name="range" min="0" max="500" />
+        <Documentation>
+          When opening a dataset or creating a new filters, use Outline representation,
+          if possible, when showing datasets with number of cells greater than thus
+          threshold (in millions).
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="DefaultInteractionMode"
+        command="SetDefaultInteractionMode"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>
+          When opening a dataset, set the initial interaction mode.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Automatic, based on the first time step" value="0" />
+          <Entry text="Always 2D" value="1" />
+          <Entry text="Always 3D" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ShowAnnotation"
+                         default_values="0"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether to see annotation providing advanced debugging and performance
+          information about each render.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PointPickingRadius"
+                         command="SetPointPickingRadius"
+                         default_values="50"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain name="range" min="0" max="100" />
+        <Documentation>
+          Set the radius (in pixels) to include when using *Select Points On*
+          to click-and-select a single point on the **Render View**.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="DisableIceT"
+                         label="Disable IceT"
+                         command="SetDisableIceT"
+                         default_values="0"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set to disable IceT (default is unchecked). This is not common and only provided
+          for special rendering modes/mappers.
+        </Documentation>
+        <Hints>
+          <RestartRequired />
+        </Hints>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Geometry Mapper Options">
+        <Property name="ResolveCoincidentTopology" />
+        <Property name="PolygonOffsetParameters" />
+        <Property name="ZShift" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Translucent Rendering Options">
+        <Property name="DepthPeeling" />
+        <Property name="MaximumNumberOfPeels" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Antialiasing Options">
+        <Property name="UseFXAA" />
+        <Property name="FXAARelativeContrastThreshold" />
+        <Property name="FXAAHardContrastThreshold" />
+        <Property name="FXAASubpixelBlendLimit" />
+        <Property name="FXAASubpixelContrastThreshold" />
+        <Property name="FXAAUseHighQualityEndpoints" />
+        <Property name="FXAAEndpointSearchIterations" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Interactive Rendering Options">
+        <Property name="LODThreshold" />
+        <Property name="LODResolution" />
+        <Property name="NonInteractiveRenderDelay" />
+        <Property name="UseOutlineForLODRendering" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Remote/Parallel Rendering Options">
+        <Property name="RemoteRenderThreshold" />
+        <Property name="StillRenderImageReductionFactor" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Client/Server Rendering Options">
+        <Property name="ImageReductionFactor" />
+        <Property name="CompressorConfig" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Miscellaneous">
+        <Property name="OutlineThreshold" />
+        <Property name="DefaultInteractionMode" />
+        <Property name="ShowAnnotation" />
+        <Property name="PointPickingRadius" />
+        <Property name="DisableIceT" />
+      </PropertyGroup>
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
+    </SettingsProxy>
+
+    <!-- ================================================================== -->
+    <SettingsProxy name="RenderViewInteractionSettings" label="Camera"
+      processes="client|dataserver|renderserver">
+      <IntVectorProperty name="Camera3DManipulators"
+        label="Camera 3D Manipulators"
+        number_of_elements="9"
+        default_values="4 1 2 3 4 1 2 4 6"
+        panel_widget="camera_manipulator">
+        <!-- For now, we are marking this property is_internal so that it won't
+        get saved in state files. -->
+        <Documentation>
+          Select how interactions are mapped to camera movements when in 3D interaction mode.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" />
+          <Entry text="Pan" value="1" />
+          <Entry text="Zoom" value="2" />
+          <Entry text="Roll" value="3" />
+          <Entry text="Rotate" value="4" />
+          <Entry text="Multi-Rotate" value="5" />
+          <Entry text="ZoomToMouse" value="6" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetCamera3DMouseWheelMotionFactor"
+                            default_values="1"
+                            name="Camera3DMouseWheelMotionFactor"
+                            label="3D Mouse Wheel Factor"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="10"
+                           min="0"
+                           name="range"
+                           resolution="0.01" />
+        <Documentation>Set the wheel motion factor for 3D interaction.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="Camera2DManipulators"
+        label="Camera 2D Manipulators"
+        number_of_elements="9"
+        default_values="1 3 2 2 2 6 3 1 4"
+        panel_widget="camera_manipulator">
+        <!-- For now, we are marking this property is_internal so that it won't
+        get saved in state files. -->
+        <Documentation>
+          Select how interactions are mapped to camera movements when in 2D interaction mode.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" />
+          <Entry text="Pan" value="1" />
+          <Entry text="Zoom" value="2" />
+          <Entry text="Roll" value="3" />
+          <Entry text="Rotate" value="4" />
+          <Entry text="ZoomToMouse" value="6" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetCamera2DMouseWheelMotionFactor"
+                            default_values="1"
+                            name="Camera2DMouseWheelMotionFactor"
+                            label="2D Mouse Wheel Factor"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="10"
+                           min="0"
+                           name="range"
+                           resolution="0.01" />
+        <Documentation>Set the wheel motion factor for 2D interaction.</Documentation>
+      </DoubleVectorProperty>
+      <PropertyGroup label="2D Interaction Options">
+        <Property name="Camera2DManipulators" />
+        <Property name="Camera2DMouseWheelMotionFactor" />
+      </PropertyGroup>
+      <PropertyGroup label="3D Interaction Options">
+        <Property name="Camera3DManipulators" />
+        <Property name="Camera3DMouseWheelMotionFactor" />
+      </PropertyGroup>
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
+    </SettingsProxy>
+
+    <!-- ================================================================== -->
+    <SettingsProxy name="RepresentedArrayListSettings"
+                   label="Color Arrays"
+                   processes="client"
+                   class="vtkPVRepresentedArrayListSettings">
+      <StringVectorProperty command="SetFilterExpression"
+                            name="FilterExpressions"
+                            label="Filter Expressions"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfFilterExpressions"
+                            use_index="1">
+        <Documentation>
+          List of expressions used to filter out arrays you do not want to display in the color array list.
+        </Documentation>
+        <!--<StringListDomain name="blah">
+        </StringListDomain>-->
+      </StringVectorProperty>
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
+    </SettingsProxy>
+
+    <!-- ================================================================== -->
+    <SettingsProxy name="ColorPalette" label="Color Palette">
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            label="Surface"
+                            name="SurfaceColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Color used when solid coloring surfaces and faces.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            label="Foreground"
+                            name="ForegroundColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Color used for rendering elements like wireframes, points.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 0.0 0.5"
+                            label="Edges"
+                            name="EdgeColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>
+          Color used for the edges when using 'Surface With Edges' representation.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            label="Text"
+                            name="TextAnnotationColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Color used for text and other annotations.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 0.0 1.0"
+                            label="Selection"
+                            name="SelectionColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Color used for showing selected
+        cells/points.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.5 0.0 1.0"
+                            label="Interactive Selection"
+                            name="InteractiveSelectionColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Color used for showing interactive selection.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.0 1.0 0.0"
+                            label="Interactive Widget"
+                            name="InteractiveWidgetColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Color used for showing interactive widget.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="UseGradientBackground"
+                         label="Use Gradient Background"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable gradient background.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty default_values="0.32 0.34 0.43"
+                            label="Background"
+                            name="BackgroundColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Color used as background for the view.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.32 0.34 0.43"
+                            label="Background 2"
+                            name="BackgroundColor2"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Color used as the 2nd color for gradient backgrounds.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseGradientBackground" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Selection">
+        <Property name="SelectionColor" />
+        <Property name="InteractiveSelectionColor" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Background">
+        <Property name="UseGradientBackground" />
+        <Property name="BackgroundColor" />
+        <Property name="BackgroundColor2" />
+      </PropertyGroup>
+
+      <Property name="LoadPalette"
+        panel_widget="color_palette_selector">
+        <Documentation>
+          You can explicitly set the colors in the application's color palette
+          above or you can load one of the predefined color palettes to
+          initialize the active palette.
+        </Documentation>
+      </Property>
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
+      <!-- End of ColorPalette -->
+    </SettingsProxy>
+    <!-- end of "settings" -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="lookup_tables">
+
+    <!-- ================================================================== -->
+    <TransferFunctionProxy class="vtkPVDiscretizableColorTransferFunction"
+                           name="PVLookupTable"
+                           post_push="Build"
+                           processes="dataserver|renderserver|client">
+      <IntVectorProperty default_values="0"
+                         name="AutomaticRescaleRangeMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry value="-1" text="Never"/>
+          <Entry value="0" text="Grow and update on 'Apply'"/>
+          <Entry value="1" text="Grow and update every timestep"/>
+          <Entry value="2" text="Update on 'Apply'"/>
+          <Entry value="3" text="Clamp and update every timestep"/>
+        </EnumerationDomain>
+        <Documentation>
+          Choose whether and how to automatically rescale the color map range.
+          "Never" means the color map range will never be changed.
+          "Grow and update on 'Apply'" will expand the range to contain the
+          union of the current range and the range of the current data source.
+          "Grow and update every timestep" will expand the range to contain
+          the union of the current range and the range of the current data source
+          when the timestep is changed. "Clamp and update every timestep" will
+          update the color map range to the current source data range.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="IndexedLookup"
+                         command="SetIndexedLookup"
+                         default_values="0"
+                         number_of_elements="1"
+                         label="Interpret Values As Categories">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, the color transfer function switches to indexed-lookup
+          (categorical colors) mode.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty default_values="0"
+                         name="AnnotationsInitialized"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <Documentation>
+         Set to 1 to indicate that the annotations have been initialized.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ShowIndexedColorActiveValues"
+                         command="SetUseActiveValues"
+                         default_values="0"
+                         number_of_elements="1"
+                         label="Show Categorical Colors in Data Range Only"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="IndexedLookup" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          When interpreting values as categories, enabling this
+          option results in the display of only the 'active'
+          categorical colors for values in the data range, i.e.,
+          values that exist in the source. You may need to click the
+          'Rescale to Data Range' button to update the active values
+          that are displayed.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="RescaleOnVisibilityChange"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Flag indicating whether the color map data range should be
+          updated when a representation's visibility changes.
+        </Documentation>
+      </IntVectorProperty>
+
+
+      <IntVectorProperty name="EnableOpacityMapping"
+                         command="SetEnableOpacityMapping"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, the opacity transfer function is used for
+          rendering, if applicable.
+        </Documentation>
+      </IntVectorProperty>
+
+      <ProxyProperty name="ScalarOpacityFunction"
+        command="SetScalarOpacityFunction">
+        <Hints>
+          <!-- when resetting to XML defaults, we don't want this property to
+               get reset. This is managed explicitly. So let's just skip this
+               from the default mechanism -->
+          <NoDefault />
+        </Hints>
+      </ProxyProperty>
+
+      <DoubleVectorProperty clean_command="RemoveAllPoints"
+                            command="AddRGBPoint"
+                            name="RGBPoints"
+                            number_of_elements_per_command="4"
+                            repeat_command="1"
+                            number_of_elements="12"
+                            default_values="0 0.231373 0.298039 0.752941 0.5 0.865003 0.865003 0.865003 1 0.705882 0.0156863 0.14902">
+        <Documentation>
+          Specify the control points that form the color-transfer-function. These are
+          a list of 4-tuples of the form (x, r, g, b) where x is the data value,
+          and r,g,b are three color components in the range [0,1].
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseLogScale"
+                         default_values="0"
+                         name="UseLogScale"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="ShowDataHistogram"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation> Proxy only property used by the ColorOpacityWidget to know if the data histogram should be shown
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="AutomaticDataHistogramComputation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation> Proxy only property used by the ColorOpacityWidget to know if the data histogram should be automatically computed
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty default_values="10"
+                         name="DataHistogramNumberOfBins"
+                         number_of_elements="1">
+        <Documentation> Proxy only property used by the ColorOpacityWidget to know the number of bin to use to compute the data histogram
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetColorSpace"
+                         default_values="3"
+                         name="ColorSpace"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="RGB" value="0" />
+          <Entry text="HSV" value="1" />
+          <Entry text="Lab" value="2" />
+          <Entry text="Diverging" value="3" />
+          <Entry text="Lab/CIEDE2000" value="4" />
+          <Entry text="Step" value="5" />
+        </EnumerationDomain>
+        <Documentation>
+          The color space used for interpolation: RGB, HSV, Lab (CIELAB), or
+          Diverging. In HSV mode, if HSVWrap is on, it will take the shortest
+          path in Hue (going back through 0 if that is the shortest way around
+          the hue circle) whereas if HSVWrap is off it will not go through 0
+          (in order the match the current functionality of vtkLookupTable).
+          Diverging is a special mode where colors will pass through white when
+          interpolating between two saturated colors.
+          In Lab/CIEDE2000 mode, it will take the shortest path in the Lab color
+          space with respect to the CIE Delta E 2000 color distance measure.
+          In Step mode, the color of an interval is the color of the second point
+          of the interval.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseBelowRangeColor"
+                         default_values="0"
+                         name="UseBelowRangeColor"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Use special color to use when a data value is below the range of the color map.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetBelowRangeColor"
+                            default_values="0 0 0"
+                            name="BelowRangeColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced" >
+        <Documentation>
+          Set the color to use when a data value is below the range of the color map.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseBelowRangeColor" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseAboveRangeColor"
+                         default_values="0"
+                         name="UseAboveRangeColor"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Use special color to use when a data value is above the range of the color map.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetAboveRangeColor"
+                            default_values="0.5 0.5 0.5"
+                            name="AboveRangeColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced" >
+        <Documentation>
+          Set the color to use when a data value is above the range of the color map.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseAboveRangeColor" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetNanColor"
+                            default_values="1 1 0"
+                            name="NanColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector" >
+        <Documentation>
+          Set the color to use when NaN (not-a-number) is encountered.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetNanOpacity"
+                         default_values="1"
+                         name="NanOpacity"
+                         number_of_elements="1" >
+        <DoubleRangeDomain min="0" max="1" name="range" />
+        <Documentation>
+          Set the opacity to use when NaN (not-a-number) is encountered.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetDiscretize"
+                         default_values="1"
+                         name="Discretize"
+                         number_of_elements="1" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the color transfer function will comprise of discrete colors
+          with number of discrete colors specified using NumberOfTableValues.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetNumberOfValues"
+                         default_values="256"
+                         name="NumberOfTableValues"
+                         number_of_elements="1" >
+        <IntRangeDomain min="1" max="1024" name="range" />
+        <Documentation>
+          When Discretize is set, this specifies the number of discrete colors
+          that must be present in the transfer function.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="Discretize" function="boolean" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty default_values="0"
+                            name="ScalarRangeInitialized"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <Documentation>
+         Set to 1 to indicate that the scalar range has been initialized.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetHSVWrap"
+                         default_values="0"
+                         name="HSVWrap"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <!-- FIXME: need to add "Wrapped HSV" as a color-space type instead -->
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <Property command="Build" name="Build" panel_visibility="never" />
+      <IntVectorProperty command="SetVectorComponent"
+                         default_values="0"
+                         name="VectorComponent"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <IntRangeDomain name="range" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetVectorMode"
+                         default_values="0"
+                         name="VectorMode"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <EnumerationDomain name="enum">
+          <Entry text="Magnitude" value="0" />
+          <Entry text="Component" value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAllowDuplicateScalars"
+                         default_values="1"
+                         name="AllowDuplicateScalars"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <StringVectorProperty name="Annotations"
+                            clean_command="ResetAnnotationsInFullSet"
+                            command="SetAnnotationInFullSet"
+                            element_types="2 2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <Documentation>
+          Specify annotations.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ActiveAnnotatedValues"
+                            clean_command="ResetActiveAnnotatedValues"
+                            command="SetActiveAnnotatedValue"
+                            element_types="2"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            panel_visibility="never">
+        <Documentation>
+          Specify active annotations.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="IndexedColors"
+                            command="SetIndexedColorInFullSet"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfIndexedColorsInFullSet"
+                            use_index="1"
+                            panel_visibility="advanced">
+        <Documentation>
+          Colors used when using IndexedLookup is true.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="IndexedOpacities"
+                            command="SetIndexedOpacityInFullSet"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfIndexedOpacitiesInFullSet"
+                            use_index="1"
+                            panel_visibility="never">
+        <Documentation>
+          Opacities used when using IndexedLookup is true.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Mapping Data" panel_widget="ColorOpacityEditor">
+        <Property name="EnableOpacityMapping" function="EnableOpacityMapping" />
+        <Property name="RGBPoints" function="XRGBPoints" />
+        <Property name="ScalarOpacityFunction" function="ScalarOpacityFunction" />
+        <Property name="UseLogScale" function="UseLogScale" />
+        <Property name="ShowDataHistogram" function="ShowDataHistogram" />
+        <Property name="AutomaticDataHistogramComputation" function="AutomaticDataHistogramComputation" />
+        <Property name="DataHistogramNumberOfBins" function="DataHistogramNumberOfBins" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Color Mapping Parameters">
+        <Property name="ColorSpace" />
+        <Property name="NanColor" />
+        <Property name="NanOpacity" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Color Discretization">
+        <Property name="NumberOfTableValues" />
+        <Property name="Discretize" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Annotations" panel_widget="AnnotationsEditor">
+        <Property name="Annotations" />
+        <Property name="EnableOpacityMapping" function="EnableOpacityMapping" />
+        <Property name="IndexedColors" />
+      </PropertyGroup>
+
+      <!-- End of PVLookupTable -->
+    </TransferFunctionProxy>
+
+    <!-- end of "lookup_tables" -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="transfer_functions">
+
+    <!-- ================================================================== -->
+    <TransferFunctionProxy class="vtkColorTransferFunction"
+                           name="ColorTransferFunction"
+                           processes="client|renderserver|dataserver">
+      <DoubleVectorProperty animateable="0"
+                            clean_command="RemoveAllPoints"
+                            command="AddRGBPoint"
+                            name="RGBPoints"
+                            number_of_elements_per_command="4"
+                            repeat_command="1"></DoubleVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetColorSpace"
+                         default_values="0"
+                         name="ColorSpace"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="RGB"
+                 value="0" />
+          <Entry text="HSV"
+                 value="1" />
+          <Entry text="Lab"
+                 value="2" />
+          <Entry text="Diverging"
+                 value="3" />
+          <Entry text="Lab/CIEDE2000"
+                 value="4" />
+          <Entry text="Step"
+                 value="5" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetHSVWrap"
+                         default_values="0"
+                         name="HSVWrap"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </TransferFunctionProxy>
+
+    <!-- end of "transfer_functions" -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="piecewise_functions">
+    <!-- ================================================================== -->
+    <TransferFunctionProxy class="vtkPiecewiseFunction"
+           name="PiecewiseFunction"
+           processes="client|renderserver|dataserver">
+      <DoubleVectorProperty clean_command="RemoveAllPoints"
+                            command="AddPoint"
+                            default_values="0.0 0.0 0.5 0.0 1.0 1.0 0.5 0.0"
+                            name="Points"
+                            number_of_elements="8"
+                            number_of_elements_per_command="4"
+                            repeat_command="1"></DoubleVectorProperty>
+      <IntVectorProperty command="SetAllowDuplicateScalars"
+                         default_values="1"
+                         name="AllowDuplicateScalars"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseLogScale"
+                         default_values="0"
+                         name="UseLogScale"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="ScalarRangeInitialized"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <Documentation>
+          Set to 1 to indicate that the scalar range has been initialized.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </TransferFunctionProxy>
+
+    <!-- end of "piecewise_functions" -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="annotations">
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkContext2DScalarBarActor"
+           name="ScalarBarActor" >
+      <ProxyProperty command="SetLookupTable"
+                     name="LookupTable"
+                     number_of_elements="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty command="GetEstimatedNumberOfAnnotations"
+                         information_only="1"
+                         name="EstimatedNumberOfAnnotations">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetTitle"
+                            default_values="Name"
+                            no_custom_default="1"
+                            name="Title"
+                            number_of_elements="1">
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetComponentTitle"
+                            default_values="Component"
+                            no_custom_default="1"
+                            name="ComponentTitle"
+                            number_of_elements="1">
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetTitleJustification"
+                         default_values="1"
+                         name="TitleJustification"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Left"
+                 value="0" />
+          <Entry text="Centered"
+                 value="1" />
+          <Entry text="Right"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>Sets the justification of the title text with respect to the scalar color bar.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetForceHorizontalTitle"
+                         default_values="0"
+                         name="HorizontalTitle"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When on, orients the title horizontally. When off (default), the title
+          will be rotated counter-clockwise 90 degrees and lie parallel to the
+          color bar.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetForceHorizontalTitle"
+                         default_values="0"
+                         name="HorizontalTitle2"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When on, orients the title horizontally. When off (default), the title
+          will be rotated counter-clockwise 90 degrees and lie parallel to the
+          color bar.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetScalarBarThickness"
+                         default_values="16"
+                         name="ScalarBarThickness"
+                         label="Color Bar Thickness"
+                         number_of_elements="1">
+        <Documentation>
+          Sets the width of the scalar bar when vertically oriented
+          and the height when horizontally oriented.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetScalarBarLength"
+                         default_values="0.33"
+                         name="ScalarBarLength"
+                         label="Color Bar Length"
+                         number_of_elements="1">
+        <Documentation>
+          Sets the length of the scalar bar. The length is defined as a
+          fraction of window width or height when the color legend is
+          horizontal or vertical, respectively.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetReverseLegend"
+                         default_values="0"
+                         name="ReverseLegend"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When on, the color bar and all associated ticks and notations will be reversed,
+          from high to low instead of low to high.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAutomaticLabelFormat"
+                         default_values="1"
+                         name="AutomaticLabelFormat"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetLabelFormat"
+                            default_values="%-#6.3g"
+                            name="LabelFormat"
+                            number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="AutomaticLabelFormat" function="boolean_invert" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetDrawNanAnnotation"
+                         default_values="0"
+                         name="DrawNanAnnotation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetDrawAnnotations"
+                         default_values="1"
+                         name="DrawAnnotations"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetAddRangeAnnotations"
+                         default_values="0"
+                         name="AddRangeAnnotations"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetAutomaticAnnotations"
+                         default_values="0"
+                         name="AutomaticAnnotations"
+                         number_of_elements="1" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, annotations are automatically created according the number
+          of colors shown on the scalar bar.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAddRangeLabels"
+                         number_of_elements="1"
+                         default_values="1"
+                         name="AddRangeLabels"
+                         label="Add Range Labels">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetRangeLabelFormat"
+                            number_of_elements="1"
+                            default_values="%-#6.1e"
+                            name="RangeLabelFormat"
+                            label="Range Label Format">
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="AddRangeLabels" function="boolean" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetNanAnnotation"
+                            default_values="NaN"
+                            name="NanAnnotation"
+                            number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="DrawNanAnnotation" function="boolean" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetDrawTickMarks"
+                         default_values="1"
+                         name="DrawTickMarks"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable drawing the color legend tick marks.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetDrawTickLabels"
+                         default_values="1"
+                         name="DrawTickLabels"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable drawing the color legend labels for tick marks.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetUseCustomLabels"
+                         name="UseCustomLabels"
+                         number_of_elements="1"
+                         default_values="0" >
+        <BooleanDomain name="bool" />
+        <Documentation>Enable the use of custom label values.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetCustomLabel"
+                            name="CustomLabels"
+                            set_number_command="SetNumberOfCustomLabels"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1" >
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseCustomLabels" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetTextPosition"
+                         default_values="1"
+                         name="TextPosition"
+                         label="Tick and Annotation Positions"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Ticks right/top, annotations left/bottom"
+                 value="1" />
+          <Entry text="Ticks left/bottom, annotations right/top"
+                 value="0" />
+        </EnumerationDomain>
+        <Documentation>Determines where the tick labels are drawn.</Documentation>
+      </IntVectorProperty>
+
+      <!--label text property -->
+      <SubProxy command="SetLabelTextProperty">
+        <Proxy name="LabelTextProperty"
+               proxygroup="properties"
+               proxyname="TextProperty"></Proxy>
+        <ExposedProperties>
+          <Property exposed_name="LabelColor"
+                    name="Color" />
+          <Property exposed_name="LabelOpacity"
+                    name="Opacity" />
+          <Property exposed_name="LabelFontFamily"
+                    name="FontFamily" />
+          <Property exposed_name="LabelFontFile"
+                    name="FontFile" />
+          <Property exposed_name="LabelBold"
+                    name="Bold" />
+          <Property exposed_name="LabelItalic"
+                    name="Italic" />
+          <Property exposed_name="LabelShadow"
+                    name="Shadow" />
+          <Property exposed_name="LabelFontSize"
+                    name="FontSize" />
+        </ExposedProperties>
+      </SubProxy>
+      <!--title text property -->
+      <SubProxy command="SetTitleTextProperty">
+        <Proxy name="TitleTextProperty"
+               proxygroup="properties"
+               proxyname="TextProperty"></Proxy>
+        <ExposedProperties>
+          <Property exposed_name="TitleColor"
+                    name="Color" />
+          <Property exposed_name="TitleOpacity"
+                    name="Opacity" />
+          <Property exposed_name="TitleFontFamily"
+                    name="FontFamily" />
+          <Property exposed_name="TitleFontFile"
+                    name="FontFile" />
+          <Property exposed_name="TitleBold"
+                    name="Bold" />
+          <Property exposed_name="TitleItalic"
+                    name="Italic" />
+          <Property exposed_name="TitleShadow"
+                    name="Shadow" />
+          <Property exposed_name="TitleFontSize"
+                    name="FontSize" />
+        </ExposedProperties>
+      </SubProxy>
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkFlagpoleLabel"
+           name="FlagpoleLabel"
+           processes="client|dataserver|renderserver"
+           >
+      <Documentation>FlagpoleLabel is a 3D representation for a text
+     source.</Documentation>
+
+      <IntVectorProperty name="Visibility"
+                         command="SetVisibility"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Show/hide the flagpole lable.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="BasePosition"
+                            command="SetBasePosition"
+                            number_of_elements="3"
+                            default_values="0.0 0.0 0.0"
+                            >
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          The world coordinate position of the base of the flagpole.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="TopPosition"
+                            command="SetTopPosition"
+                            number_of_elements="3"
+                            default_values="0.0 1.0 0.0"
+                            >
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          The world coordinate position of the top of the flagpole.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="FlagSize"
+                            command="SetFlagSize"
+                            number_of_elements="1"
+                            default_values="1.0"
+                            >
+        <DoubleRangeDomain  min="0.001" name="range" />
+        <Documentation>
+          The size of the flag. 1.0 is the default size which corresponds to
+          a preset texels/window value. Adjust this to increase or decrease
+          the default size.The world coordinate position of the top of the
+          flagpole.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <SubProxy command="SetTextProperty">
+        <Proxy name="TextProperty"
+               proxygroup="properties"
+               proxyname="TextProperty"></Proxy>
+        <ExposedProperties>
+          <Property name="Color"/>
+          <Property name="Opacity"/>
+          <Property name="FontFamily"/>
+          <Property name="FontFile"/>
+          <Property name="Bold"/>
+          <Property name="Italic"/>
+          <Property name="Shadow"/>
+          <Property name="FontSize"/>
+          <Property name="Justification"/>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of FlagpoleLabel -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkBillboardTextActor3D"
+           name="BillboardTextActor3D"
+           processes="client|dataserver|renderserver"
+           >
+      <Documentation>BillboardTextActor3D is a 3D representation for a text
+     source.</Documentation>
+
+      <IntVectorProperty name="Visibility"
+                         command="SetVisibility"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Show/hide the billboard text actor.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="BillboardPosition"
+                            command="SetPosition"
+                            number_of_elements="3"
+                            default_values="0.0 0.0 0.0"
+                            >
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          The world coordinate position of the anchor point of the text billboard.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="DisplayOffset"
+                         command="SetDisplayOffset"
+                         number_of_elements="2"
+                         default_values="0 0"
+                         panel_visibility="advanced">
+        <Documentation>
+          Fixed offset from the anchor point in display coordinated to be used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <SubProxy command="SetTextProperty">
+        <Proxy name="TextProperty"
+               proxygroup="properties"
+               proxyname="TextProperty"></Proxy>
+        <ExposedProperties>
+          <Property name="Color"/>
+          <Property name="Opacity"/>
+          <Property name="FontFamily"/>
+          <Property name="FontFile"/>
+          <Property name="Bold"/>
+          <Property name="Italic"/>
+          <Property name="Shadow"/>
+          <Property name="FontSize"/>
+          <Property name="Justification"/>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of BillboardTextActor3D -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy name="GridAxes3DActor"
+           class="vtkPVGridAxes3DActor"
+           processes="client|dataserver|renderserver">
+      <Documentation>
+        GridAxes3DActor can be used to render a grid in a render view.
+      </Documentation>
+      <IntVectorProperty name="Visibility"
+                         command="SetVisibility"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Show/hide the axes grid.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="XTitle"
+                            command="SetXTitle"
+                            number_of_elements="1"
+                            default_values="X Axis">
+        <Documentation>
+          Set the title string for X axis.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="YTitle"
+                            command="SetYTitle"
+                            number_of_elements="1"
+                            default_values="Y Axis">
+        <Documentation>
+          Set the title string for Y axis.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ZTitle"
+                            command="SetZTitle"
+                            number_of_elements="1"
+                            default_values="Z Axis">
+        <Documentation>
+          Set the title string for Z axis.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Title Texts">
+        <Property name="XTitle"/>
+        <Property name="YTitle"/>
+        <Property name="ZTitle"/>
+      </PropertyGroup>
+
+      <SubProxy command="SetXTitleTextProperty">
+        <Proxy name="XTitleProperties" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="XTitleColor" name="Color" />
+          <Property exposed_name="XTitleOpacity" name="Opacity" />
+          <Property exposed_name="XTitleFontFamily" name="FontFamily" />
+          <Property exposed_name="XTitleFontFile" name="FontFile" />
+          <Property exposed_name="XTitleBold" name="Bold" />
+          <Property exposed_name="XTitleItalic" name="Italic" />
+          <Property exposed_name="XTitleShadow" name="Shadow" />
+          <Property exposed_name="XTitleFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="X Title Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
+        <Property name="XTitleColor" function="Color"/>
+        <Property name="XTitleFontFamily" function="Family"/>
+        <Property name="XTitleFontFile" function="File"/>
+        <Property name="XTitleBold" function="Bold" />
+        <Property name="XTitleItalic" function="Italics"/>
+        <Property name="XTitleFontSize" function="Size" />
+        <Property name="XTitleShadow" function="Shadow" />
+        <Property name="XTitleOpacity" function="Opacity" />
+      </PropertyGroup>
+
+      <SubProxy command="SetYTitleTextProperty">
+        <Proxy name="YTitleProperties" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="YTitleColor" name="Color" />
+          <Property exposed_name="YTitleOpacity" name="Opacity" />
+          <Property exposed_name="YTitleFontFamily" name="FontFamily" />
+          <Property exposed_name="YTitleFontFile" name="FontFile" />
+          <Property exposed_name="YTitleBold" name="Bold" />
+          <Property exposed_name="YTitleItalic" name="Italic" />
+          <Property exposed_name="YTitleShadow" name="Shadow" />
+          <Property exposed_name="YTitleFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="Y Title Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
+        <Property name="YTitleColor" function="Color"/>
+        <Property name="YTitleFontFamily" function="Family"/>
+        <Property name="YTitleFontFile" function="File"/>
+        <Property name="YTitleBold" function="Bold" />
+        <Property name="YTitleItalic" function="Italics"/>
+        <Property name="YTitleFontSize" function="Size" />
+        <Property name="YTitleShadow" function="Shadow" />
+        <Property name="YTitleOpacity" function="Opacity" />
+      </PropertyGroup>
+
+      <SubProxy command="SetZTitleTextProperty">
+        <Proxy name="ZTitleProperties" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="ZTitleColor" name="Color" />
+          <Property exposed_name="ZTitleOpacity" name="Opacity" />
+          <Property exposed_name="ZTitleFontFamily" name="FontFamily" />
+          <Property exposed_name="ZTitleFontFile" name="FontFile" />
+          <Property exposed_name="ZTitleBold" name="Bold" />
+          <Property exposed_name="ZTitleItalic" name="Italic" />
+          <Property exposed_name="ZTitleShadow" name="Shadow" />
+          <Property exposed_name="ZTitleFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="Z Title Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
+        <Property name="ZTitleColor" function="Color"/>
+        <Property name="ZTitleFontFamily" function="Family"/>
+        <Property name="ZTitleFontFile" function="File"/>
+        <Property name="ZTitleBold" function="Bold" />
+        <Property name="ZTitleItalic" function="Italics"/>
+        <Property name="ZTitleFontSize" function="Size" />
+        <Property name="ZTitleShadow" function="Shadow" />
+        <Property name="ZTitleOpacity" function="Opacity" />
+      </PropertyGroup>
+
+      <IntVectorProperty name="FacesToRender"
+                         command="SetFaceMask"
+                         number_of_elements="1"
+                         default_values="63"
+                         panel_widget="int_mask"
+                         panel_visibility="advanced">
+        <Documentation>
+          Set the mask to select faces. The faces rendered will be a subset of the
+          faces selected depending on the status of **CullBackface** and
+          **CullFrontface** properties.
+        </Documentation>
+        <IntRangeDomain name="range" min="0" />
+        <Hints>
+          <Mask>
+            <Item name="Min-YZ" value="1" />
+            <Item name="Min-ZX" value="2" />
+            <Item name="Min-XY" value="4" />
+            <Item name="Max-YZ" value="8" />
+            <Item name="Max-ZX" value="16" />
+            <Item name="Max-XY" value="32" />
+          </Mask>
+        </Hints>
+      </IntVectorProperty>
+
+      <SubProxy command="SetProperty">
+        <Proxy name="Property" class="vtkProperty" processes="client|dataserver|renderserver" >
+          <IntVectorProperty name="CullBackface"
+                             command="SetBackfaceCulling"
+                             number_of_elements="1"
+                             default_values="0"
+                             panel_visibility="advanced">
+            <BooleanDomain name="bool" />
+            <Documentation>
+              Set to true to hide faces of the grid facing away from the camera i.e. hide all
+              back faces.
+            </Documentation>
+          </IntVectorProperty>
+
+          <IntVectorProperty name="CullFrontface"
+                             command="SetFrontfaceCulling"
+                             number_of_elements="1"
+                             default_values="1"
+                             panel_visibility="advanced">
+            <BooleanDomain name="bool" />
+            <Documentation>
+              Set to true to hide faces of the grid facing towards from the camera i.e. hide all
+              front faces.
+            </Documentation>
+          </IntVectorProperty>
+
+          <IntVectorProperty name="Representation"
+                             command="SetRepresentation"
+                             number_of_elements="1"
+                             default_values="1">
+          </IntVectorProperty>
+
+          <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                                name="GridColor"
+                                command="SetColor"
+                                number_of_elements="3"
+                                panel_widget="color_selector">
+            <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+            <Documentation>Color used when coloring the grid wireframe</Documentation>
+            <Hints>
+              <PropertyLink group="settings" proxy="ColorPalette" property="ForegroundColor"
+                unlink_if_modified="1" />
+            </Hints>
+          </DoubleVectorProperty>
+        </Proxy>
+        <ExposedProperties>
+          <Property name="CullBackface" panel_visibility="advanced"/>
+          <Property name="CullFrontface" panel_visibility="advanced"/>
+          <Property name="GridColor" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="Face Properties">
+        <Property name="FacesToRender" />
+        <Property name="CullBackface" />
+        <Property name="CullFrontface" />
+        <Property name="GridColor"/>
+      </PropertyGroup>
+
+      <IntVectorProperty name="ShowGrid"
+                         command="SetGenerateGrid"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Turn off to not render the plane grids.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ShowEdges"
+                         command="SetGenerateEdges"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Turn off to not render the plane edges.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ShowTicks"
+                         command="SetGenerateTicks"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Turn off to not render the tick marks.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="AxesToLabel"
+                         command="SetLabelMask"
+                         number_of_elements="1"
+                         default_values="63"
+                         panel_widget="int_mask"
+                         panel_visibility="advanced">
+        <Documentation>
+          Set the mask to select the axes to label. The axes labelled will be a subset of the
+          axes selected depending on which faces are also being rendered.
+        </Documentation>
+        <IntRangeDomain name="range" min="0" />
+        <Hints>
+          <Mask>
+            <Item name="Min-X" value="1" />
+            <Item name="Min-Y" value="2" />
+            <Item name="Min-Z" value="4" />
+            <Item name="Max-X" value="8" />
+            <Item name="Max-Y" value="16" />
+            <Item name="Max-Z" value="32" />
+          </Mask>
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="LabelUniqueEdgesOnly"
+                         command="SetLabelUniqueEdgesOnly"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set to true to only label edges shared with 1 face. Note that
+          if all faces are being rendered, this will generate no labels.
+        </Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Label Properties">
+        <Property name="LabelUniqueEdgesOnly" />
+        <Property name="AxesToLabel" />
+      </PropertyGroup>
+
+      <SubProxy command="SetXLabelTextProperty">
+        <Proxy name="XLabelProperties" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="XLabelColor" name="Color" />
+          <Property exposed_name="XLabelOpacity" name="Opacity" />
+          <Property exposed_name="XLabelFontFamily" name="FontFamily" />
+          <Property exposed_name="XLabelFontFile" name="FontFile" />
+          <Property exposed_name="XLabelBold" name="Bold" />
+          <Property exposed_name="XLabelItalic" name="Italic" />
+          <Property exposed_name="XLabelShadow" name="Shadow" />
+          <Property exposed_name="XLabelFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="X Axis Label Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
+        <Property name="XLabelColor" function="Color"/>
+        <Property name="XLabelFontFamily" function="Family"/>
+        <Property name="XLabelFontFile" function="File"/>
+        <Property name="XLabelBold" function="Bold" />
+        <Property name="XLabelItalic" function="Italics"/>
+        <Property name="XLabelFontSize" function="Size" />
+        <Property name="XLabelShadow" function="Shadow" />
+        <Property name="XLabelOpacity" function="Opacity" />
+      </PropertyGroup>
+
+      <SubProxy command="SetYLabelTextProperty">
+        <Proxy name="YLabelProperties" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="YLabelColor" name="Color" />
+          <Property exposed_name="YLabelOpacity" name="Opacity" />
+          <Property exposed_name="YLabelFontFamily" name="FontFamily" />
+          <Property exposed_name="YLabelFontFile" name="FontFile" />
+          <Property exposed_name="YLabelBold" name="Bold" />
+          <Property exposed_name="YLabelItalic" name="Italic" />
+          <Property exposed_name="YLabelShadow" name="Shadow" />
+          <Property exposed_name="YLabelFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="Y Axis Label Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
+        <Property name="YLabelColor" function="Color"/>
+        <Property name="YLabelFontFamily" function="Family"/>
+        <Property name="YLabelFontFile" function="File"/>
+        <Property name="YLabelBold" function="Bold" />
+        <Property name="YLabelItalic" function="Italics"/>
+        <Property name="YLabelFontSize" function="Size" />
+        <Property name="YLabelShadow" function="Shadow" />
+        <Property name="YLabelOpacity" function="Opacity" />
+      </PropertyGroup>
+
+      <SubProxy command="SetZLabelTextProperty">
+        <Proxy name="ZLabelProperties" proxygroup="properties" proxyname="TextProperty" />
+        <ExposedProperties>
+          <Property exposed_name="ZLabelColor" name="Color" />
+          <Property exposed_name="ZLabelOpacity" name="Opacity" />
+          <Property exposed_name="ZLabelFontFamily" name="FontFamily" />
+          <Property exposed_name="ZLabelFontFile" name="FontFile" />
+          <Property exposed_name="ZLabelBold" name="Bold" />
+          <Property exposed_name="ZLabelItalic" name="Italic" />
+          <Property exposed_name="ZLabelShadow" name="Shadow" />
+          <Property exposed_name="ZLabelFontSize" name="FontSize" default_values="12"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="Z Axis Label Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
+        <Property name="ZLabelColor" function="Color"/>
+        <Property name="ZLabelFontFamily" function="Family"/>
+        <Property name="ZLabelFontFile" function="File"/>
+        <Property name="ZLabelBold" function="Bold" />
+        <Property name="ZLabelItalic" function="Italics"/>
+        <Property name="ZLabelFontSize" function="Size" />
+        <Property name="ZLabelShadow" function="Shadow" />
+        <Property name="ZLabelOpacity" function="Opacity" />
+      </PropertyGroup>
+
+      <IntVectorProperty name="XAxisNotation"
+                         command="SetXNotation"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <Documentation>
+          Get/set the numerical notation, standard, scientific or mixed (0, 1, 2) for X Axis.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed" value="0" />
+          <Entry text="Scientific" value="1" />
+          <Entry text="Fixed" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetXPrecision"
+                         default_values="2"
+                         panel_visibility="advanced"
+                         name="XAxisPrecision"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" min="0"/>
+        <Documentation>
+          Get/set the numerical precision to use for the X Axis, default is 2.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetXUseCustomLabels"
+                         default_values="0"
+                         name="XAxisUseCustomLabels"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to use custom labels for the X axis. Labels
+          specified by **XAxisLabels** are used only when
+          this flag is set to 1.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="XAxisLabels"
+                            command="SetXLabel"
+                            set_number_command="SetNumberOfXLabels"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1" >
+        <!-- used to trigger the display pqScalarValueListPropertyWidget -->
+        <ArrayRangeDomain name="scalar_range"/>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="XAxisUseCustomLabels" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="X Axis Label Properties">
+        <Property name="XAxisNotation" />
+        <Property name="XAxisPrecision" />
+        <Property name="XAxisUseCustomLabels" />
+        <Property name="XAxisLabels" />
+      </PropertyGroup>
+
+      <IntVectorProperty name="YAxisNotation"
+                         command="SetYNotation"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <Documentation>
+          Get/set the numerical notation, standard, scientific or mixed (0, 1, 2) for Y Axis.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed" value="0" />
+          <Entry text="Scientific" value="1" />
+          <Entry text="Fixed" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetYPrecision"
+                         default_values="2"
+                         panel_visibility="advanced"
+                         name="YAxisPrecision"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" min="0"/>
+        <Documentation>
+          Get/set the numerical precision to use for the Y Axis, default is 2.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetYUseCustomLabels"
+                         default_values="0"
+                         name="YAxisUseCustomLabels"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to use custom labels for the Y axis. Labels
+          specified by **YAxisLabels** are used only when
+          this flag is set to 1.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetYLabel"
+                            set_number_command="SetNumberOfYLabels"
+                            name="YAxisLabels"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1">
+        <!-- used to trigger the display pqScalarValueListPropertyWidget -->
+        <ArrayRangeDomain name="scalar_range"/>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="YAxisUseCustomLabels" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Y Axis Label Properties">
+        <Property name="YAxisNotation" />
+        <Property name="YAxisPrecision" />
+        <Property name="YAxisUseCustomLabels" />
+        <Property name="YAxisLabels" />
+      </PropertyGroup>
+
+      <IntVectorProperty name="ZAxisNotation"
+                         command="SetZNotation"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <Documentation>
+          Get/set the numerical notation, standard, scientific or mixed (0, 1, 2) for Z Axis.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed" value="0" />
+          <Entry text="Scientific" value="1" />
+          <Entry text="Fixed" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetZPrecision"
+                         default_values="2"
+                         panel_visibility="advanced"
+                         name="ZAxisPrecision"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" min="0"/>
+        <Documentation>
+          Get/set the numerical precision to use for the Z Axis, default is 2.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetZUseCustomLabels"
+                         default_values="0"
+                         name="ZAxisUseCustomLabels"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to use custom labels for the Z axis. Labels
+          specified by **ZAxisLabels** are used only when
+          this flag is set to 1.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetZLabel"
+                            set_number_command="SetNumberOfZLabels"
+                            name="ZAxisLabels"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1" >
+        <!-- used to trigger the display pqScalarValueListPropertyWidget -->
+        <ArrayRangeDomain name="scalar_range"/>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="ZAxisUseCustomLabels" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Z Axis Label Properties">
+        <Property name="ZAxisNotation" />
+        <Property name="ZAxisPrecision" />
+        <Property name="ZAxisUseCustomLabels" />
+        <Property name="ZAxisLabels" />
+      </PropertyGroup>
+
+      <IntVectorProperty name="UseCustomBounds"
+                         command="SetUseCustomTransformedBounds"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If set, the axes will use explicitly specified bounds rather than using the bounds
+          computed from datasets currently visible in the view.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="CustomBounds"
+                            command="SetCustomTransformedBounds"
+                            number_of_elements="6"
+                            default_values="0 1 0 1 0 1 0 1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Specify the explicit bounds to use when **UseCustomBounds** is checked.
+        </Documentation>
+        <Hints>
+          <!-- show only when UseCustomBounds is true -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseCustomBounds"
+                                   value="1"/>
+          <DoubleVectorPropertyWidget>
+            <!-- add buttons to reset using active bounds -->
+            <Button type="use_active_source_bounds" />
+          </DoubleVectorPropertyWidget>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="DataScale"
+                            command="SetDataScale"
+                            number_of_elements="3"
+                            default_values="1 1 1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          If data is being scaled, you can show the original data bounds for the axes
+          instead of the scaled bounds by setting the DataScale to match the scaling applied
+          to the dataset.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="UseModelTransform"
+                                   value="0"/>
+          <!-- disable this when UseModelTransform is true -->
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="DataPosition"
+                            command="SetDataPosition"
+                            number_of_elements="3"
+                            default_values="0 0 0"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          If data is being translated, you can show the original data bounds for the axes
+          instead of the translated bounds by setting the DataPosition to match the
+          translation applied to the dataset.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="UseModelTransform"
+                                   value="0"/>
+          <!-- disable this when UseModelTransform is true -->
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="DataBoundsScaleFactor"
+                            command="SetDataBoundsScaleFactor"
+                            number_of_elements="1"
+                            default_values="1.0008"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="0" max="2"/>
+        <Documentation>
+          After the data bounds have been computed, this property enables to scale the
+          bounds used to generate the axes grid, so it will be slightly larger than the
+          data bounds.
+          Data bounds are not modified, only the aspect of the AxesGrid is modified.
+          The default value (1.0008) ensures that there is no concident lines drawn when
+          zooming close enough to the model.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="UseModelTransform"
+                                   value="0"/>
+          <!-- disable this when UseModelTransform is true -->
+        </Hints>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Bounds">
+        <Property name="UseCustomBounds" />
+        <Property name="CustomBounds" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Data Transform">
+        <Property name="DataScale" />
+        <Property name="DataPosition" />
+        <Property name="DataBoundsScaleFactor" />
+      </PropertyGroup>
+
+      <DoubleVectorProperty name="ModelTransformMatrix"
+                            command="SetModelTransformMatrix"
+                            number_of_elements="16"
+                            default_values="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"
+                            argument_is_array="1"
+                            panel_visibility="never">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="ModelBounds"
+                            command="SetModelBounds"
+                            number_of_elements="6"
+                            default_values="0 1 0 1 0 1"
+                            panel_visibility="never">
+      </DoubleVectorProperty>
+      <IntVectorProperty name="UseModelTransform"
+                         command="SetUseModelTransform"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="never">
+        <BooleanDomain name="range" />
+      </IntVectorProperty>
+      <!-- End of 'GridAxes3DActor' -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <!-- End of ProxyGroup annotations -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="misc">
+    <!-- ================================================================== -->
+    <ViewLayoutProxy name="ViewLayout"
+                     class="vtkViewLayout"
+                     processes="client|renderserver">
+      <Documentation>Proxy used to manage layout for multiple views.</Documentation>
+      <IntVectorProperty name="PreviewMode"
+        number_of_elements="2"
+        default_values="0 0">
+        <Documentation>
+          Set the target resolution for the preview mode to display,
+          [0, 0] is interpreted as exiting preview.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="SeparatorWidth"
+        command="SetSeparatorWidth"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" max="10" />
+        <Documentation>
+          The width of the separator (in pixels) to be displayed in preview mode.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="SeparatorColor"
+        command="SetSeparatorColor"
+        number_of_elements="3"
+        default_values="0.937 0.922 0.906">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+        <Documentation>
+          The color of the separator to be displayed in preview mode.
+        </Documentation>
+      </DoubleVectorProperty>
+    </ViewLayoutProxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkPVRayCastPickingHelper"
+           name="PickingHelper"
+           processes="dataserver">
+      <Documentation>Proxy used to pick a point of a surface
+      mesh.</Documentation>
+      <DoubleVectorProperty command="SetPointA"
+                            default_values="0.0 0.0 0.0"
+                            name="PointA"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPointB"
+                            default_values="0.0 0.0 1.0"
+                            name="PointB"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <IntVectorProperty command="SetSnapOnMeshPoint"
+                         default_values="0"
+                         name="SnapOnMeshPoint"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="GetIntersection"
+                            default_values="0.0 0.0 0.0"
+                            information_only="1"
+                            name="Intersection"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <Property command="ComputeIntersection"
+                name="Update"></Property>
+      <ProxyProperty command="SetInput"
+                     name="Input">
+        <Documentation>The input from which the selection is
+        extracted.</Documentation>
+      </ProxyProperty>
+      <ProxyProperty command="SetSelection"
+                     name="Selection">
+        <Documentation>The selection that is used to reduced the
+        input.</Documentation>
+      </ProxyProperty>
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <SaveScreenshotProxy name="SaveScreenshotBase" processes="client">
+      <Documentation>
+        Proxy used to save screenshots from view(s) or layouts.
+      </Documentation>
+      <ProxyProperty name="Layout" panel_visibility="never" />
+      <ProxyProperty name="View" panel_visibility="never" />
+
+      <IntVectorProperty name="SaveAllViews"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When checked, all views in the active layout will be saved in the image.
+          Otherwise only the active view will be saved.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ImageResolution"
+        number_of_elements="2"
+        default_values="none"
+        panel_widget="view_resolution" >
+        <ViewResolutionDomain name="range" default_mode="max">
+          <RequiredProperties>
+            <Property name="SaveAllViews" function="UseLayout" />
+            <Property name="Layout"       function="Layout" />
+            <Property name="View"         function="View" />
+          </RequiredProperties>
+        </ViewResolutionDomain>
+        <Documentation>
+          Choose the image resolution in pixels.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="FontScaling"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Scale fonts proportionally" />
+          <Entry value="1" text="Do not scale fonts" />
+        </EnumerationDomain>
+        <Documentation>
+          Select how fonts are to be scaled when saving images at different
+          resolution than the current size.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="SeparatorWidth"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="advanced">
+        <IntRangeDomain name="range" min="0" max="10" />
+        <Documentation>
+          Specify the width of border (in pixels) to use around views when
+          **Save All Views** is checked.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="SaveAllViews"
+                                   value="1" />
+        </Hints>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="SeparatorColor"
+        number_of_elements="3"
+       default_values="0.937 0.922 0.906"
+        panel_widget="color_selector_with_palette"
+        panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+        <Documentation>
+          Select the separator color.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="SaveAllViews"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <StringVectorProperty name="OverrideColorPalette"
+        number_of_elements="1"
+        default_values=""
+        panel_widget="color_palette_selector" >
+        <StringListDomain name="list" />
+        <Documentation>
+          Choose the color palette to load before saving the image.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="StereoMode"
+        number_of_elements="1"
+        default_values="-1"
+        panel_visibility="advanced">
+        <Documentation>
+          Select a stereo mode, as needed.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="No change" value="-1" />
+          <Entry text="No stereo" value="0" />
+          <Entry text="Red-Blue" value="2" />
+          <Entry text="Interlaced" value="3" />
+          <Entry text="Left Eye Only" value="4" />
+          <Entry text="Right Eye Only" value="5" />
+          <Entry text="Dresden" value="6" />
+          <Entry text="Anaglyph" value="7" />
+          <Entry text="Checkerboard" value="8" />
+          <Entry text="Side-by-Side Horizontal" value="9" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="TransparentBackground"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+           Set whether to use a transparent background.
+        </Documentation>
+      </IntVectorProperty>
+    </SaveScreenshotProxy>
+
+    <!-- ================================================================== -->
+    <SaveScreenshotProxy name="SaveScreenshot" processes="client"
+      label="Save Screenshot"
+      base_proxygroup="misc"
+      base_proxyname="SaveScreenshotBase">
+      <Documentation>
+        Proxy used to save screenshots from view(s) or layouts.
+      </Documentation>
+      <ProxyProperty name="Format">
+        <ProxyListDomain name="proxy_list">
+          <Group name="screenshot_writers" />
+        </ProxyListDomain>
+        <Hints>
+          <ProxySelectionWidget enabled="0" />
+        </Hints>
+      </ProxyProperty>
+
+      <!-- FIXME:: deprecated
+      <IntVectorProperty name="ImageQuality"
+        number_of_elements="1"
+        default_values="100"
+        panel_visibility="advanced">
+        <IntRangeDomain name="range" min="0" max="100" />
+        <Documentation>
+          Specify output image quality (or compression), if applicable.
+          **0** - low quality, **100** - high quality.
+        </Documentation>
+      </IntVectorProperty>
+      -->
+
+      <PropertyGroup label="Size and Scaling">
+        <Property name="SaveAllViews" />
+        <Property name="ImageResolution" />
+        <Property name="FontScaling" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Separator Options" >
+        <Property name="SeparatorWidth" />
+        <Property name="SeparatorColor" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Coloring">
+        <Property name="OverrideColorPalette" />
+        <Property name="StereoMode" />
+        <Property name="TransparentBackground" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Image Options">
+        <Property name="Format" />
+      </PropertyGroup>
+    </SaveScreenshotProxy>
+
+    <!-- end of "misc" -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="screenshot_writers">
+    <Documentation>
+      This group includes all writers which can be used to write screenshots in ParaView.
+    </Documentation>
+
+    <!-- ================================================================== -->
+    <Proxy name="PNG" class="vtkPNGWriter" processes="client">
+      <Documentation>
+        Writer for saving screenshots as PNG files.
+      </Documentation>
+      <IntVectorProperty name="CompressionLevel"
+        command="SetCompressionLevel"
+        number_of_elements="1"
+        default_values="5">
+        <Documentation>
+          Specify the *zlib* compression level. **0** is no compression, while **9** is
+          maximum compression.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="0" value="0" info="no compression" />
+          <Entry text="1" value="1" />
+          <Entry text="2" value="2" />
+          <Entry text="3" value="3" />
+          <Entry text="4" value="4" />
+          <Entry text="5" value="5" />
+          <Entry text="6" value="6" />
+          <Entry text="7" value="7" />
+          <Entry text="8" value="8" />
+          <Entry text="9" value="9" info="Maximum compression" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <Hints>
+        <FormatOptions extensions="png"
+          file_description="PNG images" />
+      </Hints>
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy name="JPEG" class="vtkJPEGWriter" processes="client">
+      <Documentation>
+        Writer for saving screenshots as JPEG files.
+      </Documentation>
+      <IntVectorProperty name="Quality"
+        command="SetQuality"
+        number_of_elements="1"
+        default_values="95">
+        <Documentation>
+          Specify the JPEG compression quality. **O** is low quality (maximum compression)
+          and **100** is high quality (least compression).
+        </Documentation>
+        <IntRangeDomain name="range" min="0" max="100" />
+      </IntVectorProperty>
+      <IntVectorProperty name="Progressive"
+        command="SetProgressive"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Save progressive JPEG.
+        </Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <FormatOptions extensions="jpeg jpg"
+          file_description="JPEG images" />
+      </Hints>
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy name="TIFF" class="vtkTIFFWriter" processes="client">
+      <Documentation>
+        Writer for saving screenshots as TIFF files.
+      </Documentation>
+      <IntVectorProperty name="Compression"
+        command="SetCompression"
+        number_of_elements="1"
+        default_values="1">
+        <Documentation>
+          Specify compression type.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" />
+          <Entry text="PackBits" value="1" />
+          <Entry text="Deflate" value="3" />
+          <!--
+               JPEG is disabled since it raised errors about color space when
+               using it.
+
+               LZW is disabled since its not available (as per docs in vtkTIFFWriter
+          -->
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <Hints>
+        <FormatOptions extensions="tiff tif"
+          file_description="TIFF images" />
+      </Hints>
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy name="BMP" class="vtkBMPWriter" processes="client">
+      <Documentation>
+        Writer for saving screenshots as BMP files.
+      </Documentation>
+      <Hints>
+        <FormatOptions extensions="bmp"
+          file_description="Bitmap images" />
+      </Hints>
+    </Proxy>
+
+    <!-- end of "screenshot_writers" -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="insitu2_writer_parameters">
+
+    <!-- ================================================================== -->
+    <SaveScreenshotProxy base_proxygroup="misc" base_proxyname="SaveScreenshotBase"
+        name="SaveScreenshot" processes="client">
+      <Documentation>
+        Variation with catalyst specific extensions.
+      </Documentation>
+
+      <ProxyProperty name="Format">
+        <ProxyListDomain name="proxy_list">
+          <Group name="screenshot_writers" />
+          <Group name="insitu2_misc" />
+        </ProxyListDomain>
+        <Hints>
+          <ProxySelectionWidget enabled="0" />
+        </Hints>
+      </ProxyProperty>
+
+      <PropertyGroup label="Size and Scaling">
+        <Property name="SaveAllViews" />
+        <Property name="ImageResolution" />
+        <Property name="FontScaling" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Separator Options" >
+        <Property name="SeparatorWidth" />
+        <Property name="SeparatorColor" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Coloring">
+        <Property name="OverrideColorPalette" />
+        <Property name="StereoMode" />
+        <Property name="TransparentBackground" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Image Options">
+        <Property name="Format" />
+      </PropertyGroup>
+
+      <SubProxy>
+        <Proxy name="CatalystOptions" proxygroup="misc" proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+             <Property name="CatalystFitToScreen" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    </SaveScreenshotProxy>
+
+    <!-- end of "insitu2_writer_parameters" -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

@@ -1,0 +1,93 @@
+<ServerManagerConfiguration>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="contour_line_interpolators">
+    <Proxy name="ContourLineInterpolatorBase">
+      <Documentation>Base API definition for all contour line
+      interpolators.</Documentation>
+      <!-- End of "ContourLineInterpolatorBase" -->
+    </Proxy>
+    <Proxy base_proxygroup="contour_line_interpolators"
+           base_proxyname="ContourLineInterpolatorBase"
+           class="vtkBezierContourLineInterpolator"
+           name="BezierContourLineInterpolator"></Proxy>
+
+    <!--
+      FIXME: vtkPolyDataContourLineInterpolator is an abstract class;
+             how in the world is this expected to work ????
+
+    <Proxy base_proxygroup="contour_line_interpolators"
+           base_proxyname="ContourLineInterpolatorBase"
+           class="vtkPolyDataContourLineInterpolator"
+           name="PolyDataContourLineInterpolator"></Proxy>
+    -->
+    <Proxy base_proxygroup="contour_line_interpolators"
+           base_proxyname="ContourLineInterpolatorBase"
+           class="vtkPolygonalSurfaceContourLineInterpolator"
+           name="PolygonalSurfaceContourLineInterpolator"></Proxy>
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="point_placers">
+
+    <!-- ================================================================== -->
+    <Proxy name="PointPlacerBase">
+      <Documentation>Base API definition for all point placers.</Documentation>
+      <!-- End of "PointPlacerBase" -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy base_proxygroup="point_placers"
+           base_proxyname="PointPlacerBase"
+           class="vtkFocalPlanePointPlacer"
+           name="FocalPlanePointPlacer"></Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy base_proxygroup="point_placers"
+           base_proxyname="PointPlacerBase"
+           class="vtkBoundedPlanePointPlacer"
+           name="BoundedPlanePointPlacer">
+      <IntVectorProperty command="SetProjectionNormal"
+                         default_values="2"
+                         name="ProjectionNormal"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="XAxis"
+                 value="0" />
+          <Entry text="YAxis"
+                 value="1" />
+          <Entry text="ZAxis"
+                 value="2" />
+          <Entry text="Oblique"
+                 value="3" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetProjectionPosition"
+                            default_values="0.0"
+                            name="ProjectionPosition"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <ProxyProperty clean_command="RemoveAllBoundingPlanes"
+                     command="AddBoundingPlane"
+                     name="BoundingPlanes"
+                     number_of_elements_per_command="1"
+                     repeat_command="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="implicit_functions" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="implicit_functions"
+                 name="Plane" />
+          <Proxy group="implicit_functions"
+                 name="Box" />
+        </ProxyListDomain>
+      </ProxyProperty>
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy base_proxygroup="point_placers"
+           base_proxyname="PointPlacerBase"
+           class="vtkPolygonalSurfacePointPlacer"
+           name="PolygonalSurfacePointPlacer">
+    </Proxy>
+    <!-- end of `point_placers` -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

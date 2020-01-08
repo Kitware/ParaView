@@ -1,0 +1,30 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="writers">
+    <!-- ================================================================= -->
+    <PWriterProxy base_proxygroup="internal_writers"
+                  base_proxyname="ParallelWriterBase"
+                  class="vtkEnSightWriter"
+                  name="EnSightWriter">
+      <Documentation short_help="Write unstructured grid data as an EnSight file.">
+      Writer to write unstructured grid data as an EnSight file. Binary files
+      written on one system may not be readable on other systems. Be sure to
+      specify the endian-ness of the file when reading it into
+      EnSight.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     panel_visibility="never"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <Hints>
+        <WriterFactory extensions="case"
+                       file_description="EnSight File" />
+      </Hints>
+      <!-- End of EnSightWriter -->
+    </PWriterProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

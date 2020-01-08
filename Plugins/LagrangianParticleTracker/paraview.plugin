@@ -5,10 +5,9 @@ DESCRIPTION
 CONDITION
   # TODO: It seems at a glance that it should still work without
   # this? The plugin was behind this conditional previously.
-  PARAVIEW_BUILD_QT_GUI
+  PARAVIEW_USE_QT
 REQUIRES_MODULES
-  ParaView::ClientServerCoreCore
-  ParaView::ServerManagerCore
+  ParaView::RemotingServerManager
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::CommonExecutionModel

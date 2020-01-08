@@ -1,0 +1,554 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkAttributeDataToTableFilter"
+                 label="Extract Attributes"
+                 name="AttributeDataToTableFilter">
+      <Documentation long_help="Extract attribute data as a table."
+                     short_help="Extract attribute data as a table.">This is a
+                     filter that produces a vtkTable from the chosen attribute
+                     in the input data object. This filter can accept composite
+                     datasets. If the input is a composite dataset, the output
+                     is a multiblock with vtkTable leaves.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input of the
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetFieldAssociation"
+                         default_values="0"
+                         name="FieldAssociation"
+                         number_of_elements="1">
+        <Documentation>Select the attribute data to pass.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Points"
+                 value="0" />
+          <Entry text="Cells"
+                 value="1" />
+          <Entry text="Field Data"
+                 value="2" />
+          <Entry text="Vertices"
+                 value="4" />
+          <Entry text="Edges"
+                 value="5" />
+          <Entry text="Rows"
+                 value="6" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAddMetaData"
+                         default_values="0"
+                         name="AddMetaData"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>It is possible for this filter to add additional
+        meta-data to the field data such as point coordinates (when point
+        attributes are selected and input is pointset) or structured
+        coordinates etc. To enable this addition of extra information, turn
+        this flag on. Off by default.</Documentation>
+      </IntVectorProperty>
+      <!-- End of AttributeDataToTableFilter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkDataObjectTreeToPointSetFilter"
+                 label="Merge Blocks"
+                 name="MergeBlocks">
+      <Documentation short_help="Appends vtkCompositeDataSet leaves into a single vtkUnstructuredGrid or vtkPolyData">
+      Merge Blocks appends all vtkDataSet leaves of the input composite dataset to a single
+      unstructured grid (or polydata if all leaves are polydata). The subtree to
+      be combined can be chosen using the SubTreeCompositeIndex. If the SubTreeCompositeIndex
+      is a leaf node, then no appending is required nor performed.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObjectTree" />
+        </DataTypeDomain>
+        <Documentation>Set the input composite dataset.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetOutputDataSetType"
+                         default_values="4"
+                         number_of_elements="1"
+                         name="OutputDataSetType"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Polygonal Mesh"
+                 value="0" />
+          <Entry text="Unstructured Grid"
+                 value="4" />
+        </EnumerationDomain>
+        <Documentation>Determines the output type produced by this filter. Only blocks compatible
+        with the output type will be merged in the output. For example, if the output type is
+        "Polygonal Mesh", then blocks of type "Image Data", "Structured Grid", etc. will not be merged.
+        If the output type is "UnstructuredGrid", then blocks of any type will be merged in the output.
+        Defaults to "Unstructured Grid".
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetSubTreeCompositeIndex"
+                         default_values="0"
+                         is_internal="1"
+                         name="SubTreeCompositeIndex"
+                         number_of_elements="1">
+        <CompositeTreeDomain mode="all"
+                             name="tree">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </CompositeTreeDomain>
+        <Documentation>Select the index of the subtree to be appended. For now,
+        this property is internal.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMergePoints"
+                         default_values="1"
+                         label="Merge Points"
+                         name="MergePoints"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Merge points within a distance specified by the **Tolerance**
+        property.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetTolerance"
+                            default_values="0"
+                            label="Tolerance"
+                            name="Tolerance"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Documentation>Set the tolerance for merging points if **Merge Points** is enabled.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="MergePoints"
+                                   value="1" />
+          <!-- show this widget when MergePoints==1 and showing advanced options -->
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetToleranceIsAbsolute"
+                         default_values="0"
+                         name="ToleranceIsAbsolute"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>This property determines whether to treat the **Tolerance**
+        property as absolute (points closer than Tolerance are merged) or relative
+        (points closer than a fraction of the input data's bounding box diagonal length)
+        when performing point merging.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="MergePoints"
+                                   value="1" />
+          <!-- show this widget when MergePoints==1 and showing advanced options -->
+        </Hints>
+      </IntVectorProperty>
+      <!-- End of MergeBlocks -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkEnvironmentAnnotationFilter"
+                 label="Environment Annotation"
+                 name="EnvironmentAnnotation">
+      <Documentation long_help="Allows annotation of user name, date/time, OS, and possibly filename."
+        short_help="Adds annotation overlay.">
+        Apply to any source. Gui allows manual selection of desired annotation options.
+        If the source is a file, can display the filename.
+      </Documentation>
+      <InputProperty clean_command="RemoveAllInputs"
+                     command="AddInputConnection"
+                     multiple_input="1"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>Set the input of the filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetDisplayUserName"
+                         name="DisplayUserName"
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle User Name Visibility.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDisplaySystemName"
+                         name="DisplaySystemName"
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle System Name Visibility.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDisplayDate"
+                         name="DisplayDate"
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle Date/Time Visibility.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDisplayFileName"
+                         name="DisplayFileName"
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle File Name Visibility.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDisplayFilePath"
+                         name="DisplayFilePath"
+                         default_values="1"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle Show Full File Path.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="DisplayFileName"
+                                   value="1" />
+          <!-- enable this widget when DisplayFileName==1 -->
+        </Hints>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            default_values=""
+                            number_of_elements="1"
+                            panel_widget="filename_widget">
+        <Documentation>Annotation of file name.</Documentation>
+        <InputFileNameDomain name="filename">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </InputFileNameDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="DisplayFileName"
+                                   value="1" />
+          <!-- enable this widget when DisplayFileName==1 -->
+        </Hints>
+      </StringVectorProperty>
+      <Hints>
+        <Visibility replace_input="0" />
+        <OutputPort index="0"
+                    name="Output-0"
+                    type="text" />
+      </Hints>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkMinMax" name="MinMax">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the Min Max filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetOperation"
+                            default_values="MIN"
+                            name="Operation"
+                            number_of_elements="1">
+        <StringListDomain name="operation">
+          <String value="MIN" />
+          <String value="MAX" />
+          <String value="SUM" />
+        </StringListDomain>
+        <Documentation>Select whether to perform a min, max, or sum operation
+        on the data.</Documentation>
+      </StringVectorProperty>
+      <!-- End MinMax -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPExtractHistogram"
+                 label="Histogram"
+                 name="ExtractHistogram">
+      <Documentation long_help="Extract a histogram from field data."
+                     short_help="Extract a histogram from field data.">
+                     </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array">
+        </InputArrayDomain>
+        <Documentation>This property specifies the input to the Histogram
+        filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputArray"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property indicates the name of the array from which
+        to compute the histogram.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetBinCount"
+                         default_values="10"
+                         name="BinCount"
+                         number_of_elements="1">
+        <IntRangeDomain max="256"
+                        min="1"
+                        name="range" />
+        <Documentation>The value of this property specifies the number of bins
+        for the histogram.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetComponent"
+                         default_values="0"
+                         name="Component"
+                         number_of_elements="1">
+        <NumberOfComponentsDomain name="comps" enable_magnitude="1">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputArray" />
+          </RequiredProperties>
+        </NumberOfComponentsDomain>
+        <Documentation>The value of this property specifies the array component
+        from which the histogram should be computed.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCalculateAverages"
+                         default_values="0"
+                         name="CalculateAverages"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>This option controls whether the algorithm calculates
+        averages of variables other than the primary variable that fall into
+        each bin.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseCustomBinRanges"
+                         default_values="0"
+                         name="UseCustomBinRanges"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>When set to true, CustomBinRanges will be used instead
+        of using the full range for the selected array. By default, set to
+        false.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCenterBinsAroundMinAndMax"
+                         default_values="0"
+                         name="CenterBinsAroundMinAndMax"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>When set to true, first and last bin will be centered
+          around the minimum and the maximum values of the data.
+          By default, set to false.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseCustomBinRanges" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetCustomBinRanges"
+                            default_values="0.0 100.0"
+                            name="CustomBinRanges"
+                            number_of_elements="2"
+                            panel_visibility="advanced">
+        <Documentation>Set custom bin ranges to use. These are used only when
+        UseCustomBinRanges is set to true.</Documentation>
+        <ArrayRangeDomain name="scalar_range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputArray" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseCustomBinRanges" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <Hints>
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <View type="XYBarChartView" />
+        <Plotable />
+      </Hints>
+      <!-- End ExtractHistogram -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkReductionFilter"
+                 name="AppendReductionFilter"
+                 label="Append Reduce">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>Set the input to the Reduction filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetPostGatherHelperName"
+                            name="PostGatherHelperName"
+                            panel_visibility="never"
+                            default_values="vtkAppendFilter"
+                            number_of_elements="1">
+        <Documentation>Set the algorithm that takes multiple inputs and
+        produces a single reduced output.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetReductionMode"
+                         default_values="2"
+                         name="ReductionMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Reduce all data to one processor"
+                 value="0" />
+          <Entry text="Move all data to one processor"
+                 value="1" />
+          <Entry text="Reduce all data to all processors"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>Set the reduction mode. Reducing all data to one
+        processor means that the destination process will have all data while
+        each other process will still have it's own data. Moving all to one processor means
+        that the destination process will have all data while other process have no data
+        anymore. Reduce all data to all processors is self explanatory.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetReductionProcessId"
+                         default_values="0"
+                         name="ReduceTo"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ReductionMode"
+                                   value="2"
+                                   inverse="1"/>
+          <!-- show this widget when ReductionMode is not 2 -->
+        </Hints>
+        <Documentation>Set the process to reduce to.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPassThrough"
+                         default_values="-1"
+                         name="OnlyFrom"
+                         number_of_elements="1">
+        <IntRangeDomain min="-1"
+                        name="range" />
+        <Documentation>If set to a non-negative value, then produce results
+        using only the node Id specified.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateProcessIds"
+                         default_values="0"
+                         name="GenerateProcessIds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If true, the filter will generate vtkOriginalProcessIds
+        arrays indicating the process id on which the cell/point was
+        generated.</Documentation>
+      </IntVectorProperty>
+      <!-- End ReductionFilter -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkReductionFilter"
+                 name="ReductionFilter">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <Documentation>Set the input to the Reduction filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetReductionMode"
+                         default_values="0"
+                         name="ReductionMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Move all data to one processor"
+                 value="0" />
+          <Entry text="Reduce all data to one processor"
+                 value="1" />
+          <Entry text="Reduce all data to all processors"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetReductionProcessId"
+                         default_values="0"
+                         name="ReduceTo"
+                         number_of_elements="1">
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetPreGatherHelperName"
+                            name="PreGatherHelperName"
+                            number_of_elements="1">
+        <Documentation>Set the algorithm that runs on each node in
+        parallel.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPostGatherHelperName"
+                            name="PostGatherHelperName"
+                            number_of_elements="1">
+        <Documentation>Set the algorithm that takes multiple inputs and
+        produces a single reduced output.</Documentation>
+      </StringVectorProperty>
+      <ProxyProperty command="SetPostGatherHelper"
+                     name="PostGatherHelper" />
+      <ProxyProperty command="SetPreGatherHelper"
+                     name="PreGatherHelper" />
+      <IntVectorProperty command="SetPassThrough"
+                         default_values="-1"
+                         name="PassThrough"
+                         number_of_elements="1">
+        <IntRangeDomain min="-1"
+                        name="range" />
+        <Documentation>If set to a non-negative value, then produce results
+        using only the node Id specified.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateProcessIds"
+                         default_values="0"
+                         name="GenerateProcessIds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If true, the filter will generate vtkOriginalProcessIds
+        arrays indicating the process id on which the cell/point was
+        generated.</Documentation>
+      </IntVectorProperty>
+      <!-- End ReductionFilter -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

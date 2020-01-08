@@ -1,0 +1,48 @@
+<ServerManagerConfiguration>
+  <!-- =================================================================== -->
+  <ProxyGroup name="animation">
+    <Proxy class="vtkPythonAnimationCue"
+           name="PythonAnimationCue"
+           processes="client">
+      <Documentation>Animation cue that can use python script for
+      animation.</Documentation>
+      <IntVectorProperty command="SetEnabled"
+                         default_values="1"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enables this animation cue.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTimeMode"
+                         default_values="0"
+                         name="TimeMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Normalized"
+                 value="0" />
+          <Entry text="Relative"
+                 value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetStartTime"
+                            default_values="0"
+                            name="StartTime"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetEndTime"
+                            default_values="1"
+                            name="EndTime"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <StringVectorProperty command="SetScript"
+                            default_values="def start_cue(self): pass&#xa;&#xa;def tick(self): pass&#xa;&#xa;def end_cue(self): pass"
+                            name="Script"
+                            number_of_elements="1">
+        <Hints>
+          <Widget type="multi_line" />
+        </Hints>
+        <Documentation>This property contains the text for the script to
+        execute.</Documentation>
+      </StringVectorProperty>
+      <!-- end of PythonAnimationCue -->
+    </Proxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

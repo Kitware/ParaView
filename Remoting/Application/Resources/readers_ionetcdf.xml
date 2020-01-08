@@ -1,0 +1,791 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="internal_sources">
+    <!-- ================================================================== -->
+    <Proxy class="vtkSLACParticleReader"
+                 label="SLAC Particle Data Reader"
+                 name="SLACParticleReaderCore">
+      <Documentation>The SLAC Particle data reader.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>The name of the file to load.</Documentation>
+      </StringVectorProperty>
+      <!-- SLACParticleReaderCore -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkNetCDFCAMReader"
+                 label="NetCDF CAM reader"
+                 name="NetCDFCAMReaderCore">
+      <Documentation>Core for NetCDF CAM reader.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetConnectivityFileName"
+                            name="ConnectivityFileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name to read for the
+        grid connectivity.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="PointsFileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name to read for the
+        points and field information.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetVerticalDimension"
+                         default_values="1"
+                         name="VerticalDimension"
+                         number_of_elements="1">
+        <Documentation>Specify whether to read variables from the
+        single layer, from midpoint layers or from interface
+        layers.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Single layer [time, ncol]"
+                 value="0" />
+          <Entry text="Midpoint layers [time, lev, ncol]"
+                 value="1" />
+          <Entry text="Interface layers [time, ilev, ncol]"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            name="PointArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1"
+                            panel_visibility="advanced">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which NetCDF CAM point
+        variables to load.</Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="SingleMidpointLayer"
+                         command="SetSingleMidpointLayer"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Load only one layer from variables on the midpoint layers. The layer
+          is specified by MidpointLayerIndex.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetMidpointLayersRange"
+                         information_only="1"
+                         name="MidpointLayersRangeInfo"></IntVectorProperty>
+      <IntVectorProperty name="MidpointLayerIndex"
+                            command="SetMidpointLayerIndex"
+                            number_of_elements="1"
+                            default_values="0"
+                            panel_visibility="advanced">
+        <IntRangeDomain name="range"  default_mode="min">
+          <RequiredProperties>
+            <Property function="Range"
+                      name="MidpointLayersRangeInfo" />
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="SingleMidpointLayer" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          Specifies which layer to load from the midpoint layers. Note that
+          the layer indexes 0 to n-1 map to Z values n-1 to 0.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="SingleInterfaceLayer"
+                         command="SetSingleInterfaceLayer"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Load only one layer from variables on the interface layers. The layer
+          is specified by InterfaceLayerIndex.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetInterfaceLayersRange"
+                         information_only="1"
+                         name="InterfaceLayersRangeInfo"></IntVectorProperty>
+      <IntVectorProperty name="InterfaceLayerIndex"
+                            command="SetInterfaceLayerIndex"
+                            number_of_elements="1"
+                            default_values="0"
+                            panel_visibility="advanced">
+        <IntRangeDomain name="range"  default_mode="min">
+          <RequiredProperties>
+            <Property function="Range"
+                      name="InterfaceLayersRangeInfo" />
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="SingleInterfaceLayer" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+        <Documentation>
+          Specifies which layer to load from the interface layers. Note that
+          the layer indexes 0 to n-1 map to Z values n-1 to 0.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty default_values="1"
+                         name="CellLayerRight"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <Documentation>**DEPRECATED in ParaView 4.4.** No longer needed/supported.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <!-- End NetCDFCAMReaderCore -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkNetCDFPOPReader"
+                 label="NetCDF POP reader"
+                 name="NetCDFPOPReaderCore">
+      <Documentation>Core for NetCDF POP reader.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="VariableArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Variable" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetVariableArrayStatus"
+                            element_types="2 0"
+                            information_property="VariableArrayInfo"
+                            label="Variables"
+                            name="VariableArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="VariableArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which NetCDF variables to
+        load.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetStride"
+                         default_values="1 1 1"
+                         name="Stride"
+                         number_of_elements="3">
+        <IntRangeDomain min="1 1 1"
+                        name="range" />
+        <Documentation>This property indicate the number of indices per
+        dimension (i,j,k) to skip between each point included in this
+        output.</Documentation>
+      </IntVectorProperty>
+      <!-- End NetCDFPOPReaderCore -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkNetCDFCFReader"
+                 name="netCDFReaderCore">
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>The name of the file to load.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="GetAllDimensions"
+                            information_only="1"
+                            name="DimensionInfo">
+        <StringArrayHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animatelable="0"
+                            command="SetDimensions"
+                            name="Dimensions"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="DimensionInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>Load the grid with the given dimensions. Any arrays that
+        conform to these dimensions will be loaded.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="GetVariableDimensions"
+                            information_only="1"
+                            name="VariableDimensionInfo">
+        <StringArrayHelper />
+      </StringVectorProperty>
+      <StringVectorProperty command="GetAllVariableArrayNames"
+                            information_only="1"
+                            name="VariableArrayInfo">
+        <StringArrayHelper />
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetSphericalCoordinates"
+                         default_values="1"
+                         name="SphericalCoordinates"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <BooleanDomain name="bool" />
+        <Documentation>If on, then data with latitude/longitude dimensions will
+        be read in as curvilinear data shaped like spherical coordinates. If
+        false, then the data will always be read in Cartesian
+        coordinates.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetVerticalScale"
+                            default_values="1"
+                            name="VerticalScale"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The scale of the vertical component of spherical
+        coordinates. It is common to write the vertical component with respect
+        to something other than the center of the sphere (for example, the
+        surface). In this case, it might be necessary to scale and/or bias the
+        vertical height. The height will become height*scale + bias. Keep in
+        mind that if the positive attribute of the vertical dimension is down,
+        then the height is negated. The scaling will be adjusted if it results
+        in invalid (negative) vertical values.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetVerticalBias"
+                            default_values="0"
+                            name="VerticalBias"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The bias of the vertical component of spherical
+        coordinates. It is common to write the vertical component with respect
+        to something other than the center of the sphere (for example, the
+        surface). In this case, it might be necessary to scale and/or bias the
+        vertical height. The height will become height*scale + bias. Keep in
+        mind that if the positive attribute of the vertical dimension is down,
+        then the height is negated. The scaling will be adjusted if it results
+        in invalid (negative) vertical values.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetReplaceFillValueWithNan"
+                         default_values="0"
+                         name="ReplaceFillValueWithNan"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <BooleanDomain name="bool" />
+        <Documentation>If on, any float or double variable read that has a
+        _FillValue attribute will have that fill value replaced with a
+        not-a-number (NaN) value. The advantage of setting these to NaN values
+        is that, if implemented properly by the system and careful math
+        operations are used, they can implicitly be ignored by calculations
+        like finding the range of the values. That said, this option should be
+        used with caution as VTK does not fully support NaN values and
+        therefore odd calculations may occur.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetOutputType"
+                         default_values="-1"
+                         name="OutputType"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <EnumerationDomain name="enum">
+          <Entry text="Automatic"
+                 value="-1" />
+          <Entry text="Image"
+                 value="6" />
+          <Entry text="Rectilinear"
+                 value="3" />
+          <Entry text="Structured"
+                 value="2" />
+          <Entry text="Unstructured"
+                 value="4" />
+        </EnumerationDomain>
+        <Documentation>Specifies the type of data that the reader creates. If
+        Automatic, the reader will use the most appropriate grid type for the
+        data read. Note that not all grid types support all data. A warning is
+        issued if a mismatch occurs.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>This magic property sends time information to the
+        animation panel. ParaView will then automatically set up the animation
+        to visit the time steps defined in the file.</Documentation>
+      </DoubleVectorProperty>
+      <!-- netCDFReaderCore -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <!-- end of "internal_sources" -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="SLAC Particle Data Reader"
+                 name="SLACParticleReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation short_help="The SLAC Particle data reader.">The SLAC Particle data reader.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="SLACParticleReaderCore"></Proxy>
+      </SubProxy>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>A list of files to be read in a time
+        series.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="ncdf netcdf"
+                       file_description="SLAC Particle Files" />
+      </Hints>
+      <!-- SLACParticleReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="NetCDF CAM reader"
+                 name="NetCDFCAMReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads unstructured grid data from NetCDF files. There are 2 files, a points+fields file which is set as FileName and a cell connectivity file set as ConnectivityFileName."
+                     short_help="Read unstructured grid NetCDF files in CAM format.">
+                     This reader reads in unstructured grid data from a NetCDF
+                     file. The grid data is in a set of planes as quadrilateral
+                     cells. The reader creates hex cells in order to create a
+                     volumetric grid.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="NetCDFCAMReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="ConnectivityFileName" />
+          <Property name="VerticalDimension" />
+          <Property name="PointArrayStatus" />
+          <Property name="SingleMidpointLayer" />
+          <Property name="MidpointLayerIndex" />
+          <Property name="SingleInterfaceLayer" />
+          <Property name="InterfaceLayerIndex" />
+          <Property name="CellLayerRight" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="nc ncdf"
+                       file_description="CAM NetCDF (Unstructured)" />
+      </Hints>
+      <!-- End NetCDFCAMReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="NetCDF POP reader"
+                 name="NetCDFPOPReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads rectilinear grid data from a NetCDF POP file."
+                     short_help="Read rectilinear grid data from a NetCDF file in the POP format.">
+      The reader reads regular rectilinear grid (image/volume) data from a
+      NetCDF file.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="NetCDFPOPReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="VariableArrayInfo" />
+          <Property name="VariableArrayStatus" />
+          <Property name="Stride" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="pop.ncdf pop.nc"
+                       file_description="POP Ocean NetCDF (Rectilinear)" />
+      </Hints>
+      <!-- End NetCDFPOPReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="NetCDF Reader"
+                 name="netCDFReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads regular arrays from NetCDF files. Will also read any topological information specified by the COARDS and CF conventions."
+                     short_help="Read regular arrays from NetCDF files.">Reads
+                     arrays from NetCDF files into structured VTK data sets. In
+                     the absence of any other information, the files will be
+                     read as image data. This reader will also look for meta
+                     information specified by the CF convention that specify
+                     things like topology and time. This information can cause
+                     the output to be a nonuniform rectilinear grid or
+                     curvilinear (structured) grid. Details on the CF
+                     convention can be found at http://cf-pcmdi.llnl.gov/. It
+                     should be noted that the CF convention is a superset of
+                     the COARDS convention, so COARDS conventions will also be
+                     recognized.</Documentation>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The name of the files to load.</Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="netCDFReaderCore" />
+        <ExposedProperties>
+          <Property name="DimensionInfo" />
+          <Property name="Dimensions" />
+          <Property name="VariableDimensionInfo" />
+          <Property name="VariableArrayInfo" />
+          <Property name="SphericalCoordinates" />
+          <Property name="VerticalScale" />
+          <Property name="VerticalBias" />
+          <Property name="ReplaceFillValueWithNan" />
+          <Property name="OutputType" />
+        </ExposedProperties>
+      </SubProxy>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>This magic property sends time information to the
+        animation panel. ParaView will then automatically set up the animation
+        to visit the time steps defined in the file.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="ncdf nc"
+                       file_description="netCDF files generic and CF conventions" />
+      </Hints>
+      <!-- netCDFReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkMPASReader"
+                 label="NetCDF MPAS reader"
+                 name="MPASReader">
+      <Documentation long_help="Reads unstructured grid MPAS data from a file."
+                     short_help="Read unstructured grid MPAS data from a file.">
+                     This reader reads unstructured grid MPAS data from a file.
+                     It creates a dual grid It assumes the grid is in the
+                     global domain. By default, it creates a spherical view of
+                     vertical layer 0. It assumes it is ocean data. It gives
+                     several options to change the view to multilayer (all
+                     vertical layers will have a thickness determined by the
+                     value in the slider), lat/lon projection or atmospheric
+                     (vertical layers go out away from the center of the
+                     sphere, instead of down towards the center as they do for
+                     ocean data). It doesn't handle data in the rectangular
+                     domain. This is not a parallel reader. It expects one .nc
+                     file of data. It can display cell or vertex-centered data,
+                     but not edge data. When converted to the dual grid,
+                     cell-centered data becomes vertex-centered and vice-versa.
+                     NOTES: When using this reader, it is important that you
+                     remember to do the following: 1. When changing a selected
+                     variable, remember to select it also in the drop down box
+                     to color by. It doesn't color by that variable
+                     automatically 2. When selecting multilayer sphere view,
+                     start with layer thickness around 100,000 3. When
+                     selecting multilayer lat/lon view, start with layer
+                     thickness around 10 4. Always click the -Z orientation
+                     after making a switch from lat/lon to sphere, from single
+                     to multilayer or changing thickness. 5. Be conservative on
+                     the number of changes you make before hitting Apply, since
+                     there may be bugs in this reader. Just make one change and
+                     then hit Apply. For problems, contact Christine Ahrens
+                     (cahrens@lanl.gov)</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name to read. It should
+        be an MPAS format NetCDF file ending in .nc.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetUseDimensionedArrayNames"
+                         name="UseDimensionedArrayNames"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>This property ensures that the dimension info is always
+        shown in the ParaView GUI.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            name="PointArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which NetCDF dual-grid point
+        variables to load.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            name="CellArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which NetCDF dual-grid cell
+        variables to load.</Documentation>
+      </StringVectorProperty>
+      <!-- Dimensions table: -->
+      <!-- Elements are [arrayName] [currentIndex] [dimSize]: -->
+      <StringVectorProperty information_only="1"
+                            name="DimensionInfo"
+                            command="Dimension"
+                            si_class="vtkSIIndexSelectionProperty">
+      </StringVectorProperty>
+      <!-- Elements are [arrayName] [currentIndex]: -->
+      <StringVectorProperty command="SetDimensionCurrentIndex"
+                            name="DimensionCurrentIndex"
+                            label="Extra Dimension Indices"
+                            element_types="2 0"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1"
+                            panel_widget="index_selection">
+        <IndexSelectionDomain name="index_selection">
+          <RequiredProperties>
+            <Property function="Info"
+                      name="DimensionInfo" />
+          </RequiredProperties>
+        </IndexSelectionDomain>
+      </StringVectorProperty>
+      <!-- End dimensions table -->
+      <IntVectorProperty command="SetShowMultilayerView"
+                         default_values="0"
+                         name="ShowMultilayerView"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property indicates whether to show multiple layers
+        in one view, with each vertical level having the same thickness,
+        specified by the layer thickness slider. For ocean data, the layers
+        correspond to data at vertical level whose number increases towards the
+        center of the sphere. For atmospheric data, the layers correspond to
+        data at vertical levels increasing away from the
+        center.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="GetAllDimensions"
+                            information_only="1"
+                            name="DimensionList">
+        <StringArrayHelper />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetVerticalDimension"
+                            name="VerticalDimension"
+                            label="Vertical Dimension"
+                            number_of_elements="1"
+                            default_values="nVertLevels"
+                            panel_visibility="default">
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="DimensionList" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="ShowMultilayerView" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetProjectLatLon"
+                         default_values="0"
+                         name="ProjectLatLon"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property indicates whether to view the data in the
+        lat/lon projection.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetIsAtmosphere"
+                         default_values="0"
+                         name="IsAtmosphere"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property indicates whether data is atmospheric.
+        Checking this ensures the vertical levels will go up away from the
+        sphere instead of down towards the center.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetLayerThicknessRange"
+                         information_only="1"
+                         name="LayerThicknessRangeInfo">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLayerThickness"
+                         default_values="10"
+                         label="Layer Thickness"
+                         name="LayerThickness"
+                         number_of_elements="1">
+        <IntRangeDomain name="LayerThicknessRange">
+          <RequiredProperties>
+            <Property function="Range"
+                      name="LayerThicknessRangeInfo" />
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Documentation>This property specifies how thick the layer should be if
+        viewing the data in multilayer view. Each layer corresponds to a
+        vertical level. A good starting point is 100,000 for the spherical view
+        and 10 for the lat/lon projection. Click on -Z after applying this
+        change, since the scale may change drastically.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetCenterLonRange"
+                         information_only="1"
+                         name="CenterLonRangeInfo">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCenterLon"
+                         default_values="180"
+                         label="Center Longitude"
+                         name="CenterLon"
+                         number_of_elements="1">
+        <IntRangeDomain name="CenterLonRange">
+          <RequiredProperties>
+            <Property function="Range"
+                      name="CenterLonRangeInfo" />
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Documentation>This property specifies where the center will be viewed
+        for a lat/lon projection.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="ncdf nc"
+                       file_description="MPAS NetCDF (Unstructured)" />
+      </Hints>
+    </SourceProxy>
+    <!-- End MPASReader -->
+
+    <!-- end of "sources" -->
+  </ProxyGroup>
+
+</ServerManagerConfiguration>

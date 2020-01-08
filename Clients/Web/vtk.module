@@ -1,0 +1,23 @@
+NAME
+  ParaView::ClientsWeb
+LIBRARY_NAME
+  vtkPVClientWeb
+CONDITION
+  PARAVIEW_ENABLE_WEB
+GROUPS
+  PARAVIEW_CANONICAL
+KIT
+  ParaView::ServerManagerKit
+DEPENDS
+  VTK::WebCore
+  VTK::WebGLExporter
+PRIVATE_DEPENDS
+  ParaView::RemotingApplication
+  ParaView::RemotingViews
+  VTK::CommonSystem
+TEST_DEPENDS
+  VTK::ImagingSources
+  VTK::TestingCore
+TEST_LABELS
+  ParaView
+  ParaViewWeb

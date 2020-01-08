@@ -3,6 +3,6 @@ NAME
 DESCRIPTION
   Add a new toolbar to perform flip book type rendering by switching visibility of the representations
 CONDITION
-  PARAVIEW_BUILD_QT_GUI
+  PARAVIEW_USE_QT
 REQUIRES_MODULES
   ParaView::pqApplicationComponents
