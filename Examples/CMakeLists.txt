@@ -34,6 +34,9 @@ if (ParaView_BINARY_DIR)
         PROPERTY
           ENVIRONMENT "PATH=${example_path}")
     endif ()
+    set_property(TEST "ParaViewExample-${dir}" APPEND
+      PROPERTY
+        SKIP_REGULAR_EXPRESSION "Skipping example")
   endfunction ()
 else ()
   find_package(ParaView REQUIRED)
