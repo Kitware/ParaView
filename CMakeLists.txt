@@ -239,7 +239,7 @@ set_property(GLOBAL
 
 # Note that the way that this flag gets used, it only has an effect on the
 # initial configuration.
-option(PARAVIEW_PLUGINS_DEFAULT "Default state for ParaView plugins" ON)
+option(PARAVIEW_PLUGINS_DEFAULT "Default state for ParaView plugins" ${PARAVIEW_BUILD_CANONICAL})
 mark_as_advanced(PARAVIEW_PLUGINS_DEFAULT)
 set(paraview_default_plugins
   AcceleratedAlgorithms
