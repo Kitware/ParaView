@@ -84,8 +84,7 @@ pqMoleculePropertyWidget::pqMoleculePropertyWidget(
     &pqMoleculePropertyWidget::onResetAtomFactorToggled);
   QAction* resetAtomicRadiusAction = new QAction(ui.resetAtomicRadiusFactor);
   resetAtomicRadiusAction->setToolTip("Reset the range values");
-  resetAtomicRadiusAction->setIcon(
-    ui.resetAtomicRadiusFactor->style()->standardIcon(QStyle::SP_BrowserReload));
+  resetAtomicRadiusAction->setIcon(QIcon(":/pqWidgets/Icons/pqReset.svg"));
   ui.resetAtomicRadiusFactor->addAction(resetAtomicRadiusAction);
   ui.resetAtomicRadiusFactor->setDefaultAction(resetAtomicRadiusAction);
 

@@ -63,7 +63,6 @@ pqDoubleRangeSliderPropertyWidget::pqDoubleRangeSliderPropertyWidget(
   Ui::DoubleRangeSliderPropertyWidget& ui = this->Internals->Ui;
   ui.setupUi(this);
 
-  ui.Reset->setIcon(ui.Reset->style()->standardIcon(QStyle::SP_BrowserReload));
   ui.gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
   ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
   ui.gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());

@@ -43,7 +43,7 @@
        </property>
        <property name="icon">
         <iconset resource="../pqComponents.qrc">
-         <normaloff>:/pqWidgets/Icons/pqReset.svg</normaloff>:/pqWidgets/Icons/pqReset.svg</iconset>
+         <normaloff>:/pqWidgets/Icons/pqCancel.svg</normaloff>:/pqWidgets/Icons/pqCancel.svg</iconset>
        </property>
       </widget>
      </item>
@@ -194,6 +194,10 @@
             <property name="text">
              <string/>
             </property>
+            <property name="icon">
+             <iconset resource="../pqComponents.qrc">
+              <normaloff>:/pqWidgets/Icons/pqReset.svg</normaloff>:/pqWidgets/Icons/pqReset.svg</iconset>
+            </property>
            </widget>
           </item>
           <item>
@@ -310,6 +314,10 @@
             <property name="text">
              <string/>
             </property>
+            <property name="icon">
+             <iconset resource="../pqComponents.qrc">
+              <normaloff>:/pqWidgets/Icons/pqReset.svg</normaloff>:/pqWidgets/Icons/pqReset.svg</iconset>
+            </property>
            </widget>
           </item>
           <item>
@@ -425,6 +433,10 @@
             </property>
             <property name="text">
              <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../pqComponents.qrc">
+              <normaloff>:/pqWidgets/Icons/pqReset.svg</normaloff>:/pqWidgets/Icons/pqReset.svg</iconset>
             </property>
            </widget>
           </item>

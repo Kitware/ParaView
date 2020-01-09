@@ -48,6 +48,10 @@
    </item>
    <item row="0" column="2" rowspan="2">
     <widget class="pqHighlightableToolButton" name="Reset">
+     <property name="icon">
+      <iconset resource="../../../Components/Resources/pqComponents.qrc">
+       <normaloff>:/pqWidgets/Icons/pqReset.svg</normaloff>:/pqWidgets/Icons/pqReset.svg</iconset>
+     </property>
      <property name="toolTip">
       <string>Reset using current data values</string>
      </property>

@@ -77,7 +77,6 @@ public:
     : ObserverId(0)
   {
     this->Ui.setupUi(self);
-    this->Ui.RestoreDefaults->setIcon(self->style()->standardIcon(QStyle::SP_BrowserReload));
 
     QVBoxLayout* vbox = new QVBoxLayout(this->Ui.PropertiesFrame);
     vbox->setMargin(0);

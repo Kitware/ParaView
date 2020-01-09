@@ -75,8 +75,6 @@ pqTransferFunctionWidgetPropertyDialog::pqTransferFunctionWidgetPropertyDialog(c
 
   QAction* resetActn = new QAction(this->Internals->Ui.resetButton);
   resetActn->setToolTip("Reset using current data values");
-  resetActn->setIcon(
-    this->Internals->Ui.resetButton->style()->standardIcon(QStyle::SP_BrowserReload));
   this->Internals->Ui.resetButton->addAction(resetActn);
   this->Internals->Ui.resetButton->setDefaultAction(resetActn);
   QObject::connect(this->PropertyWidget, SIGNAL(domainChanged()), this->Internals->Ui.resetButton,

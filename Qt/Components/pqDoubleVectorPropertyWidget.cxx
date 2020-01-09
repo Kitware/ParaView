@@ -311,7 +311,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
     resetButton->setObjectName("Reset");
     QAction* resetActn = new QAction(resetButton);
     resetActn->setToolTip("Reset using current data values");
-    resetActn->setIcon(resetButton->style()->standardIcon(QStyle::SP_BrowserReload));
+    resetActn->setIcon(QIcon(":/pqWidgets/Icons/pqReset.svg"));
     resetButton->addAction(resetActn);
     resetButton->setDefaultAction(resetActn);
 

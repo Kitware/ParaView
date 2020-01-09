@@ -72,6 +72,10 @@
      <property name="text">
       <string/>
      </property>
+     <property name="icon">
+      <iconset resource="../../../Components/Resources/pqComponents.qrc">
+       <normaloff>:/pqWidgets/Icons/pqReset.svg</normaloff>:/pqWidgets/Icons/pqReset.svg</iconset>
+     </property>
     </widget>
    </item>
   </layout>

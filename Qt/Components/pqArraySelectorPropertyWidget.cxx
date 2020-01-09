@@ -72,7 +72,7 @@ QIcon get_icon(int assoc)
 
 QIcon get_none_icon()
 {
-  return QIcon(":/pqWidgets/Icons/pqReset.svg");
+  return QIcon(":/pqWidgets/Icons/pqCancel.svg");
 }
 
 QString get_label(const QString& name, bool is_partial)

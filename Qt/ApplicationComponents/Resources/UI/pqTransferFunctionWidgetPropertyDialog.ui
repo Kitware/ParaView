@@ -57,7 +57,12 @@
        </widget>
       </item>
       <item row="0" column="4">
-       <widget class="pqHighlightableToolButton" name="resetButton"/>
+       <widget class="pqHighlightableToolButton" name="resetButton">
+         <property name="icon">
+          <iconset resource="../../../Components/Resources/pqComponents.qrc">
+           <normaloff>:/pqWidgets/Icons/pqReset.svg</normaloff>:/pqWidgets/Icons/pqReset.svg</iconset>
+         </property>
+       </widget>>
       </item>
      </layout>
     </widget>
