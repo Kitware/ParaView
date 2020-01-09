@@ -75,7 +75,7 @@ int vtkLagrangianIntegrationModelExample::FunctionValues(vtkLagrangianParticle* 
   // Fetch flowVelocity at index 3
   double flowVelocity[3];
   if (this->GetFlowOrSurfaceDataNumberOfComponents(3, dataSet) != 3 ||
-    !this->GetFlowOrSurfaceData(3, dataSet, cellId, weights, flowVelocity))
+    !this->GetFlowOrSurfaceData(particle, 3, dataSet, cellId, weights, flowVelocity))
   {
     vtkErrorMacro("Flow velocity is not set in source flow dataset or "
                   "have incorrect number of components, cannot use Matida equations");
@@ -85,7 +85,7 @@ int vtkLagrangianIntegrationModelExample::FunctionValues(vtkLagrangianParticle* 
   // Fetch flowDensity at index 4
   double flowDensity;
   if (this->GetFlowOrSurfaceDataNumberOfComponents(4, dataSet) != 1 ||
-    !this->GetFlowOrSurfaceData(4, dataSet, cellId, weights, &flowDensity))
+    !this->GetFlowOrSurfaceData(particle, 4, dataSet, cellId, weights, &flowDensity))
   {
     vtkErrorMacro("Flow density is not set in source flow dataset or "
                   "have incorrect number of components, cannot use Matida equations");
@@ -95,15 +95,12 @@ int vtkLagrangianIntegrationModelExample::FunctionValues(vtkLagrangianParticle* 
   // Fetch flowDynamicViscosity at index 5
   double flowDynamicViscosity;
   if (this->GetFlowOrSurfaceDataNumberOfComponents(5, dataSet) != 1 ||
-    !this->GetFlowOrSurfaceData(5, dataSet, cellId, weights, &flowDynamicViscosity))
+    !this->GetFlowOrSurfaceData(particle, 5, dataSet, cellId, weights, &flowDynamicViscosity))
   {
     vtkErrorMacro("Flow dynamic viscosity is not set in source flow dataset or "
                   "have incorrect number of components, cannot use Matida equations");
     return 0;
   }
-
-  // Fetch Particle Properties
-  vtkIdType tupleIndex = particle->GetSeedArrayTupleIndex();
 
   // Fetch Particle Diameter as the first user variables
   double particleDiameter = particle->GetUserVariables()[0];
@@ -116,13 +113,13 @@ int vtkLagrangianIntegrationModelExample::FunctionValues(vtkLagrangianParticle* 
                   "cannot use Matida equations");
     return 0;
   }
-  double particleDensity = particleDensities->GetTuple1(tupleIndex);
+  double particleDensity = particleDensities->GetTuple1(0);
 
   // Recover Gravity constant, idx 8, FieldData, as defined in the xml.
   // We read at a index 0 because these is the only tuple in the fieldData
   double gravityConstant;
   if (this->GetFlowOrSurfaceDataNumberOfComponents(8, dataSet) != 1 ||
-    !this->GetFlowOrSurfaceData(8, dataSet, 0, weights, &gravityConstant))
+    !this->GetFlowOrSurfaceData(particle, 8, dataSet, 0, weights, &gravityConstant))
   {
     vtkErrorMacro("GravityConstant is not set in source flow dataset or have"
                   "incorrect number of components, cannot use Matida Equations");
@@ -205,7 +202,7 @@ void vtkLagrangianIntegrationModelExample::InitializeParticle(vtkLagrangianParti
   else
   {
     // Copy seed data to user variables
-    *diameter = particleDiameters->GetTuple1(particle->GetSeedArrayTupleIndex());
+    *diameter = particleDiameters->GetTuple1(0);
   }
 }
 
@@ -292,11 +289,11 @@ bool vtkLagrangianIntegrationModelExample::InteractWithSurface(int vtkNotUsed(su
 }
 
 //----------------------------------------------------------------------------
-bool vtkLagrangianIntegrationModelExample::IntersectWithLine(
+bool vtkLagrangianIntegrationModelExample::IntersectWithLine(vtkLagrangianParticle* particle,
   vtkCell* cell, double p1[3], double p2[3], double tol, double& t, double x[3])
 {
   // Here one could implement its own intersection code
-  return this->Superclass::IntersectWithLine(cell, p1, p2, tol, t, x);
+  return this->Superclass::IntersectWithLine(particle, cell, p1, p2, tol, t, x);
 }
 
 //----------------------------------------------------------------------------

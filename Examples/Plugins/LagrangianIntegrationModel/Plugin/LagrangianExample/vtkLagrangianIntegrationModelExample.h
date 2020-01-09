@@ -117,8 +117,8 @@ protected:
    * and a surface, enabling to use your any intersection code. in this case it only call the
    * superclass method
    */
-  bool IntersectWithLine(
-    vtkCell* cell, double p1[3], double p2[3], double tol, double& t, double x[3]) override;
+  bool IntersectWithLine(vtkLagrangianParticle* particle, vtkCell* cell, double p1[3], double p2[3],
+    double tol, double& t, double x[3]) override;
 
   double GetRelaxationTime(const double& dynVisc, const double& diameter, const double& density);
 
