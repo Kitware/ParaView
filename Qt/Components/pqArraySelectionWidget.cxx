@@ -82,10 +82,10 @@ public:
     this->insert("EdgeSetArrayStatus", QIcon(":/pqWidgets/Icons/pqEdgeSetData.svg"));
     this->insert("ElementSetArrayStatus", QIcon(":/pqWidgets/Icons/pqElemSetData.svg"));
 
-    this->insert("NodeMapArrayStatus", QIcon(":/pqWidgets/Icons/pqNodeMapData16.png"));
+    this->insert("NodeMapArrayStatus", QIcon(":/pqWidgets/Icons/pqNodeMapData.svg"));
     this->insert("EdgeMapArrayStatus", QIcon(":/pqWidgets/Icons/pqEdgeMapData16.png"));
-    this->insert("FaceMapArrayStatus", QIcon(":/pqWidgets/Icons/pqFaceMapData16.png"));
-    this->insert("ElementMapArrayStatus", QIcon(":/pqWidgets/Icons/pqElemMapData16.png"));
+    this->insert("FaceMapArrayStatus", QIcon(":/pqWidgets/Icons/pqFaceMapData.svg"));
+    this->insert("ElementMapArrayStatus", QIcon(":/pqWidgets/Icons/pqElemMapData.svg"));
 
     this->insert("PointArrayStatus", QIcon(":/pqWidgets/Icons/pqNodalData.svg"));
     this->insert("CellArrayStatus", QIcon(":/pqWidgets/Icons/pqCellCenterData.svg"));
@@ -440,7 +440,7 @@ void pqArraySelectionWidget::setIconType(const QString& pname, const QString& ic
   }
   else if (icon_type == "node-map")
   {
-    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqNodeMapData16.png"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqNodeMapData.svg"));
   }
   else if (icon_type == "edge-map")
   {
@@ -448,7 +448,7 @@ void pqArraySelectionWidget::setIconType(const QString& pname, const QString& ic
   }
   else if (icon_type == "face-map")
   {
-    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqFaceMapData16.png"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqFaceMapData.svg"));
   }
   else
   {

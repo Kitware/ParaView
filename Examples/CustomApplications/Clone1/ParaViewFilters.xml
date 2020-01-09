@@ -1,23 +1,23 @@
 <ParaViewFilters>
   <Category name="Common" menu_label="&amp;Common" preserve_order="1"
     show_in_toolbar="1">
-    <Proxy group="filters" name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
-    <Proxy group="filters" name="Contour" icon=":/pqWidgets/Icons/pqIsosurface24.png"/>
-    <Proxy group="filters" name="Clip" icon=":/pqWidgets/Icons/pqClip24.png"/>
-    <Proxy group="filters" name="Cut" icon=":/pqWidgets/Icons/pqSlice24.png"/>
-    <Proxy group="filters" name="Threshold" icon=":/pqWidgets/Icons/pqThreshold24.png"/>
-    <Proxy group="filters" name="ExtractGrid" icon=":/pqWidgets/Icons/pqExtractGrid24.png"/>
-    <Proxy group="filters" name="Glyph" icon=":/pqWidgets/Icons/pqGlyph24.png"/>
-    <Proxy group="filters" name="StreamTracer" icon=":/pqWidgets/Icons/pqStreamTracer24.png"/>
-    <Proxy group="filters" name="WarpVector" icon=":/pqWidgets/Icons/pqWarp24.png"/>
-    <Proxy group="filters" name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup24.png"/>
-    <Proxy group="filters" name="ExtractHierarchicalLevel" icon=":/pqWidgets/Icons/pqGroupExtract24.png"/>
+    <Proxy group="filters" name="Calculator" icon=":/pqWidgets/Icons/pqCalculator.svg"/>
+    <Proxy group="filters" name="Contour" icon=":/pqWidgets/Icons/pqIsosurface.svg"/>
+    <Proxy group="filters" name="Clip" icon=":/pqWidgets/Icons/pqClip.svg"/>
+    <Proxy group="filters" name="Cut" icon=":/pqWidgets/Icons/pqSlice.svg"/>
+    <Proxy group="filters" name="Threshold" icon=":/pqWidgets/Icons/pqThreshold.svg"/>
+    <Proxy group="filters" name="ExtractGrid" icon=":/pqWidgets/Icons/pqExtractGrid.svg"/>
+    <Proxy group="filters" name="Glyph" icon=":/pqWidgets/Icons/pqGlyph.svg"/>
+    <Proxy group="filters" name="StreamTracer" icon=":/pqWidgets/Icons/pqStreamTracer.svg"/>
+    <Proxy group="filters" name="WarpVector" icon=":/pqWidgets/Icons/pqWarp.svg"/>
+    <Proxy group="filters" name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup.svg"/>
+    <Proxy group="filters" name="ExtractHierarchicalLevel" icon=":/pqWidgets/Icons/pqGroupExtract.svg"/>
   </Category>
 
   <Category name="DataAnalysis" menu_label="&amp;Data Analysis">
-    <Proxy group="filters" name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
+    <Proxy group="filters" name="Calculator" icon=":/pqWidgets/Icons/pqCalculator.svg"/>
     <Proxy group="filters" name="ExtractSelection"
-            icon=":/pqWidgets/Icons/pqExtractSelection24.png" />
+            icon=":/pqWidgets/Icons/pqExtractSelection.svg" />
     <Proxy group="filters" name="ExtractSelectionOverTime"
             icon=":/pqWidgets/Icons/pqPlotCellOverTime24.png" />
     <Proxy group="filters" name="ExtractHistogram" 
@@ -27,7 +27,7 @@
     <Proxy group="filters" name="ProbeLine" 
             icon=":/pqWidgets/Icons/pqPlotLineOverTime24.png" />
     <Proxy group="filters" name="ProbePoint" 
-            icon=":/pqWidgets/Icons/pqProbeLocation24.png" />
+            icon=":/pqWidgets/Icons/pqProbeLocation.svg" />
     <Proxy group="filters" name="PlotAttributes" />
     <Proxy group="filters" name="PlotOnSortedLines" />
     <Proxy group="filters" name="PlotOnIntersectionCurves" />

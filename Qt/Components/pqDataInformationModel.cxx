@@ -220,7 +220,7 @@ struct pqSourceInfo
         return QIcon(":/pqWidgets/Icons/pqStructuredGrid16.png");
 
       case VTK_MULTIGROUP_DATA_SET:
-        return QIcon(":/pqWidgets/Icons/pqGroup24.png");
+        return QIcon(":/pqWidgets/Icons/pqGroup.svg");
 
       case VTK_MULTIBLOCK_DATA_SET:
         return QIcon(":/pqWidgets/Icons/pqMultiBlockData16.png");
