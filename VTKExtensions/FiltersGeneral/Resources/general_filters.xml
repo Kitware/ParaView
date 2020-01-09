@@ -2232,6 +2232,78 @@ Every Nth Point.
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkLinearCellExtrusionFilter"
+                 label="Linear Cell Extrusion"
+                 name="LinearCellExtrusionFilter">
+      <Documentation long_help="This filter creates a swept surface defined by translating the input along a vector."
+                     short_help="Generate a linear swept surface.">The Linear
+                     Extrusion filter creates a swept surface by translating
+                     the input dataset along the cell normals or a specified vector.
+                     This filter is intended to operate on polygonal data and produces
+                     3D unstructured grid output.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array1"
+                          number_of_components="1" />
+        <Documentation>This property specifies the input to the Linear Cell
+        Extrusion filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputScalars"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>The array used to set the extrusion length.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty command="SetScaleFactor"
+                            default_values="1"
+                            name="ScaleFactor"
+                            number_of_elements="1">
+        <Documentation>Scale factor applied to the extrusion length.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseUserVector"
+                         default_values="0"
+                         name="UseUserVector"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Use a custom extrusion direction.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetUserVector"
+                            default_values="0 0 1"
+                            name="UserVector"
+                            number_of_elements="3">
+        <Documentation>Set the custom extrusion direction.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseUserVector" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetMergeDuplicatePoints"
+                         default_values="0"
+                         name="MergeDuplicatePoints"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Remove duplicate points.</Documentation>
+      </IntVectorProperty>
+      <!-- End LinearCellExtrusionFilter -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+
     <SourceProxy class="vtkPVMetaClipDataSet"
                  name="Clip">
       <Documentation long_help="Clip with an implicit function (an implicit description). Clipping does not reduce the dimensionality of the data set. The output data type of this filter is always an unstructured grid."

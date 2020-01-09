@@ -228,6 +228,7 @@
   <Proxy group="filters" name="IntegrateFlowThroughSurface" />
   <!--  <Proxy group="filters" name="LevelIdScalars" /> -->
   <Proxy group="filters" name="LinearExtrusionFilter" />
+  <Proxy group="filters" name="LinearCellExtrusionFilter" />
   <Proxy group="filters" name="LoopSubdivisionFilter" />
   <Proxy group="filters" name="MaskPoints" />
   <Proxy group="filters" name="Median" />

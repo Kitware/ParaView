@@ -754,6 +754,7 @@ list(APPEND TESTS_WITH_BASELINES
   InteractiveViewLinkOnscreen.xml
   InteractiveViewLinkState.xml
   LightWidget.xml
+  LinearCellExtrusion.xml
   LinesAsTubes.xml
   LinkRepresentationProperties.xml
   LoadPartiallyUpdatedStateFiles.xml
