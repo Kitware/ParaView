@@ -49,6 +49,8 @@ OPTIONAL_DEPENDS
   VTK::vtkm
 TEST_DEPENDS
   ParaView::RemotingApplication
+  VTK::glew
+  VTK::opengl
   VTK::TestingCore
 TEST_OPTIONAL_DEPENDS
   VTK::ParallelMPI
