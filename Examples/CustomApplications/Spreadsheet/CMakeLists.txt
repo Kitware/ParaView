@@ -5,9 +5,9 @@ find_package(ParaView REQUIRED)
 include(${PARAVIEW_USE_FILE})
 if (NOT PARAVIEW_USE_QT)
   message(FATAL_ERROR
-    "SpreadSheet example requires PARAVIEW_USE_QT to be enabled. "
-    "Please rebuild ParaView (or point to a different build of ParaView) "
-    "with PARAVIEW_USE_QT set to TRUE")
+    "Skipping example: ${CMAKE_PROJECT_NAME} example requires PARAVIEW_USE_QT "
+    "to be enabled. Please rebuild ParaView (or point to a different build of "
+    "ParaView) with PARAVIEW_USE_QT set to TRUE")
 endif()
 
 # Set a consistent MACOSX_RPATH default across all CMake versions.

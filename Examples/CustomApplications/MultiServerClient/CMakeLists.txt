@@ -36,8 +36,8 @@ find_package(ParaView REQUIRED)
 
 if (NOT PARAVIEW_USE_QT)
   message(STATUS
-    "${CMAKE_PROJECT_NAME} example requires PARAVIEW_USE_QT to be "
-    "enabled. Please rebuild ParaView (or point to a different build of "
+    "Skipping example: ${CMAKE_PROJECT_NAME} example requires PARAVIEW_USE_QT "
+    "to be enabled. Please rebuild ParaView (or point to a different build of "
     "ParaView) with PARAVIEW_USE_QT set to TRUE")
   return ()
 endif()
