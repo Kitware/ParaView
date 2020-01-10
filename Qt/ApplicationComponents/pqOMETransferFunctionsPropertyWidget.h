@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyWidget.h"
 #include <QScopedPointer> // for QScopedPointer
 
+class pqTransferFunctionWidget;
+
 class PQAPPLICATIONCOMPONENTS_EXPORT pqOMETransferFunctionsPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
@@ -54,8 +56,8 @@ signals:
 
 private slots:
   void channelVisibilitiesChanged();
-  void stcChanged();
-  void pwfChanged();
+  void stcChanged(pqTransferFunctionWidget* src = nullptr);
+  void pwfChanged(pqTransferFunctionWidget* src = nullptr);
 
 private:
   Q_DISABLE_COPY(pqOMETransferFunctionsPropertyWidget);

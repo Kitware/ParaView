@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqPresetDialog.h"
 #include "pqProxyWidget.h"
+#include "pqResetScalarRangeReaction.h"
 #include "vtkCommand.h"
 #include "vtkDiscretizableColorTransferFunction.h"
 #include "vtkPiecewiseFunction.h"
@@ -140,6 +141,34 @@ pqOMETransferFunctionsPropertyWidget::pqOMETransferFunctionsPropertyWidget(
         this->addPropertyLink(
           pageUi.Weight, "value", SIGNAL(valueChanged(double)), smproxy, weigthProp);
       }
+
+      auto lutWidget = pageUi.ColorEditor;
+      auto sofWidget = pageUi.OpacityEditor;
+      auto callback = [lut, sof, lutWidget, sofWidget, this](double rmin, double rmax) {
+        double range[2] = { rmin, rmax };
+        vtkSMTransferFunctionProxy::RescaleTransferFunction(lut, range);
+        vtkSMTransferFunctionProxy::RescaleTransferFunction(sof, range);
+        this->stcChanged(lutWidget);
+        this->pwfChanged(sofWidget);
+      };
+
+      QObject::connect(
+        pageUi.ColorEditor, &pqTransferFunctionWidget::rangeHandlesRangeChanged, callback);
+      QObject::connect(
+        pageUi.OpacityEditor, &pqTransferFunctionWidget::rangeHandlesRangeChanged, callback);
+
+      auto callback2 = [lut, lutWidget, sofWidget, this]() {
+        if (pqResetScalarRangeReaction::resetScalarRangeToCustom(lut))
+        {
+          this->stcChanged(lutWidget);
+          this->pwfChanged(sofWidget);
+        }
+      };
+
+      QObject::connect(
+        pageUi.ColorEditor, &pqTransferFunctionWidget::rangeHandlesDoubleClicked, callback2);
+      QObject::connect(
+        pageUi.OpacityEditor, &pqTransferFunctionWidget::rangeHandlesDoubleClicked, callback2);
     }
   }
 
@@ -190,9 +219,9 @@ void pqOMETransferFunctionsPropertyWidget::channelVisibilitiesChanged()
 }
 
 //-----------------------------------------------------------------------------
-void pqOMETransferFunctionsPropertyWidget::stcChanged()
+void pqOMETransferFunctionsPropertyWidget::stcChanged(pqTransferFunctionWidget* tfWidget)
 {
-  auto tfWidget = qobject_cast<pqTransferFunctionWidget*>(this->sender());
+  tfWidget = tfWidget ? tfWidget : qobject_cast<pqTransferFunctionWidget*>(this->sender());
   assert(tfWidget);
   auto stc = vtkDiscretizableColorTransferFunction::SafeDownCast(tfWidget->scalarsToColors());
 
@@ -214,9 +243,9 @@ void pqOMETransferFunctionsPropertyWidget::stcChanged()
 }
 
 //-----------------------------------------------------------------------------
-void pqOMETransferFunctionsPropertyWidget::pwfChanged()
+void pqOMETransferFunctionsPropertyWidget::pwfChanged(pqTransferFunctionWidget* tfWidget)
 {
-  auto tfWidget = qobject_cast<pqTransferFunctionWidget*>(this->sender());
+  tfWidget = tfWidget ? tfWidget : qobject_cast<pqTransferFunctionWidget*>(this->sender());
   assert(tfWidget);
   auto pwf = tfWidget->piecewiseFunction();
 
