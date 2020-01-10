@@ -152,7 +152,8 @@ option(PARAVIEW_ENABLE_MOMENTINVARIANTS "Enable MomentInvariants filters" OFF)
 
 option(PARAVIEW_ENABLE_VISITBRIDGE "Enable VisIt readers." OFF)
 
-option(PARAVIEW_ENABLE_XDMF2 "Enable Xdmf2 support." ON)
+# default to ON for CANONICAL builds, else OFF.
+option(PARAVIEW_ENABLE_XDMF2 "Enable Xdmf2 support." "${PARAVIEW_BUILD_CANONICAL}")
 
 option(PARAVIEW_ENABLE_XDMF3 "Enable Xdmf3 support." OFF)
 
