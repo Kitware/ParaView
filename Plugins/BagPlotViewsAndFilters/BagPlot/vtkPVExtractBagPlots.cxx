@@ -201,14 +201,8 @@ void vtkPVExtractBagPlots::GetEigenvectors(
 int vtkPVExtractBagPlots::RequestData(
   vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  vtkInformation* outputInfo = outputVector->GetInformationObject(0);
-
   vtkTable* inTable = vtkTable::GetData(inputVector[0]);
-  vtkMultiBlockDataSet* outTables =
-    vtkMultiBlockDataSet::SafeDownCast(outputInfo->Get(vtkDataObject::DATA_OBJECT()));
-
-  vtkTable* outTable = 0;
-  vtkTable* outTable2 = 0;
+  vtkMultiBlockDataSet* outTables = vtkMultiBlockDataSet::GetData(outputVector);
 
   if (inTable->GetNumberOfColumns() == 0)
   {
@@ -220,8 +214,6 @@ int vtkPVExtractBagPlots::RequestData(
     return 0;
   }
   outTables->SetNumberOfBlocks(2);
-
-  vtkNew<vtkTransposeTable> transpose;
 
   // Construct a table that holds only the selected columns
   vtkNew<vtkTable> subTable;
@@ -235,9 +227,9 @@ int vtkPVExtractBagPlots::RequestData(
   }
 
   vtkTable* inputTable = subTable.GetPointer();
+  vtkTable* outTable = subTable.GetPointer();
 
-  outTable = subTable.GetPointer();
-
+  vtkNew<vtkTransposeTable> transpose;
   if (this->TransposeTable)
   {
     transpose->SetInputData(subTable.GetPointer());
@@ -248,7 +240,7 @@ int vtkPVExtractBagPlots::RequestData(
     inputTable = transpose->GetOutput();
   }
 
-  outTable2 = inputTable;
+  vtkTable* outTable2 = inputTable;
 
   // Compute the PCA on the provided input functions
   vtkNew<vtkPSciVizPCAStats> pca;
@@ -283,13 +275,13 @@ int vtkPVExtractBagPlots::RequestData(
   vtkNew<vtkDoubleArray> eigenValues;
   this->GetEigenvectors(outputMetaDS, eigenVectors.Get(), eigenValues.Get());
 
-  double sumOfEigenValues = 0;
-  double partialSumOfEigenValues = 0;
+  double sumOfEigenValues = 0.;
+  double partialSumOfEigenValues = 0.;
   for (vtkIdType i = 0; i < eigenValues->GetNumberOfTuples(); i++)
   {
     double val = eigenValues->GetValue(i);
     sumOfEigenValues += val;
-    partialSumOfEigenValues += i < this->NumberOfProjectionAxes ? val : 0;
+    partialSumOfEigenValues += i < this->NumberOfProjectionAxes ? val : 0.;
   }
   double explainedVariance = 100. * (partialSumOfEigenValues / sumOfEigenValues);
 
@@ -327,7 +319,7 @@ int vtkPVExtractBagPlots::RequestData(
   if (this->UseSilvermanRule)
   {
     vtkIdType len = hdrArrays[0]->GetNumberOfTuples();
-    double xMean = 0.0;
+    double xMean = 0.;
     for (vtkIdType i = 0; i < len; i++)
     {
       xMean += hdrArrays[0]->GetTuple1(i);
@@ -381,9 +373,7 @@ int vtkPVExtractBagPlots::RequestData(
     {
       double x = bounds[0] + i * spaceX;
       double y = bounds[2] + j * spaceY;
-
-      inPOI->SetTuple2(pointId, x, y);
-      ++pointId;
+      inPOI->SetTuple2(pointId++, x, y);
     }
   }
 
@@ -408,19 +398,11 @@ int vtkPVExtractBagPlots::RequestData(
   double totalSumOfDensities = 0.;
   std::vector<double> sortedDensities;
   sortedDensities.reserve(densities->GetNumberOfTuples());
-  // double maxDensity = VTK_DOUBLE_MIN;
-  // int maxX, maxY;
-  for (vtkIdType pixel = 0; pixel < densities->GetNumberOfTuples(); ++pixel)
+  for (vtkIdType pixel = 0; pixel < densities->GetNumberOfTuples(); pixel++)
   {
     double density = densities->GetTuple1(pixel);
     sortedDensities.push_back(density);
     totalSumOfDensities += density;
-    /*if (density > maxDensity)
-      {
-      maxX = pixel % gridWidth;
-      maxY = pixel / gridWidth;
-      maxDensity = density;
-      }*/
   }
 
   // Sort the densities and save the densities associated to the quantiles.
@@ -430,17 +412,16 @@ int vtkPVExtractBagPlots::RequestData(
   double sumForPUser = totalSumOfDensities * ((100. - this->UserQuantile) / 100.);
   double p50 = 0.;
   double pUser = 0.;
-  for (std::vector<double>::const_iterator it = sortedDensities.begin();
-       it != sortedDensities.end(); ++it)
+  for (double d : sortedDensities)
   {
-    sumOfDensities += *it;
+    sumOfDensities += d;
     if (sumOfDensities >= sumForP50 && p50 == 0.)
     {
-      p50 = *it;
+      p50 = d;
     }
     if (sumOfDensities >= sumForPUser && pUser == 0.)
     {
-      pUser = *it;
+      pUser = d;
     }
   }
 
@@ -534,37 +515,28 @@ int vtkPVExtractBagPlots::RequestData(
   medianColumnName << maxHdrColumn->GetName() << "_median";
   maxHdrColumn->SetName(medianColumnName.str().c_str());
 
-  /*
-  vtkTable* outputMeta =
-  vtkTable::SafeDownCast(outputMetaDS->GetBlock(1));
-  vtkIdType nbDimensions = eigenVectors->GetNumberOfComponents();
-  vtkDoubleArray* meanCol =
-    vtkDoubleArray::SafeDownCast(outputMeta->GetColumnByName("Mean"));
-  // Compute the median function
-  double medianX = bounds[0] + maxX * spaceX;
-  double medianY = bounds[2] + maxY * spaceY;
-  for (vtkIdType i = 0; i < nbDimensions; i++)
+  // Inject non-selected columns in the first output block.
+  // This can be useful to select those columns as X-axis in the plot.
+  vtkIdType inNbCols = inTable->GetNumberOfColumns();
+  for (vtkIdType i = 0; i < inNbCols; i++)
+  {
+    vtkAbstractArray* col = inTable->GetColumn(i);
+    if (!this->Internal->Has(col->GetName()))
     {
-    medianFunction->SetValue(i,
-      medianX * eigenVectors->GetComponent(0, i) +
-      medianY * eigenVectors->GetComponent(1, i) +
-      meanCol->GetValue(i));
+      outTable->AddColumn(col);
     }
-  */
+  }
 
-  // Finally setup the output multi-block
+  // Finally setup the output multi-block dataset
   unsigned int blockID = 0;
   outTables->SetBlock(blockID, outTable);
-  outTables->GetMetaData(blockID)->Set(vtkCompositeDataSet::NAME(), "Functional Bag Plot Data");
-  blockID = 1;
+  outTables->GetMetaData(blockID++)->Set(vtkCompositeDataSet::NAME(), "Functional Bag Plot Data");
   outTables->SetBlock(blockID, outTable2);
-  outTables->GetMetaData(blockID)->Set(vtkCompositeDataSet::NAME(), "Bag Plot Data");
-  blockID = 2;
+  outTables->GetMetaData(blockID++)->Set(vtkCompositeDataSet::NAME(), "Bag Plot Data");
   outTables->SetBlock(blockID, grid.Get());
-  outTables->GetMetaData(blockID)->Set(vtkCompositeDataSet::NAME(), "Grid Data");
-  blockID = 3;
+  outTables->GetMetaData(blockID++)->Set(vtkCompositeDataSet::NAME(), "Grid Data");
   outTables->SetBlock(blockID, thresholdTable.Get());
-  outTables->GetMetaData(blockID)->Set(vtkCompositeDataSet::NAME(), "Threshold Data");
+  outTables->GetMetaData(blockID++)->Set(vtkCompositeDataSet::NAME(), "Threshold Data");
 
   return 1;
 }
