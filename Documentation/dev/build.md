@@ -291,7 +291,7 @@ The common variables to modify include:
 
 Less common, but variables which may be of interest to some:
 
-  * `PARAVIEW_BUILD_ESSENTIALS` (default `CANONICAL`): Choose which features to
+  * `PARAVIEW_BUILD_EDITION` (default `CANONICAL`): Choose which features to
     enable in this build. This is useful to generate ParaView builds with
     limited features. More on this later.
   * `PARAVIEW_BUILD_EXAMPLES` (default `OFF`): If set, ParaView's example code
@@ -445,12 +445,12 @@ These variables should be documented once they're effective again.
     ParaView's example Catalyst adaptors will be added as tests to the ParaView
     test suite.
 -->
-## Building essentials
+## Building editions
 
 A typical ParaView build includes several modules and dependencies. While these
 are necessary for a fully functional application, there are cases (e.g. in situ
-use-cases) where a built with limited set of features is adequate. ParaView build supports
-this using the `PARAVIEW_BUILD_ESSENTIALS` setting. Supported values for this setting are:
+use-cases) where a build with limited set of features is adequate. ParaView build supports
+this using the `PARAVIEW_BUILD_EDITION` setting. Supported values for this setting are:
 
 * `CORE`: Build modules necessary for core ParaView functionality.
   This does not include rendering.
