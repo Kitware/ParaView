@@ -1,0 +1,113 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="internal_sources">
+
+    <!-- ================================================================== -->
+    <Proxy class="vtkPLYReader" name="PLYReaderCore">
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the PLY
+        reader.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetDuplicatePointsForFaceTexture"
+                         default_values="1"
+                         name="DuplicatePointsForFaceTexture"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>If true (default) and the "face" element has
+        the property "texcoord" duplicate face points if they have 2
+        or more different texture coordinates. Otherwise, each texture
+        coordinate for a face point overwrites previously set texture
+        coordinates for that point.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetFaceTextureTolerance"
+                            default_values="0.000001"
+                            name="FaceTextureTolerance"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Tolerance used to detect different texture
+        coordinates for shared points for faces</Documentation>
+      </DoubleVectorProperty>
+      <!-- End PLYReaderCore -->
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <!-- end of "internal_sources" -->
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="PLY Reader"
+                 name="PLYReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads files stored in Stanford University's PLY polygonal file format."
+                     short_help="Read PLY polygonal files.">The PLY reader
+                     reads files stored in the PLY polygonal file format
+                     developed at Stanford University. The PLY files that
+                     ParaView can read must have the elements "vertex" and
+                     "face" defined. The "vertex" elements must have the
+                     properties "x", "y", and "z". The "face" elements must have
+                     the property "vertex_indices" defined. The default file
+                     extension for this reader is .ply.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="PLYReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="DuplicatePointsForFaceTexture" />
+          <Property name="FaceTextureTolerance" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="0"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="ply ply.series"
+                       file_description="PLY Polygonal File Format" />
+      </Hints>
+      <!-- End PLYReader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkPLYReader"
+                 name="plyreader"
+                 base_proxygroup="internal_sources"
+                 base_proxyname="PLYReaderCore">
+      <Deprecated deprecated_in="5.3" to_remove_in="5.4">
+          This has been replaced by "PLYReader" which also supports a series of PLY files.
+      </Deprecated>
+      <!-- End plyreader -->
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <!-- end of "sources" -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

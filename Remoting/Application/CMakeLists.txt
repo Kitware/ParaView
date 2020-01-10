@@ -268,6 +268,10 @@ if (TARGET VTK::IOGeometry)
     Resources/readers_iogeometry.xml
     Resources/writers_iogeometry.xml)
 endif()
+if (TARGET VTK::IOPLY)
+  list(APPEND xml_files
+    Resources/readers_ioply.xml)
+endif()
 
 if (TARGET VTK::IOParallel)
   list(APPEND xml_files
