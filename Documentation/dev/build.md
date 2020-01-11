@@ -456,6 +456,10 @@ this using the `PARAVIEW_BUILD_EDITION` setting. Supported values for this setti
   This does not include rendering.
 * `RENDERING`: Build modules necessary for supporting rendering including views
   and representations. This includes everything in `CORE`.
+* `CATALYST`: Build all modules necessary for in situ use cases without
+  rendering and optional components like NetCDF- and HDF5-based readers and
+  writers.
+* `CATALYST_RENDERING`: Same as `CATALYST` but with rendering supported added.
 * `CANONICAL` (default): Build modules necessary for standard ParaView build.
 
 

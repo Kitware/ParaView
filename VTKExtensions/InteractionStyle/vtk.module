@@ -2,8 +2,6 @@ NAME
   ParaView::VTKExtensionsInteractionStyle
 LIBRARY_NAME
   vtkPVVTKExtensionsInteractionStyle
-GROUPS
-  PARAVIEW_RENDERING
 KIT
   ParaView::CoreKit
 DEPENDS
