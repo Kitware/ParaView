@@ -41,7 +41,6 @@ set(classes
   vtkImageSimpleSource
   vtkIntegrateFlowThroughSurface
   vtkIsoVolume
-  vtkMergeArrays
   vtkOMETIFFChannelCalculator
   vtkPEquivalenceSet
   vtkPlotEdges
