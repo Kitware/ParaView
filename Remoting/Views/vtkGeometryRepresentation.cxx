@@ -162,12 +162,13 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   // setup the selection mapper so that we don't need to make any selection
   // conversions after rendering.
   vtkCompositePolyDataMapper2* mapper = vtkCompositePolyDataMapper2::New();
-  mapper->SetPointIdArrayName("vtkOriginalPointIds");
-  mapper->SetCellIdArrayName("vtkOriginalCellIds");
   mapper->SetProcessIdArrayName("vtkProcessId");
   mapper->SetCompositeIdArrayName("vtkCompositeIndex");
 
   this->Mapper = mapper;
+
+  this->SetArrayIdNames(nullptr, nullptr);
+
   this->LODMapper = vtkCompositePolyDataMapper2::New();
   this->Actor = vtkPVLODActor::New();
   this->Property = vtkProperty::New();
@@ -1474,4 +1475,12 @@ void vtkGeometryRepresentation::UpdateShaderReplacements()
         break;
     }
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetArrayIdNames(const char* pointArray, const char* cellArray)
+{
+  vtkCompositePolyDataMapper2* mapper = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
+  mapper->SetPointIdArrayName(pointArray ? pointArray : "vtkOriginalPointIds");
+  mapper->SetCellIdArrayName(cellArray ? cellArray : "vtkOriginalCellIds");
 }

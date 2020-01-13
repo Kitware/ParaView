@@ -49,10 +49,10 @@ public:
    */
   bool SelectSurfaceCells(const int region[4], vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources, bool multiple_selections = false,
-    int modifier = /* replace */ 0, bool select_blocks = false);
+    int modifier = /* replace */ 0, bool select_blocks = false, const char* arrayName = nullptr);
   bool SelectSurfacePoints(const int region[4], vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources, bool multiple_selections = false,
-    int modifier = /* replace */ 0, bool select_blocks = false);
+    int modifier = /* replace */ 0, bool select_blocks = false, const char* arrayName = nullptr);
   bool SelectFrustumCells(const int region[4], vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources, bool multiple_selections = false);
   bool SelectFrustumPoints(const int region[4], vtkCollection* selectedRepresentations,

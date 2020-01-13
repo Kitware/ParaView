@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QTimer>
 
+class pqDataRepresentation;
 class pqRenderView;
 class pqView;
 class vtkIntArray;
@@ -72,6 +73,8 @@ public:
     CLEAR_SELECTION,
     GROW_SELECTION,
     SHRINK_SELECTION,
+    SELECT_SURFACE_POINTDATA_INTERACTIVELY,
+    SELECT_SURFACE_CELLDATA_INTERACTIVELY,
     SELECT_SURFACE_CELLS_INTERACTIVELY,
     SELECT_SURFACE_POINTS_INTERACTIVELY,
     SELECT_SURFACE_POINTS_TOOLTIP,
@@ -111,6 +114,11 @@ private slots:
   * view changes.
   */
   void setView(pqView* view);
+
+  /**
+  * Called when the active representation changes.
+  */
+  void setRepresentation(pqDataRepresentation* representation);
 
   /**
   * starts the selection i.e. setup render view in selection mode.
@@ -165,6 +173,8 @@ private:
 private:
   Q_DISABLE_COPY(pqRenderViewSelectionReaction)
   QPointer<pqRenderView> View;
+  QPointer<pqDataRepresentation> Representation;
+  QMetaObject::Connection RepresentationConnection;
   SelectionMode Mode;
   bool DisableSelectionModifiers;
   int PreviousRenderViewMode;

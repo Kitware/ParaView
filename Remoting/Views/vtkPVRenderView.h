@@ -356,19 +356,19 @@ public:
    * driver). Thus, if doing client only rendering, this shouldn't be called on
    * server nodes.
    */
-  void SelectCells(int region[4]);
-  void SelectCells(int region0, int region1, int region2, int region3)
+  void SelectCells(int region[4], const char* array = nullptr);
+  void SelectCells(int region0, int region1, int region2, int region3, const char* array = nullptr)
   {
     int r[4] = { region0, region1, region2, region3 };
-    this->SelectCells(r);
+    this->SelectCells(r, array);
   }
-  void SelectPoints(int region[4]);
-  void SelectPoints(int region0, int region1, int region2, int region3)
+  void SelectPoints(int region[4], const char* array = nullptr);
+  void SelectPoints(int region0, int region1, int region2, int region3, const char* array = nullptr)
   {
     int r[4] = { region0, region1, region2, region3 };
-    this->SelectPoints(r);
+    this->SelectPoints(r, array);
   }
-  void Select(int field_association, int region[4]);
+  void Select(int field_association, int region[4], const char* array = nullptr);
   //@}
 
   //@{
@@ -1052,12 +1052,12 @@ protected:
    * Prepare for selection.
    * Returns false if it is currently generating a selection.
    */
-  bool PrepareSelect(int fieldAssociation);
+  bool PrepareSelect(int fieldAssociation, const char* array = nullptr);
 
   /**
    * Post process after selection.
    */
-  void PostSelect(vtkSelection* sel);
+  void PostSelect(vtkSelection* sel, const char* array = nullptr);
 
   /**
    * Update skybox actor
@@ -1149,7 +1149,7 @@ private:
   int PreviousSwapBuffers;
   void OnSelectionChangedEvent();
   void OnPolygonSelectionEvent();
-  void FinishSelection(vtkSelection*);
+  void FinishSelection(vtkSelection*, const char*);
 
   // This flag is set to false when not all processes cannot render e.g. cannot
   // open the DISPLAY etc.

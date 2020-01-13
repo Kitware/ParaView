@@ -541,10 +541,10 @@ void pqRenderView::resetViewDirection(
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderView::selectOnSurface(int rect[4], int selectionModifier)
+void pqRenderView::selectOnSurface(int rect[4], int selectionModifier, const char* array)
 {
   QList<pqOutputPort*> opPorts;
-  this->selectOnSurfaceInternal(rect, opPorts, false, selectionModifier, false);
+  this->selectOnSurfaceInternal(rect, opPorts, false, selectionModifier, false, array);
   this->emitSelectionSignal(opPorts);
 }
 
@@ -670,7 +670,7 @@ void pqRenderView::collectSelectionPorts(vtkCollection* selectedRepresentations,
 
 //-----------------------------------------------------------------------------
 void pqRenderView::selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>& pqOutputPorts,
-  bool select_points, int selectionModifier, bool select_blocks)
+  bool select_points, int selectionModifier, bool select_blocks, const char* array)
 {
   BEGIN_UNDO_EXCLUDE();
 
@@ -685,12 +685,12 @@ void pqRenderView::selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>& pq
     rectVector[i] = rect[i];
   }
 
-  vtkSmartPointer<vtkCollection> selectedRepresentations = vtkSmartPointer<vtkCollection>::New();
-  vtkSmartPointer<vtkCollection> selectionSources = vtkSmartPointer<vtkCollection>::New();
+  vtkNew<vtkCollection> selectedRepresentations;
+  vtkNew<vtkCollection> selectionSources;
   if (select_points)
   {
     if (!renderModuleP->SelectSurfacePoints(rect, selectedRepresentations, selectionSources,
-          this->UseMultipleRepresentationSelection, selectionModifier, select_blocks))
+          this->UseMultipleRepresentationSelection, selectionModifier, select_blocks, array))
     {
       END_UNDO_EXCLUDE();
       return;
@@ -704,7 +704,7 @@ void pqRenderView::selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>& pq
   else
   {
     if (!renderModuleP->SelectSurfaceCells(rect, selectedRepresentations, selectionSources,
-          this->UseMultipleRepresentationSelection, selectionModifier, select_blocks))
+          this->UseMultipleRepresentationSelection, selectionModifier, select_blocks, array))
     {
       END_UNDO_EXCLUDE();
       return;
@@ -733,10 +733,10 @@ void pqRenderView::selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>& pq
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderView::selectPointsOnSurface(int rect[4], int selectionModifier)
+void pqRenderView::selectPointsOnSurface(int rect[4], int selectionModifier, const char* array)
 {
   QList<pqOutputPort*> output_ports;
-  this->selectOnSurfaceInternal(rect, output_ports, true, selectionModifier, false);
+  this->selectOnSurfaceInternal(rect, output_ports, true, selectionModifier, false, array);
   // Fire selection event to let the world know that this view selected
   // something.
   this->emitSelectionSignal(output_ports);

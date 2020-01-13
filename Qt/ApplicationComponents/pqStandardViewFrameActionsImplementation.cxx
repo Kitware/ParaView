@@ -471,6 +471,37 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
     this->connect(selectBlockAction, SIGNAL(toggled(bool)), SLOT(escapeableActionToggled(bool)));
   }
 
+  if (this->isButtonVisible("InteractiveSelectSurfacePointData", renderView))
+  {
+    QAction* interactiveSelectSurfacePointDataAction = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqSurfaceSelectionPointDataInteractive.png"),
+      "Interactive Select Point Data On");
+    interactiveSelectSurfacePointDataAction->setObjectName(
+      "actionInteractiveSelectSurfacePointData");
+    interactiveSelectSurfacePointDataAction->setCheckable(true);
+    new pqRenderViewSelectionReaction(interactiveSelectSurfacePointDataAction, renderView,
+      pqRenderViewSelectionReaction::SELECT_SURFACE_POINTDATA_INTERACTIVELY, modeGroup);
+    this->connect(interactiveSelectSurfacePointDataAction, SIGNAL(toggled(bool)),
+      SLOT(escapeableActionToggled(bool)));
+    this->connect(interactiveSelectSurfacePointDataAction, SIGNAL(toggled(bool)),
+      SLOT(interactiveSelectionToggled(bool)));
+  }
+
+  if (this->isButtonVisible("InteractiveSelectSurfaceCellData", renderView))
+  {
+    QAction* interactiveSelectSurfaceCellDataAction =
+      frame->addTitleBarAction(QIcon(":/pqWidgets/Icons/pqSurfaceSelectionCellDataInteractive.png"),
+        "Interactive Select Cell Data On");
+    interactiveSelectSurfaceCellDataAction->setObjectName("actionInteractiveSelectSurfaceCellData");
+    interactiveSelectSurfaceCellDataAction->setCheckable(true);
+    new pqRenderViewSelectionReaction(interactiveSelectSurfaceCellDataAction, renderView,
+      pqRenderViewSelectionReaction::SELECT_SURFACE_CELLDATA_INTERACTIVELY, modeGroup);
+    this->connect(interactiveSelectSurfaceCellDataAction, SIGNAL(toggled(bool)),
+      SLOT(escapeableActionToggled(bool)));
+    this->connect(interactiveSelectSurfaceCellDataAction, SIGNAL(toggled(bool)),
+      SLOT(interactiveSelectionToggled(bool)));
+  }
+
   if (this->isButtonVisible("InteractiveSelectSurfaceCells", renderView))
   {
     QAction* interactiveSelectSurfaceCellsAction =
