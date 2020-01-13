@@ -45,7 +45,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../../Components/Resources/pqComponents.qrc">
-         <normaloff>:/pqWidgets/Icons/pqScalarBar16.png</normaloff>:/pqWidgets/Icons/pqScalarBar16.png</iconset>
+         <normaloff>:/pqWidgets/Icons/pqScalarBar.svg</normaloff>:/pqWidgets/Icons/pqScalarBar.svg</iconset>
        </property>
        <property name="checkable">
         <bool>true</bool>

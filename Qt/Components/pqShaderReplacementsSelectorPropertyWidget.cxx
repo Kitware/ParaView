@@ -102,7 +102,7 @@ pqShaderReplacementsSelectorPropertyWidget::pqShaderReplacementsSelectorProperty
   delButton->setText(tr("Delete"));
   delButton->setToolTip(tr("Delete the selected preset from the preset list or clear the current "
                            "shader replacement string."));
-  delButton->setIcon(QIcon(":/pqWidgets/Icons/pqQuit22.png"));
+  delButton->setIcon(QIcon(":/QtWidgets/Icons/pqDelete.svg"));
   QObject::connect(delButton, SIGNAL(clicked()), this, SLOT(onDelete()));
   gridLayout->addWidget(delButton, 0, 2);
 

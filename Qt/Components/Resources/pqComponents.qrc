@@ -96,7 +96,7 @@
         <file>Icons/pqNodalData.svg</file>
         <file>Icons/pqNodeMapData.svg</file>
         <file>Icons/pqNodeSetData.svg</file>
-        <file>Icons/pqOctreeData16.png</file>
+        <file>Icons/pqOctreeData.svg</file>
         <file>Icons/pqOpen.svg</file>
         <file>Icons/pqPalette.svg</file>
         <file>Icons/pqPaste.svg</file>
@@ -114,7 +114,6 @@
         <file>Icons/pqPreview.svg</file>
         <file>Icons/pqProbeLocation.svg</file>
         <file>Icons/pqProgrammableFilter24.png</file>
-        <file>Icons/pqQuit22.png</file>
         <file>Icons/pqRamp24.png</file>
         <file>Icons/pqRenameWindow.svg</file>
         <file>Icons/pqRectilinearGrid16.png</file>
@@ -146,9 +145,7 @@
         <file>Icons/pqSaveState.svg</file>
         <file>Icons/pqSaveTable32.png</file>
         <file>Icons/pqSaveWindow.svg</file>
-        <file>Icons/pqScalarBar16.png</file>
-        <file>Icons/pqScalarBar24.png</file>
-        <file>Icons/pqScalarBar16@2x.png</file>
+        <file>Icons/pqScalarBar.svg</file>
         <file>Icons/pqSecureServer16.png</file>
         <file>Icons/pqSelect16.png</file>
         <file>Icons/pqSelect16@2x.png</file>

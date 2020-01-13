@@ -195,7 +195,7 @@ struct pqSourceInfo
         return QIcon(":/pqWidgets/Icons/pqPolydata16.png");
 
       case VTK_HYPER_OCTREE:
-        return QIcon(":/pqWidgets/Icons/pqOctreeData16.png");
+        return QIcon(":/pqWidgets/Icons/pqOctreeData.svg");
 
       case VTK_UNSTRUCTURED_GRID:
         return QIcon(":/pqWidgets/Icons/pqUnstructuredGrid16.png");
@@ -229,7 +229,7 @@ struct pqSourceInfo
         return QIcon(":/pqWidgets/Icons/pqHierarchicalData16.png");
 
       case VTK_HIERARCHICAL_BOX_DATA_SET:
-        return QIcon(":/pqWidgets/Icons/pqOctreeData16.png");
+        return QIcon(":/pqWidgets/Icons/pqOctreeData.svg");
 
       default:
         return QIcon(":/pqWidgets/Icons/pqUnknownData16.png");

@@ -122,6 +122,7 @@ cases, being your topic name with the issue number.
 
     Caveats:
     * To add data follow these [vtk instructions][].
+    * To add icons, Kitware's graphic designer may be able to help create an SVG icon.
 
     Commit messages must contain a brief description as the first line
     and a more detailed description of what the commit contains. If

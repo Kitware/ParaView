@@ -22,7 +22,7 @@
      <bool>false</bool>
     </property>
     <property name="icon" >
-     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqScalarBar24.png</iconset>
+     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqScalarBar.svg</iconset>
     </property>
     <property name="text" >
      <string>Show Color Legend</string>

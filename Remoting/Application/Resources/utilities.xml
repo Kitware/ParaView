@@ -986,7 +986,7 @@
 
      <Hints>
       <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave32.png" />
+      <PipelineIcon name=":pqComponents/pqSave.svg" />
 
       <!-- This will help us when exporting the script state -->
       <WriterProxy group="writers" name="XMLPImageDataWriter" />
@@ -1028,7 +1028,7 @@
 
      <Hints>
       <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave32.png" />
+      <PipelineIcon name=":pqComponents/pqSave.svg" />
 
       <!-- This will help us when exporting the script state -->
       <WriterProxy group="writers" name="XMLPRectilinearGridWriter" />
@@ -1070,7 +1070,7 @@
 
      <Hints>
       <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave32.png" />
+      <PipelineIcon name=":pqComponents/pqSave.svg" />
 
       <!-- This will help us when exporting the script state -->
       <WriterProxy group="writers" name="XMLPStructuredGridWriter" />
@@ -1112,7 +1112,7 @@
 
      <Hints>
       <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave32.png" />
+      <PipelineIcon name=":pqComponents/pqSave.svg" />
 
       <!-- This will help us when exporting the script state -->
       <WriterProxy group="writers" name="XMLPPolyDataWriter" />
@@ -1154,7 +1154,7 @@
 
      <Hints>
       <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave32.png" />
+      <PipelineIcon name=":pqComponents/pqSave.svg" />
 
       <!-- This will help us when exporting the script state -->
       <WriterProxy group="writers" name="XMLPUnstructuredGridWriter" />
@@ -1196,7 +1196,7 @@
 
      <Hints>
       <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave32.png" />
+      <PipelineIcon name=":pqComponents/pqSave.svg" />
 
       <!-- This will help us when exporting the script state -->
       <WriterProxy group="writers" name="XMLMultiBlockDataWriter" />
@@ -1238,7 +1238,7 @@
 
      <Hints>
       <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave32.png" />
+      <PipelineIcon name=":pqComponents/pqSave.svg" />
 
       <!-- This will help us when exporting the script state -->
       <WriterProxy group="writers" name="XMLHierarchicalBoxDataWriter" />
@@ -1280,7 +1280,7 @@
 
      <Hints>
       <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave32.png" />
+      <PipelineIcon name=":pqComponents/pqSave.svg" />
 
       <!-- This will help us when exporting the script state -->
       <WriterProxy group="writers" name="CSVWriter" />
@@ -1325,7 +1325,7 @@
 
       <Hints>
         <!-- TODO: this doesn't work yet -->
-        <PipelineIcon name=":pqComponents/pqSave32.png" />
+        <PipelineIcon name=":pqComponents/pqSave.svg" />
 
         <!-- This will help us when exporting the script state -->
         <WriterProxy group="writers" name="ExodusIIWriter" />
@@ -1367,7 +1367,7 @@
 
      <Hints>
       <!-- TODO: this doesn't work yet -->
-      <PipelineIcon name=":pqComponents/pqSave32.png" />
+      <PipelineIcon name=":pqComponents/pqSave.svg" />
 
       <!-- This will help us when exporting the script state -->
       <WriterProxy group="writers" name="HyperTreeGridWriter" />
