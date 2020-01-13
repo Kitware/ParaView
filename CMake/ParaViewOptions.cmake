@@ -39,35 +39,36 @@ cmake_dependent_option(PARAVIEW_BUILD_VTK_TESTING "Enable VTK testing" OFF
   "PARAVIEW_BUILD_TESTING" OFF)
 option(PARAVIEW_BUILD_DEVELOPER_DOCUMENTATION "Generate ParaView C++/Python docs" "${doc_default}")
 
-set(PARAVIEW_BUILD_ESSENTIALS "CANONICAL"
+set(PARAVIEW_BUILD_EDITION "CANONICAL"
   CACHE STRING "Enable ParaView components essential for requested capabilities.")
-set_property(CACHE PARAVIEW_BUILD_ESSENTIALS
+set_property(CACHE PARAVIEW_BUILD_EDITION
   PROPERTY
-    STRINGS "CORE;RENDERING;CANONICAL")
+    STRINGS "CORE;RENDERING;CATALYST;CATALYST_RENDERING;CANONICAL")
 
-if (PARAVIEW_BUILD_ESSENTIALS STREQUAL "CORE")
-  set(VTK_GROUP_ENABLE_PARAVIEW_CORE "YES" CACHE INTERNAL "")
-  set(VTK_GROUP_ENABLE_PARAVIEW_RENDERING "NO" CACHE INTERNAL "")
-  set(VTK_GROUP_ENABLE_PARAVIEW_CANONICAL "NO" CACHE INTERNAL "")
-  set(PARAVIEW_BUILD_CORE ON)
-  set(PARAVIEW_BUILD_RENDERING OFF)
-  set(PARAVIEW_BUILD_CANONICAL OFF)
-elseif (PARAVIEW_BUILD_ESSENTIALS STREQUAL "RENDERING")
-  set(VTK_GROUP_ENABLE_PARAVIEW_CORE "YES" CACHE INTERNAL "")
-  set(VTK_GROUP_ENABLE_PARAVIEW_RENDERING "YES" CACHE INTERNAL "")
-  set(VTK_GROUP_ENABLE_PARAVIEW_CANONICAL "NO" CACHE INTERNAL "")
-  set(PARAVIEW_BUILD_CORE ON)
-  set(PARAVIEW_BUILD_RENDERING ON)
-  set(PARAVIEW_BUILD_CANONICAL OFF)
-elseif (PARAVIEW_BUILD_ESSENTIALS STREQUAL "CANONICAL")
-  set(VTK_GROUP_ENABLE_PARAVIEW_CORE "YES" CACHE INTERNAL "")
-  set(VTK_GROUP_ENABLE_PARAVIEW_RENDERING "YES" CACHE INTERNAL "")
-  set(VTK_GROUP_ENABLE_PARAVIEW_CANONICAL "YES" CACHE INTERNAL "")
-  set(PARAVIEW_BUILD_CORE ON)
-  set(PARAVIEW_BUILD_RENDERING ON)
+set(PARAVIEW_BUILD_CANONICAL OFF)
+set(PARAVIEW_ENABLE_RENDERING OFF)
+set(PARAVIEW_ENABLE_NONESSENTIAL OFF)
+if (PARAVIEW_BUILD_EDITION STREQUAL "CORE")
+  # all are OFF.
+elseif (PARAVIEW_BUILD_EDITION STREQUAL "RENDERING")
+  set(PARAVIEW_ENABLE_RENDERING ON)
+elseif (PARAVIEW_BUILD_EDITION STREQUAL "CATALYST")
   set(PARAVIEW_BUILD_CANONICAL ON)
+elseif (PARAVIEW_BUILD_EDITION STREQUAL "CATALYST_RENDERING")
+  set(PARAVIEW_ENABLE_RENDERING ON)
+  set(PARAVIEW_BUILD_CANONICAL ON)
+elseif (PARAVIEW_BUILD_EDITION STREQUAL "CANONICAL")
+  set(PARAVIEW_ENABLE_RENDERING ON)
+  set(PARAVIEW_BUILD_CANONICAL ON)
+  set(PARAVIEW_ENABLE_NONESSENTIAL ON)
 endif()
 
+set(VTK_GROUP_ENABLE_PARAVIEW_CORE "YES" CACHE INTERNAL "")
+if (PARAVIEW_BUILD_CANONICAL)
+  set(VTK_GROUP_ENABLE_PARAVIEW_CANONICAL "YES" CACHE INTERNAL "")
+else()
+  set(VTK_GROUP_ENABLE_PARAVIEW_CANONICAL "NO" CACHE INTERNAL "")
+endif()
 
 #========================================================================
 # CAPABILITY OPTIONS:
@@ -85,19 +86,19 @@ endif ()
 
 option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
 option(PARAVIEW_USE_CUDA "Support CUDA compilation" OFF)
-option(PARAVIEW_USE_VTKM "Enable VTK-m accelerated algorithms" ON)
+option(PARAVIEW_USE_VTKM "Enable VTK-m accelerated algorithms" "${PARAVIEW_ENABLE_NONESSENTIAL}")
 
 vtk_deprecated_setting(python_default PARAVIEW_USE_PYTHON PARAVIEW_ENABLE_PYTHON OFF)
 option(PARAVIEW_USE_PYTHON "Enable/Disable Python scripting support" "${python_default}")
 
 # Currently, we're making `PARAVIEW_USE_QT` available only when doing CANONICAL
-# builds. This is technically not necessary so we can support that use-case if
-# needed in future but will require some work to make sure the Qt components
+# builds with RENDERING. This is technically not necessary so we can support that
+# use-case if needed in future but will require some work to make sure the Qt components
 # work correctly with missing proxies.
 vtk_deprecated_setting(qt_gui_default PARAVIEW_USE_QT PARAVIEW_BUILD_QT_GUI "ON")
 cmake_dependent_option(PARAVIEW_USE_QT
   "Enable Qt-support needed for graphical UI" "${qt_gui_default}"
-  "PARAVIEW_BUILD_CANONICAL" OFF)
+  "PARAVIEW_BUILD_CANONICAL;PARAVIEW_ENABLE_RENDERING;PARAVIEW_ENABLE_NONESSENTIAL" OFF)
 
 # Add an option to enable using Qt Webkit for widgets, as needed.
 # Default is OFF. We don't want to depend on WebKit unless absolutely needed.
@@ -120,7 +121,7 @@ mark_as_advanced(PARAVIEW_USE_QTHELP)
 #========================================================================
 
 vtk_deprecated_setting(raytracing_default PARAVIEW_ENABLE_RAYTRACING PARAVIEW_USE_RAYTRACING "OFF")
-option(PARAVIEW_ENABLE_RAYTRACING "Build ParaView with OSPray and/or OptiX ray-tracing support")
+option(PARAVIEW_ENABLE_RAYTRACING "Build ParaView with OSPray and/or OptiX ray-tracing support" "${raytracing_default}")
 
 set(paraview_web_default ON)
 if (PARAVIEW_USE_PYTHON AND WIN32)
@@ -129,7 +130,7 @@ if (PARAVIEW_USE_PYTHON AND WIN32)
   set(paraview_web_default "${have_pywin32}")
 endif ()
 
-if (NOT PARAVIEW_BUILD_ESSENTIALS STREQUAL "CANONICAL")
+if (NOT PARAVIEW_BUILD_EDITION STREQUAL "CANONICAL")
   set(paraview_web_default OFF)
 endif()
 cmake_dependent_option(PARAVIEW_ENABLE_WEB "Enable/Disable web support" "${paraview_web_default}"
@@ -153,7 +154,11 @@ option(PARAVIEW_ENABLE_MOMENTINVARIANTS "Enable MomentInvariants filters" OFF)
 option(PARAVIEW_ENABLE_VISITBRIDGE "Enable VisIt readers." OFF)
 
 # default to ON for CANONICAL builds, else OFF.
-option(PARAVIEW_ENABLE_XDMF2 "Enable Xdmf2 support." "${PARAVIEW_BUILD_CANONICAL}")
+set(xdmf2_default OFF)
+if (PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL)
+  set(xdmf2_default ON)
+endif()
+option(PARAVIEW_ENABLE_XDMF2 "Enable Xdmf2 support." "${xdmf2_default}")
 
 option(PARAVIEW_ENABLE_XDMF3 "Enable Xdmf3 support." OFF)
 
@@ -168,15 +173,6 @@ cmake_dependent_option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF
 cmake_dependent_option(PARAVIEW_ENABLE_COSMOTOOLS
   "Build ParaView with CosmoTools VTK Extensions" OFF
   "UNIX;PARAVIEW_USE_MPI" OFF)
-
-# PARAVIEW_ENABLE_EXPORTERS option is shown only when PARAVIEW_BUILD_ESSENTIALS is set to RENDERING.
-# If PARAVIEW_BUILD_ESSENTIALS is set to CORE, the ParaView::RemotingExport module's CONDITION
-# ensures that the module is not built nor is the option available.
-# If PARAVIEW_BUILD_ESSENTIALS is set to CANONICAL, the option is not shown but is assumed ON and
-# ParaView::RemotingExport module's CONDITION succeeds, thus enabling the module.
-cmake_dependent_option(PARAVIEW_ENABLE_EXPORTERS
-  "Enable view exporters." OFF
-  "NOT PARAVIEW_BUILD_CANONICAL;PARAVIEW_BUILD_RENDERING" ON)
 
 #========================================================================
 # MISCELLANEOUS OPTIONS:
@@ -276,7 +272,7 @@ paraview_require_module(
   EXCLUSIVE)
 
 paraview_require_module(
-  CONDITION PARAVIEW_USE_PYTHON AND PARAVIEW_BUILD_RENDERING
+  CONDITION PARAVIEW_USE_PYTHON AND PARAVIEW_ENABLE_RENDERING AND PARAVIEW_BUILD_CANONICAL
   MODULES   VTK::RenderingMatplotlib)
 
 paraview_require_module(
@@ -285,7 +281,7 @@ paraview_require_module(
   EXCLUSIVE)
 
 paraview_require_module(
-  CONDITION PARAVIEW_ENABLE_RAYTRACING AND PARAVIEW_BUILD_RENDERING
+  CONDITION PARAVIEW_ENABLE_RAYTRACING AND PARAVIEW_ENABLE_RENDERING
   MODULES   VTK::RenderingRayTracing
   EXCLUSIVE)
 
@@ -388,30 +384,34 @@ paraview_require_module(
           VTK::ImagingGeneral
           VTK::ImagingHybrid
           VTK::ImagingSources
-          VTK::IOAMR
           VTK::IOAsynchronous # needed for cinema
-          VTK::IOCityGML
           VTK::IOGeometry
-          VTK::IOH5part
           VTK::IOImage
           VTK::IOInfovis
           VTK::IOLegacy
-          VTK::IONetCDF
-          VTK::IOOggTheora
           VTK::IOParallel
-          VTK::IOParallelExodus
-          VTK::IOParallelLSDyna
           VTK::IOParallelXML
-          VTK::IOPIO
-          VTK::IOSegY
-          VTK::IOTecplotTable
-          VTK::IOTRUCHAS
-          VTK::IOVeraOut
+          VTK::IOPLY
           VTK::IOVPIC
           VTK::IOXML)
 
 paraview_require_module(
-  CONDITION PARAVIEW_BUILD_RENDERING
+  CONDITION PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL
+  MODULES   VTK::IOAMR
+            VTK::IOCityGML
+            VTK::IOH5part
+            VTK::IONetCDF
+            VTK::IOOggTheora
+            VTK::IOParallelExodus
+            VTK::IOParallelLSDyna
+            VTK::IOPIO
+            VTK::IOSegY
+            VTK::IOTRUCHAS
+            VTK::IOVeraOut
+            VTK::IOTecplotTable)
+
+paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_RENDERING AND PARAVIEW_BUILD_CANONICAL
   MODULES   VTK::FiltersTexture
             VTK::RenderingFreeType)
 
@@ -426,6 +426,31 @@ paraview_require_module(
             VTK::FiltersParallelMPI
             VTK::IOMPIImage
             VTK::IOParallelNetCDF)
+
+paraview_require_module(
+  CONDITION PARAVIEW_USE_MPI AND PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL
+  MODULES  VTK::IOParallelNetCDF)
+
+if (NOT PARAVIEW_ENABLE_NONESSENTIAL)
+  # This ensures that we don't ever enable certain problematic
+  # modules when PARAVIEW_ENABLE_NONESSENTIAL is OFF.
+  list(APPEND paraview_rejected_modules
+    ParaView::cgns
+    VTK::hdf5
+    VTK::netcdf
+    VTK::ogg
+    VTK::theora
+    VTK::xdmf2
+    VTK::xdmf3)
+endif()
+
+if (NOT PARAVIEW_ENABLE_RENDERING)
+  # This ensures that we don't ever enable OpenGL
+  # modules when PARAVIEW_ENABLE_RENDERING is OFF.
+  list(APPEND paraview_rejected_modules
+    VTK::glew
+    VTK::opengl)
+endif()
 
 if (paraview_requested_modules)
   list(REMOVE_DUPLICATES paraview_requested_modules)
