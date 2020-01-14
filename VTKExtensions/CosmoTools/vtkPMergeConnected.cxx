@@ -35,6 +35,7 @@ vtkPMergeConnected::vtkPMergeConnected()
 
 vtkPMergeConnected::~vtkPMergeConnected()
 {
+  this->SetController(nullptr);
 }
 
 void vtkPMergeConnected::PrintSelf(ostream& os, vtkIndent indent)
