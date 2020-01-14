@@ -1,8 +1,6 @@
 <RCC>
     <qresource prefix="/pqCore" >
         <file>Icons/pqDomain16.png</file>
-        <file>Icons/pqLinkOut16.png</file>
-        <file>Icons/pqMousePick15.png</file>
         <file>Icons/pqNetwork16.png</file>
     </qresource>
 </RCC>

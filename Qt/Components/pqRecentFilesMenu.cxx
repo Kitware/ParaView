@@ -171,7 +171,7 @@ void pqRecentFilesMenu::buildMenu()
 
       // Add a separator for the server.
       QAction* const action = new QAction(criter.key(), this->Menu);
-      action->setIcon(QIcon(":/pqWidgets/Icons/pqConnect16.png"));
+      action->setIcon(QIcon(":/pqWidgets/Icons/pqConnect.svg"));
 
       // ensure that the server stands out
       QFont font = action->font();

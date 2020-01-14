@@ -45,7 +45,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../../Components/Resources/pqComponents.qrc">
-         <normaloff>:/pqWidgets/Icons/pqScalarBar16.png</normaloff>:/pqWidgets/Icons/pqScalarBar16.png</iconset>
+         <normaloff>:/pqWidgets/Icons/pqScalarBar.svg</normaloff>:/pqWidgets/Icons/pqScalarBar.svg</iconset>
        </property>
        <property name="checkable">
         <bool>true</bool>
@@ -62,7 +62,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../../Components/Resources/pqComponents.qrc">
-         <normaloff>:/pqWidgets/Icons/pqEditScalarBar16.png</normaloff>:/pqWidgets/Icons/pqEditScalarBar16.png</iconset>
+         <normaloff>:/pqWidgets/Icons/pqEditScalarBar.svg</normaloff>:/pqWidgets/Icons/pqEditScalarBar.svg</iconset>
        </property>
       </widget>
      </item>
@@ -142,7 +142,7 @@
            </property>
            <property name="icon">
             <iconset resource="../../../Components/Resources/pqComponents.qrc">
-             <normaloff>:/pqWidgets/Icons/pqSave16.png</normaloff>:/pqWidgets/Icons/pqSave16.png</iconset>
+             <normaloff>:/pqWidgets/Icons/pqReset.svg</normaloff>:/pqWidgets/Icons/pqReset.svg</iconset>
            </property>
           </widget>
          </item>
@@ -176,7 +176,7 @@
            </property>
            <property name="icon">
             <iconset resource="../../../Components/Resources/pqComponents.qrc">
-             <normaloff>:/pqWidgets/Icons/pqSave16.png</normaloff>:/pqWidgets/Icons/pqSave16.png</iconset>
+             <normaloff>:/pqWidgets/Icons/pqSave.svg</normaloff>:/pqWidgets/Icons/pqSave.svg</iconset>
            </property>
           </widget>
          </item>
@@ -203,7 +203,7 @@
            </property>
            <property name="icon">
             <iconset resource="../../../Components/Resources/pqComponents.qrc">
-             <normaloff>:/pqWidgets/Icons/pqUpdate16.png</normaloff>:/pqWidgets/Icons/pqUpdate16.png</iconset>
+             <normaloff>:/pqWidgets/Icons/pqApply.svg</normaloff>:/pqWidgets/Icons/pqApply.svg</iconset>
            </property>
            <property name="default">
             <bool>true</bool>
@@ -220,7 +220,7 @@
            </property>
            <property name="icon">
             <iconset resource="../../../Components/Resources/pqComponents.qrc">
-             <normaloff>:/pqWidgets/Icons/pqUpdate16.png</normaloff>:/pqWidgets/Icons/pqUpdate16.png</iconset>
+             <normaloff>:/pqWidgets/Icons/pqAutoApply.svg</normaloff>:/pqWidgets/Icons/pqAutoApply.svg</iconset>
            </property>
            <property name="checkable">
             <bool>true</bool>

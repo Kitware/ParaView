@@ -19,7 +19,7 @@
   <action name="actionOpenData">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqOpen24.png</normaloff>:/pqWidgets/Icons/pqOpen24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqOpen.svg</normaloff>:/pqWidgets/Icons/pqOpen.svg</iconset>
    </property>
    <property name="text">
     <string>Open...</string>
@@ -34,7 +34,7 @@
   <action name="actionSaveData">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqSave24.png</normaloff>:/pqWidgets/Icons/pqSave24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqSave.svg</normaloff>:/pqWidgets/Icons/pqSave.svg</iconset>
    </property>
    <property name="text">
     <string>Save Data...</string>
@@ -46,7 +46,7 @@
   <action name="actionServerConnect">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqConnect24.png</normaloff>:/pqWidgets/Icons/pqConnect24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqConnect.svg</normaloff>:/pqWidgets/Icons/pqConnect.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Connect...</string>
@@ -58,7 +58,7 @@
   <action name="actionServerDisconnect">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqDisconnect24.png</normaloff>:/pqWidgets/Icons/pqDisconnect24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqDisconnect.svg</normaloff>:/pqWidgets/Icons/pqDisconnect.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Disconnect</string>
@@ -70,7 +70,7 @@
   <action name="actionUndo">
    <property name="icon">
     <iconset>
-     <normaloff>:pqWidgets/Icons/pqUndo24.png</normaloff>:pqWidgets/Icons/pqUndo24.png</iconset>
+     <normaloff>:pqWidgets/Icons/pqUndo.svg</normaloff>:pqWidgets/Icons/pqUndo.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Undo</string>
@@ -79,7 +79,7 @@
   <action name="actionRedo">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqRedo24.png</normaloff>:/pqWidgets/Icons/pqRedo24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqRedo.svg</normaloff>:/pqWidgets/Icons/pqRedo.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Redo</string>
@@ -91,7 +91,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqAutoApply32.png</normaloff>:/pqWidgets/Icons/pqAutoApply32.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqAutoApply.svg</normaloff>:/pqWidgets/Icons/pqAutoApply.svg</iconset>
    </property>
    <property name="text">
     <string>Auto Apply</string>
@@ -109,7 +109,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqFindData24.png</normaloff>:/pqWidgets/Icons/pqFindData24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqFindData.svg</normaloff>:/pqWidgets/Icons/pqFindData.svg</iconset>
    </property>
    <property name="text">
     <string>Find data...</string>
@@ -121,7 +121,7 @@
   <action name="actionLoadPalette">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqPalette.png</normaloff>:/pqWidgets/Icons/pqPalette.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqPalette.svg</normaloff>:/pqWidgets/Icons/pqPalette.svg</iconset>
    </property>
    <property name="text">
     <string>Load Palette</string>
@@ -133,7 +133,7 @@
   <action name="actionDelete">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqReset24.png</normaloff>:/pqWidgets/Icons/pqReset24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqResetSession.svg</normaloff>:/pqWidgets/Icons/pqResetSession.svg</iconset>
    </property>
    <property name="text">
     <string>ResetSession</string>

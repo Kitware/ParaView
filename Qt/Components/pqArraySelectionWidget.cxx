@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QEvent>
 #include <QHeaderView>
+#include <QIcon>
 #include <QMap>
 #include <QPainter>
 #include <QPixmap>
@@ -53,44 +54,43 @@ namespace
 {
 // this is simply map to determine the icons to use for the properties on
 // exodus reader.
-class PixmapMap : public QMap<QString, QPixmap>
+class PixmapMap : public QMap<QString, QIcon>
 {
 public:
   PixmapMap()
   {
-    this->insert("GenerateObjectIdCellArray", QPixmap(":/pqWidgets/Icons/pqCellCenterData16.png"));
-    this->insert(
-      "GenerateGlobalElementIdArray", QPixmap(":/pqWidgets/Icons/pqCellCenterData16.png"));
-    this->insert("GenerateGlobalNodeIdArray", QPixmap(":/pqWidgets/Icons/pqNodalData16.png"));
+    this->insert("GenerateObjectIdCellArray", QIcon(":/pqWidgets/Icons/pqCellCenterData.svg"));
+    this->insert("GenerateGlobalElementIdArray", QIcon(":/pqWidgets/Icons/pqCellCenterData.svg"));
+    this->insert("GenerateGlobalNodeIdArray", QIcon(":/pqWidgets/Icons/pqNodalData.svg"));
 
-    this->insert("ElementVariables", QPixmap(":/pqWidgets/Icons/pqCellCenterData16.png"));
-    this->insert("FaceVariables", QPixmap(":/pqWidgets/Icons/pqFaceCenterData16.png"));
-    this->insert("EdgeVariables", QPixmap(":/pqWidgets/Icons/pqEdgeCenterData16.png"));
+    this->insert("ElementVariables", QIcon(":/pqWidgets/Icons/pqCellCenterData.svg"));
+    this->insert("FaceVariables", QIcon(":/pqWidgets/Icons/pqFaceCenterData.svg"));
+    this->insert("EdgeVariables", QIcon(":/pqWidgets/Icons/pqEdgeCenterData.svg"));
 
-    this->insert("SideSetResultArrayStatus", QPixmap(":/pqWidgets/Icons/pqSideSetData16.png"));
-    this->insert("NodeSetResultArrayStatus", QPixmap(":/pqWidgets/Icons/pqNodeSetData16.png"));
-    this->insert("FaceSetResultArrayStatus", QPixmap(":/pqWidgets/Icons/pqFaceSetData16.png"));
-    this->insert("EdgeSetResultArrayStatus", QPixmap(":/pqWidgets/Icons/pqEdgeSetData16.png"));
-    this->insert("ElementSetResultArrayStatus", QPixmap(":/pqWidgets/Icons/pqElemSetData16.png"));
+    this->insert("SideSetResultArrayStatus", QIcon(":/pqWidgets/Icons/pqSideSetData.svg"));
+    this->insert("NodeSetResultArrayStatus", QIcon(":/pqWidgets/Icons/pqNodeSetData.svg"));
+    this->insert("FaceSetResultArrayStatus", QIcon(":/pqWidgets/Icons/pqFaceSetData.svg"));
+    this->insert("EdgeSetResultArrayStatus", QIcon(":/pqWidgets/Icons/pqEdgeSetData.svg"));
+    this->insert("ElementSetResultArrayStatus", QIcon(":/pqWidgets/Icons/pqElemSetData.svg"));
 
-    this->insert("PointVariables", QPixmap(":/pqWidgets/Icons/pqNodalData16.png"));
-    this->insert("GlobalVariables", QPixmap(":/pqWidgets/Icons/pqGlobalData16.png"));
+    this->insert("PointVariables", QIcon(":/pqWidgets/Icons/pqNodalData.svg"));
+    this->insert("GlobalVariables", QIcon(":/pqWidgets/Icons/pqGlobalData.svg"));
 
-    this->insert("SideSetArrayStatus", QPixmap(":/pqWidgets/Icons/pqSideSetData16.png"));
-    this->insert("NodeSetArrayStatus", QPixmap(":/pqWidgets/Icons/pqNodeSetData16.png"));
-    this->insert("FaceSetArrayStatus", QPixmap(":/pqWidgets/Icons/pqFaceSetData16.png"));
-    this->insert("EdgeSetArrayStatus", QPixmap(":/pqWidgets/Icons/pqEdgeSetData16.png"));
-    this->insert("ElementSetArrayStatus", QPixmap(":/pqWidgets/Icons/pqElemSetData16.png"));
+    this->insert("SideSetArrayStatus", QIcon(":/pqWidgets/Icons/pqSideSetData.svg"));
+    this->insert("NodeSetArrayStatus", QIcon(":/pqWidgets/Icons/pqNodeSetData.svg"));
+    this->insert("FaceSetArrayStatus", QIcon(":/pqWidgets/Icons/pqFaceSetData.svg"));
+    this->insert("EdgeSetArrayStatus", QIcon(":/pqWidgets/Icons/pqEdgeSetData.svg"));
+    this->insert("ElementSetArrayStatus", QIcon(":/pqWidgets/Icons/pqElemSetData.svg"));
 
-    this->insert("NodeMapArrayStatus", QPixmap(":/pqWidgets/Icons/pqNodeMapData16.png"));
-    this->insert("EdgeMapArrayStatus", QPixmap(":/pqWidgets/Icons/pqEdgeMapData16.png"));
-    this->insert("FaceMapArrayStatus", QPixmap(":/pqWidgets/Icons/pqFaceMapData16.png"));
-    this->insert("ElementMapArrayStatus", QPixmap(":/pqWidgets/Icons/pqElemMapData16.png"));
+    this->insert("NodeMapArrayStatus", QIcon(":/pqWidgets/Icons/pqNodeMapData.svg"));
+    this->insert("EdgeMapArrayStatus", QIcon(":/pqWidgets/Icons/pqEdgeMapData16.png"));
+    this->insert("FaceMapArrayStatus", QIcon(":/pqWidgets/Icons/pqFaceMapData.svg"));
+    this->insert("ElementMapArrayStatus", QIcon(":/pqWidgets/Icons/pqElemMapData.svg"));
 
-    this->insert("PointArrayStatus", QPixmap(":/pqWidgets/Icons/pqNodalData16.png"));
-    this->insert("CellArrayStatus", QPixmap(":/pqWidgets/Icons/pqCellCenterData16.png"));
-    this->insert("ColumnArrayStatus", QPixmap(":/pqWidgets/Icons/pqSpreadsheet16.png"));
-    this->insert("SetStatus", QPixmap(":/pqWidgets/Icons/pqSideSetData16.png"));
+    this->insert("PointArrayStatus", QIcon(":/pqWidgets/Icons/pqNodalData.svg"));
+    this->insert("CellArrayStatus", QIcon(":/pqWidgets/Icons/pqCellCenterData.svg"));
+    this->insert("ColumnArrayStatus", QIcon(":/pqWidgets/Icons/pqSpreadsheet.svg"));
+    this->insert("SetStatus", QIcon(":/pqWidgets/Icons/pqSideSetData.svg"));
   }
 };
 }
@@ -112,7 +112,7 @@ public:
 
   ~Model() override {}
 
-  void addPixmap(const QString& key, QPixmap&& pixmap)
+  void addPixmap(const QString& key, QIcon&& pixmap)
   {
     this->Pixmaps.insert(key, std::move(pixmap));
   }
@@ -392,63 +392,63 @@ void pqArraySelectionWidget::setIconType(const QString& pname, const QString& ic
   auto model = this->realModel();
   if (icon_type == "point")
   {
-    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqNodalData16.png"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqNodalData.svg"));
   }
   else if (icon_type == "cell")
   {
-    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqCellCenterData16.png"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqCellCenterData.svg"));
   }
   else if (icon_type == "field")
   {
-    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqGlobalData16.png"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqGlobalData.svg"));
   }
   else if (icon_type == "vertex")
   {
-    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqNodalData16.png"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqNodalData.svg"));
   }
   else if (icon_type == "edge")
   {
-    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqEdgeCenterData16.png"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqEdgeCenterData.svg"));
   }
   else if (icon_type == "face")
   {
-    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqFaceCenterData16.png"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqFaceCenterData.svg"));
   }
   else if (icon_type == "row")
   {
-    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqSpreadsheet16.png"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqSpreadsheet.svg"));
   }
   else if (icon_type == "side-set")
   {
-    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqSideSetData16.png"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqSideSetData.svg"));
   }
   else if (icon_type == "node-set")
   {
-    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqNodeSetData16.png"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqNodeSetData.svg"));
   }
   else if (icon_type == "face-set")
   {
-    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqFaceSetData16.png"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqFaceSetData.svg"));
   }
   else if (icon_type == "edge-set")
   {
-    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqEdgeSetData16.png"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqEdgeSetData.svg"));
   }
   else if (icon_type == "cell-set")
   {
-    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqElemSetData16.png"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqElemSetData.svg"));
   }
   else if (icon_type == "node-map")
   {
-    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqNodeMapData16.png"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqNodeMapData.svg"));
   }
   else if (icon_type == "edge-map")
   {
-    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqEdgeMapData16.png"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqEdgeMapData16.png"));
   }
   else if (icon_type == "face-map")
   {
-    model->addPixmap(pname, QPixmap(":/pqWidgets/Icons/pqFaceMapData16.png"));
+    model->addPixmap(pname, QIcon(":/pqWidgets/Icons/pqFaceMapData.svg"));
   }
   else
   {

@@ -1,283 +1,206 @@
 <RCC>
     <qresource prefix="/pqWidgets">
-        <file>Icons/cinemascience_mark.png</file>
-        <file>Icons/pqFilterEyeball16.png</file>
-        <file>Icons/pqSaveArray16.png</file>
+        <file>Icons/explicit_color.png</file>
+        <file>Icons/explicit_opacity.png</file>
+        <file>Icons/inherited_color.png</file>
+        <file>Icons/inherited_opacity.png</file>
+        <file>Icons/no_color.png</file>
+        <file>Icons/no_opacity.png</file>
+        <file>Icons/pdf.png</file>
         <file>Icons/PVSplashScreen.png</file>
         <file>Icons/pq3DView16.png</file>
-        <file>Icons/pqAdvanced26.png</file>
-        <file>Icons/pqAdvancedRed26.png</file>
+        <file>Icons/pqAdvanced.svg</file>
         <file>Icons/pqAddFavorites16.png</file>
+        <file>Icons/pqApply.svg</file>
         <file>Icons/pqArrowDown16.png</file>
         <file>Icons/pqArrowUp16.png</file>
-        <file>Icons/pqAutoApply32.png</file>
+        <file>Icons/pqAutoApply.svg</file>
         <file>Icons/pqAxes.png</file>
-        <file>Icons/pqBack16.png</file>
+        <file>Icons/pqBold24.png</file>
         <file>Icons/pqBottomCenter32.png</file>
         <file>Icons/pqBottomLeftCorner32.png</file>
         <file>Icons/pqBottomRightCorner32.png</file>
         <file>Icons/pqBoxChart16.png</file>
         <file>Icons/pqBundle16.png</file>
-        <file>Icons/pqBundle22.png</file>
         <file>Icons/pqBundle32.png</file>
-        <file>Icons/pqCalculator24.png</file>
-        <file>Icons/pqCamera16.png</file>
-        <file>Icons/pqCamerad16.png</file>
-        <file>Icons/pqCancel16.png</file>
-        <file>Icons/pqCancel24.png</file>
-        <file>Icons/pqCancel32.png</file>
-        <file>Icons/pqCaptureScreenshot24.png</file>
-        <file>Icons/pqCellCenterData16.png</file>
-        <file>Icons/pqCellData16.png</file>
+        <file>Icons/pqCalculator.svg</file>
+        <file>Icons/pqCamera.svg</file>
+        <file>Icons/pqCancel.svg</file>
+        <file>Icons/pqCaptureScreenshot.svg</file>
+        <file>Icons/pqCellCenterData.svg</file>
+        <file>Icons/pqCellData.svg</file>
+        <file>Icons/pqChangeInput.svg</file>
+        <file>Icons/pqChecked.svg</file>
+        <file>Icons/pqCinemaScience.svg</file>
+        <file>Icons/pqClearSort.svg</file>
         <file>Icons/pqClient32.png</file>
-        <file>Icons/pqClip24.png</file>
-        <file>Icons/pqComparative3DView16.png</file>
-        <file>Icons/pqComparativeVis16.png</file>
-        <file>Icons/pqConnect16.png</file>
-        <file>Icons/pqConnect24.png</file>
-        <file>Icons/pqConnect32.png</file>
-        <file>Icons/pqConfig16.png</file>
-        <file>Icons/pqCopy22.png</file>
-        <file>Icons/pqCut22.png</file>
+        <file>Icons/pqClip.svg</file>
+        <file>Icons/pqConnect.svg</file>
+        <file>Icons/pqCopy.svg</file>
         <file>Icons/pqDataServer32.png</file>
-        <file>Icons/pqDisconnect16.png</file>
-        <file>Icons/pqDisconnect24.png</file>
-        <file>Icons/pqDisconnect32.png</file>
-        <file>Icons/pqEdgeCenterData16.png</file>
+        <file>Icons/pqDisconnect.svg</file>
+        <file>Icons/pqEdgeCenterData.svg</file>
         <file>Icons/pqEdgeMapData16.png</file>
-        <file>Icons/pqEdgeSetData16.png</file>
-        <file>Icons/pqEditCamera16.png</file>
-        <file>Icons/pqInteractionMode2D16.png</file>
-        <file>Icons/pqInteractionMode3D16.png</file>
-        <file>Icons/pqEditColor24.png</file>
-        <file>Icons/pqEditScalarBar16.png</file>
-        <file>Icons/pqElemData16.png</file>
-        <file>Icons/pqElemMapData16.png</file>
-        <file>Icons/pqElemSetData16.png</file>
-        <file>Icons/pqEnterCenter24.png</file>
-        <file>Icons/pqExponential16.png</file>
+        <file>Icons/pqEdgeSetData.svg</file>
+        <file>Icons/pqEditCamera.svg</file>
+        <file>Icons/pqEditColor.svg</file>
+        <file>Icons/pqEditScalarBar.svg</file>
+        <file>Icons/pqElemMapData.svg</file>
+        <file>Icons/pqElemSetData.svg</file>
+        <file>Icons/pqExitApp.svg</file>
         <file>Icons/pqExponential24.png</file>
-        <file>Icons/pqExtractGrid24.png</file>
-        <file>Icons/pqExtractSelection24.png</file>
-        <file>Icons/pqEyeball.png</file>
-        <file>Icons/pqEyeballClosed.png</file>
-        <file>Icons/pqFaceCenterData16.png</file>
-        <file>Icons/pqFaceMapData16.png</file>
-        <file>Icons/pqFaceSetData16.png</file>
-        <file>Icons/pqFavorites16.png</file>
-        <file>Icons/pqFavorites32.png</file>
+        <file>Icons/pqExportScene.svg</file>
+        <file>Icons/pqExtractGrid.svg</file>
+        <file>Icons/pqExtractSelection.svg</file>
+        <file>Icons/pqEyeball.svg</file>
+        <file>Icons/pqEyeballClosed.svg</file>
+        <file>Icons/pqFaceCenterData.svg</file>
+        <file>Icons/pqFaceMapData.svg</file>
+        <file>Icons/pqFaceSetData.svg</file>
+        <file>Icons/pqFavorites.svg</file>
         <file>Icons/pqFilter16.png</file>
-        <file>Icons/pqFilter22.png</file>
-        <file>Icons/pqFilter32.png</file>
-        <file>Icons/pqFind22.png</file>
-        <file>Icons/pqFindData16.png</file>
-        <file>Icons/pqFindData24.png</file>
-        <file>Icons/pqFindData32.png</file>
+        <file>Icons/pqFilter16@2x.png</file>
+        <file>Icons/pqFilterEyeball16.png</file>
+        <file>Icons/pqFindData.svg</file>
         <file>Icons/pqFixedRepr32.png</file>
-        <file>Icons/pqFloppyDisk16.png</file>
-        <file>Icons/pqFloppyDisk22.png</file>
-        <file>Icons/pqFloppyDisk32.png</file>
-        <file>Icons/pqFolder16.png</file>
-        <file>Icons/pqFolder32.png</file>
-        <file>Icons/pqFolderNew16.png</file>
-        <file>Icons/pqFolderOpen16.png</file>
-        <file>Icons/pqFolderUp16.png</file>
-        <file>Icons/pqFrustumSelectionCell24.png</file>
-        <file>Icons/pqFrustumSelectionPoint24.png</file>
-        <file>Icons/pqGlobalData16.png</file>
-        <file>Icons/pqGlyph24.png</file>
-        <file>Icons/pqGroup24.png</file>
-        <file>Icons/pqGroupExtract24.png</file>
-        <file>Icons/pqHelp16.png</file>
-        <file>Icons/pqHelp24.png</file>
-        <file>Icons/pqHelp32.png</file>
-        <file>Icons/pqHideCenterAxes24.png</file>
+        <file>Icons/pqFrustumSelectionCell.svg</file>
+        <file>Icons/pqFrustumSelectionPoint.svg</file>
+        <file>Icons/pqFullscreen.svg</file>
+        <file>Icons/pqGlobalData.svg</file>
+        <file>Icons/pqGlyph.svg</file>
+        <file>Icons/pqGroup.svg</file>
+        <file>Icons/pqGroupExtract.svg</file>
+        <file>Icons/pqHelp.svg</file>
         <file>Icons/pqHierarchicalData16.png</file>
         <file>Icons/pqHistogram16.png</file>
         <file>Icons/pqHistogram24.png</file>
         <file>Icons/pqHistogramReload24.png</file>
-        <file>Icons/pqImageData16.png</file>
-        <file>Icons/pqInvert24.png</file>
-        <file>Icons/pqInspect22.png</file>
-        <file>Icons/pqIsosurface24.png</file>
+        <file>Icons/pqInsituServerRunning16.png</file>
+        <file>Icons/pqInsituServerPaused16.png</file>
+        <file>Icons/pqInsituBreakpoint16.png</file>
+        <file>Icons/pqInteractionMode2D.svg</file>
+        <file>Icons/pqInteractionMode3D.svg</file>
+        <file>Icons/pqInvert.svg</file>
+        <file>Icons/pqIsosurface.svg</file>
+        <file>Icons/pqItalics24.png</file>
         <file>Icons/pqLineChart16.png</file>
         <file>Icons/pqLinkBack16.png</file>
         <file>Icons/pqLinkIn16.png</file>
         <file>Icons/pqLinkIn16d.png</file>
+        <file>Icons/pqLoadState.svg</file>
+        <file>Icons/pqLoadWindow.svg</file>
         <file>Icons/pqLock24.png</file>
-        <file>Icons/pqMeasure24.png</file>
-        <file>Icons/pqMinus16.png</file>
-        <file>Icons/pqMouseMove15.png</file>
         <file>Icons/pqMousePick15.png</file>
-        <file>Icons/pqMouseSelect15.png</file>
         <file>Icons/pqMultiBlockData16.png</file>
-        <file>Icons/pqMultiGroupData16.png</file>
-        <file>Icons/pqNewItem16.png</file>
-        <file>Icons/pqNewItem22.png</file>
-        <file>Icons/pqNewItem32.png</file>
-        <file>Icons/pqNewProject16.png</file>
-        <file>Icons/pqNewProject22.png</file>
-        <file>Icons/pqNewProject32.png</file>
-        <file>Icons/pqNodalData16.png</file>
-        <file>Icons/pqNodeMapData16.png</file>
-        <file>Icons/pqNodeSetData16.png</file>
-        <file>Icons/pqOctreeData16.png</file>
-        <file>Icons/pqOpen16.png</file>
-        <file>Icons/pqOpen24.png</file>
-        <file>Icons/pqOpen32.png</file>
-        <file>Icons/pqOptions16.png</file>
-        <file>Icons/pqPaste22.png</file>
-        <file>Icons/pqPalette.png</file>
-        <file>Icons/pqPalette@2x.png</file>
-        <file>Icons/pqPickCenter24.png</file>
+        <file>Icons/pqNewFolder.svg</file>
+        <file>Icons/pqNodalData.svg</file>
+        <file>Icons/pqNodeMapData.svg</file>
+        <file>Icons/pqNodeSetData.svg</file>
+        <file>Icons/pqOctreeData.svg</file>
+        <file>Icons/pqOpen.svg</file>
+        <file>Icons/pqPalette.svg</file>
+        <file>Icons/pqPaste.svg</file>
         <file>Icons/pqPickCenter.png</file>
         <file>Icons/pqPickCenter@2x.png</file>
-        <file>Icons/pqPipelineList22.png</file>
         <file>Icons/pqPlotCellOverTime24.png</file>
-        <file>Icons/pqPlotGlobalOverTime24.png</file>
+        <file>Icons/pqPlotGlobalOverTime.svg</file>
         <file>Icons/pqPlotLineOverTime24.png</file>
-        <file>Icons/pqPlotSelectionOverTime24.png</file>
-        <file>Icons/pqPlotOverLine24.png</file>
-        <file>Icons/pqPlotPointOverTime24.png</file>
-        <file>Icons/PluginGray.png</file>
-        <file>Icons/PluginGreen.png</file>
-        <file>Icons/PluginRed.png</file>
-        <file>Icons/PluginYellow.png</file>
-        <file>Icons/pqPointData16.png</file>
+        <file>Icons/pqPlotSelectionOverTime.svg</file>
+        <file>Icons/pqPlotOverLine.svg</file>
+        <file>Icons/pqPointData.svg</file>
         <file>Icons/pqPolydata16.png</file>
-        <file>Icons/pqPolygonSelectSurfaceCell24.png</file>
-        <file>Icons/pqPolygonSelectSurfacePoint24.png</file>
-        <file>Icons/pqPrint22.png</file>
-        <file>Icons/pqProbeLocation24.png</file>
+        <file>Icons/pqPolygonSelectSurfaceCell.svg</file>
+        <file>Icons/pqPolygonSelectSurfacePoint.svg</file>
+        <file>Icons/pqPreview.svg</file>
+        <file>Icons/pqProbeLocation.svg</file>
         <file>Icons/pqProgrammableFilter24.png</file>
-        <file>Icons/pqQuit22.png</file>
-        <file>Icons/pqRamp16.png</file>
         <file>Icons/pqRamp24.png</file>
+        <file>Icons/pqRenameWindow.svg</file>
         <file>Icons/pqRectilinearGrid16.png</file>
-        <file>Icons/pqRedo16.png</file>
-        <file>Icons/pqRedo24.png</file>
-        <file>Icons/pqRedo32.png</file>
-        <file>Icons/pqRedoCamera24.png</file>
-        <file>Icons/pqReset24.png</file>
-        <file>Icons/pqResetCamera16.png</file>
-        <file>Icons/pqResetCamera24.png</file>
-        <file>Icons/pqResetCamera32.png</file>
+        <file>Icons/pqRecentFile.svg</file>
+        <file>Icons/pqRedo.svg</file>
+        <file>Icons/pqRedoCamera.svg</file>
+        <file>Icons/pqReloadFile.svg</file>
+        <file>Icons/pqReset.svg</file>
         <file>Icons/pqResetCamera.png</file>
         <file>Icons/pqResetCamera@2x.png</file>
-        <file>Icons/pqResetCenter24.png</file>
-        <file>Icons/pqResetCenter32.png</file>
         <file>Icons/pqResetCenter.png</file>
         <file>Icons/pqResetCenter@2x.png</file>
-        <file>Icons/pqResetRange24.png</file>
-        <file>Icons/pqResetRangeCustom24.png</file>
-        <file>Icons/pqResetRangeTemporal24.png</file>
-        <file>Icons/pqResetToVisibleRange32.png</file>
-        <file>Icons/pqRotate16.png</file>
-        <file>Icons/pqRotate24.png</file>
-        <file>Icons/pqRotate32.png</file>
-        <file>Icons/pqRotateCameraCCW24.png</file>
+        <file>Icons/pqResetRange.svg</file>
+        <file>Icons/pqResetRangeCustom.svg</file>
+        <file>Icons/pqResetRangeTemporal.svg</file>
+        <file>Icons/pqResetSession.svg</file>
+        <file>Icons/pqResetSettings.svg</file>
+        <file>Icons/pqResetToVisibleRange.svg</file>
         <file>Icons/pqRotateCameraCCW.png</file>
         <file>Icons/pqRotateCameraCCW@2x.png</file>
-        <file>Icons/pqRotateCameraCW24.png</file>
         <file>Icons/pqRotateCameraCW.png</file>
         <file>Icons/pqRotateCameraCW@2x.png</file>
         <file>Icons/pqRuler.png</file>
         <file>Icons/pqRuler@2x.png</file>
         <file>Icons/pqRulerScale16.png</file>
-        <file>Icons/pqSave16.png</file>
-        <file>Icons/pqSave24.png</file>
-        <file>Icons/pqSave32.png</file>
+        <file>Icons/pqSave.svg</file>
+        <file>Icons/pqSaveAnimation.svg</file>
+        <file>Icons/pqSaveArray16.png</file>
+        <file>Icons/pqSaveState.svg</file>
         <file>Icons/pqSaveTable32.png</file>
-        <file>Icons/pqSaveAnimation24.png</file>
-        <file>Icons/pqScalarBar16.png</file>
-        <file>Icons/pqScalarBar24.png</file>
-        <file>Icons/pqScalarBar32.png</file>
+        <file>Icons/pqSaveWindow.svg</file>
+        <file>Icons/pqScalarBar.svg</file>
         <file>Icons/pqSecureServer16.png</file>
         <file>Icons/pqSelect16.png</file>
-        <file>Icons/pqSelect24.png</file>
-        <file>Icons/pqSelect32.png</file>
-        <file>Icons/pqSelectBlock24.png</file>
-        <file>Icons/pqSelectChart16.png</file>
-        <file>Icons/pqSelectChartPolygon16.png</file>
-        <file>Icons/pqSelectFrustPoints24.png</file>
-        <file>Icons/pqSelectMinus16.png</file>
-        <file>Icons/pqSelectPlus16.png</file>
-        <file>Icons/pqSelectSurfPoints24.png</file>
-        <file>Icons/pqSelectToggle16.png</file>
-        <file>Icons/pqSeparateColorMap24.png</file>
+        <file>Icons/pqSelect16@2x.png</file>
+        <file>Icons/pqSelectBlock.svg</file>
+        <file>Icons/pqSelectChart.svg</file>
+        <file>Icons/pqSelectChartPolygon.svg</file>
+        <file>Icons/pqSelectMinus.svg</file>
+        <file>Icons/pqSelectPlus.svg</file>
+        <file>Icons/pqSelectToggle.svg</file>
+        <file>Icons/pqSeparateColorMap.svg</file>
         <file>Icons/pqServer16.png</file>
-        <file>Icons/pqServer22.png</file>
-        <file>Icons/pqServer32.png</file>
-        <file>Icons/pqInsituServerRunning16.png</file>
-        <file>Icons/pqInsituServerPaused16.png</file>
-        <file>Icons/pqInsituBreakpoint16.png</file>
-        <file>Icons/pqShowCenterAxes24.png</file>
-        <file>Icons/pqShowCenterAxes32.png</file>
+        <file>Icons/pqServer16@2x.png</file>
+        <file>Icons/pqSettings.svg</file>
+        <file>Icons/pqShadow24.png</file>
         <file>Icons/pqShowCenterAxes.png</file>
         <file>Icons/pqShowCenterAxes@2x.png</file>
-        <file>Icons/pqShowOrientationAxes24.png</file>
-        <file>Icons/pqShowOrientationAxes32.png</file>
         <file>Icons/pqShowOrientationAxes.png</file>
         <file>Icons/pqShowOrientationAxes@2x.png</file>
-        <file>Icons/pqSideSetData16.png</file>
-        <file>Icons/pqSinusoidal16.png</file>
+        <file>Icons/pqSideSetData.svg</file>
         <file>Icons/pqSinusoidal24.png</file>
-        <file>Icons/pqSlice24.png</file>
-        <file>Icons/pqSolidColor16.png</file>
+        <file>Icons/pqSlice.svg</file>
+        <file>Icons/pqSolidColor.svg</file>
+        <file>Icons/pqSortAscend.svg</file>
+        <file>Icons/pqSortDescend.svg</file>
         <file>Icons/pqSource16.png</file>
-        <file>Icons/pqSource22.png</file>
-        <file>Icons/pqSource32.png</file>
-        <file>Icons/pqSplitViewH12.png</file>
-        <file>Icons/pqSplitViewV12.png</file>
-        <file>Icons/pqSplitViewH24.png</file>
-        <file>Icons/pqSplitViewV24.png</file>
-        <file>Icons/pqSpreadsheet16.png</file>
-        <file>Icons/pqStep16.png</file>
+        <file>Icons/pqSource16@2x.png</file>
+        <file>Icons/pqSplitHorizontal.svg</file>
+        <file>Icons/pqSplitVertical.svg</file>
+        <file>Icons/pqSpreadsheet.svg</file>
         <file>Icons/pqStep24.png</file>
-        <file>Icons/pqStreamTracer24.png</file>
+        <file>Icons/pqStreamTracer.svg</file>
         <file>Icons/pqStructuredGrid16.png</file>
-        <file>Icons/pqSurfaceHoveringPoint.png</file>
-        <file>Icons/pqSurfaceHoveringCell.png</file>
-        <file>Icons/pqSurfaceHoveringCell@2x.png</file>
-        <file>Icons/pqSurfaceSelectionCell24.png</file>
+        <file>Icons/pqSurfaceHoveringPoint.svg</file>
+        <file>Icons/pqSurfaceHoveringCell.svg</file>
+        <file>Icons/pqSurfaceSelectionCell.svg</file>
         <file>Icons/pqSurfaceSelectionCellDataInteractive.png</file>
-        <file>Icons/pqSurfaceSelectionCellInteractive.png</file>
+        <file>Icons/pqSurfaceSelectionCellInteractive.svg</file>
         <file>Icons/pqSurfaceSelectionPointDataInteractive.png</file>
-        <file>Icons/pqSurfaceSelectionPointInteractive.png</file>
-        <file>Icons/pqSurfaceSelectionPoint24.png</file>
-        <file>Icons/pqThreshold24.png</file>
+        <file>Icons/pqSurfaceSelectionPointInteractive.svg</file>
+        <file>Icons/pqSurfaceSelectionPoint.svg</file>
+        <file>Icons/pqTextAlignRight16.png</file>
+        <file>Icons/pqTextAlignLeft16.png</file>
+        <file>Icons/pqTextAlignCenter16.png</file>
+        <file>Icons/pqTextAlignJustified16.png</file>
+        <file>Icons/pqThreshold.svg</file>
+        <file>Icons/pqToggleLock.svg</file>
+        <file>Icons/pqToolbar.svg</file>
         <file>Icons/pqTopCenter32.png</file>
         <file>Icons/pqTopLeftCorner32.png</file>
         <file>Icons/pqTopRightCorner32.png</file>
-        <file>Icons/pqUndo16.png</file>
-        <file>Icons/pqUndo24.png</file>
-        <file>Icons/pqUndo32.png</file>
-        <file>Icons/pqUndoCamera24.png</file>
-        <file>Icons/pqUniformData16.png</file>
+        <file>Icons/pqUnchecked.svg</file>
+        <file>Icons/pqUndo.svg</file>
+        <file>Icons/pqUndoCamera.svg</file>
         <file>Icons/pqUnknownData16.png</file>
         <file>Icons/pqUnstructuredGrid16.png</file>
-        <file>Icons/pqUpdate16.png</file>
-        <file>Icons/pqUpdate24.png</file>
-        <file>Icons/pqUpdate32.png</file>
-        <file>Icons/pqVcrBack16.png</file>
-        <file>Icons/pqVcrBack24.png</file>
-        <file>Icons/pqVcrBack32.png</file>
-        <file>Icons/pqVcrFirst16.png</file>
-        <file>Icons/pqVcrFirst24.png</file>
-        <file>Icons/pqVcrFirst32.png</file>
-        <file>Icons/pqVcrForward16.png</file>
-        <file>Icons/pqVcrForward24.png</file>
-        <file>Icons/pqVcrForward32.png</file>
-        <file>Icons/pqVcrLast16.png</file>
-        <file>Icons/pqVcrLast24.png</file>
-        <file>Icons/pqVcrLast32.png</file>
-        <file>Icons/pqVcrLoop24.png</file>
-        <file>Icons/pqVcrPause16.png</file>
-        <file>Icons/pqVcrPause24.png</file>
-        <file>Icons/pqVcrPause32.png</file>
-        <file>Icons/pqVcrPlay16.png</file>
-        <file>Icons/pqVcrPlay24.png</file>
-        <file>Icons/pqVcrPlay32.png</file>
         <file>Icons/pqVcrBack.png</file>
         <file>Icons/pqVcrBack@2x.png</file>
         <file>Icons/pqVcrFirst.png</file>
@@ -292,78 +215,28 @@
         <file>Icons/pqVcrPause@2x.png</file>
         <file>Icons/pqVcrPlay.png</file>
         <file>Icons/pqVcrPlay@2x.png</file>
-        <file>Icons/pqView22.png</file>
-        <file>Icons/pqVolumeData16.png</file>
-        <file>Icons/pqWarp24.png</file>
+        <file>Icons/pqWarp.svg</file>
         <file>Icons/pqWindow16.png</file>
-        <file>Icons/pqWindow22.png</file>
-        <file>Icons/pqWindow32.png</file>
-        <file>Icons/pqWindowd16.png</file>
-        <file>Icons/pqWindowd22.png</file>
-        <file>Icons/pqWindowd32.png</file>
-        <file>Icons/pqWindowh16.png</file>
-        <file>Icons/pqXMinus16.png</file>
-        <file>Icons/pqXMinus24.png</file>
-        <file>Icons/pqXMinus32.png</file>
+        <file>Icons/pqWindow16@2x.png</file>
+        <file>Icons/pqWrench.svg</file>
         <file>Icons/pqXMinus.png</file>
         <file>Icons/pqXMinus@2x.png</file>
-        <file>Icons/pqXPlus16.png</file>
-        <file>Icons/pqXPlus24.png</file>
-        <file>Icons/pqXPlus32.png</file>
         <file>Icons/pqXPlus.png</file>
         <file>Icons/pqXPlus@2x.png</file>
-        <file>Icons/pqYMinus16.png</file>
-        <file>Icons/pqYMinus24.png</file>
-        <file>Icons/pqYMinus32.png</file>
         <file>Icons/pqYMinus.png</file>
         <file>Icons/pqYMinus@2x.png</file>
-        <file>Icons/pqYPlus16.png</file>
-        <file>Icons/pqYPlus24.png</file>
-        <file>Icons/pqYPlus32.png</file>
         <file>Icons/pqYPlus.png</file>
         <file>Icons/pqYPlus@2x.png</file>
-        <file>Icons/pqZMinus16.png</file>
-        <file>Icons/pqZMinus24.png</file>
-        <file>Icons/pqZMinus32.png</file>
         <file>Icons/pqZMinus.png</file>
         <file>Icons/pqZMinus@2x.png</file>
-        <file>Icons/pqZPlus16.png</file>
-        <file>Icons/pqZPlus24.png</file>
-        <file>Icons/pqZPlus32.png</file>
         <file>Icons/pqZPlus.png</file>
         <file>Icons/pqZPlus@2x.png</file>
-        <file>Icons/pqZoomToData24.png</file>
-        <file>Icons/pqZoomToData.png</file>
-        <file>Icons/pqZoomToData@2x.png</file>
-        <file>Icons/pqZoomToSelection24.png</file>
+        <file>Icons/pqZoomToData.svg</file>
         <file>Icons/pqZoomToSelection.png</file>
         <file>Icons/pqZoomToSelection@2x.png</file>
-        <file>Icons/SplitViewHorizontal.png</file>
-        <file>Icons/SplitViewVertical.png</file>
         <file>Icons/warning.png</file>
-        <file>Icons/pqBold16.png</file>
-        <file>Icons/pqBold24.png</file>
-        <file>Icons/pqItalics16.png</file>
-        <file>Icons/pqItalics24.png</file>
-        <file>Icons/pqShadow16.png</file>
-        <file>Icons/pqShadow24.png</file>
-        <file>Icons/pqTextAlignRight16.png</file>
-        <file>Icons/pqTextAlignLeft16.png</file>
-        <file>Icons/pqTextAlignCenter16.png</file>
-        <file>Icons/pqTextAlignJustified16.png</file>
-        <file>Icons/pvIcon16.png</file>
-        <file>Icons/pvIcon22.png</file>
-        <file>Icons/pvIcon32.png</file>
-        <file>Icons/pvIcon64.png</file>
-        <file>Icons/pvIcon96.png</file>
+        <file>Icons/pvIcon.svg</file>
         <file>Icons/pvIcon512.png</file>
-        <file>Icons/pdf.png</file>
-        <file>Icons/explicit_color.png</file>
-        <file>Icons/explicit_opacity.png</file>
-        <file>Icons/inherited_color.png</file>
-        <file>Icons/inherited_opacity.png</file>
-        <file>Icons/no_color.png</file>
-        <file>Icons/no_opacity.png</file>
         <file>pqPresetGroups.json</file>
     </qresource>
 </RCC>

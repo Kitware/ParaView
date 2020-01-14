@@ -62,17 +62,17 @@ QIcon get_icon(int assoc)
   switch (assoc)
   {
     case vtkDataObject::POINT:
-      return QIcon(":/pqWidgets/Icons/pqPointData16.png");
+      return QIcon(":/pqWidgets/Icons/pqPointData.svg");
     case vtkDataObject::CELL:
-      return QIcon(":/pqWidgets/Icons/pqCellData16.png");
+      return QIcon(":/pqWidgets/Icons/pqCellData.svg");
     case vtkDataObject::FIELD:
-      return QIcon(":/pqWidgets/Icons/pqGlobalData16.png");
+      return QIcon(":/pqWidgets/Icons/pqGlobalData.svg");
     case vtkDataObject::VERTEX:
-      return QIcon(":/pqWidgets/Icons/pqPointData16.png");
+      return QIcon(":/pqWidgets/Icons/pqPointData.svg");
     case vtkDataObject::EDGE:
-      return QIcon(":/pqWidgets/Icons/pqEdgeCenterData16.png");
+      return QIcon(":/pqWidgets/Icons/pqEdgeCenterData.svg");
     case vtkDataObject::ROW:
-      return QIcon(":/pqWidgets/Icons/pqSpreadsheet16.png");
+      return QIcon(":/pqWidgets/Icons/pqSpreadsheet.svg");
     default:
       return QIcon();
   }

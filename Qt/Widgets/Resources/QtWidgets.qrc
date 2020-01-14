@@ -1,14 +1,10 @@
 <RCC>
     <qresource prefix="/QtWidgets" >
-        <file>Icons/pqCollapsedGroup22.png</file>
-        <file>Icons/pqDelete16.png</file>
-        <file>Icons/pqDelete24.png</file>
-        <file>Icons/pqDelete32.png</file>
-        <file>Icons/pqMinus16.png</file>
+        <file>Icons/pqDelete.svg</file>
+        <file>Icons/pqMinus.svg</file>
         <file>Icons/pqMultiply@2x.png</file>
         <file>Icons/pqMultiply.png</file>
-        <file>Icons/pqPlus16.png</file>
-        <file>Icons/outline_arrow_drop_down_circle_black_24dp.png</file>
-        <file>Icons/outline_arrow_drop_down_circle_black_24dp@2x.png</file>
+        <file>Icons/pqPlus.svg</file>
+        <file>Icons/pqShowMenu.svg</file>
     </qresource>
 </RCC>

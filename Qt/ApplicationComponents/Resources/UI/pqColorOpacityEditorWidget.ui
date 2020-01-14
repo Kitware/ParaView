@@ -79,7 +79,7 @@
          </property>
          <property name="icon">
           <iconset resource="../../../Components/Resources/pqComponents.qrc">
-           <normaloff>:/pqWidgets/Icons/pqResetRange24.png</normaloff>:/pqWidgets/Icons/pqResetRange24.png</iconset>
+           <normaloff>:/pqWidgets/Icons/pqResetRange.svg</normaloff>:/pqWidgets/Icons/pqResetRange.svg</iconset>
          </property>
         </widget>
        </item>
@@ -93,7 +93,7 @@
          </property>
          <property name="icon">
           <iconset resource="../../../Components/Resources/pqComponents.qrc">
-           <normaloff>:/pqWidgets/Icons/pqResetRangeCustom24.png</normaloff>:/pqWidgets/Icons/pqResetRangeCustom24.png</iconset>
+           <normaloff>:/pqWidgets/Icons/pqResetRangeCustom.svg</normaloff>:/pqWidgets/Icons/pqResetRangeCustom.svg</iconset>
          </property>
         </widget>
        </item>
@@ -107,7 +107,7 @@
          </property>
          <property name="icon">
           <iconset resource="../../../Components/Resources/pqComponents.qrc">
-           <normaloff>:/pqWidgets/Icons/pqResetRangeTemporal24.png</normaloff>:/pqWidgets/Icons/pqResetRangeTemporal24.png</iconset>
+           <normaloff>:/pqWidgets/Icons/pqResetRangeTemporal.svg</normaloff>:/pqWidgets/Icons/pqResetRangeTemporal.svg</iconset>
          </property>
         </widget>
        </item>
@@ -121,7 +121,7 @@
          </property>
          <property name="icon">
           <iconset resource="../../../Components/Resources/pqComponents.qrc">
-           <normaloff>:/pqWidgets/Icons/pqResetToVisibleRange32.png</normaloff>:/pqWidgets/Icons/pqResetToVisibleRange32.png</iconset>
+           <normaloff>:/pqWidgets/Icons/pqResetToVisibleRange.svg</normaloff>:/pqWidgets/Icons/pqResetToVisibleRange.svg</iconset>
          </property>
         </widget>
        </item>
@@ -135,7 +135,7 @@
          </property>
          <property name="icon">
           <iconset resource="../../../Components/Resources/pqComponents.qrc">
-           <normaloff>:/pqWidgets/Icons/pqInvert24.png</normaloff>:/pqWidgets/Icons/pqInvert24.png</iconset>
+           <normaloff>:/pqWidgets/Icons/pqInvert.svg</normaloff>:/pqWidgets/Icons/pqInvert.svg</iconset>
          </property>
         </widget>
        </item>
@@ -162,7 +162,7 @@
          </property>
          <property name="icon">
           <iconset resource="../../../Components/Resources/pqComponents.qrc">
-           <normaloff>:/pqWidgets/Icons/pqFavorites16.png</normaloff>:/pqWidgets/Icons/pqFavorites16.png</iconset>
+           <normaloff>:/pqWidgets/Icons/pqFavorites.svg</normaloff>:/pqWidgets/Icons/pqFavorites.svg</iconset>
          </property>
         </widget>
        </item>
@@ -176,7 +176,7 @@
          </property>
          <property name="icon">
           <iconset resource="../../../Components/Resources/pqComponents.qrc">
-           <normaloff>:/pqWidgets/Icons/pqSave16.png</normaloff>:/pqWidgets/Icons/pqSave16.png</iconset>
+           <normaloff>:/pqWidgets/Icons/pqSave.svg</normaloff>:/pqWidgets/Icons/pqSave.svg</iconset>
          </property>
         </widget>
        </item>
@@ -208,7 +208,7 @@
          </property>
          <property name="icon">
           <iconset resource="../../../Components/Resources/pqComponents.qrc">
-           <normaloff>:/pqWidgets/Icons/pqAdvanced26.png</normaloff>:/pqWidgets/Icons/pqAdvanced26.png</iconset>
+           <normaloff>:/pqWidgets/Icons/pqAdvanced.svg</normaloff>:/pqWidgets/Icons/pqAdvanced.svg</iconset>
          </property>
          <property name="checkable">
           <bool>true</bool>

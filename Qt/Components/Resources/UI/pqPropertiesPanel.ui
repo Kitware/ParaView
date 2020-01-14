@@ -26,7 +26,7 @@
        </property>
        <property name="icon">
         <iconset resource="../pqComponents.qrc">
-         <normaloff>:/pqWidgets/Icons/pqUpdate16.png</normaloff>:/pqWidgets/Icons/pqUpdate16.png</iconset>
+         <normaloff>:/pqWidgets/Icons/pqApply.svg</normaloff>:/pqWidgets/Icons/pqApply.svg</iconset>
        </property>
        <property name="default">
         <bool>true</bool>
@@ -43,7 +43,7 @@
        </property>
        <property name="icon">
         <iconset resource="../pqComponents.qrc">
-         <normaloff>:/pqWidgets/Icons/pqCancel16.png</normaloff>:/pqWidgets/Icons/pqCancel16.png</iconset>
+         <normaloff>:/pqWidgets/Icons/pqCancel.svg</normaloff>:/pqWidgets/Icons/pqCancel.svg</iconset>
        </property>
       </widget>
      </item>
@@ -54,7 +54,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
-         <normaloff>:/QtWidgets/Icons/pqDelete16.png</normaloff>:/QtWidgets/Icons/pqDelete16.png</iconset>
+         <normaloff>:/QtWidgets/Icons/pqDelete.svg</normaloff>:/QtWidgets/Icons/pqDelete.svg</iconset>
        </property>
       </widget>
      </item>
@@ -65,7 +65,7 @@
        </property>
        <property name="icon">
         <iconset resource="../pqComponents.qrc">
-         <normaloff>:/pqWidgets/Icons/pqHelp16.png</normaloff>:/pqWidgets/Icons/pqHelp16.png</iconset>
+         <normaloff>:/pqWidgets/Icons/pqHelp.svg</normaloff>:/pqWidgets/Icons/pqHelp.svg</iconset>
        </property>
        <property name="shortcut">
         <string>Ctrl+H</string>
@@ -153,7 +153,7 @@
             </property>
             <property name="icon">
              <iconset resource="../pqComponents.qrc">
-              <normaloff>:/pqWidgets/Icons/pqCopy22.png</normaloff>:/pqWidgets/Icons/pqCopy22.png</iconset>
+              <normaloff>:/pqWidgets/Icons/pqCopy.svg</normaloff>:/pqWidgets/Icons/pqCopy.svg</iconset>
             </property>
            </widget>
           </item>
@@ -176,7 +176,7 @@
             </property>
             <property name="icon">
              <iconset resource="../pqComponents.qrc">
-              <normaloff>:/pqWidgets/Icons/pqPaste22.png</normaloff>:/pqWidgets/Icons/pqPaste22.png</iconset>
+              <normaloff>:/pqWidgets/Icons/pqPaste.svg</normaloff>:/pqWidgets/Icons/pqPaste.svg</iconset>
             </property>
            </widget>
           </item>
@@ -193,6 +193,10 @@
             </property>
             <property name="text">
              <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../pqComponents.qrc">
+              <normaloff>:/pqWidgets/Icons/pqReset.svg</normaloff>:/pqWidgets/Icons/pqReset.svg</iconset>
             </property>
            </widget>
           </item>
@@ -269,7 +273,7 @@
             </property>
             <property name="icon">
              <iconset resource="../pqComponents.qrc">
-              <normaloff>:/pqWidgets/Icons/pqCopy22.png</normaloff>:/pqWidgets/Icons/pqCopy22.png</iconset>
+              <normaloff>:/pqWidgets/Icons/pqCopy.svg</normaloff>:/pqWidgets/Icons/pqCopy.svg</iconset>
             </property>
            </widget>
           </item>
@@ -292,7 +296,7 @@
             </property>
             <property name="icon">
              <iconset resource="../pqComponents.qrc">
-              <normaloff>:/pqWidgets/Icons/pqPaste22.png</normaloff>:/pqWidgets/Icons/pqPaste22.png</iconset>
+              <normaloff>:/pqWidgets/Icons/pqPaste.svg</normaloff>:/pqWidgets/Icons/pqPaste.svg</iconset>
             </property>
            </widget>
           </item>
@@ -309,6 +313,10 @@
             </property>
             <property name="text">
              <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../pqComponents.qrc">
+              <normaloff>:/pqWidgets/Icons/pqReset.svg</normaloff>:/pqWidgets/Icons/pqReset.svg</iconset>
             </property>
            </widget>
           </item>
@@ -385,7 +393,7 @@
             </property>
             <property name="icon">
              <iconset resource="../pqComponents.qrc">
-              <normaloff>:/pqWidgets/Icons/pqCopy22.png</normaloff>:/pqWidgets/Icons/pqCopy22.png</iconset>
+              <normaloff>:/pqWidgets/Icons/pqCopy.svg</normaloff>:/pqWidgets/Icons/pqCopy.svg</iconset>
             </property>
            </widget>
           </item>
@@ -408,7 +416,7 @@
             </property>
             <property name="icon">
              <iconset resource="../pqComponents.qrc">
-              <normaloff>:/pqWidgets/Icons/pqPaste22.png</normaloff>:/pqWidgets/Icons/pqPaste22.png</iconset>
+              <normaloff>:/pqWidgets/Icons/pqPaste.svg</normaloff>:/pqWidgets/Icons/pqPaste.svg</iconset>
             </property>
            </widget>
           </item>
@@ -425,6 +433,10 @@
             </property>
             <property name="text">
              <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../pqComponents.qrc">
+              <normaloff>:/pqWidgets/Icons/pqReset.svg</normaloff>:/pqWidgets/Icons/pqReset.svg</iconset>
             </property>
            </widget>
           </item>

@@ -350,9 +350,9 @@ void pqPipelineContextMenuBehavior::buildColorFieldsMenu(
   QObject::connect(menu, SIGNAL(triggered(QAction*)), this, SLOT(colorMenuTriggered(QAction*)),
     Qt::QueuedConnection);
 
-  QIcon cellDataIcon(":/pqWidgets/Icons/pqCellData16.png");
-  QIcon pointDataIcon(":/pqWidgets/Icons/pqPointData16.png");
-  QIcon solidColorIcon(":/pqWidgets/Icons/pqSolidColor16.png");
+  QIcon cellDataIcon(":/pqWidgets/Icons/pqCellData.svg");
+  QIcon pointDataIcon(":/pqWidgets/Icons/pqPointData.svg");
+  QIcon solidColorIcon(":/pqWidgets/Icons/pqSolidColor.svg");
 
   menu->addAction(solidColorIcon, "Solid Color")->setData(convert(QPair<int, QString>()));
   vtkSMProperty* prop = pipelineRepr->getProxy()->GetProperty("ColorArrayName");

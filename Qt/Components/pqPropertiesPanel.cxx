@@ -201,13 +201,10 @@ public:
       this->Ui.Delete->setPalette(buttonPalette);
     }
 
-    // Add icons to the settings save/restore defaults buttons
-    this->Ui.PropertiesRestoreDefaults->setIcon(styleLocal->standardIcon(QStyle::SP_BrowserReload));
+    // Add icons to the settings save defaults buttons
     this->Ui.PropertiesSaveAsDefaults->setIcon(
       styleLocal->standardIcon(QStyle::SP_DialogSaveButton));
-    this->Ui.DisplayRestoreDefaults->setIcon(styleLocal->standardIcon(QStyle::SP_BrowserReload));
     this->Ui.DisplaySaveAsDefaults->setIcon(styleLocal->standardIcon(QStyle::SP_DialogSaveButton));
-    this->Ui.ViewRestoreDefaults->setIcon(styleLocal->standardIcon(QStyle::SP_BrowserReload));
     this->Ui.ViewSaveAsDefaults->setIcon(styleLocal->standardIcon(QStyle::SP_DialogSaveButton));
 
     this->Ui.PropertiesButtons->layout()->setSpacing(

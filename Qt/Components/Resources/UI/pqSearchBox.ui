@@ -40,7 +40,7 @@
      </property>
      <property name="icon">
       <iconset resource="../pqComponents.qrc">
-       <normaloff>:/pqWidgets/Icons/pqAdvanced26.png</normaloff>:/pqWidgets/Icons/pqAdvanced26.png</iconset>
+       <normaloff>:/pqWidgets/Icons/pqAdvanced.svg</normaloff>:/pqWidgets/Icons/pqAdvanced.svg</iconset>
      </property>
      <property name="checkable">
       <bool>true</bool>

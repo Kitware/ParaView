@@ -193,7 +193,7 @@ QDialog* pqExportReaction::createConfigurationDialog(pqProxyWidget* proxyWidget)
   label->setText(tr("Show advanced options:"));
 
   QToolButton* advancedButton = new QToolButton(dialog);
-  advancedButton->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced26.png"));
+  advancedButton->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced.svg"));
   advancedButton->setCheckable(true);
   connect(advancedButton, SIGNAL(toggled(bool)), proxyWidget, SLOT(filterWidgets(bool)));
 

@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include <QHeaderView>
+#include <QIcon>
 #include <QLineEdit>
 #include <QStackedWidget>
 #include <QStringList>
@@ -385,10 +386,10 @@ void pqProxyInformationWidget::fillDataInformation(vtkPVDataInformation* dataInf
   info[4] = dataInformation->GetRowDataInformation();
   info[5] = dataInformation->GetFieldDataInformation();
 
-  QPixmap pixmaps[6] = { QPixmap(":/pqWidgets/Icons/pqPointData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqCellData16.png"), QPixmap(":/pqWidgets/Icons/pqPointData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqCellData16.png"), QPixmap(":/pqWidgets/Icons/pqSpreadsheet16.png"),
-    QPixmap(":/pqWidgets/Icons/pqGlobalData16.png") };
+  QIcon pixmaps[6] = { QIcon(":/pqWidgets/Icons/pqPointData.svg"),
+    QIcon(":/pqWidgets/Icons/pqCellData.svg"), QIcon(":/pqWidgets/Icons/pqPointData.svg"),
+    QIcon(":/pqWidgets/Icons/pqCellData.svg"), QIcon(":/pqWidgets/Icons/pqSpreadsheet.svg"),
+    QIcon(":/pqWidgets/Icons/pqGlobalData.svg") };
 
   if (dataInformation->IsDataStructured())
   {

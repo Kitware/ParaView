@@ -90,7 +90,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../../Components/Resources/pqComponents.qrc">
-         <normaloff>:/pqWidgets/Icons/pqBold16.png</normaloff>:/pqWidgets/Icons/pqBold16.png</iconset>
+         <normaloff>:/pqWidgets/Icons/pqBold24.png</normaloff>:/pqWidgets/Icons/pqBold24.png</iconset>
        </property>
        <property name="checkable">
         <bool>true</bool>
@@ -107,7 +107,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../../Components/Resources/pqComponents.qrc">
-         <normaloff>:/pqWidgets/Icons/pqItalics16.png</normaloff>:/pqWidgets/Icons/pqItalics16.png</iconset>
+         <normaloff>:/pqWidgets/Icons/pqItalics24.png</normaloff>:/pqWidgets/Icons/pqItalics24.png</iconset>
        </property>
        <property name="checkable">
         <bool>true</bool>
@@ -124,7 +124,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../../Components/Resources/pqComponents.qrc">
-         <normaloff>:/pqWidgets/Icons/pqShadow16.png</normaloff>:/pqWidgets/Icons/pqShadow16.png</iconset>
+         <normaloff>:/pqWidgets/Icons/pqShadow24.png</normaloff>:/pqWidgets/Icons/pqShadow24.png</iconset>
        </property>
        <property name="checkable">
         <bool>true</bool>

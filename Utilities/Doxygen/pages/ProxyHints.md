@@ -165,7 +165,7 @@ If the desired icon is not present in the list, it is possible to use a Qt resou
     <SourceProxy ...>
       ...
       <Hints>
-        <PipelineIcon name=":/pqWidgets/Icons/pqCalculator24.png" />
+        <PipelineIcon name=":/pqWidgets/Icons/pqCalculator.svg" />
       </Hints>
     </SourceProxy>
 

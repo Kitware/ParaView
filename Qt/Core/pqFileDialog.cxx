@@ -316,7 +316,7 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   impl.Ui.CreateFolder->setIcon(style()->standardPixmap(QStyle::SP_FileDialogNewFolder));
   impl.Ui.CreateFolder->setDisabled(true);
 
-  impl.Ui.ShowDetail->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced26.png"));
+  impl.Ui.ShowDetail->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced.svg"));
 
   impl.Ui.Files->setModel(&impl.FileFilter);
   impl.Ui.Files->setSelectionBehavior(QAbstractItemView::SelectRows);

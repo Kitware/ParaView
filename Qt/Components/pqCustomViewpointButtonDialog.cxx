@@ -87,7 +87,7 @@ public:
       {
         arow.DeleteButton = new QToolButton(this->Parent);
         arow.DeleteButton->setObjectName(QString("delete%1").arg(cc));
-        arow.DeleteButton->setIcon(QIcon(":/QtWidgets/Icons/pqDelete24.png"));
+        arow.DeleteButton->setIcon(QIcon(":/QtWidgets/Icons/pqDelete.svg"));
         arow.DeleteButton->setProperty("pqCustomViewpointButtonDialog_INDEX", cc);
         this->gridLayout->addWidget(arow.DeleteButton, cc + 1, 3);
         this->Parent->connect(arow.DeleteButton, SIGNAL(clicked()), SLOT(deleteRow()));

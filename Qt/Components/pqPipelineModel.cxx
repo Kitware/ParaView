@@ -461,12 +461,12 @@ void pqPipelineModel::constructor()
     ":/pqWidgets/Icons/pqHistogram16.png");
   this->PixmapMap[PipelineModelIconType::LINECHART].load(":/pqWidgets/Icons/pqLineChart16.png");
   this->PixmapMap[PipelineModelIconType::PLOTMATRIX].load(":/pqWidgets/Icons/pqLineChart16.png");
-  this->PixmapMap[PipelineModelIconType::TABLE].load(":/pqWidgets/Icons/pqSpreadsheet16.png");
+  this->PixmapMap[PipelineModelIconType::TABLE].load(":/pqWidgets/Icons/pqSpreadsheet.svg");
   this->PixmapMap[PipelineModelIconType::INDETERMINATE].load(":/pqWidgets/Icons/pq3DView16.png");
   this->PixmapMap[PipelineModelIconType::NONE].load(":/pqWidgets/Icons/pq3DView16.png");
-  this->PixmapMap[PipelineModelIconType::EYEBALL].load(":/pqWidgets/Icons/pqEyeball.png");
+  this->PixmapMap[PipelineModelIconType::EYEBALL].load(":/pqWidgets/Icons/pqEyeball.svg");
   this->PixmapMap[PipelineModelIconType::EYEBALL_GRAY].load(
-    ":/pqWidgets/Icons/pqEyeballClosed.png");
+    ":/pqWidgets/Icons/pqEyeballClosed.svg");
   this->PixmapMap[PipelineModelIconType::INSITU_EXTRACT].load(":/pqWidgets/Icons/pqLinkIn16.png");
   this->PixmapMap[PipelineModelIconType::INSITU_EXTRACT_GRAY].load(
     ":/pqWidgets/Icons/pqLinkIn16d.png");
@@ -477,9 +477,8 @@ void pqPipelineModel::constructor()
   this->PixmapMap[PipelineModelIconType::INSITU_BREAKPOINT].load(
     ":/pqWidgets/Icons/pqInsituBreakpoint16.png");
   this->PixmapMap[PipelineModelIconType::INSITU_WRITER_PARAMETERS].load(
-    ":/pqWidgets/Icons/pqSave32.png");
-  this->PixmapMap[PipelineModelIconType::CINEMA_MARK].load(
-    ":/pqWidgets/Icons/cinemascience_mark.png");
+    ":/pqWidgets/Icons/pqSave.svg");
+  this->PixmapMap[PipelineModelIconType::CINEMA_MARK].load(":/pqWidgets/Icons/pqCinemaScience.svg");
 }
 
 //-----------------------------------------------------------------------------

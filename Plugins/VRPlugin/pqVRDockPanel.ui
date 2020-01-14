@@ -131,7 +131,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../Qt/Widgets/Resources/QtWidgets.qrc">
-         <normaloff>:/QtWidgets/Icons/pqPlus16.png</normaloff>:/QtWidgets/Icons/pqPlus16.png</iconset>
+         <normaloff>:/QtWidgets/Icons/pqPlus.svg</normaloff>:/QtWidgets/Icons/pqPlus.svg</iconset>
        </property>
       </widget>
      </item>
@@ -168,7 +168,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../Qt/Widgets/Resources/QtWidgets.qrc">
-         <normaloff>:/QtWidgets/Icons/pqDelete16.png</normaloff>:/QtWidgets/Icons/pqDelete16.png</iconset>
+         <normaloff>:/QtWidgets/Icons/pqDelete.svg</normaloff>:/QtWidgets/Icons/pqDelete.svg</iconset>
        </property>
       </widget>
      </item>
@@ -214,7 +214,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../Qt/Widgets/Resources/QtWidgets.qrc">
-         <normaloff>:/QtWidgets/Icons/pqPlus16.png</normaloff>:/QtWidgets/Icons/pqPlus16.png</iconset>
+         <normaloff>:/QtWidgets/Icons/pqPlus.svg</normaloff>:/QtWidgets/Icons/pqPlus.svg</iconset>
        </property>
       </widget>
      </item>
@@ -251,7 +251,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../Qt/Widgets/Resources/QtWidgets.qrc">
-         <normaloff>:/QtWidgets/Icons/pqDelete16.png</normaloff>:/QtWidgets/Icons/pqDelete16.png</iconset>
+         <normaloff>:/QtWidgets/Icons/pqDelete.svg</normaloff>:/QtWidgets/Icons/pqDelete.svg</iconset>
        </property>
       </widget>
      </item>

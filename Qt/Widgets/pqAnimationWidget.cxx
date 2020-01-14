@@ -153,13 +153,13 @@ void pqAnimationWidget::updateSizes()
     if (this->Model->track(i)->isDeletable())
     {
       this->CreateDeleteModel.setHeaderData(
-        i + 1, Qt::Vertical, QPixmap(":/QtWidgets/Icons/pqDelete16.png"), Qt::DecorationRole);
+        i + 1, Qt::Vertical, QPixmap(":/QtWidgets/Icons/pqDelete.svg"), Qt::DecorationRole);
     }
     this->CreateDeleteModel.setHeaderData(i + 1, Qt::Vertical, QVariant(), Qt::DisplayRole);
   }
   this->CreateDeleteModel.insertRow(this->Header->count());
   this->CreateDeleteModel.setHeaderData(this->Header->count(), Qt::Vertical,
-    QPixmap(":/QtWidgets/Icons/pqPlus16.png"), Qt::DecorationRole);
+    QPixmap(":/QtWidgets/Icons/pqPlus.svg"), Qt::DecorationRole);
 
   this->updateGeometries();
 }

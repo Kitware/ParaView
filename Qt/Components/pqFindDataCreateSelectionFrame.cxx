@@ -57,11 +57,11 @@ void InitIcons()
 {
   if (Icons.size() == 0)
   {
-    Icons[vtkDataObject::POINT] = QIcon(":/pqWidgets/Icons/pqPointData16.png");
-    Icons[vtkDataObject::CELL] = QIcon(":/pqWidgets/Icons/pqCellData16.png");
-    Icons[vtkDataObject::VERTEX] = QIcon(":/pqWidgets/Icons/pqPointData16.png");
-    Icons[vtkDataObject::EDGE] = QIcon(":/pqWidgets/Icons/pqEdgeCenterData16.png");
-    Icons[vtkDataObject::ROW] = QIcon(":/pqWidgets/Icons/pqSpreadsheet16.png");
+    Icons[vtkDataObject::POINT] = QIcon(":/pqWidgets/Icons/pqPointData.svg");
+    Icons[vtkDataObject::CELL] = QIcon(":/pqWidgets/Icons/pqCellData.svg");
+    Icons[vtkDataObject::VERTEX] = QIcon(":/pqWidgets/Icons/pqPointData.svg");
+    Icons[vtkDataObject::EDGE] = QIcon(":/pqWidgets/Icons/pqEdgeCenterData.svg");
+    Icons[vtkDataObject::ROW] = QIcon(":/pqWidgets/Icons/pqSpreadsheet.svg");
   }
 }
 }

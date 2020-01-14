@@ -46,15 +46,15 @@ void pqCustomViewpointsToolbar::constructor()
   // Create base pixmap
   this->BasePixmap.fill(QColor(0, 0, 0, 0));
   QPainter pixPaint(&this->BasePixmap);
-  pixPaint.drawPixmap(0, 0, QPixmap(":/pqWidgets/Icons/pqEditCamera16.png"));
+  pixPaint.drawPixmap(0, 0, 48, 48, QPixmap(":/pqWidgets/Icons/pqCamera.svg"));
 
   // Create plus pixmap
   this->PlusPixmap = this->BasePixmap.copy();
   QPainter pixWithPlusPaint(&this->PlusPixmap);
-  pixWithPlusPaint.drawPixmap(15, 15, QPixmap(":/QtWidgets/Icons/pqPlus16.png"));
+  pixWithPlusPaint.drawPixmap(32, 32, 32, 32, QPixmap(":/QtWidgets/Icons/pqPlus.svg"));
   this->ConfigPixmap = this->BasePixmap.copy();
   QPainter pixWithConfigPaint(&this->ConfigPixmap);
-  pixWithConfigPaint.drawPixmap(15, 15, QPixmap(":/pqWidgets/Icons/pqConfig16.png"));
+  pixWithConfigPaint.drawPixmap(32, 32, 32, 32, QPixmap(":/pqWidgets/Icons/pqWrench.svg"));
 
   this->PlusAction = this->ConfigAction = nullptr;
 
@@ -120,6 +120,9 @@ void pqCustomViewpointsToolbar::updateCustomViewpointActions()
       // action does not exist yet, create it
       pixmap = this->BasePixmap.copy();
       QPainter pixWithNumberPaint(&pixmap);
+      QFont font = pixWithNumberPaint.font();
+      font.setPixelSize(24);
+      pixWithNumberPaint.setFont(font);
       pixWithNumberPaint.setPen(QApplication::palette().windowText().color());
       pixWithNumberPaint.drawText(
         pixmap.rect(), Qt::AlignRight | Qt::AlignBottom, QString::number(cc + 1));

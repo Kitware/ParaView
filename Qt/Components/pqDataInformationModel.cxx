@@ -195,7 +195,7 @@ struct pqSourceInfo
         return QIcon(":/pqWidgets/Icons/pqPolydata16.png");
 
       case VTK_HYPER_OCTREE:
-        return QIcon(":/pqWidgets/Icons/pqOctreeData16.png");
+        return QIcon(":/pqWidgets/Icons/pqOctreeData.svg");
 
       case VTK_UNSTRUCTURED_GRID:
         return QIcon(":/pqWidgets/Icons/pqUnstructuredGrid16.png");
@@ -220,7 +220,7 @@ struct pqSourceInfo
         return QIcon(":/pqWidgets/Icons/pqStructuredGrid16.png");
 
       case VTK_MULTIGROUP_DATA_SET:
-        return QIcon(":/pqWidgets/Icons/pqGroup24.png");
+        return QIcon(":/pqWidgets/Icons/pqGroup.svg");
 
       case VTK_MULTIBLOCK_DATA_SET:
         return QIcon(":/pqWidgets/Icons/pqMultiBlockData16.png");
@@ -229,7 +229,7 @@ struct pqSourceInfo
         return QIcon(":/pqWidgets/Icons/pqHierarchicalData16.png");
 
       case VTK_HIERARCHICAL_BOX_DATA_SET:
-        return QIcon(":/pqWidgets/Icons/pqOctreeData16.png");
+        return QIcon(":/pqWidgets/Icons/pqOctreeData.svg");
 
       default:
         return QIcon(":/pqWidgets/Icons/pqUnknownData16.png");
@@ -367,7 +367,7 @@ QVariant pqDataInformationModel::data(const QModelIndex& idx, int role /*= Qt::D
           return info.getNumberOfCells();
 
         case Qt::DecorationRole:
-          return QVariant(QIcon(":/pqWidgets/Icons/pqCellData16.png"));
+          return QVariant(QIcon(":/pqWidgets/Icons/pqCellData.svg"));
       }
       break;
 
@@ -380,7 +380,7 @@ QVariant pqDataInformationModel::data(const QModelIndex& idx, int role /*= Qt::D
           return info.getNumberOfPoints();
 
         case Qt::DecorationRole:
-          return QVariant(QIcon(":/pqWidgets/Icons/pqPointData16.png"));
+          return QVariant(QIcon(":/pqWidgets/Icons/pqPointData.svg"));
       }
       break;
 

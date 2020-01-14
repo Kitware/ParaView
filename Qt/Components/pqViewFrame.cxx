@@ -88,10 +88,10 @@ pqViewFrame::pqViewFrame(QWidget* parentObject)
 
   // Create standard buttons.
   this->StandardToolButtons[SplitVertical] = this->createButton(
-    new QAction(QIcon(":/pqWidgets/Icons/pqSplitViewV24.png"), "Split Vertical", this)
+    new QAction(QIcon(":/pqWidgets/Icons/pqSplitVertical.svg"), "Split Vertical", this)
     << pqSetName("SplitVertical"));
   this->StandardToolButtons[SplitHorizontal] = this->createButton(
-    new QAction(QIcon(":/pqWidgets/Icons/pqSplitViewH24.png"), "Split Horizontal", this)
+    new QAction(QIcon(":/pqWidgets/Icons/pqSplitHorizontal.svg"), "Split Horizontal", this)
     << pqSetName("SplitHorizontal"));
   this->StandardToolButtons[Maximize] = this->createButton(
     new QAction(QIcon(this->style()->standardIcon(QStyle::SP_TitleBarMaxButton)), "Maximize", this)

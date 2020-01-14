@@ -63,7 +63,7 @@ void updateFilter(QTreeView* tree, int section, const QString& txt)
     }
     else
     {
-      pqheader->addCustomIndicatorIcon(QIcon(":/QtWidgets/Icons/pqDelete24.png"), "remove-filter");
+      pqheader->addCustomIndicatorIcon(QIcon(":/QtWidgets/Icons/pqDelete.svg"), "remove-filter");
     }
   }
 }
@@ -81,8 +81,7 @@ pqTreeViewSelectionHelper::pqTreeViewSelectionHelper(QTreeView* tree)
   if (auto pqheader = qobject_cast<pqHeaderView*>(tree->header()))
   {
     pqheader->setCustomIndicatorShown(true);
-    pqheader->addCustomIndicatorIcon(
-      QIcon(":/QtWidgets/Icons/outline_arrow_drop_down_circle_black_24dp.png"), "menu");
+    pqheader->addCustomIndicatorIcon(QIcon(":/QtWidgets/Icons/pqShowMenu.svg"), "menu");
     QObject::connect(pqheader, &pqHeaderView::customIndicatorClicked,
       [this, tree](int section, const QPoint& pt, const QString& role) {
         if (role == "menu")
@@ -171,14 +170,16 @@ void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
 
   if (user_checkable)
   {
-    if (auto actn = menu.addAction("Check highlighted items"))
+    if (auto actn =
+          menu.addAction(QIcon(":/pqWidgets/Icons/pqChecked.svg"), "Check highlighted items"))
     {
       actn->setEnabled(selectionCount > 0);
       QObject::connect(
         actn, &QAction::triggered, [this](bool) { this->setSelectedItemsCheckState(Qt::Checked); });
     }
 
-    if (auto actn = menu.addAction("Uncheck highlighted items"))
+    if (auto actn =
+          menu.addAction(QIcon(":/pqWidgets/Icons/pqUnchecked.svg"), "Uncheck highlighted items"))
     {
       actn->setEnabled(selectionCount > 0);
       QObject::connect(actn, &QAction::triggered,
@@ -199,8 +200,9 @@ void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
       order = Qt::DescendingOrder;
     }
 
-    if (auto actn =
-          menu.addAction(order == Qt::AscendingOrder ? "Sort (ascending)" : "Sort (descending)"))
+    if (auto actn = order == Qt::AscendingOrder
+        ? menu.addAction(QIcon(":/pqWidgets/Icons/pqSortAscend.svg"), "Sort (ascending)")
+        : menu.addAction(QIcon(":/pqWidgets/Icons/pqSortDescend.svg"), "Sort (descending)"))
     {
       actn->setEnabled(rowCount > 0);
       QObject::connect(actn, &QAction::triggered, [order, section, sfmodel, header](bool) {
@@ -213,7 +215,7 @@ void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
       });
     }
 
-    if (auto actn = menu.addAction("Clear sorting"))
+    if (auto actn = menu.addAction(QIcon(":/pqWidgets/Icons/pqClearSort.svg"), "Clear sorting"))
     {
       actn->setEnabled(sfmodel->sortColumn() != -1);
       QObject::connect(actn, &QAction::triggered, [sfmodel, header](bool) {

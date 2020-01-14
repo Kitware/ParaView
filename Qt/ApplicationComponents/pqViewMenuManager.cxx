@@ -88,7 +88,8 @@ void pqViewMenuManager::buildMenu()
   this->Menu->clear();
 
   // Add invariant items to the menu.
-  this->ToolbarsMenu = this->Menu->addMenu("Toolbars") << pqSetName("Toolbars");
+  this->ToolbarsMenu = this->Menu->addMenu(QIcon(":/pqWidgets/Icons/pqToolbar.svg"), "Toolbars")
+    << pqSetName("Toolbars");
   this->DockPanelSeparators[0] = this->Menu->addSeparator();
   this->DockPanelSeparators[1] = this->Menu->addSeparator();
 
@@ -101,9 +102,12 @@ void pqViewMenuManager::buildMenu()
     pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
   if (viewManager)
   {
-    new pqPreviewMenuManager((this->Menu->addMenu("Preview") << pqSetName("Preview")));
+    new pqPreviewMenuManager(
+      (this->Menu->addMenu(QIcon(":/pqWidgets/Icons/pqPreview.svg"), "Preview")
+        << pqSetName("Preview")));
 
-    QAction* fullscreen = this->Menu->addAction("Full Screen");
+    QAction* fullscreen =
+      this->Menu->addAction(QIcon(":/pqWidgets/Icons/pqFullscreen.svg"), "Full Screen");
     fullscreen->setObjectName("actionFullScreen");
     fullscreen->setShortcut(QKeySequence("F11"));
     QObject::connect(
@@ -117,7 +121,8 @@ void pqViewMenuManager::buildMenu()
     this->ShowFrameDecorationsAction = showDecorations;
   }
 
-  QAction* lockDockWidgetsAction = this->Menu->addAction("Toggle Lock Panels");
+  QAction* lockDockWidgetsAction =
+    this->Menu->addAction(QIcon(":/pqWidgets/Icons/pqToggleLock.svg"), "Toggle Lock Panels");
   lockDockWidgetsAction->setObjectName("actionLockDockWidgets");
   lockDockWidgetsAction->setToolTip("Toggle locking of dockable panels so they\
     cannot be moved");

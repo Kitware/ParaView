@@ -134,7 +134,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
-         <normaloff>:/QtWidgets/Icons/pqPlus16.png</normaloff>:/QtWidgets/Icons/pqPlus16.png</iconset>
+         <normaloff>:/QtWidgets/Icons/pqPlus.svg</normaloff>:/QtWidgets/Icons/pqPlus.svg</iconset>
        </property>
       </widget>
      </item>

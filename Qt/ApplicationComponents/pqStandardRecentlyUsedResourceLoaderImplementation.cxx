@@ -93,7 +93,7 @@ QIcon pqStandardRecentlyUsedResourceLoaderImplementation::icon(const pqServerRes
 {
   if (resource.hasData("PARAVIEW_STATE"))
   {
-    return QIcon(":/pqWidgets/Icons/pvIcon32.png");
+    return QIcon(":/pqWidgets/Icons/pvIcon.svg");
   }
   else if (resource.hasData("PARAVIEW_DATA"))
   {
@@ -101,7 +101,7 @@ QIcon pqStandardRecentlyUsedResourceLoaderImplementation::icon(const pqServerRes
   }
   else if (resource.hasData("PARAVIEW_CINEMA_DATABASE"))
   {
-    return QIcon(":/pqWidgets/Icons/cinemascience_mark.png");
+    return QIcon(":/pqWidgets/Icons/pqCinemaScience.svg");
   }
   return QIcon();
 }

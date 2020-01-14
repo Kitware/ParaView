@@ -335,7 +335,7 @@ void pqComparativeVisPanel::updateParametersList()
     this->Internal->activeParameters->setItem(static_cast<int>(cc), 0, item);
 
     QTableWidgetItem* headerItem =
-      new QTableWidgetItem(QIcon(":/QtWidgets/Icons/pqDelete16.png"), "");
+      new QTableWidgetItem(QIcon(":/QtWidgets/Icons/pqDelete.svg"), "");
     this->Internal->activeParameters->setVerticalHeaderItem(static_cast<int>(cc), headerItem);
   }
 

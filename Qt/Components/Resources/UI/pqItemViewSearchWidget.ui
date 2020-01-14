@@ -210,7 +210,7 @@
       </property>
       <property name="icon">
        <iconset resource="../pqComponents.qrc">
-        <normaloff>:/pqWidgets/Icons/pqCancel16.png</normaloff>:/pqWidgets/Icons/pqCancel16.png</iconset>
+        <normaloff>:/pqWidgets/Icons/pqCancel.svg</normaloff>:/pqWidgets/Icons/pqCancel.svg</iconset>
       </property>
       <property name="flat">
        <bool>true</bool>

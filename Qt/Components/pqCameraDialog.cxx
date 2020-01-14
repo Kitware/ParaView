@@ -153,7 +153,7 @@ public:
     this->PlusButton = new QToolButton();
     this->PlusButton->setObjectName("AddButton");
     this->PlusButton->setToolTip(QToolButton::tr("Add Current Viewpoint"));
-    this->PlusButton->setIcon(QIcon(":/QtWidgets/Icons/pqPlus16.png"));
+    this->PlusButton->setIcon(QIcon(":/QtWidgets/Icons/pqPlus.svg"));
     this->PlusButton->setMinimumSize(QSize(34, 34));
   }
 

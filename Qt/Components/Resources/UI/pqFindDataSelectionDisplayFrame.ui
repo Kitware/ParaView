@@ -47,7 +47,7 @@
      </property>
      <property name="icon">
       <iconset resource="../pqComponents.qrc">
-       <normaloff>:/pqWidgets/Icons/pqAdvanced26.png</normaloff>:/pqWidgets/Icons/pqAdvanced26.png</iconset>
+       <normaloff>:/pqWidgets/Icons/pqAdvanced.svg</normaloff>:/pqWidgets/Icons/pqAdvanced.svg</iconset>
      </property>
      <property name="toolButtonStyle">
       <enum>Qt::ToolButtonIconOnly</enum>
@@ -64,7 +64,7 @@
      </property>
      <property name="icon">
       <iconset resource="../pqComponents.qrc">
-       <normaloff>:/pqWidgets/Icons/pqCellData16.png</normaloff>:/pqWidgets/Icons/pqCellData16.png</iconset>
+       <normaloff>:/pqWidgets/Icons/pqCellData.svg</normaloff>:/pqWidgets/Icons/pqCellData.svg</iconset>
      </property>
     </widget>
    </item>
@@ -78,7 +78,7 @@
      </property>
      <property name="icon">
       <iconset resource="../pqComponents.qrc">
-       <normaloff>:/pqWidgets/Icons/pqPointData16.png</normaloff>:/pqWidgets/Icons/pqPointData16.png</iconset>
+       <normaloff>:/pqWidgets/Icons/pqPointData.svg</normaloff>:/pqWidgets/Icons/pqPointData.svg</iconset>
      </property>
     </widget>
    </item>
@@ -92,7 +92,7 @@
      </property>
      <property name="icon">
       <iconset resource="../pqComponents.qrc">
-       <normaloff>:/pqWidgets/Icons/pqFrustumSelectionCell24.png</normaloff>:/pqWidgets/Icons/pqFrustumSelectionCell24.png</iconset>
+       <normaloff>:/pqWidgets/Icons/pqFrustumSelectionCell.svg</normaloff>:/pqWidgets/Icons/pqFrustumSelectionCell.svg</iconset>
      </property>
      <property name="checkable">
       <bool>true</bool>
@@ -106,7 +106,7 @@
      </property>
      <property name="icon">
       <iconset resource="../pqComponents.qrc">
-       <normaloff>:/pqWidgets/Icons/pqAdvanced26.png</normaloff>:/pqWidgets/Icons/pqAdvanced26.png</iconset>
+       <normaloff>:/pqWidgets/Icons/pqAdvanced.svg</normaloff>:/pqWidgets/Icons/pqAdvanced.svg</iconset>
      </property>
      <property name="toolButtonStyle">
       <enum>Qt::ToolButtonIconOnly</enum>
