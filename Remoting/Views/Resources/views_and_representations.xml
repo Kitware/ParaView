@@ -3690,6 +3690,16 @@
 
       <!-- End of SpreadSheetView -->
     </SpreadSheetViewProxy>
+
+    <!-- ================================================================== -->
+    <RenderViewProxy name="RenderViewWithEDL" class="vtkPVRenderViewWithEDL"
+                     label="Eye Dome Lighting"
+                     processes="client|renderserver|dataserver"
+                     base_proxygroup="views"
+                     base_proxyname="RenderView">
+    <!-- End of EyeDomeLighting View -->
+    </RenderViewProxy>
+
   </ProxyGroup>
 
   <!-- ==================================================================== -->

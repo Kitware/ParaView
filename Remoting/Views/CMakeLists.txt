@@ -107,6 +107,7 @@ set(classes
   vtkPVRenderView
   vtkPVRenderViewDataDeliveryManager
   vtkPVRenderViewSettings
+  vtkPVRenderViewWithEDL
   vtkPVRepresentedArrayListSettings
   vtkPVRepresentedDataInformation
   vtkPVScalarBarActor
