@@ -375,18 +375,19 @@ protected:
    * point-based input data only.
    *
    * The strategy is the following:
-   * * Given located empty cells intersecting geometry (they are marked with NaN in the FillGaps
+   * * Given located empty cells intersecting geometry (they are marked with NaN in the
+   * RecursivelyFillGaps
    * method),
    * check if every cells in the neighborhood has data (using a Von Neumann cursor). If it has, just
    * compute the average
    * on both display and metric scalar fields.
-   * * It at least one neighbor is also invalid, i.e. has no data, add the id to a priority queue
+   * * If at least one neighbor is also invalid, i.e. has no data, add the id to a priority queue
    * where the priority is the number of valid neighbors.
    * * The two previous points are done in RecursivelyFillPriorityQueue.
-   * * When the priority queue is completed, iteratively get the tip of the queue, check if there is
+   * * When the priority queue is completed, iteratively get the top of the queue, check if there is
    * enough data
    * to compute an average. If there is not, set the value at this position
-   * to the accumulated mean with the available data andput it back to the queue
+   * to the accumulated mean with the available data and put it back to the queue
    * (the neighbors will have data by the time we pass over this cell again). Do that until the
    * queue is empty.
    *
@@ -425,10 +426,15 @@ protected:
   void CreateGridOfMultiResolutionGrids(
     vtkDataSet* dataSet, vtkDataArray* data, int fieldAssociation);
 
+  //@{
+  /**
+   * This method computes the intersection volume between a box and a vtkCell3D.
+   */
   bool IntersectedVolume(
     const double boxBounds[6], vtkVoxel* voxel, double volumeUnit, double& volume) const;
   bool IntersectedVolume(const double boxBounds[6], vtkCell3D* cell3D, double volumeUnit,
     double& volume, double* weights) const;
+  //@}
 
   /**
    * Helper for easy access to the cells dimensions of the hyper tree grid.
