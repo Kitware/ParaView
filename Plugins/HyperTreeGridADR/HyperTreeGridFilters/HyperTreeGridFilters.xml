@@ -237,8 +237,6 @@
           <Proxy group="array_measurement"
                  name="Harmonic Mean" />
           <Proxy group="array_measurement"
-                 name="Quantile" />
-          <Proxy group="array_measurement"
                  name="Standard Deviation" />
           <Proxy group="array_measurement"
                  name="Entropy" />
@@ -263,8 +261,6 @@
                  name="Geometric Mean" />
           <Proxy group="array_measurement"
                  name="Harmonic Mean" />
-          <Proxy group="array_measurement"
-                 name="Quantile" />
           <Proxy group="array_measurement"
                  name="Standard Deviation" />
           <Proxy group="array_measurement"

@@ -41,11 +41,60 @@ void vtkQuantileAccumulator::Add(vtkAbstractAccumulator* accumulator)
   vtkQuantileAccumulator* quantileAccumulator = vtkQuantileAccumulator::SafeDownCast(accumulator);
   assert(quantileAccumulator && "Cannot accumulate different accumulators");
 
-  ListType out;
-  std::merge(this->SortedList->begin(), this->SortedList->end(),
-    quantileAccumulator->GetSortedList()->cbegin(), quantileAccumulator->GetSortedList()->cend(),
-    std::back_inserter(out));
-  this->SortedList = std::make_shared<ListType>(out);
+  if (this->SortedList->size())
+  {
+    std::size_t i = 0;
+    ListType out;
+    while (i < quantileAccumulator->SortedList->size() &&
+      (*quantileAccumulator->SortedList)[i].Weight <
+        (*this->SortedList)[this->PercentileIdx].Weight)
+    {
+      this->PercentileWeight += (*quantileAccumulator->SortedList)[i++].Weight;
+    }
+    this->PercentileIdx += i;
+    std::merge(this->SortedList->begin(), this->SortedList->end(),
+      quantileAccumulator->SortedList->cbegin(), quantileAccumulator->SortedList->cend(),
+      std::back_inserter(out));
+    this->SortedList = std::make_shared<ListType>(out);
+    this->TotalWeight = quantileAccumulator->TotalWeight;
+    this->PercentileIdx = quantileAccumulator->PercentileIdx;
+    if (i)
+    {
+      // Move the percentile in the left direction accordingly.
+      while (this->PercentileIdx != 0 &&
+        this->Percentile -
+            100.0 * (this->PercentileWeight - (*this->SortedList)[this->PercentileIdx - 1].Weight) /
+              this->TotalWeight >=
+          0)
+      {
+        --this->PercentileIdx;
+        this->PercentileWeight -= (*this->SortedList)[this->PercentileIdx].Weight;
+      }
+    }
+    else
+    {
+      while (this->PercentileIdx < this->SortedList->size() &&
+        this->Percentile -
+            100.0 * (this->PercentileWeight + (*this->SortedList)[this->PercentileIdx + 1].Weight) /
+              this->TotalWeight <=
+          0)
+      {
+        ++this->PercentileIdx;
+        this->PercentileWeight += (*this->SortedList)[this->PercentileIdx].Weight;
+      }
+    }
+  }
+  else
+  {
+    this->SortedList->begin();
+    if (quantileAccumulator->SortedList->size())
+    {
+      this->TotalWeight = quantileAccumulator->TotalWeight;
+      this->PercentileIdx = quantileAccumulator->PercentileIdx;
+      this->PercentileWeight = quantileAccumulator->PercentileWeight;
+      *this->SortedList = *quantileAccumulator->SortedList;
+    }
+  }
   this->Modified();
 }
 
@@ -124,7 +173,7 @@ bool vtkQuantileAccumulator::HasSameParameters(vtkAbstractAccumulator* accumulat
 //----------------------------------------------------------------------------
 double vtkQuantileAccumulator::GetValue() const
 {
-  return (*this->SortedList)[this->PercentileIdx].Value;
+  return this->SortedList->size() ? (*this->SortedList)[this->PercentileIdx].Value : 0.0;
 }
 
 //----------------------------------------------------------------------------
@@ -148,6 +197,7 @@ void vtkQuantileAccumulator::ShallowCopy(vtkDataObject* accumulator)
   if (quantileAccumulator)
   {
     this->SortedList = quantileAccumulator->GetSortedList();
+    this->SetPercentile(quantileAccumulator->GetPercentile());
   }
   else
   {
@@ -164,6 +214,7 @@ void vtkQuantileAccumulator::DeepCopy(vtkDataObject* accumulator)
   {
     const ListPointer& sortedList = quantileAccumulator->GetSortedList();
     this->SortedList = std::make_shared<ListType>(sortedList->cbegin(), sortedList->cend());
+    this->SetPercentile(quantileAccumulator->GetPercentile());
   }
   else
   {
