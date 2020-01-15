@@ -51,9 +51,11 @@ git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ HEAD
     - [ ] Get positive review
     - [ ] `Do: merge`
   - Update VTK's `paraview/release` branch
-    - [ ] `git push origin paraview-vtk-submodule-hash:paraview/release`
+    - [ ] Change directory to VTK source
+    - [ ] `git push origin <paraview-vtk-submodule-hash>:paraview/release`
     - [ ] Update kwrobot with the new `paraview/release` branch rules
   - Integrate changes to `release` branch
+    - [ ] Change directory to ParaView source. Stay on the `update-to-v@VERSION@@RC@` branch.
     - [ ] `git config -f .gitmodules submodule.VTK.branch paraview/release`
     - [ ] `git commit -m "release: follow VTK's paraview/release branch" .gitmodules`
     - [ ] Merge new `release` branch into `master` using `-s ours`
@@ -123,6 +125,7 @@ set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
 ```
   - Update versions
     - [ ] Guide selections in `versions.cmake`
+    - [ ] `paraview_SOURCE_SELECTION` version in `README.md`
     - [ ] Docker: update default tag strings (in `Scripts/docker/ubuntu/Dockerfile`)
       - [ ] ARG PARAVIEW_TAG=v@VERSION@@RC@
       - [ ] ARG SUPERBUILD_TAG=v@VERSION@@RC@
