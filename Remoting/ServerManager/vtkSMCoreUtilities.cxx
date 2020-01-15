@@ -422,6 +422,21 @@ const char* vtkSMCoreUtilities::GetStringForCellType(int cellType)
       return "Lagrange Wedge";
     case VTK_LAGRANGE_PYRAMID:
       return "Lagrange Pyramid";
+
+    case VTK_BEZIER_CURVE:
+      return "Bezier Curve";
+    case VTK_BEZIER_TRIANGLE:
+      return "Bezier Triangle";
+    case VTK_BEZIER_QUADRILATERAL:
+      return "Bezier Quadrilateral";
+    case VTK_BEZIER_TETRAHEDRON:
+      return "Bezier Tetrahedron";
+    case VTK_BEZIER_HEXAHEDRON:
+      return "Bezier Hexahedron";
+    case VTK_BEZIER_WEDGE:
+      return "Bezier Wedge";
+    case VTK_BEZIER_PYRAMID:
+      return "Bezier Pyramid";
   }
   return "Unknown";
 }
