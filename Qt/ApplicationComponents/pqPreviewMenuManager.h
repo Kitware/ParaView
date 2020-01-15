@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqPreviewMenuManager_h
 
 #include "pqApplicationComponentsModule.h"
+#include "pqTimer.h" // for pqTimer;
 #include <QObject>
 #include <QPointer>
 
@@ -110,6 +111,7 @@ private:
   QAction* findAction(int dx, int dy);
   bool prependCustomResolution(int dx, int dy, const QString& label);
   QPointer<QAction> FirstCustomAction;
+  pqTimer Timer;
 
 private:
   Q_DISABLE_COPY(pqPreviewMenuManager);
