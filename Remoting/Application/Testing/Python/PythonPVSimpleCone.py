@@ -32,6 +32,12 @@ shrinkFilter.UpdatePipeline()
 if shrinkFilter.GetDataInformation().GetNumberOfCells() != resolution+1 or shrinkFilter.GetDataInformation().GetNumberOfPoints() != resolution*4:
     raise smtesting.TestError('Test failed: Problem setting property directly.')
 
+# Check OpenGL version
+info = GetOpenGLInformation()
+print("OpenGL Vendor:   %s" % info.GetVendor())
+print("OpenGL Version:  %s" % info.GetVersion())
+print("OpenGL Renderer: %s" % info.GetRenderer())
+
 Show(shrinkFilter)
 ren = Render()
 
