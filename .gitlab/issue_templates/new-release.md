@@ -150,7 +150,17 @@ git gitlab-push -f
     - [ ] Get positive review
     - [ ] `Do: merge`
     - [ ] `git tag -a -m 'ParaView superbuild @VERSION@@RC@' v@VERSION@@RC@ HEAD`
+  - Update common-superbuild's `paraview/release` branch
+    - [ ] Change directory to superbuild source
+    - [ ] `git push origin <paraview-superbuild-submodule-hash>:paraview/release`
+    - [ ] Update kwrobot with the new `paraview/release` branch rules
   - Integrate changes to `release` branch
+    - [ ] Change directory to ParaView Superbuild source. Stay on the `update-to-v@VERSION@@RC@` branch.
+    - [ ] `git config -f .gitmodules submodule.superbuild.branch paraview/release`
+    - [ ] `git commit -m "release: follow common-superbuild's paraview/release branch" .gitmodules`
+    - [ ] Merge new `release` branch into `master` using `-s ours`
+      - `git checkout master`
+      - `git merge --no-ff -s ours -m "Merge branch 'release'" update-to-v@VERSION@@RC@`
     - [ ] `git push origin update-to-v@VERSION@@RC@:release v@VERSION@@RC@`
     - [ ] Update kwrobot with the new `release` branch rules
 
