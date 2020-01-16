@@ -365,7 +365,16 @@ class NewStyleWriters(object):
                 # skip the array and property export information we stuff in this proxy
                 continue
 
-            inputname = xs.split('|')[0].lower().replace("*","").replace(".","")
+            # note: this logic is not truly correct. the way this is setup,
+            # there is no good way to really find the variable name used for the input since the names
+            # that smtrace assigns are already cleaned up at this point.
+            # Ideally, this class should have been written as a true `Accessor` so it could
+            # be traced correctly. Right now, I am hacking this to attempt to get a reasonable name
+            # that works in most cases.
+            inputname = xs.split('|')[0]
+            inputname = servermanager._make_name_valid(inputname)
+            inputname = inputname[0].lower() + inputname[1:]
+
             writername = xs.split('|')[1]
 
             xmlgroup = pxy.GetXMLGroup()
