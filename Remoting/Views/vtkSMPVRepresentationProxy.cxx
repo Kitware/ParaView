@@ -636,6 +636,39 @@ std::string vtkSMPVRepresentationProxy::GetDecoratedArrayName(const std::string&
 }
 
 //----------------------------------------------------------------------------
+int vtkSMPVRepresentationProxy::IsScalarBarStickyVisible(vtkSMProxy* view)
+{
+  if (!view)
+  {
+    return -1;
+  }
+  vtkSMProperty* lutProperty = this->GetProperty("LookupTable");
+  if (!lutProperty)
+  {
+    vtkWarningMacro("Missing 'LookupTable' property.");
+    return -1;
+  }
+  vtkSMPropertyHelper lutPropertyHelper(lutProperty);
+  if (lutPropertyHelper.GetNumberOfElements() == 0 || lutPropertyHelper.GetAsProxy(0) == nullptr)
+  {
+    vtkWarningMacro("Failed to determine the LookupTable being used.");
+    return -1;
+  }
+  vtkSMProxy* lutProxy = lutPropertyHelper.GetAsProxy(0);
+  vtkSMScalarBarWidgetRepresentationProxy* sbProxy =
+    vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(
+      vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lutProxy, view));
+  if (sbProxy)
+  {
+    vtkSMPropertyHelper sbsvPropertyHelper(sbProxy->GetProperty("StickyVisible"));
+    return sbsvPropertyHelper.GetNumberOfElements()
+      ? vtkSMPropertyHelper(sbProxy, "StickyVisible").GetAsInt()
+      : -1;
+  }
+  return -1;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool visible)
 {
   if (!view)
@@ -665,14 +698,36 @@ bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool v
     .arg("comment", visible ? "show color bar/color legend" : "hide color bar/color legend");
 
   vtkSMProxy* lutProxy = lutPropertyHelper.GetAsProxy(0);
+  vtkSMScalarBarWidgetRepresentationProxy* sbProxy =
+    vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(
+      vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lutProxy, view));
+
+  if (sbProxy)
+  {
+    int legacyVisible = vtkSMPropertyHelper(sbProxy, "Visibility").GetAsInt();
+    // If scalar bar is set to not be visible but was previously visible,
+    // then the user has pressed the scalar bar button hiding the scalar bar.
+    // We keep this information well preserved in the scalar bar representation.
+    // This method is not called when hiding the whole representation, so we are safe
+    // on scalar bar disappearance occuring on such event, it won't mess with this engine.
+    if (legacyVisible && !visible)
+    {
+      vtkSMPropertyHelper(sbProxy, "StickyVisible").Set(0);
+    }
+    // If the scalar bar is set to be visible, we are in the case where we automatically
+    // show the scalarbar, whether or not it was previously hidden.
+    else if (visible)
+    {
+      vtkSMPropertyHelper(sbProxy, "StickyVisible").Set(1);
+    }
+  }
 
   // if hiding the Scalar Bar, just look if there's a LUT and then hide the
   // corresponding scalar bar. We won't worry too much about whether scalar
   // coloring is currently enabled for this.
   if (!visible)
   {
-    if (vtkSMProxy* sbProxy = vtkSMTransferFunctionProxy::FindScalarBarRepresentation(
-          lutPropertyHelper.GetAsProxy(), view))
+    if (sbProxy)
     {
       vtkSMPropertyHelper(sbProxy, "Visibility").Set(0);
       vtkSMPropertyHelper(sbProxy, "Enabled").Set(0);
@@ -687,28 +742,28 @@ bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool v
   }
 
   vtkNew<vtkSMTransferFunctionManager> mgr;
-  vtkSMProxy* sbProxy = mgr->GetScalarBarRepresentation(lutProxy, view);
-  if (!sbProxy)
+  vtkSMProxy* sbSMProxy = mgr->GetScalarBarRepresentation(lutProxy, view);
+  if (!sbSMProxy)
   {
     vtkWarningMacro("Failed to locate/create ScalarBar representation.");
     return false;
   }
 
-  vtkSMPropertyHelper(sbProxy, "Enabled").Set(1);
-  vtkSMPropertyHelper(sbProxy, "Visibility").Set(1);
+  vtkSMPropertyHelper(sbSMProxy, "Enabled").Set(1);
+  vtkSMPropertyHelper(sbSMProxy, "Visibility").Set(1);
 
-  vtkSMProperty* titleProp = sbProxy->GetProperty("Title");
-  vtkSMProperty* compProp = sbProxy->GetProperty("ComponentTitle");
+  vtkSMProperty* titleProp = sbSMProxy->GetProperty("Title");
+  vtkSMProperty* compProp = sbSMProxy->GetProperty("ComponentTitle");
   if (titleProp && compProp && titleProp->IsValueDefault() && compProp->IsValueDefault())
   {
     vtkSMPropertyHelper colorArrayHelper(this, "ColorArrayName");
     vtkSMPropertyHelper(titleProp).Set(colorArrayHelper.GetInputArrayNameToProcess());
     // now, determine a name for it if possible.
     vtkPVArrayInformation* arrayInfo = this->GetArrayInformationForColorArray();
-    vtkSMScalarBarWidgetRepresentationProxy::UpdateComponentTitle(sbProxy, arrayInfo);
+    vtkSMScalarBarWidgetRepresentationProxy::UpdateComponentTitle(sbSMProxy, arrayInfo);
   }
-  vtkSMScalarBarWidgetRepresentationProxy::PlaceInView(sbProxy, view);
-  sbProxy->UpdateVTKObjects();
+  vtkSMScalarBarWidgetRepresentationProxy::PlaceInView(sbSMProxy, view);
+  sbSMProxy->UpdateVTKObjects();
   return true;
 }
 

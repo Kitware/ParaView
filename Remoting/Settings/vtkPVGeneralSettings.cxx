@@ -173,6 +173,7 @@ void vtkPVGeneralSettings::SetAnimationGeometryCacheLimit(unsigned long val)
 //----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetIgnoreNegativeLogAxisWarning(bool val)
 {
+  (void)val;
 #if VTK_MODULE_ENABLE_ParaView_RemotingViews
   if (vtkPVXYChartView::GetIgnoreNegativeLogAxisWarning() != val)
   {
@@ -195,6 +196,7 @@ bool vtkPVGeneralSettings::GetIgnoreNegativeLogAxisWarning()
 //----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetScalarBarMode(int val)
 {
+  (void)val;
 #if VTK_MODULE_ENABLE_ParaView_RemotingViews
   switch (val)
   {
@@ -221,6 +223,7 @@ void vtkPVGeneralSettings::SetScalarBarMode(int val)
 //----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetInheritRepresentationProperties(bool val)
 {
+  (void)val;
 #if VTK_MODULE_ENABLE_ParaView_RemotingViews
   if (val != vtkSMParaViewPipelineControllerWithRendering::GetInheritRepresentationProperties())
   {
@@ -249,6 +252,7 @@ bool vtkPVGeneralSettings::GetLoadAllVariables()
 //----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetLoadNoChartVariables(bool val)
 {
+  (void)val;
 #if VTK_MODULE_ENABLE_ParaView_RemotingViews
   if (val != vtkSMChartSeriesSelectionDomain::GetLoadNoChartVariables())
   {

@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
 
@@ -342,11 +343,33 @@ void pqPipelineBrowserWidget::setVisibility(bool visible, pqOutputPort* port)
       // update scalar bars: show new ones if needed. Hiding of scalar bars is
       // taken care of by vtkSMParaViewPipelineControllerWithRendering (I still
       // wonder if that's the best thing to do).
-      if (repr && visible &&
-        scalarBarMode == vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS &&
-        vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr))
+      if (scalarBarMode != vtkPVGeneralSettings::MANUAL_SCALAR_BARS)
       {
-        vtkSMPVRepresentationProxy::SetScalarBarVisibility(repr, viewProxy, true);
+        // This gets executed if scalar bar mode is
+        // AUTOMATICALLY_HIDE_SCALAR_BARS or AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS
+        vtkSMPVRepresentationProxy* PVRepr = vtkSMPVRepresentationProxy::SafeDownCast(repr);
+        if (visible && PVRepr && vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr))
+        {
+          int stickyVisible = PVRepr->IsScalarBarStickyVisible(viewProxy);
+          if (stickyVisible != -1)
+          {
+            PVRepr->SetScalarBarVisibility(viewProxy, stickyVisible);
+          }
+          else if (scalarBarMode == vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
+          {
+            PVRepr->SetScalarBarVisibility(viewProxy, true);
+          }
+          else if (scalarBarMode == vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS)
+          {
+            PVRepr->SetScalarBarVisibility(viewProxy, false);
+          }
+          else
+          {
+            std::cerr << "You might have added a new scalar bar mode, you need to do something "
+                         "here, skipping"
+                      << std::endl;
+          }
+        }
       }
     }
   }
