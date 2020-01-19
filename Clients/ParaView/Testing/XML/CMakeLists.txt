@@ -94,12 +94,13 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/singleSphereAnimation.pvd}"
   "DATA{${paraview_test_data_directory_input}/Data/singleSphereAnimation/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/tensors.pvti}"
-  "DATA{${paraview_test_data_directory_input}/Data/testxmlpartdscol.vtpc}"
+  "DATA{${paraview_test_data_directory_input}/Data/test_fielddata.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/testxmlpartdscol/,REGEX:.*}"
-  "DATA{${paraview_test_data_directory_input}/Data/testxmlpartds.vtpd}"
+  "DATA{${paraview_test_data_directory_input}/Data/testxmlpartdscol.vtpc}"
   "DATA{${paraview_test_data_directory_input}/Data/testxmlpartds/,REGEX:.*}"
-  "DATA{${paraview_test_data_directory_input}/Data/timestep_0_15.vts}"
+  "DATA{${paraview_test_data_directory_input}/Data/testxmlpartds.vtpd}"
   "DATA{${paraview_test_data_directory_input}/Data/time_source.pvsm}"
+  "DATA{${paraview_test_data_directory_input}/Data/timestep_0_15.vts}"
   "DATA{${paraview_test_data_directory_input}/Data/tube.exo}"
   "DATA{${paraview_test_data_directory_input}/Data/vehicle_data.csv}"
   "DATA{${paraview_test_data_directory_input}/Data/viscoplastic-ring.h5}"
@@ -454,20 +455,21 @@ ExternalData_Expand_Arguments(ParaViewData _
 SET (TESTS_WITHOUT_BASELINES
   AboutDialog.xml
   ArrayBoundsScaleDomain.xml
-  FavoritesFilters.xml
   CustomOutputFormat.xml
   DelimitedTextReader.xml
   DynamicFieldDataDomain.xml
   ExportFilteredColumnsSpreadsheet.xml
+  FavoritesFilters.xml
   FindWidget.xml
   ModifyGUIWindowTitle.xml
-  OpenHelp.xml
   OpacityWidgetRange.xml
+  OpenHelp.xml
   PartialArrayInLineChart.xml
   PointCellDataConversion.xml
   ReloadCGNSFile.xml
   SearchBox.xml
   ServerConnectDialog.xml
+  SpreadSheetFieldData.xml
   SpreadSheetSelectedCellConnectivity.xml
   StringInLineChartView.xml
   TableHistogram.xml
