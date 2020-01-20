@@ -180,6 +180,11 @@ public:
    */
   virtual bool IsAvailable(vtkIdType row);
 
+  /**
+   * Returns true of the data at the given row and column is valid.
+   */
+  virtual bool IsDataValid(vtkIdType row, vtkIdType col);
+
   //***************************************************************************
   // Forwarded to vtkSortedTableStreamer.
   /**

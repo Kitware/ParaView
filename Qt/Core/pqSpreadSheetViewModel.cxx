@@ -557,14 +557,8 @@ bool pqSpreadSheetViewModel::isDataValid(const QModelIndex& idx) const
     return false;
   }
 
-  // Ensure that the row of this index is less than the length of the
-  // data array associated with its column
-  if (idx.row() < this->Internal->VTKView->GetNumberOfRows())
-  {
-    return true;
-  }
-
-  return false;
+  vtkSpreadSheetView* view = this->GetView();
+  return view->IsDataValid(idx.row(), idx.column());
 }
 
 //-----------------------------------------------------------------------------
