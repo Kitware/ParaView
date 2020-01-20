@@ -30,8 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "pqTransferFunctionWidgetPropertyWidget.h"
+#include "ui_pqTransferFunctionWidgetPropertyWidget.h"
 
 #include "pqCoreUtilities.h"
+#include "pqDoubleLineEdit.h"
 #include "pqPVApplicationCore.h"
 #include "pqTransferFunctionWidget.h"
 #include "pqTransferFunctionWidgetPropertyDialog.h"
@@ -46,17 +48,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRangedTransferFunctionDomain.h"
 #include "vtkSMTransferFunctionProxy.h"
 
+#include <QAction>
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QVBoxLayout>
+
+class pqTransferFunctionWidgetPropertyWidget::pqInternals
+{
+public:
+  pqInternals(pqTransferFunctionWidgetPropertyWidget* self) { this->Ui.setupUi(self); }
+
+  Ui::TransferFunctionWidgetPropertyWidget Ui;
+};
 
 pqTransferFunctionWidgetPropertyWidget::pqTransferFunctionWidgetPropertyWidget(
   vtkSMProxy* smProxy, vtkSMProperty* property, QWidget* pWidget)
   : pqPropertyWidget(smProxy, pWidget)
   , Connection(nullptr)
   , Dialog(nullptr)
-
+  , Internals(new pqTransferFunctionWidgetPropertyWidget::pqInternals(this))
 {
   this->setProperty(property);
   vtkSMProxyProperty* proxyProperty = vtkSMProxyProperty::SafeDownCast(property);
@@ -88,16 +99,30 @@ pqTransferFunctionWidgetPropertyWidget::pqTransferFunctionWidgetPropertyWidget(
       this->Domain, vtkCommand::DomainModifiedEvent, this, SIGNAL(domainChanged()));
   }
 
-  QVBoxLayout* l = new QVBoxLayout;
-  l->setMargin(0);
+  QAction* resetActn = new QAction(this->Internals->Ui.resetButton);
+  resetActn->setToolTip("Reset using current data values");
+  resetActn->setIcon(QIcon(":/pqWidgets/Icons/pqReset.svg"));
+  this->Internals->Ui.resetButton->addAction(resetActn);
+  this->Internals->Ui.resetButton->setDefaultAction(resetActn);
 
-  QPushButton* button = new QPushButton("Edit");
-  connect(button, SIGNAL(clicked()), this, SLOT(buttonClicked()));
-  l->addWidget(button);
+  QObject::connect(this->Internals->Ui.editButton, &QPushButton::clicked, this,
+    &pqTransferFunctionWidgetPropertyWidget::editButtonClicked);
+  QObject::connect(
+    this, SIGNAL(domainChanged()), this->Internals->Ui.resetButton, SLOT(highlight()));
+  QObject::connect(this->Internals->Ui.resetButton, SIGNAL(clicked()),
+    this->Internals->Ui.resetButton, SLOT(clear()));
+  QObject::connect(resetActn, SIGNAL(triggered(bool)), this, SLOT(resetRangeToDomainDefault()));
+  QObject::connect(resetActn, SIGNAL(triggered(bool)), this, SLOT(updateRange()));
 
-  this->setLayout(l);
+  QObject::connect(this->Internals->Ui.rangeMin, &pqDoubleLineEdit::textChangedAndEditingFinished,
+    this, &pqTransferFunctionWidgetPropertyWidget::onRangeEdited);
+  QObject::connect(this->Internals->Ui.rangeMax, &pqDoubleLineEdit::textChangedAndEditingFinished,
+    this, &pqTransferFunctionWidgetPropertyWidget::onRangeEdited);
+
+  this->updateRange();
 }
 
+// -----------------------------------------------------------------------------
 pqTransferFunctionWidgetPropertyWidget::~pqTransferFunctionWidgetPropertyWidget()
 {
   if (this->Connection)
@@ -107,6 +132,7 @@ pqTransferFunctionWidgetPropertyWidget::~pqTransferFunctionWidgetPropertyWidget(
   delete this->Dialog;
 }
 
+// -----------------------------------------------------------------------------
 void pqTransferFunctionWidgetPropertyWidget::resetRangeToDomainDefault()
 {
   this->property()->ResetToDomainDefaults();
@@ -114,18 +140,7 @@ void pqTransferFunctionWidgetPropertyWidget::resetRangeToDomainDefault()
   emit this->changeFinished();
 }
 
-void pqTransferFunctionWidgetPropertyWidget::getRange(double range[2])
-{
-  this->TFProxy->GetRange(range);
-}
-
-void pqTransferFunctionWidgetPropertyWidget::setRange(const double& min, const double& max)
-{
-  this->TFProxy->RescaleTransferFunction(min, max, false);
-  emit this->changeAvailable();
-  emit this->changeFinished();
-}
-
+// -----------------------------------------------------------------------------
 void pqTransferFunctionWidgetPropertyWidget::propagateProxyPointsProperty()
 {
   vtkSMProxy* pxy = static_cast<vtkSMProxy*>(this->TFProxy);
@@ -148,7 +163,8 @@ void pqTransferFunctionWidgetPropertyWidget::propagateProxyPointsProperty()
   emit this->changeFinished();
 }
 
-void pqTransferFunctionWidgetPropertyWidget::buttonClicked()
+// -----------------------------------------------------------------------------
+void pqTransferFunctionWidgetPropertyWidget::editButtonClicked()
 {
   delete this->Dialog;
 
@@ -159,4 +175,22 @@ void pqTransferFunctionWidgetPropertyWidget::buttonClicked()
     this->property()->GetXMLLabel(), transferFunction, this, pqCoreUtilities::mainWidget());
   this->Dialog->setObjectName(this->property()->GetXMLName());
   this->Dialog->show();
+}
+
+// -----------------------------------------------------------------------------
+void pqTransferFunctionWidgetPropertyWidget::updateRange()
+{
+  double range[2];
+  this->TFProxy->GetRange(range);
+  this->Internals->Ui.rangeMin->setText(QString::number(range[0]));
+  this->Internals->Ui.rangeMax->setText(QString::number(range[1]));
+}
+
+// -----------------------------------------------------------------------------
+void pqTransferFunctionWidgetPropertyWidget::onRangeEdited()
+{
+  this->TFProxy->RescaleTransferFunction(this->Internals->Ui.rangeMin->text().toDouble(),
+    this->Internals->Ui.rangeMax->text().toDouble());
+  emit this->changeAvailable();
+  emit this->changeFinished();
 }

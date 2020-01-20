@@ -32,42 +32,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>28</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>Transfer Function range :</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="pqLineEdit" name="minX"/>
-      </item>
-      <item row="0" column="2">
-       <widget class="pqLineEdit" name="maxX"/>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>-</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="pqHighlightableToolButton" name="resetButton">
-         <property name="icon">
-          <iconset resource="../../../Components/Resources/pqComponents.qrc">
-           <normaloff>:/pqWidgets/Icons/pqReset.svg</normaloff>:/pqWidgets/Icons/pqReset.svg</iconset>
-         </property>
-       </widget>>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
     <widget class="QDialogButtonBox" name="ButtonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -81,20 +45,10 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqHighlightableToolButton</class>
-   <extends>QToolButton</extends>
-   <header>pqHighlightableToolButton.h</header>
-  </customwidget>
-  <customwidget>
    <class>pqTransferFunctionWidget</class>
    <extends>QWidget</extends>
    <header>pqTransferFunctionWidget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>pqLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>pqLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
