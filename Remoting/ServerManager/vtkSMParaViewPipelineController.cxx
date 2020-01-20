@@ -952,6 +952,28 @@ bool vtkSMParaViewPipelineController::RegisterLightProxy(
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::RegisterTextureProxy(vtkSMProxy* proxy, const char* filename)
+{
+  if (!proxy)
+  {
+    return false;
+  }
+
+  SM_SCOPED_TRACE(RegisterTextureProxy).arg("proxy", proxy);
+
+  // Register proxies created for proxy list domains.
+  this->RegisterProxiesForProxyListDomains(proxy);
+
+  // Register the proxy itself.
+  proxy->GetSessionProxyManager()->RegisterProxy("textures", nullptr, proxy);
+  if (filename)
+  {
+    vtkSMPropertyHelper(proxy, "FileName").Set(filename);
+  }
+  return true;
+}
+
+//----------------------------------------------------------------------------
 void vtkSMParaViewPipelineController::UpdateSettingsProxies(vtkSMSession* session)
 {
   // Set up the settings proxies
