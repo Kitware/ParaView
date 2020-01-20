@@ -308,7 +308,15 @@ class Trace(object):
                     "# get the material library",
                     "%s = GetMaterialLibrary()" % tkAccessor])
             return True
-
+        if obj.GetVTKClassName() == "vtkTexture":
+            pname = obj.SMProxy.GetSessionProxyManager().GetProxyName("textures", obj.SMProxy)
+            if pname:
+                accessor = ProxyAccessor(cls.get_varname(pname), obj)
+                filename = obj.FileName
+                cls.Output.append_separated([\
+                        "# a texture",
+                                             "%s = CreateTexture(\"%s\")" % (accessor, filename)])
+            return True
 
         return False
 
@@ -1494,6 +1502,19 @@ class CallFunction(TraceItem):
         args += ["%s=%s" % (key, CallMethod.marshall(val)) for key, val in kwargs.items()]
         to_trace.append("%s(%s)" % (functionname, ", ".join(args)))
         Trace.Output.append_separated(to_trace)
+
+class ChooseTexture(TraceItem):
+    """Traces changes of texture object selection. For example renderview background."""
+    def __init__(self, owner, texture, prop):
+        TraceItem.__init__(self)
+        owner = sm._getPyProxy(owner)
+        texture = sm._getPyProxy(texture)
+        ownerAccessor = Trace.get_accessor(owner)
+        textureAccessor = Trace.get_accessor(texture)
+
+        Trace.Output.append_separated([\
+                                       "# change texture",
+                                       "%s.%s = %s" % (str(ownerAccessor), prop.GetXMLName(), str(textureAccessor))])
 
 class SaveCameras(BookkeepingItem):
     """This is used to request recording of cameras in trace"""

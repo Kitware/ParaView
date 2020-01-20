@@ -2037,6 +2037,22 @@ def GetMaterialLibrary():
     return controller.FindMaterialLibrary(session)
 
 #==============================================================================
+# Textures.
+#==============================================================================
+def CreateTexture(filename=None):
+    """Creates and returns a new vtkTexture.
+    The texture is not attached to anything by default but it can be applied
+    to things, for example the view, like so.
+    >>> GetActiveView().UseTexturedBackground = 1
+    >>> GetActiveView().BackgroundTexture = CreateTexture("foo.png")
+    """
+    pxm = servermanager.ProxyManager()
+    textureproxy = pxm.NewProxy("textures", "ImageTexture")
+    controller = servermanager.ParaViewPipelineController()
+    controller.SMController.RegisterTextureProxy(textureproxy, filename)
+    return servermanager._getPyProxy(textureproxy)
+
+#==============================================================================
 # Miscellaneous functions.
 #==============================================================================
 def Show3DWidgets(proxy=None):
