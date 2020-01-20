@@ -11718,6 +11718,10 @@
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="OSPRayUseScaleArray"
+                                   values="1" />
         </Hints>
       </StringVectorProperty>
       <ProxyProperty command="SetScalingFunction"
@@ -11736,6 +11740,10 @@
         </ProxyListDomain>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="OSPRayUseScaleArray"
+                                   values="1" />
         </Hints>
       </ProxyProperty>
       <StringVectorProperty command="SetMaterial"
