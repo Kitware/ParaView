@@ -30,6 +30,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkStructuredGrid.h"
 #include "vtkTable.h"
+#include "vtkUnsignedCharArray.h"
 
 #include <algorithm>
 #include <cmath>
@@ -178,6 +179,7 @@ void vtkAttributeDataToTableFilter::PassFieldData(vtkFieldData* output, vtkField
       max_count = std::max(max_count, arr->GetNumberOfTuples());
     }
   }
+
   for (int cc = 0, max = output->GetNumberOfArrays(); cc < max; ++cc)
   {
     vtkAbstractArray* arr = output->GetAbstractArray(cc);
@@ -187,9 +189,16 @@ void vtkAttributeDataToTableFilter::PassFieldData(vtkFieldData* output, vtkField
     }
 
     const vtkIdType current_count = arr->GetNumberOfTuples();
-    if (current_count != max_count)
+    if ((current_count != max_count) && arr->Resize(max_count))
     {
       arr->SetNumberOfTuples(max_count);
+
+      vtkNew<vtkUnsignedCharArray> maskArray;
+      maskArray->SetName((std::string(arr->GetName()) + "__vtkValidMask__").c_str());
+      maskArray->SetNumberOfTuples(max_count);
+      maskArray->FillValue(static_cast<unsigned char>(1));
+      output->AddArray(maskArray);
+
       const int num_comps = arr->GetNumberOfComponents();
       vtkDataArray* da = vtkDataArray::SafeDownCast(arr);
       if (da != nullptr && num_comps > 0)
@@ -198,6 +207,7 @@ void vtkAttributeDataToTableFilter::PassFieldData(vtkFieldData* output, vtkField
         for (vtkIdType jj = current_count; jj < max_count; ++jj)
         {
           da->SetTuple(jj, &tuple[0]);
+          maskArray->SetTypedComponent(jj, 0, static_cast<unsigned char>(0));
         }
       }
     }

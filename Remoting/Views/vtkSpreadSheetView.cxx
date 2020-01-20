@@ -38,9 +38,11 @@
 #include "vtkSplitColumnComponents.h"
 #include "vtkSpreadSheetRepresentation.h"
 #include "vtkTable.h"
+#include "vtkUnsignedCharArray.h"
 #include "vtkVariant.h"
 
 #include <algorithm>
+#include <cstring>
 #include <map>
 #include <set>
 #include <string>
@@ -570,7 +572,12 @@ bool vtkSpreadSheetView::IsColumnInternal(vtkIdType index)
 //----------------------------------------------------------------------------
 bool vtkSpreadSheetView::IsColumnInternal(const char* columnName)
 {
-  return (columnName == nullptr || strcmp(columnName, "__vtkIsSelected__") == 0) ? true : false;
+  const char* result{ nullptr };
+  return (columnName == nullptr || strcmp(columnName, "__vtkIsSelected__") == 0) ||
+      (((result = std::strstr(columnName, "__vtkValidMask__")) != nullptr &&
+        strcmp(result, "__vtkValidMask__") == 0))
+    ? true
+    : false;
 }
 
 //----------------------------------------------------------------------------
@@ -797,6 +804,29 @@ bool vtkSpreadSheetView::IsAvailable(vtkIdType row)
   vtkIdType blockSize = this->TableStreamer->GetBlockSize();
   vtkIdType blockIndex = row / blockSize;
   return this->Internals->GetDataObject(blockIndex) != NULL;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSpreadSheetView::IsDataValid(vtkIdType row, vtkIdType col)
+{
+  vtkIdType blockSize = this->TableStreamer->GetBlockSize();
+  vtkIdType blockIndex = row / blockSize;
+  vtkTable* block = this->FetchBlock(blockIndex);
+  vtkIdType blockOffset = row - (blockIndex * blockSize);
+
+  if (auto columnName = this->GetColumnName(col))
+  {
+    const std::string maskColumnName(std::string(columnName) + "__vtkValidMask__");
+    auto maskArray =
+      vtkUnsignedCharArray::SafeDownCast(block->GetColumnByName(maskColumnName.c_str()));
+    if (maskArray && maskArray->GetNumberOfTuples() > blockOffset &&
+      maskArray->GetTypedComponent(blockOffset, 0) == static_cast<unsigned char>(0))
+    {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 //----------------------------------------------------------------------------
