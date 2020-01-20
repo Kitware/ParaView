@@ -195,7 +195,10 @@ private:
                              << formattedErrors);
     }
     delete[] rawJSON;
-    this->BuiltinPresets.insert(this->BuiltinPresets.end(), value.begin(), value.end());
+    for (auto const& preset : value)
+    {
+      this->BuiltinPresets.push_back(preset);
+    }
   }
 
   void LoadCustomPresets()
@@ -226,7 +229,10 @@ private:
       vtkGenericWarningMacro(<< "Failed to parse custom transfer function presets: "
                              << formattedErrors);
     }
-    this->CustomPresets.insert(this->CustomPresets.end(), value.begin(), value.end());
+    for (auto const& preset : value)
+    {
+      this->CustomPresets.push_back(preset);
+    }
   }
 };
 
