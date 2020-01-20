@@ -31,7 +31,7 @@ for your operating system. It will be built with the python wrapping, MPI capabi
 Please run the command in a terminal to install the following dependencies depending of your linux distribution.
 
 ##### Ubuntu 18.04 LTS / Debian 10
-`sudo apt-get install git cmake build-essential libgl1-mesa-dev libxt-dev qt5-default libqt5x11extras5-dev libqt5help5 qttools5-dev qtxmlpatterns5-dev-tools python3-dev libopenmpi-dev libtbb-dev ninja-build`
+`sudo apt-get install git cmake build-essential libgl1-mesa-dev libxt-dev qt5-default libqt5x11extras5-dev libqt5help5 qttools5-dev qtxmlpatterns5-dev-tools libqt5svg5-dev python3-dev libopenmpi-dev libtbb-dev ninja-build`
 
 ##### Centos 7
 
