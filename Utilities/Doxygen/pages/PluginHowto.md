@@ -392,7 +392,8 @@ PRIVATE_DEPENDS
 ```
 
 And then the module is built with its associated server manager XML file
-attached to the module.
+attached to the module. Note that the module name cannot be the same as the
+plugin name due to the way the library targets are managed internally.
 
 ```cmake
 set(classes
