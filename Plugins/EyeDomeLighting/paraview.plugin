@@ -1,8 +1,0 @@
-NAME
-  EyeDomeLighting
-DESCRIPTION
-  Add 3D View with eye-dome Lighting support
-REQUIRES_MODULES
-  ParaView::RemotingViews
-  VTK::CommonCore
-  VTK::RenderingOpenGL2
