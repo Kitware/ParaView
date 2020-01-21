@@ -18,11 +18,13 @@
 #include "vtkFieldData.h"
 #include "vtkObjectFactory.h"
 
+#include "vtksys/FStream.hxx"
+#include "vtksys/SystemTools.hxx"
+
 #include <cassert>
 #include <map>
 #include <sstream>
 #include <string>
-#include <vtksys/SystemTools.hxx>
 
 class vtkCSVExporter::vtkInternals
 {
@@ -144,7 +146,7 @@ bool vtkCSVExporter::Open(vtkCSVExporter::ExporterModes mode)
   }
   else
   {
-    this->OutputStream = new std::ofstream(this->FileName);
+    this->OutputStream = new vtksys::ofstream(this->FileName);
   }
 
   if (!this->OutputStream || !(*this->OutputStream))
@@ -303,12 +305,8 @@ void vtkCSVExporter::Close()
     this->Internals->DumpLines(this->FieldDelimiter, *this->OutputStream);
   }
 
-  auto fileStream = dynamic_cast<std::ofstream*>(this->OutputStream);
-  if (fileStream)
-  {
-    fileStream->close();
-  }
-  else if (this->WriteToOutputString)
+  auto fileStream = dynamic_cast<vtksys::ofstream*>(this->OutputStream);
+  if (fileStream == nullptr && this->WriteToOutputString)
   {
     auto ss = dynamic_cast<std::ostringstream*>(OutputStream);
     this->OutputString = ss->str();

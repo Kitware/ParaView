@@ -525,7 +525,7 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
   }
 #if 0
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  ofstream *tmpFile = pm->GetLogFile();
+  ostream *tmpFile = pm->GetLogFile();
   if (tmpFile)
     {
     if (data->GetSource())

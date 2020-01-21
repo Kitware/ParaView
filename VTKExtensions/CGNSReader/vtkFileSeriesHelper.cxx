@@ -24,10 +24,12 @@
 #include "vtkSubsetInclusionLattice.h"
 #include "vtkTypeTraits.h"
 
+#include "vtksys/FStream.hxx"
+#include "vtksys/SystemTools.hxx"
+
 #include <algorithm>
 #include <cassert>
 #include <iterator> // std::back_inserter
-#include <vtksys/SystemTools.hxx>
 
 //============================================================================
 // class: vtkFileSeriesHelper::vtkTimeInformation
@@ -211,7 +213,7 @@ bool vtkFileSeriesHelper::ReadMetaFile(const char* metafilename)
   }
 
   // Open the metafile.
-  ifstream metafile(metafilename);
+  vtksys::ifstream metafile(metafilename);
   if (metafile.bad())
   {
     // vtkErrorMacro("Failed to open meta-file: " << metafilename);

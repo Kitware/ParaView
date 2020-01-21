@@ -7,7 +7,6 @@
 
 #include "vtkVector.h"
 
-#include <fstream>
 #include <vector>
 
 class vtkDoubleArray;
@@ -73,7 +72,7 @@ protected:
   /// Get grid topology on rank 0.
   ///
   /// This sets IJKDivs on rank 0.
-  void ScanBlocks(std::ifstream& file, int nblocks);
+  void ScanBlocks(istream& file, int nblocks);
 
   /// Broadcast grid topology from rank 0.
   ///
@@ -93,10 +92,10 @@ protected:
   /// for IJKDivs.
   std::streamoff GetEndOffset() const;
 
-  static bool ReadSubgridHeader(ifstream& pfb, vtkVector3i& si, vtkVector3i& sn, vtkVector3i& sr);
+  static bool ReadSubgridHeader(istream& pfb, vtkVector3i& si, vtkVector3i& sn, vtkVector3i& sr);
 
   /// Read a single block from the file
-  void ReadBlock(std::ifstream& file, vtkMultiBlockDataSet* output, vtkVector3d& origin,
+  void ReadBlock(istream& file, vtkMultiBlockDataSet* output, vtkVector3d& origin,
     vtkVector3d& spacing, const std::string& arrayName, int block);
 
   /// Given the size of the whole grid, the number of subgrids on each axis, and a block IJK
@@ -104,7 +103,7 @@ protected:
   static void GetBlockExtent(const vtkVector3i& wholeExtentIn, const vtkVector3i& numberOfBlocksIn,
     const vtkVector3i& blockIJKIn, vtkVector3i& blockExtentMinOut, vtkVector3i& blockExtentMaxOut);
 
-  static void ReadBlockIntoArray(std::ifstream& file, vtkImageData* img, vtkDoubleArray* arr);
+  static void ReadBlockIntoArray(istream& file, vtkImageData* img, vtkDoubleArray* arr);
 
   /// The filename, which must be a valid path before RequestData is called.
   char* FileName;

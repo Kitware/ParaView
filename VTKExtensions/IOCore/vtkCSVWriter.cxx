@@ -32,6 +32,8 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTable.h"
 
+#include "vtksys/FStream.hxx"
+
 #include <numeric>
 #include <sstream>
 #include <vector>
@@ -97,7 +99,7 @@ namespace
 //-----------------------------------------------------------------------------
 template <class iterT>
 void vtkCSVWriterGetDataString(
-  iterT* iter, vtkIdType tupleIndex, ofstream& stream, vtkCSVWriter* writer, bool* first)
+  iterT* iter, vtkIdType tupleIndex, ostream& stream, vtkCSVWriter* writer, bool* first)
 {
   int numComps = iter->GetNumberOfComponents();
   vtkIdType index = tupleIndex * numComps;
@@ -118,7 +120,7 @@ void vtkCSVWriterGetDataString(
 //-----------------------------------------------------------------------------
 template <>
 void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<vtkStdString>* iter, vtkIdType tupleIndex,
-  ofstream& stream, vtkCSVWriter* writer, bool* first)
+  ostream& stream, vtkCSVWriter* writer, bool* first)
 {
   int numComps = iter->GetNumberOfComponents();
   vtkIdType index = tupleIndex * numComps;
@@ -139,7 +141,7 @@ void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<vtkStdString>* iter, vtk
 //-----------------------------------------------------------------------------
 template <>
 void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<char>* iter, vtkIdType tupleIndex,
-  ofstream& stream, vtkCSVWriter* writer, bool* first)
+  ostream& stream, vtkCSVWriter* writer, bool* first)
 {
   int numComps = iter->GetNumberOfComponents();
   vtkIdType index = tupleIndex * numComps;
@@ -160,7 +162,7 @@ void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<char>* iter, vtkIdType t
 //-----------------------------------------------------------------------------
 template <>
 void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<unsigned char>* iter, vtkIdType tupleIndex,
-  ofstream& stream, vtkCSVWriter* writer, bool* first)
+  ostream& stream, vtkCSVWriter* writer, bool* first)
 {
   int numComps = iter->GetNumberOfComponents();
   vtkIdType index = tupleIndex * numComps;
@@ -190,7 +192,7 @@ void vtkCSVWriterGetDataString(vtkArrayIteratorTemplate<unsigned char>* iter, vt
 
 class vtkCSVWriter::CSVFile
 {
-  ofstream Stream;
+  vtksys::ofstream Stream;
   std::vector<std::pair<std::string, int> > ColumnInfo;
   double Time = vtkMath::Nan();
 

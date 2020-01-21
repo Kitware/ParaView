@@ -30,6 +30,8 @@
 
 #include "vtk_jsoncpp.h"
 
+#include "vtksys/FStream.hxx"
+
 #include <algorithm>
 #include <cassert>
 #include <map>
@@ -228,7 +230,7 @@ void vtkPMultiResolutionGenericIOReader::SetFileName(const char* fname)
     return;
   if (fname)
   {
-    std::ifstream fis(this->FileName);
+    vtksys::ifstream fis(this->FileName);
     std::string filename(this->FileName);
     std::string::size_type idx = filename.find_last_of("/");
     std::string parentDir(filename, 0, idx + 1);

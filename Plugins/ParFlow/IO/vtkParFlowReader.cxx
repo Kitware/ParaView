@@ -12,6 +12,8 @@
 #include "vtkVector.h"
 #include "vtkVectorOperators.h"
 
+#include "vtksys/FStream.hxx"
+
 #include <cctype>
 #include <sstream>
 
@@ -96,7 +98,7 @@ int vtkParFlowReader::RequestData(vtkInformation* vtkNotUsed(request),
     return 0;
   }
 
-  std::ifstream pfb(this->FileName, std::ios::binary);
+  vtksys::ifstream pfb(this->FileName, std::ios::binary);
   if (!pfb.good())
   {
     vtkErrorMacro("Unable to open file.");
@@ -214,7 +216,7 @@ int vtkParFlowReader::RequestData(vtkInformation* vtkNotUsed(request),
 }
 
 bool vtkParFlowReader::ReadSubgridHeader(
-  ifstream& pfb, vtkVector3i& si, vtkVector3i& sn, vtkVector3i& sr)
+  istream& pfb, vtkVector3i& si, vtkVector3i& sn, vtkVector3i& sr)
 {
   pfb.read(reinterpret_cast<char*>(si.GetData()), 3 * sizeof(int));
   pfb.read(reinterpret_cast<char*>(sn.GetData()), 3 * sizeof(int));
@@ -228,7 +230,7 @@ bool vtkParFlowReader::ReadSubgridHeader(
   return pfb.good() && !pfb.eof();
 }
 
-void vtkParFlowReader::ScanBlocks(std::ifstream& pfb, int vtkNotUsed(numSubGrids))
+void vtkParFlowReader::ScanBlocks(istream& pfb, int vtkNotUsed(numSubGrids))
 {
   auto mpc = vtkMultiProcessController::GetGlobalController();
   if (mpc && mpc->GetLocalProcessId() > 0)
@@ -348,8 +350,8 @@ std::streamoff vtkParFlowReader::GetEndOffset() const
   return offset;
 }
 
-void vtkParFlowReader::ReadBlock(std::ifstream& pfb, vtkMultiBlockDataSet* output,
-  vtkVector3d& origin, vtkVector3d& spacing, const std::string& arrayName, int blockId)
+void vtkParFlowReader::ReadBlock(istream& pfb, vtkMultiBlockDataSet* output, vtkVector3d& origin,
+  vtkVector3d& spacing, const std::string& arrayName, int blockId)
 {
   vtkVector3i si;
   vtkVector3i sn;
@@ -422,8 +424,7 @@ void vtkParFlowReader::ReadBlock(std::ifstream& pfb, vtkMultiBlockDataSet* outpu
   }
 }
 
-void vtkParFlowReader::ReadBlockIntoArray(
-  std::ifstream& file, vtkImageData* img, vtkDoubleArray* arr)
+void vtkParFlowReader::ReadBlockIntoArray(istream& file, vtkImageData* img, vtkDoubleArray* arr)
 {
   arr->SetNumberOfTuples(img->GetNumberOfCells());
   auto cellData = img->GetCellData();

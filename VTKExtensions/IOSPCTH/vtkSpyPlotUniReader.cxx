@@ -8,9 +8,12 @@
 #include "vtkSpyPlotBlock.h"
 #include "vtkSpyPlotIStream.h"
 #include "vtkUnsignedCharArray.h"
+
+#include "vtksys/FStream.hxx"
+#include "vtksys/RegularExpression.hxx"
+
 #include <sstream>
 #include <vector>
-#include <vtksys/RegularExpression.hxx>
 
 //=============================================================================
 //-----------------------------------------------------------------------------
@@ -212,7 +215,7 @@ int vtkSpyPlotUniReader::MakeCurrent()
   }
 
   std::vector<unsigned char> arrayBuffer;
-  ifstream ifs(this->FileName, ios::binary | ios::in);
+  vtksys::ifstream ifs(this->FileName, ios::binary | ios::in);
   vtkSpyPlotIStream spis;
   spis.SetStream(&ifs);
   int dump;
@@ -1358,7 +1361,7 @@ int vtkSpyPlotUniReader::ReadInformation()
     vtkErrorMacro("FileName not specified");
     return 0;
   }
-  ifstream ifs(this->FileName, ios::binary | ios::in);
+  vtksys::ifstream ifs(this->FileName, ios::binary | ios::in);
   if (!ifs)
   {
     vtkErrorMacro("Cannot open file: " << this->FileName);

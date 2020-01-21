@@ -25,7 +25,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkTable.h"
 #include "vtkVariant.h"
 
-#include <fstream>
+#include "vtksys/FStream.hxx"
+
 #include <iostream>
 #include <map>
 #include <set>
@@ -126,7 +127,7 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation* request,
 
   // Open the file and get the number time steps
   std::string line;
-  std::ifstream file_stream(this->FileName, std::ifstream::in);
+  vtksys::ifstream file_stream(this->FileName, ios::in);
   int row = 0;
   while (file_stream.good())
   {
@@ -248,7 +249,7 @@ int vtkSpyPlotHistoryReader::RequestData(vtkInformation* vtkNotUsed(request),
 void vtkSpyPlotHistoryReader::FillCache()
 {
   std::string line;
-  std::ifstream file_stream(this->FileName, std::ifstream::in);
+  vtksys::ifstream file_stream(this->FileName, ios::in);
 
   std::vector<TimeStep>::iterator tsIt;
   for (tsIt = this->Info->TimeSteps.begin(); tsIt != this->Info->TimeSteps.end(); tsIt++)

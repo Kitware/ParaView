@@ -35,6 +35,8 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
 
+#include "vtksys/FStream.hxx"
+
 typedef std::vector<vtkPEnSightReader::vtkPEnSightReaderCellIds*> vtkPEnSightReaderCellIdsTypeBase;
 class vtkPEnSightReaderCellIdsType : public vtkPEnSightReaderCellIdsTypeBase
 {
@@ -1319,7 +1321,7 @@ int vtkPEnSightReader::ReadCaseFile()
     sfilename = this->CaseFileName;
   }
 
-  this->IS = new ifstream(sfilename.c_str(), ios::in);
+  this->IS = new vtksys::ifstream(sfilename.c_str(), ios::in);
   if (this->IS->fail())
   {
     vtkErrorMacro("Unable to open file: " << sfilename.c_str());

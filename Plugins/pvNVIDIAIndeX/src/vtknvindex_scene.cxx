@@ -27,6 +27,7 @@
 
 #include <cassert>
 
+#include "vtksys/FStream.hxx"
 #include "vtksys/SystemInformation.hxx"
 #include "vtksys/SystemTools.hxx"
 
@@ -65,14 +66,14 @@
 //-------------------------------------------------------------------------------------------------
 bool file_to_string(const std::string& file_path, std::string& out_file_string)
 {
-  std::ifstream src_file;
+  vtksys::ifstream src_file;
 
   src_file.open(file_path.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
 
   if (!src_file.is_open())
     return false;
 
-  const std::ifstream::pos_type src_file_size = src_file.tellg();
+  const vtksys::ifstream::pos_type src_file_size = src_file.tellg();
   src_file.seekg(std::ios::beg);
 
   out_file_string.resize(src_file_size, '\0');
@@ -1546,7 +1547,7 @@ void vtknvindex_scene::export_session()
       INFO_LOG << "Writing export session to file '"
                << vtksys::SystemTools::JoinPath(path_components) << "'";
 
-      std::ofstream f(output_filename.c_str());
+      vtksys::ofstream f(output_filename.c_str());
       f << s.str();
       std::ostringstream af;
       m_cluster_properties->get_affinity()->scene_dump_affinity_info(af);

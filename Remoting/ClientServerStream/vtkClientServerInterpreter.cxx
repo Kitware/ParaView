@@ -19,7 +19,8 @@
 #include "vtkDynamicLoader.h"
 #include "vtkObjectFactory.h"
 
-#include <vtksys/SystemTools.hxx>
+#include "vtksys/FStream.hxx"
+#include "vtksys/SystemTools.hxx"
 
 #include <map>
 #include <sstream>
@@ -184,7 +185,7 @@ void vtkClientServerInterpreter::SetLogFile(const char* name)
   // If a non-empty name was given, open a new log file.
   if (name && name[0])
   {
-    this->LogFileStream = new ofstream(name);
+    this->LogFileStream = new vtksys::ofstream(name);
     if (this->LogFileStream && *this->LogFileStream)
     {
       this->LogStream = this->LogFileStream;

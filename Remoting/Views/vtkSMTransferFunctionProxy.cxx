@@ -41,6 +41,8 @@
 #include "vtkTuple.h"
 #include "vtk_jsoncpp.h"
 
+#include "vtksys/FStream.hxx"
+
 #include <algorithm>
 #include <cmath>
 #include <set>
@@ -273,7 +275,7 @@ bool vtkSMTransferFunctionProxy::ExportTransferFunction(
 
   exportCollection.append(transferFunction);
 
-  ofstream outfs;
+  vtksys::ofstream outfs;
   outfs.open(filename);
   if (!outfs.is_open())
   {
@@ -1370,7 +1372,7 @@ bool vtkSMTransferFunctionProxy::ConvertLegacyColorMapsToJSON(
     return false;
   }
 
-  ofstream file;
+  vtksys::ofstream file;
   file.open(outjsonfile);
   if (file)
   {

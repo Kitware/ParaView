@@ -39,7 +39,8 @@
 #include "vtkStringArray.h"
 #include "vtkTypeTraits.h"
 
-#include <vtksys/SystemTools.hxx>
+#include "vtksys/FStream.hxx"
+#include "vtksys/SystemTools.hxx"
 
 #include "vtkSmartPointer.h"
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
@@ -783,7 +784,7 @@ int vtkFileSeriesReader::ReadMetaDataFile(const char* metafilename, vtkStringArr
   std::vector<double>& timeValues, int maxFilesToRead /*= VTK_INT_MAX*/)
 {
   // Open the metafile.
-  ifstream metafile(metafilename);
+  vtksys::ifstream metafile(metafilename);
   if (metafile.bad())
   {
     return 0;

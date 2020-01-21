@@ -204,7 +204,7 @@ protected:
   int ElementIdsListed;
   int Fortran;
 
-  ifstream* IFile;
+  istream* IFile;
   // The size of the file could be used to choose byte order.
   long FileSize;
 

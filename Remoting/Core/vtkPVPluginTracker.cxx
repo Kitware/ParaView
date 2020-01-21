@@ -32,13 +32,14 @@
 #include "vtkProcessModule.h"
 #include "vtkVersion.h"
 
+#include "vtksys/FStream.hxx"
+#include "vtksys/String.hxx"
+#include "vtksys/SystemTools.hxx"
+
 #include <assert.h>
-#include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <vtksys/String.hxx>
-#include <vtksys/SystemTools.hxx>
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
 /* String comparison routine. */
@@ -321,7 +322,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLs(const char* appname)
 void vtkPVPluginTracker::LoadPluginConfigurationXMLConf(
   std::string const& exe_dir, std::string const& conf)
 {
-  std::ifstream fin(conf.c_str());
+  vtksys::ifstream fin(conf.c_str());
   std::string line;
   // TODO: Replace with a JSON parser.
   while (std::getline(fin, line))

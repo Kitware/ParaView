@@ -21,6 +21,7 @@
 #include "vtkVector.h"
 #include "vtkVectorOperators.h"
 
+#include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
 
 #include "nlohmann/json.hpp"
@@ -824,7 +825,7 @@ std::streamoff vtkParFlowMetaReader::GetEndOffset(Domain dom) const
 }
 
 bool vtkParFlowMetaReader::ReadSubgridHeader(
-  ifstream& pfb, vtkVector3i& si, vtkVector3i& sn, vtkVector3i& sr)
+  istream& pfb, vtkVector3i& si, vtkVector3i& sn, vtkVector3i& sr)
 {
   pfb.read(reinterpret_cast<char*>(si.GetData()), 3 * sizeof(int));
   pfb.read(reinterpret_cast<char*>(sn.GetData()), 3 * sizeof(int));
@@ -838,7 +839,7 @@ bool vtkParFlowMetaReader::ReadSubgridHeader(
   return pfb.good() && !pfb.eof();
 }
 
-bool vtkParFlowMetaReader::ReadComponentSubgridOverlap(ifstream& pfb, const vtkVector3i& si,
+bool vtkParFlowMetaReader::ReadComponentSubgridOverlap(istream& pfb, const vtkVector3i& si,
   const vtkVector3i& sn, const int extent[6], int component, vtkDoubleArray* variable)
 {
   vtkIdType subgridSize = sn[0] * sn[1];
@@ -948,7 +949,7 @@ bool vtkParFlowMetaReader::ReadComponentSubgridOverlap(ifstream& pfb, const vtkV
 int vtkParFlowMetaReader::LoadPFBComponent(Domain dom, vtkDoubleArray* variable,
   const std::string& filename, int component, const int extent[6]) const
 {
-  std::ifstream pfb(filename.c_str(), std::ios::binary);
+  vtksys::ifstream pfb(filename.c_str(), std::ios::binary);
   if (!pfb.good() && !vtksys::SystemTools::FileIsFullPath(filename))
   {
     pfb.clear();
@@ -1293,7 +1294,7 @@ int vtkParFlowMetaReader::RequestInformation(
   std::vector<uint8_t> contents;
   if (rank == 0)
   {
-    std::ifstream pfb(this->FileName, std::ios::binary);
+    vtksys::ifstream pfb(this->FileName, std::ios::binary);
     if (pfb.good())
     {
       pfb.seekg(0, std::ios::end);

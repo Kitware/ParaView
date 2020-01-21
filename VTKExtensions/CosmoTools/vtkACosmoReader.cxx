@@ -79,10 +79,11 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
 
+#include "vtksys/FStream.hxx"
+
 // C/C++ includes
 #include <algorithm>
 #include <cassert>
-#include <fstream>
 #include <iterator>
 #include <sstream>
 #include <stdexcept>
@@ -192,7 +193,7 @@ void vtkACosmoReader::ReadMetaDataFile(const int levelIdx, std::string file)
 
   // STEP 0: Open metadata file
   int blockCount = 0;
-  std::ifstream ifs;
+  vtksys::ifstream ifs;
   ifs.open(file.c_str());
   if (!ifs.is_open())
   {
@@ -583,7 +584,7 @@ void vtkACosmoReader::ReadBlockFromFile(
 #endif
 
   // STEP 0: Open file
-  std::ifstream ifs;
+  vtksys::ifstream ifs;
   ifs.open(file.c_str(), std::ios::in | std::ios::binary);
   if (!ifs.is_open())
   {

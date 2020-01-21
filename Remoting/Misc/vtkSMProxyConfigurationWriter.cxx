@@ -23,7 +23,8 @@
 #include "vtkPVXMLElement.h"
 #include "vtkStringList.h"
 
-#include <fstream>
+#include "vtksys/FStream.hxx"
+
 #include <iostream>
 
 #define safeio(a) ((a) ? (a) : "NULL")
@@ -118,7 +119,7 @@ int vtkSMProxyConfigurationWriter::WriteConfiguration(const char* cFilename)
     filename += ext;
   }
 
-  std::ofstream os(filename.c_str(), ios::out);
+  vtksys::ofstream os(filename.c_str(), ios::out);
   if (!os.good())
   {
     vtkErrorMacro("Failed to open " << filename.c_str() << " for writing.");

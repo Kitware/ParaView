@@ -19,11 +19,13 @@
 #include "vtkObjectFactory.h"
 #include "vtkPythonInterpreter.h"
 
+#include "vtksys/FStream.hxx"
+#include "vtksys/SystemTools.hxx"
+
 #include <algorithm>
 #include <random>
 #include <sstream>
 #include <string>
-#include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 namespace
@@ -91,7 +93,7 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
   if (rank == 0)
   {
     std::string line;
-    std::ifstream myfile(fileName);
+    vtksys::ifstream myfile(fileName);
     std::string desiredString;
     if (myfile.is_open())
     {
