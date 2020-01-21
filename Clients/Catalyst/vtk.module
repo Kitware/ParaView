@@ -5,7 +5,7 @@ LIBRARY_NAME
 DEPENDS
   VTK::CommonCore
 KIT
-  ParaView::ServerManagerKit
+  ParaView::ClientKit
 GROUPS
   PARAVIEW_CORE
 PRIVATE_DEPENDS
