@@ -424,8 +424,7 @@ paraview_require_module(
   MODULES   VTK::FiltersParallelFlowPaths
             VTK::FiltersParallelGeometry
             VTK::FiltersParallelMPI
-            VTK::IOMPIImage
-            VTK::IOParallelNetCDF)
+            VTK::IOMPIImage)
 
 paraview_require_module(
   CONDITION PARAVIEW_USE_MPI AND PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL
