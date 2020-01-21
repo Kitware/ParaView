@@ -7,8 +7,9 @@ LIBRARY_NAME
 DEPENDS
   ParaView::RemotingCore
   ParaView::RemotingServerManager
-KIT
-  ParaView::ServerManagerKit
+#KIT
+#  This module cannot be part of a kit because it links to ClientServer
+#  wrappings of all modules. This ends up with a cycle in a shared kit build.
 PRIVATE_DEPENDS
   ParaView::RemotingSettings
   VTK::vtksys
