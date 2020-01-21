@@ -44,10 +44,10 @@ Ph.D. thesis of Christian BOUCHENY.
 #ifndef vtkPVRenderViewWithEDL_h
 #define vtkPVRenderViewWithEDL_h
 
-#include "vtkEyeDomeLightingViewModule.h"
 #include "vtkPVRenderView.h"
+#include "vtkRemotingViewsModule.h" //needed for exports
 
-class VTKEYEDOMELIGHTINGVIEW_EXPORT vtkPVRenderViewWithEDL : public vtkPVRenderView
+class VTKREMOTINGVIEWS_EXPORT vtkPVRenderViewWithEDL : public vtkPVRenderView
 {
 public:
   static vtkPVRenderViewWithEDL* New();

@@ -1,9 +1,0 @@
-NAME
-  EyeDomeLighting::EyeDomeLightingView
-LIBRARY_NAME
-  vtkEyeDomeLightingView
-DEPENDS
-  ParaView::RemotingViews
-PRIVATE_DEPENDS
-  VTK::CommonCore
-  VTK::RenderingOpenGL2
