@@ -113,12 +113,13 @@ public:
     {
       const auto aname = ald->GetString(cc);
       const bool is_partial = ald->IsArrayPartial(cc) ? true : false;
-      const int assoc = ald->GetDomainAssociation(cc);
+      const int icon_association = ald->GetDomainAssociation(cc);
+      const int association = ald->GetFieldAssociation(cc);
       const bool is_nonestring = (none_string && strcmp(none_string, aname) == 0);
       const int index = combobox->count();
-      combobox->addItem(
-        is_nonestring ? get_none_icon() : get_icon(assoc), ::get_label(aname, is_partial));
-      combobox->setItemData(index, assoc, ArrayAssociationRole);
+      combobox->addItem(is_nonestring ? get_none_icon() : get_icon(icon_association),
+        ::get_label(aname, is_partial));
+      combobox->setItemData(index, association, ArrayAssociationRole);
       combobox->setItemData(index, aname, ArrayNameRole);
     }
 
