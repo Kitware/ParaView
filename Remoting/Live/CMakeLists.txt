@@ -33,6 +33,7 @@ set(classes
   vtkLiveInsituLink
   vtkSMInsituStateLoader
   vtkSMLiveInsituLinkProxy
+  vtkSteeringDataGenerator
 )
 
 vtk_module_add_module(ParaView::RemotingLive

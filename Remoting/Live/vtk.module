@@ -10,5 +10,8 @@ KIT
   ParaView::ServerManagerKit
 DEPENDS
   ParaView::RemotingServerManager
+TEST_DEPENDS
+  ParaView::RemotingApplication
+  VTK::TestingCore
 TEST_LABELS
   ParaView
