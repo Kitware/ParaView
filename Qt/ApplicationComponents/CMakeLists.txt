@@ -145,6 +145,7 @@ set(classes
   pqPluginToolBarBehavior
   pqPointPickingHelper
   pqPreviewMenuManager
+  pqPropertyCollectionWidget
   pqProxyGroupMenuManager
   pqReaction
   pqReloadFilesReaction
@@ -245,6 +246,7 @@ set(ui_files
   Resources/UI/pqMoleculePropertyWidget.ui
   Resources/UI/pqOMETransferFunctionsPropertyWidget.ui
   Resources/UI/pqOMETransferFunctionsPropertyWidgetPage.ui
+  Resources/UI/pqPropertyCollectionWidget.ui
   Resources/UI/pqResetScalarRangeToDataOverTime.ui
   Resources/UI/pqSavePresetOptions.ui
   Resources/UI/pqSeriesEditorPropertyWidget.ui

@@ -510,20 +510,37 @@ bool skip_group(vtkSMPropertyGroup* smgroup, const QStringList& chosenProperties
 } // end of namespace {}
 
 //-----------------------------------------------------------------------------------
-QWidget* pqProxyWidget::newGroupLabelWidget(const QString& labelText, QWidget* parent)
+QWidget* pqProxyWidget::newGroupLabelWidget(
+  const QString& labelText, QWidget* parent, const QList<QWidget*>& buttons)
 {
   QWidget* widget = new QWidget(parent);
 
-  QVBoxLayout* hbox = new QVBoxLayout(widget);
-  hbox->setContentsMargins(0, pqPropertiesPanel::suggestedVerticalSpacing(), 0, 0);
-  hbox->setSpacing(0);
+  QVBoxLayout* vbox = new QVBoxLayout(widget);
+  vbox->setContentsMargins(0, pqPropertiesPanel::suggestedVerticalSpacing(), 0, 0);
+  vbox->setSpacing(0);
 
   QLabel* label = new QLabel(QString("<html><b>%1</b></html>").arg(labelText), widget);
   label->setWordWrap(true);
   label->setAlignment(Qt::AlignBottom | Qt::AlignLeft);
-  hbox->addWidget(label);
 
-  hbox->addWidget(newHLine(parent));
+  if (buttons.size() > 0)
+  {
+    auto hbox = new QHBoxLayout();
+    hbox->setContentsMargins(0, 0, 0, 0);
+    hbox->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
+    hbox->addWidget(label);
+    for (auto& button : buttons)
+    {
+      hbox->addWidget(button);
+    }
+
+    vbox->addLayout(hbox);
+  }
+  else
+  {
+    vbox->addWidget(label);
+  }
+  vbox->addWidget(newHLine(parent));
   return widget;
 }
 
