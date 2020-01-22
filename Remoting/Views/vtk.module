@@ -40,6 +40,7 @@ PRIVATE_DEPENDS
   VTK::RenderingLabel
   VTK::RenderingOpenGL2
   VTK::RenderingVolumeAMR
+  VTK::opengl
   VTK::zlib
 OPTIONAL_DEPENDS
   ParaView::icet
