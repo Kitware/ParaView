@@ -174,6 +174,8 @@ void pqRenderViewSelectionReaction::actionTriggered(bool val)
 //-----------------------------------------------------------------------------
 void pqRenderViewSelectionReaction::updateEnableState()
 {
+  this->endSelection();
+
   auto paction = this->parentAction();
   switch (this->Mode)
   {
@@ -283,11 +285,8 @@ void pqRenderViewSelectionReaction::setRepresentation(pqDataRepresentation* repr
 
     if (this->Representation != nullptr)
     {
-      this->RepresentationConnection = QObject::connect(
-        this->Representation, &pqDataRepresentation::colorArrayNameModified, this, [this]() {
-          this->endSelection();
-          this->updateEnableState();
-        });
+      this->RepresentationConnection = this->connect(
+        this->Representation, SIGNAL(colorArrayNameModified()), SLOT(updateEnableState()));
     }
 
     // update enable state.
