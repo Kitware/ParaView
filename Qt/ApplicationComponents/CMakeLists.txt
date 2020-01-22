@@ -145,7 +145,6 @@ set(classes
   pqPluginToolBarBehavior
   pqPointPickingHelper
   pqPreviewMenuManager
-  pqPropertyGroupButton
   pqProxyGroupMenuManager
   pqReaction
   pqReloadFilesReaction
