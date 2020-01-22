@@ -137,10 +137,10 @@ pqStandardViewFrameActionsImplementation::pqStandardViewFrameActionsImplementati
   QObject::connect(
     this->ShortCutFrustumPoints, SIGNAL(activated()), this, SLOT(selectFrustumPointsTriggered()));
   QObject::connect(this->ShortCutBlocks, SIGNAL(activated()), this, SLOT(selectBlocksTriggered()));
-  QObject::connect(
-    this->ShortCutGrow, &QShortcut::activated, []() { triggerAction("actionGrowSelection"); });
-  QObject::connect(
-    this->ShortCutShrink, &QShortcut::activated, []() { triggerAction("actionShrinkSelection"); });
+  QObject::connect(this->ShortCutGrow.data(), &QShortcut::activated,
+    []() { triggerAction("actionGrowSelection"); });
+  QObject::connect(this->ShortCutShrink.data(), &QShortcut::activated,
+    []() { triggerAction("actionShrinkSelection"); });
 
   this->ShortCutEsc = new QShortcut(QKeySequence(Qt::Key_Escape), mainWindow);
   this->ShortCutEsc->setEnabled(false);
