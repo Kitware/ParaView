@@ -618,7 +618,7 @@ void pqPythonShell::runScript()
       {
         QByteArray code;
         // First inject code to let the script know its own path
-        code.append(QString("__file__ = '%1'\n").arg(filename));
+        code.append(QString("__file__ = r'%1'\n").arg(filename));
         // Then append the file content
         code.append(file.readAll());
         this->executeScript(code.data());
