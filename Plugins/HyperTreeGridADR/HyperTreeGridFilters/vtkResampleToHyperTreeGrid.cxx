@@ -374,7 +374,7 @@ bool vtkResampleToHyperTreeGrid::IntersectedVolume(
   double x = std::min(boxBounds[1], voxelBounds[1]) - std::max(boxBounds[0], voxelBounds[0]),
          y = std::min(boxBounds[3], voxelBounds[3]) - std::max(boxBounds[2], voxelBounds[2]),
          z = std::min(boxBounds[5], voxelBounds[5]) - std::max(boxBounds[4], voxelBounds[4]);
-  constexpr double min = std::pow(VTK_DBL_MIN, 1.0 / 3.0);
+  double min = std::pow(VTK_DBL_MIN, 1.0 / 3.0);
   double normalization = volumeUnit < 1.0 ? volumeUnit : 1.0;
   bool nonZeroVolume =
     x >= min / normalization && y >= min / normalization && z >= min / normalization;
