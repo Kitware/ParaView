@@ -47,6 +47,11 @@ vtkPVLODVolume::vtkPVLODVolume()
   this->MapperBounds[3] = this->MapperBounds[4] = this->MapperBounds[5] = 0;
 
   this->EnableLOD = 0;
+
+  // having a user matrix is important in ParaView for specific interaction use cases
+  // for example: when moving actors in VR without modifying the actor's position itself
+  vtkNew<vtkMatrix4x4> mat;
+  this->SetUserMatrix(mat);
 }
 
 //----------------------------------------------------------------------------
