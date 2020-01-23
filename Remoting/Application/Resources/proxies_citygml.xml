@@ -46,7 +46,13 @@ tran:Road, bldg:Building, gen:GenericCityObject, luse:LandUse
         opacity. Set this field true to show that correctly. The
         default is false.</Documentation>
         </IntVectorProperty>
-
+      <IntVectorProperty command="SetNumberOfBuildings"
+                         default_values="2147483647"
+                         name="NumberOfBuildings"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>Number of buildings to read from the file.</Documentation>
+      </IntVectorProperty>
       <Hints>
         <ReaderFactory extensions="gml xml"
                        file_description="CityGML files" />
