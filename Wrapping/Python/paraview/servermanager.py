@@ -79,6 +79,11 @@ try:
 except ImportError:
     pass
 
+try:
+    from paraview.modules.vtkRemotingLive import *
+except ImportError:
+    pass
+
 def _wrap_property(proxy, smproperty):
     """ Internal function.
     Given a server manager property and its domains, returns the
