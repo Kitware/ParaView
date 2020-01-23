@@ -37,9 +37,7 @@ paraview_client_add(
   [FORCE_UNIX_LAYOUT    <ON|OFF>]
   [BUNDLE_DESTINATION   <directory>]
   [RUNTIME_DESTINATION  <directory>]
-  [LIBRARY_DESTINATION  <directory>]
-
-  [PLUGINS_TARGET   <target>])
+  [LIBRARY_DESTINATION  <directory>])
 ```
 
   * `NAME`: (Required) The name of the application. This is used as the target
@@ -53,8 +51,6 @@ paraview_client_add(
   * `MAIN_WINDOW_INCLUDE`: (Defaults to `QMainWindow` or
     `<MAIN_WINDOW_CLASS>.h` if it is specified) The include file for the main
     window.
-  * `PLUGINS_TARGET`: (Deprecated for `PLUGINS_TARGETS`.) The target for static
-    plugins. The associated function will be called upon startup.
   * `PLUGINS_TARGETS`: The targets for plugins. The associated functions
     will be called upon startup.
   * `REQUIRED_PLUGINS`: Plugins to load upon startup.
