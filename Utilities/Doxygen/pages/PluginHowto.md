@@ -392,14 +392,19 @@ PRIVATE_DEPENDS
 ```
 
 And then the module is built with its associated server manager XML file
-attached to the module.
+attached to the module. Note that the module name cannot be the same as the
+plugin name due to the way the library targets are managed internally.
 
 ```cmake
 set(classes
   vtkMyElevationFilter)
 
+# Find external packages here using `find_package`.
+
 vtk_module_add_module(ElevationFilters
   CLASSES ${classes})
+
+# Link to external packages here using `vtk_module_link(ElevationFilters)`.
 
 paraview_add_server_manager_xmls(
   XMLS  MyElevationFilter.xml)
