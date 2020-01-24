@@ -7,7 +7,7 @@ CONDITION
 GROUPS
   PARAVIEW_CORE
 KIT
-  ParaView::ServerManagerKit
+  ParaView::ClientKit
 DEPENDS
   ParaView::Catalyst
   VTK::PythonInterpreter
