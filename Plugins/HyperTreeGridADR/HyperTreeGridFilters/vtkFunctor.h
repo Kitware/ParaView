@@ -16,8 +16,9 @@
 #ifndef vtkFunctor_h
 #define vtkFunctor_h
 
+#include "vtkFiltersHyperTreeGridADRModule.h" // For export macro
+
 #include <cmath>
-#include <iostream>
 
 #define vtkFunctorCompMacro                                                                        \
   template <class FunctorT>                                                                        \
@@ -33,7 +34,7 @@
 
 #define vtkDefaultSpecializationFunctorCompMacro(functor)                                          \
   template <>                                                                                      \
-  bool functor::operator==(const functor&) const                                                   \
+  inline bool functor::operator==(const functor&) const                                            \
   {                                                                                                \
     return true;                                                                                   \
   }
@@ -43,50 +44,58 @@
  * @brief   Functor f(x) = x
  */
 
-struct vtkIdentityFunctor
+struct VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkIdentityFunctor
 {
   double operator()(double x) { return x; }
   vtkFunctorCompMacro;
+  vtkDefaultSpecializationFunctorCompMacro(vtkIdentityFunctor);
 };
 
 /**
  * @class   vtkSquareFunctor
  * @brief   Functor f(x) = x^2
  */
-struct vtkSquareFunctor
+struct VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkSquareFunctor
 {
   double operator()(double x) { return x * x; }
   vtkFunctorCompMacro;
+  vtkDefaultSpecializationFunctorCompMacro(vtkSquareFunctor);
 };
 
 /**
  * @class   vtkLogFunctor
  * @brief   Functor f(x) = log(x)
  */
-struct vtkLogFunctor
+struct VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkLogFunctor
 {
   double operator()(double x) { return std::log(x); }
   vtkFunctorCompMacro;
+  vtkDefaultSpecializationFunctorCompMacro(vtkLogFunctor);
 };
 
 /**
  * @class   vtkInverseFunctor
  * @brief   Functor f(x) = 1/x
  */
-struct vtkInverseFunctor
+struct VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkInverseFunctor
 {
   double operator()(double x) { return 1.0 / x; }
   vtkFunctorCompMacro;
+  vtkDefaultSpecializationFunctorCompMacro(vtkInverseFunctor);
 };
 
 /**
  * @class   vtkEntropyFunctor
  * @brief   Functor f(x) = x log(x)
  */
-struct vtkEntropyFunctor
+struct VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkEntropyFunctor
 {
   double operator()(double x) { return x * std::log(x); }
   vtkFunctorCompMacro;
+  vtkDefaultSpecializationFunctorCompMacro(vtkEntropyFunctor);
 };
+
+#undef vtkFunctorCompMacro
+#undef vtkDefaultSpecializationFunctorCompMacro
 
 #endif
