@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaGeneralSettings/qt_scrollarea_viewport/Container/ProxyWidget/AutoConvertProperties/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/can.ex2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayStatus/SelectionWidget/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayStatus/SelectionWidget/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,184,114," />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.3723,0.215213,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.3723,0.504638,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.3723,0.504638,1,0,0)" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,37,10,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,37,10,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Contour" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/SelectInputScalars/ComboBox" command="activated" arguments="EQPS" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/Table" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/Table" command="setSelection" arguments="0.0,0.0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/Table" command="doubleClick" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/Table" command="edit" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="0.6" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/Table" command="editAccepted" arguments="0.0,0.6" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionZoomToData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveZ" command="activate" arguments="" />
+</pqevents>
