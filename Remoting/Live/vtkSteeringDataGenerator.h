@@ -17,7 +17,7 @@
  * @brief source to generate dataset given field arrays
  *
  * vtkSteeringDataGenerator is simply a dataset generator that generates a
- * single partition vtkPartitionedDataSet with the 1st partition being non-empty
+ * single partition vtkMultiBlockDataSet with the 1st partition being non-empty
  * dataset of the type specified using
  * `vtkSteeringDataGenerator::SetPartitionType` with arrays added to the field
  * type chosen using vtkSteeringDataGenerator::SetFieldAssociation`.
@@ -78,6 +78,11 @@
  *
  * @endcode
  *
+ * @section Caveats Caveats
+ *
+ * This filter should ideally generated `vtkPartitionedDataSet`. However,
+ * until `vtkPartitionedDataSet` is well supported, we are making it generate
+ * vtkMultiBlockDataSet.
  */
 
 #ifndef vtkSteeringDataGenerator_h
@@ -95,7 +100,7 @@ public:
 
   //@{
   /**
-   * Choose the type for a parition in the output vtkPartitionedDataSet.
+   * Choose the type for a parition in the output vtkMultiBlockDataSet.
    * Accepted values are any non-composite dataset type know to
    * vtkDataObjectTypes.
    */

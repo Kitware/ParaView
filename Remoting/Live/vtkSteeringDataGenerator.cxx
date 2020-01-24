@@ -22,8 +22,8 @@
 #include "vtkInformationVector.h"
 #include "vtkIntArray.h"
 #include "vtkLogger.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
-#include "vtkPartitionedDataSet.h"
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
 #include "vtkSmartPointer.h"
@@ -110,7 +110,7 @@ vtkSteeringDataGenerator::~vtkSteeringDataGenerator()
 int vtkSteeringDataGenerator::FillOutputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   // now add our info
-  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPartitionedDataSet");
+  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkMultiBlockDataSet");
   return 1;
 }
 
@@ -127,7 +127,7 @@ int vtkSteeringDataGenerator::RequestInformation(
 int vtkSteeringDataGenerator::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
-  vtkPartitionedDataSet* output = vtkPartitionedDataSet::GetData(outputVector);
+  vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::GetData(outputVector);
   output->Initialize();
 
   int piece = 0;
@@ -155,7 +155,7 @@ int vtkSteeringDataGenerator::RequestData(vtkInformation* vtkNotUsed(request),
 
   vtkSmartPointer<vtkDataObject> data;
   data.TakeReference(vtkDataObjectTypes::NewDataObject(this->PartitionType));
-  output->SetPartition(0, data);
+  output->SetBlock(0, data);
 
   // note: this is an intentional copy of the map since we modify it.
   auto arrays = this->Internals->Arrays;

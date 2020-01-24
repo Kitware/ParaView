@@ -17,10 +17,10 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkInitializationHelper.h"
 #include "vtkIntArray.h"
 #include "vtkLogger.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVOptions.h"
-#include "vtkPartitionedDataSet.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkProcessModule.h"
@@ -106,14 +106,14 @@ int TestSteeringDataGenerator(int argc, char* argv[])
 
   // validate dataset.
   auto algo = vtkAlgorithm::SafeDownCast(proxy->GetClientSideObject());
-  auto pd = vtkPartitionedDataSet::SafeDownCast(algo->GetOutputDataObject(0));
-  if (pd->GetNumberOfPartitions() != 1)
+  auto mb = vtkMultiBlockDataSet::SafeDownCast(algo->GetOutputDataObject(0));
+  if (mb->GetNumberOfBlocks() != 1)
   {
-    vtkLogF(ERROR, "Partition mismatch; expected 1, got %d", (int)pd->GetNumberOfPartitions());
+    vtkLogF(ERROR, "Partition mismatch; expected 1, got %d", (int)mb->GetNumberOfBlocks());
     return EXIT_FAILURE;
   }
 
-  auto pld = vtkPolyData::SafeDownCast(pd->GetPartitionAsDataObject(0));
+  auto pld = vtkPolyData::SafeDownCast(mb->GetBlock(0));
   if (pld == nullptr)
   {
     vtkLogF(ERROR, "Partition type mismatch; expected vtkPolyData.");
