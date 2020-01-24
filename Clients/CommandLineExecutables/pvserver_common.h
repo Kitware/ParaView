@@ -44,7 +44,7 @@ static bool RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type
   if (options->GetTellVersion() || options->GetHelpSelected() || options->GetPrintMonitors())
   {
     vtkInitializationHelper::Finalize();
-    return 1;
+    return 0;
   }
 
 #ifdef PARAVIEW_USE_PYTHON
