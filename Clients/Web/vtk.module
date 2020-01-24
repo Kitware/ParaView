@@ -7,7 +7,7 @@ CONDITION
 GROUPS
   PARAVIEW_CANONICAL
 KIT
-  ParaView::ServerManagerKit
+  ParaView::ClientKit
 DEPENDS
   VTK::WebCore
   VTK::WebGLExporter
