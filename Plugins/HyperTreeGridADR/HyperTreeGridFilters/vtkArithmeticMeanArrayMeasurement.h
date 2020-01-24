@@ -109,7 +109,7 @@ protected:
    * Default constructor and destructor
    */
   vtkArithmeticMeanArrayMeasurement();
-  virtual ~vtkArithmeticMeanArrayMeasurement() override = default;
+  ~vtkArithmeticMeanArrayMeasurement() override = default;
   //@}
 
 private:

@@ -26,13 +26,16 @@
 #include "vtkDataSet.h"
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkDoubleArray.h"
+#include "vtkHexahedron.h"
 #include "vtkHyperTree.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkHyperTreeGridNonOrientedCursor.h"
+#include "vtkHyperTreeGridNonOrientedVonNeumannSuperCursor.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkLongArray.h"
 #include "vtkMath.h"
+#include "vtkMathUtilities.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
@@ -43,9 +46,11 @@
 #include "vtkVoxel.h"
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstring>
 #include <limits>
+#include <set>
 #include <vector>
 
 vtkStandardNewMacro(vtkResampleToHyperTreeGrid);
@@ -68,6 +73,8 @@ vtkResampleToHyperTreeGrid::vtkResampleToHyperTreeGrid()
   this->MinimumNumberOfPointsInSubtree = 1;
   this->InRange = true;
   this->NoEmptyCells = false;
+
+  this->Extrapolate = true;
 }
 
 //----------------------------------------------------------------------------
@@ -321,6 +328,15 @@ int vtkResampleToHyperTreeGrid::RequestData(
     return 0;
   }
 
+  output->SetMask(this->Mask);
+  this->Mask->FastDelete();
+
+  if (this->Extrapolate && fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+  {
+    vtkHyperTreeGrid* htg = vtkHyperTreeGrid::SafeDownCast(output);
+    this->ExtrapolateValuesOnGaps(htg);
+  }
+
   // Cleaning our mess
   this->GridOfMultiResolutionGrids.clear();
   for (std::size_t i = 0; i < this->Accumulators.size(); ++i)
@@ -332,9 +348,6 @@ int vtkResampleToHyperTreeGrid::RequestData(
   this->ArrayMeasurementDisplayAccumulators.clear();
   this->ArrayMeasurementAccumulators.clear();
   this->ArrayMeasurementDisplayAccumulatorMap.clear();
-
-  output->SetMask(this->Mask);
-  this->Mask->FastDelete();
 
   // Avoid keeping extra memory around.
   output->Squeeze();
@@ -351,6 +364,452 @@ vtkResampleToHyperTreeGrid::GridElement::~GridElement()
   {
     this->Accumulators[i]->FastDelete();
   }
+}
+
+//----------------------------------------------------------------------------
+bool vtkResampleToHyperTreeGrid::IntersectedVolume(
+  const double boxBounds[6], vtkVoxel* voxel, double volumeUnit, double& volume) const
+{
+  const double* voxelBounds = voxel->GetBounds();
+  double x = std::min(boxBounds[1], voxelBounds[1]) - std::max(boxBounds[0], voxelBounds[0]),
+         y = std::min(boxBounds[3], voxelBounds[3]) - std::max(boxBounds[2], voxelBounds[2]),
+         z = std::min(boxBounds[5], voxelBounds[5]) - std::max(boxBounds[4], voxelBounds[4]);
+  double min = std::pow(VTK_DBL_MIN, 1.0 / 3.0);
+  double normalization = volumeUnit < 1.0 ? volumeUnit : 1.0;
+  bool nonZeroVolume =
+    x >= min / normalization && y >= min / normalization && z >= min / normalization;
+  volume = nonZeroVolume ? (x * y * z) / volumeUnit : 0.0;
+  return nonZeroVolume;
+}
+
+//----------------------------------------------------------------------------
+bool vtkResampleToHyperTreeGrid::IntersectedVolume(const double bboxBounds[6], vtkCell3D* cell3D,
+  double vtkNotUsed(volumeUnit), double& volume, double* weights) const
+{
+  static constexpr double identity[9] = { 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 };
+  double boxBounds[6] = { bboxBounds[0], bboxBounds[1], bboxBounds[2], bboxBounds[3], bboxBounds[4],
+    bboxBounds[5] };
+  std::array<std::set<double>, 12> duplicates;
+  double boxVolume = 0.0;
+  double centroid[3] = { 0.0 };
+  double signedDistanceToCentroid = 0.0;
+  std::vector<double> facePoints(cell3D->GetNumberOfPoints() * 3);
+  double cellBounds[6];
+  cell3D->GetBounds(cellBounds);
+  vtkPoints* points = cell3D->Points;
+  volume = 0.0;
+  double p[3];
+  for (int i = 0; i < 4; ++i)
+  {
+    points->GetPoint(i, p);
+  }
+
+  double p12[6], normal[3], x1[3], x2[3], edgeNormal[3], edgeBoxBound1[3], edgeBoxBound2[3],
+    edgeNormalBoxBound1[3], edgeNormalBoxBound2[3], edgeNormalOnBox1[3], edgeNormalOnBox2[3];
+  int subId;
+  double dist2;
+  double TOL = 1e-2;
+
+  bool change;
+  do
+  {
+    change = false;
+    for (vtkIdType pointId = 0; pointId < cell3D->GetNumberOfPoints(); ++pointId)
+    {
+      points->GetPoint(pointId, p);
+      if (std::abs(p[0] - boxBounds[0]) < TOL && p[1] <= boxBounds[3] + TOL &&
+        p[1] >= boxBounds[2] - TOL && p[2] <= boxBounds[5] + TOL && p[2] >= boxBounds[4] - TOL)
+      {
+        boxBounds[0] -= TOL;
+        change = true;
+      }
+      if (std::abs(p[0] - boxBounds[1]) < TOL && p[1] <= boxBounds[3] + TOL &&
+        p[1] >= boxBounds[2] - TOL && p[2] <= boxBounds[5] + TOL && p[2] >= boxBounds[4] - TOL)
+      {
+        boxBounds[1] += TOL;
+        change = true;
+      }
+      if (std::abs(p[1] - boxBounds[2]) < TOL && p[0] <= boxBounds[1] + TOL &&
+        p[0] >= boxBounds[0] - TOL && p[2] <= boxBounds[5] + TOL && p[2] >= boxBounds[4] - TOL)
+      {
+        boxBounds[2] -= TOL;
+        change = true;
+      }
+      if (std::abs(p[1] - boxBounds[3]) < TOL && p[0] <= boxBounds[1] + TOL &&
+        p[0] >= boxBounds[0] - TOL && p[2] <= boxBounds[5] + TOL && p[2] >= boxBounds[4] - TOL)
+      {
+        boxBounds[3] += TOL;
+        change = true;
+      }
+      if (std::abs(p[2] - boxBounds[4]) < TOL && p[0] <= boxBounds[1] + TOL &&
+        p[0] >= boxBounds[0] - TOL && p[1] <= boxBounds[3] + TOL && p[1] >= boxBounds[2] - TOL)
+      {
+        boxBounds[4] -= TOL;
+        change = true;
+      }
+      if (std::abs(p[2] - boxBounds[5]) < TOL && p[0] <= boxBounds[1] + TOL &&
+        p[0] >= boxBounds[0] - TOL && p[1] <= boxBounds[3] + TOL && p[1] >= boxBounds[2] - TOL)
+      {
+        boxBounds[5] += TOL;
+        change = true;
+      }
+    }
+  } while (change);
+
+  for (std::size_t boxVertexId = 0; boxVertexId < 8; ++boxVertexId)
+  {
+    x1[0] = boxBounds[boxVertexId & 1];
+    x1[1] = boxBounds[2 + ((boxVertexId & 2) >> 1)];
+    x1[2] = boxBounds[4 + ((boxVertexId & 4) >> 2)];
+
+    if (cell3D->EvaluatePosition(x1, x2, subId, p12, dist2, weights))
+    {
+      bool sligthlyOutside = false;
+      for (vtkIdType vertexId = 0; vertexId < cell3D->GetNumberOfPoints(); ++vertexId)
+      {
+        points->GetPoint(vertexId, p);
+        if (weights[vertexId] < VTK_DBL_MIN)
+        {
+          sligthlyOutside = true;
+        }
+        else if (weights[vertexId] >= 1.0 - TOL)
+          if (0)
+          {
+            switch (boxVertexId)
+            {
+              case 0:
+                boxBounds[0] -= TOL;
+                boxBounds[2] -= TOL;
+                boxBounds[4] -= TOL;
+                break;
+              case 1:
+                boxBounds[1] += TOL;
+                boxBounds[2] -= TOL;
+                boxBounds[4] -= TOL;
+                break;
+              case 2:
+                boxBounds[1] += TOL;
+                boxBounds[3] += TOL;
+                boxBounds[4] -= TOL;
+                break;
+              case 3:
+                boxBounds[0] -= TOL;
+                boxBounds[3] += TOL;
+                boxBounds[4] -= TOL;
+                break;
+              case 4:
+                boxBounds[0] -= TOL;
+                boxBounds[2] -= TOL;
+                boxBounds[5] += TOL;
+                break;
+              case 5:
+                boxBounds[1] += TOL;
+                boxBounds[2] -= TOL;
+                boxBounds[5] += TOL;
+                break;
+              case 6:
+                boxBounds[1] += TOL;
+                boxBounds[3] += TOL;
+                boxBounds[5] += TOL;
+                break;
+              case 7:
+                boxBounds[0] -= TOL;
+                boxBounds[3] += TOL;
+                boxBounds[5] += TOL;
+                break;
+            }
+          }
+      }
+      if (!sligthlyOutside)
+      {
+        // Coefficient depending of the vertex of the box
+        // -6_____6
+        //  /|   /|
+        // 6/_|-6/ |
+        // |6|__|_|-6
+        // |/   |/
+        // /____/     x_ y/ z|
+        //-6   6
+        // !A != !B equivalent to A xor B
+        boxVolume += (!(boxVertexId & 1) != !(boxVertexId & 2) ? 6.0 : -6.0) *
+          ((boxVertexId & 4) ? -1.0 : 1.0) * x1[0] * x1[1] * x1[2];
+      }
+    }
+  }
+
+  for (vtkIdType vertexId = 0; vertexId < cell3D->GetNumberOfPoints(); ++vertexId)
+  {
+    points->GetPoint(vertexId, x1);
+    centroid[0] += x1[0];
+    centroid[1] += x1[1];
+    centroid[2] += x1[2];
+  }
+  centroid[0] /= cell3D->GetNumberOfPoints();
+  centroid[1] /= cell3D->GetNumberOfPoints();
+  centroid[2] /= cell3D->GetNumberOfPoints();
+  TOL = 1e-6;
+
+  for (vtkIdType faceId = 0; faceId < cell3D->GetNumberOfFaces(); ++faceId)
+  {
+    const vtkIdType* pts;
+    double *p1, *p2;
+    double t1, t2;
+    int plane1, plane2;
+    cell3D->GetFacePoints(faceId, pts);
+    vtkIdType faceSize = ~0;
+    while (pts[++faceSize] != -1)
+      ;
+    if (faceSize > 2)
+    {
+      vtkPolygon::ComputeNormal(cell3D->Points, faceSize, pts, normal);
+      points->GetPoint(pts[faceSize - 1], facePoints.data() + (faceSize - 1) * 3);
+      points->GetPoint(pts[0], facePoints.data());
+      points->GetPoint(pts[1], facePoints.data() + 3);
+      signedDistanceToCentroid +=
+        vtkMath::Dot(normal, centroid) - vtkMath::Dot(normal, facePoints.data());
+      for (vtkIdType idx1 = 0, idx2 = 1; idx1 < faceSize; ++idx1, idx2 = (idx2 + 1) % faceSize)
+      {
+        if (idx1 < faceSize - 3)
+        {
+          points->GetPoint(pts[idx1 + 2], facePoints.data() + (idx1 + 1) * 3);
+        }
+        p1 = facePoints.data() + idx1 * 3;
+        p2 = facePoints.data() + idx2 * 3;
+
+        if (!(vtkMathUtilities::NearlyEqual(p2[0], p1[0]) &&
+              vtkMathUtilities::NearlyEqual(p2[1], p1[1]) &&
+              vtkMathUtilities::NearlyEqual(p2[2], p1[2])))
+        {
+          double tangent[3] = { p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2] };
+          vtkMath::Normalize(tangent);
+          vtkMath::Cross(normal, tangent, edgeNormal);
+          bool p1InsideNode = p1[0] > boxBounds[0] &&
+            !vtkMathUtilities::NearlyEqual(p1[0], boxBounds[0]) && p1[0] < boxBounds[1] &&
+            !vtkMathUtilities::NearlyEqual(p1[0], boxBounds[1]) && p1[1] > boxBounds[2] &&
+            !vtkMathUtilities::NearlyEqual(p1[1], boxBounds[2]) && p1[1] < boxBounds[3] &&
+            !vtkMathUtilities::NearlyEqual(p1[1], boxBounds[3]) && p1[2] > boxBounds[4] &&
+            !vtkMathUtilities::NearlyEqual(p1[2], boxBounds[4]) && p1[2] < boxBounds[5] &&
+            !vtkMathUtilities::NearlyEqual(p1[2], boxBounds[5]),
+               p2InsideNode = p2[0] >= boxBounds[0] &&
+            !vtkMathUtilities::NearlyEqual(p2[0], boxBounds[0]) && p2[0] < boxBounds[1] &&
+            !vtkMathUtilities::NearlyEqual(p2[0], boxBounds[1]) && p2[1] > boxBounds[2] &&
+            !vtkMathUtilities::NearlyEqual(p2[1], boxBounds[2]) && p2[1] < boxBounds[3] &&
+            !vtkMathUtilities::NearlyEqual(p2[1], boxBounds[3]) && p2[2] > boxBounds[4] &&
+            !vtkMathUtilities::NearlyEqual(p2[2], boxBounds[4]) && p2[2] < boxBounds[5] &&
+            !vtkMathUtilities::NearlyEqual(p2[2], boxBounds[5]);
+          if (p1InsideNode)
+          {
+            boxVolume +=
+              vtkMath::Dot(p1, tangent) * vtkMath::Dot(p1, edgeNormal) * vtkMath::Dot(p1, normal);
+          }
+          if (p2InsideNode)
+          {
+            boxVolume -=
+              vtkMath::Dot(p2, tangent) * vtkMath::Dot(p2, edgeNormal) * vtkMath::Dot(p2, normal);
+          }
+          if ((!p1InsideNode || !p2InsideNode) &&
+            vtkBox::IntersectWithInfiniteLine(boxBounds, p1, p2, t1, t2, x1, x2, plane1, plane2) &&
+            !vtkMathUtilities::NearlyEqual(t1, t2))
+          {
+            if (t1 >= 0.0 && t1 + VTK_DBL_EPSILON <= 1.0)
+            {
+              vtkMath::Cross(identity + 3 * (plane1 / 2), normal, edgeBoxBound1);
+              vtkMath::Normalize(edgeBoxBound1);
+              vtkMath::Cross(normal, edgeBoxBound1, edgeNormalBoxBound1);
+              boxVolume +=
+                vtkMath::Dot(x1, tangent) * vtkMath::Dot(x1, edgeNormal) * vtkMath::Dot(x1, normal);
+              boxVolume -= vtkMath::Dot(x1, edgeBoxBound1) * vtkMath::Dot(x1, edgeNormalBoxBound1) *
+                vtkMath::Dot(x1, normal);
+              vtkMath::Cross(identity + 3 * (plane1 / 2), edgeBoxBound1, edgeNormalOnBox1);
+              volume += vtkMath::Dot(x1, edgeBoxBound1) * x1[plane1 / 2] *
+                vtkMath::Dot(x1, edgeNormalOnBox1);
+            }
+            if (t2 >= VTK_DBL_MIN && t2 <= 1.0)
+            {
+              vtkMath::Cross(identity + 3 * (plane2 / 2), normal, edgeBoxBound2);
+              vtkMath::Normalize(edgeBoxBound2);
+              vtkMath::Cross(normal, edgeBoxBound2, edgeNormalBoxBound2);
+              boxVolume -=
+                vtkMath::Dot(x2, tangent) * vtkMath::Dot(x2, edgeNormal) * vtkMath::Dot(x2, normal);
+              boxVolume += vtkMath::Dot(x2, edgeBoxBound2) * vtkMath::Dot(x2, edgeNormalBoxBound2) *
+                vtkMath::Dot(x2, normal);
+              vtkMath::Cross(identity + 3 * (plane2 / 2), edgeBoxBound2, edgeNormalOnBox2);
+              volume -= vtkMath::Dot(x2, edgeBoxBound2) * x2[plane2 / 2] *
+                vtkMath::Dot(x2, edgeNormalOnBox2);
+            }
+          }
+        }
+      }
+      double d = -vtkMath::Dot(normal, facePoints.data());
+      for (std::size_t dim = 0; dim < 3; ++dim)
+      {
+        vtkMath::Cross(normal, identity + (3 * (dim + 1)) % 9, edgeBoxBound1);
+        vtkMath::Normalize(edgeBoxBound1);
+        vtkMath::Cross(normal, identity + (3 * (dim + 2)) % 9, edgeBoxBound2);
+        vtkMath::Normalize(edgeBoxBound2);
+        vtkMath::Cross(edgeBoxBound1, normal, edgeNormalBoxBound1);
+        vtkMath::Cross(edgeBoxBound2, normal, edgeNormalBoxBound2);
+
+        // On edges orthogonal to dim (seen as a vertex when slicing a box with plane at constant
+        // dim.
+        //  ____
+        // |    |
+        // |    |
+        //>|____|
+        // ^
+        p12[(dim + 1) % 3] = boxBounds[(2 * (dim + 1)) % 6];
+        p12[(dim + 2) % 3] = boxBounds[(2 * (dim + 2)) % 6];
+        p12[dim] = std::abs(normal[dim]) >= VTK_DBL_EPSILON
+          ? -1.0 / normal[dim] * (d + p12[(dim + 1) % 3] * normal[(dim + 1) % 3] +
+                                   p12[(dim + 2) % 3] * normal[(dim + 2) % 3])
+          : std::numeric_limits<double>::infinity();
+        auto it = std::min_element(duplicates[dim * 4].begin(), duplicates[dim * 4].end(),
+          [&](double x, double y) { return std::fabs(x - p12[dim]) < std::fabs(y - p12[dim]); });
+        if ((it == duplicates[dim * 4].end() ||
+              (it != duplicates[dim * 4].end() && std::fabs(*it - p12[dim]) > TOL)) &&
+          ((p12[dim] >= boxBounds[2 * dim] && p12[dim] <= boxBounds[2 * dim + 1]) ||
+              (vtkMathUtilities::NearlyEqual(p12[dim], boxBounds[2 * dim]) &&
+                vtkMathUtilities::NearlyEqual(p12[dim], boxBounds[2 * dim + 1]))) &&
+          vtkPolygon::PointInPolygon(p12, faceSize, facePoints.data(), cellBounds, normal))
+        {
+          volume += (normal[dim] > 0.0 ? 1.0 : -1.0) * vtkMath::Dot(p12, edgeBoxBound1) *
+            vtkMath::Dot(p12, edgeNormalBoxBound1) * vtkMath::Dot(p12, normal);
+          vtkMath::Cross(edgeBoxBound1, identity + (3 * (dim + 1)) % 9, edgeNormalOnBox1);
+          volume -= (edgeBoxBound1[(dim + 2) % 3] > 0.0 ? 1.0 : -1.0) *
+            vtkMath::Dot(p12, edgeBoxBound1) * p12[(dim + 1) % 3] *
+            vtkMath::Dot(p12, edgeNormalOnBox1);
+          volume += (normal[dim] < 0.0 ? 1.0 : -1.0) * vtkMath::Dot(p12, edgeBoxBound2) *
+            vtkMath::Dot(p12, edgeNormalBoxBound2) * vtkMath::Dot(p12, normal);
+          vtkMath::Cross(edgeBoxBound2, identity + (3 * (dim + 2)) % 9, edgeNormalOnBox2);
+          volume -= (edgeBoxBound2[(dim + 1) % 3] > 0.0 ? 1.0 : -1.0) *
+            vtkMath::Dot(p12, edgeBoxBound2) * p12[(dim + 2) % 3] *
+            vtkMath::Dot(p12, edgeNormalOnBox2);
+          volume += (normal[dim] > 0.0 ? 2.0 : -2.0) * p12[0] * p12[1] * p12[2];
+        }
+        duplicates[dim * 4].emplace(p12[dim]);
+
+        //  ____
+        // |    |
+        // |    |
+        // |____|<
+        //      ^
+        p12[(dim + 1) % 3] = boxBounds[(2 * (dim + 1) + 1) % 6];
+        p12[dim] = std::abs(normal[dim]) >= VTK_DBL_EPSILON
+          ? -1.0 / normal[dim] * (d + p12[(dim + 1) % 3] * normal[(dim + 1) % 3] +
+                                   p12[(dim + 2) % 3] * normal[(dim + 2) % 3])
+          : std::numeric_limits<double>::infinity();
+        it = std::min_element(duplicates[dim * 4 + 1].begin(), duplicates[dim * 4 + 1].end(),
+          [&](double x, double y) { return std::fabs(x - p12[dim]) < std::fabs(y - p12[dim]); });
+        if ((it == duplicates[dim * 4 + 1].end() ||
+              (it != duplicates[dim * 4 + 1].end() && std::fabs(*it - p12[dim]) > TOL)) &&
+          ((p12[dim] >= boxBounds[2 * dim] && p12[dim] <= boxBounds[2 * dim + 1]) ||
+              (vtkMathUtilities::NearlyEqual(p12[dim], boxBounds[2 * dim]) &&
+                vtkMathUtilities::NearlyEqual(p12[dim], boxBounds[2 * dim + 1]))) &&
+          vtkPolygon::PointInPolygon(p12, faceSize, facePoints.data(), cellBounds, normal))
+        {
+          volume += (normal[dim] < 0.0 ? 1.0 : -1.0) * vtkMath::Dot(p12, edgeBoxBound1) *
+            vtkMath::Dot(p12, edgeNormalBoxBound1) * vtkMath::Dot(p12, normal);
+          vtkMath::Cross(edgeBoxBound1, identity + (3 * (dim + 1)) % 9, edgeNormalOnBox1);
+          volume += (edgeBoxBound1[(dim + 2) % 3] > 0.0 ? 1.0 : -1.0) *
+            vtkMath::Dot(p12, edgeBoxBound1) * p12[(dim + 1) % 3] *
+            vtkMath::Dot(p12, edgeNormalOnBox1);
+          volume += (normal[dim] > 0.0 ? 1.0 : -1.0) * vtkMath::Dot(p12, edgeBoxBound2) *
+            vtkMath::Dot(p12, edgeNormalBoxBound2) * vtkMath::Dot(p12, normal);
+          vtkMath::Cross(edgeBoxBound2, identity + (3 * (dim + 2)) % 9, edgeNormalOnBox2);
+          volume -= (edgeBoxBound2[(dim + 1) % 3] < 0.0 ? 1.0 : -1.0) *
+            vtkMath::Dot(p12, edgeBoxBound2) * p12[(dim + 2) % 3] *
+            vtkMath::Dot(p12, edgeNormalOnBox2);
+          volume -= (normal[dim] > 0.0 ? 2.0 : -2.0) * p12[0] * p12[1] * p12[2];
+        }
+        duplicates[dim * 4 + 1].emplace(p12[dim]);
+
+        //  ____v
+        // |    |<
+        // |    |
+        // |____|
+        //
+        p12[(dim + 2) % 3] = boxBounds[(2 * (dim + 2) + 1) % 6];
+        p12[dim] = std::abs(normal[dim]) >= VTK_DBL_EPSILON
+          ? -1.0 / normal[dim] * (d + p12[(dim + 1) % 3] * normal[(dim + 1) % 3] +
+                                   p12[(dim + 2) % 3] * normal[(dim + 2) % 3])
+          : std::numeric_limits<double>::infinity();
+        it = std::min_element(duplicates[dim * 4 + 2].begin(), duplicates[dim * 4 + 2].end(),
+          [&](double x, double y) { return std::fabs(x - p12[dim]) < std::fabs(y - p12[dim]); });
+        if ((it == duplicates[dim * 4 + 2].end() ||
+              (it != duplicates[dim * 4 + 2].end() && std::fabs(*it - p12[dim]) > TOL)) &&
+          ((p12[dim] >= boxBounds[2 * dim] && p12[dim] <= boxBounds[2 * dim + 1]) ||
+              (vtkMathUtilities::NearlyEqual(p12[dim], boxBounds[2 * dim]) &&
+                vtkMathUtilities::NearlyEqual(p12[dim], boxBounds[2 * dim + 1]))) &&
+          vtkPolygon::PointInPolygon(p12, faceSize, facePoints.data(), cellBounds, normal))
+        {
+          volume += (normal[dim] > 0.0 ? 1.0 : -1.0) * vtkMath::Dot(p12, edgeBoxBound1) *
+            vtkMath::Dot(p12, edgeNormalBoxBound1) * vtkMath::Dot(p12, normal);
+          vtkMath::Cross(edgeBoxBound1, identity + (3 * (dim + 1)) % 9, edgeNormalOnBox1);
+          volume += (edgeBoxBound1[(dim + 2) % 3] < 0.0 ? 1.0 : -1.0) *
+            vtkMath::Dot(p12, edgeBoxBound1) * p12[(dim + 1) % 3] *
+            vtkMath::Dot(p12, edgeNormalOnBox1);
+          volume += (normal[dim] < 0.0 ? 1.0 : -1.0) * vtkMath::Dot(p12, edgeBoxBound2) *
+            vtkMath::Dot(p12, edgeNormalBoxBound2) * vtkMath::Dot(p12, normal);
+          vtkMath::Cross(edgeBoxBound2, identity + (3 * (dim + 2)) % 9, edgeNormalOnBox2);
+          volume += (edgeBoxBound2[(dim + 1) % 3] < 0.0 ? 1.0 : -1.0) *
+            vtkMath::Dot(p12, edgeBoxBound2) * p12[(dim + 2) % 3] *
+            vtkMath::Dot(p12, edgeNormalOnBox2);
+          volume += (normal[dim] > 0.0 ? 2.0 : -2.0) * p12[0] * p12[1] * p12[2];
+        }
+        duplicates[dim * 4 + 2].emplace(p12[dim]);
+
+        // v____
+        //>|    |
+        // |    |
+        // |____|
+        //
+        p12[(dim + 1) % 3] = boxBounds[(2 * (dim + 1)) % 6];
+        p12[dim] = std::abs(normal[dim]) >= VTK_DBL_EPSILON
+          ? -1.0 / normal[dim] * (d + p12[(dim + 1) % 3] * normal[(dim + 1) % 3] +
+                                   p12[(dim + 2) % 3] * normal[(dim + 2) % 3])
+          : std::numeric_limits<double>::infinity();
+        it = std::min_element(duplicates[dim * 4 + 3].begin(), duplicates[dim * 4 + 3].end(),
+          [&](double x, double y) { return std::fabs(x - p12[dim]) < std::fabs(y - p12[dim]); });
+        if ((it == duplicates[dim * 4 + 3].end() ||
+              (it != duplicates[dim * 4 + 3].end() && std::fabs(*it - p12[dim]) > TOL)) &&
+          ((p12[dim] >= boxBounds[2 * dim] && p12[dim] <= boxBounds[2 * dim + 1]) ||
+              (vtkMathUtilities::NearlyEqual(p12[dim], boxBounds[2 * dim]) &&
+                vtkMathUtilities::NearlyEqual(p12[dim], boxBounds[2 * dim + 1]))) &&
+          vtkPolygon::PointInPolygon(p12, faceSize, facePoints.data(), cellBounds, normal))
+        {
+          volume += (normal[dim] < 0.0 ? 1.0 : -1.0) * vtkMath::Dot(p12, edgeBoxBound1) *
+            vtkMath::Dot(p12, edgeNormalBoxBound1) * vtkMath::Dot(p12, normal);
+          vtkMath::Cross(edgeBoxBound1, identity + (3 * (dim + 1)) % 9, edgeNormalOnBox1);
+          volume -= (edgeBoxBound1[(dim + 2) % 3] < 0.0 ? 1.0 : -1.0) *
+            vtkMath::Dot(p12, edgeBoxBound1) * p12[(dim + 1) % 3] *
+            vtkMath::Dot(p12, edgeNormalOnBox1);
+          volume += (normal[dim] > 0.0 ? 1.0 : -1.0) * vtkMath::Dot(p12, edgeBoxBound2) *
+            vtkMath::Dot(p12, edgeNormalBoxBound2) * vtkMath::Dot(p12, normal);
+          vtkMath::Cross(edgeBoxBound2, identity + (3 * (dim + 2)) % 9, edgeNormalOnBox2);
+          volume += (edgeBoxBound2[(dim + 1) % 3] > 0.0 ? 1.0 : -1.0) *
+            vtkMath::Dot(p12, edgeBoxBound2) * p12[(dim + 2) % 3] *
+            vtkMath::Dot(p12, edgeNormalOnBox2);
+          volume -= (normal[dim] > 0.0 ? 2.0 : -2.0) * p12[0] * p12[1] * p12[2];
+        }
+        duplicates[dim * 4 + 3].emplace(p12[dim]);
+      }
+    }
+  }
+  if (cell3D->IsInsideOut())
+  {
+    volume = -volume;
+  }
+  volume += boxVolume;
+  volume /= 6.0;
+  if (std::abs(volume) >
+    (boxBounds[1] - boxBounds[0]) * (boxBounds[3] - boxBounds[2]) * (boxBounds[5] - boxBounds[4]))
+  {
+    vtkWarningMacro(<< "Something wrong in the computation the intersected volume between a node "
+                       "and a cell, returning 0");
+    volume = 0.0;
+    return false;
+  }
+  return volume >= VTK_DBL_EPSILON;
 }
 
 //----------------------------------------------------------------------------
@@ -428,9 +887,171 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
       }
     }
   }
+  else if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
+  {
+    // We allocate weights which are needed to compute the distance between a point and a cell.
+    vtkIdType maxNumberOfPoints = 0;
+    for (vtkIdType cellId = 0; cellId < dataSet->GetNumberOfCells(); ++cellId)
+    {
+      vtkCell* cell = dataSet->GetCell(cellId);
+      maxNumberOfPoints = maxNumberOfPoints > cell->GetNumberOfPoints() ? maxNumberOfPoints
+                                                                        : cell->GetNumberOfPoints();
+    }
+
+    // We allocate those variables to avoid unnecessary allocation inside the recursive function.
+    // Those are used to check the distance between a point and the cell.
+    double* weights = new double[maxNumberOfPoints];
+
+    double volumeUnit = 1.0;
+    for (vtkIdType cellId = 0; cellId < dataSet->GetNumberOfCells(); ++cellId)
+    {
+      vtkCell* cell = dataSet->GetCell(cellId);
+      double* cellBounds = cell->GetBounds();
+      std::size_t depth = static_cast<std::size_t>(~0);
+      vtkIdType imin, imax, jmin, jmax, kmin, kmax;
+      do
+      {
+        ++depth;
+        imin = static_cast<vtkIdType>((cellBounds[0] - bounds[0]) * this->ResolutionPerTree[depth] *
+          this->CellDims[0] / (bounds[1] - bounds[0]));
+        imax =
+          static_cast<vtkIdType>(((cellBounds[1] - bounds[0]) * this->ResolutionPerTree[depth] *
+                                   this->CellDims[0] / (bounds[1] - bounds[0])) *
+            (1.0 - VTK_DBL_EPSILON));
+        jmin = static_cast<vtkIdType>((cellBounds[2] - bounds[2]) * this->ResolutionPerTree[depth] *
+          this->CellDims[1] / (bounds[3] - bounds[2]));
+        jmax =
+          static_cast<vtkIdType>(((cellBounds[3] - bounds[2]) * this->ResolutionPerTree[depth] *
+                                   this->CellDims[1] / (bounds[3] - bounds[2])) *
+            (1.0 - VTK_DBL_EPSILON));
+        kmin = static_cast<vtkIdType>((cellBounds[4] - bounds[4]) * this->ResolutionPerTree[depth] *
+          this->CellDims[2] / (bounds[5] - bounds[4]));
+        kmax =
+          static_cast<vtkIdType>(((cellBounds[5] - bounds[4]) * this->ResolutionPerTree[depth] *
+                                   this->CellDims[2] / (bounds[5] - bounds[4])) *
+            (1.0 - VTK_DBL_EPSILON));
+      } while ((imin == imax || jmin == jmax || kmin == kmax) && depth != this->MaxDepth);
+
+      vtkIdType igridmin = imin / this->ResolutionPerTree[depth],
+                igridmax = imax / this->ResolutionPerTree[depth],
+                jgridmin = jmin / this->ResolutionPerTree[depth],
+                jgridmax = jmax / this->ResolutionPerTree[depth],
+                kgridmin = kmin / this->ResolutionPerTree[depth],
+                kgridmax = kmax / this->ResolutionPerTree[depth];
+
+      for (vtkIdType igrid = igridmin; igrid <= igridmax; ++igrid)
+      {
+        for (vtkIdType jgrid = jgridmin; jgrid <= jgridmax; ++jgrid)
+        {
+          for (vtkIdType kgrid = kgridmin; kgrid <= kgridmax; ++kgrid)
+          {
+            auto& grid =
+              this->GridOfMultiResolutionGrids[this->GridCoordinatesToIndex(igrid, jgrid, kgrid)]
+                                              [depth];
+
+            for (vtkIdType ii = (igrid == igridmin ? imin % this->ResolutionPerTree[depth] : 0);
+                 ii <= (igrid == igridmax ? imax % this->ResolutionPerTree[depth]
+                                          : this->ResolutionPerTree[depth] - 1);
+                 ++ii)
+            {
+              for (vtkIdType jj = (jgrid == jgridmin ? jmin % this->ResolutionPerTree[depth] : 0);
+                   jj <= (jgrid == jgridmax ? jmax % this->ResolutionPerTree[depth]
+                                            : this->ResolutionPerTree[depth] - 1);
+                   ++jj)
+              {
+                for (vtkIdType kk = (kgrid == kgridmin ? kmin % this->ResolutionPerTree[depth] : 0);
+                     kk <= (kgrid == kgridmax ? kmax % this->ResolutionPerTree[depth]
+                                              : this->ResolutionPerTree[depth] - 1);
+                     ++kk)
+                {
+                  vtkIdType ires = ii + igrid * this->ResolutionPerTree[depth];
+                  vtkIdType jres = jj + jgrid * this->ResolutionPerTree[depth];
+                  vtkIdType kres = kk + kgrid * this->ResolutionPerTree[depth];
+
+                  double boxBounds[6] = { bounds[0] +
+                      (0.0 + ires) / (this->CellDims[0] * this->ResolutionPerTree[depth]) *
+                        (bounds[1] - bounds[0]),
+                    bounds[0] +
+                      (1.0 + ires) / (this->CellDims[0] * this->ResolutionPerTree[depth]) *
+                        (bounds[1] - bounds[0]),
+                    bounds[2] +
+                      (0.0 + jres) / (this->CellDims[1] * this->ResolutionPerTree[depth]) *
+                        (bounds[3] - bounds[2]),
+                    bounds[2] +
+                      (1.0 + jres) / (this->CellDims[1] * this->ResolutionPerTree[depth]) *
+                        (bounds[3] - bounds[2]),
+                    bounds[4] +
+                      (0.0 + kres) / (this->CellDims[2] * this->ResolutionPerTree[depth]) *
+                        (bounds[5] - bounds[4]),
+                    bounds[4] +
+                      (1.0 + kres) / (this->CellDims[2] * this->ResolutionPerTree[depth]) *
+                        (bounds[5] - bounds[4]) };
+
+                  double volume = 0.0;
+                  bool nonZeroVolume = false;
+
+                  vtkCell3D* cell3D = vtkCell3D::SafeDownCast(cell);
+                  vtkVoxel* voxel = vtkVoxel::SafeDownCast(cell);
+
+                  if (voxel)
+                  {
+                    nonZeroVolume = this->IntersectedVolume(boxBounds, voxel, volumeUnit, volume);
+                  }
+                  else if (cell3D)
+                  {
+                    nonZeroVolume =
+                      this->IntersectedVolume(boxBounds, cell3D, volumeUnit, volume, weights);
+                  }
+                  else
+                  {
+                    vtkErrorMacro(<< "cell type " << cell->GetClassName() << " not supported");
+                  }
+
+                  if (nonZeroVolume)
+                  {
+                    vtkIdType gridIdx = this->MultiResGridCoordinatesToIndex(ii, jj, kk, depth);
+                    auto it = grid.find(gridIdx);
+                    if (it == grid.end())
+                    {
+                      GridElement& element = grid[gridIdx];
+                      element.NumberOfLeavesInSubtree = 1;
+                      element.NumberOfPointsInSubtree = 1;
+                      element.UnmaskedChildrenHaveNoMaskedLeaves = true;
+                      element.AccumulatedWeight = volume;
+                      element.Accumulators.resize(this->Accumulators.size());
+                      for (std::size_t l = 0; l < this->Accumulators.size(); ++l)
+                      {
+                        element.Accumulators[l] = this->Accumulators[l]->NewInstance();
+                        element.Accumulators[l]->DeepCopy(this->Accumulators[l]);
+                        element.Accumulators[l]->Add(
+                          data->GetTuple(cellId), data->GetNumberOfComponents(), volume);
+                      }
+                    }
+                    // if not, then the grid location is already created, just need to add the
+                    // element into it
+                    else
+                    {
+                      for (auto& accumulator : it->second.Accumulators)
+                      {
+                        accumulator->Add(
+                          data->GetTuple(cellId), data->GetNumberOfComponents(), volume);
+                      }
+                      ++(it->second.NumberOfPointsInSubtree);
+                      it->second.AccumulatedWeight += volume;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    delete[] weights;
+  }
   else
   {
-    vtkWarningMacro(<< "Unknown field association. Supported are points");
+    vtkWarningMacro(<< "Unknown field association. Supported are points and cells");
   }
 
   // Now, we fill the multi-resolution grid bottom-up
@@ -534,7 +1155,8 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
     }
   }
 
-  if (this->NoEmptyCells && fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+  if (this->NoEmptyCells ||
+    (this->Extrapolate && fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS))
   {
     // We allocate weights which are needed to compute the distance between a point and a cell.
     vtkIdType maxNumberOfPoints = 0;
@@ -585,8 +1207,9 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
         {
           for (vtkIdType k = kmin; k <= kmax; ++k)
           {
-            this->RecursivelyFillGaps(
-              cell, bounds, cellBounds, i, j, k, x, closestPoint, pcoords, weights);
+            this->RecursivelyFillGaps(cell, bounds, cellBounds, i, j, k, x, closestPoint, pcoords,
+              weights,
+              this->Extrapolate && fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS);
           }
         }
       }
@@ -598,8 +1221,8 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
 //----------------------------------------------------------------------------
 bool vtkResampleToHyperTreeGrid::RecursivelyFillGaps(vtkCell* cell, const double bounds[6],
   const double cellBounds[6], vtkIdType i, vtkIdType j, vtkIdType k, double x[3],
-  double closestPoint[3], double pcoords[3], double* weights, vtkIdType ii, vtkIdType jj,
-  vtkIdType kk, std::size_t depth)
+  double closestPoint[3], double pcoords[3], double* weights, bool markEmpty, vtkIdType ii,
+  vtkIdType jj, vtkIdType kk, std::size_t depth)
 {
   assert(depth <= this->MaxDepth && "Too deep");
 
@@ -626,9 +1249,14 @@ bool vtkResampleToHyperTreeGrid::RecursivelyFillGaps(vtkCell* cell, const double
         (this->CellDims[2] * this->ResolutionPerTree[depth]) * (bounds[5] - bounds[4]);
 
     int inside = cell->EvaluatePosition(x, closestPoint, subId, pcoords, dist2, weights);
-
+    bool result = inside != 0;
+    if (markEmpty && result)
+    {
+      // There is geometry, we create empty element at index idx
+      this->GridOfMultiResolutionGrids[multiResGridIdx][depth][idx];
+    }
     // We tell the parent if its empty child has geometry in it.
-    return inside == -1 || 4 * dist2 >= this->Diagonal[depth];
+    return result;
   }
 
   // No need to continue if we are deep enough or if we already cannot subdivide / have full
@@ -672,15 +1300,139 @@ bool vtkResampleToHyperTreeGrid::RecursivelyFillGaps(vtkCell* cell, const double
         if (xmin <= cellBounds[1] && xmax >= cellBounds[0] && ymin <= cellBounds[3] &&
           ymax >= cellBounds[2] && zmin <= cellBounds[5] && zmax >= cellBounds[4])
         {
-          // We ask this child if it is ok to subdivide.
-          it->second.CanSubdivide &= this->RecursivelyFillGaps(cell, bounds, cellBounds, i, j, k, x,
-            closestPoint, pcoords, weights, ii * this->BranchFactor + iii,
-            jj * this->BranchFactor + jjj, kk * this->BranchFactor + kkk, depth + 1);
+          if (markEmpty)
+          {
+            this->RecursivelyFillGaps(cell, bounds, cellBounds, i, j, k, x, closestPoint, pcoords,
+              weights, markEmpty, ii * this->BranchFactor + iii, jj * this->BranchFactor + jjj,
+              kk * this->BranchFactor + kkk, depth + 1);
+          }
+          else
+          {
+            // We ask this child if it is ok to subdivide.
+            it->second.CanSubdivide &= this->RecursivelyFillGaps(cell, bounds, cellBounds, i, j, k,
+              x, closestPoint, pcoords, weights, markEmpty, ii * this->BranchFactor + iii,
+              jj * this->BranchFactor + jjj, kk * this->BranchFactor + kkk, depth + 1);
+          }
         }
       }
     }
   }
   return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkResampleToHyperTreeGrid::ExtrapolateValuesOnGaps(vtkHyperTreeGrid* htg)
+{
+  vtkHyperTreeGrid::vtkHyperTreeGridIterator it;
+  htg->InitializeTreeIterator(it);
+  vtkIdType treeId;
+  PriorityQueue pq, pqtmp;
+  while (it.GetNextTree(treeId))
+  {
+    vtkNew<vtkHyperTreeGridNonOrientedVonNeumannSuperCursor> superCursor;
+    superCursor->Initialize(htg, treeId);
+    this->RecursivelyFillPriorityQueue(superCursor, pq);
+  }
+  std::vector<PriorityQueueElement> buf;
+  while (pq.size())
+  {
+    const PriorityQueueElement& qe = pq.top();
+    vtkIdType id = qe.Id, key = qe.Key;
+    double mean = qe.Mean, displayMean = qe.DisplayMean;
+    vtkIdType invalidNeighbors = 0;
+    for (std::size_t i = 0; i < qe.InvalidNeighborIds.size(); ++i)
+    {
+      double value = this->ScalarField->GetValue(qe.InvalidNeighborIds[i]);
+      if (value == value)
+      {
+        mean += value;
+        if (this->DisplayScalarField)
+        {
+          displayMean += this->DisplayScalarField->GetValue(qe.InvalidNeighborIds[i]);
+        }
+      }
+      else
+      {
+        ++invalidNeighbors;
+      }
+    }
+    buf.emplace_back(PriorityQueueElement(
+      qe.Key + static_cast<vtkIdType>(qe.InvalidNeighborIds.size()) - invalidNeighbors, id, mean,
+      displayMean));
+    pq.pop();
+    if (!pq.size() || pq.top().Key != key)
+    {
+      for (const PriorityQueueElement& element : buf)
+      {
+        this->ScalarField->SetValue(element.Id, element.Mean / element.Key);
+        if (this->DisplayScalarField)
+        {
+          this->DisplayScalarField->SetValue(element.Id, element.DisplayMean / element.Key);
+        }
+      }
+      buf.clear();
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkResampleToHyperTreeGrid::RecursivelyFillPriorityQueue(
+  vtkHyperTreeGridNonOrientedVonNeumannSuperCursor* superCursor, PriorityQueue& pq)
+{
+  vtkIdType superCursorId = superCursor->GetGlobalNodeIndex();
+  double value = this->ScalarField->GetValue(superCursorId);
+  if (value != value)
+  {
+    PriorityQueueElement qe;
+    vtkIdType numberOfCursors = superCursor->GetNumberOfCursors();
+    vtkIdType validNeighbors = 0;
+    for (vtkIdType iCursor = 0; iCursor < numberOfCursors; ++iCursor)
+    {
+      vtkIdType id = superCursor->GetGlobalNodeIndex(iCursor);
+
+      if (id != vtkHyperTreeGrid::InvalidIndex && !superCursor->IsMasked(iCursor))
+      {
+        value = this->ScalarField->GetValue(id);
+        if (value != value)
+        {
+          qe.InvalidNeighborIds.push_back(id);
+        }
+        else
+        {
+          ++validNeighbors;
+          qe.Mean += value;
+          if (this->DisplayScalarField)
+          {
+            qe.DisplayMean += this->DisplayScalarField->GetValue(id);
+          }
+        }
+      }
+    }
+    if (!qe.InvalidNeighborIds.size())
+    {
+      this->ScalarField->SetValue(superCursorId, qe.Mean / validNeighbors);
+      if (this->DisplayScalarField)
+      {
+        this->ScalarField->SetValue(superCursorId, validNeighbors);
+      }
+    }
+    else
+    {
+      qe.Id = superCursorId;
+      qe.Key = validNeighbors;
+      pq.emplace(std::move(qe));
+    }
+  }
+  else if (!superCursor->IsLeaf())
+  {
+    vtkIdType numberOfChildren = superCursor->GetNumberOfChildren();
+    for (vtkIdType ichild = 0; ichild < numberOfChildren; ++ichild)
+    {
+      superCursor->ToChild(ichild);
+      this->RecursivelyFillPriorityQueue(superCursor, pq);
+      superCursor->ToParent();
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -731,36 +1483,44 @@ void vtkResampleToHyperTreeGrid::SubdivideLeaves(vtkHyperTreeGridNonOrientedCurs
 
   if (it != multiResolutionGrid[level].end())
   {
-    // If we use this->ArrayMeasurementDisplay, we need to put the right accumulators
-    // in the right place and then measure
-    if (this->ArrayMeasurementDisplay)
+    if (it->second.Accumulators.size())
     {
-      for (std::size_t l = 0; l < this->ArrayMeasurementAccumulators.size(); ++l)
+      // If we use this->ArrayMeasurementDisplay, we need to put the right accumulators
+      // in the right place and then measure
+      if (this->ArrayMeasurementDisplay)
       {
-        this->ArrayMeasurementAccumulators[l] = it->second.Accumulators[l];
-      }
-      if (this->ArrayMeasurement)
-      {
-        this->ArrayMeasurement->Measure(this->ArrayMeasurementAccumulators.data(),
-          it->second.NumberOfPointsInSubtree, it->second.AccumulatedWeight, value);
-      }
+        for (std::size_t l = 0; l < this->ArrayMeasurementAccumulators.size(); ++l)
+        {
+          this->ArrayMeasurementAccumulators[l] = it->second.Accumulators[l];
+        }
+        if (this->ArrayMeasurement)
+        {
+          this->ArrayMeasurement->Measure(this->ArrayMeasurementAccumulators.data(),
+            it->second.NumberOfPointsInSubtree, it->second.AccumulatedWeight, value);
+        }
 
-      for (std::size_t l = 0; l < this->ArrayMeasurementDisplayAccumulators.size(); ++l)
-      {
-        this->ArrayMeasurementDisplayAccumulators[l] =
-          it->second.Accumulators[this->ArrayMeasurementDisplayAccumulatorMap[l]];
+        for (std::size_t l = 0; l < this->ArrayMeasurementDisplayAccumulators.size(); ++l)
+        {
+          this->ArrayMeasurementDisplayAccumulators[l] =
+            it->second.Accumulators[this->ArrayMeasurementDisplayAccumulatorMap[l]];
+        }
+        this->ArrayMeasurementDisplay->Measure(this->ArrayMeasurementDisplayAccumulators.data(),
+          it->second.NumberOfPointsInSubtree, it->second.AccumulatedWeight, valueDisplay);
       }
-      this->ArrayMeasurementDisplay->Measure(this->ArrayMeasurementDisplayAccumulators.data(),
-        it->second.NumberOfPointsInSubtree, it->second.AccumulatedWeight, valueDisplay);
+      // Else, we just measure
+      else
+      {
+        if (this->ArrayMeasurement)
+        {
+          this->ArrayMeasurement->Measure(it->second.Accumulators.data(),
+            it->second.NumberOfPointsInSubtree, it->second.AccumulatedWeight, value);
+        }
+      }
     }
-    // Else, we just measure
     else
     {
-      if (this->ArrayMeasurement)
-      {
-        this->ArrayMeasurement->Measure(it->second.Accumulators.data(),
-          it->second.NumberOfPointsInSubtree, it->second.AccumulatedWeight, value);
-      }
+      value = std::numeric_limits<double>::quiet_NaN();
+      valueDisplay = std::numeric_limits<double>::quiet_NaN();
     }
   }
 
@@ -783,7 +1543,7 @@ void vtkResampleToHyperTreeGrid::SubdivideLeaves(vtkHyperTreeGridNonOrientedCurs
     // If we match the criterion, we subdivide
     // Also: if the subtrees have only one element, it is useless to subdivide, we already are at
     // the finest possible resolution given input data
-    if (level <= this->MaxDepth && it != multiResolutionGrid[level].end() &&
+    if (level <= this->MaxDepth && it != multiResolutionGrid[level].end() && value == value &&
       it->second.NumberOfLeavesInSubtree > 1 && it->second.CanSubdivide &&
       (!this->ArrayMeasurement || (this->InRange && value > this->Min && value < this->Max) ||
           (!this->InRange && !(value > this->Min && value < this->Max))))

@@ -16,7 +16,7 @@
 #include "vtkEntropyArrayMeasurement.h"
 
 #include "vtkBinsAccumulator.h"
-#include "vtkFunctionOfXList.h"
+#include "vtkFunctor.h"
 #include "vtkObjectFactory.h"
 
 #include <cassert>
@@ -41,7 +41,8 @@ bool vtkEntropyArrayMeasurement::Measure(vtkAbstractAccumulator** accumulators,
   }
   assert(accumulators && "input accumulator is not allocated");
 
-  vtkBinsAccumulator* binsAccumulator = vtkBinsAccumulator::SafeDownCast(accumulators[0]);
+  vtkBinsAccumulator<vtkEntropyFunctor>* binsAccumulator =
+    vtkBinsAccumulator<vtkEntropyFunctor>::SafeDownCast(accumulators[0]);
 
   assert(binsAccumulator && "input accumulator is of wrong type");
 
@@ -53,17 +54,15 @@ bool vtkEntropyArrayMeasurement::Measure(vtkAbstractAccumulator** accumulators,
 //----------------------------------------------------------------------------
 std::vector<vtkAbstractAccumulator*> vtkEntropyArrayMeasurement::NewAccumulators()
 {
-  vtkBinsAccumulator* acc = vtkBinsAccumulator::New();
-  acc->SetFunctionOfW(vtkValueComaNameMacro(VTK_FUNC_NXLOGX));
-  std::vector<vtkAbstractAccumulator*> accumulators{ acc };
-  return accumulators;
+  return { vtkBinsAccumulator<vtkEntropyFunctor>::New() };
 }
 
 //----------------------------------------------------------------------------
 double vtkEntropyArrayMeasurement::GetDiscretizationStep() const
 {
   assert(this->Accumulators.size() && "No accumulator in vtkEntropyArrayMeasurement");
-  vtkBinsAccumulator* binsAccumulator = vtkBinsAccumulator::SafeDownCast(this->Accumulators[0]);
+  vtkBinsAccumulator<vtkEntropyFunctor>* binsAccumulator =
+    vtkBinsAccumulator<vtkEntropyFunctor>::SafeDownCast(this->Accumulators[0]);
   if (binsAccumulator)
   {
     return binsAccumulator->GetDiscretizationStep();
@@ -80,7 +79,8 @@ double vtkEntropyArrayMeasurement::GetDiscretizationStep() const
 void vtkEntropyArrayMeasurement::SetDiscretizationStep(double discretizationStep)
 {
   assert(this->Accumulators.size() && "No accumulator in vtkEntropyArrayMeasurement");
-  vtkBinsAccumulator* binsAccumulator = vtkBinsAccumulator::SafeDownCast(this->Accumulators[0]);
+  vtkBinsAccumulator<vtkEntropyFunctor>* binsAccumulator =
+    vtkBinsAccumulator<vtkEntropyFunctor>::SafeDownCast(this->Accumulators[0]);
   if (binsAccumulator)
   {
     binsAccumulator->SetDiscretizationStep(discretizationStep);

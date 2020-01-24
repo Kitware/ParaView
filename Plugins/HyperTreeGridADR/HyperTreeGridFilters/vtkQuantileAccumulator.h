@@ -86,24 +86,24 @@ public:
   /**
    * Methods for adding data to the accumulator.
    */
-  virtual void Add(vtkAbstractAccumulator* accumulator) override;
-  virtual void Add(double value, double weight = 1.0) override;
+  void Add(vtkAbstractAccumulator* accumulator) override;
+  void Add(double value, double weight = 1.0) override;
   //@}
 
   /**
    * Set object into initial state
    */
-  virtual void Initialize() override;
+  void Initialize() override;
 
   /**
    * ShallowCopy implementation, both object then share the same SortedList.
    */
-  virtual void ShallowCopy(vtkDataObject* accumulator) override;
+  void ShallowCopy(vtkDataObject* accumulator) override;
 
   /**
    * DeepCopy implementation.
    */
-  virtual void DeepCopy(vtkDataObject* accumulator) override;
+  void DeepCopy(vtkDataObject* accumulator) override;
 
   /**
    * Getter of internally stored sorted list of values and weights
@@ -113,12 +113,12 @@ public:
   /**
    * Returns true if the parameters of accumulator is the same as the ones of this
    */
-  virtual bool HasSameParameters(vtkAbstractAccumulator* accumulator) const override;
+  bool HasSameParameters(vtkAbstractAccumulator* accumulator) const override;
 
   /**
    *
    */
-  virtual double GetValue() const override;
+  double GetValue() const override;
 
   //@{
   /**
@@ -148,7 +148,7 @@ protected:
    * Default constructor and destructor.
    */
   vtkQuantileAccumulator();
-  virtual ~vtkQuantileAccumulator() override = default;
+  ~vtkQuantileAccumulator() override = default;
 
   /**
    * Index of the targetted value.

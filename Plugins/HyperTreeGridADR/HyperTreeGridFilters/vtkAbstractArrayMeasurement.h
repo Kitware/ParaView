@@ -118,7 +118,6 @@ public:
    */
   virtual void Add(vtkAbstractArrayMeasurement* arrayMeasurement);
 
-  //@{
   /**
    * Notifies if the accumulated data is suitable for measuring.
    * The second implementation aims to be able to dynamically tell whether accumulated data is fit
@@ -134,7 +133,6 @@ public:
   virtual bool CanMeasure(vtkIdType numberOfAccumulatedData, double totalWeight) const = 0;
   //@}
 
-  //@{
   /**
    * Measures the accumulated data with the corresponding method.
    * The second implementation aims to be able to dynamically measure accumulated data with outer
@@ -171,7 +169,7 @@ public:
   /**
    * Set object into initial state.
    */
-  virtual void Initialize() override;
+  void Initialize() override;
 
   /**
    * Accessor for the number of values already fed for the measurement
