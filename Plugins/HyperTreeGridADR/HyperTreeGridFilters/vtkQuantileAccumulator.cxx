@@ -86,7 +86,6 @@ void vtkQuantileAccumulator::Add(vtkAbstractAccumulator* accumulator)
   }
   else
   {
-    this->SortedList->begin();
     if (quantileAccumulator->SortedList->size())
     {
       this->TotalWeight = quantileAccumulator->TotalWeight;
