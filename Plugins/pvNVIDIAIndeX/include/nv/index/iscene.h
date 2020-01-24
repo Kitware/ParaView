@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for a scene
@@ -16,6 +16,7 @@
 #include <nv/index/idistributed_data_import_callback.h>
 #include <nv/index/iheight_field_scene_element.h>
 #include <nv/index/iirregular_volume_scene_element.h>
+#include <nv/index/iparticle_volume_scene_element.h>
 #include <nv/index/ipipe_set.h>
 #include <nv/index/iregular_heightfield.h>
 #include <nv/index/iregular_volume.h>
@@ -28,7 +29,6 @@ namespace nv
 {
 namespace index
 {
-/// @ingroup nv_index_scene_description
 
 /// The abstract interface class representing the entire scene. The scene is
 /// also the root node of the scene description and therefore implements the
@@ -42,6 +42,8 @@ namespace index
 /// of datasets. A scene defines a <em>global region of interest</em>
 /// which is the bounding box that can be used to confine rendering to a subset
 /// of the entire world space.
+///
+/// \ingroup nv_index_scene_description
 ///
 class IScene :
     public mi::base::Interface_declare<0xaab98430,0xd6c5,0x49c5,0xbf,0x06,0x12,0xae,0xe5,0x17,0x71,0x8c,
@@ -223,11 +225,27 @@ public:
     /// \param[in] importer_callback            Distributed data import callback function.
     /// \param[in] dice_transaction             The DiCE transaction.
     ///
-    /// \return                                 The new \c ISparse_volume_scene_element instance.
+    /// \return                                 The new \c ICorner_point_grid instance.
     ///
     virtual ICorner_point_grid* create_corner_point_grid(
         const mi::math::Vector_struct<mi::Uint32, 3>&           grid_dims,
         const mi::math::Bbox_struct<mi::Float32, 3>&            bbox,
+        const mi::math::Matrix_struct<mi::Float32, 4, 4>&       transform_matrix,
+        nv::index::IDistributed_data_import_callback*           importer_callback,
+        mi::neuraylib::IDice_transaction*                       dice_transaction) const = 0;
+
+    /// Creates a new particle volume scene element from the given import configuration, but does not yet
+    /// add it to the scene description.
+    ///
+    /// \param[in] ijk_bbox                     The local space bounding box.
+    /// \param[in] transform_matrix             Transformation matrix from IJK (local) to XYZ (global) space.
+    /// \param[in] importer_callback            Distributed data import callback function.
+    /// \param[in] dice_transaction             The DiCE transaction.
+    ///
+    /// \return                                 The new \c IParticle_volume_scene_element instance.
+    ///
+    virtual IParticle_volume_scene_element* create_particle_volume(
+        const mi::math::Bbox_struct<mi::Float32, 3> &           ijk_bbox,
         const mi::math::Matrix_struct<mi::Float32, 4, 4>&       transform_matrix,
         nv::index::IDistributed_data_import_callback*           importer_callback,
         mi::neuraylib::IDice_transaction*                       dice_transaction) const = 0;

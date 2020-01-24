@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene element representing a path.
@@ -18,11 +18,11 @@ namespace nv
 namespace index
 {
 
-/// @ingroup nv_index_scene_description_attribute
-    
 /// Interface class representing the styles that can be applied to a path.
 /// Currently, the style merely defines the interpolation technique.
 /// Only one style can be active at a time.
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class IPath_style :
         public mi::base::Interface_declare<0xb4568002,0xc4f5,0x4e32,0xb2,0xf6,0x5e,0x04,0x12,0x45,0x2d,0xac,
@@ -119,8 +119,6 @@ public:
     
 };
 
-/// @ingroup nv_index_scene_description_shape
-///
 /// Interface class for 3D paths.
 /// The path is represented by a collection of 3D points connected by an unique and 
 /// continuous line path. Every point contains data represented as colors.
@@ -128,12 +126,13 @@ public:
 /// \note This shape type still supports the per-object supersampling, but the
 /// full screen antialiasing take precedence, see IConfig_settings::set_rendering_samples().
 ///
+/// \ingroup nv_index_scene_description_shape
+///
 class IPath_3D :
         public mi::base::Interface_declare<0xe284adf5,0x6beb,0x4792,0x84,0x36,0x95,0xc7,0x78,0xb9,0xff,0x8a,
                                            nv::index::IObject_space_shape>
 {
 public:
-
     /// Get the radius of the path
     ///
     /// \return     The radius of the internal representation for the path (line).
@@ -246,11 +245,12 @@ public:
         mi::Uint32  nb_ids) = 0;
 };
 
-/// @ingroup nv_index_scene_description_shape
-///
 /// Interface class for 2D paths.
 /// The path is represented by a collection of 3D points connected by an unique and 
 /// continuous line path. Every point contains data represented as colors.
+///
+/// \ingroup nv_index_scene_description_shape
+///
 class IPath_2D :
         public mi::base::Interface_declare<0xae7cff77,0x114b,0x472e,0x9b,0x77,0x1b,0xde,0x7d,0x98,0xff,0x7d,
                                            nv::index::IImage_space_shape>

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Sub-meshes of a triangle mesh.
@@ -18,7 +18,9 @@ namespace nv {
 namespace index {
 
 /// Defines the vertices and per-vertex attributes of a subset of a triangle mesh.
-/// @ingroup nv_index_data_storage
+///
+/// \ingroup nv_index_data_storage
+///
 class ITriangle_mesh_subset :
     public mi::base::Interface_declare<0x19fa1bbf,0xcda6,0x43d5,0x89,0x40,0x57,0x95,0x78,0x99,0xb5,0x3d,
                                        IDistributed_data_subset>
@@ -106,7 +108,7 @@ public:
         const mi::Uint16*                               materials               = 0,
         mi::Uint32                                      nb_materials            = 0,
 
-        const ITriangle_mesh_subset::Triflags*          triangle_flags          = 0,
+        const ITriangle_mesh_subset::Triflags*          triangle_flags          = 0,    // BROKEN, bit flag combinations!
         mi::Uint32                                      nb_triangle_flags       = 0) = 0;
 
     /// Returns the number of triangles in the sub-mesh.

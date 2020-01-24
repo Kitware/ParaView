@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for a convenience scene manipulations.
@@ -15,7 +15,6 @@ namespace nv
 {
 namespace index
 {
-/// @ingroup nv_index_scene_description
 
 /// An interface class that provides a convenient way to change commonly used scene manipulations.
 ///
@@ -31,6 +30,8 @@ namespace index
 /// \note The methods of this class will directly edit scene elements, including the \c IScene.
 /// Hence, care must be taken that all edit operations to these elements are closed before calling
 /// them, to prevent conflicts.
+///
+/// \ingroup nv_index_scene_description
 ///
 class IScene_convenience_manipulation :
     public mi::base::Interface_declare<0xc8934dfa,0xc049,0x401e,0x90,0x3a,0x8d,0x18,0x2f,0xfa,0x39,0x81>

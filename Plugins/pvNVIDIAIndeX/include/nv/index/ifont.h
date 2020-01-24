@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Base class representing the fonts in the scene description.
@@ -17,10 +17,11 @@ namespace nv
 namespace index
 {
 
-/// @ingroup nv_index_scene_description_attribute
 
 /// A font attribute describes the appearance of a label
 /// in the scene description. 
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class IFont :
         public mi::base::Interface_declare<0xde2a47e9,0xa0b3,0x4b47,0xb2,0xc6,0x8f,0x22,0x6c,0x36,0x02,0x61,

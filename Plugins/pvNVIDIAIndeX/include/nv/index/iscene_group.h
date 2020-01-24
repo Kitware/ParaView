@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Hierarchical scene description groups for structuring the scene.
@@ -20,13 +20,14 @@ namespace index
 
 class IScene;
 
-/// @ingroup nv_index_scene_description_group
-///
 /// A scene group allows structuring a scene in a hierarchical form. Every
 /// scene group may contain a list of scene elements referenced by tags. A
 /// scene element can be a shape (e.g., a sphere), an attribute (e.g., a
 /// material), or other scene groups.  Scene groups that contains other
 /// scene groups create a hierarchical scene description.
+///
+/// \ingroup nv_index_scene_description_group
+///
 class IScene_group :
     public mi::base::Interface_declare<0xdf29205a,0x010c,0x42c1,0xbe,0xc5,0xb9,0x5e,0xcd,0x3c,0x76,0x74,
                                        nv::index::IScene_element>
@@ -115,8 +116,6 @@ public:
         mi::neuraylib::IDice_transaction*   dice_transaction) = 0;
 };
 
-/// @ingroup nv_index_scene_description_group
-///
 /// A <em>transformed scene group</em> is used in the typical manner for
 /// structuring the scene but also defines a transformation matrix which
 /// will be applied to all of its children.  Transformations are inherited
@@ -124,6 +123,9 @@ public:
 ///
 /// Scene elements that represent large scale data, such as volumes or
 /// heightfields, may not be added to this type of scene group.
+///
+/// \ingroup nv_index_scene_description_group
+///
 class ITransformed_scene_group :
     public mi::base::Interface_declare<0xf6de2020,0x3fcd,0x4764,0xb3,0xbe,0x3a,0x07,0xf0,0xee,0xd6,0x60,
                                        nv::index::IScene_group>
@@ -139,8 +141,6 @@ public:
     virtual mi::math::Matrix_struct<mi::Float32, 4, 4> get_transform() const = 0;
 };
 
-/// @ingroup nv_index_scene_description_group
-///
 /// A <em>static scene group</em> is used in the typical manner for
 /// structuring the scene but does not maintain its own transformation
 /// matrix.
@@ -150,18 +150,22 @@ public:
 /// spatial distribution of large scale data.  Scene elements representing
 /// large scale data, such as volumes or heightfields, may only be attached to
 /// a static scene group.
+///
+/// \ingroup nv_index_scene_description_group
+///
 class IStatic_scene_group :
     public mi::base::Interface_declare<0x11971a80,0x8607,0x4f8b,0xa7,0x77,0x04,0x42,0x6a,0xc2,0xcc,0xda,
                                        nv::index::IScene_group>
 {
 };
 
-/// @ingroup nv_index_scene_description_group
-///
 /// A <em>shape scene group</em> (or simply "shape group") aggregates
 /// multiple scene elements to create new user-defined geometry
 /// objects. The shape group only stores the geometry; its contents are
 /// created and modified by an associated IShape_scene_group_manipulator.
+///
+/// \ingroup nv_index_scene_description_group
+///
 class IShape_scene_group :
     public mi::base::Interface_declare<0xab821bda,0x0214,0x4908,0xbb,0x51,0xb4,0xd6,0x76,0x74,0xb9,0xb6,
                                        nv::index::ITransformed_scene_group>
@@ -185,12 +189,13 @@ public:
     virtual mi::neuraylib::Tag_struct get_manipulator() const = 0;
 };
 
-/// @ingroup nv_index_scene_description_group
-///
 /// An implementation of IShape_scene_group_manipulator creates
 /// user-defined geometry by filling an IShape_scene_group with scene
 /// elements. Additional methods may be added to modify the contents of an
 /// existing shape group.
+///
+/// \ingroup nv_index_scene_description_group
+///
 class IShape_scene_group_manipulator :
     public mi::base::Interface_declare<0x8ba83935,0xb95b,0x44ce,0x83,0x2a,0x14,0x06,0x52,0x93,0x45,0x14,
                                        mi::neuraylib::IElement>

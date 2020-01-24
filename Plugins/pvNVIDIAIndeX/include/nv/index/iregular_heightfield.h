@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for regular heightfield scene elements
@@ -22,7 +22,8 @@ namespace index {
 /// The embedded geometry is closely associated with the heightfield, but rendered separately. This
 /// attribute allows to control which of the different types of embedded geometry should be shown
 /// and how they should be visualized.
-/// @ingroup nv_index_scene_description_attribute
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class IHeightfield_geometry_settings :
     public mi::base::Interface_declare<0xc1529d11,0x1fa2,0x47b0,0x95,0xa2,0x76,0x1f,0x44,0xc5,0xaf,0x1c,
@@ -187,7 +188,8 @@ public:
 /// The rendering of a heightfield can be controlled using an \c IMaterial attribute in the
 /// scene description. Arbitrary textures can be mapped onto the heightfield by
 /// applying \c IDistributed_compute_technique.
-/// @ingroup nv_index_scene_description_shape
+///
+/// \ingroup nv_index_scene_description_shape
 ///
 class IRegular_heightfield :
     public mi::base::Interface_declare<0x7a8db268,0x1c5b,0x4579,0xa4,0x42,0x0d,0x5f,0xb5,0xaa,0x9d,0x5b,

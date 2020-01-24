@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief  Bridge server
@@ -749,9 +749,9 @@ public:
     /// messages and more severe will be forwarded and the server sets the limit to warning
     /// severity, then only warning log messages will be forwarded.
     ///
-    /// Defaults to #mi::base::MESSAGE_SEVERITY_DEBUG which will allow the client to request
-    /// forwarding of all log messages. Set to #mi::base::MESSAGE_SEVERITY_FATAL to turn of log
-    /// forwarding.
+    /// Defaults to #mi::base::details::MESSAGE_SEVERITY_DEBUG which will allow the client to
+    /// request forwarding of all log messages. Set to #mi::base::details::MESSAGE_SEVERITY_FATAL
+    /// to turn of log forwarding.
     ///
     /// \see #get_log_forwarding_limit()
     ///

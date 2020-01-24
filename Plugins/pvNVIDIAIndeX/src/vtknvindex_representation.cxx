@@ -1,4 +1,4 @@
-/* Copyright 2019 NVIDIA Corporation. All rights reserved.
+/* Copyright 2020 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -713,7 +713,7 @@ mi::Sint32 vtknvindex_representation::find_time_step(
   if (lower == times.end())
     lower = times.end() - 1;
 
-  return static_cast<mi::Uint32>(*lower);
+  return static_cast<mi::Uint32>(std::distance(times.begin(), lower));
 }
 
 //
@@ -922,32 +922,38 @@ void vtknvindex_representation::update_current_kernel()
   {
     case RTC_KERNELS_ISOSURFACE:
       static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)
-        ->rtc_kernel_changed(RTC_KERNELS_ISOSURFACE, reinterpret_cast<void*>(&m_isosurface_params),
-          sizeof(m_isosurface_params));
+        ->rtc_kernel_changed(RTC_KERNELS_ISOSURFACE, KERNEL_ISOSURFACE_STRING,
+          reinterpret_cast<void*>(&m_isosurface_params), sizeof(m_isosurface_params));
       break;
 
     case RTC_KERNELS_DEPTH_ENHANCEMENT:
       static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)
-        ->rtc_kernel_changed(RTC_KERNELS_DEPTH_ENHANCEMENT,
+        ->rtc_kernel_changed(RTC_KERNELS_DEPTH_ENHANCEMENT, KERNEL_DEPTH_ENHANCEMENT_STRING,
           reinterpret_cast<void*>(&m_depth_enhancement_params), sizeof(m_depth_enhancement_params));
       break;
 
     case RTC_KERNELS_EDGE_ENHANCEMENT:
       static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)
-        ->rtc_kernel_changed(RTC_KERNELS_EDGE_ENHANCEMENT,
+        ->rtc_kernel_changed(RTC_KERNELS_EDGE_ENHANCEMENT, KERNEL_EDGE_ENHANCEMENT_STRING,
           reinterpret_cast<void*>(&m_edge_enhancement_params), sizeof(m_edge_enhancement_params));
       break;
 
     case RTC_KERNELS_GRADIENT:
       static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)
-        ->rtc_kernel_changed(RTC_KERNELS_GRADIENT, reinterpret_cast<void*>(&m_gradient_params),
-          sizeof(m_gradient_params));
+        ->rtc_kernel_changed(RTC_KERNELS_GRADIENT, KERNEL_GRADIENT_STRING,
+          reinterpret_cast<void*>(&m_gradient_params), sizeof(m_gradient_params));
+      break;
+
+    case RTC_KERNELS_CUSTOM:
+      static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)
+        ->rtc_kernel_changed(RTC_KERNELS_CUSTOM, m_custom_kernel_program,
+          reinterpret_cast<void*>(&m_custom_params), sizeof(m_custom_params));
       break;
 
     case RTC_KERNELS_NONE:
     default:
       static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)
-        ->rtc_kernel_changed(RTC_KERNELS_NONE, 0, 0);
+        ->rtc_kernel_changed(RTC_KERNELS_NONE, "", 0, 0);
       break;
   }
 }
@@ -1154,10 +1160,100 @@ void vtknvindex_representation::set_gradient_level(double gradient_level)
   if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_GRADIENT)
     update_current_kernel();
 }
+
 //----------------------------------------------------------------------------
 void vtknvindex_representation::set_gradient_scale(double gradient_scale)
 {
   m_gradient_params.grad_max = static_cast<mi::Float32>(gradient_scale);
   if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_GRADIENT)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_representation::set_kernel_filename(const char* kernel_filename)
+{
+  m_custom_kernel_filename = std::string(kernel_filename);
+  set_kernel_update();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_representation::set_kernel_update()
+{
+  std::ifstream is(m_custom_kernel_filename);
+  m_custom_kernel_program =
+    std::string((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_CUSTOM)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_representation::set_custom_pfloat_1(double custom_cf1)
+{
+  m_custom_params.floats[0] = static_cast<float>(custom_cf1);
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_CUSTOM)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_representation::set_custom_pfloat_2(double custom_cf2)
+{
+  m_custom_params.floats[1] = static_cast<float>(custom_cf2);
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_CUSTOM)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_representation::set_custom_pfloat_3(double custom_cf3)
+{
+  m_custom_params.floats[2] = static_cast<float>(custom_cf3);
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_CUSTOM)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_representation::set_custom_pfloat_4(double custom_cf4)
+{
+  m_custom_params.floats[3] = static_cast<float>(custom_cf4);
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_CUSTOM)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_representation::set_custom_pint_1(int custom_ci1)
+{
+  m_custom_params.ints[0] = static_cast<float>(custom_ci1);
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_CUSTOM)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_representation::set_custom_pint_2(int custom_ci2)
+{
+  m_custom_params.ints[1] = static_cast<float>(custom_ci2);
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_CUSTOM)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_representation::set_custom_pint_3(int custom_ci3)
+{
+  m_custom_params.ints[2] = static_cast<float>(custom_ci3);
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_CUSTOM)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_representation::set_custom_pint_4(int custom_ci4)
+{
+  m_custom_params.ints[3] = static_cast<float>(custom_ci4);
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_CUSTOM)
     update_current_kernel();
 }

@@ -1,5 +1,5 @@
 <!--
-* Copyright 2019 NVIDIA Corporation. All rights reserved.
+* Copyright 2020 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -484,6 +484,7 @@
               <Entry value="2" text="Depth enhancement"/>
               <Entry value="3" text="Edge enhancement"/>
               <Entry value="4" text="Gradient"/>
+              <Entry value="5" text="Custom"/>
             </EnumerationDomain>
             <Documentation>
               It selects the element to be visualized.
@@ -805,6 +806,192 @@
             </Hints>
           </DoubleVectorProperty>
 
+          <DoubleVectorProperty
+              label="pfloat 1"
+              name="custom_pfloat_1"
+              command="set_custom_pfloat_1"
+              number_of_elements="1"
+              default_values="1.0">
+            <DoubleRangeDomain
+                min="-100.0"
+                max="100.0"
+                name="range">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set custom parameter float 1
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="pfloat 2"
+              name="custom_pfloat_2"
+              command="set_custom_pfloat_2"
+              number_of_elements="1"
+              default_values="1.0">
+            <DoubleRangeDomain
+                min="-100.0"
+                max="100.0"
+                name="range">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set custom parameter float 2
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="pfloat 3"
+              name="custom_pfloat_3"
+              command="set_custom_pfloat_3"
+              number_of_elements="1"
+              default_values="1.0">
+            <DoubleRangeDomain
+                min="-100.0"
+                max="100.0"
+                name="range">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set custom parameter float 3
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="pfloat 4"
+              name="custom_pfloat_4"
+              command="set_custom_pfloat_4"
+              number_of_elements="1"
+              default_values="1.0">
+            <DoubleRangeDomain
+                min="-100.0"
+                max="100.0"
+                name="range">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set custom parameter float 4
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <IntVectorProperty
+              label="pint 1"
+              name="custom_pint_1"
+              command="set_custom_pint_1"
+              number_of_elements="1"
+              default_values="0">
+            <IntRangeDomain
+                min="-100"
+                max="100"
+                name="range">
+            </IntRangeDomain>
+            <Documentation>
+              Set custom parameter integer 1
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </IntVectorProperty>
+
+          <IntVectorProperty
+              label="pint 2"
+              name="custom_pint_2"
+              command="set_custom_pint_2"
+              number_of_elements="1"
+              default_values="0">
+            <IntRangeDomain
+                min="-100"
+                max="100"
+                name="range">
+            </IntRangeDomain>
+            <Documentation>
+              Set custom parameter integer 2
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </IntVectorProperty>
+
+          <IntVectorProperty
+              label="pint 3"
+              name="custom_pint_3"
+              command="set_custom_pint_3"
+              number_of_elements="1"
+              default_values="0">
+            <IntRangeDomain
+                min="-100"
+                max="100"
+                name="range">
+            </IntRangeDomain>
+            <Documentation>
+              Set custom parameter integer 3
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </IntVectorProperty>
+
+          <IntVectorProperty
+              label="pint 4"
+              name="custom_pint_4"
+              command="set_custom_pint_4"
+              number_of_elements="1"
+              default_values="0">
+            <IntRangeDomain
+                min="-100"
+                max="100"
+                name="range">
+            </IntRangeDomain>
+            <Documentation>
+              Set custom parameter integer 4
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </IntVectorProperty>
+
+          <StringVectorProperty animateable="0"
+                                label="Kernel"
+                                command="set_kernel_filename"
+                                name="custom_kernel"
+                                number_of_elements="1"
+                                panel_visibility="default">
+            <FileListDomain name="files" />
+            <Documentation>Load a custom IndeX volume XAC kernel.</Documentation>
+            <Hints>
+              <FileChooser extensions="cu" file_description="IndeX Volume XAC kernels" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </StringVectorProperty>
+
+          <Property
+              label="Update kernel"
+              command="set_kernel_update"
+              name="custom_update_kernel">
+            <Documentation>Update the current IndeX volume XAC kernel</Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </Property>
+
           <!-- End of NvidiaIndexRegularVolumeRepresentation -->
         </RepresentationProxy>
 
@@ -1028,6 +1215,7 @@
                 <Entry value="1" text="Isosurface"/>
                 <Entry value="2" text="Depth enhancement"/>
                 <Entry value="3" text="Edge enhancement"/>
+                <Entry value="5" text="Custom"/>
               </EnumerationDomain>
               <Documentation>
                 It selects the element to be visualized.
@@ -1331,6 +1519,193 @@
             </Hints>
           </IntVectorProperty>
 
+          <DoubleVectorProperty
+              label="pfloat 1"
+              name="custom_pfloat_1"
+              command="set_custom_pfloat_1"
+              number_of_elements="1"
+              default_values="1.0">
+            <DoubleRangeDomain
+                min="-100.0"
+                max="100.0"
+                name="range">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set custom parameter float 1
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="pfloat 2"
+              name="custom_pfloat_2"
+              command="set_custom_pfloat_2"
+              number_of_elements="1"
+              default_values="1.0">
+            <DoubleRangeDomain
+                min="-100.0"
+                max="100.0"
+                name="range">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set custom parameter float 2
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="pfloat 3"
+              name="custom_pfloat_3"
+              command="set_custom_pfloat_3"
+              number_of_elements="1"
+              default_values="1.0">
+            <DoubleRangeDomain
+                min="-100.0"
+                max="100.0"
+                name="range">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set custom parameter float 3
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="pfloat 4"
+              name="custom_pfloat_4"
+              command="set_custom_pfloat_4"
+              number_of_elements="1"
+              default_values="1.0">
+            <DoubleRangeDomain
+                min="-100.0"
+                max="100.0"
+                name="range">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set custom parameter float 4
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <IntVectorProperty
+              label="pint 1"
+              name="custom_pint_1"
+              command="set_custom_pint_1"
+              number_of_elements="1"
+              default_values="0">
+            <IntRangeDomain
+                min="-100"
+                max="100"
+                name="range">
+            </IntRangeDomain>
+            <Documentation>
+              Set custom parameter integer 1
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </IntVectorProperty>
+
+          <IntVectorProperty
+              label="pint 2"
+              name="custom_pint_2"
+              command="set_custom_pint_2"
+              number_of_elements="1"
+              default_values="0">
+            <IntRangeDomain
+                min="-100"
+                max="100"
+                name="range">
+            </IntRangeDomain>
+            <Documentation>
+              Set custom parameter integer 2
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </IntVectorProperty>
+
+          <IntVectorProperty
+              label="pint 3"
+              name="custom_pint_3"
+              command="set_custom_pint_3"
+              number_of_elements="1"
+              default_values="0">
+            <IntRangeDomain
+                min="-100"
+                max="100"
+                name="range">
+            </IntRangeDomain>
+            <Documentation>
+              Set custom parameter integer 3
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </IntVectorProperty>
+
+          <IntVectorProperty
+              label="pint 4"
+              name="custom_pint_4"
+              command="set_custom_pint_4"
+              number_of_elements="1"
+              default_values="0">
+            <IntRangeDomain
+                min="-100"
+                max="100"
+                name="range">
+            </IntRangeDomain>
+            <Documentation>
+              Set custom parameter integer 4
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </IntVectorProperty>
+
+          <StringVectorProperty animateable="0"
+                                label="Kernel"
+                                command="set_kernel_filename"
+                                name="custom_kernel"
+                                number_of_elements="1"
+                                panel_visibility="default">
+            <FileListDomain name="files" />
+            <Documentation>Load a custom IndeX volume XAC kernel.</Documentation>
+            <Hints>
+              <FileChooser extensions="cu" file_description="IndeX Volume XAC kernels" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </StringVectorProperty>
+
+          <Property
+              label="Update kernel"
+              command="set_kernel_update"
+              name="custom_update_kernel">
+            <Documentation>Update the current IndeX volume XAC kernel</Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </Property>
+
+
           <!-- End of NvidiaIndexRegularVolumeRepresentation -->
         </RepresentationProxy>
 
@@ -1400,6 +1775,16 @@
               <Property name="edge_samples"/>
               <Property name="gradient_level"/>
               <Property name="gradient_scale"/>
+              <Property name="custom_kernel"/>
+              <Property name="custom_update_kernel"/>
+              <Property name="custom_pfloat_1"/>
+              <Property name="custom_pfloat_2"/>
+              <Property name="custom_pfloat_3"/>
+              <Property name="custom_pfloat_4"/>
+              <Property name="custom_pint_1"/>
+              <Property name="custom_pint_2"/>
+              <Property name="custom_pint_3"/>
+              <Property name="custom_pint_4"/>
             </PropertyGroup>
         </ExposedProperties>
 
@@ -1457,6 +1842,16 @@
               <Property name="depth_gamma"/>
               <Property name="edge_range"/>
               <Property name="edge_samples"/>
+              <Property name="custom_kernel"/>
+              <Property name="custom_update_kernel"/>
+              <Property name="custom_pfloat_1"/>
+              <Property name="custom_pfloat_2"/>
+              <Property name="custom_pfloat_3"/>
+              <Property name="custom_pfloat_4"/>
+              <Property name="custom_pint_1"/>
+              <Property name="custom_pint_2"/>
+              <Property name="custom_pint_3"/>
+              <Property name="custom_pint_4"/>
             </PropertyGroup>
         </ExposedProperties>
 

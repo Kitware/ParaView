@@ -1,4 +1,4 @@
-/* Copyright 2019 NVIDIA Corporation. All rights reserved.
+/* Copyright 2020 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -130,7 +130,7 @@ void vtknvindex_affinity::add_affinity(
 
 // ------------------------------------------------------------------------------------------------
 bool vtknvindex_affinity::get_affinity(const mi::math::Bbox_struct<mi::Float32, 3>& subregion_st,
-  mi::Uint32& host_id, mi::Uint32& gpu_id) const
+  mi::Uint32& host_id, mi::IString* host_name, mi::Uint32& gpu_id) const
 {
   const mi::math::Bbox<mi::Float32, 3> subregion(subregion_st);
 
@@ -142,6 +142,14 @@ bool vtknvindex_affinity::get_affinity(const mi::math::Bbox_struct<mi::Float32, 
     if (affinity.m_bbox.contains(subregion.min) && affinity.m_bbox.contains(subregion.max))
     {
       host_id = affinity.m_host_id;
+
+      auto it = m_host_info.find(affinity.m_host_id);
+      if (it != m_host_info.end())
+      {
+        const vtknvindex_host_properties* host_properties = it->second;
+        host_name->set_c_str(host_properties->get_hostname().c_str());
+      }
+
       if (get_gpu_id(host_id, gpu_id))
       {
         // This is stored here only for the scene dump.

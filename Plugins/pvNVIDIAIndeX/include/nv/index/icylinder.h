@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene element representing a cylinder higher-level shape.
@@ -17,8 +17,6 @@ namespace nv
 namespace index
 {
 
-/// @ingroup nv_index_scene_description_shape
-///
 /// The set of higher-level 3D shapes part of the NVIDIA IndeX library includes a 3D cylinder.
 /// ICylinder is a part of the scene description.
 /// A 3D cylinder is defined by its top and bottom position and a radius. Both positions 
@@ -26,6 +24,8 @@ namespace index
 /// A cylinder can be watertight, i.e., a closed object, if caps are enabled otherwise
 /// the top and the bottom of the cylinder is open. The surface of the cylinder
 /// is shaded using the material and light defined in the hierarchical scene description.
+///
+/// \ingroup nv_index_scene_description_shape
 ///
 class ICylinder :
     public mi::base::Interface_declare<0x82b63cc6,0xcd9b,0x49af,0x90,0x8f,0x3a,0xcf,0x51,0x70,0x64,0x56,

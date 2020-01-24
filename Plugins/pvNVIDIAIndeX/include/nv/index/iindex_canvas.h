@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief User-defined rendering canvas.
@@ -24,7 +24,8 @@ namespace index
 ///
 /// The NVIDIA IndeX library ships the implementation of a main memory buffer and an OpenGL buffer
 /// based canvas classes as source code to ease the integration into a given application.
-/// @ingroup nv_index_rendering
+///
+/// \ingroup nv_index_rendering
 ///
 class IIndex_canvas :
     public mi::base::Interface_declare<0x46c5a5f7,0x31de,0x468d,0x9b,0x6c,0xb0,0x35,0x77,0xed,0xfe,0x61>

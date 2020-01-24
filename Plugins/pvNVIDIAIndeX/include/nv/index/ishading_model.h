@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Base class representing the surface appearance of shapes in the scene description.
@@ -17,8 +17,6 @@ namespace nv
 namespace index
 {
 
-/// @ingroup nv_index_scene_description_attribute
-
 /// The interface class representing a shading model.
 ///
 /// A shading model defines the normal interpolation for shading that results in
@@ -26,6 +24,8 @@ namespace index
 /// combination with the material properties and the illumination model applied
 /// to the surface. Only one shading model can be active at a time.  Derived
 /// classes define the shading model to use when rendering a surface.
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class IShading_model :
         public mi::base::Interface_declare<0x8f5bc60f,0x654f,0x46dd,0x85,0x76,0xeb,0x10,0xbf,0xab,0x06,0xb8,
@@ -95,6 +95,8 @@ public:
 /// The interface class serves as a flag considered in the scene description and
 /// therefore no parameters need to be exposed.
 ///
+/// \ingroup nv_index_scene_description_attribute
+///
 class IFlat_shading :
         public mi::base::Interface_declare<0x9af9c55e,0xd0d2,0x4dee,0x93,0x3e,0xa5,0x5f,0x96,0x30,0xe3,0x16,
                                            nv::index::IShading_model>
@@ -109,6 +111,8 @@ class IFlat_shading :
 ///
 /// The interface class serves as a flag considered in the scene description
 /// and, thus, no parameters need to be exposed.
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class IPhong_shading :
         public mi::base::Interface_declare<0x65b99243,0x4dd8,0x41aa,0xa4,0x5d,0x45,0x0a,0x79,0xf5,0xd7,0xee,

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for user-defined compute tasks that apply to heightfield patches.
@@ -16,7 +16,6 @@ namespace nv
 {
 namespace index
 {
-/// @ingroup nv_index_data_computing
 
 /// Interface class for heightfield compute tasks that operate on the elevation values of one
 /// heightfield patch.
@@ -24,6 +23,8 @@ namespace index
 /// Passing an instance of an user-defined implementation of this class to the exposed interface
 /// class \c IRegular_heightfield_data_edit::edit() executes the compute task on the heightfield
 /// patch stored locally on a cluster machine.
+///
+/// \ingroup nv_index_data_computing
 ///
 class IRegular_heightfield_compute_task :
     public mi::base::Interface_declare<0xe236fc25,0x8491,0x48fa,0xb4,0x0f,0xfc,0xad,0xeb,0x22,0x51,0x04>

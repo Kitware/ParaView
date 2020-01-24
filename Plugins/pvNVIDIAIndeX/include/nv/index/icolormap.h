@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Database element for a colormap
@@ -15,8 +15,10 @@ namespace nv
 namespace index
 {
 
-/// @ingroup nv_index_scene_description_attribute
 /// An abstract representation of a colormap for storing in the distributed database.
+///
+/// \ingroup nv_index_scene_description_attribute
+///
 class IColormap :
     public mi::base::Interface_declare<0x68ba9632,0xe3d6,0x4ced,0xa8,0xd7,0x32,0x0f,0x87,0x33,0xde,0x1b,
                                        nv::index::IAttribute>

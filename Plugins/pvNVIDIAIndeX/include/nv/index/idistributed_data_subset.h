@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Distributed subset of a large-scale dataset.
@@ -41,8 +41,6 @@ public:
     virtual mi::math::Bbox_struct<mi::Float32, 3>    get_subregion_object_space() const = 0;
 };
 
-/// @ingroup nv_index_data_storage
-///
 /// The base class for each subset of a large-scale distributed dataset.
 ///
 /// The entire scene is decomposed into smaller
@@ -53,6 +51,8 @@ public:
 /// The data import callback (\c IDistributed_data_import_callback) is
 /// responsible for creating and loading/generating the contents of the
 /// data subset.
+///
+/// \ingroup nv_index_data_storage
 ///
 class IDistributed_data_subset :
     public mi::base::Interface_declare<0x3fbeb822,0xffd0,0x4520,0x83,0x21,0xbd,0x62,0x89,0x69,0x01,0x69,
@@ -84,8 +84,6 @@ public:
     virtual bool finalize() = 0;
 };
 
-/// @ingroup nv_index_data_storage
-///
 /// The interface classes derived from \c IDistributed_data_subset cannot be
 /// instantiated beyond the library
 /// boundary, e.g., by an application. But the data import callback
@@ -95,6 +93,8 @@ public:
 /// classes for the user based on the given UUID.
 /// An implementation of this class is passed as argument to the import callback
 /// method \c IDistributed_data_import_callback::create().
+///
+/// \ingroup nv_index_data_storage
 ///
 class IData_subset_factory :
     public mi::base::Interface_declare<0x79c2f676,0x194d,0x4915,0xb0,0xce,0x66,0xbe,0x68,0x7c,0xbd,0xc7>

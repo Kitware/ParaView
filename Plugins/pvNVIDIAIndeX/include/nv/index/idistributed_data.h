@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface class representing NVIDIA IndeX's distributed datasets.
@@ -20,9 +20,9 @@ namespace nv
 namespace index
 {
 
-/// @ingroup nv_index_scene_description_shape
-///
 /// The base class of all distributed datasets.
+///
+/// \ingroup nv_index_scene_description_shape
 ///
 class IDistributed_data :
     public mi::base::Interface_declare<0xe7159219,0x4b05,0x4201,0x82,0x70,0x5a,0xaf,0xfc,0x8b,0xf4,0xdb,

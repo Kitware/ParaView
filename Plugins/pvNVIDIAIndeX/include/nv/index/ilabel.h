@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene elements representing object space and image space labels.
@@ -19,10 +19,10 @@ namespace nv
 namespace index
 {
 
-/// @ingroup nv_index_scene_description_attribute
-
-/// A label layout defined a label's appearance including, for instance, the padding around the test and 
+/// A label layout defined a label's appearance including, for instance, the padding around the test and
 /// the foreground and background colors.
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class ILabel_layout :
         public mi::base::Interface_declare<0x408633d3,0xbbe1,0x4e01,0xa1,0x27,0xb2,0x2c,0xa3,0x44,0x5c,0x55,
@@ -80,11 +80,11 @@ public:
         const mi::math::Color_struct& background) = 0;
 };
 
-/// @ingroup nv_index_scene_description_shape
-///
 /// A label defined in object space. The orientation of the label is affected by the transformations applied
 /// by the scene description. 
 /// The dimension (position, height, ...) is defined in the 3D object space.
+///
+/// \ingroup nv_index_scene_description_shape
 ///
 class ILabel_3D :
         public mi::base::Interface_declare<0x4967ddd0,0xbc19,0x45d4,0x88,0x4d,0x82,0xfa,0x68,0xd0,0x13,0x35,
@@ -174,11 +174,12 @@ public:
     virtual mi::Float32 compute_label_width(const IFont* font, const ILabel_layout *layout) const = 0;
 };
 
-/// @ingroup nv_index_scene_description_shape
-///
 /// A label defined in image space. The label always faces towards the viewer, i.e., the label is parallel to the view plane.
 /// ILabel_2D is a part of the scene description.
 /// The dimension (position, height, ...) is defined in the 2D image space (2D screen space).
+///
+/// \ingroup nv_index_scene_description_shape
+///
 class ILabel_2D :
         public mi::base::Interface_declare<0x641854bd,0xb7a7,0x45b0,0x94,0x44,0x25,0x0d,0x3e,0x10,0x6f,0xae,
                                            nv::index::IImage_space_shape>

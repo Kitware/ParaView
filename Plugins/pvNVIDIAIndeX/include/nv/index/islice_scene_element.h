@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interfaces representing slice scene elements.
@@ -27,7 +27,8 @@ namespace index {
 /// The slice interfaces classes \c ISection_scene_element, which
 /// represents the section slices and \c IVertical_profile_scene_element,
 /// which represents vertical profiles, derive from the base interface.
-/// @ingroup nv_index_scene_description_shape
+///
+/// \ingroup nv_index_scene_description_shape
 ///
 class ISlice_scene_element :
     public mi::base::Interface_declare<0xcc8eccf3,0x7a53,0x4b4c,0x80,0x7e,0x47,0x92,0x4d,0x27,0xaa,0x28,
@@ -58,7 +59,8 @@ public:
 ///
 /// A section slice can be an inline section, a cross-line section, or horizontal
 /// section positioned arbitrarily along the I, J, or K axes.
-/// @ingroup nv_index_scene_description_shape
+///
+/// \ingroup nv_index_scene_description_shape
 ///
 class ISection_scene_element :
     public mi::base::Interface_declare<0xcb0e44c4,0xe8c6,0x4533,0x9b,0xc0,0x0e,0xf7,0xf9,0x2e,0xac,0xba,
@@ -104,7 +106,8 @@ public:
 /// in the scene description. Multi-segment vertical profiles represent connected
 /// line segments that are defined in the volume's local IJ space and are
 /// extruded along the vertical axis covering the volume's IJK extent.
-/// @ingroup nv_index_scene_description_shape
+///
+/// \ingroup nv_index_scene_description_shape
 ///
 class IVertical_profile_scene_element :
     public mi::base::Interface_declare<0xff52984a,0xc189,0x451c,0x80,0x22,0xc2,0xc4,0x8b,0xb6,0x31,0xae,

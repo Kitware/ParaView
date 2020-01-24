@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene attribute controlling volume filter mode.
@@ -14,8 +14,6 @@
 namespace nv {
 namespace index {
 
-/// @ingroup nv_index_scene_description_attribute
-
 /// Scene attribute controlling volume filter mode.
 ///
 /// The volume filter mode specifies what kind of interpolation of volume samples is performed upon
@@ -26,6 +24,8 @@ namespace index {
 /// IConfig_settings::set_volume_filter().
 ///
 /// \todo Currently this attribute only affects volume data mapped onto an \c IPlane.
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class IVolume_filter_mode :
     public mi::base::Interface_declare<0x7346860a,0x21c6,0x4f71,0xab,0x1d,0x95,0xb4,0xd9,0x07,0xf2,0xd8,

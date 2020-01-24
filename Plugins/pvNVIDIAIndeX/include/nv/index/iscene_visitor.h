@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Results exposed by the NVIDIA IndeX library when querying a scene's contents.
@@ -16,8 +16,6 @@ namespace nv
 namespace index
 {
 
-/// @ingroup scene_queries
-
 /// Enables user-specific evaluations of the scene representation.
 ///
 /// The scene visitor applies to the root of the scene and will be
@@ -30,6 +28,8 @@ namespace index
 /// Common use-cases include the logging of the scene representation or
 /// determining the path (\c IScene_path) from the root to some given 
 /// scene element.
+///
+/// \ingroup scene_queries
 ///
 class IScene_visitor
 {

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Plane specific pick results returned by the NVIDIA IndeX library when querying a scene's contents using the pick operation.
@@ -17,11 +17,11 @@ namespace nv
 namespace index
 {
 
-/// @ingroup scene_queries
-
 /// Interface class that returns the plane specific result of a pick operation/query.
 /// The interface class sub classes from \c IScene_pick_result to provide additional 
 /// intersection results specific to \c IPlane scene elements.
+///
+/// \ingroup scene_queries
 ///
 class IPlane_pick_result :
     public mi::base::Interface_declare<0x0008694c,0x2dc5,0x4e07,0xb5,0x4c,0xd7,0x09,0xb7,0x29,0x87,0x5e,

@@ -1,4 +1,4 @@
-/* Copyright 2019 NVIDIA Corporation. All rights reserved.
+/* Copyright 2020 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -103,6 +103,9 @@ public:
   // Set/get the MPI rank ids of the current host.
   void set_rankids(std::vector<mi::Sint32> rankids);
   void get_rankids(std::vector<mi::Sint32>& rankids) const;
+
+  // Get host name
+  const std::string& get_hostname() const;
 
   // Print the host details.
   void print_info() const;

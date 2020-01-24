@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Intersection-highlight specific pick results returned by the
@@ -17,7 +17,6 @@ namespace nv
 {
 namespace index
 {
-/// @ingroup scene_queries
 
 /// Interface class that returns the pick result specific to the intersection highlighting.
 ///
@@ -34,6 +33,8 @@ namespace index
 /// top-most to bottom-most intersection highlight as defined by the order of the
 /// \c IIntersection_highlighting attributes given through the scene description.
 /// 
+/// \ingroup scene_queries
+///
 class IIntersection_highlight_pick_result :
     public mi::base::Interface_declare<0xec5d55c0,0x3bb0,0x41f6,0x93,0xd2,0x2a,0x4e,0xa4,0x55,0xb6,0x6a,
                                         nv::index::IScene_pick_result>
