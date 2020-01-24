@@ -474,7 +474,7 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   if (this->isButtonVisible("InteractiveSelectSurfacePointData", renderView))
   {
     QAction* interactiveSelectSurfacePointDataAction = frame->addTitleBarAction(
-      QIcon(":/pqWidgets/Icons/pqSurfaceSelectionPointDataInteractive.png"),
+      QIcon(":/pqWidgets/Icons/pqSurfaceSelectionPointDataInteractive.svg"),
       "Interactive Select Point Data On");
     interactiveSelectSurfacePointDataAction->setObjectName(
       "actionInteractiveSelectSurfacePointData");
@@ -490,7 +490,7 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
   if (this->isButtonVisible("InteractiveSelectSurfaceCellData", renderView))
   {
     QAction* interactiveSelectSurfaceCellDataAction =
-      frame->addTitleBarAction(QIcon(":/pqWidgets/Icons/pqSurfaceSelectionCellDataInteractive.png"),
+      frame->addTitleBarAction(QIcon(":/pqWidgets/Icons/pqSurfaceSelectionCellDataInteractive.svg"),
         "Interactive Select Cell Data On");
     interactiveSelectSurfaceCellDataAction->setObjectName("actionInteractiveSelectSurfaceCellData");
     interactiveSelectSurfaceCellDataAction->setCheckable(true);
