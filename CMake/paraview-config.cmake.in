@@ -205,3 +205,12 @@ unset("${CMAKE_FIND_PACKAGE_NAME}_CMAKE_PREFIX_PATH_save")
 
 set(CMAKE_MODULE_PATH "${${CMAKE_FIND_PACKAGE_NAME}_CMAKE_MODULE_PATH_save}")
 unset(${CMAKE_FIND_PACKAGE_NAME}_CMAKE_MODULE_PATH_save)
+
+# Compatibility with old code.
+if (NOT ${CMAKE_FIND_PACKAGE_NAME}_FIND_VERSION)
+  set(PARAVIEW_USE_FILE "${CMAKE_CURRENT_LIST_DIR}/paraview-use-file-deprecated.cmake")
+elseif (${CMAKE_FIND_PACKAGE_NAME}_FIND_VERSION VERSION_LESS 5.7)
+  set(PARAVIEW_USE_FILE "${CMAKE_CURRENT_LIST_DIR}/paraview-use-file-compat.cmake")
+else ()
+  set(PARAVIEW_USE_FILE "${CMAKE_CURRENT_LIST_DIR}/paraview-use-file-error.cmake")
+endif ()

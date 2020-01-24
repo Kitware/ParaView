@@ -30,6 +30,11 @@ configure_file(
 set(paraview_cmake_module_files
   FindCGNS.cmake
 
+  # Compatibility
+  paraview-use-file-compat.cmake
+  paraview-use-file-deprecated.cmake
+  paraview-use-file-error.cmake
+
   # Client API
   paraview_client_initializer.cxx.in
   paraview_client_initializer.h.in
