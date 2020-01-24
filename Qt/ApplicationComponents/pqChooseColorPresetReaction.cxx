@@ -152,7 +152,7 @@ bool pqChooseColorPresetReaction::choosePreset(const char* presetName)
   PresetDialog->setCustomizableLoadOpacities(!indexedLookup);
   PresetDialog->setCustomizableUsePresetRange(!indexedLookup);
   PresetDialog->setCustomizableLoadAnnotations(indexedLookup);
-  this->connect(PresetDialog, &pqPresetDialog::applyPreset, this,
+  this->connect(PresetDialog.data(), &pqPresetDialog::applyPreset, this,
     &pqChooseColorPresetReaction::applyCurrentPreset);
   PresetDialog->show();
   return true;
