@@ -60,13 +60,6 @@ public:
   virtual void Add(double value, double weight) = 0;
   //@}
 
-  //@{
-  /**
-   * Set object into initial state
-   */
-  virtual void Initialize() = 0;
-  //@}
-
   /**
    * Returns true if the parameters of accumulator is the same as the ones of this
    */

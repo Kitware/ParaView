@@ -169,7 +169,7 @@ public:
   /**
    * Set object into initial state.
    */
-  virtual void Initialize();
+  void Initialize() override;
 
   /**
    * Accessor for the number of values already fed for the measurement
