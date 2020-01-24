@@ -33,11 +33,7 @@
   }
 
 #define vtkDefaultSpecializationFunctorCompMacro(functor)                                          \
-  template <>                                                                                      \
-  inline bool functor::operator==(const functor&) const                                            \
-  {                                                                                                \
-    return true;                                                                                   \
-  }
+  inline bool operator==(const functor&) const { return true; }
 
 /**
  * @class   vtkIdentityFunctor
