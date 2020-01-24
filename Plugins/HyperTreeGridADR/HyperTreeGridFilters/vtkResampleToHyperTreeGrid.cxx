@@ -907,7 +907,7 @@ void vtkResampleToHyperTreeGrid::CreateGridOfMultiResolutionGrids(
     {
       vtkCell* cell = dataSet->GetCell(cellId);
       double* cellBounds = cell->GetBounds();
-      std::size_t depth = ~0;
+      std::size_t depth = static_cast<std::size_t>(~0);
       vtkIdType imin, imax, jmin, jmax, kmin, kmax;
       do
       {
