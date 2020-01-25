@@ -75,7 +75,7 @@ pqMainWindowEventBehavior::~pqMainWindowEventBehavior()
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowEventBehavior::onClose(QCloseEvent* event)
+void pqMainWindowEventBehavior::onClose(QCloseEvent*)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   if (core->settings()->value("GeneralSettings.ShowSaveStateOnExit", false).toBool())
@@ -87,7 +87,6 @@ void pqMainWindowEventBehavior::onClose(QCloseEvent* event)
       pqSaveStateReaction::saveState();
     }
   }
-  event->accept();
 }
 
 //-----------------------------------------------------------------------------
