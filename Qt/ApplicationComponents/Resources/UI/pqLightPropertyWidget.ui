@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>462</width>
-    <height>115</height>
+    <height>125</height>
    </rect>
   </property>
   <layout class="QGridLayout" name="gridLayout">
@@ -110,6 +110,16 @@
    <header>pqColorChooserButton.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>show3DWidget</tabstop>
+  <tabstop>positionalComboBox</tabstop>
+  <tabstop>worldPositionX</tabstop>
+  <tabstop>worldPositionY</tabstop>
+  <tabstop>worldPositionZ</tabstop>
+  <tabstop>focalPointX</tabstop>
+  <tabstop>focalPointY</tabstop>
+  <tabstop>focalPointZ</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
