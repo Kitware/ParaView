@@ -27,6 +27,7 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkWeakPointer.h"
 
+#include <algorithm>
 #include <set>
 #include <sstream>
 #include <sstream>
@@ -39,6 +40,25 @@ using namespace std;
 
 namespace
 {
+// A helper class to keep track of "id"s used in the state file and help
+// generate new unique ones.
+class UniqueIdGenerator
+{
+  vtkTypeUInt32 LastUniqueId = 1000; // let's just start at some high number.
+public:
+  UniqueIdGenerator(const xml_document& document)
+  {
+    auto xnodes = document.select_nodes("//Proxy[@id]");
+    for (const auto& xnode : xnodes)
+    {
+      this->LastUniqueId = std::max(
+        this->LastUniqueId, static_cast<vtkTypeUInt32>(xnode.node().attribute("id").as_uint()));
+    }
+  }
+
+  vtkTypeUInt32 GetNextUniqueId() { return (++this->LastUniqueId); }
+};
+
 string toString(int i)
 {
   ostringstream ostr;
@@ -396,6 +416,8 @@ struct Process_5_4_to_5_5
   */
   bool HeadlightToAdditionalLight(xml_document& document)
   {
+    UniqueIdGenerator generator(document);
+
     pugi::xpath_node_set proxy_nodes =
       document.select_nodes("//ServerManagerState/Proxy[@group='views' and @type='RenderView']");
 
@@ -462,7 +484,7 @@ struct Process_5_4_to_5_5
         //     </Domain>
         //   </Property>
         // </Proxy>
-        vtkTypeUInt32 proxyId = this->Session->GetNextGlobalUniqueIdentifier();
+        vtkTypeUInt32 proxyId = generator.GetNextUniqueId();
         std::ostringstream stream;
         stream << "<Proxy group=\"additional_lights\" type=\"Light\" id=\"" << proxyId
                << "\" servers=\"21\" >\n";
