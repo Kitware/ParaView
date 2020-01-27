@@ -69,7 +69,7 @@ int Run(int processType, int argc, char* argv[])
   if (options->GetTellVersion() || options->GetHelpSelected() || options->GetPrintMonitors())
   {
     vtkInitializationHelper::Finalize();
-    return 1;
+    return 0;
   }
 
   if (processType == vtkProcessModule::PROCESS_BATCH && options->GetPythonScriptName() == 0)
