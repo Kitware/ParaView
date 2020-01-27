@@ -91,7 +91,8 @@ public:
   * used on the pqProxyWidget to separate groups. Other widgets can use it for
   * the same purpose, as needed.
   */
-  static QWidget* newGroupLabelWidget(const QString& label, QWidget* parentWidget);
+  static QWidget* newGroupLabelWidget(const QString& label, QWidget* parentWidget,
+    const QList<QWidget*>& buttons = QList<QWidget*>());
 
   /**
   * Returns true of the proxy provided has XML hints indicating that labels

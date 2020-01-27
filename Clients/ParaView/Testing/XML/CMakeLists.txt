@@ -94,6 +94,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/sineWaves.csv}"
   "DATA{${paraview_test_data_directory_input}/Data/singleSphereAnimation.pvd}"
   "DATA{${paraview_test_data_directory_input}/Data/singleSphereAnimation/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/SteeringDataGeneratorPlugin.xml}"
   "DATA{${paraview_test_data_directory_input}/Data/tensors.pvti}"
   "DATA{${paraview_test_data_directory_input}/Data/test_fielddata.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/testxmlpartdscol/,REGEX:.*}"
@@ -368,14 +369,17 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SeparatedColorMapB.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Slice.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SliceDirectDoubleColoring.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SliceWithPlane.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SliceWithPlaneCellData.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SliceWithPlaneMultiBlock.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SliceWithPlaneMultiBlockSurface.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SliceWithPlaneMultiBlockSurface_1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SliceWithPlaneMultiBlockSurface.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SliceWithPlane.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SpherePointSource_InterA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SpherePointSource_InterB.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SplitViewTraceScreenshot.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SteeringDataGeneratorA.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SteeringDataGeneratorB.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SteeringDataGeneratorC.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/StepColorSpaceA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/StructuredGridCellBlanking.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/StructuredGridVolumeRendering.png}"
@@ -543,9 +547,10 @@ SET (TESTS_WITH_INLINE_COMPARES
   ResetToVisibleRange.xml
   Ruler.xml
   SaveExodus.xml
-  SelectionLinkParallelCoordinatesView.xml
   SaveLargeScreenshot.xml
+  SelectionLinkParallelCoordinatesView.xml
   Slice.xml
+  SteeringDataGenerator.xml
   TestIsoVolume.xml
   Threshold.xml
   TransferFunctionResetOnVisibilityChange.xml
@@ -1354,6 +1359,10 @@ SET (ColorEditorVolumeControls_THRESHOLD 300)
 # This leeway helps that.
 set (PlotDataOverTime-NonDistributed_THRESHOLD 25)
 
+# Test needs to load a plugin, the test only records that for the
+# client side.
+set (SteeringDataGenerator_DISABLE_CS TRUE)
+set (SteeringDataGenerator_DISABLE_CRS TRUE)
 
 # Plot image leeway.
 set (SpreadSheet2_THRESHOLD 50)

@@ -66,6 +66,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqQVTKWidgetEventTranslator.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqUndoStack.h"
 #include "pqView.h"
 #include "pqXMLEventObserver.h"
 #include "pqXMLEventSource.h"
@@ -341,6 +342,8 @@ bool pqCoreTestUtility::CompareView(pqView* curView, const QString& referenceIma
   double threshold, const QString& tempDirectory, const QSize& size /*=QSize()*/)
 {
   assert(curView != NULL);
+
+  SCOPED_UNDO_EXCLUDE();
 
   auto viewProxy = curView->getViewProxy();
 

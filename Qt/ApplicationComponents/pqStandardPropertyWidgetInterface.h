@@ -102,6 +102,7 @@ public:
    * \li \c InteractiveCylinder: pqCylinderPropertyWidget
    * \li \c YoungsMaterial: pqYoungsMaterialPropertyWidget
    * \li \c OMETransferFunctions : pqOMETransferFunctionsPropertyWidget
+   * \li \c PropertyCollection : pqPropertyCollectionWidget
    */
   pqPropertyWidget* createWidgetForPropertyGroup(
     vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parentWidget) override;
