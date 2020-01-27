@@ -33,6 +33,7 @@ project(ParaView)
 
 foreach (policy IN ITEMS
     CMP0083 # CMake 3.14
+    CMP0077 # CMake 3.16
     )
   if (POLICY ${policy})
     cmake_policy(SET ${policy} NEW)
