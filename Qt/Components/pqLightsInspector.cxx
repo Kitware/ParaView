@@ -176,16 +176,16 @@ public:
       QWidget* widget = new QWidget(self);
       widget->setObjectName(QString("LightContainer%1").arg(i));
       QVBoxLayout* vbox = new QVBoxLayout(widget);
-      vbox->setContentsMargins(0, pqPropertiesPanel::suggestedVerticalSpacing(), 0, 0);
-      vbox->setSpacing(0);
+      vbox->setContentsMargins(pqPropertiesPanel::suggestedMargins());
+      vbox->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
       vbox->addWidget(pqProxyWidget::newGroupLabelWidget(QString("Light %1").arg(i), widget));
 
       // some buttons.
       QWidget* buttonWidget = new QWidget(widget);
       buttonWidget->setObjectName("ButtonContainer");
       QHBoxLayout* hbox = new QHBoxLayout(buttonWidget);
-      hbox->setContentsMargins(0, 0, 0, 0);
-      hbox->setSpacing(0);
+      hbox->setContentsMargins(pqPropertiesPanel::suggestedMargins());
+      hbox->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
       vbox->addWidget(buttonWidget);
 
       // Add a button to sync this light with the camera.

@@ -96,6 +96,7 @@ public:
   * widgets.
   */
   static int suggestedMargin() { return 0; }
+  static QMargins suggestedMargins() { return QMargins(0, 0, 0, 0); }
   static int suggestedHorizontalSpacing() { return 4; }
   static int suggestedVerticalSpacing() { return 4; }
 
