@@ -6,14 +6,17 @@ from paraview.simple import *
 from paraview import smtesting
 smtesting.ProcessCommandLineArguments()
 
+tempdir = smtesting.GetUniqueTempDirectory("SaveScreenshot-")
+print("Generating output files in `%s`" % tempdir)
+
 def RegressionTest(imageName):
     from paraview.vtk.vtkTestingRendering import vtkTesting
     testing = vtkTesting()
     testing.AddArgument("-T")
-    testing.AddArgument(smtesting.TempDir)
+    testing.AddArgument(tempdir)
     testing.AddArgument("-V")
     testing.AddArgument(smtesting.DataDir + "/Remoting/Application/Testing/Data/Baseline/" + imageName)
-    return testing.RegressionTest(smtesting.TempDir + "/" + imageName, 10) == vtkTesting.PASSED
+    return testing.RegressionTest(tempdir + "/" + imageName, 10) == vtkTesting.PASSED
 
 renderView1 = CreateView('RenderView')
 renderView1.ViewSize = [200, 200]
@@ -74,7 +77,7 @@ Wavelet()
 r = Show()
 r.Representation = "Outline"
 Render()
-SaveScreenshot(smtesting.TempDir + "/SaveScreenshotOutline.png", magnification=2)
+SaveScreenshot(tempdir + "/SaveScreenshotOutline.png", magnification=2)
 
 SetActiveView(renderView2)
 r = GetDisplayProperties()
@@ -82,7 +85,7 @@ r.Representation = "Surface"
 Show()
 Render()
 ResetCamera()
-SaveScreenshot(smtesting.TempDir + "/SaveScreenshotSurface.png", magnification=2)
+SaveScreenshot(tempdir + "/SaveScreenshotSurface.png", magnification=2)
 
 SetActiveView(lineChartView1)
 p = PlotOverLine(Source = "High Resolution Line Source")
@@ -91,12 +94,12 @@ p.Source.Point2 = [10.0, 10.0, 10.0]
 p.Source.Resolution = 10
 Show()
 Render()
-SaveScreenshot(smtesting.TempDir + "/SaveScreenshotLinePlot.png", magnification=2)
+SaveScreenshot(tempdir + "/SaveScreenshotLinePlot.png", magnification=2)
 
 SetActiveView(barChartView1)
 Show()
 Render()
-SaveScreenshot(smtesting.TempDir + "/SaveScreenshotBarPlot.png", magnification=2)
+SaveScreenshot(tempdir + "/SaveScreenshotBarPlot.png", magnification=2)
 
 val1 = RegressionTest("SaveScreenshotOutline.png")
 val2 = RegressionTest("SaveScreenshotSurface.png")
