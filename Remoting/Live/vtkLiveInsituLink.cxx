@@ -19,6 +19,7 @@
 #include "vtkCommand.h"
 #include "vtkCommunicationErrorCatcher.h"
 #include "vtkExtractsDeliveryHelper.h"
+#include "vtkLogger.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkNetworkAccessManager.h"
 #include "vtkNew.h"
@@ -404,6 +405,10 @@ void vtkLiveInsituLink::InitializeLive()
         << "listen=true&nonblocking=true&"
         << "handshake=paraview.insitu." << PARAVIEW_VERSION;
     this->SetURL(url.str().c_str());
+
+    const auto hostname = std::string(vtksys::SystemInformation().GetHostname());
+    vtkLogF(INFO, "Listening for primary Catalyst connection on `%s:%d`", hostname.c_str(),
+      this->InsituPort);
     if (vtkMultiProcessController* proc0NodesController = nam->NewConnection(this->URL))
     {
       // controller would generally be NULL, however due to magically timing,
@@ -621,38 +626,45 @@ void vtkLiveInsituLink::InsituConnect(vtkMultiProcessController* proc0NodesContr
 
       this->ExtractsDeliveryHelper->SetNumberOfVisualizationProcesses(num_procs_paraview);
       this->ExtractsDeliveryHelper->SetNumberOfSimulationProcesses(num_procs_catalyst);
-
-      if (myId < std::min(num_procs_paraview, num_procs_catalyst))
+      assert(num_procs_catalyst > 0 && num_procs_paraview > 0);
+      if (myId == 0)
       {
-        vtkNew<vtkServerSocket> socket;
-        socket->CreateServer(0);
+        // we'll piggy back on proc0NodesController to deliver extracts as well for this rank.
+        this->ExtractsDeliveryHelper->SetSimulation2VisualizationController(
+          vtkSocketController::SafeDownCast(proc0NodesController));
 
-        std::vector<vtkMultiProcessStream> allConnectionMsgs;
-        vtkMultiProcessStream connectionMsg;
-        connectionMsg << 98210 << std::string(vtksys::SystemInformation().GetHostname())
-                      << socket->GetServerPort();
-        parallelController->Gather(connectionMsg, allConnectionMsgs, 0);
-
-        if (proc0NodesController)
+        // communicate between satellites to help them setup the catalyst-to-paraview socket
+        // connections.
+        if (std::min(num_procs_paraview, num_procs_catalyst) > 1)
         {
-          assert(myId == 0);
-          assert(allConnectionMsgs.size() > 0);
-
+          vtkMultiProcessStream connectionMsg;
+          std::vector<vtkMultiProcessStream> allConnectionMsgs;
+          parallelController->Gather(connectionMsg, allConnectionMsgs, 0);
           connectionMsg.Reset();
-          connectionMsg << 98211;
-          for (auto& msg : allConnectionMsgs)
+          for (const auto& msg : allConnectionMsgs)
           {
-            if (!msg.Empty())
-            {
-              std::string hostname;
-              int port, tag;
-              msg >> tag >> hostname >> port;
-              assert(tag == 98210);
-              connectionMsg << hostname << port;
-            }
+            connectionMsg << msg;
           }
           proc0NodesController->Send(connectionMsg, 1, 98211);
         }
+      }
+      else if (myId < std::min(num_procs_paraview, num_procs_catalyst))
+      {
+        assert(myId != 0);
+
+        // create a server-socket.
+        vtkNew<vtkServerSocket> socket;
+        socket->CreateServer(0);
+
+        const auto hostname = std::string(vtksys::SystemInformation().GetHostname());
+        vtkLogF(INFO, "Awaiting secondary Catalyst connection on `%s:%d` for data x-fer",
+          hostname.c_str(), socket->GetServerPort());
+
+        // communicate into to 0 so it can communicate that to Catalyst processes.
+        vtkMultiProcessStream connectionMsg;
+        connectionMsg << 98210 << hostname.c_str() << socket->GetServerPort();
+        std::vector<vtkMultiProcessStream> not_used;
+        parallelController->Gather(connectionMsg, not_used, 0);
 
         auto clientSocket = socket->WaitForConnection();
         if (!clientSocket)
@@ -665,14 +677,15 @@ void vtkLiveInsituLink::InsituConnect(vtkMultiProcessController* proc0NodesContr
           comm->SetSocket(clientSocket);
           comm->ServerSideHandshake();
         }
+        vtkLogF(
+          INFO, "Catalyst process connected on `%s:%d`", hostname.c_str(), socket->GetServerPort());
         clientSocket->Delete();
         this->ExtractsDeliveryHelper->SetSimulation2VisualizationController(sim2vis);
       }
-      else
+      else if (std::min(num_procs_paraview, num_procs_catalyst) > 1)
       {
         std::vector<vtkMultiProcessStream> tmp;
         parallelController->Gather(vtkMultiProcessStream(), tmp, 0);
-        assert(proc0NodesController == nullptr);
       }
 
       NotifyClientConnected(this->LiveSession, this->ProxyId, this->InsituXMLState);
@@ -718,49 +731,47 @@ void vtkLiveInsituLink::InsituConnect(vtkMultiProcessController* proc0NodesContr
       }
       this->ExtractsDeliveryHelper->SetNumberOfVisualizationProcesses(num_procs_paraview);
       this->ExtractsDeliveryHelper->SetNumberOfSimulationProcesses(num_procs_catalyst);
+      assert(num_procs_catalyst > 0 && num_procs_paraview > 0);
 
       // connect to the sim-nodes for data x'fer.
-      if (myId < std::min(num_procs_paraview, num_procs_catalyst))
+      if (myId == 0)
+      {
+        // we'll piggy back on proc0NodesController to deliver extracts.
+        this->ExtractsDeliveryHelper->SetSimulation2VisualizationController(
+          vtkSocketController::SafeDownCast(proc0NodesController));
+
+        // communicate between satellites.
+        if (std::min(num_procs_paraview, num_procs_catalyst) > 1)
+        {
+          vtkMultiProcessStream connectionMsg;
+          proc0NodesController->Receive(connectionMsg, 1, 98211);
+          parallelController->Broadcast(connectionMsg, 0);
+        }
+      }
+      else if (std::min(num_procs_catalyst, num_procs_paraview) > 1)
       {
         vtkMultiProcessStream connectionMsg;
-        if (proc0NodesController)
-        {
-          assert(myId == 0);
-          proc0NodesController->Receive(connectionMsg, 1, 98211);
-        }
         parallelController->Broadcast(connectionMsg, 0);
-        parallelController->Barrier();
 
-        int tag;
-        connectionMsg >> tag;
-        assert(tag == 98211);
-
-        int index = 0;
-        while (!connectionMsg.Empty())
+        for (int cc = 0; cc < num_procs_paraview && cc < num_procs_catalyst; ++cc)
         {
-          std::string hostname;
-          int port;
-          connectionMsg >> hostname >> port;
-          if (index == myId)
+          vtkMultiProcessStream msg;
+          connectionMsg >> msg;
+          if (myId == cc && !msg.Empty())
           {
+            std::string hostname;
+            int port, tag;
+            msg >> tag >> hostname >> port;
+            assert(tag == 98210);
             vtkNew<vtkSocketController> sim2vis;
             if (!sim2vis->ConnectTo(hostname.c_str(), port))
             {
               abort();
             }
-            this->ExtractsDeliveryHelper->SetSimulation2VisualizationController(
-              sim2vis.GetPointer());
+            this->ExtractsDeliveryHelper->SetSimulation2VisualizationController(sim2vis);
             break;
           }
-          index++;
         }
-        assert(index == myId);
-      }
-      else
-      {
-        vtkMultiProcessStream connectionMsg;
-        parallelController->Broadcast(connectionMsg, 0);
-        parallelController->Barrier();
       }
       parallelController->Barrier();
       break;
