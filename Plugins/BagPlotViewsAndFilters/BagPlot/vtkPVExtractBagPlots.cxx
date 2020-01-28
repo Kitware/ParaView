@@ -508,12 +508,19 @@ int vtkPVExtractBagPlots::RequestData(
     outTable->RemoveColumnByName(medianFunction->GetName());
   }
 
+  // We need to copy the median array before renaming it as it is a shallow
+  // copy from the input.
   vtkDataArray* maxHdrColumn =
     vtkDataArray::SafeDownCast(outTable->GetColumnByName(maxHdrCName.c_str()));
   assert(maxHdrColumn);
+  vtkSmartPointer<vtkDataArray> medianArray;
+  medianArray.TakeReference(vtkDataArray::CreateDataArray(maxHdrColumn->GetDataType()));
+  medianArray->DeepCopy(maxHdrColumn);
+  outTable->RemoveColumnByName(medianArray->GetName());
+  outTable->AddColumn(medianArray);
   std::stringstream medianColumnName;
-  medianColumnName << maxHdrColumn->GetName() << "_median";
-  maxHdrColumn->SetName(medianColumnName.str().c_str());
+  medianColumnName << medianArray->GetName() << "_median";
+  medianArray->SetName(medianColumnName.str().c_str());
 
   // Inject non-selected columns in the first output block.
   // This can be useful to select those columns as X-axis in the plot.
@@ -521,7 +528,7 @@ int vtkPVExtractBagPlots::RequestData(
   for (vtkIdType i = 0; i < inNbCols; i++)
   {
     vtkAbstractArray* col = inTable->GetColumn(i);
-    if (!this->Internal->Has(col->GetName()))
+    if (!this->Internal->Has(col->GetName()) && col->GetName() != medianColumnName.str())
     {
       outTable->AddColumn(col);
     }
