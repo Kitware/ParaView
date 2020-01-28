@@ -82,7 +82,7 @@ public slots:
   * Returns false if representation cannot be located or its is not using
   * scalar coloring.
   */
-  bool choosePreset(const char* presetName = NULL);
+  bool choosePreset(const char* presetName = nullptr);
 
   /**
   * Set the data representation explicitly when track_active_objects is false.
@@ -104,9 +104,9 @@ public slots:
 
 signals:
   /**
-  * fired every time a preset is applied.
-  */
-  void presetApplied();
+   * fired every time a preset is applied.
+   */
+  void presetApplied(const QString&);
 
 private slots:
   void applyCurrentPreset();

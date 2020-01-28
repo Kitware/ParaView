@@ -83,14 +83,14 @@
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/IndexedLookup/CheckBox" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/AnnotationsEditor/AddActive" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/AnnotationsEditor/ChoosePreset" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/AnnotationsEditor/ColorAnnotationsWidget/AddActive" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/AnnotationsEditor/ColorAnnotationsWidget/ChoosePreset" command="activate" arguments="" />
   <!-- Load "Spectrum" -->
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="0.1" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/apply" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/close" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/AnnotationsEditor/AnnotationsTable" command="mousePress" arguments="1,1,0,30,9,/5:2" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/AnnotationsEditor/AnnotationsTable" command="mouseRelease" arguments="1,0,0,30,9,/5:2" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/AnnotationsEditor/ColorAnnotationsWidget/AnnotationsTable" command="mousePress" arguments="1,1,0,30,9,/5:2" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/AnnotationsEditor/ColorAnnotationsWidget/AnnotationsTable" command="mouseRelease" arguments="1,0,0,30,9,/5:2" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/ShowScalarBar" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
   <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Color Map Editor" />
@@ -132,8 +132,8 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/SeriesGeneratorDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/AnnotationsEditor/DeleteAll" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/AnnotationsEditor/AddActive" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/AnnotationsEditor/ColorAnnotationsWidget/DeleteAll" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/AnnotationsEditor/ColorAnnotationsWidget/AddActive" command="activate" arguments="" />
 
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/Contour3.png" width="300" height="300" />
 </pqevents>

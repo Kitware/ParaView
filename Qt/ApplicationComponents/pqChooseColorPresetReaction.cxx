@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMTransferFunctionProxy.h"
 
+#include "vtk_jsoncpp.h"
+
 #include <cassert>
 
 QPointer<pqPresetDialog> pqChooseColorPresetReaction::PresetDialog;
@@ -52,7 +54,7 @@ vtkSMProxy* lutProxy(vtkSMProxy* reprProxy)
   {
     return vtkSMPropertyHelper(reprProxy, "LookupTable", true).GetAsProxy();
   }
-  return NULL;
+  return nullptr;
 }
 }
 
@@ -99,7 +101,7 @@ void pqChooseColorPresetReaction::setRepresentation(pqDataRepresentation* repr)
 void pqChooseColorPresetReaction::updateTransferFunction()
 {
   this->setTransferFunction(
-    this->Representation ? this->Representation->getLookupTableProxy() : NULL);
+    this->Representation ? this->Representation->getLookupTableProxy() : nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -112,7 +114,7 @@ void pqChooseColorPresetReaction::setTransferFunction(vtkSMProxy* lut)
 //-----------------------------------------------------------------------------
 void pqChooseColorPresetReaction::updateEnableState()
 {
-  this->parentAction()->setEnabled(this->TransferFunctionProxy != NULL);
+  this->parentAction()->setEnabled(this->TransferFunctionProxy != nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -215,5 +217,7 @@ void pqChooseColorPresetReaction::applyCurrentPreset()
       lut, dialog->currentPreset(), !dialog->loadAnnotations());
   }
   END_UNDO_SET();
-  emit this->presetApplied();
+
+  emit this->presetApplied(
+    QString(dialog->currentPreset().get("Name", "Preset").asString().c_str()));
 }

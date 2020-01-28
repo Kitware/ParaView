@@ -15,9 +15,6 @@
 #include "vtkXYChartRepresentation.h"
 #include "vtkXYChartRepresentationInternals.h"
 
-#include "vtkCommand.h"
-#include "vtkCompositeDataIterator.h"
-#include "vtkContextView.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkInformation.h"
 #include "vtkMultiBlockDataSet.h"
@@ -29,10 +26,6 @@
 #include "vtkSmartPointer.h"
 #include "vtkSortFieldData.h"
 #include "vtkTableAlgorithm.h"
-#include "vtkWeakPointer.h"
-
-#include <map>
-#include <string>
 
 class vtkXYChartRepresentation::SortTableFilter : public vtkTableAlgorithm
 {
@@ -41,7 +34,7 @@ private:
 
 protected:
   SortTableFilter()
-    : ArrayToSortBy(NULL)
+    : ArrayToSortBy(nullptr)
   {
   }
   ~SortTableFilter() override {}
@@ -83,11 +76,11 @@ vtkStandardNewMacro(vtkXYChartRepresentation);
 vtkXYChartRepresentation::vtkXYChartRepresentation()
   : Internals(new vtkXYChartRepresentation::vtkInternals())
   , ChartType(vtkChart::LINE)
-  , XAxisSeriesName(NULL)
+  , XAxisSeriesName(nullptr)
   , UseIndexForXAxis(true)
   , SortDataByXAxis(false)
   , PlotDataHasChanged(false)
-  , SeriesLabelPrefix(NULL)
+  , SeriesLabelPrefix(nullptr)
 {
   this->SelectionColor[0] = 1.;
   this->SelectionColor[1] = 0.;
@@ -102,15 +95,15 @@ vtkXYChartRepresentation::~vtkXYChartRepresentation()
     this->Internals->RemoveAllPlots(this->GetChart());
   }
   delete this->Internals;
-  this->Internals = NULL;
-  this->SetXAxisSeriesName(NULL);
-  this->SetSeriesLabelPrefix(NULL);
+  this->Internals = nullptr;
+  this->SetXAxisSeriesName(nullptr);
+  this->SetSeriesLabelPrefix(nullptr);
 }
 
 //----------------------------------------------------------------------------
 bool vtkXYChartRepresentation::RemoveFromView(vtkView* view)
 {
-  if ((this->ContextView.GetPointer() == view) && (this->GetChart() != NULL))
+  if ((this->ContextView.GetPointer() == view) && (this->GetChart() != nullptr))
   {
     this->Internals->RemoveAllPlots(this->GetChart());
   }
@@ -160,7 +153,7 @@ vtkChartXY* vtkXYChartRepresentation::GetChart()
 //----------------------------------------------------------------------------
 void vtkXYChartRepresentation::SetSeriesVisibility(const char* seriesname, bool visible)
 {
-  assert(seriesname != NULL);
+  assert(seriesname != nullptr);
   this->Internals->SeriesVisibilities[seriesname] = visible;
   this->Internals->SeriesOrder[seriesname] = static_cast<int>(this->Internals->SeriesOrder.size());
   this->Modified();
@@ -169,7 +162,7 @@ void vtkXYChartRepresentation::SetSeriesVisibility(const char* seriesname, bool 
 //----------------------------------------------------------------------------
 void vtkXYChartRepresentation::SetLineThickness(const char* seriesname, double value)
 {
-  assert(seriesname != NULL);
+  assert(seriesname != nullptr);
   this->Internals->LineThicknesses[seriesname] = value;
   this->Modified();
 }
@@ -177,7 +170,7 @@ void vtkXYChartRepresentation::SetLineThickness(const char* seriesname, double v
 //----------------------------------------------------------------------------
 void vtkXYChartRepresentation::SetLineStyle(const char* seriesname, int value)
 {
-  assert(seriesname != NULL);
+  assert(seriesname != nullptr);
   this->Internals->LineStyles[seriesname] = value;
   this->Modified();
 }
@@ -185,7 +178,7 @@ void vtkXYChartRepresentation::SetLineStyle(const char* seriesname, int value)
 //----------------------------------------------------------------------------
 void vtkXYChartRepresentation::SetColor(const char* seriesname, double r, double g, double b)
 {
-  assert(seriesname != NULL);
+  assert(seriesname != nullptr);
   this->Internals->Colors[seriesname] = vtkColor3d(r, g, b);
   this->Modified();
 }
@@ -193,7 +186,7 @@ void vtkXYChartRepresentation::SetColor(const char* seriesname, double r, double
 //----------------------------------------------------------------------------
 void vtkXYChartRepresentation::SetUseColorMapping(const char* seriesname, bool useColorMapping)
 {
-  assert(seriesname != NULL);
+  assert(seriesname != nullptr);
   this->Internals->UseColorMapping[seriesname] = useColorMapping;
   this->Modified();
 }
@@ -201,7 +194,7 @@ void vtkXYChartRepresentation::SetUseColorMapping(const char* seriesname, bool u
 //----------------------------------------------------------------------------
 void vtkXYChartRepresentation::SetLookupTable(const char* seriesname, vtkScalarsToColors* lut)
 {
-  assert(seriesname != NULL);
+  assert(seriesname != nullptr);
   this->Internals->Lut[seriesname] = lut;
   this->Modified();
 }
@@ -209,7 +202,7 @@ void vtkXYChartRepresentation::SetLookupTable(const char* seriesname, vtkScalars
 //----------------------------------------------------------------------------
 void vtkXYChartRepresentation::SetAxisCorner(const char* seriesname, int corner)
 {
-  assert(seriesname != NULL);
+  assert(seriesname != nullptr);
   this->Internals->AxisCorners[seriesname] = corner;
   this->Modified();
 }
@@ -217,7 +210,7 @@ void vtkXYChartRepresentation::SetAxisCorner(const char* seriesname, int corner)
 //----------------------------------------------------------------------------
 void vtkXYChartRepresentation::SetMarkerStyle(const char* seriesname, int style)
 {
-  assert(seriesname != NULL);
+  assert(seriesname != nullptr);
   this->Internals->MarkerStyles[seriesname] = style;
   this->Modified();
 }
@@ -225,7 +218,7 @@ void vtkXYChartRepresentation::SetMarkerStyle(const char* seriesname, int style)
 //----------------------------------------------------------------------------
 void vtkXYChartRepresentation::SetMarkerSize(const char* seriesname, double value)
 {
-  assert(seriesname != NULL);
+  assert(seriesname != nullptr);
   this->Internals->MarkerSizes[seriesname] = value;
   this->Modified();
 }
@@ -233,7 +226,7 @@ void vtkXYChartRepresentation::SetMarkerSize(const char* seriesname, double valu
 //----------------------------------------------------------------------------
 void vtkXYChartRepresentation::SetLabel(const char* seriesname, const char* label)
 {
-  assert(seriesname != NULL && label != NULL);
+  assert(seriesname != nullptr && label != nullptr);
   this->Internals->Labels[seriesname] = label;
   this->Modified();
 }
@@ -241,10 +234,10 @@ void vtkXYChartRepresentation::SetLabel(const char* seriesname, const char* labe
 //----------------------------------------------------------------------------
 const char* vtkXYChartRepresentation::GetLabel(const char* seriesname) const
 {
-  assert(seriesname != NULL);
+  assert(seriesname != nullptr);
   return (this->Internals->Labels.find(seriesname) != this->Internals->Labels.end())
     ? this->Internals->Labels[seriesname].c_str()
-    : NULL;
+    : nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -359,7 +352,7 @@ void vtkXYChartRepresentation::PrepareForRendering()
   this->Superclass::PrepareForRendering();
 
   vtkChartXY* chartXY = this->GetChart();
-  assert(chartXY != NULL); // we are assured this is always so.
+  assert(chartXY != nullptr); // we are assured this is always so.
 
   vtkChartRepresentation::MapOfTables tables;
   if (!this->GetLocalOutput(tables))
@@ -369,7 +362,7 @@ void vtkXYChartRepresentation::PrepareForRendering()
   }
 
   if (this->UseIndexForXAxis == false &&
-    (this->XAxisSeriesName == NULL || this->XAxisSeriesName[0] == 0))
+    (this->XAxisSeriesName == nullptr || this->XAxisSeriesName[0] == 0))
   {
     vtkErrorMacro("Missing XAxisSeriesName.");
     this->Internals->HideAllPlots();
@@ -383,7 +376,7 @@ void vtkXYChartRepresentation::PrepareForRendering()
   // Update plots. This will create new vtkPlot if needed.
   this->Internals->UpdatePlots(this, tables);
   this->Internals->UpdatePlotProperties(this);
-  assert(this->UseIndexForXAxis == true || this->XAxisSeriesName != NULL);
+  assert(this->UseIndexForXAxis == true || this->XAxisSeriesName != nullptr);
 }
 
 //----------------------------------------------------------------------------

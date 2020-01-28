@@ -225,49 +225,15 @@
     </widget>
    </item>
    <item row="0" column="0" colspan="2">
-    <widget class="pqTreeView" name="SeriesTable">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="whatsThis">
-      <string>This displays the list of line series. You can use the list to edit the series options.</string>
-     </property>
-     <property name="alternatingRowColors">
-      <bool>true</bool>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::ExtendedSelection</enum>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <property name="rootIsDecorated">
-      <bool>false</bool>
-     </property>
-     <property name="uniformRowHeights">
-      <bool>true</bool>
-     </property>
-     <property name="itemsExpandable">
-      <bool>false</bool>
-     </property>
-     <property name="animated">
-      <bool>true</bool>
-     </property>
-     <property name="maximumRowCountBeforeScrolling" stdset="0">
-      <number>30</number>
-     </property>
-    </widget>
+    <widget class="pqColorAnnotationsWidget" name="SeriesTable"></widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqTreeView</class>
-   <extends>QTreeView</extends>
-   <header>pqTreeView.h</header>
+   <class>pqColorAnnotationsWidget</class>
+   <extends>QWidget</extends>
+   <header>pqColorAnnotationsWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -367,6 +367,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectPointsTrace.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SeparatedColorMapA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SeparatedColorMapB.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SeriesPreset.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Slice.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SliceDirectDoubleColoring.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SliceWithPlaneCellData.png}"
@@ -571,6 +572,7 @@ SET(TESTS_WITH_BASELINES
   DataAxesGrid.xml
   MoleculeScalarBar.xml
   SelectionByArray.xml
+  SeriesPreset.xml
   TestHiddenLineRemoval.xml
   TestOpacityRendering.xml
 )

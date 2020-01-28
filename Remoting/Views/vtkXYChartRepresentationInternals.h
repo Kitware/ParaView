@@ -16,7 +16,7 @@
  * @class   vtkXYChartRepresentationInternals
  *
  * Implementation class used by vtkXYChartRepresentation.
-*/
+ */
 
 #ifndef vtkXYChartRepresentationInternals_h
 #define vtkXYChartRepresentationInternals_h
@@ -154,12 +154,14 @@ protected:
   PlotsMap SeriesPlots;
 
   //---------------------------------------------------------------------------
-  // Makes is easy to obtain a value for a series parameter, is set, else the
-  // default. This class supports two mechanisms for addresses series in a
-  // collection  (multiblock) of tables: (1) using a name that combines the
-  // table name and the column name (using
-  // vtkChartRepresentation::GetDefaultSeriesLabel), or (2) using the column
-  // name alone. (1) is always checked before (2).
+  /**
+   * Makes is easy to obtain a value for a series parameter, is set, else the
+   * default. This class supports two mechanisms for addresses series in a
+   * collection  (multiblock) of tables: (1) using a name that combines the
+   * table name and the column name (using
+   * vtkChartRepresentation::GetDefaultSeriesLabel), or (2) using the column
+   * name alone. (1) is always checked before (2).
+   */
   template <class T>
   T GetSeriesParameter(vtkXYChartRepresentation* self, const std::string& tableName,
     const std::string& columnName, const std::string& vtkNotUsed(role),
@@ -220,11 +222,15 @@ public:
   virtual ~vtkInternals() {}
 
   //---------------------------------------------------------------------------
-  // Hide all plots.
+  /**
+   * Hide all plots.
+   */
   void HideAllPlots() { this->SeriesPlots.SetPlotVisibility(false); }
 
   //---------------------------------------------------------------------------
-  // Destroy all vtkPlot instances.
+  /**
+   * Destroy all vtkPlot instances.
+   */
   void RemoveAllPlots(vtkChartXY* chartXY) { this->SeriesPlots.RemoveAllPlots(chartXY); }
 
   //---------------------------------------------------------------------------
@@ -239,6 +245,10 @@ public:
     return { std::string() };
   }
 
+  //---------------------------------------------------------------------------
+  /**
+   * Add new plot
+   */
   virtual vtkPlot* NewPlot(vtkXYChartRepresentation* self, const std::string& tableName,
     const std::string& columnName, const std::string& role)
   {
@@ -261,11 +271,13 @@ public:
   }
 
   //---------------------------------------------------------------------------
-  // Update i.e. add/remove plots based on the data in the tables.
+  /**
+   * Update i.e. add/remove plots based on the data in the tables.
+   */
   virtual void UpdatePlots(vtkXYChartRepresentation* self, const MapOfTables& tables)
   {
     PlotsMap newPlots;
-    assert(self != NULL);
+    assert(self != nullptr);
     vtkChartXY* chartXY = self->GetChart();
     this->RemoveAllPlots(chartXY);
     std::multimap<int, std::pair<vtkTable*, std::array<std::string, 3> > > orderMap;
@@ -327,7 +339,9 @@ public:
   }
 
   //---------------------------------------------------------------------------
-  // Update properties for plots in the chart.
+  /**
+   * Update properties for plots in the chart.
+   */
   virtual void UpdatePlotProperties(vtkXYChartRepresentation* self)
   {
     vtkChartXY* chartXY = self->GetChart();
@@ -374,7 +388,9 @@ public:
   }
 
   //---------------------------------------------------------------------------
-  // Export visible plots to a CSV file.
+  /**
+   * Export visible plots to a CSV file.
+   */
   virtual bool Export(vtkXYChartRepresentation* self, vtkCSVExporter* exporter)
   {
     for (PlotsMap::iterator iter1 = this->SeriesPlots.begin(); iter1 != this->SeriesPlots.end();
@@ -392,10 +408,10 @@ public:
         const std::string& columnName = plotInfo.ColumnName;
         vtkTable* table = plot->GetInput();
         vtkDataArray* xarray = self->GetUseIndexForXAxis()
-          ? NULL
+          ? nullptr
           : vtkDataArray::SafeDownCast(table->GetColumnByName(self->GetXAxisSeriesName()));
         vtkAbstractArray* yarray = table->GetColumnByName(columnName.c_str());
-        if (yarray != NULL)
+        if (yarray != nullptr)
         {
           exporter->AddColumn(yarray, plot->GetLabel().c_str(), xarray);
         }
@@ -406,7 +422,9 @@ public:
 
 protected:
   //---------------------------------------------------------------------------
-  // Returns false for in-visible plots.
+  /**
+   * Returns false for in-visible plots.
+   */
   virtual bool UpdateSinglePlotProperties(vtkXYChartRepresentation* self,
     const std::string& tableName, const std::string& columnName, const std::string& role,
     vtkPlot* plot)
@@ -463,7 +481,7 @@ protected:
       plotBar->SetScalarVisibility(colorMapping);
       plotBar->SelectColorArray("bin_extents");
       vtkScalarsToColors* lut = this->GetSeriesParameter(
-        self, tableName, columnName, role, this->Lut, static_cast<vtkScalarsToColors*>(NULL));
+        self, tableName, columnName, role, this->Lut, static_cast<vtkScalarsToColors*>(nullptr));
       if (lut)
       {
         plotBar->SetLookupTable(lut);

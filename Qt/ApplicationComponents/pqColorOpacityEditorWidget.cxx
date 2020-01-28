@@ -158,8 +158,8 @@ public:
     this->Ui.OpacityTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     this->Ui.OpacityTable->horizontalHeader()->setStretchLastSection(true);
 
-    QObject::connect(
-      this->ChoosePresetReaction.data(), SIGNAL(presetApplied()), self, SLOT(presetApplied()));
+    QObject::connect(this->ChoosePresetReaction.data(), SIGNAL(presetApplied(const QString&)), self,
+      SLOT(presetApplied()));
 
     this->HistogramTimer.setSingleShot(true);
     this->HistogramTimer.setInterval(1);

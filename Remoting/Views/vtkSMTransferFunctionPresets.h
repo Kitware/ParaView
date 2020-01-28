@@ -75,11 +75,15 @@ public:
    */
   bool RemovePreset(unsigned int index);
 
+  //@{
   /**
    * Returns a preset JSON given the name. Since multiple presets can have the
    * same name, this returns the 'first' preset with the specified name.
+   * idx is set to the index of the found preset,-1 if none.
    */
+  const Json::Value& GetFirstPresetWithName(const char* name, int& idx);
   const Json::Value& GetFirstPresetWithName(const char* name);
+  //@}
 
   /**
    * Returns a preset at a given index.
@@ -129,6 +133,12 @@ public:
    */
   bool IsPresetDefault(const Json::Value& preset);
   bool IsPresetDefault(unsigned int index) { return this->IsPresetDefault(this->GetPreset(index)); }
+
+  /**
+   * Set the Json::Value object for preset 'name' if such a preset was found in the custom presets.
+   * Return true if preset was correctly set, false otherwise.
+   */
+  bool SetPreset(const char* name, const Json::Value& preset);
 
   /**
    * Add a preset give the Json::Value object.

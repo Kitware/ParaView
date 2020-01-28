@@ -7315,6 +7315,13 @@
       </Documentation>
       </StringVectorProperty>
 
+      <StringVectorProperty name="LastPresetName"
+                            number_of_elements="1"
+                            default_values="Spectrum"
+                            panel_visibility="never">
+      <Documentation>Dummy property containing last color preset name.
+        The property widget can set it when a preset is applied, and the domain can read it when a default color is requested.</Documentation>
+      </StringVectorProperty>
       <!-- End of XYChartRepresentationBase -->
     </ChartRepresentationProxy>
 
@@ -8193,6 +8200,8 @@
                   function="SeriesMarkerStyle" />
         <Property name="SeriesPlotCorner"
                   function="SeriesPlotCorner"/>
+        <Property name="LastPresetName"
+                  function="LastPresetName"/>
       </PropertyGroup>
 
       <Hints>

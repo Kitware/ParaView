@@ -32,240 +32,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSeriesEditorPropertyWidget.h"
 #include "ui_pqSeriesEditorPropertyWidget.h"
 
+#include "pqActiveObjects.h"
+#include "pqAnnotationsModel.h"
 #include "pqPropertiesPanel.h"
-#include "pqSMAdaptor.h"
-#include "pqTreeViewSelectionHelper.h"
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMChartSeriesSelectionDomain.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMPropertyGroup.h"
-#include "vtkSMVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkSMTransferFunctionProxy.h"
+#include "vtkSetGet.h"
 #include "vtkSmartPointer.h"
-
-#include <QAbstractTableModel>
-#include <QByteArray>
-#include <QColorDialog>
-#include <QDataStream>
-#include <QFontMetrics>
-#include <QHeaderView>
-#include <QItemSelectionModel>
-#include <QMimeData>
-#include <QPair>
-#include <QPointer>
-#include <QSortFilterProxyModel>
-#include <QVector>
+#include "vtkStringList.h"
 
 #include <cassert>
 #include <limits>
 
-//=============================================================================
-// QAbstractTableModel for showing the series properties. Since series
-// properties are specified on several different vtkSMProperty instances on the
-// proxy, there could easily be a mismatch i.e. a series is specified in
-// "SeriesVisibility", but not in "SeriesColor". To overcome that issues, this
-// model uses the "SeriesVisibility" as the main driver for the model. There
-// will exactly as many rows as the number of series specified in
-// SeriesVisibility. For all other properties, extra values will not be shown
-// and default values will be made up for missing series.
-class pqSeriesParametersModel : public QAbstractTableModel
+class pqSeriesAnnotationsModel : public pqAnnotationsModel
 {
-  typedef QAbstractTableModel Superclass;
-
-  bool SupportsReorder;
-  QIcon MissingColorIcon;
-  QVector<QPair<QString, bool> > Visibilities;
-  QMap<QString, QString> Labels;
-  QMap<QString, QColor> Colors;
-  QPointer<QWidget> Widget; // used to determine text size.
-  vtkSmartPointer<vtkSMChartSeriesSelectionDomain> Domain;
-
-  QColor seriesColor(const QModelIndex& idx) const
-  {
-    if (idx.isValid() && (idx.row() < this->Visibilities.size()) &&
-      this->Colors.contains(this->Visibilities[idx.row()].first))
-    {
-      return this->Colors[this->Visibilities[idx.row()].first];
-    }
-    return QColor();
-  }
-
-  // returns true is the series is in Domain else false.
-  bool isSeriesInDomain(const QString& _seriesName) const
-  {
-    unsigned int unused = 0;
-    if (this->Domain && this->Domain->IsInDomain(_seriesName.toLocal8Bit().data(), unused) != 0)
-    {
-      return true;
-    }
-    // if no domain is present, then the series is treated is always visible.
-    return (this->Domain.GetPointer() != NULL) ? false : true;
-  }
+  typedef pqAnnotationsModel Superclass;
 
 public:
-  pqSeriesParametersModel(bool supportsReorder, QObject* parentObject = 0)
-    : Superclass(parentObject)
-    , SupportsReorder(supportsReorder)
-    , MissingColorIcon(":/pqWidgets/Icons/pqUnknownData16.png")
+  pqSeriesAnnotationsModel(QObject* parent = nullptr)
+    : Superclass(parent)
   {
-    this->Visibilities.push_back(QPair<QString, bool>("Alpha", true));
-    this->Visibilities.push_back(QPair<QString, bool>("Beta", false));
-  }
-  ~pqSeriesParametersModel() override {}
-  void setWidget(QWidget* wdg) { this->Widget = wdg; }
-  void setVisibilityDomain(vtkSMChartSeriesSelectionDomain* domain) { this->Domain = domain; }
-  void domainChanged()
-  {
-    // fire dataChanged signal so the filtering logic can kick in.
-    emit this->dataChanged(
-      this->index(0, VISIBILITY), this->index(this->rowCount() - 1, VISIBILITY));
-  }
-
-  enum ColumnRoles
-  {
-    VISIBILITY = 0,
-    COLOR = 1,
-    LABEL = 2
-  };
-
-  /// Drag/drop of rows is enabled for cases were the series ordering is
-  /// relevant e.g. parallel coordinates/scatter plot matrix.
-  Qt::ItemFlags flags(const QModelIndex& idx) const override
-  {
-    Qt::ItemFlags value = this->Superclass::flags(idx);
-    if (this->SupportsReorder)
-    {
-      value |= Qt::ItemIsDropEnabled;
-    }
-    if (idx.isValid())
-    {
-      value |= Qt::ItemIsDragEnabled;
-      switch (idx.column())
-      {
-        case VISIBILITY:
-          return value | Qt::ItemIsUserCheckable;
-        case LABEL:
-          return value | Qt::ItemIsEditable;
-        case COLOR:
-        default:
-          break;
-      }
-    }
-    return value;
-  }
-
-  int rowCount(const QModelIndex& idx = QModelIndex()) const override
-  {
-    return idx.isValid() ? 0 : this->Visibilities.size();
-  }
-
-  int columnCount(const QModelIndex& idx = QModelIndex()) const override
-  {
-    Q_UNUSED(idx);
-    return 3;
-  }
-
-  QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const override
-  {
-    assert(idx.row() < this->Visibilities.size());
-#ifndef __APPLE__
-    // On OSX, the default row-size ends up being reasonable. Hence, don't override it on OsX.
-    if (role == Qt::SizeHintRole)
-    {
-      // this make the rows appear less crowded.
-      if (this->Widget && idx.column() != COLOR)
-      {
-        int height = this->Widget->fontMetrics().boundingRect("(").height();
-        return QSize(0, static_cast<int>(height * 1.30)); // pad each row
-      }
-      return QVariant();
-    }
-#endif
-    if (idx.column() == VISIBILITY)
-    {
-      switch (role)
-      {
-        case Qt::DisplayRole:
-        case Qt::ToolTipRole:
-        case Qt::StatusTipRole:
-          return this->Visibilities[idx.row()].first;
-
-        case Qt::UserRole:
-          // check if the series is in domain and then show/hide it.
-          return this->isSeriesInDomain(this->Visibilities[idx.row()].first) ? "1" : "0";
-
-        case Qt::CheckStateRole:
-          return this->Visibilities[idx.row()].second ? Qt::Checked : Qt::Unchecked;
-      }
-    }
-    else if (idx.column() == COLOR)
-    {
-      QColor color;
-      switch (role)
-      {
-        case Qt::DecorationRole:
-          color = this->seriesColor(idx);
-          return color.isValid() ? QVariant(color) : QVariant(this->MissingColorIcon);
-
-        case Qt::ToolTipRole:
-        case Qt::StatusTipRole:
-          return "Series Color";
-      }
-    }
-    else if (idx.column() == LABEL)
-    {
-      QString label;
-      if (this->Labels.contains(this->Visibilities[idx.row()].first))
-      {
-        label = this->Labels[this->Visibilities[idx.row()].first];
-      }
-      else
-      {
-        label = this->Visibilities[idx.row()].first;
-      }
-
-      switch (role)
-      {
-        case Qt::DisplayRole:
-        case Qt::ToolTipRole:
-        case Qt::StatusTipRole:
-        case Qt::EditRole:
-          return label;
-      }
-    }
-
-    return QVariant();
-  }
-
-  bool setData(const QModelIndex& idx, const QVariant& value, int role = Qt::EditRole) override
-  {
-    if (idx.column() == VISIBILITY && role == Qt::CheckStateRole)
-    {
-      bool checkState = (value.toInt() == Qt::Checked);
-      assert(idx.row() < this->Visibilities.size());
-      this->Visibilities[idx.row()].second = checkState;
-      emit this->dataChanged(idx, idx);
-      return true;
-    }
-    else if (idx.column() == COLOR && role == Qt::EditRole)
-    {
-      assert(idx.row() < this->Visibilities.size());
-      if (value.canConvert(QVariant::Color))
-      {
-        this->Colors[this->Visibilities[idx.row()].first] = value.value<QColor>();
-        emit this->dataChanged(idx, idx);
-        return true;
-      }
-    }
-    else if (idx.column() == LABEL && role == Qt::EditRole)
-    {
-      assert(idx.row() < this->Visibilities.size());
-      this->Labels[this->Visibilities[idx.row()].first] = value.toString();
-      emit this->dataChanged(idx, idx);
-      return true;
-    }
-    return false;
   }
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override
@@ -274,250 +70,63 @@ public:
     {
       switch (section)
       {
+        case VALUE:
+          return role == Qt::DisplayRole ? tr("Variable") : tr("Series name");
         case VISIBILITY:
-          return role == Qt::DisplayRole ? "Variable" : "Toggle series visibility";
+          return role == Qt::DisplayRole ? "" : tr("Toggle series visibility");
         case COLOR:
-          return role == Qt::DisplayRole ? "" : "Set color to use for the series";
+          return role == Qt::DisplayRole ? "" : tr("Set color to use for the series");
         case LABEL:
-          return role == Qt::DisplayRole ? "Legend Name"
-                                         : "Set the text to use for the series in the legend";
+          return role == Qt::DisplayRole ? tr("Legend Name")
+                                         : tr("Set the text to use for the series in the legend");
       }
     }
+
     return this->Superclass::headerData(section, orientation, role);
   }
 
-  QString seriesName(const QModelIndex& idx) const
+  Qt::ItemFlags flags(const QModelIndex& idx) const override
   {
-    if (idx.isValid() && idx.row() < this->Visibilities.size())
+    auto value = this->Superclass::flags(idx);
+    if (idx.column() == VALUE)
     {
-      return this->Visibilities[idx.row()].first;
+      return value & ~Qt::ItemIsEditable;
     }
-    return QString();
+
+    return value;
   }
 
-  void setVisibilities(const QVector<QPair<QString, bool> >& new_visibilies)
+  void domainModified()
   {
-    emit this->beginResetModel();
-    this->Visibilities = new_visibilies;
-    emit this->endResetModel();
+    emit this->dataChanged(
+      this->index(0, 0), this->index(this->rowCount() - 1, NUMBER_OF_COLUMNS - 1));
   }
-
-  const QVector<QPair<QString, bool> >& visibilities() const { return this->Visibilities; }
-
-  void setLabels(const QVector<QPair<QString, QString> >& new_labels)
-  {
-    typedef QPair<QString, QString> item_type;
-    foreach (const item_type& pair, new_labels)
-    {
-      this->Labels[pair.first] = pair.second;
-    }
-
-    if (this->rowCount() > 0)
-    {
-      emit this->dataChanged(this->index(0, LABEL), this->index(this->rowCount() - 1, LABEL));
-    }
-  }
-
-  const QVector<QPair<QString, QString> > labels() const
-  {
-    QVector<QPair<QString, QString> > reply;
-
-    // return labels for the ones we have visibility information.
-    typedef QPair<QString, bool> item_type;
-    foreach (const item_type& pair, this->Visibilities)
-    {
-      if (this->Labels.contains(pair.first))
-      {
-        reply.push_back(QPair<QString, QString>(pair.first, this->Labels[pair.first]));
-      }
-      else
-      {
-        reply.push_back(QPair<QString, QString>(pair.first, pair.first));
-      }
-    }
-    return reply;
-  }
-
-  void setColors(const QVector<QPair<QString, QColor> >& new_colors)
-  {
-    typedef QPair<QString, QColor> item_type;
-    foreach (const item_type& pair, new_colors)
-    {
-      this->Colors[pair.first] = pair.second;
-    }
-    if (this->rowCount() > 0)
-    {
-      emit this->dataChanged(this->index(0, COLOR), this->index(this->rowCount() - 1, COLOR));
-    }
-  }
-
-  const QVector<QPair<QString, QColor> > colors() const
-  {
-    QVector<QPair<QString, QColor> > reply;
-
-    // return labels for the ones we have visibility information.
-    typedef QPair<QString, bool> item_type;
-    foreach (const item_type& pair, this->Visibilities)
-    {
-      if (this->Colors.contains(pair.first))
-      {
-        reply.push_back(QPair<QString, QColor>(pair.first, this->Colors[pair.first]));
-      }
-    }
-    return reply;
-  }
-
-  //--------- Drag-N-Drop support when enabled --------
-  Qt::DropActions supportedDropActions() const override
-  {
-    return this->SupportsReorder ? (Qt::CopyAction | Qt::MoveAction)
-                                 : this->Superclass::supportedDropActions();
-  }
-
-  QStringList mimeTypes() const override
-  {
-    if (this->SupportsReorder)
-    {
-      QStringList types;
-      types << "application/paraview.series.list";
-      return types;
-    }
-
-    return this->Superclass::mimeTypes();
-  }
-
-  QMimeData* mimeData(const QModelIndexList& indexes) const override
-  {
-    if (!this->SupportsReorder)
-    {
-      return this->Superclass::mimeData(indexes);
-    }
-    QMimeData* mime_data = new QMimeData();
-    QByteArray encodedData;
-
-    QDataStream stream(&encodedData, QIODevice::WriteOnly);
-    QList<QString> keys;
-    foreach (const QModelIndex& idx, indexes)
-    {
-      QString name = this->seriesName(idx);
-      if (!name.isEmpty() && !keys.contains(name))
-      {
-        keys << this->seriesName(idx);
-      }
-    }
-    foreach (const QString& str, keys)
-    {
-      stream << str;
-    }
-    mime_data->setData("application/paraview.series.list", encodedData);
-    return mime_data;
-  }
-
-  bool dropMimeData(const QMimeData* mime_data, Qt::DropAction action, int row, int column,
-    const QModelIndex& parentIdx) override
-  {
-    if (!this->SupportsReorder)
-    {
-      return this->Superclass::dropMimeData(mime_data, action, row, column, parentIdx);
-    }
-    if (action == Qt::IgnoreAction)
-    {
-      return true;
-    }
-    if (!mime_data->hasFormat("application/paraview.series.list"))
-    {
-      return false;
-    }
-
-    int beginRow = -1;
-    if (row != -1)
-    {
-      beginRow = row;
-    }
-    else if (parentIdx.isValid())
-    {
-      beginRow = parentIdx.row();
-    }
-    else
-    {
-      beginRow = this->rowCount();
-    }
-    if (beginRow < 0)
-    {
-      return false;
-    }
-
-    QByteArray encodedData = mime_data->data("application/paraview.series.list");
-    QDataStream stream(&encodedData, QIODevice::ReadOnly);
-    QStringList newItems;
-    while (!stream.atEnd())
-    {
-      QString text;
-      stream >> text;
-      newItems << text;
-    }
-
-    // now re-order the visibilities list.
-    QVector<QPair<QString, bool> > new_visibilies;
-    QMap<QString, bool> to_insert;
-
-    int real_begin_row = -1;
-    for (int cc = 0; cc < this->Visibilities.size(); cc++)
-    {
-      if (cc == beginRow)
-      {
-        real_begin_row = new_visibilies.size();
-      }
-      if (!newItems.contains(this->Visibilities[cc].first))
-      {
-        new_visibilies.push_back(this->Visibilities[cc]);
-      }
-      else
-      {
-        to_insert.insert(this->Visibilities[cc].first, this->Visibilities[cc].second);
-      }
-    }
-    if (real_begin_row == -1)
-    {
-      real_begin_row = new_visibilies.size();
-    }
-    foreach (const QString& item, newItems)
-    {
-      if (to_insert.contains(item))
-      {
-        new_visibilies.insert(real_begin_row, QPair<QString, bool>(item, to_insert[item]));
-        real_begin_row++;
-      }
-    }
-    this->setVisibilities(new_visibilies);
-    emit this->dataChanged(this->index(0, VISIBILITY), this->index(this->rowCount() - 1, LABEL));
-    return true;
-  }
-
-private:
-  Q_DISABLE_COPY(pqSeriesParametersModel)
 };
-
-//=============================================================================
 
 class pqSeriesEditorPropertyWidget::pqInternals
 {
 public:
   Ui::SeriesEditorPropertyWidget Ui;
-  vtkSmartPointer<vtkSMPropertyGroup> PropertyGroup;
   vtkNew<vtkEventQtSlotConnect> VTKConnector;
-  pqSeriesParametersModel Model;
   QMap<QString, double> Thickness;
   QMap<QString, int> Style;
   QMap<QString, int> MarkerStyle;
   QMap<QString, double> MarkerSize;
   QMap<QString, int> PlotCorner;
   bool RefreshingWidgets;
+  vtkSmartPointer<vtkSMTransferFunctionProxy> LookupTableProxy;
+  pqSeriesAnnotationsModel* Model;
+  QVector<int> PresetToSeriesMapping;
 
-  pqInternals(bool supportsReorder, pqSeriesEditorPropertyWidget* self)
-    : Model(supportsReorder)
-    , RefreshingWidgets(false)
+  pqInternals(pqSeriesEditorPropertyWidget* self)
+    : RefreshingWidgets(false)
   {
+    auto pxm = pqActiveObjects::instance().proxyManager();
+    auto lutProxy =
+      vtkSMTransferFunctionProxy::SafeDownCast(pxm->NewProxy("lookup_tables", "PVLookupTable"));
+    this->LookupTableProxy.TakeReference(lutProxy);
+    vtkSMPropertyHelper(lutProxy, "IndexedLookup").Set(1);
+
     this->Ui.setupUi(self);
     this->Ui.wdgLayout->setMargin(pqPropertiesPanel::suggestedMargin());
     this->Ui.wdgLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
@@ -527,64 +136,13 @@ public:
     this->Ui.MarkerSize->setMaximum(std::numeric_limits<double>::infinity());
     this->Ui.Thickness->setMaximum(std::numeric_limits<double>::infinity());
 
-    this->Ui.SeriesTable->setDragEnabled(supportsReorder);
-    this->Ui.SeriesTable->setDragDropMode(
-      supportsReorder ? QAbstractItemView::InternalMove : QAbstractItemView::NoDragDrop);
-    this->Ui.SeriesTable->header()->setHighlightSections(false);
-
-    // give the model a widget so it can compute text sizes better.
-    this->Model.setWidget(this->Ui.SeriesTable);
-
-    QSortFilterProxyModel* proxyModel = new QSortFilterProxyModel(self);
-    proxyModel->setSourceModel(&this->Model);
-    this->Ui.SeriesTable->setModel(proxyModel);
-    // sorting is enabled only when re-ordering is not supported i.e. when the
-    // order of the series is irrelevant for the plot.
-    this->Ui.SeriesTable->setSortingEnabled(!supportsReorder);
-
-    // Adds support for "Check/UnCheck" context menu to toggle check state for
-    // selected items easily.
-    new pqTreeViewSelectionHelper(this->Ui.SeriesTable);
-
-    // Add filtering capabilities.
-    // Conditionally hides rows that are no longer present in the domain.
-    // This keeps the view showing too many rows that are no longer applicable.
-    // The UI will (TODO) a mechanism to see all available values.
-    proxyModel->setFilterRole(Qt::UserRole);
-    proxyModel->setFilterRegExp("^1$");
-    proxyModel->setFilterKeyColumn(0);
-    proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    // this is needed so that the filter is updated every time data changes.
-    proxyModel->setDynamicSortFilter(true);
-
-// this needs to be done after the columns exist.
-#if QT_VERSION >= 0x050000
-    this->Ui.SeriesTable->header()->setSectionResizeMode(
-      pqSeriesParametersModel::VISIBILITY, QHeaderView::Interactive);
-    this->Ui.SeriesTable->header()->setSectionResizeMode(
-      pqSeriesParametersModel::COLOR, QHeaderView::ResizeToContents);
-    this->Ui.SeriesTable->header()->setSectionResizeMode(
-      pqSeriesParametersModel::LABEL, QHeaderView::Interactive);
-#else
-    this->Ui.SeriesTable->header()->setResizeMode(
-      pqSeriesParametersModel::VISIBILITY, QHeaderView::Interactive);
-    this->Ui.SeriesTable->header()->setResizeMode(
-      pqSeriesParametersModel::COLOR, QHeaderView::ResizeToContents);
-    this->Ui.SeriesTable->header()->setResizeMode(
-      pqSeriesParametersModel::LABEL, QHeaderView::Interactive);
-#endif
-  }
-
-  //---------------------------------------------------------------------------
-  // maps an index to that for this->Model. This is needed since we sometimes
-  // use a proxy-model for sorting. When unsure, just call this. The logic here
-  // handles correctly when this is called on an index already associated with
-  // this->Model.
-  QModelIndex modelIndex(const QModelIndex& idx) const
-  {
-    const QSortFilterProxyModel* proxyModel =
-      qobject_cast<const QSortFilterProxyModel*>(idx.model());
-    return proxyModel ? proxyModel->mapToSource(idx) : idx;
+    this->Ui.SeriesTable->setLookupTableProxy(this->LookupTableProxy);
+    this->Model = new pqSeriesAnnotationsModel(self);
+    this->Ui.SeriesTable->setAnnotationsModel(this->Model);
+    this->Ui.SeriesTable->setSupportsReorder(false);
+    this->Ui.SeriesTable->allowsUserDefinedValues(false);
+    this->Ui.SeriesTable->supportsOpacityMapping(false);
+    this->Ui.SeriesTable->setColumnVisibility(pqAnnotationsModel::VISIBILITY, true);
   }
 };
 //=============================================================================
@@ -593,55 +151,53 @@ public:
 pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
   vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject)
   : Superclass(smproxy, parentObject)
-  , Internals(NULL)
+  , Internals(nullptr)
 {
-  if (vtkSMProperty* smproperty = smgroup->GetProperty("SeriesVisibility"))
-  {
-    vtkPVXMLElement* hints = smproperty->GetHints()
-      ? smproperty->GetHints()->FindNestedElementByName("SeriesEditor")
-      : NULL;
-    int value = 0;
-    bool supportsReorder = (hints != NULL &&
-      hints->GetScalarAttribute("supports_reordering", &value) != 0 && value == 1);
-    this->Internals = new pqInternals(supportsReorder, this);
-  }
-  else
+  vtkSMProperty* visibilityProperty = smgroup->GetProperty("SeriesVisibility");
+  if (!visibilityProperty)
   {
     qCritical("SeriesVisibility property is required by pqSeriesEditorPropertyWidget."
               " This widget is not going to work.");
     return;
   }
-  this->Internals->PropertyGroup = smgroup;
+
+  this->Internals = new pqInternals(this);
+
+  auto visDomain = visibilityProperty->FindDomain<vtkSMChartSeriesSelectionDomain>();
+  this->Internals->Model->setVisibilityDomain(visDomain);
 
   Ui::SeriesEditorPropertyWidget& ui = this->Internals->Ui;
-
-  this->addPropertyLink(this, "seriesVisibility", SIGNAL(seriesVisibilityChanged()),
-    smgroup->GetProperty("SeriesVisibility"));
-  this->Internals->Model.setVisibilityDomain(
-    smgroup->GetProperty("SeriesVisibility")->FindDomain<vtkSMChartSeriesSelectionDomain>());
-  this->Internals->Ui.SeriesTable->sortByColumn(0, Qt::AscendingOrder);
 
   this->Internals->VTKConnector->Connect(smgroup->GetProperty("SeriesVisibility"),
     vtkCommand::DomainModifiedEvent, this, SLOT(domainModified(vtkObject*)));
 
   if (smgroup->GetProperty("SeriesLabel"))
   {
+    this->addPropertyLink(this, "presetLabel", SIGNAL(presetLabelChanged()),
+      this->Internals->LookupTableProxy->GetProperty("Annotations"));
+
     this->addPropertyLink(
       this, "seriesLabel", SIGNAL(seriesLabelChanged()), smgroup->GetProperty("SeriesLabel"));
   }
   else
   {
-    ui.SeriesTable->hideColumn(pqSeriesParametersModel::LABEL);
+    ui.SeriesTable->setColumnVisibility(pqAnnotationsModel::LABEL, false);
   }
+
+  this->addPropertyLink(this, "seriesVisibility", SIGNAL(seriesVisibilityChanged()),
+    smgroup->GetProperty("SeriesVisibility"));
 
   if (smgroup->GetProperty("SeriesColor"))
   {
+    this->addPropertyLink(this, "presetColor", SIGNAL(presetColorChanged()),
+      this->Internals->LookupTableProxy->GetProperty("IndexedColors"));
+
     this->addPropertyLink(
       this, "seriesColor", SIGNAL(seriesColorChanged()), smgroup->GetProperty("SeriesColor"));
   }
   else
   {
-    ui.SeriesTable->hideColumn(pqSeriesParametersModel::COLOR);
+    ui.SeriesTable->setColumnVisibility(pqAnnotationsModel::COLOR, false);
   }
 
   if (smgroup->GetProperty("SeriesLineThickness"))
@@ -699,152 +255,131 @@ pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
     ui.AxisList->hide();
   }
 
-  QObject::connect(&this->Internals->Model,
-    SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
-    SLOT(onDataChanged(const QModelIndex&, const QModelIndex&)));
+  this->connect(ui.Thickness, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
+    &pqSeriesEditorPropertyWidget::savePropertiesWidgets);
+  this->connect(ui.StyleList, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+    &pqSeriesEditorPropertyWidget::savePropertiesWidgets);
+  this->connect(ui.MarkerStyleList, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+    &pqSeriesEditorPropertyWidget::savePropertiesWidgets);
+  this->connect(ui.MarkerSize, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
+    &pqSeriesEditorPropertyWidget::savePropertiesWidgets);
+  this->connect(ui.AxisList, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+    &pqSeriesEditorPropertyWidget::savePropertiesWidgets);
 
-  this->connect(ui.SeriesTable, SIGNAL(doubleClicked(const QModelIndex&)),
-    SLOT(onDoubleClicked(const QModelIndex&)));
+  this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::indexedColorsChanged, this,
+    &pqSeriesEditorPropertyWidget::seriesColorChanged);
+  this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::presetChanged, this,
+    &pqSeriesEditorPropertyWidget::onPresetChanged);
+  this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::annotationsChanged, this,
+    &pqSeriesEditorPropertyWidget::seriesLabelChanged);
+  this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::visibilitiesChanged, this,
+    &pqSeriesEditorPropertyWidget::seriesVisibilityChanged);
 
-  this->connect(ui.SeriesTable->selectionModel(),
-    SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
-    SLOT(refreshPropertiesWidgets()));
+  this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::selectionChanged, this,
+    &pqSeriesEditorPropertyWidget::refreshPropertiesWidgets);
 
-  this->connect(ui.Thickness, SIGNAL(valueChanged(double)), SLOT(savePropertiesWidgets()));
-  this->connect(ui.StyleList, SIGNAL(currentIndexChanged(int)), SLOT(savePropertiesWidgets()));
-  this->connect(
-    ui.MarkerStyleList, SIGNAL(currentIndexChanged(int)), SLOT(savePropertiesWidgets()));
-  this->connect(ui.MarkerSize, SIGNAL(valueChanged(double)), SLOT(savePropertiesWidgets()));
-  this->connect(ui.AxisList, SIGNAL(currentIndexChanged(int)), SLOT(savePropertiesWidgets()));
+  this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::indexedColorsChanged, this,
+    &pqSeriesEditorPropertyWidget::presetColorChanged);
+  this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::indexedColorsChanged, this,
+    &pqSeriesEditorPropertyWidget::seriesColorChanged);
+
+  if (!smgroup->GetProperty("LastPresetName"))
+  {
+    ui.SeriesTable->enablePresets(false);
+  }
+  else
+  {
+    auto name = vtkSMPropertyHelper(smgroup->GetProperty("LastPresetName")).GetAsString();
+    ui.SeriesTable->applyPreset(name);
+  }
 }
 
 //-----------------------------------------------------------------------------
 pqSeriesEditorPropertyWidget::~pqSeriesEditorPropertyWidget()
 {
   delete this->Internals;
-  this->Internals = NULL;
-}
-
-//-----------------------------------------------------------------------------
-void pqSeriesEditorPropertyWidget::onDataChanged(
-  const QModelIndex& topleft, const QModelIndex& btmright)
-{
-  // We don't need to worry about proxyModel here since we're directly observing
-  // signal on this->Internals->Model.
-  if (topleft.column() == 0)
-  {
-    emit this->seriesVisibilityChanged();
-  }
-  if (topleft.column() <= 1 && btmright.column() >= 1)
-  {
-    emit this->seriesColorChanged();
-  }
-  if (btmright.column() >= 2)
-  {
-    emit this->seriesLabelChanged();
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqSeriesEditorPropertyWidget::onDoubleClicked(const QModelIndex& idx)
-{
-  // when user double-clicks on the color-swatch in the table view, we popup the
-  // color selector dialog.
-  if (idx.column() == 1)
-  {
-    QModelIndex index = this->Internals->modelIndex(idx);
-    QColor color = this->Internals->Model.data(index, Qt::DecorationRole).value<QColor>();
-    color =
-      QColorDialog::getColor(color, this, "Choose Series Color", QColorDialog::DontUseNativeDialog);
-    if (color.isValid())
-    {
-      this->Internals->Model.setData(index, color);
-    }
-  }
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 void pqSeriesEditorPropertyWidget::setSeriesVisibility(const QList<QVariant>& values)
 {
-  QVector<QPair<QString, bool> > vdata;
-  vdata.resize(values.size() / 2);
-  for (int cc = 0; (cc + 1) < values.size(); cc += 2)
-  {
-    vdata[cc / 2].first = values[cc].toString();
-    vdata[cc / 2].second = values[cc + 1].toString() == "1";
-  }
-  this->Internals->Model.setVisibilities(vdata);
+  this->Internals->Ui.SeriesTable->setVisibilities(values);
 }
 
 //-----------------------------------------------------------------------------
 QList<QVariant> pqSeriesEditorPropertyWidget::seriesVisibility() const
 {
-  const QVector<QPair<QString, bool> >& vdata = this->Internals->Model.visibilities();
+  return this->Internals->Ui.SeriesTable->visibilities();
+}
 
-  QList<QVariant> reply;
-  for (int cc = 0; cc < vdata.size(); cc++)
-  {
-    reply.push_back(vdata[cc].first);
-    reply.push_back(vdata[cc].second ? "1" : "0");
-  }
-  return reply;
+//-----------------------------------------------------------------------------
+void pqSeriesEditorPropertyWidget::setPresetLabel(const QList<QVariant>& vtkNotUsed(values))
+{
+  // handle by `onPresetChanged`.
+  return;
+}
+
+//-----------------------------------------------------------------------------
+QList<QVariant> pqSeriesEditorPropertyWidget::presetLabel() const
+{
+  return this->Internals->Ui.SeriesTable->annotations();
 }
 
 //-----------------------------------------------------------------------------
 void pqSeriesEditorPropertyWidget::setSeriesLabel(const QList<QVariant>& values)
 {
-  QVector<QPair<QString, QString> > vdata;
-  vdata.resize(values.size() / 2);
-  for (int cc = 0; (cc + 1) < values.size(); cc += 2)
-  {
-    vdata[cc / 2].first = values[cc].toString();
-    vdata[cc / 2].second = values[cc + 1].toString();
-  }
-  this->Internals->Model.setLabels(vdata);
+  this->Internals->Ui.SeriesTable->setAnnotations(values);
 }
 
 //-----------------------------------------------------------------------------
 QList<QVariant> pqSeriesEditorPropertyWidget::seriesLabel() const
 {
-  const QVector<QPair<QString, QString> >& vdata = this->Internals->Model.labels();
-  QList<QVariant> reply;
-  for (int cc = 0; cc < vdata.size(); cc++)
-  {
-    reply.push_back(vdata[cc].first);
-    reply.push_back(vdata[cc].second);
-  }
-  return reply;
+  return this->Internals->Ui.SeriesTable->annotations();
+}
+
+//-----------------------------------------------------------------------------
+void pqSeriesEditorPropertyWidget::setPresetColor(const QList<QVariant>& vtkNotUsed(values))
+{
+  // handle by `onPresetChanged`.
+  return;
+}
+
+//-----------------------------------------------------------------------------
+QList<QVariant> pqSeriesEditorPropertyWidget::presetColor() const
+{
+  return this->Internals->Ui.SeriesTable->indexedColors();
 }
 
 //-----------------------------------------------------------------------------
 void pqSeriesEditorPropertyWidget::setSeriesColor(const QList<QVariant>& values)
 {
-  QVector<QPair<QString, QColor> > vdata;
-  vdata.resize(values.size() / 4);
-  for (int cc = 0; (cc + 3) < values.size(); cc += 4)
+  // values has the format 'name r g b name r g b ...'
+  QList<QVariant> colors;
+  for (int cc = 0; cc < values.size(); cc++)
   {
-    QColor color;
-    color.setRedF(values[cc + 1].toDouble());
-    color.setGreenF(values[cc + 2].toDouble());
-    color.setBlueF(values[cc + 3].toDouble());
-
-    vdata[cc / 4].first = values[cc].toString();
-    vdata[cc / 4].second = color;
+    if (cc % 4 != 0)
+    {
+      colors.push_back(values[cc]);
+    }
   }
-  this->Internals->Model.setColors(vdata);
+
+  this->Internals->Ui.SeriesTable->setIndexedColors(colors);
 }
 
 //-----------------------------------------------------------------------------
 QList<QVariant> pqSeriesEditorPropertyWidget::seriesColor() const
 {
-  const QVector<QPair<QString, QColor> >& vdata = this->Internals->Model.colors();
+  const QList<QVariant>& colors = this->Internals->Ui.SeriesTable->indexedColors();
+  const QList<QVariant>& labels = this->seriesLabel();
+
   QList<QVariant> reply;
-  for (int cc = 0; cc < vdata.size(); cc++)
+  for (int cc = 0; cc < colors.size() / 3; cc++)
   {
-    reply.push_back(vdata[cc].first);
-    reply.push_back(QString::number(vdata[cc].second.redF()));
-    reply.push_back(QString::number(vdata[cc].second.greenF()));
-    reply.push_back(QString::number(vdata[cc].second.blueF()));
+    reply.push_back(labels[2 * cc]);
+    reply.push_back(colors[3 * cc]);
+    reply.push_back(colors[3 * cc + 1]);
+    reply.push_back(colors[3 * cc + 2]);
   }
   return reply;
 }
@@ -952,11 +487,10 @@ QList<QVariant> pqSeriesEditorPropertyWidget::seriesPlotCorner() const
 void pqSeriesEditorPropertyWidget::refreshPropertiesWidgets()
 {
   Ui::SeriesEditorPropertyWidget& ui = this->Internals->Ui;
-  pqSeriesParametersModel& model = this->Internals->Model;
 
-  QModelIndex idx = this->Internals->modelIndex(ui.SeriesTable->currentIndex());
-  QString key = model.seriesName(idx);
-  if (!idx.isValid() || key.isEmpty())
+  QString key = ui.SeriesTable->currentAnnotationValue();
+
+  if (key.isEmpty())
   {
     // nothing is selected, disable all properties widgets.
     ui.AxisList->setEnabled(false);
@@ -994,21 +528,14 @@ void pqSeriesEditorPropertyWidget::savePropertiesWidgets()
   }
 
   Ui::SeriesEditorPropertyWidget& ui = this->Internals->Ui;
-  pqSeriesParametersModel& model = this->Internals->Model;
 
   QWidget* senderWidget = qobject_cast<QWidget*>(this->sender());
   assert(senderWidget);
 
-  QModelIndexList selectedIndexes = ui.SeriesTable->selectionModel()->selectedIndexes();
-  foreach (QModelIndex selIdx, selectedIndexes)
-  {
-    QModelIndex idx = this->Internals->modelIndex(selIdx);
-    QString key = model.seriesName(idx);
-    if (!idx.isValid() || key.isEmpty())
-    {
-      continue;
-    }
+  QStringList selectedAnnotations = ui.SeriesTable->selectedAnnotations();
 
+  for (auto key : selectedAnnotations)
+  {
     // update the parameter corresponding to the modified widget.
     if (ui.Thickness == senderWidget && this->Internals->Thickness[key] != ui.Thickness->value())
     {
@@ -1045,10 +572,57 @@ void pqSeriesEditorPropertyWidget::savePropertiesWidgets()
 //-----------------------------------------------------------------------------
 void pqSeriesEditorPropertyWidget::domainModified(vtkObject*)
 {
-  // Trigger dataChanged() signals on the model so that the list refreshes to
-  // hide series that are no longer in domain.
-  this->Internals->Model.domainChanged();
+  this->Internals->Model->domainModified();
+}
 
-  // Sort the table
-  this->Internals->Ui.SeriesTable->sortByColumn(0, Qt::AscendingOrder);
+//-----------------------------------------------------------------------------
+void pqSeriesEditorPropertyWidget::onPresetChanged(const QString& name)
+{
+  auto annotationsProp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Internals->LookupTableProxy->GetProperty("Annotations"));
+  auto colorsProp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->Internals->LookupTableProxy->GetProperty("IndexedColors"));
+
+  if (!annotationsProp || !colorsProp || colorsProp->GetNumberOfElements() == 0)
+  {
+    vtkWarningWithObjectMacro(
+      nullptr, "Cannot find Annotations or IndexedColors property for series.");
+    return;
+  }
+
+  vtkNew<vtkStringList> annotations;
+  annotationsProp->GetElements(annotations);
+
+  const QList<QVariant>& currentAnnotations = this->Internals->Ui.SeriesTable->annotations();
+  QList<QVariant> newAnnotations = currentAnnotations;
+  QList<QVariant> newColors;
+
+  // We want to keep current order.
+  for (int i = 0; i + 1 < currentAnnotations.size(); i += 2)
+  {
+    QByteArray nameArray = currentAnnotations.at(i).toString().toLocal8Bit();
+    const char* seriesName = nameArray.data();
+    int idx = annotations->GetIndex(seriesName);
+    if (idx > -1 && (idx + 1 < annotations->GetLength()))
+    {
+      newAnnotations[i + 1] = annotations->GetString(idx + 1);
+    }
+
+    if (idx == -1)
+    {
+      idx = i;
+    }
+    idx = (idx / 2) % (colorsProp->GetNumberOfElements() / 3);
+
+    newColors.push_back(QVariant(seriesName));
+    newColors.push_back(vtkSMPropertyHelper(colorsProp).GetAsDouble(3 * idx));
+    newColors.push_back(vtkSMPropertyHelper(colorsProp).GetAsDouble(3 * idx + 1));
+    newColors.push_back(vtkSMPropertyHelper(colorsProp).GetAsDouble(3 * idx + 2));
+  }
+
+  this->setSeriesColor(newColors);
+  this->setSeriesLabel(newAnnotations);
+
+  auto presetProp = this->proxy()->GetProperty("LastPresetName");
+  vtkSMPropertyHelper(presetProp).Set(name.toStdString().c_str());
 }

@@ -132,7 +132,8 @@ pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy* smProxy, QW
   choosePresetAction->connect(Ui.ChoosePreset, SIGNAL(clicked()), SLOT(trigger()));
   pqChooseColorPresetReaction* ccpr = new pqChooseColorPresetReaction(choosePresetAction, false);
   ccpr->setRepresentation(representation);
-  representation->connect(ccpr, SIGNAL(presetApplied()), SLOT(renderViewEventually()));
+  representation->connect(
+    ccpr, SIGNAL(presetApplied(const QString&)), SLOT(renderViewEventually()));
 
   this->updateEnableState();
 }
@@ -141,7 +142,7 @@ pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy* smProxy, QW
 pqColorEditorPropertyWidget::~pqColorEditorPropertyWidget()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //-----------------------------------------------------------------------------

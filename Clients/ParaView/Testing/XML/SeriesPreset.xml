@@ -1,0 +1,91 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/sineWaves.csv" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="PassArrays" />
+
+  <!-- uncheck all except y1 y11 y12 and y13 -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/RowDataArrays/ArraySelectionWidget/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/RowDataArrays/ArraySelectionWidget/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/RowDataArrays/ArraySelectionWidget" command="setCheckState" arguments="0.0,2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/RowDataArrays/ArraySelectionWidget" command="setCheckState" arguments="2.0,2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/RowDataArrays/ArraySelectionWidget" command="setCheckState" arguments="3.0,2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/RowDataArrays/ArraySelectionWidget" command="setCheckState" arguments="4.0,2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- open a line chart view -->
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_tabbar" command="set_tab_with_text" arguments="+" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget2/Container/Frame.0/CentralWidgetFrame/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/XYChartView" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,14,8,/0:0/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,14,8,/0:0/0:0/0:1" />
+
+  <!-- <modify series legend> -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="setCurrent" arguments="0.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="setSelection" arguments="0.0,0.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="doubleClick" arguments="0.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="edit" arguments="0.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="a" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="setCurrent" arguments="1.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="setSelection" arguments="1.0,1.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="doubleClick" arguments="1.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="edit" arguments="1.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="b" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="setCurrent" arguments="2.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="setSelection" arguments="2.0,2.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="doubleClick" arguments="2.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="edit" arguments="2.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="c" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="setCurrent" arguments="3.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="setSelection" arguments="3.0,3.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="doubleClick" arguments="3.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="edit" arguments="3.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="d" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="setSelection" arguments="" />
+
+  <!-- modify a color -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="setCurrent" arguments="0.1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="setSelection" arguments="0.0,0.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="doubleClick" arguments="0.1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="activate" arguments="0.1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/1QColorDialog0" command="setChosenColor" arguments="255,255,0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/0QColorDialog0" command="done" arguments="1" />
+
+  <!-- save as new preset with legend -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/SaveAsNewPreset" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/SavePresetOptions/saveAnnotations" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/SavePresetOptions" command="key" arguments="16777248" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/SavePresetOptions/presetName" command="set_string" arguments="MPreset" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/SavePresetOptions/presetName" command="key" arguments="16777248" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/SavePresetOptions/presetName" command="set_string" arguments="MyPreset" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/SavePresetOptions/buttonBox/1QPushButton0" command="activate" arguments="" />
+
+  <!-- change preset and change legend -->
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="31.0" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setSelection" arguments="31.0,31.0" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="activate" arguments="31.0" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/close" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="setCurrent" arguments="1.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="setSelection" arguments="1.0,1.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="doubleClick" arguments="1.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="edit" arguments="1.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="modifiedLegend" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="setCurrent" arguments="2.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="setSelection" arguments="2.0,2.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="doubleClick" arguments="2.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="edit" arguments="2.4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="changedLegend2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/AnnotationsTable" command="editAccepted" arguments="2.4,changedLegend2" />
+
+  <!-- add a new serie -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/RowDataArrays/ArraySelectionWidget" command="setCheckState" arguments="1.0,2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- reload created preset -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/ChoosePreset" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="33.1" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setSelection" arguments="33.1,33.1" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/apply" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/close" command="activate" arguments="" />
+</pqevents>

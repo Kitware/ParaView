@@ -98,6 +98,7 @@ public:
     assert(this->CustomPresets.size() > index);
     this->CustomPresets.erase(this->CustomPresets.begin() + index);
     this->SaveToSettings();
+    this->Presets.clear();
     return true;
   }
 
@@ -286,13 +287,14 @@ const Json::Value& vtkSMTransferFunctionPresets::GetPreset(unsigned int index)
 }
 
 //----------------------------------------------------------------------------
-const Json::Value& vtkSMTransferFunctionPresets::GetFirstPresetWithName(const char* name)
+const Json::Value& vtkSMTransferFunctionPresets::GetFirstPresetWithName(const char* name, int& idx)
 {
   static Json::Value nullValue;
   if (name == nullptr)
   {
     return nullValue;
   }
+  idx = 0;
   const std::vector<Json::Value>& presets = this->Internals->GetPresets();
   for (std::vector<Json::Value>::const_iterator iter = presets.begin(); iter != presets.end();
        ++iter)
@@ -301,8 +303,18 @@ const Json::Value& vtkSMTransferFunctionPresets::GetFirstPresetWithName(const ch
     {
       return (*iter);
     }
+    idx++;
   }
+
+  idx = -1;
   return nullValue;
+}
+
+//----------------------------------------------------------------------------
+const Json::Value& vtkSMTransferFunctionPresets::GetFirstPresetWithName(const char* name)
+{
+  int idx;
+  return this->GetFirstPresetWithName(name, idx);
 }
 
 //----------------------------------------------------------------------------
@@ -349,6 +361,23 @@ bool vtkSMTransferFunctionPresets::AddPreset(const char* name, const vtkStdStrin
   }
   this->Internals->AddPreset(name, value);
   return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionPresets::SetPreset(const char* name, const Json::Value& preset)
+{
+  int idx;
+  this->GetFirstPresetWithName(name, idx);
+  if (idx < 0 || this->IsPresetBuiltin(idx))
+  {
+    return false;
+  }
+
+  if (idx >= 0)
+  {
+    this->RemovePreset(idx);
+  }
+  return this->AddPreset(name, preset);
 }
 
 //----------------------------------------------------------------------------
