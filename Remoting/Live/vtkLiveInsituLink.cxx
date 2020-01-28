@@ -15,6 +15,7 @@
 #include "vtkLiveInsituLink.h"
 
 #include "vtkAlgorithm.h"
+#include "vtkClientSocket.h"
 #include "vtkCommand.h"
 #include "vtkCommunicationErrorCatcher.h"
 #include "vtkExtractsDeliveryHelper.h"
@@ -34,7 +35,9 @@
 #include "vtkSMProxyIterator.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkServerSocket.h"
 #include "vtkSmartPointer.h"
+#include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
 #include "vtkTrivialProducer.h"
 
@@ -249,52 +252,6 @@ void NotifyClientDataInformationNextTimestep(vtkWeakPointer<vtkPVSessionBase> li
 
     // Send message
     liveSession->NotifyAllClients(&message);
-  }
-}
-
-//----------------------------------------------------------------------------
-std::string CommunicateString(
-  vtkMultiProcessController* controller, const char* value, int sourceProc, int targetProc, int tag)
-{
-  int myId = controller->GetLocalProcessId();
-  if (myId == sourceProc)
-  {
-    vtkMultiProcessStream s;
-    s << std::string(value);
-    controller->Send(s, targetProc, tag);
-    return "";
-  }
-  vtkMultiProcessStream s;
-  controller->Receive(s, sourceProc, tag);
-  std::string retValue;
-  s >> retValue;
-  return retValue;
-}
-//----------------------------------------------------------------------------
-void CommunicateString(vtkMultiProcessController* controller, std::vector<std::string>& values,
-  int sourceProc, int targetProc, int tag)
-{
-  int myId = controller->GetLocalProcessId();
-  if (myId == sourceProc)
-  {
-    vtkMultiProcessStream s;
-    s << static_cast<unsigned int>(values.size());
-    for (std::vector<std::string>::iterator iter = values.begin(); iter != values.end(); iter++)
-    {
-      s << *iter;
-    }
-    controller->Send(s, targetProc, tag);
-
-    return;
-  }
-  vtkMultiProcessStream s;
-  controller->Receive(s, sourceProc, tag);
-  unsigned int numValues;
-  s >> numValues;
-  values.resize(numValues);
-  for (unsigned int i = 0; i < numValues; i++)
-  {
-    s >> values[i];
   }
 }
 }
@@ -623,6 +580,8 @@ void vtkLiveInsituLink::InsituConnect(vtkMultiProcessController* proc0NodesContr
     {
       // LIVE side is the "slave" side in this relationship. We listen to
       // commands from INSITU.
+      int num_procs_paraview = 0;
+      int num_procs_catalyst = 0;
       if (myId == 0)
       {
         unsigned int size = 0;
@@ -642,61 +601,87 @@ void vtkLiveInsituLink::InsituConnect(vtkMultiProcessController* proc0NodesContr
         int otherProcs;
         proc0NodesController->Send(&numProcs, 1, 1, 8002);
         proc0NodesController->Receive(&otherProcs, 1, 1, 8003);
-        this->ExtractsDeliveryHelper->SetNumberOfVisualizationProcesses(numProcs);
-        this->ExtractsDeliveryHelper->SetNumberOfSimulationProcesses(otherProcs);
 
         if (numProcs > 1)
         {
           parallelController->TriggerRMIOnAllChildren(INITIALIZE_CONNECTION);
           parallelController->Broadcast(&otherProcs, 1, 0);
         }
+
+        num_procs_paraview = numProcs;
+        num_procs_catalyst = otherProcs;
       }
       else
       {
         int otherProcs = 0;
         parallelController->Broadcast(&otherProcs, 1, 0);
-        this->ExtractsDeliveryHelper->SetNumberOfVisualizationProcesses(numProcs);
-        this->ExtractsDeliveryHelper->SetNumberOfSimulationProcesses(otherProcs);
+        num_procs_paraview = numProcs;
+        num_procs_catalyst = otherProcs;
       }
 
-      // wait for each of the sim processes to setup a socket connection to the
-      // vis nodes for data x'fer.
-      if (myId < std::min(this->ExtractsDeliveryHelper->GetNumberOfVisualizationProcesses(),
-                   this->ExtractsDeliveryHelper->GetNumberOfSimulationProcesses()))
+      this->ExtractsDeliveryHelper->SetNumberOfVisualizationProcesses(num_procs_paraview);
+      this->ExtractsDeliveryHelper->SetNumberOfSimulationProcesses(num_procs_catalyst);
+
+      if (myId < std::min(num_procs_paraview, num_procs_catalyst))
       {
-        vtksys::SystemInformation sysinfo;
-        const char* hostname = sysinfo.GetHostname();
-        this->SetHostname(hostname);
-        int numCommunicationProcs =
-          std::min(this->ExtractsDeliveryHelper->GetNumberOfVisualizationProcesses(),
-            this->ExtractsDeliveryHelper->GetNumberOfSimulationProcesses());
-        std::vector<std::string> liveHostnames(numCommunicationProcs);
-        if (myId == 0)
+        vtkNew<vtkServerSocket> socket;
+        socket->CreateServer(0);
+
+        std::vector<vtkMultiProcessStream> allConnectionMsgs;
+        vtkMultiProcessStream connectionMsg;
+        connectionMsg << 98210 << std::string(vtksys::SystemInformation().GetHostname())
+                      << socket->GetServerPort();
+        parallelController->Gather(connectionMsg, allConnectionMsgs, 0);
+
+        if (proc0NodesController)
         {
-          liveHostnames[0] = this->Hostname;
-          for (int i = 1; i < numCommunicationProcs; i++)
+          assert(myId == 0);
+          assert(allConnectionMsgs.size() > 0);
+
+          connectionMsg.Reset();
+          connectionMsg << 98211;
+          for (auto& msg : allConnectionMsgs)
           {
-            liveHostnames[i] = CommunicateString(parallelController, NULL, i, 0, 8877);
+            if (!msg.Empty())
+            {
+              std::string hostname;
+              int port, tag;
+              msg >> tag >> hostname >> port;
+              assert(tag == 98210);
+              connectionMsg << hostname << port;
+            }
           }
-          CommunicateString(proc0NodesController, liveHostnames, 0, 1, 8888);
-        }
-        else
-        {
-          CommunicateString(parallelController, this->Hostname, myId, 0, 8877);
+          proc0NodesController->Send(connectionMsg, 1, 98211);
         }
 
-        vtkNew<vtkSocketController> sim2vis;
-        if (!sim2vis->WaitForConnection(this->InsituPort + 1 + myId))
+        auto clientSocket = socket->WaitForConnection();
+        if (!clientSocket)
         {
           abort();
         }
-        this->ExtractsDeliveryHelper->SetSimulation2VisualizationController(sim2vis.GetPointer());
+        vtkNew<vtkSocketController> sim2vis;
+        if (auto comm = vtkSocketCommunicator::SafeDownCast(sim2vis->GetCommunicator()))
+        {
+          comm->SetSocket(clientSocket);
+          comm->ServerSideHandshake();
+        }
+        clientSocket->Delete();
+        this->ExtractsDeliveryHelper->SetSimulation2VisualizationController(sim2vis);
       }
+      else
+      {
+        std::vector<vtkMultiProcessStream> tmp;
+        parallelController->Gather(vtkMultiProcessStream(), tmp, 0);
+        assert(proc0NodesController == nullptr);
+      }
+
       NotifyClientConnected(this->LiveSession, this->ProxyId, this->InsituXMLState);
       break;
     }
     case INSITU:
     {
+      int num_procs_paraview = 0;
+      int num_procs_catalyst = 0;
       if (myId == 0)
       {
         // send startup state to the visualization process.
@@ -721,47 +706,63 @@ void vtkLiveInsituLink::InsituConnect(vtkMultiProcessController* proc0NodesContr
         proc0NodesController->Receive(&otherProcs, 1, 1, 8002);
         proc0NodesController->Send(&numProcs, 1, 1, 8003);
         parallelController->Broadcast(&otherProcs, 1, 0);
-        this->ExtractsDeliveryHelper->SetNumberOfVisualizationProcesses(otherProcs);
-        this->ExtractsDeliveryHelper->SetNumberOfSimulationProcesses(numProcs);
+        num_procs_paraview = otherProcs;
+        num_procs_catalyst = numProcs;
       }
       else
       {
         int otherProcs = 0;
         parallelController->Broadcast(&otherProcs, 1, 0);
-        this->ExtractsDeliveryHelper->SetNumberOfVisualizationProcesses(otherProcs);
-        this->ExtractsDeliveryHelper->SetNumberOfSimulationProcesses(numProcs);
+        num_procs_paraview = otherProcs;
+        num_procs_catalyst = numProcs;
       }
-      // connect to the sim-nodes for data x'fer.
-      if (myId < std::min(this->ExtractsDeliveryHelper->GetNumberOfVisualizationProcesses(),
-                   this->ExtractsDeliveryHelper->GetNumberOfSimulationProcesses()))
-      {
-        std::vector<std::string> liveHostnames;
-        std::string liveHostname; // the hostname that this proc needs to connect to
-        if (myId == 0)
-        {
-          CommunicateString(proc0NodesController, liveHostnames, 1, 0, 8888);
-          int numCommunicationProcs =
-            std::min(this->ExtractsDeliveryHelper->GetNumberOfVisualizationProcesses(),
-              this->ExtractsDeliveryHelper->GetNumberOfSimulationProcesses());
-          liveHostname = liveHostnames[0];
-          for (int i = 1; i < numCommunicationProcs; i++)
-          {
-            CommunicateString(parallelController, liveHostnames[i].c_str(), 0, i, 8899);
-          }
-        }
-        else
-        {
-          liveHostname = CommunicateString(parallelController, "", 0, myId, 8899);
-        }
-        vtkNew<vtkSocketController> sim2vis;
-        vtksys::SystemTools::Delay(1000);
-        if (!sim2vis->ConnectTo(liveHostname.c_str(), this->InsituPort + 1 + myId))
-        {
-          abort();
-        }
+      this->ExtractsDeliveryHelper->SetNumberOfVisualizationProcesses(num_procs_paraview);
+      this->ExtractsDeliveryHelper->SetNumberOfSimulationProcesses(num_procs_catalyst);
 
-        this->ExtractsDeliveryHelper->SetSimulation2VisualizationController(sim2vis.GetPointer());
+      // connect to the sim-nodes for data x'fer.
+      if (myId < std::min(num_procs_paraview, num_procs_catalyst))
+      {
+        vtkMultiProcessStream connectionMsg;
+        if (proc0NodesController)
+        {
+          assert(myId == 0);
+          proc0NodesController->Receive(connectionMsg, 1, 98211);
+        }
+        parallelController->Broadcast(connectionMsg, 0);
+        parallelController->Barrier();
+
+        int tag;
+        connectionMsg >> tag;
+        assert(tag == 98211);
+
+        int index = 0;
+        while (!connectionMsg.Empty())
+        {
+          std::string hostname;
+          int port;
+          connectionMsg >> hostname >> port;
+          if (index == myId)
+          {
+            vtkNew<vtkSocketController> sim2vis;
+            if (!sim2vis->ConnectTo(hostname.c_str(), port))
+            {
+              abort();
+            }
+            this->ExtractsDeliveryHelper->SetSimulation2VisualizationController(
+              sim2vis.GetPointer());
+            break;
+          }
+          index++;
+        }
+        assert(index == myId);
       }
+      else
+      {
+        vtkMultiProcessStream connectionMsg;
+        parallelController->Broadcast(connectionMsg, 0);
+        parallelController->Barrier();
+      }
+      parallelController->Barrier();
       break;
     }
   }
