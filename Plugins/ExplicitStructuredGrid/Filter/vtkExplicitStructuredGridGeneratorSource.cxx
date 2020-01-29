@@ -24,6 +24,7 @@
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
 #include <vtkIntArray.h>
+#include <vtkMath.h>
 #include <vtkMultiProcessController.h>
 #include <vtkNew.h>
 #include <vtkObjectFactory.h>
@@ -47,9 +48,7 @@ vtkStandardNewMacro(vtkExplicitStructuredGridGeneratorSource);
 //----------------------------------------------------------------------------
 vtkExplicitStructuredGridGeneratorSource::vtkExplicitStructuredGridGeneratorSource()
 {
-  // this->SetDataExtent(0, 50, 0, 50, 0, 50);
   this->SetDataExtent(this->DataExtent);
-
   this->SetNumberOfInputPorts(0);
 }
 
@@ -239,7 +238,7 @@ int vtkExplicitStructuredGridGeneratorSource::RequestData(vtkInformation* vtkNot
     objectId->SetName("ObjectId");
     objectId->SetNumberOfTuples(ncells);
     objectId->FillComponent(0, 0);
-    this->Cache->GetCellData()->AddArray(objectId.Get());
+    this->Cache->GetCellData()->AddArray(objectId);
   }
 
   grid->ShallowCopy(this->Cache);
@@ -247,8 +246,6 @@ int vtkExplicitStructuredGridGeneratorSource::RequestData(vtkInformation* vtkNot
 
   return 1;
 }
-
-#define PI 3.14159265358979323846
 
 //-----------------------------------------------------------------------------
 namespace
@@ -279,6 +276,11 @@ void PillarGridGenerator(
   rank_array->SetName("Rank");
   rank_array->SetNumberOfTuples(expectedCells);
 
+  vtkNew<vtkUnsignedShortArray> coords_array;
+  coords_array->SetName("Coordinates");
+  coords_array->SetNumberOfComponents(3);
+  coords_array->SetNumberOfTuples(expectedCells);
+
   vtkIdType p_index_p4 = 0;
   vtkIdType p_index_p5 = 0;
   vtkIdType p_index_p6 = 0;
@@ -294,8 +296,8 @@ void PillarGridGenerator(
 
   for (int i = extent[0]; i < extent[1]; i++)
   {
-    double shift_z1 = nz * 0.5 * sin((static_cast<double>(i) + 1.) * PI / nx);
-    double shift_z2 = nz * 0.5 * sin((static_cast<double>(i) + 2.) * PI / nx);
+    double shift_z1 = nz * 0.5 * sin((static_cast<double>(i) + 1.) * vtkMath::Pi() / nx);
+    double shift_z2 = nz * 0.5 * sin((static_cast<double>(i) + 2.) * vtkMath::Pi() / nx);
     double shift_faille = (i > nx / 2) ? 0. : nz * 0.3333;
 
     for (int j = extent[2]; j < extent[3]; j++)
@@ -304,7 +306,6 @@ void PillarGridGenerator(
       {
         vtkIdType cellId = grid->ComputeCellId(i, j, k);
         vtkIdType* indice = grid->GetCellPoints(cellId);
-        // P0
         if (k > extent[4])
         {
           indice[0] = p_index_p4;
@@ -332,12 +333,14 @@ void PillarGridGenerator(
         double dist = sqrt(static_cast<double>(i * i + j * j + k * k));
         dist_array->SetValue(cellId, dist);
         rank_array->SetValue(cellId, rank);
+        coords_array->SetTuple3(cellId, i, j, k);
       }
     }
   }
-  grid->SetPoints(points.GetPointer());
-  grid->GetCellData()->AddArray(dist_array.GetPointer());
-  grid->GetCellData()->AddArray(rank_array.GetPointer());
+  grid->SetPoints(points);
+  grid->GetCellData()->AddArray(dist_array);
+  grid->GetCellData()->AddArray(rank_array);
+  grid->GetCellData()->AddArray(coords_array);
   grid->CheckAndReorderFaces();
   grid->ComputeFacesConnectivityFlagsArray();
 }
@@ -368,6 +371,11 @@ void DiscontinuousGridGenerator(
   rank_array->SetName("Rank");
   rank_array->SetNumberOfValues(expectedCells);
 
+  vtkNew<vtkUnsignedShortArray> coords_array;
+  coords_array->SetName("Coordinates");
+  coords_array->SetNumberOfComponents(3);
+  coords_array->SetNumberOfTuples(expectedCells);
+
   for (vtkIdType i = 0; i < expectedCells; i++)
   {
     // Blank after copying the cell data to ensure it is not overwrited
@@ -378,8 +386,8 @@ void DiscontinuousGridGenerator(
 
   for (int i = extent[0]; i < extent[1]; i++)
   {
-    double shift_z1 = nz * 0.5 * sin(((double)i + 1.) * PI / nx);
-    double shift_z2 = nz * 0.5 * sin(((double)i + 2.) * PI / nx);
+    double shift_z1 = nz * 0.5 * sin(((double)i + 1.) * vtkMath::Pi() / nx);
+    double shift_z2 = nz * 0.5 * sin(((double)i + 2.) * vtkMath::Pi() / nx);
     double shift_faille = (i > nx / 2) ? 0. : nz * 0.3333;
 
     for (int j = extent[2]; j < extent[3]; j++)
@@ -400,13 +408,15 @@ void DiscontinuousGridGenerator(
         double dist = sqrt(static_cast<double>(i * i + j * j + k * k));
         dist_array->SetValue(cellId, dist);
         rank_array->SetValue(cellId, rank);
+        coords_array->SetTuple3(cellId, i, j, k);
         grid->UnBlankCell(cellId);
       }
     }
   }
-  grid->SetPoints(points.GetPointer());
-  grid->GetCellData()->AddArray(dist_array.GetPointer());
-  grid->GetCellData()->AddArray(rank_array.GetPointer());
+  grid->SetPoints(points);
+  grid->GetCellData()->AddArray(dist_array);
+  grid->GetCellData()->AddArray(rank_array);
+  grid->GetCellData()->AddArray(coords_array);
   grid->CheckAndReorderFaces();
   grid->ComputeFacesConnectivityFlagsArray();
 }
@@ -440,6 +450,11 @@ void ContinuousGridGenerator(
   rank_array->SetName("Rank");
   rank_array->SetNumberOfValues(expectedCells);
 
+  vtkNew<vtkUnsignedShortArray> coords_array;
+  coords_array->SetName("Coordinates");
+  coords_array->SetNumberOfComponents(3);
+  coords_array->SetNumberOfTuples(expectedCells);
+
   for (vtkIdType i = 0; i < expectedCells; i++)
   {
     // Blank after copying the cell data to ensure it is not overwrited
@@ -448,7 +463,7 @@ void ContinuousGridGenerator(
 
   for (int i = extent[0]; i < extent[1] + 1; i++)
   {
-    double shift_z = nz * 0.5 * sin(((double)i + 1.) * PI / nx);
+    double shift_z = nz * 0.5 * sin(((double)i + 1.) * vtkMath::Pi() / nx);
 
     for (int j = extent[2]; j < extent[3] + 1; j++)
     {
@@ -480,13 +495,15 @@ void ContinuousGridGenerator(
         double dist = sqrt(static_cast<double>(i * i + j * j + k * k));
         dist_array->SetValue(cellId, dist);
         rank_array->SetValue(cellId, rank);
+        coords_array->SetTuple3(cellId, i, j, k);
         grid->UnBlankCell(cellId);
       }
     }
   }
-  grid->SetPoints(points.GetPointer());
-  grid->GetCellData()->AddArray(dist_array.GetPointer());
-  grid->GetCellData()->AddArray(rank_array.GetPointer());
+  grid->SetPoints(points);
+  grid->GetCellData()->AddArray(dist_array);
+  grid->GetCellData()->AddArray(rank_array);
+  grid->GetCellData()->AddArray(coords_array);
   grid->CheckAndReorderFaces();
   grid->ComputeFacesConnectivityFlagsArray();
 }
@@ -519,6 +536,11 @@ void StepsGridGenerator(
   vtkNew<vtkUnsignedShortArray> rank_array;
   rank_array->SetName("Rank");
   rank_array->SetNumberOfValues(expectedCells);
+
+  vtkNew<vtkUnsignedShortArray> coords_array;
+  coords_array->SetName("Coordinates");
+  coords_array->SetNumberOfComponents(3);
+  coords_array->SetNumberOfTuples(expectedCells);
 
   for (vtkIdType i = 0; i < expectedCells; i++)
   {
@@ -580,7 +602,7 @@ void StepsGridGenerator(
           {
             double x = i - istep;
             double y = j;
-            double shift_bf = nz * 0.5 * sin((x + 1.) * PI / nx);
+            double shift_bf = nz * 0.5 * sin((x + 1.) * vtkMath::Pi() / nx);
             double z = k + shift_bf + shift_step + shift_fault;
             shift_bf = 0.;
             points->InsertNextPoint(x, y, z);
@@ -609,6 +631,7 @@ void StepsGridGenerator(
             assert(cellId < expectedCells);
             dist_array->SetValue(cellId, dist);
             rank_array->SetValue(cellId, rank);
+            coords_array->SetTuple3(cellId, i, j, k);
             grid->UnBlankCell(cellId);
           }
         }
@@ -619,9 +642,10 @@ void StepsGridGenerator(
   }
 
   points->Squeeze();
-  grid->SetPoints(points.GetPointer());
-  grid->GetCellData()->AddArray(dist_array.GetPointer());
-  grid->GetCellData()->AddArray(rank_array.GetPointer());
+  grid->SetPoints(points);
+  grid->GetCellData()->AddArray(dist_array);
+  grid->GetCellData()->AddArray(rank_array);
+  grid->GetCellData()->AddArray(coords_array);
   grid->CheckAndReorderFaces();
   grid->ComputeFacesConnectivityFlagsArray();
 }
@@ -654,6 +678,11 @@ void PyramidGridGenerator(
   rank_array->SetNumberOfValues(expectedCells);
   rank_array->FillValue(rank);
 
+  vtkNew<vtkUnsignedShortArray> coords_array;
+  coords_array->SetName("Coordinates");
+  coords_array->SetNumberOfComponents(3);
+  coords_array->SetNumberOfTuples(expectedCells);
+
   for (vtkIdType i = 0; i < expectedCells; i++)
   {
     // Blank after copying the cell data to ensure it is not overwrited
@@ -662,7 +691,7 @@ void PyramidGridGenerator(
 
   for (int i = extent[0]; i < extent[1] + 1; i++)
   {
-    double shift_z = nz * 0.5 * sin(((double)i + 1.) * PI / nx);
+    double shift_z = nz * 0.5 * sin(((double)i + 1.) * vtkMath::Pi() / nx);
 
     for (int j = extent[2]; j < extent[3] + 1; j++)
     {
@@ -701,9 +730,9 @@ void PyramidGridGenerator(
           insert = true;
         }
 
+        vtkIdType cellId = grid->ComputeCellId(i, j, k);
         if (insert)
         {
-          vtkIdType cellId = grid->ComputeCellId(i, j, k);
           vtkIdType* indice = grid->GetCellPoints(cellId);
           indice[0] = (kk) + (jj) * (lnz + 1) + (ii) * (lnz + 1) * (lny + 1);
           indice[1] = (kk + 1) + (jj) * (lnz + 1) + (ii) * (lnz + 1) * (lny + 1);
@@ -716,17 +745,19 @@ void PyramidGridGenerator(
 
           double dist = sqrt(static_cast<double>(i * i + j * j + k * k));
           dist_array->SetValue(cellId, dist);
-          rank_array->SetValue(cellId, rank);
           grid->UnBlankCell(cellId);
         }
+        rank_array->SetValue(cellId, rank);
+        coords_array->SetTuple3(cellId, i, j, k);
       }
     }
   }
 
   points->Squeeze();
-  grid->SetPoints(points.GetPointer());
-  grid->GetCellData()->AddArray(dist_array.GetPointer());
-  grid->GetCellData()->AddArray(rank_array.GetPointer());
+  grid->SetPoints(points);
+  grid->GetCellData()->AddArray(dist_array);
+  grid->GetCellData()->AddArray(rank_array);
+  grid->GetCellData()->AddArray(coords_array);
   grid->CheckAndReorderFaces();
   grid->ComputeFacesConnectivityFlagsArray();
 }
