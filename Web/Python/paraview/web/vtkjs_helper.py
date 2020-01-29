@@ -18,8 +18,10 @@ def getAllNames():
                 newName = '%s (%d)' % (nameToUse, count)
             nameToUse = newName
         duplicates[nameToUse] = True
-        actorRep = simple.GetRepresentation(val).GetClientSideObject().GetActiveRepresentation().GetActor()
-        actorNameMapping[nameToUse] = actorRep
+        vtkRepInstance = simple.GetRepresentation(val).GetClientSideObject()
+        if 'GetActiveRepresentation' in dir(vtkRepInstance):
+            actorRep = vtkRepInstance.GetActiveRepresentation().GetActor()
+            actorNameMapping[nameToUse] = actorRep
     return actorNameMapping
 
 
