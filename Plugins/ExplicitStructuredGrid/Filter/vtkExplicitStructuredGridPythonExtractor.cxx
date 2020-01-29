@@ -14,19 +14,19 @@
 =========================================================================*/
 #include "vtkExplicitStructuredGridPythonExtractor.h"
 
-#include "vtkAlgorithmOutput.h"
-#include "vtkExplicitStructuredGrid.h"
-#include "vtkIdList.h"
-#include "vtkInformation.h"
-#include "vtkInformationVector.h"
-#include "vtkObjectFactory.h"
-#include "vtkPython.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
+#include <vtkAlgorithmOutput.h>
+#include <vtkCellData.h>
+#include <vtkExplicitStructuredGrid.h>
+#include <vtkIdList.h>
+#include <vtkInformation.h>
+#include <vtkInformationVector.h>
+#include <vtkObjectFactory.h>
+#include <vtkPointData.h>
+#include <vtkPython.h>
+#include <vtkPythonCompatibility.h>
+#include <vtkPythonInterpreter.h>
+#include <vtkStreamingDemandDrivenPipeline.h>
 
-#include "vtkCellData.h"
-#include "vtkPointData.h"
-#include "vtkPythonCompatibility.h"
-#include "vtkPythonInterpreter.h"
 #include <sstream>
 
 vtkStandardNewMacro(vtkExplicitStructuredGridPythonExtractor);
@@ -130,12 +130,11 @@ int vtkExplicitStructuredGridPythonExtractor::RequestData(vtkInformation* vtkNot
         {
           continue;
         }
-        int keepCell;
 
         vtkNew<vtkIdList> ptIds;
-        input->GetCellPoints(cellId, ptIds.GetPointer());
-        keepCell =
-          this->EvaluatePythonExpression(cellId, ptIds.Get(), i, j, k, cellArrays, pointArrays);
+        input->GetCellPoints(cellId, ptIds);
+        int keepCell =
+          this->EvaluatePythonExpression(cellId, ptIds, i, j, k, cellArrays, pointArrays);
 
         if (keepCell == 0)
         {
