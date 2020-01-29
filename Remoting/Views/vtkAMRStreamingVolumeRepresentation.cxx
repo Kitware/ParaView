@@ -241,21 +241,17 @@ int vtkAMRStreamingVolumeRepresentation::RequestUpdateExtent(
       vtkInformation* info = inputVector[cc]->GetInformationObject(kk);
       if (this->InStreamingUpdate)
       {
-        assert(this->PriorityQueue->IsEmpty() == false);
-        assert(this->StreamingRequestSize > 0);
-
-        int* request_ids = new int[this->StreamingRequestSize];
-        for (int jj = 0; jj < this->StreamingRequestSize; jj++)
+        std::vector<int> request_ids(this->StreamingRequestSize + 1);
+        int nbIds = 0;
+        while (nbIds < this->StreamingRequestSize && !this->PriorityQueue->IsEmpty())
         {
           int cid = static_cast<int>(this->PriorityQueue->Pop());
           // vtkStreamingStatusMacro(<< this << ": requesting blocks: " << cid);
-          request_ids[jj] = cid;
+          request_ids[nbIds++] = cid;
         }
         // Request the next "group of blocks" to stream.
         info->Set(vtkCompositeDataPipeline::LOAD_REQUESTED_BLOCKS(), 1);
-        info->Set(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES(), request_ids,
-          this->StreamingRequestSize);
-        delete[] request_ids;
+        info->Set(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES(), request_ids.data(), nbIds);
       }
       else
       {
