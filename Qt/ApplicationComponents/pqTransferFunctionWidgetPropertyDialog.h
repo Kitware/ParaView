@@ -48,10 +48,6 @@ public:
     vtkPiecewiseFunction* transferFunction, QWidget* propertyWdg, QWidget* parentWdg = NULL);
   ~pqTransferFunctionWidgetPropertyDialog();
 
-protected slots:
-  void onRangeEdited();
-  void updateRange();
-
 private:
   vtkSmartPointer<vtkPiecewiseFunction> TransferFunction;
   QWidget* PropertyWidget;

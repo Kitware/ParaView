@@ -60,50 +60,10 @@ pqTransferFunctionWidgetPropertyDialog::pqTransferFunctionWidgetPropertyDialog(c
   this->Internals->Ui.TransferFunctionEditor->initialize(
     NULL, false, this->TransferFunction.GetPointer(), true);
 
-  // Make sure the line edits only allow number inputs.
-  QDoubleValidator* validator = new QDoubleValidator(this);
-  this->Internals->Ui.minX->setValidator(validator);
-  this->Internals->Ui.maxX->setValidator(validator);
-  this->updateRange();
-
-  QObject::connect(
-    this->Internals->Ui.minX, SIGNAL(textChangedAndEditingFinished()), this, SLOT(onRangeEdited()));
-  QObject::connect(
-    this->Internals->Ui.maxX, SIGNAL(textChangedAndEditingFinished()), this, SLOT(onRangeEdited()));
   QObject::connect(this->Internals->Ui.TransferFunctionEditor, SIGNAL(controlPointsModified()),
     this->PropertyWidget, SLOT(propagateProxyPointsProperty()));
-
-  QAction* resetActn = new QAction(this->Internals->Ui.resetButton);
-  resetActn->setToolTip("Reset using current data values");
-  this->Internals->Ui.resetButton->addAction(resetActn);
-  this->Internals->Ui.resetButton->setDefaultAction(resetActn);
-  QObject::connect(this->PropertyWidget, SIGNAL(domainChanged()), this->Internals->Ui.resetButton,
-    SLOT(highlight()));
-  QObject::connect(this->Internals->Ui.resetButton, SIGNAL(clicked()),
-    this->Internals->Ui.resetButton, SLOT(clear()));
-  QObject::connect(
-    resetActn, SIGNAL(triggered(bool)), this->PropertyWidget, SLOT(resetRangeToDomainDefault()));
-  QObject::connect(resetActn, SIGNAL(triggered(bool)), this, SLOT(updateRange()));
 }
 
 pqTransferFunctionWidgetPropertyDialog::~pqTransferFunctionWidgetPropertyDialog()
 {
-}
-
-void pqTransferFunctionWidgetPropertyDialog::updateRange()
-{
-  pqTransferFunctionWidgetPropertyWidget* propertyWdg =
-    qobject_cast<pqTransferFunctionWidgetPropertyWidget*>(this->PropertyWidget);
-  double range[2];
-  propertyWdg->getRange(range);
-  this->Internals->Ui.minX->setText(QString::number(range[0]));
-  this->Internals->Ui.maxX->setText(QString::number(range[1]));
-}
-
-void pqTransferFunctionWidgetPropertyDialog::onRangeEdited()
-{
-  pqTransferFunctionWidgetPropertyWidget* propertyWdg =
-    qobject_cast<pqTransferFunctionWidgetPropertyWidget*>(this->PropertyWidget);
-  propertyWdg->setRange(
-    this->Internals->Ui.minX->text().toDouble(), this->Internals->Ui.maxX->text().toDouble());
 }

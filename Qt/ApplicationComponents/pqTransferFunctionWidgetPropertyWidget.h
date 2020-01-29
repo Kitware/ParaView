@@ -64,19 +64,29 @@ signals:
 protected:
   void UpdateProperty();
 
-  void getRange(double range[2]);
-  void setRange(const double& min, const double& max);
-
 protected slots:
-  void buttonClicked();
+  void editButtonClicked();
   void propagateProxyPointsProperty();
   void resetRangeToDomainDefault();
+
+  /**
+   * Update widget with transfer function proxy value.
+   */
+  void updateRange();
+
+  /**
+   * Update transfer function proxy from widgets.
+   */
+  void onRangeEdited();
 
 private:
   vtkEventQtSlotConnect* Connection;
   vtkSMTransferFunctionProxy* TFProxy;
   QDialog* Dialog;
   vtkSMRangedTransferFunctionDomain* Domain;
+
+  class pqInternals;
+  const QScopedPointer<pqInternals> Internals;
 };
 
 #endif // _pqTransferFunctionWidgetPropertyWidget_h

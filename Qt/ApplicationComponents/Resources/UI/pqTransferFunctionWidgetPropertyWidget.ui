@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TransferFunctionWidgetPropertyWidget</class>
+ <widget class="QWidget" name="TransferFunctionWidgetPropertyWidget">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0">
+   <item>
+    <widget class="QPushButton" name="editButton">
+     <property name="text">
+      <string>Edit</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label_1">
+       <property name="text">
+        <string>Range</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="pqLineEdit" name="rangeMin"/>
+     </item>
+     <item>
+      <widget class="pqLineEdit" name="rangeMax"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>-</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="pqHighlightableToolButton" name="resetButton">
+      </widget>>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqHighlightableToolButton</class>
+   <extends>QToolButton</extends>
+   <header>pqHighlightableToolButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+</ui>
