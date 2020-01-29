@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for implementing progress callbacks.
@@ -30,7 +30,8 @@ namespace index
 /// need to implement their own means for monitoring the progress of the 
 /// user-defined process.
 ///
-/// @ingroup nv_index_utilities
+/// \ingroup nv_index_utilities
+///
 class IProgress_callback :
     public mi::base::Interface_declare<0x93d1b285,0x5e1c,0x411f,0x9f,0x63,0x8c,0x2a,0x72,0xbf,0xdc,0xf5>
 {

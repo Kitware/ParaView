@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief API for compute programs in the NVIDIA IndeX library.
@@ -24,10 +24,10 @@ class ICompute_launch_request;
 class IDistributed_data_access;
 class IIndex_rendering;
 
-/// @ingroup xac_compute
-///
 /// Interface to XAC compute infrastructure.
 /// Access this by using \c IIndex::get_api_component().
+///
+/// \ingroup xac_compute
 ///
 class IIndex_compute :
     public mi::base::Interface_declare<0x5aee3342,0x97c2,0x41fc,0xa3,0x40,0x3e,0x1c,0x20,0x87,0x10,0xff>
@@ -50,9 +50,9 @@ public:
         mi::neuraylib::IDice_transaction*   dice_transaction) = 0;
 };
 
-/// @ingroup xac_compute
-///
 /// Interface to define a compute launch request.
+///
+/// \ingroup xac_compute
 ///
 class ICompute_launch_request :
     public mi::base::Interface_declare<0x7487d3dd,0x72e3,0x4a9e,0x9e,0x9d,0x1d,0x8b,0xfb,0x96,0xd5,0xa0>
@@ -90,10 +90,10 @@ public:
     virtual bool get_region_of_interest(mi::math::Bbox_struct<mi::Float32, 3>& box) const = 0;
 };
 
-/// @ingroup xac_compute
-///
 /// Interface to access results of compute launch.
 /// 
+/// \ingroup xac_compute
+///
 class ICompute_results :
     public mi::base::Interface_declare<0xcb08140d,0x10bc,0x4c8f,0xa0,0xf7,0xe,0x85,0x31,0x21,0xd8,0x6e>
 {
@@ -109,10 +109,10 @@ public:
     virtual IDistributed_data_access* access_compute_results() const = 0;
 };
 
-/// @ingroup xac_compute
-///
 /// Interface to parameters of a compute plane. Applying this attribute to a \c IPlane scene element
 /// makes the \c IPlane a valid target for a \c ICompute_launch_request. 
+///
+/// \ingroup xac_compute
 ///
 class ICompute_plane_parameters :
     public mi::base::Interface_declare<0xdaf77e98,0xd880,0x415c,0x86,0x39,0x2d,0x6b,0xee,0x9e,0x5c,0xbe,
@@ -140,9 +140,9 @@ public:
     virtual mi::Uint32 get_value_size(mi::Uint32 i) const = 0;
 };
 
-/// @ingroup xac_compute
-///
 /// Interface to compute results from a compute plane target.
+///
+/// \ingroup xac_compute
 ///
 class ICompute_result_buffer_2D :
     public mi::base::Interface_declare<0x8f335887,0x6c3b,0x48be,0xb0,0x55,0x46,0xb0,0xc4,0xdb,0xf4,0xb0,

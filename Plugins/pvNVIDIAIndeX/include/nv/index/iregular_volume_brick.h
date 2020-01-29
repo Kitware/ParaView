@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief The interface class representing a distributed brick of the entire large-scale regular volume dataset.
@@ -23,7 +23,9 @@ namespace index
 /// Typically, a fragment of a regular volume is called a volume brick or a fragment of a regular heightfield is
 /// called a patch. The data import callback (\c IDistributed_data_import_callback) is responsible for creating
 /// and loading/generating the contents of the data subset.
-/// @ingroup nv_index_data_storage
+///
+/// \ingroup nv_index_data_storage
+///
 template<typename T>
 class IRegular_volume_brick :
     public mi::base::Interface_declare<0x92b66c73,0x6141,0x4c5d,0xa6,0xb1,0xfd,0x9f,0xdb,0x41,0xd2,0x26,
@@ -88,28 +90,28 @@ public:
         const T*                                    voxels) = 0;
 };
 
-/// @ingroup nv_index_data_storage
+/// \ingroup nv_index_data_storage
 class IRegular_volume_brick_uint8 :
     public mi::base::Interface_declare<0x99f2ea96,0x71fa,0x4f42,0xbf,0x2c,0xbb,0xe8,0x1e,0xd4,0xf8,0x79,
         IRegular_volume_brick<mi::Uint8> >
 { 
 };
 
-/// @ingroup nv_index_data_storage
+/// \ingroup nv_index_data_storage
 class IRegular_volume_brick_uint16 :
     public mi::base::Interface_declare<0x51419327,0x49fc,0x4a14,0x9b,0x79,0x27,0x13,0xba,0x55,0x48,0x5a,
         IRegular_volume_brick<mi::Uint16> >
 { 
 };
 
-/// @ingroup nv_index_data_storage
+/// \ingroup nv_index_data_storage
 class IRegular_volume_brick_float32 :
     public mi::base::Interface_declare<0x5584361d,0x30f8,0x4942,0x87,0x38,0x48,0x5e,0x72,0xc1,0x28,0xe9,
         IRegular_volume_brick<mi::Float32> >
 { 
 };
 
-/// @ingroup nv_index_data_storage
+/// \ingroup nv_index_data_storage
 class IRegular_volume_brick_rgba8ui :
     public mi::base::Interface_declare<0xbdcd313b,0x3da9,0x4474,0xb9,0xa3,0x77,0x71,0x1b,0xf0,0xac,0xab,
         IRegular_volume_brick<mi::math::Vector_struct<mi::Uint8, 4> > >        

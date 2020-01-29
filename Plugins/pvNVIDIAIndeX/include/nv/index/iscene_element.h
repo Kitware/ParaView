@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface class representing scene elements in the scene description.
@@ -18,7 +18,8 @@ namespace index {
 /// class represent, for example, shapes and attributes in the scene.
 /// An IScene_element is a part of the scene description.
 ///
-/// @ingroup nv_index_scene_description
+/// \ingroup nv_index_scene_description
+///
 class IScene_element :
     public mi::base::Interface_declare<0x62a00ed6,0x8688,0x4edb,0x9c,0x03,0x36,0xcc,0xb4,0xf1,0x49,0x6f,
         mi::neuraylib::IElement>

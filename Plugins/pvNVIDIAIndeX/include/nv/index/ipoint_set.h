@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene element for point geometry.
@@ -16,8 +16,6 @@ namespace nv
 {
 namespace index
 {
-/// @ingroup nv_index_scene_description_shape
-///
 /// Interface class for a point set, which is a scene element and
 /// can be added the scene description.
 /// Each point has its own color and radius. 
@@ -25,6 +23,8 @@ namespace index
 /// Applications can derive from the interface class to implement user-defined 
 /// point geometry that may have arbitrary (per-vertex) attributes that impact
 /// the rendering attributes (such as 3D position, color and radius).
+///
+/// \ingroup nv_index_scene_description_shape
 ///
 class IPoint_set :
         public mi::base::Interface_declare<0x7dfbeee1,0x4fda,0x4b8f,0xb8,0xce,0x4e,0xa1,0x92,0xa1,0xb6,0xb1,

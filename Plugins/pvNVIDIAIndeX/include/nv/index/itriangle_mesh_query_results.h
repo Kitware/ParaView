@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Triangle mesh specific query results returned by the NVIDIA IndeX library when querying a scene's contents.
@@ -16,11 +16,12 @@ namespace nv
 {
 namespace index
 {
-/// @ingroup scene_queries
 
 /// Interface class that returns the triangle mesh specific result of a pick operation/query.
 /// The interface class sub classes from \c IScene_pick_result to provide additional 
 /// intersection results specific to \c ITriangle_mesh_scene_element.
+///
+/// \ingroup scene_queries
 ///
 class ITriangle_mesh_pick_result :
     public mi::base::Interface_declare<0xe2697b96,0xdd49,0x4506,0x81,0x57,0x40,0x31,0x96,0x43,0x0e,0x2f,
@@ -79,6 +80,8 @@ public:
 /// Each entry or lookup index refers to a single triangle of the triangle mesh and the per-vertex
 /// attributes stored along with the triangle, such as the per-vertex colors. The lookup result
 /// provides the per-vertex values in counter-clockwise order.
+///
+/// \ingroup scene_queries
 ///
 class ITriangle_mesh_lookup_result :
     public mi::base::Interface_declare<0xd91ca5a9,0x8222,0x42ec,0xab,0x44,0x65,0xd1,0x72,0xad,0x0b,0x71,

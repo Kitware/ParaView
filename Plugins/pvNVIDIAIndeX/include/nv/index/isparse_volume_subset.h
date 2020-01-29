@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Distributed subsets of sparse volume datasets.
@@ -16,8 +16,9 @@
 namespace nv {
 namespace index {
 
-/// @ingroup nv_index_data_storage
 /// Voxel format of sparse volume voxel data.
+///
+/// \ingroup nv_index_data_storage
 ///
 enum Sparse_volume_voxel_format
 {
@@ -43,7 +44,6 @@ enum Sparse_volume_voxel_format
     SPARSE_VOLUME_VOXEL_FORMAT_COUNT
 };
 
-/// @ingroup nv_index_data_storage
 /// Volume device-data accessor interface.
 ///
 /// An instance of this class will hold ownership of the device data. For this reason managing the life-time of an instance
@@ -51,6 +51,8 @@ enum Sparse_volume_voxel_format
 ///
 /// \note WORK IN PROGRESS
 ///  - for now uses the Sparse_volume_voxel_format enum to represent volume type
+///
+/// \ingroup nv_index_data_storage
 ///
 class IVolume_device_data_buffer :
     public mi::base::Interface_declare<0x60d74933,0xd556,0x49de,0xaa,0xbc,0x5d,0xa7,0xaa,0xc1,0x4c,0x50>
@@ -77,9 +79,10 @@ public:
     virtual mi::Sint32                          get_gpu_device_id() const = 0;
 };
 
-/// @ingroup nv_index_data_storage
 /// Attribute-set descriptor for sparse volume subsets. This interface is used to configure a set of
 /// attributes for a sparse volume subset to input into the NVIDIA IndeX library.
+///
+/// \ingroup nv_index_data_storage
 ///
 class ISparse_volume_attribute_set_descriptor :
     public mi::base::Interface_declare<0x728bb4d5,0x1d77,0x42da,0x81,0x1c,0x39,0xa3,0x34,0x56,0x26,0xa4,
@@ -119,7 +122,6 @@ public:
 
 };
 
-/// @ingroup nv_index_data_storage
 /// Subset-data descriptor for sparse volume subsets. This interface class is used by the NVIDIA IndeX library
 /// to communicate information about sparse volume sub-data to an application. NVIDIA IndeX is storing sparse
 /// volume data in a bricked format internally. This interface class gives detailed information about volume-brick
@@ -129,6 +131,8 @@ public:
 /// For level-of-detail volumes this interface requests volume-data bricks for potentially multiple levels-of-detail.
 /// The application is responsible to fill in all requested volume-data bricks in order to enable correct level-of-detail
 /// volume representation and rendering.
+///
+/// \ingroup nv_index_data_storage
 ///
 class ISparse_volume_subset_data_descriptor :
     public mi::base::Interface_declare<0xad2ab72c,0xab33,0x4357,0xb6,0xd5,0x5a,0xcd,0xb9,0xf9,0x62,0xca,
@@ -201,13 +205,14 @@ public:
     virtual const Data_brick_info                   get_subset_data_brick_info(mi::Uint32 brick_index) const = 0;
 };
 
-/// @ingroup nv_index_data_storage
 /// Distributed data storage class for sparse volume subsets.
 ///
 /// The data import for sparse volume data associated with \c ISparse_volume_scene_element instances using
 /// NVIDIA IndeX is performed through instances of this subset class. A subset of a sparse volume is defined
 /// by all the volume-data bricks associated with a rectangular subregion of the entire scene/dataset. This
 /// interface class provides methods to input volume data for one or multiple attributes of a dataset.
+///
+/// \ingroup nv_index_data_storage
 ///
 class ISparse_volume_subset :
     public mi::base::Interface_declare<0x1dfa0274,0xcf8,0x4f4c,0xa8,0x65,0x24,0xd0,0xae,0xf5,0x89,0x31,

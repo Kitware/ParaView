@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for user-defined editing operations on heightfields and volumes.
@@ -19,7 +19,6 @@ namespace nv
 namespace index
 {
 
-/// @ingroup nv_index_data_edit
 /// This interface class represents an entry point for user-defined editing tasks that operate on
 /// the regular volume distributed in the cluster. The editing operation modifies the amplitude values
 /// of the volume datasets.
@@ -34,6 +33,8 @@ namespace index
 /// volume bricks that are available on the current cluster host where the compute unit
 /// (fragment of the fragmented job) runs on, i.e., the volume's brick data needs to be
 /// available locally on that machine.
+///
+/// \ingroup nv_index_data_edit
 ///
 class IRegular_volume_data_edit :
     public mi::base::Interface_declare<0xe096f971,0xb9c1,0x477f,0x9a,0x86,0x0c,0xa9,0x06,0xdf,0x39,0x35>
@@ -61,7 +62,6 @@ public:
         mi::neuraylib::IDice_transaction*   dice_transaction) const = 0;
 };
 
-/// @ingroup nv_index_data_edit
 /// This interface class represents an entry point for user-defined editing tasks that operate on
 /// sparse-volume data distributed in the cluster. The editing operation modifies the voxel values
 /// of the volume datasets.
@@ -76,6 +76,8 @@ public:
 /// volume subsets that are available on the current cluster host where the compute unit
 /// (fragment of the fragmented job) runs on, i.e., the volume's subset data needs to be
 /// available locally on that machine.
+///
+/// \ingroup nv_index_data_edit
 ///
 class ISparse_volume_data_edit :
     public mi::base::Interface_declare<0xe976cf3,0xedcd,0x4318,0x8e,0xa7,0xb0,0x84,0x1,0xab,0x43,0xf6>
@@ -93,7 +95,6 @@ public:
         mi::neuraylib::IDice_transaction*  dice_transaction) const = 0;
 };
 
-/// @ingroup nv_index_data_edit
 /// This interface class represents an entry point for user-defined editing tasks
 /// that operate on the heightfield patches to modify their elevation values.
 ///
@@ -107,6 +108,8 @@ public:
 /// only for those heightfield patches that are available on the present cluster host where the compute
 /// unit (fragment of the fragmented job) runs on, i.e., the heightfield's patch data needs to be
 /// available locally on that machine.
+///
+/// \ingroup nv_index_data_edit
 ///
 class IRegular_heightfield_data_edit :
     public mi::base::Interface_declare<0x5b1758d2,0x8527,0x4a2b,0xa1,0x55,0x4f,0xa6,0x78,0x2e,0xc5,0xfb>
@@ -139,7 +142,6 @@ public:
 };
 
 
-/// @ingroup nv_index_data_edit
 /// This interface class represents an entry point for user-defined editing tasks that operate on
 /// the irregular volume distributed in the cluster.
 ///
@@ -152,6 +154,8 @@ public:
 /// (e.g., \c IDistributed_compute_algorithm) has to make sure to query the interface only for those irregular
 /// volume subsets that are available on the current cluster host where the compute unit
 /// (fragment of the fragmented job) runs on, i.e., the volume's data needs to be available locally on that machine.
+///
+/// \ingroup nv_index_data_edit
 ///
 class IIrregular_volume_data_edit :
     public mi::base::Interface_declare<0xb4baa9c9,0x1219,0x422f,0x8e,0x22,0xad,0x05,0x8d,0xba,0x9d,0xb5>

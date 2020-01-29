@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component for creation, assignment, and cloning of instances of types.

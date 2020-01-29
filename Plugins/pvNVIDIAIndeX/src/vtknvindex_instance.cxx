@@ -1,4 +1,4 @@
-/* Copyright 2019 NVIDIA Corporation. All rights reserved.
+/* Copyright 2020 NVIDIA Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -1061,7 +1061,7 @@ void vtknvindex_instance::init_scene_graph()
 //-------------------------------------------------------------------------------------------------
 const char* vtknvindex_instance::get_version() const
 {
-  return "2.3-beta";
+  return "2.4";
 }
 
 //-------------------------------------------------------------------------------------------------

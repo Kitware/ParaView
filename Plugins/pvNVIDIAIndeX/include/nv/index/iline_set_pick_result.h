@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Line set specific pick results returned by the NVIDIA IndeX library when querying a scene's contents using the pick operation.
@@ -16,11 +16,12 @@ namespace nv
 {
 namespace index
 {
-/// @ingroup scene_queries
 
 /// Interface class that returns the line set specific result of a pick operation/query.
 /// The interface class sub classes from \c IScene_pick_result to provide additional 
 /// intersection results specific to \c ILine_set scene elements.
+///
+/// \ingroup scene_queries
 ///
 class ILine_set_pick_result :
     public mi::base::Interface_declare<0x42feaea6,0xf3b0,0x4427,0x8a,0xef,0xfa,0x0f,0x8a,0x5f,0xd0,0x4a,

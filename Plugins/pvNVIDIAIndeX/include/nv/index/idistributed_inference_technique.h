@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 
 #ifndef NVIDIA_INDEX_IDISTRIBUTED_INFERENCE_TECHNIQUE_H
@@ -18,11 +18,11 @@
 namespace nv {
 namespace index {
 
-/// @ingroup nv_index_data_computing
-///
 /// Interface class for user-defined AI/DL inference techniques.
 ///
 /// An implementation of this class can be assigned as a scene description. 
+///
+/// \ingroup nv_index_data_computing
 ///
 class IDistributed_inference_technique :
     public mi::base::Interface_declare<0xfc8e88e7,0x7d00,0x41ae,0x89,0xa1,0x10,0x7f,0x8c,0x83,0xff,0x7a,
@@ -74,12 +74,12 @@ public:
     }
 };
 
-/// @ingroup nv_index_data_computing
-///
 /// Mixin class for implementing the IDistributed_inference_technique interface.
 ///
 /// This mixin class provides a default implementation of some of the pure
 /// virtual methods of the IDistributed_inference_technique interface.
+///
+/// \ingroup nv_index_data_computing
 ///
 template <mi::Uint32 i_id1, mi::Uint16 i_id2, mi::Uint16 i_id3,
           mi::Uint8  i_id4, mi::Uint8  i_id5, mi::Uint8  i_id6,  mi::Uint8 i_id7,
@@ -109,8 +109,7 @@ public:
     ///
     virtual void set_enabled(bool enable)
     {
-        // avoid warnings
-        (void) enable;
+        m_enabled = enable;
     }
 
     /// Attribute is always enabled
@@ -119,7 +118,7 @@ public:
     ///
     virtual bool get_enabled() const
     {
-        return true;
+        return m_enabled;
     }
 
     /// Each scene element can store additional user-defined meta data. Meta
@@ -143,6 +142,9 @@ public:
     ///          data associated with the scene element.
     ///
     virtual mi::neuraylib::Tag_struct get_meta_data() const { return mi::neuraylib::NULL_TAG; }
+
+protected: 
+    bool    m_enabled;
 };
 
 } // namespace index

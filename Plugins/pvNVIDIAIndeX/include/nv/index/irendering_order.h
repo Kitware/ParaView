@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Raster shape rendering order attribute
@@ -16,11 +16,11 @@ namespace nv
 {
 namespace index
 {
-/// @ingroup nv_index_scene_description_attribute
 
 /// \c IRendering_order defines a rendering priority for the raster
 /// shapes following in the scene description.
 ///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class IRendering_order :
         public mi::base::Interface_declare<0xe734389f,0x4074,0x486e,0x8c,0xf4,0x08,0xeb,0x46,0xd7,0x03,0x38,

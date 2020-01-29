@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene elements representing image space ellipses.
@@ -19,8 +19,6 @@ namespace nv
 namespace index
 {
 
-/// @ingroup nv_index_scene_description_shape
-
 /// NVIDIA IndeX provides scene elements that enable annotating 3D scenes or implementing 3D user-interface
 /// widgets. The annotations and widgets should be composed as part of the scene description.
 /// Such additional scene elements, which include for instance the following 2D ellipse, integrate seamlessly
@@ -29,6 +27,8 @@ namespace index
 /// A 2D ellipse represents a screen-space shape commonly used to annotating a scene or to build widgets.
 /// The ellipse is defined in image space, i.e., an ellipse is parallel to the view plane and always faces
 /// towards the viewer.
+///
+/// \ingroup nv_index_scene_description_shape
 ///
 class IEllipse :
         public mi::base::Interface_declare<0x570a1c6e,0xfab3,0x41f6,0x9d,0x0d,0xfe,0x47,0x68,0x60,0x8f,0xb0,

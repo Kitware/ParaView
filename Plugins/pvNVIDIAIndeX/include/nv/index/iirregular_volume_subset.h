@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Distributed subsets of irregular volume datasets.
@@ -16,7 +16,6 @@
 namespace nv {
 namespace index {
 
-/// @ingroup nv_index_data_storage
 /// Distributed data storage class for irregular volume subsets.
 ///
 /// An irregular volume dataset is defined as a set of cells (see the \c IIrregular_volume_subset::Cell structure). The  
@@ -33,8 +32,10 @@ namespace index {
 ///       While the interface allows to generate multiple attribute sets associated with the irregular volume dataset,
 ///       only the first attribute set is regarded for rendering.
 /// 
+/// \ingroup nv_index_data_storage
+///
 class IIrregular_volume_subset :
-    public mi::base::Interface_declare<0xe00304d7,0x3f25,0x4719,0xb4,0x7e,0x3d,0x10,0xec,0xbd,0x3c,0x2f,
+    public mi::base::Interface_declare<0xac50a241,0x2b4a,0x4e07,0x98,0x9e,0x04,0xa3,0x21,0x95,0x31,0x2f,
                                        IDistributed_data_subset>
 {
 public:
@@ -235,6 +236,39 @@ public:
     virtual bool get_attribute(
         mi::Uint32          attrib_index,
         Attribute_storage&  attrib_storage) const = 0;
+
+    /// -- Experimental (very experimental)
+
+    /// GPU device id if the buffer is located on a GPU device.
+    ///
+    /// \returns GPU device id, negative values indicate that the data is currently not stored on any device.
+    ///
+    virtual mi::Sint32 get_gpu_device_id() const = 0;
+
+    /// Get the currently valid attribute set device-storage for a given attribute index.
+    ///
+    /// \param[in]  attrib_index    The storage index of the attribute set.
+    /// \param[out] attrib_storage  The attribute storage for the given index.
+    ///
+    /// \return                     True when the attribute storage according to the passed index could be found, false otherwise.
+    //
+    virtual bool get_active_attribute_device_storage(
+        mi::Uint32          attrib_index,
+        Attribute_storage&  attrib_storage) const = 0;
+
+    virtual bool get_backup_attribute_device_storage(
+        mi::Uint32          attrib_index,
+        Attribute_storage&  attrib_storage) const = 0;
+
+    virtual bool swap_active_attribute_storage() = 0;
+
+
+    /// Caching interface (preliminary). Returns true if cache is loaded.
+    virtual bool use_cache_file(
+        const char*         filename,
+        mi::Uint32          mode,
+        mi::Uint32          flags) = 0;
+
 };
 
 } // namespace index

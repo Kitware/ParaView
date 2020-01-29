@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene attribute controlling regular volume rendering properties.
@@ -14,9 +14,9 @@
 namespace nv {
 namespace index {
 
-/// @ingroup nv_index_scene_description_attribute
-
 /// The interface class representing rendering properties for regular volume data.
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class IRegular_volume_rendering_properties :
     public mi::base::Interface_declare<0x89f2350b,0xf1d9,0x4924,0x92,0x92,0x64,0x74,0xea,0xb5,0x12,0xd0,

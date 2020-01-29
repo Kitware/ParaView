@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for user-defined compute tasks that apply to sparse-volume subset data.
@@ -22,7 +22,8 @@ namespace index
 /// \c ISparse_volume_data_edit::execute_compute_task() executes the compute task on the
 /// sparse-volume subset data that is stored locally on a cluster machine.
 ///
-/// @ingroup nv_index_data_computing
+/// \ingroup nv_index_data_computing
+///
 class ISparse_volume_compute_task :
     public mi::base::Interface_declare<0xc9f68e21,0xe3c6,0x44df,0xac,0xbb,0x11,0xf9,0xa1,0x8b,0xb7,0x97>
 {

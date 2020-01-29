@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief  API for reading tracing events.
@@ -77,6 +77,11 @@ public:
     ///
     /// \param[in]  handler     Pointer to the notification handler.
     virtual void add_collection_handler(ITrace_collection_handler* handler) = 0;
+
+    /// Removes a notification handler for the availability of trace collection.
+    ///
+    /// \param[in]  handler     Pointer to the notification handler.
+    virtual void remove_collection_handler(ITrace_collection_handler* handler) = 0;
 
     /// Get a specific collection id.
     ///

@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief API component to interact with the cluster manager
@@ -397,6 +397,7 @@ public:
     ///                     -  0: Success.
     ///                     - -1: The connection failed. Please check the server address.
     ///                     - -2: The authentication failed. Please check user name and password.
+    ///                     - -3: Streaming is disabled.
     ///                     - -5: The request timed out. Please check if the cluster manager is
     ///                           working properly.
     /// \return             The cluster manager connection, or \c NULL in case of failures.

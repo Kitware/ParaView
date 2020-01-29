@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for a session
@@ -26,14 +26,14 @@ namespace index {
 class IViewport;
 class IViewport_list;
 
-/// @ingroup nv_index
-
 /// The abstract interface class representing a working session with the system.
 /// Such a \e session contains a configuration (\c IConfig_settings) and an scene
 /// (\c IScene).
 ///
 /// In addition, this class makes available several factory methods, e.g., for creating a scene
 /// or a camera.
+///
+/// \ingroup nv_index
 ///
 class ISession :
     public mi::base::Interface_declare<0x21638be2,0xab6b,0x4396,0x9a,0xb7,0x3b,0xa5,0xe2,0xc9,0xe0,0xe6,

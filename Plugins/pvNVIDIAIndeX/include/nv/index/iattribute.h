@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Base class representing attributes that can be defined in a scene description.
@@ -17,7 +17,6 @@ namespace nv
 namespace index
 {
 
-/// @ingroup nv_index_scene_description_attribute
 /// <em>Attributes</em> are a part of the scene description that provide a
 /// common mechanism for parameterized information used in processing.
 /// Attributes define the rendered appearance of shapes and large-scale datasets
@@ -46,6 +45,8 @@ namespace index
 ///      therefore be active simultaneously and will all be considered for
 ///      rendering. For example, multiple light sources specified in the scene
 ///      should be used in rendering a shape.
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class IAttribute :
         public mi::base::Interface_declare<0xfb32338f,0xca95,0x49ce,0x80,0xdf,0x9c,0x1e,0x5a,0x25,0x7e,0x0f,

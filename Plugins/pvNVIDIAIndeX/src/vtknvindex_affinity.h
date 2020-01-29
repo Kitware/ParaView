@@ -1,4 +1,4 @@
-/* Copyright 2019 NVIDIA Corporation. All rights reserved.
+/* Copyright 2020 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -94,7 +94,7 @@ public:
 
   // Get the set affinity information for a given bbox.
   bool get_affinity(const mi::math::Bbox_struct<mi::Float32, 3>& subregion, mi::Uint32& host_id,
-    mi::Uint32& gpu_id) const override;
+    mi::IString* host_name, mi::Uint32& gpu_id) const override;
 
   // Get the number of subregions produced by NVIDIA IndeX.
   mi::Uint32 get_nb_subregions() const override;

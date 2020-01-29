@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// Sub-grids of a corner-point grid.
 
@@ -16,7 +16,8 @@ namespace index {
 /// having the same xy-size. Patches from different layers that have the same xy-coordinates are
 /// organized as a <em>patch stack</em>.
 ///
-/// @ingroup nv_index_data_storage
+/// \ingroup nv_index_data_storage
+///
 class ICorner_point_grid_subset :
     public mi::base::Interface_declare<0x46b85bee,0xca99,0x4edf,0x85,0x1a,0x8b,0x9d,0xbd,0x4c,0x96,0xd5,
                                        IDistributed_data_subset>

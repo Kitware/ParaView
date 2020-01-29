@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief  Interface for accessing the monitored performance values.
@@ -13,11 +13,12 @@ namespace nv {
 
 namespace index {
 
-/// @ingroup nv_index_performance_measurement
 /// Interface class that exposes the performance values and statistics of a single horizontal span.
 ///
 /// For each span, detailed information about the compositing time, the transferred image data (memory), the
 /// number of subcubes considered, etc. are gathered.
+///
+/// \ingroup nv_index_performance_measurement
 ///
 class IPer_span_statistics :
     public mi::base::Interface_declare<0x323be64a,0xbd51,0x4078,0xb3,0x29,0xf6,0xe8,0x04,0x93,0x70,0xeb,
@@ -52,8 +53,10 @@ public:
     virtual mi::Float32 get_time(const char* type_name) const = 0;
 };
 
-/// @ingroup nv_index_performance_measurement
 /// Interface class to query overall system performance values and statistics.
+///
+/// \ingroup nv_index_performance_measurement
+///
 class IPerformance_values :
     public mi::base::Interface_declare<0xa3ed753a,0x5a9c,0x4157,0xa4,0x71,0x52,0x86,0x5f,0x5f,0x43,0xd9>
 {

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Setting that configure NVIDIA IndeX's rendering and computing.
@@ -19,7 +19,8 @@ namespace index
 
 /// An abstract interface for sharing global settings that configure NVIDIA IndeX
 /// rendering and computing functionality.
-/// @ingroup nv_index_configuration
+///
+/// \ingroup nv_index_configuration
 ///
 class IConfig_settings :
     public mi::base::Interface_declare<0xf7d37400,0xdf43,0x49f2,0x8e,0x12,0x67,0xe3,0x62,0x90,0xad,0xee,

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Main API of the NVIDIA IndeX library.
@@ -32,109 +32,109 @@
 // They will be listed in the same order in which they are defined here.
 //
 
-/// @defgroup nv_index NVIDIA IndeX API
+/// \defgroup nv_index NVIDIA IndeX API
 
-/// @defgroup nv_index_configuration Configuration
-/// @ingroup nv_index
+/// \defgroup nv_index_configuration Configuration
+/// \ingroup nv_index
 ///
 /// General configuration settings that control the behavior of NVIDIA IndeX.
 ///
 
-/// @defgroup nv_index_data_access Data access
-/// @ingroup nv_index
+/// \defgroup nv_index_data_access Data access
+/// \ingroup nv_index
 
-/// @defgroup nv_index_data_computing Data computing
-/// @ingroup nv_index
+/// \defgroup nv_index_data_computing Data computing
+/// \ingroup nv_index
 ///
 
-/// @defgroup nv_index_data_edit Data editing
-/// @ingroup nv_index
+/// \defgroup nv_index_data_edit Data editing
+/// \ingroup nv_index
 
-/// @defgroup nv_index_data_storage Data storage
-/// @ingroup nv_index
+/// \defgroup nv_index_data_storage Data storage
+/// \ingroup nv_index
 
-/// @defgroup nv_index_error Errors
-/// @ingroup nv_index
+/// \defgroup nv_index_error Errors
+/// \ingroup nv_index
 
-/// @defgroup nv_index_performance_measurement Performance measurement
-/// @ingroup nv_index
+/// \defgroup nv_index_performance_measurement Performance measurement
+/// \ingroup nv_index
 
-/// @defgroup nv_index_rendering Rendering
-/// @ingroup nv_index
+/// \defgroup nv_index_rendering Rendering
+/// \ingroup nv_index
 
-/// @defgroup nv_index_scene_description_attribute Scene attributes
-/// @ingroup nv_index_scene_description
+/// \defgroup nv_index_scene_description_attribute Scene attributes
+/// \ingroup nv_index_scene_description
 /// Scene attributes provide a common mechanism for controlling other scene
 /// elements. These attributes can be created by IScene::create_attribute
 /// method.
 
-/// @defgroup nv_index_scene_description Scene description
-/// @ingroup nv_index
+/// \defgroup nv_index_scene_description Scene description
+/// \ingroup nv_index
 /// The scene description defines everything in the scene,
 /// including visible shapes, their attributes, and groups.
 
-/// @defgroup nv_index_scene_description_group Scene groups
-/// @ingroup nv_index_scene_description
+/// \defgroup nv_index_scene_description_group Scene groups
+/// \ingroup nv_index_scene_description
 /// Scene groups construct a scene in a hierarchical form.
 
-/// @defgroup scene_queries Scene queries
-/// @ingroup nv_index
+/// \defgroup scene_queries Scene queries
+/// \ingroup nv_index
 
-/// @defgroup xac XAC programs
-/// @ingroup nv_index
+/// \defgroup xac XAC programs
+/// \ingroup nv_index
 /// IndeX Accelerated Compute interface programs.
 /// The IndeX Accelerated Compute (XAC) Interface enables programmers to add
 /// real-time compiled sampling programs into the IndeX volume rendering pipeline.
 /// XAC programs are written in the CUDA programming language.
 
-/// @defgroup xac_scene XAC scene
-/// @ingroup xac
+/// \defgroup xac_scene XAC scene
+/// \ingroup xac
 /// Scene definition for XAC programs.
 /// For each rendered frame, IndeX performs a back-to-front ray
 /// casting procedure in a scene defined by an XAC class.
 
-/// @defgroup xac_obj XAC elements
-/// @ingroup xac
+/// \defgroup xac_obj XAC elements
+/// \ingroup xac
 /// Scene elements for XAC programs.
 /// Predefined elements that are part of the XAC interface can provide information
 /// about the current IndeX state as well as a set of geometric scene elements used.
 /// for the final visualization output.
 
-/// @defgroup xac_lib XAC functions
-/// @ingroup xac
+/// \defgroup xac_lib XAC functions
+/// \ingroup xac
 /// Functions and macros for XAC programs.
 /// The XAC interface also provides a set of convenience macros and functions for
 /// printing debugging information, transformation handling, basic shading
 /// operations and generic gradient operators.
 
-/// @defgroup xac_compute XAC compute
-/// @ingroup xac
+/// \defgroup xac_compute XAC compute
+/// \ingroup xac
 /// IndeX Accelerated Compute (XAC) facilities for gpu accelerated computing of data.
 
-/// @defgroup nv_index_scene_description_shape Scene shapes
-/// @ingroup nv_index_scene_description
+/// \defgroup nv_index_scene_description_shape Scene shapes
+/// \ingroup nv_index_scene_description
 ///
 /// Shapes are a visible scene object. These are created by
 /// IScene::create_shape. The behavior of many shapes can be changed using the
 /// scene attributes. \see IAttribute
 
-/// @defgroup nv_index_utilities Utilities
-/// @ingroup nv_index
+/// \defgroup nv_index_utilities Utilities
+/// \ingroup nv_index
 
-/// @defgroup nv_index_workload_balancing Workload balancing
-/// @ingroup nv_index
+/// \defgroup nv_index_workload_balancing Workload balancing
+/// \ingroup nv_index
 
 /// Common namespace for all NVIDIA APIs.
 namespace nv
 {
 
 /// Namespace for NVIDIA IndeX library APIs.
-/// @ingroup nv_index
+/// \ingroup nv_index
 namespace index
 {
 
 /// Interface for configuring and querying the NVIDIA IndeX cluster settings.
-/// @ingroup nv_index_configuration
+/// \ingroup nv_index_configuration
 class ICluster_configuration :
     public mi::base::Interface_declare<0x84fcac5c,0x25d1,0x4456,0x88,0x22,0xe4,0x92,0xec,0xee,0xea,0x1a>
 {
@@ -241,7 +241,7 @@ public:
 };
 
 /// API component for creating the user session in the NVIDIA IndeX library.
-/// @ingroup nv_index
+/// \ingroup nv_index
 ///
 class IIndex_session :
     public mi::base::Interface_declare<0x8ba1e5c7,0xaeb9,0x45ee,0xbb,0xf1,0xd6,0x25,0x91,0x70,0xce,0xaa>
@@ -394,7 +394,7 @@ public:
 /// the frame details. An instance of the user-defined class can be passed to the IndeX render call
 /// and the IndeX library takes care to populate the appropriate frame details.
 ///
-/// @ingroup nv_index_rendering
+/// \ingroup nv_index_rendering
 ///
 class IFrame_info_callbacks :
     public mi::base::Interface_declare<0xa686de09,0x6605,0x46ae,0xa0,0x9a,0xd2,0x8c,0x8b,0xcc,0xf1,0x92>
@@ -658,7 +658,7 @@ public:
 /// functionality. Only one instance of this class may exist at the same time.
 /// It enables the configuration, start-up and shutdown of the NVIDIA IndeX
 /// library and exposes the library's API functionality through API components.
-/// @ingroup nv_index
+/// \ingroup nv_index
 ///
 class IIndex :
     public mi::base::Interface_declare<0x0342c227,0x65f1,0x4465,0xb2,0x79,0x74,0x6a,0x04,0xfa,0x28,0x4b>
@@ -678,8 +678,8 @@ public:
     /// \param[in] flexnet_license_path_length Length of the FlexNet license path.
     ///                                 Can be 0 when no FlexNet license is used.
     ///
-    /// \return Result of then NVIDIA IndeX library authentication
-    /// attempt, 0 means success.
+    /// \return Result of the NVIDIA IndeX library authentication
+    ///         attempt, 0 means success.
     ///
     virtual mi::Sint32 authenticate(
         const char* vendor_key,
@@ -691,8 +691,8 @@ public:
 
     /// Starts the operation of the IndeX library.
     //
-    /// \note This method needs to be called after all user-defined serializable
-    /// classes have been registered.
+    /// \note All user-defined serializable classes must have been registered before calling this
+    /// method.
     ///
     /// \param[in] is_dice_start_block Indicates whether the DiCE start up should be done in blocking
     ///                                mode (compare mi::neuraylib::INeuray::start()). Currently
@@ -890,7 +890,7 @@ extern "C"
 ///
 /// It returns an instance of the main nv::index::IIndex interface, which can be used to
 /// configure, to start up, to operate with, and to shut down the NVIDIA IndeX library.
-/// @ingroup nv_index
+/// \ingroup nv_index
 ///
 /// \note       This function may be called only once in each process.
 ///

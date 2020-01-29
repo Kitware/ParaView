@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/math/vector.h
 /// \brief Math vector class template of fixed dimension with arithmetic operators and generic

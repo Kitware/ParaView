@@ -2,10 +2,10 @@
  * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
-/// \brief Scene element for sparse volumes.
+/// \brief Scene element for particle volumes.
 
-#ifndef NVIDIA_INDEX_ISPARSE_VOLUME_SCENE_ELEMENT_H
-#define NVIDIA_INDEX_ISPARSE_VOLUME_SCENE_ELEMENT_H
+#ifndef NVIDIA_INDEX_IPARTICLE_VOLUME_SCENE_ELEMENT_H
+#define NVIDIA_INDEX_IPARTICLE_VOLUME_SCENE_ELEMENT_H
 
 #include <mi/base/interface_declare.h>
 #include <mi/dice.h>
@@ -15,12 +15,12 @@
 namespace nv {
 namespace index {
 
-/// Interface for sparse volume scene elements.
+/// Interface for particle volume scene elements.
 ///
 /// \ingroup nv_index_scene_description_shape
 ///
-class ISparse_volume_scene_element :
-    public  mi::base::Interface_declare<0xbb6ad4b7,0xd42c,0x47f7,0xb4,0x46,0xe1,0xb,0x1,0xb,0x76,0x1b,
+class IParticle_volume_scene_element :
+    public  mi::base::Interface_declare<0xf81de023,0xd8a8,0x4fea,0x90,0x62,0x8a,0x1c,0x3d,0x8e,0xbd,0x1c,
                                         nv::index::IDistributed_data>
 {
 public:
@@ -29,4 +29,4 @@ public:
 } // namespace index
 } // namespace nv
 
-#endif // NVIDIA_INDEX_ISPARSE_VOLUME_SCENE_ELEMENT_H
+#endif // NVIDIA_INDEX_IPARTICLE_VOLUME_SCENE_ELEMENT_H

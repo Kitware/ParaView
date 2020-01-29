@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Multi-view functionality
@@ -74,7 +74,7 @@ namespace index {
 ///   IVertical_profile_scene_element, have to be added to their
 ///   parent \c IRegular_volume in global scope.
 ///
-/// @ingroup nv_index_rendering
+/// \ingroup nv_index_rendering
 ///
 class IViewport :
     public mi::base::Interface_declare<0x3dd9ae6f,0x819d,0x4c9c,0xbb,0x72,0x7f,0x5a,0x8c,0x49,0xc7,0x01>
@@ -134,7 +134,7 @@ public:
 /// For testing and debugging the multi-view support, extra \em
 /// advisory log output can be enabled.
 ///
-/// @ingroup nv_index_rendering
+/// \ingroup nv_index_rendering
 ///
 class IViewport_list :
     public mi::base::Interface_declare<0xbd7cbc5a,0x4628,0x47ea,0x94,0x9d,0x64,0x3c,0x34,0xa3,0xc6,0x8e>
@@ -204,7 +204,7 @@ public:
 ///
 /// This list is passed to the multi-canvas version of \c IIndex_rendering::render().
 ///
-/// @ingroup nv_index_rendering
+/// \ingroup nv_index_rendering
 ///
 class ICanvas_viewport_list :
     public mi::base::Interface_declare<0x84643c8a,0xd6cb,0x47d8,0xa1,0x5c,0xff,0x6a,0xc9,0x90,0x4b,0x14>

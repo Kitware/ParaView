@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for user-defined distributed computing algorithms
@@ -18,7 +18,6 @@ namespace nv
 namespace index
 {
 
-/// @ingroup nv_index_data_computing
 /// Interface class that enables implementing distributed computing algorithms or computing tasks
 /// that can operate on the distributed data uploaded to the cluster environment.
 ///
@@ -32,6 +31,8 @@ namespace index
 /// task (i.e., the fragmented job) for heightfields internally. Alternatively, the \c
 /// IDistributed_compute_algorithm interface class can also be used directly to implement
 /// distributed compute tasks working with volume or heightfield data.
+///
+/// \ingroup nv_index_data_computing
 ///
 class IDistributed_compute_algorithm :
         public mi::base::Interface_declare<0x5e67c454,0x2566,0x4485,0xb3,0xea,0x76,0x86,0x5f,0x67,0x45,0xe6,
@@ -59,11 +60,13 @@ public:
         mi::math::Bbox_struct<mi::Float32, 3>& bbox) const = 0;
 };
 
-/// @ingroup nv_index_data_computing
 /// Mixin class for implementing the IDistributed_compute_algorithm interface.
 ///
 /// For convenience, the mixin class leverages the default implementation of the
 /// fragmented job mixin class.
+///
+/// \ingroup nv_index_data_computing
+///
 template <mi::Uint32 i_id1, mi::Uint16 i_id2, mi::Uint16 i_id3,
           mi::Uint8 i_id4, mi::Uint8 i_id5, mi::Uint8 i_id6, mi::Uint8 i_id7,
           mi::Uint8 i_id8, mi::Uint8 i_id9, mi::Uint8 i_id10, mi::Uint8 i_id11,

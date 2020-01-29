@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/base/enums.h
 /// \brief Basic enums.
@@ -14,6 +14,10 @@
 namespace mi {
 
 namespace base {
+
+/// Namespace for details of the Base API.
+/// \ingroup mi_base
+namespace details {
 
 /** \addtogroup mi_base_ilogger
 @{
@@ -45,7 +49,12 @@ mi_static_assert( sizeof( Message_severity) == 4);
 
 /*@}*/ // end group mi_base_ilogger
 
+}
+
+using namespace details;
+
 } // namespace base
+
 } // namespace mi
 
 #endif // MI_BASE_ENUMS_H

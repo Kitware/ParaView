@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene elements representing object space and image space labels.
@@ -18,10 +18,11 @@ namespace nv
 {
 namespace index
 {
-/// @ingroup nv_index_scene_description_shape
-///
-/// A polygon of n vertices defined in image space. 
+/// A polygon of n vertices defined in image space.
 /// The polygon always faces towards the viewer, i.e., the polygon is parallel to the view plane.
+///
+/// \ingroup nv_index_scene_description_shape
+///
 class IPolygon :
     public mi::base::Interface_declare<0x6558d81b,0xe2de,0x4349,0x92,0xcf,0x86,0xd2,0x27,0x1b,0x3b,0xfc,
                                        nv::index::IImage_space_shape>

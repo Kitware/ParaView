@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Attribute defining a clipping region.
@@ -14,11 +14,11 @@
 namespace nv {
 namespace index {
 
-/// @ingroup nv_index_scene_description_attribute
-
 /// Defines a generic clipping region that is applied to shapes.
 /// Clipping is only supported for some shapes, as described in the documentation of the individual
 /// shape scene elements.
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class IClip_region :
     public mi::base::Interface_declare<0x7693cba2,0x8c85,0x4023,0xa2,0x96,0xab,0x56,0xab,0x53,0xc8,0x5c,

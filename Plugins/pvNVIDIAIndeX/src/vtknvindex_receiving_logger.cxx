@@ -1,4 +1,4 @@
-/* Copyright 2019 NVIDIA Corporation. All rights reserved.
+/* Copyright 2020 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -97,8 +97,8 @@ std::ostringstream& vtknvindex_receiving_logger::get_message(mi::Uint32 level)
 }
 
 //----------------------------------------------------------------------
-void vtknvindex_receiving_logger::message(
-  mi::base::Message_severity level, const char* /*category*/, const char* message)
+void vtknvindex_receiving_logger::message(mi::base::Message_severity level,
+  const char* /*category*/, const mi::base::Message_details&, const char* message)
 {
   vtknvindex_receiving_logger().get_message(level) << message;
 }

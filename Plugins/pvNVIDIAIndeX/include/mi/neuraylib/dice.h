@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief \NeurayApiName for implementing distributed parallel computing algorithms.
@@ -49,7 +49,7 @@
 #define MI_NEURAYLIB_DICE_VERSION_QUALIFIER_EMPTY
 
 /// DiCE product version number in a string representation, such as \c "2016".
-#define MI_NEURAYLIB_DICE_PRODUCT_VERSION_STRING  "2019"
+#define MI_NEURAYLIB_DICE_PRODUCT_VERSION_STRING  "2020"
 
 /*@}*/ // end group mi_neuray_dice
 

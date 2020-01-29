@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Class representing wireframe rendering for geometries in the scene description.
@@ -17,8 +17,6 @@ namespace nv
 namespace index
 {
 
-/// @ingroup nv_index_scene_description_attribute
-
 /// The interface class representing an attribute to render triangle based
 /// geometries in wireframe style.  The class provides two different styles:
 /// <em>outline</em> and <em>wireframe</em>.
@@ -34,6 +32,8 @@ namespace index
 /// can be specified per triangle for geometric types that support triangle flag
 /// data. (See, for example, the ITriangle_mesh class for details.)
 /// 
+/// \ingroup nv_index_scene_description_attribute
+///
 class IWireframe_rendering_style :
         public mi::base::Interface_declare<0x3150e667,0xf850,0x4bfc,0x84,0xdd,0x98,0xa6,0x1d,0x78,0x28,0x10,
                                            nv::index::IAttribute>
@@ -101,7 +101,9 @@ public:
 /// color of the super class.
 ///
 /// By default, the edges of all triangle are highlighted.
-/// 
+///
+/// \ingroup nv_index_scene_description_attribute
+///
 class IHeightfield_wireframe_style :
         public mi::base::Interface_declare<0x9837b2d4,0x8347,0x4e56,0x97,0x42,0x0a,0xfc,0x9f,0x54,0xae,0x45,
                                            nv::index::IWireframe_rendering_style>

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 ///
@@ -24,7 +24,7 @@ namespace index
 /// The application draws an OpenGL opaque object into this buffer and
 /// transfers its contents to the NVIDIA IndeX library through this interface.
 ///
-/// @ingroup nv_index_rendering
+/// \ingroup nv_index_rendering
 ///
 class IOpengl_application_buffer :
     public mi::base::Interface_declare<0xc66fb0b9,0x6e76,0x4a58,0xa6,0x3a,0xfa,0xb7,0x67,0x39,0x78,0x71>

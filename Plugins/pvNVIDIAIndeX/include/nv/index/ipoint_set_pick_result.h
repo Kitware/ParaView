@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Point set specific pick results returned by the NVIDIA IndeX library when querying a scene's contents using the pick operation.
@@ -16,11 +16,12 @@ namespace nv
 {
 namespace index
 {
-/// @ingroup scene_queries
 
 /// Interface class that returns the point set specific result of a pick operation/query.
 /// The interface class sub classes from \c IScene_pick_result to provide additional 
 /// intersection results specific to \c IPoint_set scene elements.
+///
+/// \ingroup scene_queries
 ///
 class IPoint_set_pick_result :
     public mi::base::Interface_declare<0x22be608a,0x48da,0x4c6a,0xa7,0xb7,0x5e,0x5c,0xa3,0x66,0x15,0x99,

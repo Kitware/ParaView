@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Database transactions.
@@ -527,7 +527,8 @@ public:
     /// might be expensive to call this method for large subgraphs.
     ///
     /// The returned scene elements are in such an order that all elements referenced by a given
-    /// element are listed before that element (before in the sense of smaller array indices).
+    /// element are listed before that element ("before" in the sense of "using smaller array
+    /// indices").
     ///
     /// \param root_element   The root of the subgraph to traverse.
     /// \param name_pattern   A regular expression that acts as filter on the names of returned

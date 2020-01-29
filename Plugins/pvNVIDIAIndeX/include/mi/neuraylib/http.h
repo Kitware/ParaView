@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief A lightweight HTTP server.
@@ -882,6 +882,23 @@ public:
 
     /// Returns the size limit for the body of HTTP POST requests.
     virtual Uint32 get_http_post_body_limit() const = 0;
+
+    /// Sets the maximum number of concurrent connections this server will accept. Defaults to 256.
+    /// 
+    /// Further connections will be put on the os backlog and serviced only after the number of 
+    /// current connections drops below this value.
+    /// 
+    /// Note that when even the os backlog is full things works a bit differently depending on OS:
+    /// 
+    /// Linux:   Further connections will be ignored by the server, client will time out and 
+    //           try again.
+    /// Windows: Further connections will be rejected by the server and fail.
+    /// 
+    /// \param limit The new limit.
+    virtual void set_concurrent_connection_limit( Uint32 limit ) = 0;
+
+    /// Returns the current concurrent connection limit.
+    virtual Uint32 get_concurrent_connection_limit() = 0;
 };
 
 /// The factory can be used to instantiate the built-in HTTP classes.
