@@ -69,7 +69,7 @@ int Run(int processType, int argc, char* argv[])
   if (options->GetTellVersion() || options->GetHelpSelected() || options->GetPrintMonitors())
   {
     vtkInitializationHelper::Finalize();
-    return 0;
+    return EXIT_SUCCESS;
   }
 
   if (processType == vtkProcessModule::PROCESS_BATCH && options->GetPythonScriptName() == 0)
@@ -77,7 +77,7 @@ int Run(int processType, int argc, char* argv[])
     vtkGenericWarningMacro("No script specified. "
                            "Please specify a batch script or use 'pvpython'.");
     vtkInitializationHelper::Finalize();
-    return 1;
+    return EXIT_FAILURE;
   }
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
