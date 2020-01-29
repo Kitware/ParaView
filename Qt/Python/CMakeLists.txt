@@ -34,6 +34,7 @@ set(classes
   pqPythonManager
   pqPythonScriptEditor
   pqPythonShell
+  pqPythonShellCompleter
   pqPythonSyntaxHighlighter)
 
 set(ui_files
