@@ -568,6 +568,14 @@
           <Documentation>Filepath to the HTML viewer to embed data in</Documentation>
           <FileListDomain name="files" />
        </StringVectorProperty>
+      <IntVectorProperty command="SetWriteTextures"
+                         default_values="1"
+                         name="WriteTextures"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <Hints>
         <ExporterFactory extensions="vtkjs" />
       </Hints>
