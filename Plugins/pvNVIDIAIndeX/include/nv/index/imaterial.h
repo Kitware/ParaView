@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Base class representing the surface appearance of shapes in the scene description.
@@ -16,7 +16,6 @@ namespace nv
 {
 namespace index
 {
-/// @ingroup nv_index_scene_description_attribute
 
 /// The material base class. Derived classes define the material properties of shapes. The material
 /// properties are applied to shapes together with the direct illumination using light sources. The
@@ -25,6 +24,8 @@ namespace index
 /// scene description. Only one material property can be active at the same time. All graphics
 /// elements that are affected by the material shall then be shaded in accordance to the material
 /// properties.
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class IMaterial :
         public mi::base::Interface_declare<0xaaf6c278,0xf36f,0x4d00,0x83,0xd6,0xfc,0x9a,0x4c,0xb3,0x2d,0x57,
@@ -74,6 +75,8 @@ class IMaterial :
 ///
 /// The term that describes the surface's light reflectance then is:
 /// surface_color = ambient + diffuse + specular
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class IPhong_gl :
         public mi::base::Interface_declare<0x9202fbb8,0x4c0f,0x442a,0xad,0x31,0x4f,0x0b,0x30,0x3d,0xc6,0xad,

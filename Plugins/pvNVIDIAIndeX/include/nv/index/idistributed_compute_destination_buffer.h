@@ -1,5 +1,5 @@
  /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Asynchronous texture generation for use with shapes.
@@ -12,13 +12,13 @@
 
 #include <nv/index/idistributed_data_subset.h>
 
+#include <nv/index/iirregular_volume_subset.h>
+
 #include <nv/index/isparse_volume_subset.h>
 
 namespace nv {
 namespace index {
 
-/// @ingroup nv_index_data_computing
-///
 /// The interface class enables the asynchronous generation of 2D texture
 /// buffers and 3D volume data. Once the generation of compute-destination buffers
 /// has been triggered, for example, by means of the interface class
@@ -34,6 +34,8 @@ namespace index {
 /// If a compute-destination buffer has been filled the buffer can be made available to
 /// the calling rendering system.
 ///
+/// \ingroup nv_index_data_computing
+///
 class IDistributed_compute_destination_buffer :
     public mi::base::Interface_declare<0xfaae5c5,0x2701,0x442e,0x8f,0x77,0xe3,0x3,0xed,0xd,0x6f,0x5c>
 {
@@ -46,7 +48,7 @@ public:
     /// \return     The bounding box of the subregion, which is defined in the
     ///             global coordinate system.
     ///
-    virtual mi::math::Bbox_struct<mi::Float32, 3> get_subregion_bbox() const = 0;
+    virtual mi::math::Bbox_struct<mi::Float32, 3>   get_subregion_bbox() const = 0;
 
     /// Returns the 2D area that the subregion covers in screen space. Based on
     /// the given screen-space area a user-defined technique can choose, for
@@ -57,11 +59,27 @@ public:
     /// \return     The screen-space area that the subregion covers defined in
     ///             window coordinates.
     ///
-    virtual mi::math::Bbox_struct<mi::Uint32, 2> get_screen_space_area() const = 0;
+    virtual mi::math::Bbox_struct<mi::Uint32, 2>    get_screen_space_area() const = 0;
+
+    /// GPU-device id if the destination buffer is located on a GPU-device.
+    ///
+    /// \returns GPU-device id, negative values indicate that the data is currently not stored on any device.
+    ///
+    virtual mi::Sint32                              get_gpu_device_id() const = 0;
+
+    /// 
+    struct Compute_frame_id {
+        mi::Uint32      frame_id;   ///< globally unique frame identifier
+        mi::Uint32      scope_id;   ///< scope id the compute task is issued under
+        mi::Uint32      host_id;    ///< host-id of the host issuing the compute task
+    };
+
+    /// Returns the frame-id the compute task was issued under
+    ///
+    virtual Compute_frame_id                        get_compute_frame_id() const = 0;
+
 };
 
-/// @ingroup nv_index_data_computing 
-///
 /// Compute-destination buffer for 3D volume generation techniques.
 ///
 /// Upon applying an \c IDistributed_compute_technique attribute to a \c IRegular_volume scene element
@@ -69,6 +87,8 @@ public:
 /// method. In order to support type safe volume data generation typed specializations of this base
 /// class are provided (e.g. \c IDistributed_compute_destination_buffer_3d_volume_uint8,
 /// \c IDistributed_compute_destination_buffer_3d_volume_rgba8).
+///
+/// \ingroup nv_index_data_computing
 ///
 class IDistributed_compute_destination_buffer_3d_volume :
     public mi::base::Interface_declare<0xcb42c8dd,0x4f80,0x4dc3,0x8a,0x20,0x98,0xe1,0x58,0x6,0x37,0x14,
@@ -127,11 +147,11 @@ public:
     virtual mi::math::Bbox_struct<mi::Sint32, 3> get_already_computed_volume_brick_bbox() const = 0;
 };
 
-/// @ingroup nv_index_data_computing
-///
 /// Intermediate-interface class for all typed volume compute-destination buffer interfaces. According
 /// to the actual dataset component type (e.g. Uint8, Uint16, Float32, Rgba8) the volume data can be
 /// written to the destination buffer.
+///
+/// \ingroup nv_index_data_computing
 ///
 template<typename T>
 class IDistributed_compute_destination_buffer_3d_volume_typed :
@@ -246,49 +266,49 @@ public:
     virtual mi::neuraylib::IRDMA_buffer* wrap_internal_buffer(mi::neuraylib::IRDMA_context* rdma_ctx) const = 0;
 };
 
-/// @ingroup nv_index_data_computing
-///
 /// Single-channel 8bit unsigned per voxel volume compute destination buffer.
+///
+/// \ingroup nv_index_data_computing
 ///
 class IDistributed_compute_destination_buffer_3d_volume_uint8 :
     public mi::base::Interface_declare<0x45065a39,0xa261,0x453f,0xa7,0xb4,0x1,0x25,0xae,0x9c,0x4,0x4f,
                                        IDistributed_compute_destination_buffer_3d_volume_typed<mi::Uint8> >
 {};
 
-/// @ingroup nv_index_data_computing
-///
 /// Single-channel 16bit unsigned per voxel volume compute destination buffer.
+///
+/// \ingroup nv_index_data_computing
 ///
 class IDistributed_compute_destination_buffer_3d_volume_uint16 :
     public mi::base::Interface_declare<0x9fd3ee6d,0x34ad,0x4bc0,0xa2,0x16,0x65,0xb2,0xb7,0x1e,0x3b,0x96,
                                        IDistributed_compute_destination_buffer_3d_volume_typed<mi::Uint16> >
 {};
 
-/// @ingroup nv_index_data_computing
-///
 /// Single-channel 32bit floating point per voxel volume compute destination buffer.
+///
+/// \ingroup nv_index_data_computing
 ///
 class IDistributed_compute_destination_buffer_3d_volume_float32 :
     public mi::base::Interface_declare<0xe8347ed0,0x7980,0x4ae8,0xa1,0xf3,0x4b,0x50,0xd6,0xa,0xcd,0x24,
                                        IDistributed_compute_destination_buffer_3d_volume_typed<mi::Float32> >
 {};
 
-/// @ingroup nv_index_data_computing
-///
 /// Four-channel 8bit per channel unsigned integer per voxel volume compute destination buffer.
+///
+/// \ingroup nv_index_data_computing
 ///
 class IDistributed_compute_destination_buffer_3d_volume_rgba8 :
     public mi::base::Interface_declare<0xffb5524d,0xc006,0x41e9,0x9e,0x99,0xfc,0x6e,0xd0,0xb,0x38,0x10,
                                        IDistributed_compute_destination_buffer_3d_volume_typed<mi::math::Vector_struct<mi::Uint8, 4> > >
 {};
 
-/// @ingroup nv_index_data_computing 
-///
 /// Compute-destination buffer for 3D sparse-volume generation techniques.
 ///
 /// Upon applying an \c IDistributed_compute_technique attribute to a \c ISparse_volume_scene_element scene element
 /// a \c IDistributed_compute_destination_buffer_3d_sparse_volume is passed to the \c IDistributed_compute_technique::launch_compute()
 /// method.
+///
+/// \ingroup nv_index_data_computing
 ///
 class IDistributed_compute_destination_buffer_3d_sparse_volume :
     public mi::base::Interface_declare<0x9da831bb,0x8425,0x4590,0xaa,0x10,0x8,0xcc,0x8d,0x5f,0x90,0xc1,
@@ -338,13 +358,42 @@ public:
     /// Returns the volume data-subset for which the compute technique is required to
     /// generate voxel values.
     ///
-    /// \return     An interface pointer to an instance of \c ISparse_volume_subset_P9.
+    /// \return     An interface pointer to an instance of \c ISparse_volume_subset.
     ///
     virtual ISparse_volume_subset* get_distributed_data_subset() = 0;
 };
 
-/// @ingroup nv_index_data_computing
+/// Compute-destination buffer for irregular volume generation techniques.
 ///
+/// Upon applying an \c IDistributed_compute_technique attribute to a \c IIrregular_volume_scene_element scene element
+/// a \c IDistributed_compute_destination_buffer_irregular_volume is passed to the \c IDistributed_compute_technique::launch_compute()
+/// method.
+///
+/// \ingroup nv_index_data_computing
+///
+class IDistributed_compute_destination_buffer_irregular_volume :
+    public mi::base::Interface_declare<0x384f6eca,0xd09c,0x47a1,0xa0,0x91,0x1e,0x5f,0xc3,0xfb,0x47,0x6,
+                                       nv::index::IDistributed_compute_destination_buffer>
+{
+public:
+    /// Returns the bounding box of the volume subset for which the compute technique
+    /// is required to generate values.
+    ///
+    /// The rendering system computes and initializes the bounding box of the volume subset.
+    ///
+    /// \return     The bounding box of the volume subset, defined in non-normalized
+    ///             volume coordinates.
+    ///
+    virtual mi::math::Bbox_struct<mi::Float32, 3> get_volume_subset_data_bbox() const = 0;
+
+    /// Returns the volume data-subset for which the compute technique is required to
+    /// generate data values.
+    ///
+    /// \return     An interface pointer to an instance of \c IIrregular_volume_subset.
+    ///
+    virtual IIrregular_volume_subset* get_distributed_data_subset() = 0;
+};
+
 /// The interface class exposes intersections points that can be used, for
 /// instance, to texture or shade the surface of geometry.
 ///
@@ -359,6 +408,8 @@ public:
 /// to nodes in the cluster. Instead, the instance of the interface class itself
 /// is sent to compute the intersection points on the remote machines on
 /// request.
+///
+/// \ingroup nv_index_data_computing
 ///
 class IDistributed_compute_intersection_points :
     public mi::base::Interface_declare<0xd985cb6a,0xe5c2,0x4c40,0x95,0xe3,0x29,0xa7,0x22,0x3e,0x35,0x9f,
@@ -384,8 +435,6 @@ public:
         mi::Uint32& nb_points) = 0;
 };
 
-/// @ingroup nv_index_data_computing
-///
 /// Compute-destination buffer for 2D texture generation techniques.
 ///
 /// Upon applying an \c IDistributed_compute_technique attribute to a \c IPlane or \c IRegular_heightfield scene element
@@ -395,6 +444,8 @@ public:
 /// Based on the 2D area returned by \c get_screen_space_area() a user-defined compute technique can choose, for
 /// instance, an appropriate level-of-detail or the least compute-intensive generation technique, for example,
 /// by either rendering into a 2D buffer or a buffer that corresponds to the ray/geometry intersection.
+///
+/// \ingroup nv_index_data_computing
 ///
 class IDistributed_compute_destination_buffer_2d_texture :
     public mi::base::Interface_declare<0x1ea87c20,0xdae0,0x4b81,0xa3,0x16,0xa0,0x52,0x2d,0xf7,0xb4,0x3c,
@@ -538,9 +589,9 @@ public:
     virtual IDistributed_compute_intersection_points* get_intersection_points() const = 0;
 };
 
-/// @ingroup nv_index_data_computing
-///
 /// \todo Documentation missing.
+///
+/// \ingroup nv_index_data_computing
 ///
 class IDistributed_compute_destination_buffer_2d_texture_LOD_configuration :
     public mi::base::Interface_declare<0xfb33be9,0x8b65,0x400d,0xb3,0xfe,0xc2,0x3a,0x47,0x2d,0x4e,0xcf>
@@ -563,8 +614,6 @@ public:
         const LOD_level_info& mip_level_info) = 0;
 };
 
-/// @ingroup nv_index_data_computing
-/// 
 /// Compute-destination buffer for 2D LOD-texture generation techniques.
 /// 
 /// Upon applying an \c IDistributed_compute_technique_LOD attribute to a \c
@@ -604,7 +653,9 @@ public:
 /// using the \c get_required_LOD_levels() method. The requested data can then be
 /// written to the data-buffer returned by the \c get_LOD_level_buffer_storage()
 /// method.
-
+///
+/// \ingroup nv_index_data_computing
+///
 class IDistributed_compute_destination_buffer_2d_texture_LOD :
     public mi::base::Interface_declare<0xb25d2721,0xab95,0x450c,0x8d,0x64,0xd0,0xc5,0xd1,0xaa,0xac,0xca,
                                        nv::index::IDistributed_compute_destination_buffer>

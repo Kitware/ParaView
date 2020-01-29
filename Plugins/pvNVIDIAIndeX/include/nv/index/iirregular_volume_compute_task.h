@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for user-defined compute tasks that apply to volume bricks.
@@ -23,7 +23,8 @@ namespace index
 /// class \c IIrregular_volume_data_edit::edit() execute the compute task on the given volume data
 /// that is stored locally on a cluster machine.
 ///
-/// @ingroup nv_index_data_computing
+/// \ingroup nv_index_data_computing
+///
 class IIrregular_volume_compute_task :
     public mi::base::Interface_declare<0x71e7409,0x77cb,0x49c6,0xaa,0x26,0x94,0x62,0x59,0xfe,0xfa,0x28>
 {
@@ -94,7 +95,9 @@ public:
 ///
 /// This mixin class provides a default implementation of some of the pure
 /// virtual methods of the IIrregular_volume_compute_task interface.
-/// @ingroup nv_index_data_computing
+///
+/// \ingroup nv_index_data_computing
+///
 class Irregular_volume_compute_task :
     public mi::base::Interface_implement<IIrregular_volume_compute_task>
 {

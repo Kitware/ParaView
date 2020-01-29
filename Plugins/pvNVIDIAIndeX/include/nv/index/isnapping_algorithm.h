@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief  Interface class for implementing user-defined snapping algorithms.
@@ -16,7 +16,6 @@ namespace nv
 {
 namespace index
 {
-/// @ingroup nv_index_data_computing
 
 /// Interface class that enables the implementation of user-defined snapping algorithms.
 /// The 'picking' operation determines the intersection point between a ray cast from a
@@ -27,6 +26,8 @@ namespace index
 /// for instance, based on the volume amplitude values below and above the original
 /// pick location. The interface class \c IHeightfield_interaction provides means to
 /// register a user-defined snapping algorithm when invoking the manual pick operation.
+///
+/// \ingroup nv_index_data_computing
 ///
 class ISnapping_algorithm :
     public mi::base::Interface_declare<0xda250d90,0x49f6,0x4804,0x9b,0x83,0x9f,0x97,0x86,0xcc,0xc4,0x1b>

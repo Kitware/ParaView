@@ -1,4 +1,4 @@
-/* Copyright 2019 NVIDIA Corporation. All rights reserved.
+/* Copyright 2020 NVIDIA Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -511,12 +511,18 @@ void vtknvindex_irregular_volume_mapper::opacity_changed()
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_irregular_volume_mapper::rtc_kernel_changed(
-  vtknvindex_rtc_kernels kernel, const void* params_buffer, mi::Uint32 buffer_size)
+void vtknvindex_irregular_volume_mapper::rtc_kernel_changed(vtknvindex_rtc_kernels kernel,
+  const std::string& kernel_program, const void* params_buffer, mi::Uint32 buffer_size)
 {
   if (kernel != m_volume_rtc_kernel.rtc_kernel)
   {
     m_volume_rtc_kernel.rtc_kernel = kernel;
+    m_rtc_kernel_changed = true;
+  }
+
+  if (kernel_program != m_volume_rtc_kernel.kernel_program)
+  {
+    m_volume_rtc_kernel.kernel_program = kernel_program;
     m_rtc_kernel_changed = true;
   }
 

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interfaces for exposing the data distribution scheme.
@@ -18,7 +18,6 @@ namespace nv
 namespace index
 {
 
-/// @ingroup nv_index_data_access
 /// The interface class exposes data locality information.
 ///
 /// In general, the data representation that corresponds to a large-scale
@@ -51,7 +50,8 @@ namespace index
 ///
 /// \deprecated This interface class is subject to change!
 ///
-
+/// \ingroup nv_index_data_access
+///
 class IDistributed_data_locality :
     public mi::base::Interface_declare<0x64624ed0,0x6e2a,0x48c9,0xb9,0x73,0x61,0x8d,0x32,0xd0,0x5e,0xf5,
                                        mi::neuraylib::ISerializable>
@@ -113,7 +113,6 @@ public:
         mi::Uint32 index) const = 0;
 };
 
-/// @ingroup nv_index_data_access
 /// The interface class exposes the locality information of a distributed regular volume dataset.
 ///
 /// The interface method \c IData_distribution::retrieve_data_locality()
@@ -121,6 +120,8 @@ public:
 ///
 ///
 /// \deprecated This interface class is subject to change!
+///
+/// \ingroup nv_index_data_access
 ///
 class IRegular_volume_data_locality :
     public mi::base::Interface_declare<0x64624ed9,0x6e2a,0x48c9,0xa9,0x82,0x61,0x8d,0x32,0xd0,0x5e,0xf9,
@@ -181,13 +182,14 @@ public:
         mi::math::Bbox_struct<mi::Uint32, 3>&   brick_bounding_box) const = 0;
 };
 
-/// @ingroup nv_index_data_access
 /// The interface class exposes the locality information of a distributed sparse-volume dataset.
 ///
 /// The interface method \c IData_distribution::retrieve_data_locality()
 /// returns the volume data locality.
 ///
 /// \deprecated This interface class is subject to change!
+///
+/// \ingroup nv_index_data_access
 ///
 class ISparse_volume_data_locality :
     public mi::base::Interface_declare<0x860724fe,0x5c07,0x43b3,0xaa,0xc8,0xbc,0x3,0x72,0xc8,0x44,0xf8,
@@ -215,13 +217,14 @@ public:
         mi::Uint32                          index) const = 0;
 };
 
-/// @ingroup nv_index_data_access
 /// The interface class exposes the locality information of a distributed height-field dataset.
 ///
 /// The interface method \c IData_distribution::retrieve_data_locality()
 /// returns the height-field data locality.
 ///
 /// \deprecated This interface class is subject to change!
+///
+/// \ingroup nv_index_data_access
 ///
 class IHeight_field_data_locality :
     public mi::base::Interface_declare<0xb7e4caa4,0x36d7,0x4712,0xba,0x91,0x89,0x9d,0x70,0x3e,0x4c,0x7a,
@@ -230,7 +233,6 @@ class IHeight_field_data_locality :
 public:
 };
 
-/// @ingroup nv_index_data_access
 /// The interface class exposes the locality information of a distributed regular heightfield dataset.
 ///
 /// The interface method \c IData_distribution::retrieve_data_locality()
@@ -238,6 +240,8 @@ public:
 ///
 ///
 /// \deprecated This interface class is subject to change!
+///
+/// \ingroup nv_index_data_access
 ///
 class IRegular_heightfield_data_locality :
     public mi::base::Interface_declare<0xe40bd2c9,0x0d82,0x4e03,0x9c,0x46,0x42,0x87,0x86,0xbb,0xee,0xdf,
@@ -263,7 +267,6 @@ public:
         mi::Uint32                          index) const = 0;
 };
 
-/// @ingroup nv_index_data_access
 /// The interface class exposes the locality information of a distributed regular volume dataset.
 ///
 /// The interface method \c IData_distribution::retrieve_data_locality()
@@ -271,6 +274,8 @@ public:
 ///
 ///
 /// \deprecated This interface class is subject to change!
+///
+/// \ingroup nv_index_data_access
 ///
 class IIrregular_volume_data_locality :
     public mi::base::Interface_declare<0x1a783273,0xea49,0x4f86,0x97,0x44,0x24,0x5b,0xb5,0xef,0xe1,0x9d,
@@ -319,10 +324,11 @@ public:
         mi::Uint32 index) const = 0;
 };
 
-/// @ingroup nv_index_data_access
 /// Interface class that exposes the data distribution in the cluster environment.
 ///
 /// \deprecated This interface class is subject to change!
+///
+/// \ingroup nv_index_data_access
 ///
 class IData_distribution :
     public mi::base::Interface_declare<0xc37caf77,0xe632,0x46ad,0x8c,0x19,0x6d,0x57,0x56,0x04,0xda,0x68,

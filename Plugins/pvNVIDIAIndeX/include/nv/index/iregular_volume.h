@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for regular volume scene elements
@@ -35,7 +35,8 @@ namespace index {
 /// Slices (i.e., an \c ISection_scene_element or \c IVertical_profile_scene_element) must be
 /// assigned to a specific regular volume as part of the scene description, hence there are
 /// methods for creating, storing and accessing them.
-/// @ingroup nv_index_scene_description_shape
+///
+/// \ingroup nv_index_scene_description_shape
 ///
 class IRegular_volume :
     public mi::base::Interface_declare<0x761c9e3b,0x255e,0x442c,0xbd,0x36,0xe9,0xeb,0x0d,0xe9,0x83,0x57,

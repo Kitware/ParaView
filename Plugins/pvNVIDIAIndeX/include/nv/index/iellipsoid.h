@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene element representing a ellipsoid higher-level shape.
@@ -17,12 +17,12 @@ namespace nv
 namespace index
 {
 
-/// @ingroup nv_index_scene_description_shape
-///
 /// The set of higher-level 3D shapes part of the NVIDIA IndeX library include a 3D ellipsoid.
 /// A 3D ellipsoid is defined by its center and three orthogonal radii.
 /// The center and radii are defined in the ellipsoid's local coordinate system. The surface of
 /// the ellipsoid is shaded using the material and light defined in the scene description.
+///
+/// \ingroup nv_index_scene_description_shape
 ///
 class IEllipsoid :
     public mi::base::Interface_declare<0xa22f3595,0xe462,0x44ef,0xa9,0x23,0x9b,0x1d,0xdc,0x7a,0xda,0x50,

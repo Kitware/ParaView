@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene elements representing image space icons.
@@ -16,12 +16,12 @@ namespace nv
 {
 namespace index
 {
-/// @ingroup nv_index_scene_description_shape
-///
 /// Icons are common means for annotating a 3D scene using images.
 /// The 3D icon is defined in 3D space and its orientation is affected by the
 /// transformations applied by the scene description.
 /// The size is defined in 3D object space length.
+///
+/// \ingroup nv_index_scene_description_shape
 ///
 class IIcon_3D :
         public mi::base::Interface_declare<0x1f5f4ed8,0xf0ac,0x4aed,0x8d,0x16,0x80,0x86,0x19,0x9d,0xe9,0x26,
@@ -93,12 +93,12 @@ public:
 };
 
 
-/// @ingroup nv_index_scene_description_shape
-///
 /// Icons are common means for annotating a 3D scene using images.
 /// The 2D icon is defined in image space and always faces towards the viewer,
 /// similar to a billboard; the label is parallel to the view plane.
 /// The size is defined in 2D image space (screen space) in pixel.
+///
+/// \ingroup nv_index_scene_description_shape
 ///
 class IIcon_2D :
         public mi::base::Interface_declare<0xfea64c6d,0xb200,0x4955,0x80,0x35,0xe3,0x1e,0x3a,0xd9,0xc1,0x13,

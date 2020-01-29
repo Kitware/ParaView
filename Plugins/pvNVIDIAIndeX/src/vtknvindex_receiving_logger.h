@@ -1,4 +1,4 @@
-/* Copyright 2019 NVIDIA Corporation. All rights reserved.
+/* Copyright 2020 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -52,8 +52,8 @@ public:
   std::ostringstream& get_message(mi::Uint32 level);
 
   // Set message and severity values.
-  void message(
-    mi::base::Message_severity level, const char* category, const char* message) override;
+  void message(mi::base::Message_severity level, const char* category,
+    const mi::base::Message_details&, const char* message) override;
 
 private:
   // Output stream.

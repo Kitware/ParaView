@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Generic camera
@@ -13,8 +13,6 @@
 namespace nv {
 
 namespace index {
-
-/// @ingroup nv_index_scene_description
 
 /// Abstract interface class representing a generic camera.
 ///
@@ -35,6 +33,9 @@ namespace index {
 /// Instances of \c ICamera implementations are created by \c ISession::create_camera().
 ///
 /// Note: ICamera is not a IScene_element.
+///
+/// \ingroup nv_index_scene_description
+///
 class ICamera :
     public mi::base::Interface_declare<0x1247f2e7,0x1725,0x47e1,0x81,0x57,0x1b,0x63,0xa4,0x85,0x64,0x29,
                                        mi::neuraylib::IElement>
@@ -80,8 +81,6 @@ public:
     virtual mi::math::Vector_struct<mi::Float32, 3> get_up_direction() const = 0;
 };
 
-/// @ingroup nv_index_scene_description
-///
 /// Interface class for a camera implementing the perspective camera model.
 ///
 /// For perspective projection, the <em>field of view</em>
@@ -99,6 +98,8 @@ public:
 /// Other attributes stored in the IPerspective_camera class include
 /// the near and far clipping planes and the canvas resolution (width
 /// and height).
+///
+/// \ingroup nv_index_scene_description
 ///
 class IPerspective_camera :
     public mi::base::Interface_declare<0x1c7386d2,0xbd2d,0x4973,0xa8,0xa8,0xb5,0xfc,0xe9,0x0,0x22,0x5e,
@@ -154,11 +155,8 @@ public:
     ///
     /// \return Field of view, in radians
     virtual mi::Float64 get_fov_y_rad() const = 0;
-
 };
 
-/// @ingroup nv_index_scene_description
-///
 /// Interface class for a camera implementing the orthographic camera model.
 ///
 /// When orthographic projection is used, only the width
@@ -169,6 +167,8 @@ public:
 /// Other attributes stored in the IOrthographic_camera class include
 /// the near and far clipping planes and the canvas resolution (width
 /// and height).
+///
+/// \ingroup nv_index_scene_description
 ///
 class IOrthographic_camera :
     public mi::base::Interface_declare<0xd7d339b2,0xa894,0x4db8,0xbe,0x67,0xe,0x42,0x50,0x19,0x9e,0xee,

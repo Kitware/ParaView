@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief  [...]
@@ -16,12 +16,13 @@ namespace nv
 {
 namespace index
 {
-/// @ingroup nv_index_data_storage
 /// Subset-data descriptor for tiled height-field subsets. This interface class is used by the NVIDIA IndeX library
 /// to communicate information about tiled height-field sub-data to an application.
 ///
 /// TODO: describe internal representation
 /// TODO: describe LOD info
+///
+/// \ingroup nv_index_data_storage
 ///
 class IHeight_field_subset_data_descriptor:
         public mi::base::Interface_declare<0x88014528,0xd6b8,0x4b17,0x9d,0x12,0x74,0x9c,0xe2,0x88,0x46,0x6b,
@@ -93,13 +94,14 @@ public:
     virtual const Data_tile_info                   get_subset_data_tile_info(mi::Uint32 tile_index) const = 0;
 };
 
-/// @ingroup nv_index_data_storage
 /// Distributed data storage class for height-field subsets.
 ///
 /// The data import for height-field data associated with \c IHeight_field_scene_element instances using
 /// NVIDIA IndeX is performed through instances of this subset class. A subset of a height field is defined
 /// by all the height-field data tiles associated with a rectangular subregion of the entire scene/dataset. This
 /// interface class provides methods to input tile data for one or multiple attributes of a dataset.
+///
+/// \ingroup nv_index_data_storage
 ///
 class IHeight_field_subset:
         public mi::base::Interface_declare<0xe6fc895a,0xdd21,0x4f63,0xac,0x99,0x78,0xe3,0x4a,0x95,0x68,0x26,

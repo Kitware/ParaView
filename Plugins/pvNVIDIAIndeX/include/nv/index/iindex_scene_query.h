@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief The scene query API of the NVIDIA IndeX library.
@@ -17,12 +17,12 @@ namespace index
 class IIndex_canvas;
 class IViewport_list;
 
-/// @ingroup scene_queries
-
 /// Interface class that enables application writers to query the scene's contents.
 /// Scene queries include, for instance, the pick operation, which is the task of
 /// determining which rendered scene element a user has clicked on, or 
 /// entry lookup, which returns a single entry of a dataset.
+///
+/// \ingroup scene_queries
 ///
 class IIndex_scene_query :
     public mi::base::Interface_declare<0xd71c4a09,0xd2ac,0x428e,0xbf,0x6e,0x01,0x5f,0x9f,0xe3,0xfa,0x35>

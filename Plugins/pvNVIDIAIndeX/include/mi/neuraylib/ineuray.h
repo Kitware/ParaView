@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file
 /// \brief Main \NeurayApiName interface.
@@ -40,7 +40,7 @@ namespace neuraylib {
 /// This is an object representing the \neurayLibraryName. Only one object of this type will exist
 /// at a time. It is used for configuration, startup and shutdown of the \neurayLibraryName.
 class INeuray : public
-    mi::base::Interface_declare<0xafdd621e,0x2918,0x41f9,0xae,0x3d,0xec,0x36,0x63,0x63,0x86,0x7a>
+    mi::base::Interface_declare<0x80ae097d,0x2654,0x4dca,0x96,0x44,0xcf,0xc2,0xe5,0x45,0x93,0x4a>
 {
 public:
     /// Returns the interface version of the \neurayLibraryName.

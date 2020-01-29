@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Cluster-change callbacks.
@@ -19,7 +19,8 @@ namespace index
 /// The interface class allows implementing user-defined callbacks
 /// issued whenever the cluster topology has changed.
 ///
-/// @ingroup nv_index_utilities
+/// \ingroup nv_index_utilities
+///
 class ICluster_change_callback :
     public mi::base::Interface_declare<0x38c98da4,0xe5dc,0x47c4,0x97,0x45,0xdc,0x7f,0x36,0x77,0x60,0xd4>
 {

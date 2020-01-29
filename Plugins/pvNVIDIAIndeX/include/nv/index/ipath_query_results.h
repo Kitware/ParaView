@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Path specific query results returned by the NVIDIA IndeX library when querying a scene's contents, e.g., using the pick operation.
@@ -16,7 +16,6 @@ namespace nv
 {
 namespace index
 {
-/// @ingroup scene_queries
 
 /// Interface class that represents the path-specific result of a pick operation/query.
 /// The interface class sub classes from \c IScene_pick_result to provide additional 
@@ -24,6 +23,8 @@ namespace index
 /// In the future, the path specific pick result interface class may be extended 
 /// by a derived interface class that returns 3D related pick information such as 
 /// the normal or 1D/2D-texture coordinates at an intersection point.
+///
+/// \ingroup scene_queries
 ///
 class IPath_pick_result :
     public mi::base::Interface_declare<0x48da609d,0x1f76,0x4a53,0x91,0x06,0x92,0x26,0xdf,0x3e,0x86,0x7c,

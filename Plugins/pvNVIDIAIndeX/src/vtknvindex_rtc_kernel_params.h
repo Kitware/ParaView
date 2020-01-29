@@ -1,4 +1,4 @@
-/* Copyright 2019 NVIDIA Corporation. All rights reserved.
+/* Copyright 2020 NVIDIA Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -36,17 +36,20 @@ enum vtknvindex_rtc_kernels
   RTC_KERNELS_DEPTH_ENHANCEMENT,
   RTC_KERNELS_EDGE_ENHANCEMENT,
   RTC_KERNELS_GRADIENT,
+  RTC_KERNELS_CUSTOM
 };
 
 // kernel parameter buffer
 struct vtknvindex_rtc_params_buffer
 {
   vtknvindex_rtc_kernels rtc_kernel;
+  std::string kernel_program;
   const void* params_buffer;
   int buffer_size;
 
   vtknvindex_rtc_params_buffer()
     : rtc_kernel(RTC_KERNELS_NONE)
+    , kernel_program("")
     , params_buffer(0)
     , buffer_size(0)
   {
@@ -176,6 +179,15 @@ struct vtknvindex_gradient_params
   }
 };
 
+// Custom CUDA code parameters.
+struct vtknvindex_custom_params
+{
+  float floats[4];
+  int ints[4];
+
+  vtknvindex_custom_params() {}
+};
+
 // IVOL isosurface CUDA code parameters.
 struct vtknvindex_ivol_isosurface_params
 {
@@ -265,6 +277,15 @@ struct vtknvindex_ivol_edge_enhancement_params
     , stp_num(6)
   {
   }
+};
+
+// IVOL custom CUDA code parameters.
+struct vtknvindex_ivol_custom_params
+{
+  float floats[4];
+  int ints[4];
+
+  vtknvindex_ivol_custom_params() {}
 };
 
 // rtc sparse volume programs

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene attribute representing a texture element
@@ -16,12 +16,13 @@ namespace nv
 {
 namespace index
 {
-/// @ingroup nv_index_scene_description_attribute
 
 /// A base class that defines the properties of a texture of resolution [x,y]
 /// for a given pixel format.  The origin of the texture coordinate system is
 /// defined to be the lower-left corner.  \note The texture is only used in
 /// combination with an IIcon_2D.
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class ITexture :
         public mi::base::Interface_declare<0x633c679,0x5eb7,0x4e0d,0x9e,0xab,0xdc,0x6e,0xed,0x87,0x56,0x38,

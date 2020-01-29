@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 
 #ifndef NVIDIA_INDEX_IINFERENCE_SOURCE_DATA_H
@@ -54,9 +54,20 @@ public:
     /// \return     Returns an interface pointer to an instance of \c IDistributed_data_access.
     ///             \note
     ///             Future version will enable a user to request data beyond the data extent
-    ///             stored locally. This feature is currently not implementd.
+    ///             stored locally. This feature is currently not implemented.
     ///
     virtual IDistributed_data_access* get_distributed_data_access() const = 0;
+
+    /// Get the id of the CUDA device on which the distributed data subset resides. 
+    ///
+    /// Returns the id of the CUDA device that stores the data of the distributed data subset.
+    /// The device id might be required to leverage external contexts that are bound to a 
+    /// device, e.g., the CUDNN context, or buffers created and managed outside
+    /// of NVIDIA IndeX that cache weights of neural network models.
+    ///
+    /// \return     Returns the CUDA device id to the calling inference implementation.
+    ///
+    virtual mi::Sint32 get_device_id() const = 0;
 };
 
 } // namespace index

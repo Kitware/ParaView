@@ -31,12 +31,12 @@ set(private_headers
   vtknvindex_rtc_kernel_params.h
   vtknvindex_utilities.h)
 set(kernel_sources
-  kernel_gradient.cu
   kernel_irregular_depth_enhancement.cu
   kernel_irregular_edge_enhancement.cu
   kernel_irregular_isosurface.cu
   kernel_depth_enhancement.cu
   kernel_edge_enhancement.cu
+  kernel_gradient.cu
   kernel_isosurface.cu
   kernel_plane_surface_mapping.cu)
 set(kernel_string_sources)

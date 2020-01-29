@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/math/bbox.h
 /// \brief An axis-aligned N-dimensional bounding box class template of fixed dimension with
@@ -137,19 +137,16 @@ public:
 
     /// Bounding box initialized to a single \c point.
     inline explicit Bbox(
-        const Vector& point)    ///< point.
+        const Vector& point) : min(point), max(point) ///< point.
     {
-        min = point;
-        max = point;
     }
 
     /// Bounding box initialized to the new extreme corner vectors, \c nmin and \c nmax.
     inline Bbox(
         const Vector& nmin,     ///< \c min corner vector
         const Vector& nmax)     ///< \c max corner vector
+  : min(nmin), max(nmax)
     {
-        min = nmin;
-        max = nmax;
     }
 
     /// 1D bounding box (interval) initialized to the new extreme corner vectors, \c (min_x) and

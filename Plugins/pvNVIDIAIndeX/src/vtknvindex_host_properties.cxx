@@ -1,4 +1,4 @@
-/* Copyright 2019 NVIDIA Corporation. All rights reserved.
+/* Copyright 2020 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -259,6 +259,12 @@ void vtknvindex_host_properties::set_rankids(std::vector<mi::Sint32> rankids)
 void vtknvindex_host_properties::get_rankids(std::vector<mi::Sint32>& rankids) const
 {
   rankids = m_rankids;
+}
+
+// ------------------------------------------------------------------------------------------------
+const std::string& vtknvindex_host_properties::get_hostname() const
+{
+  return m_hostname;
 }
 
 // ------------------------------------------------------------------------------------------------

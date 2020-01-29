@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene attribute representing user programmable rendering kernel
@@ -15,7 +15,6 @@
 namespace nv {
 namespace index {
 
-/// @ingroup nv_index_scene_description_attribute
 /// The interface class representing user-programmable rendering kernel components.
 ///
 /// There are two sub-classes from this interface representing rendering kernel programs applied to volumetric
@@ -31,6 +30,8 @@ namespace index {
 /// \note For best performance of the compiled rendering kernels, methods defined in device code need to be
 /// decorated with special qualifiers. The qualifiers required by NVIDIA IndeX are covered by the
 /// \c NV_IDX_DEVICE_INLINE_MEMBER macro. While it is not strictly required to use this macro, it is advised to do so.
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class IRendering_kernel_program :
     public mi::base::Interface_declare<0x4953ee6c,0x1099,0x47de,0x94,0xa8,0x5e,0xb7,0x17,0xe4,0x83,0x7d,
@@ -78,7 +79,6 @@ public:
     virtual const Program_options& get_program_options() const = 0;
 };
 
-/// @ingroup nv_index_scene_description_attribute
 /// Defines headers that can be included by rendering kernel programs. The attribute is applied to a
 /// scene element and then affects any \c IRendering_kernel_program that is also applied.
 ///
@@ -90,6 +90,8 @@ public:
 /// When multiple instances of this attribute are active for a rendered scene element, only the
 /// instance that is defined closest to the scene element in the scene description hierarchy will be
 /// used.
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class IRendering_kernel_program_headers :
     public mi::base::Interface_declare<0xa5edda1a,0x9a97,0x40c1,0xa2,0xe7,0xf2,0x44,0x2d,0x2d,0x55,0xc7,
@@ -137,7 +139,6 @@ public:
     virtual void clear() = 0;
 };
 
-/// @ingroup nv_index_scene_description_attribute
 /// The interface class representing user-defined parameter buffers for user-programmable rendering kernel components.
 ///
 /// User-defined parameter buffers allow the application to define custom input to \c IRendering_kernel_program
@@ -287,6 +288,8 @@ public:
 /// };
 /// \endcode
 ///
+/// \ingroup nv_index_scene_description_attribute
+///
 class IRendering_kernel_program_parameters :
     public mi::base::Interface_declare<0x82ad1cdf,0xcbac,0x452f,0x9b,0x63,0x13,0xe4,0x94,0xc9,0xbf,0xaa,
                                        nv::index::IAttribute>
@@ -327,7 +330,6 @@ public:
         mi::Size         data_size) = 0;
 };
 
-/// @ingroup nv_index_scene_description_attribute
 /// Scene attribute to map scene elements to slots that are accessible by user-programmable
 /// rendering kernel components.
 ///
@@ -367,6 +369,8 @@ public:
 /// The scene element that should be mapped to a slot must be part of the scene description. When
 /// mapping attributes (\c IAttribute), they must be enabled and also assigned to the scene element
 /// to which this mapping attribute is assigned.
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class IRendering_kernel_program_scene_element_mapping :
     public mi::base::Interface_declare<0x8ecf51a1,0xdf74,0x47a1,0x84,0x27,0xae,0xb0,0x14,0xee,0x52,0xc8,
@@ -426,7 +430,6 @@ public:
         mi::Uint32                 slot_idx) const = 0;
 };
 
-/// @ingroup nv_index_scene_description_attribute
 /// An interface class representing rendering kernel programs applied to volume primitives (e.g., \c IRegular_volume).
 ///
 /// The programs applied to volumes are evaluated for each sample taken during the rendering process. An example of a
@@ -499,13 +502,14 @@ public:
 /// actual volume type. A scalar volume, such as \c uint8 or \c float32 volumes return a simple float value, whereas RGBA-
 /// volumes return a \c float4 value.
 ///
+/// \ingroup nv_index_scene_description_attribute
+///
 class IVolume_sample_program :
     public mi::base::Interface_declare<0x4c2b9169,0xb377,0x452a,0x8f,0xfa,0x87,0x70,0x35,0xd9,0xa2,0xe8,
                                        nv::index::IRendering_kernel_program>
 {
 };
 
-/// @ingroup nv_index_scene_description_attribute
 /// An interface class representing rendering kernel programs applied to surface primitives (e.g., \c IRegular_heightfield).
 ///
 /// The programs applied to surface geometries are evaluated for each surface intersection encountered during the
@@ -583,6 +587,8 @@ class IVolume_sample_program :
 ///
 /// In contrast to \c IVolume_sample_program instances, a surface sample program does currently not expose an internal
 /// state variable. This is subject to change in future revisions of this feature.
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class ISurface_sample_program :
     public mi::base::Interface_declare<0x861e254b,0x6ade,0x4579,0x93,0x15,0x23,0x2d,0x5c,0x3f,0xe5,0xfd,

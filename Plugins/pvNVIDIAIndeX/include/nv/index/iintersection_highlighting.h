@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Highlight the intersection between two shapes.
@@ -15,8 +15,6 @@
 namespace nv {
 namespace index {
 
-/// @ingroup nv_index_scene_description_attribute
-
 /// Enables the highlighting of an intersection with another shape on the
 /// surface of the current shape. For example, when this attribute is applied to
 /// an IPlane shape and the intersection shape is set to an
@@ -31,6 +29,8 @@ namespace index {
 /// \note Currently this attribute is only evaluated by IPlane. Only
 /// IRegular_heightfield and ITriangle_mesh_scene_element are supported as
 /// intersection shapes.
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class IIntersection_highlighting :
     public mi::base::Interface_declare<0x249cc579,0x0194,0x4399,0xb1,0x91,0x79,0xd1,0xe4,0x2d,0x09,0x9e,

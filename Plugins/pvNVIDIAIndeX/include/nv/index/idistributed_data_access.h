@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interfaces for accessing distributed data.
@@ -20,8 +20,6 @@ namespace nv
 namespace index
 {
 
-/// @ingroup nv_index_data_access
-/// 
 /// Interface class for accessing distributed data.
 ///
 /// The access functionality facilitates an application to 
@@ -52,6 +50,8 @@ namespace index
 /// The interface class \c IDistributed_data_access_factory returns
 /// an interface specific to a distributed data scene element type
 /// and referred to by the element's tag.
+///
+/// \ingroup nv_index_data_access
 ///
 class IDistributed_data_access :
     public mi::base::Interface_declare<0xd9ff4bf,0xa458,0x44f4,0x8f,0x44,0xd4,0x16,0x4c,0x14,0x4d,0x99>
@@ -122,7 +122,6 @@ public:
 // -------------------------------------------------------------------
 // Deprecated interfaces:
 //
-/// @ingroup nv_index_data_access
 /// Interface class for accessing the distributed regular volume
 /// data.
 ///
@@ -152,6 +151,8 @@ public:
 ///
 /// \deprecated This class shall be removed as the deprecated regular
 ///             volume data shall be removed as well.
+///
+/// \ingroup nv_index_data_access
 ///
 class IRegular_volume_data_access :
     public mi::base::Interface_declare<0x0b266cac,0x42c9,0x4b5e,0x9d,0xe5,0xbc,0x4c,0xc4,0x8c,0x7f,0x77>
@@ -215,7 +216,6 @@ public:
     virtual const IRegular_volume_data* get_volume_data() const = 0;
 };
 
-/// @ingroup nv_index_data_access
 /// Interface class for accessing the distributed heightfield data.
 ///
 /// The access functionality, for instance, allows implementing
@@ -245,6 +245,8 @@ public:
 ///
 /// \deprecated This class shall be removed as the deprecated regular
 ///             height field data shall be removed as well.
+///
+/// \ingroup nv_index_data_access
 ///
 class IRegular_heightfield_data_access :
     public mi::base::Interface_declare<0x5f7ac66c,0x5af7,0x4af9,0xa3,0xe8,0x8f,0xac,0xf0,0x08,0x9f,0x4c>
@@ -322,14 +324,12 @@ public:
 //
 // -------------------------------------------------------------------
 
-
-
-
-/// @ingroup nv_index_data_access
 /// Interface class that exposes distributed data access interfaces
 /// for specific scene element.
 ///
 /// This interface class is exposed through the \c ISession.
+///
+/// \ingroup nv_index_data_access
 ///
 class IDistributed_data_access_factory :
     public mi::base::Interface_declare<0xc77ead83,0xf351,0x4160,0x8c,0x15,0x40,0xbc,0x86,0x21,0x4e,0xf0,

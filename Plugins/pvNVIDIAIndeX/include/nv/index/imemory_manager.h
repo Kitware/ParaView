@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 
 #ifndef NVIDIA_INDEX_IMEMORY_MANAGER_H
@@ -20,7 +20,7 @@ public:
     /// Exposes the actual pointer to a internally managed CUDA device memory area.
     ///
     /// \param[in]  offset
-    ///             Allows off-setting in the encapsualted CUDA device memory.
+    ///             Allows off-setting in the encapsulated CUDA device memory.
     ///
     /// \returns    Returns the device pointer to the encapsulated CUDA memory.
     ///
@@ -61,7 +61,7 @@ class IMemory_manager :
     public mi::base::Interface_declare<0xe0a59103,0x275c,0x43e1,0xa5,0x6d,0xda,0xc2,0x8f,0xb4,0x42,0x55>
 {
 public:
-    /// Requesting a CUDA device memory manager eanbles allocation of NVIDIA IndeX-managed CUDA device memory.
+    /// Requesting a CUDA device memory manager enables allocation of NVIDIA IndeX-managed CUDA device memory.
     ///
     /// \returns    Returns the CUDA device memory manager \c ICuda_memory_manager.
     ///

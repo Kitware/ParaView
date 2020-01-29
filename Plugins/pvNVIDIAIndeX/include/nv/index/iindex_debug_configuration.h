@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Debug settings to configure NVIDIA IndeX.
@@ -15,7 +15,9 @@ namespace nv
 namespace index
 {
 /// Interface to set debug options for the NVIDIA IndeX library.
-/// @ingroup nv_index_configuration
+///
+/// \ingroup nv_index_configuration
+///
 class IIndex_debug_configuration :
         public mi::base::Interface_declare<0x7d1a4588,0x9458,0x4459,0x87,0x45,0x1d,0xa9,0x03,0x95,0x98,0x24>
 {

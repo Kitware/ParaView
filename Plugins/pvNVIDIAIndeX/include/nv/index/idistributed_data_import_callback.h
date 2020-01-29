@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief The interface class for implementing import callbacks used for distributed large-scale data chunk loading.
@@ -42,7 +42,8 @@ namespace index
 /// box is given in the dataset's local space and defines the 3D area for which 
 /// the data of the dataset subset need to be imported.
 ///
-/// @ingroup nv_index_data_storage
+/// \ingroup nv_index_data_storage
+///
 class IDistributed_data_import_callback :
     public mi::base::Interface_declare<0x61a87e48,0x910a,0x4f48,0xba,0xca,0x04,0x3b,0x9b,0xe2,0x62,0xec,
                                        mi::neuraylib::ISerializable>
@@ -134,7 +135,9 @@ public:
 /// IDistributed_data_import_callbacks. The documentation here just lists the behavior of the
 /// default implementation, see IDistributed_data_import_callback for the documentation of the
 /// methods themselves.
-/// @ingroup nv_index_data_storage
+///
+/// \ingroup nv_index_data_storage
+///
 template <mi::Uint32 id1, mi::Uint16 id2, mi::Uint16 id3,
           mi::Uint8 id4, mi::Uint8 id5, mi::Uint8 id6, mi::Uint8 id7,
           mi::Uint8 id8, mi::Uint8 id9, mi::Uint8 id10, mi::Uint8 id11,
@@ -313,7 +316,9 @@ public:
 /// IDistributed_data_import_callback. The documentation here just lists the behavior of the
 /// default implementation, see IDistributed_data_import_callback for the documentation of the
 /// methods themselves.
-/// @ingroup nv_index_data_storage
+///
+/// \ingroup nv_index_data_storage
+///
 template <mi::Uint32 id1, mi::Uint16 id2, mi::Uint16 id3,
           mi::Uint8 id4, mi::Uint8 id5, mi::Uint8 id6, mi::Uint8 id7,
           mi::Uint8 id8, mi::Uint8 id9, mi::Uint8 id10, mi::Uint8 id11,

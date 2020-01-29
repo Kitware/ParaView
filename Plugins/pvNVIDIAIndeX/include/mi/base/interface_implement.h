@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/base/interface_implement.h
 /// \brief Mixin class template for deriving interface implementations.
@@ -128,6 +128,10 @@ public:
     {
         return typename I::IID();
     }
+
+protected:
+    /// Get the current refcount.
+    Atom32& refcount() const { return m_refcnt; }
 
 protected:
     virtual ~Interface_implement() {}

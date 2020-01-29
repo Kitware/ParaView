@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  **************************************************************************************************/
 /// \file mi/math/matrix.h
 /// \brief A NxM-dimensional matrix class template of fixed dimensions with supporting
@@ -1236,6 +1236,22 @@ inline Vector<U,2> transform_point(
     }
 }
 
+/// Returns a transformed 3D point by applying the full transformation in the 4x3 matrix
+/// \c mat on the 3D point \c point, which includes the translation.
+///
+/// The point \c point is considered to be a row vector, which is multiplied from the left with the
+/// matrix \c mat.
+template <typename T, typename U>
+inline Vector<U,3> transform_point(
+    const Matrix<T,4,3>& mat,    ///< 4x3 transformation matrix
+    const Vector<U,3>&   point)  ///< point to transform
+{
+    return Vector<U,3>(
+        U(mat.xx * point.x + mat.yx * point.y + mat.zx * point.z + mat.wx),
+        U(mat.xy * point.x + mat.yy * point.y + mat.zy * point.z + mat.wy),
+        U(mat.xz * point.x + mat.yz * point.y + mat.zz * point.z + mat.wz));
+}
+
 /// Returns a transformed 3D point by applying the full transformation in the 4x4 matrix
 /// \c mat on the 3D point \c point, which includes the translation.
 ///
@@ -1306,6 +1322,38 @@ inline Vector<U,2> transform_vector(
         U(mat.xy * vector.x + mat.yy * vector.y));
 }
 
+/// Returns a transformed 3D vector by applying the 3x3 matrix \c mat transformation
+/// on the 3D vector \c vector.
+///
+/// The vector \c vector is considered to be a row vector, which is multiplied from the left with
+/// the matrix \c mat.
+template <typename T, typename U>
+inline Vector<U,3> transform_vector(
+    const Matrix<T,3,3>& mat,    ///< 3x3 transformation matrix
+    const Vector<U,3>&   vector) ///< vector to transform
+{
+    return Vector<U,3>(
+        U(mat.xx * vector.x + mat.yx * vector.y + mat.zx * vector.z),
+        U(mat.xy * vector.x + mat.yy * vector.y + mat.zy * vector.z),
+        U(mat.xz * vector.x + mat.yz * vector.y + mat.zz * vector.z));
+}
+
+/// Returns a transformed 3D vector by applying the 3x3 linear sub-transformation in the
+/// 4x3 matrix \c mat on the 3D vector \c vector, which excludes the translation.
+///
+/// The vector \c vector is considered to be a row vector, which is multiplied from the left with
+/// the matrix \c mat.
+template <typename T, typename U>
+inline Vector<U,3> transform_vector(
+    const Matrix<T,4,3>& mat,    ///< 4x3 transformation matrix
+    const Vector<U,3>&   vector) ///< vector to transform
+{
+    return Vector<U,3>(
+        U(mat.xx * vector.x + mat.yx * vector.y + mat.zx * vector.z),
+        U(mat.xy * vector.x + mat.yy * vector.y + mat.zy * vector.z),
+        U(mat.xz * vector.x + mat.yz * vector.y + mat.zz * vector.z));
+}
+
 /// Returns a transformed 3D vector by applying the 3x3 linear sub-transformation in the
 /// 4x4 matrix \c mat on the 3D vector \c vector, which excludes the translation.
 ///
@@ -1320,6 +1368,28 @@ inline Vector<U,3> transform_vector(
         U(mat.xx * vector.x + mat.yx * vector.y + mat.zx * vector.z),
         U(mat.xy * vector.x + mat.yy * vector.y + mat.zy * vector.z),
         U(mat.xz * vector.x + mat.yz * vector.y + mat.zz * vector.z));
+}
+
+/// Returns an inverse transformed 3D normal vector by applying the 3x3 transposed linear
+/// transformation in the matrix \c inv_mat on the 3D normal vector \c normal.
+///
+/// Note that in %general, a normal vector is transformed by the transposed inverse matrix (compared
+/// to a point transformation). The inverse is often costly to compute, why one typically keeps the
+/// inverse stored and this function operates then on the inverse matrix to properly transform
+/// normal vectors. If you need to transform only one normal, you can also consider the
+/// #mi::math::transform_normal() function, which includes the inverse computation.
+///
+/// The normal vector \c normal is considered to be a row vector, which is multiplied from the left
+/// with the transposed upper-left 3x3 sub-matrix of \c inv_mat.
+template <typename T, typename U>
+inline Vector<U,3> transform_normal_inv(
+    const Matrix<T,3,3>& inv_mat, ///< inverse 4x4 transformation matrix
+    const Vector<U,3>&   normal)  ///< normal vector to transform
+{
+    return Vector<U,3>(
+        U(inv_mat.xx * normal.x + inv_mat.xy * normal.y + inv_mat.xz * normal.z),
+        U(inv_mat.yx * normal.x + inv_mat.yy * normal.y + inv_mat.yz * normal.z),
+        U(inv_mat.zx * normal.x + inv_mat.zy * normal.y + inv_mat.zz * normal.z));
 }
 
 /// Returns an inverse transformed 3D normal vector by applying the 3x3 transposed linear
@@ -1650,7 +1720,7 @@ class Matrix_inverter<T,DIM,DIM>
 {
 public:
     typedef math::Matrix<T,DIM,DIM> Matrix;
-    typedef math::Vector<T,DIM>     Vector;
+    typedef math::Vector<T,DIM>     Value_vector;
     typedef math::Vector<Size,DIM>  Index_vector;
 
     // LU decomposition of matrix lu in place.
@@ -1666,7 +1736,7 @@ public:
     static void lu_backsubstitution(
         const Matrix&       lu,   // LU decomposed matrix
         const Index_vector& indx, // permutation vector
-        Vector&             b);   // right hand side vector b, modified in place
+        Value_vector&       b);   // right hand side vector b, modified in place
 
     static bool invert( Matrix& mat);
 };
@@ -1676,7 +1746,7 @@ bool  Matrix_inverter<T,DIM,DIM>::lu_decomposition(
     Matrix&       lu,
     Index_vector& indx)
 {
-    Vector              vv;             // implicit scaling of each row
+    Value_vector vv;             // implicit scaling of each row
 
     for( Size i = 0; i < DIM; i++) {    // get implicit scaling
         T big = T(0);
@@ -1736,7 +1806,7 @@ template <class T, Size DIM>
 void Matrix_inverter<T,DIM,DIM>::lu_backsubstitution(
     const Matrix&       lu,
     const Index_vector& indx,
-    Vector&             b)
+    Value_vector&                         b)
 {
     // when ii != DIM+1, ii is index of first non-vanishing element of b
     Size ii = DIM+1;
@@ -1776,7 +1846,7 @@ bool  Matrix_inverter<T,DIM,DIM>::invert( Matrix& mat)
 
     // solve for each column vector of the I matrix
     for( Size j = 0; j < DIM; ++j) {
-        Vector col(T(0)); // TODO: do that directly in the mat matrix
+        Value_vector col(T(0)); // TODO: do that directly in the mat matrix
         col[j] = T(1);
         lu_backsubstitution( lu, indx, col);
         for( Size i = 0; i < DIM; ++i) {

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief A higher-level shape representing a 3D cone.
@@ -17,14 +17,14 @@ namespace nv
 namespace index
 {
 
-/// @ingroup nv_index_scene_description_shape
-///
 /// A 3D cone is defined by its base's center and a tip. Both need
 /// to be defined by a 3D coordinate in the cone's local coordinate
 /// system. A cone can be a closed object if caps are enabled,
 /// otherwise the base of the cone is open. The surface of the cone
 /// is shaded using the material and light defined in the scene
 /// description.
+///
+/// \ingroup nv_index_scene_description_shape
 ///
 class ICone :
     public mi::base::Interface_declare<0xe2e95b32,0x858a,0x4cb7,0x80,0x91,0xf5,0xf7,0x42,0x5e,0x9a,0x04,

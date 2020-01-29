@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene attribute controlling sparse volume rendering properties.
@@ -14,10 +14,10 @@
 namespace nv {
 namespace index {
 
-/// @ingroup nv_index_scene_description_attribute
-/// 
 /// Filtering modes (interpolation) for sparse volume access.
 /// 
+/// \ingroup nv_index_scene_description_attribute
+///
 enum Sparse_volume_filter_mode
 {
     SPARSE_VOLUME_FILTER_NEAREST                = 0x00, ///< Access a single voxel with nearest filtering (a.k.a. point filtering).
@@ -29,9 +29,9 @@ enum Sparse_volume_filter_mode
     SPARSE_VOLUME_FILTER_TRICUBIC_BSPLINE_PRE   = 0x06  ///< Tricubic B-spline interpolation with pre-classification.
 };
 
-/// @ingroup nv_index_scene_description_attribute
-/// 
 /// The interface class representing rendering properties for sparse volume data.
+///
+/// \ingroup nv_index_scene_description_attribute
 ///
 class ISparse_volume_rendering_properties :
     public mi::base::Interface_declare<0x718c9406,0x99a7,0x41cc,0xb1,0x48,0xe,0x36,0x8d,0x67,0x85,0x19,

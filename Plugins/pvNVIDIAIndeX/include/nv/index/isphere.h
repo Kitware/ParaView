@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene element representing a sphere higher-level shape.
@@ -16,9 +16,11 @@ namespace nv
 {
 namespace index
 {
-/// @ingroup nv_index_scene_description_shape
+
 ///
 /// A simple sphere.
+///
+/// \ingroup nv_index_scene_description_shape
 ///
 class ISphere :
         public mi::base::Interface_declare<0x9b0af03a,0x177c,0x4127,0x9c,0x47,0x8b,0x5c,0xc8,0x36,0x92,0xaf,

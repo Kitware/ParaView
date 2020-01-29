@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene attribute controlling diagnostic rendering.
@@ -13,6 +13,9 @@ namespace nv {
 namespace index {
 
 /// Interface representing rendering properties for diagnostic rendering.
+///
+/// \ingroup nv_index_scene_description_attribute
+///
 class IDiagnostic_rendering_properties :
     public mi::base::Interface_declare<0xd0c69d46,0x9511,0x4285,0x85,0x3e,0xb1,0xb2,0x70,0x99,0x45,0xe7,
                                        nv::index::IAttribute>
@@ -46,7 +49,7 @@ public:
 
     virtual bool            set_property(mi::Sint32 prop, mi::Float64 value) = 0;
     virtual mi::Float64     get_property(mi::Sint32 prop) const = 0;
-    virtual mi::Uint32      get_propert_count() const = 0;
+    virtual mi::Uint32      get_property_count() const = 0;
     virtual Property_type   get_property_type(mi::Sint32 prop) const = 0;
     virtual const char*     get_property_name(mi::Sint32 prop) const = 0;
 };
