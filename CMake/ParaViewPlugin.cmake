@@ -228,6 +228,15 @@ function (paraview_plugin_scan)
     PARENT_SCOPE)
 endfunction ()
 
+function (_paraview_plugin_check_destdir variable)
+  if (NOT DEFINED "${variable}")
+    message(FATAL_ERROR
+      "It appears as though ${variable} is not defined, but is needed to "
+      "default a destination directory for build artifacts. Usually this is "
+      "resolved by `include(GNUInstallDirs)` at the top of the project.")
+  endif ()
+endfunction ()
+
 #[==[.md
 ## Building plugins
 
@@ -302,14 +311,17 @@ function (paraview_plugin_build)
   endif ()
 
   if (NOT DEFINED _paraview_build_HEADERS_DESTINATION)
+    _paraview_plugin_check_destdir(CMAKE_INSTALL_INCLUDEDIR)
     set(_paraview_build_HEADERS_DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
   endif ()
 
   if (NOT DEFINED _paraview_build_RUNTIME_DESTINATION)
+    _paraview_plugin_check_destdir(CMAKE_INSTALL_BINDIR)
     set(_paraview_build_RUNTIME_DESTINATION "${CMAKE_INSTALL_BINDIR}")
   endif ()
 
   if (NOT DEFINED _paraview_build_LIBRARY_DESTINATION)
+    _paraview_plugin_check_destdir(CMAKE_INSTALL_LIBDIR)
     set(_paraview_build_LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}")
   endif ()
 
