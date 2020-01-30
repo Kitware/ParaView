@@ -337,9 +337,15 @@ function (paraview_plugin_build)
     set(_paraview_build_ADD_INSTALL_RPATHS OFF)
   endif ()
   if (_paraview_build_ADD_INSTALL_RPATHS)
-    file(RELATIVE_PATH _paraview_build_relpath
-      "/prefix/${_paraview_build_LIBRARY_DESTINATION}/${_paraview_build_LIBRARY_SUBDIRECTORY}/plugin"
-      "/prefix/${_paraview_build_LIBRARY_DESTINATION}")
+    if (NOT _paraview_build_LIBRARY_SUBDIRECTORY STREQUAL "")
+      file(RELATIVE_PATH _paraview_build_relpath
+        "/prefix/${_paraview_build_LIBRARY_DESTINATION}/${_paraview_build_LIBRARY_SUBDIRECTORY}/plugin"
+        "/prefix/${_paraview_build_LIBRARY_DESTINATION}")
+    else ()
+      file(RELATIVE_PATH _paraview_build_relpath
+        "/prefix/${_paraview_build_LIBRARY_DESTINATION}/plugin"
+        "/prefix/${_paraview_build_LIBRARY_DESTINATION}")
+    endif ()
     if (APPLE)
       list(APPEND CMAKE_INSTALL_RPATH
         "@loader_path/${_paraview_build_relpath}")
@@ -398,7 +404,9 @@ function (paraview_plugin_build)
   else ()
     set(_paraview_build_plugin_destination "${_paraview_build_LIBRARY_DESTINATION}")
   endif ()
-  string(APPEND _paraview_build_plugin_destination "/${_paraview_build_LIBRARY_SUBDIRECTORY}")
+  if (NOT _paraview_build_LIBRARY_SUBDIRECTORY STREQUAL "")
+    string(APPEND _paraview_build_plugin_destination "/${_paraview_build_LIBRARY_SUBDIRECTORY}")
+  endif ()
 
   foreach (_paraview_build_plugin IN LISTS _paraview_build_PLUGINS)
     get_property(_paraview_build_plugin_file GLOBAL
@@ -955,7 +963,7 @@ function (paraview_add_plugin name)
     else ()
       set(_paraview_plugin_subdir "${_paraview_build_LIBRARY_DESTINATION}")
     endif ()
-    if (DEFINED _paraview_build_LIBRARY_SUBDIRECTORY)
+    if (NOT _paraview_build_LIBRARY_SUBDIRECTORY STREQUAL "")
       string(APPEND _paraview_plugin_subdir "/${_paraview_build_LIBRARY_SUBDIRECTORY}")
     endif ()
     string(APPEND _paraview_plugin_subdir "/${_paraview_build_plugin}")
@@ -1305,7 +1313,7 @@ function (paraview_add_plugin name)
     # but CMake always uses `CMAKE_LIBRARY_OUTPUT_DIRECTORY`.
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
   endif ()
-  if (DEFINED _paraview_build_LIBRARY_SUBDIRECTORY)
+  if (NOT _paraview_build_LIBRARY_SUBDIRECTORY STREQUAL "")
     string(APPEND CMAKE_LIBRARY_OUTPUT_DIRECTORY "/${_paraview_build_LIBRARY_SUBDIRECTORY}")
   endif ()
   string(APPEND CMAKE_LIBRARY_OUTPUT_DIRECTORY "/${_paraview_build_plugin}")
