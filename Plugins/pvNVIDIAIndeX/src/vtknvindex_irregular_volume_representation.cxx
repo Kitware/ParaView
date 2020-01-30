@@ -284,6 +284,8 @@ int vtknvindex_irregular_volume_representation::ProcessViewRequest(
     vtkNew<vtkMatrix4x4> matrix;
     this->Actor->GetMatrix(matrix.GetPointer());
     vtkPVRenderView::SetGeometryBounds(inInfo, this, this->DataBounds, matrix.GetPointer());
+
+    vtkPVRenderView::SetRequiresDistributedRendering(inInfo, this, true);
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
