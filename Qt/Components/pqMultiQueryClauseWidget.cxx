@@ -70,6 +70,7 @@ pqMultiQueryClauseWidget::pqMultiQueryClauseWidget(QWidget* parentObject, Qt::Wi
 
   this->ChildNextId = 0;
   this->NumberOfDependentClauseWidgets = 0;
+  this->AddingClauseWidget = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -99,6 +100,11 @@ bool pqMultiQueryClauseWidget::isMultiBlock()
 //-----------------------------------------------------------------------------
 void pqMultiQueryClauseWidget::initialize()
 {
+  if (this->AddingClauseWidget)
+  {
+    return;
+  }
+
   for (pqQueryClauseWidget* child : this->Container->findChildren<pqQueryClauseWidget*>())
   {
     delete child;
@@ -195,6 +201,7 @@ void pqMultiQueryClauseWidget::addQueryClauseWidget()
 //-----------------------------------------------------------------------------
 void pqMultiQueryClauseWidget::addQueryClauseWidget(int type, bool qualifier_mode)
 {
+  this->AddingClauseWidget = true;
   pqQueryClauseWidget* queryWidget = new pqQueryClauseWidget(this, this->Container);
   queryWidget->initialize(pqQueryClauseWidget::CriteriaType(type), qualifier_mode);
   queryWidget->setObjectName(QString("queryClause%1").arg(QString::number(this->ChildNextId)));
@@ -209,6 +216,7 @@ void pqMultiQueryClauseWidget::addQueryClauseWidget(int type, bool qualifier_mod
   pqEventDispatcher::processEventsAndWait(1);
 
   this->ScrollArea->ensureWidgetVisible(queryWidget);
+  this->AddingClauseWidget = false;
 }
 
 //-----------------------------------------------------------------------------
