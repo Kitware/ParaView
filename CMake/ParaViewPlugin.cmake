@@ -361,16 +361,27 @@ function (paraview_plugin_build)
       "The `INSTALL_EXPORT` argument requires the `CMAKE_DESTINATION` argument.")
   endif ()
 
-  if (DEFINED _paraview_build_CMAKE_DESTINATION
-      AND NOT DEFINED _paraview_build_TARGET)
-    message(FATAL_ERROR
-      "The `CMAKE_DESTINATION` argument requires the `TARGET` argument.")
+  set(_paraview_build_extra_destinations)
+  if (DEFINED _paraview_build_CMAKE_DESTINATION)
+    list(APPEND _paraview_build_extra_destinations
+      CMAKE_DESTINATION)
+    if (NOT DEFINED _paraview_build_TARGET)
+      message(FATAL_ERROR
+        "The `CMAKE_DESTINATION` argument requires the `TARGET` argument.")
+    endif ()
   endif ()
 
   if (DEFINED _paraview_build_TARGET)
     _vtk_module_split_module_name("${_paraview_build_TARGET}" _paraview_build)
     string(REPLACE "::" "_" _paraview_build_target_safe "${_paraview_build_TARGET}")
   endif ()
+
+  _vtk_module_check_destinations(_paraview_build_
+    HEADERS_DESTINATION
+    RUNTIME_DESTINATION
+    LIBRARY_DESTINATION
+    LIBRARY_SUBDIRECTORY
+    ${_paraview_build_extra_destinations})
 
   if (WIN32)
     set(_paraview_build_plugin_destination "${_paraview_build_RUNTIME_DESTINATION}")
