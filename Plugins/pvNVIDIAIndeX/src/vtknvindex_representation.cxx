@@ -179,43 +179,6 @@ vtknvindex_cached_bounds::vtknvindex_cached_bounds(const double _data_bounds[6],
     spacing[i] = _spacing[i];
 }
 
-// This should not be needed anymore.
-//// The class vtknvindex_cache_keeper is an derived class of the original vtkPVCacheKeeper
-//// which it's used for datasets with time series to avoid data to be loaded again
-//// when some time steps were already cached by NVIDIA IndeX.
-//
-////----------------------------------------------------------------------------
-// class vtknvindex_cache_keeper : public vtkPVCacheKeeper
-//{
-// public:
-//  static vtknvindex_cache_keeper* New();
-//  vtkTypeMacro(vtknvindex_cache_keeper, vtkPVCacheKeeper);
-//
-// protected:
-//  vtknvindex_cache_keeper()
-//  {
-//    // This avoids the code that keeps track of memory used by the cache since
-//    // this is not applicable in our case.
-//    this->SetCacheSizeKeeper(NULL);
-//  }
-//  ~vtknvindex_cache_keeper() {}
-//  // Overridden to avoid caching the data object. We don't cache in
-//  // ParaView because NVIDIA IndeX will cache the data internally.
-//  bool SaveData(vtkDataObject* dobj) override
-//  {
-//    vtkDataObject* dNew = dobj->NewInstance();
-//    this->Superclass::SaveData(dNew);
-//    dNew->Delete();
-//    return true;
-//  }
-//  void RemoveAllCaches() override
-//  {
-//    // We never clear cache in our demo.
-//  }
-//};
-//
-// vtkStandardNewMacro(vtknvindex_cache_keeper);
-
 //----------------------------------------------------------------------------
 class vtknvindex_lod_volume : public vtkPVLODVolume
 {
@@ -333,8 +296,7 @@ int vtknvindex_representation::ProcessViewRequest(
       }
     }
 
-    vtkPVRenderView::SetPiece(
-      inInfo, this, this->OutlineSource->GetOutputDataObject(0), this->DataSize);
+    vtkPVRenderView::SetPiece(inInfo, this, this->OutlineGeometry, this->DataSize);
 
     outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
 
@@ -357,7 +319,21 @@ int vtknvindex_representation::ProcessViewRequest(
     vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
     if (producerPort)
     {
-      this->OutlineMapper->SetInputConnection(producerPort);
+      vtkAlgorithm* producer = producerPort->GetProducer();
+      vtkPolyData* polyData =
+        vtkPolyData::SafeDownCast(producer->GetOutputDataObject(producerPort->GetIndex()));
+      vtkDataArray* index_animation_params =
+        polyData->GetFieldData()->GetArray("index_animation_params");
+
+      const int has_time_steps = index_animation_params->GetComponent(0, 0);
+      const int nb_time_steps = index_animation_params->GetComponent(0, 1);
+      const int cur_time_step = index_animation_params->GetComponent(0, 2);
+
+      vtknvindex_regular_volume_properties* volume_properties =
+        m_cluster_properties->get_regular_volume_properties();
+      volume_properties->set_is_timeseries_data(has_time_steps != 0);
+      volume_properties->set_nb_time_steps(nb_time_steps);
+      volume_properties->set_current_time_step(cur_time_step);
     }
   }
 
@@ -372,7 +348,6 @@ bool vtknvindex_representation::AddToView(vtkView* view)
   {
     m_still_image_reduction_factor = rview->GetStillRenderImageReductionFactor();
     m_interactive_image_reduction_factor = rview->GetInteractiveRenderImageReductionFactor();
-
     rview->SetStillRenderImageReductionFactor(1);
     rview->SetInteractiveRenderImageReductionFactor(1);
     return this->Superclass::AddToView(view);
@@ -404,6 +379,8 @@ int vtknvindex_representation::RequestDataBase(
   this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
   this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
 
+  this->OutlineGeometry = vtkSmartPointer<vtkPolyData>::New();
+
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     vtkImageData* input = vtkImageData::GetData(inputVector[0], 0);
@@ -431,6 +408,8 @@ int vtknvindex_representation::RequestDataBase(
     this->OutlineSource->SetBounds(output->GetBounds());
     this->OutlineSource->GetBounds(this->DataBounds);
     this->OutlineSource->Update();
+
+    this->OutlineGeometry->ShallowCopy(this->OutlineSource->GetOutputDataObject(0));
 
     this->DataSize = output->GetActualMemorySize();
 
@@ -487,8 +466,17 @@ int vtknvindex_representation::RequestData(
     return 1;
   }
 
-  // Check if dataset has time steps.
+  // Cache IndeX timse series animation params.
+  vtkPolyData* polyData = this->OutlineGeometry;
+  vtkNew<vtkIntArray> index_animation_params;
+  index_animation_params->SetName("index_animation_params");
+  index_animation_params->SetNumberOfComponents(3);
+  index_animation_params->SetNumberOfTuples(1);
+  index_animation_params->SetValue(0, 0); // use time series?.
+  index_animation_params->SetValue(1, 1); // number of time steps.
+  index_animation_params->SetValue(2, 0); // current time step.
 
+  // Check if dataset has time steps.
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   mi::Sint32 nb_time_steps = 0;
   mi::Sint32 cur_time_step = 0;
@@ -511,12 +499,18 @@ int vtknvindex_representation::RequestData(
       inInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), time_range);
     }
 
+    index_animation_params->SetValue(0, 1);
+    index_animation_params->SetValue(1, nb_time_steps);
+    index_animation_params->SetValue(2, cur_time_step);
+
     vtknvindex_regular_volume_properties* volume_properties =
       m_cluster_properties->get_regular_volume_properties();
     volume_properties->set_is_timeseries_data(true);
     volume_properties->set_nb_time_steps(nb_time_steps);
     volume_properties->set_current_time_step(cur_time_step);
   }
+
+  polyData->GetFieldData()->AddArray(index_animation_params);
 
   m_has_time_steps = has_time_steps;
   m_cur_time = cur_time_step;
@@ -664,6 +658,39 @@ int vtknvindex_representation::RequestUpdateExtent(
   inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(), ghost_levels);
 
   return 1;
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtknvindex_representation::SetInputArrayToProcess(
+  int idx, int port, int connection, int fieldAssociation, const char* name)
+{
+  this->Superclass::SetInputArrayToProcess(idx, port, connection, fieldAssociation, name);
+  this->MarkModified();
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtknvindex_representation::SetInputArrayToProcess(
+  int idx, int port, int connection, int fieldAssociation, int fieldAttributeType)
+{
+  this->Superclass::SetInputArrayToProcess(
+    idx, port, connection, fieldAssociation, fieldAttributeType);
+  this->MarkModified();
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtknvindex_representation::SetInputArrayToProcess(int idx, vtkInformation* info)
+{
+  this->Superclass::SetInputArrayToProcess(idx, info);
+  this->MarkModified();
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtknvindex_representation::SetInputArrayToProcess(
+  int idx, int port, int connection, const char* fieldAssociation, const char* attributeTypeorName)
+{
+  this->Superclass::SetInputArrayToProcess(
+    idx, port, connection, fieldAssociation, attributeTypeorName);
+  this->MarkModified();
 }
 
 //-------------------------------------------------------------------------------------------------

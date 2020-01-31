@@ -497,9 +497,8 @@ bool vtknvindex_instance::authenticate_nvindex()
   // No explicit license found, use default free license.
   if (!found_license)
   {
-    index_vendor_key = "NVIDIA IndeX License for ParaView - IndeX:PV:Free:v1 - 20180927 "
-                       "(oem:retail_cloud.20210904)";
-    index_secret_key = "10aed4fb95a7fb230875decf11dd29c666612b4df39775df6256bc291bd0d346";
+    index_vendor_key = "NVIDIA IndeX License for ParaView - 20200127 (oem:retail_cloud.20211231)";
+    index_secret_key = "52114b41998feae03e0efd8717ed217fa06341b03e9b424ee653c9235332ff75";
   }
 
   // Retrieve Flex license path.

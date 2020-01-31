@@ -545,7 +545,7 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
   {
     m_last_MTime = cur_MTime;
   }
-  else if (m_last_MTime < cur_MTime)
+  else if (m_last_MTime != cur_MTime)
   {
     m_last_MTime = cur_MTime;
     m_volume_changed = true;
