@@ -228,6 +228,15 @@ function (paraview_plugin_scan)
     PARENT_SCOPE)
 endfunction ()
 
+function (_paraview_plugin_check_destdir variable)
+  if (NOT DEFINED "${variable}")
+    message(FATAL_ERROR
+      "It appears as though ${variable} is not defined, but is needed to "
+      "default a destination directory for build artifacts. Usually this is "
+      "resolved by `include(GNUInstallDirs)` at the top of the project.")
+  endif ()
+endfunction ()
+
 #[==[.md
 ## Building plugins
 
@@ -302,14 +311,17 @@ function (paraview_plugin_build)
   endif ()
 
   if (NOT DEFINED _paraview_build_HEADERS_DESTINATION)
+    _paraview_plugin_check_destdir(CMAKE_INSTALL_INCLUDEDIR)
     set(_paraview_build_HEADERS_DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
   endif ()
 
   if (NOT DEFINED _paraview_build_RUNTIME_DESTINATION)
+    _paraview_plugin_check_destdir(CMAKE_INSTALL_BINDIR)
     set(_paraview_build_RUNTIME_DESTINATION "${CMAKE_INSTALL_BINDIR}")
   endif ()
 
   if (NOT DEFINED _paraview_build_LIBRARY_DESTINATION)
+    _paraview_plugin_check_destdir(CMAKE_INSTALL_LIBDIR)
     set(_paraview_build_LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}")
   endif ()
 
@@ -325,9 +337,15 @@ function (paraview_plugin_build)
     set(_paraview_build_ADD_INSTALL_RPATHS OFF)
   endif ()
   if (_paraview_build_ADD_INSTALL_RPATHS)
-    file(RELATIVE_PATH _paraview_build_relpath
-      "/prefix/${_paraview_build_LIBRARY_DESTINATION}/${_paraview_build_LIBRARY_SUBDIRECTORY}/plugin"
-      "/prefix/${_paraview_build_LIBRARY_DESTINATION}")
+    if (NOT _paraview_build_LIBRARY_SUBDIRECTORY STREQUAL "")
+      file(RELATIVE_PATH _paraview_build_relpath
+        "/prefix/${_paraview_build_LIBRARY_DESTINATION}/${_paraview_build_LIBRARY_SUBDIRECTORY}/plugin"
+        "/prefix/${_paraview_build_LIBRARY_DESTINATION}")
+    else ()
+      file(RELATIVE_PATH _paraview_build_relpath
+        "/prefix/${_paraview_build_LIBRARY_DESTINATION}/plugin"
+        "/prefix/${_paraview_build_LIBRARY_DESTINATION}")
+    endif ()
     if (APPLE)
       list(APPEND CMAKE_INSTALL_RPATH
         "@loader_path/${_paraview_build_relpath}")
@@ -349,10 +367,14 @@ function (paraview_plugin_build)
       "The `INSTALL_EXPORT` argument requires the `CMAKE_DESTINATION` argument.")
   endif ()
 
-  if (DEFINED _paraview_build_CMAKE_DESTINATION
-      AND NOT DEFINED _paraview_build_TARGET)
-    message(FATAL_ERROR
-      "The `CMAKE_DESTINATION` argument requires the `TARGET` argument.")
+  set(_paraview_build_extra_destinations)
+  if (DEFINED _paraview_build_CMAKE_DESTINATION)
+    list(APPEND _paraview_build_extra_destinations
+      CMAKE_DESTINATION)
+    if (NOT DEFINED _paraview_build_TARGET)
+      message(FATAL_ERROR
+        "The `CMAKE_DESTINATION` argument requires the `TARGET` argument.")
+    endif ()
   endif ()
 
   if (DEFINED _paraview_build_TARGET)
@@ -360,12 +382,31 @@ function (paraview_plugin_build)
     string(REPLACE "::" "_" _paraview_build_target_safe "${_paraview_build_TARGET}")
   endif ()
 
+  _vtk_module_check_destinations(_paraview_build_
+    HEADERS_DESTINATION
+    RUNTIME_DESTINATION
+    LIBRARY_DESTINATION
+    LIBRARY_SUBDIRECTORY
+    ${_paraview_build_extra_destinations})
+
+  if (NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${_paraview_build_RUNTIME_DESTINATION}")
+  endif ()
+  if (NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${_paraview_build_LIBRARY_DESTINATION}")
+  endif ()
+  if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${_paraview_build_LIBRARY_DESTINATION}")
+  endif ()
+
   if (WIN32)
     set(_paraview_build_plugin_destination "${_paraview_build_RUNTIME_DESTINATION}")
   else ()
     set(_paraview_build_plugin_destination "${_paraview_build_LIBRARY_DESTINATION}")
   endif ()
-  string(APPEND _paraview_build_plugin_destination "/${_paraview_build_LIBRARY_SUBDIRECTORY}")
+  if (NOT _paraview_build_LIBRARY_SUBDIRECTORY STREQUAL "")
+    string(APPEND _paraview_build_plugin_destination "/${_paraview_build_LIBRARY_SUBDIRECTORY}")
+  endif ()
 
   foreach (_paraview_build_plugin IN LISTS _paraview_build_PLUGINS)
     get_property(_paraview_build_plugin_file GLOBAL
@@ -922,7 +963,7 @@ function (paraview_add_plugin name)
     else ()
       set(_paraview_plugin_subdir "${_paraview_build_LIBRARY_DESTINATION}")
     endif ()
-    if (DEFINED _paraview_build_LIBRARY_SUBDIRECTORY)
+    if (NOT _paraview_build_LIBRARY_SUBDIRECTORY STREQUAL "")
       string(APPEND _paraview_plugin_subdir "/${_paraview_build_LIBRARY_SUBDIRECTORY}")
     endif ()
     string(APPEND _paraview_plugin_subdir "/${_paraview_build_plugin}")
@@ -1272,7 +1313,7 @@ function (paraview_add_plugin name)
     # but CMake always uses `CMAKE_LIBRARY_OUTPUT_DIRECTORY`.
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
   endif ()
-  if (DEFINED _paraview_build_LIBRARY_SUBDIRECTORY)
+  if (NOT _paraview_build_LIBRARY_SUBDIRECTORY STREQUAL "")
     string(APPEND CMAKE_LIBRARY_OUTPUT_DIRECTORY "/${_paraview_build_LIBRARY_SUBDIRECTORY}")
   endif ()
   string(APPEND CMAKE_LIBRARY_OUTPUT_DIRECTORY "/${_paraview_build_plugin}")
