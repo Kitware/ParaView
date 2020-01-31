@@ -19,6 +19,11 @@ list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION
   "dmfile.*"
   )
 
+list(APPEND CTEST_CUSTOM_ERROR_EXCEPTION
+  # Xcb error does not seem to cause errors in generated test images
+  "qt.qpa.xcb: internal error"
+)
+
 # Regular expression for excluding files from coverage testing
 list(APPEND CTEST_CUSTOM_COVERAGE_EXCLUDE
   ".*/VTK/.*"
