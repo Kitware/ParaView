@@ -113,7 +113,7 @@ protected:
    * Default constructor and destructor
    */
   vtkEntropyArrayMeasurement();
-  virtual ~vtkEntropyArrayMeasurement() override = default;
+  ~vtkEntropyArrayMeasurement() override = default;
   //@}
 
 private:

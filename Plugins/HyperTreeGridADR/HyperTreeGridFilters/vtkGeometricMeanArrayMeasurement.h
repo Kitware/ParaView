@@ -106,7 +106,7 @@ protected:
    * Default constructor and destructor
    */
   vtkGeometricMeanArrayMeasurement();
-  virtual ~vtkGeometricMeanArrayMeasurement() override = default;
+  ~vtkGeometricMeanArrayMeasurement() override = default;
   //@}
 
 private:

@@ -16,7 +16,7 @@
 #include "vtkGeometricMeanArrayMeasurement.h"
 
 #include "vtkArithmeticAccumulator.h"
-#include "vtkFunctionOfXList.h"
+#include "vtkFunctor.h"
 #include "vtkObjectFactory.h"
 
 #include <cassert>
@@ -42,7 +42,8 @@ bool vtkGeometricMeanArrayMeasurement::Measure(vtkAbstractAccumulator** accumula
 
   assert(accumulators && "input accumulator is not allocated");
 
-  vtkArithmeticAccumulator* acc = vtkArithmeticAccumulator::SafeDownCast(accumulators[0]);
+  vtkArithmeticAccumulator<vtkLogFunctor>* acc =
+    vtkArithmeticAccumulator<vtkLogFunctor>::SafeDownCast(accumulators[0]);
 
   assert(this->Accumulators[0]->HasSameParameters(acc) &&
     "input accumulators are of wrong type or have wrong parameters");
@@ -54,8 +55,5 @@ bool vtkGeometricMeanArrayMeasurement::Measure(vtkAbstractAccumulator** accumula
 //----------------------------------------------------------------------------
 std::vector<vtkAbstractAccumulator*> vtkGeometricMeanArrayMeasurement::NewAccumulators()
 {
-  vtkArithmeticAccumulator* acc = vtkArithmeticAccumulator::New();
-  acc->SetFunctionOfX(vtkValueComaNameMacro(std::log));
-  std::vector<vtkAbstractAccumulator*> accumulators{ acc };
-  return accumulators;
+  return { vtkArithmeticAccumulator<vtkLogFunctor>::New() };
 }

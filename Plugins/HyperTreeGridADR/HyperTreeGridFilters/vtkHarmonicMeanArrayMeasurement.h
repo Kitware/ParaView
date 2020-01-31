@@ -106,7 +106,7 @@ protected:
    * Default constructors and destructors
    */
   vtkHarmonicMeanArrayMeasurement();
-  virtual ~vtkHarmonicMeanArrayMeasurement() override = default;
+  ~vtkHarmonicMeanArrayMeasurement() override = default;
   //@}
 
 private:

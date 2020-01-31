@@ -16,7 +16,7 @@
 #include "vtkStandardDeviationArrayMeasurement.h"
 
 #include "vtkArithmeticAccumulator.h"
-#include "vtkFunctionOfXList.h"
+#include "vtkFunctor.h"
 #include "vtkObjectFactory.h"
 
 #include <cassert>
@@ -41,10 +41,12 @@ bool vtkStandardDeviationArrayMeasurement::Measure(vtkAbstractAccumulator** accu
   }
   assert(accumulators && "input accumulator is not allocated");
 
-  vtkArithmeticAccumulator* identityAcc = vtkArithmeticAccumulator::SafeDownCast(
-    accumulators[vtkStandardDeviationArrayMeasurement::IdentityId]);
-  vtkArithmeticAccumulator* squaredAcc = vtkArithmeticAccumulator::SafeDownCast(
-    accumulators[vtkStandardDeviationArrayMeasurement::SquaredId]);
+  vtkArithmeticAccumulator<vtkIdentityFunctor>* identityAcc =
+    vtkArithmeticAccumulator<vtkIdentityFunctor>::SafeDownCast(
+      accumulators[vtkStandardDeviationArrayMeasurement::IdentityId]);
+  vtkArithmeticAccumulator<vtkSquareFunctor>* squaredAcc =
+    vtkArithmeticAccumulator<vtkSquareFunctor>::SafeDownCast(
+      accumulators[vtkStandardDeviationArrayMeasurement::SquaredId]);
 
   assert(this->Accumulators[vtkStandardDeviationArrayMeasurement::IdentityId]->HasSameParameters(
            identityAcc) &&
@@ -65,10 +67,6 @@ bool vtkStandardDeviationArrayMeasurement::Measure(vtkAbstractAccumulator** accu
 //----------------------------------------------------------------------------
 std::vector<vtkAbstractAccumulator*> vtkStandardDeviationArrayMeasurement::NewAccumulators()
 {
-  vtkArithmeticAccumulator* identityAcc = vtkArithmeticAccumulator::New();
-  vtkArithmeticAccumulator* squaredAcc = vtkArithmeticAccumulator::New();
-  identityAcc->SetFunctionOfX(vtkValueComaNameMacro(VTK_FUNC_X));
-  squaredAcc->SetFunctionOfX(vtkValueComaNameMacro(VTK_FUNC_X2));
-  std::vector<vtkAbstractAccumulator*> accumulators{ identityAcc, squaredAcc };
-  return accumulators;
+  return { vtkArithmeticAccumulator<vtkIdentityFunctor>::New(),
+    vtkArithmeticAccumulator<vtkSquareFunctor>::New() };
 }

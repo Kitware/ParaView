@@ -60,7 +60,6 @@ public:
   virtual void Add(double value, double weight) = 0;
   //@}
 
-  //@{
   /**
    * Returns true if the parameters of accumulator is the same as the ones of this
    */

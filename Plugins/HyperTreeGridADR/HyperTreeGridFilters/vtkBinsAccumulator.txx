@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkBinsAccumulator.cxx
+  Module:    vtkBinsAccumulator.txx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -13,31 +13,33 @@
 
 =========================================================================*/
 
+#ifndef vtkBinsAccumulator_txx
+#define vtkBinsAccumulator_txx
+
 #include "vtkBinsAccumulator.h"
 
-#include "vtkFunctionOfXList.h"
+#include "vtkFunctor.h"
 #include "vtkObjectFactory.h"
 
 #include <cassert>
 #include <memory>
 #include <string>
 
-vtkStandardNewMacro(vtkBinsAccumulator);
+template <typename FunctorT>
+vtkStandardNewMacro(vtkBinsAccumulator<FunctorT>);
 
 //----------------------------------------------------------------------------
-std::unordered_map<double (*)(double), std::string> vtkBinsAccumulator::FunctionName;
-
-//----------------------------------------------------------------------------
-vtkBinsAccumulator::vtkBinsAccumulator()
+template <typename FunctorT>
+vtkBinsAccumulator<FunctorT>::vtkBinsAccumulator()
   : Bins(std::make_shared<BinsType>())
-  , FunctionOfW(VTK_FUNC_X)
   , DiscretizationStep(0.0)
   , Value(0.0)
 {
 }
 
 //----------------------------------------------------------------------------
-void vtkBinsAccumulator::PrintSelf(ostream& os, vtkIndent indent)
+template <typename FunctorT>
+void vtkBinsAccumulator<FunctorT>::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Bins: ";
@@ -47,13 +49,11 @@ void vtkBinsAccumulator::PrintSelf(ostream& os, vtkIndent indent)
   }
   os << indent << std::endl;
   os << indent << "DiscretizationStep: " << this->DiscretizationStep << std::endl;
-  os << indent << "FunctionOfW: "
-     << vtkBinsAccumulator::FunctionName[*(this->FunctionOfW.target<double (*)(double)>())]
-     << std::endl;
 }
 
 //----------------------------------------------------------------------------
-void vtkBinsAccumulator::Add(vtkAbstractAccumulator* accumulator)
+template <typename FunctorT>
+void vtkBinsAccumulator<FunctorT>::Add(vtkAbstractAccumulator* accumulator)
 {
   vtkBinsAccumulator* binAccumulator = vtkBinsAccumulator::SafeDownCast(accumulator);
   assert(binAccumulator && "accumulator not of type vtkBinsAccumulator, cannot Add");
@@ -63,54 +63,59 @@ void vtkBinsAccumulator::Add(vtkAbstractAccumulator* accumulator)
     if (it == this->Bins->end())
     {
       (*this->Bins)[bin.first] = bin.second;
-      this->Value += this->FunctionOfW(bin.second);
+      this->Value += this->Functor(bin.second);
     }
     else
     {
-      this->Value -= this->FunctionOfW(it->second);
+      this->Value -= this->Functor(it->second);
       it->second += bin.second;
-      this->Value += this->FunctionOfW(it->second);
+      this->Value += this->Functor(it->second);
     }
   }
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkBinsAccumulator::Add(double value, double weight)
+template <typename FunctorT>
+void vtkBinsAccumulator<FunctorT>::Add(double value, double weight)
 {
   auto it = this->Bins->find(static_cast<long long>(value / this->DiscretizationStep));
   if (it == this->Bins->end())
   {
     (*this->Bins)[static_cast<long long>(value / this->DiscretizationStep)] = weight;
-    this->Value += this->FunctionOfW(weight);
+    this->Value += this->Functor(weight);
   }
   else
   {
-    this->Value -= this->FunctionOfW(it->second);
+    this->Value -= this->Functor(it->second);
     it->second += weight;
-    this->Value += this->FunctionOfW(it->second);
+    this->Value += this->Functor(it->second);
   }
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkBinsAccumulator::Initialize()
+template <typename FunctorT>
+void vtkBinsAccumulator<FunctorT>::Initialize()
 {
   this->Value = 0.0;
-  this->FunctionOfW = VTK_FUNC_X;
+  this->Functor = FunctorType();
   this->DiscretizationStep = 0.0;
   this->Bins->clear();
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
-const vtkBinsAccumulator::BinsPointer vtkBinsAccumulator::GetBins() const
+template <typename FunctorT>
+const typename vtkBinsAccumulator<FunctorT>::BinsPointer vtkBinsAccumulator<FunctorT>::GetBins()
+  const
 {
   return this->Bins;
 }
 
 //----------------------------------------------------------------------------
-void vtkBinsAccumulator::SetDiscretizationStep(double discretizationStep)
+template <typename FunctorT>
+void vtkBinsAccumulator<FunctorT>::SetDiscretizationStep(double discretizationStep)
 {
   if (this->Bins->size())
   {
@@ -121,51 +126,46 @@ void vtkBinsAccumulator::SetDiscretizationStep(double discretizationStep)
 }
 
 //----------------------------------------------------------------------------
-const std::function<double(double)>& vtkBinsAccumulator::GetFunctionOfW() const
+template <typename FunctorT>
+const FunctorT& vtkBinsAccumulator<FunctorT>::GetFunctor() const
 {
-  return this->FunctionOfW;
+  return this->Functor;
 }
 
 //----------------------------------------------------------------------------
-void vtkBinsAccumulator::SetFunctionOfW(double (*const f)(double), const std::string& name)
+template <typename FunctorT>
+void vtkBinsAccumulator<FunctorT>::SetFunctor(const FunctorT& f)
 {
-  this->FunctionOfW = f;
-  vtkBinsAccumulator::FunctionName[f] = std::move(name);
+  this->Functor = f;
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkBinsAccumulator::SetFunctionOfW(
-  const std::function<double(double)>& f, const std::string& name)
-{
-  this->SetFunctionOfW(*(f.target<double (*)(double)>()), name);
-}
-
-//----------------------------------------------------------------------------
-double vtkBinsAccumulator::GetValue() const
+template <typename FunctorT>
+double vtkBinsAccumulator<FunctorT>::GetValue() const
 {
   return this->Value;
 }
 
 //----------------------------------------------------------------------------
-bool vtkBinsAccumulator::HasSameParameters(vtkAbstractAccumulator* accumulator) const
+template <typename FunctorT>
+bool vtkBinsAccumulator<FunctorT>::HasSameParameters(vtkAbstractAccumulator* accumulator) const
 {
   vtkBinsAccumulator* acc = vtkBinsAccumulator::SafeDownCast(accumulator);
-  // We compare the pointer on the function used.
   return acc && acc->DiscretizationStep == this->DiscretizationStep &&
-    *(this->FunctionOfW.target<double (*)(double)>()) ==
-    *(acc->GetFunctionOfW().target<double (*)(double)>());
+    this->Functor == acc->GetFunctor();
 }
 
 //----------------------------------------------------------------------------
-void vtkBinsAccumulator::ShallowCopy(vtkDataObject* accumulator)
+template <typename FunctorT>
+void vtkBinsAccumulator<FunctorT>::ShallowCopy(vtkDataObject* accumulator)
 {
   this->Superclass::ShallowCopy(accumulator);
   vtkBinsAccumulator* binsAccumulator = vtkBinsAccumulator::SafeDownCast(accumulator);
   if (binsAccumulator)
   {
     this->Bins = binsAccumulator->GetBins();
-    this->FunctionOfW = binsAccumulator->GetFunctionOfW();
+    this->Functor = binsAccumulator->GetFunctor();
     this->DiscretizationStep = binsAccumulator->GetDiscretizationStep();
   }
   else
@@ -175,7 +175,8 @@ void vtkBinsAccumulator::ShallowCopy(vtkDataObject* accumulator)
 }
 
 //----------------------------------------------------------------------------
-void vtkBinsAccumulator::DeepCopy(vtkDataObject* accumulator)
+template <typename FunctorT>
+void vtkBinsAccumulator<FunctorT>::DeepCopy(vtkDataObject* accumulator)
 {
   this->Superclass::DeepCopy(accumulator);
   vtkBinsAccumulator* binsAccumulator = vtkBinsAccumulator::SafeDownCast(accumulator);
@@ -183,7 +184,7 @@ void vtkBinsAccumulator::DeepCopy(vtkDataObject* accumulator)
   {
     const BinsPointer& bins = binsAccumulator->GetBins();
     this->Bins = std::make_shared<BinsType>(bins->cbegin(), bins->cend());
-    this->FunctionOfW = binsAccumulator->GetFunctionOfW();
+    this->Functor = binsAccumulator->GetFunctor();
     this->DiscretizationStep = binsAccumulator->GetDiscretizationStep();
   }
   else
@@ -191,3 +192,5 @@ void vtkBinsAccumulator::DeepCopy(vtkDataObject* accumulator)
     this->Bins = nullptr;
   }
 }
+
+#endif

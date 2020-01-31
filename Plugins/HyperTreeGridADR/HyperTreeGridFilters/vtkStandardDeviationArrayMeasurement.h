@@ -113,7 +113,7 @@ protected:
    * Default constructor and destructor
    */
   vtkStandardDeviationArrayMeasurement();
-  virtual ~vtkStandardDeviationArrayMeasurement() override = default;
+  ~vtkStandardDeviationArrayMeasurement() override = default;
   //@}
 
 private:

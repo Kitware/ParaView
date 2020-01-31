@@ -106,12 +106,12 @@ public:
   /**
    * ShallowCopy implementation.
    */
-  virtual void ShallowCopy(vtkDataObject* o) override;
+  void ShallowCopy(vtkDataObject* o) override;
 
   /**
    * DeepCopy implementation.
    */
-  virtual void DeepCopy(vtkDataObject* o) override;
+  void DeepCopy(vtkDataObject* o) override;
 
   //@{
   /**
@@ -129,7 +129,7 @@ protected:
    * Default constructors and destructors
    */
   vtkQuantileArrayMeasurement();
-  virtual ~vtkQuantileArrayMeasurement() override = default;
+  ~vtkQuantileArrayMeasurement() override = default;
   //@}
 
 private:

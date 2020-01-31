@@ -20,8 +20,8 @@
  * Accumulator for adding arithmetically data.
  * The resulting accumulated value is the sum of all the inputs.
  * Noting x_i the set of inputs and w_i its weight, the accumulated value would be
- * sum_i (w_i FunctionOfX(x_i)), where FunctionOfX is a function pointer.
- * The default value for FunctionOfX is VTK_FUNC_X from header vtkFunctionOfXList.h,
+ * sum_i (w_i Functor(x_i)), where Functor is a function pointer.
+ * The default value for Functor is VTK_FUNC_X from header vtkFunctorList.h,
  * which is the identity function.
  *
  * @note Arithmetic accumulators can be used to accumulate using the product instead of the sum.
@@ -40,13 +40,16 @@
 #include <string>
 #include <unordered_map>
 
+template <typename FunctorT>
 class VTKFILTERSHYPERTREEGRIDADR_EXPORT vtkArithmeticAccumulator : public vtkAbstractAccumulator
 {
 public:
+  typedef FunctorT FunctorType;
+
   static vtkArithmeticAccumulator* New();
 
   vtkTemplateTypeMacro(vtkArithmeticAccumulator, vtkAbstractAccumulator);
-  virtual void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   using Superclass::Add;
 
@@ -54,45 +57,44 @@ public:
   /**
    * Methods for adding data to the accumulator.
    */
-  virtual void Add(vtkAbstractAccumulator* accumulator) override;
-  virtual void Add(double value, double weight) override;
+  void Add(vtkAbstractAccumulator* accumulator) override;
+  void Add(double value, double weight) override;
   //@}
 
   /**
    * Accessor to the accumulated value.
    */
-  virtual double GetValue() const override;
+  double GetValue() const override;
 
   /**
    * Set object into initial state
    */
-  virtual void Initialize() override;
+  void Initialize() override;
 
   /**
    * Shallow copy of the accumulator.
    */
-  virtual void ShallowCopy(vtkDataObject* accumulator) override;
+  void ShallowCopy(vtkDataObject* accumulator) override;
 
   /**
    * Deep copy of the accumulator.
    */
-  virtual void DeepCopy(vtkDataObject* accumulator) override;
+  void DeepCopy(vtkDataObject* accumulator) override;
 
   /**
    * Returns true if the parameters of accumulator is the same as the ones of this
    */
-  virtual bool HasSameParameters(vtkAbstractAccumulator* accumulator) const override;
+  bool HasSameParameters(vtkAbstractAccumulator* accumulator) const override;
 
   //@{
   /**
    * Accessor/mutator on the function pointer specifying which function is applied to
    * the data to accumulate.
-   * The accumulated value is sum_i w_i FunctionOfX(x_i), where x_i is the input data,
+   * The accumulated value is sum_i w_i Functor(x_i), where x_i is the input data,
    * and w_i the corresponding weight.
    */
-  const std::function<double(double)>& GetFunctionOfX() const;
-  void SetFunctionOfX(double (*const f)(double), const std::string& name);
-  void SetFunctionOfX(const std::function<double(double)>& f, const std::string& name);
+  const FunctorT& GetFunctor() const;
+  void SetFunctor(const FunctorT&& f);
   //@}
 
 protected:
@@ -101,7 +103,7 @@ protected:
    * Default constructor and destructor.
    */
   vtkArithmeticAccumulator();
-  virtual ~vtkArithmeticAccumulator() override = default;
+  ~vtkArithmeticAccumulator() override = default;
   //@}
 
   /**
@@ -112,16 +114,12 @@ protected:
   /**
    * Function applied to the values to accumulate.
    */
-  std::function<double(double)> FunctionOfX;
-
-  /**
-   * Storage of function name.
-   */
-  static std::unordered_map<double (*)(double), std::string> FunctionName;
+  FunctorType Functor;
 
 private:
-  vtkArithmeticAccumulator(vtkArithmeticAccumulator&) = delete;
-  void operator=(vtkArithmeticAccumulator&) = delete;
+  vtkArithmeticAccumulator(vtkArithmeticAccumulator<FunctorT>&) = delete;
+  void operator=(vtkArithmeticAccumulator<FunctorT>&) = delete;
 };
 
+#include "vtkArithmeticAccumulator.txx"
 #endif
