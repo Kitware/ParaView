@@ -214,3 +214,11 @@ elseif (${CMAKE_FIND_PACKAGE_NAME}_FIND_VERSION VERSION_LESS 5.7)
 else ()
   set(PARAVIEW_USE_FILE "${CMAKE_CURRENT_LIST_DIR}/paraview-use-file-error.cmake")
 endif ()
+
+# 5.8 renamed these variables, so provide them if 5.8 is not the minimum
+# requested.
+if (NOT ${CMAKE_FIND_PACKAGE_NAME}_FIND_VERSION OR
+    ${CMAKE_FIND_PACKAGE_NAME}_FIND_VERSION VERSION_LESS "5.8")
+  set(PARAVIEW_BUILD_QT_GUI "${PARAVIEW_USE_QT}")
+  set(PARAVIEW_ENABLE_PYTHON "${PARAVIEW_USE_PYTHON}")
+endif ()
