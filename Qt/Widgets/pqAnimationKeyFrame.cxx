@@ -160,9 +160,9 @@ void pqAnimationKeyFrame::paint(QPainter* painter, const QStyleOptionGraphicsIte
   if (this->parentTrack()->isEnabled())
   {
     // change brush only when parent track is enabled.
-    painter->setBrush(QBrush(QColor(255, 255, 255)));
+    painter->setBrush(widget->palette().base());
   }
-  QPen pen(QColor(0, 0, 0));
+  QPen pen(widget->palette().color(QPalette::Text));
   pen.setWidth(0);
   painter->setPen(pen);
   QRectF keyFrameRect(this->boundingRect());
