@@ -39,8 +39,8 @@ The NVIDIA IndeX for ParaView Plugin is compatible with:
   (depending on the plugin version and downloaded package, Windows 64-bit).
 * OpenMPI-1.7.4 and later.
   (if running in client-server mode).
-* NVIDIA IndeX 2.0 / NVIDIA IndeX 2.1 (starting with ParaView 5.7)
-  (installed with the ParaView plugin).
+* NVIDIA IndeX 2.0 or later.
+  (depending plugin version)
 * NVIDIA GPU(s) supporting CUDA compute capability 3.0 or higher, i.e. Kepler
   GPU architecture generation or later.
 * NVIDIA display driver version 387.26 or later on Linux and
@@ -65,11 +65,15 @@ paraview-plugin-support@nvidia.com
 
 * Interactive visualization of time varying structured volume grids.
 
-* Supporting 8-bit and 16-bit unsigned int, and 32-bit floating point volume
+* Supporting 8-bit and 16-bit (un)signed int, and 32-bit floating point volume
   data types (64-bit floating point is supported via conversion).
 
-* Advanced volume rendering techniques with three different configurable presets 
-  for Iso-surfaces, Depth enhancement and Edge enhancement.
+* XAC (NVIDIA IndeX Advanced Compute Technique) visual elements for volumes 
+  with four different configurable presets: Iso-surfaces, Depth enhancement, 
+  Edge enhancement, Gradient.
+  
+* User programable XAC (NVIDIA IndeX Advanced Compute Technique) 
+  visual element for volumes (Custom).   
 
 * Multiple, axis-aligned volume slice rendering combined with volumetric data.
 
