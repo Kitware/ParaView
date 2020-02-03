@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationTrack.h"
 
 #include <QPainter>
+#include <QPalette>
+#include <QWidget>
 
 #include "pqAnimationKeyFrame.h"
 
@@ -113,12 +115,12 @@ void pqAnimationTrack::setProperty(const QVariant& p)
   this->update();
 }
 
-void pqAnimationTrack::paint(QPainter* p, const QStyleOptionGraphicsItem*, QWidget*)
+void pqAnimationTrack::paint(QPainter* p, const QStyleOptionGraphicsItem*, QWidget* widget)
 {
   // draw border for this track
   p->save();
-  p->setBrush(QBrush());
-  QPen pen(QColor(0, 0, 0));
+  p->setBrush(Qt::NoBrush);
+  QPen pen(widget->palette().color(QPalette::Text));
   pen.setWidth(0);
   p->setPen(pen);
   p->drawRect(this->boundingRect());

@@ -341,8 +341,8 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF&)
 
   // make background for time labels white
   painter->save();
-  painter->setBrush(QColor(255, 255, 255));
-  painter->setPen(QColor());
+  painter->setBrush(this->palette().base());
+  painter->setPen(Qt::NoPen);
   painter->drawRect(labelRect);
   painter->restore();
 
@@ -356,7 +356,7 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF&)
   double w = labelRect.width() / num;
 
   painter->save();
-  painter->setPen(QColor(0, 0, 0));
+  painter->setPen(this->palette().color(QPalette::Text));
   painter->drawText(QRectF(labelRect.left(), labelRect.top(), w / 2.0, rh),
     Qt::AlignLeft | Qt::AlignVCenter,
     QString::number(this->StartTime, this->TimeNotation.toLatin1(), this->TimePrecision));
@@ -390,7 +390,7 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF&)
   QPen pen = painter->pen();
   pen.setJoinStyle(Qt::MiterJoin);
   painter->setPen(pen);
-  painter->setBrush(QColor(0, 0, 0));
+  painter->setBrush(this->palette().text());
 
   QPolygonF poly = this->timeBarPoly(this->CurrentTime);
   painter->drawPolygon(poly);
@@ -403,7 +403,7 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF&)
     pts.append(QPointF(pos - 1, sr.height() + sr.top() - 2));
     pts.append(QPointF(pos + 1, sr.height() + sr.top() - 2));
     pts.append(QPointF(pos + 1, rh - 1));
-    painter->setBrush(QColor(200, 200, 200));
+    painter->setBrush(this->palette().alternateBase());
     painter->drawPolygon(QPolygonF(pts));
   }
 
