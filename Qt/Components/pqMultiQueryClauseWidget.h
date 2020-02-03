@@ -129,6 +129,7 @@ protected:
   int AttributeType;
   int ChildNextId;
   int NumberOfDependentClauseWidgets;
+  bool AddingClauseWidget;
 
   QWidget* Container;
   QScrollArea* ScrollArea;
