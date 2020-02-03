@@ -212,6 +212,7 @@ int vtkPVArrayCalculator::RequestData(
     vtkSmartPointer<vtkCompositeDataIterator> cdIter;
     cdIter.TakeReference(inputCD->NewIterator());
     cdIter->SkipEmptyNodesOn();
+    bool supportGivenAttribute = true;
     for (cdIter->InitTraversal(); !cdIter->IsDoneWithTraversal(); cdIter->GoToNextItem())
     {
       vtkDataObject* dataObject = cdIter->GetCurrentDataObject();
@@ -219,12 +220,24 @@ int vtkPVArrayCalculator::RequestData(
       {
         int attributeType = this->GetAttributeTypeFromInput(dataObject);
         vtkDataSetAttributes* dataAttrs = dataObject->GetAttributes(attributeType);
-        vtkIdType numTuples = dataAttrs->GetNumberOfTuples();
-        if (numTuples > 0)
+        if (dataAttrs)
         {
-          this->AddArrayAndVariableNames(input, dataAttrs);
+          vtkIdType numTuples = dataAttrs->GetNumberOfTuples();
+          if (numTuples > 0)
+          {
+            this->AddArrayAndVariableNames(input, dataAttrs);
+          }
+        }
+        else
+        {
+          supportGivenAttribute = false;
         }
       }
+    }
+    if (!supportGivenAttribute)
+    {
+      vtkWarningMacro("Some blocks do not support the given attribue type. Resulting array will be "
+                      "partial or inexistant.");
     }
   }
   else
