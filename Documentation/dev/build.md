@@ -335,6 +335,8 @@ These settings control capabitities of the build. These begin with the prefix
 Less common, but potentially useful variables are:
 
   * `PARAVIEW_USE_VTKM` (default `ON`): Whether VTK-m based filters are enabled.
+  * `PARAVIEW_USE_FORTRAN` (default `ON` if Fortran compiler found): Enable
+     Fortran support for Catalyst libraries.
 
 #### Feature settings
 

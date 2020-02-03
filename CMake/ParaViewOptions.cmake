@@ -88,6 +88,21 @@ option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
 option(PARAVIEW_USE_CUDA "Support CUDA compilation" OFF)
 option(PARAVIEW_USE_VTKM "Enable VTK-m accelerated algorithms" "${PARAVIEW_ENABLE_NONESSENTIAL}")
 
+# Add option to disable Fortran
+if (NOT WIN32)
+  include(CheckFortran)
+  check_fortran_support()
+  if (CMAKE_Fortran_COMPILER)
+    set(_has_fortran TRUE)
+  else()
+    set(_has_fortran FALSE)
+  endif()
+  cmake_dependent_option(PARAVIEW_USE_FORTRAN "Enable Fortran support" ON
+    "_has_fortran" OFF)
+  mark_as_advanced(PARAVIEW_USE_FORTRAN)
+  unset(_has_fortran)
+endif()
+
 vtk_deprecated_setting(python_default PARAVIEW_USE_PYTHON PARAVIEW_ENABLE_PYTHON OFF)
 option(PARAVIEW_USE_PYTHON "Enable/Disable Python scripting support" "${python_default}")
 
