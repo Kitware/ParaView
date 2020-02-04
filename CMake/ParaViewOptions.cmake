@@ -430,6 +430,14 @@ paraview_require_module(
   CONDITION PARAVIEW_USE_MPI AND PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL
   MODULES  VTK::IOParallelNetCDF)
 
+paraview_require_module(
+  CONDITION PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_RENDERING AND PARAVIEW_ENABLE_NONESSENTIAL
+  MODULES   ParaView::RemotingMisc
+            ParaView::RemotingExport
+            ParaView::RemotingLive
+            ParaView::RemotingCinema
+            ParaView::RemotingAnimation)
+
 if (NOT PARAVIEW_ENABLE_NONESSENTIAL)
   # This ensures that we don't ever enable certain problematic
   # modules when PARAVIEW_ENABLE_NONESSENTIAL is OFF.
