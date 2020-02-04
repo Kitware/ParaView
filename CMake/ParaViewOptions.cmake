@@ -450,8 +450,11 @@ paraview_require_module(
   MODULES   ParaView::RemotingMisc
             ParaView::RemotingExport
             ParaView::RemotingLive
-            ParaView::RemotingCinema
             ParaView::RemotingAnimation)
+
+paraview_require_module(
+  CONDITION PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_RENDERING AND PARAVIEW_USE_PYTHON
+  MODULES   ParaView::RemotingCinema)
 
 if (NOT PARAVIEW_ENABLE_NONESSENTIAL)
   # This ensures that we don't ever enable certain problematic
