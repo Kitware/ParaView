@@ -81,42 +81,6 @@ if (PARAVIEW_USE_QT)
     paraview)
 endif ()
 
-option(PARAVIEW_BUILD_MESA_LAUNCHER "Build a launcher for using Mesa binaries" OFF)
-mark_as_advanced(PARAVIEW_BUILD_MESA_LAUNCHER)
-if (PARAVIEW_BUILD_MESA_LAUNCHER)
-  set(PARAVIEW_MESA_LIBDIR "<LIBDIR>/mesa"
-    CACHE STRING "The directory containing the Mesa libraries (<LIBDIR> is replaced with the runtime library install location)")
-  if (WIN32)
-    set(_paraview_mesa_replacement "${CMAKE_INSTALL_BINDIR}")
-  else ()
-    set(_paraview_mesa_replacement "${CMAKE_INSTALL_LIBDIR}")
-  endif ()
-  string(REPLACE "<LIBDIR>" "${_paraview_mesa_replacement}" _paraview_mesa_libdir "${PARAVIEW_MESA_LIBDIR}")
-  file(RELATIVE_PATH _paraview_mesa_relpath
-    "/prefix/${CMAKE_INSTALL_BINDIR}"
-    "/prefix/${_paraview_mesa_libdir}")
-
-  add_executable(paraview-mesa
-    paraview_mesa.cxx)
-  add_executable(ParaView::paraview-mesa ALIAS paraview-mesa)
-  target_link_libraries(paraview-mesa
-    PRIVATE
-      VTK::vtksys)
-  target_compile_definitions(paraview-mesa
-    PRIVATE
-      "MESA_RELATIVE_LIBDIR=\"${_paraview_mesa_relpath}\"")
-  foreach (paraview_tool IN LISTS paraview_tools)
-    target_compile_definitions(paraview-mesa
-      PRIVATE
-        "HAVE_${paraview_tool}")
-  endforeach ()
-  install(
-    TARGETS     "paraview-mesa"
-    DESTINATION "${CMAKE_INSTALL_BINDIR}"
-    COMPONENT   runtime
-    EXPORT      ParaViewTools)
-endif ()
-
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/paraview-config"
   "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/paraview-config"
@@ -138,3 +102,6 @@ if (PARAVIEW_INSTALL_DEVELOPMENT_FILES)
     DESTINATION "${paraview_cmake_destination}"
     COMPONENT   "development")
 endif ()
+
+# obsolete in ParaView 5.9
+vtk_obsolete_setting(PARAVIEW_BUILD_MESA_LAUNCHER)
