@@ -413,10 +413,36 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLHinted(
       vtkVLogF(
         PARAVIEW_LOG_PLUGIN_VERBOSITY(), "Trying to locate plugin with name `%s`", name.c_str());
       std::string plugin_filename;
-      if (child->GetAttribute("filename") &&
-        vtkPSystemTools::FileExists(child->GetAttribute("filename"), true))
+      if (child->GetAttribute("filename"))
       {
-        plugin_filename = child->GetAttribute("filename");
+        std::string filename = child->GetAttribute("filename");
+        if (hint && !vtksys::SystemTools::FileIsFullPath(filename))
+        {
+          std::string basedir = vtksys::SystemTools::GetFilenamePath(hint);
+          plugin_filename = vtksys::SystemTools::CollapseFullPath(filename, basedir);
+
+          // Ensure the path is under the base directory given.
+          if (!vtksys::SystemTools::IsSubDirectory(plugin_filename, basedir))
+          {
+            vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
+              "Invalid `filename=` setting for %s; must be underneath the XML directory.",
+              name.c_str());
+            continue;
+          }
+        }
+        else
+        {
+          plugin_filename = filename;
+        }
+
+        if (!vtkPSystemTools::FileExists(plugin_filename, true))
+        {
+          vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(),
+            "Invalid `filename=` setting for %s; the given path (%s) must exist.", name.c_str(),
+            plugin_filename.c_str());
+          // TODO: Warn that the plugin was not found.
+          plugin_filename.clear();
+        }
       }
       else
       {

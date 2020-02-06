@@ -348,16 +348,57 @@ void vtkPVPluginLoader::LoadPluginsFromPath(const char* path)
     return;
   }
 
+#ifdef _WIN32
+  const char* compiled_extension = ".dll";
+#else
+  const char* compiled_extension = ".so";
+#endif
+
   for (vtkIdType cc = 0; cc < dir->GetNumberOfFiles(); cc++)
   {
-    std::string ext = vtksys::SystemTools::GetFilenameLastExtension(dir->GetFile(cc));
-    if (ext == ".so" || ext == ".dll" || ext == ".xml" || ext == ".sl" || ext == ".py")
+    const char* file = dir->GetFile(cc);
+    std::string rel_path;
+    bool has_valid_extension;
+    bool assume_exists = false;
+
+    // If we have a directory, search it for a plugin of the same name.
+    if (dir->FileIsDirectory(file))
     {
-      std::string file = dir->GetPath();
-      file += "/";
-      file += dir->GetFile(cc);
-      this->LoadPluginSilently(file.c_str());
+      rel_path = file;
+      rel_path += '/';
+      rel_path += file;
+      rel_path += compiled_extension;
+      has_valid_extension = true;
     }
+    else
+    {
+      // We have a file, check to see if its extension is acceptable.
+      rel_path = file;
+      std::string ext = vtksys::SystemTools::GetFilenameLastExtension(rel_path);
+      has_valid_extension =
+        (ext == compiled_extension || ext == ".xml" || ext == ".sl" || ext == ".py");
+      assume_exists = true;
+    }
+
+    // No extension, not a plugin.
+    if (!has_valid_extension)
+    {
+      continue;
+    }
+
+    // Calculate the full path to the plugin.
+    std::string full_file = dir->GetPath();
+    full_file += '/';
+    full_file += rel_path;
+
+    // Check if it exists and is a file.
+    if (!assume_exists && !vtksys::SystemTools::FileExists(full_file, true))
+    {
+      continue;
+    }
+
+    // Load the plugin.
+    this->LoadPluginSilently(full_file.c_str());
   }
 }
 
