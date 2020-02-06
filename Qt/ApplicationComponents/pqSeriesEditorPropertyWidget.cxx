@@ -141,6 +141,7 @@ public:
     this->Ui.SeriesTable->setAnnotationsModel(this->Model);
     this->Ui.SeriesTable->setSupportsReorder(false);
     this->Ui.SeriesTable->allowsUserDefinedValues(false);
+    this->Ui.SeriesTable->allowsRegexpMatching(true);
     this->Ui.SeriesTable->supportsOpacityMapping(false);
     this->Ui.SeriesTable->setColumnVisibility(pqAnnotationsModel::VISIBILITY, true);
   }
@@ -178,6 +179,8 @@ pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
 
     this->addPropertyLink(
       this, "seriesLabel", SIGNAL(seriesLabelChanged()), smgroup->GetProperty("SeriesLabel"));
+
+    emit this->presetLabelChanged();
   }
   else
   {
@@ -194,6 +197,8 @@ pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
 
     this->addPropertyLink(
       this, "seriesColor", SIGNAL(seriesColorChanged()), smgroup->GetProperty("SeriesColor"));
+
+    emit this->presetColorChanged();
   }
   else
   {
@@ -283,14 +288,15 @@ pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
   this->connect(ui.SeriesTable, &pqColorAnnotationsWidget::indexedColorsChanged, this,
     &pqSeriesEditorPropertyWidget::seriesColorChanged);
 
-  if (!smgroup->GetProperty("LastPresetName"))
+  auto lastNameProp = smgroup->GetProperty("LastPresetName");
+  if (!lastNameProp)
   {
     ui.SeriesTable->enablePresets(false);
   }
   else
   {
-    auto name = vtkSMPropertyHelper(smgroup->GetProperty("LastPresetName")).GetAsString();
-    ui.SeriesTable->applyPreset(name);
+    auto name = vtkSMPropertyHelper(lastNameProp).GetAsString();
+    this->Internals->Ui.SeriesTable->setCurrentPresetName(name);
   }
 }
 
@@ -590,31 +596,67 @@ void pqSeriesEditorPropertyWidget::onPresetChanged(const QString& name)
     return;
   }
 
-  vtkNew<vtkStringList> annotations;
-  annotationsProp->GetElements(annotations);
+  vtkNew<vtkStringList> presetAnnotations;
+  annotationsProp->GetElements(presetAnnotations);
 
   const QList<QVariant>& currentAnnotations = this->Internals->Ui.SeriesTable->annotations();
   QList<QVariant> newAnnotations = currentAnnotations;
   QList<QVariant> newColors;
 
+  // create a list with preset values filtered through the given regexp.
+  vtkNew<vtkStringList> filteredPresetAnnotations;
+  QRegularExpression regexp = this->Internals->Ui.SeriesTable->presetRegularExpression();
+  for (int j = 0; j < presetAnnotations->GetNumberOfStrings(); j += 2)
+  {
+    auto presetSubstring = QString(presetAnnotations->GetString(j));
+    if (regexp.isValid() && !regexp.pattern().isEmpty())
+    {
+      auto presetMatching = regexp.match(presetAnnotations->GetString(j));
+      presetSubstring = presetMatching.hasMatch()
+        ? !presetMatching.captured(1).isNull() ? presetMatching.captured(1)
+                                               : presetMatching.captured(0)
+        : presetSubstring;
+    }
+    filteredPresetAnnotations->AddString(presetSubstring.toStdString().c_str());
+  }
+
   // We want to keep current order.
   for (int i = 0; i + 1 < currentAnnotations.size(); i += 2)
   {
-    QByteArray nameArray = currentAnnotations.at(i).toString().toLocal8Bit();
-    const char* seriesName = nameArray.data();
-    int idx = annotations->GetIndex(seriesName);
-    if (idx > -1 && (idx + 1 < annotations->GetLength()))
+    int idx = -1;
+    if (presetAnnotations->GetLength() > 0)
     {
-      newAnnotations[i + 1] = annotations->GetString(idx + 1);
+      QByteArray nameArray = currentAnnotations.at(i).toString().toLocal8Bit();
+      const char* seriesName = nameArray.data();
+
+      auto seriesSubstring = QString(seriesName);
+      if (regexp.isValid() && !regexp.pattern().isEmpty())
+      {
+        auto matching = regexp.match(seriesName);
+        // extract the substring we want to compare : first look at captured group if any, then at
+        // whole matching and at least use the full series name.
+        seriesSubstring = matching.hasMatch()
+          ? !matching.captured(1).isNull() ? matching.captured(1) : matching.captured(0)
+          : seriesSubstring;
+      }
+
+      idx = filteredPresetAnnotations->GetIndex(seriesSubstring.toLocal8Bit().data());
+
+      // if found, update annotation legend
+      if (idx > -1 && (idx + 1) < presetAnnotations->GetLength())
+      {
+        newAnnotations[i + 1] = presetAnnotations->GetString(2 * idx + 1);
+      }
     }
 
     if (idx == -1)
     {
-      idx = i;
+      idx = i / 2;
     }
-    idx = (idx / 2) % (colorsProp->GetNumberOfElements() / 3);
 
-    newColors.push_back(QVariant(seriesName));
+    newColors.push_back(QVariant(currentAnnotations.at(idx)));
+
+    idx = idx % (colorsProp->GetNumberOfElements() / 3);
     newColors.push_back(vtkSMPropertyHelper(colorsProp).GetAsDouble(3 * idx));
     newColors.push_back(vtkSMPropertyHelper(colorsProp).GetAsDouble(3 * idx + 1));
     newColors.push_back(vtkSMPropertyHelper(colorsProp).GetAsDouble(3 * idx + 2));

@@ -104,6 +104,11 @@ public:
   bool loadAnnotations() const;
 
   /**
+   * Returns the specified regularExpression.
+   */
+  QRegularExpression regularExpression();
+
+  /**
   * Returns true if the user requested to preserve/use the preset data range.
   * If false, the user is expecting the current transfer function range to be
   * maintained.
@@ -119,6 +124,11 @@ public:
   * Set when user can choose to load annotations along with the default state.
   */
   void setCustomizableLoadAnnotations(bool state, bool defaultValue = true);
+
+  /**
+   * Set when user can choose a regexp to load annotations along with the default state.
+   */
+  void setCustomizableAnnotationsRegexp(bool state, bool defaultValue = false);
 
   /**
   * Set when user can choose to load opacities along with the default state.

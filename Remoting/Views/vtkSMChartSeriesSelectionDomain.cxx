@@ -406,7 +406,8 @@ std::vector<vtkStdString> vtkSMChartSeriesSelectionDomain::GetDefaultValue(const
   {
     double rgb[3];
     auto presetProp = this->GetProperty()->GetParent()->GetProperty("LastPresetName");
-    this->Internals->GetNextColor(vtkSMPropertyHelper(presetProp).GetAsString(), rgb);
+    this->Internals->GetNextColor(
+      presetProp ? vtkSMPropertyHelper(presetProp).GetAsString() : "Spectrum", rgb);
     for (int kk = 0; kk < 3; kk++)
     {
       std::ostringstream stream;

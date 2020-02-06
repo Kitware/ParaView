@@ -1039,6 +1039,12 @@ void pqColorAnnotationsWidget::setSupportsReorder(bool reorder)
 }
 
 //-----------------------------------------------------------------------------
+void pqColorAnnotationsWidget::allowsRegexpMatching(bool allow)
+{
+  this->Internals->ChoosePresetReaction->setAllowsRegexpMatching(allow);
+}
+
+//-----------------------------------------------------------------------------
 void pqColorAnnotationsWidget::allowsUserDefinedValues(bool allow)
 {
   Ui::ColorAnnotationsWidget& ui = this->Internals->Ui;
@@ -1105,8 +1111,20 @@ const char* pqColorAnnotationsWidget::currentPresetName()
 }
 
 //-----------------------------------------------------------------------------
+void pqColorAnnotationsWidget::setCurrentPresetName(const char* name)
+{
+  this->Internals->SetCurrentPresetName(name);
+}
+
+//-----------------------------------------------------------------------------
 void pqColorAnnotationsWidget::setColumnVisibility(
   pqAnnotationsModel::ColumnRoles col, bool visible)
 {
   this->Internals->Ui.AnnotationsTable->setColumnHidden(col, !visible);
+}
+
+//-----------------------------------------------------------------------------
+QRegularExpression pqColorAnnotationsWidget::presetRegularExpression()
+{
+  return this->Internals->ChoosePresetReaction->regularExpression();
 }

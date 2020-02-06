@@ -62,6 +62,7 @@ vtkSMProxy* lutProxy(vtkSMProxy* reprProxy)
 pqChooseColorPresetReaction::pqChooseColorPresetReaction(
   QAction* parentObject, bool track_active_objects)
   : Superclass(parentObject)
+  , AllowsRegexpMatching(false)
 {
   if (track_active_objects)
   {
@@ -154,6 +155,7 @@ bool pqChooseColorPresetReaction::choosePreset(const char* presetName)
   PresetDialog->setCustomizableLoadOpacities(!indexedLookup);
   PresetDialog->setCustomizableUsePresetRange(!indexedLookup);
   PresetDialog->setCustomizableLoadAnnotations(indexedLookup);
+  PresetDialog->setCustomizableAnnotationsRegexp(indexedLookup && this->AllowsRegexpMatching);
   this->connect(PresetDialog.data(), &pqPresetDialog::applyPreset, this,
     &pqChooseColorPresetReaction::applyCurrentPreset);
   PresetDialog->show();
@@ -220,4 +222,10 @@ void pqChooseColorPresetReaction::applyCurrentPreset()
 
   emit this->presetApplied(
     QString(dialog->currentPreset().get("Name", "Preset").asString().c_str()));
+}
+
+//-----------------------------------------------------------------------------
+QRegularExpression pqChooseColorPresetReaction::regularExpression()
+{
+  return this->PresetDialog ? this->PresetDialog->regularExpression() : QRegularExpression();
 }

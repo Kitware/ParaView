@@ -561,6 +561,19 @@ public:
     // Make the vertical spacing bigger
     this->Ui.gradients->verticalHeader()->setDefaultSectionSize(
       (int)(this->Ui.gradients->verticalHeader()->defaultSectionSize() * 1.5));
+
+    QObject::connect(
+      this->Ui.useRegexp, &QCheckBox::stateChanged, [&]() { this->updateRegexpWidgets(); });
+    QObject::connect(
+      this->Ui.annotations, &QCheckBox::stateChanged, [&]() { this->updateRegexpWidgets(); });
+  }
+
+  void updateRegexpWidgets()
+  {
+    this->Ui.useRegexp->setEnabled(
+      this->Ui.annotations->isChecked() && this->Ui.annotations->isEnabled());
+    this->Ui.regexpLine->setEnabled(
+      this->Ui.useRegexp->isEnabled() && this->Ui.useRegexp->isChecked());
   }
 
   void setMode(Modes mode)
@@ -692,6 +705,17 @@ void pqPresetDialog::setCustomizableLoadAnnotations(bool state, bool defaultValu
   const Ui::pqPresetDialog& ui = this->Internals->Ui;
   ui.annotations->setVisible(state);
   ui.annotations->setChecked(defaultValue);
+  this->Internals->updateRegexpWidgets();
+}
+
+//-----------------------------------------------------------------------------
+void pqPresetDialog::setCustomizableAnnotationsRegexp(bool state, bool defaultValue)
+{
+  const Ui::pqPresetDialog& ui = this->Internals->Ui;
+  ui.useRegexp->setVisible(state);
+  ui.regexpLine->setVisible(state);
+  ui.useRegexp->setChecked(defaultValue);
+  ui.regexpLine->setEnabled(defaultValue);
 }
 
 //-----------------------------------------------------------------------------
@@ -799,6 +823,7 @@ void pqPresetDialog::updateForSelectedIndex(const QModelIndex& proxyIndex)
   ui.usePresetRange->setEnabled(!internals.Model->Presets->GetPresetHasIndexedColors(preset));
   ui.opacities->setEnabled(internals.Model->Presets->GetPresetHasOpacities(preset));
   ui.annotations->setEnabled(internals.Model->Presets->GetPresetHasAnnotations(preset));
+  this->Internals->updateRegexpWidgets();
   ui.apply->setEnabled(true);
   ui.exportPresets->setEnabled(true);
   ui.remove->setEnabled(internals.Model->flags(idx).testFlag(Qt::ItemIsEditable));
@@ -997,4 +1022,21 @@ void pqPresetDialog::setPresetIsAdvanced(int newState)
     internals.Model->removePresetFromDefaults(idx);
     internals.Ui.gradients->update(selectedRows[0]);
   }
+}
+
+//-----------------------------------------------------------------------------
+QRegularExpression pqPresetDialog::regularExpression()
+{
+  if (!this->Internals->Ui.useRegexp->isChecked())
+  {
+    return QRegularExpression();
+  }
+
+  auto regexp = QRegularExpression(this->Internals->Ui.regexpLine->text());
+  if (!regexp.isValid())
+  {
+    qWarning() << "invalid regular expression: `" << regexp.pattern().toStdString().c_str() << "`";
+  }
+
+  return regexp;
 }

@@ -141,6 +141,13 @@ public:
    */
   void allowsUserDefinedValues(bool allow);
   /**
+   * Setup ChooseColor dialog.
+   * If allow is true, add a line edit to specify a regexp to do the matching between data values
+   * and preset.
+   * Intended to be used for series preset.
+   */
+  void allowsRegexpMatching(bool allow);
+  /**
    * Show/Hide relevant widgets.
    * If enable is false, hide the buttons that save / load presets.
    */
@@ -159,10 +166,13 @@ public:
    */
   void setColumnVisibility(pqAnnotationsModel::ColumnRoles col, bool visible);
 
+  //@{
   /**
-   * Get the name of the current preset in use.
+   * Get / Set the name of the current preset in use.
    */
   const char* currentPresetName();
+  void setCurrentPresetName(const char* name);
+  //@}
 
   /**
    * Get the current annotation value.
@@ -173,6 +183,11 @@ public:
    * Get the selected annotations values.
    */
   QStringList selectedAnnotations();
+
+  /**
+   * Get the regular expression to use to apply the preset.
+   */
+  QRegularExpression presetRegularExpression();
 
 signals:
   /**
