@@ -81,7 +81,9 @@ There are four ways for loading plugins:
       on startup to load plugins. This environment variable needs to be set on
       both the client and server sides to load their respective plugins. Note
       that plugins in PV_PLUGIN_PATH are always auto-loaded irrespective of the
-      status of the `Auto Load` checkbox in the `Plugin Manager`.
+      status of the `Auto Load` checkbox in the `Plugin Manager`. Paths in this
+      list may also be of the structure created by the ParaView plugin macros
+      (e.g., `MyPlugin/MyPlugin.so`).
     - Finer control can be used using the `PV_PLUGIN_CONFIG_FILE` environment
       variable. `PV_PLUGIN_CONFIG_FILE` can be used to list a set of XML plugin
       configuration files (separated by colon (`:`) on Unix platforms or
