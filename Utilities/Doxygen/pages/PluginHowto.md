@@ -95,6 +95,8 @@ There are four ways for loading plugins:
 <?xml version="1.0"?>
 <Plugins>
   <Plugin name="MyPlugin" filename="/absolute/path/to/libMyPlugin.so"/>
+  <!-- Note that relative paths are calculated from the directory of this XML file. -->
+  <Plugin name="MyPluginRel" filename="relative/path/to/libMyPlugin.so"/>
 </Plugins>
 ```
 
