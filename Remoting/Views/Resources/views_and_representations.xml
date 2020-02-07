@@ -2664,7 +2664,7 @@
           animateable="0"
           number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Controls whether OSPRay casts shadow rays
+        <Documentation>Controls whether OSPRay raycaster back end casts shadow rays
         or not.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
@@ -2700,7 +2700,7 @@
             min="0"
             name="range"/>
         <Documentation>Sets the number of occlusion query rays that
-        OSPRay sends at each intersection.</Documentation>
+        OSPRay raycaster sends at each intersection.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -2718,8 +2718,8 @@
         <IntRangeDomain
             min="1"
             name="range"/>
-        <Documentation>Set the number of primary rays that OSPRay
-        shoots per pixel.</Documentation>
+        <Documentation>Set the number of primary rays that ray tracers
+        shoot per pixel.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -2738,7 +2738,7 @@
         <IntRangeDomain
             min="1"
             name="range"/>
-        <Documentation>Set the number of render passes OSPRay takes to
+        <Documentation>Set the number of render passes ray tracers take to
         improve image quality. Has no effect unless ParaView
         is started with the --enable-streaming option.</Documentation>
         <Hints>
@@ -2803,7 +2803,7 @@
         <IntRangeDomain
             min="0"
             name="range"/>
-        <Documentation>Set the size of the timestep cache that speeds up flip book animation in OSPRay.</Documentation>
+        <Documentation>Set the size of the timestep cache that speeds up flip book animation in ray tracers.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -2828,7 +2828,7 @@
                  value="3" />
         </EnumerationDomain>
         <Documentation>
-          Background behavior for path tracer. Backplate does not move or affect materials. Environment does.
+          Background behavior for path tracers. Backplate does not move or affect materials. Environment does.
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
@@ -2845,7 +2845,7 @@
           default_values="0.0 1.0 0.0"
           animateable="0"
           number_of_elements="3">
-        <Documentation>Sets north pole for gradient and image environmental background in path tracer.</Documentation>
+        <Documentation>Sets north pole for gradient and image environmental background in path tracers.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -2861,7 +2861,7 @@
           default_values="1.0 0.0 0.0"
           animateable="0"
           number_of_elements="3">
-        <Documentation>Sets east direction for image environmental background in path tracer.</Documentation>
+        <Documentation>Sets east direction for image environmental background in path tracers.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -3036,7 +3036,7 @@
         <Property name="BackgroundEast"/>
         <Property name="BackgroundMode"/>
       </PropertyGroup>
-      <PropertyGroup label="Path Traced Environmental Background" panel_widget="EnvironmentalBGEditor" panel_visibility="advanced">
+      <PropertyGroup label="Path Traced Environmental Background" panel_widget="EnvironmentalBGEditor" panel_visibility="default">
         <Property name="EnvironmentalBG"/>
         <Property name="EnvironmentalBG2"/>
         <Property name="UseGradientEnvironmentalBG"/>
