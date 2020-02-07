@@ -258,6 +258,7 @@ set(paraview_default_plugins
   EmbossingRepresentations
   EyeDomeLighting
   ExplicitStructuredGrid
+  FlipBookPlugin
   GenericIOReader
   GeodesicMeasurement
   GLTFReader
