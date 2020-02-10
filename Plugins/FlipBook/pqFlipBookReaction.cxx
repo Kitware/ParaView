@@ -270,11 +270,11 @@ void pqFlipBookReaction::updateVisibility()
   {
     return;
   }
-
-  for (size_t i = 0; i < this->VisibleRepresentations.size(); i++)
+  int nbReprs = this->VisibleRepresentations.size();
+  for (int i = 0; i < nbReprs; i++)
   {
     this->VisibleRepresentations[i]->setVisible(i == this->VisibilityIndex);
   }
-  this->VisibilityIndex = (this->VisibilityIndex + 1) % this->VisibleRepresentations.size();
+  this->VisibilityIndex = (this->VisibilityIndex + 1) % nbReprs;
   this->View->render();
 }
