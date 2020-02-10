@@ -126,6 +126,7 @@ set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
     - [ ] Docker: update default tag strings (in `Scripts/docker/ubuntu/Dockerfile`)
       - [ ] ARG PARAVIEW_TAG=v@VERSION@@RC@
       - [ ] ARG SUPERBUILD_TAG=v@VERSION@@RC@
+      - [ ] ARG PARAVIEW_VERSION_STRING=paraview-@MAJOR@.@MINOR@
     - [ ] Commit changes and push to GitLab
 ```
 git add versions.cmake CMakeLists.txt Scripts/docker/ubuntu/Dockerfile
