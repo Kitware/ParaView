@@ -945,6 +945,61 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkAdaptiveTemporalInterpolator"
+                 label="Temporal Interpolator"
+                 name="TemporalInterpolator">
+      <Documentation long_help="Interpolate between time steps."
+                     short_help="Interpolate between time steps.">The Temporal
+                     Interpolator converts data that is defined at discrete
+                     time steps to one that is defined over a continuum of time
+                     by linearly interpolating the data's field data between
+                     two adjacent time steps. The interpolated values are a
+                     simple approximation and should not be interpreted as
+                     anything more. The Temporal Interpolator assumes that the
+                     topology between adjacent time steps does not
+                     change.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input of the Temporal
+        Interpolator.</Documentation>
+      </InputProperty>
+      <DoubleVectorProperty command="SetDiscreteTimeStepInterval"
+                            default_values="0.0"
+                            name="DiscreteTimeStepInterval"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>If Discrete Time Step Interval is set to 0, then the
+        Temporal Interpolator will provide a continuous region of time on its
+        output. If set to anything else, then the output will define a finite
+        set of time points on its output, each spaced by the Discrete Time Step
+        Interval. The output will have (time range)/(discrete time step
+        interval) time steps. (Note that the time range is defined by the time
+        range of the data of the input filter, which may be different from
+        other pipeline objects or the range defined in the animation
+        inspector.) This is a useful option to use if you have a dataset with
+        one missing time step and wish to 'fill in' the missing data with an
+        interpolated value from the steps on either side.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimeRange">
+        <TimeRangeInformationHelper />
+      </DoubleVectorProperty>
+      <!-- End TemporalInterpolator -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkPMaskPoints"
                  label="Mask Points"
                  name="MaskPoints">
