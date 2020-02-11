@@ -83,7 +83,8 @@ $<$<BOOL:${_vtk_client_server_genex_include_directories}>:\n-I\'$<JOIN:${_vtk_cl
 
     add_custom_command(
       OUTPUT  "${_vtk_client_server_source_output}"
-      COMMAND ParaView::WrapClientServer
+      COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}
+              "$<TARGET_FILE:ParaView::WrapClientServer>"
               "@${_vtk_client_server_args_file}"
               -o "${_vtk_client_server_source_output}"
               "${_vtk_client_server_header}"
