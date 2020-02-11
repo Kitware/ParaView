@@ -460,9 +460,11 @@ void pqVRDockPanel::setActiveView(pqView* view)
   this->Internals->Camera = NULL;
   if (rview)
   {
-    if (vtkSMRenderViewProxy* renPxy = rview->getRenderViewProxy())
+    vtkSMRenderViewProxy* renPxy = rview->getRenderViewProxy();
+    if (renPxy)
     {
-      if (this->Internals->Camera = renPxy->GetActiveCamera())
+      this->Internals->Camera = renPxy->GetActiveCamera();
+      if (this->Internals->Camera)
       {
         pqCoreUtilities::connect(
           this->Internals->Camera, vtkCommand::ModifiedEvent, this, SLOT(updateDebugLabel()));

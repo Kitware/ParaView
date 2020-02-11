@@ -49,12 +49,12 @@ public:
   vtkTypeMacro(vtkVRTrackStyle, vtkVRInteractorStyle);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  virtual int GetControlledPropertySize() { return 16; }
+  int GetControlledPropertySize() override { return 16; }
 
 protected:
   vtkVRTrackStyle();
-  ~vtkVRTrackStyle();
-  virtual void HandleTracker(const vtkVREventData& data);
+  ~vtkVRTrackStyle() override;
+  void HandleTracker(const vtkVREventData& data) override;
 
 private:
   vtkVRTrackStyle(const vtkVRTrackStyle&) = delete;

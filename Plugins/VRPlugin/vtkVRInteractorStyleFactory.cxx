@@ -36,13 +36,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRControlSliceOrientationStyle.h"
 #include "vtkVRControlSlicePositionStyle.h"
 #include "vtkVRGrabWorldStyle.h"
+#include "vtkVRMovePointStyle.h"
 #include "vtkVRSpaceNavigatorGrabWorldStyle.h"
+#include "vtkVRStylusStyle.h"
 #include "vtkVRTrackStyle.h"
 #include "vtkVRVirtualHandStyle.h"
 
 //-----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRInteractorStyleFactory)
-  vtkVRInteractorStyleFactory* vtkVRInteractorStyleFactory::Instance = NULL;
+vtkStandardNewMacro(vtkVRInteractorStyleFactory);
+vtkVRInteractorStyleFactory* vtkVRInteractorStyleFactory::Instance = nullptr;
 
 //-----------------------------------------------------------------------------
 vtkVRInteractorStyleFactory::vtkVRInteractorStyleFactory()
@@ -70,6 +72,14 @@ vtkVRInteractorStyleFactory::vtkVRInteractorStyleFactory()
   // Add Virtual Hand - DJZ
   this->InteractorStyleClassNames.push_back("vtkVRVirtualHandStyle");
   this->InteractorStyleDescriptions.push_back("Virtual Hand");
+
+  // Add Stylus style
+  this->InteractorStyleClassNames.push_back("vtkVRStylusStyle");
+  this->InteractorStyleDescriptions.push_back("Stylus");
+
+  // Add Move Point style
+  this->InteractorStyleClassNames.push_back("vtkVRMovePointStyle");
+  this->InteractorStyleDescriptions.push_back("Move Point");
 }
 
 //-----------------------------------------------------------------------------
@@ -82,12 +92,12 @@ void vtkVRInteractorStyleFactory::SetInstance(vtkVRInteractorStyleFactory* ins)
 {
   if (vtkVRInteractorStyleFactory::Instance)
   {
-    vtkVRInteractorStyleFactory::Instance->UnRegister(NULL);
+    vtkVRInteractorStyleFactory::Instance->UnRegister(nullptr);
   }
 
   if (ins)
   {
-    ins->Register(NULL);
+    ins->Register(nullptr);
   }
 
   vtkVRInteractorStyleFactory::Instance = ins;
@@ -152,8 +162,16 @@ vtkVRInteractorStyle* vtkVRInteractorStyleFactory::NewInteractorStyleFromClassNa
   {
     return vtkVRVirtualHandStyle::New();
   }
+  else if (name == "vtkVRStylusStyle")
+  {
+    return vtkVRStylusStyle::New();
+  }
+  else if (name == "vtkVRMovePointStyle")
+  {
+    return vtkVRMovePointStyle::New();
+  }
 
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -167,7 +185,7 @@ vtkVRInteractorStyle* vtkVRInteractorStyleFactory::NewInteractorStyleFromDescrip
       return this->NewInteractorStyleFromClassName(this->InteractorStyleClassNames[i]);
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRSpaceNavigatorGrabWorldStyle.h
+   Module:    vtkVRMovePointStyle.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,35 +29,44 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef vtkVRSpaceNavigatorGrabWorldStyle_h_
-#define vtkVRSpaceNavigatorGrabWorldStyle_h_
+/**
+ * @class   vtkVRMovePointStyle
+ * @brief   an interaction style to control the position of a point with a stylus
+ *
+ * vtkVRMovePointStyle is an interaction style that uses the position of the
+ * tracker in screen space to modify the position of a 3D point.
+ */
+#ifndef vtkVRMovePointStyle_h_
+#define vtkVRMovePointStyle_h_
 
-#include "vtkVRInteractorStyle.h"
-
-class vtkSMDoubleVectorProperty;
-class vtkSMIntVectorProperty;
-class vtkSMProxy;
-class vtkSMRenderViewProxy;
-class vtkTransform;
+#include "vtkVRTrackStyle.h"
 
 struct vtkVREventData;
 
-class vtkVRSpaceNavigatorGrabWorldStyle : public vtkVRInteractorStyle
+class vtkVRMovePointStyle : public vtkVRTrackStyle
 {
 public:
-  static vtkVRSpaceNavigatorGrabWorldStyle* New();
-  vtkTypeMacro(vtkVRSpaceNavigatorGrabWorldStyle, vtkVRInteractorStyle);
+  static vtkVRMovePointStyle* New();
+  vtkTypeMacro(vtkVRMovePointStyle, vtkVRTrackStyle);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-protected:
-  vtkVRSpaceNavigatorGrabWorldStyle();
-  ~vtkVRSpaceNavigatorGrabWorldStyle() override;
+  int GetControlledPropertySize() override { return 3; }
 
-  void HandleAnalog(const vtkVREventData& data) override;
+protected:
+  vtkVRMovePointStyle();
+  ~vtkVRMovePointStyle() override = default;
+
+  void HandleButton(const vtkVREventData& data) override;
+  void HandleTracker(const vtkVREventData& data) override;
+
+  bool EnableMovePoint;
 
 private:
-  vtkVRSpaceNavigatorGrabWorldStyle(const vtkVRSpaceNavigatorGrabWorldStyle&) = delete;
-  void operator=(const vtkVRSpaceNavigatorGrabWorldStyle&) = delete;
+  vtkVRMovePointStyle(const vtkVRMovePointStyle&) = delete;
+  void operator=(const vtkVRMovePointStyle&) = delete;
+
+  double LastRecordedPosition[3];
+  bool PositionRecorded;
 };
 
-#endif // vtkVRSpaceNavigatorGrabWorldStyle.h_
+#endif // vtkVRMovePointStyle.h_

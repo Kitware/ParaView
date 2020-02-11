@@ -41,10 +41,14 @@ set(sources
   vtkVRInteractorStyle.h
   vtkVRInteractorStyleFactory.cxx
   vtkVRInteractorStyleFactory.h
+  vtkVRMovePointStyle.cxx
+  vtkVRMovePointStyle.h
   vtkVRQueue.cxx
   vtkVRQueue.h
   vtkVRSpaceNavigatorGrabWorldStyle.cxx
   vtkVRSpaceNavigatorGrabWorldStyle.h
+  vtkVRStylusStyle.cxx
+  vtkVRStylusStyle.h
   vtkVRTrackStyle.cxx
   vtkVRTrackStyle.h
   vtkVRVirtualHandStyle.cxx

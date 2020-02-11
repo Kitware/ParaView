@@ -44,20 +44,20 @@ public:
   vtkTypeMacro(vtkVRControlSliceOrientationStyle, vtkVRInteractorStyle);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  virtual int GetControlledPropertySize() { return 3; }
+  int GetControlledPropertySize() override { return 3; }
 
   /// called to update all the remote vtkObjects and perhaps even to render.
   /// Typically processing intensive operations go here. The method should not
   /// be called from within the handler and is reserved to be called from an
   /// external interaction style manager.
-  virtual bool Update();
+  bool Update() override;
 
 protected:
   vtkVRControlSliceOrientationStyle();
-  ~vtkVRControlSliceOrientationStyle();
+  ~vtkVRControlSliceOrientationStyle() override;
 
-  void HandleButton(const vtkVREventData& data);
-  void HandleTracker(const vtkVREventData& data);
+  void HandleButton(const vtkVREventData& data) override;
+  void HandleTracker(const vtkVREventData& data) override;
 
   bool Enabled;
   bool InitialOrientationRecorded;

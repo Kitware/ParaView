@@ -53,8 +53,8 @@ protected:
   vtkVRVirtualHandStyle();
   ~vtkVRVirtualHandStyle();
 
-  virtual void HandleButton(const vtkVREventData& data);
-  virtual void HandleTracker(const vtkVREventData& data);
+  void HandleButton(const vtkVREventData& data) override;
+  void HandleTracker(const vtkVREventData& data) override;
 
   bool CurrentButton;
   bool PrevButton;
