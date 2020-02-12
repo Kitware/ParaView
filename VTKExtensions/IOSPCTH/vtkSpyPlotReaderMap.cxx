@@ -3,8 +3,10 @@
 #include "vtkSpyPlotReader.h"
 #include "vtkSpyPlotUniReader.h"
 
+#include "vtksys/FStream.hxx"
+#include "vtksys/SystemTools.hxx"
+
 #include <assert.h>
-#include <vtksys/SystemTools.hxx>
 
 namespace
 {
@@ -83,7 +85,7 @@ bool vtkSpyPlotReaderMap::Initialize(const char* filename)
 {
   this->Clean(NULL);
 
-  ifstream ifs(filename);
+  vtksys::ifstream ifs(filename);
   if (!ifs)
   {
     vtkGenericWarningMacro("Error opening file " << filename);
@@ -238,7 +240,7 @@ bool vtkSpyPlotReaderMap::InitializeFromSpyFile(const char* filename)
 bool vtkSpyPlotReaderMap::InitializeFromCaseFile(const char* filename)
 {
   // Setup the filemap and spcth structures
-  ifstream ifs(filename);
+  vtksys::ifstream ifs(filename);
   if (!ifs)
   {
     vtkGenericWarningMacro("Error opening file " << filename);

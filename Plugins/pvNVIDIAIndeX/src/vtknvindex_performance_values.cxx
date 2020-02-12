@@ -25,10 +25,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <fstream>
 #include <iomanip>
 #include <iostream>
 
+#include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
 
 #include "vtknvindex_forwarding_logger.h"
@@ -56,7 +56,7 @@ void vtknvindex_performance_values::print_perf_values(
   // Prints only a subset of the full performance values that NVIDIA IndeX provides.
   // Additional fields can be added as and when required.
 
-  std::ofstream file_handler;
+  vtksys::ofstream file_handler;
   file_handler.open(m_performance_log_file.c_str(), std::ios::out | std::ios::app);
   std::ostringstream s;
   const std::streamsize ssize_time(10);

@@ -27,6 +27,10 @@
 
 #define GENERATE_DEBUG_LOG 0
 
+#if GENERATE_DEBUG_LOG
+#include "vtksys/FStream.hxx"
+#endif
+
 //****************************************************************************/
 //                    Internal Classes and typedefs
 //****************************************************************************/
@@ -34,7 +38,7 @@ class vtkCompositeMultiProcessController::vtkCompositeInternals
 {
 public:
 #if GENERATE_DEBUG_LOG
-  ofstream LogFile;
+  vtksys::ofstream LogFile;
 #endif
   struct RMICallbackInfo
   {

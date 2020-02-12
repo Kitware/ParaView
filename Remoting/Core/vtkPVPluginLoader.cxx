@@ -27,6 +27,8 @@
 #include "vtkPVServerManagerPluginInterface.h"
 #include "vtkPVXMLParser.h"
 #include "vtkProcessModule.h"
+
+#include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
 
 #include <cstdlib>
@@ -73,7 +75,7 @@ public:
     vtkPVXMLOnlyPlugin* instance = new vtkPVXMLOnlyPlugin();
     instance->PluginName = vtksys::SystemTools::GetFilenameWithoutExtension(xmlfile);
 
-    ifstream is;
+    vtksys::ifstream is;
     is.open(xmlfile, ios::binary);
     // get length of file:
     is.seekg(0, ios::end);

@@ -49,6 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 
+#include "vtksys/FStream.hxx"
+
 class pqCustomFilterManagerForm : public Ui::pqCustomFilterManager
 {
 };
@@ -214,7 +216,7 @@ void pqCustomFilterManager::exportSelected(const QStringList& files)
   QStringList::ConstIterator jter = files.begin();
   for (; jter != files.end(); ++jter)
   {
-    ofstream os((*jter).toLocal8Bit().data(), ios::out);
+    vtksys::ofstream os((*jter).toLocal8Bit().data(), ios::out);
     root->PrintXML(os, vtkIndent());
   }
 

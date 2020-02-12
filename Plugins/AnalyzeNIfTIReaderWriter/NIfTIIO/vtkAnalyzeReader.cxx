@@ -34,6 +34,8 @@
 #define NAME_ARRAY "Name"
 #define DEFAULT_NAME ""
 
+#include "vtksys/FStream.hxx"
+
 vtkStandardNewMacro(vtkAnalyzeReader);
 
 //----------------------------------------------------------------------------
@@ -1381,7 +1383,7 @@ int vtkAnalyzeReader::CanReadFile(const char* fname)
     return false;
   }
 
-  ifstream local_InputStream;
+  vtksys::ifstream local_InputStream;
   local_InputStream.open(HeaderFileName.c_str(), ios::in | ios::binary);
   if (local_InputStream.fail())
   {

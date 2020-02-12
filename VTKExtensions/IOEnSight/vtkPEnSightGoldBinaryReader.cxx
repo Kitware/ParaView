@@ -15,7 +15,8 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
 
-#include <vtksys/SystemTools.hxx>
+#include "vtksys/FStream.hxx"
+#include "vtksys/SystemTools.hxx"
 
 #include <ctype.h>
 #include <string>
@@ -48,12 +49,7 @@ vtkPEnSightGoldBinaryReader::vtkPEnSightGoldBinaryReader()
 //----------------------------------------------------------------------------
 vtkPEnSightGoldBinaryReader::~vtkPEnSightGoldBinaryReader()
 {
-  if (this->IFile)
-  {
-    this->IFile->close();
-    delete this->IFile;
-    this->IFile = NULL;
-  }
+  delete this->IFile;
   delete[] this->FloatBuffer[2];
   delete[] this->FloatBuffer[1];
   delete[] this->FloatBuffer[0];
@@ -70,12 +66,8 @@ int vtkPEnSightGoldBinaryReader::OpenFile(const char* filename)
   }
 
   // Close file from any previous image
-  if (this->IFile)
-  {
-    this->IFile->close();
-    delete this->IFile;
-    this->IFile = NULL;
-  }
+  delete this->IFile;
+  this->IFile = NULL;
 
   // Open the new file
   vtkDebugMacro(<< "Opening file " << filename);
@@ -86,9 +78,9 @@ int vtkPEnSightGoldBinaryReader::OpenFile(const char* filename)
     this->FileSize = (long)(fs.st_size);
 
 #ifdef _WIN32
-    this->IFile = new ifstream(filename, ios::in | ios::binary);
+    this->IFile = new vtksys::ifstream(filename, ios::in | ios::binary);
 #else
-    this->IFile = new ifstream(filename, ios::in);
+    this->IFile = new vtksys::ifstream(filename, ios::in);
 #endif
   }
   else
@@ -391,24 +383,17 @@ int vtkPEnSightGoldBinaryReader::ReadGeometryFile(
       if (lineRead < 0)
       {
         free(name);
-        if (this->IFile)
-        {
-          this->IFile->close();
-          delete this->IFile;
-          this->IFile = NULL;
-        }
+        delete this->IFile;
+        this->IFile = NULL;
         return 0;
       }
     }
     free(name);
   }
 
-  if (this->IFile)
-  {
-    this->IFile->close();
-    delete this->IFile;
-    this->IFile = NULL;
-  }
+  delete this->IFile;
+  this->IFile = NULL;
+
   if (lineRead < 0)
   {
     return 0;
@@ -536,12 +521,8 @@ int vtkPEnSightGoldBinaryReader::SkipTimeStep()
 
   if (lineRead < 0)
   {
-    if (this->IFile)
-    {
-      this->IFile->close();
-      delete this->IFile;
-      this->IFile = NULL;
-    }
+    delete this->IFile;
+    this->IFile = NULL;
     return 0;
   }
 
@@ -1278,13 +1259,9 @@ int vtkPEnSightGoldBinaryReader::ReadMeasuredGeometryFile(
   delete[] xCoords;
   delete[] yCoords;
   delete[] zCoords;
+  delete this->IFile;
+  this->IFile = NULL;
 
-  if (this->IFile)
-  {
-    this->IFile->close();
-    delete this->IFile;
-    this->IFile = NULL;
-  }
   return 1;
 }
 
@@ -1433,12 +1410,10 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerNode(const char* fileName, const 
       scalars->Delete();
       delete[] scalarsRead;
     }
-    if (this->IFile)
-    {
-      this->IFile->close();
-      delete this->IFile;
-      this->IFile = NULL;
-    }
+
+    delete this->IFile;
+    this->IFile = NULL;
+
     return 1;
   }
 
@@ -1500,12 +1475,9 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerNode(const char* fileName, const 
     lineRead = this->ReadLine(line);
   }
 
-  if (this->IFile)
-  {
-    this->IFile->close();
-    delete this->IFile;
-    this->IFile = NULL;
-  }
+  delete this->IFile;
+  this->IFile = NULL;
+
   return 1;
 }
 
@@ -1654,12 +1626,10 @@ int vtkPEnSightGoldBinaryReader::ReadVectorsPerNode(const char* fileName, const 
       }
       vectors->Delete();
     }
-    if (this->IFile)
-    {
-      this->IFile->close();
-      delete this->IFile;
-      this->IFile = NULL;
-    }
+
+    delete this->IFile;
+    this->IFile = NULL;
+
     return 1;
   }
 
@@ -1711,12 +1681,8 @@ int vtkPEnSightGoldBinaryReader::ReadVectorsPerNode(const char* fileName, const 
     lineRead = this->ReadLine(line);
   }
 
-  if (this->IFile)
-  {
-    this->IFile->close();
-    delete this->IFile;
-    this->IFile = NULL;
-  }
+  delete this->IFile;
+  this->IFile = NULL;
 
   return 1;
 }
@@ -1874,12 +1840,8 @@ int vtkPEnSightGoldBinaryReader::ReadTensorsPerNode(const char* fileName, const 
     lineRead = this->ReadLine(line);
   }
 
-  if (this->IFile)
-  {
-    this->IFile->close();
-    delete this->IFile;
-    this->IFile = NULL;
-  }
+  delete this->IFile;
+  this->IFile = NULL;
 
   return 1;
 }
@@ -1982,12 +1944,8 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerElement(const char* fileName,
               if (elementType == -1)
               {
                 vtkErrorMacro("Unknown element type \"" << line << "\"");
-                if (this->IFile)
-                {
-                  this->IFile->close();
-                  delete this->IFile;
-                  this->IFile = NULL;
-                }
+                delete this->IFile;
+                this->IFile = NULL;
                 return 0;
               }
               idx = this->UnstructuredPartIds->IsId(realId);
@@ -2069,12 +2027,9 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerElement(const char* fileName,
           if (elementType == -1)
           {
             vtkErrorMacro("Unknown element type \"" << line << "\"");
-            if (this->IFile)
-            {
-              this->IFile->close();
-              delete this->IFile;
-              this->IFile = NULL;
-            }
+            delete this->IFile;
+            this->IFile = NULL;
+
             if (component == 0)
             {
               scalars->Delete();
@@ -2131,12 +2086,9 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerElement(const char* fileName,
     }
   }
 
-  if (this->IFile)
-  {
-    this->IFile->close();
-    delete this->IFile;
-    this->IFile = NULL;
-  }
+  delete this->IFile;
+  this->IFile = NULL;
+
   return 1;
 }
 
@@ -2380,12 +2332,9 @@ int vtkPEnSightGoldBinaryReader::ReadVectorsPerElement(const char* fileName,
     }
   }
 
-  if (this->IFile)
-  {
-    this->IFile->close();
-    delete this->IFile;
-    this->IFile = NULL;
-  }
+  delete this->IFile;
+  this->IFile = NULL;
+
   return 1;
 }
 
@@ -2650,12 +2599,9 @@ int vtkPEnSightGoldBinaryReader::ReadTensorsPerElement(const char* fileName,
     }
   }
 
-  if (this->IFile)
-  {
-    this->IFile->close();
-    delete this->IFile;
-    this->IFile = NULL;
-  }
+  delete this->IFile;
+  this->IFile = NULL;
+
   return 1;
 }
 

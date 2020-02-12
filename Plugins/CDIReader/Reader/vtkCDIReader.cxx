@@ -56,6 +56,8 @@
 #include "vtkStringArray.h"
 #include "vtkUnstructuredGrid.h"
 
+#include "vtksys/FStream.hxx"
+
 #include "cdi.h"
 #include "vtk_netcdf.h"
 
@@ -1467,7 +1469,7 @@ int vtkCDIReader::GetVars()
 
   // prepare data structure and read in names
   string filename = PerformanceDataFile + "0000";
-  ifstream file(filename.c_str());
+  vtksys::ifstream file(filename.c_str());
   if (file.good())
   {
     this->HaveDomainData = true;
@@ -2835,7 +2837,7 @@ int vtkCDIReader::LoadDomainVarData(int variableIndex)
 
     vector<string> wordVec;
     vector<string>::iterator k;
-    ifstream file(filename.c_str());
+    vtksys::ifstream file(filename.c_str());
     string str, word;
     double temp[1];
 

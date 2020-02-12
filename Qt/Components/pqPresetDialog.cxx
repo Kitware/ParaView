@@ -43,7 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMTransferFunctionPresets.h"
 #include "vtkSMTransferFunctionProxy.h"
 
-#include <vtk_jsoncpp.h>
+#include "vtksys/FStream.hxx"
+
+#include "vtk_jsoncpp.h"
 
 #include <QInputEvent>
 #include <QList>
@@ -952,7 +954,7 @@ void pqPresetDialog::exportPresets()
   }
   assert(presetCollection.size() > 0);
 
-  ofstream outfs;
+  vtksys::ofstream outfs;
   outfs.open(filename.toStdString().c_str());
   if (!outfs.is_open())
   {

@@ -79,6 +79,8 @@
 #include "vtkXMLDataElement.h"
 #include "vtkXMLDataObjectWriter.h"
 #include "vtkXMLUtilities.h"
+
+#include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
 
 #include "vtkPVLODActor.h"
@@ -2119,7 +2121,7 @@ void vtkPVOpenVRHelper::ExportLocationsAsSkyboxes(vtkSMViewProxy* smview)
 
   std::string dir = "pv-skybox/";
   vtksys::SystemTools::MakeDirectory(dir);
-  ofstream json("pv-skybox/index.json");
+  vtksys::ofstream json("pv-skybox/index.json");
   json << "{ \"data\": [ { \"mimeType\": \"image/jpg\","
           "\"pattern\": \"{poseIndex}/{orientation}.jpg\","
           "\"type\": \"blob\", \"name\": \"image\", \"metadata\": {}}], "

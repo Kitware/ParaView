@@ -11,7 +11,6 @@
 #include "nlohmann/json.hpp"
 
 #include <array>
-#include <fstream>
 #include <set>
 #include <string>
 #include <vector>
@@ -169,7 +168,7 @@ protected:
   /// Get grid topology on rank 0.
   ///
   /// This sets IJKDivs on rank 0.
-  void ScanBlocks(std::ifstream& file, int nblocks);
+  void ScanBlocks(istream& file, int nblocks);
 
   /// Broadcast grid topology from rank 0.
   ///
@@ -188,9 +187,9 @@ protected:
   /// subgrid header just past the end of known space.
   std::streamoff GetEndOffset(Domain dom) const;
 
-  static bool ReadSubgridHeader(ifstream& pfb, vtkVector3i& si, vtkVector3i& sn, vtkVector3i& sr);
+  static bool ReadSubgridHeader(istream& pfb, vtkVector3i& si, vtkVector3i& sn, vtkVector3i& sr);
 
-  static bool ReadComponentSubgridOverlap(ifstream& pfb, const vtkVector3i& si,
+  static bool ReadComponentSubgridOverlap(istream& pfb, const vtkVector3i& si,
     const vtkVector3i& sn, const int extent[6], int component, vtkDoubleArray* variable);
 
   int LoadPFBComponent(Domain dom, vtkDoubleArray* variable, const std::string& filename,

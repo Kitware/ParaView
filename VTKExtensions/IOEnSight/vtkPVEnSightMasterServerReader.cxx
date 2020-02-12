@@ -33,6 +33,8 @@
 #include "vtkMPICommunicator.h"
 #endif
 
+#include "vtksys/FStream.hxx"
+
 #include <string>
 #include <vector>
 
@@ -429,7 +431,7 @@ int vtkPVEnSightMasterServerReader::ParseMasterServerFile()
   }
 
   // Open the file for reading.
-  ifstream fin(sfilename.c_str(), ios::in);
+  vtksys::ifstream fin(sfilename.c_str(), ios::in);
   if (!fin)
   {
     vtkErrorMacro("Unable to open file: " << sfilename.c_str());

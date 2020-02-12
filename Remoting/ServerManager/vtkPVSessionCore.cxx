@@ -36,8 +36,9 @@
 #include "vtkSMMessage.h"
 #include "vtkSmartPointer.h"
 
+#include "vtksys/FStream.hxx"
+
 #include <assert.h>
-#include <fstream>
 #include <set>
 #include <sstream>
 #include <string>
@@ -293,7 +294,7 @@ vtkPVSessionCore::vtkPVSessionCore()
       {
         filename << this->ParallelController->GetLocalProcessId();
       }
-      this->LogStream = new ofstream(filename.str().c_str());
+      this->LogStream = new vtksys::ofstream(filename.str().c_str());
       LOG("Log for " << options->GetArgv0() << " (" << this->ParallelController->GetLocalProcessId()
                      << ")");
     }

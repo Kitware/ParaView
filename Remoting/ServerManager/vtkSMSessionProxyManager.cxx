@@ -50,12 +50,14 @@
 #include "vtkStringList.h"
 #include "vtkVersion.h"
 
+#include "vtksys/FStream.hxx"
+#include "vtksys/RegularExpression.hxx"
+
 #include <assert.h>
 #include <map>
 #include <set>
 #include <sstream>
 #include <vector>
-#include <vtksys/RegularExpression.hxx>
 
 #include "vtkSMSessionProxyManagerInternals.h"
 
@@ -1261,7 +1263,7 @@ void vtkSMSessionProxyManager::LoadXMLState(
 bool vtkSMSessionProxyManager::SaveXMLState(const char* filename)
 {
   vtkPVXMLElement* rootElement = this->SaveXMLState();
-  ofstream os(filename, ios::out);
+  vtksys::ofstream os(filename, ios::out);
   if (!os.is_open())
   {
     return false;

@@ -196,7 +196,7 @@ protected:
 
   // A stream to which a log is written.
   ostream* LogStream;
-  ofstream* LogFileStream;
+  ostream* LogFileStream;
 
   // Internal message processing functions.
   int ProcessCommandNew(const vtkClientServerStream& css, int midx);

@@ -50,6 +50,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSpyPlotReaderMap.h"
 #include "vtkSpyPlotUniReader.h"
 
+#include "vtksys/FStream.hxx"
+#include "vtksys/SystemTools.hxx"
+
 #include <cassert>
 #include <cctype>
 #include <cmath>
@@ -57,7 +60,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include <set>
 #include <string>
 #include <vector>
-#include <vtksys/SystemTools.hxx>
 
 #define vtkMIN(x, y) (((x) < (y)) ? (x) : (y))
 
@@ -1289,7 +1291,7 @@ int vtkSpyPlotReader::MergeVectors(vtkDataSetAttributes* da, vtkDataArray* a1, v
 //-----------------------------------------------------------------------------
 int vtkSpyPlotReader::CanReadFile(const char* fname)
 {
-  ifstream ifs(fname, ios::binary | ios::in);
+  vtksys::ifstream ifs(fname, ios::binary | ios::in);
   if (!ifs)
   {
     return 0;

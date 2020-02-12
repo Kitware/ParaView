@@ -22,8 +22,10 @@
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkTuple.h"
 
-#include "vtk_jsoncpp.h"
+#include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
+
+#include "vtk_jsoncpp.h"
 
 #include <cassert>
 #include <list>
@@ -143,7 +145,7 @@ public:
     Json::CharReaderBuilder builder;
     builder["collectComments"] = false;
     Json::Value root;
-    ifstream file;
+    vtksys::ifstream file;
     file.open(filename);
     if (!file)
     {
@@ -485,7 +487,7 @@ bool vtkSMTransferFunctionPresets::ImportPresets(const char* filename)
   if (vtksys::SystemTools::LowerCase(vtksys::SystemTools::GetFilenameLastExtension(filename)) ==
     ".xml")
   {
-    ifstream in(filename);
+    vtksys::ifstream in(filename);
     if (in)
     {
       std::ostringstream contents;

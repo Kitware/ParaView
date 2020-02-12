@@ -28,7 +28,6 @@
 #ifndef vtknvindex_performance_values_h
 #define vtknvindex_performance_values_h
 
-#include <fstream>
 #include <string>
 
 #include "vtksys/SystemInformation.hxx"
