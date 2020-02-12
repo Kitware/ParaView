@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRSpaceNavigatorGrabWorldStyle.h
+   Module:    vtkVRStylusStyle.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,35 +29,45 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef vtkVRSpaceNavigatorGrabWorldStyle_h_
-#define vtkVRSpaceNavigatorGrabWorldStyle_h_
+/**
+ * @class   vtkVRStylusStyle
+ * @brief   an interaction style to control translation and rotation with a stylus
+ *
+ * vtkVRStylusStyle is an interaction style that uses the position of the
+ * stylus in screen space (for example the stylus of the zSpace) to modify a 4x4 matrix.
+ * Only the position of the stylus is used, the rotation has no effect.
+ * Only works with render view proxy.
+ */
+#ifndef vtkVRStylusStyle_h_
+#define vtkVRStylusStyle_h_
 
-#include "vtkVRInteractorStyle.h"
-
-class vtkSMDoubleVectorProperty;
-class vtkSMIntVectorProperty;
-class vtkSMProxy;
-class vtkSMRenderViewProxy;
-class vtkTransform;
+#include "vtkVRTrackStyle.h"
 
 struct vtkVREventData;
 
-class vtkVRSpaceNavigatorGrabWorldStyle : public vtkVRInteractorStyle
+class vtkVRStylusStyle : public vtkVRTrackStyle
 {
 public:
-  static vtkVRSpaceNavigatorGrabWorldStyle* New();
-  vtkTypeMacro(vtkVRSpaceNavigatorGrabWorldStyle, vtkVRInteractorStyle);
+  static vtkVRStylusStyle* New();
+  vtkTypeMacro(vtkVRStylusStyle, vtkVRTrackStyle);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
-  vtkVRSpaceNavigatorGrabWorldStyle();
-  ~vtkVRSpaceNavigatorGrabWorldStyle() override;
+  vtkVRStylusStyle();
+  ~vtkVRStylusStyle() override = default;
 
-  void HandleAnalog(const vtkVREventData& data) override;
+  void HandleButton(const vtkVREventData& data) override;
+  void HandleTracker(const vtkVREventData& data) override;
+
+  bool EnableTranslate;
+  bool EnableRotate;
 
 private:
-  vtkVRSpaceNavigatorGrabWorldStyle(const vtkVRSpaceNavigatorGrabWorldStyle&) = delete;
-  void operator=(const vtkVRSpaceNavigatorGrabWorldStyle&) = delete;
+  vtkVRStylusStyle(const vtkVRStylusStyle&) = delete;
+  void operator=(const vtkVRStylusStyle&) = delete;
+
+  double LastRecordedPosition[3];
+  bool PositionRecorded;
 };
 
-#endif // vtkVRSpaceNavigatorGrabWorldStyle.h_
+#endif // vtkVRStylusStyle.h_

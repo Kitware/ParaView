@@ -224,7 +224,9 @@ void pqAnimatablePropertiesComboBox::buildPropertyListInternal(
 //-----------------------------------------------------------------------------
 void pqAnimatablePropertiesComboBox::addDisplayProperties(vtkSMProxy* proxy)
 {
-  if (!proxy || !proxy->IsA("vtkSMSourceProxy"))
+  // if the vector size is set and not set to 1, we should not add Visibility and Opacity
+  // which have only 1 component
+  if (!proxy || !proxy->IsA("vtkSMSourceProxy") || this->Internal->VectorSizeFilter > 1)
   {
     return;
   }
