@@ -45,12 +45,7 @@ class pqAnimationKeyFrame;
 class PQWIDGETS_EXPORT pqAnimationTrack : public QObject, public QGraphicsItem
 {
   Q_OBJECT
-/**
-* Declare the interfaces implemented - fails with Qt 4.5, warns on 4.6
-*/
-#if QT_VERSION >= 0x40600
   Q_INTERFACES(QGraphicsItem)
-#endif
   /**
   * the property animated in this track
   */

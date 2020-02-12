@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QFontMetrics>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -61,7 +62,14 @@ pqPythonScriptEditor::pqPythonScriptEditor(QWidget* p)
 {
   this->pythonManager = NULL;
   this->TextEdit = new QTextEdit;
-  this->TextEdit->setTabStopWidth(4);
+// tab is 4 spaces
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+  this->TextEdit->setTabStopDistance(this->fontMetrics().horizontalAdvance("    "));
+#elif (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+  this->TextEdit->setTabStopDistance(this->fontMetrics().width("    "));
+#else
+  this->TextEdit->setTabStopWidth(this->fontMetrics().width("    "));
+#endif
   this->setCentralWidget(this->TextEdit);
   this->createActions();
   this->createMenus();

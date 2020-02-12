@@ -64,9 +64,7 @@ class PQWIDGETS_EXPORT pqAnimationKeyFrame : public QObject, public QGraphicsIte
   * an icon to help describe the keyframe
   */
   Q_PROPERTY(QIcon icon READ icon WRITE setIcon)
-#if QT_VERSION >= 0x40600
   Q_INTERFACES(QGraphicsItem)
-#endif
 public:
   pqAnimationKeyFrame(pqAnimationTrack* p);
   ~pqAnimationKeyFrame() override;

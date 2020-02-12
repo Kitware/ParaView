@@ -59,10 +59,6 @@ using Ui::pqMemoryInspectorPanelForm;
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
 
-#if QT_VERSION < 0x050000
-#include <QPlastiqueStyle>
-#endif
-
 #include <map>
 using std::map;
 using std::pair;
@@ -127,7 +123,6 @@ enum
 
 namespace
 {
-#if QT_VERSION >= 0x050000
 // ****************************************************************************
 QStyle* getMemoryUseWidgetStyle()
 {
@@ -139,19 +134,6 @@ QStyle* getMemoryUseWidgetStyle()
   static QStyle* style = QStyleFactory::create("fusion");
   return style;
 }
-#else
-// ****************************************************************************
-QPlastiqueStyle* getMemoryUseWidgetStyle()
-{
-  // this sets the style for the progress bar used to
-  // display % memory usage. If we didn't do this the
-  // display will look different on each OS. The ownership
-  // of the style does not change hands when it's set to
-  // the widget thus a single static instance is convenient.
-  static QPlastiqueStyle style;
-  return &style;
-}
-#endif
 // ****************************************************************************
 float getSystemWarningThreshold()
 {
@@ -431,11 +413,19 @@ void RankData::InitializeMemoryUseWidget()
   pid->setAutoFillBackground(true);
 
   QFontMetrics fontMet(font);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+  int rankWid = fontMet.horizontalAdvance("555555");
+#else
   int rankWid = fontMet.width("555555");
+#endif
   rank->setMinimumWidth(rankWid);
   rank->setMaximumWidth(rankWid);
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+  int pidWid = fontMet.horizontalAdvance("555555555");
+#else
   int pidWid = fontMet.width("555555555");
+#endif
   pid->setMinimumWidth(pidWid);
   pid->setMaximumWidth(pidWid);
 

@@ -360,14 +360,6 @@ void pqInteractiveViewLink::drawViewLink(int setFront)
     return;
   }
 
-#if QT_VERSION < 0x050000
-  // Switch to offscreen buffer if rendering
-  if (render)
-  {
-    this->Internal->LinkedWindow->SetUseOffScreenBuffers(true);
-  }
-#endif
-
   // Compute adapted position and size of the pixel needed on the
   // linked window
   int linkedPos[2];
@@ -422,14 +414,6 @@ void pqInteractiveViewLink::drawViewLink(int setFront)
   this->Internal->DisplayWindow->SetRGBACharPixelData(displayPos[0], displayPos[1],
     displayPos[0] + displayPos2[0] - 1, displayPos[1] + displayPos2[1] - 1,
     this->Internal->DisplayPixels.Get(), setFront, 1);
-
-#if QT_VERSION < 0x050000
-  // Set offscreen buffers back
-  if (render)
-  {
-    this->Internal->LinkedWindow->SetUseOffScreenBuffers(false);
-  }
-#endif
 }
 
 //-----------------------------------------------------------------------------

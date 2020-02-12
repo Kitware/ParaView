@@ -164,11 +164,7 @@ void pqIntegrationModelSurfaceHelperWidget::resetSurfaceWidget(bool force)
         QStandardItemModel* model = new QStandardItemModel(nLeafs, nComponents);
         table->setModel(model);
         table->horizontalHeader()->setHighlightSections(false);
-#if QT_VERSION >= 0x050000
         table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-#else
-        table->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
-#endif
         table->horizontalHeader()->setStretchLastSection(true);
         table->horizontalHeader()->hide();
         QObject::connect(

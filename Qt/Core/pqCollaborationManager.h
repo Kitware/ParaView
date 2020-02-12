@@ -41,7 +41,6 @@ class pqServer;
 class pqView;
 class pqPipelineSource;
 class vtkSMCollaborationManager;
-class QSignalMapper;
 class QMouseEvent;
 
 /**

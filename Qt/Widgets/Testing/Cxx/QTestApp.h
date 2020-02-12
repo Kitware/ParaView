@@ -14,11 +14,7 @@ public:
 
   static int exec();
 
-#if QT_VERSION >= 0x050000
   static void messageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg);
-#else
-  static void messageHandler(QtMsgType type, const char* msg);
-#endif
 
   static void delay(int ms);
 

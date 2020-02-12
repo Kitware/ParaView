@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMenu>
 #include <QPointer>
-#include <QSignalMapper>
+#include <QRegularExpression>
 #include <QtDebug>
 
 class pqCalculatorWidget::pqInternals : public Ui::CalculatorWidget
@@ -96,36 +96,24 @@ pqCalculatorWidget::pqCalculatorWidget(
   //--------------------------------------------------------------------------
   // connect all buttons for which the text of the button
   // is the same as what goes into the function
-  QRegExp regexp("^([ijk]Hat|ln|log10|sin|cos|"
-                 "tan|asin|acos|atan|sinh|cosh|tanh|"
-                 "sqrt|exp|ceil|floor|abs|norm|mag|"
-                 "LeftParentheses|RightParentheses|"
-                 "Divide|Multiply|Minus|Plus)$");
+  QRegularExpression regexp("^([ijk]Hat|ln|log10|sin|cos|"
+                            "tan|asin|acos|atan|sinh|cosh|tanh|"
+                            "sqrt|exp|ceil|floor|abs|norm|mag|"
+                            "LeftParentheses|RightParentheses|"
+                            "Divide|Multiply|Minus|Plus)$");
 
   QList<QToolButton*> buttons;
   buttons = this->findChildren<QToolButton*>(regexp);
   foreach (QToolButton* tb, buttons)
   {
-    QSignalMapper* mapper = new QSignalMapper(tb);
-    QObject::connect(tb, SIGNAL(pressed()), mapper, SLOT(map()));
-    mapper->setMapping(tb, tb->text());
-    QObject::connect(
-      mapper, SIGNAL(mapped(const QString&)), this, SLOT(buttonPressed(const QString&)));
+    QObject::connect(tb, &QToolButton::pressed, this, [=]() { this->buttonPressed(tb->text()); });
   }
 
-  QToolButton* tb = this->Internals->xy;
-  QSignalMapper* mapper = new QSignalMapper(tb);
-  QObject::connect(tb, SIGNAL(pressed()), mapper, SLOT(map()));
-  mapper->setMapping(tb, "^");
   QObject::connect(
-    mapper, SIGNAL(mapped(const QString&)), this, SLOT(buttonPressed(const QString&)));
+    this->Internals->xy, &QToolButton::pressed, this, [=]() { this->buttonPressed("^"); });
+  QObject::connect(
+    this->Internals->v1v2, &QToolButton::pressed, this, [=]() { this->buttonPressed("."); });
 
-  tb = this->Internals->v1v2;
-  mapper = new QSignalMapper(tb);
-  QObject::connect(tb, SIGNAL(pressed()), mapper, SLOT(map()));
-  mapper->setMapping(tb, ".");
-  QObject::connect(
-    mapper, SIGNAL(mapped(const QString&)), this, SLOT(buttonPressed(const QString&)));
   //--------------------------------------------------------------------------
 
   this->addPropertyLink(

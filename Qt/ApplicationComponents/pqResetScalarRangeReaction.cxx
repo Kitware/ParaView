@@ -50,7 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMTransferFunctionProxy.h"
 
 #include <QDebug>
-#include <QSignalMapper>
 
 namespace
 {
@@ -256,17 +255,11 @@ bool pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(pqPipelineRepres
   Ui::ResetScalarRangeToDataOverTime ui;
   ui.setupUi(&dialog);
 
-  QSignalMapper smapper;
-  smapper.setMapping(ui.RescaleButton, QDialog::Accepted);
-  smapper.connect(ui.RescaleButton, SIGNAL(clicked()), SLOT(map()));
+  connect(ui.RescaleButton, &QPushButton::clicked, [&]() { dialog.done(QDialog::Accepted); });
+  connect(ui.RescaleAndLockButton, &QPushButton::clicked,
+    [&]() { dialog.done(static_cast<int>(QDialog::Accepted) + 1); });
+  connect(ui.CancelButton, &QPushButton::clicked, [&]() { dialog.done(QDialog::Rejected); });
 
-  smapper.setMapping(ui.RescaleAndLockButton, static_cast<int>(QDialog::Accepted) + 1);
-  smapper.connect(ui.RescaleAndLockButton, SIGNAL(clicked()), SLOT(map()));
-
-  smapper.setMapping(ui.CancelButton, QDialog::Rejected);
-  smapper.connect(ui.CancelButton, SIGNAL(clicked()), SLOT(map()));
-
-  dialog.connect(&smapper, SIGNAL(mapped(int)), SLOT(done(int)));
   int retcode = dialog.exec();
   if (retcode != QDialog::Rejected)
   {

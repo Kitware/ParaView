@@ -209,11 +209,7 @@ pqCheckableHeaderView::pqCheckableHeaderView(Qt::Orientation orientation, QWidge
 {
   this->Internal = new pqCheckableHeaderViewInternal();
   this->Internal->Style = this->style();
-#if QT_VERSION >= 0x050000
   setSectionsClickable(true);
-#else
-  setClickable(true);
-#endif
   QObject::connect(this, SIGNAL(checkStateChanged(int)), this, SLOT(updateSection(int)));
 }
 
