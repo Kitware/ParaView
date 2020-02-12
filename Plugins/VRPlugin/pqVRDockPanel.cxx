@@ -70,7 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtCore/QMap>
 #include <QtCore/QPointer>
 
-#include <fstream>
+#include <vtksys/FStream.hxx>
 
 class pqVRDockPanel::pqInternals : public Ui::VRDockPanel
 {
@@ -504,7 +504,7 @@ void pqVRDockPanel::saveState()
 
   // Avoid temporary QByteArrays in QString --> const char * conversion:
   QByteArray filename_ba = filename.toLocal8Bit();
-  ofstream os(filename_ba.constData(), ios::out);
+  vtksys::ofstream os(filename_ba.constData(), ios::out);
   root->PrintXML(os, vtkIndent());
 }
 
