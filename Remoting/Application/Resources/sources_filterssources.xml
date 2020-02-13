@@ -146,6 +146,18 @@
                  value="72" />
           <Entry text="Lagrange Wedge"
                  value="73" />
+          <Entry text="Bezier Curve"
+                 value="75" />
+          <Entry text="Bezier Triangle"
+                 value="76" />
+          <Entry text="Bezier Quadrilateral"
+                 value="77" />
+          <Entry text="Bezier Tetrahedron"
+                 value="78" />
+          <Entry text="Bezier Hexahedron"
+                 value="79" />
+          <Entry text="Bezier Wedge"
+                 value="80" />
         </EnumerationDomain>
       </IntVectorProperty>
       <IntVectorProperty command="SetOutputPrecision"
