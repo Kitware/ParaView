@@ -51,6 +51,13 @@ public:
   void SetAngle(double angle);
 
   /**
+   * Use hardware interpolation of the cubemap texture during projection. In case of
+   * low resolution of the cubemap, it can be useful to enable it. The drawback is that there
+   * can be visible artifacts when enabled with some OpenGL implementations.
+   */
+  void SetCubemapInterpolation(bool interpolate);
+
+  /**
    * FXAA is not supported yet in this view
    * This method has no effect
    */
