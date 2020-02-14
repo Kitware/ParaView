@@ -229,8 +229,8 @@ void vtkImageSliceRepresentation::UpdateSliceData(vtkInformationVector** inputVe
     this->SliceData->Initialize();
   }
 
-  // vtkExtractVOI is not passing correct origin. Until that's fixed, I
-  // will just use the input origin/spacing to compute the bounds.
+  // vtkExtractVOI is passing the origin for the individual slice.
+  // We want to use the input origin/spacing to compute the bounds.
   this->SliceData->SetOrigin(input->GetOrigin());
 }
 

@@ -31,7 +31,7 @@
 #define vtkPVImageSliceMapper_h
 
 #include "vtkMapper.h"
-#include "vtkRemotingViewsModule.h" //needed for exports
+#include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkStructuredData.h"      // needed for VTK_*_PLANE
 
 class vtkImageData;
@@ -86,11 +86,21 @@ public:
     XZ_PLANE = VTK_XZ_PLANE,
   };
 
+  //@{
+  /**
+   * Set/Get the current slice mode: XY, XZ or YZ plane.
+   *
+   * Note that this actually refers to the indices/extents, so
+   * a better name would be IJ, IK, or JK plane. The input
+   * image's DirectionMatrix can change the mapping to physical
+   * XYZ axes.
+   */
   vtkSetClampMacro(SliceMode, int, XY_PLANE, XZ_PLANE);
   vtkGetMacro(SliceMode, int);
   void SetSliceModeToYZPlane() { this->SetSliceMode(YZ_PLANE); }
   void SetSliceModeToXZPlane() { this->SetSliceMode(XZ_PLANE); }
   void SetSliceModeToXYPlane() { this->SetSliceMode(XY_PLANE); }
+  //@}
 
   //@{
   /**
