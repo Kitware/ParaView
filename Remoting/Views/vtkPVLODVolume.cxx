@@ -20,6 +20,7 @@
 #include "vtkLODProp3D.h"
 #include "vtkMapper.h"
 #include "vtkMath.h"
+#include "vtkMultiBlockVolumeMapper.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty.h"
 #include "vtkTransform.h"
@@ -87,6 +88,10 @@ bool vtkPVLODVolume::CanRender()
   if (lodid >= 0)
   {
     vtkAbstractMapper3D* mapper = this->LODProp->GetLODMapper(lodid);
+    if (vtkMultiBlockVolumeMapper::SafeDownCast(mapper))
+    {
+      return true;
+    }
     if (vtkVolumeMapper* imageVolumeMapper = vtkVolumeMapper::SafeDownCast(mapper))
     {
       int unused = 0;

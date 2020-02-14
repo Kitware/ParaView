@@ -4512,7 +4512,7 @@
                           text="Slice" />
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <DataTypeDomain composite_data_supported="0"
+        <DataTypeDomain composite_data_supported="1"
                         name="input_type">
           <DataType value="vtkImageData" />
         </DataTypeDomain>

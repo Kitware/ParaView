@@ -384,10 +384,13 @@ int vtknvindex_representation::RequestDataBase(
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     vtkImageData* input = vtkImageData::GetData(inputVector[0], 0);
-    this->Cache->ShallowCopy(input);
+
+    vtkNew<vtkImageData> cache;
+    cache->ShallowCopy(input);
+    this->Cache = cache.GetPointer();
 
     this->Actor->SetEnableLOD(0);
-    this->VolumeMapper->SetInputData(this->Cache);
+    this->VolumeMapper->SetInputData(cache);
 
     vtkImageData* output = vtkImageData::SafeDownCast(this->Cache);
 
