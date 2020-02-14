@@ -62,7 +62,7 @@ To build ParaView developement version (usually refered as "master"), please run
 git clone --recursive https://gitlab.kitware.com/paraview/paraview.git
 mkdir paraview_build
 cd paraview_build
-cmake -GNinja -DPARAVIEW_ENABLE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION=TBB -DCMAKE_BUILD_TYPE=Release ../paraview
+cmake -GNinja -DPARAVIEW_ENABLE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION_TYPE=TBB -DCMAKE_BUILD_TYPE=Release ../paraview
 ninja
 ```
 
@@ -74,7 +74,7 @@ cd paraview
 git checkout tag
 git submodule update --init --recursive
 cd ../paraview_build
-cmake -GNinja -DPARAVIEW_ENABLE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION=TBB -DCMAKE_BUILD_TYPE=Release ../paraview
+cmake -GNinja -DPARAVIEW_ENABLE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION_TYPE=TBB -DCMAKE_BUILD_TYPE=Release ../paraview
 ninja
 ```
 
@@ -91,9 +91,8 @@ Double click on the paraview executable in the bin directory or run in the previ
  * Download and install [git bash for windows][gitforwindows]
  * Download and install [cmake][cmake-download]
  * Download and install [Visual Studio 2015 Community Edition][visual-studio]
- * Download and install [ninja-build][ninja]
- * Download and install [Microsoft MPI][msmpi]
- * Download and install [Intel TBB for windows][tbb]
+ * Download [ninja-build][ninja] and drop ninja.exe in C:/Windows/
+ * Download and install both msmpisetup.exe and msmpisdk.msi from [Microsoft MPI][msmpi]
  * Download and install [Python for windows][pythonwindows]
 
 #### Recover the source
@@ -128,7 +127,7 @@ git submodule update --init --recursive
  * Open VS2015 x64 Native Tools Command Prompt and run the following commands
 ```sh
 cd C:\pv\pvb
-cmake -GNinja -DPARAVIEW_ENABLE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION=TBB -DCMAKE_BUILD_TYPE=Release ..\pv
+cmake -GNinja -DPARAVIEW_ENABLE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION_TYPE=OpenMP -DCMAKE_BUILD_TYPE=Release ..\pv
 ninja
 ```
 

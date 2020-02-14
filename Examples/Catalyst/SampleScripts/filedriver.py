@@ -2,16 +2,21 @@ r"""
 This script is meant to act as a Catalyst instrumented simulation code.
 Instead of actually computing values though it just reads in files that
 are passed in through the command line and sets that up to act like
-it's coming in as simulation computed values. The script must be run
-with pvbatch with the following arguments:
+it's coming in as simulation computed values.
+
+This script must be run with pvbatch, either in serial or in parallel.
+The arguments are as follows :
 * -sym if run with more than a single MPI process so that pvbatch will
        have all processes run the script.
 * a list of files in quotes (wildcards are acceptable) but these are
   treated as a single argument to the script.
 * a list of Catalyst Python scripts.
 
-An example of how to use this script would be:
-mpirun -np 5 <path>/pvbatch -sym "input_*.pvtu" makeanimage.py makeaslice.py
+eg, in serial :
+<path>/pvbatch filedriver.py "temporalFile.ex2" gridwriter.py
+
+eg, in parallel
+mpirun -np 5 <path>/pvbatch filedriver.py -sym "input_*.pvtu" makeanimage.py makeaslice.py
 
 This script currently only handles a single channel. It will try to find
 an appropriate reader for the list of filenames and loop through the timesteps.
@@ -69,7 +74,6 @@ for script in sys.argv[2:]:
         print("Adding script ", script)
     pipeline.Initialize(script)
     catalyst.AddPipeline(pipeline)
-
 
 # we get the channel name here from the reader's dataset. if there
 # isn't a channel name there we just assume that the channel name
