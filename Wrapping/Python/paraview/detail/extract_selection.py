@@ -20,7 +20,7 @@ from . import calculator
 
 # this module is needed to ensure that python wrapping for
 # `vtkPythonExtractSelection` is setup correctly.
-from paraview.modules import vtkPVClientServerCoreCore
+from paraview.modules import vtkRemotingCore
 
 def _create_id_array(dataobject, attributeType):
     """Returns a VTKArray or VTKCompositeDataArray for the ids"""
