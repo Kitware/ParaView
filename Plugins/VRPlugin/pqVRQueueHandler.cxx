@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVRQueueHandler.h"
 
 #include "vtkCollection.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMRenderViewProxy.h"
@@ -55,7 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqVRQueueHandler::pqInternals
 {
 public:
-  vtkCollection* Styles;
+  vtkNew<vtkCollection> Styles;
   vtkWeakPointer<vtkVRQueue> Queue;
   QTimer Timer;
 };
@@ -80,7 +81,6 @@ pqVRQueueHandler::pqVRQueueHandler(vtkVRQueue* queue, QObject* parentObject)
   : Superclass(parentObject)
 {
   this->Internals = new pqInternals();
-  this->Internals->Styles = vtkCollection::New();
   this->Internals->Queue = queue;
   this->Internals->Timer.setInterval(1);
   this->Internals->Timer.setSingleShot(true);
