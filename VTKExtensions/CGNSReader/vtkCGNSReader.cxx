@@ -24,6 +24,7 @@
 #include "vtkCGNSReader.h"
 #include "vtkCGNSReaderInternal.h" // For parsing information request
 
+#include "vtkAssume.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
@@ -264,6 +265,9 @@ public:
     // (1,1,1); this means the default beginning cell center of the grid in that
     // zone is also (1,1,1)" (from CGNS docs:
     // https://cgns.github.io/CGNS_docs_current/sids/conv.html#structgrid).
+
+    // Hint that cellDim is <= 3
+    VTK_ASSUME(cellDim <= 3);
 
     // Hence, convert this->PointRange to 0-based values.
     int zPointRange[6];

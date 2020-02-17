@@ -12,12 +12,24 @@ list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION
   # Ignore protobuf-generated source file warnings.
   "vtkPVMessage.pb.cc"
 
+  # ignore warning from string_fortified.h inclusion
+  "string_fortified.h"
+
   # Unreachable code in xutility causes C4702 warnings in MSVC.
   "xutility.*unreachable code"
 
   # exclude warnings from dmfile.cxx
   "dmfile.*"
-  )
+
+  # exclude warnings from unreference NewInstance function
+  ".*NewInstance.*was declared but never referenced"
+
+  # Intel compiler warning about routines being both inline and noinline
+  "warning #2196.* routine is both"
+
+  # compiler optimizations may sometimes lead to this warning
+  "assuming signed overflow does not occur when assuming that"
+)
 
 list(APPEND CTEST_CUSTOM_ERROR_EXCEPTION
   # Xcb error does not seem to cause errors in generated test images
