@@ -155,7 +155,7 @@ public:
       widget->updatePanel();
 
       QObject::connect(
-        widget, &pqProxyWidget::changeFinished, [self, widget]() { self->updateProperties(); });
+        widget, &pqProxyWidget::changeFinished, [self]() { self->updateProperties(); });
       this->Ui.container->layout()->addWidget(widget);
 
       this->Items.emplace_back(Item{ prototype, removeButton, separator, widget });
