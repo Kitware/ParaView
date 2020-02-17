@@ -127,7 +127,7 @@ pqPythonSyntaxHighlighter::pqPythonSyntaxHighlighter(QTextEdit* textEdit, QObjec
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
   this->Internals->TextEdit->setTabStopDistance(metrics.horizontalAdvance("    "));
 #elif (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
-  this->TextEdit->setTabStopDistance(metrics.width("    "));
+  this->Internals->TextEdit->setTabStopDistance(metrics.width("    "));
 #else
   this->Internals->TextEdit->setTabStopWidth(metrics.width("    "));
 #endif
