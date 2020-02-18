@@ -1059,6 +1059,12 @@ void pqColorAnnotationsWidget::setSupportsReorder(bool reorder)
 }
 
 //-----------------------------------------------------------------------------
+void pqColorAnnotationsWidget::sort(int column, Qt::SortOrder order)
+{
+  this->Internals->Ui.AnnotationsTable->model()->sort(column, order);
+}
+
+//-----------------------------------------------------------------------------
 void pqColorAnnotationsWidget::allowsRegexpMatching(bool allow)
 {
   this->Internals->ChoosePresetReaction->setAllowsRegexpMatching(allow);
