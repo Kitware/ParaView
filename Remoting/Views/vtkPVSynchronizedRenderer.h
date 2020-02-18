@@ -154,6 +154,13 @@ public:
 
   //@{
   /**
+   * State flags to turn on specialized treatment for ray tracing.
+   */
+  void SetRayTracingState(int mode, bool enabled);
+  //@}
+
+  //@{
+  /**
    * Not for the faint hearted. This internal vtkSynchronizedRenderers instances
    * are exposed for advanced users that want to do advanced tricks with
    * rendering. These will change without notice. Do not use them unless you
@@ -192,6 +199,10 @@ protected:
   bool UseDepthBuffer;
   bool RenderEmptyImages;
   bool DataReplicatedOnAllProcesses;
+
+  bool RayTracing;
+  bool PathTracing;
+  int RayTraceMode;
 
 private:
   vtkPVSynchronizedRenderer(const vtkPVSynchronizedRenderer&) = delete;

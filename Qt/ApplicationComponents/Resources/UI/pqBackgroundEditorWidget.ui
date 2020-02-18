@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>BackgroundEditorWidget</class>
  <widget class="QWidget" name="BackgroundEditorWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>262</width>
+    <height>135</height>
+   </rect>
+  </property>
   <property name="sizePolicy">
    <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
     <horstretch>0</horstretch>

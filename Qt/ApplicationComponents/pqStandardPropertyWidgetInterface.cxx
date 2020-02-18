@@ -225,7 +225,11 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   }
   else if (panelWidget == "BackgroundEditor")
   {
-    return new pqBackgroundEditorWidget(proxy, group, parentWidget);
+    return new pqBackgroundEditorWidget(proxy, group, parentWidget, false);
+  }
+  else if (panelWidget == "EnvironmentalBGEditor")
+  {
+    return new pqBackgroundEditorWidget(proxy, group, parentWidget, true);
   }
   else if (panelWidget == "ArrayStatus")
   {

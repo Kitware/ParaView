@@ -2528,6 +2528,46 @@ void vtkPVRenderView::SetUseEnvironmentLighting(bool val)
   this->GetRenderer()->SetUseImageBasedLighting(val);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetBackgroundMode(int val)
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  vtkRenderer* ren = this->GetRenderer();
+  vtkOSPRayRendererNode::SetBackgroundMode(val, ren);
+#else
+  (void)val;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetEnvironmentalBG(double r, double g, double b)
+{
+  this->GetRenderer()->SetEnvironmentalBG(r, g, b);
+}
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetEnvironmentalBG2(double r, double g, double b)
+{
+  this->GetRenderer()->SetEnvironmentalBG2(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetEnvironmentalBGTexture(vtkTexture* texture)
+{
+  this->GetRenderer()->SetEnvironmentalBGTexture(texture);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetGradientEnvironmentalBG(int val)
+{
+  this->GetRenderer()->SetGradientEnvironmentalBG(val ? true : false);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetTexturedEnvironmentalBG(int val)
+{
+  this->GetRenderer()->SetTexturedEnvironmentalBG(val ? true : false);
+}
+
 //*****************************************************************
 // Entry point for dynamic lights
 //----------------------------------------------------------------------------
@@ -3151,16 +3191,18 @@ void vtkPVRenderView::SetEnableOSPRay(bool v)
   }
   this->Internals->IsInOSPRay = v;
   vtkRenderer* ren = this->GetRenderer();
-  if (this->Internals->IsInOSPRay)
+  if (v)
   {
     ren->SetUseShadows(this->Internals->OSPRayShadows);
     this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
     this->SynchronizedRenderers->SetRenderPass(this->Internals->OSPRayPass.GetPointer());
+    this->SynchronizedRenderers->SetRayTracingState(0, true);
   }
   else
   {
     ren->SetUseShadows(false);
     this->SynchronizedRenderers->SetRenderPass(this->Internals->SavedRenderPass);
+    this->SynchronizedRenderers->SetRayTracingState(0, false);
   }
   this->Modified();
 #else
@@ -3196,6 +3238,8 @@ void vtkPVRenderView::SetOSPRayRendererType(std::string name)
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetRendererType(name, ren);
+  bool pathtrace = (name.find(std::string("pathtracer")) != std::string::npos);
+  this->SynchronizedRenderers->SetRayTracingState(1, pathtrace);
 #else
   (void)name;
 #endif
