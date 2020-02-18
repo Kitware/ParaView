@@ -75,7 +75,9 @@ public:
   enum BackgroundType PreviousType;
   pqTextureSelectorPropertyWidget* TextureSelector = nullptr;
 
-  bool ForEnv = false;
+  // whether the widget is customized for Environmental background settings or
+  // the more typical Backplate type background.
+  bool ForEnvironment = false;
 
   pqInternal(pqBackgroundEditorWidget* self)
     : PreviousType(SINGLE_COLOR_TYPE)
@@ -92,14 +94,14 @@ public:
 };
 
 pqBackgroundEditorWidget::pqBackgroundEditorWidget(
-  vtkSMProxy* smProxy, vtkSMPropertyGroup* smGroup, QWidget* parentObject, bool forEnv)
+  vtkSMProxy* smProxy, vtkSMPropertyGroup* smGroup, QWidget* parentObject, bool forEnvironment)
   : Superclass(smProxy, smGroup, parentObject)
   , Internal(new pqInternal(this))
 {
   Ui::BackgroundEditorWidget& ui = *this->Internal;
-  this->Internal->ForEnv = forEnv;
+  this->Internal->ForEnvironment = forEnvironment;
 
-  if (forEnv)
+  if (this->Internal->ForEnvironment)
   {
     ui.BackgroundType->removeItem(3); // SkyBox
   }
@@ -108,7 +110,7 @@ pqBackgroundEditorWidget::pqBackgroundEditorWidget(
   connect(ui.RestoreDefaultColor, SIGNAL(clicked()), this, SLOT(clickedRestoreDefaultColor()));
   connect(ui.RestoreDefaultColor2, SIGNAL(clicked()), this, SLOT(clickedRestoreDefaultColor2()));
 
-  if (!forEnv)
+  if (!this->Internal->ForEnvironment)
   {
     this->addPropertyLink(ui.Color, COLOR_PROPERTY);
     this->addPropertyLink(ui.Color2, COLOR2_PROPERTY);
@@ -120,7 +122,7 @@ pqBackgroundEditorWidget::pqBackgroundEditorWidget(
   }
 
   vtkSMProperty* smProperty;
-  if (!forEnv)
+  if (!this->Internal->ForEnvironment)
   {
     smProperty = smGroup->GetProperty(GRADIENT_BACKGROUND_PROPERTY);
   }
@@ -138,7 +140,7 @@ pqBackgroundEditorWidget::pqBackgroundEditorWidget(
     ui.BackgroundType->hide();
   }
 
-  if (!forEnv)
+  if (!this->Internal->ForEnvironment)
   {
     smProperty = smGroup->GetProperty(IMAGE_BACKGROUND_PROPERTY);
   }
@@ -162,7 +164,7 @@ pqBackgroundEditorWidget::pqBackgroundEditorWidget(
   }
   else
   {
-    if (!forEnv)
+    if (!this->Internal->ForEnvironment)
     {
       ui.BackgroundType->hide();
     }
@@ -176,7 +178,7 @@ pqBackgroundEditorWidget::pqBackgroundEditorWidget(
   }
   else
   {
-    if (!forEnv)
+    if (!this->Internal->ForEnvironment)
     {
       ui.BackgroundType->hide();
     }
@@ -187,7 +189,7 @@ pqBackgroundEditorWidget::pqBackgroundEditorWidget(
 
   currentIndexChangedBackgroundType(this->Internal->PreviousType);
 
-  if (!forEnv)
+  if (!this->Internal->ForEnvironment)
   {
     smProperty = smGroup->GetProperty(IMAGE_PROPERTY);
   }
@@ -320,7 +322,7 @@ void pqBackgroundEditorWidget::fireGradientAndImageChanged(int oldType, int newT
 
 void pqBackgroundEditorWidget::clickedRestoreDefaultColor()
 {
-  if (!this->Internal->ForEnv)
+  if (!this->Internal->ForEnvironment)
   {
     this->changeColor(COLOR_PROPERTY);
   }
@@ -332,7 +334,7 @@ void pqBackgroundEditorWidget::clickedRestoreDefaultColor()
 
 void pqBackgroundEditorWidget::clickedRestoreDefaultColor2()
 {
-  if (!this->Internal->ForEnv)
+  if (!this->Internal->ForEnvironment)
   {
     this->changeColor(COLOR2_PROPERTY);
   }
