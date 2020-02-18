@@ -1318,6 +1318,12 @@ function (paraview_add_plugin name)
   endif ()
   string(APPEND CMAKE_LIBRARY_OUTPUT_DIRECTORY "/${_paraview_build_plugin}")
 
+  # Place static plugins in the same place they would be if they were shared.
+  if (NOT _paraview_build_LIBRARY_SUBDIRECTORY STREQUAL "")
+    string(APPEND CMAKE_ARCHIVE_OUTPUT_DIRECTORY "/${_paraview_build_LIBRARY_SUBDIRECTORY}")
+  endif ()
+  string(APPEND CMAKE_ARCHIVE_OUTPUT_DIRECTORY "/${_paraview_build_plugin}")
+
   add_library("${_paraview_build_plugin}" "${_paraview_build_plugin_type}"
     ${_paraview_add_plugin_header}
     ${_paraview_add_plugin_source}
