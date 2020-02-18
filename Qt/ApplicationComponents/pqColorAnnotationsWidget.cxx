@@ -130,6 +130,23 @@ std::vector<std::pair<QString, QString> > MergeAnnotations(
   return merged_pairs;
 }
 
+class ColorAnnotationsFilterProxyModel : public QSortFilterProxyModel
+{
+public:
+  explicit ColorAnnotationsFilterProxyModel(QObject* parent = nullptr)
+    : QSortFilterProxyModel(parent)
+  {
+  }
+
+  bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override
+  {
+    QModelIndex domainIndex =
+      sourceModel()->index(sourceRow, pqAnnotationsModel::VISIBILITY, sourceParent);
+    return sourceModel()->data(domainIndex, Qt::UserRole).toBool() &&
+      QSortFilterProxyModel::filterAcceptsRow(sourceRow, sourceParent);
+  }
+};
+
 //-----------------------------------------------------------------------------
 // Dialog to set global and selected lines opacity
 class pqGlobalOpacityRangeDialog : public QDialog
@@ -313,21 +330,10 @@ pqColorAnnotationsWidget::pqColorAnnotationsWidget(QWidget* parentObject)
 
   this->setSupportsReorder(false);
 
-  QSortFilterProxyModel* proxyModel = new QSortFilterProxyModel(this);
+  ColorAnnotationsFilterProxyModel* proxyModel = new ColorAnnotationsFilterProxyModel(this);
   proxyModel->setSourceModel(this->Internals->Model);
   ui.AnnotationsTable->setModel(proxyModel);
   ui.AnnotationsTable->setSortingEnabled(false);
-
-  // Add filtering capabilities.
-  // Conditionally hides rows that are no longer present in the domain.
-  // This keeps the view showing too many rows that are no longer applicable.
-  // The UI will (TODO) a mechanism to see all available values.
-  proxyModel->setFilterRole(Qt::UserRole);
-  proxyModel->setFilterRegExp("^1$");
-  proxyModel->setFilterKeyColumn(0);
-  proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-  // this is needed so that the filter is updated every time data changes.
-  proxyModel->setDynamicSortFilter(true);
 }
 
 //-----------------------------------------------------------------------------
