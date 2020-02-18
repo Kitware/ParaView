@@ -334,6 +334,19 @@ public:
    */
   bool GetVolumeIndependentRanges();
 
+  //@{
+  /**
+   * Checks if the scalar bar of this representation in view
+   * is sticky visible, i.e. should be visible whenever this representation
+   * is also visible.
+   * It returns 1 if the scalar bar is sticky visible, 0 other wise.
+   * If any problem is encountered, for example if view == nullptr,
+   * or if the scalar bar representation is not instanciated / found,
+   * it returns -1.
+   */
+  int IsScalarBarStickyVisible(vtkSMProxy* view);
+  //@}
+
 protected:
   vtkSMPVRepresentationProxy();
   ~vtkSMPVRepresentationProxy() override;

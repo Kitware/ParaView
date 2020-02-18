@@ -502,6 +502,16 @@
           when placing automatically.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="StickyVisible"
+                         default_values="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If the user manually toggles the scalar bar visibility, we keep that information
+          in the scalar bar representation, and will never / always show it until the
+          scalar bar button is toggled again on this array.
+        </Documentation>
+      </IntVectorProperty>
       <SubProxy>
         <Proxy name="Prop2D"
                proxygroup="3d_widget_representations"
