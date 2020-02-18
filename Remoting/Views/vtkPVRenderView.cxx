@@ -27,7 +27,6 @@
 #include "vtkCommunicator.h"
 #include "vtkCuller.h"
 #include "vtkDataRepresentation.h"
-#include "vtkEquirectangularToCubeMapTexture.h"
 #include "vtkFXAAOptions.h"
 #include "vtkFloatArray.h"
 #include "vtkGeometryRepresentation.h"
@@ -502,8 +501,6 @@ vtkPVRenderView::vtkPVRenderView()
   this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
   this->SynchronizedRenderers->Initialize(this->GetSession());
   this->SynchronizedRenderers->SetRenderer(this->RenderView->GetRenderer());
-
-  this->Skybox->SetTexture(this->CubeMap);
 }
 
 //----------------------------------------------------------------------------
@@ -2511,14 +2508,15 @@ void vtkPVRenderView::UpdateSkybox()
 
   if (this->NeedSkybox && texture != nullptr)
   {
-    this->CubeMap->SetInputTexture(vtkOpenGLTexture::SafeDownCast(texture));
-    this->CubeMap->InterpolateOn();
+    this->Skybox->SetProjection(vtkSkybox::Sphere);
+    this->Skybox->SetFloorRight(0.0, 0.0, 1.0);
+    this->Skybox->SetTexture(texture);
     this->GetRenderer()->AddActor(this->Skybox);
-    this->GetRenderer()->SetEnvironmentCubeMap(this->CubeMap, true);
+    this->GetRenderer()->SetEnvironmentTexture(texture, true);
   }
   else
   {
-    this->GetRenderer()->SetEnvironmentCubeMap(nullptr);
+    this->GetRenderer()->SetEnvironmentTexture(nullptr);
   }
 }
 
@@ -2553,7 +2551,7 @@ void vtkPVRenderView::SetEnvironmentalBG2(double r, double g, double b)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetEnvironmentalBGTexture(vtkTexture* texture)
 {
-  this->GetRenderer()->SetEnvironmentalBGTexture(texture);
+  this->GetRenderer()->SetEnvironmentTexture(texture, true);
 }
 
 //----------------------------------------------------------------------------
@@ -2565,7 +2563,7 @@ void vtkPVRenderView::SetGradientEnvironmentalBG(int val)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetTexturedEnvironmentalBG(int val)
 {
-  this->GetRenderer()->SetTexturedEnvironmentalBG(val ? true : false);
+  this->GetRenderer()->SetUseImageBasedLighting(val ? true : false);
 }
 
 //*****************************************************************
@@ -3504,15 +3502,5 @@ void vtkPVRenderView::SynchronizeMaximumIds(vtkIdType* maxPointId, vtkIdType* ma
 
     *maxPointId = static_cast<vtkIdType>(ptid);
     *maxCellId = static_cast<vtkIdType>(cellid);
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetSkyboxResolution(int resolution)
-{
-  if (this->CubeMap->GetCubeMapSize() != static_cast<unsigned int>(resolution))
-  {
-    this->CubeMap->SetCubeMapSize(resolution);
-    this->Modified();
   }
 }
