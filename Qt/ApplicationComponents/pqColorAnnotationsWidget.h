@@ -183,6 +183,7 @@ public:
    * Get the selected annotations values.
    */
   QStringList selectedAnnotations();
+  void setSelectedAnnotations(const QStringList& annotations);
 
   /**
    * Get the regular expression to use to apply the preset.

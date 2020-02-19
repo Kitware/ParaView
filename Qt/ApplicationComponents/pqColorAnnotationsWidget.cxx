@@ -972,6 +972,26 @@ QString pqColorAnnotationsWidget::currentAnnotationValue()
 }
 
 //-----------------------------------------------------------------------------
+void pqColorAnnotationsWidget::setSelectedAnnotations(const QStringList& annotations)
+{
+  auto table = this->Internals->Ui.AnnotationsTable;
+  auto prevSelection = table->selectionModel()->selection();
+  table->selectionModel()->clearSelection();
+  for (int i = 0; i < table->model()->columnCount(); i++)
+  {
+    auto idx = table->model()->index(i, pqAnnotationsModel::VALUE);
+    if (annotations.contains(idx.data().toString()))
+    {
+      table->selectionModel()->select(idx, QItemSelectionModel::Rows | QItemSelectionModel::Select);
+      table->selectionModel()->setCurrentIndex(idx, QItemSelectionModel::Rows);
+    }
+  }
+
+  auto currentSelection = table->selectionModel()->selection();
+  emit this->selectionChanged(currentSelection, prevSelection);
+}
+
+//-----------------------------------------------------------------------------
 QStringList pqColorAnnotationsWidget::selectedAnnotations()
 {
   auto selection = this->selectedIndexes();
