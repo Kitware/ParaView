@@ -70,6 +70,7 @@ target_link_libraries(OpenVR
     ParaView::RemotingViews
     VTK::CommonCore
     VTK::CommonDataModel
+    VTK::CommonSystem
     VTK::IOCore
     VTK::IOImage
     VTK::IOXML
