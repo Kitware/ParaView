@@ -405,6 +405,11 @@ void vtkPVPluginLoader::LoadPluginsFromPath(const char* path)
 //-----------------------------------------------------------------------------
 bool vtkPVPluginLoader::LoadPluginByName(const char* name)
 {
+  if (vtkPVPluginLoader::CallPluginLoaderCallbacks(name))
+  {
+    return true;
+  }
+
   vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
   unsigned int nplugins = tracker->GetNumberOfPlugins();
 
