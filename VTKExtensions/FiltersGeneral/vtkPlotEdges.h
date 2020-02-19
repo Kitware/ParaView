@@ -41,6 +41,9 @@ protected:
   vtkPlotEdges();
   ~vtkPlotEdges() override;
 
+  class Node;
+  class Segment;
+
   int FillInputPortInformation(int port, vtkInformation* info) override;
   // Usual data generation method
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
@@ -55,7 +58,7 @@ protected:
   static void SaveToMultiBlockDataSet(vtkCollection* segments, vtkMultiBlockDataSet* output);
   static void MergeSegments(vtkCollection* segments, vtkCollection* nodes, Node* node,
     Segment* segmentA, Segment* segmentB);
-  static Node* GetNodeAtPoint(vtkCollection* nodes, vtkIdType pointId);
+  static vtkPlotEdges::Node* GetNodeAtPoint(vtkCollection* nodes, vtkIdType pointId);
   static void PrintSegments(vtkCollection* segments);
 
 private:
