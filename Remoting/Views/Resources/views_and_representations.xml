@@ -820,8 +820,6 @@
                             repeat_command="1"
                             use_index="1"
                             set_number_command="SetBottomAxisLabelsNumber">
-        <!-- used to trigger the display pqScalarValueListPropertyWidget -->
-        <ArrayRangeDomain name="scalar_range"/>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
             <Property name="BottomAxisUseCustomLabels"
@@ -1122,8 +1120,6 @@
                             repeat_command="1"
                             use_index="1"
                             set_number_command="SetRightAxisLabelsNumber">
-        <!-- used to trigger the display pqScalarValueListPropertyWidget -->
-        <ArrayRangeDomain name="scalar_range"/>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
             <Property name="RightAxisUseCustomLabels"
@@ -1414,8 +1410,6 @@
                             repeat_command="1"
                             use_index="1"
                             set_number_command="SetTopAxisLabelsNumber">
-        <!-- used to trigger the display pqScalarValueListPropertyWidget -->
-        <ArrayRangeDomain name="scalar_range"/>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
             <Property name="TopAxisUseCustomLabels"
