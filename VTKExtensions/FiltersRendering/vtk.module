@@ -25,6 +25,7 @@ PRIVATE_DEPENDS
   VTK::IOLegacy
   VTK::lz4
   VTK::ParallelCore
+  VTK::RenderingVolume
   VTK::zlib
 OPTIONAL_DEPENDS
   VTK::FiltersParallelMPI
