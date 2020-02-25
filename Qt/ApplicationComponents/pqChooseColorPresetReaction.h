@@ -33,8 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqChooseColorPresetReaction_h
 
 #include "pqReaction.h"
-#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
-#include <QPointer>         // needed for QPointer
+#include "vtkWeakPointer.h"   // needed for vtkWeakPointer.
+#include <QPointer>           // needed for QPointer
+#include <QRegularExpression> // needed for QRegularExpression.
 
 class pqDataRepresentation;
 class pqPresetDialog;
@@ -102,6 +103,18 @@ public slots:
   */
   void updateEnableState() override;
 
+  /**
+   * Show/hide widget in the dialog.
+   * Allows a regexp as user entry to do the matching between data values and preset.
+   * Intended to be used for series preset.
+   */
+  void setAllowsRegexpMatching(bool allow) { this->AllowsRegexpMatching = allow; }
+
+  /**
+   * Return the regular expression specified in the Dialog.
+   */
+  QRegularExpression regularExpression();
+
 signals:
   /**
    * fired every time a preset is applied.
@@ -128,6 +141,7 @@ private:
   QPointer<pqDataRepresentation> Representation;
   vtkWeakPointer<vtkSMProxy> TransferFunctionProxy;
   static QPointer<pqPresetDialog> PresetDialog;
+  bool AllowsRegexpMatching;
 };
 
 #endif

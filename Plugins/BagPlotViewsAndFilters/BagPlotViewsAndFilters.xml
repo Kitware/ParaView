@@ -644,6 +644,13 @@
         </Hints>
 
       </StringVectorProperty>
+      <StringVectorProperty name="LastPresetName"
+                            number_of_elements="1"
+                            default_values="Spectrum"
+                            panel_visibility="never">
+      <Documentation>Dummy property containing last color preset name.
+        The property widget can set it when a preset is applied, and the domain can read it when a default color is requested.</Documentation>
+      </StringVectorProperty>
 
       <PropertyGroup label="Series Parameters"
                      panel_widget="SeriesEditor"
@@ -654,6 +661,8 @@
                   function="SeriesColor" />
         <Property name="SeriesLabel"
                   function="SeriesLabel" />
+        <Property name="LastPresetName"
+                  function="LastPresetName"/>
       </PropertyGroup>
       <!--
           Set the palette SelectionColor color to all the plots in the chart.
