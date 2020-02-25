@@ -24,6 +24,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/FieldDataBlocks/FieldDataBlocks/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/FileSeries/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/GenericIOReader/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/HeadMRVolume.mhd}"
+  "DATA{${paraview_test_data_directory_input}/Data/HeadMRVolume.raw}"
   "DATA{${paraview_test_data_directory_input}/Data/Iron_Xdmf/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/LoadState.pvsm}"
   "DATA{${paraview_test_data_directory_input}/Data/LoadStateDialog.pvsm}"
@@ -692,6 +694,7 @@ endif()
 list(APPEND TESTS_WITH_BASELINES
   4AxesContextView.xml
   AccentuatedFilename.xml
+  AdaptiveResampleToImage.xml
   AMRCutPlane.xml
   AMReXParticlesReader.xml
   Annotations.xml
@@ -1321,6 +1324,7 @@ set (ExodusModeShapes_FORCE_SERIAL TRUE)
 set (LoadSaveStateAnimation_FORCE_SERIAL TRUE)
 
 # We don't support volume rendering of image data in data server & render server mode
+set(AdaptiveResampleToImage_DISABLE_CRS TRUE)
 set(LoadSaveStateVolume_DISABLE_CRS TRUE)
 set(SeparatedColorMapOpacity_DISABLE_CRS TRUE)
 set(VolumeReprTwoIndepComp_DISABLE_CRS TRUE)
