@@ -76,8 +76,6 @@ public:
       this->SetOwnContext(0);
     }
   }
-  vtkOpenGLRenderWindow* GetContext() { return this->Context; }
-
   void MakeCurrent() override
   {
     if (this->Context)
