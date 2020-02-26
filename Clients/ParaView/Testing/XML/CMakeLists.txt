@@ -219,6 +219,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialog9.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataSelectLocation.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataSelectLocationMultiblock.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialogNaN.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FreezeQueryMultiblock.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ForceTimeDiamond.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Glyph3DRepresentation_Cylinder.png}"
@@ -1084,6 +1085,7 @@ if(PARAVIEW_USE_PYTHON)
       ContextViewSelectionTrace.xml
       ExodusModeShapes.xml
       FindDataPartialArrays.xml
+      FindDataDialogNaN.xml
       FindDataSelectLocation.xml # find data needs python/numpy
       FindDataSelectLocationMultiblock.xml # find data needs python/numpy
       ForceTimeDiamond.xml
