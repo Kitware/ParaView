@@ -1032,7 +1032,7 @@ void pqColorAnnotationsWidget::setSelectedAnnotations(const QStringList& annotat
   auto prevSelection = table->selectionModel()->selection();
   table->selectionModel()->clearSelection();
 
-  for (int i = 0; i < table->model()->columnCount(); i++)
+  for (int i = 0; i < table->model()->rowCount(); i++)
   {
     auto idx = table->model()->index(i, pqAnnotationsModel::VALUE);
     if (annotations.contains(idx.data().toString()))
