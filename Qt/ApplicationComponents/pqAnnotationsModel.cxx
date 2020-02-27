@@ -337,7 +337,7 @@ QVariant pqAnnotationsModel::data(const QModelIndex& idx, int role) const
       res = this->VisibilityDomain->IsInDomain(value.toLocal8Bit().data(), unused) != 0;
     }
 
-    return res ? "1" : "0";
+    return res ? true : false;
   }
   else if (role == Qt::CheckStateRole && idx.column() == VISIBILITY)
   {

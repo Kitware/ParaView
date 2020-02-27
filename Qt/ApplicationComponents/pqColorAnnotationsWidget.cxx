@@ -76,6 +76,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <vector>
 
+static const std::string INDEXED_COLORS = "IndexedColors";
+static const std::string ANNOTATIONS = "Annotations";
+
 namespace
 {
 
@@ -129,6 +132,23 @@ std::vector<std::pair<QString, QString> > MergeAnnotations(
 
   return merged_pairs;
 }
+
+class ColorAnnotationsFilterProxyModel : public QSortFilterProxyModel
+{
+public:
+  explicit ColorAnnotationsFilterProxyModel(QObject* parent = nullptr)
+    : QSortFilterProxyModel(parent)
+  {
+  }
+
+  bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override
+  {
+    QModelIndex domainIndex =
+      sourceModel()->index(sourceRow, pqAnnotationsModel::VISIBILITY, sourceParent);
+    return sourceModel()->data(domainIndex, Qt::UserRole).toBool() &&
+      QSortFilterProxyModel::filterAcceptsRow(sourceRow, sourceParent);
+  }
+};
 
 //-----------------------------------------------------------------------------
 // Dialog to set global and selected lines opacity
@@ -313,21 +333,10 @@ pqColorAnnotationsWidget::pqColorAnnotationsWidget(QWidget* parentObject)
 
   this->setSupportsReorder(false);
 
-  QSortFilterProxyModel* proxyModel = new QSortFilterProxyModel(this);
+  ColorAnnotationsFilterProxyModel* proxyModel = new ColorAnnotationsFilterProxyModel(this);
   proxyModel->setSourceModel(this->Internals->Model);
   ui.AnnotationsTable->setModel(proxyModel);
   ui.AnnotationsTable->setSortingEnabled(false);
-
-  // Add filtering capabilities.
-  // Conditionally hides rows that are no longer present in the domain.
-  // This keeps the view showing too many rows that are no longer applicable.
-  // The UI will (TODO) a mechanism to see all available values.
-  proxyModel->setFilterRole(Qt::UserRole);
-  proxyModel->setFilterRegExp("^1$");
-  proxyModel->setFilterKeyColumn(0);
-  proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-  // this is needed so that the filter is updated every time data changes.
-  proxyModel->setDynamicSortFilter(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -348,7 +357,7 @@ void pqColorAnnotationsWidget::applyPreset(const char* presetName)
 {
   auto presets = vtkSMTransferFunctionPresets::GetInstance();
   const Json::Value& preset = presets->GetFirstPresetWithName(presetName);
-  const Json::Value& indexedColors = preset["IndexedColors"];
+  const Json::Value& indexedColors = preset[INDEXED_COLORS];
   if (indexedColors.isNull() || !indexedColors.isArray() || (indexedColors.size() % 3) != 0 ||
     indexedColors.size() == 0)
   {
@@ -906,19 +915,64 @@ void pqColorAnnotationsWidget::saveAsPreset(
   Json::Value cpreset =
     vtkSMTransferFunctionProxy::GetStateAsPreset(this->Internals->LookupTableProxy);
 
-  if (!cpreset["IndexedColors"].size())
+  if (!cpreset[INDEXED_COLORS].size())
   {
     qWarning("Cannot save an empty preset");
     return;
   }
 
-  if (removeAnnotations)
+  // Sanity check
+  Json::Value nullValue;
+  Json::Value colors = cpreset.get(INDEXED_COLORS, nullValue);
+  Json::Value annotations = cpreset.get(ANNOTATIONS, nullValue);
+  if (annotations.size() / 2 != colors.size() / 3)
   {
-    cpreset.removeMember("Annotations");
+    qWarning("Preset has unexpected size");
+    return;
+  }
+
+  // Keep only rows visible in the widget
+  Json::Value cleanAnnotations;
+  Json::Value cleanColors;
+  auto table = this->Internals->Ui.AnnotationsTable;
+  Json::ArrayIndex idxAnno, idxColor;
+  for (idxAnno = idxColor = 0; idxAnno < annotations.size(); idxAnno += 2, idxColor += 3)
+  {
+    std::string serieName = annotations[idxAnno].asString();
+    for (int j = 0; j < table->model()->rowCount(); j++)
+    {
+      auto idx = table->model()->index(j, pqAnnotationsModel::VALUE);
+      QString annotation = table->model()->data(idx).toString();
+      if (serieName == annotation.toStdString() &&
+        table->model()
+          ->data(table->model()->index(j, pqAnnotationsModel::VISIBILITY), Qt::UserRole)
+          .toBool())
+      {
+        cleanColors.append(colors.get(idxColor, nullValue));
+        cleanColors.append(colors.get(idxColor + 1, nullValue));
+        cleanColors.append(colors.get(idxColor + 2, nullValue));
+
+        if (!removeAnnotations)
+        {
+          cleanAnnotations.append(annotations.get(idxAnno, nullValue));
+          cleanAnnotations.append(annotations.get(idxAnno + 1, nullValue));
+        }
+        break;
+      }
+    }
+  }
+
+  cpreset[INDEXED_COLORS] = cleanColors;
+  if (!removeAnnotations)
+  {
+    cpreset[ANNOTATIONS] = cleanAnnotations;
+  }
+  else
+  {
+    cpreset.removeMember(ANNOTATIONS);
   }
 
   std::string presetName = defaultName;
-  if (!cpreset.isNull())
   {
     // This scoping is necessary to ensure that the vtkSMTransferFunctionPresets
     // saves the new preset to the "settings" before the choosePreset dialog is
@@ -977,7 +1031,8 @@ void pqColorAnnotationsWidget::setSelectedAnnotations(const QStringList& annotat
   auto table = this->Internals->Ui.AnnotationsTable;
   auto prevSelection = table->selectionModel()->selection();
   table->selectionModel()->clearSelection();
-  for (int i = 0; i < table->model()->columnCount(); i++)
+
+  for (int i = 0; i < table->model()->rowCount(); i++)
   {
     auto idx = table->model()->index(i, pqAnnotationsModel::VALUE);
     if (annotations.contains(idx.data().toString()))
@@ -1056,6 +1111,12 @@ void pqColorAnnotationsWidget::setSupportsReorder(bool reorder)
   this->Internals->Ui.AnnotationsTable->setDragEnabled(reorder);
   this->Internals->Ui.AnnotationsTable->setDragDropMode(
     reorder ? QAbstractItemView::InternalMove : QAbstractItemView::NoDragDrop);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorAnnotationsWidget::sort(int column, Qt::SortOrder order)
+{
+  this->Internals->Ui.AnnotationsTable->model()->sort(column, order);
 }
 
 //-----------------------------------------------------------------------------
