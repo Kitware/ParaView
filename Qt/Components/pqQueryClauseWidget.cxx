@@ -335,6 +335,7 @@ void pqQueryClauseWidget::populateSelectionCondition()
 #ifndef REMOVE_COLLECTIVE_CLAUSES
       this->Internals->condition->addItem("is min", pqQueryClauseWidget::SINGLE_VALUE_MIN);
       this->Internals->condition->addItem("is max", pqQueryClauseWidget::SINGLE_VALUE_MAX);
+      this->Internals->condition->addItem("is NaN", pqQueryClauseWidget::SINGLE_VALUE_NAN);
       this->Internals->condition->addItem(
         "is less than mean", pqQueryClauseWidget::SINGLE_VALUE_LE_MEAN);
       this->Internals->condition->addItem(
@@ -385,6 +386,7 @@ void pqQueryClauseWidget::updateValueWidget()
   {
     case SINGLE_VALUE_MIN:
     case SINGLE_VALUE_MAX:
+    case SINGLE_VALUE_NAN:
     case SINGLE_VALUE_LE_MEAN:
     case SINGLE_VALUE_GE_MEAN:
       this->Internals->valueStackedWidget->setCurrentIndex(4);
@@ -713,6 +715,12 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
     case SINGLE_VALUE_MAX:
       if (query.isEmpty())
         query = "%1  == max(%1)";
+      query = query.arg(fieldName);
+      ok_no_value = true;
+      break;
+    case SINGLE_VALUE_NAN:
+      if (query.isEmpty())
+        query = "isnan(%1)";
       query = query.arg(fieldName);
       ok_no_value = true;
       break;
