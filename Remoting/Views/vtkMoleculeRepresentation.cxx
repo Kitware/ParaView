@@ -299,6 +299,8 @@ void vtkMoleculeRepresentation::UpdateColoringParameters()
   }
 
 vtkForwardPropertyCallMacro(SetOpacity, value, double);
+vtkForwardPropertyCallMacro(SetSpecular, value, double);
+vtkForwardPropertyCallMacro(SetSpecularPower, value, double);
 
 void vtkMoleculeRepresentation::SetMapScalars(bool map)
 {
