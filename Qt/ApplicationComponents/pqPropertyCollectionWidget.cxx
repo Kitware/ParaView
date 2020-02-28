@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqProxyWidget.h"
 #include "pqSMAdaptor.h"
+#include "pqView.h"
 #include "vtkPVLogger.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMPropertyGroup.h"
@@ -153,6 +154,8 @@ public:
         "ParaView::PropertyCollectionWidget::index", static_cast<int>(this->Items.size()));
       widget->setApplyChangesImmediately(true);
       widget->updatePanel();
+      widget->setView(self->view());
+      QObject::connect(self, &pqPropertyWidget::viewChanged, widget, &pqProxyWidget::setView);
 
       QObject::connect(
         widget, &pqProxyWidget::changeFinished, [self]() { self->updateProperties(); });
