@@ -856,14 +856,14 @@ class CoProcessor(object):
 
     def SetRootDirectory(self, root_directory):
         """ Makes Catalyst put all output under this directory. """
-        if root_directory is not '' and not root_directory.endswith("/"):
+        if root_directory and not root_directory.endswith("/"):
             root_directory = root_directory + "/"
         self.__RootDirectory = root_directory
 
 
     def __FixupWriters(self):
         """ Called once to ensure that all writers obey the root directory directive """
-        if self.__RootDirectory is "":
+        if not self.__RootDirectory:
             return
         for view in self.__ViewsList:
             view.cpFileName = self.__RootDirectory + view.cpFileName
