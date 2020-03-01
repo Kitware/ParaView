@@ -33,13 +33,13 @@ target_compile_definitions(with_paraview
     WITH_PARAVIEW)
 target_link_libraries(with_paraview
   PRIVATE
-    ${PARAVIEW_LIBRARIES}
+    ${ParaView_LIBRARIES}
     ${VTK_LIBRARIES}
     -LWITH_PARAVIEW)
 # Explicitly not doing autoinit since the generated header gets deleted.
 #vtk_module_autoinit(
 #  TARGETS with_paraview
-#  MODULES ${PARAVIEW_LIBRARIES})
+#  MODULES ${ParaView_LIBRARIES})
 
 add_executable(without_paraview "${src}")
 target_compile_definitions(without_paraview
