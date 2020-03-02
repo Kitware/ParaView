@@ -90,28 +90,19 @@ int vtkPVMergeTables::RequestData(
   vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   int num_connections = this->GetNumberOfInputConnections(0);
+  std::vector<vtkTable*> inputs;
 
   // Get output table
   vtkTable* outputTable = vtkTable::GetData(outputVector, 0);
-
   if (vtkTable::GetData(inputVector[0], 0))
   {
-    vtkTable** inputs = new vtkTable*[num_connections];
     for (int idx = 0; idx < num_connections; ++idx)
     {
-      inputs[idx] = vtkTable::GetData(inputVector[0], idx);
+      inputs.push_back(vtkTable::GetData(inputVector[0], idx));
     }
-    ::vtkPVMergeTablesMerge(outputTable, inputs, num_connections);
-    delete[] inputs;
-    return 1;
   }
-
-  vtkCompositeDataSet* input0 = vtkCompositeDataSet::GetData(inputVector[0], 0);
-  vtkCompositeDataIterator* iter = input0->NewIterator();
-  iter->SkipEmptyNodesOff();
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+  else
   {
-    vtkTable** inputs = new vtkTable*[num_connections];
     for (int idx = 0; idx < num_connections; ++idx)
     {
       vtkCompositeDataSet* inputCD = vtkCompositeDataSet::GetData(inputVector[0], idx);
@@ -119,23 +110,21 @@ int vtkPVMergeTables::RequestData(
       {
         continue;
       }
-      vtkSmartPointer<vtkCompositeDataIterator> iter2;
-      iter2.TakeReference(inputCD->NewIterator());
-      if (iter2->IsDoneWithTraversal())
+
+      vtkSmartPointer<vtkCompositeDataIterator> iter;
+      iter.TakeReference(inputCD->NewIterator());
+      iter->SkipEmptyNodesOn();
+      for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
       {
-        // trivial case, the composite dataset being merged is empty, simply
-        // ignore it.
-        inputs[idx] = NULL;
-      }
-      else
-      {
-        inputs[idx] = vtkTable::SafeDownCast(inputCD->GetDataSet(iter));
+        vtkTable* input = vtkTable::SafeDownCast(inputCD->GetDataSet(iter));
+        if (input)
+        {
+          inputs.push_back(input);
+        }
       }
     }
-    ::vtkPVMergeTablesMerge(outputTable, inputs, num_connections);
-    delete[] inputs;
   }
-  iter->Delete();
+  ::vtkPVMergeTablesMerge(outputTable, inputs.data(), static_cast<int>(inputs.size()));
   return 1;
 }
 
