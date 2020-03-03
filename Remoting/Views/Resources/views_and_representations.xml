@@ -2485,14 +2485,6 @@
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <IntVectorProperty command="SetSkyboxResolution"
-                         default_values="1000"
-                         name="SkyboxResolution"
-                         number_of_elements="1">
-        <Documentation>
-          Set the resolution of the skybox.
-        </Documentation>
-      </IntVectorProperty>
       <ProxyProperty command="SetBackgroundTexture"
                      name="BackgroundTexture" panel_widget="texture_selector">
         <ProxyGroupDomain name="groups">
@@ -2988,7 +2980,6 @@
         <Property name="UseTexturedBackground"/>
         <Property name="UseSkyboxBackground"/>
         <Property name="UseEnvironmentLighting"/>
-        <Property name="SkyboxResolution"/>
         <Property name="BackgroundTexture"/>
       </PropertyGroup>
       <PropertyGroup label="Stereo">
@@ -10269,7 +10260,6 @@
             <Property name="UseTexturedBackground"/>
             <Property name="UseSkyboxBackground"/>
             <Property name="UseEnvironmentLighting"/>
-            <Property name="SkyboxResolution"/>
             <Property name="BackgroundTexture"/>
           </PropertyGroup>
 

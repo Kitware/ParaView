@@ -37,7 +37,6 @@
 class vtkAlgorithmOutput;
 class vtkCamera;
 class vtkCuller;
-class vtkEquirectangularToCubeMapTexture;
 class vtkExtentTranslator;
 class vtkFloatArray;
 class vtkFXAAOptions;
@@ -959,12 +958,6 @@ public:
    */
   void SynchronizeMaximumIds(vtkIdType* maxPointId, vtkIdType* maxCellId);
 
-  /**
-   * Set skybox cubemap resolution in pixel.
-   * Each face (which is a square) of the skybox will have this resolution.
-   */
-  void SetSkyboxResolution(int resolution);
-
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView() override;
@@ -1088,7 +1081,6 @@ protected:
   vtkSmartPointer<vtkPVGridAxes3DActor> GridAxes3DActor;
   vtkNew<vtkSkybox> Skybox;
   bool NeedSkybox = false;
-  vtkNew<vtkEquirectangularToCubeMapTexture> CubeMap;
 
   int StillRenderImageReductionFactor;
   int InteractiveRenderImageReductionFactor;
