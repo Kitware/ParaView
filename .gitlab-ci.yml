@@ -1,0 +1,17 @@
+# This currently only has superbuild CI triggers
+# ParaView-CI stages to follow
+
+stages:
+  - package
+
+superbuild:
+  stage: package
+  only:
+    - branches@paraview/paraview
+    - tags@paraview/paraview
+  variables:
+    PARAVIEW_BRANCH: $CI_COMMIT_REF_NAME
+  trigger:
+    project: paraview/paraview-superbuild
+    branch: $CI_COMMIT_REF_NAME
+    strategy: depend
