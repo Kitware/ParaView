@@ -195,7 +195,7 @@ def get_pipeline():
     for proxy in proxies:
         source = paraview.simple.FindSource(proxy['name'])
         numberOfProducers = source.GetNumberOfProducers()
-        if proxy['parent'] is '0' and numberOfProducers > 0:
+        if proxy['parent'] == '0' and numberOfProducers > 0:
             # this proxy is the result of a merge
             parents = []
             for i in xrange(numberOfProducers):
