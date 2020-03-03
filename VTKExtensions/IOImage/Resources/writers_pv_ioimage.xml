@@ -86,6 +86,23 @@
                             number_of_elements="1">
         <Documentation>The name of the file to be written.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Scalars"
+                            name="SelectInputScalars"
+                            number_of_elements="5"
+                            panel_visibility="default">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property contains the name of the scalar array to
+        be saved.</Documentation>
+      </StringVectorProperty>
+
       <Hints>
         <WriterFactory extensions="tiff"
                        file_description="TIFF Image Files" />
