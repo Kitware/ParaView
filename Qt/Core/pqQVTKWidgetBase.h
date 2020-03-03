@@ -33,20 +33,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqQVTKWidgetBase_h
 
 #if defined(__APPLE__)
-// on macOS, we never use QVTKOpenGLWidget, but always the
-// QVTKOpenGLNativeWidget. QVTKOpenGLWidget which uses `QWidget::createWindowContainer`
+// on macOS, we never use QVTKOpenGLStereoWidget, but always the
+// QVTKOpenGLNativeWidget. QVTKOpenGLStereoWidget which uses `QWidget::createWindowContainer`
 // is not portable and only needed when quad-buffer stereo is being used. Since
 // macOS doesn't support quad-buffer stereo, there's no need to use the
 // non-portable version.
 #include "QVTKOpenGLNativeWidget.h"
 using pqQVTKWidgetBase = QVTKOpenGLNativeWidget;
 #define PARAVIEW_USING_QVTKOPENGLNATIVEWIDGET 1
-#define PARAVIEW_USING_QVTKOPENGLWIDGET 0
+#define PARAVIEW_USING_QVTKOPENGLSTEREOWIDGET 0
 #else
-#include "QVTKOpenGLWidget.h"
-using pqQVTKWidgetBase = QVTKOpenGLWidget;
+#include "QVTKOpenGLStereoWidget.h"
+using pqQVTKWidgetBase = QVTKOpenGLStereoWidget;
 #define PARAVIEW_USING_QVTKOPENGLNATIVEWIDGET 0
-#define PARAVIEW_USING_QVTKOPENGLWIDGET 1
+#define PARAVIEW_USING_QVTKOPENGLSTEREOWIDGET 1
 #endif
 
 class vtkGenericOpenGLRenderWindow;
