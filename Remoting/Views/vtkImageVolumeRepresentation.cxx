@@ -24,12 +24,14 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
+#include "vtkMultiBlockVolumeMapper.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
 #include "vtkPExtentTranslator.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
+#include "vtkPartitionedDataSet.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
@@ -107,7 +109,7 @@ vtkStandardNewMacro(vtkImageVolumeRepresentation);
 //----------------------------------------------------------------------------
 vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
 {
-  this->VolumeMapper = vtkSmartVolumeMapper::New();
+  this->VolumeMapper = vtkMultiBlockVolumeMapper::New();
   this->Property = vtkVolumeProperty::New();
 
   this->Actor = vtkPVLODVolume::New();
@@ -116,7 +118,6 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
   this->OutlineSource = vtkOutlineSource::New();
   this->OutlineMapper = vtkPolyDataMapper::New();
 
-  this->Cache = vtkImageData::New();
   this->Actor->SetLODMapper(this->OutlineMapper);
 
   vtkMath::UninitializeBounds(this->DataBounds);
@@ -139,14 +140,13 @@ vtkImageVolumeRepresentation::~vtkImageVolumeRepresentation()
   this->Actor->Delete();
   this->OutlineSource->Delete();
   this->OutlineMapper->Delete();
-
-  this->Cache->Delete();
 }
 
 //----------------------------------------------------------------------------
 int vtkImageVolumeRepresentation::FillInputPortInformation(int, vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkImageData");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPartitionedDataSet");
   info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
   return 1;
 }
@@ -175,11 +175,18 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
 
     vtkPVRenderView::SetGeometryBounds(inInfo, this, this->DataBounds);
 
-    // Pass partitioning information to the render view.
-    vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this,
-      this->PExtentTranslator.GetPointer(), this->WholeExtent, this->Origin, this->Spacing);
-
     vtkPVRenderView::SetRequiresDistributedRendering(inInfo, this, true);
+
+    if (vtkPartitionedDataSet::SafeDownCast(this->Cache))
+    {
+      vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this->DataBounds);
+    }
+    else
+    {
+      // Pass partitioning information to the render view.
+      vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this,
+        this->PExtentTranslator.GetPointer(), this->WholeExtent, this->Origin, this->Spacing);
+    }
   }
   else if (request_type == vtkPVView::REQUEST_UPDATE_LOD())
   {
@@ -210,35 +217,57 @@ int vtkImageVolumeRepresentation::RequestData(
 
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
-    vtkImageData* input = vtkImageData::GetData(inputVector[0], 0);
-    this->Cache->ShallowCopy(input);
-    if (input->HasAnyGhostCells())
+    if (auto inputID = vtkImageData::GetData(inputVector[0], 0))
     {
-      int ext[6];
-      vtkGetNonGhostExtent(ext, this->Cache);
-      // Yup, this will modify the "input", but that okay for now. Ultimately,
-      // we will teach the volume mapper to handle ghost cells and this won't
-      // be needed. Once that's done, we'll need to teach the KdTree
-      // generation code to handle overlap in extents, however.
-      this->Cache->Crop(ext);
+      vtkNew<vtkImageData> cache;
+      cache->ShallowCopy(inputID);
+      if (inputID->HasAnyGhostCells())
+      {
+        int ext[6];
+        vtkGetNonGhostExtent(ext, cache);
+        // Yup, this will modify the "input", but that okay for now. Ultimately,
+        // we will teach the volume mapper to handle ghost cells and this won't
+        // be needed. Once that's done, we'll need to teach the KdTree
+        // generation code to handle overlap in extents, however.
+        cache->Crop(ext);
+      }
+
+      this->Actor->SetEnableLOD(0);
+      this->VolumeMapper->SetInputData(cache);
+
+      this->OutlineSource->SetBounds(cache->GetBounds());
+      this->OutlineSource->GetBounds(this->DataBounds);
+      this->OutlineSource->Update();
+
+      this->DataSize = cache->GetActualMemorySize();
+
+      // Collect information about volume that is needed for data redistribution
+      // later.
+      this->PExtentTranslator->GatherExtents(cache);
+      cache->GetOrigin(this->Origin);
+      cache->GetSpacing(this->Spacing);
+      vtkStreamingDemandDrivenPipeline::GetWholeExtent(
+        inputVector[0]->GetInformationObject(0), this->WholeExtent);
+      this->Cache = cache.GetPointer();
     }
-
-    this->Actor->SetEnableLOD(0);
-    this->VolumeMapper->SetInputData(this->Cache);
-
-    this->OutlineSource->SetBounds(this->Cache->GetBounds());
-    this->OutlineSource->GetBounds(this->DataBounds);
-    this->OutlineSource->Update();
-
-    this->DataSize = this->Cache->GetActualMemorySize();
-
-    // Collect information about volume that is needed for data redistribution
-    // later.
-    this->PExtentTranslator->GatherExtents(this->Cache);
-    this->Cache->GetOrigin(this->Origin);
-    this->Cache->GetSpacing(this->Spacing);
-    vtkStreamingDemandDrivenPipeline::GetWholeExtent(
-      inputVector[0]->GetInformationObject(0), this->WholeExtent);
+    else if (auto inputPD = vtkPartitionedDataSet::GetData(inputVector[0], 0))
+    {
+      if (!vtkMultiBlockVolumeMapper::SafeDownCast(this->VolumeMapper))
+      {
+        vtkWarningMacro("Representation does not support rendering paritioned datasets yet.");
+      }
+      else
+      {
+        vtkNew<vtkPartitionedDataSet> cache;
+        cache->CopyStructure(inputPD);
+        for (unsigned int cc = 0; cc < inputPD->GetNumberOfPartitions(); ++cc)
+        {
+          cache->SetPartition(cc, vtkImageData::SafeDownCast(inputPD->GetPartition(cc)));
+        }
+        cache->GetBounds(this->DataBounds);
+        this->Cache = cache.GetPointer();
+      }
+    }
   }
   else
   {
@@ -355,8 +384,16 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
     int const mode = indep ? ctf->GetVectorMode() : vtkScalarsToColors::COMPONENT;
     int const comp = indep ? ctf->GetVectorComponent() : 0;
 
-    this->VolumeMapper->SetVectorMode(mode);
-    this->VolumeMapper->SetVectorComponent(comp);
+    if (auto smartVolumeMapper = vtkSmartVolumeMapper::SafeDownCast(this->VolumeMapper))
+    {
+      smartVolumeMapper->SetVectorMode(mode);
+      smartVolumeMapper->SetVectorComponent(comp);
+    }
+    else if (auto mbMapper = vtkMultiBlockVolumeMapper::SafeDownCast(this->VolumeMapper))
+    {
+      mbMapper->SetVectorMode(mode);
+      mbMapper->SetVectorComponent(comp);
+    }
   }
 }
 
@@ -490,7 +527,15 @@ void vtkImageVolumeRepresentation::SetSliceFunction(vtkImplicitFunction* slice)
 //----------------------------------------------------------------------------
 void vtkImageVolumeRepresentation::SetRequestedRenderMode(int mode)
 {
-  this->VolumeMapper->SetRequestedRenderMode(mode);
+  if (auto smartVolumeMapper = vtkSmartVolumeMapper::SafeDownCast(this->VolumeMapper))
+  {
+    smartVolumeMapper->SetRequestedRenderMode(mode);
+  }
+  else if (auto mbMapper = vtkMultiBlockVolumeMapper::SafeDownCast(this->VolumeMapper))
+  {
+    mbMapper->SetRequestedRenderMode(mode);
+  }
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------

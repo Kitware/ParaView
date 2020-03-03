@@ -18,40 +18,29 @@
 #include "vtkCellData.h"
 #include "vtkCharArray.h"
 #include "vtkCompositeDataIterator.h"
-#include "vtkCompositeDataSet.h"
-#include "vtkDataSetReader.h"
-#include "vtkDirectedGraph.h"
+#include "vtkDataObjectTypes.h"
 #include "vtkGenericDataObjectReader.h"
 #include "vtkGenericDataObjectWriter.h"
-#include "vtkGraphReader.h"
-#include "vtkGraphWriter.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMPIMToNSocketConnection.h"
-#include "vtkMolecule.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessControllerHelper.h"
-#include "vtkNonOverlappingAMR.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineFilter.h"
-#include "vtkOverlappingAMR.h"
 #include "vtkPVConfig.h"
 #include "vtkPVLogger.h"
 #include "vtkPVSession.h"
 #include "vtkPointData.h"
-#include "vtkPolyData.h"
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkStructuredGrid.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
-#include "vtkUndirectedGraph.h"
-#include "vtkUnstructuredGrid.h"
 
 #include "vtk_zlib.h"
 #include <sstream>
@@ -203,99 +192,21 @@ int vtkMPIMoveData::FillInputPortInformation(int, vtkInformation* info)
 int vtkMPIMoveData::RequestDataObject(
   vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
-  vtkDataObject* output = outputVector->GetInformationObject(0)->Get(vtkDataObject::DATA_OBJECT());
-
-  vtkDataObject* outputCopy = 0;
-  if (this->OutputDataType == VTK_POLY_DATA)
+  auto output = vtkDataObject::GetData(outputVector, 0);
+  if (output && output->GetDataObjectType() == this->OutputDataType)
   {
-    if (output && output->IsA("vtkPolyData"))
-    {
-      return 1;
-    }
-    outputCopy = vtkPolyData::New();
-  }
-  else if (this->OutputDataType == VTK_UNSTRUCTURED_GRID)
-  {
-    if (output && output->IsA("vtkUnstructuredGrid"))
-    {
-      return 1;
-    }
-    outputCopy = vtkUnstructuredGrid::New();
-  }
-  else if (this->OutputDataType == VTK_IMAGE_DATA)
-  {
-    if (output && output->IsA("vtkImageData"))
-    {
-      return 1;
-    }
-    outputCopy = vtkImageData::New();
-  }
-  else if (this->OutputDataType == VTK_DIRECTED_GRAPH)
-  {
-    if (output && output->IsA("vtkDirectedGraph"))
-    {
-      return 1;
-    }
-    outputCopy = vtkDirectedGraph::New();
-  }
-  else if (this->OutputDataType == VTK_UNDIRECTED_GRAPH)
-  {
-    if (output && output->IsA("vtkUndirectedGraph"))
-    {
-      return 1;
-    }
-    outputCopy = vtkUndirectedGraph::New();
-  }
-  else if (this->OutputDataType == VTK_MOLECULE)
-  {
-    if (output && output->IsA("vtkMolecule"))
-    {
-      return 1;
-    }
-    outputCopy = vtkMolecule::New();
-  }
-  else if (this->OutputDataType == VTK_MULTIBLOCK_DATA_SET)
-  {
-    if (output && output->IsA("vtkMultiBlockDataSet"))
-    {
-      return 1;
-    }
-    outputCopy = vtkMultiBlockDataSet::New();
-  }
-  else if (this->OutputDataType == VTK_OVERLAPPING_AMR)
-  {
-    if (output && output->IsA("vtkOverlappingAMR"))
-    {
-      return 1;
-    }
-    outputCopy = vtkOverlappingAMR::New();
-  }
-  else if (this->OutputDataType == VTK_NON_OVERLAPPING_AMR)
-  {
-    if (output && output->IsA("vtkNonOverlappingAMR"))
-    {
-      return 1;
-    }
-    outputCopy = vtkNonOverlappingAMR::New();
-  }
-  else if (this->OutputDataType == VTK_STRUCTURED_GRID)
-  {
-    if (output && output->IsA("vtkStructuredGrid"))
-    {
-      return 1;
-    }
-    outputCopy = vtkStructuredGrid::New();
-  }
-  else
-  {
-    vtkErrorMacro(
-      "Unrecognized output type: " << this->OutputDataType << ". Cannot create output.");
-    return 0;
+    return 1;
   }
 
-  outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), outputCopy);
-  outputCopy->Delete();
-  return 1;
+  if (auto newoutput = vtkDataObjectTypes::NewDataObject(this->OutputDataType))
+  {
+    outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), newoutput);
+    newoutput->FastDelete();
+    return 1;
+  }
+
+  vtkErrorMacro("Unrecognized output type: " << this->OutputDataType << ". Cannot create output.");
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1039,13 +950,11 @@ void vtkMPIMoveData::ClearBuffer()
 //-----------------------------------------------------------------------------
 void vtkMPIMoveData::MarshalDataToBuffer(vtkDataObject* data)
 {
-  vtkDataSet* dataSet = vtkDataSet::SafeDownCast(data);
   vtkImageData* imageData = vtkImageData::SafeDownCast(data);
-  vtkGraph* graph = vtkGraph::SafeDownCast(data);
 
   // Protect from empty data.
-  if ((dataSet && dataSet->GetNumberOfPoints() == 0) ||
-    (graph && graph->GetNumberOfVertices() == 0))
+  if (data->GetNumberOfElements(vtkDataObject::POINT) == 0 &&
+    data->GetNumberOfElements(vtkDataObject::VERTEX) == 0)
   {
     this->NumberOfBuffers = 0;
   }

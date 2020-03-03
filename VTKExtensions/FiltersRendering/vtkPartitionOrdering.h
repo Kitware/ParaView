@@ -32,6 +32,7 @@
 #ifndef vtkPartitionOrdering_h
 #define vtkPartitionOrdering_h
 
+#include "vtkBoundingBox.h" // for vtkBoundingBox
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsFiltersRenderingModule.h" // needed for export macro
 #include <vector>                                     // For dynamic data storage
@@ -96,8 +97,15 @@ protected:
 private:
   vtkMultiProcessController* Controller;
 
-  std::vector<double> ProcessBounds;
-  double GlobalBounds[6];
+  struct BoxT
+  {
+    vtkBoundingBox BBox;
+    int Rank;
+
+    void GetBounds(double bds[6]) const { this->BBox.GetBounds(bds); }
+  };
+  std::vector<BoxT> Boxes;
+  vtkBoundingBox GlobalBounds;
 
   vtkPartitionOrdering(const vtkPartitionOrdering&) = delete;
   void operator=(const vtkPartitionOrdering&) = delete;
