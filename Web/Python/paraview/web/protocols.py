@@ -2441,7 +2441,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
             groupInfo = groupList[idx]
             group = groupInfo['group']
             parentGroup = groupInfo['parentGroup']
-            if group is not 'root' and self.groupDetailsMap[group]['groupVisibility'] == 'never':
+            if group != 'root' and self.groupDetailsMap[group]['groupVisibility'] == 'never':
                 self.debug('Culling property (%s) in group (%s) because group has visibility never' % (propList[idx]['name'], group))
                 continue
             if not group in groupMap:
@@ -2486,7 +2486,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         # case, the group should be marked the same.
         if uiList:
             for groupName in groupMap:
-                if groupName is not 'root' and 'ui' in groupMap[groupName]:
+                if groupName != 'root' and 'ui' in groupMap[groupName]:
                     groupUiList = groupMap[groupName]['ui']
                     firstUiElt = groupUiList[0]
                     groupDependency = False
