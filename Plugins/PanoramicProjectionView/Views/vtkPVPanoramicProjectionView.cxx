@@ -57,6 +57,12 @@ void vtkPVPanoramicProjectionView::SetAngle(double angle)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVPanoramicProjectionView::SetCubemapInterpolation(bool interpolate)
+{
+  this->ProjectionPass->SetInterpolate(interpolate);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVPanoramicProjectionView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
