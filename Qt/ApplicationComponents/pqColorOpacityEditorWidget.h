@@ -47,20 +47,22 @@ class pqColorMapModel;
 * color and opacity transfer functions. The property group is expected to have
 * properties with the following functions. If any of the optional properties
 * are missing, then the corresponding widgets are hidden.
-* \li "XRGBPoints"            :- property with (x,r,g,b) tuples that is
-*                                controlled by a color-transfer function editor
-*                                (pqTransferFunctionWidget).
-* \li "ScalarOpacityFunction" :- (optional) proxy-property referring to a proxy with
-*                                "Points" property with (x,a,m,s) tuples that
-*                                is controlled by an opacity-transfer function
-*                                editor (pqTransferFunctionWidget).
-* \li "EnableOpacityMapping"  :- (optional) property used to enable
-*                                opacity mapping for surfaces. Controlled by a
-*                                checkbox in the Widget.
-* \li "UseLogScale"           :- (optional) property used to enable/disable log mapping
-*                                for colors.
-* \li "UseLogScaleOpacity"    :- (optional) property used to enable/disable log mapping
-*                                for opacity.
+* \li "XRGBPoints"                              :- property with (x,r,g,b) tuples that is
+*                                                  controlled by a color-transfer function
+*                                                  editor (pqTransferFunctionWidget).
+* \li "ScalarOpacityFunction"                   :- (optional) proxy-property referring to a proxy
+*                                                  with "Points" property with (x,a,m,s) tuples that
+*                                                  is controlled by an opacity-transfer function
+*                                                  editor (pqTransferFunctionWidget).
+* \li "EnableOpacityMapping"                    :- (optional) property used to enable
+*                                                  opacity mapping for surfaces. Controlled by a
+*                                                  checkbox in the Widget.
+* \li "UseLogScale"                             :- (optional) property used to enable/disable log
+*                                                  mapping for colors.
+* \li "UseLogScaleOpacity"                      :- (optional) property used to enable/disable log
+*                                                  mapping for opacity.
+* \li "UseOpacityControlPointsFreehandDrawing"  :- (optional) property used to enable/disable
+*                                                  freehand drawing for positioning control points
 * Caveats:
 * \li Opacity editor:- pqColorOpacityEditorWidget shows an opacity editor widget.
 * Typically, opacity function is optional and used only when
@@ -79,6 +81,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorOpacityEditorWidget : public pqPrope
     int dataHistogramNumberOfBins READ dataHistogramNumberOfBins WRITE setDataHistogramNumberOfBins)
   Q_PROPERTY(bool useLogScale READ useLogScale WRITE setUseLogScale)
   Q_PROPERTY(bool useLogScaleOpacity READ useLogScaleOpacity WRITE setUseLogScaleOpacity)
+  Q_PROPERTY(bool useOpacityControlPointsFreehandDrawing READ useOpacityControlPointsFreehandDrawing
+      WRITE setUseOpacityControlPointsFreehandDrawing)
   Q_PROPERTY(pqSMProxy scalarOpacityFunctionProxy READ scalarOpacityFunctionProxy WRITE
       setScalarOpacityFunctionProxy)
   typedef pqPropertyWidget Superclass;
@@ -108,6 +112,11 @@ public:
   * Returns the value for use-log-scale.
   */
   bool useLogScaleOpacity() const;
+
+  /**
+   * Returns the value for the use of freehand drawing when positioning opacity control points.
+   */
+  bool useOpacityControlPointsFreehandDrawing() const;
 
   /**
   * Returns the value for showDataHistogram
@@ -150,6 +159,11 @@ public slots:
   * Set whether to use-log scale.
   */
   void setUseLogScaleOpacity(bool value);
+
+  /**
+   * Set whether to use freehand drawing for positioning opacity control points.
+   */
+  void setUseOpacityControlPointsFreehandDrawing(bool value);
 
   /**
   * Set whether to show data histogram.
@@ -232,6 +246,11 @@ signals:
   void useLogScaleOpacityChanged();
 
   /**
+  * Signal fired when useOpacityControlPointsFreehandDrawing changes.
+  */
+  void useOpacityControlPointsFreehandDrawingChanged();
+
+  /**
   * Signal fired when showDataHistogram changes.
   */
   void showDataHistogramChanged();
@@ -303,6 +322,12 @@ protected slots:
   * extra logic to valid ranges convert the color map to log/linear space.
   */
   void useLogScaleOpacityClicked(bool);
+
+  /**
+  * Called when UseOpacityControlPointsFreehandDrawing checkbox
+  * is clicked by the user. We transfer the call to the pqTransferFunctionEditor.
+  */
+  void useOpacityControlPointsFreehandDrawingClicked(bool);
 
   /**
   * Called when the showDataHistogram checkbox is clicked by the user. We then add

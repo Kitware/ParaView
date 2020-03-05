@@ -91,6 +91,14 @@ public:
   vtkPiecewiseFunction* piecewiseFunction() const;
   //@}
 
+  //@{
+  /**
+   * Set/Get the use of freehand drawing for the control points.
+   */
+  void SetControlPointsFreehandDrawing(bool use);
+  bool GetControlPointsFreehandDrawing() const;
+  //@}
+
 public slots:
   /**
   * Set the current point. Set to -1 clear the current point.

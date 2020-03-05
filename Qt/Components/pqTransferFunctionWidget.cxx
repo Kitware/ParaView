@@ -546,6 +546,18 @@ vtkIdType pqTransferFunctionWidget::numberOfControlPoints() const
 }
 
 //-----------------------------------------------------------------------------
+void pqTransferFunctionWidget::SetControlPointsFreehandDrawing(bool use)
+{
+  this->Internals->ControlPointsItem->SetStrokeMode(use);
+}
+
+//-----------------------------------------------------------------------------
+bool pqTransferFunctionWidget::GetControlPointsFreehandDrawing() const
+{
+  return this->Internals->ControlPointsItem->GetStrokeMode();
+}
+
+//-----------------------------------------------------------------------------
 void pqTransferFunctionWidget::SetLogScaleXAxis(bool logScale)
 {
   this->Internals->ChartXY->GetAxis(vtkAxis::BOTTOM)->SetLogScale(logScale);

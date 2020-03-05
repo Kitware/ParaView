@@ -241,6 +241,16 @@
     </layout>
    </item>
    <item>
+    <widget class="QCheckBox" name="UseOpacityControlPointsFreehandDrawing">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the control point of the opacity transfer fonction can be "drawn" instead of being placed one by one.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Enable Freehand drawing of the opacity transfer function</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QCheckBox" name="UseLogScale">
      <property name="toolTip">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the mapping from data to colors is done using a log-scale. Note that this does not affect the mapping of data to opacity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
