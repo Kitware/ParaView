@@ -297,6 +297,7 @@
   <Proxy group="filters" name="TableToPolyData" />
   <Proxy group="filters" name="TableToStructuredGrid" />
   <Proxy group="filters" name="IsoVolume" />
+  <Proxy group="filters" name="DeflectNormals" />
 
   <Proxy group="filters" name="GenericClip" />
   <Proxy group="filters" name="GenericContour" />
