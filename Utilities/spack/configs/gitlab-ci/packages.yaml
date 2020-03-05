@@ -1,0 +1,5 @@
+packages:
+  cmake:
+    paths:
+      cmake: /builds/gitlab-kitware-sciviz-ci/.gitlab/cmake
+    buildable: False
