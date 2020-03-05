@@ -1052,8 +1052,8 @@ endif()
 if(PARAVIEW_USE_PYTHON)
   list(APPEND TESTS_WITH_BASELINES
     ColorByComponentNames.xml # needs programmable filter
-    PythonShellRunScript.xml
     LiveProgrammableSource.xml
+    PythonShellRunScript.xml
     SaveLoadStatePython.xml
     SelectionLabels.xml
     TraceExodus.xml
@@ -1062,6 +1062,7 @@ if(PARAVIEW_USE_PYTHON)
     TraceStatisticsFilter.xml
     TraceSupplementalProxiesFully.xml
     TraceTimeControls.xml
+    TraceWithoutRenderingComponents.xml
   )
   list(APPEND TESTS_WITH_INLINE_COMPARES
     RestoreArrayDefaultTransferFunction.xml

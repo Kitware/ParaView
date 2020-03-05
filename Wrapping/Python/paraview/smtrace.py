@@ -73,6 +73,9 @@ from paraview.vtk import vtkTimeStamp
 if sys.version_info >= (3,):
     xrange = range
 
+def _get_skip_rendering():
+    return sm.vtkSMTrace.GetActiveTracer().GetSkipRenderingComponents()
+
 class TraceOutput:
   """Internal class used to collect the trace output. Everytime anything is pushed into
   this using the append API, we ensure that the trace is updated. Trace
@@ -180,6 +183,8 @@ class Trace(object):
         ProxyAccessor has been created, other returns False. This is needed to
         bring into trace proxies that were either already created when the trace
         was started or were created indirectly and hence not explicitly traced."""
+        skip_rendering = _get_skip_rendering()
+
         if isinstance(obj, sm.SourceProxy):
             # handle pipeline source/filter proxy.
             pname = obj.SMProxy.GetSessionProxyManager().GetProxyName("sources", obj.SMProxy)
@@ -195,7 +200,7 @@ class Trace(object):
                         "# find source",
                         "%s = FindSource('%s')" % (accessor, pname)])
                 return True
-        if obj.SMProxy.IsA("vtkSMViewProxy"):
+        if not skip_rendering and obj.SMProxy.IsA("vtkSMViewProxy"):
             # handle view proxy.
             pname = obj.SMProxy.GetSessionProxyManager().GetProxyName("views", obj.SMProxy)
             if pname:
@@ -222,7 +227,7 @@ class Trace(object):
                 if layout:
                     cls.get_accessor(layout)
                 return True
-        if obj.SMProxy.IsA("vtkSMRepresentationProxy"):
+        if not skip_rendering and obj.SMProxy.IsA("vtkSMRepresentationProxy"):
             # handle representations.
             if hasattr(obj, "Input"):
                 inputAccsr = cls.get_accessor(obj.Input)
@@ -237,15 +242,15 @@ class Trace(object):
                         "%s = GetDisplayProperties(%s, view=%s)" %\
                             (accessor, inputAccsr, viewAccessor)])
                     return True
-        if cls.get_registered_name(obj, "lookup_tables"):
+        if not skip_rendering and cls.get_registered_name(obj, "lookup_tables"):
             pname = cls.get_registered_name(obj, "lookup_tables")
             if cls._create_accessor_for_tf(obj, pname):
                 return True
-        if cls.get_registered_name(obj, "piecewise_functions"):
+        if not skip_rendering and cls.get_registered_name(obj, "piecewise_functions"):
             pname = cls.get_registered_name(obj, "piecewise_functions")
             if cls._create_accessor_for_tf(obj, pname):
                 return True
-        if cls.get_registered_name(obj, "scalar_bars"):
+        if not skip_rendering and cls.get_registered_name(obj, "scalar_bars"):
             # trace scalar bar.
             lutAccessor = cls.get_accessor(obj.LookupTable)
             view = simple.LocateView(obj)
@@ -263,7 +268,7 @@ class Trace(object):
             return True
         if cls.get_registered_name(obj, "animation"):
             return cls._create_accessor_for_animation_proxies(obj)
-        if cls.get_registered_name(obj, "layouts"):
+        if not skip_rendering and cls.get_registered_name(obj, "layouts"):
             view = simple.GetActiveView()
             if view and obj.GetViewLocation(view.SMProxy) != -1:
                 viewAccessor = cls.get_accessor(view)
@@ -286,7 +291,7 @@ class Trace(object):
                     "# get the time-keeper",
                     "%s = GetTimeKeeper()" % tkAccessor])
             return True
-        if obj.GetVTKClassName() == "vtkPVLight":
+        if not skip_rendering and obj.GetVTKClassName() == "vtkPVLight":
             view = simple.GetViewForLight(obj)
             if view:
                 index = view.AdditionalLights.index(obj)
@@ -302,13 +307,13 @@ class Trace(object):
                     "# create a new light",
                     "%s = CreateLight()" % (accessor)])
             return True
-        if obj.SMProxy.IsA("vtkSMMaterialLibraryProxy"):
+        if not skip_rendering and obj.SMProxy.IsA("vtkSMMaterialLibraryProxy"):
             tkAccessor = ProxyAccessor(cls.get_varname(cls.get_registered_name(obj, "materiallibrary")), obj)
             cls.Output.append_separated([\
                     "# get the material library",
                     "%s = GetMaterialLibrary()" % tkAccessor])
             return True
-        if obj.GetVTKClassName() == "vtkTexture":
+        if not skip_rendering and obj.GetVTKClassName() == "vtkTexture":
             pname = obj.SMProxy.GetSessionProxyManager().GetProxyName("textures", obj.SMProxy)
             if pname:
                 accessor = ProxyAccessor(cls.get_varname(pname), obj)
@@ -871,10 +876,21 @@ def SupplementalProxy(cls):
 # === TraceItem types ==
 # TraceItems are units of traceable actions triggered by the application using vtkSMTrace
 # ===================================================================================================
+class RenderingMixin(object):
+    @property
+    def skip_from_trace(self):
+        if _get_skip_rendering():
+            return True
+        return False
 
 class TraceItem(object):
     def __init__(self):
-        pass
+        try:
+            if self.skip_from_trace:
+                raise Untraceable("skipped")
+        except AttributeError:
+            pass
+
     def finalize(self):
         pass
 
@@ -999,7 +1015,7 @@ class PropertiesModified(NestableTraceItem):
                         valaccessor.trace_properties(props_to_trace, in_ctor=False)])
         TraceItem.finalize(self)
 
-class ScalarBarInteraction(NestableTraceItem):
+class ScalarBarInteraction(RenderingMixin, NestableTraceItem):
     """Traces scalar bar interactions"""
     def __init__(self, proxy, comment=None):
         TraceItem.__init__(self)
@@ -1020,7 +1036,7 @@ class ScalarBarInteraction(NestableTraceItem):
                 self.Comment,
                 self.ProxyAccessor.trace_properties(props_to_trace, in_ctor=False)])
 
-class Show(TraceItem):
+class Show(RenderingMixin, TraceItem):
     """Traces Show"""
     def __init__(self, producer, port, view, display, comment=None):
         TraceItem.__init__(self)
@@ -1071,7 +1087,7 @@ class Show(TraceItem):
         Trace.Output.append_separated(output.raw_data())
         TraceItem.finalize(self)
 
-class Hide(TraceItem):
+class Hide(RenderingMixin, TraceItem):
     """Traces Hide"""
     def __init__(self, producer, port, view):
         TraceItem.__init__(self)
@@ -1086,7 +1102,7 @@ class Hide(TraceItem):
           "Hide(%s, %s)" % (str(producerAccessor), str(viewAccessor)) if port == 0 else \
               "Hide(OutputPort(%s, %d), %s)" % (str(producerAccessor), port, str(viewAccessor))])
 
-class SetScalarColoring(TraceItem):
+class SetScalarColoring(RenderingMixin, TraceItem):
     """Trace vtkSMPVRepresentationProxy.SetScalarColoring"""
     def __init__(self, display, arrayname, attribute_type, component=None, separate=False, lut=None):
         TraceItem.__init__(self)
@@ -1141,7 +1157,7 @@ class SetScalarColoring(TraceItem):
         if self.Lut:
           Trace.get_accessor(self.Lut)
 
-class RegisterViewProxy(TraceItem):
+class RegisterViewProxy(RenderingMixin, TraceItem):
     """Traces creation of a new view (vtkSMParaViewPipelineController::RegisterViewProxy)."""
     def __init__(self, proxy):
         TraceItem.__init__(self)
@@ -1188,7 +1204,7 @@ class RegisterViewProxy(TraceItem):
         # we assume views don't have proxy list domains for now, and ignore tracing them.
         TraceItem.finalize(self)
 
-class RegisterLightProxy(TraceItem):
+class RegisterLightProxy(RenderingMixin, TraceItem):
     """Traces creation of a new light (vtkSMParaViewPipelineController::RegisterLightProxy)."""
     def __init__(self, proxy, view=None):
         TraceItem.__init__(self)
@@ -1212,7 +1228,7 @@ class RegisterLightProxy(TraceItem):
         Trace.Output.append_separated(trace.raw_data())
         TraceItem.finalize(self)
 
-class ExportView(TraceItem):
+class ExportView(RenderingMixin, TraceItem):
     def __init__(self, view, exporter, filename):
         TraceItem.__init__(self)
 
@@ -1257,7 +1273,7 @@ class SaveData(TraceItem):
         del writer
         Trace.Output.append_separated(trace.raw_data())
 
-class SaveScreenshotOrAnimation(TraceItem):
+class SaveScreenshotOrAnimation(RenderingMixin, TraceItem):
     def __init__(self, helper, filename, view, layout, mode_screenshot=False):
         TraceItem.__init__(self)
         assert(view != None or layout != None)
@@ -1318,7 +1334,7 @@ class LoadState(TraceItem):
         del options
         Trace.Output.append_separated(trace.raw_data())
 
-class RegisterLayoutProxy(TraceItem):
+class RegisterLayoutProxy(RenderingMixin, TraceItem):
     def __init__(self, layout):
         TraceItem.__init__(self)
         self.Layout = sm._getPyProxy(layout)
@@ -1422,6 +1438,8 @@ class SetCurrentProxy(TraceItem):
         accessor = Trace.get_accessor(proxy)
         pxm = selmodel.GetSessionProxyManager()
         if selmodel is pxm.GetSelectionModel("ActiveView"):
+            if RenderingMixin().skip_from_trace:
+                raise Untraceable("skipped")
             Trace.Output.append_separated([\
                 "# set active view",
                 "SetActiveView(%s)" % accessor])
@@ -1503,7 +1521,7 @@ class CallFunction(TraceItem):
         to_trace.append("%s(%s)" % (functionname, ", ".join(args)))
         Trace.Output.append_separated(to_trace)
 
-class ChooseTexture(TraceItem):
+class ChooseTexture(RenderingMixin, TraceItem):
     """Traces changes of texture object selection. For example renderview background."""
     def __init__(self, owner, texture, prop):
         TraceItem.__init__(self)
@@ -1516,7 +1534,7 @@ class ChooseTexture(TraceItem):
                                        "# change texture",
                                        "%s.%s = %s" % (str(ownerAccessor), prop.GetXMLName(), str(textureAccessor))])
 
-class SaveCameras(BookkeepingItem):
+class SaveCameras(RenderingMixin, BookkeepingItem):
     """This is used to request recording of cameras in trace"""
     # This is a little hackish at this point. We'll figure something cleaner out
     # in time.
@@ -1595,23 +1613,26 @@ def _start_trace_internal(preamble=None):
         Trace.Output.append(preamble)
     Trace.Output.append([\
         "#### import the simple module from the paraview",
-        "from paraview.simple import *",
-        "#### disable automatic camera reset on 'Show'",
-        "paraview.simple._DisableFirstRenderCameraReset()"])
+        "from paraview.simple import *"])
+    if not _get_skip_rendering():
+        Trace.Output.append([\
+            "#### disable automatic camera reset on 'Show'",
+            "paraview.simple._DisableFirstRenderCameraReset()"])
     return True
 
 def _stop_trace_internal():
     """**internal** stops trace. Called by vtkSMTrace::StopTrace()."""
-    camera_trace = SaveCameras.get_trace(None)
-    if camera_trace:
-        Trace.Output.append_separated(\
-            "#### saving camera placements for all active views")
-        Trace.Output.append_separated(camera_trace)
-    Trace.Output.append_separated([\
-        "#### uncomment the following to render all views",
-        "# RenderAllViews()",
-        "# alternatively, if you want to write images, you can use SaveScreenshot(...)."
-        ])
+    if not _get_skip_rendering():
+        camera_trace = SaveCameras.get_trace(None)
+        if camera_trace:
+            Trace.Output.append_separated(\
+                "#### saving camera placements for all active views")
+            Trace.Output.append_separated(camera_trace)
+        Trace.Output.append_separated([\
+            "#### uncomment the following to render all views",
+            "# RenderAllViews()",
+            "# alternatively, if you want to write images, you can use SaveScreenshot(...)."
+            ])
     trace = str(Trace.Output)
     Trace.reset()
 
