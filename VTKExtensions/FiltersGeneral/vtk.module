@@ -17,6 +17,7 @@ PRIVATE_DEPENDS
   ParaView::VTKExtensionsCore
   ParaView::VTKExtensionsFiltersRendering
   ParaView::VTKExtensionsMisc
+  VTK::FiltersGeneral
   VTK::FiltersGeneric
   VTK::FiltersGeometry
   VTK::FiltersHyperTree

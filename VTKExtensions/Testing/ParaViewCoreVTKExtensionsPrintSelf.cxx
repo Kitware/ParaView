@@ -64,7 +64,6 @@
 #include "vtkMaterialInterfaceProcessLoading.h"
 #include "vtkMaterialInterfaceProcessRing.h"
 #include "vtkMaterialInterfaceToProcMap.h"
-#include "vtkMergeArrays.h"
 #include "vtkMergeCompositeDataSet.h"
 #include "vtkMinMax.h"
 #include "vtkMultiProcessControllerHelper.h"
@@ -243,7 +242,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int, char* [])
   // PRINT_SELF(vtkMaterialInterfaceProcessLoading);
   // PRINT_SELF(vtkMaterialInterfaceProcessRing);
   // PRINT_SELF(vtkMaterialInterfaceToProcMap);
-  PRINT_SELF(vtkMergeArrays);
   PRINT_SELF(vtkMergeCompositeDataSet);
   PRINT_SELF(vtkMinMax);
   PRINT_SELF(vtkMultiProcessControllerHelper);
