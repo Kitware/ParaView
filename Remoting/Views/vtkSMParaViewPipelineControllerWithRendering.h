@@ -249,6 +249,7 @@ private:
   void operator=(const vtkSMParaViewPipelineControllerWithRendering&) = delete;
   static bool HideScalarBarOnHide;
   static bool InheritRepresentationProperties;
+  bool SkipUpdatePipelineBeforeDisplay;
 };
 
 #endif
