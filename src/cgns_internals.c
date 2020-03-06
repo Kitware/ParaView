@@ -1151,7 +1151,7 @@ int cgi_read_section(int in_link, double parent_id, int *nsections,
                         section[0][n].connect->data = (void *)elem_data;
                     }
                 }
-                if (cg->version < 3400) {
+                if (cg->version < 4000) {
                     cgsize_t size, *elem_data = 0;
                     if (section[0][n].el_type == CGNS_ENUMV(NGON_n) ||
                         section[0][n].el_type == CGNS_ENUMV(NFACE_n) ) {
@@ -8733,7 +8733,7 @@ cgsize_t cgi_element_data_size(CGNS_ENUMT(ElementType_t) type,
         if (connect == 0) return CG_OK;
         /* Need to handle old version when opening old files */
         if (connect_offset == 0) {
-            if (cg->version < 3400) {
+            if (cg->version < 4000) {
                 for (ne = 0; ne < nelems; ne++) {
                     npe = (int)connect[size++];
                     size += npe;
