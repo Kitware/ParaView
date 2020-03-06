@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QtTestingConfigure.h"
 
 #include "QVTKOpenGLNativeWidget.h"
-#include "QVTKOpenGLWidget.h"
+#include "QVTKOpenGLStereoWidget.h"
 #include "pqApplicationCore.h"
 #include "pqCollaborationEventPlayer.h"
 #include "pqColorButtonEventPlayer.h"
@@ -310,13 +310,13 @@ bool pqCoreTestUtility::CompareImage(QWidget* widget, const QString& referenceIm
   }
 
   // try to recover the render window directly
-  QVTKOpenGLWidget* glWidget = qobject_cast<QVTKOpenGLWidget*>(widget);
+  QVTKOpenGLStereoWidget* glWidget = qobject_cast<QVTKOpenGLStereoWidget*>(widget);
   if (glWidget)
   {
     vtkRenderWindow* rw = glWidget->renderWindow();
     if (rw)
     {
-      cout << "Using QVTKOpenGLWidget RenderWindow API for capture" << endl;
+      cout << "Using QVTKOpenGLStereoWidget RenderWindow API for capture" << endl;
       return pqCoreTestUtility::CompareImage(
         rw, referenceImage, threshold, std::cerr, tempDirectory, size);
     }

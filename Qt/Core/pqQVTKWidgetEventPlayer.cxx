@@ -37,8 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 #include "QVTKOpenGLNativeWidget.h"
-#include "QVTKOpenGLWidget.h"
-#include "QVTKOpenGLWindow.h"
+#include "QVTKOpenGLStereoWidget.h"
 #include "pqEventDispatcher.h"
 
 pqQVTKWidgetEventPlayer::pqQVTKWidgetEventPlayer(QObject* p)
@@ -49,7 +48,7 @@ pqQVTKWidgetEventPlayer::pqQVTKWidgetEventPlayer(QObject* p)
 bool pqQVTKWidgetEventPlayer::playEvent(
   QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
 {
-  QVTKOpenGLWidget* qvtkWidget = qobject_cast<QVTKOpenGLWidget*>(Object);
+  QVTKOpenGLStereoWidget* qvtkWidget = qobject_cast<QVTKOpenGLStereoWidget*>(Object);
   QVTKOpenGLNativeWidget* qvtkNativeWidget = qobject_cast<QVTKOpenGLNativeWidget*>(Object);
   if (qvtkWidget || qvtkNativeWidget)
   {
@@ -92,7 +91,7 @@ bool pqQVTKWidgetEventPlayer::playEvent(
 
         if (qvtkWidget != nullptr)
         {
-          // Due to QTBUG-61836 (see QVTKOpenGLWidget::testingEvent()), events should
+          // Due to QTBUG-61836 (see QVTKOpenGLStereoWidget::testingEvent()), events should
           // be propagated back to the internal QVTKOpenGLWindow when being fired
           // explicitly on the widget instance. We have to use a custom event
           // callback in this case to ensure that events are passed to the window.

@@ -44,8 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMouseEvent>
 
 #include "QVTKOpenGLNativeWidget.h"
-#include "QVTKOpenGLWidget.h"
-#include "QVTKOpenGLWindow.h"
+#include "QVTKOpenGLStereoWidget.h"
 
 pqQVTKWidgetEventTranslator::pqQVTKWidgetEventTranslator(QObject* p)
   : pqWidgetEventTranslator(p)
@@ -70,7 +69,7 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
   // Look for a render window in the possible widget types.
   vtkRenderWindow* rw = nullptr;
 
-  if (QVTKOpenGLWidget* const qvtkWidget = qobject_cast<QVTKOpenGLWidget*>(Object))
+  if (QVTKOpenGLStereoWidget* const qvtkWidget = qobject_cast<QVTKOpenGLStereoWidget*>(Object))
   {
     rw = qvtkWidget->embeddedOpenGLWindow() ? qvtkWidget->renderWindow() : nullptr;
   }
