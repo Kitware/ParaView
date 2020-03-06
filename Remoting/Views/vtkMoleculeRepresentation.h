@@ -48,10 +48,14 @@ public:
 
   void SetLookupTable(vtkScalarsToColors* lut);
 
+  //@{
   /**
-   * Set the opacity on the corresponding actor property.
+   * Forward corresponding actor property controls down.
    */
   virtual void SetOpacity(double val);
+  virtual void SetSpecular(double val);
+  virtual void SetSpecularPower(double val);
+  //@}
 
   /**
    * Set if scalars are mapped through a color-map or are used directly as colors.
