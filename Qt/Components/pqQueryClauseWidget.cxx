@@ -756,11 +756,6 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
 
   switch (criteria_type)
   {
-    case QUERY:
-      vtkSMPropertyHelper(selSource, "QueryString")
-        .Set(values[0].toString().toLocal8Bit().constData());
-      break;
-
     case BLOCK:
       if (this->AsQualifier)
       {
@@ -769,6 +764,10 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
       }
       VTK_FALLTHROUGH;
     // break; -- don't break
+
+    case QUERY:
+      query = this->Internals->value->text();
+      VTK_FALLTHROUGH;
 
     case INDEX:
     case GLOBALID:
@@ -780,7 +779,7 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
       QString currentQuery(vtkSMPropertyHelper(selSource, "QueryString").GetAsString());
       if (!currentQuery.isEmpty())
       {
-        query = QString("%1 and %2").arg(currentQuery).arg(query);
+        query = QString("%1 and %2").arg(currentQuery, query);
       }
       this->LastQuery = query;
       if (!query.isEmpty())
