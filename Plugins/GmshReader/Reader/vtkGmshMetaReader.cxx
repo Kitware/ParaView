@@ -132,19 +132,24 @@ int vtkGmshMetaReader::RequestData(
   {
     // Get the requested time step. We only support requests of a single time
     // step in this reader right now
-    double requestedTimeSteps = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
-    double timeValue = requestedTimeSteps;
+    double requestedTimeStep = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
 
-    // find the first time value larger than requested time value
-    this->ActualTimeStep = tsLength - 1;
-    for (int cnt = 0; cnt < tsLength - 1 && steps[cnt] < timeValue; cnt++)
+    // find the timestep with the closest value
+    int cnt = 0;
+    int closestStep = 0;
+    double minDist = -1;
+    for (cnt = 0; cnt < tsLength; cnt++)
     {
-      if (steps[cnt] >= timeValue)
+      double tdist = (steps[cnt] - requestedTimeStep > requestedTimeStep - steps[cnt])
+        ? steps[cnt] - requestedTimeStep
+        : requestedTimeStep - steps[cnt];
+      if (minDist < 0 || tdist < minDist)
       {
-        this->ActualTimeStep = cnt;
-        break;
+        minDist = tdist;
+        closestStep = cnt;
       }
     }
+    this->ActualTimeStep = closestStep;
   }
 
   if (this->ActualTimeStep > this->TimeStepRange[1])
