@@ -55,6 +55,7 @@ spack:centos7:
         # this is needed as `configure` on certain packages fails when run as
         # root
         FORCE_UNSAFE_CONFIGURE: 1
+        paraview_spec: "paraview+osmesa^mesa~glx^mpich"
     timeout: 3 hours
     interruptible: true
     before_script:
@@ -75,9 +76,11 @@ spack:centos7:
         - $LAUNCHER $spack mirror add local $PWD/spack-cache
         - $LAUNCHER $spack buildcache list
     script:
-        - $LAUNCHER $spack spec paraview +osmesa ^mesa~glx
-          # - $LAUNCHER $spack install --only dependencies -j $(nproc) ninja #paraview +osmesa ^mesa~glx
-        - $LAUNCHER $spack install -j $(nproc) xz
+        - $LAUNCHER $spack spec $paraview_spec
+        - $LAUNCHER $spack install --only dependencies -j $(nproc) $paraview_spec
         - export dependency_specs=`$LAUNCHER $spack find --format "{name}{@version}{%compiler}"`
         - $LAUNCHER $spack buildcache create -a -f -u -d $PWD/spack-cache $dependency_specs
+        - $LAUNCHER $spack install -j $(nproc) $paraview_spec
+        - eval `$spack load --sh paraview`
+        - pvserver --version
         - .gitlab/sccache --show-stats
