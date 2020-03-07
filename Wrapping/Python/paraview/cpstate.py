@@ -12,21 +12,34 @@ Python CoProcessing script that can be used with in a vtkCPPythonScriptPipeline.
 
 from paraview import smtrace, smstate, servermanager
 
-class cpstate_globals: pass
+_cpstate_globals = None
 
-def reset_cpstate_globals():
-    cpstate_globals.write_frequencies = {}
-    cpstate_globals.simulation_input_map = {}
-    cpstate_globals.view_proxies = []
-    cpstate_globals.screenshot_info = {}
-    cpstate_globals.export_rendering = False
-    cpstate_globals.cinema_tracks = {}
-    cpstate_globals.cinema_arrays = {}
-    cpstate_globals.channels_needed = []
-    cpstate_globals.enable_live_viz = False
-    cpstate_globals.live_viz_frequency = 0
+def reset_globals():
+    global _cpstate_globals
+    _cpstate_globals = None
 
-reset_cpstate_globals()
+def initialize_globals():
+    global _cpstate_globals
+    class _state(object):
+        def __init__(self):
+            self.write_frequencies = {}
+            self.simulation_input_map = {}
+            self.view_proxies = []
+            self.screenshot_info = {}
+            self.export_rendering = False
+            self.cinema_tracks = {}
+            self.cinema_arrays = {}
+            self.channels_needed = []
+            self.enable_live_viz = False
+            self.live_viz_frequency = 0
+    _cpstate_globals = _state()
+    return _cpstate_globals
+
+def get_globals():
+    global _cpstate_globals
+    if _cpstate_globals is None:
+        raise RuntimeError("get_globals called before initialize_globals!")
+    return _cpstate_globals
 
 # -----------------------------------------------------------------------------
 def locate_simulation_inputs(proxy):
@@ -84,6 +97,7 @@ class ProducerAccessor(smtrace.RealProxyAccessor):
 
         # self.varname has .'s and *'s stripped. Knowing this, the key in cpstate_globals.cinema_arrays
         # should also be stripped of .'s and *'s. Refers to /Qt/ApplicationComponents/pqExportCatalystScript.cxx
+        cpstate_globals = get_globals()
         if self.varname in cpstate_globals.cinema_arrays:
             arrays = cpstate_globals.cinema_arrays[self.varname]
             trace.append_separated(["# define target arrays of filters."])
@@ -105,6 +119,7 @@ class SliceAccessor(smtrace.RealProxyAccessor):
         original_trace = smtrace.RealProxyAccessor.trace_ctor(\
             self, ctor, filter, ctor_args, skip_assignment)
         trace = smtrace.TraceOutput(original_trace)
+        cpstate_globals = get_globals()
         if cpstate_globals.cinema_tracks and self.varname in cpstate_globals.cinema_tracks:
             valrange = cpstate_globals.cinema_tracks[self.varname]
             trace.append_separated(["# register the filter with the coprocessor's cinema generator"])
@@ -157,6 +172,7 @@ class ClipAccessor(smtrace.RealProxyAccessor):
         original_trace = smtrace.RealProxyAccessor.trace_ctor( \
             self, ctor, filter, ctor_args, skip_assignment)
         trace = smtrace.TraceOutput(original_trace)
+        cpstate_globals = get_globals()
         if cpstate_globals.cinema_tracks and self.varname  in cpstate_globals.cinema_tracks:
             valrange = cpstate_globals.cinema_tracks[self.varname]
             trace.append_separated(["# register the filter with the coprocessor's cinema generator"])
@@ -183,6 +199,7 @@ class ArrayAccessor(smtrace.RealProxyAccessor):
             self, ctor, filter, ctor_args, skip_assignment)
 
         trace = smtrace.TraceOutput(original_trace)
+        cpstate_globals = get_globals()
         if self.varname in cpstate_globals.cinema_arrays:
             arrays = cpstate_globals.cinema_arrays[self.varname]
             trace.append_separated(["# define target arrays of filters."])
@@ -204,6 +221,7 @@ class ViewAccessor(smtrace.RealProxyAccessor):
         original_trace = smtrace.RealProxyAccessor.trace_ctor(\
             self, ctor, filter, ctor_args, skip_assignment)
         trace = smtrace.TraceOutput(original_trace)
+        cpstate_globals = get_globals()
         if self.ProxyName in cpstate_globals.screenshot_info:
            trace.append_separated(["# register the view with coprocessor",
           "# and provide it with information such as the filename to use,",
@@ -241,6 +259,7 @@ class WriterAccessor(smtrace.RealProxyAccessor):
         # Locate which simulation input this write is connected to, if any. If so,
         # we update the write_frequencies datastructure accordingly.
         sim_inputs = locate_simulation_inputs(proxy)
+        cpstate_globals = get_globals()
         for sim_input_name in sim_inputs:
             if not write_frequency in cpstate_globals.write_frequencies[sim_input_name]:
                 cpstate_globals.write_frequencies[sim_input_name].append(write_frequency)
@@ -293,6 +312,7 @@ class WriterAccessor(smtrace.RealProxyAccessor):
 def cp_hook(varname, proxy):
     """callback to create our special accessors instead of the standard ones."""
     pname = smtrace.Trace.get_registered_name(proxy, "sources")
+    cpstate_globals = get_globals()
     if pname:
         if pname in cpstate_globals.simulation_input_map:
             return ProducerAccessor(varname, proxy, cpstate_globals.simulation_input_map[pname])
@@ -320,6 +340,7 @@ class cpstate_filter_proxies_to_serialize(object):
     """filter used to skip views and representations a when export_rendering is
     disabled."""
     def __call__(self, proxy):
+        cpstate_globals = get_globals()
         if not smstate.visible_representations()(proxy): return False
         if (not cpstate_globals.export_rendering) and \
             (proxy.GetXMLGroup() in ["views", "representations"]): return False
@@ -398,6 +419,7 @@ class NewStyleWriters(object):
             if CompressionLevel is not None:
                 CompressionLevel = pxy.GetProperty("CompressionLevel").GetElement(0)
 
+            cpstate_globals = get_globals()
             sim_inputs = locate_simulation_inputs(pxy)
             for sim_input_name in sim_inputs:
                 if not write_frequency in cpstate_globals.write_frequencies[sim_input_name]:
@@ -484,7 +506,8 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
     """
 
     # reset the global variables.
-    reset_cpstate_globals()
+    initialize_globals()
+    cpstate_globals = get_globals()
 
     cpstate_globals.export_rendering = export_rendering
     cpstate_globals.simulation_input_map = simulation_input_map
@@ -589,6 +612,9 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
     pipelineClassDef += "      coprocessor.EnableCinemaDTable()\n"
     pipelineClassDef += "\n"
     pipelineClassDef += "  return coprocessor\n"
+
+    # cleanup globals state
+    reset_globals()
     return pipelineClassDef
 
 #------------------------------------------------------------------------------
