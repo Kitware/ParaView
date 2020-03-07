@@ -10,6 +10,11 @@ tempdir = smtesting.GetUniqueTempDirectory("SaveScreenshot-")
 print("Generating output files in `%s`" % tempdir)
 
 def RegressionTest(imageName):
+    if servermanager.vtkProcessModule.GetProcessModule().GetPartitionId() > 0:
+        # only do image comparison on root node; this avoids test failures
+        # due to satellites attempting to read generated images even before the root
+        # has written them out.
+        return True
     from paraview.vtk.vtkTestingRendering import vtkTesting
     testing = vtkTesting()
     testing.AddArgument("-T")
