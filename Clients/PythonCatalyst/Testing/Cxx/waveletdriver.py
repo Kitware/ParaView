@@ -36,6 +36,7 @@ def coProcess(grid, time, step, scriptname, wholeExtent):
     cpscript.RequestDataDescription(datadescription)
     inputdescription = datadescription.GetInputDescriptionByName("input")
     if inputdescription.GetIfGridIsNecessary() == False:
+        print("co-processing not needed. skipping")
         return
 
     inputdescription.SetGrid(grid)
@@ -55,6 +56,7 @@ except ValueError:
 #imageData2 = vtk.vtkImageData()
 
 for step in range(numsteps):
+    print("timestep: {0}/{1}".format(step+1, numsteps))
     # assume simulation time starts at 0
     time = step/float(numsteps)
 
