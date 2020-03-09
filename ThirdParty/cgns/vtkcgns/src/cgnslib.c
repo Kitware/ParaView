@@ -3041,15 +3041,11 @@ int cg_ElementPartialSize(int file_number, int B, int Z, int S,
         return CG_OK;
     }
 
-    if (read_element_data(section)) return CG_ERROR;
     if (read_offset_data(section)) return CG_ERROR;
-
-    data = (cgsize_t *)section->connect->data;
     offset_data = (cgsize_t *)section->connect_offset->data;
-    offset = cgi_element_data_size(section->el_type,
-                 start - section->range[0], data, offset_data);
-    if (offset < 0) return CG_ERROR;
-    size = offset_data[end] - offset_data[start-1];
+    if (offset_data == 0) return CG_ERROR;
+
+    size = offset_data[end-section->range[0]+1] - offset_data[start-section->range[0]];
     if (size < 0) return CG_ERROR;
     *ElementDataSize = size;
     return CG_OK;

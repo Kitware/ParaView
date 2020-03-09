@@ -15,11 +15,11 @@ endif (${CMAKE_MAJOR_VERSION} GREATER 2 OR ${CMAKE_MINOR_VERSION} GREATER 7)
 endif ()
 
 project("cgns" C)
-set(CGNS_VERSION "3.4")
+set(CGNS_VERSION "4.0")
 
 if (FALSE) # XXX(kitware): ParaView doesn't need CPack here.
 # Allow for building a package
-set(CPACK_PACKAGE_VERSION "${CGNS_VERSION}-develop")
+set(CPACK_PACKAGE_VERSION "${CGNS_VERSION}")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "cgns-${CGNS_VERSION}")
 set(CPACK_GENERATOR "STGZ;TGZ;ZIP")
 set(CPACK_SOURCE_GENERATOR "STGZ;TGZ;ZIP")
