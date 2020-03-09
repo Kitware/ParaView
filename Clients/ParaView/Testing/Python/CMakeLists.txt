@@ -49,10 +49,18 @@ if (numpy_found)
   endif()
 endif()
 
+paraview_add_test_pvbatch(
+  NO_DATA NO_RT
+
+  # Adding as a pvbatch test (i.e. use offscreen)
+  # since the test may fail on X due to X window size sync issues
+  # on certain dashboards
+  OutputImageResolution.py
+)
+
 paraview_add_test_python(
   NO_DATA NO_RT
   ColorBy.py
-  OutputImageResolution.py
   PartialArrayIndication.py
   ResetSession.py
   TestClipCylinder.py

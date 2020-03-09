@@ -225,7 +225,9 @@ public:
       /* Skip XCB errors coming from Qt 5 tests. */
       << "QXcbConnection: XCB"
       /* This error message appears on some HDPi screens with not clear reasons */
-      << "QWindowsWindow::setGeometry: Unable to set geometry";
+      << "QWindowsWindow::setGeometry: Unable to set geometry"
+      /* Skip qt.qpa.xcb errors */
+      << "qt.qpa.xcb: internal error";
   }
 
   void displayMessageInConsole(const QString& message, QtMsgType type)

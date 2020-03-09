@@ -238,7 +238,9 @@ state = smstate.get_state(filter=filter, raw=True)
 smtrace.RealProxyAccessor.unregister_create_callback(tp_hook)
 
 # add in the new style writer proxies
+cpstate.initialize_globals()
 state = state + cpstate.NewStyleWriters(make_temporal_script=True).make_trace()
+cpstate.reset_globals()
 pipelineClassDef = "\n"
 for original_line in state:
     for line in original_line.split("\n"):
