@@ -34,7 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
+#include <QPointer>
+
 class pqProxy;
+class QWidget;
 
 /**
 * @ingroup Reactions
@@ -46,16 +49,32 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqRenameProxyReaction : pqReaction
   typedef pqReaction Superclass;
 
 public:
-  pqRenameProxyReaction(QAction* renameAction, pqProxy* proxy);
+  /**
+   * Use this overload to add a handler to rename a specific proxy.
+   *
+   * `parentWidget` is used as the parent for the dialog box popped up to
+   * request new name input. If nullptr, pqCoreUtilities::mainWidget() is used.
+   */
+  pqRenameProxyReaction(QAction* renameAction, pqProxy* proxy, QWidget* parentWidget = nullptr);
+
+  /**
+   * Use this overload to add a handler to rename the active source proxy.
+   *
+   * `parentWidget` is used as the parent for the dialog box popped up to
+   * request new name input. If nullptr, pqCoreUtilities::mainWidget() is used.
+   */
+  pqRenameProxyReaction(QAction* renameAction, QWidget* parentWidget = nullptr);
 
 protected slots:
   /**
   * Called when the action is triggered.
   */
   void onTriggered() override;
+  void updateEnableState() override;
 
 protected:
   pqProxy* Proxy;
+  QPointer<QWidget> ParentWidget;
 };
 
 #endif

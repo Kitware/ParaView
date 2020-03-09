@@ -80,6 +80,20 @@
     <string>Change a Filter's Input</string>
    </property>
   </action>
+  <action name="actionRename">
+   <property name="text">
+    <string>Rename...</string>
+   </property>
+   <property name="iconText">
+    <string>Rename...</string>
+   </property>
+   <property name="toolTip">
+    <string>Rename selected source (or filter)</string>
+   </property>
+   <property name="statusTip">
+    <string>Rename selected source (or filter)</string>
+   </property>
+  </action>
   <action name="actionCopyScreenshotToClipboard">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
@@ -249,9 +263,10 @@
   <addaction name="actionCopy"/>
   <addaction name="actionPaste"/>
   <addaction name="separator"/>
+  <addaction name="actionDelete"/>
+  <addaction name="actionRename"/>
   <addaction name="actionChangeInput"/>
   <addaction name="actionIgnoreTime"/>
-  <addaction name="actionDelete"/>
   <addaction name="separator"/>
   <addaction name="actionShow_All"/>
   <addaction name="actionHide_All"/>
