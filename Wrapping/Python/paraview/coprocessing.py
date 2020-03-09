@@ -459,6 +459,22 @@ class CoProcessor(object):
         producer.UpdatePipeline(datadescription.GetTime())
         return producer
 
+    def CreateTemporalProducer(self, datadescription, inputname):
+        """Python access to a temporal cache object associated with a specific
+        one simulation product. Much like CreateProducer, only this ends up with
+        a temporal cache filter instead of a PVTrivialProducer."""
+        if not datadescription.GetInputDescriptionByName(inputname):
+            raise RuntimeError ("Simulation input name '%s' does not exist" % inputname)
+
+        idd = datadescription.GetInputDescriptionByName(inputname)
+
+        cache = idd.GetTemporalCache()
+        if not cache:
+            raise RuntimeError ("I see no cache for '%s'" % inputname)
+            return
+
+        return servermanager._getPyProxy(cache)
+
     def ProcessExodusIIWriter(self, writer):
         """Extra work for the ExodusII writer to avoid undesired warnings
            and print out a message on how to read the files into Ensight."""

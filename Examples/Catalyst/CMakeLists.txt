@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(CatalystExamples C CXX)
 
 include(CMakeDependentOption)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../../VTK/CMake")
 cmake_dependent_option(USE_CATALYST "Link the simulator with Catalyst" ON
   "NOT WIN32" OFF)
 if (USE_CATALYST)
@@ -63,6 +64,7 @@ endif()
 add_subdirectory(MPISubCommunicatorExample)
 add_subdirectory(PythonDolfinExample)
 #add_subdirectory(PythonFullExample)
+add_subdirectory(TemporalCacheExample)
 
 option(BUILD_FORTRAN_EXAMPLES "Build Fortran Catalyst Examples" OFF)
 if (BUILD_FORTRAN_EXAMPLES)

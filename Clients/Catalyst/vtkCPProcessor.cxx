@@ -23,6 +23,7 @@
 #include "vtkDataObject.h"
 #include "vtkDoubleArray.h"
 #include "vtkFieldData.h"
+#include "vtkInformation.h"
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
 #include "vtkMPI.h"
 #include "vtkMPICommunicator.h"
@@ -36,10 +37,14 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringArray.h"
+#include "vtkTemporalDataSetCache.h"
 
 #include <list>
+#include <map>
+#include <string>
 #include <vtksys/SystemTools.hxx>
 
 struct vtkCPProcessorInternals
@@ -47,6 +52,10 @@ struct vtkCPProcessorInternals
   typedef std::list<vtkSmartPointer<vtkCPPipeline> > PipelineList;
   typedef PipelineList::iterator PipelineListIterator;
   PipelineList Pipelines;
+
+  typedef std::map<std::string, vtkSmartPointer<vtkSMSourceProxy> > CacheList;
+  typedef CacheList::iterator CacheListIterator;
+  CacheList TemporalCaches;
 };
 
 vtkStandardNewMacro(vtkCPProcessor);
@@ -57,6 +66,7 @@ vtkCPProcessor::vtkCPProcessor()
   this->Internal = new vtkCPProcessorInternals;
   this->InitializationHelper = nullptr;
   this->WorkingDirectory = nullptr;
+  this->TemporalCacheSize = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -256,6 +266,21 @@ int vtkCPProcessor::CoProcess(vtkCPDataDescription* dataDescription)
       time->SetTypedComponent(0, 0, dataDescription->GetTime());
       time->SetName("TimeValue");
       input->GetFieldData()->AddArray(time);
+
+      input->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), dataDescription->GetTime());
+      if (this->GetTemporalCacheSize() > 0)
+      {
+        vtkSMSourceProxy* cacheForInput =
+          this->GetTemporalCache(dataDescription->GetInputDescriptionName(i));
+        if (cacheForInput)
+        {
+          vtkTemporalDataSetCache* tc =
+            vtkTemporalDataSetCache::SafeDownCast(cacheForInput->GetClientSideObject());
+          tc->SetInputDataObject(input);
+
+          tc->UpdateTimeStep(dataDescription->GetTime());
+        }
+      }
     }
   }
 
@@ -350,4 +375,61 @@ int vtkCPProcessor::Finalize()
 void vtkCPProcessor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkCPProcessor::SetTemporalCacheSize(int nv)
+{
+  if (this->TemporalCacheSize == nv)
+  {
+    return;
+  }
+  this->TemporalCacheSize = nv;
+  for (vtkCPProcessorInternals::CacheListIterator it = this->Internal->TemporalCaches.begin();
+       it != this->Internal->TemporalCaches.end(); it++)
+  {
+    vtkTemporalDataSetCache* tc =
+      vtkTemporalDataSetCache::SafeDownCast(it->second.GetPointer()->GetClientSideObject());
+    tc->SetCacheSize(this->TemporalCacheSize);
+  }
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkCPProcessor::MakeTemporalCache(const char* name)
+{
+  if (this->Internal->TemporalCaches.find(name) != this->Internal->TemporalCaches.end())
+  {
+    // Its ah, very nice but tell him we already got one!
+    return;
+  }
+
+  // have to make a ParaView level object so that python can grab and work
+  // with it. Unfortunately this has to wait until paraview is running or
+  // we crash with no sessionProxyManager.
+  vtkSMProxyManager* proxyManager = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* sessionProxyManager = proxyManager->GetActiveSessionProxyManager();
+  if (!sessionProxyManager)
+  {
+    return;
+  }
+  vtkSmartPointer<vtkSMSourceProxy> producer;
+  producer.TakeReference(vtkSMSourceProxy::SafeDownCast(
+    sessionProxyManager->NewProxy("sources", "TemporalCache"))); // note: source
+  producer->UpdateVTKObjects();
+  vtkTemporalDataSetCache* tc =
+    vtkTemporalDataSetCache::SafeDownCast(producer->GetClientSideObject());
+  tc->SetCacheSize(this->TemporalCacheSize);
+  tc->CacheInMemkindOn();
+  this->Internal->TemporalCaches[name] = producer;
+}
+
+//----------------------------------------------------------------------------
+vtkSMSourceProxy* vtkCPProcessor::GetTemporalCache(const char* name)
+{
+  if (this->Internal->TemporalCaches.find(name) == this->Internal->TemporalCaches.end())
+  {
+    return nullptr;
+  }
+  return this->Internal->TemporalCaches[name];
 }

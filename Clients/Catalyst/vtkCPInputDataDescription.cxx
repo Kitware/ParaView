@@ -20,6 +20,7 @@
 #include "vtkDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkSMSourceProxy.h"
 
 #include <algorithm>
 #include <map>
@@ -35,6 +36,7 @@ public:
 
 vtkStandardNewMacro(vtkCPInputDataDescription);
 vtkCxxSetObjectMacro(vtkCPInputDataDescription, Grid, vtkDataObject);
+vtkCxxSetObjectMacro(vtkCPInputDataDescription, TemporalCache, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkCPInputDataDescription::vtkCPInputDataDescription()
 {
@@ -44,6 +46,7 @@ vtkCPInputDataDescription::vtkCPInputDataDescription()
   this->Internals = new vtkCPInputDataDescription::vtkInternals();
   this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
   this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
+  this->TemporalCache = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -55,6 +58,7 @@ vtkCPInputDataDescription::~vtkCPInputDataDescription()
     delete this->Internals;
     this->Internals = NULL;
   }
+  this->SetTemporalCache(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -173,6 +177,7 @@ void vtkCPInputDataDescription::ShallowCopy(vtkCPInputDataDescription* idd)
   this->SetGrid(idd->Grid);
   memcpy(this->WholeExtent, idd->WholeExtent, 6 * sizeof(int));
   this->Internals->Fields = idd->Internals->Fields;
+  this->SetTemporalCache(idd->TemporalCache);
 }
 
 //----------------------------------------------------------------------------
