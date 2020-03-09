@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
 #include "pqProxy.h"
+#include "pqUndoStack.h"
 #include "pqView.h"
 #include "vtkSMProxy.h"
 #include "vtkSMTrace.h"
@@ -102,7 +103,8 @@ void pqRenameProxyReaction::onTriggered()
         .arg(proxy->getSMGroup().toLocal8Bit().data())
         .arg(proxy->getProxy());
     }
-
+    BEGIN_UNDO_SET(tr("Rename") + " " + group);
     proxy->rename(newName);
+    END_UNDO_SET();
   }
 }
