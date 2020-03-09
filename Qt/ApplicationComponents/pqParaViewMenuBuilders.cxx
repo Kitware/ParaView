@@ -352,7 +352,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu)
     QApplication::translate("pqPipelineBrowserContextMenu", "&Show All", Q_NULLPTR));
 #ifndef QT_NO_STATUSTIP
   actionPBShowAll->setStatusTip(QApplication::translate(
-    "pqPipelineBrowserContextMenu", "Shoo all source outputs in the pipeline", Q_NULLPTR));
+    "pqPipelineBrowserContextMenu", "Show all source outputs in the pipeline", Q_NULLPTR));
 #endif // QT_NO_STATUSTIP
 
   QAction* actionPBHideAll = new QAction(menu.parent());
