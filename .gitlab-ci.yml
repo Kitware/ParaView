@@ -1,17 +1,86 @@
-# This currently only has superbuild CI triggers
-# ParaView-CI stages to follow
+# This currently only supports `package` generation.
+# Other standard ParaView-CI stages to follow
+
+.docker_image: &docker_image
+  variables:
+    GIT_CLONE_PATH: "$CI_BUILDS_DIR/gitlab-kitware-sciviz-ci"
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_CEILING_DIRECTORIES: "$CI_BUILDS_DIR/gitlab-kitware-sciviz-ci"
+
+.centos7: &centos7
+  image: "kitware/paraview:ci-superbuild-centos7-20200210"
+  variables:
+    LAUNCHER: "scl enable devtoolset-7 --"
+  extends:
+    - .docker_image
 
 stages:
   - package
 
+# Job to trigger paraView-superbuild pipelines
 superbuild:
   stage: package
   only:
     - branches@paraview/paraview
     - tags@paraview/paraview
+  except:
+    - nightly-master
+    - hooks
   variables:
     PARAVIEW_BRANCH: $CI_COMMIT_REF_NAME
   trigger:
     project: paraview/paraview-superbuild
     branch: $CI_COMMIT_REF_NAME
     strategy: depend
+
+# Sack build
+spack:centos7:
+    cache:
+      key: spack:centos7
+      paths:
+        - spack-cache/
+    extends:
+      - .centos7
+    stage: package
+    when: manual
+    tags:
+        - build
+        - paraview
+        - docker
+        - linux
+    only:
+        - schedules
+    variables:
+        spack: "$CI_BUILDS_DIR/spack/bin/spack -C Utilities/spack/configs/gitlab-ci"
+        # this is needed as `configure` on certain packages fails when run as
+        # root
+        FORCE_UNSAFE_CONFIGURE: 1
+        paraview_spec: "paraview+osmesa^mesa~glx^mpich"
+    timeout: 3 hours
+    interruptible: true
+    before_script:
+        # [-- these must be added to the image.
+        - yum install -y bzip2 patch
+        - yum clean all
+        # ---]
+        - .gitlab/ci/sccache.sh
+        - .gitlab/ci/cmake.sh
+        - export PATH=$PWD/.gitlab:$PATH
+        - sccache --start-server
+        - sccache --show-stats
+        - .gitlab/ci/spack.sh
+        - $LAUNCHER $spack repo add $PWD/Utilities/spack/repo
+        - $LAUNCHER $spack compiler find
+        - $LAUNCHER $spack compiler info gcc@7.3.1
+        # setup buildcache mirror
+        - $LAUNCHER $spack mirror add local $PWD/spack-cache
+        - $LAUNCHER $spack buildcache list
+    script:
+        - $LAUNCHER $spack spec $paraview_spec
+        - $LAUNCHER $spack install --only dependencies -j $(nproc) $paraview_spec
+        - export dependency_specs=`$LAUNCHER $spack find --format "{name}{@version}{%compiler}"`
+        - $LAUNCHER $spack buildcache create -a -f -u -d $PWD/spack-cache $dependency_specs
+        - $LAUNCHER $spack install -j $(nproc) $paraview_spec
+        - eval `$spack load --sh paraview`
+        - pvserver --version
+        - .gitlab/sccache --show-stats
