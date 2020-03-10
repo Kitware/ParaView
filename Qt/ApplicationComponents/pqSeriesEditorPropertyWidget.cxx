@@ -180,7 +180,9 @@ pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
     this->addPropertyLink(
       this, "seriesLabel", SIGNAL(seriesLabelChanged()), smgroup->GetProperty("SeriesLabel"));
 
+    // Trigger an update of the internal lut
     emit this->presetLabelChanged();
+    this->apply();
   }
   else
   {
@@ -198,7 +200,9 @@ pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
     this->addPropertyLink(
       this, "seriesColor", SIGNAL(seriesColorChanged()), smgroup->GetProperty("SeriesColor"));
 
+    // Trigger an update of the internal lut
     emit this->presetColorChanged();
+    this->apply();
   }
   else
   {
