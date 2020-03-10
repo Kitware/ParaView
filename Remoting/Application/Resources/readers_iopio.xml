@@ -20,6 +20,57 @@
         <Documentation>ASCII .pio file describes locations of data files,
         type and order of data written to the files.</Documentation>
       </StringVectorProperty>
+
+      <IntVectorProperty command="GetHyperTreeGrid"
+                         information_only="1"
+                         name="HyperTreeGridInfo">
+      </IntVectorProperty>
+      <IntVectorProperty command="GetTracers"
+                         information_only="1"
+                         name="TracersInfo">
+      </IntVectorProperty>
+      <IntVectorProperty command="GetFloat64"
+                          information_only="1"
+                          name="Float64Info">
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetHyperTreeGrid"
+                         name="HyperTreeGrid"
+                         default_values="0"
+                         number_of_elements="1"
+                         label="Use HyperTree Grid (HTG) for AMR Mesh"
+                         information_property="HyperTreeGridInfo">
+        <BooleanDomain name="bool" />
+        <Documentation short_help="Specify if hypertree grid is created rather than unstructured for AMR."
+                       long_help="Specify if hypertree grid is created rather than unstructure for AMR.">
+          This property determines if AMR in the PIO file is created
+          as a hypertree grid rather than as an unstructured grid.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTracers"
+                         name="Tracers"
+                         default_values="0"
+                         number_of_elements="1"
+                         label="Load Tracers"
+                         information_property="TracersInfo">
+        <BooleanDomain name="bool" />
+        <Documentation short_help="Specify if tracer data is read."
+                       long_help="Specify if tracer points and data are read into a separate unstructured grid.">
+          This property determines if tracer data is read into a second unstructured grid.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFloat64"
+                         name="Float64"
+                         default_values="0"
+                         number_of_elements="1"
+                         label="Load variables as doubles (Float64)"
+                         information_property="Float64Info">
+        <BooleanDomain name="bool" />
+        <Documentation short_help="Specify if AMR and tracer data is read as 64 bit float rather than 32 bit."
+                       long_help="Specify if AMR and tracer data is read as 64 bit float rather than 32 bit.">
+          This property determines if the AMR and tracer variable data is read as 64 bit float.
+        </Documentation>
+      </IntVectorProperty>
       <StringVectorProperty information_only="1"
                             name="CellArrayInfo">
         <ArraySelectionInformationHelper attribute_name="Cell" />
