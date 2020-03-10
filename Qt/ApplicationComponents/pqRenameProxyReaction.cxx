@@ -32,28 +32,58 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenameProxyReaction.h"
 
 #include "pqActiveObjects.h"
+#include "pqCoreUtilities.h"
 #include "pqProxy.h"
+#include "pqUndoStack.h"
 #include "pqView.h"
-
+#include "vtkSMProxy.h"
 #include "vtkSMTrace.h"
 
 #include <QInputDialog>
 #include <QString>
+#include <QWidget>
 
 //-----------------------------------------------------------------------------
-pqRenameProxyReaction::pqRenameProxyReaction(QAction* renameAction, pqProxy* proxy)
+pqRenameProxyReaction::pqRenameProxyReaction(
+  QAction* renameAction, pqProxy* proxy, QWidget* parentWidget)
   : Superclass(renameAction)
   , Proxy(proxy)
+  , ParentWidget(parentWidget)
 {
+}
+
+//-----------------------------------------------------------------------------
+pqRenameProxyReaction::pqRenameProxyReaction(QAction* renameAction, QWidget* parentWidget)
+  : Superclass(renameAction)
+  , Proxy(nullptr)
+  , ParentWidget(parentWidget)
+{
+  this->connect(&pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)),
+    SLOT(updateEnableState()));
+  this->updateEnableState();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenameProxyReaction::updateEnableState()
+{
+  this->Superclass::updateEnableState();
+  this->parentAction()->setEnabled(pqActiveObjects::instance().activeSource() != nullptr);
 }
 
 //-----------------------------------------------------------------------------
 void pqRenameProxyReaction::onTriggered()
 {
+  auto proxy = (this->Proxy != nullptr) ? this->Proxy : pqActiveObjects::instance().activeSource();
+  if (!proxy)
+  {
+    return;
+  }
+
   bool ok;
-  QString group = dynamic_cast<pqView*>(this->Proxy) ? "View" : "Proxy";
-  QString oldName = this->Proxy->getSMName();
-  QString newName = QInputDialog::getText(pqActiveObjects::instance().activeView()->widget(),
+  QString group = dynamic_cast<pqView*>(proxy) ? "View" : "Proxy";
+  QString oldName = proxy->getSMName();
+  QString newName = QInputDialog::getText(
+    this->ParentWidget ? this->ParentWidget.data() : pqCoreUtilities::mainWidget(),
     tr("Rename") + " " + group + "...", tr("New name:"), QLineEdit::Normal, oldName, &ok);
 
   if (ok && !newName.isEmpty() && newName != oldName)
@@ -63,17 +93,18 @@ void pqRenameProxyReaction::onTriggered()
       SM_SCOPED_TRACE(CallFunction)
         .arg("RenameView")
         .arg(newName.toLocal8Bit().data())
-        .arg((vtkObject*)this->Proxy->getProxy());
+        .arg(proxy->getProxy());
     }
     else
     {
       SM_SCOPED_TRACE(CallFunction)
         .arg("RenameProxy")
         .arg(newName.toLocal8Bit().data())
-        .arg(this->Proxy->getSMGroup().toLocal8Bit().data())
-        .arg((vtkObject*)this->Proxy->getProxy());
+        .arg(proxy->getSMGroup().toLocal8Bit().data())
+        .arg(proxy->getProxy());
     }
-
-    this->Proxy->rename(newName);
+    BEGIN_UNDO_SET(tr("Rename") + " " + group);
+    proxy->rename(newName);
+    END_UNDO_SET();
   }
 }

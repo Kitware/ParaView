@@ -317,7 +317,7 @@ void pqStandardViewFrameActionsImplementation::addGenericActions(pqViewFrame* fr
   /// Add convert-to menu.
   frame->contextMenu()->addSeparator();
   QAction* renameAction = frame->contextMenu()->addAction("Rename");
-  new pqRenameProxyReaction(renameAction, view);
+  new pqRenameProxyReaction(renameAction, view, view->widget());
 
   QMenu* convertMenu = frame->contextMenu()->addMenu("Convert To ...");
   QObject::connect(convertMenu, SIGNAL(aboutToShow()), this, SLOT(aboutToShowConvertMenu()));
