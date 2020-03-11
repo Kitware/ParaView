@@ -31,7 +31,6 @@
 class vtkAbstractVolumeMapper;
 class vtkColorTransferFunction;
 class vtkOutlineSource;
-class vtkPExtentTranslator;
 class vtkPiecewiseFunction;
 class vtkPolyDataMapper;
 class vtkProjectedTetrahedraMapper;
@@ -163,10 +162,6 @@ protected:
 
   vtkResampleToImage* ResampleToImageFilter;
   unsigned long DataSize;
-  vtkPExtentTranslator* PExtentTranslator;
-  double Origin[3];
-  double Spacing[3];
-  int WholeExtent[6];
   vtkOutlineSource* OutlineSource;
 
   vtkPVGeometryFilter* LODGeometryFilter;

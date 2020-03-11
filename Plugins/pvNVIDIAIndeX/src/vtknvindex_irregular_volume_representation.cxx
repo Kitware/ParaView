@@ -278,7 +278,8 @@ int vtknvindex_irregular_volume_representation::ProcessViewRequest(
     outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
 
     vtkPVRenderView::SetPiece(inInfo, this, this->Preprocessor->GetOutputDataObject(0));
-    vtkPVRenderView::MarkAsRedistributable(inInfo, this);
+    vtkPVRenderView::SetOrderedCompositingConfiguration(inInfo, this,
+      vtkPVRenderView::DATA_IS_REDISTRIBUTABLE | vtkPVRenderView::USE_DATA_FOR_LOAD_BALANCING);
     vtkPVRenderView::SetRedistributionModeToDuplicateBoundaryCells(inInfo, this);
 
     vtkNew<vtkMatrix4x4> matrix;
@@ -289,15 +290,18 @@ int vtknvindex_irregular_volume_representation::ProcessViewRequest(
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
-
+    auto controller = vtkMultiProcessController::GetGlobalController();
     vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(inInfo->Get(vtkPVRenderView::VIEW()));
     auto ddm = vtkPVRenderViewDataDeliveryManager::SafeDownCast(view->GetDeliveryManager());
-    vtkPKdTree* kd_tree = ddm->GetKdTree();
-
     // Retrieve ParaView's KdTree in order to obtain domain subdivision bounding boxes.
-    if (kd_tree)
+    if (ddm->GetCuts().size() > 0 && controller != nullptr &&
+      controller->GetLocalProcessId() < static_cast<int>(ddm->GetCuts().size()))
     {
-      DefaultMapper->set_domain_kdtree(kd_tree);
+      DefaultMapper->set_subregion_bounds(ddm->GetCuts()[controller->GetLocalProcessId()]);
+    }
+    else
+    {
+      DefaultMapper->set_subregion_bounds(vtkBoundingBox());
     }
 
     if (inInfo->Has(vtkPVRenderView::USE_LOD()))

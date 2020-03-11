@@ -46,7 +46,6 @@ class vtkFixedPointVolumeRayCastMapper;
 class vtkImageData;
 class vtkImplicitFunction;
 class vtkOutlineSource;
-class vtkPExtentTranslator;
 class vtkPiecewiseFunction;
 class vtkPolyDataMapper;
 class vtkPVLODVolume;
@@ -179,16 +178,10 @@ protected:
   unsigned long DataSize;
   double DataBounds[6];
 
-  // meta-data about the input image to pass on to render view for hints
-  // when redistributing data.
-  vtkNew<vtkPExtentTranslator> PExtentTranslator;
-  double Origin[3];
-  double Spacing[3];
-  int WholeExtent[6];
-
   bool MapScalars;
   bool MultiComponentsMapping;
 
+  int WholeExtent[6];
   double CroppingOrigin[3] = { 0, 0, 0 };
   double CroppingScale[3] = { 1, 1, 1 };
 

@@ -34,12 +34,12 @@
 
 class vtkIceTSynchronizedRenderers;
 class vtkImageProcessingPass;
-class vtkPartitionOrderingInterface;
+class vtkOpenGLRenderer;
+class vtkOrderedCompositingHelper;
 class vtkPVSession;
 class vtkRenderer;
 class vtkRenderPass;
 class vtkSynchronizedRenderers;
-class vtkOpenGLRenderer;
 
 class VTKREMOTINGVIEWS_EXPORT vtkPVSynchronizedRenderer : public vtkObject
 {
@@ -66,10 +66,11 @@ public:
   void Initialize(vtkPVSession* session);
 
   /**
-   * partition ordering that gives processes ordering. Initial value is a NULL pointer.
-   * This is used only when UseOrderedCompositing is true.
+   * Used to determine sorting order and use ordered compositing. Set to nullptr
+   * to not use ordered compositing and instead use depth-buffer based
+   * compositing, if applicable.
    */
-  void SetPartitionOrdering(vtkPartitionOrderingInterface* partitionOrdering);
+  void SetOrderedCompositingHelper(vtkOrderedCompositingHelper* helper);
 
   /**
    * Set the renderer that is being synchronized.

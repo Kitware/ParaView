@@ -37,16 +37,11 @@ set(classes
   vtkCSVExporter
   vtkImageCompressor
   vtkImageTransparencyFilter
-  vtkKdTreeGenerator
-  vtkKdTreeManager
   vtkLZ4Compressor
   vtkMarkSelectedRows
   vtkMPIMoveData
   vtkNetworkImageSource
   vtkOrderedCompositeDistributor
-  vtkPartitionOrdering
-  vtkPartitionOrderingInterface
-  vtkPExtentTranslator
   vtkPVGeometryFilter
   vtkPVRecoverGeometryWireframe
   vtkRedistributePolyData

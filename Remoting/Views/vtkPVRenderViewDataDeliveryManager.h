@@ -23,6 +23,7 @@
 #ifndef vtkPVRenderViewDataDeliveryManager_h
 #define vtkPVRenderViewDataDeliveryManager_h
 
+#include "vtkBoundingBox.h" // needed for iVar.
 #include "vtkPVDataDeliveryManager.h"
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSmartPointer.h"        // needed for iVar.
@@ -33,7 +34,7 @@ class vtkAlgorithmOutput;
 class vtkDataObject;
 class vtkExtentTranslator;
 class vtkInformation;
-class vtkPKdTree;
+class vtkMatrix4x4;
 class vtkPVDataRepresentation;
 class vtkPVView;
 
@@ -68,20 +69,10 @@ public:
   void SetDeliverToClientAndRenderingProcesses(vtkPVDataRepresentation*, bool deliver_to_client,
     bool gather_before_delivery, bool low_res, int port = 0);
 
-  /**
-   * Under certain cases, e.g. when remote rendering in parallel with
-   * translucent geometry, the geometry may need to be redistributed to ensure
-   * ordered compositing can be employed correctly. Marking geometry provided by
-   * a representation as redistributable makes it possible for this class to
-   * redistribute the geometry as needed. Only vtkPolyData, vtkUnstructuredGrid
-   * or a multi-block comprising of vtkPolyData is currently supported.
-   */
-  void MarkAsRedistributable(vtkPVDataRepresentation*, bool value = true, int port = 0);
-
   //@{
   /**
    * For representations that have indicated that the data is redistributable
-   * (using MarkAsRedistributable), this control the mode for redistribution.
+   * (using SetOrderedCompositingConfiguration), this control the mode for redistribution.
    * Specifically, it indicates how to handle cells that are on the boundary of
    * the redistribution KdTree. Default is to split the cells, one can change it
    * to duplicate cells instead by using mode as
@@ -90,14 +81,9 @@ public:
   void SetRedistributionMode(vtkPVDataRepresentation*, int mode, int port = 0);
   void SetRedistributionModeToSplitBoundaryCells(vtkPVDataRepresentation* repr, int port = 0);
   void SetRedistributionModeToDuplicateBoundaryCells(vtkPVDataRepresentation* repr, int port = 0);
+  void SetRedistributionModeToUniquelyAssignBoundaryCells(
+    vtkPVDataRepresentation* repr, int port = 0);
   //@}
-
-  /**
-   * Provides access to the partitioning kd-tree that was generated using the
-   * data provided by the representations. The view uses this kd-tree to decide
-   * on the compositing order when ordered compositing is being used.
-   */
-  vtkPKdTree* GetKdTree();
 
   /**
    * Called by the view on every render when ordered compositing is to be used to
@@ -108,16 +94,27 @@ public:
   /**
    * Removes all redistributed data that may have been redistributed for ordered compositing
    * earlier when using KdTree based redistribution.
+   *
+   * TODO: check is this is still needed.
    */
   void ClearRedistributedData(bool use_load);
 
   /**
-   * Pass the structured-meta-data for determining rendering order for ordered
+   * Pass information how to handle data redistribution when using ordered
    * compositing.
    */
-  void SetOrderedCompositingInformation(vtkPVDataRepresentation* repr,
-    vtkExtentTranslator* translator, const int whole_extents[6], const double origin[3],
-    const double spacing[3], int port = 0);
+  void SetOrderedCompositingConfiguration(
+    vtkPVDataRepresentation* repr, int config, const double* bds, int port = 0);
+
+  //@{
+  /**
+   * Pass data bounds information.
+   */
+  void SetGeometryBounds(vtkPVDataRepresentation* repr, const double bds[6],
+    vtkMatrix4x4* matrix = nullptr, int port = 0);
+  vtkBoundingBox GetGeometryBounds(vtkPVDataRepresentation* repr, int port = 0);
+  vtkBoundingBox GetTransformedGeometryBounds(vtkPVDataRepresentation* repr, int port = 0);
+  //@}
 
   // *******************************************************************
   // UNDER CONSTRUCTION STREAMING API
@@ -164,6 +161,17 @@ public:
 
   int GetDeliveredDataKey(bool low_res) const override;
 
+  //@{
+  /**
+   * Provides access to the "cuts" built by this class when doing ordered
+   * compositing. Note, this may not be up-to-date unless ordered compositing is
+   * being used and are only available on the rendering-ranks i.e. pvserver or
+   * pvrenderserver ranks.
+   */
+  const std::vector<vtkBoundingBox>& GetCuts() const { return this->Cuts; }
+  vtkTimeStamp GetCutsMTime() const { return this->CutsMTime; }
+  //@}
+
 protected:
   vtkPVRenderViewDataDeliveryManager();
   ~vtkPVRenderViewDataDeliveryManager() override;
@@ -173,7 +181,9 @@ protected:
   int GetViewDataDistributionMode(bool low_res) const;
   int GetMoveMode(vtkInformation* info, int viewMode) const;
 
-  vtkSmartPointer<vtkPKdTree> KdTree;
+  std::vector<vtkBoundingBox> Cuts;
+  vtkTimeStamp CutsMTime;
+
   vtkTimeStamp RedistributionTimeStamp;
   std::string LastCutsGeneratorToken;
   bool UseRedistributedDataAsDeliveredData = false;

@@ -19,7 +19,6 @@
 #include "vtkColorTransferFunction.h"
 #include "vtkCommand.h"
 #include "vtkContourValues.h"
-#include "vtkExtentTranslator.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -28,7 +27,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
-#include "vtkPExtentTranslator.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
 #include "vtkPartitionedDataSet.h"
@@ -123,8 +121,6 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
   vtkMath::UninitializeBounds(this->DataBounds);
   this->DataSize = 0;
 
-  this->Origin[0] = this->Origin[1] = this->Origin[2] = 0;
-  this->Spacing[0] = this->Spacing[1] = this->Spacing[2] = 0;
   this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
   this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
 
@@ -176,17 +172,9 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
     vtkPVRenderView::SetGeometryBounds(inInfo, this, this->DataBounds);
 
     vtkPVRenderView::SetRequiresDistributedRendering(inInfo, this, true);
-
-    if (vtkPartitionedDataSet::SafeDownCast(this->Cache))
-    {
-      vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this->DataBounds);
-    }
-    else
-    {
-      // Pass partitioning information to the render view.
-      vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this,
-        this->PExtentTranslator.GetPointer(), this->WholeExtent, this->Origin, this->Spacing);
-    }
+    // Pass partitioning information to the render view.
+    vtkPVRenderView::SetOrderedCompositingConfiguration(
+      inInfo, this, vtkPVRenderView::USE_BOUNDS_FOR_REDISTRIBUTION);
   }
   else if (request_type == vtkPVView::REQUEST_UPDATE_LOD())
   {
@@ -210,8 +198,6 @@ int vtkImageVolumeRepresentation::RequestData(
 {
   vtkMath::UninitializeBounds(this->DataBounds);
   this->DataSize = 0;
-  this->Origin[0] = this->Origin[1] = this->Origin[2] = 0;
-  this->Spacing[0] = this->Spacing[1] = this->Spacing[2] = 0;
   this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
   this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
 
@@ -238,14 +224,7 @@ int vtkImageVolumeRepresentation::RequestData(
       this->OutlineSource->SetBounds(cache->GetBounds());
       this->OutlineSource->GetBounds(this->DataBounds);
       this->OutlineSource->Update();
-
       this->DataSize = cache->GetActualMemorySize();
-
-      // Collect information about volume that is needed for data redistribution
-      // later.
-      this->PExtentTranslator->GatherExtents(cache);
-      cache->GetOrigin(this->Origin);
-      cache->GetSpacing(this->Spacing);
       vtkStreamingDemandDrivenPipeline::GetWholeExtent(
         inputVector[0]->GetInformationObject(0), this->WholeExtent);
       this->Cache = cache.GetPointer();

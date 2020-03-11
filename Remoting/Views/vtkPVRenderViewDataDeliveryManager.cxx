@@ -15,19 +15,20 @@
 #include "vtkPVRenderViewDataDeliveryManager.h"
 #include "vtkPVDataDeliveryManagerInternals.h"
 
+#include "vtkDIYKdTreeUtilities.h"
 #include "vtkExtentTranslator.h"
 #include "vtkInformation.h"
 #include "vtkInformationDoubleVectorKey.h"
 #include "vtkInformationIntegerKey.h"
 #include "vtkInformationIntegerVectorKey.h"
 #include "vtkInformationObjectBaseKey.h"
-#include "vtkKdTreeManager.h"
 #include "vtkMPIMoveData.h"
+#include "vtkMath.h"
+#include "vtkMatrix4x4.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOrderedCompositeDistributor.h"
-#include "vtkPKdTree.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVStreamingMacros.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -54,17 +55,19 @@ public:
   static vtkInformationIntegerKey* CLONE_TO_ALL_PROCESSES();
   static vtkInformationIntegerKey* DELIVER_TO_CLIENT_AND_RENDERING_PROCESSES();
   static vtkInformationIntegerKey* GATHER_BEFORE_DELIVERING_TO_CLIENT();
-  static vtkInformationIntegerKey* IS_REDISTRIBUTABLE();
   static vtkInformationIntegerKey* REDISTRIBUTION_MODE();
   static vtkInformationIntegerKey* IS_STREAMABLE();
+  static vtkInformationDoubleVectorKey* GEOMETRY_BOUNDS();
+  static vtkInformationDoubleVectorKey* TRANSFORMED_GEOMETRY_BOUNDS();
+  static vtkInformationIntegerKey* ORDERED_COMPOSITING_CONFIGURATION();
+  static vtkInformationDoubleVectorKey* ORDERED_COMPOSITING_BOUNDS();
 
-  //@{
-  // Ordered compositing meta-data.
-  static vtkInformationIntegerVectorKey* WHOLE_EXTENT();
-  static vtkInformationDoubleVectorKey* ORIGIN();
-  static vtkInformationDoubleVectorKey* SPACING();
-  static vtkInformationObjectBaseKey* EXTENT_TRANSLATOR();
-  //@}
+  static int GetOrderedCompositingConfiguration(vtkInformation* info)
+  {
+    return info->Has(vtkPVRVDMKeys::ORDERED_COMPOSITING_CONFIGURATION())
+      ? info->Get(vtkPVRVDMKeys::ORDERED_COMPOSITING_CONFIGURATION())
+      : 0;
+  }
 
 protected:
   vtkPVRVDMKeys() = default;
@@ -77,14 +80,12 @@ private:
 vtkInformationKeyMacro(vtkPVRVDMKeys, CLONE_TO_ALL_PROCESSES, Integer);
 vtkInformationKeyMacro(vtkPVRVDMKeys, DELIVER_TO_CLIENT_AND_RENDERING_PROCESSES, Integer);
 vtkInformationKeyMacro(vtkPVRVDMKeys, GATHER_BEFORE_DELIVERING_TO_CLIENT, Integer);
-vtkInformationKeyMacro(vtkPVRVDMKeys, IS_REDISTRIBUTABLE, Integer);
 vtkInformationKeyMacro(vtkPVRVDMKeys, REDISTRIBUTION_MODE, Integer);
 vtkInformationKeyMacro(vtkPVRVDMKeys, IS_STREAMABLE, Integer);
-vtkInformationKeyRestrictedMacro(vtkPVRVDMKeys, WHOLE_EXTENT, IntegerVector, 6);
-vtkInformationKeyRestrictedMacro(vtkPVRVDMKeys, ORIGIN, DoubleVector, 3);
-vtkInformationKeyRestrictedMacro(vtkPVRVDMKeys, SPACING, DoubleVector, 3);
-vtkInformationKeyMacro(vtkPVRVDMKeys, EXTENT_TRANSLATOR, ObjectBase);
-
+vtkInformationKeyMacro(vtkPVRVDMKeys, ORDERED_COMPOSITING_CONFIGURATION, Integer);
+vtkInformationKeyRestrictedMacro(vtkPVRVDMKeys, ORDERED_COMPOSITING_BOUNDS, DoubleVector, 6);
+vtkInformationKeyRestrictedMacro(vtkPVRVDMKeys, GEOMETRY_BOUNDS, DoubleVector, 6);
+vtkInformationKeyRestrictedMacro(vtkPVRVDMKeys, TRANSFORMED_GEOMETRY_BOUNDS, DoubleVector, 6);
 } // end of namespace
 
 //*****************************************************************************
@@ -123,20 +124,6 @@ void vtkPVRenderViewDataDeliveryManager::SetDeliverToClientAndRenderingProcesses
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderViewDataDeliveryManager::MarkAsRedistributable(
-  vtkPVDataRepresentation* repr, bool value /*=true*/, int port)
-{
-  if (auto info = this->GetPieceInformation(repr, false, port))
-  {
-    info->Set(vtkPVRVDMKeys::IS_REDISTRIBUTABLE(), value ? 1 : 0);
-  }
-  if (auto info = this->GetPieceInformation(repr, true, port))
-  {
-    info->Set(vtkPVRVDMKeys::IS_REDISTRIBUTABLE(), value ? 1 : 0);
-  }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVRenderViewDataDeliveryManager::SetRedistributionMode(
   vtkPVDataRepresentation* repr, int mode, int port)
 {
@@ -166,6 +153,13 @@ void vtkPVRenderViewDataDeliveryManager::SetRedistributionModeToDuplicateBoundar
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderViewDataDeliveryManager::SetRedistributionModeToUniquelyAssignBoundaryCells(
+  vtkPVDataRepresentation* repr, int port)
+{
+  this->SetRedistributionMode(repr, vtkOrderedCompositeDistributor::ASSIGN_TO_ONE_REGION, port);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderViewDataDeliveryManager::SetStreamable(
   vtkPVDataRepresentation* repr, bool val, int port)
 {
@@ -180,22 +174,109 @@ void vtkPVRenderViewDataDeliveryManager::SetStreamable(
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderViewDataDeliveryManager::SetOrderedCompositingInformation(
-  vtkPVDataRepresentation* repr, vtkExtentTranslator* translator, const int whole_extents[6],
-  const double origin[3], const double spacing[3], int port)
+void vtkPVRenderViewDataDeliveryManager::SetOrderedCompositingConfiguration(
+  vtkPVDataRepresentation* repr, int config, const double* bds, int port)
 {
-  if (auto info = this->GetPieceInformation(repr, false, port))
+  if (auto info = this->GetPieceInformation(repr, /*low_res=*/false, port))
   {
-    info->Set(vtkPVRVDMKeys::EXTENT_TRANSLATOR(), translator);
-    info->Set(vtkPVRVDMKeys::WHOLE_EXTENT(), whole_extents, 6);
-    info->Set(vtkPVRVDMKeys::ORIGIN(), origin, 3);
-    info->Set(vtkPVRVDMKeys::SPACING(), spacing, 3);
+    info->Set(vtkPVRVDMKeys::ORDERED_COMPOSITING_CONFIGURATION(), config);
+    if (bds && vtkMath::AreBoundsInitialized(bds))
+    {
+      info->Set(vtkPVRVDMKeys::ORDERED_COMPOSITING_BOUNDS(), bds, 6);
+    }
+    else
+    {
+      info->Remove(vtkPVRVDMKeys::ORDERED_COMPOSITING_BOUNDS());
+    }
   }
+  if (auto info = this->GetPieceInformation(repr, /*low_res=*/true, port))
+  {
+    info->Set(vtkPVRVDMKeys::ORDERED_COMPOSITING_CONFIGURATION(), config);
+    if (bds && vtkMath::AreBoundsInitialized(bds))
+    {
+      info->Set(vtkPVRVDMKeys::ORDERED_COMPOSITING_BOUNDS(), bds, 6);
+    }
+    else
+    {
+      info->Remove(vtkPVRVDMKeys::ORDERED_COMPOSITING_BOUNDS());
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderViewDataDeliveryManager::SetGeometryBounds(
+  vtkPVDataRepresentation* repr, const double bounds[6], vtkMatrix4x4* matrix, int port)
+{
+  double transformed_bounds[6];
+  std::copy(bounds, bounds + 6, transformed_bounds);
+  const vtkBoundingBox bbox(bounds);
+  if (matrix && bbox.IsValid())
+  {
+    double min_point[4] = { bounds[0], bounds[2], bounds[4], 1 };
+    double max_point[4] = { bounds[1], bounds[3], bounds[5], 1 };
+    matrix->MultiplyPoint(min_point, min_point);
+    matrix->MultiplyPoint(max_point, max_point);
+    transformed_bounds[0] = min_point[0] / min_point[3];
+    transformed_bounds[2] = min_point[1] / min_point[3];
+    transformed_bounds[4] = min_point[2] / min_point[3];
+    transformed_bounds[1] = max_point[0] / max_point[3];
+    transformed_bounds[3] = max_point[1] / max_point[3];
+    transformed_bounds[5] = max_point[2] / max_point[3];
+  }
+
+  // Eventually, we may want to cache the matrix too so we can use it when
+  // building the kd-tree, for example (see paraview/paraview#19691)
+  if (auto info = this->GetPieceInformation(repr, /*low_res=*/false, port))
+  {
+    info->Set(vtkPVRVDMKeys::GEOMETRY_BOUNDS(), bounds, 6);
+    info->Set(vtkPVRVDMKeys::TRANSFORMED_GEOMETRY_BOUNDS(), transformed_bounds, 6);
+  }
+  if (auto info = this->GetPieceInformation(repr, /*low_res=*/true, port))
+  {
+    info->Set(vtkPVRVDMKeys::GEOMETRY_BOUNDS(), bounds, 6);
+    info->Set(vtkPVRVDMKeys::TRANSFORMED_GEOMETRY_BOUNDS(), transformed_bounds, 6);
+  }
+}
+
+//----------------------------------------------------------------------------
+vtkBoundingBox vtkPVRenderViewDataDeliveryManager::GetGeometryBounds(
+  vtkPVDataRepresentation* repr, int port)
+{
+  vtkBoundingBox bbox;
+  if (auto info = this->GetPieceInformation(repr, /*low-res*/ false, port))
+  {
+    if (info->Has(vtkPVRVDMKeys::GEOMETRY_BOUNDS()))
+    {
+      double gbds[6];
+      info->Get(vtkPVRVDMKeys::GEOMETRY_BOUNDS(), gbds);
+      bbox.AddBounds(gbds);
+    }
+  }
+  return bbox;
+}
+
+//----------------------------------------------------------------------------
+vtkBoundingBox vtkPVRenderViewDataDeliveryManager::GetTransformedGeometryBounds(
+  vtkPVDataRepresentation* repr, int port)
+{
+  vtkBoundingBox bbox;
+  if (auto info = this->GetPieceInformation(repr, /*low-res*/ false, port))
+  {
+    if (info->Has(vtkPVRVDMKeys::TRANSFORMED_GEOMETRY_BOUNDS()))
+    {
+      double gbds[6];
+      info->Get(vtkPVRVDMKeys::TRANSFORMED_GEOMETRY_BOUNDS(), gbds);
+      bbox.AddBounds(gbds);
+    }
+  }
+  return bbox;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderViewDataDeliveryManager::RedistributeDataForOrderedCompositing(bool low_res)
 {
+  auto controller = vtkMultiProcessController::GetGlobalController();
+  const int num_ranks = controller ? controller->GetNumberOfProcesses() : 1;
   if (this->GetView()->GetUpdateTimeStamp() > this->RedistributionTimeStamp)
   {
     this->RedistributionTimeStamp.Modified();
@@ -205,7 +286,9 @@ void vtkPVRenderViewDataDeliveryManager::RedistributeDataForOrderedCompositing(b
     // to re-generate kd-tree. So we build a token that helps us determine if
     // something significant changed.
     std::ostringstream token_stream;
-    vtkNew<vtkKdTreeManager> cutsGenerator;
+    std::vector<vtkDataObject*> data_for_loadbalacing;
+    bool use_explicit_bounds = false;
+    vtkBoundingBox local_bounds;
     for (auto iter = this->Internals->ItemsMap.begin(); iter != this->Internals->ItemsMap.end();
          ++iter)
     {
@@ -216,46 +299,57 @@ void vtkPVRenderViewDataDeliveryManager::RedistributeDataForOrderedCompositing(b
       const int mode = this->GetViewDataDistributionMode(low_res);
       if (this->Internals->IsRepresentationVisible(iter->first.first))
       {
-        if (info->Has(vtkPVRVDMKeys::EXTENT_TRANSLATOR()) &&
-          info->Get(vtkPVRVDMKeys::EXTENT_TRANSLATOR()) != nullptr)
+        const int config = vtkPVRVDMKeys::GetOrderedCompositingConfiguration(info);
+        if ((config & vtkPVRenderView::USE_DATA_FOR_LOAD_BALANCING) != 0)
         {
           token_stream << ";a" << iter->first.first << "=" << item.GetTimeStamp(cacheKey);
-          // cout << "use structured info: ";
-          // cout << this->GetRepresentation(iter->first.first)->GetLogName() << "("
-          // <<iter->first.second<<")" << endl;
-          // implies that the representation is providing us with means to
-          // override how the ordered compositing happens.
-          double origin[3];
-          double spacing[3];
-          int whole_extents[6];
-          info->Get(vtkPVRVDMKeys::WHOLE_EXTENT(), whole_extents);
-          info->Get(vtkPVRVDMKeys::ORIGIN(), origin);
-          info->Get(vtkPVRVDMKeys::SPACING(), spacing);
-          cutsGenerator->SetStructuredDataInformation(
-            vtkExtentTranslator::SafeDownCast(info->Get(vtkPVRVDMKeys::EXTENT_TRANSLATOR())),
-            whole_extents, origin, spacing);
+          data_for_loadbalacing.push_back(item.GetDeliveredDataObject(mode, cacheKey));
         }
-        else if (info->Has(vtkPVRVDMKeys::IS_REDISTRIBUTABLE()) &&
-          info->Get(vtkPVRVDMKeys::IS_REDISTRIBUTABLE()) == 1)
+        else if ((config & vtkPVRenderView::USE_BOUNDS_FOR_REDISTRIBUTION) != 0)
         {
-          token_stream << "b" << iter->first.first << "=" << item.GetTimeStamp(cacheKey) << ","
-                       << item.GetDeliveryTimeStamp(mode, cacheKey);
-          // cout << "redistribute: ";
-          // cout << this->GetRepresentation(iter->first.first)->GetLogName() << "("
-          // <<iter->first.second<<") = "
-          //   << item.GetDeliveredDataObject()
-          //   << endl;
-          cutsGenerator->AddDataObject(item.GetDeliveredDataObject(mode, cacheKey));
+          token_stream << ";b" << iter->first.first << "=" << item.GetTimeStamp(cacheKey);
+          if (info->Has(vtkPVRVDMKeys::ORDERED_COMPOSITING_BOUNDS()))
+          {
+            double gbds[6];
+            info->Get(vtkPVRVDMKeys::GEOMETRY_BOUNDS(), gbds);
+            local_bounds.AddBounds(gbds);
+          }
+          else if (info->Has(vtkPVRVDMKeys::GEOMETRY_BOUNDS()))
+          {
+            double gbds[6];
+            info->Get(vtkPVRVDMKeys::GEOMETRY_BOUNDS(), gbds);
+            local_bounds.AddBounds(gbds);
+          }
+          use_explicit_bounds = true;
         }
       }
     }
 
     if (this->LastCutsGeneratorToken != token_stream.str())
     {
-      vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "regenerate kd-tree");
-      cutsGenerator->GenerateKdTree();
-      this->KdTree = cutsGenerator->GetKdTree();
+      if (use_explicit_bounds)
+      {
+        // we redistribution_bounds is non-empty, we don't build kd-tree and
+        // just use the bounds given to us.
+        double lbds[6];
+        local_bounds.GetBounds(lbds);
+        std::vector<double> all_bounds(num_ranks * 6);
+        controller->AllGather(lbds, &all_bounds[0], 6);
+        this->Cuts.resize(num_ranks);
+        for (int cc = 0; cc < num_ranks; ++cc)
+        {
+          this->Cuts[cc].SetBounds(&all_bounds[6 * cc]);
+        }
+      }
+      else
+      {
+        vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "regenerate kd-tree");
+        this->Cuts = vtkDIYKdTreeUtilities::GenerateCuts(
+          data_for_loadbalacing, num_ranks, /*use_cell_centers*/ false, controller);
+        vtkDIYKdTreeUtilities::ResizeCuts(this->Cuts, controller->GetNumberOfProcesses());
+      }
       this->LastCutsGeneratorToken = token_stream.str();
+      this->CutsMTime.Modified();
     }
     else
     {
@@ -264,7 +358,7 @@ void vtkPVRenderViewDataDeliveryManager::RedistributeDataForOrderedCompositing(b
     }
   }
 
-  if (this->KdTree == nullptr)
+  if (this->Cuts.size() == 0)
   {
     return;
   }
@@ -294,8 +388,8 @@ void vtkPVRenderViewDataDeliveryManager::RedistributeDataForOrderedCompositing(b
     }
 
     const int mode = this->GetMoveMode(info, viewMode);
-    if (mode == vtkMPIMoveData::CLONE || (!info->Has(vtkPVRVDMKeys::IS_REDISTRIBUTABLE()) ||
-                                           info->Get(vtkPVRVDMKeys::IS_REDISTRIBUTABLE()) == 0))
+    const int config = vtkPVRVDMKeys::GetOrderedCompositingConfiguration(info);
+    if (mode == vtkMPIMoveData::CLONE || (config & vtkPVRenderView::DATA_IS_REDISTRIBUTABLE) == 0)
     {
       // nothing to do, item is either non-redistributable, or
       // data is already cloned on all ranks...no redistribution is needed.
@@ -311,8 +405,7 @@ void vtkPVRenderViewDataDeliveryManager::RedistributeDataForOrderedCompositing(b
     else
     {
       auto redistributedObject = item.GetDeliveredDataObject(REDISTRIBUTED_DATA_KEY, cacheKey);
-      if (redistributedObject == nullptr ||
-        redistributedObject->GetMTime() < this->KdTree->GetMTime() ||
+      if (redistributedObject == nullptr || redistributedObject->GetMTime() < this->CutsMTime ||
         redistributedObject->GetMTime() < deliveredDataObject->GetMTime())
       {
         item.SetDeliveredDataObject(REDISTRIBUTED_DATA_KEY, cacheKey, nullptr);
@@ -320,12 +413,12 @@ void vtkPVRenderViewDataDeliveryManager::RedistributeDataForOrderedCompositing(b
         vtkNew<vtkOrderedCompositeDistributor> redistributor;
         redistributor->SetController(vtkMultiProcessController::GetGlobalController());
         redistributor->SetInputData(deliveredDataObject);
-        redistributor->SetPKdTree(this->KdTree);
-        redistributor->SetPassThrough(0);
+        redistributor->SetCuts(this->Cuts);
         redistributor->SetBoundaryMode(info->Has(vtkPVRVDMKeys::REDISTRIBUTION_MODE())
             ? info->Get(vtkPVRVDMKeys::REDISTRIBUTION_MODE())
             : vtkOrderedCompositeDistributor::SPLIT_BOUNDARY_CELLS);
         redistributor->Update();
+        // TODO: give representation a change to "cleanup" redistributed data
         item.SetDeliveredDataObject(
           REDISTRIBUTED_DATA_KEY, cacheKey, redistributor->GetOutputDataObject(0));
         anything_moved = true;
@@ -358,12 +451,6 @@ void vtkPVRenderViewDataDeliveryManager::ClearRedistributedData(bool low_res)
     vtkInternals::vtkItem& item = low_res ? iter->second.second : iter->second.first;
     item.SetDeliveredDataObject(REDISTRIBUTED_DATA_KEY, cacheKey, nullptr);
   }
-}
-
-//----------------------------------------------------------------------------
-vtkPKdTree* vtkPVRenderViewDataDeliveryManager::GetKdTree()
-{
-  return this->KdTree;
 }
 
 //----------------------------------------------------------------------------

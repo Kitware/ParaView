@@ -44,16 +44,16 @@
 #include "vtkSynchronizedRenderers.h" //  needed for vtkRawImage.
 #include <memory>                     // for std::unique_pt
 
-class vtkMultiProcessController;
-class vtkPartitionOrderingInterface;
+class vtkFloatArray;
 class vtkIceTContext;
+class vtkMatrix4x4;
+class vtkMultiProcessController;
+class vtkOpenGLHelper;
+class vtkOpenGLRenderWindow;
+class vtkOrderedCompositingHelper;
 class vtkPixelBufferObject;
 class vtkTextureObject;
-class vtkOpenGLRenderWindow;
 class vtkUnsignedCharArray;
-class vtkFloatArray;
-class vtkOpenGLHelper;
-class vtkMatrix4x4;
 
 class VTKREMOTINGVIEWS_EXPORT vtkIceTCompositePass : public vtkRenderPass
 {
@@ -144,8 +144,8 @@ public:
    * partition ordering that gives processes ordering. Initial value is a NULL pointer.
    * This is used only when UseOrderedCompositing is true.
    */
-  vtkGetObjectMacro(PartitionOrdering, vtkPartitionOrderingInterface);
-  virtual void SetPartitionOrdering(vtkPartitionOrderingInterface* partitionOrdering);
+  vtkGetObjectMacro(OrderedCompositingHelper, vtkOrderedCompositingHelper);
+  virtual void SetOrderedCompositingHelper(vtkOrderedCompositingHelper* helper);
   //@}
 
   //@{
@@ -162,8 +162,9 @@ public:
   /**
    * Set this to true, if compositing must be done in a specific order. This is
    * necessary when rendering volumes or translucent geometries. When
-   * UseOrderedCompositing is set to true, it is expected that the PartitionOrdering is set as
-   * well. The PartitionOrdering is used to decide the process-order for compositing.
+   * UseOrderedCompositing is set to true, it is expected that the
+   * OrderedCompositingHelper is set as well. OrderedCompositingHelper is used
+   * to decide the process-order for compositing.
    * Initial value is false.
    */
   vtkGetMacro(UseOrderedCompositing, bool);
@@ -266,7 +267,7 @@ protected:
   void UpdateMatrices(const vtkRenderState*, double aspect);
 
   vtkMultiProcessController* Controller;
-  vtkPartitionOrderingInterface* PartitionOrdering;
+  vtkOrderedCompositingHelper* OrderedCompositingHelper;
   vtkRenderPass* RenderPass;
   vtkIceTContext* IceTContext;
 

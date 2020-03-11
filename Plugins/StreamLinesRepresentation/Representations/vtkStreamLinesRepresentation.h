@@ -34,7 +34,6 @@ class vtkExtentTranslator;
 class vtkImageData;
 class vtkInformation;
 class vtkInformationRequestKey;
-class vtkPExtentTranslator;
 class vtkPolyDataMapper;
 class vtkProperty;
 class vtkPVLODActor;
@@ -185,13 +184,6 @@ protected:
 
   unsigned long DataSize;
   double DataBounds[6];
-
-  // meta-data about the input image to pass on to render view for hints
-  // when redistributing data.
-  vtkNew<vtkPExtentTranslator> PExtentTranslator;
-  double Origin[3];
-  double Spacing[3];
-  int WholeExtent[6];
 
 private:
   vtkStreamLinesRepresentation(const vtkStreamLinesRepresentation&) = delete;

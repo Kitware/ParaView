@@ -20,10 +20,10 @@
 #include "vtkImageVolumeRepresentation.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPExtentTranslator.h"
 #include "vtkPVImageSliceMapper.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
@@ -44,8 +44,6 @@ vtkImageSliceRepresentation::vtkImageSliceRepresentation()
   this->Actor = vtkPVLODActor::New();
   this->Actor->SetMapper(this->SliceMapper);
   this->Actor->GetProperty()->LightingOff();
-  this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
-  this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
 }
 
 //----------------------------------------------------------------------------
@@ -131,9 +129,8 @@ int vtkImageSliceRepresentation::ProcessViewRequest(
       outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
       // Pass on the partitioning information to the view. This logic is similar
       // to what we do in vtkImageVolumeRepresentation.
-      vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this,
-        this->PExtentTranslator.GetPointer(), this->WholeExtent, this->SliceData->GetOrigin(),
-        this->SliceData->GetSpacing());
+      vtkPVRenderView::SetOrderedCompositingConfiguration(
+        inInfo, this, vtkPVRenderView::USE_BOUNDS_FOR_REDISTRIBUTION, this->WholeBounds);
     }
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())
@@ -154,6 +151,7 @@ int vtkImageSliceRepresentation::ProcessViewRequest(
 int vtkImageSliceRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+  vtkMath::UninitializeBounds(this->WholeBounds);
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
     this->UpdateSliceData(inputVector);
@@ -171,14 +169,13 @@ void vtkImageSliceRepresentation::UpdateSliceData(vtkInformationVector** inputVe
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkImageData* input = vtkImageData::GetData(inputVector[0], 0);
 
+  input->GetBounds(this->WholeBounds);
+
   int inWholeExtent[6], outExt[6];
   memset(outExt, 0, sizeof(int) * 6);
 
   inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), inWholeExtent);
   int dataDescription = vtkStructuredData::SetExtent(inWholeExtent, outExt);
-
-  std::copy(inWholeExtent, inWholeExtent + 6, this->WholeExtent);
-  this->PExtentTranslator->GatherExtents(input);
 
   if (vtkStructuredData::GetDataDimension(dataDescription) != 3)
   {

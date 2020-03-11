@@ -31,7 +31,6 @@
 #include "vtkStructuredData.h"      // for VTK_*_PLANE
 
 class vtkImageData;
-class vtkPExtentTranslator;
 class vtkPVImageSliceMapper;
 class vtkPVLODActor;
 class vtkScalarsToColors;
@@ -179,8 +178,7 @@ protected:
 
   // meta-data about the input image to pass on to render view for hints
   // when redistributing data.
-  vtkNew<vtkPExtentTranslator> PExtentTranslator;
-  int WholeExtent[6];
+  double WholeBounds[6];
 
 private:
   vtkImageSliceRepresentation(const vtkImageSliceRepresentation&) = delete;

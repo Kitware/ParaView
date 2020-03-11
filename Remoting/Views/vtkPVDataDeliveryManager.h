@@ -39,7 +39,6 @@ class vtkAlgorithmOutput;
 class vtkDataObject;
 class vtkExtentTranslator;
 class vtkInformation;
-class vtkPKdTree;
 class vtkPVDataRepresentation;
 class vtkPVView;
 

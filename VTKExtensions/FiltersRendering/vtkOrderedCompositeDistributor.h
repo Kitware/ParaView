@@ -42,61 +42,31 @@
 #define vtkOrderedCompositeDistributor_h
 
 #include "vtkPVVTKExtensionsFiltersRenderingModule.h" // needed for export macro
-#include "vtkPointSetAlgorithm.h"
 
-class vtkBSPCuts;
-class vtkDataSet;
-class vtkDataSetSurfaceFilter;
-class vtkDistributedDataFilter;
+#include "vtkDataObjectAlgorithm.h"
+#include "vtkNew.h" // needed for ivar
+
+#include <vector> // for std::vector
+
+class vtkBoundingBox;
 class vtkMultiProcessController;
-class vtkPKdTree;
+class vtkRedistributeDataSetFilter;
 
 class VTKPVVTKEXTENSIONSFILTERSRENDERING_EXPORT vtkOrderedCompositeDistributor
-  : public vtkPointSetAlgorithm
+  : public vtkDataObjectAlgorithm
 {
 public:
-  vtkTypeMacro(vtkOrderedCompositeDistributor, vtkPointSetAlgorithm);
+  vtkTypeMacro(vtkOrderedCompositeDistributor, vtkDataObjectAlgorithm);
   static vtkOrderedCompositeDistributor* New();
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
-  /**
-   * Set the vtkPKdTree to distribute with.
-   */
-  virtual void SetPKdTree(vtkPKdTree*);
-  vtkGetObjectMacro(PKdTree, vtkPKdTree);
+  void SetCuts(const std::vector<vtkBoundingBox>& boxes);
+  void SetController(vtkMultiProcessController* controller);
+  void SetBoundaryMode(int mode);
   //@}
 
-  //@{
-  /**
-   * Set/get the controller to distribute with.
-   */
-  virtual void SetController(vtkMultiProcessController*);
-  vtkGetObjectMacro(Controller, vtkMultiProcessController);
-  //@}
-
-  //@{
-  /**
-   * When on, data is passed through without compositing.
-   */
-  vtkSetMacro(PassThrough, bool);
-  vtkGetMacro(PassThrough, bool);
-  vtkBooleanMacro(PassThrough, bool);
-  //@}
-
-  //@{
-  /**
-   * When non-null, the output will be converted to the given type.
-   */
-  vtkSetStringMacro(OutputType);
-  vtkGetStringMacro(OutputType);
-  //@}
-
-  /**
-   * Boundary mode values. Note, the deliberately match
-   * vtkDistributedDataFilter. However we can't include vtkDistributedDataFilter
-   * here here it's not available in non-MPI builds.
-   */
+  // These are kept consistent with vtkRedistributeDataSetFilter::BoundaryModes
   enum BoundaryModes
   {
     ASSIGN_TO_ONE_REGION = 0,
@@ -104,24 +74,9 @@ public:
     SPLIT_BOUNDARY_CELLS = 2
   };
 
-  //@{
-  /**
-   * Get/Set the mode to use to handle cells on the boundary of the KdTree.
-   * Default is SPLIT_BOUNDARY_CELLS.
-   */
-  vtkSetClampMacro(BoundaryMode, int, ASSIGN_TO_ONE_REGION, SPLIT_BOUNDARY_CELLS);
-  vtkGetMacro(BoundaryMode, int);
-  //@}
-
 protected:
   vtkOrderedCompositeDistributor();
   ~vtkOrderedCompositeDistributor() override;
-
-  int BoundaryMode;
-  char* OutputType;
-  bool PassThrough;
-  vtkPKdTree* PKdTree;
-  vtkMultiProcessController* Controller;
 
   int FillInputPortInformation(int port, vtkInformation* info) override;
   int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
@@ -130,6 +85,8 @@ protected:
 private:
   vtkOrderedCompositeDistributor(const vtkOrderedCompositeDistributor&) = delete;
   void operator=(const vtkOrderedCompositeDistributor&) = delete;
+
+  vtkNew<vtkRedistributeDataSetFilter> RedistributeDataSetFilter;
 };
 
 #endif // vtkOrderedCompositeDistributor_h
