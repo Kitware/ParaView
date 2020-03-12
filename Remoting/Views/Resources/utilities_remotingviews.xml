@@ -2448,6 +2448,7 @@
           <Entry text="Interlaced" value="3" />
           <Entry text="Left Eye Only" value="4" />
           <Entry text="Right Eye Only" value="5" />
+          <Entry text="Both Eyes" value="11" />
           <Entry text="Dresden" value="6" />
           <Entry text="Anaglyph" value="7" />
           <Entry text="Checkerboard" value="8" />
