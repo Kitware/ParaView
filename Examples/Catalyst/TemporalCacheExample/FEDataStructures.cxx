@@ -5,7 +5,8 @@
 #include <math.h>
 #include <mpi.h>
 #include <string.h>
-#include <unistd.h>
+
+#include <vtkMath.h>
 
 class particle
 {
@@ -135,12 +136,12 @@ public:
       myparticles.push_back(chars[3]); // r
       myparticles.push_back(chars[4]); // id
       double* value = values;
-      int i0 = ((p.pos[0] - p.radius) + origin[0]) / spacing[0];
-      int i1 = ((p.pos[0] + p.radius) + origin[0]) / spacing[0];
-      int j0 = ((p.pos[1] - p.radius) + origin[1]) / spacing[1];
-      int j1 = ((p.pos[1] + p.radius) + origin[1]) / spacing[1];
-      int k0 = ((p.pos[2] - p.radius) + origin[2]) / spacing[2];
-      int k1 = ((p.pos[2] + p.radius) + origin[2]) / spacing[2];
+      int i0 = static_cast<int>(((p.pos[0] - p.radius) + origin[0]) / spacing[0]);
+      int i1 = static_cast<int>(((p.pos[0] + p.radius) + origin[0]) / spacing[0]);
+      int j0 = static_cast<int>(((p.pos[1] - p.radius) + origin[1]) / spacing[1]);
+      int j1 = static_cast<int>(((p.pos[1] + p.radius) + origin[1]) / spacing[1]);
+      int k0 = static_cast<int>(((p.pos[2] - p.radius) + origin[2]) / spacing[2]);
+      int k1 = static_cast<int>(((p.pos[2] + p.radius) + origin[2]) / spacing[2]);
       int di = extent[1] - extent[0];
       int dj = extent[3] - extent[2];
       int dk = extent[5] - extent[4];
@@ -297,7 +298,7 @@ void Attributes::Initialize(Grid* grid)
 
 // a tuning parameter which keeps sizes relatively good in cases I've tried
 #define ADJF 1.5
-  srand48(42l);
+  vtkMath::RandomSeed(42);
   // every rank has every particle just to keep the simulation simple
   // in real life you would want the particles to live with the processes
   for (int i = 0; i < this->NumParticles; i++)
@@ -313,13 +314,13 @@ void Attributes::Initialize(Grid* grid)
           z1, 0.0, 0.0, -cellsize * 0.5 * ADJF);
         break;
       default:
-        double r = drand48() * 1.5 * cellsize * ADJF;
-        double x = drand48() * (x1 - x0) + x0;
-        double y = drand48() * (y1 - y0) + y0;
-        double z = drand48() * (z1 - z0) + z0;
-        double vx = (2.0 * drand48() - 1.0) * cellsize * 2.0 * ADJF;
-        double vy = (2.0 * drand48() - 1.0) * cellsize * 2.0 * ADJF;
-        double vz = (2.0 * drand48() - 1.0) * cellsize * 2.0 * ADJF;
+        double r = vtkMath::Random() * 1.5 * cellsize * ADJF;
+        double x = vtkMath::Random() * (x1 - x0) + x0;
+        double y = vtkMath::Random() * (y1 - y0) + y0;
+        double z = vtkMath::Random() * (z1 - z0) + z0;
+        double vx = (2.0 * vtkMath::Random() - 1.0) * cellsize * 2.0 * ADJF;
+        double vy = (2.0 * vtkMath::Random() - 1.0) * cellsize * 2.0 * ADJF;
+        double vz = (2.0 * vtkMath::Random() - 1.0) * cellsize * 2.0 * ADJF;
         this->MyParticles[i] = new particle(i, r, x, y, z, vx, vy, vz);
     }
   }

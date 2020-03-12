@@ -23,6 +23,7 @@ add_executable(CachingExample
 if (TARGET CachingExampleAdaptor)
   target_link_libraries(CachingExample
     PRIVATE
+      VTK::CommonCore
       CachingExampleAdaptor
       VTK::mpi)
 else ()
