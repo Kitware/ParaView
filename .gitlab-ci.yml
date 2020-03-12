@@ -42,7 +42,6 @@ spack:centos7:
     extends:
       - .centos7
     stage: package
-    when: manual
     tags:
         - build
         - paraview
