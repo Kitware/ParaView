@@ -13,7 +13,7 @@ ParaView is being built (e.g., Python, Qt).
 
 The first chapter is a getting started guide by OS that is very helpful if you have never
 built ParaView before and do not know which options you need.
-If you are looking for the generic help, please start at ## Obtaining the source
+If you are looking for the generic help, please read the [Complete Compilation Guide](#complete-compilation-guide)
 
 ## Getting Started Guide
 This is a section intended to help those that have never built ParaView before, are not
@@ -31,18 +31,18 @@ for your operating system. It will be built with the python wrapping, MPI capabi
 Please run the command in a terminal to install the following dependencies depending of your linux distribution.
 
 ##### Ubuntu 18.04 LTS / Debian 10
-`sudo apt-get install git cmake build-essential libgl1-mesa-dev libxt-dev qt5-default libqt5x11extras5-dev libqt5help5 qttools5-dev qtxmlpatterns5-dev-tools libqt5svg5-dev python3-dev libopenmpi-dev libtbb-dev ninja-build`
+`sudo apt-get install git cmake build-essential libgl1-mesa-dev libxt-dev qt5-default libqt5x11extras5-dev libqt5help5 qttools5-dev qtxmlpatterns5-dev-tools libqt5svg5-dev python3-dev python3-numpy libopenmpi-dev libtbb-dev ninja-build`
 
 ##### Centos 7
 
-##### CMake
-Download and install [cmake](https://cmake.org/download/) as the packaged version is not enough considering that
+###### CMake
+Download and install [cmake][cmake-download]) as the packaged version is not enough considering that
 CMake 3.10 or higher is needed.
 
-##### Others
+###### Others
 `sudo yum install python3-devel openmpi-devel mesa-libGL-devel libX11-devel libXt-devel qt5-qtbase-devel qt5-qtx11extras-devel qt5-qttools-devel qt5-qtxmlpatterns-devel tbb-devel ninja-build git`
 
-##### Environement
+###### Environement
 ```sh
 alias ninja ninja-build
 export PATH=$PATH:/usr/lib64/openmpi/bin/
@@ -91,9 +91,10 @@ Double click on the paraview executable in the bin directory or run in the previ
  * Download and install [git bash for windows][gitforwindows]
  * Download and install [cmake][cmake-download]
  * Download and install [Visual Studio 2015 Community Edition][visual-studio]
- * Download [ninja-build][ninja] and drop ninja.exe in C:/Windows/
- * Download and install both msmpisetup.exe and msmpisdk.msi from [Microsoft MPI][msmpi]
+ * Download [ninja-build][ninja] and drop `ninja.exe` in `C:\Windows\`
+ * Download and install both `msmpisetup.exe` and `msmpisdk.msi` from [Microsoft MPI][msmpi]
  * Download and install [Python for windows][pythonwindows]
+ * Download and install [Qt 5.12.3][qt-download-5.12.3] for winfows, make sure to check the MSVC 2015 64-bit component during installation, make sure to add `C:\Qt\Qt5.12.3\5.12.3\msvc2015_64\bin` to your `PATH` environnement variable.
 
 #### Recover the source
  * Open git bash
@@ -489,5 +490,6 @@ The following targets are used to build documentation for ParaView:
 [pythonwindows]: https://www.python.org/downloads/windows/
 [qt-download]: https://download.qt.io/official_releases/qt
 [qt]: https://qt.io
+[qt-download-5.12.3]: https://download.qt.io/archive/qt/5.12/5.12.3/
 [tbb]: https://github.com/intel/tbb/releases
 [visual-studio]: https://visualstudio.microsoft.com/vs/older-downloads
