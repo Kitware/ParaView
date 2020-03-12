@@ -346,4 +346,65 @@
     </SourceProxy>
 
   </ProxyGroup>
+
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkTemporalDataSetCache"
+                 label="Temporal Cache Source"
+                 name="TemporalCache">
+      <Documentation long_help="Saves a copy of the data set for a fixed number of time steps."
+                     short_help="Caches data per time step.">The Temporal Cache
+                     can be used to save multiple copies of a data set at
+                     different time steps to prevent thrashing in the pipeline
+                     caused by downstream filters that adjust the requested
+                     time step. For example, assume that there is a downstream
+                     Temporal Interpolator filter. This filter will (usually)
+                     request two time steps from the upstream filters, which in
+                     turn (usually) causes the upstream filters to run twice,
+                     once for each time step. The next time the interpolator
+                     requests the same two time steps, they might force the
+                     upstream filters to re-evaluate the same two time steps.
+                     The Temporal Cache can keep copies of both of these time
+                     steps and provide the requested data without having to run
+                     upstream filters.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input of the Temporal Cache
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetCacheSize"
+                         default_values="2"
+                         name="CacheSize"
+                         number_of_elements="1">
+        <IntRangeDomain max="10"
+                        min="2"
+                        name="range" />
+        <Documentation>The cache size determines the number of time steps that
+        can be cached at one time. The maximum number is 10. The minimum is 2
+        (since it makes little sense to cache less than that).</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <IntVectorProperty name="IsASource"
+                         command="SetIsASource"
+                         number_of_elements="1"
+                         default_values="1"
+			 panel_visibility="never">
+        <BooleanDomain  name="bool"/>
+        <Documentation> Sets up the Algorithm to act as a pipeline source rather than a filter. This is used in Catalyst. </Documentation>
+      </IntVectorProperty>
+      <!-- End TemporalCache -->
+    </SourceProxy>
+  </ProxyGroup>
+
 </ServerManagerConfiguration>

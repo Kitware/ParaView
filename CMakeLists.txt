@@ -408,6 +408,8 @@ else ()
   set(VTK_USE_MPI "${PARAVIEW_USE_MPI}")
   # Forward CUDA option to VTK
   set(VTK_USE_CUDA "${PARAVIEW_USE_CUDA}")
+  # Forward Memkind option to VTK.
+  set(VTK_USE_MEMKIND "${PARAVIEW_USE_MEMKIND}")
 
   # Forward logging option to VTK.
   set(VTK_ENABLE_LOGGING ON)

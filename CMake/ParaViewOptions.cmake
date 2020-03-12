@@ -98,6 +98,9 @@ endif ()
 option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
 option(PARAVIEW_USE_CUDA "Support CUDA compilation" OFF)
 option(PARAVIEW_USE_VTKM "Enable VTK-m accelerated algorithms" "${PARAVIEW_ENABLE_NONESSENTIAL}")
+if (UNIX AND NOT APPLE)
+  option(PARAVIEW_USE_MEMKIND  "Build support for extended memory" OFF)
+endif ()
 
 # Add option to disable Fortran
 if (NOT WIN32)

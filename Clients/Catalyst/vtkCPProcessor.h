@@ -23,6 +23,7 @@ class vtkCPDataDescription;
 class vtkCPPipeline;
 class vtkMPICommunicatorOpaqueComm;
 class vtkMultiProcessController;
+class vtkSMSourceProxy;
 
 /// @defgroup CoProcessing ParaView CoProcessing
 /// The CoProcessing library is designed to be called from parallel
@@ -74,6 +75,15 @@ public:
   /// Remove pipelines.
   virtual void RemovePipeline(vtkCPPipeline* pipeline);
   virtual void RemoveAllPipelines();
+
+  // Controls cache size, in terms of timesteps, available for temporal
+  // data caching. Default is zero, which disables any caching.
+  virtual void SetTemporalCacheSize(int);
+  vtkGetMacro(TemporalCacheSize, int);
+
+  // Accessor to specific temporal cache. Names match CPInputData names
+  virtual void MakeTemporalCache(const char* name);
+  virtual vtkSMSourceProxy* GetTemporalCache(const char* name);
 
   /// Initialize the co-processor. Returns 1 if successful and 0
   /// otherwise. If Catalyst is built with MPI then Initialize()
@@ -140,6 +150,7 @@ private:
   vtkObject* InitializationHelper;
   static vtkMultiProcessController* Controller;
   char* WorkingDirectory;
+  int TemporalCacheSize = 0;
 };
 
 #endif

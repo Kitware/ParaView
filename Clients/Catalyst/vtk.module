@@ -11,6 +11,7 @@ GROUPS
 PRIVATE_DEPENDS
   ParaView::RemotingApplication
   VTK::FiltersGeneral
+  VTK::FiltersHybrid
   VTK::vtksys
 OPTIONAL_DEPENDS
   VTK::ParallelMPI

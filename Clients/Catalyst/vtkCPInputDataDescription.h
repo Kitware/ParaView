@@ -18,6 +18,7 @@
 class vtkDataObject;
 class vtkDataSet;
 class vtkFieldData;
+class vtkSMSourceProxy;
 
 #include "vtkObject.h"
 #include "vtkPVCatalystModule.h" // For windows import/export of shared libraries
@@ -97,6 +98,16 @@ public:
   // Shallow copy.
   void ShallowCopy(vtkCPInputDataDescription*);
 
+  // Description:
+  // Set the temporal cache. Adaptors can get a cache from the coprocessor
+  // object and apply them to the InputDataDescription when they want to
+  // use temporal filters in their pipelines.
+  void SetTemporalCache(vtkSMSourceProxy* cache);
+
+  // Description:
+  // Get the temporal cache.
+  vtkGetObjectMacro(TemporalCache, vtkSMSourceProxy);
+
 protected:
   vtkCPInputDataDescription();
   ~vtkCPInputDataDescription() override;
@@ -112,6 +123,10 @@ protected:
   // Description:
   // The grid for coprocessing. The grid is not owned by the object.
   vtkDataObject* Grid;
+
+  // Description:
+  // The temporal cache associated with grid. The cache is not owned by the object.
+  vtkSMSourceProxy* TemporalCache;
 
 private:
   vtkCPInputDataDescription(const vtkCPInputDataDescription&) = delete;
