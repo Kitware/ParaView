@@ -245,7 +245,7 @@ vtkPVPluginTracker::vtkPVPluginTracker()
   if (vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != nullptr)
   {
     vtkWarningMacro("`PV_PLUGIN_DEBUG` environment variable has been deprecated. "
-                    "Please use `PARAVIEW_LOG_PIPELINE_VERBOSITY=INFO` instead.");
+                    "Please use `PARAVIEW_LOG_PLUGIN_VERBOSITY=INFO` instead.");
     vtkPVLogger::SetPluginVerbosity(vtkLogger::VERBOSITY_INFO);
   }
 }
