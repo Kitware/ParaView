@@ -71,6 +71,7 @@ set(ParaView::RemotingApplication_ARGS)
 # Add tests for pvbatch.
 
 vtk_module_test_data(
+  "${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SaveAnimation_right.png"
   "${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiView_chart_view.png"
   "${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiView_render_view.png")
 
