@@ -26,6 +26,7 @@
 #include "vtkPVRenderingCapabilitiesInformation.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
+#include "vtkRenderWindow.h"
 #include "vtkSMAnimationScene.h"
 #include "vtkSMAnimationSceneWriter.h"
 #include "vtkSMParaViewPipelineController.h"
@@ -44,19 +45,26 @@
 namespace vtkSMSaveAnimationProxyNS
 {
 
-class SceneGrabber
+class Friendship
 {
 public:
-  static vtkSmartPointer<vtkImageData> Grab(vtkSMSaveAnimationProxy* proxy)
+  static std::pair<vtkSmartPointer<vtkImageData>, vtkSmartPointer<vtkImageData> > Grab(
+    vtkSMSaveAnimationProxy* proxy)
   {
-    return proxy ? proxy->CapturePreppedImage() : vtkSmartPointer<vtkImageData>();
+    return proxy ? proxy->CapturePreppedImages()
+                 : std::pair<vtkSmartPointer<vtkImageData>, vtkSmartPointer<vtkImageData> >();
+  }
+
+  static std::string GetStereoFileName(
+    vtkSMSaveAnimationProxy* proxy, const std::string& filename, bool left)
+  {
+    return proxy ? proxy->GetStereoFileName(filename, left) : filename;
   }
 };
 
 template <class T>
 class SceneImageWriter : public vtkSMAnimationSceneWriter
 {
-  vtkSmartPointer<T> Writer;
   vtkWeakPointer<vtkSMSaveAnimationProxy> Helper;
 
 public:
@@ -65,12 +73,6 @@ public:
    * Set the vtkSMSaveAnimationProxy proxy.
    */
   void SetHelper(vtkSMSaveAnimationProxy* helper) { this->Helper = helper; }
-
-  /**
-   * Set the writer to use.
-   */
-  void SetWriter(T* writer) { this->Writer = writer; }
-  T* GetWriter() { return this->Writer; }
 
 protected:
   SceneImageWriter() {}
@@ -86,20 +88,20 @@ protected:
 
   bool SaveFrame(double time) override
   {
-    vtkSmartPointer<vtkImageData> image = SceneGrabber::Grab(this->Helper);
+    auto image_pair = Friendship::Grab(this->Helper);
 
     // Now, in symmetric batch mode, while this method will get called on all
     // ranks, we really only to save the image on root node.
     // Note, the call to CapturePreppedImage() still needs to happen on all
     // ranks, since otherwise we may get mismatched renders.
     vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
-    if (image == nullptr || (controller && controller->GetLocalProcessId() != 0))
+    if (image_pair.first == nullptr || (controller && controller->GetLocalProcessId() != 0))
     {
       // don't actually save anything on this rank.
       return true;
     }
 
-    return this->WriteFrameImage(time, image);
+    return this->WriteFrameImage(time, image_pair.first, image_pair.second);
   }
 
   bool SaveFinalize() override
@@ -108,7 +110,12 @@ protected:
     return true;
   }
 
-  virtual bool WriteFrameImage(double time, vtkImageData* data) = 0;
+  virtual bool WriteFrameImage(double time, vtkImageData* dataLeft, vtkImageData* dataRight) = 0;
+
+  std::string GetStereoFileName(const std::string& filename, bool left)
+  {
+    return Friendship::GetStereoFileName(this->Helper, filename, left);
+  }
 
 private:
   SceneImageWriter(const SceneImageWriter&) = delete;
@@ -117,9 +124,16 @@ private:
 
 class SceneImageWriterMovie : public SceneImageWriter<vtkGenericMovieWriter>
 {
+  vtkGenericMovieWriter* Writers[2] = { nullptr, nullptr };
+
 public:
   static SceneImageWriterMovie* New();
   vtkTypeMacro(SceneImageWriterMovie, SceneImageWriter<vtkGenericMovieWriter>);
+
+  /**
+   * Set the writer to use.
+   */
+  void SetWriter(int index, vtkGenericMovieWriter* writer) { this->Writers[index] = writer; }
 
 protected:
   SceneImageWriterMovie()
@@ -130,35 +144,54 @@ protected:
 
   bool SaveInitialize(int startCount) override
   {
-    if (auto* writer = this->GetWriter())
+    std::string fname = this->GetFileName();
+    if (auto rWriter = this->Writers[1])
     {
-      writer->SetFileName(this->GetFileName());
-      return this->Superclass::SaveInitialize(startCount);
+      rWriter->SetFileName(this->GetStereoFileName(fname, /*left=*/false).c_str());
+      fname = this->GetStereoFileName(fname, true);
     }
-    this->Started = false;
-    return false;
+
+    auto* writer = this->Writers[0];
+    assert(writer != nullptr);
+    writer->SetFileName(fname.c_str());
+    return this->Superclass::SaveInitialize(startCount);
   }
 
-  bool WriteFrameImage(double vtkNotUsed(time), vtkImageData* data) override
+  bool WriteFrameImage(
+    double vtkNotUsed(time), vtkImageData* dataLeft, vtkImageData* dataRight) override
   {
-    assert(data);
-    auto* writer = this->GetWriter();
-    writer->SetInputData(data);
-    if (!this->Started)
+    vtkImageData* data[] = { dataLeft, dataRight };
+    bool status = true;
+    for (int cc = 0; cc < 2; ++cc)
     {
-      this->Started = true;
-      writer->Start(); // start needs input data, hence we do it here.
+      if (auto* writer = this->Writers[cc])
+      {
+        assert(data[cc] != nullptr);
+        writer->SetInputData(data[cc]);
+        if (!this->Started)
+        {
+          writer->Start(); // start needs input data, hence we do it here.
+        }
+        writer->Write();
+        writer->SetInputData(nullptr);
+        status &= (writer->GetError() == 0 && writer->GetError() == vtkErrorCode::NoError);
+      }
     }
-    writer->Write();
-    writer->SetInputData(nullptr);
-    return (writer->GetError() == 0 && writer->GetError() == vtkErrorCode::NoError);
+    this->Started = true;
+    return status;
   }
 
   bool SaveFinalize() override
   {
     if (this->Started)
     {
-      this->GetWriter()->End();
+      for (int cc = 0; cc < 2; ++cc)
+      {
+        if (auto writer = this->Writers[cc])
+        {
+          writer->End();
+        }
+      }
     }
     this->Started = false;
     return this->Superclass::SaveFinalize();
@@ -173,6 +206,8 @@ vtkStandardNewMacro(SceneImageWriterMovie);
 
 class SceneImageWriterImageSeries : public SceneImageWriter<vtkImageWriter>
 {
+  vtkImageWriter* Writer;
+
 public:
   static SceneImageWriterImageSeries* New();
   vtkTypeMacro(SceneImageWriterImageSeries, SceneImageWriter<vtkImageWriter>);
@@ -182,6 +217,11 @@ public:
    */
   vtkSetStringMacro(SuffixFormat);
   vtkGetStringMacro(SuffixFormat);
+
+  /**
+   * Set the writer to use.
+   */
+  void SetWriter(vtkImageWriter* writer) { this->Writer = writer; }
 
 protected:
   SceneImageWriterImageSeries()
@@ -201,10 +241,13 @@ protected:
     return this->Superclass::SaveInitialize(startCount);
   }
 
-  bool WriteFrameImage(double vtkNotUsed(time), vtkImageData* data) override
+  bool WriteFrameImage(
+    double vtkNotUsed(time), vtkImageData* dataLeft, vtkImageData* dataRight) override
   {
-    auto writer = this->GetWriter();
-    assert(data);
+    bool success = true;
+
+    auto writer = this->Writer;
+    assert(dataLeft);
     assert(this->SuffixFormat);
     assert(writer);
 
@@ -213,12 +256,24 @@ protected:
 
     std::ostringstream str;
     str << this->Prefix << buffer << this->Extension;
-    writer->SetInputData(data);
-    writer->SetFileName(str.str().c_str());
+
+    std::string fname = str.str();
+    if (dataRight)
+    {
+      writer->SetInputData(dataRight);
+      writer->SetFileName(this->GetStereoFileName(fname, /*left*/ false).c_str());
+      writer->Write();
+      success &= (writer->GetErrorCode() == vtkErrorCode::NoError);
+
+      // update fname for left image.
+      fname = this->GetStereoFileName(fname, /*left=*/true);
+    }
+    writer->SetFileName(fname.c_str());
+    writer->SetInputData(dataLeft);
     writer->Write();
     writer->SetInputData(nullptr);
 
-    const bool success = writer->GetErrorCode() == vtkErrorCode::NoError;
+    success &= writer->GetErrorCode() == vtkErrorCode::NoError;
     this->Counter += success ? 1 : 0;
     return success;
   }
@@ -331,21 +386,37 @@ bool vtkSMSaveAnimationProxy::WriteAnimationLocally(const char* filename)
     .Set(vtkSMPropertyHelper(this, "FrameRate").GetAsInt());
   formatProxy->UpdateVTKObjects();
 
+  // check if we're writing 2-stereo video streams at the same time.
+  vtkSmartPointer<vtkSMProxy> otherFormatProxy;
+
   // based on the format, we create an appropriate SceneImageWriter.
   auto formatObj = formatProxy->GetClientSideObject();
   if (auto imgWriter = vtkImageWriter::SafeDownCast(formatObj))
   {
     vtkNew<vtkSMSaveAnimationProxyNS::SceneImageWriterImageSeries> realWriter;
-    realWriter->SetWriter(imgWriter);
     realWriter->SetSuffixFormat(vtkSMPropertyHelper(formatProxy, "SuffixFormat").GetAsString());
     realWriter->SetHelper(this);
+    realWriter->SetWriter(imgWriter);
     writer = realWriter;
   }
   else if (auto movieWriter = vtkGenericMovieWriter::SafeDownCast(formatObj))
   {
     vtkNew<vtkSMSaveAnimationProxyNS::SceneImageWriterMovie> realWriter;
-    realWriter->SetWriter(movieWriter);
     realWriter->SetHelper(this);
+    realWriter->SetWriter(0, movieWriter);
+
+    // we need two movie writers when writing stereo videos
+    if (vtkSMPropertyHelper(this, "StereoMode").GetAsInt() == VTK_STEREO_EMULATE)
+    {
+      auto pxm = this->GetSessionProxyManager();
+      otherFormatProxy.TakeReference(
+        pxm->NewProxy(formatProxy->GetXMLGroup(), formatProxy->GetXMLName()));
+      otherFormatProxy->SetLocation(formatProxy->GetLocation());
+      otherFormatProxy->Copy(formatProxy);
+      otherFormatProxy->UpdateVTKObjects();
+      realWriter->SetWriter(
+        1, vtkGenericMovieWriter::SafeDownCast(otherFormatProxy->GetClientSideObject()));
+    }
     writer = realWriter;
   }
   else
