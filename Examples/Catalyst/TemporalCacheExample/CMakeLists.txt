@@ -1,7 +1,13 @@
+set(mpi_definitions
+  MPICH_SKIP_MPICXX
+  OMPI_SKIP_MPICXX)
+
 if (USE_CATALYST)
   add_library(CachingExampleAdaptor
     FEAdaptor.cxx
-    FEAdaptor.h)
+    FEAdaptor.h
+    FEDataStructures.cxx
+    FEDataStructures.h)
   target_link_libraries(CachingExampleAdaptor
     INTERFACE
       VTK::PythonUsed
@@ -13,23 +19,33 @@ if (USE_CATALYST)
       VTK::CommonSystem
       VTK::FiltersGeneral
       VTK::FiltersHybrid
-      VTK::IOXML)
+      VTK::IOXML
+      MPI::MPI_C)
+  target_compile_definitions(CachingExampleAdaptor
+    PUBLIC
+      ${mpi_definitions})
 endif ()
 
-add_executable(CachingExample
-  FEDataStructures.cxx
-  FEDataStructures.h
-  FEDriver.cxx)
 if (TARGET CachingExampleAdaptor)
+  add_executable(CachingExample
+    FEDriver.cxx)
   target_link_libraries(CachingExample
     PRIVATE
-      VTK::CommonCore
       CachingExampleAdaptor
       VTK::mpi)
 else ()
+  add_executable(CachingExample
+    FEDriver.cxx
+    FEDataStructures.cxx
+    FEDataStructures.h)
   target_link_libraries(CachingExample
     PRIVATE
+      VTK::CommonSystem
+      VTK::CommonCore
       MPI::MPI_C)
+  target_compile_definitions(CachingExample
+    PUBLIC
+      ${mpi_definitions})
 endif ()
 
 if (BUILD_TESTING)
