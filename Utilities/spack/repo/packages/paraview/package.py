@@ -8,7 +8,7 @@ from spack.fetch_strategy import fetcher, VCSFetchStrategy
 from spack.util.executable import which
 import llnl.util.tty as tty
 
-import os
+import os, os.path
 import copy
 
 @fetcher
@@ -31,33 +31,20 @@ class LocalStrategy(VCSFetchStrategy):
         return True
 
     @property
-    def git(self):
-        if not self._git:
-            self._git = which('git', required=True)
-        return self._git
-
-    @property
     def cachable(self):
         return False
 
     def source_id(self):
-        if not self.revision:
-            git = self.git
-            output = git("-C", self.url, "rev-parse", "--short", "HEAD", output=str)
-            self.revision = output
-        return self.revision
+        return "local"
 
     def mirror_id(self):
         return None
 
-
-current_namespace = __package__.rpartition('.')[-1]
-if current_namespace == "paraview":
+def _determine_paraview_source_dir():
     source_dir = __file__
-    source_dir = source_dir[:source_dir.rfind("/Utilities/spack/repo/packages/paraview/package.py")]
-    git = which('git', required=True)
-    output = git("-C", source_dir, "describe", "HEAD", output=str)
-    pvversion = output[1:]
+    return source_dir[:source_dir.rfind("/Utilities/spack/repo/packages/paraview/package.py")]
+
+enable_local_fetch_strategy = True
 
 class Paraview(CMakePackage, CudaPackage):
     """ParaView is an open-source, multi-platform data analysis and
@@ -71,8 +58,8 @@ class Paraview(CMakePackage, CudaPackage):
 
     maintainers = ['chuckatkins', 'danlipsa']
 
-    if current_namespace == "paraview":
-        version(pvversion, file="{0}".format(source_dir), preferred=True)
+    if enable_local_fetch_strategy:
+        version('develop', file=_determine_paraview_source_dir(), preferred=True)
     else:
         version('develop', branch='master', submodules=True)
         version('5.7.0', sha256='e41e597e1be462974a03031380d9e5ba9a7efcdb22e4ca2f3fec50361f310874')
@@ -163,7 +150,7 @@ class Paraview(CMakePackage, CudaPackage):
     depends_on('zlib')
     depends_on('cmake@3.3:', type='build')
 
-    if current_namespace == "paraview":
+    if enable_local_fetch_strategy:
         # skip patches
         # we can rely on the version number given `git describe` since
         # that may end up using an older tag when building user forks without
