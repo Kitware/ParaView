@@ -30,7 +30,7 @@
 #include "vtkSMSaveScreenshotProxy.h"
 namespace vtkSMSaveAnimationProxyNS
 {
-class SceneGrabber;
+class Friendship;
 }
 
 class vtkPVXMLElement;
@@ -87,7 +87,7 @@ private:
   vtkSMSaveAnimationProxy(const vtkSMSaveAnimationProxy&) = delete;
   void operator=(const vtkSMSaveAnimationProxy&) = delete;
 
-  friend class vtkSMSaveAnimationProxyNS::SceneGrabber;
+  friend class vtkSMSaveAnimationProxyNS::Friendship;
 
   vtkSmartPointer<vtkPVXMLElement> SceneState;
 };
