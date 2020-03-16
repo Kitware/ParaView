@@ -47,8 +47,11 @@ spack:centos7:
         - paraview
         - docker
         - linux
-    only:
-        - schedules
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_PATH == "paraview/paraview"'
+          when: always
+        - if: '$CI_MERGE_REQUEST_PROJECT_PATH == "paraview/paraview"'
+          when: manual
     variables:
         spack: "$CI_BUILDS_DIR/spack/bin/spack -C Utilities/spack/configs/gitlab-ci"
         # this is needed as `configure` on certain packages fails when run as
@@ -76,10 +79,10 @@ spack:centos7:
         - $LAUNCHER $spack buildcache list
     script:
         - $LAUNCHER $spack spec $paraview_spec
-        - $LAUNCHER $spack install --only dependencies -j $(nproc) $paraview_spec
+        - $LAUNCHER $spack install --no-check-signature --only dependencies -j $(nproc) $paraview_spec
         - export dependency_specs=`$LAUNCHER $spack find --format "{name}{@version}{%compiler}"`
         - $LAUNCHER $spack buildcache create -a -f -u -d $PWD/spack-cache $dependency_specs
-        - $LAUNCHER $spack install -j $(nproc) $paraview_spec
+        - $LAUNCHER $spack install --no-check-signature -j $(nproc) $paraview_spec
         - eval `$spack load --sh paraview`
         - pvserver --version
         - .gitlab/sccache --show-stats
