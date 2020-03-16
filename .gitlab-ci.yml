@@ -47,8 +47,11 @@ spack:centos7:
         - paraview
         - docker
         - linux
-    only:
-        - schedules
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_PATH == "paraview/paraview"'
+          when: always
+        - if: '$CI_MERGE_REQUEST_PROJECT_PATH == "paraview/paraview"'
+          when: manual
     variables:
         spack: "$CI_BUILDS_DIR/spack/bin/spack -C Utilities/spack/configs/gitlab-ci"
         # this is needed as `configure` on certain packages fails when run as
