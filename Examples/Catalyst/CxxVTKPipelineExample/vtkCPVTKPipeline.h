@@ -12,13 +12,13 @@ class vtkCPVTKPipeline : public vtkCPPipeline
 public:
   static vtkCPVTKPipeline* New();
   vtkTypeMacro(vtkCPVTKPipeline, vtkCPPipeline);
-  virtual void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   virtual void Initialize(int outputFrequency, std::string& fileName);
 
-  virtual int RequestDataDescription(vtkCPDataDescription* dataDescription);
+  int RequestDataDescription(vtkCPDataDescription* dataDescription) override;
 
-  virtual int CoProcess(vtkCPDataDescription* dataDescription);
+  int CoProcess(vtkCPDataDescription* dataDescription) override;
 
 protected:
   vtkCPVTKPipeline();

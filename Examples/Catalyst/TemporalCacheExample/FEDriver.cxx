@@ -20,7 +20,9 @@ in, ideal Optane with -o dax
 PythonPipeline... //One or more Catalyst Python Pipelines
 */
 
+#ifdef USE_CATALYST
 #include "FEAdaptor.h"
+#endif
 #include "FEDataStructures.h"
 
 #include <mpi.h>
@@ -78,11 +80,15 @@ int main(int argc, char* argv[])
   Attributes attributes(numparticles);
   attributes.Initialize(&grid);
 
+#ifdef USE_CATALYST
   // The first argument is the program name
   FEAdaptor::Initialize(ac - 1, av + 1);
+#endif
 
   double tsim = 0.0;
+#ifdef USE_CATALYST
   double tcop = 0.0;
+#endif
   auto tlog = vtkSmartPointer<vtkTimerLog>::New();
   for (unsigned int timeStep = 0; timeStep < numberOfTimeSteps; timeStep++)
   {
@@ -93,15 +99,19 @@ int main(int argc, char* argv[])
     attributes.UpdateFields(time);
     tlog->StopTimer();
     tsim += tlog->GetElapsedTime();
+#ifdef USE_CATALYST
     tlog->StartTimer();
     FEAdaptor::CoProcess(grid, attributes, time, timeStep, timeStep == numberOfTimeSteps - 1);
     tlog->StopTimer();
     tcop += tlog->GetElapsedTime();
+#endif
   }
 
   cout << "Elapsed Simulation time " << tsim << endl;
+#ifdef USE_CATALYST
   cout << "Elapsed CoProcessing time " << tcop << endl;
   FEAdaptor::Finalize();
+#endif
   MPI_Finalize();
 
   delete[] av;

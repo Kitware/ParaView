@@ -27,10 +27,10 @@ class vtkCPTestPipeline : public vtkCPPipeline
 {
   // A sample C++ pipeline that incorporates a temporal filter
 public:
-  vtkTypeMacro(vtkCPTestPipeline, vtkCPPipeline);
   static vtkCPTestPipeline* New();
+  vtkTypeMacro(vtkCPTestPipeline, vtkCPPipeline);
 
-  virtual int RequestDataDescription(vtkCPDataDescription* dataDescription) VTK_OVERRIDE
+  int RequestDataDescription(vtkCPDataDescription* dataDescription) override
   {
     dataDescription->GetInputDescriptionByName("volume")->AllFieldsOn();
     dataDescription->GetInputDescriptionByName("volume")->GenerateMeshOn();
@@ -38,7 +38,7 @@ public:
   }
 
   // Execute the pipeline. Returns 1 for success and 0 for failure.
-  virtual int CoProcess(vtkCPDataDescription* dataDescription) VTK_OVERRIDE
+  int CoProcess(vtkCPDataDescription* dataDescription) override
   {
     this->OutputCounter++;
 
