@@ -266,6 +266,7 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
 
   this->connect(
     ui.UseLogScaleOpacity, SIGNAL(clicked(bool)), SLOT(useLogScaleOpacityClicked(bool)));
+
   // if the user edits the "DataValue", we need to update the transfer function.
   QObject::connect(
     ui.CurrentDataValue, SIGNAL(textChangedAndEditingFinished()), this, SLOT(currentDataEdited()));
@@ -308,6 +309,19 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   else
   {
     ui.UseLogScale->hide();
+  }
+
+  smproperty = smgroup->GetProperty("UseOpacityControlPointsFreehandDrawing");
+  if (smproperty)
+  {
+    this->addPropertyLink(this, "useOpacityControlPointsFreehandDrawing",
+      SIGNAL(useOpacityControlPointsFreehandDrawingChanged()), smproperty);
+    this->connect(ui.UseOpacityControlPointsFreehandDrawing, SIGNAL(clicked(bool)),
+      SLOT(useOpacityControlPointsFreehandDrawingClicked(bool)));
+  }
+  else
+  {
+    ui.UseOpacityControlPointsFreehandDrawing->hide();
   }
 
   smproperty = smgroup->GetProperty("ShowDataHistogram");
@@ -659,6 +673,12 @@ bool pqColorOpacityEditorWidget::useLogScaleOpacity() const
 }
 
 //-----------------------------------------------------------------------------
+bool pqColorOpacityEditorWidget::useOpacityControlPointsFreehandDrawing() const
+{
+  return this->Internals->Ui.UseOpacityControlPointsFreehandDrawing->isChecked();
+}
+
+//-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::setUseLogScale(bool val)
 {
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
@@ -670,6 +690,13 @@ void pqColorOpacityEditorWidget::setUseLogScaleOpacity(bool val)
 {
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
   ui.UseLogScaleOpacity->setChecked(val);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::setUseOpacityControlPointsFreehandDrawing(bool val)
+{
+  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+  ui.UseOpacityControlPointsFreehandDrawing->setChecked(val);
 }
 
 //-----------------------------------------------------------------------------
@@ -689,6 +716,13 @@ void pqColorOpacityEditorWidget::useLogScaleClicked(bool log_space)
   this->Internals->Ui.ColorEditor->SetLogScaleXAxis(log_space);
 
   emit this->useLogScaleChanged();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::useOpacityControlPointsFreehandDrawingClicked(bool use)
+{
+  this->Internals->Ui.OpacityEditor->SetControlPointsFreehandDrawing(use);
+  emit this->useOpacityControlPointsFreehandDrawingChanged();
 }
 
 //-----------------------------------------------------------------------------
