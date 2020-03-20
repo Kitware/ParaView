@@ -386,6 +386,9 @@ following options:
     cmake configure and hence must be passed on the command line itself.
   * `PARAVIEW_PLUGIN_ENABLE_<name>` (default varies): Whether to enable a
     plugin or not.
+  * `PARAVIEW_PLUGIN_AUTOLOAD_<name>` (default `OFF`): Whether to autoload a
+    plugin at startup or not. Note that this affects all clients linking to
+    ParaView's plugin target.
 
 #### Miscellaneous settings
 ParaView uses VTK's module system to control its build. This infrastructure
