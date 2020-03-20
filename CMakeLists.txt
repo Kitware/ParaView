@@ -546,6 +546,17 @@ list(LENGTH vtk_modules vtk_modules_len)
 list(LENGTH paraview_modules paraview_modules_len)
 message(STATUS "Enabled modules: VTK(${vtk_modules_len}), ParaView(${paraview_modules_len})")
 
+set(autoload_plugins)
+foreach (paraview_plugin IN LISTS paraview_plugins)
+  option("PARAVIEW_PLUGIN_AUTOLOAD_${paraview_plugin}" "Autoload the ${paraview_plugin} plugin" OFF)
+  mark_as_advanced("PARAVIEW_PLUGIN_AUTOLOAD_${paraview_plugin}")
+
+  if (PARAVIEW_PLUGIN_AUTOLOAD_${paraview_plugin})
+    list(APPEND autoload_plugins
+      "${paraview_plugin}")
+  endif ()
+endforeach ()
+
 paraview_plugin_build(
   HEADERS_DESTINATION   "${CMAKE_INSTALL_INCLUDEDIR}/paraview${paraview_version_suffix}"
   RUNTIME_DESTINATION   "${CMAKE_INSTALL_BINDIR}"
@@ -558,7 +569,8 @@ paraview_plugin_build(
   INSTALL_HEADERS   "${PARAVIEW_INSTALL_DEVELOPMENT_FILES}"
   TARGET_COMPONENT  "development"
   PLUGINS_COMPONENT "plugins"
-  PLUGINS ${paraview_plugins})
+  PLUGINS ${paraview_plugins}
+  AUTOLOAD ${autoload_plugins})
 
 set(CMAKE_INSTALL_RPATH
   "${_paraview_CMAKE_INSTALL_RPATH_save}")
