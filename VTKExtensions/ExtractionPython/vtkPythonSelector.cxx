@@ -80,6 +80,10 @@ void vtkPythonSelector::Execute(vtkDataObject* input, vtkDataObject* output)
       PyErr_Clear();
     }
   }
+  else
+  {
+    this->ExpandToConnectedElements(output);
+  }
 }
 
 //----------------------------------------------------------------------------
