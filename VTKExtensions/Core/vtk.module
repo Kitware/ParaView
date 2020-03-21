@@ -14,10 +14,11 @@ DEPENDS
 OPTIONAL_DEPENDS
   VTK::FiltersCore
 PRIVATE_DEPENDS
+  VTK::IOCore
+  VTK::loguru
   VTK::ParallelCore
   VTK::pugixml
   VTK::vtksys
-  VTK::loguru
 TEST_DEPENDS
   VTK::TestingCore
 TEST_LABELS
