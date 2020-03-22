@@ -22,10 +22,16 @@
 
 #include <cassert>
 #include <map>
+#include <queue>
 #include <set>
 #include <sstream>
 #include <vtk_pugixml.h>
 #include <vtksys/SystemTools.hxx>
+
+// As soon as number of nodes (bases, grid, families, patches and all) grows beyond this number,
+// we assume that the grids are too numerous for the user to be select individually and
+// hence only the top-level bases are made accessible with the families.
+#define MAX_COLLECTABLE_NUMBER_OF_NODES 1000
 
 //=============================================================================
 /**
@@ -81,6 +87,28 @@ public:
   }
 
   void operator=(const SetState&) = delete;
+};
+
+/**
+ * A tree walker that walks the subtree to count the nodes.
+ */
+class NodeCounter : public pugi::xml_tree_walker
+{
+public:
+  vtkIdType NodeCount;
+
+  NodeCounter()
+    : NodeCount(0)
+  {
+  }
+
+  bool for_each(pugi::xml_node& vtkNotUsed(node)) override
+  {
+    NodeCount++;
+    return true;
+  }
+
+  void operator=(const NodeCounter&) = delete;
 };
 
 /**
@@ -223,6 +251,146 @@ public:
   }
   void operator=(const ReassignUids&) = delete;
 };
+
+/**
+ * A class to replace Depth First traversal by Breadth First traversal
+ **/
+template <class T>
+class BFSetState : public pugi::xml_tree_walker
+{
+  T* Parent;
+  pugi::xml_node& StartNode;
+  vtkSubsetInclusionLattice::SelectionStates State;
+
+public:
+  BFSetState(
+    T* parent, pugi::xml_node& start_node, vtkSubsetInclusionLattice::SelectionStates state)
+    : Parent(parent)
+    , StartNode(start_node)
+    , State(state)
+  {
+  }
+
+  bool for_each(pugi::xml_node& node) override
+  {
+    auto attr = node.attribute("state");
+    if (attr && attr.as_int() != this->State)
+    {
+      attr.set_value(this->State);
+      this->Parent->TriggerSelectionChanged(node.attribute("uid").as_int());
+    }
+    return true;
+  }
+
+  // pugixml like traversal
+  bool traverse()
+  {
+    // Array of visited uids, assume that uids are from 0 to NextUID =< NodeCount
+    std::vector<bool> visited(this->Parent->NodeCount, false);
+    std::queue<pugi::xml_node> nodes_to_process;
+    std::queue<pugi::xml_node> parents_to_update;
+
+    pugi::xml_node arg_begin(StartNode.internal_object());
+    if (!this->begin(arg_begin))
+      return false;
+
+    pugi::xml_node& cur = arg_begin;
+    nodes_to_process.push(cur);
+    visited[cur.attribute("uid").as_int()] = true;
+
+    while (!nodes_to_process.empty())
+    {
+      pugi::xml_node arg_for_each = std::move(nodes_to_process.front());
+      if (!this->for_each(arg_for_each))
+        return false;
+      nodes_to_process.pop();
+
+      for (pugi::xml_node& node : arg_for_each.children())
+      {
+        int uid = node.attribute("uid").as_int();
+        if (!visited[uid])
+        {
+          if (strcmp(node.name(), "Node") == 0)
+          {
+            visited[uid] = true;
+            nodes_to_process.push(node);
+          }
+          else if (strcmp(node.name(), "ref:link") == 0)
+          {
+            auto target_node = this->Parent->Find(uid);
+            Walkers::ClearExplicit clearExplicit;
+            target_node.traverse(clearExplicit);
+            target_node.remove_attribute("explicit_state");
+
+            auto state_attr = target_node.attribute("state");
+            if (state_attr.as_int() != this->State)
+            {
+              nodes_to_process.push(target_node);
+              parents_to_update.push(target_node.parent());
+            }
+          }
+          else if (strcmp(node.name(), "ref:rev-link") == 0)
+          {
+            parents_to_update.push(this->Parent->Find(node.attribute("uid").as_int()));
+          }
+        }
+      }
+    }
+
+    while (!parents_to_update.empty())
+    {
+      pugi::xml_node node = std::move(parents_to_update.front());
+      parents_to_update.pop();
+      int uid = node.attribute("uid").as_int();
+      if (!visited[uid])
+      {
+        visited[uid] = true;
+        auto state = this->Parent->GetStateFromImmediateChildren(node);
+        if (node.attribute("state").as_int() != state)
+        {
+          node.attribute("state").set_value(state);
+          // notify that the node's selection state has changed.
+          this->Parent->TriggerSelectionChanged(uid);
+          parents_to_update.push(node.parent());
+        }
+      }
+    }
+
+    pugi::xml_node arg_end(arg_begin);
+    return this->end(arg_end);
+  }
+
+  void operator=(const BFSetState&) = delete;
+};
+
+template <class T>
+class ClearState : public pugi::xml_tree_walker
+{
+  T* Parent;
+
+public:
+  ClearState(T* parent)
+    : Parent(parent)
+  {
+  }
+
+  bool for_each(pugi::xml_node& node) override
+  {
+    node.remove_attribute("explicit_state");
+    if (strcmp(node.name(), "Node") == 0)
+    {
+      auto attr = node.attribute("state");
+      if (attr && attr.as_int() != vtkSubsetInclusionLattice::NotSelected)
+      {
+        attr.set_value(vtkSubsetInclusionLattice::NotSelected);
+        this->Parent->TriggerSelectionChanged(node.attribute("uid").as_int());
+      }
+    }
+    return true;
+  }
+
+  void operator=(const ClearState&) = delete;
+};
 }
 
 //=============================================================================
@@ -233,9 +401,13 @@ class vtkSubsetInclusionLattice::vtkInternals
   vtkSubsetInclusionLattice* Parent;
 
 public:
+  vtkIdType NodeCount;
+  friend class Walkers::BFSetState<vtkSubsetInclusionLattice::vtkInternals>;
+
   vtkInternals(vtkSubsetInclusionLattice* self)
     : NextUID(0)
     , Parent(self)
+    , NodeCount(0)
   {
     this->Initialize();
   }
@@ -243,6 +415,7 @@ public:
   void Initialize()
   {
     this->Document.load_string("<Node name='SIL' version='1.0' uid='0' next_uid='1' state='0' />");
+    this->NodeCount++;
     this->NextUID = 1;
   }
 
@@ -265,10 +438,18 @@ public:
     {
       this->Document.reset(document);
       this->NextUID = this->Document.first_child().attribute("next_uid").as_int();
+      this->UpdateNodeCount();
       self->Modified();
       return true;
     }
     return false;
+  }
+
+  void UpdateNodeCount()
+  {
+    Walkers::NodeCounter counter;
+    this->GetRoot().traverse(counter);
+    this->NodeCount = counter.NodeCount + 1;
   }
 
   vtkSubsetInclusionLattice::SelectionType GetSelection() const
@@ -309,6 +490,16 @@ public:
     this->Document.save(os, str.str().c_str());
   }
 
+  bool ResetSelectionState()
+  {
+    pugi::xml_node _root = this->GetRoot();
+    // Walk the whole tree and put status NotSelected and remove explicit
+    Walkers::ClearState<vtkSubsetInclusionLattice::vtkInternals> clearState(this);
+    _root.traverse(clearState);
+    _root.remove_attribute("explicit_state");
+    return true;
+  }
+
   bool SetSelectionState(int id, bool value, bool isexplicit = false)
   {
     auto node = this->Find(id);
@@ -344,8 +535,8 @@ public:
 
       // navigate down the tree and update state for all children.
       // this will walk through `ref:link`.
-      Walkers::SetState<vtkSubsetInclusionLattice::vtkInternals> setState(this, state);
-      node.traverse(setState);
+      Walkers::BFSetState<vtkSubsetInclusionLattice::vtkInternals> setState(this, node, state);
+      setState.traverse();
 
       // navigate up and update state.
       this->UpdateState(node.parent());
@@ -439,6 +630,7 @@ public:
     Walkers::ReassignUids walker3(this->NextUID);
     this->Document.traverse(walker3);
     this->Document.first_child().attribute("next_uid").set_value(this->NextUID);
+    this->UpdateNodeCount();
   }
 
   void TriggerSelectionChanged(int id)
@@ -669,6 +861,7 @@ int vtkSubsetInclusionLattice::AddNode(const char* name, int parent)
   }
 
   auto child = node.append_child("Node");
+  internals.NodeCount++;
   int uid = internals.GetNextUID();
   child.append_attribute("name").set_value(name);
   child.append_attribute("uid").set_value(uid);
@@ -724,6 +917,7 @@ int vtkSubsetInclusionLattice::AddNodeAtPath(const char* path)
     if (!nchild)
     {
       nchild = node.append_child("Node");
+      internals.NodeCount++;
       nchild.append_attribute("name").set_value(part.c_str());
       nchild.append_attribute("uid").set_value(internals.GetNextUID());
       nchild.append_attribute("state").set_value(0);
@@ -759,9 +953,11 @@ bool vtkSubsetInclusionLattice::AddCrossLink(int src, int dst)
   }
 
   auto ref = srcnode.append_child("ref:link");
+  internals.NodeCount++;
   ref.append_attribute("uid").set_value(dst);
 
   auto rref = dstnode.append_child("ref:rev-link");
+  internals.NodeCount++;
   rref.append_attribute("uid").set_value(src);
 
   this->Modified();
@@ -929,7 +1125,7 @@ void vtkSubsetInclusionLattice::SetSelection(
   const vtkSubsetInclusionLattice::SelectionType& selection)
 {
   vtkInternals& internals = (*this->Internals);
-  internals.SetSelectionState(0, NotSelected, /*explicit=*/false);
+  internals.ResetSelectionState();
   for (auto s : selection)
   {
     if (s.second)
@@ -1015,4 +1211,11 @@ void vtkSubsetInclusionLattice::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   vtkInternals& internals = (*this->Internals);
   internals.Print(os, vtkIndent().GetNextIndent());
+}
+
+//----------------------------------------------------------------------------
+bool vtkSubsetInclusionLattice::IsMaxedOut()
+{
+  vtkInternals& internals = (*this->Internals);
+  return (internals.NodeCount >= MAX_COLLECTABLE_NUMBER_OF_NODES);
 }
