@@ -161,12 +161,13 @@ and to provide support.
 [ParaView Git README]: Documentation/dev/git/README.md
 [developer instructions]: Documentation/dev/git/develop.md
 [GitLab Access]: https://gitlab.kitware.com/users/sign_in
-[Fork ParaView]: https://gitlab.kitware.com/paraview/paraview/fork/new
+[Fork ParaView]: https://gitlab.kitware.com/paraview/paraview/forks/new
 [use SSH instead of HTTPS]: Documentation/dev/git/download.md#use-ssh-instead-of-https
 [download instructions]: Documentation/dev/git/download.md#clone
 [developer setup script]: /Utilities/SetupForDevelopment.sh
 [Setup]: Documentation/dev/git/develop.md#Setup
 [Build Paraview]: Documentation/dev/build.md
+[Create a Topic][]: Documentation/dev/git/develop.md#create-a-topic
 [Share a Topic]: Documentation/dev/git/develop.md#share-a-topic
 [Create a Merge Request]: Documentation/dev/git/develop.md#create-a-merge-request
 [Review a Merge Request]: Documentation/dev/git/develop.md#review-a-merge-request
