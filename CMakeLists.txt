@@ -536,10 +536,10 @@ vtk_module_build(
 
 include(vtkModuleJson)
 vtk_module_json(
-  MODULES "${vtk_modules}"
+  MODULES ${vtk_modules}
   OUTPUT "vtk-modules.json")
 vtk_module_json(
-  MODULES "${paraview_modules}"
+  MODULES ${paraview_modules}
   OUTPUT "paraview-modules.json")
 
 list(LENGTH vtk_modules vtk_modules_len)
