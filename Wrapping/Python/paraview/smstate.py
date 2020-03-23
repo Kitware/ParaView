@@ -18,6 +18,9 @@ import sys
 if sys.version_info >= (3,):
     xrange = range
 
+RECORD_MODIFIED_PROPERTIES = sm.vtkSMTrace.RECORD_MODIFIED_PROPERTIES
+RECORD_ALL_PROPERTIES = sm.vtkSMTrace.RECORD_ALL_PROPERTIES
+
 class supported_proxies(object):
     """filter object used to hide proxies that are currently not supported by
     the state saving mechanism or those that are generally skipped in state e.g.
@@ -102,8 +105,8 @@ def get_producers(proxy, filter, producer_set):
             get_producers(proxy.ScalarOpacityFunction, filter, producer_set)
     except AttributeError: pass
 
-def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPERTIES,
-    skipHiddenRepresentations=True, source_set=[], filter=None, raw=False):
+def get_state(propertiesToTraceOnCreate=RECORD_MODIFIED_PROPERTIES,
+    skipHiddenRepresentations=True, skipRenderingComponents=False, source_set=[], filter=None, raw=False):
     """Returns the state string"""
 
     # essential to ensure any obsolete accessor don't linger can cause havoc
@@ -142,13 +145,17 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
     trace_config = smtrace.start_trace()
     # this ensures that lookup tables/scalar bars etc. are fully traced.
     trace_config.SetFullyTraceSupplementalProxies(True)
+    trace_config.SetSkipRenderingComponents(skipRenderingComponents)
 
     trace = smtrace.TraceOutput()
     trace.append("# state file generated using %s" % simple.GetParaViewSourceVersion())
 
     #--------------------------------------------------------------------------
     # First, we trace the views and layouts, if any.
-    views = [x for x in proxies_of_interest if smtrace.Trace.get_registered_name(x, "views")]
+    if skipRenderingComponents:
+        views = []
+    else:
+        views = [x for x in proxies_of_interest if smtrace.Trace.get_registered_name(x, "views")]
 
     if views:
         # sort views by their names, so the state has some structure to it.
@@ -222,7 +229,7 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
         if smtrace.Trace.get_registered_name(x, "scalar_bars")]
     # print ("sorted_representations", sorted_representations)
     # print ("scalarbar_representations", scalarbar_representations)
-    if sorted_representations or scalarbar_representations:
+    if not skipRenderingComponents and (sorted_representations or scalarbar_representations):
         for view in views:
             view_representations = [x for x in view.Representations if x in sorted_representations]
             view_scalarbars = [x for x in view.Representations if x in scalarbar_representations]
@@ -285,7 +292,7 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
     # Now, trace the transfer functions (color maps and opacity maps) used.
     ctfs = set([x for x in proxies_of_interest \
         if smtrace.Trace.get_registered_name(x, "lookup_tables")])
-    if ctfs:
+    if not skipRenderingComponents and ctfs:
         trace.append_separated([\
             "# ----------------------------------------------------------------",
             "# setup color maps and opacity mapes used in the visualization",

@@ -47,6 +47,21 @@
 
 namespace
 {
+template <typename T>
+class vtkScopedSet
+{
+  T& Ref;
+  const T OldVal;
+
+public:
+  vtkScopedSet(T& var, const T val)
+    : Ref(var)
+    , OldVal(var)
+  {
+    var = val;
+  }
+  ~vtkScopedSet() { this->Ref = this->OldVal; }
+};
 //---------------------------------------------------------------------------
 vtkPVXMLElement* vtkFindChildFromHints(vtkPVXMLElement* hints, const int outputPort,
   const char* xmlTag, const char* xmlAttributeName = nullptr,
@@ -248,6 +263,7 @@ vtkObjectFactoryNewMacro(vtkSMParaViewPipelineControllerWithRendering);
 //----------------------------------------------------------------------------
 vtkSMParaViewPipelineControllerWithRendering::vtkSMParaViewPipelineControllerWithRendering()
 {
+  this->SkipUpdatePipelineBeforeDisplay = false;
 }
 
 //----------------------------------------------------------------------------
@@ -381,8 +397,13 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
     return repr;
   }
 
-  // update pipeline to create correct representation type.
-  this->UpdatePipelineBeforeDisplay(producer, outputPort, view);
+  // `Show` gets called in `ShowInPreferredView` and then we end up calling
+  // UpdatePipeline twice. Let's avoid that.
+  if (this->SkipUpdatePipelineBeforeDisplay == false)
+  {
+    // update pipeline to create correct representation type.
+    this->UpdatePipelineBeforeDisplay(producer, outputPort, view);
+  }
 
   vtkSMRepresentationProxy* repr = nullptr;
 
@@ -590,6 +611,7 @@ vtkSMViewProxy* vtkSMParaViewPipelineControllerWithRendering::ShowInPreferredVie
     return nullptr;
   }
 
+  vtkScopedSet<bool> scoped_setter(this->SkipUpdatePipelineBeforeDisplay, true);
   this->UpdatePipelineBeforeDisplay(producer, outputPort, view);
 
   vtkSMSessionProxyManager* pxm = producer->GetSessionProxyManager();
@@ -736,7 +758,16 @@ void vtkSMParaViewPipelineControllerWithRendering::UpdatePipelineBeforeDisplay(
   double time = view
     ? vtkSMPropertyHelper(view, "ViewTime").GetAsDouble()
     : vtkSMPropertyHelper(this->FindTimeKeeper(producer->GetSession()), "Time").GetAsDouble();
-  producer->UpdatePipeline(time);
+
+  if (vtkSMTrace::GetActiveTracer() && vtkSMTrace::GetActiveTracer()->GetSkipRenderingComponents())
+  {
+    SM_SCOPED_TRACE(CallFunction).arg("UpdatePipeline").arg("time", time).arg("proxy", producer);
+    producer->UpdatePipeline(time);
+  }
+  else
+  {
+    producer->UpdatePipeline(time);
+  }
 }
 
 //----------------------------------------------------------------------------

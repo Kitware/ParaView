@@ -146,7 +146,8 @@ bool pqSaveStateReaction::savePythonState(const QString& filename)
 
   vtkStdString state =
     vtkSMTrace::GetState(vtkSMPropertyHelper(options, "PropertiesToTraceOnCreate").GetAsInt(),
-      vtkSMPropertyHelper(options, "SkipHiddenDisplayProperties").GetAsInt() == 1);
+      vtkSMPropertyHelper(options, "SkipHiddenDisplayProperties").GetAsInt() == 1,
+      vtkSMPropertyHelper(options, "SkipRenderingComponents").GetAsInt() == 1);
   if (state.empty())
   {
     qWarning("Empty state generated.");

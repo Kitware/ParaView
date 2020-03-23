@@ -63,6 +63,7 @@ vtkSMTrace::vtkSMTrace()
   , LogTraceToStdout(true)
   , PropertiesToTraceOnCreate(vtkSMTrace::RECORD_MODIFIED_PROPERTIES)
   , FullyTraceSupplementalProxies(false)
+  , SkipRenderingComponents(false)
   , Internals(new vtkSMTrace::vtkInternals())
 {
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
@@ -105,7 +106,8 @@ vtkSMTrace::~vtkSMTrace()
 }
 
 //----------------------------------------------------------------------------
-vtkStdString vtkSMTrace::GetState(int propertiesToTraceOnCreate, bool skipHiddenRepresentations)
+vtkStdString vtkSMTrace::GetState(
+  int propertiesToTraceOnCreate, bool skipHiddenRepresentations, bool skipRenderingComponents)
 {
   if (vtkSMTrace::ActiveTracer.GetPointer() != NULL)
   {
@@ -127,7 +129,8 @@ vtkStdString vtkSMTrace::GetState(int propertiesToTraceOnCreate, bool skipHidden
     }
 
     vtkSmartPyObject result(PyObject_CallMethod(module, const_cast<char*>("get_state"),
-      const_cast<char*>("(ii)"), propertiesToTraceOnCreate, (skipHiddenRepresentations ? 1 : 0)));
+      const_cast<char*>("(iii)"), propertiesToTraceOnCreate, (skipHiddenRepresentations ? 1 : 0),
+      (skipRenderingComponents ? 1 : 0)));
     if (!result || PyErr_Occurred())
     {
       vtkGenericWarningMacro("Failed to generate state.");
@@ -166,7 +169,7 @@ vtkSMTrace* vtkSMTrace::StartTrace(const char* preamble)
     {
       vtkPythonScopeGilEnsurer gilEnsurer;
       std::ostringstream str;
-      str << "# trace generated using " << vtkSMProxyManager::GetParaViewSourceVersion() << "\n"
+      str << "# generated using " << vtkSMProxyManager::GetParaViewSourceVersion() << "\n"
           << "#"
           << "\n"
           << "# To ensure correct image size when batch processing, please search \n"
@@ -197,29 +200,32 @@ vtkStdString vtkSMTrace::StopTrace()
     return vtkStdString();
   }
 
-  vtkSmartPointer<vtkSMTrace> active = vtkSMTrace::ActiveTracer;
-  vtkSMTrace::ActiveTracer = NULL;
+  auto active = vtkSMTrace::ActiveTracer;
+  vtkStdString result;
 
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
   VTK_MODULE_ENABLE_VTK_WrappingPythonCore
   vtkPythonScopeGilEnsurer gilEnsurer;
-  vtkSmartPyObject _stop_trace_internal(
-    PyObject_CallMethod(active->GetTraceModule(), const_cast<char*>("_stop_trace_internal"), NULL));
+  vtkSmartPyObject _stop_trace_internal(PyObject_CallMethod(
+    active->GetTraceModule(), const_cast<char*>("_stop_trace_internal"), nullptr));
   if (active->CheckForError() == false)
   {
     // no error.
-    if (Py_None != _stop_trace_internal.GetPointer() && _stop_trace_internal.GetPointer() != NULL)
+    if (Py_None != _stop_trace_internal.GetPointer() &&
+      _stop_trace_internal.GetPointer() != nullptr)
     {
-      return vtkStdString(PyString_AsString(_stop_trace_internal));
+      result = PyString_AsString(_stop_trace_internal);
     }
     else
     {
       vtkGenericWarningMacro("Empty trace returned!!!");
-      return vtkStdString();
     }
   }
 #endif
-  return vtkStdString();
+
+  // must be unset after calling `_stop_trace_internal`
+  vtkSMTrace::ActiveTracer = nullptr;
+  return result;
 }
 
 //----------------------------------------------------------------------------
