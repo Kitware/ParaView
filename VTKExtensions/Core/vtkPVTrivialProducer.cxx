@@ -14,24 +14,36 @@
 =========================================================================*/
 #include "vtkPVTrivialProducer.h"
 
-#include "vtkDataSet.h"
-#include "vtkGarbageCollector.h"
+#include "vtkDataObject.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMultiProcessController.h"
+#include "vtkNumberToString.h"
 #include "vtkObjectFactory.h"
-#include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include "vtkImageData.h"
-#include "vtkRectilinearGrid.h"
-#include "vtkStructuredGrid.h"
-
+#include <cmath>
 #include <vector>
 
 struct vtkPVTrivialProducerInternal
 {
   std::vector<double> TimeSteps;
+  double FindNearestTime(double time) const
+  {
+    // we can't assume TimeSteps is sorted (see logic in SetOutput(.., time)),
+    // although in most cases it is.
+    double nearest_time = time;
+    double delta = VTK_DOUBLE_MAX;
+    for (const auto& t : this->TimeSteps)
+    {
+      const auto tdelta = std::abs(t - time);
+      if (tdelta < delta)
+      {
+        delta = tdelta;
+        nearest_time = t;
+      }
+    }
+    return nearest_time;
+  }
 };
 
 vtkStandardNewMacro(vtkPVTrivialProducer);
@@ -79,38 +91,43 @@ int vtkPVTrivialProducer::ProcessRequest(
     return 0;
   }
 
+  const auto& internals = (*this->Internals);
+
   vtkInformation* outputInfo = outputVector->GetInformationObject(0);
-
-  if (request->Has(vtkDemandDrivenPipeline::REQUEST_DATA()) &&
-    outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
+  if (request->Has(vtkDemandDrivenPipeline::REQUEST_DATA()))
   {
-    double uTime = outputInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
-    if (this->Internals->TimeSteps.empty())
+    auto dobj = vtkDataObject::GetData(outputVector, 0);
+    if (!internals.TimeSteps.empty() && dobj != nullptr)
     {
-      // vtkWarningMacro("Requesting a time step when none is available");
-    }
-    else if (uTime != this->Internals->TimeSteps.back())
-    {
-      vtkWarningMacro("Requesting time " << uTime << " but only "
-                                         << this->Internals->TimeSteps.back() << " is available");
-    }
-    outputInfo->Get(vtkDataObject::DATA_OBJECT())
-      ->GetInformation()
-      ->Set(vtkDataObject::DATA_TIME_STEP(), uTime);
-  }
+      double uTime = outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP())
+        ? outputInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP())
+        : internals.TimeSteps.back();
 
-  if (this->Internals->TimeSteps.empty() == false)
+      // we really don't produce any other timestep besides the last one. Let's
+      // check, however, if someone requested another timestep what we can
+      // satisfy. In that case, let's report a warning.
+      if (internals.FindNearestTime(uTime) != internals.TimeSteps.back())
+      {
+        vtkNumberToString convert;
+        vtkWarningMacro("Cannot produce requested time '" << convert(uTime) << "', only '"
+                                                          << convert(internals.TimeSteps.back())
+                                                          << "' is available.");
+      }
+
+      dobj->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), internals.TimeSteps.back());
+    }
+  }
+  else if (request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()))
   {
-    outputInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &this->Internals->TimeSteps[0],
-      static_cast<int>(this->Internals->TimeSteps.size()));
-    double timeRange[2] = { this->Internals->TimeSteps[0], this->Internals->TimeSteps.back() };
-    outputInfo->Get(vtkDataObject::DATA_OBJECT())
-      ->GetInformation()
-      ->Set(vtkDataObject::DATA_TIME_STEP(), this->Internals->TimeSteps.back());
-
-    outputInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
+    if (!internals.TimeSteps.empty())
+    {
+      outputInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &internals.TimeSteps[0],
+        static_cast<int>(internals.TimeSteps.size()));
+      double timeRange[2] = { this->Internals->TimeSteps.front(),
+        this->Internals->TimeSteps.back() };
+      outputInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
+    }
   }
-
   return 1;
 }
 
