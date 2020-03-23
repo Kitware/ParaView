@@ -132,7 +132,7 @@ int vtkSMProperty::IsInDomains(vtkSMDomain** ptr)
   this->DomainIterator->Begin();
   while (!this->DomainIterator->IsAtEnd())
   {
-    if (!this->DomainIterator->GetDomain()->IsInDomain(this))
+    if (this->DomainIterator->GetDomain()->IsInDomain(this) == vtkSMDomain::NOT_IN_DOMAIN)
     {
       if (ptr)
       {

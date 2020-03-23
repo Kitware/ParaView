@@ -649,16 +649,14 @@ array.
           <DataType value="vtkDataSet" />
           <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
-        <InputArrayDomain name="input_array">
-          <Array name="input_array_cell"
-                 attribute_type="cell"
-                 data_type_condition="vtkHyperTreeGrid"
-                 number_of_components="1" />
-          <Array name="input_array_point"
-                 attribute_type="point"
-                 data_type_condition="vtkDataSet"
-                 number_of_components="1" />
-        </InputArrayDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array"
+                          number_of_components="1"
+                          data_type="vtkDataSet" />
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_htg"
+                          number_of_components="1"
+                          data_type="vtkHyperTreeGrid" />
         <Documentation>This property specifies the input dataset to be used by
         the contour filter.</Documentation>
       </InputProperty>
