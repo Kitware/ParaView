@@ -486,7 +486,7 @@ spack install paraview
 ```
 
 Please refer to [Spack documentation][spack-docs] for ways of customizing the install,
-including choosing the version and/or variant to build. Based one the version chosen,
+including choosing the version and/or variant to build. Based on the version chosen,
 spack will download appropriate ParaView source and build it.
 
 To make it easier to build ParaView using spack from an existing source checkout, we have included
