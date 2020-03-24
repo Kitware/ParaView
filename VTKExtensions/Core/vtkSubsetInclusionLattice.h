@@ -295,6 +295,8 @@ public:
    */
   static vtkSmartPointer<vtkSubsetInclusionLattice> Clone(const vtkSubsetInclusionLattice* other);
 
+  bool IsMaxedOut();
+
 protected:
   vtkSubsetInclusionLattice();
   ~vtkSubsetInclusionLattice();
