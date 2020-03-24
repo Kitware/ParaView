@@ -66,6 +66,28 @@
         <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
+      </StringVectorProperty>
+
       <!-- End XMLPolyDataReaderCore -->
     </Proxy>
 
@@ -113,6 +135,28 @@
         <Documentation>This property lists which columns to
         read.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
+      </StringVectorProperty>
+
       <!-- End XMLTableReaderCore -->
     </Proxy>
 
@@ -182,6 +226,28 @@
         <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
+      </StringVectorProperty>
+
       <!-- End XMLUnstructuredGridReaderCore -->
     </Proxy>
 
@@ -250,6 +316,28 @@
         <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
+      </StringVectorProperty>
+
       <!-- End XMLImageDataReaderCore -->
     </Proxy>
 
@@ -319,6 +407,28 @@
         <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
+      </StringVectorProperty>
+
       <!-- End XMLStructuredGridReaderCore -->
     </Proxy>
 
@@ -388,6 +498,28 @@
         <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
+      </StringVectorProperty>
+
       <!-- End XMLRectilinearGridReaderCore -->
     </Proxy>
 
@@ -453,6 +585,28 @@
         <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
+      </StringVectorProperty>
+
       <!-- End XMLPPolyDataReaderCore -->
     </Proxy>
 
@@ -518,6 +672,28 @@
         <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
+      </StringVectorProperty>
+
       <!-- End vtkXMLPUnstructuredGridReader -->
     </Proxy>
 
@@ -566,6 +742,28 @@
                             name="PointArrayInfo">
         <ArraySelectionInformationHelper attribute_name="Point" />
       </StringVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
+      </StringVectorProperty>
+
       <!-- End XMLPTableReaderCore -->
     </Proxy>
 
@@ -632,6 +830,28 @@
         <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
+      </StringVectorProperty>
+
       <!-- End XMLPImageDataReaderCore -->
     </Proxy>
 
@@ -697,6 +917,28 @@
         <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
+      </StringVectorProperty>
+
       <!-- End XMLPStructuredGridReaderCore -->
     </Proxy>
 
@@ -763,6 +1005,28 @@
         <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
+      </StringVectorProperty>
+
       <!-- End XMLPRectilinearGridReaderCore -->
     </Proxy>
 
@@ -779,6 +1043,28 @@
         <Documentation>This property specifies the file name for the VTK
         hierarchical box data reader.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
+      </StringVectorProperty>
+
       <!-- End HierarchicalBoxDataReader -->
     </Proxy>
 
@@ -802,6 +1088,28 @@
           method.  Set this to 0 to imply no limit. Default is 0.
         </Documentation>
       </IntVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
+      </StringVectorProperty>
+
       <!-- End XMLUniformGridAMRReaderCore -->
     </Proxy>
 
@@ -819,6 +1127,27 @@
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the
         Hyper Tree grid reader.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
       </StringVectorProperty>
     </Proxy>
     <!-- End XMLHyperTreeReaderCore -->
@@ -843,6 +1172,27 @@
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the
         partitioned VTK XML htg reader.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
       </StringVectorProperty>
     </Proxy>
     <!-- End XMLPHyperTreeReaderCore -->
@@ -916,7 +1266,28 @@
                  value="1" />
         </EnumerationDomain>
       </IntVectorProperty>
-      <!-- End MultiBlockDataReader -->
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
+      </StringVectorProperty>
+      <!-- End MultiBlockDataReaderCore -->
     </Proxy>
 
     <!-- ================================================================== -->
@@ -987,6 +1358,27 @@
                  value="1" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
+      </StringVectorProperty>
       <!-- End XMLPartitionedDataSetReaderCore -->
     </Proxy>
 
@@ -1046,6 +1438,27 @@
         <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="TimeValue"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays to
+        read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
+      </StringVectorProperty>
       <IntVectorProperty command="SetPieceDistribution"
                          default_values="0"
                          name="PieceDistribution"
@@ -1058,7 +1471,7 @@
                  value="1" />
         </EnumerationDomain>
       </IntVectorProperty>
-      <!-- End XMLPartitionedDataSetCollectionReader -->
+      <!-- End XMLPartitionedDataSetCollectionReaderCore -->
     </Proxy>
 
     <!-- ================================================================== -->
@@ -1094,6 +1507,8 @@
             <Property name="PointArrayInfo" />
             <Property name="PointArrayStatus" />
           </PropertyGroup>
+          <Property name="TimeArrayInfo" />
+          <Property name="TimeArray" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
@@ -1152,6 +1567,8 @@
             <Property name="ColumnArrayInfo" />
             <Property name="ColumnArrayStatus" />
           </PropertyGroup>
+          <Property name="TimeArrayInfo" />
+          <Property name="TimeArray" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
@@ -1213,6 +1630,8 @@
             <Property name="PointArrayInfo" />
             <Property name="PointArrayStatus" />
           </PropertyGroup>
+          <Property name="TimeArrayInfo" />
+          <Property name="TimeArray" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
@@ -1273,6 +1692,8 @@
             <Property name="PointArrayInfo" />
             <Property name="PointArrayStatus" />
           </PropertyGroup>
+          <Property name="TimeArrayInfo" />
+          <Property name="TimeArray" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
@@ -1333,6 +1754,8 @@
             <Property name="PointArrayInfo" />
             <Property name="PointArrayStatus" />
           </PropertyGroup>
+          <Property name="TimeArrayInfo" />
+          <Property name="TimeArray" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
@@ -1393,6 +1816,8 @@
             <Property name="PointArrayInfo" />
             <Property name="PointArrayStatus" />
           </PropertyGroup>
+          <Property name="TimeArrayInfo" />
+          <Property name="TimeArray" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
@@ -1455,6 +1880,8 @@
             <Property name="PointArrayInfo" />
             <Property name="PointArrayStatus" />
           </PropertyGroup>
+          <Property name="TimeArrayInfo" />
+          <Property name="TimeArray" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
@@ -1518,6 +1945,8 @@
             <Property name="PointArrayInfo" />
             <Property name="PointArrayStatus" />
           </PropertyGroup>
+          <Property name="TimeArrayInfo" />
+          <Property name="TimeArray" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
@@ -1580,6 +2009,8 @@
             <Property name="ColumnArrayInfo" />
             <Property name="ColumnArrayStatus" />
           </PropertyGroup>
+          <Property name="TimeArrayInfo" />
+          <Property name="TimeArray" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
@@ -1644,6 +2075,8 @@
             <Property name="PointArrayInfo" />
             <Property name="PointArrayStatus" />
           </PropertyGroup>
+          <Property name="TimeArrayInfo" />
+          <Property name="TimeArray" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
@@ -1707,6 +2140,8 @@
             <Property name="PointArrayInfo" />
             <Property name="PointArrayStatus" />
           </PropertyGroup>
+          <Property name="TimeArrayInfo" />
+          <Property name="TimeArray" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
@@ -1771,6 +2206,8 @@
             <Property name="PointArrayInfo" />
             <Property name="PointArrayStatus" />
           </PropertyGroup>
+          <Property name="TimeArrayInfo" />
+          <Property name="TimeArray" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
@@ -1861,6 +2298,10 @@
         <Proxy name="Reader"
                proxygroup="internal_sources"
                proxyname="XMLHierarchicalBoxDataReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="TimeArrayInfo" />
+          <Property name="TimeArray" />
+        </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
                             information_only="1"
@@ -1918,6 +2359,8 @@
         </Proxy>
         <ExposedProperties>
           <Property name="DefaultNumberOfLevels" />
+          <Property name="TimeArrayInfo" />
+          <Property name="TimeArray" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
@@ -2073,24 +2516,26 @@
         <Proxy name="Reader"
                proxygroup="internal_sources"
                proxyname="XMLMultiBlockDataReaderCore"></Proxy>
-          <ExposedProperties>
-            <PropertyGroup label="Cell/Point Array Status"
-                           name="CellPointArrayStatus"
-                           panel_visibility="default"
-                           panel_widget="ArrayStatus">
-              <Property name="CellArrayInfo" />
-              <Property name="CellArrayStatus" />
-              <Property name="PointArrayInfo" />
-              <Property name="PointArrayStatus" />
-            </PropertyGroup>
-            <Property name="PieceDistribution" />
-          </ExposedProperties>
+        <ExposedProperties>
+          <PropertyGroup label="Cell/Point BAH Array Status"
+                         name="CellPointArrayStatus"
+                         panel_visibility="default"
+                         panel_widget="ArrayStatus">
+            <Property name="CellArrayInfo" />
+            <Property name="CellArrayStatus" />
+            <Property name="PointArrayInfo" />
+            <Property name="PointArrayStatus" />
+          </PropertyGroup>
+          <Property name="TimeArrayInfo" />
+          <Property name="TimeArray" />
+          <Property name="PieceDistribution" />
+        </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
                             information_only="1"
                             name="FileNameInfo">
         <SimpleStringInformationHelper />
-      </StringVectorProperty>
+        </StringVectorProperty>
       <StringVectorProperty animateable="0"
                             clean_command="RemoveAllFileNames"
                             command="AddFileName"
@@ -2137,18 +2582,20 @@
         <Proxy name="Reader"
                proxygroup="internal_sources"
                proxyname="XMLPartitionedDataSetReaderCore"></Proxy>
-          <ExposedProperties>
-            <PropertyGroup label="Cell/Point Array Status"
-                           name="CellPointArrayStatus"
-                           panel_visibility="default"
-                           panel_widget="ArrayStatus">
-              <Property name="CellArrayInfo" />
-              <Property name="CellArrayStatus" />
-              <Property name="PointArrayInfo" />
-              <Property name="PointArrayStatus" />
-            </PropertyGroup>
-            <Property name="PieceDistribution" />
-          </ExposedProperties>
+        <ExposedProperties>
+          <PropertyGroup label="Cell/Point Array Status"
+                         name="CellPointArrayStatus"
+                         panel_visibility="default"
+                         panel_widget="ArrayStatus">
+            <Property name="CellArrayInfo" />
+            <Property name="CellArrayStatus" />
+            <Property name="PointArrayInfo" />
+            <Property name="PointArrayStatus" />
+          </PropertyGroup>
+          <Property name="TimeArrayInfo" />
+          <Property name="TimeArray" />
+          <Property name="PieceDistribution" />
+        </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
                             information_only="1"
@@ -2197,18 +2644,20 @@
         <Proxy name="Reader"
                proxygroup="internal_sources"
                proxyname="XMLPartitionedDataSetCollectionReaderCore"></Proxy>
-          <ExposedProperties>
-            <PropertyGroup label="Cell/Point Array Status"
-                           name="CellPointArrayStatus"
-                           panel_visibility="default"
-                           panel_widget="ArrayStatus">
-              <Property name="CellArrayInfo" />
-              <Property name="CellArrayStatus" />
-              <Property name="PointArrayInfo" />
-              <Property name="PointArrayStatus" />
-            </PropertyGroup>
-            <Property name="PieceDistribution" />
-          </ExposedProperties>
+        <ExposedProperties>
+          <PropertyGroup label="Cell/Point Array Status"
+                         name="CellPointArrayStatus"
+                         panel_visibility="default"
+                         panel_widget="ArrayStatus">
+            <Property name="CellArrayInfo" />
+            <Property name="CellArrayStatus" />
+            <Property name="PointArrayInfo" />
+            <Property name="PointArrayStatus" />
+          </PropertyGroup>
+          <Property name="TimeArrayInfo" />
+          <Property name="TimeArray" />
+          <Property name="PieceDistribution" />
+        </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
                             information_only="1"

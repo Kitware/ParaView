@@ -138,13 +138,6 @@ public:
   vtkGetMacro(AttributeType, int);
   //@}
 
-  //@{
-  /**
-   * Return the string that is used as "none_string" in XML configuration.
-   */
-  vtkGetStringMacro(NoneString);
-  //@}
-
   /**
    * A vtkSMProperty is often defined with a default value in the
    * XML itself. However, many times, the default value must be determined
@@ -263,10 +256,7 @@ protected:
   vtkSetStringMacro(InputDomainName);
   //@}
 
-  vtkSetStringMacro(NoneString);
-
   char* InputDomainName;
-  char* NoneString;
 
   // Currently, used by vtkSMRepresentedArrayListDomain to avoid picking just an
   // arbitrary array for scalar coloring. Need to rethink how this should be

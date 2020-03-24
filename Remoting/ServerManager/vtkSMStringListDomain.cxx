@@ -19,6 +19,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkStdString.h"
 #include "vtkStringList.h"
 
 #include <vector>
@@ -32,6 +33,7 @@ struct vtkSMStringListDomainInternals
 
 //---------------------------------------------------------------------------
 vtkSMStringListDomain::vtkSMStringListDomain()
+  : NoneString(nullptr)
 {
   this->SLInternals = new vtkSMStringListDomainInternals;
 }
@@ -39,6 +41,7 @@ vtkSMStringListDomain::vtkSMStringListDomain()
 //---------------------------------------------------------------------------
 vtkSMStringListDomain::~vtkSMStringListDomain()
 {
+  this->SetNoneString(nullptr);
   delete this->SLInternals;
 }
 
@@ -128,6 +131,11 @@ void vtkSMStringListDomain::Update(vtkSMProperty* prop)
   {
     std::vector<std::string> values;
     unsigned int numStrings = svp->GetNumberOfElements();
+
+    if (this->NoneString)
+    {
+      values.push_back(this->NoneString);
+    }
     if (svp->GetNumberOfElementsPerCommand() == 2)
     {
       // if the information property is something like a array-status-info
@@ -159,6 +167,15 @@ int vtkSMStringListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElemen
   }
 
   std::vector<std::string> values;
+
+  // Search for attribute type with matching name.
+  const char* none_string = element->GetAttribute("none_string");
+  if (none_string)
+  {
+    this->SetNoneString(none_string);
+    values.push_back(none_string);
+  }
+
   // Loop over the top-level elements.
   unsigned int i;
   for (i = 0; i < element->GetNumberOfNestedElements(); ++i)
@@ -222,17 +239,28 @@ int vtkSMStringListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchec
   {
     vtkSMPropertyHelper helper(prop);
     helper.SetUseUnchecked(use_unchecked_values);
+    unsigned int temp;
+    vtkSMStringVectorProperty* infoProperty =
+      vtkSMStringVectorProperty::SafeDownCast(svp->GetInformationProperty());
+    int exists = 0;
+    if (exists && this->IsInDomain(svp->GetDefaultValue(0), temp))
+    {
+      helper.Set(0, svp->GetDefaultValue(0));
+      return 1;
+    }
+    else if (this->NoneString)
+    {
+      return 1;
+    }
     if (helper.GetNumberOfElements() == 1 && !svp->GetRepeatCommand())
     {
       const char* defaultValue = nullptr;
       // try information_property, if exists first.
-      vtkSMStringVectorProperty* infoProperty =
-        vtkSMStringVectorProperty::SafeDownCast(svp->GetInformationProperty());
+
       if (infoProperty && infoProperty->GetNumberOfElements() == 1)
       {
         defaultValue = infoProperty->GetElement(0);
       }
-      unsigned int temp;
       if (defaultValue && this->IsInDomain(defaultValue, temp))
       {
         helper.Set(0, defaultValue);
@@ -259,6 +287,11 @@ int vtkSMStringListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchec
       for (unsigned int cc = 0; cc < num_string; cc++)
       {
         strings->AddString(this->GetString(cc));
+      }
+
+      if (num_string == 0 && this->NoneString)
+      {
+        strings->AddString(this->NoneString);
       }
 
       if (use_unchecked_values)
