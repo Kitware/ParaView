@@ -41,6 +41,11 @@
  *                         A comma-separated list (e.g., "1" or "1,3,4") of component counts
  *                         limits acceptable arrays to those with a number of components that
  *                         appear in the list.
+ * \li \c data_type: (optional) when specified must be the class name for
+ *                         data type that this domain is applicable to. This is
+ *                         useful when adding multiple input-array-domains a
+ *                         property with different requirements based on the
+ *                         type (see `("filters", "Contour")` filter, for example).
  *
  * This domain doesn't support any required properties (to help clean old
  * code, we print a warning if any required properties are specified).
@@ -149,6 +154,14 @@ public:
    */
   int IsArrayAcceptable(vtkPVArrayInformation* arrayInfo);
 
+  /**
+   * Helper method find the first `vtkSMInputArrayDomain` on the `property` that
+   * is acceptable based on the value of the property. The property is typically
+   * `vtkSMInputProperty`. If none of the domains applicable, this will simply
+   * return the first vtkSMInputArrayDomain that is found.
+   */
+  static vtkSMInputArrayDomain* FindApplicableDomain(vtkSMProperty* property);
+
 protected:
   vtkSMInputArrayDomain();
   ~vtkSMInputArrayDomain() override;
@@ -176,6 +189,7 @@ protected:
 
   int AttributeType;
   std::vector<int> AcceptableNumbersOfComponents;
+  std::string DataType;
 
 private:
   static bool AutomaticPropertyConversion;

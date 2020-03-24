@@ -182,6 +182,9 @@ public:
    * Returns true if all values are in all domains, false otherwise.
    * The domains will check the unchecked values (SetUncheckedXXX())
    * instead of the actual values.
+   *
+   * Domains that return `vtkSMDomain::NOT_APPLICABLE` for `vtkSMDomain::IsInDomain`
+   * are skipped.
    */
   int IsInDomains();
 
@@ -189,6 +192,9 @@ public:
    * Overload of IsInDomains() that provides a mechanism to return the first
    * domain that fails the check. \c domain is set to NULL when all domain
    * checks pass.
+   *
+   * Domains that return `vtkSMDomain::NOT_APPLICABLE` for `vtkSMDomain::IsInDomain`
+   * are skipped.
    */
   int IsInDomains(vtkSMDomain** domain);
 
