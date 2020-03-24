@@ -42,6 +42,7 @@
 #include <GL/glu.h>
 #endif
 
+#include "vtkBoundingBox.h"
 #include "vtkCellData.h"
 #include "vtkCellIterator.h"
 #include "vtkCommand.h"
@@ -50,7 +51,6 @@
 #include "vtkMultiThreader.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLRenderWindow.h"
-#include "vtkPKdTree.h"
 #include "vtkPointData.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
@@ -87,11 +87,11 @@ vtknvindex_irregular_volume_mapper::vtknvindex_irregular_volume_mapper()
 {
   m_index_instance = vtknvindex_instance::get();
   m_controller = vtkMultiProcessController::GetGlobalController();
-  m_kd_tree = NULL;
   m_prev_property = "";
   m_last_MTime = 0;
 
   vtkMath::UninitializeBounds(m_whole_bounds);
+  vtkMath::UninitializeBounds(m_subregion_bounds);
 }
 
 //----------------------------------------------------------------------------
@@ -240,37 +240,17 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
     mi::Float64* bounds = unstructured_grid->GetBounds();
 
     // get subset bounds
-    if (m_kd_tree)
+    if (vtkMath::AreBoundsInitialized(m_subregion_bounds))
     {
-      /* mi::Sint32 num_datasets = m_kd_tree->GetNumberOfDataSets(); */
-      /* mi::Sint32 num_regions = m_kd_tree->GetNumberOfRegions(); */
-      // INFO_LOG << "KdTree | datasets, regions: " << num_datasets << ", " << num_regions;
+      m_volume_data.subregion_id = cur_global_rank;
 
-      vtkIntArray* region_id_array = vtkIntArray::New();
-      mi::Sint32 region_count =
-        m_kd_tree->GetRegionAssignmentList(cur_global_rank, region_id_array);
+      m_volume_data.subregion_bbox.min.x = static_cast<mi::Float32>(m_subregion_bounds[0]);
+      m_volume_data.subregion_bbox.min.y = static_cast<mi::Float32>(m_subregion_bounds[2]);
+      m_volume_data.subregion_bbox.min.z = static_cast<mi::Float32>(m_subregion_bounds[4]);
 
-      if (region_count != 1)
-      {
-        ERROR_LOG << "The subset region is not available.";
-        return true;
-      }
-
-      mi::Sint32 region_id = region_id_array->GetValue(0);
-      region_id_array->Delete();
-
-      mi::Float64 region_bb[6];
-      m_kd_tree->GetRegionBounds(region_id, region_bb);
-
-      m_volume_data.subregion_id = region_id;
-
-      m_volume_data.subregion_bbox.min.x = static_cast<mi::Float32>(region_bb[0]);
-      m_volume_data.subregion_bbox.min.y = static_cast<mi::Float32>(region_bb[2]);
-      m_volume_data.subregion_bbox.min.z = static_cast<mi::Float32>(region_bb[4]);
-
-      m_volume_data.subregion_bbox.max.x = static_cast<mi::Float32>(region_bb[1]);
-      m_volume_data.subregion_bbox.max.y = static_cast<mi::Float32>(region_bb[3]);
-      m_volume_data.subregion_bbox.max.z = static_cast<mi::Float32>(region_bb[5]);
+      m_volume_data.subregion_bbox.max.x = static_cast<mi::Float32>(m_subregion_bounds[1]);
+      m_volume_data.subregion_bbox.max.y = static_cast<mi::Float32>(m_subregion_bounds[3]);
+      m_volume_data.subregion_bbox.max.z = static_cast<mi::Float32>(m_subregion_bounds[5]);
     }
     else
     {
@@ -464,9 +444,17 @@ void vtknvindex_irregular_volume_mapper::set_cluster_properties(
   m_scene.set_cluster_properties(cluster_properties);
 }
 
-void vtknvindex_irregular_volume_mapper::set_domain_kdtree(vtkPKdTree* kd_tree)
+//-------------------------------------------------------------------------------------------------
+void vtknvindex_irregular_volume_mapper::set_subregion_bounds(const vtkBoundingBox& bbox)
 {
-  m_kd_tree = kd_tree;
+  if (bbox.IsValid())
+  {
+    bbox.GetBounds(m_subregion_bounds);
+  }
+  else
+  {
+    vtkMath::UninitializeBounds(m_subregion_bounds);
+  }
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -27,7 +27,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
-#include "vtkPExtentTranslator.h"
 #include "vtkPVGeometryFilter.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
@@ -64,11 +63,6 @@ vtkUnstructuredGridVolumeRepresentation::vtkUnstructuredGridVolumeRepresentation
   this->ResampleToImageFilter = vtkResampleToImage::New();
   this->ResampleToImageFilter->SetSamplingDimensions(128, 128, 128);
   this->DataSize = 0;
-  this->PExtentTranslator = vtkPExtentTranslator::New();
-  this->Origin[0] = this->Origin[1] = this->Origin[2] = 0.0;
-  this->Spacing[0] = this->Spacing[1] = this->Spacing[2] = 0.0;
-  this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
-  this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
   this->OutlineSource = vtkOutlineSource::New();
 
   this->DefaultMapper = vtkProjectedTetrahedraMapper::New();
@@ -96,7 +90,6 @@ vtkUnstructuredGridVolumeRepresentation::~vtkUnstructuredGridVolumeRepresentatio
   this->Actor->Delete();
 
   this->ResampleToImageFilter->Delete();
-  this->PExtentTranslator->Delete();
   this->OutlineSource->Delete();
 
   this->LODGeometryFilter->Delete();
@@ -210,14 +203,20 @@ int vtkUnstructuredGridVolumeRepresentation::ProcessViewRequest(
 
     if (this->UseDataPartitions == true)
     {
-      // Pass partitioning information to the render view.
-      vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this->DataBounds);
+      // We want to use this representation's data bounds to redistribute all other data in the
+      // scene if ordered compositing is needed.
+      vtkPVRenderView::SetOrderedCompositingConfiguration(
+        inInfo, this, vtkPVRenderView::USE_BOUNDS_FOR_REDISTRIBUTION);
     }
     else
     {
-      vtkPVRenderView::MarkAsRedistributable(inInfo, this);
+      // We want to let vtkPVRenderView do redistribution of data as necessary,
+      // and use this representations data for determining a load balanced distribution
+      // if ordered is needed.
+      vtkPVRenderView::SetOrderedCompositingConfiguration(inInfo, this,
+        vtkPVRenderView::DATA_IS_REDISTRIBUTABLE | vtkPVRenderView::USE_DATA_FOR_LOAD_BALANCING);
     }
-
+    vtkPVRenderView::SetRedistributionModeToUniquelyAssignBoundaryCells(inInfo, this);
     vtkPVRenderView::SetRequiresDistributedRendering(inInfo, this, true);
 
     vtkNew<vtkMatrix4x4> matrix;
@@ -455,9 +454,8 @@ int vtkUnstructuredGridVolumeRepresentation::ProcessViewRequestResampleToImage(
     vtkPVRenderView::SetGeometryBounds(inInfo, this, this->DataBounds);
 
     // Pass partitioning information to the render view.
-    vtkPVRenderView::SetOrderedCompositingInformation(
-      inInfo, this, this->PExtentTranslator, this->WholeExtent, this->Origin, this->Spacing);
-
+    vtkPVRenderView::SetOrderedCompositingConfiguration(
+      inInfo, this, vtkPVRenderView::USE_BOUNDS_FOR_REDISTRIBUTION);
     vtkPVRenderView::SetRequiresDistributedRendering(inInfo, this, true);
     this->Actor->SetMapper(NULL);
   }
@@ -484,10 +482,6 @@ int vtkUnstructuredGridVolumeRepresentation::RequestDataResampleToImage(
 {
   vtkMath::UninitializeBounds(this->DataBounds);
   this->DataSize = 0;
-  this->Origin[0] = this->Origin[1] = this->Origin[2] = 0;
-  this->Spacing[0] = this->Spacing[1] = this->Spacing[2] = 0;
-  this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
-  this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
 
   vtkAbstractVolumeMapper* volumeMapper = this->GetActiveVolumeMapper();
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
@@ -506,14 +500,6 @@ int vtkUnstructuredGridVolumeRepresentation::RequestDataResampleToImage(
     this->OutlineSource->Update();
 
     this->DataSize = output->GetActualMemorySize();
-
-    // Collect information about volume that is needed for data redistribution
-    // later.
-    this->PExtentTranslator->GatherExtents(output);
-    output->GetOrigin(this->Origin);
-    output->GetSpacing(this->Spacing);
-    vtkStreamingDemandDrivenPipeline::GetWholeExtent(
-      this->ResampleToImageFilter->GetOutputInformation(0), this->WholeExtent);
   }
   else
   {

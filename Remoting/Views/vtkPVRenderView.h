@@ -49,7 +49,7 @@ class vtkInteractorStyleRubberBandZoom;
 class vtkLight;
 class vtkLightKit;
 class vtkMatrix4x4;
-class vtkPartitionOrderingInterface;
+class vtkOrderedCompositingHelper;
 class vtkProp;
 class vtkPVAxesWidget;
 class vtkPVCameraCollection;
@@ -444,13 +444,13 @@ public:
     vtkInformation* info, vtkPVDataRepresentation* repr, int port = 0);
   static vtkAlgorithmOutput* GetPieceProducerLOD(
     vtkInformation* info, vtkPVDataRepresentation* repr, int port = 0);
-  static void MarkAsRedistributable(
-    vtkInformation* info, vtkPVDataRepresentation* repr, bool value = true, int port = 0);
   static void SetRedistributionMode(
     vtkInformation* info, vtkPVDataRepresentation* repr, int mode, int port = 0);
   static void SetRedistributionModeToSplitBoundaryCells(
     vtkInformation* info, vtkPVDataRepresentation* repr, int port = 0);
   static void SetRedistributionModeToDuplicateBoundaryCells(
+    vtkInformation* info, vtkPVDataRepresentation* repr, int port = 0);
+  static void SetRedistributionModeToUniquelyAssignBoundaryCells(
     vtkInformation* info, vtkPVDataRepresentation* repr, int port = 0);
   static void SetGeometryBounds(vtkInformation* info, vtkPVDataRepresentation* repr,
     const double bounds[6], vtkMatrix4x4* transform = nullptr, int port = 0);
@@ -459,6 +459,62 @@ public:
     vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* piece);
   static vtkDataObject* GetCurrentStreamedPiece(
     vtkInformation* info, vtkPVDataRepresentation* repr);
+  //@}
+
+  //@{
+  /**
+   * As of ParaView 5.9, these methods are replaced by
+   * `SetOrderedCompositingConfiguration` which provides a new mechanisms for
+   * indicating to the view how this representation participates in
+   * data-redistribution needed when ordered-compositing is being used.
+   *
+   * @deprecated ParaView 5.9.
+   */
+  VTK_LEGACY(static void MarkAsRedistributable(
+    vtkInformation* info, vtkPVDataRepresentation* repr, bool value = true, int port = 0));
+  VTK_LEGACY(static void SetOrderedCompositingInformation(vtkInformation* info,
+    vtkPVDataRepresentation* repr, vtkExtentTranslator* translator, const int whole_extents[6],
+    const double origin[3], const double spacing[3]));
+  VTK_LEGACY(
+    static void SetOrderedCompositingInformation(vtkInformation* info, const double bounds[6]));
+  //@}
+
+  //@{
+  /**
+   * `OrderedCompositingConfiguration` lets representations indicate to the view
+   * how the representation participates in data-redistribution necessary when
+   * ordered-compositing is being used. These flags are meant to be combined
+   * together using bit-wise-OR.
+   *
+   * If not specified, default is 0 i.e. the representation data will be left
+   * untouched. Except for trivial representations or representations that have
+   * their full rendering geometry available on all rendering ranks, this is not
+   * recommended.
+   *
+   * `DATA_IS_REDISTRIBUTABLE` indicates that the view may redistribute the
+   * rendering data from this representation as needed. This is typical for
+   * representation rendering poly-data or unstructured grids.
+   *
+   * `USE_DATA_FOR_LOAD_BALANCING` indicates that when building a sortable
+   * distribution for the data, it should use this representation data. If not
+   * set, the representation will not contribute to the algorithm that builds
+   * the kd-tree used to split data across rendering ranks.
+   *
+   * `USE_BOUNDS_FOR_REDISTRIBUTION` may be used when the data is too heavy to move (i.e
+   * DATA_IS_REDISTRIBUTABLE is not true) and is already split across ranks in a
+   * sortable fashion. In that case, this indicates the view must use the
+   * spatial partitioning of this representation's data and move other data
+   * accordingly. This flag cannot be combined with DATA_IS_REDISTRIBUTABLE or
+   * USE_BOUNDS_FOR_REDISTRIBUTION.
+   */
+  enum
+  {
+    USE_BOUNDS_FOR_REDISTRIBUTION = 0x01,
+    DATA_IS_REDISTRIBUTABLE = 0x02,
+    USE_DATA_FOR_LOAD_BALANCING = 0x40,
+  };
+  static void SetOrderedCompositingConfiguration(vtkInformation* info,
+    vtkPVDataRepresentation* repr, int config, const double* bounds = nullptr, int port = 0);
   //@}
 
   /**
@@ -496,17 +552,6 @@ public:
   static void SetDeliverToClientAndRenderingProcesses(vtkInformation* info,
     vtkPVDataRepresentation* repr, bool deliver_to_client, bool gather_before_delivery,
     int port = 0);
-
-  //@{
-  /**
-   * Pass the structured-meta-data for determining rendering order for ordered
-   * compositing.
-   */
-  static void SetOrderedCompositingInformation(vtkInformation* info, vtkPVDataRepresentation* repr,
-    vtkExtentTranslator* translator, const int whole_extents[6], const double origin[3],
-    const double spacing[3]);
-  static void SetOrderedCompositingInformation(vtkInformation* info, const double bounds[6]);
-  //@}
 
   //@{
   /**
@@ -962,8 +1007,6 @@ protected:
   vtkPVRenderView();
   ~vtkPVRenderView() override;
 
-  static vtkInformationDoubleVectorKey* GEOMETRY_BOUNDS();
-
   /**
    * Actual render method.
    */
@@ -1174,7 +1217,7 @@ private:
   vtkNew<vtkTextRepresentation> Annotation;
   void UpdateAnnotationText();
 
-  vtkNew<vtkPartitionOrderingInterface> PartitionOrdering;
+  vtkNew<vtkOrderedCompositingHelper> OrderedCompositingHelper;
 
   int StereoType;
   int ServerStereoType;

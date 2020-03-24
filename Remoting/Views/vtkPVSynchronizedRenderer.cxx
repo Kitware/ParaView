@@ -448,19 +448,18 @@ void vtkPVSynchronizedRenderer::SetDataReplicatedOnAllProcesses(bool replicated)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSynchronizedRenderer::SetPartitionOrdering(
-  vtkPartitionOrderingInterface* partitionOrdering)
+void vtkPVSynchronizedRenderer::SetOrderedCompositingHelper(vtkOrderedCompositingHelper* helper)
 {
 #if VTK_MODULE_ENABLE_ParaView_icet
   vtkIceTSynchronizedRenderers* sync =
     vtkIceTSynchronizedRenderers::SafeDownCast(this->ParallelSynchronizer);
   if (sync)
   {
-    sync->SetPartitionOrdering(partitionOrdering);
-    sync->SetUseOrderedCompositing(partitionOrdering != NULL);
+    sync->SetOrderedCompositingHelper(helper);
+    sync->SetUseOrderedCompositing(helper != nullptr);
   }
 #endif
-  (void)partitionOrdering;
+  (void)helper;
 }
 
 //----------------------------------------------------------------------------

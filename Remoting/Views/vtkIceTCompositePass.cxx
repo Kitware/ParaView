@@ -30,8 +30,8 @@
 #include "vtkOpenGLRenderUtilities.h"
 #include "vtkOpenGLRenderWindow.h"
 #include "vtkOpenGLState.h"
+#include "vtkOrderedCompositingHelper.h"
 #include "vtkPVLogger.h"
-#include "vtkPartitionOrderingInterface.h"
 #include "vtkPixelBufferObject.h"
 #include "vtkRenderState.h"
 #include "vtkRenderWindow.h"
@@ -116,7 +116,7 @@ void MergeCubeAxesBounds(double bounds[6], const vtkRenderState* rState)
 
 vtkStandardNewMacro(vtkIceTCompositePass);
 vtkCxxSetObjectMacro(vtkIceTCompositePass, RenderPass, vtkRenderPass);
-vtkCxxSetObjectMacro(vtkIceTCompositePass, PartitionOrdering, vtkPartitionOrderingInterface);
+vtkCxxSetObjectMacro(vtkIceTCompositePass, OrderedCompositingHelper, vtkOrderedCompositingHelper);
 vtkCxxSetObjectMacro(vtkIceTCompositePass, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIceTCompositePass::vtkIceTCompositePass()
@@ -128,7 +128,7 @@ vtkIceTCompositePass::vtkIceTCompositePass()
   this->IceTContext->UseOpenGLOn();
   this->Controller = 0;
   this->RenderPass = 0;
-  this->PartitionOrdering = 0;
+  this->OrderedCompositingHelper = nullptr;
   this->TileMullions[0] = this->TileMullions[1] = 0;
   this->TileDimensions[0] = 1;
   this->TileDimensions[1] = 1;
@@ -166,7 +166,7 @@ vtkIceTCompositePass::~vtkIceTCompositePass()
     this->Program = 0;
   }
 
-  this->SetPartitionOrdering(0);
+  this->SetOrderedCompositingHelper(nullptr);
   this->SetRenderPass(0);
   this->SetController(0);
   this->IceTContext->Delete();
@@ -223,9 +223,8 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
     icetStrategy(ICET_STRATEGY_REDUCE);
   }
 
-  bool use_ordered_compositing = (this->PartitionOrdering && this->UseOrderedCompositing &&
-    this->PartitionOrdering->GetNumberOfRegions() >=
-      this->IceTContext->GetController()->GetNumberOfProcesses());
+  const bool use_ordered_compositing =
+    (this->OrderedCompositingHelper && this->UseOrderedCompositing);
 
   IceTEnum const format =
     this->EnableFloatValuePass ? ICET_IMAGE_COLOR_RGBA_FLOAT : ICET_IMAGE_COLOR_RGBA_UBYTE;
@@ -252,37 +251,26 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
     // if ordered compositing is enabled, pass the process order from the partition ordering
     // to icet.
 
+    // sanity check: number of rendering ranks must match number of boxes
+    assert(static_cast<int>(this->OrderedCompositingHelper->GetBoundingBoxes().size()) ==
+      this->IceTContext->GetController()->GetNumberOfProcesses());
+
     // Setup IceT context for correct sorting.
     icetEnable(ICET_ORDERED_COMPOSITE);
 
     // Order all the regions.
-    vtkIntArray* orderedProcessIds = vtkIntArray::New();
     vtkCamera* camera = render_state->GetRenderer()->GetActiveCamera();
-    if (camera->GetParallelProjection())
-    {
-      this->PartitionOrdering->ViewOrderAllProcessesInDirection(
-        camera->GetDirectionOfProjection(), orderedProcessIds);
-    }
-    else
-    {
-      this->PartitionOrdering->ViewOrderAllProcessesFromPosition(
-        camera->GetPosition(), orderedProcessIds);
-    }
-
+    const auto orderedProcessIds = this->OrderedCompositingHelper->ComputeSortOrder(camera);
     if (sizeof(int) == sizeof(IceTInt))
     {
-      icetCompositeOrder((IceTInt*)orderedProcessIds->GetPointer(0));
+      icetCompositeOrder(reinterpret_cast<const IceTInt*>(&orderedProcessIds[0]));
     }
     else
     {
-      vtkIdType numprocs = orderedProcessIds->GetNumberOfTuples();
-      IceTInt* tmparray = new IceTInt[numprocs];
-      const int* opiarray = orderedProcessIds->GetPointer(0);
-      std::copy(opiarray, opiarray + numprocs, tmparray);
-      icetCompositeOrder(tmparray);
-      delete[] tmparray;
+      std::vector<IceTInt> tmparray(orderedProcessIds.size());
+      std::copy(orderedProcessIds.begin(), orderedProcessIds.end(), tmparray.begin());
+      icetCompositeOrder(&tmparray[0]);
     }
-    orderedProcessIds->Delete();
   }
   else
   {
@@ -890,7 +878,7 @@ void vtkIceTCompositePass::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "DataReplicatedOnAllProcesses: " << this->DataReplicatedOnAllProcesses << endl;
   os << indent << "ImageReductionFactor: " << this->ImageReductionFactor << endl;
-  os << indent << "PartitionOrdering: " << this->PartitionOrdering << endl;
+  os << indent << "OrderedCompositingHelper: " << this->OrderedCompositingHelper << endl;
   os << indent << "UseOrderedCompositing: " << this->UseOrderedCompositing << endl;
   os << indent << "DisplayRGBAResults: " << this->DisplayRGBAResults << endl;
   os << indent << "DisplayDepthResults: " << this->DisplayDepthResults << endl;

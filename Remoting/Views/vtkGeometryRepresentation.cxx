@@ -300,23 +300,24 @@ int vtkGeometryRepresentation::ProcessViewRequest(
     // rendering nodes as and when needed.
     vtkPVView::SetPiece(inInfo, this, this->MultiBlockMaker->GetOutputDataObject(0));
 
-    // Since we are rendering polydata, it can be redistributed when ordered
-    // compositing is needed. So let the view know that it can feel free to
-    // redistribute data as and when needed.
-    vtkPVRenderView::MarkAsRedistributable(inInfo, this);
-
-    // Tell the view if this representation needs ordered compositing. We need
-    // ordered compositing when rendering translucent geometry.
-    if (this->NeedsOrderedCompositing())
+    if (this->UseDataPartitions == true)
     {
-      outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
-
-      // Pass partitioning information to the render view.
-      if (this->UseDataPartitions == true)
-      {
-        vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this->VisibleDataBounds);
-      }
+      // We want to use this representation's data bounds to redistribute all other data in the
+      // scene if ordered compositing is needed.
+      vtkPVRenderView::SetOrderedCompositingConfiguration(
+        inInfo, this, vtkPVRenderView::USE_BOUNDS_FOR_REDISTRIBUTION);
     }
+    else
+    {
+      // We want to let vtkPVRenderView do redistribution of data as necessary,
+      // and use this representations data for determining a load balanced distribution
+      // if ordered is needed.
+      vtkPVRenderView::SetOrderedCompositingConfiguration(inInfo, this,
+        vtkPVRenderView::DATA_IS_REDISTRIBUTABLE | vtkPVRenderView::USE_DATA_FOR_LOAD_BALANCING);
+    }
+
+    outInfo->Set(
+      vtkPVRenderView::NEED_ORDERED_COMPOSITING(), this->NeedsOrderedCompositing() ? 1 : 0);
 
     // Finally, let the view know about the geometry bounds. The view uses this
     // information for resetting camera and clip planes. Since this

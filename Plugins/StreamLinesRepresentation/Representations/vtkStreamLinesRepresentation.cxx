@@ -27,7 +27,6 @@
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPExtentTranslator.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
 #include "vtkPolyDataMapper.h"
@@ -121,11 +120,6 @@ vtkStreamLinesRepresentation::vtkStreamLinesRepresentation()
 
   vtkMath::UninitializeBounds(this->DataBounds);
   this->DataSize = 0;
-
-  this->Origin[0] = this->Origin[1] = this->Origin[2] = 0;
-  this->Spacing[0] = this->Spacing[1] = this->Spacing[2] = 0;
-  this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
-  this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
 }
 
 //----------------------------------------------------------------------------
@@ -166,8 +160,8 @@ int vtkStreamLinesRepresentation::ProcessViewRequest(
     vtkPVRenderView::SetGeometryBounds(inInfo, this, this->DataBounds);
 
     // Pass partitioning information to the render view.
-    vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this,
-      this->PExtentTranslator.GetPointer(), this->WholeExtent, this->Origin, this->Spacing);
+    vtkPVRenderView::SetOrderedCompositingConfiguration(
+      inInfo, this, vtkPVRenderView::USE_BOUNDS_FOR_REDISTRIBUTION);
 
     vtkPVRenderView::SetRequiresDistributedRendering(inInfo, this, true);
   }
@@ -189,10 +183,6 @@ int vtkStreamLinesRepresentation::RequestData(
 {
   vtkMath::UninitializeBounds(this->DataBounds);
   this->DataSize = 0;
-  this->Origin[0] = this->Origin[1] = this->Origin[2] = 0;
-  this->Spacing[0] = this->Spacing[1] = this->Spacing[2] = 0;
-  this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
-  this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
 
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
   {
@@ -215,13 +205,6 @@ int vtkStreamLinesRepresentation::RequestData(
         clone->Crop(ext);
       }
       this->Cache.TakeReference(clone);
-      // Collect information about volume that is needed for data redistribution
-      // later.
-      this->PExtentTranslator->GatherExtents(inputImage);
-      inputImage->GetOrigin(this->Origin);
-      inputImage->GetSpacing(this->Spacing);
-      vtkStreamingDemandDrivenPipeline::GetWholeExtent(
-        inputVector[0]->GetInformationObject(0), this->WholeExtent);
     }
     else if (inputDS)
     {

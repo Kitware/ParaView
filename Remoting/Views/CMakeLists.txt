@@ -55,6 +55,7 @@ set(classes
   vtkLogoSourceRepresentation
   vtkMoleculeRepresentation
   vtkMultiSliceContextItem
+  vtkOrderedCompositingHelper
   vtkOutlineRepresentation
   vtkPointGaussianRepresentation
   vtkPolarAxesRepresentation

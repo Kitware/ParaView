@@ -40,7 +40,6 @@
 #include "vtkMPIMoveData.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
-#include "vtkPExtentTranslator.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
@@ -72,66 +71,6 @@ vtknvindex_representation_initializer::~vtknvindex_representation_initializer()
 {
 }
 
-namespace
-{
-//----------------------------------------------------------------------------
-void vtkGetNonGhostExtent(int* resultExtent, vtkImageData* dataSet)
-{
-  // Only meant for topologically structured grids.
-  dataSet->GetExtent(resultExtent);
-
-  if (vtkUnsignedCharArray* ghostArray = vtkUnsignedCharArray::SafeDownCast(
-        dataSet->GetCellData()->GetArray(vtkDataSetAttributes::GhostArrayName())))
-  {
-    // We have a ghost array. We need to iterate over the array to prune ghost
-    // extents.
-
-    int pntExtent[6];
-    std::copy(resultExtent, resultExtent + 6, pntExtent);
-
-    int validCellExtent[6];
-    vtkStructuredData::GetCellExtentFromPointExtent(pntExtent, validCellExtent);
-
-    // The start extent is the location of the first cell with ghost value 0.
-    for (vtkIdType cc = 0, numTuples = ghostArray->GetNumberOfTuples(); cc < numTuples; ++cc)
-    {
-      if (ghostArray->GetValue(cc) == 0)
-      {
-        int ijk[3];
-        vtkStructuredData::ComputeCellStructuredCoordsForExtent(cc, pntExtent, ijk);
-        validCellExtent[0] = ijk[0];
-        validCellExtent[2] = ijk[1];
-        validCellExtent[4] = ijk[2];
-        break;
-      }
-    }
-
-    // The end extent is the  location of the last cell with ghost value 0.
-    for (vtkIdType cc = (ghostArray->GetNumberOfTuples() - 1); cc >= 0; --cc)
-    {
-      if (ghostArray->GetValue(cc) == 0)
-      {
-        int ijk[3];
-        vtkStructuredData::ComputeCellStructuredCoordsForExtent(cc, pntExtent, ijk);
-        validCellExtent[1] = ijk[0];
-        validCellExtent[3] = ijk[1];
-        validCellExtent[5] = ijk[2];
-        break;
-      }
-    }
-
-    // Convert cell-extents to pt extents.
-    resultExtent[0] = validCellExtent[0];
-    resultExtent[2] = validCellExtent[2];
-    resultExtent[4] = validCellExtent[4];
-
-    resultExtent[1] = std::min(validCellExtent[1] + 1, resultExtent[1]);
-    resultExtent[3] = std::min(validCellExtent[3] + 1, resultExtent[3]);
-    resultExtent[5] = std::min(validCellExtent[5] + 1, resultExtent[5]);
-  }
-}
-} // namespace
-
 vtkStandardNewMacro(vtknvindex_representation);
 
 //----------------------------------------------------------------------------
@@ -139,12 +78,6 @@ vtknvindex_cached_bounds::vtknvindex_cached_bounds()
 {
   for (mi::Uint32 i = 0; i < 6; i++)
     data_bounds[i] = 0.0;
-
-  for (mi::Uint32 i = 0; i < 6; i++)
-    whole_extent[i] = 0;
-
-  for (mi::Uint32 i = 0; i < 3; i++)
-    origin[i] = spacing[i] = 0.0;
 }
 
 //----------------------------------------------------------------------------
@@ -152,31 +85,12 @@ vtknvindex_cached_bounds::vtknvindex_cached_bounds(const vtknvindex_cached_bound
 {
   for (mi::Uint32 i = 0; i < 6; i++)
     data_bounds[i] = cached_bound.data_bounds[i];
-
-  for (mi::Uint32 i = 0; i < 6; i++)
-    whole_extent[i] = cached_bound.whole_extent[i];
-
-  for (mi::Uint32 i = 0; i < 3; i++)
-    origin[i] = cached_bound.origin[i];
-
-  for (mi::Uint32 i = 0; i < 3; i++)
-    spacing[i] = cached_bound.spacing[i];
 }
 
-vtknvindex_cached_bounds::vtknvindex_cached_bounds(const double _data_bounds[6],
-  const int _whole_extent[6], const double _origin[3], const double _spacing[3])
+vtknvindex_cached_bounds::vtknvindex_cached_bounds(const double _data_bounds[6])
 {
   for (mi::Uint32 i = 0; i < 6; i++)
     data_bounds[i] = _data_bounds[i];
-
-  for (mi::Uint32 i = 0; i < 6; i++)
-    whole_extent[i] = _whole_extent[i];
-
-  for (mi::Uint32 i = 0; i < 3; i++)
-    origin[i] = _origin[i];
-
-  for (mi::Uint32 i = 0; i < 3; i++)
-    spacing[i] = _spacing[i];
 }
 
 //----------------------------------------------------------------------------
@@ -284,15 +198,6 @@ int vtknvindex_representation::ProcessViewRequest(
       {
         for (mi::Uint32 i = 0; i < 6; i++)
           this->DataBounds[i] = cached_bounds->data_bounds[i];
-
-        for (mi::Uint32 i = 0; i < 6; i++)
-          this->WholeExtent[i] = cached_bounds->whole_extent[i];
-
-        for (mi::Uint32 i = 0; i < 3; i++)
-          this->Origin[i] = cached_bounds->origin[i];
-
-        for (mi::Uint32 i = 0; i < 3; i++)
-          this->Spacing[i] = cached_bounds->spacing[i];
       }
     }
 
@@ -303,9 +208,8 @@ int vtknvindex_representation::ProcessViewRequest(
     vtkPVRenderView::SetGeometryBounds(inInfo, this, this->DataBounds);
 
     // Pass partitioning information to the render view.
-    vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this,
-      this->PExtentTranslator.GetPointer(), this->WholeExtent, this->Origin, this->Spacing);
-
+    vtkPVRenderView::SetOrderedCompositingConfiguration(
+      inInfo, this, vtkPVRenderView::USE_BOUNDS_FOR_REDISTRIBUTION);
     vtkPVRenderView::SetRequiresDistributedRendering(inInfo, this, true);
   }
   else if (request_type == vtkPVView::REQUEST_UPDATE_LOD())
@@ -374,11 +278,6 @@ int vtknvindex_representation::RequestDataBase(
 {
   vtkMath::UninitializeBounds(this->DataBounds);
   this->DataSize = 0;
-  this->Origin[0] = this->Origin[1] = this->Origin[2] = 0;
-  this->Spacing[0] = this->Spacing[1] = this->Spacing[2] = 0;
-  this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
-  this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
-
   this->OutlineGeometry = vtkSmartPointer<vtkPolyData>::New();
 
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
@@ -415,31 +314,6 @@ int vtknvindex_representation::RequestDataBase(
     this->OutlineGeometry->ShallowCopy(this->OutlineSource->GetOutputDataObject(0));
 
     this->DataSize = output->GetActualMemorySize();
-
-    // Collect information about volume that is needed for data redistribution
-    // later.
-
-    // Since the KdTree generator is not expecting ghost cells, we need to pass
-    // it extents without ghost cells.
-    if (output->HasAnyGhostCells())
-    {
-      vtkNew<vtkImageData> dummy;
-      int ext[6];
-      vtkGetNonGhostExtent(ext, output);
-      dummy->SetExtent(ext);
-      dummy->SetOrigin(output->GetOrigin());
-      dummy->SetSpacing(output->GetSpacing());
-      this->PExtentTranslator->GatherExtents(dummy.Get());
-    }
-    else
-    {
-      this->PExtentTranslator->GatherExtents(output);
-    }
-
-    output->GetOrigin(this->Origin);
-    output->GetSpacing(this->Spacing);
-    vtkStreamingDemandDrivenPipeline::GetWholeExtent(
-      inputVector[0]->GetInformationObject(0), this->WholeExtent);
   }
   else
   {
@@ -726,8 +600,7 @@ vtknvindex_cached_bounds* vtknvindex_representation::get_cached_bounds(mi::Sint3
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_representation::set_cached_bounds(mi::Sint32 time)
 {
-  vtknvindex_cached_bounds cached_bounds(
-    this->DataBounds, this->WholeExtent, this->Origin, this->Spacing);
+  vtknvindex_cached_bounds cached_bounds(this->DataBounds);
 
   m_time_to_cached_bounds.insert(
     std::pair<mi::Sint32, vtknvindex_cached_bounds>(time, cached_bounds));

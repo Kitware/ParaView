@@ -4,6 +4,38 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
+Changes in 5.9
+--------------
+
+###Representations and Ordered Compositing for Render View###
+
+We have refactored the code that manages how data redistribution is done when
+ordered compositing is needed. Ordered compositing is used for rendering
+translucent geometries or volume rendering in parallel. Previous implementation
+used `vtkDistributedDataFilter` internally which required building of
+`vtkPKdTree` for deciding how the data is distributed. The new implementation
+uses `vtkRedistributeDataSetFilter` which supports arbitrary non-intersecting
+bounding boxes. This also results is lots of code simplification. However, it
+has resulted in API changes that will impact vtkPVDataRepresentation subclasses.
+
+* `vtkPVRenderView::MarkAsRedistributable` and
+  `vtkPVRenderView::SetOrderedCompositingInformation` have been removed. Instead one
+  should use `vtkPVRenderView::SetOrderedCompositingConfiguration` which enables
+  developers to specify exactly how the representation's data products
+  participate in the data-redistribution stage.
+* For representations based on `vtkImageVolumeRepresentation`, such
+  representation no longer need to provide a `vtkExtentTranslator` subclass to
+  the render view via `vtkPVRenderView::SetOrderedCompositingInformation` to
+  enable the view to rebuild a KdTree. The view can now simply use the data
+  bounds provided either via `vtkPVRenderView::SetGeometryBounds` or
+  `vtkPVRenderView::SetOrderedCompositingInformation`.
+
+Since most custom representations are based on vtkImageVolumeRepresentation,
+vtkUnstructuredGridVolumeRepresentation or vtkGeometryRepresentation, developers
+are advised to look at the changes to those representations to get a better feel
+for how to use `vtkPVRenderView::SetOrderedCompositingInformation` instead of
+the legacy APIs.
+
 Changes in 5.8
 ---------------
 
