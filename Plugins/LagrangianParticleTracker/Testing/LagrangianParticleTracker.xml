@@ -60,7 +60,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Plugins/LagrangianParticleTracker/Testing/Data/Baseline/LagrangianParticleTracker_InterF.png" threshold="5" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CellLengthComputationMode/ComboBox" command="activated" arguments="Last Cell Length" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CellLengthComputationMode/ComboBox" command="activated" arguments="Current Cell Length" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Plugins/LagrangianParticleTracker/Testing/Data/Baseline/LagrangianParticleTracker_InterG.png" threshold="5" />

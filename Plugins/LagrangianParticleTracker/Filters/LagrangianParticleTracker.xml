@@ -495,16 +495,10 @@
                          name="CellLengthComputationMode"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry text="Last Cell Length"
-                 value="0" />
           <Entry text="Current Cell Length"
                  value="1" />
-          <Entry text="Last Cell Velocity Direction"
-                 value="2" />
           <Entry text="Current Cell Velocity Direction"
                  value="3" />
-          <Entry text="Last Cell Divergence Theorem"
-                 value="4" />
           <Entry text="Current Cell Divergence Theorem"
                  value="5" />
         </EnumerationDomain>
