@@ -99,6 +99,7 @@ set(classes
   pqLiveInsituManager
   pqLiveInsituVisualizationManager
   pqLockViewSizeCustomDialog
+  pqLogViewerWindow
   pqMemoryInspectorPanel
   pqMultiBlockInspectorWidget
   pqMultiQueryClauseWidget
@@ -138,6 +139,7 @@ set(classes
   pqRescaleRange
   pqSILModel
   pqSILWidget
+  pqSingleLogViewerWidget
   pqSMSignalAdaptors
   pqScalarSetModel
   pqScalarValueListPropertyWidget
@@ -216,6 +218,7 @@ set(ui_files
   Resources/UI/pqLinksEditor.ui
   Resources/UI/pqLinksManager.ui
   Resources/UI/pqLockViewSizeCustomDialog.ui
+  Resources/UI/pqLogViewerWindow.ui
   Resources/UI/pqMemoryInspectorPanelForm.ui
   Resources/UI/pqMultiBlockInspectorWidget.ui
   Resources/UI/pqOrbitCreatorDialog.ui

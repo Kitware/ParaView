@@ -53,6 +53,7 @@ set(classes
   vtkPVFileInformationHelper
   vtkPVGenericAttributeInformation
   vtkPVInformation
+  vtkPVLogInformation
   vtkPVMemoryUseInformation
   vtkPVMultiClientsInformation
   vtkPVOptions

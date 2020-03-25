@@ -32,15 +32,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLogViewerWidget.h"
 #include "ui_pqLogViewerWidget.h"
 
+#include "vtkPVLogger.h"
+
+#include <QPushButton>
 #include <QRegularExpression>
+#include <QScrollBar>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 #include <QTextStream>
+
+#include <cassert>
 
 //-----------------------------------------------------------------------------
 const int RAW_DATA_ROLE = Qt::UserRole + 1;
 const int RAW_DATA_SUFFIX_ROLE = Qt::UserRole + 2;
 
+//-----------------------------------------------------------------------------
 class pqLogViewerWidget::pqInternals
 {
 public:
@@ -55,6 +62,7 @@ public:
     this->Model.clear();
     this->ActiveScopeItem.clear();
     this->LastItem = nullptr;
+    this->Ui.details->setText(tr(""));
   }
 
   void addLines(const QVector<QStringRef>& lines)
@@ -66,20 +74,23 @@ public:
     for (const auto& line : lines)
     {
       bool is_raw_log;
-      auto parts = this->extractParts(line, is_raw_log);
+      auto parts = extractLogParts(line, is_raw_log);
       if (!is_raw_log)
       {
         if (this->Model.columnCount() == 0)
         {
           // got header!
           this->Model.setColumnCount(5);
-          this->Model.setHeaderData(0, Qt::Horizontal, "message");
-          this->Model.setHeaderData(1, Qt::Horizontal, "thread id");
-          this->Model.setHeaderData(2, Qt::Horizontal, "file:line");
-          this->Model.setHeaderData(3, Qt::Horizontal, "v");
-          this->Model.setHeaderData(4, Qt::Horizontal, "uptime");
+          this->Model.setHeaderData(0, Qt::Horizontal, "Message");
+          this->Model.setHeaderData(1, Qt::Horizontal, "Process");
+          this->Model.setHeaderData(2, Qt::Horizontal, "File:line");
+          this->Model.setHeaderData(3, Qt::Horizontal, "Verbosity");
+          this->Model.setHeaderData(4, Qt::Horizontal, "Time");
           this->Ui.treeView->header()->moveSection(0, 4);
-          continue;
+          if (parts[0] == "uptime")
+          {
+            continue;
+          }
         }
 
         auto ematch = scopeEnd.match(parts[4]);
@@ -103,7 +114,8 @@ public:
         const int height = this->Ui.treeView->fontMetrics().boundingRect("(").height();
         item4->setData(QSize(0, height * 1.50), Qt::SizeHintRole);
         item4->setData(line.toString(), RAW_DATA_ROLE);
-        // item4->setData(QVariant(Qt::AlignLeft|Qt::AlignTop), Qt::TextAlignmentRole);
+        // item4->setData(QVariant(Qt::AlignLeft|Qt::AlignTop),
+        // Qt::TextAlignmentRole);
 
         auto parent = !this->ActiveScopeItem.isEmpty() ? this->ActiveScopeItem.last()
                                                        : this->Model.invisibleRootItem();
@@ -122,7 +134,6 @@ public:
       {
         if (this->LastItem != nullptr)
         {
-          // add to text in the last item.
           QString txt = this->LastItem->data(Qt::DisplayRole).toString();
           txt = txt + " " + parts[4];
           this->LastItem->setData(txt, Qt::DisplayRole);
@@ -163,32 +174,6 @@ public:
     }
     return resultText;
   }
-
-private:
-  QVector<QString> extractParts(const QStringRef& txt, bool& is_raw)
-  {
-    QVector<QString> parts{ 5 };
-    /* clang-format off */
-    QRegularExpression re(
-      R"==(\(\s*(?<time>\S+)\s*\) \[(?<tid>.+)\]\s*(?<fname>\S+)\s+(?<v>\S+)\s*\| (\.\s+)*(?<txt>.*))==");
-    /* clang-format on */
-    auto match = re.match(txt);
-    if (match.hasMatch())
-    {
-      is_raw = false;
-      parts[0] = match.captured("time");
-      parts[1] = match.captured("tid");
-      parts[2] = match.captured("fname");
-      parts[3] = match.captured("v");
-      parts[4] = match.captured("txt");
-    }
-    else
-    {
-      is_raw = true;
-      parts[4] = txt.toString();
-    }
-    return parts;
-  }
 };
 
 //-----------------------------------------------------------------------------
@@ -209,6 +194,24 @@ pqLogViewerWidget::pqLogViewerWidget(QWidget* parentObject)
     [&internals](const QModelIndex& current, const QModelIndex&) {
       auto rawTxt = internals.rawText(current);
       internals.Ui.details->setText(rawTxt);
+    });
+
+  QObject::connect(
+    internals.Ui.treeView->verticalScrollBar(), &QScrollBar::valueChanged, [&internals, this]() {
+      if (this->signalsBlocked())
+      {
+        return;
+      }
+      auto modelIndex = internals.Ui.treeView->indexAt(internals.Ui.treeView->rect().topLeft());
+      if (modelIndex.isValid())
+      {
+        auto item = internals.Model.item(modelIndex.row(), 4);
+        if (item)
+        {
+          double time = item->data(Qt::DisplayRole).toString().replace('s', '0').toDouble();
+          this->scrolled(time);
+        }
+      }
     });
 
   QObject::connect(internals.Ui.filter, &QLineEdit::textChanged,
@@ -235,4 +238,72 @@ void pqLogViewerWidget::appendLog(const QString& text)
   auto& internals = (*this->Internals);
   auto lines = text.splitRef('\n'); // TODO: handle '\r'?
   internals.addLines(lines);
+}
+
+//-----------------------------------------------------------------------------
+void pqLogViewerWidget::setFilterWildcard(QString wildcard)
+{
+  auto& internals = (*this->Internals);
+  internals.FilterModel.setFilterWildcard(wildcard);
+}
+
+//-----------------------------------------------------------------------------
+void pqLogViewerWidget::scrollToTime(double time)
+{
+  auto& internals = (*this->Internals);
+  bool block = this->blockSignals(true);
+  auto modelIndex = internals.Ui.treeView->indexAt(internals.Ui.treeView->rect().topLeft());
+  int prevDirection = 0;
+  while (modelIndex.isValid())
+  {
+    double itemTime = internals.Model.item(modelIndex.row(), 4)
+                        ->data(Qt::DisplayRole)
+                        .toString()
+                        .replace('s', '0')
+                        .toDouble();
+    if (fabs(itemTime - time) < 1e-1)
+    {
+      internals.Ui.treeView->scrollTo(modelIndex, QAbstractItemView::PositionAtTop);
+      break;
+    }
+    int direction = itemTime < time ? 1 : -1;
+    if (!prevDirection)
+    {
+      prevDirection = direction;
+    }
+    else if (prevDirection != direction)
+    {
+      internals.Ui.treeView->scrollTo(modelIndex, QAbstractItemView::PositionAtTop);
+      break;
+    }
+    modelIndex = itemTime < time ? internals.Ui.treeView->indexBelow(modelIndex)
+                                 : internals.Ui.treeView->indexAbove(modelIndex);
+  }
+  this->blockSignals(block);
+}
+
+//-----------------------------------------------------------------------------
+QVector<QString> pqLogViewerWidget::extractLogParts(const QStringRef& txt, bool& is_raw)
+{
+  QVector<QString> parts{ 5 };
+  /* clang-format off */
+  QRegularExpression re(
+    R"==(\(\s*(?<time>\S+)\s*\) \[(?<tid>.+)\]\s*(?<fname>\S+)\s+(?<v>\S+)\s*\| (\.\s+)*(?<txt>.*))==");
+  /* clang-format on */
+  auto match = re.match(txt);
+  if (match.hasMatch())
+  {
+    is_raw = false;
+    parts[0] = match.captured("time");
+    parts[1] = match.captured("tid");
+    parts[2] = match.captured("fname");
+    parts[3] = match.captured("v");
+    parts[4] = match.captured("txt");
+  }
+  else
+  {
+    is_raw = true;
+    parts[4] = txt.toString();
+  }
+  return parts;
 }

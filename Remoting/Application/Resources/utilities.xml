@@ -702,6 +702,41 @@
       </IntVectorProperty>
 
     </Proxy>
+    <!-- ================================================================= -->
+    <Proxy name="LogRecorder" class="vtkLogRecorder">
+      <IntVectorProperty name="RankEnabled"
+                         command="SetRankEnabled"
+                         default_values="-1"
+                         number_of_elements="1">
+        <Documentation>Set rank to enable logging.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="RankDisabled"
+                         command="SetRankDisabled"
+                         default_values="-1"
+                         number_of_elements="1">
+        <Documentation>Set rank to disable logging.</Documentation>
+      </IntVectorProperty>
+      <Property name="ClearLogs"
+                command="ClearLogs">
+        <Documentation>Invoke to clear logs.</Documentation>
+      </Property>
+      <IntVectorProperty name="Verbosity"
+                         command="SetVerbosity"
+                         default_values="-2"
+                         number_of_elements="1">
+        <Documentation>Set verbosity of desired log entries.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="CategoryVerbosity"
+                         command="SetCategoryVerbosity"
+                         default_values="-1 0"
+                         number_of_elements="2">
+        <Documentation>Set the verbosity of a specific ParaView logging category.</Documentation>
+      </IntVectorProperty>
+      <Property name="ResetCategoryVerbosities"
+                command="ResetCategoryVerbosities">
+        <Documentation>Invoke to clear verbosity elevations.</Documentation>
+      </Property>
+    </Proxy>
     <!-- End of group "misc" -->
   </ProxyGroup>
 

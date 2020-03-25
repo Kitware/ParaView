@@ -364,8 +364,6 @@ void LogViewerWidgetTester::basic()
   {
     widget.setLog(QString::fromLocal8Bit(f.readAll()));
   }
-
-  qApp->exec();
 }
 
 int LogViewerWidget(int argc, char* argv[])

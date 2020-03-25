@@ -33,17 +33,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqLogViewerWidget_h
 
 #include "pqWidgetsModule.h"
-#include <QScopedPointer> // for QScopedPointer
-#include <QWidget>
 
+#include <QModelIndex>    // for QModelIndex
+#include <QScopedPointer> // for QScopedPointer
+#include <QWidget>        // for QWidget
+
+/**
+ * @class pqLogViewerWidget
+ *
+ * @brief Provides a treeview with scoped logs along with a filtering
+ * capability to restrict which logs are shown.
+ */
 class PQWIDGETS_EXPORT pqLogViewerWidget : public QWidget
 {
   Q_OBJECT
   using Superclass = QWidget;
 
 public:
-  pqLogViewerWidget(QWidget* parent = 0);
-  ~pqLogViewerWidget() override;
+  pqLogViewerWidget(QWidget* parent = nullptr);
+  virtual ~pqLogViewerWidget() override;
 
   /**
    * Set the contents of the log viewer to the provided txt.
@@ -51,9 +59,36 @@ public:
   void setLog(const QString& text);
 
   /**
-   * Append to log.
+   * Append text to log.
    */
   void appendLog(const QString& text);
+
+  /**
+   * Manually set the filter wildcard. Mainly used for the global filter. Can be
+   * overridden by the log-specific wildcard.
+   */
+  void setFilterWildcard(QString wildcard);
+
+  /**
+   * Scroll to the log near the specific time.
+   */
+  void scrollToTime(double time);
+
+  /**
+   * Utility function to parse a line of log into parts.
+   * @param txt One line of the log
+   * @param is_raw Return parameter stating whether the log is in the log format or just raw text.
+   * @return A QVector containing different parts of the log.
+   */
+  static QVector<QString> extractLogParts(const QStringRef& txt, bool& is_raw);
+
+signals:
+  // Emitted when the widget is closed
+  void closed();
+
+  // \brief Emits when the scroll bar value changes, with the time of the current top log.
+  // \param time
+  void scrolled(double time);
 
 private:
   Q_DISABLE_COPY(pqLogViewerWidget);

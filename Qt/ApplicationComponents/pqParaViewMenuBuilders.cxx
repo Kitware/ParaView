@@ -74,6 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLoadMaterialsReaction.h"
 #include "pqLoadRestoreWindowLayoutReaction.h"
 #include "pqLoadStateReaction.h"
+#include "pqLogViewerReaction.h"
 #include "pqMainControlsToolbar.h"
 #include "pqManageCustomFiltersReaction.h"
 #include "pqManageFavoritesReaction.h"
@@ -308,7 +309,7 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
     pqTestingReaction::LOCK_VIEW_SIZE_CUSTOM);
   menu.addSeparator();
   new pqTimerLogReaction(menu.addAction("Timer Log") << pqSetName("actionToolsTimerLog"));
-  menu.addSeparator(); // --------------------------------------------------
+  new pqLogViewerReaction(menu.addAction("Log Viewer") << pqSetName("actionToolsLogViewer"));
 
 #if VTK_MODULE_ENABLE_ParaView_pqPython
   menu.addSeparator(); // --------------------------------------------------
