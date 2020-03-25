@@ -71,7 +71,7 @@ void updateFilter(QAbstractItemView* tree, int section, const QString& txt)
 
   if (sfmodel)
   {
-    sfmodel->setFilterRegExp(QRegExp(txt, Qt::CaseInsensitive, QRegExp::Wildcard));
+    sfmodel->setFilterRegExp(QRegExp(txt, Qt::CaseInsensitive));
     sfmodel->setFilterKeyColumn(section);
   }
   if (pqheader && sfmodel)
@@ -168,7 +168,7 @@ void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
     if (auto filterActn = new QWidgetAction(&menu))
     {
       auto ledit = new QLineEdit(&menu);
-      ledit->setPlaceholderText("Filter items");
+      ledit->setPlaceholderText("Filter items (regex)");
       ledit->setClearButtonEnabled(true);
       ledit->setText(sfmodel->filterRegExp().pattern());
 
