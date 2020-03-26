@@ -413,6 +413,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPythonView.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPythonView_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPythonViewScript.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TextSourcesInChartViews.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Threshold.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ThresholdInvert.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplaySplitView-1x1-tile0_1.png}"
@@ -562,6 +563,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   Slice.xml
   SteeringDataGenerator.xml
   TestIsoVolume.xml
+  TextSourcesInChartViews.xml
   Threshold.xml
   TransferFunctionResetOnVisibilityChange.xml
   UpdateTransferFunctionRanges.xml

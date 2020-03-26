@@ -298,6 +298,36 @@ bool vtkSMContextViewProxy::CanDisplayData(vtkSMSourceProxy* producer, int outpu
 }
 
 //----------------------------------------------------------------------------
+const char* vtkSMContextViewProxy::GetRepresentationType(vtkSMSourceProxy* producer, int outputPort)
+{
+  if (vtkPVXMLElement* hints = producer->GetHints())
+  {
+    // If the source has an hint as follows, then it's a text producer and must
+    // be display-able.
+    //  <Hints>
+    //    <OutputPort name="..." index="..." type="text" />
+    //  </Hints>
+    for (unsigned int cc = 0, max = hints->GetNumberOfNestedElements(); cc < max; cc++)
+    {
+      int index;
+      vtkPVXMLElement* child = hints->GetNestedElement(cc);
+      const char* childName = child->GetName();
+      const char* childType = child->GetAttribute("type");
+      if (childName && strcmp(childName, "OutputPort") == 0 &&
+        child->GetScalarAttribute("index", &index) && index == outputPort && childType)
+      {
+        if (strcmp(childType, "text") == 0)
+        {
+          return "ChartTextRepresentation";
+        }
+      }
+    }
+  }
+
+  return this->Superclass::GetRepresentationType(producer, outputPort);
+}
+
+//----------------------------------------------------------------------------
 vtkSelection* vtkSMContextViewProxy::GetCurrentSelection()
 {
   vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(this->GetClientSideObject());

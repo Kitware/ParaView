@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>294</width>
-    <height>214</height>
+    <width>242</width>
+    <height>195</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,11 +32,20 @@
       <bool>true</bool>
      </property>
      <layout class="QGridLayout">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
        <number>9</number>
       </property>
       <property name="spacing">
-       <number>6</number>
+       <number>2</number>
       </property>
       <item row="0" column="1">
        <widget class="QToolButton" name="toolButtonUC">
@@ -269,31 +278,27 @@
       <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="doubleSpinBox_Pos1Y">
-        <property name="decimals">
-         <number>6</number>
-        </property>
-        <property name="singleStep">
-         <double>0.010000000000000</double>
-        </property>
-       </widget>
-      </item>
+      <property name="spacing">
+       <number>2</number>
+      </property>
       <item row="0" column="0">
-       <widget class="QDoubleSpinBox" name="doubleSpinBox_Pos1X">
-        <property name="decimals">
-         <number>6</number>
-        </property>
-        <property name="singleStep">
-         <double>0.010000000000000</double>
-        </property>
-       </widget>
+       <widget class="pqDoubleLineEdit" name="pos1X"/>
+      </item>
+      <item row="0" column="1">
+       <widget class="pqDoubleLineEdit" name="pos1Y"/>
       </item>
      </layout>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqDoubleLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqDoubleLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
  </resources>

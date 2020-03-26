@@ -85,6 +85,11 @@ public:
    */
   bool CanDisplayData(vtkSMSourceProxy* producer, int outputPort) override;
 
+  /**
+   * Overridden to create `ChartTextRepresentation` for text sources.
+   */
+  const char* GetRepresentationType(vtkSMSourceProxy* producer, int outputPort) override;
+
   vtkSelection* GetCurrentSelection();
 
 protected:

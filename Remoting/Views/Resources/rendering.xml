@@ -354,23 +354,7 @@
     <!-- End of group "props" -->
   </ProxyGroup>
   <ProxyGroup name="properties">
-    <Proxy class="vtkTextProperty"
-           name="TextProperty"
-           processes="client|dataserver|renderserver" >
-      <DoubleVectorProperty animateable="0"
-                            argument_is_array="1"
-                            command="SetColor"
-                            default_values="1.0 1.0 1.0"
-                            name="Color"
-                            number_of_elements="3">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Hints>
-          <PropertyLink group="settings" proxy="ColorPalette" property="TextAnnotationColor"
-            unlink_if_modified="1" />
-        </Hints>
-      </DoubleVectorProperty>
+    <Proxy class="vtkTextProperty" name="TextPropertyBase" processes="client|dataserver|renderserver" >
       <DoubleVectorProperty animateable="0"
                             command="SetOpacity"
                             default_values="1.0"
@@ -478,6 +462,41 @@
       </IntVectorProperty>
       <!-- End of TextProperty -->
     </Proxy>
+
+    <Proxy class="vtkTextProperty" name="TextProperty"
+           base_proxygroup="properties"
+           base_proxyname="TextPropertyBase"
+           processes="client|dataserver|renderserver">
+      <DoubleVectorProperty animateable="0"
+                            argument_is_array="1"
+                            command="SetColor"
+                            default_values="1.0 1.0 1.0"
+                            name="Color"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="TextAnnotationColor"
+            unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+    </Proxy>
+
+    <Proxy class="vtkTextProperty" name="ChartTextProperty"
+           base_proxygroup="properties"
+           base_proxyname="TextPropertyBase"
+           processes="client|dataserver|renderserver">
+       <!-- same as "TextProperty" except with different color that is not
+            linked with TextAnnotationColor -->
+      <DoubleVectorProperty animateable="0"
+                            argument_is_array="1"
+                            command="SetColor"
+                            default_values="0.0 0.0 0.0"
+                            name="Color"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1" min="0 0 0" name="range" />
+      </DoubleVectorProperty>
+    </Proxy>
+
   </ProxyGroup>
 
   <ProxyGroup name="additional_lights" label="Lights">
