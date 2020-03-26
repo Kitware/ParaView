@@ -87,9 +87,9 @@ pqTextLocationWidget::pqTextLocationWidget(
     QObject::connect(
       ui.groupBoxPosition, SIGNAL(toggled(bool)), this, SLOT(groupBoxPositionClicked(bool)));
     this->addPropertyLink(
-      ui.doubleSpinBox_Pos1X, "value", SIGNAL(valueChanged(double)), smproperty, 0);
+      ui.pos1X, "text2", SIGNAL(textChangedAndEditingFinished()), smproperty, 0);
     this->addPropertyLink(
-      ui.doubleSpinBox_Pos1Y, "value", SIGNAL(valueChanged(double)), smproperty, 1);
+      ui.pos1Y, "text2", SIGNAL(textChangedAndEditingFinished()), smproperty, 1);
   }
   else
   {
