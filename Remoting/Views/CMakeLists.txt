@@ -37,6 +37,7 @@ set(classes
   vtkCaveSynchronizedRenderers
   vtkChartRepresentation
   vtkChartSelectionRepresentation
+  vtkChartTextRepresentation
   vtkChartWarning
   vtkCompositeRepresentation
   vtkContext2DScalarBarActor
