@@ -572,6 +572,7 @@
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
       <DoubleVectorProperty information_only="1"
+                            repeatable="1"
                             name="TimestepValues">
         <Documentation>The timesteps currently available. This property does
         not have any information helper since vtkSMTimeKeeperProxy keeps this

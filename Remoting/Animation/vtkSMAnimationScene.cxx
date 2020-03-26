@@ -363,9 +363,9 @@ void vtkSMAnimationScene::TimeKeeperTimeRangeChanged()
 {
   // If time keeper has a non-trivial time range and the times are not locked,
   // then we change the times to match the time range.
-  vtkVector2d range(vtkSMPropertyHelper(this->TimeKeeper, "TimeRange").GetAsDouble(0),
-    vtkSMPropertyHelper(this->TimeKeeper, "TimeRange").GetAsDouble(1));
-  if (range[1] > range[0])
+  vtkVector2d range;
+  vtkSMPropertyHelper(this->TimeKeeper, "TimeRange").Get(range.GetData(), 2);
+  if (range[0] <= range[1])
   {
     this->InvokeEvent(vtkSMAnimationScene::UpdateStartEndTimesEvent, &range);
   }

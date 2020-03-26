@@ -132,6 +132,7 @@ void vtkSMAnimationSceneProxy::OnUpdateStartEndTimesEvent(
   vtkSMPropertyHelper startTime(this, "StartTime");
   vtkSMPropertyHelper endTime(this, "EndTime");
   vtkVector2d newRange(startTime.GetAsDouble(0), endTime.GetAsDouble(0));
+  const auto current_delta = (newRange[1] - newRange[0]);
   if (!caller->GetLockStartTime())
   {
     newRange.SetX(range.GetX());
@@ -139,6 +140,14 @@ void vtkSMAnimationSceneProxy::OnUpdateStartEndTimesEvent(
   if (!caller->GetLockEndTime())
   {
     newRange.SetY(range.GetY());
+  }
+
+  // if range[0] == range[1], which can happen when there's only 1 timestep in
+  // the dataset, we push back end time to avoid having an animation with no
+  // range.
+  if (newRange[0] == newRange[1])
+  {
+    newRange[1] += current_delta > 0 ? current_delta : 1.0;
   }
   startTime.Set(newRange.GetX());
   endTime.Set(newRange.GetY());
