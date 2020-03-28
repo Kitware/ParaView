@@ -47,4 +47,9 @@ vtk_module_add_python_package(ParaView::CinemaPython
   MODULE_DESTINATION  "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}")
 
 vtk_module_add_python_module(ParaView::CinemaPython
-  PACKAGES "paraview.tpl.cinema_python")
+  PACKAGES
+    "paraview.tpl.cinema_python"
+    "paraview.tpl.cinema_python.images"
+    "paraview.tpl.cinema_python.database"
+    "paraview.tpl.cinema_python.adaptors"
+    "paraview.tpl.cinema_python.adaptors.paraview")
