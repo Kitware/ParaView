@@ -71,12 +71,15 @@ if (NOT BUILD_SHARED_LIBS)
   # scan all ParaView modules and collect lists of Python modules they
   # provide/generate.
   set(_paraview_python_files)
+  set(_paraview_python_modules)
   foreach (_paraview_module IN LISTS paraview_modules)
     _vtk_module_get_module_property("${_paraview_module}"
       PROPERTY "python_modules"
       VARIABLE _paraview_module_python_files)
     list(APPEND _paraview_python_files
       ${_paraview_module_python_files})
+    list(APPEND _paraview_python_modules
+      "${_paraview_module}")
   endforeach()
 
   list(APPEND _paraview_python_files
@@ -87,7 +90,8 @@ if (NOT BUILD_SHARED_LIBS)
     OUTPUT            "${_paraview_python_zip}"
     COMMAND           ${CMAKE_COMMAND} -E tar "cfv"
                       "${_paraview_python_zip}" --format=zip ${_paraview_python_files}
-    DEPENDS           ${_paraview_python_files}
+    DEPENDS           ${_paraview_python_modules}
+                      ${_paraview_python_files}
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/${VTK_PYTHON_SITE_PACKAGES_SUFFIX}"
     COMMENT           "Creating _paraview.zip Python modules archive")
   install(
