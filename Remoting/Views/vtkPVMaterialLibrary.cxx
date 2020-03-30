@@ -14,19 +14,20 @@
 =========================================================================*/
 #include "vtkPVMaterialLibrary.h"
 
-#include "vtkPVConfig.h"
-
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVConfig.h"
+#include "vtkProcessModule.h"
+#include "vtkResourceFileLocator.h"
+#include "vtkVersion.h"
+
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
 #include "vtkOSPRayMaterialLibrary.h"
 #endif
-#include "vtkResourceFileLocator.h"
-#include "vtkVersion.h"
-#include <vtksys/SystemTools.hxx>
 
 #include <cassert>
 #include <string>
+#include <vtksys/SystemTools.hxx>
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
 const char ENV_PATH_SEP = ';';
@@ -59,8 +60,14 @@ vtkPVMaterialLibrary::vtkPVMaterialLibrary()
   }
 
   // and we look in some default locations relative to the exe
-  auto vtklibs = vtkGetLibraryPathForSymbol(GetVTKVersion);
-  assert(!vtklibs.empty());
+  std::string vtklibs = vtkGetLibraryPathForSymbol(GetVTKVersion);
+  if (vtklibs.empty())
+  {
+    // this can happen for static builds (see paraview/paraview#19775),
+    // in which case we just we the executable path to locate the materials.
+    auto pm = vtkProcessModule::GetProcessModule();
+    vtklibs = pm ? std::string(pm->GetSelfDir()) : std::string();
+  }
 
   // where materials might be in relation to that
   std::vector<std::string> prefixes = {
