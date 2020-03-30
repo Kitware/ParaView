@@ -2168,6 +2168,25 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221, timeout=60
     else:
       return None
 
+def ConnectToCatalyst(ds_host='localhost', ds_port=22222):
+    """
+    Use this function to create a new catalyst session.
+    """
+    # Create an InsituLink
+    insituLink = CreateProxy('coprocessing', 'LiveInsituLink')
+    insituLink.GetProperty('InsituPort').SetElement(0, ds_port)
+    insituLink.GetProperty('Hostname').SetElement(0, ds_host)
+    # set process type to Visualization
+    insituLink.GetProperty('ProcessType').SetElement(0, 0)
+    insituLink.UpdateVTKObjects()
+
+    # Create dummy session
+    id = vtkSMSession.ConnectToCatalyst()
+    connection = GetConnectionFromId(id)
+    insituLink.SetInsituProxyManager(connection.Session.GetSessionProxyManager())
+
+    return insituLink
+
 def ReverseConnect(port=11111):
     """
     Use this function call to create a new session. On success,
