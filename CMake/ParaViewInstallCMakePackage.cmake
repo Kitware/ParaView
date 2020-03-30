@@ -92,6 +92,7 @@ if (PARAVIEW_ENABLE_VISITBRIDGE)
     FindBoxlib.cmake
     FindGFortran.cmake
     FindMili.cmake
+    FindRapidJSON.cmake
     FindSILO.cmake)
   foreach (paraview_cmake_module_file IN LISTS paraview_visitbridge_cmake_module_files)
     configure_file(
