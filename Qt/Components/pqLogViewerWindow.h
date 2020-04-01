@@ -44,6 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkLogger.h"
 #include "vtkSMSession.h"
 
+#include <array>
+
 namespace Ui
 {
 class pqLogViewerWindow;
@@ -82,17 +84,6 @@ public:
    */
   void addLogView();
 
-  /**
-   * Set the verbosity level of a certain category of ParaView log message according
-   * to GUI selections.
-   */
-  void setCategoryVerbosity();
-
-  /**
-   * Clear all previous verbosity elevations.
-   */
-  void resetAllCategoryVerbosities();
-
 protected:
   // Override to handle custom close button icon in tab widget
   bool eventFilter(QObject* obj, QEvent* event) override;
@@ -100,20 +91,8 @@ protected:
 private slots:
   void linkedScroll(double time);
 
-  // Set the verbosity of logs recorded from the client
-  void setClientVerbosity(int index);
-
-  // Set the verbosity of logs recorded from the server
-  void setServerVerbosity(int index);
-
-  // Set the verbosity of logs recorded from the data server
-  void setDataServerVerbosity(int index);
-
-  // Set the verbosity of logs recorded from the render server.
-  void setRenderServerVerbosity(int index);
-
-  // Handle when the category combo box is changed
-  void categoryChanged(int index);
+  // Set the verbosity of logs on a given process
+  void setProcessVerbosity(int process, int index);
 
 private:
   // Add a log view to the window
@@ -123,7 +102,10 @@ private:
   void initializeRankComboBox();
   void initializeVerbosityComboBoxes();
   void initializeVerbosities(QComboBox* combobox);
-  void initializeCategoryComboBox();
+
+  void updateCategory(int category, bool promote);
+
+  void updateCategories();
 
   // Convert combobox index to verbosity
   vtkLogger::Verbosity getVerbosity(int index);
@@ -137,6 +119,7 @@ private:
   QList<vtkSmartPointer<vtkSMProxy> > LogRecorderProxies;
   using LogLocation = QPair<vtkSmartPointer<vtkSMProxy>, int>;
   QMap<LogLocation, double> RefTimes;
+  std::array<bool, 5> CategoryPromoted;
 };
 
 #endif // pqLogViewerWindow_h

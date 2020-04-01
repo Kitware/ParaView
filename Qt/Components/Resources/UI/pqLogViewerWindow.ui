@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1155</width>
-    <height>720</height>
+    <height>778</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,6 +22,9 @@
      <layout class="QVBoxLayout" name="settingsLayout">
       <property name="spacing">
        <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
       </property>
       <item>
        <widget class="QWidget" name="newLogWidget" native="true">
@@ -122,9 +125,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QWidget" name="widget" native="true"/>
-      </item>
-      <item>
        <widget class="QWidget" name="globalFilterSettings" native="true">
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <property name="spacing">
@@ -188,7 +188,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="verbositySettingsLabel">
            <property name="font">
             <font>
              <weight>75</weight>
@@ -277,7 +277,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Category Verbosity</string>
+            <string>Categories</string>
            </property>
           </widget>
          </item>
@@ -295,38 +295,63 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="categoryLabel">
+       <widget class="QLabel" name="alwaysLogLabel">
         <property name="text">
-         <string>Category</string>
+         <string>Always Log Messages About...</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="categoryComboBox">
-        <property name="toolTip">
-         <string>Select a log category whose verbosity you want to change</string>
+       <widget class="QWidget" name="categoryWidget" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>4</height>
+         </size>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="targetLabel">
-        <property name="text">
-         <string>Verbosity Level</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="targetVerbosities">
-        <property name="toolTip">
-         <string>Set desired verbosity of log category on all processes</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="resetAllCategoryVerbositiesButton">
-        <property name="text">
-         <string>Reset All Category Verbosities</string>
-        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QCheckBox" name="dataMovementCheckBox">
+           <property name="text">
+            <string>Data Movement</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="renderingCheckBox">
+           <property name="text">
+            <string>Rendering</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="applicationCheckBox">
+           <property name="text">
+            <string>Application</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="pipelineCheckBox">
+           <property name="text">
+            <string>Pipeline</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="pluginsCheckBox">
+           <property name="text">
+            <string>Plugins</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
       <item>

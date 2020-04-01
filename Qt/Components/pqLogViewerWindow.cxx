@@ -50,7 +50,18 @@ namespace
 {
 std::map<int, vtkLogger::Verbosity> indexToVerbosity;
 std::map<vtkLogger::Verbosity, int> verbosityToIndex;
-constexpr int PQTAB_WIDGET_PIXMAP_SIZE = 16;
+constexpr int PIXMAP_SIZE = 16;
+
+constexpr int CLIENT_PROCESS = 0;
+constexpr int SERVER_PROCESS = 1;
+constexpr int DATA_SERVER_PROCESS = 1;
+constexpr int RENDER_SERVER_PROCESS = 2;
+
+constexpr int DATA_MOVEMENT_CATEGORY = 0;
+constexpr int RENDERING_CATEGORY = 1;
+constexpr int APPLICATION_CATEGORY = 2;
+constexpr int PIPELINE_CATEGORY = 3;
+constexpr int PLUGINS_CATEGORY = 4;
 }
 
 //----------------------------------------------------------------------------
@@ -91,12 +102,17 @@ pqLogViewerWindow::pqLogViewerWindow()
   verbosityToIndex[vtkLogger::VERBOSITY_8] = 13;
   // verbosityToIndex[vtkLogger::VERBOSITY_9] = 14; same as TRACE, prefer TRACE
 
+  for (size_t i = 0; i < this->CategoryPromoted.size(); ++i)
+  {
+    this->CategoryPromoted[i] = false;
+  }
+
   auto* server = pqActiveObjects::instance().activeServer();
   auto* pxm = server->proxyManager();
   this->LogRecorderProxies.push_back(pxm->NewProxy("misc", "LogRecorder"));
-  this->LogRecorderProxies[0]->SetLocation(vtkSMSession::CLIENT);
-  vtkSMPropertyHelper(this->LogRecorderProxies[0], "RankEnabled").Set(0);
-  this->LogRecorderProxies[0]->UpdateVTKObjects();
+  this->LogRecorderProxies[CLIENT_PROCESS]->SetLocation(vtkSMSession::CLIENT);
+  vtkSMPropertyHelper(this->LogRecorderProxies[CLIENT_PROCESS], "RankEnabled").Set(0);
+  this->LogRecorderProxies[CLIENT_PROCESS]->UpdateVTKObjects();
 
   this->Ui->processComboBox->addItem("Client");
   vtkNew<vtkPVServerInformation> serverInfo;
@@ -106,26 +122,26 @@ pqLogViewerWindow::pqLogViewerWindow()
     if (server->isRenderServerSeparate())
     {
       this->LogRecorderProxies.push_back(pxm->NewProxy("misc", "LogRecorder"));
-      this->LogRecorderProxies[1]->SetLocation(vtkSMSession::DATA_SERVER);
-      this->LogRecorderProxies[1]->UpdateVTKObjects();
+      this->LogRecorderProxies[DATA_SERVER_PROCESS]->SetLocation(vtkSMSession::DATA_SERVER);
+      this->LogRecorderProxies[DATA_SERVER_PROCESS]->UpdateVTKObjects();
 
       this->LogRecorderProxies.push_back(pxm->NewProxy("misc", "LogRecorder"));
-      this->LogRecorderProxies[2]->SetLocation(vtkSMSession::RENDER_SERVER);
-      this->LogRecorderProxies[2]->UpdateVTKObjects();
+      this->LogRecorderProxies[RENDER_SERVER_PROCESS]->SetLocation(vtkSMSession::RENDER_SERVER);
+      this->LogRecorderProxies[RENDER_SERVER_PROCESS]->UpdateVTKObjects();
 
       this->Ui->processComboBox->addItem("Data Server");
       this->Ui->processComboBox->addItem("Render Server");
 
-      server->session()->GatherInformation(vtkPVSession::DATA_SERVER, serverInfo, 0);
+      server->session()->GatherInformation(DATA_SERVER_PROCESS, serverInfo, 0);
       this->RankNumbers.push_back(serverInfo->GetNumberOfProcesses());
-      server->session()->GatherInformation(vtkPVSession::RENDER_SERVER, serverInfo, 0);
+      server->session()->GatherInformation(RENDER_SERVER_PROCESS, serverInfo, 0);
       this->RankNumbers.push_back(serverInfo->GetNumberOfProcesses());
     }
     else
     {
       this->LogRecorderProxies.push_back(pxm->NewProxy("misc", "LogRecorder"));
-      this->LogRecorderProxies[1]->SetLocation(vtkSMSession::SERVERS);
-      this->LogRecorderProxies[1]->UpdateVTKObjects();
+      this->LogRecorderProxies[SERVER_PROCESS]->SetLocation(vtkSMSession::SERVERS);
+      this->LogRecorderProxies[SERVER_PROCESS]->UpdateVTKObjects();
 
       this->Ui->processComboBox->addItem("Server");
 
@@ -145,32 +161,25 @@ pqLogViewerWindow::pqLogViewerWindow()
 
   this->initializeRankComboBox();
   this->initializeVerbosityComboBoxes();
-  this->initializeCategoryComboBox();
 
   QObject::connect(this->Ui->processComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
     this, &pqLogViewerWindow::initializeRankComboBox);
   QObject::connect(
     this->Ui->addLogButton, &QPushButton::pressed, this, &pqLogViewerWindow::addLogView);
   QObject::connect(this->Ui->clientVerbosities, QOverload<int>::of(&QComboBox::currentIndexChanged),
-    this, &pqLogViewerWindow::setClientVerbosity);
+    [=](int index) { this->setProcessVerbosity(CLIENT_PROCESS, index); });
   QObject::connect(this->Ui->serverVerbosities, QOverload<int>::of(&QComboBox::currentIndexChanged),
-    this, &pqLogViewerWindow::setServerVerbosity);
+    [=](int index) { this->setProcessVerbosity(SERVER_PROCESS, index); });
   QObject::connect(this->Ui->dataServerVerbosities,
-    QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-    &pqLogViewerWindow::setDataServerVerbosity);
+    QOverload<int>::of(&QComboBox::currentIndexChanged),
+    [=](int index) { this->setProcessVerbosity(DATA_SERVER_PROCESS, index); });
   QObject::connect(this->Ui->renderServerVerbosities,
-    QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-    &pqLogViewerWindow::setRenderServerVerbosity);
+    QOverload<int>::of(&QComboBox::currentIndexChanged),
+    [=](int index) { this->setProcessVerbosity(RENDER_SERVER_PROCESS, index); });
   QObject::connect(
     this->Ui->refreshButton, &QPushButton::pressed, this, &pqLogViewerWindow::refresh);
   QObject::connect(
     this->Ui->clearLogsButton, &QPushButton::pressed, this, &pqLogViewerWindow::clear);
-  QObject::connect(this->Ui->categoryComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-    this, &pqLogViewerWindow::categoryChanged);
-  QObject::connect(this->Ui->targetVerbosities, QOverload<int>::of(&QComboBox::currentIndexChanged),
-    this, &pqLogViewerWindow::setCategoryVerbosity);
-  QObject::connect(this->Ui->resetAllCategoryVerbositiesButton, &QPushButton::pressed, this,
-    &pqLogViewerWindow::resetAllCategoryVerbosities);
   QObject::connect(this->Ui->logTabWidget, &QTabWidget::tabCloseRequested, this->Ui->logTabWidget,
     &QTabWidget::removeTab);
 
@@ -184,7 +193,7 @@ pqLogViewerWindow::pqLogViewerWindow()
     this->Ui->renderServerVerbosityLabel->setVisible(false);
     this->Ui->renderServerVerbosities->setVisible(false);
     vtkNew<vtkPVLogInformation> serverLogInfo;
-    this->LogRecorderProxies[1]->GatherInformation(serverLogInfo);
+    this->LogRecorderProxies[SERVER_PROCESS]->GatherInformation(serverLogInfo);
     this->Ui->serverVerbosities->setCurrentIndex(
       getVerbosityIndex(static_cast<vtkLogger::Verbosity>(serverLogInfo->GetVerbosity())));
   }
@@ -193,10 +202,10 @@ pqLogViewerWindow::pqLogViewerWindow()
     this->Ui->serverVerbosities->setVisible(false);
     this->Ui->serverVerbosityLabel->setVisible(false);
     vtkNew<vtkPVLogInformation> serverLogInfo;
-    this->LogRecorderProxies[1]->GatherInformation(serverLogInfo);
+    this->LogRecorderProxies[DATA_SERVER_PROCESS]->GatherInformation(serverLogInfo);
     this->Ui->dataServerVerbosities->setCurrentIndex(
       getVerbosityIndex(static_cast<vtkLogger::Verbosity>(serverLogInfo->GetVerbosity())));
-    this->LogRecorderProxies[2]->GatherInformation(serverLogInfo);
+    this->LogRecorderProxies[RENDER_SERVER_PROCESS]->GatherInformation(serverLogInfo);
     this->Ui->renderServerVerbosities->setCurrentIndex(
       getVerbosityIndex(static_cast<vtkLogger::Verbosity>(serverLogInfo->GetVerbosity())));
   }
@@ -210,7 +219,17 @@ pqLogViewerWindow::pqLogViewerWindow()
     this->Ui->serverVerbosityLabel->setVisible(false);
   }
 
-  this->categoryChanged(0);
+  // Set up category checkbox connections
+  QObject::connect(this->Ui->dataMovementCheckBox, &QCheckBox::stateChanged,
+    [=](bool checked) { this->updateCategory(DATA_MOVEMENT_CATEGORY, checked); });
+  QObject::connect(this->Ui->renderingCheckBox, &QCheckBox::stateChanged,
+    [=](bool checked) { this->updateCategory(RENDERING_CATEGORY, checked); });
+  QObject::connect(this->Ui->applicationCheckBox, &QCheckBox::stateChanged,
+    [=](bool checked) { this->updateCategory(APPLICATION_CATEGORY, checked); });
+  QObject::connect(this->Ui->pipelineCheckBox, &QCheckBox::stateChanged,
+    [=](bool checked) { this->updateCategory(PIPELINE_CATEGORY, checked); });
+  QObject::connect(this->Ui->pluginsCheckBox, &QCheckBox::stateChanged,
+    [=](bool checked) { this->updateCategory(PLUGINS_CATEGORY, checked); });
 }
 
 //----------------------------------------------------------------------------
@@ -275,58 +294,6 @@ void pqLogViewerWindow::recordRefTimes()
 }
 
 //----------------------------------------------------------------------------
-void pqLogViewerWindow::setCategoryVerbosity()
-{
-  int categoryIndex = this->Ui->categoryComboBox->currentIndex();
-  int targetIndex = this->Ui->targetVerbosities->currentIndex();
-  vtkLogger::Verbosity verbosity = getVerbosity(targetIndex);
-  switch (categoryIndex)
-  {
-    case 0:
-      vtkPVLogger::SetDataMovementVerbosity(verbosity);
-      break;
-    case 1:
-      vtkPVLogger::SetRenderingVerbosity(verbosity);
-      break;
-    case 2:
-      vtkPVLogger::SetApplicationVerbosity(verbosity);
-      break;
-    case 3:
-      vtkPVLogger::SetPipelineVerbosity(verbosity);
-      break;
-    case 4:
-      vtkPVLogger::SetPluginVerbosity(verbosity);
-      break;
-  }
-  for (auto logRecorderProxy : this->LogRecorderProxies)
-  {
-    vtkSMPropertyHelper(logRecorderProxy, "CategoryVerbosity").Set(0, categoryIndex);
-    vtkSMPropertyHelper(logRecorderProxy, "CategoryVerbosity").Set(1, static_cast<int>(verbosity));
-    logRecorderProxy->UpdateProperty("CategoryVerbosity", 1);
-  }
-}
-
-//----------------------------------------------------------------------------
-void pqLogViewerWindow::resetAllCategoryVerbosities()
-{
-  auto verbosity = vtkPVLogger::GetDefaultVerbosity();
-
-  vtkPVLogger::SetDataMovementVerbosity(verbosity);
-  vtkPVLogger::SetRenderingVerbosity(verbosity);
-  vtkPVLogger::SetApplicationVerbosity(verbosity);
-  vtkPVLogger::SetPipelineVerbosity(verbosity);
-  vtkPVLogger::SetPluginVerbosity(verbosity);
-
-  for (auto logRecorderProxy : this->LogRecorderProxies)
-  {
-    logRecorderProxy->InvokeCommand("ResetCategoryVerbosities");
-  }
-
-  int index = this->Ui->categoryComboBox->currentIndex();
-  this->categoryChanged(index);
-}
-
-//----------------------------------------------------------------------------
 bool pqLogViewerWindow::eventFilter(QObject* object, QEvent* event)
 {
   if (event->type() == QEvent::MouseButtonRelease && qobject_cast<QLabel*>(object))
@@ -379,9 +346,8 @@ void pqLogViewerWindow::appendLogView(pqSingleLogViewerWidget* logView)
   label->setObjectName("close");
   label->setToolTip("Close log");
   label->setStatusTip("Close log");
-  label->setPixmap(label->style()
-                     ->standardIcon(QStyle::SP_TitleBarCloseButton)
-                     .pixmap(PQTAB_WIDGET_PIXMAP_SIZE, PQTAB_WIDGET_PIXMAP_SIZE));
+  label->setPixmap(
+    label->style()->standardIcon(QStyle::SP_TitleBarCloseButton).pixmap(PIXMAP_SIZE, PIXMAP_SIZE));
   this->Ui->logTabWidget->tabBar()->setTabButton(tabIndex, QTabBar::RightSide, label);
   label->installEventFilter(this);
 
@@ -408,7 +374,6 @@ void pqLogViewerWindow::initializeRankComboBox()
 void pqLogViewerWindow::initializeVerbosityComboBoxes()
 {
   this->initializeVerbosities(this->Ui->clientVerbosities);
-  this->initializeVerbosities(this->Ui->targetVerbosities);
   if (this->LogRecorderProxies.size() == 2)
   {
     this->initializeVerbosities(this->Ui->serverVerbosities);
@@ -436,13 +401,38 @@ void pqLogViewerWindow::initializeVerbosities(QComboBox* combobox)
 }
 
 //----------------------------------------------------------------------------
-void pqLogViewerWindow::initializeCategoryComboBox()
+void pqLogViewerWindow::updateCategory(int category, bool promote)
 {
-  this->Ui->categoryComboBox->addItem("PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY");
-  this->Ui->categoryComboBox->addItem("PARAVIEW_LOG_RENDERING_VERBOSITY");
-  this->Ui->categoryComboBox->addItem("PARAVIEW_LOG_APPLICATION_VERBOSITY");
-  this->Ui->categoryComboBox->addItem("PARAVIEW_LOG_PIPELINE_VERBOSITY");
-  this->Ui->categoryComboBox->addItem("PARAVIEW_LOG_PLUGIN_VERBOSITY");
+  this->CategoryPromoted[static_cast<int>(category)] = promote;
+
+  auto DoUpdate = [=](int proxyIndex, int category) {
+    // Reset log messages to INFO
+    int verbosity = static_cast<int>(vtkLogger::VERBOSITY_TRACE);
+    if (promote)
+    {
+      // Promote log messages to the chosen verbosity on the process
+      verbosity = vtkSMPropertyHelper(this->LogRecorderProxies[proxyIndex], "Verbosity").GetAsInt();
+    }
+
+    vtkSMPropertyHelper(this->LogRecorderProxies[proxyIndex], "CategoryVerbosity").Set(0, category);
+    vtkSMPropertyHelper(this->LogRecorderProxies[proxyIndex], "CategoryVerbosity")
+      .Set(1, verbosity);
+    this->LogRecorderProxies[proxyIndex]->UpdateVTKObjects();
+  };
+
+  for (int proxyIndex = 0; proxyIndex < this->LogRecorderProxies.size(); ++proxyIndex)
+  {
+    DoUpdate(proxyIndex, category);
+  }
+}
+
+//----------------------------------------------------------------------------
+void pqLogViewerWindow::updateCategories()
+{
+  for (size_t i = 0; i < this->CategoryPromoted.size(); ++i)
+  {
+    this->updateCategory(i, this->CategoryPromoted[i]);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -480,61 +470,12 @@ void pqLogViewerWindow::linkedScroll(double time)
 }
 
 //----------------------------------------------------------------------------
-void pqLogViewerWindow::setClientVerbosity(int index)
+void pqLogViewerWindow::setProcessVerbosity(int process, int index)
 {
-  vtkSMPropertyHelper(this->LogRecorderProxies[0], "Verbosity").Set(this->getVerbosity(index));
-  this->LogRecorderProxies[0]->UpdateProperty("Verbosity");
-}
+  int verbosity = static_cast<int>(this->getVerbosity(index));
+  vtkSMPropertyHelper(this->LogRecorderProxies[process], "Verbosity").Set(verbosity);
+  this->LogRecorderProxies[process]->UpdateProperty("Verbosity");
 
-//----------------------------------------------------------------------------
-void pqLogViewerWindow::setServerVerbosity(int index)
-{
-  vtkSMPropertyHelper(this->LogRecorderProxies[1], "Verbosity").Set(this->getVerbosity(index));
-  this->LogRecorderProxies[1]->UpdateProperty("Verbosity");
-}
-
-//----------------------------------------------------------------------------
-void pqLogViewerWindow::setDataServerVerbosity(int index)
-{
-  vtkSMPropertyHelper(this->LogRecorderProxies[1], "Verbosity").Set(this->getVerbosity(index));
-  this->LogRecorderProxies[1]->UpdateProperty("Verbosity");
-}
-
-//----------------------------------------------------------------------------
-void pqLogViewerWindow::setRenderServerVerbosity(int index)
-{
-  vtkSMPropertyHelper(this->LogRecorderProxies[2], "Verbosity").Set(this->getVerbosity(index));
-  this->LogRecorderProxies[2]->UpdateProperty("Verbosity");
-}
-
-//----------------------------------------------------------------------------
-void pqLogViewerWindow::categoryChanged(int index)
-{
-  vtkLogger::Verbosity verbosity = vtkLogger::VERBOSITY_OFF;
-  switch (index)
-  {
-    case 0:
-      verbosity = vtkPVLogger::GetDataMovementVerbosity();
-      break;
-
-    case 1:
-      verbosity = vtkPVLogger::GetRenderingVerbosity();
-      break;
-
-    case 2:
-      verbosity = vtkPVLogger::GetApplicationVerbosity();
-      break;
-
-    case 3:
-      verbosity = vtkPVLogger::GetPipelineVerbosity();
-      break;
-
-    case 4:
-      verbosity = vtkPVLogger::GetPluginVerbosity();
-      break;
-  }
-
-  bool blocked = this->Ui->targetVerbosities->blockSignals(true);
-  this->Ui->targetVerbosities->setCurrentIndex(getVerbosityIndex(verbosity));
-  this->Ui->targetVerbosities->blockSignals(blocked);
+  // Update the category verbosity
+  this->updateCategories();
 }
