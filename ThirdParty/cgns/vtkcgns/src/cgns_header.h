@@ -31,6 +31,7 @@ typedef char char_66[66]; /* 32 + '/' + 32 + '\0' */
 #else
 typedef char char_66[33]; /* 32 + '\0' (caller's malloc compat issues) */
 #endif
+typedef char char_md[CG_MAX_GOTO_DEPTH*33+1]; /* ('/'+ 32)*MAX_GOTO_DEPTH + '\0' (FAMILY TREE) */
 typedef char const cchar_33[33];
 typedef cgsize_t cgsize6_t[6];
 typedef int cgint3_t[3];
@@ -166,7 +167,7 @@ typedef struct {            /* Descriptor_t node            */
 typedef struct {
     double id;
     char_33 name;
-    char_66 family;
+    char_md family;  /* ** FAMILY TREE ** */
 } cgns_famname;
 
 typedef struct {            /* DimensionalUnits_t Node      */
@@ -249,7 +250,7 @@ typedef struct cgns_user_data_s /* UserDefinedData_t Node       */
     CGNS_ENUMT(DataClass_t) data_class; /* Class of data                        */
     cgns_units *units;      /* ptrs to in-memory copy of units      */
     CGNS_ENUMT(GridLocation_t) location;/* Grid location where data is recorded */
-    char_66 family_name;    /* Family name              */
+    char_md family_name;    /* Family name              */            /* ** FAMILY TREE ** */
     int ordinal;            /* option to specify a rank     */
     cgns_ptset *ptset;      /* PointList, PointRange                */
     int nuser_data;         /* number of user defined data nodes    */
@@ -569,7 +570,7 @@ typedef struct {            /* BC_t node                */
     CGNS_ENUMT(GridLocation_t) location;/* Grid location                        */
     CGNS_ENUMT(BCType_t) type;          /* type of boco                         */
     cgns_ptset *ptset;      /* PointList, PointRange                */
-    char_66 family_name;    /* Family name for the bound. patch */
+    char_md family_name;    /* Family name for the bound. patch */  /* ** FAMILY TREE ** */
     int *Nindex;            /* Inward Normal Index          */
     double index_id;        /* ADF ID number of InwardNormalIndex   */
     cgns_array *normal;     /* Inward Normal List           */
@@ -647,7 +648,7 @@ typedef struct {            /* GridConnectivity1to1_t node      */
     int *transform;         /* short form of transformation matrix  */
     cgns_ptset ptset;       /* PointRange               */
     cgns_ptset dptset;      /* PointRangeDonor          */
-    char_66 donor;          /* donor name                           */
+    char_md donor;          /* donor name                           */
     int ordinal;            /* option to specify a rank     */
     int nuser_data;         /* number of user defined data nodes    */  /* V2.1 */
     cgns_user_data *user_data; /* User defined data.        */  /* V2.1 */
@@ -786,7 +787,7 @@ typedef struct {            /* ZoneSubRegion_t Node                 */
     CGNS_ENUMT(DataClass_t) data_class; /* Class of data            */
     cgns_units *units;      /* Dimensional Units                    */
     CGNS_ENUMT(GridLocation_t) location;/* Grid location where data is recorded */
-    char_66 family_name;    /* Family name                          */
+    char_md family_name;    /* Family name                          */ /* ** FAMILY TREE ** */
     int *rind_planes;       /* No. of rind-planes on each zone face */
     int nuser_data;         /* number of user defined data nodes    */
     cgns_user_data *user_data; /* User defined data.                */
@@ -809,7 +810,7 @@ typedef struct {            /* Zone_t Node              */
     cgns_zcoor *zcoor;      /* ptrs to in-memory copies of coords   */
     int nsections;          /* no of Elements_t nodes       */
     cgns_section *section;  /* ptrs to in-memory copies of section  */
-    char_66 family_name;    /* family name of the unstr. zone   */
+    char_md family_name;    /* family name of the unstr. zone   */ /* ** FAMILY TREE ** */
     int nsols;              /* number of FlowSolution_t nodes   */
     cgns_sol *sol;          /* ptrs to in-memory copies of sols */
     int ndiscrete;          /* number of DiscreteData_t nodes   */
@@ -875,7 +876,7 @@ typedef struct {            /* FamilyBC_t node          */
     cgns_dataset *dataset;  /* ptrs to in-mem. copy of BCDataSet    */
 } cgns_fambc;
 
-typedef struct {            /* Family_t node            */
+typedef struct cgns_family_s {            /* Family_t node            */
     char_33 name;           /* Family name & name of ADF node   */
     double id;              /* ADF ID number (address) of node      */
     cgns_link *link;        /* link information         */  /* V2.1 */
@@ -893,6 +894,9 @@ typedef struct {            /* Family_t node            */
 /* CPEX 0033 */
     int nfamname;
     cgns_famname *famname;
+    /* ** FAMILY TREE ** */
+    int nfamilies;
+    struct cgns_family_s* family;
 } cgns_family;
 
 typedef struct {            /* CGNSBase_t Node          */
@@ -1052,6 +1056,7 @@ cgns_model *cgi_model_address(int local_mode, char const *ModelLabel, int *ier);
 char *cgi_famname_address(int local_mode, int *ier);
 cgns_famname *cgi_multfam_address(int mode, int num, char const *name, int *ier);
 cgns_user_data *cgi_user_data_address(int local_mode, int given_no, char const *given_name, int *ier);
+cgns_family *cgi_family_address(int local_node, int given_no, char const *given_name, int *ier); /* ** FAMILY TREE ** */
 cgns_rotating *cgi_rotating_address(int local_mode, int *ier);
 cgns_ptset *cgi_ptset_address(int local_mode, int *ier);
 cgns_dataset * cgi_bcdataset_address(int local_mode, int given_no,
@@ -1066,7 +1071,7 @@ int cgi_read_family(cgns_family *family);
 int cgi_read_family_dataset(int in_link, double parent_id, int *ndataset,
                             cgns_dataset **dataset);
 int cgi_read_family_name(int in_link, double parent_id, char_33 parent_name,
-                         char_33 family_name);
+                         char_md family_name); /** FAMILY TREE **/
 int cgi_read_array(cgns_array *array, char *parent_label, double parent_id);
 int cgi_read_section(int in_link, double parent_id, int *nsections,
                      cgns_section **section);
@@ -1242,7 +1247,7 @@ int cgi_AverageInterfaceType(char *Name, CGNS_ENUMT(AverageInterfaceType_t) *typ
 
 int cgi_zone_no(cgns_base *base, char *zonename, int *zone_no);
 
-/* miscelleneous */
+/* miscellaneous */
 int cgi_sort_names(int n, double *ids);
 int size_of(const char_33 adf_type);
 char *type_of(char_33 data_type);

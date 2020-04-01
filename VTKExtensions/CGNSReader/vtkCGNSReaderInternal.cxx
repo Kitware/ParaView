@@ -36,8 +36,8 @@ int setUpRind(const int cgioNum, const double rindId, int* rind)
 
   if (strcmp(dataType, "I4") == 0)
   {
-    std::vector<int> mdata;
-    CGNSRead::readNodeData<int>(cgioNum, rindId, mdata);
+    std::vector<vtkTypeInt32> mdata;
+    CGNSRead::readNodeData<vtkTypeInt32>(cgioNum, rindId, mdata);
     for (std::size_t index = 0; index < mdata.size(); index++)
     {
       rind[index] = static_cast<int>(mdata[index]);
@@ -45,8 +45,8 @@ int setUpRind(const int cgioNum, const double rindId, int* rind)
   }
   else if (strcmp(dataType, "I8") == 0)
   {
-    std::vector<cglong_t> mdata;
-    CGNSRead::readNodeData<cglong_t>(cgioNum, rindId, mdata);
+    std::vector<vtkTypeInt64> mdata;
+    CGNSRead::readNodeData<vtkTypeInt64>(cgioNum, rindId, mdata);
     for (std::size_t index = 0; index < mdata.size(); index++)
     {
       rind[index] = static_cast<int>(mdata[index]);
@@ -156,12 +156,12 @@ int get_section_connectivity(const int cgioNum, const double cgioSectionId, cons
 
   if (sizeOfCnt == sizeof(vtkIdType))
   {
-    if (cgio_read_data(cgioNum, cgioElemConnectId, srcStart, srcEnd, srcStride, dim, memDim,
-          memStart, memEnd, memStride, (void*)localElements) != CG_OK)
+    if (cgio_read_data_type(cgioNum, cgioElemConnectId, srcStart, srcEnd, srcStride, dataType, dim,
+          memDim, memStart, memEnd, memStride, (void*)localElements) != CG_OK)
     {
       char message[81];
       cgio_error_message(message);
-      std::cerr << "cgio_read_data :" << message;
+      std::cerr << "cgio_read_data_type :" << message;
       return 1;
     }
   }
@@ -181,13 +181,13 @@ int get_section_connectivity(const int cgioNum, const double cgioSectionId, cons
         std::cerr << "Allocation failed for temporary connectivity array\n";
       }
 
-      if (cgio_read_data(cgioNum, cgioElemConnectId, srcStart, srcEnd, srcStride, dim, memDim,
-            memStart, memEnd, memStride, (void*)data) != CG_OK)
+      if (cgio_read_data_type(cgioNum, cgioElemConnectId, srcStart, srcEnd, srcStride, "I4", dim,
+            memDim, memStart, memEnd, memStride, (void*)data) != CG_OK)
       {
         delete[] data;
         char message[81];
         cgio_error_message(message);
-        std::cerr << "cgio_read_data :" << message;
+        std::cerr << "cgio_read_data_type :" << message;
         return 1;
       }
       for (cgsize_t n = 0; n < nn; n++)
@@ -204,13 +204,13 @@ int get_section_connectivity(const int cgioNum, const double cgioSectionId, cons
         std::cerr << "Allocation failed for temporary connectivity array\n";
         return 1;
       }
-      if (cgio_read_data(cgioNum, cgioElemConnectId, srcStart, srcEnd, srcStride, dim, memDim,
-            memStart, memEnd, memStride, (void*)data) != CG_OK)
+      if (cgio_read_data_type(cgioNum, cgioElemConnectId, srcStart, srcEnd, srcStride, "I8", dim,
+            memDim, memStart, memEnd, memStride, (void*)data) != CG_OK)
       {
         delete[] data;
         char message[81];
         cgio_error_message(message);
-        std::cerr << "cgio_read_data :" << message;
+        std::cerr << "cgio_read_data_type :" << message;
         return 1;
       }
       for (cgsize_t n = 0; n < nn; n++)
@@ -258,12 +258,12 @@ int get_section_start_offset(const int cgioNum, const double cgioSectionId, cons
 
   if (sizeOfCnt == sizeof(vtkIdType))
   {
-    if (cgio_read_data(cgioNum, cgioElemOffsetId, srcStart, srcEnd, srcStride, dim, memDim,
-          memStart, memEnd, memStride, (void*)localElementsIdx) != CG_OK)
+    if (cgio_read_data_type(cgioNum, cgioElemOffsetId, srcStart, srcEnd, srcStride, dataType, dim,
+          memDim, memStart, memEnd, memStride, (void*)localElementsIdx) != CG_OK)
     {
       char message[81];
       cgio_error_message(message);
-      std::cerr << "cgio_read_data :" << message;
+      std::cerr << "cgio_read_data_type :" << message;
       return 1;
     }
   }
@@ -283,13 +283,13 @@ int get_section_start_offset(const int cgioNum, const double cgioSectionId, cons
         std::cerr << "Allocation failed for temporary connectivity offset array\n";
       }
 
-      if (cgio_read_data(cgioNum, cgioElemOffsetId, srcStart, srcEnd, srcStride, dim, memDim,
-            memStart, memEnd, memStride, (void*)data) != CG_OK)
+      if (cgio_read_data_type(cgioNum, cgioElemOffsetId, srcStart, srcEnd, srcStride, "I4", dim,
+            memDim, memStart, memEnd, memStride, (void*)data) != CG_OK)
       {
         delete[] data;
         char message[81];
         cgio_error_message(message);
-        std::cerr << "cgio_read_data :" << message;
+        std::cerr << "cgio_read_data_type :" << message;
         return 1;
       }
       for (cgsize_t n = 0; n < nn; n++)
@@ -306,13 +306,13 @@ int get_section_start_offset(const int cgioNum, const double cgioSectionId, cons
         std::cerr << "Allocation failed for temporary connectivity array\n";
         return 1;
       }
-      if (cgio_read_data(cgioNum, cgioElemOffsetId, srcStart, srcEnd, srcStride, dim, memDim,
-            memStart, memEnd, memStride, (void*)data) != CG_OK)
+      if (cgio_read_data_type(cgioNum, cgioElemOffsetId, srcStart, srcEnd, srcStride, "I8", dim,
+            memDim, memStart, memEnd, memStride, (void*)data) != CG_OK)
       {
         delete[] data;
         char message[81];
         cgio_error_message(message);
-        std::cerr << "cgio_read_data :" << message;
+        std::cerr << "cgio_read_data_type :" << message;
         return 1;
       }
       for (cgsize_t n = 0; n < nn; n++)

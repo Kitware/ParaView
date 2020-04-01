@@ -46,6 +46,7 @@ inline int readNodeData(int cgioNum, double nodeId, std::vector<T>& data)
   cgsize_t size = 1;
   cgsize_t dimVals[12];
   int ndim;
+  constexpr const char* dtName = CGNSRead::detail::cgns_type_name<T>();
 
   if (cgio_get_dimensions(cgioNum, nodeId, &ndim, dimVals) != CG_OK)
   {
@@ -65,7 +66,7 @@ inline int readNodeData(int cgioNum, double nodeId, std::vector<T>& data)
   data.resize(size);
 
   // read data
-  if (cgio_read_all_data(cgioNum, nodeId, &data[0]) != CG_OK)
+  if (cgio_read_all_data_type(cgioNum, nodeId, dtName, &data[0]) != CG_OK)
   {
     return 1;
   }

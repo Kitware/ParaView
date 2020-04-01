@@ -44,7 +44,7 @@ int readNodeStringData(int cgioNum, double nodeId, std::string& data)
 
   data.resize(size);
   // read data
-  if (cgio_read_all_data(cgioNum, nodeId, (void*)data.c_str()) != CG_OK)
+  if (cgio_read_all_data_type(cgioNum, nodeId, "C1", (void*)data.c_str()) != CG_OK)
   {
     return 1;
   }
@@ -80,7 +80,7 @@ int readNodeData<char>(int cgioNum, double nodeId, std::vector<char>& data)
   data.resize(size + 1);
 
   // read data
-  if (cgio_read_all_data(cgioNum, nodeId, &data[0]) != CG_OK)
+  if (cgio_read_all_data_type(cgioNum, nodeId, "C1", &data[0]) != CG_OK)
   {
     return 1;
   }
@@ -167,7 +167,7 @@ int readBaseIds(int cgioNum, double rootId, std::vector<double>& baseIds)
 int readBaseCoreInfo(int cgioNum, double baseId, CGNSRead::BaseInformation& baseInfo)
 {
   CGNSRead::char_33 dataType;
-  std::vector<int> mdata;
+  std::vector<int32_t> mdata;
 
   if (cgio_get_name(cgioNum, baseId, baseInfo.name) != CG_OK)
   {
@@ -187,7 +187,7 @@ int readBaseCoreInfo(int cgioNum, double baseId, CGNSRead::BaseInformation& base
     return 1;
   }
 
-  if (CGNSRead::readNodeData<int>(cgioNum, baseId, mdata) != 0)
+  if (CGNSRead::readNodeData<int32_t>(cgioNum, baseId, mdata) != 0)
   {
     std::cerr << "error while reading base dimension" << std::endl;
     return 1;
@@ -209,7 +209,7 @@ int readBaseIteration(int cgioNum, double nodeId, CGNSRead::BaseInformation& bas
   bool createTimeStates = true;
   bool createIterStates = true;
 
-  std::vector<int> ndata;
+  std::vector<int32_t> ndata;
   // read node data type
   if (cgio_get_data_type(cgioNum, nodeId, dataType) != CG_OK)
   {
@@ -222,7 +222,7 @@ int readBaseIteration(int cgioNum, double nodeId, CGNSRead::BaseInformation& bas
     return 1;
   }
 
-  if (CGNSRead::readNodeData<int>(cgioNum, nodeId, ndata) != 0)
+  if (CGNSRead::readNodeData<int32_t>(cgioNum, nodeId, ndata) != 0)
   {
     std::cerr << "error while reading number of state in base" << std::endl;
     return 1;
@@ -298,7 +298,7 @@ int readBaseIteration(int cgioNum, double nodeId, CGNSRead::BaseInformation& bas
       }
 
       baseInfo.steps.clear();
-      CGNSRead::readNodeData<int>(cgioNum, childrenIterative[nc], baseInfo.steps);
+      CGNSRead::readNodeData<int32_t>(cgioNum, childrenIterative[nc], baseInfo.steps);
       if (static_cast<int>(baseInfo.steps.size()) != nstates)
       {
         std::cerr << "Error reading steps node";

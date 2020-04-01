@@ -72,6 +72,39 @@ struct is_float<float>
 };
 }
 
+namespace detail
+{
+template <typename T>
+constexpr const char* cgns_type_name() noexcept
+{
+  return "MT";
+}
+
+template <>
+constexpr const char* cgns_type_name<float>() noexcept
+{
+  return "R4";
+}
+
+template <>
+constexpr const char* cgns_type_name<double>() noexcept
+{
+  return "R8";
+}
+
+template <>
+constexpr const char* cgns_type_name<vtkTypeInt32>() noexcept
+{
+  return "I4";
+}
+
+template <>
+constexpr const char* cgns_type_name<vtkTypeInt64>() noexcept
+{
+  return "I8";
+}
+}
+
 typedef char char_33[33];
 
 //------------------------------------------------------------------------------
@@ -206,12 +239,12 @@ class BaseInformation
 public:
   char_33 name;
 
-  int cellDim;
-  int physicalDim;
+  int32_t cellDim;
+  int32_t physicalDim;
   //
   int baseNumber;
 
-  std::vector<int> steps;
+  std::vector<int32_t> steps;
   std::vector<double> times;
 
   // For unsteady meshes :
@@ -469,16 +502,18 @@ int get_XYZ_mesh(const int cgioNum, const std::vector<double>& gridChildId,
     // quick transfer of data if same data types
     if (sameType == true)
     {
-      if (cgio_read_data(cgioNum, coordId, srcStart, srcEnd, srcStride, cellDim, memEnd, memStart,
-            memEnd, memStride, (void*)currentCoord))
+      constexpr const char* dtNameT = detail::cgns_type_name<T>();
+      if (cgio_read_data_type(cgioNum, coordId, srcStart, srcEnd, srcStride, dtNameT, cellDim,
+            memEnd, memStart, memEnd, memStride, (void*)currentCoord))
       {
         char message[81];
         cgio_error_message(message);
-        std::cerr << "cgio_read_data :" << message;
+        std::cerr << "cgio_read_data_type :" << message;
       }
     }
     else
     {
+      constexpr const char* dtNameY = detail::cgns_type_name<Y>();
       Y* dataArray = 0;
       const cgsize_t memNoStride[3] = { 1, 1, 1 };
 
@@ -489,13 +524,13 @@ int get_XYZ_mesh(const int cgioNum, const std::vector<double>& gridChildId,
         std::cerr << "Error allocating buffer array\n";
         break;
       }
-      if (cgio_read_data(cgioNum, coordId, srcStart, srcEnd, srcStride, cellDim, memDims, memStart,
-            memDims, memNoStride, (void*)dataArray))
+      if (cgio_read_data_type(cgioNum, coordId, srcStart, srcEnd, srcStride, dtNameY, cellDim,
+            memDims, memStart, memDims, memNoStride, (void*)dataArray))
       {
         delete[] dataArray;
         char message[81];
         cgio_error_message(message);
-        std::cerr << "Buffer array cgio_read_data :" << message;
+        std::cerr << "Buffer array cgio_read_data_type :" << message;
         break;
       }
       for (vtkIdType ii = 0; ii < nPts; ++ii)
