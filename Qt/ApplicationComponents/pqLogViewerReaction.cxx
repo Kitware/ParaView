@@ -38,11 +38,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 void pqLogViewerReaction::showLogViewer()
 {
-  QPointer<pqLogViewerWindow> viewer;
+  static QPointer<pqLogViewerWindow> viewer;
   if (!viewer)
   {
     viewer = new pqLogViewerWindow();
   }
   viewer->setAttribute(Qt::WA_DeleteOnClose, true);
   viewer->show();
+  viewer->raise();
+  viewer->activateWindow();
+  viewer->refresh();
 }
