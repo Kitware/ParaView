@@ -117,6 +117,24 @@ public:
         // item4->setData(QVariant(Qt::AlignLeft|Qt::AlignTop),
         // Qt::TextAlignmentRole);
 
+        // Change log message color for warnings and errors
+        QColor color;
+        if (parts[3] == "WARN")
+        {
+          color.setRgb(174, 173, 39);
+        }
+        else if (parts[3] == "ERR")
+        {
+          color.setRgb(194, 54, 33);
+        }
+        QBrush brush;
+        brush.setColor(color);
+        item0->setForeground(brush);
+        item1->setForeground(brush);
+        item2->setForeground(brush);
+        item3->setForeground(brush);
+        item4->setForeground(brush);
+
         auto parent = !this->ActiveScopeItem.isEmpty() ? this->ActiveScopeItem.last()
                                                        : this->Model.invisibleRootItem();
         parent->appendRow(QList<QStandardItem*>{ item4, item1, item2, item3, item0 });
