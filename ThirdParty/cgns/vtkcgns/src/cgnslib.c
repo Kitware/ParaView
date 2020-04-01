@@ -53,7 +53,7 @@ freely, subject to the following restrictions:
 #include "cgns_io.h"
 
 /* to determine default file type */
-#ifdef BUILD_HDF5
+#if CG_BUILD_HDF5
 # include "vtk_hdf5.h"
 #endif
 
@@ -97,6 +97,9 @@ int CGNSLibVersion=CGNS_VERSION;/* Version of the CGNSLibrary*1000  */
 int cgns_compress = 0;
 int cgns_filetype = CG_FILE_NONE;
 void* cgns_rindindex = CG_CONFIG_RIND_CORE;
+
+/* Flag for contiguous (0) or compact storage (1) */
+int HDF5storage_type = CG_COMPACT;
 
 extern void (*cgns_error_handler)(int, char *);
 
@@ -260,7 +263,7 @@ int VersionList[] = {3210, 3200,
                      2550, 2540, 2530, 2520, 2510, 2500,
                      2460, 2420, 2400,
                      2300, 2200, 2100, 2000, 1270, 1200, 1100, 1050};
-#define nVersions (sizeof(VersionList)/sizeof(int))
+#define nVersions ((int)(sizeof(VersionList)/sizeof(int)))
 
 #ifdef DEBUG_HDF5_OBJECTS_CLOSE
 void objlist_status(char *tag)
@@ -291,15 +294,15 @@ void objlist_status(char *tag)
     {
       if (H5Iis_valid(idlist[n]))
       {
-      	printf("{%s} track %d INVALID\n",tag,idlist[n]);
+        printf("{%s} track %d INVALID\n",tag,idlist[n]);
       }
       else
       {
-      	H5Oget_info(idlist[n],&objinfo);
-      	memset(oname,'\0',256);
-      	sname=H5Iget_name(idlist[n],oname,0);
-      	sname=H5Iget_name(idlist[n],oname,sname+1);
-      	printf("{%s} track %d ALIVE (%s:%d)\n",tag,idlist[n],oname,objinfo.rc);
+        H5Oget_info(idlist[n],&objinfo);
+        memset(oname,'\0',256);
+        sname=H5Iget_name(idlist[n],oname,0);
+        sname=H5Iget_name(idlist[n],oname,sname+1);
+        printf("{%s} track %d ALIVE (%s:%d)\n",tag,idlist[n],oname,objinfo.rc);
       }
     }
   }
@@ -341,7 +344,7 @@ int cg_open(const char *filename, int mode, int *file_number)
 
 #ifdef __CG_MALLOC_H__
     fprintf(stderr, "CGNS MEM_DEBUG: before open:files %d/%d: memory %d/%d: calls %d/%d\n", n_open,
-	    cgns_file_size, cgmemnow(), cgmemmax(), cgalloccalls(), cgfreecalls());
+           cgns_file_size, cgmemnow(), cgmemmax(), cgalloccalls(), cgfreecalls());
 #endif
 
     /* check file mode */
@@ -502,7 +505,7 @@ int cg_open(const char *filename, int mode, int *file_number)
 
 #ifdef __CG_MALLOC_H__
     fprintf(stderr, "CGNS MEM_DEBUG: after  open:files %d/%d: memory %d/%d: calls %d/%d\n", n_open,
-	    cgns_file_size, cgmemnow(), cgmemmax(), cgalloccalls(), cgfreecalls());
+           cgns_file_size, cgmemnow(), cgmemmax(), cgalloccalls(), cgfreecalls());
 #endif
 
     return CG_OK;
@@ -534,7 +537,7 @@ int cg_version(int file_number, float *FileVersion)
         return CG_ERROR;
     } else {
         int vers, ndim, temp_version;
-	cgsize_t dim_vals[12];
+        cgsize_t dim_vals[12];
         char_33 node_name;
         char_33 data_type;
         void *data;
@@ -620,7 +623,7 @@ int cg_close(int file_number)
 
 #ifdef __CG_MALLOC_H__
     fprintf(stderr, "CGNS MEM_DEBUG: before close:files %d/%d: memory %d/%d: calls %d/%d\n", n_open,
-	    cgns_file_size, cgmemnow(), cgmemmax(), cgalloccalls(), cgfreecalls());
+           cgns_file_size, cgmemnow(), cgmemmax(), cgalloccalls(), cgfreecalls());
 #endif
 
     if (cgns_compress && cg->mode == CG_MODE_MODIFY &&
@@ -655,7 +658,7 @@ int cg_close(int file_number)
 
 #ifdef __CG_MALLOC_H__
     fprintf(stderr, "CGNS MEM_DEBUG: after  close:files %d/%d: memory %d/%d: calls %d/%d\n", n_open,
-	    cgns_file_size, cgmemnow(), cgmemmax(), cgalloccalls(), cgfreecalls());
+           cgns_file_size, cgmemnow(), cgmemmax(), cgalloccalls(), cgfreecalls());
 #endif
 
 #ifdef DEBUG_HDF5_OBJECTS_CLOSE
@@ -697,19 +700,19 @@ int cg_set_file_type(int file_type)
 {
     if (file_type == CG_FILE_NONE) {
         char *type = getenv("CGNS_FILETYPE");
-	if (type == NULL || !*type) {
-#if defined(BUILD_HDF5)
+        if (type == NULL || !*type) {
+#if CG_BUILD_HDF5
             cgns_filetype = CG_FILE_HDF5;
 #else
             cgns_filetype = CG_FILE_ADF;
 #endif
         }
-#ifdef BUILD_HDF5
-	else if (*type == '2' || *type == 'h' || *type == 'H') {
+#if CG_BUILD_HDF5
+        else if (*type == '2' || *type == 'h' || *type == 'H') {
             cgns_filetype = CG_FILE_HDF5;
         }
 #endif
-	else if (*type == '3' || ((*type == 'a' || *type == 'A') &&
+    else if (*type == '3' || ((*type == 'a' || *type == 'A') &&
                  strchr(type, '2') != NULL)) {
 #if CG_SIZEOF_SIZE == 64
             cgi_error("ADF2 not supported in 64-bit mode");
@@ -717,7 +720,7 @@ int cg_set_file_type(int file_type)
 #else
             cgns_filetype = CG_FILE_ADF2;
 #endif
-	}
+        }
         else
             cgns_filetype = CG_FILE_ADF;
     }
@@ -1026,7 +1029,7 @@ int cg_cell_dim(int file_number, int B, int *cell_dim)
 }
 
 int cg_base_write(int file_number, const char * basename, int cell_dim,
-		  int phys_dim, int *B)
+                 int phys_dim, int *B)
 {
     cgns_base *base = NULL;
     int index;
@@ -1180,7 +1183,7 @@ int cg_index_dim(int file_number, int B, int Z, int *index_dim)
 }
 
 int cg_zone_write(int file_number, int B, const char *zonename, const cgsize_t * nijk,
-		  CGNS_ENUMT( ZoneType_t )  type, int *Z)
+          CGNS_ENUMT( ZoneType_t )  type, int *Z)
 {
     cgns_base *base;
     cgns_zone *zone = NULL;
@@ -1302,9 +1305,8 @@ int cg_nfamilies(int file_number, int B, int *nfamilies)
 }
 
 int cg_family_read(int file_number, int B, int F, char *family_name,
-	           int *nboco, int *ngeos)
+               int *nboco, int *ngeos)
 {
-
     cgns_family *family;
 
     cg = cgi_get_file(file_number);
@@ -1322,63 +1324,150 @@ int cg_family_read(int file_number, int B, int F, char *family_name,
     return CG_OK;
 }
 
+/* ** FAMILY TREE ** */
 int cg_family_write(int file_number, int B, const char * family_name, int *F)
 {
     int index;
-    cgns_base *base;
+    cgns_base   *base;
     cgns_family *family = NULL;
 
-     /* verify input */
-    if (cgi_check_strlen(family_name)) return CG_ERROR;
+    char family_name_path[(CGIO_MAX_NAME_LENGTH+1)*CG_MAX_GOTO_DEPTH+1];
+    char *pch, *tok;
+    int   skip = 0;
 
+    /* Check file access */
     cg = cgi_get_file(file_number);
     if (cg == 0) return CG_ERROR;
 
     if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_WRITE)) return CG_ERROR;
 
-     /* get memory address for base */
+    /* Check family name validity */
+    if ( strlen( family_name ) == 0 ){
+        cgi_error( "Family name is empty" );
+        return CG_ERROR;
+    }
+    if ( strlen( family_name ) > (CGIO_MAX_NAME_LENGTH+1)*CG_MAX_GOTO_DEPTH ){
+        cgi_error( "Family name is too long" );
+        return CG_ERROR;
+    }
+
+    /* get memory address for base */
     base = cgi_get_base(cg, B);
     if (base==0) return CG_ERROR;
 
-     /* Overwrite a Family_t Node: */
-    for (index=0; index<base->nfamilies; index++) {
-        if (strcmp(family_name, base->family[index].name)==0) {
 
-             /* in CG_MODE_WRITE, children names must be unique */
-            if (cg->mode==CG_MODE_WRITE) {
-                cgi_error("Duplicate child name found: %s",family_name);
+    /* check if family_name is actually a family tree path instead */
+    pch = strchr( family_name, '/' );
+    if( pch != 0 ) {
+
+        /* Check that family tree path is absolute */
+        if( pch != family_name ) {
+            cgi_error( "Family tree path must be absolute (including base)");
+            return CG_ERROR;
+        }
+
+        /* Check that specified base's name matches begining of family tree path */
+        pch = strstr( family_name, base->name );
+        if( pch != family_name+1 ) {
+            cgi_error( "Incompatible basename (%s) and family tree (%s)", base->name, family_name );
+            return CG_ERROR;
+        }
+
+        /* points to base level instead of root in family tree path*/
+        pch += strlen( base->name );
+    }
+    else {
+        pch = (char*) family_name;
+    }
+
+    /* Make a copy of family tree path (need non const string for tokenization loop) */
+    strcpy( family_name_path, pch );
+
+    /* Init tokenization loop:
+     * We work with pointer to variables to simplify switch from cgns_base structure
+     * variables to cgns_family structure variables.
+     *  */
+    int* nfamilies_p = &(base->nfamilies);
+    cgns_family** family_p = &(base->family);
+    double parent_id = base->id;
+
+    /* Start loop over token */
+    pch = strtok( family_name_path, "/" );
+    while( pch ) {
+
+        tok = pch;
+        pch = strtok (NULL, "/"); /* when pch is null, we are at leaf (last token)*/
+
+        /* Check token size, should be max 32 */
+        if (cgi_check_strlen(tok)) {
+            cgi_error( "Invalid Family_t node %s", tok );
+            return CG_ERROR;
+        }
+        skip = 0; /* Flag to skip node creation */
+        /* Look for token in existing Family_t childs */
+        for( index=0; index < (*nfamilies_p); index++ ) {
+
+            /* If found existing Family_t named as token within the Family_t childs */
+            if( strcmp( tok, (*family_p)[index].name) == 0 ) {
+
+                /* If last token, then overwriting action */
+                if( !pch ) {
+
+                    /* Overwriting action not allowed on pure write mode */
+                    if( cg->mode == CG_MODE_WRITE ) {
+                        cgi_error( "Duplicate child name found: %s", tok );
+                        return CG_ERROR;
+                    }
+                    /* Modify mode : overwrite an existing family */
+                    if( cgi_delete_node( parent_id, (*family_p)[index].id )) {
+                        return CG_ERROR;
+                    }
+                    /* Save the old in-memory address to overwrite */
+                    family = &( (*family_p)[index] );
+                    /* free memory */
+                    cgi_free_family(family);
+                    break; /* quit "for" loop */
+
+                }
+                /* else, progressing in family tree path */
+                else {
+                    family = &( (*family_p)[index] ); /* ?? */
+                    skip = 1; /* intermediate node exists and should not be created or overwritten */
+                    break;
+                }
+
+            }
+        }
+
+        /* ... or add a Family_t Node */
+        if( index == *nfamilies_p ) {
+            if( *nfamilies_p == 0 ) {
+                *family_p = CGNS_NEW( cgns_family, (*nfamilies_p)+1 );
+            } else {
+                *family_p = CGNS_RENEW( cgns_family, (*nfamilies_p)+1, *family_p );
+            }
+            family = &( (*family_p)[*nfamilies_p] );
+            (*nfamilies_p)++;
+        }
+
+        (*F) = index+1;
+
+        if( ! skip ) { /* If not an existing intermediate family node */
+            memset( family, 0, sizeof(cgns_family) );
+            strcpy( family->name, tok );
+
+            /* Save data in file */
+            if( cgi_new_node( parent_id, tok, "Family_t", &family->id, "MT", 0, 0, 0) ) {
                 return CG_ERROR;
             }
-
-             /* overwrite an existing zone */
-             /* delete the existing zone from file */
-            if (cgi_delete_node(base->id, base->family[index].id))
-                return CG_ERROR;
-             /* save the old in-memory address to overwrite */
-            family = &(base->family[index]);
-             /* free memory */
-            cgi_free_family(family);
-            break;
         }
-    }
-     /* ... or add a Family_t Node: */
-    if (index==base->nfamilies) {
-        if (base->nfamilies == 0) {
-            base->family = CGNS_NEW(cgns_family, base->nfamilies+1);
-        } else {
-            base->family = CGNS_RENEW(cgns_family, base->nfamilies+1, base->family);
-        }
-        family = &(base->family[base->nfamilies]);
-        base->nfamilies++;
-    }
-    (*F) = index+1;
 
-    memset(family, 0, sizeof(cgns_family));
-    strcpy(family->name, family_name);
+        /* Update variables for next token */
+        nfamilies_p = &(family->nfamilies);
+        family_p    = &(family->family);
+        parent_id   = family->id;
 
-     /* save data in file */
-    if (cgi_new_node(base->id, family->name, "Family_t", &family->id,
-        "MT", 0, 0, 0)) return CG_ERROR;
+    } /* End of tokenization loop */
 
     return CG_OK;
 }
@@ -1421,7 +1510,7 @@ int cg_family_name_read(int file_number, int B, int F, int N, char *name, char *
     strcpy(family, fam->famname[N-1].family);
     return CG_OK;
 }
-
+/* ** FAMILY TREE ** */
 int cg_family_name_write(int file_number, int B, int F,
                          const char *name, const char *family)
 {
@@ -1431,8 +1520,12 @@ int cg_family_name_write(int file_number, int B, int F,
     cgns_famname *famname = 0;
 
      /* verify input */
-    if (cgi_check_strlen(name) ||
-        cgi_check_strlen(family)) return CG_ERROR;
+    if (cgi_check_strlen(name)) return CG_ERROR;
+
+    if ( strlen(family) > (CGIO_MAX_NAME_LENGTH+1)*CG_MAX_GOTO_DEPTH ) {
+        cgi_error( "Family path too long (%s, size %ld)", family, strlen(family) );
+        return CG_ERROR;
+    }
 
     cg = cgi_get_file(file_number);
     if (cg == 0) return CG_ERROR;
@@ -1474,10 +1567,239 @@ int cg_family_name_write(int file_number, int B, int F,
     return CG_OK;
 }
 
+/* ** FAMILY TREE ** */
+/* FamilyTree extension */
+int cg_node_family_write( const char* family_name, int* F)
+{
+    int ier=0, n, nfamilies;
+    cgns_family* family;
+    double posit_id;
+
+    CHECK_FILE_OPEN
+
+    /* verify input */
+    if( strchr( family_name, '/' ) != 0 ) {
+        cgi_error( "Path not allowed to create Family_t locally\n");
+        return CG_ERROR;
+    }
+    if( cgi_check_strlen( family_name ) ) return CG_ERROR;
+
+    /* check for valid posit */
+    if (posit == 0) {
+        cgi_error("No current position set by cg_goto\n");
+        (*F) = 0;
+        return CG_ERROR;
+    }
+
+    family = cgi_family_address( CG_MODE_WRITE, 0, family_name, &ier );
+    if( family==0 ) return ier;
+
+    memset( family, 0, sizeof( cgns_family ) );
+    strcpy( family->name, family_name );
+
+    /* save data in file */
+    if( cgi_posit_id( &posit_id ) ) return CG_ERROR;
+    if( cgi_new_node( posit_id, family_name, "Family_t", &family->id, "MT", 0, 0, 0))
+        return CG_ERROR;
+
+    /* retrieve index */
+    family = 0;
+    if( strcmp( posit->label, "CGNSBase_t" ) == 0 ) {
+        family = ((cgns_base*)posit->posit)->family;
+        nfamilies = ((cgns_base*)posit->posit)->nfamilies;
+    }
+    else if (strcmp(posit->label,"Family_t")==0) {
+        family = ((cgns_family *)posit->posit)->family;
+        nfamilies = ((cgns_family *)posit->posit)->nfamilies;
+    }
+    else {
+        cgi_error("Family_t node not supported under '%s' type node",posit->label);
+        (*F) = -1;
+        return CG_INCORRECT_PATH;
+    }
+
+
+    if( family ) {
+        for( n=0; n<nfamilies;n++ ){
+            if( strcmp( family_name, family[n].name) == 0 )
+                break;
+        }
+        if( n == nfamilies ) {
+            cgi_error( "Could not find Family_t node %s\n" , family_name );
+            return CG_ERROR;
+        }
+        *F = n + 1;
+    }
+    else {
+        cgi_error( "No Family_t container \n");
+        return CG_ERROR;
+    }
+
+    return CG_OK;
+}
+
+/* ** FAMILY TREE ** */
+int cg_node_nfamilies( int* nfamilies )
+{
+    /* This is valid and used during write as well as read mode. */
+
+    CHECK_FILE_OPEN
+
+    /* check for valid posit */
+    if (posit == 0) {
+        cgi_error("No current position set by cg_goto\n");
+        (*nfamilies) = 0;
+        return CG_ERROR;
+    }
+
+    if (strcmp(posit->label,"CGNSBase_t")==0 )
+        (*nfamilies) = ((cgns_base *)posit->posit)->nfamilies;
+    else if (strcmp(posit->label,"Family_t")==0)
+        (*nfamilies) = ((cgns_family *)posit->posit)->nfamilies;
+    else {
+        cgi_error("Family_t node not supported under '%s' type node",posit->label);
+        (*nfamilies) = 0;
+        return CG_INCORRECT_PATH;
+    }
+
+    return CG_OK;
+}
+
+/* ** FAMILY TREE ** */
+int cg_node_family_read( int F, char* family_name, int* nFamBC, int *nGeo )
+{
+    int ier = 0;
+    cgns_family* family;
+
+    CHECK_FILE_OPEN
+
+    /* verify input */
+    if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_READ)) return CG_ERROR;
+
+    family = cgi_family_address( CG_MODE_READ, F, "dummy", &ier );
+    if( family == 0 ) return ier;
+
+    strcpy( family_name, family->name );
+    (*nFamBC) = family->nfambc;
+    (*nGeo)   = family->ngeos;
+
+    return CG_OK;
+}
+
+/* ** FAMILY TREE ** */
+int cg_node_family_name_write( const char* node_name, const char* family_name )
+{
+    int index;
+    cgns_family*  family  = 0;
+    cgns_famname* famname = 0;
+    cgsize_t dim;
+    CHECK_FILE_OPEN
+
+    /* verify input */
+    if( cgi_check_strlen( node_name ))   return CG_ERROR;
+
+    if ( strlen(family_name) > (CGIO_MAX_NAME_LENGTH+1)*CG_MAX_GOTO_DEPTH ) {
+        cgi_error( "Family path too long (%s, size %ld)", family_name, strlen(family_name) );
+        return CG_ERROR;
+    }
+
+    /* check for valid posit */
+
+    if (posit == 0) {
+        cgi_error("No current position set by cg_goto\n");
+        return CG_ERROR;
+    }
+
+    if (strcmp(posit->label,"Family_t")==0)
+        family = ((cgns_family *)posit->posit);
+
+    if( family==0 ) {
+        cgi_error( "cg_node_family_name_write not called at a Family_t position" );
+        return CG_ERROR;
+    }
+
+    for( index = 0; index < family->nfamname; index++ ) {
+        if( 0 == strcmp( node_name, family->famname[index].name )) {
+            if( cg->mode == CG_MODE_WRITE ) {
+                cgi_error("Duplicate child name found: %s", node_name );
+                return CG_ERROR;
+            }
+            if( cgi_delete_node( family->id, family->famname[index].id))
+                return CG_ERROR;
+            famname = &(family->famname[index]);
+            break;
+        }
+    }
+
+    if (index == family->nfamname) {
+        if (0 == family->nfamname)
+            family->famname = CGNS_NEW(cgns_famname, 1);
+        else
+            family->famname = CGNS_RENEW(cgns_famname, family->nfamname+1, family->famname);
+        famname = &family->famname[family->nfamname];
+        family->nfamname++;
+    }
+
+    strcpy(famname->name, node_name);
+    strcpy(famname->family, family_name);
+    dim = (cgsize_t)strlen(famname->family);
+
+    if (cgi_new_node(family->id, famname->name, "FamilyName_t", &famname->id,
+        "C1", 1, &dim, famname->family)) return CG_ERROR;
+
+    return CG_OK;
+}
+
+/* ** FAMILY TREE ** */
+int cg_node_nfamily_names( int* nnames )
+{
+    /* This is valid and used during write as well as read mode. */
+
+   CHECK_FILE_OPEN
+
+    /* check for valid posit */
+   if (posit == 0) {
+       cgi_error("No current position set by cg_goto\n");
+       (*nnames) = 0;
+       return CG_ERROR;
+   }
+
+   if (strcmp(posit->label,"Family_t")==0)
+       (*nnames) = ((cgns_family *)posit->posit)->nfamname;
+   else {
+       cgi_error("No array of FamilyName_t supported under '%s' type node",posit->label);
+       (*nnames) = 0;
+       return CG_INCORRECT_PATH;
+   }
+
+   return CG_OK;
+}
+
+/* ** FAMILY TREE ** */
+int cg_node_family_name_read(int N, char* node_name, char* family_name )
+{
+    cgns_famname *famname;
+    int ier = 0;
+
+    CHECK_FILE_OPEN
+
+    /* verify input */
+    if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_READ)) return CG_ERROR;
+
+
+    famname = cgi_multfam_address(CG_MODE_READ, N, "", &ier);
+    if (famname==0) return ier;
+
+    strcpy(node_name, famname->name);
+    strcpy(family_name, famname->family);
+
+    return CG_OK;
+}
+
 /*----------------------------------------------------------------------*/
 
 int cg_fambc_read(int file_number, int B, int F, int BC,
-	          char *fambc_name, CGNS_ENUMT(BCType_t) *bocotype)
+              char *fambc_name, CGNS_ENUMT(BCType_t) *bocotype)
 {
     cgns_family *family;
 
@@ -1500,7 +1822,7 @@ int cg_fambc_read(int file_number, int B, int F, int BC,
 }
 
 int cg_fambc_write(int file_number, int B, int F, const char * fambc_name,
-		   CGNS_ENUMT( BCType_t )  bocotype, int *BC)
+           CGNS_ENUMT( BCType_t )  bocotype, int *BC)
 {
     int index;
     cgsize_t length;
@@ -1567,10 +1889,133 @@ int cg_fambc_write(int file_number, int B, int F, const char * fambc_name,
     return CG_OK;
 }
 
+/* FamilyTree extension */ /* ** FAMILY TREE ** */
+
+/*----------------------------------------------------------------------*/
+int cg_node_fambc_read( int BC, char* fambc_name,
+        CGNS_ENUMT(BCType_t) *bocotype)
+{
+    cgns_family*  family  = 0;
+
+    CHECK_FILE_OPEN
+
+    /* verify input */
+    if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_READ)) return CG_ERROR;
+
+
+    /* check for valid posit */
+
+    if (posit == 0) {
+        cgi_error("No current position set by cg_goto\n");
+        return CG_ERROR;
+    }
+
+    if (strcmp(posit->label,"Family_t")==0)
+        family = ((cgns_family *)posit->posit);
+
+    if( family==0 ) {
+        cgi_error( "cg_node_fambc_read not called at a Family_t position" );
+        return CG_ERROR;
+    }
+
+    if (BC<=0 || BC>family->nfambc) {
+        cgi_error("Invalid family b.c. number");
+        return CG_ERROR;
+    }
+    strcpy(fambc_name,family->fambc[BC-1].name);
+    *bocotype = family->fambc[BC-1].type;
+
+    return CG_OK;
+}
+
+/*----------------------------------------------------------------------*/
+int cg_node_fambc_write( const char* fambc_name,
+        CGNS_ENUMT(BCType_t) bocotype, int *BC )
+{
+    int index;
+    cgsize_t length;
+    cgns_family *family = 0;
+    cgns_fambc *fambc = NULL;
+
+    /* verify input */
+/*  if (cgi_check_strlen(fambc_name)) return CG_ERROR; */
+    if (INVALID_ENUM(bocotype,NofValidBCTypes)) {
+        cgi_error("Invalid BCType:  %d",bocotype);
+        return CG_ERROR;
+    }
+
+     CHECK_FILE_OPEN
+
+    /* verify input */
+    if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_WRITE)) return CG_ERROR;
+
+    /* check for valid posit */
+
+    if (posit == 0) {
+        cgi_error("No current position set by cg_goto\n");
+        return CG_ERROR;
+    }
+
+    if (strcmp(posit->label,"Family_t")==0)
+        family = ((cgns_family *)posit->posit);
+
+    if( family==0 ) {
+        cgi_error( "cg_node_fambc_write not called at a Family_t position" );
+        return CG_ERROR;
+    }
+
+
+    /* Overwrite a FamilyBC_t Node: */
+    for (index=0; index<family->nfambc; index++) {
+        if (strcmp(fambc_name, family->fambc[index].name)==0) {
+
+             /* in CG_MODE_WRITE, children names must be unique */
+            if (cg->mode==CG_MODE_WRITE) {
+                cgi_error("Duplicate child name found: %s",fambc_name);
+                return CG_ERROR;
+            }
+
+             /* overwrite an existing zone */
+             /* delete the existing fambc from file */
+            if (cgi_delete_node(family->id, family->fambc[index].id))
+                return CG_ERROR;
+             /* save the old in-memory address to overwrite */
+            fambc = &(family->fambc[index]);
+             /* free memory */
+            cgi_free_fambc(fambc);
+            break;
+        }
+    }
+    /* ... or add a FamilyBC_t Node: */
+    if (index==family->nfambc) {
+        if (family->nfambc == 0) {
+            family->fambc = CGNS_NEW(cgns_fambc, family->nfambc+1);
+        } else {
+            family->fambc = CGNS_RENEW(cgns_fambc, family->nfambc+1, family->fambc);
+        }
+        fambc = &(family->fambc[family->nfambc]);
+        family->nfambc++;
+    }
+
+    (*BC) = index+1;
+
+    memset(fambc, 0, sizeof(cgns_fambc));
+    strcpy(fambc->name, fambc_name);
+    fambc->type = bocotype;
+
+    /* save data in file */
+    length = (cgsize_t)strlen(BCTypeName[bocotype]);
+    if (cgi_new_node(family->id, fambc->name, "FamilyBC_t", &fambc->id,
+        "C1", 1, &length, BCTypeName[bocotype])) return CG_ERROR;
+
+    return CG_OK;
+}
+
+
 /*----------------------------------------------------------------------*/
 
 int cg_geo_read(int file_number, int B, int F, int G, char *geo_name,
-	        char **geo_file, char *CAD_name, int *npart)
+            char **geo_file, char *CAD_name, int *npart)
 {
     cgns_family *family;
 
@@ -1683,6 +2128,151 @@ int cg_geo_write(int file_number, int B, int F, const char * geo_name,
     return CG_OK;
 }
 
+/* FamilyTree extension */ /* ** FAMILY TREE ** */
+
+/*----------------------------------------------------------------------*/
+int cg_node_geo_read( int G, char *geo_name,
+        char **geo_file, char *CAD_name, int *npart )
+{
+    cgns_family*  family  = 0;
+
+    CHECK_FILE_OPEN
+
+    /* verify input */
+    if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_READ)) return CG_ERROR;
+
+
+    /* check for valid posit */
+
+    if (posit == 0) {
+        cgi_error("No current position set by cg_goto\n");
+        return CG_ERROR;
+    }
+
+    if (strcmp(posit->label,"Family_t")==0)
+        family = ((cgns_family *)posit->posit);
+
+    if( family==0 ) {
+        cgi_error( "cg_node_geo_read not called at a Family_t position" );
+        return CG_ERROR;
+    }
+
+    if (G<=0 || G>family->ngeos) {
+        cgi_error("Invalid geometry reference number");
+        return CG_ERROR;
+    }
+    strcpy(geo_name,family->geo[G-1].name);
+    strcpy(CAD_name,family->geo[G-1].format);
+
+     /* This string is not limited to 32 characters and can't be pre-allocated
+    in the application */
+    geo_file[0]=CGNS_NEW(char,strlen(family->geo[G-1].file)+1);
+    strcpy(geo_file[0],family->geo[G-1].file);
+
+    *npart=family->geo[G-1].npart;
+
+    return CG_OK;
+}
+
+/*----------------------------------------------------------------------*/
+int cg_node_geo_write( const char *geo_name,
+        const char *filename, const char *CADname, int *G)
+{
+    int index;
+    cgsize_t length;
+    cgns_family *family = 0;
+    cgns_geo *geo = NULL;
+    double dummy_id;
+
+     /* verify input */
+    if (cgi_check_strlen(geo_name)) return CG_ERROR;
+    if (cgi_check_strlen(CADname)) return CG_ERROR;
+
+    CHECK_FILE_OPEN
+
+    /* verify input */
+    if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_WRITE)) return CG_ERROR;
+
+    /* check for valid posit */
+
+    if (posit == 0) {
+        cgi_error("No current position set by cg_goto\n");
+        return CG_ERROR;
+    }
+
+    if (strcmp(posit->label,"Family_t")==0)
+        family = ((cgns_family *)posit->posit);
+
+    if( family==0 ) {
+        cgi_error( "cg_node_geo_write not called at a Family_t position" );
+        return CG_ERROR;
+    }
+
+     /* Overwrite a GeometryReference_t Node: */
+    for (index=0; index<family->ngeos; index++) {
+        if (strcmp(geo_name, family->geo[index].name)==0) {
+
+             /* in CG_MODE_WRITE, children names must be unique */
+            if (cg->mode==CG_MODE_WRITE) {
+                cgi_error("Duplicate child name found: %s",geo_name);
+                return CG_ERROR;
+            }
+
+             /* overwrite an existing zone */
+             /* delete the existing geo from file */
+            if (cgi_delete_node(family->id, family->geo[index].id))
+                return CG_ERROR;
+             /* save the old in-memory address to overwrite */
+            geo = &(family->geo[index]);
+             /* free memory */
+            cgi_free_geo(geo);
+            break;
+        }
+    }
+     /* ... or add a GeometryReference_t Node: */
+    if (index==family->ngeos) {
+        if (family->ngeos == 0) {
+            family->geo = CGNS_NEW(cgns_geo, family->ngeos+1);
+        } else {
+            family->geo = CGNS_RENEW(cgns_geo, family->ngeos+1, family->geo);
+        }
+        geo = &(family->geo[family->ngeos]);
+        family->ngeos++;
+    }
+    (*G) = index+1;
+
+
+    memset(geo, 0, sizeof(cgns_geo));
+    strcpy(geo->name, geo_name);
+    strcpy(geo->format, CADname);
+
+    length = (int)strlen(filename);
+    if (length<=0) {
+        cgi_error("filename undefined for GeometryReference node!");
+        return CG_ERROR;
+    }
+    geo->file = (char *)malloc((size_t)((length+1)*sizeof(char)));
+    if (geo->file == NULL) {
+        cgi_error("Error allocation geo->file");
+        return CG_ERROR;
+    }
+    strcpy(geo->file, filename);
+
+     /* save data in file */
+    if (cgi_new_node(family->id, geo->name, "GeometryReference_t", &geo->id,
+        "MT", 0, 0, 0)) return CG_ERROR;
+    length = (cgsize_t)strlen(geo->file);
+    if (cgi_new_node(geo->id, "GeometryFile", "GeometryFile_t", &dummy_id,
+        "C1", 1, &length, geo->file)) return CG_ERROR;
+    length = (cgsize_t)strlen(geo->format);
+    if (cgi_new_node(geo->id, "GeometryFormat", "GeometryFormat_t", &dummy_id,
+        "C1", 1, &length, geo->format)) return CG_ERROR;
+
+    return CG_OK;
+}
+
+
+
 /*----------------------------------------------------------------------*/
 
 int cg_part_read(int file_number, int B, int F, int G, int P, char *part_name)
@@ -1724,6 +2314,121 @@ int cg_part_write(int file_number, int B, int F, int G, const char * part_name,
      /* get memory address for geo */
     family = cgi_get_family(cg, B, F);
     if (family==0) return CG_ERROR;
+    if (G > family->ngeos || G <=0) {
+        cgi_error("Invalid index for GeometryEntity_t node");
+        return CG_ERROR;
+    }
+    geo = &family->geo[G-1];
+
+     /* Overwrite a GeometryEntity_t Node: */
+    for (index=0; index<geo->npart; index++) {
+        if (strcmp(part_name, geo->part[index].name)==0) {
+
+             /* in CG_MODE_WRITE, children names must be unique */
+            if (cg->mode==CG_MODE_WRITE) {
+                cgi_error("Duplicate child name found: %s",part_name);
+                return CG_ERROR;
+            }
+
+             /* overwrite an existing zone */
+             /* delete the existing geo from file */
+            if (cgi_delete_node(geo->id, geo->part[index].id))
+                return CG_ERROR;
+             /* save the old in-memory address to overwrite */
+            part = &(geo->part[index]);
+             /* free memory */
+            cgi_free_part(part);
+            break;
+        }
+    }
+     /* ... or add a GeometryReference_t Node: */
+    if (index==geo->npart) {
+        if (geo->npart == 0) {
+            geo->part = CGNS_NEW(cgns_part, geo->npart+1);
+        } else {
+            geo->part = CGNS_RENEW(cgns_part, geo->npart+1, geo->part);
+        }
+        part = &(geo->part[geo->npart]);
+        geo->npart++;
+    }
+    (*P) = index+1;
+
+    memset(part, 0, sizeof(cgns_part));
+    strcpy(part->name, part_name);
+
+     /* save data in file */
+    if (cgi_new_node(geo->id, part->name, "GeometryEntity_t", &part->id,
+        "MT", 0, 0, 0)) return CG_ERROR;
+    return CG_OK;
+}
+
+/* FamilyTree extension */ /* ** FAMILY TREE ** */
+
+/*----------------------------------------------------------------------*/
+int cg_node_part_read(int G, int P, char *part_name)
+{
+    cgns_family*  family  = 0;
+
+    CHECK_FILE_OPEN
+
+    /* verify input */
+    if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_READ)) return CG_ERROR;
+
+
+    /* check for valid posit */
+
+    if (posit == 0) {
+        cgi_error("No current position set by cg_goto\n");
+        return CG_ERROR;
+    }
+
+    if (strcmp(posit->label,"Family_t")==0)
+        family = ((cgns_family *)posit->posit);
+
+    if( family==0 ) {
+        cgi_error( "cg_node_part_read not called at a Family_t position" );
+        return CG_ERROR;
+    }
+
+    if (P<=0 || P>family->geo[G-1].npart) {
+        cgi_error("Invalid part number");
+        return CG_ERROR;
+    }
+    strcpy(part_name,family->geo[G-1].part[P-1].name);
+    return CG_OK;
+}
+
+/*----------------------------------------------------------------------*/
+int cg_node_part_write(int G, const char * part_name, int *P)
+{
+    int index;
+    cgns_geo *geo;
+    cgns_part *part = NULL;
+    cgns_family *family = 0;
+
+     /* verify input */
+    if (cgi_check_strlen(part_name)) return CG_ERROR;
+
+    CHECK_FILE_OPEN
+
+    /* verify input */
+    if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_WRITE)) return CG_ERROR;
+
+    /* check for valid posit */
+
+    if (posit == 0) {
+        cgi_error("No current position set by cg_goto\n");
+        return CG_ERROR;
+    }
+
+    if (strcmp(posit->label,"Family_t")==0)
+        family = ((cgns_family *)posit->posit);
+
+    if( family==0 ) {
+        cgi_error( "cg_node_part_write not called at a Family_t position" );
+        return CG_ERROR;
+    }
+
     if (G > family->ngeos || G <=0) {
         cgi_error("Invalid index for GeometryEntity_t node");
         return CG_ERROR;
@@ -1900,7 +2605,7 @@ int cg_discrete_size(int file_number, int B, int Z, int D,
 /*----------------------------------------------------------------------*/
 
 int cg_discrete_ptset_info(int fn, int B, int Z, int D,
-	CGNS_ENUMT(PointSetType_t) *ptset_type, cgsize_t *npnts)
+    CGNS_ENUMT(PointSetType_t) *ptset_type, cgsize_t *npnts)
 {
     cgns_discrete *discrete;
 
@@ -1946,9 +2651,9 @@ int cg_discrete_ptset_read(int fn, int B, int Z, int D, cgsize_t *pnts)
 }
 
 int cg_discrete_ptset_write(int fn, int B, int Z,
-	const char *discrete_name, CGNS_ENUMT(GridLocation_t) location,
-	CGNS_ENUMT(PointSetType_t) ptset_type, cgsize_t npnts,
-	const cgsize_t *pnts, int *D)
+    const char *discrete_name, CGNS_ENUMT(GridLocation_t) location,
+    CGNS_ENUMT(PointSetType_t) ptset_type, cgsize_t npnts,
+    const cgsize_t *pnts, int *D)
 {
     int i, index_dim = 0;
     cgsize_t cnt, dim_vals = 1;
@@ -2113,6 +2818,120 @@ int cg_grid_write(int file_number, int B, int Z, const char * zcoorname, int *G)
 }
 
 /*****************************************************************************\
+ *    Read and Write GridCoordinates_t bounding box
+\*****************************************************************************/
+
+int cg_grid_bounding_box_read(int file_number, int B, int Z, int G, CGNS_ENUMT(DataType_t) type, void* boundingbox)
+{
+    cgns_zcoor *zcoor;
+    cgns_base *base;
+    char_33 name;
+    char_33 data_type;
+    int ndim;
+    void * vdata;
+    cgsize_t dim_vals[12];
+    cgsize_t num;
+
+    cg = cgi_get_file(file_number);
+    if (cg == 0) return CG_ERROR;
+
+    if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_READ)) return CG_ERROR;
+
+     /* Get memory address for GridCoordinates_t node */
+    zcoor = cgi_get_zcoor(cg, B, Z, G);
+    if (zcoor==0) return CG_ERROR;
+
+    /* Read Bounding box from GridCoordinates node data */
+    if (cgi_read_node(zcoor->id, name, data_type, &ndim, dim_vals, &vdata, READ_DATA)){
+        cgi_error("Error reading node GridCoordinates_t");
+        return CG_ERROR;
+    }
+
+    /* check bounding box is not an empty array*/
+    if (strcmp(data_type,"MT")==0) {
+        cgi_warning("No bounding box read");
+        return CG_OK;
+    }
+
+    if (strcmp(data_type,"R4") &&
+        strcmp(data_type,"R8")) {
+        cgi_error("Datatype %s not supported for coordinates bounding box", data_type);
+        return CG_ERROR;
+    }
+
+    if (ndim != 2) {
+        cgi_error("Grid coordinates bounding box is %d dimensional. It should be 2.", ndim);
+        return CG_ERROR;
+    }
+
+    base = cgi_get_base(cg, B);
+    if (base==0) return CG_ERROR;
+    num = 2*base->phys_dim;
+
+    if (dim_vals[0]*dim_vals[1] != num){
+        cgi_error("Grid coordinates bounding box is not coherent with physical dimension.");
+        return CG_ERROR;
+    }
+
+     /* verify input */
+    if (type != CGNS_ENUMV(RealSingle) && type != CGNS_ENUMV(RealDouble)) {
+        cgi_error("Invalid data type for bounding box array: %d", type);
+        return CG_ERROR;
+    }
+
+    /* transfer small bounding box data to user with correct data type */
+    cgi_convert_data(num, cgi_datatype(data_type), vdata, type, boundingbox);
+    CGNS_FREE(vdata);
+
+    return CG_OK;
+}
+
+int cg_grid_bounding_box_write(int file_number, int B, int Z, int G, CGNS_ENUMT(DataType_t) type, void* boundingbox)
+{
+    cgns_base *base;
+    cgns_zcoor *zcoor;
+    cgsize_t dim_vals[2];
+
+    cg = cgi_get_file(file_number);
+    if (cg == 0) return CG_ERROR;
+
+    if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_WRITE)) return CG_ERROR;
+
+    /* Get memory address for GridCoordinates_t node */
+    zcoor = cgi_get_zcoor(cg, B, Z, G);
+    if (zcoor==0) return CG_ERROR;
+
+    if (zcoor->id == 0){
+        cgi_error("Impossible to write coordinates bounding box to unwritten node");
+        return CG_ERROR;
+    }
+    base = cgi_get_base(cg, B);
+    if (base==0) return CG_ERROR;
+    dim_vals[0] = base->phys_dim;
+    dim_vals[1] = 2;
+
+    /* Check input */
+    if (boundingbox == NULL) return CG_OK;
+
+    if (type != CGNS_ENUMV(RealSingle) && type != CGNS_ENUMV(RealDouble)) {
+        cgi_error("Invalid data type for bounding box array: %d", type);
+        return CG_ERROR;
+    }
+
+    /* Write Bounding box into existing GridCoordinates_t node */
+    if (cgio_set_dimensions(cg->cgio, zcoor->id, cgi_adf_datatype(type), 2, dim_vals)) {
+       cg_io_error("cgio_set_dimensions");
+       return CG_ERROR;
+    }
+    if (cgio_write_all_data(cg->cgio, zcoor->id, boundingbox)){
+       cg_io_error("cgio_write_all_data");
+       return CG_ERROR;
+    }
+
+    return CG_OK;
+}
+
+/*****************************************************************************\
  *    Read and Write GridCoordinates_t/DataArray_t Nodes
 \*****************************************************************************/
 
@@ -2133,7 +2952,7 @@ int cg_ncoords(int file_number, int B, int Z, int *ncoords)
 }
 
 int cg_coord_info(int file_number, int B, int Z, int C, CGNS_ENUMT(DataType_t)  *type,
-	          char *coordname)
+              char *coordname)
 {
     cgns_zcoor *zcoor;
 
@@ -2269,7 +3088,16 @@ int cg_coord_write(int file_number, int B, int Z, CGNS_ENUMT(DataType_t) type,
     cgns_zone *zone;
     cgns_zcoor *zcoor;
     int n, m_numdim;
+    int status;
 
+    HDF5storage_type = CG_CONTIGUOUS;
+
+     /* verify input */
+    if (cgi_check_strlen(coordname)) return CG_ERROR;
+    if (type!=CGNS_ENUMV( RealSingle ) && type!=CGNS_ENUMV( RealDouble )) {
+        cgi_error("Invalid datatype for coord. array:  %d", type);
+        return CG_ERROR;
+    }
      /* get memory addresses */
     cg = cgi_get_file(file_number);
     if (cg == 0) return CG_ERROR;
@@ -2294,7 +3122,7 @@ int cg_coord_write(int file_number, int B, int Z, CGNS_ENUMT(DataType_t) type,
             s_rmin[n] = 1;
         }
         else {
-             /* new behavior consitent with SIDS */
+             /* new behavior consistent with SIDS */
             s_rmin[n] = 1 - zcoor->rind_planes[2*n];
         }
         s_rmax[n] = s_rmin[n] + m_dimvals[n] - 1;
@@ -2302,10 +3130,13 @@ int cg_coord_write(int file_number, int B, int Z, CGNS_ENUMT(DataType_t) type,
         m_rmax[n] = m_dimvals[n];
     }
 
-    return cg_coord_general_write(file_number, B, Z, coordname,
+    status = cg_coord_general_write(file_number, B, Z, coordname,
                                   type, s_rmin, s_rmax,
                                   type, m_numdim, m_dimvals, m_rmin, m_rmax,
                                   coord_ptr, C);
+
+    HDF5storage_type = CG_COMPACT;
+    return status;
 }
 
 int cg_coord_partial_write(int file_number, int B, int Z,
@@ -2316,6 +3147,7 @@ int cg_coord_partial_write(int file_number, int B, int Z,
 {
     cgns_zone *zone;
     int n, m_numdim;
+    int status;
 
      /* get memory addresses */
     cg = cgi_get_file(file_number);
@@ -2339,10 +3171,11 @@ int cg_coord_partial_write(int file_number, int B, int Z,
         m_dimvals[n] = m_rmax[n];
     }
 
-    return cg_coord_general_write(file_number, B, Z, coordname,
+    status = cg_coord_general_write(file_number, B, Z, coordname,
                                   type, s_rmin, s_rmax,
                                   type, m_numdim, m_dimvals, m_rmin, m_rmax,
                                   coord_ptr, C);
+    return status;
 }
 
 int cg_coord_general_write(int fn, int B, int Z, const char *coordname,
@@ -2357,6 +3190,9 @@ int cg_coord_general_write(int fn, int B, int Z, const char *coordname,
     cgns_zone *zone;
     cgns_zcoor *zcoor;
     int n, s_numdim;
+    int status;
+
+    HDF5storage_type = CG_CONTIGUOUS;
 
      /* verify input */
     if (cgi_check_strlen(coordname)) return CG_ERROR;
@@ -2397,7 +3233,7 @@ int cg_coord_general_write(int fn, int B, int Z, const char *coordname,
                              &zcoor->id, "MT", 0, 0, 0)) return CG_ERROR;
         }
     }
-#ifdef BUILD_HDF5
+#if CG_BUILD_HDF5
     else if (cg->filetype == CGIO_FILE_HDF5) {
         hid_t hid;
         to_HDF_ID(zcoor->id, hid);
@@ -2411,12 +3247,14 @@ int cg_coord_general_write(int fn, int B, int Z, const char *coordname,
         return CG_ERROR;
     }
 
-    return cgi_array_general_write(zcoor->id, &(zcoor->ncoords),
+    status = cgi_array_general_write(zcoor->id, &(zcoor->ncoords),
                                    &(zcoor->coord), coordname,
                                    cgns_rindindex, zcoor->rind_planes,
                                    s_type, s_numdim, s_dimvals, s_rmin, s_rmax,
                                    m_type, m_numdim, m_dimvals, m_rmin, m_rmax,
                                    coord_ptr, C);
+    HDF5storage_type = CG_COMPACT;
+    return status;
 }
 
 /*****************************************************************************\
@@ -2459,7 +3297,7 @@ static void free_element_data(cgns_section *section)
 static int read_element_data(cgns_section *section)
 {
     if (section->connect->data == NULL) {
-	cgsize_t cnt = section->connect->dim_vals[0];
+    cgsize_t cnt = section->connect->dim_vals[0];
 
         section->connect->data = malloc(cnt * sizeof(cgsize_t));
         if (section->connect->data == NULL) {
@@ -2486,7 +3324,7 @@ static void free_offset_data(cgns_section *section)
 static int read_offset_data(cgns_section *section)
 {
     if (section->connect_offset->data == NULL) {
-	cgsize_t cnt = section->connect_offset->dim_vals[0];
+    cgsize_t cnt = section->connect_offset->dim_vals[0];
 
         section->connect_offset->data = malloc(cnt * sizeof(cgsize_t));
         if (section->connect_offset->data == NULL) {
@@ -2837,8 +3675,8 @@ int cg_poly_section_write(int file_number, int B, int Z, const char * SectionNam
 }
 
 int cg_section_partial_write(int file_number, int B, int Z, const char * SectionName,
-			     CGNS_ENUMT(ElementType_t) type, cgsize_t start,
-			     cgsize_t end, int nbndry, int *S)
+                 CGNS_ENUMT(ElementType_t) type, cgsize_t start,
+                 cgsize_t end, int nbndry, int *S)
 {
     cgns_zone *zone;
     cgns_section *section = NULL;
@@ -3010,10 +3848,10 @@ int cg_ElementDataSize(int file_number, int B, int Z, int S,
 }
 
 int cg_ElementPartialSize(int file_number, int B, int Z, int S,
-	cgsize_t start, cgsize_t end, cgsize_t *ElementDataSize)
+    cgsize_t start, cgsize_t end, cgsize_t *ElementDataSize)
 {
     cgns_section *section;
-    cgsize_t size, offset, *data, *offset_data;
+    cgsize_t size, *offset_data;
 
     cg = cgi_get_file(file_number);
     if (cg == 0) return CG_ERROR;
@@ -3230,10 +4068,10 @@ int cg_elements_partial_read(int file_number, int B, int Z, int S,
         m_stride[0] = 1;
         m_dim[0]    = size;
 
-        if (cgio_read_data(cg->cgio, section->connect->id,
-                           s_start, s_end, s_stride, 1, m_dim,
+        if (cgio_read_data_type(cg->cgio, section->connect->id,
+                           s_start, s_end, s_stride, CG_SIZE_DATATYPE, 1, m_dim,
                            m_start, m_end, m_stride, elements)) {
-            cg_io_error("cgio_read_data");
+            cg_io_error("cgio_read_data_type");
             return CG_ERROR;
         }
     } else {
@@ -3270,10 +4108,10 @@ int cg_elements_partial_read(int file_number, int B, int Z, int S,
                 m_dim[0]   = m_end[0];
                 m_dim[1]   = 4;
 
-                if (cgio_read_data(cg->cgio, section->parelem->id,
-                                   s_start, s_end, s_stride, 2, m_dim,
+                if (cgio_read_data_type(cg->cgio, section->parelem->id,
+                                   s_start, s_end, s_stride, CG_SIZE_DATATYPE, 2, m_dim,
                                    m_start, m_end, m_stride, parent_data)) {
-                    cg_io_error("cgio_read_data");
+                    cg_io_error("cgio_read_data_type");
                     return CG_ERROR;
                 }
             }
@@ -3281,7 +4119,7 @@ int cg_elements_partial_read(int file_number, int B, int Z, int S,
                 nn = section->parelem->dim_vals[0] * 4;
                 data = (cgsize_t *)malloc((size_t)(nn * sizeof(cgsize_t)));
                 if (data == NULL) {
-                    cgi_error("malloc failed for tempory ParentData array");
+                    cgi_error("malloc failed for temporary ParentData array");
                     return CG_ERROR;
                 }
                 if (cgi_read_int_data(section->parelem->id,
@@ -3315,20 +4153,20 @@ int cg_elements_partial_read(int file_number, int B, int Z, int S,
             m_dim[0]   = m_end[0];
             m_dim[1]   = 4;
 
-            if (cgio_read_data(cg->cgio, section->parelem->id,
-                               s_start, s_end, s_stride, 2, m_dim,
+            if (cgio_read_data_type(cg->cgio, section->parelem->id,
+                               s_start, s_end, s_stride, CG_SIZE_DATATYPE, 2, m_dim,
                                m_start, m_end, m_stride, parent_data)) {
-                cg_io_error("cgio_read_data");
+                cg_io_error("cgio_read_data_type");
                 return CG_ERROR;
             }
 
             m_start[1] = 3;
             m_end[1]   = 4;
 
-            if (cgio_read_data(cg->cgio, section->parface->id,
-                               s_start, s_end, s_stride, 2, m_dim,
+            if (cgio_read_data_type(cg->cgio, section->parface->id,
+                               s_start, s_end, s_stride, CG_SIZE_DATATYPE, 2, m_dim,
                                m_start, m_end, m_stride, parent_data)) {
-                cg_io_error("cgio_read_data");
+                cg_io_error("cgio_read_data_type");
                 return CG_ERROR;
             }
         }
@@ -3399,10 +4237,10 @@ int cg_poly_elements_partial_read(int file_number, int B, int Z, int S,
             m_stride[0] = 1;
             m_dim[0]    = size;
 
-            if (cgio_read_data(cg->cgio, section->connect->id,
-                               s_start, s_end, s_stride, 1, m_dim,
+            if (cgio_read_data_type(cg->cgio, section->connect->id,
+                               s_start, s_end, s_stride, CG_SIZE_DATATYPE, 1, m_dim,
                                m_start, m_end, m_stride, elements)) {
-                cg_io_error("cgio_read_data");
+                cg_io_error("cgio_read_data_type");
                 return CG_ERROR;
             }
         } else {
@@ -3434,10 +4272,10 @@ int cg_poly_elements_partial_read(int file_number, int B, int Z, int S,
             m_stride[0] = 1;
             m_dim[0]    = size;
 
-            if (cgio_read_data(cg->cgio, section->connect->id,
-                               s_start, s_end, s_stride, 1, m_dim,
+            if (cgio_read_data_type(cg->cgio, section->connect->id,
+                               s_start, s_end, s_stride, CG_SIZE_DATATYPE, 1, m_dim,
                                m_start, m_end, m_stride, elements)) {
-                cg_io_error("cgio_read_data");
+                cg_io_error("cgio_read_data_type");
                 return CG_ERROR;
             }
         } else {
@@ -3483,10 +4321,10 @@ int cg_poly_elements_partial_read(int file_number, int B, int Z, int S,
                 m_dim[0]   = m_end[0];
                 m_dim[1]   = 4;
 
-                if (cgio_read_data(cg->cgio, section->parelem->id,
-                                   s_start, s_end, s_stride, 2, m_dim,
+                if (cgio_read_data_type(cg->cgio, section->parelem->id,
+                                   s_start, s_end, s_stride, CG_SIZE_DATATYPE, 2, m_dim,
                                    m_start, m_end, m_stride, parent_data)) {
-                    cg_io_error("cgio_read_data");
+                    cg_io_error("cgio_read_data_type");
                     return CG_ERROR;
                 }
             }
@@ -3494,7 +4332,7 @@ int cg_poly_elements_partial_read(int file_number, int B, int Z, int S,
                 nn = section->parelem->dim_vals[0] * 4;
                 data = (cgsize_t *)malloc((size_t)(nn * sizeof(cgsize_t)));
                 if (data == NULL) {
-                    cgi_error("malloc failed for tempory ParentData array");
+                    cgi_error("malloc failed for temporary ParentData array");
                     return CG_ERROR;
                 }
                 if (cgi_read_int_data(section->parelem->id,
@@ -3528,20 +4366,20 @@ int cg_poly_elements_partial_read(int file_number, int B, int Z, int S,
             m_dim[0]   = m_end[0];
             m_dim[1]   = 4;
 
-            if (cgio_read_data(cg->cgio, section->parelem->id,
-                               s_start, s_end, s_stride, 2, m_dim,
+            if (cgio_read_data_type(cg->cgio, section->parelem->id,
+                               s_start, s_end, s_stride, CG_SIZE_DATATYPE, 2, m_dim,
                                m_start, m_end, m_stride, parent_data)) {
-                cg_io_error("cgio_read_data");
+                cg_io_error("cgio_read_data_type");
                 return CG_ERROR;
             }
 
             m_start[1] = 3;
             m_end[1]   = 4;
 
-            if (cgio_read_data(cg->cgio, section->parface->id,
-                               s_start, s_end, s_stride, 2, m_dim,
+            if (cgio_read_data_type(cg->cgio, section->parface->id,
+                               s_start, s_end, s_stride, CG_SIZE_DATATYPE, 2, m_dim,
                                m_start, m_end, m_stride, parent_data)) {
-                cg_io_error("cgio_read_data");
+                cg_io_error("cgio_read_data_type");
                 return CG_ERROR;
             }
         }
@@ -3798,7 +4636,7 @@ int cg_elements_partial_write(int file_number, int B, int Z, int S,
 
         newelems = (cgsize_t *)malloc((size_t)(cnt * newsize * sizeof(cgsize_t)));
         if (NULL == newelems) {
-            cgi_error("Error alocating new ParentElements data");
+            cgi_error("Error allocating new ParentElements data");
             return CG_ERROR;
         }
         offset = start - section->range[0];
@@ -3869,8 +4707,8 @@ int cg_elements_partial_write(int file_number, int B, int Z, int S,
 }
 
 int cg_poly_elements_partial_write(int file_number, int B, int Z, int S,
-			      cgsize_t start, cgsize_t end,
-			      const cgsize_t *elements, const cgsize_t *connect_offset)
+                  cgsize_t start, cgsize_t end,
+                  const cgsize_t *elements, const cgsize_t *connect_offset)
 {
     cgns_section *section;
     CGNS_ENUMT(ElementType_t) type;
@@ -4040,13 +4878,14 @@ int cg_poly_elements_partial_write(int file_number, int B, int Z, int S,
         /* create new element connectivity array and offsets*/
 
         newelems = (cgsize_t *) malloc ((size_t)(newsize * sizeof(cgsize_t)));
-        newoffsets = (cgsize_t *) malloc((size_t)((elemcount+1) * sizeof(cgsize_t)));
         if (NULL == newelems) {
             cgi_error("Error allocating new connectivity data");
             return CG_ERROR;
         }
+        newoffsets = (cgsize_t *) malloc((size_t)((elemcount+1) * sizeof(cgsize_t)));
         if (NULL == newoffsets) {
             cgi_error("Error allocating new connectivity offset data");
+            free(newelems);
             return CG_ERROR;
         }
 
@@ -4078,7 +4917,11 @@ int cg_poly_elements_partial_write(int file_number, int B, int Z, int S,
             } else if (end < section->range[1]) {
                 num = end - section->range[0] + 1;
                 offset = section_offset[end - section->range[0] + 1];
-                if (offset < 0) return CG_ERROR;
+                if (offset < 0) {
+                    free(newelems);
+                    free(newoffsets);
+                    return CG_ERROR;
+                }
                 size = section_offset[section->range[1]-section->range[0]+1] - section_offset[num];
                 memcpy(&newelems[n], &oldelems[offset], (size_t)(size*sizeof(cgsize_t)));
                 n += size;
@@ -4088,7 +4931,6 @@ int cg_poly_elements_partial_write(int file_number, int B, int Z, int S,
                 }
             }
         } else if (start > section->range[1]) {
-            cgsize_t ii;
             memcpy(newelems, oldelems, (size_t)(oldsize*sizeof(cgsize_t)));
             memcpy(newoffsets, section_offset, (size_t)((section->range[1]-section->range[0]+2)*sizeof(cgsize_t)));
             n += oldsize;
@@ -4110,7 +4952,6 @@ int cg_poly_elements_partial_write(int file_number, int B, int Z, int S,
                 j++;
             }
         } else {
-            cgsize_t ii;
             num = start - section->range[0];
             size = section_offset[num];
             memcpy(newelems, oldelems, (size_t)(size*sizeof(cgsize_t)));
@@ -4212,7 +5053,7 @@ int cg_poly_elements_partial_write(int file_number, int B, int Z, int S,
 
         newelems = (cgsize_t *)malloc((size_t)(cnt * newsize * sizeof(cgsize_t)));
         if (NULL == newelems) {
-            cgi_error("Error alocating new ParentElements data");
+            cgi_error("Error allocating new ParentElements data");
             return CG_ERROR;
         }
         offset = start - section->range[0];
@@ -4285,7 +5126,7 @@ int cg_poly_elements_partial_write(int file_number, int B, int Z, int S,
 /*----------------------------------------------------------------------*/
 
 int cg_parent_data_write(int file_number, int B, int Z, int S,
-			 const cgsize_t * parent_data)
+             const cgsize_t * parent_data)
 {
     cgns_section *section;
     cgsize_t num;
@@ -4422,7 +5263,7 @@ int cg_parent_data_partial_write(int file_number, int B, int Z, int S,
         return CG_ERROR;
     }
     if (size != section->parelem->dim_vals[0]) {
-        cgi_error("internal errror - invalid ParentElements data size !!!");
+        cgi_error("internal error - invalid ParentElements data size !!!");
         return CG_ERROR;
     }
 
@@ -4444,7 +5285,7 @@ int cg_parent_data_partial_write(int file_number, int B, int Z, int S,
             return CG_ERROR;
         }
         if (size != section->parface->dim_vals[0]) {
-            cgi_error("internal errror - invalid ParentElementsPosition data size !!!");
+            cgi_error("internal error - invalid ParentElementsPosition data size !!!");
             return CG_ERROR;
         }
     }
@@ -4493,7 +5334,7 @@ int cg_parent_data_partial_write(int file_number, int B, int Z, int S,
 
         if (read_parent_data(section)) return CG_ERROR;
 
-	data = (cgsize_t *)section->parelem->data;
+    data = (cgsize_t *)section->parelem->data;
         for (i = 0, num = 0; num < cnt; num++) {
             j = num * size + offset;
             for (n = start; n <= end; n++)
@@ -4541,7 +5382,7 @@ int cg_nsols(int file_number, int B, int Z, int *nsols)
 }
 
 int cg_sol_info(int file_number, int B, int Z, int S, char *solname,
-	        CGNS_ENUMT(GridLocation_t) *location)
+            CGNS_ENUMT(GridLocation_t) *location)
 {
     cgns_sol *sol;
 
@@ -4575,7 +5416,7 @@ int cg_sol_id(int file_number, int B, int Z, int S, double *sol_id)
 }
 
 int cg_sol_write(int file_number, int B, int Z, const char * solname,
-		 CGNS_ENUMT(GridLocation_t) location, int *S)
+         CGNS_ENUMT(GridLocation_t) location, int *S)
 {
     cgns_zone *zone;
     cgns_sol *sol = NULL;
@@ -4701,7 +5542,7 @@ int cg_sol_size(int file_number, int B, int Z, int S,
 /*----------------------------------------------------------------------*/
 
 int cg_sol_ptset_info(int fn, int B, int Z, int S,
-	CGNS_ENUMT(PointSetType_t) *ptset_type, cgsize_t *npnts)
+    CGNS_ENUMT(PointSetType_t) *ptset_type, cgsize_t *npnts)
 {
     cgns_sol *sol;
 
@@ -4747,9 +5588,9 @@ int cg_sol_ptset_read(int fn, int B, int Z, int S, cgsize_t *pnts)
 }
 
 int cg_sol_ptset_write(int fn, int B, int Z, const char *solname,
-	CGNS_ENUMT(GridLocation_t) location,
-	CGNS_ENUMT(PointSetType_t) ptset_type, cgsize_t npnts,
-	const cgsize_t *pnts, int *S)
+    CGNS_ENUMT(GridLocation_t) location,
+    CGNS_ENUMT(PointSetType_t) ptset_type, cgsize_t npnts,
+    const cgsize_t *pnts, int *S)
 {
     int i, index_dim = 0;
     cgsize_t cnt, dim_vals = 1;
@@ -4865,8 +5706,8 @@ int cg_field_read(int file_number, int B, int Z, int S, const char *fieldname,
 
      /* verify that range requested does not exceed range stored */
     if (s_rmin == NULL || s_rmax == NULL) {
-	cgi_error("NULL range value.");
-	return CG_ERROR;
+        cgi_error("NULL range value.");
+        return CG_ERROR;
     }
 
     cgsize_t m_dimvals[CGIO_MAX_DIMENSIONS];
@@ -4960,6 +5801,16 @@ int cg_field_write(int file_number, int B, int Z, int S,
     cgns_sol *sol;
     int n, m_numdim;
 
+    HDF5storage_type = CG_CONTIGUOUS;
+
+     /* verify input */
+    if (cgi_check_strlen(fieldname)) return CG_ERROR;
+    if (type != CGNS_ENUMV(RealSingle) && type != CGNS_ENUMV(RealDouble) &&
+        type != CGNS_ENUMV(Integer) && type != CGNS_ENUMV(LongInteger)) {
+        cgi_error("Invalid datatype for solution array %s: %d",fieldname, type);
+        return CG_ERROR;
+    }
+
      /* get memory addresses */
     cg = cgi_get_file(file_number);
     if (cg == 0) return CG_ERROR;
@@ -4991,7 +5842,7 @@ int cg_field_write(int file_number, int B, int Z, int S,
             s_rmin[n] = 1;
         }
         else {
-             /* new behavior consitent with SIDS */
+             /* new behavior consistent with SIDS */
             s_rmin[n] = 1 - sol->rind_planes[2*n];
         }
         s_rmax[n] = s_rmin[n] + m_dimvals[n] - 1;
@@ -5013,6 +5864,7 @@ int cg_field_partial_write(int file_number, int B, int Z, int S,
     cgns_zone *zone;
     cgns_sol *sol;
     int n, m_numdim;
+    int status;
 
      /* get memory addresses */
     cg = cgi_get_file(file_number);
@@ -5034,8 +5886,8 @@ int cg_field_partial_write(int file_number, int B, int Z, int S,
     }
 
     if (s_rmin == NULL || s_rmax == NULL) {
-	cgi_error("NULL range value.");
-	return CG_ERROR;
+        cgi_error("NULL range value.");
+        return CG_ERROR;
     }
 
     cgsize_t m_dimvals[CGIO_MAX_DIMENSIONS];
@@ -5046,10 +5898,14 @@ int cg_field_partial_write(int file_number, int B, int Z, int S,
         m_dimvals[n] = m_rmax[n];
     }
 
-    return cg_field_general_write(file_number, B, Z, S, fieldname,
+    status = cg_field_general_write(file_number, B, Z, S, fieldname,
                                   type, s_rmin, s_rmax,
                                   type, m_numdim, m_dimvals, m_rmin, m_rmax,
                                   field_ptr, F);
+
+    HDF5storage_type = CG_COMPACT;
+    return status;
+
 }
 
 int cg_field_general_write(int fn, int B, int Z, int S, const char *fieldname,
@@ -5064,6 +5920,9 @@ int cg_field_general_write(int fn, int B, int Z, int S, const char *fieldname,
     cgns_zone *zone;
     cgns_sol *sol;
     int s_numdim;
+    int status;
+
+    HDF5storage_type = CG_CONTIGUOUS;
 
      /* verify input */
     if (cgi_check_strlen(fieldname)) return CG_ERROR;
@@ -5104,12 +5963,15 @@ int cg_field_general_write(int fn, int B, int Z, int S, const char *fieldname,
         s_dimvals[0] = sol->ptset->size_of_patch;
     }
 
-    return cgi_array_general_write(sol->id, &(sol->nfields),
+    status= cgi_array_general_write(sol->id, &(sol->nfields),
                                    &(sol->field), fieldname,
                                    cgns_rindindex, sol->rind_planes,
                                    s_type, s_numdim, s_dimvals, s_rmin, s_rmax,
                                    m_type, m_numdim, m_dimvals, m_rmin, m_rmax,
                                    field_ptr, F);
+    
+    HDF5storage_type = CG_COMPACT;
+    return status;
 }
 
 /*************************************************************************\
@@ -5418,7 +6280,7 @@ int cg_subreg_gcname_write(int fn, int B, int Z, const char *name, int dimension
 }
 
 /*************************************************************************\
- *      Read and write ZoneGridConnectivity_t Nodes  			 *
+ *      Read and write ZoneGridConnectivity_t Nodes               *
 \*************************************************************************/
 
 int cg_nzconns(int fn, int B, int Z, int *nzconns)
@@ -5577,7 +6439,7 @@ int cg_nholes(int file_number, int B, int Z, int *nholes)
 }
 
 int cg_hole_info(int file_number, int B, int Z, int I, char *holename,
-		 CGNS_ENUMT(GridLocation_t) *location,
+         CGNS_ENUMT(GridLocation_t) *location,
                  CGNS_ENUMT(PointSetType_t) *ptset_type, int *nptsets,
                  cgsize_t *npnts)
 {
@@ -5664,9 +6526,9 @@ int cg_hole_id(int file_number, int B, int Z, int I, double *hole_id)
 }
 
 int cg_hole_write(int file_number, int B, int Z, const char * holename,
-		  CGNS_ENUMT(GridLocation_t) location,
-		  CGNS_ENUMT(PointSetType_t) ptset_type,
-		  int nptsets, cgsize_t npnts, const cgsize_t * pnts, int *I)
+          CGNS_ENUMT(GridLocation_t) location,
+          CGNS_ENUMT(PointSetType_t) ptset_type,
+          int nptsets, cgsize_t npnts, const cgsize_t * pnts, int *I)
 {
     cgns_zone *zone;
     cgns_zconn *zconn;
@@ -5778,16 +6640,16 @@ int cg_hole_write(int file_number, int B, int Z, const char * holename,
     if (cg->filetype == CGIO_FILE_ADF || cg->filetype == CGIO_FILE_ADF2) {
       if (zconn->id==0) {
         if (cgi_new_node(zone->id, zconn->name, "ZoneGridConnectivity_t",
-			 &zconn->id, "MT", 0, 0, 0)) return CG_ERROR;
+             &zconn->id, "MT", 0, 0, 0)) return CG_ERROR;
       }
     }
-#ifdef BUILD_HDF5
+#if CG_BUILD_HDF5
     else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(zconn->id, hid);
       if (hid==0) {
         if (cgi_new_node(zone->id, zconn->name, "ZoneGridConnectivity_t",
-			 &zconn->id, "MT", 0, 0, 0)) return CG_ERROR;
+             &zconn->id, "MT", 0, 0, 0)) return CG_ERROR;
       }
     }
 #endif
@@ -5810,7 +6672,7 @@ int cg_hole_write(int file_number, int B, int Z, const char * holename,
 
         if (ptset->npts > 0) {
              /* Create Point Set node on disk */
-	  if (ptset->type == CGNS_ENUMV(PointRange))
+      if (ptset->type == CGNS_ENUMV(PointRange))
                 sprintf(PointSetName, "PointRange%d",set+1);
             else
                 sprintf(PointSetName, "%s", PointSetTypeName[ptset->type]);
@@ -5842,12 +6704,12 @@ int cg_nconns(int file_number, int B, int Z, int *nconns)
 }
 
 /* in cg_conn_info, donor_datatype is useless starting with version 1.27, because
-   it's always I4.  Howver this arg. is left for backward compatibility of API
+   it's always I4.  However this arg. is left for backward compatibility of API
    and to be able to read old files */
 int cg_conn_info(int file_number, int B, int Z, int I, char *connectname,
-		 CGNS_ENUMT(GridLocation_t) *location,
+         CGNS_ENUMT(GridLocation_t) *location,
                  CGNS_ENUMT(GridConnectivityType_t) *type,
-		 CGNS_ENUMT(PointSetType_t) *ptset_type, cgsize_t *npnts,
+         CGNS_ENUMT(PointSetType_t) *ptset_type, cgsize_t *npnts,
                  char *donorname, CGNS_ENUMT(ZoneType_t) *donor_zonetype,
                  CGNS_ENUMT(PointSetType_t) *donor_ptset_type,
                  CGNS_ENUMT(DataType_t) *donor_datatype, cgsize_t *ndata_donor)
@@ -5936,10 +6798,10 @@ int cg_conn_read(int file_number, int B, int Z, int I, cgsize_t *pnts,
      /* read donor points from ADF file - data_type may be I4, R4 or R8 */
     if (conn->dptset.npts > 0) {
         cgns_ptset dptset = conn->dptset;
-        int index_dim = 0;
+        index_dim = 0;
         for (n=0; n<cg->base[B-1].nzones; n++) {
             if (strcmp(cg->base[B-1].zone[n].name,conn->donor)==0) {
-	        index_dim = cg->base[B-1].zone[n].type == CGNS_ENUMV(Structured) ? cell_dim : 1;
+            index_dim = cg->base[B-1].zone[n].type == CGNS_ENUMV(Structured) ? cell_dim : 1;
                 break;
             }
         }
@@ -5980,14 +6842,14 @@ int cg_conn_id(int file_number, int B, int Z, int I, double *conn_id)
 }
 
 int cg_conn_write(int file_number, int B, int Z,  const char * connectname,
-		  CGNS_ENUMT(GridLocation_t) location,
-		  CGNS_ENUMT(GridConnectivityType_t) type,
-		  CGNS_ENUMT(PointSetType_t) ptset_type,
-		  cgsize_t npnts, const cgsize_t * pnts, const char * donorname,
-		  CGNS_ENUMT(ZoneType_t) donor_zonetype,
-		  CGNS_ENUMT(PointSetType_t) donor_ptset_type,
+          CGNS_ENUMT(GridLocation_t) location,
+          CGNS_ENUMT(GridConnectivityType_t) type,
+          CGNS_ENUMT(PointSetType_t) ptset_type,
+          cgsize_t npnts, const cgsize_t * pnts, const char * donorname,
+          CGNS_ENUMT(ZoneType_t) donor_zonetype,
+          CGNS_ENUMT(PointSetType_t) donor_ptset_type,
                   CGNS_ENUMT(DataType_t) donor_datatype,
-		  cgsize_t ndata_donor, const cgsize_t * donor_data, int *I)
+          cgsize_t ndata_donor, const cgsize_t * donor_data, int *I)
 {
     cgns_zone *zone;
     cgns_zconn *zconn;
@@ -6202,16 +7064,16 @@ int cg_conn_write(int file_number, int B, int Z,  const char * connectname,
       /* Create node ZoneGridConnectivity_t node, if not yet created */
       if (zconn->id==0) {
         if (cgi_new_node(zone->id, zconn->name, "ZoneGridConnectivity_t",
-			 &zconn->id, "MT", 0, 0, 0)) return CG_ERROR;
+             &zconn->id, "MT", 0, 0, 0)) return CG_ERROR;
       }
     }
-#ifdef BUILD_HDF5
+#if CG_BUILD_HDF5
     else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(zconn->id, hid);
       if (hid==0) {
         if (cgi_new_node(zone->id, zconn->name, "ZoneGridConnectivity_t",
-			 &zconn->id, "MT", 0, 0, 0)) return CG_ERROR;
+             &zconn->id, "MT", 0, 0, 0)) return CG_ERROR;
       }
     }
 #endif
@@ -6245,7 +7107,7 @@ int cg_conn_write(int file_number, int B, int Z,  const char * connectname,
 
         /* Write pointset of donor */
         if (ndata_donor) {
-	    if (donor_zonetype==CGNS_ENUMV(Structured))
+        if (donor_zonetype==CGNS_ENUMV(Structured))
                 index_dim_donor = cell_dim;
             else
                 index_dim_donor=1;
@@ -6265,8 +7127,8 @@ int cg_conn_write_short(int file_number, int B, int Z,  const char * connectname
                         const char * donorname, int *I)
 {
     return cg_conn_write (file_number, B, Z,  connectname, location,
-			  type, ptset_type, npnts, pnts, donorname,
-			  CGNS_ENUMV(ZoneTypeNull), CGNS_ENUMV(PointSetTypeNull),
+              type, ptset_type, npnts, pnts, donorname,
+              CGNS_ENUMV(ZoneTypeNull), CGNS_ENUMV(PointSetTypeNull),
                           CGNS_ENUMV(DataTypeNull), 0, NULL, I);
 }
 
@@ -6470,8 +7332,8 @@ int cg_1to1_id(int file_number, int B, int Z, int I, double *one21_id)
 }
 
 int cg_1to1_write(int file_number, int B, int Z, const char * connectname,
-		  const char * donorname, const cgsize_t * range,
-		  const cgsize_t * donor_range, const int * transform, int *I)
+          const char * donorname, const cgsize_t * range,
+          const cgsize_t * donor_range, const int * transform, int *I)
 {
     cgns_zone *zone;
     cgns_zconn *zconn;
@@ -6519,11 +7381,11 @@ int cg_1to1_write(int file_number, int B, int Z, const char * connectname,
             return CG_ERROR;
         }
         if (abs(transform[i])>0) {
-	    cgsize_t dr, ddr;
+        cgsize_t dr, ddr;
             j = abs(transform[i])-1;
-	    dr = range[i+index_dim] - range[i];
-	    ddr = donor_range[j+index_dim] - donor_range[j];
-	    if (dr != ddr && dr != -ddr) {
+        dr = range[i+index_dim] - range[i];
+        ddr = donor_range[j+index_dim] - donor_range[j];
+        if (dr != ddr && dr != -ddr) {
                 cgi_error("Invalid input:  range = %d->%d and donor_range = %d->%d",
                 range[i], range[i+index_dim], donor_range[j], donor_range[j+index_dim]);
                 return CG_ERROR;
@@ -6591,16 +7453,16 @@ int cg_1to1_write(int file_number, int B, int Z, const char * connectname,
     if (cg->filetype == CGIO_FILE_ADF || cg->filetype == CGIO_FILE_ADF2) {
       if (zconn->id==0) {
         if (cgi_new_node(zone->id, zconn->name, "ZoneGridConnectivity_t",
-			 &zconn->id, "MT", 0, 0, 0)) return CG_ERROR;
+             &zconn->id, "MT", 0, 0, 0)) return CG_ERROR;
       }
     }
-#ifdef BUILD_HDF5
+#if CG_BUILD_HDF5
     else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(zconn->id, hid);
       if (hid==0) {
         if (cgi_new_node(zone->id, zconn->name, "ZoneGridConnectivity_t",
-			 &zconn->id, "MT", 0, 0, 0)) return CG_ERROR;
+             &zconn->id, "MT", 0, 0, 0)) return CG_ERROR;
       }
     }
 #endif
@@ -6746,7 +7608,7 @@ int cg_boco_id(int file_number, int B, int Z, int BC, double *boco_id)
 }
 
 int cg_boco_gridlocation_read(int file_number, int B, int Z,
-	int BC, CGNS_ENUMT(GridLocation_t) *location)
+    int BC, CGNS_ENUMT(GridLocation_t) *location)
 {
     cgns_boco *boco;
 
@@ -6763,9 +7625,9 @@ int cg_boco_gridlocation_read(int file_number, int B, int Z,
 }
 
 int cg_boco_write(int file_number, int B, int Z, const char * boconame,
-		  CGNS_ENUMT(BCType_t) bocotype,
-		  CGNS_ENUMT(PointSetType_t) ptset_type,
-		  cgsize_t npnts, const cgsize_t * pnts, int *BC)
+          CGNS_ENUMT(BCType_t) bocotype,
+          CGNS_ENUMT(PointSetType_t) ptset_type,
+          cgsize_t npnts, const cgsize_t * pnts, int *BC)
 {
     cgns_zone *zone;
     cgns_zboco *zboco;
@@ -6898,16 +7760,16 @@ int cg_boco_write(int file_number, int B, int Z, const char * boconame,
     if (cg->filetype == CGIO_FILE_ADF || cg->filetype == CGIO_FILE_ADF2) {
       if (zboco->id==0) {
         if (cgi_new_node(zone->id, "ZoneBC", "ZoneBC_t",
-			 &zboco->id, "MT", 0, 0, 0)) return CG_ERROR;
+             &zboco->id, "MT", 0, 0, 0)) return CG_ERROR;
       }
     }
-#ifdef BUILD_HDF5
+#if CG_BUILD_HDF5
     else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(zboco->id, hid);
       if (hid==0) {
         if (cgi_new_node(zone->id, "ZoneBC", "ZoneBC_t",
-			 &zboco->id, "MT", 0, 0, 0)) return CG_ERROR;
+             &zboco->id, "MT", 0, 0, 0)) return CG_ERROR;
       }
     }
 #endif
@@ -6938,7 +7800,7 @@ int cg_boco_write(int file_number, int B, int Z, const char * boconame,
 }
 
 int cg_boco_gridlocation_write(int file_number, int B, int Z,
-	int BC, CGNS_ENUMT(GridLocation_t) location)
+    int BC, CGNS_ENUMT(GridLocation_t) location)
 {
     cgns_boco *boco;
     cgsize_t dim_vals;
@@ -6970,8 +7832,8 @@ int cg_boco_gridlocation_write(int file_number, int B, int Z,
 }
 
 int cg_boco_normal_write(int file_number, int B, int Z, int BC, const int * NormalIndex,
-			 int NormalListFlag, CGNS_ENUMT(DataType_t) NormalDataType,
-			 const void * NormalList)
+             int NormalListFlag, CGNS_ENUMT(DataType_t) NormalDataType,
+             const void * NormalList)
 {
     cgns_boco *boco;
     int n, phys_dim;
@@ -7053,8 +7915,8 @@ int cg_boco_normal_write(int file_number, int B, int Z, int BC, const int * Norm
 \*****************************************************************************/
 
 int cg_dataset_read(int file_number, int B, int Z, int BC, int DSet, char *name,
-		    CGNS_ENUMT(BCType_t) *BCType, int *DirichletFlag,
-		    int *NeumannFlag)
+            CGNS_ENUMT(BCType_t) *BCType, int *DirichletFlag,
+            int *NeumannFlag)
 {
     cgns_dataset *dataset;
 
@@ -7077,7 +7939,7 @@ int cg_dataset_read(int file_number, int B, int Z, int BC, int DSet, char *name,
 }
 
 int cg_dataset_write(int file_number, int B, int Z, int BC, const char * name,
-		     CGNS_ENUMT( BCType_t )  BCType, int *Dset)
+             CGNS_ENUMT( BCType_t )  BCType, int *Dset)
 {
     cgns_boco *boco;
     cgns_dataset *dataset = NULL;
@@ -7150,7 +8012,7 @@ int cg_dataset_write(int file_number, int B, int Z, int BC, const char * name,
 \*****************************************************************************/
 
 int cg_bcdata_write(int file_number, int B, int Z, int BC, int Dset,
-		    CGNS_ENUMT(BCDataType_t) BCDataType)
+            CGNS_ENUMT(BCDataType_t) BCDataType)
 {
     cgns_dataset *dataset;
     cgns_bcdata *bcdata;
@@ -7231,7 +8093,7 @@ int cg_n_rigid_motions(int file_number, int B, int Z, int *n_rigid_motions)
 }
 
 int cg_rigid_motion_read(int file_number, int B, int Z, int R, char *name,
-			 CGNS_ENUMT(RigidGridMotionType_t) *type)
+             CGNS_ENUMT(RigidGridMotionType_t) *type)
 {
 
     cgns_rmotion *rmotion;
@@ -7251,7 +8113,7 @@ int cg_rigid_motion_read(int file_number, int B, int Z, int R, char *name,
 }
 
 int cg_rigid_motion_write(int file_number, int B, int Z, const char * rmotionname,
-			  CGNS_ENUMT(RigidGridMotionType_t) type, int *R)
+              CGNS_ENUMT(RigidGridMotionType_t) type, int *R)
 {
     cgns_zone *zone;
     cgns_rmotion *rmotion = NULL;
@@ -7343,7 +8205,7 @@ int cg_n_arbitrary_motions(int file_number, int B, int Z, int *n_arbitrary_motio
 }
 
 int cg_arbitrary_motion_read(int file_number, int B, int Z, int A, char *name,
-			     CGNS_ENUMT(ArbitraryGridMotionType_t) *type)
+                 CGNS_ENUMT(ArbitraryGridMotionType_t) *type)
 {
 
     cgns_amotion *amotion;
@@ -7363,7 +8225,7 @@ int cg_arbitrary_motion_read(int file_number, int B, int Z, int A, char *name,
 }
 
 int cg_arbitrary_motion_write(int file_number, int B, int Z, const char * amotionname,
-			      CGNS_ENUMT(ArbitraryGridMotionType_t) type, int *A)
+                  CGNS_ENUMT(ArbitraryGridMotionType_t) type, int *A)
 {
     cgns_zone *zone;
     cgns_amotion *amotion = NULL;
@@ -7818,7 +8680,7 @@ int cg_axisym_write(int file_number, int B, float const *ref_point, float const 
 \*****************************************************************************/
 
 int cg_bc_wallfunction_read(int file_number, int B, int Z, int BC,
-			    CGNS_ENUMT(WallFunctionType_t) *WallFunctionType)
+                CGNS_ENUMT(WallFunctionType_t) *WallFunctionType)
 {
     cgns_bprop *bprop;
 
@@ -7842,7 +8704,7 @@ int cg_bc_wallfunction_read(int file_number, int B, int Z, int BC,
 }
 
 int cg_bc_wallfunction_write(int file_number, int B, int Z, int BC,
-			     CGNS_ENUMT(WallFunctionType_t) WallFunctionType)
+                 CGNS_ENUMT(WallFunctionType_t) WallFunctionType)
 {
     cgns_bprop *bprop;
     cgns_bcwall *bcwall;
@@ -7901,16 +8763,16 @@ int cg_bc_wallfunction_write(int file_number, int B, int Z, int BC,
     if (cg->filetype == CGIO_FILE_ADF || cg->filetype == CGIO_FILE_ADF2) {
       if (bprop->id==0) {
         if (cgi_new_node(boco->id, "BCProperty", "BCProperty_t",
-			 &bprop->id, "MT", 0, 0, 0)) return CG_ERROR;
+             &bprop->id, "MT", 0, 0, 0)) return CG_ERROR;
       }
     }
-#ifdef BUILD_HDF5
+#if CG_BUILD_HDF5
     else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(bprop->id, hid);
       if (hid==0) {
         if (cgi_new_node(boco->id, "BCProperty", "BCProperty_t",
-			 &bprop->id, "MT", 0, 0, 0)) return CG_ERROR;
+             &bprop->id, "MT", 0, 0, 0)) return CG_ERROR;
       }
     }
 #endif
@@ -7932,8 +8794,8 @@ int cg_bc_wallfunction_write(int file_number, int B, int Z, int BC,
 /*----------------------------------------------------------------------*/
 
 int cg_bc_area_read(int file_number, int B, int Z, int BC,
-		    CGNS_ENUMT(AreaType_t)  *AreaType, float *SurfaceArea,
-		    char *RegionName)
+            CGNS_ENUMT(AreaType_t)  *AreaType, float *SurfaceArea,
+            char *RegionName)
 {
     int n;
     cgns_bprop *bprop;
@@ -7966,8 +8828,8 @@ int cg_bc_area_read(int file_number, int B, int Z, int BC,
 }
 
 int cg_bc_area_write(int file_number, int B, int Z, int BC,
-		     CGNS_ENUMT( AreaType_t )  AreaType, float SurfaceArea,
-		     const char *RegionName)
+             CGNS_ENUMT( AreaType_t )  AreaType, float SurfaceArea,
+             const char *RegionName)
 {
     cgns_boco *boco;
     cgns_bprop *bprop;
@@ -8060,16 +8922,16 @@ int cg_bc_area_write(int file_number, int B, int Z, int BC,
     if (cg->filetype == CGIO_FILE_ADF || cg->filetype == CGIO_FILE_ADF2) {
       if (bprop->id==0) {
         if (cgi_new_node(boco->id, "BCProperty", "BCProperty_t",
-			 &bprop->id, "MT", 0, 0, 0)) return CG_ERROR;
+             &bprop->id, "MT", 0, 0, 0)) return CG_ERROR;
       }
     }
-#ifdef BUILD_HDF5
+#if CG_BUILD_HDF5
     else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(bprop->id, hid);
       if (hid==0) {
         if (cgi_new_node(boco->id, "BCProperty", "BCProperty_t",
-			 &bprop->id, "MT", 0, 0, 0)) return CG_ERROR;
+             &bprop->id, "MT", 0, 0, 0)) return CG_ERROR;
       }
     }
 #endif
@@ -8216,16 +9078,16 @@ int cg_conn_periodic_write(int file_number, int B, int Z, int I,
    if (cg->filetype == CGIO_FILE_ADF || cg->filetype == CGIO_FILE_ADF2) {
      if (cprop->id==0) {
        if (cgi_new_node(conn->id, "GridConnectivityProperty",
-			"GridConnectivityProperty_t", &cprop->id, "MT", 0, 0, 0)) return CG_ERROR;
+            "GridConnectivityProperty_t", &cprop->id, "MT", 0, 0, 0)) return CG_ERROR;
      }
    }
-#ifdef BUILD_HDF5
+#if CG_BUILD_HDF5
    else if (cg->filetype == CGIO_FILE_HDF5) {
      hid_t hid;
      to_HDF_ID(cprop->id, hid);
      if (hid==0) {
        if (cgi_new_node(conn->id, "GridConnectivityProperty",
-			"GridConnectivityProperty_t", &cprop->id, "MT", 0, 0, 0)) return CG_ERROR;
+            "GridConnectivityProperty_t", &cprop->id, "MT", 0, 0, 0)) return CG_ERROR;
      }
    }
 #endif
@@ -8245,7 +9107,7 @@ int cg_conn_periodic_write(int file_number, int B, int Z, int I,
 /*----------------------------------------------------------------------*/
 
 int cg_conn_average_read(int file_number, int B, int Z, int I,
-			 CGNS_ENUMT(AverageInterfaceType_t) *AverageInterfaceType)
+             CGNS_ENUMT(AverageInterfaceType_t) *AverageInterfaceType)
 {
     cgns_cprop *cprop;
 
@@ -8269,7 +9131,7 @@ int cg_conn_average_read(int file_number, int B, int Z, int I,
 }
 
 int cg_conn_average_write(int file_number, int B, int Z, int I,
-			  CGNS_ENUMT(AverageInterfaceType_t) AverageInterfaceType)
+              CGNS_ENUMT(AverageInterfaceType_t) AverageInterfaceType)
 {
     cgns_cprop *cprop;
     cgns_caverage *caverage;
@@ -8327,16 +9189,16 @@ int cg_conn_average_write(int file_number, int B, int Z, int I,
     if (cg->filetype == CGIO_FILE_ADF || cg->filetype == CGIO_FILE_ADF2) {
       if (cprop->id==0) {
         if (cgi_new_node(conn->id, "GridConnectivityProperty",
-			 "GridConnectivityProperty_t", &cprop->id, "MT", 0, 0, 0)) return CG_ERROR;
+             "GridConnectivityProperty_t", &cprop->id, "MT", 0, 0, 0)) return CG_ERROR;
       }
     }
-#ifdef BUILD_HDF5
+#if CG_BUILD_HDF5
     else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(cprop->id, hid);
       if (hid==0) {
         if (cgi_new_node(conn->id, "GridConnectivityProperty",
-			 "GridConnectivityProperty_t", &cprop->id, "MT", 0, 0, 0)) return CG_ERROR;
+             "GridConnectivityProperty_t", &cprop->id, "MT", 0, 0, 0)) return CG_ERROR;
       }
     }
 #endif
@@ -8402,9 +9264,9 @@ int cg_1to1_periodic_read(int file_number, int B, int Z, int I,
 }
 
 int cg_1to1_periodic_write(int file_number, int B, int Z, int I,
-			   float const *RotationCenter,
-			   float const *RotationAngle,
-			   float const *Translation)
+               float const *RotationCenter,
+               float const *RotationAngle,
+               float const *Translation)
 {
     cgns_base *base;
     cgns_1to1 *one21;
@@ -8480,18 +9342,18 @@ int cg_1to1_periodic_write(int file_number, int B, int Z, int I,
     if (cg->filetype == CGIO_FILE_ADF || cg->filetype == CGIO_FILE_ADF2) {
       if (cprop->id==0) {
         if (cgi_new_node(one21->id, "GridConnectivityProperty",
-			 "GridConnectivityProperty_t", &cprop->id, "MT", 0, 0, 0))
-	  return CG_ERROR;
+             "GridConnectivityProperty_t", &cprop->id, "MT", 0, 0, 0))
+      return CG_ERROR;
       }
     }
-#ifdef BUILD_HDF5
+#if CG_BUILD_HDF5
     else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(cprop->id, hid);
       if (hid==0) {
-	if (cgi_new_node(one21->id, "GridConnectivityProperty",
-			 "GridConnectivityProperty_t", &cprop->id, "MT", 0, 0, 0))
-	  return CG_ERROR;
+    if (cgi_new_node(one21->id, "GridConnectivityProperty",
+             "GridConnectivityProperty_t", &cprop->id, "MT", 0, 0, 0))
+      return CG_ERROR;
       }
     }
 #endif
@@ -8511,7 +9373,7 @@ int cg_1to1_periodic_write(int file_number, int B, int Z, int I,
 /*----------------------------------------------------------------------*/
 
 int cg_1to1_average_read(int file_number, int B, int Z, int I,
-			 CGNS_ENUMT(AverageInterfaceType_t) *AverageInterfaceType)
+             CGNS_ENUMT(AverageInterfaceType_t) *AverageInterfaceType)
 {
     cgns_cprop *cprop;
     cgns_1to1 *one21;
@@ -8538,7 +9400,7 @@ int cg_1to1_average_read(int file_number, int B, int Z, int I,
 }
 
 int cg_1to1_average_write(int file_number, int B, int Z, int I,
-			  CGNS_ENUMT(AverageInterfaceType_t) AverageInterfaceType)
+              CGNS_ENUMT(AverageInterfaceType_t) AverageInterfaceType)
 {
     cgns_cprop *cprop;
     cgns_caverage *caverage;
@@ -8598,18 +9460,18 @@ int cg_1to1_average_write(int file_number, int B, int Z, int I,
     if (cg->filetype == CGIO_FILE_ADF || cg->filetype == CGIO_FILE_ADF2) {
       if (cprop->id==0) {
         if (cgi_new_node(one21->id, "GridConnectivityProperty",
-			 "GridConnectivityProperty_t", &cprop->id, "MT", 0, 0, 0))
-	  return CG_ERROR;
+             "GridConnectivityProperty_t", &cprop->id, "MT", 0, 0, 0))
+      return CG_ERROR;
       }
     }
-#ifdef BUILD_HDF5
+#if CG_BUILD_HDF5
     else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(cprop->id, hid);
       if (hid==0) {
-	if (cgi_new_node(one21->id, "GridConnectivityProperty",
-			 "GridConnectivityProperty_t", &cprop->id, "MT", 0, 0, 0))
-	  return CG_ERROR;
+    if (cgi_new_node(one21->id, "GridConnectivityProperty",
+             "GridConnectivityProperty_t", &cprop->id, "MT", 0, 0, 0))
+      return CG_ERROR;
       }
     }
 #endif
@@ -8787,7 +9649,7 @@ int cg_gopath(int file_number, const char *path)
     int n, len;
     const char *p = path, *s;
     int index[CG_MAX_GOTO_DEPTH];
-    char label[CG_MAX_GOTO_DEPTH][33];
+    char label[CG_MAX_GOTO_DEPTH][CGIO_MAX_NAME_LENGTH+1];
     char *lab[CG_MAX_GOTO_DEPTH];
 
     if (p == 0 || !*p) {
@@ -8950,7 +9812,8 @@ int cg_famname_write(const char * family_name)
      /* verify input */
     if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_WRITE)) return CG_ERROR;
 
-    if (cgi_check_strlen(family_name)) return CG_ERROR;
+    /* Family Tree */
+    /*if (cgi_check_strlen(family_name)) return CG_ERROR;*/
 
     famname = cgi_famname_address(CG_MODE_WRITE, &ier);
     if (famname==0) return ier;
@@ -9028,12 +9891,14 @@ int cg_multifam_write(const char *name, const char *family)
     if (cgi_check_strlen(name) ||
         cgi_check_mode(cg->filename, cg->mode, CG_MODE_WRITE)) return CG_ERROR;
 
+/* ** FAMILY TREE ** */
+/*
 #ifdef CG_BUILD_BASESCOPE
     if (cgi_check_strlen_x2(family)) return CG_ERROR;
 #else
     if (cgi_check_strlen(family)) return CG_ERROR;
 #endif
-
+*/
     famname = cgi_multfam_address(CG_MODE_WRITE, 0, name, &ier);
     if (famname == 0) return ier;
 
@@ -9238,7 +10103,7 @@ int cg_equationset_read(int *EquationDimension,
     else            (*TurbulenceModelFlag)=0;
 
     /* Version 2.1 chemistry extensions get their own read routine
-    ** for backward compatability.
+    ** for backward compatibility.
     */
     return CG_OK;
 }
@@ -9267,7 +10132,7 @@ int cg_equationset_chemistry_read(int *ThermalRelaxationFlag,
 }
 
 int cg_equationset_elecmagn_read(int *ElecFldModelFlag, int *MagnFldModelFlag,
-				 int *ConductivityModelFlag)
+                 int *ConductivityModelFlag)
 {
     cgns_equations *eq;
     int ier=0;
@@ -9532,40 +10397,40 @@ int cg_model_write(const char * ModelLabel, CGNS_ENUMT(ModelType_t) ModelType)
      /* Validate enums for each model type. */
     if (strcmp(ModelLabel, "GasModel_t")==0) {
       if (ModelType!=CGNS_ENUMV( ModelTypeNull ) && ModelType!=CGNS_ENUMV( ModelTypeUserDefined ) &&
-	  ModelType!=CGNS_ENUMV( Ideal ) && ModelType!=CGNS_ENUMV( VanderWaals ) &&
-	  ModelType!=CGNS_ENUMV( CaloricallyPerfect ) && ModelType!=CGNS_ENUMV( ThermallyPerfect ) &&
-	  ModelType!=CGNS_ENUMV( ConstantDensity ) && ModelType!=CGNS_ENUMV( RedlichKwong )) {
+      ModelType!=CGNS_ENUMV( Ideal ) && ModelType!=CGNS_ENUMV( VanderWaals ) &&
+      ModelType!=CGNS_ENUMV( CaloricallyPerfect ) && ModelType!=CGNS_ENUMV( ThermallyPerfect ) &&
+      ModelType!=CGNS_ENUMV( ConstantDensity ) && ModelType!=CGNS_ENUMV( RedlichKwong )) {
             cgi_error("Model Type '%s' is not supported for %s",
                 ModelTypeName[ModelType],ModelLabel);
             return CG_ERROR;
         }
     } else if (strcmp(ModelLabel, "ViscosityModel_t")==0) {
       if (ModelType!=CGNS_ENUMV( ModelTypeNull ) && ModelType!=CGNS_ENUMV( ModelTypeUserDefined ) &&
-	  ModelType!=CGNS_ENUMV( Constant ) && ModelType!=CGNS_ENUMV( PowerLaw ) && ModelType!=CGNS_ENUMV( SutherlandLaw )) {
+      ModelType!=CGNS_ENUMV( Constant ) && ModelType!=CGNS_ENUMV( PowerLaw ) && ModelType!=CGNS_ENUMV( SutherlandLaw )) {
             cgi_error("Model Type '%s' is not supported for %s",
                 ModelTypeName[ModelType],ModelLabel);
             return CG_ERROR;
         }
     } else if (strcmp(ModelLabel, "ThermalConductivityModel_t")==0) {
       if (ModelType!=CGNS_ENUMV( ModelTypeNull ) && ModelType!=CGNS_ENUMV( ModelTypeUserDefined ) &&
-	  ModelType!=CGNS_ENUMV( PowerLaw ) && ModelType!=CGNS_ENUMV( SutherlandLaw ) && ModelType!=CGNS_ENUMV( ConstantPrandtl )) {
+      ModelType!=CGNS_ENUMV( PowerLaw ) && ModelType!=CGNS_ENUMV( SutherlandLaw ) && ModelType!=CGNS_ENUMV( ConstantPrandtl )) {
             cgi_error("Model Type '%s' is not supported for %s",
                 ModelTypeName[ModelType],ModelLabel);
             return CG_ERROR;
         }
     } else if (strcmp(ModelLabel, "TurbulenceModel_t")==0) {
       if (ModelType!=CGNS_ENUMV( ModelTypeNull ) && ModelType!=CGNS_ENUMV( ModelTypeUserDefined ) &&
-	  ModelType!=CGNS_ENUMV( Algebraic_BaldwinLomax )&& ModelType!=CGNS_ENUMV( Algebraic_CebeciSmith )&&
-	  ModelType!=CGNS_ENUMV( HalfEquation_JohnsonKing )&& ModelType!=CGNS_ENUMV( OneEquation_BaldwinBarth )&&
-	  ModelType!=CGNS_ENUMV( OneEquation_SpalartAllmaras )&& ModelType!=CGNS_ENUMV( TwoEquation_JonesLaunder )&&
-	  ModelType!=CGNS_ENUMV( TwoEquation_MenterSST )&& ModelType!=CGNS_ENUMV( TwoEquation_Wilcox )) {
+      ModelType!=CGNS_ENUMV( Algebraic_BaldwinLomax )&& ModelType!=CGNS_ENUMV( Algebraic_CebeciSmith )&&
+      ModelType!=CGNS_ENUMV( HalfEquation_JohnsonKing )&& ModelType!=CGNS_ENUMV( OneEquation_BaldwinBarth )&&
+      ModelType!=CGNS_ENUMV( OneEquation_SpalartAllmaras )&& ModelType!=CGNS_ENUMV( TwoEquation_JonesLaunder )&&
+      ModelType!=CGNS_ENUMV( TwoEquation_MenterSST )&& ModelType!=CGNS_ENUMV( TwoEquation_Wilcox )) {
             cgi_error("Model Type '%s' is not supported for %s",
                 ModelTypeName[ModelType],ModelLabel);
             return CG_ERROR;
         }
     } else if (strcmp(ModelLabel, "TurbulenceClosure_t")==0) {
       if (ModelType!=CGNS_ENUMV( ModelTypeNull ) && ModelType!=CGNS_ENUMV( ModelTypeUserDefined ) &&
-	  ModelType!=CGNS_ENUMV( EddyViscosity )  && ModelType!=CGNS_ENUMV( ReynoldsStress ) &&
+      ModelType!=CGNS_ENUMV( EddyViscosity )  && ModelType!=CGNS_ENUMV( ReynoldsStress ) &&
             ModelType!=CGNS_ENUMV( ReynoldsStressAlgebraic )) {
             cgi_error("Model Type '%s' is not supported for %s",
                 ModelTypeName[ModelType],ModelLabel);
@@ -9573,16 +10438,16 @@ int cg_model_write(const char * ModelLabel, CGNS_ENUMT(ModelType_t) ModelType)
         }
     } else if (strcmp(ModelLabel, "ThermalRelaxationModel_t")==0) {
       if (ModelType!=CGNS_ENUMV( ModelTypeNull ) && ModelType!=CGNS_ENUMV( ModelTypeUserDefined ) &&
-	  ModelType!=CGNS_ENUMV( Frozen ) && ModelType!=CGNS_ENUMV( ThermalEquilib ) &&
-	  ModelType!=CGNS_ENUMV( ThermalNonequilib )) {
+      ModelType!=CGNS_ENUMV( Frozen ) && ModelType!=CGNS_ENUMV( ThermalEquilib ) &&
+      ModelType!=CGNS_ENUMV( ThermalNonequilib )) {
             cgi_error("Model Type '%s' is not supported for %s",
                 ModelTypeName[ModelType],ModelLabel);
             return CG_ERROR;
         }
     } else if (strcmp(ModelLabel, "ChemicalKineticsModel_t")==0) {
       if (ModelType!=CGNS_ENUMV( ModelTypeNull ) && ModelType!=CGNS_ENUMV( ModelTypeUserDefined ) &&
-	  ModelType!=CGNS_ENUMV( Frozen ) && ModelType!=CGNS_ENUMV( ChemicalEquilibCurveFit ) &&
-	  ModelType!=CGNS_ENUMV( ChemicalEquilibMinimization ) && ModelType!=CGNS_ENUMV( ChemicalNonequilib )) {
+      ModelType!=CGNS_ENUMV( Frozen ) && ModelType!=CGNS_ENUMV( ChemicalEquilibCurveFit ) &&
+      ModelType!=CGNS_ENUMV( ChemicalEquilibMinimization ) && ModelType!=CGNS_ENUMV( ChemicalNonequilib )) {
             cgi_error("Model Type '%s' is not supported for %s",
                 ModelTypeName[ModelType],ModelLabel);
             return CG_ERROR;
@@ -9590,8 +10455,8 @@ int cg_model_write(const char * ModelLabel, CGNS_ENUMT(ModelType_t) ModelType)
     }
     else if (strcmp(ModelLabel, "EMElectricFieldModel_t")==0) {
       if (ModelType!=CGNS_ENUMV( ModelTypeNull ) && ModelType!=CGNS_ENUMV( ModelTypeUserDefined ) &&
-	  ModelType!=CGNS_ENUMV( Frozen ) && ModelType!=CGNS_ENUMV( Voltage ) &&
-	  ModelType!=CGNS_ENUMV( Interpolated ) && ModelType!=CGNS_ENUMV( Constant )) {
+      ModelType!=CGNS_ENUMV( Frozen ) && ModelType!=CGNS_ENUMV( Voltage ) &&
+      ModelType!=CGNS_ENUMV( Interpolated ) && ModelType!=CGNS_ENUMV( Constant )) {
             cgi_error("Model Type '%s' is not supported for %s",
                 ModelTypeName[ModelType],ModelLabel);
             return CG_ERROR;
@@ -9599,8 +10464,8 @@ int cg_model_write(const char * ModelLabel, CGNS_ENUMT(ModelType_t) ModelType)
     }
     else if (strcmp(ModelLabel, "EMMagneticFieldModel_t")==0) {
       if (ModelType!=CGNS_ENUMV( ModelTypeNull ) && ModelType!=CGNS_ENUMV( ModelTypeUserDefined ) &&
-	  ModelType!=CGNS_ENUMV( Frozen ) && ModelType!=CGNS_ENUMV( Interpolated ) &&
-	  ModelType!=CGNS_ENUMV( Constant )) {
+      ModelType!=CGNS_ENUMV( Frozen ) && ModelType!=CGNS_ENUMV( Interpolated ) &&
+      ModelType!=CGNS_ENUMV( Constant )) {
             cgi_error("Model Type '%s' is not supported for %s",
                 ModelTypeName[ModelType],ModelLabel);
             return CG_ERROR;
@@ -9608,9 +10473,9 @@ int cg_model_write(const char * ModelLabel, CGNS_ENUMT(ModelType_t) ModelType)
     }
     else if (strcmp(ModelLabel, "EMConductivityModel_t")==0) {
       if (ModelType!=CGNS_ENUMV( ModelTypeNull ) && ModelType!=CGNS_ENUMV( ModelTypeUserDefined ) &&
-	  ModelType!=CGNS_ENUMV( Frozen ) && ModelType!=CGNS_ENUMV( Constant ) &&
-	  ModelType!=CGNS_ENUMV( Equilibrium_LinRessler ) &&
-	  ModelType!=CGNS_ENUMV( Chemistry_LinRessler )) {
+      ModelType!=CGNS_ENUMV( Frozen ) && ModelType!=CGNS_ENUMV( Constant ) &&
+      ModelType!=CGNS_ENUMV( Equilibrium_LinRessler ) &&
+      ModelType!=CGNS_ENUMV( Chemistry_LinRessler )) {
             cgi_error("Model Type '%s' is not supported for %s",
                 ModelTypeName[ModelType],ModelLabel);
             return CG_ERROR;
@@ -9623,9 +10488,9 @@ int cg_model_write(const char * ModelLabel, CGNS_ENUMT(ModelType_t) ModelType)
         strcmp(ModelLabel, "TurbulenceModel_t") &&
         strcmp(ModelLabel, "ThermalConductivityModel_t") &&
         strcmp(ModelLabel, "ViscosityModel_t") &&
-	strcmp(ModelLabel, "EMElectricFieldModel_t") &&
-	strcmp(ModelLabel, "EMMagneticFieldModel_t") &&
-	strcmp(ModelLabel, "EMConductivityModel_t") &&
+    strcmp(ModelLabel, "EMElectricFieldModel_t") &&
+    strcmp(ModelLabel, "EMMagneticFieldModel_t") &&
+    strcmp(ModelLabel, "EMConductivityModel_t") &&
         strcmp(ModelLabel, "GasModel_t")) {
         cgi_error("Invalid Model Label: %s",ModelLabel);
         return CG_ERROR;
@@ -9735,9 +10600,9 @@ int cg_narrays(int *narrays)
         strcmp(posit->label,"TurbulenceClosure_t")==0 ||
         strcmp(posit->label,"ThermalRelaxationModel_t")==0 ||
         strcmp(posit->label,"ChemicalKineticsModel_t")==0 ||
-	strcmp(posit->label,"EMElectricFieldModel_t")==0 ||
-	strcmp(posit->label,"EMMagneticFieldModel_t")==0 ||
-	strcmp(posit->label,"EMConductivityModel_t")==0) {
+        strcmp(posit->label,"EMElectricFieldModel_t")==0 ||
+        strcmp(posit->label,"EMMagneticFieldModel_t")==0 ||
+        strcmp(posit->label,"EMConductivityModel_t")==0) {
         cgns_model *model = (cgns_model *)posit->posit;
         (*narrays) = model->narrays;
 
@@ -9848,8 +10713,8 @@ int cg_array_read(int A, void *Data)
     if (array->data)
         memcpy(Data, array->data, (size_t)(num*size_of(array->data_type)));
     else {
-        if (cgio_read_all_data(cg->cgio, array->id, Data)) {
-            cg_io_error("cgio_read_all_data");
+        if (cgio_read_all_data_type(cg->cgio, array->id, array->data_type, Data)) {
+            cg_io_error("cgio_read_all_data_type");
             return CG_ERROR;
         }
     }
@@ -9887,8 +10752,8 @@ int cg_array_read_as(int A, CGNS_ENUMT(DataType_t) type, void *Data)
         if (array->data)
             memcpy(Data, array->data, (size_t)(num*size_of(array->data_type)));
         else {
-            if (cgio_read_all_data(cg->cgio, array->id, Data)) {
-                cg_io_error("cgio_read_all_data");
+            if (cgio_read_all_data_type(cg->cgio, array->id, array->data_type, Data)) {
+                cg_io_error("cgio_read_all_data_type");
                 return CG_ERROR;
             }
         }
@@ -9904,8 +10769,8 @@ int cg_array_read_as(int A, CGNS_ENUMT(DataType_t) type, void *Data)
             cgi_error("Error allocating array_data");
             return CG_ERROR;
         }
-        if (cgio_read_all_data(cg->cgio, array->id, array_data)) {
-            cg_io_error("cgio_read_all_data");
+        if (cgio_read_all_data_type(cg->cgio, array->id, array->data_type, array_data)) {
+            cg_io_error("cgio_read_all_data_type");
             return CG_ERROR;
         }
     }
@@ -9965,6 +10830,8 @@ int cg_array_write(const char * ArrayName, CGNS_ENUMT(DataType_t) DataType,
     int n, ier=0;
     double posit_id;
 
+    HDF5storage_type = CG_CONTIGUOUS;
+
     CHECK_FILE_OPEN
 
      /* verify input */
@@ -10014,7 +10881,7 @@ int cg_array_write(const char * ArrayName, CGNS_ENUMT(DataType_t) DataType,
     if (cgi_posit_id(&posit_id)) return CG_ERROR;
     if (cgi_new_node(posit_id, array->name, "DataArray_t", &array->id,
         array->data_type, array->data_dim, array->dim_vals, Data)) return CG_ERROR;
-
+    HDF5storage_type = CG_COMPACT;
     return CG_OK;
 }
 
@@ -10048,7 +10915,7 @@ int cg_array_general_write(const char *arrayname,
         return CG_ERROR;
     }
 
-     /*** verfication for dataset in file */
+     /*** verification for dataset in file */
      /* verify the rank and dimensions of the file-space array */
     if (s_numdim <= 0 || s_numdim > CGIO_MAX_DIMENSIONS) {
         cgi_error("Data arrays are limited to %d dimensions in file",
@@ -10219,7 +11086,7 @@ int cg_rind_write(const int * RindData)
         planes are still written but an error is returned */
     ier = cg_narrays(&narrays);
     if (ier == CG_OK && narrays > 0) {
-        cgi_error("Writing rind planes invalidates dimensions of exisitng "
+        cgi_error("Writing rind planes invalidates dimensions of existing "
                   "array(s).");
         return CG_ERROR;
     }
@@ -10301,9 +11168,9 @@ int cg_ndescriptors(int *ndescriptors)
          strcmp(posit->label,"TurbulenceClosure_t")==0 ||
          strcmp(posit->label,"ThermalRelaxationModel_t")==0 ||
          strcmp(posit->label,"ChemicalKineticsModel_t")==0 ||
-	 strcmp(posit->label,"EMElectricFieldModel_t")==0 ||
-	 strcmp(posit->label,"EMMagneticFieldModel_t")==0 ||
-	 strcmp(posit->label,"EMConductivityModel_t")==0)
+     strcmp(posit->label,"EMElectricFieldModel_t")==0 ||
+     strcmp(posit->label,"EMMagneticFieldModel_t")==0 ||
+     strcmp(posit->label,"EMConductivityModel_t")==0)
         NDESCRIPTOR(cgns_model)
     else if (strcmp(posit->label,"ConvergenceHistory_t")==0)
         NDESCRIPTOR(cgns_converg)
@@ -10457,8 +11324,8 @@ int cg_units_read(CGNS_ENUMT(MassUnits_t) *mass,
 int cg_units_write(CGNS_ENUMT(MassUnits_t) mass,
                    CGNS_ENUMT(LengthUnits_t) length,
                    CGNS_ENUMT(TimeUnits_t) time,
-		   CGNS_ENUMT(TemperatureUnits_t) temperature,
-		   CGNS_ENUMT(AngleUnits_t) angle)
+           CGNS_ENUMT(TemperatureUnits_t) temperature,
+           CGNS_ENUMT(AngleUnits_t) angle)
 {
     int ier=0;
     cgns_units *units;
@@ -10514,12 +11381,12 @@ int cg_units_write(CGNS_ENUMT(MassUnits_t) mass,
 
 int cg_unitsfull_read(CGNS_ENUMT(MassUnits_t) *mass,
                       CGNS_ENUMT(LengthUnits_t) *length,
-		      CGNS_ENUMT(TimeUnits_t) *time,
-		      CGNS_ENUMT(TemperatureUnits_t) *temperature,
-		      CGNS_ENUMT(AngleUnits_t) *angle,
-		      CGNS_ENUMT(ElectricCurrentUnits_t) *current,
-		      CGNS_ENUMT(SubstanceAmountUnits_t) *amount,
-		      CGNS_ENUMT(LuminousIntensityUnits_t) *intensity)
+              CGNS_ENUMT(TimeUnits_t) *time,
+              CGNS_ENUMT(TemperatureUnits_t) *temperature,
+              CGNS_ENUMT(AngleUnits_t) *angle,
+              CGNS_ENUMT(ElectricCurrentUnits_t) *current,
+              CGNS_ENUMT(SubstanceAmountUnits_t) *amount,
+              CGNS_ENUMT(LuminousIntensityUnits_t) *intensity)
 {
     cgns_units *units;
     int ier=0;
@@ -10545,12 +11412,12 @@ int cg_unitsfull_read(CGNS_ENUMT(MassUnits_t) *mass,
 
 int cg_unitsfull_write(CGNS_ENUMT(MassUnits_t) mass,
                        CGNS_ENUMT(LengthUnits_t) length,
-		       CGNS_ENUMT(TimeUnits_t) time,
-		       CGNS_ENUMT(TemperatureUnits_t) temperature,
-		       CGNS_ENUMT(AngleUnits_t) angle,
-		       CGNS_ENUMT(ElectricCurrentUnits_t) current,
-		       CGNS_ENUMT(SubstanceAmountUnits_t) amount,
-		       CGNS_ENUMT(LuminousIntensityUnits_t) intensity)
+               CGNS_ENUMT(TimeUnits_t) time,
+               CGNS_ENUMT(TemperatureUnits_t) temperature,
+               CGNS_ENUMT(AngleUnits_t) angle,
+               CGNS_ENUMT(ElectricCurrentUnits_t) current,
+               CGNS_ENUMT(SubstanceAmountUnits_t) amount,
+               CGNS_ENUMT(LuminousIntensityUnits_t) intensity)
 {
     int ier=0;
     cgns_units *units;
@@ -10750,7 +11617,7 @@ int cg_expfull_read(void *exponents)
     /* don't fail - just return 0's for last 3
     if(exponent->nexps != 8)
     {
-	cgi_error("Full set of exponents not written, use cg_exponents_read.");
+    cgi_error("Full set of exponents not written, use cg_exponents_read.");
         return CG_ERROR;
     }*/
 
@@ -10890,7 +11757,7 @@ int cg_conversion_read(void *ConversionFactors)
 }
 
 int cg_conversion_write(CGNS_ENUMT(DataType_t) DataType,
-			const void * ConversionFactors)
+            const void * ConversionFactors)
 {
     cgns_conversion *conversion;
     int ier=0;
@@ -11049,9 +11916,9 @@ int cg_gridlocation_write(CGNS_ENUMT(GridLocation_t) GridLocation)
       if (GridLocation != CGNS_ENUMV(Vertex) &&
           GridLocation != CGNS_ENUMV(CellCenter) &&
           GridLocation != CGNS_ENUMV(FaceCenter) &&
-	  GridLocation != CGNS_ENUMV(IFaceCenter) &&
-	  GridLocation != CGNS_ENUMV(JFaceCenter) &&
-	  GridLocation != CGNS_ENUMV(KFaceCenter)) ier = 1;
+      GridLocation != CGNS_ENUMV(IFaceCenter) &&
+      GridLocation != CGNS_ENUMV(JFaceCenter) &&
+      GridLocation != CGNS_ENUMV(KFaceCenter)) ier = 1;
     }
     else if (strcmp(posit->label,"OversetHoles_t")==0) {
       if (GridLocation != CGNS_ENUMV(Vertex) &&
@@ -11310,9 +12177,9 @@ int cg_nuser_data(int *nuser_data)
         strcmp(posit->label,"TurbulenceClosure_t")==0 ||
         strcmp(posit->label,"ThermalRelaxationModel_t")==0 ||
         strcmp(posit->label,"ChemicalKineticsModel_t")==0 ||
-	 strcmp(posit->label,"EMElectricFieldModel_t")==0 ||
-	 strcmp(posit->label,"EMMagneticFieldModel_t")==0 ||
-	 strcmp(posit->label,"EMConductivityModel_t")==0) )
+     strcmp(posit->label,"EMElectricFieldModel_t")==0 ||
+     strcmp(posit->label,"EMMagneticFieldModel_t")==0 ||
+     strcmp(posit->label,"EMConductivityModel_t")==0) )
         (*nuser_data) = ((cgns_model *)posit->posit)->nuser_data;
     else if (strcmp(posit->label,"GoverningEquations_t")==0)
         (*nuser_data) = ((cgns_governing *)posit->posit)->nuser_data;
@@ -11546,11 +12413,11 @@ int cg_ptset_info(CGNS_ENUMT(PointSetType_t) *ptset_type, cgsize_t *npnts)
     CHECK_FILE_OPEN
 
     if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_READ))
-	return CG_ERROR;
+    return CG_ERROR;
 
     ptset = cgi_ptset_address(CG_MODE_READ, &ier);
     if (ptset == 0)
-	return ier;
+    return ier;
 
     *ptset_type = ptset->type;
     *npnts = ptset->npts;
@@ -11586,7 +12453,7 @@ int cg_ptset_read(cgsize_t *pnts)
 }
 
 int cg_ptset_write(CGNS_ENUMT(PointSetType_t) ptset_type, cgsize_t npnts,
-		   const cgsize_t * pnts)
+           const cgsize_t * pnts)
 {
     cgns_ptset *ptset = 0;
     int i, index_dim;
@@ -11596,7 +12463,7 @@ int cg_ptset_write(CGNS_ENUMT(PointSetType_t) ptset_type, cgsize_t npnts,
 
      /* verify input */
     if(npnts == 0 || pnts == NULL) {
-	cgi_error("Invalid input:  npoint=%d, point set type=%s",
+    cgi_error("Invalid input:  npoint=%d, point set type=%s",
                    npnts, PointSetTypeName[ptset_type]);
         return CG_ERROR;
     }
@@ -11627,24 +12494,24 @@ int cg_ptset_write(CGNS_ENUMT(PointSetType_t) ptset_type, cgsize_t npnts,
 
     /* verify input */
     if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_WRITE))
-	return CG_ERROR;
+    return CG_ERROR;
 
     ptset = cgi_ptset_address(CG_MODE_WRITE, &ier);
     if (ptset==0)
-	return ier;
+    return ier;
 
     /* set these with the provided argument data */
     ptset->type = ptset_type;
     ptset->npts = npnts;
 
     if (ptset_type == CGNS_ENUMV(PointList)) {
-	ptset->size_of_patch = npnts;
+    ptset->size_of_patch = npnts;
     }
     else {
-	ptset->size_of_patch = 1;
-	for (i=0; i < index_dim; i++)
-	    ptset->size_of_patch = ptset->size_of_patch *
-		(pnts[i+index_dim] - pnts[i]+1);
+    ptset->size_of_patch = 1;
+    for (i=0; i < index_dim; i++)
+        ptset->size_of_patch = ptset->size_of_patch *
+        (pnts[i+index_dim] - pnts[i]+1);
     }
 
     /* initialize the following to default values */
@@ -11655,15 +12522,15 @@ int cg_ptset_write(CGNS_ENUMT(PointSetType_t) ptset_type, cgsize_t npnts,
 
      /* Save Point-Set on Disk */
     if (ptset->npts > 0) {
-	double posit_id;
+    double posit_id;
 
-	/* write to disk */
-	if (cgi_posit_id(&posit_id))
-	    return CG_ERROR;
+    /* write to disk */
+    if (cgi_posit_id(&posit_id))
+        return CG_ERROR;
 
-	if (cgi_write_ptset(posit_id, ptset->name, ptset, index_dim,
-			    (void *)pnts))
-	    return CG_ERROR;
+    if (cgi_write_ptset(posit_id, ptset->name, ptset, index_dim,
+                (void *)pnts))
+        return CG_ERROR;
     }
 
     return CG_OK;
@@ -11684,10 +12551,10 @@ int cg_bcdataset_info(int *n_dataset)
         return CG_ERROR;
     }
     if(strcmp(posit->label,"FamilyBC_t") ==0) {
-	cgns_fambc *fambc = (cgns_fambc *)posit->posit;
-	*n_dataset = fambc->ndataset;
+    cgns_fambc *fambc = (cgns_fambc *)posit->posit;
+    *n_dataset = fambc->ndataset;
     } else {
-	*n_dataset = 0;
+    *n_dataset = 0;
         cgi_error("FamilyBC_t node not supported under '%s' type node",
             posit->label);
         return CG_INCORRECT_PATH;
@@ -11697,7 +12564,7 @@ int cg_bcdataset_info(int *n_dataset)
 }
 
 int cg_bcdataset_read(int index, char *name, CGNS_ENUMT(BCType_t) *BCType,
-		      int *DirichletFlag, int *NeumannFlag)
+              int *DirichletFlag, int *NeumannFlag)
 {
     cgns_dataset *dataset;
     int ier = 0;
@@ -11765,9 +12632,9 @@ int cg_bcdataset_write(const char *name, CGNS_ENUMT(BCType_t) BCType,
     }
 
     if (dataset != NULL) {
-	/* Overwrite a BCDataSet_t node : */
+    /* Overwrite a BCDataSet_t node : */
         if (dataset->dirichlet && BCDataType == CGNS_ENUMV(Dirichlet)) {
-	    if (cg->mode == CG_MODE_WRITE) {
+        if (cg->mode == CG_MODE_WRITE) {
                 cgi_error("Dirichlet data already defined under FamilyBCDataSet_t '%s'",
                     dataset->name);
                 return CG_ERROR;
@@ -11775,61 +12642,61 @@ int cg_bcdataset_write(const char *name, CGNS_ENUMT(BCType_t) BCType,
             if (cgi_delete_node(dataset->id, dataset->dirichlet->id))
                 return CG_ERROR;
             cgi_free_bcdata(dataset->dirichlet);
-	    dataset->dirichlet = NULL;
-	}
-        else if (dataset->neumann && BCDataType == CGNS_ENUMV(Neumann))	{
-	    if (cg->mode == CG_MODE_WRITE) {
-		cgi_error("Neumann data already defined under FamilyBCDataSet_t '%s'",
-			  dataset->name);
-		return CG_ERROR;
-	    }
+        dataset->dirichlet = NULL;
+    }
+        else if (dataset->neumann && BCDataType == CGNS_ENUMV(Neumann))    {
+        if (cg->mode == CG_MODE_WRITE) {
+        cgi_error("Neumann data already defined under FamilyBCDataSet_t '%s'",
+              dataset->name);
+        return CG_ERROR;
+        }
             if (cgi_delete_node(dataset->id, dataset->neumann->id))
-	        return CG_ERROR;
-	    cgi_free_bcdata(dataset->neumann);
-	    dataset->neumann = NULL;
-	}
+            return CG_ERROR;
+        cgi_free_bcdata(dataset->neumann);
+        dataset->neumann = NULL;
+    }
     } else {
-	/* get memory address for FamilyBCDataSet_t node */
-	dataset = cgi_bcdataset_address(CG_MODE_WRITE, 0, name, &ierr);
-	if (dataset == 0) return ierr;
+    /* get memory address for FamilyBCDataSet_t node */
+    dataset = cgi_bcdataset_address(CG_MODE_WRITE, 0, name, &ierr);
+    if (dataset == 0) return ierr;
 
-	/* save data in memory */
-	memset(dataset, 0, sizeof(cgns_dataset));
-	dataset->type = BCType;
-	strcpy(dataset->name, name);
+    /* save data in memory */
+    memset(dataset, 0, sizeof(cgns_dataset));
+    dataset->type = BCType;
+    strcpy(dataset->name, name);
 
-	/* write to disk */
-	if (cgi_posit_id(&posit_id)) return CG_ERROR;
+    /* write to disk */
+    if (cgi_posit_id(&posit_id)) return CG_ERROR;
 
-	/* save data in file */
-	length = (cgsize_t)strlen(BCTypeName[dataset->type]);
-	if (cg->filetype == CG_FILE_ADF2) {
-	    if (cgi_new_node(posit_id, dataset->name, "BCDataSet_t",
-	            &dataset->id, "C1", 1, &length,
-	            (void *)BCTypeName[dataset->type]))
-	        return CG_ERROR;
-	} else {
-	    if (cgi_new_node(posit_id, dataset->name, "FamilyBCDataSet_t",
-	            &dataset->id, "C1", 1, &length,
-	            (void *)BCTypeName[dataset->type]))
-	        return CG_ERROR;
-	}
+    /* save data in file */
+    length = (cgsize_t)strlen(BCTypeName[dataset->type]);
+    if (cg->filetype == CG_FILE_ADF2) {
+        if (cgi_new_node(posit_id, dataset->name, "BCDataSet_t",
+                &dataset->id, "C1", 1, &length,
+                (void *)BCTypeName[dataset->type]))
+            return CG_ERROR;
+    } else {
+        if (cgi_new_node(posit_id, dataset->name, "FamilyBCDataSet_t",
+                &dataset->id, "C1", 1, &length,
+                (void *)BCTypeName[dataset->type]))
+            return CG_ERROR;
+    }
     }
 
     if (BCDataType == CGNS_ENUMV(Dirichlet)) {
         if ( !dataset->dirichlet)
-	    dataset->dirichlet = CGNS_NEW(cgns_bcdata,1);
+        dataset->dirichlet = CGNS_NEW(cgns_bcdata,1);
         strcpy(dataset->dirichlet->name, "DirichletData");
         bcdata = dataset->dirichlet;
     } else if(BCDataType == CGNS_ENUMV(Neumann)){
         if ( !dataset->neumann)
-	    dataset->neumann = CGNS_NEW(cgns_bcdata,1);
+        dataset->neumann = CGNS_NEW(cgns_bcdata,1);
         strcpy(dataset->neumann->name, "NeumannData");
         bcdata = dataset->neumann;
     }
     else {
         cgi_error("BCDataType is not Dirichlet or Neumann");
-	return CG_ERROR;
+    return CG_ERROR;
     }
 
     if (cgi_new_node(dataset->id, bcdata->name, "BCData_t", &bcdata->id,
@@ -12080,7 +12947,7 @@ int cg_delete_node(const char *node_name)
     if (strcmp(posit->label,"CGNSBase_t")==0) {
         cgns_base *parent = (cgns_base *)posit->posit;
 
-     /* Case 1: node_label = can have multiple occurence:  */
+     /* Case 1: node_label = can have multiple occurrence:  */
         if (strcmp(node_label,"Zone_t")==0)
             CGNS_DELETE_SHIFT(nzones, zone, cgi_free_zone)
         else if (strcmp(node_label,"Family_t")==0)
@@ -12094,7 +12961,7 @@ int cg_delete_node(const char *node_name)
 
      /* Case 2: node_label = can only occur once under parent: */
         else if (strcmp(node_name,"SimulationType")==0) {
-	    parent->type = CGNS_ENUMV( SimulationTypeNull );
+        parent->type = CGNS_ENUMV( SimulationTypeNull );
             parent->type_id = 0;
         }
         else if (strcmp(node_label,"BaseIterativeData_t")==0)
@@ -12108,7 +12975,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_name,"ReferenceState")==0)
             CGNS_DELETE_CHILD(state, cgi_free_state)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"Gravity")==0)
             CGNS_DELETE_CHILD(gravity, cgi_free_gravity)
         else if (strcmp(node_name,"Axisymmetry")==0)
@@ -12152,7 +13019,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_name,"ReferenceState")==0)
             CGNS_DELETE_CHILD(state, cgi_free_state)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"FamilyName")==0)
             parent->family_name[0]='\0';
         else if (strcmp(node_name,"DimensionalUnits")==0)
@@ -12177,13 +13044,13 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"AdditionalFamilyName_t")==0)
             CGNS_DELETE_SHIFT(nfamname, famname, cgi_free_famname)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"FamilyName")==0)
             parent->family_name[0]='\0';
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
         else if (strcmp(node_name,"GridLocation")==0)
-	  parent->location=CGNS_ENUMV( GridLocationNull );
+      parent->location=CGNS_ENUMV( GridLocationNull );
         else if (strcmp(node_name,"Rind")==0) {
             if (posit_base && posit_zone) {
                 index_dim = cg->base[posit_base-1].zone[posit_zone-1].index_dim;
@@ -12213,7 +13080,7 @@ int cg_delete_node(const char *node_name)
             for (n=0; n<2*index_dim; n++) parent->rind_planes[n] = 0;
         }
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
 
@@ -12223,7 +13090,7 @@ int cg_delete_node(const char *node_name)
         if (strcmp(node_label,"Descriptor_t")==0)
             CGNS_DELETE_SHIFT(ndescr, descr, cgi_free_descr)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalExponents")==0)
             CGNS_DELETE_CHILD(exponents, cgi_free_exponents)
         else if (strcmp(node_name,"DataConversion")==0)
@@ -12244,11 +13111,11 @@ int cg_delete_node(const char *node_name)
                  strcmp(node_name,"PointRange")==0)
             CGNS_DELETE_CHILD(ptset, cgi_free_ptset)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
         else if (strcmp(node_name,"GridLocation")==0)
-	  parent->location=CGNS_ENUMV( GridLocationNull );
+      parent->location=CGNS_ENUMV( GridLocationNull );
         else if (strcmp(node_name,"Rind")==0) {
             if (posit_base && posit_zone) {
                 index_dim = cg->base[posit_base-1].zone[posit_zone-1].index_dim;
@@ -12281,7 +13148,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"UserDefinedData_t")==0)
             CGNS_DELETE_SHIFT(nuser_data, user_data, cgi_free_user_data)
         else if (strcmp(node_name,"GridLocation")==0)
-	  parent->location=CGNS_ENUMV( GridLocationNull );
+      parent->location=CGNS_ENUMV( GridLocationNull );
      /* IndexRange_t & IndexArray_t can't be deleted */
 
 /* Children of GridConnectivity_t */
@@ -12292,7 +13159,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"UserDefinedData_t")==0)
             CGNS_DELETE_SHIFT(nuser_data, user_data, cgi_free_user_data)
         else if (strcmp(node_name,"InterpolantsDonor")==0) {
-	  if (parent->dptset.type==CGNS_ENUMV( CellListDonor )) {
+      if (parent->dptset.type==CGNS_ENUMV( CellListDonor )) {
                 cgi_error("Node '%s' under '%s' can not be deleted",
                     node_name,posit->label);
                 return CG_ERROR;
@@ -12301,11 +13168,11 @@ int cg_delete_node(const char *node_name)
             }
         }
         else if (strcmp(node_name,"GridLocation")==0)
-	  parent->location=CGNS_ENUMV( GridLocationNull );
+      parent->location=CGNS_ENUMV( GridLocationNull );
         else if (strcmp(node_name,"Ordinal")==0)
             parent->ordinal=0;
         else if (strcmp(node_name,"GridConnectivityType")==0)
-	  parent->type=CGNS_ENUMV( GridConnectivityTypeNull );
+      parent->type=CGNS_ENUMV( GridConnectivityTypeNull );
         else if (strcmp(node_name,"GridConnectivityProperty")==0)
             CGNS_DELETE_CHILD(cprop, cgi_free_cprop)
      /* IndexArray_t & IndexRange_t can't be deleted */
@@ -12333,7 +13200,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"BC_t")==0)
             CGNS_DELETE_SHIFT(nbocos, boco, cgi_free_boco)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
         else if (strcmp(node_name,"ReferenceState")==0)
@@ -12370,11 +13237,11 @@ int cg_delete_node(const char *node_name)
  #endif
         }
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
         else if (strcmp(node_name,"GridLocation")==0)
-	  parent->location=CGNS_ENUMV( GridLocationNull );
+      parent->location=CGNS_ENUMV( GridLocationNull );
         else if (strcmp(node_name,"InwardNormalIndex")==0) {
             if (parent->Nindex) free(parent->Nindex);
             parent->Nindex=0;
@@ -12400,7 +13267,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"UserDefinedData_t")==0)
             CGNS_DELETE_SHIFT(nuser_data, user_data, cgi_free_user_data)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"PointList")==0 ||
                  strcmp(node_name,"PointRange")==0)
             CGNS_DELETE_CHILD(ptset, cgi_free_ptset)
@@ -12412,9 +13279,9 @@ int cg_delete_node(const char *node_name)
             CGNS_DELETE_CHILD(neumann, cgi_free_bcdata)
         else if (strcmp(node_name,"ReferenceState")==0)
             CGNS_DELETE_CHILD(state, cgi_free_state)
-	else if (strcmp(node_name,"GridLocation")==0)
-	  parent->location=CGNS_ENUMV( GridLocationNull );
-	/* IndexRange_t PointRange & IndexArray_t PointList can't be deleted */
+    else if (strcmp(node_name,"GridLocation")==0)
+      parent->location=CGNS_ENUMV( GridLocationNull );
+    /* IndexRange_t PointRange & IndexArray_t PointList can't be deleted */
 
 /* Children of BCData_t */
     } else if (strcmp(posit->label,"BCData_t")==0) {
@@ -12426,7 +13293,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"DataArray_t")==0)
             CGNS_DELETE_SHIFT(narrays, array, cgi_free_array)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
 
@@ -12443,11 +13310,11 @@ int cg_delete_node(const char *node_name)
                  strcmp(node_name,"PointRange")==0)
             CGNS_DELETE_CHILD(ptset, cgi_free_ptset)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
         else if (strcmp(node_name,"GridLocation")==0)
-	  parent->location=CGNS_ENUMV( GridLocationNull );
+      parent->location=CGNS_ENUMV( GridLocationNull );
         else if (strcmp(node_name,"Rind")==0) {
             if (posit_base && posit_zone) {
                 index_dim = cg->base[posit_base-1].zone[posit_zone-1].index_dim;
@@ -12466,7 +13333,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"UserDefinedData_t")==0)
             CGNS_DELETE_SHIFT(nuser_data, user_data, cgi_free_user_data)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
         else if (strcmp(node_name,"GoverningEquations")==0)
@@ -12481,11 +13348,11 @@ int cg_delete_node(const char *node_name)
             CGNS_DELETE_CHILD(conduct, cgi_free_model)
         else if (strcmp(node_name,"ChemicalKineticsModel")==0)
             CGNS_DELETE_CHILD(chemkin, cgi_free_model)
-	else if (strcmp(node_name,"EMElectricFieldModel")==0)
+    else if (strcmp(node_name,"EMElectricFieldModel")==0)
             CGNS_DELETE_CHILD(elecfield, cgi_free_model)
-	else if (strcmp(node_name,"EMMagneticFieldModel")==0)
+    else if (strcmp(node_name,"EMMagneticFieldModel")==0)
             CGNS_DELETE_CHILD(magnfield, cgi_free_model)
-	else if (strcmp(node_name,"EMConductivityModel")==0)
+    else if (strcmp(node_name,"EMConductivityModel")==0)
             CGNS_DELETE_CHILD(emconduct, cgi_free_model)
         else if (strcmp(node_name,"TurbulenceModel")==0) {
             if (parent->turbulence) {
@@ -12521,9 +13388,9 @@ int cg_delete_node(const char *node_name)
            strcmp(posit->label,"TurbulenceClosure_t")==0 ||
            strcmp(posit->label,"ThermalRelaxationModel_t")==0 ||
            strcmp(posit->label,"ChemicalKineticsModel_t")==0 ||
-	   strcmp(posit->label,"EMElectricFieldModel_t")==0 ||
-	   strcmp(posit->label,"EMMagneticFieldModel_t")==0 ||
-	   strcmp(posit->label,"EMConductivityModel_t")==0) {
+       strcmp(posit->label,"EMElectricFieldModel_t")==0 ||
+       strcmp(posit->label,"EMMagneticFieldModel_t")==0 ||
+       strcmp(posit->label,"EMConductivityModel_t")==0) {
         cgns_model *parent = (cgns_model *)posit->posit;
         if (strcmp(node_label,"Descriptor_t")==0)
             CGNS_DELETE_SHIFT(ndescr, descr, cgi_free_descr)
@@ -12532,7 +13399,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"DataArray_t")==0)
             CGNS_DELETE_SHIFT(narrays, array, cgi_free_array)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
         else if (strcmp(posit->label,"TurbulenceModel_t")==0 &&
@@ -12553,7 +13420,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"DataArray_t")==0)
             CGNS_DELETE_SHIFT(narrays, array, cgi_free_array)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
 
@@ -12567,7 +13434,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"DataArray_t")==0)
             CGNS_DELETE_SHIFT(narrays, array, cgi_free_array)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
 
@@ -12583,7 +13450,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"DataArray_t")==0)
             CGNS_DELETE_SHIFT(narrays, array, cgi_free_array)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
 
@@ -12602,8 +13469,10 @@ int cg_delete_node(const char *node_name)
             CGNS_DELETE_SHIFT(nfamname, famname, cgi_free_famname)
         else if (strcmp(node_name,"Ordinal")==0)
             parent->ordinal=0;
-	else if (strcmp(node_name,"RotatingCoordinates")==0)
+        else if (strcmp(node_name,"RotatingCoordinates")==0)
             CGNS_DELETE_CHILD(rotating, cgi_free_rotating)
+        else if (strcmp(node_label,"Family_t")==0) /* ** FAMILY TREE **/
+            CGNS_DELETE_SHIFT(nfamilies, family, cgi_free_family)
 
 /* Children of FamilyBC_t */
     } else if (strcmp(posit->label,"FamilyBC_t")==0) {
@@ -12659,7 +13528,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"DataArray_t")==0)
             CGNS_DELETE_SHIFT(narrays, array, cgi_free_array)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
 
@@ -12673,11 +13542,11 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"DataArray_t")==0)
             CGNS_DELETE_SHIFT(narrays, array, cgi_free_array)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
         else if (strcmp(node_name,"GridLocation")==0)
-	  parent->location=CGNS_ENUMV( GridLocationNull );
+      parent->location=CGNS_ENUMV( GridLocationNull );
         else if (strcmp(node_name,"Rind")==0) {
             if (posit_base && posit_zone) {
                 index_dim = cg->base[posit_base-1].zone[posit_zone-1].index_dim;
@@ -12698,7 +13567,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"DataArray_t")==0)
             CGNS_DELETE_SHIFT(narrays, array, cgi_free_array)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
 
@@ -12712,7 +13581,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"DataArray_t")==0)
             CGNS_DELETE_SHIFT(narrays, array, cgi_free_array)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
 
@@ -12729,18 +13598,18 @@ int cg_delete_node(const char *node_name)
                  strcmp(node_name,"PointRange")==0)
             CGNS_DELETE_CHILD(ptset, cgi_free_ptset)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
         else if (strcmp(node_label,"UserDefinedData_t")==0)
             CGNS_DELETE_SHIFT(nuser_data, user_data, cgi_free_user_data)
-	else if (strcmp(node_name,"GridLocation")==0)
-	  parent->location=CGNS_ENUMV( GridLocationNull );
-	else if (strcmp(node_name,"FamilyName")==0)
-	    parent->family_name[0]='\0';
-	else if (strcmp(node_name,"Ordinal")==0)
-	    parent->ordinal=0;
-	/* IndexRange_t PointRange & IndexArray_t PointList can't be deleted */
+    else if (strcmp(node_name,"GridLocation")==0)
+      parent->location=CGNS_ENUMV( GridLocationNull );
+    else if (strcmp(node_name,"FamilyName")==0)
+        parent->family_name[0]='\0';
+    else if (strcmp(node_name,"Ordinal")==0)
+        parent->ordinal=0;
+    /* IndexRange_t PointRange & IndexArray_t PointList can't be deleted */
 
 /* Children of Gravity_t */
     } else if (strcmp(posit->label,"Gravity_t")==0) {
@@ -12750,7 +13619,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"UserDefinedData_t")==0)
             CGNS_DELETE_SHIFT(nuser_data, user_data, cgi_free_user_data)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
 
@@ -12764,7 +13633,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"DataArray_t")==0)
             CGNS_DELETE_SHIFT(narrays, array, cgi_free_array)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
 
@@ -12778,7 +13647,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"DataArray_t")==0)
             CGNS_DELETE_SHIFT(narrays, array, cgi_free_array)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
 
@@ -12832,7 +13701,7 @@ int cg_delete_node(const char *node_name)
         else if (strcmp(node_label,"UserDefinedData_t")==0)
             CGNS_DELETE_SHIFT(nuser_data, user_data, cgi_free_user_data)
         else if (strcmp(node_name,"DataClass")==0)
-	  parent->data_class = CGNS_ENUMV( DataClassNull );
+      parent->data_class = CGNS_ENUMV( DataClassNull );
         else if (strcmp(node_name,"DimensionalUnits")==0)
             CGNS_DELETE_CHILD(units, cgi_free_units)
         /* RotationCenter, RotationAngle and Translation can't be deleted */

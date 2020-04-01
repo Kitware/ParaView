@@ -182,19 +182,19 @@ const char  *ADF_error_string[] = {
    "ADF 50: Too many link level used.  May be caused by a recursive link.",
    "ADF 51: The node is not a link.  It was expected to be a link.",
    "ADF 52: The linked-to node does not exist.",
-   "ADF 53: The ADF file of a linked-node is not accessable.",
+   "ADF 53: The ADF file of a linked-node is not accessible.",
    "ADF 54: A node-id of 0.0 is not valid.",
    "ADF 55: Incomplete Data when reading multiple data blocks.",
    "ADF 56: Node name contains invalid characters.",
    "ADF 57: ADF file version incompatible with this library version.",
    "ADF 58: Nodes are not from the same file.",
    "ADF 59: Priority Stack Error.",
-   "ADF 60: Machine format and file format are incompatable.",
+   "ADF 60: Machine format and file format are incompatible.",
    "ADF 61: FFLUSH error",
    "ADF 62: The node ID pointer is NULL.",
    "ADF 63: The maximum size for a file exceeded.",
    "ADF 64: Dimensions exceed that for a 32-bit integer.",
-   "ADF  x: Last error mesage"
+   "ADF  x: Last error message"
    } ;
 
 /***********************************************************************
@@ -1019,7 +1019,11 @@ void	ADF_Database_Valid(
             *error_return = FILE_OPEN_ERROR;
         return;
     }
-    fread (header, sizeof(char), 32, fp);
+    if (32 != fread (header, sizeof(char), 32, fp)) {
+        *error_return = FREAD_ERROR;
+        fclose (fp);
+        return;
+    }
     fclose (fp);
     header[32] = 0;
     if (strncmp (&header[4], "ADF Database Version", 20))
@@ -1367,7 +1371,7 @@ ADFI_chase_link( ID, &LID, &file_index,  &block_offset, &node, error_return ) ;
 CHECK_ADF_ABORT( *error_return ) ;
 
 	/** Copy the blank-filled data-type into a C string **/
-ADFI_string_2_C_string( node.data_type, ADF_DATA_TYPE_LENGTH, data_type,
+ADFI_string_2_C_string( node.data_type, ADF_CGIO_DATA_TYPE_LENGTH, data_type,
 		error_return ) ;
 CHECK_ADF_ABORT( *error_return ) ;
 
@@ -2597,6 +2601,7 @@ output: int *error_return	Error return.
 ***********************************************************************/
 void	ADF_Read_All_Data(
 		const double ID,
+                const char *m_data_type,
 		char *data,
 		int *error_return )
 {
@@ -2625,7 +2630,16 @@ if( data == NULL ) {
 ADFI_chase_link( ID, &LID, &file_index,  &block_offset, &node, error_return ) ;
 CHECK_ADF_ABORT( *error_return ) ;
 
+/* if it was provided, check to make sure the data types match */
+if( m_data_type != NULL ) {
+  if(strncmp(m_data_type, node.data_type, 2) != 0){
+    *error_return = INVALID_DATA_TYPE;
+    CHECK_ADF_ABORT( *error_return );
+  }
+}
+
 	/** Get datatype size **/
+
 ADFI_evaluate_datatype( file_index, node.data_type, &file_bytes, &memory_bytes,
 	tokenized_data_type, &file_format, &machine_format, error_return ) ;
 CHECK_ADF_ABORT( *error_return ) ;
@@ -2710,7 +2724,7 @@ else {
 /***********************************************************************
 ADF Read Block Data:
 
-Read a continous block of data from a Node.  Reads a block the node's data
+Read a continuous block of data from a Node.  Reads a block the node's data
 and returns it into a contiguous memory space.
 
 ADF_Read_Block_Data( ID, data, error_return )
@@ -2912,6 +2926,7 @@ void	ADF_Read_Data(
 		const cgsize_t m_start[],
 		const cgsize_t m_end[],
 		const cgsize_t m_stride[],
+                const char *m_data_type,
 		char *data,
 		int *error_return )
 {
@@ -2947,6 +2962,14 @@ if( (s_start == NULL) || (s_end == NULL) || (s_stride == NULL) ||
 
 ADFI_chase_link( ID, &LID, &file_index,  &block_offset, &node, error_return ) ;
 CHECK_ADF_ABORT( *error_return ) ;
+
+/* if it was provided, check to make sure the data types match */
+if( m_data_type != NULL ) {
+  if(strncmp(m_data_type, node.data_type, 2) != 0){
+    *error_return = INVALID_DATA_TYPE;
+    CHECK_ADF_ABORT( *error_return );
+  }
+}
 
 	/** Get datatype length **/
 ADFI_evaluate_datatype( file_index, node.data_type, &file_bytes, &memory_bytes,
@@ -3057,7 +3080,7 @@ for( disk_elem=0; disk_elem<total_disk_elements; disk_elem++ ) {
       } /* end else */
 
    /** Increment disk pointers, for the special case of one dimensional
-       data we will a simple increment to maximize the throught. Thus for
+       data we will a simple increment to maximize the throughput. Thus for
        block reads you can temporarily change to 1D for the read to
        improve efficiency. Note total size shouldn't change!! **/
       if( disk_elem < total_disk_elements - 1 ) {
@@ -3443,7 +3466,7 @@ else { /** Multiple data chunks **/
 	         (data_chunk_table[i].end.offset -
 			data_chunk_table[i].start.offset) -
 		 (TAG_SIZE + DISK_POINTER_SIZE) ;
-        /** Limit the number of bytes written by whats left to write. **/
+        /** Limit the number of bytes written by what's left to write. **/
             current_bytes = MIN( current_bytes, total_bytes ) ;
             ADFI_write_data_chunk( file_index, &data_chunk_table[i].start,
 		 tokenized_data_type, file_bytes, current_bytes, 0,
@@ -4209,7 +4232,7 @@ if( node.number_of_data_chunks == 1 ) {
       } /* end else */
 
    /** Increment disk/memory pointers, for the special case of one dimensional
-       data we will a simple increment to maximize the throught. Thus for
+       data we will a simple increment to maximize the throughput. Thus for
        block writes you can temporarily change to 1D for the read to
        improve efficiency. Note total size shouldn't change!! **/
       if( disk_elem < total_disk_elements - 1 ) {
