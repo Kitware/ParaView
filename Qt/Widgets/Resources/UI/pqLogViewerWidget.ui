@@ -41,10 +41,30 @@
       <item>
        <widget class="QLineEdit" name="filter">
         <property name="placeholderText">
-         <string>filter</string>
+         <string>Set filter on this log</string>
         </property>
         <property name="clearButtonEnabled" stdset="0">
          <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="advancedButton">
+        <property name="toolTip">
+         <string>Show/hide all columns</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../Components/Resources/pqComponents.qrc">
+          <normaloff>:/pqWidgets/Icons/pqAdvanced.svg</normaloff>:/pqWidgets/Icons/pqAdvanced.svg</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonIconOnly</enum>
         </property>
        </widget>
       </item>
@@ -86,6 +106,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../Components/Resources/pqComponents.qrc"/>
+ </resources>
  <connections/>
 </ui>

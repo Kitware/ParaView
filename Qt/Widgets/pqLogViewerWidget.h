@@ -82,6 +82,11 @@ public:
    */
   static QVector<QString> extractLogParts(const QStringRef& txt, bool& is_raw);
 
+  /**
+   * Update log table column visibilities.
+   */
+  void updateColumnVisibilities();
+
 signals:
   // Emitted when the widget is closed
   void closed();
@@ -90,11 +95,16 @@ signals:
   // \param time
   void scrolled(double time);
 
+protected slots:
+  void toggleAdvanced();
+
 private:
   Q_DISABLE_COPY(pqLogViewerWidget);
 
   class pqInternals;
   QScopedPointer<pqInternals> Internals;
+
+  bool Advanced = false;
 };
 
 #endif

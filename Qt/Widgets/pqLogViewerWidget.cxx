@@ -216,6 +216,8 @@ pqLogViewerWidget::pqLogViewerWidget(QWidget* parentObject)
 
   QObject::connect(internals.Ui.filter, &QLineEdit::textChanged,
     [&internals](const QString& txt) { internals.FilterModel.setFilterWildcard(txt); });
+  QObject::connect(
+    internals.Ui.advancedButton, &QToolButton::clicked, this, &pqLogViewerWidget::toggleAdvanced);
   internals.reset();
 }
 
@@ -230,6 +232,8 @@ void pqLogViewerWidget::setLog(const QString& text)
   auto& internals = (*this->Internals);
   internals.reset();
   this->appendLog(text);
+
+  this->updateColumnVisibilities();
 }
 
 //-----------------------------------------------------------------------------
@@ -306,4 +310,19 @@ QVector<QString> pqLogViewerWidget::extractLogParts(const QStringRef& txt, bool&
     parts[4] = txt.toString();
   }
   return parts;
+}
+
+//-----------------------------------------------------------------------------
+void pqLogViewerWidget::toggleAdvanced()
+{
+  this->Advanced = !this->Advanced;
+  this->updateColumnVisibilities();
+}
+
+//-----------------------------------------------------------------------------
+void pqLogViewerWidget::updateColumnVisibilities()
+{
+  auto& internals = (*this->Internals);
+  internals.Ui.treeView->setColumnHidden(1, !this->Advanced);
+  internals.Ui.treeView->setColumnHidden(2, !this->Advanced);
 }
