@@ -167,13 +167,18 @@ following code:
 ```cmake
 # ParaView requires CMake 3.8 in order to be used.
 cmake_minimum_required(VERSION 3.8)
-project(myplugin)
+project(myplugin C CXX)
 
 find_package(ParaView REQUIRED)
 ```
 
 Where CMake will ask for the `ParaView_DIR` which you point to the ParaView
 build or install tree you would to build your with.
+
+Note that the `C` and `CXX` languages are required in general because ParaView
+may need to find other packages which are written with only C in mind (MPI is
+the usual culprit here) and need to know about the C compiler that is
+available.
 
 ## Exposing an Existing Filter
 

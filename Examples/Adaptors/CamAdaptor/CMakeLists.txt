@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.3)
-project(CamAdaptor CXX)
+project(CamAdaptor C CXX)
 
 find_package(ParaView REQUIRED COMPONENTS vtkPVPythonCatalyst)
 
