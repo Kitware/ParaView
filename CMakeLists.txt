@@ -2,9 +2,6 @@ if (FALSE) # XXX(kitware): ParaView handles versions.
 cmake_minimum_required(VERSION 2.8)
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
-  if (${CMAKE_MAJOR_VERSION} GREATER 2 OR ${CMAKE_MINOR_VERSION} GREATER 7)
-    cmake_policy(SET CMP0015 OLD)
-  endif (${CMAKE_MAJOR_VERSION} GREATER 2 OR ${CMAKE_MINOR_VERSION} GREATER 7)
 endif(COMMAND cmake_policy)
 
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING
@@ -15,7 +12,7 @@ endif (${CMAKE_MAJOR_VERSION} GREATER 2 OR ${CMAKE_MINOR_VERSION} GREATER 7)
 endif ()
 
 project("cgns" C)
-set(CGNS_VERSION "4.0")
+set(CGNS_VERSION "4.1")
 
 if (FALSE) # XXX(kitware): ParaView doesn't need CPack here.
 # Allow for building a package
@@ -396,24 +393,28 @@ endif ()
 ####################
 
 if (FALSE) # XXX(kitware): ParaView handles rpaths.
-# use, i.e. don't skip the full RPATH for the build tree
-set(CMAKE_SKIP_BUILD_RPATH  FALSE)
+if (CGNS_BUILD_SHARED)
+  # use, i.e. don't skip the full RPATH for the build tree
+  set(CMAKE_SKIP_BUILD_RPATH  FALSE)
 
-# when building, don't use the install RPATH already
-# (but later on when installing)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+  # when building, don't use the install RPATH already
+  # (but later on when installing)
+  set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-# the RPATH to be used when installing
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+  # the RPATH to be used when installing
+  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
-# add the automatically determined parts of the RPATH
-# which point to directories outside the build tree to the install RPATH
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+  # add the automatically determined parts of the RPATH
+  # which point to directories outside the build tree to the install RPATH
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+  IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+     set(CMAKE_MACOSX_RPATH TRUE)
+  ENDIF()
+else(CGNS_BUILD_SHARED)
+set(CMAKE_SKIP_RPATH TRUE)
+endif(CGNS_BUILD_SHARED)
 endif ()
-
-IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-   set(CMAKE_MACOSX_RPATH TRUE)
-ENDIF()
 
 #-----------------------------------------------------------------------------
 # Dashboard and Testing Settings
@@ -441,4 +442,3 @@ endif (CGNS_BUILD_TESTING)
 
 # Include the src directory
 add_subdirectory(src)
-

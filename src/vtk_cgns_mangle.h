@@ -503,6 +503,7 @@
 #define cgio_read_all_data vtkcgns_cgio_read_all_data
 #define cgio_read_all_data_type vtkcgns_cgio_read_all_data_type
 #define cgio_read_block_data vtkcgns_cgio_read_block_data
+#define cgio_read_block_data_type vtkcgns_cgio_read_block_data_type
 #define cgio_read_data vtkcgns_cgio_read_data
 #define cgio_read_data_type vtkcgns_cgio_read_data_type
 #define cgio_release_id vtkcgns_cgio_release_id
