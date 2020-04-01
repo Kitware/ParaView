@@ -34,6 +34,7 @@ set(classes
   vtkCommunicationErrorCatcher
   vtkDistributedTrivialProducer
   vtkFileSequenceParser
+  vtkLogRecorder
   vtkMultiProcessControllerHelper
   vtkPVCompositeDataPipeline
   vtkPVInformationKeys

@@ -1066,7 +1066,7 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
     pqPropertyWidget* pwidget = this->createWidgetForProperty(smproperty, smproxy, this);
     if (!pwidget)
     {
-      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "skip since failed to determine widget type.");
+      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "skip since could not determine widget type.");
       continue;
     }
 

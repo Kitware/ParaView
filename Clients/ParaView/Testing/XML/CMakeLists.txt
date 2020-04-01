@@ -481,6 +481,7 @@ SET (TESTS_WITHOUT_BASELINES
   ExportFilteredColumnsSpreadsheet.xml
   FavoritesFilters.xml
   FindWidget.xml
+  LogViewer.xml
   ModifyGUIWindowTitle.xml
   OpacityWidgetRange.xml
   OpenHelp.xml

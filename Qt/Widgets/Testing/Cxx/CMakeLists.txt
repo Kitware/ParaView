@@ -7,11 +7,13 @@ SET(MyTests
 
 set(TestsNoArgs
   DoubleLineEdit
-  HierarchicalGridLayout)
+  HierarchicalGridLayout
+  LogViewerWidget)
 
 SET(MocSources
   DoubleLineEdit.h
   HierarchicalGridLayout.h
+  LogViewerWidget.h
   SignalCatcher.h)
 
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Intel")

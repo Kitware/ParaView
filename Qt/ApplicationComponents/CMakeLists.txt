@@ -120,6 +120,7 @@ set(classes
   pqLoadStateReaction
   pqLockPanelsBehavior
   pqLockPanelsReaction
+  pqLogViewerReaction
   pqMainControlsToolbar
   pqMainWindowEventBehavior
   pqManageCustomFiltersReaction

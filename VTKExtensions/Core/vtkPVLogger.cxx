@@ -69,7 +69,7 @@ static vtkLogger::Verbosity get_verbosity(int key, const char* envvar = nullptr)
 
 static void set_verbosity(int key, vtkLogger::Verbosity verbosity)
 {
-  get_map().insert(std::make_pair(key, verbosity));
+  get_map()[key] = verbosity;
 }
 
 static const int PipelineVerbosityKey = 1;
