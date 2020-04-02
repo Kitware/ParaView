@@ -7,8 +7,7 @@ SET(MyTests
 
 set(TestsNoArgs
   DoubleLineEdit
-  HierarchicalGridLayout
-  LogViewerWidget)
+  HierarchicalGridLayout)
 
 SET(MocSources
   DoubleLineEdit.h
