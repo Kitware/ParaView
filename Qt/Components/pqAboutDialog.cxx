@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMViewProxy.h"
+#include "vtkVersion.h"
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
 
@@ -132,6 +133,7 @@ void pqAboutDialog::AddClientInformation()
   QTreeWidget* tree = this->Ui->ClientInformation;
 
   ::addItem(tree, "Version", QString(PARAVIEW_VERSION_FULL));
+  ::addItem(tree, "VTK Version", QString(vtkVersion::GetVTKVersionFull()));
   ::addItem(tree, "Qt Version", QT_VERSION_STR);
 
   ::addItem(tree, "vtkIdType size", QString("%1bits").arg(8 * sizeof(vtkIdType)));
