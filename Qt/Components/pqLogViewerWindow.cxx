@@ -267,11 +267,26 @@ void pqLogViewerWindow::clear()
 //----------------------------------------------------------------------------
 void pqLogViewerWindow::addLogView()
 {
-  int serverIndex = this->Ui->processComboBox->currentIndex();
+  int processIndex = this->Ui->processComboBox->currentIndex();
   int rankIndex = this->Ui->rankComboBox->currentText().toInt();
 
-  this->appendLogView(
-    new pqSingleLogViewerWidget(this, this->LogRecorderProxies[serverIndex], rankIndex));
+  // Check to see if we already have a log with this process/rank combo
+  bool exists = false;
+  for (int i = 0; i < this->LogViews.size(); ++i)
+  {
+    if (this->LogViews[i]->getRank() == rankIndex &&
+      this->LogViews[i]->getLogRecorderProxy() == this->LogRecorderProxies[processIndex])
+    {
+      exists = true;
+      break;
+    }
+  }
+
+  if (!exists)
+  {
+    this->appendLogView(
+      new pqSingleLogViewerWidget(this, this->LogRecorderProxies[processIndex], rankIndex));
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -306,7 +321,12 @@ bool pqLogViewerWindow::eventFilter(QObject* object, QEvent* event)
         QWidget* tab = this->Ui->logTabWidget->tabBar()->tabButton(cc, QTabBar::RightSide);
         if (tab == qobject_cast<QWidget*>(object))
         {
+          auto logView = dynamic_cast<pqSingleLogViewerWidget*>(this->Ui->logTabWidget->widget(cc));
           this->Ui->logTabWidget->removeTab(cc);
+          if (logView)
+          {
+            this->LogViews.removeAll(logView);
+          }
           break;
         }
       }
@@ -408,7 +428,7 @@ void pqLogViewerWindow::updateCategory(int category, bool promote)
 {
   this->CategoryPromoted[static_cast<int>(category)] = promote;
 
-  auto DoUpdate = [=](int proxyIndex, int category) {
+  auto DoUpdate = [=](int proxyIndex, int categoryIndex) {
     // Reset log messages to INFO
     int verbosity = static_cast<int>(vtkLogger::VERBOSITY_TRACE);
     if (promote)
@@ -417,7 +437,8 @@ void pqLogViewerWindow::updateCategory(int category, bool promote)
       verbosity = vtkSMPropertyHelper(this->LogRecorderProxies[proxyIndex], "Verbosity").GetAsInt();
     }
 
-    vtkSMPropertyHelper(this->LogRecorderProxies[proxyIndex], "CategoryVerbosity").Set(0, category);
+    vtkSMPropertyHelper(this->LogRecorderProxies[proxyIndex], "CategoryVerbosity")
+      .Set(0, categoryIndex);
     vtkSMPropertyHelper(this->LogRecorderProxies[proxyIndex], "CategoryVerbosity")
       .Set(1, verbosity);
     this->LogRecorderProxies[proxyIndex]->UpdateVTKObjects();
