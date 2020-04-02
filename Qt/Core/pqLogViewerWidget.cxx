@@ -34,12 +34,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVLogger.h"
 
+#include <QByteArray>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QScrollBar>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
+#include <QString>
 #include <QTextStream>
+
+#include "pqCoreUtilities.h"
+#include "pqFileDialog.h"
 
 #include <cassert>
 
@@ -247,6 +252,9 @@ pqLogViewerWidget::pqLogViewerWidget(QWidget* parentObject)
   QObject::connect(
     internals.Ui.advancedButton, &QToolButton::clicked, this, &pqLogViewerWidget::toggleAdvanced);
   internals.reset();
+
+  QObject::connect(
+    internals.Ui.exportLogButton, &QPushButton::clicked, this, &pqLogViewerWidget::exportLog);
 }
 
 //-----------------------------------------------------------------------------
@@ -345,6 +353,30 @@ void pqLogViewerWidget::toggleAdvanced()
 {
   this->Advanced = !this->Advanced;
   this->updateColumnVisibilities();
+}
+
+//-----------------------------------------------------------------------------
+void pqLogViewerWidget::exportLog()
+{
+  QString text = this->Internals->Ui.details->toPlainText();
+  pqFileDialog fileDialog(NULL, pqCoreUtilities::mainWidget(), "Save log", QString(),
+    "Text Files (*.txt);;All Files (*)");
+  fileDialog.setFileMode(pqFileDialog::AnyFile);
+  if (fileDialog.exec() != pqFileDialog::Accepted)
+  {
+    // Canceled
+    return;
+  }
+
+  QString filename = fileDialog.getSelectedFiles().first();
+  QByteArray filename_ba = filename.toLocal8Bit();
+  std::ofstream fileStream;
+  fileStream.open(filename_ba.data());
+  if (fileStream.is_open())
+  {
+    fileStream << text.toStdString();
+    fileStream.close();
+  }
 }
 
 //-----------------------------------------------------------------------------
