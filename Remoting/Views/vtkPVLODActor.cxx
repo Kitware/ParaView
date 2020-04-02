@@ -116,6 +116,8 @@ void vtkPVLODActor::Render(vtkRenderer* ren, vtkMapper* vtkNotUsed(m))
     this->Device->SetBackfaceProperty(this->BackfaceProperty);
   }
   this->Device->SetProperty(this->Property);
+  this->Device->SetForceOpaque(this->GetForceOpaque());
+  this->Device->SetForceTranslucent(this->GetForceTranslucent());
   bool inTrans = this->IsRenderingTranslucentPolygonalGeometry();
   this->Device->SetIsRenderingTranslucentPolygonalGeometry(inTrans);
 
