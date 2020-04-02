@@ -208,10 +208,20 @@ pqLogViewerWidget::pqLogViewerWidget(QWidget* parentObject)
   internals.FilterModel.setSourceModel(&internals.Model);
   internals.Ui.treeView->setModel(&internals.FilterModel);
 
-  QObject::connect(internals.Ui.treeView->selectionModel(), &QItemSelectionModel::currentChanged,
-    [&internals](const QModelIndex& current, const QModelIndex&) {
-      auto rawTxt = internals.rawText(current);
-      internals.Ui.details->setText(rawTxt);
+  QObject::connect(internals.Ui.treeView->selectionModel(), &QItemSelectionModel::selectionChanged,
+    [&internals](const QItemSelection&, const QItemSelection&) {
+      auto indexes = internals.Ui.treeView->selectionModel()->selectedRows();
+      QString detailText;
+      for (auto index : indexes)
+      {
+        // Check if the parent of this item is already in the list. Skip if so.
+        if (!(index.parent().isValid() && indexes.contains(index.parent())))
+        {
+          detailText.append(internals.rawText(index));
+          detailText.append("\n");
+        }
+      }
+      internals.Ui.details->setText(detailText);
     });
 
   QObject::connect(
