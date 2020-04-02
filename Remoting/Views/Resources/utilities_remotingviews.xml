@@ -498,7 +498,7 @@
         <DoubleRangeDomain max="10"
                            min="0"
                            name="range"
-                           resolution="0.01" />
+                           resolution="1000" />
         <Documentation>Set the wheel motion factor for 3D interaction.</Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty name="Camera2DManipulators"
@@ -528,7 +528,7 @@
         <DoubleRangeDomain max="10"
                            min="0"
                            name="range"
-                           resolution="0.01" />
+                           resolution="1000" />
         <Documentation>Set the wheel motion factor for 2D interaction.</Documentation>
       </DoubleVectorProperty>
       <PropertyGroup label="2D Interaction Options">
