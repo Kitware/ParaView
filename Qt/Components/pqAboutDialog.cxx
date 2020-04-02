@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QtTestingConfigure.h"
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
+#include "pqFileDialog.h"
 #include "pqOptions.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -53,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QOpenGLFunctions>
 
 #include <QApplication>
+#include <QClipboard>
 #include <QFile>
 #include <QHeaderView>
 
@@ -299,4 +302,59 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
   {
     ::addItem(tree, "Headless support", "None");
   }
+}
+
+//-----------------------------------------------------------------------------
+QString pqAboutDialog::formatToText(QTreeWidget* tree)
+{
+  QString text;
+  QTreeWidgetItemIterator it(tree);
+  while (*it)
+  {
+    text += (*it)->text(0) + ": " + (*it)->text(1) + "\n";
+    ++it;
+  }
+  return text;
+}
+
+//-----------------------------------------------------------------------------
+QString pqAboutDialog::formatToText()
+{
+  QString text = "Client Information:\n";
+  QTreeWidget* tree = this->Ui->ClientInformation;
+  text += this->formatToText(tree);
+  tree = this->Ui->ServerInformation;
+  text += "\nConnection Information:\n";
+  text += this->formatToText(tree);
+  return text;
+}
+
+//-----------------------------------------------------------------------------
+void pqAboutDialog::saveToFile()
+{
+  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Save to File"), QString(),
+    "Text Files (*.txt);;All Files (*)");
+  fileDialog.setFileMode(pqFileDialog::AnyFile);
+  if (fileDialog.exec() != pqFileDialog::Accepted)
+  {
+    // Canceled
+    return;
+  }
+
+  QString filename = fileDialog.getSelectedFiles().first();
+  QByteArray filename_ba = filename.toLocal8Bit();
+  std::ofstream fileStream;
+  fileStream.open(filename_ba.data());
+  if (fileStream.is_open())
+  {
+    fileStream << this->formatToText().toStdString();
+    fileStream.close();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqAboutDialog::copyToClipboard()
+{
+  QClipboard* clipboard = QGuiApplication::clipboard();
+  clipboard->setText(this->formatToText());
 }
