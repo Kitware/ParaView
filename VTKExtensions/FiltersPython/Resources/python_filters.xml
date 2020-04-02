@@ -93,7 +93,8 @@ timestep.
           <Group name="filters" />
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkDataObject" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="field"
                           name="input_array"
@@ -313,6 +314,7 @@ annotation text.
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataObject" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <Documentation>This property specifies the input(s) to the programmable
         filter.</Documentation>
@@ -350,6 +352,8 @@ annotation text.
                  value="15" />
           <!-- <Entry value="16" text="vtkGenericDataSet"/> -->
           <!-- <Entry value="17" text="vtkHyperOctree"/> -->
+          <Entry text="vtkHyperTreeGrid"
+                 value="32" />
           <!-- <Entry value="18" text="vtkTemporalDataSet"/> -->
           <Entry text="vtkTable"
                  value="19" />
