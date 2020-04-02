@@ -117,6 +117,9 @@ pqLogViewerWindow::pqLogViewerWindow()
   this->Ui->processComboBox->addItem("Client");
   vtkNew<vtkPVServerInformation> serverInfo;
 
+  server->session()->GatherInformation(vtkPVSession::CLIENT, serverInfo, 0);
+  this->RankNumbers.push_back(serverInfo->GetNumberOfProcesses());
+
   if (server->isRemote())
   {
     if (server->isRenderServerSeparate())
@@ -132,9 +135,9 @@ pqLogViewerWindow::pqLogViewerWindow()
       this->Ui->processComboBox->addItem("Data Server");
       this->Ui->processComboBox->addItem("Render Server");
 
-      server->session()->GatherInformation(DATA_SERVER_PROCESS, serverInfo, 0);
+      server->session()->GatherInformation(vtkSMSession::DATA_SERVER, serverInfo, 0);
       this->RankNumbers.push_back(serverInfo->GetNumberOfProcesses());
-      server->session()->GatherInformation(RENDER_SERVER_PROCESS, serverInfo, 0);
+      server->session()->GatherInformation(vtkSMSession::RENDER_SERVER, serverInfo, 0);
       this->RankNumbers.push_back(serverInfo->GetNumberOfProcesses());
     }
     else
@@ -149,9 +152,6 @@ pqLogViewerWindow::pqLogViewerWindow()
       this->RankNumbers.push_back(serverInfo->GetNumberOfProcesses());
     }
   }
-
-  server->session()->GatherInformation(vtkPVSession::CLIENT, serverInfo, 0);
-  this->RankNumbers.push_back(serverInfo->GetNumberOfProcesses());
 
   this->recordRefTimes();
 
@@ -363,6 +363,9 @@ void pqLogViewerWindow::initializeRankComboBox()
 {
   int index = this->Ui->processComboBox->currentIndex();
 
+  bool hideRankControls = this->RankNumbers[index] == 1;
+  this->Ui->rankLabel->setHidden(hideRankControls);
+  this->Ui->rankComboBox->setHidden(hideRankControls);
   this->Ui->rankComboBox->clear();
   for (int i = 0; i < this->RankNumbers[index]; i++)
   {
