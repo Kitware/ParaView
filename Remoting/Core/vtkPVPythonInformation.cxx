@@ -29,6 +29,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVPythonInformation.h"
 
+#include <algorithm>
 #include <sstream>
 
 vtkStandardNewMacro(vtkPVPythonInformation);
@@ -170,7 +171,11 @@ void vtkPVPythonInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
   // Find a core library path and chop off the module specific bits.
   // sys.executable and such all return paraview/pvserver/etc/etc.
   this->SetPythonPath(chopFilename(getModuleAttrAsString("os", "__file__")));
-  this->SetPythonVersion(getModuleAttrAsString("sys", "version"));
+
+  // Recover python version and remove the end of line within it
+  std::string pythonVersion = getModuleAttrAsString("sys", "version");
+  std::replace(pythonVersion.begin(), pythonVersion.end(), '\n', ' ');
+  this->SetPythonVersion(pythonVersion);
 
   // while testing for modules, we don't want the error messages to be reported
   // on to the terminal, so capture them.
