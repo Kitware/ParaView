@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqLogViewerWindow.h
+   Module:  pqLogViewerDialog.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,14 +30,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#ifndef pqLogViewerWindow_h
-#define pqLogViewerWindow_h
+#ifndef pqLogViewerDialog_h
+#define pqLogViewerDialog_h
 
 #include "pqComponentsModule.h"
 #include "pqSingleLogViewerWidget.h"
 
 #include <QComboBox>
-#include <QMainWindow>
+#include <QDialog>
 #include <QMap>
 #include <QPair>
 
@@ -48,11 +48,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace Ui
 {
-class pqLogViewerWindow;
+class pqLogViewerDialog;
 }
 
 /**
- * @class pqLogViewerWindow
+ * @class pqLogViewerDialog
  *
  * @brief A window for showing multiple log viewers.
  *
@@ -60,14 +60,14 @@ class pqLogViewerWindow;
  * with vtkLogRecorder. Individual logs from client and server processes
  * are displayed in their own tabs in a QTabWidget in this window.
  */
-class PQCOMPONENTS_EXPORT pqLogViewerWindow : public QMainWindow
+class PQCOMPONENTS_EXPORT pqLogViewerDialog : public QDialog
 {
   Q_OBJECT
-  typedef QMainWindow Superclass;
 
 public:
-  pqLogViewerWindow();
-  ~pqLogViewerWindow() override;
+  pqLogViewerDialog(QWidget* parent = nullptr);
+  ~pqLogViewerDialog() override;
+  typedef QDialog Superclass;
 
   /**
    * Refresh the log viewers.
@@ -95,6 +95,8 @@ private slots:
   void setProcessVerbosity(int process, int index);
 
 private:
+  Q_DISABLE_COPY(pqLogViewerDialog)
+
   // Add a log view to the window
   void appendLogView(pqSingleLogViewerWidget* logView);
 
@@ -113,7 +115,7 @@ private:
   // Convert verbosity to combobox index
   int getVerbosityIndex(vtkLogger::Verbosity verbosity);
 
-  Ui::pqLogViewerWindow* Ui;
+  Ui::pqLogViewerDialog* Ui;
   QList<pqSingleLogViewerWidget*> LogViews;
   QVector<int> RankNumbers;
   QList<vtkSmartPointer<vtkSMProxy> > LogRecorderProxies;
@@ -122,4 +124,4 @@ private:
   std::array<bool, 5> CategoryPromoted;
 };
 
-#endif // pqLogViewerWindow_h
+#endif // pqLogViewerDialog_h

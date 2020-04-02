@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqLogViewerWindow.cxx
+   Module:  pqLogViewerDialog.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#include "pqLogViewerWindow.h"
+#include "pqLogViewerDialog.h"
 
 #include "pqActiveObjects.h"
 #include "pqServer.h"
@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 
-#include "ui_pqLogViewerWindow.h"
+#include "ui_pqLogViewerDialog.h"
 
 namespace
 {
@@ -65,9 +65,10 @@ constexpr int PLUGINS_CATEGORY = 4;
 }
 
 //----------------------------------------------------------------------------
-pqLogViewerWindow::pqLogViewerWindow()
+pqLogViewerDialog::pqLogViewerDialog(QWidget* parent)
+  : QDialog(parent)
 {
-  this->Ui = new Ui::pqLogViewerWindow();
+  this->Ui = new Ui::pqLogViewerDialog();
   this->Ui->setupUi(this);
 
   indexToVerbosity[0] = vtkLogger::VERBOSITY_OFF;
@@ -163,9 +164,9 @@ pqLogViewerWindow::pqLogViewerWindow()
   this->initializeVerbosityComboBoxes();
 
   QObject::connect(this->Ui->processComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-    this, &pqLogViewerWindow::initializeRankComboBox);
+    this, &pqLogViewerDialog::initializeRankComboBox);
   QObject::connect(
-    this->Ui->addLogButton, &QPushButton::pressed, this, &pqLogViewerWindow::addLogView);
+    this->Ui->addLogButton, &QPushButton::pressed, this, &pqLogViewerDialog::addLogView);
   QObject::connect(this->Ui->clientVerbosities, QOverload<int>::of(&QComboBox::currentIndexChanged),
     [=](int index) { this->setProcessVerbosity(CLIENT_PROCESS, index); });
   QObject::connect(this->Ui->serverVerbosities, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -177,9 +178,9 @@ pqLogViewerWindow::pqLogViewerWindow()
     QOverload<int>::of(&QComboBox::currentIndexChanged),
     [=](int index) { this->setProcessVerbosity(RENDER_SERVER_PROCESS, index); });
   QObject::connect(
-    this->Ui->refreshButton, &QPushButton::pressed, this, &pqLogViewerWindow::refresh);
+    this->Ui->refreshButton, &QPushButton::pressed, this, &pqLogViewerDialog::refresh);
   QObject::connect(
-    this->Ui->clearLogsButton, &QPushButton::pressed, this, &pqLogViewerWindow::clear);
+    this->Ui->clearLogsButton, &QPushButton::pressed, this, &pqLogViewerDialog::clear);
   QObject::connect(this->Ui->logTabWidget, &QTabWidget::tabCloseRequested, this->Ui->logTabWidget,
     &QTabWidget::removeTab);
 
@@ -233,16 +234,18 @@ pqLogViewerWindow::pqLogViewerWindow()
 }
 
 //----------------------------------------------------------------------------
-pqLogViewerWindow::~pqLogViewerWindow()
+pqLogViewerDialog::~pqLogViewerDialog()
 {
   for (auto logRecorderProxy : this->LogRecorderProxies)
   {
     logRecorderProxy->Delete();
   }
+
+  delete this->Ui;
 }
 
 //----------------------------------------------------------------------------
-void pqLogViewerWindow::refresh()
+void pqLogViewerDialog::refresh()
 {
   for (auto* logView : this->LogViews)
   {
@@ -251,7 +254,7 @@ void pqLogViewerWindow::refresh()
 }
 
 //----------------------------------------------------------------------------
-void pqLogViewerWindow::clear()
+void pqLogViewerDialog::clear()
 {
   for (auto logRecorderProxy : this->LogRecorderProxies)
   {
@@ -265,7 +268,7 @@ void pqLogViewerWindow::clear()
 }
 
 //----------------------------------------------------------------------------
-void pqLogViewerWindow::addLogView()
+void pqLogViewerDialog::addLogView()
 {
   int processIndex = this->Ui->processComboBox->currentIndex();
   int rankIndex = this->Ui->rankComboBox->currentText().toInt();
@@ -290,7 +293,7 @@ void pqLogViewerWindow::addLogView()
 }
 
 //----------------------------------------------------------------------------
-void pqLogViewerWindow::recordRefTimes()
+void pqLogViewerDialog::recordRefTimes()
 {
   for (int i = 0; i < this->LogRecorderProxies.size(); i++)
   {
@@ -309,7 +312,7 @@ void pqLogViewerWindow::recordRefTimes()
 }
 
 //----------------------------------------------------------------------------
-bool pqLogViewerWindow::eventFilter(QObject* object, QEvent* event)
+bool pqLogViewerDialog::eventFilter(QObject* object, QEvent* event)
 {
   if (event->type() == QEvent::MouseButtonRelease && qobject_cast<QLabel*>(object))
   {
@@ -337,7 +340,7 @@ bool pqLogViewerWindow::eventFilter(QObject* object, QEvent* event)
 }
 
 //----------------------------------------------------------------------------
-void pqLogViewerWindow::appendLogView(pqSingleLogViewerWidget* logView)
+void pqLogViewerDialog::appendLogView(pqSingleLogViewerWidget* logView)
 {
   QString tabTitle;
   int rank = logView->getRank();
@@ -375,11 +378,11 @@ void pqLogViewerWindow::appendLogView(pqSingleLogViewerWidget* logView)
   QObject::connect(Ui->globalFilter, &QLineEdit::textChanged, logView,
     &pqSingleLogViewerWidget::setFilterWildcard);
 
-  QObject::connect(logView, &pqLogViewerWidget::scrolled, this, &pqLogViewerWindow::linkedScroll);
+  QObject::connect(logView, &pqLogViewerWidget::scrolled, this, &pqLogViewerDialog::linkedScroll);
 }
 
 //----------------------------------------------------------------------------
-void pqLogViewerWindow::initializeRankComboBox()
+void pqLogViewerDialog::initializeRankComboBox()
 {
   int index = this->Ui->processComboBox->currentIndex();
 
@@ -394,7 +397,7 @@ void pqLogViewerWindow::initializeRankComboBox()
 }
 
 //----------------------------------------------------------------------------
-void pqLogViewerWindow::initializeVerbosityComboBoxes()
+void pqLogViewerDialog::initializeVerbosityComboBoxes()
 {
   this->initializeVerbosities(this->Ui->clientVerbosities);
   if (this->LogRecorderProxies.size() == 2)
@@ -409,7 +412,7 @@ void pqLogViewerWindow::initializeVerbosityComboBoxes()
 }
 
 //----------------------------------------------------------------------------
-void pqLogViewerWindow::initializeVerbosities(QComboBox* combobox)
+void pqLogViewerDialog::initializeVerbosities(QComboBox* combobox)
 {
   combobox->addItem("OFF");
   combobox->addItem("ERROR");
@@ -424,7 +427,7 @@ void pqLogViewerWindow::initializeVerbosities(QComboBox* combobox)
 }
 
 //----------------------------------------------------------------------------
-void pqLogViewerWindow::updateCategory(int category, bool promote)
+void pqLogViewerDialog::updateCategory(int category, bool promote)
 {
   this->CategoryPromoted[static_cast<int>(category)] = promote;
 
@@ -451,7 +454,7 @@ void pqLogViewerWindow::updateCategory(int category, bool promote)
 }
 
 //----------------------------------------------------------------------------
-void pqLogViewerWindow::updateCategories()
+void pqLogViewerDialog::updateCategories()
 {
   for (size_t i = 0; i < this->CategoryPromoted.size(); ++i)
   {
@@ -460,7 +463,7 @@ void pqLogViewerWindow::updateCategories()
 }
 
 //----------------------------------------------------------------------------
-vtkLogger::Verbosity pqLogViewerWindow::getVerbosity(int index)
+vtkLogger::Verbosity pqLogViewerDialog::getVerbosity(int index)
 {
   if (index >= 0 && index <= 15)
   {
@@ -471,13 +474,13 @@ vtkLogger::Verbosity pqLogViewerWindow::getVerbosity(int index)
 }
 
 //----------------------------------------------------------------------------
-int pqLogViewerWindow::getVerbosityIndex(vtkLogger::Verbosity verbosity)
+int pqLogViewerDialog::getVerbosityIndex(vtkLogger::Verbosity verbosity)
 {
   return verbosityToIndex[verbosity];
 }
 
 //----------------------------------------------------------------------------
-void pqLogViewerWindow::linkedScroll(double time)
+void pqLogViewerDialog::linkedScroll(double time)
 {
   auto* sender = static_cast<pqSingleLogViewerWidget*>(QObject::sender());
   double timeDelta =
@@ -494,7 +497,7 @@ void pqLogViewerWindow::linkedScroll(double time)
 }
 
 //----------------------------------------------------------------------------
-void pqLogViewerWindow::setProcessVerbosity(int process, int index)
+void pqLogViewerDialog::setProcessVerbosity(int process, int index)
 {
   int verbosity = static_cast<int>(this->getVerbosity(index));
   vtkSMPropertyHelper(this->LogRecorderProxies[process], "Verbosity").Set(verbosity);
