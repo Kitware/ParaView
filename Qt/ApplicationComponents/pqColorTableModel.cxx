@@ -35,12 +35,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDiscretizableColorTransferFunction.h"
 #include "vtkSMProxy.h"
 
+#include <array>
+
+//-----------------------------------------------------------------------------
+class pqColorTableModel::pqInternals
+{
+public:
+  std::vector<std::array<double, 6> > XRGBPoints;
+};
+
 //-----------------------------------------------------------------------------
 pqColorTableModel::pqColorTableModel(pqColorOpacityEditorWidget* widget, QObject* parentObject)
   : Superclass(parentObject)
   , Widget(widget)
+  , Internals(new pqColorTableModel::pqInternals())
 {
-  this->NumberOfRowsCache = this->rowCount();
+  // Update the model when XRGB points change
+  QObject::connect(widget, SIGNAL(xrgbPointsChanged()), this, SLOT(controlPointsChanged()));
+  QObject::connect(widget, SIGNAL(changeFinished()), this, SLOT(controlPointsChanged()));
+
+  QObject::connect(this, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
+    SLOT(updatePoint(const QModelIndex&)));
 }
 
 //-----------------------------------------------------------------------------
@@ -65,33 +80,22 @@ bool pqColorTableModel::setData(const QModelIndex& idx, const QVariant& value, i
     return false;
   }
 
+  double newValue = value.toDouble();
+  if (idx.column() == 0 && (newValue < this->Range[0] || newValue > this->Range[1]))
+  {
+    return false;
+  }
+  else if (idx.column() > 0 && (newValue < 0.0 || newValue > 1.0))
+  {
+    return false;
+  }
+
   if (this->Widget && this->Widget->proxy())
   {
-    vtkDiscretizableColorTransferFunction* stc =
-      vtkDiscretizableColorTransferFunction::SafeDownCast(
-        this->Widget->proxy()->GetClientSideObject());
-    if (stc)
-    {
-      double range[2];
-      stc->GetRange(range);
-      double newValue = value.toDouble();
-      if (idx.column() == 0 && (newValue < range[0] || newValue > range[1]))
-      {
-        return false;
-      }
-      else if (idx.column() > 0 && (newValue < 0.0 || newValue > 1.0))
-      {
-        return false;
-      }
+    this->Internals->XRGBPoints[idx.row()][idx.column()] = newValue;
 
-      double xrgbms[6];
-      stc->GetNodeValue(idx.row(), xrgbms);
-      xrgbms[idx.column()] = newValue;
-      stc->SetNodeValue(idx.row(), xrgbms);
-
-      emit this->dataChanged(idx, idx);
-      return true;
-    }
+    emit dataChanged(idx, idx);
+    return true;
   }
 
   return false;
@@ -105,13 +109,7 @@ int pqColorTableModel::rowCount(const QModelIndex& parentIndex) const
   int size = 0;
   if (this->Widget && this->Widget->proxy())
   {
-    vtkDiscretizableColorTransferFunction* stc =
-      vtkDiscretizableColorTransferFunction::SafeDownCast(
-        this->Widget->proxy()->GetClientSideObject());
-    if (stc)
-    {
-      size = stc->GetSize();
-    }
+    size = static_cast<int>(this->Internals->XRGBPoints.size());
   }
 
   return size;
@@ -129,21 +127,7 @@ QVariant pqColorTableModel::data(const QModelIndex& idx, int role) const
 {
   if (role == Qt::DisplayRole || role == Qt::EditRole)
   {
-    vtkDiscretizableColorTransferFunction* stc = NULL;
-    if (this->Widget && this->Widget->proxy())
-    {
-      stc = vtkDiscretizableColorTransferFunction::SafeDownCast(
-        this->Widget->proxy()->GetClientSideObject());
-    }
-    if (!stc)
-    {
-      return QVariant();
-    }
-
-    // Get the XRGB value
-    double xrgbms[6];
-    stc->GetNodeValue(idx.row(), xrgbms);
-
+    std::array<double, 6>& xrgbms = this->Internals->XRGBPoints[idx.row()];
     if (idx.column() >= 0 && idx.column() < 4)
     {
       return QString::number(xrgbms[idx.column()]);
@@ -187,26 +171,63 @@ QVariant pqColorTableModel::headerData(int section, Qt::Orientation orientation,
 }
 
 //-----------------------------------------------------------------------------
-void pqColorTableModel::refresh()
+void pqColorTableModel::controlPointsChanged()
 {
-  // Tell the model that the number of rows may have changed because it does not
-  // get this information from the rowCount() method. There must be a  more elegant
-  // way to do this.
-  int currentNumberOfRows = this->rowCount();
-  if (this->NumberOfRowsCache < currentNumberOfRows)
+  vtkDiscretizableColorTransferFunction* stc = vtkDiscretizableColorTransferFunction::SafeDownCast(
+    this->Widget->proxy()->GetClientSideObject());
+  int newSize = 0;
+  if (stc)
   {
-    this->beginInsertRows(QModelIndex(), this->NumberOfRowsCache, currentNumberOfRows - 1);
-    this->endInsertRows();
+    newSize = stc->GetSize();
+    stc->GetRange(this->Range);
   }
-  else if (this->NumberOfRowsCache > currentNumberOfRows)
+
+  int previousSize = static_cast<int>(this->Internals->XRGBPoints.size());
+  if (newSize > previousSize)
   {
-    this->beginRemoveRows(QModelIndex(), currentNumberOfRows, this->NumberOfRowsCache - 1);
-    this->endRemoveRows();
+    emit this->beginInsertRows(QModelIndex(), previousSize, newSize - 1);
+    for (int idx = previousSize; idx < newSize; ++idx)
+    {
+      std::array<double, 6> xrgbms;
+      stc->GetNodeValue(idx, xrgbms.data());
+      this->Internals->XRGBPoints.push_back(xrgbms);
+    }
+    emit this->endInsertRows();
   }
-  this->NumberOfRowsCache = currentNumberOfRows;
+  else if (newSize < previousSize)
+  {
+    emit this->beginRemoveRows(QModelIndex(), newSize, previousSize - 1);
+    size_t numToRemove = previousSize - newSize;
+    for (size_t idx = 0; idx < numToRemove; ++idx)
+    {
+      this->Internals->XRGBPoints.pop_back();
+    }
+    emit this->endRemoveRows();
+  }
+  else // newSize == previousSize
+  {
+    this->beginResetModel();
+    for (int idx = 0; idx < newSize; ++idx)
+    {
+      std::array<double, 6> xrgbms;
+      stc->GetNodeValue(idx, xrgbms.data());
+      this->Internals->XRGBPoints[idx] = xrgbms;
+    }
+    this->endResetModel();
+  }
+}
 
-  QModelIndex topLeft = this->createIndex(0, 0);
-  QModelIndex bottomRight = this->createIndex(this->rowCount() - 1, this->columnCount() - 1);
-
-  emit dataChanged(topLeft, bottomRight);
+//-----------------------------------------------------------------------------
+void pqColorTableModel::updatePoint(const QModelIndex& idx)
+{
+  vtkDiscretizableColorTransferFunction* stc = vtkDiscretizableColorTransferFunction::SafeDownCast(
+    this->Widget->proxy()->GetClientSideObject());
+  if (stc)
+  {
+    double xrgbms[6];
+    stc->GetNodeValue(idx.row(), xrgbms);
+    QVariant data = this->data(idx);
+    xrgbms[idx.column()] = data.toDouble();
+    stc->SetNodeValue(idx.row(), xrgbms);
+  }
 }
