@@ -1,5 +1,5 @@
 set(classes
-  vtkSMMyElevationProxy
+  vtkSMMyBoundsDomain
   vtkSMMyElevationProxy)
 
 vtk_module_add_module(MyProxy
