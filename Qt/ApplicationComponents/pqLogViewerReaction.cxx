@@ -32,17 +32,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqLogViewerReaction.h"
 
-#include "pqLogViewerWindow.h"
+#include "pqCoreUtilities.h"
+#include "pqLogViewerDialog.h"
+
+#include <QApplication>
 #include <QPointer>
 
 //-----------------------------------------------------------------------------
 void pqLogViewerReaction::showLogViewer()
 {
-  QPointer<pqLogViewerWindow> viewer;
+  static QPointer<pqLogViewerDialog> viewer;
   if (!viewer)
   {
-    viewer = new pqLogViewerWindow();
+    viewer = new pqLogViewerDialog(pqCoreUtilities::mainWidget());
   }
-  viewer->setAttribute(Qt::WA_DeleteOnClose, true);
+  viewer->setAttribute(Qt::WA_DeleteOnClose, false);
   viewer->show();
+  viewer->raise();
+  viewer->activateWindow();
+  viewer->refresh();
 }

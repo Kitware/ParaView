@@ -34,12 +34,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVLogger.h"
 
+#include <QByteArray>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QScrollBar>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
+#include <QString>
 #include <QTextStream>
+
+#include "pqCoreUtilities.h"
+#include "pqFileDialog.h"
 
 #include <cassert>
 
@@ -117,6 +122,24 @@ public:
         // item4->setData(QVariant(Qt::AlignLeft|Qt::AlignTop),
         // Qt::TextAlignmentRole);
 
+        // Change log message color for warnings and errors
+        QColor color;
+        if (parts[3] == "WARN")
+        {
+          color.setRgb(174, 173, 39);
+        }
+        else if (parts[3] == "ERR")
+        {
+          color.setRgb(194, 54, 33);
+        }
+        QBrush brush;
+        brush.setColor(color);
+        item0->setForeground(brush);
+        item1->setForeground(brush);
+        item2->setForeground(brush);
+        item3->setForeground(brush);
+        item4->setForeground(brush);
+
         auto parent = !this->ActiveScopeItem.isEmpty() ? this->ActiveScopeItem.last()
                                                        : this->Model.invisibleRootItem();
         parent->appendRow(QList<QStandardItem*>{ item4, item1, item2, item3, item0 });
@@ -190,10 +213,20 @@ pqLogViewerWidget::pqLogViewerWidget(QWidget* parentObject)
   internals.FilterModel.setSourceModel(&internals.Model);
   internals.Ui.treeView->setModel(&internals.FilterModel);
 
-  QObject::connect(internals.Ui.treeView->selectionModel(), &QItemSelectionModel::currentChanged,
-    [&internals](const QModelIndex& current, const QModelIndex&) {
-      auto rawTxt = internals.rawText(current);
-      internals.Ui.details->setText(rawTxt);
+  QObject::connect(internals.Ui.treeView->selectionModel(), &QItemSelectionModel::selectionChanged,
+    [&internals](const QItemSelection&, const QItemSelection&) {
+      auto indexes = internals.Ui.treeView->selectionModel()->selectedRows();
+      QString detailText;
+      for (auto index : indexes)
+      {
+        // Check if the parent of this item is already in the list. Skip if so.
+        if (!(index.parent().isValid() && indexes.contains(index.parent())))
+        {
+          detailText.append(internals.rawText(index));
+          detailText.append("\n");
+        }
+      }
+      internals.Ui.details->setText(detailText);
     });
 
   QObject::connect(
@@ -216,7 +249,12 @@ pqLogViewerWidget::pqLogViewerWidget(QWidget* parentObject)
 
   QObject::connect(internals.Ui.filter, &QLineEdit::textChanged,
     [&internals](const QString& txt) { internals.FilterModel.setFilterWildcard(txt); });
+  QObject::connect(
+    internals.Ui.advancedButton, &QToolButton::clicked, this, &pqLogViewerWidget::toggleAdvanced);
   internals.reset();
+
+  QObject::connect(
+    internals.Ui.exportLogButton, &QPushButton::clicked, this, &pqLogViewerWidget::exportLog);
 }
 
 //-----------------------------------------------------------------------------
@@ -230,6 +268,8 @@ void pqLogViewerWidget::setLog(const QString& text)
   auto& internals = (*this->Internals);
   internals.reset();
   this->appendLog(text);
+
+  this->updateColumnVisibilities();
 }
 
 //-----------------------------------------------------------------------------
@@ -306,4 +346,43 @@ QVector<QString> pqLogViewerWidget::extractLogParts(const QStringRef& txt, bool&
     parts[4] = txt.toString();
   }
   return parts;
+}
+
+//-----------------------------------------------------------------------------
+void pqLogViewerWidget::toggleAdvanced()
+{
+  this->Advanced = !this->Advanced;
+  this->updateColumnVisibilities();
+}
+
+//-----------------------------------------------------------------------------
+void pqLogViewerWidget::exportLog()
+{
+  QString text = this->Internals->Ui.details->toPlainText();
+  pqFileDialog fileDialog(NULL, pqCoreUtilities::mainWidget(), "Save log", QString(),
+    "Text Files (*.txt);;All Files (*)");
+  fileDialog.setFileMode(pqFileDialog::AnyFile);
+  if (fileDialog.exec() != pqFileDialog::Accepted)
+  {
+    // Canceled
+    return;
+  }
+
+  QString filename = fileDialog.getSelectedFiles().first();
+  QByteArray filename_ba = filename.toLocal8Bit();
+  std::ofstream fileStream;
+  fileStream.open(filename_ba.data());
+  if (fileStream.is_open())
+  {
+    fileStream << text.toStdString();
+    fileStream.close();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqLogViewerWidget::updateColumnVisibilities()
+{
+  auto& internals = (*this->Internals);
+  internals.Ui.treeView->setColumnHidden(1, !this->Advanced);
+  internals.Ui.treeView->setColumnHidden(2, !this->Advanced);
 }

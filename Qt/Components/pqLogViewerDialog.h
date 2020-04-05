@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqLogViewerWindow.h
+   Module:  pqLogViewerDialog.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,27 +30,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#ifndef pqLogViewerWindow_h
-#define pqLogViewerWindow_h
+#ifndef pqLogViewerDialog_h
+#define pqLogViewerDialog_h
 
 #include "pqComponentsModule.h"
 #include "pqSingleLogViewerWidget.h"
 
 #include <QComboBox>
-#include <QMainWindow>
+#include <QDialog>
 #include <QMap>
 #include <QPair>
 
 #include "vtkLogger.h"
 #include "vtkSMSession.h"
 
+#include <array>
+
 namespace Ui
 {
-class pqLogViewerWindow;
+class pqLogViewerDialog;
 }
 
 /**
- * @class pqLogViewerWindow
+ * @class pqLogViewerDialog
  *
  * @brief A window for showing multiple log viewers.
  *
@@ -58,14 +60,14 @@ class pqLogViewerWindow;
  * with vtkLogRecorder. Individual logs from client and server processes
  * are displayed in their own tabs in a QTabWidget in this window.
  */
-class PQCOMPONENTS_EXPORT pqLogViewerWindow : public QMainWindow
+class PQCOMPONENTS_EXPORT pqLogViewerDialog : public QDialog
 {
   Q_OBJECT
-  typedef QMainWindow Superclass;
 
 public:
-  pqLogViewerWindow();
-  ~pqLogViewerWindow() override;
+  pqLogViewerDialog(QWidget* parent = nullptr);
+  ~pqLogViewerDialog() override;
+  typedef QDialog Superclass;
 
   /**
    * Refresh the log viewers.
@@ -82,17 +84,6 @@ public:
    */
   void addLogView();
 
-  /**
-   * Set the verbosity level of a certain category of ParaView log message according
-   * to GUI selections.
-   */
-  void setCategoryVerbosity();
-
-  /**
-   * Clear all previous verbosity elevations.
-   */
-  void resetAllCategoryVerbosities();
-
 protected:
   // Override to handle custom close button icon in tab widget
   bool eventFilter(QObject* obj, QEvent* event) override;
@@ -100,22 +91,12 @@ protected:
 private slots:
   void linkedScroll(double time);
 
-  // Set the verbosity of logs recorded from the client
-  void setClientVerbosity(int index);
-
-  // Set the verbosity of logs recorded from the server
-  void setServerVerbosity(int index);
-
-  // Set the verbosity of logs recorded from the data server
-  void setDataServerVerbosity(int index);
-
-  // Set the verbosity of logs recorded from the render server.
-  void setRenderServerVerbosity(int index);
-
-  // Handle when the category combo box is changed
-  void categoryChanged(int index);
+  // Set the verbosity of logs on a given process
+  void setProcessVerbosity(int process, int index);
 
 private:
+  Q_DISABLE_COPY(pqLogViewerDialog)
+
   // Add a log view to the window
   void appendLogView(pqSingleLogViewerWidget* logView);
 
@@ -123,7 +104,10 @@ private:
   void initializeRankComboBox();
   void initializeVerbosityComboBoxes();
   void initializeVerbosities(QComboBox* combobox);
-  void initializeCategoryComboBox();
+
+  void updateCategory(int category, bool promote);
+
+  void updateCategories();
 
   // Convert combobox index to verbosity
   vtkLogger::Verbosity getVerbosity(int index);
@@ -131,12 +115,13 @@ private:
   // Convert verbosity to combobox index
   int getVerbosityIndex(vtkLogger::Verbosity verbosity);
 
-  Ui::pqLogViewerWindow* Ui;
+  Ui::pqLogViewerDialog* Ui;
   QList<pqSingleLogViewerWidget*> LogViews;
   QVector<int> RankNumbers;
   QList<vtkSmartPointer<vtkSMProxy> > LogRecorderProxies;
   using LogLocation = QPair<vtkSmartPointer<vtkSMProxy>, int>;
   QMap<LogLocation, double> RefTimes;
+  std::array<bool, 5> CategoryPromoted;
 };
 
-#endif // pqLogViewerWindow_h
+#endif // pqLogViewerDialog_h

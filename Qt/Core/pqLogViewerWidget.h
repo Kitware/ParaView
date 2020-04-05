@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqLogViewerWidget_h
 #define pqLogViewerWidget_h
 
-#include "pqWidgetsModule.h"
+#include "pqCoreModule.h"
 
 #include <QModelIndex>    // for QModelIndex
 #include <QScopedPointer> // for QScopedPointer
@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @brief Provides a treeview with scoped logs along with a filtering
  * capability to restrict which logs are shown.
  */
-class PQWIDGETS_EXPORT pqLogViewerWidget : public QWidget
+class PQCORE_EXPORT pqLogViewerWidget : public QWidget
 {
   Q_OBJECT
   using Superclass = QWidget;
@@ -82,6 +82,11 @@ public:
    */
   static QVector<QString> extractLogParts(const QStringRef& txt, bool& is_raw);
 
+  /**
+   * Update log table column visibilities.
+   */
+  void updateColumnVisibilities();
+
 signals:
   // Emitted when the widget is closed
   void closed();
@@ -90,11 +95,18 @@ signals:
   // \param time
   void scrolled(double time);
 
+protected slots:
+  void toggleAdvanced();
+
+  void exportLog();
+
 private:
   Q_DISABLE_COPY(pqLogViewerWidget);
 
   class pqInternals;
   QScopedPointer<pqInternals> Internals;
+
+  bool Advanced = false;
 };
 
 #endif

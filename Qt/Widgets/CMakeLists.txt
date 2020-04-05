@@ -65,7 +65,6 @@ set(classes
   pqLineEditEventPlayer
   pqListWidgetCheckHelper
   pqListWidgetItemObject
-  pqLogViewerWidget
   pqMultiColumnHeaderView
   pqProgressWidget
   pqQuickLaunchDialog
@@ -121,7 +120,6 @@ vtk_module_find_package(
 set(ui_files
   Resources/UI/pqExpanderButton.ui
   Resources/UI/pqHelpWindow.ui
-  Resources/UI/pqLogViewerWidget.ui
   Resources/UI/pqQuickLaunchDialog.ui
   Resources/UI/pqSeriesGeneratorDialog.ui)
 

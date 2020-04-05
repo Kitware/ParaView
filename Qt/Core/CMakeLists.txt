@@ -61,6 +61,7 @@ set(classes
   pqInterfaceTracker
   pqLinkViewWidget
   pqLinksModel
+  pqLogViewerWidget
   pqMainWindowEventManager
   pqMultiSliceAxisWidget
   pqMultiSliceView
@@ -138,6 +139,7 @@ set_property(SOURCE pqCoreTestUtility.cxx APPEND
 
 set(ui_files
   Resources/UI/pqFileDialog.ui
+  Resources/UI/pqLogViewerWidget.ui
   Resources/UI/pqOutputWidget.ui
   Resources/UI/pqPluginEULADialog.ui)
 
