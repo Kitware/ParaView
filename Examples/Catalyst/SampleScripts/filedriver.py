@@ -16,7 +16,7 @@ eg, in serial :
 <path>/pvbatch filedriver.py "temporalFile.ex2" gridwriter.py
 
 eg, in parallel
-mpirun -np 5 <path>/pvbatch filedriver.py -sym "input_*.pvtu" makeanimage.py makeaslice.py
+mpirun -np 5 <path>/pvbatch -sym filedriver.py "input_*.pvtu" makeanimage.py makeaslice.py
 
 This script currently only handles a single channel. It will try to find
 an appropriate reader for the list of filenames and loop through the timesteps.
