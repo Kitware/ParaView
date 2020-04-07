@@ -109,7 +109,7 @@ vtkMTimeType vtkArrowGlyphFilter::GetMTime()
 }
 
 //-----------------------------------------------------------------------------
-void vtkArrowGlyphFilter::SetRandomMode(int mode)
+void vtkArrowGlyphFilter::SetRandomMode(bool mode)
 {
   if (mode == this->MaskPoints->GetRandomMode())
   {
@@ -124,7 +124,7 @@ void vtkArrowGlyphFilter::SetRandomMode(int mode)
 }
 
 //-----------------------------------------------------------------------------
-int vtkArrowGlyphFilter::GetRandomMode()
+bool vtkArrowGlyphFilter::GetRandomMode()
 {
   return this->MaskPoints->GetRandomMode();
 }

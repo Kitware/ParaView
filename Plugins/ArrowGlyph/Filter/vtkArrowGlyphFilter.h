@@ -86,8 +86,8 @@ public:
 
   // Description:
   // Set/get flag to cause randomization of which points to mask.
-  void SetRandomMode(int mode);
-  int GetRandomMode();
+  void SetRandomMode(bool mode);
+  bool GetRandomMode();
 
   // Description:
   // This can be overwritten by subclass to return 0 when a point is
