@@ -615,9 +615,6 @@ void pqColorOpacityEditorWidget::updateCurrentData()
   {
     ui.CurrentDataValue->setEnabled(false);
   }
-
-  this->Internals->ColorTableModel.refresh();
-  this->Internals->OpacityTableModel.refresh();
 }
 
 //-----------------------------------------------------------------------------
@@ -930,8 +927,8 @@ void pqColorOpacityEditorWidget::presetApplied()
   emit this->changeFinished();
 
   // Assume the color map and opacity have changed and refresh
-  this->Internals->ColorTableModel.refresh();
-  this->Internals->OpacityTableModel.refresh();
+  emit this->xrgbPointsChanged();
+  emit this->xvmsPointsChanged();
 }
 
 //-----------------------------------------------------------------------------

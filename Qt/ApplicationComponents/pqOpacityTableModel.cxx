@@ -36,12 +36,27 @@
 #include "vtkPiecewiseFunction.h"
 #include "vtkSMProxy.h"
 
+#include <array>
+
+//-----------------------------------------------------------------------------
+class pqOpacityTableModel::pqInternals
+{
+public:
+  std::vector<std::array<double, 4> > XVMSPoints;
+};
+
 //-----------------------------------------------------------------------------
 pqOpacityTableModel::pqOpacityTableModel(pqColorOpacityEditorWidget* widget, QObject* parentObject)
   : Superclass(parentObject)
   , Widget(widget)
+  , Internals(new pqOpacityTableModel::pqInternals())
 {
-  this->NumberOfRowsCache = this->rowCount();
+  // Update the model when XVMS points change
+  QObject::connect(widget, SIGNAL(xvmsPointsChanged()), this, SLOT(controlPointsChanged()));
+  QObject::connect(widget, SIGNAL(changeFinished()), this, SLOT(controlPointsChanged()));
+
+  QObject::connect(this, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
+    SLOT(updatePoint(const QModelIndex&)));
 }
 
 //-----------------------------------------------------------------------------
@@ -66,37 +81,22 @@ bool pqOpacityTableModel::setData(const QModelIndex& idx, const QVariant& value,
     return false;
   }
 
+  double newValue = value.toDouble();
+  if (idx.column() == 0 && (newValue < this->Range[0] || newValue > this->Range[1]))
+  {
+    return false;
+  }
+  else if (idx.column() > 0 && (newValue < 0.0 || newValue > 1.0))
+  {
+    return false;
+  }
+
   if (this->Widget && this->Widget->proxy())
   {
-    vtkDiscretizableColorTransferFunction* stc =
-      vtkDiscretizableColorTransferFunction::SafeDownCast(
-        this->Widget->proxy()->GetClientSideObject());
-    if (stc)
-    {
-      vtkPiecewiseFunction* pwf = stc ? stc->GetScalarOpacityFunction() : NULL;
-      if (pwf)
-      {
-        double range[2];
-        pwf->GetRange(range);
-        double newValue = value.toDouble();
-        if (idx.column() == 0 && (newValue < range[0] || newValue > range[1]))
-        {
-          return false;
-        }
-        else if (idx.column() > 0 && (newValue < 0.0 || newValue > 1.0))
-        {
-          return false;
-        }
+    this->Internals->XVMSPoints[idx.row()][idx.column()] = newValue;
 
-        double xvms[4];
-        pwf->GetNodeValue(idx.row(), xvms);
-        xvms[idx.column()] = newValue;
-        pwf->SetNodeValue(idx.row(), xvms);
-
-        emit this->dataChanged(idx, idx);
-        return true;
-      }
-    }
+    emit dataChanged(idx, idx);
+    return true;
   }
 
   return false;
@@ -110,17 +110,7 @@ int pqOpacityTableModel::rowCount(const QModelIndex& parentIndex) const
   int size = 0;
   if (this->Widget && this->Widget->proxy())
   {
-    vtkDiscretizableColorTransferFunction* stc =
-      vtkDiscretizableColorTransferFunction::SafeDownCast(
-        this->Widget->proxy()->GetClientSideObject());
-    if (stc)
-    {
-      vtkPiecewiseFunction* pwf = stc ? stc->GetScalarOpacityFunction() : NULL;
-      if (pwf)
-      {
-        size = pwf->GetSize();
-      }
-    }
+    size = static_cast<int>(this->Internals->XVMSPoints.size());
   }
 
   return size;
@@ -139,21 +129,10 @@ QVariant pqOpacityTableModel::data(const QModelIndex& idx, int role) const
 {
   if (role == Qt::DisplayRole || role == Qt::EditRole)
   {
-    vtkDiscretizableColorTransferFunction* stc =
-      vtkDiscretizableColorTransferFunction::SafeDownCast(
-        this->Widget->proxy()->GetClientSideObject());
-    if (stc)
+    std::array<double, 4>& xvms = this->Internals->XVMSPoints[idx.row()];
+    if (idx.column() >= 0 && idx.column() < 4)
     {
-      vtkPiecewiseFunction* pwf = stc ? stc->GetScalarOpacityFunction() : NULL;
-      if (pwf)
-      {
-        double xvms[4];
-        pwf->GetNodeValue(idx.row(), xvms);
-        if (idx.column() >= 0 && idx.column() <= 1)
-        {
-          return QString::number(xvms[idx.column()]);
-        }
-      }
+      return QString::number(xvms[idx.column()]);
     }
   }
   else if (role == Qt::ToolTipRole || role == Qt::StatusTipRole)
@@ -187,26 +166,73 @@ QVariant pqOpacityTableModel::headerData(int section, Qt::Orientation orientatio
 }
 
 //-----------------------------------------------------------------------------
-void pqOpacityTableModel::refresh()
+void pqOpacityTableModel::controlPointsChanged()
 {
-  // Tell the model that the number of rows may have changed because it does not
-  // get this information from the rowCount() method. There must be a  more elegant
-  // way to do this.
-  int currentNumberOfRows = this->rowCount();
-  if (this->NumberOfRowsCache < currentNumberOfRows)
+  vtkDiscretizableColorTransferFunction* stc = vtkDiscretizableColorTransferFunction::SafeDownCast(
+    this->Widget->proxy()->GetClientSideObject());
+  vtkPiecewiseFunction* pwf = nullptr;
+  int newSize = 0;
+  if (stc)
   {
-    this->beginInsertRows(QModelIndex(), this->NumberOfRowsCache, currentNumberOfRows - 1);
-    this->endInsertRows();
+    pwf = stc ? stc->GetScalarOpacityFunction() : NULL;
+    if (pwf)
+    {
+      newSize = pwf->GetSize();
+      stc->GetRange(this->Range);
+    }
   }
-  else if (this->NumberOfRowsCache > currentNumberOfRows)
+
+  int previousSize = static_cast<int>(this->Internals->XVMSPoints.size());
+  if (newSize > previousSize)
   {
-    this->beginRemoveRows(QModelIndex(), currentNumberOfRows, this->NumberOfRowsCache - 1);
-    this->endRemoveRows();
+    emit this->beginInsertRows(QModelIndex(), previousSize, newSize - 1);
+    for (int idx = previousSize; idx < newSize; ++idx)
+    {
+      std::array<double, 4> xvms;
+      pwf->GetNodeValue(idx, xvms.data());
+      this->Internals->XVMSPoints.push_back(xvms);
+    }
+    emit this->endInsertRows();
   }
-  this->NumberOfRowsCache = currentNumberOfRows;
+  else if (newSize < previousSize)
+  {
+    emit this->beginRemoveRows(QModelIndex(), newSize, previousSize - 1);
+    size_t numToRemove = previousSize - newSize;
+    for (size_t idx = 0; idx < numToRemove; ++idx)
+    {
+      this->Internals->XVMSPoints.pop_back();
+    }
+    emit this->endRemoveRows();
+  }
+  else // newSize == previousSize
+  {
+    this->beginResetModel();
+    for (int idx = 0; idx < newSize; ++idx)
+    {
+      std::array<double, 4> xvms;
+      pwf->GetNodeValue(idx, xvms.data());
+      this->Internals->XVMSPoints[idx] = xvms;
+    }
+    this->endResetModel();
+  }
+}
 
-  QModelIndex topLeft = this->createIndex(0, 0);
-  QModelIndex bottomRight = this->createIndex(this->rowCount() - 1, this->columnCount() - 1);
-
-  emit dataChanged(topLeft, bottomRight);
+//-----------------------------------------------------------------------------
+void pqOpacityTableModel::updatePoint(const QModelIndex& idx)
+{
+  vtkDiscretizableColorTransferFunction* stc = vtkDiscretizableColorTransferFunction::SafeDownCast(
+    this->Widget->proxy()->GetClientSideObject());
+  vtkPiecewiseFunction* pwf = nullptr;
+  if (stc)
+  {
+    pwf = stc->GetScalarOpacityFunction();
+    if (pwf)
+    {
+      double xvms[4];
+      pwf->GetNodeValue(idx.row(), xvms);
+      QVariant data = this->data(idx);
+      xvms[idx.column()] = data.toDouble();
+      pwf->SetNodeValue(idx.row(), xvms);
+    }
+  }
 }
