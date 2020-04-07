@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/disk_out_ref.ex2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayStatus/SelectionWidget" command="setCheckState" arguments="3.0,2" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.381538,0.238038,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.381538,0.238038,1,0,0)" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayStatus/SelectionWidget" command="setCheckState" arguments="3.0,2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionQuery" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/selectionType" command="activated" arguments="Point(s)" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/criteria" command="activated" arguments="Global ID" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/condition" command="activated" arguments="is greater than mean" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/addQuery" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause2/condition" command="activated" arguments="is &gt;=" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause2/valueStackedWidget/singleValue/value" command="set_string" arguments="0.13" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/runQuery" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Selection Display Inspector" />
+  <pqevent object="pqClientMainWindow/selectionDisplayDock/selectionDisplayWidget/labelPropertiesSelection" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/selectionDisplayDock/selectionDisplayWidget/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SelectionPointSize/DoubleLineEdit0" command="set_string" arguments="10" />
+  <pqevent object="pqClientMainWindow/selectionDisplayDock/selectionDisplayWidget/ProxyWidgetDialog/widget/OKButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveY" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/FindDataDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/FindDataMultiBlock.png" width="300" height="300" />
+</pqevents>
