@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNew.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkProcessModule.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMParaViewPipelineController.h"
@@ -59,6 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringList.h"
 
@@ -547,13 +549,23 @@ void pqServerManagerModel::updateSettingsFromQSettings(pqServer* server)
         continue;
       }
 
-      if (vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop))
+      QVariant value = settings->value(qsettingsName);
+      if (!value.isValid())
       {
-        QVariant value = settings->value(qsettingsName);
-        if (value.isValid())
-        {
-          ivp->SetElement(0, value.toInt());
-        }
+        continue;
+      }
+
+      if (vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(prop))
+      {
+        dvp->SetElement(0, value.toDouble());
+      }
+      else if (vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop))
+      {
+        ivp->SetElement(0, value.toInt());
+      }
+      else if (vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop))
+      {
+        svp->SetElement(0, value.toString().toLocal8Bit().data());
       }
       else
       {
