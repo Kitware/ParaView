@@ -458,7 +458,7 @@ void pqLogViewerDialog::updateCategories()
 {
   for (size_t i = 0; i < this->CategoryPromoted.size(); ++i)
   {
-    this->updateCategory(i, this->CategoryPromoted[i]);
+    this->updateCategory(static_cast<int>(i), this->CategoryPromoted[i]);
   }
 }
 
