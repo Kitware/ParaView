@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
 
+#include <QClipboard>
 #include <QMutexLocker>
 #include <QPointer>
 #include <QScopedValueRollback>
@@ -406,6 +407,7 @@ pqOutputWidget::pqOutputWidget(QWidget* parentObject, Qt::WindowFlags f)
   this->connect(
     internals.Ui.showFullMessagesCheckBox, SIGNAL(toggled(bool)), SLOT(showFullMessages(bool)));
   this->connect(internals.Ui.saveButton, SIGNAL(clicked()), SLOT(saveToFile()));
+  this->connect(internals.Ui.copyButton, SIGNAL(clicked()), SLOT(copyToClipboard()));
 
   // Tell VTK to forward all messages.
   vtkOutputWindow::SetInstance(internals.VTKOutputWindow.Get());
@@ -453,6 +455,13 @@ void pqOutputWidget::saveToFile()
     fileStream << text.toStdString();
     fileStream.close();
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqOutputWidget::copyToClipboard()
+{
+  QClipboard* clipboard = QGuiApplication::clipboard();
+  clipboard->setText(this->Internals->Ui.consoleWidget->text());
 }
 
 //-----------------------------------------------------------------------------

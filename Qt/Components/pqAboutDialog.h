@@ -55,10 +55,28 @@ public:
   pqAboutDialog(QWidget* Parent);
   ~pqAboutDialog() override;
 
+  /**
+   * Format the about dialog content into textual form
+   */
+  QString formatToText();
+
+public slots:
+
+  /**
+   * Saves about dialog formatted output to a file.
+   */
+  void saveToFile();
+
+  /**
+   * Copy about dialog formatted output to the clipboard.
+   */
+  void copyToClipboard();
+
 protected:
   void AddClientInformation();
   void AddServerInformation();
   void AddServerInformation(pqServer* server, QTreeWidget* tree);
+  QString formatToText(QTreeWidget* tree);
 
 private:
   Q_DISABLE_COPY(pqAboutDialog)

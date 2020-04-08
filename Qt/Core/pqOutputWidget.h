@@ -150,6 +150,11 @@ public slots:
   void showFullMessages(bool val);
 
   /**
+   * Copy output text to the clipboard
+   */
+  void copyToClipboard();
+
+  /**
    * Saves output text to a file.
    */
   void saveToFile();

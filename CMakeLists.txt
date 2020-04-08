@@ -216,8 +216,10 @@ else ()
   include(vtkObjectFactory)
   include(vtkExternalData)
   include(vtkVersion)
+  include(VTKDetermineVersion)
   set(VTK_VERSION
       "${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION}")
+  determine_version("${CMAKE_CURRENT_SOURCE_DIR}/VTK" "${GIT_EXECUTABLE}" "VTK")
 
   if (PARAVIEW_USE_PYTHON)
     include(vtkModuleWrapPython)
