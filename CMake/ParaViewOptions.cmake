@@ -479,6 +479,7 @@ paraview_require_module(
             VTK::IOParallelExodus
             VTK::IOParallelLSDyna
             VTK::IOPIO
+            VTK::IOHDF
             VTK::IOSegY
             VTK::IOTRUCHAS
             VTK::IOVeraOut

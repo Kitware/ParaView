@@ -248,6 +248,11 @@ if (TARGET VTK::IOCityGML)
     Resources/proxies_citygml.xml)
 endif ()
 
+if (TARGET VTK::IOHDF)
+  list(APPEND xml_files
+    Resources/readers_iohdf.xml)
+endif ()
+
 if (TARGET VTK::IOSegY)
   list(APPEND xml_files
     Resources/proxies_segy.xml)
