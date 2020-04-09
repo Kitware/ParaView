@@ -1097,6 +1097,12 @@
                  value="1" />
           <Entry text="Spatially Stratified Random Sampling"
                  value="2" />
+          <Entry text="Uniform Spatial Distribution (Bounds Based)"
+                 value="3"/>
+          <Entry text="Uniform Spatial Distribution (Surface Sampling)"
+                 value="4"/>
+          <Entry text="Uniform Spatial Distribution (Volume Sampling)"
+                 value="5"/>
         </EnumerationDomain>
         <Documentation>Randomized Id Strides picks points with random id
         increments starting at Offset (the output probably isn't a
@@ -1104,7 +1110,14 @@
         random sample of the input, ignoring Offset (fast - O(sample size)).
         Spatially Stratified Random Sampling is a variant of random sampling
         that splits the points into equal sized spatial strata before randomly
-        sampling (slow - O(N log N)).</Documentation>
+        sampling (slow - O(N log N)). The Uniform Spatial Distribution (Bound
+        based) samples points using random poisitions inside the bounds of
+        the data set and a point locator. The Uniform Spatial Distribution
+        (Surface Sampling) samples points randomly via an inverse transform on
+        surface area of each cell (3D cells are ignored). The Uniform Spatial
+        Distribution (Volume Sampling) samples points randomly sampled via an
+        inverse transform on volume area of each cell (2D cells are ignored).
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetGenerateVertices"
                          default_values="0"
