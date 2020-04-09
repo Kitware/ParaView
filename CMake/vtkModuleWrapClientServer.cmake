@@ -205,7 +205,7 @@ ${_vtk_client_server_calls}}\n")
 
   set(_vtk_client_server_export)
   if (_vtk_client_server_INSTALL_EXPORT)
-    set(_vtk_client_server_export
+    list(APPEND _vtk_client_server_export
       EXPORT "${_vtk_client_server_INSTALL_EXPORT}")
   endif ()
 
@@ -369,7 +369,7 @@ ${_vtk_client_server_calls}}
 
     set(_vtk_client_server_export)
     if (_vtk_client_server_INSTALL_EXPORT)
-      set(_vtk_client_server_export
+      list(APPEND _vtk_client_server_export
         EXPORT "${_vtk_client_server_INSTALL_EXPORT}")
     endif ()
 

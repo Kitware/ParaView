@@ -115,7 +115,7 @@ function (paraview_server_manager_process)
 
   set(_paraview_sm_process_export_args)
   if (DEFINED _paraview_sm_process_INSTALL_EXPORT)
-    set(_paraview_sm_process_export_args
+    list(APPEND _paraview_sm_process_export_args
       INSTALL_EXPORT "${_paraview_sm_process_INSTALL_EXPORT}")
   endif ()
 
