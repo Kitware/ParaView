@@ -41,4 +41,5 @@ class AttributesClass:
     def Update(self, time):
         self.Velocity = numpy.zeros((self.Grid.GetNumberOfPoints(), 3))
         self.Velocity = self.Velocity + time
-        self.Pressure = numpy.zeros(self.Grid.GetNumberOfCells())
+        x = numpy.linspace(0, numpy.pi / 2, self.Grid.GetNumberOfCells());
+        self.Pressure = numpy.sin(time * x / 20)
