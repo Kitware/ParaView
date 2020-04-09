@@ -401,8 +401,8 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
     set(_paraview_client_conf_destination
       "${_paraview_client_binary_destination}")
     if (APPLE)
-      set(_paraview_client_binary_destination
-        "${_paraview_client_RUNTIME_DESTINATION}/${_paraview_client_NAME}.app/Contents/Resources")
+      string(APPEND _paraview_client_binary_destination
+        "/${_paraview_client_NAME}.app/Contents/Resources")
       set(_paraview_client_conf_destination
         "${_paraview_client_BUNDLE_DESTINATION}/${_paraview_client_NAME}.app/Contents/Resources")
     endif ()
