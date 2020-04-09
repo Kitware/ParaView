@@ -32,6 +32,7 @@ cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 project(ParaView)
 
 foreach (policy IN ITEMS
+    CMP0074 # CMake 3.12
     CMP0083 # CMake 3.14
     CMP0077 # CMake 3.16
     )
