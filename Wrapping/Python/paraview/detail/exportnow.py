@@ -14,14 +14,14 @@ class CinemaDHelper(object):
     def __init__(self, mcd, rd):
         self.__EnableCinemaDTable = mcd
         self.__RootDirectory = rd
-        if rd is not '' and not rd.endswith("/"):
+        if rd and not rd.endswith("/"):
             self.__RootDirectory = rd + "/"
         self.Keys = set()
         self.Contents = []
         self.KeysWritten = None
 
     def __StripRootDir(self, filename):
-        if self.__RootDirectory is not '':
+        if self.__RootDirectory:
             return filename[filename.startswith(self.__RootDirectory) and len(self.__RootDirectory):]
         return filename
 
@@ -29,7 +29,7 @@ class CinemaDHelper(object):
         """ filename wrangling for root directory placement """
         indexfilename = 'data.csv'
         datafilename = filename
-        if self.__RootDirectory is not '':
+        if self.__RootDirectory:
             indexfilename = self.__RootDirectory + "data.csv"
             # strip leading root directory from filename if present
             datafilename = self.__StripRootDir(filename)
@@ -73,7 +73,7 @@ class CinemaDHelper(object):
         if not self.__EnableCinemaDTable:
             return
         indexfilename, datafilename = self.__MakeCinDFileNamesUnderRootDir()
-        if self.__RootDirectory is not '' and not os.path.exists(self.__RootDirectory):
+        if self.__RootDirectory and not os.path.exists(self.__RootDirectory):
             os.makedirs(self.__RootDirectory)
         f = open(indexfilename, "w")
         # write the header line
@@ -176,9 +176,9 @@ def ExportNow(root_directory,
     """The user facing entry point. Here we get a hold of ParaView's animation controls, step through the animation, and export the things we've been asked to be the caller."""
 
     CIND = CinemaDHelper(make_cinema_table, root_directory)
-    if root_directory is not '' and not root_directory.endswith("/"):
+    if root_directory and not root_directory.endswith("/"):
         root_directory = root_directory + "/"
-    if root_directory is not '' and not os.path.exists(root_directory):
+    if root_directory and not os.path.exists(root_directory):
         os.makedirs(root_directory)
 
     # get a hold of the scene
@@ -271,7 +271,7 @@ def ExportNow(root_directory,
         ssp = ed.GetNextScreenshotProxy()
         viewcnt = 0
         while ssp:
-            if not ssp.HasAnnotation("enabled") or not (ssp.GetAnnotation("enabled") is '1'):
+            if not ssp.HasAnnotation("enabled") or not (ssp.GetAnnotation("enabled") == '1'):
                 ssp= ed.GetNextScreenshotProxy()
                 continue
             freq = ssp.GetProperty("WriteFrequency").GetElement(0)
