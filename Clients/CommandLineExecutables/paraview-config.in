@@ -109,6 +109,7 @@ def test_extract_flags():
 
 
 def extract_paraview_flags(components, cmake='cmake',
+                           prefix=None,
                            generator='Unix Makefiles',
                            paraview_dir=None, vtk_components=[]):
     cmake_format = {}
@@ -149,6 +150,9 @@ def extract_paraview_flags(components, cmake='cmake',
             '-G' + generator,
             srcdir,
         ]
+
+        if prefix is not None:
+            configure_cmd.append('-DCMAKE_PREFIX_PATH:STRING=' + prefix)
 
         if paraview_dir is not None:
             paraview_dir = os.path.abspath(paraview_dir)
@@ -213,6 +217,11 @@ if __name__ == '__main__':
     if sys.version_info.major == 2:
         sys.stderr.write('Warning: paraview-config supports Python2, but it is recommended to use Python3\n')
 
+    bindir = '@CMAKE_INSTALL_BINDIR@'
+    prefix = os.path.abspath(__file__)
+    for _ in os.path.split(bindir):
+        prefix = os.path.dirname(prefix)
+
     import argparse
 
     parser = argparse.ArgumentParser(
@@ -250,6 +259,7 @@ if __name__ == '__main__':
     (compile_flags, link_flags) = \
         extract_paraview_flags(opts.components, cmake=opts.cmake,
                                generator=opts.generator,
+                               prefix=prefix,
                                paraview_dir=opts.paraview_dir,
                                vtk_components=opts.vtk_components)
     if opts.cppflags:

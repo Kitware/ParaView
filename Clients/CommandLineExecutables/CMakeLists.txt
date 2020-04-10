@@ -82,9 +82,9 @@ if (PARAVIEW_USE_QT)
 endif ()
 
 configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/paraview-config"
+  "${CMAKE_CURRENT_SOURCE_DIR}/paraview-config.in"
   "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/paraview-config"
-  COPYONLY)
+  @ONLY)
 install(
   PROGRAMS    "${CMAKE_CURRENT_SOURCE_DIR}/paraview-config"
   DESTINATION "${CMAKE_INSTALL_BINDIR}"
