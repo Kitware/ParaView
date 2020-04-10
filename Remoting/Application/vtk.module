@@ -53,6 +53,7 @@ OPTIONAL_DEPENDS
   VTK::IOGeometry
   VTK::IOH5part
   VTK::IOInfovis
+  VTK::IOIoss
   VTK::IOLAS
   VTK::IOLegacy
   VTK::IOMotionFX
