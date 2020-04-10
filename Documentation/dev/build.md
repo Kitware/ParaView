@@ -37,7 +37,7 @@ Please run the command in a terminal to install the following dependencies depen
 
 ###### CMake
 Download and install [cmake][cmake-download]) as the packaged version is not enough considering that
-CMake 3.10 or higher is needed.
+CMake 3.12 or higher is needed.
 
 ###### Others
 `sudo yum install python3-devel openmpi-devel mesa-libGL-devel libX11-devel libXt-devel qt5-qtbase-devel qt5-qtx11extras-devel qt5-qttools-devel qt5-qtxmlpatterns-devel tbb-devel ninja-build git`
@@ -161,7 +161,7 @@ build configuration.
 Required:
 
   * [CMake][cmake]
-    - Version 3.10 or newer, however, the latest version is always recommended
+    - Version 3.12 or newer, however, the latest version is always recommended
   * Supported compiler
     - GCC 4.8 or newer
     - Clang 4 or newer
@@ -317,9 +317,9 @@ More advanced build options are:
   * `PARAVIEW_BUILD_WITH_EXTERNAL` (default `OFF`): When set to `ON`, the build
     will try to use external copies of all included third party libraries unless
     explicitly overridden.
-  * `PARAVIEW_BUILD_WITH_KITS` (default `OFF`; requires CMake 3.12+): Compile
-    ParaView into a smaller set of libraries. Can be useful on platforms where
-    ParaView takes a long time to launch due to expensive disk access.
+  * `PARAVIEW_BUILD_WITH_KITS` (default `OFF`): Compile ParaView into a smaller
+    set of libraries. Can be useful on platforms where ParaView takes a long
+    time to launch due to expensive disk access.
 
 #### Capability settings
 

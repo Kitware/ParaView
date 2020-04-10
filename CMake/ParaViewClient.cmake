@@ -206,14 +206,14 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
         "${_paraview_client_appicon_file}")
     endif ()
 
-    set(_paraview_client_executable_flags
+    list(APPEND _paraview_client_executable_flags
       WIN32)
   elseif (APPLE)
     # TODO: nib files
 
-    set(_paraview_client_bundle_args
+    list(APPEND _paraview_client_bundle_args
       BUNDLE DESTINATION "${_paraview_client_BUNDLE_DESTINATION}")
-    set(_paraview_client_executable_flags
+    list(APPEND _paraview_client_executable_flags
       MACOSX_BUNDLE)
   endif ()
 
@@ -380,7 +380,7 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
 
   set(_paraview_client_export)
   if (DEFINED _paraview_client_EXPORT)
-    set(_paraview_client_export
+    list(APPEND _paraview_client_export
       EXPORT "${_paraview_client_EXPORT}")
   endif ()
 
@@ -401,8 +401,8 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
     set(_paraview_client_conf_destination
       "${_paraview_client_binary_destination}")
     if (APPLE)
-      set(_paraview_client_binary_destination
-        "${_paraview_client_RUNTIME_DESTINATION}/${_paraview_client_NAME}.app/Contents/Resources")
+      string(APPEND _paraview_client_binary_destination
+        "/${_paraview_client_NAME}.app/Contents/Resources")
       set(_paraview_client_conf_destination
         "${_paraview_client_BUNDLE_DESTINATION}/${_paraview_client_NAME}.app/Contents/Resources")
     endif ()
@@ -802,7 +802,7 @@ function (paraview_client_generate_help)
   set(_paraview_client_help_copy_sources)
   set(_paraview_client_help_copied_sources)
   if (DEFINED _paraview_client_help_SOURCE_DIR)
-    set(_paraview_client_help_copy_sources
+    list(APPEND _paraview_client_help_copy_sources
       COMMAND "${CMAKE_COMMAND}" -E copy_directory
               "${_paraview_client_help_SOURCE_DIR}"
               "${_paraview_client_help_OUTPUT_DIR}")

@@ -28,18 +28,8 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.12...3.16 FATAL_ERROR)
 project(ParaView)
-
-foreach (policy IN ITEMS
-    CMP0074 # CMake 3.12
-    CMP0083 # CMake 3.14
-    CMP0077 # CMake 3.16
-    )
-  if (POLICY ${policy})
-    cmake_policy(SET ${policy} NEW)
-  endif ()
-endforeach ()
 
 # Disallow in-source build
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR)

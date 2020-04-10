@@ -42,7 +42,7 @@ function (paraview_add_server_manager_xmls)
 
   foreach (_paraview_add_sm_xml IN LISTS _paraview_add_sm_XMLS)
     if (NOT IS_ABSOLUTE "${_paraview_add_sm_xml}")
-      set(_paraview_add_sm_xml "${CMAKE_CURRENT_SOURCE_DIR}/${_paraview_add_sm_xml}")
+      string(PREPEND _paraview_add_sm_xml "${CMAKE_CURRENT_SOURCE_DIR}/")
     endif ()
 
     _vtk_module_set_module_property("${_paraview_add_sm_MODULE}" APPEND
@@ -115,7 +115,7 @@ function (paraview_server_manager_process)
 
   set(_paraview_sm_process_export_args)
   if (DEFINED _paraview_sm_process_INSTALL_EXPORT)
-    set(_paraview_sm_process_export_args
+    list(APPEND _paraview_sm_process_export_args
       INSTALL_EXPORT "${_paraview_sm_process_INSTALL_EXPORT}")
   endif ()
 
