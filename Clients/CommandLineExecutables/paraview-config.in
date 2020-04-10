@@ -110,6 +110,7 @@ def test_extract_flags():
 
 def extract_paraview_flags(components, cmake='cmake',
                            prefix=None,
+                           verbose=False,
                            generator='Unix Makefiles',
                            paraview_dir=None, vtk_components=[]):
     cmake_format = {}
@@ -202,6 +203,8 @@ def extract_paraview_flags(components, cmake='cmake',
 
         for line in build_output.stdout:
             line = line.strip().decode('utf-8')
+            if verbose:
+                print(line)
             check_line(lines, line, '-DWITH_PARAVIEW', 'compile_with')
             check_line(lines, line, '-LWITH_PARAVIEW', 'link_with')
             check_line(lines, line, '-DWITHOUT_PARAVIEW', 'compile_without')
@@ -254,12 +257,17 @@ if __name__ == '__main__':
         '-l', '--ldflags', action='store_true', default=False,
         dest='ldflags',
         help='Print linker flags for using the components')
+    parser.add_argument(
+        '-V', '--verbose', action='store_true', default=False,
+        dest='verbose',
+        help='Print all output')
 
     opts = parser.parse_args()
     (compile_flags, link_flags) = \
         extract_paraview_flags(opts.components, cmake=opts.cmake,
                                generator=opts.generator,
                                prefix=prefix,
+                               verbose=opts.verbose,
                                paraview_dir=opts.paraview_dir,
                                vtk_components=opts.vtk_components)
     if opts.cppflags:
