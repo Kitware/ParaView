@@ -310,7 +310,7 @@ public:
     componentArrayIndicesMap["_y"] = 1;
     componentArrayIndicesMap["_z"] = 2;
 
-    // The Symmetric Tensor – six components index order is defined
+    // The Symmetric Tensor six components index order is defined
     // by the VTK Exodus reader
     //   see vtkExodusIIReaderPrivate.h
     //   and vtkExodusIIReader.cxx in VTK library
