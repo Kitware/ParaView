@@ -63,11 +63,12 @@ public:
   virtual int GetControlledPropertySize() { return -1; }
 
   virtual void SetControlledProxy(vtkSMProxy*);
-  vtkGetObjectMacro(ControlledProxy, vtkSMProxy)
+  vtkGetObjectMacro(ControlledProxy, vtkSMProxy);
 
-    vtkSetStringMacro(ControlledPropertyName) vtkGetStringMacro(ControlledPropertyName)
+  vtkSetStringMacro(ControlledPropertyName);
+  vtkGetStringMacro(ControlledPropertyName);
 
-      virtual bool HandleEvent(const vtkVREventData& data);
+  virtual bool HandleEvent(const vtkVREventData& data);
   virtual bool Update();
 
   // Description:
