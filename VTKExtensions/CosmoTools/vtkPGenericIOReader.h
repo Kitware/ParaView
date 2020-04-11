@@ -37,7 +37,6 @@ class vtkIdList;
 class vtkInformation;
 class vtkInformationVector;
 class vtkMultiProcessController;
-class vtkStdString;
 class vtkStringArray;
 class vtkUnstructuredGrid;
 

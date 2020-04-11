@@ -20,7 +20,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPlotArea.h"
 #include "vtkPlotLine.h"
-#include "vtkStdString.h"
 
 #include <map>
 #include <vtksys/RegularExpression.hxx>
@@ -254,8 +253,8 @@ vtkQuartileChartRepresentation::~vtkQuartileChartRepresentation()
 }
 
 //----------------------------------------------------------------------------
-vtkStdString vtkQuartileChartRepresentation::GetDefaultSeriesLabel(
-  const vtkStdString& tableName, const vtkStdString& columnName)
+std::string vtkQuartileChartRepresentation::GetDefaultSeriesLabel(
+  const std::string& tableName, const std::string& columnName)
 {
   // statsArrayRe1: e.g. "min(EQPS)".
   if (StatsArrayRe.find(columnName))

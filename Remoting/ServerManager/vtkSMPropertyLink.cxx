@@ -21,7 +21,6 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
-#include "vtkStdString.h"
 #include "vtkWeakPointer.h"
 
 #include <list>
@@ -54,7 +53,7 @@ public:
     // Either (Proxy, PropertyName) pair is valid,
     // depending on the API used to add the link.
     vtkWeakPointer<vtkSMProxy> Proxy;
-    vtkStdString PropertyName;
+    std::string PropertyName;
 
     int UpdateDirection;
     vtkWeakPointer<vtkCommand> Observer;
@@ -145,7 +144,7 @@ void vtkSMPropertyLink::Synchronize()
     {
       if (iter->Proxy)
       {
-        this->PropertyModified(iter->Proxy, iter->PropertyName);
+        this->PropertyModified(iter->Proxy, iter->PropertyName.c_str());
       }
       break;
     }
@@ -212,7 +211,7 @@ const char* vtkSMPropertyLink::GetLinkedPropertyName(int index)
   {
     return NULL;
   }
-  return iter->PropertyName;
+  return iter->PropertyName.c_str();
 }
 
 //-----------------------------------------------------------------------------
@@ -305,7 +304,7 @@ void vtkSMPropertyLink::PropertyModified(vtkSMProxy* fromProxy, const char* pnam
       vtkSMProperty* toProp = 0;
       if (iter->Proxy.GetPointer())
       {
-        toProp = iter->Proxy.GetPointer()->GetProperty(iter->PropertyName);
+        toProp = iter->Proxy.GetPointer()->GetProperty(iter->PropertyName.c_str());
       }
       if (toProp && (toProp != fromProp))
       {
@@ -375,7 +374,7 @@ void vtkSMPropertyLink::SaveXMLState(const char* linkname, vtkPVXMLElement* pare
     vtkPVXMLElement* child = vtkPVXMLElement::New();
     child->SetName("Property");
     child->AddAttribute("id", static_cast<unsigned int>(iter->Proxy.GetPointer()->GetGlobalID()));
-    child->AddAttribute("name", iter->PropertyName);
+    child->AddAttribute("name", iter->PropertyName.c_str());
     child->AddAttribute("direction", ((iter->UpdateDirection & INPUT) ? "input" : "output"));
     root->AddNestedElement(child);
     child->Delete();

@@ -76,7 +76,7 @@ void vtkSIDirectoryProxy::Pull(vtkSMMessage* message)
     vtkErrorMacro("Error getting return value of command: GetNumberOfFiles()");
   }
 
-  vtkStdString fileName;
+  std::string fileName;
   int isDirectory;
   std::vector<std::string> fileList;
   std::vector<std::string> directoryList;

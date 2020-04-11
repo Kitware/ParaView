@@ -34,7 +34,6 @@
 
 #include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkSmartPointer.h"
-#include "vtkStdString.h"    // needed for vtkStdString.
 #include <vtk_jsoncpp_fwd.h> // for forward declarations
 
 class vtkPVXMLElement;
@@ -60,7 +59,7 @@ public:
    * Gets the raw text for a preset given its index. The preset is provided as a JSON string.
    * Returns an empty string when not available.
    */
-  vtkStdString GetPresetAsString(unsigned int index);
+  std::string GetPresetAsString(unsigned int index);
 
   /**
    * Add a new preset. This will get saved across sessions using vtkSMSettings,
@@ -68,7 +67,7 @@ public:
    * existing preset (even for builtin presets).
    * \c preset must be a valid JSON string. If not, this will return failure.
    */
-  bool AddPreset(const char* name, const vtkStdString& preset);
+  bool AddPreset(const char* name, const std::string& preset);
 
   /**
    * Remove a preset. This has no effect for builtin presets.
@@ -93,7 +92,7 @@ public:
   /**
    * Returns the name for a preset at the given index.
    */
-  vtkStdString GetPresetName(unsigned int index);
+  std::string GetPresetName(unsigned int index);
 
   /**
    * Returns true if a present with given name exists.
@@ -149,7 +148,7 @@ public:
    * Same as AddPreset() expect it create a unique name using the prefix
    * provided. If no prefix is specified, "Preset" will be used as the prefix.
    */
-  vtkStdString AddUniquePreset(const Json::Value& preset, const char* prefix = NULL);
+  std::string AddUniquePreset(const Json::Value& preset, const char* prefix = NULL);
 
   /**
    * Returns true if the preset is a builtin preset.

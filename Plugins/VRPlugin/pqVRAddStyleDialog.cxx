@@ -70,12 +70,11 @@ public:
   struct InputGui
   {
     InputType type;
-    vtkStdString role;
+    std::string role;
     QComboBox* combo;
   };
 
-  void AddInput(
-    QWidget* parent, InputType type, const vtkStdString& role, const vtkStdString& name);
+  void AddInput(QWidget* parent, InputType type, const std::string& role, const std::string& name);
   QList<InputGui> Inputs;
 
   QStringList AnalogNames;
@@ -173,22 +172,22 @@ void pqVRAddStyleDialog::setInteractorStyle(vtkVRInteractorStyle* style, const Q
   style->GetAnalogRoles(roles.GetPointer());
   for (int i = 0; i < roles->GetNumberOfStrings(); ++i)
   {
-    vtkStdString role(roles->GetString(i));
-    vtkStdString analogName(style->GetAnalogName(role));
+    std::string role(roles->GetString(i));
+    std::string analogName(style->GetAnalogName(role));
     this->Internals->AddInput(this, pqInternals::Analog, role, analogName);
   }
   style->GetButtonRoles(roles.GetPointer());
   for (int i = 0; i < roles->GetNumberOfStrings(); ++i)
   {
-    vtkStdString role(roles->GetString(i));
-    vtkStdString buttonName(style->GetButtonName(role));
+    std::string role(roles->GetString(i));
+    std::string buttonName(style->GetButtonName(role));
     this->Internals->AddInput(this, pqInternals::Button, role, buttonName);
   }
   style->GetTrackerRoles(roles.GetPointer());
   for (int i = 0; i < roles->GetNumberOfStrings(); ++i)
   {
-    vtkStdString role(roles->GetString(i));
-    vtkStdString trackerName(style->GetTrackerName(role));
+    std::string role(roles->GetString(i));
+    std::string trackerName(style->GetTrackerName(role));
     this->Internals->AddInput(this, pqInternals::Tracker, role, trackerName);
   }
 
@@ -205,8 +204,8 @@ void pqVRAddStyleDialog::updateInteractorStyle()
 
   foreach (const pqInternals::InputGui& gui, this->Internals->Inputs)
   {
-    const vtkStdString& role = gui.role;
-    const vtkStdString& name = gui.combo->currentText().toStdString();
+    const std::string& role = gui.role;
+    const std::string& name = gui.combo->currentText().toStdString();
     switch (gui.type)
     {
       case pqInternals::Analog:
@@ -232,7 +231,7 @@ bool pqVRAddStyleDialog::isConfigurable()
 
 //-----------------------------------------------------------------------------
 void pqVRAddStyleDialog::pqInternals::AddInput(
-  QWidget* parent, InputType type, const vtkStdString& role, const vtkStdString& name)
+  QWidget* parent, InputType type, const std::string& role, const std::string& name)
 {
   this->Inputs.push_back(InputGui());
   InputGui& gui = this->Inputs.back();

@@ -13,7 +13,7 @@ class vtkDataSet;
 class PropertyItem
 {
 public:
-  PropertyItem(const vtkStdString& name, const bool& numeric, const int& pos, const int& status,
+  PropertyItem(const std::string& name, const bool& numeric, const int& pos, const int& status,
     int numRecords);
   ~PropertyItem();
 
@@ -24,7 +24,7 @@ public:
   int startPos;
   int endPos;
 
-  vtkStdString name;
+  std::string name;
   vtkSmartPointer<vtkAbstractArray> Storage;
 };
 

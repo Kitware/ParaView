@@ -75,7 +75,7 @@ int vtkIsoVolume::RequestData(vtkInformation* vtkNotUsed(request),
   vtkDataObject* outObj = outInfo->Get(vtkDataObject::DATA_OBJECT());
 
   // Common vars.
-  vtkStdString arrayName("");
+  std::string arrayName("");
   int fieldAssociation(-1);
   // double*       range (0);
   // bool          usingLowerBoundClipDS (false);
@@ -101,7 +101,7 @@ int vtkIsoVolume::RequestData(vtkInformation* vtkNotUsed(request),
     vtkErrorMacro("Missing field name.");
     return 1;
   }
-  arrayName = vtkStdString(inArrayInfo->Get(vtkDataObject::FIELD_NAME()));
+  arrayName = std::string(inArrayInfo->Get(vtkDataObject::FIELD_NAME()));
 
   // FIXME: Currently, both clips are always run. As a performance improvement
   // we can avoid running one of the clips if not needed.

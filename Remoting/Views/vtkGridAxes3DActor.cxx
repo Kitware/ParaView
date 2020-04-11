@@ -146,7 +146,7 @@ vtkTextProperty* vtkGridAxes3DActor::GetTitleTextProperty(int axis)
 }
 
 //----------------------------------------------------------------------------
-void vtkGridAxes3DActor::SetTitle(int axis, const vtkStdString& title)
+void vtkGridAxes3DActor::SetTitle(int axis, const std::string& title)
 {
   if (this->GetTitle(axis) != title)
   {
@@ -159,7 +159,7 @@ void vtkGridAxes3DActor::SetTitle(int axis, const vtkStdString& title)
 }
 
 //----------------------------------------------------------------------------
-const vtkStdString& vtkGridAxes3DActor::GetTitle(int axis)
+const std::string& vtkGridAxes3DActor::GetTitle(int axis)
 {
   return this->GridAxes2DActors[0]->GetTitle(axis);
 }

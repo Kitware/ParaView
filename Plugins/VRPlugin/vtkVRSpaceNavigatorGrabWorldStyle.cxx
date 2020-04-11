@@ -64,7 +64,7 @@ vtkVRSpaceNavigatorGrabWorldStyle::~vtkVRSpaceNavigatorGrabWorldStyle()
 // ----------------------------------------------------------------------------
 void vtkVRSpaceNavigatorGrabWorldStyle::HandleAnalog(const vtkVREventData& data)
 {
-  vtkStdString role = this->GetAnalogRole(data.name);
+  std::string role = this->GetAnalogRole(data.name);
   if (role == "Move")
   {
     // Values for Space Navigator

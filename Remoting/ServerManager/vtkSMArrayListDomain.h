@@ -72,7 +72,6 @@
 
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMStringListDomain.h"
-#include "vtkStdString.h" // needed for vtkStdString.
 
 class vtkPVDataSetAttributesInformation;
 class vtkSMInputArrayDomain;
@@ -212,14 +211,14 @@ public:
    * returns the mangled name for the component index that is passed in.
 
    */
-  static vtkStdString CreateMangledName(vtkPVArrayInformation* arrayInfo, int component);
+  static std::string CreateMangledName(vtkPVArrayInformation* arrayInfo, int component);
 
   //@{
   /**
    * returns the mangled name for the component index that is passed in.
 
    */
-  static vtkStdString ArrayNameFromMangledName(const char* name);
+  static std::string ArrayNameFromMangledName(const char* name);
   static int ComponentIndexFromMangledName(vtkPVArrayInformation* info, const char* name);
   //@}
 

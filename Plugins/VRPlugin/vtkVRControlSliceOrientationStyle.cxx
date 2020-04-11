@@ -105,7 +105,7 @@ bool vtkVRControlSliceOrientationStyle::Update()
 // ----------------------------------------------------------------------------
 void vtkVRControlSliceOrientationStyle::HandleButton(const vtkVREventData& data)
 {
-  vtkStdString role = this->GetButtonRole(data.name);
+  std::string role = this->GetButtonRole(data.name);
   if (role == "Grab slice")
   {
     if (this->Enabled && data.data.button.state == 0)
@@ -121,7 +121,7 @@ void vtkVRControlSliceOrientationStyle::HandleButton(const vtkVREventData& data)
 // ----------------------------------------------------------------------------
 void vtkVRControlSliceOrientationStyle::HandleTracker(const vtkVREventData& data)
 {
-  vtkStdString role = this->GetTrackerRole(data.name);
+  std::string role = this->GetTrackerRole(data.name);
   if (role != "Slice orientation")
   {
     return;

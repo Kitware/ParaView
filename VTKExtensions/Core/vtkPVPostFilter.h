@@ -30,7 +30,8 @@
 
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
-#include "vtkStdString.h"                 // needed for: vtkStdString
+
+#include <string> // for std::string
 
 class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVPostFilter : public vtkDataObjectAlgorithm
 {
@@ -46,7 +47,7 @@ public:
    */
   vtkExecutive* CreateDefaultExecutive() override;
 
-  static vtkStdString DefaultComponentName(int componentNumber, int componentCount);
+  static std::string DefaultComponentName(int componentNumber, int componentCount);
 
 protected:
   vtkPVPostFilter();

@@ -61,7 +61,7 @@ vtkVRTrackStyle::~vtkVRTrackStyle()
 // ----------------------------------------------------------------------------
 void vtkVRTrackStyle::HandleTracker(const vtkVREventData& data)
 {
-  vtkStdString role = this->GetTrackerRole(data.name);
+  std::string role = this->GetTrackerRole(data.name);
   if (role == "Tracker")
   {
     if (this->ControlledProxy && this->ControlledPropertyName != NULL &&

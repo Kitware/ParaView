@@ -273,11 +273,11 @@ vtkSMTransferFunctionPresets* vtkSMTransferFunctionPresets::GetInstance()
 }
 
 //----------------------------------------------------------------------------
-vtkStdString vtkSMTransferFunctionPresets::GetPresetAsString(unsigned int index)
+std::string vtkSMTransferFunctionPresets::GetPresetAsString(unsigned int index)
 {
   const std::vector<Json::Value>& presets = this->Internals->GetPresets();
   return index < static_cast<unsigned int>(presets.size()) ? presets[index].toStyledString()
-                                                           : vtkStdString();
+                                                           : std::string();
 }
 
 //----------------------------------------------------------------------------
@@ -326,11 +326,11 @@ bool vtkSMTransferFunctionPresets::HasPreset(const char* name)
 }
 
 //----------------------------------------------------------------------------
-vtkStdString vtkSMTransferFunctionPresets::GetPresetName(unsigned int index)
+std::string vtkSMTransferFunctionPresets::GetPresetName(unsigned int index)
 {
   const std::vector<Json::Value>& presets = this->Internals->GetPresets();
   return index < static_cast<unsigned int>(presets.size()) ? presets[index]["Name"].asString()
-                                                           : vtkStdString();
+                                                           : std::string();
 }
 
 //----------------------------------------------------------------------------
@@ -340,7 +340,7 @@ bool vtkSMTransferFunctionPresets::RenamePreset(unsigned int index, const char* 
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMTransferFunctionPresets::AddPreset(const char* name, const vtkStdString& preset)
+bool vtkSMTransferFunctionPresets::AddPreset(const char* name, const std::string& preset)
 {
   if (!name)
   {
@@ -390,7 +390,7 @@ bool vtkSMTransferFunctionPresets::AddPreset(const char* name, const Json::Value
 }
 
 //----------------------------------------------------------------------------
-vtkStdString vtkSMTransferFunctionPresets::AddUniquePreset(
+std::string vtkSMTransferFunctionPresets::AddUniquePreset(
   const Json::Value& preset, const char* prefix /*=nullptr*/)
 {
   prefix = prefix ? prefix : "Preset";
@@ -415,7 +415,7 @@ vtkStdString vtkSMTransferFunctionPresets::AddUniquePreset(
     if (suffix > 1000)
     {
       vtkErrorMacro("Giving up. Cannot find a unique name. Please provide a good prefix.");
-      return vtkStdString();
+      return std::string();
     }
   }
   this->AddPreset(name.c_str(), preset);

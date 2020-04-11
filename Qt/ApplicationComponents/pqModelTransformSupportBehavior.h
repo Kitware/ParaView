@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqModelTransformSupportBehavior_h
 
 #include "pqApplicationComponentsModule.h"
-#include "vtkStdString.h"
 #include "vtkTuple.h"
 #include <QObject>
 
@@ -58,7 +57,7 @@ public:
     vtkSMSourceProxy*, int outputPort = 0, bool* isvalid = NULL);
   static vtkTuple<double, 6> getBoundingBoxInModelCoordinates(
     vtkSMSourceProxy*, int outputPort = 0, bool* isvalid = NULL);
-  static vtkTuple<vtkStdString, 3> getAxisTitles(
+  static vtkTuple<std::string, 3> getAxisTitles(
     vtkSMSourceProxy*, int outputPort = 0, bool* isvalid = NULL);
 
 protected slots:

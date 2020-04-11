@@ -965,10 +965,10 @@ void pqColorOpacityEditorWidget::saveAsPreset()
     }
   }
 
-  vtkStdString presetName;
+  std::string presetName;
   auto presets = vtkSMTransferFunctionPresets::GetInstance();
   presetName = presets->AddUniquePreset(preset);
-  this->choosePreset(presetName);
+  this->choosePreset(presetName.c_str());
 }
 
 //-----------------------------------------------------------------------------

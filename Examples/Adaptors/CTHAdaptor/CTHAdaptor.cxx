@@ -1,6 +1,5 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkStdString.h"
 
 #include "vtkCPDataDescription.h"
 #include "vtkCPProcessor.h"

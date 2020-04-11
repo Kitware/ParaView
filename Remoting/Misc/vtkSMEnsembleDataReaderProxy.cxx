@@ -82,7 +82,7 @@ bool vtkSMEnsembleDataReaderProxy::FetchFileNames()
          << vtkClientServerStream::End;
   for (unsigned int i = 0, max = info->GetFileCount(); i < max; ++i)
   {
-    vtkStdString filePath = info->GetFilePath(i);
+    std::string filePath = info->GetFilePath(i);
     if (readerFactory->CanReadFile(filePath.c_str(), session))
     {
       // Create reader proxy
@@ -96,7 +96,7 @@ bool vtkSMEnsembleDataReaderProxy::FetchFileNames()
       const char* fileNameProperty = vtkSMCoreUtilities::GetFileNameProperty(proxy);
       assert(fileNameProperty);
 
-      vtkSMPropertyHelper(proxy, fileNameProperty).Set(filePath);
+      vtkSMPropertyHelper(proxy, fileNameProperty).Set(filePath.c_str());
       proxy->UpdateVTKObjects();
 
       // Push to stream

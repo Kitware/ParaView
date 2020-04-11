@@ -109,7 +109,7 @@ class pqPythonManagerRawInputHelper
 public:
   void rawInput(vtkObject*, unsigned long, void* calldata)
   {
-    vtkStdString* strData = reinterpret_cast<vtkStdString*>(calldata);
+    std::string* strData = reinterpret_cast<std::string*>(calldata);
     bool ok;
     QString inputText = QInputDialog::getText(pqCoreUtilities::mainWidget(),
       QCoreApplication::translate("pqPythonManager", "Enter Input requested by Python"),

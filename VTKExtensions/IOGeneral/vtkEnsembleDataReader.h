@@ -28,6 +28,8 @@
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsIOGeneralModule.h" //needed for exports
 
+#include <string> // for std::string
+
 class VTKPVVTKEXTENSIONSIOGENERAL_EXPORT vtkEnsembleDataReader : public vtkDataObjectAlgorithm
 {
 public:
@@ -62,7 +64,7 @@ public:
   /**
    * Get the file path associated with the specified row of the meta data
    */
-  vtkStdString GetFilePath(unsigned int rowIndex) const;
+  std::string GetFilePath(unsigned int rowIndex) const;
 
   /**
    * Set the file reader for the specified row of data

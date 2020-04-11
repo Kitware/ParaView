@@ -21,7 +21,6 @@
 #include "vtkSMMaterialLibraryProxy.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProperty.h"
-#include "vtkStdString.h"
 #include "vtkWeakPointer.h"
 
 #include "vtkPVConfig.h"
@@ -159,8 +158,8 @@ void vtkSMMaterialDomain::Update(vtkSMProperty* vtkNotUsed(prop))
   }
 
   // populate my list
-  std::vector<vtkStdString> sa;
-  sa.push_back(vtkStdString("None")); // 1: standard vtk coloration
+  std::vector<std::string> sa;
+  sa.push_back(std::string("None")); // 1: standard vtk coloration
   // 2: whole actor material choices
   std::set<std::string> materialNames = ml->GetMaterialNames();
   std::set<std::string>::iterator it = materialNames.begin();
@@ -172,7 +171,7 @@ void vtkSMMaterialDomain::Update(vtkSMProperty* vtkNotUsed(prop))
   // 3: cells/blocks can choose for themselves from the above
   if (materialNames.size() > 1)
   {
-    sa.push_back(vtkStdString("Value Indexed"));
+    sa.push_back(std::string("Value Indexed"));
   }
 
   this->SetStrings(sa);

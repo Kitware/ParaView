@@ -42,11 +42,11 @@ vtkSMViewExportHelper::~vtkSMViewExportHelper()
 }
 
 //----------------------------------------------------------------------------
-vtkStdString vtkSMViewExportHelper::GetSupportedFileTypes(vtkSMViewProxy* view)
+std::string vtkSMViewExportHelper::GetSupportedFileTypes(vtkSMViewProxy* view)
 {
   if (!view)
   {
-    return vtkStdString();
+    return std::string();
   }
 
   std::ostringstream stream;

@@ -20,7 +20,6 @@
 #include "vtkSMMessage.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMVectorPropertyTemplate.h"
-#include "vtkStdString.h"
 #include "vtkStringList.h"
 
 #include <algorithm>
@@ -28,13 +27,13 @@
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
 
-class vtkSMStringVectorProperty::vtkInternals : public vtkSMVectorPropertyTemplate<vtkStdString>
+class vtkSMStringVectorProperty::vtkInternals : public vtkSMVectorPropertyTemplate<std::string>
 {
 public:
   std::vector<int> ElementTypes;
 
   vtkInternals(vtkSMStringVectorProperty* ivp)
-    : vtkSMVectorPropertyTemplate<vtkStdString>(ivp)
+    : vtkSMVectorPropertyTemplate<std::string>(ivp)
   {
   }
 };
@@ -183,7 +182,7 @@ void vtkSMStringVectorProperty::SetUncheckedElement(unsigned int idx, const char
 int vtkSMStringVectorProperty::SetElements(vtkStringList* list)
 {
   unsigned int count = static_cast<unsigned int>(list->GetLength());
-  vtkStdString* values = new vtkStdString[count + 1];
+  std::string* values = new std::string[count + 1];
   for (unsigned int cc = 0; cc < count; cc++)
   {
     values[cc] = list->GetString(cc) ? list->GetString(cc) : "";
@@ -197,7 +196,7 @@ int vtkSMStringVectorProperty::SetElements(vtkStringList* list)
 int vtkSMStringVectorProperty::SetUncheckedElements(vtkStringList* list)
 {
   unsigned int count = static_cast<unsigned int>(list->GetLength());
-  vtkStdString* values = new vtkStdString[count + 1];
+  std::string* values = new std::string[count + 1];
   for (unsigned int cc = 0; cc < count; cc++)
   {
     values[cc] = list->GetString(cc) ? list->GetString(cc) : "";
@@ -210,7 +209,7 @@ int vtkSMStringVectorProperty::SetUncheckedElements(vtkStringList* list)
 //---------------------------------------------------------------------------
 int vtkSMStringVectorProperty::SetElements(const char* values[], unsigned int count)
 {
-  vtkStdString* std_values = new vtkStdString[count + 1];
+  std::string* std_values = new std::string[count + 1];
   for (unsigned int cc = 0; cc < count; cc++)
   {
     std_values[cc] = values[cc] ? values[cc] : "";
@@ -223,7 +222,7 @@ int vtkSMStringVectorProperty::SetElements(const char* values[], unsigned int co
 //---------------------------------------------------------------------------
 int vtkSMStringVectorProperty::SetElements(const std::vector<std::string>& values)
 {
-  std::vector<vtkStdString> svalues(values.size() + 1);
+  std::vector<std::string> svalues(values.size() + 1);
   std::copy(values.begin(), values.end(), svalues.begin());
   return this->Internals->SetElements(&svalues[0], static_cast<unsigned int>(values.size()));
 }
@@ -231,7 +230,7 @@ int vtkSMStringVectorProperty::SetElements(const std::vector<std::string>& value
 //---------------------------------------------------------------------------
 int vtkSMStringVectorProperty::SetUncheckedElements(const char* values[], unsigned int count)
 {
-  vtkStdString* std_values = new vtkStdString[count + 1];
+  std::string* std_values = new std::string[count + 1];
   for (unsigned int cc = 0; cc < count; cc++)
   {
     std_values[cc] = values[cc] ? values[cc] : "";
@@ -244,7 +243,7 @@ int vtkSMStringVectorProperty::SetUncheckedElements(const char* values[], unsign
 //---------------------------------------------------------------------------
 int vtkSMStringVectorProperty::SetUncheckedElements(const std::vector<std::string>& values)
 {
-  std::vector<vtkStdString> svalues(values.size() + 1);
+  std::vector<std::string> svalues(values.size() + 1);
   std::copy(values.begin(), values.end(), svalues.begin());
   return this->Internals->SetUncheckedElements(
     &svalues[0], static_cast<unsigned int>(values.size()));
@@ -316,18 +315,18 @@ int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElem
     const char* delimiter = element->GetAttribute("default_values_delimiter");
     if (tmp && delimiter)
     {
-      vtkStdString initVal = tmp;
-      vtkStdString delim = delimiter;
-      vtkStdString::size_type pos1 = 0;
-      vtkStdString::size_type pos2 = 0;
-      for (int i = 0; i < numEls && pos2 != vtkStdString::npos; i++)
+      std::string initVal = tmp;
+      std::string delim = delimiter;
+      std::string::size_type pos1 = 0;
+      std::string::size_type pos2 = 0;
+      for (int i = 0; i < numEls && pos2 != std::string::npos; i++)
       {
         if (i != 0)
         {
           pos1 += delim.size();
         }
         pos2 = initVal.find(delimiter, pos1);
-        vtkStdString v = pos1 == pos2 ? "" : initVal.substr(pos1, pos2 - pos1);
+        std::string v = pos1 == pos2 ? "" : initVal.substr(pos1, pos2 - pos1);
         this->Internals->DefaultValues.push_back(v);
         this->Internals->DefaultsValid = true;
         this->SetElement(i, v.c_str());

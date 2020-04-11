@@ -45,7 +45,7 @@ void vtkPVGL2PSExporter::WriteData()
   // and sets the extension itself, while the ParaView export mechanism uses the
   // full filename). The full name of the temporary file will be
   // this->FileName + ".pvtmp.[format extension]".
-  vtkStdString tmpFilePrefix(this->FileName + ".pvtmp");
+  std::string tmpFilePrefix(this->FileName + ".pvtmp");
   this->SetFilePrefix(tmpFilePrefix.c_str());
 
   // Setup raster exclusions if needed
@@ -89,7 +89,7 @@ void vtkPVGL2PSExporter::WriteData()
   this->Superclass::WriteData();
 
   // Move to the requested destination
-  vtkStdString tmpFileName(tmpFilePrefix);
+  std::string tmpFileName(tmpFilePrefix);
 
   switch (this->FileFormat)
   {

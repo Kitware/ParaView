@@ -101,9 +101,9 @@ public:
 
   struct PedigreeIDType
   {
-    vtkStdString Domain;
+    std::string Domain;
     vtkIdType ID;
-    PedigreeIDType(vtkStdString domain, vtkIdType id)
+    PedigreeIDType(std::string domain, vtkIdType id)
     {
       this->Domain = domain;
       this->ID = id;
@@ -120,9 +120,9 @@ public:
 
   struct PedigreeStringIDType
   {
-    vtkStdString Domain;
-    vtkStdString ID;
-    PedigreeStringIDType(vtkStdString domain, vtkStdString id)
+    std::string Domain;
+    std::string ID;
+    PedigreeStringIDType(std::string domain, std::string id)
     {
       this->Domain = domain;
       this->ID = id;

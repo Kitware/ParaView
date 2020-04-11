@@ -17,7 +17,6 @@
 #include "vtkNew.h"
 #include "vtkPointData.h"
 #include "vtkStatisticsAlgorithm.h"
-#include "vtkStdString.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
 #include "vtkVariantArray.h"

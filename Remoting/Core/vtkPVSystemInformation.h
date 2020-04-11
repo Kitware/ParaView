@@ -28,7 +28,6 @@
 #include "vtkPVInformation.h"
 #include "vtkProcessModule.h"      // needed for vtkProcessModule::ProcessTypes
 #include "vtkRemotingCoreModule.h" //needed for exports
-#include "vtkStdString.h"          // needed for vtkStdString
 #include <vector>                  // needed for std::vector
 
 class VTKREMOTINGCORE_EXPORT vtkPVSystemInformation : public vtkPVInformation
@@ -61,11 +60,11 @@ public:
     vtkProcessModule::ProcessTypes ProcessType;
     int ProcessId; // for parallel processes, this indicates the process id.
     int NumberOfProcesses;
-    vtkStdString Hostname;
-    vtkStdString OSName;
-    vtkStdString OSRelease;
-    vtkStdString OSVersion;
-    vtkStdString OSPlatform;
+    std::string Hostname;
+    std::string OSName;
+    std::string OSRelease;
+    std::string OSVersion;
+    std::string OSPlatform;
     bool Is64Bits;
     unsigned int NumberOfPhyicalCPUs;
     unsigned int NumberOfLogicalCPUs; // per physical cpu

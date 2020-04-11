@@ -24,7 +24,8 @@
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
-#include "vtkStdString.h"                 // needed for vtkStdString.
+
+#include <string> // for std::string
 
 class vtkCollection;
 class vtkPVXMLParser;
@@ -243,7 +244,7 @@ public:
   /**
    * Encode a string.
    */
-  static vtkStdString Encode(const char* plaintext);
+  static std::string Encode(const char* plaintext);
 
   /**
    * Return true if the current object has the same content as the other.

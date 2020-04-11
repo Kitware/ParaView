@@ -339,8 +339,8 @@ public:
     vtkSmartPointer<vtkStringList> stringList = vtkSmartPointer<vtkStringList>::New();
     for (size_t i = 0; i < vector.size(); ++i)
     {
-      vtkStdString vtk_string(vector[i]);
-      stringList->AddString(vtk_string);
+      std::string vtk_string(vector[i]);
+      stringList->AddString(vtk_string.c_str());
     }
 
     if (property->GetRepeatable())
@@ -1473,7 +1473,7 @@ Json::Value vtkConvertXMLElementToJSON<vtkIdType>(
 #endif // VTK_USE_64BIT_IDS
 
 template <>
-Json::Value vtkConvertXMLElementToJSON<vtkStdString>(
+Json::Value vtkConvertXMLElementToJSON<std::string>(
   vtkSMVectorProperty* vp, const std::vector<vtkSmartPointer<vtkPVXMLElement> >& elements)
 {
   Json::Value value(Json::arrayValue);

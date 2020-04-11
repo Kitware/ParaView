@@ -50,13 +50,13 @@ public:
   virtual void SetAnnotationsInFullSet(vtkAbstractArray* values, vtkStringArray* annotations);
   vtkGetObjectMacro(AnnotatedValuesInFullSet, vtkAbstractArray);
   vtkGetObjectMacro(AnnotationsInFullSet, vtkStringArray);
-  virtual vtkIdType SetAnnotationInFullSet(vtkVariant value, vtkStdString annotation);
-  virtual vtkIdType SetAnnotationInFullSet(vtkStdString value, vtkStdString annotation);
+  virtual vtkIdType SetAnnotationInFullSet(vtkVariant value, std::string annotation);
+  virtual vtkIdType SetAnnotationInFullSet(std::string value, std::string annotation);
   virtual void ResetAnnotationsInFullSet();
   //@}
 
   void ResetActiveAnnotatedValues();
-  void SetActiveAnnotatedValue(vtkStdString value);
+  void SetActiveAnnotatedValue(std::string value);
 
   void SetNumberOfIndexedColorsInFullSet(int n);
   int GetNumberOfIndexedColorsInFullSet();

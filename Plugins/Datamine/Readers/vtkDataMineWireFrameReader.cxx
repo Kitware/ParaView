@@ -104,7 +104,7 @@ int vtkDataMineWireFrameReader::RequestInformation(
   int p = this->PointFileBad();
   int s = this->StopeFileBad();
 
-  vtkStdString ext;
+  std::string ext;
   if (t)
   {
     // guess Topo File
@@ -455,10 +455,10 @@ void vtkDataMineWireFrameReader::ParseCellsWithStopes(vtkCellArray* cells, TDMFi
 }
 // --------------------------------------
 bool vtkDataMineWireFrameReader::FindAndSetFilePath(
-  vtkStdString& dmExt, const bool& update, FileTypes type)
+  std::string& dmExt, const bool& update, FileTypes type)
 {
-  vtkStdString path(this->FileName);
-  vtkStdString baseName, baseExt;
+  std::string path(this->FileName);
+  std::string baseName, baseExt;
 
   // default guess is the way datamine guess
   // which is namept.dm and nametr.dm ( that is why it is dot - 2 )
@@ -466,7 +466,7 @@ bool vtkDataMineWireFrameReader::FindAndSetFilePath(
   baseName = path.substr(0, (dot - 2));
   baseExt = path.substr(dot, path.size());
 
-  vtkStdString dm(baseName + dmExt + baseExt);
+  std::string dm(baseName + dmExt + baseExt);
   if (vtksys::SystemTools::FileExists(dm))
   {
     this->SetFileName(dm.c_str(), update, type);

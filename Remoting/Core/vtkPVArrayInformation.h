@@ -29,9 +29,11 @@
 
 #include "vtkPVInformation.h"
 #include "vtkRemotingCoreModule.h" //needed for exports
+
+#include <string> // for std::string
+
 class vtkAbstractArray;
 class vtkClientServerStream;
-class vtkStdString;
 class vtkStringArray;
 
 class VTKREMOTINGCORE_EXPORT vtkPVArrayInformation : public vtkPVInformation
@@ -209,7 +211,7 @@ protected:
 
   // this is used by GetComponentName, so that it always return a valid component name
 
-  vtkStdString* DefaultComponentName;
+  std::string* DefaultComponentName;
 
   /// assigns to a string to DefaultComponentName for this component
   void DetermineDefaultComponentName(const int& component_no, const int& numComps);

@@ -15,7 +15,6 @@
 #include "vtkCommandOptionsXMLParser.h"
 #include "vtkCommandOptions.h"
 #include "vtkObjectFactory.h"
-#include "vtkStdString.h"
 #include <map>
 
 //----------------------------------------------------------------------------

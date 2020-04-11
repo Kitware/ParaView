@@ -25,8 +25,9 @@
 #include "vtkPVVTKExtensionsIOCoreModule.h" //needed for exports
 #include "vtkWriter.h"
 
+#include <string>
+
 class vtkMultiProcessController;
-class vtkStdString;
 class vtkTable;
 
 class VTKPVVTKEXTENSIONSIOCORE_EXPORT vtkCSVWriter : public vtkWriter
@@ -135,7 +136,7 @@ public:
    * Internal method: decorates the "string" with the "StringDelimiter" if
    * UseStringDelimiter is true.
    */
-  vtkStdString GetString(vtkStdString string);
+  std::string GetString(std::string string);
   //@}
 
 protected:

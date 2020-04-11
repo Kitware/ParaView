@@ -17,7 +17,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkStdString.h"
 
 #include <assert.h>
 #include <vtksys/RegularExpression.hxx>
@@ -65,8 +64,8 @@ int vtkSMBagChartSeriesListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVX
 //----------------------------------------------------------------------------
 int vtkSMBagChartSeriesListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
-  const std::vector<vtkStdString>& strings = this->GetStrings();
-  std::vector<vtkStdString>::const_iterator iter = strings.begin();
+  const std::vector<std::string>& strings = this->GetStrings();
+  std::vector<std::string>::const_iterator iter = strings.begin();
 
   // Search for an array with a name like HDR (x,y)
   vtksys::RegularExpression re =

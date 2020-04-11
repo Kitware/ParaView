@@ -98,11 +98,11 @@ const char* vtkSMCoreUtilities::GetFileNameProperty(vtkSMProxy* proxy)
 //----------------------------------------------------------------------------
 // This is reimplemented in python's paraview.make_name_valid(). Keep both
 // implementations consistent.
-vtkStdString vtkSMCoreUtilities::SanitizeName(const char* name)
+std::string vtkSMCoreUtilities::SanitizeName(const char* name)
 {
   if (!name || name[0] == '\0')
   {
-    return vtkStdString();
+    return std::string();
   }
 
   std::ostringstream cname;

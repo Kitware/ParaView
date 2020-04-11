@@ -38,7 +38,6 @@
 #include "vtkGridAxesPlane2DActor.h" // needed for inline methods
 #include "vtkNew.h"                  // needed for vtkNew.
 #include "vtkSmartPointer.h"         // needed for vtkSmartPointer.
-#include "vtkStdString.h"            // needed for vtkStdString.
 
 class vtkAxis;
 class vtkContextScene;
@@ -137,8 +136,8 @@ public:
   /**
    * Set titles for each of the axes.
    */
-  void SetTitle(int axis, const vtkStdString& title);
-  const vtkStdString& GetTitle(int axis);
+  void SetTitle(int axis, const std::string& title);
+  const std::string& GetTitle(int axis);
   //@}
 
   //@{
@@ -248,7 +247,7 @@ protected:
 
   vtkTuple<vtkSmartPointer<vtkTextProperty>, 3> TitleTextProperty;
   vtkTuple<vtkSmartPointer<vtkTextProperty>, 3> LabelTextProperty;
-  vtkTuple<vtkStdString, 3> Titles;
+  vtkTuple<std::string, 3> Titles;
 
   vtkNew<vtkGridAxesHelper> Helper;
   vtkSmartPointer<vtkGridAxesPlane2DActor> PlaneActor;

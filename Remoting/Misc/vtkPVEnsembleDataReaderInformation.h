@@ -26,6 +26,8 @@
 #include "vtkPVInformation.h"
 #include "vtkRemotingMiscModule.h" //needed for exports
 
+#include <string> // for std::string
+
 class VTKREMOTINGMISC_EXPORT vtkPVEnsembleDataReaderInformation : public vtkPVInformation
 {
 public:
@@ -54,7 +56,7 @@ public:
   /**
    * Get the file path for the input row index.
    */
-  virtual vtkStdString GetFilePath(const unsigned int);
+  virtual std::string GetFilePath(const unsigned int);
 
 protected:
   vtkPVEnsembleDataReaderInformation();

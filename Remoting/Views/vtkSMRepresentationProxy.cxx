@@ -343,7 +343,7 @@ vtkPVDataInformation* vtkSMRepresentationProxy::GetRepresentedDataInformation()
 
 //----------------------------------------------------------------------------
 vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetProminentValuesInformation(
-  vtkStdString name, int fieldAssoc, int numComponents, double uncertaintyAllowed, double fraction,
+  std::string name, int fieldAssoc, int numComponents, double uncertaintyAllowed, double fraction,
   bool force)
 {
   bool differentAttribute =
@@ -365,7 +365,7 @@ vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetProminentValuesInf
     this->ProminentValuesInformation->Initialize();
     this->ProminentValuesInformation->SetFieldAssociation(
       vtkDataObject::GetAssociationTypeAsString(fieldAssoc));
-    this->ProminentValuesInformation->SetFieldName(name);
+    this->ProminentValuesInformation->SetFieldName(name.c_str());
     this->ProminentValuesInformation->SetNumberOfComponents(numComponents);
     this->ProminentValuesInformation->SetUncertainty(uncertaintyAllowed);
     this->ProminentValuesInformation->SetFraction(fraction);

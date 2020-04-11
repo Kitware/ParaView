@@ -28,7 +28,6 @@
 #include "vtkDirectory.h"
 #include "vtkObjectFactory.h"
 #include "vtkPExodusIIReader.h"
-#include "vtkStdString.h"
 
 #include "vtkSmartPointer.h"
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
@@ -67,7 +66,7 @@ protected:
       , status(s)
     {
     }
-    vtkStdString name;
+    std::string name;
     int status;
   };
   typedef std::vector<ObjectStatus> ObjectStatusList;
@@ -114,7 +113,7 @@ void vtkExodusFileSeriesReaderStatus::RestoreStatus(vtkExodusIIReader* reader)
     for (ObjectStatusList::iterator j = this->ArrayStatuses[i].begin();
          j != this->ArrayStatuses[i].end(); j++)
     {
-      reader->SetObjectArrayStatus(arrayType, j->name, j->status);
+      reader->SetObjectArrayStatus(arrayType, j->name.c_str(), j->status);
     }
   }
 
@@ -124,7 +123,7 @@ void vtkExodusFileSeriesReaderStatus::RestoreStatus(vtkExodusIIReader* reader)
     for (ObjectStatusList::iterator j = this->ObjectStatuses[i].begin();
          j != this->ObjectStatuses[i].end(); j++)
     {
-      reader->SetObjectStatus(objectType, j->name, j->status);
+      reader->SetObjectStatus(objectType, j->name.c_str(), j->status);
     }
   }
 }
@@ -211,13 +210,13 @@ void vtkExodusFileSeriesReader::FindRestartedResults()
     return;
   }
 
-  vtkStdString originalFile = this->GetFileName(0);
+  std::string originalFile = this->GetFileName(0);
   this->RemoveAllFileNamesInternal();
 
-  vtkStdString path;
-  vtkStdString baseName;
-  vtkStdString::size_type dirseppos = originalFile.find_last_of("/\\");
-  if (dirseppos == vtkStdString::npos)
+  std::string path;
+  std::string baseName;
+  std::string::size_type dirseppos = originalFile.find_last_of("/\\");
+  if (dirseppos == std::string::npos)
   {
     path = "./";
     baseName = originalFile;
@@ -248,19 +247,19 @@ void vtkExodusFileSeriesReader::FindRestartedResults()
   if (!regEx.find(baseName))
   {
     // Filename does not follow convention.  Just use it.
-    this->AddFileNameInternal(originalFile);
+    this->AddFileNameInternal(originalFile.c_str());
     return;
   }
 
-  vtkStdString prefix = regEx.match(1);
-  vtkStdString suffix = regEx.match(3);
+  std::string prefix = regEx.match(1);
+  std::string suffix = regEx.match(3);
 
   VTK_CREATE(vtkDirectory, dir);
-  if (!dir->Open(path))
+  if (!dir->Open(path.c_str()))
   {
     vtkWarningMacro(<< "Could not open directory " << originalFile.c_str()
                     << " is supposed to be from (" << path.c_str() << ")");
-    this->AddFileNameInternal(originalFile);
+    this->AddFileNameInternal(originalFile.c_str());
     return;
   }
 
@@ -281,7 +280,7 @@ void vtkExodusFileSeriesReader::FindRestartedResults()
   if (this->GetNumberOfFileNames() < 1)
   {
     vtkWarningMacro(<< "Could not find any actual files matching " << originalFile.c_str());
-    this->AddFileNameInternal(originalFile);
+    this->AddFileNameInternal(originalFile.c_str());
     this->CopyRealFileNamesFromFileNames();
   }
 }

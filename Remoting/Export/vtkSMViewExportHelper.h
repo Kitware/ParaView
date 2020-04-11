@@ -27,7 +27,8 @@
 
 #include "vtkRemotingExportModule.h" //needed for exports
 #include "vtkSMObject.h"
-#include "vtkStdString.h" //needed for vtkStdString.
+
+#include <string> // for std::string
 
 class vtkSMViewProxy;
 class vtkSMExporterProxy;
@@ -47,7 +48,7 @@ public:
    * "PVD Files (*.pvd);;VTK Files (*.vtk)"
    * \endverbatim
    */
-  virtual vtkStdString GetSupportedFileTypes(vtkSMViewProxy* view);
+  virtual std::string GetSupportedFileTypes(vtkSMViewProxy* view);
 
   /**
    * Exports the view to the given output file. Returns a new exporter instance

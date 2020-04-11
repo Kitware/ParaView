@@ -292,7 +292,7 @@ void vtkPVXMLElement::PrintXML(ostream& os, vtkIndent indent)
     // we always print the encoded value. The expat parser processes encoded
     // values when reading them, hence we don't need any decoding when reading
     // the values back.
-    const vtkStdString& sanitizedValue = vtkPVXMLElement::Encode(aValue);
+    const std::string& sanitizedValue = vtkPVXMLElement::Encode(aValue);
     os << " " << (aName ? aName : "NoName") << "=\""
        << (aValue ? sanitizedValue.c_str() : "NoValue") << "\"";
   }
@@ -590,10 +590,10 @@ void vtkPVXMLElement::GetElementsByName(const char* name, vtkCollection* element
 }
 
 //----------------------------------------------------------------------------
-vtkStdString vtkPVXMLElement::Encode(const char* plaintext)
+std::string vtkPVXMLElement::Encode(const char* plaintext)
 {
   // escape any characters that are not allowed in XML
-  vtkStdString sanitized = "";
+  std::string sanitized = "";
   if (!plaintext)
   {
     return sanitized;

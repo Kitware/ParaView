@@ -106,13 +106,13 @@ vtkSMTrace::~vtkSMTrace()
 }
 
 //----------------------------------------------------------------------------
-vtkStdString vtkSMTrace::GetState(
+std::string vtkSMTrace::GetState(
   int propertiesToTraceOnCreate, bool skipHiddenRepresentations, bool skipRenderingComponents)
 {
   if (vtkSMTrace::ActiveTracer.GetPointer() != NULL)
   {
     vtkGenericWarningMacro("Tracing is active. Cannot save state.");
-    return vtkStdString();
+    return std::string();
   }
 
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
@@ -136,7 +136,7 @@ vtkStdString vtkSMTrace::GetState(
       vtkGenericWarningMacro("Failed to generate state.");
       throw 1;
     }
-    return vtkStdString(PyString_AsString(result));
+    return std::string(PyString_AsString(result));
   }
   catch (int)
   {
@@ -149,7 +149,7 @@ vtkStdString vtkSMTrace::GetState(
 #endif
   (void)propertiesToTraceOnCreate;
   (void)skipHiddenRepresentations;
-  return vtkStdString();
+  return std::string();
 }
 
 //----------------------------------------------------------------------------
@@ -191,17 +191,17 @@ vtkSMTrace* vtkSMTrace::StartTrace(const char* preamble)
 }
 
 //----------------------------------------------------------------------------
-vtkStdString vtkSMTrace::StopTrace()
+std::string vtkSMTrace::StopTrace()
 {
   if (!vtkSMTrace::ActiveTracer)
   {
     vtkGenericWarningMacro("Use vtkSMTrace::StartTrace() to start a trace before calling "
                            "vtkSMTrace::StopTrace().");
-    return vtkStdString();
+    return std::string();
   }
 
   auto active = vtkSMTrace::ActiveTracer;
-  vtkStdString result;
+  std::string result;
 
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
   VTK_MODULE_ENABLE_VTK_WrappingPythonCore
@@ -229,13 +229,13 @@ vtkStdString vtkSMTrace::StopTrace()
 }
 
 //----------------------------------------------------------------------------
-vtkStdString vtkSMTrace::GetCurrentTrace()
+std::string vtkSMTrace::GetCurrentTrace()
 {
   if (!vtkSMTrace::ActiveTracer)
   {
     vtkGenericWarningMacro("Use vtkSMTrace::StartTrace() to start a trace before calling "
                            "vtkSMTrace::GetCurrentTrace().");
-    return vtkStdString();
+    return std::string();
   }
 
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_Python &&                     \
@@ -247,10 +247,10 @@ vtkStdString vtkSMTrace::GetCurrentTrace()
   if (active->CheckForError() == false && get_current_trace_output)
   {
     // no error.
-    return vtkStdString(PyString_AsString(get_current_trace_output));
+    return std::string(PyString_AsString(get_current_trace_output));
   }
 #endif
-  return vtkStdString();
+  return std::string();
 }
 
 //----------------------------------------------------------------------------

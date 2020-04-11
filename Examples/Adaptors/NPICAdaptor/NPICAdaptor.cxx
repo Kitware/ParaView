@@ -7,7 +7,6 @@
 #include "vtkImageData.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkPointData.h"
-#include "vtkStdString.h"
 
 extern "C" void createstructuredgrid_(
   int* myid, int* xdim, int* ystart, int* ystop, double* xspc, double* yspc)
@@ -40,7 +39,7 @@ extern "C" void createstructuredgrid_(
 extern "C" void add_scalar_(char* fname, int* len, double* data, int* size)
 {
   vtkDoubleArray* arr = vtkDoubleArray::New();
-  vtkStdString name(fname, *len);
+  std::string name(fname, *len);
   arr->SetName(name);
   arr->SetNumberOfComponents(1);
   // arr->SetNumberOfTuples (*size);
@@ -56,7 +55,7 @@ extern "C" void add_vector_(
   char* fname, int* len, double* data0, double* data1, double* data2, int* size)
 {
   vtkDoubleArray* arr = vtkDoubleArray::New();
-  vtkStdString name(fname, *len);
+  std::string name(fname, *len);
   arr->SetName(name);
   arr->SetNumberOfComponents(3);
   arr->SetNumberOfTuples(*size);

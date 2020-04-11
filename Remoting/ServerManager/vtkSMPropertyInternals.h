@@ -21,13 +21,12 @@
 #include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
-#include "vtkStdString.h"
 #include <map>
 #include <vector>
 
 struct vtkSMPropertyInternals
 {
-  typedef std::map<vtkStdString, vtkSmartPointer<vtkSMDomain> > DomainMap;
+  typedef std::map<std::string, vtkSmartPointer<vtkSMDomain> > DomainMap;
   DomainMap Domains;
 
   typedef std::vector<vtkSmartPointer<vtkSMDomain> > DependentsVector;

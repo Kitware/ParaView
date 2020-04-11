@@ -51,7 +51,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPythonInteractiveInterpreter.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkSmartPointer.h"
-#include "vtkStdString.h"
 #include "vtkStringOutputWindow.h"
 
 #include <QAbstractItemView>
@@ -439,7 +438,7 @@ void pqPythonShell::HandleInterpreterEvents(vtkObject*, unsigned long eventid, v
   {
     case vtkCommand::UpdateEvent:
     {
-      vtkStdString* strData = reinterpret_cast<vtkStdString*>(calldata);
+      std::string* strData = reinterpret_cast<std::string*>(calldata);
       bool ok;
       QString inputText = QInputDialog::getText(this, tr("Enter Input requested by Python"),
         tr("Input: "), QLineEdit::Normal, QString(), &ok);

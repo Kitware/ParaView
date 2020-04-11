@@ -83,7 +83,7 @@ void DeMangleArrayName(const std::string& mangledName, vtkDataSet* dataSet,
           // has to be from -1 as -1 represents the Magnitude component
           for (int componentIndex = -1; componentIndex < componentCount; componentIndex++)
           {
-            vtkStdString componentNameString;
+            std::string componentNameString;
             const char* componentName = array->GetComponentName(componentIndex);
             if (componentName)
             {
@@ -146,7 +146,7 @@ vtkExecutive* vtkPVPostFilter::CreateDefaultExecutive()
 }
 
 //----------------------------------------------------------------------------
-vtkStdString vtkPVPostFilter::DefaultComponentName(int componentNumber, int componentCount)
+std::string vtkPVPostFilter::DefaultComponentName(int componentNumber, int componentCount)
 {
   if (componentCount <= 1)
   {
@@ -510,7 +510,7 @@ int vtkPVPostFilter::ExtractComponent(vtkDataSetAttributes* dsa, const char* req
   // compare against cIndex to only run this if component names didn't match
   for (int i = -1; i < numComps && cIndex == -1; i++)
   {
-    vtkStdString defaultName = vtkPVPostFilter::DefaultComponentName(i, numComps);
+    std::string defaultName = vtkPVPostFilter::DefaultComponentName(i, numComps);
     if (vtksys::SystemTools::Strucmp(defaultName.c_str(), demangled_component_name) == 0)
     {
       cIndex = i;

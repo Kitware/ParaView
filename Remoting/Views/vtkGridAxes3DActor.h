@@ -30,7 +30,6 @@
 
 #include "vtkGridAxesHelper.h" //  needed for vtkGridAxesHelper.
 #include "vtkNew.h"            // needed for vtkNew.
-#include "vtkStdString.h"      // needed for vtkStdString.
 
 class vtkDoubleArray;
 class vtkGridAxes2DActor;
@@ -168,11 +167,11 @@ public:
    * Get/Set the text to use for titles for the axis. Setting the title to an
    * empty string will hide the title label for that axis.
    */
-  void SetTitle(int axis, const vtkStdString& title);
-  void SetXTitle(const vtkStdString& title) { this->SetTitle(0, title); }
-  void SetYTitle(const vtkStdString& title) { this->SetTitle(1, title); }
-  void SetZTitle(const vtkStdString& title) { this->SetTitle(2, title); }
-  const vtkStdString& GetTitle(int axis);
+  void SetTitle(int axis, const std::string& title);
+  void SetXTitle(const std::string& title) { this->SetTitle(0, title); }
+  void SetYTitle(const std::string& title) { this->SetTitle(1, title); }
+  void SetZTitle(const std::string& title) { this->SetTitle(2, title); }
+  const std::string& GetTitle(int axis);
   //@}
 
   /**

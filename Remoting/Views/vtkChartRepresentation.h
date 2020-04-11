@@ -30,7 +30,6 @@
 
 #include "vtkPVDataRepresentation.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer
-#include "vtkStdString.h"    //  needed for vtkStdString.
 #include "vtkWeakPointer.h"  // needed for vtkWeakPointer
 
 #include <map> // needed for map
@@ -109,8 +108,8 @@ public:
    * method is called on the client-side when filling up the domains for the
    * properties.
    */
-  virtual vtkStdString GetDefaultSeriesLabel(
-    const vtkStdString& tableName, const vtkStdString& columnName);
+  virtual std::string GetDefaultSeriesLabel(
+    const std::string& tableName, const std::string& columnName);
 
   //@{
   /**

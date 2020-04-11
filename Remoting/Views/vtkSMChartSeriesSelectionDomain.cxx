@@ -31,7 +31,6 @@
 #include "vtkSMTransferFunctionPresets.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
-#include "vtkStdString.h"
 #include "vtkStringList.h"
 
 #include <vtk_jsoncpp.h>
@@ -245,7 +244,7 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
   {
     // since there's no way to choose which dataset from a composite one to use,
     // just look at the top-level array information (skipping partial arrays).
-    std::vector<vtkStdString> column_names;
+    std::vector<std::string> column_names;
     int fieldAssociation = vtkSMUncheckedPropertyHelper(fieldDataSelection).GetAsInt(0);
     this->PopulateAvailableArrays(
       std::string(), column_names, dataInfo, fieldAssociation, this->FlattenTable);
@@ -253,7 +252,7 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
     return;
   }
 
-  std::vector<vtkStdString> column_names;
+  std::vector<std::string> column_names;
   int fieldAssociation = vtkSMUncheckedPropertyHelper(fieldDataSelection).GetAsInt(0);
 
   vtkSMUncheckedPropertyHelper compositeIndexHelper(compositeIndex);
@@ -296,7 +295,7 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
 // Add arrays from dataInfo to strings. If blockName is non-empty, then it's
 // used to "uniquify" the array names.
 void vtkSMChartSeriesSelectionDomain::PopulateAvailableArrays(const std::string& blockName,
-  std::vector<vtkStdString>& strings, vtkPVDataInformation* dataInfo, int fieldAssociation,
+  std::vector<std::string>& strings, vtkPVDataInformation* dataInfo, int fieldAssociation,
   bool flattenTable)
 {
   // this method is typically called for leaf nodes (or multi-piece).
@@ -311,7 +310,7 @@ void vtkSMChartSeriesSelectionDomain::PopulateAvailableArrays(const std::string&
 
   // helps use avoid duplicates. duplicates may arise for plot types that treat
   // multiple columns as a single series/plot e.g. quartile plots.
-  std::set<vtkStdString> uniquestrings;
+  std::set<std::string> uniquestrings;
 
   vtkPVDataSetAttributesInformation* dsa = dataInfo->GetAttributeInformation(fieldAssociation);
   for (int cc = 0; dsa != nullptr && cc < dsa->GetNumberOfArrays(); cc++)
@@ -333,8 +332,8 @@ void vtkSMChartSeriesSelectionDomain::PopulateAvailableArrays(const std::string&
 // Add array component from arrayInfo to strings. If blockName is non-empty, then it's
 // used to "uniquify" the array names.
 void vtkSMChartSeriesSelectionDomain::PopulateArrayComponents(vtkChartRepresentation* chartRepr,
-  const std::string& blockName, std::vector<vtkStdString>& strings,
-  std::set<vtkStdString>& uniquestrings, vtkPVArrayInformation* arrayInfo, bool flattenTable)
+  const std::string& blockName, std::vector<std::string>& strings,
+  std::set<std::string>& uniquestrings, vtkPVArrayInformation* arrayInfo, bool flattenTable)
 {
   if (arrayInfo && (!this->HidePartialArrays || arrayInfo->GetIsPartial() == 0))
   {
@@ -390,9 +389,9 @@ void vtkSMChartSeriesSelectionDomain::PopulateArrayComponents(vtkChartRepresenta
 }
 
 //----------------------------------------------------------------------------
-std::vector<vtkStdString> vtkSMChartSeriesSelectionDomain::GetDefaultValue(const char* series)
+std::vector<std::string> vtkSMChartSeriesSelectionDomain::GetDefaultValue(const char* series)
 {
-  std::vector<vtkStdString> values;
+  std::vector<std::string> values;
   if (this->DefaultMode == VISIBILITY)
   {
     values.push_back(this->GetDefaultSeriesVisibility(series) ? "1" : "0");
@@ -467,7 +466,7 @@ void vtkSMChartSeriesSelectionDomain::UpdateDefaultValues(
     }
   }
 
-  const std::vector<vtkStdString>& domain_strings = this->GetStrings();
+  const std::vector<std::string>& domain_strings = this->GetStrings();
   for (size_t cc = 0; cc < domain_strings.size(); cc++)
   {
     if (preserve_previous_values && seriesNames.find(domain_strings[cc]) != seriesNames.end())
@@ -476,7 +475,7 @@ void vtkSMChartSeriesSelectionDomain::UpdateDefaultValues(
       // to preserve.
       continue;
     }
-    std::vector<vtkStdString> cur_values = this->GetDefaultValue(domain_strings[cc].c_str());
+    std::vector<std::string> cur_values = this->GetDefaultValue(domain_strings[cc].c_str());
     if (cur_values.size() > 0)
     {
       values->AddString(domain_strings[cc].c_str());
@@ -533,7 +532,7 @@ void vtkSMChartSeriesSelectionDomain::OnDomainModified()
 
 //----------------------------------------------------------------------------
 void vtkSMChartSeriesSelectionDomain::SetDefaultVisibilityOverride(
-  const vtkStdString& arrayname, bool visibility)
+  const std::string& arrayname, bool visibility)
 {
   this->Internals->VisibilityOverrides[arrayname] = visibility;
 }

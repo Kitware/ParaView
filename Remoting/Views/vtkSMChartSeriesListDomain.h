@@ -79,7 +79,7 @@ protected:
 
   int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 
-  virtual void PopulateArrayComponents(vtkPVArrayInformation*, std::vector<vtkStdString>&);
+  virtual void PopulateArrayComponents(vtkPVArrayInformation*, std::vector<std::string>&);
 
   bool HidePartialArrays;
 

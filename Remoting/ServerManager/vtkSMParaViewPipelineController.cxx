@@ -157,7 +157,7 @@ vtkSMParaViewPipelineController::~vtkSMParaViewPipelineController()
 }
 
 //----------------------------------------------------------------------------
-vtkStdString vtkSMParaViewPipelineController::GetHelperProxyGroupName(vtkSMProxy* proxy)
+std::string vtkSMParaViewPipelineController::GetHelperProxyGroupName(vtkSMProxy* proxy)
 {
   assert(proxy != NULL);
   std::ostringstream groupnamestr;

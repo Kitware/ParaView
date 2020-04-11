@@ -43,6 +43,8 @@
 
 #include "vtkSMObject.h"
 
+#include <string>
+
 class vtkSMProxy;
 class vtkSMSession;
 class vtkSMSessionProxyManager;
@@ -282,7 +284,7 @@ public:
   /**
    * For a given proxy returns the name of the group used for helper proxies.
    */
-  static vtkStdString GetHelperProxyGroupName(vtkSMProxy*);
+  static std::string GetHelperProxyGroupName(vtkSMProxy*);
 
 protected:
   vtkSMParaViewPipelineController();

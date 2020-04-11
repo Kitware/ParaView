@@ -20,7 +20,6 @@
 #include "vtkPVContextView.h"
 #include "vtkPen.h"
 #include "vtkPlot.h"
-#include "vtkStdString.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
 
