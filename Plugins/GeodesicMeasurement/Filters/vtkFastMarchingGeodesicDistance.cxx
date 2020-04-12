@@ -164,6 +164,11 @@ int vtkFastMarchingGeodesicDistance::RequestData(vtkInformation* vtkNotUsed(requ
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
+  // call GetInputArrayInformation to avoid warning when calling
+  // this->GetInputArrayToProcess(0/1, input);
+  this->GetInputArrayInformation(0);
+  this->GetInputArrayInformation(1);
+
   vtkPolyData* input = vtkPolyData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
   if (!output || !input)
@@ -181,15 +186,11 @@ int vtkFastMarchingGeodesicDistance::RequestData(vtkInformation* vtkNotUsed(requ
   this->SetupCallbacks();
 
   // Extract seed point id list as points with non-zero values of a given field
-  vtkDataArray* inNonZeroField = this->GetInputArrayToProcess(0, input);
-  if (inNonZeroField)
-  {
-    this->SetSeedsFromNonZeroField(inNonZeroField);
-  }
+  this->SetSeedsFromNonZeroField(this->GetInputArrayToProcess(0, input));
 
-  // Set propagation weight field. NULL case is handled internally
-  vtkDataArray* inIsotropicMetricTensorLength = this->GetInputArrayToProcess(1, input);
-  this->SetPropagationWeights(inIsotropicMetricTensorLength);
+  // Set propagation weight field. NULL is handled internally as constant uniform propagation
+  // weights
+  this->SetPropagationWeights(this->GetInputArrayToProcess(1, input));
 
   // Internally setup seeds for fast marching
   this->AddSeedsInternal();
@@ -315,6 +316,10 @@ void vtkFastMarchingGeodesicDistance::AddSeedsInternal()
 //-----------------------------------------------------------------------------
 void vtkFastMarchingGeodesicDistance::SetSeedsFromNonZeroField(vtkDataArray* nonZeroField)
 {
+  if (!nonZeroField)
+  {
+    return;
+  }
   vtkIdType numpts = nonZeroField->GetNumberOfTuples();
   // First extract seeds ids
   vtkNew<vtkIdList> seedsId;

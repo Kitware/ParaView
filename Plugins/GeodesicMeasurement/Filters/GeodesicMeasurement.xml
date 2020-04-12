@@ -96,8 +96,7 @@
                             number_of_elements="5">
         <ArrayListDomain attribute_type="Scalars"
                          input_domain_name="SeedsNonZeroField"
-                         name="array_list"
-                         none_string="None">
+                         name="array_list">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
