@@ -78,7 +78,7 @@ vtkVRVirtualHandStyle::~vtkVRVirtualHandStyle()
 // ----------------------------------------------------------------------------
 void vtkVRVirtualHandStyle::HandleButton(const vtkVREventData& data)
 {
-  vtkStdString role = this->GetButtonRole(data.name);
+  std::string role = this->GetButtonRole(data.name);
   if (role == "Grab world")
   {
 
@@ -100,7 +100,7 @@ void vtkVRVirtualHandStyle::HandleButton(const vtkVREventData& data)
 // ----------------------------------------------------------------------------
 void vtkVRVirtualHandStyle::HandleTracker(const vtkVREventData& data)
 {
-  vtkStdString role = this->GetTrackerRole(data.name);
+  std::string role = this->GetTrackerRole(data.name);
   if (role == "Tracker")
   {
     this->CurrentTrackerMatrix->DeepCopy(data.data.tracker.matrix);

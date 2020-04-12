@@ -39,7 +39,6 @@ class vtkAbstractArray;
 class vtkClientServerStream;
 class vtkCompositeDataSet;
 class vtkDataObject;
-class vtkStdString;
 class vtkStringArray;
 
 class VTKREMOTINGVIEWS_EXPORT vtkPVProminentValuesInformation : public vtkPVInformation

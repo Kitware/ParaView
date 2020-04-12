@@ -219,7 +219,7 @@ vtkMTimeType vtkGridAxes2DActor::GetMTime()
 }
 
 //----------------------------------------------------------------------------
-void vtkGridAxes2DActor::SetTitle(int axis, const vtkStdString& title)
+void vtkGridAxes2DActor::SetTitle(int axis, const std::string& title)
 {
   if (axis >= 0 && axis < 3 && this->Titles[axis] != title)
   {
@@ -229,9 +229,9 @@ void vtkGridAxes2DActor::SetTitle(int axis, const vtkStdString& title)
 }
 
 //----------------------------------------------------------------------------
-const vtkStdString& vtkGridAxes2DActor::GetTitle(int axis)
+const std::string& vtkGridAxes2DActor::GetTitle(int axis)
 {
-  static vtkStdString nullstring;
+  static std::string nullstring;
   return (axis >= 0 && axis < 3) ? this->Titles[axis] : nullstring;
 }
 
@@ -612,7 +612,7 @@ void vtkGridAxes2DActor::UpdateTextActors(vtkViewport* viewport)
   {
     // Setup title text.
     vtkBillboardTextActor3D* titleActor = this->Labels->TitleLabels[index].GetPointer();
-    const vtkStdString& label = this->Titles[activeAxes[index % 2]];
+    const std::string& label = this->Titles[activeAxes[index % 2]];
     if (label.empty() == false && labelVisibilties[index])
     {
       vtkVector3d midPoint = (facePoints[index] + facePoints[(index + 1) % 4]) * 0.5;

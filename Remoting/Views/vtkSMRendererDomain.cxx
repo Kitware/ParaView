@@ -19,7 +19,6 @@
 #endif
 #include "vtkObjectFactory.h"
 #include "vtkSMProperty.h"
-#include "vtkStdString.h"
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMRendererDomain);
@@ -54,18 +53,18 @@ void vtkSMRendererDomain::Update(vtkSMProperty* vtkNotUsed(prop))
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
 
   // populate my list
-  std::vector<vtkStdString> sa;
+  std::vector<std::string> sa;
   if (vtkOSPRayPass::IsBackendAvailable("OSPRay raycaster"))
   {
-    sa.push_back(vtkStdString("OSPRay raycaster"));
+    sa.push_back(std::string("OSPRay raycaster"));
   }
   if (vtkOSPRayPass::IsBackendAvailable("OSPRay pathtracer"))
   {
-    sa.push_back(vtkStdString("OSPRay pathtracer"));
+    sa.push_back(std::string("OSPRay pathtracer"));
   }
   if (vtkOSPRayPass::IsBackendAvailable("OptiX pathtracer"))
   {
-    sa.push_back(vtkStdString("OptiX pathtracer"));
+    sa.push_back(std::string("OptiX pathtracer"));
   }
 
   this->SetStrings(sa);

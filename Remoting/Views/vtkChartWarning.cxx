@@ -26,7 +26,6 @@
 #include "vtkContextScene.h"
 #include "vtkPen.h"
 #include "vtkPlot.h"
-#include "vtkStdString.h"
 #include "vtkTextProperty.h"
 #include "vtkVectorOperators.h"
 

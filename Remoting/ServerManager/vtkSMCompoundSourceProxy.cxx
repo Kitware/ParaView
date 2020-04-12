@@ -437,8 +437,8 @@ vtkPVXMLElement* vtkSMCompoundSourceProxy::SaveDefinition(vtkPVXMLElement* root)
     numExposed++;
     vtkPVXMLElement* expElem = vtkPVXMLElement::New();
     expElem->SetName("Property");
-    expElem->AddAttribute("name", iter->second.PropertyName);
-    expElem->AddAttribute("proxy_name", iter->second.SubProxyName);
+    expElem->AddAttribute("name", iter->second.PropertyName.c_str());
+    expElem->AddAttribute("proxy_name", iter->second.SubProxyName.c_str());
     expElem->AddAttribute("exposed_name", iter->first.c_str());
     exposed->AddNestedElement(expElem);
     expElem->Delete();

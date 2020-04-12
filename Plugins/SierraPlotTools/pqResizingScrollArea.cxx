@@ -24,7 +24,7 @@
 #include "pqResizingScrollArea.h"
 
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 
 pqResizingScrollArea::pqResizingScrollArea(QWidget* _parent)
   : QScrollArea(_parent)
@@ -56,7 +56,7 @@ QSize pqResizingScrollArea::sizeHint() const
 
   newSize.setHeight(qMax(widgetHintHeight, scrollHintHeight));
 
-  int deskTopHeight = QApplication::desktop()->availableGeometry().height();
+  int deskTopHeight = QGuiApplication::primaryScreen()->size().height();
 
   // but don't get too big relative to the deskTopHeight
   newSize.setHeight(qMin(newSize.height(), int(deskTopHeight * 0.4)));

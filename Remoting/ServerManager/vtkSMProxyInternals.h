@@ -24,7 +24,6 @@
 #include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
-#include "vtkStdString.h"
 #include <map>
 #include <string>
 #include <vector>
@@ -51,18 +50,18 @@ struct vtkSMProxyInternals
   };
   // Note that the name of the property is the map key. That is the
   // only place where name is stored
-  typedef std::map<vtkStdString, PropertyInfo> PropertyInfoMap;
+  typedef std::map<std::string, PropertyInfo> PropertyInfoMap;
   PropertyInfoMap Properties;
 
   // This vector keeps track of the order in which properties
   // were added for the Property iterator
-  std::vector<vtkStdString> PropertyNamesInOrder;
+  std::vector<std::string> PropertyNamesInOrder;
 
   std::vector<vtkSmartPointer<vtkSMPropertyGroup> > PropertyGroups;
 
   std::vector<int> ServerIDs;
 
-  typedef std::map<vtkStdString, vtkSmartPointer<vtkSMProxy> > ProxyMap;
+  typedef std::map<std::string, vtkSmartPointer<vtkSMProxy> > ProxyMap;
   ProxyMap SubProxies;
 
   struct ConnectionInfo
@@ -78,14 +77,14 @@ struct vtkSMProxyInternals
 
   struct ExposedPropertyInfo
   {
-    vtkStdString SubProxyName;
-    vtkStdString PropertyName;
+    std::string SubProxyName;
+    std::string PropertyName;
   };
 
   // Map for exposed properties. The key is the exposed property name,
   // value is a ExposedPropertyInfo object which indicates the subproxy name
   // and the property name in that subproxy.
-  typedef std::map<vtkStdString, ExposedPropertyInfo> ExposedPropertyInfoMap;
+  typedef std::map<std::string, ExposedPropertyInfo> ExposedPropertyInfoMap;
   ExposedPropertyInfoMap ExposedProperties;
 
   // Vector of vtkSMProxyLink for shared properties among subproxies.

@@ -144,7 +144,7 @@ bool pqSaveStateReaction::savePythonState(const QString& filename)
     return false;
   }
 
-  vtkStdString state =
+  std::string state =
     vtkSMTrace::GetState(vtkSMPropertyHelper(options, "PropertiesToTraceOnCreate").GetAsInt(),
       vtkSMPropertyHelper(options, "SkipHiddenDisplayProperties").GetAsInt() == 1,
       vtkSMPropertyHelper(options, "SkipRenderingComponents").GetAsInt() == 1);
@@ -160,7 +160,7 @@ bool pqSaveStateReaction::savePythonState(const QString& filename)
     return false;
   }
   QTextStream out(&file);
-  out << state;
+  out << state.c_str();
   pqServer* server = pqActiveObjects::instance().activeServer();
   // Add this to the list of recent server resources ...
   pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(

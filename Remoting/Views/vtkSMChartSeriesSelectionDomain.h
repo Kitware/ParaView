@@ -125,7 +125,7 @@ protected:
    * Get the default value that will be used for the series with the given name
    * by this domain.
    */
-  virtual std::vector<vtkStdString> GetDefaultValue(const char* series);
+  virtual std::vector<std::string> GetDefaultValue(const char* series);
 
   /**
    * Build up the domain with available series names.
@@ -133,7 +133,7 @@ protected:
    * used to "uniquify" the array names.
    */
   virtual void PopulateAvailableArrays(const std::string& blockName,
-    std::vector<vtkStdString>& strings, vtkPVDataInformation* dataInfo, int fieldAssociation,
+    std::vector<std::string>& strings, vtkPVDataInformation* dataInfo, int fieldAssociation,
     bool flattenTable);
 
   /**
@@ -142,15 +142,15 @@ protected:
    * used to "uniquify" the array names.
    */
   virtual void PopulateArrayComponents(vtkChartRepresentation* chartRepr,
-    const std::string& blockName, std::vector<vtkStdString>& strings,
-    std::set<vtkStdString>& unique_strings, vtkPVArrayInformation* dataInfo, bool flattenTable);
+    const std::string& blockName, std::vector<std::string>& strings,
+    std::set<std::string>& unique_strings, vtkPVArrayInformation* dataInfo, bool flattenTable);
 
   /**
    * Call this method in PopulateAvailableArrays() to override a specific array's
    * default visibility. Used for hiding array components, by default, for
    * example.
    */
-  virtual void SetDefaultVisibilityOverride(const vtkStdString& arrayname, bool visibility);
+  virtual void SetDefaultVisibilityOverride(const std::string& arrayname, bool visibility);
 
   int DefaultMode;
 

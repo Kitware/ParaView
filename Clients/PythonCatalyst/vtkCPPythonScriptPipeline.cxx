@@ -183,7 +183,7 @@ int vtkCPPythonScriptPipeline::RequestDataDescription(vtkCPDataDescription* data
   }
 
   // check the script to see if it should be run...
-  vtkStdString dataDescriptionString = this->GetPythonAddress(dataDescription);
+  std::string dataDescriptionString = this->GetPythonAddress(dataDescription);
 
   std::ostringstream pythonInput;
   pythonInput << "dataDescription = vtkPVCatalyst.vtkCPDataDescription('" << dataDescriptionString
@@ -204,7 +204,7 @@ int vtkCPPythonScriptPipeline::CoProcess(vtkCPDataDescription* dataDescription)
     return 0;
   }
 
-  vtkStdString dataDescriptionString = this->GetPythonAddress(dataDescription);
+  std::string dataDescriptionString = this->GetPythonAddress(dataDescription);
 
   std::ostringstream pythonInput;
   pythonInput << "dataDescription = vtkPVCatalyst.vtkCPDataDescription('" << dataDescriptionString

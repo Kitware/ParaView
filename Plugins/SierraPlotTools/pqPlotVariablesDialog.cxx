@@ -38,7 +38,6 @@
 #include "pqUndoStack.h"
 
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QGridLayout>
 #include <QLabel>
 #include <QList>
@@ -46,6 +45,7 @@
 #include <QListWidgetItem>
 #include <QMouseEvent>
 #include <QPushButton>
+#include <QScreen>
 #include <QToolTip>
 #include <QtDebug>
 
@@ -310,7 +310,7 @@ public:
     componentArrayIndicesMap["_y"] = 1;
     componentArrayIndicesMap["_z"] = 2;
 
-    // The Symmetric Tensor – six components index order is defined
+    // The Symmetric Tensor six components index order is defined
     // by the VTK Exodus reader
     //   see vtkExodusIIReaderPrivate.h
     //   and vtkExodusIIReader.cxx in VTK library
@@ -713,7 +713,7 @@ pqPlotVariablesDialog::pqPlotVariablesDialog(QWidget* p, Qt::WindowFlags f /*=0*
   // set up some parameters for the scroll area
   // scroll area height should not be more than 60% of desktop main screen
   this->ui->rangeScrollArea->setMaximumHeight(
-    int(0.5 * QApplication::desktop()->availableGeometry().height()));
+    int(0.5 * QGuiApplication::primaryScreen()->size().height()));
 
   // main dialog height should not be more than a certain percentage of desktop main screen
 
@@ -739,7 +739,7 @@ QSize pqPlotVariablesDialog::sizeHint() const
 {
   QSize dialogSizeHint = this->QDialog::sizeHint();
 
-  float deskTopHeight = QApplication::desktop()->availableGeometry().height();
+  float deskTopHeight = QGuiApplication::primaryScreen()->size().height();
 
   dialogSizeHint.setHeight(int(0.1 * deskTopHeight));
 

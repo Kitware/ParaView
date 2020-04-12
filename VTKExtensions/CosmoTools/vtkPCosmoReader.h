@@ -90,7 +90,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkMultiProcessController;
-class vtkStdString;
 
 class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPCosmoReader : public vtkUnstructuredGridAlgorithm
 {

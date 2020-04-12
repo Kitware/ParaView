@@ -48,7 +48,7 @@ protected:
    * Get the default value that will be used for the series with the given name
    * by this domain.
    */
-  std::vector<vtkStdString> GetDefaultValue(const char* series) override;
+  std::vector<std::string> GetDefaultValue(const char* series) override;
 
 private:
   vtkSMFunctionalBagChartSeriesSelectionDomain(

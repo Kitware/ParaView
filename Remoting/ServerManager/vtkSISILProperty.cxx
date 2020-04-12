@@ -28,7 +28,6 @@
 #include "vtkSIProxy.h"
 #include "vtkSMMessage.h"
 #include "vtkSmartPointer.h"
-#include "vtkStdString.h"
 #include "vtkStringArray.h"
 
 #include <map>

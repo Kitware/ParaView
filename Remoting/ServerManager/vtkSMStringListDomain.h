@@ -32,7 +32,6 @@
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMDomain.h"
 #include <vector> //  needed for vector.
-class vtkStdString;
 
 struct vtkSMStringListDomainInternals;
 
@@ -109,8 +108,8 @@ protected:
    * Call to set the strings. Will fire DomainModifiedEvent if the domain values
    * have indeed changed.
    */
-  virtual void SetStrings(const std::vector<vtkStdString>& strings);
-  const std::vector<vtkStdString>& GetStrings();
+  virtual void SetStrings(const std::vector<std::string>& strings);
+  const std::vector<std::string>& GetStrings();
   //@}
 
 private:

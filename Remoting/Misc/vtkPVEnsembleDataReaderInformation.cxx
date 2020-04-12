@@ -23,7 +23,7 @@
 class vtkPVEnsembleDataReaderInformation::vtkInternal
 {
 public:
-  std::vector<vtkStdString> FilePaths;
+  std::vector<std::string> FilePaths;
 };
 
 vtkStandardNewMacro(vtkPVEnsembleDataReaderInformation);
@@ -86,7 +86,7 @@ void vtkPVEnsembleDataReaderInformation::CopyFromStream(const vtkClientServerStr
   }
 
   this->Internal->FilePaths.resize(filePathCount);
-  vtkStdString filePath;
+  std::string filePath;
   for (unsigned int i = 0; i < filePathCount; ++i)
   {
     if (!stream->GetArgument(0, offset++, &filePath))
@@ -104,13 +104,13 @@ unsigned int vtkPVEnsembleDataReaderInformation::GetFileCount()
 }
 
 //-----------------------------------------------------------------------------
-vtkStdString vtkPVEnsembleDataReaderInformation::GetFilePath(int unsigned i)
+std::string vtkPVEnsembleDataReaderInformation::GetFilePath(int unsigned i)
 {
   unsigned int count = static_cast<unsigned int>(this->Internal->FilePaths.size());
   if (i >= count)
   {
     vtkErrorMacro("Bad index sent to GetFilePath.");
-    return vtkStdString();
+    return std::string();
   }
   return this->Internal->FilePaths[i];
 }

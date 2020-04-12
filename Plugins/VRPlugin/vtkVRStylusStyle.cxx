@@ -62,7 +62,7 @@ void vtkVRStylusStyle::HandleButton(const vtkVREventData& data)
 {
   this->PositionRecorded = false;
 
-  vtkStdString role = this->GetButtonRole(data.name);
+  std::string role = this->GetButtonRole(data.name);
   if (role == "Translate world")
   {
     this->EnableTranslate = data.data.button.state;

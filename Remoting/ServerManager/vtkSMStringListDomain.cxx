@@ -23,13 +23,11 @@
 
 #include <vector>
 
-#include "vtkStdString.h"
-
 vtkStandardNewMacro(vtkSMStringListDomain);
 
 struct vtkSMStringListDomainInternals
 {
-  std::vector<vtkStdString> Strings;
+  std::vector<std::string> Strings;
 };
 
 //---------------------------------------------------------------------------
@@ -45,7 +43,7 @@ vtkSMStringListDomain::~vtkSMStringListDomain()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMStringListDomain::SetStrings(const std::vector<vtkStdString>& strings)
+void vtkSMStringListDomain::SetStrings(const std::vector<std::string>& strings)
 {
   if (this->SLInternals->Strings != strings)
   {
@@ -55,7 +53,7 @@ void vtkSMStringListDomain::SetStrings(const std::vector<vtkStdString>& strings)
 }
 
 //---------------------------------------------------------------------------
-const std::vector<vtkStdString>& vtkSMStringListDomain::GetStrings()
+const std::vector<std::string>& vtkSMStringListDomain::GetStrings()
 {
   return this->SLInternals->Strings;
 }
@@ -128,7 +126,7 @@ void vtkSMStringListDomain::Update(vtkSMProperty* prop)
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop);
   if (svp && svp->GetInformationOnly())
   {
-    std::vector<vtkStdString> values;
+    std::vector<std::string> values;
     unsigned int numStrings = svp->GetNumberOfElements();
     if (svp->GetNumberOfElementsPerCommand() == 2)
     {
@@ -160,7 +158,7 @@ int vtkSMStringListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElemen
     return 0;
   }
 
-  std::vector<vtkStdString> values;
+  std::vector<std::string> values;
   // Loop over the top-level elements.
   unsigned int i;
   for (i = 0; i < element->GetNumberOfNestedElements(); ++i)

@@ -369,11 +369,11 @@ bool vtkChartRepresentation::GetLocalOutput(vtkChartRepresentation::MapOfTables&
 }
 
 //----------------------------------------------------------------------------
-vtkStdString vtkChartRepresentation::GetDefaultSeriesLabel(
-  const vtkStdString& tableName, const vtkStdString& columnName)
+std::string vtkChartRepresentation::GetDefaultSeriesLabel(
+  const std::string& tableName, const std::string& columnName)
 {
-  return tableName.empty() ? vtkStdString(columnName)
-                           : vtkStdString(columnName + " (" + tableName + ")");
+  return tableName.empty() ? std::string(columnName)
+                           : std::string(columnName + " (" + tableName + ")");
 }
 
 //----------------------------------------------------------------------------

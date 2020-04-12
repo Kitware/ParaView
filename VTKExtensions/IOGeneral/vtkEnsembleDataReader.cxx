@@ -7,7 +7,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
-#include "vtkStdString.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
@@ -26,7 +25,7 @@ public:
   typedef std::vector<vtkSmartPointer<vtkAlgorithm> > VectorOfReaders;
   VectorOfReaders Readers;
 
-  std::vector<vtkStdString> FilePaths;
+  std::vector<std::string> FilePaths;
   vtkSmartPointer<vtkTable> MetaData;
 
   vtkTimeStamp ReadMetaDataMTime;
@@ -61,13 +60,13 @@ unsigned int vtkEnsembleDataReader::GetNumberOfMembers() const
 }
 
 //-----------------------------------------------------------------------------
-vtkStdString vtkEnsembleDataReader::GetFilePath(unsigned int member) const
+std::string vtkEnsembleDataReader::GetFilePath(unsigned int member) const
 {
   if (member < static_cast<unsigned int>(this->Internal->FilePaths.size()))
   {
     return this->Internal->FilePaths[member];
   }
-  return vtkStdString();
+  return std::string();
 }
 
 //-----------------------------------------------------------------------------
@@ -241,7 +240,7 @@ bool vtkEnsembleDataReader::UpdateMetaData()
   std::string fdir = vtksys::SystemTools::GetFilenamePath(this->FileName);
   for (vtkIdType row = 0; row < rowCount; ++row)
   {
-    vtkStdString filePath = fileColumn->GetValue(row);
+    std::string filePath = fileColumn->GetValue(row);
     trim(filePath); // fileName may have leading & trailing whitespace
 
     std::vector<std::string> components;

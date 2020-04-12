@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <algorithm>
 #include <sstream>
+#include <string>
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkVRInteractorStyle)
@@ -273,19 +274,19 @@ std::vector<std::string> vtkVRInteractorStyle::Tokenize(std::string input)
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRInteractorStyle::AddAnalogRole(const vtkStdString& role)
+void vtkVRInteractorStyle::AddAnalogRole(const std::string& role)
 {
   this->Analogs.insert(StringMap::value_type(role, std::string()));
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRInteractorStyle::AddButtonRole(const vtkStdString& role)
+void vtkVRInteractorStyle::AddButtonRole(const std::string& role)
 {
   this->Buttons.insert(StringMap::value_type(role, std::string()));
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRInteractorStyle::AddTrackerRole(const vtkStdString& role)
+void vtkVRInteractorStyle::AddTrackerRole(const std::string& role)
 {
   this->Trackers.insert(StringMap::value_type(role, std::string()));
 }
@@ -302,7 +303,7 @@ void vtkVRInteractorStyle::MapKeysToStringList(const StringMap& source, vtkStrin
 
 // ----------------------------------------------------------------------------
 bool vtkVRInteractorStyle::SetValueInMap(
-  StringMap& map_, const vtkStdString& key, const vtkStdString& value)
+  StringMap& map_, const std::string& key, const std::string& value)
 {
   StringMap::iterator it = map_.find(key);
   if (it != map_.end())
@@ -314,14 +315,14 @@ bool vtkVRInteractorStyle::SetValueInMap(
 }
 
 // ----------------------------------------------------------------------------
-vtkStdString vtkVRInteractorStyle::GetValueInMap(const StringMap& map_, const vtkStdString& key)
+std::string vtkVRInteractorStyle::GetValueInMap(const StringMap& map_, const std::string& key)
 {
   StringMap::const_iterator it = map_.find(key);
-  return it != map_.end() ? it->second : vtkStdString();
+  return it != map_.end() ? it->second : std::string();
 }
 
 // ----------------------------------------------------------------------------
-vtkStdString vtkVRInteractorStyle::GetKeyInMap(const StringMap& map_, const vtkStdString& value)
+std::string vtkVRInteractorStyle::GetKeyInMap(const StringMap& map_, const std::string& value)
 {
   for (StringMap::const_iterator it = map_.begin(), itEnd = map_.end(); it != itEnd; ++it)
   {
@@ -330,7 +331,7 @@ vtkStdString vtkVRInteractorStyle::GetKeyInMap(const StringMap& map_, const vtkS
       return it->first;
     }
   }
-  return vtkStdString();
+  return std::string();
 }
 
 // ----------------------------------------------------------------------------
@@ -394,55 +395,55 @@ int vtkVRInteractorStyle::GetNumberOfTrackerRoles()
 }
 
 // ----------------------------------------------------------------------------
-vtkStdString vtkVRInteractorStyle::GetAnalogRole(const vtkStdString& name)
+std::string vtkVRInteractorStyle::GetAnalogRole(const std::string& name)
 {
   return this->GetKeyInMap(this->Analogs, name);
 }
 
 // ----------------------------------------------------------------------------
-vtkStdString vtkVRInteractorStyle::GetButtonRole(const vtkStdString& name)
+std::string vtkVRInteractorStyle::GetButtonRole(const std::string& name)
 {
   return this->GetKeyInMap(this->Buttons, name);
 }
 
 // ----------------------------------------------------------------------------
-vtkStdString vtkVRInteractorStyle::GetTrackerRole(const vtkStdString& name)
+std::string vtkVRInteractorStyle::GetTrackerRole(const std::string& name)
 {
   return this->GetKeyInMap(this->Trackers, name);
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::SetAnalogName(const vtkStdString& role, const vtkStdString& name)
+bool vtkVRInteractorStyle::SetAnalogName(const std::string& role, const std::string& name)
 {
   return this->SetValueInMap(this->Analogs, role, name);
 }
 
 // ----------------------------------------------------------------------------
-vtkStdString vtkVRInteractorStyle::GetAnalogName(const vtkStdString& role)
+std::string vtkVRInteractorStyle::GetAnalogName(const std::string& role)
 {
   return this->GetValueInMap(this->Analogs, role);
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::SetButtonName(const vtkStdString& role, const vtkStdString& name)
+bool vtkVRInteractorStyle::SetButtonName(const std::string& role, const std::string& name)
 {
   return this->SetValueInMap(this->Buttons, role, name);
 }
 
 // ----------------------------------------------------------------------------
-vtkStdString vtkVRInteractorStyle::GetButtonName(const vtkStdString& role)
+std::string vtkVRInteractorStyle::GetButtonName(const std::string& role)
 {
   return this->GetValueInMap(this->Buttons, role);
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::SetTrackerName(const vtkStdString& role, const vtkStdString& name)
+bool vtkVRInteractorStyle::SetTrackerName(const std::string& role, const std::string& name)
 {
   return this->SetValueInMap(this->Trackers, role, name);
 }
 
 // ----------------------------------------------------------------------------
-vtkStdString vtkVRInteractorStyle::GetTrackerName(const vtkStdString& role)
+std::string vtkVRInteractorStyle::GetTrackerName(const std::string& role)
 {
   return this->GetValueInMap(this->Trackers, role);
 }

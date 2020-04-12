@@ -17,7 +17,6 @@
 
 #include "vtkCPPythonPipeline.h"
 #include "vtkPVPythonCatalystModule.h" // For windows import/export of shared libraries
-#include "vtkStdString.h"              // for the string
 
 class vtkCPDataDescription;
 

@@ -15,7 +15,6 @@
 #include "vtkSMFunctionalBagChartSeriesSelectionDomain.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkStdString.h"
 #include "vtksys/SystemTools.hxx"
 
 #include <vector>
@@ -42,10 +41,10 @@ bool vtkSMFunctionalBagChartSeriesSelectionDomain::GetDefaultSeriesVisibility(co
 }
 
 //----------------------------------------------------------------------------
-std::vector<vtkStdString> vtkSMFunctionalBagChartSeriesSelectionDomain::GetDefaultValue(
+std::vector<std::string> vtkSMFunctionalBagChartSeriesSelectionDomain::GetDefaultValue(
   const char* series)
 {
-  std::vector<vtkStdString> values;
+  std::vector<std::string> values;
   std::string name(series);
   if (this->DefaultMode == LABEL)
   {

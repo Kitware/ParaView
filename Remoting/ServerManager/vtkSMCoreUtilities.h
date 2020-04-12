@@ -24,7 +24,8 @@
 
 #include "vtkObject.h"
 #include "vtkRemotingServerManagerModule.h" //needed for exports
-#include "vtkStdString.h"                   // needed for vtkStdString.
+
+#include <string>
 
 class vtkSMProxy;
 
@@ -45,7 +46,7 @@ public:
   /**
    * Sanitize a label/name to be remove spaces, delimiters etc.
    */
-  static vtkStdString SanitizeName(const char*);
+  static std::string SanitizeName(const char*);
 
   //@{
   /**

@@ -20,7 +20,6 @@
 #include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
-#include "vtkStdString.h"
 #include "vtkWeakPointer.h"
 
 #include <assert.h>
@@ -32,7 +31,7 @@ struct vtkSMDomainInternals
   // There's no reason why a domain should have a hard reference to the required
   // property since both the domain and the required property belong to the same
   // proxy, so they will be deleted only when the proxy disappears.
-  typedef std::map<vtkStdString, vtkWeakPointer<vtkSMProperty> > PropertyMap;
+  typedef std::map<std::string, vtkWeakPointer<vtkSMProperty> > PropertyMap;
   PropertyMap RequiredProperties;
 
   // This is the property that has this domain.

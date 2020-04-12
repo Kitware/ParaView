@@ -23,7 +23,6 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
-#include "vtkStdString.h"
 
 #include <map>
 #include <string>
@@ -34,7 +33,7 @@
 //*****************************************************************************
 struct vtkSMDataTypeDomainInternals
 {
-  std::vector<vtkStdString> DataTypes;
+  std::vector<std::string> DataTypes;
 };
 //*****************************************************************************
 namespace vtkSMDataTypeDomainCache

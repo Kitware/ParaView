@@ -34,7 +34,6 @@
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
-#include "vtkStdString.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 #include "vtkTypeTraits.h"
@@ -859,7 +858,7 @@ int vtkFileSeriesReader::ReadMetaDataFile(const char* metafilename, vtkStringArr
     while (
       metafile.good() && !metafile.eof() && (filesToRead->GetNumberOfTuples() < maxFilesToRead))
     {
-      vtkStdString fname;
+      std::string fname;
       metafile >> fname;
       if (fname.empty())
         continue;
@@ -873,7 +872,7 @@ int vtkFileSeriesReader::ReadMetaDataFile(const char* metafilename, vtkStringArr
           return 0;
         }
       }
-      filesToRead->InsertNextValue(FromRelativeToMetaFile(metafilename, fname));
+      filesToRead->InsertNextValue(FromRelativeToMetaFile(metafilename, fname.c_str()));
     }
     return 1;
   }

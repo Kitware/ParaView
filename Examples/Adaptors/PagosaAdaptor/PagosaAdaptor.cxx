@@ -122,7 +122,7 @@ extern "C" void setcoprocessorfield_(char* fname, int* len, int* mx, int* my, in
   if (*down_convert)
   {
     vtkNew<vtkUnsignedCharArray> att;
-    vtkStdString name(fname, *len);
+    std::string name(fname, *len);
     att->SetName(name);
     att->SetNumberOfComponents(1);
     att->SetNumberOfTuples(numCells);
@@ -135,7 +135,7 @@ extern "C" void setcoprocessorfield_(char* fname, int* len, int* mx, int* my, in
   else
   {
     vtkNew<vtkFloatArray> att;
-    vtkStdString name(fname, *len);
+    std::string name(fname, *len);
     att->SetName(name);
     att->SetNumberOfComponents(1);
     att->SetArray(data, numCells, 1);
@@ -227,7 +227,7 @@ extern "C" void addmarkerscalarfield_(char* fname, // Name of data
   vtkUnstructuredGrid* ugrid = vtkUnstructuredGrid::SafeDownCast(mgrid->GetBlock(0));
 
   // Get the data array for this variable
-  vtkStdString varName(fname, *len);
+  std::string varName(fname, *len);
   vtkFloatArray* dataArray = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName));
 
   // If it doesn't exist, create and size, and refetch
@@ -267,7 +267,7 @@ extern "C" void addmarkervectorfield_(char* fname, // Name of data
   vtkUnstructuredGrid* ugrid = vtkUnstructuredGrid::SafeDownCast(mgrid->GetBlock(0));
 
   // Get the data array for this variable
-  vtkStdString varName(fname, *len);
+  std::string varName(fname, *len);
   vtkFloatArray* dataArray = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName));
 
   // If it doesn't exist, create and size, and refetch
@@ -314,7 +314,7 @@ extern "C" void addmarkertensorfield_(char* fname, // Name of data
   vtkUnstructuredGrid* ugrid = vtkUnstructuredGrid::SafeDownCast(mgrid->GetBlock(0));
 
   // Get the data array for this variable
-  vtkStdString varName(fname, *len);
+  std::string varName(fname, *len);
   vtkFloatArray* dataArray = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName));
 
   // If it doesn't exist, create and size, and refetch

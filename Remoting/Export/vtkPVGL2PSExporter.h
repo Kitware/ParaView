@@ -25,7 +25,6 @@
 
 #include "vtkOpenGLGL2PSExporter.h"
 #include "vtkRemotingExportModule.h" // needed for export macro
-#include "vtkStdString.h"            // for vtkStdString
 
 class VTKREMOTINGEXPORT_EXPORT vtkPVGL2PSExporter : public vtkOpenGLGL2PSExporter
 {
@@ -56,7 +55,7 @@ public:
 
   void WriteData() override;
 
-  vtkStdString FileName;
+  std::string FileName;
   int ExcludeCubeAxesActorsFromRasterization;
 
 private:

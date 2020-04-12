@@ -28,7 +28,6 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMUncheckedPropertyHelper.h"
-#include "vtkStdString.h"
 #include "vtkStringList.h"
 
 #include <algorithm>
@@ -41,14 +40,14 @@ vtkStandardNewMacro(vtkSMArrayListDomain);
 
 struct vtkSMArrayListDomainInformationKey
 {
-  vtkStdString Location;
-  vtkStdString Name;
+  std::string Location;
+  std::string Name;
   int Strategy;
 };
 
 struct vtkSMArrayListDomainArrayInformation
 {
-  vtkStdString ArrayName;
+  std::string ArrayName;
   bool IsPartial;
 
   // data association for this array on input.
@@ -115,9 +114,9 @@ public:
   void BuildArrayList(DomainValuesSet& result, vtkSMArrayListDomain* self,
     vtkSMProperty* fieldDataSelection, vtkSMInputArrayDomain* iad, vtkPVDataInformation* dataInfo);
 
-  std::vector<vtkStdString> GetDomainValueStrings()
+  std::vector<std::string> GetDomainValueStrings()
   {
-    std::vector<vtkStdString> values;
+    std::vector<std::string> values;
     for (DomainValuesVector::const_iterator iter = this->DomainValues.begin(),
                                             end = this->DomainValues.end();
          iter != end; ++iter)
@@ -159,7 +158,7 @@ private:
     for (size_t cc = 0, max = this->InformationKeys.size(); cc < max; ++cc)
     {
       vtkSMArrayListDomainInformationKey& key = this->InformationKeys[cc];
-      int hasInfo = arrayInfo->HasInformationKey(key.Location, key.Name);
+      int hasInfo = arrayInfo->HasInformationKey(key.Location.c_str(), key.Name.c_str());
       if (hasInfo && key.Strategy == vtkSMArrayListDomain::REJECT_KEY)
       {
         return false;
@@ -772,7 +771,7 @@ const char* vtkSMArrayListDomain::GetInformationKeyLocation(unsigned int index)
 {
   if (index < this->ALDInternals->InformationKeys.size())
   {
-    return this->ALDInternals->InformationKeys[index].Location;
+    return this->ALDInternals->InformationKeys[index].Location.c_str();
   }
   return NULL;
 }
@@ -782,7 +781,7 @@ const char* vtkSMArrayListDomain::GetInformationKeyName(unsigned int index)
 {
   if (index < this->ALDInternals->InformationKeys.size())
   {
-    return this->ALDInternals->InformationKeys[index].Name;
+    return this->ALDInternals->InformationKeys[index].Name.c_str();
   }
   return NULL;
 }
@@ -829,8 +828,7 @@ void vtkSMArrayListDomain::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //---------------------------------------------------------------------------
-vtkStdString vtkSMArrayListDomain::CreateMangledName(
-  vtkPVArrayInformation* arrayInfo, int component)
+std::string vtkSMArrayListDomain::CreateMangledName(vtkPVArrayInformation* arrayInfo, int component)
 {
   std::ostringstream stream;
   if (component != arrayInfo->GetNumberOfComponents())
@@ -845,11 +843,11 @@ vtkStdString vtkSMArrayListDomain::CreateMangledName(
 }
 
 //---------------------------------------------------------------------------
-vtkStdString vtkSMArrayListDomain::ArrayNameFromMangledName(const char* name)
+std::string vtkSMArrayListDomain::ArrayNameFromMangledName(const char* name)
 {
-  vtkStdString extractedName = name;
+  std::string extractedName = name;
   size_t pos = extractedName.rfind("_");
-  if (pos == vtkStdString::npos)
+  if (pos == std::string::npos)
   {
     return extractedName;
   }
@@ -860,13 +858,13 @@ vtkStdString vtkSMArrayListDomain::ArrayNameFromMangledName(const char* name)
 int vtkSMArrayListDomain::ComponentIndexFromMangledName(
   vtkPVArrayInformation* info, const char* name)
 {
-  vtkStdString extractedName = name;
+  std::string extractedName = name;
   size_t pos = extractedName.rfind("_");
-  if (pos == vtkStdString::npos)
+  if (pos == std::string::npos)
   {
     return -1;
   }
-  vtkStdString compName = extractedName.substr(pos + 1, extractedName.length() - pos);
+  std::string compName = extractedName.substr(pos + 1, extractedName.length() - pos);
   int numComps = info->GetNumberOfComponents();
   if (compName == "Magnitude")
   {

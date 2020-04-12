@@ -100,7 +100,7 @@ protected:
 
 //----------------------------------------------------------------------------
 // Hide use of std::map from public interface
-class vtkContext2DScalarBarActor::vtkAnnotationMap : public std::map<double, vtkStdString>
+class vtkContext2DScalarBarActor::vtkAnnotationMap : public std::map<double, std::string>
 {
 };
 
@@ -618,7 +618,7 @@ void vtkContext2DScalarBarActor::PaintColorBar(vtkContext2D* painter, double siz
       double indexedColor[4];
       vtkVariant annotatedValue = ctf->GetAnnotatedValue(i);
       ctf->GetIndexedColor(i, indexedColor);
-      vtkStdString annotation = ctf->GetAnnotation(i);
+      std::string annotation = ctf->GetAnnotation(i);
       brush->SetColorF(indexedColor);
       if (this->Orientation == VTK_ORIENT_VERTICAL)
       {
@@ -759,7 +759,7 @@ void vtkContext2DScalarBarActor::PaintColorBar(vtkContext2D* painter, double siz
         double barPosition = normalizedValue * (high - low) + low;
         if (normalizedValue >= 0.0 && normalizedValue <= 1.0 && !vtkMath::IsNan(barPosition))
         {
-          vtkStdString annotation = ctf->GetAnnotation(i);
+          std::string annotation = ctf->GetAnnotation(i);
           annotationAnchors[barPosition] = annotation;
         }
       }
@@ -1152,7 +1152,7 @@ typedef struct AI
 {
   double Anchor;
   double Position;
-  vtkStdString Annotation;
+  std::string Annotation;
   double Span;
 } AnnotationInfo;
 

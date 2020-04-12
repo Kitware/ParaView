@@ -55,7 +55,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkSpreadSheetView.h"
-#include "vtkStdString.h"
 #include "vtkTable.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkVariant.h"

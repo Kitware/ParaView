@@ -78,7 +78,6 @@
 
 #include "vtkObject.h"
 #include "vtkRemotingServerManagerModule.h" //needed for exports
-#include "vtkStdString.h"                   // needed for vtkStdString.
 #include <vector>                           // needed for vector.
 #include <vtk_jsoncpp_fwd.h>                // for forward declarations
 

@@ -34,7 +34,6 @@
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVPostFilter.h"
 #include "vtkPointData.h"
-#include "vtkStdString.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
 #include "vtkVariant.h"
@@ -448,8 +447,8 @@ void vtkPVProminentValuesInformation::CopyToStream(vtkClientServerStream* css)
 void vtkPVProminentValuesInformation::CopyFromStream(const vtkClientServerStream* css)
 {
   int pos = 0;
-  vtkStdString fieldAssoc;
-  vtkStdString fieldName;
+  std::string fieldAssoc;
+  std::string fieldName;
   if (!css->GetArgument(0, pos++, &this->PortNumber))
   {
     vtkErrorMacro("Error parsing dataset port number from message.");

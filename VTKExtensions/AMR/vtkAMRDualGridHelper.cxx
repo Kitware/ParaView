@@ -26,7 +26,6 @@
 #include "vtkNonOverlappingAMR.h"
 #include "vtkObjectFactory.h"
 #include "vtkSortDataArray.h"
-#include "vtkStdString.h"
 #include "vtkTimerLog.h"
 #include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
@@ -89,7 +88,7 @@ public:
   }
 
 private:
-  vtkStdString EventString;
+  std::string EventString;
   vtkSmartPointer<vtkMultiProcessController> Controller;
   vtkTimerLogSmartMarkEvent(const vtkTimerLogSmartMarkEvent&) = delete;
   void operator=(const vtkTimerLogSmartMarkEvent&) = delete;

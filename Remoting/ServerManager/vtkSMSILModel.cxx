@@ -27,7 +27,6 @@
 #include "vtkSMSILDomain.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
-#include "vtkStdString.h"
 #include "vtkStringArray.h"
 
 #include <map>

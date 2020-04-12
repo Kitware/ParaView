@@ -98,7 +98,7 @@ vtkSMProperty* vtkSMNamedPropertyIterator::GetProperty()
 
   // get the requested prooperty's name, it's the key into
   // the map.
-  vtkStdString name = this->PropertyNames->GetString(this->PropertyNameIndex);
+  std::string name = this->PropertyNames->GetString(this->PropertyNameIndex);
 
   // Is the requested property in this proxy?
   PropertyIterator propEnd = this->Proxy->Internals->Properties.end();

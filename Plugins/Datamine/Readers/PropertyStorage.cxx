@@ -14,7 +14,7 @@
 
 // --------------------------------------
 PropertyItem::PropertyItem(
-  const vtkStdString& aname, const bool& numeric, const int& pos, const int& status, int numRecords)
+  const std::string& aname, const bool& numeric, const int& pos, const int& status, int numRecords)
 {
   this->isNumeric = numeric;
 
@@ -50,7 +50,7 @@ PropertyItem::PropertyItem(
         this->Storage.TakeReference(vtkStringArray::New());
       }
       this->Storage->Allocate(numRecords);
-      this->Storage->SetName(this->name);
+      this->Storage->SetName(this->name.c_str());
       break;
     case 0:
     default:
@@ -75,7 +75,7 @@ PropertyStorage::~PropertyStorage()
 void PropertyStorage::AddProperty(
   char* name, const bool& numeric, const int& pos, const int& status, int numRecords)
 {
-  vtkStdString vname(name);
+  std::string vname(name);
   if (this->properties.size() > 0)
   {
     PropertyItem& lastItem = this->properties.back();
@@ -110,7 +110,7 @@ void PropertyStorage::AddValues(Data* values)
       {
         char ctmp[5];
         ctmp[4] = 0;
-        vtkStdString tempBuf;
+        std::string tempBuf;
         for (int pos = item.startPos; pos < item.endPos; ++pos)
         {
           ctmp[0] = values[pos].c[0];

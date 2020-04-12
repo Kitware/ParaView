@@ -30,7 +30,6 @@
 #include "vtkPVOptions.h"
 #include "vtkPolyData.h"
 #include "vtkSessionIterator.h"
-#include "vtkStdString.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTCPNetworkAccessManager.h"
 #include "vtkUnstructuredGrid.h"

@@ -103,7 +103,7 @@ const char* vtkSMOrderedPropertyIterator::GetKey()
 
   if (!this->IsAtEnd())
   {
-    return this->Proxy->Internals->PropertyNamesInOrder[this->Index];
+    return this->Proxy->Internals->PropertyNamesInOrder[this->Index].c_str();
   }
 
   return 0;
@@ -120,7 +120,7 @@ const char* vtkSMOrderedPropertyIterator::GetPropertyLabel()
 
   if (!this->IsAtEnd())
   {
-    const char* pname = this->Proxy->Internals->PropertyNamesInOrder[this->Index];
+    const char* pname = this->Proxy->Internals->PropertyNamesInOrder[this->Index].c_str();
 
     if (vtkSMProperty* prop = this->Proxy->GetProperty(pname, /*selfOnly*/ 1))
     {
@@ -148,7 +148,8 @@ vtkSMProperty* vtkSMOrderedPropertyIterator::GetProperty()
 
   if (!this->IsAtEnd())
   {
-    return this->Proxy->GetProperty(this->Proxy->Internals->PropertyNamesInOrder[this->Index]);
+    return this->Proxy->GetProperty(
+      this->Proxy->Internals->PropertyNamesInOrder[this->Index].c_str());
   }
   return 0;
 }

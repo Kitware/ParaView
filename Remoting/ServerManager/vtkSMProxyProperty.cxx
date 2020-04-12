@@ -30,7 +30,6 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSmartPointer.h"
-#include "vtkStdString.h"
 
 #include <assert.h>
 

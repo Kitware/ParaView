@@ -23,7 +23,6 @@
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
-#include "vtkStdString.h"
 
 #include <algorithm>
 #include <assert.h>
@@ -60,7 +59,7 @@ void vtkSMChartSeriesListDomain::Update(vtkSMProperty*)
     return;
   }
 
-  std::vector<vtkStdString> strings;
+  std::vector<std::string> strings;
   int fieldAssociation = vtkSMUncheckedPropertyHelper(fieldDataSelection).GetAsInt(0);
   vtkPVDataSetAttributesInformation* dsa = dataInfo->GetAttributeInformation(fieldAssociation);
 
@@ -80,7 +79,7 @@ void vtkSMChartSeriesListDomain::Update(vtkSMProperty*)
 
 //----------------------------------------------------------------------------
 void vtkSMChartSeriesListDomain::PopulateArrayComponents(
-  vtkPVArrayInformation* arrayInfo, std::vector<vtkStdString>& strings)
+  vtkPVArrayInformation* arrayInfo, std::vector<std::string>& strings)
 {
   if (arrayInfo && (this->HidePartialArrays == false || arrayInfo->GetIsPartial() == 0))
   {
@@ -157,7 +156,7 @@ int vtkSMChartSeriesListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_u
 {
   const char** strings_to_check = vtkSMChartSeriesListDomain::GetKnownSeriesNames();
 
-  const std::vector<vtkStdString> domain_strings = this->GetStrings();
+  const std::vector<std::string> domain_strings = this->GetStrings();
   for (int cc = 0; strings_to_check[cc] != NULL; cc++)
   {
     if (std::find(domain_strings.begin(), domain_strings.end(),

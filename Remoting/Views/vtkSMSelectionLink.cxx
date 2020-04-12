@@ -27,7 +27,6 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSelectionNode.h"
-#include "vtkStdString.h"
 #include "vtkWeakPointer.h"
 
 #include <list>

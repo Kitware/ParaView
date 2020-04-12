@@ -54,7 +54,7 @@ protected:
 
   // finds a file path based on the input. Used to find the other file for topo/triangle
   // was code in RI, but moved to a method to reduce duplication
-  bool FindAndSetFilePath(vtkStdString& dmExt, const bool& update, FileTypes type);
+  bool FindAndSetFilePath(std::string& dmExt, const bool& update, FileTypes type);
 
   void Read(vtkPoints* points, vtkCellArray* cells) override;
   void ReadPoints(vtkPoints* points);

@@ -21,7 +21,6 @@
 #include "vtkPen.h"
 #include "vtkPlot.h"
 #include "vtkPlotBox.h"
-#include "vtkStdString.h"
 #include "vtkTable.h"
 
 #include <map>

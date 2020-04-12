@@ -75,7 +75,7 @@ vtkVRGrabWorldStyle::~vtkVRGrabWorldStyle()
 // ----------------------------------------------------------------------------
 void vtkVRGrabWorldStyle::HandleButton(const vtkVREventData& data)
 {
-  vtkStdString role = this->GetButtonRole(data.name);
+  std::string role = this->GetButtonRole(data.name);
   if (role == "Translate world")
   {
     this->EnableTranslate = data.data.button.state;
@@ -103,7 +103,7 @@ void vtkVRGrabWorldStyle::HandleButton(const vtkVREventData& data)
 // ----------------------------------------------------------------------------
 void vtkVRGrabWorldStyle::HandleTracker(const vtkVREventData& data)
 {
-  vtkStdString role = this->GetTrackerRole(data.name);
+  std::string role = this->GetTrackerRole(data.name);
   if (role == "Tracker")
   {
     if (this->EnableTranslate)

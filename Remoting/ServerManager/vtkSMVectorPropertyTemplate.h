@@ -72,8 +72,8 @@ B vtkSMVPConvertFromString(const std::string& string_representation)
 }
 
 template <>
-vtkMaybeUnused("not used in non-string specializations")
-  vtkStdString vtkSMVPConvertFromString<vtkStdString>(const std::string& string_representation)
+vtkMaybeUnused("not used in non-string specializations") std::string
+  vtkSMVPConvertFromString<std::string>(const std::string& string_representation)
 {
   return string_representation;
 }

@@ -62,7 +62,6 @@
 #include "vtkRemotingServerManagerModule.h" // needed for exports
 #include "vtkSMObject.h"
 #include "vtkSmartPointer.h" // needed for iVar
-#include "vtkStdString.h"    // needed for ivar
 
 #include <vector>
 
@@ -98,7 +97,7 @@ public:
    * Stop trace and return the generated trace script.
    * This will also destroy the active tracer.
    */
-  static vtkStdString StopTrace();
+  static std::string StopTrace();
 
   //@{
   /**
@@ -153,7 +152,7 @@ public:
   /**
    * Return the current trace.
    */
-  vtkStdString GetCurrentTrace();
+  std::string GetCurrentTrace();
 
   /**
    * Save a Python state for the application and return it. Note this cannot be
@@ -165,7 +164,7 @@ public:
    * If `skipRenderingComponents` is true, all rendering components like view,
    * representations etc. are entirely skipped from the trace.
    */
-  static vtkStdString GetState(
+  static std::string GetState(
     int propertiesToTraceOnCreate, bool skipHiddenRepresentations, bool skipRenderingComponents);
 
   // ************** BEGIN INTERNAL *************************

@@ -40,7 +40,6 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
-#include "vtkStdString.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 #include "vtkStructuredGrid.h"

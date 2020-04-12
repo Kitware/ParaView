@@ -32,7 +32,6 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
-#include "vtkStdString.h"
 
 #include <map>
 #include <set>
@@ -128,7 +127,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class vtkSMProxyManagerProxyMapType : public std::map<vtkStdString, vtkSMProxyManagerProxyListType>
+class vtkSMProxyManagerProxyMapType : public std::map<std::string, vtkSMProxyManagerProxyListType>
 {
 };
 //-----------------------------------------------------------------------------
@@ -190,7 +189,7 @@ struct vtkSMSessionProxyManagerInternals
 {
   // This data structure stores actual proxy instances grouped in
   // collections.
-  typedef std::map<vtkStdString, vtkSMProxyManagerProxyMapType> ProxyGroupType;
+  typedef std::map<std::string, vtkSMProxyManagerProxyMapType> ProxyGroupType;
   ProxyGroupType RegisteredProxyMap;
 
   // This data structure stores the tuples(group, name, proxy) to compute
@@ -203,7 +202,7 @@ struct vtkSMSessionProxyManagerInternals
   SetOfProxies ModifiedProxies;
 
   // Data structure to save registered links.
-  typedef std::map<vtkStdString, vtkSmartPointer<vtkSMLink> > LinkType;
+  typedef std::map<std::string, vtkSmartPointer<vtkSMLink> > LinkType;
   LinkType RegisteredLinkMap;
 
   // Data structure for selection models.

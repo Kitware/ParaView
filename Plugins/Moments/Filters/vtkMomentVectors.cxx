@@ -28,7 +28,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
-#include "vtkStdString.h"
 
 #include "vtkSmartPointer.h"
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
@@ -158,7 +157,7 @@ const char* vtkMomentVectors::GetOutputMomentTotalName(vtkDataObject* input)
 
   if (this->InputMomentIsDensity)
   {
-    static vtkStdString result;
+    static std::string result;
     result = inputArray->GetName();
     result += "_total";
     return result.c_str();
@@ -190,7 +189,7 @@ const char* vtkMomentVectors::GetOutputMomentDensityName(vtkDataObject* input)
   }
   else
   {
-    static vtkStdString result;
+    static std::string result;
     result = inputArray->GetName();
     result += "_density";
     return result.c_str();
