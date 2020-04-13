@@ -60,6 +60,14 @@ public:
    */
   QVector<double> series() const;
 
+  //@{
+  /**
+   * Set the range for the series.
+   */
+  void setRange(double range[2]);
+  void setRange(int range[2]);
+  //@}
+
 private:
   Q_DISABLE_COPY(pqSeriesGeneratorDialog);
 
