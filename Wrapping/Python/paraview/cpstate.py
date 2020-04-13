@@ -11,6 +11,7 @@ Python CoProcessing script that can be used with in a vtkCPPythonScriptPipeline.
 """
 
 from paraview import smtrace, smstate, servermanager
+import numbers
 
 _cpstate_globals = None
 
@@ -32,6 +33,7 @@ def initialize_globals():
             self.channels_needed = []
             self.enable_live_viz = False
             self.live_viz_frequency = 0
+            self.variable_to_name_map = {}
     _cpstate_globals = _state()
     return _cpstate_globals
 
@@ -313,6 +315,7 @@ def cp_hook(varname, proxy):
     """callback to create our special accessors instead of the standard ones."""
     pname = smtrace.Trace.get_registered_name(proxy, "sources")
     cpstate_globals = get_globals()
+    cpstate_globals.variable_to_name_map[proxy] = varname
     if pname:
         if pname in cpstate_globals.simulation_input_map:
             return ProducerAccessor(varname, proxy, cpstate_globals.simulation_input_map[pname])
@@ -403,21 +406,6 @@ class NewStyleWriters(object):
             padding_amount = globalepxy.GetProperty("FileNamePadding").GetElement(0)
             write_frequency = pxy.GetProperty("WriteFrequency").GetElement(0)
             filename = pxy.GetProperty("CatalystFilePattern").GetElement(0)
-            DataMode = pxy.GetProperty("DataMode")
-            if DataMode is not None:
-                DataMode = pxy.GetProperty("DataMode").GetElement(0)
-            HeaderType = pxy.GetProperty("HeaderType")
-            if HeaderType is not None:
-                HeaderType = pxy.GetProperty("HeaderType").GetElement(0)
-            EncodeAppendedData=pxy.GetProperty("EncodeAppendedData")
-            if EncodeAppendedData is not None:
-                EncodeAppendedData = pxy.GetProperty("EncodeAppendedData").GetElement(0)!=0
-            CompressorType = pxy.GetProperty("CompressorType")
-            if CompressorType is not None:
-                CompressorType = pxy.GetProperty("CompressorType").GetElement(0)
-            CompressionLevel = pxy.GetProperty("CompressionLevel")
-            if CompressionLevel is not None:
-                CompressionLevel = pxy.GetProperty("CompressionLevel").GetElement(0)
 
             cpstate_globals = get_globals()
             sim_inputs = locate_simulation_inputs(pxy)
@@ -451,12 +439,33 @@ class NewStyleWriters(object):
             # Actual writer
             f = "%s = servermanager.writers.%s(Input=%s)" % (varname, writername, inputname)
             res.append(f)
+            # set various writer properties, except for the filename since that will be set later.
+            # point, cell and field arrays should already be set
+            notNeededProperties = ['CatalystFilePattern', 'CellDataArrays', 'ChooseArraysToWrite', 'EdgeDataArrays',
+                                   'FieldDataArrays', 'FileName', 'FileNameSuffix', 'Filenamesuffix', 'Input',
+                                   'PointDataArrays', 'WriteFrequency',]
+            for p in pxy.ListProperties():
+                if p not in notNeededProperties and len(pxy.GetProperty(p)):
+                    if isinstance(pxy.GetProperty(p).GetData(), servermanager.Proxy):
+                        proxyvalue = pxy.GetProperty(p).GetData()
+                        cpstate_globals = get_globals()
+                        if proxyvalue in cpstate_globals.variable_to_name_map:
+                            f = "%s.%s = %s" % (varname, p, cpstate_globals.variable_to_name_map[proxyvalue])
+                    else:
+                        value = pxy.GetProperty(p).GetElement(0)
+                        if isinstance(value, numbers.Number):
+                            f = "%s.%s = %s" % (varname, p, value)
+                        elif  isinstance(value, str):
+                            f = "%s.%s = '%s'" % (varname, p, value)
+                        else:
+                            f = "%s.%s = %s" % (varname, p, str(value))
+                    res.append(f)
             if self.__make_temporal_script:
                 f = "STP.RegisterWriter(%s, '%s', tp_writers)" % (
                     varname, filename)
             else:
-                f = "coprocessor.RegisterWriter(%s, filename='%s', freq=%s, paddingamount=%s, DataMode='%s', HeaderType='%s', EncodeAppendedData=%s, CompressorType='%s', CompressionLevel='%s')" % (
-                    varname, filename, write_frequency, padding_amount, DataMode, HeaderType, EncodeAppendedData, CompressorType, CompressionLevel)
+                f = "coprocessor.RegisterWriter(%s, filename='%s', freq=%s, paddingamount=%s)" % (
+                    varname, filename, write_frequency, padding_amount)
             res.append(f)
             res.append("")
         if len(res) == 2:

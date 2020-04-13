@@ -145,4 +145,80 @@
       <!-- End of PLYWriter -->
     </PSWriterProxy>
   </ProxyGroup>
+
+  <!-- the following is needed for the gui export -->
+  <ProxyGroup name="insitu2_writer_parameters">
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="writers"
+                 base_proxyname="PPLYWriter"
+                 class="vtkParallelSerialWriter"
+                 name="PPLYWriter"
+                 supports_parallel="1">
+      <Documentation short_help="Expose a writer for catalyst.">
+        Variation with catalyst specific extensions.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    </WriterProxy>
+    <!-- End of PPLYWriter -->
+  </ProxyGroup>
+
+
+  <!-- Catalyst client only proxies, used to generate a coprocessing script
+       and to modify writer filename and frequency through ParaView Live
+  -->
+  <!-- ================================================================= -->
+  <ProxyGroup name="insitu_writer_parameters">
+    <SourceProxy name="PPLYWriter" class="vtkPVNullSource"
+      label="Parallel PLY Writer">
+      <InputProperty name="Input">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type" composite_data_supported="0">
+            <DataType value="vtkPolyData" />
+          </DataTypeDomain>
+          <Documentation>
+            The input.
+          </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+        number_of_elements="1"
+        default_values="filename_%t.ply">
+     </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PaddingAmount"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+
+     <Hints>
+      <!-- TODO: this doesn't work yet -->
+      <PipelineIcon name=":pqComponents/pqSave.svg" />
+
+      <!-- This will help us when exporting the script state -->
+      <WriterProxy group="writers" name="PPLYWriter" />
+     </Hints>
+     <!-- End of PPLYWriter -->
+    </SourceProxy>
+  </ProxyGroup>
+
 </ServerManagerConfiguration>
