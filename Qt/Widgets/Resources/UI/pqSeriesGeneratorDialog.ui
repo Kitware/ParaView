@@ -6,48 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>336</width>
-    <height>257</height>
+    <width>352</width>
+    <height>315</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Generate Number Series</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,1,0">
-   <item row="1" column="0" colspan="2">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="pqDoubleLineEdit" name="min"/>
-     </item>
-     <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;-&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="pqDoubleLineEdit" name="max"/>
-     </item>
-    </layout>
-   </item>
-   <item row="2" column="0" colspan="2">
-    <widget class="Line" name="line_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Type:</string>
-     </property>
-    </widget>
-   </item>
+  <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0">
    <item row="3" column="1">
     <widget class="QComboBox" name="comboBox">
      <item>
@@ -70,6 +36,40 @@
        <string>Geometric (common ratio)</string>
       </property>
      </item>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="pqDoubleLineEdit" name="min"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;-&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="pqDoubleLineEdit" name="max"/>
+     </item>
+    </layout>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Type:</string>
+     </property>
     </widget>
    </item>
    <item row="4" column="0">
@@ -106,22 +106,6 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="0" colspan="2">
-    <widget class="QLabel" name="message">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
    <item row="7" column="0" colspan="2">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
@@ -152,6 +136,47 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item row="6" column="0" colspan="2">
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>326</width>
+        <height>79</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QLabel" name="message">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
    </item>
   </layout>
  </widget>
