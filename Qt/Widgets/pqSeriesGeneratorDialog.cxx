@@ -246,19 +246,3 @@ QVector<double> pqSeriesGeneratorDialog::series() const
   auto& internals = (*this->Internals);
   return internals.validate() ? internals.values() : QVector<double>();
 }
-
-//-----------------------------------------------------------------------------
-void pqSeriesGeneratorDialog::setRange(double range[2])
-{
-  auto& internals = (*this->Internals);
-  internals.Ui.min->setText(QVariant(range[0]).toString());
-  internals.Ui.max->setText(QVariant(range[1]).toString());
-}
-
-//-----------------------------------------------------------------------------
-void pqSeriesGeneratorDialog::setRange(int range[2])
-{
-  auto& internals = (*this->Internals);
-  internals.Ui.min->setText(QVariant(range[0]).toString());
-  internals.Ui.max->setText(QVariant(range[1]).toString());
-}
