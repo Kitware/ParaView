@@ -479,6 +479,7 @@ SET (TESTS_WITHOUT_BASELINES
   StringInLineChartView.xml
   TableHistogram.xml
   TestCompositePropertyWidgetDecorator.xml
+  TextSource.xml
 )
 
 if (PARAVIEW_PLUGIN_ENABLE_EULATestPlugin)

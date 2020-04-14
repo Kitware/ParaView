@@ -61,9 +61,9 @@ protected:
   void setWindowLocation(QString&);
 
 protected slots:
-  void emitWindowLocationChangedSignal();
-  void groupBoxLocationClicked(bool);
-  void groupBoxPositionClicked(bool);
+  void groupBoxLocationClicked();
+  void groupBoxPositionClicked();
+  void updateUI();
 
 private:
   Q_DISABLE_COPY(pqTextLocationWidget)
