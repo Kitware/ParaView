@@ -65,6 +65,11 @@ endif ()
 
 set(paraview_cmake_dir "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 set(vtk_cmake_dir "${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake")
+if (NOT IS_DIRECTORY "${vtk_cmake_dir}")
+  message(FATAL_ERROR
+    "Failed to find the VTK CMake directory. Did you forget to initialize the "
+    "submodule? (git submodule update --init --recursive)")
+endif ()
 list(APPEND CMAKE_MODULE_PATH
   "${paraview_cmake_dir}"
   "${vtk_cmake_dir}")
