@@ -86,7 +86,7 @@ configure_file(
   "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/paraview-config"
   @ONLY)
 install(
-  PROGRAMS    "${CMAKE_CURRENT_SOURCE_DIR}/paraview-config"
+  PROGRAMS    "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/paraview-config"
   DESTINATION "${CMAKE_INSTALL_BINDIR}"
   COMPONENT   development)
 
