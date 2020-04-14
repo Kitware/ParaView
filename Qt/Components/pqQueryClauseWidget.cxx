@@ -772,7 +772,7 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
       QString currentQuery(vtkSMPropertyHelper(selSource, "QueryString").GetAsString());
       if (!currentQuery.isEmpty())
       {
-        query = QString("%1 and %2").arg(currentQuery).arg(query);
+        query = QString("%1 & %2").arg(currentQuery, query);
       }
       this->LastQuery = query;
       if (!query.isEmpty())
