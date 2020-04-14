@@ -706,6 +706,7 @@ list(APPEND TESTS_WITH_BASELINES
   ChartAxisRangeAndLabels.xml
   CheckableHeader.xml
   Clip.xml
+  CrinkleClip.xml
   ColorEditorControls.xml
   ColorEditorVolumeControls.xml
   ColorLegendMinMaxLabels.xml
