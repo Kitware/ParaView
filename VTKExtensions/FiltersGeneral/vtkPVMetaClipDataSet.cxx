@@ -113,10 +113,7 @@ void vtkPVMetaClipDataSet::SetUseValueAsOffset(int value)
 //----------------------------------------------------------------------------
 void vtkPVMetaClipDataSet::PreserveInputCells(int keepCellAsIs)
 {
-  if (this->Internal->Clip->GetClipFunction() == this->ImplicitFunctions[METACLIP_DATASET])
-  {
-    this->SetActiveFilter(keepCellAsIs);
-  }
+  this->SetActiveFilter(keepCellAsIs);
 }
 //----------------------------------------------------------------------------
 void vtkPVMetaClipDataSet::SetInputArrayToProcess(
