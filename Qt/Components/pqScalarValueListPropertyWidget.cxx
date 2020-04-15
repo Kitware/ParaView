@@ -342,6 +342,7 @@ public:
   vtkWeakPointer<vtkSMDomain> RangeDomain;
   pqTableModel Model;
   ValueMode Mode;
+  QPointer<pqSeriesGeneratorDialog> GeneratorDialog;
 
   pqInternals(pqScalarValueListPropertyWidget* self, int columnCount)
     : Model(columnCount)
@@ -497,14 +498,17 @@ void pqScalarValueListPropertyWidget::addRange()
       range_max = 10.0;
     }
 
-    pqSeriesGeneratorDialog dialog(range_min, range_max, this);
-    if (dialog.exec() != QDialog::Accepted)
+    if (!this->Internals->GeneratorDialog)
+    {
+      this->Internals->GeneratorDialog = new pqSeriesGeneratorDialog(range_min, range_max, this);
+    }
+    if (this->Internals->GeneratorDialog->exec() != QDialog::Accepted)
     {
       return;
     }
 
     QVariantList value = this->Internals->Model.value().toList();
-    for (const auto& newvalue : dialog.series())
+    for (const auto& newvalue : this->Internals->GeneratorDialog->series())
     {
       value.push_back(QVariant(newvalue));
     }
@@ -520,14 +524,17 @@ void pqScalarValueListPropertyWidget::addRange()
       range_max = 10;
     }
 
-    pqSeriesGeneratorDialog dialog(range_min, range_max, this);
-    if (dialog.exec() != QDialog::Accepted)
+    if (!this->Internals->GeneratorDialog)
+    {
+      this->Internals->GeneratorDialog = new pqSeriesGeneratorDialog(range_min, range_max, this);
+    }
+    if (this->Internals->GeneratorDialog->exec() != QDialog::Accepted)
     {
       return;
     }
 
     QVariantList intRange;
-    for (const auto& newvalue : dialog.series())
+    for (const auto& newvalue : this->Internals->GeneratorDialog->series())
     {
       const int ival = static_cast<int>(std::floor(newvalue + 0.5));
       if (intRange.empty() || (intRange.back().toInt() != ival))

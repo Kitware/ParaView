@@ -564,6 +564,7 @@ if(NOT APPLE)
 endif()
 
 SET(TESTS_WITH_BASELINES
+  ContourRange.xml
   DataAxesGrid.xml
   MoleculeScalarBar.xml
   SelectionByArray.xml
