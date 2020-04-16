@@ -12,6 +12,10 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/can.ex2}"
   "DATA{${paraview_test_data_directory_input}/Data/iron_protein.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/multicomb_0.vts}"
+  "DATA{${paraview_test_data_directory_input}/Data/mg_diff_0000.vtm}"
+  "DATA{${paraview_test_data_directory_input}/Data/mg_diff_0000/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/mg_diff_0062.vtm}"
+  "DATA{${paraview_test_data_directory_input}/Data/mg_diff_0062/,REGEX:.*}"
 
   # baselines
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPythonViewMatplotlibScript.png}"
@@ -85,6 +89,7 @@ paraview_add_test_python(
   LoadStateWithOptions.py
   Plot3DReader.py
   SaveDataWithArraySelection.py
+  ReadTimeArray.py
 )
 
 # These tests could run safely in serial and parallel.

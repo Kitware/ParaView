@@ -18,6 +18,12 @@
  *
  * vtkSMStringListDomain represents a domain consisting of a list of
  * strings. It only works with vtkSMStringVectorProperty.
+ *
+ * Supported attributes:
+ * \li \c none_string: (optional) when specified, this string appears as the
+ *                first entry in the domain the list and can be used to show
+ *                "None", or "Not available" etc.
+ *
  * Valid XML elements are:
  * @verbatim
  * * <String value="">
@@ -79,6 +85,14 @@ public:
 
   //@{
   /**
+   * Return the string that is used as "none_string" in XML configuration.
+   */
+  vtkGetStringMacro(NoneString);
+  vtkSetStringMacro(NoneString);
+  //@}
+
+  //@{
+  /**
    * A vtkSMProperty is often defined with a default value in the
    * XML itself. However, many times, the default value must be determined
    * at run time. To facilitate this, domains can override this method
@@ -102,6 +116,12 @@ protected:
   int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 
   void ChildSaveState(vtkPVXMLElement* domainElement) override;
+
+  /**
+   * Default string always present in this string list. When selected, it is equivalent
+   * with not selecting any string.
+   */
+  char* NoneString;
 
   //@{
   /**
