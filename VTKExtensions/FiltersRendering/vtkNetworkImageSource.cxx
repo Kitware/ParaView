@@ -26,6 +26,7 @@
 
 #if VTK_MODULE_ENABLE_VTK_IOImage
 #include "vtkBMPReader.h"
+#include "vtkHDRReader.h"
 #include "vtkJPEGReader.h"
 #include "vtkPNGReader.h"
 #include "vtkPNMReader.h"
@@ -136,6 +137,10 @@ int vtkNetworkImageSource::ReadImageFromFile(const char* filename)
   else if (ext == ".tif")
   {
     reader.TakeReference(vtkTIFFReader::New());
+  }
+  else if (ext == ".hdr")
+  {
+    reader.TakeReference(vtkHDRReader::New());
   }
   else
   {

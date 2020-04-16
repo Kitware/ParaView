@@ -88,6 +88,7 @@
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
 #include "vtkTextRepresentation.h"
+#include "vtkTexture.h"
 #include "vtkTimerLog.h"
 #include "vtkTrackballPan.h"
 #include "vtkTrivialProducer.h"
@@ -2484,6 +2485,8 @@ void vtkPVRenderView::UpdateSkybox()
     this->Skybox->SetFloorRight(0.0, 0.0, 1.0);
     this->Skybox->SetTexture(texture);
     this->GetRenderer()->AddActor(this->Skybox);
+    texture->MipmapOn();
+    texture->InterpolateOn();
     this->GetRenderer()->SetEnvironmentTexture(texture, true);
   }
   else

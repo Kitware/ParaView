@@ -142,7 +142,7 @@
                             number_of_elements="1"
                             panel_visibility="never">
         <FileListDomain name="files" />
-        <Documentation>This property specifies the file name for the PNG
+        <Documentation>This property specifies the file name for the JPEG
         reader.</Documentation>
       </StringVectorProperty>
       <DoubleVectorProperty name="DataSpacing"
@@ -244,6 +244,36 @@
         reader.</Documentation>
       </StringVectorProperty>
       <!-- End Meta Image Reader -->
+    </Proxy>
+
+    <!-- ============================================================= -->
+    <Proxy class="vtkHDRReader"
+                 label="HDR Reader"
+                 name="HDRReader">
+      <Documentation long_help="Reads a HDR file into an image data."
+                     short_help="Read a HDR file.">The HDR reader reads HDR
+                     (High Dynamic Range) files, and the output is a
+                     uniform rectilinear (image/volume) dataset. The default
+                     file extension is .hdr.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the HDR
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty name="DataSpacing"
+                            command="SetDataSpacing"
+                            number_of_elements="3"
+                            default_values="1 1 1">
+        <DoubleRangeDomain name="range" min="0 0 0" />
+        <Documentation>
+          Set the spacing to use for the image output by this reader.
+        </Documentation>
+      </DoubleVectorProperty>
+      <!-- End HDRReader -->
     </Proxy>
 
     <!-- end of "internal_sources" -->
@@ -828,6 +858,23 @@
        <StringVectorProperty name="FileName" command="SetFileName" animateable="0" number_of_elements="1">
            <FileListDomain name="files"/>
        </StringVectorProperty>
+    </SourceProxy>
+
+    <!-- ============================================================= -->
+    <SourceProxy name="HDRReader" class="vtkHDRReader" label="HDR Reader">
+      <Documentation
+        short_help="Reads a file in Radiance HDR format."
+        long_help="Reads a file in Radiance High Dynamic Range format.">
+         An HDR image is a high-bit–depth image (normally 32 bits per channel)
+         that contains color and brightness information across a very wide dynamic range.
+      </Documentation>
+       <Hints>
+          <ReaderFactory extensions="hdr" file_description="Radiance HDR file"/>
+       </Hints>
+       <StringVectorProperty name="FileName" command="SetFileName" animateable="0" number_of_elements="1">
+           <FileListDomain name="files"/>
+       </StringVectorProperty>
+       <!-- End HDRReader -->
     </SourceProxy>
 
     <!-- ============================================================= -->
