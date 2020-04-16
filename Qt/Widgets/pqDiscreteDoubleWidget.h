@@ -20,8 +20,6 @@
 #include <QVector>
 #include <QWidget>
 
-#include "vtkConfigure.h" // for override
-
 /**
  * Customize pqDoubleSliderWidget to use a custom set of allowed values
  */

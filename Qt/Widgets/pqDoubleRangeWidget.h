@@ -36,8 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsModule.h"
 #include <QWidget>
 
-#include "vtkConfigure.h"
-
 /**
  * Extends pqDoubleSliderWidget to use it with a range of doubles : provides
  * control on min/max, resolution and on line edit validator.

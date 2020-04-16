@@ -63,7 +63,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkByteSwap.h"
 #include "vtkCellArray.h"
 #include "vtkCompositeDataPipeline.h"
-#include "vtkConfigure.h"
 #include "vtkDataArray.h"
 #include "vtkErrorCode.h"
 #include "vtkFieldData.h"

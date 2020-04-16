@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsModule.h"
 #include "pqTreeViewSelectionHelper.h"
-#include "vtkConfigure.h"
 #include <QList>
 #include <QPointer>
 #include <QTabWidget>
