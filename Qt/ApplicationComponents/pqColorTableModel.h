@@ -67,7 +67,7 @@ public:
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-protected slots:
+protected Q_SLOTS:
 
   void controlPointsChanged();
 

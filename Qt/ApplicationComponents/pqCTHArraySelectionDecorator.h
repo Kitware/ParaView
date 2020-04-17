@@ -50,7 +50,7 @@ public:
   pqCTHArraySelectionDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
   ~pqCTHArraySelectionDecorator() override;
 
-private slots:
+private Q_SLOTS:
   void updateSelection();
 
 private:

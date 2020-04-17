@@ -125,14 +125,14 @@ public:
   static void setColorRangeScalingMode(int);
   static int colorRangeScalingMode(int default_value = GROW_ON_MODIFIED);
 
-signals:
+Q_SIGNALS:
   /**
   * signal fired when the "VectorMode" or "VectorComponent" properties are
   * modified.
   */
   void componentOrModeChanged();
 
-public slots:
+public Q_SLOTS:
   // This method checks if this LUT is used by any display,
   // if not, it hides all the scalars bar showing this LUT.
   void hideUnusedScalarBars();
@@ -147,7 +147,7 @@ public slots:
   */
   void build();
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Checks to make sure that the range is compatible with the log flag
   * and adjusts it if necessary.

@@ -508,7 +508,7 @@ void pqMultiViewWidget::markActive(pqViewFrame* frame)
     frame->setBorderVisibility(true);
     // indicate to the world that a frame on this widget has been activated.
     // pqTabbedMultiViewWidget listens to this signal to raise that tab.
-    emit this->frameActivated();
+    Q_EMIT this->frameActivated();
     // NOTE: this signal will result in call to makeFrameActive().
   }
 }
@@ -791,7 +791,7 @@ void pqMultiViewWidget::setDecorationsVisibility(bool val)
 {
   auto& internals = (*this->Internals);
   internals.setDecorationsVisibility(val);
-  emit this->decorationsVisibilityChanged(val);
+  Q_EMIT this->decorationsVisibilityChanged(val);
 }
 
 //-----------------------------------------------------------------------------

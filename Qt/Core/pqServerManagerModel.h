@@ -218,7 +218,7 @@ public:
   static pqServerManagerModelItem* findItemHelper(
     const pqServerManagerModel* const model, const QMetaObject& mo, const QString& name);
 
-signals:
+Q_SIGNALS:
   /**
   * Signals emitted when a new pqServer object is created.
   */
@@ -333,7 +333,7 @@ signals:
   */
   void dataUpdated(pqPipelineSource*);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called when a proxy is registered.
   */

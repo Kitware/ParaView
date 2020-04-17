@@ -543,12 +543,12 @@ void pqRenderViewSelectionReaction::selectionChanged(vtkObject*, unsigned long, 
       break;
 
     case SELECT_CUSTOM_BOX:
-      emit this->selectedCustomBox(region);
-      emit this->selectedCustomBox(region[0], region[1], region[2], region[3]);
+      Q_EMIT this->selectedCustomBox(region);
+      Q_EMIT this->selectedCustomBox(region[0], region[1], region[2], region[3]);
       break;
 
     case SELECT_CUSTOM_POLYGON:
-      emit this->selectedCustomPolygon(vtkIntArray::SafeDownCast(unsafe_object));
+      Q_EMIT this->selectedCustomPolygon(vtkIntArray::SafeDownCast(unsafe_object));
       break;
 
     case ZOOM_TO_BOX:

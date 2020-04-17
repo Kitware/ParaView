@@ -64,7 +64,7 @@ public:
   pqLinePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   ~pqLinePropertyWidget() override;
 
-public slots:
+public Q_SLOTS:
   void useXAxis() { this->useAxis(0); }
   void useYAxis() { this->useAxis(1); }
   void useZAxis() { this->useAxis(2); }
@@ -75,7 +75,7 @@ public slots:
   */
   void setLineColor(const QColor& color);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Places the interactive widget using current data source information.
   */

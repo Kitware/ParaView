@@ -56,14 +56,14 @@ public:
   pqAnimationViewWidget(QWidget* parent = 0);
   ~pqAnimationViewWidget() override;
 
-public slots:
+public Q_SLOTS:
 
   /**
   * set the scene to view
   */
   void setScene(pqAnimationScene* scene);
 
-protected slots:
+protected Q_SLOTS:
 
   /**
   * The cues in the scene have changed, so we make sure

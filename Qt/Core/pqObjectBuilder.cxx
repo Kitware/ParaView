@@ -161,8 +161,8 @@ pqPipelineSource* pqObjectBuilder::createSource(
   }
 
   pqPipelineSource* source = pqObjectBuilderNS::postCreatePipelineProxy(controller, proxy, server);
-  emit this->sourceCreated(source);
-  emit this->proxyCreated(source);
+  Q_EMIT this->sourceCreated(source);
+  Q_EMIT this->proxyCreated(source);
   return source;
 }
 
@@ -201,8 +201,8 @@ pqPipelineSource* pqObjectBuilder::createFilter(const QString& sm_group, const Q
   }
 
   pqPipelineSource* filter = pqObjectBuilderNS::postCreatePipelineProxy(controller, proxy, server);
-  emit this->filterCreated(filter);
-  emit this->proxyCreated(filter);
+  Q_EMIT this->filterCreated(filter);
+  Q_EMIT this->proxyCreated(filter);
   return filter;
 }
 
@@ -307,10 +307,10 @@ pqPipelineSource* pqObjectBuilder::createReader(
 
   pqPipelineSource* reader =
     pqObjectBuilderNS::postCreatePipelineProxy(controller, proxy, server, reg_name);
-  emit this->readerCreated(reader, files[0]);
-  emit this->readerCreated(reader, files);
-  emit this->sourceCreated(reader);
-  emit this->proxyCreated(reader);
+  Q_EMIT this->readerCreated(reader, files[0]);
+  Q_EMIT this->readerCreated(reader, files);
+  Q_EMIT this->sourceCreated(reader);
+  Q_EMIT this->proxyCreated(reader);
   return reader;
 }
 //-----------------------------------------------------------------------------
@@ -328,7 +328,7 @@ void pqObjectBuilder::destroy(pqPipelineSource* source)
     return;
   }
 
-  emit this->destroying(source);
+  Q_EMIT this->destroying(source);
 
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->UnRegisterProxy(source->getProxy());
@@ -354,7 +354,7 @@ pqView* pqObjectBuilder::createView(const QString& type, pqServer* server)
 
   // notify the world that we may create a new view. applications may handle
   // this by setting up layouts, etc.
-  emit this->aboutToCreateView(server);
+  Q_EMIT this->aboutToCreateView(server);
 
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(proxy);
@@ -365,8 +365,8 @@ pqView* pqObjectBuilder::createView(const QString& type, pqServer* server)
   pqView* view = model->findItem<pqView*>(proxy);
   if (view)
   {
-    emit this->viewCreated(view);
-    emit this->proxyCreated(view);
+    Q_EMIT this->viewCreated(view);
+    Q_EMIT this->proxyCreated(view);
   }
   else
   {
@@ -391,7 +391,7 @@ void pqObjectBuilder::destroy(pqView* view)
     return;
   }
 
-  emit this->destroying(view);
+  Q_EMIT this->destroying(view);
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->UnRegisterProxy(view->getProxy());
 }
@@ -466,8 +466,8 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
     core->getServerManagerModel()->findItem<pqDataRepresentation*>(reprProxy);
   if (repr)
   {
-    emit this->dataRepresentationCreated(repr);
-    emit this->proxyCreated(repr);
+    Q_EMIT this->dataRepresentationCreated(repr);
+    Q_EMIT this->proxyCreated(repr);
   }
   return repr;
 }
@@ -514,7 +514,7 @@ void pqObjectBuilder::destroy(pqRepresentation* repr)
     return;
   }
 
-  emit this->destroying(repr);
+  Q_EMIT this->destroying(repr);
 
   // Remove repr from the view module.
   pqView* view = repr->getView();
@@ -548,7 +548,7 @@ void pqObjectBuilder::destroy(pqRepresentation* repr)
 //-----------------------------------------------------------------------------
 void pqObjectBuilder::destroy(pqProxy* proxy)
 {
-  emit this->destroying(proxy);
+  Q_EMIT this->destroying(proxy);
 
   this->destroyProxyInternal(proxy);
 }
@@ -726,7 +726,7 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource, int co
   if (id != 0)
   {
     server = smModel->findServer(id);
-    emit this->finishedAddingServer(server);
+    Q_EMIT this->finishedAddingServer(server);
   }
   this->WaitingForConnection = false;
   return server;
@@ -792,7 +792,7 @@ pqServer* pqObjectBuilder::resetServer(pqServer* server)
     auto deltaMinutes = std::chrono::duration_cast<std::chrono::minutes>(endTime - startTime);
     newServer->setRemainingLifeTime(
       remainingLifetime > 0 ? (remainingLifetime - deltaMinutes.count()) : remainingLifetime);
-    emit this->finishedAddingServer(newServer);
+    Q_EMIT this->finishedAddingServer(newServer);
   }
   return newServer;
 }

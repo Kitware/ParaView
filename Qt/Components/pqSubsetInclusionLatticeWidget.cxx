@@ -86,7 +86,7 @@ public:
       {
         case Qt::CheckStateRole:
           this->setHeaderCheckState(value);
-          emit this->headerDataChanged(orientation, section, section);
+          Q_EMIT this->headerDataChanged(orientation, section, section);
           return true;
 
         default:

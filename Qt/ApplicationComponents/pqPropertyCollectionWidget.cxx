@@ -365,6 +365,6 @@ void pqPropertyCollectionWidget::updateProperties()
 
   if (modified)
   {
-    emit this->widgetModified();
+    Q_EMIT this->widgetModified();
   }
 }

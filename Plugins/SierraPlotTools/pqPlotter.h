@@ -106,7 +106,7 @@ public:
 
   virtual QString getPlotterTextEditObjectName();
 
-signals:
+Q_SIGNALS:
   void activateAllVariables(pqPlotter*);
 
 protected:

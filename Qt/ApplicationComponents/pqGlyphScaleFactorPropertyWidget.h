@@ -50,7 +50,7 @@ public:
   pqGlyphScaleFactorPropertyWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
   ~pqGlyphScaleFactorPropertyWidget() override;
 
-protected slots:
+protected Q_SLOTS:
   /**
   * update the property's value using the domain.
   */

@@ -159,7 +159,7 @@ void pqSignalAdaptorColor::setColor(const QVariant& var)
 void pqSignalAdaptorColor::handleColorChanged()
 {
   QVariant col = this->color();
-  emit this->colorChanged(col);
+  Q_EMIT this->colorChanged(col);
 }
 
 //----------------------------------------------------------------------------
@@ -188,7 +188,7 @@ void pqSignalAdaptorSliderRange::setValue(double val)
 //----------------------------------------------------------------------------
 void pqSignalAdaptorSliderRange::handleValueChanged()
 {
-  emit this->valueChanged(this->value());
+  Q_EMIT this->valueChanged(this->value());
 }
 
 //----------------------------------------------------------------------------

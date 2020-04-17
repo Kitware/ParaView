@@ -51,7 +51,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSpreadSheetVisibilityBehavior : public QO
 public:
   pqSpreadSheetVisibilityBehavior(QObject* parent = 0);
 
-protected slots:
+protected Q_SLOTS:
   void showActiveSource(pqView*);
 
 private:

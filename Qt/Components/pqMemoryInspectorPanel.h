@@ -50,7 +50,7 @@ protected:
   // Update when the panel is made visible.
   void showEvent(QShowEvent* event) override;
 
-protected slots:
+protected Q_SLOTS:
 
   // Description:
   // Configure the UI based on conneccted servers.

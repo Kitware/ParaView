@@ -49,7 +49,7 @@ public:
   pqColorEditorPropertyWidget(vtkSMProxy* proxy, QWidget* parent = 0);
   ~pqColorEditorPropertyWidget() override;
 
-private slots:
+private Q_SLOTS:
   void updateEnableState();
 
 private:

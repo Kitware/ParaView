@@ -134,6 +134,6 @@ void pqBoolPropertyWidgetDecorator::setBoolProperty(bool val)
   if (this->BoolProperty != val)
   {
     this->BoolProperty = val;
-    emit this->boolPropertyChanged();
+    Q_EMIT this->boolPropertyChanged();
   }
 }

@@ -67,7 +67,7 @@ public:
   */
   static void clear();
 
-protected slots:
+protected Q_SLOTS:
   void enable(bool);
   void setLabel(const QString& label);
   void setUndoStack(pqUndoStack*);

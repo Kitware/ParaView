@@ -139,7 +139,7 @@ public:
    */
   bool event(QEvent* e) override;
 
-signals:
+Q_SIGNALS:
   void widgetModified();
 
 private:

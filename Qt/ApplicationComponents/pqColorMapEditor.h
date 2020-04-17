@@ -55,7 +55,7 @@ public:
   pqColorMapEditor(QWidget* parent = 0);
   ~pqColorMapEditor() override;
 
-protected slots:
+protected Q_SLOTS:
   /**
   * slot called to update the currently showing proxies.
   */
@@ -98,7 +98,7 @@ protected:
   void setDataRepresentation(pqDataRepresentation* repr);
   void setColorTransferFunction(vtkSMProxy* ctf);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * update the enabled state for show/edit scalar bar buttons.
   */

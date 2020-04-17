@@ -62,7 +62,7 @@ public:
   void setValuesOnly(bool);
   bool valuesOnly() const;
 
-public slots:
+public Q_SLOTS:
   /**
   * read the key frame data and display it
   */
@@ -72,7 +72,7 @@ public slots:
   */
   void writeKeyFrameData();
 
-private slots:
+private Q_SLOTS:
   void newKeyFrame();
   void deleteKeyFrame();
   void deleteAllKeyFrames();

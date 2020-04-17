@@ -45,6 +45,6 @@ void pqDoubleSpinBox::stepBy(int steps)
 
   if (this->value() != old_value)
   {
-    emit this->editingFinished();
+    Q_EMIT this->editingFinished();
   }
 }

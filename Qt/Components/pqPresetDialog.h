@@ -140,10 +140,10 @@ public:
   */
   void setCustomizableUsePresetRange(bool state, bool defaultValue = false);
 
-signals:
+Q_SIGNALS:
   void applyPreset(const Json::Value& preset);
 
-protected slots:
+protected Q_SLOTS:
   void updateEnabledStateForSelection();
   void updateForSelectedIndex(const QModelIndex& proxyIndex);
   void triggerApply(const QModelIndex& proxyIndex = QModelIndex());
@@ -157,7 +157,7 @@ protected:
   void showEvent(QShowEvent* e) override;
   void closeEvent(QCloseEvent* e) override;
 
-private slots:
+private Q_SLOTS:
   void updateGroups();
 
 private:

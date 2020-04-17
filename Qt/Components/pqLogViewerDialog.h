@@ -88,7 +88,7 @@ protected:
   // Override to handle custom close button icon in tab widget
   bool eventFilter(QObject* obj, QEvent* event) override;
 
-private slots:
+private Q_SLOTS:
   void linkedScroll(double time);
 
   // Set the verbosity of logs on a given process

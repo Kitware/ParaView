@@ -72,7 +72,7 @@ public:
   void setKeyFrameProxy(vtkSMProxy* keyframe);
   vtkSMProxy* getKeyFrameProxy() const;
 
-private slots:
+private Q_SLOTS:
   /**
   * Called when the combo-box changes
   */

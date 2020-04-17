@@ -36,11 +36,11 @@ public:
   pqSLACDataLoadManager(QWidget* p, Qt::WindowFlags f = 0);
   ~pqSLACDataLoadManager();
 
-public slots:
+public Q_SLOTS:
   virtual void checkInputValid();
   virtual void setupPipeline();
 
-signals:
+Q_SIGNALS:
   void createdPipeline();
 
 protected:

@@ -50,7 +50,7 @@ public:
   pqPipelineTimeKeyFrameEditor(pqAnimationScene* scene, pqAnimationCue* cue, QWidget* p);
   ~pqPipelineTimeKeyFrameEditor() override;
 
-public slots:
+public Q_SLOTS:
   /**
   * read the key frame data and display it
   */
@@ -60,7 +60,7 @@ public slots:
   */
   void writeKeyFrameData();
 
-protected slots:
+protected Q_SLOTS:
   void updateState();
 
 private:

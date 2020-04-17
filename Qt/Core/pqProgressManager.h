@@ -89,7 +89,7 @@ protected:
   */
   bool eventFilter(QObject* obj, QEvent* event) override;
 
-public slots:
+public Q_SLOTS:
   /**
   * Update progress. The progress must be enbled by
   * calling enableProgress(true) before calling  this method
@@ -135,7 +135,7 @@ public slots:
    */
   bool unblockEvents(bool val);
 
-signals:
+Q_SIGNALS:
   /**
   * Emitted to trigger an abort.
   */
@@ -150,7 +150,7 @@ signals:
   void progressStartEvent();
   void progressEndEvent();
 
-protected slots:
+protected Q_SLOTS:
   /**
   * callbacks for signals fired from vtkProcessModule.
   */

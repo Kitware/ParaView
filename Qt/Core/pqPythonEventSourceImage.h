@@ -56,7 +56,7 @@ public:
 protected:
   virtual void run();
 
-protected slots:
+protected Q_SLOTS:
   void doComparison();
 };
 

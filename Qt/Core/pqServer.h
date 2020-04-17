@@ -175,7 +175,7 @@ public:
    */
   void setRemainingLifeTime(int value);
 
-signals:
+Q_SIGNALS:
   /**
   * Fired when the name of the proxy is changed.
   */
@@ -214,7 +214,7 @@ protected:
 
   // ---- Collaboration client-to-clients communication mechanisme ----
 
-signals:
+Q_SIGNALS:
   /**
   * Allow user to listen messages from other clients.
   * But if you plan to push some state by for example calling
@@ -236,7 +236,7 @@ signals:
   void triggeredUserListChanged();
   void triggerFollowCamera(int);
 
-public slots:
+public Q_SLOTS:
   /**
   * Allow user to broadcast to other client a given message
   */
@@ -244,7 +244,7 @@ public slots:
 
   // ---- Collaboration client-to-clients communication mechanisme ----
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called to send a heartbeat to the server.
   */

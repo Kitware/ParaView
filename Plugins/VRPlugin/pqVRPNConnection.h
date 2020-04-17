@@ -143,7 +143,7 @@ public:
     this->TrackerPresent = (this->TrackerMapping.size() > 0);
   }
 
-protected slots:
+protected Q_SLOTS:
   /// This is called by VRPNEventListener in a threadsafe manner, and should not
   /// be called directly.
   void listen();

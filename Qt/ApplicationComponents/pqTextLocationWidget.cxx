@@ -124,7 +124,7 @@ void pqTextLocationWidget::setWindowLocation(QString& str)
   }
   this->Internals->windowLocation = str;
 
-  emit this->windowLocationChanged(str);
+  Q_EMIT this->windowLocationChanged(str);
 }
 
 //-----------------------------------------------------------------------------

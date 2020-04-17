@@ -69,7 +69,7 @@ public:
   pqColorChooserButtonWithPalettes(QWidget* parent = 0);
   ~pqColorChooserButtonWithPalettes() override;
 
-private slots:
+private Q_SLOTS:
   /**
   * Called to rebuild the menu. This is called everytime the popup menu is
   * going to be shown.

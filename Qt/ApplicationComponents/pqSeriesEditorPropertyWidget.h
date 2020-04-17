@@ -156,7 +156,7 @@ public:
   void setSeriesPlotCorner(const QList<QVariant>&);
   //@}
 
-signals:
+Q_SIGNALS:
   //@{
   /**
    * Fired when the series visibility changes.
@@ -217,7 +217,7 @@ signals:
   void seriesPlotCornerChanged();
   //@}
 
-private slots:
+private Q_SLOTS:
   //@{
   /**
    * update all series-properties widgets using the "current" series.

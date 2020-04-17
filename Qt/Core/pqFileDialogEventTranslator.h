@@ -62,7 +62,7 @@ private:
 
   QPointer<pqFileDialog> CurrentObject;
 
-private slots:
+private Q_SLOTS:
   void onFilesSelected(const QString&);
   void onCancelled();
 };

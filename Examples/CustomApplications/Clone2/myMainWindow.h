@@ -44,7 +44,7 @@ public:
   myMainWindow();
   ~myMainWindow();
 
-protected slots:
+protected Q_SLOTS:
   void showHelpForProxy(const QString& groupname, const QString& proxyname);
 
 private:

@@ -66,7 +66,7 @@ public:
   */
   static void deleteSources(QSet<pqPipelineSource*>& sources);
 
-public slots:
+public Q_SLOTS:
   /**
   * Updates the enabled state. Applications need not explicitly call
   * this.

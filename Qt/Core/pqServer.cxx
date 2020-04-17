@@ -190,7 +190,7 @@ void pqServer::setRemainingLifeTime(int value)
     }
     // since RemainingLifeTime is used it labelling the server, fire nameChanged
     // so pipeline browser can accurately indicate it.
-    emit this->nameChanged(this);
+    Q_EMIT this->nameChanged(this);
   }
 }
 
@@ -288,7 +288,7 @@ bool pqServer::isRenderServerSeparate()
 void pqServer::setResource(const pqServerResource& server_resource)
 {
   this->Resource = server_resource;
-  emit this->nameChanged(this);
+  Q_EMIT this->nameChanged(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -348,14 +348,14 @@ void pqServer::updateRemainingLifeTime()
     this->Internals->RemainingLifeTime--;
     if (this->Internals->RemainingLifeTime == 5)
     {
-      emit fiveMinuteTimeoutWarning();
+      Q_EMIT fiveMinuteTimeoutWarning();
     }
     else if (this->Internals->RemainingLifeTime == 1)
     {
-      emit finalTimeoutWarning();
+      Q_EMIT finalTimeoutWarning();
     }
 
-    emit this->nameChanged(this);
+    Q_EMIT this->nameChanged(this);
   }
 }
 
@@ -446,22 +446,22 @@ void pqServer::onCollaborationCommunication(
     case vtkSMCollaborationManager::UpdateUserName:
       userId = *reinterpret_cast<int*>(data);
       userName = this->Internals->CollaborationCommunicator->GetUserLabel(userId);
-      emit triggeredUserName(userId, userName);
+      Q_EMIT triggeredUserName(userId, userName);
       break;
     case vtkSMCollaborationManager::UpdateUserList:
-      emit triggeredUserListChanged();
+      Q_EMIT triggeredUserListChanged();
       break;
     case vtkSMCollaborationManager::UpdateMasterUser:
       userId = *reinterpret_cast<int*>(data);
-      emit triggeredMasterUser(userId);
+      Q_EMIT triggeredMasterUser(userId);
       break;
     case vtkSMCollaborationManager::FollowUserCamera:
       userId = *reinterpret_cast<int*>(data);
-      emit triggerFollowCamera(userId);
+      Q_EMIT triggerFollowCamera(userId);
       break;
     case vtkSMCollaborationManager::CollaborationNotification:
       vtkSMMessage* msg = reinterpret_cast<vtkSMMessage*>(data);
-      emit sentFromOtherClient(this, msg);
+      Q_EMIT sentFromOtherClient(this, msg);
       break;
   }
 }
@@ -469,7 +469,7 @@ void pqServer::onCollaborationCommunication(
 //-----------------------------------------------------------------------------
 void pqServer::onConnectionLost(vtkObject*, unsigned long, void*, void*)
 {
-  emit serverSideDisconnected();
+  Q_EMIT serverSideDisconnected();
 }
 //-----------------------------------------------------------------------------
 void pqServer::sendToOtherClients(vtkSMMessage* msg)

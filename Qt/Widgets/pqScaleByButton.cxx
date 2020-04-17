@@ -96,6 +96,6 @@ void pqScaleByButton::scaleTriggered()
 {
   if (QAction* senderAction = qobject_cast<QAction*>(this->sender()))
   {
-    emit this->scale(senderAction->data().toDouble());
+    Q_EMIT this->scale(senderAction->data().toDouble());
   }
 }

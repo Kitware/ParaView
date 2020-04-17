@@ -50,7 +50,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDataTimeStepBehavior : public QObject
 public:
   pqDataTimeStepBehavior(QObject* parent = 0);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * called when a reader is created.
   */

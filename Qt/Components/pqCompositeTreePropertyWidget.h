@@ -76,10 +76,10 @@ public:
   QList<QVariant> values() const;
   void setValues(const QList<QVariant>& values);
 
-signals:
+Q_SIGNALS:
   void valuesChanged();
 
-private slots:
+private Q_SLOTS:
   void domainModified();
 
 private:

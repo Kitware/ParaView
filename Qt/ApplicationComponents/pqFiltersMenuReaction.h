@@ -54,7 +54,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqFiltersMenuReaction : public QObject
 public:
   pqFiltersMenuReaction(pqProxyGroupMenuManager* menuManager, bool hideDisabledActions = false);
 
-public slots:
+public Q_SLOTS:
   /**
   * Updates the enabled state.  The actions in toolbars will
   * be updated automatically.  The containing widget of other actions
@@ -67,7 +67,7 @@ public slots:
   */
   static pqPipelineSource* createFilter(const QString& group, const QString& name);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called when the action is triggered.
   */

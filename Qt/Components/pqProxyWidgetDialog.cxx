@@ -394,7 +394,7 @@ void pqProxyWidgetDialog::onChangeAvailable()
 void pqProxyWidgetDialog::onApply()
 {
   this->Internals->acceptChanges();
-  emit this->accepted();
+  Q_EMIT this->accepted();
 }
 
 //-----------------------------------------------------------------------------
@@ -425,7 +425,7 @@ void pqProxyWidgetDialog::onRestoreDefaults()
 {
   if (this->Internals->restoreDefaults())
   {
-    emit this->accepted();
+    Q_EMIT this->accepted();
   }
 }
 

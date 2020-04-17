@@ -1301,8 +1301,8 @@ bool pqProxyWidget::restoreDefaults()
   // the properties have been reset.
   if (anyReset)
   {
-    emit changeAvailable();
-    emit changeFinished();
+    Q_EMIT changeAvailable();
+    Q_EMIT changeFinished();
   }
   return anyReset;
 }
@@ -1336,5 +1336,5 @@ void pqProxyWidget::onChangeFinished()
       pqSender->apply();
     }
   }
-  emit this->changeFinished();
+  Q_EMIT this->changeFinished();
 }

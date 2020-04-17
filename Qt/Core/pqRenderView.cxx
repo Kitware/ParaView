@@ -389,8 +389,8 @@ void pqRenderView::onUndoStackChanged()
   bool can_undo = this->Internal->InteractionUndoStack->CanUndo();
   bool can_redo = this->Internal->InteractionUndoStack->CanRedo();
 
-  emit this->canUndoChanged(can_undo);
-  emit this->canRedoChanged(can_redo);
+  Q_EMIT this->canUndoChanged(can_undo);
+  Q_EMIT this->canRedoChanged(can_redo);
 }
 
 //-----------------------------------------------------------------------------
@@ -555,16 +555,16 @@ void pqRenderView::emitSelectionSignal(QList<pqOutputPort*> opPorts)
   // something.
   if (opPorts.count() > 0)
   {
-    emit this->selected(opPorts.value(0));
+    Q_EMIT this->selected(opPorts.value(0));
   }
   else
   {
-    emit this->selected(0);
+    Q_EMIT this->selected(0);
   }
 
   if (this->UseMultipleRepresentationSelection)
   {
-    emit this->multipleSelected(opPorts);
+    Q_EMIT this->multipleSelected(opPorts);
   }
 }
 
@@ -578,7 +578,7 @@ pqDataRepresentation* pqRenderView::pick(int pos[2])
   END_UNDO_EXCLUDE();
   if (pq_repr)
   {
-    emit this->picked(pq_repr->getOutputPortFromInput());
+    Q_EMIT this->picked(pq_repr->getOutputPortFromInput());
   }
   return pq_repr;
 }
@@ -593,7 +593,7 @@ pqDataRepresentation* pqRenderView::pickBlock(int pos[2], unsigned int& flatInde
   END_UNDO_EXCLUDE();
   if (pq_repr)
   {
-    emit this->picked(pq_repr->getOutputPortFromInput());
+    Q_EMIT this->picked(pq_repr->getOutputPortFromInput());
   }
   return pq_repr;
 }
@@ -986,7 +986,7 @@ void pqRenderView::onInteractionModeChange()
   if (mode != this->Internal->CurrentInteractionMode)
   {
     this->Internal->CurrentInteractionMode = mode;
-    emit updateInteractionMode(this->Internal->CurrentInteractionMode);
+    Q_EMIT updateInteractionMode(this->Internal->CurrentInteractionMode);
   }
 }
 

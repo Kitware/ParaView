@@ -77,7 +77,7 @@ public:
    */
   void setFontSize(int size);
 
-signals:
+Q_SIGNALS:
   /**
   * Signal emitted whenever the user enters a command
   */
@@ -88,7 +88,7 @@ signals:
    */
   void consoleFocusInEvent();
 
-public slots:
+public Q_SLOTS:
   /**
   * Writes the supplied text to the console
   */

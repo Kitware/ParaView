@@ -142,9 +142,9 @@ bool pqAbstractItemSelectionModel::setData(
   if (role == Qt::CheckStateRole)
   {
     item->setCheckState(0, static_cast<Qt::CheckState>(value.toInt()));
-    emit QAbstractItemModel::headerDataChanged(Qt::Horizontal, index_.column(), index_.column());
+    Q_EMIT QAbstractItemModel::headerDataChanged(Qt::Horizontal, index_.column(), index_.column());
 
-    // No need to emit QAbstractItemModel::dataChanged(idx, idx) since in this case
+    // No need to Q_EMIT QAbstractItemModel::dataChanged(idx, idx) since in this case
     // the change comes from the view and it handles it directly.
 
     return true;

@@ -75,7 +75,7 @@ public:
   static pqPipelineSource* pipelineSource(pqServer* insituSession);
   static void time(pqPipelineSource* source, double* time, vtkIdType* timeStep);
 
-signals:
+Q_SIGNALS:
   void connectionInitiated(pqServer* displaySession);
   void timeUpdated();
   void breakpointAdded(pqServer* insituSession);
@@ -122,7 +122,7 @@ public:
   void waitTimestep(vtkIdType timeStep);
   void waitBreakpointHit();
 
-protected slots:
+protected Q_SLOTS:
   /**
   * called when Catalyst disconnects. We clean up the Catalyst connection.
   */

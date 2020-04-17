@@ -55,7 +55,7 @@ public:
   void setRange(double min, double max);
   bool lock() const { return this->Lock; }
 
-protected slots:
+protected Q_SLOTS:
   void validate();
   void rescaleAndLock();
 

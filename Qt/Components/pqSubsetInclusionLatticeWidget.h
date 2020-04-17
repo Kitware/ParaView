@@ -68,7 +68,7 @@ public:
    */
   QAbstractItemModel* model() const;
 
-private slots:
+private Q_SLOTS:
   void modelReset();
   /*
   void rowsInserted(const QModelIndex &parent, int first, int last);

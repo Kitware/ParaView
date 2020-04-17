@@ -49,14 +49,14 @@ public:
   pqFileNamePropertyWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
   ~pqFileNamePropertyWidget() override;
 
-signals:
+Q_SIGNALS:
   /**
   * internal signal used to clear highlights from pqHighlightablePushButton.
   */
   void clearHighlight();
   void highlightResetButton();
 
-protected slots:
+protected Q_SLOTS:
   /**
   * update the property's value using the domain.
   */

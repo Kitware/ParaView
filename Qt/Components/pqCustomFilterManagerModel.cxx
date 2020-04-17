@@ -166,7 +166,7 @@ void pqCustomFilterManagerModel::addCustomFilter(QString name)
   this->Internal->insert(row, name);
   this->endInsertRows();
 
-  emit this->customFilterAdded(name);
+  Q_EMIT this->customFilterAdded(name);
 }
 
 void pqCustomFilterManagerModel::removeCustomFilter(QString name)

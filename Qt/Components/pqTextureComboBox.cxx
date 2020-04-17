@@ -125,14 +125,14 @@ void pqTextureComboBox::onCurrentIndexChanged(int index)
   switch (index)
   {
     case 0:
-      emit textureChanged(nullptr);
+      Q_EMIT textureChanged(nullptr);
       break;
     case 1:
       this->loadTexture();
       break;
     default:
       vtkSMProxy* texture = reinterpret_cast<vtkSMProxy*>(this->currentData().value<void*>());
-      emit textureChanged(texture);
+      Q_EMIT textureChanged(texture);
       break;
   }
 }

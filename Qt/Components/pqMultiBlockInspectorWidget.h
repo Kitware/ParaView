@@ -143,7 +143,7 @@ public:
    */
   pqDataRepresentation* representation() const;
 
-public slots:
+public Q_SLOTS:
   /**
    * When auto-tracking is disabled, sets the port to use to get the data
    * information for this widget to show.
@@ -163,7 +163,7 @@ public slots:
    */
   void setView(pqView* view);
 
-private slots:
+private Q_SLOTS:
   void setOutputPortInternal(pqOutputPort* port);
   void setViewInternal(pqView* view);
   void setRepresentation(pqDataRepresentation* repr);
@@ -181,7 +181,7 @@ private slots:
    */
   void updateScalarColoring();
 
-signals:
+Q_SIGNALS:
   void blockVisibilitiesChanged();
   void blockColorsChanged();
   void blockOpacitiesChanged();

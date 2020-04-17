@@ -202,7 +202,7 @@ void pqServerConfigurationImporter::fetchConfigurations()
   // Unblock test events
   pqEventDispatcher::deferEventsIfBlocked(false);
 
-  emit this->configurationsUpdated();
+  Q_EMIT this->configurationsUpdated();
 }
 
 //-----------------------------------------------------------------------------
@@ -234,7 +234,7 @@ bool pqServerConfigurationImporter::fetch(const QUrl& url)
   QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
   if (reply->error() != QNetworkReply::NoError)
   {
-    emit this->message(QString("Request failed: %1").arg(reply->errorString()));
+    Q_EMIT this->message(QString("Request failed: %1").arg(reply->errorString()));
   }
   else if (!redirectionTarget.isNull())
   {
@@ -260,7 +260,7 @@ void pqServerConfigurationImporter::abortFetch()
   {
     this->Internals->AbortFetch = true;
     this->Internals->ActiveReply->abort();
-    emit this->abortFetchTriggered();
+    Q_EMIT this->abortFetchTriggered();
   }
 }
 //-----------------------------------------------------------------------------
@@ -304,7 +304,7 @@ bool pqServerConfigurationImporter::processDownloadedContents()
 
   if (appended)
   {
-    emit this->incrementalUpdate();
+    Q_EMIT this->incrementalUpdate();
   }
   return true;
 }

@@ -144,17 +144,17 @@ public:
     const int newsize = static_cast<int>(pts.size());
     if (newsize > cursize)
     {
-      emit this->beginInsertRows(QModelIndex(), cursize, newsize - 1);
+      Q_EMIT this->beginInsertRows(QModelIndex(), cursize, newsize - 1);
       this->Points.resize(newsize);
       std::copy(
         std::next(pts.begin(), cursize), pts.end(), std::next(this->Points.begin(), cursize));
-      emit this->endInsertRows();
+      Q_EMIT this->endInsertRows();
     }
     else if (cursize > newsize)
     {
-      emit this->beginRemoveRows(QModelIndex(), newsize, cursize - 1);
+      Q_EMIT this->beginRemoveRows(QModelIndex(), newsize, cursize - 1);
       this->Points.resize(newsize);
-      emit this->endRemoveRows();
+      Q_EMIT this->endRemoveRows();
     }
 
     // check for data changes.
@@ -170,7 +170,7 @@ public:
         }
         else if (change_range.second != (cc - 1))
         {
-          emit this->dataChanged(this->index(change_range.first, 0),
+          Q_EMIT this->dataChanged(this->index(change_range.first, 0),
             this->index(change_range.second, 2), QVector<int>({ Qt::DisplayRole }));
           change_range.first = change_range.second = cc;
         }
@@ -182,7 +182,7 @@ public:
     }
     if (change_range.second != -1)
     {
-      emit this->dataChanged(this->index(change_range.first, 0),
+      Q_EMIT this->dataChanged(this->index(change_range.first, 0),
         this->index(change_range.second, 2), QVector<int>({ Qt::DisplayRole }));
     }
 
@@ -305,17 +305,17 @@ pqSplinePropertyWidget::pqSplinePropertyWidget(vtkSMProxy* smproxy, vtkSMPropert
     internals.InternalLinks.addPropertyLink(
       this, "currentRow", SIGNAL(currentRowChanged()), this->widgetProxy(), prop);
     QObject::connect(ui.PointsTable->selectionModel(), &QItemSelectionModel::currentChanged, [&]() {
-      emit this->currentRowChanged();
+      Q_EMIT this->currentRowChanged();
       this->render();
     });
   }
 
-  QObject::connect(
-    &internals.Model, &QAbstractTableModel::dataChanged, [this]() { emit this->pointsChanged(); });
-  QObject::connect(
-    &internals.Model, &QAbstractTableModel::rowsInserted, [this]() { emit this->pointsChanged(); });
-  QObject::connect(
-    &internals.Model, &QAbstractTableModel::rowsRemoved, [this]() { emit this->pointsChanged(); });
+  QObject::connect(&internals.Model, &QAbstractTableModel::dataChanged,
+    [this]() { Q_EMIT this->pointsChanged(); });
+  QObject::connect(&internals.Model, &QAbstractTableModel::rowsInserted,
+    [this]() { Q_EMIT this->pointsChanged(); });
+  QObject::connect(&internals.Model, &QAbstractTableModel::rowsRemoved,
+    [this]() { Q_EMIT this->pointsChanged(); });
 
   // Setup picking handlers
   auto pickCurrent = [&](double x, double y, double z) {
@@ -401,7 +401,7 @@ void pqSplinePropertyWidget::setCurrentRow(int row)
   {
     selModel->setCurrentIndex(this->Internals->Model.index(row, 0),
       QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
-    emit this->currentRowChanged();
+    Q_EMIT this->currentRowChanged();
   }
 }
 
@@ -443,6 +443,6 @@ void pqSplinePropertyWidget::setPoints(const QList<QVariant>& pts)
   auto& model = this->Internals->Model;
   if (model.setPoints(coords))
   {
-    emit this->pointsChanged();
+    Q_EMIT this->pointsChanged();
   }
 }

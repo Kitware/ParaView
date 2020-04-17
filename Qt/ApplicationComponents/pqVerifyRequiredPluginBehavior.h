@@ -52,7 +52,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqVerifyRequiredPluginBehavior : public QOb
 public:
   pqVerifyRequiredPluginBehavior(QObject* parent = 0);
 
-protected slots:
+protected Q_SLOTS:
   void requiredPluginsNotLoaded();
 
 private:

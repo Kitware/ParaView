@@ -139,5 +139,5 @@ pqBlotDialogExecuteAction* pqBlotDialogExecuteAction::connect(QAction* action, p
 //-----------------------------------------------------------------------------
 void pqBlotDialogExecuteAction::trigger()
 {
-  emit this->triggered(this->Command);
+  Q_EMIT this->triggered(this->Command);
 }

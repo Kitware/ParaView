@@ -63,11 +63,11 @@ public:
   void onShutdown() {}
   void onStartup() {}
 
-public slots:
+public Q_SLOTS:
   void onViewAdded(pqView*);
   void onViewRemoved(pqView*);
 
-protected slots:
+protected Q_SLOTS:
   void onRenderEnded();
 
 protected:

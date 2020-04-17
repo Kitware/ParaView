@@ -71,7 +71,7 @@ void pqBoxChartView::updateRepresentationVisibility(pqRepresentation* repr, bool
 {
   if (!visible && repr)
   {
-    emit this->showing(0);
+    Q_EMIT this->showing(0);
   }
 
   if (!visible || !repr)
@@ -90,5 +90,5 @@ void pqBoxChartView::updateRepresentationVisibility(pqRepresentation* repr, bool
   }
 
   pqDataRepresentation* dataRepr = qobject_cast<pqDataRepresentation*>(repr);
-  emit this->showing(dataRepr);
+  Q_EMIT this->showing(dataRepr);
 }

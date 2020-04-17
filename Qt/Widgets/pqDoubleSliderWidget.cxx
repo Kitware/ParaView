@@ -84,7 +84,7 @@ void pqDoubleSliderWidget::setValue(double val)
     this->BlockUpdate = false;
   }
 
-  emit this->valueChanged(this->Value);
+  Q_EMIT this->valueChanged(this->Value);
 }
 
 //-----------------------------------------------------------------------------
@@ -179,7 +179,7 @@ void pqDoubleSliderWidget::emitValueEdited()
 {
   if (this->InteractingWithSlider == false)
   {
-    emit this->valueEdited(this->Value);
+    Q_EMIT this->valueEdited(this->Value);
   }
   else
   {

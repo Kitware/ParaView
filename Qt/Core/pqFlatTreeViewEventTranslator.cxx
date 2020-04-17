@@ -75,7 +75,7 @@ bool pqFlatTreeViewEventTranslator::translateEvent(QObject* Object, QEvent* Even
                        .arg(ke->text())
                        .arg(ke->isAutoRepeat())
                        .arg(ke->count());
-      emit recordEvent(object, "keyEvent", data);
+      Q_EMIT recordEvent(object, "keyEvent", data);
       return true;
     }
     case QEvent::MouseButtonPress:
@@ -108,19 +108,19 @@ bool pqFlatTreeViewEventTranslator::translateEvent(QObject* Object, QEvent* Even
                        .arg(idxStr);
       if (Event->type() == QEvent::MouseButtonPress)
       {
-        emit recordEvent(object, "mousePress", info);
+        Q_EMIT recordEvent(object, "mousePress", info);
       }
       else if (Event->type() == QEvent::MouseButtonDblClick)
       {
-        emit recordEvent(object, "mouseDblClick", info);
+        Q_EMIT recordEvent(object, "mouseDblClick", info);
       }
       else if (Event->type() == QEvent::MouseButtonRelease)
       {
         if (this->LastPos != mouseEvent->pos())
         {
-          emit recordEvent(object, "mouseMove", info);
+          Q_EMIT recordEvent(object, "mouseMove", info);
         }
-        emit recordEvent(object, "mouseRelease", info);
+        Q_EMIT recordEvent(object, "mouseRelease", info);
       }
       return true;
     }

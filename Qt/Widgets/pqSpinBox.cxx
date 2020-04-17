@@ -48,7 +48,7 @@ void pqSpinBox::stepBy(int steps)
 
   if (this->value() != old_value)
   {
-    emit this->editingFinished();
+    Q_EMIT this->editingFinished();
   }
 }
 
@@ -63,7 +63,7 @@ void pqSpinBox::onEditingFinished()
 {
   if (this->EditingFinishedPending)
   {
-    emit this->valueChangedAndEditingFinished();
+    Q_EMIT this->valueChangedAndEditingFinished();
     this->EditingFinishedPending = false;
   }
 }

@@ -280,7 +280,7 @@ void pqApplicationCore::setUndoStack(pqUndoStack* stack)
     {
       stack->setParent(this);
     }
-    emit this->undoStackChanged(stack);
+    Q_EMIT this->undoStackChanged(stack);
   }
 }
 
@@ -431,7 +431,7 @@ void pqApplicationCore::loadStateIncremental(
 void pqApplicationCore::loadStateIncremental(
   vtkPVXMLElement* rootElement, pqServer* server, vtkSMStateLoader* loader)
 {
-  emit this->aboutToLoadState(rootElement);
+  Q_EMIT this->aboutToLoadState(rootElement);
 
   // TODO: this->LoadingState cannot be relied upon.
   this->LoadingState = true;
@@ -443,7 +443,7 @@ void pqApplicationCore::loadStateIncremental(
 //-----------------------------------------------------------------------------
 void pqApplicationCore::onStateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* locator)
 {
-  emit this->stateLoaded(root, locator);
+  Q_EMIT this->stateLoaded(root, locator);
 
   pqEventDispatcher::processEventsAndWait(1);
 
@@ -467,7 +467,7 @@ void pqApplicationCore::onStateSaved(vtkPVXMLElement* root)
     QString valid_name = QApplication::applicationName().replace(QRegExp("\\W"), "_");
     root->SetName(valid_name.toLocal8Bit().data());
   }
-  emit this->stateSaved(root);
+  Q_EMIT this->stateSaved(root);
 }
 
 //-----------------------------------------------------------------------------
@@ -632,7 +632,7 @@ void pqApplicationCore::loadConfigurationXML(const char* xmldata)
       << " This should now be specified in the Hints section of the XML definition.");
   }
 
-  emit this->loadXML(root);
+  Q_EMIT this->loadXML(root);
 }
 
 //-----------------------------------------------------------------------------
@@ -736,5 +736,5 @@ void pqApplicationCore::_paraview_client_environment_complete()
 
   Initialized = true;
   vtkVLogScopeF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "clientEnvironmentDone");
-  emit this->clientEnvironmentDone();
+  Q_EMIT this->clientEnvironmentDone();
 }

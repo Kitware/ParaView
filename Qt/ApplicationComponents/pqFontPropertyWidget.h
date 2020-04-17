@@ -56,14 +56,14 @@ public:
   ~pqFontPropertyWidget() override;
 
   QString justification() const;
-signals:
+Q_SIGNALS:
   void justificationChanged(QString&);
 
 protected:
   void setJustification(QString&);
   void setupJustificationButton();
 
-protected slots:
+protected Q_SLOTS:
   void changeJustificationIcon(QAction*);
   void onFontFamilyChanged();
 

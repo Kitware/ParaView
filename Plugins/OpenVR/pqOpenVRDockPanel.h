@@ -50,7 +50,7 @@ protected:
   vtkPVOpenVRHelper* Helper;
   pqOpenVRControls* OpenVRControls;
 
-protected slots:
+protected Q_SLOTS:
   void sendToOpenVR();
 
   void exportLocationsAsSkyboxes();

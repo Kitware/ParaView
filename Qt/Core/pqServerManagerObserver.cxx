@@ -107,7 +107,7 @@ void pqServerManagerObserver::connectionCreated(vtkObject*, unsigned long, void*
     SLOT(stateLoaded(vtkObject*, unsigned long, void*, void*)));
   this->Internal->VTKConnect->Connect(proxyManager, vtkCommand::SaveStateEvent, this,
     SLOT(stateSaved(vtkObject*, unsigned long, void*, void*)));
-  emit this->connectionCreated(sessionId);
+  Q_EMIT this->connectionCreated(sessionId);
 }
 
 //-----------------------------------------------------------------------------
@@ -122,7 +122,7 @@ void pqServerManagerObserver::connectionClosed(vtkObject*, unsigned long, void*,
     return;
   }
 
-  emit this->connectionClosed(sessionId);
+  Q_EMIT this->connectionClosed(sessionId);
 
   vtkSMSessionProxyManager* proxyManager =
     vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
@@ -145,11 +145,11 @@ void pqServerManagerObserver::proxyRegistered(
 
   if (info->Type == vtkSMProxyManager::RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION)
   {
-    emit this->compoundProxyDefinitionRegistered(info->ProxyName);
+    Q_EMIT this->compoundProxyDefinitionRegistered(info->ProxyName);
   }
   else if (info->Type == vtkSMProxyManager::RegisteredProxyInformation::PROXY && info->Proxy)
   {
-    emit this->proxyRegistered(info->GroupName, info->ProxyName, info->Proxy);
+    Q_EMIT this->proxyRegistered(info->GroupName, info->ProxyName, info->Proxy);
   }
 }
 
@@ -168,11 +168,11 @@ void pqServerManagerObserver::proxyUnRegistered(
 
   if (info->Type == vtkSMProxyManager::RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION)
   {
-    emit this->compoundProxyDefinitionUnRegistered(info->ProxyName);
+    Q_EMIT this->compoundProxyDefinitionUnRegistered(info->ProxyName);
   }
   else if (info->Type == vtkSMProxyManager::RegisteredProxyInformation::PROXY && info->Proxy)
   {
-    emit this->proxyUnRegistered(info->GroupName, info->ProxyName, info->Proxy);
+    Q_EMIT this->proxyUnRegistered(info->GroupName, info->ProxyName, info->Proxy);
   }
 }
 
@@ -181,7 +181,7 @@ void pqServerManagerObserver::stateLoaded(vtkObject*, unsigned long, void*, void
 {
   vtkSMProxyManager::LoadStateInformation& info =
     *reinterpret_cast<vtkSMProxyManager::LoadStateInformation*>(callData);
-  emit this->stateLoaded(info.RootElement, info.ProxyLocator);
+  Q_EMIT this->stateLoaded(info.RootElement, info.ProxyLocator);
 }
 
 //-----------------------------------------------------------------------------
@@ -189,5 +189,5 @@ void pqServerManagerObserver::stateSaved(vtkObject*, unsigned long, void*, void*
 {
   vtkSMProxyManager::LoadStateInformation& info =
     *reinterpret_cast<vtkSMProxyManager::LoadStateInformation*>(callData);
-  emit this->stateSaved(info.RootElement);
+  Q_EMIT this->stateSaved(info.RootElement);
 }

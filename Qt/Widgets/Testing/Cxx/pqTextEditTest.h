@@ -50,7 +50,7 @@ public:
     TextChangedAndEditingFinished,
   };
 
-private slots:
+private Q_SLOTS:
   void init();
   void cleanup();
 

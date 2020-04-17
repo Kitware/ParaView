@@ -61,7 +61,7 @@ protected:
   */
   void showEvent(QShowEvent* event) override;
 
-private slots:
+private Q_SLOTS:
   /**
   * Populates the widget content with global options and sourceproxy and view lists.
   */

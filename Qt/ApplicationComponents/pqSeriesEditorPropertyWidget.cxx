@@ -98,7 +98,7 @@ public:
 
   void domainModified()
   {
-    emit this->dataChanged(
+    Q_EMIT this->dataChanged(
       this->index(0, 0), this->index(this->rowCount() - 1, NUMBER_OF_COLUMNS - 1));
   }
 };
@@ -181,7 +181,7 @@ pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
       this, "seriesLabel", SIGNAL(seriesLabelChanged()), smgroup->GetProperty("SeriesLabel"));
 
     // Trigger an update of the internal lut
-    emit this->presetLabelChanged();
+    Q_EMIT this->presetLabelChanged();
     this->apply();
   }
   else
@@ -201,7 +201,7 @@ pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
       this, "seriesColor", SIGNAL(seriesColorChanged()), smgroup->GetProperty("SeriesColor"));
 
     // Trigger an update of the internal lut
-    emit this->presetColorChanged();
+    Q_EMIT this->presetColorChanged();
     this->apply();
   }
   else
@@ -550,31 +550,31 @@ void pqSeriesEditorPropertyWidget::savePropertiesWidgets()
     if (ui.Thickness == senderWidget && this->Internals->Thickness[key] != ui.Thickness->value())
     {
       this->Internals->Thickness[key] = ui.Thickness->value();
-      emit this->seriesLineThicknessChanged();
+      Q_EMIT this->seriesLineThicknessChanged();
     }
     else if (ui.StyleList == senderWidget &&
       this->Internals->Style[key] != ui.StyleList->currentIndex())
     {
       this->Internals->Style[key] = ui.StyleList->currentIndex();
-      emit this->seriesLineStyleChanged();
+      Q_EMIT this->seriesLineStyleChanged();
     }
     else if (ui.MarkerStyleList == senderWidget &&
       this->Internals->MarkerStyle[key] != ui.MarkerStyleList->currentIndex())
     {
       this->Internals->MarkerStyle[key] = ui.MarkerStyleList->currentIndex();
-      emit this->seriesMarkerStyleChanged();
+      Q_EMIT this->seriesMarkerStyleChanged();
     }
     else if (ui.MarkerSize == senderWidget &&
       this->Internals->MarkerSize[key] != ui.MarkerSize->value())
     {
       this->Internals->MarkerSize[key] = ui.MarkerSize->value();
-      emit this->seriesMarkerSizeChanged();
+      Q_EMIT this->seriesMarkerSizeChanged();
     }
     else if (ui.AxisList == senderWidget &&
       this->Internals->PlotCorner[key] != ui.AxisList->currentIndex())
     {
       this->Internals->PlotCorner[key] = ui.AxisList->currentIndex();
-      emit this->seriesPlotCornerChanged();
+      Q_EMIT this->seriesPlotCornerChanged();
     }
   }
 }

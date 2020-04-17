@@ -51,7 +51,7 @@ public:
   // Returns true if there are any user-configurable options.
   bool isConfigurable();
 
-private slots:
+private Q_SLOTS:
 
 private:
   Q_DISABLE_COPY(pqVRAddStyleDialog)

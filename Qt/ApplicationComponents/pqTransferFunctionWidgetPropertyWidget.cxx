@@ -136,8 +136,8 @@ pqTransferFunctionWidgetPropertyWidget::~pqTransferFunctionWidgetPropertyWidget(
 void pqTransferFunctionWidgetPropertyWidget::resetRangeToDomainDefault()
 {
   this->property()->ResetToDomainDefaults();
-  emit this->changeAvailable();
-  emit this->changeFinished();
+  Q_EMIT this->changeAvailable();
+  Q_EMIT this->changeFinished();
 }
 
 // -----------------------------------------------------------------------------
@@ -159,8 +159,8 @@ void pqTransferFunctionWidgetPropertyWidget::propagateProxyPointsProperty()
 
   vtkSMPropertyHelper(pxy, "Points").Set(pts, numPoints * 4);
   this->TFProxy->UpdateVTKObjects();
-  emit this->changeAvailable();
-  emit this->changeFinished();
+  Q_EMIT this->changeAvailable();
+  Q_EMIT this->changeFinished();
 }
 
 // -----------------------------------------------------------------------------
@@ -191,6 +191,6 @@ void pqTransferFunctionWidgetPropertyWidget::onRangeEdited()
 {
   this->TFProxy->RescaleTransferFunction(this->Internals->Ui.rangeMin->text().toDouble(),
     this->Internals->Ui.rangeMax->text().toDouble());
-  emit this->changeAvailable();
-  emit this->changeFinished();
+  Q_EMIT this->changeAvailable();
+  Q_EMIT this->changeFinished();
 }

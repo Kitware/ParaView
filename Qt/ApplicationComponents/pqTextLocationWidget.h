@@ -54,13 +54,13 @@ public:
 
   QString windowLocation() const;
 
-signals:
+Q_SIGNALS:
   void windowLocationChanged(QString&);
 
 protected:
   void setWindowLocation(QString&);
 
-protected slots:
+protected Q_SLOTS:
   void groupBoxLocationClicked();
   void groupBoxPositionClicked();
   void updateUI();

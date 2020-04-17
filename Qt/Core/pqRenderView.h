@@ -232,11 +232,11 @@ public:
   virtual void selectPolygonCells(
     vtkIntArray* polygon, int selectionModifier = pqView::PV_SELECTION_DEFAULT);
 
-signals:
+Q_SIGNALS:
   // Triggered when interaction mode change underneath
   void updateInteractionMode(int mode);
 
-public slots:
+public Q_SLOTS:
   // Toggle the orientation axes visibility.
   virtual void setOrientationAxesVisibility(bool visible);
 
@@ -306,7 +306,7 @@ public slots:
   */
   virtual void updateInteractionMode(pqOutputPort* opPort);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called when VTK event get trigger to notify that the interaction mode has changed
   */

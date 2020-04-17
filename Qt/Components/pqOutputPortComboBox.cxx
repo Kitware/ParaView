@@ -188,5 +188,5 @@ pqOutputPort* pqOutputPortComboBox::currentPort() const
 void pqOutputPortComboBox::onCurrentIndexChanged(int /*changed*/)
 {
   pqOutputPort* port = this->currentPort();
-  emit this->currentIndexChanged(port);
+  Q_EMIT this->currentIndexChanged(port);
 }

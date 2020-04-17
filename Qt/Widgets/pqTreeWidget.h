@@ -76,22 +76,22 @@ public:
   void setMaximumRowCountBeforeScrolling(int val) { this->MaximumRowCountBeforeScrolling = val; }
   int maximumRowCountBeforeScrolling() const { return this->MaximumRowCountBeforeScrolling; }
 
-public slots:
+public Q_SLOTS:
   void allOn();
   void allOff();
 
-signals:
+Q_SIGNALS:
   /**
   * Fired when moveCursor takes the cursor beyond the last row.
   */
   void navigatedPastEnd();
 
-protected slots:
+protected Q_SLOTS:
   void doToggle(int col);
   void updateCheckState();
   void invalidateLayout();
 
-private slots:
+private Q_SLOTS:
   void updateCheckStateInternal();
 
 protected:

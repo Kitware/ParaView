@@ -46,7 +46,7 @@ public:
   pqFileDialogFilter(pqFileDialogModel* sourceModel, QObject* Parent = NULL);
   ~pqFileDialogFilter() override;
 
-public slots:
+public Q_SLOTS:
   void setFilter(const QString& filter);
   void setShowHidden(const bool& hidden);
   bool getShowHidden() { return showHidden; };

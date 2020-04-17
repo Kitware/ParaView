@@ -220,7 +220,7 @@ void pqChooseColorPresetReaction::applyCurrentPreset()
   }
   END_UNDO_SET();
 
-  emit this->presetApplied(
+  Q_EMIT this->presetApplied(
     QString(dialog->currentPreset().get("Name", "Preset").asString().c_str()));
 }
 

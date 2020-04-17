@@ -133,10 +133,10 @@ void pqBlotShell::destroyInterpretor()
 //-----------------------------------------------------------------------------
 void pqBlotShell::executePythonCommand(const QString& command)
 {
-  emit this->executing(true);
+  Q_EMIT this->executing(true);
   // this->printMessage(command);
   this->Interpretor->RunSimpleString(command.toLocal8Bit().data());
-  emit this->executing(false);
+  Q_EMIT this->executing(false);
 }
 
 //-----------------------------------------------------------------------------

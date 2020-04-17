@@ -55,7 +55,7 @@ public:
   pqAnimationShortcutWidget(QWidget* parent, vtkSMProxy* proxy, vtkSMProperty* property);
   ~pqAnimationShortcutWidget();
 
-protected slots:
+protected Q_SLOTS:
   /**
    * Called when the menu is about to be shown.
    */

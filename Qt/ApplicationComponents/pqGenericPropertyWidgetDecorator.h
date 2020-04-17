@@ -68,7 +68,7 @@ public:
   bool canShowWidget(bool show_advanced) const override;
   bool enableWidget() const override;
 
-private slots:
+private Q_SLOTS:
   void updateState();
 
 private:

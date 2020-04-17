@@ -68,7 +68,7 @@ public:
   // returns the resolution.
   int resolution() const;
 
-public slots:
+public Q_SLOTS:
   // set the min range value
   void setMinimum(double);
   // set the max range value
@@ -85,7 +85,7 @@ protected:
   int valueToSliderPos(double val) override;
   double sliderPosToValue(int pos) override;
 
-private slots:
+private Q_SLOTS:
   void updateValidator();
 
 private:

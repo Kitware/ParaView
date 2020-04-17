@@ -241,7 +241,7 @@ void pqMultiSliceView::onSliceAdded(int activeSliceIndex)
   this->updateSlices();
 
   // Notify that the slices location have changed
-  emit sliceAdded(axisIndex, activeSliceIndex);
+  Q_EMIT sliceAdded(axisIndex, activeSliceIndex);
 }
 
 //-----------------------------------------------------------------------------
@@ -253,7 +253,7 @@ void pqMultiSliceView::onSliceRemoved(int activeSliceIndex)
   this->updateSlices();
 
   // Notify that the slices location have changed
-  emit sliceRemoved(axisIndex, activeSliceIndex);
+  Q_EMIT sliceRemoved(axisIndex, activeSliceIndex);
 }
 
 //-----------------------------------------------------------------------------
@@ -265,7 +265,7 @@ void pqMultiSliceView::onSliceModified(int activeSliceIndex)
   this->updateSlices();
 
   // Notify that the slices location have changed
-  emit sliceModified(axisIndex, activeSliceIndex);
+  Q_EMIT sliceModified(axisIndex, activeSliceIndex);
 }
 
 //-----------------------------------------------------------------------------
@@ -398,15 +398,15 @@ void pqMultiSliceView::onSliceClicked(int button, int modifier, double value)
   QObject* senderObject = QObject::sender();
   if (senderObject == this->AxisX.data())
   {
-    emit sliceClicked(0, value, button, modifier);
+    Q_EMIT sliceClicked(0, value, button, modifier);
   }
   else if (senderObject == this->AxisY.data())
   {
-    emit sliceClicked(1, value, button, modifier);
+    Q_EMIT sliceClicked(1, value, button, modifier);
   }
   else if (senderObject == this->AxisZ.data())
   {
-    emit sliceClicked(2, value, button, modifier);
+    Q_EMIT sliceClicked(2, value, button, modifier);
   }
 }
 //-----------------------------------------------------------------------------

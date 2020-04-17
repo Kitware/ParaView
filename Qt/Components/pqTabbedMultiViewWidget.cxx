@@ -620,7 +620,7 @@ void pqTabbedMultiViewWidget::lockViewSize(const QSize& viewSize)
     }
   }
 
-  emit this->viewSizeLocked(!viewSize.isEmpty());
+  Q_EMIT this->viewSizeLocked(!viewSize.isEmpty());
 }
 
 //-----------------------------------------------------------------------------

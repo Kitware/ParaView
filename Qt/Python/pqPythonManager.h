@@ -92,7 +92,7 @@ public:
    */
   void updateMacroList();
 
-public slots:
+public Q_SLOTS:
   /**
    * Executes the given script.  If the python interpreter hasn't been initialized
    * yet it will be initialized.

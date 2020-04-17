@@ -61,7 +61,7 @@ public:
    */
   bool useGlobalPrecisionAndNotation() const;
 
-signals:
+Q_SIGNALS:
   /**
    * signal the value changed
    */
@@ -75,7 +75,7 @@ signals:
    */
   void valueEdited(double);
 
-public slots:
+public Q_SLOTS:
   /**
    * set the value
    */
@@ -107,7 +107,7 @@ protected:
   void setSliderRange(int min, int max);
   void updateSlider();
 
-private slots:
+private Q_SLOTS:
   void sliderChanged(int val);
   void textChanged(const QString& text);
   void editingFinished();

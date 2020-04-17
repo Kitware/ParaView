@@ -16,7 +16,7 @@ public:
   pqFileDialogTestUtility();
   ~pqFileDialogTestUtility();
   virtual bool playTests(const QStringList& filenames);
-public slots:
+public Q_SLOTS:
   void playTheTests(const QStringList&);
 
 protected:
@@ -33,7 +33,7 @@ public:
 
   pqTestUtility* Tester() { return &this->TestUtility; }
 
-public slots:
+public Q_SLOTS:
   void record();
   void openFileDialog();
   void emittedFiles(const QList<QStringList>& files);

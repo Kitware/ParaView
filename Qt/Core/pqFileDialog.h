@@ -172,7 +172,7 @@ public:
   static QString getSaveFileName(pqServer* server, QWidget* parentWdg,
     const QString& title = QString(), const QString& directory = QString(),
     const QString& filter = QString());
-signals:
+Q_SIGNALS:
   /**
   * Signal emitted when the user has chosen a set of files
   */
@@ -202,7 +202,7 @@ protected:
 
   void showEvent(QShowEvent* showEvent) override;
 
-private slots:
+private Q_SLOTS:
   void onModelReset();
   void onNavigate(const QString& = QString());
   void onNavigateUp();

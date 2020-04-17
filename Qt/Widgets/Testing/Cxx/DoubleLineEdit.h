@@ -6,7 +6,7 @@
 class DoubleLineEditTester : public QObject
 {
   Q_OBJECT;
-private slots:
+private Q_SLOTS:
   void basic();
   void useGlobalPrecision();
   void useGlobalPrecision_data();

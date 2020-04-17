@@ -136,7 +136,7 @@ public:
   static QString formatDoubleUsingGlobalPrecisionAndNotation(double value);
   //@}
 
-public slots:
+public Q_SLOTS:
   /**
    * Set the notation used to display the number.
    * \sa notation()

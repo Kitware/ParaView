@@ -78,7 +78,7 @@ void pqExportViewSelection::onPreviousClicked()
           qobject_cast<pqImageOutputInfo*>(this->Ui->swViews->widget(previousIndex)))
     {
       bool isComposite = qinfo->getComposite();
-      emit arraySelectionEnabledChanged(isComposite);
+      Q_EMIT arraySelectionEnabledChanged(isComposite);
     }
   }
 }
@@ -105,7 +105,7 @@ void pqExportViewSelection::onNextClicked()
           qobject_cast<pqImageOutputInfo*>(this->Ui->swViews->widget(nextIndex)))
     {
       bool isComposite = qinfo->getComposite();
-      emit arraySelectionEnabledChanged(isComposite);
+      Q_EMIT arraySelectionEnabledChanged(isComposite);
     }
   }
 }

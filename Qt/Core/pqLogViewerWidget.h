@@ -87,7 +87,7 @@ public:
    */
   void updateColumnVisibilities();
 
-signals:
+Q_SIGNALS:
   // Emitted when the widget is closed
   void closed();
 
@@ -95,7 +95,7 @@ signals:
   // \param time
   void scrolled(double time);
 
-protected slots:
+protected Q_SLOTS:
   void toggleAdvanced();
 
   void exportLog();

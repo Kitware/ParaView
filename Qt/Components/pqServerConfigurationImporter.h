@@ -105,7 +105,7 @@ public:
   */
   const QList<Item>& configurations() const;
 
-public slots:
+public Q_SLOTS:
   /**
   * Use this method to fetch server configurations from urls specified.
   * This call blocks until all configurations are fetched. It uses a
@@ -122,7 +122,7 @@ public slots:
   */
   void abortFetch();
 
-signals:
+Q_SIGNALS:
   /**
   * fired as source configurations are fetched. Makes it possible to build
   * interfaces that are populated as new configurations arrive, rather than
@@ -168,7 +168,7 @@ protected:
   */
   bool fetch(const QUrl& url);
 
-private slots:
+private Q_SLOTS:
   /**
   * called data is available on the network request.
   */

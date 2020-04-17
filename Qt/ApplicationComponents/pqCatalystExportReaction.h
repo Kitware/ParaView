@@ -49,7 +49,7 @@ public:
   pqCatalystExportReaction(QAction* parent);
   ~pqCatalystExportReaction();
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called when the action is triggered.
   */

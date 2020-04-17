@@ -239,7 +239,7 @@ void pqOMETransferFunctionsPropertyWidget::stcChanged(pqTransferFunctionWidget* 
   QScopedValueRollback<bool> rollback(this->UpdatingProperty, true);
   auto pname = tfWidget->property("SM_PROPERTY").toString();
   this->setProperty(pname.toLocal8Bit().data(), values);
-  emit this->xrgbPointsChanged();
+  Q_EMIT this->xrgbPointsChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -262,7 +262,7 @@ void pqOMETransferFunctionsPropertyWidget::pwfChanged(pqTransferFunctionWidget* 
   QScopedValueRollback<bool> rollback(this->UpdatingProperty, true);
   auto pname = tfWidget->property("SM_PROPERTY").toString();
   this->setProperty(pname.toLocal8Bit().data(), values);
-  emit this->xvmsPointsChanged();
+  Q_EMIT this->xvmsPointsChanged();
 }
 
 //-----------------------------------------------------------------------------

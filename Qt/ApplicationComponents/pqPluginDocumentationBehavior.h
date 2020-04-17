@@ -52,7 +52,7 @@ public:
   pqPluginDocumentationBehavior(QHelpEngine* engine);
   ~pqPluginDocumentationBehavior() override;
 
-protected slots:
+protected Q_SLOTS:
   void updatePlugin(vtkPVPlugin*);
   void updatePlugins();
   void refreshHelpEngine();

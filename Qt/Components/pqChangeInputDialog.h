@@ -70,7 +70,7 @@ public:
   */
   const QMap<QString, QList<pqOutputPort*> >& selectedInputs() const;
 
-protected slots:
+protected Q_SLOTS:
   void inputPortToggled(bool);
   void selectionChanged();
 

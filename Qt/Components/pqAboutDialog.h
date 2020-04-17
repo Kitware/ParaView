@@ -60,7 +60,7 @@ public:
    */
   QString formatToText();
 
-public slots:
+public Q_SLOTS:
 
   /**
    * Saves about dialog formatted output to a file.

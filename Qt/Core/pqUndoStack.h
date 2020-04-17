@@ -119,7 +119,7 @@ public:
   */
   void updateAllModifiedProxies();
 
-public slots:
+public Q_SLOTS:
   void beginUndoSet(QString label);
   void endUndoSet();
 
@@ -154,7 +154,7 @@ public slots:
   */
   void addToActiveUndoSet(vtkUndoElement* element);
 
-signals:
+Q_SIGNALS:
   /**
   * Fired to notify interested parites that the stack has changed.
   * Has information to know the status of the top of the stack.
@@ -171,7 +171,7 @@ signals:
   // Fired after redo.
   void redone();
 
-private slots:
+private Q_SLOTS:
   void onStackChanged();
 
 private:

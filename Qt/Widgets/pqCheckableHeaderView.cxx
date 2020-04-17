@@ -287,7 +287,7 @@ void pqCheckableHeaderView::paintSection(
     if (checkstate != newCheckstate)
     {
       this->Internal->checkState[logicalIdx] = newCheckstate;
-      emit this->checkStateChanged(logicalIdx);
+      Q_EMIT this->checkStateChanged(logicalIdx);
     }
   }
   else
@@ -331,7 +331,7 @@ void pqCheckableHeaderView::mousePressEvent(QMouseEvent* evt)
             this->Internal->checkState[logicalIndexPressed] = QVariant(Qt::Checked);
           }
           this->Internal->forceCheck = true;
-          emit this->checkStateChanged(logicalIndexPressed);
+          Q_EMIT this->checkStateChanged(logicalIndexPressed);
           this->updateModelCheckState(logicalIndexPressed);
         }
         else

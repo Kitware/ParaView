@@ -83,10 +83,10 @@ public:
    */
   static QStringList CustomViewpointConfigurations();
 
-public slots:
+public Q_SLOTS:
   void setRenderModule(pqView*);
 
-private slots:
+private Q_SLOTS:
   // Description:
   // Choose a file and load/save camera properties.
   void saveCameraConfiguration();

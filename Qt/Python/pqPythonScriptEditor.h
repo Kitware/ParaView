@@ -58,7 +58,7 @@ public:
    */
   void scrollToBottom();
 
-public slots:
+public Q_SLOTS:
 
   void open(const QString& filename);
   void setText(const QString& text);
@@ -68,13 +68,13 @@ public slots:
   // be created and this method returns false.
   bool newFile();
 
-signals:
+Q_SIGNALS:
   void fileSaved();
 
 protected:
   void closeEvent(QCloseEvent* event) override;
 
-private slots:
+private Q_SLOTS:
   void open();
   bool save();
   bool saveAs();

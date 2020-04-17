@@ -86,7 +86,7 @@ public:
   void setSortByServers(bool val) { this->SortByServers = val; }
   bool sortByServers() const { return this->SortByServers; }
 
-private slots:
+private Q_SLOTS:
   void buildMenu();
   void onOpenResource(QAction*);
   void onOpenResource(const pqServerResource& resource);

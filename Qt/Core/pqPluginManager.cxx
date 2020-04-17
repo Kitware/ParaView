@@ -203,7 +203,7 @@ void pqPluginManager::onServerConnected(pqServer* server)
   // are indeed present on both.
   if (!this->verifyPlugins(server))
   {
-    emit this->requiredPluginsNotLoaded(server);
+    Q_EMIT this->requiredPluginsNotLoaded(server);
   }
 }
 
@@ -234,7 +234,7 @@ void pqPluginManager::onServerDisconnected(pqServer* server)
 //-----------------------------------------------------------------------------
 void pqPluginManager::updatePluginLists()
 {
-  emit this->pluginsUpdated();
+  Q_EMIT this->pluginsUpdated();
 }
 
 //-----------------------------------------------------------------------------

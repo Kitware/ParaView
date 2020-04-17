@@ -65,7 +65,7 @@ public:
 
   ~pqTextEdit() override;
 
-signals:
+Q_SIGNALS:
   /**
   * Unlike editingFinished() which gets fired whenever the widget looses
   * focus irrespective of if the text actually was edited,
@@ -80,7 +80,7 @@ signals:
   */
   void editingFinished();
 
-private slots:
+private Q_SLOTS:
   void onEditingFinished();
   void onTextEdited();
 

@@ -54,10 +54,10 @@ public:
 
   pqSMProxy selectedInput() const;
 
-public slots:
+public Q_SLOTS:
   void setSelectedInput(pqSMProxy);
 
-signals:
+Q_SIGNALS:
   void selectedInputChanged();
 
 private:

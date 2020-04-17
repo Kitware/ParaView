@@ -60,7 +60,7 @@ public:
   }
   ~pqVCRToolbar() override;
 
-protected slots:
+protected Q_SLOTS:
   void setTimeRanges(double, double);
   void onPlaying(bool);
 

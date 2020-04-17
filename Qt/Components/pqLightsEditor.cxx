@@ -127,6 +127,6 @@ void pqLightsEditor::resetLights()
     _property->ResetToDefault();
   }
   proxy()->UpdateVTKObjects();
-  emit this->changeFinished();
+  Q_EMIT this->changeFinished();
   END_UNDO_SET();
 }

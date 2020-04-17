@@ -128,7 +128,7 @@ public:
   */
   static bool resetScalarRangeToVisible(pqPipelineRepresentation* repr = NULL);
 
-public slots:
+public Q_SLOTS:
   /**
   * Updates the enabled state. Applications need not explicitly call
   * this.
@@ -146,7 +146,7 @@ protected:
   */
   void onTriggered() override;
 
-protected slots:
+protected Q_SLOTS:
   virtual void onServerAdded(pqServer* server);
   virtual void onAboutToRemoveServer(pqServer* server);
 

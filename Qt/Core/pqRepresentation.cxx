@@ -82,7 +82,7 @@ pqRepresentation::~pqRepresentation()
 void pqRepresentation::setView(pqView* view)
 {
   this->Internal->View = view;
-  emit this->visibilityChanged(false);
+  Q_EMIT this->visibilityChanged(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -116,7 +116,7 @@ void pqRepresentation::renderView(bool force)
 //-----------------------------------------------------------------------------
 void pqRepresentation::onVisibilityChanged()
 {
-  emit this->visibilityChanged(this->isVisible());
+  Q_EMIT this->visibilityChanged(this->isVisible());
 }
 
 //-----------------------------------------------------------------------------

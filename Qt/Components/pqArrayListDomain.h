@@ -59,7 +59,7 @@ public:
     vtkSMProperty* smproperty, vtkSMDomain* domain);
   ~pqArrayListDomain() override;
 
-private slots:
+private Q_SLOTS:
   void domainChanged();
 
 private:

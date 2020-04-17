@@ -62,7 +62,7 @@ public:
 
   static const std::string TEXTURES_GROUP;
 
-signals:
+Q_SIGNALS:
 
   /**
    * Emitted whenever the texture has been changed
@@ -73,7 +73,7 @@ protected:
   void loadTexture();
   bool loadTexture(const QString& filename);
 
-protected slots:
+protected Q_SLOTS:
   void onCurrentIndexChanged(int index);
   void updateTextures();
   void proxyRegistered(const QString& group, const QString&, vtkSMProxy* proxy);

@@ -58,7 +58,7 @@ public:
 
   vtkSMProxy* currentProxy() const;
 
-public slots:
+public Q_SLOTS:
   void setCurrentProxy(vtkSMProxy* proxy);
 
   /**
@@ -67,7 +67,7 @@ public slots:
   */
   void reload();
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called when user activates an item.
   */

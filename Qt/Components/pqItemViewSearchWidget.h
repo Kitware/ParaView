@@ -60,10 +60,10 @@ public:
     Previous
   };
 
-public slots:
+public Q_SLOTS:
   virtual void showSearchWidget();
 
-protected slots:
+protected Q_SLOTS:
 
   /**
   * Given the user entered text, update the GUI.

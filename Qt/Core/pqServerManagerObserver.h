@@ -59,7 +59,7 @@ public:
   pqServerManagerObserver(QObject* parent = 0);
   ~pqServerManagerObserver() override;
 
-signals:
+Q_SIGNALS:
   /**
   * Fired when a compound proxy definition is registered.
   */
@@ -96,7 +96,7 @@ signals:
   */
   void stateSaved(vtkPVXMLElement* root);
 
-private slots:
+private Q_SLOTS:
   void proxyRegistered(
     vtkObject* object, unsigned long e, void* clientData, void* callData, vtkCommand* command);
   void proxyUnRegistered(vtkObject*, unsigned long, void*, void* callData, vtkCommand*);

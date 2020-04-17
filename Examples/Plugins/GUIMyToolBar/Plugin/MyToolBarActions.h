@@ -8,6 +8,6 @@ public:
   MyToolBarActions(QObject* p);
   ~MyToolBarActions();
 
-public slots:
+public Q_SLOTS:
   void onAction();
 };

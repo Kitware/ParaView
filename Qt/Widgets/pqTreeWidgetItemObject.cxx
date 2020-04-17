@@ -55,14 +55,14 @@ void pqTreeWidgetItemObject::setData(int column, int role, const QVariant& v)
     if (v != this->data(column, Qt::CheckStateRole))
     {
       QTreeWidgetItem::setData(column, role, v);
-      emit this->checkedStateChanged(Qt::Checked == v ? true : false);
+      Q_EMIT this->checkedStateChanged(Qt::Checked == v ? true : false);
     }
   }
   else
   {
     QTreeWidgetItem::setData(column, role, v);
   }
-  emit this->modified();
+  Q_EMIT this->modified();
 }
 
 bool pqTreeWidgetItemObject::isChecked() const

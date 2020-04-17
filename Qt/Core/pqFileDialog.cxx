@@ -589,10 +589,10 @@ void pqFileDialog::addToFilesSelected(const QStringList& files)
 void pqFileDialog::emitFilesSelectionDone()
 {
   auto& impl = *this->Implementation;
-  emit filesSelected(impl.SelectedFiles);
+  Q_EMIT filesSelected(impl.SelectedFiles);
   if (impl.Mode != this->ExistingFiles && impl.SelectedFiles.size() > 0)
   {
-    emit filesSelected(impl.SelectedFiles[0]);
+    Q_EMIT filesSelected(impl.SelectedFiles[0]);
   }
   this->done(QDialog::Accepted);
 }
@@ -635,7 +635,7 @@ void pqFileDialog::accept()
   }
   if (loadedFile)
   {
-    emit this->emitFilesSelectionDone();
+    Q_EMIT this->emitFilesSelectionDone();
   }
 }
 
@@ -657,7 +657,7 @@ bool pqFileDialog::acceptExistingFiles()
     filename = filename.trimmed();
 
     QString fullFilePath = impl.Model->absoluteFilePath(filename);
-    emit this->fileAccepted(fullFilePath);
+    Q_EMIT this->fileAccepted(fullFilePath);
     loadedFiles = (this->acceptInternal(this->buildFileGroup(filename)) || loadedFiles);
   }
   return loadedFiles;
@@ -672,7 +672,7 @@ bool pqFileDialog::acceptDefault(const bool& checkForGrouping)
   filename = filename.trimmed();
 
   QString fullFilePath = impl.Model->absoluteFilePath(filename);
-  emit this->fileAccepted(fullFilePath);
+  Q_EMIT this->fileAccepted(fullFilePath);
 
   QStringList files;
   if (checkForGrouping)

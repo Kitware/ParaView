@@ -46,7 +46,7 @@ public:
   {
   }
 
-public slots:
+public Q_SLOTS:
   void onValuesChanged(int min, int max)
   {
     std::cout << "Integer, min: " << min << std::endl;

@@ -271,7 +271,7 @@ pqArraySelectorPropertyWidget::pqArraySelectorPropertyWidget(
   QObject::connect(combobox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int) {
     this->Internals->pruneUnusedUnknownItems();
     this->Internals->updateArrayToCurrent();
-    emit this->arrayChanged();
+    Q_EMIT this->arrayChanged();
   });
 }
 

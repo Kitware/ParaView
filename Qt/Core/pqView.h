@@ -110,7 +110,7 @@ public:
   */
   QString getViewType() const { return this->ViewType; }
 
-public slots:
+public Q_SLOTS:
   /**
   * Request a StillRender on idle. Multiple calls are collapsed into one.
   */
@@ -201,7 +201,7 @@ public:
   */
   virtual void emitSelectionSignals(bool frustum);
 
-signals:
+Q_SIGNALS:
   /**
   * Fired when the vtkSMViewProxy fires the vtkCommand::UpdateDataEvent
   * The view proxy fires this event at the end of vtkSMViewProxy::Update()
@@ -297,7 +297,7 @@ signals:
   */
   void multipleSelected(QList<pqOutputPort*> opports);
 
-private slots:
+private Q_SLOTS:
   /**
   * Called when the "Representations" property changes.
   */

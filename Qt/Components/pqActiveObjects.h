@@ -125,7 +125,7 @@ public:
    */
   int activeLayoutLocation() const;
 
-public slots:
+public Q_SLOTS:
   void setActiveView(pqView* view);
   void setActiveSource(pqPipelineSource* source);
   void setActivePort(pqOutputPort* port);
@@ -140,7 +140,7 @@ public slots:
   */
   void setSelection(const pqProxySelection& selection, pqServerManagerModelItem* current);
 
-signals:
+Q_SIGNALS:
   /**
   * These signals are fired when any of the corresponding active items change.
   */
@@ -159,7 +159,7 @@ signals:
   */
   void dataUpdated();
 
-private slots:
+private Q_SLOTS:
   /**
   * if a new server connection was established, and no active server is set,
   * this makes the new server active by default. This helps with single-session

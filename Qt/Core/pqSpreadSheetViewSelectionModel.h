@@ -62,7 +62,7 @@ public:
   pqSpreadSheetViewSelectionModel(pqSpreadSheetViewModel* model, QObject* parent = 0);
   ~pqSpreadSheetViewSelectionModel() override;
 
-public slots:
+public Q_SLOTS:
   void select(const QModelIndex& index, QItemSelectionModel::SelectionFlags command) override
   {
     this->Superclass::select(index, command);
@@ -71,10 +71,10 @@ public slots:
   void select(
     const QItemSelection& selection, QItemSelectionModel::SelectionFlags command) override;
 
-signals:
+Q_SIGNALS:
   void selection(vtkSMSourceProxy*);
 
-protected slots:
+protected Q_SLOTS:
   void serverSelectionChanged(const QItemSelection&);
 
 protected:

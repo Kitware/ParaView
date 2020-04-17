@@ -67,10 +67,10 @@ public:
   void setShowLabels(bool);
   void setLabels(std::vector<const char*>&);
 
-signals:
+Q_SIGNALS:
   void scalarsChanged();
 
-private slots:
+private Q_SLOTS:
   void smRangeModified();
 
   /**

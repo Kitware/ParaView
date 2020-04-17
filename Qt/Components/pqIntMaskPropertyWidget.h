@@ -81,13 +81,13 @@ public:
   */
   int mask() const;
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the mask.
   */
   void setMask(int mask);
 
-signals:
+Q_SIGNALS:
   /**
   * Fired whenever the user changes the selection.
   */

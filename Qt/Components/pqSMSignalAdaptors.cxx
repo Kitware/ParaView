@@ -95,5 +95,5 @@ void pqSignalAdaptorProxy::setProxy(const QVariant& var)
 void pqSignalAdaptorProxy::handleProxyChanged()
 {
   QVariant p = this->proxy();
-  emit this->proxyChanged(p);
+  Q_EMIT this->proxyChanged(p);
 }

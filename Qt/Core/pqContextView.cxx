@@ -257,7 +257,7 @@ void pqContextView::setSelection(vtkSelection* sel)
       .arg("ContainingCells", vtkSMPropertyHelper(selectionSource, "ContainingCells").GetAsInt());
   }
 
-  emit this->selected(opPort);
+  Q_EMIT this->selected(opPort);
 }
 
 //-----------------------------------------------------------------------------

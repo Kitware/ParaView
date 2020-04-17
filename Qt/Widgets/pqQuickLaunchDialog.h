@@ -60,13 +60,13 @@ public:
   */
   void addActions(const QList<QAction*>& actions);
 
-public slots:
+public Q_SLOTS:
   /**
   * Overridden to trigger the user selected action.
   */
   void accept() override;
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called when the user chooses an item from available choices shown in the
   * options list.

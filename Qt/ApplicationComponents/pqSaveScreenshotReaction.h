@@ -93,7 +93,7 @@ public:
   static QString promptFileName(
     vtkSMSaveScreenshotProxy* saveProxy, const QString& defaultExtension);
 
-public slots:
+public Q_SLOTS:
   /**
   * Updates the enabled state. Applications need not explicitly call
   * this.

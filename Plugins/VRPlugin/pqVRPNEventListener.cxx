@@ -70,7 +70,7 @@ void pqVRPNEventListener::addConnection(pqVRPNConnection* conn)
   {
     // Need to synchronize and use signals/slots if running.
     this->Bridge->SyncMutex.lock();
-    emit addConnectionInternal(conn);
+    Q_EMIT addConnectionInternal(conn);
     this->Bridge->SyncCondition.wait(&this->Bridge->SyncMutex);
     this->Bridge->SyncMutex.unlock();
   }
@@ -102,7 +102,7 @@ void pqVRPNEventListener::removeConnection(pqVRPNConnection* conn)
   {
     // Need to synchronize and use signals/slots if running.
     this->Bridge->SyncMutex.lock();
-    emit removeConnectionInternal(conn);
+    Q_EMIT removeConnectionInternal(conn);
     this->Bridge->SyncCondition.wait(&this->Bridge->SyncMutex);
     bool needsStop = this->Bridge->Connections.isEmpty();
     this->Bridge->SyncMutex.unlock();
@@ -145,7 +145,7 @@ void pqVRPNEventListener::start()
     return;
   }
   this->Thread.start();
-  emit listen();
+  Q_EMIT listen();
 }
 
 //------------------------------------------------------------------------------

@@ -77,7 +77,7 @@ public:
   pqChooseColorPresetReaction(QAction* parent, bool track_active_objects = true);
   ~pqChooseColorPresetReaction() override;
 
-public slots:
+public Q_SLOTS:
   /**
   * Choose color preset for the representation set using setRepresentation().
   * Returns false if representation cannot be located or its is not using
@@ -115,13 +115,13 @@ public slots:
    */
   QRegularExpression regularExpression();
 
-signals:
+Q_SIGNALS:
   /**
    * fired every time a preset is applied.
    */
   void presetApplied(const QString&);
 
-private slots:
+private Q_SLOTS:
   void applyCurrentPreset();
 
   /**

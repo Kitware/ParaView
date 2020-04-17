@@ -318,7 +318,7 @@ void pqServerConnectDialog::onServerSelected()
 void pqServerConnectDialog::addServer()
 {
   this->editConfiguration(pqServerConfiguration());
-  emit serverAdded();
+  Q_EMIT serverAdded();
 }
 
 //-----------------------------------------------------------------------------
@@ -641,7 +641,7 @@ void pqServerConnectDialog::deleteServer()
     pqApplicationCore::instance()->serverConfigurations().saveNow();
   }
 
-  emit serverDeleted();
+  Q_EMIT serverDeleted();
 }
 
 //-----------------------------------------------------------------------------

@@ -83,7 +83,7 @@ public:
   int currentRow() const;
   void setCurrentRow(int idx);
   //@}
-signals:
+Q_SIGNALS:
   /**
    * Signal fired whenever the points are changed.
    */
@@ -94,13 +94,13 @@ signals:
    */
   void currentRowChanged();
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the color to use for the spline.
   */
   void setLineColor(const QColor&);
 
-protected slots:
+protected Q_SLOTS:
   void placeWidget() override;
 
 private:

@@ -53,7 +53,7 @@ public:
 
   virtual pqSMProxy selection() { return this->SelectionSource; }
 
-public slots:
+public Q_SLOTS:
   virtual void setSelection(pqSMProxy selection);
 
   /**
@@ -64,13 +64,13 @@ public slots:
   virtual void preAccept();
   virtual void postAccept();
 
-signals:
+Q_SIGNALS:
   /**
   * Signal that the selection proxy changed.
   */
   void selectionChanged(pqSMProxy);
 
-protected slots:
+protected Q_SLOTS:
   // Copy active selection.
   void copyActiveSelection();
 

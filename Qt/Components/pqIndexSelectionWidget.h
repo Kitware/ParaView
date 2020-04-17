@@ -56,14 +56,14 @@ public:
   pqIndexSelectionWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
   ~pqIndexSelectionWidget() override;
 
-public slots:
+public Q_SLOTS:
   void setHeaderLabel(const QString& str);
   void setPushPropertyName(const QByteArray& pName);
 
-signals:
+Q_SIGNALS:
   void widgetModified();
 
-protected slots:
+protected Q_SLOTS:
   void currentChanged(const QString& current);
   void currentChanged(int current);
   void currentChanged(); // pqLineEdit::textChangedAndEditingFinished() handler

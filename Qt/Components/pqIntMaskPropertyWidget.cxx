@@ -120,7 +120,7 @@ void pqIntMaskPropertyWidget::setMask(int ivalue)
       unsigned int mask_flag = actn->data().value<unsigned int>();
       actn->setChecked((value & mask_flag) != 0);
     }
-    emit this->maskChanged();
+    Q_EMIT this->maskChanged();
   }
 }
 

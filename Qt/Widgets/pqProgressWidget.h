@@ -97,7 +97,7 @@ public:
   const QString& busyText() const { return this->BusyText; }
   //@}
 
-public slots:
+public Q_SLOTS:
   /**
    * Set the progress. Progress must be enabled by calling 'enableProgress`
    * otherwise this method will have no effect.
@@ -116,7 +116,7 @@ public slots:
    */
   void enableAbort(bool enabled);
 
-signals:
+Q_SIGNALS:
   /**
    * triggered with the abort button is pressed.
    */

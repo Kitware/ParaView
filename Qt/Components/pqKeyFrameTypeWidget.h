@@ -53,7 +53,7 @@ public:
   pqKeyFrameTypeWidget(QWidget* parent = NULL);
   ~pqKeyFrameTypeWidget() override;
 
-public slots:
+public Q_SLOTS:
   void setType(const QString& text);
   void setBase(const QString& text);
   void setStartPower(const QString& text);
@@ -73,7 +73,7 @@ public:
 
   QComboBox* typeComboBox() const;
 
-signals:
+Q_SIGNALS:
   void typeChanged(const QString&);
   void baseChanged(const QString&);
   void startPowerChanged(const QString&);
@@ -82,7 +82,7 @@ signals:
   void offsetChanged(const QString&);
   void frequencyChanged(const QString&);
 
-protected slots:
+protected Q_SLOTS:
   void onTypeChanged();
 
 private:

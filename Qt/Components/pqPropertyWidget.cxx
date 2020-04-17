@@ -81,7 +81,7 @@ void pqPropertyWidget::onChangeAvailable()
 {
   if (this->ChangeAvailableAsChangeFinished)
   {
-    emit this->changeFinished();
+    Q_EMIT this->changeFinished();
   }
 }
 
@@ -95,7 +95,7 @@ pqView* pqPropertyWidget::view() const
 void pqPropertyWidget::setView(pqView* pqview)
 {
   this->View = pqview;
-  emit this->viewChanged(pqview);
+  Q_EMIT this->viewChanged(pqview);
 }
 
 //-----------------------------------------------------------------------------

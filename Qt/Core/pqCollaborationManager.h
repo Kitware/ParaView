@@ -69,7 +69,7 @@ public:
   */
   vtkSMCollaborationManager* activeCollaborationManager();
 
-signals:
+Q_SIGNALS:
   /**
   * This will be triggered by the remote clients to update any interesting
   * components. This should be triggered by local client to broadcast to
@@ -100,7 +100,7 @@ signals:
   */
   void triggerFollowCamera(int);
 
-public slots:
+public Q_SLOTS:
   /**
   * Slot used to keep track of all possible vtkSMCollaborationManagers
   * They are used in pqCollaborationBehavior to listen to the
@@ -165,7 +165,7 @@ public slots:
    */
   void setConnectID(int connectID);
 
-private slots:
+private Q_SLOTS:
   /**
   * Called when a message has been sent by another client
   * This method will trigger signals that will be used by other Qt classes

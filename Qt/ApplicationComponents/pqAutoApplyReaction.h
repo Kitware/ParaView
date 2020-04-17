@@ -56,7 +56,7 @@ public:
   */
   static bool autoApply();
 
-protected slots:
+protected Q_SLOTS:
   void updateState();
   void checkStateChanged(bool);
 

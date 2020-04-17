@@ -53,13 +53,13 @@ public:
 
   QList<QVariant> arrayToGenerate() const;
 
-public slots:
+public Q_SLOTS:
   void setArrayToGenerate(const QList<QVariant>&);
 
-signals:
+Q_SIGNALS:
   void arrayToGenerateChanged();
 
-protected slots:
+protected Q_SLOTS:
   /// Create/Reset the widget
   void resetWidget() override;
   void forceResetSeedWidget();

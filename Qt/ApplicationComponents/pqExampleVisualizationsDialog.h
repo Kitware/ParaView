@@ -25,7 +25,7 @@ public:
   explicit pqExampleVisualizationsDialog(QWidget* parent = 0);
   ~pqExampleVisualizationsDialog() override;
 
-protected slots:
+protected Q_SLOTS:
   virtual void onButtonPressed();
 
 private:

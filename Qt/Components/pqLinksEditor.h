@@ -108,7 +108,7 @@ public:
   */
   bool convertToIndicesChecked();
 
-private slots:
+private Q_SLOTS:
   void currentProxy1Changed(const QModelIndex& cur, const QModelIndex&);
   void currentProxy2Changed(const QModelIndex& cur, const QModelIndex&);
 

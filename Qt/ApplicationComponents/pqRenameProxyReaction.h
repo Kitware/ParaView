@@ -65,7 +65,7 @@ public:
    */
   pqRenameProxyReaction(QAction* renameAction, QWidget* parentWidget = nullptr);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called when the action is triggered.
   */

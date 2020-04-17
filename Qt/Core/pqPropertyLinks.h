@@ -125,7 +125,7 @@ public:
   bool autoUpdateVTKObjects() const { return this->AutoUpdateVTKObjects; }
   bool useUncheckedProperties() const { return this->UseUncheckedProperties; }
 
-public slots:
+public Q_SLOTS:
   /**
   * Remove all links.
   */
@@ -157,11 +157,11 @@ public slots:
   */
   void setAutoUpdateVTKObjects(bool val) { this->AutoUpdateVTKObjects = val; }
 
-signals:
+Q_SIGNALS:
   void qtWidgetChanged();
   void smPropertyChanged();
 
-private slots:
+private Q_SLOTS:
   /**
   * slots called when pqPropertyLinksConnection indicates that a Qt or SM
   * property was changed.

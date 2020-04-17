@@ -61,7 +61,7 @@ public:
 
   static pqVRQueueHandler* instance();
 
-public slots:
+public Q_SLOTS:
   /// start/stop queue processing.
   void start();
   void stop();
@@ -73,10 +73,10 @@ public slots:
   /// saves the styles configuration.
   void saveStylesConfiguration(vtkPVXMLElement* root);
 
-signals:
+Q_SIGNALS:
   void stylesChanged();
 
-protected slots:
+protected Q_SLOTS:
   /// called to processes events from the queue.
   void processEvents();
 

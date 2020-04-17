@@ -200,7 +200,7 @@ void pqFontPropertyWidget::setJustification(QString& str)
     }
   }
 
-  emit this->justificationChanged(str);
+  Q_EMIT this->justificationChanged(str);
 }
 
 //-----------------------------------------------------------------------------

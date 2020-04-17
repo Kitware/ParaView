@@ -46,17 +46,17 @@ pqDialog::~pqDialog()
 //-----------------------------------------------------------------------------
 void pqDialog::accept()
 {
-  emit this->beginUndo(this->UndoLabel);
+  Q_EMIT this->beginUndo(this->UndoLabel);
   this->acceptInternal();
   this->Superclass::accept();
-  emit this->endUndo();
+  Q_EMIT this->endUndo();
 }
 
 //-----------------------------------------------------------------------------
 void pqDialog::done(int r)
 {
-  emit this->beginUndo(this->UndoLabel);
+  Q_EMIT this->beginUndo(this->UndoLabel);
   this->doneInternal(r);
   this->Superclass::done(r);
-  emit this->endUndo();
+  Q_EMIT this->endUndo();
 }

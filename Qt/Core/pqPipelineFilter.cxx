@@ -423,7 +423,7 @@ void pqPipelineFilter::inputChanged(const QString& portname)
   // The pqPipelineSource whose consumer changes raises the events when the
   // consumer is removed added, so we don't need to raise any events here to
   // let the world know that connections were broken/created.
-  emit this->producerChanged(portname);
+  Q_EMIT this->producerChanged(portname);
 }
 
 //-----------------------------------------------------------------------------

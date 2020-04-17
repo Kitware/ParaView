@@ -50,12 +50,12 @@ public:
   virtual pqServer* activeServer() const { return this->ActiveServer; }
   virtual void setActiveServer(pqServer* server) { this->ActiveServer = server; }
 
-signals:
+Q_SIGNALS:
   /// Emitted whenever this widget starts or stops executing something.  The
   /// single argument is true when execution starts, false when it stops.
   void executing(bool);
 
-public slots:
+public Q_SLOTS:
   virtual void initialize();
   virtual void initialize(const QString& filename);
   virtual void executePythonCommand(const QString& command);
@@ -84,7 +84,7 @@ protected:
 
   virtual void promptForInput();
 
-protected slots:
+protected Q_SLOTS:
   virtual void printStderr(vtkObject*, unsigned long, void*, void*);
   virtual void printStdout(vtkObject*, unsigned long, void*, void*);
 

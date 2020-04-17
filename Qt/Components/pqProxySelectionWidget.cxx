@@ -182,7 +182,7 @@ void pqProxySelectionWidget::setChosenProxy(vtkSMProxy* cproxy)
         this->Internal->Ui.comboBox->setCurrentIndex(cc);
       }
     }
-    emit this->chosenProxyChanged();
+    Q_EMIT this->chosenProxyChanged();
   }
 }
 

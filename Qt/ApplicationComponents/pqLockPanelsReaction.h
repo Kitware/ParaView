@@ -52,7 +52,7 @@ public:
   pqLockPanelsReaction(QAction* action);
   ~pqLockPanelsReaction() override;
 
-public slots:
+public Q_SLOTS:
   void actionTriggered();
 
 private:

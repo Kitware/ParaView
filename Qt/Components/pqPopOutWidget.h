@@ -66,9 +66,9 @@ public:
   */
   void setPopOutButton(QPushButton* button);
 
-signals:
+Q_SIGNALS:
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Moves the widget to the other location.
   */

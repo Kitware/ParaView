@@ -129,7 +129,7 @@ public:
   */
   static DocumentationType showProxyDocumentationInPanel(vtkSMProxy* proxy);
 
-signals:
+Q_SIGNALS:
   /**
   * This signal is fired as soon as the user starts editing in the widget. The
   * editing may not be complete.
@@ -148,7 +148,7 @@ signals:
   */
   void restartRequired();
 
-public slots:
+public Q_SLOTS:
   /**
   * Updates the property widgets shown based on the filterText or
   * show_advanced flag. Calling filterWidgets() without any arguments will
@@ -193,7 +193,7 @@ protected:
   void showEvent(QShowEvent* event) override;
   void hideEvent(QHideEvent* event) override;
 
-private slots:
+private Q_SLOTS:
   /**
   * Called when a pqPropertyWidget fires changeFinished() signal.
   * This callback fires changeFinished() signal and handles AutoUpdateVTKObjects.

@@ -106,7 +106,7 @@ public:
   QIcon customIndicatorIcon(const QString& role) const;
   //@}
 
-signals:
+Q_SIGNALS:
   void customIndicatorClicked(int section, const QPoint& pt, const QString& role);
 
 protected:

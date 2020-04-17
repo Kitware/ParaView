@@ -120,7 +120,7 @@ public:
   QString getCurrentConfiguration();
   //@}
 
-private slots:
+private Q_SLOTS:
   void appendRow();
   void importConfigurations();
   void exportConfigurations();

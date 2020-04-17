@@ -55,7 +55,7 @@ public:
   pqExpandableTableView(QWidget* parent = 0);
   ~pqExpandableTableView() override;
 
-signals:
+Q_SIGNALS:
   /**
   * signal fired when the user edits past the last row. Handlers can add a new
   * row to the table, if needed, to allow used to edit expandable tables with

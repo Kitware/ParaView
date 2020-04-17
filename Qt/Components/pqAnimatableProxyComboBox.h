@@ -63,13 +63,13 @@ public:
   void removeProxy(const QString& label);
   int findProxy(vtkSMProxy*);
 
-protected slots:
+protected Q_SLOTS:
   void onSourceAdded(pqPipelineSource* src);
   void onSourceRemoved(pqPipelineSource* src);
   void onNameChanged(pqServerManagerModelItem* src);
   void onCurrentSourceChanged(int idx);
 
-signals:
+Q_SIGNALS:
   void currentProxyChanged(vtkSMProxy*);
 
 private:

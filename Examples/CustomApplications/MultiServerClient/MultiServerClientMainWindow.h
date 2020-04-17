@@ -47,7 +47,7 @@ public:
   MultiServerClientMainWindow(QWidget* parent = 0, Qt::WindowFlags flags = 0);
   ~MultiServerClientMainWindow();
 
-protected slots:
+protected Q_SLOTS:
   void addServerInFiltering(pqServer*);
   void applyPipelineFiltering(int);
   void applyPipelineFiltering2(int);

@@ -104,12 +104,12 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
           QSize size = widget->size();
           double normalized_x = mouseEvent->x() / static_cast<double>(size.width());
           double normalized_y = mouseEvent->y() / static_cast<double>(size.height());
-          emit recordEvent(widget, "mousePress", QString("(%1,%2,%3,%4,%5)")
-                                                   .arg(normalized_x)
-                                                   .arg(normalized_y)
-                                                   .arg(mouseEvent->button())
-                                                   .arg(mouseEvent->buttons())
-                                                   .arg(mouseEvent->modifiers()));
+          Q_EMIT recordEvent(widget, "mousePress", QString("(%1,%2,%3,%4,%5)")
+                                                     .arg(normalized_x)
+                                                     .arg(normalized_y)
+                                                     .arg(mouseEvent->button())
+                                                     .arg(mouseEvent->buttons())
+                                                     .arg(mouseEvent->modifiers()));
         }
         return true;
         break;
@@ -126,18 +126,18 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
           // Move to the place where the mouse was released and then release it.
           // This mimics drag without actually having to save all the intermediate
           // mouse move positions.
-          emit recordEvent(widget, "mouseMove", QString("(%1,%2,%3,%4,%5)")
-                                                  .arg(normalized_x)
-                                                  .arg(normalized_y)
-                                                  .arg(mouseEvent->button())
-                                                  .arg(mouseEvent->buttons())
-                                                  .arg(mouseEvent->modifiers()));
-          emit recordEvent(widget, "mouseRelease", QString("(%1,%2,%3,%4,%5)")
-                                                     .arg(normalized_x)
-                                                     .arg(normalized_y)
-                                                     .arg(mouseEvent->button())
-                                                     .arg(mouseEvent->buttons())
-                                                     .arg(mouseEvent->modifiers()));
+          Q_EMIT recordEvent(widget, "mouseMove", QString("(%1,%2,%3,%4,%5)")
+                                                    .arg(normalized_x)
+                                                    .arg(normalized_y)
+                                                    .arg(mouseEvent->button())
+                                                    .arg(mouseEvent->buttons())
+                                                    .arg(mouseEvent->modifiers()));
+          Q_EMIT recordEvent(widget, "mouseRelease", QString("(%1,%2,%3,%4,%5)")
+                                                       .arg(normalized_x)
+                                                       .arg(normalized_y)
+                                                       .arg(mouseEvent->button())
+                                                       .arg(mouseEvent->buttons())
+                                                       .arg(mouseEvent->modifiers()));
         }
         return true;
         break;
@@ -154,7 +154,7 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
                          .arg(ke->text())
                          .arg(ke->isAutoRepeat())
                          .arg(ke->count());
-        emit recordEvent(widget, "keyEvent", data);
+        Q_EMIT recordEvent(widget, "keyEvent", data);
         return true;
         break;
       }
@@ -223,7 +223,7 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
       widget->resize(oldSize);
 
       // Emit record signal
-      emit recordEvent(Object, pqCoreTestUtility::PQ_COMPAREVIEW_PROPERTY_NAME,
+      Q_EMIT recordEvent(Object, pqCoreTestUtility::PQ_COMPAREVIEW_PROPERTY_NAME,
         "$PARAVIEW_TEST_BASELINE_DIR/" + relPathFile, pqEventTypes::CHECK_EVENT);
       return true;
     }

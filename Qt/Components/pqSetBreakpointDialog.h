@@ -59,10 +59,10 @@ public:
   pqSetBreakpointDialog(QWidget* Parent);
   ~pqSetBreakpointDialog() override;
 
-signals:
+Q_SIGNALS:
   void breakpointHit();
 
-protected slots:
+protected Q_SLOTS:
   void onAccepted();
   void onTimeUpdated();
 

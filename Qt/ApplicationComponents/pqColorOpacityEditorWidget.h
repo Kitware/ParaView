@@ -139,7 +139,7 @@ public:
   */
   pqSMProxy scalarOpacityFunctionProxy() const;
 
-public slots:
+public Q_SLOTS:
   /**
   * Sets the xvmsPoints that control the opacity transfer function.
   */
@@ -224,7 +224,7 @@ public slots:
 
   void onRangeHandlesRangeChanged(double rangeMin, double rangeMax);
 
-signals:
+Q_SIGNALS:
   /**
   * Signal fired when the xrgbPoints change.
   */
@@ -272,7 +272,7 @@ signals:
   */
   void scalarOpacityFunctionProxyChanged();
 
-protected slots:
+protected Q_SLOTS:
   /**
   * slots called when the current point changes on the two internal
   * pqTransferFunctionWidget widgets.

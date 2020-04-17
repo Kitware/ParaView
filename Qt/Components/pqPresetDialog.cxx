@@ -232,7 +232,7 @@ public:
       settings.setValue("pqSettingdDialog/userChosenPresets", userChosenPresets);
       auto changedIndexStart = this->index(idx.row(), 0);
       auto changedIndexEnd = this->index(idx.row(), this->columnCount(idx) - 1);
-      emit this->dataChanged(changedIndexStart, changedIndexEnd);
+      Q_EMIT this->dataChanged(changedIndexStart, changedIndexEnd);
     }
   }
 
@@ -252,7 +252,7 @@ public:
       settings.setValue("pqSettingdDialog/userChosenPresets", userChosenPresets);
       auto changedIndexStart = this->index(idx.row(), 0);
       auto changedIndexEnd = this->index(idx.row(), this->columnCount(idx) - 1);
-      emit this->dataChanged(changedIndexStart, changedIndexEnd);
+      Q_EMIT this->dataChanged(changedIndexStart, changedIndexEnd);
     }
   }
 
@@ -266,7 +266,7 @@ public:
 
     if (this->Presets->RenamePreset(idx.row(), value.toString().toStdString().c_str()))
     {
-      emit this->dataChanged(idx, idx);
+      Q_EMIT this->dataChanged(idx, idx);
       return true;
     }
     return true;
@@ -842,7 +842,7 @@ void pqPresetDialog::triggerApply(const QModelIndex& _proxyIndex)
   const Json::Value& preset = internals.Model->Presets->GetPreset(idx.row());
   if (preset.empty() == false)
   {
-    emit this->applyPreset(preset);
+    Q_EMIT this->applyPreset(preset);
   }
 }
 

@@ -148,7 +148,7 @@ void pqProxySILModel::setValues(const QList<QVariant>& arg)
 //-----------------------------------------------------------------------------
 void pqProxySILModel::onCheckStatusChanged()
 {
-  emit valuesChanged();
+  Q_EMIT valuesChanged();
 }
 
 //-----------------------------------------------------------------------------

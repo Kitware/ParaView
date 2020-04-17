@@ -130,7 +130,7 @@ public:
    */
   VTK_LEGACY(void setDecorationsVisible(bool val));
 
-signals:
+Q_SIGNALS:
   /**
   * fired when a frame in this widget becomes active.
   */
@@ -142,7 +142,7 @@ signals:
    */
   void decorationsVisibilityChanged(bool visible);
 
-public slots:
+public Q_SLOTS:
   /**
   * This forces the pqMultiViewWidget to reload its layout from the
   * vtkSMViewLayoutProxy instance. One does not need to call this method
@@ -184,7 +184,7 @@ public slots:
   */
   void destroyAllViews();
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Slots called on different signals fired by the nested frames or splitters.
   * Note that these slots use this->sender(), hence these should not be called

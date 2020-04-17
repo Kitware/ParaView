@@ -79,7 +79,7 @@ public:
 
   QRectF boundingRect() const override;
 
-public slots:
+public Q_SLOTS:
   void setProperty(const QVariant& p);
 
   void setBoundingRect(const QRectF& r);
@@ -87,10 +87,10 @@ public slots:
   void setEnabled(bool enable)
   {
     this->QGraphicsItem::setEnabled(enable);
-    emit this->enabledChanged();
+    Q_EMIT this->enabledChanged();
   }
 
-signals:
+Q_SIGNALS:
   void propertyChanged();
   void enabledChanged();
 

@@ -396,7 +396,7 @@ QModelIndex pqTreeWidget::moveCursor(CursorAction cursorAction, Qt::KeyboardModi
     {
       // User is at last row, we need to add a new row before moving to that
       // row.
-      emit this->navigatedPastEnd();
+      Q_EMIT this->navigatedPastEnd();
       // if the table grows, the index may change.
       suggestedIndex = this->Superclass::moveCursor(cursorAction, modifiers);
     }

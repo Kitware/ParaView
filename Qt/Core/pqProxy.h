@@ -188,7 +188,7 @@ public:
   */
   bool userModifiedSMName() { return this->UserModifiedSMName; }
 
-signals:
+Q_SIGNALS:
   /**
   * Fired when the name of the proxy is changed.
   */
@@ -223,7 +223,7 @@ protected:
   virtual void addInternalHelperProxy(const QString& key, vtkSMProxy*) const;
   virtual void removeInternalHelperProxy(const QString& key, vtkSMProxy*) const;
 
-protected slots:
+protected Q_SLOTS:
   // Used to monitor helper proxy registration when created on other clients
   void onProxyRegistered(const QString&, const QString&, vtkSMProxy*);
   void onProxyUnRegistered(const QString&, const QString&, vtkSMProxy*);

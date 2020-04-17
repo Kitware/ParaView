@@ -66,7 +66,7 @@ public:
   // Returns if this cue can accept more than 1 value as a parameter value.
   bool acceptsMultipleValues() const;
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the comparative grid size.
   */
@@ -76,11 +76,11 @@ public slots:
     this->updateGUIOnIdle();
   }
 
-signals:
+Q_SIGNALS:
   // triggered every time the user changes the values.
   void valuesChanged();
 
-protected slots:
+protected Q_SLOTS:
   /**
   * refreshes the GUI with values from the proxy.
   */

@@ -139,7 +139,7 @@ public:
    */
   void replaceGroups(const QString& json);
 
-signals:
+Q_SIGNALS:
   /**
    * Fired whenever loadGroups or replaceGroups is called and new group information
    * is available.

@@ -60,7 +60,7 @@ public:
   static vtkTuple<std::string, 3> getAxisTitles(
     vtkSMSourceProxy*, int outputPort = 0, bool* isvalid = NULL);
 
-protected slots:
+protected Q_SLOTS:
   virtual void viewAdded(pqView*);
   virtual void viewUpdated();
 

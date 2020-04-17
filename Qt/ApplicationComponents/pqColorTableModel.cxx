@@ -94,7 +94,7 @@ bool pqColorTableModel::setData(const QModelIndex& idx, const QVariant& value, i
   {
     this->Internals->XRGBPoints[idx.row()][idx.column()] = newValue;
 
-    emit dataChanged(idx, idx);
+    Q_EMIT dataChanged(idx, idx);
     return true;
   }
 
@@ -185,24 +185,24 @@ void pqColorTableModel::controlPointsChanged()
   int previousSize = static_cast<int>(this->Internals->XRGBPoints.size());
   if (newSize > previousSize)
   {
-    emit this->beginInsertRows(QModelIndex(), previousSize, newSize - 1);
+    Q_EMIT this->beginInsertRows(QModelIndex(), previousSize, newSize - 1);
     for (int idx = previousSize; idx < newSize; ++idx)
     {
       std::array<double, 6> xrgbms;
       stc->GetNodeValue(idx, xrgbms.data());
       this->Internals->XRGBPoints.push_back(xrgbms);
     }
-    emit this->endInsertRows();
+    Q_EMIT this->endInsertRows();
   }
   else if (newSize < previousSize)
   {
-    emit this->beginRemoveRows(QModelIndex(), newSize, previousSize - 1);
+    Q_EMIT this->beginRemoveRows(QModelIndex(), newSize, previousSize - 1);
     size_t numToRemove = previousSize - newSize;
     for (size_t idx = 0; idx < numToRemove; ++idx)
     {
       this->Internals->XRGBPoints.pop_back();
     }
-    emit this->endRemoveRows();
+    Q_EMIT this->endRemoveRows();
   }
   else // newSize == previousSize
   {

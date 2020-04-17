@@ -407,7 +407,7 @@ void pqIndexSelectionWidget::updatePropertyImpl()
   this->IgnorePushPropertyUpdates = true;
   this->setProperty(this->PushPropertyName.constData(), newProp);
   this->IgnorePushPropertyUpdates = false;
-  emit widgetModified();
+  Q_EMIT widgetModified();
 }
 
 //------------------------------------------------------------------------------

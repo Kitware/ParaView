@@ -84,7 +84,7 @@ public:
   */
   vtkSMViewProxy* getViewProxy() const;
 
-public slots:
+public Q_SLOTS:
 
   /**
   * Renders the view to which this representation has been added if any.
@@ -98,7 +98,7 @@ public slots:
   */
   void renderViewEventually() { this->renderView(false); }
 
-signals:
+Q_SIGNALS:
   /**
   * Fired when the visibility property of the underlying display changes.
   * It must be noted that this is fired on the property change, the property
@@ -111,7 +111,7 @@ signals:
   * Fired whenever Update() is called on the underlying display proxy.
   */
   void updated();
-protected slots:
+protected Q_SLOTS:
   /**
   * called when the display visibility property changes.
   */

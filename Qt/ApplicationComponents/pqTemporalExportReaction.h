@@ -52,7 +52,7 @@ public:
   pqTemporalExportReaction(QAction* parent);
   ~pqTemporalExportReaction();
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called when the action is triggered.
   */

@@ -51,7 +51,7 @@ public:
    */
   static void addToFavorites(QAction* parent);
 
-public slots:
+public Q_SLOTS:
   /**
   * Updates the enabled state. Applications need not explicitly call
   * this.

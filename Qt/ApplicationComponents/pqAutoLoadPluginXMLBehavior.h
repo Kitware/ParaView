@@ -59,7 +59,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqAutoLoadPluginXMLBehavior : public QObjec
 public:
   pqAutoLoadPluginXMLBehavior(QObject* parent = 0);
 
-protected slots:
+protected Q_SLOTS:
   void updateResources();
 
 private:

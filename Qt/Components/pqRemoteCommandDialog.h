@@ -49,7 +49,7 @@ public:
   // Returns the command that the user has selected
   string GetCommand();
 
-private slots:
+private Q_SLOTS:
   void AddCommandTemplate();
   void EditCommandTemplate();
   void DeleteCommandTemplate();

@@ -44,7 +44,7 @@ public:
   virtual void startup();
   virtual void shutdown();
 
-protected slots:
+protected Q_SLOTS:
 
   void initialize();
 

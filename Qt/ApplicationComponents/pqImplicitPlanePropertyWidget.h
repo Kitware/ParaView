@@ -65,7 +65,7 @@ public:
   void apply() override;
   void reset() override;
 
-public slots:
+public Q_SLOTS:
   /**
   * Slots used to toggle the visibility of the translucent plane.
   */
@@ -103,13 +103,13 @@ public slots:
   */
   void useCameraNormal();
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Places the interactive widget using current data source information.
   */
   void placeWidget() override;
 
-private slots:
+private Q_SLOTS:
   void setOrigin(double x, double y, double z);
 
 private:

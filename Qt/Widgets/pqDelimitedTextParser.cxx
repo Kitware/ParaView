@@ -60,7 +60,7 @@ void pqDelimitedTextParser::parseColumns(QIODevice& stream)
 {
   QVector<QStringList> series;
 
-  emit startParsing();
+  Q_EMIT startParsing();
 
   for (;;)
   {
@@ -88,7 +88,7 @@ void pqDelimitedTextParser::parseColumns(QIODevice& stream)
   }
 
   for (int i = 0; i != series.size(); ++i)
-    emit parseSeries(series[i]);
+    Q_EMIT parseSeries(series[i]);
 
-  emit finishParsing();
+  Q_EMIT finishParsing();
 }

@@ -209,12 +209,12 @@ void pqSettingsDialog::clicked(QAbstractButton* button)
   {
     case QDialogButtonBox::AcceptRole:
     case QDialogButtonBox::ApplyRole:
-      emit this->accepted();
+      Q_EMIT this->accepted();
       break;
 
     case QDialogButtonBox::ResetRole:
     case QDialogButtonBox::RejectRole:
-      emit this->rejected();
+      Q_EMIT this->rejected();
       break;
     default:
       break;
@@ -284,7 +284,7 @@ void pqSettingsDialog::onTabIndexChanged(int index)
 void pqSettingsDialog::filterPanelWidgets()
 {
   Ui::SettingsDialog& ui = this->Internals->Ui;
-  emit this->filterWidgets(ui.SearchBox->isAdvancedSearchActive(), ui.SearchBox->text());
+  Q_EMIT this->filterWidgets(ui.SearchBox->isAdvancedSearchActive(), ui.SearchBox->text());
 }
 
 //-----------------------------------------------------------------------------

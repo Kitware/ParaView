@@ -85,7 +85,7 @@ public:
   */
   QVariant headerData(int section, Qt::Orientation, int role) const override;
 
-public slots:
+public Q_SLOTS:
   void setChosenFiles(const QList<QStringList>& files);
 
 protected:

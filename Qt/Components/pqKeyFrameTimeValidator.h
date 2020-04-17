@@ -56,7 +56,7 @@ public:
   // the normalized range for this validator.
   void setDomain(vtkSMDomain* domain);
 
-protected slots:
+protected Q_SLOTS:
   void onDomainModified();
 
 private:

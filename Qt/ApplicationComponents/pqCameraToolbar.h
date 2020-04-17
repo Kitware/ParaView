@@ -56,7 +56,7 @@ public:
     this->constructor();
   }
 
-private slots:
+private Q_SLOTS:
   void updateEnabledState();
 
 private:

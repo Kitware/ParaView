@@ -50,11 +50,11 @@ public:
 
   bool event(QEvent* evt) override;
 
-signals:
+Q_SIGNALS:
   void xrgbPointsChanged();
   void xvmsPointsChanged();
 
-private slots:
+private Q_SLOTS:
   void channelVisibilitiesChanged();
   void stcChanged(pqTransferFunctionWidget* src = nullptr);
   void pwfChanged(pqTransferFunctionWidget* src = nullptr);

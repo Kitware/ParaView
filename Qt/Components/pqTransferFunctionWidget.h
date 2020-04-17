@@ -99,7 +99,7 @@ public:
   bool GetControlPointsFreehandDrawing() const;
   //@}
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the current point. Set to -1 clear the current point.
   */
@@ -124,7 +124,7 @@ public slots:
    */
   void setHistogramTable(vtkTable* table);
 
-signals:
+Q_SIGNALS:
   /**
   * signal fired when the \c current selected control point changes.
   */
@@ -151,7 +151,7 @@ signals:
    */
   void rangeHandlesDoubleClicked();
 
-protected slots:
+protected Q_SLOTS:
   /**
   * slot called when the internal vtkControlPointsItem fires
   * vtkControlPointsItem::CurrentPointChangedEvent

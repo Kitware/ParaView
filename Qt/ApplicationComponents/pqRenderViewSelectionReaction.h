@@ -89,12 +89,12 @@ public:
     QActionGroup* modifierGroup = NULL);
   ~pqRenderViewSelectionReaction() override;
 
-signals:
+Q_SIGNALS:
   void selectedCustomBox(int xmin, int ymin, int xmax, int ymax);
   void selectedCustomBox(const int region[4]);
   void selectedCustomPolygon(vtkIntArray* polygon);
 
-private slots:
+private Q_SLOTS:
   /**
   * For checkable actions, this calls this->beginSelection() or
   * this->endSelection() is val is true or false, respectively. For

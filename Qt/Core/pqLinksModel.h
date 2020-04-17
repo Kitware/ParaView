@@ -203,7 +203,7 @@ public:
   */
   static vtkSMProxyListDomain* proxyListDomain(vtkSMProxy* proxy);
 
-signals:
+Q_SIGNALS:
   /**
   * Fired when a link is added
   */
@@ -214,7 +214,7 @@ signals:
   */
   void linkRemoved(const QString& name);
 
-protected slots:
+protected Q_SLOTS:
   void onSessionCreated(pqServer*);
   void onSessionRemoved(pqServer*);
 
@@ -262,10 +262,10 @@ public:
   QString name() const;
   vtkSMLink* link() const;
 
-signals:
+Q_SIGNALS:
   void linkRemoved();
 
-private slots:
+private Q_SLOTS:
   void proxyModified(pqServerManagerModelItem*);
   void refresh();
   void remove();

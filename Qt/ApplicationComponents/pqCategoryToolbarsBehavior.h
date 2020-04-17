@@ -59,7 +59,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCategoryToolbarsBehavior : public QObject
 public:
   pqCategoryToolbarsBehavior(pqProxyGroupMenuManager* menuManager, QMainWindow* mainWindow);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called when menuManager fires the menuPopulated() signal.
   */

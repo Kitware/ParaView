@@ -55,7 +55,7 @@ protected:
   */
   void onTriggered() override;
 
-public slots:
+public Q_SLOTS:
   void updateInteractionLabel(int interactionMode);
 
 private:

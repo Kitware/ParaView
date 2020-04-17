@@ -60,7 +60,7 @@ public:
   pqCoreUtilitiesEventHelper(QObject* parent);
   ~pqCoreUtilitiesEventHelper() override;
 
-signals:
+Q_SIGNALS:
   void eventInvoked(vtkObject*, unsigned long, void*);
 
 private:

@@ -122,7 +122,7 @@ protected:
   void hideEvent(QHideEvent* event) override;
   void done(int r) override;
 
-private slots:
+private Q_SLOTS:
   void filterWidgets();
   void onChangeAvailable();
 

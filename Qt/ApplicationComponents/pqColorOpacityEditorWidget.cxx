@@ -99,7 +99,7 @@ public:
     if (val != this->Hidden)
     {
       this->Hidden = val;
-      emit this->visibilityChanged();
+      Q_EMIT this->visibilityChanged();
     }
   }
   bool canShowWidget(bool show_advanced) const override
@@ -712,14 +712,14 @@ void pqColorOpacityEditorWidget::useLogScaleClicked(bool log_space)
 
   this->Internals->Ui.ColorEditor->SetLogScaleXAxis(log_space);
 
-  emit this->useLogScaleChanged();
+  Q_EMIT this->useLogScaleChanged();
 }
 
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::useOpacityControlPointsFreehandDrawingClicked(bool use)
 {
   this->Internals->Ui.OpacityEditor->SetControlPointsFreehandDrawing(use);
-  emit this->useOpacityControlPointsFreehandDrawingChanged();
+  Q_EMIT this->useOpacityControlPointsFreehandDrawingChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -739,7 +739,7 @@ void pqColorOpacityEditorWidget::useLogScaleOpacityClicked(bool log_space)
 
   this->Internals->Ui.OpacityEditor->SetLogScaleXAxis(log_space);
 
-  emit this->useLogScaleOpacityChanged();
+  Q_EMIT this->useLogScaleOpacityChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -842,7 +842,7 @@ void pqColorOpacityEditorWidget::resetRangeToData()
   if (pqResetScalarRangeReaction::resetScalarRangeToData(nullptr))
   {
     this->Internals->render();
-    emit this->changeFinished();
+    Q_EMIT this->changeFinished();
   }
 }
 
@@ -853,7 +853,7 @@ void pqColorOpacityEditorWidget::resetRangeToDataOverTime()
   if (pqResetScalarRangeReaction::resetScalarRangeToDataOverTime(nullptr))
   {
     this->Internals->render();
-    emit this->changeFinished();
+    Q_EMIT this->changeFinished();
   }
 }
 
@@ -899,7 +899,7 @@ void pqColorOpacityEditorWidget::resetRangeToCustom()
   if (pqResetScalarRangeReaction::resetScalarRangeToCustom(this->proxy()))
   {
     this->Internals->render();
-    emit this->changeFinished();
+    Q_EMIT this->changeFinished();
   }
 }
 
@@ -909,7 +909,7 @@ void pqColorOpacityEditorWidget::invertTransferFunctions()
   BEGIN_UNDO_SET("Invert transfer function");
   vtkSMTransferFunctionProxy::InvertTransferFunction(this->proxy());
 
-  emit this->changeFinished();
+  Q_EMIT this->changeFinished();
   // We don't invert the opacity function, for now.
   END_UNDO_SET();
 }
@@ -924,11 +924,11 @@ void pqColorOpacityEditorWidget::choosePreset(const char* presetName)
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::presetApplied()
 {
-  emit this->changeFinished();
+  Q_EMIT this->changeFinished();
 
   // Assume the color map and opacity have changed and refresh
-  emit this->xrgbPointsChanged();
-  emit this->xvmsPointsChanged();
+  Q_EMIT this->xrgbPointsChanged();
+  Q_EMIT this->xvmsPointsChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -1024,7 +1024,7 @@ void pqColorOpacityEditorWidget::showDataHistogramClicked(bool showDataHistogram
   {
     this->Internals->Ui.OpacityEditor->setHistogramTable(nullptr);
   }
-  emit this->showDataHistogramChanged();
+  Q_EMIT this->showDataHistogramChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -1071,14 +1071,14 @@ void pqColorOpacityEditorWidget::automaticDataHistogramComputationClicked(bool v
     this->showDataHistogramClicked(true);
   }
   this->updateDataHistogramEnableState();
-  emit this->automaticDataHistogramComputationChanged();
+  Q_EMIT this->automaticDataHistogramComputationChanged();
 }
 
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::dataHistogramNumberOfBinsEdited(int vtkNotUsed(val))
 {
   this->setHistogramOutdated();
-  emit this->dataHistogramNumberOfBinsEdited();
+  Q_EMIT this->dataHistogramNumberOfBinsEdited();
 }
 
 //-----------------------------------------------------------------------------
@@ -1115,5 +1115,5 @@ void pqColorOpacityEditorWidget::onRangeHandlesRangeChanged(double rangeMin, dou
   vtkSMTransferFunctionProxy::RescaleTransferFunction(colorProxy, range);
   vtkSMTransferFunctionProxy::RescaleTransferFunction(opacityProxy, range);
   this->Internals->render();
-  emit this->changeFinished();
+  Q_EMIT this->changeFinished();
 }

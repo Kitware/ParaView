@@ -71,7 +71,7 @@ public:
    */
   bool eventFilter(QObject* caller, QEvent* evt) override;
 
-signals:
+Q_SIGNALS:
   void splitterMoved(int location, double splitFraction);
 
 protected:

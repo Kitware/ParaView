@@ -155,7 +155,7 @@ public:
       {
         this->Values[offset] = aValue;
       }
-      emit this->dataChanged(idx, idx);
+      Q_EMIT this->dataChanged(idx, idx);
       return true;
     }
 
@@ -174,14 +174,14 @@ public:
     if (old_row_count > new_row_count)
     {
       // rows are removed.
-      emit this->beginRemoveRows(QModelIndex(), new_row_count, old_row_count - 1);
+      Q_EMIT this->beginRemoveRows(QModelIndex(), new_row_count, old_row_count - 1);
       this->Values.resize(new_size);
-      emit this->endRemoveRows();
+      Q_EMIT this->endRemoveRows();
     }
     else if (new_row_count > old_row_count)
     {
       // rows are added.
-      emit this->beginInsertRows(QModelIndex(), old_row_count, new_row_count - 1);
+      Q_EMIT this->beginInsertRows(QModelIndex(), old_row_count, new_row_count - 1);
       this->Values.resize(new_size);
       for (int cc = old_size; cc < new_size; cc++)
       {
@@ -194,7 +194,7 @@ public:
           this->Values[cc] = values[cc];
         }
       }
-      emit this->endInsertRows();
+      Q_EMIT this->endInsertRows();
     }
 
     assert(this->Values.size() == values.size());
@@ -213,7 +213,7 @@ public:
           this->Values[cc] = values[cc];
         }
         QModelIndex idx = this->computeIndex(cc);
-        emit this->dataChanged(idx, idx);
+        Q_EMIT this->dataChanged(idx, idx);
       }
     }
   }
@@ -232,7 +232,7 @@ public:
     // insert after current row.
     row++;
 
-    emit this->beginInsertRows(QModelIndex(), row, row);
+    Q_EMIT this->beginInsertRows(QModelIndex(), row, row);
     if (row * this->NumberOfColumns > this->Values.size())
     {
       this->Values.resize(row * this->NumberOfColumns - 1);
@@ -241,7 +241,7 @@ public:
     {
       this->Values.insert(row * this->NumberOfColumns + cc, copy[cc]);
     }
-    emit this->endInsertRows();
+    Q_EMIT this->endInsertRows();
     return this->index(row, 0);
   }
 
@@ -294,12 +294,12 @@ public:
       int numRows = rowRanges.at(g).size();
       int beginRow = rowRanges.at(g).at(0).toInt();
       int endRow = rowRanges.at(g).at(numRows - 1).toInt();
-      emit this->beginRemoveRows(QModelIndex(), beginRow, endRow);
+      Q_EMIT this->beginRemoveRows(QModelIndex(), beginRow, endRow);
       for (int r = endRow; r >= beginRow; --r)
       {
         this->Values.remove(r * this->NumberOfColumns, this->NumberOfColumns);
       }
-      emit this->endRemoveRows();
+      Q_EMIT this->endRemoveRows();
     }
 
     int firstRow = rowRanges.at(0).at(0).toInt();
@@ -320,9 +320,9 @@ public:
 
   void removeAll()
   {
-    emit this->beginResetModel();
+    Q_EMIT this->beginResetModel();
     this->Values.clear();
-    emit this->endResetModel();
+    Q_EMIT this->endResetModel();
   }
 };
 }
@@ -457,14 +457,14 @@ void pqScalarValueListPropertyWidget::add()
   QModelIndex idx = this->Internals->Model.addRow(this->Internals->Ui.Table->currentIndex());
   this->Internals->Ui.Table->setCurrentIndex(idx);
   this->Internals->Ui.Table->edit(idx);
-  emit this->scalarsChanged();
+  Q_EMIT this->scalarsChanged();
 }
 
 //-----------------------------------------------------------------------------
 void pqScalarValueListPropertyWidget::editPastLastRow()
 {
   this->Internals->Model.addRow(this->Internals->Ui.Table->currentIndex());
-  emit this->scalarsChanged();
+  Q_EMIT this->scalarsChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -478,7 +478,7 @@ void pqScalarValueListPropertyWidget::remove()
   }
   QModelIndex idx = this->Internals->Model.removeListedRows(indexes);
   this->Internals->Ui.Table->setCurrentIndex(idx);
-  emit this->scalarsChanged();
+  Q_EMIT this->scalarsChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -487,7 +487,7 @@ void pqScalarValueListPropertyWidget::removeAll()
   auto& internals = (*this->Internals);
   internals.Ui.Table->selectionModel()->clear();
   internals.Model.removeAll();
-  emit this->scalarsChanged();
+  Q_EMIT this->scalarsChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -517,7 +517,7 @@ void pqScalarValueListPropertyWidget::addRange()
       value.push_back(QVariant(newvalue));
     }
     this->Internals->Model.setValue(value);
-    emit this->scalarsChanged();
+    Q_EMIT this->scalarsChanged();
   }
   else if (this->Internals->Mode == pqInternals::MODE_INT)
   {
@@ -550,7 +550,7 @@ void pqScalarValueListPropertyWidget::addRange()
     QVariantList value = this->Internals->Model.value().toList();
     value += intRange;
     this->Internals->Model.setValue(value);
-    emit this->scalarsChanged();
+    Q_EMIT this->scalarsChanged();
   }
 }
 

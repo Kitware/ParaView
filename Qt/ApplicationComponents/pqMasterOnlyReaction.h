@@ -58,7 +58,7 @@ public:
   pqMasterOnlyReaction(QAction* parentObject);
   pqMasterOnlyReaction(QAction* parentObject, Qt::ConnectionType type);
 
-protected slots:
+protected Q_SLOTS:
   void updateEnableState() override;
 
 private:

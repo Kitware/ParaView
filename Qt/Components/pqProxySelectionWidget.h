@@ -78,13 +78,13 @@ public:
   void setPanelVisibility(const char* vis) override;
   void setView(pqView*) override;
 
-signals:
+Q_SIGNALS:
   /**
   * Signal fired by setChosenProxy() when the proxy changes.
   */
   void chosenProxyChanged();
 
-private slots:
+private Q_SLOTS:
   /**
   * Called when the current index in the combo-box is changed from the UI.
   * This calls setChosenProxy() with the argument as the proxy corresponding

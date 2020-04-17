@@ -143,5 +143,5 @@ void pqColorPaletteSelectorWidget::loadPalette(int index)
   // return the combobox back to the "select .." text.
   this->ComboBox->setCurrentIndex(0);
 
-  emit this->changeAvailable();
+  Q_EMIT this->changeAvailable();
 }

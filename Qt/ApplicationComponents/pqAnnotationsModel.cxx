@@ -285,7 +285,7 @@ bool pqAnnotationsModel::setData(const QModelIndex& idx, const QVariant& value, 
 
   if (this->Internals->Items[idx.row()].setData(idx.column(), value))
   {
-    emit this->dataChanged(idx, idx);
+    Q_EMIT this->dataChanged(idx, idx);
     return true;
   }
   return false;
@@ -540,7 +540,7 @@ bool pqAnnotationsModel::dropMimeData(const QMimeData* mime_data, Qt::DropAction
   }
   this->endResetModel();
 
-  emit this->dataChanged(
+  Q_EMIT this->dataChanged(
     this->index(0, 0), this->index(this->rowCount() - 1, this->columnCount(parentIdx) - 1));
   return true;
 }
@@ -551,10 +551,10 @@ QModelIndex pqAnnotationsModel::addAnnotation(const QModelIndex& after)
   // insert after the current one.
   row++;
 
-  emit this->beginInsertRows(QModelIndex(), row, row);
+  Q_EMIT this->beginInsertRows(QModelIndex(), row, row);
   auto it = this->Internals->Items.begin();
   this->Internals->Items.insert(it + row, AnnotationItem());
-  emit this->endInsertRows();
+  Q_EMIT this->endInsertRows();
   if (this->hasColors())
   {
     this->Internals->Items[row].setData(
@@ -576,9 +576,9 @@ QModelIndex pqAnnotationsModel::removeAnnotations(const QModelIndexList& toRemov
   auto startItemIter = this->Internals->Items.begin();
   for (auto riter = rowsToRemove.rbegin(); riter != rowsToRemove.rend(); ++riter)
   {
-    emit this->beginRemoveRows(QModelIndex(), *riter, *riter);
+    Q_EMIT this->beginRemoveRows(QModelIndex(), *riter, *riter);
     this->Internals->Items.erase(startItemIter + *riter);
-    emit this->endRemoveRows();
+    Q_EMIT this->endRemoveRows();
   }
 
   if (rowsToRemove.size() > 0 &&
@@ -597,9 +597,9 @@ QModelIndex pqAnnotationsModel::removeAnnotations(const QModelIndexList& toRemov
 //-----------------------------------------------------------------------------
 void pqAnnotationsModel::removeAllAnnotations()
 {
-  emit this->beginResetModel();
+  Q_EMIT this->beginResetModel();
   this->Internals->Items.clear();
-  emit this->endResetModel();
+  Q_EMIT this->endResetModel();
 }
 
 //-----------------------------------------------------------------------------
@@ -622,9 +622,9 @@ void pqAnnotationsModel::setAnnotations(
     if (annotationSize > size)
     {
       // rows are added.
-      emit this->beginInsertRows(QModelIndex(), size, annotationSize - 1);
+      Q_EMIT this->beginInsertRows(QModelIndex(), size, annotationSize - 1);
       this->Internals->Items.resize(annotationSize);
-      emit this->endInsertRows();
+      Q_EMIT this->endInsertRows();
     }
 
     // now check for data changes.
@@ -665,22 +665,22 @@ void pqAnnotationsModel::setAnnotations(
     }
     if (colorFlag)
     {
-      emit this->dataChanged(this->index(0, COLOR),
+      Q_EMIT this->dataChanged(this->index(0, COLOR),
         this->index(static_cast<int>(this->Internals->Items.size()) - 1, COLOR));
     }
     if (opacityFlag)
     {
-      emit this->dataChanged(this->index(0, OPACITY),
+      Q_EMIT this->dataChanged(this->index(0, OPACITY),
         this->index(static_cast<int>(this->Internals->Items.size()) - 1, OPACITY));
     }
     if (valueFlag)
     {
-      emit this->dataChanged(this->index(0, VALUE),
+      Q_EMIT this->dataChanged(this->index(0, VALUE),
         this->index(static_cast<int>(this->Internals->Items.size()) - 1, VALUE));
     }
     if (annotationFlag)
     {
-      emit this->dataChanged(this->index(0, LABEL),
+      Q_EMIT this->dataChanged(this->index(0, LABEL),
         this->index(static_cast<int>(this->Internals->Items.size()) - 1, LABEL));
     }
   }
@@ -724,7 +724,7 @@ void pqAnnotationsModel::setVisibilities(
 
   if (visibilityFlag)
   {
-    emit this->dataChanged(this->index(0, VISIBILITY),
+    Q_EMIT this->dataChanged(this->index(0, VISIBILITY),
       this->index(static_cast<int>(this->Internals->Items.size()) - 1, VISIBILITY));
   }
 }
@@ -763,7 +763,7 @@ void pqAnnotationsModel::setIndexedColors(const std::vector<QColor>& newColors)
     }
     if (colorFlag)
     {
-      emit this->dataChanged(this->index(0, COLOR),
+      Q_EMIT this->dataChanged(this->index(0, COLOR),
         this->index(static_cast<int>(this->Internals->Items.size()) - 1, COLOR));
     }
   }
@@ -802,7 +802,7 @@ void pqAnnotationsModel::setIndexedOpacities(const std::vector<double>& newOpaci
   }
   if (opacityFlag)
   {
-    emit this->dataChanged(this->index(0, OPACITY),
+    Q_EMIT this->dataChanged(this->index(0, OPACITY),
       this->index(static_cast<int>(this->Internals->Items.size()) - 1, OPACITY));
   }
 }
@@ -834,7 +834,7 @@ void pqAnnotationsModel::setGlobalOpacity(double opacity)
   }
   if (opacityFlag)
   {
-    emit this->dataChanged(this->index(0, OPACITY),
+    Q_EMIT this->dataChanged(this->index(0, OPACITY),
       this->index(static_cast<int>(this->Internals->Items.size()) - 1, OPACITY));
   }
 }
@@ -853,7 +853,7 @@ void pqAnnotationsModel::setSelectedOpacity(QList<int> rows, double opacity)
   }
   if (opacityFlag)
   {
-    emit this->dataChanged(this->index(0, OPACITY),
+    Q_EMIT this->dataChanged(this->index(0, OPACITY),
       this->index(static_cast<int>(this->Internals->Items.size()) - 1, OPACITY));
   }
 }
@@ -893,7 +893,7 @@ void pqAnnotationsModel::reorder(std::vector<int> oldOrder)
   this->Internals->Items = newItems;
   this->endResetModel();
   this->setIndexedColors(this->Internals->Colors);
-  emit this->dataChanged(
+  Q_EMIT this->dataChanged(
     this->index(0, 0), this->index(this->rowCount() - 1, this->columnCount() - 1));
 }
 

@@ -74,7 +74,7 @@ public:
    */
   static bool isPaused() { return pqLiveSourceBehavior::PauseLiveUpdates; }
 
-protected slots:
+protected Q_SLOTS:
   void viewAdded(pqView*);
   void sourceAdded(pqPipelineSource*);
   void timeout();

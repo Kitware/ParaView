@@ -69,7 +69,7 @@ public:
   */
   static void startSelection(pqContextView* view, int selectionType, int selectionModifier);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called when the action is triggered.
   */

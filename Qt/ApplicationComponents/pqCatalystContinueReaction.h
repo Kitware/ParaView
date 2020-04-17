@@ -55,7 +55,7 @@ public:
   {
   }
 
-public slots:
+public Q_SLOTS:
   void updateEnableState() override
   {
     pqCatalystPauseSimulationReaction::updateEnableState(CONTINUE);

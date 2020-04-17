@@ -56,7 +56,7 @@ public:
   }
   virtual ~pqVRDockPanel();
 
-private slots:
+private Q_SLOTS:
   void addConnection();
   void removeConnection();
   void updateConnections();

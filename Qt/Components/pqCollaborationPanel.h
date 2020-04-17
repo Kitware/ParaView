@@ -55,7 +55,7 @@ public:
   pqCollaborationPanel(QWidget* parent = 0);
   ~pqCollaborationPanel() override;
 
-signals:
+Q_SIGNALS:
   /**
   * Emitting this signal will result by adding the message into the UI and
   * if the user is the local one, the message will be broadcasted to the
@@ -86,7 +86,7 @@ signals:
    */
   void connectIDChanged(int);
 
-public slots:
+public Q_SLOTS:
   /**
   * Called by pqCollaborationManager when a message is received
   */
@@ -101,7 +101,7 @@ public slots:
   */
   void onNewMaster(int);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called when user hit enter in the input line of chat message
   */

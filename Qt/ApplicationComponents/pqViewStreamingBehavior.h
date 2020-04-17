@@ -68,7 +68,7 @@ public:
   void resumeAutoUpdates();
   void triggerSingleUpdate();
 
-protected slots:
+protected Q_SLOTS:
   void onViewAdded(pqView*);
   void onViewUpdated(vtkObject*, unsigned long, void*);
   void onTimeout();

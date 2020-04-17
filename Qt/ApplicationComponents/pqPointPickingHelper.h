@@ -63,7 +63,7 @@ public:
   */
   bool pickOnMesh() const { return this->PickOnMesh; }
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the view on which the pick is active. We only support pqRenderView and
   * subclasses currently.
@@ -75,10 +75,10 @@ public slots:
   */
   void setShortcutEnabled(bool);
 
-signals:
+Q_SIGNALS:
   void pick(double x, double y, double z);
 
-private slots:
+private Q_SLOTS:
   void pickPoint();
 
 private:

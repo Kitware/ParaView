@@ -44,7 +44,7 @@ void pqListWidgetItemObject::setData(int role, const QVariant& v)
     if (v != this->data(Qt::CheckStateRole))
     {
       QListWidgetItem::setData(role, v);
-      emit this->checkedStateChanged(Qt::Checked == v ? true : false);
+      Q_EMIT this->checkedStateChanged(Qt::Checked == v ? true : false);
     }
   }
   else

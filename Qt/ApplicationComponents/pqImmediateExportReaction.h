@@ -53,7 +53,7 @@ public:
   pqImmediateExportReaction(QAction* parent);
   ~pqImmediateExportReaction();
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called when the action is triggered.
   */

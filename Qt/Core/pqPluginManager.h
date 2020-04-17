@@ -120,7 +120,7 @@ public:
   */
   bool verifyPlugins(pqServer* session);
 
-signals:
+Q_SIGNALS:
   /**
   * notification when plugin has been loaded.
   */
@@ -135,7 +135,7 @@ signals:
 protected:
   void initialize(vtkSMPluginManager*);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * attempts to load the configuration for plugins for the particular server.
   */

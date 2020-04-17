@@ -67,11 +67,11 @@ public:
   */
   void registerPanel(pqPropertiesPanel* panel);
   void unregisterPanel(pqPropertiesPanel* panel);
-protected slots:
+protected Q_SLOTS:
   virtual void applied(pqPropertiesPanel*, pqProxy*);
   virtual void applied(pqPropertiesPanel*);
 
-private slots:
+private Q_SLOTS:
   void onApplied(pqProxy*);
   void onApplied();
 

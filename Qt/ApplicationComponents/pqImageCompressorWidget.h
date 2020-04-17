@@ -53,12 +53,12 @@ public:
 
   QString compressorConfig() const;
 
-public slots:
+public Q_SLOTS:
   void setCompressorConfig(const QString&);
 
-signals:
+Q_SIGNALS:
   void compressorConfigChanged();
-private slots:
+private Q_SLOTS:
   void currentIndexChanged(int);
   void setConfigurationDefault(int);
 

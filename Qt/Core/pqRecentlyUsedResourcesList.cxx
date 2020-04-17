@@ -70,7 +70,7 @@ void pqRecentlyUsedResourcesList::add(const pqServerResource& resource)
     this->ResourceList.removeAt(max_length);
   }
 
-  emit this->changed();
+  Q_EMIT this->changed();
 }
 
 //-----------------------------------------------------------------------------

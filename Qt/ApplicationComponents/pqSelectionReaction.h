@@ -58,7 +58,7 @@ public:
   */
   pqSelectionReaction(QAction* parent, QActionGroup* modifierGroup = NULL);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * called when modifier group is changed.
   */

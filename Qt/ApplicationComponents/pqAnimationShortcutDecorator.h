@@ -62,7 +62,7 @@ public:
    */
   static bool accept(pqPropertyWidget* widget);
 
-protected slots:
+protected Q_SLOTS:
   /**
    * Called when general settings has changed
    * to hide/show the widget if necessary

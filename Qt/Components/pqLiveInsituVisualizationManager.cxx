@@ -252,5 +252,5 @@ void pqLiveInsituVisualizationManager::timestepsUpdated()
     }
   }
   this->Internals->ExtractSourceProxies.clear();
-  emit nextTimestepAvailable();
+  Q_EMIT nextTimestepAvailable();
 }

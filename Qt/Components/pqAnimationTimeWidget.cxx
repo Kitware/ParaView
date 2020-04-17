@@ -216,7 +216,7 @@ void pqAnimationTimeWidget::timeLineEditChanged()
   auto& ui = this->Internals->Ui;
   const auto currentValue = ui.timeValue->text().toDouble();
   this->setTimeValue(currentValue);
-  emit this->timeValueChanged();
+  Q_EMIT this->timeValueChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -225,7 +225,7 @@ void pqAnimationTimeWidget::timeComboBoxChanged()
   auto& ui = this->Internals->Ui;
   const auto currentValue = ui.timeValueComboBox->currentData().toDouble();
   this->setTimeValue(currentValue);
-  emit this->timeValueChanged();
+  Q_EMIT this->timeValueChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -330,7 +330,7 @@ void pqAnimationTimeWidget::timeSpinBoxChanged()
   if (index >= 0 && static_cast<unsigned int>(index) < helper.GetNumberOfElements())
   {
     this->setTimeValue(helper.GetAsDouble(index));
-    emit this->timeValueChanged();
+    Q_EMIT this->timeValueChanged();
   }
 }
 //-----------------------------------------------------------------------------
@@ -411,5 +411,5 @@ QString pqAnimationTimeWidget::formatDouble(double value)
 void pqAnimationTimeWidget::timeRadioButtonToggled()
 {
   this->setPlayMode(this->playMode());
-  emit this->playModeChanged();
+  Q_EMIT this->playModeChanged();
 }

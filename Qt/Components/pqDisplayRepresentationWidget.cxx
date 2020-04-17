@@ -210,7 +210,7 @@ void pqDisplayRepresentationWidget::comboBoxChanged(const QString& text)
     }
   }
   this->Internal->setRepresentationText(text);
-  emit this->representationTextChanged(text);
+  Q_EMIT this->representationTextChanged(text);
 }
 
 //=============================================================================

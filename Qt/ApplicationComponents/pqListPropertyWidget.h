@@ -62,7 +62,7 @@ public:
   QList<QVariant> value() const;
   void setValue(const QList<QVariant>& value);
 
-signals:
+Q_SIGNALS:
   void valueChanged();
 
 private:

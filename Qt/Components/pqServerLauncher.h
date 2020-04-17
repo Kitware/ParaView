@@ -93,7 +93,7 @@ public:
   */
   pqServer* connectedServer() const;
 
-protected slots:
+protected Q_SLOTS:
   void processFailed(QProcess::ProcessError);
   void readStandardOutput();
   void readStandardError();

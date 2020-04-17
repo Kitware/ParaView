@@ -269,7 +269,7 @@ public:
   void focusInEvent(QFocusEvent* e) override
   {
     QTextEdit::focusInEvent(e);
-    emit this->Parent.consoleFocusInEvent();
+    Q_EMIT this->Parent.consoleFocusInEvent();
   }
 
   /// overridden to handle middle-button click pasting in *nix
@@ -578,7 +578,7 @@ void pqConsoleWidget::clear()
 //-----------------------------------------------------------------------------
 void pqConsoleWidget::internalExecuteCommand(const QString& Command)
 {
-  emit this->executeCommand(Command);
+  Q_EMIT this->executeCommand(Command);
 }
 
 //-----------------------------------------------------------------------------

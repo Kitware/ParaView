@@ -65,13 +65,13 @@ public:
 
   void updateConnection();
 
-public slots:
+public Q_SLOTS:
   void accept();
 
 protected:
   void keyPressEvent(QKeyEvent*);
 
-private slots:
+private Q_SLOTS:
   void addInput();
   void removeInput();
 

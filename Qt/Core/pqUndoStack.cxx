@@ -158,11 +158,11 @@ void pqUndoStack::onStackChanged()
     redo_label = this->Implementation->UndoStack->GetRedoSetLabel(0);
   }
 
-  emit this->stackChanged(can_undo, undo_label, can_redo, redo_label);
-  emit this->canUndoChanged(can_undo);
-  emit this->canRedoChanged(can_redo);
-  emit this->undoLabelChanged(undo_label);
-  emit this->redoLabelChanged(redo_label);
+  Q_EMIT this->stackChanged(can_undo, undo_label, can_redo, redo_label);
+  Q_EMIT this->canUndoChanged(can_undo);
+  Q_EMIT this->canRedoChanged(can_redo);
+  Q_EMIT this->undoLabelChanged(undo_label);
+  Q_EMIT this->redoLabelChanged(redo_label);
 }
 
 //-----------------------------------------------------------------------------
@@ -202,7 +202,7 @@ void pqUndoStack::undo()
 
   pqApplicationCore::instance()->render();
 
-  emit this->undone();
+  Q_EMIT this->undone();
 }
 
 //-----------------------------------------------------------------------------
@@ -215,7 +215,7 @@ void pqUndoStack::redo()
 
   pqApplicationCore::instance()->render();
 
-  emit this->redone();
+  Q_EMIT this->redone();
 }
 //-----------------------------------------------------------------------------
 void pqUndoStack::updateAllModifiedProxies()

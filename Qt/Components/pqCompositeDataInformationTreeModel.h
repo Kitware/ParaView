@@ -350,7 +350,7 @@ public:
     CompositeIndexRole
   };
 
-public slots:
+public Q_SLOTS:
   /**
    * Reset and rebuild the model using the data information object provided.
    * The model does not maintain a reference to the vtkPVDataInformation

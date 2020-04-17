@@ -51,9 +51,9 @@ public:
     vtkSMProperty* prop, int index = -1);
   ~pqWidgetRangeDomain() override;
 
-public slots:
+public Q_SLOTS:
   void domainChanged();
-protected slots:
+protected Q_SLOTS:
   void internalDomainChanged();
 
 protected:

@@ -57,13 +57,13 @@ public:
   pqFlipBookReaction(QAction* parent, QAction* playAction, QAction* stepAction, QSpinBox* autoVal);
   ~pqFlipBookReaction() override = default;
 
-public slots:
+public Q_SLOTS:
   /**
    * Updates the enabled state. Applications need not explicitly call this.
    */
   void updateEnableState() override;
 
-protected slots:
+protected Q_SLOTS:
   /**
    * Called when the action is toggled.
    */

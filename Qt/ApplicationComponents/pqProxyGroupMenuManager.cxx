@@ -619,7 +619,7 @@ void pqProxyGroupMenuManager::populateMenu()
     }
   }
 
-  emit this->menuPopulated();
+  Q_EMIT this->menuPopulated();
 }
 
 //-----------------------------------------------------------------------------
@@ -741,7 +741,7 @@ void pqProxyGroupMenuManager::triggered()
     return;
   }
   QPair<QString, QString> key(data_list[0], data_list[1]);
-  emit this->triggered(key.first, key.second);
+  Q_EMIT this->triggered(key.first, key.second);
   if (this->RecentlyUsedMenuSize > 0)
   {
     this->Internal->RecentlyUsed.removeAll(key);

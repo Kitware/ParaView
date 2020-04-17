@@ -98,7 +98,7 @@ public:
   void setIconType(const QString& pname, const QString& icon_type);
   const QString& iconType(const QString& pname) const;
   //@}
-signals:
+Q_SIGNALS:
   /**
   * fired whenever the check state has been modified.
   */

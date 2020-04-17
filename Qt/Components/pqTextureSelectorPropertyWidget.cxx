@@ -113,8 +113,8 @@ void pqTextureSelectorPropertyWidget::onTextureChanged(vtkSMProxy* texture)
   vtkSMPropertyHelper(this->property()).Set(texture);
   this->proxy()->UpdateVTKObjects();
   END_UNDO_SET();
-  emit this->changeAvailable();
-  emit this->changeFinished();
+  Q_EMIT this->changeAvailable();
+  Q_EMIT this->changeFinished();
 }
 
 //-----------------------------------------------------------------------------

@@ -318,7 +318,7 @@ public:
       item->setKeySequence(shortcut);
       QVector<int> roles;
       roles << Qt::DisplayRole;
-      emit dataChanged(idx, idx, roles);
+      Q_EMIT dataChanged(idx, idx, roles);
     }
   }
 

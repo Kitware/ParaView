@@ -85,7 +85,7 @@ public:
   // maintained by this object.
   void removeAllLinks();
 
-signals:
+Q_SIGNALS:
   /**
   * Signal emitted when there are possible properties to send down to
   * the server manager
@@ -102,7 +102,7 @@ signals:
   */
   void rejected();
 
-public slots:
+public Q_SLOTS:
   /**
   * accept property changes by pushing them all down to the server manager
   */

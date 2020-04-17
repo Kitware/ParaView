@@ -56,7 +56,7 @@ public:
   using Superclass::translateEvent;
   bool translateEvent(QObject* Object, QEvent* Event, bool& Error) override;
 
-private slots:
+private Q_SLOTS:
   void onColorChosen(const QColor&);
   void onFinished(int);
 
