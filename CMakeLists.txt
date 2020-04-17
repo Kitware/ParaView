@@ -426,6 +426,9 @@ else ()
 
   vtk_module_find_modules(vtk_module_files "${CMAKE_CURRENT_SOURCE_DIR}/VTK")
   vtk_module_find_kits(vtk_kit_files "${CMAKE_CURRENT_SOURCE_DIR}/VTK")
+  # Exclude VTK's examples.
+  list(FILTER vtk_module_files EXCLUDE REGEX "/Examples/")
+  list(FILTER vtk_kit_files EXCLUDE REGEX "/Examples/")
   vtk_module_scan(
     MODULE_FILES        ${vtk_module_files}
     KIT_FILES           ${vtk_kit_files}
