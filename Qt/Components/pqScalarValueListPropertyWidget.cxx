@@ -410,6 +410,14 @@ pqScalarValueListPropertyWidget::pqScalarValueListPropertyWidget(
     [&ui](const QItemSelection&, const QItemSelection&) {
       ui.Remove->setEnabled(ui.Table->selectionModel()->selectedIndexes().size() > 0);
     });
+
+  if (smProperty->GetInformationOnly())
+  {
+    ui.Add->hide();
+    ui.AddRange->hide();
+    ui.Remove->hide();
+    ui.RemoveAll->hide();
+  }
 }
 
 //-----------------------------------------------------------------------------
