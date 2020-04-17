@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // vtk includes
-#include "vtkConfigure.h" // for 64-bitness
 #include "vtkNew.h"
+#include "vtkOptions.h" // for 64-bitness
 #include "vtkSmartPointer.h"
 #include "vtkStringList.h"
 
