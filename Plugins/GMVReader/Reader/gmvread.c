@@ -10,8 +10,6 @@
 /* #include <malloc.h> */
 #include <math.h>
 
-#include <vtkConfigure.h> // for snprintf
-
 #define FREE(a) { if (a) free(a); a = NULL; }
 
 #define CHAR 0
