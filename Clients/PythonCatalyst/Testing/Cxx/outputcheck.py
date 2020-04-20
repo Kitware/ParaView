@@ -17,4 +17,4 @@ if g.GetNumberOfPoints() != 441 or g.GetNumberOfCells() != 800:
         'but should be 800.' % (g.GetNumberOfPoints(), g.GetNumberOfCells()))
     sys.exit(1)
 else:
-  print("All's good!!!!")
+  print("All's good for file ", sys.argv[1])

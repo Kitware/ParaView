@@ -100,7 +100,15 @@ if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflow")
     ${COPROCESSING_TEST_DIR}/filename_0.pvtp
     RESULT_VARIABLE rv)
   if(rv)
-    message(FATAL_ERROR "vtkpython return value was = '${rv}' ")
+    message(FATAL_ERROR "vtkpython return value when opening filename_0.pvtp was = '${rv}' ")
+  endif()
+  execute_process_with_echo(COMMAND
+    ${PVBATCH_EXECUTABLE} -dr
+    ${COPROCESSING_OUTPUTCHECK_SCRIPT}
+    ${COPROCESSING_TEST_DIR}/Slice2_0.ply
+    RESULT_VARIABLE rv)
+  if(rv)
+    message(FATAL_ERROR "vtkpython return value when opening Slice2_0.ply was = '${rv}' ")
   endif()
 endif()
 

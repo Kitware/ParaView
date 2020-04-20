@@ -451,7 +451,8 @@ class NewStyleWriters(object):
                         cpstate_globals = get_globals()
                         if proxyvalue in cpstate_globals.variable_to_name_map:
                             f = "%s.%s = %s" % (varname, p, cpstate_globals.variable_to_name_map[proxyvalue])
-                    else:
+                            res.append(f)
+                    elif hasattr(pxy.GetProperty(p), 'GetElement'):
                         value = pxy.GetProperty(p).GetElement(0)
                         if isinstance(value, numbers.Number):
                             f = "%s.%s = %s" % (varname, p, value)
@@ -459,7 +460,8 @@ class NewStyleWriters(object):
                             f = "%s.%s = '%s'" % (varname, p, value)
                         else:
                             f = "%s.%s = %s" % (varname, p, str(value))
-                    res.append(f)
+                        res.append(f)
+
             if self.__make_temporal_script:
                 f = "STP.RegisterWriter(%s, '%s', tp_writers)" % (
                     varname, filename)
