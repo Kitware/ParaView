@@ -89,7 +89,7 @@ public:
   {
     this->ItemCreatorFunctionPtr = fptr;
   }
-signals:
+Q_SIGNALS:
   /**
   * Fired when the tree widget is modified.
   */
@@ -101,7 +101,7 @@ signals:
   */
   void tableGrown(QTreeWidgetItem* item);
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the values in the widget.
   */
@@ -113,7 +113,7 @@ public slots:
   */
   QTreeWidgetItem* growTable();
 
-private slots:
+private Q_SLOTS:
   void sort(int);
 
 private:

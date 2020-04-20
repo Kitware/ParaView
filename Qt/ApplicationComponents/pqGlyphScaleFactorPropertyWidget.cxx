@@ -126,9 +126,9 @@ void pqGlyphScaleFactorPropertyWidget::resetButtonClicked()
   if (helper.GetAsDouble() != scalefactor)
   {
     vtkSMUncheckedPropertyHelper(smproperty).Set(scalefactor);
-    emit this->changeAvailable();
-    emit this->changeFinished();
+    Q_EMIT this->changeAvailable();
+    Q_EMIT this->changeFinished();
   }
 
-  emit this->clearHighlight();
+  Q_EMIT this->clearHighlight();
 }

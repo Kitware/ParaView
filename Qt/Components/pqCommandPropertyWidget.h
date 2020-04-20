@@ -50,7 +50,7 @@ public:
   pqCommandPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
   ~pqCommandPropertyWidget() override;
 
-protected slots:
+protected Q_SLOTS:
   /**
   * called when the button is clicked by the user.
   */

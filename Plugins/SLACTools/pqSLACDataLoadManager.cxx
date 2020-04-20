@@ -178,5 +178,5 @@ void pqSLACDataLoadManager::setupPipeline()
   }
 
   END_UNDO_SET();
-  emit this->createdPipeline();
+  Q_EMIT this->createdPipeline();
 }

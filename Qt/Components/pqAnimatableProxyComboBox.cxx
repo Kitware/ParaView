@@ -96,7 +96,7 @@ void pqAnimatableProxyComboBox::onSourceRemoved(pqPipelineSource* source)
     this->removeItem(index);
     if (this->count() == 0)
     {
-      emit this->currentProxyChanged(NULL);
+      Q_EMIT this->currentProxyChanged(NULL);
     }
   }
 }
@@ -119,7 +119,7 @@ void pqAnimatableProxyComboBox::onNameChanged(pqServerManagerModelItem* item)
 void pqAnimatableProxyComboBox::onCurrentSourceChanged(int idx)
 {
   pqSMProxy pxy = this->itemData(idx).value<pqSMProxy>();
-  emit this->currentProxyChanged(pxy);
+  Q_EMIT this->currentProxyChanged(pxy);
 }
 
 void pqAnimatableProxyComboBox::addProxy(int index, const QString& label, vtkSMProxy* pxy)
@@ -137,7 +137,7 @@ void pqAnimatableProxyComboBox::removeProxy(const QString& label)
     this->removeItem(index);
     if (this->count() == 0)
     {
-      emit this->currentProxyChanged(NULL);
+      Q_EMIT this->currentProxyChanged(NULL);
     }
   }
 }

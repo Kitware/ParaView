@@ -243,7 +243,7 @@ pqFindDataCurrentSelectionFrame::~pqFindDataCurrentSelectionFrame()
 void pqFindDataCurrentSelectionFrame::showSelectedData(pqOutputPort* port)
 {
   this->Internals->showSelectedData(port, this);
-  emit this->showing(port);
+  Q_EMIT this->showing(port);
 }
 
 //-----------------------------------------------------------------------------

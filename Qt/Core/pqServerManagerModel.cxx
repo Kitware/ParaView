@@ -315,8 +315,8 @@ void pqServerManagerModel::onProxyRegistered(
   // Set the QObject parent, simplifying clean up of objects.
   item->setParent(this);
 
-  emit this->preItemAdded(item);
-  emit this->preProxyAdded(item);
+  Q_EMIT this->preItemAdded(item);
+  Q_EMIT this->preProxyAdded(item);
 
   pqView* view = qobject_cast<pqView*>(item);
   pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
@@ -324,7 +324,7 @@ void pqServerManagerModel::onProxyRegistered(
 
   if (view)
   {
-    emit this->preViewAdded(view);
+    Q_EMIT this->preViewAdded(view);
   }
   else if (source)
   {
@@ -344,18 +344,18 @@ void pqServerManagerModel::onProxyRegistered(
     QObject::connect(
       source, SIGNAL(dataUpdated(pqPipelineSource*)), this, SIGNAL(dataUpdated(pqPipelineSource*)));
 
-    emit this->preSourceAdded(source);
+    Q_EMIT this->preSourceAdded(source);
   }
   else if (repr)
   {
-    emit this->preRepresentationAdded(repr);
+    Q_EMIT this->preRepresentationAdded(repr);
   }
 
   this->Internal->Proxies[proxy] = item;
   this->Internal->ItemList.push_back(item);
 
-  emit this->itemAdded(item);
-  emit this->proxyAdded(item);
+  Q_EMIT this->itemAdded(item);
+  Q_EMIT this->proxyAdded(item);
 
   if (view)
   {
@@ -363,20 +363,20 @@ void pqServerManagerModel::onProxyRegistered(
     // widget) for the view is created thus avoiding the window from ever
     // popping up and causing issues as as seen in BUG #13855.
     view->widget();
-    emit this->viewAdded(view);
+    Q_EMIT this->viewAdded(view);
   }
   else if (source)
   {
-    emit this->sourceAdded(source);
+    Q_EMIT this->sourceAdded(source);
   }
   else if (repr)
   {
-    emit this->representationAdded(repr);
+    Q_EMIT this->representationAdded(repr);
   }
 
   // It is essential to let the world know of the addition of pqProxy
   // before we start emitting signals as we update the initial state
-  // of the pqProxy from its underlying proxy. Hence we emit this->proxyAdded()
+  // of the pqProxy from its underlying proxy. Hence we Q_EMIT this->proxyAdded()
   // before we do a pqSource->initialize();
   item->initialize();
 
@@ -419,19 +419,19 @@ void pqServerManagerModel::onProxyUnRegistered(
 
   if (view)
   {
-    emit this->preViewRemoved(view);
+    Q_EMIT this->preViewRemoved(view);
   }
   else if (source)
   {
-    emit this->preSourceRemoved(source);
+    Q_EMIT this->preSourceRemoved(source);
   }
   else if (repr)
   {
-    emit this->preRepresentationRemoved(repr);
+    Q_EMIT this->preRepresentationRemoved(repr);
   }
 
-  emit this->preProxyRemoved(item);
-  emit this->preItemRemoved(item);
+  Q_EMIT this->preProxyRemoved(item);
+  Q_EMIT this->preItemRemoved(item);
 
   QObject::disconnect(item, 0, this, 0);
   this->Internal->ItemList.removeAll(item);
@@ -440,19 +440,19 @@ void pqServerManagerModel::onProxyUnRegistered(
   if (view)
   {
     view->cancelPendingRenders();
-    emit this->viewRemoved(view);
+    Q_EMIT this->viewRemoved(view);
   }
   else if (source)
   {
-    emit this->sourceRemoved(source);
+    Q_EMIT this->sourceRemoved(source);
   }
   else if (repr)
   {
-    emit this->representationRemoved(repr);
+    Q_EMIT this->representationRemoved(repr);
   }
 
-  emit this->proxyRemoved(item);
-  emit this->itemRemoved(item);
+  Q_EMIT this->proxyRemoved(item);
+  Q_EMIT this->itemRemoved(item);
   delete item;
 }
 
@@ -482,8 +482,8 @@ void pqServerManagerModel::onConnectionCreated(vtkIdType id)
 
   this->Internal->ActiveResource = pqServerResource();
 
-  emit this->preItemAdded(server);
-  emit this->preServerAdded(server);
+  Q_EMIT this->preItemAdded(server);
+  Q_EMIT this->preServerAdded(server);
 
   this->Internal->Servers[id] = server;
   this->Internal->ItemList.push_back(server);
@@ -500,9 +500,9 @@ void pqServerManagerModel::onConnectionCreated(vtkIdType id)
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->InitializeSession(server->session());
 
-  emit this->serverReady(server);
-  emit this->itemAdded(server);
-  emit this->serverAdded(server);
+  Q_EMIT this->serverReady(server);
+  Q_EMIT this->itemAdded(server);
+  Q_EMIT this->serverAdded(server);
 
   this->updateSettingsFromQSettings(server);
 }
@@ -589,14 +589,14 @@ void pqServerManagerModel::onConnectionClosed(vtkIdType id)
     return;
   }
 
-  emit this->preServerRemoved(server);
-  emit this->preItemRemoved(server);
+  Q_EMIT this->preServerRemoved(server);
+  Q_EMIT this->preItemRemoved(server);
 
   this->Internal->Servers.remove(server->GetConnectionID());
   this->Internal->ItemList.removeAll(server);
 
-  emit this->serverRemoved(server);
-  emit this->itemRemoved(server);
+  Q_EMIT this->serverRemoved(server);
+  Q_EMIT this->itemRemoved(server);
   delete server;
 }
 
@@ -610,11 +610,11 @@ void pqServerManagerModel::onStateLoaded(vtkPVXMLElement* root, vtkSMProxyLocato
 //-----------------------------------------------------------------------------
 void pqServerManagerModel::beginRemoveServer(pqServer* server)
 {
-  emit this->aboutToRemoveServer(server);
+  Q_EMIT this->aboutToRemoveServer(server);
 }
 
 //-----------------------------------------------------------------------------
 void pqServerManagerModel::endRemoveServer()
 {
-  emit this->finishedRemovingServer();
+  Q_EMIT this->finishedRemovingServer();
 }

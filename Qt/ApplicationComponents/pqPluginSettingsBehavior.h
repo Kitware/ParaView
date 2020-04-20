@@ -47,7 +47,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPluginSettingsBehavior : public QObject
 public:
   pqPluginSettingsBehavior(QObject* parent = 0);
 
-public slots:
+public Q_SLOTS:
   void updateSettings();
 };
 

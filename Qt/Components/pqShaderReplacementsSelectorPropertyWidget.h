@@ -52,7 +52,7 @@ public:
     vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = nullptr);
   ~pqShaderReplacementsSelectorPropertyWidget() override;
 
-protected slots:
+protected Q_SLOTS:
   void updateShaderReplacements();
   void textChangedAndEditingFinished();
   void onLoad();

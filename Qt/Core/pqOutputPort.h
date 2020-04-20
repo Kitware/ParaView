@@ -171,7 +171,7 @@ public:
   */
   void setSelectionInput(vtkSMSourceProxy* src, int port);
 
-public slots:
+public Q_SLOTS:
   /**
   * This method updates all render modules to which all
   * representations for this source belong, if force is true, it for an
@@ -179,7 +179,7 @@ public slots:
   */
   void renderAllViews(bool force = false);
 
-signals:
+Q_SIGNALS:
   /**
   * Fired when a connection is added between this output port and a consumer.
   */
@@ -209,7 +209,7 @@ signals:
   */
   void visibilityChanged(pqOutputPort* source, pqDataRepresentation* repr);
 
-protected slots:
+protected Q_SLOTS:
   void onRepresentationVisibilityChanged();
 
 protected:

@@ -54,7 +54,7 @@ public:
   */
   void setData(int role, const QVariant& v) override;
 
-public slots:
+public Q_SLOTS:
   /**
   * get the check true/false
   */
@@ -64,7 +64,7 @@ public slots:
   */
   void setChecked(bool v);
 
-signals:
+Q_SIGNALS:
   /**
   * signal check state changed
   */

@@ -52,7 +52,7 @@ public:
   virtual ~pqSignalAdaptorSILModel();
 
   QList<QVariant> values() const;
-  slots:
+  Q_SLOTS:
   void setValues(const QList<QVariant>&);
 
 private:

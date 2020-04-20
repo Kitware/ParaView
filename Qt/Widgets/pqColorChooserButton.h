@@ -86,7 +86,7 @@ public:
   bool showAlphaChannel() const { return this->ShowAlphaChannel; }
   void setShowAlphaChannel(bool val) { this->ShowAlphaChannel = val; }
 
-signals:
+Q_SIGNALS:
   /**
   * signal color changed. This is fired in setChosenColor() only
   * when the color is indeed different.
@@ -99,7 +99,7 @@ signals:
   */
   void validColorChosen(const QColor&);
 
-public slots:
+public Q_SLOTS:
   /**
   * set the color
   */

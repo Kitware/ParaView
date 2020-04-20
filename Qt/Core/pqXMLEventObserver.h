@@ -58,7 +58,7 @@ public:
 
   void setStream(QTextStream* stream) override;
 
-public slots:
+public Q_SLOTS:
   /**
   * Record on event in xml file
   */

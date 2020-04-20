@@ -66,7 +66,7 @@ public:
   void setCenter(double xyz[3]);
   void setOrigin(double xyz[3]);
 
-protected slots:
+protected Q_SLOTS:
   void resetBounds();
 
 private:

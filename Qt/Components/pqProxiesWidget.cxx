@@ -197,7 +197,7 @@ void pqProxiesWidget::triggerChangeFinished()
 {
   if (pqProxyWidget* pwSender = qobject_cast<pqProxyWidget*>(this->sender()))
   {
-    emit this->changeFinished(pwSender->proxy());
+    Q_EMIT this->changeFinished(pwSender->proxy());
   }
 }
 
@@ -206,7 +206,7 @@ void pqProxiesWidget::triggerChangeAvailable()
 {
   if (pqProxyWidget* pwSender = qobject_cast<pqProxyWidget*>(this->sender()))
   {
-    emit this->changeAvailable(pwSender->proxy());
+    Q_EMIT this->changeAvailable(pwSender->proxy());
   }
 }
 
@@ -215,7 +215,7 @@ void pqProxiesWidget::triggerRestartRequired()
 {
   if (pqProxyWidget* pwSender = qobject_cast<pqProxyWidget*>(this->sender()))
   {
-    emit this->restartRequired(pwSender->proxy());
+    Q_EMIT this->restartRequired(pwSender->proxy());
   }
 }
 

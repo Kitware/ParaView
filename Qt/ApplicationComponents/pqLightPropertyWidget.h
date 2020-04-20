@@ -59,7 +59,7 @@ public:
   pqLightPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   ~pqLightPropertyWidget() override;
 
-protected slots:
+protected Q_SLOTS:
   void placeWidget() override {}
 
   /**

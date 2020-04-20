@@ -137,7 +137,7 @@ public:
   void setEnabledHeaderToolTip(const QString& val);
   const QString& enabledHeaderToolTip() const { return this->EnabledHeaderToolTip; }
 
-public slots:
+public Q_SLOTS:
 
   /**
   * set the animation mode
@@ -180,7 +180,7 @@ public slots:
    */
   void setTimeNotation(const QChar& notation);
 
-signals:
+Q_SIGNALS:
   // emitted when a track is double clicked on
   void trackSelected(pqAnimationTrack*);
   // emitted when the current time was changed by this model
@@ -188,7 +188,7 @@ signals:
   // emitted when the time of a keyframe was changed by this model
   void keyFrameTimeChanged(pqAnimationTrack* track, pqAnimationKeyFrame* kf, int end, double time);
 
-protected slots:
+protected Q_SLOTS:
 
   void resizeTracks();
   void trackNameChanged();

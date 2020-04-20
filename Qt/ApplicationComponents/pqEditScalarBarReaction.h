@@ -57,7 +57,7 @@ public:
   pqEditScalarBarReaction(QAction* parent = 0, bool track_active_objects = true);
   ~pqEditScalarBarReaction() override;
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the active representation. This should only be used when
   * \c track_active_objects is false. If used when \c track_active_objects is
@@ -71,7 +71,7 @@ public slots:
   */
   bool editScalarBar();
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Updates the enabled state. Applications need not explicitly call
   * this.

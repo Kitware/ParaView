@@ -108,7 +108,7 @@ void pqPresetGroupsManager::loadGroups(const QString& jsonString)
     this->GroupNames.append("default");
     this->Groups["default"] = QList<QString>();
   }
-  emit groupsUpdated();
+  Q_EMIT groupsUpdated();
 }
 
 void pqPresetGroupsManager::clearGroups()

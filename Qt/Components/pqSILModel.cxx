@@ -166,7 +166,7 @@ void pqSILModel::setStatus(const QString& hierarchyName, const QList<QVariant>& 
       this->SILModel->SetCheckState(vertex, vtkSMSILModel::UNCHECKED);
     }
   }
-  emit this->checkStatusChanged();
+  Q_EMIT this->checkStatusChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -434,7 +434,7 @@ bool pqSILModel::setData(const QModelIndex& idx, const QVariant& value, int role
     bool checked = (value.toInt() == Qt::Checked);
     this->SILModel->SetCheckState(
       vertexId, checked ? vtkSMSILModel::CHECKED : vtkSMSILModel::UNCHECKED);
-    emit this->checkStatusChanged();
+    Q_EMIT this->checkStatusChanged();
     return true;
   }
 
@@ -471,5 +471,5 @@ void pqSILModel::checkStateUpdated(
 {
   vtkIdType vertexId = *reinterpret_cast<vtkIdType*>(calldata);
   QModelIndex idx = this->makeIndex(vertexId);
-  emit this->dataChanged(idx, idx, QVector<int>{ Qt::CheckStateRole });
+  Q_EMIT this->dataChanged(idx, idx, QVector<int>{ Qt::CheckStateRole });
 }

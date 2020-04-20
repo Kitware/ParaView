@@ -146,7 +146,7 @@ public:
     PythonQt::self()->registerClass(metaobject, "%s");
   }
 
-public slots:
+public Q_SLOTS:
 
 %s
 

@@ -144,7 +144,7 @@ public:
   */
   bool isAdvancedSearchEnabled() const;
 
-signals:
+Q_SIGNALS:
   /**
   * Sent when the advanced button is toggled. Note that no signal is
   * sent when the configuration is None.
@@ -164,7 +164,7 @@ signals:
   */
   void settingKeyChanged(const QString&);
 
-public slots:
+public Q_SLOTS:
   /**
   * Toggle the advanced search button. This is a no-op when the configuration
   * is None.
@@ -197,7 +197,7 @@ public slots:
 protected:
   void keyPressEvent(QKeyEvent* e) override;
 
-protected slots:
+protected Q_SLOTS:
   void onAdvancedButtonClicked(bool);
   void updateSettings();
   void updateFromSettings();

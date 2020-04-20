@@ -98,10 +98,10 @@ public:
   */
   void SetEdgeMargin(int margin);
 
-public slots:
+public Q_SLOTS:
   void renderView();
 
-signals:
+Q_SIGNALS:
   /**
   * Signal emitted when the model has changed internally
   */

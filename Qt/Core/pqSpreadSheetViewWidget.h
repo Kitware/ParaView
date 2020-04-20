@@ -67,7 +67,7 @@ public:
   */
   pqSpreadSheetViewModel* spreadSheetViewModel() const;
 
-protected slots:
+protected Q_SLOTS:
   /**
   * called when a header section is clicked in order to be sorted.
   * It results in that column being sorted if possible.

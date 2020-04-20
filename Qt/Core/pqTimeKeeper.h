@@ -90,7 +90,7 @@ public:
   */
   void setTime(double time);
 
-signals:
+Q_SIGNALS:
   /**
   * Fired when the keeper updates the times.
   */

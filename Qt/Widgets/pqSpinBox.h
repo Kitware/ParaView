@@ -56,7 +56,7 @@ public:
   */
   void stepBy(int steps) override;
 
-signals:
+Q_SIGNALS:
   /**
   * Unlike QSpinBox::editingFinished() which gets fired whenever the widget
   * looses focus irrespective of if the value was indeed edited,
@@ -65,7 +65,7 @@ signals:
   */
   void valueChangedAndEditingFinished();
 
-private slots:
+private Q_SLOTS:
   void onValueEdited();
   void onEditingFinished();
 

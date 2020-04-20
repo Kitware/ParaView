@@ -23,12 +23,12 @@ public:
   explicit pqWelcomeDialog(QWidget* parent = 0);
   ~pqWelcomeDialog() override;
 
-public slots:
+public Q_SLOTS:
   virtual void onGettingStartedGuideClicked();
 
   virtual void onExampleVisualizationsClicked();
 
-protected slots:
+protected Q_SLOTS:
   /**
   * React to checkbox events
   */

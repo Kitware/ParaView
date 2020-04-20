@@ -54,11 +54,11 @@ public:
   void apply() override;
   void reset() override;
 
-protected slots:
+protected Q_SLOTS:
   void highlightResetButton(bool highlight = true);
   void resetClicked();
 
-private slots:
+private Q_SLOTS:
   /**
   * slots called when the slider(s) are moved.
   */

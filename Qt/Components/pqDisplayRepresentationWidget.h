@@ -61,7 +61,7 @@ public:
   */
   QString representationText() const;
 
-public slots:
+public Q_SLOTS:
   /**
   * set the representation proxy or pqDataRepresentation instance.
   */
@@ -73,7 +73,7 @@ public slots:
   */
   void setRepresentationText(const QString&);
 
-private slots:
+private Q_SLOTS:
   /**
   * Slot called when the combo-box is changed. If this change was due to
   * a UI interaction, we need to prompt the user if he really intended to make
@@ -81,7 +81,7 @@ private slots:
   */
   void comboBoxChanged(const QString&);
 
-signals:
+Q_SIGNALS:
   void representationTextChanged(const QString&);
 
 private:

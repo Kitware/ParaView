@@ -326,7 +326,7 @@ public:
   */
   void disableFilterSession();
 
-public slots:
+public Q_SLOTS:
   /**
   * Called when a new server connection is detected. Adds the connection to the
   * list.
@@ -368,10 +368,10 @@ public slots:
   */
   void setView(pqView* module);
 
-signals:
+Q_SIGNALS:
   void firstChildAdded(const QModelIndex& index);
 
-private slots:
+private Q_SLOTS:
   void onInsituConnectionInitiated(pqServer* server);
 
   void serverDataChanged();

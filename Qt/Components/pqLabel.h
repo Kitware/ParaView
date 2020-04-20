@@ -50,7 +50,7 @@ public:
 
   void mousePressEvent(QMouseEvent* event) override;
 
-signals:
+Q_SIGNALS:
   void clicked();
 };
 

@@ -259,7 +259,7 @@ void pqViewFrame::buttonClicked()
     StandardButton key = this->StandardToolButtons.key(toolButton, NoButton);
     if (key != NoButton)
     {
-      emit this->buttonPressed(key);
+      Q_EMIT this->buttonPressed(key);
     }
   }
 }
@@ -366,7 +366,7 @@ void pqViewFrame::drag()
   if (dragObj->exec() == Qt::MoveAction)
   {
     // Let the target know that the drag operation has concluded.
-    emit this->finishDrag(this);
+    Q_EMIT this->finishDrag(this);
   }
   // It seems we are not supposed to call delete on QDrag. It gets deleted on
   // its own. Calling delete was causing segfaults on Linux in obscure call
@@ -402,7 +402,7 @@ void pqViewFrame::drop(QDropEvent* evt)
 void pqViewFrame::finishedDrag(pqViewFrame* source)
 {
   assert(source != NULL);
-  emit this->swapPositions(source->uniqueID().toString());
+  Q_EMIT this->swapPositions(source->uniqueID().toString());
 }
 
 //-----------------------------------------------------------------------------

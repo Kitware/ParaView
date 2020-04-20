@@ -95,14 +95,14 @@ public:
    */
   vtkBoundingBox selectedDataBounds() const;
 
-signals:
+Q_SIGNALS:
   /**
   * Fired when the selection changes. Argument is the pqOutputPort (if any)
   * that was selected. If selection was cleared then the argument is NULL.
   */
   void selectionChanged(pqOutputPort*);
 
-public slots:
+public Q_SLOTS:
   /**
   * Clear selection on a pqOutputPort.
   * Calling the method without arguments or with null
@@ -135,7 +135,7 @@ public slots:
    */
   void expandSelection(int layers);
 
-private slots:
+private Q_SLOTS:
   /**
   * Called when pqLinkModel creates a link,
   * to update the selection

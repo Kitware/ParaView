@@ -69,10 +69,10 @@ public:
   QString paletteName() const;
   void setPaletteName(const QString& name);
 
-signals:
+Q_SIGNALS:
   void paletteNameChanged();
 
-private slots:
+private Q_SLOTS:
   void loadPalette(int);
 
 private:

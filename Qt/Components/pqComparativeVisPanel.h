@@ -59,7 +59,7 @@ public:
   */
   pqView* view() const;
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the view to shown in this panel. If the view is not a comparative view
   * then the panel will be disabled, otherwise, it shows the properties of the
@@ -67,7 +67,7 @@ public slots:
   */
   void setView(pqView*);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * If vtkSMProxy has a TimestepValues property then this method will set the
   * TimeRange property of vtkSMComparativeViewProxy to reflect the values.

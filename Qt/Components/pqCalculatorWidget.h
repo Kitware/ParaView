@@ -54,7 +54,7 @@ public:
   pqCalculatorWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
   ~pqCalculatorWidget() override;
 
-protected slots:
+protected Q_SLOTS:
   /**
   * called when the user selects a variable from the scalars/vectors menus.
   */

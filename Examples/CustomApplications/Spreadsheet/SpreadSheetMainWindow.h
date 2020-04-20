@@ -44,7 +44,7 @@ public:
   SpreadSheetMainWindow(QWidget* parent = 0, Qt::WindowFlags flags = 0);
   ~SpreadSheetMainWindow();
 
-protected slots:
+protected Q_SLOTS:
   void showData(pqPipelineSource*);
 
 private:

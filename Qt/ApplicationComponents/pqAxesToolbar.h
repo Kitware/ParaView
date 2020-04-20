@@ -57,7 +57,7 @@ public:
   }
   ~pqAxesToolbar() override;
 
-protected slots:
+protected Q_SLOTS:
   void updateEnabledState();
   void showCenterAxes(bool);
   void showOrientationAxes(bool);

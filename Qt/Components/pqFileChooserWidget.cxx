@@ -221,13 +221,13 @@ void pqFileChooserWidget::handleFileLineEditChanged(const QString& fileString)
 
 void pqFileChooserWidget::emitFilenamesChanged(const QStringList& fileList)
 {
-  emit this->filenamesChanged(fileList);
+  Q_EMIT this->filenamesChanged(fileList);
   if (!fileList.empty())
   {
-    emit this->filenameChanged(fileList[0]);
+    Q_EMIT this->filenameChanged(fileList[0]);
   }
   else
   {
-    emit this->filenameChanged("");
+    Q_EMIT this->filenameChanged("");
   }
 }

@@ -91,14 +91,14 @@ public:
 
   static QList<pqPipelineSource*> loadData();
 
-public slots:
+public Q_SLOTS:
   /**
   * Updates the enabled state. Applications need not explicitly call
   * this.
   */
   void updateEnableState() override;
 
-signals:
+Q_SIGNALS:
   /**
   * Fired when a dataset is loaded by this reaction.
   */
@@ -114,7 +114,7 @@ protected:
     pqPipelineSource* source;
     foreach (source, sources)
     {
-      emit this->loadedData(source);
+      Q_EMIT this->loadedData(source);
     }
   }
 

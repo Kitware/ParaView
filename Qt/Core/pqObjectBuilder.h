@@ -249,13 +249,13 @@ public:
   */
   bool forceWaitingForConnection(bool force);
 
-public slots:
+public Q_SLOTS:
   /**
   * Closes any open connections for reverse-connection.
   */
   void abortPendingConnections();
 
-signals:
+Q_SIGNALS:
 
   /**
   * Emitted after a new server connection is created

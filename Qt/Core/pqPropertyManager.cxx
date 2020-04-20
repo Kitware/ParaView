@@ -82,9 +82,9 @@ void pqPropertyManager::removeAllLinks()
 //-----------------------------------------------------------------------------
 void pqPropertyManager::accept()
 {
-  emit this->aboutToAccept();
+  Q_EMIT this->aboutToAccept();
   this->Links->accept();
-  emit this->accepted();
+  Q_EMIT this->accepted();
   this->Modified = false;
 }
 
@@ -92,7 +92,7 @@ void pqPropertyManager::accept()
 void pqPropertyManager::reject()
 {
   this->Links->reset();
-  emit this->rejected();
+  Q_EMIT this->rejected();
   this->Modified = false;
 }
 
@@ -100,7 +100,7 @@ void pqPropertyManager::reject()
 void pqPropertyManager::propertyChanged()
 {
   this->Modified = true;
-  emit this->modified();
+  Q_EMIT this->modified();
 }
 
 //-----------------------------------------------------------------------------

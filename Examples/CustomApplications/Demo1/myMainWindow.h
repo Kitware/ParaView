@@ -43,7 +43,7 @@ public:
   myMainWindow(QWidget* parent = 0, Qt::WindowFlags flags = 0);
   ~myMainWindow();
 
-protected slots:
+protected Q_SLOTS:
 
 private:
   Q_DISABLE_COPY(myMainWindow)

@@ -360,7 +360,7 @@ bool pqPythonScriptEditor::saveFile(const QString& fileName)
 
   this->setCurrentFile(fileName);
   this->statusBar()->showMessage(tr("File saved"), 2000);
-  emit this->fileSaved();
+  Q_EMIT this->fileSaved();
   return true;
 }
 

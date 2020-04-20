@@ -64,14 +64,14 @@ public:
   */
   static void populateSelectionTypeCombo(QComboBox* bbox, pqOutputPort* port);
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the port to create a query selection on. If the port is different from
   * the current one, it clears any existing query.
   */
   void setPort(pqOutputPort*);
 
-private slots:
+private Q_SLOTS:
   /**
   * marks if the underlying data has changed
   */

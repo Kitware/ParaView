@@ -77,13 +77,13 @@ public:
 
   pqSMProxy proxyToEdit() const;
 
-public slots:
+public Q_SLOTS:
   void setProxyToEdit(pqSMProxy);
 
-protected slots:
+protected Q_SLOTS:
   void buttonClicked();
 
-signals:
+Q_SIGNALS:
   void dummySignal();
 
 private:

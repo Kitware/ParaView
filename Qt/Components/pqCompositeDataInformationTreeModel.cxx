@@ -716,7 +716,7 @@ bool pqCompositeDataInformationTreeModel::setHeaderData(
   if (orientation == Qt::Horizontal && section == 0 && role == Qt::DisplayRole)
   {
     this->HeaderLabel = value.toString();
-    emit this->headerDataChanged(orientation, section, section);
+    Q_EMIT this->headerDataChanged(orientation, section, section);
     return true;
   }
   return this->Superclass::setHeaderData(section, orientation, value, role);

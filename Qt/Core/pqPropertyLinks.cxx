@@ -178,7 +178,7 @@ void pqPropertyLinks::onQtPropertyModified()
     {
       connection->proxy()->UpdateVTKObjects();
     }
-    emit this->qtWidgetChanged();
+    Q_EMIT this->qtWidgetChanged();
 
     // although unintuitive, several panels e.g. pqDisplayProxyEditor expect
     // smPropertyChanged() whenever the SMProperty is chnaged, either by the GUI
@@ -190,7 +190,7 @@ void pqPropertyLinks::onQtPropertyModified()
     // behavior.
     if (this->autoUpdateVTKObjects() && connection->proxy())
     {
-      emit this->smPropertyChanged();
+      Q_EMIT this->smPropertyChanged();
     }
   }
 }
@@ -205,7 +205,7 @@ void pqPropertyLinks::onSMPropertyModified()
     if (connection)
     {
       connection->copyValuesFromServerManagerToQt(this->useUncheckedProperties());
-      emit this->smPropertyChanged();
+      Q_EMIT this->smPropertyChanged();
     }
   }
 }

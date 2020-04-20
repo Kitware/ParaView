@@ -217,7 +217,7 @@ void pqComparativeCueWidget::onCellChanged(int rowno, int colno)
   }
   END_UNDO_SET();
 
-  emit this->valuesChanged();
+  Q_EMIT this->valuesChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -360,7 +360,7 @@ void pqComparativeCueWidget::editRange()
   }
 
   END_UNDO_SET();
-  emit this->valuesChanged();
+  Q_EMIT this->valuesChanged();
 
   this->updateGUIOnIdle();
 }

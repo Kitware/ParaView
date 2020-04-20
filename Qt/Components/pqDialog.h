@@ -63,7 +63,7 @@ public:
   * Set the label used for undo command.
   */
   void setUndoLabel(const QString& label) { this->UndoLabel = label; }
-signals:
+Q_SIGNALS:
   /**
   * Fired when dialog begins undo-able changes.
   * Should be connected to undo-redo stack builder.

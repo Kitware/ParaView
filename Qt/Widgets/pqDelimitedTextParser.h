@@ -75,7 +75,7 @@ public:
   */
   void parse(const QString& path);
 
-signals:
+Q_SIGNALS:
   /**
   * Signal emitted when parsing begins.
   */

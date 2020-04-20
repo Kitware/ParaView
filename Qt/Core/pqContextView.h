@@ -88,7 +88,7 @@ public:
   */
   void resetDisplay() override;
 
-protected slots:
+protected Q_SLOTS:
   //@{
   /**
    * Slots called when vtkCommand::StartInteractionEvent and

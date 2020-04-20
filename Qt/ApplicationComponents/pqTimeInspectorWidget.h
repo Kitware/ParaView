@@ -137,7 +137,7 @@ public:
   */
   double sceneCurrentTime() const;
 
-public slots:
+public Q_SLOTS:
   /**
   * set the active server.
   */
@@ -148,7 +148,7 @@ public slots:
   */
   void setSceneCurrentTime(double);
 
-private slots:
+private Q_SLOTS:
   /**
   * Updates the panel based on the scene on this->server().
   */
@@ -166,7 +166,7 @@ private slots:
 
   void generalSettingsChanged();
 
-signals:
+Q_SIGNALS:
   void dummySignal();
   void sceneCurrentTimeChanged();
   void suppressedTimeSourcesChanged();

@@ -62,7 +62,7 @@ public:
   pqPipelineContextMenuBehavior(QObject* parent = 0);
   ~pqPipelineContextMenuBehavior() override;
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called when a new view is added. We add actions to the widget for context
   * menu if the view is a render-view.

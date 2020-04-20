@@ -67,7 +67,7 @@ public:
   */
   QAction* parentAction() const { return qobject_cast<QAction*>(this->parent()); }
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called when the action is triggered.
   */

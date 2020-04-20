@@ -106,7 +106,7 @@ void pqVRConnectionManager::add(pqVRPNConnection* conn)
 {
   this->Internals->VRPNConnections.push_front(conn);
   conn->setQueue(this->Internals->Queue);
-  emit this->connectionsChanged();
+  Q_EMIT this->connectionsChanged();
 }
 
 // ----------------------------------------------------------------------------
@@ -114,7 +114,7 @@ void pqVRConnectionManager::remove(pqVRPNConnection* conn)
 {
   conn->stop();
   this->Internals->VRPNConnections.removeAll(conn);
-  emit this->connectionsChanged();
+  Q_EMIT this->connectionsChanged();
 }
 
 // ----------------------------------------------------------------------------
@@ -141,7 +141,7 @@ void pqVRConnectionManager::add(pqVRUIConnection* conn)
 {
   this->Internals->VRUIConnections.push_front(conn);
   conn->setQueue(this->Internals->Queue);
-  emit this->connectionsChanged();
+  Q_EMIT this->connectionsChanged();
 }
 
 // ----------------------------------------------------------------------------
@@ -149,7 +149,7 @@ void pqVRConnectionManager::remove(pqVRUIConnection* conn)
 {
   conn->stop();
   this->Internals->VRUIConnections.removeAll(conn);
-  emit this->connectionsChanged();
+  Q_EMIT this->connectionsChanged();
 }
 
 // ----------------------------------------------------------------------------
@@ -180,7 +180,7 @@ void pqVRConnectionManager::clear()
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
   this->Internals->VRUIConnections.clear();
 #endif
-  emit this->connectionsChanged();
+  Q_EMIT this->connectionsChanged();
 }
 
 // ----------------------------------------------------------------------------
@@ -339,7 +339,7 @@ void pqVRConnectionManager::configureConnections(vtkPVXMLElement* xml, vtkSMProx
   {
     this->configureConnections(xml->FindNestedElementByName("VRConnectionManager"), locator);
   }
-  emit this->connectionsChanged();
+  Q_EMIT this->connectionsChanged();
 }
 
 // ----------------------------------------------------------------------------

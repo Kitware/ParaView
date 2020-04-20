@@ -75,7 +75,7 @@ public:
   // the widgets range when the domain changes.
   void setDomain(vtkSMIntRangeDomain* domain);
 
-signals:
+Q_SIGNALS:
   /**
   * signal the value changed
   */
@@ -89,7 +89,7 @@ signals:
   */
   void valueEdited(int);
 
-public slots:
+public Q_SLOTS:
   /**
   * set the value
   */
@@ -104,7 +104,7 @@ public slots:
   // whereas other methods just do it on the slider
   void setStrictRange(bool);
 
-private slots:
+private Q_SLOTS:
   void sliderChanged(int);
   void textChanged(const QString&);
   void editingFinished();

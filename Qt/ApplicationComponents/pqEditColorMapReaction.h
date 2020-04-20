@@ -60,14 +60,14 @@ public:
   */
   static void editColorMap(pqPipelineRepresentation* repr = NULL);
 
-public slots:
+public Q_SLOTS:
   /**
   * Updates the enabled state. Applications need not explicitly call
   * this.
   */
   void updateEnableState() override;
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the active representation.
   */

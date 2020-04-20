@@ -95,7 +95,7 @@ public:
    */
   void unlock();
 
-private slots:
+private Q_SLOTS:
   void updateEnabledState();
   void addCustom();
   void lockResolution(bool lock);

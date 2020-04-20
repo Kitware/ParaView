@@ -494,7 +494,7 @@ void pqAnimationModel::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEven
     pqAnimationTrack* t = hitTestTracks(pos);
     if (t)
     {
-      emit trackSelected(t);
+      Q_EMIT trackSelected(t);
       return;
     }
   }
@@ -673,14 +673,14 @@ void pqAnimationModel::mouseReleaseEvent(QGraphicsSceneMouseEvent*)
   if (this->CurrentTimeGrabbed)
   {
     this->CurrentTimeGrabbed = false;
-    emit this->currentTimeSet(this->NewCurrentTime);
+    Q_EMIT this->currentTimeSet(this->NewCurrentTime);
     this->NewCurrentTime = this->CurrentTime;
     this->update();
   }
 
   if (this->CurrentKeyFrameGrabbed)
   {
-    emit this->keyFrameTimeChanged(this->CurrentTrackGrabbed, this->CurrentKeyFrameGrabbed,
+    Q_EMIT this->keyFrameTimeChanged(this->CurrentTrackGrabbed, this->CurrentKeyFrameGrabbed,
       this->CurrentKeyFrameEdge, this->NewCurrentTime);
 
     this->CurrentTrackGrabbed = NULL;

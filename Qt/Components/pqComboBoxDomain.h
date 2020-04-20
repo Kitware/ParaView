@@ -75,9 +75,9 @@ public:
   vtkSMDomain* getDomain() const;
   const QStringList& getUserStrings() const;
 
-public slots:
+public Q_SLOTS:
   void domainChanged();
-protected slots:
+protected Q_SLOTS:
   virtual void internalDomainChanged();
 
 protected:

@@ -181,16 +181,16 @@ public:
   */
   void setHeaderTitle(QString& title);
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the status values for the hierarchy.
   */
   void setValues(const QList<QVariant>&);
 
-signals:
+Q_SIGNALS:
   void valuesChanged();
 
-protected slots:
+protected Q_SLOTS:
   void sourceDataChanged(const QModelIndex& idx1, const QModelIndex& idx2)
   {
     QModelIndex pidx1 = this->mapFromSource(idx1);
@@ -198,9 +198,9 @@ protected slots:
     if (!pidx1.isValid() || !pidx2.isValid())
     {
       // index is root, that mean header data may have changed as well.
-      emit this->headerDataChanged(Qt::Horizontal, 0, 0);
+      Q_EMIT this->headerDataChanged(Qt::Horizontal, 0, 0);
     }
-    emit this->dataChanged(pidx1, pidx2);
+    Q_EMIT this->dataChanged(pidx1, pidx2);
   }
 
   void onCheckStatusChanged();

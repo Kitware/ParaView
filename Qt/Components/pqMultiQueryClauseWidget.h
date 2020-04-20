@@ -101,7 +101,7 @@ public:
    */
   vtkPVDataSetAttributesInformation* getChosenAttributeInfo() const;
 
-protected slots:
+protected Q_SLOTS:
   /**
    * Adds a default query clause widget.
    */

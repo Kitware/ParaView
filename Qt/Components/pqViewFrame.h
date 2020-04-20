@@ -144,7 +144,7 @@ public:
   */
   QUuid uniqueID() const { return this->UniqueID; }
 
-signals:
+Q_SIGNALS:
   /**
   * fired when a standard button is pressed.
   */
@@ -166,7 +166,7 @@ signals:
   */
   void finishDrag(pqViewFrame* source);
 
-public slots:
+public Q_SLOTS:
   /**
   * set whether the border is visible.
   */
@@ -212,7 +212,7 @@ protected:
   void dragEnter(QDragEnterEvent*);
   void drop(QDropEvent*);
 
-protected slots:
+protected Q_SLOTS:
   void buttonClicked();
   void contextMenuRequested(const QPoint&);
 
@@ -243,7 +243,7 @@ private:
 
   class pqInternals;
   const QScopedPointer<pqInternals> Internals;
-private slots:
+private Q_SLOTS:
   void finishedDrag(pqViewFrame* source);
 };
 

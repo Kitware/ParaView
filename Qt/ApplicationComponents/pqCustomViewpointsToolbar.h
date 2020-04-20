@@ -64,7 +64,7 @@ public:
   }
   ~pqCustomViewpointsToolbar() override = default;
 
-protected slots:
+protected Q_SLOTS:
 
   /**
    * Clear and recreate all custom viewpoint actions

@@ -159,7 +159,7 @@ public:
   */
   vtkSMSourceProxy* getSourceProxy();
 
-signals:
+Q_SIGNALS:
   /**
   * fired when a connection is created between two pqPipelineSources.
   */
@@ -202,13 +202,13 @@ signals:
    */
   void selectionChanged(pqOutputPort* port);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called when the visibility of any representation for this source changes.
   */
   void onRepresentationVisibilityChanged();
 
-private slots:
+private Q_SLOTS:
   /**
   * Slots called when corresponding signals are fired from pqOutputPort.
   * These slots simply fire the appropriate signals.

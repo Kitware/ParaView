@@ -81,11 +81,11 @@ void pqVCRController::setAnimationScene(pqAnimationScene* scene)
     QObject::connect(this->Scene, SIGNAL(endPlay()), this, SLOT(onEndPlay()));
     bool loop_checked =
       pqSMAdaptor::getElementProperty(scene->getProxy()->GetProperty("Loop")).toBool();
-    emit this->loop(loop_checked);
+    Q_EMIT this->loop(loop_checked);
   }
 
   this->onTimeRangesChanged();
-  emit this->enabled(this->Scene != NULL);
+  Q_EMIT this->enabled(this->Scene != NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -94,7 +94,7 @@ void pqVCRController::onTimeRangesChanged()
   if (this->Scene)
   {
     QPair<double, double> range = this->Scene->getClockTimeRange();
-    emit this->timeRanges(range.first, range.second);
+    Q_EMIT this->timeRanges(range.first, range.second);
   }
 }
 
@@ -128,20 +128,20 @@ void pqVCRController::onTick()
 
   // process the events so that the GUI remains responsive.
   QApplication::processEvents();
-  emit this->timestepChanged();
+  Q_EMIT this->timestepChanged();
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRController::onBeginPlay()
 {
-  emit this->playing(true);
+  Q_EMIT this->playing(true);
   BEGIN_UNDO_EXCLUDE();
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRController::onEndPlay()
 {
-  emit this->playing(false);
+  Q_EMIT this->playing(false);
   END_UNDO_EXCLUDE();
 }
 
@@ -150,7 +150,7 @@ void pqVCRController::onLoopPropertyChanged()
 {
   vtkSMProxy* scene = this->Scene->getProxy();
   bool loop_checked = pqSMAdaptor::getElementProperty(scene->GetProperty("Loop")).toBool();
-  emit this->loop(loop_checked);
+  Q_EMIT this->loop(loop_checked);
 }
 
 //-----------------------------------------------------------------------------

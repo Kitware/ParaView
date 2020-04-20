@@ -52,7 +52,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystPauseSimulationReaction : public 
 public:
   pqCatalystPauseSimulationReaction(QAction* parent = 0);
 
-public slots:
+public Q_SLOTS:
   void updateEnableState() override { updateEnableState(PAUSE); }
 
 protected:

@@ -188,7 +188,7 @@ public:
    */
   QString GetRowsAsString() const;
 
-public slots:
+public Q_SLOTS:
   /**
   * resets the model.
   */
@@ -207,13 +207,13 @@ public slots:
   */
   void setActiveRepresentationProxy(vtkSMProxy*);
 
-signals:
+Q_SIGNALS:
   /**
   * Fired whenever the server side selection changes.
   */
   void selectionChanged(const QItemSelection& selection);
 
-private slots:
+private Q_SLOTS:
   /**
   * called to fetch data for all pending blocks.
   */

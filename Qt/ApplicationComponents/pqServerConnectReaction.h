@@ -83,7 +83,7 @@ protected:
   */
   void onTriggered() override { pqServerConnectReaction::connectToServerWithWarning(); }
 
-private slots:
+private Q_SLOTS:
   /**
   * Updates the state of this reaction.
   */

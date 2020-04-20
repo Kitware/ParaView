@@ -57,7 +57,7 @@ public:
   using Superclass::translateEvent;
   bool translateEvent(QObject* target, QEvent* qtevent, bool& errorFlag) override;
 
-protected slots:
+protected Q_SLOTS:
   void recordCommand(const QString& text);
 
 private:

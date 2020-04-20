@@ -131,7 +131,7 @@ public:
     this->TrackerPresent = (this->TrackerMapping.size() > 0);
   }
 
-protected slots:
+protected Q_SLOTS:
   void run();
   void callback();
 

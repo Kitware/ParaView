@@ -269,7 +269,7 @@ void pqSampleScalarWidget::onDelete()
   this->Implementation->UI->Values->selectionModel()->clear();
 
   this->onSamplesChanged();
-  emit samplesChanged();
+  Q_EMIT samplesChanged();
 }
 void pqSampleScalarWidget::onDeleteAll()
 {
@@ -278,7 +278,7 @@ void pqSampleScalarWidget::onDeleteAll()
   this->Implementation->UI->Values->selectionModel()->clear();
 
   this->onSamplesChanged();
-  emit samplesChanged();
+  Q_EMIT samplesChanged();
 }
 void pqSampleScalarWidget::onNewValue()
 {
@@ -346,7 +346,7 @@ void pqSampleScalarWidget::onNewRange()
   }
 
   this->onSamplesChanged();
-  emit samplesChanged();
+  Q_EMIT samplesChanged();
 }
 
 void pqSampleScalarWidget::onSelectAll()

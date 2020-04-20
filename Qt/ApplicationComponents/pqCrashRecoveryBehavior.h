@@ -54,7 +54,7 @@ public:
   pqCrashRecoveryBehavior(QObject* parent = 0);
   ~pqCrashRecoveryBehavior() override;
 
-protected slots:
+protected Q_SLOTS:
   void delayedSaveRecoveryState();
   void saveRecoveryState();
   void onServerAdded(pqServer* server);

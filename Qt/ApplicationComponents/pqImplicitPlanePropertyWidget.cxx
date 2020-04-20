@@ -220,7 +220,7 @@ void pqImplicitPlanePropertyWidget::resetToDataBounds()
     vtkSMPropertyHelper(wdgProxy, "WidgetBounds").Set(bounds, 6);
     wdgProxy->UpdateProperty("WidgetBounds", true);
     wdgProxy->UpdateVTKObjects();
-    emit this->changeAvailable();
+    Q_EMIT this->changeAvailable();
     this->render();
   }
 }
@@ -267,7 +267,7 @@ void pqImplicitPlanePropertyWidget::setNormal(double wx, double wy, double wz)
   double n[3] = { wx, wy, wz };
   vtkSMPropertyHelper(wdgProxy, "Normal").Set(n, 3);
   wdgProxy->UpdateVTKObjects();
-  emit this->changeAvailable();
+  Q_EMIT this->changeAvailable();
   this->render();
 }
 
@@ -278,6 +278,6 @@ void pqImplicitPlanePropertyWidget::setOrigin(double wx, double wy, double wz)
   double o[3] = { wx, wy, wz };
   vtkSMPropertyHelper(wdgProxy, "Origin").Set(o, 3);
   wdgProxy->UpdateVTKObjects();
-  emit this->changeAvailable();
+  Q_EMIT this->changeAvailable();
   this->render();
 }

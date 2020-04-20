@@ -55,13 +55,13 @@ public:
   bool environmentLighting() const;
   void setEnvironmentLighting(bool envLighting);
 
-signals:
+Q_SIGNALS:
   void gradientBackgroundChanged();
   void imageBackgroundChanged();
   void skyboxBackgroundChanged();
   void environmentLightingChanged();
 
-protected slots:
+protected Q_SLOTS:
   void currentIndexChangedBackgroundType(int type);
   void clickedRestoreDefaultColor();
   void clickedRestoreDefaultColor2();

@@ -60,7 +60,7 @@ public:
   */
   void showTab(const QString& title);
 
-private slots:
+private Q_SLOTS:
   void clicked(QAbstractButton*);
   void onAccepted();
   void onRejected();
@@ -77,7 +77,7 @@ private slots:
   */
   void serverRemoved(pqServer*);
 
-signals:
+Q_SIGNALS:
   void filterWidgets(bool showAdvanced, const QString& text);
 
 private:

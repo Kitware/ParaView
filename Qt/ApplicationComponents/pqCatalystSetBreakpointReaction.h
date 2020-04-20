@@ -53,7 +53,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystSetBreakpointReaction : public pq
 public:
   pqCatalystSetBreakpointReaction(QAction* parent = 0);
 
-public slots:
+public Q_SLOTS:
   void updateEnableState() override;
 
 protected:

@@ -338,7 +338,7 @@ void pqSelectionInputWidget::setSelection(pqSMProxy newSelection)
   this->SelectionSource = newSelection;
 
   this->updateLabels();
-  emit this->selectionChanged(this->SelectionSource);
+  Q_EMIT this->selectionChanged(this->SelectionSource);
 }
 
 //-----------------------------------------------------------------------------

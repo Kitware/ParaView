@@ -69,7 +69,7 @@ public:
   void setCheckMode(CheckMode mode) { this->Mode = mode; }
   CheckMode checkMode() const { return this->Mode; }
 
-protected slots:
+protected Q_SLOTS:
   void onItemClicked(QTreeWidgetItem* item, int column);
   void onItemPressed(QTreeWidgetItem* item, int column);
 

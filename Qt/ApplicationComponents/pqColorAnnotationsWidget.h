@@ -201,7 +201,7 @@ public:
    */
   QRegularExpression presetRegularExpression();
 
-signals:
+Q_SIGNALS:
   /**
    * Fired when the annotations are changed.
    */
@@ -243,7 +243,7 @@ protected:
    */
   bool addActiveAnnotationsFromVisibleSources(bool force);
 
-private slots:
+private Q_SLOTS:
   //@{
   /**
    * slots called when user presses corresponding buttons to add/remove

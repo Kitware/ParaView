@@ -191,7 +191,7 @@ pqCoreUtilitiesEventHelper::~pqCoreUtilitiesEventHelper()
 //-----------------------------------------------------------------------------
 void pqCoreUtilitiesEventHelper::executeEvent(vtkObject* obj, unsigned long eventid, void* calldata)
 {
-  emit this->eventInvoked(obj, eventid, calldata);
+  Q_EMIT this->eventInvoked(obj, eventid, calldata);
 }
 
 //-----------------------------------------------------------------------------

@@ -38,11 +38,11 @@ public:
   virtual pqServer* activeServer();
   virtual QWidget* mainWindow();
 
-public slots:
+public Q_SLOTS:
   virtual void startPVBlot();
   virtual void startPVBlot(const QString& filename);
 
-protected slots:
+protected Q_SLOTS:
   virtual void startPVBlot(const QStringList& filenames);
 
 private:

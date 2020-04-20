@@ -109,7 +109,7 @@ public:
   */
   void save(pqSettings&) const;
 
-signals:
+Q_SIGNALS:
   /**
   * Signal emitted whenever the collection is changed i.e. new  items are added
   * or removed.

@@ -55,7 +55,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDefaultViewBehavior : public QObject
 public:
   pqDefaultViewBehavior(QObject* parent = 0);
 
-protected slots:
+protected Q_SLOTS:
   void onServerCreation(pqServer*);
   void fiveMinuteTimeoutWarning();
   void finalTimeoutWarning();

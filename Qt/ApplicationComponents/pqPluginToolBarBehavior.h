@@ -59,7 +59,7 @@ public:
   pqPluginToolBarBehavior(QMainWindow* parent = nullptr);
   virtual ~pqPluginToolBarBehavior();
 
-public slots:
+public Q_SLOTS:
   void addPluginInterface(QObject* iface);
 
 private:

@@ -225,7 +225,7 @@ void pqIntegrationModelSurfaceHelperWidget::resetSurfaceWidget(bool force)
         gridLayout->addWidget(gb, i, 0);
       }
     }
-    emit(this->arrayToGenerateChanged());
+    Q_EMIT(this->arrayToGenerateChanged());
   }
 }
 

@@ -71,7 +71,7 @@ public:
   pqCustomFilterManager(pqCustomFilterManagerModel* model, QWidget* parent = 0);
   ~pqCustomFilterManager() override;
 
-public slots:
+public Q_SLOTS:
   /**
   * \brief
   *   Selects the given custom filter in the list.
@@ -93,7 +93,7 @@ public slots:
   */
   void exportSelected(const QStringList& files);
 
-private slots:
+private Q_SLOTS:
   /**
   * \brief
   *   Opens the file dialog to select import files.

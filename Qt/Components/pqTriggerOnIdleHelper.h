@@ -62,14 +62,14 @@ public:
   */
   pqServer* server() const;
 
-signals:
+Q_SIGNALS:
   void triggered();
 
-public slots:
+public Q_SLOTS:
   void setServer(pqServer*);
   void trigger();
 
-protected slots:
+protected Q_SLOTS:
   void triggerInternal();
 
 private:

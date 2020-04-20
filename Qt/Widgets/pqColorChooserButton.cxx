@@ -107,10 +107,10 @@ void pqColorChooserButton::setChosenColorRgbF(const QVariantList& val)
       this->Color[2] = val[2].toDouble();
 
       this->setIcon(this->renderColorSwatch(color));
-      emit this->chosenColorChanged(color);
+      Q_EMIT this->chosenColorChanged(color);
     }
 
-    emit this->validColorChosen(color);
+    Q_EMIT this->validColorChosen(color);
   }
 }
 
@@ -132,9 +132,9 @@ void pqColorChooserButton::setChosenColorRgbaF(const QVariantList& val)
       this->Color[3] = val[3].toDouble();
 
       this->setIcon(this->renderColorSwatch(color));
-      emit this->chosenColorChanged(color);
+      Q_EMIT this->chosenColorChanged(color);
     }
-    emit this->validColorChosen(color);
+    Q_EMIT this->validColorChosen(color);
   }
 }
 

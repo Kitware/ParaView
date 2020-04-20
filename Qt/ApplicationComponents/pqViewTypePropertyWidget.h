@@ -58,13 +58,13 @@ public:
   */
   QString value() const;
 
-public slots:
+public Q_SLOTS:
   /**
   * set the value for the widget.
   */
   void setValue(const QString& value);
 
-signals:
+Q_SIGNALS:
   void valueChanged();
 
 private:

@@ -112,7 +112,7 @@ public:
   */
   QString getCustomFilterName() const;
 
-public slots:
+public Q_SLOTS:
   /**
   * \brief
   *   Creates a compound proxy definition.
@@ -161,7 +161,7 @@ private:
   */
   void setupDefaultInputOutput();
 
-private slots:
+private Q_SLOTS:
   /**
   * \name Page Navigation
   */

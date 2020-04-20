@@ -133,7 +133,7 @@ public:
   QModelIndex getIndexFor(const QString& filter) const;
   //@}
 
-public slots:
+public Q_SLOTS:
   /**
   * \brief
   *   Adds a new custom filter definition to the model.
@@ -154,7 +154,7 @@ public slots:
   void importCustomFiltersFromSettings();
   void exportCustomFiltersToSettings();
 
-signals:
+Q_SIGNALS:
   /**
   * \brief
   *   Emitted when a new custom filter definition is added to the

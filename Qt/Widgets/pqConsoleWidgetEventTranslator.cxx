@@ -82,5 +82,5 @@ bool pqConsoleWidgetEventTranslator::translateEvent(
 //-----------------------------------------------------------------------------
 void pqConsoleWidgetEventTranslator::recordCommand(const QString& text)
 {
-  emit this->recordEvent(this->CurrentObject, "executeCommand", text);
+  Q_EMIT this->recordEvent(this->CurrentObject, "executeCommand", text);
 }

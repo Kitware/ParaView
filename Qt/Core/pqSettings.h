@@ -90,7 +90,7 @@ private:
   * beyond the viewport, we correct them.
   */
   void sanityCheckDock(QDockWidget* dock_widget);
-signals:
+Q_SIGNALS:
   void modified();
 };
 

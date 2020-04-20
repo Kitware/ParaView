@@ -52,7 +52,7 @@ public:
   pqFindDataDialog(QWidget* parent = 0, Qt::WindowFlags flags = 0);
   ~pqFindDataDialog() override;
 
-private slots:
+private Q_SLOTS:
   /**
   * called when pqFindDataCurrentSelectionFrame notifies the dialog that it's
   * showing a new selection. We update the UI accordingly.

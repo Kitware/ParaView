@@ -172,7 +172,7 @@ QString pqSearchBox::setSettingKey(const QString& key)
 
   this->SettingKey = key;
   this->updateFromSettings();
-  emit this->settingKeyChanged(this->SettingKey);
+  Q_EMIT this->settingKeyChanged(this->SettingKey);
   return oldKey;
 }
 
@@ -181,7 +181,7 @@ void pqSearchBox::onAdvancedButtonClicked(bool clicked)
 {
   assert(this->isAdvancedSearchEnabled());
   this->updateSettings();
-  emit this->advancedSearchActivated(clicked);
+  Q_EMIT this->advancedSearchActivated(clicked);
 }
 
 //-----------------------------------------------------------------------------

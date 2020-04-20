@@ -50,23 +50,23 @@ pqMainWindowEventManager::~pqMainWindowEventManager()
 //-----------------------------------------------------------------------------
 void pqMainWindowEventManager::closeEvent(QCloseEvent* event)
 {
-  emit this->close(event);
+  Q_EMIT this->close(event);
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindowEventManager::showEvent(QShowEvent* event)
 {
-  emit this->show(event);
+  Q_EMIT this->show(event);
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindowEventManager::dragEnterEvent(QDragEnterEvent* event)
 {
-  emit this->dragEnter(event);
+  Q_EMIT this->dragEnter(event);
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindowEventManager::dropEvent(QDropEvent* event)
 {
-  emit this->drop(event);
+  Q_EMIT this->drop(event);
 }

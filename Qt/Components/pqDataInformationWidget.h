@@ -55,7 +55,7 @@ protected:
   */
   bool eventFilter(QObject* object, QEvent* event) override;
 
-private slots:
+private Q_SLOTS:
   void showHeaderContextMenu(const QPoint&);
   void showBodyContextMenu(const QPoint&);
 

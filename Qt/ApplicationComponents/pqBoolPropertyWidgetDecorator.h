@@ -53,7 +53,7 @@ public:
 
   bool isBoolProperty() const { return this->BoolProperty; }
 
-signals:
+Q_SIGNALS:
   void boolPropertyChanged();
 
 protected:

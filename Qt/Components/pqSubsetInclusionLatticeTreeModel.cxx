@@ -125,8 +125,8 @@ void pqSubsetInclusionLatticeTreeModel::silSelectionModified(
   const int nodeid = *(reinterpret_cast<const int*>(calldata));
   QModelIndex idx = this->indexForNode(nodeid);
   QVector<int> roles = { Qt::CheckStateRole };
-  emit this->dataChanged(idx, idx, roles);
-  emit this->selectionModified();
+  Q_EMIT this->dataChanged(idx, idx, roles);
+  Q_EMIT this->selectionModified();
 }
 
 //-----------------------------------------------------------------------------
@@ -308,5 +308,5 @@ void pqSubsetInclusionLatticeTreeModel::setSelection(const QList<QVariant>& qtSe
 
   pqInternals& internals = (*this->Internals);
   internals.SIL->SetSelection(vtkSel);
-  emit this->selectionModified();
+  Q_EMIT this->selectionModified();
 }

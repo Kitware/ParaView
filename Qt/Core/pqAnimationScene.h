@@ -107,7 +107,7 @@ public:
   */
   QList<double> getTimeSteps() const;
 
-signals:
+Q_SIGNALS:
   /**
   * Fired before a new cue is added to the scene.
   */
@@ -186,7 +186,7 @@ signals:
   */
   void timeLabelChanged();
 
-public slots:
+public Q_SLOTS:
   /**
   * Play animation.
   */
@@ -202,7 +202,7 @@ public slots:
   */
   void setAnimationTime(double time);
 
-private slots:
+private Q_SLOTS:
   /**
   * Called when the "Cues" property on the AnimationScene proxy
   * is changed. Updates the internal datastructure to reflect the current

@@ -98,7 +98,7 @@ void pqInterfaceTracker::onPluginLoaded(vtkObject*, unsigned long, void* calldat
     foreach (QObject* iface, ifaces)
     {
       this->Interfaces.append(iface);
-      emit this->interfaceRegistered(iface);
+      Q_EMIT this->interfaceRegistered(iface);
 
       pqAutoStartInterface* asi = qobject_cast<pqAutoStartInterface*>(iface);
       if (asi)
@@ -115,7 +115,7 @@ void pqInterfaceTracker::addInterface(QObject* iface)
   if (!this->Interfaces.contains(iface) && !this->RegisteredInterfaces.contains(iface))
   {
     this->RegisteredInterfaces.push_back(iface);
-    emit this->interfaceRegistered(iface);
+    Q_EMIT this->interfaceRegistered(iface);
 
     pqAutoStartInterface* asi = qobject_cast<pqAutoStartInterface*>(iface);
     if (asi)

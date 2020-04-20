@@ -307,15 +307,15 @@ void pqBackgroundEditorWidget::fireGradientAndImageChanged(int oldType, int newT
   {
     if (oldType == GRADIENT_TYPE || newType == GRADIENT_TYPE)
     {
-      emit gradientBackgroundChanged();
+      Q_EMIT gradientBackgroundChanged();
     }
     if (oldType == IMAGE_TYPE || newType == IMAGE_TYPE)
     {
-      emit imageBackgroundChanged();
+      Q_EMIT imageBackgroundChanged();
     }
     if (oldType == SKYBOX_TYPE || newType == SKYBOX_TYPE)
     {
-      emit skyboxBackgroundChanged();
+      Q_EMIT skyboxBackgroundChanged();
     }
   }
 }
@@ -349,6 +349,6 @@ void pqBackgroundEditorWidget::changeColor(const char* propertyName)
   vtkSMProperty* _property = this->propertyGroup()->GetProperty(propertyName);
   BEGIN_UNDO_SET("Restore Default Color");
   _property->ResetToDefault();
-  emit this->changeFinished();
+  Q_EMIT this->changeFinished();
   END_UNDO_SET();
 }

@@ -51,7 +51,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPluginDockWidgetsBehavior : public QObjec
 public:
   pqPluginDockWidgetsBehavior(QMainWindow* parent = 0);
 
-public slots:
+public Q_SLOTS:
   void addPluginInterface(QObject* iface);
 
 private:

@@ -994,7 +994,7 @@ void pqPipelineModel::addChild(pqPipelineModelDataItem* _parent, pqPipelineModel
 
   if (row == 0)
   {
-    emit this->firstChildAdded(parentIndex);
+    Q_EMIT this->firstChildAdded(parentIndex);
   }
 }
 
@@ -1033,7 +1033,7 @@ void pqPipelineModel::serverDataChanged()
   {
     QModelIndex minIndex = this->getIndex(this->Internal->Root.Children[0]);
     QModelIndex maxIndex = this->getIndex(this->Internal->Root.Children[max]);
-    emit this->dataChanged(minIndex, maxIndex);
+    Q_EMIT this->dataChanged(minIndex, maxIndex);
   }
 }
 
@@ -1041,7 +1041,7 @@ void pqPipelineModel::serverDataChanged()
 void pqPipelineModel::itemDataChanged(pqPipelineModelDataItem* item)
 {
   QModelIndex idx = this->getIndex(item);
-  emit this->dataChanged(idx, idx);
+  Q_EMIT this->dataChanged(idx, idx);
 }
 
 //-----------------------------------------------------------------------------

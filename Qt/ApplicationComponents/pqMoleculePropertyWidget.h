@@ -59,7 +59,7 @@ public:
    */
   void updateWidget(bool showing_advanced_properties) override;
 
-protected slots:
+protected Q_SLOTS:
   //@{
   /**
    * Show/hide widgets depending on the states of other widgets.

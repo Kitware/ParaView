@@ -71,7 +71,7 @@ public:
 
   static pqVRConnectionManager* instance();
 
-public slots:
+public Q_SLOTS:
   /// start/stop connections
   void start();
   void stop();
@@ -83,7 +83,7 @@ public slots:
   // save the connection configuration
   void saveConnectionsConfiguration(vtkPVXMLElement* root);
 
-signals:
+Q_SIGNALS:
   void connectionsChanged();
 
 private:

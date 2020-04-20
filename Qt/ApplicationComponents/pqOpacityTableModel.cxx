@@ -95,7 +95,7 @@ bool pqOpacityTableModel::setData(const QModelIndex& idx, const QVariant& value,
   {
     this->Internals->XVMSPoints[idx.row()][idx.column()] = newValue;
 
-    emit dataChanged(idx, idx);
+    Q_EMIT dataChanged(idx, idx);
     return true;
   }
 
@@ -185,24 +185,24 @@ void pqOpacityTableModel::controlPointsChanged()
   int previousSize = static_cast<int>(this->Internals->XVMSPoints.size());
   if (newSize > previousSize)
   {
-    emit this->beginInsertRows(QModelIndex(), previousSize, newSize - 1);
+    Q_EMIT this->beginInsertRows(QModelIndex(), previousSize, newSize - 1);
     for (int idx = previousSize; idx < newSize; ++idx)
     {
       std::array<double, 4> xvms;
       pwf->GetNodeValue(idx, xvms.data());
       this->Internals->XVMSPoints.push_back(xvms);
     }
-    emit this->endInsertRows();
+    Q_EMIT this->endInsertRows();
   }
   else if (newSize < previousSize)
   {
-    emit this->beginRemoveRows(QModelIndex(), newSize, previousSize - 1);
+    Q_EMIT this->beginRemoveRows(QModelIndex(), newSize, previousSize - 1);
     size_t numToRemove = previousSize - newSize;
     for (size_t idx = 0; idx < numToRemove; ++idx)
     {
       this->Internals->XVMSPoints.pop_back();
     }
-    emit this->endRemoveRows();
+    Q_EMIT this->endRemoveRows();
   }
   else // newSize == previousSize
   {

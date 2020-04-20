@@ -51,7 +51,7 @@ public:
   pqExpanderButton(QWidget* parent = 0);
   ~pqExpanderButton() override;
 
-public slots:
+public Q_SLOTS:
   /**
   * Toggles the state of the checkable button.
   */
@@ -70,7 +70,7 @@ public slots:
   void setText(const QString& text);
   QString text() const;
 
-signals:
+Q_SIGNALS:
   /**
   * This signal is emitted whenever a button changes its state.
   * checked is true if the button is checked, or false if the button is

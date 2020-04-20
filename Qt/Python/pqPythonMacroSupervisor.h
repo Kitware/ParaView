@@ -86,7 +86,7 @@ public:
 
   static QStringList getMacrosFilePaths();
 
-signals:
+Q_SIGNALS:
 
   // Description:
   // Emitted when a macro has been triggered.
@@ -96,7 +96,7 @@ signals:
   // Emitted when a macro has to be edited
   void onEditMacro(const QString& filename);
 
-public slots:
+public Q_SLOTS:
 
   // Description:
   // Add an action with the given name and filename.  If there is already
@@ -115,7 +115,7 @@ public slots:
   // Update Macro list widgets and actions...
   void updateMacroList();
 
-protected slots:
+protected Q_SLOTS:
 
   // Description:
   // If the sender is a QAction managed by this class, the filename will be

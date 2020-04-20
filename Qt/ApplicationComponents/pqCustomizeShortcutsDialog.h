@@ -45,7 +45,7 @@ public:
 
   static QString getActionName(QAction* action);
 
-private slots:
+private Q_SLOTS:
   void onEditingFinished();
   void onSelectionChanged();
   void onClearShortcut();

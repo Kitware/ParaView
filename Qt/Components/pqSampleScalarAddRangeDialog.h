@@ -71,7 +71,7 @@ public:
   bool isLogRangeStrict() const;
   QVariantList getRange() const;
 
-private slots:
+private Q_SLOTS:
   void onRangeChanged();
 
 private:

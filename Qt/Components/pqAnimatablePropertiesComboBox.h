@@ -78,7 +78,7 @@ public:
   */
   void setUseBlankEntry(bool b) { this->UseBlankEntry = b; }
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the source whose properties this widget should list. If source is
   * null, the widget gets disabled.
@@ -109,7 +109,7 @@ public slots:
   */
   void addSMProperty(const QString& label, const QString& propertyname, int index);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Builds the property list.
   */

@@ -67,7 +67,7 @@ public:
    */
   static void activateView();
 
-public slots:
+public Q_SLOTS:
   /**
   * Updates the enabled state. Applications need not explicitly call
   * this.

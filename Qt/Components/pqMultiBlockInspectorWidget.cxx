@@ -253,7 +253,7 @@ public:
     {
       this->RootLabel = str;
       QModelIndex rootIdx = this->index(0, 0, QModelIndex());
-      emit this->dataChanged(rootIdx, rootIdx);
+      Q_EMIT this->dataChanged(rootIdx, rootIdx);
     }
   }
   inline const int& iconSize() const { return this->IconSize; }
@@ -424,7 +424,7 @@ private:
     const int numChildren = this->rowCount(idx);
     if (numChildren > 0)
     {
-      emit this->dataChanged(this->index(0, col, idx), this->index(numChildren, col, idx));
+      Q_EMIT this->dataChanged(this->index(0, col, idx), this->index(numChildren, col, idx));
       for (int cc = 0; cc < numChildren; ++cc)
       {
         this->emitDataChanged(col, this->index(cc, col, idx));
@@ -1243,8 +1243,8 @@ void pqMultiBlockInspectorWidget::modelDataChanged(const QModelIndex& start, con
   if (start.column() <= 0 && end.column() >= 0)
   {
     SCOPED_UNDO_SET("Change Block Visibilities");
-    emit this->blockVisibilitiesChanged();
-    emit this->requestRender();
+    Q_EMIT this->blockVisibilitiesChanged();
+    Q_EMIT this->requestRender();
   }
 }
 
@@ -1289,8 +1289,8 @@ void pqMultiBlockInspectorWidget::contextMenu(const QPoint& pos)
       {
         internals.ProxyModel->setData(*iter, val, Qt::CheckStateRole);
       }
-      emit this->blockVisibilitiesChanged();
-      emit this->requestRender();
+      Q_EMIT this->blockVisibilitiesChanged();
+      Q_EMIT this->requestRender();
     }
     else if (selAction == setColors)
     {
@@ -1352,8 +1352,8 @@ void pqMultiBlockInspectorWidget::setColor(const QModelIndex& idx, const QColor&
   {
     internals.ProxyModel->setColor(itemIdx, val);
   }
-  emit this->blockColorsChanged();
-  emit this->requestRender();
+  Q_EMIT this->blockColorsChanged();
+  Q_EMIT this->requestRender();
 }
 
 //-----------------------------------------------------------------------------
@@ -1376,6 +1376,6 @@ void pqMultiBlockInspectorWidget::setOpacity(const QModelIndex& idx, double opac
   {
     internals.ProxyModel->setOpacity(itemIdx, val);
   }
-  emit this->blockOpacitiesChanged();
-  emit this->requestRender();
+  Q_EMIT this->blockOpacitiesChanged();
+  Q_EMIT this->requestRender();
 }

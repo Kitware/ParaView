@@ -60,7 +60,7 @@ public:
   QVariantList scalars() const;
   QString filterName() const;
 
-public slots:
+public Q_SLOTS:
 
   void setFilterName(QString const& name);
 

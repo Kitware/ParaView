@@ -574,7 +574,7 @@ void pqTimeInspectorWidget::setSceneCurrentTime(double time)
   pqAnimationModel* animationModel = this->Internals->Ui.AnimationWidget->animationModel();
   assert(animationModel);
   animationModel->setCurrentTime(time);
-  emit this->sceneCurrentTimeChanged();
+  Q_EMIT this->sceneCurrentTimeChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -604,7 +604,7 @@ void pqTimeInspectorWidget::toggleTrackSuppression(pqAnimationTrack* track)
     }
     this->Internals->SuppressedTimeSources = newValue;
   }
-  emit this->suppressedTimeSourcesChanged();
+  Q_EMIT this->suppressedTimeSourcesChanged();
 }
 
 //-----------------------------------------------------------------------------

@@ -967,21 +967,21 @@ QList<int> pqPlotVariablesDialog::determineSelectedItemsList(bool& errFlag)
 //-----------------------------------------------------------------------------
 void pqPlotVariablesDialog::slotUseParaViewGUIToSelectNodesCheckBox(bool /*checked*/)
 {
-  emit this->useParaViewGUIToSelectNodesCheck();
+  Q_EMIT this->useParaViewGUIToSelectNodesCheck();
 }
 
 //-----------------------------------------------------------------------------
 void pqPlotVariablesDialog::slotOk(void)
 {
   // user clicked on OK button
-  emit this->okDismissed();
+  Q_EMIT this->okDismissed();
 }
 
 //-----------------------------------------------------------------------------
 void pqPlotVariablesDialog::slotCancel(void)
 {
   // user clicked on OK button
-  emit this->cancelDismissed();
+  Q_EMIT this->cancelDismissed();
 }
 
 //-----------------------------------------------------------------------------
@@ -1127,7 +1127,7 @@ void pqPlotVariablesDialog::slotItemSelectionChanged()
     if (*statesIter == true && !this->Internal->inSelection(statesIter.key(), selectedItems))
     {
       // deselection
-      emit this->variableDeselectionByName(statesIter.key());
+      Q_EMIT this->variableDeselectionByName(statesIter.key());
 
       // and set the selection state accordingly
       this->Internal->variableSelectionStates[statesIter.key()] = false;
@@ -1144,7 +1144,7 @@ void pqPlotVariablesDialog::slotItemSelectionChanged()
     if (*statesIter == false && this->Internal->inSelection(statesIter.key(), selectedItems))
     {
       // new selection
-      emit this->variableSelectionByName(statesIter.key());
+      Q_EMIT this->variableSelectionByName(statesIter.key());
 
       // and set the selection state accordingly
       this->Internal->variableSelectionStates[statesIter.key()] = true;

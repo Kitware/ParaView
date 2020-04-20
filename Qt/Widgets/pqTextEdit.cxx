@@ -117,7 +117,7 @@ void pqTextEdit::onEditingFinished()
   Q_D(pqTextEdit);
   if (d->TextChangedAndEditingFinishedPending)
   {
-    emit this->textChangedAndEditingFinished();
+    Q_EMIT this->textChangedAndEditingFinished();
     d->TextChangedAndEditingFinishedPending = false;
   }
 }
@@ -144,5 +144,5 @@ void pqTextEdit::keyPressEvent(QKeyEvent* e)
 void pqTextEdit::focusOutEvent(QFocusEvent* e)
 {
   this->Superclass::focusOutEvent(e);
-  emit this->editingFinished();
+  Q_EMIT this->editingFinished();
 }

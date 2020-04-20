@@ -87,11 +87,11 @@ public:
   /// consumers.
   static void destroyPipelineSourceAndConsumers(pqPipelineSource* source);
 
-signals:
+Q_SIGNALS:
   void createdPlotGUI();
   void createPlot();
 
-public slots:
+public Q_SLOTS:
   void showDataLoadManager();
   void checkActionEnabled();
   void showSolidMesh();

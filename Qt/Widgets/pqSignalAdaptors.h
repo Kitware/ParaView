@@ -74,14 +74,14 @@ public:
   */
   QVariant currentData() const;
 
-signals:
+Q_SIGNALS:
   /**
   * signal text changed in a combo box
   */
   void currentTextChanged(const QString&);
 
   void currentIndexChanged(int);
-public slots:
+public Q_SLOTS:
   /**
   * set the current text of a combo box (actually sets the index for the text)
   */
@@ -118,17 +118,17 @@ public:
   */
   QVariant color() const;
 
-signals:
+Q_SIGNALS:
   /**
   * signal the color changed
   */
   void colorChanged(const QVariant&);
-public slots:
+public Q_SLOTS:
   /**
   * set the red component
   */
   void setColor(const QVariant&);
-protected slots:
+protected Q_SLOTS:
   void handleColorChanged();
 
 protected:
@@ -152,17 +152,17 @@ public:
   * get the value components
   */
   double value() const;
-signals:
+Q_SIGNALS:
   /**
   * signal the color changed
   */
   void valueChanged(double val);
-public slots:
+public Q_SLOTS:
   /**
   * set the red component
   */
   void setValue(double val);
-protected slots:
+protected Q_SLOTS:
   void handleValueChanged();
 };
 
@@ -183,12 +183,12 @@ public:
   * get the current text
   */
   QString text() const;
-signals:
+Q_SIGNALS:
   /**
   * signal text changed
   */
   void textChanged();
-public slots:
+public Q_SLOTS:
   void setText(const QString&);
 
 protected:
@@ -211,12 +211,12 @@ public:
   * get the current text
   */
   int value() const;
-signals:
+Q_SIGNALS:
   /**
   * signal text changed
   */
   void valueChanged(int val);
-public slots:
+public Q_SLOTS:
   void setValue(int val);
 
 protected:

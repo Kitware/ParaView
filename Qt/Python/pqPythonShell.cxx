@@ -144,7 +144,7 @@ public:
     if (this->ExecutionCounter == 0)
     {
       assert(this->OldInstance == nullptr);
-      emit this->Parent->executing(true);
+      Q_EMIT this->Parent->executing(true);
 
       if (this->isInterpreterInitialized() == false)
       {
@@ -173,7 +173,7 @@ public:
       this->OldCapture = false;
       vtkOutputWindow::SetInstance(this->OldInstance);
       this->OldInstance = nullptr;
-      emit this->Parent->executing(false);
+      Q_EMIT this->Parent->executing(false);
     }
   }
 

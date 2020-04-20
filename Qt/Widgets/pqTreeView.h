@@ -115,7 +115,7 @@ protected:
   bool edit(const QModelIndex& index, EditTrigger trigger, QEvent* event) override;
   //@}
 
-private slots:
+private Q_SLOTS:
   void invalidateLayout();
 
 private:

@@ -36,11 +36,11 @@ public:
   pqSierraPlotToolsDataLoadManager(QWidget* p, Qt::WindowFlags f = 0);
   ~pqSierraPlotToolsDataLoadManager();
 
-public slots:
+public Q_SLOTS:
   virtual void checkInputValid();
   virtual void setupPipeline();
 
-signals:
+Q_SIGNALS:
   void createdPipeline();
 
 protected:

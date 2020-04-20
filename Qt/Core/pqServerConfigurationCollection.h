@@ -114,7 +114,7 @@ public:
   */
   const pqServerConfiguration* configuration(const char* configuration_name) const;
 
-signals:
+Q_SIGNALS:
   /**
   * fired when the collection is modified.
   */

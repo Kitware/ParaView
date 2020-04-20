@@ -57,7 +57,7 @@ public:
   static void copy();
   static void paste();
 
-public slots:
+public Q_SLOTS:
   /**
   * Updates the enabled state. Applications need not explicitly call
   * this.

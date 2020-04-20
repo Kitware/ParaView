@@ -609,7 +609,7 @@ void pqPropertiesPanel::updateViewPanel(pqView* argView)
       }
     }
     this->Internals->View = argView;
-    emit this->viewChanged(argView);
+    Q_EMIT this->viewChanged(argView);
     if (_view)
     {
       // create the widgets for this view
@@ -743,7 +743,7 @@ void pqPropertiesPanel::updateButtonState()
     this->Internals->ReceivedChangeAvailable = false;
   }
 
-  emit this->applyEnableStateChanged();
+  Q_EMIT this->applyEnableStateChanged();
   this->updateButtonEnableState();
 }
 
@@ -827,7 +827,7 @@ void pqPropertiesPanel::apply()
     if (widgets)
     {
       widgets->apply(this->view());
-      emit this->applied(widgets->Proxy);
+      Q_EMIT this->applied(widgets->Proxy);
     }
   }
   else
@@ -835,14 +835,14 @@ void pqPropertiesPanel::apply()
     foreach (pqProxyWidgets* widgets, this->Internals->SourceWidgets)
     {
       widgets->apply(this->view());
-      emit this->applied(widgets->Proxy);
+      Q_EMIT this->applied(widgets->Proxy);
     }
   }
 
   this->Internals->updateInformationAndDomains();
   this->updateButtonState();
 
-  emit this->applied();
+  Q_EMIT this->applied();
   END_UNDO_SET();
   vtkTimerLog::MarkEndEvent("PropertiesPanel::Apply");
 }
@@ -880,7 +880,7 @@ void pqPropertiesPanel::deleteProxy()
   if (this->Internals->Source)
   {
     BEGIN_UNDO_SET(tr("Delete") + " " + this->Internals->Source->getSMName());
-    emit this->deleteRequested(this->Internals->Source);
+    Q_EMIT this->deleteRequested(this->Internals->Source);
     END_UNDO_SET();
   }
 }
@@ -908,8 +908,8 @@ void pqPropertiesPanel::propertiesRestoreDefaults()
       // apply for the source, so that the property changes are "accepted" and
       // rest of the application updates.
       widgets->apply(this->view());
-      emit this->applied(widgets->Proxy);
-      emit this->applied();
+      Q_EMIT this->applied(widgets->Proxy);
+      Q_EMIT this->applied();
     }
   }
 }

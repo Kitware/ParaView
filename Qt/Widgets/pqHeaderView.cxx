@@ -186,7 +186,7 @@ void pqHeaderView::mouseClickEvent(QMouseEvent* evt)
         const auto& role = pair.second;
         if (rect.contains(this->PressPosition))
         {
-          emit this->customIndicatorClicked(logicalIndex, rect.bottomLeft(), role);
+          Q_EMIT this->customIndicatorClicked(logicalIndex, rect.bottomLeft(), role);
           return;
         }
       }

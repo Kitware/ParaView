@@ -129,12 +129,12 @@ void MessageHandler::handler(QtMsgType type, const QMessageLogContext& cntxt, co
 {
   QString formattedMsg = qFormatLogMessage(type, cntxt, msg);
   formattedMsg += "\n";
-  emit instance()->message(type, formattedMsg);
+  Q_EMIT instance()->message(type, formattedMsg);
 }
 
 void MessageHandler::handlerVTK(QtMsgType type, const QString& msg)
 {
-  emit instance()->showMessage(msg, type);
+  Q_EMIT instance()->showMessage(msg, type);
 }
 
 MessageHandler* MessageHandler::instance()
@@ -481,7 +481,7 @@ bool pqOutputWidget::displayMessage(const QString& message, QtMsgType type)
     QString summary = this->extractSummary(tmessage, type);
     this->Internals->addMessageToTree(message, type, summary);
 
-    emit this->messageDisplayed(message, type);
+    Q_EMIT this->messageDisplayed(message, type);
     return true;
   }
   return false;

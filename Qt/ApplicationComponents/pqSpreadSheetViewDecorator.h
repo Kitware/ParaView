@@ -100,10 +100,10 @@ public:
    */
   bool eventFilter(QObject* object, QEvent* e) override;
 
-signals:
+Q_SIGNALS:
   void uiModified();
 
-protected slots:
+protected Q_SLOTS:
   void currentIndexChanged(pqOutputPort*);
   void showing(pqDataRepresentation*);
   void displayPrecisionChanged(int);

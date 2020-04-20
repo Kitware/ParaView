@@ -65,7 +65,7 @@ public:
   * Provides access to the pqAnimationTimeWidget used.
   */
   pqAnimationTimeWidget* animationTimeWidget() const;
-private slots:
+private Q_SLOTS:
   void setAnimationScene(pqAnimationScene* scene);
 
   /**

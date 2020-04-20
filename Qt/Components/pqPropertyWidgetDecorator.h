@@ -96,7 +96,7 @@ public:
    */
   static pqPropertyWidgetDecorator* create(vtkPVXMLElement* xml, pqPropertyWidget* parent);
 
-signals:
+Q_SIGNALS:
   /**
   * This signal is fired whenever the decorator has determined that the panel
   * *may* need a refresh since the state of the system has changed which would

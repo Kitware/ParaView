@@ -55,7 +55,7 @@ public:
     pqServer* server, QObject* parent = 0);
   ~pqScalarBarRepresentation() override;
 
-protected slots:
+protected Q_SLOTS:
   void startInteraction();
   void endInteraction();
 };

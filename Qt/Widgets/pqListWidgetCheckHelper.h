@@ -57,7 +57,7 @@ public:
   // parent :- QObject parent.
   pqListWidgetCheckHelper(QListWidget* ListWidget, QObject* parent);
 
-protected slots:
+protected Q_SLOTS:
   void onItemClicked(QListWidgetItem* item);
   void onItemPressed(QListWidgetItem* item);
 

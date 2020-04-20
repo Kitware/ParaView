@@ -47,7 +47,7 @@ public:
   pqLightsEditor(vtkSMProxy* proxy, vtkSMPropertyGroup* smGroup, QWidget* parent = 0);
   ~pqLightsEditor() override;
 
-protected slots:
+protected Q_SLOTS:
   void resetLights();
 
 private:

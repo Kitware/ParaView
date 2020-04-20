@@ -185,10 +185,10 @@ public:
   */
   vtkIdType findVertex(const char* name) const;
 
-signals:
+Q_SIGNALS:
   void checkStatusChanged();
 
-public slots:
+public Q_SLOTS:
   /**
   * Used to reset the model based on the sil.
   */

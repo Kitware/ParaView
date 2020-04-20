@@ -231,8 +231,8 @@ void pqSpreadSheetViewModel::forceUpdate()
     if (rows && columns)
     {
       // we always invalidate header data, just to be on a safe side.
-      emit this->headerDataChanged(Qt::Horizontal, 0, columns - 1);
-      emit this->dataChanged(this->index(0, 0), this->index(rows - 1, columns - 1));
+      Q_EMIT this->headerDataChanged(Qt::Horizontal, 0, columns - 1);
+      Q_EMIT this->dataChanged(this->index(0, 0), this->index(rows - 1, columns - 1));
     }
   }
   // this ensures that we update the selected based on the current state.
@@ -251,7 +251,7 @@ void pqSpreadSheetViewModel::delayedUpdate()
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewModel::triggerSelectionChanged()
 {
-  emit this->selectionChanged(this->Internal->SelectionModel.selection());
+  Q_EMIT this->selectionChanged(this->Internal->SelectionModel.selection());
 }
 
 //-----------------------------------------------------------------------------
@@ -663,6 +663,6 @@ void pqSpreadSheetViewModel::hiddenColumnsChanged()
   const int numCols = this->columnCount();
   if (numCols > 0)
   {
-    emit this->headerDataChanged(Qt::Horizontal, 0, this->columnCount() - 1);
+    Q_EMIT this->headerDataChanged(Qt::Horizontal, 0, this->columnCount() - 1);
   }
 }

@@ -144,7 +144,7 @@ void pqSpherePropertyWidget::setCenter(double x, double y, double z)
   double origin[3] = { x, y, z };
   vtkSMPropertyHelper(wdgProxy, "Center").Set(origin, 3);
   wdgProxy->UpdateVTKObjects();
-  emit this->changeAvailable();
+  Q_EMIT this->changeAvailable();
   this->render();
 }
 
@@ -160,7 +160,7 @@ void pqSpherePropertyWidget::centerOnBounds()
     vtkSMPropertyHelper(wdgProxy, "Center").Set(origin, 3);
     vtkSMPropertyHelper(wdgProxy, "Radius").Set(bbox.GetMaxLength() / 2.0);
     wdgProxy->UpdateVTKObjects();
-    emit this->changeAvailable();
+    Q_EMIT this->changeAvailable();
     this->render();
   }
 }

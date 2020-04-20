@@ -86,7 +86,7 @@ public:
   /// consumers.
   static void destroyPipelineSourceAndConsumers(pqPipelineSource* source);
 
-public slots:
+public Q_SLOTS:
   void showDataLoadManager();
   void checkActionEnabled();
   void showField(QString name);

@@ -195,7 +195,7 @@ void pqCollaborationPanel::onUserMessage()
       pqApplicationCore::instance()->getServerManagerModel()->findServer(collab->GetSession());
     int userId = collab->GetUserId();
     QString msg = this->Internal->message->text();
-    emit triggerChatMessage(activeServer, userId, msg);
+    Q_EMIT triggerChatMessage(activeServer, userId, msg);
     this->Internal->message->clear();
   }
 }
@@ -499,5 +499,5 @@ void pqCollaborationPanel::onServerChanged()
 //-----------------------------------------------------------------------------
 void pqCollaborationPanel::onConnectIDChanged()
 {
-  emit connectIDChanged(this->Internal->connectId->value());
+  Q_EMIT connectIDChanged(this->Internal->connectId->value());
 }

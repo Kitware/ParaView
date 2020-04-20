@@ -206,11 +206,11 @@ public:
   void cancelEditing();
   //@}
 
-signals:
+Q_SIGNALS:
   void activated(const QModelIndex& index);
   void clicked(const QModelIndex& index);
 
-public slots:
+public Q_SLOTS:
   void reset();
   void selectAll();
   void setCurrentIndex(const QModelIndex& index);
@@ -219,7 +219,7 @@ public slots:
   void collapse(const QModelIndex& index);
   void scrollTo(const QModelIndex& index);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * \name Model Change Handlers
   */
@@ -267,7 +267,7 @@ protected:
   void paintEvent(QPaintEvent* e) override;
   QStyleOptionViewItem getViewOptions() const;
 
-private slots:
+private Q_SLOTS:
   /**
   * \name Header Signal Handlers
   */

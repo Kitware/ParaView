@@ -67,7 +67,7 @@ public:
   */
   vtkSMRenderViewProxy* getRenderViewProxy() const override;
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called when the layout on the comparative vis changes.
   */

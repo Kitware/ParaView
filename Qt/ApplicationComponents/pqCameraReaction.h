@@ -73,7 +73,7 @@ public:
   static void zoomToData();
   static void rotateCamera(double angle);
 
-public slots:
+public Q_SLOTS:
   /**
   * Updates the enabled state. Applications need not explicitly call
   * this.

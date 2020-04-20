@@ -121,5 +121,5 @@ void pqUseSeparateColorMapReaction::onTriggered()
   }
 
   // Force color widget to update representation and color map
-  emit this->ColorWidget->arraySelectionChanged();
+  Q_EMIT this->ColorWidget->arraySelectionChanged();
 }

@@ -92,13 +92,13 @@ public:
 
   // Set the current value of the widget.
   void setSamples(QList<QVariant> samples);
-signals:
+Q_SIGNALS:
   /**
   * Signal emitted whenever the set of samples changes.
   */
   void samplesChanged();
 
-private slots:
+private Q_SLOTS:
   void onSamplesChanged();
   void onSelectionChanged(const QItemSelection&, const QItemSelection&);
 

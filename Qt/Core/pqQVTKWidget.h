@@ -84,10 +84,10 @@ public:
   void setSizePropertyName(const QString& pname) { this->SizePropertyName = pname; }
   const QString& sizePropertyName() const { return this->SizePropertyName; }
 
-public slots:
+public Q_SLOTS:
   void paintMousePointer(int x, int y);
 
-private slots:
+private Q_SLOTS:
   void prepareContextForRendering();
 
 protected:

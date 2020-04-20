@@ -131,7 +131,7 @@ public:
    */
   void wheelEvent(QWheelEvent* event) override;
 
-private slots:
+private Q_SLOTS:
   void invalidateLayout();
 
 private:

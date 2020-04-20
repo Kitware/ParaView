@@ -144,7 +144,7 @@ bool pqPipelineBrowserWidget::eventFilter(QObject* object, QEvent* eventArg)
     QKeyEvent* keyEvent = static_cast<QKeyEvent*>(eventArg);
     if (keyEvent->key() == Qt::Key_Delete || keyEvent->key() == Qt::Key_Backspace)
     {
-      emit this->deleteKey();
+      Q_EMIT this->deleteKey();
     }
   }
 

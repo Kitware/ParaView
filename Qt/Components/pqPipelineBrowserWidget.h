@@ -117,21 +117,21 @@ public:
   */
   QMenu* contextMenu() const;
 
-signals:
+Q_SIGNALS:
   /**
   * Fired when the delete key is pressed.
   * Typically implies that the selected items need to be deleted.
   */
   void deleteKey();
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the active view. By default connected to
   * pqActiveObjects::viewChanged() so it keeps track of the active view.
   */
   void setActiveView(pqView*);
 
-protected slots:
+protected Q_SLOTS:
   void handleIndexClicked(const QModelIndex& index);
   void expandWithModelIndexTranslation(const QModelIndex&);
 

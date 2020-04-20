@@ -39,18 +39,18 @@ class pqPythonEventFilter : public QObject
 {
   Q_OBJECT
 
-public slots:
+public Q_SLOTS:
 
   void setEventHandlerResult(bool result) { this->EventHandlerResult = result; }
 
-signals:
+Q_SIGNALS:
 
   void handleEvent(QObject* obj, QEvent* event);
 
 protected:
   bool eventFilter(QObject* obj, QEvent* event)
   {
-    emit this->handleEvent(obj, event);
+    Q_EMIT this->handleEvent(obj, event);
     return this->EventHandlerResult;
   }
 

@@ -94,7 +94,7 @@ public:
   void setTraceChanges(bool trace) { this->TraceChanges = trace; }
   bool traceChanges() const { return this->TraceChanges; }
 
-public slots:
+public Q_SLOTS:
   /**
   * Copy values from ServerManager to Qt. If use_unchecked is true, unchecked
   * SMProperty values are used.
@@ -117,7 +117,7 @@ protected:
   virtual QVariant currentQtValue() const;
   virtual QVariant currentServerManagerValue(bool use_unchecked) const;
 
-signals:
+Q_SIGNALS:
   /**
   * Fired whenever the Qt widget changes (except in during a call to
   * copyValuesFromServerManagerToQt()).

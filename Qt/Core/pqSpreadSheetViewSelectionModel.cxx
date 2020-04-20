@@ -157,7 +157,7 @@ void pqSpreadSheetViewSelectionModel::select(
   selSource.TakeReference(this->getSelectionSource());
   if (!selSource)
   {
-    emit this->selection(0);
+    Q_EMIT this->selection(0);
     return;
   }
 
@@ -256,7 +256,7 @@ void pqSpreadSheetViewSelectionModel::select(
       .arg("ContainingCells", vtkSMPropertyHelper(selSource, "ContainingCells").GetAsInt());
   }
 
-  emit this->selection(selSource);
+  Q_EMIT this->selection(selSource);
 }
 
 //-----------------------------------------------------------------------------

@@ -85,7 +85,7 @@ public:
    */
   QList<QVariant> array() const;
 
-public slots:
+public Q_SLOTS:
   /**
    * Set the chosen array name and association.
    */
@@ -104,10 +104,10 @@ public slots:
    */
   void setArrayName(const QString& name);
 
-signals:
+Q_SIGNALS:
   void arrayChanged();
 
-private slots:
+private Q_SLOTS:
   void domainModified();
 
 private:

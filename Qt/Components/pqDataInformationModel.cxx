@@ -501,7 +501,7 @@ void pqDataInformationModel::dataUpdated(pqPipelineSource* changedSource)
       dataInfo->GetTimeSpan(iter->TimeSpan);
       iter->DataInformationValid = true;
 
-      emit this->dataChanged(
+      Q_EMIT this->dataChanged(
         this->index(row_no, Name), this->index(row_no, pqDataInformationModel::Max_Columns - 1));
     }
   }
@@ -620,7 +620,7 @@ void pqDataInformationModel::refreshGeometrySizes()
     }
   }
 
-  emit this->dataChanged(this->index(0, pqDataInformationModel::GeometrySize),
+  Q_EMIT this->dataChanged(this->index(0, pqDataInformationModel::GeometrySize),
     this->index(this->rowCount() - 1, pqDataInformationModel::GeometrySize));
 }
 //-----------------------------------------------------------------------------

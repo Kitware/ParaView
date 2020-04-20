@@ -140,5 +140,5 @@ void pqSierraPlotToolsDataLoadManager::setupPipeline()
   if (stack)
     stack->endUndoSet();
 
-  emit this->createdPipeline();
+  Q_EMIT this->createdPipeline();
 }

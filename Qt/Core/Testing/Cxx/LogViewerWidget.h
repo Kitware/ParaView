@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class LogViewerWidgetTester : public QObject
 {
   Q_OBJECT;
-private slots:
+private Q_SLOTS:
   void basic();
 };
 #endif

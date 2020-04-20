@@ -157,7 +157,7 @@ void pqSignalAdaptorSelectionTreeWidget::setValues(const QList<QList<QVariant> >
 
   if (changed)
   {
-    emit this->valuesChanged();
+    Q_EMIT this->valuesChanged();
   }
 }
 

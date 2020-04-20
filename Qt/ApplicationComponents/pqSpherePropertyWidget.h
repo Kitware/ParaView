@@ -56,19 +56,19 @@ public:
   pqSpherePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   ~pqSpherePropertyWidget() override;
 
-public slots:
+public Q_SLOTS:
   /**
   * Center the widget on the data bounds.
   */
   void centerOnBounds();
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Places the interactive widget using current data source information.
   */
   void placeWidget() override;
 
-private slots:
+private Q_SLOTS:
   void setCenter(double x, double y, double z);
 
 private:

@@ -59,7 +59,7 @@ public:
   pqFavoritesDialog(const QVariant& filtersList, QWidget* p = nullptr);
   ~pqFavoritesDialog() override;
 
-protected slots:
+protected Q_SLOTS:
   /**
    * Create a category at the top level of the favorites tree.
    */

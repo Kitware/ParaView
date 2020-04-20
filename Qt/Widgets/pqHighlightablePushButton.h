@@ -51,7 +51,7 @@ public:
   pqHighlightablePushButton(const QIcon& icon, const QString& text, QWidget* parent = 0);
   ~pqHighlightablePushButton() override;
 
-public slots:
+public Q_SLOTS:
   /**
   * Slots to highlight (or clear the highlight).
   */

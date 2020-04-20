@@ -82,7 +82,7 @@ public:
    */
   void setExpanderState(const QMap<QString, bool>& state);
 
-public slots:
+public Q_SLOTS:
   /**
   * Remove all proxy widgets added to the panel.
   */
@@ -129,7 +129,7 @@ public slots:
   */
   void updatePanel();
 
-signals:
+Q_SIGNALS:
   /**
   * This signal is fired as soon as the user starts editing in the widget. The
   * editing may not be complete.
@@ -148,7 +148,7 @@ signals:
   */
   void restartRequired(vtkSMProxy* proxy);
 
-private slots:
+private Q_SLOTS:
   void triggerChangeFinished();
   void triggerChangeAvailable();
   void triggerRestartRequired();

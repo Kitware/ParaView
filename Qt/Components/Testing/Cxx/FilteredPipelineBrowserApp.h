@@ -24,7 +24,7 @@ protected:
   QPointer<pqPipelineBrowserWidget> PipelineWidget;
   QPointer<QCheckBox> InvertMatching;
 
-public slots:
+public Q_SLOTS:
   void processTest();
   void updateSelectedFilter(int);
   void invertFilterMatching(int);

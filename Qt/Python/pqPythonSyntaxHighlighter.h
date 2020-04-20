@@ -80,7 +80,7 @@ protected:
   * Tab key into 4 spaces being inserted
   */
   bool eventFilter(QObject*, QEvent*) override;
-private slots:
+private Q_SLOTS:
   void rehighlightSyntax();
 
 private:

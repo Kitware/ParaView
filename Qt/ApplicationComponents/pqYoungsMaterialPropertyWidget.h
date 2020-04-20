@@ -64,11 +64,11 @@ public:
   void setNormalArrays(const QList<QVariant>&);
   QList<QVariant> normalArrays() const;
 
-signals:
+Q_SIGNALS:
   void normalArraysChanged();
   void orderingArraysChanged();
 
-private slots:
+private Q_SLOTS:
   void normalArraysChanged(const QString& value);
   void orderingArraysChanged(const QString& value);
   void updateComboBoxes();

@@ -103,7 +103,7 @@ void pqPointPickingHelper::pickPoint()
     if (rview->getRenderViewProxy()->ConvertDisplayToPointOnSurface(
           eventpos, position, this->PickOnMesh))
     {
-      emit this->pick(position[0], position[1], position[2]);
+      Q_EMIT this->pick(position[0], position[1], position[2]);
     }
   }
 }

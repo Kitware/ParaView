@@ -75,7 +75,7 @@ void pqLineEdit::onEditingFinished()
 {
   if (this->EditingFinishedPending)
   {
-    emit this->textChangedAndEditingFinished();
+    Q_EMIT this->textChangedAndEditingFinished();
     this->EditingFinishedPending = false;
   }
   if (this->ResetCursorPositionOnEditingFinished)

@@ -53,7 +53,7 @@ public:
   pqHelpWindow(QHelpEngine* engine, QWidget* parent = 0, Qt::WindowFlags flags = 0);
   ~pqHelpWindow() override;
 
-public slots:
+public Q_SLOTS:
   /**
   * Requests showing of a particular page. The url must begin with "qthelp:"
   * scheme when referring to pages from the help files.
@@ -67,13 +67,13 @@ public slots:
   */
   virtual void showHomePage(const QString& namespace_name);
 
-signals:
+Q_SIGNALS:
   /**
   * fired to relay warning messages from the help system.
   */
   void helpWarnings(const QString&);
 
-protected slots:
+protected Q_SLOTS:
   void search();
 
 protected:

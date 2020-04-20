@@ -265,7 +265,7 @@ void pqProxy::setSMName(const QString& name)
   if (!name.isEmpty() && this->SMName != name)
   {
     this->SMName = name;
-    emit this->nameChanged(this);
+    Q_EMIT this->nameChanged(this);
   }
 }
 
@@ -299,7 +299,7 @@ void pqProxy::setModifiedState(ModifiedState modified)
   if (modified != this->Modified)
   {
     this->Modified = modified;
-    emit this->modifiedStateChanged(this);
+    Q_EMIT this->modifiedStateChanged(this);
   }
 }
 

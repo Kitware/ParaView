@@ -41,7 +41,7 @@ class SourceToolbarActions : public QActionGroup
 public:
   SourceToolbarActions(QObject* p);
 
-public slots:
+public Q_SLOTS:
   /// Callback for each action triggered.
   void onAction(QAction* a);
 };

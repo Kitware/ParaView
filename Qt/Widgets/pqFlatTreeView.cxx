@@ -2009,7 +2009,7 @@ void pqFlatTreeView::keyPressEvent(QKeyEvent* e)
       {
         if (current.isValid())
         {
-          emit this->activated(current);
+          Q_EMIT this->activated(current);
         }
       }
       else
@@ -2035,7 +2035,7 @@ void pqFlatTreeView::keyPressEvent(QKeyEvent* e)
     {
       if (current.isValid())
       {
-        emit this->activated(current);
+        Q_EMIT this->activated(current);
       }
 
       break;
@@ -2291,7 +2291,7 @@ void pqFlatTreeView::mousePressEvent(QMouseEvent* e)
     // If the item was not edited, send the clicked signal.
     if (sendClicked)
     {
-      emit this->clicked(index);
+      Q_EMIT this->clicked(index);
     }
   }
 }
@@ -2362,7 +2362,7 @@ void pqFlatTreeView::mouseDoubleClickEvent(QMouseEvent* e)
 
     if (this->Model->flags(index) & Qt::ItemIsEnabled)
     {
-      emit this->activated(index);
+      Q_EMIT this->activated(index);
     }
   }
 }

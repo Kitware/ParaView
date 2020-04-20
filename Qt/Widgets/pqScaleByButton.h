@@ -69,13 +69,13 @@ public:
 
   virtual ~pqScaleByButton();
 
-signals:
+Q_SIGNALS:
   /**
    * Fired when the action corresponding to a scale factor is triggered.
    */
   void scale(double factor);
 
-private slots:
+private Q_SLOTS:
   void scaleTriggered();
 
 private:

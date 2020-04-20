@@ -355,7 +355,7 @@ private:
   void emitHeaderDataChanged()
   {
     this->HeaderCheckState.clear();
-    emit this->headerDataChanged(Qt::Horizontal, 0, 0);
+    Q_EMIT this->headerDataChanged(Qt::Horizontal, 0, 0);
   }
 
   std::map<QString, std::map<QString, QStandardItem*> > GroupedItemsMap;
@@ -530,7 +530,7 @@ void pqArraySelectionWidget::updateProperty(const QString& pname, const QVariant
     QScopedValueRollback<bool> rollback(this->UpdatingProperty, true);
     this->setProperty(pname.toLocal8Bit().data(), value);
   }
-  emit this->widgetModified();
+  Q_EMIT this->widgetModified();
 }
 
 //-----------------------------------------------------------------------------

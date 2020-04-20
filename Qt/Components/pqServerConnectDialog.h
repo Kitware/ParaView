@@ -83,7 +83,7 @@ public:
   static bool selectServer(pqServerConfiguration& selected_configuration,
     QWidget* dialogParent = NULL, const pqServerResource& selector = pqServerResource());
 
-signals:
+Q_SIGNALS:
 
   /**
    * Emitted when a server is added.
@@ -95,7 +95,7 @@ signals:
    */
   void serverDeleted();
 
-protected slots:
+protected Q_SLOTS:
   /**
   * called to update the shown server configurations.
   */

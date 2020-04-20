@@ -250,7 +250,7 @@ void pqInteractivePropertyWidget::setWidgetVisible(bool val)
 
     internals.WidgetVisibility = val;
     this->updateWidgetVisibility();
-    emit this->widgetVisibilityToggled(val);
+    Q_EMIT this->widgetVisibilityToggled(val);
   }
 }
 
@@ -265,7 +265,7 @@ void pqInteractivePropertyWidget::updateWidgetVisibility()
   vtkSMPropertyHelper(wdgProxy, "Enabled", true).Set(visible);
   wdgProxy->UpdateVTKObjects();
   this->render();
-  emit this->widgetVisibilityUpdated(visible);
+  Q_EMIT this->widgetVisibilityUpdated(visible);
 }
 
 //-----------------------------------------------------------------------------

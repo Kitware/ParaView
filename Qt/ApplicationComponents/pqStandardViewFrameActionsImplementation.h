@@ -104,7 +104,7 @@ public:
   */
   void frameConnected(pqViewFrame* frame, pqView* view) override;
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called before the "Convert To" menu is shown. We populate the menu with
   * actions for available view types.

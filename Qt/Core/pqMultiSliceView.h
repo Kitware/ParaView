@@ -86,7 +86,7 @@ public:
   bool getOutlineVisibility();
   void setOutlineVisibility(bool visible);
 
-signals:
+Q_SIGNALS:
   // Fired when the slices are changed by user interaction.
   // Provides information about which slice is being
   // changed. axisIndex is the index of axis [0,2], while sliceIndex is the
@@ -99,10 +99,10 @@ signals:
 
   void sliceClicked(int axisIndex, double sliceOffsetOnAxis, int button, int modifier);
 
-public slots:
+public Q_SLOTS:
   void updateSlices();
 
-private slots:
+private Q_SLOTS:
   void updateAxisBounds();
   void onSliceAdded(int activeSliceIndex);
   void onSliceRemoved(int activeSliceIndex);
@@ -140,7 +140,7 @@ protected:
   double NormalValuesHolder[9];
   double OriginValuesHolder[9];
 
-protected slots:
+protected Q_SLOTS:
   // Internal slot that will emit sliceClicked()
   void onSliceClicked(int button, int modifier, double value);
 

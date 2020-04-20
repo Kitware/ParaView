@@ -96,7 +96,7 @@ void pqExpandableTableView::closeEditor(QWidget* editor, QAbstractItemDelegate::
     if (idx.isValid() && idx.row() == (curModel->rowCount() - 1) &&
       idx.column() == (curModel->columnCount() - 1) && hint == QAbstractItemDelegate::EditNextItem)
     {
-      emit this->editPastLastRow();
+      Q_EMIT this->editPastLastRow();
     }
 
     this->MoveToNextEditableItem = true;

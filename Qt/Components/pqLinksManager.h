@@ -61,7 +61,7 @@ public:
   */
   ~pqLinksManager() override;
 
-public slots:
+public Q_SLOTS:
   /**
   * add a link
   */
@@ -75,7 +75,7 @@ public slots:
   */
   void removeLink();
 
-private slots:
+private Q_SLOTS:
   void selectionChanged(const QModelIndex& idx);
 
 private:

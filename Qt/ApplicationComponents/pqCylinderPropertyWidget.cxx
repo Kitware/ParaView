@@ -207,7 +207,7 @@ void pqCylinderPropertyWidget::resetBounds()
     vtkSMPropertyHelper(wdgProxy, "WidgetBounds").Set(bnds, 6);
     wdgProxy->UpdateProperty("WidgetBounds", true);
 
-    emit this->changeAvailable();
+    Q_EMIT this->changeAvailable();
     this->render();
   }
 }
@@ -254,7 +254,7 @@ void pqCylinderPropertyWidget::setAxis(double wx, double wy, double wz)
   double axis[3] = { wx, wy, wz };
   vtkSMPropertyHelper(wdgProxy, "Axis").Set(axis, 3);
   wdgProxy->UpdateVTKObjects();
-  emit this->changeAvailable();
+  Q_EMIT this->changeAvailable();
   this->render();
 }
 

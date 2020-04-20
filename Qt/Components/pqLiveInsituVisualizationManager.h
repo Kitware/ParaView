@@ -84,12 +84,12 @@ public:
   */
   static pqServer* displaySession(pqServer* catalystSession);
 
-signals:
+Q_SIGNALS:
   void insituConnected();
   void insituDisconnected();
   void nextTimestepAvailable();
 
-protected slots:
+protected Q_SLOTS:
   void timestepsUpdated();
   void sourceRemoved(pqPipelineSource*);
 

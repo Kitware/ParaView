@@ -76,19 +76,19 @@ public:
   */
   void fillExistingPorts();
 
-public slots:
+public Q_SLOTS:
   /**
   * Sets the current index to be the one representing the indicated port.
   */
   void setCurrentPort(pqOutputPort* port);
 
-signals:
+Q_SIGNALS:
   /**
   * Fired when the current index changes.
   */
   void currentIndexChanged(pqOutputPort*);
 
-private slots:
+private Q_SLOTS:
   /**
   * Called when a source's name might have changed.
   */

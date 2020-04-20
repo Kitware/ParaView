@@ -179,5 +179,5 @@ void pqKeyFrameTypeWidget::onTypeChanged()
     this->Internal->sinusoidGroup->show();
   }
 
-  emit this->typeChanged(text);
+  Q_EMIT this->typeChanged(text);
 }

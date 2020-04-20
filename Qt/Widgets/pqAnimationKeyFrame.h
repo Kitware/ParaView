@@ -77,7 +77,7 @@ public:
 
   QRectF boundingRect() const override;
 
-public slots:
+public Q_SLOTS:
   void setNormalizedStartTime(double t);
   void setNormalizedEndTime(double t);
   void setStartValue(const QVariant&);
@@ -86,7 +86,7 @@ public slots:
   void setBoundingRect(const QRectF& r);
   void adjustRect();
 
-signals:
+Q_SIGNALS:
   void startValueChanged();
   void endValueChanged();
   void iconChanged();

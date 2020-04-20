@@ -82,14 +82,14 @@ public:
    */
   static void handlerVTK(QtMsgType type, const QString& msg);
 
-signals:
+Q_SIGNALS:
   void message(QtMsgType type, const QString& msg);
   void showMessage(QString msg, QtMsgType type);
 
 private:
   static MessageHandler* instance();
 
-private slots:
+private Q_SLOTS:
   void displayMessage(QtMsgType type, const QString& msg);
 };
 
@@ -134,7 +134,7 @@ public:
   void setFontSize(int fontSize);
   //@}
 
-public slots:
+public Q_SLOTS:
   /**
    * Display a message in the widget. There's generally no need to use this
    * since one can have the same effect by triggering the message through Qt or
@@ -164,7 +164,7 @@ public slots:
    */
   void clear();
 
-signals:
+Q_SIGNALS:
   /**
    * Signal fired any time a message is displayed.
    */

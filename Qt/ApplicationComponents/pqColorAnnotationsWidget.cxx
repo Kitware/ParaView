@@ -402,19 +402,19 @@ void pqColorAnnotationsWidget::onDataChanged(
 {
   if (topleft.column() <= pqAnnotationsModel::VISIBILITY)
   {
-    emit this->visibilitiesChanged();
+    Q_EMIT this->visibilitiesChanged();
   }
   if (topleft.column() == pqAnnotationsModel::COLOR)
   {
-    emit this->indexedColorsChanged();
+    Q_EMIT this->indexedColorsChanged();
   }
   if (topleft.column() == pqAnnotationsModel::OPACITY)
   {
-    emit this->indexedOpacitiesChanged();
+    Q_EMIT this->indexedOpacitiesChanged();
   }
   if (btmright.column() >= pqAnnotationsModel::VALUE)
   {
-    emit this->annotationsChanged();
+    Q_EMIT this->annotationsChanged();
   }
 }
 
@@ -505,7 +505,7 @@ void pqColorAnnotationsWidget::setAnnotations(const QList<QVariant>& value)
   }
   this->Internals->Model->setAnnotations(annotationsData);
 
-  emit this->annotationsChanged();
+  Q_EMIT this->annotationsChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -538,7 +538,7 @@ void pqColorAnnotationsWidget::setIndexedColors(const QList<QVariant>& value)
   }
 
   this->Internals->Model->setIndexedColors(colors);
-  emit this->indexedColorsChanged();
+  Q_EMIT this->indexedColorsChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -570,7 +570,7 @@ void pqColorAnnotationsWidget::setVisibilities(const QList<QVariant>& values)
   }
 
   this->Internals->Model->setVisibilities(visibilities);
-  emit this->visibilitiesChanged();
+  Q_EMIT this->visibilitiesChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -595,7 +595,7 @@ void pqColorAnnotationsWidget::setIndexedOpacities(const QList<QVariant>& values
     opacities.push_back(val.toDouble());
   }
   this->Internals->Model->setIndexedOpacities(opacities);
-  emit this->indexedOpacitiesChanged();
+  Q_EMIT this->indexedOpacitiesChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -618,14 +618,14 @@ void pqColorAnnotationsWidget::addAnnotation()
   // now select the newly added item.
   internals.Ui.AnnotationsTable->selectionModel()->setCurrentIndex(
     idx, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
-  emit this->annotationsChanged();
+  Q_EMIT this->annotationsChanged();
 }
 
 //-----------------------------------------------------------------------------
 void pqColorAnnotationsWidget::editPastLastRow()
 {
   this->Internals->Model->addAnnotation(this->Internals->Ui.AnnotationsTable->currentIndex());
-  emit this->annotationsChanged();
+  Q_EMIT this->annotationsChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -641,7 +641,7 @@ void pqColorAnnotationsWidget::removeAnnotation()
   QModelIndex idx = internals.Model->removeAnnotations(indexes);
   internals.Ui.AnnotationsTable->selectionModel()->setCurrentIndex(
     idx, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
-  emit this->annotationsChanged();
+  Q_EMIT this->annotationsChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -722,7 +722,7 @@ bool pqColorAnnotationsWidget::addActiveAnnotations(bool force)
   auto& internals = (*this->Internals);
   if (internals.updateAnnotations(uniqueValues, true))
   {
-    emit this->annotationsChanged();
+    Q_EMIT this->annotationsChanged();
   }
   return true;
 }
@@ -859,7 +859,7 @@ bool pqColorAnnotationsWidget::addActiveAnnotationsFromVisibleSources(bool force
   auto& internals = (*this->Internals);
   if (internals.updateAnnotations(uniqueAnnotationsArray, true))
   {
-    emit this->annotationsChanged();
+    Q_EMIT this->annotationsChanged();
   }
 
   return !missingValues;
@@ -870,7 +870,7 @@ void pqColorAnnotationsWidget::removeAllAnnotations()
 {
   this->Internals->Model->removeAllAnnotations();
   this->Internals->Model->setGlobalOpacity(1.0);
-  emit this->annotationsChanged();
+  Q_EMIT this->annotationsChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -1043,7 +1043,7 @@ void pqColorAnnotationsWidget::setSelectedAnnotations(const QStringList& annotat
   }
 
   auto currentSelection = table->selectionModel()->selection();
-  emit this->selectionChanged(currentSelection, prevSelection);
+  Q_EMIT this->selectionChanged(currentSelection, prevSelection);
 }
 
 //-----------------------------------------------------------------------------
@@ -1182,7 +1182,7 @@ void pqColorAnnotationsWidget::supportsOpacityMapping(bool val)
 void pqColorAnnotationsWidget::onPresetApplied(const QString& name)
 {
   this->Internals->SetCurrentPresetName(name.toStdString());
-  emit this->presetChanged(name);
+  Q_EMIT this->presetChanged(name);
 }
 
 //-----------------------------------------------------------------------------

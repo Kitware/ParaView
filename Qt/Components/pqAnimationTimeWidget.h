@@ -116,12 +116,12 @@ public:
   */
   void setTimeLabel(const QString& val);
   QString timeLabel() const;
-signals:
+Q_SIGNALS:
   void timeValueChanged();
   void playModeChanged();
   void dummySignal();
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the animation scene proxy which is reflected/controlled by this
   * widget.
@@ -139,7 +139,7 @@ protected:
    */
   QString formatDouble(double value);
 
-private slots:
+private Q_SLOTS:
   void updateTimestepCountLabelVisibility();
 
   /**

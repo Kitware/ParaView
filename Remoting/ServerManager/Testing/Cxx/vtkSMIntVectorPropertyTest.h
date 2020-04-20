@@ -22,7 +22,7 @@ class vtkSMIntVectorPropertyTest : public QObject
 {
   Q_OBJECT
 
-private slots:
+private Q_SLOTS:
   void SetNumberOfElements();
   void SetElement();
   void SetElements();

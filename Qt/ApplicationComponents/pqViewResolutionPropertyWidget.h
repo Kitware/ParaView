@@ -71,7 +71,7 @@ public:
   void reset() override;
   //@}
 
-signals:
+Q_SIGNALS:
   //@{
   /**
    * internal signals used to highlight (or not) the "reset-to-domain" button.
@@ -80,7 +80,7 @@ signals:
   void clearHighlight();
   //@}
 
-private slots:
+private Q_SLOTS:
   void resetButtonClicked();
   void scale(double factor);
   void widthTextEdited(const QString&);

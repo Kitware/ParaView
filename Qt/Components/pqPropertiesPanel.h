@@ -129,7 +129,7 @@ public:
    */
   bool canReset();
 
-public slots:
+public Q_SLOTS:
   /**
   * Apply the changes properties to the proxies.
   *
@@ -222,7 +222,7 @@ public slots:
   * when the active representation changes.
   */
   void setRepresentation(pqDataRepresentation*);
-signals:
+Q_SIGNALS:
   /**
   * This signal is emitted after the user clicks the apply button.
   */
@@ -255,7 +255,7 @@ signals:
    */
   void applyEnableStateChanged();
 
-private slots:
+private Q_SLOTS:
   /**
   * This is called when the user clicks the "Delete" button on the
   * properties panel. This triggers the deleteRequested() signal with proper

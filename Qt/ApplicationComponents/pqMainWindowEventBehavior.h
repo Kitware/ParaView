@@ -53,7 +53,7 @@ public:
   pqMainWindowEventBehavior(QObject* parent = 0);
   virtual ~pqMainWindowEventBehavior();
 
-public slots:
+public Q_SLOTS:
   /**
   * Triggered when a close event occurs on the main window.
   */

@@ -62,7 +62,7 @@ public:
   QHeaderView* createDeleteHeader() const;
   QWidget* createDeleteWidget() const;
 
-signals:
+Q_SIGNALS:
   // emitted when a track is double clicked on
   void trackSelected(pqAnimationTrack*);
   void deleteTrackClicked(pqAnimationTrack*);
@@ -73,7 +73,7 @@ signals:
   */
   void enableTrackClicked(pqAnimationTrack*);
 
-protected slots:
+protected Q_SLOTS:
   void updateSizes();
   void headerDblClicked(int);
   void headerDeleteClicked(int);

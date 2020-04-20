@@ -93,7 +93,7 @@ public:
   void setOpacityMapping(const QVariant&);
   //@}
 
-signals:
+Q_SIGNALS:
   /**
    * Fired when the annotations are changed.
    */
@@ -114,7 +114,7 @@ signals:
    */
   void opacityMappingChanged();
 
-private slots:
+private Q_SLOTS:
 
   /**
    * Ensures that the table for indexedColors are shown only when this

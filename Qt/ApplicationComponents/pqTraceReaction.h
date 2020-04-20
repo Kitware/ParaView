@@ -69,7 +69,7 @@ protected:
   */
   void onTriggered() override;
 
-protected slots:
+protected Q_SLOTS:
   virtual void updateTrace();
 
 private:

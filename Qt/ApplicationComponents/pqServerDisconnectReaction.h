@@ -63,7 +63,7 @@ public:
   * disconnect happened, false if not i.e. the user cancelled the operation.
   */
   static bool disconnectFromServerWithWarning();
-private slots:
+private Q_SLOTS:
   void updateState();
 
 protected:

@@ -96,13 +96,13 @@ public:
    */
   pqMultiViewWidget* findTab(vtkSMViewLayoutProxy*) const;
 
-signals:
+Q_SIGNALS:
   /**
   * fired when lockViewSize() is called.
   */
   void viewSizeLocked(bool);
 
-public slots:
+public Q_SLOTS:
   virtual int createTab();
   virtual int createTab(pqServer*);
   virtual int createTab(vtkSMViewLayoutProxy*);
@@ -159,7 +159,7 @@ public slots:
    */
   QSize preview(const QSize& previewSize = QSize());
 
-protected slots:
+protected Q_SLOTS:
   /**
   * slots connects to corresponding signals on pqServerManagerObserver.
   */

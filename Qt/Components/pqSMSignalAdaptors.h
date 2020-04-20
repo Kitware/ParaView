@@ -55,17 +55,17 @@ public:
   * get the proxy
   */
   QVariant proxy() const;
-signals:
+Q_SIGNALS:
   /**
   * signal the proxy changed
   */
   void proxyChanged(const QVariant&);
-public slots:
+public Q_SLOTS:
   /**
   * set the proxy
   */
   void setProxy(const QVariant&);
-protected slots:
+protected Q_SLOTS:
   void handleProxyChanged();
 
 protected:

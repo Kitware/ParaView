@@ -51,7 +51,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPluginActionGroupBehavior : public QObjec
 public:
   pqPluginActionGroupBehavior(QMainWindow* parent = 0);
 
-public slots:
+public Q_SLOTS:
   void addPluginInterface(QObject* iface);
 
 private:

@@ -55,7 +55,7 @@ public:
 protected:
   void updateEnableState() override;
 
-private slots:
+private Q_SLOTS:
   void populateMenu();
   void actionTriggered(QAction* actn);
 

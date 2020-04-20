@@ -141,7 +141,7 @@ QWidget* pqMultiSliceAxisWidget::getVTKWidget()
 void pqMultiSliceAxisWidget::setTitle(const QString& newTitle)
 {
   this->Internal->SliceItem->GetAxis()->SetTitle(newTitle.toLocal8Bit().data());
-  emit this->titleChanged(newTitle);
+  Q_EMIT this->titleChanged(newTitle);
 }
 
 // ----------------------------------------------------------------------------
@@ -192,15 +192,15 @@ void pqMultiSliceAxisWidget::invalidateCallback(vtkObject*, unsigned long eventi
   switch (eventid)
   {
     case vtkMultiSliceContextItem::AddSliceEvent:
-      emit this->sliceAdded(index);
+      Q_EMIT this->sliceAdded(index);
       break;
 
     case vtkMultiSliceContextItem::RemoveSliceEvent:
-      emit this->sliceRemoved(index);
+      Q_EMIT this->sliceRemoved(index);
       break;
 
     case vtkMultiSliceContextItem::ModifySliceEvent:
-      emit this->sliceModified(index);
+      Q_EMIT this->sliceModified(index);
       break;
   }
 }
@@ -245,6 +245,6 @@ void pqMultiSliceAxisWidget::onMarkClicked(vtkObject* src, unsigned long eventId
     int button = array[0];
     int modifier = array[1];
     double value = item->GetSliceValue(array[2]);
-    emit markClicked(button, modifier, value);
+    Q_EMIT markClicked(button, modifier, value);
   }
 }

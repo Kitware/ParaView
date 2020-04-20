@@ -90,7 +90,7 @@ QString pqSettings::backup(const QString& argName)
 //-----------------------------------------------------------------------------
 void pqSettings::alertSettingsModified()
 {
-  emit this->modified();
+  Q_EMIT this->modified();
 }
 
 //-----------------------------------------------------------------------------

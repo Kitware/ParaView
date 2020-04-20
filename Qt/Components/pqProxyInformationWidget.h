@@ -62,7 +62,7 @@ public:
   */
   pqOutputPort* getOutputPort();
 
-public slots:
+public Q_SLOTS:
   void updateInformation();
 
   /**
@@ -70,7 +70,7 @@ public slots:
   */
   void setOutputPort(pqOutputPort* outputport);
 
-private slots:
+private Q_SLOTS:
   void onCurrentChanged(const QModelIndex& item);
 
   // This is used to ensure that we don't have extra space in the

@@ -45,13 +45,13 @@ public:
   virtual pqServer* activeServer() const;
   virtual void setActiveServer(pqServer* server);
 
-public slots:
+public Q_SLOTS:
   virtual void open();
   virtual void open(const QString& filename);
   virtual void runScript();
   virtual void runScript(const QStringList& files);
 
-protected slots:
+protected Q_SLOTS:
   virtual void open(const QStringList& filenames);
 
 private:
@@ -73,10 +73,10 @@ public:
 
   static pqBlotDialogExecuteAction* connect(QAction* action, pqBlotShell* shell);
 
-public slots:
+public Q_SLOTS:
   virtual void trigger();
 
-signals:
+Q_SIGNALS:
   void triggered(const QString& command);
 
 protected:

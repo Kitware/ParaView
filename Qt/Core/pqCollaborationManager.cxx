@@ -236,7 +236,7 @@ void pqCollaborationManager::onClientMessage(pqServer* server, vtkSMMessage* msg
         userId = msg->GetExtension(ChatMessage::author);
         userName = server->session()->GetCollaborationManager()->GetUserLabel(userId);
         chatMsg = msg->GetExtension(ChatMessage::txt).c_str();
-        emit triggerChatMessage(server, userId, chatMsg);
+        Q_EMIT triggerChatMessage(server, userId, chatMsg);
         break;
       case QtEvent::OTHER:
         // Custom handling
@@ -256,7 +256,7 @@ void pqCollaborationManager::onClientMessage(pqServer* server, vtkSMMessage* msg
   }
   else
   {
-    emit triggerStateClientOnlyMessage(server, msg);
+    Q_EMIT triggerStateClientOnlyMessage(server, msg);
   }
 }
 
@@ -417,7 +417,7 @@ void pqCollaborationManager::updateEnabledState()
     }
   }
 
-  emit triggeredMasterChanged(enabled);
+  Q_EMIT triggeredMasterChanged(enabled);
 }
 
 //-----------------------------------------------------------------------------

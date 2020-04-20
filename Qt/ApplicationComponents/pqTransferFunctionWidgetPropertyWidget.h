@@ -58,13 +58,13 @@ public:
 
   friend pqTransferFunctionWidgetPropertyDialog;
 
-signals:
+Q_SIGNALS:
   void domainChanged();
 
 protected:
   void UpdateProperty();
 
-protected slots:
+protected Q_SLOTS:
   void editButtonClicked();
   void propagateProxyPointsProperty();
   void resetRangeToDomainDefault();

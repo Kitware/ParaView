@@ -74,6 +74,6 @@ void pqTriggerOnIdleHelper::triggerInternal()
   }
   else
   {
-    emit this->triggered();
+    Q_EMIT this->triggered();
   }
 }

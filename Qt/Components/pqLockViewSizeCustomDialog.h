@@ -52,7 +52,7 @@ public:
   */
   QSize customResolution() const;
 
-public slots:
+public Q_SLOTS:
   /**
   * Sets the view size to the displayed resolution.
   */

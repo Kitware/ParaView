@@ -92,7 +92,7 @@ public:
   * initializes the tracker using existing plugins.
   */
   void initialize();
-signals:
+Q_SIGNALS:
   /**
   * fired every time an interface is registered either from a plugin on
   * manually.

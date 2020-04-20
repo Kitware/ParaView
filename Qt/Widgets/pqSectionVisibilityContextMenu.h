@@ -57,7 +57,7 @@ public:
   void setHeaderView(QHeaderView* header);
   QHeaderView* headerView() { return this->HeaderView; }
 
-protected slots:
+protected Q_SLOTS:
   void toggleSectionVisibility(QAction* action);
 
 protected:

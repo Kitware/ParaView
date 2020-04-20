@@ -139,7 +139,7 @@ public:
    */
   static int hintsWidgetHeightNumberOfRows(vtkPVXMLElement* hints, int defaultValue = 10);
 
-signals:
+Q_SIGNALS:
   /**
   * This signal is emitted when the current view changes.
   */
@@ -163,7 +163,7 @@ signals:
   */
   void restartRequired();
 
-public slots:
+public Q_SLOTS:
   /**
   * called to set the active view. This will fire the viewChanged() signal.
   */
@@ -218,7 +218,7 @@ private:
   friend class pqPropertyWidgetDecorator;
   friend class pqProxyWidget;
 
-private slots:
+private Q_SLOTS:
   /**
   * check if changeFinished() must be fired as well.
   */

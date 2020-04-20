@@ -42,5 +42,5 @@ pqLabel::~pqLabel()
 
 void pqLabel::mousePressEvent(QMouseEvent*)
 {
-  emit clicked();
+  Q_EMIT clicked();
 }

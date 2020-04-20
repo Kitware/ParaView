@@ -64,7 +64,7 @@ public:
   */
   static void redo(pqView* view);
 
-protected slots:
+protected Q_SLOTS:
   void setEnabled(bool enable) { this->parentAction()->setEnabled(enable); }
   void setActiveView(pqView*);
 

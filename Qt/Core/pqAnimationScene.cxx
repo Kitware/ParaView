@@ -158,21 +158,21 @@ void pqAnimationScene::onCuesChanged()
 
   foreach (pqAnimationCue* cue, removed)
   {
-    emit this->preRemovedCue(cue);
+    Q_EMIT this->preRemovedCue(cue);
     this->Internals->Cues.remove(cue);
-    emit this->removedCue(cue);
+    Q_EMIT this->removedCue(cue);
   }
 
   foreach (pqAnimationCue* cue, added)
   {
-    emit this->preAddedCue(cue);
+    Q_EMIT this->preAddedCue(cue);
     this->Internals->Cues.insert(cue);
-    emit this->addedCue(cue);
+    Q_EMIT this->addedCue(cue);
   }
 
   if (removed.size() > 0 || added.size() > 0)
   {
-    emit this->cuesChanged();
+    Q_EMIT this->cuesChanged();
   }
 }
 
@@ -468,7 +468,7 @@ void pqAnimationScene::setAnimationTime(double time)
 //-----------------------------------------------------------------------------
 void pqAnimationScene::onAnimationTimePropertyChanged()
 {
-  emit this->animationTime(this->getAnimationTime());
+  Q_EMIT this->animationTime(this->getAnimationTime());
 }
 
 //-----------------------------------------------------------------------------
@@ -490,5 +490,5 @@ void pqAnimationScene::onTick(vtkObject*, unsigned long, void*, void* info)
     (cueInfo->AnimationTime - cueInfo->StartTime) * 100 / (cueInfo->EndTime - cueInfo->StartTime));
 
   this->setAnimationTime(cueInfo->AnimationTime);
-  emit this->tick(progress);
+  Q_EMIT this->tick(progress);
 }

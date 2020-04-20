@@ -48,7 +48,7 @@ protected:
 
   pqTreeWidget* treeWidget;
 
-protected slots:
+protected Q_SLOTS:
   void updateTracerDataStatus(int state);
 };
 

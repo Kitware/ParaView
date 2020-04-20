@@ -55,14 +55,14 @@ public:
   */
   QList<QVariant> manipulatorTypes() const;
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the manipulator types selection. This must have exactly 9 items or
   * less. Any missing items are treated as "None".
   */
   void setManipulatorTypes(const QList<QVariant>& value);
 
-signals:
+Q_SIGNALS:
   void manipulatorTypesChanged();
 
 private:

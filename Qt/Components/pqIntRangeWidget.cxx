@@ -116,7 +116,7 @@ void pqIntRangeWidget::setValue(int val)
   }
 
   this->Value = val;
-  emit this->valueChanged(this->Value);
+  Q_EMIT this->valueChanged(this->Value);
 }
 
 //-----------------------------------------------------------------------------
@@ -236,7 +236,7 @@ void pqIntRangeWidget::emitValueEdited()
 {
   if (this->InteractingWithSlider == false)
   {
-    emit this->valueEdited(this->Value);
+    Q_EMIT this->valueEdited(this->Value);
   }
   else
   {

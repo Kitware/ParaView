@@ -55,7 +55,7 @@ public:
   */
   static void resetApplication();
 
-protected slots:
+protected Q_SLOTS:
   void processCommandLineOptions();
   void playTests();
 

@@ -53,21 +53,21 @@ public:
 
   ~pqBoxChartView() override;
 
-signals:
+Q_SIGNALS:
   /**
   * Fired when the currently shown representation changes. \c repr may be
   * NULL.
   */
   void showing(pqDataRepresentation* repr);
 
-public slots:
+public Q_SLOTS:
   /**
   * Called when a new repr is added.
   */
   void onAddRepresentation(pqRepresentation*);
   void onRemoveRepresentation(pqRepresentation*);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called to ensure that at most 1 repr is visible at a time.
   */

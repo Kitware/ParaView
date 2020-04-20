@@ -64,13 +64,13 @@ public:
   */
   pqDataRepresentation* representation() const;
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the active representation.
   */
   void setRepresentation(pqDataRepresentation*);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Updates the enabled state. Applications need not explicitly call
   * this.

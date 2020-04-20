@@ -83,7 +83,7 @@ public:
   */
   void dropEvent(QDropEvent*);
 
-signals:
+Q_SIGNALS:
   /**
   * notification when a close event has been sent to the main window.
   */

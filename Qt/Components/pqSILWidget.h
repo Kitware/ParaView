@@ -85,7 +85,7 @@ public:
   */
   pqProxySILModel* activeModel() { return this->ActiveModel; }
 
-protected slots:
+protected Q_SLOTS:
   void onModelReset();
   void checkSelectedBlocks() { this->toggleSelectedBlocks(true); }
   void uncheckSelectedBlocks() { this->toggleSelectedBlocks(false); }

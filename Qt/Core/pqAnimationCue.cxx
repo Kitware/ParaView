@@ -140,7 +140,7 @@ bool pqAnimationCue::isEnabled() const
 //-----------------------------------------------------------------------------
 void pqAnimationCue::onEnabledModified()
 {
-  emit this->enabled(this->isEnabled());
+  Q_EMIT this->enabled(this->isEnabled());
 }
 
 //-----------------------------------------------------------------------------

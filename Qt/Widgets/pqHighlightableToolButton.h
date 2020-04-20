@@ -52,7 +52,7 @@ public:
   pqHighlightableToolButton(QWidget* parent = nullptr);
   virtual ~pqHighlightableToolButton();
 
-public slots:
+public Q_SLOTS:
   /**
   * Slots to highlight (or clear the highlight).
   */

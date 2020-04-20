@@ -80,19 +80,19 @@ public:
   */
   vtkSMViewProxy* viewProxy() const;
 
-signals:
+Q_SIGNALS:
   /**
   * fired to indicate the array-name changed.
   */
   void arraySelectionChanged();
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the representation to control the scalar coloring properties on.
   */
   void setRepresentation(pqDataRepresentation* display);
 
-private slots:
+private Q_SLOTS:
   /**
   * fills up the Variables combo-box using the active representation's
   * ColorArrayName property's domain.

@@ -58,7 +58,7 @@ public:
   static void restoreState(QMainWindow*);
   static void saveState(QMainWindow*);
 
-protected slots:
+protected Q_SLOTS:
   void saveState();
   void restoreState();
 

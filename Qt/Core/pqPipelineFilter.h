@@ -133,13 +133,13 @@ public:
   */
   int replaceInput() const;
 
-signals:
+Q_SIGNALS:
   /**
   * fired whenever an input connection changes.
   */
   void producerChanged(const QString& inputportname);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * process some change in the input property for the proxy.
   */

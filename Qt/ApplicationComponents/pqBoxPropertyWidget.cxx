@@ -217,7 +217,7 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
       vtkSMPropertyHelper(wdgProxy, "Position").Set(bbox.GetMinPoint(), 3);
     }
     wdgProxy->UpdateVTKObjects();
-    emit this->changeAvailable();
+    Q_EMIT this->changeAvailable();
     this->placeWidget();
     this->render();
   });

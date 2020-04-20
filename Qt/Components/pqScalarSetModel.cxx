@@ -71,7 +71,7 @@ pqScalarSetModel::~pqScalarSetModel()
 void pqScalarSetModel::clear()
 {
   this->Implementation->Values.clear();
-  emit layoutChanged();
+  Q_EMIT layoutChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -113,7 +113,7 @@ QModelIndex pqScalarSetModel::insert(double value)
   int idx=std::distance(this->Implementation->Values.begin(),iter.first);
   QModelIndex mindex=this->createIndex(idx,0);
   */
-  emit layoutChanged();
+  Q_EMIT layoutChanged();
   return mindex;
 }
 
@@ -121,7 +121,7 @@ QModelIndex pqScalarSetModel::insert(double value)
 void pqScalarSetModel::erase(double value)
 {
   this->Implementation->Values.removeAll(value);
-  emit layoutChanged();
+  Q_EMIT layoutChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -133,7 +133,7 @@ void pqScalarSetModel::erase(int row)
   }
 
   this->Implementation->Values.removeAt(row);
-  emit layoutChanged();
+  Q_EMIT layoutChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -147,7 +147,7 @@ void pqScalarSetModel::setFormat(char f, int precision)
 {
   this->Implementation->Format = f;
   this->Implementation->Precision = precision;
-  emit dataChanged(this->index(0), this->index(this->Implementation->Values.size() - 1));
+  Q_EMIT dataChanged(this->index(0), this->index(this->Implementation->Values.size() - 1));
 }
 
 //-----------------------------------------------------------------------------
@@ -207,8 +207,8 @@ bool pqScalarSetModel::setData(const QModelIndex& i, const QVariant& value, int 
       */
       this->erase(i.row());
       this->insert(value.toDouble());
-      emit dataChanged(this->index(0), this->index(this->Implementation->Values.size() - 1));
-      emit layoutChanged();
+      Q_EMIT dataChanged(this->index(0), this->index(this->Implementation->Values.size() - 1));
+      Q_EMIT layoutChanged();
     }
   }
 

@@ -28,7 +28,7 @@ public:
 
   int GetModified() { return this->Modified; }
 
-private slots:
+private Q_SLOTS:
   void SetModified() { ++this->Modified; }
 
 private:

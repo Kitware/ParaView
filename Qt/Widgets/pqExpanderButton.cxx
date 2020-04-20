@@ -93,7 +93,7 @@ void pqExpanderButton::setChecked(bool val)
   {
     this->Internals->icon->setPixmap(this->Internals->UncheckedPixmap);
   }
-  emit this->toggled(this->Checked);
+  Q_EMIT this->toggled(this->Checked);
 }
 
 //-----------------------------------------------------------------------------

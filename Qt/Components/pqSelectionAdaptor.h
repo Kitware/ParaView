@@ -79,7 +79,7 @@ protected:
   */
   const QAbstractItemModel* getQModel() const;
 
-protected slots:
+protected Q_SLOTS:
   /**
   * called when the selection in the Qt-model changes.
   */

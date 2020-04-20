@@ -80,7 +80,7 @@ public:
   bool isFilterable() const { return this->Filterable; }
   void setFilterable(bool val) { this->Filterable = val; }
   //@}
-protected slots:
+protected Q_SLOTS:
   virtual void showContextMenu(int section, const QPoint&);
 
 private:

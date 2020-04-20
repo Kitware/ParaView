@@ -108,39 +108,39 @@ void pqActiveObjects::triggerSignals()
   if (this->ActiveServer.data() != this->CachedServer)
   {
     this->CachedServer = this->ActiveServer.data();
-    emit this->serverChanged(this->ActiveServer);
+    Q_EMIT this->serverChanged(this->ActiveServer);
   }
 
   if (this->ActivePort.data() != this->CachedPort)
   {
     this->CachedPort = this->ActivePort.data();
-    emit this->portChanged(this->ActivePort);
+    Q_EMIT this->portChanged(this->ActivePort);
   }
 
   if (this->ActiveSource.data() != this->CachedSource)
   {
     this->CachedSource = this->ActiveSource.data();
-    emit this->sourceChanged(this->ActiveSource);
+    Q_EMIT this->sourceChanged(this->ActiveSource);
   }
 
   if (this->ActiveRepresentation.data() != this->CachedRepresentation)
   {
     this->CachedRepresentation = this->ActiveRepresentation.data();
-    emit this->representationChanged(this->ActiveRepresentation);
-    emit this->representationChanged(
+    Q_EMIT this->representationChanged(this->ActiveRepresentation);
+    Q_EMIT this->representationChanged(
       static_cast<pqRepresentation*>(this->ActiveRepresentation.data()));
   }
 
   if (this->ActiveView.data() != this->CachedView)
   {
     this->CachedView = this->ActiveView.data();
-    emit this->viewChanged(this->ActiveView);
+    Q_EMIT this->viewChanged(this->ActiveView);
   }
 
   if (this->CachedSelection != this->Selection)
   {
     this->CachedSelection = this->Selection;
-    emit this->selectionChanged(this->Selection);
+    Q_EMIT this->selectionChanged(this->Selection);
   }
 }
 

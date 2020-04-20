@@ -147,7 +147,7 @@ void pqApplyBehavior::applied(pqPropertiesPanel*, pqProxy* pqproxy)
   pqsource->setModifiedState(pqProxy::UNMODIFIED);
 
   // Make sure filters menu enable state is updated
-  emit pqApplicationCore::instance()->forceFilterMenuRefresh();
+  Q_EMIT pqApplicationCore::instance()->forceFilterMenuRefresh();
 
   pqPipelineFilter* pqfilter = qobject_cast<pqPipelineFilter*>(pqproxy);
   if (!pqfilter)

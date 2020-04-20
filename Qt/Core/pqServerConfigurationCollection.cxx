@@ -186,7 +186,7 @@ bool pqServerConfigurationCollection::loadContents(const QString& contents, bool
   }
 
   this->blockSignals(prev);
-  emit this->changed();
+  Q_EMIT this->changed();
   return true;
 }
 
@@ -232,7 +232,7 @@ void pqServerConfigurationCollection::addConfiguration(const pqServerConfigurati
   }
 
   this->Configurations[config.name()] = config;
-  emit this->changed();
+  Q_EMIT this->changed();
 }
 
 //-----------------------------------------------------------------------------
@@ -246,7 +246,7 @@ void pqServerConfigurationCollection::removeConfiguration(const QString& toremov
 
   if (this->Configurations.remove(toremove) > 0)
   {
-    emit this->changed();
+    Q_EMIT this->changed();
   }
 }
 

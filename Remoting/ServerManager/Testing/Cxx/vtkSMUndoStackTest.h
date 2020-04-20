@@ -22,7 +22,7 @@ class vtkSMUndoStackTest : public QObject
 {
   Q_OBJECT
 
-private slots:
+private Q_SLOTS:
   void UndoRedo();
   void StackDepth();
 };

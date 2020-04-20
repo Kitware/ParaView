@@ -73,7 +73,7 @@ public:
   */
   void resetDisplay() override;
 
-protected slots:
+protected Q_SLOTS:
   virtual void initializeAfterObjectsCreated();
 
   /**

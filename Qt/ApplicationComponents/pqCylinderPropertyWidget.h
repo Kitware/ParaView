@@ -61,7 +61,7 @@ public:
   pqCylinderPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   ~pqCylinderPropertyWidget() override;
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the cylinder axis to be along the X axis.
   */
@@ -87,7 +87,7 @@ public slots:
   */
   void useCameraAxis();
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Places the interactive widget using current data source information.
   */

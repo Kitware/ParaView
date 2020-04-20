@@ -51,7 +51,7 @@ public:
   */
   static void createMacro();
 
-protected slots:
+protected Q_SLOTS:
   void enable(bool);
 
 protected:

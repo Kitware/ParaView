@@ -48,7 +48,7 @@ class pqSurfaceRepresentationBehavior : public QObject
 public:
   pqSurfaceRepresentationBehavior(QObject* parent = 0);
 
-protected slots:
+protected Q_SLOTS:
   void onRepresentationAdded(pqRepresentation*);
   void onViewAdded(pqView*);
 

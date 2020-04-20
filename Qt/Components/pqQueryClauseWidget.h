@@ -104,7 +104,7 @@ public:
     pqMultiQueryClauseWidget* multiQueryWidget, QWidget* parent = 0, Qt::WindowFlags flags = 0);
   ~pqQueryClauseWidget() override;
 
-public slots:
+public Q_SLOTS:
   /**
   * use this slot to initialize the clause GUI after all properties have been
   * set.
@@ -146,13 +146,13 @@ public slots:
    */
   void setAndLabelVisible(bool show);
 
-signals:
+Q_SIGNALS:
 
   /**
    * Emited when user ask for a new query.
    */
   void addQueryRequested();
-protected slots:
+protected Q_SLOTS:
   /**
   * Based on the selection criteria, populate the options in the selection
   * "condition" combo box.

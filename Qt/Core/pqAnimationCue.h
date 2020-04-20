@@ -87,7 +87,7 @@ public:
   * Used by editors to trigger keyframesModified() signal after bulk of
   * modifications have been made to the cue/key frames.
   */
-  void triggerKeyFramesModified() { emit this->keyframesModified(); }
+  void triggerKeyFramesModified() { Q_EMIT this->keyframesModified(); }
 
   /**
   * Get/Set the enabled state for the cue.
@@ -95,7 +95,7 @@ public:
   void setEnabled(bool enable);
   bool isEnabled() const;
 
-signals:
+Q_SIGNALS:
   // emitted when something about the keyframes changes.
   void keyframesModified();
 
@@ -108,7 +108,7 @@ signals:
   */
   void enabled(bool);
 
-private slots:
+private Q_SLOTS:
   /**
   * Called when the "Enabled" property is changed.
   */

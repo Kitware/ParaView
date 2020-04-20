@@ -90,5 +90,5 @@ void pqColorButtonEventTranslator::onColorChosen(const QColor& color)
 
   QString colorvalue = QString("%1,%2,%3").arg(color.red()).arg(color.green()).arg(color.blue());
 
-  emit this->recordEvent(color_button, pqColorButtonEventPlayer::EVENT_NAME(), colorvalue);
+  Q_EMIT this->recordEvent(color_button, pqColorButtonEventPlayer::EVENT_NAME(), colorvalue);
 }

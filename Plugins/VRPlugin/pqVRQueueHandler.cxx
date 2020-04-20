@@ -105,7 +105,7 @@ void pqVRQueueHandler::add(vtkVRInteractorStyle* style)
   if (!this->Internals->Styles->IsItemPresent(style))
   {
     this->Internals->Styles->AddItem(style);
-    emit stylesChanged();
+    Q_EMIT stylesChanged();
     return;
   }
 }
@@ -114,7 +114,7 @@ void pqVRQueueHandler::add(vtkVRInteractorStyle* style)
 void pqVRQueueHandler::remove(vtkVRInteractorStyle* style)
 {
   this->Internals->Styles->RemoveItem(style);
-  emit stylesChanged();
+  Q_EMIT stylesChanged();
 }
 
 //----------------------------------------------------------------------public
@@ -123,7 +123,7 @@ void pqVRQueueHandler::clear()
   if (this->Internals->Styles->GetNumberOfItems() != 0)
   {
     this->Internals->Styles->RemoveAllItems();
-    emit stylesChanged();
+    Q_EMIT stylesChanged();
   }
 }
 
@@ -255,7 +255,7 @@ void pqVRQueueHandler::configureStyles(vtkPVXMLElement* xml, vtkSMProxyLocator* 
     this->configureStyles(xml->FindNestedElementByName("VRInteractorStyles"), locator);
   }
 
-  emit stylesChanged();
+  Q_EMIT stylesChanged();
 }
 
 //----------------------------------------------------------------------------

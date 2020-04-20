@@ -64,11 +64,11 @@ public:
   */
   ~pqPluginDialog() override;
 
-public slots:
+public Q_SLOTS:
   void loadLocalPlugin();
   void loadRemotePlugin();
 
-protected slots:
+protected Q_SLOTS:
   void onPluginItemChanged(QTreeWidgetItem*, int);
   void onRefresh();
   void refresh();

@@ -74,7 +74,7 @@ public:
     if (val != this->IsAdvanced)
     {
       this->IsAdvanced = val;
-      emit this->visibilityChanged();
+      Q_EMIT this->visibilityChanged();
     }
   }
   bool canShowWidget(bool show_advanced) const override

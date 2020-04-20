@@ -54,14 +54,14 @@ public:
 
   bool usePathBasedMode() const;
 
-signals:
+Q_SIGNALS:
   /**
   * Fired when user requests the use of the current camera as the value for
   * the key frame.
   */
   void useCurrentCamera();
 
-public slots:
+public Q_SLOTS:
   /**
   * Initialize the widget using the values from the key frame proxy.
   */
@@ -90,7 +90,7 @@ protected:
   void showEvent(QShowEvent*) override;
   void hideEvent(QHideEvent*) override;
 
-private slots:
+private Q_SLOTS:
   /**
   * called when the user clicks on an item in the left pane.
   */

@@ -62,7 +62,7 @@ public:
    */
   static bool warnOnCreate(const QString& group, const QString& name, pqServer* server = nullptr);
 
-public slots:
+public Q_SLOTS:
   /**
   * Updates the enabled state. Applications need not explicitly call
   * this.
@@ -70,7 +70,7 @@ public slots:
   virtual void updateEnableState();
   void updateEnableState(bool);
 
-protected slots:
+protected Q_SLOTS:
   /**
   * Called when the action is triggered.
   */

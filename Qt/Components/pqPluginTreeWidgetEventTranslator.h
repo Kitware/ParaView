@@ -52,7 +52,7 @@ public:
   using Superclass::translateEvent;
   bool translateEvent(QObject* Object, QEvent* Event, bool& Error) override;
 
-private slots:
+private Q_SLOTS:
   void onItemChanged(const QModelIndex&);
   void onExpanded(const QModelIndex&);
   void onCollapsed(const QModelIndex&);

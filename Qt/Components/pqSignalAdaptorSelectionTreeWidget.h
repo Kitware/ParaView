@@ -87,13 +87,13 @@ public:
     this->ItemCreatorFunctionPtr = fptr;
   }
 
-signals:
+Q_SIGNALS:
   /**
   * Fired whenever the values change.
   */
   void valuesChanged();
 
-public slots:
+public Q_SLOTS:
   /**
   * Set the selected value on the widget. All the strings in the
   * \param values are set as selected in the tree widget.
@@ -102,7 +102,7 @@ public slots:
   */
   void setValues(const QList<QList<QVariant> >& values);
 
-private slots:
+private Q_SLOTS:
   /**
   * Called when vtkSMStringListDomain changes. We update the
   * tree widget to show the user the new set of strings he can choose.

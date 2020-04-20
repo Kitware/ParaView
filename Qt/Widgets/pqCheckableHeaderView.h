@@ -77,7 +77,7 @@ public:
   */
   QVariant getCheckState(int section);
 
-signals:
+Q_SIGNALS:
   /**
   * \brief
   *   This signal is emitted whenever the state of the \em section header

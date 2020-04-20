@@ -79,7 +79,7 @@ public:
   virtual void setPlotter(pqPlotter* thePlotter);
   virtual pqPlotter* getPlotter();
 
-public slots:
+public Q_SLOTS:
   void slotItemSelectionChanged();
 
   void slotOk(void);
@@ -88,7 +88,7 @@ public slots:
   void slotUseParaViewGUIToSelectNodesCheckBox(bool checked);
   void slotTextChanged(const QString&);
 
-signals:
+Q_SIGNALS:
   void variableSelected(QListWidgetItem* item);
   void variableDeselectionByName(QString varName);
   void variableSelectionByName(QString varName);

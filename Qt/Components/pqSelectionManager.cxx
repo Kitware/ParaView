@@ -153,7 +153,7 @@ void pqSelectionManager::expandSelection(int layers)
       selsource->UpdateVTKObjects();
     }
     port->renderAllViews();
-    emit this->selectionChanged(port);
+    Q_EMIT this->selectionChanged(port);
   }
 }
 
@@ -183,7 +183,7 @@ void pqSelectionManager::clearSelection(pqOutputPort* outputPort)
       SM_SCOPED_TRACE(CallFunction).arg("ClearSelection").arg("comment", "clear all selections");
 
       // inform selection have changed
-      emit this->selectionChanged(static_cast<pqOutputPort*>(0));
+      Q_EMIT this->selectionChanged(static_cast<pqOutputPort*>(0));
     }
   }
   else
@@ -204,7 +204,7 @@ void pqSelectionManager::clearSelection(pqOutputPort* outputPort)
     outputPort->renderAllViews(false);
 
     // Inform selection have been changed
-    emit this->selectionChanged(outputPort);
+    Q_EMIT this->selectionChanged(outputPort);
   }
 }
 
@@ -333,7 +333,7 @@ void pqSelectionManager::select(pqOutputPort* selectedPort)
   }
 
   // Inform about the selection
-  emit this->selectionChanged(selectedPort);
+  Q_EMIT this->selectionChanged(selectedPort);
 }
 
 //-----------------------------------------------------------------------------
