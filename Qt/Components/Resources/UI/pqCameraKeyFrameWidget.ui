@@ -258,6 +258,13 @@ p, li { white-space: pre-wrap; }
           <string>Use Current</string>
          </property>
         </widget>
+        </item>
+        <item row="8" column="0" colspan="5">
+        <widget class="QPushButton" name="updateCurrent">
+         <property name="text">
+          <string>Apply to camera</string>
+         </property>
+        </widget>
        </item>
        <item row="5" column="2" colspan="3">
         <widget class="pqLineEdit" name="viewAngle"/>

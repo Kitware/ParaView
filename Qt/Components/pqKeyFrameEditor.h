@@ -77,6 +77,7 @@ private Q_SLOTS:
   void deleteKeyFrame();
   void deleteAllKeyFrames();
   void useCurrentCamera(QObject*);
+  void updateCurrentCamera(QObject*);
 
 private:
   class pqInternal;

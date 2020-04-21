@@ -739,6 +739,7 @@ list(APPEND TESTS_WITH_BASELINES
   AdaptiveResampleToImage.xml
   AMRCutPlane.xml
   AMReXParticlesReader.xml
+  AnimationUseCamera.xml
   Annotations.xml
   ConvertToMolecule.xml
   ContourCellData.xml

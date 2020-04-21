@@ -60,6 +60,7 @@ Q_SIGNALS:
   * the key frame.
   */
   void useCurrentCamera();
+  void updateCurrentCamera();
 
 public Q_SLOTS:
   /**
@@ -71,6 +72,11 @@ public Q_SLOTS:
   * Initialize the widget using the camera.
   */
   void initializeUsingCamera(vtkCamera* camera);
+
+  /**
+   * Initialize the camera using the widget values.
+   */
+  void applyToCamera(vtkCamera* camera);
 
   /**
   * The camera keyframes have 2 modes either interpolate vtkCamera's using the

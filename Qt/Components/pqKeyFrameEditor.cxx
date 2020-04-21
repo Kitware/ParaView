@@ -46,12 +46,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkSMRenderViewProxy.h>
 
+#include "pqActiveObjects.h"
 #include "pqAnimationCue.h"
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
 #include "pqCameraKeyFrameWidget.h"
 #include "pqKeyFrameTypeWidget.h"
 #include "pqPropertyLinks.h"
+#include "pqRenderView.h"
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
 #include "pqServerManagerModel.h"
@@ -321,6 +323,8 @@ public:
     pqCameraKeyFrameItem* item = nullptr;
     item = new pqCameraKeyFrameItem();
 
+    QObject::connect(&item->CamWidget, &pqCameraKeyFrameWidget::updateCurrentCamera, this->Editor,
+      [=]() { this->Editor->updateCurrentCamera(item); });
     QObject::connect(&item->CamWidget, &pqCameraKeyFrameWidget::useCurrentCamera, this->Editor,
       [=]() { this->Editor->useCurrentCamera(item); });
     // default to current view
@@ -481,6 +485,8 @@ void pqKeyFrameEditor::readKeyFrameData()
       if ((i < numberKeyFrames - 1) || !path_based)
       {
         pqCameraKeyFrameItem* item = new pqCameraKeyFrameItem();
+        QObject::connect(&item->CamWidget, &pqCameraKeyFrameWidget::updateCurrentCamera, this,
+          [=]() { this->Internal->Editor->updateCurrentCamera(item); });
         QObject::connect(&item->CamWidget, &pqCameraKeyFrameWidget::useCurrentCamera, this,
           [=]() { this->Internal->Editor->useCurrentCamera(item); });
         item->CamWidget.setUsePathBasedMode(path_based);
@@ -665,4 +671,17 @@ void pqKeyFrameEditor::useCurrentCamera(QObject* o)
   vtkSMRenderViewProxy* ren = vtkSMRenderViewProxy::SafeDownCast(pxy);
   ren->SynchronizeCameraProperties();
   item->CamWidget.initializeUsingCamera(ren->GetActiveCamera());
+}
+
+//-----------------------------------------------------------------------------
+void pqKeyFrameEditor::updateCurrentCamera(QObject* o)
+{
+  pqCameraKeyFrameItem* item = static_cast<pqCameraKeyFrameItem*>(o);
+
+  vtkSMProxy* pxy = this->Internal->Cue->getAnimatedProxy();
+
+  vtkSMRenderViewProxy* ren = vtkSMRenderViewProxy::SafeDownCast(pxy);
+  ren->SynchronizeCameraProperties();
+  item->CamWidget.applyToCamera(ren->GetActiveCamera());
+  ren->StillRender();
 }
