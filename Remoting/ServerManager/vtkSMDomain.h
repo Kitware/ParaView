@@ -49,6 +49,7 @@ struct vtkSMDomainInternals;
 class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMDomain : public vtkSMSessionObject
 {
 public:
+  static vtkSMDomain* New();
   vtkTypeMacro(vtkSMDomain, vtkSMSessionObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
@@ -72,14 +73,14 @@ public:
    * implies that the value is acceptable.
    *
    */
-  virtual int IsInDomain(vtkSMProperty* property) = 0;
+  virtual int IsInDomain(vtkSMProperty* vtkNotUsed(property)) { return IN_DOMAIN; }
 
   /**
    * Update self based on the "unchecked" values of all required
    * properties. Subclasses must override this method to update the domain based
    * on the requestingProperty (and/or other required properties).
    */
-  virtual void Update(vtkSMProperty* requestingProperty) { (void)requestingProperty; }
+  virtual void Update(vtkSMProperty* requestingProperty);
 
   /**
    * Set the value of an element of a property from the animation editor.

@@ -62,6 +62,7 @@ set(classes
   pqCustomFilterManager
   pqCustomFilterManagerModel
   pqCustomViewpointButtonDialog
+  pqDataAssemblyTreeModel
   pqDataInformationModel
   pqDataInformationWidget
   pqDialog

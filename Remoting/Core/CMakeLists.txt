@@ -41,6 +41,7 @@ set(classes
   vtkPVClassNameInformation
   vtkPVCompositeDataInformation
   vtkPVCompositeDataInformationIterator
+  vtkPVDataAssemblyInformation
   vtkPVDataInformation
   vtkPVDataInformationHelper
   vtkPVDataSetAttributesInformation

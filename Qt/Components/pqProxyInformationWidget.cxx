@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLineEdit>
 #include <QStackedWidget>
 #include <QStringList>
+#include <QTabBar>
 
 // VTK includes
 #include "vtkCommand.h"
@@ -67,6 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqCompositeDataInformationTreeModel.h"
 #include "pqCoreUtilities.h"
+#include "pqDataAssemblyTreeModel.h"
 #include "pqNonEditableStyledItemDelegate.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
@@ -82,11 +84,12 @@ class pqProxyInformationWidget::pqUi : public Ui::pqProxyInformationWidget
 public:
   pqUi(QObject* p)
     : compositeTreeModel(new pqCompositeDataInformationTreeModel(p))
+    , assemblyTreeModel(new pqDataAssemblyTreeModel(p))
   {
-    this->compositeTreeModel->setHeaderData(0, Qt::Horizontal, "Data Hierarchy");
   }
 
   QPointer<pqCompositeDataInformationTreeModel> compositeTreeModel;
+  QPointer<pqDataAssemblyTreeModel> assemblyTreeModel;
 };
 
 //-----------------------------------------------------------------------------
@@ -104,6 +107,7 @@ pqProxyInformationWidget::pqProxyInformationWidget(QWidget* p)
   this->connect(this->Ui->compositeTree->selectionModel(),
     SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
     SLOT(onCurrentChanged(const QModelIndex&)));
+  this->Ui->assemblyTree->setModel(this->Ui->assemblyTreeModel);
   this->connect(this->Ui->dataTypeProperties, SIGNAL(currentChanged(int)),
     SLOT(onDataTypePropertiesWidgetChanged(int)));
   this->onDataTypePropertiesWidgetChanged(0); // set initial size
@@ -161,7 +165,7 @@ pqOutputPort* pqProxyInformationWidget::getOutputPort()
 void pqProxyInformationWidget::updateInformation()
 {
   this->Ui->compositeTreeModel->reset(nullptr);
-  this->Ui->compositeTree->setVisible(false);
+  this->Ui->hierarchyTabWidget->setVisible(false);
   this->Ui->filename->setText(tr("NA"));
   this->Ui->filename->setToolTip(tr("NA"));
   this->Ui->filename->setStatusTip(tr("NA"));
@@ -171,12 +175,14 @@ void pqProxyInformationWidget::updateInformation()
 
   vtkPVDataInformation* dataInformation = NULL;
   pqPipelineSource* source = NULL;
+  vtkDataAssembly* assembly = nullptr;
   if (this->OutputPort)
   {
     source = this->OutputPort->getSource();
     if (this->OutputPort->getOutputPortProxy())
     {
       dataInformation = this->OutputPort->getDataInformation();
+      assembly = this->OutputPort->dataAssembly();
     }
   }
 
@@ -192,10 +198,22 @@ void pqProxyInformationWidget::updateInformation()
 
   if (this->Ui->compositeTreeModel->reset(dataInformation))
   {
-    this->Ui->compositeTree->setVisible(true);
+    this->Ui->hierarchyTabWidget->setVisible(true);
     this->Ui->compositeTree->expandToDepth(1);
     this->Ui->compositeTree->selectionModel()->setCurrentIndex(
       this->Ui->compositeTreeModel->rootIndex(), QItemSelectionModel::ClearAndSelect);
+    this->Ui->assemblyTreeModel->setDataAssembly(assembly);
+    this->Ui->assemblyTree->expandToDepth(1);
+
+    if (assembly == nullptr)
+    {
+      this->Ui->hierarchyTabWidget->setCurrentIndex(0);
+      this->Ui->hierarchyTabWidget->tabBar()->hide();
+    }
+    else
+    {
+      this->Ui->hierarchyTabWidget->tabBar()->show();
+    }
   }
 
   this->fillDataInformation(dataInformation);

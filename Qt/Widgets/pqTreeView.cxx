@@ -72,6 +72,18 @@ pqTreeView::pqTreeView(QWidget* widgetParent, bool use_pqHeaderView)
 {
   this->ScrollPadding = 0;
 
+  // Listen for the show/hide events of the horizontal scroll bar.
+  this->horizontalScrollBar()->installEventFilter(this);
+
+  // better handle scrolling in panels with nested scrollbars.
+  this->setFocusPolicy(Qt::StrongFocus);
+
+  this->setupCustomHeader(use_pqHeaderView);
+}
+
+//-----------------------------------------------------------------------------
+void pqTreeView::setupCustomHeader(bool use_pqHeaderView /*=false*/)
+{
   // Change the default header view to a checkable one.
   QPointer<QHeaderView> oldheader = this->header();
   if (use_pqHeaderView)
@@ -92,12 +104,6 @@ pqTreeView::pqTreeView(QWidget* widgetParent, bool use_pqHeaderView)
     checkable->setSectionsClickable(true);
   }
   delete oldheader;
-
-  // Listen for the show/hide events of the horizontal scroll bar.
-  this->horizontalScrollBar()->installEventFilter(this);
-
-  // better handle scrolling in panels with nested scrollbars.
-  this->setFocusPolicy(Qt::StrongFocus);
 }
 
 //-----------------------------------------------------------------------------

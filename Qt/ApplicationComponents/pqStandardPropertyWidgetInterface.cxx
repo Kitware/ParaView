@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCommandButtonPropertyWidget.h"
 #include "pqCompositePropertyWidgetDecorator.h"
 #include "pqCylinderPropertyWidget.h"
+#include "pqDataAssemblyPropertyWidget.h"
 #include "pqDisplayRepresentationWidget.h"
 #include "pqDoubleRangeSliderPropertyWidget.h"
 #include "pqEnableWidgetDecorator.h"
@@ -203,6 +204,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
   {
     return new pqPauseLiveSourcePropertyWidget(smProxy, smProperty, parentWidget);
   }
+  else if (name == "data_assembly_editor")
+  {
+    return new pqDataAssemblyPropertyWidget(smProxy, smProperty, parentWidget);
+  }
 
   // *** NOTE: When adding new types, please update the header documentation ***
   return NULL;
@@ -306,6 +311,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   else if (panelWidget == "PropertyCollection")
   {
     return new pqPropertyCollectionWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "DataAssemblyEditor")
+  {
+    return new pqDataAssemblyPropertyWidget(proxy, group, parentWidget);
   }
   // *** NOTE: When adding new types, please update the header documentation ***
 
