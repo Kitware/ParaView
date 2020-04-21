@@ -548,7 +548,9 @@ vtkIdType pqTransferFunctionWidget::numberOfControlPoints() const
 //-----------------------------------------------------------------------------
 void pqTransferFunctionWidget::SetControlPointsFreehandDrawing(bool use)
 {
+  this->Internals->ControlPointsItem->SetDrawPoints(!use);
   this->Internals->ControlPointsItem->SetStrokeMode(use);
+  this->render();
 }
 
 //-----------------------------------------------------------------------------
