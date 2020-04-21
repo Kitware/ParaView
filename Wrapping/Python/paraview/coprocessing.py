@@ -497,7 +497,9 @@ class CoProcessor(object):
     def RegisterWriter(self, writer, filename, freq, paddingamount=0, **params):
         """Registers a writer proxy. This method is generally used in
            CreatePipeline() to register writers. All writes created as such will
-           write the output files appropriately in WriteData() is called."""
+           write the output files appropriately in WriteData() is called.
+           params should be empty as of ParaView 5.9 but is passed in for
+           backwards compatibility."""
         writerParametersProxy = self.WriterParametersProxy(
             writer, filename, freq, paddingamount)
 
@@ -535,6 +537,7 @@ class CoProcessor(object):
         proxy = servermanager.ProxyManager().NewProxy(
             "insitu_writer_parameters", helperName)
         controller.PreInitializeProxy(proxy)
+
         if writerIsProxy:
             # it's possible that the writer can take in multiple input connections
             # so we need to go through all of them. the try/except block seems
