@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWeakPointer.h"
 
 #include <QDoubleValidator>
+#include <QList>
+#include <QVariant>
 
 #include <cassert>
 
@@ -54,6 +56,7 @@ public:
   int CachedTimestepCount;
   int Precision;
   QChar TimeNotation;
+  QList<QVariant> TimeDataList;
 
   pqInternals(pqAnimationTimeWidget* self)
     : AnimationSceneVoidPtr(NULL)
@@ -159,6 +162,8 @@ void pqAnimationTimeWidget::setAnimationScene(vtkSMProxy* ascene)
     SIGNAL(dummySignal()), atimekeeper, atimekeeper->GetProperty("TimestepValues"));
   internals.Links.addPropertyLink(
     this, "timeLabel", SIGNAL(dummySignal()), atimekeeper, atimekeeper->GetProperty("TimeLabel"));
+  internals.Links.addPropertyLink(this, "timestepValues", SIGNAL(dummySignal()), atimekeeper,
+    atimekeeper->GetProperty("TimestepValues"));
 }
 
 //-----------------------------------------------------------------------------
@@ -203,6 +208,12 @@ void pqAnimationTimeWidget::setTimeValue(double time)
 }
 
 //-----------------------------------------------------------------------------
+QList<QVariant> pqAnimationTimeWidget::timestepValues()
+{
+  return this->Internals->TimeDataList;
+}
+
+//-----------------------------------------------------------------------------
 double pqAnimationTimeWidget::timeValue() const
 {
   Ui::AnimationTimeWidget& ui = this->Internals->Ui;
@@ -233,7 +244,7 @@ void pqAnimationTimeWidget::setTimePrecision(int val)
 {
   this->Internals->Precision = val;
   this->setTimeValue(this->timeValue());
-  this->repopulateTimeComboBox();
+  this->setTimestepValues(this->timestepValues());
 }
 
 //-----------------------------------------------------------------------------
@@ -250,7 +261,7 @@ void pqAnimationTimeWidget::setTimeNotation(const QChar& notation)
   {
     this->Internals->TimeNotation = notation;
     this->setTimeValue(this->timeValue());
-    this->repopulateTimeComboBox();
+    this->setTimestepValues(this->timestepValues());
   }
 }
 
@@ -276,7 +287,7 @@ void pqAnimationTimeWidget::setTimeStepCount(int value)
     vtkSMTimeKeeperProxy::GetLowerBoundTimeStepIndex(this->timeKeeper(), this->timeValue()));
   ui.timestepValue->blockSignals(prev);
 
-  this->repopulateTimeComboBox();
+  this->setTimestepValues(this->timestepValues());
   this->updateTimestepCountLabelVisibility();
 }
 
@@ -364,28 +375,23 @@ bool pqAnimationTimeWidget::playModeReadOnly() const
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationTimeWidget::repopulateTimeComboBox()
+void pqAnimationTimeWidget::setTimestepValues(const QList<QVariant>& list)
 {
-  if (this->timeKeeper() == nullptr)
-  {
-    return;
-  }
-
   double currentTimeValue = this->timeValue();
   Ui::AnimationTimeWidget& ui = this->Internals->Ui;
 
-  vtkSMPropertyHelper helper(this->timeKeeper(), "TimestepValues");
   bool prev = ui.timeValueComboBox->blockSignals(true);
   ui.timeValueComboBox->clear();
 
-  for (unsigned int index = 0; index < helper.GetNumberOfElements(); index++)
+  for (const auto& value : list)
   {
-    QString textValue = this->formatDouble(helper.GetAsDouble(index));
-    ui.timeValueComboBox->addItem(textValue, helper.GetAsDouble(index));
+    double val = value.toDouble();
+    ui.timeValueComboBox->addItem(this->formatDouble(val), val);
   }
   ui.timeValueComboBox->blockSignals(prev);
-
+  this->timeComboBoxChanged();
   this->setTimeValue(currentTimeValue);
+  this->Internals->TimeDataList = list;
 }
 
 //-----------------------------------------------------------------------------
