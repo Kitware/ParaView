@@ -129,7 +129,7 @@ private:
 private:
   pqMemoryInspectorPanelUI* Ui;
 
-  int ClientOnly;
+  bool ClientOnly;
   HostData* ClientHost;
   int ClientSystemType;
   bool StackTraceOnClient;
@@ -149,8 +149,8 @@ private:
   int RenderServerSystemType;
   bool StackTraceOnRenderServer;
 
-  int UpdateEnabled;
-  int PendingUpdate;
+  bool UpdateEnabled;
+  bool PendingUpdate;
   bool AutoUpdate;
 };
 
