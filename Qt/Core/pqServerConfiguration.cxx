@@ -473,15 +473,15 @@ QString pqServerConfiguration::command(double& timeout, double& delay) const
       {
         /* Command explanation :
            /bin/sh : because QProcess can run only a single command at a time
-           echo sshCommand remoteCommand into a temporary script : because MacOS Terminal can only
-           run a
-           single command or a script
+           echo sshCommand remoteCommand into a temporary shell script :
+           because MacOS Terminal can only run a single command or a single script
            ps, pid and kill : because MacOS do not close Terminal app after running the script
            chmod Saved State : When killing an application, MacOS will try to restore its state next
            time it runs. We ensure that this does not happen by changing permissions.
            rm script to clean up at the end.
          */
-        stream << "/bin/sh -c \"tmpFile=`mktemp`; echo \'" << sshFullCommand << " " << execCommand
+        stream << "/bin/sh -c \"tmpFile=`mktemp`; echo \'#!/bin/sh\n"
+               << sshFullCommand << " " << execCommand
                << ";pid=`ps -o ppid= -p $PPID`; ppid=`ps -o ppid= -p $pid`; kill -2 $ppid; exit\'"
                   "> $tmpFile; chmod +x $tmpFile; chmod -rw ~/Library/Saved\\ Application\\ "
                   "State/com.apple.Terminal.savedState/; open -W -n -a Terminal $tmpFile; rm "
