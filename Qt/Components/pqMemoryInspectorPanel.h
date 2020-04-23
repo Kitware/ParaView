@@ -67,6 +67,10 @@ protected slots:
   void EnableUpdate();
 
   // Description:
+  // Clear all member variables and models.
+  void Clear();
+
+  // Description:
   // Update the UI with values from the server(s).
   int Initialize();
 

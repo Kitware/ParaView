@@ -844,8 +844,7 @@ void pqMemoryInspectorPanel::ServerDisconnected()
   cerr << ":::::pqMemoryInspectorPanel:;ServerDisconnected" << endl;
 #endif
 
-  this->ClearClient();
-  this->ClearServers();
+  this->Clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -1039,10 +1038,10 @@ void pqMemoryInspectorPanel::InitializeServerGroup(long long clientPid,
 }
 
 //-----------------------------------------------------------------------------
-int pqMemoryInspectorPanel::Initialize()
+void pqMemoryInspectorPanel::Clear()
 {
 #if defined pqMemoryInspectorPanelDEBUG
-  cerr << ":::::pqMemoryInspectorPanel::Initialize" << endl;
+  cerr << ":::::pqMemoryInspectorPanel::Clear" << endl;
 #endif
 
   this->ClearClient();
@@ -1059,6 +1058,16 @@ int pqMemoryInspectorPanel::Initialize()
   this->StackTraceOnRenderServer = 0;
 
   this->Ui->configView->clear();
+}
+
+//-----------------------------------------------------------------------------
+int pqMemoryInspectorPanel::Initialize()
+{
+#if defined pqMemoryInspectorPanelDEBUG
+  cerr << ":::::pqMemoryInspectorPanel::Initialize" << endl;
+#endif
+
+  this->Clear();
 
   pqServer* server = pqActiveObjects::instance().activeServer();
   if (!server)
