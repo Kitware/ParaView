@@ -700,7 +700,7 @@ pqMemoryInspectorPanel::pqMemoryInspectorPanel(QWidget* pWidget, Qt::WindowFlags
 #endif
 
   this->ClientOnly = 1;
-  this->ClientHost = 0;
+  this->ClientHost = nullptr;
   this->AutoUpdate = true;
   this->UpdateEnabled = 0;
 
@@ -789,7 +789,7 @@ void pqMemoryInspectorPanel::ClearClient()
   {
     delete this->ClientHost;
   }
-  this->ClientHost = 0;
+  this->ClientHost = nullptr;
 }
 
 //-----------------------------------------------------------------------------
