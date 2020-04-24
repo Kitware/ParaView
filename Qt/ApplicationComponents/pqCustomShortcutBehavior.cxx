@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqCustomShortcutBehavior.h"
 
+#include "pqActiveObjects.h"
 #include "pqCustomizeShortcutsDialog.h"
 #include "pqSettings.h"
 
@@ -45,7 +46,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqCustomShortcutBehavior::pqCustomShortcutBehavior(QMainWindow* parentObject)
   : Superclass(parentObject)
 {
-  this->loadMenuItemShortcuts();
+  loadMenuItemShortcuts();
+
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)), this,
+    SLOT(loadMenuItemShortcuts()));
 }
 
 namespace
