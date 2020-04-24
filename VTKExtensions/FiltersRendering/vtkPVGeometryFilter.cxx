@@ -615,9 +615,9 @@ void vtkPVGeometryFilter::CleanupOutputData(vtkPolyData* output, int doCommunica
 //----------------------------------------------------------------------------
 namespace
 {
-static vtkPolyData* vtkPVGeometryFilterMergePieces(vtkMultiPieceDataSet* mp)
+static vtkPolyData* vtkPVGeometryFilterMergePieces(vtkPartitionedDataSet* mp)
 {
-  unsigned int num_pieces = mp->GetNumberOfPieces();
+  unsigned int num_pieces = mp->GetNumberOfPartitions();
   if (num_pieces == 0)
   {
     return nullptr;
@@ -635,7 +635,7 @@ static vtkPolyData* vtkPVGeometryFilterMergePieces(vtkMultiPieceDataSet* mp)
   cell_counts.resize(num_pieces);
   for (unsigned int cc = 0; cc < num_pieces; cc++)
   {
-    vtkPolyData* piece = vtkPolyData::SafeDownCast(mp->GetPiece(cc));
+    vtkPolyData* piece = vtkPolyData::SafeDownCast(mp->GetPartition(cc));
     if (piece && piece->GetNumberOfPoints() > 0)
     {
       inputs.push_back(piece);
@@ -682,10 +682,10 @@ static vtkPolyData* vtkPVGeometryFilterMergePieces(vtkMultiPieceDataSet* mp)
 
   for (unsigned int cc = 0; cc < num_pieces; cc++)
   {
-    mp->SetPiece(cc, NULL);
+    mp->SetPartition(cc, nullptr);
   }
 
-  mp->SetPiece(0, output);
+  mp->SetPartition(0, output);
   output->FastDelete();
 
   vtkInformation* metadata = mp->GetMetaData(static_cast<unsigned int>(0));
@@ -985,10 +985,10 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
   outIter->VisitOnlyLeavesOff();
   outIter->SkipEmptyNodesOn();
 
-  std::vector<vtkMultiPieceDataSet*> pieces_to_merge;
+  std::vector<vtkPartitionedDataSet*> pieces_to_merge;
   for (outIter->InitTraversal(); !outIter->IsDoneWithTraversal(); outIter->GoToNextItem())
   {
-    if (auto piece = vtkMultiPieceDataSet::SafeDownCast(outIter->GetCurrentDataObject()))
+    if (auto piece = vtkPartitionedDataSet::SafeDownCast(outIter->GetCurrentDataObject()))
     {
       pieces_to_merge.push_back(piece);
     }
