@@ -49,6 +49,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCustomShortcutBehavior : public QObject
 public:
   pqCustomShortcutBehavior(QMainWindow* parent = 0);
 
+public slots:
   void loadMenuItemShortcuts();
 
 private:
