@@ -59,10 +59,6 @@ using Ui::pqMemoryInspectorPanelForm;
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
 
-#if QT_VERSION < 0x050000
-#include <QPlastiqueStyle>
-#endif
-
 #include <map>
 using std::map;
 using std::pair;
@@ -127,7 +123,6 @@ enum
 
 namespace
 {
-#if QT_VERSION >= 0x050000
 // ****************************************************************************
 QStyle* getMemoryUseWidgetStyle()
 {
@@ -139,19 +134,6 @@ QStyle* getMemoryUseWidgetStyle()
   static QStyle* style = QStyleFactory::create("fusion");
   return style;
 }
-#else
-// ****************************************************************************
-QPlastiqueStyle* getMemoryUseWidgetStyle()
-{
-  // this sets the style for the progress bar used to
-  // display % memory usage. If we didn't do this the
-  // display will look different on each OS. The ownership
-  // of the style does not change hands when it's set to
-  // the widget thus a single static instance is convenient.
-  static QPlastiqueStyle style;
-  return &style;
-}
-#endif
 // ****************************************************************************
 float getSystemWarningThreshold()
 {
@@ -717,10 +699,10 @@ pqMemoryInspectorPanel::pqMemoryInspectorPanel(QWidget* pWidget, Qt::WindowFlags
   cerr << ":::::pqMemoryInspectorPanel::pqMemoryInspectorPanel" << endl;
 #endif
 
-  this->ClientOnly = 1;
-  this->ClientHost = 0;
+  this->ClientOnly = true;
+  this->ClientHost = nullptr;
   this->AutoUpdate = true;
-  this->UpdateEnabled = 0;
+  this->UpdateEnabled = false;
 
   // Construct Qt form.
   this->Ui = new pqMemoryInspectorPanelUI;
@@ -807,7 +789,7 @@ void pqMemoryInspectorPanel::ClearClient()
   {
     delete this->ClientHost;
   }
-  this->ClientHost = 0;
+  this->ClientHost = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -831,7 +813,7 @@ void pqMemoryInspectorPanel::ClearServer(map<string, HostData*>& hosts, vector<R
 //-----------------------------------------------------------------------------
 void pqMemoryInspectorPanel::ClearServers()
 {
-  this->ClientOnly = 1;
+  this->ClientOnly = true;
   this->ClearServer(this->ServerHosts, this->ServerRanks);
   this->ClearServer(this->DataServerHosts, this->DataServerRanks);
   this->ClearServer(this->RenderServerHosts, this->RenderServerRanks);
@@ -844,8 +826,7 @@ void pqMemoryInspectorPanel::ServerDisconnected()
   cerr << ":::::pqMemoryInspectorPanel:;ServerDisconnected" << endl;
 #endif
 
-  this->ClearClient();
-  this->ClearServers();
+  this->Clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -889,7 +870,7 @@ void pqMemoryInspectorPanel::EnableUpdate()
   cerr << ":::::pqMemoryInspectorPanel::EnableUpdate" << endl;
 #endif
 
-  this->UpdateEnabled = 1;
+  this->UpdateEnabled = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -935,7 +916,7 @@ void pqMemoryInspectorPanel::RenderCompleted()
         // there are two still renders after the last
         // interactive render.
         QTimer::singleShot(2000, this, SLOT(Update()));
-        this->PendingUpdate=1;
+        this->PendingUpdate=true;
         }
       }
     }
@@ -1039,10 +1020,10 @@ void pqMemoryInspectorPanel::InitializeServerGroup(long long clientPid,
 }
 
 //-----------------------------------------------------------------------------
-int pqMemoryInspectorPanel::Initialize()
+void pqMemoryInspectorPanel::Clear()
 {
 #if defined pqMemoryInspectorPanelDEBUG
-  cerr << ":::::pqMemoryInspectorPanel::Initialize" << endl;
+  cerr << ":::::pqMemoryInspectorPanel::Clear" << endl;
 #endif
 
   this->ClearClient();
@@ -1059,6 +1040,16 @@ int pqMemoryInspectorPanel::Initialize()
   this->StackTraceOnRenderServer = 0;
 
   this->Ui->configView->clear();
+}
+
+//-----------------------------------------------------------------------------
+int pqMemoryInspectorPanel::Initialize()
+{
+#if defined pqMemoryInspectorPanelDEBUG
+  cerr << ":::::pqMemoryInspectorPanel::Initialize" << endl;
+#endif
+
+  this->Clear();
 
   pqServer* server = pqActiveObjects::instance().activeServer();
   if (!server)
@@ -1210,11 +1201,11 @@ int pqMemoryInspectorPanel::Initialize()
   configs->Delete();
 
   //
-  this->ClientOnly = 0;
+  this->ClientOnly = false;
   if ((this->RenderServerHosts.size() == 0) && (this->DataServerHosts.size() == 0) &&
     (this->ServerHosts.size() == 0))
   {
-    this->ClientOnly = 1;
+    this->ClientOnly = true;
   }
   else
   {
@@ -1281,8 +1272,8 @@ void pqMemoryInspectorPanel::Update()
   this->UpdateRanks();
   this->UpdateHosts();
 
-  this->PendingUpdate = 0;
-  this->UpdateEnabled = 0;
+  this->PendingUpdate = false;
+  this->UpdateEnabled = false;
 }
 
 //-----------------------------------------------------------------------------
