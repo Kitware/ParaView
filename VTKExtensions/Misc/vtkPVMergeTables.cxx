@@ -14,8 +14,8 @@
 =========================================================================*/
 #include "vtkPVMergeTables.h"
 
-#include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
+#include "vtkCompositeDataSetRange.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -51,13 +51,12 @@ vtkExecutive* vtkPVMergeTables::CreateDefaultExecutive()
 }
 
 //----------------------------------------------------------------------------
-static void vtkPVMergeTablesMerge(vtkTable* output, vtkTable* inputs[], int num_inputs)
+void vtkPVMergeTables::MergeTables(vtkTable* output, const std::vector<vtkTable*>& tables)
 {
   vtkDataSetAttributes::FieldList fields;
-  for (int idx = 0; idx < num_inputs; ++idx)
+  for (auto& curTable : tables)
   {
-    vtkTable* curTable = inputs[idx];
-    if (curTable && curTable->GetNumberOfRows() > 0 && curTable->GetNumberOfColumns() > 0)
+    if (curTable->GetNumberOfRows() > 0 && curTable->GetNumberOfColumns() > 0)
     {
       fields.IntersectFieldList(curTable->GetRowData());
     }
@@ -69,10 +68,10 @@ static void vtkPVMergeTablesMerge(vtkTable* output, vtkTable* inputs[], int num_
   fields.CopyAllocate(outRD, vtkDataSetAttributes::PASSDATA, /*sz=*/0, /*ext=*/0);
 
   vtkIdType outStartRow = 0;
-  for (int idx = 0, fieldsInputIdx = 0; idx < num_inputs; ++idx)
+  int fieldsInputIdx = 0;
+  for (auto& curTable : tables)
   {
-    vtkTable* curTable = inputs[idx];
-    if (!curTable || curTable->GetNumberOfRows() == 0 || curTable->GetNumberOfColumns() == 0)
+    if (curTable->GetNumberOfRows() == 0 || curTable->GetNumberOfColumns() == 0)
     {
       continue;
     }
@@ -89,43 +88,37 @@ static void vtkPVMergeTablesMerge(vtkTable* output, vtkTable* inputs[], int num_
 int vtkPVMergeTables::RequestData(
   vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  int num_connections = this->GetNumberOfInputConnections(0);
-  std::vector<vtkTable*> inputs;
+  auto inputs = vtkPVMergeTables::GetTables(inputVector[0]);
+  auto output = vtkTable::GetData(outputVector, 0);
 
-  // Get output table
-  vtkTable* outputTable = vtkTable::GetData(outputVector, 0);
-  if (vtkTable::GetData(inputVector[0], 0))
+  vtkPVMergeTables::MergeTables(output, inputs);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkTable*> vtkPVMergeTables::GetTables(vtkInformationVector* inputVector)
+{
+  std::vector<vtkTable*> tables;
+  const int numInputs = inputVector->GetNumberOfInformationObjects();
+  for (int inputIdx = 0; inputIdx < numInputs; ++inputIdx)
   {
-    for (int idx = 0; idx < num_connections; ++idx)
+    if (auto table = vtkTable::GetData(inputVector, inputIdx))
     {
-      inputs.push_back(vtkTable::GetData(inputVector[0], idx));
+      tables.push_back(table);
     }
-  }
-  else
-  {
-    for (int idx = 0; idx < num_connections; ++idx)
+    else if (auto cd = vtkCompositeDataSet::GetData(inputVector, inputIdx))
     {
-      vtkCompositeDataSet* inputCD = vtkCompositeDataSet::GetData(inputVector[0], idx);
-      if (!inputCD)
+      using Opts = vtk::CompositeDataSetOptions;
+      for (auto node : vtk::Range(cd, Opts::SkipEmptyNodes))
       {
-        continue;
-      }
-
-      vtkSmartPointer<vtkCompositeDataIterator> iter;
-      iter.TakeReference(inputCD->NewIterator());
-      iter->SkipEmptyNodesOn();
-      for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-      {
-        vtkTable* input = vtkTable::SafeDownCast(inputCD->GetDataSet(iter));
-        if (input)
+        if ((table = vtkTable::SafeDownCast(node.GetDataObject())))
         {
-          inputs.push_back(input);
+          tables.push_back(table);
         }
       }
     }
   }
-  ::vtkPVMergeTablesMerge(outputTable, inputs.data(), static_cast<int>(inputs.size()));
-  return 1;
+  return tables;
 }
 
 //----------------------------------------------------------------------------
