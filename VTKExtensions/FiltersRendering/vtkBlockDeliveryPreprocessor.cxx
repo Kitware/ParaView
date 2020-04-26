@@ -21,6 +21,8 @@
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPartitionedDataSet.h"
+#include "vtkPartitionedDataSetCollection.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
@@ -82,36 +84,48 @@ int vtkBlockDeliveryPreprocessor::RequestDataObject(
     return 0;
   }
 
-  vtkCompositeDataSet* inputCD = vtkCompositeDataSet::GetData(inInfo);
-  vtkDataObject* newOutput = 0;
-
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  if (inputCD)
+  if (vtkPartitionedDataSetCollection::GetData(inInfo))
+  {
+    if (vtkPartitionedDataSetCollection::GetData(outInfo))
+    {
+      return 1;
+    }
+
+    vtkNew<vtkPartitionedDataSetCollection> output;
+    outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
+    return 1;
+  }
+  else if (vtkPartitionedDataSet::GetData(inInfo))
+  {
+    if (vtkPartitionedDataSet::GetData(outInfo))
+    {
+      return 1;
+    }
+    vtkNew<vtkPartitionedDataSet> output;
+    outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
+    return 1;
+  }
+  else if (vtkCompositeDataSet::GetData(inInfo))
   {
     if (vtkMultiBlockDataSet::GetData(outInfo))
     {
       return 1;
     }
-    newOutput = vtkMultiBlockDataSet::New();
+    vtkNew<vtkMultiBlockDataSet> output;
+    outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
+    return 1;
+  }
+  else if (vtkTable::GetData(outInfo))
+  {
+    return 1;
   }
   else
   {
-    if (vtkTable::GetData(outInfo))
-    {
-      return 1;
-    }
-    newOutput = vtkTable::New();
-  }
-  if (newOutput)
-  {
-    outInfo->Set(vtkDataObject::DATA_OBJECT(), newOutput);
-    newOutput->Delete();
-    this->GetOutputPortInformation(0)->Set(
-      vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
+    vtkNew<vtkTable> output;
+    outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
     return 1;
   }
-
-  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -151,13 +165,14 @@ int vtkBlockDeliveryPreprocessor::RequestData(
     filter = split;
   }
 
-  vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::SafeDownCast(outputDO);
-  if (!output)
+  vtkCompositeDataSet* output = vtkCompositeDataSet::SafeDownCast(outputDO);
+  if (output == nullptr)
   {
     outputDO->ShallowCopy(filter->GetOutputDataObject(0));
     return 1;
   }
 
+  // For composite datasets, we need to add some more meta-data.
   if (this->CompositeDataSetIndices->size() == 0 ||
     (this->CompositeDataSetIndices->size() == 1 && (*this->CompositeDataSetIndices->begin()) == 0))
   {
