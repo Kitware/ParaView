@@ -21,9 +21,12 @@
 #include "vtkCommunicator.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
+#include "vtkDataArrayRange.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkFieldData.h"
+#include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
+#include "vtkLogger.h"
 #include "vtkMarkSelectedRows.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkMultiProcessController.h"
@@ -37,6 +40,7 @@
 #include "vtkSortedTableStreamer.h"
 #include "vtkSplitColumnComponents.h"
 #include "vtkSpreadSheetRepresentation.h"
+#include "vtkStringArray.h"
 #include "vtkTable.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkVariant.h"
@@ -53,9 +57,9 @@ struct OrderByNames : std::binary_function<vtkAbstractArray*, vtkAbstractArray*,
 {
   bool operator()(vtkAbstractArray* a1, vtkAbstractArray* a2)
   {
-    const char* order[] = { "vtkOriginalProcessIds", "vtkCompositeIndexArray", "vtkOriginalIndices",
-      "vtkOriginalCellIds", "vtkOriginalPointIds", "vtkOriginalRowIds", "Structured Coordinates",
-      NULL };
+    const char* order[] = { "vtkBlockNameIndices", "vtkOriginalProcessIds",
+      "vtkCompositeIndexArray", "vtkOriginalIndices", "vtkOriginalCellIds", "vtkOriginalPointIds",
+      "vtkOriginalRowIds", "Structured Coordinates", NULL };
     std::string a1Name = a1->GetName() ? a1->GetName() : "";
     std::string a2Name = a2->GetName() ? a2->GetName() : "";
     int a1Index = VTK_INT_MAX, a2Index = VTK_INT_MAX;
@@ -85,6 +89,27 @@ struct OrderByNames : std::binary_function<vtkAbstractArray*, vtkAbstractArray*,
   }
 };
 
+vtkSmartPointer<vtkAbstractArray> MapBlockNames(vtkAbstractArray* aa_ids, vtkStringArray* names)
+{
+  const auto ids = vtkIdTypeArray::SafeDownCast(aa_ids);
+  if (ids == nullptr || names == nullptr)
+  {
+    return aa_ids;
+  }
+
+  const auto maxNames = names->GetNumberOfTuples();
+
+  vtkNew<vtkStringArray> mappedNames;
+  mappedNames->SetName(ids->GetName());
+  mappedNames->SetNumberOfTuples(ids->GetNumberOfTuples());
+  const auto range = vtk::DataArrayValueRange<1>(ids);
+  std::transform(range.begin(), range.end(), mappedNames->WritePointer(0, ids->GetNumberOfTuples()),
+    [&names, &maxNames](vtkIdType idx) {
+      return (idx >= 0 && idx < maxNames) ? names->GetValue(idx) : vtkStdString();
+    });
+  return mappedNames;
+}
+
 /// internal function to convert any array's name to a user friendly name.
 const char* get_userfriendly_name(
   const char* name, vtkSpreadSheetView* self, bool* converted = nullptr)
@@ -100,6 +125,10 @@ const char* get_userfriendly_name(
       *converted = false;
     }
     return name;
+  }
+  else if (strcmp("vtkBlockNameIndices", name) == 0)
+  {
+    return "Block Name";
   }
   else if (strcmp("vtkOriginalProcessIds", name) == 0)
   {
@@ -147,6 +176,102 @@ const char* get_userfriendly_name(
   }
   return name;
 }
+
+/**
+ * A subclass of vtkPVMergeTables to handle reduction for "vtkBlockNameIndices"
+ * and "vtkBlockNames" arrays correctly.
+ */
+class SpreadSheetViewMergeTables : public vtkPVMergeTables
+{
+public:
+  static SpreadSheetViewMergeTables* New();
+  vtkTypeMacro(SpreadSheetViewMergeTables, vtkPVMergeTables);
+
+protected:
+  SpreadSheetViewMergeTables() = default;
+  ~SpreadSheetViewMergeTables() override = default;
+
+  int RequestData(vtkInformation* req, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override
+  {
+    auto output = vtkTable::GetData(outputVector, 0);
+    auto inputs = vtkPVMergeTables::GetTables(inputVector[0]);
+
+    const bool has_block_names =
+      (inputs.size() && inputs[0]->GetFieldData()->GetAbstractArray("vtkBlockNames"));
+    if (!has_block_names)
+    {
+      return this->Superclass::RequestData(req, inputVector, outputVector);
+    }
+
+    // Reduce vtkBlockNameIndices array correctly.
+    // vtkSortedTableStreamer adds a Row array named "vtkBlockNameIndices" which
+    // is the index for "vtkBlockNames" field array which is the name of the
+    // block. This indirection is used to avoid duplicating strings for all
+    // elements since they don't change for the entire block. However, with MBs
+    // block names are rarely consistent across ranks. So we do this reduction
+    // to build a reduced `vtkBlockNames` array and update the
+    // `vtkBlockNameIndices` accordingly.
+    std::map<std::string, vtkIdType> nameMap;
+    std::vector<vtkTable*> new_inputs(inputs.size(), nullptr);
+    std::transform(inputs.begin(), inputs.end(), new_inputs.begin(), [&nameMap](vtkTable* input) {
+      vtkTable* xformed = vtkTable::New();
+      xformed->ShallowCopy(input);
+
+      auto inIndices = vtkIdTypeArray::SafeDownCast(input->GetColumnByName("vtkBlockNameIndices"));
+      auto inNames =
+        vtkStringArray::SafeDownCast(input->GetFieldData()->GetAbstractArray("vtkBlockNames"));
+      if (!inIndices || !inNames)
+      {
+        return xformed;
+      }
+
+      // insert names in map, if not already present.
+      for (vtkIdType cc = 0, max = inNames->GetNumberOfTuples(); cc < max; ++cc)
+      {
+        nameMap.insert(
+          std::make_pair(inNames->GetValue(cc), static_cast<vtkIdType>(nameMap.size())));
+      }
+
+      vtkNew<vtkIdTypeArray> outIndices;
+      outIndices->SetName("vtkBlockNameIndices");
+      outIndices->SetNumberOfTuples(inIndices->GetNumberOfTuples());
+      auto irange = vtk::DataArrayValueRange<1>(inIndices);
+      auto orange = vtk::DataArrayValueRange<1>(outIndices);
+      std::transform(
+        irange.begin(), irange.end(), orange.begin(), [&nameMap, inNames](const vtkIdType& index) {
+          return nameMap.at(inNames->GetValue(index));
+        });
+
+      xformed->RemoveColumnByName("vtkBlockNameIndices");
+      xformed->AddColumn(outIndices);
+      return xformed;
+    });
+
+    vtkPVMergeTables::MergeTables(output, new_inputs);
+    for (auto input : new_inputs)
+    {
+      input->Delete();
+    }
+    new_inputs.clear();
+
+    vtkNew<vtkStringArray> outNames;
+    outNames->SetName("vtkBlockNames");
+    outNames->SetNumberOfTuples(static_cast<vtkIdType>(nameMap.size()));
+    for (const auto& pair : nameMap)
+    {
+      outNames->SetValue(pair.second, pair.first);
+    }
+    output->GetFieldData()->RemoveArray("vtkBlockNames");
+    output->GetFieldData()->AddArray(outNames);
+    return 1;
+  }
+
+private:
+  SpreadSheetViewMergeTables(const SpreadSheetViewMergeTables&) = delete;
+  void operator=(const SpreadSheetViewMergeTables&) = delete;
+};
+vtkStandardNewMacro(SpreadSheetViewMergeTables);
 }
 
 class vtkSpreadSheetView::vtkInternals
@@ -263,7 +388,7 @@ public:
     return NULL;
   }
 
-  void AddToCache(vtkIdType blockId, vtkTable* data, vtkIdType max)
+  vtkTable* AddToCache(vtkIdType blockId, vtkTable* data, vtkIdType max)
   {
     CacheType::iterator iter = this->CachedBlocks.find(blockId);
     if (iter != this->CachedBlocks.end())
@@ -290,30 +415,38 @@ public:
     vtkTable* clone = vtkTable::New();
 
     // sort columns for better usability.
-    std::vector<vtkAbstractArray*> arrays;
+    std::vector<vtkSmartPointer<vtkAbstractArray> > arrays;
     for (vtkIdType cc = 0; cc < data->GetNumberOfColumns(); cc++)
     {
-      if (data->GetColumn(cc))
+      if (auto column = data->GetColumn(cc))
       {
-        arrays.push_back(data->GetColumn(cc));
+        if (column->GetName() && strcmp(column->GetName(), "vtkBlockNameIndices") == 0)
+        {
+          arrays.push_back(::MapBlockNames(column,
+            vtkStringArray::SafeDownCast(data->GetFieldData()->GetAbstractArray("vtkBlockNames"))));
+        }
+        else
+        {
+          arrays.push_back(column);
+        }
       }
     }
+    // if block-names are present in field-data, create an array
     std::sort(arrays.begin(), arrays.end(), OrderByNames());
-    for (std::vector<vtkAbstractArray*>::iterator viter = arrays.begin(); viter != arrays.end();
-         ++viter)
+    for (const auto& column : arrays)
     {
-      clone->AddColumn(*viter);
+      clone->AddColumn(column);
     }
     info.Dataobject = clone;
     clone->FastDelete();
     info.RecentUseTime.Modified();
     this->CachedBlocks[blockId] = info;
     this->MostRecentlyAccessedBlock = blockId;
-
     if (this->CachedBlocks.size() == 1)
     {
       this->UpdateColumnMetaData(clone);
     }
+    return clone;
   }
 
   /**
@@ -432,10 +565,7 @@ vtkSpreadSheetView::vtkSpreadSheetView()
 
   this->ReductionFilter = vtkReductionFilter::New();
   this->ReductionFilter->SetController(vtkMultiProcessController::GetGlobalController());
-
-  vtkPVMergeTables* post_gather_algo = vtkPVMergeTables::New();
-  this->ReductionFilter->SetPostGatherHelper(post_gather_algo);
-  post_gather_algo->FastDelete();
+  this->ReductionFilter->SetPostGatherHelper(vtkNew<SpreadSheetViewMergeTables>().GetPointer());
 
   this->DeliveryFilter = vtkClientServerMoveData::New();
   this->DeliveryFilter->SetOutputDataType(VTK_TABLE);
@@ -688,7 +818,9 @@ vtkTable* vtkSpreadSheetView::FetchBlock(vtkIdType blockindex)
   if (!block)
   {
     block = this->FetchBlockCallback(blockindex);
-    this->Internals->AddToCache(blockindex, block, 10);
+    // use the block returned from the AddToCache since that is cleaned up
+    // to have columns in correct order.
+    block = this->Internals->AddToCache(blockindex, block, 10);
     this->InvokeEvent(vtkCommand::UpdateEvent, &blockindex);
   }
   return block;
