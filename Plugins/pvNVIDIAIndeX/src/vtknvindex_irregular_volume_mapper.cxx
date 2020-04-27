@@ -70,6 +70,11 @@
 #include "vtknvindex_irregular_volume_mapper.h"
 #include "vtknvindex_utilities.h"
 
+#ifdef USE_KDTREE
+#include "vtkBSPCuts.h"
+#include "vtkKdNode.h"
+#endif
+
 static const int TET_EDGES[6][2] = { { 0, 1 }, { 1, 2 }, { 2, 0 }, { 0, 3 }, { 1, 3 }, { 2, 3 } };
 
 vtkStandardNewMacro(vtknvindex_irregular_volume_mapper);
@@ -592,9 +597,25 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
 
       // Setup scene information.
       if (!m_scene.scene_created())
+      {
+#ifdef USE_KDTREE
+        // Update KDtree subdivision
+        if (m_kd_tree)
+        {
+          vtkKdNode* root = m_kd_tree->GetCuts()->GetKdNodeTree();
+
+          mi::base::Handle<vtknvindex_KDTree_affinity> affinity =
+            m_cluster_properties->get_affinity();
+
+          affinity->build_node(root);
+        }
+#endif
         m_scene.create_scene(ren, vol, dice_transaction, vtknvindex_scene::VOLUME_TYPE_IRREGULAR);
+      }
       else if (m_volume_changed)
+      {
         m_scene.update_volume(dice_transaction, vtknvindex_scene::VOLUME_TYPE_IRREGULAR);
+      }
 
       // Update scene parameters.
       m_scene.update_scene(

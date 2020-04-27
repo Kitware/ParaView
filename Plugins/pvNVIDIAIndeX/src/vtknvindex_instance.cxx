@@ -497,8 +497,9 @@ bool vtknvindex_instance::authenticate_nvindex()
   // No explicit license found, use default free license.
   if (!found_license)
   {
-    index_vendor_key = "NVIDIA IndeX License for ParaView - 20200127 (oem:retail_cloud.20211231)";
-    index_secret_key = "52114b41998feae03e0efd8717ed217fa06341b03e9b424ee653c9235332ff75";
+    index_vendor_key =
+      "NVIDIA IndeX License for Paraview IndeX:PV:Free:v1 - 20200427 (oem:retail_cloud.20220630)";
+    index_secret_key = "10e9ce315607f2d230e82647682d250a176ddd4e3d05c49401b5556a6794c72c";
   }
 
   // Retrieve Flex license path.
@@ -768,24 +769,29 @@ mi::Uint32 vtknvindex_instance::setup_nvindex()
     assert(idebug_configuration.is_valid_interface());
 
     // Don't pre-allocate buffers for rasterizer
-    std::string rasterizer_memory_allocation = "rasterizer_memory_allocation=-1";
-    idebug_configuration->set_option(rasterizer_memory_allocation.c_str());
+    idebug_configuration->set_option("rasterizer_memory_allocation=-1");
 
     // Disable timeseries data prefetch.
-    std::string disable_timeseries_data_prefetch =
-      std::string("timeseries_data_prefetch_disable=1");
-    idebug_configuration->set_option(disable_timeseries_data_prefetch.c_str());
+    idebug_configuration->set_option("timeseries_data_prefetch_disable=1");
 
-    // Temporarily disabling parallel importer.
-    std::string async_subset_load = std::string("async_subset_load=0");
-    idebug_configuration->set_option(async_subset_load.c_str());
+    // Disable IndeX parallel importing, given importeres are already parallelized.
+    idebug_configuration->set_option("async_subset_load=0");
 
     // Use strict domain subdivision only with multiples ranks.
     if (vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() > 1)
-    {
-      std::string use_strict_domain_subdivision = std::string("use_strict_domain_subdivision=1");
-      idebug_configuration->set_option(use_strict_domain_subdivision.c_str());
-    }
+      idebug_configuration->set_option("use_strict_domain_subdivision=1");
+
+#ifdef USE_KDTREE
+    // Enable KDTree affinity
+    idebug_configuration->set_option("use_kdtree_subdivision=1");
+
+    // TODO: Should this be set based on the number of GPUs when no MPI.
+    idebug_configuration->set_option("subdivision_parts=4");
+
+    // Debug KDTree
+    idebug_configuration->set_option("debug_kdtree_subdivision=1");
+    idebug_configuration->set_option("dump_kdtree_subdivision=1");
+#endif
 
     // Use pinned memory for staging buffer (enabled by default).
     if (use_config_file)
@@ -823,8 +829,13 @@ mi::Uint32 vtknvindex_instance::setup_nvindex()
       m_nvindex_interface->register_serializable_class<vtknvindex_sparse_volume_importer>();
     assert(is_registered);
 
+#ifdef USE_KDTREE
+    is_registered = m_nvindex_interface->register_serializable_class<vtknvindex_KDTree_affinity>();
+    assert(is_registered);
+#else
     is_registered = m_nvindex_interface->register_serializable_class<vtknvindex_affinity>();
     assert(is_registered);
+#endif
 
     is_registered =
       m_nvindex_interface->register_serializable_class<vtknvindex_clock_pulse_generator>();

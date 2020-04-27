@@ -60,6 +60,11 @@
 #include "vtknvindex_irregular_volume_representation.h"
 #include "vtknvindex_utilities.h"
 
+#ifdef USE_KDTREE
+#include "vtkBSPCuts.h"
+#include "vtkKdNode.h"
+#endif
+
 //----------------------------------------------------------------------------
 class vtknvindex_irregular_volume_representation::vtkInternals
 {
@@ -264,6 +269,28 @@ int vtknvindex_irregular_volume_representation::RequestData(
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 
+#ifdef USE_KDTREE
+void print_node(vtkKdNode* node, int idx)
+{
+  if (node == NULL)
+    return;
+
+  double bbox[6];
+  node->GetBounds(bbox);
+  int nodeID = node->GetID();
+
+  ERROR_LOG << "Node: " << idx << ", ID: " << nodeID << ", BB: " << bbox[0] << ", " << bbox[2]
+            << ", " << bbox[4] << "; " << bbox[1] << ", " << bbox[3] << ", " << bbox[5];
+
+  // child nodes?
+  if (nodeID == -1)
+  {
+    print_node(node->GetLeft(), 2 * idx + 1);
+    print_node(node->GetRight(), 2 * idx + 2);
+  }
+}
+#endif
+
 //----------------------------------------------------------------------------
 int vtknvindex_irregular_volume_representation::ProcessViewRequest(
   vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo)
@@ -298,6 +325,25 @@ int vtknvindex_irregular_volume_representation::ProcessViewRequest(
     if (kd_tree)
     {
       DefaultMapper->set_domain_kdtree(kd_tree);
+
+#ifdef USE_KDTREE
+      if (m_controller->GetLocalProcessId() == 0)
+      {
+        ERROR_LOG << "KDTree| Num regions: " << kd_tree->GetNumberOfRegions();
+        kd_tree->PrintTree();
+
+        double bounds[6];
+        for (int i = 0; i < kd_tree->GetNumberOfRegions(); i++)
+        {
+          kd_tree->GetRegionBounds(i, bounds);
+          ERROR_LOG << "KDTree| Region[" << i << "]: " << bounds[0] << ", " << bounds[2] << ", "
+                    << bounds[4] << "; " << bounds[1] << ", " << bounds[3] << ", " << bounds[5];
+        }
+
+        vtkKdNode* root = kd_tree->GetCuts()->GetKdNodeTree();
+        print_node(root, 0);
+      }
+#endif
     }
 
     if (inInfo->Has(vtkPVRenderView::USE_LOD()))

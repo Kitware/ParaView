@@ -212,8 +212,14 @@ void vtknvindex_scene::set_visibility(bool visibility)
       // Update scene transformation
       if (visibility)
       {
-        // Reset the affinity information to IndeX in case it changed. Otherwise it will be ignored.
+// Reset the affinity information to IndeX in case it changed. Otherwise it will be ignored.
+
+#ifdef USE_KDTREE
+        mi::base::Handle<vtknvindex_KDTree_affinity> affinity =
+          m_cluster_properties->get_affinity();
+#else
         mi::base::Handle<vtknvindex_affinity> affinity = m_cluster_properties->get_affinity();
+#endif
 
         // NVIDIA IndeX session will take ownership of the affinity.
         affinity->retain();
@@ -281,9 +287,12 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
   if (m_scene_created)
     return;
 
-  // Set the affinity information.
+// Set the affinity information.
+#ifdef USE_KDTREE
+  mi::base::Handle<vtknvindex_KDTree_affinity> affinity = m_cluster_properties->get_affinity();
+#else
   mi::base::Handle<vtknvindex_affinity> affinity = m_cluster_properties->get_affinity();
-
+#endif
   std::ostringstream s;
   affinity->scene_dump_affinity_info(s);
   INFO_LOG << s.str();
@@ -819,8 +828,12 @@ void vtknvindex_scene::update_volume(
     }
   }
 
-  // Set the affinity information.
+// Set the affinity information.
+#ifdef USE_KDTREE
+  mi::base::Handle<vtknvindex_KDTree_affinity> affinity = m_cluster_properties->get_affinity();
+#else
   mi::base::Handle<vtknvindex_affinity> affinity = m_cluster_properties->get_affinity();
+#endif
 
   std::ostringstream s;
   affinity->scene_dump_affinity_info(s);
