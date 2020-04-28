@@ -570,8 +570,7 @@ public:
 
   void updateRegexpWidgets()
   {
-    this->Ui.useRegexp->setEnabled(
-      this->Ui.annotations->isChecked() && this->Ui.annotations->isEnabled());
+    this->Ui.useRegexp->setEnabled(this->Ui.annotations->isEnabled());
     this->Ui.regexpLine->setEnabled(
       this->Ui.useRegexp->isEnabled() && this->Ui.useRegexp->isChecked());
   }
