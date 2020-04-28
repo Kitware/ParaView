@@ -13,7 +13,7 @@
           <Group name="filters" />
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkCompositeDataSet" />
+          <DataType value="vtkNonOverlappingAMR" />
         </DataTypeDomain>
         <Documentation>This property specifies the input of the
         filter.</Documentation>
