@@ -152,6 +152,7 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
   loadPythonModules << "_" << moduleName << ".__file__ = '" << moduleName << ".pyc'" << std::endl;
 
   loadPythonModules << "import sys" << std::endl;
+  loadPythonModules << "sys.dont_write_bytecode = True" << std::endl;
   loadPythonModules << "sys.modules['" << moduleName << "'] = _" << moduleName << std::endl;
 
   loadPythonModules << "_source = \"\"\"" << std::endl;
