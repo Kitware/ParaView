@@ -40,7 +40,12 @@
 
 class vtkMultiProcessController;
 
+#ifdef USE_KDTREE
+class vtknvindex_KDTree_affinity;
+#else
 class vtknvindex_affinity;
+#endif
+
 class vtknvindex_config_settings;
 class vtknvindex_cluster_properties;
 

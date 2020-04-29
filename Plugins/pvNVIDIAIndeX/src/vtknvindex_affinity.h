@@ -1,32 +1,34 @@
 /* Copyright 2020 NVIDIA Corporation. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions
-* are met:
-*  * Redistributions of source code must retain the above copyright
-*    notice, this list of conditions and the following disclaimer.
-*  * Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the
-*    documentation and/or other materials provided with the distribution.
-*  * Neither the name of NVIDIA CORPORATION nor the names of its
-*    contributors may be used to endorse or promote products derived
-*    from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-* PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-* OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *  * Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *  * Neither the name of NVIDIA CORPORATION nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #ifndef vtknvindex_affinity_h
 #define vtknvindex_affinity_h
+
+//#define USE_KDTREE
 
 #include <fstream>
 #include <map>
@@ -38,6 +40,7 @@
 #include <mi/neuraylib/iserializer.h>
 #include <nv/index/iaffinity_information.h>
 
+class vtkKdNode;
 class vtknvindex_host_properties;
 
 // vtknvindex_affinity stores ParaView's spatial subdivision.
@@ -121,6 +124,119 @@ private:
     m_spatial_subdivision; // List of bbox to gpu id/host id mapping from ParaView.
   std::map<mi::Uint32, vtknvindex_host_properties*>
     m_host_info; // The host id to host properties mapping.
+};
+
+class vtknvindex_KDTree_affinity_base
+  : public mi::base::Interface_declare<0x357d6811, 0x7208, 0x4ab3, 0xa6, 0x2f, 0xff, 0xd8, 0xcf,
+      0x75, 0x1b, 0x2, nv::index::IDomain_specific_subdivision_topology>
+{
+};
+
+class vtknvindex_KDTree_affinity
+  : public mi::base::Interface_implement<vtknvindex_KDTree_affinity_base>
+{
+public:
+  vtknvindex_KDTree_affinity();
+  virtual ~vtknvindex_KDTree_affinity();
+
+  // Single affinity mapping from bbox to host_id, gpu_id.
+  struct affinity_struct
+  {
+    affinity_struct()
+      : m_host_id(~0u)
+      , m_gpu_id(~0u)
+    {
+    }
+
+    affinity_struct(
+      const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 host_id, mi::Uint32 gpu_id)
+      : m_bbox(bbox)
+      , m_host_id(host_id)
+      , m_gpu_id(gpu_id)
+    {
+    }
+
+    mi::math::Bbox<mi::Float32, 3> m_bbox;
+    mi::Uint32 m_host_id;
+    mi::Uint32 m_gpu_id;
+  };
+
+  // Single kdtree node struct
+  struct kd_node
+  {
+    kd_node()
+      : m_nodeID(-1)
+    {
+      m_childs[0] = m_childs[1] = 0;
+    }
+
+    mi::math::Bbox<mi::Float32, 3> m_bbox;
+    mi::Sint32 m_nodeID;
+    mi::Sint32 m_childs[2];
+  };
+
+  // Set the host properties.
+  void set_hostinfo(std::map<mi::Uint32, vtknvindex_host_properties*>& host_info);
+
+  // Reset all affinity information.
+  void reset_affinity();
+
+  // Add ParaView's affinity information indicating where the data is located for a given bbox.
+  void add_affinity(
+    const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 host_id = ~0u, mi::Uint32 gpu_id = ~0u);
+
+  // Get the set affinity information for a given bbox.
+  bool get_affinity(const mi::math::Bbox_struct<mi::Float32, 3>& subregion, mi::Uint32& host_id,
+    mi::IString* host_name, mi::Uint32& gpu_id) const override;
+
+  // Get the number of subregions produced by NVIDIA IndeX.
+  mi::Uint32 get_nb_subregions() const override;
+
+  // Get the bounding box associated to a subregion.
+  mi::math::Bbox_struct<mi::Float32, 3> get_subregion(mi::Uint32 index) const override;
+
+  // Get type of topology.
+  mi::Uint32 get_topology_type() const override;
+
+  // Get the total number of nodes of the topology.
+  mi::Uint32 get_nb_nodes() const override;
+
+  // Get the bounding box of the inode.
+  mi::math::Bbox_struct<mi::Float32, 3> get_node_box(mi::Uint32 inode) const override;
+
+  // Get the number of children of an inode.
+  mi::Uint32 get_node_child_count(mi::Uint32 inode) const override;
+
+  // Get a child index of the inode. Return -1 if no child at given ichild slot.
+  mi::Sint32 get_node_child(mi::Uint32 inode, mi::Uint32 ichild) const override;
+
+  // Get index of subregion associated with inode (or -1, if no subregion).
+  mi::Sint32 get_node_subregion_index(mi::Uint32 inode) const override;
+
+  // Builds kd-tree cached data. Returns the node index inside m_kdtree
+  mi::Sint32 build_node(vtkKdNode* vtk_node);
+
+  // Print the affinity information as part of the scene dump.
+  void scene_dump_affinity_info(std::ostringstream& s);
+
+  // DiCE methods
+  mi::base::Uuid get_class_id() const override;
+  void serialize(mi::neuraylib::ISerializer* serializer) const override;
+  void deserialize(mi::neuraylib::IDeserializer* deserializer) override;
+
+private:
+  // Get a gpu id for the given host using robin-round scheme.
+  bool get_gpu_id(mi::Sint32 host_id, mi::Uint32& gpu_id) const;
+
+  mutable std::map<mi::Sint32, mi::Sint32>
+    m_roundrobin_ids; // Used in around-robin scheme to return gpu ids.
+  mutable std::vector<affinity_struct> m_final_spatial_subdivision; // Used only for the scene dump.
+  std::vector<affinity_struct>
+    m_spatial_subdivision; // List of bbox to gpu id/host id mapping from ParaView.
+  std::map<mi::Uint32, vtknvindex_host_properties*>
+    m_host_info; // The host id to host properties mapping.
+
+  std::vector<kd_node> m_kdtree; // ParaView kd-tree nodes cahed in an array.
 };
 
 #endif
