@@ -62,7 +62,7 @@ To build ParaView developement version (usually refered as "master"), please run
 git clone --recursive https://gitlab.kitware.com/paraview/paraview.git
 mkdir paraview_build
 cd paraview_build
-cmake -GNinja -DPARAVIEW_ENABLE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION_TYPE=TBB -DCMAKE_BUILD_TYPE=Release ../paraview
+cmake -GNinja -DPARAVIEW_USE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION_TYPE=TBB -DCMAKE_BUILD_TYPE=Release ../paraview
 ninja
 ```
 
@@ -74,7 +74,7 @@ cd paraview
 git checkout tag
 git submodule update --init --recursive
 cd ../paraview_build
-cmake -GNinja -DPARAVIEW_ENABLE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION_TYPE=TBB -DCMAKE_BUILD_TYPE=Release ../paraview
+cmake -GNinja -DPARAVIEW_USE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION_TYPE=TBB -DCMAKE_BUILD_TYPE=Release ../paraview
 ninja
 ```
 
@@ -128,7 +128,7 @@ git submodule update --init --recursive
  * Open VS2015 x64 Native Tools Command Prompt and run the following commands
 ```sh
 cd C:\pv\pvb
-cmake -GNinja -DPARAVIEW_ENABLE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION_TYPE=OpenMP -DCMAKE_BUILD_TYPE=Release ..\pv
+cmake -GNinja -DPARAVIEW_USE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION_TYPE=OpenMP -DCMAKE_BUILD_TYPE=Release ..\pv
 ninja
 ```
 
