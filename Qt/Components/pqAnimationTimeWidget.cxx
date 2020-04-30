@@ -185,18 +185,22 @@ void pqAnimationTimeWidget::setTimeValue(double time)
 
   QString textValue = this->formatDouble(time);
 
+  bool prev = ui.timeValue->blockSignals(true);
   ui.timeValue->setTextAndResetCursor(textValue);
+  ui.timeValue->blockSignals(prev);
 
   for (int index = 0; index < ui.timeValueComboBox->count(); index++)
   {
     if (ui.timeValueComboBox->itemData(index).toDouble() == time)
     {
+      prev = ui.timeValueComboBox->blockSignals(true);
       ui.timeValueComboBox->setCurrentIndex(index);
+      ui.timeValueComboBox->blockSignals(prev);
       break;
     }
   }
 
-  bool prev = ui.timestepValue->blockSignals(true);
+  prev = ui.timestepValue->blockSignals(true);
   int index = vtkSMTimeKeeperProxy::GetLowerBoundTimeStepIndex(this->timeKeeper(), time);
   ui.timestepValue->setValue(index);
   ui.timestepValue->blockSignals(prev);
@@ -293,14 +297,23 @@ void pqAnimationTimeWidget::setPlayMode(const QString& value)
   Ui::AnimationTimeWidget& ui = this->Internals->Ui;
   if (value == "Sequence" || value == "Real Time")
   {
+    bool prev = ui.radioButtonValue->blockSignals(true);
     ui.radioButtonValue->setChecked(true);
+    ui.radioButtonValue->blockSignals(prev);
     ui.timeValueComboBox->setVisible(false);
+    ui.timestepValue->setVisible(true);
     ui.timeValue->setVisible(true);
+    ui.timeValue->setEnabled(true);
   }
   else if (value == "Snap To TimeSteps")
   {
+    bool prev = ui.radioButtonStep->blockSignals(true);
     ui.radioButtonStep->setChecked(true);
+    ui.radioButtonStep->blockSignals(prev);
     ui.timeValueComboBox->setVisible(true);
+    ui.timeValueComboBox->setEnabled(true);
+    ui.timestepValue->setVisible(true);
+    ui.timestepValue->setEnabled(true);
     ui.timeValue->setVisible(false);
   }
   this->updateTimestepCountLabelVisibility();
