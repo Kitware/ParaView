@@ -190,8 +190,7 @@ if (PARAVIEW_USE_PYTHON AND PARAVIEW_BUILD_TESTING)
   # testing needs Python interpreter i.e. `PYTHON_EXECUTABLE` without which
   # our `find_python_module` checks to determine which tests to add or exclude
   # will fail. We find it here.
-  find_package(PythonInterp 3.3 QUIET)
-  mark_as_advanced(PYTHON_EXECUTABLE)
+  find_package(Python3 3.3 QUIET COMPONENTS Interpreter)
   include(FindPythonModules)
 endif()
 
