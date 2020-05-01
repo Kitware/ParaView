@@ -169,24 +169,28 @@ mark_as_advanced(PARAVIEW_BUILD_CATALYST_ADAPTORS)
 
 
 if (PARAVIEW_USE_PYTHON)
-  set(PARAVIEW_PYTHON_VERSION "3"
-    CACHE STRING "")
-  set_property(CACHE PARAVIEW_PYTHON_VERSION
-    PROPERTY
-      STRINGS "2;3")
-  if (NOT PARAVIEW_PYTHON_VERSION STREQUAL "2" AND
-      NOT PARAVIEW_PYTHON_VERSION STREQUAL "3")
-    message(FATAL_ERROR
-      "`PARAVIEW_PYTHON_VERSION` must either be 2 or 3.")
+  if (DEFINED PARAVIEW_PYTHON_VERSION)
+    if (PARAVIEW_PYTHON_VERSION STREQUAL "3")
+      message(DEPRECATION
+        "Python 2 is no longer supported. Ignoring the explicit "
+        "`PARAVIEW_PYTHON_VERSION=3` request as it is the only valid value "
+        "now.")
+    else ()
+      message(FATAL_ERROR
+        "Python 2 is no longer supported. Please either set "
+        "`PARAVIEW_PYTHON_VERSION=3` or remove the option completely.")
+    endif ()
+    unset(PARAVIEW_PYTHON_VERSION)
+    unset(PARAVIEW_PYTHON_VERSION CACHE)
   endif ()
-  set(VTK_PYTHON_VERSION "${PARAVIEW_PYTHON_VERSION}")
+  set(VTK_PYTHON_VERSION 3)
 endif ()
 
 if (PARAVIEW_USE_PYTHON AND PARAVIEW_BUILD_TESTING)
   # testing needs Python interpreter i.e. `PYTHON_EXECUTABLE` without which
   # our `find_python_module` checks to determine which tests to add or exclude
   # will fail. We find it here.
-  find_package(PythonInterp "${PARAVIEW_PYTHON_VERSION}" QUIET)
+  find_package(PythonInterp 3.3 QUIET)
   mark_as_advanced(PYTHON_EXECUTABLE)
   include(FindPythonModules)
 endif()
@@ -363,9 +367,9 @@ if (PARAVIEW_USE_EXTERNAL_VTK)
   endif ()
 
   if (PARAVIEW_USE_PYTHON)
-    find_package("Python${PARAVIEW_PYTHON_VERSION}" QUIET REQUIRED COMPONENTS Interpreter)
-    set(PYTHON_VERSION_MAJOR "${Python${PARAVIEW_PYTHON_VERSION}_VERSION_MAJOR}")
-    set(PYTHON_VERSION_MINOR "${Python${PARAVIEW_PYTHON_VERSION}_VERSION_MINOR}")
+    find_package(Python3 3.3 QUIET REQUIRED COMPONENTS Interpreter)
+    set(PYTHON_VERSION_MAJOR "${Python3_VERSION_MAJOR}")
+    set(PYTHON_VERSION_MINOR "${Python3_VERSION_MINOR}")
     if (NOT PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX)
       vtk_module_python_default_destination(PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX)
     endif ()
@@ -452,9 +456,9 @@ else ()
   endif ()
 
   if (PARAVIEW_USE_PYTHON)
-    find_package("Python${PARAVIEW_PYTHON_VERSION}" QUIET REQUIRED COMPONENTS Interpreter)
-    set(PYTHON_VERSION_MAJOR "${Python${PARAVIEW_PYTHON_VERSION}_VERSION_MAJOR}")
-    set(PYTHON_VERSION_MINOR "${Python${PARAVIEW_PYTHON_VERSION}_VERSION_MINOR}")
+    find_package("Python3" 3.3 QUIET REQUIRED COMPONENTS Interpreter)
+    set(PYTHON_VERSION_MAJOR "${Python3_VERSION_MAJOR}")
+    set(PYTHON_VERSION_MINOR "${Python3_VERSION_MINOR}")
     if (NOT PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX)
       vtk_module_python_default_destination(PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX)
     endif ()

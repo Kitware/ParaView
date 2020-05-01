@@ -1,10 +1,10 @@
-find_package("Python${PARAVIEW_PYTHON_VERSION}" QUIET REQUIRED COMPONENTS Interpreter)
+find_package(Python3 QUIET REQUIRED COMPONENTS Interpreter)
 
 set(decorator_file "${CMAKE_CURRENT_BINARY_DIR}/pqPluginDecorators.h")
 
 add_custom_command(
   OUTPUT ${decorator_file}
-  COMMAND "Python${PARAVIEW_PYTHON_VERSION}::Interpreter"
+  COMMAND Python3::Interpreter
           "${CMAKE_CURRENT_SOURCE_DIR}/WrapPythonQt.py"
           -i "${CMAKE_CURRENT_SOURCE_DIR}/wrapped_methods.txt"
           -o "${decorator_file}"
