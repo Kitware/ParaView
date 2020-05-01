@@ -9,12 +9,7 @@ from paraview.web import pv_wslink
 from paraview.web import protocols as pv_protocols
 from wslink import server
 
-try:
-    import argparse
-except ImportError:
-    # since  Python 2.6 and earlier don't have argparse, we simply provide
-    # the source for the same as _argparse and we use it instead.
-    from vtk.util import _argparse as argparse
+import argparse
 
 
 # =============================================================================
