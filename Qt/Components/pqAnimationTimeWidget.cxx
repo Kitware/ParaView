@@ -304,14 +304,23 @@ void pqAnimationTimeWidget::setPlayMode(const QString& value)
   Ui::AnimationTimeWidget& ui = this->Internals->Ui;
   if (value == "Sequence" || value == "Real Time")
   {
+    bool prev = ui.radioButtonValue->blockSignals(true);
     ui.radioButtonValue->setChecked(true);
+    ui.radioButtonValue->blockSignals(prev);
     ui.timeValueComboBox->setVisible(false);
+    ui.timestepValue->setVisible(true);
     ui.timeValue->setVisible(true);
+    ui.timeValue->setEnabled(true);
   }
   else if (value == "Snap To TimeSteps")
   {
+    bool prev = ui.radioButtonStep->blockSignals(true);
     ui.radioButtonStep->setChecked(true);
+    ui.radioButtonStep->blockSignals(prev);
     ui.timeValueComboBox->setVisible(true);
+    ui.timeValueComboBox->setEnabled(true);
+    ui.timestepValue->setVisible(true);
+    ui.timestepValue->setEnabled(true);
     ui.timeValue->setVisible(false);
   }
   this->updateTimestepCountLabelVisibility();
