@@ -849,7 +849,7 @@ found and the point will be rejected.</Documentation>
                       name="Input" />
           </RequiredProperties>
         </BoundsDomain>
-        <Documentation>This property defines one end of the direction vector
+        <Documentation>This property defines low end of the direction vector
         (small scalar values).</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty animateable="1"
@@ -866,7 +866,7 @@ found and the point will be rejected.</Documentation>
                       name="Input" />
           </RequiredProperties>
         </BoundsDomain>
-        <Documentation>This property defines the other end of the direction
+        <Documentation>This property defines the high end of the direction
         vector (large scalar values).</Documentation>
       </DoubleVectorProperty>
       <PropertyGroup panel_widget="InteractiveLine">
