@@ -357,9 +357,9 @@
         command="SetOutlineThreshold">
         <IntRangeDomain name="range" min="0" max="500" />
         <Documentation>
-          When opening a dataset or creating a new filters, use Outline representation,
-          if possible, when showing datasets with number of cells greater than thus
-          threshold (in millions).
+          When opening a dataset or creating a new filter that has a number of
+          cells greater than this threshold (in millions), use the Outline
+          representation by default.
         </Documentation>
       </IntVectorProperty>
 
