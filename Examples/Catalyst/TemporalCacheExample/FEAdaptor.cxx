@@ -208,6 +208,7 @@ void Initialize(int argc, char* argv[])
     if (!strcmp(argv[a], "-HOME") && a < argc - 1)
     {
       home = std::string(argv[a + 1]);
+      a += 1;
     }
     else if (!strcmp(argv[a], "-CACHESIZE") && a < argc - 1)
     {
