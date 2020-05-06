@@ -269,7 +269,7 @@
         <Documentation>
           Set the factor used to compute the decimated geometry when employed.
           This affects the size of the grid used for
-          quadric clustering, for example. 1.0 implies maximum resolution while 0
+          quadric clustering. For example, 1.0 implies maximum resolution while 0
           implies minimum resolution.
         </Documentation>
         <Hints>
