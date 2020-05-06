@@ -249,7 +249,6 @@ set(paraview_default_plugins
   FlipBookPlugin
   GenericIOReader
   GeodesicMeasurement
-  GLTFReader
   GMVReader
   HyperTreeGridADR
   LagrangianParticleTracker
