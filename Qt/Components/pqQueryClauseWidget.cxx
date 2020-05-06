@@ -550,9 +550,11 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
       fieldName = "id";
       break;
     case GLOBALID:
-      fieldName = this->MultiQueryWidget->getChosenAttributeInfo()
-                    ->GetAttributeInformation(vtkDataSetAttributes::GLOBALIDS)
-                    ->GetName();
+      fieldName = vtkSMCoreUtilities::SanitizeName(
+                    this->MultiQueryWidget->getChosenAttributeInfo()
+                      ->GetAttributeInformation(vtkDataSetAttributes::GLOBALIDS)
+                      ->GetName())
+                    .c_str();
       break;
     case THRESHOLD:
       pqInternals::ArrayInfo info =
