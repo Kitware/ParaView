@@ -387,7 +387,7 @@ void pqServerConnectDialog::editConfiguration(const pqServerConfiguration& confi
   this->Internals->dataServerHost->setText("localhost");
   this->Internals->dataServerPort->setValue(11111);
   this->Internals->renderServerHost->setText("localhost");
-  this->Internals->renderServerPort->setValue(22222);
+  this->Internals->renderServerPort->setValue(22221);
 
   // Update the interface based on the values in \c configuration.
   int type = CLIENT_SERVER;
