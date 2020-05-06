@@ -2979,7 +2979,7 @@ class ParaViewWebStartupRemoteConnection(ParaViewWebProtocol):
 
     connected = False
 
-    def __init__(self, dsHost = None, dsPort = 11111, rsHost=None, rsPort=22222, rcPort=-1, **kwargs):
+    def __init__(self, dsHost = None, dsPort = 11111, rsHost=None, rsPort=22221, rcPort=-1, **kwargs):
         super(ParaViewWebStartupRemoteConnection, self).__init__()
         if not ParaViewWebStartupRemoteConnection.connected and dsHost:
             ParaViewWebStartupRemoteConnection.connected = True
