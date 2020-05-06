@@ -318,9 +318,10 @@ class Trace(object):
             if pname:
                 accessor = ProxyAccessor(cls.get_varname(pname), obj)
                 filename = obj.FileName
+                # repr() will escape the path correctly, especially backslash on Windows.
                 cls.Output.append_separated([\
                         "# a texture",
-                                             "%s = CreateTexture(\"%s\")" % (accessor, filename)])
+                                             "%s = CreateTexture(%s)" % (accessor, repr(filename))])
             return True
 
         return False
@@ -1242,7 +1243,7 @@ class ExportView(RenderingMixin, TraceItem):
         trace.append("# export view")
         trace.append(\
             exporterAccessor.trace_ctor("ExportView", ExporterProxyFilter(),
-              ctor_args="'%s', view=%s" % (filename, viewAccessor),
+              ctor_args="%s, view=%s" % (repr(filename), viewAccessor),
               skip_assignment=True))
         exporterAccessor.finalize() # so that it will get deleted
         del exporterAccessor
@@ -1266,7 +1267,7 @@ class SaveData(TraceItem):
         trace.append("# save data")
         trace.append(\
             writerAccessor.trace_ctor("SaveData", WriterProxyFilter(),
-              ctor_args="'%s', proxy=%s" % (filename, ctor_args_1),
+              ctor_args="%s, proxy=%s" % (repr(filename), ctor_args_1),
               skip_assignment=True))
         writerAccessor.finalize() # so that it will get deleted.
         del writerAccessor
