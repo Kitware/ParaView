@@ -289,7 +289,7 @@
           Set the radius of the sphere.
         </Documentation>
       </DoubleVectorProperty>
-      <PropertyGroup label="Sphere Parameters" panel_widget="InteractiveSphere">
+      <PropertyGroup label="Point Cloud Parameters" panel_widget="InteractiveSphere">
         <Property function="Center" name="Center" />
         <Property function="Radius" name="Radius" />
         <Property function="Input" name="Input" />
@@ -1529,7 +1529,7 @@
 
   <ProxyGroup name="seed_sources">
     <Proxy group="extended_sources"
-           name="PointSource"/>
+           name="PointCloud"/>
     <Proxy group="extended_sources"
            name="HighResLineSource"/>
   </ProxyGroup>

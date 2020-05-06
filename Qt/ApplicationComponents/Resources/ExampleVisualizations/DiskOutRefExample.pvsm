@@ -1355,7 +1355,7 @@
         <Proxy value="28913"/>
       </Property>
     </Proxy>
-    <Proxy group="extended_sources" type="PointSource" id="28891" servers="1">
+    <Proxy group="extended_sources" type="PointCloud" id="28891" servers="1">
       <Property name="Center" id="28891.Center" number_of_elements="3">
         <Element index="0" value="0"/>
         <Element index="1" value="0"/>

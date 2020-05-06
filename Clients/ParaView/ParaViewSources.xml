@@ -29,7 +29,7 @@
     <Proxy group="sources" name="LineSource" />
     <Proxy group="sources" name="OutlineSource" />
     <Proxy group="sources" name="PlaneSource" />
-    <Proxy group="sources" name="PointSource" />
+    <Proxy group="sources" name="PointCloud" />
     <Proxy group="sources" name="PolyLineSource" />
     <Proxy group="sources" name="PolyPointSource" />
     <Proxy group="sources" name="SphereSource" />

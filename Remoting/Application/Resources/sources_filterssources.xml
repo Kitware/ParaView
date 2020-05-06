@@ -935,8 +935,8 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPointSource"
-                 label="Point Source"
-                 name="PointSource">
+                 label="Point Cloud"
+                 name="PointCloud">
       <Documentation long_help="Create a point cloud of a certain size, radius, and center."
                      short_help="Create a point cloud">The point source creates
                      a specified number of points within a given radius about a
@@ -1008,11 +1008,11 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPolyPointSource"
-                 label="Poly Point Source"
+                 label="Poly Point Cloud"
                  name="PolyPointSource">
       <Documentation long_help="Create polydata from one or more points."
                      short_help="Create polydata from one or more points.">
-        The Poly Point Source creates a poly data of points from an arbitrary
+        The Poly Point Cloud creates a poly data of points from an arbitrary
         number of specified points.
       </Documentation>
       <DoubleVectorProperty command="SetPoint"
@@ -1376,7 +1376,7 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkLineSource"
-                 label="High Resolution Line Source"
+                 label="Line Source"
                  name="HighResLineSource">
       <DoubleVectorProperty animateable="1"
                             command="SetPoint1"
@@ -1473,8 +1473,8 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPointSource"
-                 label="Point Source"
-                 name="PointSource">
+                 label="Point Cloud"
+                 name="PointCloud">
       <DoubleVectorProperty animateable="1"
                             command="SetCenter"
                             default_values="0.0 0.0 0.0"
@@ -1515,7 +1515,7 @@
                      name="DummyInput">
         <!-- Used when this source is added to a proxy list domain. -->
       </InputProperty>
-      <PropertyGroup label="Sphere Parameters" panel_widget="InteractiveSphere">
+      <PropertyGroup label="Point Cloud Parameters" panel_widget="InteractiveSphere">
         <Property function="Center" name="Center" />
         <Property function="Radius" name="Radius" />
         <Property function="Input" name="DummyInput" />
@@ -1530,7 +1530,7 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPointSource"
-                 label="Fixed Radius Point Source"
+                 label="Fixed Radius Point Cloud"
                  name="FixedRadiusPointSource">
       <DoubleVectorProperty animateable="1"
                             command="SetCenter"
@@ -1566,7 +1566,7 @@
                      name="DummyInput">
         <!-- Used when this source is added to a proxy list domain. -->
       </InputProperty>
-      <PropertyGroup label="Sphere Parameters" panel_widget="InteractiveSphere">
+      <PropertyGroup label="Point Cloud Parameters" panel_widget="InteractiveSphere">
         <Property function="Center" name="Center" />
         <Property function="Radius" name="Radius" />
         <Property function="Input" name="DummyInput" />
