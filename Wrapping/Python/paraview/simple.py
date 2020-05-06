@@ -857,6 +857,14 @@ def LocateView(displayProperties=None):
             pass
     return None
 
+def GetSettingsProxy(type):
+    """
+    Given a type as name returns the Proxy for those settings.
+    For example for type=GeneralSettings"""
+    pxm = servermanager.ProxyManager()
+    proxy =  pxm.GetProxy("settings", type)
+    return proxy
+
 # -----------------------------------------------------------------------------
 
 def GetSources():
