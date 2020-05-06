@@ -67,10 +67,10 @@ exec(code)
 # Get the recreated proxies
 view = FindView("RenderView1")
 view2 = FindView("RenderView2")
-sphere = FindSource("Sphere1")
-glyph = FindSource("Glyph1")
-clip = FindSource("Clip1")
-group = FindSource("GroupDatasets1")
+sphere = FindSource("my sphere")
+glyph = FindSource("my glyph")
+clip = FindSource("my clip")
+group = FindSource("my group")
 
 
 # Test the results
