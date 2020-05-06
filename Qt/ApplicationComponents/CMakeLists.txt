@@ -163,6 +163,7 @@ set(classes
   pqSaveScreenshotReaction
   pqSaveStateReaction
   pqScalarBarVisibilityReaction
+  pqSearchItemReaction
   pqSelectionReaction
   pqSeriesEditorPropertyWidget
   pqServerConnectReaction
