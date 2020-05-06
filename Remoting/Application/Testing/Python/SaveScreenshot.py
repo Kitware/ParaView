@@ -93,7 +93,7 @@ ResetCamera()
 SaveScreenshot(tempdir + "/SaveScreenshotSurface.png", magnification=2)
 
 SetActiveView(lineChartView1)
-p = PlotOverLine(Source = "High Resolution Line Source")
+p = PlotOverLine(Source = "Line Source")
 p.Source.Point1 = [-10.0, -10.0, -10.0]
 p.Source.Point2 = [10.0, 10.0, 10.0]
 p.Source.Resolution = 10
