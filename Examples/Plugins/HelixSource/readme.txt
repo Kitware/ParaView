@@ -1,13 +1,3 @@
-TODO : THIS EXAMPLE PLUGIN IS NOT WORKING
-There is a problem with the python script, the error generated is :
-Traceback (most recent call last):
-  File "<string>", line 20, in <module>
-  File "<string>", line 9, in RequestData
-  TypeError: range() integer end argument expected, got str.
-  Traceback (most recent call last):
-  File "<string>", line 20, in <module>
-  File "<string>", line 9, in RequestData
-
 This example contains:
 
 1.  A server manager xml file (helix.xml) which defines a programmable source 

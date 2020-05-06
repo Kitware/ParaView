@@ -35,33 +35,36 @@
 
      <!-- python script references a variable "numPts" 
           we expose this as a property allowing the user to set it -->
-     <StringVectorProperty
-       name="NumberOfPoints"
-       command="SetParameter"
-       number_of_elements="2"
-       default_values_delimiter=";"
-       default_values="numPts;80">
-     </StringVectorProperty>
-     
+     <IntVectorProperty
+        name="NumberOfPoints"
+        command="SetParameter"
+        number_of_elements="1"
+        animateable="1"
+        initial_string="numPts"
+        default_values="80" >
+     </IntVectorProperty>
+
      <!-- python script references a variable "length" 
           we expose this as a property allowing the user to set it -->
-     <StringVectorProperty
-       name="Length"
-       command="SetParameter"
-       number_of_elements="2"
-       default_values_delimiter=";"
-       default_values="length;2.0">
-     </StringVectorProperty>
-     
+     <DoubleVectorProperty
+        name="Length"
+        command="SetParameter"
+        number_of_elements="1"
+        animateable="1"
+        initial_string="length"
+        default_values="2.0" >
+     </DoubleVectorProperty>
+
      <!-- python script references a variable "rounds" 
           we expose this as a property allowing the user to set it -->
-     <StringVectorProperty
-       name="NumberOfRounds"
-       command="SetParameter"
-       number_of_elements="2"
-       default_values_delimiter=";"
-       default_values="rounds;3">
-     </StringVectorProperty>
+     <IntVectorProperty
+        name="NumberOfRounds"
+        command="SetParameter"
+        number_of_elements="1"
+        animateable="1"
+        initial_string="rounds"
+        default_values="3" >
+     </IntVectorProperty>
 
     <!-- End HelixSource -->
     </SourceProxy>
