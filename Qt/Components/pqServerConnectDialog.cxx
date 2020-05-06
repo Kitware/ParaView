@@ -414,13 +414,13 @@ void pqServerConnectDialog::editConfiguration(const pqServerConfiguration& confi
     this->Internals->dataServerHost->setText(configuration.resource().dataServerHost());
     this->Internals->dataServerPort->setValue(configuration.resource().dataServerPort(11111));
     this->Internals->renderServerHost->setText(configuration.resource().renderServerHost());
-    this->Internals->renderServerPort->setValue(configuration.resource().renderServerPort(22222));
+    this->Internals->renderServerPort->setValue(configuration.resource().renderServerPort(22221));
   }
   else if (scheme == "cdsrsrc")
   {
     type = CLIENT_DATA_SERVER_RENDER_SERVER_REVERSE_CONNECT;
     this->Internals->dataServerPort->setValue(configuration.resource().dataServerPort(11111));
-    this->Internals->renderServerPort->setValue(configuration.resource().renderServerPort(22222));
+    this->Internals->renderServerPort->setValue(configuration.resource().renderServerPort(22221));
 
     // set the host the the remote server name is correct, even if it not used for connecting.
     this->Internals->dataServerHost->setText(configuration.resource().dataServerHost());
