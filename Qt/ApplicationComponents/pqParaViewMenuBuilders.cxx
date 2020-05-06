@@ -509,7 +509,7 @@ void pqParaViewMenuBuilders::buildMacrosMenu(QMenu& menu)
   pqPythonManager* manager = pqPVApplicationCore::instance()->pythonManager();
   if (manager)
   {
-    new pqMacroReaction(menu.addAction("Add new macro...") << pqSetName("actionMacroCreate"));
+    new pqMacroReaction(menu.addAction("Import new macro...") << pqSetName("actionMacroCreate"));
     QMenu* editMenu = menu.addMenu("Edit...");
     QMenu* deleteMenu = menu.addMenu("Delete...");
     menu.addSeparator();
