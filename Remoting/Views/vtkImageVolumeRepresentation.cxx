@@ -31,6 +31,7 @@
 #include "vtkPVRenderView.h"
 #include "vtkPartitionedDataSet.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkRectilinearGrid.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkSmartVolumeMapper.h"
@@ -142,6 +143,7 @@ vtkImageVolumeRepresentation::~vtkImageVolumeRepresentation()
 int vtkImageVolumeRepresentation::FillInputPortInformation(int, vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkImageData");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkRectilinearGrid");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPartitionedDataSet");
   info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
   return 1;
@@ -229,6 +231,22 @@ int vtkImageVolumeRepresentation::RequestData(
         inputVector[0]->GetInformationObject(0), this->WholeExtent);
       this->Cache = cache.GetPointer();
     }
+    else if (auto inputRD = vtkRectilinearGrid::GetData(inputVector[0], 0))
+    {
+      vtkNew<vtkRectilinearGrid> cache;
+      cache->ShallowCopy(inputRD);
+
+      this->Actor->SetEnableLOD(0);
+      this->VolumeMapper->SetInputData(cache);
+
+      this->OutlineSource->SetBounds(cache->GetBounds());
+      this->OutlineSource->GetBounds(this->DataBounds);
+      this->OutlineSource->Update();
+      this->DataSize = cache->GetActualMemorySize();
+      vtkStreamingDemandDrivenPipeline::GetWholeExtent(
+        inputVector[0]->GetInformationObject(0), this->WholeExtent);
+      this->Cache = cache.GetPointer();
+    }
     else if (auto inputPD = vtkPartitionedDataSet::GetData(inputVector[0], 0))
     {
       if (!vtkMultiBlockVolumeMapper::SafeDownCast(this->VolumeMapper))
@@ -241,7 +259,17 @@ int vtkImageVolumeRepresentation::RequestData(
         cache->CopyStructure(inputPD);
         for (unsigned int cc = 0; cc < inputPD->GetNumberOfPartitions(); ++cc)
         {
-          cache->SetPartition(cc, vtkImageData::SafeDownCast(inputPD->GetPartition(cc)));
+          auto partition = inputPD->GetPartition(cc);
+          auto partitionID = vtkImageData::SafeDownCast(partition);
+          auto partitionRG = vtkRectilinearGrid::SafeDownCast(partition);
+          if (partitionID)
+          {
+            cache->SetPartition(cc, partitionID);
+          }
+          else
+          {
+            cache->SetPartition(cc, partitionRG);
+          }
         }
         cache->GetBounds(this->DataBounds);
         this->Cache = cache.GetPointer();
