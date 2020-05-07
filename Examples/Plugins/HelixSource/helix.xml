@@ -12,7 +12,7 @@
          short_help="Creates a helix.">
            This source will execute a python script to produce a helix dataset.
       </Documentation>
-      
+
       <!-- data set type -->
       <IntVectorProperty 
         name="OutputDataSetType" 
@@ -23,45 +23,48 @@
       </IntVectorProperty>
 
       <!-- the script -->
-     <StringVectorProperty 
-        name="Script" 
-        command="SetScript"
-        number_of_elements="1"
-        default_values="import math;&#xa;pdo = self.GetPolyDataOutput()&#xa;&#xa;newPts = vtk.vtkPoints()&#xa;for i in range(0, numPts):&#xa;   x = i*float(length)/float(numPts)&#xa;   y = math.sin(i*rounds*2*math.pi/numPts)&#xa;   z = math.cos(i*rounds*2*math.pi/numPts)&#xa;   newPts.InsertPoint(i, x,y,z)&#xa;&#xa;pdo.SetPoints(newPts)&#xa;aPolyLine = vtk.vtkPolyLine()&#xa;&#xa;aPolyLine.GetPointIds().SetNumberOfIds(numPts)&#xa;for i in range(0,numPts):&#xa;   aPolyLine.GetPointIds().SetId(i, i)&#xa;&#xa;pdo.Allocate(1, 1)&#xa;pdo.InsertNextCell(aPolyLine.GetCellType(), aPolyLine.GetPointIds())&#xa;">
-       <Hints>
-         <Widget type="multi_line"/>
-       </Hints>
-     </StringVectorProperty>
+      <StringVectorProperty
+         name="Script"
+         command="SetScript"
+         number_of_elements="1"
+         default_values="import math;&#xa;pdo = self.GetPolyDataOutput()&#xa;&#xa;newPts = vtk.vtkPoints()&#xa;for i in range(0, numPts):&#xa;   x = i*float(length)/float(numPts)&#xa;   y = math.sin(i*rounds*2*math.pi/numPts)&#xa;   z = math.cos(i*rounds*2*math.pi/numPts)&#xa;   newPts.InsertPoint(i, x,y,z)&#xa;&#xa;pdo.SetPoints(newPts)&#xa;aPolyLine = vtk.vtkPolyLine()&#xa;&#xa;aPolyLine.GetPointIds().SetNumberOfIds(numPts)&#xa;for i in range(0,numPts):&#xa;   aPolyLine.GetPointIds().SetId(i, i)&#xa;&#xa;pdo.Allocate(1, 1)&#xa;pdo.InsertNextCell(aPolyLine.GetCellType(), aPolyLine.GetPointIds())&#xa;">
+        <Hints>
+          <Widget type="multi_line"/>
+        </Hints>
+      </StringVectorProperty>
 
      <!-- python script references a variable "numPts" 
           we expose this as a property allowing the user to set it -->
-     <StringVectorProperty
-       name="NumberOfPoints"
-       command="SetParameter"
-       number_of_elements="2"
-       default_values_delimiter=";"
-       default_values="numPts;80">
-     </StringVectorProperty>
-     
+     <IntVectorProperty
+        name="NumberOfPoints"
+        command="SetParameter"
+        number_of_elements="1"
+        animateable="1"
+        initial_string="numPts"
+        default_values="80" >
+     </IntVectorProperty>
+
      <!-- python script references a variable "length" 
           we expose this as a property allowing the user to set it -->
-     <StringVectorProperty
-       name="Length"
-       command="SetParameter"
-       number_of_elements="2"
-       default_values_delimiter=";"
-       default_values="length;2.0">
-     </StringVectorProperty>
-     
+     <DoubleVectorProperty
+        name="Length"
+        command="SetParameter"
+        number_of_elements="1"
+        animateable="1"
+        initial_string="length"
+        default_values="2.0" >
+     </DoubleVectorProperty>
+
      <!-- python script references a variable "rounds" 
           we expose this as a property allowing the user to set it -->
-     <StringVectorProperty
-       name="NumberOfRounds"
-       command="SetParameter"
-       number_of_elements="2"
-       default_values_delimiter=";"
-       default_values="rounds;3">
-     </StringVectorProperty>
+     <IntVectorProperty
+        name="NumberOfRounds"
+        command="SetParameter"
+        number_of_elements="1"
+        animateable="1"
+        initial_string="rounds"
+        default_values="3" >
+     </IntVectorProperty>
 
     <!-- End HelixSource -->
     </SourceProxy>
