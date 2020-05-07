@@ -115,6 +115,11 @@ public Q_SLOTS:
    */
   QRegularExpression regularExpression();
 
+  /**
+   * Return if annotations should be loaded.
+   */
+  bool loadAnnotations();
+
 Q_SIGNALS:
   /**
    * fired every time a preset is applied.

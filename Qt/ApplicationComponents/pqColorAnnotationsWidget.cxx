@@ -1205,6 +1205,12 @@ void pqColorAnnotationsWidget::setColumnVisibility(
 }
 
 //-----------------------------------------------------------------------------
+bool pqColorAnnotationsWidget::presetLoadAnnotations()
+{
+  return this->Internals->ChoosePresetReaction->loadAnnotations();
+}
+
+//-----------------------------------------------------------------------------
 QRegularExpression pqColorAnnotationsWidget::presetRegularExpression()
 {
   return this->Internals->ChoosePresetReaction->regularExpression();

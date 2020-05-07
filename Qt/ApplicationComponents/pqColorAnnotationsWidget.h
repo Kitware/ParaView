@@ -197,6 +197,11 @@ public:
   void setSelectedAnnotations(const QStringList& annotations);
 
   /**
+   * Get if annotations should be loaded with the preset.
+   */
+  bool presetLoadAnnotations();
+
+  /**
    * Get the regular expression to use to apply the preset.
    */
   QRegularExpression presetRegularExpression();

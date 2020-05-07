@@ -138,7 +138,7 @@
      <item>
       <widget class="QLineEdit" name="regexpLine">
        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This regexp will be applied to seriesName and preset value. If any, first matching group is used, otherwise whole matching. &lt;/p&gt;
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This regexp will be applied to seriesName and preset value. If any, matching groups are used, otherwise whole matching. &lt;/p&gt;
            E.g. series name is `y1 &#x02d3;custom&#x02d2;`, preset have `y1 &#x02d3;generic&#x02d2;` and `z1 &#x02d3;custom&#x02d2;`. Then with the regexp `(.*) &#x02d3;.*&#x02d2;` the `y1 &#x02d3;custom&#x02d2;` series will match with `y1 &#x02d3;generic&#x02d2;`, whereas with `.* (&#x02d3;custom&#x02d2;)` it will match with `z1 &#x02d3;custom&#x02d2;`.
            &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
        </string>
