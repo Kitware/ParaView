@@ -200,13 +200,9 @@ void setMemoryUseWidgetColor(QPalette& palette, float fracUsed, float fracWarn, 
 // ****************************************************************************
 void setWidgetContainerColor(QPalette& palette, int rank)
 {
-  if (rank % 2)
+  if (rank % 2 != 0)
   {
-    palette.setColor(QPalette::Base, QColor(250, 250, 250));
-  }
-  else
-  {
-    palette.setColor(QPalette::Base, QColor(237, 237, 237));
+    palette.setColor(QPalette::Base, palette.alternateBase().color());
   }
 }
 
@@ -372,12 +368,6 @@ void RankData::InitializeMemoryUseWidget()
   QLabel* rank = new QLabel;
   rank->setText(QString("%1").arg(this->Rank));
 
-  QFrame* vline = new QFrame;
-  vline->setFrameStyle(QFrame::VLine | QFrame::Plain);
-
-  QFrame* vline2 = new QFrame;
-  vline2->setFrameStyle(QFrame::VLine | QFrame::Plain);
-
   QLabel* pid = new QLabel;
   pid->setText(QString("%1").arg(this->Pid));
 
@@ -388,16 +378,14 @@ void RankData::InitializeMemoryUseWidget()
 
   QHBoxLayout* l = new QHBoxLayout;
   l->addWidget(rank);
-  l->addWidget(vline);
   l->addWidget(pid);
-  l->addWidget(vline2);
   l->addLayout(w);
   l->setContentsMargins(1, 0, 1, 0);
   l->setSpacing(0);
 
   this->WidgetContainer = new QFrame;
   this->WidgetContainer->setLayout(l);
-  this->WidgetContainer->setFrameStyle(QFrame::Box | QFrame::Plain);
+  this->WidgetContainer->setFrameStyle(QFrame::Plain);
   this->WidgetContainer->setLineWidth(1);
   QFont font(this->WidgetContainer->font());
   font.setPointSize(8);
@@ -406,11 +394,8 @@ void RankData::InitializeMemoryUseWidget()
   QPalette palette(rank->palette());
   ::setWidgetContainerColor(palette, this->Rank);
 
-  rank->setPalette(palette);
-  rank->setAutoFillBackground(true);
-
-  pid->setPalette(palette);
-  pid->setAutoFillBackground(true);
+  this->WidgetContainer->setPalette(palette);
+  this->WidgetContainer->setAutoFillBackground(true);
 
   QFontMetrics fontMet(font);
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))

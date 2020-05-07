@@ -116,7 +116,7 @@ pqViewFrame::pqViewFrame(QWidget* parentObject)
   this->ContextMenu->addAction(this->StandardToolButtons[SplitVertical]->defaultAction());
   this->ContextMenu->addAction(this->StandardToolButtons[Close]->defaultAction());
 
-  this->setBorderColor(QColor("blue"));
+  this->setBorderColor(this->palette().link().color());
   this->Internals->Ui.TitleLabel->installEventFilter(this);
 
   this->setStandardButtons(SplitVertical | SplitHorizontal | Maximize | Close);
