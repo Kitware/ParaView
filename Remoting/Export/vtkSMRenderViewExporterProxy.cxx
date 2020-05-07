@@ -16,6 +16,8 @@
 
 #include "vtkExporter.h"
 #include "vtkObjectFactory.h"
+#include "vtkRenderWindow.h"
+#include "vtkRendererCollection.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSession.h"
@@ -58,8 +60,9 @@ void vtkSMRenderViewExporterProxy::Write()
 
     vtkRenderWindow* renWin = rv->GetRenderWindow();
     exporter->SetRenderWindow(renWin);
+    exporter->SetActiveRenderer(renWin->GetRenderers()->GetFirstRenderer());
     exporter->Write();
-    exporter->SetRenderWindow(0);
+    exporter->SetRenderWindow(nullptr);
     if (rv->GetProperty("RemoteRenderThreshold"))
     {
       vtkSMPropertyHelper(rv, "RemoteRenderThreshold").Set(old_threshold);
