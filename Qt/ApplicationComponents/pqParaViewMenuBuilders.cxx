@@ -664,7 +664,7 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
     (menu.addAction("ParaView Wiki") << pqSetName("actionWiki")));
 
   // ParaView Community Support
-  new pqDesktopServicesReaction(QUrl("http://www.paraview.org/community-support/"),
+  new pqDesktopServicesReaction(QUrl("https://discourse.paraview.org/c/paraview-support"),
     (menu.addAction("ParaView Community Support") << pqSetName("actionCommunitySupport")));
 
   // ParaView Release Notes
