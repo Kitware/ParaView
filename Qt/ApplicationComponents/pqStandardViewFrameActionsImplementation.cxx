@@ -471,6 +471,21 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
     this->connect(selectBlockAction, SIGNAL(toggled(bool)), SLOT(escapeableActionToggled(bool)));
   }
 
+  if (this->isButtonVisible("InteractiveSelectSurfaceCellData", renderView))
+  {
+    QAction* interactiveSelectSurfaceCellDataAction =
+      frame->addTitleBarAction(QIcon(":/pqWidgets/Icons/pqSurfaceSelectionCellDataInteractive.svg"),
+        "Interactive Select Cell Data On");
+    interactiveSelectSurfaceCellDataAction->setObjectName("actionInteractiveSelectSurfaceCellData");
+    interactiveSelectSurfaceCellDataAction->setCheckable(true);
+    new pqRenderViewSelectionReaction(interactiveSelectSurfaceCellDataAction, renderView,
+      pqRenderViewSelectionReaction::SELECT_SURFACE_CELLDATA_INTERACTIVELY, modeGroup);
+    this->connect(interactiveSelectSurfaceCellDataAction, SIGNAL(toggled(bool)),
+      SLOT(escapeableActionToggled(bool)));
+    this->connect(interactiveSelectSurfaceCellDataAction, SIGNAL(toggled(bool)),
+      SLOT(interactiveSelectionToggled(bool)));
+  }
+
   if (this->isButtonVisible("InteractiveSelectSurfacePointData", renderView))
   {
     QAction* interactiveSelectSurfacePointDataAction = frame->addTitleBarAction(
@@ -484,21 +499,6 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
     this->connect(interactiveSelectSurfacePointDataAction, SIGNAL(toggled(bool)),
       SLOT(escapeableActionToggled(bool)));
     this->connect(interactiveSelectSurfacePointDataAction, SIGNAL(toggled(bool)),
-      SLOT(interactiveSelectionToggled(bool)));
-  }
-
-  if (this->isButtonVisible("InteractiveSelectSurfaceCellData", renderView))
-  {
-    QAction* interactiveSelectSurfaceCellDataAction =
-      frame->addTitleBarAction(QIcon(":/pqWidgets/Icons/pqSurfaceSelectionCellDataInteractive.svg"),
-        "Interactive Select Cell Data On");
-    interactiveSelectSurfaceCellDataAction->setObjectName("actionInteractiveSelectSurfaceCellData");
-    interactiveSelectSurfaceCellDataAction->setCheckable(true);
-    new pqRenderViewSelectionReaction(interactiveSelectSurfaceCellDataAction, renderView,
-      pqRenderViewSelectionReaction::SELECT_SURFACE_CELLDATA_INTERACTIVELY, modeGroup);
-    this->connect(interactiveSelectSurfaceCellDataAction, SIGNAL(toggled(bool)),
-      SLOT(escapeableActionToggled(bool)));
-    this->connect(interactiveSelectSurfaceCellDataAction, SIGNAL(toggled(bool)),
       SLOT(interactiveSelectionToggled(bool)));
   }
 
@@ -532,20 +532,6 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
       SLOT(interactiveSelectionToggled(bool)));
   }
 
-  if (this->isButtonVisible("HoveringSurfacePoints", renderView))
-  {
-    QAction* hoveringSurfacePointsAction = frame->addTitleBarAction(
-      QIcon(":/pqWidgets/Icons/pqSurfaceHoveringPoint.svg"), "Hover Points On");
-    hoveringSurfacePointsAction->setObjectName("actionHoveringSurfacePoints");
-    hoveringSurfacePointsAction->setCheckable(true);
-    new pqRenderViewSelectionReaction(hoveringSurfacePointsAction, renderView,
-      pqRenderViewSelectionReaction::SELECT_SURFACE_POINTS_TOOLTIP);
-    this->connect(
-      hoveringSurfacePointsAction, SIGNAL(toggled(bool)), SLOT(escapeableActionToggled(bool)));
-    this->connect(
-      hoveringSurfacePointsAction, SIGNAL(toggled(bool)), SLOT(interactiveSelectionToggled(bool)));
-  }
-
   if (this->isButtonVisible("HoveringSurfaceCells", renderView))
   {
     QAction* hoveringSurfaceCellsAction = frame->addTitleBarAction(
@@ -558,6 +544,20 @@ void pqStandardViewFrameActionsImplementation::addRenderViewActions(
       hoveringSurfaceCellsAction, SIGNAL(toggled(bool)), SLOT(escapeableActionToggled(bool)));
     this->connect(
       hoveringSurfaceCellsAction, SIGNAL(toggled(bool)), SLOT(interactiveSelectionToggled(bool)));
+  }
+
+  if (this->isButtonVisible("HoveringSurfacePoints", renderView))
+  {
+    QAction* hoveringSurfacePointsAction = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqSurfaceHoveringPoint.svg"), "Hover Points On");
+    hoveringSurfacePointsAction->setObjectName("actionHoveringSurfacePoints");
+    hoveringSurfacePointsAction->setCheckable(true);
+    new pqRenderViewSelectionReaction(hoveringSurfacePointsAction, renderView,
+      pqRenderViewSelectionReaction::SELECT_SURFACE_POINTS_TOOLTIP);
+    this->connect(
+      hoveringSurfacePointsAction, SIGNAL(toggled(bool)), SLOT(escapeableActionToggled(bool)));
+    this->connect(
+      hoveringSurfacePointsAction, SIGNAL(toggled(bool)), SLOT(interactiveSelectionToggled(bool)));
   }
 
   if (this->isButtonVisible("Grow Selection", renderView))
