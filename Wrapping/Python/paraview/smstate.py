@@ -1,6 +1,6 @@
 r"""Module for generating a Python state for ParaView.
 This module uses paraview.smtrace to generate a trace for a selected set of
-proxies my mimicking the creating of various pipeline components in sequence.
+proxies by mimicking the creation of various pipeline components in sequence.
 Typical usage of this module is as follows::
 
     from paraview import smstate
@@ -109,7 +109,7 @@ def get_state(propertiesToTraceOnCreate=RECORD_MODIFIED_PROPERTIES,
     skipHiddenRepresentations=True, skipRenderingComponents=False, source_set=[], filter=None, raw=False):
     """Returns the state string"""
 
-    # essential to ensure any obsolete accessor don't linger can cause havoc
+    # essential to ensure any obsolete accessors don't linger - can cause havoc
     # when saving state following a Python trace session
     # (paraview/paraview#18994)
     import gc
@@ -216,11 +216,15 @@ def get_state(propertiesToTraceOnCreate=RECORD_MODIFIED_PROPERTIES,
             traceitem = smtrace.RegisterPipelineProxy(source)
             traceitem.finalize()
             del traceitem
+            # make sure any name changes are recorded
+            traceitem = smtrace.RenameProxy(source)
+            traceitem.finalize()
+            del traceitem
         trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
     #--------------------------------------------------------------------------
     # Can't decide if the representations should be saved with the pipeline
-    # objects or afterwords, opting for afterwords for now since the topological
+    # objects or afterwards, opting for afterwards for now since the topological
     # sort doesn't guarantee that the representations will follow their sources
     # anyways.
     sorted_representations = [x for x in sorted_proxies_of_interest \
