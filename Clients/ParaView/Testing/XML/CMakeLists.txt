@@ -17,6 +17,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphInput.vtp}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphTree/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphTree.vtm}"
+  "DATA{${paraview_test_data_directory_input}/Data/convergecfd_post_5016_spray.h5}"
   "DATA{${paraview_test_data_directory_input}/Data/cth.vtr}"
   "DATA{${paraview_test_data_directory_input}/Data/cube_1ts_mod.e}"
   "DATA{${paraview_test_data_directory_input}/Data/CubeStringArray.vtk}"
@@ -187,6 +188,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Contour2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Contour3.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ContourCellData.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CONVERGECFDReaderMesh.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CONVERGECFDReaderParcels.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ConvertToMoleculeBonds.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CustomTCoords.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CustomViewpoints.png}"
@@ -546,6 +549,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ColorOpacityTableEditorHistogram.xml
   Connectivity.xml
   Contour.xml
+  CONVERGECFDReader.xml
   DataAxesGrid2X.xml
   EllipseSource.xml
   Ensemble.xml
