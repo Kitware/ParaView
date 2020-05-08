@@ -3998,6 +3998,10 @@
                                            mode="visibility"
                                            property="Representation"
                                            value="Feature Edges" />
+                  <PropertyWidgetDecorator type="GenericDecorator"
+                                           mode="visibility"
+                                           property="Representation"
+                                           value="Stream Lines" />
                 </Expression>
               </PropertyWidgetDecorator>
             </Hints>

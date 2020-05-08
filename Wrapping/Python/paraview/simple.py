@@ -1875,9 +1875,39 @@ def LoadPlugin(filename, remote=True, ns=None):
 
     Otherwise, the new functions will not appear in the global namespace."""
 
-    if not ns:
-        ns = globals()
-    servermanager.LoadPlugin(filename, remote)
+    return LoadPlugins(filename, remote=remote, ns=ns)
+
+# -----------------------------------------------------------------------------
+
+def LoadPlugins(*args, **kwargs):
+    """Loads ParaView plugins and updates this module with new constructors
+    if any. The remote keword argument (default to ``True``) is to specify
+    whether the plugin will be loaded on client (``remote=False``) or on server
+    (``remote=True``). Proxy definition updates are deferred until all plugins
+    have been read, which can be more computationally efficient when multiple
+    plugins are loaded in sequence.
+    If you loaded the simple module with ``from paraview.simple import *``,
+    make sure to pass ``globals()`` as a keyword argument::
+
+        LoadPlugins("myplugin1", "myplugin2", remote=False, ns=globals()) # to load on client
+        LoadPlugins("myplugin", "myplugin2", remote=True, ns=globals())  # to load on server
+        LoadPlugins("myplugin", "myplugin2", ns=globals())     # to load on server
+
+    Otherwise, the new functions will not appear in the global namespace."""
+
+    remote = True
+    if 'remote' in kwargs:
+        remote = kwargs['remote']
+
+    ns = globals()
+    if 'ns' in kwargs and kwargs['ns']:
+        ns = kwargs['ns']
+
+    servermanager.vtkSMProxyManager.GetProxyManager().SetBlockProxyDefinitionUpdates(True)
+    for arg in args:
+        servermanager.LoadPlugin(arg, remote)
+    servermanager.vtkSMProxyManager.GetProxyManager().SetBlockProxyDefinitionUpdates(False)
+    servermanager.vtkSMProxyManager.GetProxyManager().UpdateProxyDefinitions()
     _add_functions(ns)
 
 # -----------------------------------------------------------------------------

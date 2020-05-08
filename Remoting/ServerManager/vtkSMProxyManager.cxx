@@ -71,20 +71,15 @@ vtkSMProxyManager::vtkSMProxyManager()
   this->UndoStackBuilder = NULL;
 
   this->ReaderFactory = vtkSMReaderFactory::New();
-  // Keep track of when proxy definitions change and then if it's a new
-  // reader we add it to ReaderFactory.
-  this->AddObserver(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated, this->ReaderFactory,
-    &vtkSMReaderFactory::UpdateAvailableReaders);
-  this->AddObserver(vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated,
-    this->ReaderFactory, &vtkSMReaderFactory::UpdateAvailableReaders);
-
   this->WriterFactory = vtkSMWriterFactory::New();
+
   // Keep track of when proxy definitions change and then if it's a new
-  // writer we add it to WriterFactory.
-  this->AddObserver(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated, this->WriterFactory,
-    &vtkSMWriterFactory::UpdateAvailableWriters);
-  this->AddObserver(vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated,
-    this->WriterFactory, &vtkSMWriterFactory::UpdateAvailableWriters);
+  // reader or writer we add it to ReaderFactory or WriterFactory.
+  this->BlockProxyDefinitionUpdates = false;
+  this->AddObserver(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated, this,
+    &vtkSMProxyManager::UpdateProxyDefinitions);
+  this->AddObserver(vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated, this,
+    &vtkSMProxyManager::UpdateProxyDefinitions);
 
   // Monitor session creations. If a new session is created and we don't have an
   // active one, we make that new session active.
@@ -235,6 +230,17 @@ vtkSMSessionProxyManager* vtkSMProxyManager::GetActiveSessionProxyManager()
 vtkSMSessionProxyManager* vtkSMProxyManager::GetSessionProxyManager(vtkSMSession* session)
 {
   return session ? session->GetSessionProxyManager() : NULL;
+}
+
+//---------------------------------------------------------------------------
+
+void vtkSMProxyManager::UpdateProxyDefinitions()
+{
+  if (!this->BlockProxyDefinitionUpdates)
+  {
+    this->ReaderFactory->UpdateAvailableReaders();
+    this->WriterFactory->UpdateAvailableWriters();
+  }
 }
 
 //----------------------------------------------------------------------------
