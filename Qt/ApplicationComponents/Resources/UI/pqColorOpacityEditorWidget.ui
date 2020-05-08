@@ -246,7 +246,7 @@
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the control point of the opacity transfer fonction can be "drawn" instead of being placed one by one.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
-      <string>Enable Freehand drawing of the opacity transfer function</string>
+      <string>Enable freehand drawing of opacity transfer function</string>
      </property>
     </widget>
    </item>
