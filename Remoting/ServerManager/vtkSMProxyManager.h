@@ -133,6 +133,11 @@ public:
   const char* GetProxyName(const char* groupname, vtkSMProxy* proxy);
   //@}
 
+  vtkSetMacro(BlockProxyDefinitionUpdates, bool);
+  vtkGetMacro(BlockProxyDefinitionUpdates, bool);
+  vtkBooleanMacro(BlockProxyDefinitionUpdates, bool);
+  void UpdateProxyDefinitions();
+
   //@{
   /**
    * Get/Set the undo-stack builder if the application is using undo-redo
@@ -224,6 +229,8 @@ protected:
   vtkSMPluginManager* PluginManager;
   vtkSMReaderFactory* ReaderFactory;
   vtkSMWriterFactory* WriterFactory;
+
+  bool BlockProxyDefinitionUpdates;
 
 private:
   class vtkPXMInternal;
