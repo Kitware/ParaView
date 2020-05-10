@@ -295,7 +295,7 @@ class Trace(object):
             pname = obj.SMProxy.GetSessionProxyManager().GetProxyName("settings", obj.SMProxy)
             accessor = ProxyAccessor(cls.get_varname(pname), obj)
             cls.Output.append_separated([\
-                "# find source",
+                "# find settings proxy",
                 "%s = GetSettingsProxy('%s')" % (accessor, pname)])
             return True
         if not skip_rendering and obj.GetVTKClassName() == "vtkPVLight":
