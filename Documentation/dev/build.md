@@ -434,10 +434,12 @@ More advanced options:
   * `PARAVIEW_INSTALL_DEVELOPMENT_FILES` (default `ON`): If set, ParaView will
     install its headers, CMake API, etc. into its install tree for use.
   * `PARAVIEW_RELOCATABLE_INSTALL` (default `ON`): If set, the install tree
-    will be relocatable to another path. If unset, the install tree may be tied
-    to the build machine with absolute paths, but finding dependencies in
-    non-standard locations may require work without passing extra information
-    when consuming ParaView.
+    will be relocatable to another path or machine. External dependencies
+    needed by ParaView which are in non-standard locations may need manual
+    settings in ParaView-using projects (those which share an install prefix
+    with ParaView should be OK though). If unset, the install tree will include
+    hints for the location of its dependencies which may include
+    build-machine-specific paths in the install tree.
 
 <!--
 These variables should be documented once they're effective again.
