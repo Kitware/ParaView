@@ -59,7 +59,7 @@
     <string>Camera Redo</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+F</string>
+    <string>Ctrl+G</string>
    </property>
   </action>
   <action name="actionChangeInput">
@@ -219,10 +219,24 @@
     <string>Find Data</string>
    </property>
    <property name="toolTip">
-    <string>Find data matching various criteria from the current source (v).</string>
+    <string>Find data matching various criteria from the current source.</string>
    </property>
    <property name="shortcut">
     <string>V</string>
+   </property>
+  </action>
+  <action name="actionSearch">
+   <property name="text">
+    <string>Search in item list</string>
+   </property>
+   <property name="iconText">
+    <string>Search in item list</string>
+   </property>
+   <property name="toolTip">
+    <string>Pops up a search dialog if focus is on an item list</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
    </property>
   </action>
   <action name="actionResetDefaultSettings">
@@ -273,6 +287,7 @@
   <addaction name="actionDelete_All"/>
   <addaction name="separator"/>
   <addaction name="actionQuery"/>
+  <addaction name="actionSearch"/>
   <addaction name="separator"/>
   <addaction name="actionEditSettings"/>
   <addaction name="actionResetDefaultSettings"/>

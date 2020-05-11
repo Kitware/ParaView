@@ -93,6 +93,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSaveDataReaction.h"
 #include "pqSaveScreenshotReaction.h"
 #include "pqSaveStateReaction.h"
+#include "pqSearchItemReaction.h"
 #include "pqServerConnectReaction.h"
 #include "pqServerDisconnectReaction.h"
 #include "pqSetMainWindowTitleReaction.h"
@@ -202,6 +203,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu, pqPropertiesPanel* prope
   new pqCopyReaction(ui.actionPaste, true);
   new pqApplicationSettingsReaction(ui.actionEditSettings);
   new pqDataQueryReaction(ui.actionQuery);
+  new pqSearchItemReaction(ui.actionSearch);
   new pqResetDefaultSettingsReaction(ui.actionResetDefaultSettings);
   new pqSetMainWindowTitleReaction(ui.actionSetMainWindowTitle);
   new pqRenameProxyReaction(ui.actionRename, propertiesPanel);

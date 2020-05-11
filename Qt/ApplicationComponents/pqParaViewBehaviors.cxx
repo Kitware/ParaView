@@ -303,9 +303,6 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
     QShortcut* altSpace = new QShortcut(Qt::ALT + Qt::Key_Space, mainWindow);
     QObject::connect(
       altSpace, SIGNAL(activated()), pqApplicationCore::instance(), SLOT(quickLaunch()));
-    QShortcut* ctrlF = new QShortcut(Qt::CTRL + Qt::Key_F, mainWindow);
-    QObject::connect(
-      ctrlF, SIGNAL(activated()), pqApplicationCore::instance(), SLOT(startSearch()));
   }
 
   if (PQ_IS_BEHAVIOR_ENABLED(LockPanelsBehavior))
