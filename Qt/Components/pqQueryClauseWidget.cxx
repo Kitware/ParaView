@@ -375,6 +375,8 @@ void pqQueryClauseWidget::populateSelectionCondition()
     case INVALID:
       break;
   }
+
+  this->Internals->condition->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
 //-----------------------------------------------------------------------------
