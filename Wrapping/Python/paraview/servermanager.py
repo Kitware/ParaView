@@ -760,14 +760,13 @@ class GenericIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.index >= len(self.Object):
             raise StopIteration
 
         idx = self.index
         self.index += 1
         return self.Object[idx]
-    __next__ = next # Python 3.X compatibility
 
 class VectorProperty(Property):
     """A VectorProperty provides access to one or more values. You can use
@@ -1561,7 +1560,7 @@ class FieldDataInformationIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.index >= self.FieldDataInformation.GetNumberOfArrays():
             raise StopIteration
 
@@ -1571,7 +1570,6 @@ class FieldDataInformationIterator(object):
             return (ai.GetName(), ai)
         else:
             return ai
-    __next__ = next # Python 3.X compatibility
 
 class FieldDataInformation(object):
     """Meta-data for a field of an output object (point data, cell data etc...).
@@ -1883,7 +1881,7 @@ class PropertyIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if not self.SMIterator:
             raise StopIteration
 
@@ -1894,20 +1892,19 @@ class PropertyIterator(object):
         self.PropertyLabel = self.SMIterator.GetPropertyLabel()
         self.SMIterator.Next()
         return self.Proxy.GetProperty(self.Key)
-    __next__ = next # Python 3.X compatibility
 
     def GetProxy(self):
         """Returns the proxy for the property last returned by the call to
-        'next()'"""
+        '__next__()'"""
         return self.Proxy
 
     def GetKey(self):
         """Returns the key for the property last returned by the call to
-        'next()' """
+        '__next__()' """
         return self.Key
 
     def GetProperty(self):
-        """Returns the property last returned by the call to 'next()' """
+        """Returns the property last returned by the call to '__next__()' """
         return self.Proxy.GetProperty(self.Key)
 
     def __getattr__(self, name):
@@ -1930,7 +1927,7 @@ class ProxyDefinitionIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.SMIterator.IsDoneWithTraversal():
             self.Group = None
             self.Key = None
@@ -1939,16 +1936,15 @@ class ProxyDefinitionIterator(object):
         self.Key = self.SMIterator.GetProxyName()
         self.SMIterator.GoToNextItem()
         return {"group": self.Group, "key":self.Key }
-    __next__ = next # Python 3.X compatibility
 
     def GetProxyName(self):
         """Returns the key for the proxy definition last returned by the call
-        to 'next()' """
+        to '__next__()' """
         return self.Key
 
     def GetGroup(self):
         """Returns the group for the proxy definition last returned by the
-        call to 'next()' """
+        call to '__next__()' """
         return self.Group
 
     def __getattr__(self, name):
@@ -1972,7 +1968,7 @@ class ProxyIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.SMIterator.IsAtEnd():
             self.AProxy = None
             self.Group = None
@@ -1984,20 +1980,19 @@ class ProxyIterator(object):
         self.Key = self.SMIterator.GetKey()
         self.SMIterator.Next()
         return self.AProxy
-    __next__ = next # Python 3.X compatibility
 
     def GetProxy(self):
-        """Returns the proxy last returned by the call to 'next()'"""
+        """Returns the proxy last returned by the call to '__next__()'"""
         return self.AProxy
 
     def GetKey(self):
         """Returns the key for the proxy last returned by the call to
-        'next()' """
+        '__next__()' """
         return self.Key
 
     def GetGroup(self):
         """Returns the group for the proxy last returned by the call to
-        'next()' """
+        '__next__()' """
         return self.Group
 
     def __getattr__(self, name):
@@ -2297,64 +2292,29 @@ def CreateRepresentation(aProxy, view, **extraArgs):
     view.Representations.append(proxy)
     return proxy
 
-if sys.version_info < (3, 3):
-    class ParaViewMetaPathFinder(object):
-        def find_module(self, fullname, path=None):
-            if vtkPVPythonModule.HasModule(fullname):
-                return self
-            return None
+import importlib, importlib.abc
+class ParaViewMetaPathFinder(importlib.abc.MetaPathFinder):
+    def __init__(self):
+        self._loader = ParaViewLoader()
 
-        def load_module(self, fullname):
-            try:
-                return sys.modules[fullname]
-            except KeyError:
-                pass
-
-            info = vtkPVPythonModule.GetModule(fullname)
-            if not info:
-                raise ImportError
-
-            import imp
-            module = imp.new_module(fullname)
-            module.__file__ = "<%s>" % fullname
-            module.__loader__ = self
+    def find_spec(self, fullname, path, target=None):
+        info = vtkPVPythonModule.GetModule(fullname)
+        if info:
+            package = None
             if info.GetIsPackage():
-                module.__path__ = []
-                module.__package__ = fullname
-            else:
-                module.__package__ = fullname.rpartition('.')[0]
+                package = fullname
+            return importlib.machinery.ModuleSpec(fullname, self._loader, is_package=package)
+        return None
 
-            sys.modules[fullname] = module
-            try:
-                exec(info.GetSource(), module.__dict__)
-            except:
-                del sys.modules[fullname]
-                raise
-            return module
-else:
-    import importlib, importlib.abc
-    class ParaViewMetaPathFinder(importlib.abc.MetaPathFinder):
-        def __init__(self):
-            self._loader = ParaViewLoader()
+class ParaViewLoader(importlib.abc.InspectLoader):
+    def _info(self, fullname):
+        return vtkPVPythonModule.GetModule(fullname)
 
-        def find_spec(self, fullname, path, target=None):
-            info = vtkPVPythonModule.GetModule(fullname)
-            if info:
-                package = None
-                if info.GetIsPackage():
-                    package = fullname
-                return importlib.machinery.ModuleSpec(fullname, self._loader, is_package=package)
-            return None
+    def is_package(self, fullname):
+        return self._info(fullname).GetIsPackage()
 
-    class ParaViewLoader(importlib.abc.InspectLoader):
-        def _info(self, fullname):
-            return vtkPVPythonModule.GetModule(fullname)
-
-        def is_package(self, fullname):
-            return self._info(fullname).GetIsPackage()
-
-        def get_source(self, fullname):
-            return self._info(fullname).GetSource()
+    def get_source(self, fullname):
+        return self._info(fullname).GetSource()
 
 def LoadXML(xmlstring):
     """DEPRECATED. Given a server manager XML as a string, parse and process it."""

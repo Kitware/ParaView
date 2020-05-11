@@ -171,8 +171,7 @@ Required:
 Optional dependencies:
 
   * [Python][python]
-    - When using Python 2, at least 2.7 is required
-    - When using Python 3, at least 3.3 is required
+    - At least 3.3 is required
   * [Qt5][qt]
     - Version 5.9 or newer
 
@@ -215,8 +214,8 @@ Linux/Mac, we suggest either [OpenMPI][openmpi] or [MPICH][mpich]. On Windows,
 
 ##### Python
 
-In order to use scripting, [Python][python] is required (versions 2.7 and 3.3).
-Python is also required in order to build ParaViewWeb support.
+In order to use scripting, [Python][python] is required (version 3.3). Python
+is also required in order to build ParaViewWeb support.
 
 ##### OSMesa
 

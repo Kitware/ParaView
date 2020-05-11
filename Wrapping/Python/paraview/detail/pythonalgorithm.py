@@ -502,13 +502,13 @@ def load_plugin(filepath, default_modulename=None):
         modulename = "%s" % os.path.splitext(os.path.basename(filepath))[0]
 
     try:
-        # for Python 3.4+
+        # for Python 3.5+
         from importlib.util import spec_from_file_location, module_from_spec
         spec = spec_from_file_location(modulename, filepath)
         module = module_from_spec(spec)
         spec.loader.exec_module(module)
     except ImportError:
-        # for Python 2.7
+        # for Python 3.3 and 3.4
         import imp
         module = imp.load_source(modulename, filepath)
 
