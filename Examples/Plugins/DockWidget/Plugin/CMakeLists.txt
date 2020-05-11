@@ -15,6 +15,11 @@ list(APPEND interfaces
 list(APPEND sources
   ${dock_sources})
 
+# If UI files are not in the current source or binary directory, they may be
+# searched for by adding its directory to `CMAKE_AUTOUIC_SEARCH_PATHS`.
+list(APPEND CMAKE_AUTOUIC_SEARCH_PATHS
+  "${CMAKE_CURRENT_SOURCE_DIR}/UIs")
+
 paraview_add_plugin(ExampleDockPanel
   VERSION "1.0"
   UI_FILES ExampleDockPanel.ui
