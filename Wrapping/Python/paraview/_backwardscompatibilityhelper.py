@@ -360,6 +360,26 @@ def setattr_fix_value(proxy, pname, value, setter_func):
         else:
             raise NotSupportedException("'FieldAssociation' is using an obsolete "\
                     "value '%s', use `Point Data` or `Cell Data` instead." % value)
+
+    # In 5.9, we changed "High Resolution Line Source" to "Line Source" and "Point Source" to
+    # "Point Cloud"
+    seed_sources_from = ["High Resolution Line Source", "Point Source"]
+    seed_sources_to = ["Line Source", "Point Cloud"]
+    seed_sources_proxyname = ["HighResLineSource", "PointSource"]
+    if value in seed_sources_from and proxy.GetProperty(pname).SMProperty.IsA("vtkSMInputProperty"):
+        domain = proxy.GetProperty(pname).SMProperty.FindDomain("vtkSMProxyListDomain")
+        for i in range(len(seed_sources_to)):
+            if value == seed_sources_from[i]:
+                domain_proxy = domain.FindProxy("extended_sources", seed_sources_proxyname[i])
+                if domain_proxy:
+                    if paraview.compatibility.GetVersion() < 5.9:
+                        value = seed_sources_to[i]
+                        setter_func(proxy, value)
+                        raise Continue()
+                    else:
+                        raise NotSupportedException("%s is an obsolete value. Use %s instead." % (seed_sources_from[i], seed_sources_to[i]))
+
+    # Always keep this line last
     raise ValueError("'%s' is not a valid value for %s!" % (value, pname))
 
 _fgetattr = getattr
