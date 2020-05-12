@@ -157,19 +157,22 @@ void pqFileChooserWidget::chooseFile()
   QString filters = this->Extension;
   filters += ";;All files (*)";
 
-  QString title;
+  QString title = this->Title;
 
-  if (this->UseDirectoryMode)
+  if (title.isEmpty())
   {
-    title = tr("Open Directory:");
-  }
-  else if (this->AcceptAnyFile)
-  {
-    title = tr("Save File:");
-  }
-  else
-  {
-    title = tr("Open File:");
+    if (this->UseDirectoryMode)
+    {
+      title = tr("Open Directory:");
+    }
+    else if (this->AcceptAnyFile)
+    {
+      title = tr("Save File:");
+    }
+    else
+    {
+      title = tr("Open File:");
+    }
   }
 
   pqFileDialog dialog(this->Server, this, title, QString(), filters);

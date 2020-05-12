@@ -161,6 +161,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqFileChooserWidget`.");
     pqFileChooserWidget* chooser = new pqFileChooserWidget(this);
     chooser->setObjectName("FileChooser");
+    chooser->setTitle(QString("Select %1").arg(smProperty->GetXMLLabel()));
 
     // decide whether to allow multiple files
     if (smProperty->GetRepeatable())
@@ -228,7 +229,6 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
     pqServerManagerModel* smm = pqApplicationCore::instance()->getServerManagerModel();
     chooser->setServer(smm->findServer(smProxy->GetSession()));
-
     vbox->addWidget(chooser);
   }
   else if (arrayListDomain)
