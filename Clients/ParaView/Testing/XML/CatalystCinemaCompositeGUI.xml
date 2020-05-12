@@ -62,10 +62,10 @@
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewExtract" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewConfigure" command="activate" arguments="" />
   <!-- Spec B, i.e. dynamically toggleable. -->
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Format/ProxySelectionWidget/frame/ChosenProxyWidget/DeferredRendering/ComboBox" command="activated" arguments="Composable" />
+  <pqevent object="pqClientMainWindow/ExportImageOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Format/ProxySelectionWidget/frame/ChosenProxyWidget/DeferredRendering/ComboBox" command="activated" arguments="Composable" />
   <!-- A name for this View/RenderWindow. -->
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CatalystFilePattern/CatalystFilePattern" command="set_string" arguments="composite_%t.cdb" />
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExportImageOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CatalystFilePattern/CatalystFilePattern" command="set_string" arguments="composite_%t.cdb" />
+  <pqevent object="pqClientMainWindow/ExportImageOptionsDialog/widget/OKButton" command="activate" arguments="" />
 
   <!-- Write out the script." -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
