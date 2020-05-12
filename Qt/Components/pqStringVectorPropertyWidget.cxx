@@ -227,8 +227,16 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       chooser->setExtension(supportedExtensions.join(";;"));
     }
 
-    pqServerManagerModel* smm = pqApplicationCore::instance()->getServerManagerModel();
-    chooser->setServer(smm->findServer(smProxy->GetSession()));
+    if (hints == nullptr || hints->FindNestedElementByName("BrowseLocalFileSystem") == nullptr)
+    {
+      pqServerManagerModel* smm = pqApplicationCore::instance()->getServerManagerModel();
+      chooser->setServer(smm->findServer(smProxy->GetSession()));
+    }
+    else
+    {
+      chooser->setServer(nullptr);
+    }
+
     vbox->addWidget(chooser);
   }
   else if (arrayListDomain)
