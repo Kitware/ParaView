@@ -437,6 +437,8 @@ void pqRenderViewSelectionReaction::beginSelection()
       break;
 
     case CLEAR_SELECTION:
+    case GROW_SELECTION:
+    case SHRINK_SELECTION:
       break;
 
     case SELECT_SURFACE_POINTDATA_INTERACTIVELY:
@@ -764,7 +766,7 @@ void pqRenderViewSelectionReaction::onLeftButtonRelease()
 {
   if (pqRenderViewSelectionReaction::ActiveReaction != this)
   {
-    qWarning("Unexpected call to selectionChanged.");
+    qWarning("Unexpected call to onLeftButtonRelease.");
     return;
   }
 
