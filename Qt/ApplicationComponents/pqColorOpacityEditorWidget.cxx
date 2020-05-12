@@ -1056,7 +1056,7 @@ void pqColorOpacityEditorWidget::setHistogramOutdated()
   this->Internals->HistogramOutdated = true;
   if (this->Internals->Ui.AutomaticDataHistogramComputation->isChecked())
   {
-    this->showDataHistogramClicked(true);
+    this->showDataHistogramClicked(this->showDataHistogram());
   }
   else
   {
