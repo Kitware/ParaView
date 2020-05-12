@@ -93,7 +93,8 @@ pqPreviewMenuManager::pqPreviewMenuManager(QMenu* menu)
   , FirstCustomAction(nullptr)
 {
   QStringList defaultItems;
-  defaultItems << "1280 x 800 (WXGA)"
+  defaultItems << "1280 x 720 (HD)"
+               << "1280 x 800 (WXGA)"
                << "1280 x 1024 (SXGA)"
                << "1600 x 900 (HD+)"
                << "1920 x 1080 (FHD)"
