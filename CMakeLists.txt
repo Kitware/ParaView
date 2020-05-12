@@ -272,7 +272,6 @@ set(paraview_default_plugins
   PanoramicProjectionView
   # ParFlow - Because of dependency to nlohmann_json
   SLACTools
-  SierraPlotTools
   StreamLinesRepresentation
   StreamingParticles
   SurfaceLIC

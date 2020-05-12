@@ -117,7 +117,6 @@ There are four ways for loading plugins:
   <Plugin name="PrismPlugin" auto_load="0"/>
   <Plugin name="PointSprite_Plugin" auto_load="0"/>
   <Plugin name="pvblot" auto_load="0"/>
-  <Plugin name="SierraPlotTools" auto_load="0"/>
   <Plugin name="H5PartReader" auto_load="1"/>
 </Plugins>
 ```
