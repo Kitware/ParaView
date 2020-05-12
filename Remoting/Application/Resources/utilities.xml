@@ -847,15 +847,30 @@
         </Documentation>
       </IntVectorProperty>
 
-      <StringVectorProperty name="RootDirectory"
+      <StringVectorProperty name="DataExtractsRootDirectory"
                             number_of_elements="1"
                             default_values="">
         <FileListDomain name="directory" />
         <Hints>
           <UseDirectoryName/>
+          <AcceptAnyFile />
         </Hints>
         <Documentation>
-          Defines a top level directory where Catalyst output files are placed under.
+          Defines a top level directory where data extracts are placed under.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ImageExtractsRootDirectory"
+                            number_of_elements="1"
+                            default_values="">
+        <FileListDomain name="directory" />
+        <Hints>
+          <UseDirectoryName/>
+          <BrowseLocalFileSystem />
+          <AcceptAnyFile />
+        </Hints>
+        <Documentation>
+          Defines a top level directory where image extracts are placed under.
         </Documentation>
       </StringVectorProperty>
 

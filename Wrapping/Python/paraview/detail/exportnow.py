@@ -167,7 +167,15 @@ class __CinemaACHelper(object):
       def ExportNow(self, time):
           pass
 
-def ExportNow(root_directory,
+def _fixup_and_makedir_if_needed(rootdir):
+    if rootdir and not rootdir.endswith("/"):
+        rootdir = rootdir + "/"
+    if rootdir and not os.path.exists(rootdir):
+        os.makedirs(rootdir)
+    return rootdir
+
+def ExportNow(image_root_directory,
+              data_root_directory,
               file_name_padding,
               make_cinema_table,
               cinema_tracks,
@@ -175,11 +183,9 @@ def ExportNow(root_directory,
               rendering_info):
     """The user facing entry point. Here we get a hold of ParaView's animation controls, step through the animation, and export the things we've been asked to be the caller."""
 
-    CIND = CinemaDHelper(make_cinema_table, root_directory)
-    if root_directory and not root_directory.endswith("/"):
-        root_directory = root_directory + "/"
-    if root_directory and not os.path.exists(root_directory):
-        os.makedirs(root_directory)
+    CIND = CinemaDHelper(make_cinema_table, image_root_directory)
+    image_root_directory = _fixup_and_makedir_if_needed(image_root_directory)
+    data_root_directory = _fixup_and_makedir_if_needed(data_root_directory)
 
     # get a hold of the scene
     spm = servermanager.vtkSMProxyManager.GetProxyManager().GetActiveSessionProxyManager()
@@ -238,9 +244,9 @@ def ExportNow(root_directory,
                     helpers.append(inputproxy)
                 fname = wp.GetProperty("CatalystFilePattern").GetElement(0)
                 if wp.GetXMLName() == "ExodusIIWriter":
-                    fnamefilled = root_directory+fname+padded_tstep
+                    fnamefilled = data_root_directory+fname+padded_tstep
                 else:
-                    fnamefilled = root_directory+fname.replace("%t", padded_tstep)
+                    fnamefilled = data_root_directory+fname.replace("%t", padded_tstep)
 
                 kwargs = {}
                 DataMode = wp.GetProperty("DataMode")
@@ -278,7 +284,7 @@ def ExportNow(root_directory,
             if tstep % freq==0:
                 fname = ssp.GetProperty("CatalystFilePattern").GetElement(0)
                 if fname.endswith("cdb"):
-                    CINAC = __CinemaACHelper(root_directory,
+                    CINAC = __CinemaACHelper(image_root_directory,
                               rendering_info,
                               cinema_tracks,
                               cinema_arrays)
@@ -287,7 +293,7 @@ def ExportNow(root_directory,
                     # don't forget to tell cinema D about it
                     CIND.AppendCViewToCinemaDTable(tnow, "cview_%s"%viewcnt, CINAC.NewFiles)
                 else:
-                    fnamefilled = root_directory+fname.replace("%t", padded_tstep)
+                    fnamefilled = image_root_directory+fname.replace("%t", padded_tstep)
                     # save the screenshot
                     ssp.WriteImage(fnamefilled)
                     # don't forget to tell cinema D about it

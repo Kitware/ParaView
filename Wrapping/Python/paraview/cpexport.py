@@ -28,7 +28,8 @@ rescale_lookuptable=%s
 requestSpecificArrays=%s
 
 # a root directory under which all Catalyst output goes
-rootDirectory='%s'
+imageRootDirectory='%s'
+dataRootDirectory='%s'
 
 # makes a cinema D index table
 make_cinema_table=%s
@@ -89,7 +90,8 @@ from paraview import cpstate
 def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_info,
     padding_amount, rescale_data_range, enable_live_viz, live_viz_frequency,
                            cinema_tracks, cinema_arrays, filename=None, write_start=0,
-                           make_cinema_table=False, root_directory="",
+                           make_cinema_table=False, image_root_directory="",
+                           data_root_directory="",
                            request_specific_arrays=False, force_first_output=False):
     """Returns a string with the generated CoProcessing script based on the
     options specified.
@@ -115,7 +117,9 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
 
     :param filename: if specified, the script is written to the file.
 
-    :param root_directory: if specified, the script will export underneath this directory.
+    :param image_root_directory: if specified, the script will export image extracts underneath this directory.
+
+    :param data_root_directory: if specified, the script will export data extracts underneath this directory.
 
     :param request_specific_arrays: boolean set to true to ask for individual arrays
 
@@ -133,7 +137,8 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
                                   padding_amount,
                                   rescale_data_range,
                                   request_specific_arrays,
-                                  root_directory,
+                                  image_root_directory,
+                                  data_root_directory,
                                   make_cinema_table,
                                   version_str,
                                   pipeline_script,

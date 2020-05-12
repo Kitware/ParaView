@@ -48,14 +48,16 @@
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
 
   <!-- set root directory for interactive export -->
-  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/scrollArea_2/qt_scrollarea_viewport/container/1pqProxyWidget0/RootDirectory/FileChooser/FileLineEdit" command="set_string" arguments="$PARAVIEW_TEST_ROOT/cinema/interactive/CinemaExportFloatFiles.cdb" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/scrollArea_2/qt_scrollarea_viewport/container/1pqProxyWidget0/ImageExtractsRootDirectory/FileChooser/FileLineEdit" command="set_string" arguments="$PARAVIEW_TEST_ROOT/cinema/interactive/CinemaExportFloatFiles.cdb" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/scrollArea_2/qt_scrollarea_viewport/container/1pqProxyWidget0/DataExtractsRootDirectory/FileChooser/FileLineEdit" command="set_string" arguments="$PARAVIEW_TEST_ROOT/cinema/interactive/CinemaExportFloatFiles.cdb" />
 
   <!-- export cinema database -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
   <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionExportImmediate" />
 
   <!-- set root directory for batch export -->
-  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/scrollArea_2/qt_scrollarea_viewport/container/1pqProxyWidget0/RootDirectory/FileChooser/FileLineEdit" command="set_string" arguments="$PARAVIEW_TEST_ROOT/cinema/batch/CinemaExportFloatFiles.cdb" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/scrollArea_2/qt_scrollarea_viewport/container/1pqProxyWidget0/ImageExtractsRootDirectory/FileChooser/FileLineEdit" command="set_string" arguments="$PARAVIEW_TEST_ROOT/cinema/batch/CinemaExportFloatFiles.cdb" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/scrollArea_2/qt_scrollarea_viewport/container/1pqProxyWidget0/DataExtractsRootDirectory/FileChooser/FileLineEdit" command="set_string" arguments="$PARAVIEW_TEST_ROOT/cinema/batch/CinemaExportFloatFiles.cdb" />
 
   <!-- export catalyst script -->
   <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionExportCatalyst" />

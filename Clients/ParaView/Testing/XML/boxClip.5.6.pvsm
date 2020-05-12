@@ -124,9 +124,6 @@
         <Element index="0" value="0"/>
         <Domain name="bool" id="6008.RescaleToDataRange.bool"/>
       </Property>
-      <Property name="RootDirectory" id="6008.RootDirectory" number_of_elements="1">
-        <Element index="0" value=""/>
-      </Property>
       <Property name="SaveDTable" id="6008.SaveDTable" number_of_elements="1">
         <Element index="0" value="0"/>
         <Domain name="bool" id="6008.SaveDTable.bool"/>
