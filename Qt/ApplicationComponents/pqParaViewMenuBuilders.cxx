@@ -121,6 +121,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMainWindow>
 #include <QMenu>
 #include <QProxyStyle>
+#include <QSysInfo>
 
 #include "vtkPVFileInformation.h"
 #include "vtkSMProxyManager.h"
@@ -647,6 +648,16 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   // -----------------
   menu.addSeparator();
 #endif
+
+  // Bug report
+  QString bugReportURL = QString("https://gitlab.kitware.com/paraview/paraview/issues/"
+                                 "new?issue[title]=Bug&issue[description]="
+                                 "OS: %1\nParaView Version: %2\nQt Version: %3\n\nDescription")
+                           .arg(QSysInfo::prettyProductName())
+                           .arg(PARAVIEW_VERSION_FULL)
+                           .arg(QT_VERSION_STR);
+  new pqDesktopServicesReaction(
+    QUrl(bugReportURL), (menu.addAction("Bug Report") << pqSetName("bugReport")));
 
   // About
   new pqAboutDialogReaction(menu.addAction("About...") << pqSetName("actionAbout"));
