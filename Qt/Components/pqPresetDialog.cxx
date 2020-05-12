@@ -1028,7 +1028,8 @@ QRegularExpression pqPresetDialog::regularExpression()
 {
   if (!this->Internals->Ui.useRegexp->isChecked())
   {
-    return QRegularExpression();
+    // create a simple invalid regex
+    return QRegularExpression("[");
   }
 
   auto regexp = QRegularExpression(this->Internals->Ui.regexpLine->text());
