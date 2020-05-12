@@ -12,6 +12,8 @@ DEPENDS
   VTK::CommonMisc
   VTK::FiltersCore
   VTK::FiltersGeneral
+  VTK::FiltersParallelDIY2
+  VTK::ParallelCore
 PRIVATE_DEPENDS
   VTK::CommonCore
   VTK::CommonSystem
