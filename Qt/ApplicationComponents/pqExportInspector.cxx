@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqView.h"
 
+#include "pqPropertiesPanel.h"
 #include "vtkSMExportProxyDepot.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
@@ -71,6 +72,11 @@ public:
     : self(inSelf)
   {
     this->Ui.setupUi(inSelf);
+    auto vbox = new QVBoxLayout(this->Ui.container);
+    vbox->setMargin(pqPropertiesPanel::suggestedMargin());
+    ;
+    vbox->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
+    vbox->addStretch();
     this->GlobalOptionsUI = nullptr;
   }
 
@@ -242,6 +248,9 @@ void pqExportInspector::UpdateGlobalOptions(const QString& searchString)
   vtkSMProxy* globalProxy = ed->GetGlobalOptions();
 
   this->Internals->GlobalOptionsUI = new pqProxyWidget(globalProxy, this->Internals->Ui.container);
+  auto vbox = qobject_cast<QVBoxLayout*>(this->Internals->Ui.container->layout());
+  vbox->insertWidget(0, this->Internals->GlobalOptionsUI);
+
   this->Internals->GlobalOptionsUI->filterWidgets(
     this->Internals->Ui.advanced->isChecked(), searchString);
   this->Internals->GlobalOptionsUI->setApplyChangesImmediately(true);
