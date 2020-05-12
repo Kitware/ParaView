@@ -178,10 +178,6 @@ void pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
 
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(shProxy);
-  vtkSMPropertyHelper(shProxy, "View").Set(viewProxy);
-  vtkSMPropertyHelper(shProxy, "Layout").Set(layout);
-  shProxy->UpdateDefaultsAndVisibilities(filename.toLocal8Bit().data());
-  controller->PostInitializeProxy(shProxy);
 
   if (layout)
   {
@@ -201,6 +197,11 @@ void pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
       vtkSMPropertyHelper(shProxy, "SaveAllViews").Set(1);
     }
   }
+
+  vtkSMPropertyHelper(shProxy, "View").Set(viewProxy);
+  vtkSMPropertyHelper(shProxy, "Layout").Set(layout);
+  shProxy->UpdateDefaultsAndVisibilities(filename.toLocal8Bit().data());
+  controller->PostInitializeProxy(shProxy);
 
   pqProxyWidgetDialog dialog(shProxy, pqCoreUtilities::mainWidget());
   dialog.setObjectName("SaveScreenshotDialog");
