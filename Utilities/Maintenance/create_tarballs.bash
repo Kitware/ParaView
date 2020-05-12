@@ -378,7 +378,7 @@ tree="$( git write-tree )"
 
 info "Generating testing data archive(s)..."
 for format in $formats; do
-    git_archive "$format" "$tree" "ParaViewTestingData-$version" "ParaView-$version" || \
+    git_archive "$format" "$tree" "ParaViewTestingDataStore-$version" "ParaView-$version" || \
         result=1
 done
 
@@ -390,7 +390,7 @@ tree="$( git write-tree )"
 
 info "Generating data archive(s)..."
 for format in $formats; do
-    git_archive "$format" "$tree" "ParaViewData-$version" "ParaView-$version" || \
+    git_archive "$format" "$tree" "ParaViewTestingDataFiles-$version" "ParaView-$version" || \
         result=1
 done
 
