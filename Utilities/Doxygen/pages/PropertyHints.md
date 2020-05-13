@@ -182,7 +182,9 @@ specified to show multiple extensions with different description texts.
 
 By default, the file chooser widget will accept only existing files.
 It is possible to add `<UseDirectoryName/>` in the `<Hints>` section to accept only directories,
-or `<AcceptAnyFile/>` to accept any filename to export data.
+`<AcceptAnyFile/>` to accept any filename to export data, or
+`<BrowseLocalFileSystem/>` to browse local file-system irrespective of the
+connection type.
 
     <StringVectorProperty animateable="0"
                           command="SetQFileName"

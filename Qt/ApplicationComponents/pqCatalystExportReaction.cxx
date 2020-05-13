@@ -81,9 +81,10 @@ static const char* cp_python_export_code = "from paraview import cpexport\n"
                                            "   cinema_arrays={%10},\n"
                                            "   write_start=%11,\n"
                                            "   make_cinema_table=%12,\n"
-                                           "   root_directory='%13',\n"
-                                           "   request_specific_arrays=%14,\n"
-                                           "   force_first_output=%15)\n";
+                                           "   image_root_directory='%13',\n"
+                                           "   data_root_directory='%14',\n"
+                                           "   request_specific_arrays=%15,\n"
+                                           "   force_first_output=%16)\n";
 }
 
 //-----------------------------------------------------------------------------
@@ -115,7 +116,8 @@ void pqCatalystExportReaction::onTriggered()
   QString rendering_info; // a map from the render view name to render output params
   QString rescale_data_range = "False";
   QString make_cinema_table = "False";
-  QString root_directory = "";
+  QString image_root_directory = "";
+  QString data_root_directory = "";
   QString request_specific_arrays = "False";
   QString force_first_output = "False";
 
@@ -152,7 +154,10 @@ void pqCatalystExportReaction::onTriggered()
     vtkSMPropertyHelper(globaloptions, "RescaleToDataRange").GetAsInt(0) == 0 ? "False" : "True";
   make_cinema_table =
     vtkSMPropertyHelper(globaloptions, "SaveDTable").GetAsInt(0) == 0 ? "False" : "True";
-  root_directory = vtkSMPropertyHelper(globaloptions, "RootDirectory").GetAsString(0);
+  image_root_directory =
+    vtkSMPropertyHelper(globaloptions, "ImageExtractsRootDirectory").GetAsString(0);
+  data_root_directory =
+    vtkSMPropertyHelper(globaloptions, "DataExtractsRootDirectory").GetAsString(0);
   request_specific_arrays =
     vtkSMPropertyHelper(globaloptions, "RequestSpecificArrays").GetAsInt(0) == 0 ? "False" : "True";
   force_first_output =
@@ -530,7 +535,8 @@ void pqCatalystExportReaction::onTriggered()
                 .arg(cinema_arrays)
                 .arg(write_start)
                 .arg(make_cinema_table)
-                .arg(root_directory)
+                .arg(image_root_directory)
+                .arg(data_root_directory)
                 .arg(request_specific_arrays)
                 .arg(force_first_output);
 

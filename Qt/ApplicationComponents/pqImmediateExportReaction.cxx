@@ -60,16 +60,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace
 {
 static const char* export_now_code = R"DONTPARSE(
-root_directory='%1'
-file_name_padding=%2
-make_cinema_table=%3
-cinema_tracks={%4}
-cinema_arrays={%5}
-rendering_info={%6}
+image_root_directory='%1'
+data_root_directory='%2'
+file_name_padding=%3
+make_cinema_table=%4
+cinema_tracks={%5}
+cinema_arrays={%6}
+rendering_info={%7}
 
 from paraview.detail import exportnow
 
-exportnow.ExportNow(root_directory, file_name_padding, make_cinema_table, cinema_tracks, cinema_arrays, rendering_info)
+exportnow.ExportNow(image_root_directory, data_root_directory,
+    file_name_padding, make_cinema_table, cinema_tracks,
+    cinema_arrays, rendering_info)
 
 )DONTPARSE";
 }
@@ -95,7 +98,10 @@ void pqImmediateExportReaction::onTriggered()
 
   // global options
   vtkSMProxy* globaloptions = ed->GetGlobalOptions();
-  QString root_directory = vtkSMPropertyHelper(globaloptions, "RootDirectory").GetAsString();
+  QString image_root_directory =
+    vtkSMPropertyHelper(globaloptions, "ImageExtractsRootDirectory").GetAsString();
+  QString data_root_directory =
+    vtkSMPropertyHelper(globaloptions, "DataExtractsRootDirectory").GetAsString();
   int file_name_padding = vtkSMPropertyHelper(globaloptions, "FileNamePadding").GetAsInt();
   QString make_cinema_table =
     vtkSMPropertyHelper(globaloptions, "SaveDTable").GetAsInt(0) == 0 ? "False" : "True";
@@ -408,7 +414,8 @@ void pqImmediateExportReaction::onTriggered()
   else
   {
     QString command = export_now_code;
-    command = command.arg(root_directory)
+    command = command.arg(image_root_directory)
+                .arg(data_root_directory)
                 .arg(file_name_padding)
                 .arg(make_cinema_table)
                 .arg(cinema_tracks)
