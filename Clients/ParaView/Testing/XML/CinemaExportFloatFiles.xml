@@ -44,8 +44,8 @@
 
   <!-- export composable+recolorable float files -->
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewConfigure" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Format/ProxySelectionWidget/frame/ChosenProxyWidget/DeferredRendering/ComboBox" command="activated" arguments="Composable+Recolorable" />
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExportImageOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Format/ProxySelectionWidget/frame/ChosenProxyWidget/DeferredRendering/ComboBox" command="activated" arguments="Composable+Recolorable" />
+  <pqevent object="pqClientMainWindow/ExportImageOptionsDialog/widget/OKButton" command="activate" arguments="" />
 
   <!-- set root directory for interactive export -->
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/scrollArea_2/qt_scrollarea_viewport/container/1pqProxyWidget0/RootDirectory/FileChooser/FileLineEdit" command="set_string" arguments="$PARAVIEW_TEST_ROOT/cinema/interactive/CinemaExportFloatFiles.cdb" />

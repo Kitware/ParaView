@@ -45,10 +45,10 @@
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewExtract" command="set_boolean" arguments="true" />
   <!-- Spec C, i.e. dynamically recolormappable. -->
   <pqevent object="pqClientMainWindow/catalystInspectorDock/ExportInspector/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/viewConfigure" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Format/ProxySelectionWidget/frame/ChosenProxyWidget/DeferredRendering/ComboBox" command="activated" arguments="Composable+Recolorable" />
+  <pqevent object="pqClientMainWindow/ExportImageOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Format/ProxySelectionWidget/frame/ChosenProxyWidget/DeferredRendering/ComboBox" command="activated" arguments="Composable+Recolorable" />
   <!-- A name for this View/RenderWindow. -->
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CatalystFilePattern/CatalystFilePattern" command="set_string" arguments="recolorable_%t.cdb" />
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExportImageOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/CatalystFilePattern/CatalystFilePattern" command="set_string" arguments="recolorable_%t.cdb" />
+  <pqevent object="pqClientMainWindow/ExportImageOptionsDialog/widget/OKButton" command="activate" arguments="" />
 
   <!-- Write out the script. -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
