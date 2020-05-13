@@ -72,6 +72,11 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/elements.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/ensemble-wavelet/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/filters.xml}"
+  "DATA{${paraview_test_data_directory_input}/Data/glTF/AnimatedMorphCube/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/glTF/BoxAnimated/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/glTF/InterpolationTest/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/glTF/Triangle/Triangle.glb}"
+  "DATA{${paraview_test_data_directory_input}/Data/glTF/SimpleSkin/SimpleSkin.gltf}"
   "DATA{${paraview_test_data_directory_input}/Data/iron_protein.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/linesPolydata.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/manyTypes.vtu}"
@@ -228,6 +233,18 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialogNaN.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FreezeQueryMultiblock.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ForceTimeDiamond.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderTriangle.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderAnimatedMorphing.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderAnimatedMorphing_IsLoaded.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderMultipleScenes_IsLoaded.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderMultipleScenes_SceneOne.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderMultipleScenes.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderMultipleAnimations_IsLoaded.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderMultipleAnimations_ThreeAnimations.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderMultipleAnimations.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderToggleDeformation_IsLoaded.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderToggleDeformation_IsSkinned.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/glTFReaderToggleDeformation.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Glyph3DRepresentation_Cylinder.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Glyph3DRepresentation_Cylinder_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/GlyphWithEmptyCells_A.png}"
@@ -779,6 +796,11 @@ list(APPEND TESTS_WITH_BASELINES
   FollowHiddenData.xml
   ForceTime.xml
   Fractal2D.xml
+  glTFReaderAnimatedMorphing.xml
+  glTFReaderMultipleAnimations.xml
+  glTFReaderMultipleScenes.xml
+  glTFReaderTriangle.xml
+  glTFReaderToggleDeformation.xml
   Glyph3DCullingAndLOD.xml
   Glyph3DRepresentation.xml
   GlyphUseCellCenters.xml

@@ -799,6 +799,107 @@
     </SourceProxy>
 
     <!-- ================================================================== -->
+    <!-- Beginning of glTF Reader -->
+    <SourceProxy
+        class="vtkGLTFReader"
+        name="glTF 2.0 Reader"
+        label="glTF Reader">
+      <Documentation
+          long_help="Read a glTF file."
+          short_help="Read a glTF file">The glTF reader reads a glTF file.</Documentation>
+      <StringVectorProperty
+          name="FileName"
+          command="SetFileName"
+          number_of_elements="1"
+          panel_visibility="never">
+        <FileListDomain name="files" />
+      </StringVectorProperty>
+      <IntVectorProperty
+          name="ApplyDeformationsToGeometry"
+          command="SetApplyDeformationsToGeometry"
+          number_of_elements="1"
+          default_values="1"
+          panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <StringVectorProperty
+          command="GetAllSceneNames"
+          information_only="1"
+          name="SceneNameInfo">
+        <StringArrayHelper />
+      </StringVectorProperty>
+      <StringVectorProperty
+          command="SetScene"
+          name="Scene"
+          number_of_elements="1"
+          default_values="0">
+        <StringListDomain name="SceneList">
+          <RequiredProperties>
+            <Property
+                function="SceneNameInfo"
+                name="SceneNameInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty
+          name="AnimationInfo"
+          command="GetAnimationSelection"
+          number_of_elements_per_command="2"
+          information_only="1"
+          si_class="vtkSIDataArraySelectionProperty" />
+      <StringVectorProperty
+          name="AnimationStatus"
+          command="GetAnimationSelection"
+          information_property="AnimationInfo"
+          number_of_elements_per_command="2"
+          element_types="2 0"
+          repeat_command="1"
+          si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="animation_list">
+          <RequiredProperties>
+            <Property
+                function="AnimationList"
+                name="AnimationInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the animations to enable.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property
+                name="ApplyDeformationsToGeometry"
+                function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <DoubleVectorProperty
+          information_only="1"
+          name="TimestepValues"
+          repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <IntVectorProperty
+          name="Framerate"
+          command="SetFrameRate"
+          number_of_elements="1"
+          default_values="60"
+          panel_visibility="advanced">
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property
+                name="ApplyDeformationsToGeometry"
+                function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <Hints>
+        <ReaderFactory
+            extensions="gltf glb"
+            file_description="glTF 2.0 Files" />
+      </Hints>
+    </SourceProxy>
+    <!-- End of vtkGLTFReader -->
+
+    <!-- ================================================================== -->
     <!-- end of "sources" -->
   </ProxyGroup>
 </ServerManagerConfiguration>
