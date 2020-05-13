@@ -649,11 +649,11 @@ void pqExportInspector::ConfigureScreenshotProxy()
     ed->GetScreenshotProxy(view, viewName.toStdString().c_str(), ssName.toStdString().c_str()));
 
   pqProxyWidgetDialog dialog(ssProxy, pqCoreUtilities::mainWidget());
-  dialog.setObjectName("SaveScreenshotDialog");
+  dialog.setObjectName("ExportImageOptionsDialog");
   dialog.setApplyChangesImmediately(true);
-  dialog.setWindowTitle("Save Screenshot Options");
+  dialog.setWindowTitle("Export Image Options");
   dialog.setEnableSearchBar(true);
-  dialog.setSettingsKey("SaveScreenshotDialog");
+  dialog.setSettingsKey("ExportImageOptionsDialog");
   dialog.exec();
 }
 
