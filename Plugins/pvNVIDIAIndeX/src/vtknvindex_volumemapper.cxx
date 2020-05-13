@@ -153,14 +153,14 @@ bool vtknvindex_volumemapper::prepare_data(mi::Sint32 time_step, vtkVolume* /*vo
   vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Preparing data");
 
   int extent[6];
-  this->GetInput()->GetExtent(extent);
+  vtkImageData* image_piece = vtkImageData::SafeDownCast(this->GetInput());
+  image_piece->GetExtent(extent);
 
   // Get ParaView's volume data
   vtkDataArray* scalar_array = m_scalar_array;
   if (m_cluster_properties->get_regular_volume_properties()->is_timeseries_data())
   {
     // Get the input
-    vtkImageData* image_piece = this->GetInput();
     if (image_piece == NULL)
     {
       ERROR_LOG << "vtkImageData in representation is invalid!";
@@ -215,7 +215,7 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkRenderer* /*ren*/, vtkVolume*
   vol->Update();
 
   // Get the input.
-  vtkImageData* image_piece = this->GetInput();
+  vtkImageData* image_piece = vtkImageData::SafeDownCast(this->GetInput());
   if (image_piece == NULL)
   {
     ERROR_LOG << "vtkImageData in representation is invalid.";
