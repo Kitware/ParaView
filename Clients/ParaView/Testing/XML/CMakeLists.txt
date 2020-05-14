@@ -690,6 +690,7 @@ list(APPEND TESTS_WITH_BASELINES
   ContourCellData.xml
   CopyPasteProperties.xml
   CTHAMRBaseline.xml
+  CTHAMRCellSize.xml
   CTHAMRClip.xml
   CTHAMRContour.xml
   CTHAMRDualClip.xml
