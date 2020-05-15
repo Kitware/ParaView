@@ -2298,9 +2298,29 @@ void vtkPEnSightReader::InsertVariableComponent(vtkFloatArray* array, int i, int
 }
 
 //----------------------------------------------------------------------------
+void vtkPEnSightReader::MapToGlobalIds(
+  const vtkIdType* inputIds, vtkIdType numPoints, int partId, vtkIdType* globalIds)
+{
+  for (vtkIdType i = 0; i < numPoints; i++)
+  {
+    int realId = this->GetPointIds(partId)->GetId(inputIds[i]);
+    if (realId == -1)
+    {
+      this->GetPointIds(partId)->SetId(inputIds[i], this->LastPointId);
+      globalIds[i] = this->LastPointId;
+      this->LastPointId++;
+    }
+    else
+    {
+      globalIds[i] = realId;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPEnSightReader::InsertNextCellAndId(vtkUnstructuredGrid* output, int vtkCellType,
   vtkIdType numPoints, vtkIdType* points, int partId, int ensightCellType, vtkIdType globalId,
-  vtkIdType numElements)
+  vtkIdType numElements, const std::vector<vtkIdType>& faces)
 {
   // Reader is Distributed. Insert If necessary, and keep global Id trace
   // Should be based on pointIds, aka points, but for now it is based on globalId
@@ -2308,27 +2328,36 @@ void vtkPEnSightReader::InsertNextCellAndId(vtkUnstructuredGrid* output, int vtk
   int mpiNumberOfProcesses = this->GetMultiProcessNumberOfProcesses();
   vtkIdType numElnts = (numElements / mpiNumberOfProcesses) + 1;
   vtkIdType begin = mpiLocalProcessId * numElnts;
+
   if ((globalId >= begin) && (globalId < (begin + numElnts)))
   {
     // First note the points : they will be injected later
     vtkIdType* newPoints = new vtkIdType[numPoints];
+    this->MapToGlobalIds(points, numPoints, partId, newPoints);
 
-    for (int i = 0; i < numPoints; i++)
+    vtkIdType cellId;
+    if (vtkCellType == VTK_POLYHEDRON)
     {
-      int realId = this->GetPointIds(partId)->GetId(points[i]);
-      if (realId == -1)
+      std::vector<vtkIdType> newFaces;
+      newFaces.reserve(faces.size());
+      vtkIdType numFace = 0;
+      // faces is sizeOfFace0, pt0, ... ptn, sizeOfFace1, pts...
+      for (size_t idx = 0; idx < faces.size();)
       {
-        this->GetPointIds(partId)->SetId(points[i], this->LastPointId);
-        newPoints[i] = this->LastPointId;
-        this->LastPointId++;
+        vtkIdType faceSize = faces[idx];
+        newFaces[idx] = faceSize;
+        idx++;
+        this->MapToGlobalIds(&faces[idx], faceSize, partId, &newFaces[idx]);
+        idx += faceSize;
+        numFace++;
       }
-      else
-      {
-        newPoints[i] = realId;
-      }
+      cellId = output->InsertNextCell(vtkCellType, numPoints, newPoints, numFace, newFaces.data());
     }
-    // go. Insert It with real points Ids
-    vtkIdType cellId = output->InsertNextCell(vtkCellType, numPoints, newPoints);
+    else
+    {
+      cellId = output->InsertNextCell(vtkCellType, numPoints, newPoints);
+    }
+
     this->GetCellIds(partId, ensightCellType)->InsertNextId(cellId);
     delete[] newPoints;
 
