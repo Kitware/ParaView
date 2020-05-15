@@ -102,7 +102,7 @@
        <bool>true</bool>
       </property>
       <property name="placeholderText" stdset="0">
-       <string>Details</string>
+       <string>Select rows above to show raw log text here. Save text with the Export Log button below.</string>
       </property>
      </widget>
     </widget>
