@@ -11,6 +11,7 @@ set(PY_TESTS
   ColorAttributeTypeBackwardsCompatibility.py,NO_VALID
   CSVWriterReader.py,NO_VALID
   GenerateIdScalarsBackwardsCompatibility.py,NO_VALID
+  GetActiveCamera.py,NO_VALID
   GhostCellsInMergeBlocks.py
   IntegrateAttributes.py,NO_VALID
   LookupTable.py,NO_VALID

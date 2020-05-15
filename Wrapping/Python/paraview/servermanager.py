@@ -458,7 +458,8 @@ class Proxy(object):
                 return result
             return newfunc
 
-        class _camera_wrapper(object):
+        # Camera eventually inherit from Object
+        class _camera_wrapper(type(camera)):
             def __getattribute__(self, s):
                 try:
                     return super(_camera_wrapper, self).__getattribute__(s)
