@@ -96,7 +96,6 @@ include(vtkCompilerPlatformFlags)
 include(vtkCompilerExtraFlags)
 include(vtkInitializeBuildType)
 include(vtkSupportMacros)
-include(vtkDirectories)
 
 include(CMakeDependentOption)
 include(ParaViewOptions)
