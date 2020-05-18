@@ -69,7 +69,7 @@ bool vtkSMTimeKeeperProxy::AddTimeSource(vtkSMProxy* proxy, bool suppress_input)
   for (unsigned int cc = 0, max = proxy->GetNumberOfProducers(); suppress_input && cc < max; cc++)
   {
     vtkSMProxy* producer = proxy->GetProducerProxy(cc);
-    producer = producer ? producer->GetTrueParentProxy() : NULL;
+    producer = producer ? vtkSMSourceProxy::SafeDownCast(producer->GetTrueParentProxy()) : nullptr;
     if (producer && !stspp->IsProxyAdded(producer))
     {
       stspp->AddProxy(producer);
@@ -96,7 +96,7 @@ bool vtkSMTimeKeeperProxy::RemoveTimeSource(vtkSMProxy* proxy, bool unsuppress_i
   for (unsigned int cc = 0, max = proxy->GetNumberOfProducers(); unsuppress_input && cc < max; cc++)
   {
     vtkSMProxy* producer = proxy->GetProducerProxy(cc);
-    producer = producer ? vtkSMSourceProxy::SafeDownCast(producer->GetTrueParentProxy()) : NULL;
+    producer = producer ? vtkSMSourceProxy::SafeDownCast(producer->GetTrueParentProxy()) : nullptr;
     if (producer)
     {
       stspp->RemoveProxy(producer);
@@ -121,6 +121,7 @@ bool vtkSMTimeKeeperProxy::IsTimeSourceTracked(vtkSMProxy* proxy)
 //----------------------------------------------------------------------------
 bool vtkSMTimeKeeperProxy::SetSuppressTimeSource(vtkSMProxy* proxy, bool suppress)
 {
+  proxy = vtkSMSourceProxy::SafeDownCast(proxy);
   if (proxy)
   {
     SM_SCOPED_TRACE(CallMethod)
