@@ -199,22 +199,6 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy, int outputport /*=0
     return 0;
   }
 
-  // hypertree grid's dataset API is somewhat broken.
-  // prevent it from going into filters that have not been
-  // whitelisted.
-  if (strcmp(info->GetDataClassName(), "vtkHyperTreeGrid") == 0)
-  {
-    for (unsigned int i = 0; i < numTypes; i++)
-    {
-      if (strcmp(this->GetDataType(i), "vtkHyperTreeGrid") == 0 ||
-        strcmp(this->GetDataType(i), "vtkMultiBlockDataSet") == 0)
-      {
-        return 1;
-      }
-    }
-    return 0;
-  }
-
   for (unsigned int i = 0; i < numTypes; i++)
   {
     // Unfortunately, vtkDataSet, vtkPointSet, and vtkUnstructuredGridBase have
@@ -226,10 +210,7 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy, int outputport /*=0
       {
         return 1;
       }
-      else
-      {
-        continue;
-      }
+      continue;
     }
     if (strcmp(info->GetDataClassName(), "vtkPointSet") == 0)
     {
@@ -238,10 +219,7 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy, int outputport /*=0
       {
         return 1;
       }
-      else
-      {
-        continue;
-      }
+      continue;
     }
     if (strcmp(info->GetDataClassName(), "vtkUnstructuredGridBase") == 0)
     {
@@ -251,10 +229,7 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy, int outputport /*=0
       {
         return 1;
       }
-      else
-      {
-        continue;
-      }
+      continue;
     }
     if (dobj->IsA(this->GetDataType(i)))
     {
