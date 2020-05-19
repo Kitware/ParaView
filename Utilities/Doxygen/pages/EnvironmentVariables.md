@@ -9,6 +9,8 @@ Variable | Description
 `PARAVIEW_DATA_ROOT`  | Change the location of the data root for testing.
 `PV_DEBUG_PANELS` | When set, debugging text will be printed out explaining the reason for creation of various widgets on the properties panel (pqPropertiesPanel).
 `PV_DEBUG_SKIP_OPENGL_VERSION_CHECK` | Skip test to validate OpenGL support at launch.
+`VTK_DEBUG_SKIP_VISRTX_CHECK` | Skip test to validate VisRTX rendering support.
+`VTK_DEBUG_SKIP_OSPRAY_CHECK` | Skip test to validate OSPRay rendering support.
 `PV_DEBUG_TEST` | Prints debugging information about the testing framework during playback to cout.
 `PV_ICET_WINDOW_BORDERS` | Force render windows to be 400x400 instead of fullscreen.
 `PV_SHARED_WINDOW_SIZE`  | Similar to `PV_ICET_WINDOW_BORDERS` except that the value is specified as `WxH` where `W` and `H` is the width and height for the render window.
