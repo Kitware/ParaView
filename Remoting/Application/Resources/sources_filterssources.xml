@@ -1376,7 +1376,7 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkLineSource"
-                 label="Line Source"
+                 label="Line"
                  name="HighResLineSource">
       <DoubleVectorProperty animateable="1"
                             command="SetPoint1"
