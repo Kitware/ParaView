@@ -816,15 +816,6 @@ bool vtkPVGlyphFilter::Execute(unsigned int index, vtkDataSet* input,
     return true;
   }
 
-#if 0
-  if (this->GlyphDataRange[0] > this->GlyphDataRange[1])
-  {
-    vtkErrorMacro(
-      "First element in GlyphDataRange must be less than or equal to the second element.");
-    return false;
-  }
-#endif
-
   if (orientArray && orientArray->GetNumberOfComponents() > 3)
   {
     vtkErrorMacro(<< "vtkDataArray " << orientArray->GetName() << " has more than 3 components.\n");
@@ -1122,6 +1113,9 @@ bool vtkPVGlyphFilter::Execute(unsigned int index, vtkDataSet* input,
 
   // In certain cases, we can have a left over processing array, remove it.
   outputPD->RemoveArray(IDS_ARRAY_NAME.c_str());
+
+  // Pass the field data
+  output->GetFieldData()->PassData(input->GetFieldData());
 
   // Update ourselves and release memory
   //
