@@ -269,6 +269,7 @@ set(paraview_default_plugins
   PacMan
   PanoramicProjectionView
   # ParFlow - Because of dependency to nlohmann_json
+  SaveStateAndScreenshot
   SLACTools
   StreamLinesRepresentation
   StreamingParticles

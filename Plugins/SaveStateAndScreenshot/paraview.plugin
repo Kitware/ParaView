@@ -1,0 +1,9 @@
+NAME
+  SaveStateAndScreenshot
+DESCRIPTION
+  Saves the ParaView state and a screenshot without any user interaction
+CONDITION
+  PARAVIEW_USE_QT
+REQUIRES_MODULES
+  ParaView::RemotingViews
+  ParaView::pqApplicationComponents
