@@ -764,6 +764,10 @@ void vtkSMProxy::CreateVTKObjects()
   message.SetExtension(DefinitionHeader::server_class, this->GetSIClassName());
   message.SetExtension(ProxyState::xml_group, this->GetXMLGroup());
   message.SetExtension(ProxyState::xml_name, this->GetXMLName());
+  if (this->GetVTKClassName())
+  {
+    message.SetExtension(ProxyState::vtk_classname, this->GetVTKClassName());
+  }
   if (this->XMLSubProxyName)
   {
     message.SetExtension(ProxyState::xml_sub_proxy_name, this->XMLSubProxyName);
