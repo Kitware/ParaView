@@ -1,18 +1,28 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
     <!-- ==================================================================== -->
+    <MultiplexerSourceProxy name="ExtractBlock" label="Extract Block">
+      <Documentation long_help="Extract blocks from composite datasets">
+        This filter extract blocks from composite datasets such as
+        vtkMultiBlockDataSet or vtkPartitionedDataSetCollection
+      </Documentation>
+
+      <InputProperty name="Input">
+        <Documentation>
+          Specify the input to this filter.
+        </Documentation>
+        <MultiplexerInputDomain name="input" />
+      </InputProperty>
+
+    </MultiplexerSourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkExtractBlock"
-                 label="Extract Block"
-                 name="ExtractBlock">
+                 name="ExtractBlockUsingIds">
       <Documentation long_help="This filter extracts a range of blocks from a multiblock dataset."
                      short_help="Extract block.">This filter extracts a range
                      of groups from a multiblock dataset</Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
+      <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type">
           <DataType value="vtkMultiBlockDataSet" />
         </DataTypeDomain>
@@ -56,7 +66,71 @@
         non-null child block, then that node is removed. To preserve these
         parent nodes, set this flag to true.</Documentation>
       </IntVectorProperty>
-      <!-- End ExtractBlock -->
+      <!-- End ExtractBlockUsingIds -->
+      <Hints>
+        <MultiplexerSourceProxy proxygroup="filters" proxyname="ExtractBlock" >
+          <LinkProperties>
+            <Property name="Input" with_property="Input" />
+          </LinkProperties>
+        </MultiplexerSourceProxy>
+      </Hints>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkExtractBlockUsingDataAssembly"
+                 name="ExtractBlockUsingDataAssembly">
+      <Documentation long_help="This filter extracts a range of blocks from a multiblock dataset."
+                     short_help="Extract block.">This filter extracts a range
+                     of groups from a multiblock dataset</Documentation>
+      <InputProperty name="Input" command="SetInputConnection">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPartitionedDataSetCollection" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Extract Group
+        filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty clean_command="ClearNodePaths"
+                         command="AddNodePath"
+                         name="Paths"
+                         number_of_elements_per_command="1"
+                         panel_visibility="default"
+                         panel_widget="data_assembly_editor"
+                         repeat_command="1"
+                         animateable="0">
+        <Hints>
+          <WidgetHeight number_of_rows="20" />
+        </Hints>
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          This property lists the paths for blocks to extract.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Paths">
+        <Property name="Paths" />
+      </PropertyGroup>
+
+      <IntVectorProperty command="SetPruneDataAssembly"
+                         default_values="1"
+                         name="PruneOutput"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When set, the output multiblock dataset will be pruned
+        to remove empty nodes. On by default.</Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <MultiplexerSourceProxy proxygroup="filters" proxyname="ExtractBlock">
+          <LinkProperties>
+            <Property name="Input" with_property="Input" />
+          </LinkProperties>
+        </MultiplexerSourceProxy>
+      </Hints>
+      <!-- End ExtractBlockUsingDataAssembly -->
     </SourceProxy>
 
     <!-- ==================================================================== -->
