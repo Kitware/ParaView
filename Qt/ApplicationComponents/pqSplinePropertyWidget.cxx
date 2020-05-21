@@ -109,6 +109,22 @@ public:
     return this->Superclass::headerData(section, orientation, role);
   }
 
+  bool setData(const QModelIndex& idx, const QVariant& value, int role) override
+  {
+    Q_UNUSED(role);
+
+    int row = idx.row();
+    int col = idx.column();
+    if (row >= 0 && static_cast<size_t>(row) < this->Points.size() && col >= 0 && col < 3)
+    {
+      this->Points[idx.row()][idx.column()] = value.toDouble();
+      Q_EMIT this->dataChanged(idx, idx, QVector<int>({ Qt::DisplayRole }));
+      return true;
+    }
+
+    return false;
+  }
+
   const std::vector<vtkVector3d>& points() const { return this->Points; }
 
   int setPoint(int idx, double x, double y, double z)
