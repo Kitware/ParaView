@@ -459,12 +459,17 @@ class Proxy(object):
             return newfunc
 
         # Camera eventually inherit from Object
-        class _camera_wrapper(type(camera)):
+        class _camera_wrapper(object):
             def __getattribute__(self, s):
+                return _camera_sync(camera.__getattribute__(s))
+
+            # Calls to __dir__ bypass the __getattribute__ function, so override it here
+            # to delegate it to the vtkCameara class
+            def __dir__(self):
                 try:
-                    return super(_camera_wrapper, self).__getattribute__(s)
-                except AttributeError:
-                    return _camera_sync(camera.__getattribute__(s))
+                    return camera.__dir__()
+                except:
+                    return []
 
         return _camera_wrapper()
 
