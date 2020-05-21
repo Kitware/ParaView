@@ -662,21 +662,21 @@ def getattr(proxy, pname):
                     'The `Scale` property has been renamed in ParaView 5.7 to `Length`.')
     raise Continue()
 
-def GetProxy(module, key):
+def GetProxy(module, key, **kwargs):
     version = paraview.compatibility.GetVersion()
     if version < 5.2:
         if key == "ResampleWithDataset":
-            return module.__dict__["LegacyResampleWithDataset"]()
+            return module.__dict__["LegacyResampleWithDataset"](**kwargs)
     if version < 5.3:
         if key == "PLYReader":
             # note the case. The old reader didn't support `FileNames` property,
             # only `FileName`.
-            return module.__dict__["plyreader"]()
+            return module.__dict__["plyreader"](**kwargs)
     if version < 5.5:
         if key == "Clip":
             # in PV 5.5 we changed the default for Clip's InsideOut property to 1 instead of 0
             # also InsideOut was changed to Invert in 5.5
-            clip = module.__dict__[key]()
+            clip = module.__dict__[key](**kwargs)
             clip.Invert = 0
             return clip
     if version < 5.6:
@@ -685,7 +685,7 @@ def GetProxy(module, key):
             # different set of properties. The previous implementation was renamed to
             # GlyphLegacy.
             print("Creating GlyphLegacy")
-            glyph = module.__dict__["GlyphLegacy"]()
+            glyph = module.__dict__["GlyphLegacy"](**kwargs)
             print(glyph)
             return glyph
     if version < 5.6:
@@ -694,14 +694,14 @@ def GetProxy(module, key):
             # different set of properties. The previous implementation was renamed to
             # GlyphLegacy.
             print("Creating GlyphLegacy")
-            glyph = module.__dict__["GlyphLegacy"]()
+            glyph = module.__dict__["GlyphLegacy"](**kwargs)
             print(glyph)
             return glyph
     if version < 5.7:
         if key == "ExodusRestartReader" or key == "ExodusIIReader":
             # in 5.7, we changed the names for blocks, this preserves old
             # behavior
-            reader = module.__dict__[key]()
+            reader = module.__dict__[key](**kwargs)
             reader.UseLegacyBlockNamesWithElementTypes = 1
             return reader
-    return module.__dict__[key]()
+    return module.__dict__[key](**kwargs)

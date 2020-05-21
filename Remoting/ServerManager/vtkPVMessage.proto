@@ -111,6 +111,7 @@ message ProxyState
     optional bool       has_annotation      = 26 [default = false];
     repeated UserData   user_data           = 27;
     optional string     log_name            = 28;
+    optional string     vtk_classname       = 29;
   }
 }
 

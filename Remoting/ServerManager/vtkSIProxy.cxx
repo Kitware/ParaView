@@ -329,7 +329,14 @@ bool vtkSIProxy::InitializeAndCreateVTKObjects(vtkSMMessage* message)
 
   this->SetXMLGroup(message->GetExtension(ProxyState::xml_group).c_str());
   this->SetXMLName(message->GetExtension(ProxyState::xml_name).c_str());
-  this->SetVTKClassName(element->GetAttribute("class"));
+  if (!message->GetExtension(ProxyState::vtk_classname).empty())
+  {
+    this->SetVTKClassName(message->GetExtension(ProxyState::vtk_classname).c_str());
+  }
+  else
+  {
+    this->SetVTKClassName(element->GetAttribute("class"));
+  }
 
   // Locate sub-proxies.
   for (int cc = 0; cc < message->ExtensionSize(ProxyState::subproxy); cc++)

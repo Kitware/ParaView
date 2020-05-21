@@ -19,6 +19,7 @@ endif()
 vtk_add_test_cxx(vtkRemotingServerManagerCxxTests tests
   NO_DATA NO_VALID
   TestAdjustRange.cxx
+  TestMultiplexerSourceProxy.cxx
   TestProxyAnnotation.cxx
   TestRecreateVTKObjects.cxx
   TestSelfGeneratingSourceProxy.cxx
