@@ -51,6 +51,7 @@ set(classes
   vtkSIInputProperty
   vtkSIIntVectorProperty
   vtkSIMetaReaderProxy
+  vtkSIMultiplexerSourceProxy
   vtkSIObject
   vtkSIProperty
   vtkSIProxy
@@ -109,6 +110,8 @@ set(classes
   vtkSMLoadStateOptionsProxy
   vtkSMMapProperty
   vtkSMMessage
+  vtkSMMultiplexerSourceProxy
+  vtkSMMultiplexerInputDomain
   vtkSMNamedPropertyIterator
   vtkSMNullProxy
   vtkSMNumberOfComponentsDomain

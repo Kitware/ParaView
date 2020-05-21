@@ -1461,11 +1461,13 @@ public:
   typedef vtkCommand Superclass;
   const char* GetClassNameInternal() const override { return "vtkSMProxyPropertyLinkObserver"; }
   static vtkSMProxyPropertyLinkObserver* New() { return new vtkSMProxyPropertyLinkObserver(); }
-  void Execute(vtkObject* caller, unsigned long event, void* calldata) override
+  void Execute(vtkObject* caller, unsigned long, void*) override
   {
-    (void)event;
-    (void)calldata;
-    vtkSMProperty* input = vtkSMProperty::SafeDownCast(caller);
+    this->Copy(vtkSMProperty::SafeDownCast(caller));
+  }
+
+  void Copy(vtkSMProperty* input)
+  {
     if (input && this->Output)
     {
       // this will copy both checked and unchecked property values.
@@ -1488,6 +1490,7 @@ void vtkSMProxy::LinkProperty(vtkSMProperty* input, vtkSMProperty* output)
   observer->Output = output;
   input->AddObserver(vtkCommand::PropertyModifiedEvent, observer);
   input->AddObserver(vtkCommand::UncheckedPropertyModifiedEvent, observer);
+  observer->Copy(input);
   observer->FastDelete();
 }
 
@@ -1506,6 +1509,17 @@ vtkSMPropertyGroup* vtkSMProxy::NewPropertyGroup(vtkPVXMLElement* groupElem)
   group->Delete();
 
   return group;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::AppendPropertyGroup(vtkSMPropertyGroup* group)
+{
+  auto& internals = (*this->Internals);
+  auto iter = std::find(internals.PropertyGroups.begin(), internals.PropertyGroups.end(), group);
+  if (iter == internals.PropertyGroups.end())
+  {
+    internals.PropertyGroups.push_back(group);
+  }
 }
 
 //---------------------------------------------------------------------------

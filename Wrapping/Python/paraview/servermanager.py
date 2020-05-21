@@ -622,6 +622,16 @@ class ExodusIIReaderProxy(SourceProxy):
                 f = getattr(self, prop)
                 f.DeselectAll()
 
+class MultiplexerSourceProxy(SourceProxy):
+    def UpdateDynamicProperties(self):
+        """Update the instance to add properties of newly exposed
+        SMProperties. The current limitation is that help() still
+        doesn't work as one would expect."""
+        exclude = frozenset([p for p in dir(self.__class__) if isinstance(getattr(self.__class__, p), property)])
+        cdict = _createClassProperties(self, exclude)
+        for key, val in cdict.items():
+            self.add_attribute(key, val)
+
 class ViewLayoutProxy(Proxy):
     """Special class to define convenience methods for View Layout"""
 
@@ -2693,6 +2703,35 @@ class PVModule(object):
 def _make_name_valid(name):
     return paraview.make_name_valid(name)
 
+def _createClassProperties(proto, excludeset=frozenset()):
+    """Builds a dict of properties for all SMProperties on the `proto` proxy.
+    If excludeset is not empty, then it is expected to be names of properties
+    to exclude."""
+    cdict = {}
+    iter = PropertyIterator(proto)
+    # Add all properties as python properties.
+    for prop in iter:
+        propName = iter.GetKey()
+        if paraview.compatibility.GetVersion() >= 3.5:
+            if (prop.GetInformationOnly() and propName != "TimestepValues" \
+              and prop.GetPanelVisibility() == "never") or prop.GetIsInternal():
+                continue
+        names = [propName]
+        if paraview.compatibility.GetVersion() >= 3.5:
+            names = [iter.PropertyLabel]
+
+        propDoc = None
+        if prop.GetDocumentation():
+            propDoc = prop.GetDocumentation().GetDescription()
+        for name in names:
+            name = _make_name_valid(name)
+            if name and name not in excludeset:
+                cdict[name] = property(_createGetProperty(propName),
+                                       _createSetProperty(propName),
+                                       None,
+                                       propDoc)
+    return cdict
+
 def _createClass(groupName, proxyName, apxm=None, prototype=None):
     """Defines a new class type for the proxy."""
     if prototype is None:
@@ -2712,28 +2751,8 @@ def _createClass(groupName, proxyName, apxm=None, prototype=None):
     cdict = {}
     # Create an Initialize() method for this sub-class.
     cdict['Initialize'] = _createInitialize(groupName, proxyName)
-    iter = PropertyIterator(proto)
-    # Add all properties as python properties.
-    for prop in iter:
-        propName = iter.GetKey()
-        if paraview.compatibility.GetVersion() >= 3.5:
-            if (prop.GetInformationOnly() and propName != "TimestepValues" \
-              and prop.GetPanelVisibility() == "never") or prop.GetIsInternal():
-                continue
-        names = [propName]
-        if paraview.compatibility.GetVersion() >= 3.5:
-            names = [iter.PropertyLabel]
+    cdict.update(_createClassProperties(proto))
 
-        propDoc = None
-        if prop.GetDocumentation():
-            propDoc = prop.GetDocumentation().GetDescription()
-        for name in names:
-            name = _make_name_valid(name)
-            if name:
-                cdict[name] = property(_createGetProperty(propName),
-                                       _createSetProperty(propName),
-                                       None,
-                                       propDoc)
     # Add the documentation as the class __doc__
     if proto.GetDocumentation() and \
        proto.GetDocumentation().GetDescription():
@@ -2744,6 +2763,8 @@ def _createClass(groupName, proxyName, apxm=None, prototype=None):
     # Create the new type
     if proto.GetXMLName() == "ExodusIIReader":
         superclasses = (ExodusIIReaderProxy,)
+    elif proto.IsA("vtkSMMultiplexerSourceProxy"):
+        superclasses = (MultiplexerSourceProxy,)
     elif proto.IsA("vtkSMSourceProxy"):
         superclasses = (SourceProxy,)
     elif proto.IsA("vtkSMViewLayoutProxy"):

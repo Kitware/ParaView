@@ -2261,7 +2261,7 @@ def _create_func(key, module, skipRegisteration=False):
         controller = servermanager.ParaViewPipelineController()
 
         # Instantiate the actual object from the given module.
-        px = paraview._backwardscompatibilityhelper.GetProxy(module, key)
+        px = paraview._backwardscompatibilityhelper.GetProxy(module, key, no_update=True)
 
         # preinitialize the proxy.
         controller.PreInitializeProxy(px)
@@ -2301,6 +2301,9 @@ def _create_func(key, module, skipRegisteration=False):
 
         # post initialize
         controller.PostInitializeProxy(px)
+
+        if isinstance(px, servermanager.MultiplexerSourceProxy):
+            px.UpdateDynamicProperties()
 
         if not skipRegisteration:
             # Register the proxy with the proxy manager (assuming we are only using

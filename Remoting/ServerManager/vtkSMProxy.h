@@ -893,6 +893,11 @@ protected:
    */
   vtkSMPropertyGroup* NewPropertyGroup(vtkPVXMLElement* propElement);
 
+  /**
+   * Adds a property groups.
+   */
+  void AppendPropertyGroup(vtkSMPropertyGroup* group);
+
   //@{
   /**
    * Read attributes from an XML element.
