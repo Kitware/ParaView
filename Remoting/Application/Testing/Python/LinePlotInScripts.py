@@ -13,7 +13,7 @@ smtesting.ProcessCommandLineArguments()
 
 w = Wavelet()
 UpdatePipeline()
-p = PlotOverLine(Source='Line Source')
+p = PlotOverLine(Source='Line')
 p.Source.Point1 = [-10.0, -10.0, -10.0]
 p.Source.Point2 = [10.0, 10.0, 10.0]
 

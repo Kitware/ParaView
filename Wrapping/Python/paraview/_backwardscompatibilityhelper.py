@@ -361,10 +361,10 @@ def setattr_fix_value(proxy, pname, value, setter_func):
             raise NotSupportedException("'FieldAssociation' is using an obsolete "\
                     "value '%s', use `Point Data` or `Cell Data` instead." % value)
 
-    # In 5.9, we changed "High Resolution Line Source" to "Line Source" and "Point Source" to
+    # In 5.9, we changed "High Resolution Line Source" to "Line" and "Point Source" to
     # "Point Cloud"
     seed_sources_from = ["High Resolution Line Source", "Point Source"]
-    seed_sources_to = ["Line Source", "Point Cloud"]
+    seed_sources_to = ["Line", "Point Cloud"]
     seed_sources_proxyname = ["HighResLineSource", "PointSource"]
     if value in seed_sources_from and proxy.GetProperty(pname).SMProperty.IsA("vtkSMInputProperty"):
         domain = proxy.GetProperty(pname).SMProperty.FindDomain("vtkSMProxyListDomain")
