@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCollection.h"
 #include "vtkSMParaViewPipelineController.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyManager.h"
@@ -127,24 +128,14 @@ void pqSaveStateAndScreenshotReaction::CopyProperties(
   vtkSMSaveScreenshotProxy* shProxySaved, vtkSMSaveScreenshotProxy* shProxy)
 {
   // if I copy ImageResolution over the color bar and fonts are very big
-  std::array<const char*, 5> properties = { "SaveAllViews", "FontScaling", "SeparatorWidth",
-    "StereoMode", "TransparentBackground" };
-  std::array<int, 5> propertiesSize = { 1, 1, 1, 1, 1 };
-  for (int i = 0; i < properties.size(); ++i)
+  std::array<const char*, 7> properties = { "SaveAllViews", "FontScaling", "SeparatorWidth",
+    "StereoMode", "TransparentBackground", "SeparatorColor", "OverrideColorPalette" };
+  for (const char* property : properties)
   {
-    int data[2];
-    int oldData[2];
-    vtkSMPropertyHelper(shProxySaved, properties[i]).Get(data, propertiesSize[i]);
-    vtkSMPropertyHelper(shProxy, properties[i]).Get(oldData, propertiesSize[i]);
-    vtkSMPropertyHelper(shProxy, properties[i]).Set(data, propertiesSize[i]);
+    vtkSMProperty* src = shProxySaved->GetProperty(property);
+    vtkSMProperty* target = shProxy->GetProperty(property);
+    target->Copy(src);
   }
-  double dataDouble[3];
-  const char* property = "SeparatorColor";
-  vtkSMPropertyHelper(shProxySaved, property).Get(dataDouble, 3);
-  vtkSMPropertyHelper(shProxy, property).Set(dataDouble, 3);
-  property = "OverrideColorPalette";
-  const char* value = vtkSMPropertyHelper(shProxySaved, property).GetAsString();
-  vtkSMPropertyHelper(shProxy, property).Set(value);
   shProxy->UpdateVTKObjects();
 }
 
