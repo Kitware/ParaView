@@ -158,12 +158,17 @@ void pqSaveStateAndScreenshotReaction::onTriggered()
     // save the file
     QDateTime dateTime = QDateTime::currentDateTime();
     QString dateTimeString = dateTime.toString("-yyyyMMdd-hhmmss");
-    QString stateFile =
-      this->Directory + "/" + this->Name + (this->FromCTest ? "" : dateTimeString) + ".pvsm";
+    QString nameNoExt = this->Name + (this->FromCTest ? "" : dateTimeString);
+    ;
+    QString pathNoExt = this->Directory + "/" + nameNoExt;
+    QString stateFile = pathNoExt + ".pvsm";
     pqSaveStateReaction::saveState(stateFile);
-    QString screenshotFile =
-      this->Directory + "/" + this->Name + (this->FromCTest ? "" : dateTimeString) + ".png";
+    QString screenshotFile = pathNoExt + ".png";
     shProxy->WriteImage(screenshotFile.toLocal8Bit().data());
+    QString textFile = pathNoExt + ".txt";
+    std::ofstream ofs(textFile.toLocal8Bit().data(), std::ofstream::out);
+    ofs << nameNoExt.toLocal8Bit().data() << std::endl;
+    ofs.close();
   }
 }
 
