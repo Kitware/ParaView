@@ -61,8 +61,8 @@ protected:
   void setWindowLocation(QString&);
 
 protected Q_SLOTS:
-  void groupBoxLocationClicked();
-  void groupBoxPositionClicked();
+  void radioButtonLocationClicked();
+  void radioButtonPositionClicked();
   void updateUI();
 
 private:
