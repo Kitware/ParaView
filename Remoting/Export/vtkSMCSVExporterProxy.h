@@ -20,6 +20,8 @@
  * vtkSMCSVExporterProxy is used to export the certain views to a CSV file.
  * Currently, we support vtkSpreadSheetView and vtkPVXYChartView (which includes
  * Bar/Line/Quartile/Parallel Coordinates views).
+ *
+ * @sa vtkCSVExporter
 */
 
 #ifndef vtkSMCSVExporterProxy_h
