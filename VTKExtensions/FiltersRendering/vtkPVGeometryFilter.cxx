@@ -1065,6 +1065,13 @@ int vtkPVGeometryFilter::RequestDataObjectTree(
     }
   }
 
+  if (block_id > 0)
+  {
+    // Add block colors to root-node's field data to keep it from being flagged as
+    // partial.
+    this->AddBlockColors(output, 0);
+  }
+
   vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::RequestDataObjectTree");
   return 1;
 }
