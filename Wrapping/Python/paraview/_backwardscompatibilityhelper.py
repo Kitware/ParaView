@@ -705,3 +705,33 @@ def GetProxy(module, key, **kwargs):
             reader.UseLegacyBlockNamesWithElementTypes = 1
             return reader
     return module.__dict__[key](**kwargs)
+
+def lookupTableUpdate(lutName):
+    """
+    Provide backwards compatibility for color lookup table name changes.
+    """
+    # For backwards compatibility
+    reverseLut = False
+    version = paraview.compatibility.GetVersion()
+    if (version <= 5.8):
+        # In 5.9, some redundant color maps were removed and some had name changes.
+        # Replace these with a color map that remains. Also handle some color map
+        # name changes.
+        reverse = ["Red to Blue Rainbow"]
+        if lutName in reverse:
+            reverseLut = True
+        nameChanges = {
+            "jet": "Jet",
+            "coolwarm": "Cool to Warm",
+            "Asymmtrical Earth Tones (6_21b)": "Asymmetrical Earth Tones (6_21b)",
+            "CIELab_blue2red": "CIELab Blue to Red",
+            "gray_Matlab": "Grayscale",
+            "rainbow": "Blue to Red Rainbow",
+            "Red to Blue Rainbow": "Blue to Red Rainbow"
+        }
+        try:
+            lutName = nameChanges[lutName]
+        except:
+            pass
+
+    return (lutName, reverseLut)
