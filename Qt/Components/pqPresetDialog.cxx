@@ -178,7 +178,7 @@ public:
         case Qt::FontRole:
           QFont font;
           // Find the column in this model for the default group.
-          auto column = this->GroupManager->groupNames().indexOf("default") + 1;
+          auto column = this->GroupManager->groupNames().indexOf("Default") + 1;
           // if this is a default preset, bold and underline the name
           if (column != 0 && this->data(this->index(idx.row(), column), Qt::DisplayRole) != -1)
           {
@@ -197,7 +197,7 @@ public:
           auto name = this->Presets->GetPresetName(idx.row());
           auto applicationGroupIndex =
             this->GroupManager->presetRankInGroup(name.c_str(), groupName);
-          if (groupName != "default")
+          if (groupName != "Default")
           {
             return applicationGroupIndex;
           }
@@ -589,7 +589,7 @@ public:
     else
     {
       auto groupMgr = this->Model->GroupManager;
-      auto defaultColumn = groupMgr->groupNames().indexOf("default") + 1;
+      auto defaultColumn = groupMgr->groupNames().indexOf("Default") + 1;
       this->Ui.groupChooser->setCurrentIndex(defaultColumn);
       this->CurrentGroupColumn = defaultColumn;
     }
@@ -679,7 +679,7 @@ void pqPresetDialog::updateGroups()
   }
   else
   {
-    auto defaultColumn = groupMgr->groupNames().indexOf("default") + 1;
+    auto defaultColumn = groupMgr->groupNames().indexOf("Default") + 1;
     this->Internals->Ui.groupChooser->setCurrentIndex(defaultColumn);
     this->Internals->CurrentGroupColumn = defaultColumn;
   }
@@ -808,11 +808,11 @@ void pqPresetDialog::updateForSelectedIndex(const QModelIndex& proxyIndex)
   idx = internals.ProxyModel->mapToSource(idx);
   const Json::Value& preset = internals.Model->Presets->GetPreset(idx.row());
   assert(preset.empty() == false);
-  auto column = internals.Model->GroupManager->groupNames().indexOf("default") + 1;
+  auto column = internals.Model->GroupManager->groupNames().indexOf("Default") + 1;
   QModelIndex defaultColumnIndex = internals.Model->index(idx.row(), column);
 
   int defaultPosition = internals.Model->data(defaultColumnIndex, Qt::DisplayRole).toInt();
-  int numDefaultPresets = internals.Model->GroupManager->numberOfPresetsInGroup("default");
+  int numDefaultPresets = internals.Model->GroupManager->numberOfPresetsInGroup("Default");
 
   const Ui::pqPresetDialog& ui = internals.Ui;
 
@@ -1006,7 +1006,7 @@ void pqPresetDialog::setPresetIsAdvanced(int newState)
   idx = internals.ReflowModel->mapToSource(idx);
   idx = internals.ProxyModel->mapToSource(idx);
 
-  auto column = internals.Model->GroupManager->groupNames().indexOf("default") + 1;
+  auto column = internals.Model->GroupManager->groupNames().indexOf("Default") + 1;
   QModelIndex defaultColumnIndex = internals.Model->index(idx.row(), column);
 
   int defaultPosition = internals.Model->data(defaultColumnIndex, Qt::DisplayRole).toInt();

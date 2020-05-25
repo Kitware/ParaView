@@ -102,11 +102,11 @@ void pqPresetGroupsManager::loadGroups(const QString& jsonString)
     }
     this->Groups[name] = groupMembers;
   }
-  // pqPresetDialog relies on "default" being avialable.  Even an empty group should be fine.
-  if (!this->GroupNames.contains("default"))
+  // pqPresetDialog relies on "Default" being available.  Even an empty group should be fine.
+  if (!this->GroupNames.contains("Default"))
   {
-    this->GroupNames.append("default");
-    this->Groups["default"] = QList<QString>();
+    this->GroupNames.append("Default");
+    this->Groups["Default"] = QList<QString>();
   }
   Q_EMIT groupsUpdated();
 }
