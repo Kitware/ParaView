@@ -38,7 +38,13 @@
  * `vtkCSVExporter::WriteHeader(vtkFieldData*)` and the pass rows in order by
  * using `vtkCSVExporter::WriteData(vtkFieldData*) multiple times. Finally,
  * close using `vtkCSVExporter::Close`.
-*/
+ *
+ * In STREAM_ROWS mode, the exporter supports invalid / empty cells. When
+ * writing each column in `WriteData` call, for each column-name an
+ * vtkUnsignedCharArray with the name `{COLUMN-NAME}__vtkValidMask__` is looked
+ * up. If found, it's value is used to determine if that cell is to written out
+ * or not.
+ */
 
 #ifndef vtkCSVExporter_h
 #define vtkCSVExporter_h

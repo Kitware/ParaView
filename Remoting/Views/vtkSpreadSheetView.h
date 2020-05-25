@@ -155,6 +155,12 @@ public:
   //@}
 
   /**
+   * Returns the column index for a column given its name.
+   * May return -1 is name is not valid or present.
+   */
+  vtkIdType GetColumnByName(const char* columnName);
+
+  /**
    * Returns the visibility for the column at the given index.
    */
   virtual bool GetColumnVisibility(vtkIdType index);

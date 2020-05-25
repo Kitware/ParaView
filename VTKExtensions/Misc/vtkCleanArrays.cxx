@@ -24,8 +24,10 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkUnsignedCharArray.h"
 
 #include <algorithm>
+#include <cstring>
 #include <iterator>
 #include <set>
 #include <string>
@@ -65,16 +67,17 @@ vtkStandardNewMacro(vtkCleanArrays);
 vtkCxxSetObjectMacro(vtkCleanArrays, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkCleanArrays::vtkCleanArrays()
+  : Controller(nullptr)
+  , FillPartialArrays(false)
+  , MarkFilledPartialArrays(false)
 {
-  this->FillPartialArrays = false;
-  this->Controller = 0;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
 //----------------------------------------------------------------------------
 vtkCleanArrays::~vtkCleanArrays()
 {
-  this->SetController(0);
+  this->SetController(nullptr);
 }
 
 //****************************************************************************
@@ -199,12 +202,14 @@ public:
   }
 
   // Remove arrays from \c dsa not present in \c this.
-  void UpdateFieldData(vtkFieldData* dsa) const
+  void UpdateFieldData(vtkFieldData* dsa, bool add_validity_array) const
   {
     if (this->Valid == 0)
     {
       return;
     }
+
+    std::vector<std::pair<std::string, bool> > partial_flags;
     vtkArraySet myself = (*this);
     int numArrays = dsa->GetNumberOfArrays();
     for (int cc = numArrays - 1; cc >= 0; cc--)
@@ -222,6 +227,7 @@ public:
         else
         {
           myself.erase(mda);
+          partial_flags.push_back(std::make_pair(std::string(array->GetName()), true));
         }
       }
     }
@@ -232,7 +238,38 @@ public:
       if (array)
       {
         dsa->AddArray(array);
-        array->Delete();
+        array->FastDelete();
+        partial_flags.push_back(std::make_pair(std::string(array->GetName()), false));
+      }
+    }
+
+    // let's add validity arrays if requested.
+    if (add_validity_array)
+    {
+      for (const auto& pair : partial_flags)
+      {
+        auto validArrayName = pair.first + "__vtkValidMask__";
+        if (dsa->GetAbstractArray(validArrayName.c_str()))
+        {
+          // a valid mask array may have already been added by an earlier
+          // filter such as vtkAttributeDataToTableFilter.
+          continue;
+        }
+
+        const char* suffix = std::strstr(pair.first.c_str(), "__vtkValidMask__");
+        if (suffix != nullptr && strlen(suffix) == strlen("__vtkValidMask__"))
+        {
+          // don't add a validity mask for a validity mask array added by an
+          // earlier filter such as vtkAttributeDataToTableFilter.
+          continue;
+        }
+
+        auto validArray = vtkUnsignedCharArray::New();
+        validArray->SetName((pair.first + "__vtkValidMask__").c_str());
+        validArray->SetNumberOfTuples(dsa->GetNumberOfTuples());
+        validArray->FillValue(pair.second ? 1 : 0);
+        dsa->AddArray(validArray);
+        validArray->FastDelete();
       }
     }
   }
@@ -389,7 +426,8 @@ int vtkCleanArrays::RequestData(
         {
           continue;
         }
-        arraySets[attr].UpdateFieldData(dobj->GetAttributesAsFieldData(attr));
+        arraySets[attr].UpdateFieldData(
+          dobj->GetAttributesAsFieldData(attr), this->MarkFilledPartialArrays);
       }
     }
   }
@@ -401,7 +439,8 @@ int vtkCleanArrays::RequestData(
       {
         continue;
       }
-      arraySets[attr].UpdateFieldData(outputDO->GetAttributesAsFieldData(attr));
+      arraySets[attr].UpdateFieldData(
+        outputDO->GetAttributesAsFieldData(attr), this->MarkFilledPartialArrays);
     }
   }
   return 1;

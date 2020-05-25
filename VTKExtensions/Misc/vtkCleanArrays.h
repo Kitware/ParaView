@@ -57,6 +57,18 @@ public:
   vtkBooleanMacro(FillPartialArrays, bool);
   //@}
 
+  //@{
+  /**
+   * When FillPartialArrays is true, this filter can add a `vtkUnsignedCharArray`
+   * for each partial array to indicate which entries are valid and which are
+   * simply filled in with 0. To do that, set this flag to true.
+   * Default is false.
+   */
+  vtkSetMacro(MarkFilledPartialArrays, bool);
+  vtkGetMacro(MarkFilledPartialArrays, bool);
+  vtkBooleanMacro(MarkFilledPartialArrays, bool);
+  //@}
+
 protected:
   vtkCleanArrays();
   ~vtkCleanArrays() override;
@@ -65,8 +77,8 @@ protected:
     vtkInformationVector* outputVector) override;
 
   vtkMultiProcessController* Controller;
-
   bool FillPartialArrays;
+  bool MarkFilledPartialArrays;
 
 private:
   vtkCleanArrays(const vtkCleanArrays&) = delete;

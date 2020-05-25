@@ -47,10 +47,12 @@
 
 #include <algorithm>
 #include <cstring>
+#include <iterator>
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
+
 namespace
 {
 struct OrderByNames : std::binary_function<vtkAbstractArray*, vtkAbstractArray*, bool>
@@ -301,15 +303,9 @@ class vtkSpreadSheetView::vtkInternals
         ? colInfo->Get(vtkSplitColumnComponents::ORIGINAL_COMPONENT_NUMBER())
         : -1;
 
-      std::string strName = "<None>";
-      const char* colName = col->GetName();
-      if (colName)
-      {
-        strName = std::string(colName);
-      }
-
+      const std::string colName(col->GetName() ? col->GetName() : "<None>");
       auto tuple = std::make_tuple(
-        strName, original_component >= 0 ? original_name : std::string(), original_component);
+        colName, original_component >= 0 ? original_name : std::string(), original_component);
       this->ColumnIndexMap[std::get<0>(tuple)] = this->ColumnMetaData.size();
       this->ColumnMetaData.push_back(std::move(tuple));
     }
@@ -363,6 +359,17 @@ public:
       return std::get<0>(this->ColumnMetaData[index]).c_str();
     }
     return nullptr;
+  }
+
+  vtkIdType GetColumnByName(const std::string& aname) const
+  {
+    const auto& columns = this->ColumnMetaData;
+    auto iter = std::find_if(columns.begin(), columns.end(),
+      [&aname](const std::tuple<std::string, std::string, int>& tuple) {
+        return (std::get<0>(tuple) == aname);
+      });
+    return iter != columns.end() ? static_cast<vtkIdType>(std::distance(columns.begin(), iter))
+                                 : -1;
   }
 
   std::string GetOriginalArrayName(const std::string& aname) const
@@ -892,6 +899,17 @@ std::string vtkSpreadSheetView::GetColumnLabel(const char* name)
   bool cleaned = false;
   auto cleanedname = ::get_userfriendly_name(name, this, &cleaned);
   return cleaned ? cleanedname : this->Internals->GetOriginalArrayName(name);
+}
+
+//----------------------------------------------------------------------------
+vtkIdType vtkSpreadSheetView::GetColumnByName(const char* columnName)
+{
+  if (columnName == nullptr)
+  {
+    return -1;
+  }
+
+  return this->Internals->GetColumnByName(columnName);
 }
 
 //----------------------------------------------------------------------------

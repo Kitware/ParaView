@@ -17,6 +17,7 @@
 #include "vtkDataArray.h"
 #include "vtkFieldData.h"
 #include "vtkObjectFactory.h"
+#include "vtkUnsignedCharArray.h"
 
 #include "vtksys/FStream.hxx"
 #include "vtksys/SystemTools.hxx"
@@ -270,6 +271,8 @@ void vtkCSVExporter::WriteData(vtkFieldData* data)
         continue;
       }
 
+      auto validMask = vtkUnsignedCharArray::SafeDownCast(
+        data->GetArray((std::string(name) + "__vtkValidMask__").c_str()));
       int numComps = array->GetNumberOfComponents();
       for (int comp = 0; comp < numComps; comp++)
       {
@@ -277,15 +280,19 @@ void vtkCSVExporter::WriteData(vtkFieldData* data)
         {
           (*this->OutputStream) << this->FieldDelimiter;
         }
-        vtkVariant value = array->GetVariantValue(tuple * numComps + comp);
 
-        // to avoid weird characters in the output, cast char /
-        // signed char / unsigned char variables to integers
-        value = (value.IsChar() || value.IsSignedChar() || value.IsUnsignedChar())
-          ? vtkVariant(value.ToInt())
-          : value;
+        if (validMask == nullptr || validMask->GetValue(tuple) == 1)
+        {
+          vtkVariant value = array->GetVariantValue(tuple * numComps + comp);
 
-        (*this->OutputStream) << value.ToString().c_str();
+          // to avoid weird characters in the output, cast char /
+          // signed char / unsigned char variables to integers
+          value = (value.IsChar() || value.IsSignedChar() || value.IsUnsignedChar())
+            ? vtkVariant(value.ToInt())
+            : value;
+
+          (*this->OutputStream) << value.ToString().c_str();
+        }
         first = false;
       }
     }
