@@ -4519,6 +4519,7 @@
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
           <DataType value="vtkImageData" />
+          <DataType value="vtkRectilinearGrid" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="cell"
                           name="input_array_cell"
