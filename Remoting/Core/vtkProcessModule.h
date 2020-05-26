@@ -77,7 +77,7 @@ public:
   static ProcessTypes GetProcessType();
   static unsigned int GetProcessTypeAsInt()
   {
-    return static_cast<int>(vtkProcessModule::GetProcessType());
+    return static_cast<unsigned int>(vtkProcessModule::GetProcessType());
   }
 
   /**
