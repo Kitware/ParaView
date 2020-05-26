@@ -74,6 +74,7 @@ public:
    * any derived class.
    */
   using Superclass::EvaluateFunction;
+  void EvaluateFunction(vtkDataArray* input, vtkDataArray* output) override;
   double EvaluateFunction(double x[3]) override;
 
   /**
