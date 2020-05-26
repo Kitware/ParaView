@@ -21,5 +21,5 @@ appending time-varying data.
 * The SDK packaging for Linux has been fixed.
 
 The list of issues addressed by this release are available
-[here](https://gitlab.kitware.com/paraview/paraview/milestones/11#tab-issues),
-and merge requests included in this release are [here](https://gitlab.kitware.com/paraview/paraview/milestones/11#tab-merge-requests).
+[here](https://gitlab.kitware.com/paraview/paraview/-/milestones/11#tab-issues),
+and merge requests included in this release are [here](https://gitlab.kitware.com/paraview/paraview/-/milestones/11#tab-merge-requests).

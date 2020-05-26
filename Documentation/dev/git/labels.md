@@ -77,6 +77,6 @@ at a time.
 | `workflow:active-developement` | x | | added to an open issue that is under development |
 | `workflow:customer-review` | x | | added to a closed issue that is ready for review by the customer/reporter |
 
-[Labels]: https://gitlab.kitware.com/paraview/paraview/labels
-[Issues]: https://gitlab.kitware.com/paraview/paraview/issues
-[Merge Requests]: https://gitlab.kitware.com/paraview/paraview/merge_requests
+[Labels]: https://gitlab.kitware.com/paraview/paraview/-/labels
+[Issues]: https://gitlab.kitware.com/paraview/paraview/-/issues
+[Merge Requests]: https://gitlab.kitware.com/paraview/paraview/-/merge_requests

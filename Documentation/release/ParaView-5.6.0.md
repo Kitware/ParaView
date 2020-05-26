@@ -2,7 +2,7 @@ ParaView 5.6.0 Release Notes
 ============================
 
 Major changes made since ParaView 5.5.2 are listed in this document. The full list of issues addressed by this release is available
-[here](https://gitlab.kitware.com/paraview/paraview/milestones/8).
+[here](https://gitlab.kitware.com/paraview/paraview/-/milestones/8).
 
 # General Notes
 
@@ -160,7 +160,7 @@ pvts, pvtr, pvtk, ply, stl
 
 The name of the series file must follow the format \<filename\>.\<format\>.series,
 e.g., `images.vti.series`. More information about the content of the file can be
-found [here](https://gitlab.kitware.com/paraview/paraview/blob/v5.5.0/Documentation/release/ParaView-5.5.0.md).
+found [here](https://gitlab.kitware.com/paraview/paraview/-/blob/v5.5.0/Documentation/release/ParaView-5.5.0.md).
 
 ## Tecplot reader
 

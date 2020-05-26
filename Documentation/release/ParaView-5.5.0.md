@@ -2,7 +2,7 @@ ParaView 5.5.0 Release Notes
 ============================
 
 The full list of issues addressed by this release is available
-[here](https://gitlab.kitware.com/paraview/paraview/milestones/7). Major changes
+[here](https://gitlab.kitware.com/paraview/paraview/-/milestones/7). Major changes
 made since ParaView 5.4.1 include the following:
 
 # Rendering Enhancements

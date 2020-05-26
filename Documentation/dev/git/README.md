@@ -17,7 +17,7 @@ Main Tasks
 Other Tasks
 -----------
 
-* [Review Changes](https://gitlab.kitware.com/paraview/paraview/merge_requests) -
+* [Review Changes](https://gitlab.kitware.com/paraview/paraview/-/merge_requests) -
   ParaView GitLab Merge Requests
 * [Learn Git](http://public.kitware.com/Wiki/Git/Resources) -
   Third-party documentation

@@ -47,7 +47,7 @@
  </screenshots>
  <launchable type="desktop-id">org.paraview.ParaView.desktop</launchable>
  <url type="homepage">http://paraview.org/</url>
- <url type="bugtracker">https://gitlab.kitware.com/paraview/paraview/issues</url>
+ <url type="bugtracker">https://gitlab.kitware.com/paraview/paraview/-/issues</url>
  <url type="faq">https://www.paraview.org/Wiki/ParaView:FAQ</url>
  <url type="help">https://www.paraview.org/documentation/</url>
  <update_contact>paraview+paraview-support@discourse.paraview.org</update_contact>

@@ -370,7 +370,7 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
     PRIVATE
       "${CMAKE_CURRENT_SOURCE_DIR}"
       "${CMAKE_CURRENT_BINARY_DIR}"
-      # https://gitlab.kitware.com/cmake/cmake/issues/18049
+      # https://gitlab.kitware.com/cmake/cmake/-/issues/18049
       "$<TARGET_PROPERTY:VTK::vtksys,INTERFACE_INCLUDE_DIRECTORIES>")
   target_link_libraries("${_paraview_client_NAME}"
     PRIVATE

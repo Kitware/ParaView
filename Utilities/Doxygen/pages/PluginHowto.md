@@ -1377,7 +1377,7 @@ configuration type, which may look something like
 `C:\Users\MyUser\ParaView-v4.2.0-build\lib\Release\vtkPVAnimation-pv4.2.lib`.
 
 [ParaView Guide]: http://www.kitware.com/products/books/paraview.html
-[core readers]: https://gitlab.kitware.com/paraview/paraview/blob/87babdbeab6abe20aac6f8b2692788abc6bb20ac/ParaViewCore/ServerManager/SMApplication/Resources/readers.xml#L158-179
+[core readers]: https://gitlab.kitware.com/paraview/paraview/-/blob/87babdbeab6abe20aac6f8b2692788abc6bb20ac/ParaViewCore/ServerManager/SMApplication/Resources/readers.xml#L158-179
 [pqPropertyWidget]: https://kitware.github.io/paraview-docs/nightly/cxx/classpqPropertyWidget.html
 [pqPropertyWidgetDecorator]: https://kitware.github.io/paraview-docs/nightly/cxx/classpqPropertyWidgetDecorator.html
 [QActionGroup]: https://doc.qt.io/qt-5/qactiongroup.html
