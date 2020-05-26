@@ -1440,7 +1440,7 @@ Json::Value vtkConvertXMLElementToJSON(
 // not needed, because `vtkIdType` represents plain (Int32)
 // integers in this case.
 //
-// See: https://gitlab.kitware.com/paraview/paraview/issues/16938
+// See: https://gitlab.kitware.com/paraview/paraview/-/issues/16938
 #ifdef VTK_USE_64BIT_IDS
 template <>
 Json::Value vtkConvertXMLElementToJSON<vtkIdType>(

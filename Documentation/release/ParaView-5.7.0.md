@@ -10,7 +10,7 @@ Major changes made since ParaView 5.6.0 are listed in this document. The full li
 
 The CMake build sub-system for ParaView has been completely redone and updated to effectively use the latest enhancements in CMake. Following these improvements, developers should see a vast improvement in CMake configure and generate times due to minimizing of the number of generated configuration files that were previously used to track module-related information. Now, all of that information is associated with the targets themselves. Furthermore, modules now respect private and
 public dependencies between modules including propagation of include paths. That improves build times as it avoids leaking include paths and minimizes potential for private includes from clobbering other modules. Please be advised that these changes have resulted in changes
-to available CMake options when building ParaView [Read more...](https://gitlab.kitware.com/paraview/paraview/blob/master/Documentation/dev/build.md).
+to available CMake options when building ParaView [Read more...](https://gitlab.kitware.com/paraview/paraview/-/blob/master/Documentation/dev/build.md).
 
 Guidelines for updating ParaView plugins and ParaView-based
 applications will be enumerated in a future transition guide document.
@@ -25,7 +25,7 @@ This version of ParaView does not support the building of Catalyst editions. A C
 
 ## Updated third-party dependencies
 
-ParaView and VTK depend on a number of open source third-party libraries. ParaView 5.7.0 has the latest known stable versions of third-party libraries. For details and specific version numbers of third-party libraries that ParaView now depends on, please see the [list of updates in VTK](https://gitlab.kitware.com/vtk/vtk/issues/17608) and [ParaView](https://gitlab.kitware.com/paraview/paraview/issues/19045).
+ParaView and VTK depend on a number of open source third-party libraries. ParaView 5.7.0 has the latest known stable versions of third-party libraries. For details and specific version numbers of third-party libraries that ParaView now depends on, please see the [list of updates in VTK](https://gitlab.kitware.com/vtk/vtk/-/issues/17608) and [ParaView](https://gitlab.kitware.com/paraview/paraview/-/issues/19045).
 
 ## Enabling rendering with Mesa
 

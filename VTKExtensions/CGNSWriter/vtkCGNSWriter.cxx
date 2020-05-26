@@ -435,7 +435,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteFieldArray(write_info& info, const char* so
       else // 1-component field data.
       {
         // force to double precision, even if data type is single precision,
-        // see https://gitlab.kitware.com/paraview/paraview/issues/18827
+        // see https://gitlab.kitware.com/paraview/paraview/-/issues/18827
         for (vtkIdType t = 0; t < da->GetNumberOfTuples(); ++t)
         {
           double* tpl = da->GetTuple(t);

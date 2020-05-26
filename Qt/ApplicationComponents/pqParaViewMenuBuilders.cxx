@@ -650,7 +650,7 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
 #endif
 
   // Bug report
-  QString bugReportURL = QString("https://gitlab.kitware.com/paraview/paraview/issues/"
+  QString bugReportURL = QString("https://gitlab.kitware.com/paraview/paraview/-/issues/"
                                  "new?issue[title]=Bug&issue[description]="
                                  "OS: %1\nParaView Version: %2\nQt Version: %3\n\nDescription")
                            .arg(QSysInfo::prettyProductName())

@@ -58,7 +58,7 @@ pqTextureComboBox::pqTextureComboBox(vtkSMProxyGroupDomain* domain, QWidget* par
   QObject::connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentIndexChanged(int)));
 
   // DomainModifiedEvent is never invoked by ProxyGroupDomain
-  // https://gitlab.kitware.com/paraview/paraview/issues/19062
+  // https://gitlab.kitware.com/paraview/paraview/-/issues/19062
   // We have to monitor proxy creation
   pqServerManagerObserver* observer = pqApplicationCore::instance()->getServerManagerObserver();
   QObject::connect(observer, SIGNAL(proxyRegistered(const QString&, const QString&, vtkSMProxy*)),

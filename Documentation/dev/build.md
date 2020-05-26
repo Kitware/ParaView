@@ -530,7 +530,7 @@ steps:
 [ninja]: https://github.com/ninja-build/ninja/releases
 [nvpipe]: https://github.com/NVIDIA/NvPipe
 [openmpi]: https://www.open-mpi.org
-[paraview-issues]: https://gitlab.kitware.com/paraview/paraview/issues
+[paraview-issues]: https://gitlab.kitware.com/paraview/paraview/-/issues
 [python]: https://python.org
 [pythonwindows]: https://www.python.org/downloads/windows/
 [qt-download]: https://download.qt.io/official_releases/qt

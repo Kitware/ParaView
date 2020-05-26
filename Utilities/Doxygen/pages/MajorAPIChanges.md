@@ -685,13 +685,13 @@ XMLs to JSON.
 
 ###Changes to `pqViewFrame`###
 
-Commit [afaf6a510](https://gitlab.kitware.com/paraview/paraview/commit/afaf6a510ecb872c49461cd850022817741e1558)
+Commit [afaf6a510](https://gitlab.kitware.com/paraview/paraview/-/commit/afaf6a510ecb872c49461cd850022817741e1558)
 changes the internal widgets created in `pqViewFrame` to add a new `QFrame` named
 **CentralWidgetFrame** around the rendering viewport. While this shouldn't break any
 code, this will certainly break tests since the widgets have changed. The change to the testing
 XML is fairly simple. Just add the **CentralWidgetFrame** to the widget hierarchy at the appropriate
 location. See the original
-[merge request](https://gitlab.kitware.com/paraview/paraview/merge_requests/167)
+[merge request](https://gitlab.kitware.com/paraview/paraview/-/merge_requests/167)
 for details.
 
 ###Changes to `vtkSMProxyIterator`###

@@ -161,7 +161,7 @@ and to provide support.
 [ParaView Git README]: Documentation/dev/git/README.md
 [developer instructions]: Documentation/dev/git/develop.md
 [GitLab Access]: https://gitlab.kitware.com/users/sign_in
-[Fork ParaView]: https://gitlab.kitware.com/paraview/paraview/forks/new
+[Fork ParaView]: https://gitlab.kitware.com/paraview/paraview/-/forks/new
 [use SSH instead of HTTPS]: Documentation/dev/git/download.md#use-ssh-instead-of-https
 [download instructions]: Documentation/dev/git/download.md#clone
 [developer setup script]: /Utilities/SetupForDevelopment.sh
@@ -172,12 +172,12 @@ and to provide support.
 [Create a Merge Request]: Documentation/dev/git/develop.md#create-a-merge-request
 [Review a Merge Request]: Documentation/dev/git/develop.md#review-a-merge-request
 [review]: Documentation/dev/git/develop.md#review-a-merge-request
-[Issues]: https://gitlab.kitware.com/paraview/paraview/issues
-[Merge Requests]: https://gitlab.kitware.com/paraview/paraview/merge_requests
-[Labels]: https://gitlab.kitware.com/paraview/paraview/labels
-[Milestones]: https://gitlab.kitware.com/paraview/paraview/milestones
+[Issues]: https://gitlab.kitware.com/paraview/paraview/-/issues
+[Merge Requests]: https://gitlab.kitware.com/paraview/paraview/-/merge_requests
+[Labels]: https://gitlab.kitware.com/paraview/paraview/-/labels
+[Milestones]: https://gitlab.kitware.com/paraview/paraview/-/milestones
 [Wiki]: http://www.paraview.org/Wiki/ParaView
 [ParaView Discourse]: https://discourse.paraview.org/
 [Gitlab Markdown]: https://gitlab.kitware.com/help/markdown/markdown
-[new issue]: https://gitlab.kitware.com/paraview/paraview/issues/new
+[new issue]: https://gitlab.kitware.com/paraview/paraview/-/issues/new
 [Labels Glossary]: Documentation/dev/git/labels.md
