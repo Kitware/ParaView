@@ -368,12 +368,19 @@ void pqMultiViewWidget::setLayoutManager(vtkSMViewLayoutProxy* vlayout)
         vlayout->AddObserver(vtkCommand::ConfigureEvent, this, &pqMultiViewWidget::reload));
       internals.ObserverIds.push_back(vlayout->AddObserver(
         vtkCommand::PropertyModifiedEvent, this, &pqMultiViewWidget::layoutPropertyModified));
+
+      // explicitly call `layoutPropertyModified` for all properties we care
+      // about to ensure our state is initialized to the current values from the
+      // layout proxy.
       this->layoutPropertyModified(
         vlayout, vtkCommand::PropertyModifiedEvent, const_cast<char*>("SeparatorWidth"));
       this->layoutPropertyModified(
         vlayout, vtkCommand::PropertyModifiedEvent, const_cast<char*>("SeparatorColor"));
+      this->layoutPropertyModified(
+        vlayout, vtkCommand::PropertyModifiedEvent, const_cast<char*>("PreviewMode"));
     }
   }
+
   // we delay the setting of the LayoutManager to avoid the duplicate `reload`
   // call when `addPropertyLink` is called if the window decorations
   // visibility changed.
