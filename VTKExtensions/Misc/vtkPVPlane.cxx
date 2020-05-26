@@ -58,6 +58,17 @@ void vtkPVPlane::SetTransform(vtkAbstractTransform* transform)
   this->Plane->SetTransform(transform);
 }
 
+void vtkPVPlane::EvaluateFunction(vtkDataArray* input, vtkDataArray* output)
+{
+  if (this->GetMTime() > this->Plane->GetMTime())
+  {
+    this->Plane->SetNormal(this->Normal);
+    this->Plane->SetOrigin(this->Origin);
+    this->Plane->Push(this->Offset);
+  }
+
+  return this->Plane->EvaluateFunction(input, output);
+}
 //----------------------------------------------------------------------------
 double vtkPVPlane::EvaluateFunction(double x[3])
 {
