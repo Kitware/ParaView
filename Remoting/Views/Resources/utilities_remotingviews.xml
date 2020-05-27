@@ -568,7 +568,7 @@
     </SettingsProxy>
 
     <!-- ================================================================== -->
-    <SettingsProxy name="ColorPalette" label="Color Palette">
+    <SettingsProxy name="ColorPalette" label="Color Palette" serializable="1">
       <DoubleVectorProperty default_values="1.0 1.0 1.0"
                             label="Surface"
                             name="SurfaceColor"

@@ -179,6 +179,15 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy(
       return exporter;
     }
   }
+  else if (xml_group && xml_name && strcmp(xml_group, "settings") == 0 &&
+    strcmp(xml_name, "ColorPalette") == 0)
+  {
+    if (auto palette = pxm->FindProxy("settings", "settings", "ColorPalette"))
+    {
+      palette->Register(this);
+      return palette;
+    }
+  }
 
   //**************************************************************************
 
