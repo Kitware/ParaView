@@ -9,6 +9,7 @@ set(PY_TESTS
   CellIntegrator.py,NO_VALID
   ChangeTimeSteps.py
   ColorAttributeTypeBackwardsCompatibility.py,NO_VALID
+  ColorPaletteInStateFile.py
   CSVWriterReader.py,NO_VALID
   GenerateIdScalarsBackwardsCompatibility.py,NO_VALID
   GhostCellsInMergeBlocks.py

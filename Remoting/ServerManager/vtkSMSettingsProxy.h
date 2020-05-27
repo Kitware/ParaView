@@ -40,6 +40,26 @@
  * links between the proxy being initialized any of the settings proxies for
  * that session. This is done by processing property hints on the proxy being
  * initialized.
+ *
+ * @section SettingsAndStateFiles SettingsProxies and state files
+ *
+ * By default, settings proxies are not saved in the XML state files by
+ * `vtkSMSessionProxyManager::SaveXMLState`. This is so since settings proxies
+ * are often used for application settings to preserve across sessions rather
+ * than visualization state. However, there are exceptions. For example, color
+ * palettes which are handled using a settings proxy are part of the
+ * visualization state and hence should be saved in the XML state. For such
+ * settings proxies, one can add the `serializable="1"` attribute in the proxy
+ * definition XML.
+ *
+ * @code{xml}
+ *   <SettingsProxy name="ColorPalette" label="Color Palette" serializable="1">
+ *   ...
+ *   </SettingsProxy>
+ * @endcode
+ *
+ * All settings proxies with this attribute will be saved in the XML state
+ * files.
  */
 
 #ifndef vtkSMSettingsProxy_h
@@ -93,6 +113,14 @@ public:
   void LoadLinksState(vtkPVXMLElement* root, vtkSMProxyLocator* locator);
   //@}
 
+  //@{
+  /**
+   * Get/Set whether the settings proxy is serializable.
+   */
+  vtkSetMacro(IsSerializable, bool);
+  vtkGetMacro(IsSerializable, bool);
+  //@}
+
 protected:
   vtkSMSettingsProxy();
   ~vtkSMSettingsProxy() override;
@@ -116,6 +144,8 @@ private:
   void AutoBreakMapPropertyLink(vtkObject*, unsigned long, void*);
 
   unsigned long VTKObjectObserverId = 0;
+  bool IsSerializable = false;
+
   class vtkInternals;
   vtkInternals* Internals;
 };

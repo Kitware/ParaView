@@ -105,6 +105,12 @@ int vtkSMSettingsProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXML
     return 0;
   }
 
+  int serializable = 0;
+  if (element->GetScalarAttribute("serializable", &serializable) && serializable == 1)
+  {
+    this->SetIsSerializable(true);
+  }
+
   // Now link information properties that provide the current value of the VTK
   // object with the corresponding proxy property
   vtkSmartPointer<vtkSMPropertyIterator> iter;
@@ -155,6 +161,7 @@ void vtkSMSettingsProxy::VTKObjectModified()
 void vtkSMSettingsProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "IsSerializable: " << this->IsSerializable << endl;
 }
 
 //----------------------------------------------------------------------------

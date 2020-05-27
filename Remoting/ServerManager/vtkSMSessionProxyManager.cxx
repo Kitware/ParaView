@@ -1331,13 +1331,6 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement* par
 
     const char* colname = it->first.c_str();
 
-    // Do not save the state of settings.
-    const char* settings = "settings";
-    if (strcmp(settings, colname) == 0)
-    {
-      continue;
-    }
-
     // Do not save the state of prototypes.
     const char* protstr = "_prototypes";
     int do_group = 1;
@@ -1365,6 +1358,14 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement* par
       for (; it3 != it2->second.end(); ++it3)
       {
         auto proxy = it3->GetPointer()->Proxy.GetPointer();
+        if (auto settings = vtkSMSettingsProxy::SafeDownCast(proxy))
+        {
+          // skip setting proxies that are not serializable.
+          if (!settings->GetIsSerializable())
+          {
+            continue;
+          }
+        }
         if (visited_proxies.find(proxy) != visited_proxies.end())
         {
           // proxy has been saved.
@@ -1382,13 +1383,6 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement* par
   it = this->Internals->RegisteredProxyMap.begin();
   for (; it != this->Internals->RegisteredProxyMap.end(); it++)
   {
-    // Do not save the state of options
-    const char* options = "settings";
-    if (strcmp(options, it->first.c_str()) == 0)
-    {
-      continue;
-    }
-
     // Do not save the state of prototypes.
     const char* protstr = "_prototypes";
     int do_group = 1;
