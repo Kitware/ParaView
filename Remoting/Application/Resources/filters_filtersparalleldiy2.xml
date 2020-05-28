@@ -168,6 +168,28 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkOverlappingCellsDetector"
+                 label="Overlapping Cells Detector"
+                 name="OverlappingCellsDetector">
+      <Documentation short_help="Detects overlapping cells.">
+        Generates overlap count between cells of the input in a cell array named
+        "NumberOfCollisionsPerCell".
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPointSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input.</Documentation>
+      </InputProperty>
+      <!-- End GenerateGlobalIds -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkAdaptiveResampleToImage"
                  name="AdaptiveResampleToImage"
                  label="Adaptive Resample To Image">

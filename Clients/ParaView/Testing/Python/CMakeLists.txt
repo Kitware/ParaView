@@ -81,6 +81,7 @@ paraview_add_test_python(
   MergeBlocksPolyData.py
   PointPicking.py
   TestResetProperty.py
+  TestOverlappingCellsDetector.py
 )
 
 paraview_add_test_python(
