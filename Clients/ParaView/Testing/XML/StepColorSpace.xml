@@ -15,11 +15,9 @@
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorSpace/ComboBox" command="activated" arguments="Step" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/StepColorSpaceA.png" threshold="5" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/ChoosePreset" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqPresetDialog/widget/groupChooser" command="activated" arguments="All" />
-  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,1,49" />
-  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,22,443" />
-  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,22,443" />
-  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="60.1" />
-  <pqevent object="pqClientMainWindow/pqPresetDialog/apply" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/widget/searchBox/SearchLineEdit" command="set_string" arguments="kaa" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setSelection" arguments="0.0,0.0" />
+   <pqevent object="pqClientMainWindow/pqPresetDialog/apply" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/close" command="activate" arguments="" />
 </pqevents>
