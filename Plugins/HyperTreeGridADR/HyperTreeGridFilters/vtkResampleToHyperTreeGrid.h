@@ -327,11 +327,13 @@ protected:
       , DisplayMean(0.0)
     {
     }
-    PriorityQueueElement(vtkIdType key, vtkIdType id, double mean, double displayMean)
+    PriorityQueueElement(vtkIdType key, vtkIdType id, double mean, double displayMean,
+      const std::vector<double>&& invalidNeighborIds)
       : Key(key)
       , Id(id)
       , Mean(mean)
       , DisplayMean(displayMean)
+      , InvalidNeighborIds(std::move(invalidNeighborIds))
     {
     }
 
