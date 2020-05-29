@@ -14,27 +14,37 @@
 =========================================================================*/
 /**
  * @class   vtkCSVExporter
- * @brief   exporter used by certain views to export data as a CSV
- * file.
+ * @brief   exporter used by certain views to export data as CSV.
  *
- * This is used by vtkSMCSVExporterProxy to export the data shown in the
- * spreadsheet view or chart views as a CSV. The reason this class simply
- * doesn't use a vtkCSVWriter is that vtkCSVWriter is designed to write out a
- * single vtkTable as CSV. For exporting data from views, generating this single
- * vtkTable that can be exported is often time consuming or memory consuming or
- * both. Having a special exporter helps us with that. It provides two sets of
- * APIs:
+ * vtkCSVExporter can be used to generate comma-separated files. Unlike
+ * `vtkCSVWriter`, this class can generate a single CSV from multiple array
+ * collections. This avoids the need to generate of single large appended table.
+ * The multiple arrays together represent the complete tabular
+ * data that gets exported. The table can be split column-wise or row-wise
+ * between multiple arrays. The `vtkCSVExporter` provides
+ * two sets of APIs to handle the two cases. They cannot be mixed.
  *
- * \li \c STREAM_ROWS: to use to stream a single large vtkTable as contiguous chunks where each
- * chuck
- * is a subset of the rows (ideal for use by vtkSpreadSheetView) viz. OpenFile,
- * WriteHeader, WriteData (which can be repeated as many times as needed), and CloseFile,
- * \li \c STREAM_COLUMNS: to use to add columns (idea for chart views) viz. OpenFile,
- * AddColumn (which can be repeated), and CloseFile.
+ * When exporting array instances split by columns, i.e. each array
+ * will have exactly same number of rows but different columns that are to be
+ * concatenated together, use the `STREAM_COLUMNS` mode. To use this mode,
+ * start writing by using `vtkCSVExporter::Open(vtkCSVExporter::STREAM_COLUMNS)`
+ * and then add each column using `vtkCSVExporter::AddColumn`. Finally, complete
+ * the export can generate the output using `vtkCSVExporter::Close`.
  *
- * One has to pick which mode the exporter is operating in during the OpenFile()
- * call.
-*/
+ * When exporting arrays that are split by rows, use the STREAM_ROWS mode.
+ * The arrays are provided as a part of vtkFieldData (or subclass). To begin
+ * exporting in this mode, use
+ * `vtkCSVExporter::Open(vtkCSVExporter::STREAM_ROWS)`. Write the header using
+ * `vtkCSVExporter::WriteHeader(vtkFieldData*)` and the pass rows in order by
+ * using `vtkCSVExporter::WriteData(vtkFieldData*) multiple times. Finally,
+ * close using `vtkCSVExporter::Close`.
+ *
+ * In STREAM_ROWS mode, the exporter supports invalid / empty cells. When
+ * writing each column in `WriteData` call, for each column-name an
+ * vtkUnsignedCharArray with the name `{COLUMN-NAME}__vtkValidMask__` is looked
+ * up. If found, it's value is used to determine if that cell is to written out
+ * or not.
+ */
 
 #ifndef vtkCSVExporter_h
 #define vtkCSVExporter_h

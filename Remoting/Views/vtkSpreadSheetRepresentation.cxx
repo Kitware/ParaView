@@ -32,12 +32,16 @@ vtkSpreadSheetRepresentation::vtkSpreadSheetRepresentation()
   this->DataConditioner->SetSplitComponentsNamingMode(
     vtkSplitColumnComponents::NUMBERS_WITH_UNDERSCORES);
   this->CleanArrays->SetInputConnection(this->DataConditioner->GetOutputPort());
+  this->CleanArrays->SetFillPartialArrays(true);
+  this->CleanArrays->SetMarkFilledPartialArrays(true);
 
   this->ExtractedDataConditioner->SetGenerateOriginalIds(0);
   this->ExtractedDataConditioner->SetFlattenTable(true);
   this->ExtractedDataConditioner->SetSplitComponentsNamingMode(
     vtkSplitColumnComponents::NUMBERS_WITH_UNDERSCORES);
   this->ExtractedCleanArrays->SetInputConnection(this->ExtractedDataConditioner->GetOutputPort());
+  this->ExtractedCleanArrays->SetFillPartialArrays(true);
+  this->ExtractedCleanArrays->SetMarkFilledPartialArrays(true);
 }
 
 //----------------------------------------------------------------------------

@@ -33,7 +33,10 @@
 #define vtkPVMergeTables_h
 
 #include "vtkPVVTKExtensionsMiscModule.h" // needed for export macro
+#include "vtkSmartPointer.h"              // needed for vtkSmartPointer.
 #include "vtkTableAlgorithm.h"
+
+#include <vector> // needed for std::vector.
 
 class VTKPVVTKEXTENSIONSMISC_EXPORT vtkPVMergeTables : public vtkTableAlgorithm
 {
@@ -50,6 +53,9 @@ protected:
 
   int FillInputPortInformation(int port, vtkInformation* info) override;
   vtkExecutive* CreateDefaultExecutive() override;
+
+  static std::vector<vtkTable*> GetTables(vtkInformationVector* inputVector);
+  static void MergeTables(vtkTable* output, const std::vector<vtkTable*>& tables);
 
 private:
   vtkPVMergeTables(const vtkPVMergeTables&) = delete;

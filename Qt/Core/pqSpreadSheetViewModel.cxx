@@ -368,8 +368,8 @@ QVariant pqSpreadSheetViewModel::data(const QModelIndex& idx, int role /*=Qt::Di
 
   if (!this->isDataValid(idx))
   {
-    // If displaying field data, check to make sure that the data is valid
-    // since its arrays can be of different lengths
+    // a cell may not have valid entry for partial arrays for field data
+    // arrays with variable lengths.
     return QVariant("");
   }
 
@@ -544,14 +544,8 @@ QSet<pqSpreadSheetViewModel::vtkIndex> pqSpreadSheetViewModel::getVTKIndices(
 //-----------------------------------------------------------------------------
 bool pqSpreadSheetViewModel::isDataValid(const QModelIndex& idx) const
 {
-  if (this->getFieldType() != vtkDataObject::FIELD_ASSOCIATION_NONE)
-  {
-    return true;
-  }
-
   // First make sure the index itself is valid
-  pqDataRepresentation* repr = this->activeRepresentation();
-  if (!idx.isValid() || repr == NULL)
+  if (!idx.isValid() || this->activeRepresentationProxy() == nullptr)
   {
     return false;
   }

@@ -27,7 +27,7 @@ ExportView(filename)
 header = get_header(filename)
 print(header)
 assert ("Normals_0" in header and \
-        "Block Number" in header and \
+        "Block Name" in header and \
         "Elevation" in header and \
         "Point ID" in header and \
         "__vtkIsSelected__" not in header)
@@ -38,7 +38,7 @@ Render()
 ExportView(filename)
 header = get_header(filename)
 assert ("Normals_0" not in header and \
-        "Block Number" in header and \
+        "Block Name" in header and \
         "Elevation" in header and \
         "Point ID" in header and \
         "__vtkIsSelected__" not in header)
