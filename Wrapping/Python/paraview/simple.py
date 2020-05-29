@@ -1597,7 +1597,7 @@ def AssignLookupTable(arrayInfo, lutName, rangeOveride=[]):
 
     `lutName` is the name for the transfer function preset.
 
-    `rangeOveride` is provided is the range to use instead of the range of the
+    `rangeOveride` is provided as the range to use instead of the range of the
     array determined using the `arrayInfo`.
 
     Example usage::
@@ -1607,16 +1607,30 @@ def AssignLookupTable(arrayInfo, lutName, rangeOveride=[]):
       AssignLookupTable(arrayInfo, "Cool to Warm")
 
     """
+
+    # If the named LUT is not in the presets, see if it was one that was removed and
+    # substitute it with the backwards compatibility helper
     presets = servermanager.vtkSMTransferFunctionPresets.GetInstance()
+    reverse = False
+    if not presets.HasPreset(lutName):
+        (lutName, reverse) = paraview._backwardscompatibilityhelper.lookupTableUpdate(lutName)
+
+    # If no alternate LUT exists, raise an exception
     if not presets.HasPreset(lutName):
         raise RuntimeError("no preset with name `%s` present", lutName)
 
+    # Preset found. Apply it.
     lut = GetColorTransferFunction(arrayInfo.Name)
     if not lut.ApplyPreset(lutName):
         return False
 
     if rangeOveride:
         lut.RescaleTransferFunction(rangeOveride)
+
+    # Reverse if necessary for backwards compatibility
+    if reverse:
+        lut.InvertTransferFunction()
+
     return True
 
 # -----------------------------------------------------------------------------
