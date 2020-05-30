@@ -172,6 +172,21 @@ public:
   vtkTimeStamp GetCutsMTime() const { return this->CutsMTime; }
   //@}
 
+  //@{
+  /**
+   * When using an internally generated kd-tree for ordered compositing, this
+   * method provides access to the complete kd-tree and the rendering rank
+   * assignments for each node in the kd-tree.
+   *
+   * These are empty when the explicit data bounds are being used to determine
+   * sorting order i.e. when vtkPVRenderViewDataDeliveryManager does not
+   * generate its own kd tree internally instead relies on the representation
+   * provided partitioning.
+   */
+  const std::vector<vtkBoundingBox>& GetRawCuts() const { return this->RawCuts; }
+  const std::vector<int> GetRawCutsRankAssignments() const { return this->RawCutsRankAssignments; }
+  //@}
+
 protected:
   vtkPVRenderViewDataDeliveryManager();
   ~vtkPVRenderViewDataDeliveryManager() override;
@@ -182,6 +197,8 @@ protected:
   int GetMoveMode(vtkInformation* info, int viewMode) const;
 
   std::vector<vtkBoundingBox> Cuts;
+  std::vector<vtkBoundingBox> RawCuts;
+  std::vector<int> RawCutsRankAssignments;
   vtkTimeStamp CutsMTime;
 
   vtkTimeStamp RedistributionTimeStamp;
