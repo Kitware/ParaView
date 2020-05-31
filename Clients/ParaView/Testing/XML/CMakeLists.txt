@@ -549,7 +549,6 @@ SET (TESTS_WITH_INLINE_COMPARES
   ColorOpacityTableEditorHistogram.xml
   Connectivity.xml
   Contour.xml
-  CONVERGECFDReader.xml
   DataAxesGrid2X.xml
   EllipseSource.xml
   Ensemble.xml
@@ -634,6 +633,9 @@ if(PARAVIEW_ENABLE_VISITBRIDGE)
     #VisItBridgePixie.xml
     VisItBridgeSamrai.xml
     TruchasReaderWithVisItBridge.xml)
+  list(APPEND TESTS_WITH_INLINE_COMPARES
+    CONVERGECFDReaderWithVisItBridge.xml
+  )
 else()
   # A number of VisIt readers support reading of .pdb and
   # of .h5 files, so when the VisItBridge is enabled,
@@ -644,6 +646,8 @@ else()
   list(APPEND TESTS_WITH_BASELINES
     MoleculeColoring.xml
     TruchasReader.xml)
+  list(APPEND TESTS_WITH_INLINE_COMPARES
+    CONVERGECFDReader.xml)
 endif()
 
 if(PARAVIEW_ENABLE_RAYTRACING)
