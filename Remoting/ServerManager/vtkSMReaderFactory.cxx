@@ -532,7 +532,10 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
   std::ostringstream all_types;
   all_types << "Supported Files (";
 
-  std::set<std::string> sorted_types;
+  auto case_insensitive_comp = [](const std::string& s1, const std::string& s2) {
+    return vtksys::SystemTools::Strucmp(s1.c_str(), s2.c_str()) < 0;
+  };
+  std::set<std::string, decltype(case_insensitive_comp)> sorted_types(case_insensitive_comp);
 
   for (auto& proto : this->Internals->Prototypes)
   {
