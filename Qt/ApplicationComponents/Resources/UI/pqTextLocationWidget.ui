@@ -7,29 +7,33 @@
     <x>0</x>
     <y>0</y>
     <width>242</width>
-    <height>195</height>
+    <height>198</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QGroupBox" name="groupBoxLocation">
+   <item row="4" column="0">
+    <widget class="QRadioButton" name="radioButtonPosition">
+     <property name="toolTip">
+      <string>Coordinates of the bottom left corner of the text object</string>
+     </property>
+     <property name="text">
+      <string>Use Coordinates</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup</string>
+     </attribute>
+    </widget>
+   </item>
+   <item row="2" column="0" rowspan="2">
+    <widget class="QFrame" name="frameLocation">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="title">
-      <string>Use Window Location</string>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
      </property>
      <layout class="QGridLayout">
       <property name="leftMargin">
@@ -47,77 +51,7 @@
       <property name="spacing">
        <number>2</number>
       </property>
-      <item row="0" column="1">
-       <widget class="QToolButton" name="toolButtonUC">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="toolTip">
-         <string>Top Center</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../../../Components/Resources/pqComponents.qrc">
-          <normaloff>:/pqWidgets/Icons/pqTopCenter32.png</normaloff>:/pqWidgets/Icons/pqTopCenter32.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>24</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="autoExclusive">
-         <bool>true</bool>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">buttonGroupLocation</string>
-        </attribute>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QToolButton" name="toolButtonUR">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="toolTip">
-         <string>Top Right Corner</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../../../Components/Resources/pqComponents.qrc">
-          <normaloff>:/pqWidgets/Icons/pqTopRightCorner32.png</normaloff>:/pqWidgets/Icons/pqTopRightCorner32.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>24</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="autoExclusive">
-         <bool>true</bool>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">buttonGroupLocation</string>
-        </attribute>
-       </widget>
-      </item>
-      <item row="0" column="0">
+      <item row="1" column="0">
        <widget class="QToolButton" name="toolButtonUL">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -145,7 +79,7 @@
          <bool>true</bool>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="autoExclusive">
          <bool>true</bool>
@@ -155,7 +89,7 @@
         </attribute>
        </widget>
       </item>
-      <item row="1" column="2">
+      <item row="2" column="2">
        <widget class="QToolButton" name="toolButtonLR">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -190,7 +124,7 @@
         </attribute>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QToolButton" name="toolButtonLL">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -225,7 +159,77 @@
         </attribute>
        </widget>
       </item>
+      <item row="1" column="2">
+       <widget class="QToolButton" name="toolButtonUR">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Top Right Corner</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../Components/Resources/pqComponents.qrc">
+          <normaloff>:/pqWidgets/Icons/pqTopRightCorner32.png</normaloff>:/pqWidgets/Icons/pqTopRightCorner32.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">buttonGroupLocation</string>
+        </attribute>
+       </widget>
+      </item>
       <item row="1" column="1">
+       <widget class="QToolButton" name="toolButtonUC">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Top Center</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../Components/Resources/pqComponents.qrc">
+          <normaloff>:/pqWidgets/Icons/pqTopCenter32.png</normaloff>:/pqWidgets/Icons/pqTopCenter32.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">buttonGroupLocation</string>
+        </attribute>
+       </widget>
+      </item>
+      <item row="2" column="1">
        <widget class="QToolButton" name="toolButtonLC">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -266,28 +270,50 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QGroupBox" name="groupBoxPosition">
-     <property name="title">
-      <string>Lower Left Corner</string>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="checked">
+   <item row="5" column="0">
+    <widget class="QFrame" name="framePosition">
+     <property name="enabled">
       <bool>false</bool>
      </property>
+     <property name="toolTip">
+      <string>Coordinates of the lower left corner of the text object</string>
+     </property>
      <layout class="QGridLayout" name="gridLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <property name="spacing">
        <number>2</number>
       </property>
-      <item row="0" column="0">
+      <item row="1" column="0">
        <widget class="pqDoubleLineEdit" name="pos1X"/>
       </item>
-      <item row="0" column="1">
+      <item row="1" column="1">
        <widget class="pqDoubleLineEdit" name="pos1Y"/>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QRadioButton" name="radioButtonLocation">
+     <property name="text">
+      <string>Use Window Location</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup</string>
+     </attribute>
     </widget>
    </item>
   </layout>
@@ -299,11 +325,57 @@
    <header>pqDoubleLineEdit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>frameLocation</tabstop>
+  <tabstop>framePosition</tabstop>
+  <tabstop>toolButtonUC</tabstop>
+  <tabstop>toolButtonUR</tabstop>
+  <tabstop>toolButtonUL</tabstop>
+  <tabstop>toolButtonLR</tabstop>
+  <tabstop>toolButtonLL</tabstop>
+  <tabstop>toolButtonLC</tabstop>
+  <tabstop>pos1X</tabstop>
+  <tabstop>pos1Y</tabstop>
+ </tabstops>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>radioButtonLocation</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>framePosition</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>120</x>
+     <y>21</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>120</x>
+     <y>172</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioButtonLocation</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>frameLocation</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>120</x>
+     <y>21</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>120</x>
+     <y>79</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
  <buttongroups>
   <buttongroup name="buttonGroupLocation"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

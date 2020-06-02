@@ -80,21 +80,21 @@ pqTextLocationWidget::pqTextLocationWidget(
       this, "windowLocation", SIGNAL(windowLocationChanged(QString&)), smproperty);
     QObject::connect(this, SIGNAL(windowLocationChanged(QString&)), this, SLOT(updateUI()));
     QObject::connect(
-      ui.groupBoxLocation, SIGNAL(toggled(bool)), this, SLOT(groupBoxLocationClicked()));
+      ui.radioButtonLocation, SIGNAL(clicked()), this, SLOT(radioButtonLocationClicked()));
     QObject::connect(ui.buttonGroupLocation, SIGNAL(buttonClicked(QAbstractButton*)), this,
-      SLOT(groupBoxLocationClicked()));
+      SLOT(radioButtonLocationClicked()));
   }
   else
   {
-    ui.groupBoxLocation->hide();
-    ui.groupBoxPosition->setCheckable(false);
+    ui.radioButtonLocation->hide();
+    ui.radioButtonPosition->setCheckable(false);
   }
 
   smproperty = smgroup->GetProperty("Position");
   if (smproperty)
   {
     QObject::connect(
-      ui.groupBoxPosition, SIGNAL(toggled(bool)), this, SLOT(groupBoxPositionClicked()));
+      ui.radioButtonPosition, SIGNAL(clicked()), this, SLOT(radioButtonPositionClicked()));
     this->addPropertyLink(
       ui.pos1X, "text2", SIGNAL(textChangedAndEditingFinished()), smproperty, 0);
     this->addPropertyLink(
@@ -102,7 +102,7 @@ pqTextLocationWidget::pqTextLocationWidget(
   }
   else
   {
-    ui.groupBoxPosition->hide();
+    ui.radioButtonPosition->hide();
   }
 
   this->updateUI();
@@ -134,7 +134,7 @@ QString pqTextLocationWidget::windowLocation() const
 }
 
 //-----------------------------------------------------------------------------
-void pqTextLocationWidget::groupBoxLocationClicked()
+void pqTextLocationWidget::radioButtonLocationClicked()
 {
   auto button = this->Internals->Ui.buttonGroupLocation->checkedButton();
   QString locationStr(button->property("location").toString());
@@ -142,7 +142,7 @@ void pqTextLocationWidget::groupBoxLocationClicked()
 }
 
 //-----------------------------------------------------------------------------
-void pqTextLocationWidget::groupBoxPositionClicked()
+void pqTextLocationWidget::radioButtonPositionClicked()
 {
   QString str("AnyLocation");
   this->setWindowLocation(str);
@@ -156,12 +156,12 @@ void pqTextLocationWidget::updateUI()
   const QString& windowLocation = this->Internals->windowLocation;
 
   bool anyLocation = (windowLocation == "AnyLocation");
-  ui.groupBoxPosition->blockSignals(true);
-  ui.groupBoxPosition->setChecked(anyLocation);
-  ui.groupBoxPosition->blockSignals(false);
-  ui.groupBoxLocation->blockSignals(true);
-  ui.groupBoxLocation->setChecked(!anyLocation);
-  ui.groupBoxLocation->blockSignals(false);
+  ui.radioButtonPosition->blockSignals(true);
+  ui.radioButtonPosition->setChecked(anyLocation);
+  ui.radioButtonPosition->blockSignals(false);
+  ui.radioButtonLocation->blockSignals(true);
+  ui.radioButtonLocation->setChecked(!anyLocation);
+  ui.radioButtonLocation->blockSignals(false);
 
   // Check the selected location button if location is anything other than "AnyLocation"
   if (!anyLocation)
