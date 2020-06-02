@@ -165,7 +165,7 @@ vtkSMMultiplexerSourceProxy::vtkSMMultiplexerSourceProxy()
   : Internals(new vtkSMMultiplexerSourceProxy::vtkInternals())
 {
   this->SetSIClassName("vtkSIMultiplexerSourceProxy");
-  this->SetVTKClassName("vtkPassThroughFilter");
+  this->SetVTKClassName("vtkPassThrough");
 }
 
 //----------------------------------------------------------------------------
