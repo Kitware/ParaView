@@ -14,6 +14,7 @@
 #include "vtkPVOptions.h"
 
 #include "vtkLogger.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVOptionsXMLParser.h"
 #include "vtkProcessModule.h"
@@ -23,6 +24,7 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <algorithm>
+#include <string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
@@ -82,7 +84,7 @@ vtkPVOptions::vtkPVOptions()
   this->ForceOnscreenRendering = 0;
   this->CatalystLivePort = -1;
   this->LogStdErrVerbosity = vtkLogger::VERBOSITY_INVALID;
-
+  this->DisplaysAssignmentMode = vtkPVOptions::ROUNDROBIN;
   if (this->XMLParser)
   {
     this->XMLParser->Delete();
@@ -319,6 +321,19 @@ void vtkPVOptions::Initialize()
     "for rendering results.",
     vtkPVOptions::PVSERVER | vtkPVOptions::PVBATCH | vtkPVOptions::PVCLIENT |
       vtkPVOptions::PVRENDER_SERVER);
+
+  this->AddCallback("--displays", nullptr, &vtkPVOptions::DisplaysArgumentHandler, this,
+    "Specify a comma separated list of rendering display or device ids. For X-based "
+    "systems, this can be the value to set for the DISPLAY environment. For EGL-based "
+    "systems, these are the available EGL device indices. When specified these are distributed "
+    "among the number of rendering ranks using the '--displays-assignment-mode=' specified.",
+    vtkPVOptions::PVSERVER | vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVBATCH);
+
+  this->AddCallback("--displays-assignment-mode", "-m",
+    &vtkPVOptions::DisplaysAssignmentModeArgumentHandler, this,
+    "Specify how to assign displays (specified using '--displays=') among rendering ranks. "
+    "Supported values are 'contiguous' and 'round-robin'. Default is 'round-robin'.",
+    vtkPVOptions::PVSERVER | vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVBATCH);
 }
 
 //----------------------------------------------------------------------------
@@ -369,6 +384,47 @@ int vtkPVOptions::VerbosityArgumentHandler(
   return 0;
 }
 
+//----------------------------------------------------------------------------
+int vtkPVOptions::DisplaysArgumentHandler(
+  const char* vtkNotUsed(argument), const char* cvalue, void* call_data)
+{
+  if (cvalue == nullptr)
+  {
+    return 0;
+  }
+
+  auto self = reinterpret_cast<vtkPVOptions*>(call_data);
+  self->Displays = vtksys::SystemTools::SplitString(cvalue, ',');
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVOptions::DisplaysAssignmentModeArgumentHandler(
+  const char* vtkNotUsed(argument), const char* cvalue, void* call_data)
+{
+  if (cvalue == nullptr)
+  {
+    return 0;
+  }
+
+  auto self = reinterpret_cast<vtkPVOptions*>(call_data);
+  auto arg = vtksys::SystemTools::LowerCase(cvalue);
+  if (arg == "contiguous")
+  {
+    self->DisplaysAssignmentMode = CONTIGUOUS;
+    return 1;
+  }
+  else if (arg == "round-robin")
+  {
+    self->DisplaysAssignmentMode = ROUNDROBIN;
+    return 1;
+  }
+
+  vtkErrorWithObjectMacro(self, "Unknown value for 'displays-assignment-mode': " << cvalue);
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 namespace
 {
 static void OnAtExit()
@@ -513,6 +569,32 @@ int vtkPVOptions::PostProcess(int argc, const char* const* argv)
     this->ForceOnscreenRendering = 1;
   }
 
+  // handle displays.
+  if (!this->Displays.empty())
+  {
+    auto controller = vtkMultiProcessController::GetGlobalController();
+    const int rank = controller->GetLocalProcessId();
+    const int numRanks = controller->GetNumberOfProcesses();
+    const auto display = this->GetDisplay(rank, numRanks);
+    if (!display.empty())
+    {
+      // for X, add DISPLAY environment variable.
+      vtkLogF(TRACE, "Setting environment variable 'DISPLAY=%s'", display.c_str());
+      vtksys::SystemTools::PutEnv("DISPLAY=" + display);
+      // for EGL, set EGLDeviceIndex, if not already specified.
+      if (this->EGLDeviceIndex == -1)
+      {
+        try
+        {
+          this->EGLDeviceIndex = std::stoi(display);
+          vtkLogF(TRACE, "Setting EGLDeviceIndex to %d", this->EGLDeviceIndex);
+        }
+        catch (std::invalid_argument&)
+        {
+        }
+      }
+    }
+  }
   return 1;
 }
 
@@ -553,6 +635,36 @@ bool vtkPVOptions::GetIsInTileDisplay() const
 bool vtkPVOptions::GetIsInCave() const
 {
   return false;
+}
+
+//----------------------------------------------------------------------------
+const std::string& vtkPVOptions::GetDisplay(int myrank, int num_ranks)
+{
+  static std::string empty_string;
+  if (this->Displays.empty())
+  {
+    return empty_string;
+  }
+
+  const int count = static_cast<int>(this->Displays.size());
+  switch (this->DisplaysAssignmentMode)
+  {
+    case ROUNDROBIN:
+      return this->Displays[(myrank % count)];
+
+    case CONTIGUOUS:
+    {
+      // same as diy::ContiguousAssigner::rank()
+      const int div = num_ranks / count;
+      const int mod = num_ranks % count;
+      const int r = myrank / (div + 1);
+      const int index = (r < mod) ? r : (mod + (myrank - (div + 1) * mod) / div);
+      return this->Displays[index];
+    }
+    break;
+    default:
+      return empty_string;
+  }
 }
 
 //----------------------------------------------------------------------------
