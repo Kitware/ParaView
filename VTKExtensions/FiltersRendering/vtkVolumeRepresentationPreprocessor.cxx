@@ -128,8 +128,9 @@ vtkDataSet* vtkVolumeRepresentationPreprocessor::MultiBlockToDataSet(vtkMultiBlo
   this->ExtractBlockFilter->Update();
   this->ExtractBlockFilter->SetInputData(0);
 
-  // output is a vtkMultiBlockDataSet with a single leaf node.
-  vtkMultiBlockDataSet* output = this->ExtractBlockFilter->GetOutput();
+  // output is a vtkCompositeDataSet with a single leaf node.
+  vtkCompositeDataSet* output =
+    vtkCompositeDataSet::SafeDownCast(this->ExtractBlockFilter->GetOutput());
 
   // use an iterator to get the dataset at the leaf node.
   vtkDataSet* dataset = 0;
