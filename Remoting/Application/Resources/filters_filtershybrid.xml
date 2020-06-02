@@ -51,9 +51,6 @@
                                    value="1" />
         </Hints>
       </DoubleVectorProperty>
-      <Hints>
-        <ShowInMenu category="Temporal" />
-      </Hints>
       <!-- End ForceTime -->
     </SourceProxy>
 
@@ -141,9 +138,6 @@
         If empty, output will be suffixed with '_' and the operation type.
         </Documentation>
       </StringVectorProperty>
-      <Hints>
-        <ShowInMenu category="Temporal" />
-      </Hints>
       <!-- End TemporalArrayOperator -->
     </SourceProxy>
 

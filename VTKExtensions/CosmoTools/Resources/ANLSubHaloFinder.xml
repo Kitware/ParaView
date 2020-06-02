@@ -180,10 +180,6 @@
           the subhalo finder where X is the value of this parameter.
         </Documentation>
       </IntVectorProperty>
-
-      <Hints>
-        <ShowInMenu category="CosmoTools"/>
-      </Hints>
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

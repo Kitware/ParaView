@@ -303,11 +303,6 @@
           if subhalo finding is enabled.
         </Documentation>
       </IntVectorProperty>
-
-      <Hints>
-        <ShowInMenu category="CosmoTools"/>
-      </Hints>
-
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
