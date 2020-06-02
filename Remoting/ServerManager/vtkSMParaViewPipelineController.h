@@ -34,7 +34,7 @@
  * behaviour (see vtkSMParaViewPipelineControllerWithRender).
  *
  * For an example of using vtkSMParaViewPipelineController in your application,
- * see `ParaView/ParaViewCore/ServerManager/Core/Testing/Cxx/TestParaViewPipelineController.cxx`.
+ * see `Remoting/Views/Testing/Cxx/TestParaViewPipelineController.cxx`.
  *
 */
 

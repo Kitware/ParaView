@@ -22,6 +22,7 @@ set(python_files
   paraview/detail/extract_selection.py
   paraview/detail/pythonalgorithm.py
   paraview/detail/python_selector.py
+  paraview/live.py
   paraview/lookuptable.py
   paraview/modules/__init__.py
   paraview/numeric.py
