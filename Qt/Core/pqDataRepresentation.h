@@ -144,6 +144,13 @@ Q_SIGNALS:
   */
   void colorArrayNameModified();
 
+  /**
+  * Signal fired to indicate that the rendering attribute arrays properties
+  * (Normals, TCoords, Tangents) were modified.
+  * These properties control the shading and texture mapping.
+  */
+  void attrArrayNameModified();
+
 public Q_SLOTS:
   /**
   * Slot to update the lookup table if the application setting to
