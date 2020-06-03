@@ -3767,6 +3767,7 @@
                             panel_visibility="never"
                             default_values_delimiter=";"
                             default_values="Block Number"
+                            number_of_elements="1"
                             repeat_command="1">
         <Documentation>This is list of labels for columns that will be hidden
           in the view i.e. these columns won't be show in the GUI or exported
