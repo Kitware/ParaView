@@ -49,11 +49,22 @@ public:
   pqCatalystExportReaction(QAction* parent);
   ~pqCatalystExportReaction();
 
+  /**
+   * Export a Catalyst script. Returns true on success.
+   */
+  static bool exportScript(const QString& name);
+
+  /**
+   * Export a Catalyst script. Returns the non-empty name of the file
+   * written on success.
+   */
+  static QString exportScript();
+
 protected Q_SLOTS:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered();
+  void onTriggered() override { this->exportScript(); }
 
 private:
   Q_DISABLE_COPY(pqCatalystExportReaction)

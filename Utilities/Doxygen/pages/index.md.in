@@ -20,6 +20,7 @@ Page | Description
 [Proxy Documentation Formatting](@ref ProxyDocumentationFormatting) | Formatting options for proxy documentation.
 [Community Admosphere Model (CAM5) Catalyst Adaptor](@ref Cam5Adaptor) | Analyze Cam5 output with ParaView Catalyst.
 [ParaView and Offscreen Rendering](@ref Offscreen) | Configuring and using ParaView in offscreen and/or headless environments.
+[Anatomy of Catalyst Python Module (Version 2.0)](@ref CatalystPythonScriptsV2) | Understanding Catalyst Python modules.
 
 Design/Implementation Details
 -----------------------------

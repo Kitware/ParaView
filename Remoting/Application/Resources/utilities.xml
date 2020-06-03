@@ -674,35 +674,6 @@
     </Proxy>
 
     <!-- ================================================================= -->
-    <Proxy name="CatalystOptions">
-      <Documentation>Common XML for Catalyst Specific Properties</Documentation>
-      <IntVectorProperty name="WriteFrequency"
-                       label="Write Frequency"
-                       default_values="1"
-                       number_of_elements="1">
-        <Documentation>Set how often Catalyst runs will export this data product. Zero is OK and means only when output is forced by the simulation.
-        </Documentation>
-        <IntRangeDomain min="0"
-                        name="range" />
-      </IntVectorProperty>
-      <StringVectorProperty name="CatalystFilePattern"
-                          label="File Pattern"
-                          default_values="filename_%t.ext"
-                          number_of_elements="1">
-        <Documentation>Set the filename pattern Catalyst runs will use to export this data product.
-        </Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty name="CatalystFitToScreen"
-                       label="Fit To Screen"
-                       default_values="0"
-                       number_of_elements="1">
-        <Documentation>Causes Catalyst to reset the camera with each screenshot to keep all objects in view.
-        </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-
-    </Proxy>
-    <!-- ================================================================= -->
     <Proxy name="LogRecorder" class="vtkLogRecorder">
       <IntVectorProperty name="RankEnabled"
                          command="SetRankEnabled"
@@ -857,6 +828,105 @@
   </ProxyGroup>
 
   <ProxyGroup name="coprocessing">
+    <Proxy name="CatalystOptions">
+      <Documentation>
+        Catalyst options that affect the script execution when running in situ.
+      </Documentation>
+
+      <StringVectorProperty name="DataExtractsOutputDirectory"
+        number_of_elements="1"
+        default_values="datasets">
+        <Documentation>
+          Choose directory under which to save all data extracts. All text
+          of the form **$ENV{VAR}** will be replaced using environment variable
+          named **VAR** when generating extracts.
+        </Documentation>
+        <FileListDomain name="directory" />
+        <Hints>
+          <UseDirectoryName />
+          <AcceptAnyFile />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ImageExtractsOutputDirectory"
+        number_of_elements="1"
+        default_values="images">
+        <Documentation>
+          Choose directory under which to save all image extracts. All text
+          of the form **$ENV{VAR}** will be replaced using environment variable
+          named **VAR** when generating extracts.
+        </Documentation>
+        <FileListDomain name="directory" />
+        <Hints>
+          <UseDirectoryName />
+          <AcceptAnyFile />
+        </Hints>
+      </StringVectorProperty>
+
+      <ProxyProperty name="GlobalTrigger">
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="extract_triggers" name="Time" />
+        </ProxyListDomain>
+      </ProxyProperty>
+
+      <IntVectorProperty name="EnableCatalystLive"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Enable Catalyst Live which allows connecting to a Catalyst instrumented simulation
+          using the ParaView GUI.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <StringVectorProperty name="CatalystLiveURL"
+        label="Catalyst Live URL"
+        number_of_elements="1"
+        default_values="localhost:22222">
+        <Documentation>
+          Specify the hostname (or IP address) and port for the node on which a ParaView client will
+          be listening for Catalyst Live connections.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="enabled_state"
+            property="EnableCatalystLive"
+            value="1" />
+        </Hints>
+      </StringVectorProperty>
+
+      <ProxyProperty name="CatalystLiveTrigger" panel_visibility="advanced">
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="extract_triggers" name="Time" />
+        </ProxyListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="enabled_state"
+            property="EnableCatalystLive"
+            value="1" />
+        </Hints>
+      </ProxyProperty>
+
+      <PropertyGroup label="Directories">
+        <Property name="DataExtractsOutputDirectory" />
+        <Property name="ImageExtractsOutputDirectory" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Global Options">
+        <Property name="GlobalTrigger" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Catalyst Live Options">
+        <Property name="EnableCatalystLive" />
+        <Property name="CatalystLiveURL" />
+        <Property name="CatalystLiveTrigger" />
+      </PropertyGroup>
+
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
+    </Proxy>
+
     <Proxy name="CatalystGlobalOptions">
       <Documentation>
         A proxy used to maintain global Catalyst state. This, combined with the pipeline shape and a choice of writers and screenshots define what Catalyst will do with and produce from the data that the simulation gives to it.
@@ -1531,11 +1601,25 @@
           </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
-      <PropertyGroup label="General options">
+      <SubProxy>
+        <Proxy name="SaveExtractsOptions" proxygroup="misc" proxyname="SaveAnimationExtracts"/>
+        <ExposedProperties>
+          <Property name="DataExtractsOutputDirectory" />
+          <Property name="ImageExtractsOutputDirectory" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <PropertyGroup label="General Options">
         <Property name="PropertiesToTraceOnCreate" />
         <Property name="SkipRenderingComponents" />
         <Property name="SkipHiddenDisplayProperties" />
       </PropertyGroup>
+
+      <PropertyGroup label="Save Extracts Options">
+        <Property name="DataExtractsOutputDirectory" />
+        <Property name="ImageExtractsOutputDirectory" />
+      </PropertyGroup>
+
       <Hints>
         <UseDocumentationForLabels />
       </Hints>

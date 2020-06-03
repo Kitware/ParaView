@@ -325,28 +325,35 @@
     <!-- end of "writers" -->
   </ProxyGroup>
 
-  <ProxyGroup name="insitu2_writer_parameters">
-    <PSWriterProxy base_proxygroup="writers"
-                   base_proxyname="CSVWriter"
-                   class="vtkParallelSerialWriter"
-                   name="CSVWriter"
-                   supports_parallel="1">
-      <Documentation short_help="Expose a writer for catalyst.">
-        Variation with catalyst specific extensions.
+  <!-- =================================================================== -->
+  <ProxyGroup name="extract_writers">
+
+    <!-- ================================================================= -->
+    <DataExtractWriterProxy name="CSV">
+      <Documentation>
+        Extract writer to write tabular data using the CSV file format (csv).
       </Documentation>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="dataset_%.6ts.csv">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
       <SubProxy>
-        <Proxy name="CatalystOptions"
-               proxygroup="misc"
-               proxyname="CatalystOptions"></Proxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="CSVWriter" />
         <ExposedProperties>
-           <PropertyGroup label="Catalyst Options">
-             <Property name="WriteFrequency" />
-             <Property name="CatalystFilePattern" />
-           </PropertyGroup>
+          <Property name="Input" />
+          <Property name="FieldAssociation" />
+          <Property name="Precision" panel_visibility="advanced"/>
+          <Property name="UseScientificNotation" panel_visibility="advanced"/>
+          <Property name="AddMetaData" panel_visibility="advanced"/>
+          <Property name="AddTime" panel_visibility="advanced"/>
         </ExposedProperties>
       </SubProxy>
-      <!-- End of CSVWriter -->
-    </PSWriterProxy>
-    <!-- end of "insitu2_writer_parameters" -->
+    </DataExtractWriterProxy>
+
+    <!-- end of "extract_writers" -->
   </ProxyGroup>
+
 </ServerManagerConfiguration>

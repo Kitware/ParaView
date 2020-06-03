@@ -28,3 +28,17 @@ def IntegrateCell(dataset, cellId):
     """
     from paraview.modules.vtkPVVTKExtensionsFiltersGeneral import vtkCellIntegrator
     return vtkCellIntegrator.Integrate(dataset, cellId)
+
+
+def ReplaceDollarVariablesWithEnvironment(text):
+    """Replaces all substrings of the type `${FOO}` with `FOO` obtained
+    from the `os.environ`. If the key is not defined in the environment, this
+    raises a `KeyError`.
+    """
+    import os, re
+    r = re.compile(r"\$ENV\{([^}]+)\}")
+    def repl(m):
+        if m.group(1) in os.environ:
+            return os.environ[m.group(1)]
+        raise KeyError("'%s' is not defined in the process environment" % m.group(1))
+    return re.sub(r, repl, text)

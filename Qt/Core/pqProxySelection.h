@@ -60,6 +60,14 @@ public:
   * copy values to vtkSMProxySelectionModel. Clears any existing selection.
   */
   static bool copy(const pqProxySelection& source, vtkSMProxySelectionModel* dest);
+
+  /**
+   * Selections can contains pqOutputPort, pqPipelineSource, or
+   * pqExtractGenerator instances. Use this method to filter out all
+   * pqOutputPort and replace them with corresponding pqPipelineSource
+   * instances.
+   */
+  static pqProxySelection getPipelineProxies(const pqProxySelection& sel);
 };
 
 #endif

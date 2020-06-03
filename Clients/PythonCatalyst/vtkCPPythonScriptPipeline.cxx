@@ -166,6 +166,7 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
   loadPythonModules << "del _code" << std::endl;
   loadPythonModules << moduleName << " = ";
   loadPythonModules << "__import__('" << fileNameName << "')" << std::endl;
+  loadPythonModules << "from paraview.modules import vtkPVCatalyst" << std::endl;
 
   delete[] scriptPath;
   delete[] scriptText;

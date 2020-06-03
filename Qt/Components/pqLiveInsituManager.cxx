@@ -154,7 +154,7 @@ bool pqLiveInsituManager::isWriterParametersProxy(vtkSMProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
-bool pqLiveInsituManager::isInsitu(pqPipelineSource* pipelineSource)
+bool pqLiveInsituManager::isInsitu(pqProxy* pipelineSource)
 {
   pqServer* insituSession = pqLiveInsituManager::instance()->selectedInsituServer();
   if (!insituSession)

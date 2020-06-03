@@ -14,6 +14,7 @@ DEPENDS
 PRIVATE_DEPENDS
   ParaView::PythonInitializer
   VTK::ParallelCore
+  VTK::WrappingPythonCore
 TEST_DEPENDS
   ParaView::CatalystTestDriver
   VTK::IOImage

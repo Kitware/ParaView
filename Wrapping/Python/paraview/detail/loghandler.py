@@ -30,11 +30,10 @@ class VTKHandler(logging.Handler):
             return vtkLogger.VERBOSITY_MAX
 
 
-def get_level():
+def get_level(vtklevel=None):
     """returns current log level used by vtkLogger"""
     from vtkmodules.vtkCommonCore import vtkLogger
-    vtk_level = vtkLogger.GetCurrentVerbosityCutoff()
-    print("current", vtk_level)
+    vtk_level = vtkLogger.GetCurrentVerbosityCutoff() if vtklevel is None else vtklevel
     if vtk_level == vtkLogger.VERBOSITY_ERROR:
         return logging.ERROR
     elif vtk_level == vtkLogger.VERBOSITY_WARNING:

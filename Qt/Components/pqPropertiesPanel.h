@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqPropertiesPanel_h
 
 #include "pqComponentsModule.h"
+#include "vtkLegacy.h" // for legacy macros
 #include <QWidget>
 
 class pqDataRepresentation;
@@ -115,9 +116,11 @@ public:
   int panelMode() const { return this->PanelMode; }
 
   /**
-  * Update the panel to show the widgets for the given pair.
-  */
-  void updatePanel(pqOutputPort* port);
+   * Update the panel to show the widgets for the given pair.
+   * @deprecated in ParaView 5.9. Use `setRepresentation`, `setView` and
+   * `setPipelineProxy` instead.
+   */
+  VTK_LEGACY(void updatePanel(pqOutputPort* port));
 
   /**
    * Returns true if there are changes to be applied.
@@ -128,6 +131,14 @@ public:
    * Returns true if there are changes to be reset.
    */
   bool canReset();
+
+  /**
+   * This has been replaced by `setPipelineProxy` to add support for other types
+   * of pqProxy subclasses such as pqExtractGenerator.
+   *
+   * @deprecated in ParaView 5.9. Use `setPipelineProxy` instead.
+   */
+  VTK_LEGACY(void setOutputPort(pqOutputPort*));
 
 public Q_SLOTS:
   /**
@@ -210,11 +221,11 @@ public Q_SLOTS:
   void setView(pqView*);
 
   /**
-  * Set the output port currently managed by the
-  * panel, should be called automatically
-  * when the active output port changes.
-  */
-  void setOutputPort(pqOutputPort*);
+   * Set the `pqProxy` to show properties for under the "Properties" section.
+   * Typically, this is a pqPipelineSource (or subclass), pqOutputPort, or
+   * a pqExtractGenerator.
+   */
+  void setPipelineProxy(pqProxy*);
 
   /**
   * Set the representation currently managed by the
@@ -246,7 +257,7 @@ Q_SIGNALS:
   /**
   * This signal is emitted when the user clicks the delete button.
   */
-  void deleteRequested(pqPipelineSource* source);
+  void deleteRequested(pqProxy* source);
 
   /**
    * This signal is emitted when the apply button's enable state changes.
@@ -266,7 +277,7 @@ private Q_SLOTS:
   /**
   * slot gets called when a proxy is deleted.
   */
-  void proxyDeleted(pqPipelineSource*);
+  void proxyDeleted(pqProxy*);
 
   /**
   * Updates the entire panel (properties+display) using the current
@@ -315,7 +326,7 @@ private Q_SLOTS:
   void pasteView();
 
 protected:
-  void updatePropertiesPanel(pqPipelineSource* source);
+  void updatePropertiesPanel(pqProxy* source);
   void updateDisplayPanel(pqDataRepresentation* repr);
   void updateViewPanel(pqView* view);
 

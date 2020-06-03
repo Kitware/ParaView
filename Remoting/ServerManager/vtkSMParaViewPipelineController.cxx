@@ -977,6 +977,35 @@ bool vtkSMParaViewPipelineController::RegisterTextureProxy(vtkSMProxy* proxy, co
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::RegisterExtractGeneratorProxy(
+  vtkSMProxy* proxy, const char* proxyname)
+{
+  if (!proxy)
+  {
+    return false;
+  }
+
+  auto pxm = proxy->GetSessionProxyManager();
+
+  this->RegisterProxiesForProxyListDomains(proxy);
+
+  const std::string groupname = this->GetHelperProxyGroupName(proxy);
+  if (auto writer = vtkSMPropertyHelper(proxy, "Writer").GetAsProxy())
+  {
+    pxm->RegisterProxy(groupname.c_str(), "Writer", writer);
+  }
+  pxm->RegisterProxy("extract_generators", proxyname, proxy);
+
+  // Make the proxy active.
+  vtkSMProxySelectionModel* selmodel =
+    proxy->GetSessionProxyManager()->GetSelectionModel("ActiveSources");
+  assert(selmodel != nullptr);
+  selmodel->SetCurrentProxy(proxy, vtkSMProxySelectionModel::CLEAR_AND_SELECT);
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
 void vtkSMParaViewPipelineController::UpdateSettingsProxies(vtkSMSession* session)
 {
   // Set up the settings proxies
@@ -1217,6 +1246,9 @@ bool vtkSMParaViewPipelineController::UnRegisterDependencies(vtkSMProxy* proxy)
       // Remove any animation cues for this proxy
       strcmp(consumer->GetXMLGroup(), "animation") == 0 ||
 
+      // Remove any exporters for this proxy
+      strcmp(consumer->GetXMLGroup(), "extract_generators") == 0 ||
+
       false)
     {
       this->UnRegisterProxy(consumer);
@@ -1263,9 +1295,8 @@ bool vtkSMParaViewPipelineController::UnRegisterProxy(vtkSMProxy* proxy)
   else
   {
     PREPARE_FOR_UNREGISTERING(proxy);
-
     const char* known_groups[] = { "lookup_tables", "piecewise_functions", "layouts",
-      "additional_lights", NULL };
+      "additional_lights", "extract_generators", nullptr };
     for (int cc = 0; known_groups[cc] != NULL; ++cc)
     {
       if (const char* pname = pxm->GetProxyName(known_groups[cc], proxy))

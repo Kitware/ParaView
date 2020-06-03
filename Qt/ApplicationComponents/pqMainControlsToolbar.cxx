@@ -33,11 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqMainControlsToolbar.h"
 
 #include "pqAutoApplyReaction.h"
+#include "pqCatalystExportReaction.h"
 #include "pqDataQueryReaction.h"
 #include "pqDeleteReaction.h"
+#include "pqImmediateExportReaction.h"
 #include "pqLoadDataReaction.h"
 #include "pqLoadPaletteReaction.h"
 #include "pqSaveDataReaction.h"
+#include "pqSaveStateReaction.h"
 #include "pqServerConnectReaction.h"
 #include "pqServerDisconnectReaction.h"
 #include "pqUndoRedoReaction.h"
@@ -59,6 +62,13 @@ void pqMainControlsToolbar::constructor()
   new pqAutoApplyReaction(ui.actionAutoApply);
   new pqDataQueryReaction(ui.actionQuery);
   new pqLoadPaletteReaction(ui.actionLoadPalette);
+  new pqSaveStateReaction(ui.actionSaveState);
+  new pqImmediateExportReaction(ui.actionGenerateExtracts);
+#if VTK_MODULE_ENABLE_ParaView_pqPython
+  new pqCatalystExportReaction(ui.actionSaveCatalystState);
+#else
+  ui.actionSaveCatalystState->setEnabled(false);
+#endif
 
   QToolButton* tb = qobject_cast<QToolButton*>(this->widgetForAction(ui.actionLoadPalette));
   if (tb)

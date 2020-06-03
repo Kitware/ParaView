@@ -155,17 +155,13 @@ public:
   std::string GetCurrentTrace();
 
   /**
-   * Save a Python state for the application and return it. Note this cannot be
-   * called when tracing is active.
+   * Generate a Python state for the application and return it. Note this cannot
+   * be called when Python tracing is active.
    *
-   * If `skipHiddenRepresentations` is true, only visible representations are
-   * saved in the generate state file.
-   *
-   * If `skipRenderingComponents` is true, all rendering components like view,
-   * representations etc. are entirely skipped from the trace.
+   * `options` is a proxy with options to customize the state generation such as
+   * `('pythontracing', 'PythonStateOptions')`.
    */
-  static std::string GetState(
-    int propertiesToTraceOnCreate, bool skipHiddenRepresentations, bool skipRenderingComponents);
+  static std::string GetState(vtkSMProxy* options);
 
   // ************** BEGIN INTERNAL *************************
   //@{

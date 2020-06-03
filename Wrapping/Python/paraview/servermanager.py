@@ -477,9 +477,9 @@ class Proxy(object):
     def __setattr__(self, name, value):
         try:
             setter = getattr(self.__class__, name)
-            paraview.print_debug_info("No attribute %s" % name)
             setter = setter.__set__
         except AttributeError:
+            paraview.print_debug_info("No attribute %s" % name)
             # Let the backwards compatibility helper try to handle this
             try:
                 _bc.setattr(self, name, value)
@@ -494,7 +494,7 @@ class Proxy(object):
                         "mistakes due to typos. Use add_attribute() if you really want " +
                         "to add this attribute.")
         else:
-            paraview.print_debug_info(name)
+            paraview.print_debug_info("Setting '%s' as '%s'", name, value)
             try:
                 setter(self, value)
             except ValueError:
@@ -2556,9 +2556,10 @@ def _getPyProxy(smproxy, outputPort=0):
     if isinstance(smproxy, Proxy):
         # if already a pyproxy, do nothing.
         return smproxy
-
     if not smproxy:
         return None
+    if smproxy.IsA("vtkSMOutputPort"):
+        return _getPyProxy(smproxy.GetSourceProxy(), smproxy.GetPortIndex())
     try:
         # is argument is already a Proxy instance, this takes care of it.
         return _getPyProxy(smproxy.SMProxy, outputPort)

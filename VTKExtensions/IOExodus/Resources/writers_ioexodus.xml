@@ -53,38 +53,28 @@
   </ProxyGroup>
 
   <!-- =================================================================== -->
-  <ProxyGroup name="insitu2_writer_parameters">
-    <!-- ================================================================= -->
-    <PWriterProxy base_proxygroup="writers"
-                  base_proxyname="ExodusIIWriter"
-                  class="vtkExodusIIWriter"
-                  name="ExodusIIWriter"
-                  supports_parallel="1">
-      <Documentation short_help="Expose a writer for catalyst.">
-        Variation with catalyst specific extensions.
+  <ProxyGroup name="extract_writers">
+    <DataExtractWriterProxy name="Exodus">
+      <Documentation>
+        Extract writer to write data using the Exodus file format.
       </Documentation>
-      <IntVectorProperty name="WriteFrequency"
-                       label="Catalyst Write Frequency"
-                       default_values="1"
-                       number_of_elements="1">
-        <Documentation>Set how often Catalyst runs will export this data product. Zero is OK and means only when output is forced by the simulation.
-        </Documentation>
-        <IntRangeDomain min="0"
-                        name="range" />
-      </IntVectorProperty>
-      <StringVectorProperty name="CatalystFilePattern"
-                          default_values="filename.e-s"
-                          number_of_elements="1">
-        <Documentation>Set the filename pattern Catalyst runs will use to export this data product.
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="dataset_%.6ts.ex2">
+        <Documentation>
+          Specify the filename to use.
         </Documentation>
       </StringVectorProperty>
-      <PropertyGroup label="Catalyst Options">
-        <Property name="CatalystFilePattern" />
-        <Property name="WriteFrequency" />
-      </PropertyGroup>
-      <!-- End of ExodusIIWriter -->
-    </PWriterProxy>
+      <SubProxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="ExodusIIWriter" />
+        <ExposedProperties>
+          <Property name="Input" />
+        </ExposedProperties>
+      </SubProxy>
+      <!-- end of Exodus -->
+    </DataExtractWriterProxy>
 
-    <!-- end of "insitu2_writer_parameters" -->
+    <!-- end of "extract_writers" -->
   </ProxyGroup>
+
 </ServerManagerConfiguration>

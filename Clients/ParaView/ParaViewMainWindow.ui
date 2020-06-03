@@ -45,7 +45,7 @@
      <x>0</x>
      <y>0</y>
      <width>1152</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -93,11 +93,17 @@
      <string>&amp;Catalyst</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuExtractGenerators">
+    <property name="title">
+     <string>E&amp;xtract Generators</string>
+    </property>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
    <addaction name="menu_View"/>
    <addaction name="menuSources"/>
    <addaction name="menuFilters"/>
+   <addaction name="menuExtractGenerators"/>
    <addaction name="menuTools"/>
    <addaction name="menu_Catalyst"/>
    <addaction name="menu_Macros"/>
@@ -203,7 +209,7 @@
           <x>0</x>
           <y>0</y>
           <width>78</width>
-          <height>154</height>
+          <height>162</height>
          </rect>
         </property>
        </widget>
@@ -265,17 +271,6 @@
     <number>1</number>
    </attribute>
    <widget class="pqLightsInspector" name="lightInspectorPanel"/>
-  </widget>
-  <widget class="QDockWidget" name="catalystInspectorDock">
-   <property name="allowedAreas">
-    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
-   </property>
-   <property name="windowTitle">
-    <string>Export Inspector</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
   </widget>
   <widget class="QDockWidget" name="colorMapEditorDock">
    <property name="allowedAreas">
@@ -503,12 +498,6 @@
    <class>pqLightsInspector</class>
    <extends>QWidget</extends>
    <header>pqLightsInspector.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>pqExportInspector</class>
-   <extends>QWidget</extends>
-   <header>pqExportInspector.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

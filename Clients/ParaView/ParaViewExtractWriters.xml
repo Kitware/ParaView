@@ -1,0 +1,23 @@
+<ParaViewExtractWriters>
+  <Category name="Data" show_in_toolbar="0" preserve_order="0">
+    <Proxy group="extract_writers" name="VTP" />
+    <Proxy group="extract_writers" name="VTU" />
+    <Proxy group="extract_writers" name="HTG" />
+    <Proxy group="extract_writers" name="VTS" />
+    <Proxy group="extract_writers" name="VTR" />
+    <Proxy group="extract_writers" name="VTI" />
+    <Proxy group="extract_writers" name="VTM" />
+    <Proxy group="extract_writers" name="VTPD" />
+    <Proxy group="extract_writers" name="VTPC" />
+    <Proxy group="extract_writers" name="VTHB" />
+    <Proxy group="extract_writers" name="VTHB" />
+    <Proxy group="extract_writers" name="CSV" />
+    <Proxy group="extract_writers" name="Exodus" />
+  </Category>
+
+  <Category name="Image" show_in_toolbar="0" preserve_order="0">
+    <Proxy group="extract_writers" name="PNG" />
+    <Proxy group="extract_writers" name="JPG" />
+    <Proxy group="extract_writers" name="Cinema" />
+  </Category>
+</ParaViewExtractWriters>

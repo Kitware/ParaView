@@ -5,9 +5,6 @@ This can capture the ParaView state in a Pipeline object that can then be used
 in CoProcessing scripts. The entry point into this module is the function
 DumpPipeline() which returns the Python trace script. Most of the other
 functions can be considered internal.
-
-Also refer to paraview.cpexport Module which is used to generate a complete
-Python CoProcessing script that can be used with in a vtkCPPythonScriptPipeline.
 """
 
 from paraview import smtrace, smstate, servermanager
@@ -331,11 +328,6 @@ def cp_hook(varname, proxy):
             return ContourAccessor(varname, proxy)
         else:
             return ArrayAccessor(varname, proxy)
-
-    pname = smtrace.Trace.get_registered_name(proxy, "views")
-    if pname:
-        cpstate_globals.view_proxies.append(proxy)
-        return ViewAccessor(varname, proxy, pname)
     raise NotImplementedError
 
 # -----------------------------------------------------------------------------

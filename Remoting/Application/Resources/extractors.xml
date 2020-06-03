@@ -1,0 +1,88 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="extract_generators">
+    <Proxy name="Extractor">
+      <IntVectorProperty name="EnableExtract"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable the extract.
+        </Documentation>
+      </IntVectorProperty>
+
+      <ProxyProperty name="Trigger">
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="extract_triggers" name="Time" />
+        </ProxyListDomain>
+      </ProxyProperty>
+      <ProxyProperty name="Writer">
+        <ProxyListDomain name="proxy_list" />
+      </ProxyProperty>
+      <ProxyProperty name="Producer" panel_visibility="never" />
+    </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="extract_triggers">
+    <ExtractTriggerProxy name="Time">
+
+      <IntVectorProperty name="UseStartTimeStep"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, **StartTimeStep** will be used to delay the activation of this
+          trigger.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="StartTimeStep"
+                         number_of_elements="1"
+                         default_values="0">
+        <IntRangeDomain name="range" min="0" />
+        <Documentation>
+          Specify the timestep to at which this trigger is evaluated. This used only
+          if **UseStartTimeStep** is enabled.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="UseEndTimeStep"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, **EndTimeStep** will be used to delay the activation of this
+          trigger.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="EndTimeStep"
+                         number_of_elements="1"
+                         default_values="0">
+        <IntRangeDomain name="range" min="0" />
+        <Documentation>
+          Specify the timestep to at which this trigger is evaluated. This used only
+          if **UseEndTimeStep** is enabled.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Frequency"
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Specify the frequency.
+        </Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Start Time Step" panel_widget="CheckableProperty">
+        <Property name="StartTimeStep" function="Property" />
+        <Property name="UseStartTimeStep" function="PropertyCheckBox" />
+      </PropertyGroup>
+
+      <PropertyGroup label="End Time Step" panel_widget="CheckableProperty">
+        <Property name="EndTimeStep" function="Property" />
+        <Property name="UseEndTimeStep" function="PropertyCheckBox" />
+      </PropertyGroup>
+    </ExtractTriggerProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

@@ -53,11 +53,16 @@ public:
   pqImmediateExportReaction(QAction* parent);
   ~pqImmediateExportReaction();
 
+  /**
+   * Generates exports.
+   */
+  static bool generateExtracts();
+
 protected Q_SLOTS:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered();
+  void onTriggered() override { pqImmediateExportReaction::generateExtracts(); }
 
 private:
   Q_DISABLE_COPY(pqImmediateExportReaction)

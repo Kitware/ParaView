@@ -34,10 +34,12 @@ set(classes
   vtkCinemaLayerMapper
   vtkCinemaLayerRepresentation
   vtkPVCinemaDatabaseInformation
-  vtkSMCinemaDatabaseImporter)
+  vtkSMCinemaDatabaseImporter
+  vtkSMCinemaExtractWriterProxy)
 
 vtk_module_add_module(ParaView::RemotingCinema
   CLASSES ${classes})
 
 paraview_add_server_manager_xmls(
-  XMLS  "Resources/cinema_readers.xml")
+  XMLS  "Resources/cinema_readers.xml"
+        "Resources/extractors_remotingcinema.xml")

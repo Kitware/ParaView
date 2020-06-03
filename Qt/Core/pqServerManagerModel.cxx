@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 
 #include "pqApplicationCore.h"
+#include "pqExtractGenerator.h"
 #include "pqInterfaceTracker.h"
 #include "pqOptions.h"
 #include "pqOutputPort.h"
@@ -321,6 +322,7 @@ void pqServerManagerModel::onProxyRegistered(
   pqView* view = qobject_cast<pqView*>(item);
   pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
   pqRepresentation* repr = qobject_cast<pqRepresentation*>(item);
+  auto exGenerator = qobject_cast<pqExtractGenerator*>(item);
 
   if (view)
   {
@@ -350,6 +352,16 @@ void pqServerManagerModel::onProxyRegistered(
   {
     Q_EMIT this->preRepresentationAdded(repr);
   }
+  else if (exGenerator)
+  {
+    this->connect(exGenerator,
+      SIGNAL(producerAdded(pqServerManagerModelItem*, pqExtractGenerator*)),
+      SIGNAL(connectionAdded(pqServerManagerModelItem*, pqExtractGenerator*)));
+    this->connect(exGenerator,
+      SIGNAL(producerRemoved(pqServerManagerModelItem*, pqExtractGenerator*)),
+      SIGNAL(connectionRemoved(pqServerManagerModelItem*, pqExtractGenerator*)));
+    Q_EMIT this->preExtractGeneratorAdded(exGenerator);
+  }
 
   this->Internal->Proxies[proxy] = item;
   this->Internal->ItemList.push_back(item);
@@ -372,6 +384,10 @@ void pqServerManagerModel::onProxyRegistered(
   else if (repr)
   {
     Q_EMIT this->representationAdded(repr);
+  }
+  else if (exGenerator)
+  {
+    Q_EMIT this->extractGeneratorAdded(exGenerator);
   }
 
   // It is essential to let the world know of the addition of pqProxy
@@ -416,6 +432,7 @@ void pqServerManagerModel::onProxyUnRegistered(
   pqView* view = qobject_cast<pqView*>(item);
   pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
   pqRepresentation* repr = qobject_cast<pqRepresentation*>(item);
+  auto exGenerator = qobject_cast<pqExtractGenerator*>(item);
 
   if (view)
   {
@@ -428,6 +445,10 @@ void pqServerManagerModel::onProxyUnRegistered(
   else if (repr)
   {
     Q_EMIT this->preRepresentationRemoved(repr);
+  }
+  else if (exGenerator)
+  {
+    Q_EMIT this->preExtractGeneratorRemoved(exGenerator);
   }
 
   Q_EMIT this->preProxyRemoved(item);
@@ -449,6 +470,10 @@ void pqServerManagerModel::onProxyUnRegistered(
   else if (repr)
   {
     Q_EMIT this->representationRemoved(repr);
+  }
+  else if (exGenerator)
+  {
+    Q_EMIT this->extractGeneratorRemoved(exGenerator);
   }
 
   Q_EMIT this->proxyRemoved(item);

@@ -1062,169 +1062,261 @@
     <!-- End of "writers" -->
   </ProxyGroup>
 
-  <ProxyGroup name="insitu2_writer_parameters">
+  <!-- =================================================================== -->
+  <ProxyGroup name="extract_writers">
 
     <!-- ================================================================= -->
-    <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLPPolyDataWriter"
-                 class="vtkFileSeriesWriter"
-                 name="XMLPPolyDataWriter"
-                 supports_parallel="1">
-      <Documentation short_help="Expose a writer for catalyst.">
-        Variation with catalyst specific extensions.
+    <DataExtractWriterProxy name="VTP">
+      <Documentation>
+        Extract writer to write polygonal data using the VTK XML file format
+        (vtp or pvtkp).
       </Documentation>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="dataset_%.6ts.pvtp">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
       <SubProxy>
-        <Proxy name="CatalystOptions"
-               proxygroup="misc"
-               proxyname="CatalystOptions"></Proxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="XMLPPolyDataWriter" />
         <ExposedProperties>
-           <PropertyGroup label="Catalyst Options">
-             <Property name="WriteFrequency" />
-             <Property name="CatalystFilePattern" />
-           </PropertyGroup>
+          <Property name="Input" />
+          <Property name="DataMode" panel_visibility="advanced" />
+          <Property name="EncodeAppendedData" panel_visibility="advanced" />
+          <Property name="CompressorType" />
+          <Property name="CompressionLevel" />
+          <Property name="UseSubdirectory" panel_visibility="advanced" />
         </ExposedProperties>
       </SubProxy>
-      <!-- End of XMLPPolyDataWriter -->
-    </WriterProxy>
+    </DataExtractWriterProxy>
 
     <!-- ================================================================= -->
-    <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLPUnstructuredGridWriter"
-                 class="vtkFileSeriesWriter"
-                 name="XMLPUnstructuredGridWriter"
-                 supports_parallel="1">
-      <Documentation short_help="Expose a writer for catalyst.">
-        Variation with catalyst specific extensions.
+    <DataExtractWriterProxy name="VTU">
+      <Documentation>
+        Extract writer to write unstructured data using the VTK XML file format
+        (vtu or pvtu).
       </Documentation>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="dataset_%.6ts.pvtu">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
       <SubProxy>
-        <Proxy name="CatalystOptions"
-               proxygroup="misc"
-               proxyname="CatalystOptions"></Proxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="XMLPUnstructuredGridWriter" />
         <ExposedProperties>
-           <PropertyGroup label="Catalyst Options">
-             <Property name="WriteFrequency" />
-             <Property name="CatalystFilePattern" />
-           </PropertyGroup>
+          <Property name="Input" />
+          <Property name="DataMode" panel_visibility="advanced" />
+          <Property name="EncodeAppendedData" panel_visibility="advanced" />
+          <Property name="CompressorType" />
+          <Property name="CompressionLevel" />
+          <Property name="UseSubdirectory" panel_visibility="advanced" />
         </ExposedProperties>
       </SubProxy>
-      <!-- End of XMLPUnstructuredGridWriter -->
-    </WriterProxy>
+    </DataExtractWriterProxy>
 
     <!-- ================================================================= -->
-    <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLPHyperTreeGridWriter"
-                 class="vtkFileSeriesWriter"
-                 name="XMLPHyperTreeGridWriter"
-                 supports_parallel="1">
-      <Documentation short_help="Expose a writer for catalyst.">
-        Variation with catalyst specific extensions.
+    <DataExtractWriterProxy name="HTG">
+      <Documentation>
+        Extract writer to write hypertree grid using the VTK XML file format
+        (htg or phtg).
       </Documentation>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="dataset_%.6ts.phtg">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
       <SubProxy>
-        <Proxy name="CatalystOptions"
-               proxygroup="misc"
-               proxyname="CatalystOptions"></Proxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="XMLPHyperTreeGridWriter" />
         <ExposedProperties>
-           <PropertyGroup label="Catalyst Options">
-             <Property name="WriteFrequency" />
-             <Property name="CatalystFilePattern" />
-           </PropertyGroup>
+          <Property name="Input" />
+          <Property name="DataMode" panel_visibility="advanced" />
+          <Property name="EncodeAppendedData" panel_visibility="advanced" />
+          <Property name="CompressorType" />
+          <Property name="CompressionLevel" />
         </ExposedProperties>
       </SubProxy>
-      <!-- End of XMLPHyperTreeGridWriter -->
-    </WriterProxy>
+    </DataExtractWriterProxy>
 
     <!-- ================================================================= -->
-    <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLPStructuredGridWriter"
-                 class="vtkFileSeriesWriter"
-                 name="XMLPStructuredGridWriter"
-                 supports_parallel="1">
-      <Documentation short_help="Expose a writer for catalyst.">
-        Variation with catalyst specific extensions.
+    <DataExtractWriterProxy name="VTS">
+      <Documentation>
+        Extract writer to write structured grid using the VTK XML file format
+        (vts or pvts).
       </Documentation>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="dataset_%.6ts.pvts">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
       <SubProxy>
-        <Proxy name="CatalystOptions"
-               proxygroup="misc"
-               proxyname="CatalystOptions"></Proxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="XMLPStructuredGridWriter" />
         <ExposedProperties>
-           <PropertyGroup label="Catalyst Options">
-             <Property name="WriteFrequency" />
-             <Property name="CatalystFilePattern" />
-           </PropertyGroup>
+          <Property name="Input" />
+          <Property name="DataMode" panel_visibility="advanced" />
+          <Property name="EncodeAppendedData" panel_visibility="advanced" />
+          <Property name="CompressorType" />
+          <Property name="CompressionLevel" />
         </ExposedProperties>
       </SubProxy>
-      <!-- End of XMLPStructuredGridWriter -->
-    </WriterProxy>
+    </DataExtractWriterProxy>
 
     <!-- ================================================================= -->
-    <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLPRectilinearGridWriter"
-                 class="vtkFileSeriesWriter"
-                 file_name_method="SetFileName"
-                 name="XMLPRectilinearGridWriter"
-                 supports_parallel="1">
-      <Documentation short_help="Expose a writer for catalyst.">
-        Variation with catalyst specific extensions.
+    <DataExtractWriterProxy name="VTR">
+      <Documentation>
+        Extract writer to write rectilinear grid using the VTK XML file format
+        (vtr or pvtr).
       </Documentation>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="dataset_%.6ts.pvtr">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
       <SubProxy>
-        <Proxy name="CatalystOptions"
-               proxygroup="misc"
-               proxyname="CatalystOptions"></Proxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="XMLPRectilinearGridWriter" />
         <ExposedProperties>
-           <PropertyGroup label="Catalyst Options">
-             <Property name="WriteFrequency" />
-             <Property name="CatalystFilePattern" />
-           </PropertyGroup>
+          <Property name="Input" />
+          <Property name="DataMode" panel_visibility="advanced" />
+          <Property name="EncodeAppendedData" panel_visibility="advanced" />
+          <Property name="CompressorType" />
+          <Property name="CompressionLevel" />
         </ExposedProperties>
       </SubProxy>
-      <!-- End of XMLPRectilinearGridWriter -->
-    </WriterProxy>
+    </DataExtractWriterProxy>
 
     <!-- ================================================================= -->
-    <WriterProxy base_proxygroup="writers"
-               base_proxyname="XMLPImageDataWriter"
-               class="vtkFileSeriesWriter"
-               name="XMLPImageDataWriter"
-               supports_parallel="1">
-      <Documentation short_help="Expose a writer for catalyst.">
-        Variation with catalyst specific extensions.
+    <DataExtractWriterProxy name="VTI">
+      <Documentation>
+        Extract writer to write image data (uniform rectilinear grid) using the
+        VTK XML file format (vti or pvti).
       </Documentation>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="dataset_%.6ts.pvti">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
       <SubProxy>
-        <Proxy name="CatalystOptions"
-               proxygroup="misc"
-               proxyname="CatalystOptions"></Proxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="XMLPImageDataWriter" />
         <ExposedProperties>
-           <PropertyGroup label="Catalyst Options">
-             <Property name="WriteFrequency" />
-             <Property name="CatalystFilePattern" />
-           </PropertyGroup>
+          <Property name="Input" />
+          <Property name="DataMode" panel_visibility="advanced" />
+          <Property name="EncodeAppendedData" panel_visibility="advanced" />
+          <Property name="CompressorType" />
+          <Property name="CompressionLevel" />
         </ExposedProperties>
       </SubProxy>
-      <!-- End of XMLPImageDataWriter -->
-    </WriterProxy>
+    </DataExtractWriterProxy>
 
     <!-- ================================================================= -->
-    <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLMultiBlockDataWriter"
-                 class="vtkFileSeriesWriter"
-                 name="XMLMultiBlockDataWriter"
-                 supports_parallel="1">
-      <Documentation short_help="Expose a writer for catalyst.">
-        Variation with catalyst specific extensions.
+    <DataExtractWriterProxy name="VTM">
+      <Documentation>
+        Extract writer to write a multiblock dataset using the
+        VTK XML file format (vtm).
       </Documentation>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="dataset_%.6ts.vtm">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
       <SubProxy>
-        <Proxy name="CatalystOptions"
-               proxygroup="misc"
-               proxyname="CatalystOptions"></Proxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="XMLMultiBlockDataWriter" />
         <ExposedProperties>
-           <PropertyGroup label="Catalyst Options">
-             <Property name="WriteFrequency" />
-             <Property name="CatalystFilePattern" />
-           </PropertyGroup>
+          <Property name="Input" />
+          <Property name="DataMode" panel_visibility="advanced" />
+          <Property name="EncodeAppendedData" panel_visibility="advanced" />
+          <Property name="CompressorType" />
+          <Property name="CompressionLevel" />
         </ExposedProperties>
       </SubProxy>
-      <!-- End of XMLMultiBlockDataWriter -->
-    </WriterProxy>
-    <!-- end of "insitu2_writer_parameters" -->
+    </DataExtractWriterProxy>
+
+    <!-- ================================================================= -->
+    <DataExtractWriterProxy name="VTPD">
+      <Documentation>
+        Extract writer to write a partitioned dataset using the
+        VTK XML file format (vtpd).
+      </Documentation>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="dataset_%.6ts.vtpd">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="XMLPartitionedDataSetWriter" />
+        <ExposedProperties>
+          <Property name="Input" />
+          <Property name="DataMode" panel_visibility="advanced" />
+          <Property name="EncodeAppendedData" panel_visibility="advanced" />
+          <Property name="CompressorType" />
+          <Property name="CompressionLevel" />
+        </ExposedProperties>
+      </SubProxy>
+    </DataExtractWriterProxy>
+
+    <!-- ================================================================= -->
+    <DataExtractWriterProxy name="VTPC">
+      <Documentation>
+        Extract writer to write a partitioned dataset collection using the
+        VTK XML file format (vtpc).
+      </Documentation>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="dataset_%.6ts.vtpc">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="XMLPartitionedDataSetCollectionWriter" />
+        <ExposedProperties>
+          <Property name="Input" />
+          <Property name="DataMode" panel_visibility="advanced" />
+          <Property name="EncodeAppendedData" panel_visibility="advanced" />
+          <Property name="CompressorType" />
+          <Property name="CompressionLevel" />
+        </ExposedProperties>
+      </SubProxy>
+    </DataExtractWriterProxy>
+
+    <!-- ================================================================= -->
+    <DataExtractWriterProxy name="VTHB">
+      <Documentation>
+        Extract writer to write a partitioned dataset collection using the
+        VTK XML file format (vtpc).
+      </Documentation>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="dataset_%.6ts.vthb">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="XMLUniformGridAMRWriter" />
+        <ExposedProperties>
+          <Property name="Input" />
+          <Property name="DataMode" panel_visibility="advanced" />
+          <Property name="EncodeAppendedData" panel_visibility="advanced" />
+          <Property name="CompressorType" />
+          <Property name="CompressionLevel" />
+        </ExposedProperties>
+      </SubProxy>
+    </DataExtractWriterProxy>
+
+    <!-- end of "extract_writers" -->
   </ProxyGroup>
 </ServerManagerConfiguration>

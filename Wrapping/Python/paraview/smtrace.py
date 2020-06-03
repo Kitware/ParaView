@@ -330,7 +330,12 @@ class Trace(object):
                         "# a texture",
                                              "%s = CreateTexture(%s)" % (accessor, repr(filename))])
             return True
-
+        if cls.get_registered_name(obj, "extract_generators"):
+            regName = cls.get_registered_name(obj, "extract_generators")
+            accessor = ProxyAccessor(cls.get_varname(regName), obj)
+            cls.Output.append_separated([\
+                "# get extract generator",
+                "%s = FindExtractGenerator('%s')" % (accessor, regName)])
         return False
 
     @classmethod
@@ -716,6 +721,9 @@ class PropertyTraceHelper(object):
 # === Filters used to filter properties traced ===
 # ===================================================================================================
 class ProxyFilter(object):
+    def __init__(self, trace_all_in_ctor=False):
+        self.trace_all_in_ctor = trace_all_in_ctor
+
     def should_never_trace(self, prop, hide_gui_hidden=True):
         if prop.get_object().GetIsInternal() or prop.get_object().GetInformationOnly():
             return True
@@ -754,7 +762,8 @@ class ProxyFilter(object):
         return (trace_props_with_default_values or not prop.get_object().IsValueDefault())
 
     def should_trace_in_ctor(self, prop):
-        return False
+        return False if not self.trace_all_in_ctor else \
+                (not self.should_never_trace(prop) and self.should_trace_in_create(prop))
 
 class PipelineProxyFilter(ProxyFilter):
     def should_trace_in_create(self, prop):
@@ -864,6 +873,13 @@ class ScalarBarProxyFilter(ProxyFilter):
             return False
         return ProxyFilter.should_never_trace(self, prop)
 
+class ExtractGeneratorFilter(ProxyFilter):
+    def should_trace_in_ctor(self, prop): return False
+    def should_never_trace(self, prop):
+        if prop.get_property_name() in ["Trigger", "Writer"]:
+            return True
+        return super(ExtractGeneratorFilter, self).should_never_trace(prop)
+
 def SupplementalProxy(cls):
     """This function decorates a ProxyFilter. Designed to be
     used for supplemental proxies, so that we can centralize the logic
@@ -934,8 +950,8 @@ class RegisterPipelineProxy(TraceItem):
             filter_type = ExtractSelectionFilter()
         else:
             filter_type = PipelineProxyFilter()
-
-        trace.append(accessor.trace_ctor(ctor, filter_type))
+        ctor_args = "registrationName='%s'" % pname
+        trace.append(accessor.trace_ctor(ctor, filter_type, ctor_args=ctor_args))
         Trace.Output.append_separated(trace.raw_data())
         TraceItem.finalize(self)
 
@@ -1584,6 +1600,48 @@ class SaveCameras(RenderingMixin, BookkeepingItem):
             raise Untraceable("Invalid argument type %r"% proxy)
         return trace.raw_data()
 
+class CreateExtractGenerator(TraceItem):
+    """Traces creation of extract generators"""
+    def __init__(self, xmlname, producer, generator, registrationName, comment=None):
+        super(CreateExtractGenerator, self).__init__()
+
+        producer = sm._getPyProxy(producer)
+        generator = sm._getPyProxy(generator)
+
+        self.ProducerAccessor = Trace.get_accessor(producer)
+        self.OutputPort = producer.Port
+        self.Generator = generator
+        self.XMLName = xmlname
+        self.Comment = comment
+        self.Name = registrationName
+
+    def finalize(self):
+        output = TraceOutput()
+        port = self.OutputPort
+        regName = self.Name
+        accessor = ProxyAccessor(Trace.get_varname(regName), self.Generator)
+
+        if self.Comment is not None:
+            output.append("# %s", self.Comment)
+        else:
+            output.append("# create extract generator")
+
+        if port > 0:
+            output.append(\
+                    "%s = CreateExtractGenerator('%s', OutputPort(%s, %d), registrationName='%s')" % \
+                    (str(accessor), self.XMLName, str(self.ProducerAccessor), port, regName))
+        else:
+            output.append(\
+                    "%s = CreateExtractGenerator('%s', %s, registrationName='%s')" % \
+                    (str(accessor), self.XMLName, str(self.ProducerAccessor), regName))
+
+        ctor_trace = accessor.trace_ctor(None, ExtractGeneratorFilter())
+        if ctor_trace:
+            output.append("# trace defaults for the extract generator.")
+            output.append(ctor_trace)
+        Trace.Output.append_separated(output.raw_data())
+        super(CreateExtractGenerator, self).finalize()
+
 # __ActiveTraceItems is simply used to keep track of items that are currently
 # active to avoid non-nestable trace items from being created when previous
 # items are active.
@@ -1655,11 +1713,11 @@ def _stop_trace_internal():
 #------------------------------------------------------------------------------
 # Public methods
 #------------------------------------------------------------------------------
-def start_trace():
+def start_trace(preamble=None):
     """Starting tracing. On successful start, will return a vtkSMTrace object.
     One can set tracing options on it to control how the tracing. If tracing was
     already started, calling this contine with the same trace."""
-    return sm.vtkSMTrace.StartTrace()
+    return sm.vtkSMTrace.StartTrace(preamble)
 
 def stop_trace():
     """Stops the trace and returns the generated trace output string."""

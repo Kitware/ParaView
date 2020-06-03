@@ -97,6 +97,7 @@ set(classes
   pqExampleVisualizationsDialog
   pqExampleVisualizationsDialogReaction
   pqExportReaction
+  pqExtractGeneratorsMenuReaction
   pqFileNamePropertyWidget
   pqFiltersMenuReaction
   pqFontPropertyWidget
@@ -216,7 +217,6 @@ set(headers
 
 if (TARGET ParaView::pqPython)
   list(APPEND classes
-    pqExportInspector
     pqMacroReaction
     pqTraceReaction)
 endif ()
@@ -227,7 +227,6 @@ set(ui_files
   Resources/UI/pqBoxPropertyWidget.ui
   Resources/UI/pqCameraManipulatorWidget.ui
   Resources/UI/pqCameraToolbar.ui
-  Resources/UI/pqExportInspector.ui
   Resources/UI/pqColorAnnotationsWidget.ui
   Resources/UI/pqColorEditorPropertyWidget.ui
   Resources/UI/pqColorMapEditor.ui

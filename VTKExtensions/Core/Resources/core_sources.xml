@@ -19,6 +19,10 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVTrivialProducer" name="PVTrivialProducer2">
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkDistributedTrivialProducer"
                  name="DistributedTrivialProducer">
       <IntVectorProperty command="SetWholeExtent"

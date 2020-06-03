@@ -1,0 +1,88 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="extract_writers">
+    <!-- =================================================================== -->
+    <ImageExtractWriterProxy name="PNG">
+      <StringVectorProperty name="FileName" number_of_elements="1" default_values="image_%.6ts.png">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
+
+      <SubProxy>
+        <Proxy name="Writer" proxygroup="misc" proxyname="SaveScreenshot" />
+        <ExposedProperties>
+          <Property name="View" />
+          <PropertyGroup label="Size and Scaling">
+            <Property name="ImageResolution" />
+            <Property name="FontScaling" />
+          </PropertyGroup>
+          <PropertyGroup label="Coloring">
+            <Property name="OverrideColorPalette" panel_visibility="advanced" />
+            <Property name="StereoMode" panel_visibility="advanced" />
+            <Property name="TransparentBackground" panel_visibility="advanced" />
+          </PropertyGroup>
+          <PropertyGroup label="Image Options">
+            <Property name="Format" panel_visibility="advanced" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+
+      <IntVectorProperty name="ResetDisplay"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the camera (or viewport) will be reset to ensure all data
+          is visible.
+        </Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Miscellaneous">
+        <Property name="ResetDisplay" />
+      </PropertyGroup>
+    </ImageExtractWriterProxy>
+
+    <!-- =================================================================== -->
+    <ImageExtractWriterProxy name="JPG">
+      <StringVectorProperty name="FileName" number_of_elements="1" default_values="image_%.6ts.jpg">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
+
+      <SubProxy>
+        <Proxy name="Writer" proxygroup="misc" proxyname="SaveScreenshot" />
+        <ExposedProperties>
+          <Property name="View" />
+          <PropertyGroup label="Size and Scaling">
+            <Property name="ImageResolution" />
+            <Property name="FontScaling" />
+          </PropertyGroup>
+          <PropertyGroup label="Coloring">
+            <Property name="OverrideColorPalette" panel_visibility="advanced" />
+            <Property name="StereoMode" panel_visibility="advanced" />
+            <Property name="TransparentBackground" panel_visibility="advanced" />
+          </PropertyGroup>
+          <PropertyGroup label="Image Options">
+            <Property name="Format" panel_visibility="advanced" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+
+      <IntVectorProperty name="ResetDisplay"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the camera (or viewport) will be reset to ensure all data
+          is visible.
+        </Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Miscellaneous">
+        <Property name="ResetDisplay" />
+      </PropertyGroup>
+    </ImageExtractWriterProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

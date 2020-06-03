@@ -106,8 +106,7 @@ vtkSMTrace::~vtkSMTrace()
 }
 
 //----------------------------------------------------------------------------
-std::string vtkSMTrace::GetState(
-  int propertiesToTraceOnCreate, bool skipHiddenRepresentations, bool skipRenderingComponents)
+std::string vtkSMTrace::GetState(vtkSMProxy* options)
 {
   if (vtkSMTrace::ActiveTracer.GetPointer() != NULL)
   {
@@ -128,9 +127,10 @@ std::string vtkSMTrace::GetState(
       throw 1;
     }
 
-    vtkSmartPyObject result(PyObject_CallMethod(module, const_cast<char*>("get_state"),
-      const_cast<char*>("(iii)"), propertiesToTraceOnCreate, (skipHiddenRepresentations ? 1 : 0),
-      (skipRenderingComponents ? 1 : 0)));
+    vtkSmartPyObject name(PyString_FromString("get_state"));
+    vtkSmartPyObject pyoptions(vtkPythonUtil::GetObjectFromPointer(options));
+    vtkSmartPyObject result(
+      PyObject_CallMethodObjArgs(module, name, pyoptions.GetPointer(), nullptr));
     if (!result || PyErr_Occurred())
     {
       vtkGenericWarningMacro("Failed to generate state.");
@@ -147,8 +147,7 @@ std::string vtkSMTrace::GetState(
     }
   }
 #endif
-  (void)propertiesToTraceOnCreate;
-  (void)skipHiddenRepresentations;
+  (void)options;
   return std::string();
 }
 
@@ -172,7 +171,7 @@ vtkSMTrace* vtkSMTrace::StartTrace(const char* preamble)
       str << "# generated using " << vtkSMProxyManager::GetParaViewSourceVersion() << "\n"
           << "#"
           << "\n"
-          << "# To ensure correct image size when batch processing, please search \n"
+          << "# To ensure correct image size when batch processing, please search\n"
           << "# for and uncomment the line `# renderView*.ViewSize = [*,*]`\n";
       vtkSmartPyObject _start_trace_internal(PyObject_CallMethod(
         vtkSMTrace::ActiveTracer->GetTraceModule(), const_cast<char*>("_start_trace_internal"),
