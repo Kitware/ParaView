@@ -39,6 +39,10 @@
   <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/PythonShellRunScriptDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceSaveGeometry.py" />
   <pqevent object="pqClientMainWindow/pythonShellDock/qt_dockwidget_closebutton" command="activate" arguments="" />
 
+  <!-- hide the data shown -->
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,11,8,/0:0/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,11,8,/0:0/0:0/0:1" />
+
   <!-- now, open the pvd file which should be been generated during trace playback -->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceSaveGeometry.pvd" />
