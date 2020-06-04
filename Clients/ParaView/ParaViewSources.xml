@@ -1,4 +1,6 @@
 <ParaViewSources>
+
+  <!-- This section list all categories/toolbar sources. Sources should be duplicated in the next section -->
   <Category name="Annotation" menu_label="&amp;Annotation" preserve_order="1"
     show_in_toolbar="0">
     <Proxy group="sources" name="VectorText" />
@@ -38,11 +40,43 @@
   </Category>
   <Category name="MeasurementTools" menu_label="&amp;Measurement Tools" preserve_order="1"
     show_in_toolbar="1">
-    <Proxy group="sources" name="Axes" omit_from_toolbar="1" icon=":/pqWidgets/Icons/pqAxes.png"/>
-    <Proxy group="sources" name="Ruler" icon=":/pqWidgets/Icons/pqRuler.png"/>
+    <Proxy group="sources" name="Axes" omit_from_toolbar="1" />
+    <Proxy group="sources" name="Ruler" />
   </Category>
+
+  <!-- This section list all sources that can be available in ParaView and their icons -->
+  <Proxy group="sources" name="AMRGaussianPulseSource" />
+  <Proxy group="sources" name="ArrowSource" />
+  <Proxy group="sources" name="Axes" icon=":/pqWidgets/Icons/pqAxes.png"/>
+  <Proxy group="sources" name="ConeSource" />
+  <Proxy group="sources" name="CubeSource" />
+  <Proxy group="sources" name="CylinderSource" />
+  <Proxy group="sources" name="DataObjectGenerator" />
+  <Proxy group="sources" name="DiskSource" />
+  <Proxy group="sources" name="EllipseSource" />
+  <Proxy group="sources" name="FastUniformGrid" />
   <Proxy group="sources" name="GlyphSource2D" />
+  <Proxy group="sources" name="HierarchicalFractal" />
+  <Proxy group="sources" name="HyperTreeGridSource" />
+  <Proxy group="sources" name="ImageMandelbrotSource" />
+  <Proxy group="sources" name="LineSource" />
+  <Proxy group="sources" name="LiveProgrammableSource" />
+  <Proxy group="sources" name="LogoSource" />
+  <Proxy group="sources" name="OutlineSource" />
+  <Proxy group="sources" name="PlaneSource" />
+  <Proxy group="sources" name="PointSource" />
+  <Proxy group="sources" name="PolyLineSource" />
+  <Proxy group="sources" name="PolyPointSource" />
   <Proxy group="sources" name="ProgrammableSource" />
+  <Proxy group="sources" name="RTAnalyticSource" />
+  <Proxy group="sources" name="RandomHyperTreeGridSource" />
+  <Proxy group="sources" name="Ruler" icon=":/pqWidgets/Icons/pqRuler.png"/>
+  <Proxy group="sources" name="SphereSource" />
+  <Proxy group="sources" name="SplineSource" />
+  <Proxy group="sources" name="SuperquadricSource" />
+  <Proxy group="sources" name="TextSource" />
   <Proxy group="sources" name="TimeSource" />
+  <Proxy group="sources" name="TimeToTextConvertorSource" />
   <Proxy group="sources" name="UnstructuredCellTypes" />
+  <Proxy group="sources" name="VectorText" />
 </ParaViewSources>
