@@ -62,6 +62,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * **UseReferenceBounds** and **ReferenceBounds** must be used together i.e. both
  * are required for this to work.
  *
+ * The constructor accepts a boolean "hideReferenceBounds" to toggle the visibility
+ * of reference bounds items. This is useful when reference bounds are fixed by an
+ * external entity that doesn't want the user to modify it.
+ *
  * Note while all of the above are optional, it really doesn't make much sense
  * to use this widget if any of them are not specified.
  */
@@ -71,7 +75,8 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqBoxPropertyWidget : public pqInteractiveP
   typedef pqInteractivePropertyWidget Superclass;
 
 public:
-  pqBoxPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
+  pqBoxPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0,
+    bool hideReferenceBounds = false);
   ~pqBoxPropertyWidget() override;
 
 protected Q_SLOTS:

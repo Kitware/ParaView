@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqBoxPropertyWidget::pqBoxPropertyWidget(
-  vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject)
+  vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject, bool hideReferenceBounds)
   : Superclass("representations", "BoxWidgetRepresentation", smproxy, smgroup, parentObject)
   , BoxIsRelativeToInput(false)
 {
@@ -171,6 +171,19 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
     wdgProxy->UpdateVTKObjects();
 
     this->BoxIsRelativeToInput = true;
+  }
+
+  if (hideReferenceBounds)
+  {
+    ui.referenceBoundsLabel->hide();
+    ui.referenceBoundsHLine->hide();
+    ui.useReferenceBounds->hide();
+    ui.xmin->hide();
+    ui.xmax->hide();
+    ui.ymin->hide();
+    ui.ymax->hide();
+    ui.zmin->hide();
+    ui.zmax->hide();
   }
 
   this->connect(&this->WidgetLinks, SIGNAL(qtWidgetChanged()), SLOT(render()));
