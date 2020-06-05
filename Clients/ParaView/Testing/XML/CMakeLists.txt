@@ -188,6 +188,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Contour3.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ContourCellData.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ConvertToMoleculeBonds.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CustomTCoords.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CustomViewpoints.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CustomViewpoints_A.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CustomViewpoints_B.png}"
@@ -731,6 +732,7 @@ list(APPEND TESTS_WITH_BASELINES
   ConvertToMolecule.xml
   ContourCellData.xml
   CopyPasteProperties.xml
+  CustomTCoords.xml
   CTHAMRBaseline.xml
   CTHAMRClip.xml
   CTHAMRContour.xml

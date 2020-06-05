@@ -164,14 +164,20 @@ void vtkPVDataSetAttributesInformation::CopyFromDataSetAttributes(vtkDataSetAttr
 
   // update attribute information.
   vtkInternals& internals = (*this->Internals);
-  for (int cc = 0, max = da->GetNumberOfArrays(); cc < max; ++cc)
+
+  int attrIndices[vtkDataSetAttributes::NUM_ATTRIBUTES];
+  da->GetAttributeIndices(attrIndices);
+
+  for (int i = 0; i < vtkDataSetAttributes::NUM_ATTRIBUTES; i++)
   {
-    vtkAbstractArray* aa = da->GetAbstractArray(cc);
-    int attrIdx = da->IsArrayAnAttribute(cc);
-    if (aa != NULL && aa->GetName() && attrIdx >= 0 &&
-      internals.ArrayInformation.find(aa->GetName()) != internals.ArrayInformation.end())
+    if (attrIndices[i] >= 0)
     {
-      internals.AttributesInformation[attrIdx] = aa->GetName();
+      vtkAbstractArray* arr = da->GetAbstractArray(attrIndices[i]);
+      if (arr)
+      {
+        const char* name = arr->GetName();
+        internals.AttributesInformation[i] = name ? name : "";
+      }
     }
   }
 }

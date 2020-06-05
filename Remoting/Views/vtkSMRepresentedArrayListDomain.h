@@ -23,6 +23,8 @@
  * arrays e.g. "ColorArrayName" property of geometry representations. This
  * domain extends vtkSMArrayListDomain to add arrays from represented data
  * for representations.
+ * If the chosen attribute type is not present on the data, no array
+ * (or none_string if available) will be chosen.
 */
 
 #ifndef vtkSMRepresentedArrayListDomain_h

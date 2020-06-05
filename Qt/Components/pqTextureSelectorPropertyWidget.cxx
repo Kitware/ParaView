@@ -100,6 +100,9 @@ pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(
     {
       QObject::connect(this->Representation, &pqDataRepresentation::dataUpdated, this,
         [=] { this->checkAttributes(checkTCoords, checkTangents); });
+
+      QObject::connect(this->Representation, &pqDataRepresentation::attrArrayNameModified, this,
+        [=] { this->checkAttributes(checkTCoords, checkTangents); });
     }
     this->checkAttributes(checkTCoords, checkTangents);
   }
@@ -150,4 +153,8 @@ void pqTextureSelectorPropertyWidget::checkAttributes(bool tcoords, bool tangent
     }
   }
   this->Selector->setEnabled(enable);
+  if (enable)
+  {
+    this->setToolTip("");
+  }
 }

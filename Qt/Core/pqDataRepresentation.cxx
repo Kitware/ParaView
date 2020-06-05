@@ -89,6 +89,18 @@ pqDataRepresentation::pqDataRepresentation(
   {
     vtkconnector->Connect(prop, vtkCommand::ModifiedEvent, this, SIGNAL(colorArrayNameModified()));
   }
+  if (vtkSMProperty* prop = repr->GetProperty("SelectNormalArray"))
+  {
+    vtkconnector->Connect(prop, vtkCommand::ModifiedEvent, this, SIGNAL(attrArrayNameModified()));
+  }
+  if (vtkSMProperty* prop = repr->GetProperty("SelectTCoordArray"))
+  {
+    vtkconnector->Connect(prop, vtkCommand::ModifiedEvent, this, SIGNAL(attrArrayNameModified()));
+  }
+  if (vtkSMProperty* prop = repr->GetProperty("SelectTangentArray"))
+  {
+    vtkconnector->Connect(prop, vtkCommand::ModifiedEvent, this, SIGNAL(attrArrayNameModified()));
+  }
 }
 
 //-----------------------------------------------------------------------------

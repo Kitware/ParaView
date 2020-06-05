@@ -4025,6 +4025,9 @@
             <Property name="Diffuse" panel_visibility="advanced"/>
             <Property name="Roughness" panel_visibility="advanced"/>
             <Property name="Metallic" panel_visibility="advanced"/>
+            <Property name="SelectTCoordArray" panel_visibility="advanced"/>
+            <Property name="SelectNormalArray" panel_visibility="advanced"/>
+            <Property name="SelectTangentArray" panel_visibility="advanced"/>
             <Property name="Texture" panel_visibility="advanced"/>
             <Property name="RepeatTextures" panel_visibility="advanced"/>
             <Property name="InterpolateTextures" panel_visibility="advanced"/>
@@ -5905,6 +5908,10 @@
         <InputArrayDomain attribute_type="point"
                           name="input_array_point_1"
                           number_of_components="1"
+                          optional="1" />
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point_2"
+                          number_of_components="2"
                           optional="1" />
         <InputArrayDomain attribute_type="cell"
                           name="input_array_cell_3"
@@ -11249,6 +11256,63 @@
           <String value="Surface" />
           <String value="Surface With Edges" />
         </StringListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetTCoordArray"
+                            default_values=""
+                            label="Texture Coordinates"
+                            name="SelectTCoordArray"
+                            number_of_elements="1">
+        <Documentation>
+          Set the texture coordinates array used for texture mapping.
+        </Documentation>
+        <RepresentedArrayListDomain attribute_type="TCoords"
+                         input_domain_name="input_array_point_2"
+                         data_type="VTK_FLOAT VTK_DOUBLE"
+                         name="array_list"
+                         none_string="None">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </RepresentedArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetNormalArray"
+                            default_values=""
+                            label="Normal Array"
+                            name="SelectNormalArray"
+                            number_of_elements="1">
+        <Documentation>
+          Set the normal array used for smooth shading.
+        </Documentation>
+        <RepresentedArrayListDomain attribute_type="Normals"
+                         input_domain_name="input_array_point_3"
+                         data_type="VTK_FLOAT VTK_DOUBLE"
+                         name="array_list"
+                         none_string="None">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </RepresentedArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetTangentArray"
+                            default_values=""
+                            label="Tangent Array"
+                            name="SelectTangentArray"
+                            number_of_elements="1">
+        <Documentation>
+          Set the tangent coordinates array used for normal mapping.
+        </Documentation>
+        <RepresentedArrayListDomain attribute_type="Tangents"
+                         input_domain_name="input_array_point_3"
+                         data_type="VTK_FLOAT VTK_DOUBLE"
+                         name="array_list"
+                         none_string="None">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </RepresentedArrayListDomain>
       </StringVectorProperty>
       <DoubleVectorProperty command="SetAmbient"
                             default_values="0.0"

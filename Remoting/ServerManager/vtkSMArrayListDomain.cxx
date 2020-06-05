@@ -137,7 +137,7 @@ public:
         return &(*iter);
       }
     }
-    return NULL;
+    return nullptr;
   }
 
 private:
@@ -235,7 +235,7 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
     }
     vtkPVDataSetAttributesInformation* attrInfo = dataInfo->GetAttributeInformation(type);
     int acceptable_as = type;
-    if (attrInfo == NULL ||
+    if (attrInfo == nullptr ||
       !vtkSMInputArrayDomain::IsAttributeTypeAcceptable(association, type, &acceptable_as))
     {
       continue;
@@ -247,14 +247,14 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
     for (int idx = 0, maxIdx = attrInfo->GetNumberOfArrays(); idx < maxIdx; ++idx)
     {
       vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(idx);
-      if (arrayInfo == NULL)
+      if (arrayInfo == nullptr)
       {
         continue;
       }
 
       // First check if the array is acceptable by the domain.
       int acceptedNumberOfComponents = 0;
-      if (iad != NULL)
+      if (iad != nullptr)
       {
         acceptedNumberOfComponents = iad->IsArrayAcceptable(arrayInfo);
         if (acceptedNumberOfComponents == -1)
@@ -342,7 +342,7 @@ vtkSMArrayListDomain::~vtkSMArrayListDomain()
   this->SetInputDomainName(0);
   this->SetNoneString(0);
   delete this->ALDInternals;
-  this->ALDInternals = NULL;
+  this->ALDInternals = nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -455,7 +455,7 @@ int vtkSMArrayListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
   const char* key_locations = element->GetAttribute("key_locations");
   const char* key_names = element->GetAttribute("key_names");
   const char* key_strategies = element->GetAttribute("key_strategies");
-  if (key_locations == NULL)
+  if (key_locations == nullptr)
   {
     // Default value : add a needed information key vtkAbstractArray::GUI_HIDE
     this->AddInformationKey("vtkAbstractArray", "GUI_HIDE", vtkSMArrayListDomain::REJECT_KEY);
@@ -679,10 +679,27 @@ int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_uncheck
 
   const vtkSMArrayListDomainArrayInformation* info =
     this->ALDInternals->FindAttribute(this->AttributeType);
-  if (info == NULL && this->ALDInternals->DomainValues.size() > 0 &&
-    this->PickFirstAvailableArrayByDefault == true)
+  if (info == nullptr && this->ALDInternals->DomainValues.size() > 0)
   {
-    info = &this->ALDInternals->DomainValues[0];
+    if (this->PickFirstAvailableArrayByDefault == true)
+    {
+      info = &this->ALDInternals->DomainValues[0];
+    }
+    else
+    {
+      // check for None string
+      if (this->NoneString)
+      {
+        for (const auto& currentDomainValue : this->ALDInternals->DomainValues)
+        {
+          if (currentDomainValue.ArrayName == this->NoneString)
+          {
+            info = &currentDomainValue;
+            break;
+          }
+        }
+      }
+    }
   }
   if (info)
   {
@@ -773,7 +790,7 @@ const char* vtkSMArrayListDomain::GetInformationKeyLocation(unsigned int index)
   {
     return this->ALDInternals->InformationKeys[index].Location.c_str();
   }
-  return NULL;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -783,7 +800,7 @@ const char* vtkSMArrayListDomain::GetInformationKeyName(unsigned int index)
   {
     return this->ALDInternals->InformationKeys[index].Name.c_str();
   }
-  return NULL;
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
