@@ -291,6 +291,13 @@ class Trace(object):
                     "# get the time-keeper",
                     "%s = GetTimeKeeper()" % tkAccessor])
             return True
+        if obj.SMProxy.IsA("vtkSMSettingsProxy"):
+            pname = obj.SMProxy.GetSessionProxyManager().GetProxyName("settings", obj.SMProxy)
+            accessor = ProxyAccessor(cls.get_varname(pname), obj)
+            cls.Output.append_separated([\
+                "# find settings proxy",
+                "%s = GetSettingsProxy('%s')" % (accessor, pname)])
+            return True
         if not skip_rendering and obj.GetVTKClassName() == "vtkPVLight":
             view = simple.GetViewForLight(obj)
             if view:

@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyIterator.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSettings.h"
+#include "vtkSMTrace.h"
 #include "vtkSmartPointer.h"
 
 #include <QKeyEvent>
@@ -235,6 +236,7 @@ void pqSettingsDialog::onAccepted()
   for (iter->Begin("settings"); !iter->IsAtEnd(); iter->Next())
   {
     vtkSMProxy* proxy = iter->GetProxy();
+    SM_SCOPED_TRACE(PropertiesModified).arg("proxy", proxy);
     settings->SetProxySettings(proxy);
     vtkSmartPointer<vtkSMPropertyIterator> iter2;
     iter2.TakeReference(proxy->NewPropertyIterator());
