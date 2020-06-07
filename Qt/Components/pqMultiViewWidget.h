@@ -222,6 +222,15 @@ protected slots:
   */
   void viewAdded(pqView*);
 
+  //@{
+  /**
+   * If in preview mode, we need to update the widget's constraints based on the
+   * current widget geometry. We do that in this overridden method which is
+   * called when the geometry may have potentially changed.
+   */
+  void resizeEvent(QResizeEvent* evt) override;
+  //@}
+
 protected:
   /**
   * Called whenever a new frame needs to be created for a view. Note that view

@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
+#include "vtkLogger.h"
 #include "vtkNew.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProperty.h"
@@ -195,6 +196,7 @@ public:
 
   void preview(const QSize& size)
   {
+    vtkLogScopeF(TRACE, "preview (%d, %d)", size.width(), size.height());
     this->PreviewSize = size;
     if (size.isEmpty())
     {
@@ -218,9 +220,13 @@ public:
       vtkVector2i csize(crect.width(), crect.height());
       vtkSMSaveScreenshotProxy::ComputeMagnification(tsize, csize);
       this->Container->setMaximumSize(csize[0], csize[1]);
+      vtkLogF(
+        TRACE, "cur=(%d, %d), new=(%d, %d)", crect.width(), crect.height(), csize[0], csize[1]);
     }
     this->updateDecorations();
   }
+
+  const QSize& previewSize() const { return this->PreviewSize; }
 
   void setDecorationsVisibility(bool val)
   {
@@ -453,6 +459,18 @@ bool pqMultiViewWidget::eventFilter(QObject* caller, QEvent* evt)
   }
 
   return this->Superclass::eventFilter(caller, evt);
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::resizeEvent(QResizeEvent* evt)
+{
+  this->Superclass::resizeEvent(evt);
+  auto& internals = (*this->Internals);
+  const auto& psize = internals.previewSize();
+  if (!psize.isEmpty())
+  {
+    internals.preview(psize);
+  }
 }
 
 //-----------------------------------------------------------------------------
