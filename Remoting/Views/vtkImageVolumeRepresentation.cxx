@@ -37,6 +37,7 @@
 #include "vtkSmartVolumeMapper.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredData.h"
+#include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkVolumeProperty.h"
 
@@ -207,8 +208,17 @@ int vtkImageVolumeRepresentation::RequestData(
   {
     if (auto inputID = vtkImageData::GetData(inputVector[0], 0))
     {
-      vtkNew<vtkImageData> cache;
-      cache->ShallowCopy(inputID);
+      vtkSmartPointer<vtkImageData> cache = nullptr;
+      if (auto inputUG = vtkUniformGrid::GetData(inputVector[0], 0))
+      {
+        cache = vtkSmartPointer<vtkUniformGrid>::New();
+        cache->ShallowCopy(inputUG);
+      }
+      else
+      {
+        cache = vtkSmartPointer<vtkImageData>::New();
+        cache->ShallowCopy(inputID);
+      }
       if (inputID->HasAnyGhostCells())
       {
         int ext[6];
