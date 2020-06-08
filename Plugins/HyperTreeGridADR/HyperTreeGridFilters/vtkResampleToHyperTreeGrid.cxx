@@ -171,9 +171,9 @@ int vtkResampleToHyperTreeGrid::RequestData(
   // Skip execution if there is no input geometry.
   vtkIdType numCells = input->GetNumberOfCells();
   vtkIdType numPts = input->GetNumberOfPoints();
-  if (numCells < 1 || numPts < 1)
+  if (numCells < 1 && numPts < 1)
   {
-    vtkDebugMacro("No data to convert!");
+    vtkWarningMacro("Input must have points or cells");
     return 1;
   }
 
