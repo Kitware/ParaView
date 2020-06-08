@@ -88,10 +88,6 @@ There are 4 possibilities:
  - not UseFFT and not UseGPU: Use vtk convolution
         </Documentation>
       </IntVectorProperty>
-
-      <Hints>
-        <ShowInMenu category="Moment Invariants" />
-      </Hints>
    </SourceProxy>
  </ProxyGroup>
 </ServerManagerConfiguration>

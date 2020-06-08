@@ -87,10 +87,6 @@ There are 4 possibilities:
  - not UseFFT and not UseGPU: Use vtk convolution
         </Documentation>
       </IntVectorProperty>
-
-      <Hints>
-        <ShowInMenu category="Moment Invariants" />
-      </Hints>
    </SourceProxy>
 
    <SourceProxy name="MomentInvariants" class="vtkMomentInvariants" label="Moment Invariants">
@@ -180,10 +176,6 @@ There are 4 possibilities:
                      default_values="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
-
-      <Hints>
-        <ShowInMenu category="Moment Invariants" />
-      </Hints>
    </SourceProxy>
  </ProxyGroup>
 </ServerManagerConfiguration>

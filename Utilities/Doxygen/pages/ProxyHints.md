@@ -244,6 +244,26 @@ specifies the XML proxy name for representation to create. The optional
       </Hints>
     </SourceProxy>
 
+OutputPort
+--------------------------
+Set name and representation of a specific output port.
+
+This hint is used to rename a specific output port
+and also the type of representation to use.
+Type can be either "text", "logo" or "progress".
+
+The representation part of this hint may be deprecated soon.
+Use Representation hint instead.
+
+    <SourceProxy ...>
+      ...
+      <Hints>
+        <OutputPort index="0"
+                    name="Output-0"
+                    type="text" />
+      </Hints>
+    </SourceProxy>
+
 ShowProxyDocumentationInPanel
 -----------------------------
 Show an annotation label in the auto-generated panel generated using
@@ -330,3 +350,18 @@ vtkSMPVRepresentationProxy.
         <ConnectToPortIndex value="2" />
       </Hints>
     </RepresentationProxy>
+
+ShowInMenu
+--------------------------
+Plugin specific hint to control how a filter/source is shown in menus
+
+This is used **in plugins only** to configure how a source or filter
+should be shown in the filters/sources menu. It enables to place them
+into an existing category or a new category, as well as set the icon.
+
+    <SourceProxy ...>
+      ...
+      <Hints>
+        <ShowInMenu category="Category" icon=":/path/to/ressource/icon.png" />
+      </Hints>
+    </SourceProxy>
