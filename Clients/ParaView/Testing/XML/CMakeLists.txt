@@ -1624,10 +1624,11 @@ list(APPEND TESTS_WITHOUT_BASELINES
   ${TESTS_WITH_INLINE_COMPARES})
 
 # ResampleToHyperTreeGrid only works in client mode
-paraview_add_client_tests(
-  BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-  TEST_SCRIPTS ResampleToHyperTreeGridBranching_3.xml
-)
+# Disabled in release 5.8.1 because of an API bug with scalar fields
+#paraview_add_client_tests(
+#  BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+#  TEST_SCRIPTS ResampleToHyperTreeGridBranching_3.xml
+#)
 
 paraview_add_client_tests(
   TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}
