@@ -34,7 +34,9 @@
                      panel_visibility="never"
                      name="Input">
         <DataTypeDomain composite_data_supported="0" name="input_type">
-          <DataType value="vtkDataObject" />
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkTable" />
+          <DataType value="vtkGraph" />
         </DataTypeDomain>
         <Documentation>The input filter/source whose output dataset is to
         written to the file.</Documentation>
