@@ -99,6 +99,12 @@ public:
    */
   vtkSMSourceProxy* GetSourceProxy();
 
+  //@{
+  /** Overridden to forward to the source proxy.
+   */
+  vtkSMSession* GetSession() override;
+  vtkSMSessionProxyManager* GetSessionProxyManager() override;
+  //@}
 protected:
   vtkSMOutputPort();
   ~vtkSMOutputPort() override;
