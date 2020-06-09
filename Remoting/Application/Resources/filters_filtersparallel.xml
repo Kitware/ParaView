@@ -996,6 +996,20 @@
                             name="TimeRange">
         <TimeRangeInformationHelper />
       </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetResampleFactor"
+                         default_values="1"
+                         name="ResampleFactor"
+                         number_of_elements="1">
+        <IntRangeDomain min="1" name="range" />
+        <Documentation>When ResampleFactor is a non zero positive integer, each pair
+          of input time steps will be interpolated between with the number
+          of steps specified. For example an input of 1,2,3,4,5 and a resample factor
+          of 10, will produce steps 0f 1.0, 1.1, 1.2, ..., 1.9, 2.0.
+          Irregular input steps will produce irregular output steps.
+          Resample factor will only be used if DiscreteTimeStepInterval is zero,
+          otherwise the DiscreteTimeStepInterval takes precedence</Documentation>
+      </IntVectorProperty>
       <!-- End TemporalInterpolator -->
     </SourceProxy>
 
