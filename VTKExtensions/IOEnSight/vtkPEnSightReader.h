@@ -779,12 +779,20 @@ protected:
   /**
    * Merge InsertNextCell & GetId->InsertNextId
    * Take Distributed Read into account.
+   * faces should be specified for VTK_POLYHEDRON cells and is unused otherwise.
    */
   void InsertNextCellAndId(vtkUnstructuredGrid*, int vtkCellType, vtkIdType numPoints,
-    vtkIdType* points, int partId, int ensightCellType, vtkIdType globalId, vtkIdType numElements);
+    vtkIdType* points, int partId, int ensightCellType, vtkIdType globalId, vtkIdType numElements,
+    const std::vector<vtkIdType>& faces = {});
   void InsertVariableComponent(vtkFloatArray* array, int i, int component, float* content,
     int partId, int ensightCellType, int insertionType);
   //@}
+
+  /**
+   * Convenience method to map the point ids from current rank to global ids.
+   */
+  void MapToGlobalIds(
+    const vtkIdType* inputIds, vtkIdType numPoints, int partId, vtkIdType* globalIds);
 
   /**
    * 1. Find future split dimension for distribution (biggest)

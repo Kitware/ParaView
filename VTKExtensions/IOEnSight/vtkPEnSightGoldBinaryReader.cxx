@@ -3155,9 +3155,6 @@ int vtkPEnSightGoldBinaryReader::CreateUnstructuredGridOutput(
         faceCount += numFacesPerElement[i];
       }
 
-      delete[] numFacesPerElement;
-      delete[] numNodesPerFace;
-
       for (i = 0; i < numElements; i++)
       {
         numNodes += numNodesPerElement[i];
@@ -3176,11 +3173,28 @@ int vtkPEnSightGoldBinaryReader::CreateUnstructuredGridOutput(
       nodeIdList = new int[numNodes];
       this->ReadIntArray(nodeIdList, numNodes);
 
+      int faceIdx = 0; // indexing faces throughout all polyhedra
+      int nodeIdx = 0; // indexing nodes throughout all polyhedra
+
       for (i = 0; i < numElements; i++)
       {
         // For each nfaced...
         elementNodeCount = 0;
         nodeIds = new vtkIdType[numNodesPerElement[i]];
+
+        // array of Ids describing a vtkPolyhedron
+        std::vector<vtkIdType> faceArray(numFacesPerElement[i] + numNodesPerElement[i]);
+        vtkIdType faceArrayIdx = 0;
+        for (j = 0; j < numFacesPerElement[i]; j++, faceIdx++)
+        {
+          faceArray[faceArrayIdx++] = numNodesPerFace[faceIdx];
+          for (int k = 0; k < numNodesPerFace[faceIdx]; k++)
+          {
+            // convert EnSight 1-based indexing to VTK 0-based indexing
+            faceArray[faceArrayIdx++] = nodeIdList[nodeIdx++] - 1;
+          }
+        }
+
         for (j = 0; j < numNodesPerElement[i]; j++)
         {
           // For each Node (Point) in Element (Nfaced) ...
@@ -3192,11 +3206,15 @@ int vtkPEnSightGoldBinaryReader::CreateUnstructuredGridOutput(
           }
           nodeCount++;
         }
-        this->InsertNextCellAndId(
-          output, VTK_CONVEX_POINT_SET, elementNodeCount, nodeIds, idx, cellType, i, numElements);
+
+        this->InsertNextCellAndId(output, VTK_POLYHEDRON, elementNodeCount, nodeIds, idx, cellType,
+          i, numElements, faceArray);
 
         delete[] nodeIds;
       }
+
+      delete[] numNodesPerFace;
+      delete[] numFacesPerElement;
 
       delete[] nodeMarker;
       delete[] nodeIdList;
@@ -4082,7 +4100,16 @@ int vtkPEnSightGoldBinaryReader::ReadLine(char result[80])
 
   if (this->Fortran)
   {
-    strncpy(result, &result[4], 76);
+    // strncpy cannot be used for overlapping buffers
+    int i = 0;
+    for (; i < 76 && result[i + 4] != '\0'; ++i)
+    {
+      result[i] = result[i + 4];
+    }
+    for (; i < 76; ++i)
+    {
+      result[i] = '\0';
+    }
     result[76] = 0;
     // better read an extra 8 bytes to prevent error next time
     char dummy[8];
