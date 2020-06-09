@@ -22,7 +22,7 @@ list(APPEND CMAKE_AUTOUIC_SEARCH_PATHS
 
 paraview_add_plugin(ExampleDockPanel
   VERSION "1.0"
-  UI_FILES ExampleDockPanel.ui
+  UI_FILES UIs/ExampleDockPanel.ui
   UI_INTERFACES ${interfaces}
   SOURCES ${sources})
 
