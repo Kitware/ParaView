@@ -171,9 +171,9 @@ int vtkResampleToHyperTreeGrid::RequestData(
   // Skip execution if there is no input geometry.
   vtkIdType numCells = input->GetNumberOfCells();
   vtkIdType numPts = input->GetNumberOfPoints();
-  if (numCells < 1 || numPts < 1)
+  if (numCells < 1 && numPts < 1)
   {
-    vtkDebugMacro("No data to convert!");
+    vtkWarningMacro("Input must have points or cells");
     return 1;
   }
 
@@ -1323,6 +1323,21 @@ bool vtkResampleToHyperTreeGrid::RecursivelyFillGaps(vtkCell* cell, const double
 //----------------------------------------------------------------------------
 void vtkResampleToHyperTreeGrid::ExtrapolateValuesOnGaps(vtkHyperTreeGrid* htg)
 {
+  // Strategy: we fill a priority queue of NaN vertices in which the priority is
+  // the number of valid neighbors (non NaN vertices). Its Key is thus the valid
+  // neighborhood size.
+  //
+  // When we have this priority queue filled, we read it, setting the new value
+  // to the average of valid neighbors.
+  //
+  // We treat all vertices of same priority simultaneously, storing it inside a
+  // temporary priority queue (buf) that we flush when we reach an element with
+  // a lower priority. This is so the output of this pipeline is order
+  // independent for elements of same priority.
+  //
+  // In the case that a NaN vertex is surrounded only by NaN values, it is put
+  // back inside the queue so a second pass is done on it.
+
   vtkHyperTreeGrid::vtkHyperTreeGridIterator it;
   htg->InitializeTreeIterator(it);
   vtkIdType treeId;
@@ -1357,17 +1372,24 @@ void vtkResampleToHyperTreeGrid::ExtrapolateValuesOnGaps(vtkHyperTreeGrid* htg)
       }
     }
     buf.emplace_back(PriorityQueueElement(
-      qe.Key + static_cast<vtkIdType>(qe.InvalidNeighborIds.size()) - invalidNeighbors, id, mean,
-      displayMean));
+      key + static_cast<vtkIdType>(qe.InvalidNeighborIds.size()) - invalidNeighbors, id, mean,
+      displayMean, std::move(qe.InvalidNeighborIds)));
     pq.pop();
     if (!pq.size() || pq.top().Key != key)
     {
       for (const PriorityQueueElement& element : buf)
       {
-        this->ScalarField->SetValue(element.Id, element.Mean / element.Key);
-        if (this->DisplayScalarField)
+        if (element.Mean != element.Mean || !element.Key)
         {
-          this->DisplayScalarField->SetValue(element.Id, element.DisplayMean / element.Key);
+          pq.emplace(std::move(element));
+        }
+        else
+        {
+          this->ScalarField->SetValue(element.Id, element.Mean / element.Key);
+          if (this->DisplayScalarField)
+          {
+            this->DisplayScalarField->SetValue(element.Id, element.DisplayMean / element.Key);
+          }
         }
       }
       buf.clear();

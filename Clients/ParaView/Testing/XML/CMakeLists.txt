@@ -322,6 +322,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RenderNanDefaultColor.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RenderNanGUIColor.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RenderNanPresetColor.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleToHyperTreeGridBranching_3.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleWithDataset_A.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleWithDataset_B.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ResampleWithDataset_C.png}"
@@ -1621,6 +1622,13 @@ set(TESTS_WITH_MULTI_SERVERS_3
 
 list(APPEND TESTS_WITHOUT_BASELINES
   ${TESTS_WITH_INLINE_COMPARES})
+
+# ResampleToHyperTreeGrid only works in client mode
+# Disabled in release 5.8.1 because of an API bug with scalar fields
+#paraview_add_client_tests(
+#  BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+#  TEST_SCRIPTS ResampleToHyperTreeGridBranching_3.xml
+#)
 
 paraview_add_client_tests(
   TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}
