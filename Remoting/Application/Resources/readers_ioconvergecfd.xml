@@ -1,0 +1,77 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkCONVERGECFDReader"
+      file_name_method="SetFileName"
+      name="CONVERGECFDReader">
+      <Documentation long_help="Reads a CONVERGE CFD post file into a multiblock dataset."
+                     short_help="Reads a CONVERGE CFD post file.">
+        Reads CONVERGE post files containing meshes, surfaces,
+        and parcels into a multiblock dataset. Each stream in a file is
+        read as a top-level block and meshes, surfaces, and parcels are
+        datasets under each stream.
+      </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>The Converge CFD file name.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="CellArrayInfo"
+                            command="GetCellDataArraySelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+      <StringVectorProperty name="CellArrayStatus"
+                            command="GetCellDataArraySelection"
+                            information_property="CellArrayInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty" >
+        <ArraySelectionDomain name="array_list" >
+          <RequiredProperties>
+            <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          Available cell variables.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="ParcelArrayInfo"
+                            command="GetParcelDataArraySelection"
+                            number_of_elements_per_command="2"
+                            information_only="1"
+                            si_class="vtkSIDataArraySelectionProperty" />
+      <StringVectorProperty name="ParcelArrayStatus"
+                            command="GetParcelDataArraySelection"
+                            information_property="ParcelArrayInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty" >
+        <ArraySelectionDomain name="array_list" >
+          <RequiredProperties>
+            <Property name="ParcelArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          Available parcel variables.
+        </Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>
+          Reports time values to the GUI.
+        </Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="h5"
+                       file_description="CONVERGE CFD" />
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

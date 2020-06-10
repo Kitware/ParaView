@@ -319,6 +319,11 @@ if (TARGET VTK::IOPIO)
     Resources/readers_iopio.xml)
 endif()
 
+if (TARGET VTK::IOCONVERGECFD)
+  list(APPEND xml_files
+    Resources/readers_ioconvergecfd.xml)
+endif()
+
 if (TARGET VTK::FiltersOpenTURNS)
   list(APPEND xml_files
     Resources/proxies_openturns.xml)
