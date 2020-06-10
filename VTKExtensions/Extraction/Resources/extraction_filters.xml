@@ -381,7 +381,8 @@
     <SourceProxy base_proxygroup="sources"
                  base_proxyname="SelectionSourceBase"
                  class="vtkPVSelectionSource"
-                 name="BlockSelectionSource">
+                 name="BlockSelectionSource"
+                 processes="client|renderserver|dataserver">
       <Documentation>BlockSelectionSource is a source producing a block-based
       selection used to select blocks from a composite dataset.</Documentation>
       <IdTypeVectorProperty clean_command="RemoveAllBlocks"
@@ -401,7 +402,8 @@
     <SourceProxy base_proxygroup="sources"
                  base_proxyname="SelectionSourceBase"
                  class="vtkPVSelectionSource"
-                 name="FrustumSelectionSource">
+                 name="FrustumSelectionSource"
+                 processes="client|renderserver|dataserver">
       <Documentation>FrustumSelectionSource is a source producing a frustum
       selection.</Documentation>
       <DoubleVectorProperty argument_is_array="1"
@@ -426,7 +428,8 @@
     <SourceProxy base_proxygroup="sources"
                  base_proxyname="SelectionSourceBase"
                  class="vtkPVSelectionSource"
-                 name="GlobalIDSelectionSource">
+                 name="GlobalIDSelectionSource"
+                 processes="client|renderserver|dataserver">
       <Documentation>GlobalIDSelectionSource is a source producing a global ID
       based selection.</Documentation>
       <IdTypeVectorProperty clean_command="RemoveAllGlobalIDs"
@@ -445,7 +448,8 @@
     <SourceProxy base_proxygroup="sources"
                  base_proxyname="SelectionSourceBase"
                  class="vtkPVSelectionSource"
-                 name="PedigreeIDSelectionSource">
+                 name="PedigreeIDSelectionSource"
+                 processes="client|renderserver|dataserver">
       <Documentation>PedigreeIDSelectionSource is a source producing a pedigree
       ID based selection.</Documentation>
       <StringVectorProperty clean_command="RemoveAllPedigreeIDs"
@@ -480,7 +484,8 @@
     <SourceProxy base_proxygroup="sources"
                  base_proxyname="SelectionSourceBase"
                  class="vtkPVSelectionSource"
-                 name="IDSelectionSource">
+                 name="IDSelectionSource"
+                 processes="client|renderserver|dataserver">
       <Documentation>IDSelectionSource is a source producing a ID based
       selection. This cannot be used for selecting composite
       datasets.</Documentation>
@@ -500,7 +505,8 @@
     <SourceProxy base_proxygroup="sources"
                  base_proxyname="SelectionSourceBase"
                  class="vtkPVSelectionSource"
-                 name="ValueSelectionSource">
+                 name="ValueSelectionSource"
+                 processes="client|renderserver|dataserver">
       <Documentation>ValueSelectionSource is a source producing a value based
       selection. This cannot be used for selecting composite
       datasets.</Documentation>
@@ -525,7 +531,8 @@
     <SourceProxy base_proxygroup="sources"
                  base_proxyname="SelectionSourceBase"
                  class="vtkPVSelectionSource"
-                 name="CompositeDataIDSelectionSource">
+                 name="CompositeDataIDSelectionSource"
+                 processes="client|renderserver|dataserver">
       <Documentation>CompositeDataIDSelectionSource used to create an ID based
       selection for composite datasets (Multiblock or HierarchicalBox
       dataset).</Documentation>
@@ -545,7 +552,8 @@
     <SourceProxy base_proxygroup="sources"
                  base_proxyname="SelectionSourceBase"
                  class="vtkPVSelectionSource"
-                 name="HierarchicalDataIDSelectionSource">
+                 name="HierarchicalDataIDSelectionSource"
+                 processes="client|renderserver|dataserver">
       <Documentation>HierarchicalDataIDSelectionSource used to create an ID
       based selection for HierarchicalBox datasets.</Documentation>
       <IdTypeVectorProperty clean_command="RemoveAllHierarchicalIDs"
@@ -564,7 +572,8 @@
     <SourceProxy base_proxygroup="sources"
                  base_proxyname="SelectionSourceBase"
                  class="vtkPVSelectionSource"
-                 name="ThresholdSelectionSource">
+                 name="ThresholdSelectionSource"
+                 processes="client|renderserver|dataserver">
       <Documentation>ThresholdSelectionSource is used to create a threshold
       based selection.</Documentation>
       <DoubleVectorProperty clean_command="RemoveAllThresholds"
@@ -590,7 +599,8 @@
     <SourceProxy base_proxygroup="sources"
                  base_proxyname="SelectionSourceBase"
                  class="vtkPVSelectionSource"
-                 name="LocationSelectionSource">
+                 name="LocationSelectionSource"
+                 processes="client|renderserver|dataserver">
       <Documentation>LocationSelectionSource is used to create a location based
       selection.</Documentation>
       <DoubleVectorProperty clean_command="RemoveAllLocations"

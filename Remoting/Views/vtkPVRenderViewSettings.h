@@ -102,6 +102,17 @@ public:
   vtkGetMacro(DisableIceT, bool);
   //@}
 
+  //@{
+  /**
+   * Enable fast preselection. When enabled, the preselection is computed using
+   * the visible geometry. This avoid a call to the extract selection filter each time
+   * the mouse move, improving a lot the preselection highlight display, especially for
+   * big datasets.
+   */
+  vtkSetMacro(EnableFastPreselection, bool);
+  vtkGetMacro(EnableFastPreselection, bool);
+  //@}
+
 protected:
   vtkPVRenderViewSettings();
   ~vtkPVRenderViewSettings() override;
@@ -110,6 +121,7 @@ protected:
   vtkIdType OutlineThreshold;
   int PointPickingRadius;
   bool DisableIceT;
+  bool EnableFastPreselection;
 
 private:
   vtkPVRenderViewSettings(const vtkPVRenderViewSettings&) = delete;

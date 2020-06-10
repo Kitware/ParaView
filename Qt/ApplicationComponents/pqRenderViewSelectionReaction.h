@@ -43,6 +43,7 @@ class pqRenderView;
 class pqView;
 class vtkIntArray;
 class vtkObject;
+class vtkSMPVRepresentationProxy;
 
 /**
 * pqRenderViewSelectionReaction handles various selection modes available on
@@ -137,6 +138,11 @@ private Q_SLOTS:
   void preSelection();
 
   /**
+  * makes fast pre-selection.
+  */
+  void fastPreSelection();
+
+  /**
   * callback called for mouse stop events when in 'interactive selection'
   * modes.
   */
@@ -183,6 +189,7 @@ private:
   QCursor ZoomCursor;
   QTimer MouseMovingTimer;
   bool MouseMoving;
+  vtkSMPVRepresentationProxy* CurrentRepresentation = nullptr;
 
   static QPointer<pqRenderViewSelectionReaction> ActiveReaction;
 

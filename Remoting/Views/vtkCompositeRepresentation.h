@@ -91,6 +91,12 @@ public:
   //@}
 
   /**
+   * Set the selection connection. This is used to pass a selection source output
+   * to the mapper in order to display the selection content.
+   */
+  void SetSelectionConnection(vtkAlgorithmOutput* input);
+
+  /**
    * Propagate the modification to all internal representations.
    */
   void MarkModified() override;

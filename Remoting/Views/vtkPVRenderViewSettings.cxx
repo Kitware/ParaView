@@ -48,6 +48,7 @@ vtkPVRenderViewSettings::vtkPVRenderViewSettings()
   , OutlineThreshold(250)
   , PointPickingRadius(0)
   , DisableIceT(false)
+  , EnableFastPreselection(false)
 {
 }
 

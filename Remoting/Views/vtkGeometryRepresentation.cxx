@@ -208,12 +208,14 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->Property = vtkProperty::New();
 
   // setup composite display attributes
-  vtkCompositeDataDisplayAttributes* compositeAttributes = vtkCompositeDataDisplayAttributes::New();
+  vtkNew<vtkCompositeDataDisplayAttributes> compositeAttributes;
   vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)
     ->SetCompositeDataDisplayAttributes(compositeAttributes);
   vtkCompositePolyDataMapper2::SafeDownCast(this->LODMapper)
     ->SetCompositeDataDisplayAttributes(compositeAttributes);
-  compositeAttributes->Delete();
+
+  vtkNew<vtkSelection> sel;
+  this->Mapper->SetSelection(sel);
 
   this->RequestGhostCellsIfNeeded = true;
   this->RepeatTextures = true;
@@ -360,8 +362,8 @@ int vtkGeometryRepresentation::ProcessViewRequest(
     this->ComputeVisibleDataBounds();
 
     vtkNew<vtkMatrix4x4> matrix;
-    this->Actor->GetMatrix(matrix.GetPointer());
-    vtkPVRenderView::SetGeometryBounds(inInfo, this, this->VisibleDataBounds, matrix.GetPointer());
+    this->Actor->GetMatrix(matrix);
+    vtkPVRenderView::SetGeometryBounds(inInfo, this, this->VisibleDataBounds, matrix);
   }
   else if (request_type == vtkPVView::REQUEST_UPDATE_LOD())
   {
@@ -482,7 +484,7 @@ int vtkGeometryRepresentation::RequestData(
   else
   {
     vtkNew<vtkMultiBlockDataSet> placeholder;
-    this->GeometryFilter->SetInputDataObject(0, placeholder.GetPointer());
+    this->GeometryFilter->SetInputDataObject(0, placeholder);
   }
 
   this->MultiBlockMaker->Modified();
@@ -518,9 +520,8 @@ bool vtkGeometryRepresentation::GetBounds(
 }
 
 //----------------------------------------------------------------------------
-vtkDataObject* vtkGeometryRepresentation::GetRenderedDataObject(int port)
+vtkDataObject* vtkGeometryRepresentation::GetRenderedDataObject(int vtkNotUsed(port))
 {
-  (void)port;
   if (this->GeometryFilter->GetNumberOfInputConnections(0) > 0)
   {
     return this->MultiBlockMaker->GetOutputDataObject(0);
@@ -617,7 +618,7 @@ const char* vtkGeometryRepresentation::GetColorArrayName()
   {
     return info->Get(vtkDataObject::FIELD_NAME());
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -668,9 +669,8 @@ void vtkGeometryRepresentation::UpdateColoringParameters()
   {
     this->Mapper->SetScalarVisibility(0);
     this->LODMapper->SetScalarVisibility(0);
-    const char* null = NULL;
-    this->Mapper->SelectColorArray(null);
-    this->LODMapper->SelectColorArray(null);
+    this->Mapper->SelectColorArray(nullptr);
+    this->LODMapper->SelectColorArray(nullptr);
   }
 
   // Adjust material properties.
@@ -976,6 +976,12 @@ void vtkGeometryRepresentation::SetEdgeColor(double r, double g, double b)
 }
 
 //----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetInteractiveSelectionColor(double r, double g, double b)
+{
+  this->Property->SetSelectionColor(r, g, b, 1.0);
+}
+
+//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetInterpolation(int val)
 {
   this->Property->SetInterpolation(val);
@@ -1028,7 +1034,15 @@ void vtkGeometryRepresentation::SetUserTransform(const double matrix[16])
 {
   vtkNew<vtkTransform> transform;
   transform->SetMatrix(matrix);
-  this->Actor->SetUserTransform(transform.GetPointer());
+  this->Actor->SetUserTransform(transform);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetSelection(vtkSelection* selection)
+{
+  // we need to shallow copy the existing selection instead of changing it in order to avoid
+  // changing the MTime of the mapper to avoid rebuilding everything
+  this->Mapper->GetSelection()->ShallowCopy(selection);
 }
 
 //----------------------------------------------------------------------------

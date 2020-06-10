@@ -174,6 +174,7 @@ public:
   virtual void SetColor(double r, double g, double b);
   virtual void SetDiffuseColor(double r, double g, double b);
   virtual void SetEdgeColor(double r, double g, double b);
+  virtual void SetInteractiveSelectionColor(double r, double g, double b);
   virtual void SetInterpolation(int val);
   virtual void SetLineWidth(double val);
   virtual void SetOpacity(double val);
@@ -230,6 +231,11 @@ public:
   virtual void SetMapScalars(int val);
   virtual void SetStatic(int val);
   //@}
+
+  /**
+   * Sets the selection used by the mapper.
+   */
+  virtual void SetSelection(vtkSelection* selection);
 
   /**
    * Provides access to the actor used by this representation.
