@@ -42,7 +42,8 @@ class vtkSMProperty;
 /**
 * pqSettingsDialog provides a dialog for controlling application settings
 * for a ParaView application. It's designed to look show all proxies
-* registered under the "settings" group by default. For each proxy, it creates
+* registered under the "settings" group by default, unless specified in the
+* proxyLabelsToShow constructor argument. For each proxy, it creates
 * a pqProxyWidget and adds that to a tab-widget contained in the dialog.
 */
 class PQCOMPONENTS_EXPORT pqSettingsDialog : public QDialog
@@ -51,7 +52,8 @@ class PQCOMPONENTS_EXPORT pqSettingsDialog : public QDialog
   typedef QDialog Superclass;
 
 public:
-  pqSettingsDialog(QWidget* parent = 0, Qt::WindowFlags flags = 0);
+  pqSettingsDialog(QWidget* parent = 0, Qt::WindowFlags flags = 0,
+    const QStringList& proxyLabelsToShow = QStringList());
   ~pqSettingsDialog() override;
 
   /**
