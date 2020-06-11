@@ -42,7 +42,22 @@ void ProcessArgsForPython(
   pythonArgs.push_back(vtksys::SystemTools::DuplicateString(argv[0]));
   if (script)
   {
-    pythonArgs.push_back(vtksys::SystemTools::DuplicateString(script));
+    // here we handle a special case when the filename specified is a zip
+    // archive.
+    if (vtksys::SystemTools::GetFilenameLastExtension(script) == ".zip")
+    {
+      // add the archive to sys.path
+      vtkPythonInterpreter::PrependPythonPath(script);
+      pythonArgs.push_back(vtksys::SystemTools::DuplicateString("-m"));
+
+      std::string modulename = vtksys::SystemTools::GetFilenameWithoutLastExtension(
+        vtksys::SystemTools::GetFilenameName(script));
+      pythonArgs.push_back(vtksys::SystemTools::DuplicateString(modulename.c_str()));
+    }
+    else
+    {
+      pythonArgs.push_back(vtksys::SystemTools::DuplicateString(script));
+    }
   }
   else if (argc > 1)
   {

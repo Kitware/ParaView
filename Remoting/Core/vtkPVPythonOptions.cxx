@@ -41,13 +41,16 @@ vtkPVPythonOptions::~vtkPVPythonOptions()
 //----------------------------------------------------------------------------
 int vtkPVPythonOptions::PostProcess(int argc, const char* const* argv)
 {
-  if (this->PythonScriptName &&
-    vtksys::SystemTools::GetFilenameLastExtension(this->PythonScriptName) != ".py")
+  if (this->PythonScriptName)
   {
-    std::ostringstream str;
-    str << "Wrong batch script name: " << this->PythonScriptName;
-    this->SetErrorMessage(str.str().c_str());
-    return 0;
+    auto extension = vtksys::SystemTools::GetFilenameLastExtension(this->PythonScriptName);
+    if (extension != ".py" && extension != ".zip")
+    {
+      std::ostringstream str;
+      str << "Wrong batch script name: " << this->PythonScriptName;
+      this->SetErrorMessage(str.str().c_str());
+      return 0;
+    }
   }
 
   this->Synchronize();
@@ -59,7 +62,8 @@ int vtkPVPythonOptions::PostProcess(int argc, const char* const* argv)
 int vtkPVPythonOptions::WrongArgument(const char* argument)
 {
   if (vtkPSystemTools::FileExists(argument) &&
-    vtksys::SystemTools::GetFilenameLastExtension(argument) == ".py")
+    (vtksys::SystemTools::GetFilenameLastExtension(argument) == ".py" ||
+        vtksys::SystemTools::GetFilenameLastExtension(argument) == ".zip"))
   {
     this->SetPythonScriptName(argument);
     return 1;
