@@ -93,6 +93,28 @@
         .pio file and are presented for selection. Only selected variables are
         loaded for a time step.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty name="TimeArrayInfo"
+        command="GetTimeDataStringArray"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty" />
+      <StringVectorProperty command="SetActiveTimeDataArrayName"
+                            element_types="str"
+                            information_property="TimeArrayInfo"
+                            label="Time Array"
+                            default_values="SimulationTime"
+                            name="TimeArray"
+                            number_of_elements="1">
+        <StringListDomain name="array_list"
+                          none_string="None" >
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="TimeArrayInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>This property sets which field data to use as time arrays
+         to read. If set to Default, time steps are incremented integer values
+         starting at zero.</Documentation>
+      </StringVectorProperty>
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues"
                             repeatable="1">
