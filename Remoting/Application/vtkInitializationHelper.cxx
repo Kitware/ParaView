@@ -383,7 +383,6 @@ void vtkInitializationHelper::LoadSettings()
 std::string vtkInitializationHelper::GetUserSettingsDirectory()
 {
   std::string organizationName(vtkInitializationHelper::GetOrganizationName());
-  std::string applicationName(vtkInitializationHelper::GetApplicationName());
 #if defined(_WIN32)
   const char* appData = vtksys::SystemTools::GetEnv("APPDATA");
   if (!appData)
@@ -396,7 +395,7 @@ std::string vtkInitializationHelper::GetUserSettingsDirectory()
   {
     directoryPath.append(separator);
   }
-  directoryPath += applicationName + separator;
+  directoryPath += organizationName + separator;
 #else
   std::string directoryPath;
   std::string separator("/");
