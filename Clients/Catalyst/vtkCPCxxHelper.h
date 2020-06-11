@@ -17,6 +17,7 @@
 
 #include "vtkObject.h"
 #include "vtkPVCatalystModule.h" // For windows import/export of shared libraries
+#include "vtkSmartPointer.h"     // needed for vtkSmartPointer.
 #include "vtkWeakPointer.h"      // needed for vtkWeakPointer.
 
 class vtkPVOptions;
@@ -44,10 +45,11 @@ private:
   vtkCPCxxHelper(const vtkCPCxxHelper&) = delete;
   void operator=(const vtkCPCxxHelper&) = delete;
 
-  vtkPVOptions* Options;
+  vtkSmartPointer<vtkPVOptions> Options;
 
   /// The singleton instance of the class.
   static vtkWeakPointer<vtkCPCxxHelper> Instance;
+  static bool ParaViewExternallyInitialized;
 };
 
 #endif
