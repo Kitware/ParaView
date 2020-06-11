@@ -138,7 +138,11 @@ extern "C" void setcoprocessorfield_(char* fname, int* len, int* mx, int* my, in
     vtkStdString name(fname, *len);
     att->SetName(name);
     att->SetNumberOfComponents(1);
-    att->SetArray(data, numCells, 1);
+    att->SetNumberOfTuples(numCells);
+    for (vtkIdType idx = 0; idx < numCells; ++idx)
+    {
+      att->SetValue(idx, data[idx]);
+    }
     img->GetCellData()->AddArray(att);
   }
 
