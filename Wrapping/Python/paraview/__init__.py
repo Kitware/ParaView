@@ -136,19 +136,6 @@ class options:
     connect or do anything else."""
     satelite = False
 
-def print_warning(text):
-   """Print text"""
-   print(text)
-
-def print_error(text):
-   """Print text"""
-   print(text)
-
-def print_debug_info(text):
-   """Print text"""
-   if options.print_debug_messages:
-       print(text)
-
 class NotSupportedException(Exception):
     """Exception that is fired when obsolete API is used in a script."""
     def __init__(self, msg):
@@ -165,7 +152,6 @@ taylor their behaviour based on whether the Python environment is embedded
 within an application or not."""
 fromGUI = False
 
-
 #------------------------------------------------------------------------------
 # this little trick is for static builds of ParaView. In such builds, if
 # the user imports this Python package in a non-statically linked Python
@@ -176,3 +162,22 @@ try:
 except ImportError:
     import _paraview_modules_static
 #------------------------------------------------------------------------------
+
+
+def _create_logger(name="paraview"):
+    import logging
+    logger = logging.getLogger(name)
+    if not hasattr(logger, "_paraview_initialized"):
+        logger._paraview_initialized = True
+        from paraview.detail import loghandler
+        logger.addHandler(loghandler.VTKHandler())
+        logger.setLevel(loghandler.get_level())
+    return logger
+
+logger = _create_logger()
+print_error = logger.error
+print_warning = logger.warning
+print_debug_info = logger.debug
+print_debug = logger.debug
+print_info = logger.info
+log = logger.log
