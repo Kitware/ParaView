@@ -36,6 +36,15 @@ are advised to look at the changes to those representations to get a better feel
 for how to use `vtkPVRenderView::SetOrderedCompositingInformation` instead of
 the legacy APIs.
 
+###Changes where ParaView applications settings files are stored on Windows
+
+Due to a bug prior to 5.9 on Windows only, user settings JSON files (`<application>-UserSettings.json`)
+written from ParaView-based applications were stored in the wrong directory on Windows.
+Settings file are normally stored in a directory with the name of the organization,
+but ParaView was storing them in a directory with the name of the application instead.
+In ParaView 5.9, the `<application>-UserSettings.json` file is stored in the directory named
+for the organization as expected.
+
 Changes in 5.8
 ---------------
 
