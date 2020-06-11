@@ -38,3 +38,4 @@ Variable | Description
 `PARAVIEW_LOG_PIPELINE_VERBOSITY`  | Log messages related to Pipeline execution (see vtkPVLogger::GetPipelineVerbosity())
 `PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY` | Log messages related to data movement for rendering and other tasks (see vtkPVLogger::GetDataMovementVerbosity())
 `PARAVIEW_LOG_APPLICATION_VERBOSITY` | Log messages related to the application (see vtkPVLogger::GetApplicationVerbosity())
+`PARAVIEW_LOG_CATALYST_VERBOSITY` | Log messages related to Catalyst (see vtkPVLogger::GetCatalystVerbosity())

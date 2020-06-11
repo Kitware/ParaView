@@ -64,8 +64,8 @@ public:
    * `SetPipelineVerbosity` or by setting the environment variable
    * `PARAVIEW_LOG_PIPELINE_VERBOSITY` to the expected verbosity level.
    */
-  static Verbosity GetPipelineVerbosity();
-  static void SetPipelineVerbosity(Verbosity value);
+  static vtkLogger::Verbosity GetPipelineVerbosity();
+  static void SetPipelineVerbosity(vtkLogger::Verbosity value);
   //@}
 
   //@{
@@ -77,8 +77,8 @@ public:
    * `SetExecutionVerbosity` or by setting the environment variable
    * `PARAVIEW_LOG_EXECUTION_VERBOSITY` to the expected verbosity level.
    */
-  static Verbosity GetExecutionVerbosity();
-  static void SetExecutionVerbosity(Verbosity value);
+  static vtkLogger::Verbosity GetExecutionVerbosity();
+  static void SetExecutionVerbosity(vtkLogger::Verbosity value);
   //@}
 
   //@{
@@ -90,8 +90,8 @@ public:
    * `SetPluginVerbosity` or by setting the environment variable
    * `PARAVIEW_LOG_PLUGIN_VERBOSITY` to the expected verbosity level.
    */
-  static Verbosity GetPluginVerbosity();
-  static void SetPluginVerbosity(Verbosity value);
+  static vtkLogger::Verbosity GetPluginVerbosity();
+  static void SetPluginVerbosity(vtkLogger::Verbosity value);
   //@}
 
   //@{
@@ -103,8 +103,8 @@ public:
    * `SetDataMovementVerbosity` or by setting the environment variable
    * `PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY` to the expected verbosity level.
    */
-  static Verbosity GetDataMovementVerbosity();
-  static void SetDataMovementVerbosity(Verbosity value);
+  static vtkLogger::Verbosity GetDataMovementVerbosity();
+  static void SetDataMovementVerbosity(vtkLogger::Verbosity value);
   //@}
 
   //@{
@@ -115,8 +115,8 @@ public:
    * `SetRenderingVerbosity` or by setting the environment variable
    * `PARAVIEW_LOG_RENDERING_VERBOSITY` to the expected verbosity level.
    */
-  static Verbosity GetRenderingVerbosity();
-  static void SetRenderingVerbosity(Verbosity value);
+  static vtkLogger::Verbosity GetRenderingVerbosity();
+  static void SetRenderingVerbosity(vtkLogger::Verbosity value);
   //@}
 
   //@{
@@ -128,8 +128,21 @@ public:
    * `SetApplicationVerbosity` or by setting the environment variable
    * `PARAVIEW_LOG_APPLICATION_VERBOSITY` to the expected verbosity level.
    */
-  static Verbosity GetApplicationVerbosity();
-  static void SetApplicationVerbosity(Verbosity value);
+  static vtkLogger::Verbosity GetApplicationVerbosity();
+  static void SetApplicationVerbosity(vtkLogger::Verbosity value);
+  //@}
+
+  //@{
+  /**
+   * Verbosity level for log messages related to Catalyst and other in situ
+   * tasks.
+   *
+   * Default level is `vtkLogger::VERBOSITY_TRACE` unless overridden by calling
+   * `SetCatalystVerbosity` or by setting the environment variable
+   * `PARAVIEW_LOG_CATALYST_VERBOSITY` to the expected verbosity level.
+   */
+  static vtkLogger::Verbosity GetCatalystVerbosity();
+  static void SetCatalystVerbosity(vtkLogger::Verbosity value);
   //@}
 
   //@{
@@ -141,8 +154,8 @@ public:
    *
    * Default level is `vtkLogger::VERBOSITY_TRACE`.
    */
-  static Verbosity GetDefaultVerbosity();
-  static void SetDefaultVerbosity(Verbosity value);
+  static vtkLogger::Verbosity GetDefaultVerbosity();
+  static void SetDefaultVerbosity(vtkLogger::Verbosity value);
   //@}
 protected:
   vtkPVLogger();
