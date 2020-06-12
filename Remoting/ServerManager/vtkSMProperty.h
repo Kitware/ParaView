@@ -430,8 +430,18 @@ public:
    * the first one returns true i.e. indicate that it can set a default value
    * and did so. Returns true if any domain can setup a default value for this
    * property. Otherwise false.
+   *
    * vtkSMVectorProperty overrides this method to add support for setting
    * default values using information_property.
+   *
+   * In symmetric MPI mode (i.e. when vtkProcessModule::GetSymmetricMPIMode() ==
+   * true), domains need not have correct values since data information is not
+   * collected by doing any reduction in parallel. To avoid setting incorrect
+   * values, or worse, different values on different ranks, this method does
+   * nothing in the case. Except for vtkSMProxyProperty. For vtkSMProxyProperty,
+   * we don't have any domain that is runtime data dependent and hence we let
+   * the property reset itself. This ensures that properties with
+   * vtkSMProxyListDomain, for example, are initialized correctly.
    */
   virtual bool ResetToDomainDefaults(bool use_unchecked_values = false);
 
