@@ -473,6 +473,100 @@
     </Proxy>
 
     <!-- ================================================================== -->
+    <Proxy class="vtkAMRVelodyneReader"
+                 label="Velodyne AMR Reader"
+                 name="VelodyneReaderCore">
+      <Documentation long_help="Read OvelappingAMR from a Velodyne AMR dataset."
+                     short_help="Read Velodyne AMR.">
+                     This Velodyne AMR reader loads data stored in xamr format. The
+                     output of this reader is a vtkOverlappingAMR
+                     dataset.</Documentation>
+      <!-- Define Filename -->
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the Vamr file
+        name</Documentation>
+      </StringVectorProperty>
+      <!-- Display the number of levels -->
+      <IntVectorProperty command="GetNumberOfLevels"
+                         information_only="1"
+                         name="NumLevels">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <!--  Display the number of blocks -->
+      <IntVectorProperty command="GetNumberOfBlocks"
+                         information_only="1"
+                         name="NumBlocks">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetEnableCaching"
+                         default_values="0"
+                         name="EnableCaching"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Turn caching on/off</Documentation>
+      </IntVectorProperty>
+      <!--  Define MaxLevel property -->
+      <IntVectorProperty command="SetMaxLevel"
+                         default_values="15"
+                         name="Level"
+                         number_of_elements="1">
+        <IntRangeDomain max="100"
+                        min="0"
+                        name="range" />
+        <Documentation>This property specifies the desired level of resolution
+        that will be visible.</Documentation>
+      </IntVectorProperty>
+      <!--  Array Selection GUI Component -->
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="PointArrays"
+                            name="PointArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which point-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+    </Proxy>
+
+    <!-- ================================================================== -->
     <SourceProxy name="AMReXParticlesReaderCore"
       class="vtkAMReXParticlesReader">
       <Documentation short_help="Reader for AMReX particle data">
@@ -733,6 +827,63 @@
       <Hints>
         <ReaderFactory extensions="boundary hierarchy"
                        file_description="AMR Enzo Files" />
+      </Hints>
+    </SourceProxy>
+
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkAMRFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="Velodyne AMR Reader"
+                 name="VelodyneAMRReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Read vtkOverlappingAMR data set from from a Xamr dataset."
+                     short_help="Read Velodyne AMR.">
+                     This Velodyne AMR reader loads data stored in XAMR format. The
+                     output of this reader is a vtkOverlappingAMR
+                     dataset.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="VelodyneReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="NumLevels" />
+          <Property name="NumBlocks" />
+          <Property name="EnableCaching" />
+          <Property name="Level" />
+          <PropertyGroup label="Cell/Point Array Status"
+                         name="CellPointArrayStatus"
+                         panel_visibility="default"
+                         panel_widget="ArrayStatus">
+            <Property name="PointArrayStatus" />
+            <Property name="CellArrayStatus" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="0"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="xamr Xamr XAMR"
+                       file_description="AMR Velodyne Files" />
       </Hints>
     </SourceProxy>
 
