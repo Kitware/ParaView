@@ -264,6 +264,7 @@ class Proxy(object):
         self.add_attribute('_Proxy__Properties', {})
         self.add_attribute('_Proxy__LastAttrName', None)
         self.add_attribute('SMProxy', None)
+        self.add_attribute('IgnoreUnknownSetRequests', False)
         if 'port' in args:
             self.add_attribute('Port', args['port'])
             del args['port']
@@ -485,10 +486,13 @@ class Proxy(object):
             except _bc.Continue:
                 pass
             except AttributeError:
-                raise AttributeError("Attribute %s does not exist. " % name +
-                    " This class does not allow addition of new attributes to avoid " +
-                    "mistakes due to typos. Use add_attribute() if you really want " +
-                    "to add this attribute.")
+                if self.IgnoreUnknownSetRequests:
+                    pass
+                else:
+                    raise AttributeError("Attribute %s does not exist. " % name +
+                        " This class does not allow addition of new attributes to avoid " +
+                        "mistakes due to typos. Use add_attribute() if you really want " +
+                        "to add this attribute.")
         else:
             paraview.print_debug_info(name)
             try:
