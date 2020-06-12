@@ -882,6 +882,12 @@ void vtkGeometryRepresentation::SetMetallic(double val)
 }
 
 //----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetEdgeTint(double r, double g, double b)
+{
+  this->Property->SetEdgeTint(r, g, b);
+}
+
+//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetBaseColorTexture(vtkTexture* tex)
 {
   if (tex)

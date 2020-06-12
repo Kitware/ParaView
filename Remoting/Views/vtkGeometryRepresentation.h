@@ -186,6 +186,7 @@ public:
   virtual void SetRenderLinesAsTubes(bool);
   virtual void SetRoughness(double val);
   virtual void SetMetallic(double val);
+  virtual void SetEdgeTint(double r, double g, double b);
   virtual void SetBaseColorTexture(vtkTexture* tex);
   virtual void SetMaterialTexture(vtkTexture* tex);
   virtual void SetNormalTexture(vtkTexture* tex);
