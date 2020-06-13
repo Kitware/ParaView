@@ -77,6 +77,7 @@ set(classes
   vtkSMCompoundSourceProxy
   vtkSMCompoundSourceProxyDefinitionBuilder
   vtkSMCoreUtilities
+  vtkSMDataAssemblyDomain
   vtkSMDataSourceProxy
   vtkSMDataTypeDomain
   vtkSMDeserializer

@@ -13,13 +13,19 @@
 
 =========================================================================*/
 /**
- * @class   vtkBlockDeliveryPreprocessor
- * @brief   filter used by block-delivery
- * representation for pre-processing data.
+ * @class vtkBlockDeliveryPreprocessor
+ * @brief prepares data for certain table-based representations
  *
- * vtkBlockDeliveryPreprocessor is a filter used by block-delivery
- * representation for pre-processing data.
- * It internally uses vtkAttributeDataToTableFilter.
+ * Despite its name, vtkBlockDeliveryPreprocessor is simply a filter that
+ * prepares an input data for certain representations that work with tables
+ * alone e.g. vtkSpreadSheetView, vtkChartRepresentation. Using
+ * vtkAttributeDataToTableFilter this convert any input data to a vtkTable (or
+ * composite of vtkTables). If FlattenTable, it uses `vtkSplitColumnComponents`
+ * to split multicomponent arrays into single component arrays with special
+ * names.
+ *
+ * When dealing with composite datasets, it uses `vtkExtractBlock` to pass only
+ * the selected blocks.
 */
 
 #ifndef vtkBlockDeliveryPreprocessor_h

@@ -1,0 +1,568 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkIossReader" label="Ioss Reader" name="IossReader" executive="vtkReaderExecutive" >
+      <StringVectorProperty clean_command="ClearFileNames"
+                            command="AddFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the IOSS reader.</Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty information_only="1" name="TimestepValues" repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+
+
+      <StringVectorProperty name="EdgeBlockInfo"
+        command="GetEdgeBlockSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="EdgeBlocks"
+        command="GetEdgeBlockSelection"
+        information_property="EdgeBlockInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="EdgeBlockInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the edge blocks to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="edge" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="FaceBlockInfo"
+        command="GetFaceBlockSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="FaceBlocks"
+        command="GetFaceBlockSelection"
+        information_property="FaceBlockInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="FaceBlockInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Hints>
+          <ArraySelectionWidget icon_type="face" />
+        </Hints>
+        <Documentation>Select the face blocks to read.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ElementBlockInfo"
+        command="GetElementBlockSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="ElementBlocks"
+        command="GetElementBlockSelection"
+        information_property="ElementBlockInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="ElementBlockInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+
+        <Documentation>Select the element blocks to read.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="NodeBlockFieldInfo"
+        command="GetNodeBlockFieldSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="NodeBlockFields"
+        command="GetNodeBlockFieldSelection"
+        information_property="NodeBlockFieldInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="NodeBlockFieldInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the edge blocks fields / arrays to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="point" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="EdgeBlockFieldInfo"
+        command="GetEdgeBlockFieldSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="EdgeBlockFields"
+        command="GetEdgeBlockFieldSelection"
+        information_property="EdgeBlockFieldInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="EdgeBlockFieldInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the edge blocks fields / arrays to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="edge" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="FaceBlockFieldInfo"
+        command="GetFaceBlockFieldSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="FaceBlockFields"
+        command="GetFaceBlockFieldSelection"
+        information_property="FaceBlockFieldInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="FaceBlockFieldInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Hints>
+          <ArraySelectionWidget icon_type="face" />
+        </Hints>
+        <Documentation>Select the face blocks fields / arrays to read.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ElementBlockFieldInfo"
+        command="GetElementBlockFieldSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="ElementBlockFields"
+        command="GetElementBlockFieldSelection"
+        information_property="ElementBlockFieldInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="ElementBlockFieldInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+        <Documentation>Select the element blocks fields / arrays to read.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="NodeSetInfo"
+        command="GetNodeSetSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="NodeSets"
+        command="GetNodeSetSelection"
+        information_property="NodeSetInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="NodeSetInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the node sets to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="node-set" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="EdgeSetInfo"
+        command="GetEdgeSetSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="EdgeSets"
+        command="GetEdgeSetSelection"
+        information_property="EdgeSetInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="EdgeSetInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the edge sets to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="edge-set" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="FaceSetInfo"
+        command="GetFaceSetSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="FaceSets"
+        command="GetFaceSetSelection"
+        information_property="FaceSetInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="FaceSetInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the face sets to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="face-set" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ElementSetInfo"
+        command="GetElementSetSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="ElementSets"
+        command="GetElementSetSelection"
+        information_property="ElementSetInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="ElementSetInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the element sets to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell-set" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SideSetInfo"
+        command="GetSideSetSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="SideSets"
+        command="GetSideSetSelection"
+        information_property="SideSetInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="SideSetInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the side sets to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="side-set" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="NodeSetFieldInfo"
+        command="GetNodeSetFieldSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="NodeSetFields"
+        command="GetNodeSetFieldSelection"
+        information_property="NodeSetFieldInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="NodeSetFieldInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the node sets fields / arrays to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="node-set" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="EdgeSetFieldInfo"
+        command="GetEdgeSetFieldSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="EdgeSetFields"
+        command="GetEdgeSetFieldSelection"
+        information_property="EdgeSetFieldInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="EdgeSetFieldInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the edge sets fields / arrays to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="edge-set" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="FaceSetFieldInfo"
+        command="GetFaceSetFieldSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="FaceSetFields"
+        command="GetFaceSetFieldSelection"
+        information_property="FaceSetFieldInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="FaceSetFieldInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the face sets fields / arrays to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="face-set" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ElementSetFieldInfo"
+        command="GetElementSetFieldSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="ElementSetFields"
+        command="GetElementSetFieldSelection"
+        information_property="ElementSetFieldInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="ElementSetFieldInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the element sets fields / arrays to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell-set" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SideSetFieldInfo"
+        command="GetSideSetFieldSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="SideSetFields"
+        command="GetSideSetFieldSelection"
+        information_property="SideSetFieldInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="SideSetFieldInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the side sets fields / arrays to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="side-set" />
+        </Hints>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="ScanForRelatedFiles"
+        command="SetScanForRelatedFiles"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This reader can lookup additional related files using pattern matching
+          based on the files provided. This is useful to lookup restarted results,
+          for example. To avoid this behavior, uncheck this property.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetApplyDisplacements"
+                         default_values="1"
+                         name="ApplyDisplacements"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Geometric locations can include displacements. When this
+          option is on, the nodal positions are 'displaced' by the standard
+          exodus displacement vector. If displacements are turned 'off', the user
+          can explicitly add them by applying a warp filter.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="RemoveUnusedPoints"
+        command="SetRemoveUnusedPoints"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Node related data, including point coordinates, point field data etc. is
+          typically shared between all blocks and sets. By default, the reader will
+          remove unused points for each block or set. To avoid this, set this flag to
+          false.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="GenerateFileId"
+        command="SetGenerateFileId"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When checked, the reader will add a cell array called 'file_id'
+          indicate which partitioned file the cell came from.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ReadIds"
+        command="SetReadIds"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When checked, the reader will read 'ids' and 'element_side'
+          fields, if available.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ReadGlobalFields"
+        command="SetReadGlobalFields"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When checked, the reader will read quality assurance and
+          information records, if available.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ReadQAAndInformationRecords"
+        label="Read QA And Information Records"
+        command="SetReadQAAndInformationRecords"
+        number_of_elements="1"
+        default_values="1"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When checked, the reader will read global fields, if available.
+        </Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Blocks"
+        name="Blocks"
+        panel_widget="ArrayStatus">
+        <Property name="ElementBlocks" />
+        <Property name="EdgeBlocks" />
+        <Property name="FaceBlocks" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Block Arrays"
+        name="BlockArrays"
+        panel_widget="ArrayStatus">
+        <Property name="NodeBlockFields" />
+        <Property name="ElementBlockFields" />
+        <Property name="EdgeBlockFields" />
+        <Property name="FaceBlockFields" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Sets"
+        name="Sets"
+        panel_widget="ArrayStatus">
+        <Property name="NodeSets" />
+        <Property name="EdgeSets" />
+        <Property name="FaceSets" />
+        <Property name="ElementSets" />
+        <Property name="SideSets" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Set Arrays"
+        name="SetArrays"
+        panel_widget="ArrayStatus">
+        <Property name="NodeSetFields" />
+        <Property name="EdgeSetFields" />
+        <Property name="FaceSetFields" />
+        <Property name="ElementSetFields" />
+        <Property name="SideSetFields" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Miscellaneous">
+        <Property name="ScanForRelatedFiles" />
+        <Property name="ApplyDisplacements" />
+        <Property name="RemoveUnusedPoints" />
+        <Property name="GenerateFileId" />
+        <Property name="ReadIds" />
+        <Property name="ReadGlobalFields" />
+        <Property name="ReadQAAndInformationRecords" />
+      </PropertyGroup>
+
+      <Hints>
+        <ReaderFactory extensions="g e h gc ex2 ex2v2 exo gen par exoII exii ex-timeseries"
+                       file_description="Ioss Exodus Files"
+                       filename_patterns="*e-s*" />
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

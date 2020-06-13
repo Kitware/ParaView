@@ -15,8 +15,8 @@
 
 #include "vtkVolumeRepresentationPreprocessor.h"
 #include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataToUnstructuredGridFilter.h"
 #include "vtkDataSetTriangleFilter.h"
-#include "vtkExtractBlock.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
@@ -28,20 +28,14 @@ vtkStandardNewMacro(vtkVolumeRepresentationPreprocessor);
 
 //----------------------------------------------------------------------------
 vtkVolumeRepresentationPreprocessor::vtkVolumeRepresentationPreprocessor()
+  : TetrahedraOnly(0)
+  , ExtractedBlockIndex(0)
 {
-  this->DataSetTriangleFilter = vtkDataSetTriangleFilter::New();
-  this->ExtractBlockFilter = vtkExtractBlock::New();
-  this->ExtractBlockFilter->SetPruneOutput(1);
-  this->ExtractedBlockIndex = VTK_UNSIGNED_INT_MAX;
-  this->SetExtractedBlockIndex(0);
-  this->SetTetrahedraOnly(0);
 }
 
 //----------------------------------------------------------------------------
 vtkVolumeRepresentationPreprocessor::~vtkVolumeRepresentationPreprocessor()
 {
-  this->DataSetTriangleFilter->Delete();
-  this->ExtractBlockFilter->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -53,20 +47,18 @@ int vtkVolumeRepresentationPreprocessor::RequestData(vtkInformation* vtkNotUsed(
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   // get the input and output
-  vtkDataObject* input = vtkDataObject::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkSmartPointer<vtkDataObject> input =
+    vtkDataObject::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkUnstructuredGrid* output =
     vtkUnstructuredGrid::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  // input to the triangle filter is a vtkDataSet
-  vtkDataSet* triangleFilterInput = 0;
-
-  if (input->IsA("vtkMultiBlockDataSet"))
+  if (auto cd = vtkCompositeDataSet::SafeDownCast(input))
   {
     // extract a dataset from the multiblock data.
-    triangleFilterInput = this->MultiBlockToDataSet(vtkMultiBlockDataSet::SafeDownCast(input));
+    input = this->ExtractDataSet(cd);
 
     // check for error
-    if (!triangleFilterInput)
+    if (!input)
     {
       vtkErrorMacro("Could not extract a dataset from multiblock input.");
       return 0;
@@ -75,10 +67,10 @@ int vtkVolumeRepresentationPreprocessor::RequestData(vtkInformation* vtkNotUsed(
   else
   {
     // try to down cast input DataOject to DataSet
-    triangleFilterInput = vtkDataSet::SafeDownCast(input);
+    input = vtkDataSet::SafeDownCast(input);
 
     // check for error
-    if (!triangleFilterInput)
+    if (!input)
     {
       vtkErrorMacro("Could not downcast data object input to dataset.");
       return 0;
@@ -86,10 +78,10 @@ int vtkVolumeRepresentationPreprocessor::RequestData(vtkInformation* vtkNotUsed(
   }
 
   // push dataset through the triangle filter
-  vtkUnstructuredGrid* triangleFilterOutput = this->TriangulateDataSet(triangleFilterInput);
+  input = this->Tetrahedralize(input);
 
   // copy to output
-  output->ShallowCopy(triangleFilterOutput);
+  output->ShallowCopy(input);
   output->RemoveGhostCells();
   return 1;
 }
@@ -97,71 +89,34 @@ int vtkVolumeRepresentationPreprocessor::RequestData(vtkInformation* vtkNotUsed(
 //----------------------------------------------------------------------------
 /// Pushes input dataset through a vtkDataSetTriangleFilter and returns
 /// the output.
-vtkUnstructuredGrid* vtkVolumeRepresentationPreprocessor::TriangulateDataSet(vtkDataSet* input)
+vtkSmartPointer<vtkUnstructuredGrid> vtkVolumeRepresentationPreprocessor::Tetrahedralize(
+  vtkDataObject* input)
 {
-  // shallow copy the input and connect to triangle filter
-  vtkDataSet* clone = input->NewInstance();
-  clone->ShallowCopy(input);
-  this->DataSetTriangleFilter->SetInputData(clone);
-  clone->Delete();
-
-  // update the triangulate filter
-  this->DataSetTriangleFilter->Update();
-  this->DataSetTriangleFilter->SetInputData(0);
-
-  // return output of triangle filter
-  return this->DataSetTriangleFilter->GetOutput();
+  vtkNew<vtkDataSetTriangleFilter> tetrahedralizer;
+  tetrahedralizer->SetInputData(input);
+  tetrahedralizer->Update();
+  tetrahedralizer->SetTetrahedraOnly(this->TetrahedraOnly);
+  return tetrahedralizer->GetOutput();
 }
 
 //----------------------------------------------------------------------------
 /// Extracts a single block from a multiblock dataset and attempts to downcast
 /// the extracted block to dataset before returning.
-vtkDataSet* vtkVolumeRepresentationPreprocessor::MultiBlockToDataSet(vtkMultiBlockDataSet* input)
+vtkSmartPointer<vtkDataSet> vtkVolumeRepresentationPreprocessor::ExtractDataSet(
+  vtkCompositeDataSet* input)
 {
-  // shallow copy the input and connect to extract block filter
-  vtkMultiBlockDataSet* clone = input->NewInstance();
-  clone->ShallowCopy(input);
-  this->ExtractBlockFilter->SetInputData(clone);
-  clone->Delete();
-
-  // update extract block filter
-  this->ExtractBlockFilter->Update();
-  this->ExtractBlockFilter->SetInputData(0);
-
-  // output is a vtkCompositeDataSet with a single leaf node.
-  vtkCompositeDataSet* output =
-    vtkCompositeDataSet::SafeDownCast(this->ExtractBlockFilter->GetOutput());
-
-  // use an iterator to get the dataset at the leaf node.
-  vtkDataSet* dataset = 0;
-  vtkCompositeDataIterator* iter = output->NewIterator();
-  iter->GoToFirstItem();
-  dataset = vtkDataSet::SafeDownCast(output->GetDataSet(iter));
-  iter->Delete();
-
-  // return the dataset
-  return dataset;
-}
-
-//----------------------------------------------------------------------------
-/// Choose which block to volume render.  Ignored if input is not multiblock.
-void vtkVolumeRepresentationPreprocessor::SetExtractedBlockIndex(unsigned int index)
-{
-  if (this->ExtractedBlockIndex != index)
-  {
-    this->ExtractedBlockIndex = index;
-    this->ExtractBlockFilter->RemoveAllIndices();
-    this->ExtractBlockFilter->AddIndex(this->ExtractedBlockIndex);
-    this->Modified();
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkVolumeRepresentationPreprocessor::SetTetrahedraOnly(int value)
-{
-  this->TetrahedraOnly = value;
-  this->DataSetTriangleFilter->SetTetrahedraOnly(this->TetrahedraOnly);
-  this->Modified();
+  // We use vtkCompositeDataToUnstructuredGridFilter instead of using vtkExtractBlock since
+  // this filter merges partitions (or pieces) which may be selected into a single
+  // vtkUnstructuredGrid as
+  // needed by the volume mapper. Once we fix the volume mapper to support composite datasets
+  // better we should revert back to using vtkExtractBlock filter.
+  // ref: paraview/paraview#19955.
+  vtkNew<vtkCompositeDataToUnstructuredGridFilter> extractor;
+  extractor->SetSubTreeCompositeIndex(this->ExtractedBlockIndex);
+  extractor->SetInputData(input);
+  extractor->Update();
+  extractor->MergePointsOff();
+  return extractor->GetOutput();
 }
 
 //----------------------------------------------------------------------------
@@ -178,5 +133,3 @@ void vtkVolumeRepresentationPreprocessor::PrintSelf(ostream& os, vtkIndent inden
   os << indent << "ExtractedBlockIndex: " << this->ExtractedBlockIndex << "\n";
   os << indent << "TetrahedraOnly: " << (this->TetrahedraOnly ? "On" : "Off") << "\n";
 }
-
-//----------------------------------------------------------------------------

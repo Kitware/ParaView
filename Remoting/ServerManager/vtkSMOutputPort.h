@@ -35,7 +35,9 @@
 #include "vtkWeakPointer.h" // needed by SourceProxy pointer
 
 class vtkCollection;
+class vtkDataAssembly;
 class vtkPVClassNameInformation;
+class vtkPVDataAssemblyInformation;
 class vtkPVDataInformation;
 class vtkPVTemporalDataInformation;
 class vtkSMCompoundSourceProxy;
@@ -62,6 +64,13 @@ public:
    * the pipeline and hence can be slow. Use with caution.
    */
   virtual vtkPVTemporalDataInformation* GetTemporalDataInformation();
+
+  /**
+   * If available, returns the data assembly associated with the data produced
+   * on this port. This is collected alongside DataInformation and hence all
+   * rules about validity and update are the same as DataInformation.
+   */
+  virtual vtkDataAssembly* GetDataAssembly();
 
   /**
    * Returns the classname of the data object on this output port.
@@ -132,7 +141,9 @@ protected:
 
   vtkPVClassNameInformation* ClassNameInformation;
   int ClassNameInformationValid;
+
   vtkPVDataInformation* DataInformation;
+  vtkPVDataAssemblyInformation* DataAssemblyInformation;
   bool DataInformationValid;
 
   vtkPVTemporalDataInformation* TemporalDataInformation;

@@ -55,16 +55,16 @@ int vtkMarkSelectedRows::RequestDataObject(
     return 0;
   }
 
-  vtkCompositeDataSet* inputCD = vtkCompositeDataSet::GetData(inInfo);
-  vtkDataObject* newOutput = 0;
+  vtkDataObject* newOutput = nullptr;
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  if (inputCD)
+  if (auto inputCD = vtkDataObject::GetData(inInfo))
   {
-    if (vtkMultiBlockDataSet::GetData(outInfo))
+    auto output = vtkDataObjectTree::GetData(outInfo);
+    if (output != nullptr && output->GetDataObjectType() == inputCD->GetDataObjectType())
     {
       return 1;
     }
-    newOutput = vtkMultiBlockDataSet::New();
+    newOutput = inputCD->NewInstance();
   }
   else
   {
@@ -87,13 +87,12 @@ int vtkMarkSelectedRows::RequestDataObject(
 //----------------------------------------------------------------------------
 int vtkMarkSelectedRows::FillInputPortInformation(int port, vtkInformation* info)
 {
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObjectTree");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
   if (port == 1)
   {
     info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
   }
-
   return 1;
 }
 
@@ -129,29 +128,30 @@ int vtkMarkSelectedRows::RequestData(
     return this->RequestDataInternal(inputTable, extractedTable, outputTable);
   }
 
-  vtkMultiBlockDataSet* inputMB = vtkMultiBlockDataSet::SafeDownCast(inputDO);
-  vtkMultiBlockDataSet* extractedMB = vtkMultiBlockDataSet::SafeDownCast(extractedDO);
-  vtkMultiBlockDataSet* outputMB = vtkMultiBlockDataSet::SafeDownCast(outputDO);
-  if (inputMB)
+  vtkDataObjectTree* inputCD = vtkDataObjectTree::SafeDownCast(inputDO);
+  vtkDataObjectTree* extractedCD = vtkDataObjectTree::SafeDownCast(extractedDO);
+  vtkDataObjectTree* outputCD = vtkDataObjectTree::SafeDownCast(outputDO);
+  if (inputCD)
   {
-    assert(extractedMB != NULL && outputMB != NULL);
+    assert(extractedCD != NULL && outputCD != NULL);
 
-    // it's possible that extractedMB is an empty multiblock indicating no
+    // it's possible that extractedCD is an empty multiblock indicating no
     // selected data was extracted from the input. Determine that.
-    bool nothing_extracted = extractedMB == NULL || extractedMB->GetNumberOfBlocks() == 0;
+    bool nothing_extracted =
+      extractedCD == NULL || extractedCD->GetNumberOfElements(vtkDataObject::ROW) == 0;
 
-    outputMB->CopyStructure(inputMB);
-    vtkCompositeDataIterator* iter = inputMB->NewIterator();
+    outputCD->CopyStructure(inputCD);
+    vtkCompositeDataIterator* iter = inputCD->NewIterator();
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
       vtkTable* curInput = vtkTable::SafeDownCast(iter->GetCurrentDataObject());
       if (curInput)
       {
         vtkTable* curOutput = vtkTable::New();
-        outputMB->SetDataSet(iter, curOutput);
+        outputCD->SetDataSet(iter, curOutput);
         curOutput->FastDelete();
         vtkTable* curExtractedTable =
-          nothing_extracted ? NULL : vtkTable::SafeDownCast(extractedMB->GetDataSet(iter));
+          nothing_extracted ? NULL : vtkTable::SafeDownCast(extractedCD->GetDataSet(iter));
 
         this->RequestDataInternal(curInput, curExtractedTable, curOutput);
       }

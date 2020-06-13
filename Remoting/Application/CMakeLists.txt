@@ -362,5 +362,10 @@ if (TARGET VTK::FiltersParallel AND
     Resources/filters_selectionfftovertime.xml)
 endif()
 
+if (TARGET VTK::IOIoss AND FALSE) # disabling for now
+  list(APPEND xml_files
+    Resources/readers_ioioss.xml)
+endif()
+
 paraview_add_server_manager_xmls(
   XMLS  ${xml_files})

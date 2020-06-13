@@ -81,6 +81,7 @@ set(classes
   pqCustomizeShortcutsDialog
   pqCustomViewpointsToolbar
   pqCylinderPropertyWidget
+  pqDataAssemblyPropertyWidget
   pqDataQueryReaction
   pqDataTimeStepBehavior
   pqDefaultMainWindow
@@ -234,6 +235,7 @@ set(ui_files
   Resources/UI/pqCustomResolutionDialog.ui
   Resources/UI/pqCylinderPropertyWidget.ui
   Resources/UI/pqCustomizeShortcutsDialog.ui
+  Resources/UI/pqDataAssemblyPropertyWidget.ui
   Resources/UI/pqDefaultMainWindow.ui
   Resources/UI/pqDoubleRangeSliderPropertyWidget.ui
   Resources/UI/pqEditMenuBuilder.ui

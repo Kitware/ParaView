@@ -15,6 +15,7 @@
 #include "vtkSMDomain.h"
 
 #include "vtkCommand.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProperty.h"
 #include "vtkSMSession.h"
@@ -60,6 +61,7 @@ vtkSMDomain::DeferDomainModifiedEvents::~DeferDomainModifiedEvents()
   }
 }
 
+vtkStandardNewMacro(vtkSMDomain);
 //---------------------------------------------------------------------------
 vtkSMDomain::vtkSMDomain()
 {
@@ -76,6 +78,12 @@ vtkSMDomain::~vtkSMDomain()
 {
   this->SetXMLName(0);
   delete this->Internals;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDomain::Update(vtkSMProperty* vtkNotUsed(requestingProperty))
+{
+  this->DomainModified();
 }
 
 //---------------------------------------------------------------------------
