@@ -193,7 +193,11 @@ if (PARAVIEW_USE_MPI AND MPIEXEC_EXECUTABLE)
   set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::smTestDriver>")
   set(_vtk_test_python_args
     --script $<TARGET_FILE:ParaView::pvbatch> -sym
-      ${CMAKE_CURRENT_SOURCE_DIR}/TestCatalystDriver.py
+      -m paraview.demos.wavelet_miniapp
+      -s ${CMAKE_CURRENT_SOURCE_DIR}/DoLive.py
+      --script-version 2
+      -t 10
+      --size 21
     --client $<TARGET_FILE:ParaView::pvpython> -dr)
   vtk_add_test_python(NO_DATA NO_RT TestCatalystClient.py)
   unset(_vtk_testing_python_exe)

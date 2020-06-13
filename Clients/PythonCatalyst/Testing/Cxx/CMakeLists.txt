@@ -31,12 +31,12 @@ vtk_module_test_executable(CoProcessingCompareImagesTester CompareImages.cxx)
 # a simple test to see if the input is changing, i.e. that the initial
 # pipeline is having it's trivial producer updated with a new grid
 add_test(NAME CoProcessingTestInput
-  COMMAND pvbatch -sym ${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/TestInput.py 4
-  )
+  COMMAND pvbatch -sym
+            -m paraview.demos.wavelet_miniapp
+            -s ${CMAKE_CURRENT_SOURCE_DIR}/TestInput.py
+            -t 4
+            --size 21)
 _set_standard_test_properties(CoProcessingTestInput)
-
-
 
 # the CoProcessingTestPythonScript needs to be run with ${MPIEXEC_EXECUTABLE} if
 # CoProcessingPythonScriptExample was built with MPI because certain
