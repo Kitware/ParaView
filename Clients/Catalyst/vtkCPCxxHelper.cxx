@@ -15,6 +15,8 @@
 #include "vtkCPCxxHelper.h"
 
 #include "vtkInitializationHelper.h"
+#include "vtkLogger.h"
+#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h" // Required to get build options for paraview
@@ -59,6 +61,18 @@ vtkCPCxxHelper* vtkCPCxxHelper::New()
   {
     vtkCPCxxHelper::Instance->Register(NULL);
     return vtkCPCxxHelper::Instance;
+  }
+
+  // For in situ, when running in distributed mode, ensure that we don't
+  // generate any output on the stderr on satellite ranks. One can of course
+  // generate log files, if needed for satellite, but it's best to disable
+  // any terminal output for errors/warnings etc.
+  if (auto controller = vtkMultiProcessController::GetGlobalController())
+  {
+    if (controller->GetLocalProcessId() > 0)
+    {
+      vtkLogger::SetStderrVerbosity(vtkLogger::VERBOSITY_OFF);
+    }
   }
 
   // Try the factory first
