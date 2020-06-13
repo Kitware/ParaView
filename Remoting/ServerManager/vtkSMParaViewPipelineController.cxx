@@ -231,6 +231,9 @@ void vtkSMParaViewPipelineController::RegisterProxiesForProxyListDomains(vtkSMPr
       vtkSMProxy* plproxy = pld->GetProxy(cc);
       this->PostInitializeProxy(plproxy);
       pxm->RegisterProxy(groupname.c_str(), iter->GetKey(), plproxy);
+
+      // Handle nest proxy-list domains (ref: #19986).
+      this->RegisterProxiesForProxyListDomains(plproxy);
     }
   }
 }
