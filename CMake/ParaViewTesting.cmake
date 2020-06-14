@@ -4,12 +4,6 @@ function (paraview_add_test_python)
   vtk_add_test_python(${ARGN})
 endfunction ()
 
-function (paraview_add_test_python_mpi)
-  set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::pvpython>")
-  set(_vtk_test_python_args -dr ${paraview_python_args})
-  vtk_add_test_python_mpi(${ARGN})
-endfunction ()
-
 function (paraview_add_test_pvbatch)
   set(_vtk_testing_python_exe "$<TARGET_FILE:ParaView::pvbatch>")
   set(_vtk_test_python_args -dr ${paraview_pvbatch_args})
