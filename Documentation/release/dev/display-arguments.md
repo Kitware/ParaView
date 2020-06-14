@@ -20,7 +20,7 @@ These displays (or devices) are then assigned to each of the ranks in a
 round-robin fashion. Thus, if there are 5 ranks and 2 displays, the displays are
 assigned as `0, 1, 0, 1, 0` sequentially for the 5 ranks.
 
-`--displays-assignment-mode=` or `-m=` argument can be used to customize this
+`--displays-assignment-mode=` argument can be used to customize this
 default assignment mode to use a contiguous assigment instead. Accepted values
 are 'contiguous' and 'round-robin'. If contiguous mode is used
 for the 5 ranks and 2 displays example, the displays are assigned as
