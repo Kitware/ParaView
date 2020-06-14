@@ -1174,7 +1174,7 @@ if(PARAVIEW_USE_PYTHON)
     list(APPEND TESTS_WITH_INLINE_COMPARES
       FindDataDialog.xml)
 
-    if (TARGET ParaView::CinemaReader)
+    if (TARGET ParaView::RemotingCinema)
       # Cinema importing capabilities are only available in Python + OpenGL2
       # add the cinema database files.
       set(cinema_data

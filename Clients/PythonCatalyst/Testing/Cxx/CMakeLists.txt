@@ -190,7 +190,7 @@ if (PARAVIEW_USE_QT)
     _set_standard_test_properties(CoProcessingFullWorkflowWithPlots)
 
     find_python_module(numpy numpy_found)
-    if (numpy_found AND TARGET ParaView::CinemaReader)
+    if (numpy_found AND TARGET ParaView::RemotingCinema)
       add_test(NAME CoProcessingFullWorkflowCinema
         COMMAND ${CMAKE_COMMAND}
         -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::paraview>
