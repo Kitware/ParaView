@@ -132,6 +132,7 @@ private:
   int NumberOfServers;
   // Specify if the -rc flag was passed or not
   int ReverseConnection;
+  bool ClientUseMPI;
 };
 
 #endif

@@ -181,6 +181,9 @@ function (_paraview_add_tests function)
     string(REPLACE "__paraview_script__" "--test-script=${_paraview_add_tests_script}"
       _paraview_add_tests_script_args
       "${_paraview_add_tests__COMMAND_PATTERN}")
+    string(REPLACE "__paraview_scriptpath__" "${_paraview_add_tests_script}"
+      _paraview_add_tests_script_args
+      "${_paraview_add_tests_script_args}")
     string(REPLACE "__paraview_client_args__" "${_paraview_add_tests_client_args}"
       _paraview_add_tests_script_args
       "${_paraview_add_tests_script_args}")
@@ -386,4 +389,33 @@ function (paraview_add_cave_tests num_ranks config)
         -dr
         --exit
     ${ARGN})
+endfunction ()
+
+# This is a catch-all function to run any custom command as the "client"
+# using th smTestDriver. Note, the command must print "Process started" for
+# smTestDriver to treat it as started otherwise the test will fail.
+# The command to execute is passed as {ARGN} and is suffixed by each of the
+# TEST_SCRIPTS provided, one at at time.
+function (paraview_add_test prefix)
+  _paraview_add_tests("paraview_add_test"
+    PREFIX "${prefix}"
+    _COMMAND_PATTERN
+      --client
+      __paraview_args__
+      __paraview_scriptpath__
+    ${ARGN})
+endfunction ()
+
+# Same as `paraview_add_test` except makes smTestDriver run the command using
+# mpi. If `PARAVIEW_USE_MPI` if not defined, this does not add any test.
+function (paraview_add_test_mpi prefix)
+  if (PARAVIEW_USE_MPI)
+    _paraview_add_tests("paraview_add_test"
+      PREFIX "${prefix}"
+      _COMMAND_PATTERN
+        --client-mpi
+        __paraview_args__
+        __paraview_scriptpath__
+      ${ARGN})
+  endif ()
 endfunction ()
