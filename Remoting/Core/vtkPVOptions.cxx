@@ -329,7 +329,7 @@ void vtkPVOptions::Initialize()
     "among the number of rendering ranks using the '--displays-assignment-mode=' specified.",
     vtkPVOptions::PVSERVER | vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVBATCH);
 
-  this->AddCallback("--displays-assignment-mode", "-m",
+  this->AddCallback("--displays-assignment-mode", nullptr,
     &vtkPVOptions::DisplaysAssignmentModeArgumentHandler, this,
     "Specify how to assign displays (specified using '--displays=') among rendering ranks. "
     "Supported values are 'contiguous' and 'round-robin'. Default is 'round-robin'.",
