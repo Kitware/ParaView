@@ -19,9 +19,9 @@ TEST_DEPENDS
   ParaView::CatalystTestDriver
   VTK::IOImage
   VTK::ParallelCore
+  VTK::TestingRendering
 TEST_OPTIONAL_DEPENDS
   VTK::ParallelMPI
-  VTK::TestingRendering
 TEST_LABELS
   Catalyst
   ParaView

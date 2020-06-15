@@ -85,6 +85,8 @@ def DoCoProcessing(datadescription):
     "Callback to do co-processing for current timestep"
     global coprocessor
 
+    print("in DoCoProcessing")
+
     # Update the coprocessor by providing it the newly generated simulation data.
     # If the pipeline hasn't been setup yet, this will setup the pipeline.
     coprocessor.UpdateProducers(datadescription)

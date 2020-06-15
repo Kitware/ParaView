@@ -4,6 +4,7 @@ try: paraview.simple
 except: from paraview.simple import *
 
 def DoCoProcessing(datadescription):
+  print("in DoCoProcessing")
   timestep = datadescription.GetTimeStep()
 
   grid = datadescription.GetInputDescriptionByName("input").GetGrid()
