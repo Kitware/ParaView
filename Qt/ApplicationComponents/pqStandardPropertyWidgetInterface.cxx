@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCTHArraySelectionDecorator.h"
 #include "pqCalculatorWidget.h"
 #include "pqCameraManipulatorWidget.h"
+#include "pqCheckableProperty.h"
 #include "pqColorAnnotationsPropertyWidget.h"
 #include "pqColorEditorPropertyWidget.h"
 #include "pqColorOpacityEditorWidget.h"
@@ -315,6 +316,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   else if (panelWidget == "DataAssemblyEditor")
   {
     return new pqDataAssemblyPropertyWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "CheckableProperty")
+  {
+    return new pqCheckableProperty(proxy, group, parentWidget);
   }
   // *** NOTE: When adding new types, please update the header documentation ***
 

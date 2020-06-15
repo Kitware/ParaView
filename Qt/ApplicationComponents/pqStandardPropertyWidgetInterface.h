@@ -105,6 +105,7 @@ public:
    * \li \c OMETransferFunctions : pqOMETransferFunctionsPropertyWidget
    * \li \c PropertyCollection : pqPropertyCollectionWidget
    * \li \c DataAssemblyEditor: pqDataAssemblyPropertyWidget
+   * \li \c CheckableProperty : pqCheckableProperty
    */
   pqPropertyWidget* createWidgetForPropertyGroup(
     vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parentWidget) override;

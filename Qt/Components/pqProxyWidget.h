@@ -189,6 +189,12 @@ public Q_SLOTS:
   */
   void saveAsDefaults();
 
+  /**
+  * create a widget for a property.
+  */
+  static pqPropertyWidget* createWidgetForProperty(
+    vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parentObj);
+
 protected:
   void showEvent(QShowEvent* event) override;
   void hideEvent(QHideEvent* event) override;
@@ -221,12 +227,6 @@ private:
   * create 3D widgets, if any.
   */
   void create3DWidgets();
-
-  /**
-  * create a widget for a property.
-  */
-  pqPropertyWidget* createWidgetForProperty(
-    vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parentObj);
 
 private:
   Q_DISABLE_COPY(pqProxyWidget)
