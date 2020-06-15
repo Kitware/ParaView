@@ -417,6 +417,21 @@
         </Hints>
       </IntVectorProperty>
 
+      <IntVectorProperty name="EnableFastPreselection"
+                         label="Enable fast preselection"
+                         command="SetEnableFastPreselection"
+                         default_values="0"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable fast preselection. When enabled, the preselection is computed using
+          the visible geometry. This avoid a call to the extract selection filter each time
+          the mouse move, improving a lot the preselection highlight display, especially for
+          big datasets.
+        </Documentation>
+      </IntVectorProperty>
+
       <PropertyGroup label="Geometry Mapper Options">
         <Property name="ResolveCoincidentTopology" />
         <Property name="PolygonOffsetParameters" />

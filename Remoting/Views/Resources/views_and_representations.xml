@@ -3813,6 +3813,13 @@
                            processes="client|renderserver|dataserver">
       <Documentation>ParaView's default representation for showing any type of
       dataset in the render view.</Documentation>
+      <InputProperty command="SetSelectionConnection"
+                     name="Selection">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkSelection" />
+        </DataTypeDomain>
+        <Documentation>Set the selection.</Documentation>
+      </InputProperty>
       <IntVectorProperty command="SetVisibility"
                          default_values="1"
                          name="Visibility"
@@ -4018,6 +4025,8 @@
             <Property name="SpecularColor"
                       panel_widget="color_selector"
                       panel_visibility="advanced" />
+            <Property name="InteractiveSelectionColor"
+                      panel_visibility="never" />
             <Property name="SpecularPower"
                       panel_visibility="advanced" />
             <Property name="Luminosity"
@@ -11788,6 +11797,19 @@
                            name="range" />
         <Hints>
           <PropertyLink group="settings" proxy="ColorPalette" property="EdgeColor" unlink_if_modified="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetInteractiveSelectionColor"
+                            default_values="0.5 0.0 1.0"
+                            name="InteractiveSelectionColor"
+                            number_of_elements="3">
+        <Documentation>Set the preselection color. This color is used to draw the edge
+        of the current preselection.</Documentation>
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <PropertyLink group="settings" proxy="ColorPalette" property="InteractiveSelectionColor" unlink_if_modified="1" />
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetPosition"

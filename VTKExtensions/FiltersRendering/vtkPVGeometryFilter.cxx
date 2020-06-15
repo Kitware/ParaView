@@ -595,20 +595,31 @@ void vtkPVGeometryFilter::CleanupOutputData(vtkPolyData* output, int doCommunica
   }
   this->ExecuteCellNormals(output, doCommunicate);
   this->RemoveGhostCells(output);
-  if (this->GenerateProcessIds && output && output->GetNumberOfPoints() > 0)
+  if (this->GenerateProcessIds && output)
   {
     // add process ids array.
-    int procId = this->Controller ? this->Controller->GetLocalProcessId() : 0;
+    unsigned int procId =
+      this->Controller ? static_cast<unsigned int>(this->Controller->GetLocalProcessId()) : 0;
+
     vtkIdType numPoints = output->GetNumberOfPoints();
-    vtkNew<vtkUnsignedIntArray> array;
-    array->SetNumberOfTuples(numPoints);
-    unsigned int* ptr = array->GetPointer(0);
-    for (vtkIdType cc = 0; cc < numPoints; cc++)
+    if (numPoints > 0)
     {
-      ptr[cc] = static_cast<unsigned int>(procId);
+      vtkNew<vtkUnsignedIntArray> array;
+      array->SetNumberOfTuples(numPoints);
+      array->FillTypedComponent(0, procId);
+      array->SetName("vtkProcessId");
+      output->GetPointData()->AddArray(array);
     }
-    array->SetName("vtkProcessId");
-    output->GetPointData()->AddArray(array.GetPointer());
+
+    vtkIdType numCells = output->GetNumberOfCells();
+    if (numCells > 0)
+    {
+      vtkNew<vtkUnsignedIntArray> cellArray;
+      cellArray->SetNumberOfTuples(numCells);
+      cellArray->FillTypedComponent(0, procId);
+      cellArray->SetName("vtkProcessId");
+      output->GetCellData()->AddArray(cellArray);
+    }
   }
 }
 
@@ -709,10 +720,18 @@ void vtkPVGeometryFilter::AddCompositeIndex(vtkPolyData* pd, unsigned int index)
   vtkUnsignedIntArray* cindex = vtkUnsignedIntArray::New();
   cindex->SetNumberOfComponents(1);
   cindex->SetNumberOfTuples(pd->GetNumberOfCells());
-  cindex->FillComponent(0, index);
+  cindex->FillTypedComponent(0, index);
   cindex->SetName("vtkCompositeIndex");
   pd->GetCellData()->AddArray(cindex);
   cindex->FastDelete();
+
+  vtkUnsignedIntArray* pindex = vtkUnsignedIntArray::New();
+  pindex->SetNumberOfComponents(1);
+  pindex->SetNumberOfTuples(pd->GetNumberOfPoints());
+  pindex->FillTypedComponent(0, index);
+  pindex->SetName("vtkCompositeIndex");
+  pd->GetPointData()->AddArray(pindex);
+  pindex->FastDelete();
 }
 
 //----------------------------------------------------------------------------
@@ -733,14 +752,14 @@ void vtkPVGeometryFilter::AddHierarchicalIndex(
 {
   vtkUnsignedIntArray* dslevel = vtkUnsignedIntArray::New();
   dslevel->SetNumberOfTuples(pd->GetNumberOfCells());
-  dslevel->FillComponent(0, level);
+  dslevel->FillTypedComponent(0, level);
   dslevel->SetName("vtkAMRLevel");
   pd->GetCellData()->AddArray(dslevel);
   dslevel->FastDelete();
 
   vtkUnsignedIntArray* dsindex = vtkUnsignedIntArray::New();
   dsindex->SetNumberOfTuples(pd->GetNumberOfCells());
-  dsindex->FillComponent(0, index);
+  dsindex->FillTypedComponent(0, index);
   dsindex->SetName("vtkAMRIndex");
   pd->GetCellData()->AddArray(dsindex);
   dsindex->FastDelete();
