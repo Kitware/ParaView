@@ -86,7 +86,7 @@ pqKeyFrameEditorDialog::pqKeyFrameEditorDialog(QWidget* p, QWidget* child)
 pqKeyFrameEditorDialog::~pqKeyFrameEditorDialog()
 {
   // disconnect child
-  this->Child->setParent(NULL);
+  this->Child->setParent(nullptr);
   this->Child->hide();
 }
 
@@ -104,7 +104,7 @@ public:
   }
   ~pqKeyFrameEditorWidget() override
   {
-    this->Child->setParent(NULL);
+    this->Child->setParent(nullptr);
     this->Child->hide();
   }
 
@@ -118,9 +118,9 @@ class pqKeyFrameItem : public QObject, public QStandardItem
 {
 public:
   // return an editor for the item
-  virtual QWidget* editorWidget() { return NULL; }
+  virtual QWidget* editorWidget() { return nullptr; }
   // return an editor for a dialog
-  virtual QWidget* editorDialog() { return NULL; }
+  virtual QWidget* editorDialog() { return nullptr; }
 };
 
 //-----------------------------------------------------------------------------
@@ -215,7 +215,7 @@ public:
     {
       return new QLineEdit(p);
     }
-    return NULL;
+    return nullptr;
   }
   void updateEditorGeometry(
     QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const override
@@ -308,7 +308,7 @@ public:
   }
   pqKeyFrameInterpolationItem* newInterpolationItem(int row)
   {
-    pqKeyFrameInterpolationItem* item = NULL;
+    pqKeyFrameInterpolationItem* item = nullptr;
     int count = this->Model.rowCount();
     if (count != row || row == 0)
     {
@@ -318,7 +318,7 @@ public:
   }
   pqCameraKeyFrameItem* newCameraItem(int)
   {
-    pqCameraKeyFrameItem* item = NULL;
+    pqCameraKeyFrameItem* item = nullptr;
     item = new pqCameraKeyFrameItem();
 
     QObject::connect(&item->CamWidget, &pqCameraKeyFrameWidget::useCurrentCamera, this->Editor,
