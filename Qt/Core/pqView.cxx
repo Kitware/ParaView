@@ -58,7 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqProgressManager.h"
-#include "pqQVTKWidgetBase.h"
+#include "pqQVTKWidget.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqTimeKeeper.h"
@@ -229,8 +229,8 @@ void pqView::forceRender()
 {
   // avoid calling render if the widget isn't valid, i.e. if the context isn't
   // ready yet. This is due to asynchronous initialization of the context by
-  // the pqQVTKWidgetBase class.
-  pqQVTKWidgetBase* qwdg = qobject_cast<pqQVTKWidgetBase*>(this->widget());
+  // the pqQVTKWidget class.
+  pqQVTKWidget* qwdg = qobject_cast<pqQVTKWidget*>(this->widget());
   if (qwdg != nullptr && !qwdg->isValid())
   {
     return;

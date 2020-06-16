@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqEventTypes.h"
 #include "pqFileDialog.h"
+#include "pqQVTKWidget.h"
 
 #include "vtkRenderWindow.h"
 
@@ -78,6 +79,11 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
         qobject_cast<QVTKOpenGLNativeWidget*>(Object))
   {
     rw = qvtkNativeWidget->renderWindow();
+  }
+
+  if (pqQVTKWidget* const qvtkWidget = qobject_cast<pqQVTKWidget*>(Object))
+  {
+    rw = qvtkWidget->renderWindow();
   }
 
   // Could not find a render window, don't translate the event

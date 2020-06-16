@@ -85,7 +85,7 @@ void MainWindow::processTest()
   if (pqOptions* const options = pqApplicationCore::instance()->getOptions())
   {
     // make sure the widget had enough time to become valid
-    pqQVTKWidgetBase* qwdg = qobject_cast<pqQVTKWidgetBase*>(this->RenderView->widget());
+    pqQVTKWidget* qwdg = qobject_cast<pqQVTKWidget*>(this->RenderView->widget());
     if (qwdg != nullptr && !qwdg->isValid())
     {
       QTimer::singleShot(100, this, SLOT(processTest()));

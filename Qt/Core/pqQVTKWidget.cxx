@@ -31,8 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqQVTKWidget.h"
 
+#include <QApplication>
 #include <QResizeEvent>
+#include <QVBoxLayout>
 
+#include "QVTKOpenGLNativeWidget.h"
+#include "QVTKOpenGLStereoWidget.h"
 #include "pqApplicationCore.h"
 #include "pqEventDispatcher.h"
 #include "pqOptions.h"
@@ -49,14 +53,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f)
+  : pqQVTKWidget(
+      parentObject, f, pqApplicationCore::instance()->getOptions()->GetUseStereoRendering())
+{
+}
+
+//----------------------------------------------------------------------------
+pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f, bool isStereo)
   : Superclass(parentObject, f)
   , SizePropertyName("ViewSize")
+  , useStereo(isStereo)
 {
+  auto options = pqApplicationCore::instance()->getOptions();
+  auto* layout = new QVBoxLayout(this);
+  layout->setMargin(0);
+
+  if (useStereo)
+  {
+    auto ptr = new QVTKOpenGLStereoWidget(parentObject, f);
+    baseClass.setValue(ptr);
+    layout->addWidget(ptr);
+
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "Using stereo-capable context.");
+  }
+  else
+  {
+    auto ptr = new QVTKOpenGLNativeWidget(parentObject, f);
+    baseClass.setValue(ptr);
+    layout->addWidget(ptr);
+
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "Using native-capable context.");
+  }
+
   // disable HiDPI if we are running tests
-  this->setEnableHiDPI(vtksys::SystemTools::GetEnv("DASHBOARD_TEST_FROM_CTEST") ? false : true);
+  if (this->useStereo)
+  {
+    baseClass.value<QVTKOpenGLStereoWidget*>()->setEnableHiDPI(
+      vtksys::SystemTools::GetEnv("DASHBOARD_TEST_FROM_CTEST") ? false : true);
+  }
+  else
+  {
+    baseClass.value<QVTKOpenGLNativeWidget*>()->setEnableHiDPI(
+      vtksys::SystemTools::GetEnv("DASHBOARD_TEST_FROM_CTEST") ? false : true);
+  }
 
   // if active stereo requested, then we need to request appropriate context.
-  auto options = pqApplicationCore::instance()->getOptions();
   if (options->GetStereoType() && strcmp(options->GetStereoType(), "Crystal Eyes") == 0)
   {
 #if PARAVIEW_USING_QVTKOPENGLWIDGET
@@ -167,7 +208,18 @@ void pqQVTKWidget::prepareContextForRendering()
   }
 
   auto start = std::chrono::system_clock::now();
-  while (!this->isValid())
+  bool ret = false;
+
+  if (this->useStereo)
+  {
+    ret = baseClass.value<QVTKOpenGLStereoWidget*>()->isValid();
+  }
+  else
+  {
+    ret = baseClass.value<QVTKOpenGLNativeWidget*>()->isValid();
+  }
+
+  while (!ret)
   {
     pqEventDispatcher::processEventsAndWait(10);
     auto end = std::chrono::system_clock::now();
@@ -176,9 +228,27 @@ void pqQVTKWidget::prepareContextForRendering()
     {
       break;
     }
+
+    if (this->useStereo)
+    {
+      ret = baseClass.value<QVTKOpenGLStereoWidget*>()->isValid();
+    }
+    else
+    {
+      ret = baseClass.value<QVTKOpenGLNativeWidget*>()->isValid();
+    }
   }
 
-  if (!this->isValid())
+  if (this->useStereo)
+  {
+    ret = baseClass.value<QVTKOpenGLStereoWidget*>()->isValid();
+  }
+  else
+  {
+    ret = baseClass.value<QVTKOpenGLNativeWidget*>()->isValid();
+  }
+
+  if (!ret)
   {
     qCritical("Failed to create a valid OpenGL context for 5 seconds....giving up!");
   }
@@ -190,4 +260,73 @@ void pqQVTKWidget::paintMousePointer(int xLocation, int yLocation)
   Q_UNUSED(xLocation);
   Q_UNUSED(yLocation);
   // TODO: need to add support to paint collaboration mouse pointer in Qt 5.
+}
+
+//----------------------------------------------------------------------------
+void pqQVTKWidget::setRenderWindow(vtkRenderWindow* win)
+{
+  if (this->useStereo)
+  {
+    baseClass.value<QVTKOpenGLStereoWidget*>()->setRenderWindow(win);
+  }
+  else
+  {
+    baseClass.value<QVTKOpenGLNativeWidget*>()->setRenderWindow(win);
+  }
+}
+
+//----------------------------------------------------------------------------
+QVTKInteractor* pqQVTKWidget::interactor() const
+{
+  if (this->useStereo)
+  {
+    return baseClass.value<QVTKOpenGLStereoWidget*>()->interactor();
+  }
+  else
+  {
+    return baseClass.value<QVTKOpenGLNativeWidget*>()->interactor();
+  }
+}
+
+//----------------------------------------------------------------------------
+bool pqQVTKWidget::isValid()
+{
+  if (this->useStereo)
+  {
+    return baseClass.value<QVTKOpenGLStereoWidget*>()->isValid();
+  }
+  else
+  {
+    return baseClass.value<QVTKOpenGLNativeWidget*>()->isValid();
+  }
+}
+
+//----------------------------------------------------------------------------
+vtkRenderWindow* pqQVTKWidget::renderWindow() const
+{
+  if (this->useStereo)
+  {
+    return baseClass.value<QVTKOpenGLStereoWidget*>()->renderWindow();
+  }
+  else
+  {
+    return baseClass.value<QVTKOpenGLNativeWidget*>()->renderWindow();
+  }
+}
+
+//----------------------------------------------------------------------------
+void pqQVTKWidget::notifyQApplication(QMouseEvent* e)
+{
+  if (this->useStereo)
+  {
+    // Due to QTBUG-61836 (see QVTKOpenGLStereoWidget::testingEvent()), events should
+    // be propagated back to the internal QVTKOpenGLWindow when being fired
+    // explicitly on the widget instance. We have to use a custom event
+    // callback in this case to ensure that events are passed to the window.
+    qApp->notify(baseClass.value<QVTKOpenGLStereoWidget*>()->embeddedOpenGLWindow(), e);
+  }
+  else
+  {
+    qApp->notify(baseClass.value<QVTKOpenGLNativeWidget*>(), e);
+  }
 }

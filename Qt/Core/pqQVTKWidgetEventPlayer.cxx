@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKOpenGLNativeWidget.h"
 #include "QVTKOpenGLStereoWidget.h"
 #include "pqEventDispatcher.h"
+#include "pqQVTKWidget.h"
 
 pqQVTKWidgetEventPlayer::pqQVTKWidgetEventPlayer(QObject* p)
   : pqWidgetEventPlayer(p)
@@ -48,9 +49,10 @@ pqQVTKWidgetEventPlayer::pqQVTKWidgetEventPlayer(QObject* p)
 bool pqQVTKWidgetEventPlayer::playEvent(
   QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
 {
-  QVTKOpenGLStereoWidget* qvtkWidget = qobject_cast<QVTKOpenGLStereoWidget*>(Object);
+  QVTKOpenGLStereoWidget* qvtkStereoWidget = qobject_cast<QVTKOpenGLStereoWidget*>(Object);
   QVTKOpenGLNativeWidget* qvtkNativeWidget = qobject_cast<QVTKOpenGLNativeWidget*>(Object);
-  if (qvtkWidget || qvtkNativeWidget)
+  pqQVTKWidget* qvtkWidget = qobject_cast<pqQVTKWidget*>(Object);
+  if (qvtkStereoWidget || qvtkNativeWidget || qvtkWidget)
   {
     if (Command == "mousePress" || Command == "mouseRelease" || Command == "mouseMove" ||
       Command == "mouseDblClick")
@@ -89,18 +91,23 @@ bool pqQVTKWidgetEventPlayer::playEvent(
         }
         QMouseEvent e(type, QPoint(x, y), button, buttons, keym);
 
-        if (qvtkWidget != nullptr)
+        if (qvtkStereoWidget != nullptr)
         {
           // Due to QTBUG-61836 (see QVTKOpenGLStereoWidget::testingEvent()), events should
           // be propagated back to the internal QVTKOpenGLWindow when being fired
           // explicitly on the widget instance. We have to use a custom event
           // callback in this case to ensure that events are passed to the window.
-          qApp->notify(qvtkWidget->embeddedOpenGLWindow(), &e);
+          qApp->notify(qvtkStereoWidget->embeddedOpenGLWindow(), &e);
         }
 
         if (qvtkNativeWidget != nullptr)
         {
           qApp->notify(qvtkNativeWidget, &e);
+        }
+
+        if (qvtkWidget != nullptr)
+        {
+          qvtkWidget->notifyQApplication(&e);
         }
       }
       return true;

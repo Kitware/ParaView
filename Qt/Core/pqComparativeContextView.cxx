@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqComparativeContextView.h"
 
-#include "pqQVTKWidgetBase.h"
+#include "pqQVTKWidget.h"
 #include "pqServer.h"
 #include "pqUndoStack.h"
 #include "vtkCollection.h"
@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqComparativeContextView::pqInternal
 {
 public:
-  QMap<vtkSMViewProxy*, QPointer<pqQVTKWidgetBase> > RenderWidgets;
+  QMap<vtkSMViewProxy*, QPointer<pqQVTKWidget> > RenderWidgets;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 
   pqInternal() { this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New(); }
@@ -99,7 +99,7 @@ pqComparativeContextView::pqComparativeContextView(const QString& type, const QS
 //-----------------------------------------------------------------------------
 pqComparativeContextView::~pqComparativeContextView()
 {
-  foreach (pqQVTKWidgetBase* wdg, this->Internal->RenderWidgets.values())
+  foreach (pqQVTKWidget* wdg, this->Internal->RenderWidgets.values())
   {
     delete wdg;
   }
@@ -168,7 +168,7 @@ void pqComparativeContextView::updateViewWidgets()
   // Destroy old QVTKWidgets widgets.
   foreach (vtkSMViewProxy* key, removed)
   {
-    pqQVTKWidgetBase* item = this->Internal->RenderWidgets.take(key);
+    pqQVTKWidget* item = this->Internal->RenderWidgets.take(key);
     delete item;
   }
 
@@ -178,7 +178,7 @@ void pqComparativeContextView::updateViewWidgets()
     vtkSMContextViewProxy* cntxtView = vtkSMContextViewProxy::SafeDownCast(key);
     cntxtView->UpdateVTKObjects();
 
-    pqQVTKWidgetBase* wdg = new pqQVTKWidgetBase();
+    pqQVTKWidget* wdg = new pqQVTKWidget();
     wdg->setRenderWindow(cntxtView->GetContextView()->GetRenderWindow());
     cntxtView->SetupInteractor(wdg->interactor());
     wdg->installEventFilter(this);
@@ -208,7 +208,7 @@ void pqComparativeContextView::updateViewWidgets()
     {
       int index = y * dimensions[0] + x;
       vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(currentViews->GetItemAsObject(index));
-      pqQVTKWidgetBase* vtkwidget = this->Internal->RenderWidgets[view];
+      pqQVTKWidget* vtkwidget = this->Internal->RenderWidgets[view];
       layout->addWidget(vtkwidget, y, x);
     }
   }
