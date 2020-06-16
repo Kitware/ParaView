@@ -3921,8 +3921,8 @@
             <Property name="Texture" panel_visibility="advanced"/>
             <Property name="RepeatTextures" panel_visibility="advanced"/>
             <Property name="InterpolateTextures" panel_visibility="advanced"/>
-            <Property name="SeamlessU" pabel_visibility="advanced"/>
-            <Property name="SeamlessV" pabel_visibility="advanced"/>
+            <Property name="SeamlessU" panel_visibility="advanced"/>
+            <Property name="SeamlessV" panel_visibility="advanced"/>
             <Property name="UseMipmapTextures" panel_visibility="advanced"/>
             <Property name="BaseColorTexture" panel_visibility="advanced"/>
             <Property name="NormalTexture" panel_visibility="advanced"/>
