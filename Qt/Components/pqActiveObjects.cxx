@@ -53,11 +53,11 @@ pqActiveObjects& pqActiveObjects::instance()
 
 //-----------------------------------------------------------------------------
 pqActiveObjects::pqActiveObjects()
-  : CachedServer(NULL)
-  , CachedSource(NULL)
-  , CachedPort(NULL)
-  , CachedView(NULL)
-  , CachedRepresentation(NULL)
+  : CachedServer(nullptr)
+  , CachedSource(nullptr)
+  , CachedPort(nullptr)
+  , CachedView(nullptr)
+  , CachedRepresentation(nullptr)
   , VTKConnector(vtkEventQtSlotConnect::New())
 {
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
@@ -83,16 +83,16 @@ pqActiveObjects::pqActiveObjects()
 pqActiveObjects::~pqActiveObjects()
 {
   this->VTKConnector->Delete();
-  this->VTKConnector = NULL;
+  this->VTKConnector = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 void pqActiveObjects::resetActives()
 {
-  this->ActiveSource = NULL;
-  this->ActivePort = NULL;
-  this->ActiveView = NULL;
-  this->ActiveRepresentation = NULL;
+  this->ActiveSource = nullptr;
+  this->ActivePort = nullptr;
+  this->ActiveView = nullptr;
+  this->ActiveRepresentation = nullptr;
   this->Selection.clear();
 }
 
@@ -147,7 +147,7 @@ void pqActiveObjects::triggerSignals()
 //-----------------------------------------------------------------------------
 void pqActiveObjects::serverAdded(pqServer* server)
 {
-  if (this->activeServer() == NULL && server)
+  if (this->activeServer() == nullptr && server)
   {
     this->setActiveServer(server);
   }
@@ -158,7 +158,7 @@ void pqActiveObjects::serverRemoved(pqServer* server)
 {
   if (this->activeServer() == server)
   {
-    this->setActiveServer(NULL);
+    this->setActiveServer(nullptr);
   }
 }
 
@@ -169,15 +169,15 @@ void pqActiveObjects::proxyRemoved(pqServerManagerModelItem* proxy)
 
   if (this->ActiveSource == proxy)
   {
-    this->setActiveSource(NULL);
+    this->setActiveSource(nullptr);
   }
   else if (this->ActivePort == proxy)
   {
-    this->setActivePort(NULL);
+    this->setActivePort(nullptr);
   }
   else if (this->ActiveView == proxy)
   {
-    this->setActiveView(NULL);
+    this->setActiveView(nullptr);
   }
 
   this->blockSignals(prev);
@@ -195,14 +195,14 @@ void pqActiveObjects::viewSelectionChanged()
     return;
   }
 
-  if (server->activeViewSelectionModel() == NULL)
+  if (server->activeViewSelectionModel() == nullptr)
   {
     // This mean that the servermanager is currently updating itself and no
     // selection manager is set yet...
     return;
   }
 
-  vtkSMProxy* selectedProxy = NULL;
+  vtkSMProxy* selectedProxy = nullptr;
   vtkSMProxySelectionModel* viewSelection = server->activeViewSelectionModel();
   if (viewSelection->GetNumberOfSelectedProxies() == 1)
   {
@@ -213,7 +213,7 @@ void pqActiveObjects::viewSelectionChanged()
     selectedProxy = viewSelection->GetCurrentProxy();
     if (selectedProxy && !viewSelection->IsSelected(selectedProxy))
     {
-      selectedProxy = NULL;
+      selectedProxy = nullptr;
     }
   }
 
@@ -250,7 +250,7 @@ void pqActiveObjects::sourceSelectionChanged()
     return;
   }
 
-  if (server->activeSourcesSelectionModel() == NULL)
+  if (server->activeSourcesSelectionModel() == nullptr)
   {
     // This mean that the servermanager is currently updating itself and no
     // selection manager is set yet...
@@ -307,7 +307,7 @@ void pqActiveObjects::sourceSelectionChanged()
 void pqActiveObjects::onActiveServerChanged()
 {
   vtkSMSession* activeSession = vtkSMProxyManager::GetProxyManager()->GetActiveSession();
-  if (activeSession == NULL)
+  if (activeSession == nullptr)
   {
     return;
   }
@@ -342,7 +342,7 @@ void pqActiveObjects::setActiveServer(pqServer* server)
 
   this->ActiveServer = server;
 
-  vtkSMProxyManager::GetProxyManager()->SetActiveSession(server ? server->session() : NULL);
+  vtkSMProxyManager::GetProxyManager()->SetActiveSession(server ? server->session() : nullptr);
   if (server && server->activeSourcesSelectionModel() && server->activeViewSelectionModel())
   {
     this->VTKConnector->Connect(server->activeSourcesSelectionModel(),
@@ -378,7 +378,7 @@ void pqActiveObjects::setActiveView(pqView* view)
   if (server && server->activeViewSelectionModel())
   {
     server->activeViewSelectionModel()->SetCurrentProxy(
-      view ? view->getProxy() : NULL, vtkSMProxySelectionModel::CLEAR_AND_SELECT);
+      view ? view->getProxy() : nullptr, vtkSMProxySelectionModel::CLEAR_AND_SELECT);
 
     // this triggers a call to viewSelectionChanged(); but in collaboration mode
     // the ProxySelectionModel has been changed underneath therefore this
@@ -389,7 +389,7 @@ void pqActiveObjects::setActiveView(pqView* view)
   else
   {
     // if there's no-active server, it implies that setActiveView() must be
-    // called with NULL. In that case, we cannot really clear the selection
+    // called with nullptr. In that case, we cannot really clear the selection
     // since we have no clue what's the active server. So nothing to do here.
   }
 
@@ -412,13 +412,13 @@ void pqActiveObjects::setActiveSource(pqPipelineSource* source)
   if (server && server->activeSourcesSelectionModel())
   {
     server->activeSourcesSelectionModel()->SetCurrentProxy(
-      source ? source->getProxy() : NULL, vtkSMProxySelectionModel::CLEAR_AND_SELECT);
+      source ? source->getProxy() : nullptr, vtkSMProxySelectionModel::CLEAR_AND_SELECT);
     // this triggers a call to sourceSelectionChanged();
   }
   else
   {
     // if there's no-active server, it implies that setActiveSource() must be
-    // called with NULL. In that case, we cannot really clear the selection
+    // called with nullptr. In that case, we cannot really clear the selection
     // since we have no clue what's the active server. So nothing to do here.
   }
 
@@ -441,13 +441,13 @@ void pqActiveObjects::setActivePort(pqOutputPort* port)
   if (server)
   {
     server->activeSourcesSelectionModel()->SetCurrentProxy(
-      port ? port->getOutputPortProxy() : NULL, vtkSMProxySelectionModel::CLEAR_AND_SELECT);
+      port ? port->getOutputPortProxy() : nullptr, vtkSMProxySelectionModel::CLEAR_AND_SELECT);
     // this triggers a call to selectionChanged();
   }
   else
   {
     // if there's no-active server, it implies that setActivePort() must be
-    // called with NULL. In that case, we cannot really clear the selection
+    // called with nullptr. In that case, we cannot really clear the selection
     // since we have no clue what's the active server. So nothing to do here.
   }
 
@@ -461,8 +461,8 @@ void pqActiveObjects::setSelection(
 {
   pqProxy* current_proxy = qobject_cast<pqProxy*>(current);
   pqOutputPort* current_port = qobject_cast<pqOutputPort*>(current);
-  pqServer* server =
-    current_proxy ? current_proxy->getServer() : (current_port ? current_port->getServer() : NULL);
+  pqServer* server = current_proxy ? current_proxy->getServer()
+                                   : (current_port ? current_port->getServer() : nullptr);
 
   // ascertain that all items in the selection have the same server.
   foreach (pqServerManagerModelItem* item, selection_)
@@ -471,9 +471,9 @@ void pqActiveObjects::setSelection(
     pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
     pqServer* cur_server =
       proxy ? proxy->getServer() : (port ? port->getServer() : qobject_cast<pqServer*>(item));
-    if (cur_server != NULL && cur_server != server)
+    if (cur_server != nullptr && cur_server != server)
     {
-      if (server == NULL)
+      if (server == nullptr)
       {
         server = cur_server;
       }
@@ -495,14 +495,15 @@ void pqActiveObjects::setSelection(
     pqProxySelectionUtilities::copy(selection_, server->activeSourcesSelectionModel());
     // this triggers a call to selectionChanged() if selection actually changed.
 
-    vtkSMProxy* proxy = current_proxy ? current_proxy->getProxy()
-                                      : (current_port ? current_port->getOutputPortProxy() : NULL);
+    vtkSMProxy* proxy = current_proxy
+      ? current_proxy->getProxy()
+      : (current_port ? current_port->getOutputPortProxy() : nullptr);
     server->activeSourcesSelectionModel()->SetCurrentProxy(proxy, vtkSMProxySelectionModel::SELECT);
   }
   else
   {
     // if there's no-active server, it implies that setSelection() must be
-    // called with NULL. In that case, we cannot really clear the selection
+    // called with nullptr. In that case, we cannot really clear the selection
     // since we have no clue what's the active server. So nothing to do here.
   }
   this->blockSignals(prev);
@@ -519,7 +520,7 @@ void pqActiveObjects::updateRepresentation()
   }
   else
   {
-    this->ActiveRepresentation = NULL;
+    this->ActiveRepresentation = nullptr;
   }
   this->triggerSignals();
 }
@@ -527,7 +528,7 @@ void pqActiveObjects::updateRepresentation()
 //-----------------------------------------------------------------------------
 vtkSMSessionProxyManager* pqActiveObjects::proxyManager() const
 {
-  return this->activeServer() ? this->activeServer()->proxyManager() : NULL;
+  return this->activeServer() ? this->activeServer()->proxyManager() : nullptr;
 }
 
 //-----------------------------------------------------------------------------
