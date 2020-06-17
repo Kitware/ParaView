@@ -184,7 +184,7 @@ public:
    * provided partitioning.
    */
   const std::vector<vtkBoundingBox>& GetRawCuts() const { return this->RawCuts; }
-  const std::vector<int> GetRawCutsRankAssignments() const { return this->RawCutsRankAssignments; }
+  const std::vector<int>& GetRawCutsRankAssignments() const { return this->RawCutsRankAssignments; }
   //@}
 
 protected:
