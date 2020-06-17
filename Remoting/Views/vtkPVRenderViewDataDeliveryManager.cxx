@@ -340,12 +340,21 @@ void vtkPVRenderViewDataDeliveryManager::RedistributeDataForOrderedCompositing(b
         {
           this->Cuts[cc].SetBounds(&all_bounds[6 * cc]);
         }
+        this->RawCuts.clear();
+        this->RawCutsRankAssignments.clear();
       }
       else
       {
         vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "regenerate kd-tree");
         this->Cuts = vtkDIYKdTreeUtilities::GenerateCuts(
           data_for_loadbalacing, num_ranks, /*use_cell_centers*/ false, controller);
+
+        // save raw cuts and assignments.
+        this->RawCuts = this->Cuts;
+        this->RawCutsRankAssignments = vtkDIYKdTreeUtilities::ComputeAssignments(
+          static_cast<int>(this->RawCuts.size()), controller->GetNumberOfProcesses());
+
+        // Now, resize cuts to match the number of ranks we're rendering on.
         vtkDIYKdTreeUtilities::ResizeCuts(this->Cuts, controller->GetNumberOfProcesses());
       }
       this->LastCutsGeneratorToken = token_stream.str();
