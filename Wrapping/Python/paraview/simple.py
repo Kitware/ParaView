@@ -2532,12 +2532,12 @@ class _active_objects(object):
         "Internal method."
         if not px:
             return None
-        if px.IsA("vtkSMSourceProxy"):
-            return servermanager._getPyProxy(px)
-        else:
+        elif px.IsA("vtkSMOutputPort"):
             return servermanager.OutputPort(
               servermanager._getPyProxy(px.GetSourceProxy()),
               px.GetPortIndex())
+        else:
+            return servermanager._getPyProxy(px)
 
     def get_source(self):
         "Returns the active source."
