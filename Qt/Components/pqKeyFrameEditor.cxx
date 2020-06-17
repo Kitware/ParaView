@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program:   ParaView
    Module:    pqKeyFrameEditor.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.2.
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.2.
 
-   See License_v1.2.txt for the full ParaQ license.
+   See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -46,12 +46,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkSMRenderViewProxy.h>
 
+#include "pqActiveObjects.h"
 #include "pqAnimationCue.h"
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
 #include "pqCameraKeyFrameWidget.h"
 #include "pqKeyFrameTypeWidget.h"
 #include "pqPropertyLinks.h"
+#include "pqRenderView.h"
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
 #include "pqServerManagerModel.h"
@@ -86,7 +88,7 @@ pqKeyFrameEditorDialog::pqKeyFrameEditorDialog(QWidget* p, QWidget* child)
 pqKeyFrameEditorDialog::~pqKeyFrameEditorDialog()
 {
   // disconnect child
-  this->Child->setParent(NULL);
+  this->Child->setParent(nullptr);
   this->Child->hide();
 }
 
@@ -104,7 +106,7 @@ public:
   }
   ~pqKeyFrameEditorWidget() override
   {
-    this->Child->setParent(NULL);
+    this->Child->setParent(nullptr);
     this->Child->hide();
   }
 
@@ -118,9 +120,9 @@ class pqKeyFrameItem : public QObject, public QStandardItem
 {
 public:
   // return an editor for the item
-  virtual QWidget* editorWidget() { return NULL; }
+  virtual QWidget* editorWidget() { return nullptr; }
   // return an editor for a dialog
-  virtual QWidget* editorDialog() { return NULL; }
+  virtual QWidget* editorDialog() { return nullptr; }
 };
 
 //-----------------------------------------------------------------------------
@@ -215,7 +217,7 @@ public:
     {
       return new QLineEdit(p);
     }
-    return NULL;
+    return nullptr;
   }
   void updateEditorGeometry(
     QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const override
@@ -308,7 +310,7 @@ public:
   }
   pqKeyFrameInterpolationItem* newInterpolationItem(int row)
   {
-    pqKeyFrameInterpolationItem* item = NULL;
+    pqKeyFrameInterpolationItem* item = nullptr;
     int count = this->Model.rowCount();
     if (count != row || row == 0)
     {
@@ -318,9 +320,11 @@ public:
   }
   pqCameraKeyFrameItem* newCameraItem(int)
   {
-    pqCameraKeyFrameItem* item = NULL;
+    pqCameraKeyFrameItem* item = nullptr;
     item = new pqCameraKeyFrameItem();
 
+    QObject::connect(&item->CamWidget, &pqCameraKeyFrameWidget::updateCurrentCamera, this->Editor,
+      [=]() { this->Editor->updateCurrentCamera(item); });
     QObject::connect(&item->CamWidget, &pqCameraKeyFrameWidget::useCurrentCamera, this->Editor,
       [=]() { this->Editor->useCurrentCamera(item); });
     // default to current view
@@ -481,6 +485,8 @@ void pqKeyFrameEditor::readKeyFrameData()
       if ((i < numberKeyFrames - 1) || !path_based)
       {
         pqCameraKeyFrameItem* item = new pqCameraKeyFrameItem();
+        QObject::connect(&item->CamWidget, &pqCameraKeyFrameWidget::updateCurrentCamera, this,
+          [=]() { this->Internal->Editor->updateCurrentCamera(item); });
         QObject::connect(&item->CamWidget, &pqCameraKeyFrameWidget::useCurrentCamera, this,
           [=]() { this->Internal->Editor->useCurrentCamera(item); });
         item->CamWidget.setUsePathBasedMode(path_based);
@@ -665,4 +671,17 @@ void pqKeyFrameEditor::useCurrentCamera(QObject* o)
   vtkSMRenderViewProxy* ren = vtkSMRenderViewProxy::SafeDownCast(pxy);
   ren->SynchronizeCameraProperties();
   item->CamWidget.initializeUsingCamera(ren->GetActiveCamera());
+}
+
+//-----------------------------------------------------------------------------
+void pqKeyFrameEditor::updateCurrentCamera(QObject* o)
+{
+  pqCameraKeyFrameItem* item = static_cast<pqCameraKeyFrameItem*>(o);
+
+  vtkSMProxy* pxy = this->Internal->Cue->getAnimatedProxy();
+
+  vtkSMRenderViewProxy* ren = vtkSMRenderViewProxy::SafeDownCast(pxy);
+  ren->SynchronizeCameraProperties();
+  item->CamWidget.applyToCamera(ren->GetActiveCamera());
+  ren->StillRender();
 }

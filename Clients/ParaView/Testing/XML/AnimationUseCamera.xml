@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="ConeSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Animation View" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/CreateDeleteWidget/ProxyCombo" command="activated" arguments="Camera" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/CreateDeleteWidget/PropertyCombo" command="activated" arguments="Interpolate camera locations (spline)" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,2" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,2" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionRotate90degCW" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/TrackHeader" command="mousePress" arguments="1,1,0,0,0,2" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/TrackHeader" command="mouseRelease" arguments="1,0,0,0,0,2" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/TrackHeader" command="mouseDblClick" arguments="1,1,0,0,0,2" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/TrackHeader" command="mouseRelease" arguments="1,0,0,0,0,2" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="1.1" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="doubleClick" arguments="1.1" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="edit" arguments="1.1" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/1QWidget0/CameraKeyFrameWidget/stackedWidgetMode/page_5/useCurrent" command="activate" arguments="" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="0.1" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="doubleClick" arguments="0.1" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="edit" arguments="0.1" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/1QWidget0/CameraKeyFrameWidget/stackedWidgetMode/page_5/updateCurrent" command="activate" arguments="" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1pqKeyFrameEditorDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
+</pqevents>
