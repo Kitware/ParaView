@@ -39,11 +39,15 @@
 #include <vector>
 
 #define vtkPVPluginLoaderErrorMacro(x)                                                             \
-  if (!no_errors)                                                                                  \
+  do                                                                                               \
   {                                                                                                \
-    vtkErrorMacro(<< x << endl);                                                                   \
-  }                                                                                                \
-  this->SetErrorString(x);
+    const char* errstring = x;                                                                     \
+    if (!no_errors)                                                                                \
+    {                                                                                              \
+      vtkErrorMacro(<< errstring << endl);                                                         \
+    }                                                                                              \
+    this->SetErrorString(errstring);                                                               \
+  } while (false)
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
 const char ENV_PATH_SEP = ';';
