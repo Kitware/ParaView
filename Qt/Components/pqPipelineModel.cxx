@@ -805,7 +805,7 @@ QVariant pqPipelineModel::data(const QModelIndex& idx, int role) const
       if (idx.column() == 0 && server && server->getRemainingLifeTime() > -1 &&
         server->getRemainingLifeTime() <= 5)
       {
-        return qVariantFromValue<QColor>(QColor(Qt::red));
+        return QVariant::fromValue<QColor>(QColor(Qt::red));
       }
       break;
     }
@@ -824,7 +824,7 @@ QVariant pqPipelineModel::data(const QModelIndex& idx, int role) const
     {
       if (idx.column() == 0 && item->isModified())
       {
-        return qVariantFromValue<QFont>(this->Internal->ModifiedFont);
+        return QVariant::fromValue<QFont>(this->Internal->ModifiedFont);
       }
       break;
     }
