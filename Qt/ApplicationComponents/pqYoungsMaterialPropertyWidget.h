@@ -38,12 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QScopedPointer>
 
 class vtkSMPropertyGroup;
+class QStandardItem;
 
 /**
-* This is a custom widget for YoungsMaterialInterface filter. We use a custom widget
-* since this filter has unusual requirements when it comes to setting
-* OrderingArrays and NormalArrays properties.
-*/
+ * This is a custom widget for YoungsMaterialInterface filter. We use a custom widget
+ * since this filter has unusual requirements when it comes to setting
+ * OrderingArrays and NormalArrays properties.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqYoungsMaterialPropertyWidget
   : public pqStringVectorPropertyWidget
 {
@@ -68,9 +69,12 @@ signals:
   void normalArraysChanged();
   void orderingArraysChanged();
 
-private slots:
-  void normalArraysChanged(const QString& value);
-  void orderingArraysChanged(const QString& value);
+protected:
+  QStandardItem* currentItem();
+
+protected slots:
+  void onNormalArraysChanged();
+  void onOrderingArraysChanged();
   void updateComboBoxes();
 
 private:
