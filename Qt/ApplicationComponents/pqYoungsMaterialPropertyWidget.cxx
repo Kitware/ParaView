@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqArraySelectionWidget.h"
 #include "pqArraySelectorPropertyWidget.h"
-#include "pqPropertyLinks.h"
 #include "pqPropertyLinksConnection.h"
 #include "pqSMAdaptor.h"
 #include "vtkSMPropertyGroup.h"
@@ -60,7 +59,8 @@ public:
         use_unchecked_modified_event, parentObject)
   {
   }
-  ~pqYoungsMaterialPropertyLinksConnection() override {}
+
+  ~pqYoungsMaterialPropertyLinksConnection() override = default;
 
 protected:
   QVariant currentServerManagerValue(bool use_unchecked) const override
@@ -101,7 +101,7 @@ pqYoungsMaterialPropertyWidget::pqYoungsMaterialPropertyWidget(
   ui.setupUi(frame);
   this->layout()->addWidget(frame);
 
-  assert(smproxy != NULL);
+  assert(smproxy != nullptr);
   assert(smgroup->GetProperty("VolumeFractionArrays"));
   assert(smgroup->GetProperty("OrderingArrays"));
   assert(smgroup->GetProperty("NormalArrays"));
@@ -137,9 +137,7 @@ pqYoungsMaterialPropertyWidget::pqYoungsMaterialPropertyWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqYoungsMaterialPropertyWidget::~pqYoungsMaterialPropertyWidget()
-{
-}
+pqYoungsMaterialPropertyWidget::~pqYoungsMaterialPropertyWidget() = default;
 
 //-----------------------------------------------------------------------------
 void pqYoungsMaterialPropertyWidget::setOrderingArrays(const QList<QVariant>& values)
@@ -194,6 +192,17 @@ QList<QVariant> pqYoungsMaterialPropertyWidget::normalArrays() const
 }
 
 //-----------------------------------------------------------------------------
+QStandardItem* pqYoungsMaterialPropertyWidget::currentItem()
+{
+  pqInternals& internals = (*this->Internals);
+  QModelIndex index = internals.VolumeFractionArrays->selectionModel()->currentIndex();
+  auto sortModel = qobject_cast<QSortFilterProxyModel*>(internals.VolumeFractionArrays->model());
+  index = sortModel->mapToSource(index);
+  auto model = qobject_cast<QStandardItemModel*>(sortModel->sourceModel());
+  return model->itemFromIndex(index);
+}
+
+//-----------------------------------------------------------------------------
 void pqYoungsMaterialPropertyWidget::onNormalArraysChanged()
 {
   pqInternals& internals = (*this->Internals);
@@ -201,11 +210,7 @@ void pqYoungsMaterialPropertyWidget::onNormalArraysChanged()
   QString value = internals.NormalArrays->arrayName();
   value = (value == "None") ? "" : value;
 
-  QModelIndex index = internals.VolumeFractionArrays->selectionModel()->currentIndex();
-  auto sortModel = qobject_cast<QSortFilterProxyModel*>(internals.VolumeFractionArrays->model());
-  index = sortModel->mapToSource(index);
-  auto model = qobject_cast<QStandardItemModel*>(sortModel->sourceModel());
-  QStandardItem* currentItem = model->itemFromIndex(index);
+  QStandardItem* currentItem = this->currentItem();
   if (currentItem)
   {
     QString key = currentItem->text();
@@ -224,11 +229,7 @@ void pqYoungsMaterialPropertyWidget::onOrderingArraysChanged()
   QString value = internals.OrderingArrays->arrayName();
   value = (value == "None") ? "" : value;
 
-  QModelIndex index = internals.VolumeFractionArrays->selectionModel()->currentIndex();
-  auto sortModel = qobject_cast<QSortFilterProxyModel*>(internals.VolumeFractionArrays->model());
-  index = sortModel->mapToSource(index);
-  auto model = qobject_cast<QStandardItemModel*>(sortModel->sourceModel());
-  QStandardItem* currentItem = model->itemFromIndex(index);
+  QStandardItem* currentItem = this->currentItem();
   if (currentItem)
   {
     QString key = currentItem->text();
@@ -246,11 +247,7 @@ void pqYoungsMaterialPropertyWidget::updateComboBoxes()
   pqInternals& internals = (*this->Internals);
 
   // determine the volume fraction array currently selected.
-  QModelIndex index = internals.VolumeFractionArrays->selectionModel()->currentIndex();
-  auto sortModel = qobject_cast<QSortFilterProxyModel*>(internals.VolumeFractionArrays->model());
-  index = sortModel->mapToSource(index);
-  auto model = qobject_cast<QStandardItemModel*>(sortModel->sourceModel());
-  QStandardItem* currentItem = model->itemFromIndex(index);
+  QStandardItem* currentItem = this->currentItem();
   if (!currentItem)
   {
     internals.OrderingArrays->setEnabled(false);
@@ -265,26 +262,26 @@ void pqYoungsMaterialPropertyWidget::updateComboBoxes()
 
   // check if there's a normal and ordering array already defined for this
   // volume-fraction array. If so, show it.
-  const char* ordering_array = vtkSMUncheckedPropertyHelper(this->proxy(), "OrderingArrays")
-                                 .GetStatus(label.toLocal8Bit().data(), "");
+  const char* orderingArray = vtkSMUncheckedPropertyHelper(this->proxy(), "OrderingArrays")
+                                .GetStatus(label.toLocal8Bit().data(), "");
 
-  const char* normal_array = vtkSMUncheckedPropertyHelper(this->proxy(), "NormalArrays")
-                               .GetStatus(label.toLocal8Bit().data(), "");
+  const char* normalArray = vtkSMUncheckedPropertyHelper(this->proxy(), "NormalArrays")
+                              .GetStatus(label.toLocal8Bit().data(), "");
 
-  if (ordering_array == NULL || strlen(ordering_array) == 0)
+  if (orderingArray == nullptr || strlen(orderingArray) == 0)
   {
-    ordering_array = "None";
+    orderingArray = "None";
   }
-  if (normal_array == NULL || strlen(normal_array) == 0)
+  if (normalArray == nullptr || strlen(normalArray) == 0)
   {
-    normal_array = "None";
+    normalArray = "None";
   }
 
   bool prev = internals.OrderingArrays->blockSignals(true);
-  internals.OrderingArrays->setArrayName(ordering_array);
+  internals.OrderingArrays->setArrayName(orderingArray);
   internals.OrderingArrays->blockSignals(prev);
 
   prev = internals.NormalArrays->blockSignals(true);
-  internals.NormalArrays->setArrayName(normal_array);
+  internals.NormalArrays->setArrayName(normalArray);
   internals.NormalArrays->blockSignals(prev);
 }
