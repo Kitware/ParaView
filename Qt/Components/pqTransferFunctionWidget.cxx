@@ -277,7 +277,7 @@ pqTransferFunctionWidget::pqTransferFunctionWidget(QWidget* parentObject)
   // whenever the rendering timer times out, we render the widget.
   QObject::connect(&this->Internals->Timer, &QTimer::timeout, [this]() {
     auto renWin = this->Internals->ContextView->GetRenderWindow();
-    if (this->isVisible() && renWin->IsDrawable())
+    if (this->isVisible())
     {
       renWin->Render();
     }
