@@ -2130,6 +2130,7 @@
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArrayListDomain attribute_type="Vectors"
+                         none_string="None"
                          input_domain_name="input_array3"
                          name="array_list">
           <RequiredProperties>
@@ -2147,6 +2148,7 @@
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArrayListDomain attribute_type="Scalars"
+                         none_string="None"
                          input_domain_name="input_array1"
                          name="array_list">
           <RequiredProperties>
