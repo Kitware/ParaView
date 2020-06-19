@@ -206,7 +206,7 @@ function (_paraview_add_tests function)
       set_property(TEST "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
         PROPERTY
           RUN_SERIAL ON)
-    else ()
+    elseif (EXISTS "${_paraview_add_tests_script}")
       # if the XML test contains PARAVIEW_TEST_ROOT we assume that we may be writing
       # to that file and reading it back in so we add a resource lock on the XML
       # file so that the pv.X, pvcx.X and pvcrs.X tests don't run simultaneously.
