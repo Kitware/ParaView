@@ -32,57 +32,71 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqQVTKWidget_h
 #define pqQVTKWidget_h
 
+#include "QVTKInteractor.h"
 #include "pqCoreModule.h"
-#include "pqQVTKWidgetBase.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
+#include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
-#include <QPointer>
+
+#include <QVariant>
+#include <QWidget>
 
 class vtkSMProxy;
 class vtkSMSession;
 
 /**
-* pqQVTKWidget extends pqQVTKWidgetBase to add awareness for view proxies. The
-* advantage of doing that is that pqQVTKWidget can automatically update the
-* "ViewSize" property on the view proxy whenever the
-* widget's size/position changes.
-*
-* This class also enables image-caching by default (image caching support is
-* provided by the superclass).
-*/
-class PQCORE_EXPORT pqQVTKWidget : public pqQVTKWidgetBase
+ * pqQVTKWidget has a QVTKOpenGL*Widget object to which it adds awareness for view proxies.
+ * The advantage of doing that is that pqQVTKWidget can automatically update the
+ * "ViewSize" property on the view proxy whenever the widget's size/position changes.
+ *
+ * This class also enables image-caching by default (image caching support is
+ * provided by its contained QVTKOpenGL*Widget class).
+ */
+class PQCORE_EXPORT pqQVTKWidget : public QWidget
 {
   Q_OBJECT
-  typedef pqQVTKWidgetBase Superclass;
+  typedef QWidget Superclass;
 
 public:
   pqQVTKWidget(QWidget* parent = NULL, Qt::WindowFlags f = 0);
+  pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f, bool isStereo);
   ~pqQVTKWidget() override;
 
   /**
-  * Set the view proxy.
-  */
+   * Set the view proxy.
+   */
   void setViewProxy(vtkSMProxy*);
 
   /**
-  * Set the session.
-  * This is only used when ViewProxy is not set.
-  */
+   * Set the session.
+   * This is only used when ViewProxy is not set.
+   */
   void setSession(vtkSMSession*);
 
   /**
-  * Return the Proxy ID if any, otherwise return 0
-  */
+   * Return the Proxy ID if any, otherwise return 0
+   */
   vtkTypeUInt32 getProxyId();
 
   /**
-  * Set/Get the name of the property to use to update the size of the widget
-  * on the proxy. By default "ViewSize" is used.
-  */
+   * Set/Get the name of the property to use to update the size of the widget
+   * on the proxy. By default "ViewSize" is used.
+   */
   void setSizePropertyName(const QString& pname) { this->SizePropertyName = pname; }
   const QString& sizePropertyName() const { return this->SizePropertyName; }
+
+  void notifyQApplication(QMouseEvent*);
+
+  /**
+   * Methods that decorates QVTKOpenGL*Widget methods
+   */
+  void setRenderWindow(vtkRenderWindow* win);
+  vtkRenderWindow* renderWindow() const;
+
+  QVTKInteractor* interactor() const;
+  bool isValid();
 
 public Q_SLOTS:
   void paintMousePointer(int x, int y);
@@ -104,6 +118,12 @@ private:
   vtkWeakPointer<vtkSMSession> Session;
   QString SizePropertyName;
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
+
+  bool useStereo;
+  QVariant baseClass;
 };
+
+class vtkGenericOpenGLRenderWindow;
+typedef vtkGenericOpenGLRenderWindow pqQVTKWidgetBaseRenderWindowType;
 
 #endif

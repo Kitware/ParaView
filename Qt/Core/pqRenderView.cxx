@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 
 // ParaView Server Manager includes.
-#include "pqQVTKWidgetBase.h"
 #include "vtkCollection.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkIntArray.h"
@@ -75,6 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOptions.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
+#include "pqQVTKWidget.h"
 #include "pqSMAdaptor.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -205,7 +205,7 @@ void pqRenderView::initialize()
 QWidget* pqRenderView::createWidget()
 {
   QWidget* vtkwidget = this->Superclass::createWidget();
-  if (pqQVTKWidgetBase* qvtkwidget = qobject_cast<pqQVTKWidgetBase*>(vtkwidget))
+  if (pqQVTKWidget* qvtkwidget = qobject_cast<pqQVTKWidget*>(vtkwidget))
   {
     vtkSMRenderViewProxy* renModule = this->getRenderViewProxy();
     qvtkwidget->setRenderWindow(renModule->GetRenderWindow());

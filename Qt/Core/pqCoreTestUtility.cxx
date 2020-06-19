@@ -62,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqImageUtil.h"
 #include "pqLineEditEventPlayer.h"
 #include "pqOptions.h"
+#include "pqQVTKWidget.h"
 #include "pqQVTKWidgetEventPlayer.h"
 #include "pqQVTKWidgetEventTranslator.h"
 #include "pqServer.h"
@@ -325,6 +326,17 @@ bool pqCoreTestUtility::CompareImage(QWidget* widget, const QString& referenceIm
   if (nativeWidget)
   {
     vtkRenderWindow* rw = nativeWidget->renderWindow();
+    if (rw)
+    {
+      cout << "Using QVTKOpenGLNativeWidget RenderWindow API for capture" << endl;
+      return pqCoreTestUtility::CompareImage(
+        rw, referenceImage, threshold, std::cerr, tempDirectory, size);
+    }
+  }
+
+  if (pqQVTKWidget* const qvtkWidget = qobject_cast<pqQVTKWidget*>(widget))
+  {
+    vtkRenderWindow* rw = qvtkWidget->renderWindow();
     if (rw)
     {
       cout << "Using QVTKOpenGLNativeWidget RenderWindow API for capture" << endl;

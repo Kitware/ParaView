@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
-#include "pqQVTKWidgetBase.h"
+#include "pqQVTKWidget.h"
 #include "pqSMAdaptor.h"
 #include "pqServer.h"
 #include "vtkAxis.h"
@@ -63,7 +63,7 @@ public:
   pqInternal(pqMultiSliceAxisWidget& object)
     : Widget_ptr(&object)
   {
-    this->View = new pqQVTKWidgetBase(Widget_ptr);
+    this->View = new pqQVTKWidget(Widget_ptr);
     this->View->setObjectName("1QVTKWidget0");
     this->Range[0] = -10.;
     this->Range[1] = +10.;
@@ -95,7 +95,7 @@ public:
 
   vtkNew<vtkContextView> ContextView;
   vtkNew<vtkMultiSliceContextItem> SliceItem;
-  QPointer<pqQVTKWidgetBase> View;
+  QPointer<pqQVTKWidget> View;
   double Range[2];
   pqMultiSliceAxisWidget* Widget_ptr;
 };

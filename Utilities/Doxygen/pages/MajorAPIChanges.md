@@ -45,6 +45,16 @@ but ParaView was storing them in a directory with the name of the application in
 In ParaView 5.9, the `<application>-UserSettings.json` file is stored in the directory named
 for the organization as expected.
 
+###Run-time selection of OpenGL Widget rendering implementation###
+
+We have enabled run-time selection of Widget rendering OpenGL implementation, by
+default it is set to _native_ mode. However, this can be changed to _Stereo_ mode
+in startup time by adding the flag `--stereo` to the _Paraview_ binary.
+
+This also makes `pqQVTKWidget` not to extend from `pqQVTKWidgetBase`, instead,
+extend from QWidget and contain (composition) either an instance of
+`QVTKOpenGLNativeWidget` or `QVTKOpenGLStereoWidget`.
+
 Changes in 5.8
 ---------------
 

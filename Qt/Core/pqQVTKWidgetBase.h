@@ -49,6 +49,4 @@ using pqQVTKWidgetBase = QVTKOpenGLStereoWidget;
 #define PARAVIEW_USING_QVTKOPENGLSTEREOWIDGET 1
 #endif
 
-class vtkGenericOpenGLRenderWindow;
-typedef vtkGenericOpenGLRenderWindow pqQVTKWidgetBaseRenderWindowType;
 #endif
