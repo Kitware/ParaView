@@ -118,6 +118,9 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/viscoplastic-ring.h5}"
   "DATA{${paraview_test_data_directory_input}/Data/waveletElevation.vti}"
   "DATA{${paraview_test_data_directory_input}/Data/waveletMaterial.vti}"
+  "DATA{${paraview_test_data_directory_input}/Data/YoungsMaterialInterface/youngs.vtm}"
+  "DATA{${paraview_test_data_directory_input}/Data/YoungsMaterialInterface/youngs/youngs_0.vtu}"
+  "DATA{${paraview_test_data_directory_input}/Data/YoungsMaterialInterface/youngs/youngs_1.vtu}"
 
   # Baselines
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/AAXAxis.png}"
@@ -490,6 +493,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeIsosurfaceBlendMode.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeNoMapScalars.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/VolumeSliceBlendMode.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/YoungsMaterialInterface.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/XYChart_ChangeParameters.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/XYChart_Default.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/XYChart_DisableBlocks.png}"
@@ -969,6 +973,7 @@ list(APPEND TESTS_WITH_BASELINES
   VTPSeriesFile.xml
   #  XYBarChart.xml
   RandomAttributes.xml
+  YoungsMaterialInterface.xml
 )
 
 if (TARGET VTK::IOParallelLSDyna)
