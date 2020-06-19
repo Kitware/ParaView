@@ -223,9 +223,23 @@ function (_paraview_add_tests function)
   endforeach ()
 endfunction ()
 
+function(_get_prefix varname default)
+  cmake_parse_arguments(_get_prefix
+    ""
+    "PREFIX"
+    ""
+    ${ARGN})
+  if (_get_prefix_PREFIX)
+    set(${varname} "${_get_prefix_PREFIX}" PARENT_SCOPE)
+  else()
+    set(${varname} "${default}" PARENT_SCOPE)
+  endif()
+endfunction()
+
 function (paraview_add_client_tests)
+  _get_prefix(chosen_prefix "pv" ${ARGN})
   _paraview_add_tests("paraview_add_client_tests"
-    PREFIX "pv"
+    PREFIX "${chosen_prefix}"
     _DISABLE_SUFFIX "_DISABLE_C"
     _COMMAND_PATTERN
       --client __paraview_client__
@@ -239,8 +253,9 @@ function (paraview_add_client_tests)
 endfunction ()
 
 function (paraview_add_client_server_tests)
+  _get_prefix(chosen_prefix "pvcs" ${ARGN})
   _paraview_add_tests("paraview_add_client_server_tests"
-    PREFIX "pvcs"
+    PREFIX "${chosen_prefix}"
     _DISABLE_SUFFIX "_DISABLE_CS"
     _COMMAND_PATTERN
       --server "$<TARGET_FILE:ParaView::pvserver>"
@@ -257,8 +272,9 @@ function (paraview_add_client_server_tests)
 endfunction ()
 
 function (paraview_add_client_server_render_tests)
+  _get_prefix(chosen_prefix "pvcrs" ${ARGN})
   _paraview_add_tests("paraview_add_client_server_render_tests"
-    PREFIX "pvcrs"
+    PREFIX "${chosen_prefix}"
     _DISABLE_SUFFIX "_DISABLE_CRS"
     _COMMAND_PATTERN
       --data-server "$<TARGET_FILE:ParaView::pvdataserver>"
@@ -278,8 +294,9 @@ function (paraview_add_client_server_render_tests)
 endfunction ()
 
 function (paraview_add_multi_client_tests)
+  _get_prefix(chosen_prefix "pvcs-multi-clients" ${ARGN})
   _paraview_add_tests("paraview_add_multi_client_tests"
-    PREFIX "pvcs-multi-clients"
+    PREFIX "${chosen_prefix}"
     _ENABLE_SUFFIX "_ENABLE_MULTI_CLIENT"
     FORCE_SERIAL
     _COMMAND_PATTERN
@@ -306,8 +323,9 @@ function (paraview_add_multi_client_tests)
 endfunction ()
 
 function (paraview_add_multi_server_tests count)
+  _get_prefix(chosen_prefix "pvcs-multi-servers" ${ARGN})
   _paraview_add_tests("paraview_add_multi_server_tests"
-    PREFIX "pvcs-multi-servers"
+    PREFIX "${chosen_prefix}"
     SUFFIX "-${count}"
     _COMMAND_PATTERN
       --test-multi-servers "${count}"
@@ -331,8 +349,9 @@ function (paraview_add_tile_display_tests width height)
     return ()
   endif ()
 
+  _get_prefix(chosen_prefix "pvcs-tile-display" ${ARGN})
   _paraview_add_tests("paraview_add_tile_display_tests"
-    PREFIX "pvcs-tile-display"
+    PREFIX "${chosen_prefix}"
     SUFFIX "-${width}x${height}"
     ENVIRONMENT
       PV_SHARED_WINDOW_SIZE=800x600
@@ -362,8 +381,9 @@ function (paraview_add_cave_tests num_ranks config)
 
   get_filename_component(_config_name "${config}" NAME_WE)
 
+  _get_prefix(chosen_prefix "pvcs-cave-${_config_name}" ${ARGN})
   _paraview_add_tests("paraview_add_cave_tests"
-    PREFIX "pvcs-cave-${_config_name}"
+    PREFIX "${chosen_prefix}"
     SUFFIX "-${num_ranks}"
     ENVIRONMENT
       PV_SHARED_WINDOW_SIZE=400x300
@@ -390,9 +410,10 @@ endfunction ()
 # smTestDriver to treat it as started otherwise the test will fail.
 # The command to execute is passed as {ARGN} and is suffixed by each of the
 # TEST_SCRIPTS provided, one at at time.
-function (paraview_add_test prefix)
+function (paraview_add_test)
+  _get_prefix(chosen_prefix "paraview" ${ARGN})
   _paraview_add_tests("paraview_add_test"
-    PREFIX "${prefix}"
+    PREFIX "${chosen_prefix}"
     _COMMAND_PATTERN
       --client
       __paraview_args__
@@ -402,10 +423,11 @@ endfunction ()
 
 # Same as `paraview_add_test` except makes smTestDriver run the command using
 # mpi. If `PARAVIEW_USE_MPI` if not defined, this does not add any test.
-function (paraview_add_test_mpi prefix)
+function (paraview_add_test_mpi)
   if (PARAVIEW_USE_MPI)
+    _get_prefix(chosen_prefix "paraview-mpi" ${ARGN})
     _paraview_add_tests("paraview_add_test"
-      PREFIX "${prefix}"
+      PREFIX "${chosen_prefix}"
       _COMMAND_PATTERN
         --client-mpi
         __paraview_args__
