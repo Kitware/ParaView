@@ -17,6 +17,7 @@
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkErrorCode.h"
+#include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkGenericRenderWindowInteractor.h"
 #include "vtkImageData.h"
 #include "vtkImageTransparencyFilter.h"
@@ -772,9 +773,10 @@ bool vtkSMViewProxy::GetTransparentBackground()
 //----------------------------------------------------------------------------
 bool vtkSMViewProxy::IsContextReadyForRendering()
 {
-  if (vtkRenderWindow* window = this->GetRenderWindow())
+  auto renWin = vtkGenericOpenGLRenderWindow::SafeDownCast(this->GetRenderWindow());
+  if (renWin)
   {
-    if (window->IsDrawable())
+    if (renWin->GetReadyForRendering())
     {
       return true;
     }
@@ -783,7 +785,7 @@ bool vtkSMViewProxy::IsContextReadyForRendering()
     // that we really need the OpenGL context. The application may use delays
     // etc to try to provide the context, if possible (see paraview/paraview#18945).
     this->InvokeEvent(vtkSMViewProxy::PrepareContextForRendering);
-    return window->IsDrawable();
+    return renWin->GetReadyForRendering();
   }
   return true;
 }
