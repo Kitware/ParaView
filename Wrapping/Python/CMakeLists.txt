@@ -17,6 +17,7 @@ set(python_files
   paraview/coprocessing.py
   paraview/cpstate.py
   paraview/demos/demo1.py
+  paraview/demos/export_catalyst_state.py
   paraview/demos/show_grid_as_background.py
   paraview/demos/wavelet_miniapp.py
   paraview/detail/__init__.py
@@ -43,6 +44,7 @@ set(python_files
   paraview/smtesting.py
   paraview/smtrace.py
   paraview/spatiotemporalparallelism.py
+  paraview/tests/validate_extracts.py
   paraview/tpl/__init__.py
   paraview/util/__init__.py
   paraview/util/vtkAlgorithm.py
