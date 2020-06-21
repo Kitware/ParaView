@@ -26,6 +26,8 @@
 #include "vtkRemotingCinemaModule.h" // for export macros
 #include "vtkSMImageExtractWriterProxy.h"
 
+#include <memory> // for std::unique_ptr
+
 class VTKREMOTINGCINEMA_EXPORT vtkSMCinemaExtractWriterProxy : public vtkSMImageExtractWriterProxy
 {
 public:
@@ -47,6 +49,9 @@ protected:
 private:
   vtkSMCinemaExtractWriterProxy(const vtkSMCinemaExtractWriterProxy&) = delete;
   void operator=(const vtkSMCinemaExtractWriterProxy&) = delete;
+
+  class vtkInternals;
+  std::unique_ptr<vtkInternals> Internals;
 };
 
 #endif

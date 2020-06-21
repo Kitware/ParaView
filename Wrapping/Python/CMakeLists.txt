@@ -24,6 +24,7 @@ set(python_files
   paraview/detail/annotation.py
   paraview/detail/calculator.py
   paraview/detail/catalyst_export.py
+  paraview/detail/cinema_extracts_writer.py
   paraview/detail/exportnow.py
   paraview/detail/extract_selection.py
   paraview/detail/loghandler.py

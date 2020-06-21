@@ -1,0 +1,61 @@
+[
+  {"type":"directory","name":"Testing/Temporary/CinemaSpecAExtracts","contents":[
+    {"type":"directory","name":"BatchExtracts","contents":[
+      {"type":"directory","name":"cinema.cdb","contents":[
+        {"type":"file","name":"0.000000e+00.png"},
+        {"type":"file","name":"1.000000e+00.png"},
+        {"type":"file","name":"1.111111e-01.png"},
+        {"type":"file","name":"2.222222e-01.png"},
+        {"type":"file","name":"3.333333e-01.png"},
+        {"type":"file","name":"4.444444e-01.png"},
+        {"type":"file","name":"5.555556e-01.png"},
+        {"type":"file","name":"6.666667e-01.png"},
+        {"type":"file","name":"7.777778e-01.png"},
+        {"type":"file","name":"8.888889e-01.png", "compare" : true},
+        {"type":"file","name":"info.json"}
+      ]}
+    ]},
+    {"type":"file","name":"CinemaSpecAExtracts.pvsm"},
+    {"type":"file","name":"CinemaSpecAExtracts.zip"},
+    {"type":"directory","name":"CoprocessingExtracts","contents":[
+      {"type":"directory","name":"cinema.cdb","contents":[
+        {"type":"file","name":"0.000000e+00.png"},
+        {"type":"file","name":"1.000000e-01.png"},
+        {"type":"file","name":"1.500000e-01.png"},
+        {"type":"file","name":"2.000000e-01.png"},
+        {"type":"file","name":"2.500000e-01.png"},
+        {"type":"file","name":"3.000000e-01.png"},
+        {"type":"file","name":"3.500000e-01.png"},
+        {"type":"file","name":"4.000000e-01.png"},
+        {"type":"file","name":"4.500000e-01.png"},
+        {"type":"file","name":"5.000000e-01.png"},
+        {"type":"file","name":"5.000000e-02.png"},
+        {"type":"file","name":"5.500000e-01.png"},
+        {"type":"file","name":"6.000000e-01.png"},
+        {"type":"file","name":"6.500000e-01.png"},
+        {"type":"file","name":"7.000000e-01.png"},
+        {"type":"file","name":"7.500000e-01.png"},
+        {"type":"file","name":"8.000000e-01.png"},
+        {"type":"file","name":"8.500000e-01.png"},
+        {"type":"file","name":"9.000000e-01.png"},
+        {"type":"file","name":"9.500000e-01.png", "compare": true},
+        {"type":"file","name":"info.json"}
+      ]}
+    ]},
+    {"type":"directory","name":"ImmediateExtracts","contents":[
+      {"type":"directory","name":"cinema.cdb","contents":[
+        {"type":"file","name":"0.000000e+00.png"},
+        {"type":"file","name":"1.000000e+00.png"},
+        {"type":"file","name":"1.111111e-01.png"},
+        {"type":"file","name":"2.222222e-01.png"},
+        {"type":"file","name":"3.333333e-01.png"},
+        {"type":"file","name":"4.444444e-01.png"},
+        {"type":"file","name":"5.555556e-01.png"},
+        {"type":"file","name":"6.666667e-01.png"},
+        {"type":"file","name":"7.777778e-01.png"},
+        {"type":"file","name":"8.888889e-01.png", "compare": true},
+        {"type":"file","name":"info.json"}
+      ]}
+    ]}
+  ]}
+]

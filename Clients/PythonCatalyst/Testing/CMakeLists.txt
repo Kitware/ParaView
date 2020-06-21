@@ -20,6 +20,10 @@ vtk_module_test_data(
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_BatchExtracts_renderview_0008.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_CoprocessingExtracts_histogram_0.000000.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_CoprocessingExtracts_renderview_0018.png"
+
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CinemaSpecAExtracts_BatchExtracts_cinema.cdb_8.888889e_01.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CinemaSpecAExtracts_CoprocessingExtracts_cinema.cdb_9.500000e_01.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CinemaSpecAExtracts_ImmediateExtracts_cinema.cdb_8.888889e_01.png"
 )
 
 set(simple_scripts
@@ -95,7 +99,9 @@ paraview_add_test_mpi(
 #    baselines.
 #---------------------------------------------------------------------
 if (PARAVIEW_USE_QT)
-  set(catalyst_tests WaveletHistogramExtracts)
+  set(catalyst_tests
+    CinemaSpecAExtracts
+    WaveletHistogramExtracts)
 
   foreach (tname IN LISTS catalyst_tests)
     set(ttemp_dir "${CMAKE_BINARY_DIR}/Testing/Temporary/${tname}")
