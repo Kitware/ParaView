@@ -59,22 +59,54 @@ public:
   pqYoungsMaterialPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parent = 0);
   ~pqYoungsMaterialPropertyWidget() override;
 
+  //@{
+  /**
+   * Get/Set the ordering arrays, linked to the SMProperty
+   */
   void setOrderingArrays(const QList<QVariant>&);
   QList<QVariant> orderingArrays() const;
+  //@}
 
+  //@{
+  /**
+   * Get/Set the normal arrays, linked to the SMProperty
+   */
   void setNormalArrays(const QList<QVariant>&);
   QList<QVariant> normalArrays() const;
+  //@}
 
 Q_SIGNALS:
-  void normalArraysChanged();
+
+  /**
+   * Emitted when the ordering arrays change, linked ot the SMProperty
+   */
   void orderingArraysChanged();
 
+  /**
+   * Emitted when the normal arrays change, linked ot the SMProperty
+   */
+  void normalArraysChanged();
+
 protected:
+  /**
+   * Recover the currently selecticted item in the VolumeFractionArrays widget
+   */
   QStandardItem* currentItem();
 
 protected slots:
-  void onNormalArraysChanged();
+  /**
+   * Called when the ordering array is changed
+   */
   void onOrderingArraysChanged();
+
+  /**
+   * Called when the normal array is changed
+   */
+  void onNormalArraysChanged();
+
+  /**
+   * Called to initialize/update the combobox according to the current item
+   */
   void updateComboBoxes();
 
 private:
