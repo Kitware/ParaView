@@ -402,6 +402,9 @@ pqOutputWidget::pqOutputWidget(QWidget* parentObject, Qt::WindowFlags f)
   : Superclass(parentObject, f)
   , Internals(new pqOutputWidget::pqInternals(this))
 {
+  // Setup Qt message pattern
+  qSetMessagePattern("%{type}: In %{file}, line %{line}\n%{type}: %{message}");
+
   pqInternals& internals = (*this->Internals);
 
   this->connect(
