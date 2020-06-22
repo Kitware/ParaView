@@ -192,7 +192,7 @@ int vtkResampleToHyperTreeGrid::RequestData(
   // Skip execution if there is no input geometry.
   vtkIdType numCells = redistributedInput->GetNumberOfCells();
   vtkIdType numPts = redistributedInput->GetNumberOfPoints();
-  if (numCells < 1 || numPts < 1)
+  if (numCells < 1 && numPts < 1)
   {
     vtkWarningMacro("Input must have points or cells");
     return 1;
@@ -408,6 +408,7 @@ vtkResampleToHyperTreeGrid::GridElement::~GridElement()
   {
     this->Accumulators[i]->Delete();
   }
+  this->Accumulators.clear();
 }
 
 //----------------------------------------------------------------------------
