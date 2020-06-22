@@ -19,6 +19,8 @@ def load_package_from_zip(zipfilename, packagename=None):
     :returns: the module object for the package on success else None
     """
     import zipimport, os.path
+
+    zipfilename = _mpi_exchange_if_needed(zipfilename)
     if packagename:
         package = packagename
     else:
@@ -46,6 +48,7 @@ def load_package_from_dir(path):
 
 def load_module_from_file(fname):
     import importlib.util, os.path
+    fname = _mpi_exchange_if_needed(fname)
     modulename = os.path.basename(fname)
     spec = importlib.util.spec_from_file_location(modulename, fname)
     module = importlib.util.module_from_spec(spec)
@@ -341,3 +344,34 @@ def _do_live(dataDescription, module):
             break
         elif live_link.WaitForLiveChange():
             break
+
+_temp_directory = None
+def _mpi_exchange_if_needed(filename):
+    global _temp_directory
+
+    from ..modules.vtkRemotingCore import vtkProcessModule
+    pm = vtkProcessModule.GetProcessModule()
+    if pm.GetNumberOfLocalPartitions() <= 1:
+        return filename
+
+    from mpi4py import MPI
+    from vtkmodules.vtkParallelMPI4Py import vtkMPI4PyCommunicator
+    comm = vtkMPI4PyCommunicator.ConvertToPython(pm.GetGlobalController().GetCommunicator())
+    if comm.Get_rank() == 0:
+        with open(filename, 'rb') as f:
+            data = f.read()
+    else:
+        data = None
+    data = comm.bcast(data, root=0)
+    if comm.Get_rank() == 0:
+        return filename
+    else:
+        if not _temp_directory:
+            import tempfile, os.path
+            # we hook the temp-dir to the module so it lasts for the livetime of
+            # the interpreter and gets cleaned up on exit.
+            _temp_directory = tempfile.TemporaryDirectory()
+        filename = os.path.join(_temp_directory.name, os.path.basename(filename))
+        with open(filename, "wb") as f:
+            f.write(data)
+        return filename

@@ -75,9 +75,7 @@ vtkCPPythonScriptV2Pipeline::~vtkCPPythonScriptV2Pipeline()
 bool vtkCPPythonScriptV2Pipeline::InitializeFromZIP(
   const char* zipfilename, const char* packagename)
 {
-  // TODO: Use MPI to exchange ZIP package among ranks.
   auto& internals = (*this->Internals);
-
   vtkPythonInterpreter::Initialize();
   vtkPythonScopeGilEnsurer gilEnsurer;
 
@@ -127,7 +125,6 @@ bool vtkCPPythonScriptV2Pipeline::InitializeFromDirectory(const char* path)
 //----------------------------------------------------------------------------
 bool vtkCPPythonScriptV2Pipeline::InitializeFromScript(const char* pyfilename)
 {
-  // TODO: Use MPI to exchange py file among ranks.
   auto& internals = (*this->Internals);
   vtkPythonInterpreter::Initialize();
   vtkPythonScopeGilEnsurer gilEnsurer;
