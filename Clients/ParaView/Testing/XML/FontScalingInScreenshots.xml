@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- set up window -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size_Custom" />
+  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Width" command="set_string" arguments="400" />
+  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Height" command="set_string" arguments="400" />
+  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/ButtonBox/1QPushButton2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/ButtonBox/1QPushButton0" command="activate" arguments="" />
+
+  <!-- generate source -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="RTData" />
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Surface" />
+
+  <!-- save screenshot #1 with no font scaling -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveScreenshot" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/WaveNoFontScale.png" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/SearchBox/AdvancedButton" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/scaleBy/2X" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FontScaling/ComboBox" command="activated" arguments="Do not scale fonts" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
+
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/WaveNoFontScale.png" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/WaveNoFontScale.png" />
+
+  <!-- save screenshot #2 with font scaling -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveScreenshot" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/WaveFontScale.png" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/SearchBox/AdvancedButton" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/scaleBy/2X" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FontScaling/ComboBox" command="activated" arguments="Scale fonts proportionally" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
+
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/WaveFontScale.png" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/WaveFontScale.png" />
+</pqevents>
