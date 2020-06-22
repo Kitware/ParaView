@@ -29,7 +29,7 @@ parser.add_argument("--script-version", type=int,
     "will be determined automatically. When specifying multiple scripts, this "
     "setting applies to all scripts.", default=0)
 parser.add_argument("-d", "--delay", type=float,
-    help="delay (in seconds) between timesteps (default: 1.0)", default=1.0)
+    help="delay (in seconds) between timesteps (default: 0.0)", default=0.0)
 parser.add_argument("-c", "--channel", type=str,
     help="Catalyst channel name (default: input)", default="input")
 args = parser.parse_args()
@@ -66,6 +66,10 @@ wholeExtent = wavelet.GetWholeExtent()
 
 numsteps = args.timesteps
 for step in range(numsteps):
+    if args.delay > 0:
+        import time
+        time.sleep(args.delay)
+
     if rank == 0:
         print("timestep: {0}/{1}".format(step+1, numsteps))
 
