@@ -725,13 +725,16 @@ bool vtkSMSaveScreenshotProxy::Prepare()
     vtkSMPropertyHelper(this, "TransparentBackground").GetAsInt() != 0);
   this->State->SetColorPalette(vtkSMPropertyHelper(this, "OverrideColorPalette").GetAsString());
   this->State->SetStereoMode(vtkSMPropertyHelper(this, "StereoMode").GetAsInt());
-  this->State->SetFontScaling(vtkSMPropertyHelper(this, "FontScaling").GetAsInt());
   this->State->SetSeparatorWidth(vtkSMPropertyHelper(this, "SeparatorWidth").GetAsInt());
   double scolor[3];
   vtkSMPropertyHelper(this, "SeparatorColor").Get(scolor, 3);
   this->State->SetSeparatorColor(scolor);
 
   this->State->SetSize(targetSize);
+
+  // font scaling is using this->Maginifcation which is evaluated in SetSize
+  // so font scaling has to happen after SetSize
+  this->State->SetFontScaling(vtkSMPropertyHelper(this, "FontScaling").GetAsInt());
   return true;
 }
 
