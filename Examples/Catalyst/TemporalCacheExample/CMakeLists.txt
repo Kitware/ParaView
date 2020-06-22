@@ -34,6 +34,7 @@ if (TARGET CachingExampleAdaptor)
       CachingExampleAdaptor
       VTK::mpi)
 else ()
+  find_package(ParaView REQUIRED)
   add_executable(CachingExample
     FEDriver.cxx
     FEDataStructures.cxx
