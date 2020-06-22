@@ -34,6 +34,7 @@
 #include <string> // for std::string
 #include <vector> // for std::vector
 
+class vtkCollection;
 class vtkSMProxy;
 class vtkSMSessionProxyManager;
 
@@ -99,6 +100,12 @@ public:
    */
   bool Extract();
 
+  /**
+   * Generate extract s for the current state using only the extract generators
+   * in the collection.
+   */
+  bool Extract(vtkCollection* collection);
+
   //@{
   /**
    * Check if any of the extract generators registered with the chosen
@@ -108,6 +115,7 @@ public:
    */
   bool IsAnyTriggerActivated(vtkSMSessionProxyManager* pxm);
   bool IsAnyTriggerActivated();
+  bool IsAnyTriggerActivated(vtkCollection* collection);
   //@}
 
   /**

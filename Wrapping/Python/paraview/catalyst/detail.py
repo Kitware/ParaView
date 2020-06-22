@@ -25,6 +25,20 @@ def IsInsituInput(name):
         return True
     return False
 
+def RegisterExtractGenerator(generator):
+    """Keeps track of extract generators created inside a specific Catalyst
+    script.  This is useful to ensure we only update the generators for that
+    current script when multiple scripts are being executed in the same run.
+    """
+    global ActivePythonPipelineModule
+    assert IsInsitu()
+
+    module = ActivePythonPipelineModule
+    if not hasattr(module, "_extract_generators"):
+        from vtkmodules.vtkCommonCore import vtkCollection
+        module._extract_generators = vtkCollection()
+    module._extract_generators.AddItem(generator.SMProxy)
+
 def CreateProducer(name):
     global ActiveDataDescription, ActivePythonPipelineModule
     assert IsInsituInput(name)
@@ -91,6 +105,30 @@ def HasProducers():
     module = ActivePythonPipelineModule
     return hasattr(module, "_producer_map")
 
+def IsAnyTriggerActivated(cntr):
+    global ActivePythonPipelineModule
+    assert IsInsitu()
+
+    module = ActivePythonPipelineModule
+    if hasattr(module, "_extract_generators"):
+        return cntr.IsAnyTriggerActivated(module._extract_generators)
+
+    # if there are no extract generators in this module, what should we do?
+    # I am leaning towards saying treat it as if they are activated since
+    # the user may have custom extract generation code.
+    from . import log_level
+    from .. import log
+    log(log_level(), "module has no extract generators, treating as activated.")
+    return True
+
+def Extract(cntr):
+    global ActivePythonPipelineModule
+    assert IsInsitu()
+
+    module = ActivePythonPipelineModule
+    if hasattr(module, "_extract_generators"):
+        return cntr.Extract(module._extract_generators)
+    return False
 
 def InitializePythonEnvironment():
     """

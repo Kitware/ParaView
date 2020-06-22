@@ -6,7 +6,8 @@ Used by vtkCPPythonScriptV2Pipeline and may change without notice.
 """
 from . import log_level
 from .. import log, print_warning
-from .detail import UpdateProducers, HasProducers, CreateProducer, SetActiveDataDescription
+from .detail import UpdateProducers, HasProducers, CreateProducer, \
+                    SetActiveDataDescription, IsAnyTriggerActivated, Extract
 
 def load_package_from_zip(zipfilename, packagename=None):
     """Loads a zip file and imports a top-level package from it with the name
@@ -121,7 +122,7 @@ def co_process(dataDescription, module):
 
     # now call standard co_process that uses the extract
     # generators known to the system
-    cntr.Extract()
+    Extract(cntr)
 
     # now handle Live request
     if _is_live_trigger_activated(cntr, options):
@@ -153,13 +154,30 @@ def _get_extracts_controller(dataDescription, options):
     :type options: :class:`paraview.servermanager.Proxy`
     for '(misc, CatalystOptions)'
     """
-
     from paraview.modules.vtkRemotingServerManager import vtkSMExtractsController
+    import re, os
+
     cntr = vtkSMExtractsController()
     cntr.SetTimeStep(dataDescription.GetTimeStep())
     cntr.SetTime(dataDescription.GetTime())
-    cntr.SetImageExtractsOutputDirectory(options.ImageExtractsOutputDirectory)
-    cntr.SetDataExtractsOutputDirectory(options.DataExtractsOutputDirectory)
+
+    # override options if passed in environment options.
+    if 'PARAVIEW_OVERRIDE_DATA_OUTPUT_DIRECTORY' in os.environ:
+        data_root = os.environ["PARAVIEW_OVERRIDE_DATA_OUTPUT_DIRECTORY"]
+    else:
+        data_root = options.DataExtractsOutputDirectory
+
+    if 'PARAVIEW_OVERRIDE_IMAGE_OUTPUT_DIRECTORY' in os.environ:
+        image_root = os.environ["PARAVIEW_OVERRIDE_IMAGE_OUTPUT_DIRECTORY"]
+    else:
+        image_root = options.ImageExtractsOutputDirectory
+
+    # if the paths have ${...}, replace that with environment variables.
+    from ..util import ReplaceDollarVariablesWithEnvironment
+    data_root = ReplaceDollarVariablesWithEnvironment(data_root)
+    image_root = ReplaceDollarVariablesWithEnvironment(image_root)
+    cntr.SetDataExtractsOutputDirectory(data_root)
+    cntr.SetImageExtractsOutputDirectory(image_root)
     return cntr
 
 
@@ -253,7 +271,7 @@ def _is_activated(cntr, options, module):
         log(log_level(), "Treating as activated due to presence of custom callbacks"),
         return True
 
-    if not _is_live_trigger_activated(cntr, options) and not cntr.IsAnyTriggerActivated():
+    if not _is_live_trigger_activated(cntr, options) and not IsAnyTriggerActivated(cntr):
         log(log_level(), "Live or Extracts trigger not activated")
         return False
 

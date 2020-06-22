@@ -14,6 +14,8 @@
 =========================================================================*/
 #include "vtkSMExtractsController.h"
 
+#include "vtkCollection.h"
+#include "vtkCollectionRange.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -77,6 +79,21 @@ bool vtkSMExtractsController::Extract(vtkSMSessionProxyManager* pxm)
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMExtractsController::Extract(vtkCollection* collection)
+{
+  bool status = false;
+  auto range = vtk::Range(collection);
+  for (auto item : range)
+  {
+    if (auto generator = vtkSMProxy::SafeDownCast(item))
+    {
+      status = this->Extract(generator) || status;
+    }
+  }
+  return status;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMExtractsController::Extract(vtkSMProxy* extractor)
 {
   if (!this->IsTriggerActivated(extractor))
@@ -118,6 +135,23 @@ bool vtkSMExtractsController::IsAnyTriggerActivated()
     return this->IsAnyTriggerActivated(session->GetSessionProxyManager());
   }
   vtkErrorMacro("No active session!");
+  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMExtractsController::IsAnyTriggerActivated(vtkCollection* collection)
+{
+  auto range = vtk::Range(collection);
+  for (auto item : range)
+  {
+    if (auto generator = vtkSMProxy::SafeDownCast(item))
+    {
+      if (this->IsTriggerActivated(generator))
+      {
+        return true;
+      }
+    }
+  }
   return false;
 }
 

@@ -460,13 +460,24 @@ def CreateExtractGenerator(name, proxy=None, registrationName=None):
     """
     if proxy is None:
         proxy = GetActiveSource()
-    controller = servermanager.vtkSMExtractsController()
+    if not proxy:
+        raise RuntimeError("Could determine input for extract generator")
+
     if proxy.Port > 0:
         rawProxy = proxy.SMProxy.GetOutputPort(proxy.Port)
     else:
         rawProxy = proxy.SMProxy
+
+    controller = servermanager.vtkSMExtractsController()
     rawGenerator = controller.CreateExtractGenerator(rawProxy, name, registrationName)
-    return servermanager._getPyProxy(rawGenerator)
+    generator = servermanager._getPyProxy(rawGenerator)
+
+    from .catalyst.detail import IsInsitu, RegisterExtractGenerator
+    if IsInsitu():
+        # tag the extract generator to know which pipeline this came from.
+        RegisterExtractGenerator(generator)
+    return generator
+
 
 def GetExtractGenerators(proxy=None):
     """
@@ -637,7 +648,7 @@ def Show(proxy=None, view=None, representationType=None, **params):
     If pipeline object and/or view are not specified, active objects are used."""
     if proxy == None:
         proxy = GetActiveSource()
-    if proxy.GetNumberOfOutputPorts() == 0:
+    if not hasattr(proxy, "GetNumberOfOutputPorts") or proxy.GetNumberOfOutputPorts() == 0:
         raise RuntimeError('Cannot show a sink i.e. algorithm with no output.')
     if proxy == None:
         raise RuntimeError ("Show() needs a proxy argument or that an active source is set.")

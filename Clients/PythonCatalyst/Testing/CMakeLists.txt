@@ -24,6 +24,9 @@ vtk_module_test_data(
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CinemaSpecAExtracts_BatchExtracts_cinema.cdb_8.888889e_01.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CinemaSpecAExtracts_CoprocessingExtracts_cinema.cdb_9.500000e_01.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CinemaSpecAExtracts_ImmediateExtracts_cinema.cdb_8.888889e_01.png"
+
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/MultiplePipelines_Pipeline1_pipeline1_000000.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/MultiplePipelines_Pipeline2_pipeline2_000001.png"
 )
 
 set(simple_scripts
@@ -38,6 +41,37 @@ paraview_add_test_mpi(
   PREFIX "Catalyst::MPI::WaveletMiniApp"
   ARGS   "$<TARGET_FILE:ParaView::pvbatch>" -sym -m paraview.demos.wavelet_miniapp -t 20 --size 21 --script-version 2 -s
   TEST_SCRIPTS ${simple_scripts})
+
+#--------------------------------------------------------------------
+# add test to validate multiple analysis pipelines can be used.
+paraview_add_test(
+    PREFIX "Catalyst::WaveletMiniApp::MultiplePipelines::pipeline1"
+    ENVIRONMENT
+      PIPELINE1_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}/Testing/Temporary/MultiplePipelines/Pipeline1
+      PIPELINE2_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}/Testing/Temporary/MultiplePipelines/Pipeline2
+    ARGS   "$<TARGET_FILE:ParaView::pvbatch>" -sym -m
+           paraview.demos.wavelet_miniapp -t 2 --size 21
+           --script-version 2
+           --channel Wavelet1
+           -s "${CMAKE_CURRENT_SOURCE_DIR}/pipeline1.zip"
+           -s
+    TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/pipeline2.zip")
+
+paraview_add_test(
+    PREFIX "Catalyst::WaveletMiniApp::MultiplePipelines::Validate::pipeline1"
+    ARGS   "$<TARGET_FILE:ParaView::pvpython>"
+           -m paraview.tests.validate_extracts
+           --name MultiplePipelines
+           --root "${CMAKE_BINARY_DIR}/Testing/Temporary/MultiplePipelines"
+           --baseline-dir "${paraview_test_data_directory_output}/Clients/PythonCatalyst/Testing/Data/Baseline"
+           --temp-dir "${CMAKE_BINARY_DIR}/Testing/Temporary"
+           --json
+    TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/pipeline2.json")
+set_tests_properties(
+    "Catalyst::WaveletMiniApp::MultiplePipelines::Validate::pipeline1.pipeline2"
+    PROPERTIES DEPENDS
+      "Catalyst::WaveletMiniApp::MultiplePipelines::pipeline1.pipeline2")
+
 
 #---------------------------------------------------------------------
 # Let's add some full workflow tests.

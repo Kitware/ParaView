@@ -20,13 +20,14 @@ parser.add_argument("-t", "--timesteps", type=int,
     help="number of timesteps to run the miniapp for (default: 100)", default=100)
 parser.add_argument("--size",  type=int,
     help="number of samples in each coordinate direction (default: 101)", default=101)
-parser.add_argument("-s", "--script",
-    help="path to the Catalyst script to use for in situ processing. Can be a "
+parser.add_argument("-s", "--script", type=str, action="append",
+    help="path(s) to the Catalyst script(s) to use for in situ processing. Can be a "
     ".py file or a Python package zip or directory",
     required=True)
 parser.add_argument("--script-version", type=int,
     help="choose Catalyst analysis script version explicitly, otherwise it "
-    "will be determined automatically", default=0)
+    "will be determined automatically. When specifying multiple scripts, this "
+    "setting applies to all scripts.", default=0)
 parser.add_argument("-d", "--delay", type=float,
     help="delay (in seconds) between timesteps (default: 1.0)", default=1.0)
 parser.add_argument("-c", "--channel", type=str,
@@ -39,7 +40,8 @@ from paraview.catalyst import bridge
 bridge.initialize()
 
 # add analysis script
-bridge.add_pipeline(args.script, args.script_version)
+for script in args.script:
+    bridge.add_pipeline(script, args.script_version)
 
 #----------------------------------------------------------------
 # Here's our simulation main loop
