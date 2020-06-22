@@ -164,6 +164,11 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
 
   new pqLoadStateReaction(ui.actionFileLoadServerState);
   new pqSaveStateReaction(ui.actionFileSaveServerState);
+#if VTK_MODULE_ENABLE_ParaView_pqPython
+  new pqCatalystExportReaction(ui.actionFileSaveCatalystState);
+#else
+  ui.actionFileSaveCatalystState->setEnabled(false);
+#endif
 
   new pqServerConnectReaction(ui.actionServerConnect);
   new pqServerDisconnectReaction(ui.actionServerDisconnect);
@@ -173,7 +178,7 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   new pqSaveAnimationGeometryReaction(ui.actionFileSaveGeometry);
 
   new pqExportReaction(ui.actionExport);
-  new pqImmediateExportReaction(ui.actionExportImmediate);
+  new pqImmediateExportReaction(ui.actionFileSaveExtracts);
   new pqSaveDataReaction(ui.actionFileSaveData);
 
   new pqLoadRestoreWindowLayoutReaction(true, ui.actionFileLoadWindowArrangement);
@@ -758,16 +763,4 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu)
 
   new pqCatalystRemoveBreakpointReaction(
     menu.addAction("Remove Breakpoint") << pqSetName("actionCatalystRemoveBreakpoint"));
-
-#if VTK_MODULE_ENABLE_ParaView_pqPython
-  menu.addSeparator(); // --------------------------------------------------
-  QAction* gcatalyst = menu.addAction("Export Catalyst Script")
-    << pqSetName("actionExportCatalyst");
-  new pqCatalystExportReaction(gcatalyst);
-  QAction* gimmediate = menu.addAction("Export Now") << pqSetName("actionExportImmediate");
-  new pqImmediateExportReaction(gimmediate);
-  QAction* gtemporal = menu.addAction("Export Temporal Script")
-    << pqSetName("actionExportTemporal");
-  new pqTemporalExportReaction(gtemporal);
-#endif
 }

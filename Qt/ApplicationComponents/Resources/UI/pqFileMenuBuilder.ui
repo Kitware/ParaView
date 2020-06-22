@@ -95,6 +95,15 @@
     <string>&amp;Save State...</string>
    </property>
   </action>
+  <action name="actionFileSaveCatalystState">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqCatalyst.svg</normaloff>:/pqWidgets/Icons/pqCatalyst.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Save Catalyst State...</string>
+   </property>
+  </action>
   <action name="actionFileSaveGeometry">
    <property name="text">
     <string>Save &amp;Geometry...</string>
@@ -193,15 +202,6 @@
     <string>Load window arrangement from a file</string>
    </property>
   </action>
-  <action name="actionExportImmediate">
-   <property name="icon">
-    <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqCinemaScience.svg</normaloff>:/pqWidgets/Icons/pqCinemaScience.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Export Now</string>
-   </property>
-  </action>
   <action name="actionFileImportCinemaDatabase">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
@@ -228,23 +228,32 @@
     <string>Load an Appearance Materials file</string>
    </property>
   </action>
+  <action name="actionFileSaveExtracts">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqExportScene.svg</normaloff>:/pqWidgets/Icons/pqExportScene.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Save Extracts...</string>
+   </property>
+  </action>
   <addaction name="actionFileOpen"/>
   <addaction name="menuRecentFiles"/>
   <addaction name="actionReloadFiles"/>
   <addaction name="separator"/>
   <addaction name="actionFileLoadServerState"/>
   <addaction name="actionFileSaveServerState"/>
+  <addaction name="actionFileSaveCatalystState"/>
   <addaction name="separator"/>
   <addaction name="actionFileSaveData"/>
   <addaction name="actionFileSaveScreenshot"/>
   <addaction name="actionExport"/>
   <addaction name="separator"/>
   <addaction name="actionFileSaveAnimation"/>
+  <addaction name="actionFileSaveExtracts"/>
   <addaction name="actionFileSaveGeometry"/>
   <addaction name="separator"/>
-  <addaction name="actionExportImmediate"/>
   <addaction name="actionFileImportCinemaDatabase"/>
-  <addaction name="separator"/>
   <addaction name="actionFileLoadMaterials"/>
   <addaction name="separator"/>
   <addaction name="actionFileLoadWindowArrangement"/>

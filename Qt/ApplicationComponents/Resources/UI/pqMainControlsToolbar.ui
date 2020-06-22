@@ -112,7 +112,7 @@
      <normaloff>:/pqWidgets/Icons/pqFindData.svg</normaloff>:/pqWidgets/Icons/pqFindData.svg</iconset>
    </property>
    <property name="text">
-    <string>Find data...</string>
+    <string>Find Data...</string>
    </property>
    <property name="toolTip">
     <string>Find data matching various criteria from the current source (v)</string>
@@ -136,7 +136,7 @@
      <normaloff>:/pqWidgets/Icons/pqResetSession.svg</normaloff>:/pqWidgets/Icons/pqResetSession.svg</iconset>
    </property>
    <property name="text">
-    <string>ResetSession</string>
+    <string>Reset Session</string>
    </property>
    <property name="toolTip">
     <string>Reset Session</string>
@@ -151,10 +151,10 @@
      <normaloff>:/pqWidgets/Icons/pqExportScene.svg</normaloff>:/pqWidgets/Icons/pqExportScene.svg</iconset>
    </property>
    <property name="text">
-    <string>Generate Extracts</string>
+    <string>Save Extracts...</string>
    </property>
    <property name="toolTip">
-    <string>Generate Extracts</string>
+    <string>Save Extracts</string>
    </property>
   </action>
   <action name="actionSaveState">
@@ -163,7 +163,7 @@
      <normaloff>:/pqWidgets/Icons/pqSaveState.svg</normaloff>:/pqWidgets/Icons/pqSaveState.svg</iconset>
    </property>
    <property name="text">
-    <string>Save State</string>
+    <string>Save State...</string>
    </property>
    <property name="toolTip">
     <string>Save State</string>
@@ -175,7 +175,7 @@
      <normaloff>:/pqWidgets/Icons/pqCatalyst.svg</normaloff>:/pqWidgets/Icons/pqCatalyst.svg</iconset>
    </property>
    <property name="text">
-    <string>Save Catalyst State</string>
+    <string>Save Catalyst State...</string>
    </property>
    <property name="toolTip">
     <string>Save Catalyst State</string>
