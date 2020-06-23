@@ -38,12 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QScopedPointer>
 
 class vtkSMPropertyGroup;
+class QStandardItem;
 
 /**
-* This is a custom widget for YoungsMaterialInterface filter. We use a custom widget
-* since this filter has unusual requirements when it comes to setting
-* OrderingArrays and NormalArrays properties.
-*/
+ * This is a custom widget for YoungsMaterialInterface filter. We use a custom widget
+ * since this filter has unusual requirements when it comes to setting
+ * OrderingArrays and NormalArrays properties.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqYoungsMaterialPropertyWidget
   : public pqStringVectorPropertyWidget
 {
@@ -58,19 +59,53 @@ public:
   pqYoungsMaterialPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parent = 0);
   ~pqYoungsMaterialPropertyWidget() override;
 
+  //@{
+  /**
+   * Get/Set the ordering arrays, linked to the SMProperty
+   */
   void setOrderingArrays(const QList<QVariant>&);
   QList<QVariant> orderingArrays() const;
+  //@}
 
+  //@{
+  /**
+   * Get/Set the normal arrays, linked to the SMProperty
+   */
   void setNormalArrays(const QList<QVariant>&);
   QList<QVariant> normalArrays() const;
+  //@}
 
 signals:
-  void normalArraysChanged();
+  /**
+   * Emitted when the ordering arrays change, linked ot the SMProperty
+   */
   void orderingArraysChanged();
 
-private slots:
-  void normalArraysChanged(const QString& value);
-  void orderingArraysChanged(const QString& value);
+  /**
+   * Emitted when the normal arrays change, linked ot the SMProperty
+   */
+  void normalArraysChanged();
+
+protected:
+  /**
+   * Recover the currently selecticted item in the VolumeFractionArrays widget
+   */
+  QStandardItem* currentItem();
+
+protected slots:
+  /**
+   * Called when the ordering array is changed
+   */
+  void onOrderingArraysChanged();
+
+  /**
+   * Called when the normal array is changed
+   */
+  void onNormalArraysChanged();
+
+  /**
+   * Called to initialize/update the combobox according to the current item
+   */
   void updateComboBoxes();
 
 private:
