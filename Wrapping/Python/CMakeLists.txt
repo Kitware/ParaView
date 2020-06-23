@@ -16,6 +16,7 @@ set(python_files
   paraview/collaboration.py
   paraview/coprocessing.py
   paraview/cpstate.py
+  paraview/demos/__init__.py
   paraview/demos/demo1.py
   paraview/demos/export_catalyst_state.py
   paraview/demos/show_grid_as_background.py
@@ -45,6 +46,7 @@ set(python_files
   paraview/smtesting.py
   paraview/smtrace.py
   paraview/spatiotemporalparallelism.py
+  paraview/tests/__init__.py
   paraview/tests/validate_extracts.py
   paraview/tpl/__init__.py
   paraview/util/__init__.py
