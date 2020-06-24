@@ -91,12 +91,12 @@
       {"type":"file","name":"histogram_0.666667.png"},
       {"type":"file","name":"histogram_0.777778.png"},
       {"type":"file","name":"histogram_0.888889.png"},
-      {"type":"file","name":"histogram_1.000000.png", "compare":true},
+      {"type":"file","name":"histogram_1.000000.png"},
       {"type":"file","name":"renderview_0000.png", "compare":true},
       {"type":"file","name":"renderview_0002.png"},
       {"type":"file","name":"renderview_0004.png"},
       {"type":"file","name":"renderview_0006.png"},
-      {"type":"file","name":"renderview_0008.png", "compare":true}
+      {"type":"file","name":"renderview_0008.png"}
     ]},
     {"type":"file","name":"WaveletHistogramExtracts.pvsm"},
     {"type":"file","name":"WaveletHistogramExtracts.zip"}
