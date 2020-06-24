@@ -38,7 +38,7 @@ class PQCOMPONENTS_EXPORT pqMemoryInspectorPanel : public QWidget
 {
   Q_OBJECT
 public:
-  pqMemoryInspectorPanel(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  pqMemoryInspectorPanel(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
   ~pqMemoryInspectorPanel() override;
 
   // Description:

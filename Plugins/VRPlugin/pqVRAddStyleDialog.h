@@ -42,7 +42,7 @@ class pqVRAddStyleDialog : public QDialog
   typedef QDialog Superclass;
 
 public:
-  pqVRAddStyleDialog(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  pqVRAddStyleDialog(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
   virtual ~pqVRAddStyleDialog();
 
   void setInteractorStyle(vtkVRInteractorStyle*, const QString& name);

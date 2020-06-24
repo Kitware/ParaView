@@ -100,8 +100,8 @@ public:
   };
 
 public:
-  pqQueryClauseWidget(
-    pqMultiQueryClauseWidget* multiQueryWidget, QWidget* parent = 0, Qt::WindowFlags flags = 0);
+  pqQueryClauseWidget(pqMultiQueryClauseWidget* multiQueryWidget, QWidget* parent = nullptr,
+    Qt::WindowFlags flags = Qt::WindowFlags{});
   ~pqQueryClauseWidget() override;
 
 public Q_SLOTS:

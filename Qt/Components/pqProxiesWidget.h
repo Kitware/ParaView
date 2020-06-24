@@ -64,7 +64,7 @@ class PQCOMPONENTS_EXPORT pqProxiesWidget : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqProxiesWidget(QWidget* parent = 0, Qt::WindowFlags flags = 0);
+  pqProxiesWidget(QWidget* parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags{});
   ~pqProxiesWidget() override;
 
   /**

@@ -45,7 +45,7 @@ class PQCOMPONENTS_EXPORT pqLabel : public QLabel
   Q_OBJECT
 
 public:
-  pqLabel(const QString& text, QWidget* parent = 0, Qt::WindowFlags f = 0);
+  pqLabel(const QString& text, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
   ~pqLabel() override;
 
   void mousePressEvent(QMouseEvent* event) override;

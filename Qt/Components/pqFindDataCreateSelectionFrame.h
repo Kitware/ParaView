@@ -55,7 +55,7 @@ class PQCOMPONENTS_EXPORT pqFindDataCreateSelectionFrame : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqFindDataCreateSelectionFrame(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  pqFindDataCreateSelectionFrame(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
   ~pqFindDataCreateSelectionFrame() override;
 
   /**

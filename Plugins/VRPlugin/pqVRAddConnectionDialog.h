@@ -49,7 +49,7 @@ class pqVRAddConnectionDialog : public QDialog
   typedef QDialog Superclass;
 
 public:
-  pqVRAddConnectionDialog(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  pqVRAddConnectionDialog(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
   virtual ~pqVRAddConnectionDialog();
 
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN

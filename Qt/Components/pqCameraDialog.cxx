@@ -619,7 +619,8 @@ bool pqCameraDialog::configureCustomViewpoints(
   QString currentConfig(os.str().c_str());
 
   // user modifies the configuration
-  pqCustomViewpointButtonDialog dialog(parentWidget, 0, toolTips, configs, currentConfig);
+  pqCustomViewpointButtonDialog dialog(
+    parentWidget, Qt::WindowFlags{}, toolTips, configs, currentConfig);
   if (dialog.exec() == QDialog::Accepted)
   {
     // save the new configuration into the app wide settings.

@@ -52,7 +52,7 @@ class PQCOMPONENTS_EXPORT pqSettingsDialog : public QDialog
   typedef QDialog Superclass;
 
 public:
-  pqSettingsDialog(QWidget* parent = 0, Qt::WindowFlags flags = 0,
+  pqSettingsDialog(QWidget* parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags{},
     const QStringList& proxyLabelsToShow = QStringList());
   ~pqSettingsDialog() override;
 

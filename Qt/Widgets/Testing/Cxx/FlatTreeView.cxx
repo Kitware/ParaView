@@ -17,13 +17,13 @@
 
 void FlatTreeViewTests(pqFlatTreeView* w)
 {
-  QTestApp::keyClick(w, Qt::Key_Down, 0, 20);
+  QTestApp::keyClick(w, Qt::Key_Down, Qt::NoModifier, 20);
   VERIFY(w->getSelectionModel()->currentIndex() == w->getModel()->index(0, 0));
-  QTestApp::keyClick(w, Qt::Key_PageDown, 0, 20);
-  QTestApp::keyClick(w, Qt::Key_PageUp, 0, 20);
+  QTestApp::keyClick(w, Qt::Key_PageDown, Qt::NoModifier, 20);
+  QTestApp::keyClick(w, Qt::Key_PageUp, Qt::NoModifier, 20);
   VERIFY(w->getSelectionModel()->currentIndex() == w->getModel()->index(0, 0));
-  QTestApp::keyClick(w, Qt::Key_End, 0, 20);
-  QTestApp::keyClick(w, Qt::Key_Home, 0, 20);
+  QTestApp::keyClick(w, Qt::Key_End, Qt::NoModifier, 20);
+  QTestApp::keyClick(w, Qt::Key_Home, Qt::NoModifier, 20);
   VERIFY(w->getSelectionModel()->currentIndex() == w->getModel()->index(0, 0));
 
   QTestApp::delay(20);
@@ -34,23 +34,23 @@ void FlatTreeViewTests(pqFlatTreeView* w)
   w->setCurrentIndex(w->getModel()->index(1, 0));
   VERIFY(w->getSelectionModel()->currentIndex() == w->getModel()->index(1, 0));
 
-  QTestApp::mouseDown(w->viewport(), QPoint(31, 35), Qt::LeftButton, 0, 20);
+  QTestApp::mouseDown(w->viewport(), QPoint(31, 35), Qt::LeftButton, Qt::NoModifier, 20);
   VERIFY(w->getSelectionModel()->currentIndex() == w->getModel()->index(0, 0));
   VERIFY(w->getIndexVisibleAt(QPoint(31, 35)) == w->getModel()->index(0, 0));
 
-  QTestApp::mouseDown(w->viewport(), QPoint(31, 35), Qt::LeftButton, 0, 20);
-  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_A, 0, 20);
+  QTestApp::mouseDown(w->viewport(), QPoint(31, 35), Qt::LeftButton, Qt::NoModifier, 20);
+  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_A, Qt::NoModifier, 20);
   QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_B, Qt::ShiftModifier, 20);
-  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_C, 0, 20);
-  QTestApp::keyDown(QApplication::focusWidget(), Qt::Key_Enter, 0, 20);
-  QTestApp::mouseDown(w->viewport(), QPoint(31, 59), Qt::LeftButton, 0, 20);
+  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_C, Qt::NoModifier, 20);
+  QTestApp::keyDown(QApplication::focusWidget(), Qt::Key_Enter, Qt::NoModifier, 20);
+  QTestApp::mouseDown(w->viewport(), QPoint(31, 59), Qt::LeftButton, Qt::NoModifier, 20);
 
-  QTestApp::mouseDown(w->viewport(), QPoint(31, 35), Qt::LeftButton, 0, 20);
-  QTestApp::mouseDown(w->viewport(), QPoint(31, 35), Qt::LeftButton, 0, 20);
-  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_C, 0, 20);
+  QTestApp::mouseDown(w->viewport(), QPoint(31, 35), Qt::LeftButton, Qt::NoModifier, 20);
+  QTestApp::mouseDown(w->viewport(), QPoint(31, 35), Qt::LeftButton, Qt::NoModifier, 20);
+  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_C, Qt::NoModifier, 20);
   QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_B, Qt::ShiftModifier, 20);
-  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_A, 0, 20);
-  QTestApp::keyDown(QApplication::focusWidget(), Qt::Key_Escape, 0, 20);
+  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_A, Qt::NoModifier, 20);
+  QTestApp::keyDown(QApplication::focusWidget(), Qt::Key_Escape, Qt::NoModifier, 20);
 
   w->setSelectionMode(pqFlatTreeView::ExtendedSelection);
   w->setSelectionBehavior(pqFlatTreeView::SelectItems);
@@ -58,19 +58,19 @@ void FlatTreeViewTests(pqFlatTreeView* w)
 
   int searchDelay = 2 * QApplication::keyboardInputInterval();
   QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_A, Qt::ControlModifier, 20);
-  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_B, 0, 20);
-  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_C, 0, searchDelay);
-  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_C, 0, searchDelay);
-  QTestApp::keyClick(w, Qt::Key_Up, 0, 20);
-  QTestApp::keyClick(w, Qt::Key_Up, 0, 20);
-  QTestApp::keyClick(w, Qt::Key_Up, 0, 20);
+  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_B, Qt::NoModifier, 20);
+  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_C, Qt::NoModifier, searchDelay);
+  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_C, Qt::NoModifier, searchDelay);
+  QTestApp::keyClick(w, Qt::Key_Up, Qt::NoModifier, 20);
+  QTestApp::keyClick(w, Qt::Key_Up, Qt::NoModifier, 20);
+  QTestApp::keyClick(w, Qt::Key_Up, Qt::NoModifier, 20);
   // VERIFY(w->getSelectionModel()->currentIndex() == w->getModel()->index(1, 0));
 
-  QTestApp::keyClick(w, Qt::Key_Left, 0, 20);
-  QTestApp::keyClick(w, Qt::Key_Right, 0, 20);
+  QTestApp::keyClick(w, Qt::Key_Left, Qt::NoModifier, 20);
+  QTestApp::keyClick(w, Qt::Key_Right, Qt::NoModifier, 20);
 
-  QTestApp::mouseDClick(w->viewport(), QPoint(31, 62), Qt::LeftButton, 0, 20);
-  QTestApp::mouseDClick(w->viewport(), QPoint(31, 62), Qt::LeftButton, 0, 20);
+  QTestApp::mouseDClick(w->viewport(), QPoint(31, 62), Qt::LeftButton, Qt::NoModifier, 20);
+  QTestApp::mouseDClick(w->viewport(), QPoint(31, 62), Qt::LeftButton, Qt::NoModifier, 20);
 }
 
 int FlatTreeView(int argc, char* argv[])

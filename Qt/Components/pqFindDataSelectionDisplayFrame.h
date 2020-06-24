@@ -54,7 +54,7 @@ class PQCOMPONENTS_EXPORT pqFindDataSelectionDisplayFrame : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqFindDataSelectionDisplayFrame(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  pqFindDataSelectionDisplayFrame(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
   ~pqFindDataSelectionDisplayFrame() override;
 
   /**
