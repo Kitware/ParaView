@@ -24,8 +24,10 @@
 
 #include <algorithm>
 #include <cassert>
-
+#include <chrono>
 #include <sstream>
+#include <thread>
+
 #if !defined(_WIN32) || defined(__CYGWIN__)
 #include <sys/wait.h>
 #include <unistd.h>
@@ -774,6 +776,9 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
       if (clients.size() > 1)
       {
         client_name << cc;
+        // wait a few seconds before launching the additional clients for
+        // collaboration mode.
+        std::this_thread::sleep_for(std::chrono::seconds(2));
       }
 
       std::string output_to_ignore;
