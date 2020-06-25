@@ -147,7 +147,7 @@ void pqQVTKWidget::resizeEvent(QResizeEvent* evt)
     // will not see updated size until Qt's event processing catches up. This can
     // cause issues with test playback since the RenderWIndow size may not be
     // correct just yet. So we manually update the render window size.
-    const QSize newsize = evt->size() * this->devicePixelRatioF();
+    const QSize newsize = evt->size() * this->effectiveDevicePixelRatio();
     const int inewsize[2] = { newsize.width(), newsize.height() };
     vtkSMPropertyHelper(this->ViewProxy, "ViewSize").Set(inewsize, 2);
     this->ViewProxy->UpdateVTKObjects();
