@@ -103,6 +103,8 @@ public:
   void SetColor(vtkColorTransferFunction* lut);
   void SetScalarOpacity(vtkPiecewiseFunction* pwf);
   void SetScalarOpacityUnitDistance(double val);
+  void SetMapScalars(bool);
+  void SetMultiComponentsMapping(bool);
 
   /**
    * Provides access to the actor used by this representation.
@@ -167,6 +169,9 @@ protected:
   vtkPVGeometryFilter* LODGeometryFilter;
   vtkPolyDataMapper* LODMapper;
   double DataBounds[6];
+
+  bool MapScalars;
+  bool MultiComponentsMapping;
 
   bool UseDataPartitions;
 
