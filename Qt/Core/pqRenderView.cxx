@@ -784,7 +784,7 @@ void pqRenderView::selectPolygonInternal(vtkIntArray* polygon, QList<pqOutputPor
   if (select_points)
   {
     if (!renderModuleP->SelectPolygonPoints(polygon, selectedRepresentations, selectionSources,
-          this->UseMultipleRepresentationSelection))
+          this->UseMultipleRepresentationSelection, selectionModifier, select_blocks))
     {
       END_UNDO_EXCLUDE();
       return;
@@ -798,7 +798,7 @@ void pqRenderView::selectPolygonInternal(vtkIntArray* polygon, QList<pqOutputPor
   else
   {
     if (!renderModuleP->SelectPolygonCells(polygon, selectedRepresentations, selectionSources,
-          this->UseMultipleRepresentationSelection))
+          this->UseMultipleRepresentationSelection, selectionModifier, select_blocks))
     {
       END_UNDO_EXCLUDE();
       return;

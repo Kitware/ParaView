@@ -1098,24 +1098,26 @@ bool vtkSMRenderViewProxy::SelectFrustumInternal(const int region[4],
 
 //----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::SelectPolygonPoints(vtkIntArray* polygonPts,
-  vtkCollection* selectedRepresentations, vtkCollection* selectionSources, bool multiple_selections)
+  vtkCollection* selectedRepresentations, vtkCollection* selectionSources, bool multiple_selections,
+  int modifier, bool selectBlocks)
 {
   return this->SelectPolygonInternal(polygonPts, selectedRepresentations, selectionSources,
-    multiple_selections, vtkSelectionNode::POINT);
+    multiple_selections, vtkSelectionNode::POINT, modifier, selectBlocks);
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::SelectPolygonCells(vtkIntArray* polygonPts,
-  vtkCollection* selectedRepresentations, vtkCollection* selectionSources, bool multiple_selections)
+  vtkCollection* selectedRepresentations, vtkCollection* selectionSources, bool multiple_selections,
+  int modifier, bool selectBlocks)
 {
   return this->SelectPolygonInternal(polygonPts, selectedRepresentations, selectionSources,
-    multiple_selections, vtkSelectionNode::CELL);
+    multiple_selections, vtkSelectionNode::CELL, modifier, selectBlocks);
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::SelectPolygonInternal(vtkIntArray* polygonPts,
   vtkCollection* selectedRepresentations, vtkCollection* selectionSources, bool multiple_selections,
-  int fieldAssociation)
+  int fieldAssociation, int modifier, bool selectBlocks)
 {
   const char* method =
     fieldAssociation == vtkSelectionNode::POINT ? "SelectPolygonPoints" : "SelectPolygonCells";
@@ -1126,7 +1128,7 @@ bool vtkSMRenderViewProxy::SelectPolygonInternal(vtkIntArray* polygonPts,
          << polygonPts->GetNumberOfTuples() * polygonPts->GetNumberOfComponents()
          << vtkClientServerStream::End;
   return this->SelectInternal(
-    stream, selectedRepresentations, selectionSources, multiple_selections);
+    stream, selectedRepresentations, selectionSources, multiple_selections, modifier, selectBlocks);
 }
 
 //----------------------------------------------------------------------------
