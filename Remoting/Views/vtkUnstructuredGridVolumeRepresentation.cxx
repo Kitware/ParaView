@@ -23,6 +23,7 @@
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
+#include "vtkMultiBlockVolumeMapper.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -35,6 +36,7 @@
 #include "vtkRenderer.h"
 #include "vtkResampleToImage.h"
 #include "vtkSmartPointer.h"
+#include "vtkSmartVolumeMapper.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkVolumeProperty.h"
@@ -78,6 +80,9 @@ vtkUnstructuredGridVolumeRepresentation::vtkUnstructuredGridVolumeRepresentation
   this->Actor->SetMapper(this->DefaultMapper);
   this->Actor->SetLODMapper(this->LODMapper);
   vtkMath::UninitializeBounds(this->DataBounds);
+
+  this->MapScalars = true;
+  this->MultiComponentsMapping = false;
   this->UseDataPartitions = false;
 }
 
@@ -341,6 +346,44 @@ void vtkUnstructuredGridVolumeRepresentation::UpdateMapperParameters()
       break;
   }
 
+  if (this->Property)
+  {
+    if (this->MapScalars)
+    {
+      if (this->MultiComponentsMapping)
+      {
+        this->Property->SetIndependentComponents(false);
+      }
+      else
+      {
+        this->Property->SetIndependentComponents(true);
+      }
+    }
+    else
+    {
+      this->Property->SetIndependentComponents(false);
+    }
+
+    // Update the mapper's vector mode
+    vtkColorTransferFunction* ctf = this->Property->GetRGBTransferFunction(0);
+
+    // Logic borrowed from vtkImageVolumeRepresentation::UpdateMapperParameters()
+    int const indep = this->Property->GetIndependentComponents();
+    int const mode = indep ? ctf->GetVectorMode() : vtkScalarsToColors::COMPONENT;
+    int const comp = indep ? ctf->GetVectorComponent() : 0;
+
+    if (auto smartVolumeMapper = vtkSmartVolumeMapper::SafeDownCast(activeMapper))
+    {
+      smartVolumeMapper->SetVectorMode(mode);
+      smartVolumeMapper->SetVectorComponent(comp);
+    }
+    else if (auto mbMapper = vtkMultiBlockVolumeMapper::SafeDownCast(activeMapper))
+    {
+      mbMapper->SetVectorMode(mode);
+      mbMapper->SetVectorComponent(comp);
+    }
+  }
+
   this->Actor->SetMapper(activeMapper);
 }
 
@@ -435,6 +478,18 @@ void vtkUnstructuredGridVolumeRepresentation::SetScalarOpacity(vtkPiecewiseFunct
 void vtkUnstructuredGridVolumeRepresentation::SetScalarOpacityUnitDistance(double val)
 {
   this->Property->SetScalarOpacityUnitDistance(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkUnstructuredGridVolumeRepresentation::SetMapScalars(bool map)
+{
+  this->MapScalars = map;
+}
+
+//----------------------------------------------------------------------------
+void vtkUnstructuredGridVolumeRepresentation::SetMultiComponentsMapping(bool multi)
+{
+  this->MultiComponentsMapping = multi;
 }
 
 //----------------------------------------------------------------------------
