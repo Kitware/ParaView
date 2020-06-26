@@ -117,8 +117,21 @@
           Maximum tree depth of output Hyper Tree Grid.
         </Documentation>
       </IntVectorProperty>
+      <StringVectorProperty clean_command="ClearDataArrays"
+                            command="AddDataArray"
+                            name="PointDataArrays"
+                            label="Point Data Array to process"
+                            number_of_elements_per_command="1"
+                            repeat_command="1">
+        <Documentation>Add a point array by name to be resampled.</Documentation>
+        <ArrayListDomain input_domain_name="input_array" name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
       <StringVectorProperty name="SelectInputScalars"
-                            label="Array"
+                            label="Subdividing Criterion Array"
                             command="SetInputArrayToProcess"
                             number_of_elements="5"
                             element_types="int int int int str"
@@ -132,7 +145,7 @@
           </RequiredProperties>
         </ArrayListDomain>
         <Documentation>
-          Input point data to use for creating the Hyper Tree Grid.
+          Input point data used as a subdividing criterion to build the hypertree grid.
         </Documentation>
       </StringVectorProperty>
       <IntVectorProperty name="UseMax"
@@ -271,7 +284,7 @@
                  name="Entropy" />
         </ProxyListDomain>
         <Documentation>This property sets an extra array measurement method only for visualization
-          purposes.</Documentation>
+          purposes. This measurement is applied to the list of inputs.</Documentation>
       </ProxyProperty>
       <!-- End ResampleToHyperTreeGrid -->
     </SourceProxy>

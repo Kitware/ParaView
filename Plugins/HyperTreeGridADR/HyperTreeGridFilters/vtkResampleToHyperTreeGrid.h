@@ -54,6 +54,7 @@ class vtkBitArray;
 class vtkCell;
 class vtkCell3D;
 class vtkDataArray;
+class vtkDataArraySelection;
 class vtkDataSet;
 class vtkDoubleArray;
 class vtkHyperTreeGrid;
@@ -71,7 +72,6 @@ public:
   static vtkResampleToHyperTreeGrid* New();
   vtkTypeMacro(vtkResampleToHyperTreeGrid, vtkAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  vtkMTimeType GetMTime() override;
 
   //@{
   /**
@@ -228,6 +228,9 @@ public:
   vtkBooleanMacro(Extrapolate, bool);
   //@}
 
+  void AddDataArray(const char* name);
+  void ClearDataArrays();
+
 protected:
   vtkResampleToHyperTreeGrid();
   ~vtkResampleToHyperTreeGrid() override;
@@ -283,7 +286,7 @@ protected:
     /**
      * Accumulators used for measuring quantities on subtrees
      */
-    std::vector<vtkAbstractAccumulator*> Accumulators;
+    std::vector<vtkSmartPointer<vtkAbstractArrayMeasurement> > ArrayMeasurements;
 
     vtkIdType NumberOfLeavesInSubtree;
     vtkIdType NumberOfPointsInSubtree;
@@ -301,6 +304,16 @@ protected:
      */
     bool CanSubdivide;
   };
+
+  /**
+   * Pointers used to determine what resampling metric is used for the subdivision criterion.
+   */
+  vtkAbstractArrayMeasurement* ArrayMeasurement;
+
+  /**
+   * Pointers used to determine what resampling metric is used for the list of input scalar fields.
+   */
+  vtkAbstractArrayMeasurement* ArrayMeasurementDisplay;
 
   /**
    * Only needed internally. This draws a multi resolution grid that should have this->MaxDepth+1
@@ -334,16 +347,13 @@ protected:
     PriorityQueueElement()
       : Key(0)
       , Id(0)
-      , Mean(0.0)
-      , DisplayMean(0.0)
     {
     }
-    PriorityQueueElement(vtkIdType key, vtkIdType id, double mean, double displayMean,
+    PriorityQueueElement(vtkIdType key, vtkIdType id, const std::vector<double>&& means,
       const std::vector<double>&& invalidNeighborIds)
       : Key(key)
       , Id(id)
-      , Mean(mean)
-      , DisplayMean(displayMean)
+      , Means(means)
       , InvalidNeighborIds(std::move(invalidNeighborIds))
     {
     }
@@ -360,14 +370,9 @@ protected:
     vtkIdType Id;
 
     /**
-     * Accumulated mean (not normalized until the end of the algorithm)
+     * Accumulated means for each scalar field (not normalized until the end of the algorithm)
      */
-    double Mean;
-
-    /**
-     * Accumulated display mean (not normalized until the end of the algorithm)
-     */
-    double DisplayMean;
+    std::vector<double> Means;
 
     /**
      * Invalid neighbors ids, i.e. neighbors not having data. They will be updated through the
@@ -436,8 +441,7 @@ protected:
    * resolution grids
    * matching the subdivision scheme of the output hyper tree grid.
    */
-  void CreateGridOfMultiResolutionGrids(
-    vtkDataSet* dataSet, vtkDataArray* data, int fieldAssociation);
+  void CreateGridOfMultiResolutionGrids(vtkDataSet* dataSet, int fieldAssociation);
 
   //@{
   /**
@@ -463,7 +467,7 @@ protected:
   /**
    * Output scalar/vector field
    */
-  vtkDoubleArray *ScalarField, *DisplayScalarField;
+  std::vector<vtkDoubleArray*> ScalarFields;
   vtkLongArray *NumberOfLeavesInSubtreeField, *NumberOfPointsInSubtreeField;
   //@}
 
@@ -483,14 +487,11 @@ protected:
   std::vector<vtkIdType> ResolutionPerTree;
   std::vector<double> Diagonal;
 
-  //@{
   /**
    * Dummy pointer for creating at run-time the proper type of ArrayMeasurement or
    * ArrayMeasurementDisplay.
    */
-  vtkAbstractArrayMeasurement* ArrayMeasurement;
-  vtkAbstractArrayMeasurement* ArrayMeasurementDisplay;
-  //@}
+  std::vector<vtkSmartPointer<vtkAbstractArrayMeasurement> > ArrayMeasurements;
 
   /**
    * Converts indexing at given resolution to a tuple (i,j,k) to navigate in a MultiResolutionGrid.
@@ -527,18 +528,6 @@ protected:
   typedef std::vector<MultiResGridType> GridOfMultiResGridsType;
   GridOfMultiResGridsType GridOfMultiResolutionGrids;
   //@}
-
-  /**
-   * Maps from the vector of vtkAbstractAccumulator* of GridElement to their position
-   * in the accumulator needed by either this->ArrayMeasurementDisplay.
-   */
-  std::vector<std::size_t> ArrayMeasurementDisplayAccumulatorMap;
-
-  /**
-   * Accumulators needed to compute the measures. They are used as dummy pointers
-   * to create the correct instances when creating the grid of multi-resolution grids.
-   */
-  std::vector<vtkAbstractAccumulator*> Accumulators;
 
   //@{
   /**
@@ -594,6 +583,17 @@ protected:
    * Setting it on will make the filter slightly slower.
    */
   bool NoEmptyCells;
+
+  /**
+   * Collection of input point data arrays to resample, deducted from
+   * InputDataArrayNames.
+   */
+  std::vector<vtkDataArray*> InputPointDataArrays;
+
+  /**
+   * Collection of input scalar field names to resample.
+   */
+  std::vector<std::string> InputDataArrayNames;
 
   /**
    *  Multi-controller pointer for multi-process handling.
