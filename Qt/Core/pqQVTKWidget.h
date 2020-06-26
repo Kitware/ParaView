@@ -60,7 +60,7 @@ class PQCORE_EXPORT pqQVTKWidget : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqQVTKWidget(QWidget* parent = NULL, Qt::WindowFlags f = 0);
+  pqQVTKWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
   pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f, bool isStereo);
   ~pqQVTKWidget() override;
 

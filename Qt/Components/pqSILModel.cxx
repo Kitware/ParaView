@@ -446,7 +446,7 @@ Qt::ItemFlags pqSILModel::flags(const QModelIndex& idx) const
 {
   if (!INDEX_IS_VALID(idx))
   {
-    return 0;
+    return Qt::ItemFlags{};
   }
 
   vtkIdType vertexId = 0;

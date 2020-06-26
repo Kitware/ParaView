@@ -50,7 +50,8 @@ class PQWIDGETS_EXPORT pqHelpWindow : public QMainWindow
   typedef QMainWindow Superclass;
 
 public:
-  pqHelpWindow(QHelpEngine* engine, QWidget* parent = 0, Qt::WindowFlags flags = 0);
+  pqHelpWindow(
+    QHelpEngine* engine, QWidget* parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags{});
   ~pqHelpWindow() override;
 
 public Q_SLOTS:

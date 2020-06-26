@@ -400,7 +400,7 @@ void pqRemoteCommandDialog::AddCommandTemplate()
     toks += tokens[i];
   }
 
-  pqRemoteCommandTemplateDialog dialog(this, 0);
+  pqRemoteCommandTemplateDialog dialog(this, Qt::WindowFlags{});
   dialog.SetCommandName(QString("new command"));
   dialog.SetCommandTemplate(toks);
 
@@ -432,7 +432,7 @@ void pqRemoteCommandDialog::EditCommandTemplate()
   QString commandName = this->Ui->commandTemplates->itemText(itemId);
   QString commandTemplate = this->Ui->commandTemplates->itemData(itemId).toString();
 
-  pqRemoteCommandTemplateDialog dialog(this, 0);
+  pqRemoteCommandTemplateDialog dialog(this, Qt::WindowFlags{});
   dialog.SetCommandName(commandName);
   dialog.SetCommandTemplate(commandTemplate);
 

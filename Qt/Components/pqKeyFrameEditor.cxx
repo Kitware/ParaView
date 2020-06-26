@@ -74,13 +74,13 @@ pqKeyFrameEditorDialog::pqKeyFrameEditorDialog(QWidget* p, QWidget* child)
   this->setWindowTitle(tr("Key Frame Interpolation"));
   this->setModal(true);
   QVBoxLayout* l = new QVBoxLayout(this);
-  l->addWidget(this->Child, 0, 0);
+  l->addWidget(this->Child, 0);
   QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok);
   connect(buttons, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
 
   l->addStretch();
-  l->addWidget(buttons, 1, 0);
+  l->addWidget(buttons);
   this->Child->show();
 }
 

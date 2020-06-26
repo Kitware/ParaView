@@ -44,7 +44,7 @@ class PQCOMPONENTS_EXPORT pqSelectionLinkDialog : public QDialog
   typedef QDialog Superclass;
 
 public:
-  pqSelectionLinkDialog(QWidget* parent, Qt::WindowFlags f = 0);
+  pqSelectionLinkDialog(QWidget* parent, Qt::WindowFlags f = Qt::WindowFlags{});
   ~pqSelectionLinkDialog() override;
 
   /**

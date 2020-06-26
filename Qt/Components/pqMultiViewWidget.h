@@ -62,7 +62,7 @@ class PQCOMPONENTS_EXPORT pqMultiViewWidget : public QWidget
       NOTIFY decorationsVisibilityChanged);
 
 public:
-  pqMultiViewWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  pqMultiViewWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
   ~pqMultiViewWidget() override;
 
   /**

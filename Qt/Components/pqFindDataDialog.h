@@ -49,7 +49,7 @@ class PQCOMPONENTS_EXPORT pqFindDataDialog : public QDialog
   typedef QDialog Superclass;
 
 public:
-  pqFindDataDialog(QWidget* parent = 0, Qt::WindowFlags flags = 0);
+  pqFindDataDialog(QWidget* parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags{});
   ~pqFindDataDialog() override;
 
 private Q_SLOTS:

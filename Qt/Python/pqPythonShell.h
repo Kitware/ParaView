@@ -64,7 +64,7 @@ class PQPYTHON_EXPORT pqPythonShell : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqPythonShell(QWidget* parent = 0, Qt::WindowFlags flags = 0);
+  pqPythonShell(QWidget* parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags{});
   ~pqPythonShell() override;
 
   /**

@@ -44,7 +44,7 @@ class PQCOMPONENTS_EXPORT pqLockViewSizeCustomDialog : public QDialog
   typedef QDialog Superclass;
 
 public:
-  pqLockViewSizeCustomDialog(QWidget* parent, Qt::WindowFlags f = 0);
+  pqLockViewSizeCustomDialog(QWidget* parent, Qt::WindowFlags f = Qt::WindowFlags{});
   ~pqLockViewSizeCustomDialog() override;
 
   /**

@@ -56,7 +56,7 @@ class PQCOMPONENTS_EXPORT pqDialog : public QDialog
   typedef QDialog Superclass;
 
 public:
-  pqDialog(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  pqDialog(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
   ~pqDialog() override;
 
   /**

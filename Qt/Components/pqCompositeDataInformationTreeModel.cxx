@@ -755,7 +755,7 @@ QList<unsigned int> pqCompositeDataInformationTreeModel::checkedNodes() const
   QSet<unsigned int> indices;
   pqInternals& internals = (*this->Internals);
   internals.rootNode().checkedNodes(indices, false);
-  return indices.toList();
+  return indices.values();
 }
 
 //-----------------------------------------------------------------------------
@@ -764,7 +764,7 @@ QList<unsigned int> pqCompositeDataInformationTreeModel::checkedLeaves() const
   QSet<unsigned int> indices;
   pqInternals& internals = (*this->Internals);
   internals.rootNode().checkedNodes(indices, true);
-  return indices.toList();
+  return indices.values();
 }
 
 //-----------------------------------------------------------------------------

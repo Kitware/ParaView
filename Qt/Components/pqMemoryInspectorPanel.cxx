@@ -1506,7 +1506,8 @@ void pqMemoryInspectorPanel::ExecuteRemoteCommand()
         }
 
         // select and configure a command
-        pqRemoteCommandDialog dialog(this, 0, this->ClientSystemType, serverSystemType);
+        pqRemoteCommandDialog dialog(
+          this, Qt::WindowFlags{}, this->ClientSystemType, serverSystemType);
 
         dialog.SetActiveHost(host);
         dialog.SetActivePid(pid);

@@ -50,7 +50,7 @@ class PQCOMPONENTS_EXPORT pqFindDataCurrentSelectionFrame : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqFindDataCurrentSelectionFrame(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  pqFindDataCurrentSelectionFrame(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
   ~pqFindDataCurrentSelectionFrame() override;
 
   /**

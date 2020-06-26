@@ -310,9 +310,8 @@ QSize pqTreeWidget::sizeHint() const
     pix = qMax(pix, this->sizeHintForRow(0) * num);
   }
 
-  int margin[4];
-  this->getContentsMargins(margin, margin + 1, margin + 2, margin + 3);
-  int h = pix + margin[1] + margin[3] + this->header()->frameSize().height();
+  QMargins margin = this->contentsMargins();
+  int h = pix + margin.top() + margin.bottom() + this->header()->frameSize().height();
   return QSize(156, h);
 }
 

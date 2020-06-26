@@ -50,9 +50,10 @@ class PQCOMPONENTS_EXPORT pqProxyWidgetDialog : public QDialog
   typedef QDialog Superclass;
 
 public:
-  pqProxyWidgetDialog(vtkSMProxy* proxy, QWidget* parent = 0, Qt::WindowFlags f = 0);
   pqProxyWidgetDialog(
-    vtkSMProxy* proxy, const QStringList& properties, QWidget* parent = 0, Qt::WindowFlags f = 0);
+    vtkSMProxy* proxy, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
+  pqProxyWidgetDialog(vtkSMProxy* proxy, const QStringList& properties, QWidget* parent = nullptr,
+    Qt::WindowFlags f = Qt::WindowFlags{});
   ~pqProxyWidgetDialog() override;
 
   /**
