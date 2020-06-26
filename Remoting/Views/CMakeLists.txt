@@ -180,6 +180,7 @@ set(classes
   vtkTilesHelper
   vtkUnstructuredGridVolumeRepresentation
   vtkViewLayout
+  vtkVolumeRepresentation
   vtkXYChartRepresentation)
 
 set(private_headers

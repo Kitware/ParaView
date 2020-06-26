@@ -35,12 +35,15 @@
 #ifndef vtkImageVolumeRepresentation_h
 #define vtkImageVolumeRepresentation_h
 
-#include "vtkNew.h" // needed for vtkNew.
-#include "vtkPVDataRepresentation.h"
+#include "vtkNew.h"                 // needed for vtkNew.
 #include "vtkRemotingViewsModule.h" //needed for exports
 #include "vtkSmartPointer.h"        // needed for vtkSmartPointer
+#include "vtkVolumeRepresentation.h"
+
+#include <string> // for ivar
 
 class vtkColorTransferFunction;
+class vtkDataSet;
 class vtkExtentTranslator;
 class vtkFixedPointVolumeRayCastMapper;
 class vtkImageData;
@@ -52,11 +55,11 @@ class vtkPVLODVolume;
 class vtkVolumeMapper;
 class vtkVolumeProperty;
 
-class VTKREMOTINGVIEWS_EXPORT vtkImageVolumeRepresentation : public vtkPVDataRepresentation
+class VTKREMOTINGVIEWS_EXPORT vtkImageVolumeRepresentation : public vtkVolumeRepresentation
 {
 public:
   static vtkImageVolumeRepresentation* New();
-  vtkTypeMacro(vtkImageVolumeRepresentation, vtkPVDataRepresentation);
+  vtkTypeMacro(vtkImageVolumeRepresentation, vtkVolumeRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -68,33 +71,13 @@ public:
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) override;
 
-  /**
-   * Get/Set the visibility for this representation. When the visibility of
-   * representation of false, all view passes are ignored.
-   */
-  void SetVisibility(bool val) override;
-
-  //***************************************************************************
-  // Forwarded to Actor.
-  void SetOrientation(double, double, double);
-  void SetOrigin(double, double, double);
-  void SetPickable(int val);
-  void SetPosition(double, double, double);
-  void SetScale(double, double, double);
-
   //***************************************************************************
   // Forwarded to vtkVolumeProperty.
-  void SetInterpolationType(int val);
-  void SetColor(vtkColorTransferFunction* lut);
-  void SetScalarOpacity(vtkPiecewiseFunction* pwf);
-  void SetScalarOpacityUnitDistance(double val);
   void SetAmbient(double);
   void SetDiffuse(double);
   void SetSpecular(double);
   void SetSpecularPower(double);
   void SetShade(bool);
-  void SetMapScalars(bool);
-  void SetMultiComponentsMapping(bool);
   void SetSliceFunction(vtkImplicitFunction* slice);
 
   //@{
@@ -126,11 +109,6 @@ public:
   vtkSetVector3Macro(CroppingScale, double);
   vtkGetVector3Macro(CroppingScale, double);
   //@}
-
-  /**
-   * Provides access to the actor used by this representation.
-   */
-  vtkPVLODVolume* GetActor() { return this->Actor; }
 
 protected:
   vtkImageVolumeRepresentation();
@@ -168,20 +146,11 @@ protected:
   virtual vtkPVLODVolume* GetRenderedProp() { return this->Actor; };
 
   vtkSmartPointer<vtkDataObject> Cache;
-  vtkVolumeMapper* VolumeMapper;
-  vtkVolumeProperty* Property;
-  vtkPVLODVolume* Actor;
+  vtkSmartPointer<vtkVolumeMapper> VolumeMapper;
 
-  vtkOutlineSource* OutlineSource;
-  vtkPolyDataMapper* OutlineMapper;
+  vtkNew<vtkPolyDataMapper> OutlineMapper;
 
-  unsigned long DataSize;
-  double DataBounds[6];
-
-  bool MapScalars;
-  bool MultiComponentsMapping;
-
-  int WholeExtent[6];
+  int WholeExtent[6] = { 0, -1, 0, -1, 0, -1 };
   double CroppingOrigin[3] = { 0, 0, 0 };
   double CroppingScale[3] = { 1, 1, 1 };
 
