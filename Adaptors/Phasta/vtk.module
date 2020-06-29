@@ -1,14 +1,14 @@
 NAME
-  ParaView::AdaptorsPagosa
+  ParaView::AdaptorsPhasta
 LIBRARY_NAME
-  vtkPVAdaptorsPagosa
+  vtkPVAdaptorsPhasta
 GROUPS
   PARAVIEW_CORE
 CONDITION
-  PARAVIEW_USE_FORTRAN AND PARAVIEW_USE_PYTHON
+  PARAVIEW_USE_FORTRAN
 DEPENDS
   ParaView::Catalyst
+  VTK::CommonCore
   VTK::CommonDataModel
 OPTIONAL_DEPENDS
-  ParaView::PythonCatalyst
   VTK::ParallelMPI

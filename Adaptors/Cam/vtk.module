@@ -1,0 +1,13 @@
+NAME
+  ParaView::AdaptorsCam
+LIBRARY_NAME
+  vtkPVAdaptorsCam
+GROUPS
+  PARAVIEW_CORE
+CONDITION
+  PARAVIEW_USE_FORTRAN
+DEPENDS
+  ParaView::Catalyst
+  ParaView::PythonCatalyst
+  VTK::CommonDataModel
+  VTK::CommonCore

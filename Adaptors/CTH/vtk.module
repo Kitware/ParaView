@@ -1,0 +1,15 @@
+NAME
+  ParaView::AdaptorsCTH
+LIBRARY_NAME
+  vtkPVAdaptorsCTH
+GROUPS
+  PARAVIEW_CORE
+CONDITION
+  PARAVIEW_USE_MPI AND PARAVIEW_USE_PYTHON
+DEPENDS
+  ParaView::Catalyst
+  ParaView::PythonCatalyst
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::ParallelMPI
