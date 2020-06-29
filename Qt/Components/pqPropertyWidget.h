@@ -96,6 +96,18 @@ public:
   virtual char* panelVisibility() const;
   virtual void setPanelVisibility(const char* vis);
 
+  /**
+  * Determines if the PropertyWidget must be constructed using a single row.
+  *
+  * Originally intended for PropertyWidgets which are a group of other
+  * Propertywidgets, such as pqCheckableProperty. This mandates that when the
+  * widget is rendered, its label to be placed in the same row as the
+  * widget group.
+  *
+  * @see pqProxyWidgetItem::newGroupItem
+  */
+  virtual bool isSingleRowItem() const;
+
   bool showLabel() const;
 
   /**

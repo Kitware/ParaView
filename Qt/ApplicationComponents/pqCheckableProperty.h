@@ -63,8 +63,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *             <BooleanDomain name="bool" />
  *           </IntVectorProperty>
  *
- *           <PropertyGroup panel_widget="CheckableProperty">
- *             <Property name="PropertyA" function="PropertyName" />
+ *           <PropertyGroup label="Property A" panel_widget="CheckableProperty">
+ *             <Property name="PropertyA" function="Property" />
  *             <Property name="EnablePropertyA" function="PropertyCheckBox" />
  *           </PropertyGroup>
  *         </SourceProxy>
@@ -88,6 +88,7 @@ public:
   void updateWidget(bool showing_advanced_properties) override;
   void setPanelVisibility(const char* vis) override;
   void setView(pqView*) override;
+  bool isSingleRowItem() const override;
 
   bool enableCheckbox() const;
 

@@ -234,6 +234,13 @@ public:
   static pqProxyWidgetItem* newGroupItem(
     pqPropertyWidget* widget, const QString& label, QObject* parentObj)
   {
+    if (widget->isSingleRowItem())
+    {
+      pqProxyWidgetItem* item = newItem(widget, label, parentObj);
+      item->Group = true;
+      return item;
+    }
+
     pqProxyWidgetItem* item = newItem(widget, QString(), parentObj);
     item->Group = true;
     if (!label.isEmpty() && widget->showLabel())

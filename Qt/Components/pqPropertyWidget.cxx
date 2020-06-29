@@ -234,3 +234,8 @@ int pqPropertyWidget::hintsWidgetHeightNumberOfRows(vtkPVXMLElement* hints, int 
   }
   return defaultValue;
 }
+
+bool pqPropertyWidget::isSingleRowItem() const
+{
+  return false;
+}

@@ -56,11 +56,11 @@ pqCheckableProperty::pqCheckableProperty(
   : Superclass(smproxy, parentObject)
   , internal(new Internal)
 {
-  vtkSMProperty* PropertyName = smgroup->GetProperty("PropertyName");
-  if (!PropertyName)
+  this->setShowLabel(true);
+  vtkSMProperty* propertyName = smgroup->GetProperty("Property");
+  if (!propertyName)
   {
-    vtkVLogF(
-      PARAVIEW_LOG_PLUGIN_VERBOSITY(), "pqCheckableProperty: missing `PropertyName` parameters");
+    vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "pqCheckableProperty: missing `Property` parameters");
     return;
   }
 
@@ -77,16 +77,15 @@ pqCheckableProperty::pqCheckableProperty(
   auto* layoutLocal = new QHBoxLayout;
   layoutLocal->setMargin(pqPropertiesPanel::suggestedMargin());
   layoutLocal->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
-  layoutLocal->addWidget(new QLabel(PropertyName->GetXMLName(), this));
   this->setLayout(layoutLocal);
 
   // Main Property widget --------------------------------------
-  auto widget = pqProxyWidget::createWidgetForProperty(PropertyName, smproxy, this);
+  auto widget = pqProxyWidget::createWidgetForProperty(propertyName, smproxy, this);
 
   if (!widget)
   {
     vtkVLogF(
-      PARAVIEW_LOG_PLUGIN_VERBOSITY(), "pqCheckableProperty: `PropertyName` with wrong parameters");
+      PARAVIEW_LOG_PLUGIN_VERBOSITY(), "pqCheckableProperty: `Property` with wrong parameters");
     return;
   }
 
@@ -95,7 +94,7 @@ pqCheckableProperty::pqCheckableProperty(
   // Trailing checkbox -----------------------------------------
   auto* checkBox = new QCheckBox(this);
   checkBox->setObjectName("CheckBox");
-  checkBox->setToolTip(PropertyCheckBox->GetXMLName());
+  checkBox->setToolTip(PropertyCheckBox->GetXMLLabel());
   layoutLocal->addWidget(checkBox);
 
   this->addPropertyLink(checkBox, "checked", SIGNAL(toggled(bool)), PropertyCheckBox);
@@ -124,7 +123,9 @@ pqCheckableProperty::~pqCheckableProperty()
 bool pqCheckableProperty::enableCheckbox() const
 {
   if (this->internal->propertyWidget)
+  {
     return this->internal->propertyWidget->isEnabled();
+  }
 
   return false;
 }
@@ -133,14 +134,18 @@ bool pqCheckableProperty::enableCheckbox() const
 void pqCheckableProperty::setEnableCheckbox(bool enableCheckbox)
 {
   if (this->internal->propertyWidget)
+  {
     this->internal->propertyWidget->setEnabled(enableCheckbox);
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqCheckableProperty::apply()
 {
   if (this->internal->propertyWidget)
+  {
     this->internal->propertyWidget->apply();
+  }
 
   this->Superclass::apply();
 }
@@ -149,7 +154,9 @@ void pqCheckableProperty::apply()
 void pqCheckableProperty::reset()
 {
   if (this->internal->propertyWidget)
+  {
     this->internal->propertyWidget->reset();
+  }
 
   this->Superclass::reset();
 }
@@ -158,7 +165,9 @@ void pqCheckableProperty::reset()
 void pqCheckableProperty::select()
 {
   if (this->internal->propertyWidget)
+  {
     this->internal->propertyWidget->select();
+  }
 
   this->Superclass::select();
 }
@@ -167,7 +176,9 @@ void pqCheckableProperty::select()
 void pqCheckableProperty::deselect()
 {
   if (this->internal->propertyWidget)
+  {
     this->internal->propertyWidget->deselect();
+  }
 
   this->Superclass::deselect();
 }
@@ -176,7 +187,9 @@ void pqCheckableProperty::deselect()
 void pqCheckableProperty::updateWidget(bool showing_advanced_properties)
 {
   if (this->internal->propertyWidget)
+  {
     this->internal->propertyWidget->updateWidget(showing_advanced_properties);
+  }
 
   this->Superclass::updateWidget(showing_advanced_properties);
 }
@@ -185,7 +198,9 @@ void pqCheckableProperty::updateWidget(bool showing_advanced_properties)
 void pqCheckableProperty::setPanelVisibility(const char* vis)
 {
   if (this->internal->propertyWidget)
+  {
     this->internal->propertyWidget->setPanelVisibility(vis);
+  }
 
   this->Superclass::setPanelVisibility(vis);
 }
@@ -194,7 +209,15 @@ void pqCheckableProperty::setPanelVisibility(const char* vis)
 void pqCheckableProperty::setView(pqView* aview)
 {
   if (this->internal->propertyWidget)
+  {
     this->internal->propertyWidget->setView(aview);
+  }
 
   this->Superclass::setView(aview);
+}
+
+//-----------------------------------------------------------------------------
+bool pqCheckableProperty::isSingleRowItem() const
+{
+  return true;
 }
