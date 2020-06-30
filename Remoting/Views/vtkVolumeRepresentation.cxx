@@ -25,6 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkVolumeRepresentation::vtkVolumeRepresentation()
+  : Actor(vtkSmartPointer<vtkPVLODVolume>::New())
 {
   this->Actor->SetProperty(this->Property);
 

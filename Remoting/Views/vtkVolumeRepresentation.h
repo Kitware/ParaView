@@ -24,7 +24,9 @@
 #include "vtkPVDataRepresentation.h"
 
 #include "vtkNew.h"
+#include "vtkPVLODVolume.h"
 #include "vtkRemotingViewsModule.h" //needed for exports
+#include "vtkSmartPointer.h"        //needed for vtkSmartPointer
 
 class vtkColorTransferFunction;
 class vtkDataSet;
@@ -78,7 +80,7 @@ protected:
   ~vtkVolumeRepresentation() override;
 
   vtkNew<vtkVolumeProperty> Property;
-  vtkNew<vtkPVLODVolume> Actor;
+  vtkSmartPointer<vtkPVLODVolume> Actor;
   vtkNew<vtkOutlineSource> OutlineSource;
 
   unsigned long DataSize = 0;
