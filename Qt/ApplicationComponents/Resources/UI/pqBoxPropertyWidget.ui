@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>230</width>
-    <height>329</height>
+    <width>244</width>
+    <height>441</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,6 +29,16 @@
    <property name="bottomMargin">
     <number>0</number>
    </property>
+   <item>
+    <widget class="QCheckBox" name="enableInteractive">
+     <property name="toolTip">
+      <string>Translate the object using X,Y,Z and mouse movements</string>
+     </property>
+     <property name="text">
+      <string>Interactive</string>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="QCheckBox" name="show3DWidget">
      <property name="toolTip">
