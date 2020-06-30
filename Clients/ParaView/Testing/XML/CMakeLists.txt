@@ -404,6 +404,10 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectPointsTrace.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SeparatedColorMapA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SeparatedColorMapB.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SeparateOpacityArray_X.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SeparateOpacityArray_Y.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SeparateOpacityArray_Z.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SeparateOpacityArray_Magnitude.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SeriesPreset.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SeriesPresetRegexpNoRegexp.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SeriesPresetRegexpYD.png}"
@@ -603,6 +607,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   SaveExodus.xml
   SaveLargeScreenshot.xml
   SelectionLinkParallelCoordinatesView.xml
+  SeparateOpacityArray.xml
   Slice.xml
   SteeringDataGenerator.xml
   TestIsoVolume.xml
@@ -615,6 +620,8 @@ SET (TESTS_WITH_INLINE_COMPARES
   XYHistogram.xml
 )
 
+# Image data delivery to render server not supported.
+set(SeparateOpacityArray_DISABLE_CRS TRUE)
 
 if(NOT APPLE)
   # Workaround to avoid testing failures on high-res Retina displays on Macs
