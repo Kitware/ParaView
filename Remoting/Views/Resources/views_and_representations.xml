@@ -4035,6 +4035,9 @@
             <Property name="Diffuse" panel_visibility="advanced"/>
             <Property name="Roughness" panel_visibility="advanced"/>
             <Property name="Metallic" panel_visibility="advanced"/>
+            <Property name="EdgeTint"
+                      panel_widget="color_selector"
+                      panel_visibility="advanced"/>
             <Property name="SelectTCoordArray" panel_visibility="advanced"/>
             <Property name="SelectNormalArray" panel_visibility="advanced"/>
             <Property name="SelectTangentArray" panel_visibility="advanced"/>
@@ -11530,6 +11533,23 @@
         </Documentation>
         <DoubleRangeDomain max="1"
                            min="0"
+                           name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Interpolation"
+                                   value="3" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetEdgeTint"
+                            default_values="1.0 1.0 1.0"
+                            name="EdgeTint"
+                            number_of_elements="3">
+        <Documentation>
+          For metals only. Set the tint at grazing angles.
+        </Documentation>
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
                            name="range" />
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
