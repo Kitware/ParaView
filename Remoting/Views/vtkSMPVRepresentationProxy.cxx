@@ -362,7 +362,40 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
       double rangeColor[2];
       double rangeOpacity[2];
 
-      if (this->GetVolumeIndependentRanges())
+      bool useOpacityArray = false;
+      if (auto uoaProperty = this->GetProperty("UseSeparateOpacityArray"))
+      {
+        useOpacityArray = vtkSMPropertyHelper(uoaProperty).GetAsInt() == 1;
+      }
+
+      if (useOpacityArray)
+      {
+        vtkSMPropertyHelper inputHelper(this->GetProperty("Input"));
+        vtkSMSourceProxy* inputProxy = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
+        int port = inputHelper.GetOutputPort();
+        if (!inputProxy)
+        {
+          // no input.
+          vtkWarningMacro("No input present. Cannot determine opacity data range.");
+          return false;
+        }
+
+        vtkPVDataInformation* dataInfo = inputProxy->GetDataInformation(port);
+        vtkSMPropertyHelper opacityArrayNameHelper(this, "OpacityArrayName");
+        int opacityArrayFieldAssociation = opacityArrayNameHelper.GetAsInt(3);
+        const char* opacityArrayName = opacityArrayNameHelper.GetAsString(4);
+        int opacityArrayComponent = vtkSMPropertyHelper(this, "OpacityComponent").GetAsInt();
+
+        vtkPVArrayInformation* opacityArrayInfo =
+          dataInfo->GetArrayInformation(opacityArrayName, opacityArrayFieldAssociation);
+        if (opacityArrayComponent >= opacityArrayInfo->GetNumberOfComponents())
+        {
+          opacityArrayComponent = -1;
+        }
+        info->GetComponentFiniteRange(component, rangeColor);
+        opacityArrayInfo->GetComponentFiniteRange(opacityArrayComponent, rangeOpacity);
+      }
+      else if (this->GetVolumeIndependentRanges())
       {
         info->GetComponentFiniteRange(0, rangeColor);
         info->GetComponentFiniteRange(1, rangeOpacity);
@@ -1011,9 +1044,11 @@ bool vtkSMPVRepresentationProxy::GetVolumeIndependentRanges()
     return false;
   }
 
-  // MapScalars and MultiComponentsMapping are checked
+  // MapScalars and (MultiComponentsMapping or UseSeparateOpacityArray) are checked
   vtkSMProperty* msProperty = this->GetProperty("MapScalars");
   vtkSMProperty* mcmProperty = this->GetProperty("MultiComponentsMapping");
+  vtkSMProperty* uoaProperty = this->GetProperty("UseSeparateOpacityArray");
   return (vtkSMPropertyHelper(msProperty).GetAsInt() != 0 &&
-    vtkSMPropertyHelper(mcmProperty).GetAsInt() != 0);
+    (vtkSMPropertyHelper(mcmProperty).GetAsInt() != 0 ||
+            vtkSMPropertyHelper(uoaProperty).GetAsInt() != 0));
 }

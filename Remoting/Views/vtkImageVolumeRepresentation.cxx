@@ -19,6 +19,7 @@
 #include "vtkColorTransferFunction.h"
 #include "vtkCommand.h"
 #include "vtkContourValues.h"
+#include "vtkDataSet.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -33,6 +34,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRenderer.h"
+#include "vtkSMPTools.h"
 #include "vtkSmartPointer.h"
 #include "vtkSmartVolumeMapper.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -108,36 +110,16 @@ void vtkGetNonGhostExtent(int* resultExtent, vtkImageData* dataSet)
 vtkStandardNewMacro(vtkImageVolumeRepresentation);
 //----------------------------------------------------------------------------
 vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
+  : Superclass()
 {
-  this->VolumeMapper = vtkMultiBlockVolumeMapper::New();
-  this->Property = vtkVolumeProperty::New();
-
-  this->Actor = vtkPVLODVolume::New();
-  this->Actor->SetProperty(this->Property);
-
-  this->OutlineSource = vtkOutlineSource::New();
-  this->OutlineMapper = vtkPolyDataMapper::New();
+  this->VolumeMapper.TakeReference(vtkMultiBlockVolumeMapper::New());
 
   this->Actor->SetLODMapper(this->OutlineMapper);
-
-  vtkMath::UninitializeBounds(this->DataBounds);
-  this->DataSize = 0;
-
-  this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
-  this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
-
-  this->MapScalars = true;
-  this->MultiComponentsMapping = false;
 }
 
 //----------------------------------------------------------------------------
 vtkImageVolumeRepresentation::~vtkImageVolumeRepresentation()
 {
-  this->VolumeMapper->Delete();
-  this->Property->Delete();
-  this->Actor->Delete();
-  this->OutlineSource->Delete();
-  this->OutlineMapper->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -213,11 +195,21 @@ int vtkImageVolumeRepresentation::RequestData(
       {
         cache = vtkSmartPointer<vtkUniformGrid>::New();
         cache->ShallowCopy(inputUG);
+
+        if (this->UseSeparateOpacityArray)
+        {
+          this->AppendOpacityComponent(cache);
+        }
       }
       else
       {
         cache = vtkSmartPointer<vtkImageData>::New();
         cache->ShallowCopy(inputID);
+
+        if (this->UseSeparateOpacityArray)
+        {
+          this->AppendOpacityComponent(cache);
+        }
       }
       if (inputID->HasAnyGhostCells())
       {
@@ -246,6 +238,11 @@ int vtkImageVolumeRepresentation::RequestData(
       vtkNew<vtkRectilinearGrid> cache;
       cache->ShallowCopy(inputRD);
 
+      if (this->UseSeparateOpacityArray)
+      {
+        this->AppendOpacityComponent(cache);
+      }
+
       this->Actor->SetEnableLOD(0);
       this->VolumeMapper->SetInputData(cache);
 
@@ -270,6 +267,10 @@ int vtkImageVolumeRepresentation::RequestData(
         for (unsigned int cc = 0; cc < inputPD->GetNumberOfPartitions(); ++cc)
         {
           auto partition = inputPD->GetPartition(cc);
+          if (this->UseSeparateOpacityArray)
+          {
+            this->AppendOpacityComponent(partition);
+          }
           auto partitionID = vtkImageData::SafeDownCast(partition);
           auto partitionRG = vtkRectilinearGrid::SafeDownCast(partition);
           if (partitionID)
@@ -329,7 +330,7 @@ bool vtkImageVolumeRepresentation::RemoveFromView(vtkView* view)
 //----------------------------------------------------------------------------
 void vtkImageVolumeRepresentation::UpdateMapperParameters()
 {
-  const char* colorArrayName = NULL;
+  const char* colorArrayName = nullptr;
   int fieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
 
   vtkInformation* info = this->GetInputArrayInformation(0);
@@ -340,7 +341,17 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
     fieldAssociation = info->Get(vtkDataObject::FIELD_ASSOCIATION());
   }
 
-  this->VolumeMapper->SelectScalarArray(colorArrayName);
+  if (this->UseSeparateOpacityArray)
+  {
+    // See AppendOpacityComponent() for the construction of this array.
+    std::string combinedName(colorArrayName);
+    combinedName += "_and_opacity";
+    this->VolumeMapper->SelectScalarArray(combinedName.c_str());
+  }
+  else
+  {
+    this->VolumeMapper->SelectScalarArray(colorArrayName);
+  }
   switch (fieldAssociation)
   {
     case vtkDataObject::FIELD_ASSOCIATION_CELLS:
@@ -359,7 +370,7 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
 
   this->Actor->SetMapper(this->VolumeMapper);
   // this is necessary since volume mappers don't like empty arrays.
-  this->Actor->SetVisibility(colorArrayName != NULL && colorArrayName[0] != 0);
+  this->Actor->SetVisibility(colorArrayName != nullptr && colorArrayName[0] != 0);
 
   if (this->VolumeMapper->GetCropping())
   {
@@ -375,7 +386,7 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
   {
     if (this->MapScalars)
     {
-      if (this->MultiComponentsMapping)
+      if (this->MultiComponentsMapping || this->UseSeparateOpacityArray)
       {
         this->Property->SetIndependentComponents(false);
       }
@@ -424,70 +435,6 @@ void vtkImageVolumeRepresentation::PrintSelf(ostream& os, vtkIndent indent)
      << ", " << this->CroppingScale[2] << endl;
 }
 
-//***************************************************************************
-// Forwarded to Actor.
-
-//----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::SetOrientation(double x, double y, double z)
-{
-  this->Actor->SetOrientation(x, y, z);
-}
-
-//----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::SetOrigin(double x, double y, double z)
-{
-  this->Actor->SetOrigin(x, y, z);
-}
-
-//----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::SetPickable(int val)
-{
-  this->Actor->SetPickable(val);
-}
-//----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::SetPosition(double x, double y, double z)
-{
-  this->Actor->SetPosition(x, y, z);
-}
-//----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::SetScale(double x, double y, double z)
-{
-  this->Actor->SetScale(x, y, z);
-}
-
-//----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::SetVisibility(bool val)
-{
-  this->Superclass::SetVisibility(val);
-  this->Actor->SetVisibility(val ? 1 : 0);
-}
-
-//***************************************************************************
-// Forwarded to vtkVolumeProperty.
-//----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::SetInterpolationType(int val)
-{
-  this->Property->SetInterpolationType(val);
-}
-
-//----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::SetColor(vtkColorTransferFunction* lut)
-{
-  this->Property->SetColor(lut);
-}
-
-//----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::SetScalarOpacity(vtkPiecewiseFunction* pwf)
-{
-  this->Property->SetScalarOpacity(pwf);
-}
-
-//----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::SetScalarOpacityUnitDistance(double val)
-{
-  this->Property->SetScalarOpacityUnitDistance(val);
-}
-
 //----------------------------------------------------------------------------
 void vtkImageVolumeRepresentation::SetAmbient(double val)
 {
@@ -519,23 +466,6 @@ void vtkImageVolumeRepresentation::SetShade(bool val)
 }
 
 //----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::SetMapScalars(bool val)
-{
-  this->MapScalars = val;
-  // the value is passed on to the vtkVolumeProperty in UpdateMapperParameters
-  // since SetMapScalars and SetMultiComponentsMapping both control the same
-  // vtkVolumeProperty ivar i.e. IndependentComponents.
-}
-
-//----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::SetMultiComponentsMapping(bool val)
-{
-  this->MultiComponentsMapping = val;
-  // the value is passed on to the vtkVolumeProperty in UpdateMapperParameters
-  // since SetMapScalars and SetMultiComponentsMapping both control the same
-  // vtkVolumeProperty ivar i.e. IndependentComponents.
-}
-
 void vtkImageVolumeRepresentation::SetSliceFunction(vtkImplicitFunction* slice)
 {
   this->Property->SetSliceFunction(slice);

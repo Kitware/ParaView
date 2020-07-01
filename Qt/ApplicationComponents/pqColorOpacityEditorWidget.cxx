@@ -461,13 +461,23 @@ void pqColorOpacityEditorWidget::setScalarOpacityFunctionProxy(pqSMProxy sofProx
     this->Internals->RangeConnector->Disconnect();
     vtkSMProperty* msProp = proxy->GetProperty("MapScalars");
     vtkSMProperty* mcmProp = proxy->GetProperty("MultiComponentsMapping");
-    if (msProp && mcmProp)
+    vtkSMProperty* uoaProperty = proxy->GetProperty("UseSeparateOpacityArray");
+    if (msProp && (mcmProp || uoaProperty))
     {
       this->Internals->RangeConnector->Connect(msProp, vtkCommand::ModifiedEvent, this,
         SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
 
-      this->Internals->RangeConnector->Connect(mcmProp, vtkCommand::ModifiedEvent, this,
-        SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
+      if (mcmProp)
+      {
+        this->Internals->RangeConnector->Connect(mcmProp, vtkCommand::ModifiedEvent, this,
+          SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
+      }
+
+      if (uoaProperty)
+      {
+        this->Internals->RangeConnector->Connect(uoaProperty, vtkCommand::ModifiedEvent, this,
+          SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
+      }
     }
 
     this->initializeOpacityEditor(pwf);
@@ -803,13 +813,23 @@ void pqColorOpacityEditorWidget::representationOrViewChanged()
   this->Internals->RangeConnector->Disconnect();
   vtkSMProperty* msProp = repr->getProxy()->GetProperty("MapScalars");
   vtkSMProperty* mcmProp = repr->getProxy()->GetProperty("MultiComponentsMapping");
-  if (msProp && mcmProp)
+  vtkSMProperty* uoaProp = repr->getProxy()->GetProperty("UseSeparateOpacityArray");
+  if (msProp && (mcmProp || uoaProp))
   {
     this->Internals->RangeConnector->Connect(msProp, vtkCommand::ModifiedEvent, this,
       SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
 
-    this->Internals->RangeConnector->Connect(mcmProp, vtkCommand::ModifiedEvent, this,
-      SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
+    if (mcmProp)
+    {
+      this->Internals->RangeConnector->Connect(mcmProp, vtkCommand::ModifiedEvent, this,
+        SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
+    }
+
+    if (uoaProp)
+    {
+      this->Internals->RangeConnector->Connect(uoaProp, vtkCommand::ModifiedEvent, this,
+        SLOT(multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*)), pwf);
+    }
   }
   this->initializeOpacityEditor(pwf);
 }

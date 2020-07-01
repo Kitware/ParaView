@@ -4418,6 +4418,12 @@
             <Property name="ScalarOpacityFunction" />
             <Property name="ScalarOpacityUnitDistance"
                       panel_visibility="advanced" />
+            <Property name="UseSeparateOpacityArray"
+                      panel_visibility="advanced" />
+            <Property name="OpacityArrayName"
+                      panel_visibility="advanced" />
+            <Property name="OpacityComponent"
+                      panel_visibility="advanced" />
             <Property name="ExtractedBlockIndex"
                       panel_visibility="advanced" />
             <Property name="SelectMapper"
@@ -4557,6 +4563,12 @@
             <Property name="ScalarOpacityUnitDistance"
                       panel_visibility="advanced" />
             <Property name="ScalarOpacityFunction" />
+            <Property name="UseSeparateOpacityArray"
+                      panel_visibility="advanced" />
+            <Property name="OpacityArrayName"
+                      panel_visibility="advanced" />
+            <Property name="OpacityComponent"
+                      panel_visibility="advanced" />
             <Property name="VolumeRenderingMode"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="volume" />
@@ -4802,6 +4814,60 @@
           </RequiredProperties>
         </RepresentedArrayListDomain>
       </StringVectorProperty>
+      <IntVectorProperty command="SetUseSeparateOpacityArray"
+                         default_values="0"
+                         name="UseSeparateOpacityArray"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is on, the Opacity Array will be used to determine the
+          point gaussian sprites.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty name="OpacityArrayName"
+                            command="SelectOpacityArray"
+                            number_of_elements="5"
+                            element_types="0 0 0 0 2"
+                            label="Volume Opacity Array"
+                            panel_visibility="advanced">
+        <ArrayListDomain name="array_list"
+          input_domain_name="input_point_array">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property specifies the name of the input array to map to opacity.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseSeparateOpacityArray" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SelectOpacityArrayComponent"
+                         default_values="0"
+                         name="OpacityComponent"
+                         number_of_elements="1">
+        <NumberOfComponentsDomain name="comps" enable_magnitude="1">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="OpacityArrayName" />
+          </RequiredProperties>
+        </NumberOfComponentsDomain>
+        <Documentation>
+          This property indicates the component of the array to be used for opacity.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseSeparateOpacityArray" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
       <DoubleVectorProperty command="SetPosition"
                             default_values="0 0 0"
                             name="Position"
@@ -5556,6 +5622,60 @@
           </RequiredProperties>
         </RepresentedArrayListDomain>
       </StringVectorProperty>
+      <IntVectorProperty command="SetUseSeparateOpacityArray"
+                         default_values="0"
+                         name="UseSeparateOpacityArray"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is on, the Opacity Array will be used to determine the
+          point gaussian sprites.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty name="OpacityArrayName"
+                            command="SelectOpacityArray"
+                            number_of_elements="5"
+                            element_types="0 0 0 0 2"
+                            label="Volume Opacity Array"
+                            panel_visibility="advanced">
+        <ArrayListDomain name="array_list"
+          input_domain_name="input_point_array">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property specifies the name of the input array to map to opacity.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseSeparateOpacityArray" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SelectOpacityArrayComponent"
+                         default_values="0"
+                         name="OpacityComponent"
+                         number_of_elements="1">
+        <NumberOfComponentsDomain name="comps" enable_magnitude="1">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="OpacityArrayName" />
+          </RequiredProperties>
+        </NumberOfComponentsDomain>
+        <Documentation>
+          This property indicates the component of the array to be used for opacity.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseSeparateOpacityArray" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
       <IntVectorProperty command="SetExtractedBlockIndex"
                          default_values="0"
                          name="ExtractedBlockIndex"

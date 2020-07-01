@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Calculator" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Function/Function" command="set_string" arguments="coordsX*20*iHat + coordsY*10*jHat + coordsZ*5*kHat" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Volume" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/SearchBox/AdvancedButton" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/UseSeparateOpacityArray/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/OpacityArrayName/ComboBox" command="activated" arguments="Result" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveY" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/SeparateOpacityArray_X.png" width="400" height="400" />
+
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/OpacityComponent/ComboBox" command="activated" arguments="Y" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/SeparateOpacityArray_Y.png" width="400" height="400" />
+
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/OpacityComponent/ComboBox" command="activated" arguments="Z" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionResetRange" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/OpacityEditor/1QVTKWidget0" command="mousePress" arguments="(0.481013,0.512315,1,1,0)" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/OpacityEditor/1QVTKWidget0" command="mouseMove" arguments="(0.503165,1.17241,1,0,0)" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/OpacityEditor/1QVTKWidget0" command="mouseRelease" arguments="(0.503165,1.17241,1,0,0)" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/qt_dockwidget_closebutton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/SeparateOpacityArray_Z.png" width="400" height="400" />
+
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/OpacityComponent/ComboBox" command="activated" arguments="Magnitude" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/OpacityEditor/1QVTKWidget0" command="mousePress" arguments="(0.0189873,0.975369,1,1,0)" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/OpacityEditor/1QVTKWidget0" command="mouseMove" arguments="(0.0189873,-0.428571,1,0,0)" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/OpacityEditor/1QVTKWidget0" command="mouseRelease" arguments="(0.0189873,-0.428571,1,0,0)" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/OpacityEditor/1QVTKWidget0" command="mousePress" arguments="(0.993671,0.0147783,1,1,0)" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/OpacityEditor/1QVTKWidget0" command="mouseMove" arguments="(1.07911,1.24138,1,0,0)" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/OpacityEditor/1QVTKWidget0" command="mouseRelease" arguments="(1.07911,1.24138,1,0,0)" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionResetRange" command="activate" arguments="" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/SeparateOpacityArray_Magnitude.png" width="400" height="400" />
+</pqevents>
