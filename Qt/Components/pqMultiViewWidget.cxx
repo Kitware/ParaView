@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqInterfaceTracker.h"
 #include "pqObjectBuilder.h"
 #include "pqPropertyLinks.h"
+#include "pqQVTKWidget.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
@@ -104,6 +105,8 @@ public:
 
   pqPropertyLinks Links;
 
+  double CustomDevicePixelRatio = 0.0;
+
   pqInternals(pqMultiViewWidget* self)
     : Popout(false)
     , SavedButtons(pqViewFrame::NoButton)
@@ -133,6 +136,8 @@ public:
     ui.setupUi(this->PopoutPlaceholder.data());
     QObject::connect(
       ui.restoreButton, &QPushButton::clicked, [self](bool) { self->togglePopout(); });
+
+    this->CustomDevicePixelRatio = 0.0;
   }
 
   ~pqInternals()
@@ -200,6 +205,7 @@ public:
     this->PreviewSize = size;
     if (size.isEmpty())
     {
+      this->setCustomDevicePixelRatio(0.0); // set to 0 to not use custom value.
       this->Container->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
       this->Container->layout()->setSpacing(PARAVIEW_DEFAULT_LAYOUT_SPACING);
 
@@ -218,7 +224,8 @@ public:
       vtkVector2i tsize(size.width(), size.height());
       const QRect crect = this->Container->parentWidget()->contentsRect();
       vtkVector2i csize(crect.width(), crect.height());
-      vtkSMSaveScreenshotProxy::ComputeMagnification(tsize, csize);
+      const int magnification = vtkSMSaveScreenshotProxy::ComputeMagnification(tsize, csize);
+      this->setCustomDevicePixelRatio(magnification);
       this->Container->setMaximumSize(csize[0], csize[1]);
       vtkLogF(
         TRACE, "cur=(%d, %d), new=(%d, %d)", crect.width(), crect.height(), csize[0], csize[1]);
@@ -227,6 +234,20 @@ public:
   }
 
   const QSize& previewSize() const { return this->PreviewSize; }
+
+  void setCustomDevicePixelRatio(double sf)
+  {
+    if (this->CustomDevicePixelRatio != sf)
+    {
+      this->CustomDevicePixelRatio = sf;
+      for (auto renderWidget : this->Container->findChildren<pqQVTKWidget*>())
+      {
+        renderWidget->setCustomDevicePixelRatio(sf);
+        // need to disable font-scaling if custom ratio is being used.
+        renderWidget->setEnableHiDPI(sf == 0.0 ? true : false);
+      }
+    }
+  }
 
   void setDecorationsVisibility(bool val)
   {

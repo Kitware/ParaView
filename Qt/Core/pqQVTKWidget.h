@@ -98,6 +98,11 @@ public:
   QVTKInteractor* interactor() const;
   bool isValid();
 
+  void setEnableHiDPI(bool flag);
+  void setCustomDevicePixelRatio(double cdpr);
+  double effectiveDevicePixelRatio() const;
+  void setViewSize(int width, int height);
+
 public Q_SLOTS:
   void paintMousePointer(int x, int y);
 

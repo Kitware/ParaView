@@ -188,7 +188,7 @@ void pqQVTKWidget::resizeEvent(QResizeEvent* evt)
     // will not see updated size until Qt's event processing catches up. This can
     // cause issues with test playback since the RenderWIndow size may not be
     // correct just yet. So we manually update the render window size.
-    const QSize newsize = evt->size() * this->devicePixelRatioF();
+    const QSize newsize = evt->size() * this->effectiveDevicePixelRatio();
     const int inewsize[2] = { newsize.width(), newsize.height() };
     vtkSMPropertyHelper(this->ViewProxy, "ViewSize").Set(inewsize, 2);
     this->ViewProxy->UpdateVTKObjects();
@@ -328,5 +328,59 @@ void pqQVTKWidget::notifyQApplication(QMouseEvent* e)
   else
   {
     qApp->notify(baseClass.value<QVTKOpenGLNativeWidget*>(), e);
+  }
+}
+//----------------------------------------------------------------------------
+void pqQVTKWidget::setEnableHiDPI(bool flag)
+{
+  // disable HiDPI if we are running tests
+  if (this->useStereo)
+  {
+    baseClass.value<QVTKOpenGLStereoWidget*>()->setEnableHiDPI(flag);
+  }
+  else
+  {
+    baseClass.value<QVTKOpenGLNativeWidget*>()->setEnableHiDPI(flag);
+  }
+}
+//----------------------------------------------------------------------------
+void pqQVTKWidget::setCustomDevicePixelRatio(double cdpr)
+{
+  // disable HiDPI if we are running tests
+  if (this->useStereo)
+  {
+    baseClass.value<QVTKOpenGLStereoWidget*>()->setCustomDevicePixelRatio(cdpr);
+  }
+  else
+  {
+    baseClass.value<QVTKOpenGLNativeWidget*>()->setCustomDevicePixelRatio(cdpr);
+  }
+}
+//----------------------------------------------------------------------------
+double pqQVTKWidget::effectiveDevicePixelRatio() const
+{
+  // disable HiDPI if we are running tests
+  if (this->useStereo)
+  {
+    return baseClass.value<QVTKOpenGLStereoWidget*>()->effectiveDevicePixelRatio();
+  }
+  else
+  {
+    return baseClass.value<QVTKOpenGLNativeWidget*>()->effectiveDevicePixelRatio();
+  }
+}
+//----------------------------------------------------------------------------
+void pqQVTKWidget::setViewSize(int width, int height)
+{
+  if (this->ViewProxy)
+  {
+    int targetSize[2] = { width, height };
+    int currentSize[2];
+    vtkSMPropertyHelper(this->ViewProxy, "ViewSize").Get(currentSize, 2);
+    if (currentSize[0] != targetSize[0] || currentSize[1] != targetSize[1])
+    {
+      vtkSMPropertyHelper(this->ViewProxy, "ViewSize").Set(targetSize, 2);
+      this->ViewProxy->UpdateVTKObjects();
+    }
   }
 }
