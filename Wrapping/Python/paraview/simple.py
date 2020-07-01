@@ -439,6 +439,151 @@ def RemoveViewsAndLayouts():
         pxm.UnRegisterProxy('layouts', name, layouts[(name, id)])
 
 #==============================================================================
+# Extracts and Extract Generators
+#==============================================================================
+def CreateExtractGenerator(name, proxy=None, registrationName=None):
+    """
+    Creates a new extract generator and returns it.
+
+    :param name: The type of the extract generator to create.
+    :type name: `str`
+    :param proxy: The proxy to generate the extract from. If not specified
+    `GetActiveSource()` is used.
+    :type proxy: :class:`paraview.servermanager.Proxy`, optional
+    :param registrationName: The registration name to use to register
+    the generator with the ProxyManager. If not specified a unique name
+    will be generated.
+    :type name: `str`, optional
+
+    :return: The extract generator created, on success, else None
+    :rtype: :class:`paraview.servermanager.Proxy` or `None`
+    """
+    if proxy is None:
+        proxy = GetActiveSource()
+    if not proxy:
+        raise RuntimeError("Could determine input for extract generator")
+
+    if proxy.Port > 0:
+        rawProxy = proxy.SMProxy.GetOutputPort(proxy.Port)
+    else:
+        rawProxy = proxy.SMProxy
+
+    controller = servermanager.vtkSMExtractsController()
+    rawGenerator = controller.CreateExtractGenerator(rawProxy, name, registrationName)
+    generator = servermanager._getPyProxy(rawGenerator)
+
+    from .catalyst.detail import IsInsitu, RegisterExtractGenerator
+    if IsInsitu():
+        # tag the extract generator to know which pipeline this came from.
+        RegisterExtractGenerator(generator)
+    return generator
+
+
+def GetExtractGenerators(proxy=None):
+    """
+    Returns a list of extract generators associated with the proxy.
+
+    :param proxy: The proxy to return the extract generators associated with.
+    If not specified (or is None) then all extract generators are returned.
+    :type proxy: :class:`paraview.servermanager.Proxy`, optional
+
+    :return: List of associated extract generators if any. May return an empty
+    list.
+    :rtype: list of :class:`paraview.servermanager.Proxy`
+    """
+    controller = servermanager.vtkSMExtractsController()
+    pxm = servermanager.ProxyManager()
+    generators = pxm.GetProxiesInGroup("extract_generators").values()
+    if proxy is None:
+        return list(generators)
+    else:
+        return [g for g in generators if controller.IsExtractGenerator(g.SMProxy, proxy.SMProxy)]
+
+def FindExtractGenerator(registrationName):
+    """
+    Returns an extract generator with a specific registrationName.
+
+    :param registrationName: Registration name for the extract generator.
+    :type registrationName: `str`
+
+    :return: The extract generator or None
+    :rtype: :class:`paraview.servermanager.Proxy` or `None`
+    """
+    pxm = servermanager.ProxyManager()
+    return pxm.GetProxy("extract_generators", registrationName)
+
+def SaveExtractsUsingCatalystOptions(options):
+    """
+    Generates extracts using a CatalystOptions object. This is intended for use
+    when a Catalyst analysis script is being run in batch.
+    """
+    # handle the case where options is CatalystOptions
+
+    # currently, Catalyst state files don't have anything about animation,
+    # however, we reply one animation to generate the extracts, so we ensure
+    # that the animation is updated based on timesteps in data by explicitly
+    # calling UpdateAnimationUsingDataTimeSteps.
+    scene = GetAnimationScene()
+    scene.UpdateAnimationUsingDataTimeSteps()
+
+    pxm = servermanager.ProxyManager()
+    proxy = servermanager._getPyProxy(pxm.NewProxy("misc", "SaveAnimationExtracts"))
+
+    # override options if passed in environment options.
+    import os
+    if 'PARAVIEW_OVERRIDE_DATA_OUTPUT_DIRECTORY' in os.environ:
+        proxy.DataExtractsOutputDirectory = os.environ["PARAVIEW_OVERRIDE_DATA_OUTPUT_DIRECTORY"]
+    else:
+        proxy.DataExtractsOutputDirectory = options.DataExtractsOutputDirectory
+    if 'PARAVIEW_OVERRIDE_IMAGE_OUTPUT_DIRECTORY' in os.environ:
+        proxy.ImageExtractsOutputDirectory = os.environ["PARAVIEW_OVERRIDE_IMAGE_OUTPUT_DIRECTORY"]
+    else:
+        proxy.ImageExtractsOutputDirectory = options.ImageExtractsOutputDirectory
+    return proxy.SaveExtracts()
+
+def SaveExtracts(**kwargs):
+    """
+    Generate extracts. Parameters are forwarded for 'SaveAnimationExtracts'
+    Currently, supported keyword parameters are:
+
+    :param DataExtractsOutputDirectory: root directory for data extracts
+    :type DataExtractsOutputDirectory: `str`
+
+    :param ImageExtractsOutputDirectory: root directory for image extracts
+    :type ImageExtractsOutputDirectory: `str`
+    """
+    # currently, Python state files don't have anything about animation,
+    # however, we reply one animation to generate the extracts, so we ensure
+    # that the animation is updated based on timesteps in data by explicitly
+    # calling UpdateAnimationUsingDataTimeSteps.
+    scene = GetAnimationScene()
+    scene.UpdateAnimationUsingDataTimeSteps()
+
+    pxm = servermanager.ProxyManager()
+    proxy = servermanager._getPyProxy(pxm.NewProxy("misc", "SaveAnimationExtracts"))
+    SetProperties(proxy, **kwargs)
+
+    # override options if passed in environment options.
+    import os
+    if 'PARAVIEW_OVERRIDE_DATA_OUTPUT_DIRECTORY' in os.environ:
+        data_root = os.environ["PARAVIEW_OVERRIDE_DATA_OUTPUT_DIRECTORY"]
+    else:
+        data_root = proxy.DataExtractsOutputDirectory
+
+    if 'PARAVIEW_OVERRIDE_IMAGE_OUTPUT_DIRECTORY' in os.environ:
+        image_root = os.environ["PARAVIEW_OVERRIDE_IMAGE_OUTPUT_DIRECTORY"]
+    else:
+        image_root = proxy.ImageExtractsOutputDirectory
+
+    # if the paths have ${...}, replace that with environment variables.
+    from .util import ReplaceDollarVariablesWithEnvironment
+    data_root = ReplaceDollarVariablesWithEnvironment(data_root)
+    image_root = ReplaceDollarVariablesWithEnvironment(image_root)
+    proxy.DataExtractsOutputDirectory = data_root
+    proxy.ImageExtractsOutputDirectory = image_root
+    return proxy.SaveExtracts()
+
+#==============================================================================
 # XML State management
 #==============================================================================
 
@@ -503,7 +648,7 @@ def Show(proxy=None, view=None, representationType=None, **params):
     If pipeline object and/or view are not specified, active objects are used."""
     if proxy == None:
         proxy = GetActiveSource()
-    if proxy.GetNumberOfOutputPorts() == 0:
+    if not hasattr(proxy, "GetNumberOfOutputPorts") or proxy.GetNumberOfOutputPorts() == 0:
         raise RuntimeError('Cannot show a sink i.e. algorithm with no output.')
     if proxy == None:
         raise RuntimeError ("Show() needs a proxy argument or that an active source is set.")
@@ -2294,11 +2439,22 @@ def _create_func(key, module, skipRegisteration=False):
         all non-keyword arguments are assumed to be inputs. All keyword arguments are
         assumed to be property,value pairs and are passed to the new proxy."""
 
+        registrationName = None
+        for nameParam in ['registrationName', 'guiName']:
+          if nameParam in params:
+              registrationName = params[nameParam]
+              del params[nameParam]
+
         # Create a controller instance.
         controller = servermanager.ParaViewPipelineController()
 
-        # Instantiate the actual object from the given module.
-        px = paraview._backwardscompatibilityhelper.GetProxy(module, key, no_update=True)
+        from .catalyst.detail import IsInsituInput, CreateProducer
+        if IsInsituInput(registrationName):
+            # This is a catalyst input, replace with a trivial producer
+            px = CreateProducer(registrationName)
+        else:
+            # Instantiate the actual object from the given module.
+            px = paraview._backwardscompatibilityhelper.GetProxy(module, key, no_update=True)
 
         # preinitialize the proxy.
         controller.PreInitializeProxy(px)
@@ -2326,12 +2482,6 @@ def _create_func(key, module, skipRegisteration=False):
         else:
             if len(input) > 0:
                 raise RuntimeError ("This function does not expect an input.")
-
-        registrationName = None
-        for nameParam in ['registrationName', 'guiName']:
-          if nameParam in params:
-              registrationName = params[nameParam]
-              del params[nameParam]
 
         # Pass all the named arguments as property,value pairs
         SetProperties(px, **params)
@@ -2532,12 +2682,12 @@ class _active_objects(object):
         "Internal method."
         if not px:
             return None
-        if px.IsA("vtkSMSourceProxy"):
-            return servermanager._getPyProxy(px)
-        else:
+        elif px.IsA("vtkSMOutputPort"):
             return servermanager.OutputPort(
               servermanager._getPyProxy(px.GetSourceProxy()),
               px.GetPortIndex())
+        else:
+            return servermanager._getPyProxy(px)
 
     def get_source(self):
         "Returns the active source."

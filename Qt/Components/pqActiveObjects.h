@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxySelection.h"
 #include "pqServer.h"
 #include "pqView.h"
+#include "vtkNew.h"
 
 class vtkEventQtSlotConnect;
 class vtkSMProxySelectionModel;
@@ -74,15 +75,28 @@ public:
   */
   pqView* activeView() const { return this->ActiveView; }
 
+  //@{
   /**
-  * Returns the active source
-  */
-  pqPipelineSource* activeSource() const { return this->ActiveSource; }
+   * Returns the active pipeline proxy e.g. a pqPipelineSource or pqExtractGenerator.
+   *
+   * Historical note: until ParaView 5.9, the only types of objects that could be part of
+   * the data-processing pipeline were pqPipelineSource (or subclass) instances i.e. they
+   * were all vtkAlgorithm-based. With 5.9, we introduced a concept of extract generators
+   * (pqExtractGenerator) which are not vtkAlgorithm-based and hence cannot be
+   * `pqPipelineSource`. To avoid major disruption to API and applications, here was
+   * the chosen strategy: we let active-source be either a pqPipelineSource or pqExtractGenerator.
+   * `setActiveSource`/`activeSource()` remains unchanged but will likely get deprecated
+   * in the future.  `setActivePipelineProxy` and `activePipelineProxy()` is the now recommended
+   * API to get access to the active source and active extract generator.
+   */
+  pqProxy* activePipelineProxy() const { return this->ActivePipelineProxy; }
+  pqPipelineSource* activeSource() const;
+  //@}
 
   /**
   * Returns the active port.
   */
-  pqOutputPort* activePort() const { return this->ActivePort; }
+  pqOutputPort* activePort() const;
 
   /**
   * Returns the active server.
@@ -126,11 +140,30 @@ public:
   int activeLayoutLocation() const;
 
 public Q_SLOTS:
+  /**
+   * Set the active view. Changing the active view may lead to change in
+   * active representation as well.
+   */
   void setActiveView(pqView* view);
-  void setActiveSource(pqPipelineSource* source);
-  void setActivePort(pqOutputPort* port);
+
+  //@{
+  /**
+   * Set the active source. Changing the active source may lead to changes in
+   * active port, and active representation.
+   *
+   * Using `setActivePipelineProxy` is the recommended approach since ParaView 5.9
+   * since it allows for supporting pqExtractGenerator items.
+   */
+  void setActivePipelineProxy(pqProxy* proxy);
+  void setActiveSource(pqPipelineSource* source) { this->setActivePipelineProxy(source); }
+  void setActivePort(pqOutputPort* port) { this->setActivePipelineProxy(port); }
+  //@}
+
+  /**
+   * Set the active server. Changing the server typically leads to changes all
+   * other active items.
+   */
   void setActiveServer(pqServer*);
-  void onActiveServerChanged();
 
   /**
   * Sets the selected set of proxies. All proxies in the selection must be on
@@ -146,6 +179,7 @@ Q_SIGNALS:
   */
   void serverChanged(pqServer*);
   void viewChanged(pqView* view);
+  void pipelineProxyChanged(pqProxy*);
   void sourceChanged(pqPipelineSource*);
   void portChanged(pqOutputPort*);
   void representationChanged(pqDataRepresentation*);
@@ -185,6 +219,7 @@ private Q_SLOTS:
 
   void sourceSelectionChanged();
   void viewSelectionChanged();
+  void onActiveServerChanged();
 
 protected:
   pqActiveObjects();
@@ -205,21 +240,21 @@ private:
   void resetActives();
 
   QPointer<pqServer> ActiveServer;
-  QPointer<pqPipelineSource> ActiveSource;
-  QPointer<pqOutputPort> ActivePort;
+  QPointer<pqProxy> ActivePipelineProxy;
   QPointer<pqView> ActiveView;
   QPointer<pqDataRepresentation> ActiveRepresentation;
   pqProxySelection Selection;
 
   // these are void* maintained to detect when values have changed.
   void* CachedServer;
+  void* CachedPipelineProxy;
   void* CachedSource;
   void* CachedPort;
   void* CachedView;
   void* CachedRepresentation;
   pqProxySelection CachedSelection;
 
-  vtkEventQtSlotConnect* VTKConnector;
+  vtkNew<vtkEventQtSlotConnect> VTKConnector;
 };
 
 #endif

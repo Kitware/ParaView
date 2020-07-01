@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqDataRepresentation.h"
+#include "pqExtractGenerator.h"
 #include "pqLiveInsituManager.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
@@ -67,6 +68,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
+bool isDeletable(pqProxy* proxy)
+{
+  if (pqLiveInsituManager::isInsitu(proxy))
+  {
+    return false;
+  }
+
+  if (auto source = qobject_cast<pqPipelineSource*>(proxy))
+  {
+    return source->getNumberOfConsumers() == 0;
+  }
+  return true;
+}
 
 // internal class used to keep track of all the widgets associated with a
 // panel either for a source or representation.
@@ -153,8 +167,7 @@ class pqPropertiesPanel::pqInternals
 public:
   Ui::propertiesPanel Ui;
   QPointer<pqView> View;
-  QPointer<pqOutputPort> Port;
-  QPointer<pqPipelineSource> Source;
+  QPointer<pqProxy> Source;
   QPointer<pqDataRepresentation> Representation;
   QMap<void*, QPointer<pqProxyWidgets> > SourceWidgets;
   QPointer<pqProxyWidgets> DisplayWidgets;
@@ -273,15 +286,14 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget* parentObject)
   // source/view/representation, etc.
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
   this->connect(
-    activeObjects, SIGNAL(portChanged(pqOutputPort*)), this, SLOT(setOutputPort(pqOutputPort*)));
+    activeObjects, SIGNAL(pipelineProxyChanged(pqProxy*)), this, SLOT(setPipelineProxy(pqProxy*)));
   this->connect(activeObjects, SIGNAL(viewChanged(pqView*)), this, SLOT(setView(pqView*)));
   this->connect(activeObjects, SIGNAL(representationChanged(pqDataRepresentation*)), this,
     SLOT(setRepresentation(pqDataRepresentation*)));
 
   // listen to server manager changes
   pqServerManagerModel* smm = pqApplicationCore::instance()->getServerManagerModel();
-  this->connect(
-    smm, SIGNAL(sourceRemoved(pqPipelineSource*)), SLOT(proxyDeleted(pqPipelineSource*)));
+  this->connect(smm, SIGNAL(proxyRemoved(pqProxy*)), SLOT(proxyDeleted(pqProxy*)));
   // this connection ensures that the button state is updated everytime any
   // item's state changes.
   this->connect(
@@ -328,7 +340,9 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget* parentObject)
   this->connect(this->Internals->Ui.ViewCopy, SIGNAL(clicked()), SLOT(copyView()));
   this->connect(this->Internals->Ui.ViewPaste, SIGNAL(clicked()), SLOT(pasteView()));
 
-  this->setOutputPort(NULL);
+  this->setPipelineProxy(nullptr);
+  this->setView(nullptr);
+  this->setRepresentation(nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -431,46 +445,65 @@ pqView* pqPropertiesPanel::view() const
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::setRepresentation(pqDataRepresentation* repr)
 {
-  if (repr)
-  {
-    this->setView(repr->getView());
-  }
   this->updateDisplayPanel(repr);
+  this->updateButtonState();
 }
 
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::setView(pqView* pqview)
 {
   this->updateViewPanel(pqview);
+  this->updateButtonState();
 }
 
 //-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 void pqPropertiesPanel::setOutputPort(pqOutputPort* port)
 {
-  this->updatePanel(port);
+  VTK_LEGACY_REPLACED_BODY(
+    pqPropertiesPanel::setOutputPort, "ParaView 5.9", pqPropertiesPanel::setPipelineProxy);
+  this->setPipelineProxy(port);
+}
+#endif
+
+//-----------------------------------------------------------------------------
+void pqPropertiesPanel::setPipelineProxy(pqProxy* proxy)
+{
+  if (auto port = qobject_cast<pqOutputPort*>(proxy))
+  {
+    proxy = port->getSource();
+  }
+  this->updatePropertiesPanel(proxy);
+  this->updateButtonState();
 }
 
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::updatePanel()
 {
-  this->updatePanel(this->Internals->Port);
-}
-
-//-----------------------------------------------------------------------------
-void pqPropertiesPanel::updatePanel(pqOutputPort* port)
-{
-  this->Internals->Port = port;
-
-  // Determine if the proxy/repr has changed. If so, we have to recreate the
-  // entire panel, else we simply update the widgets.
-  this->updatePropertiesPanel(port ? port->getSource() : NULL);
-  this->updateDisplayPanel(port ? port->getRepresentation(this->view()) : NULL);
-  this->updateViewPanel(this->view());
+  auto& internals = (*this->Internals);
+  this->updatePropertiesPanel(internals.Source);
+  this->updateDisplayPanel(internals.Representation);
+  this->updateViewPanel(internals.View);
   this->updateButtonState();
 }
 
 //-----------------------------------------------------------------------------
-void pqPropertiesPanel::updatePropertiesPanel(pqPipelineSource* source)
+#if !defined(VTK_LEGACY_REMOVE)
+void pqPropertiesPanel::updatePanel(pqOutputPort* port)
+{
+  VTK_LEGACY_BODY(pqPropertiesPanel::updatePanel, "ParaView 5.9");
+
+  // Determine if the proxy/repr has changed. If so, we have to recreate the
+  // entire panel, else we simply update the widgets.
+  this->setPipelineProxy(port);
+  this->updateDisplayPanel(port ? port->getRepresentation(this->view()) : NULL);
+  this->updateViewPanel(this->view());
+  this->updateButtonState();
+}
+#endif
+
+//-----------------------------------------------------------------------------
+void pqPropertiesPanel::updatePropertiesPanel(pqProxy* source)
 {
   if ((this->PanelMode & SOURCE_PROPERTIES) == 0)
   {
@@ -698,9 +731,7 @@ void pqPropertiesPanel::updateButtonState()
   ui.Accept->setEnabled(false);
   ui.Reset->setEnabled(false);
   ui.Help->setEnabled(this->Internals->Source != NULL);
-  ui.Delete->setEnabled(this->Internals->Source != NULL &&
-    this->Internals->Source->getNumberOfConsumers() == 0 &&
-    !pqLiveInsituManager::isInsitu(this->Internals->Source));
+  ui.Delete->setEnabled(isDeletable(this->Internals->Source));
 
   foreach (const pqProxyWidgets* widgets, this->Internals->SourceWidgets)
   {
@@ -873,10 +904,10 @@ void pqPropertiesPanel::reset()
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::deleteProxy()
 {
-  if (this->Internals->Source)
+  if (auto source = this->Internals->Source.data())
   {
-    BEGIN_UNDO_SET(tr("Delete") + " " + this->Internals->Source->getSMName());
-    Q_EMIT this->deleteRequested(this->Internals->Source);
+    BEGIN_UNDO_SET(tr("Delete") + " " + source->getSMName());
+    Q_EMIT this->deleteRequested(source);
     END_UNDO_SET();
   }
 }
@@ -964,11 +995,11 @@ void pqPropertiesPanel::viewSaveAsDefaults()
 }
 
 //-----------------------------------------------------------------------------
-void pqPropertiesPanel::proxyDeleted(pqPipelineSource* source)
+void pqPropertiesPanel::proxyDeleted(pqProxy* source)
 {
   if (this->Internals->Source == source)
   {
-    this->setOutputPort(NULL);
+    this->setPipelineProxy(nullptr);
   }
   if (this->Internals->SourceWidgets.contains(source))
   {

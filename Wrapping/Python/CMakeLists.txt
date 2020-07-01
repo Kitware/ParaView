@@ -9,19 +9,29 @@ set(python_files
   paraview/benchmark/manyspheres.py
   paraview/benchmark/waveletcontour.py
   paraview/benchmark/waveletvolume.py
+  paraview/catalyst/__init__.py
+  paraview/catalyst/bridge.py
+  paraview/catalyst/detail.py
+  paraview/catalyst/v2_internals.py
   paraview/collaboration.py
   paraview/coprocessing.py
-  paraview/cpexport.py
   paraview/cpstate.py
+  paraview/demos/__init__.py
   paraview/demos/demo1.py
+  paraview/demos/export_catalyst_state.py
   paraview/demos/show_grid_as_background.py
+  paraview/demos/wavelet_miniapp.py
   paraview/detail/__init__.py
   paraview/detail/annotation.py
   paraview/detail/calculator.py
+  paraview/detail/catalyst_export.py
+  paraview/detail/cinema_extracts_writer.py
   paraview/detail/exportnow.py
   paraview/detail/extract_selection.py
+  paraview/detail/loghandler.py
   paraview/detail/pythonalgorithm.py
   paraview/detail/python_selector.py
+  paraview/detail/catalyst_export.py
   paraview/live.py
   paraview/lookuptable.py
   paraview/modules/__init__.py
@@ -36,6 +46,8 @@ set(python_files
   paraview/smtesting.py
   paraview/smtrace.py
   paraview/spatiotemporalparallelism.py
+  paraview/tests/__init__.py
+  paraview/tests/validate_extracts.py
   paraview/tpl/__init__.py
   paraview/util/__init__.py
   paraview/util/vtkAlgorithm.py

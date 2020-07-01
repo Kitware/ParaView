@@ -57,7 +57,8 @@ public:
 
 //-----------------------------------------------------------------------------
 pqOutputPort::pqOutputPort(pqPipelineSource* source, int portno)
-  : Superclass(source)
+  : Superclass(QString(), QString(), source->getSourceProxy()->GetOutputPort(portno),
+      source->getServer(), source)
   , Source(source)
   , PortNumber(portno)
 {

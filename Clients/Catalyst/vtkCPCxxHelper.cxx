@@ -15,6 +15,8 @@
 #include "vtkCPCxxHelper.h"
 
 #include "vtkInitializationHelper.h"
+#include "vtkLogger.h"
+#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h" // Required to get build options for paraview
@@ -35,40 +37,64 @@
 #include <vtksys/SystemTools.hxx>
 
 vtkWeakPointer<vtkCPCxxHelper> vtkCPCxxHelper::Instance;
+bool vtkCPCxxHelper::ParaViewExternallyInitialized = false;
 
 //----------------------------------------------------------------------------
 vtkCPCxxHelper::vtkCPCxxHelper()
+  : Options(nullptr)
 {
-  this->Options = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkCPCxxHelper::~vtkCPCxxHelper()
 {
-  if (this->Options)
+  if (!vtkCPCxxHelper::ParaViewExternallyInitialized)
   {
-    this->Options->Delete();
-    this->Options = 0;
+    vtkInitializationHelper::Finalize();
   }
-  vtkInitializationHelper::Finalize();
 }
 
 //----------------------------------------------------------------------------
 vtkCPCxxHelper* vtkCPCxxHelper::New()
 {
-  if (vtkCPCxxHelper::Instance.GetPointer() == 0)
+  if (vtkCPCxxHelper::Instance.GetPointer() != nullptr)
   {
-    // Try the factory first
-    vtkCPCxxHelper* instance = (vtkCPCxxHelper*)vtkObjectFactory::CreateInstance("vtkCPCxxHelper");
-    // if the factory did not provide one, then create it here
-    if (!instance)
-    {
-      instance = new vtkCPCxxHelper;
-      // for compliance with vtkDebugLeaks, initialize the object base
-      instance->InitializeObjectBase();
-    }
+    vtkCPCxxHelper::Instance->Register(NULL);
+    return vtkCPCxxHelper::Instance;
+  }
 
-    vtkCPCxxHelper::Instance = instance;
+  // For in situ, when running in distributed mode, ensure that we don't
+  // generate any output on the stderr on satellite ranks. One can of course
+  // generate log files, if needed for satellite, but it's best to disable
+  // any terminal output for errors/warnings etc.
+  if (auto controller = vtkMultiProcessController::GetGlobalController())
+  {
+    if (controller->GetLocalProcessId() > 0)
+    {
+      vtkLogger::SetStderrVerbosity(vtkLogger::VERBOSITY_OFF);
+    }
+  }
+
+  // Try the factory first
+  vtkCPCxxHelper* instance = (vtkCPCxxHelper*)vtkObjectFactory::CreateInstance("vtkCPCxxHelper");
+  // if the factory did not provide one, then create it here
+  if (!instance)
+  {
+    instance = new vtkCPCxxHelper;
+    // for compliance with vtkDebugLeaks, initialize the object base
+    instance->InitializeObjectBase();
+  }
+
+  vtkCPCxxHelper::Instance = instance;
+
+  if (auto pm = vtkProcessModule::GetProcessModule())
+  {
+    vtkCPCxxHelper::ParaViewExternallyInitialized = true;
+    vtkCPCxxHelper::Instance->Options = pm->GetOptions();
+  }
+  else
+  {
+    vtkCPCxxHelper::ParaViewExternallyInitialized = false;
 
 // Since when coprocessing, we have no information about the executable, we
 // make one up using the current working directory.
@@ -84,7 +110,7 @@ vtkCPCxxHelper* vtkCPCxxHelper::New()
     argv[0] = vtksys::SystemTools::DuplicateString(programname.c_str());
     argv[1] = nullptr;
 
-    vtkCPCxxHelper::Instance->Options = vtkPVOptions::New();
+    vtkCPCxxHelper::Instance->Options.TakeReference(vtkPVOptions::New());
     vtkCPCxxHelper::Instance->Options->SetSymmetricMPIMode(1);
 
     // Disable vtkSMSettings processing for Catalyst applications.
@@ -93,21 +119,24 @@ vtkCPCxxHelper* vtkCPCxxHelper::New()
     vtkInitializationHelper::Initialize(
       argc, argv, vtkProcessModule::PROCESS_BATCH, vtkCPCxxHelper::Instance->Options);
 
+    delete[] argv[0];
+    delete[] argv;
+  }
+
+  // Create session, if none exists.
+  auto pm = vtkProcessModule::GetProcessModule();
+  assert(pm != nullptr);
+
+  if (pm->GetSession() == nullptr)
+  {
+
     // Setup default session.
     vtkIdType connectionId = vtkSMSession::ConnectToSelf();
     assert(connectionId != 0);
 
     // initialize the session for a ParaView session.
     vtkNew<vtkSMParaViewPipelineController> controller;
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     controller->InitializeSession(vtkSMSession::SafeDownCast(pm->GetSession(connectionId)));
-
-    delete[] argv[0];
-    delete[] argv;
-  }
-  else
-  {
-    vtkCPCxxHelper::Instance->Register(NULL);
   }
 
   return vtkCPCxxHelper::Instance;

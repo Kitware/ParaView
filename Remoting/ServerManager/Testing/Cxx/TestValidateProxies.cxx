@@ -42,7 +42,8 @@ int TestValidateProxies(int argc, char* argv[])
   exceptions.insert(std::pair<std::string, std::string>("internal_views", "XYChartViewBase4Axes"));
   exceptions.insert(
     std::pair<std::string, std::string>("internal_readers", "VisItSeriesReaderBase"));
-
+  exceptions.insert(std::pair<std::string, std::string>("extract_writers", "JPG"));
+  exceptions.insert(std::pair<std::string, std::string>("extract_writers", "PNG"));
   (void)argc;
 
   int exitCode = EXIT_SUCCESS;

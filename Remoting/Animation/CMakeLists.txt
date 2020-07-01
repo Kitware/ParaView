@@ -54,6 +54,7 @@ set(classes
   vtkSMAnimationSceneGeometryWriter
   vtkSMAnimationSceneProxy
   vtkSMAnimationSceneWriter
+  vtkSMSaveAnimationExtractsProxy
   vtkSMSaveAnimationProxy
   vtkSequenceAnimationPlayer
   vtkTimestepsAnimationPlayer

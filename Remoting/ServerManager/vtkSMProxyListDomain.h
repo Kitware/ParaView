@@ -145,9 +145,9 @@ public:
   int RemoveProxy(unsigned int index);
 
   /**
-   * Creates and populates the domain with the proxy-types. This will remove any
-   * existing proxies in the domain. Note that the newly created proxies won't
-   * be registered with the proxy manager.
+   * Creates and populates the domain with the proxy-types.
+   * Note that the newly created proxies won't be registered with
+   * the proxy manager.
    */
   void CreateProxies(vtkSMSessionProxyManager* pxm);
 

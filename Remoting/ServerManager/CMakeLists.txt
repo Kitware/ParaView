@@ -78,6 +78,7 @@ set(classes
   vtkSMCompoundSourceProxyDefinitionBuilder
   vtkSMCoreUtilities
   vtkSMDataAssemblyDomain
+  vtkSMDataExtractWriterProxy
   vtkSMDataSourceProxy
   vtkSMDataTypeDomain
   vtkSMDeserializer
@@ -95,8 +96,10 @@ set(classes
   vtkSMDoubleRangeDomain
   vtkSMDoubleVectorProperty
   vtkSMEnumerationDomain
-  vtkSMExportProxyDepot
   vtkSMExtentDomain
+  vtkSMExtractsController
+  vtkSMExtractTriggerProxy
+  vtkSMExtractWriterProxy
   vtkSMFieldDataDomain
   vtkSMFileListDomain
   vtkSMFixedTypeDomain

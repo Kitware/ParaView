@@ -1,0 +1,11 @@
+[
+  {"type":"directory","name":"Testing/Temporary/MultiplePipelines","contents":[
+    {"type":"directory","name":"Pipeline1","contents":[
+      {"type":"file","name":"pipeline1_000000.png", "compare": true},
+      {"type":"file","name":"pipeline1_000001.png"}
+    ]},
+    {"type":"directory","name":"Pipeline2","contents":[
+      {"type":"file","name":"pipeline2_000001.png", "compare": true}
+    ]}
+  ]}
+]

@@ -62,6 +62,7 @@ class ModifiedLiveInsituLink;
 class QFont;
 class QPixmap;
 class QString;
+class pqExtractGenerator;
 class pqPipelineModelDataItem;
 class pqPipelineModelInternal;
 class pqPipelineSource;
@@ -90,6 +91,7 @@ public:
     Server = 0,
     Proxy,
     Port,
+    ExtractGenerator,
     Link
   };
 
@@ -359,6 +361,22 @@ public Q_SLOTS:
   * is broken.
   */
   void removeConnection(pqPipelineSource* source, pqPipelineSource* sink, int);
+
+  //@{
+  /**
+   * Called to update extract generator connections.
+   */
+  void addConnection(pqServerManagerModelItem* source, pqExtractGenerator* sink);
+  void removeConnection(pqServerManagerModelItem* source, pqExtractGenerator* sink);
+  //@}
+
+  //@{
+  /**
+   * Add/remove extract generator.
+   */
+  void addExtractGenerator(pqExtractGenerator*);
+  void removeExtractGenerator(pqExtractGenerator*);
+  //@}
 
   /**
   * Updates the icons in the current window column.

@@ -12,11 +12,13 @@
   PURPOSE.  See the above copyright notice for more information.
 
   =========================================================================*/
+#include "vtkPython.h" // must be first
+
 #include "vtkCPPythonPipeline.h"
 
 #include "vtkPythonInterpreter.h"
-
-#include <sstream>
+#include "vtkPythonUtil.h"
+#include "vtkSmartPyObject.h"
 
 extern "C" {
 void vtkPVInitializePythonModules();
@@ -39,23 +41,23 @@ void CatalystInitializePython()
   vtkPVInitializePythonModules();
 
   vtkPythonInterpreter::Initialize();
+  vtkPythonScopeGilEnsurer gilEnsurer;
 
-  std::ostringstream loadPythonModules;
-  loadPythonModules << "import sys\n"
-                    << "import paraview\n"
-                    << "f1 = paraview.print_error\n"
-                    << "f2 = paraview.print_debug_info\n"
-                    << "def print_dummy(text):\n"
-                    << "  pass\n"
-                    << "paraview.print_error = print_dummy\n"
-                    << "paraview.print_debug_info = print_dummy\n"
-                    // we now import stuff that have warnings or errors that we know are bad
-                    // when we're in a Catalyst edition. This fixes #18248.
-                    << "import paraview.servermanager\n"
-                    << "paraview.print_error = f1\n"
-                    << "paraview.print_debug_info = f2\n"
-                    << "from paraview.modules import vtkPVCatalyst\n";
-  vtkPythonInterpreter::RunSimpleString(loadPythonModules.str().c_str());
+  // initialize Python environment.
+  vtkSmartPyObject module(PyImport_ImportModule("paraview.catalyst.detail"));
+  if (!module)
+  {
+    PyErr_Print();
+    PyErr_Clear();
+  }
+
+  vtkSmartPyObject method(PyString_FromString("InitializePythonEnvironment"));
+  vtkSmartPyObject result(PyObject_CallMethodObjArgs(module, method, nullptr));
+  if (!result)
+  {
+    PyErr_Print();
+    PyErr_Clear();
+  }
 }
 }
 //----------------------------------------------------------------------------

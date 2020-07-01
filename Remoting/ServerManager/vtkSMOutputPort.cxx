@@ -231,3 +231,15 @@ void vtkSMOutputPort::SetCompoundSourceProxy(vtkSMCompoundSourceProxy* src)
 {
   this->CompoundSourceProxy = src;
 }
+
+//----------------------------------------------------------------------------
+vtkSMSession* vtkSMOutputPort::GetSession()
+{
+  return this->SourceProxy ? this->SourceProxy->GetSession() : nullptr;
+}
+
+//----------------------------------------------------------------------------
+vtkSMSessionProxyManager* vtkSMOutputPort::GetSessionProxyManager()
+{
+  return this->SourceProxy ? this->SourceProxy->GetSessionProxyManager() : nullptr;
+}

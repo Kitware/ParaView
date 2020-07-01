@@ -123,38 +123,34 @@ void pqApplyBehavior::onApplied()
 //-----------------------------------------------------------------------------
 void pqApplyBehavior::applied(pqPropertiesPanel*, pqProxy* pqproxy)
 {
-  pqPipelineSource* pqsource = qobject_cast<pqPipelineSource*>(pqproxy);
-  if (pqsource == NULL)
+  if (pqproxy->modifiedState() == pqProxy::UNINITIALIZED)
   {
-    return;
-  }
-
-  assert(pqsource);
-
-  if (pqsource->modifiedState() == pqProxy::UNINITIALIZED)
-  {
-    // if this is first apply after creation, show the data in the view.
-    this->showData(pqsource, pqActiveObjects::instance().activeView());
+    if (auto pqsource = qobject_cast<pqPipelineSource*>(pqproxy))
+    {
+      // if this is first apply after creation, show the data in the view.
+      this->showData(pqsource, pqActiveObjects::instance().activeView());
+    }
 
     // add undo-element to ensure this state change happens when
     // undoing/redoing.
     pqProxyModifiedStateUndoElement* undoElement = pqProxyModifiedStateUndoElement::New();
-    undoElement->SetSession(pqsource->getServer()->session());
-    undoElement->MadeUnmodified(pqsource);
+    undoElement->SetSession(pqproxy->getServer()->session());
+    undoElement->MadeUnmodified(pqproxy);
     ADD_UNDO_ELEM(undoElement);
     undoElement->Delete();
   }
-  pqsource->setModifiedState(pqProxy::UNMODIFIED);
+  pqproxy->setModifiedState(pqProxy::UNMODIFIED);
 
   // Make sure filters menu enable state is updated
   Q_EMIT pqApplicationCore::instance()->forceFilterMenuRefresh();
 
-  pqPipelineFilter* pqfilter = qobject_cast<pqPipelineFilter*>(pqproxy);
-  if (!pqfilter)
+  auto pqfilter = qobject_cast<pqPipelineFilter*>(pqproxy);
+  auto pqsource = qobject_cast<pqPipelineSource*>(pqproxy);
+  if (pqsource != nullptr && pqfilter == nullptr)
   {
     // if we have a dataset from a source that has a Catalyst channel name we now rename
     // the proxy to be the channel name if the user didn't modify the name already
-    if (pqsource->userModifiedSMName() == false)
+    if (pqproxy->userModifiedSMName() == false)
     {
       vtkSMSourceProxy* proxy = pqsource->getSourceProxy();
 
@@ -167,7 +163,7 @@ void pqApplyBehavior::applied(pqPropertiesPanel*, pqProxy* pqproxy)
       std::string name = information->GetChannelName();
       if (!name.empty())
       {
-        pqsource->rename(name.c_str());
+        pqproxy->rename(name.c_str());
       }
     }
   }

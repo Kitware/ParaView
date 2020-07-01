@@ -62,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDesktopServicesReaction.h"
 #include "pqExampleVisualizationsDialogReaction.h"
 #include "pqExportReaction.h"
+#include "pqExtractGeneratorsMenuReaction.h"
 #include "pqFiltersMenuReaction.h"
 #ifdef PARAVIEW_USE_QTHELP
 #include "pqHelpReaction.h"
@@ -163,6 +164,11 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
 
   new pqLoadStateReaction(ui.actionFileLoadServerState);
   new pqSaveStateReaction(ui.actionFileSaveServerState);
+#if VTK_MODULE_ENABLE_ParaView_pqPython
+  new pqCatalystExportReaction(ui.actionFileSaveCatalystState);
+#else
+  ui.actionFileSaveCatalystState->setEnabled(false);
+#endif
 
   new pqServerConnectReaction(ui.actionServerConnect);
   new pqServerDisconnectReaction(ui.actionServerDisconnect);
@@ -172,7 +178,7 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   new pqSaveAnimationGeometryReaction(ui.actionFileSaveGeometry);
 
   new pqExportReaction(ui.actionExport);
-  new pqImmediateExportReaction(ui.actionExportImmediate);
+  new pqImmediateExportReaction(ui.actionFileSaveExtracts);
   new pqSaveDataReaction(ui.actionFileSaveData);
 
   new pqLoadRestoreWindowLayoutReaction(true, ui.actionFileLoadWindowArrangement);
@@ -255,6 +261,31 @@ void pqParaViewMenuBuilders::buildFiltersMenu(
   // pqFiltersMenuReaction
   menuReaction->connect(&menu, SIGNAL(aboutToShow()), SLOT(updateEnableState()));
 
+  auto* pvappcore = pqPVApplicationCore::instance();
+  if (quickLaunchable && pvappcore)
+  {
+    menuReaction->connect(pvappcore, SIGNAL(aboutToShowQuickLaunch()), SLOT(updateEnableState()));
+  }
+
+  if (mainWindow)
+  {
+    // create toolbars for categories as needed.
+    new pqCategoryToolbarsBehavior(mgr, mainWindow);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqParaViewMenuBuilders::buildExtractGeneratorsMenu(
+  QMenu& menu, QMainWindow* mainWindow, bool hideDisabled, bool quickLaunchable)
+{
+  // Make sure disabled actions are still considered active
+  menu.setStyle(new pqActiveDisabledStyle);
+
+  pqProxyGroupMenuManager* mgr =
+    new pqProxyGroupMenuManager(&menu, "ParaViewExtractWriters", quickLaunchable);
+  mgr->addProxyDefinitionUpdateListener("extract_writers");
+
+  auto menuReaction = new pqExtractGeneratorsMenuReaction(mgr, hideDisabled);
   auto* pvappcore = pqPVApplicationCore::instance();
   if (quickLaunchable && pvappcore)
   {
@@ -719,7 +750,7 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
 }
 
 //-----------------------------------------------------------------------------
-void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu, QWidget* exportConfiguration)
+void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu)
 {
   new pqCatalystConnectReaction(menu.addAction("Connect...") << pqSetName("actionCatalystConnect"));
   new pqCatalystPauseSimulationReaction(
@@ -732,25 +763,4 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu, QWidget* exportConfi
 
   new pqCatalystRemoveBreakpointReaction(
     menu.addAction("Remove Breakpoint") << pqSetName("actionCatalystRemoveBreakpoint"));
-
-#if VTK_MODULE_ENABLE_ParaView_pqPython
-  menu.addSeparator(); // --------------------------------------------------
-  // QAction* cexport = menu.addAction("Configure Exports"); //WTH won't this show up on mac?
-  // QAction* cexport = menu.addAction("Setup Exports"); //or this on mac?
-  QAction* cexport = menu.addAction("Define Exports")
-    << pqSetName("actionCatalystConfigure"); // but this is OK?
-  QObject::connect(cexport, SIGNAL(triggered()), exportConfiguration, SLOT(show()));
-
-  QAction* gcatalyst = menu.addAction("Export Catalyst Script")
-    << pqSetName("actionExportCatalyst");
-  new pqCatalystExportReaction(gcatalyst);
-  QAction* gimmediate = menu.addAction("Export Now") << pqSetName("actionExportImmediate");
-  new pqImmediateExportReaction(gimmediate);
-  QAction* gtemporal = menu.addAction("Export Temporal Script")
-    << pqSetName("actionExportTemporal");
-  new pqTemporalExportReaction(gtemporal);
-
-#else
-  (void)exportConfiguration; // avoid unreferenced parameter comp warning
-#endif
 }

@@ -219,6 +219,18 @@ public:
   virtual bool RegisterTextureProxy(vtkSMProxy* proxy, const char* filename);
 
   //---------------------------------------------------------------------------
+  // *******  Methods for Extract generators   *********
+
+  /**
+   * Registers an extract generator.
+   */
+  virtual bool RegisterExtractGeneratorProxy(vtkSMProxy* proxy, const char* proxyname);
+  virtual bool RegisterExtractGeneratorProxy(vtkSMProxy* proxy)
+  {
+    return this->RegisterExtractGeneratorProxy(proxy, nullptr);
+  }
+
+  //---------------------------------------------------------------------------
   // *******  Methods for Animation   *********
 
   /**

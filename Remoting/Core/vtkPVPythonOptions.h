@@ -34,47 +34,19 @@ public:
   vtkTypeMacro(vtkPVPythonOptions, vtkPVOptions);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
-  /**
-   * Get the python script name.
-   */
-  vtkGetStringMacro(PythonScriptName);
-  //@}
-
 protected:
-  /**
-   * Default constructor.
-   */
   vtkPVPythonOptions();
-
-  /**
-   * Destructor.
-   */
   ~vtkPVPythonOptions() override;
 
   /**
-   * Synchronizes the options among root and satellites.
-   */
-  void Synchronize();
-
-  /**
-   * After parsing, process extra option dependencies.
-   */
-  int PostProcess(int argc, const char* const* argv) override;
-
-  /**
-   * This method is called when wrong argument is found. If it returns 0, then
-   * the parsing will fail.
+   * This method is called when wrong argument is found. We record the first
+   * unknown argument and then stop argument parsing by simply returning 1.
    */
   int WrongArgument(const char* argument) override;
-
-  // Options:
-  vtkSetStringMacro(PythonScriptName);
-  char* PythonScriptName;
 
 private:
   vtkPVPythonOptions(const vtkPVPythonOptions&) = delete;
   void operator=(const vtkPVPythonOptions&) = delete;
 };
 
-#endif // #ifndef vtkPVPythonOptions_h
+#endif

@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPVApplicationCore.h"
 #include "pqPipelineFilter.h"
+#include "pqProxySelection.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
@@ -104,18 +105,17 @@ void pqDeleteReaction::updateEnableState()
 
 //-----------------------------------------------------------------------------
 static void pqDeleteReactionGetSelectedSet(
-  vtkSMProxySelectionModel* selModel, QSet<pqPipelineSource*>& selectedSources)
+  vtkSMProxySelectionModel* selModel, QSet<pqProxy*>& selectedSources)
 {
-  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
-  for (unsigned int cc = 0; cc < selModel->GetNumberOfSelectedProxies(); cc++)
+  pqProxySelection qselection;
+  pqProxySelectionUtilities::copy(selModel, qselection);
+  // convert all pqOutputPorts to pqPipelineSources
+  qselection = pqProxySelectionUtilities::getPipelineProxies(qselection);
+  for (auto& item : qselection)
   {
-    vtkSMProxy* proxy = selModel->GetSelectedProxy(cc);
-    pqServerManagerModelItem* item = smmodel->findItem<pqServerManagerModelItem*>(proxy);
-    pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
-    pqPipelineSource* source = port ? port->getSource() : qobject_cast<pqPipelineSource*>(item);
-    if (source)
+    if (auto proxy = qobject_cast<pqProxy*>(item))
     {
-      selectedSources.insert(source);
+      selectedSources.insert(proxy);
     }
   }
 }
@@ -129,7 +129,7 @@ bool pqDeleteReaction::canDeleteSelected()
     return false;
   }
 
-  QSet<pqPipelineSource*> selectedSources;
+  QSet<pqProxy*> selectedSources;
   ::pqDeleteReactionGetSelectedSet(selModel, selectedSources);
 
   if (selectedSources.size() == 0)
@@ -139,15 +139,17 @@ bool pqDeleteReaction::canDeleteSelected()
 
   // Now ensure that all consumers for the current sources don't have consumers
   // outside the selectedSources, then alone can we delete the selected items.
-  foreach (pqPipelineSource* source, selectedSources)
+  for (auto item : selectedSources)
   {
-    QList<pqPipelineSource*> consumers = source->getAllConsumers();
-    for (int cc = 0; cc < consumers.size(); cc++)
+    if (auto source = qobject_cast<pqPipelineSource*>(item))
     {
-      pqPipelineSource* consumer = consumers[cc];
-      if (consumer && !selectedSources.contains(consumer))
+      QList<pqPipelineSource*> consumers = source->getAllConsumers();
+      for (auto consumer : consumers)
       {
-        return false;
+        if (consumer && !selectedSources.contains(consumer))
+        {
+          return false;
+        }
       }
     }
   }
@@ -179,34 +181,40 @@ void pqDeleteReaction::deleteSelected()
 
   vtkSMProxySelectionModel* selModel = pqActiveObjects::instance().activeSourcesSelectionModel();
 
-  QSet<pqPipelineSource*> selectedSources;
+  QSet<pqProxy*> selectedSources;
   ::pqDeleteReactionGetSelectedSet(selModel, selectedSources);
   pqDeleteReaction::deleteSources(selectedSources);
 }
 
 //-----------------------------------------------------------------------------
-void pqDeleteReaction::deleteSource(pqPipelineSource* source)
+void pqDeleteReaction::deleteSource(pqProxy* source)
 {
-  if (source)
+  if (auto port = qobject_cast<pqOutputPort*>(source))
   {
-    QSet<pqPipelineSource*> sources;
-    sources.insert(source);
-    pqDeleteReaction::deleteSources(sources);
+    pqDeleteReaction::deleteSource(port->getSource());
+  }
+  else if (source)
+  {
+    pqDeleteReaction::deleteSources(QSet<pqProxy*>{
+      source,
+    });
   }
 }
 
 //-----------------------------------------------------------------------------
-void pqDeleteReaction::deleteSources(QSet<pqPipelineSource*>& sources)
+void pqDeleteReaction::deleteSources(const QSet<pqProxy*>& argSources)
 {
-  if (sources.size() == 0)
+  if (argSources.size() == 0)
   {
     return;
   }
 
+  QSet<pqProxy*> sources = argSources;
+
   vtkNew<vtkSMParaViewPipelineController> controller;
   if (sources.size() == 1)
   {
-    pqPipelineSource* source = (*sources.begin());
+    auto source = (*sources.begin());
     BEGIN_UNDO_SET(QString("Delete %1").arg(source->getSMName()));
   }
   else
@@ -220,14 +228,14 @@ void pqDeleteReaction::deleteSources(QSet<pqPipelineSource*>& sources)
   do
   {
     something_deleted_in_current_iteration = false;
-    foreach (pqPipelineSource* source, sources)
+    for (pqProxy* proxy : sources)
     {
-      if (source && source->getNumberOfConsumers() == 0)
+      auto source = qobject_cast<pqPipelineSource*>(proxy);
+      if (proxy != nullptr && (source == nullptr || source->getNumberOfConsumers() == 0))
       {
-        pqDeleteReaction::aboutToDelete(source);
-
-        sources.remove(source);
-        controller->UnRegisterProxy(source->getProxy());
+        pqDeleteReaction::aboutToDelete(proxy);
+        sources.remove(proxy);
+        controller->UnRegisterProxy(proxy->getProxy());
         something_deleted = true;
         something_deleted_in_current_iteration = true;
         break;
@@ -263,7 +271,7 @@ void pqDeleteReaction::deleteSources(QSet<pqPipelineSource*>& sources)
 }
 
 //-----------------------------------------------------------------------------
-void pqDeleteReaction::aboutToDelete(pqPipelineSource* source)
+void pqDeleteReaction::aboutToDelete(pqProxy* source)
 {
   pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(source);
   if (!filter)
@@ -292,10 +300,10 @@ void pqDeleteReaction::aboutToDelete(pqPipelineSource* source)
   foreach (pqView* view, views)
   {
     vtkSMViewProxy* viewProxy = view->getViewProxy();
-    if (controller->GetVisibility(source->getSourceProxy(), 0, viewProxy))
+    if (controller->GetVisibility(filter->getSourceProxy(), 0, viewProxy))
     {
       // this will also hide scalar bars if needed.
-      controller->Hide(source->getSourceProxy(), 0, viewProxy);
+      controller->Hide(filter->getSourceProxy(), 0, viewProxy);
 
       // if firstInput had a representation in this view that was hidden, show
       // it. We don't want to create a new representation, however.

@@ -105,9 +105,17 @@ def get_producers(proxy, filter, producer_set):
             get_producers(proxy.ScalarOpacityFunction, filter, producer_set)
     except AttributeError: pass
 
-def get_state(propertiesToTraceOnCreate=RECORD_MODIFIED_PROPERTIES,
-    skipHiddenRepresentations=True, skipRenderingComponents=False, source_set=[], filter=None, raw=False):
+def get_state(options=None, source_set=[], filter=None, raw=False):
     """Returns the state string"""
+    if options:
+        options = sm._getPyProxy(options)
+        propertiesToTraceOnCreate = options.PropertiesToTraceOnCreate
+        skipHiddenRepresentations = options.SkipHiddenDisplayProperties
+        skipRenderingComponents = options.SkipRenderingComponents
+    else:
+        propertiesToTraceOnCreate = RECORD_MODIFIED_PROPERTIES
+        skipHiddenRepresentations = True
+        skipRenderingComponents = False
 
     # essential to ensure any obsolete accessors don't linger - can cause havoc
     # when saving state following a Python trace session
@@ -142,16 +150,17 @@ def get_state(propertiesToTraceOnCreate=RECORD_MODIFIED_PROPERTIES,
     proxies_of_interest = producers.union(consumers)
     #print ("proxies_of_interest", proxies_of_interest)
 
-    trace_config = smtrace.start_trace()
+    trace_config = smtrace.start_trace(preamble="")
     # this ensures that lookup tables/scalar bars etc. are fully traced.
     trace_config.SetFullyTraceSupplementalProxies(True)
     trace_config.SetSkipRenderingComponents(skipRenderingComponents)
 
     trace = smtrace.TraceOutput()
     trace.append("# state file generated using %s" % simple.GetParaViewSourceVersion())
+    trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
     #--------------------------------------------------------------------------
-    # First, we trace the views and layouts, if any.
+    # We trace the views and layouts, if any.
     if skipRenderingComponents:
         views = []
     else:
@@ -214,10 +223,6 @@ def get_state(propertiesToTraceOnCreate=RECORD_MODIFIED_PROPERTIES,
             "# ----------------------------------------------------------------"])
         for source in sorted_sources:
             traceitem = smtrace.RegisterPipelineProxy(source)
-            traceitem.finalize()
-            del traceitem
-            # make sure any name changes are recorded
-            traceitem = smtrace.RenameProxy(source)
             traceitem.finalize()
             del traceitem
         trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
@@ -308,14 +313,42 @@ def get_state(propertiesToTraceOnCreate=RECORD_MODIFIED_PROPERTIES,
                 smtrace.Trace.get_accessor(ctf.ScalarOpacityFunction)
         trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
+    # Trace extract generators.
+    exgens = set([x for x in proxies_of_interest \
+            if smtrace.Trace.get_registered_name(x, "extract_generators")])
+    if exgens:
+        trace.append_separated([\
+            "# ----------------------------------------------------------------",
+            "# setup extract generators",
+            "# ----------------------------------------------------------------"])
+        for exgen in exgens:
+            # FIXME: this currently doesn't handle multiple output ports
+            # correctly.
+            traceitem = smtrace.CreateExtractGenerator(\
+                    xmlname=exgen.Writer.GetXMLName(),
+                    producer=exgen.Producer,
+                    generator=exgen,
+                    registrationName=smtrace.Trace.get_registered_name(exgen, "extract_generators"))
+            traceitem.finalize()
+            del traceitem
+        trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
+
     # restore the active source since the order in which the pipeline is created
     # in the state file can end up changing the active source to be different
     # than what it was when the state is being saved.
     trace.append_separated([\
             "# ----------------------------------------------------------------",
-            "# finally, restore active source",
+            "# restore active source",
             "SetActiveSource(%s)" % smtrace.Trace.get_accessor(simple.GetActiveSource()),
             "# ----------------------------------------------------------------"])
+
+    if options:
+        # add coda about extracts generation.
+        trace.append_separated(["",
+            "if __name__ == '__main__':",
+            "    # generate extracts",
+            "    SaveExtracts(DataExtractsOutputDirectory='%s'," % options.DataExtractsOutputDirectory,
+            "        ImageExtractsOutputDirectory='%s')" % options.ImageExtractsOutputDirectory])
     del trace_config
     smtrace.stop_trace()
     #print (trace)

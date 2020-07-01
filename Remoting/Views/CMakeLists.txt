@@ -137,6 +137,7 @@ set(classes
   vtkSMComparativeViewProxy
   vtkSMContextViewProxy
   vtkSMDataDeliveryManagerProxy
+  vtkSMImageExtractWriterProxy
   vtkSMImplicitPlaneRepresentationProxy
   vtkSMLightProxy
   vtkSMMaterialDomain
@@ -240,6 +241,7 @@ vtk_module_add_module(ParaView::RemotingViews
 
 paraview_add_server_manager_xmls(
   XMLS Resources/3dwidgets_remotingviews.xml
+       Resources/extractors_remotingviews.xml
        Resources/rendering.xml
        Resources/sources_remotingviews.xml
        Resources/utilities_remotingviews.xml

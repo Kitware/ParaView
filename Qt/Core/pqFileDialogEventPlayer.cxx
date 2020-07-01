@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtksys/SystemTools.hxx>
 
 #include <QApplication>
+#include <QDir>
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------
@@ -126,6 +127,19 @@ bool pqFileDialogEventPlayer::playEvent(
       Error = true;
     }
     return true;
+  }
+  if (Command == "removeDir")
+  {
+    QDir dir(fileString);
+    if (dir.exists())
+    {
+      return dir.removeRecursively();
+    }
+    return true;
+  }
+  if (Command == "makeDir")
+  {
+    return vtksys::SystemTools::MakeDirectory(fileString.toLocal8Bit().data());
   }
   if (!this->Superclass::playEvent(Object, Command, Arguments, Error))
   {

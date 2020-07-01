@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqOutputPort_h
 
 #include "pqCoreModule.h"
-#include "pqServerManagerModelItem.h"
+#include "pqProxy.h"
 
 class pqDataRepresentation;
 class pqPipelineSource;
@@ -55,10 +55,10 @@ class vtkSMSourceProxy;
 * Once the outputs can be named, we will change this class to use output port
 * names instead of numbers.
 */
-class PQCORE_EXPORT pqOutputPort : public pqServerManagerModelItem
+class PQCORE_EXPORT pqOutputPort : public pqProxy
 {
   Q_OBJECT
-  typedef pqServerManagerModelItem Superclass;
+  typedef pqProxy Superclass;
 
 public:
   pqOutputPort(pqPipelineSource* source, int portno);

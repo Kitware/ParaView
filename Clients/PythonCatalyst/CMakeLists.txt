@@ -33,6 +33,7 @@ set(classes
   vtkCPPythonAdaptorAPI
   vtkCPPythonPipeline
   vtkCPPythonScriptPipeline
+  vtkCPPythonScriptV2Pipeline
   vtkCPPythonStringPipeline)
 
 set(catalyst_fortran_using_mangling)

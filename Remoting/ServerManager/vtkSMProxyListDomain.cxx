@@ -269,7 +269,6 @@ const std::vector<vtkSMProxyListDomain::ProxyType>& vtkSMProxyListDomain::GetPro
 void vtkSMProxyListDomain::CreateProxies(vtkSMSessionProxyManager* pxm)
 {
   assert(pxm);
-  this->Internals->ClearProxies();
   for (const auto& apair : this->Internals->ProxyTypeList)
   {
     if (vtkSMProxy* proxy = pxm->NewProxy(apair.GroupName.c_str(), apair.ProxyName.c_str()))
@@ -368,7 +367,6 @@ int vtkSMProxyListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
     return 0;
   }
 
-  int found = 0;
   unsigned int max = element->GetNumberOfNestedElements();
   for (unsigned int cc = 0; cc < max; ++cc)
   {
@@ -380,7 +378,6 @@ int vtkSMProxyListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
       if (name && group)
       {
         this->AddProxy(group, name);
-        found = 1;
       }
     }
     else if (strcmp(proxyElement->GetName(), "Group") == 0)
@@ -390,8 +387,6 @@ int vtkSMProxyListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
 
       if (name)
       {
-        found = 1;
-
         // Browse group and recover each proxy type
         vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
         vtkSMProxyDefinitionManager* pxdm = pxm->GetProxyDefinitionManager();
@@ -413,13 +408,6 @@ int vtkSMProxyListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
       }
     }
   }
-  if (!found)
-  {
-    vtkErrorMacro("Required element \"Proxy\" (with a 'name' and 'group' attribute) "
-                  " or \"Group\" ( with a name attribute ) was not found.");
-    return 0;
-  }
-
   return 1;
 }
 

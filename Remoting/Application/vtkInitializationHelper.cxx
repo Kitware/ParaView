@@ -263,6 +263,14 @@ void vtkInitializationHelper::Initialize(int argc, char** argv, int type, vtkPVO
                                     "\"AtomicNumbers\": \"BlueObeliskElements\" "
                                     "} }",
     0.0);
+
+  // until we replace PARAVIEW_SMTESTDRIVER with something cleaner, we have
+  // to print this greeting out when the process is launched from
+  // smTestDriver
+  if (vtksys::SystemTools::HasEnv("PARAVIEW_SMTESTDRIVER"))
+  {
+    cout << "Process started" << endl;
+  }
 }
 
 //----------------------------------------------------------------------------

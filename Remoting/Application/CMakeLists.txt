@@ -44,9 +44,9 @@ vtk_module_link(ParaView::RemotingApplication
 vtk_module_client_server_exclude()
 
 set(xml_files
+  Resources/extractors.xml
   Resources/internal_writers.xml
-  Resources/utilities.xml
-  Resources/writers.xml)
+  Resources/utilities.xml)
 
 if (TARGET VTK::CommonComputationalGeometry)
   list(APPEND xml_files

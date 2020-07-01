@@ -670,5 +670,41 @@
 
     </SaveAnimationProxy>
 
+   <SaveAnimationExtractsProxy name="SaveAnimationExtracts" processes="client">
+      <StringVectorProperty name="DataExtractsOutputDirectory"
+        number_of_elements="1"
+        default_values="datasets">
+        <Documentation>
+          Choose directory under which to save all data extracts. All text
+          of the form **$ENV{VAR}** will be replaced using environment variable
+          named **VAR**.
+        </Documentation>
+        <FileListDomain name="directory" />
+        <Hints>
+          <UseDirectoryName />
+          <AcceptAnyFile />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ImageExtractsOutputDirectory"
+        number_of_elements="1"
+        default_values="images">
+        <Documentation>
+          Choose directory under which to save all image extracts. All text
+          of the form **$ENV{VAR}** will be replaced using environment variable
+          named **VAR**.
+        </Documentation>
+        <FileListDomain name="directory" />
+        <Hints>
+          <UseDirectoryName />
+          <BrowseLocalFileSystem />
+          <AcceptAnyFile />
+        </Hints>
+      </StringVectorProperty>
+
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
+    </SaveAnimationExtractsProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

@@ -78,6 +78,12 @@ public:
     bool quickLaunchable = true);
 
   /**
+   * Builds "Extract Generators" menu.
+   */
+  static void buildExtractGeneratorsMenu(QMenu& menu, QMainWindow* mainWindow = nullptr,
+    bool hideDisabled = false, bool quickLaunchable = true);
+
+  /**
   * Builds the "Tools" menu.
   */
   static void buildToolsMenu(QMenu& menu);
@@ -85,7 +91,7 @@ public:
   /**
   * Builds the "Catalyst" menu
   */
-  static void buildCatalystMenu(QMenu& menu, QWidget* confpanel);
+  static void buildCatalystMenu(QMenu& menu);
 
   /**
   * Builds the "View" menu.

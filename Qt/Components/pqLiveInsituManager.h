@@ -70,7 +70,7 @@ public:
     return pqLiveInsituManager::linkProxy(this->selectedInsituServer());
   }
   static bool isInsituServer(pqServer* server);
-  static bool isInsitu(pqPipelineSource* pipelineSource);
+  static bool isInsitu(pqProxy* pipelineSource);
   static bool isWriterParametersProxy(vtkSMProxy* proxy);
   static pqPipelineSource* pipelineSource(pqServer* insituSession);
   static void time(pqPipelineSource* source, double* time, vtkIdType* timeStep);
