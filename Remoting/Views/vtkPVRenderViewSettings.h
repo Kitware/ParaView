@@ -105,8 +105,8 @@ public:
   //@{
   /**
    * Enable fast preselection. When enabled, the preselection is computed using
-   * the visible geometry. This avoid a call to the extract selection filter each time
-   * the mouse move, improving a lot the preselection highlight display, especially for
+   * the visible geometry. This avoids a call to the extract selection filter each time
+   * the mouse moves, improving a lot the preselection highlight display, especially for
    * big datasets.
    */
   vtkSetMacro(EnableFastPreselection, bool);
