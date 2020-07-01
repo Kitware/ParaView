@@ -136,13 +136,13 @@ void vtkSurfaceLICRepresentation::SetNumberOfSteps(int val)
   {                                                                                                \
     this->SurfaceLICMapper->GetLICInterface()->Set##_name(val);                                    \
   }
-vtkSurfaceLICRepresentationPassParameterMacro(
-  EnhancedLIC, int) vtkSurfaceLICRepresentationPassParameterMacro(EnhanceContrast,
-  int) vtkSurfaceLICRepresentationPassParameterMacro(LowLICContrastEnhancementFactor,
-  double) vtkSurfaceLICRepresentationPassParameterMacro(HighLICContrastEnhancementFactor,
-  double) vtkSurfaceLICRepresentationPassParameterMacro(LowColorContrastEnhancementFactor,
-  double) vtkSurfaceLICRepresentationPassParameterMacro(HighColorContrastEnhancementFactor,
-  double) vtkSurfaceLICRepresentationPassParameterMacro(AntiAlias, int)
+vtkSurfaceLICRepresentationPassParameterMacro(EnhancedLIC, int);
+vtkSurfaceLICRepresentationPassParameterMacro(EnhanceContrast, int);
+vtkSurfaceLICRepresentationPassParameterMacro(LowLICContrastEnhancementFactor, double);
+vtkSurfaceLICRepresentationPassParameterMacro(HighLICContrastEnhancementFactor, double);
+vtkSurfaceLICRepresentationPassParameterMacro(LowColorContrastEnhancementFactor, double);
+vtkSurfaceLICRepresentationPassParameterMacro(HighColorContrastEnhancementFactor, double);
+vtkSurfaceLICRepresentationPassParameterMacro(AntiAlias, int);
 #endif
 
 //----------------------------------------------------------------------------
@@ -154,44 +154,39 @@ vtkSurfaceLICRepresentationPassParameterMacro(
   }
 
 #if !defined(vtkSurfaceLICRepresentationFASTLOD)
-  vtkSurfaceLICRepresentationPassParameterWithLODMacro(
-    StepSize, double) vtkSurfaceLICRepresentationPassParameterWithLODMacro(NumberOfSteps,
-    int) vtkSurfaceLICRepresentationPassParameterWithLODMacro(EnhancedLIC,
-    int) vtkSurfaceLICRepresentationPassParameterWithLODMacro(EnhanceContrast,
-    int) vtkSurfaceLICRepresentationPassParameterWithLODMacro(LowLICContrastEnhancementFactor,
-    double) vtkSurfaceLICRepresentationPassParameterWithLODMacro(HighLICContrastEnhancementFactor,
-    double) vtkSurfaceLICRepresentationPassParameterWithLODMacro(LowColorContrastEnhancementFactor,
-    double) vtkSurfaceLICRepresentationPassParameterWithLODMacro(HighColorContrastEnhancementFactor,
-    double) vtkSurfaceLICRepresentationPassParameterWithLODMacro(AntiAlias, int)
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(StepSize, double);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(NumberOfSteps, int);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(EnhancedLIC, int);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(EnhanceContrast, int);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(LowLICContrastEnhancementFactor, double);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(HighLICContrastEnhancementFactor, double);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(LowColorContrastEnhancementFactor, double);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(HighColorContrastEnhancementFactor, double);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(AntiAlias, int);
 #endif
-    vtkSurfaceLICRepresentationPassParameterWithLODMacro(
-      NormalizeVectors, int) vtkSurfaceLICRepresentationPassParameterWithLODMacro(ColorMode,
-      int) vtkSurfaceLICRepresentationPassParameterWithLODMacro(MapModeBias, double)
-      vtkSurfaceLICRepresentationPassParameterWithLODMacro(LICIntensity, double)
-        vtkSurfaceLICRepresentationPassParameterWithLODMacro(MaskOnSurface, int)
-          vtkSurfaceLICRepresentationPassParameterWithLODMacro(MaskThreshold, double)
-            vtkSurfaceLICRepresentationPassParameterWithLODMacro(MaskColor, double*)
-              vtkSurfaceLICRepresentationPassParameterWithLODMacro(MaskIntensity, double)
-                vtkSurfaceLICRepresentationPassParameterWithLODMacro(GenerateNoiseTexture, int)
-                  vtkSurfaceLICRepresentationPassParameterWithLODMacro(NoiseType, int)
-                    vtkSurfaceLICRepresentationPassParameterWithLODMacro(NoiseTextureSize, int)
-                      vtkSurfaceLICRepresentationPassParameterWithLODMacro(MinNoiseValue, double)
-                        vtkSurfaceLICRepresentationPassParameterWithLODMacro(MaxNoiseValue, double)
-                          vtkSurfaceLICRepresentationPassParameterWithLODMacro(NoiseGrainSize, int)
-                            vtkSurfaceLICRepresentationPassParameterWithLODMacro(
-                              NumberOfNoiseLevels, int)
-                              vtkSurfaceLICRepresentationPassParameterWithLODMacro(
-                                ImpulseNoiseProbability, double)
-                                vtkSurfaceLICRepresentationPassParameterWithLODMacro(
-                                  ImpulseNoiseBackgroundValue, double)
-                                  vtkSurfaceLICRepresentationPassParameterWithLODMacro(
-                                    NoiseGeneratorSeed, int)
-                                    vtkSurfaceLICRepresentationPassParameterWithLODMacro(
-                                      CompositeStrategy, int)
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(NormalizeVectors, int);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(ColorMode, int);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(MapModeBias, double);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(LICIntensity, double);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(MaskOnSurface, int);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(MaskThreshold, double);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(MaskColor, double*);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(MaskIntensity, double);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(GenerateNoiseTexture, int);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(NoiseType, int);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(NoiseTextureSize, int);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(MinNoiseValue, double);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(MaxNoiseValue, double);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(NoiseGrainSize, int);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(NumberOfNoiseLevels, int);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(ImpulseNoiseProbability, double);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(ImpulseNoiseBackgroundValue, double);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(NoiseGeneratorSeed, int);
+vtkSurfaceLICRepresentationPassParameterWithLODMacro(CompositeStrategy, int);
 
-  //----------------------------------------------------------------------------
-  void vtkSurfaceLICRepresentation::SelectInputVectors(
-    int a, int b, int c, int attributeMode, const char* name)
+//----------------------------------------------------------------------------
+void vtkSurfaceLICRepresentation::SelectInputVectors(
+  int a, int b, int c, int attributeMode, const char* name)
 {
   this->SurfaceLICMapper->SetInputArrayToProcess(a, b, c, attributeMode, name);
   this->SurfaceLICLODMapper->SetInputArrayToProcess(a, b, c, attributeMode, name);
