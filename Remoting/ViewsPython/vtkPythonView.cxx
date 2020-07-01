@@ -125,13 +125,13 @@ public:
       return false;
     }
 
+    vtkPythonScopeGilEnsurer gilEnsurer;
     if (PyObject_HasAttrString(this->ScriptModule, "setup_data") != 1)
     {
       // not having `setup_data` defined in the script is acceptable.
       return true;
     }
 
-    vtkPythonScopeGilEnsurer gilEnsurer;
     vtkSmartPyObject methodName(PyString_FromString("setup_data"));
     vtkSmartPyObject view(vtkPythonUtil::GetObjectFromPointer(self));
     vtkSmartPyObject retVal(PyObject_CallMethodObjArgs(
@@ -146,6 +146,7 @@ public:
       return false;
     }
 
+    vtkPythonScopeGilEnsurer gilEnsurer;
     if (PyObject_HasAttrString(this->ScriptModule, "render") != 1)
     {
       // not having `render` defined in the script is acceptable.
@@ -155,7 +156,6 @@ public:
     vtkSmartPyObject renderFunction(PyObject_GetAttrString(this->ScriptModule, "render"));
     assert(renderFunction);
 
-    vtkPythonScopeGilEnsurer gilEnsurer;
     vtkSmartPyObject methodName(PyString_FromString("call_render"));
     vtkSmartPyObject view(vtkPythonUtil::GetObjectFromPointer(self));
     vtkSmartPyObject widthObj(PyInt_FromLong(width));

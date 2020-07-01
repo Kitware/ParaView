@@ -49,9 +49,16 @@ void vtkPVDataAssemblyInformation::CopyFromObject(vtkObject* obj)
   this->DataAssembly = nullptr;
   if (auto algorithm = vtkAlgorithm::SafeDownCast(obj))
   {
-    auto data = vtkPartitionedDataSetCollection::SafeDownCast(
-      algorithm->GetOutputDataObject(this->PortNumber));
-    this->DataAssembly = data ? data->GetDataAssembly() : nullptr;
+    // since we don't want to cause `RequestDataObject` to be triggered
+    // here (see #paraview/paraview#20016), we explicitly check if the data
+    // object exists rather than using vtkAlgorithm::GetOutputDataObject().
+    auto info = (this->PortNumber < algorithm->GetNumberOfOutputPorts())
+      ? algorithm->GetOutputInformation(this->PortNumber)
+      : nullptr;
+    if (auto data = vtkPartitionedDataSetCollection::GetData(info))
+    {
+      this->DataAssembly = data->GetDataAssembly();
+    }
   }
   else
   {
