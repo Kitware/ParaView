@@ -264,15 +264,19 @@ void vtkPVImageSliceMapper::RenderInternal(vtkRenderer* renderer, vtkActor* acto
     // The LUT can be simply passed to the vtkTexture. It can handle scalar
     // mapping.
     this->Texture->SetInputConnection(extractVOI->GetOutputPort());
-    double outputbounds[6];
-
-    // TODO: vtkExtractVOI is not passing correct origin. Until that's fixed, I
-    // will just use the input origin/spacing to compute the bounds.
-    clone->SetExtent(evoi);
-    clone->GetBounds(outputbounds);
-
     this->Texture->SetLookupTable(this->LookupTable);
     this->Texture->SetColorMode(this->ColorMode);
+
+    // construct the plane extent in index space, then transform to
+    // physical space when we assign to the polydata, below.
+    // This correctly handles oriented images with a DirectionMatrix.
+    double outputExtent[6];
+    outputExtent[0] = inextent[0];
+    outputExtent[1] = inextent[1];
+    outputExtent[2] = inextent[2];
+    outputExtent[3] = inextent[3];
+    outputExtent[4] = inextent[4];
+    outputExtent[5] = inextent[5];
 
     if (cellFlag)
     {
@@ -280,21 +284,19 @@ void vtkPVImageSliceMapper::RenderInternal(vtkRenderer* renderer, vtkActor* acto
       // center bounds.
       // i.e move min bounds up by spacing/2 in that direction
       //     and move max bounds down by spacing/2 in that direction.
-      double spacing[3];
-      input->GetSpacing(spacing); // since spacing doesn't change, we can use
-                                  // input spacing directly.
+      // We are in index coords, so that's just 0.5 of a voxel
       for (int dir = 0; dir < 3; dir++)
       {
-        double& min = outputbounds[2 * dir];
-        double& max = outputbounds[2 * dir + 1];
-        if (min + spacing[dir] <= max)
+        double& min = outputExtent[2 * dir];
+        double& max = outputExtent[2 * dir + 1];
+        if (min + 1.0 <= max)
         {
-          min += spacing[dir] / 2.0;
-          max -= spacing[dir] / 2.0;
+          min += 0.5;
+          max -= 0.5;
         }
         else
         {
-          min = max = (min + spacing[dir] / 2.0);
+          min = max = (min + 0.5);
         }
       }
     }
@@ -306,8 +308,8 @@ void vtkPVImageSliceMapper::RenderInternal(vtkRenderer* renderer, vtkActor* acto
         indices = XY_PLANE_QPOINTS_INDICES;
         if (this->UseXYPlane)
         {
+          // z coord is clamped to zero below.
           indices = XY_PLANE_QPOINTS_INDICES_ORTHO;
-          outputbounds[4] = 0;
         }
         break;
 
@@ -316,7 +318,6 @@ void vtkPVImageSliceMapper::RenderInternal(vtkRenderer* renderer, vtkActor* acto
         if (this->UseXYPlane)
         {
           indices = YZ_PLANE_QPOINTS_INDICES_ORTHO;
-          outputbounds[0] = 0;
         }
         break;
 
@@ -325,7 +326,6 @@ void vtkPVImageSliceMapper::RenderInternal(vtkRenderer* renderer, vtkActor* acto
         if (this->UseXYPlane)
         {
           indices = XZ_PLANE_QPOINTS_INDICES_ORTHO;
-          outputbounds[2] = 0;
         }
         break;
     }
@@ -336,8 +336,15 @@ void vtkPVImageSliceMapper::RenderInternal(vtkRenderer* renderer, vtkActor* acto
 
     for (int i = 0; i < 4; i++)
     {
-      polyPoints->SetPoint(i, outputbounds[indices[i * 3]], outputbounds[indices[3 * i + 1]],
-        outputbounds[indices[3 * i + 2]]);
+      double outPt[3] = { outputExtent[indices[i * 3]], outputExtent[indices[3 * i + 1]],
+        outputExtent[indices[3 * i + 2]] };
+      // Using this transform respects the input image's DirectionMatrix, for oriented images.
+      input->TransformContinuousIndexToPhysicalPoint(outPt, outPt);
+      if (this->UseXYPlane)
+      {
+        outPt[2] = 0;
+      }
+      polyPoints->SetPoint(i, outPt);
     }
     polyPoints->Modified();
   }
