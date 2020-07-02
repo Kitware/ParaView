@@ -58,9 +58,11 @@ public:
   bool SelectFrustumPoints(const int region[4], vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources, bool multiple_selections = false);
   bool SelectPolygonPoints(vtkIntArray* polygon, vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources, bool multiple_selections = false);
+    vtkCollection* selectionSources, bool multiple_selections = false, int modifier = 0,
+    bool selectBlocks = false);
   bool SelectPolygonCells(vtkIntArray* polygon, vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources, bool multiple_selections = false);
+    vtkCollection* selectionSources, bool multiple_selections = false, int modifier = 0,
+    bool selectBlocks = false);
   //@}
 
   //@{
@@ -248,7 +250,8 @@ protected:
   bool SelectFrustumInternal(const int region[4], vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources, bool multiple_selections, int fieldAssociation);
   bool SelectPolygonInternal(vtkIntArray* polygon, vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources, bool multiple_selections, int fieldAssociation);
+    vtkCollection* selectionSources, bool multiple_selections, int fieldAssociation, int modifier,
+    bool selectBlocks);
 
   vtkTypeUInt32 PreRender(bool interactive) override;
   void PostRender(bool interactive) override;
