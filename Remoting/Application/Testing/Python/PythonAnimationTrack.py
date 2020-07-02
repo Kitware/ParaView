@@ -9,6 +9,8 @@ Render()
 AnimationScene1 = GetAnimationScene()
 PythonAnimationCue1 = PythonAnimationCue()
 PythonAnimationCue1.Script= """
+from paraview.simple import *
+
 def start_cue(self):
   print("Start Cue")
 

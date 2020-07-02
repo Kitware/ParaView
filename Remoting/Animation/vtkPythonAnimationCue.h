@@ -25,6 +25,9 @@
 #include "vtkAnimationCue.h"
 #include "vtkRemotingAnimationModule.h" //needed for exports
 
+#include <memory>
+#include <string>
+
 class VTKREMOTINGANIMATION_EXPORT vtkPythonAnimationCue : public vtkAnimationCue
 {
 public:
@@ -49,8 +52,8 @@ public:
    * \li tick(cue) : (required) called on every tick.
    * \li end_cue(cue): (optional) if present, called when the cue ends.
    */
-  vtkSetStringMacro(Script);
-  vtkGetStringMacro(Script);
+  void SetScript(const std::string&);
+  std::string GetScript() const;
   //@}
 
 protected:
@@ -72,11 +75,14 @@ protected:
   void DeleteInterpretor();
 
   bool Enabled;
-  char* Script;
+  std::string Script;
 
 private:
   vtkPythonAnimationCue(const vtkPythonAnimationCue&) = delete;
   void operator=(const vtkPythonAnimationCue&) = delete;
+
+  struct pqInternals;
+  std::unique_ptr<pqInternals> Internals;
 };
 
 #endif
