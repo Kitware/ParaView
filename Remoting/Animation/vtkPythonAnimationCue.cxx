@@ -12,21 +12,44 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPythonAnimationCue.h"
 
+#include "vtkPython.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPythonAnimationCue.h"
 #include "vtkPythonInterpreter.h"
+#include "vtkPythonUtil.h"
+#include "vtkSmartPyObject.h"
 
-#include <sstream>
+namespace
+{
+bool CheckAndFlushPythonErrors()
+{
+  if (PyErr_Occurred())
+  {
+    PyErr_Print();
+    PyErr_Clear();
+    return true;
+  }
+  return false;
+}
+}
+
+struct vtkPythonAnimationCue::pqInternals
+{
+  const char* ModuleName = "paraview.detail";
+  vtkSmartPyObject Module;
+  vtkTimeStamp ScriptModifiedTime;
+  vtkTimeStamp ModuleUpdateTime;
+};
 
 vtkStandardNewMacro(vtkPythonAnimationCue);
 //----------------------------------------------------------------------------
 vtkPythonAnimationCue::vtkPythonAnimationCue()
+  : Internals(new vtkPythonAnimationCue::pqInternals)
 {
   this->Enabled = true;
-  this->Script = 0;
   this->AddObserver(
     vtkCommand::StartAnimationCueEvent, this, &vtkPythonAnimationCue::HandleStartCueEvent);
   this->AddObserver(
@@ -38,7 +61,6 @@ vtkPythonAnimationCue::vtkPythonAnimationCue()
 //----------------------------------------------------------------------------
 vtkPythonAnimationCue::~vtkPythonAnimationCue()
 {
-  this->SetScript(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -48,102 +70,72 @@ void vtkPythonAnimationCue::HandleStartCueEvent()
   {
     return;
   }
+  vtkPythonScopeGilEnsurer gilEnsurer;
 
-  // Set self to point to this
-  char addrofthis[1024];
-  sprintf(addrofthis, "%p", this);
-  char* aplus = addrofthis;
-  if ((addrofthis[0] == '0') && ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
+  if (!this->Internals->Module ||
+    this->Internals->ModuleUpdateTime < this->Internals->ScriptModifiedTime)
   {
-    aplus += 2; // skip over "0x"
-  }
-  if (this->Script)
-  {
-    std::ostringstream stream;
-    stream << "from paraview import servermanager" << endl;
-    stream << "def start_cue(foo): pass" << endl;
-    stream << this->Script << endl;
-    stream << "_me = servermanager.vtkPythonAnimationCue('" << aplus << "')\n";
-    stream << "try:\n";
-    stream << "  start_cue(_me)\n";
-    stream << "finally:\n"
-              "  del _me\n"
-              "  import gc\n"
-              "  gc.collect()\n";
+    // Import Module --------------------------------------------------------
+    vtkSmartPyObject importedModule(PyImport_ImportModule(this->Internals->ModuleName));
+    if (!importedModule || CheckAndFlushPythonErrors())
+    {
+      return;
+    }
 
-    // ensure Python is initialized.
-    vtkPythonInterpreter::Initialize();
-    vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
+    // Setup Module with user given script
+    vtkSmartPyObject load_method(PyString_FromString("module_from_string"));
+    this->Internals->Module.TakeReference(PyObject_CallMethodObjArgs(
+      importedModule, load_method, PyString_FromString(Script.c_str()), nullptr));
+
+    if (!this->Internals->Module || CheckAndFlushPythonErrors())
+    {
+      std::cerr << "'Python' module_from_string failed to load" << std::endl;
+      return;
+    }
+    this->Internals->ModuleUpdateTime.Modified();
   }
+
+  // call wrapper_start_cue ---------------------------------------------------
+  vtkSmartPyObject start_method(PyString_FromString("start_cue"));
+  vtkSmartPyObject self = vtkPythonUtil::GetObjectFromPointer(this);
+  vtkSmartPyObject resultMethod(
+    PyObject_CallMethodObjArgs(this->Internals->Module, start_method, self.GetPointer(), nullptr));
+
+  CheckAndFlushPythonErrors();
 }
 
 //----------------------------------------------------------------------------
 void vtkPythonAnimationCue::HandleTickEvent()
 {
-  if (!this->Enabled)
+  if (!this->Enabled || !this->Internals->Module)
   {
     return;
   }
 
-  // Set self to point to this
-  char addrofthis[1024];
-  sprintf(addrofthis, "%p", this);
-  char* aplus = addrofthis;
-  if ((addrofthis[0] == '0') && ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
-  {
-    aplus += 2; // skip over "0x"
-  }
-  if (this->Script)
-  {
-    std::ostringstream stream;
-    stream << "from paraview import servermanager" << endl;
-    stream << this->Script << endl;
-    stream << "_me = servermanager.vtkPythonAnimationCue('" << aplus << "')\n";
-    stream << "try:\n";
-    stream << "  tick(_me)\n";
-    stream << "finally:\n"
-              "  del _me\n"
-              "  import gc\n"
-              "  gc.collect()\n";
+  vtkPythonScopeGilEnsurer gilEnsurer;
+  vtkSmartPyObject method(PyString_FromString("tick"));
+  vtkSmartPyObject self(vtkPythonUtil::GetObjectFromPointer(this));
+  vtkSmartPyObject result(
+    PyObject_CallMethodObjArgs(this->Internals->Module, method, self.GetPointer(), nullptr));
 
-    // ensure Python is initialized.
-    vtkPythonInterpreter::Initialize();
-    vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
-  }
+  CheckAndFlushPythonErrors();
 }
 
 //----------------------------------------------------------------------------
 void vtkPythonAnimationCue::HandleEndCueEvent()
 {
-  if (!this->Enabled)
+  if (!this->Enabled || !this->Internals->Module)
   {
     return;
   }
 
-  // Set self to point to this
-  char addrofthis[1024];
-  sprintf(addrofthis, "%p", this);
-  char* aplus = addrofthis;
-  if ((addrofthis[0] == '0') && ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
-  {
-    aplus += 2; // skip over "0x"
-  }
-  if (this->Script)
-  {
-    std::ostringstream stream;
-    stream << "from paraview import servermanager" << endl;
-    stream << "def end_cue(foo): pass" << endl;
-    stream << this->Script << endl;
-    stream << "_me = servermanager.vtkPythonAnimationCue('" << aplus << "')\n";
-    stream << "try:\n";
-    stream << "  end_cue(_me)\n";
-    stream << "finally:\n"
-              "  del _me\n"
-              "  import gc\n"
-              "  gc.collect()\n";
-    vtkPythonInterpreter::Initialize();
-    vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
-  }
+  vtkPythonScopeGilEnsurer gilEnsurer;
+  vtkSmartPyObject method(PyString_FromString("end_cue"));
+  vtkSmartPyObject self(vtkPythonUtil::GetObjectFromPointer(this));
+  vtkSmartPyObject result(
+    PyObject_CallMethodObjArgs(this->Internals->Module, method, self.GetPointer(), nullptr));
+
+  CheckAndFlushPythonErrors();
 }
 
 //----------------------------------------------------------------------------
@@ -152,4 +144,20 @@ void vtkPythonAnimationCue::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Enabled: " << this->Enabled << endl;
   os << indent << "Script: " << this->Script << endl;
+}
+
+//----------------------------------------------------------------------------
+void vtkPythonAnimationCue::SetScript(const std::string& script)
+{
+  if (this->Script != script)
+  {
+    this->Script = script;
+    this->Internals->ScriptModifiedTime.Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+std::string vtkPythonAnimationCue::GetScript() const
+{
+  return this->Script;
 }

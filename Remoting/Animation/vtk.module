@@ -24,6 +24,7 @@ OPTIONAL_DEPENDS
   VTK::IOOggTheora
   # These affect the public API.
   VTK::PythonInterpreter
+  VTK::WrappingPythonCore
 TEST_DEPENDS
   VTK::TestingCore
 TEST_LABELS
