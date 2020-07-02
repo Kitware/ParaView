@@ -213,7 +213,7 @@ vtkPVXMLElement* pqServerConfiguration::startupXML() const
 //-----------------------------------------------------------------------------
 QString pqServerConfiguration::termCommand()
 {
-#if defined(__linux)
+#if defined(__linux__)
   // Based on i3 code
   // https://github.com/i3/i3/blob/next/i3-sensible-terminal
   QStringList termNames = { qgetenv("TERMINAL"), "x-terminal-emulator", "urxvt", "rxvt", "termit",
@@ -425,7 +425,7 @@ QString pqServerConfiguration::command(double& timeout, double& delay) const
       // Recover full ssh command
       QString sshFullCommand = this->sshFullCommand(sshCommand, sshConfigXML);
 
-#if defined(__linux)
+#if defined(__linux__)
       // Simple askpass support
       vtkPVXMLElement* sshAskpassXML = sshConfigXML->FindNestedElementByName("Askpass");
       if (sshAskpassXML)
@@ -451,7 +451,7 @@ QString pqServerConfiguration::command(double& timeout, double& delay) const
         }
         if (!termCommand.isEmpty())
         {
-#if defined(__linux)
+#if defined(__linux__)
           stream << termCommand << " -e ";
 #elif defined(_WIN32)
           stream << "cmd /C start \"SSH Terminal\" " << termCommand << " /C ";
