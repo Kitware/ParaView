@@ -17,7 +17,6 @@ set(python_files
   paraview/coprocessing.py
   paraview/cpstate.py
   paraview/demos/__init__.py
-  paraview/demos/demo1.py
   paraview/demos/export_catalyst_state.py
   paraview/demos/show_grid_as_background.py
   paraview/demos/wavelet_miniapp.py
