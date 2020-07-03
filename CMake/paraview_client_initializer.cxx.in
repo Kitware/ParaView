@@ -106,7 +106,7 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
 
 #if _paraview_client_SPLASH_IMAGE
   pqSettings *settings = this->PVApp->settings();
-  if (this->PVApp->getOptions()->GetDisableRegistry() == false &&
+  if (!this->PVApp->getOptions()->GetDisableRegistry() &&
     settings->value("GeneralSettings.ShowSplashScreen", true).toBool())
   {
     // Create and show the splash screen as the main window is being created.
