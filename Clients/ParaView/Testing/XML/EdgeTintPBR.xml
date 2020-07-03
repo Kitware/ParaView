@@ -13,6 +13,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/EdgeTint/ColorButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/EdgeTint/ColorButton/1QColorDialog0" command="setChosenColor" arguments="0,0,255" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/EdgeTint/ColorButton/1QColorDialog0" command="done" arguments="1" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Light Inspector" />
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/addLight" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/0pqProxyWidget0/LightIntensity/DoubleLineEdit0" command="set_string" arguments="10" />
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/0pqProxyWidget0/InteractiveLight/worldPositionX" command="set_string" arguments="1" />
@@ -24,4 +25,5 @@
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/addLight" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer2/0pqProxyWidget0/LightIntensity/DoubleLineEdit0" command="set_string" arguments="10" />
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/LightsEditor/LightKitControls/LightKit" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Light Inspector" />
 </pqevents>
