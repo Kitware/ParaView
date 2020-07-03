@@ -133,7 +133,11 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
   // Load required application plugins.
   vtkVLogStartScopeF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "req-plugins", "load required plugins: `@_paraview_client_REQUIRED_PLUGINS@`");
   QString plugin_string = "@_paraview_client_REQUIRED_PLUGINS@";
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
   QStringList plugin_list = plugin_string.split(';',QString::SkipEmptyParts);
+#else
+  QStringList plugin_list = plugin_string.split(';',Qt::SkipEmptyParts);
+#endif
   foreach (const QString plugin_name, plugin_list)
   {
     if (!loader->LoadPluginByName(plugin_name.toLatin1().data()))
