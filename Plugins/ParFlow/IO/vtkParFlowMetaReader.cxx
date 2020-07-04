@@ -3,6 +3,7 @@
 #include "vtkVectorJSON.h"
 
 #include "vtkByteSwap.h"
+#include "vtkCellArray.h"
 #include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkDataObjectTypes.h"
@@ -12,12 +13,12 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 // #include "vtkMultiBlockDataSet.h"
+#include "vtkExplicitStructuredGrid.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkSMPTools.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkStructuredGrid.h"
 #include "vtkVector.h"
 #include "vtkVectorOperators.h"
 
@@ -477,7 +478,7 @@ void vtkParFlowMetaReader::GenerateDistributedMesh(
     jbsz = mpc->GetNumberOfProcesses();
   }
 
-  // This code is horked from VTK's vtkRectlinearGridPartitioner.
+  // This code is horked from VTK's vtkRectilinearGridPartitioner.
   vtkNew<vtkExtentRCBPartitioner> extentPartitioner;
   extentPartitioner->SetGlobalExtent(extent);
   extentPartitioner->SetNumberOfPartitions(jbsz);
@@ -504,107 +505,144 @@ void vtkParFlowMetaReader::GenerateDistributedMesh(
   extentPartitioner->GetPartitionExtent(rank, subext);
   data->GetInformation()->Set(vtkDataObject::PIECE_EXTENT(), subext, 6);
 
-  // TODO: Also handle variable dz with a vtkRectlinearGrid
+  bool didSetUpGrid = false;
   if (this->DeflectTerrain)
   {
-    auto grid = vtkStructuredGrid::SafeDownCast(data);
-    grid->SetExtent(subext);
-    vtkNew<vtkPoints> pts;
-    vtkIdType numPoints = 1;
-    for (int ii = 0; ii < 3; ++ii)
+    auto grid = vtkExplicitStructuredGrid::SafeDownCast(data);
+    if (grid)
     {
-      int numPointsThisAxis = subext[2 * ii + 1] - subext[2 * ii] + 1;
-      if (numPointsThisAxis > 0)
+      didSetUpGrid = true;
+      grid->SetExtent(subext);
+      vtkNew<vtkPoints> pts;
+      vtkIdType numPoints = subext[5] - subext[4] + 1; // k-axis faces will share points
+      // i- and j-axis faces do not share points since elevation is constant over each column:
+      for (int ii = 0; ii < 2; ++ii)
       {
-        numPoints *= numPointsThisAxis;
-      }
-    }
-    grid->SetPoints(pts);
-    pts->SetNumberOfPoints(numPoints);
-    // Now generate the points
-    std::vector<double> dz;
-    vtkDataArray* def = nullptr;
-    auto it = this->SurfaceVariables.find("elevation");
-    if (it != this->SurfaceVariables.end())
-    {
-      vtkNew<vtkImageData> dummy;
-      int dummyExtent[] = { subext[0], subext[1], subext[2], subext[3], 0, 0 };
-      dummy->SetExtent(dummyExtent);
-      dummy->GetInformation()->Set(vtkDataObject::PIECE_EXTENT(), dummyExtent, 6);
-      this->LoadVariable(dummy, it->first, it->second, /* assume elevation is constant */ 0);
-      def = dummy->GetCellData()->GetArray("elevation");
-      def->Register(this);
-    }
-    try
-    {
-      dz.clear();
-      auto cfg = this->Metadata["inputs"]["configuration"]["data"];
-      auto vdz = cfg["Solver.Nonlinear.VariableDz"];
-      auto val = vdz.get<std::string>();
-      std::transform(val.begin(), val.end(), val.begin(), ::tolower);
-      if (val == "true" || val == "on" || val == "1")
-      { // Have variable dz... fetch multipliers
-        double zaccum = 0.0;
-        dz.push_back(zaccum);
-        for (int kk = subext[4]; kk < subext[5]; ++kk)
+        int numPointsThisAxis = 2 * (subext[2 * ii + 1] - subext[2 * ii]);
+        if (numPointsThisAxis > 0)
         {
-          std::ostringstream name;
-          name << "Cell." << kk << ".dzScale.Value";
-          std::istringstream multiplier(cfg[name.str()].get<std::string>());
-          double dzv;
-          multiplier >> dzv;
-          zaccum += spacing[2] * dzv;
+          numPoints *= numPointsThisAxis;
+        }
+        else
+        {
+          numPoints *= 2;
+        }
+      }
+      grid->SetPoints(pts);
+      pts->SetNumberOfPoints(numPoints);
+      // Now generate the points
+      std::vector<double> dz;
+      vtkDataArray* def = nullptr;
+      auto it = this->SurfaceVariables.find("elevation");
+      if (it != this->SurfaceVariables.end())
+      {
+        vtkNew<vtkImageData> dummy;
+        int dummyExtent[] = { subext[0], subext[1], subext[2], subext[3], 0, 0 };
+        dummy->SetExtent(dummyExtent);
+        dummy->GetInformation()->Set(vtkDataObject::PIECE_EXTENT(), dummyExtent, 6);
+        this->LoadVariable(dummy, it->first, it->second, /* assume elevation is constant */ 0);
+        def = dummy->GetCellData()->GetArray("elevation");
+        def->Register(this);
+      }
+      try
+      {
+        dz.clear();
+        auto cfg = this->Metadata["inputs"]["configuration"]["data"];
+        auto vdz = cfg["Solver.Nonlinear.VariableDz"];
+        auto val = vdz.get<std::string>();
+        std::transform(val.begin(), val.end(), val.begin(), ::tolower);
+        if (val == "true" || val == "on" || val == "1")
+        { // Have variable dz... fetch multipliers
+          double zaccum = 0.0;
           dz.push_back(zaccum);
+          for (int kk = subext[4]; kk < subext[5]; ++kk)
+          {
+            std::ostringstream name;
+            name << "Cell." << kk << ".dzScale.Value";
+            std::istringstream multiplier(cfg[name.str()].get<std::string>());
+            double dzv;
+            multiplier >> dzv;
+            zaccum += spacing[2] * dzv;
+            dz.push_back(zaccum);
+          }
         }
       }
-    }
-    catch (std::exception&)
-    {
-      dz.clear();
-    }
-    if (dz.empty())
-    {
-      if (!def)
+      catch (std::exception&)
       {
-        static bool once = false;
-        // No variable dz, no elevation. Warn user this is inefficient.
-        if (!once)
+        dz.clear();
+      }
+      if (dz.empty())
+      {
+        if (!def)
         {
-          once = true;
-          vtkWarningMacro("No variable dz and no elevation. "
-                          "It would be more efficient to turn DeflectTerrain off.");
+          static bool once = false;
+          // No variable dz, no elevation. Warn user this is inefficient.
+          if (!once)
+          {
+            once = true;
+            vtkWarningMacro("No variable dz and no elevation. "
+                            "It would be more efficient to turn DeflectTerrain off.");
+          }
+        }
+        for (int kk = subext[4]; kk <= subext[5]; ++kk)
+        {
+          dz.push_back(1.0 * spacing[2] * kk);
         }
       }
-      for (int kk = subext[4]; kk <= subext[5]; ++kk)
+      vtkIdType pid = 0;
+      double deflectionScale = this->DeflectionScale <= 0.0 ? 1.0 : this->DeflectionScale;
+      vtkNew<vtkCellArray> conn;
+      conn->AllocateExact(grid->GetNumberOfCells(), pts->GetNumberOfPoints());
+      // Insert points in i-j columns
+      for (int jj = subext[2]; jj < subext[3]; ++jj)
       {
-        dz.push_back(1.0 * spacing[2] * kk);
-      }
-    }
-    vtkIdType pid = 0;
-    double deflectionScale = this->DeflectionScale <= 0.0 ? 1.0 : this->DeflectionScale;
-    for (int kk = subext[4]; kk <= subext[5]; ++kk)
-    {
-      for (int jj = subext[2]; jj <= subext[3]; ++jj)
-      {
-        for (int ii = subext[0]; ii <= subext[1]; ++ii, ++pid)
+        for (int ii = subext[0]; ii < subext[1]; ++ii)
         {
           double elev = def
             ? def->GetTuple1((ii == subext[1] ? ii - 1 : ii) - subext[0] +
                 (subext[1] - subext[0]) * ((jj == subext[3] ? jj - 1 : jj) - subext[2]))
             : 0.0;
-          vtkVector3d pt = origin + vtkVector3d(ii * spacing[0], jj * spacing[1],
-                                      deflectionScale * (dz[kk - subext[4]] + elev));
-          pts->SetPoint(pid, pt.GetData());
+          for (int kk = subext[4]; kk <= subext[5]; ++kk)
+          {
+            double zz = deflectionScale * (dz[kk - subext[4]] + elev);
+            for (int vv = 0; vv < 4; ++vv, ++pid)
+            {
+              vtkVector3d pt = origin +
+                vtkVector3d((ii + vv % 2) * spacing[0], (jj + (vv / 2) % 2) * spacing[1], zz);
+              pts->SetPoint(pid, pt.GetData());
+            }
+          }
         }
       }
-    }
-    if (def)
-    {
-      def->Delete();
+      // Insert cells with i varying fastest to match file's array-order
+      // so we don't have to reshuffle them, esp. time-varying arrays.
+      vtkIdType nk = subext[5] - subext[4] + 1; // number of cells per i-j column
+      for (int kk = subext[4]; kk < subext[5]; ++kk)
+      {
+        for (int jj = subext[2]; jj < subext[3]; ++jj)
+        {
+          for (int ii = subext[0]; ii < subext[1]; ++ii)
+          {
+            vtkIdType offset = 4 *
+              (kk - subext[4] + nk * (ii - subext[0] + (subext[1] - subext[0]) * (jj - subext[2])));
+            std::array<vtkIdType, 8> hexConn{ offset + 0, offset + 1, offset + 3, offset + 2,
+              offset + 4, offset + 5, offset + 7, offset + 6 };
+            conn->InsertNextCell(8, hexConn.data());
+          }
+        }
+      }
+
+      grid->SetCells(conn);
+      grid->ComputeFacesConnectivityFlagsArray();
+      if (def)
+      {
+        def->Delete();
+      }
     }
   }
-  else
+  if (!didSetUpGrid)
   {
+    // TODO: Also handle variable dz with a vtkRectlinearGrid
     auto grid = vtkImageData::SafeDownCast(data);
     grid->SetExtent(subext);
     grid->SetOrigin(origin.GetData());
@@ -1253,19 +1291,7 @@ int vtkParFlowMetaReader::LoadSurfaceData(vtkDataSet* mbds, int timestep)
 
 int vtkParFlowMetaReader::FillOutputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
-#if 0
-  if (this->DeflectTerrain)
-  {
-    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkStructuredGrid");
-  }
-  else
-  {
-    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkImageData");
-  }
-#endif
   info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
-  // std::cout << "FillOutputPortInformation: " << info->Get(vtkDataObject::DATA_TYPE_NAME()) <<
-  // "\n";
   return 1;
 }
 
@@ -1365,13 +1391,16 @@ int vtkParFlowMetaReader::RequestInformation(
 int vtkParFlowMetaReader::RequestDataObject(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inInfo), vtkInformationVector* outputVector)
 {
-  int outputDataSetType = this->DeflectTerrain ? VTK_STRUCTURED_GRID : VTK_IMAGE_DATA;
-  const char* outTypeStr = vtkDataObjectTypes::GetClassNameFromTypeId(outputDataSetType);
-
-  // for each output
-  for (int i = 0; i < this->GetNumberOfOutputPorts(); ++i)
+  for (int port = 0; port < this->GetNumberOfOutputPorts(); ++port)
   {
-    vtkInformation* info = outputVector->GetInformationObject(i);
+    // Use a vtkExplicitStructuredGrid for the subsurface when deflecting by elevation.
+    // Use vtkImageData in all other cases.
+    int outputDataSetType = this->DeflectTerrain && port == Domain::Subsurface
+      ? VTK_EXPLICIT_STRUCTURED_GRID
+      : VTK_IMAGE_DATA;
+    const char* outTypeStr = vtkDataObjectTypes::GetClassNameFromTypeId(outputDataSetType);
+
+    vtkInformation* info = outputVector->GetInformationObject(port);
     vtkDataObject* output = info->Get(vtkDataObject::DATA_OBJECT());
     if (!output || !output->IsA(outTypeStr))
     {
