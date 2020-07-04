@@ -3,18 +3,13 @@ if (NOT PARAVIEW_USE_PYTHON)
   return()
 endif()
 
-find_program(sphinx-build
-  NAMES sphinx-build
-  DOC "Path to sphinx-build executable.")
-
-if (NOT sphinx-build)
+include(FindPythonModules)
+find_python_module("sphinx" sphinx_found)
+if (NOT sphinx_found)
   message(STATUS
     "Please install Sphinx to generate documentation for Python modules.")
   return()
 endif()
-
-# mark these advanced if found.
-mark_as_advanced(sphinx-build)
 
 # Copy Sphinx configuration files to the build directory.
 file(COPY config
@@ -26,10 +21,6 @@ set (paraview_paths
     '${CMAKE_RUNTIME_OUTPUT_DIRECTORY}',
     '${CMAKE_LIBRARY_OUTPUT_DIRECTORY}']")
 configure_file(config/conf.py.in config/conf.py @ONLY)
-
-# Copy sphinx-build to rename the file to have .py extension
-# since pvpython expects Python scripts to have .py extensions.
-configure_file("${sphinx-build}" sphinx-build.py COPYONLY)
 
 # This depends on the python modules being placed at the appropriate locations.
 # Since all python files are copies to lib/site-packages at configure time and
@@ -43,7 +34,7 @@ add_custom_target(ParaViewPythonDoc
           "${ParaView_BINARY_DIR}/${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}/paraview"
   COMMAND $<TARGET_FILE:pvpython>
           --no-mpi
-          "${CMAKE_CURRENT_BINARY_DIR}/sphinx-build.py"
+          -m sphinx
           -b html "${CMAKE_CURRENT_BINARY_DIR}/config"
           "${PARAVIEW_GENERATED_DOCUMENTATION_OUTPUT_DIRECTORY}/python"
   SOURCES sphinx_apidoc.py
@@ -51,4 +42,6 @@ add_custom_target(ParaViewPythonDoc
           config/quick-start.rst
           config/api-changes.rst
           config/conf.py.in
-          "${CMAKE_CURRENT_BINARY_DIR}/sphinx-build.py")
+  # ensures that the output is continuously generated
+  # when using ninja; avoids builder from timing out
+  USES_TERMINAL)
