@@ -914,6 +914,19 @@ class DoubleMapProperty(Property):
         """Returns the keys."""
         return self.GetData().keys()
 
+    def items(self):
+        """Iterates over the (key, value) pairs."""
+        return self.GetData().items()
+
+    def values(self):
+        """Returns the values"""
+        return self.GetData().values()
+
+    def get(self, key, default_value=None):
+        """Returns value of the given key, or the default_value if the key is not found
+        in the map."""
+        return self.GetData().get(key, default_value)
+
     def GetData(self):
         """Returns all the elements as a dictionary"""
 
