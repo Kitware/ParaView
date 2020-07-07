@@ -12120,7 +12120,9 @@
                          number_of_elements_per_command="2"
                          repeatable="1">
         <Documentation>
-          Set the visibility for a block. Value is (property, visibility).
+          Set the visibility for blocks. In Python, assign the value from an interleaved
+          list of block indices and visibilities, e.g., [index1, visibility1, index2, visibility2, ...].
+          The list does not need to contain all block indices.
         </Documentation>
       </IntVectorProperty>
       <DoubleMapProperty name="BlockColor"
@@ -12129,7 +12131,9 @@
                          number_of_components="3"
                          repeatable="1">
         <Documentation>
-          Set the color for a block. Value is (index, r, g, b).
+          Set the colors for blocks.
+          In Python, assign the value from a dictionary of the form
+          {index1:, [r1, g1, b1], index2: [r2, g2, b2], ...}.
         </Documentation>
       </DoubleMapProperty>
       <DoubleMapProperty name="BlockOpacity"
@@ -12138,7 +12142,8 @@
                          number_of_components="1"
                          repeatable="1">
         <Documentation>
-          Set the opacity for a block. Value is (index, alpha).
+          Set the opacity for blocks.
+          In Python, assign the value from a dictionary of the form {index1:, [a1], index2: [a2], ...}.
         </Documentation>
       </DoubleMapProperty>
       <IntVectorProperty command="SetBlockColorsDistinctValues"
