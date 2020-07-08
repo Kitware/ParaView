@@ -275,7 +275,7 @@ annotation text.
                             number_of_elements="1">
         <Documentation>The Python expression evaluated during execution.
         FieldData arrays are directly available through their name. Set of
-        provided variables [input, t_value, t_steps, t_range, t_index,
+        provided variables [inputs, t_value, t_steps, t_range, t_index,
         FieldData, PointData, CellData] (i.e.: "Momentum: (%f, %f, %f)" %
         (XMOM[t_index,0], YMOM[t_index,0], ZMOM[t_index,0]) )</Documentation>
       </StringVectorProperty>
