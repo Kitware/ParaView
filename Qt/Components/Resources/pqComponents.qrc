@@ -67,6 +67,7 @@
         <file>Icons/pqFrustumSelectionCell.svg</file>
         <file>Icons/pqFrustumSelectionPoint.svg</file>
         <file>Icons/pqFullscreen.svg</file>
+        <file>Icons/pqGhostCellsGenerator.svg</file>
         <file>Icons/pqGlobalData.svg</file>
         <file>Icons/pqGlyph.svg</file>
         <file>Icons/pqGroup.svg</file>
@@ -121,6 +122,7 @@
         <file>Icons/pqRecentFile.svg</file>
         <file>Icons/pqRedo.svg</file>
         <file>Icons/pqRedoCamera.svg</file>
+        <file>Icons/pqReflect.svg</file>
         <file>Icons/pqReloadFile.svg</file>
         <file>Icons/pqReset.svg</file>
         <file>Icons/pqResetCamera.png</file>
@@ -229,6 +231,7 @@
         <file>Icons/pqYMinus@2x.png</file>
         <file>Icons/pqYPlus.png</file>
         <file>Icons/pqYPlus@2x.png</file>
+        <file>Icons/pqYoungsMaterialInterface.svg</file>
         <file>Icons/pqZMinus.png</file>
         <file>Icons/pqZMinus@2x.png</file>
         <file>Icons/pqZPlus.png</file>
