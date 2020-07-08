@@ -70,7 +70,7 @@ namespace
 {
 bool isDeletable(pqProxy* proxy)
 {
-  if (pqLiveInsituManager::isInsitu(proxy))
+  if (proxy && pqLiveInsituManager::isInsitu(proxy))
   {
     return false;
   }
@@ -79,7 +79,7 @@ bool isDeletable(pqProxy* proxy)
   {
     return source->getNumberOfConsumers() == 0;
   }
-  return true;
+  return proxy ? true : false;
 }
 
 // internal class used to keep track of all the widgets associated with a
