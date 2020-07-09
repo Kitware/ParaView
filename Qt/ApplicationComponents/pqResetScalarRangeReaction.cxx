@@ -187,8 +187,17 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(pqPipelineRepresentati
     }
   }
 
+  // See if we should show a separate opacity function range
+  bool separateOpacity = false;
+  auto proxy = repr->getProxy();
+  if (proxy->GetProperty("UseSeparateOpacityArray"))
+  {
+    vtkSMPropertyHelper helper(proxy, "UseSeparateOpacityArray", true /*quiet*/);
+    separateOpacity = helper.GetAsInt() == 1;
+  }
+
   vtkSMProxy* lut = lutProxy(repr);
-  if (pqResetScalarRangeReaction::resetScalarRangeToCustom(lut))
+  if (pqResetScalarRangeReaction::resetScalarRangeToCustom(lut, separateOpacity))
   {
     repr->renderViewEventually();
     return true;
@@ -197,7 +206,7 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(pqPipelineRepresentati
 }
 
 //-----------------------------------------------------------------------------
-bool pqResetScalarRangeReaction::resetScalarRangeToCustom(vtkSMProxy* lut)
+bool pqResetScalarRangeReaction::resetScalarRangeToCustom(vtkSMProxy* lut, bool separateOpacity)
 {
   vtkSMTransferFunctionProxy* tfProxy = vtkSMTransferFunctionProxy::SafeDownCast(lut);
   if (!tfProxy)
@@ -214,14 +223,33 @@ bool pqResetScalarRangeReaction::resetScalarRangeToCustom(vtkSMProxy* lut)
 
   pqRescaleRange dialog(pqCoreUtilities::mainWidget());
   dialog.setRange(range[0], range[1]);
+  dialog.showOpacityControls(separateOpacity);
+  vtkSMTransferFunctionProxy* sofProxy = vtkSMTransferFunctionProxy::SafeDownCast(
+    vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy());
+  if (sofProxy && true)
+  {
+    if (!sofProxy->GetRange(range))
+    {
+      range[0] = 0;
+      range[1] = 1.0;
+    }
+    dialog.setOpacityRange(range[0], range[1]);
+  }
   if (dialog.exec() == QDialog::Accepted)
   {
     BEGIN_UNDO_SET("Reset transfer function ranges");
-    tfProxy->RescaleTransferFunction(dialog.minimum(), dialog.maximum());
-    if (vtkSMProxy* sofProxy = vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy())
+    range[0] = dialog.minimum();
+    range[1] = dialog.maximum();
+    tfProxy->RescaleTransferFunction(range[0], range[1]);
+    if (sofProxy)
     {
-      vtkSMTransferFunctionProxy::RescaleTransferFunction(
-        sofProxy, dialog.minimum(), dialog.maximum());
+      // If we are using a separate opacity range, get those values from the GUI
+      if (separateOpacity)
+      {
+        range[0] = dialog.opacityMinimum();
+        range[1] = dialog.opacityMaximum();
+      }
+      vtkSMTransferFunctionProxy::RescaleTransferFunction(sofProxy, range[0], range[1]);
     }
     // disable auto-rescale of transfer function since the user has set on
     // explicitly (BUG #14371).

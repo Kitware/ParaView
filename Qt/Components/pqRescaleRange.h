@@ -50,9 +50,27 @@ public:
   pqRescaleRange(QWidget* parent = 0);
   ~pqRescaleRange() override;
 
+  // Get the minimum of the color map range
   double minimum() const;
+
+  // Get the maximum of the color map range
   double maximum() const;
+
+  // Show or hide the opacity controls
+  void showOpacityControls(bool show);
+
+  // Get the minimum of the opacity map range
+  double opacityMinimum() const;
+
+  // Get the maximum of the opacity map range
+  double opacityMaximum() const;
+
+  // Initialize the range for the color map
   void setRange(double min, double max);
+
+  // Initialize the range for a separate opacity map, if the option is available
+  void setOpacityRange(double min, double max);
+
   bool lock() const { return this->Lock; }
 
 protected Q_SLOTS:

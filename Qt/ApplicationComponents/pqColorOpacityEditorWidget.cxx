@@ -915,7 +915,20 @@ void pqColorOpacityEditorWidget::resetRangeToVisibleData()
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::resetRangeToCustom()
 {
-  if (pqResetScalarRangeReaction::resetScalarRangeToCustom(this->proxy()))
+  bool changed = false;
+  pqPipelineRepresentation* repr =
+    qobject_cast<pqPipelineRepresentation*>(pqActiveObjects::instance().activeRepresentation());
+  if (repr)
+  {
+    changed = pqResetScalarRangeReaction::resetScalarRangeToCustom(repr);
+  }
+  else
+  {
+    // Shouldn't happen, but fall back to the active lut if there is no active representation
+    changed = pqResetScalarRangeReaction::resetScalarRangeToCustom(this->proxy());
+  }
+
+  if (changed)
   {
     this->Internals->render();
     Q_EMIT this->changeFinished();
