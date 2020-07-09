@@ -17,20 +17,21 @@
 
 class vtkDataSet;
 class vtkDoubleArray;
-class vtkImageData;
-class vtkStructuredGrid;
 
 /**\brief Read ParFlow simulation output.
   *
-  * Data is output as 2 uniform grids (elevation deflection turned off) or
-  * 2 structured grids (elevation deflection turned on).
+  * Data is output as 2 images (elevation deflection turned off) or an explicit
+  * structured grid (subsurface) and image data (surface) (elevation deflection
+  * turned on).
   * In each case, the first output is the 3-D subsurface domain and the
   * second output in the 2-D surface domain.
   *
   * Nearly all variables defined on the outputs are cell-centered.
-  * However, elevation (used to warp the meshes to follow terrain)
-  * and subsurface fluid velocity (computed on 3 staggered, face-aligned
-  * grids) are interpolated to points.
+  * However, subsurface fluid velocity (computed on 3 staggered, face-aligned
+  * grids) is interpolated to points.
+  * When deflecting by elevation, each cell's points are deflected by the cell's
+  * elevation (this feature of vtkExplicitStructuredGrid presents discontinuities
+  * at cell boundaries).
   *
   * This reader will work in parallel settings via a uniform grid partitioner
   * that redistributes data from the file according to the number of ranks
