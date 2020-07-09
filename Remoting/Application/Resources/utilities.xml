@@ -1246,6 +1246,48 @@
      <!-- End of XMLHierarchicalBoxDataWriter -->
     </SourceProxy>
 
+    <SourceProxy name="XMLUniformGridAMRWriter" class="vtkPVNullSource"
+      label="Parallel Uniform Grid AMR Writer">
+      <InputProperty name="Input">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkUniformGridAMR" />
+          </DataTypeDomain>
+          <Documentation>
+            The input.
+          </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+        number_of_elements="1"
+        default_values="filename_%t.vth">
+     </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PaddingAmount"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+
+      <Hints>
+      <!-- TODO: this doesn't work yet -->
+      <PipelineIcon name=":pqComponents/pqSave.svg" />
+
+      <!-- This will help us when exporting the script state -->
+      <WriterProxy group="writers" name="XMLUniformGridAMRWriter" />
+     </Hints>
+     <!-- End of XMLUniformGridAMRWriter -->
+    </SourceProxy>
+
     <SourceProxy name="CSVWriter" class="vtkPVNullSource"
       label="CSV Table Writer">
       <InputProperty name="Input">
