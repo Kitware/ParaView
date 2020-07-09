@@ -168,13 +168,6 @@ if (PARAVIEW_BUILD_TESTING)
   set(BUILD_TESTING ON)
 endif ()
 
-cmake_dependent_option(PARAVIEW_BUILD_CATALYST_ADAPTORS
-  "Build Adaptors for various simulation codes" OFF
-  # XXX: Adaptors need some work yet.
-  "FALSE;NOT WIN32" OFF)
-mark_as_advanced(PARAVIEW_BUILD_CATALYST_ADAPTORS)
-
-
 if (PARAVIEW_USE_PYTHON)
   if (DEFINED PARAVIEW_PYTHON_VERSION)
     if (PARAVIEW_PYTHON_VERSION STREQUAL "3")
@@ -293,6 +286,7 @@ paraview_plugin_scan(
 set(paraview_source_directories
   "${CMAKE_CURRENT_SOURCE_DIR}/Kits"
   "${CMAKE_CURRENT_SOURCE_DIR}/Clients"
+  "${CMAKE_CURRENT_SOURCE_DIR}/Adaptors"
   "${CMAKE_CURRENT_SOURCE_DIR}/Qt"
   "${CMAKE_CURRENT_SOURCE_DIR}/VTKExtensions"
   "${CMAKE_CURRENT_SOURCE_DIR}/Web"
@@ -788,14 +782,6 @@ if (FALSE) # XXX(FIXME)
 endif()
 endif()
 #------------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-if (PARAVIEW_BUILD_CATALYST_ADAPTORS)
-  # BuildAdaptors.cmake builds the adaptors as a separate project. We mark is
-  # OPTIONAL for Catalyst packages that don't have the adaptors included.
-  include(${CMAKE_CURRENT_SOURCE_DIR}/CoProcessing/Adaptors/BuildAdaptors.cmake
-          OPTIONAL)
-endif()
 
 install(
   FILES       "${CMAKE_CURRENT_SOURCE_DIR}/Copyright.txt"
