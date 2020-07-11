@@ -850,12 +850,6 @@ bool vtkPVGlyphFilter::Execute(unsigned int index, vtkDataSet* input,
     return 1;
   }
 
-  // Allocate storage for output PolyData
-  vtkPointData* outputPD = output->GetPointData();
-  outputPD->CopyVectorsOff();
-  outputPD->CopyNormalsOff();
-  outputPD->CopyTCoordsOff();
-
   vtkSmartPointer<vtkPolyData> source = this->GetSource(0, sourceVector);
   if (source == nullptr)
   {
@@ -879,8 +873,10 @@ bool vtkPVGlyphFilter::Execute(unsigned int index, vtkDataSet* input,
 
   vtkDataArray* sourceNormals = source->GetPointData()->GetNormals();
 
-  // Prepare to copy output.
-  pd = input->GetPointData();
+  // Allocate storage for output point data
+  vtkPointData* outputPD = output->GetPointData();
+  outputPD->CopyNormalsOff();
+
   outputPD->CopyAllocate(pd, numPts * numSourcePts);
 
   vtkNew<vtkIdList> srcPointIdList;
