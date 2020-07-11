@@ -135,8 +135,8 @@ vtknvindex_representation::vtknvindex_representation()
   this->VolumeMapper.TakeReference(vtknvindex_volumemapper::New());
 
   // Replace default Actor.
-  this->Actor->Delete();
-  this->Actor = vtknvindex_lod_volume::New();
+  this->Actor = nullptr;
+  this->Actor.TakeReference(vtknvindex_lod_volume::New());
   this->Actor->SetProperty(this->Property);
   this->Actor->SetLODMapper(this->OutlineMapper);
 
