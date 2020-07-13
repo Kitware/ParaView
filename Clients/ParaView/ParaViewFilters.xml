@@ -189,6 +189,7 @@
   <Proxy group="filters" name="ComputeQuartiles" icon=":/pqWidgets/Icons/pqBoxChart16.png" />
   <Proxy group="filters" name="ContingencyStatistics" />
   <Proxy group="filters" name="Contour" icon=":/pqWidgets/Icons/pqIsosurface.svg" />
+  <Proxy group="filters" name="ConvertPolyhedra" />
   <Proxy group="filters" name="CountCellFaces" />
   <Proxy group="filters" name="CountCellVertices" />
   <Proxy group="filters" name="Curvatures" />

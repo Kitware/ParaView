@@ -32,6 +32,7 @@ set(classes
   vtkCellIntegrator
   vtkCleanUnstructuredGrid
   vtkCleanUnstructuredGridCells
+  vtkConvertPolyhedraFilter
   vtkEquivalenceSet
   vtkExtractScatterPlot
   vtkFlashContour
