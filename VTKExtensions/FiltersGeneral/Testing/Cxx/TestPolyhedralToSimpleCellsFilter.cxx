@@ -39,7 +39,7 @@
   if (o->GetError())                                                                               \
     return EXIT_FAILURE;
 
-class TestPolyhedralToSimpleCellsFilter
+class TestConvertPolyhedra
 {
 public:
   static int DoTest()
@@ -173,9 +173,9 @@ public:
   }
 };
 
-int TestPolyhedralToSimpleCellsFilter(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
+int TestPolyhedralToSimpleCellsFilter(int vtkNotUsed(argc), char** vtkNotUsed(argv))
 {
   // test is inside class such that friend declaration in
   // filter can work
-  return TestPolyhedralToSimpleCellsFilter::DoTest();
+  return TestConvertPolyhedra::DoTest();
 }

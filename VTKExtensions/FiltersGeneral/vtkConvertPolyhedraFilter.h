@@ -31,7 +31,7 @@
 
 class vtkUnstructuredGridBase;
 class vtkIdList;
-class TestPolyhedralToSimpleCellsFilter; // for testing purposes
+class TestConvertPolyhedra; // for testing purposes
 
 class VTKPVVTKEXTENSIONSFILTERSGENERAL_EXPORT vtkConvertPolyhedraFilter
   : public vtkUnstructuredGridAlgorithm
@@ -54,7 +54,7 @@ private:
 
   // forward declared test class is friend so that it can call
   // the two functions below without having to expose them as public
-  friend class TestPolyhedralToSimpleCellsFilter;
+  friend class TestConvertPolyhedra;
 
   void InsertNextPolyhedralCell(vtkUnstructuredGridBase*, vtkIdList*) const;
   void InsertNextPolygonalCell(vtkUnstructuredGridBase*, vtkIdList*) const;
