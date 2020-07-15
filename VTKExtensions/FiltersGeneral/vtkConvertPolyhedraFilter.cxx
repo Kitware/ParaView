@@ -444,7 +444,8 @@ int vtkConvertPolyhedraFilter::RequestData(vtkInformation* vtkNotUsed(request),
     std::max(static_cast<vtkIdType>(1), input->GetNumberOfCells() / 100);
 
   int n = 0;
-  for (auto it = input->NewCellIterator(); !it->IsDoneWithTraversal(); it->GoToNextCell())
+  auto it = input->NewCellIterator();
+  for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextCell())
   {
     const int cellType = it->GetCellType();
 
@@ -469,6 +470,7 @@ int vtkConvertPolyhedraFilter::RequestData(vtkInformation* vtkNotUsed(request),
     }
     ++n;
   }
+  it->Delete();
 
   return 1;
 }
