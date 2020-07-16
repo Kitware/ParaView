@@ -2516,8 +2516,9 @@ int vtkCGNSReader::GetUnstructuredZone(
         if (0 != CGNSRead::get_section_start_offset(this->cgioNum, elemIdList[osec], 1, srcStart,
                    srcEnd, srcStride, memStart, memEnd, memStride, memDim, localFaceElementsIdx))
         {
-          vtkWarningMacro("FAILED to read NGON_n ElementStartOffset array."
-                          " Trying a fallback solution for CGNS previous to 3.4\n");
+          // NOTE: the old polygonal layout was replaced in CGNS version 4.0
+          // NOTE: support for the old NFACE_n/NGON_n array layout may be deprecated in
+          // NOTE: a future version of ParaView.
           old_polygonal_layout = true;
         }
 
@@ -2645,8 +2646,9 @@ int vtkCGNSReader::GetUnstructuredZone(
         if (0 != CGNSRead::get_section_start_offset(this->cgioNum, cgioSectionId, 1, srcStart,
                    srcEnd, srcStride, memStart, memEnd, memStride, memDim, localCellElementsIdx))
         {
-          vtkWarningMacro("FAILED to read NFACE_n ElementStartOffset array."
-                          " Trying a fallback solution for CGNS previous to 3.4\n");
+          // NOTE: the old polygonal layout was replaced in CGNS version 4.0
+          // NOTE: support for the old NFACE_n/NGON_n array layout may be deprecated in
+          // NOTE: a future version of ParaView.
           old_polygonal_layout = true;
         }
         if (startNFaceArraySec[sec] != 0)
