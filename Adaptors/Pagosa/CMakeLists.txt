@@ -2,9 +2,11 @@ enable_language(Fortran)
 include(FortranCInterface)
 
 FortranCInterface_HEADER(PagosaAdaptorAPIMangling.h SYMBOLS
-  setcoprocessorgeometry setcoprocessorfield
+  setcoprocessorgeometry
+  setgridgeometry
+  addgridfield
   setmarkergeometry
-  setmarkerscalarfield setmarkervectorfield setmarkertensorfield)
+  addmarkerscalarfield addmarkervectorfield addmarkertensorfield)
 
 set(headers
   PagosaAdaptor.h
