@@ -28,6 +28,7 @@ superbuild:
     - hooks
   variables:
     PARAVIEW_BRANCH: $CI_COMMIT_REF_NAME
+    RSYNC_UPLOAD_ENABLE: true
   trigger:
     project: paraview/paraview-superbuild
     branch: $CI_COMMIT_REF_NAME
