@@ -176,10 +176,11 @@ void UpdateVTKAttributes(Grid& grid, Attributes& attributes, vtkCPInputDataDescr
   ids->SetNumberOfComponents(1);
   for (int i = 0; i < numpts; i++)
   {
-    points->InsertNextPoint(pts[i * 5 + 0], pts[i * 5 + 1], pts[i * 5 + 2]);
+    points->InsertNextPoint(pts[i * 5 + 2], pts[i * 5 + 1], pts[i * 5 + 0]);
     rads->InsertNextValue(pts[i * 5 + 3]);
     ids->InsertNextValue(pts[i * 5 + 4]);
   }
+
   VTKPoints->SetPoints(points);
   VTKPoints->GetPointData()->AddArray(rads);
   VTKPoints->GetPointData()->AddArray(ids);
@@ -242,6 +243,7 @@ void Initialize(int argc, char* argv[])
     // KEY POINT:
     // You have to make a temporal cache for every output you want to temporally process
     Processor->MakeTemporalCache("volume");
+    Processor->MakeTemporalCache("points");
   }
   else
   {
@@ -301,7 +303,13 @@ void CoProcess(
 
     vtkCPInputDataDescription* idd2 = dataDescription->GetInputDescriptionByName("points");
     idd2->SetGrid(VTKPoints);
-
+    vtkSMSourceProxy* cache2 = Processor->GetTemporalCache("points");
+    if (cache2)
+    {
+      // KEY POINT:
+      // The adaptor has to associate the cache with the pipeline every timestep
+      idd2->SetTemporalCache(cache2);
+    }
     Processor->CoProcess(dataDescription.GetPointer());
   }
 }
