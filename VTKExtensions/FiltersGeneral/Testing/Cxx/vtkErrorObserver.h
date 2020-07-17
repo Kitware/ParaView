@@ -33,14 +33,14 @@ public:
   bool GetError() const;
   bool GetWarning() const;
   void Clear();
-  virtual void Execute(vtkObject* vtkNotUsed(caller), unsigned long event, void* calldata);
+  virtual void Execute(vtkObject* vtkNotUsed(caller), unsigned long event, void* calldata) override;
 
   std::string GetErrorMessage() const;
   std::string GetWarningMessage() const;
 
 protected:
-  vtkErrorObserver();
-  ~vtkErrorObserver() override;
+  vtkErrorObserver() = default;
+  ~vtkErrorObserver() = default;
 
 private:
   vtkErrorObserver(const vtkErrorObserver&) = delete;

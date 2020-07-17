@@ -40,7 +40,7 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
 {
   if (grid == nullptr || faces == nullptr)
   {
-    vtkErrorMacro(<< "Grid or faces list undefined.");
+    vtkErrorMacro("Grid or faces list undefined.");
     return;
   }
 
@@ -51,7 +51,7 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
     case 2:
     case 3:
     {
-      vtkErrorMacro(<< "Cell with < 4 faces not supported.");
+      vtkErrorMacro("Cell with < 4 faces not supported.");
       break;
     }
     case 4:
@@ -85,7 +85,7 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
         }
         if (ids.size() != 4)
         {
-          vtkErrorMacro(<< "4-sided cell with all triangles, but not 4 unique vertex indices.");
+          vtkErrorMacro("4-sided cell with all triangles, but not 4 unique vertex indices.");
           return;
         }
 
@@ -221,7 +221,7 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
 
             if (topVertex == cellVertices.end())
             {
-              vtkErrorMacro(<< "Failed to find VTK_PYRAMID top vertex");
+              vtkErrorMacro("Failed to find VTK_PYRAMID top vertex");
             }
             else
             {
@@ -375,14 +375,14 @@ void vtkConvertPolyhedraFilter::InsertNextPolygonalCell(
 {
   if (grid == nullptr || vertices == nullptr)
   {
-    vtkErrorMacro(<< "Grid or vertex list undefined.");
+    vtkErrorMacro("Grid or vertex list undefined.");
     return;
   }
 
   const vtkIdType nVertices = vertices->GetNumberOfIds();
   if (nVertices < 3)
   {
-    vtkErrorMacro(<< "Polygonal cell with < 3 vertices not supported.");
+    vtkErrorMacro("Polygonal cell with < 3 vertices not supported.");
     return;
   }
 

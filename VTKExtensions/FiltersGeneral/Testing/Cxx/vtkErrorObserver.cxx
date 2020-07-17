@@ -15,25 +15,11 @@
 
 #include "vtkErrorObserver.h"
 
-#include <vtkDebugLeaks.h>
-
 //------------------------------------------------------------------------------
 vtkErrorObserver* vtkErrorObserver::New()
 {
   // do not use vtkStandardNewMacro - see vtkDebugLeaks.h for details
   return new vtkErrorObserver;
-}
-
-//------------------------------------------------------------------------------
-vtkErrorObserver::vtkErrorObserver()
-{
-  vtkDebugLeaks::ConstructClass(this);
-}
-
-//------------------------------------------------------------------------------
-vtkErrorObserver::~vtkErrorObserver()
-{
-  vtkDebugLeaks::DestructClass(this);
 }
 
 //------------------------------------------------------------------------------
