@@ -1,9 +1,9 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
+  Program:   ParaView
   Module:    vtkConvertPolyhedraFilter.h
 
-  Copyright (c) Menno Deij - van Rijswijk (MARIN)
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
   See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
@@ -12,6 +12,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+/*-------------------------------------------------------------------------
+  Copyright 2020 Menno Deij - van Rijswijk (MARIN)
+-------------------------------------------------------------------------*/
 
 /**
  * @class   vtkConvertPolyhedraFilter
@@ -43,8 +46,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
-  vtkConvertPolyhedraFilter();
-  ~vtkConvertPolyhedraFilter() override;
+  vtkConvertPolyhedraFilter() = default;
+  ~vtkConvertPolyhedraFilter() = default;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 

@@ -1,9 +1,9 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
+  Program:   ParaView
   Module:    vtkConvertPolyhedraFilter.cxx
 
-  Copyright (c) Menno Deij - van Rijswijk (MARIN)
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
   See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
@@ -12,6 +12,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+/*-------------------------------------------------------------------------
+  Copyright 2020 Menno Deij - van Rijswijk (MARIN)
+-------------------------------------------------------------------------*/
 
 #include "vtkConvertPolyhedraFilter.h"
 
@@ -32,21 +35,12 @@
 vtkStandardNewMacro(vtkConvertPolyhedraFilter);
 
 //------------------------------------------------------------------------------
-vtkConvertPolyhedraFilter::vtkConvertPolyhedraFilter()
-{
-}
-
-//------------------------------------------------------------------------------
-vtkConvertPolyhedraFilter::~vtkConvertPolyhedraFilter()
-{
-}
-
 void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
   vtkUnstructuredGridBase* grid, vtkIdList* faces) const
 {
   if (grid == nullptr || faces == nullptr)
   {
-    vtkErrorWithObjectMacro(this, << "Grid or faces list undefined.");
+    vtkErrorMacro(<< "Grid or faces list undefined.");
     return;
   }
 
@@ -56,8 +50,10 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
     case 1:
     case 2:
     case 3:
-      vtkErrorWithObjectMacro(this, << "Cell with < 4 faces not supported.");
+    {
+      vtkErrorMacro(<< "Cell with < 4 faces not supported.");
       break;
+    }
     case 4:
     {
       // VTK_TETRAHEDRON OR VTK_POLYHEDRON
@@ -89,8 +85,7 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
         }
         if (ids.size() != 4)
         {
-          vtkErrorWithObjectMacro(
-            this, << "4-sided cell with all triangles, but not 4 unique vertex indices.");
+          vtkErrorMacro(<< "4-sided cell with all triangles, but not 4 unique vertex indices.");
           return;
         }
 
@@ -114,9 +109,13 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
       {
         const vtkIdType nVertices = faces->GetId(offset);
         if (nVertices == 3)
+        {
           triFaces.push_back(fi);
+        }
         else if (nVertices == 4)
+        {
           quadFaces.push_back(fi);
+        }
         else if (nVertices > 4)
         {
           polyFaces.push_back(fi);
@@ -156,49 +155,48 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
             std::array<std::vector<vtkIdType>*, 3> actualSides = { &faceVertices[quadFaces[0]],
               &faceVertices[quadFaces[1]], &faceVertices[quadFaces[2]] };
 
-            bool reversed(false);
-          retryWedge:
+            // the next bit is tried two times, the second time with the top face reversed
+            // if the first time the correct orientation was not found.
             bool ok(false);
             vtkIdType topFaceCandidate[3];
-            std::array<std::array<vtkIdType, 4>, 3> sides = { { { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
-              { 0, 0, 0, 0 } } };
-
-            for (offset = 0; offset < 3; ++offset)
+            for (int twoTimes = 0; twoTimes < 2 && !ok; ++twoTimes)
             {
-              topFaceCandidate[0] = topFace[(0 + offset) % 3];
-              topFaceCandidate[1] = topFace[(1 + offset) % 3];
-              topFaceCandidate[2] = topFace[(2 + offset) % 3];
+              std::array<std::array<vtkIdType, 4>, 3> sides = { { { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 } } };
 
-              for (int i = 0; i < 3; ++i)
+              for (offset = 0; offset < 3 && !ok; ++offset)
               {
-                sides[i][0] = bottomFace[(0 + i) % 3];
-                sides[i][1] = bottomFace[(1 + i) % 3];
-                sides[i][3] = topFaceCandidate[(1 + i) % 3];
-                sides[i][2] = topFaceCandidate[(0 + i) % 3];
-              }
+                topFaceCandidate[0] = topFace[(0 + offset) % 3];
+                topFaceCandidate[1] = topFace[(1 + offset) % 3];
+                topFaceCandidate[2] = topFace[(2 + offset) % 3];
 
-              // next bit is: all of the sides must match at least one of the actual sides
-              ok = std::all_of(sides.begin(), sides.end(), [&actualSides](
-                                                             std::array<vtkIdType, 4>& side) {
-                return std::any_of(actualSides.begin(), actualSides.end(),
-                  [&side](std::vector<vtkIdType>* actualSide) {
-                    return std::all_of(actualSide->begin(), actualSide->end(),
-                      [&side](const vtkIdType actualSideVertex) {
-                        return std::find(side.begin(), side.end(), actualSideVertex) != side.end();
+                for (int i = 0; i < 3; ++i)
+                {
+                  sides[i][0] = bottomFace[(0 + i) % 3];
+                  sides[i][1] = bottomFace[(1 + i) % 3];
+                  sides[i][3] = topFaceCandidate[(1 + i) % 3];
+                  sides[i][2] = topFaceCandidate[(0 + i) % 3];
+                }
+
+                // next bit is: all of the sides must match at least one of the actual sides
+                ok = std::all_of(
+                  sides.begin(), sides.end(), [&actualSides](std::array<vtkIdType, 4>& side) {
+                    return std::any_of(actualSides.begin(), actualSides.end(),
+                      [&side](std::vector<vtkIdType>* actualSide) {
+                        return std::all_of(actualSide->begin(), actualSide->end(),
+                          [&side](const vtkIdType actualSideVertex) {
+                            return std::find(side.begin(), side.end(), actualSideVertex) !=
+                              side.end();
+                          });
                       });
                   });
-              });
-
-              if (ok)
-              {
-                break; // for-loop
               }
-            }
-            if (!ok && !reversed)
-            {
-              std::reverse(topFace.begin(), topFace.end());
-              reversed = true;
-              goto retryWedge;
+
+              if (!ok)
+              {
+                // reverse topFace and try again
+                std::reverse(topFace.begin(), topFace.end());
+              }
             }
 
             if (ok)
@@ -223,7 +221,7 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
 
             if (topVertex == cellVertices.end())
             {
-              vtkErrorWithObjectMacro(this, << "Failed to find VTK_PYRAMID top vertex");
+              vtkErrorMacro(<< "Failed to find VTK_PYRAMID top vertex");
             }
             else
             {
@@ -296,50 +294,46 @@ void vtkConvertPolyhedraFilter::InsertNextPolyhedralCell(
                 // topFace array AND trying it clock-wise and anti-clockwise
 
                 vtkIdType topFaceCandidate[4];
-                bool reversed(false);
-              retryHexa:
+
                 bool ok(false);
-                for (offset = 0; offset < 4; ++offset)
+                for (int twoTimes = 0; twoTimes < 2 && !ok; ++twoTimes)
                 {
-                  topFaceCandidate[0] = topFace[(0 + offset) % 4];
-                  topFaceCandidate[1] = topFace[(1 + offset) % 4];
-                  topFaceCandidate[2] = topFace[(2 + offset) % 4];
-                  topFaceCandidate[3] = topFace[(3 + offset) % 4];
-
-                  std::array<std::array<vtkIdType, 4>, 4> sides = { { { 0, 0, 0, 0 },
-                    { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } } };
-
-                  for (int i = 0; i < 4; ++i)
+                  for (offset = 0; offset < 4 && !ok; ++offset)
                   {
-                    sides[i][0] = bottomFace[(0 + i) % 4];
-                    sides[i][1] = bottomFace[(1 + i) % 4];
-                    sides[i][2] = topFaceCandidate[(0 + i) % 4];
-                    sides[i][3] = topFaceCandidate[(1 + i) % 4];
+                    topFaceCandidate[0] = topFace[(0 + offset) % 4];
+                    topFaceCandidate[1] = topFace[(1 + offset) % 4];
+                    topFaceCandidate[2] = topFace[(2 + offset) % 4];
+                    topFaceCandidate[3] = topFace[(3 + offset) % 4];
+
+                    std::array<std::array<vtkIdType, 4>, 4> sides = { { { 0, 0, 0, 0 },
+                      { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } } };
+
+                    for (int i = 0; i < 4; ++i)
+                    {
+                      sides[i][0] = bottomFace[(0 + i) % 4];
+                      sides[i][1] = bottomFace[(1 + i) % 4];
+                      sides[i][2] = topFaceCandidate[(0 + i) % 4];
+                      sides[i][3] = topFaceCandidate[(1 + i) % 4];
+                    }
+
+                    // next bit is: all of the sides must match at least one of the actual sides
+                    ok = std::all_of(
+                      sides.begin(), sides.end(), [&actualSides](std::array<vtkIdType, 4>& side) {
+                        return std::any_of(actualSides.begin(), actualSides.end(),
+                          [&side](std::vector<vtkIdType>* actualSide) {
+                            return std::all_of(actualSide->begin(), actualSide->end(),
+                              [&side](vtkIdType actualSideVertex) {
+                                return std::find(side.begin(), side.end(), actualSideVertex) !=
+                                  side.end();
+                              });
+                          });
+                      });
                   }
 
-                  // next bit is: all of the sides must match at least one of the actual sides
-                  ok = std::all_of(
-                    sides.begin(), sides.end(), [&actualSides](std::array<vtkIdType, 4>& side) {
-                      return std::any_of(actualSides.begin(), actualSides.end(),
-                        [&side](std::vector<vtkIdType>* actualSide) {
-                          return std::all_of(actualSide->begin(), actualSide->end(),
-                            [&side](vtkIdType actualSideVertex) {
-                              return std::find(side.begin(), side.end(), actualSideVertex) !=
-                                side.end();
-                            });
-                        });
-                    });
-
-                  if (ok)
+                  if (!ok)
                   {
-                    break; // for-loop
+                    std::reverse(topFace.begin(), topFace.end());
                   }
-                }
-                if (!ok && !reversed)
-                {
-                  std::reverse(topFace.begin(), topFace.end());
-                  reversed = true;
-                  goto retryHexa;
                 }
 
                 if (ok)
@@ -381,14 +375,14 @@ void vtkConvertPolyhedraFilter::InsertNextPolygonalCell(
 {
   if (grid == nullptr || vertices == nullptr)
   {
-    vtkErrorWithObjectMacro(this, << "Grid or vertex list undefined.");
+    vtkErrorMacro(<< "Grid or vertex list undefined.");
     return;
   }
 
   const vtkIdType nVertices = vertices->GetNumberOfIds();
   if (nVertices < 3)
   {
-    vtkErrorWithObjectMacro(this, << "Polygonal cell with < 3 vertices not supported.");
+    vtkErrorMacro(<< "Polygonal cell with < 3 vertices not supported.");
     return;
   }
 

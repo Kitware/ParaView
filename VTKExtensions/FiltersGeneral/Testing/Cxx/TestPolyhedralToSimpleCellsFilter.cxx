@@ -3,14 +3,18 @@
   Program:   ParaView
   Module:    TestPolyhedralToSimpleCellsFilter.cxx
 
-  Copyright (c) Menno Deij - van Rijswijk, MARIN, The Netherlands
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
      This software is distributed WITHOUT ANY WARRANTY; without even
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+/*-------------------------------------------------------------------------
+  Copyright 2020 Menno Deij - van Rijswijk (MARIN)
+-------------------------------------------------------------------------*/
 
 #include "vtkCell.h"
 #include "vtkConvertPolyhedraFilter.h"
@@ -19,6 +23,7 @@
 #include "vtkNew.h"
 #include "vtkTestUtilities.h"
 #include "vtkUnstructuredGrid.h"
+
 #include <string>
 
 #define vtk_assert(x)                                                                              \
@@ -50,6 +55,7 @@ public:
 
     vtkNew<vtkErrorObserver> obs;
     r->AddObserver(vtkCommand::ErrorEvent, obs);
+
     // === expect error if input is null
     r->InsertNextPolygonalCell(nullptr, nullptr);
     vtk_observe_has_error(obs);
@@ -168,6 +174,8 @@ public:
     vtk_assert(ug->GetNumberOfCells() == 1);
     ct = ug->GetCellType(0);
     vtk_assert(ct == VTK_HEXAHEDRON);
+
+    r->RemoveObserver(obs);
 
     return EXIT_SUCCESS;
   }

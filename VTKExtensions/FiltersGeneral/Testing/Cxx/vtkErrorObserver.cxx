@@ -1,26 +1,54 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkErrorObserver.cxx
+
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
 #include "vtkErrorObserver.h"
-#include <vtkSmartPointer.h>
 
-vtkErrorObserver::vtkErrorObserver()
-  : Error(false)
-  , Warning(false)
-  , ErrorMessage("")
-  , WarningMessage("")
-{
-}
+#include <vtkDebugLeaks.h>
 
+//------------------------------------------------------------------------------
 vtkErrorObserver* vtkErrorObserver::New()
 {
+  // do not use vtkStandardNewMacro - see vtkDebugLeaks.h for details
   return new vtkErrorObserver;
 }
+
+//------------------------------------------------------------------------------
+vtkErrorObserver::vtkErrorObserver()
+{
+  vtkDebugLeaks::ConstructClass(this);
+}
+
+//------------------------------------------------------------------------------
+vtkErrorObserver::~vtkErrorObserver()
+{
+  vtkDebugLeaks::DestructClass(this);
+}
+
+//------------------------------------------------------------------------------
 bool vtkErrorObserver::GetError() const
 {
   return this->Error;
 }
+
+//------------------------------------------------------------------------------
 bool vtkErrorObserver::GetWarning() const
 {
   return this->Warning;
 }
+
+//------------------------------------------------------------------------------
 void vtkErrorObserver::Clear()
 {
   this->Error = false;
@@ -29,6 +57,7 @@ void vtkErrorObserver::Clear()
   this->WarningMessage = "";
 }
 
+//------------------------------------------------------------------------------
 void vtkErrorObserver::Execute(vtkObject* vtkNotUsed(caller), unsigned long event, void* calldata)
 {
   switch (event)
@@ -47,10 +76,13 @@ void vtkErrorObserver::Execute(vtkObject* vtkNotUsed(caller), unsigned long even
   }
 }
 
+//------------------------------------------------------------------------------
 std::string vtkErrorObserver::GetErrorMessage() const
 {
   return ErrorMessage;
 }
+
+//------------------------------------------------------------------------------
 std::string vtkErrorObserver::GetWarningMessage() const
 {
   return WarningMessage;
