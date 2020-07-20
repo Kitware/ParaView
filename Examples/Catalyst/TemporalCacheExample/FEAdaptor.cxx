@@ -64,7 +64,7 @@ public:
     vtkDataObject* pointsNow = idd2->GetGrid();
     dsw->SetInputData(pointsNow);
     // Ditto for the points at each timestep.
-    fname = "tcache_ex_pts_time_" + std::to_string(this->OutputCounter) + ".vtp";
+    fname = "tcache_ex_pts_time_" + std::to_string(this->OutputCounter) + ".vtu";
     dsw->SetFileName(fname.c_str());
     dsw->Write();
 
