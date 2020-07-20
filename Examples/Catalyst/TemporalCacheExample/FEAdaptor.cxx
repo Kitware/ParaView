@@ -200,6 +200,7 @@ void Initialize(int argc, char* argv[])
 {
   std::string home = ".";
   int tcachesize = 100;
+  bool enableCaching = true;
   bool enableCxxPipeline = false;
 
   int numScripts = 0;
@@ -220,6 +221,10 @@ void Initialize(int argc, char* argv[])
     {
       enableCxxPipeline = true;
     }
+    else if (!strcmp(argv[a], "-NOCACHING"))
+    {
+      enableCaching = false;
+    }
     else
     {
       // pass unmatched arguments through as pythonscripts
@@ -227,11 +232,18 @@ void Initialize(int argc, char* argv[])
       numScripts++;
     }
   }
+  if (!enableCaching)
+  {
+    tcachesize = 1;
+  }
 
-  // KEY POINT:
-  // If you want to use memkind features, you have to tell VTK where you want to map from.
-  cout << "Extended memory is backed by " << home << endl;
-  vtkObjectBase::SetMemkindDirectory(home.c_str());
+  if (enableCaching)
+  {
+    // KEY POINT:
+    // If you want to use memkind features, you have to tell VTK where you want to map from.
+    cout << "Extended memory is backed by " << home << endl;
+    vtkObjectBase::SetMemkindDirectory(home.c_str());
+  }
 
   if (Processor == NULL)
   {
@@ -242,8 +254,11 @@ void Initialize(int argc, char* argv[])
     Processor->Initialize();
     // KEY POINT:
     // You have to make a temporal cache for every output you want to temporally process
-    Processor->MakeTemporalCache("volume");
-    Processor->MakeTemporalCache("points");
+    if (enableCaching)
+    {
+      Processor->MakeTemporalCache("volume");
+      Processor->MakeTemporalCache("points");
+    }
   }
   else
   {
