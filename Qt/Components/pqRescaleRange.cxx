@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreUtilities.h"
 
+#include <algorithm> // for std::swap
+
 class pqRescaleRangeForm : public Ui::pqRescaleRangeDialog
 {
 };
@@ -71,14 +73,24 @@ void pqRescaleRange::setRange(double min, double max)
 {
   if (min > max)
   {
-    double tmp = min;
-    min = max;
-    max = tmp;
+    std::swap(min, max);
   }
 
   // Update the displayed range.
   this->Form->MinimumScalar->setText(pqCoreUtilities::number(min));
   this->Form->MaximumScalar->setText(pqCoreUtilities::number(max));
+}
+
+void pqRescaleRange::setOpacityRange(double min, double max)
+{
+  if (min > max)
+  {
+    std::swap(min, max);
+  }
+
+  // Update the displayed opacity range.
+  this->Form->MinimumOpacityScalar->setText(pqCoreUtilities::number(min));
+  this->Form->MaximumOpacityScalar->setText(pqCoreUtilities::number(max));
 }
 
 double pqRescaleRange::minimum() const
@@ -89,6 +101,30 @@ double pqRescaleRange::minimum() const
 double pqRescaleRange::maximum() const
 {
   return this->Form->MaximumScalar->text().toDouble();
+}
+
+void pqRescaleRange::showOpacityControls(bool show)
+{
+  if (!show)
+  {
+    this->Form->OpacityLabel->setVisible(show);
+    this->Form->MinimumOpacityScalar->setVisible(show);
+    this->Form->OpacityHyphenLabel->setVisible(show);
+    this->Form->MaximumOpacityScalar->setVisible(show);
+
+    // Force the dialog to resize after changing widget visibilities
+    this->resize(0, 0);
+  }
+}
+
+double pqRescaleRange::opacityMinimum() const
+{
+  return this->Form->MinimumOpacityScalar->text().toDouble();
+}
+
+double pqRescaleRange::opacityMaximum() const
+{
+  return this->Form->MaximumOpacityScalar->text().toDouble();
 }
 
 void pqRescaleRange::validate()

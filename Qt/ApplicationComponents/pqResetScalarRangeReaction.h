@@ -103,10 +103,12 @@ public:
    * Reset range to a custom range.
    *
    * @param[in] tfProxy The transfer function proxy to reset the range on.
+   * @param[in] separateOpacity Show controls for setting the opacity function range
+   *                            separately from the color transfer function.
    *
    * @returns `true` if the operation was successful, otherwise `false`.
    */
-  static bool resetScalarRangeToCustom(vtkSMProxy* tfProxy);
+  static bool resetScalarRangeToCustom(vtkSMProxy* tfProxy, bool separateOpacity = false);
 
   /**
   * Reset range to data range over time.
