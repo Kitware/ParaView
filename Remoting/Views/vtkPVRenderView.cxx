@@ -3267,6 +3267,28 @@ int vtkPVRenderView::GetAmbientOcclusionSamples()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetRouletteDepth(int v)
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  vtkRenderer* ren = this->GetRenderer();
+  vtkOSPRayRendererNode::SetRouletteDepth(v, ren);
+#else
+  (void)v;
+#endif
+}
+
+//----------------------------------------------------------------------------
+int vtkPVRenderView::GetRouletteDepth()
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  vtkRenderer* ren = this->GetRenderer();
+  return vtkOSPRayRendererNode::GetRouletteDepth(ren);
+#else
+  return 0;
+#endif
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::SetSamplesPerPixel(int v)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
@@ -3285,6 +3307,28 @@ int vtkPVRenderView::GetSamplesPerPixel()
   return vtkOSPRayRendererNode::GetSamplesPerPixel(ren);
 #else
   return 1;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetVolumeAnisotropy(double v)
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  vtkRenderer* ren = this->GetRenderer();
+  vtkOSPRayRendererNode::SetVolumeAnisotropy(v, ren);
+#else
+  (void)v;
+#endif
+}
+
+//----------------------------------------------------------------------------
+double vtkPVRenderView::GetVolumeAnisotropy()
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  vtkRenderer* ren = this->GetRenderer();
+  return vtkOSPRayRendererNode::GetVolumeAnisotropy(ren);
+#else
+  return 0.0f;
 #endif
 }
 

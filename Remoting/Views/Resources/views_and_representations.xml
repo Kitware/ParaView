@@ -2715,6 +2715,44 @@
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty
+          name="RouletteDepth"
+          command="SetRouletteDepth"
+          default_values="5"
+          animateable="0"
+          number_of_elements="1">
+        <IntRangeDomain
+            min="0"
+            name="range"/>
+        <Documentation>Sets the number of occlusion query rays that
+        OSPRay sends at each intersection.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty
+          name="VolumeAnisotropy"
+          command="SetVolumeAnisotropy"
+          default_values="0.0"
+          animateable="0"
+          number_of_elements="1">
+        <DoubleRangeDomain
+            min="-1.0"
+            name="1.0"/>
+        <Documentation>Volume anisotropy of the phase function in
+        the path tracer.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty
           name="MaxFrames"
           label="Progressive Passes"
           command="SetMaxFrames"
