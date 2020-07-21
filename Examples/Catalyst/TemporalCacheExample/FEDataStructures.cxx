@@ -230,22 +230,6 @@ unsigned int Grid::GetNumberOfLocalCells()
     (this->Extent[5] - this->Extent[4]);
 }
 
-void Grid::GetLocalPoint(unsigned int pointId, double* point)
-{
-  unsigned int logicalX = pointId % (this->Extent[1] - this->Extent[0] + 1);
-  assert(logicalX <= this->Extent[1]);
-  point[0] = this->Spacing[0] * logicalX;
-  unsigned int logicalY =
-    pointId % ((this->Extent[1] - this->Extent[0] + 1) * (this->Extent[3] - this->Extent[2] + 1));
-  logicalY /= this->Extent[1] - this->Extent[0] + 1;
-  assert(logicalY <= this->Extent[3]);
-  point[1] = this->Spacing[1] * logicalY;
-  unsigned int logicalZ =
-    pointId / ((this->Extent[1] - this->Extent[0] + 1) * (this->Extent[3] - this->Extent[2] + 1));
-  assert(logicalZ <= this->Extent[5]);
-  point[2] = this->Spacing[2] * logicalZ;
-}
-
 unsigned int* Grid::GetNumPoints()
 {
   return this->NumPoints;

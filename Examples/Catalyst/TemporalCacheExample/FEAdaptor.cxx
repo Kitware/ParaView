@@ -64,7 +64,7 @@ public:
     vtkDataObject* pointsNow = idd2->GetGrid();
     dsw->SetInputData(pointsNow);
     // Ditto for the points at each timestep.
-    fname = "tcache_ex_pts_time_" + std::to_string(this->OutputCounter) + ".vtp";
+    fname = "tcache_ex_pts_time_" + std::to_string(this->OutputCounter) + ".vtu";
     dsw->SetFileName(fname.c_str());
     dsw->Write();
 
@@ -176,10 +176,11 @@ void UpdateVTKAttributes(Grid& grid, Attributes& attributes, vtkCPInputDataDescr
   ids->SetNumberOfComponents(1);
   for (int i = 0; i < numpts; i++)
   {
-    points->InsertNextPoint(pts[i * 5 + 0], pts[i * 5 + 1], pts[i * 5 + 2]);
+    points->InsertNextPoint(pts[i * 5 + 2], pts[i * 5 + 1], pts[i * 5 + 0]);
     rads->InsertNextValue(pts[i * 5 + 3]);
     ids->InsertNextValue(pts[i * 5 + 4]);
   }
+
   VTKPoints->SetPoints(points);
   VTKPoints->GetPointData()->AddArray(rads);
   VTKPoints->GetPointData()->AddArray(ids);
@@ -199,6 +200,7 @@ void Initialize(int argc, char* argv[])
 {
   std::string home = ".";
   int tcachesize = 100;
+  bool enableCaching = true;
   bool enableCxxPipeline = false;
 
   int numScripts = 0;
@@ -219,6 +221,10 @@ void Initialize(int argc, char* argv[])
     {
       enableCxxPipeline = true;
     }
+    else if (!strcmp(argv[a], "-NOCACHING"))
+    {
+      enableCaching = false;
+    }
     else
     {
       // pass unmatched arguments through as pythonscripts
@@ -226,11 +232,18 @@ void Initialize(int argc, char* argv[])
       numScripts++;
     }
   }
+  if (!enableCaching)
+  {
+    tcachesize = 1;
+  }
 
-  // KEY POINT:
-  // If you want to use memkind features, you have to tell VTK where you want to map from.
-  cout << "Extended memory is backed by " << home << endl;
-  vtkObjectBase::SetMemkindDirectory(home.c_str());
+  if (enableCaching)
+  {
+    // KEY POINT:
+    // If you want to use memkind features, you have to tell VTK where you want to map from.
+    cout << "Extended memory is backed by " << home << endl;
+    vtkObjectBase::SetMemkindDirectory(home.c_str());
+  }
 
   if (Processor == NULL)
   {
@@ -241,7 +254,11 @@ void Initialize(int argc, char* argv[])
     Processor->Initialize();
     // KEY POINT:
     // You have to make a temporal cache for every output you want to temporally process
-    Processor->MakeTemporalCache("volume");
+    if (enableCaching)
+    {
+      Processor->MakeTemporalCache("volume");
+      Processor->MakeTemporalCache("points");
+    }
   }
   else
   {
@@ -301,7 +318,13 @@ void CoProcess(
 
     vtkCPInputDataDescription* idd2 = dataDescription->GetInputDescriptionByName("points");
     idd2->SetGrid(VTKPoints);
-
+    vtkSMSourceProxy* cache2 = Processor->GetTemporalCache("points");
+    if (cache2)
+    {
+      // KEY POINT:
+      // The adaptor has to associate the cache with the pipeline every timestep
+      idd2->SetTemporalCache(cache2);
+    }
     Processor->CoProcess(dataDescription.GetPointer());
   }
 }
