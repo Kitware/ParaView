@@ -2723,8 +2723,7 @@
         <IntRangeDomain
             min="0"
             name="range"/>
-        <Documentation>Sets the number of occlusion query rays that
-        OSPRay sends at each intersection.</Documentation>
+        <Documentation>Set the ray recursion depth at which to start Russian roulette termination.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -2741,9 +2740,9 @@
           number_of_elements="1">
         <DoubleRangeDomain
             min="-1.0"
-            name="1.0"/>
-        <Documentation>Volume anisotropy of the phase function in
-        the path tracer.</Documentation>
+            max="1.0"
+            name="range"/>
+        <Documentation>Set the tendency for light to scatter back towards (negative) or away from (positive) the light source within path traced volumes.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -3051,8 +3050,10 @@
         <Property name="OSPRayRendererType"/>
         <Property name="AmbientSamples"/>
         <Property name="SamplesPerPixel"/>
+        <Property name="RouletteDepth"/>
         <Property name="MaxFrames"/>
         <Property name="Denoise"/>
+        <Property name="VolumeAnisotropy"/>
         <Property name="LightScale"/>
         <Property name="OSPRayTemporalCacheSize"/>
         <Property name="BackgroundNorth"/>
