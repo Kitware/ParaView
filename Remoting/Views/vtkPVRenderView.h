@@ -902,6 +902,20 @@ public:
   //@}
   //@{
   /**
+   * Sets the depth of monte carlo samples on the path tracer
+   */
+  void SetRouletteDepth(int);
+  int GetRouletteDepth();
+  //@}
+  //@{
+  /**
+   * Set the path tracers volume anisotropy
+   */
+  void SetVolumeAnisotropy(double);
+  double GetVolumeAnisotropy();
+  //@}
+  //@{
+  /**
    * Set the number of primary rays that OSPRay shoots per pixel.
    */
   void SetSamplesPerPixel(int);
