@@ -118,7 +118,7 @@ bool pqLinkViewWidget::eventFilter(QObject* watched, QEvent* e)
     QList<pqRenderView*> views = smModel->findItems<pqRenderView*>();
     foreach (pqRenderView* view, views)
     {
-      if (view && view->widget() == wid)
+      if (view && wid && view->widget() == wid->parent())
       {
         otherView = view;
         break;
