@@ -2643,23 +2643,6 @@
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
         </Hints>
       </IntVectorProperty>
-      <IntVectorProperty
-          name="Shadows"
-          command="SetShadows"
-          default_values="0"
-          animateable="0"
-          number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Controls whether OSPRay raycaster back end casts shadow rays
-        or not.</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="EnableOSPRay"
-                                   values="1" />
-        </Hints>
-      </IntVectorProperty>
       <StringVectorProperty name="OSPRayRendererType"
           command="SetOSPRayRendererType"
           label="Back End"
@@ -2677,6 +2660,30 @@
         </Hints>
       </StringVectorProperty>
       <IntVectorProperty
+          name="Shadows"
+          command="SetShadows"
+          default_values="0"
+          animateable="0"
+          number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Controls whether OSPRay raycaster back end casts shadow rays
+        or not.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                 <Property name="OSPRayRendererType" function="equals" value="OSPRay raycaster"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+	  </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty
           name="AmbientSamples"
           command="SetAmbientOcclusionSamples"
           default_values="0"
@@ -2689,10 +2696,17 @@
         OSPRay raycaster sends at each intersection.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="EnableOSPRay"
-                                   values="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                 <Property name="OSPRayRendererType" function="equals" value="OSPRay raycaster"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+	  </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty
@@ -2723,13 +2737,20 @@
         <IntRangeDomain
             min="0"
             name="range"/>
-        <Documentation>Set the ray recursion depth at which to start Russian roulette termination.</Documentation>
+        <Documentation>Set the path traced ray recursion depth at which to start Russian roulette termination.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="EnableOSPRay"
-                                   values="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                 <Property name="OSPRayRendererType" function="equals" value="OSPRay pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+	  </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <DoubleVectorProperty
@@ -2745,10 +2766,17 @@
         <Documentation>Set the tendency for light to scatter back towards (negative) or away from (positive) the light source within path traced volumes.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="EnableOSPRay"
-                                   values="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                 <Property name="OSPRayRendererType" function="equals" value="OSPRay pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+	  </PropertyWidgetDecorator>
         </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty
