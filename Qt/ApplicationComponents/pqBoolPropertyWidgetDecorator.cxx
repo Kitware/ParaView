@@ -63,7 +63,8 @@ pqBoolPropertyWidgetDecorator::pqBoolPropertyWidgetDecorator(
 
       int index = atoi(child->GetAttributeOrDefault("index", "0"));
       if (strcmp(function, "boolean") != 0 && strcmp(function, "boolean_invert") != 0 &&
-        strcmp(function, "greaterthan") != 0 && strcmp(function, "lessthan") != 0)
+        strcmp(function, "greaterthan") != 0 && strcmp(function, "lessthan") != 0 &&
+        strcmp(function, "equals") != 0)
       {
         qDebug("pqBoolPropertyWidgetDecorator currently only "
                "supports 'boolean', 'boolean_invert', 'greaterthan', "
@@ -124,6 +125,12 @@ void pqBoolPropertyWidgetDecorator::updateBoolPropertyState()
   {
     int number = this->Value.toInt();
     bool enabled = vtkSMUncheckedPropertyHelper(this->Property).GetAsInt(this->Index) < number;
+    this->setBoolProperty(enabled);
+  }
+  if (this->Property && this->Function == "equals")
+  {
+    bool enabled =
+      this->Value == vtkSMUncheckedPropertyHelper(this->Property).GetAsString(this->Index);
     this->setBoolProperty(enabled);
   }
 }
