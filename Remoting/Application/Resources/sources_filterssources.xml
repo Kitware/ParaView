@@ -55,7 +55,7 @@
                          number_of_elements="1"
                          panel_visibility="advanced">
         <IntRangeDomain max="128"
-                        min="0"
+                        min="3"
                         name="range" />
         <Documentation>This property specifies the number of faces of the shaft
         of the arrow (the cylinder). As the resolution increases, the cylinder
