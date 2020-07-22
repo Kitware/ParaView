@@ -1684,11 +1684,14 @@ def _start_trace_internal(preamble=None):
         Trace.Output.append([\
             "#### disable automatic camera reset on 'Show'",
             "paraview.simple._DisableFirstRenderCameraReset()"])
+
     return True
 
 def _stop_trace_internal():
     """**internal** stops trace. Called by vtkSMTrace::StopTrace()."""
     if not _get_skip_rendering():
+        # ensure we trace the active view, so camera changes will be recorded.
+        Trace.get_accessor(simple.GetActiveView())
         camera_trace = SaveCameras.get_trace(None)
         if camera_trace:
             Trace.Output.append_separated(\
