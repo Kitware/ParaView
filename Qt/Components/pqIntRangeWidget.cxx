@@ -48,7 +48,6 @@ pqIntRangeWidget::pqIntRangeWidget(QWidget* p)
   this->Value = 0;
   this->Minimum = 0;
   this->Maximum = 1;
-  this->StrictRange = false;
   this->Domain = 0;
   this->DomainConnection = 0;
   this->InteractingWithSlider = false;
@@ -150,29 +149,36 @@ void pqIntRangeWidget::setMinimum(int val)
 //-----------------------------------------------------------------------------
 void pqIntRangeWidget::updateValidator()
 {
+#if !defined(VTK_LEGACY_REMOVE)
   if (this->StrictRange)
   {
     this->LineEdit->setValidator(
       new QIntValidator(this->minimum(), this->maximum(), this->LineEdit));
   }
   else
+#endif
   {
     this->LineEdit->setValidator(new QIntValidator(this->LineEdit));
   }
 }
 
+#if !defined(VTK_LEGACY_REMOVE)
 //-----------------------------------------------------------------------------
 bool pqIntRangeWidget::strictRange() const
 {
   const QIntValidator* dv = qobject_cast<const QIntValidator*>(this->LineEdit->validator());
   return dv->bottom() == this->minimum() && dv->top() == this->maximum();
 }
+#endif
 
+#if !defined(VTK_LEGACY_REMOVE)
+//-----------------------------------------------------------------------------
 void pqIntRangeWidget::setStrictRange(bool s)
 {
   this->StrictRange = s;
   this->updateValidator();
 }
+#endif
 
 //-----------------------------------------------------------------------------
 void pqIntRangeWidget::setDomain(vtkSMIntRangeDomain* domain)
