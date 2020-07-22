@@ -65,7 +65,7 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f, bool isSter
   , useStereo(isStereo)
 {
   auto options = pqApplicationCore::instance()->getOptions();
-  auto* layout = new QVBoxLayout(this);
+  auto* layout = new QVBoxLayout();
   layout->setMargin(0);
 
   if (useStereo)
@@ -84,6 +84,8 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f, bool isSter
 
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "Using native-capable context.");
   }
+
+  this->setLayout(layout);
 
   // disable HiDPI if we are running tests
   if (this->useStereo)
