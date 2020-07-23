@@ -207,28 +207,33 @@ public:
     this->VTKOutputWindow->SetWidget(self);
 
     // this list needs to be reevaluated. For now, leaving it untouched.
-    this->SuppressedStrings
-      << "QEventDispatcherUNIX::unregisterTimer"
-      << "looking for 'HistogramView"
-      << "(looking for 'XYPlot"
-      << "Unrecognised OpenGL version"
-      /* Skip DBusMenuExporterPrivate errors. These, I suspect, are due to
-       * repeated menu actions in the menus. */
-      << "DBusMenuExporterPrivate"
-      << "DBusMenuExporterDBus"
-      /* This error appears in Qt 5.6 on Mac OS X 10.11.1 (and maybe others) */
-      << "QNSView mouseDragged: Internal mouse button tracking invalid"
-      << "Unrecognised OpenGL version"
-      /* Skip DBusMenuExporterPrivate errors. These, I suspect, are due to
-       * repeated menu actions in the menus. */
-      << "DBusMenuExporterPrivate"
-      << "DBusMenuExporterDBus"
-      /* Skip XCB errors coming from Qt 5 tests. */
-      << "QXcbConnection: XCB"
-      /* This error message appears on some HDPi screens with not clear reasons */
-      << "QWindowsWindow::setGeometry: Unable to set geometry"
-      /* Skip qt.qpa.xcb errors */
-      << "qt.qpa.xcb: internal error";
+    this->SuppressedStrings << "QEventDispatcherUNIX::unregisterTimer"
+                            << "looking for 'HistogramView"
+                            << "(looking for 'XYPlot"
+                            << "Unrecognised OpenGL version"
+                            /* Skip DBusMenuExporterPrivate errors. These, I suspect, are due to
+                             * repeated menu actions in the menus. */
+                            << "DBusMenuExporterPrivate"
+                            << "DBusMenuExporterDBus"
+                            /* This error appears in Qt 5.6 on Mac OS X 10.11.1 (and maybe others)
+                               */
+                            << "QNSView mouseDragged: Internal mouse button tracking invalid"
+                            << "Unrecognised OpenGL version"
+                            /* Skip DBusMenuExporterPrivate errors. These, I suspect, are due to
+                             * repeated menu actions in the menus. */
+                            << "DBusMenuExporterPrivate"
+                            << "DBusMenuExporterDBus"
+                            /* Skip XCB errors coming from Qt 5 tests. */
+                            << "QXcbConnection: XCB"
+                            /* This error message appears on some HDPi screens with not clear
+                               reasons */
+                            << "QWindowsWindow::setGeometry: Unable to set geometry"
+                            /* Skip qt.qpa.xcb errors */
+                            << "qt.qpa.xcb: internal error"
+                            /* suppress "warning: internal error:  void
+                               QXcbWindow::setNetWmStateOnUnmappedWindow() called on mapped window"
+                               */
+                            << "QXcbWindow::setNetWmStateOnUnmappedWindow";
   }
 
   void displayMessageInConsole(const QString& message, QtMsgType type)
