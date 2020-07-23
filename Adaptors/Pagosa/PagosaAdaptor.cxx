@@ -27,7 +27,6 @@
 #include "vtkFloatArray.h"
 #include "vtkImageData.h"
 #include "vtkMultiBlockDataSet.h"
-#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkNonOverlappingAMR.h"
 #include "vtkPointData.h"
