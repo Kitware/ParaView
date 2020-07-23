@@ -416,9 +416,6 @@
          <property name="toolTip">
           <string>Define the rotation speed factor.</string>
          </property>
-         <property name="StrictRange" stdset="0">
-          <bool>true</bool>
-         </property>
         </widget>
        </item>
        <item>
@@ -896,9 +893,6 @@
           <widget class="pqDoubleRangeWidget" name="interactiveViewLinkOpacity" native="true">
            <property name="toolTip">
             <string>Define the view link opacity.</string>
-           </property>
-           <property name="StrictRange" stdset="0">
-            <bool>true</bool>
            </property>
           </widget>
          </item>

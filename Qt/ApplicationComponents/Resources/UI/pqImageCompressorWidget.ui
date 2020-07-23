@@ -72,9 +72,6 @@
      <property name="value" stdset="0">
       <number>3</number>
      </property>
-     <property name="strictRange" stdset="0">
-      <bool>true</bool>
-     </property>
     </widget>
    </item>
    <item>
@@ -98,9 +95,6 @@
      <property name="value" stdset="0">
       <number>1</number>
      </property>
-     <property name="strictRange" stdset="0">
-      <bool>true</bool>
-     </property>
     </widget>
    </item>
    <item>
@@ -123,9 +117,6 @@
      </property>
      <property name="value" stdset="0">
       <number>3</number>
-     </property>
-     <property name="strictRange" stdset="0">
-      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -157,9 +148,6 @@
      </property>
      <property name="value" stdset="0">
       <number>4</number>
-     </property>
-     <property name="strictRange" stdset="0">
-      <bool>true</bool>
      </property>
     </widget>
    </item>

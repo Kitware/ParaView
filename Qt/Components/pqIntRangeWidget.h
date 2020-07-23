@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqIntRangeWidget_h
 
 #include "pqComponentsModule.h"
+#include "vtkSetGet.h" // for VTK_LEGACY
 #include "vtkSmartPointer.h"
 #include <QWidget>
 
@@ -50,7 +51,8 @@ class PQCOMPONENTS_EXPORT pqIntRangeWidget : public QWidget
   Q_PROPERTY(int value READ value WRITE setValue USER true)
   Q_PROPERTY(int minimum READ minimum WRITE setMinimum)
   Q_PROPERTY(int maximum READ maximum WRITE setMaximum)
-  Q_PROPERTY(bool strictRange READ strictRange WRITE setStrictRange)
+  VTK_LEGACY(Q_PROPERTY(bool strictRange READ strictRange WRITE setStrictRange));
+
 public:
   /**
   * constructor requires the proxy, property
@@ -68,8 +70,10 @@ public:
   // get the max range value
   int maximum() const;
 
-  // returns whether the line edit is also limited
-  bool strictRange() const;
+  /**
+   * @deprecated strictRange is deprecated and is not working as intended
+   */
+  VTK_LEGACY(bool strictRange() const);
 
   // Sets the range domain to monitor. This will automatically update
   // the widgets range when the domain changes.
@@ -100,9 +104,12 @@ public Q_SLOTS:
   // set the max range value
   void setMaximum(int);
 
-  // set the range on both the slider and line edit's validator
-  // whereas other methods just do it on the slider
+#if !defined(VTK_LEGACY_REMOVE)
+  /**
+   * @deprecated strictRange is deprecated and is not working as intended
+   */
   void setStrictRange(bool);
+#endif
 
 private Q_SLOTS:
   void sliderChanged(int);
@@ -122,7 +129,9 @@ private:
   QSlider* Slider;
   pqLineEdit* LineEdit;
   bool BlockUpdate;
-  bool StrictRange;
+#if !defined(VTK_LEGACY_REMOVE)
+  bool StrictRange = false;
+#endif
   vtkSmartPointer<vtkSMIntRangeDomain> Domain;
   vtkEventQtSlotConnect* DomainConnection;
   bool InteractingWithSlider;
