@@ -9049,7 +9049,7 @@
                                        value="0" />
             </Hints>
           </PropertyGroup>
-          <Property name="TextScaleMode" panel_visibility="never"/>
+          <Property name="TextScaleMode" panel_visibility="never" default_values="0"/>
           <Property name="Resizable" panel_visibility="never"/>
         </ExposedProperties>
       </SubProxy>
