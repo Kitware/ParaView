@@ -101,6 +101,22 @@ public:
   unsigned int GetLabelMask();
   //@}
 
+  /**
+   * For some exporters and other other operations we must be
+   * able to collect all the actors or volumes. These methods
+   * are used in that process.
+   * In case the viewport is not a consumer of this prop:
+   * call UpdateGeometry() first for updated viewport-specific
+   * billboard geometry.
+   */
+  void GetActors(vtkPropCollection*) override;
+
+  /**
+   * Updates the billboard geometry without performing any rendering,
+   * to assist GetActors().
+   */
+  void UpdateGeometry(vtkViewport* vp);
+
   //@{
   /**
    * Set to true to only label edges shared with 1 face. Note that

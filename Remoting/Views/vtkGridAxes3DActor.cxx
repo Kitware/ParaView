@@ -94,6 +94,28 @@ vtkGridAxes3DActor::~vtkGridAxes3DActor()
 }
 
 //----------------------------------------------------------------------------
+void vtkGridAxes3DActor::GetActors(vtkPropCollection* props)
+{
+  if (this->GetVisibility())
+  {
+    vtkViewport* vp = nullptr;
+    if (this->NumberOfConsumers)
+    {
+      vp = vtkViewport::SafeDownCast(this->Consumers[0]);
+      if (vp)
+      {
+        this->UpdateGeometry(vp);
+      }
+    }
+  }
+
+  for (int i = 0; i < this->GridAxes2DActors.GetSize(); ++i)
+  {
+    this->GridAxes2DActors[i]->GetActors(props);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkGridAxes3DActor::SetFaceMask(unsigned int mask)
 {
   if (this->FaceMask != mask)
@@ -395,6 +417,22 @@ int vtkGridAxes3DActor::RenderOpaqueGeometry(vtkViewport* viewport)
       : 0;
   }
   return counter;
+}
+
+//----------------------------------------------------------------------------
+void vtkGridAxes3DActor::UpdateGeometry(vtkViewport* viewport)
+{
+  vtkRenderWindow* rWin = vtkRenderWindow::SafeDownCast(viewport->GetVTKWindow());
+  if (rWin == nullptr || rWin->GetDesiredUpdateRate() < 1.0)
+  {
+    this->Update(viewport);
+  }
+
+  for (int cc = 0; cc < 6; cc++)
+  {
+    if (this->GridAxes2DActors[cc]->GetVisibility())
+      this->GridAxes2DActors[cc]->UpdateGeometry(viewport, false);
+  }
 }
 
 //----------------------------------------------------------------------------

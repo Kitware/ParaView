@@ -74,6 +74,25 @@ vtkGridAxesPlane2DActor::~vtkGridAxesPlane2DActor()
 }
 
 //----------------------------------------------------------------------------
+void vtkGridAxesPlane2DActor::GetActors(vtkPropCollection* props)
+{
+  if (this->GetVisibility())
+  {
+    vtkViewport* vp = nullptr;
+    if (this->NumberOfConsumers)
+    {
+      vp = vtkViewport::SafeDownCast(this->Consumers[0]);
+      if (vp)
+      {
+        this->UpdateGeometry(vp);
+      }
+    }
+  }
+
+  props->AddItem(this->Actor.Get());
+}
+
+//----------------------------------------------------------------------------
 void vtkGridAxesPlane2DActor::SetProperty(vtkProperty* property)
 {
   if (this->GetProperty() != property)
@@ -118,6 +137,13 @@ int vtkGridAxesPlane2DActor::RenderOpaqueGeometry(vtkViewport* viewport)
   // Do tasks that need to be done when this->MTime changes.
   this->Update(viewport);
   return this->Actor->RenderOpaqueGeometry(viewport);
+}
+
+//----------------------------------------------------------------------------
+void vtkGridAxesPlane2DActor::UpdateGeometry(vtkViewport* viewport)
+{
+  // Do tasks that need to be done when this->MTime changes.
+  this->Update(viewport);
 }
 
 //----------------------------------------------------------------------------
