@@ -294,6 +294,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LineChartSelection2_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LineChartSelection4.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LineChartSelection4_1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LinkCameraFromView.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LinkCameraFromView_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LoadStateMultiView.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LogColorMap1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LogColorMap2.png}"
@@ -1708,6 +1710,8 @@ paraview_add_multi_server_tests(3
 
 paraview_add_tile_display_tests(1 1
    TEST_SCRIPTS TileDisplaySplitView.xml)
+paraview_add_tile_display_tests(1 1
+   TEST_SCRIPTS LinkCameraFromView.xml)
 if (PARAVIEW_USE_MPI)
   paraview_add_tile_display_tests(2 1
      TEST_SCRIPTS TileDisplaySplitView.xml)
