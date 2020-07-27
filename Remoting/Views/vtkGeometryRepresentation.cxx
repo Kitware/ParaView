@@ -450,7 +450,9 @@ int vtkGeometryRepresentation::RequestData(
     this->GeometryFilter->SetInputDataObject(0, placeholder.GetPointer());
   }
 
-  this->MultiBlockMaker->Modified();
+  // essential to re-execute geometry filter consistently on all ranks since it
+  // does use parallel communication (see #19963).
+  this->GeometryFilter->Modified();
   this->MultiBlockMaker->Update();
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
