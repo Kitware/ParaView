@@ -17,6 +17,8 @@
 #include "vtkClientServerStreamInstantiator.h"
 #include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVCompositeDataInformation.h"
+#include "vtkPVCompositeDataInformationIterator.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
@@ -31,10 +33,28 @@
 //*****************************************************************************
 // Internal classes
 //*****************************************************************************
+struct vtkSMDataTypeDomainAllowedType
+{
+  vtkSMDataTypeDomainAllowedType() = delete;
+  vtkSMDataTypeDomainAllowedType(std::string Name, bool HasChildren = false, bool MatchAny = false,
+    std::vector<std::string> Children = {});
+  std::string typeName;
+  bool hasChildren;
+  bool childMatchAny;
+  std::vector<std::string> childAllowedTypes;
+};
+
 struct vtkSMDataTypeDomainInternals
 {
-  std::vector<std::string> DataTypes;
+  std::vector<vtkSMDataTypeDomainAllowedType> DataTypes;
 };
+
+vtkSMDataTypeDomainAllowedType::vtkSMDataTypeDomainAllowedType(
+  std::string Name, bool HasChildren, bool MatchAny, std::vector<std::string> Children)
+  : typeName(Name)
+  , hasChildren(HasChildren)
+  , childMatchAny(MatchAny)
+  , childAllowedTypes(Children){};
 //*****************************************************************************
 namespace vtkSMDataTypeDomainCache
 {
@@ -114,9 +134,27 @@ unsigned int vtkSMDataTypeDomain::GetNumberOfDataTypes()
 }
 
 //---------------------------------------------------------------------------
-const char* vtkSMDataTypeDomain::GetDataType(unsigned int idx)
+const char* vtkSMDataTypeDomain::GetDataTypeName(unsigned int idx)
 {
-  return this->DTInternals->DataTypes[idx].c_str();
+  return this->DTInternals->DataTypes[idx].typeName.c_str();
+}
+
+//---------------------------------------------------------------------------
+bool vtkSMDataTypeDomain::DataTypeHasChildren(unsigned int idx)
+{
+  return this->DTInternals->DataTypes[idx].hasChildren;
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMDataTypeDomain::GetDataTypeChildMatchTypeAsString(unsigned int idx)
+{
+  return this->DTInternals->DataTypes[idx].childMatchAny ? "any" : "all";
+}
+
+//---------------------------------------------------------------------------
+const std::vector<std::string>& vtkSMDataTypeDomain::GetDataTypeChildren(unsigned int idx)
+{
+  return this->DTInternals->DataTypes[idx].childAllowedTypes;
 }
 
 //---------------------------------------------------------------------------
@@ -200,12 +238,16 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy, int outputport /*=0
 
   for (unsigned int i = 0; i < numTypes; i++)
   {
+    if (this->DataTypeHasChildren(i))
+    {
+      continue;
+    }
     // Unfortunately, vtkDataSet, vtkPointSet, and vtkUnstructuredGridBase have
     // to be handled specially. These classes are abstract and can not be
     // instantiated.
     if (strcmp(info->GetDataClassName(), "vtkDataSet") == 0)
     {
-      if (strcmp(this->GetDataType(i), "vtkDataSet") == 0)
+      if (strcmp(this->GetDataTypeName(i), "vtkDataSet") == 0)
       {
         return 1;
       }
@@ -213,8 +255,8 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy, int outputport /*=0
     }
     if (strcmp(info->GetDataClassName(), "vtkPointSet") == 0)
     {
-      if ((strcmp(this->GetDataType(i), "vtkPointSet") == 0) ||
-        (strcmp(this->GetDataType(i), "vtkDataSet") == 0))
+      if ((strcmp(this->GetDataTypeName(i), "vtkPointSet") == 0) ||
+        (strcmp(this->GetDataTypeName(i), "vtkDataSet") == 0))
       {
         return 1;
       }
@@ -222,15 +264,15 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy, int outputport /*=0
     }
     if (strcmp(info->GetDataClassName(), "vtkUnstructuredGridBase") == 0)
     {
-      if ((strcmp(this->GetDataType(i), "vtkPointSet") == 0) ||
-        (strcmp(this->GetDataType(i), "vtkDataSet") == 0) ||
-        (strcmp(this->GetDataType(i), "vtkUnstructuredGridBase") == 0))
+      if ((strcmp(this->GetDataTypeName(i), "vtkPointSet") == 0) ||
+        (strcmp(this->GetDataTypeName(i), "vtkDataSet") == 0) ||
+        (strcmp(this->GetDataTypeName(i), "vtkUnstructuredGridBase") == 0))
       {
         return 1;
       }
       continue;
     }
-    if (dobj->IsA(this->GetDataType(i)))
+    if (dobj->IsA(this->GetDataTypeName(i)))
     {
       return 1;
     }
@@ -240,11 +282,58 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy, int outputport /*=0
   {
     vtkDataObject* cDobj =
       vtkSMDataTypeDomainCache::GetDataObjectOfType(info->GetCompositeDataClassName());
+    // Composite data with specified child
     for (unsigned int i = 0; i < numTypes; i++)
     {
-      if (cDobj->IsA(this->GetDataType(i)))
+      if (cDobj->IsA(this->GetDataTypeName(i)))
       {
-        return 1;
+        if (!this->DataTypeHasChildren(i))
+        {
+          return 1;
+        }
+        // Check child types
+        bool childMatchAny =
+          strcmp(this->GetDataTypeChildMatchTypeAsString(i), "any") == 0 ? true : false;
+        auto& dataTypes = this->GetDataTypeChildren(i);
+        vtkNew<vtkPVCompositeDataInformationIterator> iter;
+        iter->SetDataInformation(info);
+        for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+        {
+          vtkPVDataInformation* childInfo = iter->GetCurrentDataInformation();
+          if (!childInfo)
+          {
+            continue;
+          }
+          // Skip non-leaf children
+          vtkPVCompositeDataInformation* compositeInfo = childInfo->GetCompositeDataInformation();
+          if (compositeInfo->GetDataIsComposite() && !compositeInfo->GetDataIsMultiPiece())
+          {
+            continue;
+          }
+          vtkDataObject* childObj =
+            vtkSMDataTypeDomainCache::GetDataObjectOfType(childInfo->GetDataClassName());
+          bool childMatched = false;
+          for (auto& type : dataTypes)
+          {
+            if (childObj->IsA(type.c_str()))
+            {
+              childMatched = true;
+              break;
+            }
+          }
+          if (childMatched && childMatchAny)
+          {
+            return 1;
+          }
+          else if ((!childMatched) && (!childMatchAny))
+          {
+            return 0;
+          }
+        }
+        if (!childMatchAny && info->GetNumberOfBlockLeafs(true))
+        {
+          return 1;
+        }
       }
     }
   }
@@ -284,8 +373,62 @@ int vtkSMDataTypeDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement*
                     << "Can not parse domain xml.");
       return 0;
     }
+    // For composite data with specified child data type
+    const char* childMatch = selement->GetAttribute("child_match");
+    if (childMatch)
+    {
+      bool compositeChildMatchAny = true;
+      if (strcmp("any", childMatch) == 0)
+      {
+        compositeChildMatchAny = true;
+      }
+      else if (strcmp("all", childMatch) == 0)
+      {
+        compositeChildMatchAny = false;
+      }
+      else
+      {
+        vtkErrorMacro("The value of child_match should be \"any\" or \"all\"."
+          << "Can not parse domain xml.");
+        return 0;
+      }
 
-    this->DTInternals->DataTypes.push_back(value);
+      if (!selement->GetNumberOfNestedElements())
+      {
+        vtkErrorMacro(<< "child_match set but no nested datatypes."
+                      << "Can not parse domain xml.");
+        return 0;
+      }
+      unsigned int j;
+      std::vector<std::string> childValues;
+      for (j = 0; j < selement->GetNumberOfNestedElements(); ++j)
+      {
+        vtkPVXMLElement* childElement = selement->GetNestedElement(j);
+        if (strcmp("DataType", childElement->GetName()) != 0)
+        {
+          continue;
+        }
+        const char* childValue = childElement->GetAttribute("value");
+        if (!childValue)
+        {
+          vtkErrorMacro(<< "Can not find required attribute: value. "
+                        << "Can not parse domain xml.");
+          return 0;
+        }
+        childValues.push_back(childValue);
+      }
+      this->DTInternals->DataTypes.emplace_back(value, true, compositeChildMatchAny, childValues);
+    }
+    else if (selement->GetNumberOfNestedElements())
+    {
+      vtkErrorMacro(<< "Child type set but child_match not specified."
+                    << "Can not parse domain xml.");
+      return 0;
+    }
+    else
+    {
+      this->DTInternals->DataTypes.emplace_back(value);
+    }
   }
   return 1;
 }

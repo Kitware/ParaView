@@ -174,10 +174,10 @@
           <Group name="filters" />
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkImageData" />
-          <!-- temporary for now until we can check if there is a vtkImageData in the composite dataset
-          see https://discourse.paraview.org/t/xml-specification-questions-for-a-filter/2641 -->
-          <DataType value="vtkCompositeDataSet" />
+          <DataType value="vtkImageData"/>
+          <DataType value="vtkCompositeDataSet" child_match="any">
+            <DataType value="vtkImageData" />
+          </DataType>
         </DataTypeDomain>
         <InputArrayDomain name="input_array"
                           number_of_components="1" />
