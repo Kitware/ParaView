@@ -9,8 +9,7 @@
     <Proxy group="extract_writers" name="VTM" />
     <Proxy group="extract_writers" name="VTPD" />
     <Proxy group="extract_writers" name="VTPC" />
-    <Proxy group="extract_writers" name="VTHB" />
-    <Proxy group="extract_writers" name="VTHB" />
+    <Proxy group="extract_writers" name="VTH" />
     <Proxy group="extract_writers" name="CSV" />
     <Proxy group="extract_writers" name="Exodus" />
   </Category>

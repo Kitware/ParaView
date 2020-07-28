@@ -1293,14 +1293,14 @@
     </DataExtractWriterProxy>
 
     <!-- ================================================================= -->
-    <DataExtractWriterProxy name="VTHB">
+    <DataExtractWriterProxy name="VTH">
       <Documentation>
-        Extract writer to write a partitioned dataset collection using the
-        VTK XML file format (vtpc).
+        Extract writer to write a uniform grid AMR dataset using the
+        VTK XML file format (vth).
       </Documentation>
       <StringVectorProperty name="FileName"
                             number_of_elements="1"
-                            default_values="dataset_%.6ts.vthb">
+                            default_values="dataset_%.6ts.vth">
         <Documentation>
           Specify the filename to use.
         </Documentation>
