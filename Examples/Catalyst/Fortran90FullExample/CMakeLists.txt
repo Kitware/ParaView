@@ -11,6 +11,7 @@ add_executable(Fortran90FullExample
 target_link_libraries(Fortran90FullExample
   PRIVATE
     ParaView::PythonCatalyst
+    VTK::CommonDataModel
     MPI::MPI_Fortran)
 set_property(TARGET Fortran90FullExample
   PROPERTY
