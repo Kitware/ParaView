@@ -46,8 +46,22 @@ std::string vtkSMExtractWriterProxy::GenerateDataExtractsFileName(
 std::string vtkSMExtractWriterProxy::GenerateImageExtractsFileName(
   const std::string& fname, vtkSMExtractsController* extractor)
 {
-  return vtkSMExtractWriterProxy::GenerateExtractsFileName(
+  return vtkSMExtractWriterProxy::GenerateImageExtractsFileName(fname, std::string(), extractor);
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMExtractWriterProxy::GenerateImageExtractsFileName(
+  const std::string& fname, const std::string& cameraparams, vtkSMExtractsController* extractor)
+{
+  auto str = vtkSMExtractWriterProxy::GenerateExtractsFileName(
     fname, extractor, extractor->GetImageExtractsOutputDirectory());
+  size_t pos = 0;
+  while ((pos = str.find("\%cm", pos)) != std::string::npos)
+  {
+    str.replace(pos, 3, cameraparams);
+    pos += cameraparams.size();
+  }
+  return str;
 }
 
 //----------------------------------------------------------------------------

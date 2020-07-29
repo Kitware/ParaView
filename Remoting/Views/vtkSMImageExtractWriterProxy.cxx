@@ -14,13 +14,15 @@
 =========================================================================*/
 #include "vtkSMImageExtractWriterProxy.h"
 
+#include "vtkCamera.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMContextViewProxy.h"
 #include "vtkSMExtractsController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSaveScreenshotProxy.h"
-#include "vtkSMViewProxy.h"
+
+#include <sstream>
 
 vtkStandardNewMacro(vtkSMImageExtractWriterProxy);
 //----------------------------------------------------------------------------
@@ -105,15 +107,18 @@ bool vtkSMImageExtractWriterProxy::Write(vtkSMExtractsController* extractor)
 
   double old_time = VTK_DOUBLE_MAX;
   auto view = vtkSMViewProxy::SafeDownCast(vtkSMPropertyHelper(writer, "View").GetAsProxy());
-  if (view)
+  if (!view)
   {
-    vtkSMPropertyHelper helper(view, "ViewTime");
-    old_time = helper.GetAsDouble();
-    helper.Set(extractor->GetTime());
-    view->UpdateVTKObjects();
+    vtkErrorMacro("No view provided to generate extract from!");
+    return false;
   }
 
-  if (view != nullptr && vtkSMPropertyHelper(this, "ResetDisplay").GetAsInt() == 1)
+  vtkSMPropertyHelper helper(view, "ViewTime");
+  old_time = helper.GetAsDouble();
+  helper.Set(extractor->GetTime());
+  view->UpdateVTKObjects();
+
+  if (vtkSMPropertyHelper(this, "ResetDisplay").GetAsInt() == 1)
   {
     // BUG: currently, if we have more than 1 extract for the same view,
     // and only 1 of them resetting the display, we don't have a means to restore
@@ -128,15 +133,74 @@ bool vtkSMImageExtractWriterProxy::Write(vtkSMExtractsController* extractor)
     }
   }
 
-  auto convertedname = this->GenerateImageExtractsFileName(fname, extractor);
-  const bool status = writer->WriteImage(convertedname.c_str());
-  if (old_time != VTK_DOUBLE_MAX && view != nullptr)
+  if (vtkSMPropertyHelper(this, "CameraMode").GetAsInt() ==
+    vtkSMImageExtractWriterProxy::CameraMode::PhiTheta)
   {
-    vtkSMPropertyHelper(view, "ViewTime").Set(old_time);
-    view->UpdateVTKObjects();
-  }
+    auto rv = vtkSMRenderViewProxy::SafeDownCast(view);
+    if (rv == nullptr)
+    {
+      vtkErrorMacro("PhiTheta camera mode is not supported on this view of type '"
+        << view->GetXMLName() << "'");
+      return false;
+    }
 
-  return status;
+    const int phi_resolution = vtkSMPropertyHelper(this, "PhiResolution").GetAsInt();
+    if (phi_resolution < 1 || phi_resolution > 360)
+    {
+      vtkErrorMacro("PhiResolution must be in range [1, 360]");
+      return false;
+    }
+
+    const int theta_resolution = vtkSMPropertyHelper(this, "ThetaResolution").GetAsInt();
+    if (theta_resolution < 1 || theta_resolution > 360)
+    {
+      vtkErrorMacro("ThetaResolution must be in range [1, 360]");
+      return false;
+    }
+
+    for (int phi = 0; phi <= 360; phi += 360 / phi_resolution)
+    {
+      auto camera = rv->GetActiveCamera();
+      camera->Azimuth(phi_resolution);
+      camera->OrthogonalizeViewUp();
+      for (int theta = 0; theta <= 360; theta += 360 / theta_resolution)
+      {
+        camera->Elevation(theta_resolution);
+        camera->OrthogonalizeViewUp();
+        if (phi == 360 || theta == 360)
+        {
+          // no need to write this image since it's same as the one with phi=0
+          // or theta=0.
+          continue;
+        }
+        std::ostringstream str;
+        str << "p=" << phi << "t=" << theta;
+        auto convertedname = this->GenerateImageExtractsFileName(fname, str.str(), extractor);
+        const bool status = writer->WriteImage(convertedname.c_str());
+        if (old_time != VTK_DOUBLE_MAX && view != nullptr)
+        {
+          vtkSMPropertyHelper(view, "ViewTime").Set(old_time);
+          view->UpdateVTKObjects();
+        }
+        if (!status)
+        {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  else
+  {
+    auto convertedname = this->GenerateImageExtractsFileName(fname, extractor);
+    const bool status = writer->WriteImage(convertedname.c_str());
+    if (old_time != VTK_DOUBLE_MAX && view != nullptr)
+    {
+      vtkSMPropertyHelper(view, "ViewTime").Set(old_time);
+      view->UpdateVTKObjects();
+    }
+    return status;
+  }
 }
 
 //----------------------------------------------------------------------------
