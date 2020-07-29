@@ -20,10 +20,6 @@ vtk_module_test_data(
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_CoprocessingExtracts_histogram_0.000000.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_CoprocessingExtracts_renderview_0018.png"
 
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CinemaSpecAExtracts_BatchExtracts_cinema.cdb_8.888889e_01.png"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CinemaSpecAExtracts_CoprocessingExtracts_cinema.cdb_9.500000e_01.png"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/CinemaSpecAExtracts_ImmediateExtracts_cinema.cdb_8.888889e_01.png"
-
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/MultiplePipelines_Pipeline1_pipeline1_000000.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/MultiplePipelines_Pipeline2_pipeline2_000001.png"
 )
@@ -133,7 +129,6 @@ set_tests_properties(
 #---------------------------------------------------------------------
 if (PARAVIEW_USE_QT)
   set(catalyst_tests
-    CinemaSpecAExtracts
     WaveletHistogramExtracts)
 
   foreach (tname IN LISTS catalyst_tests)
