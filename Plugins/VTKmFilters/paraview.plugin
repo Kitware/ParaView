@@ -5,4 +5,4 @@ CONDITION
 DESCRIPTION
   VTKm many-core filters
 REQUIRES_MODULES
-  VTK::AcceleratorsVTKm
+  VTK::AcceleratorsVTKmFilters

@@ -22,10 +22,10 @@
 // serial backend.
 #ifndef __VTK_WRAP__
 #if VTK_MODULE_ENABLE_VTK_vtkm
-#include "vtkmConfig.h" // for VTKM_ENABLE_TBB
+#include "vtkmConfigFilters.h" // for VTKM_ENABLE_TBB
 #endif
 
-#if defined(VTKM_ENABLE_TBB) && VTK_MODULE_ENABLE_VTK_AcceleratorsVTKm
+#if defined(VTKM_ENABLE_TBB) && VTK_MODULE_ENABLE_VTK_AcceleratorsVTKmFilters
 #include "vtkCellArray.h"
 #include "vtkQuadricClustering.h"
 #include "vtkmLevelOfDetail.h"

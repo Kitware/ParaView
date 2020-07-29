@@ -306,7 +306,7 @@ paraview_require_module(
 
 paraview_require_module(
   CONDITION PARAVIEW_USE_VTKM
-  MODULES   VTK::AcceleratorsVTKm
+  MODULES   VTK::AcceleratorsVTKmFilters
   EXCLUSIVE)
 
 paraview_require_module(
