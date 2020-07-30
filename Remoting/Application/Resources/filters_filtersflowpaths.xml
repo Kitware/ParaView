@@ -1141,5 +1141,56 @@
       </Hints>
       <!-- End StreamTracer -->
     </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy name="VortexCores"
+      class="vtkVortexCore"
+      label="Vortex Core">
+      <Documentation long_help="Compute vortex cores"
+        short_help="Compute vortex cores">
+        Compute vortex cores.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+        name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array1"
+                          number_of_components="3"
+                          optional="0" />
+        <Documentation>The input.</Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="SelectInputArray"
+       command="SetInputArrayToProcess"
+       number_of_elements="5"
+       element_types="0 0 0 0 2"
+       label="Vector Field" >
+       <ArrayListDomain name="array_list" attribute_type="Vectors"
+         input_domain_name="input_array1">
+         <RequiredProperties>
+           <Property name="Input" function="Input" />
+         </RequiredProperties>
+       </ArrayListDomain>
+       <Documentation>
+         This property indicates the name of the tensor array on which to operate. The indicated array's
+         eigenvalues and eigenvectors are used for scaling and orienting the glyphs.
+       </Documentation>
+     </StringVectorProperty>
+
+      <IntVectorProperty command="SetHigherOrderMethod"
+        name="UseHigherOrderMethod"
+        default_values="0"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+    </SourceProxy>
+      <!-- End VortexCores -->
   </ProxyGroup>
 </ServerManagerConfiguration>
