@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 @_paraview_graph_layout_strategy_STRATEGY_TYPE@Implementation::@_paraview_graph_layout_strategy_STRATEGY_TYPE@Implementation(QObject* o)
   : QObject(o)
 {
+  setObjectName("@_paraview_graph_layout_strategy_STRATEGY_TYPE@");
 }
 
 QStringList @_paraview_graph_layout_strategy_STRATEGY_TYPE@Implementation::graphLayoutStrategies() const
