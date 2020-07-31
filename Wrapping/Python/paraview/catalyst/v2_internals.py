@@ -165,22 +165,15 @@ def _get_extracts_controller(dataDescription, options):
     cntr.SetTime(dataDescription.GetTime())
 
     # override options if passed in environment options.
-    if 'PARAVIEW_OVERRIDE_DATA_OUTPUT_DIRECTORY' in os.environ:
-        data_root = os.environ["PARAVIEW_OVERRIDE_DATA_OUTPUT_DIRECTORY"]
+    if 'PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY' in os.environ:
+        extracts_output_dir = os.environ["PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY"]
     else:
-        data_root = options.DataExtractsOutputDirectory
-
-    if 'PARAVIEW_OVERRIDE_IMAGE_OUTPUT_DIRECTORY' in os.environ:
-        image_root = os.environ["PARAVIEW_OVERRIDE_IMAGE_OUTPUT_DIRECTORY"]
-    else:
-        image_root = options.ImageExtractsOutputDirectory
+        extracts_output_dir = options.ExtractsOutputDirectory
 
     # if the paths have ${...}, replace that with environment variables.
     from ..util import ReplaceDollarVariablesWithEnvironment
-    data_root = ReplaceDollarVariablesWithEnvironment(data_root)
-    image_root = ReplaceDollarVariablesWithEnvironment(image_root)
-    cntr.SetDataExtractsOutputDirectory(data_root)
-    cntr.SetImageExtractsOutputDirectory(image_root)
+    extracts_output_dir = ReplaceDollarVariablesWithEnvironment(extracts_output_dir)
+    cntr.SetExtractsOutputDirectory(extracts_output_dir)
     return cntr
 
 

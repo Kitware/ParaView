@@ -64,8 +64,7 @@ vtkStandardNewMacro(vtkSMExtractsController);
 vtkSMExtractsController::vtkSMExtractsController()
   : TimeStep(0)
   , Time(0.0)
-  , DataExtractsOutputDirectory(nullptr)
-  , ImageExtractsOutputDirectory(nullptr)
+  , ExtractsOutputDirectory(nullptr)
   , SummaryTable(nullptr)
 {
 }
@@ -73,8 +72,7 @@ vtkSMExtractsController::vtkSMExtractsController()
 //----------------------------------------------------------------------------
 vtkSMExtractsController::~vtkSMExtractsController()
 {
-  this->SetDataExtractsOutputDirectory(nullptr);
-  this->SetImageExtractsOutputDirectory(nullptr);
+  this->SetExtractsOutputDirectory(nullptr);
   if (this->SummaryTable)
   {
     this->SummaryTable->Delete();
@@ -372,19 +370,10 @@ vtkSMProxy* vtkSMExtractsController::CreateExtractGenerator(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMExtractsController::CreateImageExtractsOutputDirectory() const
+bool vtkSMExtractsController::CreateExtractsOutputDirectory() const
 {
-  return this->ImageExtractsOutputDirectory
-    ? this->CreateDirectory(this->ImageExtractsOutputDirectory)
-    : false;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMExtractsController::CreateDataExtractsOutputDirectory() const
-{
-  return this->DataExtractsOutputDirectory
-    ? this->CreateDirectory(this->DataExtractsOutputDirectory)
-    : false;
+  return this->ExtractsOutputDirectory ? this->CreateDirectory(this->ExtractsOutputDirectory)
+                                       : false;
 }
 
 //----------------------------------------------------------------------------
@@ -512,4 +501,6 @@ void vtkSMExtractsController::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "TimeStep: " << this->TimeStep << endl;
   os << indent << "Time: " << this->Time << endl;
+  os << indent << "ExtractsOutputDirectory: "
+     << (this->ExtractsOutputDirectory ? this->ExtractsOutputDirectory : "(nullptr)") << endl;
 }

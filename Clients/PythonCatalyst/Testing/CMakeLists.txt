@@ -202,8 +202,7 @@ if (PARAVIEW_USE_QT)
     paraview_add_test(
       PREFIX "Catalyst::Workflow::BatchExecute"
       ENVIRONMENT
-        PARAVIEW_OVERRIDE_DATA_OUTPUT_DIRECTORY=${ttemp_dir}/BatchExtracts
-        PARAVIEW_OVERRIDE_IMAGE_OUTPUT_DIRECTORY=${ttemp_dir}/BatchExtracts
+        PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY=${ttemp_dir}/BatchExtracts
       ARGS "$<TARGET_FILE:ParaView::pvbatch>"
       TEST_SCRIPTS ${ttemp_dir}/${tname}.zip)
 

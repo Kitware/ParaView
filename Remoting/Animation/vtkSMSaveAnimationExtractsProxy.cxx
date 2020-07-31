@@ -39,10 +39,8 @@ public:
   {
     this->SetFileName("/tmp/not-used");
     this->ProxyManager = options->GetSessionProxyManager();
-    this->Controller->SetDataExtractsOutputDirectory(
-      vtkSMPropertyHelper(options, "DataExtractsOutputDirectory").GetAsString());
-    this->Controller->SetImageExtractsOutputDirectory(
-      vtkSMPropertyHelper(options, "ImageExtractsOutputDirectory").GetAsString());
+    this->Controller->SetExtractsOutputDirectory(
+      vtkSMPropertyHelper(options, "ExtractsOutputDirectory").GetAsString());
   }
 
 protected:

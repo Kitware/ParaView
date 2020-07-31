@@ -100,7 +100,7 @@ bool vtkSMImageExtractWriterProxy::Write(vtkSMExtractsController* extractor)
   }
 
   // Let's create the output directory.
-  if (!extractor->CreateImageExtractsOutputDirectory())
+  if (!extractor->CreateExtractsOutputDirectory())
   {
     return false;
   }

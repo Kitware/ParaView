@@ -72,20 +72,11 @@ public:
 
   //@{
   /**
-   * Get/Set the root directory to use for writing data extracts.
+   * Get/Set the root directory to use for writing extracts.
    * This must be set correctly before using `Extract` to generate extracts.
    */
-  vtkSetStringMacro(DataExtractsOutputDirectory);
-  vtkGetStringMacro(DataExtractsOutputDirectory);
-  //@}
-
-  //@{
-  /**
-   * Get/Set the root directory to use for writing image extracts.
-   * This must be set correctly before using `Extract` to generate extracts.
-   */
-  vtkSetStringMacro(ImageExtractsOutputDirectory);
-  vtkGetStringMacro(ImageExtractsOutputDirectory);
+  vtkSetStringMacro(ExtractsOutputDirectory);
+  vtkGetStringMacro(ExtractsOutputDirectory);
   //@}
 
   /**
@@ -187,8 +178,7 @@ public:
    * Return true on success, or false to failed to create writeable directories.
    * Extract writers should not attempt to write any extracts when that happens.
    */
-  bool CreateImageExtractsOutputDirectory() const;
-  bool CreateDataExtractsOutputDirectory() const;
+  bool CreateExtractsOutputDirectory() const;
   bool CreateDirectory(const std::string& dname) const;
   //@}
 
@@ -240,8 +230,7 @@ private:
 
   int TimeStep;
   double Time;
-  char* DataExtractsOutputDirectory;
-  char* ImageExtractsOutputDirectory;
+  char* ExtractsOutputDirectory;
   vtkTable* SummaryTable;
 };
 

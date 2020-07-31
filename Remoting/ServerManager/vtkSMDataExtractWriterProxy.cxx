@@ -52,7 +52,7 @@ bool vtkSMDataExtractWriterProxy::Write(vtkSMExtractsController* extractor)
   }
 
   // Let's create the output directory.
-  if (!extractor->CreateDataExtractsOutputDirectory())
+  if (!extractor->CreateExtractsOutputDirectory())
   {
     return false;
   }

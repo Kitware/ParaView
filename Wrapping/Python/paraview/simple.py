@@ -531,14 +531,10 @@ def SaveExtractsUsingCatalystOptions(options):
 
     # override options if passed in environment options.
     import os
-    if 'PARAVIEW_OVERRIDE_DATA_OUTPUT_DIRECTORY' in os.environ:
-        proxy.DataExtractsOutputDirectory = os.environ["PARAVIEW_OVERRIDE_DATA_OUTPUT_DIRECTORY"]
+    if 'PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY' in os.environ:
+        proxy.ExtractsOutputDirectory = os.environ["PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY"]
     else:
-        proxy.DataExtractsOutputDirectory = options.DataExtractsOutputDirectory
-    if 'PARAVIEW_OVERRIDE_IMAGE_OUTPUT_DIRECTORY' in os.environ:
-        proxy.ImageExtractsOutputDirectory = os.environ["PARAVIEW_OVERRIDE_IMAGE_OUTPUT_DIRECTORY"]
-    else:
-        proxy.ImageExtractsOutputDirectory = options.ImageExtractsOutputDirectory
+        proxy.ExtractsOutputDirectory = options.ExtractsOutputDirectory
     return proxy.SaveExtracts()
 
 def SaveExtracts(**kwargs):
@@ -546,11 +542,8 @@ def SaveExtracts(**kwargs):
     Generate extracts. Parameters are forwarded for 'SaveAnimationExtracts'
     Currently, supported keyword parameters are:
 
-    :param DataExtractsOutputDirectory: root directory for data extracts
-    :type DataExtractsOutputDirectory: `str`
-
-    :param ImageExtractsOutputDirectory: root directory for image extracts
-    :type ImageExtractsOutputDirectory: `str`
+    :param ExtractsOutputDirectory: root directory for extracts
+    :type ExtractsOutputDirectory: `str`
     """
     # currently, Python state files don't have anything about animation,
     # however, we reply one animation to generate the extracts, so we ensure
@@ -565,22 +558,15 @@ def SaveExtracts(**kwargs):
 
     # override options if passed in environment options.
     import os
-    if 'PARAVIEW_OVERRIDE_DATA_OUTPUT_DIRECTORY' in os.environ:
-        data_root = os.environ["PARAVIEW_OVERRIDE_DATA_OUTPUT_DIRECTORY"]
+    if 'PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY' in os.environ:
+        root = os.environ["PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY"]
     else:
-        data_root = proxy.DataExtractsOutputDirectory
-
-    if 'PARAVIEW_OVERRIDE_IMAGE_OUTPUT_DIRECTORY' in os.environ:
-        image_root = os.environ["PARAVIEW_OVERRIDE_IMAGE_OUTPUT_DIRECTORY"]
-    else:
-        image_root = proxy.ImageExtractsOutputDirectory
+        root = proxy.ExtractsOutputDirectory
 
     # if the paths have ${...}, replace that with environment variables.
     from .util import ReplaceDollarVariablesWithEnvironment
-    data_root = ReplaceDollarVariablesWithEnvironment(data_root)
-    image_root = ReplaceDollarVariablesWithEnvironment(image_root)
-    proxy.DataExtractsOutputDirectory = data_root
-    proxy.ImageExtractsOutputDirectory = image_root
+    root = ReplaceDollarVariablesWithEnvironment(root)
+    proxy.ExtractsOutputDirectory = root
     return proxy.SaveExtracts()
 
 #==============================================================================

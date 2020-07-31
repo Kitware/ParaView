@@ -20,8 +20,7 @@ from paraview import simple, catalyst
 simple.LoadState(args.pvsm)
 
 options = catalyst.Options()
-options.DataExtractsOutputDirectory = args.extracts_dir
-options.ImageExtractsOutputDirectory = args.extracts_dir
+options.ExtractsOutputDirectory = args.extracts_dir
 
 # TODO: add a 'simple' version for this, we don't want users to
 # import anything from 'detail' and hence we don't want that in a demo

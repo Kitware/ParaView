@@ -833,26 +833,11 @@
         Catalyst options that affect the script execution when running in situ.
       </Documentation>
 
-      <StringVectorProperty name="DataExtractsOutputDirectory"
+      <StringVectorProperty name="ExtractsOutputDirectory"
         number_of_elements="1"
         default_values="datasets">
         <Documentation>
-          Choose directory under which to save all data extracts. All text
-          of the form **$ENV{VAR}** will be replaced using environment variable
-          named **VAR** when generating extracts.
-        </Documentation>
-        <FileListDomain name="directory" />
-        <Hints>
-          <UseDirectoryName />
-          <AcceptAnyFile />
-        </Hints>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="ImageExtractsOutputDirectory"
-        number_of_elements="1"
-        default_values="images">
-        <Documentation>
-          Choose directory under which to save all image extracts. All text
+          Choose directory under which to save all extracts. All text
           of the form **$ENV{VAR}** will be replaced using environment variable
           named **VAR** when generating extracts.
         </Documentation>
@@ -908,8 +893,7 @@
       </ProxyProperty>
 
       <PropertyGroup label="Directories">
-        <Property name="DataExtractsOutputDirectory" />
-        <Property name="ImageExtractsOutputDirectory" />
+        <Property name="ExtractsOutputDirectory" />
       </PropertyGroup>
 
       <PropertyGroup label="Global Options">
@@ -1646,8 +1630,7 @@
       <SubProxy>
         <Proxy name="SaveExtractsOptions" proxygroup="misc" proxyname="SaveAnimationExtracts"/>
         <ExposedProperties>
-          <Property name="DataExtractsOutputDirectory" />
-          <Property name="ImageExtractsOutputDirectory" />
+          <Property name="ExtractsOutputDirectory" />
         </ExposedProperties>
       </SubProxy>
 
@@ -1658,8 +1641,7 @@
       </PropertyGroup>
 
       <PropertyGroup label="Save Extracts Options">
-        <Property name="DataExtractsOutputDirectory" />
-        <Property name="ImageExtractsOutputDirectory" />
+        <Property name="ExtractsOutputDirectory" />
       </PropertyGroup>
 
       <Hints>
