@@ -28,7 +28,7 @@
  * vtkSMExtractsController generates a summary table for all
  * extracts generated. Each row in this summary table corresponds to an extract
  * generated. Each column provides information about that extract. A column
- * named "filename" has the full path to the filename for the extract generated.
+ * named "FILE" has the full path to the filename for the extract generated.
  * Other columns are used to stored named values that characterize the extract.
  *
  * Currently, this summary table is used to generated a Cinema specification
@@ -202,7 +202,13 @@ public:
    * Returns the name of the column used in the summary table to save extract
    * filenames.
    */
-  static const char* GetSummaryTableFilenameColumnName() { return "filename"; }
+  static const char* GetSummaryTableFilenameColumnName() { return "FILE"; }
+
+  /**
+   * Saves summary table to a file. Path is relative to the
+   * ExtractsOutputDirectory.
+   */
+  bool SaveSummaryTable(const std::string& fname, vtkSMSessionProxyManager* pxm);
 
   //@{
   /**

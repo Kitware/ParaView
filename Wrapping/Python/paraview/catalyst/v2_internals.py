@@ -71,9 +71,9 @@ def request_data_description(dataDescription, module):
     log(log_level(), "called request_data_description (ts=%d, time=%f)",
         dataDescription.GetTimeStep(), dataDescription.GetTime())
 
-    options = module.options
-    cntr = _get_extracts_controller(dataDescription, options)
+    cntr = _get_extracts_controller(dataDescription, module)
 
+    options = module.options
     if not _is_activated(cntr, options, module):
         return
 
@@ -96,7 +96,7 @@ def co_process(dataDescription, module):
     log(log_level(), "called co_process (ts=%d, time=%f)",
         dataDescription.GetTimeStep(), dataDescription.GetTime())
     options = module.options
-    cntr = _get_extracts_controller(dataDescription, options)
+    cntr = _get_extracts_controller(dataDescription, module)
     params = module.catalyst_params
 
     # first, load all analysis scripts, if we haven't already.
@@ -131,6 +131,7 @@ def co_process(dataDescription, module):
     if _is_live_trigger_activated(cntr, options):
         _do_live(dataDescription, module)
 
+
 def finalize(module):
     """
     Called when Catalyst is being finalized. It's unclear which cases this would
@@ -139,6 +140,11 @@ def finalize(module):
     """
     params = module.catalyst_params
 
+    if module.options.GenerateCinemaSpecification:
+        log(log_level(), "saving cinema specification")
+        cntr = params["extracts_controller"]
+        cntr.SaveSummaryTable("data.csv", module.options.GetSessionProxyManager())
+
     # note: the order here is inverse of all other customization callbacks.
     # we first call 'catalyst_finalize' on all analysis pipeline and then the parent
     # module.
@@ -146,12 +152,18 @@ def finalize(module):
     _call_customized_callback(module, "catalyst_finalize", do_submodules_first=True)
 
 
-def _get_extracts_controller(dataDescription, options):
+def _get_extracts_controller(dataDescription, module):
     """Returns a vtkSMExtractsController instance initialized based on the
-    dataDescription and options
+    dataDescription and module
+    """
+    cntr = module.catalyst_params["extracts_controller"]
+    cntr.SetTimeStep(dataDescription.GetTimeStep())
+    cntr.SetTime(dataDescription.GetTime())
+    return cntr
 
-    :param dataDescription: Catalyst data description object
-    :type dataDescription: :class:`vtkCPDataDescription`
+def _create_extracts_controller(options):
+    """Returns a new vtkSMExtractsController instance initialized based on the
+    options
 
     :param options: Catalyst options
     :type options: :class:`paraview.servermanager.Proxy`
@@ -161,8 +173,6 @@ def _get_extracts_controller(dataDescription, options):
     import re, os
 
     cntr = vtkSMExtractsController()
-    cntr.SetTimeStep(dataDescription.GetTimeStep())
-    cntr.SetTime(dataDescription.GetTime())
 
     # override options if passed in environment options.
     if 'PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY' in os.environ:
@@ -175,7 +185,6 @@ def _get_extracts_controller(dataDescription, options):
     extracts_output_dir = ReplaceDollarVariablesWithEnvironment(extracts_output_dir)
     cntr.SetExtractsOutputDirectory(extracts_output_dir)
     return cntr
-
 
 def _is_live_trigger_activated(cntr, options):
     return options.EnableCatalystLive and options.CatalystLiveTrigger.IsActivated(cntr)
@@ -218,6 +227,10 @@ def _validate_and_initialize(module, is_zip):
         print_warning("Module '%s' missing Catalyst 'options', will use a default options object", module.__name__)
         from . import Options
         module.options = Options()
+    # setup extracts controller to use.
+    # we need to use the same controller throughout the entire run to ensure
+    # that we can generate a summary table, if requested correctly.
+    module.catalyst_params["extracts_controller"] = _create_extracts_controller(module.options)
 
 def _load_analysis_scripts(module):
     import importlib, importlib.util, zipimport, os.path

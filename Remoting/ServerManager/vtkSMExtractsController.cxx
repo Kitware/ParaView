@@ -37,6 +37,10 @@
 #include "vtkStringArray.h"
 #include "vtkTable.h"
 
+#if VTK_MODULE_ENABLE_VTK_IOCore
+#include "vtkDelimitedTextWriter.h"
+#endif
+
 // clang-format off
 #include "vtk_doubleconversion.h"
 #include VTK_DOUBLECONVERSION_HEADER(double-conversion.h)
@@ -379,6 +383,8 @@ bool vtkSMExtractsController::CreateExtractsOutputDirectory() const
 //----------------------------------------------------------------------------
 bool vtkSMExtractsController::CreateDirectory(const std::string& dname) const
 {
+  // TODO: FIXME: in client-server mode, we need to create this directory on the
+  // server side.
   if (dname.empty())
   {
     return false;
@@ -447,7 +453,8 @@ bool vtkSMExtractsController::AddSummaryEntry(
     return false;
   }
 
-  auto idx = fname->InsertNextValue(filename.c_str());
+  auto idx = fname->InsertNextValue(
+    vtksys::SystemTools::RelativePath(this->ExtractsOutputDirectory, filename).c_str());
   for (const auto& pair : params)
   {
     if (auto array = vtkStringArray::SafeDownCast(table->GetColumnByName(pair.first.c_str())))
@@ -493,6 +500,33 @@ std::string vtkSMExtractsController::GetName(vtkSMExtractWriterProxy* writer)
   }
 
   return writer->GetGlobalIDAsString();
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMExtractsController::SaveSummaryTable(
+  const std::string& fname, vtkSMSessionProxyManager* pxm)
+{
+#if VTK_MODULE_ENABLE_VTK_IOCore
+  if (!this->SummaryTable || !pxm)
+  {
+    return false;
+  }
+
+  if (!this->CreateExtractsOutputDirectory())
+  {
+    return false;
+  }
+
+  // TODO: in client-server mode, the file must be saved on the server-side.
+  vtkNew<vtkDelimitedTextWriter> writer;
+  writer->SetInputDataObject(this->SummaryTable);
+  writer->SetFileName(
+    vtksys::SystemTools::JoinPath({ this->ExtractsOutputDirectory, "/" + fname }).c_str());
+  return writer->Write() != 0;
+#else
+  vtkErrorMacro("VTK::IOCore module not built. Cannot save summary table.");
+  return false;
+#endif
 }
 
 //----------------------------------------------------------------------------

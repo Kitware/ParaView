@@ -535,6 +535,7 @@ def SaveExtractsUsingCatalystOptions(options):
         proxy.ExtractsOutputDirectory = os.environ["PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY"]
     else:
         proxy.ExtractsOutputDirectory = options.ExtractsOutputDirectory
+    proxy.GenerateCinemaSpecification = options.GenerateCinemaSpecification
     return proxy.SaveExtracts()
 
 def SaveExtracts(**kwargs):

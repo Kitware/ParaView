@@ -848,6 +848,16 @@
         </Hints>
       </StringVectorProperty>
 
+      <IntVectorProperty name="GenerateCinemaSpecification"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Generate Cinema specification to summarize generated extracts in a file named
+          **data.csv** under the **Extracts Output Directory**.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <ProxyProperty name="GlobalTrigger">
         <ProxyListDomain name="proxy_list">
           <Proxy group="extract_triggers" name="Time" />

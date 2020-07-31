@@ -670,7 +670,8 @@
 
     </SaveAnimationProxy>
 
-   <SaveAnimationExtractsProxy name="SaveAnimationExtracts" processes="client">
+    <SaveAnimationExtractsProxy name="SaveAnimationExtracts" processes="client">
+
       <StringVectorProperty name="ExtractsOutputDirectory"
         number_of_elements="1"
         default_values="extracts">
@@ -685,6 +686,16 @@
           <AcceptAnyFile />
         </Hints>
       </StringVectorProperty>
+
+      <IntVectorProperty name="GenerateCinemaSpecification"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Generate Cinema specification to summarize generated extracts in a file named
+          **data.csv** under the **Extracts Output Directory**.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <Hints>
         <UseDocumentationForLabels />
       </Hints>
