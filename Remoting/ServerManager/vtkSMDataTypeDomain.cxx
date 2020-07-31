@@ -294,6 +294,7 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy, int outputport /*=0
         // Check child types
         bool childMatchAny =
           strcmp(this->GetDataTypeChildMatchTypeAsString(i), "any") == 0 ? true : false;
+        bool allChildrenMatched = true;
         auto& dataTypes = this->GetDataTypeChildren(i);
         vtkNew<vtkPVCompositeDataInformationIterator> iter;
         iter->SetDataInformation(info);
@@ -325,12 +326,12 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy, int outputport /*=0
           {
             return 1;
           }
-          else if ((!childMatched) && (!childMatchAny))
+          else if (!childMatched)
           {
-            return 0;
+            allChildrenMatched = false;
           }
         }
-        if (!childMatchAny && info->GetNumberOfBlockLeafs(true))
+        if (!childMatchAny && info->GetNumberOfBlockLeafs(true) && allChildrenMatched)
         {
           return 1;
         }
