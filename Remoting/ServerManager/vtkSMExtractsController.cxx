@@ -34,8 +34,30 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkStringArray.h"
+#include "vtkTable.h"
 
+// clang-format off
+#include "vtk_doubleconversion.h"
+#include VTK_DOUBLECONVERSION_HEADER(double-conversion.h)
+// clang-format on
+
+#include <sstream>
 #include <vtksys/SystemTools.hxx>
+
+namespace
+{
+std::string ConvertToString(const double val)
+{
+  char buf[256];
+  const double_conversion::DoubleToStringConverter& converter =
+    double_conversion::DoubleToStringConverter::EcmaScriptConverter();
+  double_conversion::StringBuilder builder(buf, sizeof(buf));
+  builder.Reset();
+  converter.ToShortest(val, &builder);
+  return builder.Finalize();
+}
+}
 
 vtkStandardNewMacro(vtkSMExtractsController);
 //----------------------------------------------------------------------------
@@ -44,6 +66,7 @@ vtkSMExtractsController::vtkSMExtractsController()
   , Time(0.0)
   , DataExtractsOutputDirectory(nullptr)
   , ImageExtractsOutputDirectory(nullptr)
+  , SummaryTable(nullptr)
 {
 }
 
@@ -52,6 +75,11 @@ vtkSMExtractsController::~vtkSMExtractsController()
 {
   this->SetDataExtractsOutputDirectory(nullptr);
   this->SetImageExtractsOutputDirectory(nullptr);
+  if (this->SummaryTable)
+  {
+    this->SummaryTable->Delete();
+    this->SummaryTable = nullptr;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -382,6 +410,100 @@ bool vtkSMExtractsController::CreateDirectory(const std::string& dname) const
   {
     return vtksys::SystemTools::MakeDirectory(dname);
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMExtractsController::ResetSummaryTable()
+{
+  if (this->SummaryTable)
+  {
+    this->SummaryTable->Delete();
+    this->SummaryTable = nullptr;
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMExtractsController::AddSummaryEntry(
+  vtkSMExtractWriterProxy* writer, const std::string& filename, const SummaryParametersT& inparams)
+{
+  SummaryParametersT params(inparams);
+
+  // add time, if not already present.
+  params.insert({ "time", ::ConvertToString(this->Time) });
+  params.insert({ "timestep", std::to_string(this->TimeStep) });
+
+  // get a helpful name for this writer.
+  auto name = this->GetName(writer);
+  if (!name.empty())
+  {
+    params.insert({ "producer", name });
+  }
+
+  if (this->SummaryTable == nullptr)
+  {
+    this->SummaryTable = vtkTable::New();
+    this->SummaryTable->Initialize();
+
+    vtkNew<vtkStringArray> fname;
+    fname->SetName(vtkSMExtractsController::GetSummaryTableFilenameColumnName());
+    this->SummaryTable->AddColumn(fname);
+  }
+
+  auto table = this->SummaryTable;
+  auto fname = vtkStringArray::SafeDownCast(
+    table->GetColumnByName(vtkSMExtractsController::GetSummaryTableFilenameColumnName()));
+  if (!fname)
+  {
+    vtkErrorMacro("Invalid summary table!");
+    return false;
+  }
+
+  auto idx = fname->InsertNextValue(filename.c_str());
+  for (const auto& pair : params)
+  {
+    if (auto array = vtkStringArray::SafeDownCast(table->GetColumnByName(pair.first.c_str())))
+    {
+      array->InsertValue(idx, pair.second);
+    }
+    else
+    {
+      vtkNew<vtkStringArray> narray;
+      narray->SetName(pair.first.c_str());
+      narray->InsertValue(idx, pair.second);
+      table->AddColumn(narray);
+    }
+  }
+
+  // resize all columns if needed.
+  for (vtkIdType cc = 0, max = table->GetNumberOfColumns(); cc < max; ++cc)
+  {
+    auto column = vtkStringArray::SafeDownCast(table->GetColumn(cc));
+    if (column && idx >= column->GetNumberOfTuples())
+    {
+      column->InsertValue(idx, std::string());
+    }
+  }
+  return true;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMExtractsController::GetName(vtkSMExtractWriterProxy* writer)
+{
+  for (unsigned int cc = 0, max = writer->GetNumberOfConsumers(); cc < max; ++cc)
+  {
+    auto producer = writer->GetConsumerProxy(cc);
+    auto pproperty = writer->GetConsumerProperty(cc);
+    if (pproperty && strcmp(pproperty->GetXMLName(), "Writer") == 0 && producer &&
+      strcmp(producer->GetXMLGroup(), "extract_generators") == 0 &&
+      strcmp(producer->GetXMLName(), "Extractor") == 0)
+    {
+      auto pxm = producer->GetSessionProxyManager();
+      auto name = pxm->GetProxyName("extract_generators", producer);
+      return name;
+    }
+  }
+
+  return writer->GetGlobalIDAsString();
 }
 
 //----------------------------------------------------------------------------

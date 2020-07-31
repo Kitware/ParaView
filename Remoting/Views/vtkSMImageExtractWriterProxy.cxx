@@ -177,6 +177,14 @@ bool vtkSMImageExtractWriterProxy::Write(vtkSMExtractsController* extractor)
         str << "p=" << phi << "t=" << theta;
         auto convertedname = this->GenerateImageExtractsFileName(fname, str.str(), extractor);
         const bool status = writer->WriteImage(convertedname.c_str());
+        if (status)
+        {
+          // add to summary
+          vtkSMExtractsController::SummaryParametersT params;
+          params.insert({ "phi", std::to_string(phi) });
+          params.insert({ "theta", std::to_string(theta) });
+          extractor->AddSummaryEntry(this, convertedname, params);
+        }
         if (old_time != VTK_DOUBLE_MAX && view != nullptr)
         {
           vtkSMPropertyHelper(view, "ViewTime").Set(old_time);
@@ -198,6 +206,12 @@ bool vtkSMImageExtractWriterProxy::Write(vtkSMExtractsController* extractor)
     {
       vtkSMPropertyHelper(view, "ViewTime").Set(old_time);
       view->UpdateVTKObjects();
+    }
+
+    if (status)
+    {
+      // add to summary
+      extractor->AddSummaryEntry(this, convertedname);
     }
     return status;
   }
