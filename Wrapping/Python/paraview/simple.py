@@ -1133,19 +1133,13 @@ def ExtendFileSeries(proxy=None):
 
 # -----------------------------------------------------------------------------
 def ImportCinema(filename, view=None):
-    """Import a cinema database. This can potentially create multiple
-    sources/filters for visualizable objects in the Cinema database.
-    Returns True on success. If view is provided, then the cinema sources
-    are shown in that view as indicated in the database.
+    """::deprecated:: 5.9
+
+    Cinema import capabilities are no longer supported in this version.
     """
-    try:
-        from paraview.modules.vtkPVCinemaReader import vtkSMCinemaDatabaseImporter
-    except ImportError:
-        # cinema not supported in current configuration
-        return False
-    session = servermanager.ActiveConnection.Session
-    importer = vtkSMCinemaDatabaseImporter()
-    return importer.ImportCinema(filename, session, view)
+    import warnings
+    warnings.warn("'ImportCinema' is no longer supported", DeprecationWarning)
+    return False
 
 # -----------------------------------------------------------------------------
 def CreateWriter(filename, proxy=None, **extraArgs):

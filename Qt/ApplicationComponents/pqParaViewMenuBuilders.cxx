@@ -69,7 +69,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 #include "pqIgnoreSourceTimeReaction.h"
 #include "pqImmediateExportReaction.h"
-#include "pqImportCinemaReaction.h"
 #include "pqLinkSelectionReaction.h"
 #include "pqLoadDataReaction.h"
 #include "pqLoadMaterialsReaction.h"
@@ -153,11 +152,10 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
 
   // now setup reactions.
   new pqLoadDataReaction(ui.actionFileOpen);
-  new pqImportCinemaReaction(ui.actionFileImportCinemaDatabase);
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   new pqLoadMaterialsReaction(ui.actionFileLoadMaterials);
 #else
-  delete ui.actionFileLoadMaterials;
+  ui.actionFileLoadMaterials->setEnabled(false);
 #endif
   new pqRecentFilesMenu(*ui.menuRecentFiles, ui.menuRecentFiles);
   new pqReloadFilesReaction(ui.actionReloadFiles);
