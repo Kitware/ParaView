@@ -51,12 +51,6 @@ bool vtkSMDataExtractWriterProxy::Write(vtkSMExtractsController* extractor)
     return false;
   }
 
-  // Let's create the output directory.
-  if (!extractor->CreateExtractsOutputDirectory())
-  {
-    return false;
-  }
-
   auto convertedname = this->GenerateDataExtractsFileName(fname, extractor);
   vtkSMPropertyHelper(writer, "FileName").Set(convertedname.c_str());
   writer->UpdateVTKObjects();

@@ -21,6 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkProcessModule.h"
+#include "vtkSMDirectoryProxy.h"
 #include "vtkSMExtractTriggerProxy.h"
 #include "vtkSMExtractWriterProxy.h"
 #include "vtkSMOutputPort.h"
@@ -34,6 +35,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkSmartPointer.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
 
@@ -70,6 +72,8 @@ vtkSMExtractsController::vtkSMExtractsController()
   , Time(0.0)
   , ExtractsOutputDirectory(nullptr)
   , SummaryTable(nullptr)
+  , LastExtractsOutputDirectory{}
+  , ExtractsOutputDirectoryValid(false)
 {
 }
 
@@ -129,6 +133,11 @@ bool vtkSMExtractsController::Extract(vtkSMProxy* extractor)
   if (!this->IsTriggerActivated(extractor))
   {
     // skipping, nothing to do.
+    return false;
+  }
+
+  if (!this->CreateExtractsOutputDirectory(extractor->GetSessionProxyManager()))
+  {
     return false;
   }
 
@@ -374,36 +383,49 @@ vtkSMProxy* vtkSMExtractsController::CreateExtractGenerator(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMExtractsController::CreateExtractsOutputDirectory() const
+bool vtkSMExtractsController::CreateExtractsOutputDirectory(vtkSMSessionProxyManager* pxm) const
 {
-  return this->ExtractsOutputDirectory ? this->CreateDirectory(this->ExtractsOutputDirectory)
-                                       : false;
+  if (this->ExtractsOutputDirectory == nullptr)
+  {
+    vtkErrorMacro("ExtractsOutputDirectory must be specified.");
+    return false;
+  }
+
+  if (this->LastExtractsOutputDirectory != this->ExtractsOutputDirectory)
+  {
+    this->ExtractsOutputDirectoryValid = this->CreateDirectory(this->ExtractsOutputDirectory, pxm);
+    this->LastExtractsOutputDirectory = this->ExtractsOutputDirectory;
+  }
+
+  return this->ExtractsOutputDirectoryValid;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMExtractsController::CreateDirectory(const std::string& dname) const
+bool vtkSMExtractsController::CreateDirectory(
+  const std::string& dname, vtkSMSessionProxyManager* pxm) const
 {
-  // TODO: FIXME: in client-server mode, we need to create this directory on the
-  // server side.
   if (dname.empty())
   {
     return false;
   }
 
-  auto controller = vtkMultiProcessController::GetGlobalController();
-  if (controller)
+  if (auto proxy = vtkSmartPointer<vtkSMDirectoryProxy>::Take(
+        vtkSMDirectoryProxy::SafeDownCast(pxm->NewProxy("misc", "Directory"))))
   {
-    int status = 0;
-    if (controller->GetLocalProcessId() == 0)
+    if (proxy->MakeDirectory(dname.c_str()))
     {
-      status = vtksys::SystemTools::MakeDirectory(dname) ? 1 : 0;
+      return true;
     }
-    controller->Broadcast(&status, 1, 0);
-    return (status == 1);
+    else
+    {
+      vtkErrorMacro("Failed to create directory: '" << dname.c_str() << "'.");
+      return false;
+    }
   }
   else
   {
-    return vtksys::SystemTools::MakeDirectory(dname);
+    vtkErrorMacro("Failed to create 'Directory' proxy!");
+    return false;
   }
 }
 
@@ -512,7 +534,7 @@ bool vtkSMExtractsController::SaveSummaryTable(
     return false;
   }
 
-  if (!this->CreateExtractsOutputDirectory())
+  if (!this->CreateExtractsOutputDirectory(pxm))
   {
     return false;
   }

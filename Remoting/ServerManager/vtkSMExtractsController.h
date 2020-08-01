@@ -169,19 +169,6 @@ public:
    */
   vtkSMProxy* GetInputForGenerator(vtkSMProxy* generator) const;
 
-  //@{
-  /**
-   * These methods are intended to be use by vtkSMExtractWriterProxy and
-   * subclasses to ensure chosen output directories are created before
-   * attempting to generate extracts.
-   *
-   * Return true on success, or false to failed to create writeable directories.
-   * Extract writers should not attempt to write any extracts when that happens.
-   */
-  bool CreateExtractsOutputDirectory() const;
-  bool CreateDirectory(const std::string& dname) const;
-  //@}
-
   /**
    * Get access to the summary table generated so far. This will be nullptr
    * until the first extract is generated.
@@ -225,6 +212,19 @@ protected:
   vtkSMExtractsController();
   ~vtkSMExtractsController();
 
+  //@{
+  /**
+   * These methods are intended to be use by vtkSMExtractWriterProxy and
+   * subclasses to ensure chosen output directories are created before
+   * attempting to generate extracts.
+   *
+   * Return true on success, or false to failed to create writeable directories.
+   * Extract writers should not attempt to write any extracts when that happens.
+   */
+  bool CreateExtractsOutputDirectory(vtkSMSessionProxyManager* pxm) const;
+  bool CreateDirectory(const std::string& dname, vtkSMSessionProxyManager* pxm) const;
+  //@}
+
   /**
    * Returns a friendly name derived from the extract writer.
    */
@@ -238,6 +238,8 @@ private:
   double Time;
   char* ExtractsOutputDirectory;
   vtkTable* SummaryTable;
+  mutable std::string LastExtractsOutputDirectory;
+  mutable bool ExtractsOutputDirectoryValid;
 };
 
 #endif

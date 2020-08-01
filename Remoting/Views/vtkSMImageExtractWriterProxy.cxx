@@ -99,12 +99,6 @@ bool vtkSMImageExtractWriterProxy::Write(vtkSMExtractsController* extractor)
     return false;
   }
 
-  // Let's create the output directory.
-  if (!extractor->CreateExtractsOutputDirectory())
-  {
-    return false;
-  }
-
   double old_time = VTK_DOUBLE_MAX;
   auto view = vtkSMViewProxy::SafeDownCast(vtkSMPropertyHelper(writer, "View").GetAsProxy());
   if (!view)
