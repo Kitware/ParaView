@@ -518,25 +518,8 @@ def SaveExtractsUsingCatalystOptions(options):
     when a Catalyst analysis script is being run in batch.
     """
     # handle the case where options is CatalystOptions
-
-    # currently, Catalyst state files don't have anything about animation,
-    # however, we reply one animation to generate the extracts, so we ensure
-    # that the animation is updated based on timesteps in data by explicitly
-    # calling UpdateAnimationUsingDataTimeSteps.
-    scene = GetAnimationScene()
-    scene.UpdateAnimationUsingDataTimeSteps()
-
-    pxm = servermanager.ProxyManager()
-    proxy = servermanager._getPyProxy(pxm.NewProxy("misc", "SaveAnimationExtracts"))
-
-    # override options if passed in environment options.
-    import os
-    if 'PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY' in os.environ:
-        proxy.ExtractsOutputDirectory = os.environ["PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY"]
-    else:
-        proxy.ExtractsOutputDirectory = options.ExtractsOutputDirectory
-    proxy.GenerateCinemaSpecification = options.GenerateCinemaSpecification
-    return proxy.SaveExtracts()
+    return SaveExtracts(ExtractsOutputDirectory = options.ExtractsOutputDirectory,
+                        GenerateCinemaSpecification = options.GenerateCinemaSpecification)
 
 def SaveExtracts(**kwargs):
     """
@@ -547,7 +530,7 @@ def SaveExtracts(**kwargs):
     :type ExtractsOutputDirectory: `str`
     """
     # currently, Python state files don't have anything about animation,
-    # however, we reply one animation to generate the extracts, so we ensure
+    # however, we rely on animation to generate the extracts, so we ensure
     # that the animation is updated based on timesteps in data by explicitly
     # calling UpdateAnimationUsingDataTimeSteps.
     scene = GetAnimationScene()
