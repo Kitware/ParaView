@@ -20,6 +20,7 @@ set(python_files
   paraview/demos/export_catalyst_state.py
   paraview/demos/show_grid_as_background.py
   paraview/demos/wavelet_miniapp.py
+  paraview/demos/wavelet_miniapp_plugin.py
   paraview/detail/__init__.py
   paraview/detail/annotation.py
   paraview/detail/calculator.py
