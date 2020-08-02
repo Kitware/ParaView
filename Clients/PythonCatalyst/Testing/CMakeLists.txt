@@ -6,7 +6,7 @@ add_subdirectory(Legacy)
 # New testing stuff is here
 vtk_module_test_data(
 
-  # baselines
+  # baselines for WaveletHistogramExtracts
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_ImmediateExtracts_renderview_0000.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_BatchExtracts_histogram_1.000000.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_CoprocessingExtracts_renderview_0000.png"
@@ -19,6 +19,14 @@ vtk_module_test_data(
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_BatchExtracts_renderview_0008.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_CoprocessingExtracts_histogram_0.000000.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_CoprocessingExtracts_renderview_0018.png"
+
+  # baselines for WaveletPhiThetaExtractsWithCinema
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletPhiThetaExtractsWithCinema_BatchExtracts_image_000000p_0t_0.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletPhiThetaExtractsWithCinema_BatchExtracts_image_000000p_0t_300.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletPhiThetaExtractsWithCinema_CoprocessingExtracts_image_000000p_0t_0.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletPhiThetaExtractsWithCinema_CoprocessingExtracts_image_000000p_0t_300.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletPhiThetaExtractsWithCinema_ImmediateExtracts_image_000000p_0t_0.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletPhiThetaExtractsWithCinema_ImmediateExtracts_image_000000p_0t_300.png"
 
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/MultiplePipelines_Pipeline1_pipeline1_000000.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/MultiplePipelines_Pipeline2_pipeline2_000001.png"
@@ -132,9 +140,19 @@ set_tests_properties(
 #---------------------------------------------------------------------
 if (PARAVIEW_USE_QT)
   set(catalyst_tests
-    WaveletHistogramExtracts)
+    WaveletHistogramExtracts.xml
+    WaveletPhiThetaExtractsWithCinema.xml,CINEMA)
 
-  foreach (tname IN LISTS catalyst_tests)
+  set(catalyst_options
+    CINEMA
+    )
+
+  _vtk_test_parse_args("${catalyst_options}" "xml" ${catalyst_tests})
+  _vtk_test_set_options("${catalyst_options}" "" ${options})
+
+  foreach (tname IN LISTS names)
+    _vtk_test_set_options("${catalyst_options}" "local_" ${_${tname}_options})
+
     set(ttemp_dir "${CMAKE_BINARY_DIR}/Testing/Temporary/${tname}")
 
     #----------------------------------------------------------------------
@@ -189,6 +207,11 @@ if (PARAVIEW_USE_QT)
 
     # 2. add test to generate Catalyst Python state. We'll just use pvpython for
     #    this.
+    set(cinema_args)
+    if (local_CINEMA)
+        set(cinema_args "--cinema")
+    endif ()
+
     paraview_add_test(
       PREFIX "Catalyst::Workflow::SaveCatalystState"
       ARGS "$<TARGET_FILE:ParaView::pvpython>"
@@ -196,6 +219,7 @@ if (PARAVIEW_USE_QT)
             -m paraview.demos.export_catalyst_state
             --output "${ttemp_dir}/${tname}.zip"
             --extracts-dir "${ttemp_dir}/CoprocessingExtracts"
+            ${cinema_args}
             --pvsm
       TEST_SCRIPTS ${ttemp_dir}/${tname}.pvsm)
 

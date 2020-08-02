@@ -11,6 +11,9 @@ parser.add_argument("--output", type=str,
 parser.add_argument("--extracts-dir", type=str,
     help="path to directory where to make the Catalyst script save generated extracts",
     required=True)
+parser.add_argument("--cinema",
+    help="generate Cinema specification summary for the extracts generated.",
+    action="store_true")
 parser.add_argument("--pvsm", type=str,
     help="pvsm state file to load", required=True)
 
@@ -21,6 +24,8 @@ simple.LoadState(args.pvsm)
 
 options = catalyst.Options()
 options.ExtractsOutputDirectory = args.extracts_dir
+if args.cinema:
+    options.GenerateCinemaSpecification = 1
 
 # TODO: add a 'simple' version for this, we don't want users to
 # import anything from 'detail' and hence we don't want that in a demo
