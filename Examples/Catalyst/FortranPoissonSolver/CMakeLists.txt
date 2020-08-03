@@ -21,6 +21,7 @@ if (USE_CATALYST)
   target_link_libraries(FortranPoissonSolver
     PRIVATE
       ParaView::PythonCatalyst
+      VTK::CommonDataModel
       VTK::ParallelMPI)
 endif ()
 set_property(TARGET FortranPoissonSolver
