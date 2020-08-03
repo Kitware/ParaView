@@ -21,9 +21,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkProcessModule.h"
-#include "vtkSMDirectoryProxy.h"
 #include "vtkSMExtractTriggerProxy.h"
 #include "vtkSMExtractWriterProxy.h"
+#include "vtkSMFileUtilities.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProperty.h"
@@ -145,7 +145,12 @@ bool vtkSMExtractsController::Extract(vtkSMProxy* extractor)
   if (auto writer = vtkSMExtractWriterProxy::SafeDownCast(
         vtkSMPropertyHelper(extractor, "Writer").GetAsProxy(0)))
   {
-    return writer->Write(this);
+    if (!writer->Write(this))
+    {
+      vtkErrorMacro("Write failed! Extracts may not be generated correctly!");
+      return false;
+    }
+    return true;
   }
 
   return false;
@@ -409,22 +414,15 @@ bool vtkSMExtractsController::CreateDirectory(
     return false;
   }
 
-  if (auto proxy = vtkSmartPointer<vtkSMDirectoryProxy>::Take(
-        vtkSMDirectoryProxy::SafeDownCast(pxm->NewProxy("misc", "Directory"))))
+  vtkNew<vtkSMFileUtilities> utils;
+  utils->SetSession(pxm->GetSession());
+  if (utils->MakeDirectory(dname, vtkPVSession::DATA_SERVER))
   {
-    if (proxy->MakeDirectory(dname.c_str()))
-    {
-      return true;
-    }
-    else
-    {
-      vtkErrorMacro("Failed to create directory: '" << dname.c_str() << "'.");
-      return false;
-    }
+    return true;
   }
   else
   {
-    vtkErrorMacro("Failed to create 'Directory' proxy!");
+    vtkErrorMacro("Failed to create directory: " << dname.c_str());
     return false;
   }
 }

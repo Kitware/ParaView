@@ -16,6 +16,10 @@
  * @class   vtkSMDirectoryProxy
  *
  * Is a utility proxy to create/delete/rename directories.
+ *
+ * @sa vtkSMFileUtilities. Using `vtkSMFileUtilities` is recommended over
+ * directly using this class since vtkSMFileUtilities handles MPI and parallel
+ * file systems better.
 */
 
 #ifndef vtkSMDirectoryProxy_h

@@ -102,6 +102,7 @@ set(classes
   vtkSMExtractWriterProxy
   vtkSMFieldDataDomain
   vtkSMFileListDomain
+  vtkSMFileUtilities
   vtkSMFixedTypeDomain
   vtkSMIdTypeVectorProperty
   vtkSMIndexSelectionDomain
