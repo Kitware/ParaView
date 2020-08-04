@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 @_paraview_property_widget_CLASS_NAME@PWIImplementation::@_paraview_property_widget_CLASS_NAME@PWIImplementation(QObject* parentObject)
   : QObject(parentObject)
 {
+  setObjectName("@_paraview_property_widget_CLASS_NAME@");
 }
 
 //-----------------------------------------------------------------------------

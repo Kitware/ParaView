@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   : QObject(o)
 {
   this->@_paraview_tree_layout_strategy_STRATEGY_TYPE@ = vtkSmartPointer<vtk@_paraview_tree_layout_strategy_STRATEGY_TYPE@>::New();
+  setObjectName("@_paraview_tree_layout_strategy_STRATEGY_TYPE@");
 }
 
 QStringList @_paraview_tree_layout_strategy_STRATEGY_TYPE@Implementation::treeLayoutStrategies() const

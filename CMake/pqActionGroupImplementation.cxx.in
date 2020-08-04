@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   : QObject(p)
 {
   this->ActionGroup = new @_paraview_action_group_CLASS_NAME@(this);
+  setObjectName("@_paraview_action_group_CLASS_NAME@");
 }
 
 @_paraview_action_group_CLASS_NAME@Implementation::~@_paraview_action_group_CLASS_NAME@Implementation() = default;

@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   : QObject(_parent)
 {
   this->UserImplementation = new @_paraview_auto_start_CLASS_NAME@();
+  setObjectName("@_paraview_auto_start_CLASS_NAME@");
 }
 
 //-----------------------------------------------------------------------------

@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 @_paraview_toolbar_CLASS_NAME@Implementation::@_paraview_toolbar_CLASS_NAME@Implementation(QObject* p)
   : QObject(p)
 {
+  setObjectName("@_paraview_toolbar_CLASS_NAME@");
 }
 
 @_paraview_toolbar_CLASS_NAME@Implementation::~@_paraview_toolbar_CLASS_NAME@Implementation() = default;
