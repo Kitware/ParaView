@@ -21,16 +21,57 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
+namespace
+{
+enum PanAxis
+{
+  AXIS_X = 0,
+  AXIS_Y,
+  AXIS_XY
+};
+}
+
+struct vtkTrackballPan::Internal
+{
+  PanAxis AxisOfMovement = AXIS_XY;
+};
+
 vtkStandardNewMacro(vtkTrackballPan);
 
 //-------------------------------------------------------------------------
 vtkTrackballPan::vtkTrackballPan()
+  : Internals(new vtkTrackballPan::Internal)
 {
 }
 
 //-------------------------------------------------------------------------
 vtkTrackballPan::~vtkTrackballPan()
 {
+}
+
+//-------------------------------------------------------------------------
+void vtkTrackballPan::OnKeyUp(vtkRenderWindowInteractor* interactor)
+{
+  const auto sym = std::string(interactor->GetKeySym());
+
+  if (sym.find_first_of("xyXY") != std::string::npos)
+  {
+    this->Internals->AxisOfMovement = AXIS_XY;
+  }
+}
+
+//-------------------------------------------------------------------------
+void vtkTrackballPan::OnKeyDown(vtkRenderWindowInteractor* interactor)
+{
+  const auto sym = std::string(interactor->GetKeySym());
+  if (sym == "x")
+  {
+    this->Internals->AxisOfMovement = AXIS_X;
+  }
+  else if (sym == "y")
+  {
+    this->Internals->AxisOfMovement = AXIS_Y;
+  }
 }
 
 //-------------------------------------------------------------------------
@@ -41,6 +82,7 @@ void vtkTrackballPan::OnButtonDown(int, int, vtkRenderer*, vtkRenderWindowIntera
 //-------------------------------------------------------------------------
 void vtkTrackballPan::OnButtonUp(int, int, vtkRenderer*, vtkRenderWindowInteractor*)
 {
+  this->Internals->AxisOfMovement = AXIS_XY;
 }
 
 //-------------------------------------------------------------------------
@@ -49,6 +91,18 @@ void vtkTrackballPan::OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindo
   if (ren == NULL)
   {
     return;
+  }
+
+  // Do not update the Y position (only move X)
+  if (this->Internals->AxisOfMovement == AXIS_X)
+  {
+    y = rwi->GetLastEventPosition()[1];
+  }
+
+  // Do not update the X position (only move Y)
+  if (this->Internals->AxisOfMovement == AXIS_Y)
+  {
+    x = rwi->GetLastEventPosition()[0];
   }
 
   vtkCamera* camera = ren->GetActiveCamera();
