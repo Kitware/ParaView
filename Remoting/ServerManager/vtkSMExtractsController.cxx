@@ -446,6 +446,8 @@ bool vtkSMExtractsController::AddSummaryEntry(
   // add time, if not already present.
   params.insert({ "time", ::ConvertToString(this->Time) });
   params.insert({ "timestep", std::to_string(this->TimeStep) });
+  params.insert({ vtkSMExtractsController::GetSummaryTableFilenameColumnName(filename),
+    vtksys::SystemTools::RelativePath(this->ExtractsOutputDirectory, filename) });
 
   // get a helpful name for this writer.
   auto name = this->GetName(writer);
@@ -458,23 +460,10 @@ bool vtkSMExtractsController::AddSummaryEntry(
   {
     this->SummaryTable = vtkTable::New();
     this->SummaryTable->Initialize();
-
-    vtkNew<vtkStringArray> fname;
-    fname->SetName(vtkSMExtractsController::GetSummaryTableFilenameColumnName());
-    this->SummaryTable->AddColumn(fname);
   }
 
   auto table = this->SummaryTable;
-  auto fname = vtkStringArray::SafeDownCast(
-    table->GetColumnByName(vtkSMExtractsController::GetSummaryTableFilenameColumnName()));
-  if (!fname)
-  {
-    vtkErrorMacro("Invalid summary table!");
-    return false;
-  }
-
-  auto idx = fname->InsertNextValue(
-    vtksys::SystemTools::RelativePath(this->ExtractsOutputDirectory, filename).c_str());
+  auto idx = table->GetNumberOfRows();
   for (const auto& pair : params)
   {
     if (auto array = vtkStringArray::SafeDownCast(table->GetColumnByName(pair.first.c_str())))
@@ -547,6 +536,19 @@ bool vtkSMExtractsController::SaveSummaryTable(
   vtkErrorMacro("VTK::IOCore module not built. Cannot save summary table.");
   return false;
 #endif
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMExtractsController::GetSummaryTableFilenameColumnName(const std::string& fname)
+{
+  auto ext = vtksys::SystemTools::GetFilenameLastExtension(fname);
+  if (!ext.empty())
+  {
+    // remote the dot.
+    ext.erase(ext.begin());
+    ext = vtksys::SystemTools::LowerCase(ext);
+  }
+  return ext.empty() ? "FILE" : ("FILE_" + ext);
 }
 
 //----------------------------------------------------------------------------
