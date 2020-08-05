@@ -42,6 +42,7 @@
 
 #include "vtkObject.h"
 #include "vtkRemotingServerManagerModule.h" // for exports
+#include "vtkSmartPointer.h"                // for vtkSmartPointer
 
 #include <map>    // for std::map
 #include <string> // for std::string
@@ -176,7 +177,7 @@ public:
    *
    * See @ref GeneratingExtractsSummary for information about summary table.
    */
-  vtkGetObjectMacro(SummaryTable, vtkTable);
+  vtkTable* GetSummaryTable() const;
 
   /**
    * Reset summary table.
@@ -238,7 +239,7 @@ private:
   int TimeStep;
   double Time;
   char* ExtractsOutputDirectory;
-  vtkTable* SummaryTable;
+  vtkSmartPointer<vtkTable> SummaryTable;
   mutable std::string LastExtractsOutputDirectory;
   mutable bool ExtractsOutputDirectoryValid;
 };

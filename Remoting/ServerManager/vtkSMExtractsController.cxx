@@ -81,11 +81,6 @@ vtkSMExtractsController::vtkSMExtractsController()
 vtkSMExtractsController::~vtkSMExtractsController()
 {
   this->SetExtractsOutputDirectory(nullptr);
-  if (this->SummaryTable)
-  {
-    this->SummaryTable->Delete();
-    this->SummaryTable = nullptr;
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -430,11 +425,7 @@ bool vtkSMExtractsController::CreateDirectory(
 //----------------------------------------------------------------------------
 void vtkSMExtractsController::ResetSummaryTable()
 {
-  if (this->SummaryTable)
-  {
-    this->SummaryTable->Delete();
-    this->SummaryTable = nullptr;
-  }
+  this->SummaryTable = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -458,7 +449,7 @@ bool vtkSMExtractsController::AddSummaryEntry(
 
   if (this->SummaryTable == nullptr)
   {
-    this->SummaryTable = vtkTable::New();
+    this->SummaryTable.TakeReference(vtkTable::New());
     this->SummaryTable->Initialize();
   }
 
@@ -549,6 +540,12 @@ std::string vtkSMExtractsController::GetSummaryTableFilenameColumnName(const std
     ext = vtksys::SystemTools::LowerCase(ext);
   }
   return ext.empty() ? "FILE" : ("FILE_" + ext);
+}
+
+//----------------------------------------------------------------------------
+vtkTable* vtkSMExtractsController::GetSummaryTable() const
+{
+  return this->SummaryTable.GetPointer();
 }
 
 //----------------------------------------------------------------------------
