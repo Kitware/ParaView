@@ -16,6 +16,7 @@
 
 #include "vtkCollection.h"
 #include "vtkCollectionRange.h"
+#include "vtkDataSetAttributes.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -466,7 +467,7 @@ bool vtkSMExtractsController::AddSummaryEntry(
       vtkNew<vtkStringArray> narray;
       narray->SetName(pair.first.c_str());
       narray->InsertValue(idx, pair.second);
-      table->AddColumn(narray);
+      table->GetRowData()->AddArray(narray);
     }
   }
 
