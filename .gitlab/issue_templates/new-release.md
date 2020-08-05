@@ -60,10 +60,10 @@ git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ HEAD
     - [ ] Merge new `release` branch into `master` using `-s ours`
       - `git checkout master`
       - `git merge --no-ff -s ours -m "Merge branch 'release'" update-to-v@VERSION@@RC@`
-    - [ ] `git push origin master update-to-v@VERSION@@RC@:release v@VERSION@@RC@`
+    - [ ] `git push origin master update-to-v@VERSION@@RC@:release`
     - [ ] Update kwrobot with the new `release` branch rules
 
-If making a release from the `release` branch, e.g., `v@MAJOR@.@MINOR@.0-RC2 or above`:
+If instead making a release from the `release` branch, e.g., `v@MAJOR@.@MINOR@.0-RC2 or above`:
 
   - [ ] Update `release` branch for **paraview**
 ```
@@ -83,7 +83,7 @@ git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ HEAD
     - [ ] Create a merge request targeting `master` (do *not* add `Backport: release`)
     - [ ] `Do: merge`
   - Integrate changes to `release` branch
-    - [ ] `git push origin update-to-v@VERSION@@RC@:release v@VERSION@@RC@`
+    - [ ] `git push origin update-to-v@VERSION@@RC@:release`
 
 If making a non-RC release, additionally:
 
@@ -122,13 +122,13 @@ set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
   - Update versions
     - [ ] Guide selections in `versions.cmake`
     - [ ] `paraview_SOURCE_SELECTION` version in `README.md`
-    - [ ] Docker: update default tag strings (in `Scripts/docker/ubuntu/Dockerfile`)
+    - [ ] Docker: update default tag strings (in `Scripts/docker/ubuntu/development/Dockerfile`)
       - [ ] ARG PARAVIEW_TAG=v@VERSION@@RC@
       - [ ] ARG SUPERBUILD_TAG=v@VERSION@@RC@
       - [ ] ARG PARAVIEW_VERSION_STRING=paraview-@MAJOR@.@MINOR@
     - [ ] Commit changes and push to GitLab
 ```
-git add versions.cmake CMakeLists.txt Scripts/docker/ubuntu/Dockerfile
+git add versions.cmake CMakeLists.txt Scripts/docker/ubuntu/development/Dockerfile
 git commit -m "Update the default version to @VERSION@@RC@"
 git gitlab-push
 ```
@@ -150,7 +150,7 @@ git gitlab-push -f
   - Update common-superbuild's `paraview/release` branch
     - [ ] Change directory to superbuild source
     - [ ] `git push origin <paraview-superbuild-submodule-hash>:paraview/release`
-    - [ ] Update kwrobot with the new `paraview/release` branch rules
+    - [ ] Update `kwrobot` with the new `paraview/release` branch rules
   - Integrate changes to `release` branch
     - [ ] Change directory to ParaView Superbuild source. Stay on the `update-to-v@VERSION@@RC@` branch.
     - [ ] `git config -f .gitmodules submodule.superbuild.branch paraview/release`
@@ -158,10 +158,10 @@ git gitlab-push -f
     - [ ] Merge new `release` branch into `master` using `-s ours`
       - `git checkout master`
       - `git merge --no-ff -s ours -m "Merge branch 'release'" update-to-v@VERSION@@RC@`
-    - [ ] `git push origin update-to-v@VERSION@@RC@:release v@VERSION@@RC@`
+    - [ ] `git push origin update-to-v@VERSION@@RC@:release`
     - [ ] Update kwrobot with the new `release` branch rules
 
-If making a release from the `release` branch, e.g., `v@MAJOR@.@MINOR@.0-RC2 or above`:
+If instead making a release from the `release` branch, e.g., `v@MAJOR@.@MINOR@.0-RC2 or above`:
 
   - [ ] Update `release` branch for **paraview/paraview-superbuild**
 ```
@@ -181,12 +181,12 @@ set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
 ```
   - Update versions
     - [ ] Guide selections in `versions.cmake`
-    - [ ] Docker: update default tag strings (in `Scripts/docker/ubuntu/Dockerfile`)
+    - [ ] Docker: update default tag strings (in `Scripts/docker/ubuntu/development/Dockerfile`)
       - [ ] ARG PARAVIEW_TAG=v@VERSION@@RC@
       - [ ] ARG SUPERBUILD_TAG=v@VERSION@@RC@
     - [ ] Commit changes and push to GitLab
 ```
-git add versions.cmake CMakeLists.txt Scripts/docker/ubuntu/Dockerfile
+git add versions.cmake CMakeLists.txt Scripts/docker/ubuntu/development/Dockerfile
 git commit -m "Update the default version to @VERSION@@RC@"
 git gitlab-push
 ```
@@ -206,7 +206,7 @@ git gitlab-push -f
     - [ ] `Do: merge`
     - [ ] `git tag -a -m 'ParaView superbuild @VERSION@@RC@' v@VERSION@@RC@ HEAD`
   - Integrate changes to `release` branch
-    - [ ] `git push origin update-to-v@VERSION@@RC@:release v@VERSION@@RC@`
+    - [ ] `git push origin update-to-v@VERSION@@RC@:release`
 -->
 
 # Sign macOS binaries
@@ -217,19 +217,27 @@ git gitlab-push -f
 
 # Validating binaries
 
-  - For each binary, check
-    - [ ] Getting started guide opens
-    - [ ] Examples load and match thumbnails in dialog
-    - [ ] Python
-    - [ ] `import numpy`
-    - [ ] Plugins are present and load properly
-    - [ ] Text source LaTeX `$A^2$`
-    - [ ] OSPRay raycasting and pathtracing runs
-    - [ ] OptiX pathtracing runs
-    - [ ] IndeX runs
-    - [ ] AutoMPI
+For each binary, open the Python shell and run the following:
 
-  - Binary checklist
+```python
+import numpy
+s = Show(Sphere())
+ColorBy(s, ('POINTS', 'Normals', 'X'))
+Show(Text(Text="$A^2$"))
+```
+
+  Check that
+  - Getting started guide opens
+  - Examples load and match thumbnails in dialog
+  - Python. Open the Python shell and run
+  - Plugins are present and load properly
+  - OSPRay raycasting and pathtracing runs
+  - OptiX pathtracing runs
+  - IndeX runs
+  - AutoMPI
+
+
+Binary checklist
     - [ ] macOS
     - [ ] Linux
     - [ ] Linux osmesa
@@ -250,12 +258,20 @@ updateMD5sum.sh v@MAJOR@.@MINOR@
 
   - [ ] Test download links on https://www.paraview.org/download
 
+# Push tags
+
+ - [ ] In the `paraview` repository, run `git push origin v@VERSION@@RC@`.
+ - [ ] In the `paraview-superbuild` repository, run `git push origin v@VERSION@@RC@`.
+
 <!--
 If making a non-RC release:
 
 # Update documentation
 
   - [ ] Upload versioned documentation to `https://github.com/kitware/paraview-docs` (see `https://github.com/Kitware/paraview-docs/blob/master/README.md`)
+  - [ ] Tag the [ParaView docs](https://gitlab.kitware.com/paraview/paraview-docs/-/tags) with v@VERSION@.
+  - [ ] Activate the tag on [readthedocs](https://readthedocs.org/projects/paraview/versions/) and build it [here](https://readthedocs.org/projects/paraview/)
+  - [ ] Go to readthedocs.org and activate
   - [ ] Write and publish blog post with release notes.
   - [ ] Update release notes
     (https://www.paraview.org/Wiki/ParaView_Release_Notes)
@@ -268,7 +284,7 @@ If making a non-RC release:
 <!--
 If making a non-RC release:
 
-  - [ ] Request update of version number in "Download Latest Release" text on www.kitware.org
+  - [ ] Request update of version number in "Download Latest Release" text on www.paraview.org
   - [ ] Request update of link to ParaView Guide PDF at https://www.paraview.org/paraview-guide/
   - [ ] Move unclosed issues to next release milestone in GitLab
 -->
