@@ -51,15 +51,13 @@ bool vtkSMDataExtractWriterProxy::Write(vtkSMExtractsController* extractor)
     return false;
   }
 
-  // Let's create the output directory.
-  if (!extractor->CreateDataExtractsOutputDirectory())
-  {
-    return false;
-  }
   auto convertedname = this->GenerateDataExtractsFileName(fname, extractor);
   vtkSMPropertyHelper(writer, "FileName").Set(convertedname.c_str());
   writer->UpdateVTKObjects();
   writer->UpdatePipeline(extractor->GetTime());
+
+  // On success, add to summary.
+  extractor->AddSummaryEntry(this, convertedname);
   return true;
 }
 

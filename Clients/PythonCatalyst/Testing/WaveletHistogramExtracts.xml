@@ -51,18 +51,18 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,59,8,/0:0/2:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,59,8,/0:0/2:0" />
 
-  <!-- generate extracts now -->
+  <!-- save pvsm state -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveServerState" />
   <pqevent object="pqClientMainWindow/FileSaveServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/WaveletHistogramExtracts.pvsm" />
-  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionGenerateExtracts" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/DataExtractsOutputDirectory/FileChooser/FileButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/DataExtractsOutputDirectory/FileChooser/pqFileDialog" command="removeDir" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
-  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/DataExtractsOutputDirectory/FileChooser/pqFileDialog" command="makeDir" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
 
-  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/DataExtractsOutputDirectory/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
-  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageExtractsOutputDirectory/FileChooser/FileButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageExtractsOutputDirectory/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
+  <!-- generate extracts now -->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionGenerateExtracts" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/FileButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/pqFileDialog" command="removeDir" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/pqFileDialog" command="makeDir" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
+
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
   <pqevent object="pqClientMainWindow/ProxyWidgetDialog/widget/ApplyButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/ProxyWidgetDialog/widget/OKButton" command="activate" arguments="" />
 </pqevents>

@@ -670,12 +670,13 @@
 
     </SaveAnimationProxy>
 
-   <SaveAnimationExtractsProxy name="SaveAnimationExtracts" processes="client">
-      <StringVectorProperty name="DataExtractsOutputDirectory"
+    <SaveAnimationExtractsProxy name="SaveAnimationExtracts" processes="client">
+
+      <StringVectorProperty name="ExtractsOutputDirectory"
         number_of_elements="1"
-        default_values="datasets">
+        default_values="extracts">
         <Documentation>
-          Choose directory under which to save all data extracts. All text
+          Choose directory under which to save all extracts. All text
           of the form **$ENV{VAR}** will be replaced using environment variable
           named **VAR**.
         </Documentation>
@@ -686,22 +687,15 @@
         </Hints>
       </StringVectorProperty>
 
-      <StringVectorProperty name="ImageExtractsOutputDirectory"
+      <IntVectorProperty name="GenerateCinemaSpecification"
         number_of_elements="1"
-        default_values="images">
+        default_values="0">
         <Documentation>
-          Choose directory under which to save all image extracts. All text
-          of the form **$ENV{VAR}** will be replaced using environment variable
-          named **VAR**.
+          Generate Cinema specification to summarize generated extracts in a file named
+          **data.csv** under the **Extracts Output Directory**.
         </Documentation>
-        <FileListDomain name="directory" />
-        <Hints>
-          <UseDirectoryName />
-          <BrowseLocalFileSystem />
-          <AcceptAnyFile />
-        </Hints>
-      </StringVectorProperty>
-
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <Hints>
         <UseDocumentationForLabels />
       </Hints>

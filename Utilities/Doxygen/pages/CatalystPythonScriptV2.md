@@ -60,8 +60,7 @@ and initializing this options instance.
 # catalyst options
 from paraview.catalyst import Options
 options = Options()
-options.ImageExtractsOutputDirectory = "...."
-options.DataExtractsOutputDirectory = "...."
+options.ExtractsOutputDirectory = "...."
 
 # global trigger params (optional)
 options.GlobalTrigger.UseStartTimeStep = ... # default=False

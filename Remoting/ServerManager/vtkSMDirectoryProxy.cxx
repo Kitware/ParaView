@@ -69,7 +69,7 @@ bool vtkSMDirectoryProxy::CallDirectoryMethod(
     vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(this->GetSession());
   vtkSmartPointer<vtkSMProxy> helper;
   helper.TakeReference(pxm->NewProxy("misc", "FilePathEncodingHelper"));
-  helper->UpdateVTKObjects();
+  helper->SetLocation(this->GetLocation());
   vtkSMPropertyHelper(helper->GetProperty("ActiveFileName")).Set(path);
   if (secondaryPath != NULL)
   {

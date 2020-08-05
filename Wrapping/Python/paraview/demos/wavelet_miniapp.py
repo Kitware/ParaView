@@ -32,57 +32,26 @@ parser.add_argument("-d", "--delay", type=float,
     help="delay (in seconds) between timesteps (default: 0.0)", default=0.0)
 parser.add_argument("-c", "--channel", type=str,
     help="Catalyst channel name (default: input)", default="input")
-args = parser.parse_args()
 
 #----------------------------------------------------------------
-# initialize Catalyst
-from paraview.catalyst import bridge
-bridge.initialize()
+# A helper function that creates a VTK dataset per timestep/per rank.
+def create_dataset(timestep, args, piece, npieces):
 
-# add analysis script
-for script in args.script:
-    bridge.add_pipeline(script, args.script_version)
+    # We'll use vtkRTAnalyticSource to generate our dataset
+    # to keep things simple.
+    from vtkmodules.vtkImagingCore import vtkRTAnalyticSource
+    wavelet = vtkRTAnalyticSource()
+    ext = (args.size - 1) // 2
+    wavelet.SetWholeExtent(-ext, ext, -ext, ext, -ext, ext)
+    wholeExtent = wavelet.GetWholeExtent()
 
-#----------------------------------------------------------------
-# Here's our simulation main loop
-
-try:
-    from mpi4py import MPI
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    num_ranks = comm.Get_size()
-except ImportError:
-    print("missing mpi4py, running in serial (non-distributed) mode")
-    rank = 0
-    num_ranks = 1
-
-# We'll use vtkRTAnalyticSource to generate our dataset
-# to keep things simple.
-from vtkmodules.vtkImagingCore import vtkRTAnalyticSource
-wavelet = vtkRTAnalyticSource()
-ext = (args.size - 1) // 2
-wavelet.SetWholeExtent(-ext, ext, -ext, ext, -ext, ext)
-wholeExtent = wavelet.GetWholeExtent()
-
-numsteps = args.timesteps
-for step in range(numsteps):
-    if args.delay > 0:
-        import time
-        time.sleep(args.delay)
-
-    if rank == 0:
-        print("timestep: {0}/{1}".format(step+1, numsteps))
-
-    # assume simulation time starts at 0
-    time = step/float(numsteps)
-
-    # put in some variation in the point data that changes with time
-    wavelet.SetMaximum(255+200*math.sin(step))
+    # put in some variation in the point data that changes with timestep
+    wavelet.SetMaximum(255+200*math.sin(timestep))
 
     # using 'UpdatePiece' lets us generate a subextent based on the
-    # 'rank' and 'num_ranks'; thus works seamlessly in distributed and
+    # 'piece' and 'npieces'; thus works seamlessly in distributed and
     # non-distributed modes
-    wavelet.UpdatePiece(rank, num_ranks, 0)
+    wavelet.UpdatePiece(piece, npieces, 0)
 
     # typically, here you'll have some adaptor code that converts your
     # simulation data into a vtkDataObject subclass. In this example,
@@ -90,10 +59,57 @@ for step in range(numsteps):
     # vtkDataObject.
     dataset = wavelet.GetOutputDataObject(0)
 
-    # "perform" coprocessing.  results are outputted only if
-    # the passed in script says we should at time/step
-    bridge.coprocess(time, step, dataset, name=args.channel, wholeExtent=wholeExtent)
+    return (dataset, wholeExtent)
 
-    del dataset
+#----------------------------------------------------------------
+# Here's our simulation main loop
+def main(args):
+    """The main loop"""
 
-bridge.finalize()
+    # initialize Catalyst
+    from paraview.catalyst import bridge
+    bridge.initialize()
+
+    # add analysis script
+    for script in args.script:
+        bridge.add_pipeline(script, args.script_version)
+
+    # Some MPI related stuff to figure out if we're running with MPI
+    # and if so, on how many ranks.
+    try:
+        from mpi4py import MPI
+        comm = MPI.COMM_WORLD
+        rank = comm.Get_rank()
+        num_ranks = comm.Get_size()
+    except ImportError:
+        print("missing mpi4py, running in serial (non-distributed) mode")
+        rank = 0
+        num_ranks = 1
+
+    numsteps = args.timesteps
+    for step in range(numsteps):
+        if args.delay > 0:
+            import time
+            time.sleep(args.delay)
+
+        if rank == 0:
+            print("timestep: {0}/{1}".format(step+1, numsteps))
+
+        # assume simulation time starts at 0
+        time = step/float(numsteps)
+
+        dataset, wholeExtent = create_dataset(step, args, rank, num_ranks)
+
+        # "perform" coprocessing.  results are outputted only if
+        # the passed in script says we should at time/step
+        bridge.coprocess(time, step, dataset, name=args.channel, wholeExtent=wholeExtent)
+
+        del dataset
+        del wholeExtent
+
+    # finalize Catalyst
+    bridge.finalize()
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+    main(args)

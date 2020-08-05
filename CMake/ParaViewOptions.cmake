@@ -468,9 +468,10 @@ paraview_require_module(
             ParaView::RemotingLive
             ParaView::RemotingAnimation)
 
+# Legacy Catalyst Python modules depends on paraview.tpl.cinema_python
 paraview_require_module(
-  CONDITION PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_RENDERING AND PARAVIEW_USE_PYTHON
-  MODULES   ParaView::RemotingCinema)
+  CONDITION PARAVIEW_USE_PYTHON
+  MODULES   ParaView::CinemaPython)
 
 if (NOT PARAVIEW_ENABLE_NONESSENTIAL)
   # This ensures that we don't ever enable certain problematic

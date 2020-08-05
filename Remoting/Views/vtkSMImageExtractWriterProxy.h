@@ -47,6 +47,12 @@ public:
   vtkSMProxy* GetInput() override;
   //@}
 
+  enum CameraMode
+  {
+    Static = 0,
+    PhiTheta = 1,
+  };
+
 protected:
   vtkSMImageExtractWriterProxy();
   ~vtkSMImageExtractWriterProxy();

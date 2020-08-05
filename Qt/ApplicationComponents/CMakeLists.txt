@@ -108,7 +108,6 @@ set(classes
   pqImageCompressorWidget
   pqImmediateExportReaction
   pqImplicitPlanePropertyWidget
-  pqImportCinemaReaction
   pqInputDataTypeDecorator
   pqInteractivePropertyWidget
   pqLightPropertyWidget

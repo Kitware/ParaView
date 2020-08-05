@@ -22,7 +22,6 @@ PRIVATE_DEPENDS
   VTK::IOCore
 OPTIONAL_DEPENDS
   ParaView::nvpipe
-  ParaView::RemotingCinema
   VTK::PythonInterpreter
   VTK::RenderingRayTracing
 

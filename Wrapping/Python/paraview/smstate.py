@@ -347,8 +347,7 @@ def get_state(options=None, source_set=[], filter=None, raw=False):
         trace.append_separated(["",
             "if __name__ == '__main__':",
             "    # generate extracts",
-            "    SaveExtracts(DataExtractsOutputDirectory='%s'," % options.DataExtractsOutputDirectory,
-            "        ImageExtractsOutputDirectory='%s')" % options.ImageExtractsOutputDirectory])
+            "    SaveExtracts(ExtractsOutputDirectory='%s')" % options.ExtractsOutputDirectory])
     del trace_config
     smtrace.stop_trace()
     #print (trace)

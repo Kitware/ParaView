@@ -77,17 +77,11 @@ public:
    */
   static bool addStateFileToRecentResources(pqServer* server, const QString& file);
 
-  /**
-   * Add cinema database to the recently used resources list.
-   */
-  static bool addCinemaDatabaseToRecentResources(pqServer* server, const QString& file);
-
 private:
   Q_DISABLE_COPY(pqStandardRecentlyUsedResourceLoaderImplementation)
 
   bool loadState(const pqServerResource& resource, pqServer* server);
   bool loadData(const pqServerResource& resource, pqServer* server);
-  bool loadCinemaDatabase(const pqServerResource& resource, pqServer* server);
 };
 
 #endif

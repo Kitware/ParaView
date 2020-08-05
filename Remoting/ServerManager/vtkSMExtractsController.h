@@ -23,6 +23,18 @@
  * It provides API to query, create extract generators of known types. It also
  * provides API to generate extracts using the defined extract generators.
  *
+ * @section GeneratingExtractsSummary Summary of generated extracts
+ *
+ * vtkSMExtractsController generates a summary table for all
+ * extracts generated. Each row in this summary table corresponds to an extract
+ * generated. Each column provides information about that extract. Filename for
+ * the extract is stored in a column named `FILE_[type]` where `[type]` is
+ * replaced by the extension of the file. Other columns are used to stored
+ * named values that characterize the extract.
+ *
+ * Currently, this summary table is used to generated a Cinema specification
+ * which can be used to explore the generated extracts using Cinema tools
+ * (https://cinemascience.github.io/).
  */
 
 #ifndef vtkSMExtractsController_h
@@ -30,13 +42,17 @@
 
 #include "vtkObject.h"
 #include "vtkRemotingServerManagerModule.h" // for exports
+#include "vtkSmartPointer.h"                // for vtkSmartPointer
 
+#include <map>    // for std::map
 #include <string> // for std::string
 #include <vector> // for std::vector
 
 class vtkCollection;
+class vtkSMExtractWriterProxy;
 class vtkSMProxy;
 class vtkSMSessionProxyManager;
+class vtkTable;
 
 class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMExtractsController : public vtkObject
 {
@@ -58,20 +74,11 @@ public:
 
   //@{
   /**
-   * Get/Set the root directory to use for writing data extracts.
+   * Get/Set the root directory to use for writing extracts.
    * This must be set correctly before using `Extract` to generate extracts.
    */
-  vtkSetStringMacro(DataExtractsOutputDirectory);
-  vtkGetStringMacro(DataExtractsOutputDirectory);
-  //@}
-
-  //@{
-  /**
-   * Get/Set the root directory to use for writing image extracts.
-   * This must be set correctly before using `Extract` to generate extracts.
-   */
-  vtkSetStringMacro(ImageExtractsOutputDirectory);
-  vtkGetStringMacro(ImageExtractsOutputDirectory);
+  vtkSetStringMacro(ExtractsOutputDirectory);
+  vtkGetStringMacro(ExtractsOutputDirectory);
   //@}
 
   /**
@@ -164,6 +171,43 @@ public:
    */
   vtkSMProxy* GetInputForGenerator(vtkSMProxy* generator) const;
 
+  /**
+   * Get access to the summary table generated so far. This will be nullptr
+   * until the first extract is generated.
+   *
+   * See @ref GeneratingExtractsSummary for information about summary table.
+   */
+  vtkTable* GetSummaryTable() const;
+
+  /**
+   * Reset summary table.
+   *
+   * Generally not needed since there is not much use for reusing
+   * vtkSMExtractsController, one should just create a new one when needed.
+   */
+  void ResetSummaryTable();
+
+  /**
+   * Saves summary table to a file. Path is relative to the
+   * ExtractsOutputDirectory.
+   */
+  bool SaveSummaryTable(const std::string& fname, vtkSMSessionProxyManager* pxm);
+
+  //@{
+  /**
+   * Called by vtkSMExtractWriterProxy subclasses to add an entry to the summary table.
+   * Note, this must be called for every extract written out by the extract
+   * writer.
+   */
+  using SummaryParametersT = std::map<std::string, std::string>;
+  bool AddSummaryEntry(vtkSMExtractWriterProxy* writer, const std::string& filename,
+    const SummaryParametersT& params = SummaryParametersT{});
+  //@}
+
+protected:
+  vtkSMExtractsController();
+  ~vtkSMExtractsController();
+
   //@{
   /**
    * These methods are intended to be use by vtkSMExtractWriterProxy and
@@ -173,22 +217,31 @@ public:
    * Return true on success, or false to failed to create writeable directories.
    * Extract writers should not attempt to write any extracts when that happens.
    */
-  bool CreateImageExtractsOutputDirectory() const;
-  bool CreateDataExtractsOutputDirectory() const;
-  bool CreateDirectory(const std::string& dname) const;
+  bool CreateExtractsOutputDirectory(vtkSMSessionProxyManager* pxm) const;
+  bool CreateDirectory(const std::string& dname, vtkSMSessionProxyManager* pxm) const;
   //@}
-protected:
-  vtkSMExtractsController();
-  ~vtkSMExtractsController();
+
+  /**
+   * Returns a friendly name derived from the extract writer.
+   */
+  std::string GetName(vtkSMExtractWriterProxy* writer);
 
 private:
   vtkSMExtractsController(const vtkSMExtractsController&) = delete;
   void operator=(const vtkSMExtractsController&) = delete;
 
+  /**
+   * Returns the name of the column used in the summary table to save extract
+   * filenames. This is currently based on the file's extension.
+   */
+  static std::string GetSummaryTableFilenameColumnName(const std::string& fname);
+
   int TimeStep;
   double Time;
-  char* DataExtractsOutputDirectory;
-  char* ImageExtractsOutputDirectory;
+  char* ExtractsOutputDirectory;
+  vtkSmartPointer<vtkTable> SummaryTable;
+  mutable std::string LastExtractsOutputDirectory;
+  mutable bool ExtractsOutputDirectoryValid;
 };
 
 #endif

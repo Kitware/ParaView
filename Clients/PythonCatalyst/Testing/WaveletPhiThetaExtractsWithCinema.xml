@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Contour" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuExtractGenerators" />
+  <pqevent object="pqClientMainWindow/menubar/menuExtractGenerators/Image" command="activate" arguments="PNG" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/ImageResolution/width" command="set_string" arguments="200" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/ImageResolution/height" command="set_string" arguments="200" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/ResetDisplay/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/CameraMode/ComboBox" command="activated" arguments="Phi-Theta" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Writer/ProxySelectionWidget/frame/ChosenProxyWidget/PhiResolution/IntRangeWidget/LineEdit" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- save pvsm state -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveServerState" />
+  <pqevent object="pqClientMainWindow/FileSaveServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/WaveletPhiThetaExtractsWithCinema.pvsm" />
+
+  <!-- generate extracts now -->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionGenerateExtracts" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/FileButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/pqFileDialog" command="removeDir" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/pqFileDialog" command="makeDir" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
+
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/GenerateCinemaSpecification/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/widget/ApplyButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/widget/OKButton" command="activate" arguments="" />
+</pqevents>

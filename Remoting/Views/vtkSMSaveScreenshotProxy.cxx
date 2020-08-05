@@ -17,6 +17,7 @@
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
 #include "vtkImageWriter.h"
+#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
@@ -40,6 +41,35 @@
 #include <set>
 #include <sstream>
 #include <vtksys/SystemTools.hxx>
+
+template <typename T>
+T SymmetricReturnCode(const T& ref)
+{
+  auto pm = vtkProcessModule::GetProcessModule();
+  if (pm->GetSymmetricMPIMode())
+  {
+    auto controller = pm->GetGlobalController();
+    if (pm->GetPartitionId() == 0)
+    {
+      controller->Broadcast(const_cast<T*>(&ref), 1, 0);
+      return ref;
+    }
+    else
+    {
+      T temp{ ref };
+      controller->Broadcast(&temp, 1, 0);
+      return temp;
+    }
+  }
+  return ref;
+}
+
+template <>
+bool SymmetricReturnCode(const bool& ref)
+{
+  int val = ref ? 1 : 0;
+  return SymmetricReturnCode<int>(val) != 0;
+}
 
 //============================================================================
 /**
@@ -482,9 +512,9 @@ bool vtkSMSaveScreenshotProxy::WriteImage(const char* fname)
   auto image_pair = this->CapturePreppedImages();
   this->Cleanup();
 
-  if (image_pair.first == nullptr || vtkProcessModule::GetProcessModule()->GetPartitionId() != 0)
+  if (image_pair.first == nullptr || vtkProcessModule::GetProcessModule()->GetPartitionId() > 0)
   {
-    return false;
+    return SymmetricReturnCode(false);
   }
 
   auto writer = vtkImageWriter::SafeDownCast(format->GetClientSideObject());
@@ -492,7 +522,7 @@ bool vtkSMSaveScreenshotProxy::WriteImage(const char* fname)
   {
     vtkErrorMacro(
       "Format writer not a 'vtkImageWriter'.  Failed to write '" << filename.c_str() << "'.");
-    return false;
+    return SymmetricReturnCode(false);
   }
 
   vtkTimerLog::MarkStartEvent("Write image to disk");
@@ -515,7 +545,7 @@ bool vtkSMSaveScreenshotProxy::WriteImage(const char* fname)
   writer->SetInputData(nullptr);
   vtkTimerLog::MarkEndEvent("Write image to disk");
 
-  return writer->GetErrorCode() == vtkErrorCode::NoError;
+  return SymmetricReturnCode(writer->GetErrorCode() == vtkErrorCode::NoError);
 }
 
 //----------------------------------------------------------------------------

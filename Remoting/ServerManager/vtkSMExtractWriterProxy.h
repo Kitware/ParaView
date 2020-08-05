@@ -73,6 +73,8 @@ protected:
     const std::string& fname, vtkSMExtractsController* extractor);
   static std::string GenerateImageExtractsFileName(
     const std::string& fname, vtkSMExtractsController* extractor);
+  static std::string GenerateImageExtractsFileName(
+    const std::string& fname, const std::string& cameraparams, vtkSMExtractsController* extractor);
   //@}
 
 private:

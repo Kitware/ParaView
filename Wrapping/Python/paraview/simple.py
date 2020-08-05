@@ -518,42 +518,19 @@ def SaveExtractsUsingCatalystOptions(options):
     when a Catalyst analysis script is being run in batch.
     """
     # handle the case where options is CatalystOptions
-
-    # currently, Catalyst state files don't have anything about animation,
-    # however, we reply one animation to generate the extracts, so we ensure
-    # that the animation is updated based on timesteps in data by explicitly
-    # calling UpdateAnimationUsingDataTimeSteps.
-    scene = GetAnimationScene()
-    scene.UpdateAnimationUsingDataTimeSteps()
-
-    pxm = servermanager.ProxyManager()
-    proxy = servermanager._getPyProxy(pxm.NewProxy("misc", "SaveAnimationExtracts"))
-
-    # override options if passed in environment options.
-    import os
-    if 'PARAVIEW_OVERRIDE_DATA_OUTPUT_DIRECTORY' in os.environ:
-        proxy.DataExtractsOutputDirectory = os.environ["PARAVIEW_OVERRIDE_DATA_OUTPUT_DIRECTORY"]
-    else:
-        proxy.DataExtractsOutputDirectory = options.DataExtractsOutputDirectory
-    if 'PARAVIEW_OVERRIDE_IMAGE_OUTPUT_DIRECTORY' in os.environ:
-        proxy.ImageExtractsOutputDirectory = os.environ["PARAVIEW_OVERRIDE_IMAGE_OUTPUT_DIRECTORY"]
-    else:
-        proxy.ImageExtractsOutputDirectory = options.ImageExtractsOutputDirectory
-    return proxy.SaveExtracts()
+    return SaveExtracts(ExtractsOutputDirectory = options.ExtractsOutputDirectory,
+                        GenerateCinemaSpecification = options.GenerateCinemaSpecification)
 
 def SaveExtracts(**kwargs):
     """
     Generate extracts. Parameters are forwarded for 'SaveAnimationExtracts'
     Currently, supported keyword parameters are:
 
-    :param DataExtractsOutputDirectory: root directory for data extracts
-    :type DataExtractsOutputDirectory: `str`
-
-    :param ImageExtractsOutputDirectory: root directory for image extracts
-    :type ImageExtractsOutputDirectory: `str`
+    :param ExtractsOutputDirectory: root directory for extracts
+    :type ExtractsOutputDirectory: `str`
     """
     # currently, Python state files don't have anything about animation,
-    # however, we reply one animation to generate the extracts, so we ensure
+    # however, we rely on animation to generate the extracts, so we ensure
     # that the animation is updated based on timesteps in data by explicitly
     # calling UpdateAnimationUsingDataTimeSteps.
     scene = GetAnimationScene()
@@ -565,22 +542,15 @@ def SaveExtracts(**kwargs):
 
     # override options if passed in environment options.
     import os
-    if 'PARAVIEW_OVERRIDE_DATA_OUTPUT_DIRECTORY' in os.environ:
-        data_root = os.environ["PARAVIEW_OVERRIDE_DATA_OUTPUT_DIRECTORY"]
+    if 'PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY' in os.environ:
+        root = os.environ["PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY"]
     else:
-        data_root = proxy.DataExtractsOutputDirectory
-
-    if 'PARAVIEW_OVERRIDE_IMAGE_OUTPUT_DIRECTORY' in os.environ:
-        image_root = os.environ["PARAVIEW_OVERRIDE_IMAGE_OUTPUT_DIRECTORY"]
-    else:
-        image_root = proxy.ImageExtractsOutputDirectory
+        root = proxy.ExtractsOutputDirectory
 
     # if the paths have ${...}, replace that with environment variables.
     from .util import ReplaceDollarVariablesWithEnvironment
-    data_root = ReplaceDollarVariablesWithEnvironment(data_root)
-    image_root = ReplaceDollarVariablesWithEnvironment(image_root)
-    proxy.DataExtractsOutputDirectory = data_root
-    proxy.ImageExtractsOutputDirectory = image_root
+    root = ReplaceDollarVariablesWithEnvironment(root)
+    proxy.ExtractsOutputDirectory = root
     return proxy.SaveExtracts()
 
 #==============================================================================
@@ -1146,19 +1116,13 @@ def ExtendFileSeries(proxy=None):
 
 # -----------------------------------------------------------------------------
 def ImportCinema(filename, view=None):
-    """Import a cinema database. This can potentially create multiple
-    sources/filters for visualizable objects in the Cinema database.
-    Returns True on success. If view is provided, then the cinema sources
-    are shown in that view as indicated in the database.
+    """::deprecated:: 5.9
+
+    Cinema import capabilities are no longer supported in this version.
     """
-    try:
-        from paraview.modules.vtkPVCinemaReader import vtkSMCinemaDatabaseImporter
-    except ImportError:
-        # cinema not supported in current configuration
-        return False
-    session = servermanager.ActiveConnection.Session
-    importer = vtkSMCinemaDatabaseImporter()
-    return importer.ImportCinema(filename, session, view)
+    import warnings
+    warnings.warn("'ImportCinema' is no longer supported", DeprecationWarning)
+    return False
 
 # -----------------------------------------------------------------------------
 def CreateWriter(filename, proxy=None, **extraArgs):

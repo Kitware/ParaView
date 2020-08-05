@@ -202,21 +202,6 @@
     <string>Load window arrangement from a file</string>
    </property>
   </action>
-  <action name="actionFileImportCinemaDatabase">
-   <property name="icon">
-    <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqCinemaScience.svg</normaloff>:/pqWidgets/Icons/pqCinemaScience.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Import Cinema Image Database...</string>
-   </property>
-   <property name="toolTip">
-    <string>Import a Cinema Image Database file</string>
-   </property>
-   <property name="statusTip">
-    <string>Import a Cinema Image Database file</string>
-   </property>
-  </action>
   <action name="actionFileLoadMaterials">
    <property name="text">
     <string>Load Path Tracer Materials...</string>
@@ -253,7 +238,6 @@
   <addaction name="actionFileSaveExtracts"/>
   <addaction name="actionFileSaveGeometry"/>
   <addaction name="separator"/>
-  <addaction name="actionFileImportCinemaDatabase"/>
   <addaction name="actionFileLoadMaterials"/>
   <addaction name="separator"/>
   <addaction name="actionFileLoadWindowArrangement"/>

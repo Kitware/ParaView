@@ -281,8 +281,6 @@ ExternalData_Expand_Arguments(ParaViewData _
   #"DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridThreshold.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridThreshold-DepthOne.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/HyperTreeGridThreshold-DepthTwo.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ImportCinema.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ImportCinemaSpecA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/IndexedLookupInitialization.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/IndexedLookupInitialization_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LightAddRemove1.png}"
@@ -1187,43 +1185,6 @@ if(PARAVIEW_USE_PYTHON)
 
     list(APPEND TESTS_WITH_INLINE_COMPARES
       FindDataDialog.xml)
-
-    if (TARGET ParaView::RemotingCinema)
-      # Cinema importing capabilities are only available in Python + OpenGL2
-      # add the cinema database files.
-      set(cinema_data
-        "cinema-composite.cdb/image/info.json")
-      foreach(poseidx RANGE 0 17)
-        foreach(visidx RANGE 0 1)
-          list(APPEND cinema_data
-            "cinema-composite.cdb/image/pose=${poseidx}/vis=${visidx}/,REGEX:.*")
-        endforeach()
-      endforeach()
-      list(APPEND cinema_data
-        "cinema-non-composite.cdb/image/info.json")
-      foreach(phi 0 90 180)
-        list(APPEND cinema_data
-          "cinema-non-composite.cdb/image/${phi}/0/,REGEX:.*")
-      endforeach()
-      set(cinema_data_refs)
-      foreach (cinema_data_file IN LISTS cinema_data)
-        list(APPEND cinema_data_refs
-          "DATA{${paraview_test_data_directory_input}/Data/${cinema_data_file}}")
-      endforeach ()
-      ExternalData_Expand_Arguments(ParaViewData _
-        ${cinema_data_refs})
-
-      list(APPEND TESTS_WITH_BASELINES
-        ImportCinema.xml
-        ImportCinemaSpecA.xml)
-
-      # presently, we don't support client-server configurations.
-      set(ImportCinema_DISABLE_CS TRUE)
-      set(ImportCinema_DISABLE_CRS TRUE)
-      set(ImportCinemaSpecA_DISABLE_CS TRUE)
-      set(ImportCinemaSpecA_DISABLE_CRS TRUE)
-    endif ()
-
 
     # PythonAlgorithm plugin tests.
     configure_file(

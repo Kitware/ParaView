@@ -4,8 +4,7 @@ from paraview import catalyst
 options = catalyst.Options()
 
 # ensure not extracts get saved anywhere.
-options.DataExtractsOutputDirectory = ""
-options.ImageExtractsOutputDirectory = ""
+options.ExtractsOutputDirectory = ""
 options.GlobalTrigger = "Time"
 
 scripts = []

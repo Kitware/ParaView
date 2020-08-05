@@ -13,8 +13,7 @@ def _get_catalyst_state(options):
     soptions.PropertiesToTraceOnCreate = smstate.RECORD_MODIFIED_PROPERTIES
     soptions.SkipHiddenDisplayProperties = True
     soptions.SkipRenderingComponents = False
-    soptions.DataExtractsOutputDirectory = options.DataExtractsOutputDirectory
-    soptions.ImageExtractsOutputDirectory = options.ImageExtractsOutputDirectory
+    soptions.ExtractsOutputDirectory = options.ExtractsOutputDirectory
     return smstate.get_state(options=soptions, source_set=extract_generators)
 
 def save_catalyst_state(fname, options):

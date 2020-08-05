@@ -2,7 +2,7 @@
   <ProxyGroup name="extract_writers">
     <!-- =================================================================== -->
     <ImageExtractWriterProxy name="PNG">
-      <StringVectorProperty name="FileName" number_of_elements="1" default_values="image_%.6ts.png">
+      <StringVectorProperty name="FileName" number_of_elements="1" default_values="image_%.6ts%cm.png">
         <Documentation>
           Specify the filename to use.
         </Documentation>
@@ -37,14 +37,58 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="CameraMode"
+                         number_of_elements="1"
+                         default_values="0">
+        <Documentation>
+          Select whether to the camera should be moved in the the scence to generate
+          images from multiple view points. Default is **Static** which means the camera
+          is not moved. Another option is **Phi-Theta** which results in moving the camera
+          around the focal point over a sphere of radius equal to the focal distance.
+          This is only applicable for views that have a camera i.e. does not apply to
+          chart views and other 2D plotting views.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Static" />
+          <Entry value="1" text="Phi-Theta" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PhiResolution"
+                         number_of_elements="1"
+                         default_values="6" >
+        <IntRangeDomain name="range" min="1" max="360" />
+        <Documentation>
+          Number of samples along the phi direction.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraMode" value="1" />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ThetaResolution"
+                         number_of_elements="1"
+                         default_values="6" >
+        <IntRangeDomain name="range" min="1" max="360" />
+       <Documentation>
+         Number of samples along the theta direction.
+       </Documentation>
+       <Hints>
+         <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraMode" value="1" />
+       </Hints>
+      </IntVectorProperty>
+
       <PropertyGroup label="Miscellaneous">
         <Property name="ResetDisplay" />
+        <Property name="CameraMode" />
+        <Property name="PhiResolution" />
+        <Property name="ThetaResolution" />
       </PropertyGroup>
     </ImageExtractWriterProxy>
 
     <!-- =================================================================== -->
     <ImageExtractWriterProxy name="JPG">
-      <StringVectorProperty name="FileName" number_of_elements="1" default_values="image_%.6ts.jpg">
+      <StringVectorProperty name="FileName" number_of_elements="1" default_values="image_%.6ts%cm.jpg">
         <Documentation>
           Specify the filename to use.
         </Documentation>
@@ -79,8 +123,52 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="CameraMode"
+                         number_of_elements="1"
+                         default_values="0">
+        <Documentation>
+          Select whether to the camera should be moved in the the scence to generate
+          images from multiple view points. Default is **Static** which means the camera
+          is not moved. Another option is **Phi-Theta** which results in moving the camera
+          around the focal point over a sphere of radius equal to the focal distance.
+          This is only applicable for views that have a camera i.e. does not apply to
+          chart views and other 2D plotting views.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Static" />
+          <Entry value="1" text="Phi-Theta" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PhiResolution"
+                         number_of_elements="1"
+                         default_values="6" >
+        <IntRangeDomain name="range" min="1" max="360" />
+        <Documentation>
+          Number of samples along the phi direction.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraMode" value="1" />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ThetaResolution"
+                         number_of_elements="1"
+                         default_values="6" >
+        <IntRangeDomain name="range" min="1" max="360" />
+       <Documentation>
+         Number of samples along the theta direction.
+       </Documentation>
+       <Hints>
+         <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraMode" value="1" />
+       </Hints>
+      </IntVectorProperty>
+
       <PropertyGroup label="Miscellaneous">
         <Property name="ResetDisplay" />
+        <Property name="CameraMode" />
+        <Property name="PhiResolution" />
+        <Property name="ThetaResolution" />
       </PropertyGroup>
     </ImageExtractWriterProxy>
 

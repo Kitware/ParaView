@@ -20,11 +20,11 @@ set(python_files
   paraview/demos/export_catalyst_state.py
   paraview/demos/show_grid_as_background.py
   paraview/demos/wavelet_miniapp.py
+  paraview/demos/wavelet_miniapp_plugin.py
   paraview/detail/__init__.py
   paraview/detail/annotation.py
   paraview/detail/calculator.py
   paraview/detail/catalyst_export.py
-  paraview/detail/cinema_extracts_writer.py
   paraview/detail/exportnow.py
   paraview/detail/extract_selection.py
   paraview/detail/loghandler.py

@@ -23,6 +23,7 @@
 #include "vtkProcessModule.h"
 #include "vtkSMExtractTriggerProxy.h"
 #include "vtkSMExtractWriterProxy.h"
+#include "vtkSMFileUtilities.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProperty.h"
@@ -34,24 +35,52 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkSmartPointer.h"
+#include "vtkStringArray.h"
+#include "vtkTable.h"
 
+#if VTK_MODULE_ENABLE_VTK_IOCore
+#include "vtkDelimitedTextWriter.h"
+#endif
+
+// clang-format off
+#include "vtk_doubleconversion.h"
+#include VTK_DOUBLECONVERSION_HEADER(double-conversion.h)
+// clang-format on
+
+#include <sstream>
 #include <vtksys/SystemTools.hxx>
+
+namespace
+{
+std::string ConvertToString(const double val)
+{
+  char buf[256];
+  const double_conversion::DoubleToStringConverter& converter =
+    double_conversion::DoubleToStringConverter::EcmaScriptConverter();
+  double_conversion::StringBuilder builder(buf, sizeof(buf));
+  builder.Reset();
+  converter.ToShortest(val, &builder);
+  return builder.Finalize();
+}
+}
 
 vtkStandardNewMacro(vtkSMExtractsController);
 //----------------------------------------------------------------------------
 vtkSMExtractsController::vtkSMExtractsController()
   : TimeStep(0)
   , Time(0.0)
-  , DataExtractsOutputDirectory(nullptr)
-  , ImageExtractsOutputDirectory(nullptr)
+  , ExtractsOutputDirectory(nullptr)
+  , SummaryTable(nullptr)
+  , LastExtractsOutputDirectory{}
+  , ExtractsOutputDirectoryValid(false)
 {
 }
 
 //----------------------------------------------------------------------------
 vtkSMExtractsController::~vtkSMExtractsController()
 {
-  this->SetDataExtractsOutputDirectory(nullptr);
-  this->SetImageExtractsOutputDirectory(nullptr);
+  this->SetExtractsOutputDirectory(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -102,11 +131,21 @@ bool vtkSMExtractsController::Extract(vtkSMProxy* extractor)
     return false;
   }
 
+  if (!this->CreateExtractsOutputDirectory(extractor->GetSessionProxyManager()))
+  {
+    return false;
+  }
+
   // Update filenames etc.
   if (auto writer = vtkSMExtractWriterProxy::SafeDownCast(
         vtkSMPropertyHelper(extractor, "Writer").GetAsProxy(0)))
   {
-    return writer->Write(this);
+    if (!writer->Write(this))
+    {
+      vtkErrorMacro("Write failed! Extracts may not be generated correctly!");
+      return false;
+    }
+    return true;
   }
 
   return false;
@@ -344,44 +383,169 @@ vtkSMProxy* vtkSMExtractsController::CreateExtractGenerator(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMExtractsController::CreateImageExtractsOutputDirectory() const
+bool vtkSMExtractsController::CreateExtractsOutputDirectory(vtkSMSessionProxyManager* pxm) const
 {
-  return this->ImageExtractsOutputDirectory
-    ? this->CreateDirectory(this->ImageExtractsOutputDirectory)
-    : false;
+  if (this->ExtractsOutputDirectory == nullptr)
+  {
+    vtkErrorMacro("ExtractsOutputDirectory must be specified.");
+    return false;
+  }
+
+  if (this->LastExtractsOutputDirectory != this->ExtractsOutputDirectory)
+  {
+    this->ExtractsOutputDirectoryValid = this->CreateDirectory(this->ExtractsOutputDirectory, pxm);
+    this->LastExtractsOutputDirectory = this->ExtractsOutputDirectory;
+  }
+
+  return this->ExtractsOutputDirectoryValid;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMExtractsController::CreateDataExtractsOutputDirectory() const
-{
-  return this->DataExtractsOutputDirectory
-    ? this->CreateDirectory(this->DataExtractsOutputDirectory)
-    : false;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMExtractsController::CreateDirectory(const std::string& dname) const
+bool vtkSMExtractsController::CreateDirectory(
+  const std::string& dname, vtkSMSessionProxyManager* pxm) const
 {
   if (dname.empty())
   {
     return false;
   }
 
-  auto controller = vtkMultiProcessController::GetGlobalController();
-  if (controller)
+  vtkNew<vtkSMFileUtilities> utils;
+  utils->SetSession(pxm->GetSession());
+  if (utils->MakeDirectory(dname, vtkPVSession::DATA_SERVER))
   {
-    int status = 0;
-    if (controller->GetLocalProcessId() == 0)
-    {
-      status = vtksys::SystemTools::MakeDirectory(dname) ? 1 : 0;
-    }
-    controller->Broadcast(&status, 1, 0);
-    return (status == 1);
+    return true;
   }
   else
   {
-    return vtksys::SystemTools::MakeDirectory(dname);
+    vtkErrorMacro("Failed to create directory: " << dname.c_str());
+    return false;
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMExtractsController::ResetSummaryTable()
+{
+  this->SummaryTable = nullptr;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMExtractsController::AddSummaryEntry(
+  vtkSMExtractWriterProxy* writer, const std::string& filename, const SummaryParametersT& inparams)
+{
+  SummaryParametersT params(inparams);
+
+  // add time, if not already present.
+  params.insert({ "time", ::ConvertToString(this->Time) });
+  params.insert({ "timestep", std::to_string(this->TimeStep) });
+  params.insert({ vtkSMExtractsController::GetSummaryTableFilenameColumnName(filename),
+    vtksys::SystemTools::RelativePath(this->ExtractsOutputDirectory, filename) });
+
+  // get a helpful name for this writer.
+  auto name = this->GetName(writer);
+  if (!name.empty())
+  {
+    params.insert({ "producer", name });
+  }
+
+  if (this->SummaryTable == nullptr)
+  {
+    this->SummaryTable.TakeReference(vtkTable::New());
+    this->SummaryTable->Initialize();
+  }
+
+  auto table = this->SummaryTable;
+  auto idx = table->GetNumberOfRows();
+  for (const auto& pair : params)
+  {
+    if (auto array = vtkStringArray::SafeDownCast(table->GetColumnByName(pair.first.c_str())))
+    {
+      array->InsertValue(idx, pair.second);
+    }
+    else
+    {
+      vtkNew<vtkStringArray> narray;
+      narray->SetName(pair.first.c_str());
+      narray->InsertValue(idx, pair.second);
+      table->AddColumn(narray);
+    }
+  }
+
+  // resize all columns if needed.
+  for (vtkIdType cc = 0, max = table->GetNumberOfColumns(); cc < max; ++cc)
+  {
+    auto column = vtkStringArray::SafeDownCast(table->GetColumn(cc));
+    if (column && idx >= column->GetNumberOfTuples())
+    {
+      column->InsertValue(idx, std::string());
+    }
+  }
+  return true;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMExtractsController::GetName(vtkSMExtractWriterProxy* writer)
+{
+  for (unsigned int cc = 0, max = writer->GetNumberOfConsumers(); cc < max; ++cc)
+  {
+    auto producer = writer->GetConsumerProxy(cc);
+    auto pproperty = writer->GetConsumerProperty(cc);
+    if (pproperty && strcmp(pproperty->GetXMLName(), "Writer") == 0 && producer &&
+      strcmp(producer->GetXMLGroup(), "extract_generators") == 0 &&
+      strcmp(producer->GetXMLName(), "Extractor") == 0)
+    {
+      auto pxm = producer->GetSessionProxyManager();
+      auto name = pxm->GetProxyName("extract_generators", producer);
+      return name;
+    }
+  }
+
+  return writer->GetGlobalIDAsString();
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMExtractsController::SaveSummaryTable(
+  const std::string& fname, vtkSMSessionProxyManager* pxm)
+{
+#if VTK_MODULE_ENABLE_VTK_IOCore
+  if (!this->SummaryTable || !pxm)
+  {
+    return false;
+  }
+
+  if (!this->CreateExtractsOutputDirectory(pxm))
+  {
+    return false;
+  }
+
+  // TODO: in client-server mode, the file must be saved on the server-side.
+  vtkNew<vtkDelimitedTextWriter> writer;
+  writer->SetInputDataObject(this->SummaryTable);
+  writer->SetFileName(
+    vtksys::SystemTools::JoinPath({ this->ExtractsOutputDirectory, "/" + fname }).c_str());
+  return writer->Write() != 0;
+#else
+  vtkErrorMacro("VTK::IOCore module not built. Cannot save summary table.");
+  return false;
+#endif
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMExtractsController::GetSummaryTableFilenameColumnName(const std::string& fname)
+{
+  auto ext = vtksys::SystemTools::GetFilenameLastExtension(fname);
+  if (!ext.empty())
+  {
+    // remote the dot.
+    ext.erase(ext.begin());
+    ext = vtksys::SystemTools::LowerCase(ext);
+  }
+  return ext.empty() ? "FILE" : ("FILE_" + ext);
+}
+
+//----------------------------------------------------------------------------
+vtkTable* vtkSMExtractsController::GetSummaryTable() const
+{
+  return this->SummaryTable.GetPointer();
 }
 
 //----------------------------------------------------------------------------
@@ -390,4 +554,6 @@ void vtkSMExtractsController::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "TimeStep: " << this->TimeStep << endl;
   os << indent << "Time: " << this->Time << endl;
+  os << indent << "ExtractsOutputDirectory: "
+     << (this->ExtractsOutputDirectory ? this->ExtractsOutputDirectory : "(nullptr)") << endl;
 }

@@ -39,10 +39,10 @@ public:
   {
     this->SetFileName("/tmp/not-used");
     this->ProxyManager = options->GetSessionProxyManager();
-    this->Controller->SetDataExtractsOutputDirectory(
-      vtkSMPropertyHelper(options, "DataExtractsOutputDirectory").GetAsString());
-    this->Controller->SetImageExtractsOutputDirectory(
-      vtkSMPropertyHelper(options, "ImageExtractsOutputDirectory").GetAsString());
+    this->Controller->SetExtractsOutputDirectory(
+      vtkSMPropertyHelper(options, "ExtractsOutputDirectory").GetAsString());
+    this->GenerateCinemaSpecification =
+      (vtkSMPropertyHelper(options, "GenerateCinemaSpecification").GetAsInt() != 0);
   }
 
 protected:
@@ -63,6 +63,10 @@ protected:
   bool SaveFinalize() override
   {
     this->AnimationScene->SetOverrideStillRender(0);
+    if (this->GenerateCinemaSpecification)
+    {
+      this->Controller->SaveSummaryTable("data.csv", this->ProxyManager);
+    }
     return true;
   }
 
@@ -82,6 +86,7 @@ private:
   vtkNew<vtkSMExtractsController> Controller;
   vtkSMSessionProxyManager* ProxyManager = nullptr;
   int TimeStep = 0;
+  bool GenerateCinemaSpecification = false;
 };
 
 vtkStandardNewMacro(ExtractsWriter);
