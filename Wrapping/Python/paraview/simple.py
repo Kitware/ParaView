@@ -349,6 +349,21 @@ def ResetCamera(view=None):
 
 # -----------------------------------------------------------------------------
 
+def ResetCameraToDirection(position, direction, up=None, view=None):
+    """Resets the settings of the camera to the given position and direction"""
+    if not view:
+        view = active_objects.view
+    if hasattr(view, "CameraFocalPoint"):
+        view.CameraFocalPoint = position
+    if hasattr(view, "CameraPosition"):
+        for i in range(3):
+            view.CameraPosition[i] = position[i] - direction[i]
+    if hasattr(view, "CameraViewUp") and up:
+        view.CameraViewUp = up
+    ResetCamera(view)
+
+# -----------------------------------------------------------------------------
+
 def CreateLayout(name=None):
     """Create a new layout with no active view."""
     layout = servermanager.misc.ViewLayout(registrationGroup="layouts")
