@@ -1,6 +1,6 @@
 <!--
-Use this template when making a second or higher release candidate or final version.
-If creating a first release candidate , use the `new-release-first-rc.md` template instead.
+Use this template when making a new first release candidate from master.
+If creating a second or final release, use the `new-release.md` template instead.
 
 This template is for tracking a release of ParaView. Please replace the
 following strings with the associated values:
@@ -66,17 +66,16 @@ git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ HEAD
     - [ ] `rsync -rptv $tarballs paraview.release:ParaView_Release/v@MAJOR@.@MINOR@/`
 
 # Update ParaView-Superbuild
-  - [ ] Update `master` branch for **paraview/paraview-superbuild**
+
+  - [ ] Update `release` branch for **paraview/paraview-superbuild**
 ```
 git fetch origin
-git checkout master
-git merge --ff-only origin/master
+git checkout release
+git merge --ff-only origin/release
 git submodule update
 git checkout -b update-to-v@VERSION@@RC@
 ```
   - Update `CMakeLists.txt`
-    - [ ] `git checkout -b update-to-v@VERSION@@RC@`
-    - [ ] Update PARAVIEW_VERSION_DEFAULT to the release version (without RC*)
     - [ ] Set ParaView source selections in `CMakeLists.txt` and force explicit
       version in `CMakeLists.txt`:
 ```
@@ -86,11 +85,9 @@ set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
 ```
   - Update versions
     - [ ] Guide selections in `versions.cmake`
-    - [ ] `paraview_SOURCE_SELECTION` version in `README.md`
     - [ ] Docker: update default tag strings (in `Scripts/docker/ubuntu/development/Dockerfile`)
       - [ ] ARG PARAVIEW_TAG=v@VERSION@@RC@
       - [ ] ARG SUPERBUILD_TAG=v@VERSION@@RC@
-      - [ ] ARG PARAVIEW_VERSION_STRING=paraview-@MAJOR@.@MINOR@
     - [ ] Commit changes and push to GitLab
 ```
 git add versions.cmake CMakeLists.txt Scripts/docker/ubuntu/development/Dockerfile
@@ -101,7 +98,7 @@ git gitlab-push
     - [ ] Create a merge request targeting `master`, title beginning with WIP (do *not* add `Backport: release` to description)
     - [ ] Build binaries (`Do: test`)
     - [ ] Download the binaries that have been generated in the dashboard results. They will be deleted within 24 hours.
-    - [ ] Remove explicit version forcing added in CMakeLists.txt and force push
+    - [ ] Remove explicit version forcing added in CMakeLists.txt, amend the commit, and force push
 ```
 git add CMakeLists.txt
 git commit --amend --no-edit
@@ -112,19 +109,8 @@ git gitlab-push -f
     - [ ] Get positive review
     - [ ] `Do: merge`
     - [ ] `git tag -a -m 'ParaView superbuild @VERSION@@RC@' v@VERSION@@RC@ HEAD`
-  - Update common-superbuild's `paraview/release` branch
-    - [ ] Change directory to superbuild source
-    - [ ] `git push origin <paraview-superbuild-submodule-hash>:paraview/release`
-    - [ ] Update `kwrobot` with the new `paraview/release` branch rules
   - Integrate changes to `release` branch
-    - [ ] Change directory to ParaView Superbuild source. Stay on the `update-to-v@VERSION@@RC@` branch.
-    - [ ] `git config -f .gitmodules submodule.superbuild.branch paraview/release`
-    - [ ] `git commit -m "release: follow common-superbuild's paraview/release branch" .gitmodules`
-    - [ ] Merge new `release` branch into `master` using `-s ours`
-      - `git checkout master`
-      - `git merge --no-ff -s ours -m "Merge branch 'release'" update-to-v@VERSION@@RC@`
     - [ ] `git push origin update-to-v@VERSION@@RC@:release`
-    - [ ] Update kwrobot with the new `release` branch rules
 
 # Sign macOS binaries
 
@@ -180,31 +166,10 @@ updateMD5sum.sh v@MAJOR@.@MINOR@
  - [ ] In the `paraview` repository, run `git push origin v@VERSION@@RC@`.
  - [ ] In the `paraview-superbuild` repository, run `git push origin v@VERSION@@RC@`.
 
-<!--
-If making a non-RC release:
-
-# Update documentation
-
-  - [ ] Upload versioned documentation to `https://github.com/kitware/paraview-docs` (see `https://github.com/Kitware/paraview-docs/blob/master/README.md`)
-  - [ ] Tag the [ParaView docs](https://gitlab.kitware.com/paraview/paraview-docs/-/tags) with v@VERSION@.
-  - [ ] Activate the tag on [readthedocs](https://readthedocs.org/projects/paraview/versions/) and build it [here](https://readthedocs.org/projects/paraview/)
-  - [ ] Go to readthedocs.org and activate
-  - [ ] Write and publish blog post with release notes.
-  - [ ] Update release notes
-    (https://www.paraview.org/Wiki/ParaView_Release_Notes)
--->
-
 # Post-release
 
   - [ ] Post an announcement in the Announcements category on
         [discourse.paraview.org](https://discourse.paraview.org/).
-<!--
-If making a non-RC release:
-
-  - [ ] Request update of version number in "Download Latest Release" text on www.paraview.org
-  - [ ] Request update of link to ParaView Guide PDF at https://www.paraview.org/paraview-guide/
-  - [ ] Move unclosed issues to next release milestone in GitLab
--->
 
 /cc @ben.boeckel
 /cc @cory.quammen
