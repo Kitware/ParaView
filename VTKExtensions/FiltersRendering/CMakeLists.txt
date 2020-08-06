@@ -41,6 +41,7 @@ set(classes
   vtkMarkSelectedRows
   vtkMPIMoveData
   vtkNetworkImageSource
+  vtkNetworkImageWriter
   vtkOrderedCompositeDistributor
   vtkPVGeometryFilter
   vtkPVRecoverGeometryWireframe
