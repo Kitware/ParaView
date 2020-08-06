@@ -498,7 +498,7 @@ void pqAnimationViewWidget::onSceneCuesChanged()
     this->Internal->TrackMap.remove(iter.key());
     if (iter.key())
     {
-      QObject::disconnect(iter.key(), &pqAnimationCue::keyframesModified, nullptr, nullptr);
+      QObject::disconnect(iter.key(), SIGNAL(keyframesModified()), nullptr, nullptr);
     }
   }
 }
