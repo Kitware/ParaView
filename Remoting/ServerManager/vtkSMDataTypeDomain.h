@@ -25,6 +25,25 @@
  * * <DataType value=""> where value is the classname for the data type
  * for example: vtkDataSet, vtkImageData,...
  * @endverbatim
+ * Optional XML attributes for composite datasets only:
+ * \li \c child_match : Value can be "any" or "all". This is used if specific
+ * types of child datasets are required. "any" indicates that composite datasets
+ * with any child matching the nested data types are in the domain. "all"
+ * indicates that all the child datasets must match the nested data types(can be
+ * mix-match). Example:
+ * \code
+ * <DataType value="vtkCompositeDataSet" child_match="any">
+ *     <DataType value="vtkImageData" />
+ * </DataType>
+ * <DataType value="vtkMultiBlockDataSet" child_match="all">
+ *     <DataType value="vtkImageData" />
+ *     <DataType value="vtkUnstructuredGrid" />
+ * </DataType>
+ * \endcode
+ * The first element accepts vtkCompositeDataSet with at least one child dataset
+ * of vtkImageData. The second element accepts vtkMultiBlockDataSet with all the
+ * child datasets being either vtkImageData or vtkUnstructuredGrid.
+ *
  * @sa
  * vtkSMDomain  vtkSMSourceProxy
 */
@@ -34,6 +53,9 @@
 
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMDomain.h"
+
+#include <string>
+#include <vector>
 
 class vtkSMSourceProxy;
 
@@ -67,7 +89,22 @@ public:
   /**
    * Returns a data type.
    */
-  const char* GetDataType(unsigned int idx);
+  const char* GetDataTypeName(unsigned int idx);
+
+  /**
+   * Returns if the data type is composite.
+   */
+  bool DataTypeHasChildren(unsigned int idx);
+
+  /**
+   * Returns if the child match type of a composite data type
+   */
+  const char* GetDataTypeChildMatchTypeAsString(unsigned int idx);
+
+  /**
+   * Returns the allowed child types of a composite data type
+   */
+  const std::vector<std::string>& GetDataTypeChildren(unsigned int idx);
 
 protected:
   vtkSMDataTypeDomain();

@@ -60,6 +60,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDebug>
 #include <QMap>
+#include <string>
+#include <vector>
 
 static vtkSMInputProperty* getInputProperty(vtkSMProxy* proxy)
 {
@@ -84,10 +86,32 @@ QString getDomainDisplayText(vtkSMDomain* domain, vtkSMInputProperty*)
   if (domain->IsA("vtkSMDataTypeDomain"))
   {
     QStringList types;
+    QStringList typesWithChildren;
     vtkSMDataTypeDomain* dtd = static_cast<vtkSMDataTypeDomain*>(domain);
     for (unsigned int cc = 0; cc < dtd->GetNumberOfDataTypes(); cc++)
     {
-      types << dtd->GetDataType(cc);
+      if (!dtd->DataTypeHasChildren(cc))
+      {
+        types << dtd->GetDataTypeName(cc);
+      }
+      else
+      {
+        QString phrase(dtd->GetDataTypeName(cc));
+        if (strcmp(dtd->GetDataTypeChildMatchTypeAsString(cc), "any"))
+        {
+          phrase.append(" with at least one child dataset of ");
+        }
+        else
+        {
+          phrase.append(" with all child datasets being ");
+        }
+        for (auto& type : dtd->GetDataTypeChildren(cc))
+        {
+          phrase.append(type.c_str()).append(" or ");
+        }
+        phrase.chop(4);
+        typesWithChildren << phrase;
+      }
     }
 
     return QString("Input data must be %1").arg(types.join(" or "));
