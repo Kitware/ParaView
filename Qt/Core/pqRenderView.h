@@ -312,6 +312,11 @@ protected Q_SLOTS:
   */
   virtual void onInteractionModeChange();
 
+  /**
+  * Called when VTK event get trigger to notify that the generic filmic presets has changed
+  */
+  virtual void onGenericFilmicPresetsChange();
+
   // Called when vtkSMRenderViewProxy fires
   // ResetCameraEvent.
   virtual void onResetCameraEvent();

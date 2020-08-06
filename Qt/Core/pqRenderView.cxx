@@ -161,6 +161,10 @@ void pqRenderView::InternalConstructor(vtkSMViewProxy* renModule)
   // Monitor any interaction mode change
   this->getConnector()->Connect(this->getProxy()->GetProperty("InteractionMode"),
     vtkCommand::ModifiedEvent, this, SLOT(onInteractionModeChange()));
+
+  // Reuse tone mapping parameters set by the user if no presets are selected
+  this->getConnector()->Connect(this->getProxy()->GetProperty("GenericFilmicPresets"),
+    vtkCommand::ModifiedEvent, this, SLOT(onGenericFilmicPresetsChange()));
 }
 
 //-----------------------------------------------------------------------------
@@ -987,6 +991,23 @@ void pqRenderView::onInteractionModeChange()
   {
     this->Internal->CurrentInteractionMode = mode;
     Q_EMIT updateInteractionMode(this->Internal->CurrentInteractionMode);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::onGenericFilmicPresetsChange()
+{
+  int presets = -1;
+  vtkSMPropertyHelper(this->getProxy(), "GenericFilmicPresets").Get(&presets);
+  if (presets == vtkPVRenderView::Custom)
+  {
+    // No presets, fall back to user specified parameters
+    this->getProxy()->UpdateProperty("Contrast", 1);
+    this->getProxy()->UpdateProperty("Shoulder", 1);
+    this->getProxy()->UpdateProperty("MidIn", 1);
+    this->getProxy()->UpdateProperty("MidOut", 1);
+    this->getProxy()->UpdateProperty("HdrMax", 1);
+    this->getProxy()->UpdateProperty("UseACES", 1);
   }
 }
 
