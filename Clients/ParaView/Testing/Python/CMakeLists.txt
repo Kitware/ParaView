@@ -74,6 +74,7 @@ paraview_add_test_python(
   TestHoudiniWriter.py
   TestLineChartLabelPrefix.py
   TestPythonViewScript.py
+  TestResetCameraToDirection.py
 )
 
 paraview_add_test_python(
