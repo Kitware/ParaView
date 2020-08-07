@@ -181,7 +181,7 @@ void vtkSMFieldDataDomain::Update(vtkSMProperty* vtkNotUsed(prop))
     {
       continue;
     }
-    if (idx == vtkDataObject::FIELD && !this->EnableFieldDataSelection)
+    if (idx == vtkDataObject::FIELD)
     {
       continue;
     }
@@ -191,6 +191,15 @@ void vtkSMFieldDataDomain::Update(vtkSMProperty* vtkNotUsed(prop))
     }
     this->AddEntry(label, idx);
   }
+
+  // FIELD is always considered last
+  if (this->EnableFieldDataSelection &&
+    (!dataInfo || dataInfo->IsAttributeValid(vtkDataObject::FIELD)))
+  {
+    auto label = vtkSMFieldDataDomain::GetAttributeTypeAsString(vtkDataObject::FIELD);
+    this->AddEntry(label, vtkDataObject::FIELD);
+  }
+
   this->DomainModified();
 }
 
