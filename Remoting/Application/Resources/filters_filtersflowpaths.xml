@@ -1145,10 +1145,16 @@
     <!-- ==================================================================== -->
     <SourceProxy name="VortexCores"
       class="vtkVortexCore"
-      label="Vortex Core">
+      label="Vortex Cores">
       <Documentation long_help="Compute vortex cores"
-        short_help="Compute vortex cores">
-        Compute vortex cores.
+        short_help="Compute vortex cores of a vector field">
+        Compute vortex core lines using the parallel vectors method. By default, the "Higher-Order"
+        approach of computing the parallel vector lines between the flow field's velocity and jerk
+        is disabled in favor of computing the parallel vector lines between the velocity and
+        acceleration. To further discriminate against spurious vortex cores, at each potential point
+        value the Q-criterion, delta-criterion, lambda_ci, and lambda_2-criterion are checked. The Q-criterion
+        and delta-criterion are used to prefilter cells prior to the execution of the parallel lines
+        algorithm, and all criteria values are stored as point values on the output polylines.
       </Documentation>
 
       <InputProperty command="SetInputConnection"
@@ -1178,8 +1184,7 @@
          </RequiredProperties>
        </ArrayListDomain>
        <Documentation>
-         This property indicates the name of the tensor array on which to operate. The indicated array's
-         eigenvalues and eigenvectors are used for scaling and orienting the glyphs.
+         This property indicates the name of the vector array from which to compute vortex cores.
        </Documentation>
      </StringVectorProperty>
 
@@ -1188,6 +1193,10 @@
         default_values="0"
         number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Documentation>
+          Use the flow field's jerk instead of acceleration as the second vector field during the
+          parallel vector operation. Disabled by default.
+        </Documentation>
       </IntVectorProperty>
 
     </SourceProxy>
