@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkNetworkImageWriter.h
+  Module:    vtkRemoteWriterHelper.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -13,10 +13,10 @@
 
 =========================================================================*/
 /**
- * @class  vtkNetworkImageWriter
+ * @class  vtkRemoteWriterHelper
  * @brief  Helper to write data on client or data-server-root.
  *
- * vtkNetworkImageWriter is designed to be used to write data that is being
+ * vtkRemoteWriterHelper is designed to be used to write data that is being
  * generated on the client-side either directly on the client or on the
  * data-server root node. This is useful for saving data such as screenshots,
  * state files, etc. that are generated on the client-side but sometimes needs
@@ -27,33 +27,27 @@
  * object, pass the input data to the client-instance and then set
  * `OutputDestination` property as needed. The actual writer to use must be set
  * using the "Writer" property. Now, when you call UpdatePipeline,
- * the vtkNetworkImageWriter will transfer data if needed and then invoke the
+ * the vtkRemoteWriterHelper will transfer data if needed and then invoke the
  * writer's Write method on the target process.
 */
 
-#ifndef vtkNetworkImageWriter_h
-#define vtkNetworkImageWriter_h
+#ifndef vtkRemoteWriterHelper_h
+#define vtkRemoteWriterHelper_h
 
 #include "vtkDataObjectAlgorithm.h"
-#include "vtkPVVTKExtensionsFiltersRenderingModule.h" //needed for exports
+#include "vtkPVSession.h"                   // for vtkPVSession::ServerFlags
+#include "vtkRemotingServerManagerModule.h" // for exports
 
 class vtkAlgorithm;
 class vtkClientServerInterpreter;
 class vtkDataObject;
 
-class VTKPVVTKEXTENSIONSFILTERSRENDERING_EXPORT vtkNetworkImageWriter
-  : public vtkDataObjectAlgorithm
+class VTKREMOTINGSERVERMANAGER_EXPORT vtkRemoteWriterHelper : public vtkDataObjectAlgorithm
 {
 public:
-  static vtkNetworkImageWriter* New();
-  vtkTypeMacro(vtkNetworkImageWriter, vtkDataObjectAlgorithm);
+  static vtkRemoteWriterHelper* New();
+  vtkTypeMacro(vtkRemoteWriterHelper, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-
-  enum FileDestination
-  {
-    CLIENT = 0x0,
-    DATA_SERVER_ROOT = 0x1,
-  };
 
   //@{
   /**
@@ -65,11 +59,14 @@ public:
 
   //@{
   /**
-   * Get/Set the destination of the image
+   * Get/Set the process on which the data must be written. Currently supported
+   * values are vtkPVSession::CLIENT and vtkPVSession::DATA_SERVER_ROOT (or
+   * vtkPVSession::DATA_SERVER). vtkPVSession::DATA_SERVER and
+   * vtkPVSession::DATA_SERVER_ROOT are treated identically since the data is
+   * only written on the root node.
    */
-  vtkSetClampMacro(
-    OutputDestination, int, vtkNetworkImageWriter::CLIENT, vtkNetworkImageWriter::DATA_SERVER_ROOT);
-  vtkGetMacro(OutputDestination, int);
+  vtkSetMacro(OutputDestination, vtkTypeUInt32);
+  vtkGetMacro(OutputDestination, vtkTypeUInt32);
   //@}
 
   //@{
@@ -83,8 +80,8 @@ public:
   //@}
 
 protected:
-  vtkNetworkImageWriter();
-  ~vtkNetworkImageWriter() override;
+  vtkRemoteWriterHelper();
+  ~vtkRemoteWriterHelper() override;
 
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
@@ -95,7 +92,7 @@ protected:
    */
   void WriteLocally(vtkDataObject* input);
 
-  int OutputDestination = CLIENT;
+  vtkTypeUInt32 OutputDestination = vtkPVSession::CLIENT;
   vtkAlgorithm* Writer = nullptr;
   vtkClientServerInterpreter* Interpreter = nullptr;
 };

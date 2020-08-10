@@ -41,7 +41,6 @@ set(classes
   vtkMarkSelectedRows
   vtkMPIMoveData
   vtkNetworkImageSource
-  vtkNetworkImageWriter
   vtkOrderedCompositeDistributor
   vtkPVGeometryFilter
   vtkPVRecoverGeometryWireframe
@@ -66,5 +65,4 @@ vtk_module_add_module(ParaView::VTKExtensionsFiltersRendering
 
 paraview_add_server_manager_xmls(
   XMLS  Resources/rendering_sources.xml
-        Resources/filters_filtersrendering.xml
-        Resources/misc_filtersrendering.xml)
+        Resources/filters_filtersrendering.xml)

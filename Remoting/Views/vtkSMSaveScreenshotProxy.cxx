@@ -14,10 +14,10 @@
 =========================================================================*/
 #include "vtkSMSaveScreenshotProxy.h"
 
+#include "vtkAlgorithm.h"
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
 #include "vtkMultiProcessController.h"
-#include "vtkNetworkImageWriter.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
@@ -547,16 +547,13 @@ bool vtkSMSaveScreenshotProxy::WriteImage(const char* fname, vtkTypeUInt32 locat
 
   auto pxm = this->GetSessionProxyManager();
   auto remoteWriter = vtkSmartPointer<vtkSMSourceProxy>::Take(
-    vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("misc", "NetworkImageWriter")));
+    vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("misc", "RemoteWriterHelper")));
   vtkSMPropertyHelper(remoteWriter, "Writer").Set(format);
-  vtkSMPropertyHelper(remoteWriter, "OutputDestination")
-    .Set(location == vtkPVSession::CLIENT ? vtkNetworkImageWriter::CLIENT
-                                          : vtkNetworkImageWriter::DATA_SERVER_ROOT);
+  vtkSMPropertyHelper(remoteWriter, "OutputDestination").Set(static_cast<int>(location));
   remoteWriter->UpdateVTKObjects();
 
   vtkTimerLog::MarkStartEvent("Write image to disk");
-  auto remoteWriterAlgorithm =
-    vtkNetworkImageWriter::SafeDownCast(remoteWriter->GetClientSideObject());
+  auto remoteWriterAlgorithm = vtkAlgorithm::SafeDownCast(remoteWriter->GetClientSideObject());
 
   // write right-eye image first.
   if (image_pair.second)
@@ -579,9 +576,9 @@ bool vtkSMSaveScreenshotProxy::WriteImage(const char* fname, vtkTypeUInt32 locat
   }
 
   // now write left-eye.
-  remoteWriterAlgorithm->SetInputData(image_pair.first);
+  remoteWriterAlgorithm->SetInputDataObject(image_pair.first);
   remoteWriter->UpdatePipeline();
-  remoteWriterAlgorithm->SetInputData(nullptr);
+  remoteWriterAlgorithm->SetInputDataObject(nullptr);
   vtkTimerLog::MarkEndEvent("Write image to disk");
 
   return SymmetricReturnCode(true); // FIXME writer->GetErrorCode() == vtkErrorCode::NoError);

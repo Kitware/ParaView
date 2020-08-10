@@ -22,6 +22,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkProcessModule.h"
+#include "vtkRemoteWriterHelper.h"
 #include "vtkSMExtractTriggerProxy.h"
 #include "vtkSMExtractWriterProxy.h"
 #include "vtkSMFileUtilities.h"
@@ -39,10 +40,6 @@
 #include "vtkSmartPointer.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
-
-#if VTK_MODULE_ENABLE_VTK_IOCore
-#include "vtkDelimitedTextWriter.h"
-#endif
 
 // clang-format off
 #include "vtk_doubleconversion.h"
@@ -514,7 +511,6 @@ std::string vtkSMExtractsController::GetName(vtkSMExtractWriterProxy* writer)
 bool vtkSMExtractsController::SaveSummaryTable(
   const std::string& fname, vtkSMSessionProxyManager* pxm)
 {
-#if VTK_MODULE_ENABLE_VTK_IOCore
   if (!this->SummaryTable || !pxm)
   {
     return false;
@@ -525,16 +521,34 @@ bool vtkSMExtractsController::SaveSummaryTable(
     return false;
   }
 
-  // TODO: in client-server mode, the file must be saved on the server-side.
-  vtkNew<vtkDelimitedTextWriter> writer;
-  writer->SetInputDataObject(this->SummaryTable);
-  writer->SetFileName(
-    vtksys::SystemTools::JoinPath({ this->ExtractsOutputDirectory, "/" + fname }).c_str());
-  return writer->Write() != 0;
-#else
-  vtkErrorMacro("VTK::IOCore module not built. Cannot save summary table.");
-  return false;
-#endif
+  // TODO: eventually, this must be replaced by a Cinema table writer.
+  auto writer =
+    vtkSmartPointer<vtkSMProxy>::Take(pxm->NewProxy("misc_internals", "DelimitedTextWriter"));
+  if (!writer)
+  {
+    vtkErrorMacro("Failed to create 'DelimitedTextWriter'. Cannot write summary table.");
+    return false;
+  }
+
+  auto helper = vtkSmartPointer<vtkSMSourceProxy>::Take(
+    vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("misc", "RemoteWriterHelper")));
+  if (!helper)
+  {
+    vtkErrorMacro("Failed to create 'RemoteWriterHelper' proxy. Cannot write summary table.");
+    return false;
+  }
+
+  writer->SetLocation(helper->GetLocation());
+  vtkSMPropertyHelper(writer, "FileName")
+    .Set(vtksys::SystemTools::JoinPath({ this->ExtractsOutputDirectory, "/" + fname }).c_str());
+  writer->UpdateVTKObjects();
+  vtkSMPropertyHelper(helper, "OutputDestination").Set(vtkPVSession::DATA_SERVER_ROOT);
+  vtkSMPropertyHelper(helper, "Writer").Set(writer);
+  helper->UpdateVTKObjects();
+
+  vtkAlgorithm::SafeDownCast(helper->GetClientSideObject())->SetInputDataObject(this->SummaryTable);
+  helper->UpdatePipeline();
+  return true;
 }
 
 //----------------------------------------------------------------------------

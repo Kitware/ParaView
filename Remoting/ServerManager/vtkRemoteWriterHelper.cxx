@@ -1,4 +1,4 @@
-#include "vtkNetworkImageWriter.h"
+#include "vtkRemoteWriterHelper.h"
 
 #include "vtkAlgorithm.h"
 #include "vtkClientServerInterpreter.h"
@@ -13,13 +13,11 @@
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
 
-#include <cstring>
-
-vtkStandardNewMacro(vtkNetworkImageWriter);
-vtkCxxSetObjectMacro(vtkNetworkImageWriter, Writer, vtkAlgorithm);
-vtkCxxSetObjectMacro(vtkNetworkImageWriter, Interpreter, vtkClientServerInterpreter);
+vtkStandardNewMacro(vtkRemoteWriterHelper);
+vtkCxxSetObjectMacro(vtkRemoteWriterHelper, Writer, vtkAlgorithm);
+vtkCxxSetObjectMacro(vtkRemoteWriterHelper, Interpreter, vtkClientServerInterpreter);
 //----------------------------------------------------------------------------
-vtkNetworkImageWriter::vtkNetworkImageWriter()
+vtkRemoteWriterHelper::vtkRemoteWriterHelper()
 {
   this->SetNumberOfInputPorts(1);
   this->SetNumberOfOutputPorts(1);
@@ -27,14 +25,14 @@ vtkNetworkImageWriter::vtkNetworkImageWriter()
 }
 
 //----------------------------------------------------------------------------
-vtkNetworkImageWriter::~vtkNetworkImageWriter()
+vtkRemoteWriterHelper::~vtkRemoteWriterHelper()
 {
   this->SetWriter(nullptr);
   this->SetInterpreter(nullptr);
 }
 
 //-----------------------------------------------------------------------------
-void vtkNetworkImageWriter::PrintSelf(ostream& os, vtkIndent indent)
+void vtkRemoteWriterHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Writer: " << this->Writer << endl;
@@ -43,21 +41,29 @@ void vtkNetworkImageWriter::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkNetworkImageWriter::FillInputPortInformation(int port, vtkInformation* info)
+int vtkRemoteWriterHelper::FillInputPortInformation(int port, vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
   return this->Superclass::FillInputPortInformation(port, info);
 }
 
 //----------------------------------------------------------------------------
-int vtkNetworkImageWriter::RequestData(
-  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+int vtkRemoteWriterHelper::RequestData(
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector*)
 {
   auto session =
     vtkPVSession::SafeDownCast(vtkProcessModule::GetProcessModule()->GetActiveSession());
   const vtkPVSession::ServerFlags roles = session->GetProcessRoles();
 
-  if (this->OutputDestination == CLIENT)
+  if (this->OutputDestination != vtkPVSession::CLIENT &&
+    this->OutputDestination != vtkPVSession::DATA_SERVER &&
+    this->OutputDestination != vtkPVSession::DATA_SERVER_ROOT)
+  {
+    vtkErrorMacro("Invalid 'OutputDestination' specified: " << this->OutputDestination);
+    return 0;
+  }
+
+  if (this->OutputDestination == vtkPVSession::CLIENT)
   {
     if ((roles & vtkPVSession::CLIENT) != 0)
     {
@@ -72,7 +78,7 @@ int vtkNetworkImageWriter::RequestData(
       return 1;
     }
   }
-  else if (this->OutputDestination == DATA_SERVER_ROOT)
+  else
   {
     if ((roles & vtkPVSession::CLIENT) != 0)
     {
@@ -88,7 +94,6 @@ int vtkNetworkImageWriter::RequestData(
         // not in client-server mode, must be in builtin mode, just write locally.
         this->WriteLocally(input);
       }
-      return 1;
     }
     else
     {
@@ -108,18 +113,13 @@ int vtkNetworkImageWriter::RequestData(
           // rank.
         }
       }
-      return 1;
     }
-  }
-  else
-  {
-    vtkErrorMacro("Unknown output destination: " << this->OutputDestination);
-    return 0;
+    return 1;
   }
 }
 
 //----------------------------------------------------------------------------
-void vtkNetworkImageWriter::WriteLocally(vtkDataObject* input)
+void vtkRemoteWriterHelper::WriteLocally(vtkDataObject* input)
 {
   if (this->Writer)
   {
