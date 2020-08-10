@@ -341,20 +341,18 @@ vtkSMProxy* vtkSMExtractsController::CreateExtractGenerator(
   {
     return nullptr;
   }
+  controller->PreInitializeProxy(writer);
+  writer->SetInput(proxy);
+  // don't call PostInitializeProxy here, let
+  // vtkSMParaViewPipelineController::RegisterProxiesForProxyListDomains handle
+  // that.
+  // controller->PostInitializeProxy(writer);
 
   const std::string pname = registrationName
     ? std::string(registrationName)
     : pxm->GetUniqueProxyName("extract_generators", writer->GetXMLLabel());
   auto generator =
     vtkSmartPointer<vtkSMProxy>::Take(pxm->NewProxy("extract_generators", "Extractor"));
-  // add it to the proxy list domain too so the UI shows it correctly.
-  if (auto prop = generator->GetProperty("Writer"))
-  {
-    if (auto pld = prop->FindDomain<vtkSMProxyListDomain>())
-    {
-      pld->AddProxy(writer);
-    }
-  }
 
   SM_SCOPED_TRACE(CreateExtractGenerator)
     .arg("producer", proxy)
@@ -363,7 +361,6 @@ vtkSMProxy* vtkSMExtractsController::CreateExtractGenerator(
     .arg("registrationName", pname.c_str());
 
   controller->PreInitializeProxy(generator);
-  writer->SetInput(proxy);
   vtkSMPropertyHelper(generator, "Writer").Set(writer);
 
   // this is done so that producer-consumer links are setup properly. Makes it easier
@@ -378,8 +375,18 @@ vtkSMProxy* vtkSMExtractsController::CreateExtractGenerator(
   }
   controller->PostInitializeProxy(generator);
   generator->UpdateVTKObjects();
-  controller->RegisterExtractGeneratorProxy(generator, pname.c_str());
 
+  // add it to the proxy list domain too so the UI shows it correctly.
+  // doing this before calling RegisterExtractGeneratorProxy also ensures that
+  // it gets registered as a helper proxy.
+  if (auto prop = generator->GetProperty("Writer"))
+  {
+    if (auto pld = prop->FindDomain<vtkSMProxyListDomain>())
+    {
+      pld->AddProxy(writer);
+    }
+  }
+  controller->RegisterExtractGeneratorProxy(generator, pname.c_str());
   return generator;
 }
 

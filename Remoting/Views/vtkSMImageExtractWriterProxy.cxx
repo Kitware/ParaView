@@ -16,6 +16,7 @@
 
 #include "vtkCamera.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVSession.h"
 #include "vtkSMContextViewProxy.h"
 #include "vtkSMExtractsController.h"
 #include "vtkSMPropertyHelper.h"
@@ -170,7 +171,8 @@ bool vtkSMImageExtractWriterProxy::Write(vtkSMExtractsController* extractor)
         std::ostringstream str;
         str << "p=" << phi << "t=" << theta;
         auto convertedname = this->GenerateImageExtractsFileName(fname, str.str(), extractor);
-        const bool status = writer->WriteImage(convertedname.c_str());
+        const bool status =
+          writer->WriteImage(convertedname.c_str(), vtkPVSession::DATA_SERVER_ROOT);
         if (status)
         {
           // add to summary
@@ -195,7 +197,7 @@ bool vtkSMImageExtractWriterProxy::Write(vtkSMExtractsController* extractor)
   else
   {
     auto convertedname = this->GenerateImageExtractsFileName(fname, extractor);
-    const bool status = writer->WriteImage(convertedname.c_str());
+    const bool status = writer->WriteImage(convertedname.c_str(), vtkPVSession::DATA_SERVER_ROOT);
     if (old_time != VTK_DOUBLE_MAX && view != nullptr)
     {
       vtkSMPropertyHelper(view, "ViewTime").Set(old_time);

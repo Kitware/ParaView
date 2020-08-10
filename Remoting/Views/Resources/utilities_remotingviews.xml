@@ -2550,10 +2550,17 @@
     </Documentation>
 
     <!-- ================================================================== -->
-    <Proxy name="PNG" class="vtkPNGWriter" processes="client">
+    <Proxy name="PNG" class="vtkPNGWriter" processes="client|dataserver">
       <Documentation>
         Writer for saving screenshots as PNG files.
       </Documentation>
+
+      <StringVectorProperty name="FileName" command="SetFileName"
+        number_of_elements="1"
+        default_values=""
+        panel_visibility="never">
+      </StringVectorProperty>
+
       <IntVectorProperty name="CompressionLevel"
         command="SetCompressionLevel"
         number_of_elements="1"
@@ -2582,10 +2589,17 @@
     </Proxy>
 
     <!-- ================================================================== -->
-    <Proxy name="JPEG" class="vtkJPEGWriter" processes="client">
+    <Proxy name="JPEG" class="vtkJPEGWriter" processes="client|dataserver">
       <Documentation>
         Writer for saving screenshots as JPEG files.
       </Documentation>
+
+      <StringVectorProperty name="FileName" command="SetFileName"
+        number_of_elements="1"
+        default_values=""
+        panel_visibility="never">
+      </StringVectorProperty>
+
       <IntVectorProperty name="Quality"
         command="SetQuality"
         number_of_elements="1"
@@ -2612,10 +2626,17 @@
     </Proxy>
 
     <!-- ================================================================== -->
-    <Proxy name="TIFF" class="vtkTIFFWriter" processes="client">
+    <Proxy name="TIFF" class="vtkTIFFWriter" processes="client|dataserver">
       <Documentation>
         Writer for saving screenshots as TIFF files.
       </Documentation>
+
+      <StringVectorProperty name="FileName" command="SetFileName"
+        number_of_elements="1"
+        default_values=""
+        panel_visibility="never">
+      </StringVectorProperty>
+
       <IntVectorProperty name="Compression"
         command="SetCompression"
         number_of_elements="1"
@@ -2642,10 +2663,17 @@
     </Proxy>
 
     <!-- ================================================================== -->
-    <Proxy name="BMP" class="vtkBMPWriter" processes="client">
+    <Proxy name="BMP" class="vtkBMPWriter" processes="client|dataserver">
       <Documentation>
         Writer for saving screenshots as BMP files.
       </Documentation>
+
+      <StringVectorProperty name="FileName" command="SetFileName"
+        number_of_elements="1"
+        default_values=""
+        panel_visibility="never">
+      </StringVectorProperty>
+
       <Hints>
         <FormatOptions extensions="bmp"
           file_description="Bitmap images" />

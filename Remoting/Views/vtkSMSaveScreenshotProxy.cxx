@@ -16,8 +16,8 @@
 
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
-#include "vtkImageWriter.h"
 #include "vtkMultiProcessController.h"
+#include "vtkNetworkImageWriter.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
@@ -27,7 +27,9 @@
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyListDomain.h"
+#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
@@ -469,9 +471,35 @@ vtkSMSaveScreenshotProxy::~vtkSMSaveScreenshotProxy()
 //----------------------------------------------------------------------------
 bool vtkSMSaveScreenshotProxy::WriteImage(const char* fname)
 {
+  return this->WriteImage(fname, vtkPVSession::CLIENT);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSaveScreenshotProxy::WriteImage(const char* fname, vtkTypeUInt32 location)
+{
   if (fname == nullptr)
   {
     return false;
+  }
+
+  if (location != vtkPVSession::CLIENT && location != vtkPVSession::DATA_SERVER &&
+    location != vtkPVSession::DATA_SERVER_ROOT)
+  {
+    vtkErrorMacro("Location not supported: " << location);
+    return false;
+  }
+
+  auto session = this->GetSession();
+  if (session->GetProcessRoles() != vtkPVSession::CLIENT)
+  {
+    // implies that the current session is not a remote-session (since the
+    // process is acting as more than just CLIENT). Simply set location to
+    // CLIENT since CLIENT and DATA_SERVER_ROOT are the same process.
+    location = vtkPVSession::CLIENT;
+  }
+  else if (location == vtkPVSession::DATA_SERVER)
+  {
+    location = vtkPVSession::DATA_SERVER_ROOT;
   }
 
   const std::string filename(fname);
@@ -517,35 +545,46 @@ bool vtkSMSaveScreenshotProxy::WriteImage(const char* fname)
     return SymmetricReturnCode(false);
   }
 
-  auto writer = vtkImageWriter::SafeDownCast(format->GetClientSideObject());
-  if (writer == nullptr)
-  {
-    vtkErrorMacro(
-      "Format writer not a 'vtkImageWriter'.  Failed to write '" << filename.c_str() << "'.");
-    return SymmetricReturnCode(false);
-  }
+  auto pxm = this->GetSessionProxyManager();
+  auto remoteWriter = vtkSmartPointer<vtkSMSourceProxy>::Take(
+    vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("misc", "NetworkImageWriter")));
+  vtkSMPropertyHelper(remoteWriter, "Writer").Set(format);
+  vtkSMPropertyHelper(remoteWriter, "OutputDestination")
+    .Set(location == vtkPVSession::CLIENT ? vtkNetworkImageWriter::CLIENT
+                                          : vtkNetworkImageWriter::DATA_SERVER_ROOT);
+  remoteWriter->UpdateVTKObjects();
 
   vtkTimerLog::MarkStartEvent("Write image to disk");
-  writer->SetFileName(filename.c_str());
+  auto remoteWriterAlgorithm =
+    vtkNetworkImageWriter::SafeDownCast(remoteWriter->GetClientSideObject());
 
   // write right-eye image first.
   if (image_pair.second)
   {
-    writer->SetFileName(this->GetStereoFileName(filename, /*left=*/false).c_str());
-    writer->SetInputData(image_pair.second);
-    writer->Write();
+    vtkSMPropertyHelper(format, "FileName")
+      .Set(this->GetStereoFileName(filename, /*left=*/false).c_str());
+    format->UpdateVTKObjects();
+    remoteWriterAlgorithm->SetInputDataObject(image_pair.second);
+    remoteWriter->UpdatePipeline();
 
     // change left-eye filename too
-    writer->SetFileName(this->GetStereoFileName(filename, /*left=*/true).c_str());
+    vtkSMPropertyHelper(format, "FileName")
+      .Set(this->GetStereoFileName(filename, /*left=*/true).c_str());
+    format->UpdateVTKObjects();
+  }
+  else
+  {
+    vtkSMPropertyHelper(format, "FileName").Set(filename.c_str());
+    format->UpdateVTKObjects();
   }
 
   // now write left-eye.
-  writer->SetInputData(image_pair.first);
-  writer->Write();
-  writer->SetInputData(nullptr);
+  remoteWriterAlgorithm->SetInputData(image_pair.first);
+  remoteWriter->UpdatePipeline();
+  remoteWriterAlgorithm->SetInputData(nullptr);
   vtkTimerLog::MarkEndEvent("Write image to disk");
 
-  return SymmetricReturnCode(writer->GetErrorCode() == vtkErrorCode::NoError);
+  return SymmetricReturnCode(true); // FIXME writer->GetErrorCode() == vtkErrorCode::NoError);
 }
 
 //----------------------------------------------------------------------------
