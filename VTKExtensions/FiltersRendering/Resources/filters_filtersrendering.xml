@@ -190,43 +190,6 @@
       <!-- End GeometryFilter -->
     </SourceProxy>
 
-
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkNetworkImageWriter"
-                 name="NetworkImageWriter"
-                 processes="client|dataserver">
-
-      <IntVectorProperty name="OutputDestination"
-          command="SetOutputDestination"
-          number_of_elements="1"
-          default_values="0"
-          panel_visibility="never">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="CLIENT" />
-          <Entry value="1" text="SERVER" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-
-      <SubProxy command="SetWriter">
-        <Proxy name="Writer" proxygroup="imagewriters" proxyname="PNGWriter" />
-        <ExposedProperties>
-          <Property  name="FileName" />
-        </ExposedProperties>
-      </SubProxy>
-    </SourceProxy>
-  </ProxyGroup>
-
-  <ProxyGroup name="imagewriters">
-    <Proxy class="vtkPNGWriter"
-      name="PNGWriter"
-      processes="client|dataserver">
-
-      <StringVectorProperty command="SetFileName"
-        name="FileName"
-        number_of_elements="1">
-        <Documentation>Set the name of image file to load.</Documentation>
-        <FileListDomain name="files" />
-      </StringVectorProperty>
-    </Proxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
