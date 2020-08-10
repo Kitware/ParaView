@@ -15,6 +15,7 @@
 #include "vtkSIProxyProperty.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkLogger.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSIObject.h"
@@ -238,6 +239,11 @@ bool vtkSIProxyProperty::IsValidNull(vtkTypeUInt32 globalId)
   }
 
   vtkSIProxy* siProxy = vtkSIProxy::SafeDownCast(this->GetSIObject(globalId));
+  vtkLogIfF(ERROR, siProxy == nullptr,
+    "Property '%s' on ['%s', '%s'] has a value that is not available on this process. "
+    "That typically indicates that the Location for the Proxy may not be correct. "
+    "Aborting for debugging purposes.",
+    this->XMLName, this->SIProxyObject->GetXMLGroup(), this->SIProxyObject->GetXMLName());
   assert(
     "SIProxy shouldn't be null otherwise it's a Proxy location issue in the XML" && siProxy != 0);
   return siProxy->IsNullProxy();
