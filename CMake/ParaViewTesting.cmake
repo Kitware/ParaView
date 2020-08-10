@@ -435,3 +435,14 @@ function (paraview_add_test_mpi)
       ${ARGN})
   endif ()
 endfunction ()
+
+
+# if PARAVIEW_USE_MPI, calls paraview_add_test_mpi(), else calls
+# paraview_add_test()
+function (paraview_add_test_mpi_optional)
+  if (PARAVIEW_USE_MPI)
+    paraview_add_test_mpi(${ARGN})
+  else()
+    paraview_add_test(${ARGN})
+  endif()
+endfunction()

@@ -20,6 +20,12 @@ vtk_module_test_data(
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_CoprocessingExtracts_histogram_0.000000.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_CoprocessingExtracts_renderview_0018.png"
 
+  # baselines for WaveletHistogramExtracts with MPI. The histograms are difference since points along edges are counted twice.
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_BatchExtracts_histogram_0.000000_1.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_BatchExtracts_histogram_1.000000_1.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_CoprocessingExtracts_histogram_0.000000_1.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_CoprocessingExtracts_histogram_0.950000_1.png"
+
   # baselines for WaveletPhiThetaExtractsWithCinema
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletPhiThetaExtractsWithCinema_BatchExtracts_image_000000p_0t_0.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletPhiThetaExtractsWithCinema_BatchExtracts_image_000000p_0t_300.png"
@@ -228,7 +234,7 @@ if (PARAVIEW_USE_QT)
       PROPERTIES DEPENDS "Catalyst::Workflow::ParaView.${tname}")
 
     # 3. add test to load catalyst script in pvbatch.
-    paraview_add_test(
+    paraview_add_test_mpi_optional(
       PREFIX "Catalyst::Workflow::BatchExecute"
       ENVIRONMENT
         PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY=${ttemp_dir}/BatchExtracts
@@ -242,6 +248,12 @@ if (PARAVIEW_USE_QT)
         "Catalyst::Workflow::SaveCatalystState.${tname}")
 
     # 3.1 validate 'BatchExtracts'
+    set(json_infix )
+    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${tname}.MPI.json AND PARAVIEW_USE_MPI)
+      # MPI runs sometimes have different files generated. Handle that.
+      set(json_infix ".MPI")
+    endif()
+
     paraview_add_test(
       PREFIX "Catalyst::Workflow::BatchExecute::Validate"
       ARGS "$<TARGET_FILE:ParaView::pvpython>"
@@ -253,14 +265,14 @@ if (PARAVIEW_USE_QT)
            --baseline-dir "${paraview_test_data_directory_output}/Clients/PythonCatalyst/Testing/Data/Baseline"
            --temp-dir "${CMAKE_BINARY_DIR}/Testing/Temporary"
            --json
-      TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/${tname}.json")
+      TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/${tname}${json_infix}.json")
 
     set_tests_properties(
       "Catalyst::Workflow::BatchExecute::Validate.${tname}"
       PROPERTIES DEPENDS "Catalyst::Workflow::BatchExecute.${tname}")
 
     # 4. run with WaveletMiniApp
-    paraview_add_test(
+    paraview_add_test_mpi_optional(
       PREFIX "Catalyst::Workflow::WaveletMiniApp"
       ARGS "$<TARGET_FILE:ParaView::pvbatch>"
             -dr
@@ -286,7 +298,7 @@ if (PARAVIEW_USE_QT)
            --baseline-dir "${paraview_test_data_directory_output}/Clients/PythonCatalyst/Testing/Data/Baseline"
            --temp-dir "${CMAKE_BINARY_DIR}/Testing/Temporary"
            --json
-      TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/${tname}.json")
+      TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/${tname}${json_infix}.json")
 
     set_tests_properties(
       "Catalyst::Workflow::WaveletMiniApp::Validate.${tname}"
