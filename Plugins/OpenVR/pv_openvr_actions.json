@@ -1,0 +1,73 @@
+{
+  "actions": [
+    {
+      "name": "/actions/vtk/in/ForwardThickCrop",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/BackThickCrop",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/ShowNavigationPanel",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/NextCameraPose",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/TriggerAction",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/LeftGripAction",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/RightGripAction",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/ShowMenu",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/StartMovement",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/vtk/in/Movement",
+      "type": "vector2"
+    }
+  ],
+  "default_bindings": [
+    {
+      "binding_url": "pv_openvr_binding_vive_controller.json",
+      "controller_type": "vive_controller"
+    },
+    {
+      "binding_url": "pv_openvr_binding_oculus_touch.json",
+      "controller_type": "oculus_touch"
+    },
+    {
+      "binding_url": "pv_openvr_binding_hpmotioncontroller.json",
+      "controller_type": "hpmotioncontroller"
+    }
+  ],
+  "localization": [
+    {
+      "/actions/vtk/in/Movement": "Trackpad Movement",
+      "/actions/vtk/in/BackThickCrop": "Move Thick Crop Back",
+      "/actions/vtk/in/ForwardThickCrop": "Move Thick Crop Forward",
+      "/actions/vtk/in/LeftGripAction": "Left Grip Action",
+      "/actions/vtk/in/NextCameraPose": "Next Camera Pose",
+      "/actions/vtk/in/RightGripAction": "Right Grip Action",
+      "/actions/vtk/in/ShowMenu": "Show Menu",
+      "/actions/vtk/in/ShowNavigationPanel": "Show Navigation Panel",
+      "/actions/vtk/in/StartMovement": "Start Movement",
+      "/actions/vtk/in/TriggerAction": "Trigger Action",
+      "language_tag": "en_US"
+    }
+  ]
+}

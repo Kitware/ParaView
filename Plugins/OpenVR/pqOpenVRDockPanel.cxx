@@ -14,6 +14,7 @@
 #include "vtkNew.h"
 #include "vtkPVOpenVRCollaborationClient.h"
 #include "vtkPVOpenVRHelper.h"
+#include "vtkPVOpenVRWidgets.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVXMLElement.h"
 #include "vtkRenderViewBase.h"
@@ -36,13 +37,30 @@ void pqOpenVRDockPanel::constructor()
   this->Internals->setupUi(t_widget);
   this->setWidget(t_widget);
 
-  connect(this->Internals->sendToOpenVRButton, SIGNAL(clicked()), this, SLOT(sendToOpenVR()));
+  this->Internals->showVRViewButton->setEnabled(false);
+
+  // connect(this->Internals->sendToOpenVRButton, SIGNAL(clicked()), this, SLOT(sendToOpenVR()));
+  QObject::connect(this->Internals->sendToOpenVRButton, &QPushButton::clicked,
+    std::bind(&pqOpenVRDockPanel::sendToOpenVR, this));
+  QObject::connect(this->Internals->attachToCurrentViewButton, &QPushButton::clicked,
+    std::bind(&pqOpenVRDockPanel::attachToCurrentView, this));
+  QObject::connect(this->Internals->showVRViewButton, &QPushButton::clicked,
+    std::bind(&pqOpenVRDockPanel::showVRView, this));
   connect(this->Internals->exportLocationsAsSkyboxesButton, SIGNAL(clicked()), this,
     SLOT(exportLocationsAsSkyboxes()));
   connect(this->Internals->exportLocationsAsViewButton, SIGNAL(clicked()), this,
     SLOT(exportLocationsAsView()));
-  connect(
-    this->Internals->multisamples, SIGNAL(stateChanged(int)), this, SLOT(multiSampleChanged(int)));
+
+  connect(this->Internals->editableField, SIGNAL(textChanged(const QString&)), this,
+    SLOT(editableFieldChanged(const QString&)));
+  connect(this->Internals->fieldValues, SIGNAL(textChanged(const QString&)), this,
+    SLOT(fieldValuesChanged(const QString&)));
+
+  QObject::connect(this->Internals->multisamples, &QCheckBox::stateChanged,
+    [&](int state) { this->Helper->SetMultiSample(state == Qt::Checked); });
+  QObject::connect(this->Internals->baseStationVisibility, &QCheckBox::stateChanged,
+    [&](int state) { this->Helper->SetBaseStationVisibility(state == Qt::Checked); });
+
   connect(this->Internals->cropThickness, SIGNAL(textChanged(const QString&)), this,
     SLOT(defaultCropThicknessChanged(const QString&)));
 
@@ -87,26 +105,194 @@ void pqOpenVRDockPanel::constructor()
     this->Internals->cServerValue->hide();
     this->Internals->cHeader->hide();
   }
+
+// hide/show widgets based on Imago support
+#ifdef OPENVR_HAS_IMAGO_SUPPORT
+  QObject::connect(this->Internals->imagoLoginButton, &QPushButton::clicked, [&]() {
+    std::string uid = this->Internals->imagoUserValue->text().toLocal8Bit().constData();
+    std::string pw = this->Internals->imagoPasswordValue->text().toLocal8Bit().constData();
+    if (this->Helper->GetWidgets()->LoginToImago(uid, pw))
+    {
+      // set the combo box values to what the context has
+      // try to save previous values if we can
+      std::vector<std::string> vals;
+      {
+        this->Helper->GetWidgets()->GetImagoImageryTypes(vals);
+        std::string oldValue =
+          this->Internals->imagoImageryTypeCombo->currentText().toLatin1().data();
+        this->Internals->imagoImageryTypeCombo->clear();
+        QStringList list;
+        list << QString("Any");
+        for (auto s : vals)
+        {
+          list << QString(s.c_str());
+        }
+        this->Internals->imagoImageryTypeCombo->addItems(list);
+        auto idx = this->Internals->imagoImageryTypeCombo->findText(QString(oldValue.c_str()));
+        this->Internals->imagoImageryTypeCombo->setCurrentIndex(idx);
+      }
+
+      {
+        this->Helper->GetWidgets()->GetImagoImageTypes(vals);
+        std::string oldValue =
+          this->Internals->imagoImageTypeCombo->currentText().toLatin1().data();
+        this->Internals->imagoImageTypeCombo->clear();
+        QStringList list;
+        list << QString("Any");
+        for (auto s : vals)
+        {
+          list << QString(s.c_str());
+        }
+        this->Internals->imagoImageTypeCombo->addItems(list);
+        auto idx = this->Internals->imagoImageTypeCombo->findText(QString(oldValue.c_str()));
+        this->Internals->imagoImageTypeCombo->setCurrentIndex(idx);
+      }
+
+      {
+        this->Helper->GetWidgets()->GetImagoDatasets(vals);
+        std::string oldValue = this->Internals->imagoDatasetCombo->currentText().toLatin1().data();
+        this->Internals->imagoDatasetCombo->clear();
+        QStringList list;
+        list << QString("Any");
+        for (auto s : vals)
+        {
+          list << QString(s.c_str());
+        }
+        this->Internals->imagoDatasetCombo->addItems(list);
+        auto idx = this->Internals->imagoDatasetCombo->findText(QString(oldValue.c_str()));
+        this->Internals->imagoDatasetCombo->setCurrentIndex(idx);
+      }
+
+      {
+        this->Helper->GetWidgets()->GetImagoWorkspaces(vals);
+        std::string oldValue =
+          this->Internals->imagoWorkspaceCombo->currentText().toLatin1().data();
+        this->Internals->imagoWorkspaceCombo->clear();
+        QStringList list;
+        list << QString("Any");
+        for (auto s : vals)
+        {
+          list << QString(s.c_str());
+        }
+        this->Internals->imagoWorkspaceCombo->addItems(list);
+        auto idx = this->Internals->imagoWorkspaceCombo->findText(QString(oldValue.c_str()));
+        this->Internals->imagoWorkspaceCombo->setCurrentIndex(idx);
+      }
+    }
+    else
+    {
+      vtkGenericWarningMacro("Failed to login to Imago");
+    }
+  });
+
+  QObject::connect(this->Internals->imagoWorkspaceCombo,
+    QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
+      if (text.length())
+      {
+        this->Helper->GetWidgets()->SetImagoWorkspace(text.toLocal8Bit().constData());
+      }
+    });
+  QObject::connect(this->Internals->imagoDatasetCombo,
+    QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
+      if (text.length())
+      {
+        this->Helper->GetWidgets()->SetImagoDataset(text.toLocal8Bit().constData());
+      }
+    });
+  QObject::connect(this->Internals->imagoImageryTypeCombo,
+    QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
+      if (text.length())
+      {
+        this->Helper->GetWidgets()->SetImagoImageryType(text.toLocal8Bit().constData());
+      }
+    });
+  QObject::connect(this->Internals->imagoImageTypeCombo,
+    QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
+      if (text.length())
+      {
+        this->Helper->GetWidgets()->SetImagoImageType(text.toLocal8Bit().constData());
+      }
+    });
+#else
+  this->Internals->imagoLine->hide();
+  this->Internals->imagoGroupBox->hide();
+#endif
+}
+
+void pqOpenVRDockPanel::editableFieldChanged(const QString& text)
+{
+  this->Helper->SetEditableField(text.toLatin1().data());
+}
+
+void pqOpenVRDockPanel::fieldValuesChanged(const QString& text)
+{
+  this->OpenVRControls->SetFieldValues(text.toLatin1().data());
 }
 
 void pqOpenVRDockPanel::sendToOpenVR()
 {
-  pqView* view = pqActiveObjects::instance().activeView();
-
-  if (view)
+  if (this->Internals->sendToOpenVRButton->text() == "Send to OpenVR")
   {
-    vtkSMViewProxy* smview = view->getViewProxy();
-    this->Internals->cConnectButton->setEnabled(true);
-    if (this->Internals->cConnectButton->text() != "Connect")
-    {
-      this->Internals->cConnectButton->setText("Connect");
-    }
-    this->Helper->SendToOpenVR(smview);
+    pqView* view = pqActiveObjects::instance().activeView();
 
-    if (!this->Helper->InVR())
+    if (view)
     {
+      vtkSMViewProxy* smview = view->getViewProxy();
+      if (this->Internals->cConnectButton->text() != "Connect")
+      {
+        this->Internals->cConnectButton->setText("Connect");
+      }
+      this->Internals->attachToCurrentViewButton->setEnabled(false);
+      this->Internals->showVRViewButton->setEnabled(true);
+      this->Internals->sendToOpenVRButton->setText("Quit VR");
+      this->Internals->cConnectButton->setEnabled(true);
+      this->Helper->SendToOpenVR(smview);
       this->Internals->cConnectButton->setEnabled(false);
+      this->Internals->cConnectButton->setText("Connect");
+      this->Internals->sendToOpenVRButton->setText("Send to OpenVR");
+      this->Internals->attachToCurrentViewButton->setEnabled(true);
     }
+  }
+  else
+  {
+    this->Internals->showVRViewButton->setEnabled(false);
+    this->Internals->cConnectButton->setEnabled(false);
+    this->Helper->Quit();
+  }
+}
+
+void pqOpenVRDockPanel::showVRView()
+{
+  this->Helper->ShowVRView();
+}
+
+void pqOpenVRDockPanel::attachToCurrentView()
+{
+  if (this->Internals->attachToCurrentViewButton->text() == "Attach to Current View")
+  {
+    pqView* view = pqActiveObjects::instance().activeView();
+
+    if (view)
+    {
+      vtkSMViewProxy* smview = view->getViewProxy();
+      if (this->Internals->cConnectButton->text() != "Connect")
+      {
+        this->Internals->cConnectButton->setText("Connect");
+      }
+      this->Internals->cConnectButton->setEnabled(true);
+      this->Internals->sendToOpenVRButton->setEnabled(false);
+      this->Internals->attachToCurrentViewButton->setText("Detach from View");
+      this->Helper->AttachToCurrentView(smview);
+      this->Internals->cConnectButton->setEnabled(false);
+      this->Internals->cConnectButton->setText("Connect");
+      this->Internals->attachToCurrentViewButton->setText("Attach to Current View");
+      this->Internals->sendToOpenVRButton->setEnabled(true);
+    }
+  }
+  else
+  {
+    this->Internals->cConnectButton->setEnabled(false);
+    this->Helper->Quit();
   }
 }
 
@@ -161,11 +347,6 @@ void pqOpenVRDockPanel::exportLocationsAsView()
   this->Helper->ExportLocationsAsView(smview);
 }
 
-void pqOpenVRDockPanel::multiSampleChanged(int state)
-{
-  this->Helper->SetMultiSample(state == Qt::Checked);
-}
-
 void pqOpenVRDockPanel::defaultCropThicknessChanged(const QString& text)
 {
   bool ok;
@@ -204,6 +385,11 @@ void pqOpenVRDockPanel::loadState(vtkPVXMLElement* root, vtkSMProxyLocator* loca
   if (e)
   {
     int ms = 0;
+    if (e->GetScalarAttribute("BaseStationVisibility", &ms))
+    {
+      this->Helper->SetBaseStationVisibility(ms);
+      this->Internals->baseStationVisibility->setCheckState(ms ? Qt::Checked : Qt::Unchecked);
+    }
     if (e->GetScalarAttribute("MultiSample", &ms))
     {
       this->Helper->SetMultiSample(ms);
@@ -215,7 +401,12 @@ void pqOpenVRDockPanel::loadState(vtkPVXMLElement* root, vtkSMProxyLocator* loca
       this->Internals->cropThickness->setText(QString::number(dcropThickness));
     }
 
-    std::string tmp = e->GetAttributeOrEmpty("CollaborationServer");
+    std::string tmp = e->GetAttributeOrEmpty("EditableField");
+    this->Internals->editableField->setText(QString(tmp.c_str()));
+    tmp = e->GetAttributeOrEmpty("FieldValues");
+    this->Internals->fieldValues->setText(QString(tmp.c_str()));
+
+    tmp = e->GetAttributeOrEmpty("CollaborationServer");
     if (tmp.size())
     {
       this->Internals->cServerValue->setText(QString(tmp.c_str()));
@@ -230,6 +421,54 @@ void pqOpenVRDockPanel::loadState(vtkPVXMLElement* root, vtkSMProxyLocator* loca
     {
       this->Internals->cPortValue->setText(QString(tmp.c_str()));
     }
+
+    // imago values
+    tmp = e->GetAttributeOrEmpty("ImagoUser");
+    if (tmp.size())
+    {
+      this->Internals->imagoUserValue->setText(QString(tmp.c_str()));
+    }
+    tmp = e->GetAttributeOrEmpty("ImagoWorkspace");
+    this->Internals->imagoWorkspaceCombo->clear();
+    if (tmp.size())
+    {
+      QStringList list;
+      list << QString(tmp.c_str());
+      this->Internals->imagoWorkspaceCombo->addItems(list);
+      auto idx = this->Internals->imagoWorkspaceCombo->findText(QString(tmp.c_str()));
+      this->Internals->imagoWorkspaceCombo->setCurrentIndex(idx);
+    }
+    tmp = e->GetAttributeOrEmpty("ImagoDataset");
+    this->Internals->imagoDatasetCombo->clear();
+    if (tmp.size())
+    {
+      QStringList list;
+      list << QString(tmp.c_str());
+      this->Internals->imagoDatasetCombo->addItems(list);
+      auto idx = this->Internals->imagoDatasetCombo->findText(QString(tmp.c_str()));
+      this->Internals->imagoDatasetCombo->setCurrentIndex(idx);
+    }
+    tmp = e->GetAttributeOrEmpty("ImagoImageryType");
+    this->Internals->imagoImageryTypeCombo->clear();
+    if (tmp.size())
+    {
+      QStringList list;
+      list << QString(tmp.c_str());
+      this->Internals->imagoImageryTypeCombo->addItems(list);
+      auto idx = this->Internals->imagoImageryTypeCombo->findText(QString(tmp.c_str()));
+      this->Internals->imagoImageryTypeCombo->setCurrentIndex(idx);
+    }
+    tmp = e->GetAttributeOrEmpty("ImagoImageType");
+    this->Internals->imagoImageTypeCombo->clear();
+    if (tmp.size())
+    {
+      QStringList list;
+      list << QString(tmp.c_str());
+      this->Internals->imagoImageTypeCombo->addItems(list);
+      auto idx = this->Internals->imagoImageTypeCombo->findText(QString(tmp.c_str()));
+      this->Internals->imagoImageTypeCombo->setCurrentIndex(idx);
+    }
+
     this->Helper->LoadState(e, locator);
   }
 }
@@ -239,6 +478,10 @@ void pqOpenVRDockPanel::saveState(vtkPVXMLElement* root)
   vtkNew<vtkPVXMLElement> e;
   e->SetName("OpenVR");
 
+  e->AddAttribute("EditableField", this->Internals->editableField->text().toLatin1().data());
+  e->AddAttribute("FieldValues", this->Internals->fieldValues->text().toLatin1().data());
+
+  e->AddAttribute("BaseStationVisibility", this->Helper->GetBaseStationVisibility() ? 1 : 0);
   e->AddAttribute("MultiSample", this->Helper->GetMultiSample() ? 1 : 0);
 
   e->AddAttribute("DefaultCropThickness", this->Helper->GetDefaultCropThickness());
@@ -246,6 +489,16 @@ void pqOpenVRDockPanel::saveState(vtkPVXMLElement* root)
   e->AddAttribute("CollaborationServer", this->Internals->cServerValue->text().toLatin1().data());
   e->AddAttribute("CollaborationSession", this->Internals->cSessionValue->text().toLatin1().data());
   e->AddAttribute("CollaborationPort", this->Internals->cPortValue->text().toLatin1().data());
+
+  e->AddAttribute("ImagoUser", this->Internals->imagoUserValue->text().toLatin1().data());
+  e->AddAttribute(
+    "ImagoWorkspace", this->Internals->imagoWorkspaceCombo->currentText().toLatin1().data());
+  e->AddAttribute(
+    "ImagoDataset", this->Internals->imagoDatasetCombo->currentText().toLatin1().data());
+  e->AddAttribute(
+    "ImagoImageryType", this->Internals->imagoImageryTypeCombo->currentText().toLatin1().data());
+  e->AddAttribute(
+    "ImagoImageType", this->Internals->imagoImageTypeCombo->currentText().toLatin1().data());
 
   this->Helper->SaveState(e);
 

@@ -22,6 +22,7 @@
 #include <QTabWidget>
 
 #include <functional>
+#include <sstream>
 
 class pqOpenVRControls::pqInternals : public Ui::pqOpenVRControls
 {
@@ -50,23 +51,26 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
   QObject::connect(this->Internals->measurement, &QPushButton::clicked,
     std::bind(&vtkPVOpenVRHelper::TakeMeasurement, this->Helper));
 
+  QObject::connect(this->Internals->comeToMeButton, &QPushButton::clicked,
+    std::bind(&vtkPVOpenVRHelper::ComeToMe, this->Helper));
+
   QObject::connect(this->Internals->removeMeasurement, &QPushButton::clicked,
     std::bind(&vtkPVOpenVRHelper::RemoveMeasurement, this->Helper));
 
-  QObject::connect(this->Internals->controllerLabels, &QCheckBox::stateChanged,
-    [=](int state) { this->Helper->SetDrawControls(state == Qt::Checked); });
-
   QObject::connect(this->Internals->navigationPanel, &QCheckBox::stateChanged,
-    [=](int state) { this->Helper->SetShowNavigationPanel(state == Qt::Checked); });
+    [&](int state) { this->Helper->SetShowNavigationPanel(state == Qt::Checked); });
 
   QObject::connect(this->Internals->interactiveRay, &QCheckBox::stateChanged,
-    [=](int state) { this->Helper->GetStyle()->SetHoverPick(state == Qt::Checked); });
+    [&](int state) { this->Helper->SetHoverPick(state == Qt::Checked); });
 
   QObject::connect(
-    this->Internals->rightTrigger, &QComboBox::currentTextChanged, [=](QString const& text) {
+    this->Internals->rightTrigger, &QComboBox::currentTextChanged, [&](QString const& text) {
       std::string mode = text.toLocal8Bit().constData();
       this->Helper->SetRightTriggerMode(mode);
     });
+
+  QObject::connect(this->Internals->fieldValueButton, &QPushButton::clicked, this,
+    &pqOpenVRControls::assignFieldValue);
 
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   QList<pqRenderViewBase*> views = smmodel->findItems<pqRenderViewBase*>();
@@ -81,12 +85,17 @@ void pqOpenVRControls::constructor(vtkPVOpenVRHelper* val)
   QObject::connect(this->Internals->addThickCropButton, &QPushButton::clicked,
     std::bind(&vtkPVOpenVRHelper::AddAThickCrop, this->Helper, nullptr));
   QObject::connect(this->Internals->removeCropsButton, &QPushButton::clicked,
-    std::bind(&vtkPVOpenVRHelper::RemoveAllCropPlanes, this->Helper));
+    std::bind(&vtkPVOpenVRHelper::RemoveAllCropPlanesAndThickCrops, this->Helper));
   QObject::connect(this->Internals->cropSnapping, &QCheckBox::stateChanged,
     std::bind(&vtkPVOpenVRHelper::SetCropSnapping, this->Helper, std::placeholders::_1));
 
-  QObject::connect(this->Internals->showFloorCheckbox, &QCheckBox::stateChanged,
-    [=](int state) { this->Helper->GetRenderer()->SetShowFloor(state == Qt::Checked); });
+  QObject::connect(this->Internals->showFloorCheckbox, &QCheckBox::stateChanged, [&](int state) {
+    auto ovrr = vtkOpenVRRenderer::SafeDownCast(this->Helper->GetRenderer());
+    if (ovrr)
+    {
+      ovrr->SetShowFloor(state == Qt::Checked);
+    }
+  });
 
   QObject::connect(this->Internals->scaleFactorCombo,
     QOverload<const QString&>::of(&QComboBox::activated), [=](QString const& text) {
@@ -136,6 +145,14 @@ void pqOpenVRControls::resetPositions()
   this->Helper->ResetPositions();
 }
 
+void pqOpenVRControls::assignFieldValue()
+{
+  // get the current combo setting
+  std::string val = this->Internals->fieldValueCombo->currentText().toLocal8Bit().constData();
+
+  this->Helper->SetEditableFieldValue(val);
+}
+
 void pqOpenVRControls::SetRightTriggerMode(std::string const& text)
 {
   this->Internals->rightTrigger->setCurrentText(text.c_str());
@@ -157,6 +174,37 @@ pqPipelineSource* pqOpenVRControls::GetSelectedPipelineSource()
   // We need to obtain the source to give the undo element some sensible name.
   pqServerManagerModelItem* smModelItem = model->getItemFor(index);
   return qobject_cast<pqPipelineSource*>(smModelItem);
+}
+
+namespace
+{
+std::string trim(std::string const& str)
+{
+  if (str.empty())
+    return str;
+
+  std::size_t firstScan = str.find_first_not_of(' ');
+  std::size_t first = firstScan == std::string::npos ? str.length() : firstScan;
+  std::size_t last = str.find_last_not_of(' ');
+  return str.substr(first, last - first + 1);
+}
+}
+
+void pqOpenVRControls::SetFieldValues(std::string vals)
+{
+  this->Internals->fieldValueCombo->clear();
+  QStringList list;
+
+  std::istringstream iss(vals);
+
+  std::string token;
+  while (std::getline(iss, token, ','))
+  {
+    token = trim(token);
+    list << QString(token.c_str());
+  }
+
+  this->Internals->fieldValueCombo->addItems(list);
 }
 
 void pqOpenVRControls::SetAvailablePositions(std::vector<int> const& vals)

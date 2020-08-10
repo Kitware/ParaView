@@ -13,14 +13,18 @@
 =========================================================================*/
 #include "vtkPVOpenVRCollaborationClient.h"
 
+#include "vtkBoxRepresentation.h"
+#include "vtkBoxWidget2.h"
 #include "vtkImplicitPlaneRepresentation.h"
 #include "vtkImplicitPlaneWidget2.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenVRModel.h"
+#include "vtkOpenVROverlayInternal.h"
 #include "vtkOpenVRRay.h"
 #include "vtkOpenVRRenderWindow.h"
 #include "vtkOpenVRRenderer.h"
 #include "vtkPVOpenVRHelper.h"
+#include "vtkTransform.h"
 
 #ifdef OPENVR_HAS_COLLABORATION
 #include "mvCollaborationClient.h"
@@ -66,7 +70,50 @@ protected:
       // only want to change if it's from someone else.
       if (otherID != this->CollabID)
       {
+        // if we are a VR window then use the update values directly
         this->Helper->GoToSavedLocation(viewIndex, updateTranslation, updateDirection);
+      }
+    }
+    // go to pose
+    else if (type == "PO")
+    {
+      // only want to change if it's from someone else.
+      if (otherID != this->CollabID)
+      {
+        zmq::message_t update;
+        int count = 0;
+
+        this->Subscriber.recv(&update);
+        memcpy(&count, update.data(), sizeof(count));
+
+        std::vector<double> dvec;
+        dvec.resize(count);
+        this->Subscriber.recv(&update);
+        memcpy(dvec.data(), update.data(), dvec.size() * sizeof(decltype(dvec)::value_type));
+
+        vtkOpenVRCameraPose pose;
+        auto it = dvec.begin();
+        std::copy(it, it + 3, pose.Position);
+        it += 3;
+        std::copy(it, it + 3, pose.PhysicalViewUp);
+        it += 3;
+        std::copy(it, it + 3, pose.PhysicalViewDirection);
+        it += 3;
+        std::copy(it, it + 3, pose.ViewDirection);
+        it += 3;
+        std::copy(it, it + 3, pose.Translation);
+        it += 3;
+        pose.Distance = *it++;
+        pose.MotionFactor = *it++;
+
+        double collabTrans[3];
+        std::copy(it, it + 3, collabTrans);
+        it += 3;
+        double collabDir[3];
+        std::copy(it, it + 3, collabDir);
+        it += 3;
+
+        this->Helper->collabGoToPose(&pose, collabTrans, collabDir);
       }
     }
     // point source
@@ -80,61 +127,80 @@ protected:
     }
     else if (type == "PSA")
     {
-      zmq::message_t update;
-      unsigned int count = 0;
+      std::vector<Argument> args = this->GetMessageArguments();
 
-      this->Subscriber.recv(&update);
-      memcpy(&count, update.data(), sizeof(count));
-
-      std::vector<double> tmp;
-      tmp.resize(count);
-
-      this->Subscriber.recv(&update);
-      memcpy(&tmp[0], update.data(), count * sizeof(tmp[0]));
+      std::string name;         // first arg is string name
+      std::vector<double> dvec; // second arg is double[3] location
+      if (args.size() != 2 || !args[0].GetString(name) || !args[1].GetDoubleVector(dvec))
+      {
+        mvLog("Incorrect arguments for PSA collaboration message" << std::endl);
+        return;
+      }
 
       // only want to change if it's from someone else.
-      if (otherID != this->CollabID && count == 3)
+      if (otherID != this->CollabID)
       {
         double origin[3];
-        origin[0] = tmp[0];
-        origin[1] = tmp[1];
-        origin[2] = tmp[2];
-        this->Helper->AddPointToSource(origin);
+        origin[0] = dvec[0];
+        origin[1] = dvec[1];
+        origin[2] = dvec[2];
+        this->Helper->collabAddPointToSource(name, origin);
       }
     }
-    // clip planes
-    else if (type == "CPC")
+    // crop planes
+    else if (type == "RCP")
     {
-      zmq::message_t update;
-      int count = 0;
+      // only want to change if it's from someone else.
+      if (otherID != this->CollabID)
+      {
+        this->Helper->collabRemoveAllCropPlanes();
+      }
+    }
+    else if (type == "UCP")
+    {
+      std::vector<Argument> args = this->GetMessageArguments();
 
-      this->Subscriber.recv(&update);
-      memcpy(&count, update.data(), sizeof(count));
+      int32_t index;
+      std::vector<double> origin;
+      std::vector<double> normal;
+      if (args.size() != 3 || !args[0].GetInt32(index) || !args[1].GetDoubleVector(origin) ||
+        !args[2].GetDoubleVector(normal))
+      {
+        mvLog("Incorrect arguments for UCP collaboration message" << std::endl);
+        return;
+      }
 
       // only want to change if it's from someone else.
       if (otherID != this->CollabID)
       {
-        this->Helper->SetNumberOfCropPlanes(count);
+        this->Helper->collabUpdateCropPlane(index, origin.data(), normal.data());
       }
     }
-    else if (type == "CPU")
+    // thick crops
+    else if (type == "RTC")
     {
-      zmq::message_t update;
-      int count = 0;
-      double origin[3] = { 0.0 };
-      double normal[3] = { 0.0 };
+      // only want to change if it's from someone else.
+      if (otherID != this->CollabID)
+      {
+        this->Helper->collabRemoveAllThickCrops();
+      }
+    }
+    else if (type == "UTC")
+    {
+      std::vector<Argument> args = this->GetMessageArguments();
 
-      this->Subscriber.recv(&update);
-      memcpy(&count, update.data(), sizeof(count));
-      this->Subscriber.recv(&update);
-      memcpy(&origin[0], update.data(), sizeof(origin));
-      this->Subscriber.recv(&update);
-      memcpy(&normal[0], update.data(), sizeof(normal));
+      int32_t index;
+      std::vector<double> matrix;
+      if (args.size() != 2 || !args[0].GetInt32(index) || !args[1].GetDoubleVector(matrix))
+      {
+        mvLog("Incorrect arguments for UTC collaboration message" << std::endl);
+        return;
+      }
 
       // only want to change if it's from someone else.
       if (otherID != this->CollabID)
       {
-        this->Helper->UpdateCropPlane(count, origin, normal);
+        this->Helper->collabUpdateThickCrop(index, matrix.data());
       }
     }
     else if (type == "SB")
@@ -148,6 +214,14 @@ protected:
       if (otherID != this->CollabID)
       {
         this->Helper->ShowBillboard(text, update == "true", file);
+      }
+    }
+    else if (type == "HB")
+    {
+      // only want to change if it's from someone else.
+      if (otherID != this->CollabID)
+      {
+        this->Helper->HideBillboard();
       }
     }
     else
@@ -189,11 +263,11 @@ bool vtkPVOpenVRCollaborationClient::SupportsCollaboration()
 }
 
 #ifdef OPENVR_HAS_COLLABORATION
-bool vtkPVOpenVRCollaborationClient::Connect(vtkOpenVRRenderer* ren)
+bool vtkPVOpenVRCollaborationClient::Connect(vtkOpenGLRenderer* ren)
 {
   return this->Internal->Initialize(ren);
 #else
-bool vtkPVOpenVRCollaborationClient::Connect(vtkOpenVRRenderer*)
+bool vtkPVOpenVRCollaborationClient::Connect(vtkOpenGLRenderer*)
 {
   return true;
 #endif
@@ -244,9 +318,12 @@ void vtkPVOpenVRCollaborationClient::GoToSavedLocation(int index)
     if (this->Internal->GetConnected())
     {
       vtkOpenVRRenderWindow* renWin =
-        static_cast<vtkOpenVRRenderWindow*>(this->Internal->GetRenderer()->GetVTKWindow());
-      this->Internal->SendMessage(
-        "P", index, renWin->GetPhysicalTranslation(), renWin->GetPhysicalViewDirection());
+        vtkOpenVRRenderWindow::SafeDownCast(this->Internal->GetRenderer()->GetVTKWindow());
+      if (renWin)
+      {
+        this->Internal->SendMessage(
+          "P", index, renWin->GetPhysicalTranslation(), renWin->GetPhysicalViewDirection());
+      }
     }
     this->CurrentLocation = index;
   }
@@ -257,33 +334,69 @@ void vtkPVOpenVRCollaborationClient::SetHelper(vtkPVOpenVRHelper* val)
   this->Internal->SetHelper(val);
 }
 
+void vtkPVOpenVRCollaborationClient::GoToPose(
+  vtkOpenVRCameraPose const& pose, double* collabTrans, double* collabDir)
+{
+  // store the data as a vector
+  std::vector<double> dvec;
+  dvec.insert(dvec.end(), pose.Position, pose.Position + 3);
+  dvec.insert(dvec.end(), pose.PhysicalViewUp, pose.PhysicalViewUp + 3);
+  dvec.insert(dvec.end(), pose.PhysicalViewDirection, pose.PhysicalViewDirection + 3);
+  dvec.insert(dvec.end(), pose.ViewDirection, pose.ViewDirection + 3);
+  dvec.insert(dvec.end(), pose.Translation, pose.Translation + 3);
+  dvec.push_back(pose.Distance);
+  dvec.push_back(pose.MotionFactor);
+  dvec.insert(dvec.end(), collabTrans, collabTrans + 3);
+  dvec.insert(dvec.end(), collabDir, collabDir + 3);
+
+  this->Internal->SendMessage("PO", dvec);
+}
+
 void vtkPVOpenVRCollaborationClient::RemoveAllCropPlanes()
 {
   if (this->Internal->GetConnected())
   {
-    this->Internal->SendMessage("CPC", 0);
+    this->Internal->SendMessage("RCP");
   }
 }
 
-void vtkPVOpenVRCollaborationClient::UpdateCropPlanes(
-  std::set<vtkImplicitPlaneWidget2*> const& planes)
+void vtkPVOpenVRCollaborationClient::RemoveAllThickCrops()
 {
   if (this->Internal->GetConnected())
   {
-    this->Internal->SendMessage("CPC", static_cast<int>(planes.size()));
+    this->Internal->SendMessage("RTC");
   }
+}
 
-  int count = 0;
-  for (auto const& widget : planes)
+void vtkPVOpenVRCollaborationClient::UpdateCropPlane(size_t i, vtkImplicitPlaneWidget2* widget)
+{
+  if (this->Internal->GetConnected())
   {
     vtkImplicitPlaneRepresentation* rep =
       static_cast<vtkImplicitPlaneRepresentation*>(widget->GetRepresentation());
-    double origin[3];
-    double normal[3];
-    rep->GetOrigin(origin);
-    rep->GetNormal(normal);
-    this->Internal->SendMessage("CPU", count, origin, normal);
-    count++;
+
+    std::vector<mvCollaborationClient::Argument> args;
+    args.resize(3);
+    args[0].SetInt32(static_cast<int32_t>(i));
+    args[1].SetDoubleVector(rep->GetOrigin(), 3);
+    args[2].SetDoubleVector(rep->GetNormal(), 3);
+    this->Internal->SendMessage("UCP", args);
+  }
+}
+
+void vtkPVOpenVRCollaborationClient::UpdateThickCrop(size_t i, vtkBoxWidget2* widget)
+{
+  if (this->Internal->GetConnected())
+  {
+    vtkBoxRepresentation* rep = static_cast<vtkBoxRepresentation*>(widget->GetRepresentation());
+    vtkNew<vtkTransform> t;
+    rep->GetTransform(t);
+
+    std::vector<mvCollaborationClient::Argument> args;
+    args.resize(2);
+    args[0].SetInt32(static_cast<int32_t>(i));
+    args[1].SetDoubleVector(t->GetMatrix()->GetData(), 16);
+    this->Internal->SendMessage("UTC", args);
   }
 }
 
@@ -300,21 +413,35 @@ void vtkPVOpenVRCollaborationClient::ShowBillboard(std::vector<std::string> cons
   this->Internal->SendMessage("SB", vals);
 }
 
-void vtkPVOpenVRCollaborationClient::AddPointToSource(double const* pt)
+void vtkPVOpenVRCollaborationClient::HideBillboard()
 {
-  std::vector<double> tmp;
-  tmp.push_back(pt[0]);
-  tmp.push_back(pt[1]);
-  tmp.push_back(pt[2]);
-  this->Internal->SendMessage("PSA", tmp);
+  this->Internal->SendMessage("HB");
+}
+
+void vtkPVOpenVRCollaborationClient::AddPointToSource(std::string const& name, double const* pt)
+{
+  if (this->Internal->GetConnected())
+  {
+    std::vector<mvCollaborationClient::Argument> args;
+    args.resize(2);
+    args[0].SetString(name);
+    args[1].SetDoubleVector(pt, 3);
+    this->Internal->SendMessage("PSA", args);
+  }
 }
 
 void vtkPVOpenVRCollaborationClient::ClearPointSource()
 {
-  this->Internal->SendMessage("PSC");
+  if (this->Internal->GetConnected())
+  {
+    this->Internal->SendMessage("PSC");
+  }
 }
 
 #else
+void vtkPVOpenVRCollaborationClient::GoToPose(vtkOpenVRCameraPose const&, double*, double*)
+{
+}
 void vtkPVOpenVRCollaborationClient::SetCollabHost(std::string const&)
 {
 }
@@ -340,7 +467,13 @@ void vtkPVOpenVRCollaborationClient::SetHelper(vtkPVOpenVRHelper*)
 void vtkPVOpenVRCollaborationClient::RemoveAllCropPlanes()
 {
 }
-void vtkPVOpenVRCollaborationClient::UpdateCropPlanes(std::set<vtkImplicitPlaneWidget2*> const&)
+void vtkPVOpenVRCollaborationClient::RemoveAllThickCrops()
+{
+}
+void vtkPVOpenVRCollaborationClient::UpdateCropPlane(size_t, vtkImplicitPlaneWidget2*)
+{
+}
+void vtkPVOpenVRCollaborationClient::UpdateThickCrop(size_t, vtkBoxWidget2*)
 {
 }
 void vtkPVOpenVRCollaborationClient::UpdateRay(vtkOpenVRModel*, vtkEventDataDevice)
@@ -349,7 +482,10 @@ void vtkPVOpenVRCollaborationClient::UpdateRay(vtkOpenVRModel*, vtkEventDataDevi
 void vtkPVOpenVRCollaborationClient::ShowBillboard(std::vector<std::string> const&)
 {
 }
-void vtkPVOpenVRCollaborationClient::AddPointToSource(double const*)
+void vtkPVOpenVRCollaborationClient::HideBillboard()
+{
+}
+void vtkPVOpenVRCollaborationClient::AddPointToSource(std::string const&, double const*)
 {
 }
 void vtkPVOpenVRCollaborationClient::ClearPointSource()

@@ -6,30 +6,49 @@ set(sources
   pqOpenVRControls.h
   pqOpenVRDockPanel.cxx
   pqOpenVRDockPanel.h
+  vtkOpenVRPolyfill.h
+  vtkOpenVRPolyfill.cxx
   vtkPVOpenVRCollaborationClient.cxx
   vtkPVOpenVRCollaborationClient.h
+  vtkPVOpenVRExporter.cxx
+  vtkPVOpenVRExporter.h
   vtkPVOpenVRHelper.cxx
-  vtkPVOpenVRHelper.h)
+  vtkPVOpenVRHelper.h
+  vtkPVOpenVRPluginLocation.cxx
+  vtkPVOpenVRPluginLocation.h
+  vtkPVOpenVRWidgets.cxx
+  vtkPVOpenVRWidgets.h
+  )
 
 
 # if we build the openvr plugin then look to add collaboration
 # for collaboration we leverage mineview.
 #-----------------------------------------------------------------------------
-if (WIN32 AND PARAVIEW_PLUGIN_ENABLE_OpenVR AND PARAVIEW_MINEVIEW_SOURCE_DIR)
+if (WIN32 AND
+    PARAVIEW_MINEVIEW_SOURCE_DIR AND
+    PARAVIEW_OpenVR_COLLABORATION)
   list(APPEND sources "${PARAVIEW_MINEVIEW_SOURCE_DIR}/mvCollaborationClient.cxx")
 endif()
+
 
 paraview_plugin_add_dock_window(
   CLASS_NAME pqOpenVRDockPanel
   DOCK_AREA Right
   INTERFACES dock_interfaces
   SOURCES dock_sources)
-list(APPEND interfaces
-  ${dock_interfaces})
-list(APPEND sources
-  ${dock_sources})
 
-  paraview_add_plugin(OpenVR
+paraview_plugin_add_location(
+  CLASS_NAME vtkPVOpenVRPluginLocation
+  INTERFACES location_interfaces
+  SOURCES location_sources
+  )
+
+list(APPEND interfaces
+  ${dock_interfaces} ${location_interfaces})
+list(APPEND sources
+  ${dock_sources} ${location_sources})
+
+paraview_add_plugin(OpenVR
   VERSION "1.2"
   UI_FILES pqOpenVRDockPanel.ui pqOpenVRControls.ui
   UI_INTERFACES ${interfaces}
@@ -42,6 +61,18 @@ if (WIN32 AND PARAVIEW_PLUGIN_ENABLE_OpenVR)
   option(PARAVIEW_OpenVR_COLLABORATION
     "Turn on collaboration support for the openVR plugin, requires mineview source tree" OFF)
   mark_as_advanced(PARAVIEW_OpenVR_COLLABORATION)
+  option(PARAVIEW_OpenVR_Imago_Support
+    "Turn on support for the Imago Image Loading" OFF)
+  mark_as_advanced(PARAVIEW_OpenVR_Imago_Support)
+endif()
+
+if (PARAVIEW_OpenVR_Imago_Support)
+  set_property(
+    SOURCE
+      pqOpenVRDockPanel.cxx
+      vtkPVOpenVRWidgets.cxx
+    APPEND PROPERTY
+      COMPILE_DEFINITIONS OPENVR_HAS_IMAGO_SUPPORT)
 endif()
 
 if (PARAVIEW_OpenVR_COLLABORATION)
@@ -61,6 +92,26 @@ if (PARAVIEW_OpenVR_COLLABORATION AND PARAVIEW_MINEVIEW_SOURCE_DIR)
     COMPILE_DEFINITIONS OPENVR_HAS_COLLABORATION
     )
 endif()
+
+set(openvr_input_files
+  pv_openvr_actions.json
+  pv_openvr_binding_hpmotioncontroller.json
+  pv_openvr_binding_vive_controller.json
+  pv_openvr_binding_oculus_touch.json
+)
+
+foreach(inputfile IN LISTS openvr_input_files)
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/${inputfile}
+    "${CMAKE_BINARY_DIR}/${_paraview_build_plugin_directory}/${inputfile}"
+    COPYONLY)
+endforeach()
+
+install(
+  FILES ${openvr_input_files}
+  DESTINATION ${_paraview_build_plugin_directory}
+  COMPONENT   ${_paraview_build_PLUGINS_COMPONENT}
+)
 
 target_link_libraries(OpenVR
   PRIVATE

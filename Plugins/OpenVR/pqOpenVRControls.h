@@ -52,12 +52,15 @@ public:
   void SetCurrentMotionFactor(double val);
   void SetCurrentScaleFactor(double val);
 
+  void SetFieldValues(std::string vals);
+
 protected:
   vtkPVOpenVRHelper* Helper;
   bool NoForward;
 
 protected Q_SLOTS:
   void resetPositions();
+  void assignFieldValue();
 
 private:
   void constructor(vtkPVOpenVRHelper* val);

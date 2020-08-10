@@ -17,7 +17,7 @@
  *
  * This class exists as part of the desktop GUI for ParaView and exposes
  * OpenVR settings and controls.
-*/
+ */
 
 #include <QDockWidget>
 
@@ -49,14 +49,15 @@ public:
 protected:
   vtkPVOpenVRHelper* Helper;
   pqOpenVRControls* OpenVRControls;
+  void attachToCurrentView();
+  void sendToOpenVR();
+  void showVRView();
 
 protected Q_SLOTS:
-  void sendToOpenVR();
 
   void exportLocationsAsSkyboxes();
   void exportLocationsAsView();
 
-  void multiSampleChanged(int state);
   void defaultCropThicknessChanged(const QString& text);
 
   void setActiveView(pqView*);
@@ -75,6 +76,9 @@ protected Q_SLOTS:
 
   void collaborationConnect();
   void collaborationCallback(std::string const& data, void* cd);
+
+  void editableFieldChanged(const QString& text);
+  void fieldValuesChanged(const QString& text);
 
 private:
   void constructor();
