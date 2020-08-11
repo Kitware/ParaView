@@ -55,6 +55,11 @@ This also makes `pqQVTKWidget` not to extend from `pqQVTKWidgetBase`, instead,
 extend from QWidget and contain (composition) either an instance of
 `QVTKOpenGLNativeWidget` or `QVTKOpenGLStereoWidget`.
 
+###Consistent font size in text source
+
+Corrected a setting that resulted in unwanted scaling of the font size from the
+*Text Source* that scaled according to the size of the *RenderView*.
+
 Changes in 5.8
 ---------------
 
