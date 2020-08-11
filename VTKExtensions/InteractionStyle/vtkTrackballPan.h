@@ -28,6 +28,7 @@
 
 #include "vtkCameraManipulator.h"
 #include "vtkPVVTKExtensionsInteractionStyleModule.h" // needed for export macro
+#include <memory>
 
 class VTKPVVTKEXTENSIONSINTERACTIONSTYLE_EXPORT vtkTrackballPan : public vtkCameraManipulator
 {
@@ -35,6 +36,9 @@ public:
   static vtkTrackballPan* New();
   vtkTypeMacro(vtkTrackballPan, vtkCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent) override;
+
+  void OnKeyUp(vtkRenderWindowInteractor*) override;
+  void OnKeyDown(vtkRenderWindowInteractor*) override;
 
   //@{
   /**
@@ -52,6 +56,9 @@ protected:
 
   vtkTrackballPan(const vtkTrackballPan&) = delete;
   void operator=(const vtkTrackballPan&) = delete;
+
+  struct Internal;
+  std::unique_ptr<Internal> Internals;
 };
 
 #endif

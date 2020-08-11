@@ -34,8 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqInteractivePropertyWidget.h"
 
-#include <memory>
-
 /**
  * @class pqBoxPropertyWidget
  * @brief custom property widget using vtkBoxWidget2 and vtkBoxRepresentation.
@@ -81,27 +79,16 @@ public:
     bool hideReferenceBounds = false);
   ~pqBoxPropertyWidget() override;
 
-  void mouseMoveEvent(QMouseEvent*) override;
-  void keyPressEvent(QKeyEvent*) override;
-  void keyReleaseEvent(QKeyEvent*) override;
-  void focusOutEvent(QFocusEvent*) override;
-
 protected Q_SLOTS:
   /**
   * Places the interactive widget using current data source information.
   */
   void placeWidget() override;
-  void onEnableInteractive(bool isEnabled);
 
 private:
   Q_DISABLE_COPY(pqBoxPropertyWidget)
-  void translate(double);
-
   pqPropertyLinks WidgetLinks;
   bool BoxIsRelativeToInput;
-
-  struct pqInternals;
-  std::unique_ptr<pqInternals> Internals;
 };
 
 #endif
