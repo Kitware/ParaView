@@ -180,6 +180,10 @@ updateMD5sum.sh v@MAJOR@.@MINOR@
  - [ ] In the `paraview` repository, run `git push origin v@VERSION@@RC@`.
  - [ ] In the `paraview-superbuild` repository, run `git push origin v@VERSION@@RC@`.
 
+ # Spack
+
+ - [ ] Update Spack package: https://github.com/spack/spack/blob/develop/var/spack/repos/builtin/packages/paraview/package.py
+
 <!--
 If making a non-RC release:
 
