@@ -117,14 +117,14 @@ void pqBoolPropertyWidgetDecorator::updateBoolPropertyState()
   }
   if (this->Property && this->Function == "greaterthan")
   {
-    int number = this->Value.toInt();
-    bool enabled = vtkSMUncheckedPropertyHelper(this->Property).GetAsInt(this->Index) > number;
+    double number = this->Value.toDouble();
+    bool enabled = vtkSMUncheckedPropertyHelper(this->Property).GetAsDouble(this->Index) > number;
     this->setBoolProperty(enabled);
   }
   if (this->Property && this->Function == "lessthan")
   {
-    int number = this->Value.toInt();
-    bool enabled = vtkSMUncheckedPropertyHelper(this->Property).GetAsInt(this->Index) < number;
+    double number = this->Value.toDouble();
+    bool enabled = vtkSMUncheckedPropertyHelper(this->Property).GetAsDouble(this->Index) < number;
     this->setBoolProperty(enabled);
   }
   if (this->Property && this->Function == "equals")
