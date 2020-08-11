@@ -4,6 +4,8 @@ notice.
 """
 from .. import logger
 
+from ..modules.vtkPVInSitu import vtkInSituInitializationHelper, vtkInSituPipelinePython
+
 ActiveDataDescription = None
 ActivePythonPipelineModule = None
 
@@ -15,13 +17,22 @@ def SetActiveDataDescription(dataDesc, module):
 def IsInsitu():
     """Returns True if executing in an insitu environment, else false"""
     global ActiveDataDescription
+    if vtkInSituInitializationHelper.IsInitialized():
+        # Catalyst 2.0
+        return True
+    # Legacy Catalyst
     return ActiveDataDescription is not None
 
 def IsInsituInput(name):
     global ActiveDataDescription
     if not name or not IsInsitu():
         return False
-    if ActiveDataDescription.GetInputDescriptionByName(name) is not None:
+
+    if vtkInSituInitializationHelper.IsInitialized():
+        # Catalyst 2.0
+        return vtkInSituInitializationHelper.GetProducer(name) != None
+    elif ActiveDataDescription.GetInputDescriptionByName(name) is not None:
+        # Legacy Catalyst
         return True
     return False
 
@@ -33,16 +44,31 @@ def RegisterExtractGenerator(generator):
     global ActivePythonPipelineModule
     assert IsInsitu()
 
-    module = ActivePythonPipelineModule
-    if not hasattr(module, "_extract_generators"):
-        from vtkmodules.vtkCommonCore import vtkCollection
-        module._extract_generators = vtkCollection()
-    module._extract_generators.AddItem(generator.SMProxy)
+    if vtkInSituInitializationHelper.IsInitialized():
+        # Catalyst 2.0
+        vtkInSituPipelinePython.RegisterExtractGenerator(generator.SMProxy)
+    else:
+        module = ActivePythonPipelineModule
+        if not hasattr(module, "_extract_generators"):
+            from vtkmodules.vtkCommonCore import vtkCollection
+            module._extract_generators = vtkCollection()
+        module._extract_generators.AddItem(generator.SMProxy)
 
 def CreateProducer(name):
     global ActiveDataDescription, ActivePythonPipelineModule
     assert IsInsituInput(name)
 
+    if vtkInSituInitializationHelper.IsInitialized():
+        # Catalyst 2.0
+        from paraview import servermanager
+        producer = servermanager._getPyProxy(vtkInSituInitializationHelper.GetProducer(name))
+
+        # since state file may have arbitrary properties being specified
+        # on the original source, we ensure we ignore them
+        producer.IgnoreUnknownSetRequests = True
+        return producer
+
+    # Legacy Catalyst
     module = ActivePythonPipelineModule
     if not hasattr(module, "_producer_map"):
         module._producer_map = {}
@@ -175,7 +201,9 @@ def LoadPackageFromZip(zipfilename, packagename=None):
 
     z = zipimport.zipimporter(zipfilename)
     assert z.is_package(package)
-    return z.load_module(package)
+    module = z.load_module(package)
+    module._pv_is_zip = True
+    return module
 
 
 def LoadPackageFromDir(path):
@@ -196,6 +224,21 @@ def LoadModuleFromFile(fname):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+def LoadSubmodule(name, module):
+    from . import log_level
+    from .. import log
+    import importlib, importlib.util, zipimport, os.path
+    log(log_level(), "importing '%s'", name)
+    if hasattr(module, "_pv_is_zip"):
+        z = zipimport.zipimporter(module.__path__[0])
+        s_module = z.load_module(name)
+    else:
+        spec = importlib.util.spec_from_file_location(name,
+                os.path.join(module.__path__[0], "%s.py" % name))
+        s_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(s_module)
+    return s_module
 
 _temp_directory = None
 def _mpi_exchange_if_needed(filename):

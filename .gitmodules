@@ -12,3 +12,6 @@
 	path = ThirdParty/QtTesting/vtkqttesting
 	url = https://gitlab.kitware.com/paraview/qttesting.git
 	branch = for/paraview
+[submodule "ThirdParty/catalyst/vtkcatalyst/catalyst"]
+	path = ThirdParty/catalyst/vtkcatalyst/catalyst
+	url = https://gitlab.kitware.com/paraview/catalyst.git

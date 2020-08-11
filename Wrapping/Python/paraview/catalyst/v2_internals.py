@@ -215,7 +215,7 @@ def _validate_and_initialize(module, is_zip):
     module.catalyst_params["extracts_controller"] = _create_extracts_controller(module.options)
 
 def _load_analysis_scripts(module):
-    import importlib, importlib.util, zipimport, os.path
+    from .detail import LoadSubmodule
     params  = module.catalyst_params
     if params["analysis_modules"] is not None:
         # already loaded, nothing to do.
@@ -225,18 +225,10 @@ def _load_analysis_scripts(module):
         params["analysis_modules"] = []
         return
 
-    log(log_level(), "loading analsis modules '%s'", str(module.scripts))
+    log(log_level(), "loading analysis modules '%s'", str(module.scripts))
     analysis_modules = []
     for script in module.scripts:
-        log(log_level(), "importing '%s'", script)
-        if params["is_zip"]:
-            z = zipimport.zipimporter(module.__path__[0])
-            s_module = z.load_module(script)
-        else:
-            spec = importlib.util.spec_from_file_location(script,
-                    os.path.join(module.__path__[0], "%s.py" % script))
-            s_module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(s_module)
+        s_module = LoadSubmodule(script, module)
         analysis_modules.append(s_module)
     # check if any of the analysis_modules customized execution.
     for m in analysis_modules:

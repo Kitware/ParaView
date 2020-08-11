@@ -1,0 +1,20 @@
+NAME
+  ParaView::VTKExtensionsConduit
+LIBRARY_NAME
+  vtkPVVTKExtensionsConduit
+DESCRIPTION
+  Producer, reader and writer algorithms for Conduit
+GROUPS
+  PARAVIEW_CORE
+KIT
+  ParaView::CoreKit
+DEPENDS
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  ParaView::vtkcatalyst
+TEST_DEPENDS
+  ParaView::vtkcatalyst
+  VTK::TestingCore
+TEST_LABELS
+  ParaView

@@ -12,6 +12,7 @@ set(python_files
   paraview/catalyst/__init__.py
   paraview/catalyst/bridge.py
   paraview/catalyst/detail.py
+  paraview/catalyst/insitu_pipeline.py
   paraview/catalyst/v2_internals.py
   paraview/collaboration.py
   paraview/coprocessing.py
