@@ -356,4 +356,13 @@
     <!-- end of "extract_writers" -->
   </ProxyGroup>
 
+  <ProxyGroup name="misc_internals">
+    <Proxy name="DelimitedTextWriter" class="vtkDelimitedTextWriter">
+      <Documentation>
+        This is used by vtkSMExtractsController to write summary table.
+        Eventually, this will be replaced by a Cinema writer.
+      </Documentation>
+      <StringVectorProperty name="FileName" command="SetFileName" />
+    </Proxy>
+  </ProxyGroup>
 </ServerManagerConfiguration>

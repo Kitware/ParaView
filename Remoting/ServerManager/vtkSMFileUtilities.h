@@ -79,8 +79,6 @@ protected:
 private:
   vtkSMFileUtilities(const vtkSMFileUtilities&) = delete;
   void operator=(const vtkSMFileUtilities&) = delete;
-
-  vtkSMSession* Session;
 };
 
 #endif

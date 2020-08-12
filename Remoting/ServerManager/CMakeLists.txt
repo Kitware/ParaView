@@ -30,6 +30,7 @@
 #==========================================================================
 set(classes
   vtkLoadStateOptions
+  vtkRemoteWriterHelper
   vtkPVCatalystChannelInformation
   vtkPVCatalystSessionCore
   vtkPVFilePathEncodingHelper

@@ -708,6 +708,20 @@
         <Documentation>Invoke to clear verbosity elevations.</Documentation>
       </Property>
     </Proxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkRemoteWriterHelper" name="RemoteWriterHelper" processes="client|dataserver">
+      <Documentation>
+        Proxy used internally to help write data generated on the client-side on the data-server side.
+      </Documentation>
+      <IntVectorProperty name="OutputDestination"
+                         command="SetOutputDestination"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="never" />
+      <ProxyProperty name="Writer" command="SetWriter" />
+    </SourceProxy>
+
     <!-- End of group "misc" -->
   </ProxyGroup>
 

@@ -22,6 +22,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkProcessModule.h"
+#include "vtkRemoteWriterHelper.h"
 #include "vtkSMExtractTriggerProxy.h"
 #include "vtkSMExtractWriterProxy.h"
 #include "vtkSMFileUtilities.h"
@@ -39,10 +40,6 @@
 #include "vtkSmartPointer.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
-
-#if VTK_MODULE_ENABLE_VTK_IOCore
-#include "vtkDelimitedTextWriter.h"
-#endif
 
 // clang-format off
 #include "vtk_doubleconversion.h"
@@ -341,20 +338,18 @@ vtkSMProxy* vtkSMExtractsController::CreateExtractGenerator(
   {
     return nullptr;
   }
+  controller->PreInitializeProxy(writer);
+  writer->SetInput(proxy);
+  // don't call PostInitializeProxy here, let
+  // vtkSMParaViewPipelineController::RegisterProxiesForProxyListDomains handle
+  // that.
+  // controller->PostInitializeProxy(writer);
 
   const std::string pname = registrationName
     ? std::string(registrationName)
     : pxm->GetUniqueProxyName("extract_generators", writer->GetXMLLabel());
   auto generator =
     vtkSmartPointer<vtkSMProxy>::Take(pxm->NewProxy("extract_generators", "Extractor"));
-  // add it to the proxy list domain too so the UI shows it correctly.
-  if (auto prop = generator->GetProperty("Writer"))
-  {
-    if (auto pld = prop->FindDomain<vtkSMProxyListDomain>())
-    {
-      pld->AddProxy(writer);
-    }
-  }
 
   SM_SCOPED_TRACE(CreateExtractGenerator)
     .arg("producer", proxy)
@@ -363,7 +358,6 @@ vtkSMProxy* vtkSMExtractsController::CreateExtractGenerator(
     .arg("registrationName", pname.c_str());
 
   controller->PreInitializeProxy(generator);
-  writer->SetInput(proxy);
   vtkSMPropertyHelper(generator, "Writer").Set(writer);
 
   // this is done so that producer-consumer links are setup properly. Makes it easier
@@ -378,8 +372,18 @@ vtkSMProxy* vtkSMExtractsController::CreateExtractGenerator(
   }
   controller->PostInitializeProxy(generator);
   generator->UpdateVTKObjects();
-  controller->RegisterExtractGeneratorProxy(generator, pname.c_str());
 
+  // add it to the proxy list domain too so the UI shows it correctly.
+  // doing this before calling RegisterExtractGeneratorProxy also ensures that
+  // it gets registered as a helper proxy.
+  if (auto prop = generator->GetProperty("Writer"))
+  {
+    if (auto pld = prop->FindDomain<vtkSMProxyListDomain>())
+    {
+      pld->AddProxy(writer);
+    }
+  }
+  controller->RegisterExtractGeneratorProxy(generator, pname.c_str());
   return generator;
 }
 
@@ -507,7 +511,6 @@ std::string vtkSMExtractsController::GetName(vtkSMExtractWriterProxy* writer)
 bool vtkSMExtractsController::SaveSummaryTable(
   const std::string& fname, vtkSMSessionProxyManager* pxm)
 {
-#if VTK_MODULE_ENABLE_VTK_IOCore
   if (!this->SummaryTable || !pxm)
   {
     return false;
@@ -518,16 +521,34 @@ bool vtkSMExtractsController::SaveSummaryTable(
     return false;
   }
 
-  // TODO: in client-server mode, the file must be saved on the server-side.
-  vtkNew<vtkDelimitedTextWriter> writer;
-  writer->SetInputDataObject(this->SummaryTable);
-  writer->SetFileName(
-    vtksys::SystemTools::JoinPath({ this->ExtractsOutputDirectory, "/" + fname }).c_str());
-  return writer->Write() != 0;
-#else
-  vtkErrorMacro("VTK::IOCore module not built. Cannot save summary table.");
-  return false;
-#endif
+  // TODO: eventually, this must be replaced by a Cinema table writer.
+  auto writer =
+    vtkSmartPointer<vtkSMProxy>::Take(pxm->NewProxy("misc_internals", "DelimitedTextWriter"));
+  if (!writer)
+  {
+    vtkErrorMacro("Failed to create 'DelimitedTextWriter'. Cannot write summary table.");
+    return false;
+  }
+
+  auto helper = vtkSmartPointer<vtkSMSourceProxy>::Take(
+    vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("misc", "RemoteWriterHelper")));
+  if (!helper)
+  {
+    vtkErrorMacro("Failed to create 'RemoteWriterHelper' proxy. Cannot write summary table.");
+    return false;
+  }
+
+  writer->SetLocation(helper->GetLocation());
+  vtkSMPropertyHelper(writer, "FileName")
+    .Set(vtksys::SystemTools::JoinPath({ this->ExtractsOutputDirectory, "/" + fname }).c_str());
+  writer->UpdateVTKObjects();
+  vtkSMPropertyHelper(helper, "OutputDestination").Set(vtkPVSession::DATA_SERVER_ROOT);
+  vtkSMPropertyHelper(helper, "Writer").Set(writer);
+  helper->UpdateVTKObjects();
+
+  vtkAlgorithm::SafeDownCast(helper->GetClientSideObject())->SetInputDataObject(this->SummaryTable);
+  helper->UpdatePipeline();
+  return true;
 }
 
 //----------------------------------------------------------------------------

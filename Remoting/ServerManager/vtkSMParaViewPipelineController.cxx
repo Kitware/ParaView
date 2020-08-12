@@ -19,6 +19,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h"
+#include "vtkPVLogger.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProperty.h"
@@ -189,12 +190,16 @@ bool vtkSMParaViewPipelineController::CreateProxiesForProxyListDomains(vtkSMProx
       {
         if (vtkSMProxy* dproxy = pld->GetProxy(cc))
         {
-          // it makes sense to have all proxies in the ProxyListDomain have the
-          // same location as the proxy to which the property belongs. Note this
-          // may be different that proxy for cases where it's a property exposed
-          // from a subproxy.
+          // Ensure that the `dproxy` a location that is superset of the location for the `proxy`.
+          // Note,`parentProxy` may be different than `proxy` for cases where
+          // it's a property exposed from a subproxy.
           vtkSMProxy* parentProxy = iter->GetProperty()->GetParent();
-          dproxy->SetLocation(parentProxy->GetLocation());
+          const auto location = dproxy->GetLocation() | parentProxy->GetLocation();
+          vtkVLogIfF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), location != dproxy->GetLocation(),
+            "Location for proxy (%s) in proxy list domain for property '%s' "
+            "on proxy (%s) has been changed.",
+            proxy->GetLogNameOrDefault(), iter->GetKey(), dproxy->GetLogNameOrDefault());
+          dproxy->SetLocation(location);
           this->PreInitializeProxy(dproxy);
         }
       }
