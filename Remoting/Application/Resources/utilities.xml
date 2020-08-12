@@ -874,7 +874,7 @@
 
       <ProxyProperty name="GlobalTrigger">
         <ProxyListDomain name="proxy_list">
-          <Proxy group="extract_triggers" name="Time" />
+          <Proxy group="extract_triggers" name="TimeStep" />
         </ProxyListDomain>
       </ProxyProperty>
 
@@ -906,7 +906,7 @@
 
       <ProxyProperty name="CatalystLiveTrigger" panel_visibility="advanced">
         <ProxyListDomain name="proxy_list">
-          <Proxy group="extract_triggers" name="Time" />
+          <Proxy group="extract_triggers" name="TimeStep" />
         </ProxyListDomain>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
