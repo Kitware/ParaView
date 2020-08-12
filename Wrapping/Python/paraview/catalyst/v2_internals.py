@@ -18,41 +18,22 @@ def load_package_from_zip(zipfilename, packagename=None):
 
     :returns: the module object for the package on success else None
     """
-    import zipimport, os.path
-
-    zipfilename = _mpi_exchange_if_needed(zipfilename)
-    if packagename:
-        package = packagename
-    else:
-        basename = os.path.basename(zipfilename)
-        package = os.path.splitext(basename)[0]
-
-    z = zipimport.zipimporter(zipfilename)
-    assert z.is_package(package)
+    from .detail import LoadPackageFromZip
+    module = LoadPackageFromZip(zipfilename, packagename)
     # todo: validate package now, that way we can raise failure here itself.
     # rather than waiting till request_data_description or co_process
-
-    module = z.load_module(package)
     _validate_and_initialize(module, is_zip=True)
     return module
 
 def load_package_from_dir(path):
-    import importlib.util, os.path
-    packagename = os.path.basename(path)
-    init_py = os.path.join(path, "__init__.py")
-    spec = importlib.util.spec_from_file_location(packagename, init_py)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    from .detail import LoadPackageFromDir
+    module = LoadPackageFromDir(path)
     _validate_and_initialize(module, is_zip=False)
     return module
 
 def load_module_from_file(fname):
-    import importlib.util, os.path
-    fname = _mpi_exchange_if_needed(fname)
-    modulename = os.path.basename(fname)
-    spec = importlib.util.spec_from_file_location(modulename, fname)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    from .detail import LoadModuleFromFile
+    module = LoadModuleFromFile(fname)
     _validate_and_initialize(module, is_zip=False)
     return module
 
