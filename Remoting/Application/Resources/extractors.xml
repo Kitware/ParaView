@@ -12,7 +12,7 @@
 
       <ProxyProperty name="Trigger">
         <ProxyListDomain name="proxy_list">
-          <Proxy group="extract_triggers" name="Time" />
+          <Proxy group="extract_triggers" name="TimeStep" />
         </ProxyListDomain>
       </ProxyProperty>
       <ProxyProperty name="Writer">
@@ -23,7 +23,7 @@
   </ProxyGroup>
 
   <ProxyGroup name="extract_triggers">
-    <ExtractTriggerProxy name="Time">
+    <ExtractTriggerProxy name="TimeStep">
 
       <IntVectorProperty name="UseStartTimeStep"
                          number_of_elements="1"

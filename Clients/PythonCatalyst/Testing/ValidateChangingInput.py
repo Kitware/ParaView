@@ -5,7 +5,7 @@ options = catalyst.Options()
 
 # ensure not extracts get saved anywhere.
 options.ExtractsOutputDirectory = ""
-options.GlobalTrigger = "Time"
+options.GlobalTrigger = "TimeStep"
 
 scripts = []
 __all__ = scripts + ["options"]

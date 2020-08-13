@@ -6,7 +6,7 @@
 from paraview import catalyst
 options = catalyst.Options()
 options.EnableCatalystLive = 1
-options.CatalystLiveTrigger = 'Time'
+options.CatalystLiveTrigger = 'TimeStep'
 options.CatalystLiveURL = "localhost:22222"
 
 
