@@ -46,7 +46,9 @@ class PQWIDGETS_EXPORT pqDoubleRangeWidget : public pqDoubleSliderWidget
   Q_OBJECT
   Q_PROPERTY(double minimum READ minimum WRITE setMinimum)
   Q_PROPERTY(double maximum READ maximum WRITE setMaximum)
-  VTK_LEGACY(Q_PROPERTY(bool strictRange READ strictRange WRITE setStrictRange));
+#if !defined(VTK_LEGACY_REMOVE)
+  Q_PROPERTY(bool strictRange READ strictRange WRITE setStrictRange);
+#endif
   Q_PROPERTY(int resolution READ resolution WRITE setResolution)
 
   typedef pqDoubleSliderWidget Superclass;
