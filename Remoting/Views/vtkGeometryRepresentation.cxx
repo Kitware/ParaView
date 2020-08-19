@@ -719,6 +719,31 @@ void vtkGeometryRepresentation::SetVisibility(bool val)
 }
 
 //----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetCoordinateShiftScaleMethod(int val)
+{
+  vtkOpenGLPolyDataMapper* mapper = vtkOpenGLPolyDataMapper::SafeDownCast(this->Mapper);
+  if (mapper)
+  {
+    mapper->SetVBOShiftScaleMethod(val);
+  }
+  mapper = vtkOpenGLPolyDataMapper::SafeDownCast(this->LODMapper);
+  if (mapper)
+  {
+    mapper->SetVBOShiftScaleMethod(val);
+  }
+}
+
+int vtkGeometryRepresentation::GetCoordinateShiftScaleMethod()
+{
+  vtkOpenGLPolyDataMapper* mapper = vtkOpenGLPolyDataMapper::SafeDownCast(this->Mapper);
+  if (mapper)
+  {
+    return mapper->GetVBOShiftScaleMethod();
+  }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 bool vtkGeometryRepresentation::NeedsOrderedCompositing()
 {
   // One would think simply calling `vtkActor::HasTranslucentPolygonalGeometry`
