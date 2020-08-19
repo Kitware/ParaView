@@ -181,16 +181,21 @@ bool vtkSMImageExtractWriterProxy::Write(vtkSMExtractsController* extractor)
           params.insert({ "theta", std::to_string(theta) });
           extractor->AddSummaryEntry(this, convertedname, params);
         }
-        if (old_time != VTK_DOUBLE_MAX && view != nullptr)
-        {
-          vtkSMPropertyHelper(view, "ViewTime").Set(old_time);
-          view->UpdateVTKObjects();
-        }
         if (!status)
         {
+          if (old_time != VTK_DOUBLE_MAX && view != nullptr)
+          {
+            vtkSMPropertyHelper(view, "ViewTime").Set(old_time);
+            view->UpdateVTKObjects();
+          }
           return false;
         }
       }
+    }
+    if (old_time != VTK_DOUBLE_MAX && view != nullptr)
+    {
+      vtkSMPropertyHelper(view, "ViewTime").Set(old_time);
+      view->UpdateVTKObjects();
     }
     return true;
   }
