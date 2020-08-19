@@ -6,7 +6,10 @@
 #include <vtkCPInputDataDescription.h>
 #include <vtkCPProcessor.h>
 #include <vtkCPPythonScriptPipeline.h>
+#include <vtkCPPythonScriptV2Pipeline.h>
 #include <vtkNew.h>
+
+#include <vtksys/SystemTools.hxx>
 
 // Sample C++ simulation code that provides different levels of ghost cells
 // for either a vtkUnstructuredGrid of vtkImageData. This example is
@@ -98,9 +101,19 @@ int main(int argc, char* argv[])
   processor->Initialize();
   for (auto& script : scripts)
   {
-    vtkNew<vtkCPPythonScriptPipeline> pipeline;
-    pipeline->Initialize(script.c_str());
-    processor->AddPipeline(pipeline);
+    std::string ext = vtksys::SystemTools::GetFilenameLastExtension(script);
+    if (ext == ".zip")
+    {
+      vtkNew<vtkCPPythonScriptV2Pipeline> pipeline;
+      pipeline->InitializeFromZIP(script.c_str());
+      processor->AddPipeline(pipeline);
+    }
+    else
+    {
+      vtkNew<vtkCPPythonScriptPipeline> pipeline;
+      pipeline->Initialize(script.c_str());
+      processor->AddPipeline(pipeline);
+    }
   }
   vtkIdType numberOfTimeSteps = 20;
   for (vtkIdType timeStep = 0; timeStep < numberOfTimeSteps; timeStep++)

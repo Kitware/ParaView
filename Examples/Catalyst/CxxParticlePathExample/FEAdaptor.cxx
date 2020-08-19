@@ -6,6 +6,7 @@
 #include <vtkCPInputDataDescription.h>
 #include <vtkCPProcessor.h>
 #include <vtkCPPythonScriptPipeline.h>
+#include <vtkCPPythonScriptV2Pipeline.h>
 #include <vtkCellData.h>
 #include <vtkCellType.h>
 #include <vtkDoubleArray.h>
@@ -14,6 +15,8 @@
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkUnstructuredGrid.h>
+
+#include <vtksys/SystemTools.hxx>
 
 namespace
 {
@@ -27,8 +30,8 @@ void BuildVTKGrid(Grid& grid, vtkUnstructuredGrid* vtkgrid)
   pointArray->SetArray(
     grid.GetPointsArray(), static_cast<vtkIdType>(grid.GetNumberOfPoints() * 3), 1);
   vtkNew<vtkPoints> points;
-  points->SetData(pointArray.GetPointer());
-  vtkgrid->SetPoints(points.GetPointer());
+  points->SetData(pointArray);
+  vtkgrid->SetPoints(points);
 
   // create the cells
   size_t numCells = grid.GetNumberOfCells();
@@ -54,7 +57,7 @@ void UpdateVTKAttributes(
       velocity->SetName("velocity");
       velocity->SetNumberOfComponents(3);
       velocity->SetNumberOfTuples(static_cast<vtkIdType>(grid.GetNumberOfPoints()));
-      vtkgrid->GetPointData()->AddArray(velocity.GetPointer());
+      vtkgrid->GetPointData()->AddArray(velocity);
     }
     vtkDoubleArray* velocity =
       vtkDoubleArray::SafeDownCast(vtkgrid->GetPointData()->GetArray("velocity"));
@@ -78,7 +81,7 @@ void UpdateVTKAttributes(
       vtkNew<vtkFloatArray> pressure;
       pressure->SetName("pressure");
       pressure->SetNumberOfComponents(1);
-      vtkgrid->GetCellData()->AddArray(pressure.GetPointer());
+      vtkgrid->GetCellData()->AddArray(pressure);
     }
     vtkFloatArray* pressure =
       vtkFloatArray::SafeDownCast(vtkgrid->GetCellData()->GetArray("pressure"));
@@ -112,9 +115,19 @@ void Initialize(std::vector<std::string>& scripts)
   }
   for (std::vector<std::string>::iterator it = scripts.begin(); it != scripts.end(); it++)
   {
-    vtkNew<vtkCPPythonScriptPipeline> pipeline;
-    pipeline->Initialize(it->c_str());
-    Processor->AddPipeline(pipeline.GetPointer());
+    std::string ext = vtksys::SystemTools::GetFilenameLastExtension(it->c_str());
+    if (ext == ".zip")
+    {
+      vtkNew<vtkCPPythonScriptV2Pipeline> pipeline;
+      pipeline->InitializeFromZIP(it->c_str());
+      Processor->AddPipeline(pipeline);
+    }
+    else
+    {
+      vtkNew<vtkCPPythonScriptPipeline> pipeline;
+      pipeline->Initialize(it->c_str());
+      Processor->AddPipeline(pipeline);
+    }
   }
 }
 
@@ -139,13 +152,13 @@ void CoProcess(
     // is the last time step.
     dataDescription->ForceOutputOn();
   }
-  if (Processor->RequestDataDescription(dataDescription.GetPointer()) != 0)
+  if (Processor->RequestDataDescription(dataDescription) != 0)
   {
     vtkCPInputDataDescription* idd = dataDescription->GetInputDescriptionByName("input");
     vtkNew<vtkUnstructuredGrid> vtkgrid;
-    BuildVTKDataStructures(grid, attributes, vtkgrid.GetPointer(), idd);
-    idd->SetGrid(vtkgrid.GetPointer());
-    Processor->CoProcess(dataDescription.GetPointer());
+    BuildVTKDataStructures(grid, attributes, vtkgrid, idd);
+    idd->SetGrid(vtkgrid);
+    Processor->CoProcess(dataDescription);
   }
 }
 } // end of Catalyst namespace

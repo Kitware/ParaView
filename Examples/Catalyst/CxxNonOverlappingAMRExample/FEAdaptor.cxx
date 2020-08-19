@@ -40,28 +40,28 @@ void BuildVTKGrid()
   level0Grid->SetSpacing(4, 4, 4);
   level0Grid->SetOrigin(0, 0, 0);
   level0Grid->SetExtent(0, 10, 0, 20, 0, 20);
-  VTKGrid->SetDataSet(0, 0, level0Grid.GetPointer());
+  VTKGrid->SetDataSet(0, 0, level0Grid);
 
   // the first mid-level grid
   vtkNew<vtkUniformGrid> level1Grid0;
   level1Grid0->SetSpacing(2, 2, 2);
   level1Grid0->SetOrigin(40, 0, 0);
   level1Grid0->SetExtent(0, 8, 0, 20, 0, 40);
-  VTKGrid->SetDataSet(1, 0, level1Grid0.GetPointer());
+  VTKGrid->SetDataSet(1, 0, level1Grid0);
 
   // the second mid-level grid
   vtkNew<vtkUniformGrid> level1Grid1;
   level1Grid1->SetSpacing(2, 2, 2);
   level1Grid1->SetOrigin(40, 40, 0);
   level1Grid1->SetExtent(0, 40, 0, 20, 0, 40);
-  VTKGrid->SetDataSet(1, 1, level1Grid1.GetPointer());
+  VTKGrid->SetDataSet(1, 1, level1Grid1);
 
   // the lowest level grid
   vtkNew<vtkUniformGrid> level2Grid;
   level2Grid->SetSpacing(1, 1, 2);
   level2Grid->SetOrigin(0, 0, 0);
   level2Grid->SetExtent(56, 120, 0, 40, 0, 40);
-  VTKGrid->SetDataSet(2, 0, level2Grid.GetPointer());
+  VTKGrid->SetDataSet(2, 0, level2Grid);
 }
 }
 
@@ -82,7 +82,7 @@ void Initialize(int numScripts, char* scripts[])
   {
     vtkNew<vtkCPPythonScriptPipeline> pipeline;
     pipeline->Initialize(scripts[i]);
-    Processor->AddPipeline(pipeline.GetPointer());
+    Processor->AddPipeline(pipeline);
   }
 }
 
@@ -111,11 +111,11 @@ void CoProcess(double time, unsigned int timeStep, bool lastTimeStep)
     // is the last time step.
     dataDescription->ForceOutputOn();
   }
-  if (Processor->RequestDataDescription(dataDescription.GetPointer()) != 0)
+  if (Processor->RequestDataDescription(dataDescription) != 0)
   {
     BuildVTKGrid();
     dataDescription->GetInputDescriptionByName("input")->SetGrid(VTKGrid);
-    Processor->CoProcess(dataDescription.GetPointer());
+    Processor->CoProcess(dataDescription);
   }
 }
 } // end of Catalyst namespace

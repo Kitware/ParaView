@@ -29,8 +29,8 @@ void BuildVTKGrid(Grid& grid)
   pointArray->SetArray(
     grid.GetPointsArray(), static_cast<vtkIdType>(grid.GetNumberOfPoints() * 3), 1);
   vtkNew<vtkPoints> points;
-  points->SetData(pointArray.GetPointer());
-  VTKGrid->SetPoints(points.GetPointer());
+  points->SetData(pointArray);
+  VTKGrid->SetPoints(points);
 
   // create the cells
   size_t numCells = grid.GetNumberOfCells();
@@ -53,7 +53,7 @@ void UpdateVTKAttributes(Grid& grid, Attributes& attributes)
     velocity->SetName("velocity");
     velocity->SetNumberOfComponents(3);
     velocity->SetNumberOfTuples(static_cast<vtkIdType>(grid.GetNumberOfPoints()));
-    VTKGrid->GetPointData()->AddArray(velocity.GetPointer());
+    VTKGrid->GetPointData()->AddArray(velocity);
   }
   if (VTKGrid->GetCellData()->GetNumberOfArrays() == 0)
   {
@@ -61,7 +61,7 @@ void UpdateVTKAttributes(Grid& grid, Attributes& attributes)
     vtkNew<vtkFloatArray> pressure;
     pressure->SetName("pressure");
     pressure->SetNumberOfComponents(1);
-    VTKGrid->GetCellData()->AddArray(pressure.GetPointer());
+    VTKGrid->GetCellData()->AddArray(pressure);
   }
   vtkDoubleArray* velocity =
     vtkDoubleArray::SafeDownCast(VTKGrid->GetPointData()->GetArray("velocity"));
@@ -111,7 +111,7 @@ void Initialize(int outputFrequency, std::string fileName)
   vtkSMSession::ConnectToSelf();
   vtkNew<vtkCPPVSMPipeline> pipeline;
   pipeline->Initialize(outputFrequency, fileName);
-  Processor->AddPipeline(pipeline.GetPointer());
+  Processor->AddPipeline(pipeline);
 }
 
 void Finalize()
@@ -140,11 +140,11 @@ void CoProcess(
     // is the last time step.
     dataDescription->ForceOutputOn();
   }
-  if (Processor->RequestDataDescription(dataDescription.GetPointer()) != 0)
+  if (Processor->RequestDataDescription(dataDescription) != 0)
   {
     BuildVTKDataStructures(grid, attributes);
     dataDescription->GetInputDescriptionByName("input")->SetGrid(VTKGrid);
-    Processor->CoProcess(dataDescription.GetPointer());
+    Processor->CoProcess(dataDescription);
   }
 }
 } // end of Catalyst namespace

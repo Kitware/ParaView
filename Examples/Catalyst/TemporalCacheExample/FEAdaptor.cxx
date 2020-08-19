@@ -7,6 +7,7 @@
 #include <vtkCPInputDataDescription.h>
 #include <vtkCPProcessor.h>
 #include <vtkCPPythonScriptPipeline.h>
+#include <vtkCPPythonScriptV2Pipeline.h>
 #include <vtkCellData.h>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
@@ -20,6 +21,8 @@
 #include <vtkTemporalStatistics.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkXMLDataSetWriter.h>
+
+#include <vtksys/SystemTools.hxx>
 
 namespace CPPPipeline
 {
@@ -155,7 +158,7 @@ void UpdateVTKAttributes(Grid& grid, Attributes& attributes, vtkCPInputDataDescr
       vtkNew<vtkDoubleArray> occupancy;
       occupancy->SetName("occupancy");
       occupancy->SetNumberOfComponents(1);
-      VTKVolume->GetCellData()->AddArray(occupancy.GetPointer());
+      VTKVolume->GetCellData()->AddArray(occupancy);
     }
     vtkDoubleArray* occupancy =
       vtkDoubleArray::SafeDownCast(VTKVolume->GetCellData()->GetArray("occupancy"));
@@ -267,15 +270,25 @@ void Initialize(int argc, char* argv[])
   // Python Pipelines
   for (int i = 0; i < numScripts; i++)
   {
-    vtkNew<vtkCPPythonScriptPipeline> pipeline;
-    pipeline->Initialize(scripts[i]);
-    Processor->AddPipeline(pipeline.GetPointer());
+    std::string ext = vtksys::SystemTools::GetFilenameLastExtension(scripts[i]);
+    if (ext == ".zip")
+    {
+      vtkNew<vtkCPPythonScriptV2Pipeline> pipeline;
+      pipeline->InitializeFromZIP(scripts[i]);
+      Processor->AddPipeline(pipeline);
+    }
+    else
+    {
+      vtkNew<vtkCPPythonScriptPipeline> pipeline;
+      pipeline->Initialize(scripts[i]);
+      Processor->AddPipeline(pipeline);
+    }
   }
   // Optionally, the example C++ Pipeline too.
   if (enableCxxPipeline)
   {
     vtkNew<CPPPipeline::vtkCPTestPipeline> cpipeline;
-    Processor->AddPipeline(cpipeline.GetPointer());
+    Processor->AddPipeline(cpipeline);
   }
   delete[] scripts;
 }
@@ -294,7 +307,7 @@ void CoProcess(
     // is the last time step.
     dataDescription->ForceOutputOn();
   }
-  if (Processor->RequestDataDescription(dataDescription.GetPointer()) != 0)
+  if (Processor->RequestDataDescription(dataDescription) != 0)
   {
     vtkCPInputDataDescription* idd = dataDescription->GetInputDescriptionByName("volume");
     BuildVTKDataStructures(grid, attributes, idd);
@@ -325,7 +338,7 @@ void CoProcess(
       // The adaptor has to associate the cache with the pipeline every timestep
       idd2->SetTemporalCache(cache2);
     }
-    Processor->CoProcess(dataDescription.GetPointer());
+    Processor->CoProcess(dataDescription);
   }
 }
 
