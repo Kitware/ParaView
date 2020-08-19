@@ -10,6 +10,7 @@ KIT
   ParaView::ServerManagerKit
 IMPLEMENTS
   ParaView::RemotingServerManager
+IMPLEMENTABLE
 DEPENDS
   ParaView::RemotingCore
   ParaView::RemotingServerManager
