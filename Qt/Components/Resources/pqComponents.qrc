@@ -102,8 +102,7 @@
         <file>Icons/pqOpen.svg</file>
         <file>Icons/pqPalette.svg</file>
         <file>Icons/pqPaste.svg</file>
-        <file>Icons/pqPickCenter.png</file>
-        <file>Icons/pqPickCenter@2x.png</file>
+        <file>Icons/pqPickCenter.svg</file>
         <file>Icons/pqPlotCellOverTime24.png</file>
         <file>Icons/pqPlotGlobalOverTime.svg</file>
         <file>Icons/pqPlotLineOverTime24.png</file>
@@ -125,22 +124,17 @@
         <file>Icons/pqReflect.svg</file>
         <file>Icons/pqReloadFile.svg</file>
         <file>Icons/pqReset.svg</file>
-        <file>Icons/pqResetCamera.png</file>
-        <file>Icons/pqResetCamera@2x.png</file>
-        <file>Icons/pqResetCenter.png</file>
-        <file>Icons/pqResetCenter@2x.png</file>
+        <file>Icons/pqResetCamera.svg</file>
+        <file>Icons/pqResetCenter.svg</file>
         <file>Icons/pqResetRange.svg</file>
         <file>Icons/pqResetRangeCustom.svg</file>
         <file>Icons/pqResetRangeTemporal.svg</file>
         <file>Icons/pqResetSession.svg</file>
         <file>Icons/pqResetSettings.svg</file>
         <file>Icons/pqResetToVisibleRange.svg</file>
-        <file>Icons/pqRotateCameraCCW.png</file>
-        <file>Icons/pqRotateCameraCCW@2x.png</file>
-        <file>Icons/pqRotateCameraCW.png</file>
-        <file>Icons/pqRotateCameraCW@2x.png</file>
-        <file>Icons/pqRuler.png</file>
-        <file>Icons/pqRuler@2x.png</file>
+        <file>Icons/pqRotateCameraCCW.svg</file>
+        <file>Icons/pqRotateCameraCW.svg</file>
+        <file>Icons/pqRuler.svg</file>
         <file>Icons/pqRulerScale16.png</file>
         <file>Icons/pqSave.svg</file>
         <file>Icons/pqSaveAnimation.svg</file>
@@ -164,8 +158,7 @@
         <file>Icons/pqServer16@2x.png</file>
         <file>Icons/pqSettings.svg</file>
         <file>Icons/pqShadow24.png</file>
-        <file>Icons/pqShowCenterAxes.png</file>
-        <file>Icons/pqShowCenterAxes@2x.png</file>
+        <file>Icons/pqShowCenterAxes.svg</file>
         <file>Icons/pqShowOrientationAxes.png</file>
         <file>Icons/pqShowOrientationAxes@2x.png</file>
         <file>Icons/pqSideSetData.svg</file>
@@ -205,40 +198,26 @@
         <file>Icons/pqUndoCamera.svg</file>
         <file>Icons/pqUnknownData16.png</file>
         <file>Icons/pqUnstructuredGrid16.png</file>
-        <file>Icons/pqVcrBack.png</file>
-        <file>Icons/pqVcrBack@2x.png</file>
-        <file>Icons/pqVcrFirst.png</file>
-        <file>Icons/pqVcrFirst@2x.png</file>
-        <file>Icons/pqVcrForward.png</file>
-        <file>Icons/pqVcrForward@2x.png</file>
-        <file>Icons/pqVcrLast.png</file>
-        <file>Icons/pqVcrLast@2x.png</file>
-        <file>Icons/pqVcrLoop.png</file>
-        <file>Icons/pqVcrLoop@2x.png</file>
-        <file>Icons/pqVcrPause.png</file>
-        <file>Icons/pqVcrPause@2x.png</file>
-        <file>Icons/pqVcrPlay.png</file>
-        <file>Icons/pqVcrPlay@2x.png</file>
+        <file>Icons/pqVcrBack.svg</file>
+        <file>Icons/pqVcrFirst.svg</file>
+        <file>Icons/pqVcrForward.svg</file>
+        <file>Icons/pqVcrLast.svg</file>
+        <file>Icons/pqVcrLoop.svg</file>
+        <file>Icons/pqVcrPause.svg</file>
+        <file>Icons/pqVcrPlay.svg</file>
         <file>Icons/pqWarp.svg</file>
         <file>Icons/pqWindow16.png</file>
         <file>Icons/pqWindow16@2x.png</file>
         <file>Icons/pqWrench.svg</file>
-        <file>Icons/pqXMinus.png</file>
-        <file>Icons/pqXMinus@2x.png</file>
-        <file>Icons/pqXPlus.png</file>
-        <file>Icons/pqXPlus@2x.png</file>
-        <file>Icons/pqYMinus.png</file>
-        <file>Icons/pqYMinus@2x.png</file>
-        <file>Icons/pqYPlus.png</file>
-        <file>Icons/pqYPlus@2x.png</file>
+        <file>Icons/pqXMinus.svg</file>
+        <file>Icons/pqXPlus.svg</file>
+        <file>Icons/pqYMinus.svg</file>
+        <file>Icons/pqYPlus.svg</file>
         <file>Icons/pqYoungsMaterialInterface.svg</file>
-        <file>Icons/pqZMinus.png</file>
-        <file>Icons/pqZMinus@2x.png</file>
-        <file>Icons/pqZPlus.png</file>
-        <file>Icons/pqZPlus@2x.png</file>
+        <file>Icons/pqZMinus.svg</file>
+        <file>Icons/pqZPlus.svg</file>
         <file>Icons/pqZoomToData.svg</file>
-        <file>Icons/pqZoomToSelection.png</file>
-        <file>Icons/pqZoomToSelection@2x.png</file>
+        <file>Icons/pqZoomToSelection.svg</file>
         <file>Icons/warning.png</file>
         <file>Icons/pvIcon.svg</file>
         <file>Icons/pvIcon512.png</file>

@@ -116,10 +116,10 @@ void pqAnimationShortcutWidget::updateMenu()
   if (!cue)
   {
     QAction* playAction = new QAction(
-      QIcon(":/pqWidgets/Icons/pqVcrPlay24.png"), tr("Create a new animation track"), this);
+      QIcon(":/pqWidgets/Icons/pqVcrPlay.svg"), tr("Create a new animation track"), this);
     playAction->setData(QVariant(0));
     popupMenu->addAction(playAction);
-    this->setIcon(QIcon(":/pqWidgets/Icons/pqVcrPlay24.png"));
+    this->setIcon(QIcon(":/pqWidgets/Icons/pqVcrPlay.svg"));
   }
   else
   {
