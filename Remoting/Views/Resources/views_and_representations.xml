@@ -4180,6 +4180,8 @@
                       panel_visibility="advanced" />
             <Property name="Origin"
                       panel_visibility="advanced" />
+            <Property name="CoordinateShiftScaleMethod"
+                      panel_visibility="advanced"/>
           </PropertyGroup>
 
           <PropertyGroup label="Miscellaneous">
@@ -11479,6 +11481,34 @@
           <String value="Surface With Edges" />
         </StringListDomain>
       </StringVectorProperty>
+      <IntVectorProperty command="SetCoordinateShiftScaleMethod"
+                         default_values="2"
+                         name="CoordinateShiftScaleMethod"
+                         number_of_elements="1">
+        <Documentation>Options for normalizing the point coordinates.
+        The points are sent to the GPU as float data which can result in resolution issues
+        due to the limited precision of float. VTK includes a variety of methods to normalize
+        the point coordinates prior to sending them to the GPU. Auto shift scale is a good
+        setting that should work for most datasets. Focal point shift scale works based
+        on the current camera viewpoint which makes it the most robust setting but it
+        will renormalize the data occasionally as the camera's settings change which
+        requires reuploading the data to the GPU so there may be a performance cost.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Disable"
+                 value="0" />
+          <Entry text="Auto Shift Scale"
+                 value="1" />
+          <Entry text="Always Auto Shift Scale"
+                 value="2" />
+          <Entry text="Auto Shift Only"
+                 value="4" />
+          <Entry text="Near Focal Plane Shift Scale"
+                 value="5" />
+          <Entry text="Focal Point Shift Scale"
+                 value="6" />
+        </EnumerationDomain>
+      </IntVectorProperty>
       <StringVectorProperty command="SetTCoordArray"
                             default_values=""
                             label="Texture Coordinates"

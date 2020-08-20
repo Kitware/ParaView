@@ -114,6 +114,15 @@ public:
 
   //@{
   /**
+   * Set the shift scale method for the point coordinates
+   * see vtkOpenGLVertexBufferObject.h for more information.
+   */
+  void SetCoordinateShiftScaleMethod(int val);
+  int GetCoordinateShiftScaleMethod();
+  //@}
+
+  //@{
+  /**
    * Set the representation type. This adds VTK_SURFACE_WITH_EDGES to those
    * defined in vtkProperty.
    */
