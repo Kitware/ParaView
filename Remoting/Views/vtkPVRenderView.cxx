@@ -307,7 +307,7 @@ void vtkUpdateTrackballZoomManipulators(
 }
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVRenderView);
+vtkObjectFactoryNewMacro(vtkPVRenderView);
 vtkInformationKeyMacro(vtkPVRenderView, USE_LOD, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, USE_OUTLINE_FOR_LOD, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, LOD_RESOLUTION, Double);
