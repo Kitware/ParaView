@@ -34,13 +34,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqDataRepresentation.h"
+#include "pqPropertyLinks.h"
 #include "pqRenderView.h"
 #include "pqRenderViewSelectionReaction.h"
+#include "pqView.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMTrace.h"
 
 class pqAxesToolbar::pqInternals : public Ui::pqAxesToolbar
 {
+public:
+  pqView* View = nullptr;
+  pqPropertyLinks Links;
 };
 
 //-----------------------------------------------------------------------------
@@ -49,6 +54,8 @@ void pqAxesToolbar::constructor()
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
 
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this,
+    SLOT(setView(pqView*)), Qt::QueuedConnection);
   QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this,
     SLOT(updateEnabledState()), Qt::QueuedConnection);
 
@@ -84,21 +91,34 @@ pqAxesToolbar::~pqAxesToolbar()
 }
 
 //-----------------------------------------------------------------------------
+void pqAxesToolbar::setView(pqView* view)
+{
+  if (this->Internals->View == view)
+  {
+    return;
+  }
+
+  this->Internals->View = view;
+  this->Internals->Links.removeAllPropertyLinks();
+
+  if (!(view && view->getProxy()->GetProperty("OrientationAxesVisibility")))
+  {
+    return;
+  }
+
+  this->Internals->Links.addPropertyLink(this->Internals->actionShowOrientationAxes, "checked",
+    SIGNAL(toggled(bool)), view->getProxy(),
+    view->getProxy()->GetProperty("OrientationAxesVisibility"));
+  this->Internals->Links.addPropertyLink(this->Internals->actionShowCenterAxes, "checked",
+    SIGNAL(toggled(bool)), view->getProxy(), view->getProxy()->GetProperty("CenterAxesVisibility"));
+}
+
+//-----------------------------------------------------------------------------
 void pqAxesToolbar::updateEnabledState()
 {
   pqRenderView* renderView = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
-
   this->Internals->actionShowOrientationAxes->setEnabled(renderView != NULL);
-  this->Internals->actionShowOrientationAxes->blockSignals(true);
-  this->Internals->actionShowOrientationAxes->setChecked(
-    renderView ? renderView->getOrientationAxesVisibility() : false);
-  this->Internals->actionShowOrientationAxes->blockSignals(false);
-
   this->Internals->actionShowCenterAxes->setEnabled(renderView != NULL);
-  this->Internals->actionShowCenterAxes->blockSignals(true);
-  this->Internals->actionShowCenterAxes->setChecked(
-    renderView ? renderView->getCenterAxesVisibility() : false);
-  this->Internals->actionShowCenterAxes->blockSignals(false);
   this->Internals->actionResetCenter->setEnabled(
     pqActiveObjects::instance().activeRepresentation() != NULL);
 }
