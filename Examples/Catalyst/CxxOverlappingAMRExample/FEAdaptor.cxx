@@ -7,6 +7,7 @@
 #include <vtkCPInputDataDescription.h>
 #include <vtkCPProcessor.h>
 #include <vtkCPPythonScriptPipeline.h>
+#include <vtkCPPythonScriptV2Pipeline.h>
 #include <vtkCompositeDataIterator.h>
 #include <vtkDoubleArray.h>
 #include <vtkMultiProcessController.h>
@@ -14,6 +15,8 @@
 #include <vtkOverlappingAMR.h>
 #include <vtkPointData.h>
 #include <vtkUniformGrid.h>
+
+#include <vtksys/SystemTools.hxx>
 
 namespace
 {
@@ -81,7 +84,7 @@ void BuildVTKGrid(vtkOverlappingAMR* grid)
   // first and last point in each direction which is 1 more than cells in each direction
   level0Grid->SetExtent(level0CellDims[0], level0CellDims[1] + 1, level0CellDims[2],
     level0CellDims[3] + 1, level0CellDims[4], level0CellDims[5] + 1);
-  grid->SetDataSet(0, myRank, level0Grid.GetPointer());
+  grid->SetDataSet(0, myRank, level0Grid);
 
   // the mid-level grid
   vtkNew<vtkUniformGrid> level1Grid;
@@ -90,7 +93,7 @@ void BuildVTKGrid(vtkOverlappingAMR* grid)
   // first and last point in each direction which is 1 more than cells in each direction
   level1Grid->SetExtent(level1CellDims[0], level1CellDims[1] + 1, level1CellDims[2],
     level1CellDims[3] + 1, level1CellDims[4], level1CellDims[5] + 1);
-  grid->SetDataSet(1, myRank, level1Grid.GetPointer());
+  grid->SetDataSet(1, myRank, level1Grid);
 
   // the lowest level grids
   vtkNew<vtkUniformGrid> level2Grid_0;
@@ -99,14 +102,14 @@ void BuildVTKGrid(vtkOverlappingAMR* grid)
   // first and last point in each direction which is 1 more than cells in each direction
   level2Grid_0->SetExtent(level2CellDims_0[0], level2CellDims_0[1] + 1, level2CellDims_0[2],
     level2CellDims_0[3] + 1, level2CellDims_0[4], level2CellDims_0[5] + 1);
-  grid->SetDataSet(2, 2 * myRank, level2Grid_0.GetPointer());
+  grid->SetDataSet(2, 2 * myRank, level2Grid_0);
   vtkNew<vtkUniformGrid> level2Grid_1;
   level2Grid_1->SetOrigin(globalOrigin);
   level2Grid_1->SetSpacing(level2Spacing);
   // first and last point in each direction which is 1 more than cells in each direction
   level2Grid_1->SetExtent(level2CellDims_1[0], level2CellDims_1[1] + 1, level2CellDims_1[2],
     level2CellDims_1[3] + 1, level2CellDims_1[4], level2CellDims_1[5] + 1);
-  grid->SetDataSet(2, 2 * myRank + 1, level2Grid_1.GetPointer());
+  grid->SetDataSet(2, 2 * myRank + 1, level2Grid_1);
 }
 }
 
@@ -125,10 +128,19 @@ void Initialize(int numScripts, char* scripts[])
   }
   for (int i = 0; i < numScripts; i++)
   {
-    vtkNew<vtkCPPythonScriptPipeline> pipeline;
-    pipeline->Initialize(scripts[i]);
-    cerr << "adding in script " << scripts[i] << endl;
-    Processor->AddPipeline(pipeline.GetPointer());
+    std::string ext = vtksys::SystemTools::GetFilenameLastExtension(scripts[i]);
+    if (ext == ".zip")
+    {
+      vtkNew<vtkCPPythonScriptV2Pipeline> pipeline;
+      pipeline->InitializeFromZIP(scripts[i]);
+      Processor->AddPipeline(pipeline);
+    }
+    else
+    {
+      vtkNew<vtkCPPythonScriptPipeline> pipeline;
+      pipeline->Initialize(scripts[i]);
+      Processor->AddPipeline(pipeline);
+    }
   }
 }
 
@@ -164,7 +176,7 @@ void BuildFields(vtkOverlappingAMR* grid, vtkCPInputDataDescription* idd)
         pt[0] = -pt[0]; // just to make it change inversely proportional to myRank
         data->SetTypedTuple(i, pt);
       }
-      gridDataset->GetPointData()->AddArray(data.GetPointer());
+      gridDataset->GetPointData()->AddArray(data);
     }
   }
   iter->Delete();
@@ -182,14 +194,14 @@ void CoProcess(double time, unsigned int timeStep, bool lastTimeStep)
     // is the last time step.
     dataDescription->ForceOutputOn();
   }
-  if (Processor->RequestDataDescription(dataDescription.GetPointer()) != 0)
+  if (Processor->RequestDataDescription(dataDescription) != 0)
   {
     vtkNew<vtkOverlappingAMR> grid;
-    BuildVTKGrid(grid.GetPointer());
+    BuildVTKGrid(grid);
     vtkCPInputDataDescription* idd = dataDescription->GetInputDescriptionByName("input");
-    BuildFields(grid.GetPointer(), idd);
-    idd->SetGrid(grid.GetPointer());
-    Processor->CoProcess(dataDescription.GetPointer());
+    BuildFields(grid, idd);
+    idd->SetGrid(grid);
+    Processor->CoProcess(dataDescription);
   }
 }
 } // end of Catalyst namespace

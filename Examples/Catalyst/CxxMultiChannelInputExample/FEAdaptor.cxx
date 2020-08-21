@@ -6,6 +6,7 @@
 #include <vtkCPInputDataDescription.h>
 #include <vtkCPProcessor.h>
 #include <vtkCPPythonScriptPipeline.h>
+#include <vtkCPPythonScriptV2Pipeline.h>
 #include <vtkCellData.h>
 #include <vtkCellType.h>
 #include <vtkDoubleArray.h>
@@ -16,15 +17,27 @@
 #include <vtkPolyData.h>
 #include <vtkUnstructuredGrid.h>
 
+#include <vtksys/SystemTools.hxx>
+
 FEAdaptor::FEAdaptor(int numScripts, char* scripts[])
 {
   this->Processor = vtkCPProcessor::New();
   this->Processor->Initialize();
   for (int i = 0; i < numScripts; i++)
   {
-    vtkNew<vtkCPPythonScriptPipeline> pipeline;
-    pipeline->Initialize(scripts[i]);
-    this->Processor->AddPipeline(pipeline);
+    std::string ext = vtksys::SystemTools::GetFilenameLastExtension(scripts[i]);
+    if (ext == ".zip")
+    {
+      vtkNew<vtkCPPythonScriptV2Pipeline> pipeline;
+      pipeline->InitializeFromZIP(scripts[i]);
+      this->Processor->AddPipeline(pipeline);
+    }
+    else
+    {
+      vtkNew<vtkCPPythonScriptPipeline> pipeline;
+      pipeline->Initialize(scripts[i]);
+      this->Processor->AddPipeline(pipeline);
+    }
   }
 }
 

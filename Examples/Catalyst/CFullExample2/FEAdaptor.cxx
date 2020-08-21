@@ -4,8 +4,8 @@
 #include <vtkCPAdaptorAPI.h>
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
+#include <vtkCPInputDataDescription.h>
 #include <vtkCPProcessor.h>
-#include <vtkCPPythonScriptPipeline.h>
 #include <vtkCellData.h>
 #include <vtkCellType.h>
 #include <vtkDoubleArray.h>
@@ -28,8 +28,8 @@ void BuildVTKGrid(unsigned int numberOfPoints, double* pointsData, unsigned int 
   pointArray->SetNumberOfComponents(3);
   pointArray->SetArray(pointsData, static_cast<vtkIdType>(numberOfPoints * 3), 1);
   vtkNew<vtkPoints> points;
-  points->SetData(pointArray.GetPointer());
-  VTKGrid->SetPoints(points.GetPointer());
+  points->SetData(pointArray);
+  VTKGrid->SetPoints(points);
 
   // create the cells
   VTKGrid->Allocate(static_cast<vtkIdType>(numberOfCells * 9));
@@ -54,7 +54,7 @@ void UpdateVTKAttributes(vtkCPInputDataDescription* idd, unsigned int numberOfPo
       velocity->SetName("velocity");
       velocity->SetNumberOfComponents(3);
       velocity->SetNumberOfTuples(static_cast<vtkIdType>(numberOfPoints));
-      VTKGrid->GetPointData()->AddArray(velocity.GetPointer());
+      VTKGrid->GetPointData()->AddArray(velocity);
     }
     vtkDoubleArray* velocity =
       vtkDoubleArray::SafeDownCast(VTKGrid->GetPointData()->GetArray("velocity"));
@@ -76,7 +76,7 @@ void UpdateVTKAttributes(vtkCPInputDataDescription* idd, unsigned int numberOfPo
       vtkNew<vtkFloatArray> pressure;
       pressure->SetName("pressure");
       pressure->SetNumberOfComponents(1);
-      VTKGrid->GetCellData()->AddArray(pressure.GetPointer());
+      VTKGrid->GetCellData()->AddArray(pressure);
     }
     vtkFloatArray* pressure =
       vtkFloatArray::SafeDownCast(VTKGrid->GetCellData()->GetArray("pressure"));
