@@ -22,7 +22,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqResetCamera.png</normaloff>:/pqWidgets/Icons/pqResetCamera.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqResetCamera.svg</normaloff>:/pqWidgets/Icons/pqResetCamera.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Reset</string>
@@ -40,7 +40,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqXPlus.png</normaloff>:/pqWidgets/Icons/pqXPlus.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqXPlus.svg</normaloff>:/pqWidgets/Icons/pqXPlus.svg</iconset>
    </property>
    <property name="text">
     <string>+X</string>
@@ -61,7 +61,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqXMinus.png</normaloff>:/pqWidgets/Icons/pqXMinus.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqXMinus.svg</normaloff>:/pqWidgets/Icons/pqXMinus.svg</iconset>
    </property>
    <property name="text">
     <string>-X</string>
@@ -82,7 +82,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqYPlus.png</normaloff>:/pqWidgets/Icons/pqYPlus.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqYPlus.svg</normaloff>:/pqWidgets/Icons/pqYPlus.svg</iconset>
    </property>
    <property name="text">
     <string>+Y</string>
@@ -103,7 +103,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqYMinus.png</normaloff>:/pqWidgets/Icons/pqYMinus.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqYMinus.svg</normaloff>:/pqWidgets/Icons/pqYMinus.svg</iconset>
    </property>
    <property name="text">
     <string>-Y</string>
@@ -124,7 +124,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqZPlus.png</normaloff>:/pqWidgets/Icons/pqZPlus.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqZPlus.svg</normaloff>:/pqWidgets/Icons/pqZPlus.svg</iconset>
    </property>
    <property name="text">
     <string>+Z</string>
@@ -145,7 +145,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqZMinus.png</normaloff>:/pqWidgets/Icons/pqZMinus.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqZMinus.svg</normaloff>:/pqWidgets/Icons/pqZMinus.svg</iconset>
    </property>
    <property name="text">
     <string>-Z</string>
@@ -166,7 +166,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqRotateCameraCW.png</normaloff>:/pqWidgets/Icons/pqRotateCameraCW.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqRotateCameraCW.svg</normaloff>:/pqWidgets/Icons/pqRotateCameraCW.svg</iconset>
    </property>
    <property name="text">
     <string></string>
@@ -187,7 +187,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqRotateCameraCCW.png</normaloff>:/pqWidgets/Icons/pqRotateCameraCCW.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqRotateCameraCCW.svg</normaloff>:/pqWidgets/Icons/pqRotateCameraCCW.svg</iconset>
    </property>
    <property name="text">
     <string></string>
@@ -208,7 +208,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqZoomToSelection.png</normaloff>:/pqWidgets/Icons/pqZoomToSelection.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqZoomToSelection.svg</normaloff>:/pqWidgets/Icons/pqZoomToSelection.svg</iconset>
    </property>
    <property name="text">
     <string>Zoom to Box</string>
