@@ -3,6 +3,7 @@ vtk_add_test_cxx(vtkRemotingViewsCxxTests tests
   TestComparativeAnimationCueProxy.cxx
   TestImageScaleFactors.cxx
   TestParaViewPipelineControllerWithRendering.cxx
+  TestProxyManagerUtilities.cxx
   TestSystemCaps.cxx
   TestTransferFunctionManager.cxx
   TestTransferFunctionPresets.cxx)
