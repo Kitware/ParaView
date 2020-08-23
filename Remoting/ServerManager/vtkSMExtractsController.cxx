@@ -61,6 +61,14 @@ std::string ConvertToString(const double val)
   converter.ToShortest(val, &builder);
   return builder.Finalize();
 }
+
+std::string RelativePath(const std::string& root, const std::string& target)
+{
+  // vtksys::SystemTools::RelativePath() does not work unless both paths are
+  // full paths; so make them full relative to CWD, if needed.
+  return vtksys::SystemTools::RelativePath(
+    vtksys::SystemTools::CollapseFullPath(root), vtksys::SystemTools::CollapseFullPath(target));
+}
 }
 
 vtkStandardNewMacro(vtkSMExtractsController);
@@ -443,7 +451,7 @@ bool vtkSMExtractsController::AddSummaryEntry(
   params.insert({ "time", ::ConvertToString(this->Time) });
   params.insert({ "timestep", std::to_string(this->TimeStep) });
   params.insert({ vtkSMExtractsController::GetSummaryTableFilenameColumnName(filename),
-    vtksys::SystemTools::RelativePath(this->ExtractsOutputDirectory, filename) });
+    ::RelativePath(this->ExtractsOutputDirectory, filename) });
 
   // get a helpful name for this writer.
   auto name = this->GetName(writer);
