@@ -72,6 +72,9 @@ vtkCPProcessor::vtkCPProcessor()
 //----------------------------------------------------------------------------
 vtkCPProcessor::~vtkCPProcessor()
 {
+  // in case the adaptor failed to call `vtkCPProcessor::Finalize()`
+  // see paraview/paraview#20154
+  this->FinalizeAndRemovePipelines();
   if (this->Internal)
   {
     delete this->Internal;
@@ -356,8 +359,15 @@ int vtkCPProcessor::Finalize()
     this->Controller->SetGlobalController(nullptr);
     this->Controller->Finalize(1);
     this->Controller->Delete();
+    this->Controller = nullptr;
   }
+  this->FinalizeAndRemovePipelines();
+  return 1;
+}
 
+//----------------------------------------------------------------------------
+void vtkCPProcessor::FinalizeAndRemovePipelines()
+{
   for (vtkCPProcessorInternals::PipelineListIterator it = this->Internal->Pipelines.begin();
        it != this->Internal->Pipelines.end(); it++)
   {
@@ -368,7 +378,6 @@ int vtkCPProcessor::Finalize()
   }
 
   this->RemoveAllPipelines();
-  return 1;
 }
 
 //----------------------------------------------------------------------------
