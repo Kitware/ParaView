@@ -37,7 +37,10 @@ vtk_module_add_module(ParaView::InSitu
   CLASSES ${classes})
 vtk_module_client_server_exclude()
 
-add_library(catalyst
+# catalyst library is always built SHARED.
+# this is necessary so that it be loaded in simulations built with
+# stub catalyst build.
+add_library(catalyst SHARED
   ParaViewCatalyst.cxx
   vtkCatalystBlueprint.cxx)
 
