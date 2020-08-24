@@ -51,6 +51,15 @@ target_link_libraries(catalyst
     ParaView::VTKExtensionsConduit
     ParaView::RemotingServerManager)
 
+if (TARGET VTK::WrappingPythonCore AND VTK_PYTHON_OPTIONAL_LINK)
+  # if Python is enabled and optionally linking with Python,
+  # we need to link against Python non-optionally here.
+  find_package(Python3 COMPONENTS Development)
+  target_link_libraries(catalyst
+    PRIVATE
+      Python3::Python)
+endif()
+
 include("${_catalyst_macros_path}/catalyst-macros.cmake")
 _vtk_module_install(catalyst)
 _vtk_module_apply_properties(catalyst)
