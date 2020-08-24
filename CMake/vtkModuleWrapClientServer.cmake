@@ -285,6 +285,11 @@ function (vtk_module_wrap_client_server)
     set(_vtk_client_server_FUNCTION_NAME "${_vtk_client_server_TARGET}_initialize")
   endif ()
 
+  # Disable CMake's automoc support for these targets.
+  set(CMAKE_AUTOMOC 0)
+  set(CMAKE_AUTORCC 0)
+  set(CMAKE_AUTOUIC 0)
+
   # TODO: Install cmake properties?
 
   set(_vtk_client_server_all_modules)
