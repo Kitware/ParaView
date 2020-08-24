@@ -44,7 +44,7 @@ CMake 3.12 or higher is needed.
 
 ###### Environement
 ```sh
-alias ninja ninja-build
+alias ninja=ninja-build
 export PATH=$PATH:/usr/lib64/openmpi/bin/
 ```
 
