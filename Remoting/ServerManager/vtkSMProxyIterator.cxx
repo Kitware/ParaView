@@ -108,7 +108,8 @@ void vtkSMProxyIterator::Begin()
   }
   if (this->SkipPrototypes)
   {
-    if (this->GetProxy() && this->GetProxy()->GetSession() == NULL)
+    auto proxy = this->GetProxy();
+    if (proxy && (proxy->GetSession() == nullptr || proxy->IsPrototype()))
     {
       this->Next();
     }
@@ -136,9 +137,10 @@ int vtkSMProxyIterator::IsAtEnd()
 void vtkSMProxyIterator::Next()
 {
   this->NextInternal();
-  if (this->SkipPrototypes)
+  if (this->SkipPrototypes && !this->IsAtEnd())
   {
-    if (!this->IsAtEnd() && this->GetProxy() && this->GetProxy()->GetSession() == NULL)
+    auto proxy = this->GetProxy();
+    if (proxy && (proxy->GetSession() == nullptr || proxy->IsPrototype()))
     {
       this->Next();
     }
