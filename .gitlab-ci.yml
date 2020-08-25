@@ -34,7 +34,7 @@ superbuild:
     branch: $CI_COMMIT_REF_NAME
     strategy: depend
 
-# Sack build
+# Spack build
 spack:centos7:
     cache:
       key: spack:centos7
@@ -90,3 +90,59 @@ spack:centos7:
         - eval `$spack load --sh paraview`
         - pvserver --version
         - .gitlab/sccache --show-stats
+
+# Doxygen
+docs:generate:
+  stage: package
+  extends:
+    - .centos7
+  tags:
+    - build
+    - paraview
+    - docker
+    - linux
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_PATH == "paraview/paraview"'
+      when: always
+    - if: '$CI_MERGE_REQUEST_PROJECT_PATH == "paraview/paraview"'
+      when: manual
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    PARAVIEW_DOCS_REPO: git@github.com:Kitware/paraview-docs.git
+    WORKDIR: ""
+    GIT_SSH_COMMAND: ""
+    CURRENT_RELEASE: nightly
+  timeout: 3 hours
+  before_script:
+    - WORKDIR=$(pwd)
+    - GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -i $GITHUB_SSH_PRIVATE_KEY"
+    - chmod 600 $GITHUB_SSH_PRIVATE_KEY
+    - yum install -y bzip2 patch python-twisted-core python-twisted-web python-twisted-words python3 python3-devel \
+      qt5-qtbase-devel qt5-qttools-devel qt5-qtsvg-devel qt5-qtxmlpatterns-devel doxygen openmpi-devel python36-numpy
+    - yum clean all
+    - pip3 install sphinx
+    - .gitlab/ci/sccache.sh
+    - .gitlab/ci/cmake.sh
+    - export PATH=$PWD/.gitlab:$PATH
+    - export PATH=$PWD/.gitlab/cmake/bin:$PATH
+    - export PATH=/usr/lib64/openmpi/bin:$PATH
+    - git clone $PARAVIEW_DOCS_REPO paraview-docs
+    - cd paraview-docs
+    - cd $WORKDIR
+    - mkdir build
+  script:
+    - cd build
+    - $LAUNCHER cmake -DPARAVIEW_USE_PYTHON=ON -DVTK_WRAP_PYTHON=ON -DVTK_ENABLE_WRAPPING=ON -DPARAVIEW_BUILD_DEVELOPER_DOCUMENTATION=ON -DPARAVIEW_USE_MPI=ON ..
+    - cmake --build . -j &> $WORKDIR/compile_output.log
+    - make ParaViewDoc-TGZ &> $WORKDIR/doxygen_output.log
+    - cd $WORKDIR/paraview-docs
+    - CURRENT_RELEASE=nightly
+    - test -n "$CI_COMMIT_TAG" && CURRENT_RELEASE="$CI_COMMIT_TAG"
+    - $LAUNCHER ./scripts/prepare-doc.sh "$WORKDIR" "$WORKDIR/build" "$WORKDIR" "$CURRENT_RELEASE"  &> $WORKDIR/prepare_output.log
+  artifacts:
+    expire_in: 1 week
+    when: always
+    paths:
+      - compile_output.log
+      - doxygen_output.log
+      - prepare_output.log
