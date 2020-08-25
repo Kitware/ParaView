@@ -142,6 +142,11 @@ protected:
   /// set this through the *Initialize()* methods.
   vtkSetStringMacro(WorkingDirectory);
 
+  /**
+   * Finalizes and remove all pipelines.
+   */
+  void FinalizeAndRemovePipelines();
+
 private:
   vtkCPProcessor(const vtkCPProcessor&) = delete;
   void operator=(const vtkCPProcessor&) = delete;

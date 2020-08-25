@@ -138,6 +138,7 @@ def finalize(module):
     be useful, but we definitely need this for testing to ensure the analysis
     executed as expected.
     """
+    log(log_level(), "called finalize (%s)", module)
     params = module.catalyst_params
 
     if module.options.GenerateCinemaSpecification:
