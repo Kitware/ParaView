@@ -183,7 +183,9 @@
   </action>
   <addaction name="actionOpenData"/>
   <addaction name="actionSaveData"/>
+  <addaction name="actionSaveState"/>
   <addaction name="actionGenerateExtracts"/>
+  <addaction name="actionSaveCatalystState"/>
   <addaction name="separator"/>
   <addaction name="actionServerConnect"/>
   <addaction name="actionServerDisconnect"/>
@@ -195,9 +197,6 @@
   <addaction name="actionAutoApply"/>
   <addaction name="actionQuery"/>
   <addaction name="actionLoadPalette"/>
-  <addaction name="separator"/>
-  <addaction name="actionSaveState"/>
-  <addaction name="actionSaveCatalystState"/>
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
