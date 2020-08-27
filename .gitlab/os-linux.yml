@@ -1,0 +1,120 @@
+# Linux-specific builder configurations and build commands
+
+## Base images
+
+### CentOS
+#
+# CentOS 7 is the primary deployment platform. This gains us maximum
+# compatibility with many Linux distros while also providing easy ways to get
+# newer compilers.
+
+.centos7:
+    image: "kitware/paraview:ci-superbuild-centos7-20200210"
+
+    variables:
+        GIT_SUBMODULE_STRATEGY: none
+        LAUNCHER: "scl enable devtoolset-7 --"
+        GIT_CLONE_PATH: $CI_BUILDS_DIR/gitlab-kitware-sciviz-ci
+
+## Tags
+
+.linux_builder_tags:
+    tags:
+        - build
+        - docker
+        - linux
+        - paraview
+
+## Linux-specific scripts
+
+.spack_build_linux:
+    stage: package
+
+    variables:
+        # This is needed as `configure` on certain packages fails when run as
+        # root
+        FORCE_UNSAFE_CONFIGURE: 1
+
+        spack: "$CI_BUILDS_DIR/spack/bin/spack -C Utilities/spack/configs/gitlab-ci"
+        paraview_spec: "paraview+osmesa^mesa~glx^mpich"
+
+    before_script:
+        # [-- these must be added to the image.
+        - yum install -y bzip2 patch
+        - yum clean all
+        # ---]
+        - .gitlab/ci/sccache.sh
+        - .gitlab/ci/cmake.sh
+        - export PATH=$PWD/.gitlab:$PWD/.gitlab/cmake/bin:$PATH
+        - cmake --version
+        - "git submodule update --init --recursive || :"
+        - git submodule foreach --recursive cmake "-Dusername:STRING=$CI_PROJECT_NAMESPACE" "-Durl_prefix:STRING=https://$CI_SERVER_HOST" -P "$PWD/.gitlab/ci/fetch_submodule.cmake"
+        - git submodule sync --recursive
+        - git submodule update --init --recursive
+        - sccache --start-server
+        - sccache --show-stats
+        - .gitlab/ci/spack.sh
+        - $LAUNCHER $spack repo add $PWD/Utilities/spack/repo
+        - $LAUNCHER $spack compiler find
+        - $LAUNCHER $spack compiler info gcc@7.3.1
+        # setup buildcache mirror
+        - $LAUNCHER $spack mirror add local $PWD/spack-cache
+        - $LAUNCHER $spack buildcache list
+    script:
+        - TRACK="Experimental"
+        - if [ "$CI_PIPELINE_SOURCE" == "schedule" ] && [ "$CI_PROJECT_PATH" == "paraview/paraview" ]; then TRACK="master-packages" ; fi
+        - if [ "$CI_MERGE_REQUEST_ID" ]; then TRACK="merge-requests" ; fi
+        - $LAUNCHER $spack spec $paraview_spec
+        - $LAUNCHER $spack install --no-check-signature --only dependencies -j $(nproc) $paraview_spec
+        - export dependency_specs=`$LAUNCHER $spack find --format "{name}{@version}{%compiler}"`
+        - $LAUNCHER $spack buildcache create -a -f -u -d $PWD/spack-cache $dependency_specs
+        - $LAUNCHER $spack install --no-check-signature -j $(nproc) --cdash-upload-url="http://open.cdash.org/submit.php?project=ParaView" --cdash-track $TRACK --cdash-build="paraview-spack-$CI_COMMIT_REF_NAME" $paraview_spec
+        - eval `$spack load --sh paraview`
+        - pvserver --version
+        - .gitlab/sccache --show-stats
+
+    interruptible: true
+    timeout: 3 hours
+    cache:
+        key: spack:centos7
+        paths:
+            - spack-cache/
+
+.before_script_linux: &before_script_linux
+    - .gitlab/ci/cmake.sh
+    - .gitlab/ci/ninja.sh
+    - export PATH=$PWD/.gitlab:$PWD/.gitlab/cmake/bin:$PATH
+    - cmake --version
+    - ninja --version
+    - "git submodule update --init --recursive || :"
+    - git submodule foreach --recursive cmake "-Dusername:STRING=$CI_PROJECT_NAMESPACE" "-Durl_prefix:STRING=https://$CI_SERVER_HOST" -P "$PWD/.gitlab/ci/fetch_submodule.cmake"
+    - git submodule sync --recursive
+    - git submodule update --init --recursive
+
+.doxygen_build_linux:
+    stage: package
+
+    script:
+        - *before_script_linux
+        - test -n "$GITHUB_SSH_PRIVATE_KEY" && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -i $GITHUB_SSH_PRIVATE_KEY"
+        - test -n "$GITHUB_SSH_PRIVATE_KEY" && chmod 600 $GITHUB_SSH_PRIVATE_KEY
+        - test -n "$GITHUB_SSH_PRIVATE_KEY" && PARAVIEW_DOCS_REPO="ssh://git@github.com/kitware/paraview-docs"
+        - yum install -y bzip2 patch python-twisted-core python-twisted-web python-twisted-words python3 python3-devel qt5-qtbase-devel qt5-qttools-devel qt5-qtsvg-devel qt5-qtxmlpatterns-devel doxygen openmpi-devel python36-numpy
+        - pip3 install sphinx
+        - .gitlab/ci/sccache.sh
+        - git clone $PARAVIEW_DOCS_REPO paraview-docs
+        - mkdir build
+        - cd build
+        - $LAUNCHER cmake -DCMAKE_PREFIX_PATH=/usr/lib64/openmpi -DPARAVIEW_USE_PYTHON=ON -DVTK_WRAP_PYTHON=ON -DVTK_ENABLE_WRAPPING=ON -DPARAVIEW_BUILD_DEVELOPER_DOCUMENTATION=ON -DPARAVIEW_USE_MPI=ON ..
+        - cmake --build . -j &> $GIT_CLONE_PATH/compile_output.log
+        - make ParaViewDoc-TGZ &> $GIT_CLONE_PATH/doxygen_output.log
+        - cd $GIT_CLONE_PATH/paraview-docs
+        - CURRENT_RELEASE=nightly
+        - test -n "$CI_COMMIT_TAG" && CURRENT_RELEASE="$CI_COMMIT_TAG"
+        - $LAUNCHER ./scripts/prepare-doc.sh "$GIT_CLONE_PATH" "$GIT_CLONE_PATH/build" "$GIT_CLONE_PATH" "$CURRENT_RELEASE"  &> $GIT_CLONE_PATH/prepare_output.log
+
+    variables:
+        PARAVIEW_DOCS_REPO: https://github.com/Kitware/paraview-docs.git
+        CURRENT_RELEASE: nightly
+
+    interruptible: true
