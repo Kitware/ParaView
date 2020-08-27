@@ -140,7 +140,7 @@ void vtkPVOptions::Initialize()
     "Log verbosity on stderr as an integer in range [-9, 9] "
     "or INFO, WARNING, ERROR, or OFF. Defaults to INFO(0).",
     vtkPVOptions::PVCLIENT | vtkPVOptions::PVSERVER | vtkPVOptions::PVDATA_SERVER |
-      vtkPVOptions::PVRENDER_SERVER);
+      vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVBATCH);
 
   this->AddCallback("--log", "-l", &vtkPVOptions::LogArgumentHandler, this,
     "Addition log files to generate. Can be specified multiple times. "
