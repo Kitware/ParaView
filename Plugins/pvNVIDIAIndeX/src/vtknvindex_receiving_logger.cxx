@@ -30,6 +30,8 @@
 #include "vtkOutputWindow.h"
 #include "vtkSetGet.h"
 
+#include <atomic>
+
 //----------------------------------------------------------------------
 vtknvindex_receiving_logger::vtknvindex_receiving_logger()
 {
@@ -71,6 +73,21 @@ void vtknvindex_receiving_logger::message(mi::base::Message_severity level, cons
                                   "ParaView Plug-In User's Guide for details.\n") +
           prefix + message_str;
       }
+    }
+  }
+  else if (category_str == "API:MISC")
+  {
+    // These messages are printed by DiCE during normal startup, skip them
+    static std::atomic_int counter(0);
+    if (counter == 0 && message_str.rfind("  0.0   API    misc info : Loaded \"", 0) == 0)
+    {
+      counter++;
+      return;
+    }
+    else if (counter == 1 && message_str.rfind("  0.0   API    misc info : DiCE ", 0) == 0)
+    {
+      counter++;
+      return;
     }
   }
 

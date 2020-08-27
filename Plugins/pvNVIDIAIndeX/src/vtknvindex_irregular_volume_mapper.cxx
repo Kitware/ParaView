@@ -690,6 +690,13 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
 
     vtkTimerLog::MarkEndEvent("NVIDIA-IndeX: Rendering");
   }
+  else if (m_index_instance->is_index_viewer())
+  {
+    static bool first = true;
+    if (first)
+      ERROR_LOG << "The NVIDIA IndeX plug-in was not initialized! See the log output for details.";
+    first = false;
+  }
 
   m_volume_changed = false;
 

@@ -25,7 +25,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <assert.h>
+#include "vtknvindex_instance.h"
+
+#include <cassert>
+#include <sstream>
+
 #ifdef _WIN32
 #include <windows.h>
 #else // _WIN32
@@ -43,17 +47,16 @@
 #include <nv/index/ilight.h>
 #include <nv/index/iscene.h>
 #include <nv/index/isession.h>
+#include <nv/index/version.h>
 
 #include "vtknvindex_affinity.h"
 #include "vtknvindex_colormap_utility.h"
 #include "vtknvindex_config_settings.h"
 #include "vtknvindex_forwarding_logger.h"
 #include "vtknvindex_host_properties.h"
-#include "vtknvindex_instance.h"
 #include "vtknvindex_irregular_volume_importer.h"
 #include "vtknvindex_receiving_logger.h"
 #include "vtknvindex_sparse_volume_importer.h"
-#include "vtknvindex_version.h"
 #include "vtknvindex_volume_compute.h"
 
 #ifdef _WIN32
@@ -208,8 +211,6 @@ void vtknvindex_instance::init_index()
   // Start one IndeX instance per host (running on the local rank 0)
   if (m_nvindex_interface && !is_index_initialized() && is_index_rank())
   {
-    INFO_LOG << "NVIDIA IndeX ParaView plug-in " << get_version() << ".";
-
     // Setup NVIDIA IndeX
     if (!setup_nvindex())
     {
@@ -335,41 +336,34 @@ void vtknvindex_instance::build_cluster_info()
 bool vtknvindex_instance::load_nvindex()
 {
   // Load shared libraries.
-  std::string lib_name = "libnvindex";
-  void* index_lib_symbol = NULL;
+  const char* lib_name = "libnvindex" MI_BASE_DLL_FILE_EXT;
+  const char* entry_point_name = "nv_index_factory";
+  void* index_lib_symbol = nullptr;
 
 #ifdef _WIN32
-  lib_name += ".dll";
-  m_p_handle = LoadLibrary(TEXT(lib_name.c_str()));
+  m_p_handle = LoadLibrary(TEXT(lib_name));
 
   if (m_p_handle)
-    index_lib_symbol = GetProcAddress((HMODULE)m_p_handle, "nv_index_factory");
-
-#else // _WIN32
-  lib_name += ".so";
-  m_p_handle = dlopen(lib_name.c_str(), RTLD_LAZY);
+    index_lib_symbol = GetProcAddress((HMODULE)m_p_handle, entry_point_name);
+#else
+  m_p_handle = dlopen(lib_name, RTLD_LAZY);
 
   if (m_p_handle)
-    index_lib_symbol = dlsym(m_p_handle, "nv_index_factory");
-
-#endif // _WIN32
+    index_lib_symbol = dlsym(m_p_handle, entry_point_name);
+#endif
 
   if (!index_lib_symbol)
   {
 #ifdef _WIN32
-    const std::string error_str(get_last_error_as_str());
-    ERROR_LOG << "Failed to load the NVIDIA IndeX library.";
-    ERROR_LOG << error_str;
-    ERROR_LOG << "Please verify that the PATH environemnt contains"
-                 " the location of the NVIDIA IndeX libraries.";
-#else // _WIN32
-    const std::string error_str(dlerror());
-
-    ERROR_LOG << "Failed to load the NVIDIA IndeX library.";
-    ERROR_LOG << error_str;
-    ERROR_LOG << "Please verify that the LD_LIBRARY_PATH environemnt contains"
-                 " the location of the NVIDIA IndeX libraries.";
+    const std::string error_str = get_last_error_as_str();
+    const std::string path_env = "PATH";
+#else
+    const std::string error_str = dlerror();
+    const std::string path_env = "LD_LIBRARY_PATH";
 #endif
+    ERROR_LOG << "Failed to load the NVIDIA IndeX library: '" << error_str << "'.";
+    ERROR_LOG << "Please verify that the environment variable " << path_env
+              << " contains the location of the NVIDIA IndeX libraries.";
     return false;
   }
 
@@ -381,41 +375,89 @@ bool vtknvindex_instance::load_nvindex()
   m_nvindex_interface = factory();
   if (!m_nvindex_interface.is_valid_interface())
   {
-    ERROR_LOG << "Failed to Initialize NVIDIA IndeX library.";
-    // TODO: Is it possible to know the reason?
+    ERROR_LOG << "Failed to initialize the NVIDIA IndeX library interface.";
     return false;
   }
 
-  // Check if this IndeX library is compatible with this plug-in version
-  if (VTKNVINDEX_PLUGIN_REVISION_BASE != 0)
+  // Check that this IndeX library is compatible with this plug-in version
+  const std::string build_revision_str = NVIDIA_INDEX_LIBRARY_REVISION_STRING;
+  const std::string library_revision_full_str = m_nvindex_interface->get_revision();
+  bool revision_mismatch = false;
   {
-    const std::string plugin_revision_base = std::to_string(VTKNVINDEX_PLUGIN_REVISION_BASE);
-    const std::string index_revision_base = m_nvindex_interface->get_revision();
-
-    if (index_revision_base.substr(0, 6) != plugin_revision_base)
+    // Extract just the revision, without build date and platform
+    std::string library_revision_str = library_revision_full_str;
+    const std::size_t pos = library_revision_str.find(',');
+    if (pos != std::string::npos)
     {
-      ERROR_LOG << "The IndeX libraries '" << index_revision_base
-                << "' are not compatible with this plug-in version '" << get_version() << "'";
-      ERROR_LOG << "Please get the matching IndeX libraries from ParaView dependencies repository:";
-      ERROR_LOG << "https://www.paraview.org/files/dependencies/";
+      library_revision_str = library_revision_str.substr(0, pos);
+    }
 
-      // Unload incompatible IndeX libs
-      INFO_LOG << "IndeX is shuting down...";
-      m_nvindex_interface->shutdown();
-      m_nvindex_interface = 0;
+    revision_mismatch = (library_revision_str != build_revision_str);
+    if (revision_mismatch)
+    {
+      // Split up revision into its components
+      std::vector<std::string> library_revision;
+      std::stringstream str(library_revision_str);
+      while (str.good())
+      {
+        std::string component;
+        std::getline(str, component, '.');
+        library_revision.push_back(component);
+      }
 
-      // Unload the libraries.
-      unload_nvindex();
+      std::vector<std::string> build_revision = { std::to_string(
+        NVIDIA_INDEX_LIBRARY_REVISION_MAJOR) };
+      if (NVIDIA_INDEX_LIBRARY_REVISION_MINOR > 0)
+      {
+        build_revision.push_back(std::to_string(NVIDIA_INDEX_LIBRARY_REVISION_MINOR));
+        if (NVIDIA_INDEX_LIBRARY_REVISION_SUBMINOR > 0)
+        {
+          build_revision.push_back(std::to_string(NVIDIA_INDEX_LIBRARY_REVISION_SUBMINOR));
+        }
+      }
 
-      return false;
+      bool is_compatible = false;
+      if (build_revision.size() == 1 || library_revision.size() == 1)
+      {
+        // No branch, meaning development version. Let's assume users know what they're doing.
+        is_compatible = true;
+      }
+      else if (build_revision.size() != library_revision.size())
+      {
+        is_compatible = false;
+      }
+      else if (build_revision.size() >= 2)
+      {
+        // It's a release branch, verify that the major revision is the same
+        is_compatible = (build_revision[0] == library_revision[0]);
+      }
+
+      if (!is_compatible)
+      {
+        // Note that this doesn't automatically open the "Output Messages" window if it happens
+        // during ParaView startup. The message will however become visible when another error is
+        // later triggered in Render().
+        ERROR_LOG << "The loaded NVIDIA IndeX library build '" << library_revision_full_str
+                  << "' is not compatible with this plug-in version '" << get_version()
+                  << "', which was built against revision '" << build_revision_str << "' "
+                  << "Please check your ParaView installation or get the matching IndeX libraries "
+                  << "from the ParaView dependencies repository: "
+                  << "https://www.paraview.org/files/dependencies/";
+
+        INFO_LOG << "Shutting down NVIDIA IndeX...";
+        m_nvindex_interface->shutdown();
+        m_nvindex_interface.reset();
+        unload_nvindex();
+
+        return false;
+      }
     }
   }
 
   // Check for license and authenticate.
   if (!authenticate_nvindex())
   {
-    ERROR_LOG
-      << "Failed to authenticate NVIDIA IndeX library, please provide a valid license file.";
+    ERROR_LOG << "Failed to authenticate NVIDIA IndeX library, please provide a valid license.";
     return false;
   }
 
@@ -437,8 +479,10 @@ bool vtknvindex_instance::load_nvindex()
   }
 
   // Access and log NVIDIA IndeX version.
-  INFO_LOG << "NVIDIA IndeX " << m_nvindex_interface->get_version() << " (build "
-           << m_nvindex_interface->get_revision() << ").";
+  INFO_LOG << "NVIDIA IndeX ParaView plug-in " << get_version() << " "
+           << (revision_mismatch ? "(compiled against " + build_revision_str + ") " : "")
+           << "using NVIDIA IndeX library " << m_nvindex_interface->get_version() << " (build "
+           << library_revision_full_str << ").";
 
   return true;
 }
@@ -470,16 +514,15 @@ bool vtknvindex_instance::unload_nvindex()
 //-------------------------------------------------------------------------------------------------
 bool vtknvindex_instance::authenticate_nvindex()
 {
-
-  std::string index_vendor_key, index_secret_key;
-
+  std::string index_vendor_key;
+  std::string index_secret_key;
   bool found_license = false;
 
   // Try reading license from environment.
   const char* env_vendor_key = vtksys::SystemTools::GetEnv("NVINDEX_VENDOR_KEY");
   const char* env_secret_key = vtksys::SystemTools::GetEnv("NVINDEX_SECRET_KEY");
 
-  if (env_vendor_key != NULL && env_secret_key != NULL)
+  if (env_vendor_key != nullptr && env_secret_key != nullptr)
   {
     index_vendor_key = env_vendor_key;
     index_secret_key = env_secret_key;
@@ -489,15 +532,21 @@ bool vtknvindex_instance::authenticate_nvindex()
   {
     vtknvindex_xml_config_parser xml_parser;
     if (xml_parser.open_config_file("nvindex_config.xml"))
+    {
       found_license = xml_parser.get_license_strings(index_vendor_key, index_secret_key);
+    }
   }
 
-  // No explicit license found, use default free license.
-  if (!found_license)
+  // No explicit license was specified, fall back to default license.
+  if (!found_license || index_vendor_key.empty() || index_secret_key.empty())
   {
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 327600)
+    return true;
+#else
     index_vendor_key =
       "NVIDIA IndeX License for Paraview IndeX:PV:Free:v1 - 20200427 (oem:retail_cloud.20220630)";
     index_secret_key = "10e9ce315607f2d230e82647682d250a176ddd4e3d05c49401b5556a6794c72c";
+#endif
   }
 
   // Retrieve Flex license path.
@@ -505,7 +554,7 @@ bool vtknvindex_instance::authenticate_nvindex()
 
   // Try reading Flex license path from environment.
   const char* env_flexnet_lic_path = vtksys::SystemTools::GetEnv("NVINDEX_FLEXNET_PATH");
-  if (env_flexnet_lic_path != NULL)
+  if (env_flexnet_lic_path != nullptr)
   {
     flexnet_lic_path = env_flexnet_lic_path;
   }
@@ -514,7 +563,7 @@ bool vtknvindex_instance::authenticate_nvindex()
     vtknvindex_xml_config_parser xml_parser;
     if (xml_parser.open_config_file("nvindex_config.xml"))
     {
-      found_license = xml_parser.get_flex_license_path(flexnet_lic_path);
+      xml_parser.get_flex_license_path(flexnet_lic_path);
     }
   }
 
@@ -765,6 +814,11 @@ bool vtknvindex_instance::setup_nvindex()
     mi::base::Handle<nv::index::IIndex_debug_configuration> idebug_configuration(
       m_nvindex_interface->get_api_component<nv::index::IIndex_debug_configuration>());
     assert(idebug_configuration.is_valid_interface());
+
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 327600)
+    // Reduce log output
+    idebug_configuration->set_option("debug_configuration_quiet=yes");
+#endif
 
     // Don't pre-allocate buffers for rasterizer
     idebug_configuration->set_option("rasterizer_memory_allocation=-1");

@@ -124,8 +124,8 @@ bool vtknvindex_xml_config_parser::get_license_strings(
     return false;
   }
 
-  vendor_key = std::string(vendor_key_elm->GetCharacterData());
-  secret_key = std::string(secret_key_elm->GetCharacterData());
+  vendor_key = vendor_key_elm->GetCharacterData();
+  secret_key = secret_key_elm->GetCharacterData();
 
   return true;
 }
