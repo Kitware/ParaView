@@ -585,17 +585,31 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
     (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "Getting Started with ParaView")
                                   << pqSetName("actionGettingStarted")));
 
-  // ParaView Guide
-  QAction* guide = menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "ParaView Guide");
+  QString versionString = QString("%1.%2.%3")
+                            .arg(vtkSMProxyManager::GetVersionMajor())
+                            .arg(vtkSMProxyManager::GetVersionMinor())
+                            .arg(vtkSMProxyManager::GetVersionPatch());
+
+  // ParaView Guide. If there is a copy local to the install tree, use it instead of going
+  // out to the web.
+  QString paraViewGuideFile =
+    QString("%1/ParaViewGuide-%2.pdf").arg(documentationPath).arg(versionString);
+  QFile guideLocalFile(paraViewGuideFile);
+  QAction* guide = menu.addAction("ParaView Guide");
   guide->setObjectName("actionGuide");
   guide->setShortcut(QKeySequence::HelpContents);
-  QString guideURL = QString("https://www.paraview.org/paraview-downloads/"
-                             "download.php?submit=Download&version=v%1.%2&type=binary&os="
-                             "Sources&downloadFile=ParaViewGuide-%1.%2.%3.pdf")
-                       .arg(vtkSMProxyManager::GetVersionMajor())
-                       .arg(vtkSMProxyManager::GetVersionMinor())
-                       .arg(vtkSMProxyManager::GetVersionPatch());
-  new pqDesktopServicesReaction(QUrl(guideURL), guide);
+  if (guideLocalFile.exists())
+  {
+    guide->setIcon(QIcon(":/pqWidgets/Icons/pdf.png"));
+    QUrl guideUrl = QUrl::fromLocalFile(paraViewGuideFile);
+    new pqDesktopServicesReaction(guideUrl, guide);
+  }
+  else
+  {
+    // Remote ParaView Guide
+    QString guideURL = QString("https://docs.paraview.org/en/v%1/").arg(versionString);
+    new pqDesktopServicesReaction(QUrl(guideURL), guide);
+  }
 
 #ifdef PARAVIEW_USE_QTHELP
   // Help
@@ -643,12 +657,6 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
     (menu.addAction("ParaView Community Support") << pqSetName("actionCommunitySupport")));
 
   // ParaView Release Notes
-  QString versionString(PARAVIEW_VERSION_FULL);
-  int indexOfHyphen = versionString.indexOf('-');
-  if (indexOfHyphen > -1)
-  {
-    versionString = versionString.left(indexOfHyphen);
-  }
   versionString.replace('.', '-');
   new pqDesktopServicesReaction(
     QUrl("https://blog.kitware.com/paraview-" + versionString + "-release-notes/"),
