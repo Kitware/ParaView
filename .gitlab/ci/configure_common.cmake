@@ -1,0 +1,29 @@
+# Stock CI builds test everything possible (platforms will disable modules as
+# needed).
+set(PARAVIEW_BUILD_ALL_MODULES ON CACHE BOOL "")
+set(PARAVIEW_BUILD_LEGACY_REMOVE ON CACHE BOOL "")
+set(PARAVIEW_BUILD_TESTING WANT CACHE BOOL "")
+set(PARAVIEW_BUILD_EXAMPLES ON CACHE BOOL "")
+
+set(VTK_DEBUG_LEAKS ON CACHE BOOL "")
+set(VTK_USE_LARGE_DATA ON CACHE BOOL "")
+
+set(PARAVIEW_BUILD_CATALYST_ADAPTORS ON CACHE BOOL "")
+
+# The install trees on CI machines need help since dependencies are not in a
+# default location.
+set(PARAVIEW_RELOCATABLE_INSTALL ON CACHE BOOL "")
+
+# Enable default-off plugins.
+set(PARAVIEW_PLUGIN_ENABLE_TemporalParallelismScriptGenerator ON CACHE BOOL "")
+
+include("${CMAKE_CURRENT_LIST_DIR}/configure_options.cmake")
+
+# Default to Release builds.
+if ("$ENV{CMAKE_BUILD_TYPE}" STREQUAL "")
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "")
+else ()
+  set(CMAKE_BUILD_TYPE "$ENV{CMAKE_BUILD_TYPE}" CACHE STRING "")
+endif ()
+
+include("${CMAKE_CURRENT_LIST_DIR}/configure_sccache.cmake")
