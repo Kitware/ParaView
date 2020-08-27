@@ -17,6 +17,9 @@ set(PARAVIEW_RELOCATABLE_INSTALL ON CACHE BOOL "")
 # Enable default-off plugins.
 set(PARAVIEW_PLUGIN_ENABLE_TemporalParallelismScriptGenerator ON CACHE BOOL "")
 
+# We run the install right after the build. Avoid rerunning it when installing.
+set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY "ON" CACHE BOOL "")
+
 include("${CMAKE_CURRENT_LIST_DIR}/configure_options.cmake")
 
 # Default to Release builds.

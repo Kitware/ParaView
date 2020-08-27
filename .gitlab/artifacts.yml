@@ -16,17 +16,45 @@
             # The artifacts of the build.
             - build/bin/
             - build/lib/
+            - build/VTK/Utilities/KWIML/vtkkwiml/test/kwiml_test
+
+            # Needed for installation.
+            - build/CMakeCache.txt
+            - build/build.ninja
+            - build/rules.ninja
+            - build/Clients/ParaView/Documentation/paraview.qch
+            - build/cmake_install.cmake
+            - build/*/cmake_install.cmake
+            - build/*/*/cmake_install.cmake
+            - build/*/*/*/cmake_install.cmake
+            - build/*/*/*/*/cmake_install.cmake
+            - build/*/*/*/*/*/cmake_install.cmake
+            - build/*/*/*/*/*/*/cmake_install.cmake
+            - build/*/*/*/*/*/*/*/cmake_install.cmake
 
             # CTest files.
-            - build/CTestCustom*.cmake
+            - build/CTestCustom.cmake
+            - build/VTK/CTestCustom.cmake
             # XXX(globbing): Can be simplified with support from
             # https://gitlab.com/gitlab-org/gitlab-runner/issues/4840
             - build/CTestTestfile.cmake
             - build/*/CTestTestfile.cmake
             - build/*/*/CTestTestfile.cmake
             - build/*/*/*/CTestTestfile.cmake
+            - build/*/*/*/*/CTestTestfile.cmake
+            - build/*/*/*/*/*/CTestTestfile.cmake
+            - build/*/*/*/*/*/*/CTestTestfile.cmake
+            - build/*/*/*/*/*/*/*/CTestTestfile.cmake
+            - build/*/*.h
+            - build/*/*/*.h
+            - build/*/*/*/*.h
+            - build/*/*/*/*/*.h
+            - build/*/*/*/*/*/*.h
+            - build/*/*/*/*/*/*/*.h
+            - build/*/*/*/*/*/*/*/*.h
+            - build/ExternalData/
             - build/Testing/
-            - build/testing/temporary/
+            - build/Testing/Temporary/
 
             # CDash files.
             - build/DartConfiguration.tcl
