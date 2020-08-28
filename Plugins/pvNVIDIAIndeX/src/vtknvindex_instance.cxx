@@ -211,10 +211,8 @@ void vtknvindex_instance::init_index()
     INFO_LOG << "NVIDIA IndeX ParaView plug-in " << get_version() << ".";
 
     // Setup NVIDIA IndeX
-    mi::Uint32 setup_result = 0;
-    if (setup_result = setup_nvindex() != 0)
+    if (!setup_nvindex())
     {
-      ERROR_LOG << "Failed to start the NVIDIA IndeX library: " << setup_result << ".";
       return;
     }
 
@@ -528,7 +526,7 @@ bool vtknvindex_instance::authenticate_nvindex()
 }
 
 //-------------------------------------------------------------------------------------------------
-mi::Uint32 vtknvindex_instance::setup_nvindex()
+bool vtknvindex_instance::setup_nvindex()
 {
   vtknvindex_xml_config_parser xml_parser;
   bool use_config_file = xml_parser.open_config_file("nvindex_config.xml");
@@ -840,11 +838,13 @@ mi::Uint32 vtknvindex_instance::setup_nvindex()
     assert(is_registered);
   }
 
-  // Starting the NVIDIA IndeX library.
-  mi::Uint32 start_result = 0;
-  if ((start_result = m_nvindex_interface->start(true)) != 0)
+  // Start the NVIDIA IndeX library.
+  const mi::Uint32 start_result = m_nvindex_interface->start(true);
+  if (start_result != 0)
   {
-    ERROR_LOG << "Start of the NVIDIA IndeX library failed.";
+    ERROR_LOG << "Fatal: Could not start NVIDIA IndeX library (error code " << start_result << "), "
+              << "see log messages above for details.";
+    return false;
   }
 
   // Synchronize IndeX viewer with remote instances.
@@ -885,7 +885,7 @@ mi::Uint32 vtknvindex_instance::setup_nvindex()
     }
   }
 
-  return start_result;
+  return true;
 }
 
 //-------------------------------------------------------------------------------------------------

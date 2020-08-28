@@ -105,7 +105,7 @@ private:
   bool authenticate_nvindex();
 
   // Setup and start NVIDIA IndeX library.
-  mi::Uint32 setup_nvindex();
+  bool setup_nvindex();
 
   // Shutting down NVIDIA IndeX library.
   bool shutdown_nvindex();
