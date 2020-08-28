@@ -122,6 +122,16 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
     return 0;
   }
 
+  query_bbox = bounding_box;
+  bool face_filtering = false;
+
+  if (query_bbox.min.x > shm_bbox.min.x || query_bbox.min.y > shm_bbox.min.y ||
+    query_bbox.min.z > shm_bbox.min.z || query_bbox.max.x < shm_bbox.max.x ||
+    query_bbox.max.y < shm_bbox.max.y || query_bbox.max.z < shm_bbox.max.z)
+  {
+    face_filtering = true;
+  }
+
   vtkUnstructuredGridBase* pv_ugrid = nullptr;
 
   mi::Uint32 num_points = 0u;
@@ -263,7 +273,7 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
           static_cast<mi::Float32>(point[1]), static_cast<mi::Float32>(point[2])));
       }
 
-      if (tet_bbox.intersects(subset_bbox))
+      if (!face_filtering || tet_bbox.intersects(subset_bbox))
       {
         Vec4ui tet_vtx_indices(
           cell_point_ids[0], cell_point_ids[1], cell_point_ids[2], cell_point_ids[3]);
@@ -283,7 +293,7 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
       for (mi::Uint32 k = 0; k < 4; k++)
         tet_bbox.insert(points[tet_vtx_indices[k]]);
 
-      if (tet_bbox.intersects(subset_bbox))
+      if (!face_filtering || tet_bbox.intersects(subset_bbox))
         subset_tetrahedrons.push_back(tet_vtx_indices);
     }
   }

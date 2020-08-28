@@ -112,6 +112,9 @@ vtknvindex_irregular_volume_representation::vtknvindex_irregular_volume_represen
   m_roi_range_K[1] = 100.0;
 
   m_prev_time_step = -1.0f;
+
+  m_still_image_reduction_factor = 1;
+  m_interactive_image_reduction_factor = 2;
 }
 
 //----------------------------------------------------------------------------
@@ -290,9 +293,39 @@ int vtknvindex_irregular_volume_representation::ProcessViewRequest(
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {
+
     auto controller = vtkMultiProcessController::GetGlobalController();
     vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(inInfo->Get(vtkPVRenderView::VIEW()));
     auto ddm = vtkPVRenderViewDataDeliveryManager::SafeDownCast(view->GetDeliveryManager());
+
+#ifdef USE_KDTREE
+    if (m_controller->GetLocalProcessId() == 0)
+    {
+      DefaultMapper->set_raw_cuts(ddm->GetRawCuts(), ddm->GetRawCutsRankAssignments());
+
+      const std::vector<vtkBoundingBox>& raw_cuts = ddm->GetRawCuts();
+      const std::vector<int>& raw_cuts_ranks = ddm->GetRawCutsRankAssignments();
+
+      INFO_LOG << "RawCuts for process " << m_controller->GetLocalProcessId() << ": "
+               << raw_cuts.size();
+      for (size_t i = 0; i < raw_cuts.size(); ++i)
+      {
+        if (raw_cuts[i].IsValid())
+        {
+          mi::Float64 bbox[6];
+          raw_cuts[i].GetBounds(bbox);
+          INFO_LOG << "  cut " << i << ", rank " << raw_cuts_ranks[i] << ": " << bbox[0] << ", "
+                   << bbox[2] << ", " << bbox[4] << "; " << bbox[1] << ", " << bbox[3] << ", "
+                   << bbox[5];
+        }
+        else
+        {
+          INFO_LOG << "  cut " << i << ", rank " << raw_cuts_ranks[i] << ": invalid";
+        }
+      }
+    }
+#endif
+
     // Retrieve ParaView's KdTree in order to obtain domain subdivision bounding boxes.
     if (ddm->GetCuts().size() > 0 && controller != nullptr &&
       controller->GetLocalProcessId() < static_cast<int>(ddm->GetCuts().size()))
@@ -330,6 +363,11 @@ bool vtknvindex_irregular_volume_representation::AddToView(vtkView* view)
   vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(view);
   if (rview)
   {
+    m_still_image_reduction_factor = rview->GetStillRenderImageReductionFactor();
+    m_interactive_image_reduction_factor = rview->GetInteractiveRenderImageReductionFactor();
+    rview->SetStillRenderImageReductionFactor(1);
+    rview->SetInteractiveRenderImageReductionFactor(1);
+
     rview->GetRenderer()->AddActor(this->Actor);
     return this->Superclass::AddToView(view);
   }
@@ -342,6 +380,9 @@ bool vtknvindex_irregular_volume_representation::RemoveFromView(vtkView* view)
   vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(view);
   if (rview)
   {
+    rview->SetStillRenderImageReductionFactor(m_still_image_reduction_factor);
+    rview->SetInteractiveRenderImageReductionFactor(m_interactive_image_reduction_factor);
+
     rview->GetRenderer()->RemoveActor(this->Actor);
     return this->Superclass::RemoveFromView(view);
   }

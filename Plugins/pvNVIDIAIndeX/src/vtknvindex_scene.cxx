@@ -39,13 +39,10 @@
 #include <nv/index/ilight.h>
 #include <nv/index/imaterial.h>
 #include <nv/index/iplane.h>
-#include <nv/index/iregular_volume_rendering_properties.h>
-#include <nv/index/iregular_volume_texture.h>
 #include <nv/index/irendering_kernel_programs.h>
 #include <nv/index/iscene.h>
 
 #include <nv/index/isparse_volume_rendering_properties.h>
-#include <nv/index/ivolume_filter_mode.h>
 
 #include "vtkCamera.h"
 #include "vtkRenderWindow.h"
@@ -214,11 +211,11 @@ void vtknvindex_scene::set_visibility(bool visibility)
       if (visibility)
       {
         // Reset the affinity information to IndeX in case it changed. Otherwise it will be ignored.
-        mi::base::Handle<vtknvindex_affinity> affinity = m_cluster_properties->get_affinity();
+        nv::index::IAffinity_information* affinity = m_cluster_properties->get_affinity();
 
         // NVIDIA IndeX session will take ownership of the affinity.
         affinity->retain();
-        m_index_instance->m_iindex_session->set_affinity_information(affinity.get());
+        m_index_instance->m_iindex_session->set_affinity_information(affinity);
 
         // Access the session instance from the database.
         mi::base::Handle<const nv::index::ISession> session(
@@ -282,22 +279,36 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
   if (m_scene_created)
     return;
 
-  // Set the affinity information.
-  mi::base::Handle<vtknvindex_affinity> affinity = m_cluster_properties->get_affinity();
+// Set the affinity information.
+#ifdef USE_KDTREE
+  // Set KDTree affinity only when running in multiple ranks
+  if (vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() > 1)
+#endif
+  {
+    nv::index::IAffinity_information* affinity = m_cluster_properties->get_affinity();
+    std::ostringstream s;
 
-  std::ostringstream s;
-  affinity->scene_dump_affinity_info(s);
-  INFO_LOG << s.str();
+    mi::base::Handle<vtknvindex_KDTree_affinity> affinity_vtk_kdtree(
+      affinity->get_interface<vtknvindex_KDTree_affinity>());
+    if (affinity_vtk_kdtree)
+    {
+      affinity_vtk_kdtree->scene_dump_affinity_info(s);
+    }
 
-  // NVIDIA IndeX session will take ownership of the affinity.
-  affinity->retain();
+    mi::base::Handle<vtknvindex_affinity> affinity_vtk(
+      affinity->get_interface<vtknvindex_affinity>());
+    if (affinity_vtk)
+    {
+      affinity_vtk->scene_dump_affinity_info(s);
+    }
 
-  m_index_instance->m_iindex_session->set_affinity_information(affinity.get());
+    INFO_LOG << s.str();
 
-  // // DiCE database access.
-  // mi::base::Handle<mi::neuraylib::IDice_transaction> dice_transaction(
-  //  m_index_instance.m_global_scope->create_transaction<mi::neuraylib::IDice_transaction>());
-  // assert(dice_transaction.is_valid_interface());
+    // NVIDIA IndeX session will take ownership of the affinity.
+    affinity->retain();
+
+    m_index_instance->m_iindex_session->set_affinity_information(affinity);
+  }
 
   // GUI settings.
   vtknvindex_config_settings* pv_config_settings = m_cluster_properties->get_config_settings();
@@ -820,16 +831,36 @@ void vtknvindex_scene::update_volume(
     }
   }
 
-  // Set the affinity information.
-  mi::base::Handle<vtknvindex_affinity> affinity = m_cluster_properties->get_affinity();
+// Set the affinity information.
+#ifdef USE_KDTREE
+  // Set KDTree affinity only when running in multiple ranks
+  if (vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() > 1)
+#endif
+  {
+    nv::index::IAffinity_information* affinity = m_cluster_properties->get_affinity();
+    std::ostringstream s;
 
-  std::ostringstream s;
-  affinity->scene_dump_affinity_info(s);
-  INFO_LOG << s.str();
+    mi::base::Handle<vtknvindex_KDTree_affinity> affinity_vtk_kdtree(
+      affinity->get_interface<vtknvindex_KDTree_affinity>());
+    if (affinity_vtk_kdtree)
+    {
+      affinity_vtk_kdtree->scene_dump_affinity_info(s);
+    }
 
-  // NVIDIA IndeX session takes ownership of the affinity.
-  affinity->retain();
-  m_index_instance->m_iindex_session->set_affinity_information(affinity.get());
+    mi::base::Handle<vtknvindex_affinity> affinity_vtk(
+      affinity->get_interface<vtknvindex_affinity>());
+    if (affinity_vtk)
+    {
+      affinity_vtk->scene_dump_affinity_info(s);
+    }
+
+    INFO_LOG << s.str();
+
+    // NVIDIA IndeX session will take ownership of the affinity.
+    affinity->retain();
+
+    m_index_instance->m_iindex_session->set_affinity_information(affinity);
+  }
 
   // Create and setup the scene.
   {
@@ -1550,7 +1581,23 @@ void vtknvindex_scene::export_session()
       vtksys::ofstream f(output_filename.c_str());
       f << s.str();
       std::ostringstream af;
-      m_cluster_properties->get_affinity()->scene_dump_affinity_info(af);
+
+      nv::index::IAffinity_information* affinity = m_cluster_properties->get_affinity();
+
+      mi::base::Handle<vtknvindex_KDTree_affinity> affinity_vtk_kdtree(
+        affinity->get_interface<vtknvindex_KDTree_affinity>());
+      if (affinity_vtk_kdtree)
+      {
+        affinity_vtk_kdtree->scene_dump_affinity_info(af);
+      }
+
+      mi::base::Handle<vtknvindex_affinity> affinity_vtk(
+        affinity->get_interface<vtknvindex_affinity>());
+      if (affinity_vtk)
+      {
+        affinity_vtk->scene_dump_affinity_info(af);
+      }
+
       f << af.str();
       f.close();
     }

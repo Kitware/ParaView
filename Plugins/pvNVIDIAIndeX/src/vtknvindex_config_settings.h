@@ -125,7 +125,7 @@ public:
 
   // Set/get filtering mode
   void set_filter_mode(mi::Sint32 filter_mode);
-  nv::index::IConfig_settings::Volume_filtering_modes get_filter_mode() const;
+  mi::Sint32 get_filter_mode() const;
 
   // Set/get pre-integration mode.
   void set_preintegration(bool enable_preint);

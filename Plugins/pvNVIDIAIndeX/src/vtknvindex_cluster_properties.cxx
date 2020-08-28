@@ -1,29 +1,29 @@
 /* Copyright 2020 NVIDIA Corporation. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions
-* are met:
-*  * Redistributions of source code must retain the above copyright
-*    notice, this list of conditions and the following disclaimer.
-*  * Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the
-*    documentation and/or other materials provided with the distribution.
-*  * Neither the name of NVIDIA CORPORATION nor the names of its
-*    contributors may be used to endorse or promote products derived
-*    from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-* PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-* OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *  * Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *  * Neither the name of NVIDIA CORPORATION nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <algorithm>
 #include <limits>
@@ -78,6 +78,10 @@ vtknvindex_cluster_properties::vtknvindex_cluster_properties()
   : m_rank_id(-1)
 {
   m_affinity = new vtknvindex_affinity();
+#ifdef USE_KDTREE
+  m_affinity_kdtree = new vtknvindex_KDTree_affinity();
+#endif
+
   m_config_settings = new vtknvindex_config_settings();
   m_regular_vol_properties = new vtknvindex_regular_volume_properties();
 }
@@ -115,9 +119,18 @@ vtknvindex_regular_volume_properties* vtknvindex_cluster_properties::get_regular
 }
 
 // ------------------------------------------------------------------------------------------------
-mi::base::Handle<vtknvindex_affinity> vtknvindex_cluster_properties::get_affinity() const
+nv::index::IAffinity_information* vtknvindex_cluster_properties::get_affinity() const
 {
-  return m_affinity;
+  if (m_affinity_kdtree && m_affinity_kdtree->get_nb_nodes() > 0)
+    return m_affinity_kdtree.get();
+  else
+    return m_affinity.get();
+}
+
+// ------------------------------------------------------------------------------------------------
+vtknvindex_KDTree_affinity* vtknvindex_cluster_properties::get_affinity_kdtree() const
+{
+  return m_affinity_kdtree.get();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -195,6 +208,12 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
   // Set affinity information for NVIDIA IndeX.
   m_affinity->reset_affinity();
   m_affinity->add_affinity(current_bbox, 1);
+
+  if (m_affinity_kdtree)
+  {
+    m_affinity_kdtree->reset_affinity();
+    m_affinity_kdtree->add_affinity(current_bbox, 1);
+  }
 
   m_rankid_to_hostid[0] = 1;
 
@@ -298,6 +317,8 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
   }
 
   m_affinity->set_hostinfo(m_hostinfo);
+  if (m_affinity_kdtree)
+    m_affinity_kdtree->set_hostinfo(m_hostinfo);
 
   return true;
 }
@@ -429,6 +450,9 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
 
   // Add per rank information like affinity, shared memory details etc.
   m_affinity->reset_affinity();
+  if (m_affinity_kdtree)
+    m_affinity_kdtree->reset_affinity();
+
   for (mi::Uint32 i = 0; i < m_num_ranks; ++i)
   {
     mi::Uint32 offset = i * 6;
@@ -500,6 +524,8 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
 
     // Set affinity information for NVIDIA IndeX.
     m_affinity->add_affinity(current_affinity, hostid, all_gpu_ids[i]);
+    if (m_affinity_kdtree)
+      m_affinity_kdtree->add_affinity(current_affinity, hostid, all_gpu_ids[i]);
 
     m_rankid_to_hostid[m_all_rank_ids[i]] = hostid;
 
@@ -583,6 +609,8 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
   delete[] all_rank_extents;
 
   m_affinity->set_hostinfo(m_hostinfo);
+  if (m_affinity_kdtree)
+    m_affinity_kdtree->set_hostinfo(m_hostinfo);
 
   return true;
 }

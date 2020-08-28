@@ -93,7 +93,9 @@ public:
   // Cluster properties from Representation.
   void set_cluster_properties(vtknvindex_cluster_properties* cluster_properties);
 
-  // Set ParaView domain subdivision KD-Tree.
+  // Set raw cuts (leaf node before merging) and associated ranks, used to reconstruct kd-tree.
+  void set_raw_cuts(const std::vector<vtkBoundingBox>& raw_cuts, const std::vector<int>& ranks);
+
   void set_subregion_bounds(const vtkBoundingBox& bbox);
 
   // The CUDA code need to be updated on changes applied in the GUI.
@@ -141,6 +143,9 @@ private:
   vtkMultiProcessController* m_controller;             // MPI controller from ParaView.
   vtkDataArray* m_scalar_array;                        // Scalar array containing actual data.
   vtknvindex_irregular_volume_data m_volume_data;      // Tetrahedral volume data.
+
+  std::vector<vtkBoundingBox> m_raw_cuts; // Raw cuts used to reconstruct kd-tree, optional.
+  std::vector<int> m_raw_cuts_ranks;      // Ranks associated with the raw cuts.
 
   mi::Float64 m_subregion_bounds[6]; // bounds when using ordered compositing.
   mi::Float64 m_whole_bounds[6];     // whole volume bounds.

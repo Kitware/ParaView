@@ -43,6 +43,7 @@
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVRenderViewDataDeliveryManager.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProcessModule.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -223,14 +224,24 @@ int vtknvindex_representation::ProcessViewRequest(
     if (producerPort)
     {
       vtkAlgorithm* producer = producerPort->GetProducer();
+
+      int has_time_steps = 0;
+      int nb_time_steps = 0;
+      int cur_time_step = 0;
+
       vtkPolyData* polyData =
         vtkPolyData::SafeDownCast(producer->GetOutputDataObject(producerPort->GetIndex()));
-      vtkDataArray* index_animation_params =
-        polyData->GetFieldData()->GetArray("index_animation_params");
-
-      const int has_time_steps = index_animation_params->GetComponent(0, 0);
-      const int nb_time_steps = index_animation_params->GetComponent(0, 1);
-      const int cur_time_step = index_animation_params->GetComponent(0, 2);
+      if (polyData)
+      {
+        vtkDataArray* index_animation_params =
+          polyData->GetFieldData()->GetArray("index_animation_params");
+        if (index_animation_params)
+        {
+          has_time_steps = index_animation_params->GetComponent(0, 0);
+          nb_time_steps = index_animation_params->GetComponent(0, 1);
+          cur_time_step = index_animation_params->GetComponent(0, 2);
+        }
+      }
 
       vtknvindex_regular_volume_properties* volume_properties =
         m_cluster_properties->get_regular_volume_properties();

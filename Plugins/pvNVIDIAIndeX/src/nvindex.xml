@@ -194,8 +194,8 @@
                 <EnumerationDomain name="enum">
                     <Entry value="0" text="Nearest"/>
                     <Entry value="1" text="Trilinear"/>
-                    <Entry value="5" text="Tricubic Catmull"/>
-                    <Entry value="7" text="Tricubic Bspline"/>
+                    <Entry value="3" text="Tricubic Catmull"/>
+                    <Entry value="5" text="Tricubic Bspline"/>
                 </EnumerationDomain>
                 <Documentation> Values correspond to that of in IndeX
                     Trilinear post-HW in IndeX
@@ -1163,8 +1163,8 @@
                 <EnumerationDomain name="enum">
                     <Entry value="0" text="Nearest"/>
                     <Entry value="1" text="Trilinear"/>
-                    <Entry value="5" text="Tricubic Catmull"/>
-                    <Entry value="7" text="Tricubic Bspline"/>
+                    <Entry value="3" text="Tricubic Catmull"/>
+                    <Entry value="5" text="Tricubic Bspline"/>
                 </EnumerationDomain>
                 <Documentation> Values correspond to that of in IndeX
                     Trilinear post-HW in IndeX

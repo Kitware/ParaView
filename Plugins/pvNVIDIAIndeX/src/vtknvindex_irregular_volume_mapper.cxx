@@ -445,6 +445,14 @@ void vtknvindex_irregular_volume_mapper::set_cluster_properties(
 }
 
 //-------------------------------------------------------------------------------------------------
+void vtknvindex_irregular_volume_mapper::set_raw_cuts(
+  const std::vector<vtkBoundingBox>& raw_cuts, const std::vector<int>& ranks)
+{
+  m_raw_cuts = raw_cuts;
+  m_raw_cuts_ranks = ranks;
+}
+
+//-------------------------------------------------------------------------------------------------
 void vtknvindex_irregular_volume_mapper::set_subregion_bounds(const vtkBoundingBox& bbox)
 {
   if (bbox.IsValid())
@@ -580,9 +588,23 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
 
       // Setup scene information.
       if (!m_scene.scene_created())
+      {
+        if (!m_raw_cuts.empty())
+        {
+          vtknvindex_KDTree_affinity* affinity_vtk_kdtree =
+            m_cluster_properties->get_affinity_kdtree();
+          if (affinity_vtk_kdtree)
+          {
+            affinity_vtk_kdtree->build(m_raw_cuts, m_raw_cuts_ranks);
+          }
+        }
+
         m_scene.create_scene(ren, vol, dice_transaction, vtknvindex_scene::VOLUME_TYPE_IRREGULAR);
+      }
       else if (m_volume_changed)
+      {
         m_scene.update_volume(dice_transaction, vtknvindex_scene::VOLUME_TYPE_IRREGULAR);
+      }
 
       // Update scene parameters.
       m_scene.update_scene(
