@@ -85,6 +85,7 @@ vtknvindex_volumemapper::vtknvindex_volumemapper()
   , m_volume_changed(false)
   , m_rtc_kernel_changed(false)
   , m_rtc_param_changed(false)
+  , m_is_mpi_rendering(false)
 
 {
   m_index_instance = vtknvindex_instance::get();
@@ -198,8 +199,8 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
 {
   vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Initialization");
 
-  bool is_MPI = (m_controller->GetNumberOfProcesses() > 1);
-  const mi::Sint32 cur_global_rank = is_MPI ? m_controller->GetLocalProcessId() : 0;
+  m_is_mpi_rendering = (m_controller->GetNumberOfProcesses() > 1);
+  const mi::Sint32 cur_global_rank = m_is_mpi_rendering ? m_controller->GetLocalProcessId() : 0;
 
   // Init scalar pointers array
   if (m_cluster_properties->get_regular_volume_properties()->is_timeseries_data())
@@ -278,12 +279,38 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
 
   dataset_parameters.volume_data = &volume_data;
 
+  if (m_is_mpi_rendering)
+  {
+    bool matches_whole_bounds = true;
+    for (int i = 0; i < 6; ++i)
+    {
+      if (static_cast<int>(m_whole_bounds[i]) != extent[i])
+      {
+        matches_whole_bounds = false;
+        break;
+      }
+    }
+
+    if (matches_whole_bounds)
+    {
+      WARN_LOG << "Parallel rendering disabled, only a single GPU will be used! "
+               << "The extent of the volume piece on MPI rank " << cur_global_rank << " (of "
+               << m_controller->GetNumberOfProcesses() << ") "
+               << "is equal to the extent of the entire volume: [" << extent[0] << " " << extent[2]
+               << " " << extent[4] << "; " << extent[1] << " " << extent[3] << " " << extent[5]
+               << "]. "
+               << "This typically happens when using a file format that does not support parallel "
+               << "processing, such as the legacy VTK file format.";
+      m_is_mpi_rendering = false;
+    }
+  }
+
   // clean shared memory
   m_cluster_properties->unlink_shared_memory(true);
 
   // Collect dataset type, ranges, bounding boxes, scalar values and affinity to be passed to NVIDIA
   // IndeX.
-  if (is_MPI)
+  if (m_is_mpi_rendering)
   {
     mi::Sint32 current_hostid = 0;
     if (m_index_instance->is_index_rank())
@@ -312,7 +339,10 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
 
   m_is_mapper_initialized = true;
 
-  m_controller->Barrier();
+  if (m_is_mpi_rendering)
+  {
+    m_controller->Barrier();
+  }
 
   vtkTimerLog::MarkEndEvent("NVIDIA-IndeX: Initialization");
 
@@ -491,12 +521,19 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
 
     std::string scalar_type;
     m_cluster_properties->get_regular_volume_properties()->get_scalar_type(scalar_type);
-    host_props->fetch_remote_volume_border_data(
-      m_controller, cur_time_step, piece_data, scalar_type);
+
+    if (m_is_mpi_rendering)
+    {
+      host_props->fetch_remote_volume_border_data(
+        m_controller, cur_time_step, piece_data, scalar_type);
+    }
   }
 
-  // Wait for all ranks to finish writing volume data before the render starts.
-  m_controller->Barrier();
+  if (m_is_mpi_rendering)
+  {
+    // Wait for all ranks to finish writing volume data before the render starts.
+    m_controller->Barrier();
+  }
 
   if (m_index_instance->is_index_viewer() && m_index_instance->is_index_initialized())
   {
@@ -607,8 +644,12 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
 
   m_volume_changed = false;
 
+  if (m_is_mpi_rendering)
+  {
+    m_controller->Barrier();
+  }
+
   // clean shared memory
-  m_controller->Barrier();
   m_cluster_properties->unlink_shared_memory(false);
 }
 
