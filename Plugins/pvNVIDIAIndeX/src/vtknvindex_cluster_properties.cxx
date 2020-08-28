@@ -74,9 +74,26 @@ size_t vtknvindex_irregular_volume_data::get_memory_size(const std::string& scal
 }
 
 // ------------------------------------------------------------------------------------------------
-vtknvindex_cluster_properties::vtknvindex_cluster_properties()
+std::map<mi::Uint32, vtknvindex_cluster_properties*> vtknvindex_cluster_properties::s_instances;
+
+// ------------------------------------------------------------------------------------------------
+vtknvindex_cluster_properties::vtknvindex_cluster_properties(bool register_instance)
   : m_rank_id(-1)
 {
+  if (register_instance)
+  {
+    // Register the instance
+    static mi::Uint32 instance_counter = 0;
+    instance_counter++;
+    m_instance_id = instance_counter;
+
+    s_instances[m_instance_id] = this;
+  }
+  else
+  {
+    m_instance_id = 0;
+  }
+
   m_affinity = new vtknvindex_affinity();
 #ifdef USE_KDTREE
   m_affinity_kdtree = new vtknvindex_KDTree_affinity();
@@ -103,6 +120,12 @@ vtknvindex_cluster_properties::~vtknvindex_cluster_properties()
 
   delete m_regular_vol_properties;
   delete m_config_settings;
+
+  if (m_instance_id > 0)
+  {
+    // Unregister the instance
+    s_instances.erase(m_instance_id);
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -642,72 +665,21 @@ void vtknvindex_cluster_properties::print_info() const
 }
 
 // ------------------------------------------------------------------------------------------------
-void vtknvindex_cluster_properties::serialize(mi::neuraylib::ISerializer* serializer) const
+mi::Uint32 vtknvindex_cluster_properties::get_instance_id() const
 {
-  // Serialize rankid to host id.
-  {
-    const mi::Size nb_elements = m_rankid_to_hostid.size();
-    serializer->write(&nb_elements);
-
-    std::map<mi::Sint32, mi::Uint32>::const_iterator itr = m_rankid_to_hostid.begin();
-    for (; itr != m_rankid_to_hostid.end(); ++itr)
-    {
-      serializer->write(&itr->first);
-      serializer->write(&itr->second);
-    }
-  }
-
-  // Serialize host properties.
-  {
-    const mi::Size nb_elements = m_hostinfo.size();
-    serializer->write(&nb_elements);
-
-    std::map<mi::Uint32, vtknvindex_host_properties*>::const_iterator itr = m_hostinfo.begin();
-    for (; itr != m_hostinfo.end(); ++itr)
-    {
-      serializer->write(&itr->first);
-      const vtknvindex_host_properties* host_properties = itr->second;
-      host_properties->serialize(serializer);
-    }
-  }
-
-  // Serialize volume properties.
-  m_regular_vol_properties->serialize(serializer);
+  return m_instance_id;
 }
 
 // ------------------------------------------------------------------------------------------------
-void vtknvindex_cluster_properties::deserialize(mi::neuraylib::IDeserializer* deserializer)
+vtknvindex_cluster_properties* vtknvindex_cluster_properties::get_instance(mi::Uint32 instance_id)
 {
-  // Deserialize rank id to host id.
+  auto it = s_instances.find(instance_id);
+  if (it != s_instances.end())
   {
-    mi::Size nb_elements = 0;
-    deserializer->read(&nb_elements);
-
-    for (mi::Uint32 i = 0; i < nb_elements; ++i)
-    {
-      mi::Sint32 rankid = 0;
-      deserializer->read(&rankid);
-      mi::Uint32 hostid = 0;
-      deserializer->read(&hostid);
-      m_rankid_to_hostid[rankid] = hostid;
-    }
+    return it->second;
   }
-
-  // Deserialize shminfo.
+  else
   {
-    mi::Size nb_elements = 0;
-    deserializer->read(&nb_elements);
-
-    for (mi::Uint32 i = 0; i < nb_elements; ++i)
-    {
-      mi::Uint32 hostid = 0;
-      deserializer->read(&hostid);
-      vtknvindex_host_properties* host_properties = new vtknvindex_host_properties();
-      host_properties->deserialize(deserializer);
-      m_hostinfo[hostid] = host_properties;
-    }
+    return nullptr;
   }
-
-  // Deserialize volume properties.
-  m_regular_vol_properties->deserialize(deserializer);
 }

@@ -116,10 +116,6 @@ public:
   // Print the host details.
   void print_info() const;
 
-  // Serialization
-  void serialize(mi::neuraylib::ISerializer* serializer) const;
-  void deserialize(mi::neuraylib::IDeserializer* deserializer);
-
 private:
   vtknvindex_host_properties(const vtknvindex_host_properties&) = delete;
   void operator=(const vtknvindex_host_properties&) = delete;

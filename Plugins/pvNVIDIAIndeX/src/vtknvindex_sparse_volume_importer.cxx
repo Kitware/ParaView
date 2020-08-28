@@ -865,7 +865,8 @@ void vtknvindex_sparse_volume_importer::serialize(mi::neuraylib::ISerializer* se
   serializer->write(&m_border_size);
   serializer->write(&m_ghost_levels);
 
-  m_cluster_properties->serialize(serializer);
+  const mi::Uint32 instance_id = m_cluster_properties->get_instance_id();
+  serializer->write(&instance_id);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -876,8 +877,9 @@ void vtknvindex_sparse_volume_importer::deserialize(mi::neuraylib::IDeserializer
   deserializer->read(&m_border_size);
   deserializer->read(&m_ghost_levels);
 
-  m_cluster_properties = new vtknvindex_cluster_properties();
-  m_cluster_properties->deserialize(deserializer);
+  mi::Uint32 instance_id;
+  deserializer->read(&instance_id);
+  m_cluster_properties = vtknvindex_cluster_properties::get_instance(instance_id);
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -149,7 +149,7 @@ vtknvindex_representation::vtknvindex_representation()
   this->Actor->SetProperty(this->Property);
   this->Actor->SetLODMapper(this->OutlineMapper);
 
-  m_cluster_properties = new vtknvindex_cluster_properties();
+  m_cluster_properties = new vtknvindex_cluster_properties(true);
   m_app_config_settings = m_cluster_properties->get_config_settings();
 
   static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer())

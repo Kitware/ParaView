@@ -85,7 +85,9 @@ struct vtknvindex_dataset_parameters
 class vtknvindex_cluster_properties
 {
 public:
-  vtknvindex_cluster_properties();
+  // When register_instance is true, the newly created instance will be made available through
+  // get_instance().
+  vtknvindex_cluster_properties(bool register_instance = false);
   ~vtknvindex_cluster_properties();
 
   // Get general config settings.
@@ -121,14 +123,17 @@ public:
   // Print all the cluster details.
   void print_info() const;
 
-  void serialize(mi::neuraylib::ISerializer* serializer) const;
-  void deserialize(mi::neuraylib::IDeserializer* deserializer);
+  // Returns the id that can be passed to get_instance(), or 0 if it was not registered.
+  mi::Uint32 get_instance_id() const;
 
-  // Build the host list with its rank list assignments.
+  // Returns a previously registered instance of this class.
+  static vtknvindex_cluster_properties* get_instance(mi::Uint32 instance_id);
 
 private:
   vtknvindex_cluster_properties(const vtknvindex_cluster_properties&) = delete;
   void operator=(const vtknvindex_cluster_properties&) = delete;
+
+  mi::Uint32 m_instance_id; // Identifier of this instance.
 
   mi::Sint32 m_rank_id;                                           // Rank id for the host.
   mi::base::Handle<vtknvindex_affinity> m_affinity;               // Affinity for NVIDIA IndeX.
@@ -142,6 +147,9 @@ private:
   std::map<std::string, mi::Uint32> m_hostname_to_hostid; // Host names to host ids.
   std::map<mi::Sint32, mi::Uint32> m_rankid_to_hostid;    // Rank_id to host id.
   std::map<mi::Uint32, vtknvindex_host_properties*> m_hostinfo; // Host_id to host_properties.
+
+  static std::map<mi::Uint32, vtknvindex_cluster_properties*>
+    s_instances; // All registered instances.
 };
 
 #endif

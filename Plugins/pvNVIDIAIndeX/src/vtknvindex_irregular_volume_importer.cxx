@@ -556,7 +556,8 @@ void vtknvindex_irregular_volume_importer::serialize(mi::neuraylib::ISerializer*
 {
   vtknvindex::util::serialize(serializer, m_scalar_type);
 
-  m_cluster_properties->serialize(serializer);
+  const mi::Uint32 instance_id = m_cluster_properties->get_instance_id();
+  serializer->write(&instance_id);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -564,6 +565,7 @@ void vtknvindex_irregular_volume_importer::deserialize(mi::neuraylib::IDeseriali
 {
   vtknvindex::util::deserialize(deserializer, m_scalar_type);
 
-  m_cluster_properties = new vtknvindex_cluster_properties();
-  m_cluster_properties->deserialize(deserializer);
+  mi::Uint32 instance_id;
+  deserializer->read(&instance_id);
+  m_cluster_properties = vtknvindex_cluster_properties::get_instance(instance_id);
 }

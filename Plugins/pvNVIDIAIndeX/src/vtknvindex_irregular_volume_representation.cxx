@@ -97,7 +97,7 @@ vtknvindex_irregular_volume_representation::vtknvindex_irregular_volume_represen
   vtkMath::UninitializeBounds(this->DataBounds);
 
   // Create NVIDIA IndeX cluster properties and application settings.
-  m_cluster_properties = new vtknvindex_cluster_properties();
+  m_cluster_properties = new vtknvindex_cluster_properties(true);
   m_app_config_settings = m_cluster_properties->get_config_settings();
 
   this->DefaultMapper->set_cluster_properties(m_cluster_properties);

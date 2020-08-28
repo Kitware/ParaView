@@ -249,7 +249,8 @@ void vtknvindex_volume_compute::serialize(mi::neuraylib::ISerializer* serializer
   serializer->write(&m_ghost_levels);
   serializer->write(&m_volume_size.x, 3);
 
-  m_cluster_properties->serialize(serializer);
+  const mi::Uint32 instance_id = m_cluster_properties->get_instance_id();
+  serializer->write(&instance_id);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -261,6 +262,7 @@ void vtknvindex_volume_compute::deserialize(mi::neuraylib::IDeserializer* deseri
   deserializer->read(&m_ghost_levels);
   deserializer->read(&m_volume_size.x, 3);
 
-  m_cluster_properties = new vtknvindex_cluster_properties();
-  m_cluster_properties->deserialize(deserializer);
+  mi::Uint32 instance_id;
+  deserializer->read(&instance_id);
+  m_cluster_properties = vtknvindex_cluster_properties::get_instance(instance_id);
 }
