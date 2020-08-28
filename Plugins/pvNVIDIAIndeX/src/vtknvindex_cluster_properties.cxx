@@ -240,11 +240,13 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
   // collecting information for shared memory: bbox, type, size, time step.
   mi::Uint32 nb_time_steps = m_regular_vol_properties->get_nb_time_steps();
 
+  const mi::Sint32 current_rankid = 0;
+
   for (mi::Uint32 time_step = 0; time_step < nb_time_steps; ++time_step)
   {
     std::stringstream ss;
     ss << "pv_nvindex_shm_rank_";
-    ss << 0;
+    ss << current_rankid;
     ss << "_timestep_";
     ss << time_step;
 
@@ -531,7 +533,7 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
 
     m_rankid_to_hostid[m_all_rank_ids[i]] = hostid;
 
-    mi::Sint32 current_rankid = m_all_rank_ids[i];
+    const mi::Sint32 current_rankid = m_all_rank_ids[i];
 
     std::map<mi::Uint32, vtknvindex_host_properties*>::iterator shmit = m_hostinfo.find(hostid);
     if (shmit == m_hostinfo.end())
@@ -657,25 +659,25 @@ void vtknvindex_cluster_properties::serialize(mi::neuraylib::ISerializer* serial
   // Serialize rankid to host id.
   {
     const mi::Size nb_elements = m_rankid_to_hostid.size();
-    serializer->write(&nb_elements, 1);
+    serializer->write(&nb_elements);
 
     std::map<mi::Sint32, mi::Uint32>::const_iterator itr = m_rankid_to_hostid.begin();
     for (; itr != m_rankid_to_hostid.end(); ++itr)
     {
-      serializer->write(&itr->first, 1);
-      serializer->write(&itr->second, 1);
+      serializer->write(&itr->first);
+      serializer->write(&itr->second);
     }
   }
 
   // Serialize host properties.
   {
     const mi::Size nb_elements = m_hostinfo.size();
-    serializer->write(&nb_elements, 1);
+    serializer->write(&nb_elements);
 
     std::map<mi::Uint32, vtknvindex_host_properties*>::const_iterator itr = m_hostinfo.begin();
     for (; itr != m_hostinfo.end(); ++itr)
     {
-      serializer->write(&itr->first, 1);
+      serializer->write(&itr->first);
       const vtknvindex_host_properties* host_properties = itr->second;
       host_properties->serialize(serializer);
     }
@@ -691,14 +693,14 @@ void vtknvindex_cluster_properties::deserialize(mi::neuraylib::IDeserializer* de
   // Deserialize rank id to host id.
   {
     mi::Size nb_elements = 0;
-    deserializer->read(&nb_elements, 1);
+    deserializer->read(&nb_elements);
 
     for (mi::Uint32 i = 0; i < nb_elements; ++i)
     {
       mi::Sint32 rankid = 0;
-      deserializer->read(&rankid, 1);
+      deserializer->read(&rankid);
       mi::Uint32 hostid = 0;
-      deserializer->read(&hostid, 1);
+      deserializer->read(&hostid);
       m_rankid_to_hostid[rankid] = hostid;
     }
   }
@@ -706,12 +708,12 @@ void vtknvindex_cluster_properties::deserialize(mi::neuraylib::IDeserializer* de
   // Deserialize shminfo.
   {
     mi::Size nb_elements = 0;
-    deserializer->read(&nb_elements, 1);
+    deserializer->read(&nb_elements);
 
     for (mi::Uint32 i = 0; i < nb_elements; ++i)
     {
       mi::Uint32 hostid = 0;
-      deserializer->read(&hostid, 1);
+      deserializer->read(&hostid);
       vtknvindex_host_properties* host_properties = new vtknvindex_host_properties();
       host_properties->deserialize(deserializer);
       m_hostinfo[hostid] = host_properties;
