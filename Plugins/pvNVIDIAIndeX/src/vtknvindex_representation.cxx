@@ -58,14 +58,22 @@
 #include "vtknvindex_utilities.h"
 #include "vtknvindex_volumemapper.h"
 
+// Enable ghosting in VTK to provide border data for regular volumes
+#define VTKNVINDEX_REGULAR_VOLUME_FORCE_VTK_GHOSTING
+
 vtknvindex_representation_initializer::vtknvindex_representation_initializer()
 {
+#ifdef VTKNVINDEX_REGULAR_VOLUME_FORCE_VTK_GHOSTING
+  // Force creation of ghost arrays for structured data (i.e. regular volumes) whenever this plugin
+  // is loaded. Setting this globally can be more efficient than requesting it later in
+  // vtknvindex_representation::RequestUpdateExtent().
   static unsigned int counter = 0;
   if (counter == 0)
   {
     vtkProcessModule::SetDefaultMinimumGhostLevelsToRequestForStructuredPipelines(2);
     ++counter;
   }
+#endif // VTKNVINDEX_REGULAR_VOLUME_FORCE_VTK_GHOSTING
 }
 
 vtknvindex_representation_initializer::~vtknvindex_representation_initializer()
@@ -538,6 +546,7 @@ int vtknvindex_representation::RequestUpdateExtent(
 {
   this->Superclass::RequestUpdateExtent(request, inputVector, outputVector);
 
+#ifdef VTKNVINDEX_REGULAR_VOLUME_FORCE_VTK_GHOSTING
   if (inputVector[0]->GetNumberOfInformationObjects() < 1)
   {
     return 1;
@@ -547,10 +556,15 @@ int vtknvindex_representation::RequestUpdateExtent(
 
   int ghost_levels = inInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS());
 
-  // ParaView's ghost cells must be equal to NVIDIA IndeX's border size.
+  // Request ParaView's ghost level to match NVIDIA IndeX border size.
+  //
+  // When the requested level is larger than the level of the source data (which may be influenced
+  // by vtknvindex_representation_initializer() above), the data will be gerated on the fly (an
+  // expensive operation).
   ghost_levels += m_app_config_settings->get_subcube_border();
 
   inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(), ghost_levels);
+#endif // VTKNVINDEX_REGULAR_VOLUME_FORCE_VTK_GHOSTING
 
   return 1;
 }

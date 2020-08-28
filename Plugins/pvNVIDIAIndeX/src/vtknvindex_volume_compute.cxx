@@ -190,9 +190,13 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
     free_buffer = true;
   }
 
+  // Ensure neighbor data is available
+  vtknvindex_neighbor_data neighbor_data(shm_info->m_shm_bbox, m_volume_size, m_border_size,
+    m_ghost_levels, m_cluster_properties->get_host_properties(rankid), time_step);
+
   // Import all brick pieces in parallel
   vtknvindex_import_bricks import_bricks_job(svol_subset_desc.get(), svol_data_subset.get(),
-    subset_data_buffer, vol_fmt_size, m_border_size, shm_bbox);
+    subset_data_buffer, vol_fmt_size, m_border_size, m_ghost_levels, shm_bbox, neighbor_data);
 
   dice_transaction->execute_fragmented(&import_bricks_job, import_bricks_job.get_nb_fragments());
 

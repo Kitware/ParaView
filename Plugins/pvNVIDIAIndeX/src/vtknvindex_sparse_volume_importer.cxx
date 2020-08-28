@@ -84,16 +84,139 @@ inline mi::Size volume_format_size(const nv::index::Sparse_volume_voxel_format f
 }
 
 //-------------------------------------------------------------------------------------------------
+vtknvindex_neighbor_data::vtknvindex_neighbor_data(const mi::math::Bbox<mi::Float32, 3>& piece_bbox,
+  const mi::math::Vector<mi::Uint32, 3>& volume_size, mi::Uint32 border_size,
+  mi::Uint32 ghost_levels, vtknvindex_host_properties* host_props, mi::Uint32 time_step)
+{
+  if (ghost_levels >= border_size)
+  {
+    // Border already handled by VTK ghosting, nothing to do
+    return;
+  }
+
+  // Handle the case where VTK ghost level are set to a smaller value than required by IndeX
+  const mi::Uint32 remaining_border_size = border_size - ghost_levels;
+
+  mi::math::Vector<mi::Sint32, 3> dir;
+  for (dir.z = -1; dir.z <= 1; ++dir.z)
+  {
+    for (dir.y = -1; dir.y <= 1; ++dir.y)
+    {
+      for (dir.x = -1; dir.x <= 1; ++dir.x)
+      {
+        if (dir.x == 0 && dir.y == 0 && dir.z == 0)
+        {
+          continue; // current piece, not a neighbor, skip
+        }
+
+        // Bbox containing all the required border data, located in the neighbor piece. Note that
+        // this bbox may be larger than the bbox of the neighbor, e.g. when the border size is set
+        // to 2 but the volume size of neighbor is just 1.
+        mi::math::Bbox<mi::Sint32, 3> border_bbox(piece_bbox);
+
+        // Similar, but fixed to a border size of 1. This is used to intersect with the bbox of
+        // the neighbor, making sure to handle the case where border_bbox is larger than the bbox
+        // of the neighbor.
+        mi::math::Bbox<mi::Float32, 3> query_bbox = piece_bbox;
+
+        bool outer_boundary = false;
+        for (int i = 0; i < 3; ++i)
+        {
+          if (dir[i] < 0)
+          {
+            border_bbox.max[i] = border_bbox.min[i];
+            border_bbox.min[i] -= remaining_border_size;
+
+            // Use fixed border size of 1 for query to handle the case when size of the neighbor
+            // piece is smaller than the border size (data will be clamped later).
+            query_bbox.max[i] = query_bbox.min[i];
+            query_bbox.min[i] -= 1;
+
+            if (query_bbox.min[i] < 0)
+            {
+              outer_boundary = true;
+              break;
+            }
+          }
+          else if (dir[i] > 0)
+          {
+            border_bbox.min[i] = border_bbox.max[i];
+            border_bbox.max[i] += remaining_border_size;
+
+            query_bbox.min[i] = query_bbox.max[i];
+            query_bbox.max[i] += 1;
+
+            if (query_bbox.max[i] > volume_size[i])
+            {
+              outer_boundary = true;
+              break;
+            }
+          }
+        }
+
+        if (outer_boundary)
+        {
+          // The outer boundary of the volume will be clamped anyway, ignore
+          continue;
+        }
+
+        // Retrieve neighbor data from shared memory
+        const vtknvindex_host_properties::shm_info* neighbor_info;
+        const mi::Uint8* neighbor_buffer =
+          host_props->get_subset_data_buffer(query_bbox, time_step, &neighbor_info);
+
+        if (!neighbor_info)
+        {
+          ERROR_LOG << LOG_svol_rvol_prefix << "Could not access volume information for neighbor "
+                    << query_bbox << " of " << piece_bbox << ".";
+        }
+        else if (!neighbor_buffer)
+        {
+          ERROR_LOG << LOG_svol_rvol_prefix << "Could not access volume data for neighbor "
+                    << query_bbox << " of " << piece_bbox << ": " << neighbor_info->m_shm_name
+                    << ". "
+                    << "Data is not available in shared memory?";
+        }
+        else
+        {
+          Neighbor_info* ni = new Neighbor_info();
+          ni->direction = dir;
+          ni->border_bbox = border_bbox;
+          ni->query_bbox = mi::math::Bbox<mi::Sint32, 3>(query_bbox);
+
+          ni->data_bbox = mi::math::Bbox<mi::Sint32, 3>(neighbor_info->m_shm_bbox);
+          ni->data_buffer = neighbor_buffer;
+
+          m_neighbors.push_back(ni);
+        }
+      }
+    }
+  }
+}
+
+//-------------------------------------------------------------------------------------------------
+vtknvindex_neighbor_data::~vtknvindex_neighbor_data()
+{
+  for (auto& it : m_neighbors)
+  {
+    delete it;
+  }
+}
+
+//-------------------------------------------------------------------------------------------------
 vtknvindex_import_bricks::vtknvindex_import_bricks(
   const nv::index::ISparse_volume_subset_data_descriptor* subset_data_descriptor,
   nv::index::ISparse_volume_subset* volume_subset, const mi::Uint8* source_buffer,
-  mi::Size vol_fmt_size, mi::Sint32 border_size, const vtknvindex::util::Bbox3i& source_bbox)
+  mi::Size vol_fmt_size, mi::Sint32 border_size, mi::Sint32 ghost_levels,
+  const vtknvindex::util::Bbox3i& source_bbox, const vtknvindex_neighbor_data& neighbor_data)
   : m_subset_data_descriptor(subset_data_descriptor)
   , m_volume_subset(volume_subset)
   , m_source_buffer(source_buffer)
   , m_vol_fmt_size(vol_fmt_size)
   , m_border_size(border_size)
+  , m_ghost_levels(ghost_levels)
   , m_source_bbox(source_bbox)
+  , m_neighbor_data(neighbor_data)
 {
   m_nb_bricks = subset_data_descriptor->get_subset_number_of_data_bricks();
   m_nb_fragments = vtknvindex_sysinfo::get_sysinfo()->get_number_logical_cpu();
@@ -109,7 +232,180 @@ vtknvindex_import_bricks::vtknvindex_import_bricks(
     m_nb_fragments = m_nb_bricks;
 }
 
+namespace
+{
+
+inline mi::Size calc_offset(mi::Uint32 x, mi::Uint32 y, mi::Uint32 z,
+  const mi::math::Vector<mi::Uint32, 3>& buffer_dims, mi::Size fmt_size)
+{
+  const mi::Size offset = static_cast<mi::Size>(x) + static_cast<mi::Size>(y) * buffer_dims.x +
+    static_cast<mi::Size>(z) * buffer_dims.x * buffer_dims.y;
+  return offset * fmt_size;
+}
+
+// Duplicate border voxels of src_bbox towards dst_bbox, effectively clamping the sub-volume. Voxels
+// outside of dst_bbox and voxels inside of src_bbox will stay unchanged.
+//
+// brick_bbox_global: bbox of the entire destination brick (volume coords)
+// src_bbox_global: data already written to the brick (volume coords)
+// dst_bbox_global: data that should be filled, clamping to src_bbox_global
+void clamp_to_border(const mi::math::Bbox<mi::Sint32, 3>& brick_bbox_global,
+  const mi::math::Bbox<mi::Sint32, 3>& src_bbox_global,
+  const mi::math::Bbox<mi::Sint32, 3>& dst_bbox_global, mi::Uint8* brick_buffer,
+  mi::Size voxel_fmt_size)
+{
+  using namespace vtknvindex::util;
+
+  if (src_bbox_global == brick_bbox_global)
+  {
+    return;
+  }
+
+  const Vec3u brick_dims(brick_bbox_global.extent());
+
+  // Convert to brick coordinates and clamp
+  const mi::math::Bbox<mi::Uint32, 3> src_bbox(
+    Vec3u(
+      mi::math::clamp(src_bbox_global.min - brick_bbox_global.min, Vec3i(0), Vec3i(brick_dims))),
+    Vec3u(
+      mi::math::clamp(src_bbox_global.max - brick_bbox_global.min, Vec3i(0), Vec3i(brick_dims))));
+
+  const mi::math::Bbox<mi::Uint32, 3> dst_bbox(
+    Vec3u(
+      mi::math::clamp(dst_bbox_global.min - brick_bbox_global.min, Vec3i(0), Vec3i(brick_dims))),
+    Vec3u(
+      mi::math::clamp(dst_bbox_global.max - brick_bbox_global.min, Vec3i(0), Vec3i(brick_dims))));
+
+  // Sanity check
+  if (!dst_bbox.is_volume() || !src_bbox.is_volume() || dst_bbox == src_bbox)
+  {
+    return;
+  }
+
+  // Clamp to border in x-direction
+  for (mi::Uint32 z = src_bbox.min.z; z < src_bbox.max.z; ++z)
+  {
+    for (mi::Uint32 y = src_bbox.min.y; y < src_bbox.max.y; ++y)
+    {
+      for (mi::Uint32 x = dst_bbox.min.x; x < src_bbox.min.x; ++x)
+      {
+        const mi::Size src = calc_offset(src_bbox.min.x, y, z, brick_dims, voxel_fmt_size);
+        const mi::Size dst = calc_offset(x, y, z, brick_dims, voxel_fmt_size);
+        memcpy(brick_buffer + dst, brick_buffer + src, voxel_fmt_size);
+      }
+
+      for (mi::Uint32 x = src_bbox.max.x; x < dst_bbox.max.x; ++x)
+      {
+        const mi::Size src = calc_offset(src_bbox.max.x - 1, y, z, brick_dims, voxel_fmt_size);
+        const mi::Size dst = calc_offset(x, y, z, brick_dims, voxel_fmt_size);
+        memcpy(brick_buffer + dst, brick_buffer + src, voxel_fmt_size);
+      }
+    }
+  }
+
+  // Length of a run in x-direction
+  const mi::Size len_x = dst_bbox.max.x - dst_bbox.min.x;
+
+  // Clamp to border in y-direction (including previously duplicated voxels in x)
+  for (mi::Uint32 z = src_bbox.min.z; z < src_bbox.max.z; ++z)
+  {
+
+    for (mi::Uint32 y = dst_bbox.min.y; y < src_bbox.min.y; ++y)
+    {
+      const mi::Size src =
+        calc_offset(dst_bbox.min.x, src_bbox.min.y, z, brick_dims, voxel_fmt_size);
+      const mi::Size dst = calc_offset(dst_bbox.min.x, y, z, brick_dims, voxel_fmt_size);
+      memcpy(brick_buffer + dst, brick_buffer + src, len_x * voxel_fmt_size);
+    }
+
+    for (mi::Uint32 y = src_bbox.max.y; y < dst_bbox.max.y; ++y)
+    {
+      const mi::Size src =
+        calc_offset(dst_bbox.min.x, src_bbox.max.y - 1, z, brick_dims, voxel_fmt_size);
+      const mi::Size dst = calc_offset(dst_bbox.min.x, y, z, brick_dims, voxel_fmt_size);
+      memcpy(brick_buffer + dst, brick_buffer + src, len_x * voxel_fmt_size);
+    }
+  }
+
+  // Clamp to border in z-direction (including previously duplicated voxels in x and y)
+  for (mi::Uint32 z = dst_bbox.min.z; z < src_bbox.min.z; ++z)
+  {
+    for (mi::Uint32 y = dst_bbox.min.y; y < dst_bbox.max.y; ++y)
+    {
+      const mi::Size src =
+        calc_offset(dst_bbox.min.x, y, src_bbox.min.z, brick_dims, voxel_fmt_size);
+      const mi::Size dst = calc_offset(dst_bbox.min.x, y, z, brick_dims, voxel_fmt_size);
+      memcpy(brick_buffer + dst, brick_buffer + src, len_x * voxel_fmt_size);
+    }
+  }
+
+  for (mi::Uint32 z = src_bbox.max.z; z < dst_bbox.max.z; ++z)
+  {
+    for (mi::Uint32 y = dst_bbox.min.y; y < dst_bbox.max.y; ++y)
+    {
+      const mi::Size src =
+        calc_offset(dst_bbox.min.x, y, src_bbox.max.z - 1, brick_dims, voxel_fmt_size);
+      const mi::Size dst = calc_offset(dst_bbox.min.x, y, z, brick_dims, voxel_fmt_size);
+      memcpy(brick_buffer + dst, brick_buffer + src, len_x * voxel_fmt_size);
+    }
+  }
+}
+
+// Copy a brick between two buffers. All bboxes are in the same global coordinate system.
+void copy_to_brick(const mi::math::Bbox<mi::Sint32, 3>& copy_bbox_global, mi::Uint8* dst_buffer,
+  const mi::math::Bbox<mi::Sint32, 3>& dst_buffer_bbox_global, const mi::Uint8* src_buffer,
+  const mi::math::Bbox<mi::Sint32, 3>& src_buffer_bbox_global, mi::Size voxel_fmt_size)
+{
+  using namespace vtknvindex::util;
+
+  // Destination buffer bbox might be smaller than requested copy_bbox, clamp accordingly.
+  // Note: No clamping for source buffer bbox
+  const Bbox3i copy_bbox_global_clamped(
+    mi::math::clamp(copy_bbox_global.min, dst_buffer_bbox_global.min, dst_buffer_bbox_global.max),
+    mi::math::clamp(copy_bbox_global.max, dst_buffer_bbox_global.min, dst_buffer_bbox_global.max));
+
+#if 0
+  ERROR_LOG << "*** copy_to_brick copy_bbox=" << copy_bbox_global
+            << ", clamped_bbox=" << copy_bbox_global_clamped
+            << ", dst_buffer_bbox=" << dst_buffer_bbox_global
+            << ", src_buffer_bbox=" << src_buffer_bbox_global;
+#endif
+
+  const Bbox3u read_bbox(Vec3u(copy_bbox_global_clamped.min - src_buffer_bbox_global.min),
+    Vec3u(copy_bbox_global_clamped.max - src_buffer_bbox_global.min));
+
+  const Vec3i write_delta(src_buffer_bbox_global.min - dst_buffer_bbox_global.min);
+
+  const Bbox3u write_bbox(
+    Vec3u(Vec3i(read_bbox.min) + write_delta), Vec3u(Vec3i(read_bbox.max) + write_delta));
+
+  const Vec3u dst_buffer_dims(dst_buffer_bbox_global.extent());
+  const Vec3u src_buffer_dims(src_buffer_bbox_global.extent());
+
+  const mi::Size len_x = read_bbox.max.x - read_bbox.min.x;
+
+  for (mi::Uint32 z = read_bbox.min.z; z < read_bbox.max.z; ++z)
+  {
+    for (mi::Uint32 y = read_bbox.min.y; y < read_bbox.max.y; ++y)
+    {
+      const mi::Size src_offset =
+        calc_offset(read_bbox.min.x, y, z, src_buffer_dims, voxel_fmt_size);
+      const mi::Size dst_offset = calc_offset(read_bbox.min.x + write_delta.x, y + write_delta.y,
+        z + write_delta.z, dst_buffer_dims, voxel_fmt_size);
+      memcpy(dst_buffer + dst_offset, src_buffer + src_offset, len_x * voxel_fmt_size);
+    }
+  }
+}
+
+} // namespace
+
 //-------------------------------------------------------------------------------------------------
+
+// Handle clamping against the outside border of the volume in a separated step and not in the main
+// copying loop. This is required to support border handling with neighboring pieces without VTK
+// ghosting.
+#define VTKNVINDEX_CLAMP_SEPARATELY
+
 void vtknvindex_import_bricks::execute_fragment(
   mi::neuraylib::IDice_transaction* /*dice_transaction*/, mi::Size index, mi::Size /*count*/,
   const mi::neuraylib::IJob_execution_context* /*context*/)
@@ -153,33 +449,78 @@ void vtknvindex_import_bricks::execute_fragment(
     // Destination: Bounding box of the brick where data will be written to (includes border
     const Vec3u dest_brick_dims = m_subset_data_descriptor->get_subset_data_brick_dimensions();
     const Vec3i dest_brick_position(brick_info.brick_position);
+    const Bbox3i dest_brick_bbox(dest_brick_position, dest_brick_position + Vec3i(dest_brick_dims));
 
-    // Clip against source bounding box plus outside border
-    Bbox3i clip_bbox(m_source_bbox);
+    const Bbox3i dest_brick_bbox_clipped_without_border(
+      mi::math::clamp(dest_brick_bbox.min, m_source_bbox.min, m_source_bbox.max),
+      mi::math::clamp(dest_brick_bbox.max, m_source_bbox.min, m_source_bbox.max));
+
+    Bbox3i source_bbox_with_border_inner(m_source_bbox);
     for (mi::Uint32 i = 0; i < 3; ++i)
     {
-      // Add outside border if necessary
-      if (clip_bbox.min[i] == entire_volume_bbox.min[i])
-        clip_bbox.min[i] -= m_border_size;
+      // Add inner border required by IndeX (adjusting for existing ghosting), but not outside
+      // border
+      const mi::Sint32 remaining_border = std::max(0, m_border_size - m_ghost_levels);
+      source_bbox_with_border_inner.min[i] = std::max(
+        source_bbox_with_border_inner.min[i] - remaining_border, entire_volume_bbox.min[i]);
+      source_bbox_with_border_inner.max[i] = std::min(
+        source_bbox_with_border_inner.max[i] + remaining_border, entire_volume_bbox.max[i]);
+    }
 
-      if (clip_bbox.max[i] == entire_volume_bbox.max[i])
-        clip_bbox.max[i] += m_border_size;
+    const Bbox3i dest_brick_bbox_clipped_with_border_inner(
+      mi::math::clamp(
+        dest_brick_bbox.min, source_bbox_with_border_inner.min, source_bbox_with_border_inner.max),
+      mi::math::clamp(
+        dest_brick_bbox.max, source_bbox_with_border_inner.min, source_bbox_with_border_inner.max));
+
+    Bbox3i source_bbox_with_border_all(source_bbox_with_border_inner);
+    for (mi::Uint32 i = 0; i < 3; ++i)
+    {
+      // Also add outside border (which is never covered by ghosting)
+      if (source_bbox_with_border_all.min[i] == entire_volume_bbox.min[i])
+        source_bbox_with_border_all.min[i] -= m_border_size;
+
+      if (source_bbox_with_border_all.max[i] == entire_volume_bbox.max[i])
+        source_bbox_with_border_all.max[i] += m_border_size;
     }
 
     // Defines what will be read from the source. If larger than the source bbox, then data will be
     // clamped/duplicated. This typically happens for outside border voxels or interior boundaries
     // when ghosting is not enabled.
-    Bbox3i read_bbox(dest_brick_position, dest_brick_position + Vec3i(dest_brick_dims));
-    read_bbox.min = mi::math::clamp(read_bbox.min, clip_bbox.min, clip_bbox.max);
-    read_bbox.max = mi::math::clamp(read_bbox.max, clip_bbox.min, clip_bbox.max);
+    const Bbox3i dest_brick_bbox_clipped_with_border(
+      mi::math::clamp(
+        dest_brick_bbox.min, source_bbox_with_border_all.min, source_bbox_with_border_all.max),
+      mi::math::clamp(
+        dest_brick_bbox.max, source_bbox_with_border_all.min, source_bbox_with_border_all.max));
+
+#ifdef VTKNVINDEX_CLAMP_SEPARATELY
+    // Border clamping will be handled separately, use bbox without border in the main loop
+    const Bbox3i dest_brick_bbox_clipped = dest_brick_bbox_clipped_without_border;
+#else
+    // Handle the border in the main loop
+    const Bbox3i dest_brick_bbox_clipped = dest_brick_bbox_clipped_with_border;
+#endif // VTKNVINDEX_CLAMP_SEPARATELY
 
     // Translate to local coordinates of the source buffer. Voxels with coordinates outside of
     // [0, source_dims - 1] will be clamped.
-    read_bbox.min -= m_source_bbox.min;
-    read_bbox.max -= m_source_bbox.min;
+    const Bbox3i read_bbox(dest_brick_bbox_clipped.min - m_source_bbox.min,
+      dest_brick_bbox_clipped.max - m_source_bbox.min);
 
     // Offset between start position in destination and source buffers
     const Vec3i dest_delta(m_source_bbox.min - dest_brick_position);
+
+#if 0
+    ERROR_LOG << "source_bbox=" << m_source_bbox << ", source_dims=" << source_dims
+              << ", entire_volume_bbox=" << entire_volume_bbox
+              << ", dest_brick_dims=" << dest_brick_dims << ", brick_bbox=" << dest_brick_bbox
+              << ", read_bbox=" << read_bbox << ", read_in_full_bbox="
+              << Bbox3i(read_bbox.min + m_source_bbox.min, read_bbox.max + m_source_bbox.min)
+              << ", write_in_brick_bbox="
+              << Bbox3i(read_bbox.min + dest_delta, read_bbox.max + dest_delta)
+              << ", write_in_full_bbox=" << Bbox3i(read_bbox.min + dest_delta + dest_brick_position,
+                                              read_bbox.max + dest_delta + dest_brick_position)
+              << ", dest_delta=" << dest_delta;
+#endif
 
     for (mi::Sint32 z = read_bbox.min.z; z < read_bbox.max.z; ++z)
     {
@@ -247,6 +588,63 @@ void vtknvindex_import_bricks::execute_fragment(
         }
       }
     }
+
+    // Handle inside border, retrieve voxels from neighboring pieces
+    for (const vtknvindex_neighbor_data::Neighbor_info* it : m_neighbor_data)
+    {
+      const Vec3i& dir = it->direction;
+
+      // Check whether any voxels of the neighbor piece need to be accessed for this brick
+      bool neighbor_access = false;
+      for (int i = 0; i < 3; ++i)
+      {
+        if (dir[i] > 0)
+        {
+          if (dest_brick_bbox_clipped_with_border_inner.max[i] > dest_brick_bbox_clipped.max[i])
+          {
+            neighbor_access = true;
+            break;
+          }
+        }
+        else if (dir[i] < 0)
+        {
+          if (dest_brick_bbox_clipped_with_border_inner.min[i] < dest_brick_bbox_clipped.min[i])
+          {
+            neighbor_access = true;
+            break;
+          }
+        }
+      }
+
+      if (!neighbor_access)
+      {
+        // Nothing to do
+        continue;
+      }
+
+      if (dest_brick_bbox_clipped_with_border_inner.contains(it->query_bbox.min) &&
+        dest_brick_bbox_clipped_with_border_inner.contains(it->query_bbox.max))
+      {
+#if 0
+        ERROR_LOG << "** neighbor " << it->direction << " for dest "
+                  << dest_brick_bbox_clipped_with_border_inner << " with border_bbox "
+                  << it->border_bbox << " and source " << m_source_bbox << ", with query "
+                  << it->query_bbox << " ==> copy border_bbox" << it->border_bbox
+                  << " from neighbor " << it->direction << " with data bbox " << it->data_bbox
+                  << " to " << dest_brick_bbox_clipped_with_border_inner << " in brick "
+                  << dest_brick_bbox;
+#endif
+
+        copy_to_brick(it->border_bbox, svol_brick_data_raw, dest_brick_bbox, it->data_buffer,
+          it->data_bbox, m_vol_fmt_size);
+      }
+    }
+
+    //
+    // Clamp data collected so far to the outer border (of the entire volume, not of the piece)
+    //
+    clamp_to_border(dest_brick_bbox, dest_brick_bbox_clipped_with_border_inner,
+      dest_brick_bbox_clipped_with_border, svol_brick_data_raw, m_vol_fmt_size);
   }
 }
 
@@ -408,6 +806,10 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
     free_buffer = true;
   }
 
+  // Ensure neighbor data is available
+  vtknvindex_neighbor_data neighbor_data(shm_info->m_shm_bbox, m_volume_size, m_border_size,
+    m_ghost_levels, m_cluster_properties->get_host_properties(rankid), time_step);
+
   INFO_LOG << "Importing volume data from " << (rankid == shm_info->m_rank_id ? "local" : "shared")
            << " "
            << "memory (" << shm_info->m_shm_name << ") on rank " << rankid << ", "
@@ -418,7 +820,7 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
 
   // Import all bricks for the subregion in parallel
   vtknvindex_import_bricks import_bricks_job(svol_subset_desc.get(), svol_data_subset.get(),
-    subset_data_buffer, vol_fmt_size, m_border_size, shm_bbox);
+    subset_data_buffer, vol_fmt_size, m_border_size, m_ghost_levels, shm_bbox, neighbor_data);
 
   dice_transaction->execute_fragmented(&import_bricks_job, import_bricks_job.get_nb_fragments());
 
