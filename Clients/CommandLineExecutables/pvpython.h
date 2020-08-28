@@ -30,6 +30,8 @@ void vtkPVInitializePythonModules();
 #include <vector>
 #include <vtksys/SystemTools.hxx>
 
+#include "ParaView_paraview_plugins.h"
+
 namespace ParaViewPython
 {
 
@@ -102,6 +104,9 @@ int Run(int processType, int argc, char* argv[])
   // register callback to initialize modules statically. The callback is
   // empty when BUILD_SHARED_LIBS is ON.
   vtkPVInitializePythonModules();
+
+  // register static plugins
+  ParaView_paraview_plugins_initialize();
 
   vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLs("paraview");
 

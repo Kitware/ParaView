@@ -53,7 +53,7 @@ static bool RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type
   vtkPVInitializePythonModules();
 #endif
 
-  // load static plugins
+  // register static plugins
   ParaView_paraview_plugins_initialize();
 
   vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLs("paraview");

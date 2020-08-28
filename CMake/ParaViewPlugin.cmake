@@ -488,7 +488,7 @@ ${_paraview_build_declarations}
 static bool ${_paraview_build_target_safe}_static_plugins_load(const char* name);
 static bool ${_paraview_build_target_safe}_static_plugins_search(const char* name);
 
-void ${_paraview_build_target_safe}_initialize()
+static void ${_paraview_build_target_safe}_initialize()
 {
   vtkPVPluginLoader::RegisterLoadPluginCallback(${_paraview_build_target_safe}_static_plugins_load);
   vtkPVPluginTracker::RegisterStaticPluginSearchFunction(${_paraview_build_target_safe}_static_plugins_search);
@@ -496,17 +496,17 @@ void ${_paraview_build_target_safe}_initialize()
 
 static bool ${_paraview_build_target_safe}_static_plugins_func(const char* name, bool load);
 
-bool ${_paraview_build_target_safe}_static_plugins_load(const char* name)
+static bool ${_paraview_build_target_safe}_static_plugins_load(const char* name)
 {
   return ${_paraview_build_target_safe}_static_plugins_func(name, true);
 }
 
-bool ${_paraview_build_target_safe}_static_plugins_search(const char* name)
+static bool ${_paraview_build_target_safe}_static_plugins_search(const char* name)
 {
   return ${_paraview_build_target_safe}_static_plugins_func(name, false);
 }
 
-bool ${_paraview_build_target_safe}_static_plugins_func(const char* name, bool load)
+static bool ${_paraview_build_target_safe}_static_plugins_func(const char* name, bool load)
 {
   std::string const sname = name;
 
