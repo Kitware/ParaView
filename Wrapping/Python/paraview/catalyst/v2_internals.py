@@ -18,41 +18,22 @@ def load_package_from_zip(zipfilename, packagename=None):
 
     :returns: the module object for the package on success else None
     """
-    import zipimport, os.path
-
-    zipfilename = _mpi_exchange_if_needed(zipfilename)
-    if packagename:
-        package = packagename
-    else:
-        basename = os.path.basename(zipfilename)
-        package = os.path.splitext(basename)[0]
-
-    z = zipimport.zipimporter(zipfilename)
-    assert z.is_package(package)
+    from .detail import LoadPackageFromZip
+    module = LoadPackageFromZip(zipfilename, packagename)
     # todo: validate package now, that way we can raise failure here itself.
     # rather than waiting till request_data_description or co_process
-
-    module = z.load_module(package)
     _validate_and_initialize(module, is_zip=True)
     return module
 
 def load_package_from_dir(path):
-    import importlib.util, os.path
-    packagename = os.path.basename(path)
-    init_py = os.path.join(path, "__init__.py")
-    spec = importlib.util.spec_from_file_location(packagename, init_py)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    from .detail import LoadPackageFromDir
+    module = LoadPackageFromDir(path)
     _validate_and_initialize(module, is_zip=False)
     return module
 
 def load_module_from_file(fname):
-    import importlib.util, os.path
-    fname = _mpi_exchange_if_needed(fname)
-    modulename = os.path.basename(fname)
-    spec = importlib.util.spec_from_file_location(modulename, fname)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    from .detail import LoadModuleFromFile
+    module = LoadModuleFromFile(fname)
     _validate_and_initialize(module, is_zip=False)
     return module
 
@@ -234,7 +215,7 @@ def _validate_and_initialize(module, is_zip):
     module.catalyst_params["extracts_controller"] = _create_extracts_controller(module.options)
 
 def _load_analysis_scripts(module):
-    import importlib, importlib.util, zipimport, os.path
+    from .detail import LoadSubmodule
     params  = module.catalyst_params
     if params["analysis_modules"] is not None:
         # already loaded, nothing to do.
@@ -244,18 +225,10 @@ def _load_analysis_scripts(module):
         params["analysis_modules"] = []
         return
 
-    log(log_level(), "loading analsis modules '%s'", str(module.scripts))
+    log(log_level(), "loading analysis modules '%s'", str(module.scripts))
     analysis_modules = []
     for script in module.scripts:
-        log(log_level(), "importing '%s'", script)
-        if params["is_zip"]:
-            z = zipimport.zipimporter(module.__path__[0])
-            s_module = z.load_module(script)
-        else:
-            spec = importlib.util.spec_from_file_location(script,
-                    os.path.join(module.__path__[0], "%s.py" % script))
-            s_module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(s_module)
+        s_module = LoadSubmodule(script, module)
         analysis_modules.append(s_module)
     # check if any of the analysis_modules customized execution.
     for m in analysis_modules:

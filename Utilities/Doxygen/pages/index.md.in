@@ -22,6 +22,20 @@ Page | Description
 [ParaView and Offscreen Rendering](@ref Offscreen) | Configuring and using ParaView in offscreen and/or headless environments.
 [Anatomy of Catalyst Python Module (Version 2.0)](@ref CatalystPythonScriptsV2) | Understanding Catalyst Python modules.
 
+
+ParaView Catalyst
+-----------------
+
+These pages includes documentation for ParaView Catalyst library, the
+[Catalyst API](https://catalyst-in-situ.readthedocs.io/en/latest/)
+implementation introduced with ParaView 5.9.
+
+Page | Description
+-----|----------------------------------------
+[ParaView-Catalyst](@ref ParaViewCatalyst) | Design/Implementation details
+[ParaView-Catalyst Blueprint](@ref ParaViewCatalystBlueprint) | Blueprint for ParaView Catalyst
+
+
 Design/Implementation Details
 -----------------------------
 

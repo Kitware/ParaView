@@ -66,3 +66,7 @@ add_example(CustomApplications/SimpleParaView)
 # add_example(CustomApplications/Spreadsheet)
 
 add_example(Catalyst)
+add_example(Catalyst2/CFullExample)
+add_example(Catalyst2/CxxFullExample)
+add_example(Catalyst2/CxxImageDataExample)
+add_example(Catalyst2/CxxMultiChannelInputExample)

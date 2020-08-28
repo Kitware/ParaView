@@ -226,4 +226,13 @@ private:
  */
 #define PARAVIEW_LOG_APPLICATION_VERBOSITY() vtkPVLogger::GetApplicationVerbosity()
 
+/**
+ * Macro to use for verbosity when logging application messages. Same as calling
+ * vtkPVLogger::GetCatalystVerbosity() e.g.
+ *
+ * @code{cpp}
+ *  vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "reading catalyst config file %s", filename);
+ * @endcode
+ */
+#define PARAVIEW_LOG_CATALYST_VERBOSITY() vtkPVLogger::GetCatalystVerbosity()
 #endif
