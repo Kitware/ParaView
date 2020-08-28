@@ -470,23 +470,28 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
       m_regular_vol_properties->get_volume_extents(volume_extents);
       const mi::math::Vector<mi::Float32, 3> volume_extents_min(volume_extents.min);
 
-      // Trying to reconstruct cur_bbox without ghost cells = affinity.
-      mi::math::Bbox<mi::Float32, 3> vol_ext_flt(volume_extents);
-      mi::Float32 border_size = m_config_settings->get_subcube_border();
+      // Trying to reconstruct cur_bbox without ghost cells, to be used for affinity
+      const mi::math::Bbox<mi::Float32, 3> vol_ext_flt(volume_extents);
+      const mi::Float32 ghost_levels =
+        static_cast<mi::Float32>(m_regular_vol_properties->get_ghost_levels());
+      if (ghost_levels > 0.f)
+      {
+        // Ghost cells only exist at inner boundaries between pieces, not on the outside boundary of
+        // the entire volume. Shrink the bbox used for the affinity accordingly.
+        if (current_affinity.min.x > vol_ext_flt.min.x)
+          current_affinity.min.x += ghost_levels;
+        if (current_affinity.min.y > vol_ext_flt.min.y)
+          current_affinity.min.y += ghost_levels;
+        if (current_affinity.min.z > vol_ext_flt.min.z)
+          current_affinity.min.z += ghost_levels;
 
-      if (current_affinity.min.x > vol_ext_flt.min.x)
-        current_affinity.min.x += border_size;
-      if (current_affinity.min.y > vol_ext_flt.min.y)
-        current_affinity.min.y += border_size;
-      if (current_affinity.min.z > vol_ext_flt.min.z)
-        current_affinity.min.z += border_size;
-
-      if (current_affinity.max.x < vol_ext_flt.max.x)
-        current_affinity.max.x -= border_size;
-      if (current_affinity.max.y < vol_ext_flt.max.y)
-        current_affinity.max.y -= border_size;
-      if (current_affinity.max.z < vol_ext_flt.max.z)
-        current_affinity.max.z -= border_size;
+        if (current_affinity.max.x < vol_ext_flt.max.x)
+          current_affinity.max.x -= ghost_levels;
+        if (current_affinity.max.y < vol_ext_flt.max.y)
+          current_affinity.max.y -= ghost_levels;
+        if (current_affinity.max.z < vol_ext_flt.max.z)
+          current_affinity.max.z -= ghost_levels;
+      }
 
       // Translate to origin
       current_affinity.min -= volume_extents_min;

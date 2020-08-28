@@ -498,13 +498,20 @@ int vtknvindex_representation::RequestData(
       mi::math::Vector<mi::Float32, 3> scaling_flt(static_cast<mi::Float32>(1. / scaling.x),
         static_cast<mi::Float32>(1. / scaling.y), static_cast<mi::Float32>(1. / scaling.z));
 
-      m_cluster_properties->get_regular_volume_properties()->set_volume_extents(volume_extents);
-      m_cluster_properties->get_regular_volume_properties()->set_volume_translation(
-        translation_flt);
-      m_cluster_properties->get_regular_volume_properties()->set_volume_scaling(scaling_flt);
+      vtknvindex_regular_volume_properties* volume_properties =
+        m_cluster_properties->get_regular_volume_properties();
+
+      volume_properties->set_volume_extents(volume_extents);
+      volume_properties->set_volume_translation(translation_flt);
+      volume_properties->set_volume_scaling(scaling_flt);
 
       // volume size
-      m_cluster_properties->get_regular_volume_properties()->set_volume_size(m_volume_size);
+      volume_properties->set_volume_size(m_volume_size);
+
+      // store the current VTK ghost levels (these are distinct from IndeX borders size settings)
+      const int ghost_levels =
+        inInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS());
+      volume_properties->set_ghost_levels(ghost_levels);
 
       delete[] all_rank_bounds;
 

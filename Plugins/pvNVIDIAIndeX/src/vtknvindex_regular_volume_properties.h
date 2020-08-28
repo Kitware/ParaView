@@ -70,6 +70,10 @@ public:
   void set_ivol_volume_extents(mi::math::Bbox<mi::Float32, 3> volume_extents);
   void get_ivol_volume_extents(mi::math::Bbox<mi::Float32, 3>& volume_extents) const;
 
+  // Number of VTK ghost level (distinct from IndeX border size settings)
+  void set_ghost_levels(mi::Sint32 ghost_levels);
+  mi::Sint32 get_ghost_levels() const;
+
   // Translation, Scaling.
   void set_volume_translation(mi::math::Vector<mi::Float32, 3> translation);
   void get_volume_translation(mi::math::Vector<mi::Float32, 3>& translation) const;
@@ -130,6 +134,8 @@ private:
   mi::math::Vector_struct<mi::Uint32, 3> m_volume_size;  // Entire volume size.
   mi::math::Vector<mi::Float32, 3> m_volume_translation; // Volume translation.
   mi::math::Vector<mi::Float32, 3> m_volume_scaling;     // Volume scaling.
+
+  mi::Sint32 m_ghost_levels; // VTK ghost levels
 };
 
 #endif

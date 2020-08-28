@@ -42,6 +42,7 @@ vtknvindex_regular_volume_properties::vtknvindex_regular_volume_properties()
   , m_time_steps_written(0)
   , m_nb_time_steps(1)
   , m_current_time_step(0)
+  , m_ghost_levels(0)
 
 {
   m_volume_translation = mi::math::Vector<mi::Float32, 3>(0.f);
@@ -189,6 +190,18 @@ void vtknvindex_regular_volume_properties::get_ivol_volume_extents(
   mi::math::Bbox<mi::Float32, 3>& volume_extents) const
 {
   volume_extents = m_ivol_volume_extents;
+}
+
+// ------------------------------------------------------------------------------------------------
+void vtknvindex_regular_volume_properties::set_ghost_levels(mi::Sint32 ghost_levels)
+{
+  m_ghost_levels = ghost_levels;
+}
+
+// ------------------------------------------------------------------------------------------------
+mi::Sint32 vtknvindex_regular_volume_properties::get_ghost_levels() const
+{
+  return m_ghost_levels;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -494,11 +507,13 @@ void vtknvindex_regular_volume_properties::serialize(mi::neuraylib::ISerializer*
 {
   // Serialize scalar type string.
   mi::Uint32 scalar_typename_size = mi::Uint32(m_scalar_type.size());
-  serializer->write(&scalar_typename_size, 1);
+  serializer->write(&scalar_typename_size);
   serializer->write(
     reinterpret_cast<const mi::Uint8*>(m_scalar_type.c_str()), scalar_typename_size);
 
   serializer->write(&m_voxel_range.x, 2);
+
+  serializer->write(&m_ghost_levels);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -506,9 +521,11 @@ void vtknvindex_regular_volume_properties::deserialize(mi::neuraylib::IDeseriali
 {
   // Deserialize scalar type string.
   mi::Uint32 scalar_typename_size = 0;
-  deserializer->read(&scalar_typename_size, 1);
+  deserializer->read(&scalar_typename_size);
   m_scalar_type.resize(scalar_typename_size);
   deserializer->read(reinterpret_cast<mi::Uint8*>(&m_scalar_type[0]), scalar_typename_size);
 
   deserializer->read(&m_voxel_range.x, 2);
+
+  deserializer->read(&m_ghost_levels);
 }
