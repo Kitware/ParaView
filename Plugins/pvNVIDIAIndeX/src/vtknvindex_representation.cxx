@@ -59,7 +59,7 @@
 #include "vtknvindex_volumemapper.h"
 
 // Enable ghosting in VTK to provide border data for regular volumes
-#define VTKNVINDEX_REGULAR_VOLUME_FORCE_VTK_GHOSTING
+// #define VTKNVINDEX_REGULAR_VOLUME_FORCE_VTK_GHOSTING
 
 vtknvindex_representation_initializer::vtknvindex_representation_initializer()
 {
