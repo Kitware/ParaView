@@ -45,15 +45,37 @@ void vtknvindex_receiving_logger::message(mi::base::Message_severity level, cons
     return;
 #endif
 
-  const std::string message_str = message;
+  std::string message_str = message;
 
   if (message_str.empty() && level > mi::base::MESSAGE_SEVERITY_FATAL)
     return; // no message
 
+  bool use_output_window = (level <= mi::base::MESSAGE_SEVERITY_WARNING);
   const std::string prefix = "nvindex: ";
 
+  // Customize how some specific log messages are handled
+  const std::string category_str = category;
+  if (category_str == "TCPNET:NETWORK")
+  {
+    use_output_window = true; // Always show these in the Output Messages window
+    if (message_str.find("TCPNET net  warn : The any address can't be used.") != std::string::npos)
+    {
+      level = mi::base::MESSAGE_SEVERITY_INFO; // make it less severe
+
+      static bool already = false;
+      if (!already)
+      {
+        already = true;
+        message_str = std::string("Note: It is recommended to explicitly set the "
+                                  "'cluster_interface_address' option. See the NVIDIA IndeX for "
+                                  "ParaView Plug-In User's Guide for details.\n") +
+          prefix + message_str;
+      }
+    }
+  }
+
   // This is based on vtkErrorWithObjectMacro()
-  if (level <= mi::base::MESSAGE_SEVERITY_WARNING && vtkObject::GetGlobalWarningDisplay())
+  if (use_output_window && vtkObject::GetGlobalWarningDisplay())
   {
     // This will pop up the Output Messages window. The messages will also be printed to the
     // console.
@@ -66,17 +88,24 @@ void vtknvindex_receiving_logger::message(mi::base::Message_severity level, cons
     {
       vtkOutputWindowDisplayErrorText(vtkmsg.str());
     }
-    else
+    else if (level <= mi::base::MESSAGE_SEVERITY_WARNING)
     {
       vtkOutputWindowDisplayWarningText(vtkmsg.str());
     }
+    else
+    {
+      vtkOutputWindowDisplayText(vtkmsg.str());
+    }
 
     vtkmsg.rdbuf()->freeze(0);
-    vtkObject::BreakOnError();
+    if (level <= mi::base::MESSAGE_SEVERITY_WARNING)
+    {
+      vtkObject::BreakOnError();
+    }
   }
   else
   {
-    // Log info level only to console.
+    // Log only to console.
     std::cout << prefix << message_str << std::endl;
   }
 }
