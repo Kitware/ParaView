@@ -76,9 +76,7 @@ public:
   vtknvindex_sparse_volume_importer();
 
   vtknvindex_sparse_volume_importer(const mi::math::Vector_struct<mi::Uint32, 3>& volume_size,
-    const mi::Sint32& border_size, const std::string& scalar_type);
-
-  virtual ~vtknvindex_sparse_volume_importer();
+    mi::Sint32 border_size, mi::Sint32 ghost_levels, const std::string& scalar_type);
 
   // Estimates the volume data size inside the bounding box (in bytes).
   mi::Size estimate(const mi::math::Bbox_struct<mi::Sint32, 3>& bounding_box,
@@ -107,7 +105,8 @@ public:
   mi::base::Uuid subset_id() const override;
 
 private:
-  mi::Sint32 m_border_size;                            // subcube border size.
+  mi::Sint32 m_border_size;                            // IndeX subcube border size.
+  mi::Sint32 m_ghost_levels;                           // VTK ghost levels.
   mi::math::Vector<mi::Uint32, 3> m_volume_size;       // Volume size.
   std::string m_scalar_type;                           // Volume scalar type as string.
   vtknvindex_cluster_properties* m_cluster_properties; // Cluster properties.

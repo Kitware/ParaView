@@ -258,24 +258,22 @@ mi::Size vtknvindex_import_bricks::get_nb_fragments() const
 
 //-------------------------------------------------------------------------------------------------
 vtknvindex_sparse_volume_importer::vtknvindex_sparse_volume_importer(
-  const mi::math::Vector_struct<mi::Uint32, 3>& volume_size, const mi::Sint32& border_size,
-  const std::string& scalar_type)
+  const mi::math::Vector_struct<mi::Uint32, 3>& volume_size, mi::Sint32 border_size,
+  mi::Sint32 ghost_levels, const std::string& scalar_type)
   : m_border_size(border_size)
+  , m_ghost_levels(ghost_levels)
   , m_volume_size(volume_size)
   , m_scalar_type(scalar_type)
+  , m_cluster_properties(nullptr)
 {
   // empty
 }
 
 //-------------------------------------------------------------------------------------------------
 vtknvindex_sparse_volume_importer::vtknvindex_sparse_volume_importer()
-  : m_border_size(2)
-{
-  // empty
-}
-
-//-------------------------------------------------------------------------------------------------
-vtknvindex_sparse_volume_importer::~vtknvindex_sparse_volume_importer()
+  : m_border_size(0)
+  , m_ghost_levels(0)
+  , m_cluster_properties(nullptr)
 {
   // empty
 }
@@ -373,7 +371,7 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
   if (!shm_info)
   {
     ERROR_LOG << LOG_svol_rvol_prefix << "Failed to retrieve shared memory info for subset "
-              << subset_subregion_bbox << ".";
+              << subset_subregion_bbox << " on rank " << rankid << ".";
     return nullptr;
   }
 
@@ -390,13 +388,9 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
   {
     ERROR_LOG << LOG_svol_rvol_prefix
               << "Could not retrieve data for shared memory: " << shm_info->m_shm_name << " box "
-              << shm_bbox << " from rank: " << rankid << ".";
+              << shm_bbox << " on rank " << rankid << ".";
     return nullptr;
   }
-
-  INFO_LOG << "Using shared memory: " << shm_info->m_shm_name << " box " << shm_bbox
-           << " from rank: " << rankid << ".";
-  INFO_LOG << "Bounding box requested by NVIDIA IndeX: " << bounding_box;
 
   bool free_buffer = false;
   // Convert double scalar data to float.
@@ -413,6 +407,14 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
     subset_data_buffer = reinterpret_cast<mi::Uint8*>(voxels_float);
     free_buffer = true;
   }
+
+  INFO_LOG << "Importing volume data from " << (rankid == shm_info->m_rank_id ? "local" : "shared")
+           << " "
+           << "memory (" << shm_info->m_shm_name << ") on rank " << rankid << ", "
+           << (m_scalar_type == "double" ? "converted to float, " : "") << "data bbox " << shm_bbox
+           << ", "
+           << "importer bbox " << bounding_box << ", border " << m_ghost_levels << "/"
+           << m_border_size << ".";
 
   // Import all bricks for the subregion in parallel
   vtknvindex_import_bricks import_bricks_job(svol_subset_desc.get(), svol_data_subset.get(),
@@ -456,6 +458,7 @@ void vtknvindex_sparse_volume_importer::serialize(mi::neuraylib::ISerializer* se
 
   serializer->write(&m_volume_size.x, 3);
   serializer->write(&m_border_size);
+  serializer->write(&m_ghost_levels);
 
   m_cluster_properties->serialize(serializer);
 }
@@ -470,6 +473,7 @@ void vtknvindex_sparse_volume_importer::deserialize(mi::neuraylib::IDeserializer
 
   deserializer->read(&m_volume_size.x, 3);
   deserializer->read(&m_border_size);
+  deserializer->read(&m_ghost_levels);
 
   m_cluster_properties = new vtknvindex_cluster_properties();
   m_cluster_properties->deserialize(deserializer);

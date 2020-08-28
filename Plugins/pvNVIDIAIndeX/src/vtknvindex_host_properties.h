@@ -51,14 +51,16 @@ public:
   struct shm_info
   {
     shm_info()
-      : m_subset_ptr(nullptr)
+      : m_rank_id(-1)
+      , m_subset_ptr(nullptr)
       , m_mapped_subset_ptr(nullptr)
     {
     }
 
-    shm_info(std::string shm_name, mi::math::Bbox<mi::Float32, 3> bbox, mi::Uint64 shm_size,
-      void* subset_ptr = nullptr)
-      : m_shm_name(shm_name)
+    shm_info(mi::Sint32 rank_id, std::string shm_name, mi::math::Bbox<mi::Float32, 3> bbox,
+      mi::Uint64 shm_size, void* subset_ptr = nullptr)
+      : m_rank_id(rank_id)
+      , m_shm_name(shm_name)
       , m_shm_bbox(bbox)
       , m_size(shm_size)
       , m_subset_ptr(subset_ptr)
@@ -66,6 +68,7 @@ public:
     {
     }
 
+    mi::Sint32 m_rank_id;
     std::string m_shm_name;
     mi::math::Bbox<mi::Float32, 3> m_shm_bbox;
     mi::Uint64 m_size;
@@ -83,7 +86,7 @@ public:
   void shm_cleanup(bool reset);
 
   // Set the shared memory data for the current bounding box and the time step.
-  void set_shminfo(mi::Uint32 time_step, std::string shmname,
+  void set_shminfo(mi::Uint32 time_step, mi::Sint32 rank_id, std::string shmname,
     mi::math::Bbox<mi::Float32, 3> shmbbox, mi::Uint64 shmsize, void* subset_ptr = NULL);
 
   // Get the shared memory data for the current bounding box and the time step.

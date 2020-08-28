@@ -54,6 +54,7 @@ inline mi::Sint32 volume_format_size(const nv::index::Sparse_volume_voxel_format
 vtknvindex_volume_compute::vtknvindex_volume_compute()
   : m_enabled(false)
   , m_border_size(0)
+  , m_ghost_levels(0)
   , m_scalar_type("")
   , m_cluster_properties(NULL)
 {
@@ -63,10 +64,12 @@ vtknvindex_volume_compute::vtknvindex_volume_compute()
 //-------------------------------------------------------------------------------------------------
 vtknvindex_volume_compute::vtknvindex_volume_compute(
   const mi::math::Vector_struct<mi::Uint32, 3>& volume_size, mi::Sint32 border_size,
-  std::string scalar_type, vtknvindex_cluster_properties* cluster_properties)
+  const mi::Sint32& ghost_levels, std::string scalar_type,
+  vtknvindex_cluster_properties* cluster_properties)
   : m_volume_size(volume_size)
   , m_enabled(false)
   , m_border_size(border_size)
+  , m_ghost_levels(ghost_levels)
   , m_scalar_type(scalar_type)
   , m_cluster_properties(cluster_properties)
 {
@@ -219,6 +222,7 @@ mi::neuraylib::IElement* vtknvindex_volume_compute::copy() const
 
   other->m_enabled = this->m_enabled;
   other->m_border_size = this->m_border_size;
+  other->m_ghost_levels = this->m_ghost_levels;
   other->m_scalar_type = this->m_scalar_type;
   other->m_cluster_properties = this->m_cluster_properties;
   other->m_volume_size = this->m_volume_size;
@@ -243,6 +247,7 @@ void vtknvindex_volume_compute::serialize(mi::neuraylib::ISerializer* serializer
     reinterpret_cast<const mi::Uint8*>(m_scalar_type.c_str()), scalar_typename_size);
 
   serializer->write(&m_border_size);
+  serializer->write(&m_ghost_levels);
   serializer->write(&m_volume_size.x, 3);
 
   m_cluster_properties->serialize(serializer);
@@ -259,6 +264,7 @@ void vtknvindex_volume_compute::deserialize(mi::neuraylib::IDeserializer* deseri
   deserializer->read(reinterpret_cast<mi::Uint8*>(&m_scalar_type[0]), scalar_typename_size);
 
   deserializer->read(&m_border_size);
+  deserializer->read(&m_ghost_levels);
   deserializer->read(&m_volume_size.x, 3);
 
   m_cluster_properties = new vtknvindex_cluster_properties();

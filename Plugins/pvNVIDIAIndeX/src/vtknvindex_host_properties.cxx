@@ -92,19 +92,19 @@ void vtknvindex_host_properties::shm_cleanup(bool reset)
 }
 
 // ------------------------------------------------------------------------------------------------
-void vtknvindex_host_properties::set_shminfo(mi::Uint32 time_step, std::string shmname,
-  mi::math::Bbox<mi::Float32, 3> shmbbox, mi::Uint64 shmsize, void* subset_ptr)
+void vtknvindex_host_properties::set_shminfo(mi::Uint32 time_step, mi::Sint32 rank_id,
+  std::string shmname, mi::math::Bbox<mi::Float32, 3> shmbbox, mi::Uint64 shmsize, void* subset_ptr)
 {
   std::map<mi::Uint32, std::vector<shm_info> >::iterator shmit = m_shmlist.find(time_step);
   if (shmit == m_shmlist.end())
   {
     std::vector<shm_info> shmlist;
-    shmlist.push_back(shm_info(shmname, shmbbox, shmsize, subset_ptr));
+    shmlist.push_back(shm_info(rank_id, shmname, shmbbox, shmsize, subset_ptr));
     m_shmlist[time_step] = shmlist;
   }
   else
   {
-    shmit->second.push_back(shm_info(shmname, shmbbox, shmsize, subset_ptr));
+    shmit->second.push_back(shm_info(rank_id, shmname, shmbbox, shmsize, subset_ptr));
   }
 
   // TODO : Change this to reflect the actual subcube size.
@@ -333,6 +333,8 @@ void vtknvindex_host_properties::serialize(mi::neuraylib::ISerializer* serialize
       {
         const shm_info& shm = shmlist[i];
 
+        serializer->write(&shm.m_rank_id);
+
         // shm bbox
         serializer->write(&shm.m_shm_bbox.min.x, 6);
 
@@ -405,6 +407,8 @@ void vtknvindex_host_properties::deserialize(mi::neuraylib::IDeserializer* deser
       for (mi::Uint32 j = 0; j < shmlist_size; ++j)
       {
         shm_info shm;
+
+        deserializer->read(&shm.m_rank_id);
 
         // shm bbox
         deserializer->read(&shm.m_shm_bbox.min.x, 6);

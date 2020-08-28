@@ -46,7 +46,7 @@ public:
   vtknvindex_volume_compute();
   /// Constructor
   vtknvindex_volume_compute(const mi::math::Vector_struct<mi::Uint32, 3>& volume_size,
-    mi::Sint32 border_size, std::string scalar_type,
+    mi::Sint32 border_size, const mi::Sint32& ghost_levels, std::string scalar_type,
     vtknvindex_cluster_properties* cluster_properties);
 
   virtual void launch_compute(mi::neuraylib::IDice_transaction* dice_transaction,
@@ -84,6 +84,7 @@ private:
   bool m_enabled;
 
   mi::Sint32 m_border_size;                            // subcube border size.
+  mi::Sint32 m_ghost_levels;                           // VTK ghost levels.
   std::string m_scalar_type;                           // Volume scalar type as string.
   vtknvindex_cluster_properties* m_cluster_properties; // Cluster properties.
   mi::math::Vector<mi::Uint32, 3> m_volume_size;       // Volume size.

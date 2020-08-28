@@ -341,8 +341,8 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
       regular_volume_properties->get_volume_size(volume_size);
 
       // Create shared memory regular volume data importer.
-      vtknvindex_sparse_volume_importer* volume_importer =
-        new vtknvindex_sparse_volume_importer(volume_size, subcube_border, scalar_type);
+      vtknvindex_sparse_volume_importer* volume_importer = new vtknvindex_sparse_volume_importer(
+        volume_size, subcube_border, regular_volume_properties->get_ghost_levels(), scalar_type);
 
       assert(volume_importer);
 
@@ -608,8 +608,9 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
         mi::math::Vector_struct<mi::Uint32, 3> volume_size;
         regular_volume_properties->get_volume_size(volume_size);
 
-        mi::base::Handle<vtknvindex_volume_compute> vol_compute(new vtknvindex_volume_compute(
-          volume_size, subcube_border, scalar_type, m_cluster_properties));
+        mi::base::Handle<vtknvindex_volume_compute> vol_compute(
+          new vtknvindex_volume_compute(volume_size, subcube_border,
+            regular_volume_properties->get_ghost_levels(), scalar_type, m_cluster_properties));
         assert(vol_compute.is_valid_interface());
 
         vol_compute->set_enabled(false);
@@ -899,8 +900,8 @@ void vtknvindex_scene::update_volume(
       regular_volume_properties->get_volume_size(volume_size);
 
       // Create shared memory regular volume data importer.
-      vtknvindex_sparse_volume_importer* volume_importer =
-        new vtknvindex_sparse_volume_importer(volume_size, subcube_border, scalar_type);
+      vtknvindex_sparse_volume_importer* volume_importer = new vtknvindex_sparse_volume_importer(
+        volume_size, subcube_border, regular_volume_properties->get_ghost_levels(), scalar_type);
       assert(volume_importer);
 
       volume_importer->set_cluster_properties(m_cluster_properties);

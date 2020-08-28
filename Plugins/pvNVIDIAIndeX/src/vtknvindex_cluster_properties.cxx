@@ -291,7 +291,7 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
       }
 
       host_properties->set_shminfo(
-        time_step, ss.str(), current_bbox, shm_size, volume_data->scalars);
+        time_step, current_rankid, ss.str(), current_bbox, shm_size, volume_data->scalars);
     }
     else // vtknvindex_scene::VOLUME_TYPE_IRREGULAR
     {
@@ -314,7 +314,8 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
 
       shm_size = volume_data->get_memory_size(scalar_type);
 
-      host_properties->set_shminfo(time_step, ss.str(), current_bbox, shm_size, volume_data);
+      host_properties->set_shminfo(
+        time_step, current_rankid, ss.str(), current_bbox, shm_size, volume_data);
     }
   }
 
@@ -603,8 +604,8 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
         shm_size = all_shm_sizes[i];
       }
 
-      host_properties->set_shminfo(
-        time_step, ss.str(), current_bbox, shm_size, reinterpret_cast<void*>(all_data_ptrs[i]));
+      host_properties->set_shminfo(time_step, current_rankid, ss.str(), current_bbox, shm_size,
+        reinterpret_cast<void*>(all_data_ptrs[i]));
     }
   }
   delete[] all_rank_extents;
