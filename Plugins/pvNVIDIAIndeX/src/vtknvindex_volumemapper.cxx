@@ -54,6 +54,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLRenderWindow.h"
 #include "vtkPKdTree.h"
+#include "vtkPVRenderViewSettings.h"
 #include "vtkPointData.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
@@ -404,6 +405,26 @@ void vtknvindex_volumemapper::rtc_kernel_changed(vtknvindex_rtc_kernels kernel,
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
 {
+  // Ensure IceT is enabled in MPI mode, print warning only on first rank
+  if (m_controller->GetNumberOfProcesses() > 1 && m_controller->GetLocalProcessId() == 0)
+  {
+    static bool IceT_was_enabled = false;
+    if (!vtkPVRenderViewSettings::GetInstance()->GetDisableIceT())
+    {
+      WARN_LOG << "IceT compositing must be disabled when using the NVIDIA IndeX plug-in with MPI, "
+                  "otherwise nothing will be rendered. "
+               << "Please open 'Edit | Settings', go to the 'Render View' tab, activate 'Advanced "
+                  "Properties' (gear icon) and check 'Disable IceT'. "
+               << "Then restart ParaView for the setting to take effect.";
+      IceT_was_enabled = true;
+    }
+    else if (IceT_was_enabled)
+    {
+      WARN_LOG << "Please restart ParaView so that IceT compositing is disabled.";
+      IceT_was_enabled = false; // only print this once
+    }
+  }
+
   // check if volume data was modified
   if (!m_cluster_properties->get_regular_volume_properties()->is_timeseries_data())
   {
