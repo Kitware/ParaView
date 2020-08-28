@@ -149,44 +149,6 @@ bool vtknvindex_host_properties::get_shminfo(const mi::math::Bbox<mi::Float32, 3
 }
 
 // ------------------------------------------------------------------------------------------------
-bool vtknvindex_host_properties::get_shminfo_isect(const mi::math::Bbox<mi::Float32, 3>& bbox,
-  std::string& shmname, mi::math::Bbox<mi::Float32, 3>& shmbbox, mi::Uint64& shmsize,
-  void** subset_ptr, mi::Uint32 time_step)
-{
-  std::map<mi::Uint32, std::vector<shm_info> >::iterator shmit = m_shmlist.find(time_step);
-  if (shmit == m_shmlist.end())
-  {
-    ERROR_LOG << "The shared memory information in vtknvindex_host_properties::get_shminfo is not "
-                 "available for the time step: "
-              << time_step << ".";
-    return false;
-  }
-
-  std::vector<shm_info>& shmlist = shmit->second;
-  if (shmlist.empty())
-  {
-    ERROR_LOG << "The shared memory list in vtknvindex_host_properties::get_shminfo is empty.";
-    return false;
-  }
-
-  for (mi::Uint32 i = 0; i < shmlist.size(); ++i)
-  {
-    const shm_info& current_shm = shmlist[i];
-
-    if (current_shm.m_shm_bbox.intersects(bbox))
-    {
-      shmname = current_shm.m_shm_name;
-      shmbbox = current_shm.m_shm_bbox;
-      shmsize = current_shm.m_size;
-      *subset_ptr = current_shm.m_subset_ptr;
-
-      return true;
-    }
-  }
-  return false;
-}
-
-// ------------------------------------------------------------------------------------------------
 vtknvindex_host_properties::shm_info* vtknvindex_host_properties::get_shminfo(
   const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step)
 {
@@ -337,9 +299,8 @@ void vtknvindex_host_properties::serialize(mi::neuraylib::ISerializer* serialize
         serializer->write(&shm.m_size, 1);
 
         // shm raw pointer
-        mi::Uint32 shm_ptr_size = sizeof(void*);
-        serializer->write(&shm_ptr_size, 1);
-        serializer->write(reinterpret_cast<const mi::Uint8*>(&(shm.m_subset_ptr)), shm_ptr_size);
+        serializer->write(
+          reinterpret_cast<const mi::Uint8*>(&shm.m_subset_ptr), sizeof(shm.m_subset_ptr));
       }
 
       // Serialize the time step.
@@ -411,9 +372,8 @@ void vtknvindex_host_properties::deserialize(mi::neuraylib::IDeserializer* deser
         deserializer->read(&shm.m_size, 1);
 
         // shm raw pointer
-        mi::Uint32 shm_ptr_size = 0;
-        deserializer->read(&shm_ptr_size, 1);
-        deserializer->read(reinterpret_cast<mi::Uint8*>(&shm.m_subset_ptr), shm_ptr_size);
+        deserializer->read(
+          reinterpret_cast<mi::Uint8*>(&shm.m_subset_ptr), sizeof(shm.m_subset_ptr));
 
         shmlist.push_back(shm);
       }

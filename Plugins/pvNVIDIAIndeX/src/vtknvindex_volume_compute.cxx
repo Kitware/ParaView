@@ -250,14 +250,14 @@ const char* vtknvindex_volume_compute::get_class_name() const
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_volume_compute::serialize(mi::neuraylib::ISerializer* serializer) const
 {
-  serializer->write(&m_enabled, 1);
+  serializer->write(&m_enabled);
 
   mi::Uint32 scalar_typename_size = mi::Uint32(m_scalar_type.size());
-  serializer->write(&scalar_typename_size, 1);
+  serializer->write(&scalar_typename_size);
   serializer->write(
     reinterpret_cast<const mi::Uint8*>(m_scalar_type.c_str()), scalar_typename_size);
 
-  serializer->write(&m_border_size, 1);
+  serializer->write(&m_border_size);
   serializer->write(&m_volume_size.x, 3);
 
   m_cluster_properties->serialize(serializer);
@@ -266,14 +266,14 @@ void vtknvindex_volume_compute::serialize(mi::neuraylib::ISerializer* serializer
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_volume_compute::deserialize(mi::neuraylib::IDeserializer* deserializer)
 {
-  deserializer->read(&m_enabled, 1);
+  deserializer->read(&m_enabled);
 
   mi::Uint32 scalar_typename_size = 0;
-  deserializer->read(&scalar_typename_size, 1);
+  deserializer->read(&scalar_typename_size);
   m_scalar_type.resize(scalar_typename_size);
   deserializer->read(reinterpret_cast<mi::Uint8*>(&m_scalar_type[0]), scalar_typename_size);
 
-  deserializer->read(&m_border_size, 1);
+  deserializer->read(&m_border_size);
   deserializer->read(&m_volume_size.x, 3);
 
   m_cluster_properties = new vtknvindex_cluster_properties();

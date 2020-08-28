@@ -38,19 +38,20 @@
 #include "vtksys/SystemInformation.hxx"
 #include "vtksys/SystemTools.hxx"
 
+#include <nv/index/icolormap.h>
 #include <nv/index/iindex_debug_configuration.h>
 #include <nv/index/ilight.h>
+#include <nv/index/iscene.h>
+#include <nv/index/isession.h>
 
 #include "vtknvindex_affinity.h"
-#include "vtknvindex_clock_pulse_generator.h"
-#include "vtknvindex_cluster_properties.h"
+#include "vtknvindex_colormap_utility.h"
 #include "vtknvindex_config_settings.h"
 #include "vtknvindex_forwarding_logger.h"
 #include "vtknvindex_host_properties.h"
 #include "vtknvindex_instance.h"
 #include "vtknvindex_irregular_volume_importer.h"
 #include "vtknvindex_receiving_logger.h"
-#include "vtknvindex_regular_volume_properties.h"
 #include "vtknvindex_sparse_volume_importer.h"
 #include "vtknvindex_version.h"
 #include "vtknvindex_volume_compute.h"
@@ -124,7 +125,7 @@ vtknvindex_instance::vtknvindex_instance()
   // Build cluster information
   build_cluster_info();
 
-  // Start one IndeX instane per host (on local rank == 0)
+  // Use one IndeX instance per host (running on the local rank 0)
   if (is_index_rank())
   {
     // Load NVIDIA IndeX library
@@ -204,7 +205,7 @@ vtknvindex_instance* vtknvindex_instance::create()
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_instance::init_index()
 {
-  // Start one IndeX instane per host (on local rank == 0)
+  // Start one IndeX instance per host (running on the local rank 0)
   if (m_nvindex_interface && !is_index_initialized() && is_index_rank())
   {
     INFO_LOG << "NVIDIA IndeX ParaView plug-in " << get_version() << ".";
@@ -217,8 +218,8 @@ void vtknvindex_instance::init_index()
       return;
     }
 
-    // Initialize application render context
-    initialize_arc();
+    // Initialize IndeX session
+    initialize_session();
 
     // Initialize scene graph
     if (m_is_index_viewer)
@@ -835,21 +836,6 @@ mi::Uint32 vtknvindex_instance::setup_nvindex()
     is_registered = m_nvindex_interface->register_serializable_class<vtknvindex_KDTree_affinity>();
     assert(is_registered);
 
-    is_registered =
-      m_nvindex_interface->register_serializable_class<vtknvindex_clock_pulse_generator>();
-    assert(is_registered);
-
-    is_registered =
-      m_nvindex_interface->register_serializable_class<vtknvindex_cluster_properties>();
-    assert(is_registered);
-
-    is_registered = m_nvindex_interface->register_serializable_class<vtknvindex_host_properties>();
-    assert(is_registered);
-
-    is_registered =
-      m_nvindex_interface->register_serializable_class<vtknvindex_regular_volume_properties>();
-    assert(is_registered);
-
     is_registered = m_nvindex_interface->register_serializable_class<vtknvindex_volume_compute>();
     assert(is_registered);
   }
@@ -932,7 +918,7 @@ bool vtknvindex_instance::shutdown_nvindex()
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_instance::initialize_arc()
+void vtknvindex_instance::initialize_session()
 {
   {
     m_database = m_nvindex_interface->get_api_component<mi::neuraylib::IDatabase>();
@@ -955,11 +941,6 @@ void vtknvindex_instance::initialize_arc()
       m_nvindex_interface->get_api_component<nv::index::IIndex_debug_configuration>();
     assert(m_iindex_debug_configuration.is_valid_interface());
   }
-
-  // TODO: Remove this, possible no longer required.
-  // Verifying it the local host has joined.
-  // This may fail if there is a license problem.
-  // assert(is_local_host_joined());
 
   {
     mi::base::Handle<mi::neuraylib::IDice_transaction> dice_transaction(

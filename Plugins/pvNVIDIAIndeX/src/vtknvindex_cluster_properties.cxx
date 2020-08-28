@@ -652,21 +652,6 @@ void vtknvindex_cluster_properties::print_info() const
 }
 
 // ------------------------------------------------------------------------------------------------
-mi::neuraylib::IElement* vtknvindex_cluster_properties::copy() const
-{
-  vtknvindex_cluster_properties* other = new vtknvindex_cluster_properties();
-  other->m_rankid_to_hostid = this->m_rankid_to_hostid;
-  other->m_hostinfo = this->m_hostinfo;
-  return other;
-}
-
-// ------------------------------------------------------------------------------------------------
-const char* vtknvindex_cluster_properties::get_class_name() const
-{
-  return "vtknvindex_cluster_properties";
-}
-
-// ------------------------------------------------------------------------------------------------
 void vtknvindex_cluster_properties::serialize(mi::neuraylib::ISerializer* serializer) const
 {
   // Serialize rankid to host id.

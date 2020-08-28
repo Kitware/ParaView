@@ -39,8 +39,7 @@ class vtkUnstructuredGridBase;
 
 // The class vtknvindex_regular_volume_properties represents the complementary
 // regular volume dataset information such as dimension, data type, time steps, etc.
-class vtknvindex_regular_volume_properties : public mi::neuraylib::Base<0x18c04ecc, 0x0296, 0x42af,
-                                               0xa4, 0x1d, 0x35, 0xe1, 0x7e, 0x46, 0x2d, 0x9b>
+class vtknvindex_regular_volume_properties
 {
 public:
   vtknvindex_regular_volume_properties();

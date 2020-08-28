@@ -85,11 +85,6 @@ public:
     mi::math::Bbox<mi::Float32, 3>& shmbbox, mi::Uint64& shmsize, void** subset_ptr,
     mi::Uint32 time_step);
 
-  // Get the shared memory data that intersects the current bounding box and the time step.
-  bool get_shminfo_isect(const mi::math::Bbox<mi::Float32, 3>& bbox, std::string& shmname,
-    mi::math::Bbox<mi::Float32, 3>& shmbbox, mi::Uint64& shmsize, void** subset_ptr,
-    mi::Uint32 time_step);
-
   // Get the shared memory info for the current bounding box and the time step.
   shm_info* get_shminfo(const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step);
 

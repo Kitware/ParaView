@@ -149,7 +149,7 @@ static void reset_orthogonal_projection_matrix(mi::Sint32& win_width, mi::Sint32
 }
 
 //-------------------------------------------------------------------------------------------------
-bool vtknvindex_volumemapper::prepare_data(mi::Sint32 time_step, vtkVolume* /*vol*/)
+bool vtknvindex_volumemapper::prepare_data(mi::Sint32 time_step)
 {
   vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Preparing data");
 
@@ -194,7 +194,7 @@ bool vtknvindex_volumemapper::prepare_data(mi::Sint32 time_step, vtkVolume* /*vo
 }
 
 //-------------------------------------------------------------------------------------------------
-bool vtknvindex_volumemapper::initialize_mapper(vtkRenderer* /*ren*/, vtkVolume* vol)
+bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
 {
   vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Initialization");
 
@@ -433,7 +433,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
   }
 
   // Initialize the mapper
-  if ((!m_is_mapper_intialized || m_volume_changed) && !initialize_mapper(ren, vol))
+  if ((!m_is_mapper_intialized || m_volume_changed) && !initialize_mapper(vol))
   {
     ERROR_LOG << "Failed to initialize the mapper in "
               << "vtknvindex_volumemapper::Render().";
@@ -446,7 +446,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
   mi::Sint32 cur_time_step =
     m_cluster_properties->get_regular_volume_properties()->get_current_time_step();
 
-  if ((!is_data_prepared(cur_time_step) || m_volume_changed) && !prepare_data(cur_time_step, vol))
+  if ((!is_data_prepared(cur_time_step) || m_volume_changed) && !prepare_data(cur_time_step))
   {
     ERROR_LOG << "Failed to prepare data in "
               << "vtknvindex_volumemapper::Render().";

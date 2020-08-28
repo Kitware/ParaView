@@ -44,7 +44,7 @@ class vtknvindex_import_bricks : public mi::neuraylib::Fragmented_job<0x6538523c
 public:
   vtknvindex_import_bricks(
     const nv::index::ISparse_volume_subset_data_descriptor* subset_data_descriptor,
-    nv::index::ISparse_volume_subset* volume_subset, mi::Uint8* source_buffer,
+    nv::index::ISparse_volume_subset* volume_subset, const mi::Uint8* source_buffer,
     mi::Size vol_fmt_size, mi::Sint32 border_size, const vtknvindex::util::Bbox3i& source_bbox);
 
   virtual ~vtknvindex_import_bricks() {}
@@ -57,7 +57,7 @@ public:
 private:
   const nv::index::ISparse_volume_subset_data_descriptor* m_subset_data_descriptor;
   nv::index::ISparse_volume_subset* m_volume_subset;
-  mi::Uint8* m_source_buffer;
+  const mi::Uint8* m_source_buffer;
   mi::Size m_vol_fmt_size;
   mi::Sint32 m_border_size;
   mi::Size m_nb_fragments;

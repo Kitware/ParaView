@@ -82,8 +82,7 @@ struct vtknvindex_dataset_parameters
 // general config settings,
 // list of host in the cluster, affinity information.
 
-class vtknvindex_cluster_properties : public mi::neuraylib::Element<0xba7f59f5, 0xffed, 0x467b,
-                                        0xa6, 0x5a, 0xd4, 0x9f, 0x50, 0xb7, 0x00, 0x8f>
+class vtknvindex_cluster_properties
 {
 public:
   vtknvindex_cluster_properties();
@@ -122,11 +121,8 @@ public:
   // Print all the cluster details.
   void print_info() const;
 
-  // DiCE database element methods
-  mi::neuraylib::IElement* copy() const override;
-  void serialize(mi::neuraylib::ISerializer* serializer) const override;
-  void deserialize(mi::neuraylib::IDeserializer* deserializer) override;
-  const char* get_class_name() const override;
+  void serialize(mi::neuraylib::ISerializer* serializer) const;
+  void deserialize(mi::neuraylib::IDeserializer* deserializer);
 
   // Build the host list with its rank list assignments.
 

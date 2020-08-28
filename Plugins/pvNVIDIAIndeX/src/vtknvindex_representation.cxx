@@ -129,7 +129,7 @@ vtknvindex_representation::vtknvindex_representation()
 {
   m_controller = vtkMultiProcessController::GetGlobalController();
 
-  // Init IndeX and ARC
+  // Initialize and start IndeX
   vtknvindex_instance::get()->init_index();
 
   // Replace default volume mapper with vtknvindex_volumemapper.

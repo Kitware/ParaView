@@ -43,8 +43,7 @@ public:
   vtknvindex_irregular_volume_importer();
   virtual ~vtknvindex_irregular_volume_importer();
 
-  vtknvindex_irregular_volume_importer(
-    const mi::Sint32& border_size, const std::string& scalar_type);
+  vtknvindex_irregular_volume_importer(const std::string& scalar_type);
 
   // Estimates the size (in byte) of the volume data contained in the bounding box.
   mi::Size estimate(const mi::math::Bbox_struct<mi::Float32, 3>& bounding_box,
@@ -66,7 +65,6 @@ public:
   void deserialize(mi::neuraylib::IDeserializer* deserializer) override;
   mi::base::Uuid subset_id() const override;
 
-  mi::Sint32 m_border_size;                            // Subcube border size.
   std::string m_scalar_type;                           // Volume's scalar type as string.
   vtknvindex_cluster_properties* m_cluster_properties; // Cluster properties.
 };

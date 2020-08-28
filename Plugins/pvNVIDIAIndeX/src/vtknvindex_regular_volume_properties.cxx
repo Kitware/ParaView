@@ -322,8 +322,16 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* sca
 
   m_time_steps_written++;
 
-  INFO_LOG << "Done writing bounding box: " << current_bbox
-           << " into shared memory: " << shm_info->m_shm_name << ".";
+  if (use_shared_mem)
+  {
+    INFO_LOG << "Done writing bounding box " << current_bbox
+             << " into shared memory: " << shm_info->m_shm_name << ".";
+  }
+  else
+  {
+    INFO_LOG << "Bounding box " << current_bbox
+             << " is available in local memory: " << shm_info->m_shm_name << ".";
+  }
 
   return true;
 }

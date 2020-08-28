@@ -86,8 +86,8 @@ inline mi::Size volume_format_size(const nv::index::Sparse_volume_voxel_format f
 //-------------------------------------------------------------------------------------------------
 vtknvindex_import_bricks::vtknvindex_import_bricks(
   const nv::index::ISparse_volume_subset_data_descriptor* subset_data_descriptor,
-  nv::index::ISparse_volume_subset* volume_subset, mi::Uint8* source_buffer, mi::Size vol_fmt_size,
-  mi::Sint32 border_size, const vtknvindex::util::Bbox3i& source_bbox)
+  nv::index::ISparse_volume_subset* volume_subset, const mi::Uint8* source_buffer,
+  mi::Size vol_fmt_size, mi::Sint32 border_size, const vtknvindex::util::Bbox3i& source_bbox)
   : m_subset_data_descriptor(subset_data_descriptor)
   , m_volume_subset(volume_subset)
   , m_source_buffer(source_buffer)
@@ -298,7 +298,7 @@ mi::Size vtknvindex_sparse_volume_importer::estimate(
   if (m_scalar_type == "float")
     return volume_brick_size * sizeof(mi::Float32);
 
-  // Double scalar data is converted to float berfore passed to IndeX
+  // Double scalar data is converted to float before passing to IndeX
   if (m_scalar_type == "double")
     return volume_brick_size * sizeof(mi::Float32);
 
@@ -399,9 +399,9 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
            << " from rank: " << rankid << ".";
   INFO_LOG << "Bounding box requested by NVIDIA IndeX: " << bounding_box;
 
-  mi::Uint8* subdivision_ptr = nullptr;
+  const mi::Uint8* subdivision_ptr = nullptr;
 
-  // Using volume subvision from ParaView scalar raw pointer
+  // Using volume subdivision from ParaView scalar raw pointer
   if (pv_subdivision_ptr)
   {
     // Convert double scalar data to float.
@@ -421,7 +421,7 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
 
     subdivision_ptr = reinterpret_cast<mi::Uint8*>(pv_subdivision_ptr);
   }
-  else // Using volume subvision passed through shared memory pointer
+  else // Using volume subdivision passed through shared memory pointer
   {
     subdivision_ptr = vtknvindex::util::get_vol_shm(shm_memory_name, shmsize);
   }
@@ -442,7 +442,7 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
   }
   else
   {
-    // free memory space linked to shared memory
+    // unmap shared memory
     vtknvindex::util::unmap_shm(subdivision_ptr, shmsize);
   }
 
@@ -469,12 +469,12 @@ void vtknvindex_sparse_volume_importer::set_cluster_properties(
 void vtknvindex_sparse_volume_importer::serialize(mi::neuraylib::ISerializer* serializer) const
 {
   mi::Uint32 scalar_typename_size = mi::Uint32(m_scalar_type.size());
-  serializer->write(&scalar_typename_size, 1);
+  serializer->write(&scalar_typename_size);
   serializer->write(
     reinterpret_cast<const mi::Uint8*>(m_scalar_type.c_str()), scalar_typename_size);
 
   serializer->write(&m_volume_size.x, 3);
-  serializer->write(&m_border_size, 1);
+  serializer->write(&m_border_size);
 
   m_cluster_properties->serialize(serializer);
 }
@@ -483,12 +483,12 @@ void vtknvindex_sparse_volume_importer::serialize(mi::neuraylib::ISerializer* se
 void vtknvindex_sparse_volume_importer::deserialize(mi::neuraylib::IDeserializer* deserializer)
 {
   mi::Uint32 scalar_typename_size = 0;
-  deserializer->read(&scalar_typename_size, 1);
+  deserializer->read(&scalar_typename_size);
   m_scalar_type.resize(scalar_typename_size);
   deserializer->read(reinterpret_cast<mi::Uint8*>(&m_scalar_type[0]), scalar_typename_size);
 
   deserializer->read(&m_volume_size.x, 3);
-  deserializer->read(&m_border_size, 1);
+  deserializer->read(&m_border_size);
 
   m_cluster_properties = new vtknvindex_cluster_properties();
   m_cluster_properties->deserialize(deserializer);

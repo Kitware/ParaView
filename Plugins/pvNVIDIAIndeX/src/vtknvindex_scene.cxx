@@ -227,11 +227,8 @@ void vtknvindex_scene::set_visibility(bool visibility)
           dice_transaction->edit<nv::index::IScene>(session->get_scene()));
         assert(scene.is_valid_interface());
 
-        mi::base::Handle<const mi::neuraylib::IElement> vol_elem(
-          dice_transaction->access<mi::neuraylib::IElement>(m_volume_tag));
-
         mi::base::Handle<const nv::index::ISparse_volume_scene_element> sparse_vol_elem(
-          vol_elem->get_interface<nv::index::ISparse_volume_scene_element>());
+          dice_transaction->access<nv::index::ISparse_volume_scene_element>(m_volume_tag));
 
         // Set global scene transform (only required for regular volumes).
         mi::math::Matrix<mi::Float32, 4, 4> scene_rotation_matrix(1.0f);
@@ -389,7 +386,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
 
       // Create shared memory irregular volume data importer.
       vtknvindex_irregular_volume_importer* volume_importer =
-        new vtknvindex_irregular_volume_importer(subcube_border, scalar_type);
+        new vtknvindex_irregular_volume_importer(scalar_type);
 
       assert(volume_importer);
 
@@ -952,7 +949,7 @@ void vtknvindex_scene::update_volume(
 
       // Create shared memory irregular volume data importer.
       vtknvindex_irregular_volume_importer* volume_importer =
-        new vtknvindex_irregular_volume_importer(subcube_border, scalar_type);
+        new vtknvindex_irregular_volume_importer(scalar_type);
 
       assert(volume_importer);
 
@@ -1441,11 +1438,8 @@ void vtknvindex_scene::update_config_settings(
 void vtknvindex_scene::update_volume_opacity(
   vtkVolume* vol, const mi::base::Handle<mi::neuraylib::IDice_transaction>& dice_transaction)
 {
-  mi::base::Handle<const mi::neuraylib::IElement> vol_elem(
-    dice_transaction->access<mi::neuraylib::IElement>(m_volume_tag));
-
   mi::base::Handle<const nv::index::ISparse_volume_scene_element> sparse_vol_elem(
-    vol_elem->get_interface<nv::index::ISparse_volume_scene_element>());
+    dice_transaction->access<nv::index::ISparse_volume_scene_element>(m_volume_tag));
 
   // Is regular volume?
   vtknvindex_config_settings* pv_config_settings = m_cluster_properties->get_config_settings();

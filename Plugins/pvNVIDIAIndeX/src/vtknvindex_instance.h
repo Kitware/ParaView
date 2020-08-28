@@ -31,7 +31,6 @@
 #include <map>
 #include <vector>
 
-//#include <mi/dice.h>
 #include "vtknvindex_opengl_app_buffer.h"
 #include "vtknvindex_opengl_canvas.h"
 #include <nv/index/iindex_debug_configuration.h>
@@ -111,8 +110,8 @@ private:
   // Shutting down NVIDIA IndeX library.
   bool shutdown_nvindex();
 
-  // Initialize application rendering context.
-  void initialize_arc();
+  // Initialize IndeX session
+  void initialize_session();
 
   // Initialize IndeX scene graph
   void init_scene_graph();

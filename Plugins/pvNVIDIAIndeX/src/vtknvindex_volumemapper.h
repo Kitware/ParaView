@@ -81,7 +81,7 @@ public:
   void Render(vtkRenderer* ren, vtkVolume* vol) override;
 
   // Prepare data for the importer.
-  bool prepare_data(mi::Sint32 time_step, vtkVolume* vol);
+  bool prepare_data(mi::Sint32 time_step);
 
   // Get the local host id from NVIDIA IndeX running on this machine.
   mi::Sint32 get_local_hostid();
@@ -109,7 +109,7 @@ public:
     const void* params_buffer, mi::Uint32 buffer_size);
 
   // Initialize the mapper.
-  bool initialize_mapper(vtkRenderer* ren, vtkVolume* vol);
+  bool initialize_mapper(vtkVolume* vol);
 
   // Set/get caching state.
   void is_caching(bool is_caching);
