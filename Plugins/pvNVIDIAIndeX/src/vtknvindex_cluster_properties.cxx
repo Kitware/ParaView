@@ -491,6 +491,7 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
       // Translate to origin
       current_affinity.min -= volume_extents_min;
       current_affinity.max -= volume_extents_min;
+      current_affinity.max += mi::math::Vector<mi::Float32, 3>(1.f); // Convert from "value range"
 
       // Same for current_bbox (but without the special border/ghosting handling)
       current_bbox.min -= volume_extents_min;

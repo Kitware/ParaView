@@ -166,9 +166,6 @@ void vtknvindex_import_bricks::execute_fragment(
         clip_bbox.max[i] += m_border_size;
     }
 
-    // FIXME: Why??? This looks wrong
-    clip_bbox.max += Vec3i(1);
-
     // Defines what will be read from the source. If larger than the source bbox, then data will be
     // clamped/duplicated. This typically happens for outside border voxels or interior boundaries
     // when ghosting is not enabled.
