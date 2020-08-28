@@ -41,29 +41,26 @@
 // assigned to the host,
 // the shared memory information and the gpus to ranks assignments.
 
-class vtknvindex_host_properties_base : public mi::base::Interface_declare<0xec688118, 0x13f0,
-                                          0x4e4f, 0x81, 0x35, 0xb0, 0xac, 0x94, 0xf6, 0x7a, 0x59>
-{
-};
-
-class vtknvindex_host_properties
-  : public mi::base::Interface_implement<vtknvindex_host_properties_base>
+class vtknvindex_host_properties : public mi::neuraylib::Base<0xec688118, 0x13f0, 0x4e4f, 0x81,
+                                     0x35, 0xb0, 0xac, 0x94, 0xf6, 0x7a, 0x59>
 {
 public:
   // Shared memory name and bounding box of the
   // data, which the shared memory represents.
   struct shm_info
   {
-    shm_info() { m_subset_ptr = NULL; }
+    shm_info()
+      : m_subset_ptr(nullptr)
+    {
+    }
 
     shm_info(std::string shm_name, mi::math::Bbox<mi::Float32, 3> bbox, mi::Uint64 shm_size,
-      void* subset_ptr = NULL)
+      void* subset_ptr = nullptr)
       : m_shm_name(shm_name)
       , m_shm_bbox(bbox)
       , m_size(shm_size)
       , m_subset_ptr(subset_ptr)
     {
-      // empty
     }
 
     std::string m_shm_name;
@@ -110,11 +107,9 @@ public:
   // Print the host details.
   void print_info() const;
 
-  // DiCE database element methods.
-  virtual void serialize(mi::neuraylib::ISerializer* serializer) const;
-  virtual void deserialize(mi::neuraylib::IDeserializer* deserializer);
-  virtual mi::base::Uuid get_class_id() const;
-  virtual const char* get_class_name() const;
+  // Serialization
+  void serialize(mi::neuraylib::ISerializer* serializer) const;
+  void deserialize(mi::neuraylib::IDeserializer* deserializer);
 
 private:
   vtknvindex_host_properties(const vtknvindex_host_properties&) = delete;

@@ -468,6 +468,7 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
       // If the origin is not [0,0,0] we have to translate all the pieces.
       mi::math::Bbox<mi::Sint32, 3> volume_extents;
       m_regular_vol_properties->get_volume_extents(volume_extents);
+      const mi::math::Vector<mi::Float32, 3> volume_extents_min(volume_extents.min);
 
       // Trying to reconstruct cur_bbox without ghost cells = affinity.
       mi::math::Bbox<mi::Float32, 3> vol_ext_flt(volume_extents);
@@ -487,19 +488,14 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
       if (current_affinity.max.z < vol_ext_flt.max.z)
         current_affinity.max.z -= border_size;
 
-      current_affinity.min.x -= volume_extents.min.x;
-      current_affinity.min.y -= volume_extents.min.y;
-      current_affinity.min.z -= volume_extents.min.z;
-      current_affinity.max.x -= (volume_extents.min.x);
-      current_affinity.max.y -= (volume_extents.min.y);
-      current_affinity.max.z -= (volume_extents.min.z);
+      // Translate to origin
+      current_affinity.min -= volume_extents_min;
+      current_affinity.max -= volume_extents_min;
 
-      current_bbox.min.x -= volume_extents.min.x;
-      current_bbox.min.y -= volume_extents.min.y;
-      current_bbox.min.z -= volume_extents.min.z;
-      current_bbox.max.x -= (volume_extents.min.x - 1);
-      current_bbox.max.y -= (volume_extents.min.y - 1);
-      current_bbox.max.z -= (volume_extents.min.z - 1);
+      // Same for current_bbox (but without the special border/ghosting handling)
+      current_bbox.min -= volume_extents_min;
+      current_bbox.max -= volume_extents_min;
+      current_bbox.max += mi::math::Vector<mi::Float32, 3>(1.f);
     }
 
     std::string host = host_names[i];
@@ -566,16 +562,13 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
 
       std::map<mi::Uint32, vtknvindex_host_properties*>::iterator shmjt = m_hostinfo.find(hostid);
       vtknvindex_host_properties* host_properties = shmjt->second;
-      mi::Uint64 shm_size = 0;
+      mi::Size shm_size = 0;
 
       if (dataset_parameters.volume_type == vtknvindex_scene::VOLUME_TYPE_REGULAR)
       {
-        mi::math::Vector_struct<mi::Uint64, 3> pernode_volume = {
-          static_cast<mi::Uint64>(current_bbox.max.x - current_bbox.min.x),
-          static_cast<mi::Uint64>(current_bbox.max.y - current_bbox.min.y),
-          static_cast<mi::Uint64>(current_bbox.max.z - current_bbox.min.z)
-        };
-        mi::Uint64 volume_size = pernode_volume.x * pernode_volume.y * pernode_volume.z;
+        const mi::math::Vector<mi::Size, 3> pernode_volume_extent(current_bbox.extent());
+        const mi::Size volume_size =
+          pernode_volume_extent.x * pernode_volume_extent.y * pernode_volume_extent.z;
 
         const std::string& scalar_type = dataset_parameters.scalar_type;
 
@@ -665,12 +658,6 @@ mi::neuraylib::IElement* vtknvindex_cluster_properties::copy() const
 const char* vtknvindex_cluster_properties::get_class_name() const
 {
   return "vtknvindex_cluster_properties";
-}
-
-// ------------------------------------------------------------------------------------------------
-mi::base::Uuid vtknvindex_cluster_properties::get_class_id() const
-{
-  return IID();
 }
 
 // ------------------------------------------------------------------------------------------------

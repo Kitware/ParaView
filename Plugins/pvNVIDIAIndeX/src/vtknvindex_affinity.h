@@ -36,7 +36,6 @@
 
 #include "vtkBoundingBox.h" // needed for vtkBoundingBox.
 
-#include <mi/base/interface_declare.h>
 #include <mi/dice.h>
 #include <mi/math/bbox.h>
 #include <mi/neuraylib/iserializer.h>
@@ -52,13 +51,8 @@ class vtknvindex_host_properties;
 // to distribute
 // evenly datasets and rendering among cluster's gpu resources.
 
-class vtknvindex_affinity_base
-  : public mi::base::Interface_declare<0x9bda367e, 0x755d, 0x47a4, 0xb5, 0x2f, 0xe1, 0x0f, 0xd7,
-      0xae, 0x34, 0x90, nv::index::IDomain_specific_subdivision>
-{
-};
-
-class vtknvindex_affinity : public mi::base::Interface_implement<vtknvindex_affinity_base>
+class vtknvindex_affinity : public mi::neuraylib::Base<0x9bda367e, 0x755d, 0x47a4, 0xb5, 0x2f, 0xe1,
+                              0x0f, 0xd7, 0xae, 0x34, 0x90, nv::index::IDomain_specific_subdivision>
 {
 public:
   vtknvindex_affinity();
@@ -110,7 +104,6 @@ public:
   void scene_dump_affinity_info(std::ostringstream& s);
 
   // DiCE methods
-  mi::base::Uuid get_class_id() const override;
   void serialize(mi::neuraylib::ISerializer* serializer) const override;
   void deserialize(mi::neuraylib::IDeserializer* deserializer) override;
 
@@ -127,14 +120,9 @@ private:
     m_host_info; // The host id to host properties mapping.
 };
 
-class vtknvindex_KDTree_affinity_base
-  : public mi::base::Interface_declare<0x357d6811, 0x7208, 0x4ab3, 0xa6, 0x2f, 0xff, 0xd8, 0xcf,
-      0x75, 0x1b, 0x2, nv::index::IDomain_specific_subdivision_topology>
-{
-};
-
 class vtknvindex_KDTree_affinity
-  : public mi::base::Interface_implement<vtknvindex_KDTree_affinity_base>
+  : public mi::neuraylib::Base<0x357d6811, 0x7208, 0x4ab3, 0xa6, 0x2f, 0xff, 0xd8, 0xcf, 0x75, 0x1b,
+      0x2, nv::index::IDomain_specific_subdivision_topology>
 {
 public:
   vtknvindex_KDTree_affinity();
@@ -221,7 +209,6 @@ public:
   void scene_dump_affinity_info(std::ostringstream& s);
 
   // DiCE methods
-  mi::base::Uuid get_class_id() const override;
   void serialize(mi::neuraylib::ISerializer* serializer) const override;
   void deserialize(mi::neuraylib::IDeserializer* deserializer) override;
 

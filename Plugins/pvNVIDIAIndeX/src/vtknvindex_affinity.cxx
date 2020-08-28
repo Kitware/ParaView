@@ -169,12 +169,6 @@ bool vtknvindex_affinity::get_affinity(const mi::math::Bbox_struct<mi::Float32, 
 }
 
 // ------------------------------------------------------------------------------------------------
-mi::base::Uuid vtknvindex_affinity::get_class_id() const
-{
-  return IID();
-}
-
-// ------------------------------------------------------------------------------------------------
 void vtknvindex_affinity::serialize(mi::neuraylib::ISerializer* serializer) const
 {
   const mi::Uint32 nb_elements = static_cast<mi::Uint32>(m_spatial_subdivision.size());
@@ -401,12 +395,6 @@ void vtknvindex_KDTree_affinity::scene_dump_affinity_info(std::ostringstream& s)
     s << "index::paraview_subdivision::affinity_information_" << i
       << "::gpu = " << affinity.m_gpu_id << "\n";
   }
-}
-
-// ------------------------------------------------------------------------------------------------
-mi::base::Uuid vtknvindex_KDTree_affinity::get_class_id() const
-{
-  return IID();
 }
 
 // ------------------------------------------------------------------------------------------------

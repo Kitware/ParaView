@@ -44,8 +44,8 @@ class vtknvindex_import_bricks : public mi::neuraylib::Fragmented_job<0x6538523c
 public:
   vtknvindex_import_bricks(
     const nv::index::ISparse_volume_subset_data_descriptor* subset_data_descriptor,
-    nv::index::ISparse_volume_subset* volume_subset, mi::Uint8* brick_storage,
-    mi::Size vol_fmt_size, mi::Sint32 border_size, const vtknvindex::util::Bbox3i& read_bounds);
+    nv::index::ISparse_volume_subset* volume_subset, mi::Uint8* source_buffer,
+    mi::Size vol_fmt_size, mi::Sint32 border_size, const vtknvindex::util::Bbox3i& source_bbox);
 
   virtual ~vtknvindex_import_bricks() {}
 
@@ -57,12 +57,12 @@ public:
 private:
   const nv::index::ISparse_volume_subset_data_descriptor* m_subset_data_descriptor;
   nv::index::ISparse_volume_subset* m_volume_subset;
-  mi::Uint8* m_app_subdivision;
+  mi::Uint8* m_source_buffer;
   mi::Size m_vol_fmt_size;
   mi::Sint32 m_border_size;
   mi::Size m_nb_fragments;
   mi::Size m_nb_bricks;
-  vtknvindex::util::Bbox3i m_read_bounds;
+  vtknvindex::util::Bbox3i m_source_bbox;
 };
 
 // The class vtknvindex_sparse_volume_importer represents a distributed data importer for NVIDIA
@@ -83,9 +83,7 @@ public:
   // Estimates the volume data size inside the bounding box (in bytes).
   mi::Size estimate(const mi::math::Bbox_struct<mi::Sint32, 3>& bounding_box,
     mi::neuraylib::IDice_transaction* dice_transaction) const override;
-
-  using nv::index::Distributed_discrete_data_import_callback<0x5c35b7ce, 0x496c, 0x4342, 0xa3, 0x5f,
-    0x9d, 0x85, 0x4, 0xa1, 0x69, 0x7e>::estimate;
+  using Self::estimate; // handle overloaded method
 
   // NVIDIA IndeX triggers this callback if time varying data shall be imported.
   nv::index::IDistributed_data_subset* create(
@@ -98,9 +96,7 @@ public:
     const mi::math::Bbox_struct<mi::Sint32, 3>& bounding_box,
     nv::index::IData_subset_factory* factory,
     mi::neuraylib::IDice_transaction* dice_transaction) const override;
-
-  using nv::index::Distributed_discrete_data_import_callback<0x5c35b7ce, 0x496c, 0x4342, 0xa3, 0x5f,
-    0x9d, 0x85, 0x4, 0xa1, 0x69, 0x7e>::create;
+  using Self::create; // handle overloaded method
 
   // The cluster properties triggered by ParaView.
   void set_cluster_properties(vtknvindex_cluster_properties* host_properties);
@@ -108,7 +104,6 @@ public:
   // DiCE methods.
   void serialize(mi::neuraylib::ISerializer* serializer) const override;
   void deserialize(mi::neuraylib::IDeserializer* deserializer) override;
-  virtual void get_references(mi::neuraylib::ITag_set* result) const;
   mi::base::Uuid subset_id() const override;
 
 private:

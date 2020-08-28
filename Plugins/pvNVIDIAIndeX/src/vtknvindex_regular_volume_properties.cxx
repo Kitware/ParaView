@@ -268,7 +268,6 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* sca
 
   vtknvindex_host_properties::shm_info* shm_info =
     host_properties->get_shminfo(current_bbox, current_timestep);
-
   if (!shm_info)
   {
     ERROR_LOG << "Failed to get shared memory in "
@@ -285,38 +284,13 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* sca
 
   if (use_shared_mem)
   {
-    void* shm_ptr = NULL;
-
-    if (m_scalar_type == "unsigned char")
-    {
-      shm_ptr = vtknvindex::util::get_vol_shm<mi::Uint8>(shm_info->m_shm_name, shm_info->m_size);
-    }
-    else if (m_scalar_type == "unsigned short")
-    {
-      shm_ptr = vtknvindex::util::get_vol_shm<mi::Uint16>(shm_info->m_shm_name, shm_info->m_size);
-    }
-    else if (m_scalar_type == "char")
-    {
-      shm_ptr = vtknvindex::util::get_vol_shm<mi::Sint8>(shm_info->m_shm_name, shm_info->m_size);
-    }
-    else if (m_scalar_type == "short")
-    {
-      shm_ptr = vtknvindex::util::get_vol_shm<mi::Sint16>(shm_info->m_shm_name, shm_info->m_size);
-    }
-    else if (m_scalar_type == "float")
-    {
-      shm_ptr = vtknvindex::util::get_vol_shm<mi::Float32>(shm_info->m_shm_name, shm_info->m_size);
-    }
-    else if (m_scalar_type == "double")
-    {
-      shm_ptr = vtknvindex::util::get_vol_shm<mi::Float64>(shm_info->m_shm_name, shm_info->m_size);
-    }
-    else
+    if (shm_info->m_size == 0)
     {
       return false;
     }
 
-    if (shm_ptr == NULL)
+    mi::Uint8* shm_ptr = vtknvindex::util::get_vol_shm(shm_info->m_shm_name, shm_info->m_size);
+    if (!shm_ptr)
     {
       ERROR_LOG << "Error retrieving shared memory pointer in "
                 << "vtknvindex_regular_volume_properties::write_shared_memory.";
@@ -397,9 +371,8 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(
     return false;
   }
 
-  mi::Uint8* shm_ptr = NULL;
-  shm_ptr = vtknvindex::util::get_vol_shm<mi::Uint8>(shm_memory_name, shm_size);
-  if (shm_ptr == NULL)
+  mi::Uint8* shm_ptr = vtknvindex::util::get_vol_shm(shm_memory_name, shm_size);
+  if (!shm_ptr)
   {
     ERROR_LOG << "Encountered an error when retrieving a shred memory pointer in "
               << "vtknvindex_regular_volume_properties::write_shared_memory.";
@@ -514,18 +487,6 @@ void vtknvindex_regular_volume_properties::print_info() const
   INFO_LOG << "Volume size: " << m_ivol_volume_extents.max - m_ivol_volume_extents.min;
   INFO_LOG << "Voxel range: " << m_voxel_range;
   INFO_LOG << "Time series: " << ((m_is_timeseries_data) ? "Yes" : "No");
-}
-
-// ------------------------------------------------------------------------------------------------
-const char* vtknvindex_regular_volume_properties::get_class_name() const
-{
-  return "vtknvindex_regular_volume_properties";
-}
-
-// ------------------------------------------------------------------------------------------------
-mi::base::Uuid vtknvindex_regular_volume_properties::get_class_id() const
-{
-  return IID();
 }
 
 // ------------------------------------------------------------------------------------------------

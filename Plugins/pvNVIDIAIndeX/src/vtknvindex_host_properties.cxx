@@ -111,23 +111,6 @@ void vtknvindex_host_properties::set_shminfo(mi::Uint32 time_step, std::string s
 }
 
 // ------------------------------------------------------------------------------------------------
-// Returns \c true if the point is inside or on the boundary of the bounding box.
-namespace
-{
-bool contains(const mi::math::Bbox<mi::Float32, 3>& bb, const mi::math::Vector<mi::Float32, 3>& vec)
-{
-  for (mi::Size i = 0; i < 3; i++)
-  {
-    if (vec[i] < bb.min[i] || vec[i] > bb.max[i])
-    {
-      return false;
-    }
-  }
-  return true;
-}
-}
-
-// ------------------------------------------------------------------------------------------------
 bool vtknvindex_host_properties::get_shminfo(const mi::math::Bbox<mi::Float32, 3>& bbox,
   std::string& shmname, mi::math::Bbox<mi::Float32, 3>& shmbbox, mi::Uint64& shmsize,
   void** subset_ptr, mi::Uint32 time_step)
@@ -152,7 +135,7 @@ bool vtknvindex_host_properties::get_shminfo(const mi::math::Bbox<mi::Float32, 3
   {
     const shm_info& current_shm = shmlist[i];
 
-    if (contains(current_shm.m_shm_bbox, bbox.min) && contains(current_shm.m_shm_bbox, bbox.max))
+    if (current_shm.m_shm_bbox.contains(bbox.min) && current_shm.m_shm_bbox.contains(bbox.max))
     {
       shmname = current_shm.m_shm_name;
       shmbbox = current_shm.m_shm_bbox;
@@ -296,18 +279,6 @@ void vtknvindex_host_properties::print_info() const
                << shmlist[i].m_shm_bbox;
     }
   }
-}
-
-// ------------------------------------------------------------------------------------------------
-const char* vtknvindex_host_properties::get_class_name() const
-{
-  return "vtknvindex_cluster_properties";
-}
-
-// ------------------------------------------------------------------------------------------------
-mi::base::Uuid vtknvindex_host_properties::get_class_id() const
-{
-  return IID();
 }
 
 // ------------------------------------------------------------------------------------------------

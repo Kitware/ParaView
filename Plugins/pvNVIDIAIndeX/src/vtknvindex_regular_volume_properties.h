@@ -30,25 +30,18 @@
 
 #include <string>
 
-#include <mi/base/interface_implement.h>
 #include <mi/math/bbox.h>
+#include <mi/neuraylib/dice.h>
 
 class vtknvindex_host_properties;
 struct vtknvindex_irregular_volume_data;
 class vtkUnstructuredGridBase;
 
-class vtknvindex_regular_volume_properties_base
-  : public mi::base::Interface_declare<0x18c04ecc, 0x0296, 0x42af, 0xa4, 0x1d, 0x35, 0xe1, 0x7e,
-      0x46, 0x2d, 0x9b>
-{
-};
-
 // The class vtknvindex_regular_volume_properties represents the complementary
 // regular volume dataset information such as dimension, data type, time steps, etc.
-class vtknvindex_regular_volume_properties
-  : public mi::base::Interface_implement<vtknvindex_regular_volume_properties_base>
+class vtknvindex_regular_volume_properties : public mi::neuraylib::Base<0x18c04ecc, 0x0296, 0x42af,
+                                               0xa4, 0x1d, 0x35, 0xe1, 0x7e, 0x46, 0x2d, 0x9b>
 {
-
 public:
   vtknvindex_regular_volume_properties();
   ~vtknvindex_regular_volume_properties();
@@ -111,11 +104,9 @@ public:
 
   void print_info() const;
 
-  // DiCE database element methods.
-  virtual void serialize(mi::neuraylib::ISerializer* serializer) const;
-  virtual void deserialize(mi::neuraylib::IDeserializer* deserializer);
-  virtual mi::base::Uuid get_class_id() const;
-  virtual const char* get_class_name() const;
+  // Serialization
+  void serialize(mi::neuraylib::ISerializer* serializer) const;
+  void deserialize(mi::neuraylib::IDeserializer* deserializer);
 
 private:
   vtknvindex_regular_volume_properties(const vtknvindex_regular_volume_properties&) = delete;

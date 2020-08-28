@@ -193,7 +193,7 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
   }
   else // Using volume subvision passed through shared memory pointer
   {
-    subdivision_ptr = vtknvindex::util::get_vol_shm<mi::Uint8>(shm_memory_name, shmsize);
+    subdivision_ptr = vtknvindex::util::get_vol_shm(shm_memory_name, shmsize);
   }
 
   // Import all brick pieces in parallel
@@ -278,9 +278,4 @@ void vtknvindex_volume_compute::deserialize(mi::neuraylib::IDeserializer* deseri
 
   m_cluster_properties = new vtknvindex_cluster_properties();
   m_cluster_properties->deserialize(deserializer);
-}
-
-//-------------------------------------------------------------------------------------------------
-void vtknvindex_volume_compute::get_references(mi::neuraylib::ITag_set* /*result*/) const
-{
 }

@@ -156,11 +156,9 @@ inline const char* get_process_user_name()
 
 //-------------------------------------------------------------------------------------------------
 // Return shared memory pointer to given name of the shared memory of size shared_seg_size
-// After finishing using this shared memory pointer unmap_shm() must be call.
-template <typename T>
-inline T* get_vol_shm(const std::string& shmname, const mi::Uint64& shared_seg_size)
+// After finishing using this shared memory pointer unmap_shm() must be called.
+inline mi::Uint8* get_vol_shm(const std::string& shmname, const mi::Uint64& shared_seg_size)
 {
-
 #ifdef _WIN32
   HANDLE hMapFile;
 
@@ -174,7 +172,7 @@ inline T* get_vol_shm(const std::string& shmname, const mi::Uint64& shared_seg_s
     return NULL;
   }
 
-  T* shm_volume = (T*)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, shared_seg_size);
+  void* shm_volume = MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, shared_seg_size);
 
   if (shm_volume == NULL)
   {
@@ -186,7 +184,7 @@ inline T* get_vol_shm(const std::string& shmname, const mi::Uint64& shared_seg_s
 
   CloseHandle(hMapFile);
 
-  return shm_volume;
+  return reinterpret_cast<mi::Uint8*>(shm_volume);
 #else
 
   mi::Sint32 shmfd = shm_open(shmname.c_str(), O_CREAT | O_RDWR, S_IRWXU);
@@ -205,7 +203,7 @@ inline T* get_vol_shm(const std::string& shmname, const mi::Uint64& shared_seg_s
     return NULL;
   }
 
-  T* shm_volume = (T*)mmap(NULL, shared_seg_size, PROT_READ | PROT_WRITE, MAP_SHARED, shmfd, 0);
+  void* shm_volume = mmap(NULL, shared_seg_size, PROT_READ | PROT_WRITE, MAP_SHARED, shmfd, 0);
   if (shm_volume == NULL)
   {
     ERROR_LOG << "The function mmap() failed in vtknvindex_representation, shared memory: "
@@ -214,7 +212,7 @@ inline T* get_vol_shm(const std::string& shmname, const mi::Uint64& shared_seg_s
   }
   close(shmfd);
 
-  return shm_volume;
+  return reinterpret_cast<mi::Uint8*>(shm_volume);
 #endif
 }
 

@@ -139,7 +139,7 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
   mi::math::Vector<mi::Float32, 3>* points = NULL;
   mi::math::Vector<mi::Uint32, 4>* cells = NULL;
   void* scalars = NULL;
-  mi::Uint8* shm_ivol = NULL;
+  mi::Uint8* shm_ivol = nullptr;
   mi::Float32 max_edge_length_sqr = 0.f;
 
   INFO_LOG << "The bounding box requested by NVIDIA IndeX: " << bounding_box << ".";
@@ -157,7 +157,7 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
   {
     INFO_LOG << "Using shared memory: " << shm_memory_name << " with bbox: " << shm_bbox << ".";
 
-    shm_ivol = vtknvindex::util::get_vol_shm<mi::Uint8>(shm_memory_name, shm_size);
+    shm_ivol = vtknvindex::util::get_vol_shm(shm_memory_name, shm_size);
 
     mi::Uint8* shm_offset = shm_ivol;
     size_t size_elm;
@@ -570,10 +570,4 @@ void vtknvindex_irregular_volume_importer::deserialize(mi::neuraylib::IDeseriali
 
   m_cluster_properties = new vtknvindex_cluster_properties();
   m_cluster_properties->deserialize(deserializer);
-}
-
-//-------------------------------------------------------------------------------------------------
-void vtknvindex_irregular_volume_importer::get_references(mi::neuraylib::ITag_set* /*result*/) const
-{
-  // empty
 }

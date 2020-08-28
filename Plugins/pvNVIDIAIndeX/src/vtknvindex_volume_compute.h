@@ -80,8 +80,6 @@ public:
   ///
   virtual void deserialize(mi::neuraylib::IDeserializer* deserializer);
 
-  virtual void get_references(mi::neuraylib::ITag_set* result) const;
-
 private:
   bool m_enabled;
 
