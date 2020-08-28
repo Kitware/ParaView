@@ -179,6 +179,24 @@ vtknvindex_host_properties* vtknvindex_cluster_properties::get_host_properties(
 }
 
 // ------------------------------------------------------------------------------------------------
+const vtknvindex_host_properties::shm_info* vtknvindex_cluster_properties::get_shminfo(
+  const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step)
+{
+  const vtknvindex_host_properties::shm_info* info = nullptr;
+
+  for (auto& hostinfo : m_hostinfo)
+  {
+    info = hostinfo.second->get_shminfo(bbox, time_step);
+    if (info)
+    {
+      break;
+    }
+  }
+
+  return info;
+}
+
+// ------------------------------------------------------------------------------------------------
 bool vtknvindex_cluster_properties::retrieve_process_configuration(
   const vtknvindex_dataset_parameters& dataset_parameters)
 {
@@ -389,10 +407,8 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
   }
 
   // Gather bounds of all the pieces.
-  mi::Float32* all_rank_extents = new mi::Float32[6 * m_num_ranks];
-  {
-    controller->AllGather(dataset_parameters.bounds, all_rank_extents, 6);
-  }
+  std::vector<mi::Float32> all_rank_extents(6 * m_num_ranks);
+  controller->AllGather(dataset_parameters.bounds, all_rank_extents.data(), 6);
 
   //// Gather local node rank sizes.
   vtknvindex_instance* index_instance = vtknvindex_instance::get();
@@ -467,6 +483,8 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
     mi::Uint64 shm_size = ivol_data->get_memory_size(dataset_parameters.scalar_type);
     controller->AllGather(&shm_size, &all_shm_sizes[0], 1);
   }
+
+  const mi::Uint32 nb_time_steps = m_regular_vol_properties->get_nb_time_steps();
 
   // Add per rank information like affinity, shared memory details etc.
   m_affinity->reset_affinity();
@@ -571,9 +589,6 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
       host_properties->set_rankids(m_all_rank_ids);
     }
 
-    // Collecting information for shared memory: bbox, type, size, time step.
-    mi::Uint32 nb_time_steps = m_regular_vol_properties->get_nb_time_steps();
-
     for (mi::Uint32 time_step = 0; time_step < nb_time_steps; ++time_step)
     {
       std::stringstream ss;
@@ -590,6 +605,7 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
       vtknvindex_host_properties* host_properties = shmjt->second;
       mi::Size shm_size = 0;
 
+      // Collecting information for shared memory: bbox, type, size, time step.
       if (dataset_parameters.volume_type == vtknvindex_scene::VOLUME_TYPE_REGULAR)
       {
         const mi::math::Vector<mi::Size, 3> pernode_volume_extent(current_bbox.extent());
@@ -618,8 +634,19 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
         reinterpret_cast<void*>(all_data_ptrs[i]));
     }
   }
-  delete[] all_rank_extents;
 
+  // Add more per host information
+  for (auto& it : m_hostinfo)
+  {
+    vtknvindex_host_properties* host_props = it.second;
+    for (mi::Uint32 time_step = 0; time_step < nb_time_steps; ++time_step)
+    {
+      // Neighbor information
+      host_props->create_volume_neighbor_info(this, time_step);
+    }
+  }
+
+  // Pass host information to the affinity
   m_affinity->set_hostinfo(m_hostinfo);
   if (m_affinity_kdtree)
     m_affinity_kdtree->set_hostinfo(m_hostinfo);

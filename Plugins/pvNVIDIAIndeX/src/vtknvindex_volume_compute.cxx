@@ -140,11 +140,12 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
   void* pv_subdivision_ptr = NULL;
   void* shm_ptr = NULL;
 
+  vtknvindex_host_properties* host_props = m_cluster_properties->get_host_properties(rankid);
+
   const vtknvindex_host_properties::shm_info* shm_info;
   const mi::Uint32 time_step = 0;
   const mi::Uint8* subset_data_buffer =
-    m_cluster_properties->get_host_properties(rankid)->get_subset_data_buffer(
-      subset_subregion_bbox, time_step, &shm_info);
+    host_props->get_subset_data_buffer(subset_subregion_bbox, time_step, &shm_info);
 
   if (!shm_info)
   {
@@ -190,13 +191,16 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
     free_buffer = true;
   }
 
-  // Ensure neighbor data is available
-  vtknvindex_neighbor_data neighbor_data(shm_info->m_shm_bbox, m_volume_size, m_border_size,
-    m_ghost_levels, m_cluster_properties->get_host_properties(rankid), time_step);
+  if (shm_info->m_neighbors)
+  {
+    // Ensure border data is available
+    shm_info->m_neighbors->fetch_data(host_props, time_step);
+  }
 
   // Import all brick pieces in parallel
   vtknvindex_import_bricks import_bricks_job(svol_subset_desc.get(), svol_data_subset.get(),
-    subset_data_buffer, vol_fmt_size, m_border_size, m_ghost_levels, shm_bbox, neighbor_data);
+    subset_data_buffer, vol_fmt_size, m_border_size, m_ghost_levels, shm_bbox,
+    shm_info->m_neighbors.get());
 
   dice_transaction->execute_fragmented(&import_bricks_job, import_bricks_job.get_nb_fragments());
 

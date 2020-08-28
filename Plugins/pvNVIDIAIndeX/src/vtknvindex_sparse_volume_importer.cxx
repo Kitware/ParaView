@@ -84,131 +84,11 @@ inline mi::Size volume_format_size(const nv::index::Sparse_volume_voxel_format f
 }
 
 //-------------------------------------------------------------------------------------------------
-vtknvindex_neighbor_data::vtknvindex_neighbor_data(const mi::math::Bbox<mi::Float32, 3>& piece_bbox,
-  const mi::math::Vector<mi::Uint32, 3>& volume_size, mi::Uint32 border_size,
-  mi::Uint32 ghost_levels, vtknvindex_host_properties* host_props, mi::Uint32 time_step)
-{
-  if (ghost_levels >= border_size)
-  {
-    // Border already handled by VTK ghosting, nothing to do
-    return;
-  }
-
-  // Handle the case where VTK ghost level are set to a smaller value than required by IndeX
-  const mi::Uint32 remaining_border_size = border_size - ghost_levels;
-
-  mi::math::Vector<mi::Sint32, 3> dir;
-  for (dir.z = -1; dir.z <= 1; ++dir.z)
-  {
-    for (dir.y = -1; dir.y <= 1; ++dir.y)
-    {
-      for (dir.x = -1; dir.x <= 1; ++dir.x)
-      {
-        if (dir.x == 0 && dir.y == 0 && dir.z == 0)
-        {
-          continue; // current piece, not a neighbor, skip
-        }
-
-        // Bbox containing all the required border data, located in the neighbor piece. Note that
-        // this bbox may be larger than the bbox of the neighbor, e.g. when the border size is set
-        // to 2 but the volume size of neighbor is just 1.
-        mi::math::Bbox<mi::Sint32, 3> border_bbox(piece_bbox);
-
-        // Similar, but fixed to a border size of 1. This is used to intersect with the bbox of
-        // the neighbor, making sure to handle the case where border_bbox is larger than the bbox
-        // of the neighbor.
-        mi::math::Bbox<mi::Float32, 3> query_bbox = piece_bbox;
-
-        bool outer_boundary = false;
-        for (int i = 0; i < 3; ++i)
-        {
-          if (dir[i] < 0)
-          {
-            border_bbox.max[i] = border_bbox.min[i];
-            border_bbox.min[i] -= remaining_border_size;
-
-            // Use fixed border size of 1 for query to handle the case when size of the neighbor
-            // piece is smaller than the border size (data will be clamped later).
-            query_bbox.max[i] = query_bbox.min[i];
-            query_bbox.min[i] -= 1;
-
-            if (query_bbox.min[i] < 0)
-            {
-              outer_boundary = true;
-              break;
-            }
-          }
-          else if (dir[i] > 0)
-          {
-            border_bbox.min[i] = border_bbox.max[i];
-            border_bbox.max[i] += remaining_border_size;
-
-            query_bbox.min[i] = query_bbox.max[i];
-            query_bbox.max[i] += 1;
-
-            if (query_bbox.max[i] > volume_size[i])
-            {
-              outer_boundary = true;
-              break;
-            }
-          }
-        }
-
-        if (outer_boundary)
-        {
-          // The outer boundary of the volume will be clamped anyway, ignore
-          continue;
-        }
-
-        // Retrieve neighbor data from shared memory
-        const vtknvindex_host_properties::shm_info* neighbor_info;
-        const mi::Uint8* neighbor_buffer =
-          host_props->get_subset_data_buffer(query_bbox, time_step, &neighbor_info);
-
-        if (!neighbor_info)
-        {
-          ERROR_LOG << LOG_svol_rvol_prefix << "Could not access volume information for neighbor "
-                    << query_bbox << " of " << piece_bbox << ".";
-        }
-        else if (!neighbor_buffer)
-        {
-          ERROR_LOG << LOG_svol_rvol_prefix << "Could not access volume data for neighbor "
-                    << query_bbox << " of " << piece_bbox << ": " << neighbor_info->m_shm_name
-                    << ". "
-                    << "Data is not available in shared memory?";
-        }
-        else
-        {
-          Neighbor_info* ni = new Neighbor_info();
-          ni->direction = dir;
-          ni->border_bbox = border_bbox;
-          ni->query_bbox = mi::math::Bbox<mi::Sint32, 3>(query_bbox);
-
-          ni->data_bbox = mi::math::Bbox<mi::Sint32, 3>(neighbor_info->m_shm_bbox);
-          ni->data_buffer = neighbor_buffer;
-
-          m_neighbors.push_back(ni);
-        }
-      }
-    }
-  }
-}
-
-//-------------------------------------------------------------------------------------------------
-vtknvindex_neighbor_data::~vtknvindex_neighbor_data()
-{
-  for (auto& it : m_neighbors)
-  {
-    delete it;
-  }
-}
-
-//-------------------------------------------------------------------------------------------------
 vtknvindex_import_bricks::vtknvindex_import_bricks(
   const nv::index::ISparse_volume_subset_data_descriptor* subset_data_descriptor,
   nv::index::ISparse_volume_subset* volume_subset, const mi::Uint8* source_buffer,
   mi::Size vol_fmt_size, mi::Sint32 border_size, mi::Sint32 ghost_levels,
-  const vtknvindex::util::Bbox3i& source_bbox, const vtknvindex_neighbor_data& neighbor_data)
+  const vtknvindex::util::Bbox3i& source_bbox, const vtknvindex_volume_neighbor_data* neighbor_data)
   : m_subset_data_descriptor(subset_data_descriptor)
   , m_volume_subset(volume_subset)
   , m_source_buffer(source_buffer)
@@ -347,52 +227,6 @@ void clamp_to_border(const mi::math::Bbox<mi::Sint32, 3>& brick_bbox_global,
         calc_offset(dst_bbox.min.x, y, src_bbox.max.z - 1, brick_dims, voxel_fmt_size);
       const mi::Size dst = calc_offset(dst_bbox.min.x, y, z, brick_dims, voxel_fmt_size);
       memcpy(brick_buffer + dst, brick_buffer + src, len_x * voxel_fmt_size);
-    }
-  }
-}
-
-// Copy a brick between two buffers. All bboxes are in the same global coordinate system.
-void copy_to_brick(const mi::math::Bbox<mi::Sint32, 3>& copy_bbox_global, mi::Uint8* dst_buffer,
-  const mi::math::Bbox<mi::Sint32, 3>& dst_buffer_bbox_global, const mi::Uint8* src_buffer,
-  const mi::math::Bbox<mi::Sint32, 3>& src_buffer_bbox_global, mi::Size voxel_fmt_size)
-{
-  using namespace vtknvindex::util;
-
-  // Destination buffer bbox might be smaller than requested copy_bbox, clamp accordingly.
-  // Note: No clamping for source buffer bbox
-  const Bbox3i copy_bbox_global_clamped(
-    mi::math::clamp(copy_bbox_global.min, dst_buffer_bbox_global.min, dst_buffer_bbox_global.max),
-    mi::math::clamp(copy_bbox_global.max, dst_buffer_bbox_global.min, dst_buffer_bbox_global.max));
-
-#if 0
-  ERROR_LOG << "*** copy_to_brick copy_bbox=" << copy_bbox_global
-            << ", clamped_bbox=" << copy_bbox_global_clamped
-            << ", dst_buffer_bbox=" << dst_buffer_bbox_global
-            << ", src_buffer_bbox=" << src_buffer_bbox_global;
-#endif
-
-  const Bbox3u read_bbox(Vec3u(copy_bbox_global_clamped.min - src_buffer_bbox_global.min),
-    Vec3u(copy_bbox_global_clamped.max - src_buffer_bbox_global.min));
-
-  const Vec3i write_delta(src_buffer_bbox_global.min - dst_buffer_bbox_global.min);
-
-  const Bbox3u write_bbox(
-    Vec3u(Vec3i(read_bbox.min) + write_delta), Vec3u(Vec3i(read_bbox.max) + write_delta));
-
-  const Vec3u dst_buffer_dims(dst_buffer_bbox_global.extent());
-  const Vec3u src_buffer_dims(src_buffer_bbox_global.extent());
-
-  const mi::Size len_x = read_bbox.max.x - read_bbox.min.x;
-
-  for (mi::Uint32 z = read_bbox.min.z; z < read_bbox.max.z; ++z)
-  {
-    for (mi::Uint32 y = read_bbox.min.y; y < read_bbox.max.y; ++y)
-    {
-      const mi::Size src_offset =
-        calc_offset(read_bbox.min.x, y, z, src_buffer_dims, voxel_fmt_size);
-      const mi::Size dst_offset = calc_offset(read_bbox.min.x + write_delta.x, y + write_delta.y,
-        z + write_delta.z, dst_buffer_dims, voxel_fmt_size);
-      memcpy(dst_buffer + dst_offset, src_buffer + src_offset, len_x * voxel_fmt_size);
     }
   }
 }
@@ -589,54 +423,64 @@ void vtknvindex_import_bricks::execute_fragment(
       }
     }
 
-    // Handle inside border, retrieve voxels from neighboring pieces
-    for (const vtknvindex_neighbor_data::Neighbor_info* it : m_neighbor_data)
+    if (m_neighbor_data)
     {
-      const Vec3i& dir = it->direction;
-
-      // Check whether any voxels of the neighbor piece need to be accessed for this brick
-      bool neighbor_access = false;
-      for (int i = 0; i < 3; ++i)
+      // Handle inside border, retrieve voxels from neighboring pieces
+      for (const vtknvindex_volume_neighbor_data::Neighbor_info* neighbor : *m_neighbor_data)
       {
-        if (dir[i] > 0)
+        const Vec3i& dir = neighbor->direction;
+
+        // Check whether any voxels of the neighbor piece need to be accessed for this brick
+        bool neighbor_access = false;
+        for (int i = 0; i < 3; ++i)
         {
-          if (dest_brick_bbox_clipped_with_border_inner.max[i] > dest_brick_bbox_clipped.max[i])
+          if (dir[i] > 0)
           {
-            neighbor_access = true;
-            break;
+            if (dest_brick_bbox_clipped_with_border_inner.max[i] > dest_brick_bbox_clipped.max[i])
+            {
+              neighbor_access = true;
+              break;
+            }
+          }
+          else if (dir[i] < 0)
+          {
+            if (dest_brick_bbox_clipped_with_border_inner.min[i] < dest_brick_bbox_clipped.min[i])
+            {
+              neighbor_access = true;
+              break;
+            }
           }
         }
-        else if (dir[i] < 0)
+
+        if (!neighbor_access)
         {
-          if (dest_brick_bbox_clipped_with_border_inner.min[i] < dest_brick_bbox_clipped.min[i])
-          {
-            neighbor_access = true;
-            break;
-          }
+          // Nothing to do
+          continue;
         }
-      }
 
-      if (!neighbor_access)
-      {
-        // Nothing to do
-        continue;
-      }
-
-      if (dest_brick_bbox_clipped_with_border_inner.contains(it->query_bbox.min) &&
-        dest_brick_bbox_clipped_with_border_inner.contains(it->query_bbox.max))
-      {
+        if (dest_brick_bbox_clipped_with_border_inner.contains(neighbor->query_bbox.min) &&
+          dest_brick_bbox_clipped_with_border_inner.contains(neighbor->query_bbox.max))
+        {
 #if 0
-        ERROR_LOG << "** neighbor " << it->direction << " for dest "
-                  << dest_brick_bbox_clipped_with_border_inner << " with border_bbox "
-                  << it->border_bbox << " and source " << m_source_bbox << ", with query "
-                  << it->query_bbox << " ==> copy border_bbox" << it->border_bbox
-                  << " from neighbor " << it->direction << " with data bbox " << it->data_bbox
-                  << " to " << dest_brick_bbox_clipped_with_border_inner << " in brick "
-                  << dest_brick_bbox;
+          ERROR_LOG << "** neighbor " << neighbor->direction << " for dest "
+                    << dest_brick_bbox_clipped_with_border_inner << " with border_bbox "
+                    << neighbor->border_bbox << " and source " << m_source_bbox << ", with query "
+                    << neighbor->query_bbox << " ==> copy border_bbox" << neighbor->border_bbox
+                    << " from neighbor " << neighbor->direction << " with data bbox " << neighbor->data_bbox
+                    << " to " << dest_brick_bbox_clipped_with_border_inner << " in brick "
+                    << dest_brick_bbox;
 #endif
 
-        copy_to_brick(it->border_bbox, svol_brick_data_raw, dest_brick_bbox, it->data_buffer,
-          it->data_bbox, m_vol_fmt_size);
+          if (neighbor->is_data_available())
+          {
+            neighbor->copy(svol_brick_data_raw, dest_brick_bbox, m_vol_fmt_size);
+          }
+          else
+          {
+            ERROR_LOG << LOG_svol_rvol_prefix << "Border data " << neighbor->border_bbox
+                      << " is not available for brick " << dest_brick_bbox << ".";
+          }
+        }
       }
     }
 
@@ -767,11 +611,12 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
   const mi::Sint32 rankid = controller ? controller->GetLocalProcessId() : 0;
 
+  vtknvindex_host_properties* host_props = m_cluster_properties->get_host_properties(rankid);
+
   // Fetch local or shared memory details from host properties
   const vtknvindex_host_properties::shm_info* shm_info;
   const mi::Uint8* subset_data_buffer =
-    m_cluster_properties->get_host_properties(rankid)->get_subset_data_buffer(
-      subset_subregion_bbox, time_step, &shm_info);
+    host_props->get_subset_data_buffer(subset_subregion_bbox, time_step, &shm_info);
 
   if (!shm_info)
   {
@@ -813,9 +658,11 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
     free_buffer = true;
   }
 
-  // Ensure neighbor data is available
-  vtknvindex_neighbor_data neighbor_data(shm_info->m_shm_bbox, m_volume_size, m_border_size,
-    m_ghost_levels, m_cluster_properties->get_host_properties(rankid), time_step);
+  if (shm_info->m_neighbors)
+  {
+    // Ensure border data is available
+    shm_info->m_neighbors->fetch_data(host_props, time_step);
+  }
 
   INFO_LOG << "Importing volume data from " << (rankid == shm_info->m_rank_id ? "local" : "shared")
            << " "
@@ -827,7 +674,8 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
 
   // Import all bricks for the subregion in parallel
   vtknvindex_import_bricks import_bricks_job(svol_subset_desc.get(), svol_data_subset.get(),
-    subset_data_buffer, vol_fmt_size, m_border_size, m_ghost_levels, shm_bbox, neighbor_data);
+    subset_data_buffer, vol_fmt_size, m_border_size, m_ghost_levels, shm_bbox,
+    shm_info->m_neighbors.get());
 
   dice_transaction->execute_fragmented(&import_bricks_job, import_bricks_job.get_nb_fragments());
 

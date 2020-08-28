@@ -34,53 +34,6 @@
 
 #include "vtknvindex_utilities.h"
 
-class vtknvindex_cluster_properties;
-
-// Enable data access to neighboring pieces (via shared memory) that are required for proper
-// boundary handling. When the current piece already contains the necessary border (e.g. when VTK
-// ghosting is enabled) then no neighbors will be listed here.
-class vtknvindex_neighbor_data
-{
-public:
-  struct Neighbor_info
-  {
-    // Direction from current piece to neighbor: -1, 0, 1
-    mi::math::Vector<mi::Sint32, 3> direction;
-
-    // Bbox of data that needs to be retrieved from the neighbor piece to satisfy boundary of the
-    // current piece
-    mi::math::Bbox<mi::Sint32, 3> border_bbox;
-
-    // Same as border_bbox, but for a fixed border size of 1. Used for intersection queries.
-    mi::math::Bbox<mi::Sint32, 3> query_bbox;
-
-    // Bbox of the neighboring piece (from shm_info)
-    mi::math::Bbox<mi::Sint32, 3> data_bbox;
-
-    // Data buffer, located either in local or shared memory
-    const mi::Uint8* data_buffer;
-  };
-
-  typedef std::vector<Neighbor_info*> Neighbor_vector;
-
-  vtknvindex_neighbor_data(const mi::math::Bbox<mi::Float32, 3>& piece_bbox,
-    const mi::math::Vector<mi::Uint32, 3>& volume_size, mi::Uint32 border_size,
-    mi::Uint32 ghost_levels, vtknvindex_host_properties* host_props, mi::Uint32 time_step);
-
-  ~vtknvindex_neighbor_data();
-
-  // Alow iterating over the neighbors
-  Neighbor_vector::const_iterator begin() const { return m_neighbors.begin(); }
-  Neighbor_vector::const_iterator end() const { return m_neighbors.end(); }
-  std::size_t size() const { return m_neighbors.size(); }
-
-private:
-  vtknvindex_neighbor_data(const vtknvindex_neighbor_data&) = delete;
-  void operator=(const vtknvindex_neighbor_data&) = delete;
-
-  Neighbor_vector m_neighbors;
-};
-
 // Fragmented job to import in parallel all brick storage pieces
 class vtknvindex_import_bricks : public mi::neuraylib::Fragmented_job<0x6538523c, 0xba06, 0x4227,
                                    0xbe, 0xb4, 0x2, 0xdf, 0x9, 0xb6, 0x69, 0xa4>
@@ -91,7 +44,8 @@ public:
     const nv::index::ISparse_volume_subset_data_descriptor* subset_data_descriptor,
     nv::index::ISparse_volume_subset* volume_subset, const mi::Uint8* source_buffer,
     mi::Size vol_fmt_size, mi::Sint32 border_size, mi::Sint32 ghost_levels,
-    const vtknvindex::util::Bbox3i& source_bbox, const vtknvindex_neighbor_data& neighbor_data);
+    const vtknvindex::util::Bbox3i& source_bbox,
+    const vtknvindex_volume_neighbor_data* neighbor_data);
 
   void execute_fragment(mi::neuraylib::IDice_transaction* dice_transaction, mi::Size index,
     mi::Size count, const mi::neuraylib::IJob_execution_context* context) override;
@@ -109,7 +63,7 @@ private:
   mi::Size m_nb_bricks;
   vtknvindex::util::Bbox3i m_source_bbox;
 
-  const vtknvindex_neighbor_data& m_neighbor_data;
+  const vtknvindex_volume_neighbor_data* m_neighbor_data;
 };
 
 // The class vtknvindex_sparse_volume_importer represents a distributed data importer for NVIDIA

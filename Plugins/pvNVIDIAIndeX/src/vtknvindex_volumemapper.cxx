@@ -455,9 +455,28 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
       ERROR_LOG << "NVIDIA IndeX rendering was aborted.";
       return;
     }
+
+    // Ensure border data is available, fetching it from other hosts if necessary
+    vtknvindex_host_properties* host_props =
+      m_cluster_properties->get_host_properties(m_controller->GetLocalProcessId());
+
+    const void* piece_data = nullptr;
+    if (m_cluster_properties->get_regular_volume_properties()->is_timeseries_data())
+    {
+      piece_data = m_subset_ptrs[cur_time_step];
+    }
+    else if (m_scalar_array)
+    {
+      piece_data = m_scalar_array->GetVoidPointer(0);
+    }
+
+    std::string scalar_type;
+    m_cluster_properties->get_regular_volume_properties()->get_scalar_type(scalar_type);
+    host_props->fetch_remote_volume_border_data(
+      m_controller, cur_time_step, piece_data, scalar_type);
   }
 
-  // Wait all ranks finish to write volume data before the render starts.
+  // Wait for all ranks to finish writing volume data before the render starts.
   m_controller->Barrier();
 
   if (m_index_instance->is_index_viewer() && m_index_instance->is_index_initialized())
