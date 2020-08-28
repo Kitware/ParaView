@@ -282,7 +282,7 @@ vtknvindex_config_settings::vtknvindex_config_settings()
   , m_log_performance(false)
   , m_animation_play_forward(true)
   , m_animation_interval_max(1)
-  , m_filter_mode(0)
+  , m_filter_mode(nv::index::SPARSE_VOLUME_FILTER_TRILINEAR_POST)
   , m_subcube_border(2)
   , m_step_size(1.0f)
   , m_ivol_step_size(1.0f)
@@ -340,13 +340,13 @@ mi::Uint32 vtknvindex_config_settings::get_subcube_border() const
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_config_settings::set_filter_mode(mi::Sint32 filter_mode)
+void vtknvindex_config_settings::set_filter_mode(nv::index::Sparse_volume_filter_mode filter_mode)
 {
   m_filter_mode = filter_mode;
 }
 
 //-------------------------------------------------------------------------------------------------
-mi::Sint32 vtknvindex_config_settings::get_filter_mode() const
+nv::index::Sparse_volume_filter_mode vtknvindex_config_settings::get_filter_mode() const
 {
   return m_filter_mode;
 }

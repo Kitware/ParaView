@@ -671,7 +671,31 @@ void vtknvindex_representation::set_subcube_border(int border)
 //----------------------------------------------------------------------------
 void vtknvindex_representation::set_filter_mode(int filter_mode)
 {
-  m_app_config_settings->set_filter_mode(filter_mode);
+  nv::index::Sparse_volume_filter_mode filter_mode_index =
+    nv::index::SPARSE_VOLUME_FILTER_TRILINEAR_POST;
+
+  // Map numerical values to IndeX filter mode (the values were chosen for historical reasons, they
+  // don't match directly).
+  switch (filter_mode)
+  {
+    case 0:
+      filter_mode_index = nv::index::SPARSE_VOLUME_FILTER_NEAREST;
+      break;
+    case 1:
+      filter_mode_index = nv::index::SPARSE_VOLUME_FILTER_TRILINEAR_POST;
+      break;
+    case 5:
+      filter_mode_index = nv::index::SPARSE_VOLUME_FILTER_TRICUBIC_CATMULL_POST;
+      break;
+    case 7:
+      filter_mode_index = nv::index::SPARSE_VOLUME_FILTER_TRICUBIC_BSPLINE_POST;
+      break;
+    default:
+      ERROR_LOG << "Invalid volume filter mode " << filter_mode << " requested.";
+      return;
+  }
+
+  m_app_config_settings->set_filter_mode(filter_mode_index);
   static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer())->config_settings_changed();
 }
 

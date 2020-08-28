@@ -560,10 +560,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
         assert(sparse_volume_render_properties.is_valid_interface());
 
         // filter mode
-        const nv::index::Sparse_volume_filter_mode filter_mode =
-          static_cast<nv::index::Sparse_volume_filter_mode>(pv_config_settings->get_filter_mode());
-
-        sparse_volume_render_properties->set_filter_mode(filter_mode);
+        sparse_volume_render_properties->set_filter_mode(pv_config_settings->get_filter_mode());
 
         // use pre-integration
         const vtknvindex_rtc_kernels rtc_kernel = pv_config_settings->get_rtc_kernel();
@@ -1256,10 +1253,7 @@ void vtknvindex_scene::update_config_settings(
     assert(sparse_volume_render_properties.is_valid_interface());
 
     // filter mode
-    const nv::index::Sparse_volume_filter_mode filter_mode =
-      static_cast<nv::index::Sparse_volume_filter_mode>(pv_config_settings->get_filter_mode());
-
-    sparse_volume_render_properties->set_filter_mode(filter_mode);
+    sparse_volume_render_properties->set_filter_mode(pv_config_settings->get_filter_mode());
 
     // use pre-integration
     bool use_preintegration = rtc_kernel == RTC_KERNELS_NONE &&

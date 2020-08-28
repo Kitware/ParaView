@@ -143,12 +143,6 @@ public:
   // Set subcube border size.
   void set_subcube_border(int border);
 
-  // Set filtering mode.
-  void set_filter_mode(int filter_mode);
-
-  // Set pre-integration mode.
-  void set_preintegration(bool enable_preint);
-
   // Set dump internal state of NVIDIA IndeX.
   void set_dump_internal_state(bool is_dump);
 

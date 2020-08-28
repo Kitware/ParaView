@@ -535,20 +535,6 @@ void vtknvindex_irregular_volume_representation::set_subcube_border(int border)
 }
 
 //----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::set_filter_mode(int filter_mode)
-{
-  m_app_config_settings->set_filter_mode(filter_mode);
-  DefaultMapper->config_settings_changed();
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::set_preintegration(bool enable_preint)
-{
-  m_app_config_settings->set_preintegration(enable_preint);
-  DefaultMapper->config_settings_changed();
-}
-
-//----------------------------------------------------------------------------
 void vtknvindex_irregular_volume_representation::update_index_roi()
 {
   // Set region of interest.

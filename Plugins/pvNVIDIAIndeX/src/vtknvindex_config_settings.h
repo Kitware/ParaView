@@ -36,7 +36,7 @@
 #include <vtkXMLDataParser.h>
 
 #include <nv/index/iconfig_settings.h>
-#include <nv/index/islice_scene_element.h>
+#include <nv/index/isparse_volume_rendering_properties.h>
 
 #include "vtknvindex_rtc_kernel_params.h"
 
@@ -124,8 +124,8 @@ public:
   mi::Uint32 get_subcube_border() const;
 
   // Set/get filtering mode
-  void set_filter_mode(mi::Sint32 filter_mode);
-  mi::Sint32 get_filter_mode() const;
+  void set_filter_mode(nv::index::Sparse_volume_filter_mode filter_mode);
+  nv::index::Sparse_volume_filter_mode get_filter_mode() const;
 
   // Set/get pre-integration mode.
   void set_preintegration(bool enable_preint);
@@ -185,7 +185,7 @@ private:
   bool m_log_performance;                                     // Log performance values to file.
   bool m_animation_play_forward;                              // Animation is running.
   mi::Uint32 m_animation_interval_max;                        // The max animation interval.
-  mi::Uint32 m_filter_mode;                                   // Volume filtering mode.
+  nv::index::Sparse_volume_filter_mode m_filter_mode;         // Volume filtering mode.
   mi::Uint32 m_subcube_border;                                // NVIDIA IndeX subcube border size.
   mi::Float32 m_step_size;                                    // Volume raycast step size.
   mi::Float32 m_ivol_step_size;                               // IRR-Volume raycast step size.
