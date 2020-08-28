@@ -431,8 +431,7 @@ bool vtknvindex_instance::load_nvindex()
     logging_configuration->set_log_locally(true); // local logging
 
     // Install the receiving logger.
-    mi::base::Handle<mi::base::ILogger> receiving_logger(
-      new vtknvindex::logger::vtknvindex_receiving_logger());
+    mi::base::Handle<mi::base::ILogger> receiving_logger(new vtknvindex_receiving_logger());
     assert(receiving_logger.is_valid_interface());
     logging_configuration->set_receiving_logger(receiving_logger.get());
   }

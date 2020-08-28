@@ -25,52 +25,44 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/// \file
-
 #include "vtknvindex_receiving_logger.h"
-
-#include <iostream>
 
 #include "vtkOutputWindow.h"
 #include "vtkSetGet.h"
 
-namespace vtknvindex
-{
-namespace logger
-{
-
 //----------------------------------------------------------------------
 vtknvindex_receiving_logger::vtknvindex_receiving_logger()
-  : m_os()
-  , m_level(mi::base::MESSAGE_SEVERITY_INFO)
 {
   // empty
 }
 
 //----------------------------------------------------------------------
-vtknvindex_receiving_logger::~vtknvindex_receiving_logger()
+void vtknvindex_receiving_logger::message(mi::base::Message_severity level, const char* category,
+  const mi::base::Message_details& /*details*/, const char* message)
 {
 #ifdef NDEBUG
-  if (m_level >= mi::base::MESSAGE_SEVERITY_DEBUG) // No debug output in an optimized build.
+  if (level >= mi::base::MESSAGE_SEVERITY_DEBUG) // No debug output in an optimized build.
     return;
 #endif
 
-  if (m_os.str().empty() && m_level > mi::base::MESSAGE_SEVERITY_FATAL)
+  const std::string message_str = message;
+
+  if (message_str.empty() && level > mi::base::MESSAGE_SEVERITY_FATAL)
     return; // no message
 
   const std::string prefix = "nvindex: ";
 
   // This is based on vtkErrorWithObjectMacro()
-  if (m_level <= mi::base::MESSAGE_SEVERITY_WARNING && vtkObject::GetGlobalWarningDisplay())
+  if (level <= mi::base::MESSAGE_SEVERITY_WARNING && vtkObject::GetGlobalWarningDisplay())
   {
     // This will pop up the Output Messages window. The messages will also be printed to the
     // console.
     vtkOStreamWrapper::EndlType endl;
     vtkOStreamWrapper::UseEndl(endl);
     vtkOStrStreamWrapper vtkmsg;
-    vtkmsg << prefix << m_os.str() << '\n';
+    vtkmsg << prefix << message_str << '\n';
 
-    if (m_level <= mi::base::MESSAGE_SEVERITY_ERROR)
+    if (level <= mi::base::MESSAGE_SEVERITY_ERROR)
     {
       vtkOutputWindowDisplayErrorText(vtkmsg.str());
     }
@@ -85,22 +77,6 @@ vtknvindex_receiving_logger::~vtknvindex_receiving_logger()
   else
   {
     // Log info level only to console.
-    std::cout << prefix << m_os.str() << std::endl;
+    std::cout << prefix << message_str << std::endl;
   }
 }
-
-//----------------------------------------------------------------------
-std::ostringstream& vtknvindex_receiving_logger::get_message(mi::Uint32 level)
-{
-  m_level = level;
-  return m_os;
-}
-
-//----------------------------------------------------------------------
-void vtknvindex_receiving_logger::message(mi::base::Message_severity level,
-  const char* /*category*/, const mi::base::Message_details&, const char* message)
-{
-  vtknvindex_receiving_logger().get_message(level) << message;
-}
-}
-} // namespace

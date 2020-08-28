@@ -28,43 +28,23 @@
 #ifndef vtknvindex_receiving_logger_h
 #define vtknvindex_receiving_logger_h
 
-#include <sstream>
-
 #include <mi/base/ilogger.h>
 #include <mi/dice.h>
 
-namespace vtknvindex
-{
-namespace logger
-{
-
 // The class vtknvindex_forwarding_logger forwards warning/errors messages gathered
 // by the NVIDIA IndeX library to ParaView's console.
-
 class vtknvindex_receiving_logger : public mi::base::Interface_implement<mi::base::ILogger>
 {
 public:
   vtknvindex_receiving_logger();
-  virtual ~vtknvindex_receiving_logger();
-
-  /// Get message stream.
-  /// \param[in] level message The severity level of the message.
-  std::ostringstream& get_message(mi::Uint32 level);
 
   // Set message and severity values.
   void message(mi::base::Message_severity level, const char* category,
-    const mi::base::Message_details&, const char* message) override;
+    const mi::base::Message_details& details, const char* message) override;
 
 private:
-  // Output stream.
-  std::ostringstream m_os;
-  // Message severity level.
-  mi::Uint32 m_level;
-
   vtknvindex_receiving_logger(const vtknvindex_receiving_logger&) = delete;
   void operator=(const vtknvindex_receiving_logger&) = delete;
 };
-}
-} // namespace
 
 #endif // vtknvindex_receiving_logger_h

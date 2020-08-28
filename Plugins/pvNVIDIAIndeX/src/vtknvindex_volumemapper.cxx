@@ -247,9 +247,9 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
   else if (scalar_type == "double")
   {
     WARN_LOG
-      << "Datasets with scalar values in double precision are not natively supported by IndeX.";
-    WARN_LOG << "The plug-in will proceed to convert those values from double to float with the "
-                "corresponding overhead.";
+      << "Datasets with scalar values in double precision are not natively supported by IndeX. "
+      << "The plug-in will proceed to convert those values from double to float with the "
+         "corresponding overhead.";
   }
 
   m_subset_ptrs[0] = m_scalar_array->GetVoidPointer(0);

@@ -222,9 +222,9 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
   else if (scalar_type == "double")
   {
     WARN_LOG
-      << "Datasets with scalar values in double precision are not natively supported by IndeX.";
-    WARN_LOG << "The plug-in will proceed to convert those values from double to float with the "
-                "corresponding overhead.";
+      << "Datasets with scalar values in double precision are not natively supported by IndeX. "
+      << "The plug-in will proceed to convert those values from double to float with the "
+         "corresponding overhead.";
   }
 
   if (true) //   (this->InputAnalyzedTime < this->MTime) || (this->InputAnalyzedTime <
