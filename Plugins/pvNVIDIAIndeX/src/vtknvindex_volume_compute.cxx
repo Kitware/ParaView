@@ -106,7 +106,7 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
 
   if (!svol_data_subset.is_valid_interface())
   {
-    ERROR_LOG << LOG_prefix << "Unable to retrive sparse-volume data-subset.";
+    ERROR_LOG << LOG_prefix << "Unable to retrieve sparse-volume data-subset.";
     return;
   }
 
@@ -243,13 +243,8 @@ const char* vtknvindex_volume_compute::get_class_name() const
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_volume_compute::serialize(mi::neuraylib::ISerializer* serializer) const
 {
+  vtknvindex::util::serialize(serializer, m_scalar_type);
   serializer->write(&m_enabled);
-
-  mi::Uint32 scalar_typename_size = mi::Uint32(m_scalar_type.size());
-  serializer->write(&scalar_typename_size);
-  serializer->write(
-    reinterpret_cast<const mi::Uint8*>(m_scalar_type.c_str()), scalar_typename_size);
-
   serializer->write(&m_border_size);
   serializer->write(&m_ghost_levels);
   serializer->write(&m_volume_size.x, 3);
@@ -260,13 +255,8 @@ void vtknvindex_volume_compute::serialize(mi::neuraylib::ISerializer* serializer
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_volume_compute::deserialize(mi::neuraylib::IDeserializer* deserializer)
 {
+  vtknvindex::util::deserialize(deserializer, m_scalar_type);
   deserializer->read(&m_enabled);
-
-  mi::Uint32 scalar_typename_size = 0;
-  deserializer->read(&scalar_typename_size);
-  m_scalar_type.resize(scalar_typename_size);
-  deserializer->read(reinterpret_cast<mi::Uint8*>(&m_scalar_type[0]), scalar_typename_size);
-
   deserializer->read(&m_border_size);
   deserializer->read(&m_ghost_levels);
   deserializer->read(&m_volume_size.x, 3);

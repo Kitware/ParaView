@@ -369,25 +369,8 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(
   }
 
   // check scalar type
-  size_t scalar_size = 0;
-
-  if (m_scalar_type == "char" || m_scalar_type == "unsigned char")
-  {
-    scalar_size = sizeof(mi::Uint8);
-  }
-  else if (m_scalar_type == "short" || m_scalar_type == "unsigned short")
-  {
-    scalar_size = sizeof(mi::Uint16);
-  }
-  else if (m_scalar_type == "float")
-  {
-    scalar_size = sizeof(mi::Float32);
-  }
-  else if (m_scalar_type == "double")
-  {
-    scalar_size = sizeof(mi::Float64);
-  }
-  else
+  const mi::Size scalar_size = get_scalar_size(m_scalar_type);
+  if (scalar_size == 0)
   {
     return false;
   }
@@ -536,4 +519,29 @@ void vtknvindex_regular_volume_properties::deserialize(mi::neuraylib::IDeseriali
   deserializer->read(&m_voxel_range.x, 2);
 
   deserializer->read(&m_ghost_levels);
+}
+
+// ------------------------------------------------------------------------------------------------
+mi::Size vtknvindex_regular_volume_properties::get_scalar_size(const std::string& scalar_type)
+{
+  mi::Size scalar_size = 0;
+
+  if (scalar_type == "char" || scalar_type == "unsigned char")
+  {
+    scalar_size = sizeof(mi::Uint8);
+  }
+  else if (scalar_type == "short" || scalar_type == "unsigned short")
+  {
+    scalar_size = sizeof(mi::Uint16);
+  }
+  else if (scalar_type == "float")
+  {
+    scalar_size = sizeof(mi::Float32);
+  }
+  else if (scalar_type == "double")
+  {
+    scalar_size = sizeof(mi::Float64);
+  }
+
+  return scalar_size;
 }

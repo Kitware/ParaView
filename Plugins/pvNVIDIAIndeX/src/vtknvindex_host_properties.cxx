@@ -279,7 +279,7 @@ void vtknvindex_host_properties::print_info() const
   std::map<mi::Uint32, std::vector<shm_info> >::const_iterator shmit = m_shmlist.begin();
   for (; shmit != m_shmlist.end(); ++shmit)
   {
-    std::vector<shm_info> shmlist = shmit->second;
+    const std::vector<shm_info>& shmlist = shmit->second;
     for (mi::Uint32 i = 0; i < shmlist.size(); ++i)
     {
       INFO_LOG << "Time step: " << shmit->first << " " << shmlist[i].m_shm_name << ":"
@@ -299,10 +299,7 @@ void vtknvindex_host_properties::serialize(mi::neuraylib::ISerializer* serialize
     std::map<std::string, mi::Uint32>::const_iterator itr = m_shmref.begin();
     for (; itr != m_shmref.end(); ++itr)
     {
-      mi::Uint32 shmname_size = mi::Uint32(itr->first.size());
-      serializer->write(&shmname_size);
-      serializer->write(reinterpret_cast<const mi::Uint8*>(itr->first.c_str()), shmname_size);
-
+      vtknvindex::util::serialize(serializer, itr->first);
       serializer->write(&itr->second);
     }
   }
@@ -324,7 +321,7 @@ void vtknvindex_host_properties::serialize(mi::neuraylib::ISerializer* serialize
     std::map<mi::Uint32, std::vector<shm_info> >::const_iterator shmit = m_shmlist.begin();
     for (; shmit != m_shmlist.end(); ++shmit)
     {
-      std::vector<shm_info> shmlist = shmit->second;
+      const std::vector<shm_info>& shmlist = shmit->second;
 
       const mi::Size shmlist_size = shmlist.size();
       serializer->write(&shmlist_size);
@@ -339,9 +336,7 @@ void vtknvindex_host_properties::serialize(mi::neuraylib::ISerializer* serialize
         serializer->write(&shm.m_shm_bbox.min.x, 6);
 
         // shm name
-        mi::Uint32 shmname_size = mi::Uint32(shm.m_shm_name.size());
-        serializer->write(&shmname_size);
-        serializer->write(reinterpret_cast<const mi::Uint8*>(shm.m_shm_name.c_str()), shmname_size);
+        vtknvindex::util::serialize(serializer, shm.m_shm_name);
 
         // shm size
         serializer->write(&shm.m_size);
@@ -367,12 +362,8 @@ void vtknvindex_host_properties::deserialize(mi::neuraylib::IDeserializer* deser
 
     for (mi::Uint32 i = 0; i < nb_elements; ++i)
     {
-      mi::Uint32 shmname_size = 0;
-      deserializer->read(&shmname_size);
       std::string shmname;
-      shmname.resize(shmname_size);
-      deserializer->read(reinterpret_cast<mi::Uint8*>(&shmname[0]), shmname_size);
-
+      vtknvindex::util::deserialize(deserializer, shmname);
       mi::Uint32 refcount = 0;
       deserializer->read(&refcount);
       m_shmref[shmname] = refcount;
@@ -414,10 +405,7 @@ void vtknvindex_host_properties::deserialize(mi::neuraylib::IDeserializer* deser
         deserializer->read(&shm.m_shm_bbox.min.x, 6);
 
         // shm name
-        mi::Uint32 shmname_size = 0;
-        deserializer->read(&shmname_size);
-        shm.m_shm_name.resize(shmname_size);
-        deserializer->read(reinterpret_cast<mi::Uint8*>(&shm.m_shm_name[0]), shmname_size);
+        vtknvindex::util::deserialize(deserializer, shm.m_shm_name);
 
         // shm size
         deserializer->read(&shm.m_size);

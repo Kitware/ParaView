@@ -120,7 +120,7 @@ private:
   bool m_is_index_viewer;
   bool m_is_index_initialized;
 
-  std::map<std::string, std::vector<mi::Sint32> > m_hostmane_to_rankids; // Hostname to rank_id.
+  std::map<std::string, std::vector<mi::Sint32> > m_hostname_to_rankids; // Hostname to rank_id.
   std::vector<std::string> m_host_list;                                  // List of host
 
   std::string m_nvindexlib_fname;                          // libnvindex.so/dll string name.

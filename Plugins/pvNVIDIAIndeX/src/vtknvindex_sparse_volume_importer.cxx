@@ -686,21 +686,28 @@ mi::Size vtknvindex_sparse_volume_importer::estimate(
   const mi::Size dy = bounding_box.max.y - bounding_box.min.y;
   const mi::Size dz = bounding_box.max.z - bounding_box.min.z;
   const mi::Size volume_brick_size = dx * dy * dz;
+  mi::Size scalar_size = 0;
 
-  if (m_scalar_type == "char" || m_scalar_type == "unsigned char")
-    return volume_brick_size;
-  if (m_scalar_type == "short" || m_scalar_type == "unsigned short")
-    return volume_brick_size * sizeof(mi::Uint16);
-  if (m_scalar_type == "float")
-    return volume_brick_size * sizeof(mi::Float32);
-
-  // Double scalar data is converted to float before passing to IndeX
   if (m_scalar_type == "double")
-    return volume_brick_size * sizeof(mi::Float32);
+  {
+    // Double scalar data is converted to float before passing to IndeX
+    scalar_size = sizeof(mi::Float32);
+  }
+  else
+  {
+    scalar_size = vtknvindex_regular_volume_properties::get_scalar_size(m_scalar_type);
+  }
 
-  ERROR_LOG << "Failed to give an estimate for the unsupported scalar_type: " << m_scalar_type
-            << ".";
-  return 0;
+  if (scalar_size > 0)
+  {
+    return volume_brick_size * scalar_size;
+  }
+  else
+  {
+    ERROR_LOG << "Failed to give an estimate for the unsupported scalar_type: " << m_scalar_type
+              << ".";
+    return 0;
+  }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -853,11 +860,7 @@ void vtknvindex_sparse_volume_importer::set_cluster_properties(
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_sparse_volume_importer::serialize(mi::neuraylib::ISerializer* serializer) const
 {
-  mi::Uint32 scalar_typename_size = mi::Uint32(m_scalar_type.size());
-  serializer->write(&scalar_typename_size);
-  serializer->write(
-    reinterpret_cast<const mi::Uint8*>(m_scalar_type.c_str()), scalar_typename_size);
-
+  vtknvindex::util::serialize(serializer, m_scalar_type);
   serializer->write(&m_volume_size.x, 3);
   serializer->write(&m_border_size);
   serializer->write(&m_ghost_levels);
@@ -868,11 +871,7 @@ void vtknvindex_sparse_volume_importer::serialize(mi::neuraylib::ISerializer* se
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_sparse_volume_importer::deserialize(mi::neuraylib::IDeserializer* deserializer)
 {
-  mi::Uint32 scalar_typename_size = 0;
-  deserializer->read(&scalar_typename_size);
-  m_scalar_type.resize(scalar_typename_size);
-  deserializer->read(reinterpret_cast<mi::Uint8*>(&m_scalar_type[0]), scalar_typename_size);
-
+  vtknvindex::util::deserialize(deserializer, m_scalar_type);
   deserializer->read(&m_volume_size.x, 3);
   deserializer->read(&m_border_size);
   deserializer->read(&m_ghost_levels);

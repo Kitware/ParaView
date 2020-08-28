@@ -90,7 +90,7 @@ public:
   void set_cluster_properties(vtknvindex_cluster_properties* cluster_properties);
 
   // Returns true if NVIDIA IndeX is initialized by this mapper.
-  bool is_mapper_initialized() { return m_is_mapper_intialized; }
+  bool is_mapper_initialized() { return m_is_mapper_initialized; }
 
   // Update render canvas.
   void update_canvas(vtkRenderer* ren);
@@ -126,7 +126,7 @@ private:
   bool is_data_prepared(mi::Sint32 time_step);
 
   bool m_is_caching;              // True when ParaView is caching data on animation loops.
-  bool m_is_mapper_intialized;    // True if mapper was initialized.
+  bool m_is_mapper_initialized;   // True if mapper was initialized.
   bool m_config_settings_changed; // True if some parameter changed on the GUI.
   bool m_opacity_changed;         // True if volume opacity changed.
   bool m_slices_changed;          // True if any slice parameter changed.

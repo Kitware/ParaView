@@ -77,7 +77,7 @@ vtkStandardNewMacro(vtknvindex_volumemapper);
 //----------------------------------------------------------------------------
 vtknvindex_volumemapper::vtknvindex_volumemapper()
   : m_is_caching(false)
-  , m_is_mapper_intialized(false)
+  , m_is_mapper_initialized(false)
   , m_config_settings_changed(false)
   , m_opacity_changed(false)
   , m_slices_changed(false)
@@ -237,8 +237,8 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
 
   // check for valid data types
   const std::string scalar_type = m_scalar_array->GetDataTypeAsString();
-  if (scalar_type != "unsigned char" && scalar_type != "unsigned short" && scalar_type != "char" &&
-    scalar_type != "short" && scalar_type != "float" && scalar_type != "double")
+
+  if (vtknvindex_regular_volume_properties::get_scalar_size(scalar_type) == 0)
   {
     ERROR_LOG << "The scalar type: " << scalar_type << " is not supported by NVIDIA IndeX.";
     return false;
@@ -277,7 +277,7 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
   dataset_parameters.bounds[4] = extent[4];
   dataset_parameters.bounds[5] = extent[5];
 
-  dataset_parameters.volume_data = static_cast<void*>(&volume_data);
+  dataset_parameters.volume_data = &volume_data;
 
   // clean shared memory
   m_cluster_properties->unlink_shared_memory(true);
@@ -311,7 +311,7 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
     }
   }
 
-  m_is_mapper_intialized = true;
+  m_is_mapper_initialized = true;
 
   m_controller->Barrier();
 
@@ -433,7 +433,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
   }
 
   // Initialize the mapper
-  if ((!m_is_mapper_intialized || m_volume_changed) && !initialize_mapper(vol))
+  if ((!m_is_mapper_initialized || m_volume_changed) && !initialize_mapper(vol))
   {
     ERROR_LOG << "Failed to initialize the mapper in "
               << "vtknvindex_volumemapper::Render().";
@@ -446,12 +446,15 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
   mi::Sint32 cur_time_step =
     m_cluster_properties->get_regular_volume_properties()->get_current_time_step();
 
-  if ((!is_data_prepared(cur_time_step) || m_volume_changed) && !prepare_data(cur_time_step))
+  if (!is_data_prepared(cur_time_step) || m_volume_changed)
   {
-    ERROR_LOG << "Failed to prepare data in "
-              << "vtknvindex_volumemapper::Render().";
-    ERROR_LOG << "NVIDIA IndeX rendering was aborted.";
-    return;
+    if (!prepare_data(cur_time_step))
+    {
+      ERROR_LOG << "Failed to prepare data in "
+                << "vtknvindex_volumemapper::Render().";
+      ERROR_LOG << "NVIDIA IndeX rendering was aborted.";
+      return;
+    }
   }
 
   // Wait all ranks finish to write volume data before the render starts.

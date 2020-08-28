@@ -177,8 +177,8 @@ mi::Sint32 vtknvindex_instance::get_cur_local_rank_id() const
   std::string cur_host = sys_info.GetHostname();
 
   std::map<std::string, std::vector<mi::Sint32> >::const_iterator it =
-    m_hostmane_to_rankids.find(cur_host);
-  if (it == m_hostmane_to_rankids.end())
+    m_hostname_to_rankids.find(cur_host);
+  if (it == m_hostname_to_rankids.end())
     return -1;
 
   for (mi::Size j = 0; j < it->second.size(); ++j)
@@ -305,7 +305,7 @@ void vtknvindex_instance::build_cluster_info()
 
   // Get host ranks distribution
   for (mi::Sint32 i = 0; i < nb_ranks; i++)
-    m_hostmane_to_rankids[host_names[i]].push_back(rank_ids[i]);
+    m_hostname_to_rankids[host_names[i]].push_back(rank_ids[i]);
 
   // Find index ranks
   if (cur_rank_id == 0)
@@ -318,8 +318,8 @@ void vtknvindex_instance::build_cluster_info()
     m_is_index_viewer = false;
     cur_host_name = sys_info.GetHostname();
     std::map<std::string, std::vector<mi::Sint32> >::const_iterator it =
-      m_hostmane_to_rankids.find(cur_host_name);
-    m_is_index_rank = (it != m_hostmane_to_rankids.cend() && it->second[0] == cur_rank_id);
+      m_hostname_to_rankids.find(cur_host_name);
+    m_is_index_rank = (it != m_hostname_to_rankids.cend() && it->second[0] == cur_rank_id);
   }
 
   // Get host list

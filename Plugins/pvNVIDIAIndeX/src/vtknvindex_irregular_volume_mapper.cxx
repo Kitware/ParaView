@@ -388,7 +388,7 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
     dataset_parameters.bounds[4] = m_volume_data.subregion_bbox.min.z;
     dataset_parameters.bounds[5] = m_volume_data.subregion_bbox.max.z;
 
-    dataset_parameters.volume_data = static_cast<void*>(&m_volume_data);
+    dataset_parameters.volume_data = &m_volume_data;
 
     // clean shared memory
     m_cluster_properties->unlink_shared_memory(true);

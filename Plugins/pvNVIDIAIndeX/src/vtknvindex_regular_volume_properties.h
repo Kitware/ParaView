@@ -33,6 +33,8 @@
 #include <mi/math/bbox.h>
 #include <mi/neuraylib/dice.h>
 
+#include "vtkDataArray.h"
+
 class vtknvindex_host_properties;
 struct vtknvindex_irregular_volume_data;
 class vtkUnstructuredGridBase;
@@ -110,6 +112,10 @@ public:
   // Serialization
   void serialize(mi::neuraylib::ISerializer* serializer) const;
   void deserialize(mi::neuraylib::IDeserializer* deserializer);
+
+  // Returns size of a voxel in memory for the given scalar type, or 0 if the type is invalid or not
+  // supported by NVIDIA IndeX.
+  static mi::Size get_scalar_size(const std::string& scalar_type);
 
 private:
   vtknvindex_regular_volume_properties(const vtknvindex_regular_volume_properties&) = delete;

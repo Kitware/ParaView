@@ -272,18 +272,12 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
       mi::Uint64 volume_size =
         static_cast<mi::Uint64>(pernode_volume.x) * pernode_volume.y * pernode_volume.z;
 
-      if (scalar_type == "unsigned char")
-        shm_size = volume_size * sizeof(mi::Uint8);
-      else if (scalar_type == "unsigned short")
-        shm_size = volume_size * sizeof(mi::Uint16);
-      else if (scalar_type == "char")
-        shm_size = volume_size * sizeof(mi::Sint8);
-      else if (scalar_type == "short")
-        shm_size = volume_size * sizeof(mi::Sint16);
-      else if (scalar_type == "float")
-        shm_size = volume_size * sizeof(mi::Float32);
-      else if (scalar_type == "double")
-        shm_size = volume_size * sizeof(mi::Float64);
+      const mi::Size scalar_size =
+        vtknvindex_regular_volume_properties::get_scalar_size(scalar_type);
+      if (scalar_size > 0)
+      {
+        shm_size = volume_size * scalar_size;
+      }
       else
       {
         ERROR_LOG << "The scalar type: " << scalar_type << " is not supported by NVIDIA IndeX.";
@@ -580,19 +574,12 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
           pernode_volume_extent.x * pernode_volume_extent.y * pernode_volume_extent.z;
 
         const std::string& scalar_type = dataset_parameters.scalar_type;
-
-        if (scalar_type == "unsigned char")
-          shm_size = volume_size * sizeof(mi::Uint8);
-        else if (scalar_type == "unsigned short")
-          shm_size = volume_size * sizeof(mi::Uint16);
-        else if (scalar_type == "char")
-          shm_size = volume_size * sizeof(mi::Sint8);
-        else if (scalar_type == "short")
-          shm_size = volume_size * sizeof(mi::Sint16);
-        else if (scalar_type == "float")
-          shm_size = volume_size * sizeof(mi::Float32);
-        else if (scalar_type == "double")
-          shm_size = volume_size * sizeof(mi::Float64);
+        const mi::Size scalar_size =
+          vtknvindex_regular_volume_properties::get_scalar_size(scalar_type);
+        if (scalar_size > 0)
+        {
+          shm_size = volume_size * scalar_size;
+        }
         else
         {
           ERROR_LOG << "The scalar type: " << scalar_type << " is not supported by NVIDIA IndeX.";

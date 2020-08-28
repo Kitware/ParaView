@@ -61,33 +61,6 @@
 #include "vtknvindex_volume_compute.h"
 
 //-------------------------------------------------------------------------------------------------
-bool file_to_string(const std::string& file_path, std::string& out_file_string)
-{
-  vtksys::ifstream src_file;
-
-  src_file.open(file_path.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
-
-  if (!src_file.is_open())
-    return false;
-
-  const vtksys::ifstream::pos_type src_file_size = src_file.tellg();
-  src_file.seekg(std::ios::beg);
-
-  out_file_string.resize(src_file_size, '\0');
-  src_file.read(&out_file_string[0], src_file_size);
-
-  if (!src_file)
-  {
-    out_file_string.clear();
-    return false;
-  }
-
-  src_file.close();
-
-  return true;
-}
-
-//-------------------------------------------------------------------------------------------------
 void update_slice_planes(nv::index::IPlane* plane, const vtknvindex_slice_params& slice_params,
   const mi::math::Vector_struct<mi::Uint32, 3>& volume_size)
 {
@@ -132,29 +105,21 @@ void update_slice_planes(nv::index::IPlane* plane, const vtknvindex_slice_params
   plane->set_extent(extent);
 }
 
+//-------------------------------------------------------------------------------------------------
 vtknvindex_scene::vtknvindex_scene()
   : m_scene_created(false)
   , m_only_init(true)
   , m_is_parallel(false)
-  , m_vol_properties_tag(mi::neuraylib::NULL_TAG)
-  , m_timeseries_tag(mi::neuraylib::NULL_TAG)
-  , m_root_group_tag(mi::neuraylib::NULL_TAG)
-  , m_static_group_tag(mi::neuraylib::NULL_TAG)
-  , m_volume_tag(mi::neuraylib::NULL_TAG)
-  , m_prog_se_mapping_tag(mi::neuraylib::NULL_TAG)
-  , m_rtc_program_params_tag(mi::neuraylib::NULL_TAG)
-  , m_rtc_program_tag(mi::neuraylib::NULL_TAG)
-  , m_volume_compute_attrib_tag(mi::neuraylib::NULL_TAG)
-  , m_sparse_volume_render_properties_tag(mi::neuraylib::NULL_TAG)
+  , m_cluster_properties(nullptr)
 {
-  m_cluster_properties = NULL;
   m_index_instance = vtknvindex_instance::get();
 }
 
+//-------------------------------------------------------------------------------------------------
 vtknvindex_scene::~vtknvindex_scene()
 {
   // Remove this volume instance and complementary elements from scene graph
-  if (m_index_instance->is_index_viewer() && m_root_group_tag != mi::neuraylib::NULL_TAG)
+  if (m_index_instance->is_index_viewer() && m_root_group_tag)
   {
     mi::base::Handle<mi::neuraylib::IDice_transaction> dice_transaction(
       m_index_instance->m_global_scope->create_transaction<mi::neuraylib::IDice_transaction>());
@@ -168,33 +133,16 @@ vtknvindex_scene::~vtknvindex_scene()
       assert(scene_geom_group_edit.is_valid_interface());
 
       scene_geom_group_edit->remove(m_root_group_tag, dice_transaction.get());
-
-      // ERROR_LOG << "Removing tag: " << m_root_group_tag.id
-      //          << " from Geom group: " << m_index_instance->get_scene_geom_group();
     }
 
     dice_transaction->commit();
   }
-
-  m_vol_properties_tag = mi::neuraylib::NULL_TAG;
-  m_timeseries_tag = mi::neuraylib::NULL_TAG;
-  m_root_group_tag = mi::neuraylib::NULL_TAG;
-  m_volume_tag = mi::neuraylib::NULL_TAG;
-  m_prog_se_mapping_tag = mi::neuraylib::NULL_TAG;
-  m_rtc_program_params_tag = mi::neuraylib::NULL_TAG;
-  m_rtc_program_tag = mi::neuraylib::NULL_TAG;
-  m_volume_compute_attrib_tag = mi::neuraylib::NULL_TAG;
-  m_sparse_volume_render_properties_tag = mi::neuraylib::NULL_TAG;
-  m_static_group_tag = mi::neuraylib::NULL_TAG;
-
-  for (mi::Uint32 i = 0; i < m_plane_tags.size(); i++)
-    m_plane_tags[i] = mi::neuraylib::NULL_TAG;
 }
 
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_scene::set_visibility(bool visibility)
 {
-  if (m_root_group_tag != mi::neuraylib::NULL_TAG)
+  if (m_root_group_tag)
   {
     mi::base::Handle<mi::neuraylib::IDice_transaction> dice_transaction(
       m_index_instance->m_global_scope->create_transaction<mi::neuraylib::IDice_transaction>());
@@ -231,9 +179,9 @@ void vtknvindex_scene::set_visibility(bool visibility)
           dice_transaction->access<nv::index::ISparse_volume_scene_element>(m_volume_tag));
 
         // Set global scene transform (only required for regular volumes).
-        mi::math::Matrix<mi::Float32, 4, 4> scene_rotation_matrix(1.0f);
-        mi::math::Vector_struct<mi::Float32, 3> scene_translate_vec;
-        mi::math::Vector_struct<mi::Float32, 3> scene_scaling_vec;
+        mi::math::Matrix<mi::Float32, 4, 4> scene_rotation_matrix(1.f);
+        mi::math::Vector<mi::Float32, 3> scene_translate_vec(0.f);
+        mi::math::Vector<mi::Float32, 3> scene_scaling_vec(1.f);
 
         // Is regular volume?
         if (sparse_vol_elem.is_valid_interface())
@@ -241,23 +189,9 @@ void vtknvindex_scene::set_visibility(bool visibility)
           vtknvindex_regular_volume_properties* regular_volume_properties =
             m_cluster_properties->get_regular_volume_properties();
 
-          mi::math::Vector<mi::Float32, 3> translation, scaling;
-          regular_volume_properties->get_volume_translation(translation);
-          regular_volume_properties->get_volume_scaling(scaling);
-
           // Need to translate if the volume doesn't start at [0,0,0].
-          scene_translate_vec.x = translation.x;
-          scene_translate_vec.y = translation.y;
-          scene_translate_vec.z = translation.z;
-
-          scene_scaling_vec.x = scaling.x;
-          scene_scaling_vec.y = scaling.y;
-          scene_scaling_vec.z = scaling.z;
-        }
-        else
-        {
-          scene_translate_vec.x = scene_translate_vec.y = scene_translate_vec.z = 0.0f;
-          scene_scaling_vec.x = scene_scaling_vec.y = scene_scaling_vec.z = 1.0f;
+          regular_volume_properties->get_volume_translation(scene_translate_vec);
+          regular_volume_properties->get_volume_scaling(scene_scaling_vec);
         }
         scene->set_transform_matrix(scene_translate_vec, scene_rotation_matrix, scene_scaling_vec);
       }
@@ -323,7 +257,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
     assert(scene.is_valid_interface());
 
     // Dataset subcube border size.
-    mi::Sint32 subcube_border = m_cluster_properties->get_config_settings()->get_subcube_border();
+    mi::Sint32 subcube_border = pv_config_settings->get_subcube_border();
 
     // Print cluster details in ParaView's console.
     m_cluster_properties->print_info();
@@ -525,7 +459,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
           case RTC_KERNELS_ISOSURFACE:
           {
             vtknvindex_ivol_isosurface_params iso_params;
-            iso_params.rh = m_cluster_properties->get_config_settings()->get_ivol_step_size();
+            iso_params.rh = pv_config_settings->get_ivol_step_size();
             rtc_program->set_program_source(KERNEL_IRREGULAR_ISOSURFACE_STRING);
             rtc_program_parameters->set_buffer_data(
               0, reinterpret_cast<void*>(&iso_params), sizeof(iso_params));
@@ -535,7 +469,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
           case RTC_KERNELS_DEPTH_ENHANCEMENT:
           {
             vtknvindex_ivol_depth_enhancement_params depth_params;
-            depth_params.rh = m_cluster_properties->get_config_settings()->get_ivol_step_size();
+            depth_params.rh = pv_config_settings->get_ivol_step_size();
             rtc_program->set_program_source(KERNEL_IRREGULAR_DEPTH_ENHANCEMENT_STRING);
             rtc_program_parameters->set_buffer_data(
               0, reinterpret_cast<void*>(&depth_params), sizeof(depth_params));
@@ -545,7 +479,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
           case RTC_KERNELS_EDGE_ENHANCEMENT:
           {
             vtknvindex_ivol_edge_enhancement_params edge_params;
-            edge_params.rh = m_cluster_properties->get_config_settings()->get_ivol_step_size();
+            edge_params.rh = pv_config_settings->get_ivol_step_size();
             rtc_program->set_program_source(KERNEL_IRREGULAR_EDGE_ENHANCEMENT_STRING);
             rtc_program_parameters->set_buffer_data(
               0, reinterpret_cast<void*>(&edge_params), sizeof(edge_params));
@@ -588,8 +522,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
           (m_volume_rtc_kernel.rtc_kernel == RTC_KERNELS_NONE) ? 0 : 1);
 
         vol_render_properties->set_sampling_segment_length(
-          m_cluster_properties->get_config_settings()->get_ivol_step_size() *
-          m_cluster_properties->get_config_settings()->get_step_size());
+          pv_config_settings->get_ivol_step_size() * pv_config_settings->get_step_size());
 
         vol_render_properties->set_sampling_reference_segment_length(
           calculate_volume_reference_step_size(vol, pv_config_settings->get_opacity_mode(),
