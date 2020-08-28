@@ -116,7 +116,9 @@
 #include "vtkRemotingServerManagerModule.h" // needed for exports
 #include "vtkSMMessageMinimal.h"            // needed for vtkSMMessage.
 #include "vtkSMSessionObject.h"
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer
 
+#include <set>    // needed for std::set
 #include <string> // needed for std::string
 
 class vtkCollection;
@@ -441,6 +443,19 @@ public:
    */
   vtkPVXMLElement* SaveXMLState();
 
+  //@{
+  /**
+   * Returns the XML state for the proxy manager. If a non-empty set of proxies
+   * is passed, then state is limited to those chosen proxies.
+   *
+   * Unlike `SaveXMLState`, this does not fire the `vtkCommand::SaveStateEvent`.
+   * This API is primarily intended for use-cases where complete application XML
+   * state is not being saved.
+   */
+  vtkSmartPointer<vtkPVXMLElement> GetXMLState() { return this->GetXMLState({}); }
+  vtkSmartPointer<vtkPVXMLElement> GetXMLState(const std::set<vtkSMProxy*>& restrictionSet);
+  //@}
+
   /**
    * Save/Load registered link states.
    */
@@ -619,14 +634,6 @@ protected:
   void MarkProxyAsModified(vtkSMProxy*);
   void UnMarkProxyAsModified(vtkSMProxy*);
   //@}
-
-  /**
-   * Internal method to save server manager state in an XML
-   * and return the created vtkPVXMLElement for it. The caller has
-   * the responsibility of freeing the vtkPVXMLElement returned IF the
-   * parentElement is NULL.
-   */
-  vtkPVXMLElement* AddInternalState(vtkPVXMLElement* parentElement);
 
   /**
    * Recursively collects all proxies referred by the proxy in the set.

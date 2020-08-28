@@ -143,6 +143,7 @@ set(classes
   vtkSMProxyListDomain
   vtkSMProxyLocator
   vtkSMProxyManager
+  vtkSMProxyManagerUtilities
   vtkSMProxyProperty
   vtkSMProxySelectionModel
   vtkSMPSWriterProxy
