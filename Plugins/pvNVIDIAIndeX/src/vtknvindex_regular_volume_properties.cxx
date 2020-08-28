@@ -263,8 +263,8 @@ void vtknvindex_regular_volume_properties::transform_zyx_to_xyz(
 
 //----------------------------------------------------------------------------
 bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* scalar_array,
-  mi::Sint32* bounds, // vtkImageData*              current_piece,
-  vtknvindex_host_properties* host_properties, mi::Uint32 current_timestep, bool use_shared_mem)
+  mi::Sint32* bounds, vtknvindex_host_properties* host_properties, mi::Uint32 current_timestep,
+  bool use_shared_mem)
 {
   if (!host_properties)
   {
@@ -310,7 +310,25 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* sca
       return false;
     }
 
-    memcpy(shm_ptr, scalar_array->GetVoidPointer(0), shm_info->m_size);
+    const std::string scalar_type = scalar_array->GetDataTypeAsString();
+    if (scalar_type == "double")
+    {
+      // Convert double to float data.
+      // shm_ptr and m_size were already set up for float data.
+      const mi::Size nb_voxels = shm_info->m_size / sizeof(mi::Float32);
+
+      const mi::Float64* src =
+        reinterpret_cast<const mi::Float64*>(scalar_array->GetVoidPointer(0));
+      mi::Float32* dst = reinterpret_cast<mi::Float32*>(shm_ptr);
+      for (mi::Size i = 0; i < nb_voxels; ++i)
+      {
+        dst[i] = static_cast<mi::Float32>(src[i]);
+      }
+    }
+    else
+    {
+      memcpy(shm_ptr, scalar_array->GetVoidPointer(0), shm_info->m_size);
+    }
 
     // free memory space linked to shared memory
     vtknvindex::util::unmap_shm(shm_ptr, shm_info->m_size);

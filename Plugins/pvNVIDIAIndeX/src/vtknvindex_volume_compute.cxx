@@ -169,16 +169,11 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
     return;
   }
 
-  INFO_LOG << LOG_prefix << "Reading '" << shm_info->m_shm_name << "', bounds: " << shm_bbox
-           << ", format: " << vol_fmt << " [0x" << std::hex << vol_fmt << "]...";
-
   bool free_buffer = false;
-  // Convert double scalar data to float.
-  if (m_scalar_type == "double")
+  // Convert double scalar data to float, but only if the data is local. Data in shared memory will
+  // already have been converted at this point.
+  if (shm_info->m_rank_id == rankid && m_scalar_type == "double")
   {
-    WARN_LOG << "Datasets in double format are not natively supported by IndeX.";
-    WARN_LOG << "Converting scalar values to float format...";
-
     mi::Size nb_voxels = shm_info->m_size / sizeof(mi::Float64);
 
     mi::Float32* voxels_float = new mi::Float32[nb_voxels];
@@ -196,6 +191,14 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
     // Ensure border data is available
     shm_info->m_neighbors->fetch_data(host_props, time_step);
   }
+
+  INFO_LOG << "Updating volume data from " << (rankid == shm_info->m_rank_id ? "local" : "shared")
+           << " "
+           << "memory (" << shm_info->m_shm_name << ") on rank " << rankid << ", "
+           << (m_scalar_type == "double" ? "converted to float, " : "") << "data bbox " << shm_bbox
+           << ", "
+           << "subset bbox " << subset_subregion_bbox << ", border " << m_ghost_levels << "/"
+           << m_border_size << ".";
 
   // Import all brick pieces in parallel
   vtknvindex_import_bricks import_bricks_job(svol_subset_desc.get(), svol_data_subset.get(),

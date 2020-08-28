@@ -643,8 +643,9 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
   }
 
   bool free_buffer = false;
-  // Convert double scalar data to float.
-  if (m_scalar_type == "double")
+  // Convert double scalar data to float, but only if the data is local. Data in shared memory will
+  // already have been converted at this point.
+  if (shm_info->m_rank_id == rankid && m_scalar_type == "double")
   {
     mi::Size nb_voxels = shm_info->m_size / sizeof(mi::Float64);
 

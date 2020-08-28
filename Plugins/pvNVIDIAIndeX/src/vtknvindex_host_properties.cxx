@@ -54,6 +54,7 @@ inline mi::Size calc_offset(mi::Uint32 x, mi::Uint32 y, mi::Uint32 z,
 }
 
 // Copy a brick between two buffers. All bboxes are in the same global coordinate system.
+template <bool CONVERT_DOUBLE_TO_FLOAT = false>
 void copy_brick(const mi::math::Bbox<mi::Sint32, 3>& copy_bbox_global, mi::Uint8* dst_buffer,
   const mi::math::Bbox<mi::Sint32, 3>& dst_buffer_bbox_global, const mi::Uint8* src_buffer,
   const mi::math::Bbox<mi::Sint32, 3>& src_buffer_bbox_global, mi::Size voxel_fmt_size)
@@ -92,11 +93,34 @@ void copy_brick(const mi::math::Bbox<mi::Sint32, 3>& copy_bbox_global, mi::Uint8
     {
       const mi::Size src_offset =
         calc_offset(read_bbox.min.x, y, z, src_buffer_dims, voxel_fmt_size);
-      const mi::Size dst_offset = calc_offset(read_bbox.min.x + write_delta.x, y + write_delta.y,
-        z + write_delta.z, dst_buffer_dims, voxel_fmt_size);
-      memcpy(dst_buffer + dst_offset, src_buffer + src_offset, len_x * voxel_fmt_size);
+      const mi::Size dst_offset =
+        calc_offset(read_bbox.min.x + write_delta.x, y + write_delta.y, z + write_delta.z,
+          dst_buffer_dims, CONVERT_DOUBLE_TO_FLOAT ? sizeof(mi::Float32) : voxel_fmt_size);
+
+      if (CONVERT_DOUBLE_TO_FLOAT)
+      {
+        const mi::Float64* src_double =
+          reinterpret_cast<const mi::Float64*>(src_buffer + src_offset);
+        mi::Float32* dst_float = reinterpret_cast<mi::Float32*>(dst_buffer + dst_offset);
+        for (mi::Size i = 0; i < len_x; ++i)
+        {
+          dst_float[i] = static_cast<mi::Float32>(src_double[i]);
+        }
+      }
+      else
+      {
+        memcpy(dst_buffer + dst_offset, src_buffer + src_offset, len_x * voxel_fmt_size);
+      }
     }
   }
+}
+
+void copy_brick_double_to_float(const mi::math::Bbox<mi::Sint32, 3>& copy_bbox_global,
+  mi::Uint8* dst_buffer, const mi::math::Bbox<mi::Sint32, 3>& dst_buffer_bbox_global,
+  const mi::Uint8* src_buffer, const mi::math::Bbox<mi::Sint32, 3>& src_buffer_bbox_global)
+{
+  copy_brick<true>(copy_bbox_global, dst_buffer, dst_buffer_bbox_global, src_buffer,
+    src_buffer_bbox_global, sizeof(mi::Float64));
 }
 
 } // namespace
@@ -641,9 +665,13 @@ void vtknvindex_host_properties::fetch_remote_volume_border_data(
 
   const int COMM_TAG = 200; // recommended to use custom tag number over 100
 
-  // TODO: Convert double to float already here
-  const mi::Size scalar_size = vtknvindex_regular_volume_properties::get_scalar_size(scalar_type);
-  if (scalar_size == 0)
+  mi::Size scalar_size = vtknvindex_regular_volume_properties::get_scalar_size(scalar_type);
+  if (scalar_type == "double")
+  {
+    // Convert to float when writing to the send buffer
+    scalar_size = sizeof(mi::Float32);
+  }
+  else if (scalar_size == 0)
   {
     return;
   }
@@ -668,8 +696,16 @@ void vtknvindex_host_properties::fetch_remote_volume_border_data(
 
       if (local_info)
       {
-        copy_brick(f.border_bbox, buffer.get(), f.border_bbox,
-          reinterpret_cast<const mi::Uint8*>(local_piece_data), f.data_bbox, scalar_size);
+        if (scalar_type == "double")
+        {
+          copy_brick_double_to_float(f.border_bbox, buffer.get(), f.border_bbox,
+            reinterpret_cast<const mi::Uint8*>(local_piece_data), f.data_bbox);
+        }
+        else
+        {
+          copy_brick(f.border_bbox, buffer.get(), f.border_bbox,
+            reinterpret_cast<const mi::Uint8*>(local_piece_data), f.data_bbox, scalar_size);
+        }
       }
       else
       {

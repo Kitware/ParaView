@@ -612,7 +612,14 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
         const mi::Size volume_size =
           pernode_volume_extent.x * pernode_volume_extent.y * pernode_volume_extent.z;
 
-        const std::string& scalar_type = dataset_parameters.scalar_type;
+        std::string scalar_type = dataset_parameters.scalar_type;
+        if (scalar_type == "double" && !(is_index_rank && current_rankid == m_rank_id))
+        {
+          // Data will be converted to float when writing to shared memory. The data in
+          // local memory on IndeX ranks will stay in double format.
+          scalar_type = "float";
+        }
+
         const mi::Size scalar_size =
           vtknvindex_regular_volume_properties::get_scalar_size(scalar_type);
         if (scalar_size > 0)
