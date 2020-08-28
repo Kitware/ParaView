@@ -169,10 +169,9 @@ bool vtknvindex_volumemapper::prepare_data(mi::Sint32 time_step)
       return false;
     }
 
-    mi::Sint32 use_cell_colors;
+    mi::Sint32 cell_flag;
     scalar_array = this->GetScalars(image_piece, this->ScalarMode, this->ArrayAccessMode,
-      this->ArrayId, this->ArrayName,
-      use_cell_colors); // CellFlag
+      this->ArrayId, this->ArrayName, cell_flag);
 
     m_subset_ptrs[time_step] = scalar_array->GetVoidPointer(0);
   }
@@ -224,13 +223,12 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
     return false;
   }
 
-  mi::Sint32 use_cell_colors;
+  mi::Sint32 cell_flag;
   m_scalar_array = this->GetScalars(image_piece, this->ScalarMode, this->ArrayAccessMode,
-    this->ArrayId, this->ArrayName,
-    use_cell_colors); // CellFlag
+    this->ArrayId, this->ArrayName, cell_flag);
 
   // check for scalar per cell values
-  if (use_cell_colors)
+  if (cell_flag)
   {
     ERROR_LOG << "Scalar values per cell are not supported in NVIDIA IndeX.";
     return false;
@@ -420,7 +418,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
     }
     else if (IceT_was_enabled)
     {
-      WARN_LOG << "Please restart ParaView so that IceT compositing is disabled.";
+      WARN_LOG << "Please restart ParaView so that IceT compositing is fully disabled.";
       IceT_was_enabled = false; // only print this once
     }
   }
@@ -428,9 +426,9 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
   // check if volume data was modified
   if (!m_cluster_properties->get_regular_volume_properties()->is_timeseries_data())
   {
-    mi::Sint32 use_cell_colors;
+    mi::Sint32 cell_flag;
     vtkDataArray* scalar_array = this->GetScalars(this->GetInput(), this->ScalarMode,
-      this->ArrayAccessMode, this->ArrayId, this->ArrayName, use_cell_colors);
+      this->ArrayAccessMode, this->ArrayId, this->ArrayName, cell_flag);
 
     vtkMTimeType cur_MTime = scalar_array->GetMTime();
 

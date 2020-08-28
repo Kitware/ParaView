@@ -67,9 +67,9 @@ size_t vtknvindex_irregular_volume_data::get_memory_size(const std::string& scal
     return 0;
   }
 
-  return sizeof(num_points) + sizeof(num_cells) +
+  return sizeof(num_points) + sizeof(num_cells) + sizeof(num_scalars) + sizeof(cell_flag) +
     sizeof(mi::math::Vector<mi::Float32, 3>) * num_points +
-    sizeof(mi::math::Vector<mi::Uint32, 4>) * num_cells + scalar_size * num_points +
+    sizeof(mi::math::Vector<mi::Uint32, 4>) * num_cells + scalar_size * num_scalars +
     sizeof(max_edge_length2);
 }
 

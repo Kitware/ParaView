@@ -416,45 +416,69 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(
   memcpy(shm_offset, &ivol_data->num_cells, size_elm);
   shm_offset += size_elm;
 
+  // num scalars
+  size_elm = sizeof(ivol_data->num_scalars);
+  memcpy(shm_offset, &ivol_data->num_scalars, size_elm);
+  shm_offset += size_elm;
+
+  // cell flag
+  size_elm = sizeof(ivol_data->cell_flag);
+  memcpy(shm_offset, &ivol_data->cell_flag, size_elm);
+  shm_offset += size_elm;
+
   // points
   size_elm = sizeof(mi::Float32) * 3;
 
   for (vtkIdType i = 0; i < ivol_data->num_points; ++i)
   {
-    mi::Float64 point_pv[3];
-    ugrid->GetPoint(i, point_pv);
-
-    mi::Float32 point_index[3] = { static_cast<mi::Float32>(point_pv[0]),
-      static_cast<mi::Float32>(point_pv[1]), static_cast<mi::Float32>(point_pv[2]) };
-
-    memcpy(shm_offset, point_index, size_elm);
+    mi::math::Vector<mi::Float64, 3> point_pv;
+    ugrid->GetPoint(i, point_pv.begin());
+    const mi::math::Vector<mi::Float32, 3> point_index(point_pv);
+    memcpy(shm_offset, &point_index, size_elm);
     shm_offset += size_elm;
   }
 
   // cells
   size_elm = sizeof(mi::Uint32) * 4;
 
+  const bool per_cell_scalars = (ivol_data->cell_flag == 1);
+  mi::Uint8* shm_scalar_offset = shm_offset + ivol_data->num_cells * size_elm;
+
   vtkSmartPointer<vtkCellIterator> cellIter =
     vtkSmartPointer<vtkCellIterator>::Take(ugrid->NewCellIterator());
   for (cellIter->InitTraversal(); !cellIter->IsDoneWithTraversal(); cellIter->GoToNextCell())
   {
-    vtkIdType npts = cellIter->GetNumberOfPoints();
+    const vtkIdType npts = cellIter->GetNumberOfPoints();
     if (npts != 4)
       continue;
 
-    vtkIdType* cell_point_ids = cellIter->GetPointIds()->GetPointer(0);
+    const vtkIdType* cell_point_ids = cellIter->GetPointIds()->GetPointer(0);
 
-    mi::Uint32 cur_cell_index[4] = { static_cast<mi::Uint32>(cell_point_ids[0]),
+    const mi::Uint32 cur_cell_index[4] = { static_cast<mi::Uint32>(cell_point_ids[0]),
       static_cast<mi::Uint32>(cell_point_ids[1]), static_cast<mi::Uint32>(cell_point_ids[2]),
       static_cast<mi::Uint32>(cell_point_ids[3]) };
 
     memcpy(shm_offset, cur_cell_index, size_elm);
     shm_offset += size_elm;
+
+    if (per_cell_scalars)
+    {
+      // copy per-cell scalars
+      const vtkIdType cell_id = cellIter->GetCellId();
+      memcpy(shm_scalar_offset,
+        &reinterpret_cast<const mi::Uint8*>(ivol_data->scalars)[cell_id * scalar_size],
+        scalar_size);
+      shm_scalar_offset += scalar_size;
+    }
   }
 
   // scalars
-  size_elm = scalar_size * ivol_data->num_points;
-  memcpy(shm_offset, ivol_data->scalars, size_elm);
+  size_elm = scalar_size * ivol_data->num_scalars;
+  if (!per_cell_scalars)
+  {
+    // copy per-point scalars here (any per-cell scalars were already copied in the loop above)
+    memcpy(shm_offset, ivol_data->scalars, size_elm);
+  }
   shm_offset += size_elm;
 
   // max edge length

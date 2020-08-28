@@ -190,7 +190,7 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
 
   vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Initialization");
 
-  bool is_MPI = (m_controller->GetNumberOfProcesses() > 1);
+  const bool is_MPI = (m_controller->GetNumberOfProcesses() > 1);
   const mi::Sint32 cur_global_rank = is_MPI ? m_controller->GetLocalProcessId() : 0;
 
   // Update volume first to make sure that the states are current.
@@ -199,15 +199,15 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
   // Get the unstructured_grid.
   vtkUnstructuredGridBase* unstructured_grid = this->GetInput();
 
-  mi::Sint32 use_cell_colors;
+  mi::Sint32 cell_flag;
   m_scalar_array = this->GetScalars(unstructured_grid, this->ScalarMode, this->ArrayAccessMode,
-    this->ArrayId, this->ArrayName,
-    use_cell_colors); // CellFlag
+    this->ArrayId, this->ArrayName, cell_flag);
 
-  // Check for scalar per cell values
-  if (use_cell_colors)
+  // Check for per point scalars and cell scalars
+  if (cell_flag != 0 && cell_flag != 1)
   {
-    ERROR_LOG << "Scalars per cell are not supported by NVIDIA IndeX";
+    ERROR_LOG << "Only per point and per cell scalars are supported by NVIDIA IndeX (cellFlag is "
+              << cell_flag << ").";
     return false;
   }
 
@@ -238,7 +238,7 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
 
     // subset subregion
     // get geometry bounds
-    mi::Float64* bounds = unstructured_grid->GetBounds();
+    const mi::Float64* bounds = unstructured_grid->GetBounds();
 
     // get subset bounds
     if (vtkMath::AreBoundsInitialized(m_subregion_bounds))
@@ -267,8 +267,7 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
     }
 
     // Tetrahedral mesh points.
-    vtkIdType num_points = unstructured_grid->GetNumberOfPoints();
-    m_volume_data.num_points = static_cast<mi::Uint32>(num_points);
+    m_volume_data.num_points = static_cast<mi::Uint32>(unstructured_grid->GetNumberOfPoints());
 
     // Tetrahedral mesh cells.
     bool gave_error = 0;
@@ -283,19 +282,20 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
       vtkSmartPointer<vtkCellIterator>::Take(unstructured_grid->NewCellIterator());
     for (cellIter->InitTraversal(); !cellIter->IsDoneWithTraversal(); cellIter->GoToNextCell())
     {
-      vtkIdType npts = cellIter->GetNumberOfPoints();
+      const vtkIdType npts = cellIter->GetNumberOfPoints();
       if (npts != 4)
       {
         if (!gave_error)
         {
-          vtkErrorMacro("Encountered non-tetrahedral cell. NVIDIA IndeX's irregular volume "
-                        "renderer supports tetrahedral cells only.");
+          ERROR_LOG << "Encountered non-tetrahedral cell with " << npts
+                    << " points. The NVIDIA IndeX plug-in currently "
+                       "supports tetrahedral cells only.";
           gave_error = true;
         }
         continue;
       }
 
-      vtkIdType* cell_point_ids = cellIter->GetPointIds()->GetPointer(0);
+      const vtkIdType* cell_point_ids = cellIter->GetPointIds()->GetPointer(0);
 
       m_volume_data.num_cells++;
 
@@ -345,6 +345,9 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
 
     // scalars
     m_volume_data.scalars = m_scalar_array->GetVoidPointer(0);
+    m_volume_data.cell_flag = cell_flag;
+    m_volume_data.num_scalars =
+      (cell_flag == 1 ? m_volume_data.num_cells : m_volume_data.num_points);
 
     if (m_index_instance->is_index_rank())
       m_volume_data.pv_unstructured_grid = unstructured_grid;
@@ -524,15 +527,15 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
     }
     else if (IceT_was_enabled)
     {
-      WARN_LOG << "Please restart ParaView so that IceT compositing is disabled.";
+      WARN_LOG << "Please restart ParaView so that IceT compositing is fully disabled.";
       IceT_was_enabled = false; // only print this once
     }
   }
 
   // check if volume data was modified
-  mi::Sint32 use_cell_colors;
+  mi::Sint32 cell_flag;
   vtkDataArray* scalar_array = this->GetScalars(this->GetInput(), this->ScalarMode,
-    this->ArrayAccessMode, this->ArrayId, this->ArrayName, use_cell_colors);
+    this->ArrayAccessMode, this->ArrayId, this->ArrayName, cell_flag);
 
   vtkMTimeType cur_MTime = scalar_array->GetMTime();
 

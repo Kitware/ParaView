@@ -59,8 +59,11 @@ struct vtknvindex_irregular_volume_data
   vtkUnstructuredGridBase* pv_unstructured_grid;
   mi::Uint32 num_points;
   mi::Uint32 num_cells;
+  mi::Uint32 num_scalars; // either equal to num_points or num_cells, depending on cell_flag
 
   void* scalars;
+  mi::Sint32 cell_flag; // 0: point scalars, 1: cell scalars, 2: field_scalars; see
+                        // vtkAbstractMapper::GetScalars()
   mi::Float32 max_edge_length2;
 
   // Get the memory required to allocate this dataset.
