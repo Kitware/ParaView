@@ -15,3 +15,9 @@ if (PARAVIEW_USE_QT AND BUILD_SHARED_LIBS)
     TEST_SCRIPTS ${module_tests}
   )
 endif ()
+
+if (PARAVIEW_USE_PYTHON)
+  paraview_add_test_pvbatch(
+    NO_DATA NO_VALID
+    LoadVTKmFilterPlugin.py)
+endif()
