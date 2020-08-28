@@ -34,6 +34,7 @@
 
 #include "vtknvindex_forwarding_logger.h"
 #include "vtknvindex_host_properties.h"
+#include "vtknvindex_utilities.h"
 
 // ------------------------------------------------------------------------------------------------
 vtknvindex_host_properties::vtknvindex_host_properties()
@@ -62,19 +63,27 @@ vtknvindex_host_properties::~vtknvindex_host_properties()
 // ------------------------------------------------------------------------------------------------
 void vtknvindex_host_properties::shm_cleanup(bool reset)
 {
-  std::map<mi::Uint32, std::vector<shm_info> >::iterator shmit = m_shmlist.begin();
-  for (; shmit != m_shmlist.end(); ++shmit)
+  for (auto& it : m_shmlist)
   {
-    std::vector<shm_info> shmlist = shmit->second;
-
-    for (mi::Uint32 i = 0; i < shmlist.size(); ++i)
+    for (shm_info& current_shm : it.second)
     {
-      shm_info current_shm = shmlist[i];
+      if (current_shm.m_mapped_subset_ptr)
+      {
+        vtknvindex::util::unmap_shm(current_shm.m_mapped_subset_ptr, current_shm.m_size);
+        current_shm.m_mapped_subset_ptr = nullptr;
+      }
+
+      // TODO: Only call unlink on the rank that created the shared memory
+
+      // Remove shared memory (skip when local subset was available)
+      if (!current_shm.m_subset_ptr)
+      {
 #ifdef _WIN32
 // TODO: Unlink using windows functions
 #else  // _WIN32
-      shm_unlink(current_shm.m_shm_name.c_str());
+        shm_unlink(current_shm.m_shm_name.c_str());
 #endif // _WIN32
+      }
     }
   }
 
@@ -180,6 +189,42 @@ vtknvindex_host_properties::shm_info* vtknvindex_host_properties::get_shminfo(
     }
   }
   return NULL;
+}
+
+// ------------------------------------------------------------------------------------------------
+const mi::Uint8* vtknvindex_host_properties::get_subset_data_buffer(
+  const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step,
+  const vtknvindex_host_properties::shm_info** shm_info_out)
+{
+  vtknvindex_host_properties::shm_info* shm_info = get_shminfo(bbox, time_step);
+  if (shm_info_out)
+  {
+    *shm_info_out = shm_info;
+  }
+
+  if (!shm_info)
+  {
+    return nullptr;
+  }
+
+  std::lock_guard<std::mutex> lock(m_mutex);
+
+  if (shm_info->m_subset_ptr)
+  {
+    // Data is locally available in this rank, return directly
+    void** subdivision_pointers = static_cast<void**>(shm_info->m_subset_ptr);
+    // TODO: multiple timesteps only supported in non-MPI mode?
+    return reinterpret_cast<mi::Uint8*>(subdivision_pointers[time_step]);
+  }
+
+  // Data must be in shared memory, map it if not already the case
+  if (!shm_info->m_mapped_subset_ptr)
+  {
+    shm_info->m_mapped_subset_ptr =
+      vtknvindex::util::get_vol_shm(shm_info->m_shm_name, shm_info->m_size);
+  }
+
+  return reinterpret_cast<mi::Uint8*>(shm_info->m_mapped_subset_ptr);
 }
 
 // ------------------------------------------------------------------------------------------------

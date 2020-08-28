@@ -29,6 +29,7 @@
 #define vtknvindex_host_properties_h
 
 #include <map>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -51,6 +52,7 @@ public:
   {
     shm_info()
       : m_subset_ptr(nullptr)
+      , m_mapped_subset_ptr(nullptr)
     {
     }
 
@@ -60,13 +62,15 @@ public:
       , m_shm_bbox(bbox)
       , m_size(shm_size)
       , m_subset_ptr(subset_ptr)
+      , m_mapped_subset_ptr(nullptr)
     {
     }
 
     std::string m_shm_name;
     mi::math::Bbox<mi::Float32, 3> m_shm_bbox;
     mi::Uint64 m_size;
-    void* m_subset_ptr;
+    void* m_subset_ptr;        // Non-null if data is local, otherwise it is in shared memory
+    void* m_mapped_subset_ptr; // Non-null if shared memory buffer is mapped
   };
 
   vtknvindex_host_properties();
@@ -74,6 +78,8 @@ public:
 
   ~vtknvindex_host_properties();
 
+  // Unmap and unlink any shared memory.
+  // If "reset" is true, also clear m_shmlist, i.e. remove all information.
   void shm_cleanup(bool reset);
 
   // Set the shared memory data for the current bounding box and the time step.
@@ -87,6 +93,11 @@ public:
 
   // Get the shared memory info for the current bounding box and the time step.
   shm_info* get_shminfo(const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step);
+
+  // Returns the subset (piece) data (and optionally its shm_info), mapping shared memory if
+  // necessary. Data will stay mapped until shm_cleanup() gets called.
+  const mi::Uint8* get_subset_data_buffer(const mi::math::Bbox<mi::Float32, 3>& bbox,
+    mi::Uint32 time_step, const vtknvindex_host_properties::shm_info** shm_info_out = nullptr);
 
   // Set/get the GPU ids of the present host.
   void set_gpuids(std::vector<mi::Sint32> gpuids);
@@ -120,7 +131,7 @@ private:
   std::map<mi::Uint32, std::vector<shm_info> >
     m_shmlist; // List of shared memory pieces on the present host.
 
-  mi::base::Lock s_ptr_lock;
+  std::mutex m_mutex;
 };
 
 #endif // vtknvindex_host_properties_h

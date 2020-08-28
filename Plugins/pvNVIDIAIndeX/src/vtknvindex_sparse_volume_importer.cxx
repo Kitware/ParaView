@@ -356,96 +356,77 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
   Handle<const ISparse_volume_subset_data_descriptor> svol_subset_desc(
     svol_data_subset->get_subset_data_descriptor());
 
-  // Fetch shared memory details from host properties
-  std::string shm_memory_name;
-  mi::math::Bbox<mi::Float32, 3> shm_bbox_float;
-  mi::Uint64 shmsize = 0;
-  void* pv_subdivision_ptr = nullptr;
-  void* shm_ptr = nullptr;
-
   // Bounding box of the IndeX subset (without border). This should match (or be contained in) the
   // bounding box of the corresponding shared memory buffer.
   const mi::math::Bbox<mi::Float32, 3> subset_subregion_bbox =
     svol_subset_desc->get_subregion_scene_space();
 
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
-  mi::Sint32 rankid = controller ? controller->GetLocalProcessId() : 0;
+  const mi::Sint32 rankid = controller ? controller->GetLocalProcessId() : 0;
 
-  if (!m_cluster_properties->get_host_properties(rankid)->get_shminfo(
-        subset_subregion_bbox, shm_memory_name, shm_bbox_float, shmsize, &shm_ptr, time_step))
-  {
-    ERROR_LOG << "Failed to get shared memory information in regular volume importer for rank: "
-              << rankid << ".";
-    return 0;
-  }
-  const Bbox3i shm_bbox(
-    shm_bbox_float); // no rounding necessary, shm_bbox_float only uses integer values
+  // Fetch local or shared memory details from host properties
+  const vtknvindex_host_properties::shm_info* shm_info;
+  const mi::Uint8* subset_data_buffer =
+    m_cluster_properties->get_host_properties(rankid)->get_subset_data_buffer(
+      subset_subregion_bbox, time_step, &shm_info);
 
-  // retrieve subset scalars for the currrent time step from the subset scalars array
-  if (shm_ptr != nullptr)
+  if (!shm_info)
   {
-    void** pv_subdivision_pointers = static_cast<void**>(shm_ptr);
-    pv_subdivision_ptr = pv_subdivision_pointers[time_step];
+    ERROR_LOG << LOG_svol_rvol_prefix << "Failed to retrieve shared memory info for subset "
+              << subset_subregion_bbox << ".";
+    return nullptr;
   }
 
-  if (shm_memory_name.empty() || shm_bbox.empty())
+  const Bbox3i shm_bbox(shm_info->m_shm_bbox); // no rounding necessary, only uses integer values
+
+  if (shm_info->m_shm_name.empty() || shm_bbox.empty())
   {
-    ERROR_LOG << "Failed to open shared memory shmname: " << shm_memory_name
+    ERROR_LOG << LOG_svol_rvol_prefix
+              << "Failed to open shared memory shmname: " << shm_info->m_shm_name
               << " with bbox: " << shm_bbox << ".";
-    return 0;
+    return nullptr;
+  }
+  if (!subset_data_buffer)
+  {
+    ERROR_LOG << LOG_svol_rvol_prefix
+              << "Could not retrieve data for shared memory: " << shm_info->m_shm_name << " box "
+              << shm_bbox << " from rank: " << rankid << ".";
+    return nullptr;
   }
 
-  INFO_LOG << "Using shared memory: " << shm_memory_name << " box " << shm_bbox
+  INFO_LOG << "Using shared memory: " << shm_info->m_shm_name << " box " << shm_bbox
            << " from rank: " << rankid << ".";
   INFO_LOG << "Bounding box requested by NVIDIA IndeX: " << bounding_box;
 
-  const mi::Uint8* subdivision_ptr = nullptr;
-
-  // Using volume subdivision from ParaView scalar raw pointer
-  if (pv_subdivision_ptr)
+  bool free_buffer = false;
+  // Convert double scalar data to float.
+  if (m_scalar_type == "double")
   {
-    // Convert double scalar data to float.
-    if (m_scalar_type == "double")
-    {
-      mi::Size nb_voxels = shmsize / sizeof(mi::Float64);
-      void* subdivison_ptr_float = malloc(nb_voxels * sizeof(mi::Float32));
+    mi::Size nb_voxels = shm_info->m_size / sizeof(mi::Float64);
 
-      mi::Float32* voxels_float = reinterpret_cast<mi::Float32*>(subdivison_ptr_float);
-      const mi::Float64* voxels_dlb = reinterpret_cast<mi::Float64*>(pv_subdivision_ptr);
+    mi::Float32* voxels_float = new mi::Float32[nb_voxels];
+    const mi::Float64* voxels_double = reinterpret_cast<const mi::Float64*>(subset_data_buffer);
 
-      for (mi::Size i = 0; i < nb_voxels; ++i)
-        voxels_float[i] = static_cast<mi::Float32>(voxels_dlb[i]);
+    for (mi::Size i = 0; i < nb_voxels; ++i)
+      voxels_float[i] = static_cast<mi::Float32>(voxels_double[i]);
 
-      pv_subdivision_ptr = subdivison_ptr_float;
-    }
-
-    subdivision_ptr = reinterpret_cast<mi::Uint8*>(pv_subdivision_ptr);
-  }
-  else // Using volume subdivision passed through shared memory pointer
-  {
-    subdivision_ptr = vtknvindex::util::get_vol_shm(shm_memory_name, shmsize);
+    subset_data_buffer = reinterpret_cast<mi::Uint8*>(voxels_float);
+    free_buffer = true;
   }
 
-  // Import all brick pieces in parallel
+  // Import all bricks for the subregion in parallel
   vtknvindex_import_bricks import_bricks_job(svol_subset_desc.get(), svol_data_subset.get(),
-    subdivision_ptr, vol_fmt_size, m_border_size, shm_bbox);
+    subset_data_buffer, vol_fmt_size, m_border_size, shm_bbox);
 
   dice_transaction->execute_fragmented(&import_bricks_job, import_bricks_job.get_nb_fragments());
 
+  if (free_buffer)
+  {
+    // Free temporary data buffer (used for double-float conversion)
+    delete[] subset_data_buffer;
+  }
+
   svol_data_subset->retain();
-
-  if (pv_subdivision_ptr)
-  {
-    // Free temporary voxel buffer
-    if (m_scalar_type == "double")
-      free(pv_subdivision_ptr);
-  }
-  else
-  {
-    // unmap shared memory
-    vtknvindex::util::unmap_shm(subdivision_ptr, shmsize);
-  }
-
   return svol_data_subset.get();
 }
 
