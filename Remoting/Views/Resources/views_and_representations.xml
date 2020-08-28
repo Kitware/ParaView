@@ -12272,12 +12272,21 @@
       <IntVectorProperty command="SetEnableScaling"
                          default_values="0"
                          name="OSPRayUseScaleArray"
-                         label="Use Scale Array"
+                         label="Scaling Mode"
                          number_of_elements="1">
         <Documentation>
-          Allows OSPRay implicit points and lines to be sized by an array.
+          Choose how the size of each sphere and cylinder is determined.
         </Documentation>
-        <BooleanDomain name="bool" />
+        <EnumerationDomain name="enum">
+          <Entry text="All Exact"
+                 value="-1" />
+          <Entry text="All Approximate"
+                 value="0" />
+          <Entry text="Each Scaled"
+                 value="1" />
+          <Entry text="Each Exact"
+                 value="2" />
+        </EnumerationDomain>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
         </Hints>
