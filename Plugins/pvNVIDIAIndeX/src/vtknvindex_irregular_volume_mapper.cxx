@@ -297,28 +297,6 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
 
       vtkIdType* cell_point_ids = cellIter->GetPointIds()->GetPointer(0);
 
-      // check for degenerated cells
-      bool invalid_cell = false;
-      for (mi::Uint32 i = 0; i < 3; i++)
-      {
-        for (mi::Uint32 j = i + 1; j < 4; j++)
-        {
-          if (cell_point_ids[i] == cell_point_ids[j])
-          {
-            invalid_cell = true;
-            break;
-          }
-        }
-
-        if (invalid_cell)
-          break;
-      }
-
-      if (invalid_cell)
-      {
-        continue;
-      }
-
       m_volume_data.num_cells++;
 
       mi::Float64 avg_edge_size2 = 0.0;

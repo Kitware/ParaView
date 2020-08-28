@@ -240,26 +240,6 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
 
       vtkIdType* cell_point_ids = cellIter->GetPointIds()->GetPointer(0);
 
-      // check for degenerated cells
-      bool invalid_cell = false;
-      for (mi::Uint32 i = 0; i < 3; i++)
-      {
-        for (mi::Uint32 j = i + 1; j < 4; j++)
-        {
-          if (cell_point_ids[i] == cell_point_ids[j])
-          {
-            invalid_cell = true;
-            break;
-          }
-        }
-
-        if (invalid_cell)
-          break;
-      }
-
-      if (invalid_cell)
-        continue;
-
       mi::math::Bbox<mi::Float32, 3> tet_bbox;
       tet_bbox.clear();
 

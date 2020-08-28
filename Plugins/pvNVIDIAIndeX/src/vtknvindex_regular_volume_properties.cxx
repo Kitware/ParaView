@@ -444,26 +444,6 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(
 
     vtkIdType* cell_point_ids = cellIter->GetPointIds()->GetPointer(0);
 
-    // check for degenerated cells
-    bool invalid_cell = false;
-    for (mi::Uint32 i = 0; i < 3; i++)
-    {
-      for (mi::Uint32 j = i + 1; j < 4; j++)
-      {
-        if (cell_point_ids[i] == cell_point_ids[j])
-        {
-          invalid_cell = true;
-          break;
-        }
-      }
-
-      if (invalid_cell)
-        break;
-    }
-
-    if (invalid_cell)
-      continue;
-
     mi::Uint32 cur_cell_index[4] = { static_cast<mi::Uint32>(cell_point_ids[0]),
       static_cast<mi::Uint32>(cell_point_ids[1]), static_cast<mi::Uint32>(cell_point_ids[2]),
       static_cast<mi::Uint32>(cell_point_ids[3]) };
