@@ -1,0 +1,10 @@
+# Lists of paths for artifacts of various stages.
+
+.doxygen_log_artifacts:
+    artifacts:
+        expire_in: 1 week
+        when: always
+        paths:
+            - compile_output.log
+            - doxygen_output.log
+            - prepare_output.log

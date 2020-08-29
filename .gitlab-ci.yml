@@ -1,148 +1,64 @@
-# This currently only supports `package` generation.
-# Other standard ParaView-CI stages to follow
+include:
+    # Metadata shared my many jobs
+    - local: .gitlab/rules.yml
+    - local: .gitlab/artifacts.yml
 
-.docker_image: &docker_image
-  variables:
-    GIT_CLONE_PATH: "$CI_BUILDS_DIR/gitlab-kitware-sciviz-ci"
-    GIT_SUBMODULE_STRATEGY: recursive
-    GIT_CEILING_DIRECTORIES: "$CI_BUILDS_DIR/gitlab-kitware-sciviz-ci"
-
-.centos7: &centos7
-  image: "kitware/paraview:ci-superbuild-centos7-20200210"
-  variables:
-    LAUNCHER: "scl enable devtoolset-7 --"
-  extends:
-    - .docker_image
+    # OS builds.
+    - local: .gitlab/os-linux.yml
 
 stages:
-  - package
+    - package
 
-# Job to trigger paraView-superbuild pipelines
-superbuild:
-  stage: package
-  only:
-    - branches@paraview/paraview
-    - tags@paraview/paraview
-  except:
-    - nightly-master
-    - hooks
-  variables:
-    PARAVIEW_BRANCH: $CI_COMMIT_REF_NAME
-    RSYNC_UPLOAD_ENABLE: "true"
-  trigger:
-    project: paraview/paraview-superbuild
-    branch: $CI_COMMIT_REF_NAME
-    strategy: depend
+################################################################################
+# Job declarations
+#
+# Each job must pull in each of the following keys:
+#
+#   - a "base image"
+#   - a build script
+#   - tags for the jobs
+#     - already provided for upload and CI update jobs
+#   - rules for when to run the job
+#
+# Additionally, jobs may also contain:
+#
+#   - artifacts
+#   - dependency/needs jobs for required jobs
+################################################################################
 
-# Spack build
-spack:centos7:
-    cache:
-      key: spack:centos7
-      paths:
-        - spack-cache/
+# Linux
+
+## Spack
+
+package:spack-centos7:
     extends:
-      - .centos7
-    stage: package
-    tags:
-        - build
-        - paraview
-        - docker
-        - linux
-    rules:
-        - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_PATH == "paraview/paraview"'
-          when: always
-        - if: '$CI_MERGE_REQUEST_PROJECT_PATH == "paraview/paraview"'
-          when: manual
-    variables:
-        spack: "$CI_BUILDS_DIR/spack/bin/spack -C Utilities/spack/configs/gitlab-ci"
-        # this is needed as `configure` on certain packages fails when run as
-        # root
-        FORCE_UNSAFE_CONFIGURE: 1
-        paraview_spec: "paraview+osmesa^mesa~glx^mpich"
-    timeout: 3 hours
-    interruptible: true
-    before_script:
-        # [-- these must be added to the image.
-        - yum install -y bzip2 patch
-        - yum clean all
-        # ---]
-        - .gitlab/ci/sccache.sh
-        - .gitlab/ci/cmake.sh
-        - export PATH=$PWD/.gitlab:$PATH
-        - sccache --start-server
-        - sccache --show-stats
-        - .gitlab/ci/spack.sh
-        - $LAUNCHER $spack repo add $PWD/Utilities/spack/repo
-        - $LAUNCHER $spack compiler find
-        - $LAUNCHER $spack compiler info gcc@7.3.1
-        # setup buildcache mirror
-        - $LAUNCHER $spack mirror add local $PWD/spack-cache
-        - $LAUNCHER $spack buildcache list
-    script:
-        - TRACK="Experimental"
-        - if [ "$CI_PIPELINE_SOURCE" == "schedule" ] && [ "$CI_PROJECT_PATH" == "paraview/paraview" ]; then TRACK="master-packages" ; fi
-        - if [ "$CI_MERGE_REQUEST_PROJECT_PATH" == "paraview/paraview" ]; then TRACK="merge-requests" ; fi
-        - $LAUNCHER $spack spec $paraview_spec
-        - $LAUNCHER $spack install --no-check-signature --only dependencies -j $(nproc) $paraview_spec
-        - export dependency_specs=`$LAUNCHER $spack find --format "{name}{@version}{%compiler}"`
-        - $LAUNCHER $spack buildcache create -a -f -u -d $PWD/spack-cache $dependency_specs
-        - $LAUNCHER $spack install --no-check-signature -j $(nproc) --cdash-upload-url="http://open.cdash.org/submit.php?project=ParaView" --cdash-track $TRACK --cdash-build="paraview-spack-$CI_COMMIT_REF_NAME" $paraview_spec
-        - eval `$spack load --sh paraview`
-        - pvserver --version
-        - .gitlab/sccache --show-stats
+        - .centos7
+        - .spack_build_linux
+        - .linux_builder_tags
+        - .run_scheduled
 
-# Doxygen
-docs:generate:
-  stage: package
-  extends:
-    - .centos7
-  tags:
-    - build
-    - paraview
-    - docker
-    - linux
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_PATH == "paraview/paraview"'
-      when: always
-    - if: '$CI_MERGE_REQUEST_PROJECT_PATH == "paraview/paraview"'
-      when: manual
-  variables:
-    GIT_SUBMODULE_STRATEGY: recursive
-    PARAVIEW_DOCS_REPO: git@github.com:Kitware/paraview-docs.git
-    WORKDIR: ""
-    GIT_SSH_COMMAND: ""
-    CURRENT_RELEASE: nightly
-  timeout: 3 hours
-  before_script:
-    - WORKDIR=$(pwd)
-    - GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -i $GITHUB_SSH_PRIVATE_KEY"
-    - chmod 600 $GITHUB_SSH_PRIVATE_KEY
-    - yum install -y bzip2 patch python-twisted-core python-twisted-web python-twisted-words python3 python3-devel \
-      qt5-qtbase-devel qt5-qttools-devel qt5-qtsvg-devel qt5-qtxmlpatterns-devel doxygen openmpi-devel python36-numpy
-    - yum clean all
-    - pip3 install sphinx
-    - .gitlab/ci/sccache.sh
-    - .gitlab/ci/cmake.sh
-    - export PATH=$PWD/.gitlab:$PATH
-    - export PATH=$PWD/.gitlab/cmake/bin:$PATH
-    - export PATH=/usr/lib64/openmpi/bin:$PATH
-    - git clone $PARAVIEW_DOCS_REPO paraview-docs
-    - cd paraview-docs
-    - cd $WORKDIR
-    - mkdir build
-  script:
-    - cd build
-    - $LAUNCHER cmake -DPARAVIEW_USE_PYTHON=ON -DVTK_WRAP_PYTHON=ON -DVTK_ENABLE_WRAPPING=ON -DPARAVIEW_BUILD_DEVELOPER_DOCUMENTATION=ON -DPARAVIEW_USE_MPI=ON ..
-    - cmake --build . -j &> $WORKDIR/compile_output.log
-    - make ParaViewDoc-TGZ &> $WORKDIR/doxygen_output.log
-    - cd $WORKDIR/paraview-docs
-    - CURRENT_RELEASE=nightly
-    - test -n "$CI_COMMIT_TAG" && CURRENT_RELEASE="$CI_COMMIT_TAG"
-    - $LAUNCHER ./scripts/prepare-doc.sh "$WORKDIR" "$WORKDIR/build" "$WORKDIR" "$CURRENT_RELEASE"  &> $WORKDIR/prepare_output.log
-  artifacts:
-    expire_in: 1 week
-    when: always
-    paths:
-      - compile_output.log
-      - doxygen_output.log
-      - prepare_output.log
+## Doxygen
+
+package:documentation:
+    extends:
+        - .centos7
+        - .doxygen_build_linux
+        - .linux_builder_tags
+        - .doxygen_log_artifacts
+        - .run_scheduled
+
+# Triggers
+
+## Superbuild
+
+superbuild:
+    extends:
+        - .run_superbuild_trigger
+    stage: package
+    variables:
+        PARAVIEW_BRANCH: $CI_COMMIT_REF_NAME
+        RSYNC_UPLOAD_ENABLE: "true"
+    trigger:
+        project: paraview/paraview-superbuild
+        branch: $CI_COMMIT_REF_NAME
+        strategy: depend
