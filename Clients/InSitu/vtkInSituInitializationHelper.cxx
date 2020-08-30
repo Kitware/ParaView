@@ -27,6 +27,14 @@
 #include <map>
 #include <string>
 
+#if VTK_MODULE_ENABLE_ParaView_PythonCatalyst
+extern "C" {
+void vtkPVInitializePythonModules();
+}
+#endif
+
+#include "ParaView_paraview_plugins.h"
+
 class vtkInSituInitializationHelper::vtkInternals
 {
 public:
@@ -90,6 +98,14 @@ void vtkInSituInitializationHelper::Initialize()
   // for now, I am using vtkCPCxxHelper; that class should be removed when we
   // deprecate Legacy Catalyst API.
   internals.CPCxxHelper.TakeReference(vtkCPCxxHelper::New());
+
+#if VTK_MODULE_ENABLE_ParaView_PythonCatalyst
+  // register static Python modules built, if any.
+  vtkPVInitializePythonModules();
+#endif
+
+  // register static plugins
+  ParaView_paraview_plugins_initialize();
 }
 
 //----------------------------------------------------------------------------
