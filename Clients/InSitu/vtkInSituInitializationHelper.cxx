@@ -33,7 +33,7 @@ void vtkPVInitializePythonModules();
 }
 #endif
 
-#include "ParaView_paraview_plugins.h"
+// #include "ParaView_paraview_plugins.h"
 
 class vtkInSituInitializationHelper::vtkInternals
 {
@@ -104,8 +104,9 @@ void vtkInSituInitializationHelper::Initialize()
   vtkPVInitializePythonModules();
 #endif
 
-  // register static plugins
-  ParaView_paraview_plugins_initialize();
+  // skipping for now
+  // // register static plugins
+  // ParaView_paraview_plugins_initialize();
 }
 
 //----------------------------------------------------------------------------
