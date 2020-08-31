@@ -209,6 +209,8 @@ bool vtkInSituPipelinePython::Execute(int timestep, double time)
   }
   return true;
 #else
+  (void)timestep;
+  (void)time;
   vtkLogF(WARNING, "Python support not enabled!");
   return false;
 #endif
