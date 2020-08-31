@@ -62,8 +62,8 @@ class PQCOMPONENTS_EXPORT pqProxyWidget : public QWidget
 public:
   pqProxyWidget(
     vtkSMProxy* proxy, QWidget* parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags{});
-  pqProxyWidget(vtkSMProxy* proxy, const QStringList& properties, QWidget* parent = 0,
-    Qt::WindowFlags flags = Qt::WindowFlags{});
+  pqProxyWidget(vtkSMProxy* proxy, const QStringList& properties, bool showHeadersFooters = true,
+    QWidget* parent = 0, Qt::WindowFlags flags = Qt::WindowFlags{});
   ~pqProxyWidget() override;
 
   /**
@@ -211,8 +211,8 @@ private:
   /**
   * the actual constructor implementation.
   */
-  void constructor(
-    vtkSMProxy* proxy, const QStringList& properties, QWidget* parent, Qt::WindowFlags flags);
+  void constructor(vtkSMProxy* proxy, const QStringList& properties, bool showHeadersFooters,
+    QWidget* parent, Qt::WindowFlags flags);
 
   /**
   * create all widgets
@@ -234,6 +234,7 @@ private:
 
   bool ApplyChangesImmediately;
   bool UseDocumentationForLabels;
+  bool ShowHeadersFooters = false;
   class pqInternals;
   pqInternals* Internals;
 };
