@@ -7,7 +7,7 @@
                      short_help="Read Exodus II files.">The Exodus reader loads
                      Exodus II files and produces an unstructured grid output.
                      The default file extensions are .g, .e, .ex2, .ex2v2,
-                     .exo, .gen, .exoII, .exii, .0, .00, .000, and
+                     .exo, .gen, .exoII, .exii, .frq, .0, .00, .000, and
                      .0000.</Documentation>
       <StringVectorProperty animateable="0"
                             command="SetFileName"
@@ -799,7 +799,7 @@
                      short_help="Read Exodus II files.">The Exodus reader loads
                      Exodus II files and produces an unstructured grid output.
                      The default file extensions are .g, .e, .ex2, .ex2v2,
-                     .exo, .gen, .exoII, .exii, .0, .00, .000, and .0000. The
+                     .exo, .gen, .exoII, .exii, .frq, .0, .00, .000, and .0000. The
                      file format is described fully at:
                      http://endo.sandia.gov/SEACAS/Documentation/exodusII.pdf.
                      Each Exodus file contains a single set of points with 2-D
@@ -954,7 +954,7 @@
         <TimeStepsInformationHelper />
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="g e h gc ex2 ex2v2 exo gen par exoII exii"
+        <ReaderFactory extensions="g e h gc ex2 ex2v2 exo gen par exoII exii frq"
                        file_description="ExodusII"
                        filename_patterns="*e-s*" />
       </Hints>
