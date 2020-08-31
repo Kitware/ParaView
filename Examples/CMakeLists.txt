@@ -3,6 +3,11 @@ project(ParaViewExamples)
 
 if (ParaView_BINARY_DIR)
   function (add_example dir)
+    cmake_parse_arguments(arg "" "TEST_TIMEOUT" "" ${ARGN})
+    if (arg_UNPARSED_ARGUMENTS)
+      message(FATAL_ERROR "Unknown arguments passed to 'add_example': ${arg_UNPARSED_ARGUMENTS}")
+    endif()
+
     add_test(
       NAME    "ParaViewExample-${dir}"
       COMMAND "${CMAKE_CTEST_COMMAND}"
@@ -29,6 +34,13 @@ if (ParaView_BINARY_DIR)
     set_property(TEST "ParaViewExample-${dir}" APPEND
       PROPERTY
         SKIP_REGULAR_EXPRESSION "Skipping example")
+
+    if (arg_TEST_TIMEOUT)
+      # override timeout, if specified.
+      set_property(TEST "ParaViewExample-${dir}"
+        PROPERTY
+          TIMEOUT "${arg_TEST_TIMEOUT}")
+    endif()
   endfunction ()
 else ()
   find_package(ParaView REQUIRED)
@@ -65,7 +77,11 @@ add_example(CustomApplications/SimpleParaView)
 # TODO Update this custom application to load only specific data types.
 # add_example(CustomApplications/Spreadsheet)
 
-add_example(Catalyst)
+# increate timeout for this test since it builds multiple executables
+# which be timeconsuming on static builds.
+add_example(Catalyst
+  TEST_TIMEOUT 600)
+
 add_example(Catalyst2/CFullExample)
 add_example(Catalyst2/CxxFullExample)
 add_example(Catalyst2/CxxImageDataExample)
