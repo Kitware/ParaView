@@ -71,7 +71,7 @@ bool vtkFileSequenceParser::ParseFileSequence(const char* file)
   if (this->reg_ex->find(file))
   {
     this->SetSequenceName(this->reg_ex->match(1).c_str());
-    this->SequenceIndex = atoi(reg_ex->match(2).c_str());
+    this->SequenceIndexString = this->reg_ex->match(2);
     match = true;
   }
   else if (this->reg_ex2->find(file))
@@ -79,7 +79,7 @@ bool vtkFileSequenceParser::ParseFileSequence(const char* file)
     this->SetSequenceName(std::string(this->reg_ex2->match(1) + this->reg_ex2->match(2) + ".." +
                             this->reg_ex2->match(4))
                             .c_str());
-    this->SequenceIndex = atoi(reg_ex2->match(3).c_str());
+    this->SequenceIndexString = this->reg_ex2->match(3);
     match = true;
   }
   else if (this->reg_ex3->find(file))
@@ -87,7 +87,7 @@ bool vtkFileSequenceParser::ParseFileSequence(const char* file)
     this->SetSequenceName(std::string(this->reg_ex3->match(1) + this->reg_ex3->match(2) + ".." +
                             this->reg_ex3->match(4))
                             .c_str());
-    this->SequenceIndex = atoi(reg_ex3->match(3).c_str());
+    this->SequenceIndexString = this->reg_ex3->match(3);
     match = true;
   }
   else if (this->reg_ex4->find(file))
@@ -95,7 +95,7 @@ bool vtkFileSequenceParser::ParseFileSequence(const char* file)
     this->SetSequenceName(std::string(".." + this->reg_ex4->match(2) + this->reg_ex4->match(3) +
                             "." + this->reg_ex4->match(4))
                             .c_str());
-    this->SequenceIndex = atoi(reg_ex4->match(1).c_str());
+    this->SequenceIndexString = this->reg_ex4->match(1);
     match = true;
   }
   else if (this->reg_ex5->find(file))
@@ -103,7 +103,7 @@ bool vtkFileSequenceParser::ParseFileSequence(const char* file)
     this->SetSequenceName(std::string(".." + this->reg_ex5->match(2) + this->reg_ex5->match(3) +
                             "." + this->reg_ex5->match(4))
                             .c_str());
-    this->SequenceIndex = atoi(reg_ex5->match(1).c_str());
+    this->SequenceIndexString = this->reg_ex5->match(1);
     match = true;
   }
   else
@@ -114,9 +114,13 @@ bool vtkFileSequenceParser::ParseFileSequence(const char* file)
     {
       this->SetSequenceName(
         (this->reg_ex_last->match(1) + ".." + this->reg_ex_last->match(3) + ext).c_str());
-      this->SequenceIndex = atoi(reg_ex_last->match(2).c_str());
+      this->SequenceIndexString = this->reg_ex_last->match(2);
       match = true;
     }
+  }
+  if (match)
+  {
+    this->SequenceIndex = atoi(this->SequenceIndexString.c_str());
   }
   return match;
 }
