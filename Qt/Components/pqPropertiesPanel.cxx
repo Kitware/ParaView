@@ -589,19 +589,19 @@ void pqPropertiesPanel::updateDisplayPanel(pqDataRepresentation* repr)
     this->Internals->Representation = repr;
     if (repr)
     {
-      if (repr->getProxy()->GetProperty("Representation"))
-      {
-        this->Internals->RepresentationEventConnect->Connect(
-          repr->getProxy()->GetProperty("Representation"), vtkCommand::ModifiedEvent, this,
-          SLOT(updateDisplayPanel()));
-      }
-
       // create the panel for the repr.
       pqProxyWidgets* widgets = new pqProxyWidgets(repr, this);
       widgets->Panel->setApplyChangesImmediately(true);
       QObject::connect(widgets->Panel, SIGNAL(changeFinished()), this, SLOT(renderActiveView()));
       this->Internals->DisplayWidgets = widgets;
       this->Internals->DisplayWidgets->show(this->Internals->Ui.DisplayFrame);
+
+      if (repr->getProxy()->GetProperty("Representation"))
+      {
+        this->Internals->RepresentationEventConnect->Connect(
+          repr->getProxy()->GetProperty("Representation"), vtkCommand::ModifiedEvent, this,
+          SLOT(updateDisplayPanel()));
+      }
     }
   }
 
