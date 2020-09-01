@@ -103,14 +103,15 @@ void pqProxiesWidget::clear()
 
 //-----------------------------------------------------------------------------
 void pqProxiesWidget::addProxy(vtkSMProxy* proxy, const QString& componentName /*=QString()*/,
-  const QStringList& properties /*=QStringList()*/, bool applyChangesImmediately /*=false*/)
+  const QStringList& properties /*=QStringList()*/, bool applyChangesImmediately /*=false*/,
+  bool showHeadersFooters /*=true*/)
 {
   // TODO: add check to avoid duplicate insertions.
 
   QList<pqInternals::ProxyInfo>& proxies = this->Internals->ComponentProxies[componentName];
   pqInternals::ProxyInfo info;
   info.Proxy = proxy;
-  info.ProxyWidget = new pqProxyWidget(proxy, properties, this);
+  info.ProxyWidget = new pqProxyWidget(proxy, properties, showHeadersFooters, this);
   info.ProxyWidget->setApplyChangesImmediately(applyChangesImmediately);
   info.ProxyWidget->setView(this->Internals->View);
   this->connect(info.ProxyWidget, SIGNAL(changeAvailable()), SLOT(triggerChangeAvailable()));

@@ -92,7 +92,8 @@ public Q_SLOTS:
   * Add the widgets for a proxy.
   */
   void addProxy(vtkSMProxy*, const QString& componentName = QString(),
-    const QStringList& properties = QStringList(), bool applyChangesImmediately = false);
+    const QStringList& properties = QStringList(), bool applyChangesImmediately = false,
+    bool showHeadersFooters = true);
 
   /**
   * Call this method once after all proxies have been added (or after clear)

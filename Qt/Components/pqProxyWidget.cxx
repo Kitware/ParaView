@@ -232,7 +232,7 @@ public:
   /// an item for a group where there's a single widget for all the properties
   /// in that group.
   static pqProxyWidgetItem* newGroupItem(
-    pqPropertyWidget* widget, const QString& label, QObject* parentObj)
+    pqPropertyWidget* widget, const QString& label, bool showSeparators, QObject* parentObj)
   {
     if (widget->isSingleRowItem())
     {
@@ -243,7 +243,7 @@ public:
 
     pqProxyWidgetItem* item = newItem(widget, QString(), parentObj);
     item->Group = true;
-    if (!label.isEmpty() && widget->showLabel())
+    if (!label.isEmpty() && widget->showLabel() && showSeparators)
     {
       item->GroupHeader = pqProxyWidget::newGroupLabelWidget(label, widget->parentWidget());
       item->GroupFooter = newGroupSeparator(widget->parentWidget());
@@ -254,13 +254,13 @@ public:
   /// Creates a new item for a property group with several widgets (for
   /// individual properties in the group).
   static pqProxyWidgetItem* newMultiItemGroupItem(const QString& group_label,
-    pqPropertyWidget* widget, const QString& widget_label, QObject* parentObj)
+    pqPropertyWidget* widget, const QString& widget_label, bool showSeparators, QObject* parentObj)
   {
     pqProxyWidgetItem* item = newItem(widget, widget_label, parentObj);
     item->Group = true;
     // ensure GroupTag is not null for multi-property groups.
     item->GroupTag = group_label.isNull() ? QString("") : group_label;
-    if (!group_label.isEmpty())
+    if (!group_label.isEmpty() && showSeparators)
     {
       item->GroupHeader = pqProxyWidget::newGroupLabelWidget(group_label, widget->parentWidget());
       item->GroupFooter = newGroupSeparator(widget->parentWidget());
@@ -631,21 +631,21 @@ public:
 pqProxyWidget::pqProxyWidget(vtkSMProxy* smproxy, QWidget* parentObject, Qt::WindowFlags wflags)
   : Superclass(parentObject, wflags)
 {
-  this->constructor(smproxy, QStringList(), parentObject, wflags);
+  this->constructor(smproxy, QStringList(), true, parentObject, wflags);
 }
 
 //-----------------------------------------------------------------------------
-pqProxyWidget::pqProxyWidget(
-  vtkSMProxy* smproxy, const QStringList& properties, QWidget* parentObject, Qt::WindowFlags wflags)
+pqProxyWidget::pqProxyWidget(vtkSMProxy* smproxy, const QStringList& properties,
+  bool showHeadersFooters, QWidget* parentObject, Qt::WindowFlags wflags)
   : Superclass(parentObject, wflags)
 {
-  this->constructor(smproxy, properties, parentObject, wflags);
+  this->constructor(smproxy, properties, showHeadersFooters, parentObject, wflags);
   this->updatePanel();
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyWidget::constructor(
-  vtkSMProxy* smproxy, const QStringList& properties, QWidget* parentObject, Qt::WindowFlags wflags)
+void pqProxyWidget::constructor(vtkSMProxy* smproxy, const QStringList& properties,
+  bool showHeadersFooters, QWidget* parentObject, Qt::WindowFlags wflags)
 {
   assert(smproxy);
   (void)parentObject;
@@ -661,6 +661,9 @@ void pqProxyWidget::constructor(
   this->Internals->RequestUpdatePanel.setInterval(0);
   this->Internals->RequestUpdatePanel.setSingleShot(true);
   this->connect(&this->Internals->RequestUpdatePanel, SIGNAL(timeout()), SLOT(updatePanel()));
+
+  // record whether to create and show header and footers for property groups
+  this->ShowHeadersFooters = showHeadersFooters;
 
   QGridLayout* gridLayout = new QGridLayout(this);
   gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
@@ -1038,8 +1041,8 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
             gwidget->setParent(this);
             gwidget->setObjectName(QString(smgroup->GetPanelWidget()).remove(' '));
 
-            auto item =
-              pqProxyWidgetItem::newGroupItem(gwidget, QString(smgroup->GetXMLLabel()), this);
+            auto item = pqProxyWidgetItem::newGroupItem(
+              gwidget, QString(smgroup->GetXMLLabel()), this->ShowHeadersFooters, this);
             item->Advanced = (smgroup->GetPanelVisibility() &&
               strcmp(smgroup->GetPanelVisibility(), "advanced") == 0);
             item->SearchTags << smgroup->GetPanelWidget();
@@ -1092,9 +1095,10 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
       ? QString("<p><b>%1</b>: %2</p>").arg(xmllabel).arg(xmlDocumentation)
       : QString(xmllabel);
 
-    auto item = (smgroup == nullptr) ? pqProxyWidgetItem::newItem(pwidget, QString(itemLabel), this)
-                                     : pqProxyWidgetItem::newMultiItemGroupItem(
-                                         smgroup->GetXMLLabel(), pwidget, QString(itemLabel), this);
+    auto item = (smgroup == nullptr)
+      ? pqProxyWidgetItem::newItem(pwidget, QString(itemLabel), this)
+      : pqProxyWidgetItem::newMultiItemGroupItem(
+          smgroup->GetXMLLabel(), pwidget, QString(itemLabel), this->ShowHeadersFooters, this);
 
     // save record of the property widget and containing widget
     item->SearchTags << xmllabel << xmlDocumentation << smkey.c_str();
