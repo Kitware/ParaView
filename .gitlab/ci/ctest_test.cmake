@@ -9,6 +9,9 @@ ctest_start(APPEND)
 include(ProcessorCount)
 ProcessorCount(nproc)
 
+# Default to a reasonable test timeout.
+set(CTEST_TEST_TIMEOUT 100)
+
 set(test_exclusions
 )
 string(REPLACE ";" "|" test_exclusions "${test_exclusions}")
