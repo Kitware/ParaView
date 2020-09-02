@@ -1005,7 +1005,8 @@ bool vtkPVFileInformation::DetectType()
 
 struct vtkPVFileInformation::vtkInfo
 {
-  typedef std::map<std::string, vtkSmartPointer<vtkPVFileInformation> > ChildrenType;
+  typedef std::map<std::pair<int, std::string>, vtkSmartPointer<vtkPVFileInformation> >
+    ChildrenType;
   vtkSmartPointer<vtkPVFileInformation> Group;
   ChildrenType Children;
 };
@@ -1033,6 +1034,7 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
       {
         const std::string groupName = this->SequenceParser->GetSequenceName();
         std::string suffixString = this->SequenceParser->GetSequenceIndexString();
+        int sequenceIndex = this->SequenceParser->GetSequenceIndex();
 
         // since I want to keep file groups and directory groups separate, for
         // the key, I'm creating a new key by prefixing it with the group
@@ -1057,7 +1059,7 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
           iter2 = fileGroups.insert(std::pair<std::string, vtkInfo>(key, info)).first;
         }
 
-        iter2->second.Children[suffixString] = obj;
+        iter2->second.Children[std::make_pair(sequenceIndex, suffixString)] = obj;
 
         iter = info_set.erase(iter);
         continue; // needed to skip the ++iter, since we already incremented.
