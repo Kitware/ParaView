@@ -30,6 +30,8 @@
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsCoreModule.h" //needed for exports
 
+#include <string>
+
 namespace vtksys
 {
 class RegularExpression;
@@ -49,8 +51,24 @@ public:
    */
   bool ParseFileSequence(const char* file);
 
+  /**
+   * Getter to use to get the sequence name after
+   * calling ParseFileSequence
+   */
   vtkGetStringMacro(SequenceName);
+
+  /**
+   * Getter to use to get the sequence index after
+   * calling ParseFileSequence
+   */
   vtkGetMacro(SequenceIndex, int);
+
+  /**
+   * Getter to use to get the sequence index string
+   * after calling ParseFileSequence. It can be usefull
+   * when sequence index is duplicated.
+   */
+  vtkGetMacro(SequenceIndexString, std::string);
 
 protected:
   vtkFileSequenceParser();
@@ -68,6 +86,7 @@ protected:
 
   int SequenceIndex;
   char* SequenceName;
+  std::string SequenceIndexString;
 
 private:
   vtkFileSequenceParser(const vtkFileSequenceParser&) = delete;
