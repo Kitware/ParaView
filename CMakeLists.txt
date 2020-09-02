@@ -408,6 +408,8 @@ else ()
 
   # Forward MPI option to VTK.
   set(VTK_USE_MPI "${PARAVIEW_USE_MPI}")
+  set(VTK_SERIAL_TESTS_USE_MPIEXEC "${PARAVIEW_SERIAL_TESTS_USE_MPIEXEC}")
+
   # Forward CUDA option to VTK
   set(VTK_USE_CUDA "${PARAVIEW_USE_CUDA}")
   # Forward Memkind option to VTK.

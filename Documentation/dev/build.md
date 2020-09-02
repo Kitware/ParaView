@@ -439,6 +439,9 @@ More advanced options:
     with ParaView should be OK though). If unset, the install tree will include
     hints for the location of its dependencies which may include
     build-machine-specific paths in the install tree.
+  * `PARAVIEW_SERIAL_TESTS_USE_MPIEXEC` (default `OFF`): Used on HPC to run
+    serial tests on compute nodes. If set, it prefixes serial tests with
+    "${MPIEXEC_EXECUTABLE}" "${MPIEXEC_NUMPROC_FLAG}" "1" ${MPIEXEC_PREFLAGS}
 
 <!--
 These variables should be documented once they're effective again.

@@ -96,6 +96,9 @@ set(PARAVIEW_USE_EXTERNAL_VTK OFF)
 endif ()
 
 option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
+option(PARAVIEW_SERIAL_TESTS_USE_MPIEXEC
+  "Used on HPC to run serial tests on compute nodes" OFF)
+mark_as_advanced(PARAVIEW_SERIAL_TESTS_USE_MPIEXEC)
 option(PARAVIEW_USE_CUDA "Support CUDA compilation" OFF)
 option(PARAVIEW_USE_VTKM "Enable VTK-m accelerated algorithms" "${PARAVIEW_ENABLE_NONESSENTIAL}")
 if (UNIX AND NOT APPLE)
