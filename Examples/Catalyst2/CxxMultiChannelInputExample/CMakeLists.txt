@@ -7,14 +7,19 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Since this example uses MPI, find and link against it.
+find_package(MPI COMPONENTS C CXX)
+if (NOT MPI_FOUND)
+  message(STATUS
+    "Skipping example: ${CMAKE_PROJECT_NAME} requires MPI.")
+  return ()
+endif ()
+
 #------------------------------------------------------------------------------
 add_executable(CxxMultiChannelInputExampleV2
   FEDataStructures.cxx
   FEDataStructures.h
   FEDriver.cxx)
-
-# Since this example uses MPI, find and link against it.
-find_package(MPI COMPONENTS C CXX REQUIRED)
 target_link_libraries(CxxMultiChannelInputExampleV2
   PRIVATE
     MPI::MPI_C
