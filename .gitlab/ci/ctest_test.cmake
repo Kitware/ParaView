@@ -14,6 +14,14 @@ set(CTEST_TEST_TIMEOUT 100)
 
 set(test_exclusions
 )
+
+if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
+  list(APPEND test_exclusions
+    # Unstructured grid volume rendering (paraview/paraview#19130)
+    "\.MultiBlockVolumeRendering$"
+    "\.UnstructuredVolumeRenderingVectorComponent$")
+endif ()
+
 string(REPLACE ";" "|" test_exclusions "${test_exclusions}")
 if (test_exclusions)
   set(test_exclusions "(${test_exclusions})")
