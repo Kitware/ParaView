@@ -111,11 +111,13 @@
         - cd $GIT_CLONE_PATH/paraview-docs
         - CURRENT_RELEASE=nightly
         - test -n "$CI_COMMIT_TAG" && CURRENT_RELEASE="$CI_COMMIT_TAG"
-        - $LAUNCHER ./scripts/prepare-doc.sh "$GIT_CLONE_PATH" "$GIT_CLONE_PATH/build" "$GIT_CLONE_PATH" "$CURRENT_RELEASE"  &> $GIT_CLONE_PATH/prepare_output.log
+        - $LAUNCHER ./scripts/prepare-doc.sh "$GIT_CLONE_PATH" "$GIT_CLONE_PATH/build" "$GIT_CLONE_PATH" "$CURRENT_RELEASE" &> $GIT_CLONE_PATH/prepare_output.log
 
     variables:
         PARAVIEW_DOCS_REPO: https://github.com/Kitware/paraview-docs.git
         CURRENT_RELEASE: nightly
+        GIT_SSH_COMMAND: ""
+        PARAVIEW_DOC_UPLOAD: "true"
 
     interruptible: true
     timeout: 3 hours
