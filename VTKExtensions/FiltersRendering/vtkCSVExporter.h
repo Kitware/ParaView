@@ -89,6 +89,28 @@ public:
 
   //@{
   /**
+   * Set a formatting to use when writing real numbers
+   * (aka floating-point numbers) to csv.
+   * See the std::fixed doc for more info.
+   * Default is vtkVariant::DEFAULT_FORMATTING
+   */
+  vtkSetMacro(Formatting, int);
+  vtkGetMacro(Formatting, int);
+  //@}
+
+  //@{
+  /**
+   * Set a precision to use when writing real numbers
+   * (aka floating-point numbers) to csv.
+   * See the std::setprecision doc for more info.
+   * Default is 6
+   */
+  vtkSetMacro(Precision, int);
+  vtkGetMacro(Precision, int);
+  //@}
+
+  //@{
+  /**
    * In STREAM_ROWS mode, this API can be used to change columns labels
    * when exporting.
    */
@@ -154,13 +176,16 @@ protected:
   vtkCSVExporter();
   ~vtkCSVExporter() override;
 
-  char* FileName;
-  char* FieldDelimiter;
-  std::ostream* OutputStream;
-  ExporterModes Mode;
+  char* FileName = nullptr;
+  char* FieldDelimiter = nullptr;
+  std::ostream* OutputStream = nullptr;
+  ExporterModes Mode = STREAM_ROWS;
 
-  bool WriteToOutputString;
+  bool WriteToOutputString = false;
   std::string OutputString;
+
+  int Formatting;
+  int Precision = 6;
 
 private:
   vtkCSVExporter(const vtkCSVExporter&) = delete;

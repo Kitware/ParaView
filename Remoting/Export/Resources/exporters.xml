@@ -133,6 +133,28 @@
                             number_of_elements="1">
         <Documentation>Name of the file to be written.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetFormatting"
+                         default_values="0"
+                         name="RealNumberNotation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed"
+                 value="0" />
+          <Entry text="Fixed"
+                 value="1" />
+          <Entry text="Scientific"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>Formatting to use when writing real numbers.
+        'Mixed' will automatically choose the shortest display.
+        See the std::fixed doc for more info.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPrecision"
+                         default_values="6"
+                         name="RealNumberPrecision"
+                         number_of_elements="1">
+        <Documentation>Precision to use when writing real numbers.</Documentation>
+      </IntVectorProperty>
       <Hints>
         <ExporterFactory extensions="csv tsv txt" />
       </Hints>

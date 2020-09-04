@@ -526,6 +526,7 @@ SET (TESTS_WITHOUT_BASELINES
   DelimitedTextReader.xml
   DynamicFieldDataDomain.xml
   ExportFilteredColumnsSpreadsheet.xml
+  ExportSpreadsheetFormatting.xml
   FavoritesFilters.xml
   FindWidget.xml
   LogViewer.xml
