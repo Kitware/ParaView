@@ -1066,6 +1066,27 @@
   <ProxyGroup name="extract_writers">
 
     <!-- ================================================================= -->
+    <DataExtractWriterProxy name="PLY">
+      <Documentation>
+        Extract writer to write polygonal data to the PLY file format.
+      </Documentation>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            default_values="dataset_%.6ts.ply">
+        <Documentation>
+          Specify the filename to use.
+        </Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="Writer" proxygroup="writers" proxyname="PPLYWriter" />
+        <ExposedProperties>
+          <Property name="Input" />
+          <Property name="FileType" />
+        </ExposedProperties>
+      </SubProxy>
+    </DataExtractWriterProxy>
+
+    <!-- ================================================================= -->
     <DataExtractWriterProxy name="VTP">
       <Documentation>
         Extract writer to write polygonal data using the VTK XML file format

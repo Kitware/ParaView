@@ -1,5 +1,6 @@
 <ParaViewExtractWriters>
   <Category name="Data" show_in_toolbar="0" preserve_order="0">
+    <Proxy group="extract_writers" name="PLY" />
     <Proxy group="extract_writers" name="VTP" />
     <Proxy group="extract_writers" name="VTU" />
     <Proxy group="extract_writers" name="HTG" />
