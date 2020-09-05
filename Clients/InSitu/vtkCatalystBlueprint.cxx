@@ -75,6 +75,14 @@ bool verify(const std::string& protocol, const conduit::Node& n)
   {
     vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "no 'scripts' provided.");
   }
+  if (n.has_child("mpi_comm"))
+  {
+    if (!n["mpi_comm"].dtype().is_integer())
+    {
+      vtkLogF(ERROR, "'mpi_comm' must be an integer. Did you forget to use 'MPI_Type_c2f()'?");
+      return false;
+    }
+  }
   return true;
 }
 

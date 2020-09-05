@@ -33,6 +33,12 @@ void vtkPVInitializePythonModules();
 }
 #endif
 
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
+#include "vtkMPI.h"
+#include "vtkMPICommunicator.h"
+#include "vtkMPIController.h"
+#endif
+
 // #include "ParaView_paraview_plugins.h"
 
 class vtkInSituInitializationHelper::vtkInternals
@@ -69,8 +75,26 @@ vtkInSituInitializationHelper::~vtkInSituInitializationHelper()
 }
 
 //----------------------------------------------------------------------------
-void vtkInSituInitializationHelper::Initialize()
+void vtkInSituInitializationHelper::Initialize(vtkTypeUInt64 comm)
 {
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
+  {
+    vtkVLogScopeF(
+      PARAVIEW_LOG_CATALYST_VERBOSITY(), "Initializing MPI communicator using 'comm' (%llu)", comm);
+    // convert comm to MPI handle.
+    MPI_Comm mpicomm = MPI_Comm_f2c(comm);
+    vtkMPICommunicatorOpaqueComm opaqueComm(&mpicomm);
+    vtkNew<vtkMPICommunicator> mpiCommunicator;
+    mpiCommunicator->InitializeExternal(&opaqueComm);
+    vtkNew<vtkMPIController> controller;
+    controller->SetCommunicator(mpiCommunicator);
+    vtkMultiProcessController::SetGlobalController(controller);
+  }
+#else
+  vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(),
+    "ParaView not built with MPI enabled. 'comm' (%llu) is ignored.", comm);
+#endif
+
   if (auto controller = vtkMultiProcessController::GetGlobalController())
   {
     // For in situ, when running in distributed mode, ensure that we don't
