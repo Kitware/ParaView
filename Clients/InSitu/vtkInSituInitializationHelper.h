@@ -58,10 +58,19 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Initializes the engine. This can only be called one in the lifetime of the
+   * Initializes the engine. This can only be called once in the lifetime of the
    * process. Calling this after the first call has no effect.
+   *
+   * 'comm' is used to determine the 'MPI_Comm' handle to be used for ParaView.
+   * In non-MPI builds of ParaView, this argument is simply ignored. In
+   * MPI-enabled builds of ParaView, this argument must be 'MPI_Fint' that
+   * represents the Fortran handle for MPI_Comm to use. The Fortran handle is
+   * an integer and hence we use 'vtkTypeUInt64' as a wide-enough container for
+   * the Fortran handle without having to include 'mpi.h' in this public header.
+   * The Fortran MPI communicator handle can be obtained from a `MPI_Comm` using
+   * `MPI_Comm_c2f()`. Refer to MPI specification for details.
    */
-  static void Initialize();
+  static void Initialize(vtkTypeUInt64 comm);
 
   /**
    * Finalizes the engine. This can be called only once in the lifetime of the

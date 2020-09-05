@@ -55,6 +55,15 @@ target_link_libraries(catalyst
     ParaView::VTKExtensionsConduit
     ParaView::RemotingServerManager)
 
+if (TARGET VTK::ParallelMPI)
+  target_link_libraries(catalyst
+    PRIVATE
+      VTK::ParallelMPI)
+  target_compile_definitions(catalyst
+    PRIVATE
+      VTK_MODULE_ENABLE_VTK_ParallelMPI=1)
+endif()
+
 if (TARGET VTK::WrappingPythonCore AND VTK_PYTHON_OPTIONAL_LINK)
   # if Python is enabled and optionally linking with Python,
   # we need to link against Python non-optionally here.

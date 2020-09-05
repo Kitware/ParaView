@@ -27,6 +27,10 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
+#include "vtkMPI.h"
+#endif
+
 static bool update_producer_mesh_blueprint(
   const std::string& channel_name, const conduit::Node* node)
 {
@@ -70,7 +74,18 @@ void catalyst_initialize(const conduit_node* params)
     return;
   }
 
-  vtkInSituInitializationHelper::Initialize();
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
+  static_assert(sizeof(MPI_Fint) <= sizeof(vtkTypeUInt64),
+    "MPI_Fint size is greater than 64bit! That is not supported.");
+  vtkTypeUInt64 comm = static_cast<vtkTypeUInt64>(MPI_Comm_c2f(MPI_COMM_WORLD));
+  if (cpp_params.has_path("catalyst/mpi_comm"))
+  {
+    comm = cpp_params["catalyst/mpi_comm"].to_int64();
+  }
+#else
+  const vtkTypeUInt64 comm = 0;
+#endif
+  vtkInSituInitializationHelper::Initialize(comm);
 
   if (cpp_params.has_path("catalyst/scripts"))
   {

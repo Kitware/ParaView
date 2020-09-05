@@ -49,7 +49,7 @@ API functions.
 
 
 In each of the Catalyst API calls, ParaView looks for a top-level node named
-'catalyst'. This expected children vary based on the protocol described in the
+'catalyst'. The expected children vary based on the protocol described in the
 following sub-sections.
 
 These top-level protocols use other internal protocols e.g. 'channel'.
@@ -62,6 +62,14 @@ analysis.
 * catalyst/scripts: (optional) if present must either be a 'list' or 'object'
   node with child nodes that provides paths to the Python scripts to load for
   in situ analysis.
+
+In MPI-enabled builds, ParaView is by default initialized to use `MPI_COMM_WORLD`
+as the global communicator. A specific MPI communicator can be provided as
+follows:
+
+* catalyst/mpi\_comm: (optional) if present, must be an integer representing the
+Fortran handle for the MPI communicator to use. The Fortran handle can be
+obtained from `MPI_Comm` using `MPI_Comm_c2f()`.
 
 ### protocol: 'execute'
 
