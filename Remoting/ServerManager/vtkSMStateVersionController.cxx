@@ -826,38 +826,6 @@ struct Process_5_7_to_5_8
   }
 };
 
-//===========================================================================
-struct Process_5_8_to_5_9
-{
-  bool operator()(xml_document& document) { return ConvertExtractBlock(document); }
-
-  /**
-   * Handle "ExtractBlock".
-   */
-  static bool ConvertExtractBlock(xml_document& document)
-  {
-    auto xpath_set = document.select_nodes(
-      "//ServerManagerState/Proxy[@group='filters' and @type='ExtractBlock']");
-    for (auto xpath_node : xpath_set)
-    {
-      auto node = xpath_node.node();
-      if (node.child("MultiplexerSourceProxy"))
-      {
-        // this is a newer version of the filter, do nothing.
-        continue;
-      }
-
-      auto child = node.append_child("MultiplexerSourceProxy");
-      child.append_attribute("selected_group").set_value("filters");
-      child.append_attribute("selected_type").set_value("ExtractBlockUsingIds");
-      auto available = child.append_child("AvailableProxy");
-      available.append_attribute("group").set_value("filters");
-      available.append_attribute("type").set_value("ExtractBlockUsingIds");
-    }
-    return true;
-  }
-};
-
 } // end of namespace
 
 vtkStandardNewMacro(vtkSMStateVersionController);
@@ -960,13 +928,6 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
     Process_5_7_to_5_8 converter;
     status = converter(document);
     version = vtkSMVersion(5, 8, 0);
-  }
-
-  if (status && (version < vtkSMVersion(5, 9, 0)))
-  {
-    Process_5_8_to_5_9 converter;
-    status = converter(document);
-    version = vtkSMVersion(5, 9, 0);
   }
 
   if (status)
