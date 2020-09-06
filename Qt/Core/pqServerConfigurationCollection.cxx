@@ -36,10 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerConfiguration.h"
 #include "pqServerResource.h"
 #include "vtkNew.h"
+#include "vtkPVLogger.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkProcessModule.h"
-#include "vtkProcessModule.h"
+#include "vtkResourceFileLocator.h"
+
+#include <vtksys/SystemTools.hxx>
 
 #include <QApplication>
 #include <QDir>
@@ -78,7 +81,17 @@ static QString systemServers()
 
 static QString defaultServers()
 {
-  return (QApplication::applicationDirPath() + QDir::separator() + "default_servers.pvsc");
+  auto vtk_libs = vtkGetLibraryPathForSymbol(GetVTKVersion);
+  std::vector<std::string> prefixes = { ".", "bin", "lib" };
+
+  vtkNew<vtkResourceFileLocator> locator;
+  locator->SetLogVerbosity(vtkPVLogger::GetApplicationVerbosity());
+  auto path = locator->Locate(vtk_libs, prefixes, "default_servers.pvsc");
+  if (!path.empty())
+  {
+    return vtksys::SystemTools::CollapseFullPath(path).c_str();
+  }
+  return QString();
 }
 }
 
@@ -116,10 +129,13 @@ pqServerConfigurationCollection::~pqServerConfigurationCollection()
 //-----------------------------------------------------------------------------
 bool pqServerConfigurationCollection::load(const QString& filename, bool mutable_configs)
 {
-  QFile file(filename);
-  if (file.open(QIODevice::ReadOnly))
+  if (!filename.isEmpty())
   {
-    return this->loadContents(file.readAll().data(), mutable_configs);
+    QFile file(filename);
+    if (file.open(QIODevice::ReadOnly))
+    {
+      return this->loadContents(file.readAll().data(), mutable_configs);
+    }
   }
   return false;
 }
