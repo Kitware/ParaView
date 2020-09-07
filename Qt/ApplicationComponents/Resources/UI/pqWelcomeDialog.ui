@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Startup Screen</string>
+   <string>Welcome to ParaView</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
