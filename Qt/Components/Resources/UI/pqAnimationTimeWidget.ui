@@ -53,17 +53,24 @@
     </widget>
    </item>
    <item>
-    <widget class="pqLineEdit" name="timeValue">
+    <widget class="pqDoubleLineEdit" name="timeValue">
      <property name="text">
       <string>0</string>
      </property>
      <property name="resetCursorPositionOnEditingFinished" stdset="0">
       <bool>true</bool>
      </property>
+     <property name="useGlobalPrecisionAndNotation" stdset="0">
+      <bool>false</bool>
+     </property>
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="timeValueComboBox"/>
+    <widget class="QComboBox" name="timeValueComboBox">
+     <property name="sizeAdjustPolicy">
+      <enum>QComboBox::AdjustToContents</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QRadioButton" name="radioButtonStep">
@@ -117,9 +124,9 @@
    <header>pqSpinBox.h</header>
   </customwidget>
   <customwidget>
-   <class>pqLineEdit</class>
+   <class>pqDoubleLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>pqLineEdit.h</header>
+   <header>pqDoubleLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

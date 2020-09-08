@@ -68,7 +68,7 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   , GUIFontSize(0)
   , GUIOverrideFont(false)
   , ColorByBlockColorsOnApply(true)
-  , AnimationTimeNotation('g')
+  , AnimationTimeNotation(vtkPVGeneralSettings::MIXED)
 {
   this->SetDefaultViewType("RenderView");
 }
@@ -286,21 +286,4 @@ void vtkPVGeneralSettings::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AnimationGeometryCacheLimit: " << this->AnimationGeometryCacheLimit << "\n";
   os << indent << "PropertiesPanelMode: " << this->PropertiesPanelMode << "\n";
   os << indent << "LockPanels: " << this->LockPanels << "\n";
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeneralSettings::SetAnimationTimeNotation(int notation)
-{
-  switch (notation)
-  {
-    case vtkPVGeneralSettings::SCIENTIFIC:
-      this->SetAnimationTimeNotation('e');
-      break;
-    case vtkPVGeneralSettings::FIXED:
-      this->SetAnimationTimeNotation('f');
-      break;
-    case vtkPVGeneralSettings::MIXED:
-    default:
-      this->SetAnimationTimeNotation('g');
-  }
 }
