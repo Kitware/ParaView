@@ -749,7 +749,7 @@
         </Hints>
       </StringVectorProperty>
       <DoubleVectorProperty command="SetVolumeFractionSurfaceValue"
-                            default_values="0.1"
+                            default_values="0.45"
                             label="Volume Fraction Value"
                             name="VolumeFractionSurfaceValue"
                             number_of_elements="1">
