@@ -1,14 +1,19 @@
 cmake_minimum_required(VERSION 3.13)
 project(CFullExampleV2 LANGUAGES C)
 
+# Since this example uses MPI, find and link against it.
+find_package(MPI COMPONENTS C)
+if (NOT MPI_FOUND)
+  message(STATUS
+    "Skipping example: ${CMAKE_PROJECT_NAME} requires MPI.")
+  return ()
+endif ()
+
 #------------------------------------------------------------------------------
 add_executable(CFullExampleV2
   FEDataStructures.c
   FEDataStructures.h
   FEDriver.c)
-
-# Since this example uses MPI, find and link against it.
-find_package(MPI COMPONENTS C REQUIRED)
 target_link_libraries(CFullExampleV2
   PRIVATE
     MPI::MPI_C)

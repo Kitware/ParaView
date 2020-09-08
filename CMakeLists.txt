@@ -764,7 +764,9 @@ if (BUILD_TESTING AND PARAVIEW_INSTALL_DEVELOPMENT_FILES)
     -P ${CMAKE_CURRENT_SOURCE_DIR}/CMake/ParaViewTestInstall.cmake)
   set_tests_properties(pv.TestDevelopmentInstall PROPERTIES
     LABELS "paraview"
-    ENVIRONMENT "DESTDIR=${CMAKE_BINARY_DIR}/test-install")
+    ENVIRONMENT "DESTDIR=${CMAKE_BINARY_DIR}/test-install"
+    # 10 minutes should be enough time.
+    TIMEOUT 600)
 endif()
 #------------------------------------------------------------------------------
 

@@ -5,8 +5,11 @@ include:
 
     # OS builds.
     - local: .gitlab/os-linux.yml
+    - local: .gitlab/os-macos.yml
 
 stages:
+    - build
+    - test
     - package
 
 ################################################################################
@@ -46,6 +49,24 @@ package:documentation:
         - .linux_builder_tags
         - .doxygen_log_artifacts
         - .run_scheduled
+
+# macOS
+
+build:macos-python-qt:
+    extends:
+        - .macos_python_qt
+        - .cmake_build_macos
+        - .macos_builder_tags
+        - .cmake_build_artifacts
+        - .run_manually
+
+test:macos-python-qt:
+    extends:
+        - .macos_python_qt
+        - .cmake_test_macos
+        - .macos_builder_tags
+        - .cmake_test_artifacts
+        - .run_automatically
 
 # Triggers
 
