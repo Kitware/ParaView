@@ -34,7 +34,8 @@ endif ()
 ctest_test(APPEND
   PARALLEL_LEVEL "${nproc}"
   RETURN_VALUE test_result
-  EXCLUDE "${test_exclusions}")
+  EXCLUDE "${test_exclusions}"
+  REPEAT UNTIL_PASS:3)
 ctest_submit(PARTS Test)
 
 if (test_result)
