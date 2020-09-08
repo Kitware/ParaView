@@ -62,6 +62,10 @@ if (TARGET VTK::ParallelMPI)
   target_compile_definitions(catalyst
     PRIVATE
       VTK_MODULE_ENABLE_VTK_ParallelMPI=1)
+else()
+  target_compile_definitions(catalyst
+    PRIVATE
+      VTK_MODULE_ENABLE_VTK_ParallelMPI=0)
 endif()
 
 if (TARGET VTK::WrappingPythonCore AND VTK_PYTHON_OPTIONAL_LINK)
