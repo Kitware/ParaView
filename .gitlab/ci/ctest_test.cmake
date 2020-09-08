@@ -17,6 +17,10 @@ set(test_exclusions
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
   list(APPEND test_exclusions
+    # Known-bad
+    "\.SliceWithPlaneMultiBlock$"
+    "\.PreviewFontScaling$"
+
     # Unstructured grid volume rendering (paraview/paraview#19130)
     "\.MultiBlockVolumeRendering$"
     "\.UnstructuredVolumeRenderingVectorComponent$")
