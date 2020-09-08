@@ -120,6 +120,14 @@
  * properties with same names between the chosen proxies since we cannot expose
  * a property with same name multiple times.
  *
+ * @section PythonSupport Python Support
+ *
+ * vtkSMMultiplexerSourceProxy currently suffers from lack of Python support.
+ * ParaView's Python infrastructure is not capable of supporting different
+ * instances of the same proxy with different set of properties. Consequently,
+ * do not use this unless you don't need Python support.
+ * See paraview/paraview#20187.
+ *
  * @sa vtkSIMultiplexerSourceProxy, vtkSMMultiplexerInputDomain.
  */
 
