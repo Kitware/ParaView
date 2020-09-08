@@ -2729,6 +2729,27 @@
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty
+          name="MaxFrames"
+          label="Progressive Passes"
+          command="SetMaxFrames"
+          default_values="1"
+          animateable="0"
+          number_of_elements="1">
+        <IntRangeDomain
+            min="1"
+            name="range"/>
+        <Documentation>Set the number of render passes ray tracers take to
+        improve image quality. Note, this requires turning on the
+        'Enable Streaming' setting in Edit->Preferences/Settings.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty
           name="RouletteDepth"
           command="SetRouletteDepth"
           default_values="5"
@@ -2779,27 +2800,6 @@
 	  </PropertyWidgetDecorator>
         </Hints>
       </DoubleVectorProperty>
-      <IntVectorProperty
-          name="MaxFrames"
-          label="Progressive Passes"
-          command="SetMaxFrames"
-          default_values="1"
-          animateable="0"
-          number_of_elements="1">
-        <IntRangeDomain
-            min="1"
-            name="range"/>
-        <Documentation>Set the number of render passes ray tracers take to
-        improve image quality. Has no effect unless ParaView
-        is started with the --enable-streaming option.</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="EnableOSPRay"
-                                   values="1" />
-        </Hints>
-      </IntVectorProperty>
       <IntVectorProperty
           name="Denoise"
           command="SetDenoise"

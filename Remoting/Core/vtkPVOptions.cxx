@@ -253,9 +253,9 @@ void vtkPVOptions::Initialize()
     "When specified, the python script is processed symmetrically on all processes.",
     vtkPVOptions::PVBATCH);
 
-  this->AddBooleanArgument("--enable-streaming", 0, &this->EnableStreaming,
-    "EXPERIMENTAL: When specified, view-based streaming is enabled for certain "
-    "views and representation types.",
+  this->AddDeprecatedArgument("--enable-streaming", 0, "DEPRECATED: Since 5.9, use "
+                                                       "settings/preferences dialog to enable or "
+                                                       "disable view-based streaming.",
     vtkPVOptions::ALLPROCESS);
 
   this->AddBooleanArgument("--enable-satellite-message-ids", "-satellite",
