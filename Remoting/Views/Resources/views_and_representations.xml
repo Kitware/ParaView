@@ -2650,7 +2650,7 @@
           number_of_elements="1">
         <RendererDomain name="list">
         </RendererDomain>
-        <Documentation>Set the OSPRay renderer to use.</Documentation>
+        <Documentation>Selects a specific ray traced rendering engine.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -2737,7 +2737,7 @@
         <IntRangeDomain
             min="0"
             name="range"/>
-        <Documentation>Set the path traced ray recursion depth at which to start Russian roulette termination.</Documentation>
+        <Documentation>Set the path traced recursion depth at which to start Russian roulette termination.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="CompositeDecorator">
@@ -2750,7 +2750,7 @@
                  <Property name="OSPRayRendererType" function="equals" value="OSPRay pathtracer"/>
               </PropertyWidgetDecorator>
             </Expression>
-	  </PropertyWidgetDecorator>
+          </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <DoubleVectorProperty
@@ -2835,7 +2835,7 @@
         <DoubleRangeDomain
             min="0.0"
             name="range"/>
-        <Documentation>Diminish or Amplify all lights in the scene.</Documentation>
+        <Documentation>Diminish or amplify all lights in the scene.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -2883,10 +2883,17 @@
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="EnableOSPRay"
-                                   values="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="contains" value="pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <DoubleVectorProperty
@@ -2899,10 +2906,17 @@
         <Documentation>Sets north pole for gradient and image environmental background in path tracers.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="EnableOSPRay"
-                                   values="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="contains" value="pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty
@@ -2915,10 +2929,17 @@
         <Documentation>Sets east direction for image environmental background in path tracers.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="EnableOSPRay"
-                                   values="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="contains" value="pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetEnvironmentalBG"
@@ -2931,10 +2952,17 @@
                            name="range" />
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="EnableOSPRay"
-                                   values="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="contains" value="pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetEnvironmentalBG2"
@@ -2947,10 +2975,17 @@
                            name="range" />
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="EnableOSPRay"
-                                   values="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="contains" value="pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetGradientEnvironmentalBG"
@@ -2960,10 +2995,17 @@
         <BooleanDomain name="bool" />
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="EnableOSPRay"
-                                   values="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="contains" value="pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetTexturedEnvironmentalBG"
@@ -2973,10 +3015,17 @@
         <BooleanDomain name="bool" />
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="EnableOSPRay"
-                                   values="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="contains" value="pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <ProxyProperty command="SetEnvironmentalBGTexture"
@@ -2987,10 +3036,17 @@
         </ProxyGroupDomain>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="EnableOSPRay"
-                                   values="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="contains" value="pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </ProxyProperty>
       <ProxyProperty
@@ -3088,7 +3144,7 @@
         <Property name="BackgroundEast"/>
         <Property name="BackgroundMode"/>
       </PropertyGroup>
-      <PropertyGroup label="Path Traced Environmental Background" panel_widget="EnvironmentalBGEditor" panel_visibility="default">
+      <PropertyGroup label="Path Traced Environment" panel_widget="EnvironmentalBGEditor" panel_visibility="default">
         <Property name="EnvironmentalBG"/>
         <Property name="EnvironmentalBG2"/>
         <Property name="UseGradientEnvironmentalBG"/>
@@ -3096,10 +3152,17 @@
         <Property name="EnvironmentalBGTexture"/>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="EnableOSPRay"
-                                   values="1" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="EnableOSPRay"
+                                       values="1" />
+              <PropertyWidgetDecorator type="EnableWidgetDecorator">
+                <Property name="OSPRayRendererType" function="equals" value="OSPRay pathtracer"/>
+              </PropertyWidgetDecorator>
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </PropertyGroup>
 
