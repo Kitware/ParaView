@@ -22,8 +22,62 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSaveScreenshotProxy.h"
+#include "vtkVector.h"
 
+#include <algorithm>
 #include <sstream>
+
+namespace
+{
+class ScopedCamera
+{
+  vtkVector3d FocalPoint;
+  vtkVector3d Position;
+  vtkVector3d ViewUp;
+  vtkCamera* Camera;
+
+public:
+  ScopedCamera(vtkCamera* camera)
+    : Camera(camera)
+  {
+    camera->GetFocalPoint(this->FocalPoint.GetData());
+    camera->GetPosition(this->Position.GetData());
+    camera->GetViewUp(this->ViewUp.GetData());
+  }
+
+  ~ScopedCamera() { this->CopyTo(this->Camera); }
+
+  void Restore() { this->CopyTo(this->Camera); }
+  void CopyTo(vtkCamera* camera)
+  {
+    camera->SetFocalPoint(this->FocalPoint.GetData());
+    camera->SetPosition(this->Position.GetData());
+    camera->SetViewUp(this->ViewUp.GetData());
+  }
+};
+
+class ScopedViewTime
+{
+  double Time;
+  vtkSMProxy* View;
+
+public:
+  ScopedViewTime(vtkSMProxy* view, double newTime)
+    : View(view)
+  {
+    vtkSMPropertyHelper helper(this->View, "ViewTime");
+    this->Time = helper.GetAsDouble();
+    helper.Set(newTime);
+    this->View->UpdateVTKObjects();
+  }
+
+  ~ScopedViewTime()
+  {
+    vtkSMPropertyHelper(this->View, "ViewTime").Set(this->Time);
+    this->View->UpdateVTKObjects();
+  }
+};
+}
 
 vtkStandardNewMacro(vtkSMImageExtractWriterProxy);
 //----------------------------------------------------------------------------
@@ -100,7 +154,6 @@ bool vtkSMImageExtractWriterProxy::Write(vtkSMExtractsController* extractor)
     return false;
   }
 
-  double old_time = VTK_DOUBLE_MAX;
   auto view = vtkSMViewProxy::SafeDownCast(vtkSMPropertyHelper(writer, "View").GetAsProxy());
   if (!view)
   {
@@ -108,10 +161,7 @@ bool vtkSMImageExtractWriterProxy::Write(vtkSMExtractsController* extractor)
     return false;
   }
 
-  vtkSMPropertyHelper helper(view, "ViewTime");
-  old_time = helper.GetAsDouble();
-  helper.Set(extractor->GetTime());
-  view->UpdateVTKObjects();
+  const ScopedViewTime viewState(view, extractor->GetTime());
 
   if (vtkSMPropertyHelper(this, "ResetDisplay").GetAsInt() == 1)
   {
@@ -153,24 +203,22 @@ bool vtkSMImageExtractWriterProxy::Write(vtkSMExtractsController* extractor)
       return false;
     }
 
-    for (int phi = 0; phi <= 360; phi += 360 / phi_resolution)
+    auto camera = rv->GetActiveCamera();
+    ScopedCamera cameraState(camera);
+
+    for (double phi = 0; phi < 360; phi += 360.0 / phi_resolution)
     {
-      auto camera = rv->GetActiveCamera();
-      camera->Azimuth(phi_resolution);
-      camera->OrthogonalizeViewUp();
-      for (int theta = 0; theta <= 360; theta += 360 / theta_resolution)
+      cameraState.Restore();
+      camera->Azimuth(phi);
+      for (double theta = 0; theta < 360; theta += 360.0 / theta_resolution)
       {
-        camera->Elevation(theta_resolution);
+        const double elevation = theta > 0.0 ? (360.0 / theta_resolution) : 0.0;
+        camera->Elevation(elevation);
         camera->OrthogonalizeViewUp();
-        if (phi == 360 || theta == 360)
-        {
-          // no need to write this image since it's same as the one with phi=0
-          // or theta=0.
-          continue;
-        }
-        std::ostringstream str;
-        str << "p=" << phi << "t=" << theta;
-        auto convertedname = this->GenerateImageExtractsFileName(fname, str.str(), extractor);
+
+        char buffer[128];
+        std::snprintf(buffer, 128, "p=%06.2ft=%06.2f", phi, theta);
+        auto convertedname = this->GenerateImageExtractsFileName(fname, buffer, extractor);
         const bool status =
           writer->WriteImage(convertedname.c_str(), vtkPVSession::DATA_SERVER_ROOT);
         if (status)
@@ -181,34 +229,19 @@ bool vtkSMImageExtractWriterProxy::Write(vtkSMExtractsController* extractor)
           params.insert({ "theta", std::to_string(theta) });
           extractor->AddSummaryEntry(this, convertedname, params);
         }
-        if (!status)
+        else
         {
-          if (old_time != VTK_DOUBLE_MAX && view != nullptr)
-          {
-            vtkSMPropertyHelper(view, "ViewTime").Set(old_time);
-            view->UpdateVTKObjects();
-          }
           return false;
         }
       }
     }
-    if (old_time != VTK_DOUBLE_MAX && view != nullptr)
-    {
-      vtkSMPropertyHelper(view, "ViewTime").Set(old_time);
-      view->UpdateVTKObjects();
-    }
+
     return true;
   }
   else
   {
     auto convertedname = this->GenerateImageExtractsFileName(fname, extractor);
     const bool status = writer->WriteImage(convertedname.c_str(), vtkPVSession::DATA_SERVER_ROOT);
-    if (old_time != VTK_DOUBLE_MAX && view != nullptr)
-    {
-      vtkSMPropertyHelper(view, "ViewTime").Set(old_time);
-      view->UpdateVTKObjects();
-    }
-
     if (status)
     {
       // add to summary
