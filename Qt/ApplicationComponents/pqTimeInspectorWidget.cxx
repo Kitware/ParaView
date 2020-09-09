@@ -630,10 +630,30 @@ void pqTimeInspectorWidget::handleProxyNameChanged(pqServerManagerModelItem* ite
 //-----------------------------------------------------------------------------
 void pqTimeInspectorWidget::generalSettingsChanged()
 {
-  int timePrecision = vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision();
-  this->Internals->Ui.AnimationTimeWidget->setTimePrecision(timePrecision);
+  const int timePrecision = vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision();
+  this->Internals->Ui.AnimationTimeWidget->setPrecision(timePrecision);
   this->Internals->Ui.AnimationWidget->animationModel()->setTimePrecision(timePrecision);
-  char timeNotation = vtkPVGeneralSettings::GetInstance()->GetAnimationTimeNotation();
-  this->Internals->Ui.AnimationTimeWidget->setTimeNotation(timeNotation);
-  this->Internals->Ui.AnimationWidget->animationModel()->setTimeNotation(timeNotation);
+
+  const int timeNotation = vtkPVGeneralSettings::GetInstance()->GetAnimationTimeNotation();
+  this->Internals->Ui.AnimationTimeWidget->setNotation(
+    static_cast<pqAnimationTimeWidget::RealNumberNotation>(timeNotation));
+
+  QChar cnotation;
+  switch (timeNotation)
+  {
+    case vtkPVGeneralSettings::FIXED:
+      cnotation = 'f';
+      break;
+
+    case vtkPVGeneralSettings::SCIENTIFIC:
+      cnotation = 'e';
+      break;
+
+    case vtkPVGeneralSettings::MIXED:
+    default:
+      cnotation = 'g';
+      break;
+  }
+
+  this->Internals->Ui.AnimationWidget->animationModel()->setTimeNotation(cnotation);
 }

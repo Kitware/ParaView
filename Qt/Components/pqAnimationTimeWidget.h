@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqAnimationTimeWidget_h
 
 #include "pqComponentsModule.h"
+#include "pqDoubleLineEdit.h" // for pqDoubleLineEdit::RealNumberNotation.
+#include "vtkLegacy.h"        // for VTK_LEGACY
 
 #include <QList>
 #include <QScopedPointer>
@@ -58,9 +60,9 @@ class vtkSMProxy;
 class PQCOMPONENTS_EXPORT pqAnimationTimeWidget : public QWidget
 {
   Q_OBJECT
+  Q_ENUMS(RealNumberNotation)
   Q_PROPERTY(double timeValue READ timeValue WRITE setTimeValue NOTIFY timeValueChanged)
-  Q_PROPERTY(int timeStepCount READ timeStepCount WRITE setTimeStepCount)
-  Q_PROPERTY(QString playMode READ playMode WRITE setPlayMode)
+  Q_PROPERTY(QString playMode READ playMode WRITE setPlayMode NOTIFY playModeChanged)
   Q_PROPERTY(bool playModeReadOnly READ playModeReadOnly WRITE setPlayModeReadOnly)
   Q_PROPERTY(QString timeLabel READ timeLabel WRITE setTimeLabel)
   Q_PROPERTY(QList<QVariant> timestepValues READ timestepValues WRITE setTimestepValues)
@@ -71,57 +73,87 @@ public:
   pqAnimationTimeWidget(QWidget* parent = 0);
   ~pqAnimationTimeWidget() override;
 
+  using RealNumberNotation = pqDoubleLineEdit::RealNumberNotation;
+
   /**
   * Provides access to the animation scene proxy currently
   * controlled/reflected by this widget.
   */
   vtkSMProxy* animationScene() const;
 
+  //@{
+  /**
+   * Get/Set the list of timestep. `QList<QVariant>` is a list of variants
+   * convertible to double.
+   */
   void setTimestepValues(const QList<QVariant>& list);
-  QList<QVariant> timestepValues();
+  const QList<QVariant>& timestepValues() const;
+  //@}
 
+  //@{
   /**
   * Get/set the current time value.
   */
   void setTimeValue(double time);
   double timeValue() const;
+  //@}
 
   /**
-  * Get/set the precision with which time is reported.
-  */
-  void setTimePrecision(int val);
-  int timePrecision() const;
-
-  /**
-   * Get/set the precision with which time is reported.
+   * Return the notation used to display the number.
+   * \sa setNotation()
    */
-  void setTimeNotation(const QChar& val);
-  QChar timeNotation() const;
+  RealNumberNotation notation() const;
 
   /**
-  * Get/set the number of timesteps.
-  */
-  void setTimeStepCount(int count);
-  int timeStepCount() const;
+   * Return the precision used to display the number.
+   * \sa setPrecision()
+   */
+  int precision() const;
 
+  //@{
   /**
-  * Get/set the playmode.
+  * Get/set the animation playback mode.
   */
   void setPlayMode(const QString& mode);
   QString playMode() const;
+  //@}
 
+  //@{
   /**
   * Get/set whether the user should be able to change the animation
   * play mode using this widget.
   */
   void setPlayModeReadOnly(bool val);
   bool playModeReadOnly() const;
+  //@}
 
+  //@{
   /**
   * Get/set the label text to use for the "time" parameter.
   */
   void setTimeLabel(const QString& val);
   QString timeLabel() const;
+  //@}
+
+  //@{
+  /**
+   * @deprecated ParaView 5.9. Use `setPrecision`  and `setNotation` instead.
+   */
+  VTK_LEGACY(void setTimePrecision(int));
+  VTK_LEGACY(int timePrecision() const);
+  VTK_LEGACY(void setTimeNotation(const QChar& val));
+  VTK_LEGACY(QChar timeNotation() const);
+  //@}
+
+  //@{
+  /**
+   * @deprecated ParaVIew 5.9. No longer used. Use `setTimestepValues` instead
+   * to provide the timesteps explicitly.
+   */
+  VTK_LEGACY(void setTimeStepCount(int count));
+  VTK_LEGACY(int timeStepCount() const);
+  //@}
+
 Q_SIGNALS:
   void timeValueChanged();
   void playModeChanged();
@@ -134,47 +166,20 @@ public Q_SLOTS:
   */
   void setAnimationScene(vtkSMProxy* animationScene);
 
-protected:
   /**
-   * Format a double with the requested notation and precision.
+   * Set the notation used to display the number.
+   * \sa notation()
    */
-  QString formatDouble(double value);
-
-private Q_SLOTS:
-  void updateTimestepCountLabelVisibility();
+  void setNotation(RealNumberNotation _notation);
 
   /**
-  * called when the user changes the timestepValues spinbox manually
-  * to change the current timestep. We will update the current time and
-  * result in triggering  timeValueChanged() if time indeed changed.
-  */
-  void timeSpinBoxChanged();
-
-  /**
-   * called when user changes the time value in the line edit.
-   * we update the internal "full precision" time value and fire
-   * `timeValueChanged`.
+   * Set the precision used to display the number.
+   * \sa precision()
    */
-  void timeLineEditChanged();
-
-  /**
-   * called when user changes the time value in the combobox.
-   * we update the internal "full precision" time value and fire
-   * `timeValueChanged`.
-   */
-  void timeComboBoxChanged();
-
-  /**
-   * called when user toggles the radio button.
-   * we switch playmode and fire `playModeChanged`
-   */
-  void timeRadioButtonToggled();
+  void setPrecision(int precision);
 
 private:
   Q_DISABLE_COPY(pqAnimationTimeWidget)
-
-  // Returns the current timekeeper.
-  vtkSMProxy* timeKeeper() const;
 
   class pqInternals;
   QScopedPointer<pqInternals> Internals;

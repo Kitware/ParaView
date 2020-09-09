@@ -170,10 +170,10 @@ public:
   //@{
   /**
    * Set the notation for the animation time toolbar.
+   * Accepted values are MIXED, SCIENTIFIC, and FIXED.
    */
-  void SetAnimationTimeNotation(int notation);
-  vtkSetMacro(AnimationTimeNotation, char);
-  vtkGetMacro(AnimationTimeNotation, char);
+  vtkSetMacro(AnimationTimeNotation, int);
+  vtkGetMacro(AnimationTimeNotation, int);
   //@}
 
   //@{
@@ -324,7 +324,7 @@ protected:
   bool GUIOverrideFont;
   int ConsoleFontSize;
   bool ColorByBlockColorsOnApply;
-  char AnimationTimeNotation;
+  int AnimationTimeNotation;
 
 private:
   vtkPVGeneralSettings(const vtkPVGeneralSettings&) = delete;
