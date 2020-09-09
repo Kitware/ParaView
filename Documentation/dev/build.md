@@ -87,14 +87,17 @@ Double click on the paraview executable in the bin directory or run in the previ
 
 ### Windows
 
+Note: the following steps concerning Visual Studio 2015 can also be applied to Visual Studio 2019.
+If so, beware to use the msvc2019_64 Qt Version and the Developer Command Prompt for VS 2019.
+
 #### Dependencies
  * Download and install [git bash for windows][gitforwindows]
  * Download and install [cmake][cmake-download]
  * Download and install [Visual Studio 2015 Community Edition][visual-studio]
  * Download [ninja-build][ninja] and drop `ninja.exe` in `C:\Windows\`
  * Download and install both `msmpisetup.exe` and `msmpisdk.msi` from [Microsoft MPI][msmpi]
- * Download and install [Python for windows][pythonwindows]
- * Download and install [Qt 5.12.3][qt-download-5.12.3] for winfows, make sure to check the MSVC 2015 64-bit component during installation, make sure to add `C:\Qt\Qt5.12.3\5.12.3\msvc2015_64\bin` to your `PATH` environnement variable.
+ * Download and install [Python for windows][pythonwindows], make sure to add the path to your Python installation folder to the `PATH` environnement variable.
+ * Download and install [Qt 5.12.3][qt-download-5.12.3] for windows, make sure to check the MSVC 2015 64-bit component during installation, make sure to add `C:\Qt\Qt5.12.3\5.12.3\msvc2015_64\bin` to your `PATH` environnement variable.
 
 #### Recover the source
  * Open git bash
