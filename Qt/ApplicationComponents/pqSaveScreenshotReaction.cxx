@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
+#include "pqEventDispatcher.h"
 #include "pqFileDialog.h"
 #include "pqImageUtil.h"
 #include "pqProxyWidgetDialog.h"
@@ -190,6 +191,8 @@ void pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
       vtkVector2i layoutSize = layout->GetSize();
       previewHelper.Set(layoutSize.GetData(), 2);
       restorePreviewMode = true;
+      // essential to give the UI a change to update after the preview change.
+      pqEventDispatcher::processEvents();
     }
     else
     {

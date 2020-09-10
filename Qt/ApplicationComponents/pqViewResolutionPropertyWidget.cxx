@@ -92,11 +92,17 @@ pqViewResolutionPropertyWidget::pqViewResolutionPropertyWidget(
   this->connect(ui.reset, SIGNAL(clicked()), SLOT(resetButtonClicked()));
   ui.reset->connect(this, SIGNAL(highlightResetButton()), SLOT(highlight()));
   ui.reset->connect(this, SIGNAL(clearHighlight()), SLOT(clear()));
-
-  pqCoreUtilities::connect(
-    smproperty, vtkCommand::DomainModifiedEvent, this, SLOT(resetButtonClicked()));
   pqCoreUtilities::connect(
     smproperty, vtkCommand::UncheckedPropertyModifiedEvent, this, SIGNAL(highlightResetButton()));
+
+  // a little bit of a hack: whenever the 'SaveAllViews' property is toggled, we
+  // need to ensure that the size show in the UI is updated (see #14958).
+  // For that, we explicitly observe the property and do the needful.
+  if (auto saveAllViews = smproxy->GetProperty("SaveAllViews"))
+  {
+    pqCoreUtilities::connect(
+      saveAllViews, vtkCommand::UncheckedPropertyModifiedEvent, this, SLOT(resetButtonClicked()));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -109,7 +115,7 @@ void pqViewResolutionPropertyWidget::resetButtonClicked()
 {
   if (vtkSMProperty* smproperty = this->property())
   {
-    smproperty->ResetToDomainDefaults(/*use_unchecked_values*/ false);
+    smproperty->ResetToDomainDefaults(/*use_unchecked_values*/ true);
     Q_EMIT this->changeAvailable();
     Q_EMIT this->changeFinished();
     this->Internals->resetAspect();
