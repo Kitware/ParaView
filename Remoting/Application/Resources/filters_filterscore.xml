@@ -2085,6 +2085,8 @@ found and the point will be rejected.</Documentation>
                  value="2" />
           <Entry text="By Absolute Scalar"
                  value="3" />
+          <Entry text="By Vector Norm"
+                 value="4" />
         </EnumerationDomain>
         <Documentation>The property determines whether/how to vary the radius
         of the tube. If varying by scalar (1), the tube radius is based on the
