@@ -159,8 +159,7 @@
         <file>Icons/pqSettings.svg</file>
         <file>Icons/pqShadow24.png</file>
         <file>Icons/pqShowCenterAxes.svg</file>
-        <file>Icons/pqShowOrientationAxes.png</file>
-        <file>Icons/pqShowOrientationAxes@2x.png</file>
+        <file>Icons/pqShowOrientationAxes.svg</file>
         <file>Icons/pqSideSetData.svg</file>
         <file>Icons/pqSinusoidal24.png</file>
         <file>Icons/pqSlice.svg</file>
