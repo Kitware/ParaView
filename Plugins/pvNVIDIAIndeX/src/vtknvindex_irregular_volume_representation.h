@@ -1,29 +1,29 @@
 /* Copyright 2020 NVIDIA Corporation. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions
-* are met:
-*  * Redistributions of source code must retain the above copyright
-*    notice, this list of conditions and the following disclaimer.
-*  * Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the
-*    documentation and/or other materials provided with the distribution.
-*  * Neither the name of NVIDIA CORPORATION nor the names of its
-*    contributors may be used to endorse or promote products derived
-*    from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-* PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-* OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *  * Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *  * Neither the name of NVIDIA CORPORATION nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #ifndef vtknvindex_irregular_volume_representation_h
 #define vtknvindex_irregular_volume_representation_h
@@ -54,7 +54,6 @@ class vtkUnstructuredGridVolumeMapper;
 class vtkVolumeProperty;
 class vtkVolumeRepresentationPreprocessor;
 
-class vtknvindex_affinity;
 class vtknvindex_config_settings;
 class vtknvindex_cluster_properties;
 class vtknvindex_irregular_volume_mapper;
@@ -143,12 +142,6 @@ public:
 
   // Set subcube border size.
   void set_subcube_border(int border);
-
-  // Set filtering mode.
-  void set_filter_mode(int filter_mode);
-
-  // Set pre-integration mode.
-  void set_preintegration(bool enable_preint);
 
   // Set dump internal state of NVIDIA IndeX.
   void set_dump_internal_state(bool is_dump);
@@ -271,6 +264,10 @@ private:
     m_cluster_properties; // Cluster wide properties, refer class documentation.
   mi::math::Bbox_struct<mi::Float32, 3> m_roi_gui;    // Region of interest set in the GUI.
   mi::math::Bbox<mi::Float32, 3> m_volume_dimensions; // Cached volume dimensions
+
+  // backup of original Image Reduction Factors
+  mi::Sint32 m_still_image_reduction_factor;
+  mi::Sint32 m_interactive_image_reduction_factor;
 
   mi::Float32 m_prev_time_step;
 

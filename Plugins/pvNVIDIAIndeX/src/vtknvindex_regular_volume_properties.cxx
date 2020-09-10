@@ -42,6 +42,7 @@ vtknvindex_regular_volume_properties::vtknvindex_regular_volume_properties()
   , m_time_steps_written(0)
   , m_nb_time_steps(1)
   , m_current_time_step(0)
+  , m_ghost_levels(0)
 
 {
   m_volume_translation = mi::math::Vector<mi::Float32, 3>(0.f);
@@ -192,6 +193,18 @@ void vtknvindex_regular_volume_properties::get_ivol_volume_extents(
 }
 
 // ------------------------------------------------------------------------------------------------
+void vtknvindex_regular_volume_properties::set_ghost_levels(mi::Sint32 ghost_levels)
+{
+  m_ghost_levels = ghost_levels;
+}
+
+// ------------------------------------------------------------------------------------------------
+mi::Sint32 vtknvindex_regular_volume_properties::get_ghost_levels() const
+{
+  return m_ghost_levels;
+}
+
+// ------------------------------------------------------------------------------------------------
 void vtknvindex_regular_volume_properties::set_volume_translation(
   mi::math::Vector<mi::Float32, 3> translation)
 {
@@ -250,8 +263,8 @@ void vtknvindex_regular_volume_properties::transform_zyx_to_xyz(
 
 //----------------------------------------------------------------------------
 bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* scalar_array,
-  mi::Sint32* bounds, // vtkImageData*              current_piece,
-  vtknvindex_host_properties* host_properties, mi::Uint32 current_timestep, bool use_shared_mem)
+  mi::Sint32* bounds, vtknvindex_host_properties* host_properties, mi::Uint32 current_timestep,
+  bool use_shared_mem)
 {
   if (!host_properties)
   {
@@ -268,7 +281,6 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* sca
 
   vtknvindex_host_properties::shm_info* shm_info =
     host_properties->get_shminfo(current_bbox, current_timestep);
-
   if (!shm_info)
   {
     ERROR_LOG << "Failed to get shared memory in "
@@ -285,45 +297,38 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* sca
 
   if (use_shared_mem)
   {
-    void* shm_ptr = NULL;
-
-    if (m_scalar_type == "unsigned char")
-    {
-      shm_ptr = vtknvindex::util::get_vol_shm<mi::Uint8>(shm_info->m_shm_name, shm_info->m_size);
-    }
-    else if (m_scalar_type == "unsigned short")
-    {
-      shm_ptr = vtknvindex::util::get_vol_shm<mi::Uint16>(shm_info->m_shm_name, shm_info->m_size);
-    }
-    else if (m_scalar_type == "char")
-    {
-      shm_ptr = vtknvindex::util::get_vol_shm<mi::Sint8>(shm_info->m_shm_name, shm_info->m_size);
-    }
-    else if (m_scalar_type == "short")
-    {
-      shm_ptr = vtknvindex::util::get_vol_shm<mi::Sint16>(shm_info->m_shm_name, shm_info->m_size);
-    }
-    else if (m_scalar_type == "float")
-    {
-      shm_ptr = vtknvindex::util::get_vol_shm<mi::Float32>(shm_info->m_shm_name, shm_info->m_size);
-    }
-    else if (m_scalar_type == "double")
-    {
-      shm_ptr = vtknvindex::util::get_vol_shm<mi::Float64>(shm_info->m_shm_name, shm_info->m_size);
-    }
-    else
+    if (shm_info->m_size == 0)
     {
       return false;
     }
 
-    if (shm_ptr == NULL)
+    mi::Uint8* shm_ptr = vtknvindex::util::get_vol_shm(shm_info->m_shm_name, shm_info->m_size);
+    if (!shm_ptr)
     {
       ERROR_LOG << "Error retrieving shared memory pointer in "
                 << "vtknvindex_regular_volume_properties::write_shared_memory.";
       return false;
     }
 
-    memcpy(shm_ptr, scalar_array->GetVoidPointer(0), shm_info->m_size);
+    const std::string scalar_type = scalar_array->GetDataTypeAsString();
+    if (scalar_type == "double")
+    {
+      // Convert double to float data.
+      // shm_ptr and m_size were already set up for float data.
+      const mi::Size nb_voxels = shm_info->m_size / sizeof(mi::Float32);
+
+      const mi::Float64* src =
+        reinterpret_cast<const mi::Float64*>(scalar_array->GetVoidPointer(0));
+      mi::Float32* dst = reinterpret_cast<mi::Float32*>(shm_ptr);
+      for (mi::Size i = 0; i < nb_voxels; ++i)
+      {
+        dst[i] = static_cast<mi::Float32>(src[i]);
+      }
+    }
+    else
+    {
+      memcpy(shm_ptr, scalar_array->GetVoidPointer(0), shm_info->m_size);
+    }
 
     // free memory space linked to shared memory
     vtknvindex::util::unmap_shm(shm_ptr, shm_info->m_size);
@@ -335,8 +340,16 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* sca
 
   m_time_steps_written++;
 
-  INFO_LOG << "Done writing bounding box: " << current_bbox
-           << " into shared memory: " << shm_info->m_shm_name << ".";
+  if (use_shared_mem)
+  {
+    INFO_LOG << "Done writing bounding box " << current_bbox
+             << " into shared memory: " << shm_info->m_shm_name << ".";
+  }
+  else
+  {
+    INFO_LOG << "Bounding box " << current_bbox
+             << " is available in local memory: " << shm_info->m_shm_name << ".";
+  }
 
   return true;
 }
@@ -374,32 +387,14 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(
   }
 
   // check scalar type
-  size_t scalar_size = 0;
-
-  if (m_scalar_type == "char" || m_scalar_type == "unsigned char")
-  {
-    scalar_size = sizeof(mi::Uint8);
-  }
-  else if (m_scalar_type == "short" || m_scalar_type == "unsigned short")
-  {
-    scalar_size = sizeof(mi::Uint16);
-  }
-  else if (m_scalar_type == "float")
-  {
-    scalar_size = sizeof(mi::Float32);
-  }
-  else if (m_scalar_type == "double")
-  {
-    scalar_size = sizeof(mi::Float64);
-  }
-  else
+  const mi::Size scalar_size = get_scalar_size(m_scalar_type);
+  if (scalar_size == 0)
   {
     return false;
   }
 
-  mi::Uint8* shm_ptr = NULL;
-  shm_ptr = vtknvindex::util::get_vol_shm<mi::Uint8>(shm_memory_name, shm_size);
-  if (shm_ptr == NULL)
+  mi::Uint8* shm_ptr = vtknvindex::util::get_vol_shm(shm_memory_name, shm_size);
+  if (!shm_ptr)
   {
     ERROR_LOG << "Encountered an error when retrieving a shred memory pointer in "
               << "vtknvindex_regular_volume_properties::write_shared_memory.";
@@ -421,65 +416,69 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(
   memcpy(shm_offset, &ivol_data->num_cells, size_elm);
   shm_offset += size_elm;
 
+  // num scalars
+  size_elm = sizeof(ivol_data->num_scalars);
+  memcpy(shm_offset, &ivol_data->num_scalars, size_elm);
+  shm_offset += size_elm;
+
+  // cell flag
+  size_elm = sizeof(ivol_data->cell_flag);
+  memcpy(shm_offset, &ivol_data->cell_flag, size_elm);
+  shm_offset += size_elm;
+
   // points
   size_elm = sizeof(mi::Float32) * 3;
 
   for (vtkIdType i = 0; i < ivol_data->num_points; ++i)
   {
-    mi::Float64 point_pv[3];
-    ugrid->GetPoint(i, point_pv);
-
-    mi::Float32 point_index[3] = { static_cast<mi::Float32>(point_pv[0]),
-      static_cast<mi::Float32>(point_pv[1]), static_cast<mi::Float32>(point_pv[2]) };
-
-    memcpy(shm_offset, point_index, size_elm);
+    mi::math::Vector<mi::Float64, 3> point_pv;
+    ugrid->GetPoint(i, point_pv.begin());
+    const mi::math::Vector<mi::Float32, 3> point_index(point_pv);
+    memcpy(shm_offset, &point_index, size_elm);
     shm_offset += size_elm;
   }
 
   // cells
   size_elm = sizeof(mi::Uint32) * 4;
 
+  const bool per_cell_scalars = (ivol_data->cell_flag == 1);
+  mi::Uint8* shm_scalar_offset = shm_offset + ivol_data->num_cells * size_elm;
+
   vtkSmartPointer<vtkCellIterator> cellIter =
     vtkSmartPointer<vtkCellIterator>::Take(ugrid->NewCellIterator());
   for (cellIter->InitTraversal(); !cellIter->IsDoneWithTraversal(); cellIter->GoToNextCell())
   {
-    vtkIdType npts = cellIter->GetNumberOfPoints();
+    const vtkIdType npts = cellIter->GetNumberOfPoints();
     if (npts != 4)
       continue;
 
-    vtkIdType* cell_point_ids = cellIter->GetPointIds()->GetPointer(0);
+    const vtkIdType* cell_point_ids = cellIter->GetPointIds()->GetPointer(0);
 
-    // check for degenerated cells
-    bool invalid_cell = false;
-    for (mi::Uint32 i = 0; i < 3; i++)
-    {
-      for (mi::Uint32 j = i + 1; j < 4; j++)
-      {
-        if (cell_point_ids[i] == cell_point_ids[j])
-        {
-          invalid_cell = true;
-          break;
-        }
-      }
-
-      if (invalid_cell)
-        break;
-    }
-
-    if (invalid_cell)
-      continue;
-
-    mi::Uint32 cur_cell_index[4] = { static_cast<mi::Uint32>(cell_point_ids[0]),
+    const mi::Uint32 cur_cell_index[4] = { static_cast<mi::Uint32>(cell_point_ids[0]),
       static_cast<mi::Uint32>(cell_point_ids[1]), static_cast<mi::Uint32>(cell_point_ids[2]),
       static_cast<mi::Uint32>(cell_point_ids[3]) };
 
     memcpy(shm_offset, cur_cell_index, size_elm);
     shm_offset += size_elm;
+
+    if (per_cell_scalars)
+    {
+      // copy per-cell scalars
+      const vtkIdType cell_id = cellIter->GetCellId();
+      memcpy(shm_scalar_offset,
+        &reinterpret_cast<const mi::Uint8*>(ivol_data->scalars)[cell_id * scalar_size],
+        scalar_size);
+      shm_scalar_offset += scalar_size;
+    }
   }
 
   // scalars
-  size_elm = scalar_size * ivol_data->num_points;
-  memcpy(shm_offset, ivol_data->scalars, size_elm);
+  size_elm = scalar_size * ivol_data->num_scalars;
+  if (!per_cell_scalars)
+  {
+    // copy per-point scalars here (any per-cell scalars were already copied in the loop above)
+    memcpy(shm_offset, ivol_data->scalars, size_elm);
+  }
   shm_offset += size_elm;
 
   // max edge length
@@ -517,27 +516,17 @@ void vtknvindex_regular_volume_properties::print_info() const
 }
 
 // ------------------------------------------------------------------------------------------------
-const char* vtknvindex_regular_volume_properties::get_class_name() const
-{
-  return "vtknvindex_regular_volume_properties";
-}
-
-// ------------------------------------------------------------------------------------------------
-mi::base::Uuid vtknvindex_regular_volume_properties::get_class_id() const
-{
-  return IID();
-}
-
-// ------------------------------------------------------------------------------------------------
 void vtknvindex_regular_volume_properties::serialize(mi::neuraylib::ISerializer* serializer) const
 {
   // Serialize scalar type string.
   mi::Uint32 scalar_typename_size = mi::Uint32(m_scalar_type.size());
-  serializer->write(&scalar_typename_size, 1);
+  serializer->write(&scalar_typename_size);
   serializer->write(
     reinterpret_cast<const mi::Uint8*>(m_scalar_type.c_str()), scalar_typename_size);
 
   serializer->write(&m_voxel_range.x, 2);
+
+  serializer->write(&m_ghost_levels);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -545,9 +534,36 @@ void vtknvindex_regular_volume_properties::deserialize(mi::neuraylib::IDeseriali
 {
   // Deserialize scalar type string.
   mi::Uint32 scalar_typename_size = 0;
-  deserializer->read(&scalar_typename_size, 1);
+  deserializer->read(&scalar_typename_size);
   m_scalar_type.resize(scalar_typename_size);
   deserializer->read(reinterpret_cast<mi::Uint8*>(&m_scalar_type[0]), scalar_typename_size);
 
   deserializer->read(&m_voxel_range.x, 2);
+
+  deserializer->read(&m_ghost_levels);
+}
+
+// ------------------------------------------------------------------------------------------------
+mi::Size vtknvindex_regular_volume_properties::get_scalar_size(const std::string& scalar_type)
+{
+  mi::Size scalar_size = 0;
+
+  if (scalar_type == "char" || scalar_type == "unsigned char")
+  {
+    scalar_size = sizeof(mi::Uint8);
+  }
+  else if (scalar_type == "short" || scalar_type == "unsigned short")
+  {
+    scalar_size = sizeof(mi::Uint16);
+  }
+  else if (scalar_type == "float")
+  {
+    scalar_size = sizeof(mi::Float32);
+  }
+  else if (scalar_type == "double")
+  {
+    scalar_size = sizeof(mi::Float64);
+  }
+
+  return scalar_size;
 }

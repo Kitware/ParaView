@@ -192,15 +192,15 @@
                 number_of_elements="1"
                 default_values="1">
                 <EnumerationDomain name="enum">
+                    <!-- These entry numbers are mapped in vtknvindex_representation::set_filter_mode().
+                         Note that the values don't directly match IndeX filter modes (any more). Keep them
+                         the same for backward-compatibility. -->
                     <Entry value="0" text="Nearest"/>
                     <Entry value="1" text="Trilinear"/>
                     <Entry value="5" text="Tricubic Catmull"/>
                     <Entry value="7" text="Tricubic Bspline"/>
                 </EnumerationDomain>
-                <Documentation> Values correspond to that of in IndeX
-                    Trilinear post-HW in IndeX
-                    Tricubic catmull is post-HW in IndeX
-                    Tricubic B-spline is post-HW in IndeX </Documentation>
+                <Documentation>Filtering mode (interpolation) for volume rendering.</Documentation>
             </IntVectorProperty>
 
             <IntVectorProperty
@@ -1156,32 +1156,6 @@
             </IntVectorProperty>
 
             <IntVectorProperty
-                name="Filtering"
-                command="set_filter_mode"
-                number_of_elements="1"
-                default_values="1">
-                <EnumerationDomain name="enum">
-                    <Entry value="0" text="Nearest"/>
-                    <Entry value="1" text="Trilinear"/>
-                    <Entry value="5" text="Tricubic Catmull"/>
-                    <Entry value="7" text="Tricubic Bspline"/>
-                </EnumerationDomain>
-                <Documentation> Values correspond to that of in IndeX
-                    Trilinear post-HW in IndeX
-                    Tricubic catmull is post-HW in IndeX
-                    Tricubic B-spline is post-HW in IndeX </Documentation>
-            </IntVectorProperty>
-
-            <IntVectorProperty
-                name="Pre-integration"
-                command="set_preintegration"
-                number_of_elements="1"
-                default_values="1">
-                <BooleanDomain name="bool" />
-                <Documentation>Set Pre-integration.</Documentation>
-            </IntVectorProperty>
-
-            <IntVectorProperty
                 label="Log Performance"
                 name="log_performance"
                 panel_visibility="advanced"
@@ -1820,8 +1794,6 @@
             </PropertyGroup>
             <PropertyGroup label="NVIDIA IndeX Volume">
                     <Property name="Subcube Size"/>
-                    <!-- <Property name="Pre-integration"/> -->
-                    <!-- <Property name="Filtering"/>  -->
                     <Property name="dump_internal_state"/>
                     <Property name="log_performance"/>
             </PropertyGroup>

@@ -156,11 +156,9 @@ inline const char* get_process_user_name()
 
 //-------------------------------------------------------------------------------------------------
 // Return shared memory pointer to given name of the shared memory of size shared_seg_size
-// After finishing using this shared memory pointer unmap_shm() must be call.
-template <typename T>
-inline T* get_vol_shm(const std::string& shmname, const mi::Uint64& shared_seg_size)
+// After finishing using this shared memory pointer unmap_shm() must be called.
+inline mi::Uint8* get_vol_shm(const std::string& shmname, const mi::Uint64& shared_seg_size)
 {
-
 #ifdef _WIN32
   HANDLE hMapFile;
 
@@ -174,7 +172,7 @@ inline T* get_vol_shm(const std::string& shmname, const mi::Uint64& shared_seg_s
     return NULL;
   }
 
-  T* shm_volume = (T*)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, shared_seg_size);
+  void* shm_volume = MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, shared_seg_size);
 
   if (shm_volume == NULL)
   {
@@ -186,7 +184,7 @@ inline T* get_vol_shm(const std::string& shmname, const mi::Uint64& shared_seg_s
 
   CloseHandle(hMapFile);
 
-  return shm_volume;
+  return reinterpret_cast<mi::Uint8*>(shm_volume);
 #else
 
   mi::Sint32 shmfd = shm_open(shmname.c_str(), O_CREAT | O_RDWR, S_IRWXU);
@@ -205,7 +203,7 @@ inline T* get_vol_shm(const std::string& shmname, const mi::Uint64& shared_seg_s
     return NULL;
   }
 
-  T* shm_volume = (T*)mmap(NULL, shared_seg_size, PROT_READ | PROT_WRITE, MAP_SHARED, shmfd, 0);
+  void* shm_volume = mmap(NULL, shared_seg_size, PROT_READ | PROT_WRITE, MAP_SHARED, shmfd, 0);
   if (shm_volume == NULL)
   {
     ERROR_LOG << "The function mmap() failed in vtknvindex_representation, shared memory: "
@@ -214,7 +212,7 @@ inline T* get_vol_shm(const std::string& shmname, const mi::Uint64& shared_seg_s
   }
   close(shmfd);
 
-  return shm_volume;
+  return reinterpret_cast<mi::Uint8*>(shm_volume);
 #endif
 }
 
@@ -227,287 +225,6 @@ inline void unmap_shm(void* shm_ptr, const mi::Uint64 shared_seg_size)
 #else
   munmap(shm_ptr, shared_seg_size);
 #endif
-}
-
-//-------------------------------------------------------------------------------------------------
-inline mi::math::Color_struct convert_to_color_st(const mi::math::Color& col)
-{
-  mi::math::Color_struct col_st = {
-    col.r, col.g, col.b, col.a,
-  };
-  return col_st;
-}
-
-//-------------------------------------------------------------------------------------------------
-inline std::vector<mi::math::Color_struct> create_synth_colormap()
-{
-
-  std::vector<mi::math::Color> colormap_entry;
-  colormap_entry.push_back(mi::math::Color(0, 0, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.00392157f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.00784314f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.0117647f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.0196078f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.0235294f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.027451f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.0313726f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.0352941f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.0392157f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.0431373f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.0470588f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.054902f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.0588235f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.0627451f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.0666667f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.0705882f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.0745098f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.0784314f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.0823529f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.0901961f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.0941176f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.0980392f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.101961f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.105882f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.109804f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.113725f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.121569f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.12549f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.129412f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.133333f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.137255f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.141176f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.145098f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.14902f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.156863f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.160784f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.164706f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.168627f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.172549f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.176471f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.180392f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.184314f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.192157f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.196078f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.2f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.203922f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.207843f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.211765f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.215686f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.223529f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.227451f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.231373f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.235294f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.239216f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.243137f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.247059f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.25098f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.258824f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.262745f, 1, 0));
-  colormap_entry.push_back(mi::math::Color(0, 0.266667f, 1, 0.000351434f));
-  colormap_entry.push_back(mi::math::Color(0, 0.270588f, 1, 0.00197421f));
-  colormap_entry.push_back(mi::math::Color(0, 0.27451f, 1, 0.00359698f));
-  colormap_entry.push_back(mi::math::Color(0, 0.278431f, 1, 0.00521975f));
-  colormap_entry.push_back(mi::math::Color(0, 0.286275f, 1, 0.00684252f));
-  colormap_entry.push_back(mi::math::Color(0, 0.290196f, 1, 0.0084653f));
-  colormap_entry.push_back(mi::math::Color(0, 0.294118f, 1, 0.0100881f));
-  colormap_entry.push_back(mi::math::Color(0, 0.298039f, 1, 0.0117108f));
-  colormap_entry.push_back(mi::math::Color(0, 0.301961f, 1, 0.0133336f));
-  colormap_entry.push_back(mi::math::Color(0, 0.305882f, 1, 0.0149564f));
-  colormap_entry.push_back(mi::math::Color(0, 0.313726f, 1, 0.0165792f));
-  colormap_entry.push_back(mi::math::Color(0, 0.317647f, 1, 0.0182019f));
-  colormap_entry.push_back(mi::math::Color(0, 0.321569f, 1, 0.0198247f));
-  colormap_entry.push_back(mi::math::Color(0, 0.32549f, 1, 0.0214475f));
-  colormap_entry.push_back(mi::math::Color(0, 0.329412f, 1, 0.0230702f));
-  colormap_entry.push_back(mi::math::Color(0, 0.333333f, 1, 0.024693f));
-  colormap_entry.push_back(mi::math::Color(0, 0.341176f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.345098f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.34902f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.352941f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.356863f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.360784f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.368627f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.372549f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.376471f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.380392f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.384314f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.392157f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.396078f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.4f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.403922f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.407843f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.411765f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.419608f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.423529f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.427451f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.431373f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.435294f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.439216f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.447059f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.45098f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.454902f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.458824f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.462745f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.466667f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.47451f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.478431f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.482353f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.486275f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.490196f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.498039f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.501961f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.505882f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.509804f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.513726f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.517647f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.52549f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.529412f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.533333f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.537255f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.541176f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.545098f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.552941f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.556863f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.560784f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.564706f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.568627f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.572549f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.580392f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.603922f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.639216f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.67451f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.709804f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.745098f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.780392f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.811765f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.847059f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.882353f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.917647f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.952941f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 0.988235f, 1, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.976471f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.941176f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.905882f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.87451f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.839216f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.803922f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.768627f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.733333f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.698039f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.662745f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.627451f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.592157f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.560784f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.52549f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.490196f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.454902f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.419608f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.384314f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.34902f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.313726f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.278431f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.231373f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.164706f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.0980392f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0, 1, 0.0313726f, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0.0352941f, 1, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0.0980392f, 1, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0.164706f, 1, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0.231373f, 1, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0.298039f, 1, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0.364706f, 1, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0.431373f, 1, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0.498039f, 1, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0.564706f, 1, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0.631373f, 1, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0.698039f, 1, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0.764706f, 1, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0.831373f, 1, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0.898039f, 1, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(0.964706f, 1, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.968627f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.901961f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.835294f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.768627f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.701961f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.635294f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.568627f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.52549f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.517647f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.509804f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.501961f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.494118f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.486275f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.478431f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.470588f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.462745f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.454902f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.447059f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.439216f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.431373f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.423529f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.415686f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.407843f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.4f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.392157f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.384314f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.376471f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.368627f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.360784f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.352941f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.345098f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.337255f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.329412f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.321569f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.313726f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.305882f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.298039f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.290196f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.282353f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.27451f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.266667f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.258824f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.25098f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.243137f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.235294f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.227451f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.219608f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.211765f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.203922f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.196078f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.188235f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.180392f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.172549f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.164706f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.156863f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.14902f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.141176f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.133333f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.12549f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.117647f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.109804f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.101961f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.0941176f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.0862745f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.0784314f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.0705882f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.0627451f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.054902f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.0470588f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.0392157f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.0313726f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.0235294f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.0156863f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0.00784314f, 0, 0.0263158f));
-  colormap_entry.push_back(mi::math::Color(1, 0, 0, 0.0263158f));
-
-  std::vector<mi::math::Color_struct> colormap_entry_st;
-  mi::Size const colormap_count = colormap_entry.size();
-  for (mi::Size i = 0; i < colormap_count; ++i)
-  {
-    colormap_entry_st.push_back(convert_to_color_st(colormap_entry.at(i)));
-  }
-
-  return colormap_entry_st;
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -43,14 +43,12 @@ public:
   vtknvindex_irregular_volume_importer();
   virtual ~vtknvindex_irregular_volume_importer();
 
-  vtknvindex_irregular_volume_importer(
-    const mi::Sint32& border_size, const std::string& scalar_type);
+  vtknvindex_irregular_volume_importer(const std::string& scalar_type);
 
   // Estimates the size (in byte) of the volume data contained in the bounding box.
   mi::Size estimate(const mi::math::Bbox_struct<mi::Float32, 3>& bounding_box,
     mi::neuraylib::IDice_transaction* dice_transaction) const override;
-  using nv::index::Distributed_continuous_data_import_callback<0xa034b89a, 0xdd90, 0x464d, 0x85,
-    0x9, 0x5f, 0xef, 0x93, 0xb8, 0x2d, 0x96>::estimate;
+  using Self::estimate; // handle overloaded method
 
   // Sets the cluster properties triggered by ParaView.
   void set_cluster_properties(vtknvindex_cluster_properties* host_properties);
@@ -60,16 +58,13 @@ public:
     const mi::math::Bbox_struct<mi::Float32, 3>& bounding_box,
     nv::index::IData_subset_factory* factory,
     mi::neuraylib::IDice_transaction* dice_transaction) const override;
-  using nv::index::Distributed_continuous_data_import_callback<0xa034b89a, 0xdd90, 0x464d, 0x85,
-    0x9, 0x5f, 0xef, 0x93, 0xb8, 0x2d, 0x96>::create;
+  using Self::create; // handle overloaded method
 
   // DiCE methods
   void serialize(mi::neuraylib::ISerializer* serializer) const override;
   void deserialize(mi::neuraylib::IDeserializer* deserializer) override;
-  virtual void get_references(mi::neuraylib::ITag_set* result) const;
   mi::base::Uuid subset_id() const override;
 
-  mi::Sint32 m_border_size;                            // Subcube border size.
   std::string m_scalar_type;                           // Volume's scalar type as string.
   vtknvindex_cluster_properties* m_cluster_properties; // Cluster properties.
 };

@@ -43,6 +43,7 @@
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVRenderViewDataDeliveryManager.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProcessModule.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -57,14 +58,22 @@
 #include "vtknvindex_utilities.h"
 #include "vtknvindex_volumemapper.h"
 
+// Enable ghosting in VTK to provide border data for regular volumes
+// #define VTKNVINDEX_REGULAR_VOLUME_FORCE_VTK_GHOSTING
+
 vtknvindex_representation_initializer::vtknvindex_representation_initializer()
 {
+#ifdef VTKNVINDEX_REGULAR_VOLUME_FORCE_VTK_GHOSTING
+  // Force creation of ghost arrays for structured data (i.e. regular volumes) whenever this plugin
+  // is loaded. Setting this globally can be more efficient than requesting it later in
+  // vtknvindex_representation::RequestUpdateExtent().
   static unsigned int counter = 0;
   if (counter == 0)
   {
     vtkProcessModule::SetDefaultMinimumGhostLevelsToRequestForStructuredPipelines(2);
     ++counter;
   }
+#endif // VTKNVINDEX_REGULAR_VOLUME_FORCE_VTK_GHOSTING
 }
 
 vtknvindex_representation_initializer::~vtknvindex_representation_initializer()
@@ -128,7 +137,7 @@ vtknvindex_representation::vtknvindex_representation()
 {
   m_controller = vtkMultiProcessController::GetGlobalController();
 
-  // Init IndeX and ARC
+  // Initialize and start IndeX
   vtknvindex_instance::get()->init_index();
 
   // Replace default volume mapper with vtknvindex_volumemapper.
@@ -140,7 +149,7 @@ vtknvindex_representation::vtknvindex_representation()
   this->Actor->SetProperty(this->Property);
   this->Actor->SetLODMapper(this->OutlineMapper);
 
-  m_cluster_properties = new vtknvindex_cluster_properties();
+  m_cluster_properties = new vtknvindex_cluster_properties(true);
   m_app_config_settings = m_cluster_properties->get_config_settings();
 
   static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer())
@@ -223,14 +232,24 @@ int vtknvindex_representation::ProcessViewRequest(
     if (producerPort)
     {
       vtkAlgorithm* producer = producerPort->GetProducer();
+
+      int has_time_steps = 0;
+      int nb_time_steps = 0;
+      int cur_time_step = 0;
+
       vtkPolyData* polyData =
         vtkPolyData::SafeDownCast(producer->GetOutputDataObject(producerPort->GetIndex()));
-      vtkDataArray* index_animation_params =
-        polyData->GetFieldData()->GetArray("index_animation_params");
-
-      const int has_time_steps = index_animation_params->GetComponent(0, 0);
-      const int nb_time_steps = index_animation_params->GetComponent(0, 1);
-      const int cur_time_step = index_animation_params->GetComponent(0, 2);
+      if (polyData)
+      {
+        vtkDataArray* index_animation_params =
+          polyData->GetFieldData()->GetArray("index_animation_params");
+        if (index_animation_params)
+        {
+          has_time_steps = index_animation_params->GetComponent(0, 0);
+          nb_time_steps = index_animation_params->GetComponent(0, 1);
+          cur_time_step = index_animation_params->GetComponent(0, 2);
+        }
+      }
 
       vtknvindex_regular_volume_properties* volume_properties =
         m_cluster_properties->get_regular_volume_properties();
@@ -487,13 +506,20 @@ int vtknvindex_representation::RequestData(
       mi::math::Vector<mi::Float32, 3> scaling_flt(static_cast<mi::Float32>(1. / scaling.x),
         static_cast<mi::Float32>(1. / scaling.y), static_cast<mi::Float32>(1. / scaling.z));
 
-      m_cluster_properties->get_regular_volume_properties()->set_volume_extents(volume_extents);
-      m_cluster_properties->get_regular_volume_properties()->set_volume_translation(
-        translation_flt);
-      m_cluster_properties->get_regular_volume_properties()->set_volume_scaling(scaling_flt);
+      vtknvindex_regular_volume_properties* volume_properties =
+        m_cluster_properties->get_regular_volume_properties();
+
+      volume_properties->set_volume_extents(volume_extents);
+      volume_properties->set_volume_translation(translation_flt);
+      volume_properties->set_volume_scaling(scaling_flt);
 
       // volume size
-      m_cluster_properties->get_regular_volume_properties()->set_volume_size(m_volume_size);
+      volume_properties->set_volume_size(m_volume_size);
+
+      // store the current VTK ghost levels (these are distinct from IndeX borders size settings)
+      const int ghost_levels =
+        inInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS());
+      volume_properties->set_ghost_levels(ghost_levels);
 
       delete[] all_rank_bounds;
 
@@ -520,6 +546,7 @@ int vtknvindex_representation::RequestUpdateExtent(
 {
   this->Superclass::RequestUpdateExtent(request, inputVector, outputVector);
 
+#ifdef VTKNVINDEX_REGULAR_VOLUME_FORCE_VTK_GHOSTING
   if (inputVector[0]->GetNumberOfInformationObjects() < 1)
   {
     return 1;
@@ -529,10 +556,15 @@ int vtknvindex_representation::RequestUpdateExtent(
 
   int ghost_levels = inInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS());
 
-  // ParaView's ghost cells must be equal to NVIDIA IndeX's border size.
+  // Request ParaView's ghost level to match NVIDIA IndeX border size.
+  //
+  // When the requested level is larger than the level of the source data (which may be influenced
+  // by vtknvindex_representation_initializer() above), the data will be gerated on the fly (an
+  // expensive operation).
   ghost_levels += m_app_config_settings->get_subcube_border();
 
   inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(), ghost_levels);
+#endif // VTKNVINDEX_REGULAR_VOLUME_FORCE_VTK_GHOSTING
 
   return 1;
 }
@@ -639,7 +671,31 @@ void vtknvindex_representation::set_subcube_border(int border)
 //----------------------------------------------------------------------------
 void vtknvindex_representation::set_filter_mode(int filter_mode)
 {
-  m_app_config_settings->set_filter_mode(filter_mode);
+  nv::index::Sparse_volume_filter_mode filter_mode_index =
+    nv::index::SPARSE_VOLUME_FILTER_TRILINEAR_POST;
+
+  // Map numerical values to IndeX filter mode (the values were chosen for historical reasons, they
+  // don't match directly).
+  switch (filter_mode)
+  {
+    case 0:
+      filter_mode_index = nv::index::SPARSE_VOLUME_FILTER_NEAREST;
+      break;
+    case 1:
+      filter_mode_index = nv::index::SPARSE_VOLUME_FILTER_TRILINEAR_POST;
+      break;
+    case 5:
+      filter_mode_index = nv::index::SPARSE_VOLUME_FILTER_TRICUBIC_CATMULL_POST;
+      break;
+    case 7:
+      filter_mode_index = nv::index::SPARSE_VOLUME_FILTER_TRICUBIC_BSPLINE_POST;
+      break;
+    default:
+      ERROR_LOG << "Invalid volume filter mode " << filter_mode << " requested.";
+      return;
+  }
+
+  m_app_config_settings->set_filter_mode(filter_mode_index);
   static_cast<vtknvindex_volumemapper*>(this->VolumeMapper.GetPointer())->config_settings_changed();
 }
 

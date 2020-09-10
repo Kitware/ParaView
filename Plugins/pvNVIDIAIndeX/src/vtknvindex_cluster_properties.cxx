@@ -1,29 +1,29 @@
 /* Copyright 2020 NVIDIA Corporation. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions
-* are met:
-*  * Redistributions of source code must retain the above copyright
-*    notice, this list of conditions and the following disclaimer.
-*  * Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the
-*    documentation and/or other materials provided with the distribution.
-*  * Neither the name of NVIDIA CORPORATION nor the names of its
-*    contributors may be used to endorse or promote products derived
-*    from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-* PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-* OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *  * Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *  * Neither the name of NVIDIA CORPORATION nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <algorithm>
 #include <limits>
@@ -67,17 +67,38 @@ size_t vtknvindex_irregular_volume_data::get_memory_size(const std::string& scal
     return 0;
   }
 
-  return sizeof(num_points) + sizeof(num_cells) +
+  return sizeof(num_points) + sizeof(num_cells) + sizeof(num_scalars) + sizeof(cell_flag) +
     sizeof(mi::math::Vector<mi::Float32, 3>) * num_points +
-    sizeof(mi::math::Vector<mi::Uint32, 4>) * num_cells + scalar_size * num_points +
+    sizeof(mi::math::Vector<mi::Uint32, 4>) * num_cells + scalar_size * num_scalars +
     sizeof(max_edge_length2);
 }
 
 // ------------------------------------------------------------------------------------------------
-vtknvindex_cluster_properties::vtknvindex_cluster_properties()
+std::map<mi::Uint32, vtknvindex_cluster_properties*> vtknvindex_cluster_properties::s_instances;
+
+// ------------------------------------------------------------------------------------------------
+vtknvindex_cluster_properties::vtknvindex_cluster_properties(bool register_instance)
   : m_rank_id(-1)
 {
+  if (register_instance)
+  {
+    // Register the instance
+    static mi::Uint32 instance_counter = 0;
+    instance_counter++;
+    m_instance_id = instance_counter;
+
+    s_instances[m_instance_id] = this;
+  }
+  else
+  {
+    m_instance_id = 0;
+  }
+
   m_affinity = new vtknvindex_affinity();
+#ifdef USE_KDTREE
+  m_affinity_kdtree = new vtknvindex_KDTree_affinity();
+#endif
+
   m_config_settings = new vtknvindex_config_settings();
   m_regular_vol_properties = new vtknvindex_regular_volume_properties();
 }
@@ -99,6 +120,12 @@ vtknvindex_cluster_properties::~vtknvindex_cluster_properties()
 
   delete m_regular_vol_properties;
   delete m_config_settings;
+
+  if (m_instance_id > 0)
+  {
+    // Unregister the instance
+    s_instances.erase(m_instance_id);
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -115,9 +142,18 @@ vtknvindex_regular_volume_properties* vtknvindex_cluster_properties::get_regular
 }
 
 // ------------------------------------------------------------------------------------------------
-mi::base::Handle<vtknvindex_affinity> vtknvindex_cluster_properties::get_affinity() const
+nv::index::IAffinity_information* vtknvindex_cluster_properties::get_affinity() const
 {
-  return m_affinity;
+  if (m_affinity_kdtree && m_affinity_kdtree->get_nb_nodes() > 0)
+    return m_affinity_kdtree.get();
+  else
+    return m_affinity.get();
+}
+
+// ------------------------------------------------------------------------------------------------
+vtknvindex_KDTree_affinity* vtknvindex_cluster_properties::get_affinity_kdtree() const
+{
+  return m_affinity_kdtree.get();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -140,6 +176,24 @@ vtknvindex_host_properties* vtknvindex_cluster_properties::get_host_properties(
     return NULL;
 
   return shmit->second;
+}
+
+// ------------------------------------------------------------------------------------------------
+const vtknvindex_host_properties::shm_info* vtknvindex_cluster_properties::get_shminfo(
+  const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step)
+{
+  const vtknvindex_host_properties::shm_info* info = nullptr;
+
+  for (auto& hostinfo : m_hostinfo)
+  {
+    info = hostinfo.second->get_shminfo(bbox, time_step);
+    if (info)
+    {
+      break;
+    }
+  }
+
+  return info;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -196,6 +250,12 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
   m_affinity->reset_affinity();
   m_affinity->add_affinity(current_bbox, 1);
 
+  if (m_affinity_kdtree)
+  {
+    m_affinity_kdtree->reset_affinity();
+    m_affinity_kdtree->add_affinity(current_bbox, 1);
+  }
+
   m_rankid_to_hostid[0] = 1;
 
   std::vector<mi::Sint32> all_gpu_ids;
@@ -221,11 +281,13 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
   // collecting information for shared memory: bbox, type, size, time step.
   mi::Uint32 nb_time_steps = m_regular_vol_properties->get_nb_time_steps();
 
+  const mi::Sint32 current_rankid = 0;
+
   for (mi::Uint32 time_step = 0; time_step < nb_time_steps; ++time_step)
   {
     std::stringstream ss;
     ss << "pv_nvindex_shm_rank_";
-    ss << 0;
+    ss << current_rankid;
     ss << "_timestep_";
     ss << time_step;
 
@@ -251,18 +313,12 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
       mi::Uint64 volume_size =
         static_cast<mi::Uint64>(pernode_volume.x) * pernode_volume.y * pernode_volume.z;
 
-      if (scalar_type == "unsigned char")
-        shm_size = volume_size * sizeof(mi::Uint8);
-      else if (scalar_type == "unsigned short")
-        shm_size = volume_size * sizeof(mi::Uint16);
-      else if (scalar_type == "char")
-        shm_size = volume_size * sizeof(mi::Sint8);
-      else if (scalar_type == "short")
-        shm_size = volume_size * sizeof(mi::Sint16);
-      else if (scalar_type == "float")
-        shm_size = volume_size * sizeof(mi::Float32);
-      else if (scalar_type == "double")
-        shm_size = volume_size * sizeof(mi::Float64);
+      const mi::Size scalar_size =
+        vtknvindex_regular_volume_properties::get_scalar_size(scalar_type);
+      if (scalar_size > 0)
+      {
+        shm_size = volume_size * scalar_size;
+      }
       else
       {
         ERROR_LOG << "The scalar type: " << scalar_type << " is not supported by NVIDIA IndeX.";
@@ -270,7 +326,7 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
       }
 
       host_properties->set_shminfo(
-        time_step, ss.str(), current_bbox, shm_size, volume_data->scalars);
+        time_step, current_rankid, ss.str(), current_bbox, shm_size, volume_data->scalars);
     }
     else // vtknvindex_scene::VOLUME_TYPE_IRREGULAR
     {
@@ -293,11 +349,14 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
 
       shm_size = volume_data->get_memory_size(scalar_type);
 
-      host_properties->set_shminfo(time_step, ss.str(), current_bbox, shm_size, volume_data);
+      host_properties->set_shminfo(
+        time_step, current_rankid, ss.str(), current_bbox, shm_size, volume_data);
     }
   }
 
   m_affinity->set_hostinfo(m_hostinfo);
+  if (m_affinity_kdtree)
+    m_affinity_kdtree->set_hostinfo(m_hostinfo);
 
   return true;
 }
@@ -348,10 +407,8 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
   }
 
   // Gather bounds of all the pieces.
-  mi::Float32* all_rank_extents = new mi::Float32[6 * m_num_ranks];
-  {
-    controller->AllGather(dataset_parameters.bounds, all_rank_extents, 6);
-  }
+  std::vector<mi::Float32> all_rank_extents(6 * m_num_ranks);
+  controller->AllGather(dataset_parameters.bounds, all_rank_extents.data(), 6);
 
   //// Gather local node rank sizes.
   vtknvindex_instance* index_instance = vtknvindex_instance::get();
@@ -427,8 +484,13 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
     controller->AllGather(&shm_size, &all_shm_sizes[0], 1);
   }
 
+  const mi::Uint32 nb_time_steps = m_regular_vol_properties->get_nb_time_steps();
+
   // Add per rank information like affinity, shared memory details etc.
   m_affinity->reset_affinity();
+  if (m_affinity_kdtree)
+    m_affinity_kdtree->reset_affinity();
+
   for (mi::Uint32 i = 0; i < m_num_ranks; ++i)
   {
     mi::Uint32 offset = i * 6;
@@ -444,38 +506,40 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
       // If the origin is not [0,0,0] we have to translate all the pieces.
       mi::math::Bbox<mi::Sint32, 3> volume_extents;
       m_regular_vol_properties->get_volume_extents(volume_extents);
+      const mi::math::Vector<mi::Float32, 3> volume_extents_min(volume_extents.min);
 
-      // Trying to reconstruct cur_bbox without ghost cells = affinity.
-      mi::math::Bbox<mi::Float32, 3> vol_ext_flt(volume_extents);
-      mi::Float32 border_size = m_config_settings->get_subcube_border();
+      // Trying to reconstruct cur_bbox without ghost cells, to be used for affinity
+      const mi::math::Bbox<mi::Float32, 3> vol_ext_flt(volume_extents);
+      const mi::Float32 ghost_levels =
+        static_cast<mi::Float32>(m_regular_vol_properties->get_ghost_levels());
+      if (ghost_levels > 0.f)
+      {
+        // Ghost cells only exist at inner boundaries between pieces, not on the outside boundary of
+        // the entire volume. Shrink the bbox used for the affinity accordingly.
+        if (current_affinity.min.x > vol_ext_flt.min.x)
+          current_affinity.min.x += ghost_levels;
+        if (current_affinity.min.y > vol_ext_flt.min.y)
+          current_affinity.min.y += ghost_levels;
+        if (current_affinity.min.z > vol_ext_flt.min.z)
+          current_affinity.min.z += ghost_levels;
 
-      if (current_affinity.min.x > vol_ext_flt.min.x)
-        current_affinity.min.x += border_size;
-      if (current_affinity.min.y > vol_ext_flt.min.y)
-        current_affinity.min.y += border_size;
-      if (current_affinity.min.z > vol_ext_flt.min.z)
-        current_affinity.min.z += border_size;
+        if (current_affinity.max.x < vol_ext_flt.max.x)
+          current_affinity.max.x -= ghost_levels;
+        if (current_affinity.max.y < vol_ext_flt.max.y)
+          current_affinity.max.y -= ghost_levels;
+        if (current_affinity.max.z < vol_ext_flt.max.z)
+          current_affinity.max.z -= ghost_levels;
+      }
 
-      if (current_affinity.max.x < vol_ext_flt.max.x)
-        current_affinity.max.x -= border_size;
-      if (current_affinity.max.y < vol_ext_flt.max.y)
-        current_affinity.max.y -= border_size;
-      if (current_affinity.max.z < vol_ext_flt.max.z)
-        current_affinity.max.z -= border_size;
+      // Translate to origin
+      current_affinity.min -= volume_extents_min;
+      current_affinity.max -= volume_extents_min;
+      current_affinity.max += mi::math::Vector<mi::Float32, 3>(1.f); // Convert from "value range"
 
-      current_affinity.min.x -= volume_extents.min.x;
-      current_affinity.min.y -= volume_extents.min.y;
-      current_affinity.min.z -= volume_extents.min.z;
-      current_affinity.max.x -= (volume_extents.min.x);
-      current_affinity.max.y -= (volume_extents.min.y);
-      current_affinity.max.z -= (volume_extents.min.z);
-
-      current_bbox.min.x -= volume_extents.min.x;
-      current_bbox.min.y -= volume_extents.min.y;
-      current_bbox.min.z -= volume_extents.min.z;
-      current_bbox.max.x -= (volume_extents.min.x - 1);
-      current_bbox.max.y -= (volume_extents.min.y - 1);
-      current_bbox.max.z -= (volume_extents.min.z - 1);
+      // Same for current_bbox (but without the special border/ghosting handling)
+      current_bbox.min -= volume_extents_min;
+      current_bbox.max -= volume_extents_min;
+      current_bbox.max += mi::math::Vector<mi::Float32, 3>(1.f);
     }
 
     std::string host = host_names[i];
@@ -500,10 +564,12 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
 
     // Set affinity information for NVIDIA IndeX.
     m_affinity->add_affinity(current_affinity, hostid, all_gpu_ids[i]);
+    if (m_affinity_kdtree)
+      m_affinity_kdtree->add_affinity(current_affinity, hostid, all_gpu_ids[i]);
 
     m_rankid_to_hostid[m_all_rank_ids[i]] = hostid;
 
-    mi::Sint32 current_rankid = m_all_rank_ids[i];
+    const mi::Sint32 current_rankid = m_all_rank_ids[i];
 
     std::map<mi::Uint32, vtknvindex_host_properties*>::iterator shmit = m_hostinfo.find(hostid);
     if (shmit == m_hostinfo.end())
@@ -523,9 +589,6 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
       host_properties->set_rankids(m_all_rank_ids);
     }
 
-    // Collecting information for shared memory: bbox, type, size, time step.
-    mi::Uint32 nb_time_steps = m_regular_vol_properties->get_nb_time_steps();
-
     for (mi::Uint32 time_step = 0; time_step < nb_time_steps; ++time_step)
     {
       std::stringstream ss;
@@ -540,31 +603,29 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
 
       std::map<mi::Uint32, vtknvindex_host_properties*>::iterator shmjt = m_hostinfo.find(hostid);
       vtknvindex_host_properties* host_properties = shmjt->second;
-      mi::Uint64 shm_size = 0;
+      mi::Size shm_size = 0;
 
+      // Collecting information for shared memory: bbox, type, size, time step.
       if (dataset_parameters.volume_type == vtknvindex_scene::VOLUME_TYPE_REGULAR)
       {
-        mi::math::Vector_struct<mi::Uint64, 3> pernode_volume = {
-          static_cast<mi::Uint64>(current_bbox.max.x - current_bbox.min.x),
-          static_cast<mi::Uint64>(current_bbox.max.y - current_bbox.min.y),
-          static_cast<mi::Uint64>(current_bbox.max.z - current_bbox.min.z)
-        };
-        mi::Uint64 volume_size = pernode_volume.x * pernode_volume.y * pernode_volume.z;
+        const mi::math::Vector<mi::Size, 3> pernode_volume_extent(current_bbox.extent());
+        const mi::Size volume_size =
+          pernode_volume_extent.x * pernode_volume_extent.y * pernode_volume_extent.z;
 
-        const std::string& scalar_type = dataset_parameters.scalar_type;
+        std::string scalar_type = dataset_parameters.scalar_type;
+        if (scalar_type == "double" && !(is_index_rank && current_rankid == m_rank_id))
+        {
+          // Data will be converted to float when writing to shared memory. The data in
+          // local memory on IndeX ranks will stay in double format.
+          scalar_type = "float";
+        }
 
-        if (scalar_type == "unsigned char")
-          shm_size = volume_size * sizeof(mi::Uint8);
-        else if (scalar_type == "unsigned short")
-          shm_size = volume_size * sizeof(mi::Uint16);
-        else if (scalar_type == "char")
-          shm_size = volume_size * sizeof(mi::Sint8);
-        else if (scalar_type == "short")
-          shm_size = volume_size * sizeof(mi::Sint16);
-        else if (scalar_type == "float")
-          shm_size = volume_size * sizeof(mi::Float32);
-        else if (scalar_type == "double")
-          shm_size = volume_size * sizeof(mi::Float64);
+        const mi::Size scalar_size =
+          vtknvindex_regular_volume_properties::get_scalar_size(scalar_type);
+        if (scalar_size > 0)
+        {
+          shm_size = volume_size * scalar_size;
+        }
         else
         {
           ERROR_LOG << "The scalar type: " << scalar_type << " is not supported by NVIDIA IndeX.";
@@ -576,13 +637,26 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
         shm_size = all_shm_sizes[i];
       }
 
-      host_properties->set_shminfo(
-        time_step, ss.str(), current_bbox, shm_size, reinterpret_cast<void*>(all_data_ptrs[i]));
+      host_properties->set_shminfo(time_step, current_rankid, ss.str(), current_bbox, shm_size,
+        reinterpret_cast<void*>(all_data_ptrs[i]));
     }
   }
-  delete[] all_rank_extents;
 
+  // Add more per host information
+  for (auto& it : m_hostinfo)
+  {
+    vtknvindex_host_properties* host_props = it.second;
+    for (mi::Uint32 time_step = 0; time_step < nb_time_steps; ++time_step)
+    {
+      // Neighbor information
+      host_props->create_volume_neighbor_info(this, time_step);
+    }
+  }
+
+  // Pass host information to the affinity
   m_affinity->set_hostinfo(m_hostinfo);
+  if (m_affinity_kdtree)
+    m_affinity_kdtree->set_hostinfo(m_hostinfo);
 
   return true;
 }
@@ -625,93 +699,21 @@ void vtknvindex_cluster_properties::print_info() const
 }
 
 // ------------------------------------------------------------------------------------------------
-mi::neuraylib::IElement* vtknvindex_cluster_properties::copy() const
+mi::Uint32 vtknvindex_cluster_properties::get_instance_id() const
 {
-  vtknvindex_cluster_properties* other = new vtknvindex_cluster_properties();
-  other->m_rankid_to_hostid = this->m_rankid_to_hostid;
-  other->m_hostinfo = this->m_hostinfo;
-  return other;
+  return m_instance_id;
 }
 
 // ------------------------------------------------------------------------------------------------
-const char* vtknvindex_cluster_properties::get_class_name() const
+vtknvindex_cluster_properties* vtknvindex_cluster_properties::get_instance(mi::Uint32 instance_id)
 {
-  return "vtknvindex_cluster_properties";
-}
-
-// ------------------------------------------------------------------------------------------------
-mi::base::Uuid vtknvindex_cluster_properties::get_class_id() const
-{
-  return IID();
-}
-
-// ------------------------------------------------------------------------------------------------
-void vtknvindex_cluster_properties::serialize(mi::neuraylib::ISerializer* serializer) const
-{
-  // Serialize rankid to host id.
+  auto it = s_instances.find(instance_id);
+  if (it != s_instances.end())
   {
-    const mi::Size nb_elements = m_rankid_to_hostid.size();
-    serializer->write(&nb_elements, 1);
-
-    std::map<mi::Sint32, mi::Uint32>::const_iterator itr = m_rankid_to_hostid.begin();
-    for (; itr != m_rankid_to_hostid.end(); ++itr)
-    {
-      serializer->write(&itr->first, 1);
-      serializer->write(&itr->second, 1);
-    }
+    return it->second;
   }
-
-  // Serialize host properties.
+  else
   {
-    const mi::Size nb_elements = m_hostinfo.size();
-    serializer->write(&nb_elements, 1);
-
-    std::map<mi::Uint32, vtknvindex_host_properties*>::const_iterator itr = m_hostinfo.begin();
-    for (; itr != m_hostinfo.end(); ++itr)
-    {
-      serializer->write(&itr->first, 1);
-      const vtknvindex_host_properties* host_properties = itr->second;
-      host_properties->serialize(serializer);
-    }
+    return nullptr;
   }
-
-  // Serialize volume properties.
-  m_regular_vol_properties->serialize(serializer);
-}
-
-// ------------------------------------------------------------------------------------------------
-void vtknvindex_cluster_properties::deserialize(mi::neuraylib::IDeserializer* deserializer)
-{
-  // Deserialize rank id to host id.
-  {
-    mi::Size nb_elements = 0;
-    deserializer->read(&nb_elements, 1);
-
-    for (mi::Uint32 i = 0; i < nb_elements; ++i)
-    {
-      mi::Sint32 rankid = 0;
-      deserializer->read(&rankid, 1);
-      mi::Uint32 hostid = 0;
-      deserializer->read(&hostid, 1);
-      m_rankid_to_hostid[rankid] = hostid;
-    }
-  }
-
-  // Deserialize shminfo.
-  {
-    mi::Size nb_elements = 0;
-    deserializer->read(&nb_elements, 1);
-
-    for (mi::Uint32 i = 0; i < nb_elements; ++i)
-    {
-      mi::Uint32 hostid = 0;
-      deserializer->read(&hostid, 1);
-      vtknvindex_host_properties* host_properties = new vtknvindex_host_properties();
-      host_properties->deserialize(deserializer);
-      m_hostinfo[hostid] = host_properties;
-    }
-  }
-
-  // Deserialize volume properties.
-  m_regular_vol_properties->deserialize(deserializer);
 }

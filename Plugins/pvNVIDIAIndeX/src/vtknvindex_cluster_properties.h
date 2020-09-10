@@ -59,8 +59,11 @@ struct vtknvindex_irregular_volume_data
   vtkUnstructuredGridBase* pv_unstructured_grid;
   mi::Uint32 num_points;
   mi::Uint32 num_cells;
+  mi::Uint32 num_scalars; // either equal to num_points or num_cells, depending on cell_flag
 
   void* scalars;
+  mi::Sint32 cell_flag; // 0: point scalars, 1: cell scalars, 2: field_scalars; see
+                        // vtkAbstractMapper::GetScalars()
   mi::Float32 max_edge_length2;
 
   // Get the memory required to allocate this dataset.
@@ -82,18 +85,22 @@ struct vtknvindex_dataset_parameters
 // general config settings,
 // list of host in the cluster, affinity information.
 
-class vtknvindex_cluster_properties : public mi::neuraylib::Element<0xba7f59f5, 0xffed, 0x467b,
-                                        0xa6, 0x5a, 0xd4, 0x9f, 0x50, 0xb7, 0x00, 0x8f>
+class vtknvindex_cluster_properties
 {
 public:
-  vtknvindex_cluster_properties();
+  // When register_instance is true, the newly created instance will be made available through
+  // get_instance().
+  vtknvindex_cluster_properties(bool register_instance = false);
   ~vtknvindex_cluster_properties();
 
   // Get general config settings.
   vtknvindex_config_settings* get_config_settings() const;
 
   // Get ParaView's domain subdivision affinity.
-  mi::base::Handle<vtknvindex_affinity> get_affinity() const;
+  nv::index::IAffinity_information* get_affinity() const;
+
+  // Get kd-tree affinity, or null if it doesn't exists
+  vtknvindex_KDTree_affinity* get_affinity_kdtree() const;
 
   // Get regular (and irregular) volume general properties.
   vtknvindex_regular_volume_properties* get_regular_volume_properties() const;
@@ -103,6 +110,10 @@ public:
 
   // Return host_properties of the host this rank belongs to.
   vtknvindex_host_properties* get_host_properties(const mi::Sint32& rankid) const;
+
+  // Get the shared memory info for the given bounding box and time step, searching over all hosts.
+  const vtknvindex_host_properties::shm_info* get_shminfo(
+    const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step);
 
   // Gather process information used for setting affinity
   // for NVIDIA IndeX.
@@ -119,22 +130,23 @@ public:
   // Print all the cluster details.
   void print_info() const;
 
-  // DiCE database element methods
-  mi::neuraylib::IElement* copy() const override;
-  void serialize(mi::neuraylib::ISerializer* serializer) const override;
-  void deserialize(mi::neuraylib::IDeserializer* deserializer) override;
-  const char* get_class_name() const override;
-  mi::base::Uuid get_class_id() const override;
+  // Returns the id that can be passed to get_instance(), or 0 if it was not registered.
+  mi::Uint32 get_instance_id() const;
 
-  // Build the host list with its rank list assignments.
+  // Returns a previously registered instance of this class.
+  static vtknvindex_cluster_properties* get_instance(mi::Uint32 instance_id);
 
 private:
   vtknvindex_cluster_properties(const vtknvindex_cluster_properties&) = delete;
   void operator=(const vtknvindex_cluster_properties&) = delete;
 
-  mi::Sint32 m_rank_id;                             // Rank id for the host.
-  mi::base::Handle<vtknvindex_affinity> m_affinity; // Affinity for NVIDIA IndeX.
-  vtknvindex_config_settings* m_config_settings;    // Configuration settings.
+  mi::Uint32 m_instance_id; // Identifier of this instance.
+
+  mi::Sint32 m_rank_id;                                           // Rank id for the host.
+  mi::base::Handle<vtknvindex_affinity> m_affinity;               // Affinity for NVIDIA IndeX.
+  mi::base::Handle<vtknvindex_KDTree_affinity> m_affinity_kdtree; // kd-tree affinity, optional.
+
+  vtknvindex_config_settings* m_config_settings; // Configuration settings.
   vtknvindex_regular_volume_properties*
     m_regular_vol_properties;                             // Regular/irregular volume properties.
   mi::Uint32 m_num_ranks;                                 // Total number of MPI ranks.
@@ -142,6 +154,9 @@ private:
   std::map<std::string, mi::Uint32> m_hostname_to_hostid; // Host names to host ids.
   std::map<mi::Sint32, mi::Uint32> m_rankid_to_hostid;    // Rank_id to host id.
   std::map<mi::Uint32, vtknvindex_host_properties*> m_hostinfo; // Host_id to host_properties.
+
+  static std::map<mi::Uint32, vtknvindex_cluster_properties*>
+    s_instances; // All registered instances.
 };
 
 #endif

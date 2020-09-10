@@ -40,7 +40,6 @@
 
 class vtkMultiProcessController;
 
-class vtknvindex_affinity;
 class vtknvindex_config_settings;
 class vtknvindex_cluster_properties;
 

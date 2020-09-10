@@ -25,7 +25,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <assert.h>
+#include "vtknvindex_instance.h"
+
+#include <cassert>
+#include <sstream>
+
 #ifdef _WIN32
 #include <windows.h>
 #else // _WIN32
@@ -38,21 +42,21 @@
 #include "vtksys/SystemInformation.hxx"
 #include "vtksys/SystemTools.hxx"
 
+#include <nv/index/icolormap.h>
 #include <nv/index/iindex_debug_configuration.h>
 #include <nv/index/ilight.h>
+#include <nv/index/iscene.h>
+#include <nv/index/isession.h>
+#include <nv/index/version.h>
 
 #include "vtknvindex_affinity.h"
-#include "vtknvindex_clock_pulse_generator.h"
-#include "vtknvindex_cluster_properties.h"
+#include "vtknvindex_colormap_utility.h"
 #include "vtknvindex_config_settings.h"
 #include "vtknvindex_forwarding_logger.h"
 #include "vtknvindex_host_properties.h"
-#include "vtknvindex_instance.h"
 #include "vtknvindex_irregular_volume_importer.h"
 #include "vtknvindex_receiving_logger.h"
-#include "vtknvindex_regular_volume_properties.h"
 #include "vtknvindex_sparse_volume_importer.h"
-#include "vtknvindex_version.h"
 #include "vtknvindex_volume_compute.h"
 
 #ifdef _WIN32
@@ -124,7 +128,7 @@ vtknvindex_instance::vtknvindex_instance()
   // Build cluster information
   build_cluster_info();
 
-  // Start one IndeX instane per host (on local rank == 0)
+  // Use one IndeX instance per host (running on the local rank 0)
   if (is_index_rank())
   {
     // Load NVIDIA IndeX library
@@ -176,8 +180,8 @@ mi::Sint32 vtknvindex_instance::get_cur_local_rank_id() const
   std::string cur_host = sys_info.GetHostname();
 
   std::map<std::string, std::vector<mi::Sint32> >::const_iterator it =
-    m_hostmane_to_rankids.find(cur_host);
-  if (it == m_hostmane_to_rankids.end())
+    m_hostname_to_rankids.find(cur_host);
+  if (it == m_hostname_to_rankids.end())
     return -1;
 
   for (mi::Size j = 0; j < it->second.size(); ++j)
@@ -204,21 +208,17 @@ vtknvindex_instance* vtknvindex_instance::create()
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_instance::init_index()
 {
-  // Start one IndeX instane per host (on local rank == 0)
+  // Start one IndeX instance per host (running on the local rank 0)
   if (m_nvindex_interface && !is_index_initialized() && is_index_rank())
   {
-    INFO_LOG << "NVIDIA IndeX ParaView plug-in " << get_version() << ".";
-
     // Setup NVIDIA IndeX
-    mi::Uint32 setup_result = 0;
-    if (setup_result = setup_nvindex() != 0)
+    if (!setup_nvindex())
     {
-      ERROR_LOG << "Failed to start the NVIDIA IndeX library: " << setup_result << ".";
       return;
     }
 
-    // Initialize application render context
-    initialize_arc();
+    // Initialize IndeX session
+    initialize_session();
 
     // Initialize scene graph
     if (m_is_index_viewer)
@@ -304,7 +304,7 @@ void vtknvindex_instance::build_cluster_info()
 
   // Get host ranks distribution
   for (mi::Sint32 i = 0; i < nb_ranks; i++)
-    m_hostmane_to_rankids[host_names[i]].push_back(rank_ids[i]);
+    m_hostname_to_rankids[host_names[i]].push_back(rank_ids[i]);
 
   // Find index ranks
   if (cur_rank_id == 0)
@@ -317,8 +317,8 @@ void vtknvindex_instance::build_cluster_info()
     m_is_index_viewer = false;
     cur_host_name = sys_info.GetHostname();
     std::map<std::string, std::vector<mi::Sint32> >::const_iterator it =
-      m_hostmane_to_rankids.find(cur_host_name);
-    m_is_index_rank = (it != m_hostmane_to_rankids.cend() && it->second[0] == cur_rank_id);
+      m_hostname_to_rankids.find(cur_host_name);
+    m_is_index_rank = (it != m_hostname_to_rankids.cend() && it->second[0] == cur_rank_id);
   }
 
   // Get host list
@@ -336,41 +336,34 @@ void vtknvindex_instance::build_cluster_info()
 bool vtknvindex_instance::load_nvindex()
 {
   // Load shared libraries.
-  std::string lib_name = "libnvindex";
-  void* index_lib_symbol = NULL;
+  const char* lib_name = "libnvindex" MI_BASE_DLL_FILE_EXT;
+  const char* entry_point_name = "nv_index_factory";
+  void* index_lib_symbol = nullptr;
 
 #ifdef _WIN32
-  lib_name += ".dll";
-  m_p_handle = LoadLibrary(TEXT(lib_name.c_str()));
+  m_p_handle = LoadLibrary(TEXT(lib_name));
 
   if (m_p_handle)
-    index_lib_symbol = GetProcAddress((HMODULE)m_p_handle, "nv_index_factory");
-
-#else // _WIN32
-  lib_name += ".so";
-  m_p_handle = dlopen(lib_name.c_str(), RTLD_LAZY);
+    index_lib_symbol = GetProcAddress((HMODULE)m_p_handle, entry_point_name);
+#else
+  m_p_handle = dlopen(lib_name, RTLD_LAZY);
 
   if (m_p_handle)
-    index_lib_symbol = dlsym(m_p_handle, "nv_index_factory");
-
-#endif // _WIN32
+    index_lib_symbol = dlsym(m_p_handle, entry_point_name);
+#endif
 
   if (!index_lib_symbol)
   {
 #ifdef _WIN32
-    const std::string error_str(get_last_error_as_str());
-    ERROR_LOG << "Failed to load the NVIDIA IndeX library.";
-    ERROR_LOG << error_str;
-    ERROR_LOG << "Please verify that the PATH environemnt contains"
-                 " the location of the NVIDIA IndeX libraries.";
-#else // _WIN32
-    const std::string error_str(dlerror());
-
-    ERROR_LOG << "Failed to load the NVIDIA IndeX library.";
-    ERROR_LOG << error_str;
-    ERROR_LOG << "Please verify that the LD_LIBRARY_PATH environemnt contains"
-                 " the location of the NVIDIA IndeX libraries.";
+    const std::string error_str = get_last_error_as_str();
+    const std::string path_env = "PATH";
+#else
+    const std::string error_str = dlerror();
+    const std::string path_env = "LD_LIBRARY_PATH";
 #endif
+    ERROR_LOG << "Failed to load the NVIDIA IndeX library: '" << error_str << "'.";
+    ERROR_LOG << "Please verify that the environment variable " << path_env
+              << " contains the location of the NVIDIA IndeX libraries.";
     return false;
   }
 
@@ -382,41 +375,89 @@ bool vtknvindex_instance::load_nvindex()
   m_nvindex_interface = factory();
   if (!m_nvindex_interface.is_valid_interface())
   {
-    ERROR_LOG << "Failed to Initialize NVIDIA IndeX library.";
-    // TODO: Is it possible to know the reason?
+    ERROR_LOG << "Failed to initialize the NVIDIA IndeX library interface.";
     return false;
   }
 
-  // Check if this IndeX library is compatible with this plug-in version
-  if (VTKNVINDEX_PLUGIN_REVISION_BASE != 0)
+  // Check that this IndeX library is compatible with this plug-in version
+  const std::string build_revision_str = NVIDIA_INDEX_LIBRARY_REVISION_STRING;
+  const std::string library_revision_full_str = m_nvindex_interface->get_revision();
+  bool revision_mismatch = false;
   {
-    const std::string plugin_revision_base = std::to_string(VTKNVINDEX_PLUGIN_REVISION_BASE);
-    const std::string index_revision_base = m_nvindex_interface->get_revision();
-
-    if (index_revision_base.substr(0, 6) != plugin_revision_base)
+    // Extract just the revision, without build date and platform
+    std::string library_revision_str = library_revision_full_str;
+    const std::size_t pos = library_revision_str.find(',');
+    if (pos != std::string::npos)
     {
-      ERROR_LOG << "The IndeX libraries '" << index_revision_base
-                << "' are not compatible with this plug-in version '" << get_version() << "'";
-      ERROR_LOG << "Please get the matching IndeX libraries from ParaView dependencies repository:";
-      ERROR_LOG << "https://www.paraview.org/files/dependencies/";
+      library_revision_str = library_revision_str.substr(0, pos);
+    }
 
-      // Unload incompatible IndeX libs
-      INFO_LOG << "IndeX is shuting down...";
-      m_nvindex_interface->shutdown();
-      m_nvindex_interface = 0;
+    revision_mismatch = (library_revision_str != build_revision_str);
+    if (revision_mismatch)
+    {
+      // Split up revision into its components
+      std::vector<std::string> library_revision;
+      std::stringstream str(library_revision_str);
+      while (str.good())
+      {
+        std::string component;
+        std::getline(str, component, '.');
+        library_revision.push_back(component);
+      }
 
-      // Unload the libraries.
-      unload_nvindex();
+      std::vector<std::string> build_revision = { std::to_string(
+        NVIDIA_INDEX_LIBRARY_REVISION_MAJOR) };
+      if (NVIDIA_INDEX_LIBRARY_REVISION_MINOR > 0)
+      {
+        build_revision.push_back(std::to_string(NVIDIA_INDEX_LIBRARY_REVISION_MINOR));
+        if (NVIDIA_INDEX_LIBRARY_REVISION_SUBMINOR > 0)
+        {
+          build_revision.push_back(std::to_string(NVIDIA_INDEX_LIBRARY_REVISION_SUBMINOR));
+        }
+      }
 
-      return false;
+      bool is_compatible = false;
+      if (build_revision.size() == 1 || library_revision.size() == 1)
+      {
+        // No branch, meaning development version. Let's assume users know what they're doing.
+        is_compatible = true;
+      }
+      else if (build_revision.size() != library_revision.size())
+      {
+        is_compatible = false;
+      }
+      else if (build_revision.size() >= 2)
+      {
+        // It's a release branch, verify that the major revision is the same
+        is_compatible = (build_revision[0] == library_revision[0]);
+      }
+
+      if (!is_compatible)
+      {
+        // Note that this doesn't automatically open the "Output Messages" window if it happens
+        // during ParaView startup. The message will however become visible when another error is
+        // later triggered in Render().
+        ERROR_LOG << "The loaded NVIDIA IndeX library build '" << library_revision_full_str
+                  << "' is not compatible with this plug-in version '" << get_version()
+                  << "', which was built against revision '" << build_revision_str << "' "
+                  << "Please check your ParaView installation or get the matching IndeX libraries "
+                  << "from the ParaView dependencies repository: "
+                  << "https://www.paraview.org/files/dependencies/";
+
+        INFO_LOG << "Shutting down NVIDIA IndeX...";
+        m_nvindex_interface->shutdown();
+        m_nvindex_interface.reset();
+        unload_nvindex();
+
+        return false;
+      }
     }
   }
 
   // Check for license and authenticate.
   if (!authenticate_nvindex())
   {
-    ERROR_LOG
-      << "Failed to authenticate NVIDIA IndeX library, please provide a valid license file.";
+    ERROR_LOG << "Failed to authenticate NVIDIA IndeX library, please provide a valid license.";
     return false;
   }
 
@@ -432,15 +473,16 @@ bool vtknvindex_instance::load_nvindex()
     logging_configuration->set_log_locally(true); // local logging
 
     // Install the receiving logger.
-    mi::base::Handle<mi::base::ILogger> receiving_logger(
-      new vtknvindex::logger::vtknvindex_receiving_logger());
+    mi::base::Handle<mi::base::ILogger> receiving_logger(new vtknvindex_receiving_logger());
     assert(receiving_logger.is_valid_interface());
     logging_configuration->set_receiving_logger(receiving_logger.get());
   }
 
   // Access and log NVIDIA IndeX version.
-  INFO_LOG << "NVIDIA IndeX " << m_nvindex_interface->get_version() << " (build "
-           << m_nvindex_interface->get_revision() << ").";
+  INFO_LOG << "NVIDIA IndeX ParaView plug-in " << get_version() << " "
+           << (revision_mismatch ? "(compiled against " + build_revision_str + ") " : "")
+           << "using NVIDIA IndeX library " << m_nvindex_interface->get_version() << " (build "
+           << library_revision_full_str << ").";
 
   return true;
 }
@@ -472,16 +514,15 @@ bool vtknvindex_instance::unload_nvindex()
 //-------------------------------------------------------------------------------------------------
 bool vtknvindex_instance::authenticate_nvindex()
 {
-
-  std::string index_vendor_key, index_secret_key;
-
+  std::string index_vendor_key;
+  std::string index_secret_key;
   bool found_license = false;
 
   // Try reading license from environment.
   const char* env_vendor_key = vtksys::SystemTools::GetEnv("NVINDEX_VENDOR_KEY");
   const char* env_secret_key = vtksys::SystemTools::GetEnv("NVINDEX_SECRET_KEY");
 
-  if (env_vendor_key != NULL && env_secret_key != NULL)
+  if (env_vendor_key != nullptr && env_secret_key != nullptr)
   {
     index_vendor_key = env_vendor_key;
     index_secret_key = env_secret_key;
@@ -491,15 +532,21 @@ bool vtknvindex_instance::authenticate_nvindex()
   {
     vtknvindex_xml_config_parser xml_parser;
     if (xml_parser.open_config_file("nvindex_config.xml"))
+    {
       found_license = xml_parser.get_license_strings(index_vendor_key, index_secret_key);
+    }
   }
 
-  // No explicit license found, use default free license.
-  if (!found_license)
+  // No explicit license was specified, fall back to default license.
+  if (!found_license || index_vendor_key.empty() || index_secret_key.empty())
   {
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 327600)
+    return true;
+#else
     index_vendor_key =
       "NVIDIA IndeX License for Paraview IndeX:PV:Free:v1 - 20200427 (oem:retail_cloud.20220630)";
     index_secret_key = "10e9ce315607f2d230e82647682d250a176ddd4e3d05c49401b5556a6794c72c";
+#endif
   }
 
   // Retrieve Flex license path.
@@ -507,7 +554,7 @@ bool vtknvindex_instance::authenticate_nvindex()
 
   // Try reading Flex license path from environment.
   const char* env_flexnet_lic_path = vtksys::SystemTools::GetEnv("NVINDEX_FLEXNET_PATH");
-  if (env_flexnet_lic_path != NULL)
+  if (env_flexnet_lic_path != nullptr)
   {
     flexnet_lic_path = env_flexnet_lic_path;
   }
@@ -516,7 +563,7 @@ bool vtknvindex_instance::authenticate_nvindex()
     vtknvindex_xml_config_parser xml_parser;
     if (xml_parser.open_config_file("nvindex_config.xml"))
     {
-      found_license = xml_parser.get_flex_license_path(flexnet_lic_path);
+      xml_parser.get_flex_license_path(flexnet_lic_path);
     }
   }
 
@@ -527,7 +574,7 @@ bool vtknvindex_instance::authenticate_nvindex()
 }
 
 //-------------------------------------------------------------------------------------------------
-mi::Uint32 vtknvindex_instance::setup_nvindex()
+bool vtknvindex_instance::setup_nvindex()
 {
   vtknvindex_xml_config_parser xml_parser;
   bool use_config_file = xml_parser.open_config_file("nvindex_config.xml");
@@ -768,25 +815,35 @@ mi::Uint32 vtknvindex_instance::setup_nvindex()
       m_nvindex_interface->get_api_component<nv::index::IIndex_debug_configuration>());
     assert(idebug_configuration.is_valid_interface());
 
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 327600)
+    // Reduce log output
+    idebug_configuration->set_option("debug_configuration_quiet=yes");
+#endif
+
     // Don't pre-allocate buffers for rasterizer
-    std::string rasterizer_memory_allocation = "rasterizer_memory_allocation=-1";
-    idebug_configuration->set_option(rasterizer_memory_allocation.c_str());
+    idebug_configuration->set_option("rasterizer_memory_allocation=-1");
 
     // Disable timeseries data prefetch.
-    std::string disable_timeseries_data_prefetch =
-      std::string("timeseries_data_prefetch_disable=1");
-    idebug_configuration->set_option(disable_timeseries_data_prefetch.c_str());
+    idebug_configuration->set_option("timeseries_data_prefetch_disable=1");
 
-    // Temporarily disabling parallel importer.
-    std::string async_subset_load = std::string("async_subset_load=0");
-    idebug_configuration->set_option(async_subset_load.c_str());
+    // Disable IndeX parallel importing, given importeres are already parallelized.
+    idebug_configuration->set_option("async_subset_load=0");
 
     // Use strict domain subdivision only with multiples ranks.
     if (vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() > 1)
-    {
-      std::string use_strict_domain_subdivision = std::string("use_strict_domain_subdivision=1");
-      idebug_configuration->set_option(use_strict_domain_subdivision.c_str());
-    }
+      idebug_configuration->set_option("use_strict_domain_subdivision=1");
+
+#ifdef USE_KDTREE
+    // Enable KDTree affinity
+    idebug_configuration->set_option("use_kdtree_subdivision=1");
+
+    // TODO: Should this be set based on the number of GPUs when no MPI.
+    idebug_configuration->set_option("subdivision_parts=4");
+
+    // Debug KDTree
+    idebug_configuration->set_option("debug_kdtree_subdivision=1");
+    idebug_configuration->set_option("dump_kdtree_subdivision=1");
+#endif
 
     // Use pinned memory for staging buffer (enabled by default).
     if (use_config_file)
@@ -827,33 +884,23 @@ mi::Uint32 vtknvindex_instance::setup_nvindex()
     is_registered = m_nvindex_interface->register_serializable_class<vtknvindex_affinity>();
     assert(is_registered);
 
-    is_registered =
-      m_nvindex_interface->register_serializable_class<vtknvindex_clock_pulse_generator>();
-    assert(is_registered);
-
-    is_registered =
-      m_nvindex_interface->register_serializable_class<vtknvindex_cluster_properties>();
-    assert(is_registered);
-
-    is_registered = m_nvindex_interface->register_serializable_class<vtknvindex_host_properties>();
-    assert(is_registered);
-
-    is_registered =
-      m_nvindex_interface->register_serializable_class<vtknvindex_regular_volume_properties>();
+    is_registered = m_nvindex_interface->register_serializable_class<vtknvindex_KDTree_affinity>();
     assert(is_registered);
 
     is_registered = m_nvindex_interface->register_serializable_class<vtknvindex_volume_compute>();
     assert(is_registered);
   }
 
-  // Starting the NVIDIA IndeX library.
-  mi::Uint32 start_result = 0;
-  if ((start_result = m_nvindex_interface->start(true)) != 0)
+  // Start the NVIDIA IndeX library.
+  const mi::Uint32 start_result = m_nvindex_interface->start(true);
+  if (start_result != 0)
   {
-    ERROR_LOG << "Start of the NVIDIA IndeX library failed.";
+    ERROR_LOG << "Fatal: Could not start NVIDIA IndeX library (error code " << start_result << "), "
+              << "see log messages above for details.";
+    return false;
   }
 
-  // Syncronize IndeX viewer with remote instances.
+  // Synchronize IndeX viewer with remote instances.
   if (inetwork_configuration->get_mode() != mi::neuraylib::INetwork_configuration::MODE_OFF)
   {
     // IndeX viewer must wait until the remote nodes are connected
@@ -891,7 +938,7 @@ mi::Uint32 vtknvindex_instance::setup_nvindex()
     }
   }
 
-  return start_result;
+  return true;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -924,7 +971,7 @@ bool vtknvindex_instance::shutdown_nvindex()
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_instance::initialize_arc()
+void vtknvindex_instance::initialize_session()
 {
   {
     m_database = m_nvindex_interface->get_api_component<mi::neuraylib::IDatabase>();
@@ -947,11 +994,6 @@ void vtknvindex_instance::initialize_arc()
       m_nvindex_interface->get_api_component<nv::index::IIndex_debug_configuration>();
     assert(m_iindex_debug_configuration.is_valid_interface());
   }
-
-  // TODO: Remove this, possible no longer required.
-  // Verifying it the local host has joined.
-  // This may fail if there is a license problem.
-  // assert(is_local_host_joined());
 
   {
     mi::base::Handle<mi::neuraylib::IDice_transaction> dice_transaction(

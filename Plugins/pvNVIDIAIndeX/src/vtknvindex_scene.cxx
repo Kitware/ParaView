@@ -39,13 +39,10 @@
 #include <nv/index/ilight.h>
 #include <nv/index/imaterial.h>
 #include <nv/index/iplane.h>
-#include <nv/index/iregular_volume_rendering_properties.h>
-#include <nv/index/iregular_volume_texture.h>
 #include <nv/index/irendering_kernel_programs.h>
 #include <nv/index/iscene.h>
 
 #include <nv/index/isparse_volume_rendering_properties.h>
-#include <nv/index/ivolume_filter_mode.h>
 
 #include "vtkCamera.h"
 #include "vtkRenderWindow.h"
@@ -62,33 +59,6 @@
 #include "vtknvindex_rtc_kernel_params.h"
 #include "vtknvindex_sparse_volume_importer.h"
 #include "vtknvindex_volume_compute.h"
-
-//-------------------------------------------------------------------------------------------------
-bool file_to_string(const std::string& file_path, std::string& out_file_string)
-{
-  vtksys::ifstream src_file;
-
-  src_file.open(file_path.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
-
-  if (!src_file.is_open())
-    return false;
-
-  const vtksys::ifstream::pos_type src_file_size = src_file.tellg();
-  src_file.seekg(std::ios::beg);
-
-  out_file_string.resize(src_file_size, '\0');
-  src_file.read(&out_file_string[0], src_file_size);
-
-  if (!src_file)
-  {
-    out_file_string.clear();
-    return false;
-  }
-
-  src_file.close();
-
-  return true;
-}
 
 //-------------------------------------------------------------------------------------------------
 void update_slice_planes(nv::index::IPlane* plane, const vtknvindex_slice_params& slice_params,
@@ -135,29 +105,21 @@ void update_slice_planes(nv::index::IPlane* plane, const vtknvindex_slice_params
   plane->set_extent(extent);
 }
 
+//-------------------------------------------------------------------------------------------------
 vtknvindex_scene::vtknvindex_scene()
   : m_scene_created(false)
   , m_only_init(true)
   , m_is_parallel(false)
-  , m_vol_properties_tag(mi::neuraylib::NULL_TAG)
-  , m_timeseries_tag(mi::neuraylib::NULL_TAG)
-  , m_root_group_tag(mi::neuraylib::NULL_TAG)
-  , m_static_group_tag(mi::neuraylib::NULL_TAG)
-  , m_volume_tag(mi::neuraylib::NULL_TAG)
-  , m_prog_se_mapping_tag(mi::neuraylib::NULL_TAG)
-  , m_rtc_program_params_tag(mi::neuraylib::NULL_TAG)
-  , m_rtc_program_tag(mi::neuraylib::NULL_TAG)
-  , m_volume_compute_attrib_tag(mi::neuraylib::NULL_TAG)
-  , m_sparse_volume_render_properties_tag(mi::neuraylib::NULL_TAG)
+  , m_cluster_properties(nullptr)
 {
-  m_cluster_properties = NULL;
   m_index_instance = vtknvindex_instance::get();
 }
 
+//-------------------------------------------------------------------------------------------------
 vtknvindex_scene::~vtknvindex_scene()
 {
   // Remove this volume instance and complementary elements from scene graph
-  if (m_index_instance->is_index_viewer() && m_root_group_tag != mi::neuraylib::NULL_TAG)
+  if (m_index_instance->is_index_viewer() && m_root_group_tag)
   {
     mi::base::Handle<mi::neuraylib::IDice_transaction> dice_transaction(
       m_index_instance->m_global_scope->create_transaction<mi::neuraylib::IDice_transaction>());
@@ -171,33 +133,16 @@ vtknvindex_scene::~vtknvindex_scene()
       assert(scene_geom_group_edit.is_valid_interface());
 
       scene_geom_group_edit->remove(m_root_group_tag, dice_transaction.get());
-
-      // ERROR_LOG << "Removing tag: " << m_root_group_tag.id
-      //          << " from Geom group: " << m_index_instance->get_scene_geom_group();
     }
 
     dice_transaction->commit();
   }
-
-  m_vol_properties_tag = mi::neuraylib::NULL_TAG;
-  m_timeseries_tag = mi::neuraylib::NULL_TAG;
-  m_root_group_tag = mi::neuraylib::NULL_TAG;
-  m_volume_tag = mi::neuraylib::NULL_TAG;
-  m_prog_se_mapping_tag = mi::neuraylib::NULL_TAG;
-  m_rtc_program_params_tag = mi::neuraylib::NULL_TAG;
-  m_rtc_program_tag = mi::neuraylib::NULL_TAG;
-  m_volume_compute_attrib_tag = mi::neuraylib::NULL_TAG;
-  m_sparse_volume_render_properties_tag = mi::neuraylib::NULL_TAG;
-  m_static_group_tag = mi::neuraylib::NULL_TAG;
-
-  for (mi::Uint32 i = 0; i < m_plane_tags.size(); i++)
-    m_plane_tags[i] = mi::neuraylib::NULL_TAG;
 }
 
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_scene::set_visibility(bool visibility)
 {
-  if (m_root_group_tag != mi::neuraylib::NULL_TAG)
+  if (m_root_group_tag)
   {
     mi::base::Handle<mi::neuraylib::IDice_transaction> dice_transaction(
       m_index_instance->m_global_scope->create_transaction<mi::neuraylib::IDice_transaction>());
@@ -214,11 +159,11 @@ void vtknvindex_scene::set_visibility(bool visibility)
       if (visibility)
       {
         // Reset the affinity information to IndeX in case it changed. Otherwise it will be ignored.
-        mi::base::Handle<vtknvindex_affinity> affinity = m_cluster_properties->get_affinity();
+        nv::index::IAffinity_information* affinity = m_cluster_properties->get_affinity();
 
         // NVIDIA IndeX session will take ownership of the affinity.
         affinity->retain();
-        m_index_instance->m_iindex_session->set_affinity_information(affinity.get());
+        m_index_instance->m_iindex_session->set_affinity_information(affinity);
 
         // Access the session instance from the database.
         mi::base::Handle<const nv::index::ISession> session(
@@ -230,16 +175,13 @@ void vtknvindex_scene::set_visibility(bool visibility)
           dice_transaction->edit<nv::index::IScene>(session->get_scene()));
         assert(scene.is_valid_interface());
 
-        mi::base::Handle<const mi::neuraylib::IElement> vol_elem(
-          dice_transaction->access<mi::neuraylib::IElement>(m_volume_tag));
-
         mi::base::Handle<const nv::index::ISparse_volume_scene_element> sparse_vol_elem(
-          vol_elem->get_interface<nv::index::ISparse_volume_scene_element>());
+          dice_transaction->access<nv::index::ISparse_volume_scene_element>(m_volume_tag));
 
         // Set global scene transform (only required for regular volumes).
-        mi::math::Matrix<mi::Float32, 4, 4> scene_rotation_matrix(1.0f);
-        mi::math::Vector_struct<mi::Float32, 3> scene_translate_vec;
-        mi::math::Vector_struct<mi::Float32, 3> scene_scaling_vec;
+        mi::math::Matrix<mi::Float32, 4, 4> scene_rotation_matrix(1.f);
+        mi::math::Vector<mi::Float32, 3> scene_translate_vec(0.f);
+        mi::math::Vector<mi::Float32, 3> scene_scaling_vec(1.f);
 
         // Is regular volume?
         if (sparse_vol_elem.is_valid_interface())
@@ -247,23 +189,9 @@ void vtknvindex_scene::set_visibility(bool visibility)
           vtknvindex_regular_volume_properties* regular_volume_properties =
             m_cluster_properties->get_regular_volume_properties();
 
-          mi::math::Vector<mi::Float32, 3> translation, scaling;
-          regular_volume_properties->get_volume_translation(translation);
-          regular_volume_properties->get_volume_scaling(scaling);
-
           // Need to translate if the volume doesn't start at [0,0,0].
-          scene_translate_vec.x = translation.x;
-          scene_translate_vec.y = translation.y;
-          scene_translate_vec.z = translation.z;
-
-          scene_scaling_vec.x = scaling.x;
-          scene_scaling_vec.y = scaling.y;
-          scene_scaling_vec.z = scaling.z;
-        }
-        else
-        {
-          scene_translate_vec.x = scene_translate_vec.y = scene_translate_vec.z = 0.0f;
-          scene_scaling_vec.x = scene_scaling_vec.y = scene_scaling_vec.z = 1.0f;
+          regular_volume_properties->get_volume_translation(scene_translate_vec);
+          regular_volume_properties->get_volume_scaling(scene_scaling_vec);
         }
         scene->set_transform_matrix(scene_translate_vec, scene_rotation_matrix, scene_scaling_vec);
       }
@@ -282,22 +210,36 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
   if (m_scene_created)
     return;
 
-  // Set the affinity information.
-  mi::base::Handle<vtknvindex_affinity> affinity = m_cluster_properties->get_affinity();
+// Set the affinity information.
+#ifdef USE_KDTREE
+  // Set KDTree affinity only when running in multiple ranks
+  if (vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() > 1)
+#endif
+  {
+    nv::index::IAffinity_information* affinity = m_cluster_properties->get_affinity();
+    std::ostringstream s;
 
-  std::ostringstream s;
-  affinity->scene_dump_affinity_info(s);
-  INFO_LOG << s.str();
+    mi::base::Handle<vtknvindex_KDTree_affinity> affinity_vtk_kdtree(
+      affinity->get_interface<vtknvindex_KDTree_affinity>());
+    if (affinity_vtk_kdtree)
+    {
+      affinity_vtk_kdtree->scene_dump_affinity_info(s);
+    }
 
-  // NVIDIA IndeX session will take ownership of the affinity.
-  affinity->retain();
+    mi::base::Handle<vtknvindex_affinity> affinity_vtk(
+      affinity->get_interface<vtknvindex_affinity>());
+    if (affinity_vtk)
+    {
+      affinity_vtk->scene_dump_affinity_info(s);
+    }
 
-  m_index_instance->m_iindex_session->set_affinity_information(affinity.get());
+    INFO_LOG << s.str();
 
-  // // DiCE database access.
-  // mi::base::Handle<mi::neuraylib::IDice_transaction> dice_transaction(
-  //  m_index_instance.m_global_scope->create_transaction<mi::neuraylib::IDice_transaction>());
-  // assert(dice_transaction.is_valid_interface());
+    // NVIDIA IndeX session will take ownership of the affinity.
+    affinity->retain();
+
+    m_index_instance->m_iindex_session->set_affinity_information(affinity);
+  }
 
   // GUI settings.
   vtknvindex_config_settings* pv_config_settings = m_cluster_properties->get_config_settings();
@@ -315,7 +257,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
     assert(scene.is_valid_interface());
 
     // Dataset subcube border size.
-    mi::Sint32 subcube_border = m_cluster_properties->get_config_settings()->get_subcube_border();
+    mi::Sint32 subcube_border = pv_config_settings->get_subcube_border();
 
     // Print cluster details in ParaView's console.
     m_cluster_properties->print_info();
@@ -333,8 +275,8 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
       regular_volume_properties->get_volume_size(volume_size);
 
       // Create shared memory regular volume data importer.
-      vtknvindex_sparse_volume_importer* volume_importer =
-        new vtknvindex_sparse_volume_importer(volume_size, subcube_border, scalar_type);
+      vtknvindex_sparse_volume_importer* volume_importer = new vtknvindex_sparse_volume_importer(
+        volume_size, subcube_border, regular_volume_properties->get_ghost_levels(), scalar_type);
 
       assert(volume_importer);
 
@@ -378,7 +320,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
 
       // Create shared memory irregular volume data importer.
       vtknvindex_irregular_volume_importer* volume_importer =
-        new vtknvindex_irregular_volume_importer(subcube_border, scalar_type);
+        new vtknvindex_irregular_volume_importer(scalar_type);
 
       assert(volume_importer);
 
@@ -517,7 +459,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
           case RTC_KERNELS_ISOSURFACE:
           {
             vtknvindex_ivol_isosurface_params iso_params;
-            iso_params.rh = m_cluster_properties->get_config_settings()->get_ivol_step_size();
+            iso_params.rh = pv_config_settings->get_ivol_step_size();
             rtc_program->set_program_source(KERNEL_IRREGULAR_ISOSURFACE_STRING);
             rtc_program_parameters->set_buffer_data(
               0, reinterpret_cast<void*>(&iso_params), sizeof(iso_params));
@@ -527,7 +469,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
           case RTC_KERNELS_DEPTH_ENHANCEMENT:
           {
             vtknvindex_ivol_depth_enhancement_params depth_params;
-            depth_params.rh = m_cluster_properties->get_config_settings()->get_ivol_step_size();
+            depth_params.rh = pv_config_settings->get_ivol_step_size();
             rtc_program->set_program_source(KERNEL_IRREGULAR_DEPTH_ENHANCEMENT_STRING);
             rtc_program_parameters->set_buffer_data(
               0, reinterpret_cast<void*>(&depth_params), sizeof(depth_params));
@@ -537,7 +479,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
           case RTC_KERNELS_EDGE_ENHANCEMENT:
           {
             vtknvindex_ivol_edge_enhancement_params edge_params;
-            edge_params.rh = m_cluster_properties->get_config_settings()->get_ivol_step_size();
+            edge_params.rh = pv_config_settings->get_ivol_step_size();
             rtc_program->set_program_source(KERNEL_IRREGULAR_EDGE_ENHANCEMENT_STRING);
             rtc_program_parameters->set_buffer_data(
               0, reinterpret_cast<void*>(&edge_params), sizeof(edge_params));
@@ -580,8 +522,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
           (m_volume_rtc_kernel.rtc_kernel == RTC_KERNELS_NONE) ? 0 : 1);
 
         vol_render_properties->set_sampling_segment_length(
-          m_cluster_properties->get_config_settings()->get_ivol_step_size() *
-          m_cluster_properties->get_config_settings()->get_step_size());
+          pv_config_settings->get_ivol_step_size() * pv_config_settings->get_step_size());
 
         vol_render_properties->set_sampling_reference_segment_length(
           calculate_volume_reference_step_size(vol, pv_config_settings->get_opacity_mode(),
@@ -600,8 +541,9 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
         mi::math::Vector_struct<mi::Uint32, 3> volume_size;
         regular_volume_properties->get_volume_size(volume_size);
 
-        mi::base::Handle<vtknvindex_volume_compute> vol_compute(new vtknvindex_volume_compute(
-          volume_size, subcube_border, scalar_type, m_cluster_properties));
+        mi::base::Handle<vtknvindex_volume_compute> vol_compute(
+          new vtknvindex_volume_compute(volume_size, subcube_border,
+            regular_volume_properties->get_ghost_levels(), scalar_type, m_cluster_properties));
         assert(vol_compute.is_valid_interface());
 
         vol_compute->set_enabled(false);
@@ -618,10 +560,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
         assert(sparse_volume_render_properties.is_valid_interface());
 
         // filter mode
-        const nv::index::Sparse_volume_filter_mode filter_mode =
-          static_cast<nv::index::Sparse_volume_filter_mode>(pv_config_settings->get_filter_mode());
-
-        sparse_volume_render_properties->set_filter_mode(filter_mode);
+        sparse_volume_render_properties->set_filter_mode(pv_config_settings->get_filter_mode());
 
         // use pre-integration
         const vtknvindex_rtc_kernels rtc_kernel = pv_config_settings->get_rtc_kernel();
@@ -820,16 +759,36 @@ void vtknvindex_scene::update_volume(
     }
   }
 
-  // Set the affinity information.
-  mi::base::Handle<vtknvindex_affinity> affinity = m_cluster_properties->get_affinity();
+// Set the affinity information.
+#ifdef USE_KDTREE
+  // Set KDTree affinity only when running in multiple ranks
+  if (vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() > 1)
+#endif
+  {
+    nv::index::IAffinity_information* affinity = m_cluster_properties->get_affinity();
+    std::ostringstream s;
 
-  std::ostringstream s;
-  affinity->scene_dump_affinity_info(s);
-  INFO_LOG << s.str();
+    mi::base::Handle<vtknvindex_KDTree_affinity> affinity_vtk_kdtree(
+      affinity->get_interface<vtknvindex_KDTree_affinity>());
+    if (affinity_vtk_kdtree)
+    {
+      affinity_vtk_kdtree->scene_dump_affinity_info(s);
+    }
 
-  // NVIDIA IndeX session takes ownership of the affinity.
-  affinity->retain();
-  m_index_instance->m_iindex_session->set_affinity_information(affinity.get());
+    mi::base::Handle<vtknvindex_affinity> affinity_vtk(
+      affinity->get_interface<vtknvindex_affinity>());
+    if (affinity_vtk)
+    {
+      affinity_vtk->scene_dump_affinity_info(s);
+    }
+
+    INFO_LOG << s.str();
+
+    // NVIDIA IndeX session will take ownership of the affinity.
+    affinity->retain();
+
+    m_index_instance->m_iindex_session->set_affinity_information(affinity);
+  }
 
   // Create and setup the scene.
   {
@@ -871,8 +830,8 @@ void vtknvindex_scene::update_volume(
       regular_volume_properties->get_volume_size(volume_size);
 
       // Create shared memory regular volume data importer.
-      vtknvindex_sparse_volume_importer* volume_importer =
-        new vtknvindex_sparse_volume_importer(volume_size, subcube_border, scalar_type);
+      vtknvindex_sparse_volume_importer* volume_importer = new vtknvindex_sparse_volume_importer(
+        volume_size, subcube_border, regular_volume_properties->get_ghost_levels(), scalar_type);
       assert(volume_importer);
 
       volume_importer->set_cluster_properties(m_cluster_properties);
@@ -921,7 +880,7 @@ void vtknvindex_scene::update_volume(
 
       // Create shared memory irregular volume data importer.
       vtknvindex_irregular_volume_importer* volume_importer =
-        new vtknvindex_irregular_volume_importer(subcube_border, scalar_type);
+        new vtknvindex_irregular_volume_importer(scalar_type);
 
       assert(volume_importer);
 
@@ -1294,10 +1253,7 @@ void vtknvindex_scene::update_config_settings(
     assert(sparse_volume_render_properties.is_valid_interface());
 
     // filter mode
-    const nv::index::Sparse_volume_filter_mode filter_mode =
-      static_cast<nv::index::Sparse_volume_filter_mode>(pv_config_settings->get_filter_mode());
-
-    sparse_volume_render_properties->set_filter_mode(filter_mode);
+    sparse_volume_render_properties->set_filter_mode(pv_config_settings->get_filter_mode());
 
     // use pre-integration
     bool use_preintegration = rtc_kernel == RTC_KERNELS_NONE &&
@@ -1410,11 +1366,8 @@ void vtknvindex_scene::update_config_settings(
 void vtknvindex_scene::update_volume_opacity(
   vtkVolume* vol, const mi::base::Handle<mi::neuraylib::IDice_transaction>& dice_transaction)
 {
-  mi::base::Handle<const mi::neuraylib::IElement> vol_elem(
-    dice_transaction->access<mi::neuraylib::IElement>(m_volume_tag));
-
   mi::base::Handle<const nv::index::ISparse_volume_scene_element> sparse_vol_elem(
-    vol_elem->get_interface<nv::index::ISparse_volume_scene_element>());
+    dice_transaction->access<nv::index::ISparse_volume_scene_element>(m_volume_tag));
 
   // Is regular volume?
   vtknvindex_config_settings* pv_config_settings = m_cluster_properties->get_config_settings();
@@ -1550,7 +1503,23 @@ void vtknvindex_scene::export_session()
       vtksys::ofstream f(output_filename.c_str());
       f << s.str();
       std::ostringstream af;
-      m_cluster_properties->get_affinity()->scene_dump_affinity_info(af);
+
+      nv::index::IAffinity_information* affinity = m_cluster_properties->get_affinity();
+
+      mi::base::Handle<vtknvindex_KDTree_affinity> affinity_vtk_kdtree(
+        affinity->get_interface<vtknvindex_KDTree_affinity>());
+      if (affinity_vtk_kdtree)
+      {
+        affinity_vtk_kdtree->scene_dump_affinity_info(af);
+      }
+
+      mi::base::Handle<vtknvindex_affinity> affinity_vtk(
+        affinity->get_interface<vtknvindex_affinity>());
+      if (affinity_vtk)
+      {
+        affinity_vtk->scene_dump_affinity_info(af);
+      }
+
       f << af.str();
       f.close();
     }

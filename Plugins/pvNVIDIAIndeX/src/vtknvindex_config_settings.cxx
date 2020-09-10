@@ -124,8 +124,8 @@ bool vtknvindex_xml_config_parser::get_license_strings(
     return false;
   }
 
-  vendor_key = std::string(vendor_key_elm->GetCharacterData());
-  secret_key = std::string(secret_key_elm->GetCharacterData());
+  vendor_key = vendor_key_elm->GetCharacterData();
+  secret_key = secret_key_elm->GetCharacterData();
 
   return true;
 }
@@ -282,7 +282,7 @@ vtknvindex_config_settings::vtknvindex_config_settings()
   , m_log_performance(false)
   , m_animation_play_forward(true)
   , m_animation_interval_max(1)
-  , m_filter_mode(0)
+  , m_filter_mode(nv::index::SPARSE_VOLUME_FILTER_TRILINEAR_POST)
   , m_subcube_border(2)
   , m_step_size(1.0f)
   , m_ivol_step_size(1.0f)
@@ -340,22 +340,15 @@ mi::Uint32 vtknvindex_config_settings::get_subcube_border() const
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_config_settings::set_filter_mode(mi::Sint32 filter_mode)
+void vtknvindex_config_settings::set_filter_mode(nv::index::Sparse_volume_filter_mode filter_mode)
 {
   m_filter_mode = filter_mode;
 }
 
 //-------------------------------------------------------------------------------------------------
-nv::index::IConfig_settings::Volume_filtering_modes vtknvindex_config_settings::get_filter_mode()
-  const
+nv::index::Sparse_volume_filter_mode vtknvindex_config_settings::get_filter_mode() const
 {
-  mi::Uint32 filter_mode = m_filter_mode;
-  if (filter_mode == 5)
-    filter_mode = 3;
-  else if (filter_mode == 7)
-    filter_mode = 5;
-
-  return static_cast<nv::index::IConfig_settings::Volume_filtering_modes>(filter_mode);
+  return m_filter_mode;
 }
 
 //-------------------------------------------------------------------------------------------------

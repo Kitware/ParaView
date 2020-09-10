@@ -81,7 +81,7 @@ public:
   void Render(vtkRenderer* ren, vtkVolume* vol) override;
 
   // Prepare data for the importer.
-  bool prepare_data(mi::Sint32 time_step, vtkVolume* vol);
+  bool prepare_data(mi::Sint32 time_step);
 
   // Get the local host id from NVIDIA IndeX running on this machine.
   mi::Sint32 get_local_hostid();
@@ -90,7 +90,7 @@ public:
   void set_cluster_properties(vtknvindex_cluster_properties* cluster_properties);
 
   // Returns true if NVIDIA IndeX is initialized by this mapper.
-  bool is_mapper_initialized() { return m_is_mapper_intialized; }
+  bool is_mapper_initialized() { return m_is_mapper_initialized; }
 
   // Update render canvas.
   void update_canvas(vtkRenderer* ren);
@@ -109,7 +109,7 @@ public:
     const void* params_buffer, mi::Uint32 buffer_size);
 
   // Initialize the mapper.
-  bool initialize_mapper(vtkRenderer* ren, vtkVolume* vol);
+  bool initialize_mapper(vtkVolume* vol);
 
   // Set/get caching state.
   void is_caching(bool is_caching);
@@ -126,7 +126,7 @@ private:
   bool is_data_prepared(mi::Sint32 time_step);
 
   bool m_is_caching;              // True when ParaView is caching data on animation loops.
-  bool m_is_mapper_intialized;    // True if mapper was initialized.
+  bool m_is_mapper_initialized;   // True if mapper was initialized.
   bool m_config_settings_changed; // True if some parameter changed on the GUI.
   bool m_opacity_changed;         // True if volume opacity changed.
   bool m_slices_changed;          // True if any slice parameter changed.
@@ -144,7 +144,8 @@ private:
   vtknvindex_cluster_properties* m_cluster_properties; // Cluster properties gathered from ParaView.
   vtknvindex_performance_values m_performance_values;  // Performance values logger.
   vtkMultiProcessController* m_controller;             // MPI controller from ParaView.
-  vtkDataArray* m_scalar_array;                        // Scalar array containing actual data.
+  bool m_is_mpi_rendering;          // True when multiple MPI ranks are used for rendering.
+  vtkDataArray* m_scalar_array;     // Scalar array containing actual data.
   std::vector<void*> m_subset_ptrs; // Array with pointers to scalars data for all time steps.
 
   mi::Float64 m_whole_bounds[6]; // Whole volume bounds.

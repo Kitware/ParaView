@@ -31,7 +31,6 @@
 #include <map>
 #include <vector>
 
-//#include <mi/dice.h>
 #include "vtknvindex_opengl_app_buffer.h"
 #include "vtknvindex_opengl_canvas.h"
 #include <nv/index/iindex_debug_configuration.h>
@@ -106,13 +105,13 @@ private:
   bool authenticate_nvindex();
 
   // Setup and start NVIDIA IndeX library.
-  mi::Uint32 setup_nvindex();
+  bool setup_nvindex();
 
   // Shutting down NVIDIA IndeX library.
   bool shutdown_nvindex();
 
-  // Initialize application rendering context.
-  void initialize_arc();
+  // Initialize IndeX session
+  void initialize_session();
 
   // Initialize IndeX scene graph
   void init_scene_graph();
@@ -121,7 +120,7 @@ private:
   bool m_is_index_viewer;
   bool m_is_index_initialized;
 
-  std::map<std::string, std::vector<mi::Sint32> > m_hostmane_to_rankids; // Hostname to rank_id.
+  std::map<std::string, std::vector<mi::Sint32> > m_hostname_to_rankids; // Hostname to rank_id.
   std::vector<std::string> m_host_list;                                  // List of host
 
   std::string m_nvindexlib_fname;                          // libnvindex.so/dll string name.
