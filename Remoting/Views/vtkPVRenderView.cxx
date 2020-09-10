@@ -3338,6 +3338,19 @@ void vtkPVRenderView::SetMaxFrames(int v)
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetMaxFrames(v, ren);
+  static bool warned_once = false;
+  if (!warned_once && v > 1)
+  {
+    vtkPVOptions* options = vtkProcessModule::GetProcessModule()
+      ? vtkProcessModule::GetProcessModule()->GetOptions()
+      : nullptr;
+    if (options && !options->GetEnableStreaming())
+    {
+      vtkWarningMacro(
+        "You must enable streaming in Edit->Settings/Preferences for iterative refinement.");
+      warned_once = true;
+    }
+  }
 #else
   (void)v;
 #endif
