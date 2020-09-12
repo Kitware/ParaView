@@ -3169,13 +3169,13 @@ void vtkPVRenderView::SetEnableOSPRay(bool v)
     ren->SetUseShadows(this->Internals->OSPRayShadows);
     this->Internals->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
     this->SynchronizedRenderers->SetRenderPass(this->Internals->OSPRayPass.GetPointer());
-    this->SynchronizedRenderers->SetRayTracingState(0, true);
+    this->SynchronizedRenderers->SetEnableRayTracing(true);
   }
   else
   {
     ren->SetUseShadows(false);
     this->SynchronizedRenderers->SetRenderPass(this->Internals->SavedRenderPass);
-    this->SynchronizedRenderers->SetRayTracingState(0, false);
+    this->SynchronizedRenderers->SetEnableRayTracing(false);
   }
   this->Modified();
 #else
@@ -3211,8 +3211,8 @@ void vtkPVRenderView::SetOSPRayRendererType(std::string name)
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetRendererType(name, ren);
-  bool pathtrace = (name.find(std::string("pathtracer")) != std::string::npos);
-  this->SynchronizedRenderers->SetRayTracingState(1, pathtrace);
+  const bool pathtrace = (name.find(std::string("pathtracer")) != std::string::npos);
+  this->SynchronizedRenderers->SetEnablePathTracing(pathtrace);
 #else
   (void)name;
 #endif
