@@ -56,7 +56,7 @@ std::string vtkSMExtractWriterProxy::GenerateImageExtractsFileName(
   auto str = vtkSMExtractWriterProxy::GenerateExtractsFileName(
     fname, extractor, extractor->GetRealExtractsOutputDirectory());
   size_t pos = 0;
-  while ((pos = str.find("\%cm", pos)) != std::string::npos)
+  while ((pos = str.find("%cm", pos)) != std::string::npos)
   {
     str.replace(pos, 3, cameraparams);
     pos += cameraparams.size();
