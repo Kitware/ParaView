@@ -77,16 +77,23 @@ vtkSMExtractsController::vtkSMExtractsController()
   : TimeStep(0)
   , Time(0.0)
   , ExtractsOutputDirectory(nullptr)
+  , EnvironmentExtractsOutputDirectory(nullptr)
   , SummaryTable(nullptr)
   , LastExtractsOutputDirectory{}
   , ExtractsOutputDirectoryValid(false)
 {
+  if (vtksys::SystemTools::HasEnv("PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY"))
+  {
+    this->SetEnvironmentExtractsOutputDirectory(
+      vtksys::SystemTools::GetEnv("PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY"));
+  }
 }
 
 //----------------------------------------------------------------------------
 vtkSMExtractsController::~vtkSMExtractsController()
 {
   this->SetExtractsOutputDirectory(nullptr);
+  this->SetEnvironmentExtractsOutputDirectory(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -396,18 +403,26 @@ vtkSMProxy* vtkSMExtractsController::CreateExtractGenerator(
 }
 
 //----------------------------------------------------------------------------
+const char* vtkSMExtractsController::GetRealExtractsOutputDirectory() const
+{
+  return (this->EnvironmentExtractsOutputDirectory ? this->EnvironmentExtractsOutputDirectory
+                                                   : this->ExtractsOutputDirectory);
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMExtractsController::CreateExtractsOutputDirectory(vtkSMSessionProxyManager* pxm) const
 {
-  if (this->ExtractsOutputDirectory == nullptr)
+  const auto output_directory = this->GetRealExtractsOutputDirectory();
+  if (output_directory == nullptr)
   {
     vtkErrorMacro("ExtractsOutputDirectory must be specified.");
     return false;
   }
 
-  if (this->LastExtractsOutputDirectory != this->ExtractsOutputDirectory)
+  if (this->LastExtractsOutputDirectory != output_directory)
   {
-    this->ExtractsOutputDirectoryValid = this->CreateDirectory(this->ExtractsOutputDirectory, pxm);
-    this->LastExtractsOutputDirectory = this->ExtractsOutputDirectory;
+    this->ExtractsOutputDirectoryValid = this->CreateDirectory(output_directory, pxm);
+    this->LastExtractsOutputDirectory = output_directory;
   }
 
   return this->ExtractsOutputDirectoryValid;
@@ -451,7 +466,7 @@ bool vtkSMExtractsController::AddSummaryEntry(
   params.insert({ "time", ::ConvertToString(this->Time) });
   params.insert({ "timestep", std::to_string(this->TimeStep) });
   params.insert({ vtkSMExtractsController::GetSummaryTableFilenameColumnName(filename),
-    ::RelativePath(this->ExtractsOutputDirectory, filename) });
+    ::RelativePath(this->GetRealExtractsOutputDirectory(), filename) });
 
   // get a helpful name for this writer.
   auto name = this->GetName(writer);
@@ -548,7 +563,8 @@ bool vtkSMExtractsController::SaveSummaryTable(
 
   writer->SetLocation(helper->GetLocation());
   vtkSMPropertyHelper(writer, "FileName")
-    .Set(vtksys::SystemTools::JoinPath({ this->ExtractsOutputDirectory, "/" + fname }).c_str());
+    .Set(vtksys::SystemTools::JoinPath({ this->GetRealExtractsOutputDirectory(), "/" + fname })
+           .c_str());
   writer->UpdateVTKObjects();
   vtkSMPropertyHelper(helper, "OutputDestination").Set(vtkPVSession::DATA_SERVER_ROOT);
   vtkSMPropertyHelper(helper, "Writer").Set(writer);

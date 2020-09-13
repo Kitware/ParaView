@@ -155,17 +155,7 @@ def _create_extracts_controller(options):
     import re, os
 
     cntr = vtkSMExtractsController()
-
-    # override options if passed in environment options.
-    if 'PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY' in os.environ:
-        extracts_output_dir = os.environ["PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY"]
-    else:
-        extracts_output_dir = options.ExtractsOutputDirectory
-
-    # if the paths have ${...}, replace that with environment variables.
-    from ..util import ReplaceDollarVariablesWithEnvironment
-    extracts_output_dir = ReplaceDollarVariablesWithEnvironment(extracts_output_dir)
-    cntr.SetExtractsOutputDirectory(extracts_output_dir)
+    cntr.SetExtractsOutputDirectory(options.ExtractsOutputDirectory)
     return cntr
 
 def _is_live_trigger_activated(cntr, options):
