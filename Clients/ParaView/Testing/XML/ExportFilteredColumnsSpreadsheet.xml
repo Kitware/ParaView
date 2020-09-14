@@ -14,6 +14,7 @@
   <pqevent object="1QMenu0/RTData/CheckBox" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/pqSpreadSheetViewDecorator/actionExport" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileExportDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/dummy" />
+  <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Delete" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/dummy.csv" />
@@ -23,6 +24,7 @@
   <!-- now try doing the same thing but in a tsv file -->
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/pqSpreadSheetViewDecorator/actionExport" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileExportDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/dummy.tsv" />
+  <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Delete" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/dummy.tsv" />
