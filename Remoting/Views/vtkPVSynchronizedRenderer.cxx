@@ -53,9 +53,10 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   , UseDepthBuffer(false)
   , RenderEmptyImages(false)
   , DataReplicatedOnAllProcesses(false)
-  , RayTracing(false)
-  , PathTracing(false)
-  , RayTraceMode(0)
+  , EnableRayTracing(false)
+  , EnablePathTracing(false)
+  , InTileDisplayMode(false)
+  , InCAVEMode(false)
 {
   this->DisableIceT = vtkPVRenderViewSettings::GetInstance()->GetDisableIceT();
 }
@@ -82,8 +83,8 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
   serverInfo->GetTileDimensions(tile_dims);
   serverInfo->GetTileMullions(tile_mullions);
 
-  const bool in_tile_display_mode = (tile_dims[0] > 0 || tile_dims[1] > 0);
-  const bool in_cave_mode = !in_tile_display_mode ? (serverInfo->GetNumberOfMachines() > 0) : false;
+  this->InTileDisplayMode = (tile_dims[0] > 0 || tile_dims[1] > 0);
+  this->InCAVEMode = !this->InTileDisplayMode ? (serverInfo->GetNumberOfMachines() > 0) : false;
 
   switch (pm->GetProcessType())
   {
@@ -92,7 +93,7 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
       if (auto cs_controller = session->GetController(vtkPVSession::RENDER_SERVER_ROOT))
       {
         // in client-server mode.
-        if (in_tile_display_mode || in_cave_mode)
+        if (this->InTileDisplayMode || this->InCAVEMode)
         {
           this->CSSynchronizer = vtkSynchronizedRenderers::New();
           this->CSSynchronizer->WriteBackImagesOff();
@@ -101,7 +102,6 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
         {
           this->CSSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
           this->CSSynchronizer->WriteBackImagesOn();
-          this->RayTraceMode = 1; // remember that we may have to turn bg OFF
         }
         this->CSSynchronizer->SetRootProcessId(0);
         this->CSSynchronizer->SetParallelController(cs_controller);
@@ -116,13 +116,13 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
     case vtkProcessModule::PROCESS_RENDER_SERVER:
     case vtkProcessModule::PROCESS_BATCH:
 
-      if (in_cave_mode)
+      if (this->InCAVEMode)
       {
         this->ParallelSynchronizer = vtkCaveSynchronizedRenderers::New();
         this->ParallelSynchronizer->SetParallelController(pm->GetGlobalController());
         this->ParallelSynchronizer->WriteBackImagesOn();
       }
-      else if (in_tile_display_mode || pm->GetNumberOfLocalPartitions() > 1)
+      else if (this->InTileDisplayMode || pm->GetNumberOfLocalPartitions() > 1)
       {
 #if VTK_MODULE_ENABLE_ParaView_icet
         if (!this->DisableIceT)
@@ -152,7 +152,7 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
         this->ParallelSynchronizer->FixBackgroundOn();
         this->ParallelSynchronizer->SetParallelController(pm->GetGlobalController());
         this->ParallelSynchronizer->SetRootProcessId(0);
-        if (in_tile_display_mode)
+        if (this->InTileDisplayMode)
         {
           this->ParallelSynchronizer->WriteBackImagesOn();
         }
@@ -171,7 +171,7 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
       {
         // note cs_controller will be null in batch mode and on satellites.
         assert(pm->GetPartitionId() == 0);
-        if (in_tile_display_mode || in_cave_mode)
+        if (this->InTileDisplayMode || this->InCAVEMode)
         {
           this->CSSynchronizer = vtkSynchronizedRenderers::New();
         }
@@ -182,7 +182,6 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
         this->CSSynchronizer->WriteBackImagesOff();
         this->CSSynchronizer->SetRootProcessId(1);
         this->CSSynchronizer->SetParallelController(cs_controller);
-
         if (this->ParallelSynchronizer)
         {
           // This ensures that CSSynchronizer simply fetches the captured buffer from
@@ -190,16 +189,6 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
           this->CSSynchronizer->SetCaptureDelegate(this->ParallelSynchronizer);
           this->ParallelSynchronizer->AutomaticEventHandlingOff();
         }
-        else
-        {
-          // no ParallelSynchronizer is being used, however, we still need to
-          // fix the background color so that we don't overblend the background.
-          // hence we will make the CSSynchronizer to fix the background,
-          // otherwise the ParallelSynchronizer is fixing the background (either
-          // explicitly or via IceT.
-          this->CSSynchronizer->FixBackgroundOn();
-        }
-        this->RayTraceMode = 2; // remember that we may have to turn bg ON
       }
       break;
 
@@ -210,6 +199,10 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
       vtkErrorMacro("Unknown process type detected. Aborting for debugging purposes!");
       abort();
   }
+
+  // calling this to ensure that the `FixBackground` state on all
+  // synchronized renderers is set correctly.
+  this->UpdateFixBackgroundState();
 }
 
 //----------------------------------------------------------------------------
@@ -469,39 +462,40 @@ void vtkPVSynchronizedRenderer::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSynchronizedRenderer::SetRayTracingState(int RTorPT, bool value)
+void vtkPVSynchronizedRenderer::SetEnableRayTracing(bool val)
 {
-  if (RTorPT == 0) // using this flag to avoid having two methods
+  if (this->EnableRayTracing != val)
   {
-    this->RayTracing = value;
+    this->EnableRayTracing = val;
+    this->Modified();
+    this->UpdateFixBackgroundState();
   }
-  else
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderer::SetEnablePathTracing(bool val)
+{
+  if (this->EnablePathTracing != val)
   {
-    this->PathTracing = value;
+    this->EnablePathTracing = val;
+    this->Modified();
+    this->UpdateFixBackgroundState();
   }
-  if (!value && this->RayTraceMode)
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderer::UpdateFixBackgroundState()
+{
+  // note EnablePathTracing==true has no effect unless EnableRayTracing==true as well.
+  if (this->CSSynchronizer)
   {
-    // whenever you turn off ray or path tracing restore standard behavior
-    if (this->RayTraceMode == 1)
-    {
-      this->CSSynchronizer->FixBackgroundOff();
-    }
-    if (this->RayTraceMode == 2)
-    {
-      this->CSSynchronizer->FixBackgroundOn();
-    }
+    const bool fix_background = !(this->EnableRayTracing && this->EnablePathTracing) &&
+      !this->InTileDisplayMode && !this->InCAVEMode;
+    this->CSSynchronizer->SetFixBackground(fix_background);
   }
-  if (value && this->RayTraceMode && (RTorPT == 0 ? this->PathTracing : this->RayTracing))
+  if (this->ParallelSynchronizer)
   {
-    // when both ray and path tracing are on, and if this process's role needs it, then then turn on
-    // non-standard behavior to get environment on server
-    if (this->RayTraceMode == 1)
-    {
-      this->CSSynchronizer->FixBackgroundOn();
-    }
-    if (this->RayTraceMode == 2)
-    {
-      this->CSSynchronizer->FixBackgroundOff();
-    }
+    const bool fix_background = !(this->EnableRayTracing && this->EnablePathTracing);
+    this->ParallelSynchronizer->SetFixBackground(fix_background);
   }
 }

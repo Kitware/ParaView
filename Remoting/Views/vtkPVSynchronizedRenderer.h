@@ -157,7 +157,10 @@ public:
   /**
    * State flags to turn on specialized treatment for ray tracing.
    */
-  void SetRayTracingState(int mode, bool enabled);
+  void SetEnableRayTracing(bool val);
+  vtkGetMacro(EnableRayTracing, bool);
+  void SetEnablePathTracing(bool val);
+  vtkGetMacro(EnablePathTracing, bool);
   //@}
 
   //@{
@@ -201,13 +204,20 @@ protected:
   bool RenderEmptyImages;
   bool DataReplicatedOnAllProcesses;
 
-  bool RayTracing;
-  bool PathTracing;
-  int RayTraceMode;
+  bool EnableRayTracing;
+  bool EnablePathTracing;
 
 private:
   vtkPVSynchronizedRenderer(const vtkPVSynchronizedRenderer&) = delete;
   void operator=(const vtkPVSynchronizedRenderer&) = delete;
+
+  /**
+   * Internal method to update FixBackground flag on all synchronized renderers
+   * based on state of raytracing/pathtracing and tile-display/cave modes.
+   */
+  void UpdateFixBackgroundState();
+  bool InTileDisplayMode;
+  bool InCAVEMode;
 };
 
 #endif
