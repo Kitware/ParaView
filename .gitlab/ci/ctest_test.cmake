@@ -18,18 +18,18 @@ set(test_exclusions
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
   list(APPEND test_exclusions
     # Segfaults in an event handler
-    "\.ColorOpacityTableEditing$"
+    "\\.ColorOpacityTableEditing$"
 
     # Possibly https://gitlab.kitware.com/paraview/paraview/-/issues/19091
-    "\.SeparateOpacityArray$"
+    "\\.SeparateOpacityArray$"
 
     # Known-bad
-    "\.SliceWithPlaneMultiBlock$"
-    "\.PreviewFontScaling$"
+    "\\.SliceWithPlaneMultiBlock$"
+    "\\.PreviewFontScaling$"
 
     # Unstructured grid volume rendering (paraview/paraview#19130)
-    "\.MultiBlockVolumeRendering$"
-    "\.UnstructuredVolumeRenderingVectorComponent$")
+    "\\.MultiBlockVolumeRendering$"
+    "\\.UnstructuredVolumeRenderingVectorComponent$")
 endif ()
 
 string(REPLACE ";" "|" test_exclusions "${test_exclusions}")
