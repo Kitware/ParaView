@@ -81,7 +81,7 @@ namespace lanl
 #endif
 
 #ifdef _WIN32
-#include <Windows.h>
+#include <windows.h>
 #include <io.h>
 #include <stdio.h>
 #define S_IRUSR _S_IREAD
