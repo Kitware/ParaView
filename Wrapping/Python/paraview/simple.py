@@ -554,18 +554,6 @@ def SaveExtracts(**kwargs):
     pxm = servermanager.ProxyManager()
     proxy = servermanager._getPyProxy(pxm.NewProxy("misc", "SaveAnimationExtracts"))
     SetProperties(proxy, **kwargs)
-
-    # override options if passed in environment options.
-    import os
-    if 'PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY' in os.environ:
-        root = os.environ["PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY"]
-    else:
-        root = proxy.ExtractsOutputDirectory
-
-    # if the paths have ${...}, replace that with environment variables.
-    from .util import ReplaceDollarVariablesWithEnvironment
-    root = ReplaceDollarVariablesWithEnvironment(root)
-    proxy.ExtractsOutputDirectory = root
     return proxy.SaveExtracts()
 
 #==============================================================================

@@ -76,10 +76,23 @@ public:
   /**
    * Get/Set the root directory to use for writing extracts.
    * This must be set correctly before using `Extract` to generate extracts.
+   *
+   * @note
+   * This can be overridden at runtime using environment variable
+   * `PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY`. If set, the value specified
+   * here ignored and the environment variable is used instead.
    */
   vtkSetStringMacro(ExtractsOutputDirectory);
   vtkGetStringMacro(ExtractsOutputDirectory);
   //@}
+
+  /**
+   * Returns the extract output directory to use. If
+   * `PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY` is not set, this will be same
+   * as `GetExtractsOutputDirectory` else this will be the value of the
+   * `PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY` environment variable.
+   */
+  const char* GetRealExtractsOutputDirectory() const;
 
   /**
    * Generate the extract for the current state. Returns true if extract was
@@ -239,9 +252,12 @@ private:
   int TimeStep;
   double Time;
   char* ExtractsOutputDirectory;
+  char* EnvironmentExtractsOutputDirectory;
   vtkSmartPointer<vtkTable> SummaryTable;
   mutable std::string LastExtractsOutputDirectory;
   mutable bool ExtractsOutputDirectoryValid;
+
+  vtkSetStringMacro(EnvironmentExtractsOutputDirectory);
 };
 
 #endif

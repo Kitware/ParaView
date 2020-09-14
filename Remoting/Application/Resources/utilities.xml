@@ -851,9 +851,7 @@
         number_of_elements="1"
         default_values="datasets">
         <Documentation>
-          Choose directory under which to save all extracts. All text
-          of the form **$ENV{VAR}** will be replaced using environment variable
-          named **VAR** when generating extracts.
+          Choose directory under which to save all extracts.
         </Documentation>
         <FileListDomain name="directory" />
         <Hints>

@@ -40,8 +40,8 @@ vtk_module_test_data(
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletPhiThetaExtractsWithCinema_ImmediateExtracts_image_000001p_000.00t_000.00.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletPhiThetaExtractsWithCinema_ImmediateExtracts_image_000001p_000.00t_060.00.png"
 
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/MultiplePipelines_Pipeline1_pipeline1_000000.png"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/MultiplePipelines_Pipeline2_pipeline2_000001.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/MultiplePipelines_pipeline1_000000.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/MultiplePipelines_pipeline2_000001.png"
 )
 
 set(simple_scripts
@@ -59,11 +59,16 @@ paraview_add_test_mpi(
 
 #--------------------------------------------------------------------
 # add test to validate multiple analysis pipelines can be used.
+add_test(NAME Catalyst::WaveletMiniApp::MultiplePipelines::Prepare
+         COMMAND "${CMAKE_COMMAND}" -E remove_directory "${CMAKE_BINARY_DIR}/Testing/Temporary/MultiplePipelines")
+set_tests_properties(
+  "Catalyst::WaveletMiniApp::MultiplePipelines::Prepare"
+  PROPERTIES
+    FIXTURES_SETUP "Catalyst::WaveletMiniApp::MultiplePipelines::Prepare")
 paraview_add_test(
     PREFIX "Catalyst::WaveletMiniApp::MultiplePipelines::pipeline1"
     ENVIRONMENT
-      PIPELINE1_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}/Testing/Temporary/MultiplePipelines/Pipeline1
-      PIPELINE2_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}/Testing/Temporary/MultiplePipelines/Pipeline2
+      PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}/Testing/Temporary/MultiplePipelines/
     ARGS   "$<TARGET_FILE:ParaView::pvbatch>"
            -sym
            -dr
@@ -73,6 +78,10 @@ paraview_add_test(
            -s "${CMAKE_CURRENT_SOURCE_DIR}/pipeline1.zip"
            -s
     TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/pipeline2.zip")
+set_tests_properties(
+  "Catalyst::WaveletMiniApp::MultiplePipelines::pipeline1.pipeline2"
+  PROPERTIES
+    FIXTURES_REQUIRED "Catalyst::WaveletMiniApp::MultiplePipelines::Prepare")
 
 paraview_add_test(
     PREFIX "Catalyst::WaveletMiniApp::MultiplePipelines::Validate::pipeline1"
@@ -91,6 +100,7 @@ set_tests_properties(
       "Catalyst::WaveletMiniApp::MultiplePipelines::pipeline1.pipeline2")
 
 
+
 #---------------------------------------------------------------------
 # Let's add some full workflow tests.
 # These workflow tests have several steps and require special care when
@@ -100,8 +110,9 @@ set_tests_properties(
 #    add extract generators (which are necessary).
 #
 #    One of the steps in the test must be generation of extracts using
-#    "General Extracts" action. Choose output directories such that all extracts
-#    are generated under the `$PARAVIEW_TEST_ROOT/ImmediateExtracts`.
+#    "General Extracts" action. During test playback the
+#    output directory is set to `$PARAVIEW_TEST_ROOT/ImmediateExtracts` using
+#    PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY environment variable.
 #
 #    Another step is save out a pvsm state file named same as the name of the
 #    test in the `$PARAVIEW_TEST_ROOT` directory.
@@ -197,7 +208,10 @@ if (PARAVIEW_USE_QT)
 
     set_tests_properties("Catalyst::Workflow::ParaView.${tname}"
       PROPERTIES
-        FIXTURES_REQUIRED "CatalystWorkflowSetup.${tname}")
+        FIXTURES_REQUIRED "CatalystWorkflowSetup.${tname}"
+        ENVIRONMENT
+            PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY=${ttemp_dir}/ImmediateExtracts
+        )
 
     # 1.1 validate 'ImmediateExtracts'
     paraview_add_test(
