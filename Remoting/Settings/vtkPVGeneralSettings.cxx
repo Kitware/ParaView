@@ -15,6 +15,8 @@
 #include "vtkPVGeneralSettings.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkPVOptions.h"
+#include "vtkProcessModule.h"
 #include "vtkProcessModuleAutoMPI.h"
 #include "vtkSISourceProxy.h"
 #include "vtkSMArraySelectionDomain.h"
@@ -69,6 +71,7 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   , GUIOverrideFont(false)
   , ColorByBlockColorsOnApply(true)
   , AnimationTimeNotation(vtkPVGeneralSettings::MIXED)
+  , EnableStreaming(false)
 {
   this->SetDefaultViewType("RenderView");
 }
@@ -270,6 +273,23 @@ bool vtkPVGeneralSettings::GetLoadNoChartVariables()
 #else
   return false;
 #endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeneralSettings::SetEnableStreaming(bool val)
+{
+  if (this->GetEnableStreaming() != val)
+  {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    if (!pm)
+    {
+      vtkErrorMacro("vtkProcessModule not initialized. Igoring streaming change.");
+      return;
+    }
+    auto options = pm->GetOptions();
+    options->SetEnableStreaming(val);
+    this->Modified();
+  }
 }
 
 //----------------------------------------------------------------------------

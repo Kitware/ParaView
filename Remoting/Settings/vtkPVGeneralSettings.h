@@ -301,6 +301,15 @@ public:
   vtkGetMacro(ColorByBlockColorsOnApply, bool);
   //@}
 
+  //@{
+  /**
+   * Turn on streamed rendering.
+   */
+  void SetEnableStreaming(bool);
+  vtkGetMacro(EnableStreaming, bool);
+  vtkBooleanMacro(EnableStreaming, bool);
+  //@}
+
 protected:
   vtkPVGeneralSettings();
   ~vtkPVGeneralSettings() override;
@@ -325,6 +334,7 @@ protected:
   int ConsoleFontSize;
   bool ColorByBlockColorsOnApply;
   int AnimationTimeNotation;
+  bool EnableStreaming;
 
 private:
   vtkPVGeneralSettings(const vtkPVGeneralSettings&) = delete;

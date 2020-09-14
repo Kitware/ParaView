@@ -179,6 +179,7 @@ public:
    * Until streaming becomes mainstream, we enable streaming support by passing
    * a command line argument to all processes.
    */
+  vtkSetMacro(EnableStreaming, int);
   vtkGetMacro(EnableStreaming, int);
   //@}
 

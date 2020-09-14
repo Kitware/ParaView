@@ -468,6 +468,20 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="EnableStreaming"
+        command="SetEnableStreaming"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="default">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable streamed multipass rendering (Experimental).
+        </Documentation>
+        <Hints>
+          <RestartRequired />
+        </Hints>
+      </IntVectorProperty>
+
       <PropertyGroup label="General Options">
         <Property name="ShowWelcomeDialog" />
         <Property name="ShowSaveStateOnExit" />
