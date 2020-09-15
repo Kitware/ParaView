@@ -130,6 +130,7 @@ set(classes
   pqManageLinksReaction
   pqManagePluginsReaction
   pqMasterOnlyReaction
+  pqMenuReactionUtils
   pqModelTransformSupportBehavior
   pqMoleculePropertyWidget
   pqMultiComponentsDecorator

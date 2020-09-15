@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqExtractGenerator.h"
+#include "pqFiltersMenuReaction.h"
+#include "pqMenuReactionUtils.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqProxyGroupMenuManager.h"
@@ -44,9 +46,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNew.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMExtractsController.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMOutputPort.h"
-#include "vtkSMProxySelectionModel.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSourceProxy.h"
 
 #include <QMenu>
 
@@ -91,7 +94,7 @@ void pqExtractGeneratorsMenuReaction::updateEnableState(bool)
   pqProxySelection selection;
   pqProxySelectionUtilities::copy(selModel, selection);
 
-  std::vector<vtkSMProxy*> ports;
+  std::vector<pqOutputPort*> outputPorts;
   for (const auto& item : selection)
   {
     auto port = qobject_cast<pqOutputPort*>(item);
@@ -107,9 +110,13 @@ void pqExtractGeneratorsMenuReaction::updateEnableState(bool)
 
     if (source && source->modifiedState() != pqProxy::UNINITIALIZED && port)
     {
-      ports.push_back(port->getOutputPortProxy());
+      outputPorts.push_back(port);
     }
   }
+
+  std::vector<vtkSMProxy*> ports;
+  std::transform(outputPorts.begin(), outputPorts.end(), std::back_inserter(ports),
+    [](pqOutputPort* p) { return p->getOutputPortProxy(); });
 
   auto view = (activeObjects.activeView() ? activeObjects.activeView()->getProxy() : nullptr);
 
@@ -121,24 +128,44 @@ void pqExtractGeneratorsMenuReaction::updateEnableState(bool)
   for (auto& actn : actionList)
   {
     auto prototype = manager->getPrototype(actn);
+
+    // If the action is disabled
     if (prototype == nullptr || !enabled)
     {
       actn->setEnabled(false);
       actn->setVisible(this->HideDisabledActions ? false : true);
       actn->setStatusTip("Requires an input");
     }
+
     else if (controller->CanExtract(prototype, ports) || controller->CanExtract(prototype, view))
     {
       actn->setEnabled(true);
       actn->setVisible(true);
       actn->setStatusTip(prototype->GetDocumentation()->GetShortHelp());
     }
-    else
+    else // Either we do not have an input or the input domain
     {
       actn->setEnabled(false);
       actn->setVisible(this->HideDisabledActions ? false : true);
-      // FIXME: get test from domains.
-      // actn->setStatusTip("Requires an input");
+
+      auto input = pqMenuReactionUtils::getInputProperty(prototype);
+
+      input->RemoveAllUncheckedProxies();
+      for (int cc = 0; cc < outputPorts.size(); cc++)
+      {
+        pqOutputPort* port = outputPorts[cc];
+        input->AddUncheckedInputConnection(port->getSource()->getProxy(), port->getPortNumber());
+      }
+
+      vtkSMDomain* domain = NULL;
+      if (input && !input->IsInDomains(&domain)) // Wrong input domain
+      {
+        actn->setStatusTip(pqMenuReactionUtils::getDomainDisplayText(domain));
+      }
+      else // No Input
+      {
+        actn->setStatusTip("Requires an input");
+      }
     }
   }
 }
