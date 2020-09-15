@@ -1,0 +1,7 @@
+__pycache__
+idea
+.DS_Store
+testing/scratch
+html/
+build/
+*.egg-info/

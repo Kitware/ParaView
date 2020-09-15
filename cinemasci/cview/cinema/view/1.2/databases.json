@@ -1,0 +1,39 @@
+[
+	{
+		"database_name-comment" : "The name of the dataset. It will appear in the dropdown.",
+		"database_name": "sphere test",
+
+		"databases-comment" : "JSON array containing list of datasets to view",
+		"datasets": 
+		[
+			{
+				"name-comment": "Each dataset must have a name that will appear at the top of the image",
+				"name": "sphere",
+
+				"location-comment" : "Location of the cinema database relative to cinema root or absolute paths",
+				"location": "data/sphere.cdb"
+			}
+		]
+	},
+
+	{	
+		"database_name": "sedov test",
+		"datasets": 
+		[
+			{
+				"name": "sedov 1",
+				"location": "data/sedov1.cdb"
+			},
+
+			{
+				"name": "sedov 2",
+				"location": "data/sedov2.cdb"
+			},
+
+			{
+				"name": "sedov 3",
+				"location": "data/sedov3.cdb"
+			}
+		]
+	}
+]
