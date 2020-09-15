@@ -103,7 +103,7 @@ SHORT_NAMES          = @DOXYGEN_SHORT_NAMES@
 
 FILE_PATTERNS        = *.h *.md *.cmake
 EXTENSION_MAPPING    = cmake=c
-FILTER_PATTERNS      = *.cmake="@PERL_EXECUTABLE@ @ParaView_SOURCE_DIR@/Utilities/Doxygen/filters/cmake2c.pl"
+FILTER_PATTERNS      = *.cmake="@ParaView_SOURCE_DIR@/Utilities/Doxygen/filters/cmake2c.pl"
 RECURSIVE            = YES
 
 ALPHABETICAL_INDEX   = YES
