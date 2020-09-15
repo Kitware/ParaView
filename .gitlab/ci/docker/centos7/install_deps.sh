@@ -8,4 +8,6 @@ yum install -y \
    qt5-qtsvg-devel qt5-qtxmlpatterns-devel doxygen openmpi-devel \
    python36-numpy
 
+pip3 install sphinx
+
 yum clean all
