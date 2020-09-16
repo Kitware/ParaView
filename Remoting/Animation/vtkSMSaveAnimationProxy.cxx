@@ -349,6 +349,9 @@ bool vtkSMSaveAnimationProxy::WriteAnimation(const char* filename)
   // Enforce any restrictions on the image size based on the file format
   this->EnforceSizeRestrictions(filename);
 
+  SM_SCOPED_TRACE(SaveLayoutSizes)
+    .arg("proxy", view != NULL ? static_cast<vtkSMProxy*>(view) : static_cast<vtkSMProxy*>(layout));
+
   SM_SCOPED_TRACE(SaveCameras)
     .arg("proxy", view != NULL ? static_cast<vtkSMProxy*>(view) : static_cast<vtkSMProxy*>(layout));
 

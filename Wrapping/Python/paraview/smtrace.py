@@ -213,19 +213,7 @@ class Trace(object):
                     ctor_args = "'%s', viewtype='%s'" % (pname, obj.GetXMLName())
                     trace.append("# find view")
                     trace.append("%s = FindViewOrCreate(%s)" % (accessor, ctor_args))
-                # trace view size, if present. We trace this commented out so
-                # that the playback in the GUI doesn't cause issues.
-                viewSizeAccessor = accessor.get_property("ViewSize")
-                if viewSizeAccessor:
-                    trace.append([\
-                        "# uncomment following to set a specific view size",
-                        "# %s" % viewSizeAccessor.get_property_trace(in_ctor=False)])
                 cls.Output.append_separated(trace.raw_data())
-                # good idea to grab the layout accessor, if any, right now. This avoids the issue
-                # described in BUG #19403.
-                layout = simple.GetLayout(view=obj)
-                if layout:
-                    cls.get_accessor(layout)
                 return True
         if not skip_rendering and obj.SMProxy.IsA("vtkSMRepresentationProxy"):
             # handle representations.
@@ -1217,14 +1205,6 @@ class RegisterViewProxy(RenderingMixin, TraceItem):
         #     trace.append("%s.AdditionalLights = [%s]" % (Trace.get_accessor(self.Proxy), ", ".join(lightsList)))
 
         Trace.Output.append_separated(trace.raw_data())
-
-        viewSizeAccessor = accessor.get_property("ViewSize")
-        if viewSizeAccessor and not filter.should_trace_in_create(viewSizeAccessor):
-            # trace view size, if present. We trace this commented out so
-            # that the playback in the GUI doesn't cause issues.
-            Trace.Output.append([\
-                "# uncomment following to set a specific view size",
-                "# %s" % viewSizeAccessor.get_property_trace(in_ctor=False)])
         # we assume views don't have proxy list domains for now, and ignore tracing them.
         TraceItem.finalize(self)
 
@@ -1582,7 +1562,6 @@ class SaveCameras(RenderingMixin, BookkeepingItem):
         elif proxy.IsA("vtkSMViewProxy"):
             if proxy.GetProperty("CameraPosition"):
                 accessor = Trace.get_accessor(proxy)
-                trace.append("# current camera placement for %s" % accessor)
                 prop_names = ["CameraPosition", "CameraFocalPoint",
                          "CameraViewUp", "CameraViewAngle",
                          "CameraParallelScale", "CameraParallelProjection",
@@ -1591,6 +1570,7 @@ class SaveCameras(RenderingMixin, BookkeepingItem):
                     if x.get_property_name() in prop_names and \
                        not x.get_object().IsValueDefault()]
                 if props:
+                    trace.append("# current camera placement for %s" % accessor)
                     trace.append(accessor.trace_properties(props, in_ctor=False))
             else: pass # non-camera views
         elif proxy.IsA("vtkSMAnimationSceneProxy"):
@@ -1598,6 +1578,41 @@ class SaveCameras(RenderingMixin, BookkeepingItem):
                 trace.append_separated(cls.get_trace(proxy=view))
         else:
             raise Untraceable("Invalid argument type %r"% proxy)
+        return trace.raw_data()
+
+class SaveLayoutSizes(RenderingMixin, BookkeepingItem):
+    """
+    A bookkeeping item to trace sizes for all layouts used by the trace (or
+    the one explicitly passed to the constructor).
+
+    This ensures that all the layouts (and consequently views in those layout)
+    are setup with sizes similar to those in the UI (BUG #20102).
+    """
+    def __init__(self, proxy=None):
+        trace = self.get_trace(proxy)
+        if trace:
+            Trace.Output.append_separated(trace)
+
+    @classmethod
+    def get_trace(cls, proxy=None):
+        trace = TraceOutput()
+        proxy = sm._getPyProxy(proxy)
+        if proxy is None:
+            # scan all views we have created trace-accessors for and get layouts
+            # for those views.
+            views = [x for x in simple.GetViews() if Trace.has_accessor(x)]
+            layouts = set([simple.GetLayout(v) for v in views \
+                                if simple.GetLayout(v) is not None])
+            for l in layouts:
+                trace.append_separated(cls.get_trace(l))
+        elif proxy.IsA("vtkSMViewLayoutProxy"):
+            layoutAccessor = Trace.get_accessor(proxy)
+            lsize = proxy.GetSize()
+            trace.append_separated([\
+                    "# layout/tab size in pixels",
+                    "%s.SetSize(%d, %d)" % (layoutAccessor, lsize[0], lsize[1])])
+        else:
+            raise Untraceable("Invalid argument type %r" % proxy)
         return trace.raw_data()
 
 class CreateExtractGenerator(TraceItem):
@@ -1692,13 +1707,30 @@ def _stop_trace_internal():
     if not _get_skip_rendering():
         # ensure we trace the active view, so camera changes will be recorded.
         Trace.get_accessor(simple.GetActiveView())
+
+        Trace.Output.append_separated([\
+            "#================================================================",
+            "# addendum: following script captures some of the application",
+            "# state to faithfully reproduce the visualization during playback",
+            "#================================================================"])
+
+        # save layout sizes
+        layout_trace = SaveLayoutSizes.get_trace(None)
+        if layout_trace:
+            Trace.Output.append_separated([\
+                "#--------------------------------",
+                "# saving layout sizes for layouts"])
+            Trace.Output.append_separated(layout_trace)
+
         camera_trace = SaveCameras.get_trace(None)
         if camera_trace:
-            Trace.Output.append_separated(\
-                "#### saving camera placements for all active views")
+            Trace.Output.append_separated([\
+                "#-----------------------------------",
+                "# saving camera placements for views"])
             Trace.Output.append_separated(camera_trace)
         Trace.Output.append_separated([\
-            "#### uncomment the following to render all views",
+            "#--------------------------------------------",
+            "# uncomment the following to render all views",
             "# RenderAllViews()",
             "# alternatively, if you want to write images, you can use SaveScreenshot(...)."
             ])
