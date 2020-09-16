@@ -2089,8 +2089,10 @@ found and the point will be rejected.</Documentation>
                  value="4" />
         </EnumerationDomain>
         <Documentation>The property determines whether/how to vary the radius
-        of the tube. If varying by scalar (1), the tube radius is based on the
-        point-based scalar values in the dataset. If it is varied by vector,
+        of the tube. If varying by scalar, the tube radius linearly varies w.r.t
+        point-based scalar values in the dataset. If the radius varies by vector, a mass flux preserving
+        variation is used. If it varies by absolute scalar, the radius is equal to the scalar field
+        (which thus must be positive!). If it varies by vector norm,
         the vector magnitude is used in varying the radius.</Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetRadiusFactor"
