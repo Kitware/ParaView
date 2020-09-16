@@ -15,12 +15,14 @@
 #include "vtkSMProxyManager.h"
 
 #include "vtkCommand.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h" // for PARAVIEW_VERSION_*
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
 #include "vtkSIProxyDefinitionManager.h"
 #include "vtkSMPluginManager.h"
+#include "vtkSMProxyIterator.h"
 #include "vtkSMReaderFactory.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
@@ -31,6 +33,9 @@
 #include "vtkWeakPointer.h"
 
 #include <map>
+#include <set>
+#include <sstream>
+#include <vector>
 
 #define PARAVIEW_SOURCE_VERSION "paraview version " PARAVIEW_VERSION_FULL
 //***************************************************************************
@@ -325,4 +330,65 @@ const char* vtkSMProxyManager::GetProxyName(const char* groupname, vtkSMProxy* p
     vtkErrorMacro("No active session found.");
   }
   return NULL;
+}
+
+//---------------------------------------------------------------------------
+std::string vtkSMProxyManager::GetUniqueProxyName(
+  const char* groupname, const char* prefix, bool alwaysAppend)
+{
+  std::vector<vtkSMSessionProxyManager*> pxms;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkSessionIterator* iter = pm->NewSessionIterator();
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+  {
+    if (auto session = vtkSMSession::SafeDownCast(iter->GetCurrentSession()))
+    {
+      pxms.push_back(session->GetSessionProxyManager());
+    }
+  }
+  iter->Delete();
+
+  if (!groupname || !prefix || pxms.size() == 0)
+  {
+    return std::string();
+  }
+
+  if (pxms.size() == 1)
+  {
+    return pxms[0]->GetUniqueProxyName(groupname, prefix, alwaysAppend);
+  }
+
+  // find unique name across all sessions.
+  std::set<std::string> existingNames;
+
+  vtkNew<vtkSMProxyIterator> piter;
+  for (auto pxm : pxms)
+  {
+    piter->SetSessionProxyManager(pxm);
+    for (piter->Begin(groupname); !piter->IsAtEnd(); piter->Next())
+    {
+      existingNames.insert(piter->GetKey());
+    }
+  }
+
+  if (!alwaysAppend)
+  {
+    if (existingNames.find(prefix) == existingNames.end())
+    {
+      return prefix;
+    }
+  }
+
+  for (int suffix = 1; suffix < VTK_INT_MAX; ++suffix)
+  {
+    std::ostringstream name_stream;
+    name_stream << prefix << suffix;
+    if (existingNames.find(name_stream.str()) == existingNames.end())
+    {
+      return name_stream.str();
+    }
+  }
+
+  vtkErrorMacro("Failed to come up with a unique name!");
+  abort();
 }

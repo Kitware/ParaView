@@ -25,6 +25,7 @@
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMSessionProxyManager.h"
@@ -780,9 +781,20 @@ bool vtkSMParaViewPipelineControllerWithRendering::RegisterLayoutProxy(
   }
 
   SM_SCOPED_TRACE(RegisterLayoutProxy).arg("layout", proxy);
-
   vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
-  pxm->RegisterProxy("layouts", proxyname, proxy);
+
+  std::string pname;
+  if (proxyname == nullptr)
+  {
+    // get a unique name across all sessions (for multi-server sessions).
+    vtkSMProxyManager* gpxm = vtkSMProxyManager::GetProxyManager();
+    pname = gpxm->GetUniqueProxyName("layouts", "Layout #", /*alwaysAppend=*/true);
+  }
+  else
+  {
+    pname = proxyname;
+  }
+  pxm->RegisterProxy("layouts", pname.c_str(), proxy);
   return true;
 }
 
