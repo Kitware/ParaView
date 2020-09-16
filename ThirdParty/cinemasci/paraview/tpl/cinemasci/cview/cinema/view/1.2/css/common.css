@@ -1,0 +1,29 @@
+* {
+    font-family: helvetica !important;
+}
+
+div.container {
+    width: 100%;
+    border: 1px solid gray;
+}
+
+body {
+    background-color: #f9f9f9;
+}
+
+header, footer {
+    padding-left:   1px;
+    padding-right:  1px;
+    padding-top:    10px;
+    padding-bottom: 10px;
+    color: white;
+    background-color: #373737;
+    clear: left;
+    text-align: center;
+}
+
+#header h2 {
+	display: inline-block;
+	margin: initial;
+}
+

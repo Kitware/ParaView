@@ -1,0 +1,26 @@
+#resultsArea {
+	float: left;
+	left: 0px;
+	right: 0px;
+	width: 100%;
+	padding: 10px;
+	background-color: white;
+}
+
+.imageArea {
+	float: left;
+	position: relative;
+	width: 75%;
+}
+
+.sliderArea {
+	float: left;
+	position: relative;
+	width: 20%;
+}
+
+.cinemaImage {
+	float: left;
+	position: relative;
+	padding: 2px;
+}

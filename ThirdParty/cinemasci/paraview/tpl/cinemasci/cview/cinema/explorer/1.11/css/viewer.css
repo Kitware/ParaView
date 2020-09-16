@@ -1,0 +1,213 @@
+/*
+A general Parallel Coordinates-based viewer for Spec-D cinema databases 
+
+pcoord_viewer Version 1.8
+
+Copyright 2017 Los Alamos National Laboratory 
+
+Redistribution and use in source and binary forms, with or without 
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this 
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, 
+   this list of conditions and the following disclaimer in the documentation 
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors 
+   may be used to endorse or promote products derived from this software 
+   without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+body {
+	background-color: gray;
+	margin: initial;
+	overflow: hidden;
+
+	color: #404040;
+	font-family: Ubuntu, Tahoma, Helvetica, sans-serif
+}
+
+#top {
+	box-sizing: border-box;
+	box-shadow: 0px 4px 4px black;
+}
+
+#header {
+	border-bottom: 3px solid rgba(100,100,100,0.35);
+	background: #e2e2e2;
+	padding: 6px 24px 6px;
+}
+
+#header h1 {
+	display: inline-block;
+	margin: initial;
+}
+
+#databaseControls,
+#axisOrderPanel {
+	display: inline-block;
+	margin-left: 40px;
+}
+
+#pcoordArea {
+	position: relative;
+	height: 300px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	padding: 10px 25px 15px;
+	background-color: whitesmoke;
+}
+
+#slideOut {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 25px;
+	background-color: rgba(25,25,25,0.85);
+}
+#slideOutContents {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 25px;
+	padding: 5px;
+	box-sizing: border-box;
+	overflow: auto;
+	white-space: nowrap;
+}
+#queryContainer {
+	width: 100%;
+	height: 100%;
+}
+
+#showHideButton {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	width: 25px;
+	background-color: #e2e2e2;
+}
+#showHideButton:hover {
+	background-color: lightgray;;
+}
+#showHideLabel {
+	font-size: 24px;
+	font-weight: bold;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translateY(-50%) translateX(-50%);
+}
+
+#pcoordContainer {
+	width: 100%;
+	height: 100%;
+}
+
+#smoothLinesWrapper {
+	position: absolute;
+	top: 3px;
+	right: 10px;
+	font-size: 12px;
+}
+
+#selectionStats {
+	position: absolute;
+	bottom: 0px;
+	right: 2px;
+	padding: 2px 5px 5px 2px;
+	background-color: #e2e2e2;
+	border-radius: 6px 6px 0px 0px;
+	font-size: 12px;
+}
+
+#resizeBar {
+	cursor: ns-resize;
+	height: 3px;
+	background-color: rgb(50,50,50);
+}
+#resizeBar:hover {
+	background-color: lightskyblue;
+}
+#resizeBar[mode="dragging"],
+#resizeBar[mode="dragging"]:hover {
+	background-color: rgb(105, 168, 207);
+}
+
+#tabContainer {
+	position: relative;
+	height: 45px;
+}
+
+.tab {
+	position: absolute;
+	box-sizing: border-box;
+	width: 33%;
+	height: 35px;
+	top: 10px;
+	padding: 5px;
+
+	text-align: center;
+	border-radius: 15px 15px 0px 0px;
+}
+.tab:first-child {
+	left: 0px;
+}
+.tab:nth-child(2) {
+    left: 33.5%;
+}
+.tab:last-child {
+	right: 0px;
+}
+.tab[selected="selected"] {
+	background: #e2e2e2;
+	border: 2px solid #9c9c9c;
+	border-bottom-width: 0px;
+}
+.tab[selected="default"] {
+	background: #6b6b6b;
+	border: 2px solid #505050;
+	border-bottom-width: 0px;
+	color: rgb(36, 36, 36);
+}
+.tab[selected="default"]:hover {
+	cursor: pointer;
+	background: #8b8b8b;
+	color: rgb(36, 36, 36);
+}
+
+.infoPane {
+	position: fixed;
+	bottom: 30px;
+	white-space: nowrap;
+	padding: 8px;
+
+	background-color: rgba(25,25,25,0.85);
+	box-shadow: 0px 0px 8px black;
+	color: white;
+	font-family: initial;
+	border: 3px solid white;
+	border-radius: 5px;
+}
+
+/*Override background for Scatter Plot*/
+.CINEMA_COMPONENT.SCATTER_PLOT {
+	background: #e2e2e2;
+}
