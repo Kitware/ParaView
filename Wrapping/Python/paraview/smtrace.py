@@ -1372,6 +1372,11 @@ class RegisterLayoutProxy(RenderingMixin, TraceItem):
                     Trace.Output.append([\
                         "%s.AssignView(%d, %s)" % (laccessor, location, vaccessor)])
         _trace_layout(self.Layout, accessor, 0)
+
+        # save size, if non-empty.
+        lsize = self.Layout.GetSize()
+        if lsize[0] > 0 and lsize[1] > 0:
+            Trace.Output.append("%s.SetSize(%d, %d)" % (accessor, lsize[0], lsize[1]))
         TraceItem.finalize(self)
 
 class LoadPlugin(TraceItem):
