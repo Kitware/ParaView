@@ -57,6 +57,7 @@ int TestMultiBlockDataSet(int argc, char* argv[])
 
   vtkNew<vtkCGNSReader> r;
   r->SetFileName(filename);
+  r->UpdateInformation();
   r->EnableAllBases();
   r->Update();
 

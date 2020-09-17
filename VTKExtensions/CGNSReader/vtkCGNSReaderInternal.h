@@ -35,7 +35,9 @@
 #include <string>
 #include <vector>
 
+#include "vtkCGNSReader.h"
 #include "vtkCGNSSubsetInclusionLattice.h"
+#include "vtkDataArraySelection.h"
 #include "vtkIdTypeArray.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
@@ -281,7 +283,22 @@ public:
   vtkCGNSArraySelection CellDataArraySelection;
 };
 
-//------------------------------------------------------------------------------
+//==============================================================================
+
+//@{
+/**
+ * Helpers to encapsulate all logic to read various nodes (zones, bc patches
+ * etc.).
+ */
+bool ReadBase(vtkCGNSReader* reader, const BaseInformation& baseInfo);
+bool ReadGridForZone(
+  vtkCGNSReader* reader, const BaseInformation& baseInfo, const ZoneInformation& zoneInfo);
+bool ReadPatchesForBase(vtkCGNSReader* reader, const BaseInformation&);
+bool ReadPatch(vtkCGNSReader* reader, const BaseInformation&, const ZoneInformation& zoneInfo,
+  const std::string& patchFamilyname);
+//@}
+
+//==============================================================================
 class vtkCGNSMetaData
 {
 public:
@@ -317,38 +334,18 @@ public:
   /**
    * Constructor/Destructor
    */
-  vtkCGNSMetaData();
-  ~vtkCGNSMetaData();
+  vtkCGNSMetaData() = default;
+  ~vtkCGNSMetaData() = default;
   //@}
-
-  vtkCGNSSubsetInclusionLattice* GetSIL() const { return this->SIL; }
-  void SetExternalSIL(vtkCGNSSubsetInclusionLattice* sil)
-  {
-    if (sil)
-    {
-      this->SIL = sil;
-      this->SkipSILUpdates = true;
-    }
-    else
-    {
-      this->SIL = vtkSmartPointer<vtkCGNSSubsetInclusionLattice>::New();
-      this->SkipSILUpdates = false;
-    }
-  }
 
 private:
   vtkCGNSMetaData(const vtkCGNSMetaData&) = delete;
   void operator=(const vtkCGNSMetaData&) = delete;
 
-  void UpdateSIL();
-
   std::vector<CGNSRead::BaseInformation> baseList;
   std::string LastReadFilename;
   // Not very elegant :
   std::vector<double> GlobalTime;
-
-  vtkSmartPointer<vtkCGNSSubsetInclusionLattice> SIL;
-  bool SkipSILUpdates;
 };
 
 //------------------------------------------------------------------------------

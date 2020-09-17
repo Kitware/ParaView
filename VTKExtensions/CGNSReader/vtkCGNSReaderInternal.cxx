@@ -869,114 +869,7 @@ bool vtkCGNSMetaData::Parse(const char* cgnsFileName)
 
   this->LastReadFilename = cgnsFileName;
   cgio_close_file(cgioNum);
-
-  if (this->SkipSILUpdates == false)
-  {
-    this->UpdateSIL();
-  }
-
   return true;
-}
-
-//------------------------------------------------------------------------------
-void vtkCGNSMetaData::UpdateSIL()
-{
-  // initialize the SIL.
-  const auto selection = this->SIL->GetSelection();
-  this->SIL->Initialize();
-
-  // build the SIL.
-  auto silHierarchy = this->SIL->AddNode("Hierarchy");
-  auto silFamilies = this->SIL->AddNode("Families");
-
-  // these are provided to make it easier to support legacy API.
-  // Can be dropped entirely if not found useful.
-  auto silGrids = this->SIL->AddNode("Grids");
-  auto silPatches = this->SIL->AddNode("Patches");
-
-  // first add families.
-  std::map<std::string, int> silFamilyIds;
-  for (const CGNSRead::BaseInformation& baseInfo : this->baseList)
-  {
-    for (const CGNSRead::FamilyInformation& familyInfo : baseInfo.family)
-    {
-      if (silFamilyIds.find(familyInfo.name) == silFamilyIds.end())
-      {
-        silFamilyIds[familyInfo.name] = this->SIL->AddNode(familyInfo.name, silFamilies);
-      }
-    }
-  }
-
-  bool firstGridSelected = false;
-
-  // now handles bases/zones/zone_bcs
-  for (const CGNSRead::BaseInformation& baseInfo : this->baseList)
-  {
-    auto silBase = this->SIL->AddNode(baseInfo.name, silHierarchy);
-    auto silBaseGrids = this->SIL->AddNode(baseInfo.name, silGrids);
-    auto silBasePatches = this->SIL->AddNode(baseInfo.name, silPatches);
-
-    for (const CGNSRead::ZoneInformation& zoneInfo : baseInfo.zones)
-    {
-      auto silZone = this->SIL->AddZoneNode(zoneInfo.name, silBase);
-      auto silZoneGrid = this->SIL->AddNode("Grid", silZone);
-      if (!firstGridSelected)
-      {
-        firstGridSelected = true;
-        this->SIL->Select(silZoneGrid);
-      }
-
-      this->SIL->AddCrossLink(this->SIL->AddZoneNode(zoneInfo.name, silBaseGrids), silZoneGrid);
-      if (zoneInfo.family[0])
-      {
-        auto fiter = silFamilyIds.find(zoneInfo.family);
-        if (fiter == silFamilyIds.end())
-        {
-          fiter = silFamilyIds
-                    .insert(std::pair<std::string, int>(
-                      zoneInfo.family, this->SIL->AddNode(zoneInfo.family, silFamilies)))
-                    .first;
-        }
-        this->SIL->AddCrossLink(fiter->second, silZoneGrid);
-      }
-
-      auto silZonePatches = this->SIL->AddZoneNode(zoneInfo.name, silBasePatches);
-      for (const CGNSRead::ZoneBCInformation& bcInfo : zoneInfo.bcs)
-      {
-        auto silBC = this->SIL->AddNode(bcInfo.name, silZone);
-        this->SIL->AddCrossLink(silZonePatches, silBC);
-        if (bcInfo.family[0])
-        {
-          auto fiter = silFamilyIds.find(bcInfo.family);
-          if (fiter == silFamilyIds.end())
-          {
-            fiter = silFamilyIds
-                      .insert(std::pair<std::string, int>(
-                        bcInfo.family, this->SIL->AddNode(bcInfo.family, silFamilies)))
-                      .first;
-          }
-          this->SIL->AddCrossLink(fiter->second, silBC);
-        }
-      }
-    }
-  }
-  if (!selection.empty())
-  {
-    this->SIL->SetSelection(selection);
-  }
-}
-
-//------------------------------------------------------------------------------
-vtkCGNSMetaData::vtkCGNSMetaData()
-  : SIL(nullptr)
-  , SkipSILUpdates(false)
-{
-  this->SIL = vtkSmartPointer<vtkCGNSSubsetInclusionLattice>::New();
-}
-
-//------------------------------------------------------------------------------
-vtkCGNSMetaData::~vtkCGNSMetaData()
-{
 }
 
 //------------------------------------------------------------------------------
@@ -1293,4 +1186,70 @@ void vtkCGNSMetaData::Broadcast(vtkMultiProcessController* controller, int rank)
   CGNSRead::BroadcastString(controller, this->LastReadFilename, rank);
   BroadcastDoubleVector(controller, this->GlobalTime, rank);
 }
+
+//------------------------------------------------------------------------------
+bool ReadBase(vtkCGNSReader* reader, const BaseInformation& baseInfo)
+{
+  auto baseSelection = reader->GetBaseSelection();
+  if (!baseSelection->ArrayIsEnabled(baseInfo.name))
+  {
+    // base has not been enabled.
+    return false;
+  }
+
+  return true;
 }
+
+//------------------------------------------------------------------------------
+bool ReadGridForZone(
+  vtkCGNSReader* reader, const BaseInformation& baseInfo, const ZoneInformation& zoneInfo)
+{
+  if (!reader->GetLoadMesh())
+  {
+    return false;
+  } // mesh (aka grid) is not enabled.
+
+  auto baseSelection = reader->GetBaseSelection();
+  if (!baseSelection->ArrayIsEnabled(baseInfo.name))
+  {
+    // base has not been enabled.
+    return false;
+  }
+
+  // check if the zone's family is enabled.
+  auto familySelection = reader->GetFamilySelection();
+  if (familySelection->ArrayExists(zoneInfo.family) &&
+    !familySelection->ArrayIsEnabled(zoneInfo.family))
+  {
+    return false;
+  }
+
+  return true;
+}
+
+//------------------------------------------------------------------------------
+bool ReadPatchesForBase(vtkCGNSReader* reader, const BaseInformation&)
+{
+  if (!reader->GetLoadBndPatch())
+  {
+    // patches have been globally disabled.
+    return false;
+  }
+
+  return true;
+}
+
+//------------------------------------------------------------------------------
+bool ReadPatch(vtkCGNSReader* reader, const BaseInformation&, const ZoneInformation&,
+  const std::string& patchFamilyname)
+{
+  auto familySelection = reader->GetFamilySelection();
+  if (!patchFamilyname.empty() && !familySelection->ArrayIsEnabled(patchFamilyname.c_str()))
+  {
+    return false;
+  }
+
+  return true;
+}
+
+} // end of namespace

@@ -660,6 +660,17 @@ def getattr(proxy, pname):
         else:
             raise NotSupportedException(
                     'The `Scale` property has been renamed in ParaView 5.7 to `Length`.')
+
+    # In 5.9, CGNSSeriesReader no longer supports the "Blocks" property.
+    if pname == "Blocks" and proxy.SMProxy.GetXMLName() == "CGNSSeriesReader":
+        if paraview.compatibility.GetVersion() < 5.9:
+            return []
+        else:
+            raise NotSupportedException(
+                    "The 'Blocks' property has been removed in ParaView 5.9. Use "
+                    "'Bases' to choose bases and 'Families' to choose families "
+                    "to load instead. 'LoadMesh' and 'LoadPatches' may also be "
+                    "used to enable loading of meshes and BC-patches.")
     raise Continue()
 
 def GetProxy(module, key, **kwargs):

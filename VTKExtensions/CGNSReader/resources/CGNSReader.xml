@@ -11,6 +11,46 @@
         a multi-block dataset.
       </Documentation>
 
+      <StringVectorProperty name="BaseInfo"
+        command="GetBaseSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="Bases"
+                            command="GetBaseSelection"
+                            information_property="BaseInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="BaseInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="FamilyInfo"
+        command="GetFamilySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="Families"
+                            command="GetFamilySelection"
+                            information_property="FamilyInfo"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            repeat_command="1"
+                            si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="FamilyInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+      </StringVectorProperty>
+
       <StringVectorProperty name="PointArrayInfo"
                             information_only="1">
         <ArraySelectionInformationHelper attribute_name="Point" />
@@ -58,6 +98,27 @@
           This property contains a list of the cell-centered arrays to read.
         </Documentation>
       </StringVectorProperty>
+
+      <IntVectorProperty name="LoadMesh"
+                         command="SetLoadMesh"
+                         number_of_elements="1"
+                         default_values="1">
+       <BooleanDomain name="bool" />
+       <Documentation>
+         Toggle whether zone mesh must be read for selected bases/families.
+       </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="LoadPatches"
+                         command="SetLoadBndPatch"
+                         number_of_elements="1"
+                         default_values="0">
+       <BooleanDomain name="bool" />
+       <Documentation>
+          Toggle whether boundary condition patches must be read for selected
+          bases/families.
+       </Documentation>
+      </IntVectorProperty>
 
       <IntVectorProperty name="DoublePrecisionMesh"
                          command="SetDoublePrecisionMesh"
@@ -194,50 +255,22 @@
         </Documentation>
       </StringVectorProperty>
 
-      <IdTypeVectorProperty command="GetSILUpdateStamp"
-        number_of_elements="1"
-        default_values="0"
-        information_only="1"
-        name="SILTimeStamp">
-        <Documentation>
-          Indicates the timestamp when the SIL structured was modified.
-          Useful to determine which to rebuild the SIL on the client.
-        </Documentation>
-      </IdTypeVectorProperty>
-
-      <StringVectorProperty
-         name="Blocks"
-         label="Blocks"
-         command="SetBlockStatus"
-         clean_command="ClearBlockStatus"
-         repeat_command="1"
-         number_of_elements_per_command="2"
-         element_types="2 0">
-         <SubsetInclusionLatticeDomain name="array_list" class="vtkCGNSSubsetInclusionLattice" default_path="//Grid">
-           <RequiredProperties>
-             <Property function="TimeStamp" name="SILTimeStamp" />
-           </RequiredProperties>
-         </SubsetInclusionLatticeDomain>
-        <Documentation>
-          Select the blocks (i.e. zones, bc-patches etc)
-          to be loaded from the dataset. **Hierarchy** reflects the
-          hierarchy as present in the CGNS file. **Families** allows selecting of blocks
-          using their family names. **Grids** and **Patches** allows loading grids or
-          bc-patches for specific zones.
-        </Documentation>
-      </StringVectorProperty>
-
-
       <SubProxy command="SetReader">
         <Proxy name="Reader"
                proxygroup="internal_sources"
                proxyname="CGNSReader">
         </Proxy>
         <ExposedProperties>
+          <Property name="BaseInfo" />
+          <Property name="Bases" />
+          <Property name="FamilyInfo" />
+          <Property name="Families" />
           <Property name="CellArrayInfo" />
           <Property name="CellArrayStatus" />
           <Property name="PointArrayInfo" />
           <Property name="PointArrayStatus" />
+          <Property name="LoadMesh" />
+          <Property name="LoadPatches" />
           <Property name="DoublePrecisionMesh" />
           <Property name="CacheMesh" />
           <Property name="CacheConnectivity" />
