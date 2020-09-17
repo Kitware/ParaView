@@ -89,7 +89,7 @@ static QString defaultServers()
   auto path = locator->Locate(vtk_libs, prefixes, "default_servers.pvsc");
   if (!path.empty())
   {
-    return vtksys::SystemTools::CollapseFullPath(path).c_str();
+    return vtksys::SystemTools::CollapseFullPath("default_servers.pvsc", path).c_str();
   }
   return QString();
 }
