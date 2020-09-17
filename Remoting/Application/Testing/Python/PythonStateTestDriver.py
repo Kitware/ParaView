@@ -12,7 +12,7 @@ exec(open(sys.argv[1]).read())
 
 _view = GetActiveView()
 _view.ViewSize = [300, 300]
-_view.SMProxy.UpdateVTKObjects()
+_view.StillRender()
 
 if not smtesting.DoRegressionTesting(_view.SMProxy):
   # This will lead to VTK object leaks.

@@ -28,7 +28,7 @@ endif()
 
 # run pvpython to load the state file and verify the result
 execute_process(
-  COMMAND ${PVPYTHON_EXECUTABLE} -dr
+  COMMAND ${PVPYTHON_EXECUTABLE} -dr --force-offscreen-rendering
   ${TEST_DRIVER}
   ${TEMPORARY_DIR}/${PYTHON_STATE_TEST_NAME}-StateFile.py
   -T ${TEMPORARY_DIR}
