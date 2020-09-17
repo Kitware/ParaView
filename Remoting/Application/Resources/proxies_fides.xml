@@ -1,0 +1,120 @@
+<ServerManagerConfiguration>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+    <!-- User selects bp file that vtkFidesReader will use to determine
+         which pre-defined data model to select -->
+    <SourceProxy name="FidesFileReader"
+                 label="FidesReader"
+                 class="vtkFidesReader">
+      <Documentation short_help="Read ADIOS2 files using Fides.">
+        Reader to read ADIOS2 files using Fides library.
+      </Documentation>
+      <StringVectorProperty
+            name="FileName"
+            animateable="0"
+            command="SetFileName"
+            number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property sets the ADIOS2 bp filename for Fides to read.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty
+            name="ConvertToVTK"
+            command="SetConvertToVTK"
+            label="Convert To VTK"
+            number_of_elements="1"
+            default_values="1"
+            panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property determines whether data should be converted to VTK
+          or stay in VTK-m format.
+        </Documentation>
+      </IntVectorProperty>
+      <Property
+            name="PrepareNextStep"
+            command="PrepareNextStep"
+            label="PrepareNextStep"
+            panel_visibility="never"
+            repeat_command="1">
+        <Documentation>
+          This property has Fides/ADIOS prepare for reading the next time step when in
+          streaming mode.
+        </Documentation>
+      </Property>
+      <IntVectorProperty
+            command="GetNextStepStatus"
+            name="NextStepStatus"
+            number_of_elements="1"
+            default_values="1"
+            information_only="1"
+            panel_visibility="advanced">
+        <SimpleIntInformationHelper />
+        <Documentation>
+          This property returns the status of the next step to be read. 0 means the step is
+          ready to be read, 1 means it is not ready, and 2 means the end of the stream has
+          been reached.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty
+            name="TimestepValues"
+            repeatable="1"
+            information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="bp"
+                       file_description="Fides Files (ADIOS2 BP)" />
+      </Hints>
+    </SourceProxy>
+
+    <!-- User selects json data model file. Currently should only be used for debugging
+         purposes. -->
+    <SourceProxy name="FidesJSONReader"
+                 label="FidesJSONReader"
+                 class="vtkFidesReader">
+      <Documentation short_help="Read ADIOS2 files using Fides.">
+        Reader to read ADIOS2 files using Fides library. This method requires selecting the
+        JSON file containing the Fides data model.
+      </Documentation>
+      <StringVectorProperty
+            name="FileName"
+            animateable="0"
+            command="ParseDataModel"
+            number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property sets the Fides JSON data model filename.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty
+            name="DataSourcePath"
+            animateable="0"
+            command="SetDataSourcePath"
+            repeat_command="1"
+            element_types="2 2"
+            number_of_elements="0"
+            number_of_elements_per_command="2"
+            panel_visibility="default">
+      </StringVectorProperty>
+      <IntVectorProperty
+            name="ConvertToVTK"
+            command="SetConvertToVTK"
+            label="Convert to VTK"
+            number_of_elements="1"
+            default_values="1"
+            panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="json"
+                       file_description="Fides Data Model File (JSON)" />
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
