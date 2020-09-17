@@ -36,7 +36,6 @@
 #include <vector>
 
 #include "vtkCGNSReader.h"
-#include "vtkCGNSSubsetInclusionLattice.h"
 #include "vtkDataArraySelection.h"
 #include "vtkIdTypeArray.h"
 #include "vtkMultiProcessController.h"

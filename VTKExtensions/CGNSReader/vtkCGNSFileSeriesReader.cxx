@@ -15,7 +15,6 @@
 #include "vtkCGNSFileSeriesReader.h"
 
 #include "vtkCGNSReader.h"
-#include "vtkCGNSSubsetInclusionLattice.h"
 #include "vtkCommand.h"
 #include "vtkCommunicator.h"
 #include "vtkDataSet.h"
