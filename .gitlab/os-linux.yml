@@ -91,7 +91,11 @@
     - git submodule update --init --recursive
 
 .doxygen_build_linux:
-    stage: package
+    stage: deploy
+    environment:
+      name: documentation
+      url: https://kitware.github.io/paraview-docs/latest/cxx/
+
     needs: []
 
     script:

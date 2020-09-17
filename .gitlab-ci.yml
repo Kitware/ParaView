@@ -11,6 +11,7 @@ stages:
     - build
     - test
     - package
+    - deploy
 
 ################################################################################
 # Job declarations
@@ -40,16 +41,6 @@ package:spack-centos7:
         - .linux_builder_tags
         - .run_scheduled
 
-## Doxygen
-
-package:documentation:
-    extends:
-        - .centos7
-        - .doxygen_build_linux
-        - .linux_builder_tags
-        - .doxygen_log_artifacts
-        - .run_scheduled
-
 # macOS
 
 build:macos-python-qt:
@@ -67,6 +58,17 @@ test:macos-python-qt:
         - .macos_builder_tags
         - .cmake_test_artifacts
         - .run_automatically
+
+# Deployment
+
+## Documentation
+deploy:documentation:
+    extends:
+        - .centos7
+        - .doxygen_build_linux
+        - .linux_builder_tags
+        - .doxygen_log_artifacts
+        - .run_scheduled
 
 # Triggers
 
