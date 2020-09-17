@@ -2481,17 +2481,39 @@ void vtkPVRenderView::UpdateSkybox()
 
   if (this->NeedSkybox && texture != nullptr)
   {
+    this->ConfigureTexture(texture);
+
+    this->Skybox->GammaCorrectOn();
     this->Skybox->SetProjection(vtkSkybox::Sphere);
     this->Skybox->SetFloorRight(0.0, 0.0, 1.0);
     this->Skybox->SetTexture(texture);
+
     this->GetRenderer()->AddActor(this->Skybox);
-    texture->MipmapOn();
-    texture->InterpolateOn();
-    this->GetRenderer()->SetEnvironmentTexture(texture, true);
+
+    this->GetRenderer()->SetEnvironmentTexture(texture);
   }
   else
   {
     this->GetRenderer()->SetEnvironmentTexture(nullptr);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::ConfigureTexture(vtkTexture* texture)
+{
+  if (texture != nullptr)
+  {
+    // environment texture is always declared in linear color space
+    vtkImageData* input = texture->GetInput();
+    if (input)
+    {
+      texture->Update();
+      texture->SetUseSRGBColorSpace(input->GetScalarType() == VTK_UNSIGNED_CHAR);
+
+      // mip map is required for correct IBL generation
+      texture->MipmapOn();
+      texture->InterpolateOn();
+    }
   }
 }
 
@@ -2526,7 +2548,8 @@ void vtkPVRenderView::SetEnvironmentalBG2(double r, double g, double b)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetEnvironmentalBGTexture(vtkTexture* texture)
 {
-  this->GetRenderer()->SetEnvironmentTexture(texture, true);
+  this->ConfigureTexture(texture);
+  this->GetRenderer()->SetEnvironmentTexture(texture);
 }
 
 //----------------------------------------------------------------------------

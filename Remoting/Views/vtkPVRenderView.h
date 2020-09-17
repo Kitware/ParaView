@@ -1123,6 +1123,11 @@ protected:
    */
   void UpdateSkybox();
 
+  /**
+   * Configure texture based on scalar type
+   */
+  void ConfigureTexture(vtkTexture* texture);
+
   vtkLightKit* LightKit;
   vtkRenderViewBase* RenderView;
   vtkRenderer* NonCompositedRenderer;
