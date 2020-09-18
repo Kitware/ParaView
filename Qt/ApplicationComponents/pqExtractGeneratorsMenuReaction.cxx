@@ -151,7 +151,7 @@ void pqExtractGeneratorsMenuReaction::updateEnableState(bool)
       auto input = pqMenuReactionUtils::getInputProperty(prototype);
 
       input->RemoveAllUncheckedProxies();
-      for (int cc = 0; cc < outputPorts.size(); cc++)
+      for (size_t cc = 0; cc < outputPorts.size(); cc++)
       {
         pqOutputPort* port = outputPorts[cc];
         input->AddUncheckedInputConnection(port->getSource()->getProxy(), port->getPortNumber());
