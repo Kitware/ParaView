@@ -62,7 +62,7 @@ public:
   //@}
 protected:
   vtkSMExtractWriterProxy();
-  ~vtkSMExtractWriterProxy();
+  ~vtkSMExtractWriterProxy() override;
 
   //@{
   /**
