@@ -94,10 +94,10 @@
     <!-- ================================================================= -->
     <PWriterProxy base_proxygroup="internal_writers"
                   base_proxyname="XMLDataObjectWriterCore"
-                  class="vtkXMLPartitionedDataSetWriter"
-                  name="XMLPartitionedDataSetWriterCore">
-      <Documentation>Internal proxy used by XMLPartitionedDataSetWriter.</Documentation>
-      <!-- End of XMLPartitionedDataSetWriterCore -->
+                  class="vtkXMLPPartitionedDataSetWriter"
+                  name="XMLPPartitionedDataSetWriterCore">
+      <Documentation>Internal proxy used by XMLPPartitionedDataSetWriter.</Documentation>
+      <!-- End of XMLPPartitionedDataSetWriterCore -->
     </PWriterProxy>
 
     <!-- ================================================================= -->
@@ -793,7 +793,7 @@
                  base_proxyname="FileSeriesWriter"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
-                 name="XMLPartitionedDataSetWriter"
+                 name="XMLPPartitionedDataSetWriter"
                  supports_parallel="1">
       <Documentation>
         Write a vtkPartitionedDataSet to a xml-based vtk data file.
@@ -811,7 +811,7 @@
       <SubProxy>
         <Proxy name="Writer"
                proxygroup="internal_writers"
-               proxyname="XMLPartitionedDataSetWriterCore"></Proxy>
+               proxyname="XMLPPartitionedDataSetWriterCore"></Proxy>
         <ExposedProperties>
           <PropertyGroup label="XML Writer Parameters">
             <Property name="DataMode" />
@@ -826,7 +826,7 @@
         <WriterFactory extensions="vtpd"
                        file_description="VTK PartitionedDataSet Files" />
       </Hints>
-      <!-- End of XMLPartitionedDataSetWriter -->
+      <!-- End of XMLPPartitionedDataSetWriter -->
     </WriterProxy>
 
     <!-- ================================================================= -->
@@ -1277,7 +1277,7 @@
         </Documentation>
       </StringVectorProperty>
       <SubProxy>
-        <Proxy name="Writer" proxygroup="writers" proxyname="XMLPartitionedDataSetWriter" />
+        <Proxy name="Writer" proxygroup="writers" proxyname="XMLPPartitionedDataSetWriter" />
         <ExposedProperties>
           <Property name="Input" />
           <Property name="DataMode" panel_visibility="advanced" />
