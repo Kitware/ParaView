@@ -5,8 +5,7 @@ mark_as_advanced(PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
 
 set(xmls
   "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewFilters.xml"
-  "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewSources.xml"
-  "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewExtractWriters.xml")
+  "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewSources.xml")
 
 if (PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
   #------------------------------------------------------------------------------
