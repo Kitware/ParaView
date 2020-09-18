@@ -132,6 +132,7 @@ set(classes
   vtkSMChartSeriesListDomain
   vtkSMChartSeriesSelectionDomain
   vtkSMChartUseIndexForAxisDomain
+  vtkSMCinemaVolumetricImageExtractWriterProxy
   vtkSMComparativeAnimationCueProxy
   vtkSMComparativeAnimationCueUndoElement
   vtkSMComparativeViewProxy

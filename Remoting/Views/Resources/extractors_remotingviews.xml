@@ -180,5 +180,104 @@
       </Hints>
     </ImageExtractWriterProxy>
 
+    <!-- =================================================================== -->
+    <CinemaVolumetricImageExtractWriterProxy name="CinemaVolumetricPNG"
+      label="Cinema-Volumetric PNG"
+      base_proxygroup="extract_writers"
+      base_proxyname="PNG">
+
+      <IntVectorProperty name="OpacityLevels"
+        number_of_elements="1"
+        default_values="1">
+        <Documentation>
+          Specify the number of opacity levels.
+        </Documentation>
+        <IntRangeDomain name="range" min="1" max="5" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Functions"
+        number_of_elements="1"
+        default_values="5">
+        <IntRangeDomain name="range" min="2" max="20" />
+        <Documentation>
+          Number of functions.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="SingleFunctionOnly"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Have only 1 function active at a time.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="MaximumNumberOfFunctions"
+        number_of_elements="1"
+        default_values="4">
+        <Documentation>
+          Maximum number of active functions at a time.
+          and single function only is disabled.
+        </Documentation>
+        <IntRangeDomain name="range" min="1" max="64" />
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="SingleFunctionOnly" value="0" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="MaximumOpacityValue"
+        number_of_elements="1"
+        default_values="1">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+        <Documentation>
+          The maximum opacity value.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="SpecifiedRange"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Use a specified field range as the range for the LUT.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Range"
+        default_values="none"
+        number_of_elements="2">
+        <Documentation>
+          A user defined range for the LUT. Only meaningful if volume rendering and specified range are enabled.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="SpecifiedRange" value="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="ExportTransferFunctions"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Export the transfer functions to JSON files.
+        </Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <ShowInMenu category="Experimental" />
+      </Hints>
+      <!-- end of CinemaVolumetricPNG -->
+    </CinemaVolumetricImageExtractWriterProxy>
+
+    <!-- end of 'extract_writers' -->
   </ProxyGroup>
 </ServerManagerConfiguration>

@@ -42,6 +42,14 @@ vtk_module_test_data(
 
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/MultiplePipelines_pipeline1_000000.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/MultiplePipelines_pipeline2_000001.png"
+
+  # baselines for WaveletVolumeRenderWithCinema
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletVolumeRenderWithCinema_BatchExtracts_image_000000otf_0.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletVolumeRenderWithCinema_BatchExtracts_image_000000otf_4.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletVolumeRenderWithCinema_CoprocessingExtracts_image_000000otf_0.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletVolumeRenderWithCinema_CoprocessingExtracts_image_000000otf_4.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletVolumeRenderWithCinema_ImmediateExtracts_image_000000otf_0.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletVolumeRenderWithCinema_ImmediateExtracts_image_000000otf_4.png"
 )
 
 set(simple_scripts
@@ -164,7 +172,8 @@ set_tests_properties(
 if (PARAVIEW_USE_QT)
   set(catalyst_tests
     WaveletHistogramExtracts.xml
-    WaveletPhiThetaExtractsWithCinema.xml,CINEMA)
+    WaveletPhiThetaExtractsWithCinema.xml,CINEMA,
+    WaveletVolumeRenderWithCinema.xml,CINEMA)
 
   set(catalyst_options
     CINEMA
