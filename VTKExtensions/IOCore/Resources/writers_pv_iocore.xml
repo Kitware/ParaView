@@ -351,6 +351,10 @@
           <Property name="AddTime" panel_visibility="advanced"/>
         </ExposedProperties>
       </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data" />
+      </Hints>
     </DataExtractWriterProxy>
 
     <!-- end of "extract_writers" -->

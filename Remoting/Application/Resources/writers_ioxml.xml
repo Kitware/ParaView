@@ -1084,6 +1084,10 @@
           <Property name="FileType" />
         </ExposedProperties>
       </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data" />
+      </Hints>
     </DataExtractWriterProxy>
 
     <!-- ================================================================= -->
@@ -1110,6 +1114,10 @@
           <Property name="UseSubdirectory" panel_visibility="advanced" />
         </ExposedProperties>
       </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data" />
+      </Hints>
     </DataExtractWriterProxy>
 
     <!-- ================================================================= -->
@@ -1136,6 +1144,10 @@
           <Property name="UseSubdirectory" panel_visibility="advanced" />
         </ExposedProperties>
       </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data" />
+      </Hints>
     </DataExtractWriterProxy>
 
     <!-- ================================================================= -->
@@ -1161,6 +1173,10 @@
           <Property name="CompressionLevel" />
         </ExposedProperties>
       </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data" />
+      </Hints>
     </DataExtractWriterProxy>
 
     <!-- ================================================================= -->
@@ -1186,6 +1202,10 @@
           <Property name="CompressionLevel" />
         </ExposedProperties>
       </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data" />
+      </Hints>
     </DataExtractWriterProxy>
 
     <!-- ================================================================= -->
@@ -1211,6 +1231,10 @@
           <Property name="CompressionLevel" />
         </ExposedProperties>
       </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data" />
+      </Hints>
     </DataExtractWriterProxy>
 
     <!-- ================================================================= -->
@@ -1236,6 +1260,10 @@
           <Property name="CompressionLevel" />
         </ExposedProperties>
       </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data" />
+      </Hints>
     </DataExtractWriterProxy>
 
     <!-- ================================================================= -->
@@ -1261,6 +1289,10 @@
           <Property name="CompressionLevel" />
         </ExposedProperties>
       </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data" />
+      </Hints>
     </DataExtractWriterProxy>
 
     <!-- ================================================================= -->
@@ -1286,6 +1318,10 @@
           <Property name="CompressionLevel" />
         </ExposedProperties>
       </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data" />
+      </Hints>
     </DataExtractWriterProxy>
 
     <!-- ================================================================= -->
@@ -1311,6 +1347,10 @@
           <Property name="CompressionLevel" />
         </ExposedProperties>
       </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data" />
+      </Hints>
     </DataExtractWriterProxy>
 
     <!-- ================================================================= -->
@@ -1336,6 +1376,10 @@
           <Property name="CompressionLevel" />
         </ExposedProperties>
       </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data" />
+      </Hints>
     </DataExtractWriterProxy>
 
     <!-- end of "extract_writers" -->

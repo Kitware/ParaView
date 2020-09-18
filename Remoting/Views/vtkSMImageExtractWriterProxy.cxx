@@ -178,6 +178,19 @@ bool vtkSMImageExtractWriterProxy::Write(vtkSMExtractsController* extractor)
     }
   }
 
+  return this->WriteInternal(extractor);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMImageExtractWriterProxy::WriteInternal(vtkSMExtractsController* extractor,
+  const vtkSMImageExtractWriterProxy::SummaryParametersT& params)
+{
+  auto writer = vtkSMSaveScreenshotProxy::SafeDownCast(this->GetSubProxy("Writer"));
+  assert(writer != nullptr);
+
+  auto view = vtkSMViewProxy::SafeDownCast(vtkSMPropertyHelper(writer, "View").GetAsProxy());
+  assert(view != nullptr);
+
   if (vtkSMPropertyHelper(this, "CameraMode").GetAsInt() ==
     vtkSMImageExtractWriterProxy::CameraMode::PhiTheta)
   {
@@ -216,20 +229,15 @@ bool vtkSMImageExtractWriterProxy::Write(vtkSMExtractsController* extractor)
         camera->Elevation(elevation);
         camera->OrthogonalizeViewUp();
 
+        vtkSMExtractsController::SummaryParametersT tparams = params;
         char buffer[128];
-        std::snprintf(buffer, 128, "p=%06.2ft=%06.2f", phi, theta);
-        auto convertedname = this->GenerateImageExtractsFileName(fname, buffer, extractor);
-        const bool status =
-          writer->WriteImage(convertedname.c_str(), vtkPVSession::DATA_SERVER_ROOT);
-        if (status)
-        {
-          // add to summary
-          vtkSMExtractsController::SummaryParametersT params;
-          params.insert({ "phi", std::to_string(phi) });
-          params.insert({ "theta", std::to_string(theta) });
-          extractor->AddSummaryEntry(this, convertedname, params);
-        }
-        else
+        std::snprintf(buffer, 128, "%06.2f", phi);
+        tparams["phi"] = buffer;
+
+        std::snprintf(buffer, 128, "%06.2f", theta);
+        tparams["theta"] = buffer;
+
+        if (!this->WriteImage(extractor, tparams))
         {
           return false;
         }
@@ -240,15 +248,62 @@ bool vtkSMImageExtractWriterProxy::Write(vtkSMExtractsController* extractor)
   }
   else
   {
-    auto convertedname = this->GenerateImageExtractsFileName(fname, extractor);
-    const bool status = writer->WriteImage(convertedname.c_str(), vtkPVSession::DATA_SERVER_ROOT);
-    if (status)
-    {
-      // add to summary
-      extractor->AddSummaryEntry(this, convertedname);
-    }
-    return status;
+    return this->WriteImage(extractor, params);
   }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMImageExtractWriterProxy::WriteImage(
+  vtkSMExtractsController* extractor, const SummaryParametersT& cameraParams)
+{
+  auto fname = vtkSMPropertyHelper(this, "FileName").GetAsString();
+  if (!fname)
+  {
+    vtkErrorMacro("Missing \"FileName\"!");
+    return false;
+  }
+
+  auto writer = vtkSMSaveScreenshotProxy::SafeDownCast(this->GetSubProxy("Writer"));
+  if (!writer)
+  {
+    vtkErrorMacro("Missing writer sub proxy.");
+    return false;
+  }
+
+  auto view = vtkSMViewProxy::SafeDownCast(vtkSMPropertyHelper(writer, "View").GetAsProxy());
+  if (!view)
+  {
+    vtkErrorMacro("No view provided to generate extract from!");
+    return false;
+  }
+
+  std::ostringstream sparams;
+  for (const auto& pair : cameraParams)
+  {
+    sparams << this->GetShortName(pair.first) << "=" << pair.second;
+  }
+  auto convertedname = this->GenerateImageExtractsFileName(fname, sparams.str(), extractor);
+  const bool status = writer->WriteImage(convertedname.c_str(), vtkPVSession::DATA_SERVER_ROOT);
+  if (status)
+  {
+    // add to summary
+    extractor->AddSummaryEntry(this, convertedname, cameraParams);
+  }
+  return status;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkSMImageExtractWriterProxy::GetShortName(const std::string& key) const
+{
+  if (key == "phi")
+  {
+    return "p";
+  }
+  else if (key == "theta")
+  {
+    return "t";
+  }
+  return key.c_str();
 }
 
 //----------------------------------------------------------------------------

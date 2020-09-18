@@ -46,7 +46,7 @@ public:
 
 protected:
   vtkSMDataExtractWriterProxy();
-  ~vtkSMDataExtractWriterProxy();
+  ~vtkSMDataExtractWriterProxy() override;
 
 private:
   vtkSMDataExtractWriterProxy(const vtkSMDataExtractWriterProxy&) = delete;

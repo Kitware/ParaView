@@ -28,6 +28,7 @@
 
 #include "vtkRemotingViewsModule.h" // needed for exports
 #include "vtkSMExtractWriterProxy.h"
+#include "vtkSMExtractsController.h" // for SummaryParametersT type
 
 class VTKREMOTINGVIEWS_EXPORT vtkSMImageExtractWriterProxy : public vtkSMExtractWriterProxy
 {
@@ -55,9 +56,32 @@ public:
 
 protected:
   vtkSMImageExtractWriterProxy();
-  ~vtkSMImageExtractWriterProxy();
+  ~vtkSMImageExtractWriterProxy() override;
 
   void CreateVTKObjects() override;
+
+  using SummaryParametersT = vtkSMExtractsController::SummaryParametersT;
+
+  /**
+   * Save a single image. Uses the `cameraParams` to create a unique filename.
+   * The cameraParams are also used when adding an entry to the summary table
+   * maintained by the vtkSMExtractsController.
+   */
+  bool WriteImage(vtkSMExtractsController* extractor,
+    const SummaryParametersT& cameraParams = SummaryParametersT{});
+
+  /**
+   * Called in Write(). Intended for subclasses to override to customize
+   * image generation
+   */
+  virtual bool WriteInternal(
+    vtkSMExtractsController* extractor, const SummaryParametersT& params = SummaryParametersT{});
+
+  /**
+   * Used to convert a parameter name used in the SummaryParametersT to a
+   * shorter version suitable for use in filename.
+   */
+  virtual const char* GetShortName(const std::string& key) const;
 
 private:
   vtkSMImageExtractWriterProxy(const vtkSMImageExtractWriterProxy&) = delete;

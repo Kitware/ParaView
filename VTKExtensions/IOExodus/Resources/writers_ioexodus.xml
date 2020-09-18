@@ -71,6 +71,10 @@
           <Property name="Input" />
         </ExposedProperties>
       </SubProxy>
+
+      <Hints>
+        <ShowInMenu category="Data" />
+      </Hints>
       <!-- end of Exodus -->
     </DataExtractWriterProxy>
 
