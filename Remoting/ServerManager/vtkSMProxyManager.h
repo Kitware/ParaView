@@ -30,6 +30,8 @@
 #include "vtkSMObject.h"
 #include "vtkSmartPointer.h" // Needed for the singleton
 
+#include <string> // needed for std::string
+
 class vtkPVXMLElement;
 class vtkSMPluginManager;
 class vtkSMProxy;
@@ -210,6 +212,17 @@ public:
     vtkSMProxy* Proxy;
     vtkPVXMLElement* StateChangeElement;
   };
+
+  /**
+   * Given a group, returns a name not already used for proxies registered in
+   * the given group. The prefix is used to come up with a new name.
+   * if alwaysAppend is true, then a suffix will always be appended, if not,
+   * the prefix may be used directly if possible. If there are multiple
+   * vtkSMSessionProxyManager instances in the application, this method tries to
+   * find a unique name across all of them.
+   */
+  std::string GetUniqueProxyName(
+    const char* groupname, const char* prefix, bool alwaysAppend = true);
 
 protected:
   vtkSMProxyManager();

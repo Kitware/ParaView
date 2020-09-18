@@ -248,11 +248,23 @@ public:
    */
   void GetLayoutExtent(int extent[4]);
 
+  //@{
   /**
    * Update the size for all the views in the layout assuming the new size
-   * provided for the whole layout.
+   * provided for the whole layout. This resizes and repositions each view based
+   * the recursive split ratios for all the cells in the layout.
    */
   void SetSize(const int size[2]);
+  void SetSize(int width, int height)
+  {
+    const int size[] = { width, height };
+    this->SetSize(size);
+  }
+  //@}
+
+  /**
+   * Returns the current size.
+   */
   vtkVector2i GetSize()
   {
     int extent[4];
