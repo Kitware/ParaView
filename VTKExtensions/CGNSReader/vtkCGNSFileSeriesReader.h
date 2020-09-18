@@ -107,15 +107,6 @@ public:
    */
   int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  //@{
-  /**
-   * API for support SIL and SIL based selections.
-   */
-  vtkIdType GetSILUpdateStamp() const;
-  void SetBlockStatus(const char* nodepath, bool enabled);
-  void ClearBlockStatus();
-  //@}
-
 protected:
   vtkCGNSFileSeriesReader();
   ~vtkCGNSFileSeriesReader() override;
@@ -152,8 +143,6 @@ private:
   unsigned long ReaderObserverId;
   bool InProcessRequest;
   std::vector<std::string> ActiveFiles;
-
-  vtkNew<vtkCGNSSubsetInclusionLattice> SIL;
 };
 
 #endif

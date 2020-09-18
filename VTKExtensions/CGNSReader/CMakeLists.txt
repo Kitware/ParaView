@@ -1,7 +1,6 @@
 set(classes
   vtkCGNSFileSeriesReader
-  vtkCGNSReader
-  vtkCGNSSubsetInclusionLattice)
+  vtkCGNSReader)
 
 set(sources
   cgio_helpers.cxx

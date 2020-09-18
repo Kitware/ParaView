@@ -39,7 +39,6 @@ class vtkAlgorithm;
 class vtkMultiProcessController;
 class vtkInformation;
 class vtkMultiProcessStream;
-class vtkSubsetInclusionLattice;
 
 class VTKPVVTKEXTENSIONSCGNSREADER_EXPORT vtkFileSeriesHelper : public vtkObject
 {
@@ -166,17 +165,6 @@ public:
    */
   std::vector<std::string> GetActiveFiles(vtkInformation* outInfo) const;
 
-  /**
-   * Certain readers support vtkSubsetInclusionLattice. If that's the case, one
-   * can set this variable to point to an instance of vtkSubsetInclusionLattice
-   * (or subclass) that the reader generates. Defaults to `nullptr`. If
-   * non-null, then the this class will populate it in `UpdateInformation`. For
-   * partitioned files, this support accumulating the SIL across all partitioned
-   * files.
-   */
-  void SetSIL(vtkSubsetInclusionLattice*);
-  vtkSubsetInclusionLattice* GetSIL() const;
-
 protected:
   vtkFileSeriesHelper();
   ~vtkFileSeriesHelper() override;
@@ -218,17 +206,11 @@ private:
     const std::vector<std::string>& files, int piece, int numPieces) const;
 
   void Broadcast(int srcRank);
-  void Broadcast(vtkSubsetInclusionLattice* sil, int srcRank);
-  void AllGather(vtkSubsetInclusionLattice* sil);
-
-  void UpdateSIL(vtkAlgorithm* reader, const vtkFileSeriesHelper::FileNameFunctorType& setFileName);
 
   std::vector<double> AggregatedTimeSteps;
   bool AggregatedTimeRangeValid;
   std::pair<double, double> AggregatedTimeRange;
   vtkTimeStamp UpdateInformationTime;
-
-  vtkSmartPointer<vtkSubsetInclusionLattice> SIL;
 };
 
 #endif

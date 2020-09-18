@@ -21,7 +21,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkSubsetInclusionLattice.h"
 #include "vtkTypeTraits.h"
 
 #include "vtksys/FStream.hxx"
@@ -157,7 +156,6 @@ vtkFileSeriesHelper::vtkFileSeriesHelper()
   , AggregatedTimeSteps()
   , AggregatedTimeRangeValid(false)
   , AggregatedTimeRange(0, 0)
-  , SIL(nullptr)
 {
   this->SetController(vtkMultiProcessController::GetGlobalController());
 }
@@ -372,9 +370,6 @@ bool vtkFileSeriesHelper::UpdateInformation(
     }
   }
 
-  // let's check if we need to do something about SILs.
-  this->UpdateSIL(reader, setFileName);
-
   this->UpdateInformationTime.Modified();
   return true;
 }
@@ -543,136 +538,6 @@ std::vector<std::string> vtkFileSeriesHelper::SplitFiles(
     }
     return retval;
   }
-}
-
-//----------------------------------------------------------------------------
-void vtkFileSeriesHelper::UpdateSIL(
-  vtkAlgorithm* reader, const vtkFileSeriesHelper::FileNameFunctorType& setFileName)
-{
-  if (this->SIL == nullptr || reader == nullptr)
-  {
-    return;
-  }
-
-  // capture current selection
-  auto currentSelection = this->SIL->GetSelection();
-  this->SIL->Initialize();
-
-  // SIL needs special handling for file series.
-
-  //--------------------------------------------------------------------------
-  // For temporal file series, we assume that the SIL from the 1st file on the
-  // root node is good enough. Let's obtain that and share it with everyone.
-  if (this->PartitionedFiles == false)
-  {
-    if (this->Controller == nullptr || this->Controller->GetLocalProcessId() == 0)
-    {
-      setFileName(reader, this->FileNames[0]);
-      reader->UpdateInformation();
-      this->SIL->DeepCopy(vtkSubsetInclusionLattice::GetSIL(reader->GetOutputInformation(0)));
-    }
-    this->Broadcast(this->SIL, 0);
-  }
-
-  //--------------------------------------------------------------------------
-  // For partitioned files, since the structure need not be identical in all
-  // partitioned files, we need to build a combined structure ourselves. We do
-  // that by making each rank read the file-set it's intended to read and then
-  // share the sil with each other.
-  if (this->PartitionedFiles == true)
-  {
-    auto activeFiles = this->Controller != nullptr
-      ? this->SplitFiles(this->FileNames, this->Controller->GetLocalProcessId(),
-          this->Controller->GetNumberOfProcesses())
-      : this->FileNames;
-
-    for (auto fname : activeFiles)
-    {
-      setFileName(reader, fname);
-      reader->UpdateInformation();
-      this->SIL->Merge(vtkSubsetInclusionLattice::GetSIL(reader->GetOutputInformation(0)));
-    }
-    this->AllGather(this->SIL);
-  }
-
-  // restore selection state.
-  if (!currentSelection.empty())
-  {
-    this->SIL->SetSelection(currentSelection);
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkFileSeriesHelper::Broadcast(vtkSubsetInclusionLattice* sil, int srcRank)
-{
-  if (this->Controller && this->Controller->GetNumberOfProcesses() > 1 && sil)
-  {
-    if (this->Controller->GetLocalProcessId() == srcRank)
-    {
-      std::string data = sil->Serialize();
-      vtkIdType len = static_cast<vtkIdType>(data.size() + 1);
-      this->Controller->Broadcast(&len, 1, srcRank);
-      this->Controller->Broadcast(const_cast<char*>(data.c_str()), len, srcRank);
-    }
-    if (this->Controller->GetLocalProcessId() > 0)
-    {
-      vtkIdType len = 0;
-      this->Controller->Broadcast(&len, 1, srcRank);
-      char* data = new char[len];
-      this->Controller->Broadcast(data, len, srcRank);
-      sil->Deserialize(data);
-      delete[] data;
-    }
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkFileSeriesHelper::AllGather(vtkSubsetInclusionLattice* sil)
-{
-  if (this->Controller && this->Controller->GetNumberOfProcesses() > 1 && sil)
-  {
-    int numRanks = this->Controller->GetNumberOfProcesses();
-
-    std::string data = sil->Serialize();
-    const vtkIdType len = static_cast<vtkIdType>(data.size() + 1);
-
-    std::vector<vtkIdType> lengths(numRanks);
-    this->Controller->AllGather(&len, &lengths[0], 1);
-
-    std::vector<vtkIdType> offsets(numRanks);
-    vtkIdType totalLen = 0;
-    for (int rank = 0; rank < numRanks; ++rank)
-    {
-      offsets[rank] = totalLen;
-      totalLen += lengths[rank];
-    }
-
-    std::vector<char> all_data(totalLen);
-    this->Controller->AllGatherV(data.c_str(), &all_data[0], len, &lengths[0], &offsets[0]);
-
-    for (int rank = 0; rank < numRanks; ++rank)
-    {
-      vtkNew<vtkSubsetInclusionLattice> tmp;
-      tmp->Deserialize(&all_data[offsets[rank]]);
-      sil->Merge(tmp);
-    }
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkFileSeriesHelper::SetSIL(vtkSubsetInclusionLattice* asil)
-{
-  if (this->SIL != asil)
-  {
-    this->SIL = asil;
-    this->Modified();
-  }
-}
-
-//----------------------------------------------------------------------------
-vtkSubsetInclusionLattice* vtkFileSeriesHelper::GetSIL() const
-{
-  return this->SIL;
 }
 
 //----------------------------------------------------------------------------

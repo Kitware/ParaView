@@ -15,7 +15,6 @@
 #include "vtkCGNSFileSeriesReader.h"
 
 #include "vtkCGNSReader.h"
-#include "vtkCGNSSubsetInclusionLattice.h"
 #include "vtkCommand.h"
 #include "vtkCommunicator.h"
 #include "vtkDataSet.h"
@@ -76,7 +75,6 @@ vtkCGNSFileSeriesReader::vtkCGNSFileSeriesReader()
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
   this->SetController(vtkMultiProcessController::GetGlobalController());
-  this->FileSeriesHelper->SetSIL(this->SIL);
 }
 
 //----------------------------------------------------------------------------
@@ -129,14 +127,12 @@ void vtkCGNSFileSeriesReader::SetReader(vtkCGNSReader* reader)
   if (this->Reader)
   {
     this->RemoveObserver(this->ReaderObserverId);
-    this->Reader->SetExternalSIL(nullptr);
   }
   vtkSetObjectBodyMacro(Reader, vtkCGNSReader, reader);
   if (this->Reader)
   {
     this->ReaderObserverId = this->Reader->AddObserver(
       vtkCommand::ModifiedEvent, this, &vtkCGNSFileSeriesReader::OnReaderModifiedEvent);
-    this->Reader->SetExternalSIL(this->SIL);
   }
 }
 
@@ -217,7 +213,6 @@ int vtkCGNSFileSeriesReader::ProcessRequest(
 
   // restore time information.
   this->FileSeriesHelper->FillTimeInformation(outInfo);
-  outInfo->Set(vtkSubsetInclusionLattice::SUBSET_INCLUSION_LATTICE(), this->SIL);
   return 1;
 }
 
@@ -501,33 +496,4 @@ int vtkCGNSFileSeriesReader::RequestData(
   output->Initialize();
   output->ShallowCopy(hierarchy.Get());
   return 1;
-}
-
-//----------------------------------------------------------------------------
-vtkIdType vtkCGNSFileSeriesReader::GetSILUpdateStamp() const
-{
-  return static_cast<vtkIdType>(this->FileSeriesHelper->GetUpdateInformationTime());
-}
-
-//----------------------------------------------------------------------------
-void vtkCGNSFileSeriesReader::SetBlockStatus(const char* nodepath, bool val)
-{
-  this->Reader->SetBlockStatus(nodepath, val);
-  if (val)
-  {
-    this->SIL->Select(nodepath);
-  }
-  else
-  {
-    this->SIL->Deselect(nodepath);
-  }
-  this->Modified();
-}
-
-//----------------------------------------------------------------------------
-void vtkCGNSFileSeriesReader::ClearBlockStatus()
-{
-  this->Reader->ClearBlockStatus();
-  this->SIL->ClearSelections();
-  this->Modified();
 }

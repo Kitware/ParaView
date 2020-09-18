@@ -826,6 +826,32 @@ struct Process_5_7_to_5_8
   }
 };
 
+//===========================================================================
+struct Process_5_8_to_5_9
+{
+  bool operator()(xml_document& document) { return WarnCGNSReader(document); }
+
+  static bool WarnCGNSReader(xml_document& document)
+  {
+    pugi::xpath_node_set elements =
+      document.select_nodes("//ServerManagerState/Proxy[@group='sources' and "
+                            "(@type='CGNSSeriesReader')]");
+    if (elements.size() == 0)
+    {
+      return true;
+    }
+
+    // Unfortunately, there's no easy way to convert obsolete SIL-based
+    // selection to base/family selection, so we simply warn.
+    vtkGenericWarningMacro(
+      "Your state file uses CGNS reader. The selection mechanism "
+      "in the reader was changed in ParaView 5.9 and is not compatible with older "
+      "states. As a result, the visualization may be different than with earlier versions. "
+      "You may have to manually adjust properties on the the CGNS reader after loading state.");
+    return true;
+  }
+};
+
 } // end of namespace
 
 vtkStandardNewMacro(vtkSMStateVersionController);
@@ -928,6 +954,13 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
     Process_5_7_to_5_8 converter;
     status = converter(document);
     version = vtkSMVersion(5, 8, 0);
+  }
+
+  if (status && (version < vtkSMVersion(5, 9, 0)))
+  {
+    Process_5_8_to_5_9 converter;
+    status = converter(document);
+    version = vtkSMVersion(5, 9, 0);
   }
 
   if (status)
