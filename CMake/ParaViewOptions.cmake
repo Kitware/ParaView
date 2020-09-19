@@ -183,6 +183,8 @@ option(PARAVIEW_ENABLE_MOTIONFX "Enable MotionFX support." OFF)
 
 option(PARAVIEW_ENABLE_MOMENTINVARIANTS "Enable MomentInvariants filters" OFF)
 
+option(PARAVIEW_ENABLE_LOOKINGGLASS "Enable LookingGlass displays" OFF)
+
 option(PARAVIEW_ENABLE_VISITBRIDGE "Enable VisIt readers." OFF)
 
 # default to ON for CANONICAL builds, else OFF.
@@ -355,6 +357,11 @@ paraview_require_module(
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_MOMENTINVARIANTS AND PARAVIEW_USE_MPI
   MODULES   VTK::ParallelMomentInvariants
+  EXCLUSIVE)
+
+paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_LOOKINGGLASS
+  MODULES   VTK::RenderingLookingGlass
   EXCLUSIVE)
 
 paraview_require_module(

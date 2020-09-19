@@ -1,0 +1,9 @@
+NAME
+  LookingGlass::Settings
+LIBRARY_NAME
+  vtkLookingGlassSettings
+DEPENDS
+  ParaView::RemotingViews
+  VTK::CommonCore
+PRIVATE_DEPENDS
+  VTK::RenderingCore
