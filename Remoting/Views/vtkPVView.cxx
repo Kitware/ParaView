@@ -220,7 +220,7 @@ vtkPVView::vtkPVView(bool create_render_window)
 
   this->Size[1] = this->Size[0] = 300;
   this->Position[0] = this->Position[1] = 0;
-  this->PPI = 96;
+  this->PPI = 72;
 
   this->InCaptureScreenshot = false;
 

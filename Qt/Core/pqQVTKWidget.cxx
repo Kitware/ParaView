@@ -269,10 +269,12 @@ void pqQVTKWidget::setRenderWindow(vtkRenderWindow* win)
 {
   if (this->useStereo)
   {
+    baseClass.value<QVTKOpenGLStereoWidget*>()->setUnscaledDPI(win->GetDPI());
     baseClass.value<QVTKOpenGLStereoWidget*>()->setRenderWindow(win);
   }
   else
   {
+    baseClass.value<QVTKOpenGLNativeWidget*>()->setUnscaledDPI(win->GetDPI());
     baseClass.value<QVTKOpenGLNativeWidget*>()->setRenderWindow(win);
   }
 }
