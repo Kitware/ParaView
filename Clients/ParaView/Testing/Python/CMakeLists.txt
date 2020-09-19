@@ -21,6 +21,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPythonViewMatplotlibScript.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPythonViewNumpyScript.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCatalystClient.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FontSize.png}"
   )
 
 # only enable TestPythonAnnotationFilter test if numpy is available
@@ -61,6 +62,8 @@ paraview_add_test_pvbatch(
   # since the test may fail on X due to X window size sync issues
   # on certain dashboards
   OutputImageResolution.py
+
+  FontSize.py # BUG #19816
 )
 
 paraview_add_test_python(
@@ -98,6 +101,7 @@ paraview_add_test_python(
 # These tests could run safely in serial and parallel.
 set(PVBATCH_TESTS
   BatchAxesGrid.py
+  FontSize.py # BUG #19816
   PLYWriter.py
   VolumeCellSelection.py
   SaveDataWithArraySelection.py,NO_VALID
