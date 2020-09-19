@@ -73,7 +73,8 @@ slice1.SliceType.Origin = [0.217060089111328, 4.0, -5.1109471321106]
 slice1.SliceType.Origin = [0.217060089111328, 4.0, -5.1109471321106]
 
 # save data
-SaveData(tempDir+'canslices.vtm', proxy=slice1, Writetimestepsasfileseries=1,
+from os.path import join
+SaveData(join(tempDir,'canslices.vtm'), proxy=slice1, Writetimestepsasfileseries=1,
     Firsttimestep=10,
     Lasttimestep=20,
     Timestepstride=3,
@@ -84,8 +85,10 @@ SaveData(tempDir+'canslices.vtm', proxy=slice1, Writetimestepsasfileseries=1,
     CompressorType='None')
 
 # create a new 'XML MultiBlock Data Reader'
-canslices = XMLMultiBlockDataReader(FileName=[tempDir+'canslices_10.vtm', tempDir+'canslices_13.vtm', tempDir+'canslices_16.vtm', tempDir+'canslices_19.vtm'])
-
+canslices = XMLMultiBlockDataReader(FileName=[join(tempDir, 'canslices_10.vtm'),
+                                              join(tempDir, 'canslices_13.vtm'),
+                                              join(tempDir, 'canslices_16.vtm'),
+                                              join(tempDir, 'canslices_19.vtm')])
 
 canslices.UpdatePipeline()
 if len(canslices.TimestepValues) != 4:
@@ -93,7 +96,12 @@ if len(canslices.TimestepValues) != 4:
     sys.exit(1)
 
 # list of files that should not have been written out
-otherFileNames = [tempDir+'canslices_7.vtm', tempDir+'canslices_8.vtm', tempDir+'canslices_9.vtm', tempDir+'canslices_11.vtm', tempDir+'canslices_12.vtm', tempDir+'canslices_20.vtm']
+otherFileNames = [join(tempDir, 'canslices_7.vtm'),
+                  join(tempDir, 'canslices_8.vtm'),
+                  join(tempDir, 'canslices_9.vtm'),
+                  join(tempDir+'canslices_11.vtm'),
+                  join(tempDir+'canslices_12.vtm'),
+                  join(tempDir+'canslices_20.vtm')]
 import os.path
 for f in otherFileNames:
     if os.path.isfile(f):
