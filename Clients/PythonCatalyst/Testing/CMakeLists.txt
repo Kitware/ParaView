@@ -21,10 +21,10 @@ vtk_module_test_data(
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_CoprocessingExtracts_renderview_0018.png"
 
   # baselines for WaveletHistogramExtracts with MPI. The histograms are difference since points along edges are counted twice.
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_BatchExtracts_histogram_0.000000_1.png"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_BatchExtracts_histogram_1.000000_1.png"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_CoprocessingExtracts_histogram_0.000000_1.png"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_CoprocessingExtracts_histogram_0.950000_1.png"
+  #"DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_BatchExtracts_histogram_0.000000_1.png"
+  #"DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_BatchExtracts_histogram_1.000000_1.png"
+  #"DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_CoprocessingExtracts_histogram_0.000000_1.png"
+  #"DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_CoprocessingExtracts_histogram_0.950000_1.png"
 
   # baselines for WaveletPhiThetaExtractsWithCinema
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletPhiThetaExtractsWithCinema_BatchExtracts_image_000000p_000.00t_000.00.png"

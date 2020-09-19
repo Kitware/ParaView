@@ -62,8 +62,6 @@ paraview_add_test_pvbatch(
   # since the test may fail on X due to X window size sync issues
   # on certain dashboards
   OutputImageResolution.py
-
-  FontSize.py # BUG #19816
 )
 
 paraview_add_test_python(
