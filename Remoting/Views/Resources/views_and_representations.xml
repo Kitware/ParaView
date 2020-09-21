@@ -77,7 +77,7 @@
         <Documentation>Representations in this view.</Documentation>
       </ProxyProperty>
       <IntVectorProperty command="SetPPI"
-                         default_values="96"
+                         default_values="72"
                          name="PPI"
                          number_of_elements="1"
                          panel_visibility="never">

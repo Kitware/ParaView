@@ -1319,17 +1319,23 @@ def SaveScreenshot(filename, viewOrLayout=None, **params):
     # Previous API for this method took the following arguments:
     # SaveScreenshot(filename, view=None, layout=None, magnification=None, quality=None)
     # If we notice any of the old arguments, call legacy method.
-    if "view" in params or "layout" in params or \
-            "magnification" in params or \
-            "quality" in params:
-                # since in previous variant, view was a positional param,
-                # we handle that too.
-                if "view" in params:
-                    view = params.get("view")
-                    del params["view"]
-                else:
-                    view = viewOrLayout
-                return _SaveScreenshotLegacy(filename, view=view, **params)
+    if "magnification" in params or "quality" in params:
+        if viewOrLayout is not None and not "view" in params:
+            # since in previous variant, view could have been passed as a
+            # positional argument, we handle it.
+            params["view"] = viewOrLayout
+        return _SaveScreenshotLegacy(filename, **params)
+
+    # sometimes users love to pass 'view' or 'layout' as keyword arguments
+    # even though the signature for this function doesn't support it. let's
+    # handle that, it's easy enough.
+    if viewOrLayout is None:
+        if "view" in params:
+            viewOrLayout = params["view"]
+            del params["view"]
+        elif "layout" in params:
+            viewOrLayout = params["layout"]
+            del params["layout"]
 
     # use active view if no view or layout is specified.
     viewOrLayout = viewOrLayout if viewOrLayout else GetActiveView()

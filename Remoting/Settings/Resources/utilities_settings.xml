@@ -103,9 +103,9 @@
 
       <IntVectorProperty name="ScreenPixelsPerInch"
         number_of_elements="1"
-        default_values="96"
+        default_values="72"
         panel_visibility="advanced">
-        <IntRangeDomain name="range" min="80" />
+        <IntRangeDomain name="range" />
         <Documentation>
           Set pixels per inch on the current screen/monitor. This is used for determining
           pixel sizes for fonts and other 2D annotations.

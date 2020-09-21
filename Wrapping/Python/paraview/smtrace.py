@@ -1616,6 +1616,10 @@ class SaveLayoutSizes(RenderingMixin, BookkeepingItem):
             trace.append_separated([\
                     "# layout/tab size in pixels",
                     "%s.SetSize(%d, %d)" % (layoutAccessor, lsize[0], lsize[1])])
+        elif proxy.IsA("vtkSMViewProxy"):
+            l = simple.GetLayout(proxy)
+            if l:
+                trace.append_separated(cls.get_trace(l))
         else:
             raise Untraceable("Invalid argument type %r" % proxy)
         return trace.raw_data()
