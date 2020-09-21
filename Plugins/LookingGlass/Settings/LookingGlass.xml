@@ -1,0 +1,82 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="looking_glass">
+    <Proxy class="vtkPVLookingGlassSettings"
+           name="LookingGlassSettings">
+      <Documentation>Proxy that stores Looking Glass display settings associated with a view.</Documentation>
+      <ProxyProperty name="View"
+        command="SetView"
+        panel_visibility="never" />
+      <DoubleVectorProperty command="SetFocalPlaneMovementFactor"
+          default_values="0.2"
+          name="FocalPlaneMovementFactor"
+          panel_visibility="advanced"
+          number_of_elements="1">
+          <DoubleRangeDomain max="0.5"
+              min="0.05"
+              name="range" />
+          <Documentation>
+      Set how far to move the focal plane when pushing or pulling it.
+      Is a factor applied to the near or far clipping limits.
+          </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetDeviceIndex"
+          default_values="0"
+          name="DeviceIndex"
+          panel_visibility="advanced"
+          number_of_elements="1">
+          <IntRangeDomain name="range"
+              min="0"
+              max="4" />
+          <Documentation>
+      Set which Looking Glass display to use.
+          </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRenderRate"
+          default_values="1"
+          name="RenderRate"
+          label="Rendering"
+          number_of_elements="1">
+          <EnumerationDomain name="enum">
+              <Entry text="Always"
+                  value="0" />
+              <Entry text="Only Still Renders"
+                  value="1" />
+              <Entry text="Only When Requested"
+                  value="2" />
+          </EnumerationDomain>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetNearClippingLimit"
+          default_values="0.8"
+          name="NearClippingLimit"
+          panel_visibility="advanced"
+          number_of_elements="1">
+          <DoubleRangeDomain
+              max="1.5"
+              min="0.75"
+              name="range" />
+          <Documentation>
+      Set a limit for the ratio of the near clipping plane to the focal
+      distance. This is a mechanism to limit parallex and resulting
+      ghosting when using the looking glass display. The typical value
+      should be around 0.8.
+          </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFarClippingLimit"
+          default_values="1.2"
+          name="FarClippingLimit"
+          panel_visibility="advanced"
+          number_of_elements="1">
+          <DoubleRangeDomain
+              max="1.5"
+              min="0.75"
+              name="range" />
+          <Documentation>
+      Set a limit for the ratio of the far clipping plane to the focal
+      distance. This is a mechanism to limit parallex and resulting
+      ghosting when using the looking glass display. The typical value
+      should be around 1.2.
+          </Documentation>
+      </DoubleVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

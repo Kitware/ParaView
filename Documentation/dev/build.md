@@ -368,6 +368,7 @@ More advanced / less common options include:
     MotionFX files.
   * `PARAVIEW_ENABLE_MOMENTINVARIANTS` (default `OFF`): Enable
     MomentInvariants filters.
+  * `PARAVIEW_ENABLE_LOOKINGGLASS` (default `OFF`): Enable LookingGlass display.
   * `PARAVIEW_ENABLE_XDMF2` (default `OFF`): Enable support for reading Xdmf2
     files.
   * `PARAVIEW_ENABLE_XDMF3` (default `OFF`): Enable support for reading Xdmf3

@@ -1,0 +1,12 @@
+NAME
+  LookingGlass
+DESCRIPTION
+  Add support for rendering views on Looking Glass displays.
+CONDITION
+  PARAVIEW_USE_QT
+REQUIRES_MODULES
+  ParaView::pqApplicationComponents
+  ParaView::RemotingViews
+  VTK::CommonCore
+  VTK::RenderingCore
+  VTK::RenderingLookingGlass
