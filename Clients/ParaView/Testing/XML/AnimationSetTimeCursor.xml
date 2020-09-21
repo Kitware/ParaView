@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="CubeSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Animation View" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,2" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,2" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/qt_scrollarea_viewport/1QGraphicsView0/1QWidget0" command="mousePress" arguments="1,1,0,127,71" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/qt_scrollarea_viewport/1QGraphicsView0/1QWidget0" command="mouseRelease" arguments="1,0,0,127,71" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/qt_scrollarea_viewport/1QGraphicsView0/1QWidget0" command="mouseDblClick" arguments="1,1,0,127,71" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/qt_scrollarea_viewport/1QGraphicsView0/1QWidget0" command="mouseRelease" arguments="1,0,0,127,71" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="setCurrent" arguments="1.2" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="doubleClick" arguments="1.2" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="edit" arguments="1.2" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1QLineEdit0" command="set_string" arguments="1" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="editAccepted" arguments="1.2,1" />
+  <pqevent object="1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/qt_scrollarea_viewport/1QGraphicsView0/1QWidget0" command="mousePress" arguments="1,1,0,387,13" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/qt_scrollarea_viewport/1QGraphicsView0/1QWidget0" command="mouseRelease" arguments="1,0,0,387,13" />
+</pqevents>
