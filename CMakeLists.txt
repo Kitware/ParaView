@@ -440,6 +440,18 @@ else ()
     add_subdirectory(VTK/Remote)
   endif()
 
+  # Set up these variables now so that modules may acess them
+  if (NOT PARAVIEW_USE_EXTERNAL_VTK AND PARAVIEW_INSTALL_DEVELOPMENT_FILES)
+    set(vtk_cmake_dir
+      "${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake")
+    set(vtk_cmake_destination
+      "${paraview_cmake_destination}/vtk")
+    set(vtk_cmake_build_dir
+      "${CMAKE_CURRENT_BINARY_DIR}/${vtk_cmake_destination}")
+    set(VTK_RELOCATABLE_INSTALL
+      "${PARAVIEW_RELOCATABLE_INSTALL}")
+  endif ()
+
   vtk_module_find_modules(vtk_module_files "${CMAKE_CURRENT_SOURCE_DIR}/VTK")
   vtk_module_find_kits(vtk_kit_files "${CMAKE_CURRENT_SOURCE_DIR}/VTK")
   # Exclude VTK's examples.
@@ -509,22 +521,14 @@ else ()
     TEST_INPUT_DATA_DIRECTORY   "${CMAKE_CURRENT_SOURCE_DIR}/VTK/Testing"
     TEST_OUTPUT_DATA_DIRECTORY  "${CMAKE_CURRENT_BINARY_DIR}/ExternalData/VTK/Testing")
 
-  if (NOT PARAVIEW_USE_EXTERNAL_VTK AND PARAVIEW_INSTALL_DEVELOPMENT_FILES)
-    set(vtk_cmake_dir
-      "${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake")
-    set(vtk_cmake_destination
-      "${paraview_cmake_destination}/vtk")
-    set(vtk_cmake_build_dir
-      "${CMAKE_CURRENT_BINARY_DIR}/${vtk_cmake_destination}")
-    set(VTK_RELOCATABLE_INSTALL
-      "${PARAVIEW_RELOCATABLE_INSTALL}")
-    include("${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake/vtkInstallCMakePackage.cmake")
-  endif ()
-
   install(
     FILES       "${CMAKE_CURRENT_SOURCE_DIR}/VTK/Copyright.txt"
     DESTINATION "${CMAKE_INSTALL_LICENSEDIR}/VTK"
     COMPONENT   "license")
+endif ()
+
+if (NOT PARAVIEW_USE_EXTERNAL_VTK AND PARAVIEW_INSTALL_DEVELOPMENT_FILES)
+  include("${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake/vtkInstallCMakePackage.cmake")
 endif ()
 
 set(paraview_test_data_directory_input
