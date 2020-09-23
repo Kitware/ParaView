@@ -198,6 +198,8 @@ option(PARAVIEW_ENABLE_XDMF3 "Enable Xdmf3 support." OFF)
 
 option(PARAVIEW_ENABLE_ADIOS2 "Enable ADIOS 2.x support." OFF)
 
+option(PARAVIEW_ENABLE_FIDES "Enable Fides support." OFF)
+
 cmake_dependent_option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF
   "UNIX" OFF)
 
@@ -383,6 +385,11 @@ paraview_require_module(
 paraview_require_module(
   CONDITION PARAVIEW_ENABLE_ADIOS2
   MODULES   VTK::IOADIOS2
+  EXCLUSIVE)
+
+paraview_require_module(
+  CONDITION PARAVIEW_ENABLE_FIDES
+  MODULES   VTK::IOFides
   EXCLUSIVE)
 
 paraview_require_module(

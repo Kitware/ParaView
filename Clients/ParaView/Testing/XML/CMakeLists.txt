@@ -73,6 +73,10 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/dualSphereAnimation4.pvd}"
   "DATA{${paraview_test_data_directory_input}/Data/elements.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/ensemble-wavelet/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/Fides/cartesian-attr.bp}"
+  "DATA{${paraview_test_data_directory_input}/Data/Fides/cartesian-attr.bp.dir/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/Fides/tris-blocks-time-attr.bp}"
+  "DATA{${paraview_test_data_directory_input}/Data/Fides/tris-blocks-time-attr.bp.dir/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/filters.xml}"
   "DATA{${paraview_test_data_directory_input}/Data/glTF/AnimatedMorphCube/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/glTF/BoxAnimated/,REGEX:.*}"
@@ -220,6 +224,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FastUniformGridSource2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FastUniformGridSource3.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FastUniformGridSource4.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FidesReader_cartesian.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FidesReader_blocks.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FileSeries1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FileSeries2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/FindDataDialog1.png}"
@@ -998,6 +1004,18 @@ if (TARGET VTK::IOParallelLSDyna)
     SelectReader.xml
     )
 endif ()
+
+if (TARGET VTK::IOFides)
+  if (PARAVIEW_ENABLE_ADIOS2)
+    list(APPEND TESTS_WITH_INLINE_COMPARES
+      FidesReaderADIOS2.xml
+      )
+  else()
+    list(APPEND TESTS_WITH_INLINE_COMPARES
+      FidesReader.xml
+      )
+  endif()
+endif()
 
 if(VTK_USE_LARGE_DATA)
   ExternalData_Expand_Arguments(ParaViewData _
