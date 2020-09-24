@@ -674,9 +674,9 @@ void Flatten(vtkMultiBlockDataSet* mb, vector<entry>& o2d, vector<entry>& o3d, i
       {
         vtkUnstructuredGrid* ug = vtkUnstructuredGrid::SafeDownCast(block);
         CellDim = 1;
-        for (int i = 0; i < ug->GetNumberOfCells(); ++i)
+        for (int n = 0; n < ug->GetNumberOfCells(); ++n)
         {
-          vtkCell* cell = ug->GetCell(i);
+          vtkCell* cell = ug->GetCell(n);
           int curCellDim = cell->GetCellDimension();
           if (CellDim < curCellDim)
             CellDim = curCellDim;
