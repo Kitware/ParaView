@@ -518,7 +518,8 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   // set the dimensions
   int* pointDims = sg->GetDimensions();
   int cellDims[3];
-  int j = 0;
+  int j;
+
   sg->GetCellDims(cellDims);
 
   if (!pointDims)
@@ -530,10 +531,11 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   // init dimensions
   for (int i = 0; i < 3; ++i)
   {
-    dim[0][j] = 1;
-    dim[1][j] = 0;
-    dim[2][j] = 0; // always 0 for structured
+    dim[0][i] = 1;
+    dim[1][i] = 0;
+    dim[2][i] = 0; // always 0 for structured
   }
+  j = 0;
   for (int i = 0; i < 3; ++i)
   {
     // skip unitary index dimension
