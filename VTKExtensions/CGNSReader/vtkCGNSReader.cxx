@@ -73,6 +73,7 @@
 
 #include "cgio_helpers.h"
 
+vtkInformationKeyMacro(vtkCGNSReader, FAMILY, String);
 vtkStandardNewMacro(vtkCGNSReader);
 
 namespace
@@ -2029,8 +2030,7 @@ int vtkCGNSReader::GetCurvilinearZone(
 
               if (!binfo.FamilyName.empty())
               {
-                vtkInformationStringKey* bcfamily =
-                  new vtkInformationStringKey("FAMILY", "vtkCompositeDataSet");
+                vtkInformationStringKey* bcfamily = vtkCGNSReader::FAMILY();
                 patchesMB->GetMetaData(idx)->Set(bcfamily, binfo.FamilyName.c_str());
               }
               patchesMB->GetMetaData(idx)->Set(vtkCompositeDataSet::NAME(), binfo.Name);
@@ -3387,8 +3387,7 @@ int vtkCGNSReader::GetUnstructuredZone(
 
               if (!binfo.FamilyName.empty())
               {
-                vtkInformationStringKey* bcfamily =
-                  new vtkInformationStringKey("FAMILY", "vtkCompositeDataSet");
+                vtkInformationStringKey* bcfamily = vtkCGNSReader::FAMILY();
                 patchesMB->GetMetaData(idx)->Set(bcfamily, binfo.FamilyName.c_str());
               }
               patchesMB->GetMetaData(idx)->Set(vtkCompositeDataSet::NAME(), binfo.Name);
@@ -4135,8 +4134,7 @@ int vtkCGNSReader::GetUnstructuredZone(
               patchesMB->SetBlock(idx, bcGrid.Get());
               if (!binfo.FamilyName.empty())
               {
-                vtkInformationStringKey* bcfamily =
-                  new vtkInformationStringKey("FAMILY", "vtkCompositeDataSet");
+                vtkInformationStringKey* bcfamily = vtkCGNSReader::FAMILY();
                 patchesMB->GetMetaData(idx)->Set(bcfamily, binfo.FamilyName.c_str());
               }
               patchesMB->GetMetaData(idx)->Set(vtkCompositeDataSet::NAME(), binfo.Name);
@@ -4499,8 +4497,7 @@ int vtkCGNSReader::RequestData(vtkInformation* vtkNotUsed(request),
 
       if (familyName.empty() == false)
       {
-        vtkInformationStringKey* zonefamily =
-          new vtkInformationStringKey("FAMILY", "vtkCompositeDataSet");
+        vtkInformationStringKey* zonefamily = vtkCGNSReader::FAMILY();
         mbase->GetMetaData(zone)->Set(zonefamily, familyName.c_str());
       }
 
