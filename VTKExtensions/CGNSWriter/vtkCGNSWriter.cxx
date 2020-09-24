@@ -363,6 +363,21 @@ bool vtkCGNSWriter::vtkPrivate::WritePointSet(vtkPointSet* grid, const char* fil
   {
     info.CellDim = 2;
   }
+  else if (grid->IsA("vtkUnstructuredGrid"))
+  {
+    info.CellDim = 1;
+    for (int i = 0; i < grid->GetNumberOfCells(); ++i)
+    {
+      vtkCell* cell = grid->GetCell(i);
+      int cellDim = cell->GetCellDimension();
+      if (info.CellDim < cellDim)
+        info.CellDim = cellDim;
+    }
+  }
+  else
+  {
+    info.CellDim = 3;
+  }
 
   if (!InitCGNSFile(info, file, error))
   {
@@ -549,6 +564,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   vtkStructuredGrid* sg, const char* file, string& error)
 {
   write_info info;
+  info.CellDim = 3; // VTK structured grid always use three indices even for 2D cell
   if (!InitCGNSFile(info, file, error) || !WriteBase(info, "Base", error))
   {
     return false;
