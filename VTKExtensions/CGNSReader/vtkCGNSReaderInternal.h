@@ -204,11 +204,11 @@ class ZoneBCInformation
 {
 public:
   char_33 name;
-  char_33 family;
+  std::string family;
   ZoneBCInformation()
+    : family(32, '\0')
   {
     this->name[0] = '\0';
-    this->family[0] = '\0';
   }
 };
 
@@ -217,12 +217,12 @@ class ZoneInformation
 {
 public:
   char_33 name;
-  char_33 family;
+  std::string family;
   std::vector<CGNSRead::ZoneBCInformation> bcs;
   ZoneInformation()
+    : family(32, '\0')
   {
     this->name[0] = '\0';
-    this->family[0] = '\0';
   }
 };
 
@@ -230,7 +230,7 @@ public:
 class FamilyInformation
 {
 public:
-  char_33 name;
+  std::string name;
   bool isBC;
 };
 

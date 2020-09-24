@@ -203,6 +203,15 @@ public:
       else if (strcmp(nodeLabel, "FamilyName_t") == 0)
       {
         CGNSRead::readNodeStringData(cgioNum, *iter, this->FamilyName);
+        if (this->FamilyName.size() > 0 && this->FamilyName[0] == '/')
+        {
+          // This is a family path
+          std::string::size_type pos = this->FamilyName.find('/', 1);
+          if (pos != std::string::npos)
+          {
+            this->FamilyName = this->FamilyName.substr(pos + 1);
+          }
+        }
       }
       else if (strcmp(nodeLabel, "GridLocation_t") == 0)
       {
@@ -368,6 +377,15 @@ public:
       else if (strcmp(nodeLabel, "FamilyName_t") == 0)
       {
         CGNSRead::readNodeStringData(cgioNum, *iter, this->FamilyName);
+        if (this->FamilyName.size() > 0 && this->FamilyName[0] == '/')
+        {
+          // This is a family path
+          std::string::size_type pos = this->FamilyName.find('/', 1);
+          if (pos != std::string::npos)
+          {
+            this->FamilyName = this->FamilyName.substr(pos + 1);
+          }
+        }
       }
       else if (strcmp(nodeLabel, "GridLocation_t") == 0)
       {
@@ -4631,7 +4649,7 @@ int vtkCGNSReader::RequestInformation(vtkInformation* vtkNotUsed(request),
     // add families.
     for (auto& finfo : curBase.family)
     {
-      this->FamilySelection->AddArray(finfo.name);
+      this->FamilySelection->AddArray(finfo.name.c_str());
     }
 
     // Fill Variable Vertex/Cell names ... perhaps should be improved
