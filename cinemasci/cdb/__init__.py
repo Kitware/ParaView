@@ -162,7 +162,7 @@ class cdb:
 # ------------------------------------------------------------------------------
 #
 # ------------------------------------------------------------------------------
-    def initialize(self):
+    def initialize(self, dirExistCheck=True):
         """Create the destination directory and report error if it fails
         """
         result = True
@@ -176,8 +176,11 @@ class cdb:
                         self.path))
                 result = False
         else:
-            # TODO: report error that it exists
-            result = False
+            # directory exists
+            if dirExistCheck:
+                result = False
+            else:
+                result = True
 
         return result
 
