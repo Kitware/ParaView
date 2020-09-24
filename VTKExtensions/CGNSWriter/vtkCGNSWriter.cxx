@@ -676,7 +676,7 @@ void Flatten(vtkMultiBlockDataSet* mb, vector<entry>& o2d, vector<entry>& o3d, i
         CellDim = 1;
         for (int i = 0; i < ug->GetNumberOfCells(); ++i)
         {
-          vtkCell* cell = grid->GetCell(i);
+          vtkCell* cell = ug->GetCell(i);
           int curCellDim = cell->GetCellDimension();
           if (CellDim < curCellDim)
             CellDim = curCellDim;
