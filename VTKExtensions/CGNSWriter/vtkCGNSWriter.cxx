@@ -371,7 +371,9 @@ bool vtkCGNSWriter::vtkPrivate::WritePointSet(vtkPointSet* grid, const char* fil
       vtkCell* cell = grid->GetCell(i);
       int cellDim = cell->GetCellDimension();
       if (info.CellDim < cellDim)
+      {
         info.CellDim = cellDim;
+      }
     }
   }
 
@@ -540,7 +542,9 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   {
     // skip unitary index dimension
     if (pointDims[i] == 1)
+    {
       continue;
+    }
     dim[0][j] = pointDims[i];
     dim[1][j] = cellDims[i];
     j++;
@@ -578,7 +582,9 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   for (int n = 0; n < 3; n++)
   {
     if (dims[n] > 1)
+    {
       info.CellDim += 1;
+    }
   }
   if (!InitCGNSFile(info, file, error) || !WriteBase(info, "Base", error))
   {
@@ -669,7 +675,9 @@ void Flatten(vtkMultiBlockDataSet* mb, vector<entry>& o2d, vector<entry>& o3d, i
         for (int n = 0; n < 3; n++)
         {
           if (dims[n] > 1)
+          {
             CellDim += 1;
+          }
         }
       }
       else if (block->IsA("vtkUnstructuredGrid"))
@@ -681,7 +689,9 @@ void Flatten(vtkMultiBlockDataSet* mb, vector<entry>& o2d, vector<entry>& o3d, i
           vtkCell* cell = ug->GetCell(n);
           int curCellDim = cell->GetCellDimension();
           if (CellDim < curCellDim)
+          {
             CellDim = curCellDim;
+          }
         }
       }
       if (CellDim == 3)
