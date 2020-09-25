@@ -71,9 +71,9 @@ pqCatalystExportReaction::~pqCatalystExportReaction()
 //-----------------------------------------------------------------------------
 QString pqCatalystExportReaction::exportScript()
 {
-  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Save Catalyst Script:"),
+  pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Save Catalyst State:"),
     QString(), "Python ZIP Archives (*.zip);;All files (*)");
-  fileDialog.setObjectName("GenerateCatalystScriptFileDialog");
+  fileDialog.setObjectName("SaveCatalystStateFileDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (!fileDialog.exec())
   {
@@ -98,7 +98,7 @@ bool pqCatalystExportReaction::exportScript(const QString& filename)
   auto proxy = vtkSmartPointer<vtkSMProxy>::Take(pxm->NewProxy("coprocessing", "CatalystOptions"));
   controller->InitializeProxy(proxy);
   pqProxyWidgetDialog dialog(proxy, pqCoreUtilities::mainWidget());
-  dialog.setWindowTitle("Generate Catalyst Script Options");
+  dialog.setWindowTitle("Save Catalyst State Options");
   dialog.setSettingsKey("CatalystOptions");
   dialog.setEnableSearchBar(true);
   if (dialog.exec() != QDialog::Accepted)
@@ -132,7 +132,7 @@ bool pqCatalystExportReaction::exportScript(const QString& filename)
   }
   return true;
 #else
-  qCritical("Catalyst script cannot be exported since Python support not enabled in this build.");
+  qCritical("Catalyst state cannot be exported since Python support not enabled in this build.");
   return false;
 #endif
 }
