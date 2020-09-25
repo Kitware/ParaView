@@ -17,11 +17,11 @@
  * @brief controller for extract generation
  *
  * vtkSMExtractsController is a controllers that provides API to handle various
- * aspects of extract generators and extract generation mechanisms supported by
+ * aspects of extractors and extract generation mechanisms supported by
  * ParaView.
  *
- * It provides API to query, create extract generators of known types. It also
- * provides API to generate extracts using the defined extract generators.
+ * It provides API to query, create extractors of known types. It also
+ * provides API to generate extracts using the defined extractors.
  *
  * @section GeneratingExtractsSummary Summary of generated extracts
  *
@@ -98,7 +98,7 @@ public:
    * Generate the extract for the current state. Returns true if extract was
    * generated, false if skipped or failed.
    *
-   * This overload generates extract from the specific extract-generator.
+   * This overload generates extract from the specific extractor.
    */
   bool Extract(vtkSMProxy* extractor);
 
@@ -106,7 +106,7 @@ public:
    * Generate the extract for the current state. Returns true if extract was
    * generated, false if skipped or failed.
    *
-   * This overload generates extracts from all extract-generators registered
+   * This overload generates extracts from all extractors registered
    * with the proxy-manager.
    */
   bool Extract(vtkSMSessionProxyManager* pxm);
@@ -121,14 +121,14 @@ public:
   bool Extract();
 
   /**
-   * Generate extract s for the current state using only the extract generators
+   * Generate extract s for the current state using only the extractors
    * in the collection.
    */
   bool Extract(vtkCollection* collection);
 
   //@{
   /**
-   * Check if any of the extract generators registered with the chosen
+   * Check if any of the extractors registered with the chosen
    * proxy-manager (or active proxy-manager, is none specified) has their
    * trigger activated given the current state of the application and the values
    * for Time and TimeStep set on the controller.
@@ -139,50 +139,50 @@ public:
   //@}
 
   /**
-   * Same as `IsAnyTriggerActivated` except only check the selected extract
-   * generator's trigger definition.
+   * Same as `IsAnyTriggerActivated` except only check the selected extractor's
+   * trigger definition.
    */
-  bool IsTriggerActivated(vtkSMProxy* generator);
+  bool IsTriggerActivated(vtkSMProxy* extractor);
 
   /**
-   * Returns a list of extract generators associated with the proxy.
+   * Returns a list of extractors associated with the proxy.
    */
-  std::vector<vtkSMProxy*> FindExtractGenerators(vtkSMProxy* proxy) const;
+  std::vector<vtkSMProxy*> FindExtractors(vtkSMProxy* proxy) const;
 
   /**
-   * Returns a list of prototype proxies for extract generators that can be
+   * Returns a list of prototype proxies for extractors that can be
    * attached to the given `proxy`.
    */
-  std::vector<vtkSMProxy*> GetSupportedExtractGeneratorPrototypes(vtkSMProxy* proxy) const;
+  std::vector<vtkSMProxy*> GetSupportedExtractorPrototypes(vtkSMProxy* proxy) const;
 
   /**
-   * Returns true is the given extract generator (or prototype of the same) can
+   * Returns true is the given extractor (or prototype of the same) can
    * extract the selected set of proxies at the same time.
    */
-  bool CanExtract(vtkSMProxy* generator, const std::vector<vtkSMProxy*>& inputs) const;
-  bool CanExtract(vtkSMProxy* generator, vtkSMProxy* input) const
+  bool CanExtract(vtkSMProxy* extractor, const std::vector<vtkSMProxy*>& inputs) const;
+  bool CanExtract(vtkSMProxy* extractor, vtkSMProxy* input) const
   {
-    return this->CanExtract(generator, std::vector<vtkSMProxy*>{ input });
+    return this->CanExtract(extractor, std::vector<vtkSMProxy*>{ input });
   }
 
   //@{
   /**
-   * Creates, initializes and registers a new extract generator of the chosen type.
+   * Creates, initializes and registers a new extractor of the chosen type.
    */
-  vtkSMProxy* CreateExtractGenerator(
+  vtkSMProxy* CreateExtractor(
     vtkSMProxy* proxy, const char* xmlname, const char* registrationName = nullptr) const;
   //@}
 
   /**
-   * Returns true is the `generator` is an extract generator for the `proxy`.
+   * Returns true is the `extractor` is an extractor for the `proxy`.
    */
-  static bool IsExtractGenerator(vtkSMProxy* generator, vtkSMProxy* proxy);
+  static bool IsExtractor(vtkSMProxy* extractor, vtkSMProxy* proxy);
 
   /**
-   * Given an extract generator proxy, returns the producer for the generator,
+   * Given an extractor proxy, returns the producer for the extractor,
    * if any. May return a vtkSMViewProxy or a vtkSMOutputPort.
    */
-  vtkSMProxy* GetInputForGenerator(vtkSMProxy* generator) const;
+  vtkSMProxy* GetInputForExtractor(vtkSMProxy* extractor) const;
 
   /**
    * Get access to the summary table generated so far. This will be nullptr

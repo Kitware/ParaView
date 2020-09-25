@@ -251,8 +251,8 @@ ParaViewMainWindow::ParaViewMainWindow()
   // Populate filters menu.
   pqParaViewMenuBuilders::buildFiltersMenu(*this->Internals->menuFilters, this);
 
-  // Populate extract generators menu.
-  pqParaViewMenuBuilders::buildExtractGeneratorsMenu(*this->Internals->menuExtractGenerators, this);
+  // Populate extractors menu.
+  pqParaViewMenuBuilders::buildExtractorsMenu(*this->Internals->menuExtractors, this);
 
   // Populate Tools menu.
   pqParaViewMenuBuilders::buildToolsMenu(*this->Internals->menuTools);

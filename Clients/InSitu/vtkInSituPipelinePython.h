@@ -63,7 +63,7 @@ public:
    */
   void SetOptions(vtkSMProxy* catalystOptions);
   vtkGetObjectMacro(Options, vtkSMProxy);
-  static void RegisterExtractGenerator(vtkSMProxy* generator);
+  static void RegisterExtractor(vtkSMProxy* extractor);
   //@}
 protected:
   vtkInSituPipelinePython();

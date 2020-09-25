@@ -108,8 +108,8 @@ color map ranges, etc. Note, this happens only the first time **CoProcess** is c
 scripts = ["pipeline"]
 ```
 
-The submodule may define visualization state that includes extract generators for generating extracts.
-These extract generators may have their own triggers. Before proceeding further, Catalyst now checks if
+The submodule may define visualization state that includes extractors for generating extracts.
+These extractors may have their own triggers. Before proceeding further, Catalyst now checks if
 any triggers defined are activated for the current timestep. If not, the further processing of the module
 is skipped.
 
@@ -125,7 +125,7 @@ Next, Catalyst optionally calls the function `catalyst_coprocess`, if present, o
 the submodules imported via `scripts` in same order as `catalyst_initialize`. Again, this is generally
 not needed except for highly customized / advanced use-cases.
 
-Next, Catalyst will generate extracts using extract generators created by the module (or its submodules). Finally,
+Next, Catalyst will generate extracts using extractors created by the module (or its submodules). Finally,
 if `EnableCatalystLive` is true and the CatalystLiveTrigger is satisfied, Catalyst attempts to connect to
 ParaView GUI at the `CatalystLiveURL` for Live.
 
@@ -253,7 +253,7 @@ on the screen as the simulation advances.
 
 In this example, we are using `catalyst_coprocess` callback described earlier to
 execute certain actions per timestep. A more advanced analysis script would use
-extract generators, in which case `catalyst_coprocess` is rarely needed.
+extractors, in which case `catalyst_coprocess` is rarely needed.
 
 Also note, in this example we simply use a directory for the Python package
 instead of archiving it in a `.zip`. This is useful for development and

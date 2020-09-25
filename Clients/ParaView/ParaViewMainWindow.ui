@@ -93,9 +93,9 @@
      <string>&amp;Catalyst</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuExtractGenerators">
+   <widget class="QMenu" name="menuExtractors">
     <property name="title">
-     <string>E&amp;xtract Generators</string>
+     <string>E&amp;xtractors</string>
     </property>
    </widget>
    <addaction name="menu_File"/>
@@ -103,7 +103,7 @@
    <addaction name="menu_View"/>
    <addaction name="menuSources"/>
    <addaction name="menuFilters"/>
-   <addaction name="menuExtractGenerators"/>
+   <addaction name="menuExtractors"/>
    <addaction name="menuTools"/>
    <addaction name="menu_Catalyst"/>
    <addaction name="menu_Macros"/>

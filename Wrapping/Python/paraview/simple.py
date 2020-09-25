@@ -454,29 +454,29 @@ def RemoveViewsAndLayouts():
         pxm.UnRegisterProxy('layouts', name, layouts[(name, id)])
 
 #==============================================================================
-# Extracts and Extract Generators
+# Extracts and Extractors
 #==============================================================================
-def CreateExtractGenerator(name, proxy=None, registrationName=None):
+def CreateExtractor(name, proxy=None, registrationName=None):
     """
-    Creates a new extract generator and returns it.
+    Creates a new extractor and returns it.
 
-    :param name: The type of the extract generator to create.
+    :param name: The type of the extractor to create.
     :type name: `str`
     :param proxy: The proxy to generate the extract from. If not specified
     `GetActiveSource()` is used.
     :type proxy: :class:`paraview.servermanager.Proxy`, optional
     :param registrationName: The registration name to use to register
-    the generator with the ProxyManager. If not specified a unique name
+    the extractor with the ProxyManager. If not specified a unique name
     will be generated.
     :type name: `str`, optional
 
-    :return: The extract generator created, on success, else None
+    :return: The extractor created, on success, else None
     :rtype: :class:`paraview.servermanager.Proxy` or `None`
     """
     if proxy is None:
         proxy = GetActiveSource()
     if not proxy:
-        raise RuntimeError("Could determine input for extract generator")
+        raise RuntimeError("Could determine input for extractor")
 
     if proxy.Port > 0:
         rawProxy = proxy.SMProxy.GetOutputPort(proxy.Port)
@@ -484,48 +484,48 @@ def CreateExtractGenerator(name, proxy=None, registrationName=None):
         rawProxy = proxy.SMProxy
 
     controller = servermanager.vtkSMExtractsController()
-    rawGenerator = controller.CreateExtractGenerator(rawProxy, name, registrationName)
-    generator = servermanager._getPyProxy(rawGenerator)
+    rawExtractor = controller.CreateExtractor(rawProxy, name, registrationName)
+    extractor = servermanager._getPyProxy(rawExtractor)
 
-    from .catalyst.detail import IsInsitu, RegisterExtractGenerator
+    from .catalyst.detail import IsInsitu, RegisterExtractor
     if IsInsitu():
-        # tag the extract generator to know which pipeline this came from.
-        RegisterExtractGenerator(generator)
-    return generator
+        # tag the extractor to know which pipeline this came from.
+        RegisterExtractor(extractor)
+    return extractor
 
 
-def GetExtractGenerators(proxy=None):
+def GetExtractors(proxy=None):
     """
-    Returns a list of extract generators associated with the proxy.
+    Returns a list of extractors associated with the proxy.
 
-    :param proxy: The proxy to return the extract generators associated with.
-    If not specified (or is None) then all extract generators are returned.
+    :param proxy: The proxy to return the extractors associated with.
+    If not specified (or is None) then all extractors are returned.
     :type proxy: :class:`paraview.servermanager.Proxy`, optional
 
-    :return: List of associated extract generators if any. May return an empty
+    :return: List of associated extractors if any. May return an empty
     list.
     :rtype: list of :class:`paraview.servermanager.Proxy`
     """
     controller = servermanager.vtkSMExtractsController()
     pxm = servermanager.ProxyManager()
-    generators = pxm.GetProxiesInGroup("extract_generators").values()
+    extractors = pxm.GetProxiesInGroup("extractors").values()
     if proxy is None:
-        return list(generators)
+        return list(extractors)
     else:
-        return [g for g in generators if controller.IsExtractGenerator(g.SMProxy, proxy.SMProxy)]
+        return [g for g in extractors if controller.IsExtractor(g.SMProxy, proxy.SMProxy)]
 
-def FindExtractGenerator(registrationName):
+def FindExtractor(registrationName):
     """
-    Returns an extract generator with a specific registrationName.
+    Returns an extractor with a specific registrationName.
 
-    :param registrationName: Registration name for the extract generator.
+    :param registrationName: Registration name for the extractor.
     :type registrationName: `str`
 
-    :return: The extract generator or None
+    :return: The extractor or None
     :rtype: :class:`paraview.servermanager.Proxy` or `None`
     """
     pxm = servermanager.ProxyManager()
-    return pxm.GetProxy("extract_generators", registrationName)
+    return pxm.GetProxy("extractors", registrationName)
 
 def SaveExtractsUsingCatalystOptions(options):
     """

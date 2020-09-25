@@ -1,12 +1,12 @@
 <ServerManagerConfiguration>
-  <ProxyGroup name="extract_generators">
+  <ProxyGroup name="extractors">
     <Proxy name="Extractor">
-      <IntVectorProperty name="EnableExtract"
+      <IntVectorProperty name="Enable"
                          number_of_elements="1"
                          default_values="1">
         <BooleanDomain name="bool" />
         <Documentation>
-          Enable the extract.
+          Enable the extractor.
         </Documentation>
       </IntVectorProperty>
 

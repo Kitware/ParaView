@@ -313,22 +313,22 @@ def get_state(options=None, source_set=[], filter=None, raw=False):
                 smtrace.Trace.get_accessor(ctf.ScalarOpacityFunction)
         trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
-    # Trace extract generators.
+    # Trace extractors.
     exgens = set([x for x in proxies_of_interest \
-            if smtrace.Trace.get_registered_name(x, "extract_generators")])
+            if smtrace.Trace.get_registered_name(x, "extractors")])
     if exgens:
         trace.append_separated([\
             "# ----------------------------------------------------------------",
-            "# setup extract generators",
+            "# setup extractors",
             "# ----------------------------------------------------------------"])
         for exgen in exgens:
             # FIXME: this currently doesn't handle multiple output ports
             # correctly.
-            traceitem = smtrace.CreateExtractGenerator(\
+            traceitem = smtrace.CreateExtractor(\
                     xmlname=exgen.Writer.GetXMLName(),
                     producer=exgen.Producer,
-                    generator=exgen,
-                    registrationName=smtrace.Trace.get_registered_name(exgen, "extract_generators"))
+                    extractor=exgen,
+                    registrationName=smtrace.Trace.get_registered_name(exgen, "extractors"))
             traceitem.finalize()
             del traceitem
         trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))

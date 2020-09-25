@@ -78,9 +78,9 @@ public:
     bool quickLaunchable = true);
 
   /**
-   * Builds "Extract Generators" menu.
+   * Builds "Extractors" menu.
    */
-  static void buildExtractGeneratorsMenu(QMenu& menu, QMainWindow* mainWindow = nullptr,
+  static void buildExtractorsMenu(QMenu& menu, QMainWindow* mainWindow = nullptr,
     bool hideDisabled = false, bool quickLaunchable = true);
 
   /**

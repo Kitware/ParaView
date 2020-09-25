@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineModel.h"
 
 #include "pqBoxChartView.h"
-#include "pqExtractGenerator.h"
+#include "pqExtractor.h"
 #include "pqLiveInsituManager.h"
 #include "pqLiveInsituVisualizationManager.h"
 #include "pqOutputPort.h"
@@ -104,8 +104,8 @@ static const QString INSITU_EXTRACT_GRAY = "INSITU_EXTRACT_GRAY";
 static const QString INSITU_SERVER_RUNNING = "INSITU_SERVER_RUNNING";
 static const QString INSITU_SERVER_PAUSED = "INSITU_SERVER_PAUSED";
 static const QString INSITU_BREAKPOINT = "INSITU_BREAKPOINT";
-static const QString DATA_EXTRACT_GENERATOR = "DATA_EXTRACT_GENERATOR";
-static const QString IMAGE_EXTRACT_GENERATOR = "IMAGE_EXTRACT_GENERATOR";
+static const QString DATA_EXTRACTOR = "DATA_EXTRACTOR";
+static const QString IMAGE_EXTRACTOR = "IMAGE_EXTRACTOR";
 static const QString CINEMA_MARK = "CINEMA_MARK";
 static const QString LAST = "LAST";
 }
@@ -250,14 +250,14 @@ public:
       case pqPipelineModel::Link:
         return PipelineModelIconType::LINK;
 
-      case pqPipelineModel::ExtractGenerator:
+      case pqPipelineModel::Extractor:
         // TODO: respect `PipelineIcon` hint, if available.
-        if (auto eg = qobject_cast<pqExtractGenerator*>(this->Object))
+        if (auto eg = qobject_cast<pqExtractor*>(this->Object))
         {
-          return eg->isImageExtractGenerator() ? PipelineModelIconType::IMAGE_EXTRACT_GENERATOR
-                                               : PipelineModelIconType::DATA_EXTRACT_GENERATOR;
+          return eg->isImageExtractor() ? PipelineModelIconType::IMAGE_EXTRACTOR
+                                        : PipelineModelIconType::DATA_EXTRACTOR;
         }
-        return PipelineModelIconType::DATA_EXTRACT_GENERATOR;
+        return PipelineModelIconType::DATA_EXTRACTOR;
 
       case pqPipelineModel::Invalid:
         return PipelineModelIconType::INDETERMINATE;
@@ -321,7 +321,7 @@ public:
       }
       break;
 
-      case pqPipelineModel::ExtractGenerator:
+      case pqPipelineModel::Extractor:
         return false;
 
       default:
@@ -416,7 +416,7 @@ private:
     }
     else if (pqLiveInsituManager::isWriterParametersProxy(port->getSourceProxy()))
     {
-      return PipelineModelIconType::DATA_EXTRACT_GENERATOR;
+      return PipelineModelIconType::DATA_EXTRACTOR;
     }
 
     QString iconType =
@@ -489,9 +489,8 @@ void pqPipelineModel::constructor()
     ":/pqWidgets/Icons/pqInsituServerPaused16.png");
   this->PixmapMap[PipelineModelIconType::INSITU_BREAKPOINT].load(
     ":/pqWidgets/Icons/pqInsituBreakpoint16.png");
-  this->PixmapMap[PipelineModelIconType::DATA_EXTRACT_GENERATOR].load(
-    ":/pqWidgets/Icons/pqSave.svg");
-  this->PixmapMap[PipelineModelIconType::IMAGE_EXTRACT_GENERATOR].load(
+  this->PixmapMap[PipelineModelIconType::DATA_EXTRACTOR].load(":/pqWidgets/Icons/pqSave.svg");
+  this->PixmapMap[PipelineModelIconType::IMAGE_EXTRACTOR].load(
     ":/pqWidgets/Icons/pqCaptureScreenshot.svg");
   this->PixmapMap[PipelineModelIconType::CINEMA_MARK].load(":/pqWidgets/Icons/pqCinemaScience.svg");
 }
@@ -903,7 +902,7 @@ Qt::ItemFlags pqPipelineModel::flags(const QModelIndex& idx) const
     }
 
     if (this->Editable &&
-      (item->Type == pqPipelineModel::Proxy || item->Type == pqPipelineModel::ExtractGenerator))
+      (item->Type == pqPipelineModel::Proxy || item->Type == pqPipelineModel::Extractor))
     {
       _flags |= Qt::ItemIsEditable;
     }
@@ -1343,7 +1342,7 @@ void pqPipelineModel::removeConnection(
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineModel::addExtractGenerator(pqExtractGenerator* egenerator)
+void pqPipelineModel::addExtractor(pqExtractor* egenerator)
 {
   pqServer* server = egenerator->getServer();
   pqPipelineModelDataItem* parentItem =
@@ -1354,8 +1353,7 @@ void pqPipelineModel::addExtractGenerator(pqExtractGenerator* egenerator)
     return;
   }
 
-  auto item =
-    new pqPipelineModelDataItem(this, egenerator, pqPipelineModel::ExtractGenerator, this);
+  auto item = new pqPipelineModelDataItem(this, egenerator, pqPipelineModel::Extractor, this);
 
   // add to the 'server'.
   this->addChild(parentItem, item);
@@ -1368,10 +1366,9 @@ void pqPipelineModel::addExtractGenerator(pqExtractGenerator* egenerator)
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineModel::removeExtractGenerator(pqExtractGenerator* egenerator)
+void pqPipelineModel::removeExtractor(pqExtractor* egenerator)
 {
-  if (auto item =
-        this->getDataItem(egenerator, &this->Internal->Root, pqPipelineModel::ExtractGenerator))
+  if (auto item = this->getDataItem(egenerator, &this->Internal->Root, pqPipelineModel::Extractor))
   {
     this->removeChildFromParent(item);
     delete item;
@@ -1379,14 +1376,14 @@ void pqPipelineModel::removeExtractGenerator(pqExtractGenerator* egenerator)
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineModel::addConnection(pqServerManagerModelItem* source, pqExtractGenerator* sink)
+void pqPipelineModel::addConnection(pqServerManagerModelItem* source, pqExtractor* sink)
 {
   if (source == nullptr || sink == nullptr)
   {
     return;
   }
 
-  if (sink->isImageExtractGenerator())
+  if (sink->isImageExtractor())
   {
     return;
   }
@@ -1404,7 +1401,7 @@ void pqPipelineModel::addConnection(pqServerManagerModelItem* source, pqExtractG
 
   auto& internals = (*this->Internal);
   auto srcItem = this->getDataItem(pqsource, &internals.Root, pqPipelineModel::Proxy);
-  auto sinkItem = this->getDataItem(sink, &internals.Root, pqPipelineModel::ExtractGenerator);
+  auto sinkItem = this->getDataItem(sink, &internals.Root, pqPipelineModel::Extractor);
   if (!srcItem || !sinkItem)
   {
     qDebug("Connection involves unknown items. Ignoring.");
@@ -1424,15 +1421,15 @@ void pqPipelineModel::addConnection(pqServerManagerModelItem* source, pqExtractG
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineModel::removeConnection(pqServerManagerModelItem*, pqExtractGenerator* sink)
+void pqPipelineModel::removeConnection(pqServerManagerModelItem*, pqExtractor* sink)
 {
-  if (sink == nullptr || sink->isImageExtractGenerator())
+  if (sink == nullptr || sink->isImageExtractor())
   {
     return;
   }
 
   auto& internals = (*this->Internal);
-  auto sinkItem = this->getDataItem(sink, &internals.Root, pqPipelineModel::ExtractGenerator);
+  auto sinkItem = this->getDataItem(sink, &internals.Root, pqPipelineModel::Extractor);
 
   pqServer* server = sink->getServer();
   auto serverItem = this->getDataItem(server, &internals.Root, pqPipelineModel::Server);

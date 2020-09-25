@@ -36,9 +36,9 @@ def IsInsituInput(name):
         return True
     return False
 
-def RegisterExtractGenerator(generator):
-    """Keeps track of extract generators created inside a specific Catalyst
-    script.  This is useful to ensure we only update the generators for that
+def RegisterExtractor(extractor):
+    """Keeps track of extractors created inside a specific Catalyst
+    script.  This is useful to ensure we only update the extractors for that
     current script when multiple scripts are being executed in the same run.
     """
     global ActivePythonPipelineModule
@@ -46,13 +46,13 @@ def RegisterExtractGenerator(generator):
 
     if vtkInSituInitializationHelper.IsInitialized():
         # Catalyst 2.0
-        vtkInSituPipelinePython.RegisterExtractGenerator(generator.SMProxy)
+        vtkInSituPipelinePython.RegisterExtractor(extractor.SMProxy)
     else:
         module = ActivePythonPipelineModule
-        if not hasattr(module, "_extract_generators"):
+        if not hasattr(module, "_extractors"):
             from vtkmodules.vtkCommonCore import vtkCollection
-            module._extract_generators = vtkCollection()
-        module._extract_generators.AddItem(generator.SMProxy)
+            module._extractors = vtkCollection()
+        module._extractors.AddItem(extractor.SMProxy)
 
 def CreateProducer(name):
     global ActiveDataDescription, ActivePythonPipelineModule
@@ -136,15 +136,15 @@ def IsAnyTriggerActivated(cntr):
     assert IsInsitu()
 
     module = ActivePythonPipelineModule
-    if hasattr(module, "_extract_generators"):
-        return cntr.IsAnyTriggerActivated(module._extract_generators)
+    if hasattr(module, "_extractors"):
+        return cntr.IsAnyTriggerActivated(module._extractors)
 
-    # if there are no extract generators in this module, what should we do?
+    # if there are no extractors in this module, what should we do?
     # I am leaning towards saying treat it as if they are activated since
     # the user may have custom extract generation code.
     from . import log_level
     from .. import log
-    log(log_level(), "module has no extract generators, treating as activated.")
+    log(log_level(), "module has no extractors, treating as activated.")
     return True
 
 def Extract(cntr):
@@ -152,8 +152,8 @@ def Extract(cntr):
     assert IsInsitu()
 
     module = ActivePythonPipelineModule
-    if hasattr(module, "_extract_generators"):
-        return cntr.Extract(module._extract_generators)
+    if hasattr(module, "_extractors"):
+        return cntr.Extract(module._extractors)
     return False
 
 def InitializePythonEnvironment():

@@ -982,7 +982,7 @@ bool vtkSMParaViewPipelineController::RegisterTextureProxy(vtkSMProxy* proxy, co
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::RegisterExtractGeneratorProxy(
+bool vtkSMParaViewPipelineController::RegisterExtractorProxy(
   vtkSMProxy* proxy, const char* proxyname)
 {
   if (!proxy)
@@ -999,7 +999,7 @@ bool vtkSMParaViewPipelineController::RegisterExtractGeneratorProxy(
   {
     pxm->RegisterProxy(groupname.c_str(), "Writer", writer);
   }
-  pxm->RegisterProxy("extract_generators", proxyname, proxy);
+  pxm->RegisterProxy("extractors", proxyname, proxy);
 
   // Make the proxy active.
   vtkSMProxySelectionModel* selmodel =
@@ -1252,7 +1252,7 @@ bool vtkSMParaViewPipelineController::UnRegisterDependencies(vtkSMProxy* proxy)
       strcmp(consumer->GetXMLGroup(), "animation") == 0 ||
 
       // Remove any exporters for this proxy
-      strcmp(consumer->GetXMLGroup(), "extract_generators") == 0 ||
+      strcmp(consumer->GetXMLGroup(), "extractors") == 0 ||
 
       false)
     {
@@ -1301,7 +1301,7 @@ bool vtkSMParaViewPipelineController::UnRegisterProxy(vtkSMProxy* proxy)
   {
     PREPARE_FOR_UNREGISTERING(proxy);
     const char* known_groups[] = { "lookup_tables", "piecewise_functions", "layouts",
-      "additional_lights", "extract_generators", nullptr };
+      "additional_lights", "extractors", nullptr };
     for (int cc = 0; known_groups[cc] != NULL; ++cc)
     {
       if (const char* pname = pxm->GetProxyName(known_groups[cc], proxy))

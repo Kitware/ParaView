@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqExtractGeneratorsMenuReaction.h
+   Module:  pqExtractorsMenuReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,25 +29,24 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqExtractGeneratorsMenuReaction_h
-#define pqExtractGeneratorsMenuReaction_h
+#ifndef pqExtractorsMenuReaction_h
+#define pqExtractorsMenuReaction_h
 
 #include "pqApplicationComponentsModule.h" // for exports
 #include "pqTimer.h"                       // for pqTimer
 #include <QObject>
 
-class pqExtractGenerator;
+class pqExtractor;
 class pqProxyGroupMenuManager;
 
-class PQAPPLICATIONCOMPONENTS_EXPORT pqExtractGeneratorsMenuReaction : public QObject
+class PQAPPLICATIONCOMPONENTS_EXPORT pqExtractorsMenuReaction : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
 
 public:
-  pqExtractGeneratorsMenuReaction(
-    pqProxyGroupMenuManager* menuManager, bool hideDisabledActions = false);
-  ~pqExtractGeneratorsMenuReaction() override;
+  pqExtractorsMenuReaction(pqProxyGroupMenuManager* menuManager, bool hideDisabledActions = false);
+  ~pqExtractorsMenuReaction() override;
 
 public Q_SLOTS:
   /**
@@ -59,10 +58,10 @@ public Q_SLOTS:
   /**
    * Creates an extract generator.
    */
-  pqExtractGenerator* createExtractGenerator(const QString& group, const QString& name) const;
+  pqExtractor* createExtractor(const QString& group, const QString& name) const;
 
 private:
-  Q_DISABLE_COPY(pqExtractGeneratorsMenuReaction);
+  Q_DISABLE_COPY(pqExtractorsMenuReaction);
   bool HideDisabledActions;
   pqTimer Timer;
 };

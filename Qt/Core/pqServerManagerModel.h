@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QObject>
 
-class pqExtractGenerator;
+class pqExtractor;
 class pqPipelineSource;
 class pqProxy;
 class pqRepresentation;
@@ -307,12 +307,12 @@ Q_SIGNALS:
 
   //@{
   /**
-   * Signals figured for pqExtractGenerator.
+   * Signals figured for pqExtractor.
    */
-  void preExtractGeneratorAdded(pqExtractGenerator*);
-  void extractGeneratorAdded(pqExtractGenerator*);
-  void preExtractGeneratorRemoved(pqExtractGenerator*);
-  void extractGeneratorRemoved(pqExtractGenerator*);
+  void preExtractorAdded(pqExtractor*);
+  void extractorAdded(pqExtractor*);
+  void preExtractorRemoved(pqExtractor*);
+  void extractorRemoved(pqExtractor*);
   //@}
   /**
    * Fired when the name of an item changes.
@@ -339,10 +339,10 @@ Q_SIGNALS:
 
   //@{
   /**
-   * Signals fired to notify changes to extract-generator connections.
+   * Signals fired to notify changes to extractor connections.
    */
-  void connectionAdded(pqServerManagerModelItem* source, pqExtractGenerator* consumer);
-  void connectionRemoved(pqServerManagerModelItem* source, pqExtractGenerator* consumer);
+  void connectionAdded(pqServerManagerModelItem* source, pqExtractor* consumer);
+  void connectionRemoved(pqServerManagerModelItem* source, pqExtractor* consumer);
   //@}
 
   /**

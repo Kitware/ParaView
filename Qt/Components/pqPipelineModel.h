@@ -62,7 +62,7 @@ class ModifiedLiveInsituLink;
 class QFont;
 class QPixmap;
 class QString;
-class pqExtractGenerator;
+class pqExtractor;
 class pqPipelineModelDataItem;
 class pqPipelineModelInternal;
 class pqPipelineSource;
@@ -91,7 +91,7 @@ public:
     Server = 0,
     Proxy,
     Port,
-    ExtractGenerator,
+    Extractor,
     Link
   };
 
@@ -364,18 +364,18 @@ public Q_SLOTS:
 
   //@{
   /**
-   * Called to update extract generator connections.
+   * Called to update extractor connections.
    */
-  void addConnection(pqServerManagerModelItem* source, pqExtractGenerator* sink);
-  void removeConnection(pqServerManagerModelItem* source, pqExtractGenerator* sink);
+  void addConnection(pqServerManagerModelItem* source, pqExtractor* sink);
+  void removeConnection(pqServerManagerModelItem* source, pqExtractor* sink);
   //@}
 
   //@{
   /**
-   * Add/remove extract generator.
+   * Add/remove extractor.
    */
-  void addExtractGenerator(pqExtractGenerator*);
-  void removeExtractGenerator(pqExtractGenerator*);
+  void addExtractor(pqExtractor*);
+  void removeExtractor(pqExtractor*);
   //@}
 
   /**
