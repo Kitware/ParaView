@@ -170,10 +170,19 @@ set_tests_properties(
 #    baselines.
 #---------------------------------------------------------------------
 if (PARAVIEW_USE_QT)
+  include(FindPythonModules)
+  find_python_module(pandas pandas_found)
+
   set(catalyst_tests
-    WaveletHistogramExtracts.xml
-    WaveletPhiThetaExtractsWithCinema.xml,CINEMA,
-    WaveletVolumeRenderWithCinema.xml,CINEMA)
+    WaveletHistogramExtracts.xml)
+
+  if (pandas_found)
+    list(APPEND catalyst_tests
+      WaveletPhiThetaExtractsWithCinema.xml,CINEMA,
+      WaveletVolumeRenderWithCinema.xml,CINEMA)
+  else ()
+    message(WARNING "'pandas' is missing. Skipping Cinema tests")
+  endif()
 
   set(catalyst_options
     CINEMA
