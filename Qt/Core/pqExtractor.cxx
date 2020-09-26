@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqExtractGenerator.cxx
+   Module:  pqExtractor.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqExtractGenerator.h"
+#include "pqExtractor.h"
 
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
@@ -44,17 +44,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QPointer>
 
-class pqExtractGenerator::pqInternals
+class pqExtractor::pqInternals
 {
 public:
   QPointer<pqServerManagerModelItem> Producer;
 };
 
 //-----------------------------------------------------------------------------
-pqExtractGenerator::pqExtractGenerator(const QString& group, const QString& name,
-  vtkSMProxy* smproxy, pqServer* server, QObject* parentObject)
+pqExtractor::pqExtractor(const QString& group, const QString& name, vtkSMProxy* smproxy,
+  pqServer* server, QObject* parentObject)
   : Superclass(group, name, smproxy, server, parentObject)
-  , Internals(new pqExtractGenerator::pqInternals())
+  , Internals(new pqExtractor::pqInternals())
 {
   Q_ASSERT(smproxy != nullptr && smproxy->GetProperty("Producer"));
 
@@ -64,51 +64,51 @@ pqExtractGenerator::pqExtractGenerator(const QString& group, const QString& name
 }
 
 //-----------------------------------------------------------------------------
-pqExtractGenerator::~pqExtractGenerator()
+pqExtractor::~pqExtractor()
 {
 }
 
 //-----------------------------------------------------------------------------
-void pqExtractGenerator::initialize()
+void pqExtractor::initialize()
 {
   this->Superclass::initialize();
   this->producerChanged();
 }
 
 //-----------------------------------------------------------------------------
-pqServerManagerModelItem* pqExtractGenerator::producer() const
+pqServerManagerModelItem* pqExtractor::producer() const
 {
   auto& internals = (*this->Internals);
   return internals.Producer;
 }
 
 //-----------------------------------------------------------------------------
-bool pqExtractGenerator::isImageExtractGenerator() const
+bool pqExtractor::isImageExtractor() const
 {
   auto& internals = (*this->Internals);
   return qobject_cast<pqView*>(internals.Producer) != nullptr;
 }
 
 //-----------------------------------------------------------------------------
-bool pqExtractGenerator::isDataExtractGenerator() const
+bool pqExtractor::isDataExtractor() const
 {
   auto& internals = (*this->Internals);
   return qobject_cast<pqOutputPort*>(internals.Producer) != nullptr;
 }
 
 //-----------------------------------------------------------------------------
-void pqExtractGenerator::producerChanged()
+void pqExtractor::producerChanged()
 {
   auto& internals = (*this->Internals);
   auto smmmodel = pqApplicationCore::instance()->getServerManagerModel();
   vtkNew<vtkSMExtractsController> controller;
 
-  auto pproxy = controller->GetInputForGenerator(this->getProxy());
+  auto pproxy = controller->GetInputForExtractor(this->getProxy());
   auto smitem = smmmodel->findItem<pqServerManagerModelItem*>(pproxy);
 
   if (pproxy != nullptr && smitem == nullptr)
   {
-    qCritical("A proxy was added as input to the extract generator without "
+    qCritical("A proxy was added as input to the extractor without "
               "having previously registered it with the proxy manager. "
               "This is not supported.");
   }

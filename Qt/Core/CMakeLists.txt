@@ -46,7 +46,7 @@ set(classes
   pqCoreTestUtility
   pqCoreUtilities
   pqDataRepresentation
-  pqExtractGenerator
+  pqExtractor
   pqFileDialog
   pqFileDialogEventPlayer
   pqFileDialogEventTranslator

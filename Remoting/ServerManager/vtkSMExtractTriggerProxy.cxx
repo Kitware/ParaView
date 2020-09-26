@@ -30,9 +30,9 @@ vtkSMExtractTriggerProxy::~vtkSMExtractTriggerProxy()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMExtractTriggerProxy::IsActivated(vtkSMExtractsController* extractor)
+bool vtkSMExtractTriggerProxy::IsActivated(vtkSMExtractsController* controller)
 {
-  const int timestep = extractor->GetTimeStep();
+  const int timestep = controller->GetTimeStep();
 
   int start_timestep = 0;
   if (vtkSMPropertyHelper(this, "UseStartTimeStep").GetAsInt() == 1)

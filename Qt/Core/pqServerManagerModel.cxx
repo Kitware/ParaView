@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 
 #include "pqApplicationCore.h"
-#include "pqExtractGenerator.h"
+#include "pqExtractor.h"
 #include "pqInterfaceTracker.h"
 #include "pqOptions.h"
 #include "pqOutputPort.h"
@@ -322,7 +322,7 @@ void pqServerManagerModel::onProxyRegistered(
   pqView* view = qobject_cast<pqView*>(item);
   pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
   pqRepresentation* repr = qobject_cast<pqRepresentation*>(item);
-  auto exGenerator = qobject_cast<pqExtractGenerator*>(item);
+  auto extrator = qobject_cast<pqExtractor*>(item);
 
   if (view)
   {
@@ -352,15 +352,13 @@ void pqServerManagerModel::onProxyRegistered(
   {
     Q_EMIT this->preRepresentationAdded(repr);
   }
-  else if (exGenerator)
+  else if (extrator)
   {
-    this->connect(exGenerator,
-      SIGNAL(producerAdded(pqServerManagerModelItem*, pqExtractGenerator*)),
-      SIGNAL(connectionAdded(pqServerManagerModelItem*, pqExtractGenerator*)));
-    this->connect(exGenerator,
-      SIGNAL(producerRemoved(pqServerManagerModelItem*, pqExtractGenerator*)),
-      SIGNAL(connectionRemoved(pqServerManagerModelItem*, pqExtractGenerator*)));
-    Q_EMIT this->preExtractGeneratorAdded(exGenerator);
+    this->connect(extrator, SIGNAL(producerAdded(pqServerManagerModelItem*, pqExtractor*)),
+      SIGNAL(connectionAdded(pqServerManagerModelItem*, pqExtractor*)));
+    this->connect(extrator, SIGNAL(producerRemoved(pqServerManagerModelItem*, pqExtractor*)),
+      SIGNAL(connectionRemoved(pqServerManagerModelItem*, pqExtractor*)));
+    Q_EMIT this->preExtractorAdded(extrator);
   }
 
   this->Internal->Proxies[proxy] = item;
@@ -385,9 +383,9 @@ void pqServerManagerModel::onProxyRegistered(
   {
     Q_EMIT this->representationAdded(repr);
   }
-  else if (exGenerator)
+  else if (extrator)
   {
-    Q_EMIT this->extractGeneratorAdded(exGenerator);
+    Q_EMIT this->extractorAdded(extrator);
   }
 
   // It is essential to let the world know of the addition of pqProxy
@@ -432,7 +430,7 @@ void pqServerManagerModel::onProxyUnRegistered(
   pqView* view = qobject_cast<pqView*>(item);
   pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
   pqRepresentation* repr = qobject_cast<pqRepresentation*>(item);
-  auto exGenerator = qobject_cast<pqExtractGenerator*>(item);
+  auto extrator = qobject_cast<pqExtractor*>(item);
 
   if (view)
   {
@@ -446,9 +444,9 @@ void pqServerManagerModel::onProxyUnRegistered(
   {
     Q_EMIT this->preRepresentationRemoved(repr);
   }
-  else if (exGenerator)
+  else if (extrator)
   {
-    Q_EMIT this->preExtractGeneratorRemoved(exGenerator);
+    Q_EMIT this->preExtractorRemoved(extrator);
   }
 
   Q_EMIT this->preProxyRemoved(item);
@@ -471,9 +469,9 @@ void pqServerManagerModel::onProxyUnRegistered(
   {
     Q_EMIT this->representationRemoved(repr);
   }
-  else if (exGenerator)
+  else if (extrator)
   {
-    Q_EMIT this->extractGeneratorRemoved(exGenerator);
+    Q_EMIT this->extractorRemoved(extrator);
   }
 
   Q_EMIT this->proxyRemoved(item);

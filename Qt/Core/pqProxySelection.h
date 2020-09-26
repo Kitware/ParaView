@@ -63,7 +63,7 @@ public:
 
   /**
    * Selections can contains pqOutputPort, pqPipelineSource, or
-   * pqExtractGenerator instances. Use this method to filter out all
+   * pqExtractor instances. Use this method to filter out all
    * pqOutputPort and replace them with corresponding pqPipelineSource
    * instances.
    */

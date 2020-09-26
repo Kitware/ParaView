@@ -46,8 +46,8 @@ class vtkInSituPipelinePython::vtkInternals
 public:
   vtkSmartPointer<vtkSMExtractsController> ExtractsController;
 
-  // Collection of extract generators created in this pipeline.
-  vtkNew<vtkCollection> ExtractGenerators;
+  // Collection of extractor created in this pipeline.
+  vtkNew<vtkCollection> Extractors;
 
 #if VTK_MODULE_ENABLE_ParaView_RemotingLive
   vtkSmartPointer<vtkLiveInsituLink> LiveLink;
@@ -197,10 +197,10 @@ bool vtkInSituPipelinePython::Execute(int timestep, double time)
     return false;
   }
 
-  // Generate extracts from extract generators added by this pipeline.
+  // Generate extracts from extractor added by this pipeline.
   internals.ExtractsController->SetTimeStep(timestep);
   internals.ExtractsController->SetTime(time);
-  internals.ExtractsController->Extract(internals.ExtractGenerators);
+  internals.ExtractsController->Extract(internals.Extractors);
 
   // Handle Live.
   if (this->IsLiveActivated())
@@ -254,7 +254,7 @@ bool vtkInSituPipelinePython::Finalize()
 }
 
 //----------------------------------------------------------------------------
-void vtkInSituPipelinePython::RegisterExtractGenerator(vtkSMProxy* generator)
+void vtkInSituPipelinePython::RegisterExtractor(vtkSMProxy* extractor)
 {
   auto pipeline = ScopedActivate::GetActivePipeline();
   if (!pipeline)
@@ -265,10 +265,9 @@ void vtkInSituPipelinePython::RegisterExtractGenerator(vtkSMProxy* generator)
   }
 
   auto& internals = (*pipeline->Internals);
-  vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(),
-    "Registering extract generator (%s) for pipeline (%s)", vtkLogIdentifier(generator),
-    vtkLogIdentifier(pipeline));
-  internals.ExtractGenerators->AddItem(generator);
+  vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "Registering extractor (%s) for pipeline (%s)",
+    vtkLogIdentifier(extractor), vtkLogIdentifier(pipeline));
+  internals.Extractors->AddItem(extractor);
 }
 
 //----------------------------------------------------------------------------

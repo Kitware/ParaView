@@ -97,7 +97,7 @@ set(classes
   pqExampleVisualizationsDialog
   pqExampleVisualizationsDialogReaction
   pqExportReaction
-  pqExtractGeneratorsMenuReaction
+  pqExtractorsMenuReaction
   pqFileNamePropertyWidget
   pqFiltersMenuReaction
   pqFontPropertyWidget

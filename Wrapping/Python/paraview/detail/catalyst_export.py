@@ -2,10 +2,10 @@ r"""Module used to generate Catalyst export scripts"""
 from .. import simple, smstate, smtrace, servermanager
 
 def _get_catalyst_state(options):
-    # build a `source_set` comprising of the extract generator proxies.
+    # build a `source_set` comprising of the extractor proxies.
     # if not extracts have been configured, then there's nothing to generate.
-    extract_generators = simple.GetExtractGenerators()
-    if not extract_generators:
+    extractors = simple.GetExtractors()
+    if not extractors:
         return None
     # convert catalyst options to PythonStateOptions.
     soptions = servermanager.ProxyManager().NewProxy("pythontracing", "PythonStateOptions")
@@ -14,7 +14,7 @@ def _get_catalyst_state(options):
     soptions.SkipHiddenDisplayProperties = True
     soptions.SkipRenderingComponents = False
     soptions.ExtractsOutputDirectory = options.ExtractsOutputDirectory
-    return smstate.get_state(options=soptions, source_set=extract_generators)
+    return smstate.get_state(options=soptions, source_set=extractors)
 
 def save_catalyst_state(fname, options):
     options = servermanager._getPyProxy(options)

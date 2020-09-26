@@ -62,7 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDesktopServicesReaction.h"
 #include "pqExampleVisualizationsDialogReaction.h"
 #include "pqExportReaction.h"
-#include "pqExtractGeneratorsMenuReaction.h"
+#include "pqExtractorsMenuReaction.h"
 #include "pqFiltersMenuReaction.h"
 #ifdef PARAVIEW_USE_QTHELP
 #include "pqHelpReaction.h"
@@ -273,7 +273,7 @@ void pqParaViewMenuBuilders::buildFiltersMenu(
 }
 
 //-----------------------------------------------------------------------------
-void pqParaViewMenuBuilders::buildExtractGeneratorsMenu(
+void pqParaViewMenuBuilders::buildExtractorsMenu(
   QMenu& menu, QMainWindow* mainWindow, bool hideDisabled, bool quickLaunchable)
 {
   // Make sure disabled actions are still considered active
@@ -283,7 +283,7 @@ void pqParaViewMenuBuilders::buildExtractGeneratorsMenu(
     new pqProxyGroupMenuManager(&menu, "ParaViewExtractWriters", quickLaunchable);
   mgr->addProxyDefinitionUpdateListener("extract_writers");
 
-  auto menuReaction = new pqExtractGeneratorsMenuReaction(mgr, hideDisabled);
+  auto menuReaction = new pqExtractorsMenuReaction(mgr, hideDisabled);
   auto* pvappcore = pqPVApplicationCore::instance();
   if (quickLaunchable && pvappcore)
   {

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqExtractGeneratorsMenuReaction.cxx
+   Module:  pqExtractorsMenuReaction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,11 +29,11 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqExtractGeneratorsMenuReaction.h"
+#include "pqExtractorsMenuReaction.h"
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "pqExtractGenerator.h"
+#include "pqExtractor.h"
 #include "pqFiltersMenuReaction.h"
 #include "pqMenuReactionUtils.h"
 #include "pqOutputPort.h"
@@ -54,7 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 
 //-----------------------------------------------------------------------------
-pqExtractGeneratorsMenuReaction::pqExtractGeneratorsMenuReaction(
+pqExtractorsMenuReaction::pqExtractorsMenuReaction(
   pqProxyGroupMenuManager* parentObject, bool hideDisabledActions)
   : Superclass(parentObject)
   , HideDisabledActions(hideDisabledActions)
@@ -72,16 +72,16 @@ pqExtractGeneratorsMenuReaction::pqExtractGeneratorsMenuReaction(
   this->connect(parentObject->menu(), SIGNAL(aboutToShow()), SLOT(updateEnableState()));
 
   this->connect(parentObject, SIGNAL(triggered(const QString&, const QString&)),
-    SLOT(createExtractGenerator(const QString&, const QString&)));
+    SLOT(createExtractor(const QString&, const QString&)));
 }
 
 //-----------------------------------------------------------------------------
-pqExtractGeneratorsMenuReaction::~pqExtractGeneratorsMenuReaction()
+pqExtractorsMenuReaction::~pqExtractorsMenuReaction()
 {
 }
 
 //-----------------------------------------------------------------------------
-void pqExtractGeneratorsMenuReaction::updateEnableState(bool)
+void pqExtractorsMenuReaction::updateEnableState(bool)
 {
   auto& activeObjects = pqActiveObjects::instance();
   pqServer* server = activeObjects.activeServer();
@@ -171,7 +171,7 @@ void pqExtractGeneratorsMenuReaction::updateEnableState(bool)
 }
 
 //-----------------------------------------------------------------------------
-pqExtractGenerator* pqExtractGeneratorsMenuReaction::createExtractGenerator(
+pqExtractor* pqExtractorsMenuReaction::createExtractor(
   const QString& group, const QString& name) const
 {
   auto& activeObjects = pqActiveObjects::instance();
@@ -202,8 +202,8 @@ pqExtractGenerator* pqExtractGeneratorsMenuReaction::createExtractGenerator(
   }
 
   BEGIN_UNDO_SET(QString("Create Extract Generator '%1'").arg(name));
-  auto generator = controller->CreateExtractGenerator(input, name.toLocal8Bit());
+  auto generator = controller->CreateExtractor(input, name.toLocal8Bit());
   END_UNDO_SET();
   auto smmodel = pqApplicationCore::instance()->getServerManagerModel();
-  return generator ? smmodel->findItem<pqExtractGenerator*>(generator) : nullptr;
+  return generator ? smmodel->findItem<pqExtractor*>(generator) : nullptr;
 }

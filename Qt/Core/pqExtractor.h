@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqExtractGenerator.h
+   Module:  pqExtractor.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,48 +29,48 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqExtractGenerator_h
-#define pqExtractGenerator_h
+#ifndef pqExtractor_h
+#define pqExtractor_h
 
 #include "pqProxy.h"
 #include <QScopedPointer>
 
 /**
- * @class pqExtractGenerator
- * @brief pqProxy subclass for extract generators
+ * @class pqExtractor
+ * @brief pqProxy subclass for extractors
  *
- * pqExtractGenerator is an Qt-adaptor for an extract generator proxy.
- * Extract generators are used in ParaView to generate data or image extracts.
+ * pqExtractor is an Qt-adaptor for an extractor proxy.
+ * Extractors are used in ParaView to generate data or image extracts.
  * This class is used to represent such a proxy. It simply provides convenience
- * API to make it easier to monitor an extract generator proxy in the Qt code.
+ * API to make it easier to monitor an extractor proxy in the Qt code.
  */
-class PQCORE_EXPORT pqExtractGenerator : public pqProxy
+class PQCORE_EXPORT pqExtractor : public pqProxy
 {
   Q_OBJECT
   typedef pqProxy Superclass;
 
 public:
-  pqExtractGenerator(const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server,
+  pqExtractor(const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server,
     QObject* parent = nullptr);
-  ~pqExtractGenerator() override;
+  ~pqExtractor() override;
 
   /**
    * Returns the producer that provides the data or rendering results to this
-   * extract generator. When non-null, the returned value may be a
+   * extractor. When non-null, the returned value may be a
    * pqOutputPort for generators producing data extracts or pqView for
    * generators producing image extracts.
    */
   pqServerManagerModelItem* producer() const;
 
   /**
-   * Returns true if this extract generator is an image extract producer.
+   * Returns true if this extractor is an image extract producer.
    */
-  bool isImageExtractGenerator() const;
+  bool isImageExtractor() const;
 
   /**
-   * Returns true if this extract generator is a data extract generator.
+   * Returns true if this extractor is a data extractor.
    */
-  bool isDataExtractGenerator() const;
+  bool isDataExtractor() const;
 
 Q_SIGNALS:
   //@{
@@ -79,8 +79,8 @@ Q_SIGNALS:
    * has been made i.e. `this->producer()` will return the new producer for both
    * signals.
    */
-  void producerAdded(pqServerManagerModelItem* producer, pqExtractGenerator* self);
-  void producerRemoved(pqServerManagerModelItem* producer, pqExtractGenerator* self);
+  void producerAdded(pqServerManagerModelItem* producer, pqExtractor* self);
+  void producerRemoved(pqServerManagerModelItem* producer, pqExtractor* self);
   //@}
 
 protected:
@@ -90,7 +90,7 @@ private Q_SLOTS:
   void producerChanged();
 
 private:
-  Q_DISABLE_COPY(pqExtractGenerator);
+  Q_DISABLE_COPY(pqExtractor);
 
   class pqInternals;
   QScopedPointer<pqInternals> Internals;

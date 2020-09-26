@@ -17,7 +17,7 @@
  * @brief trigger to control extract generation
  *
  * vtkSMExtractTriggerProxy defines a trigger that is intended to use a control
- * an extract generator. Currently, this class directly implements a time-based
+ * an extractor. Currently, this class directly implements a time-based
  * trigger which relies on properties to indicate the start-time, end-time, and
  * update frequency. Subclasses can be added to define new types of triggers.
  */
@@ -39,7 +39,7 @@ public:
   /**
    * Returns true if the trigger conditions are satisfied.
    */
-  virtual bool IsActivated(vtkSMExtractsController* extractor);
+  virtual bool IsActivated(vtkSMExtractsController* controller);
 
 protected:
   vtkSMExtractTriggerProxy();

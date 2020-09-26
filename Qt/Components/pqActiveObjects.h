@@ -77,17 +77,17 @@ public:
 
   //@{
   /**
-   * Returns the active pipeline proxy e.g. a pqPipelineSource or pqExtractGenerator.
+   * Returns the active pipeline proxy e.g. a pqPipelineSource or pqExtractor.
    *
    * Historical note: until ParaView 5.9, the only types of objects that could be part of
    * the data-processing pipeline were pqPipelineSource (or subclass) instances i.e. they
-   * were all vtkAlgorithm-based. With 5.9, we introduced a concept of extract generators
-   * (pqExtractGenerator) which are not vtkAlgorithm-based and hence cannot be
+   * were all vtkAlgorithm-based. With 5.9, we introduced a concept of extractors
+   * (pqExtractor) which are not vtkAlgorithm-based and hence cannot be
    * `pqPipelineSource`. To avoid major disruption to API and applications, here was
-   * the chosen strategy: we let active-source be either a pqPipelineSource or pqExtractGenerator.
+   * the chosen strategy: we let active-source be either a pqPipelineSource or pqExtractor.
    * `setActiveSource`/`activeSource()` remains unchanged but will likely get deprecated
    * in the future.  `setActivePipelineProxy` and `activePipelineProxy()` is the now recommended
-   * API to get access to the active source and active extract generator.
+   * API to get access to the active source and active extractor.
    */
   pqProxy* activePipelineProxy() const { return this->ActivePipelineProxy; }
   pqPipelineSource* activeSource() const;
@@ -152,7 +152,7 @@ public Q_SLOTS:
    * active port, and active representation.
    *
    * Using `setActivePipelineProxy` is the recommended approach since ParaView 5.9
-   * since it allows for supporting pqExtractGenerator items.
+   * since it allows for supporting pqExtractor items.
    */
   void setActivePipelineProxy(pqProxy* proxy);
   void setActiveSource(pqPipelineSource* source) { this->setActivePipelineProxy(source); }
