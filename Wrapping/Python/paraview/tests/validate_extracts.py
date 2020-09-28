@@ -66,6 +66,11 @@ if args.subdir is not None:
 # Validate directory structure.
 regressions_failure_count = 0
 for dirpath, dirs, files in os.walk(test_dir):
+    # skip hidden files and directories
+    # ref: https://stackoverflow.com/questions/13454164/os-walk-without-hidden-folders
+    files = [f for f in files if not f[0] == '.']
+    dirs[:] = [d for d in dirs if not d[0] == '.']
+
     relpath = os.path.relpath(dirpath, test_dir)
     currentnode = find_directory(relpath, node)
     if not currentnode:
