@@ -1061,7 +1061,7 @@ static void BroadcastFamilies(vtkMultiProcessController* controller,
   std::vector<CGNSRead::FamilyInformation>::iterator ite;
   for (ite = famInfo.begin(); ite != famInfo.end(); ++ite)
   {
-    BroadcastCGNSString(controller, ite->name);
+    BroadcastString(controller, ite->name, rank);
     int flags = 0;
     if (rank == 0)
     {
@@ -1093,12 +1093,12 @@ static void BroadcastZones(
     for (auto& zinfo : zoneInfo)
     {
       stream.Push(zinfo.name, 33);
-      stream.Push(zinfo.family, 33);
+      stream << zinfo.family;
       stream << static_cast<unsigned int>(zinfo.bcs.size());
       for (auto& bcinfo : zinfo.bcs)
       {
         stream.Push(bcinfo.name, 33);
-        stream.Push(bcinfo.family, 33);
+        stream << bcinfo.family;
       }
     }
   }
@@ -1114,16 +1114,14 @@ static void BroadcastZones(
       unsigned int size = 33;
       char* cref = zinfo.name;
       stream.Pop(cref, size);
-      cref = zinfo.family;
-      stream.Pop(cref, size);
+      stream >> zinfo.family;
       stream >> count;
       zinfo.bcs.resize(count);
       for (auto& bcinfo : zinfo.bcs)
       {
         cref = bcinfo.name;
         stream.Pop(cref, size);
-        cref = bcinfo.family;
-        stream.Pop(cref, size);
+        stream >> bcinfo.family;
       }
     }
   }
@@ -1218,8 +1216,8 @@ bool ReadGridForZone(
 
   // check if the zone's family is enabled.
   auto familySelection = reader->GetFamilySelection();
-  if (familySelection->ArrayExists(zoneInfo.family) &&
-    !familySelection->ArrayIsEnabled(zoneInfo.family))
+  if (familySelection->ArrayExists(zoneInfo.family.c_str()) &&
+    !familySelection->ArrayIsEnabled(zoneInfo.family.c_str()))
   {
     return false;
   }
@@ -1244,6 +1242,7 @@ bool ReadPatch(vtkCGNSReader* reader, const BaseInformation&, const ZoneInformat
   const std::string& patchFamilyname)
 {
   auto familySelection = reader->GetFamilySelection();
+
   if (!patchFamilyname.empty() && !familySelection->ArrayIsEnabled(patchFamilyname.c_str()))
   {
     return false;

@@ -45,6 +45,7 @@ class vtkDataArraySelection;
 class vtkCGNSSubsetInclusionLattice;
 class vtkPoints;
 class vtkUnstructuredGrid;
+class vtkInformationStringKey;
 
 namespace CGNSRead
 {
@@ -242,6 +243,11 @@ public:
    * through this API) from the rank 0 node to all other processes in a job.
    */
   void Broadcast(vtkMultiProcessController* ctrl);
+
+  /**
+   * Key used to put a family name in the meta-data associated with a node
+   */
+  static vtkInformationStringKey* FAMILY();
 
 protected:
   vtkCGNSReader();
