@@ -463,7 +463,9 @@ bool vtkSMExtractsController::AddSummaryEntry(
 
   // add time, if not already present.
   params.insert({ "time", ::ConvertToString(this->Time) });
-  params.insert({ "timestep", std::to_string(this->TimeStep) });
+  // removing timestep from Cinema. I'm told only time (or timestep) should be
+  // written; opting to use time.
+  // params.insert({ "timestep", std::to_string(this->TimeStep) });
   params.insert({ vtkSMExtractsController::GetSummaryTableFilenameColumnName(filename),
     ::RelativePath(this->GetRealExtractsOutputDirectory(), filename) });
 
