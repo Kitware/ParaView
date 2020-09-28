@@ -42,3 +42,7 @@ vtk_module_add_python_package(ParaView::CinemaSci
 vtk_module_add_python_module(ParaView::CinemaSci
   PACKAGES
     "paraview.tpl.cinemasci")
+
+set_property(GLOBAL APPEND
+  PROPERTY
+    vtk_required_python_modules "pandas>=0.21")
