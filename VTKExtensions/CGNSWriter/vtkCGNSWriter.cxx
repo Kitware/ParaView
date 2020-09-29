@@ -516,6 +516,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   write_info& info, vtkStructuredGrid* sg, const char* zonename, string& error)
 {
   cgsize_t dim[3][3];
+  cgsize_t* pdim = (cgsize_t*)dim;
 
   // set the dimensions
   int* pointDims = sg->GetDimensions();
@@ -548,6 +549,15 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
     dim[0][j] = pointDims[i];
     dim[1][j] = cellDims[i];
     j++;
+  }
+  // Repacking dimension in case j < 3 because CGNS expects a resized dim matrix
+  // For instance if j == 2 then move from 3x3 matrix to 3x2 matrix
+  for (int k = 1; k < 3; k++)
+  {
+    for (int i = 0; i < j; i++)
+    {
+      pdim[j * k + i] = pdim[3 * k + i];
+    }
   }
 
   // create the structured zone. Cells are implicit
