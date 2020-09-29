@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqImmediateExportReaction.h
+   Module:    pqSaveExtractsReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,29 +29,31 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqImmediateExportReaction_h
-#define pqImmediateExportReaction_h
+#ifndef pqSaveExtractsReaction_h
+#define pqSaveExtractsReaction_h
 
 #include "pqApplicationComponentsModule.h"
 #include "pqReaction.h"
 
 /**
-* @ingroup Reactions
-* Reaction to export a set of configured data products now. This will
-* run through time and periodically save any images or call any writers to
-* that are requested.
-*
-* @sa pqCatalystExportReaction, pqTemporalExportReaction7
-*/
-
-class PQAPPLICATIONCOMPONENTS_EXPORT pqImmediateExportReaction : public pqReaction
+ *
+ * @class pqSaveExtractsReaction
+ * @brief reaction to save extracts.
+ * @ingroup Reactions
+ *
+ * pqSaveExtractsReaction is a reaction that can be connection to a QAction
+ * which when triggered should save extracts. This uses "SaveAnimationExtracts"
+ * proxy internally to generate extracts using the animation defined on the
+ * active session.
+ */
+class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveExtractsReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 
 public:
-  pqImmediateExportReaction(QAction* parent);
-  ~pqImmediateExportReaction();
+  pqSaveExtractsReaction(QAction* parent);
+  ~pqSaveExtractsReaction();
 
   /**
    * Generates exports.
@@ -62,10 +64,10 @@ protected Q_SLOTS:
   /**
   * Called when the action is triggered.
   */
-  void onTriggered() override { pqImmediateExportReaction::generateExtracts(); }
+  void onTriggered() override { pqSaveExtractsReaction::generateExtracts(); }
 
 private:
-  Q_DISABLE_COPY(pqImmediateExportReaction)
+  Q_DISABLE_COPY(pqSaveExtractsReaction)
 };
 
 #endif

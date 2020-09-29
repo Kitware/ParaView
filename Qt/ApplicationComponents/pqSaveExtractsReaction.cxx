@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqImmediateExportReaction.cxx
+   Module:    pqSaveExtractsReaction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqImmediateExportReaction.h"
+#include "pqSaveExtractsReaction.h"
 
 #include "pqActiveObjects.h"
 #include "pqAnimationProgressDialog.h"
@@ -45,18 +45,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 //-----------------------------------------------------------------------------
-pqImmediateExportReaction::pqImmediateExportReaction(QAction* parentObject)
+pqSaveExtractsReaction::pqSaveExtractsReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
 }
 
 //-----------------------------------------------------------------------------
-pqImmediateExportReaction::~pqImmediateExportReaction()
+pqSaveExtractsReaction::~pqSaveExtractsReaction()
 {
 }
 
 //-----------------------------------------------------------------------------
-bool pqImmediateExportReaction::generateExtracts()
+bool pqSaveExtractsReaction::generateExtracts()
 {
   vtkNew<vtkSMParaViewPipelineController> controller;
   auto pxm = pqActiveObjects::instance().proxyManager();
