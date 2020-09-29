@@ -561,7 +561,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
 
   // create the structured zone. Cells are implicit
   cg_check_operation(
-    cg_zone_write(info.F, info.B, zonename, *dim, CGNS_ENUMV(Structured), &(info.Z)));
+    cg_zone_write(info.F, info.B, zonename, dim, CGNS_ENUMV(Structured), &(info.Z)));
 
   vtkPoints* pts = sg->GetPoints();
 
