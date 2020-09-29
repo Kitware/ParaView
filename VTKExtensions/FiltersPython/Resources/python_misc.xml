@@ -1,0 +1,10 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="misc_internals">
+    <Proxy name="CDBWriter" class="vtkCDBWriter">
+      <Documentation>
+        This is used by vtkSMExtractsController to write summary table.
+      </Documentation>
+      <StringVectorProperty name="FileName" command="SetPath" />
+    </Proxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

@@ -463,7 +463,9 @@ bool vtkSMExtractsController::AddSummaryEntry(
 
   // add time, if not already present.
   params.insert({ "time", ::ConvertToString(this->Time) });
-  params.insert({ "timestep", std::to_string(this->TimeStep) });
+  // removing timestep from Cinema. I'm told only time (or timestep) should be
+  // written; opting to use time.
+  // params.insert({ "timestep", std::to_string(this->TimeStep) });
   params.insert({ vtkSMExtractsController::GetSummaryTableFilenameColumnName(filename),
     ::RelativePath(this->GetRealExtractsOutputDirectory(), filename) });
 
@@ -531,7 +533,7 @@ std::string vtkSMExtractsController::GetName(vtkSMExtractWriterProxy* writer)
 
 //----------------------------------------------------------------------------
 bool vtkSMExtractsController::SaveSummaryTable(
-  const std::string& fname, vtkSMSessionProxyManager* pxm)
+  const std::string& vtkNotUsed(fname), vtkSMSessionProxyManager* pxm)
 {
   if (!this->SummaryTable || !pxm)
   {
@@ -543,12 +545,10 @@ bool vtkSMExtractsController::SaveSummaryTable(
     return false;
   }
 
-  // TODO: eventually, this must be replaced by a Cinema table writer.
-  auto writer =
-    vtkSmartPointer<vtkSMProxy>::Take(pxm->NewProxy("misc_internals", "DelimitedTextWriter"));
+  auto writer = vtkSmartPointer<vtkSMProxy>::Take(pxm->NewProxy("misc_internals", "CDBWriter"));
   if (!writer)
   {
-    vtkErrorMacro("Failed to create 'DelimitedTextWriter'. Cannot write summary table.");
+    vtkErrorMacro("Failed to create 'CDBWriter'. Cannot write summary table.");
     return false;
   }
 
@@ -561,9 +561,7 @@ bool vtkSMExtractsController::SaveSummaryTable(
   }
 
   writer->SetLocation(helper->GetLocation());
-  vtkSMPropertyHelper(writer, "FileName")
-    .Set(vtksys::SystemTools::JoinPath({ this->GetRealExtractsOutputDirectory(), "/" + fname })
-           .c_str());
+  vtkSMPropertyHelper(writer, "FileName").Set(this->GetRealExtractsOutputDirectory());
   writer->UpdateVTKObjects();
   vtkSMPropertyHelper(helper, "OutputDestination").Set(vtkPVSession::DATA_SERVER_ROOT);
   vtkSMPropertyHelper(helper, "Writer").Set(writer);

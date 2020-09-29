@@ -9,7 +9,7 @@
 # newer compilers.
 
 .centos7:
-    image: "kitware/paraview:ci-centos7-20200911"
+    image: "kitware/paraview:ci-centos7-20200929"
 
     variables:
         GIT_SUBMODULE_STRATEGY: none

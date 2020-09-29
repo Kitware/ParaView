@@ -26,12 +26,13 @@ set(files
   paraview/tpl/cinemasci/cview/cinema/view/1.2/css/view.css
   paraview/tpl/cinemasci/cview/cinema/view/1.2/css/range-css.css
   paraview/tpl/cinemasci/cview/cinema/view/1.2/version.md
-  paraview/tpl/cinemasci/cview/cinema/view/1.2/license.md
-  paraview/tpl/cinemasci/cview/cinema/view/1.2/images/empty.png
-  paraview/tpl/cinemasci/cview/cinema/view/1.2/databases.json
+  paraview/tpl/cinemasci/cdb/__init__.py
   paraview/tpl/cinemasci/cview/cinema/view/1.2/copyright.md
+  paraview/tpl/cinemasci/cview/cinema/view/1.2/databases.json
+  paraview/tpl/cinemasci/cview/cinema/view/1.2/images/empty.png
+  paraview/tpl/cinemasci/cview/cinema/view/1.2/license.md
   paraview/tpl/cinemasci/__init__.py
-  paraview/tpl/cinemasci/cdb/__init__.py)
+  paraview/tpl/cinemasci/pynb/__init__.py)
 
 vtk_module_add_python_package(ParaView::CinemaSci
   FILES               ${files}
@@ -41,3 +42,7 @@ vtk_module_add_python_package(ParaView::CinemaSci
 vtk_module_add_python_module(ParaView::CinemaSci
   PACKAGES
     "paraview.tpl.cinemasci")
+
+set_property(GLOBAL APPEND
+  PROPERTY
+    vtk_required_python_modules "pandas>=0.21")
