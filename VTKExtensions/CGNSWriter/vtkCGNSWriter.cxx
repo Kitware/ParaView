@@ -516,7 +516,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   write_info& info, vtkStructuredGrid* sg, const char* zonename, string& error)
 {
   cgsize_t dim[3][3];
-  cgsize_t* pdim = (cgsize_t*)dim;
+  cgsize_t* pdim = static_cast<cgsize_t*>(dim);
 
   // set the dimensions
   int* pointDims = sg->GetDimensions();
