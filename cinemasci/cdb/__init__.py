@@ -54,6 +54,57 @@ class cdb:
 
         return result
 
+    def checkNumericColumns(self):
+        """Based on the first row of entries, determines which columns are numeric and non-numeric
+    
+        Returns a list of True/False
+        """
+        indexisNumeric = []
+        cur = self.con.cursor()
+        query = "SELECT * from {} ORDER BY ROWID ASC LIMIT 1".format(self.tablename)
+        result = cur.execute(query)
+        for item in result:
+            for value in item:
+                try:
+                    valueAsNumber = float(value)
+                    indexisNumeric.append(True)
+                except ValueError:
+                    indexisNumeric.append(False)
+        return indexisNumeric
+
+    def getParameterValues(self, parameter):
+        """Given a parameter, return a sorted list of unique values of the parameter
+        """
+        parameterValues = []
+        if parameter in self.parameternames:
+            cur = self.con.cursor()
+            query = "SELECT {} from {}".format(parameter, self.tablename)
+            vals = [float(entry[0]) for entry in cur.execute(query)]
+            parameterValues = set(vals)
+        return parameterValues
+        
+    def getFilepathMap(self, selectedParameters, selectedFilepaths):
+        mapping = []
+        indexisNumeric = self.checkNumericColumns()
+        cur = self.con.cursor()
+        query = "SELECT * from {}".format(self.tablename)
+        cur.execute(query)
+        for row in cur:
+            filepaths = []
+            parameterKey = ""
+            for i in selectedParameters:
+                value = row[i]
+                if indexisNumeric[i]:
+                    value = str(float(value))
+
+                parameterKey += value+"_"
+                
+            for i in selectedFilepaths:
+                filepaths.append(row[i])
+                
+            mapping.append((parameterKey, filepaths))
+        return mapping
+        
     def parameter_exists(self, parameter):
         """Check if a parameter exists
         """
