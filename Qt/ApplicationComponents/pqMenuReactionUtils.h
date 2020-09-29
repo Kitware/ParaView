@@ -41,7 +41,7 @@ class vtkSMProxy;
 /**
  * Groups helper functions used by multiple pq*MenuReaction classes.
  *
- * @see pqExtractGeneratorsMenuReaction
+ * @see pqExtractorsMenuReaction
  * @see pqFiltersMenuReaction
  */
 namespace pqMenuReactionUtils

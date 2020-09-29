@@ -1,15 +1,15 @@
 ## Changes to Cinema support
 
-Extract Generators introduced in this release also impact support for generation
+Extractor introduced in this release also impact support for generation
 of Cinema databases. Cinema Science project has undergone several changes over
 the years with latest specification called Spec D, or just Cinema specification
 for short. In this release, we simply ability to export Cinema specification by
-integrating it with extract generators.
+integrating it with extractors.
 
-Image Extract Generators such as PNG, JPEG now support generation of images from
+Image Extractors such as PNG, JPEG now support generation of images from
 multiple camera angles in addition the one used during the visualization setup.
 By setting the **Camera Mode** to **Phi-Theta** on the **Properties** panel for
-the extract generator, you can make the extract generator save out multiple
+the extractor, you can make the extractor save out multiple
 images per timestep, each done from a different camera position along a sphere
 centered at the focal point with a radius set to the focal length.
 
@@ -23,7 +23,7 @@ when using **Save Catalyst State** to generate extracts in situ.
 Cinema Science project is developing a new format for defining a composable
 image set. This will support the ability of recoloring rendering results, and
 combining multiple layers. Support for these composable-image-sets (CIS) will
-be added in the future as a new type of Image Extract Generator.
+be added in the future as a new type of Image Extractor.
 
 Also removed in this release is the ability to import Cinema databases. The
 importer was designed for legacy Cinema specifications and hence removed.

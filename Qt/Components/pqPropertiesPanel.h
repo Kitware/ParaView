@@ -134,7 +134,7 @@ public:
 
   /**
    * This has been replaced by `setPipelineProxy` to add support for other types
-   * of pqProxy subclasses such as pqExtractGenerator.
+   * of pqProxy subclasses such as pqExtractor.
    *
    * @deprecated in ParaView 5.9. Use `setPipelineProxy` instead.
    */
@@ -223,7 +223,7 @@ public Q_SLOTS:
   /**
    * Set the `pqProxy` to show properties for under the "Properties" section.
    * Typically, this is a pqPipelineSource (or subclass), pqOutputPort, or
-   * a pqExtractGenerator.
+   * a pqExtractor.
    */
   void setPipelineProxy(pqProxy*);
 

@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComparativeRenderView.h"
 #include "pqComparativeXYBarChartView.h"
 #include "pqComparativeXYChartView.h"
-#include "pqExtractGenerator.h"
+#include "pqExtractor.h"
 #include "pqMultiSliceView.h"
 #include "pqParallelCoordinatesChartView.h"
 #include "pqPipelineFilter.h"
@@ -185,9 +185,9 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
       return new pqPipelineSource(name, proxy, server, 0);
     }
   }
-  else if (group == "extract_generators" && xml_type == "Extractor")
+  else if (group == "extractors" && xml_type == "Extractor")
   {
-    return new pqExtractGenerator(group, name, proxy, server);
+    return new pqExtractor(group, name, proxy, server);
   }
   else if (group == "timekeeper")
   {

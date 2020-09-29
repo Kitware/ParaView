@@ -395,18 +395,6 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF&)
   QPolygonF poly = this->timeBarPoly(this->CurrentTime);
   painter->drawPolygon(poly);
 
-  if (this->NewCurrentTime != this->CurrentTime)
-  {
-    double pos = this->positionFromTime(this->NewCurrentTime);
-    QVector<QPointF> pts;
-    pts.append(QPointF(pos - 1, rh - 1));
-    pts.append(QPointF(pos - 1, sr.height() + sr.top() - 2));
-    pts.append(QPointF(pos + 1, sr.height() + sr.top() - 2));
-    pts.append(QPointF(pos + 1, rh - 1));
-    painter->setBrush(this->palette().alternateBase());
-    painter->drawPolygon(QPolygonF(pts));
-  }
-
   painter->restore();
 }
 
@@ -507,13 +495,19 @@ void pqAnimationModel::mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent)
     return;
   }
 
-  // see if current time is grabbed
+  // see if current time is grabbed or if the time header is clicked
   QPointF pos = mouseEvent->scenePos();
-  if (this->hitTestCurrentTimePoly(pos))
+  if (this->hitTestCurrentTimePoly(pos) || !this->hitTestTracks(pos))
   {
     this->CurrentTimeGrabbed = true;
     this->InteractiveRange.first = this->StartTime;
     this->InteractiveRange.second = this->EndTime;
+
+    // if the time header is clicked, update the current time
+    if (!this->hitTestTracks(pos))
+    {
+      this->mouseMoveEvent(mouseEvent);
+    }
   }
 
   // see if any keyframe is grabbed
@@ -635,6 +629,13 @@ void pqAnimationModel::mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)
     time = qMin(time, this->InteractiveRange.second);
 
     this->NewCurrentTime = time;
+
+    if (this->NewCurrentTime != this->CurrentTime)
+    {
+      Q_EMIT this->currentTimeSet(this->NewCurrentTime);
+      this->NewCurrentTime = this->CurrentTime;
+    }
+
     this->update();
     return;
   }
@@ -673,9 +674,6 @@ void pqAnimationModel::mouseReleaseEvent(QGraphicsSceneMouseEvent*)
   if (this->CurrentTimeGrabbed)
   {
     this->CurrentTimeGrabbed = false;
-    Q_EMIT this->currentTimeSet(this->NewCurrentTime);
-    this->NewCurrentTime = this->CurrentTime;
-    this->update();
   }
 
   if (this->CurrentKeyFrameGrabbed)

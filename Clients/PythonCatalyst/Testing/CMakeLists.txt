@@ -115,7 +115,7 @@ set_tests_properties(
 # creation. The following describes the steps involved.
 #
 # 1. Create the test XML: record a ParaView UI/XML test as usual with actions to
-#    add extract generators (which are necessary).
+#    add extractors (which are necessary).
 #
 #    One of the steps in the test must be generation of extracts using
 #    "General Extracts" action. During test playback the

@@ -73,6 +73,7 @@
 
 #include "cgio_helpers.h"
 
+vtkInformationKeyMacro(vtkCGNSReader, FAMILY, String);
 vtkStandardNewMacro(vtkCGNSReader);
 
 namespace
@@ -203,6 +204,15 @@ public:
       else if (strcmp(nodeLabel, "FamilyName_t") == 0)
       {
         CGNSRead::readNodeStringData(cgioNum, *iter, this->FamilyName);
+        if (this->FamilyName.size() > 0 && this->FamilyName[0] == '/')
+        {
+          // This is a family path
+          std::string::size_type pos = this->FamilyName.find('/', 1);
+          if (pos != std::string::npos)
+          {
+            this->FamilyName = this->FamilyName.substr(pos + 1);
+          }
+        }
       }
       else if (strcmp(nodeLabel, "GridLocation_t") == 0)
       {
@@ -368,6 +378,15 @@ public:
       else if (strcmp(nodeLabel, "FamilyName_t") == 0)
       {
         CGNSRead::readNodeStringData(cgioNum, *iter, this->FamilyName);
+        if (this->FamilyName.size() > 0 && this->FamilyName[0] == '/')
+        {
+          // This is a family path
+          std::string::size_type pos = this->FamilyName.find('/', 1);
+          if (pos != std::string::npos)
+          {
+            this->FamilyName = this->FamilyName.substr(pos + 1);
+          }
+        }
       }
       else if (strcmp(nodeLabel, "GridLocation_t") == 0)
       {
@@ -2011,8 +2030,7 @@ int vtkCGNSReader::GetCurvilinearZone(
 
               if (!binfo.FamilyName.empty())
               {
-                vtkInformationStringKey* bcfamily =
-                  new vtkInformationStringKey("FAMILY", "vtkCompositeDataSet");
+                vtkInformationStringKey* bcfamily = vtkCGNSReader::FAMILY();
                 patchesMB->GetMetaData(idx)->Set(bcfamily, binfo.FamilyName.c_str());
               }
               patchesMB->GetMetaData(idx)->Set(vtkCompositeDataSet::NAME(), binfo.Name);
@@ -3369,8 +3387,7 @@ int vtkCGNSReader::GetUnstructuredZone(
 
               if (!binfo.FamilyName.empty())
               {
-                vtkInformationStringKey* bcfamily =
-                  new vtkInformationStringKey("FAMILY", "vtkCompositeDataSet");
+                vtkInformationStringKey* bcfamily = vtkCGNSReader::FAMILY();
                 patchesMB->GetMetaData(idx)->Set(bcfamily, binfo.FamilyName.c_str());
               }
               patchesMB->GetMetaData(idx)->Set(vtkCompositeDataSet::NAME(), binfo.Name);
@@ -4117,8 +4134,7 @@ int vtkCGNSReader::GetUnstructuredZone(
               patchesMB->SetBlock(idx, bcGrid.Get());
               if (!binfo.FamilyName.empty())
               {
-                vtkInformationStringKey* bcfamily =
-                  new vtkInformationStringKey("FAMILY", "vtkCompositeDataSet");
+                vtkInformationStringKey* bcfamily = vtkCGNSReader::FAMILY();
                 patchesMB->GetMetaData(idx)->Set(bcfamily, binfo.FamilyName.c_str());
               }
               patchesMB->GetMetaData(idx)->Set(vtkCompositeDataSet::NAME(), binfo.Name);
@@ -4481,8 +4497,7 @@ int vtkCGNSReader::RequestData(vtkInformation* vtkNotUsed(request),
 
       if (familyName.empty() == false)
       {
-        vtkInformationStringKey* zonefamily =
-          new vtkInformationStringKey("FAMILY", "vtkCompositeDataSet");
+        vtkInformationStringKey* zonefamily = vtkCGNSReader::FAMILY();
         mbase->GetMetaData(zone)->Set(zonefamily, familyName.c_str());
       }
 
@@ -4631,7 +4646,7 @@ int vtkCGNSReader::RequestInformation(vtkInformation* vtkNotUsed(request),
     // add families.
     for (auto& finfo : curBase.family)
     {
-      this->FamilySelection->AddArray(finfo.name);
+      this->FamilySelection->AddArray(finfo.name.c_str());
     }
 
     // Fill Variable Vertex/Cell names ... perhaps should be improved

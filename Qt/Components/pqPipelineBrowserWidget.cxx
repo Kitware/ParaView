@@ -118,16 +118,15 @@ void pqPipelineBrowserWidget::configureModel()
   QObject::connect(smModel, SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*, int)),
     this->PipelineModel, SLOT(removeConnection(pqPipelineSource*, pqPipelineSource*, int)));
 
-  // monitor extract generator related signals.
-  QObject::connect(smModel, SIGNAL(extractGeneratorAdded(pqExtractGenerator*)), this->PipelineModel,
-    SLOT(addExtractGenerator(pqExtractGenerator*)));
-  QObject::connect(smModel, SIGNAL(extractGeneratorRemoved(pqExtractGenerator*)),
-    this->PipelineModel, SLOT(removeExtractGenerator(pqExtractGenerator*)));
-  QObject::connect(smModel, SIGNAL(connectionAdded(pqServerManagerModelItem*, pqExtractGenerator*)),
-    this->PipelineModel, SLOT(addConnection(pqServerManagerModelItem*, pqExtractGenerator*)));
-  QObject::connect(smModel,
-    SIGNAL(connectionRemoved(pqServerManagerModelItem*, pqExtractGenerator*)), this->PipelineModel,
-    SLOT(removeConnection(pqServerManagerModelItem*, pqExtractGenerator*)));
+  // monitor extractor related signals.
+  QObject::connect(smModel, SIGNAL(extractorAdded(pqExtractor*)), this->PipelineModel,
+    SLOT(addExtractor(pqExtractor*)));
+  QObject::connect(smModel, SIGNAL(extractorRemoved(pqExtractor*)), this->PipelineModel,
+    SLOT(removeExtractor(pqExtractor*)));
+  QObject::connect(smModel, SIGNAL(connectionAdded(pqServerManagerModelItem*, pqExtractor*)),
+    this->PipelineModel, SLOT(addConnection(pqServerManagerModelItem*, pqExtractor*)));
+  QObject::connect(smModel, SIGNAL(connectionRemoved(pqServerManagerModelItem*, pqExtractor*)),
+    this->PipelineModel, SLOT(removeConnection(pqServerManagerModelItem*, pqExtractor*)));
 
   // Use the tree view's font as the base for the model's modified
   // font.

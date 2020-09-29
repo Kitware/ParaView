@@ -766,6 +766,7 @@ list(APPEND TESTS_WITH_BASELINES
   AMRCutPlane.xml
   AMReXParticlesReader.xml
   AnimationUseCamera.xml
+  AnimationSetTimeCursor.xml
   Annotations.xml
   ConvertToMolecule.xml
   ContourCellData.xml

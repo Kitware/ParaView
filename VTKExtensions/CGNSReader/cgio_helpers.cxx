@@ -529,17 +529,27 @@ int readSolInfo(int cgioNum, double nodeId, CGNSRead::BaseInformation& baseInfo)
 }
 
 //------------------------------------------------------------------------------
-int readBaseFamily(int cgioNum, double nodeId, CGNSRead::BaseInformation& baseInfo)
+int readBaseFamily(
+  int cgioNum, double nodeId, CGNSRead::BaseInformation& baseInfo, const std::string& parentPath)
 {
   CGNSRead::FamilyInformation curFamily;
   CGNSRead::char_33 nodeLabel;
+  CGNSRead::char_33 nodeName;
   std::vector<double> famChildId;
 
-  if (cgio_get_name(cgioNum, nodeId, curFamily.name) != CG_OK)
+  if (cgio_get_name(cgioNum, nodeId, nodeName) != CG_OK)
   {
     return 1;
   }
   curFamily.isBC = false;
+
+  // use a path relative to base to select Family_t part of Family_t tree
+  std::string curPath = std::string(nodeName);
+  if (!parentPath.empty())
+  {
+    curPath = parentPath + "/" + curPath;
+  }
+  curFamily.name = curPath;
 
   getNodeChildrenId(cgioNum, nodeId, famChildId);
 
@@ -553,8 +563,12 @@ int readBaseFamily(int cgioNum, double nodeId, CGNSRead::BaseInformation& baseIn
     {
       curFamily.isBC = true;
     }
-    cgio_release_id(cgioNum, famChildId[nn]);
+    else if (strcmp(nodeLabel, "Family_t") == 0)
+    {
+      readBaseFamily(cgioNum, famChildId[nn], baseInfo, curPath);
+    }
   }
+  CGNSRead::releaseIds(cgioNum, famChildId);
   baseInfo.family.push_back(curFamily);
 
   return 0;
@@ -683,11 +697,19 @@ int readZoneInfo(int cgioNum, double zoneId, CGNSRead::ZoneInformation& zoneInfo
     {
       if (strcmp(nodeLabel, "FamilyName_t") == 0)
       {
-        std::string fname;
-        CGNSRead::readNodeStringData(cgioNum, zoneChildId, fname);
-        std::copy(fname.c_str(),
-          fname.c_str() + std::min(fname.size() + 1, sizeof(zoneInfo.family)), zoneInfo.family);
-        zoneInfo.family[32] = 0;
+        CGNSRead::readNodeStringData(cgioNum, zoneChildId, zoneInfo.family);
+        if (zoneInfo.family.size() > 0 && zoneInfo.family[0] == '/')
+        {
+          // This is a family path
+          std::string::size_type pos = zoneInfo.family.find('/', 1);
+          if (pos == std::string::npos)
+          {
+            // Invalid family path
+            return 1;
+          }
+          // Remove /Base prefix of path for backward compatibility
+          zoneInfo.family = zoneInfo.family.substr(pos + 1);
+        }
       }
       else if (strcmp(nodeLabel, "ZoneBC_t") == 0)
       {
@@ -709,11 +731,18 @@ int readZoneInfo(int cgioNum, double zoneId, CGNSRead::ZoneInformation& zoneInfo
               if (cgio_get_label(cgioNum, bcChildId, nodeLabel) == CG_OK &&
                 strcmp(nodeLabel, "FamilyName_t") == 0)
               {
-                std::string fname;
-                CGNSRead::readNodeStringData(cgioNum, bcChildId, fname);
-                std::copy(fname.c_str(),
-                  fname.c_str() + std::min(fname.size() + 1, sizeof(bcinfo.family)), bcinfo.family);
-                bcinfo.family[32] = 0;
+                CGNSRead::readNodeStringData(cgioNum, bcChildId, bcinfo.family);
+                if (bcinfo.family.size() > 0 && bcinfo.family[0] == '/')
+                {
+                  // This is a family path
+                  std::string::size_type pos = bcinfo.family.find('/', 1);
+                  if (pos == std::string::npos)
+                  {
+                    // Invalid family path
+                    return 1;
+                  }
+                  bcinfo.family = bcinfo.family.substr(pos + 1);
+                }
                 break;
               }
             }

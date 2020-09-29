@@ -113,7 +113,7 @@ bool vtkSMExtractsController::Extract(vtkSMSessionProxyManager* pxm)
   bool status = false;
   vtkNew<vtkSMProxyIterator> piter;
   piter->SetSessionProxyManager(pxm);
-  for (piter->Begin("extract_generators"); !piter->IsAtEnd(); piter->Next())
+  for (piter->Begin("extractors"); !piter->IsAtEnd(); piter->Next())
   {
     status = this->Extract(piter->GetProxy()) || status;
   }
@@ -127,9 +127,9 @@ bool vtkSMExtractsController::Extract(vtkCollection* collection)
   auto range = vtk::Range(collection);
   for (auto item : range)
   {
-    if (auto generator = vtkSMProxy::SafeDownCast(item))
+    if (auto extractor = vtkSMProxy::SafeDownCast(item))
     {
-      status = this->Extract(generator) || status;
+      status = this->Extract(extractor) || status;
     }
   }
   return status;
@@ -169,7 +169,7 @@ bool vtkSMExtractsController::IsAnyTriggerActivated(vtkSMSessionProxyManager* px
 {
   vtkNew<vtkSMProxyIterator> piter;
   piter->SetSessionProxyManager(pxm);
-  for (piter->Begin("extract_generators"); !piter->IsAtEnd(); piter->Next())
+  for (piter->Begin("extractors"); !piter->IsAtEnd(); piter->Next())
   {
     if (this->IsTriggerActivated(piter->GetProxy()))
     {
@@ -196,9 +196,9 @@ bool vtkSMExtractsController::IsAnyTriggerActivated(vtkCollection* collection)
   auto range = vtk::Range(collection);
   for (auto item : range)
   {
-    if (auto generator = vtkSMProxy::SafeDownCast(item))
+    if (auto extractor = vtkSMProxy::SafeDownCast(item))
     {
-      if (this->IsTriggerActivated(generator))
+      if (this->IsTriggerActivated(extractor))
       {
         return true;
       }
@@ -216,7 +216,7 @@ bool vtkSMExtractsController::IsTriggerActivated(vtkSMProxy* extractor)
     return false;
   }
 
-  if (vtkSMPropertyHelper(extractor, "EnableExtract").GetAsInt() != 1)
+  if (vtkSMPropertyHelper(extractor, "Enable").GetAsInt() != 1)
   {
     // skipping, not enabled.
     return false;
@@ -235,7 +235,7 @@ bool vtkSMExtractsController::IsTriggerActivated(vtkSMProxy* extractor)
 }
 
 //----------------------------------------------------------------------------
-std::vector<vtkSMProxy*> vtkSMExtractsController::FindExtractGenerators(vtkSMProxy* proxy) const
+std::vector<vtkSMProxy*> vtkSMExtractsController::FindExtractors(vtkSMProxy* proxy) const
 {
   std::vector<vtkSMProxy*> result;
   if (!proxy)
@@ -246,19 +246,19 @@ std::vector<vtkSMProxy*> vtkSMExtractsController::FindExtractGenerators(vtkSMPro
   auto pxm = proxy->GetSessionProxyManager();
   vtkNew<vtkSMProxyIterator> piter;
   piter->SetSessionProxyManager(pxm);
-  for (piter->Begin("extract_generators"); !piter->IsAtEnd(); piter->Next())
+  for (piter->Begin("extractors"); !piter->IsAtEnd(); piter->Next())
   {
-    auto generator = piter->GetProxy();
-    if (vtkSMExtractsController::IsExtractGenerator(generator, proxy))
+    auto extractor = piter->GetProxy();
+    if (vtkSMExtractsController::IsExtractor(extractor, proxy))
     {
-      result.push_back(generator);
+      result.push_back(extractor);
     }
   }
   return result;
 }
 
 //----------------------------------------------------------------------------
-std::vector<vtkSMProxy*> vtkSMExtractsController::GetSupportedExtractGeneratorPrototypes(
+std::vector<vtkSMProxy*> vtkSMExtractsController::GetSupportedExtractorPrototypes(
   vtkSMProxy* proxy) const
 {
   std::vector<vtkSMProxy*> result;
@@ -285,59 +285,59 @@ std::vector<vtkSMProxy*> vtkSMExtractsController::GetSupportedExtractGeneratorPr
 
 //----------------------------------------------------------------------------
 bool vtkSMExtractsController::CanExtract(
-  vtkSMProxy* generator, const std::vector<vtkSMProxy*>& inputs) const
+  vtkSMProxy* extractor, const std::vector<vtkSMProxy*>& inputs) const
 {
-  if (!generator || inputs.size() == 0)
+  if (!extractor || inputs.size() == 0)
   {
     return false;
   }
 
-  // currently, we don't have any multiple input extract generators.
+  // currently, we don't have any multiple input extractors.
   if (inputs.size() > 1)
   {
     return false;
   }
 
-  // let's support the case where the 'generator' is not really the generator
+  // let's support the case where the 'extractor' is not really the extractor
   // but a writer prototype.
-  auto writer = vtkSMExtractWriterProxy::SafeDownCast(generator);
+  auto writer = vtkSMExtractWriterProxy::SafeDownCast(extractor);
   if (!writer)
   {
     writer =
-      vtkSMExtractWriterProxy::SafeDownCast(vtkSMPropertyHelper(generator, "Writer").GetAsProxy());
+      vtkSMExtractWriterProxy::SafeDownCast(vtkSMPropertyHelper(extractor, "Writer").GetAsProxy());
   }
 
   return (writer && writer->CanExtract(inputs[0]));
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMExtractsController::IsExtractGenerator(vtkSMProxy* generator, vtkSMProxy* proxy)
+bool vtkSMExtractsController::IsExtractor(vtkSMProxy* extractor, vtkSMProxy* proxy)
 {
-  if (proxy == nullptr || generator == nullptr)
+  if (proxy == nullptr || extractor == nullptr)
   {
     return false;
   }
 
   auto writer =
-    vtkSMExtractWriterProxy::SafeDownCast(vtkSMPropertyHelper(generator, "Writer").GetAsProxy());
+    vtkSMExtractWriterProxy::SafeDownCast(vtkSMPropertyHelper(extractor, "Writer").GetAsProxy());
   return (writer && writer->IsExtracting(proxy)) ? true : false;
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMExtractsController::GetInputForGenerator(vtkSMProxy* generator) const
+vtkSMProxy* vtkSMExtractsController::GetInputForExtractor(vtkSMProxy* extractor) const
 {
-  if (generator == nullptr)
+  if (extractor == nullptr)
   {
     return nullptr;
   }
 
   auto writer =
-    vtkSMExtractWriterProxy::SafeDownCast(vtkSMPropertyHelper(generator, "Writer").GetAsProxy());
+    vtkSMExtractWriterProxy::SafeDownCast(vtkSMPropertyHelper(extractor, "Writer").GetAsProxy());
   return (writer ? writer->GetInput() : nullptr);
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMExtractsController::CreateExtractGenerator(
+vtkSMProxy* vtkSMExtractsController::CreateExtractor(
   vtkSMProxy* proxy, const char* xmlname, const char* registrationName /*=nullptr*/) const
 {
   if (!proxy)
@@ -362,44 +362,43 @@ vtkSMProxy* vtkSMExtractsController::CreateExtractGenerator(
 
   const std::string pname = registrationName
     ? std::string(registrationName)
-    : pxm->GetUniqueProxyName("extract_generators", writer->GetXMLLabel());
-  auto generator =
-    vtkSmartPointer<vtkSMProxy>::Take(pxm->NewProxy("extract_generators", "Extractor"));
+    : pxm->GetUniqueProxyName("extractors", writer->GetXMLLabel());
+  auto extractor = vtkSmartPointer<vtkSMProxy>::Take(pxm->NewProxy("extractors", "Extractor"));
 
-  SM_SCOPED_TRACE(CreateExtractGenerator)
+  SM_SCOPED_TRACE(CreateExtractor)
     .arg("producer", proxy)
-    .arg("generator", generator)
+    .arg("extractor", extractor)
     .arg("xmlname", xmlname)
     .arg("registrationName", pname.c_str());
 
-  controller->PreInitializeProxy(generator);
-  vtkSMPropertyHelper(generator, "Writer").Set(writer);
+  controller->PreInitializeProxy(extractor);
+  vtkSMPropertyHelper(extractor, "Writer").Set(writer);
 
   // this is done so that producer-consumer links are setup properly. Makes it easier
   // to delete the Extractor when the producer goes away.
   if (auto port = vtkSMOutputPort::SafeDownCast(proxy))
   {
-    vtkSMPropertyHelper(generator, "Producer").Set(port->GetSourceProxy());
+    vtkSMPropertyHelper(extractor, "Producer").Set(port->GetSourceProxy());
   }
   else
   {
-    vtkSMPropertyHelper(generator, "Producer").Set(proxy);
+    vtkSMPropertyHelper(extractor, "Producer").Set(proxy);
   }
-  controller->PostInitializeProxy(generator);
-  generator->UpdateVTKObjects();
+  controller->PostInitializeProxy(extractor);
+  extractor->UpdateVTKObjects();
 
   // add it to the proxy list domain too so the UI shows it correctly.
-  // doing this before calling RegisterExtractGeneratorProxy also ensures that
+  // doing this before calling RegisterExtractorProxy also ensures that
   // it gets registered as a helper proxy.
-  if (auto prop = generator->GetProperty("Writer"))
+  if (auto prop = extractor->GetProperty("Writer"))
   {
     if (auto pld = prop->FindDomain<vtkSMProxyListDomain>())
     {
       pld->AddProxy(writer);
     }
   }
-  controller->RegisterExtractGeneratorProxy(generator, pname.c_str());
-  return generator;
+  controller->RegisterExtractorProxy(extractor, pname.c_str());
+  return extractor;
 }
 
 //----------------------------------------------------------------------------
@@ -518,11 +517,11 @@ std::string vtkSMExtractsController::GetName(vtkSMExtractWriterProxy* writer)
     auto producer = writer->GetConsumerProxy(cc);
     auto pproperty = writer->GetConsumerProperty(cc);
     if (pproperty && strcmp(pproperty->GetXMLName(), "Writer") == 0 && producer &&
-      strcmp(producer->GetXMLGroup(), "extract_generators") == 0 &&
+      strcmp(producer->GetXMLGroup(), "extractors") == 0 &&
       strcmp(producer->GetXMLName(), "Extractor") == 0)
     {
       auto pxm = producer->GetSessionProxyManager();
-      auto name = pxm->GetProxyName("extract_generators", producer);
+      auto name = pxm->GetProxyName("extractors", producer);
       return name;
     }
   }

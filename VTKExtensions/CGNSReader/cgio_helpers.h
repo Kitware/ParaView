@@ -152,7 +152,8 @@ int readZoneIterInfo(int cgioNum, double nodeId, CGNSRead::BaseInformation& base
 int readSolInfo(int cgioNum, double nodeId, CGNSRead::BaseInformation& baseInfo);
 
 //------------------------------------------------------------------------------
-int readBaseFamily(int cgioNum, double nodeId, CGNSRead::BaseInformation& baseInfo);
+int readBaseFamily(int cgioNum, double nodeId, CGNSRead::BaseInformation& baseInfo,
+  const std::string& parentPath = "");
 
 //------------------------------------------------------------------------------
 int readBaseReferenceState(int cgioNum, double nodeId, CGNSRead::BaseInformation& baseInfo);
