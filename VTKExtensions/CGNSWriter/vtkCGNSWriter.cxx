@@ -515,8 +515,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteBase(write_info& info, const char* basename
 bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   write_info& info, vtkStructuredGrid* sg, const char* zonename, string& error)
 {
-  cgsize_t dim[3][3];
-  cgsize_t* pdim = static_cast<cgsize_t*>(dim);
+  cgsize_t dim[9];
 
   // set the dimensions
   int* pointDims = sg->GetDimensions();
@@ -534,9 +533,9 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   // init dimensions
   for (int i = 0; i < 3; ++i)
   {
-    dim[0][i] = 1;
-    dim[1][i] = 0;
-    dim[2][i] = 0; // always 0 for structured
+    dim[0 * 3 + i] = 1;
+    dim[1 * 3 + i] = 0;
+    dim[2 * 3 + i] = 0; // always 0 for structured
   }
   j = 0;
   for (int i = 0; i < 3; ++i)
@@ -546,8 +545,8 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
     {
       continue;
     }
-    dim[0][j] = pointDims[i];
-    dim[1][j] = cellDims[i];
+    dim[0 * 3 + j] = pointDims[i];
+    dim[1 * 3 + j] = cellDims[i];
     j++;
   }
   // Repacking dimension in case j < 3 because CGNS expects a resized dim matrix
@@ -556,7 +555,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   {
     for (int i = 0; i < j; i++)
     {
-      pdim[j * k + i] = pdim[3 * k + i];
+      dim[j * k + i] = dim[3 * k + i];
     }
   }
 
