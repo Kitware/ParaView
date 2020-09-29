@@ -32,7 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqImmediateExportReaction.h"
 
 #include "pqActiveObjects.h"
+#include "pqAnimationProgressDialog.h"
+#include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
+#include "pqProgressManager.h"
+#include "pqProxyWidgetDialog.h"
 #include "pqProxyWidgetDialog.h"
 #include "vtkNew.h"
 #include "vtkSMParaViewPipelineController.h"
@@ -68,10 +72,22 @@ bool pqImmediateExportReaction::generateExtracts()
     dialog.setSettingsKey("SaveAnimationExtracts");
     if (dialog.exec() == QDialog::Accepted)
     {
-      // TODO: progress dialog (see pqSaveAnimationReaction). Maybe, we can
-      // create a new class say pqAnimationProgressDialog that makes that
-      // piece of code reusable.
-      return exporter->SaveExtracts();
+      pqAnimationProgressDialog progress(
+        "Save Extracts Progress", "Abort", 0, 100, pqCoreUtilities::mainWidget());
+      progress.setWindowTitle("Saving Extracts ...");
+      progress.setAnimationScene(controller->FindAnimationScene(pxm->GetSession()));
+      progress.show();
+
+      auto appcore = pqApplicationCore::instance();
+      auto pgm = appcore->getProgressManager();
+      // this is essential since pqProgressManager blocks all interaction
+      // events when progress events are pending. since we have a QProgressDialog
+      // as modal, we don't need to that. Plus, we want the cancel button on the
+      // dialog to work.
+      const auto prev = pgm->unblockEvents(true);
+      const auto status = exporter->SaveExtracts();
+      pgm->unblockEvents(prev);
+      return status;
     }
   }
   return false;
