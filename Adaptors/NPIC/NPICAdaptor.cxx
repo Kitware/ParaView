@@ -12,6 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "NPICAdaptor.h"
 
 #include "vtkCPAdaptorAPI.h"
 #include "vtkCPDataDescription.h"
