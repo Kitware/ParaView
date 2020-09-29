@@ -11,3 +11,4 @@ DEPENDS
   ParaView::PythonCatalyst
   VTK::CommonDataModel
   VTK::CommonCore
+EXCLUDE_WRAP

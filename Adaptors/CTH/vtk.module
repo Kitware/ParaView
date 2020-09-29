@@ -13,3 +13,4 @@ DEPENDS
   VTK::CommonDataModel
   VTK::CommonExecutionModel
   VTK::ParallelMPI
+EXCLUDE_WRAP
