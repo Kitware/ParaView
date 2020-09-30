@@ -151,7 +151,11 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
   // Load optional plugins.
   vtkVLogStartScopeF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "opt-plugins", "load optional plugins: `@_paraview_client_OPTIONAL_PLUGINS@`");
   plugin_string = "@_paraview_client_OPTIONAL_PLUGINS@";
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
   plugin_list = plugin_string.split(';',QString::SkipEmptyParts);
+#else
+  plugin_list = plugin_string.split(';',Qt::SkipEmptyParts);
+#endif
   foreach (const QString plugin_name, plugin_list)
   {
     if (!loader->LoadPluginByName(plugin_name.toLatin1().data()))
