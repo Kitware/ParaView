@@ -357,21 +357,64 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF&)
 
   painter->save();
   painter->setPen(this->palette().color(QPalette::Text));
-  painter->drawText(QRectF(labelRect.left(), labelRect.top(), w / 2.0, rh),
-    Qt::AlignLeft | Qt::AlignVCenter,
-    QString::number(this->StartTime, this->TimeNotation.toLatin1(), this->TimePrecision));
+
+  // draw the current time label
+  QString timeLabString =
+    QString::number(this->CurrentTime, this->TimeNotation.toLatin1(), this->TimePrecision);
+  double timeLabSize = metrics.horizontalAdvance(timeLabString);
+  double currentTimePos = this->positionFromTime(this->CurrentTime);
+  double timeLabPos;
+
+  if (currentTimePos - timeLabSize / 2.0 < labelRect.left())
+  {
+    timeLabPos = labelRect.left();
+  }
+  else if (currentTimePos + timeLabSize / 2.0 > labelRect.right())
+  {
+    timeLabPos = labelRect.right() - timeLabSize;
+  }
+  else
+  {
+    timeLabPos = currentTimePos - timeLabSize / 2.0;
+  }
+
+  QRectF timeLabRect(timeLabPos, labelRect.top(), timeLabSize, rh);
+  painter->drawText(timeLabRect, Qt::AlignCenter, timeLabString);
+
+  // draw the other labels
+  QString curLabString =
+    QString::number(this->StartTime, this->TimeNotation.toLatin1(), this->TimePrecision);
+  double curLabSize = metrics.horizontalAdvance(curLabString);
+  QRectF curLabRect(labelRect.left(), labelRect.top(), curLabSize, rh);
+
+  if (!curLabRect.intersects(timeLabRect))
+  {
+    painter->drawText(curLabRect, Qt::AlignLeft | Qt::AlignVCenter, curLabString);
+  }
 
   for (int i = 1; i < num; i++)
   {
     double time = this->StartTime + (this->EndTime - this->StartTime) * (double)i / (double)num;
-    double left = labelRect.left() + w / 2.0 + w * (i - 1);
-    painter->drawText(QRectF(left, labelRect.top(), w, rh), Qt::AlignCenter,
-      QString::number(time, this->TimeNotation.toLatin1(), this->TimePrecision));
+    curLabString = QString::number(time, this->TimeNotation.toLatin1(), this->TimePrecision);
+    curLabSize = metrics.horizontalAdvance(curLabString);
+    double left = labelRect.left() + w * i - curLabSize / 2.0;
+    curLabRect = QRectF(left, labelRect.top(), curLabSize, rh);
+
+    if (!curLabRect.intersects(timeLabRect))
+    {
+      painter->drawText(curLabRect, Qt::AlignCenter, curLabString);
+    }
   }
 
-  painter->drawText(QRectF(labelRect.right() - w / 2.0, labelRect.top(), w / 2.0, rh),
-    Qt::AlignRight | Qt::AlignVCenter,
-    QString::number(this->EndTime, this->TimeNotation.toLatin1(), this->TimePrecision));
+  curLabString = QString::number(this->EndTime, this->TimeNotation.toLatin1(), this->TimePrecision);
+  curLabSize = metrics.horizontalAdvance(curLabString);
+  curLabRect = QRectF(labelRect.right() - curLabSize, labelRect.top(), curLabSize, rh);
+
+  if (!curLabRect.intersects(timeLabRect))
+  {
+    painter->drawText(curLabRect, Qt::AlignRight | Qt::AlignVCenter, curLabString);
+  }
+
   painter->restore();
 
   // if sequence, draw a tick mark for each frame
