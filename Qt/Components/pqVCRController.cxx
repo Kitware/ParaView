@@ -107,6 +107,7 @@ void pqVCRController::onPlay()
     return;
   }
 
+  CLEAR_UNDO_STACK();
   BEGIN_UNDO_EXCLUDE();
 
   SM_SCOPED_TRACE(CallMethod).arg(this->Scene->getProxy()).arg("Play");
@@ -135,6 +136,7 @@ void pqVCRController::onTick()
 void pqVCRController::onBeginPlay()
 {
   Q_EMIT this->playing(true);
+  CLEAR_UNDO_STACK();
   BEGIN_UNDO_EXCLUDE();
 }
 
@@ -156,9 +158,11 @@ void pqVCRController::onLoopPropertyChanged()
 //-----------------------------------------------------------------------------
 void pqVCRController::onLoop(bool checked)
 {
+  BEGIN_UNDO_EXCLUDE();
   vtkSMProxy* scene = this->Scene->getProxy();
   pqSMAdaptor::setElementProperty(scene->GetProperty("Loop"), checked);
   scene->UpdateProperty("Loop");
+  END_UNDO_EXCLUDE();
 }
 
 //-----------------------------------------------------------------------------

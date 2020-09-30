@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVariant>
 #include <QWidget>
 
+class pqAnimationScene;
 class pqAnimationTrack;
 class pqServer;
 class pqServerManagerModelItem;
@@ -70,8 +71,6 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTimeInspectorWidget : public QWidget
   Q_PROPERTY(QList<QVariant> timeSources READ timeSources WRITE setTimeSources)
   Q_PROPERTY(
     QList<QVariant> suppressedTimeSources READ suppressedTimeSources WRITE setSuppressedTimeSources)
-  Q_PROPERTY(double sceneCurrentTime READ sceneCurrentTime WRITE setSceneCurrentTime NOTIFY
-      sceneCurrentTimeChanged)
 
   typedef QWidget Superclass;
 
@@ -132,11 +131,6 @@ public:
   QList<QVariant> suppressedTimeSources() const;
   void setSuppressedTimeSources(const QList<QVariant>& proxies);
 
-  /**
-  * Get the current time for the scene.
-  */
-  double sceneCurrentTime() const;
-
 public Q_SLOTS:
   /**
   * set the active server.
@@ -147,6 +141,14 @@ public Q_SLOTS:
   * set the current time for the scene.
   */
   void setSceneCurrentTime(double);
+
+  void setAnimationScene(pqAnimationScene* scene);
+
+protected Q_SLOTS:
+  /**
+  * called when scene time changes
+  */
+  void updateSceneTime();
 
 private Q_SLOTS:
   /**
@@ -168,7 +170,6 @@ private Q_SLOTS:
 
 Q_SIGNALS:
   void dummySignal();
-  void sceneCurrentTimeChanged();
   void suppressedTimeSourcesChanged();
 
 private:

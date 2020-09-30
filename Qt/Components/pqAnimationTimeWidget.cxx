@@ -32,13 +32,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationTimeWidget.h"
 #include "ui_pqAnimationTimeWidget.h"
 
+#include "pqAnimationScene.h"
 #include "pqCoreUtilities.h"
 #include "pqDoubleLineEdit.h"
 #include "pqPropertyLinks.h"
 #include "pqPropertyLinksConnection.h"
 #include "pqTimer.h"
+#include "pqUndoStack.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMTimeKeeperProxy.h"
+#include "vtkSMTrace.h"
 #include "vtkWeakPointer.h"
 
 #include <QDoubleValidator>
@@ -74,26 +77,26 @@ public:
     return this->TimeStepsVariants;
   }
 
-  // returns true if the time was modified.
-  bool setTimeStepIndex(int index)
+  /**
+  * Checks if the index in input has an associated timestep.
+  * If so, the timestep is passed to the input timestep parameter and the function returns true.
+  */
+  bool checkTimeStepFromIndex(int index, double& timestep)
   {
     if (!this->DisableModifications && index >= 0 &&
       index < static_cast<int>(this->TimeSteps.size()))
     {
-      return this->setTime(this->TimeSteps[index]);
+      timestep = this->TimeSteps[index];
+      return this->canTimeBeSet(timestep);
     }
     return false;
   }
 
-  bool setTime(double time)
-  {
-    if (!this->DisableModifications && time != this->Time)
-    {
-      this->Time = time;
-      return true;
-    }
-    return false;
-  }
+  // sets the current time
+  void setTime(double time) { this->Time = time; }
+
+  // checks if the time value in input can be set to the current time
+  bool canTimeBeSet(double time) { return (!this->DisableModifications && time != this->Time); }
 
   bool setPlayModeSnapToTimeSteps(bool val)
   {
@@ -253,20 +256,18 @@ pqAnimationTimeWidget::pqAnimationTimeWidget(QWidget* parentObject)
     ui.timeValue, &pqDoubleLineEdit::textChangedAndEditingFinished, [this, &internals, &ui]() {
       // user has manually changed the time-value in the line edit.
       const double time = ui.timeValue->text().toDouble();
-      if (internals.State.setTime(time))
+      if (internals.State.canTimeBeSet(time))
       {
-        internals.render(this);
-        Q_EMIT this->timeValueChanged();
+        setCurrentTime(time);
       }
     });
 
   QObject::connect(ui.timeValueComboBox, &QComboBox::currentTextChanged, [this, &internals, &ui]() {
     // user has selected a timestep using the combo-box.
     const double time = ui.timeValueComboBox->currentData().toDouble();
-    if (internals.State.setTime(time))
+    if (internals.State.canTimeBeSet(time))
     {
-      internals.render(this);
-      Q_EMIT this->timeValueChanged();
+      setCurrentTime(time);
     }
   });
 
@@ -287,10 +288,10 @@ pqAnimationTimeWidget::pqAnimationTimeWidget(QWidget* parentObject)
   QObject::connect(timer, &QTimer::timeout, [this, &internals, &ui]() {
     // user has changed the time-step in the spinbox.
     const int timeIndex = ui.timestepValue->value();
-    if (internals.State.setTimeStepIndex(timeIndex))
+    double time;
+    if (internals.State.checkTimeStepFromIndex(timeIndex, time))
     {
-      internals.render(this);
-      Q_EMIT this->timeValueChanged();
+      setCurrentTime(time);
     }
   });
 
@@ -299,24 +300,50 @@ pqAnimationTimeWidget::pqAnimationTimeWidget(QWidget* parentObject)
 }
 
 //-----------------------------------------------------------------------------
+void pqAnimationTimeWidget::setCurrentTime(double t)
+{
+  BEGIN_UNDO_EXCLUDE();
+
+  vtkSMProxy* animationScene = this->Internals->AnimationScene;
+  {
+    // Use another scope to prevent modifications to the TimeKeeper from
+    // being traced.
+    SM_SCOPED_TRACE(PropertiesModified).arg("proxy", animationScene);
+    vtkSMPropertyHelper(animationScene, "AnimationTime").Set(t);
+  }
+  animationScene->UpdateVTKObjects();
+
+  END_UNDO_EXCLUDE();
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationTimeWidget::updateCurrentTime(double t)
+{
+  this->Internals->State.setTime(t);
+  this->Internals->render(this);
+}
+
+//-----------------------------------------------------------------------------
 pqAnimationTimeWidget::~pqAnimationTimeWidget()
 {
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationTimeWidget::setAnimationScene(vtkSMProxy* ascene)
+void pqAnimationTimeWidget::setAnimationScene(pqAnimationScene* ascene)
 {
+  vtkSMProxy* asceneProxy = ascene ? ascene->getProxy() : nullptr;
+
   pqInternals& internals = *this->Internals;
-  if (internals.AnimationSceneVoidPtr == ascene)
+  if (internals.AnimationSceneVoidPtr == asceneProxy)
   {
     return;
   }
 
   internals.Links.clear();
-  internals.AnimationScene = ascene;
-  internals.AnimationSceneVoidPtr = ascene;
-  this->setEnabled(ascene != NULL);
-  if (!ascene)
+  internals.AnimationScene = asceneProxy;
+  internals.AnimationSceneVoidPtr = asceneProxy;
+  this->setEnabled(asceneProxy != nullptr);
+  if (!asceneProxy)
   {
     return;
   }
@@ -324,13 +351,12 @@ void pqAnimationTimeWidget::setAnimationScene(vtkSMProxy* ascene)
   // In a ParaView application, it's safe to assume that the timekeeper an
   // animation scene is using doesn't change in the life span of the scene.
   vtkSMProxy* atimekeeper = internals.timeKeeper();
-  assert(atimekeeper != NULL);
+  assert(atimekeeper != nullptr);
 
-  // bi-directional links.
+  QObject::connect(ascene, SIGNAL(animationTime(double)), this, SLOT(updateCurrentTime(double)));
+
   internals.Links.addTraceablePropertyLink(
-    this, "timeValue", SIGNAL(timeValueChanged()), ascene, ascene->GetProperty("AnimationTime"));
-  internals.Links.addTraceablePropertyLink(
-    this, "playMode", SIGNAL(playModeChanged()), ascene, ascene->GetProperty("PlayMode"));
+    this, "playMode", SIGNAL(playModeChanged()), asceneProxy, asceneProxy->GetProperty("PlayMode"));
 
   // uni-directional links.
   internals.Links.addPropertyLink(
@@ -347,27 +373,10 @@ vtkSMProxy* pqAnimationTimeWidget::animationScene() const
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationTimeWidget::setTimeValue(double time)
-{
-  auto& internals = (*this->Internals);
-  if (internals.State.setTime(time))
-  {
-    internals.render(this);
-  }
-}
-
-//-----------------------------------------------------------------------------
 const QList<QVariant>& pqAnimationTimeWidget::timestepValues() const
 {
   const auto& internals = (*this->Internals);
   return internals.State.timeStepsAsVariantList();
-}
-
-//-----------------------------------------------------------------------------
-double pqAnimationTimeWidget::timeValue() const
-{
-  const auto& internals = (*this->Internals);
-  return internals.State.time();
 }
 
 //-----------------------------------------------------------------------------
