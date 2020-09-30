@@ -1,0 +1,14 @@
+NAME
+  ParaView::AdaptorsNPIC
+LIBRARY_NAME
+  vtkPVAdaptorsNPIC
+GROUPS
+  PARAVIEW_CORE
+CONDITION
+  PARAVIEW_USE_MPI
+DEPENDS
+  ParaView::Catalyst
+  VTK::CommonDataModel
+  VTK::CommonCore
+  VTK::ParallelMPI
+EXCLUDE_WRAP
