@@ -551,9 +551,9 @@ bool vtkCGNSWriter::vtkPrivate::WriteStructuredGrid(
   }
   // Repacking dimension in case j < 3 because CGNS expects a resized dim matrix
   // For instance if j == 2 then move from 3x3 matrix to 3x2 matrix
-  for (int k = 1; k < 3; k++)
+  for (int k = 1; (k < 3) && (j < 3); ++k)
   {
-    for (int i = 0; i < j; i++)
+    for (int i = 0; i < j; ++i)
     {
       dim[j * k + i] = dim[3 * k + i];
     }
