@@ -68,7 +68,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHelpReaction.h"
 #endif
 #include "pqIgnoreSourceTimeReaction.h"
-#include "pqImmediateExportReaction.h"
 #include "pqLinkSelectionReaction.h"
 #include "pqLoadDataReaction.h"
 #include "pqLoadMaterialsReaction.h"
@@ -91,6 +90,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSaveAnimationGeometryReaction.h"
 #include "pqSaveAnimationReaction.h"
 #include "pqSaveDataReaction.h"
+#include "pqSaveExtractsReaction.h"
 #include "pqSaveScreenshotReaction.h"
 #include "pqSaveStateReaction.h"
 #include "pqSearchItemReaction.h"
@@ -176,7 +176,7 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   new pqSaveAnimationGeometryReaction(ui.actionFileSaveGeometry);
 
   new pqExportReaction(ui.actionExport);
-  new pqImmediateExportReaction(ui.actionFileSaveExtracts);
+  new pqSaveExtractsReaction(ui.actionFileSaveExtracts);
   new pqSaveDataReaction(ui.actionFileSaveData);
 
   new pqLoadRestoreWindowLayoutReaction(true, ui.actionFileLoadWindowArrangement);

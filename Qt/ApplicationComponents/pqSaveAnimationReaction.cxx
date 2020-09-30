@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSaveAnimationReaction.h"
 
 #include "pqActiveObjects.h"
+#include "pqAnimationProgressDialog.h"
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
@@ -57,7 +58,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 #include <QDebug>
-#include <QProgressDialog>
 
 //-----------------------------------------------------------------------------
 pqSaveAnimationReaction::pqSaveAnimationReaction(QAction* parentObject)
@@ -165,26 +165,13 @@ void pqSaveAnimationReaction::saveAnimation()
 
   if (dialog.exec() == QDialog::Accepted)
   {
-    QProgressDialog progress(
+    pqAnimationProgressDialog progress(
       "Save animation progress", "Abort", 0, 100, pqCoreUtilities::mainWidget());
-    progress.setWindowModality(Qt::ApplicationModal);
     progress.setWindowTitle("Saving Animation ...");
+    progress.setAnimationScene(scene);
     progress.show();
-    QObject::connect(&progress, &QProgressDialog::canceled, [scene, &progress]() {
-      progress.hide();
-      scene->InvokeCommand("Stop");
-    });
 
     auto appcore = pqApplicationCore::instance();
-    auto pqscene = appcore->getServerManagerModel()->findItem<pqAnimationScene*>(scene);
-    auto sceneConnection =
-      QObject::connect(pqscene, &pqAnimationScene::tick, [&progress](int progressInPercent) {
-        if (progress.isVisible())
-        {
-          progress.setValue(progressInPercent);
-        }
-      });
-
     auto pgm = appcore->getProgressManager();
     // this is essential since pqProgressManager blocks all interaction
     // events when progress events are pending. since we have a QProgressDialog
@@ -193,7 +180,6 @@ void pqSaveAnimationReaction::saveAnimation()
     const auto prev = pgm->unblockEvents(true);
     ahProxy->WriteAnimation(filename.toUtf8().data());
     pgm->unblockEvents(prev);
-    pqscene->disconnect(sceneConnection);
   }
 
   if (layout)

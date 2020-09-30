@@ -36,6 +36,7 @@ set(classes
   pqAnimatablePropertiesComboBox
   pqAnimatableProxyComboBox
   pqAnimationManager
+  pqAnimationProgressDialog
   pqAnimationTimeWidget
   pqAnimationViewWidget
   pqArrayListDomain

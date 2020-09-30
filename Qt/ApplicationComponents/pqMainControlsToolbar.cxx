@@ -36,10 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCatalystExportReaction.h"
 #include "pqDataQueryReaction.h"
 #include "pqDeleteReaction.h"
-#include "pqImmediateExportReaction.h"
 #include "pqLoadDataReaction.h"
 #include "pqLoadPaletteReaction.h"
 #include "pqSaveDataReaction.h"
+#include "pqSaveExtractsReaction.h"
 #include "pqSaveStateReaction.h"
 #include "pqServerConnectReaction.h"
 #include "pqServerDisconnectReaction.h"
@@ -63,7 +63,7 @@ void pqMainControlsToolbar::constructor()
   new pqDataQueryReaction(ui.actionQuery);
   new pqLoadPaletteReaction(ui.actionLoadPalette);
   new pqSaveStateReaction(ui.actionSaveState);
-  new pqImmediateExportReaction(ui.actionGenerateExtracts);
+  new pqSaveExtractsReaction(ui.actionGenerateExtracts);
 #if VTK_MODULE_ENABLE_ParaView_pqPython
   new pqCatalystExportReaction(ui.actionSaveCatalystState);
 #else

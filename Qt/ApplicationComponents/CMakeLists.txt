@@ -106,7 +106,6 @@ set(classes
   pqHandlePropertyWidget
   pqIgnoreSourceTimeReaction
   pqImageCompressorWidget
-  pqImmediateExportReaction
   pqImplicitPlanePropertyWidget
   pqInputDataTypeDecorator
   pqInteractivePropertyWidget
@@ -163,6 +162,7 @@ set(classes
   pqSaveAnimationGeometryReaction
   pqSaveAnimationReaction
   pqSaveDataReaction
+  pqSaveExtractsReaction
   pqSaveScreenshotReaction
   pqSaveStateReaction
   pqScalarBarVisibilityReaction
