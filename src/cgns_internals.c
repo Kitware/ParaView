@@ -1171,7 +1171,7 @@ int cgi_read_section(int in_link, double parent_id, int *nsections,
                         section[0][n].connect->data = (void *)elem_data;
                     }
                 }
-                if (cg->version < 4000) {
+                if (cg->version < 4000 && cg->version != 3400) {
                     cgsize_t size, *elem_data = 0;
                     if (section[0][n].el_type == CGNS_ENUMV(NGON_n) ||
                         section[0][n].el_type == CGNS_ENUMV(NFACE_n) ) {
