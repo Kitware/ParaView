@@ -28,10 +28,9 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Author: kenton@google.com (Kenton Varda)
-
 #include <google/protobuf/compiler/cpp/cpp_generator.h>
 #include <google/protobuf/compiler/command_line_interface.h>
+
 #include <google/protobuf/port_def.inc>
 
 namespace google {
