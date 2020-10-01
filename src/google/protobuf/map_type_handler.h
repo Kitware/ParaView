@@ -155,13 +155,13 @@ class MapTypeHandler<WireFormatLite::TYPE_MESSAGE, Type> {
   typedef typename MapWireFieldTypeTraits<WireFormatLite::TYPE_MESSAGE,
                                           Type>::TypeOnMemory TypeOnMemory;
   // Corresponding wire type for field type.
-  static const WireFormatLite::WireType kWireType =
+  static constexpr WireFormatLite::WireType kWireType =
       MapWireFieldTypeTraits<WireFormatLite::TYPE_MESSAGE, Type>::kWireType;
   // Whether wire type is for message.
-  static const bool kIsMessage =
+  static constexpr bool kIsMessage =
       MapWireFieldTypeTraits<WireFormatLite::TYPE_MESSAGE, Type>::kIsMessage;
   // Whether wire type is for enum.
-  static const bool kIsEnum =
+  static constexpr bool kIsEnum =
       MapWireFieldTypeTraits<WireFormatLite::TYPE_MESSAGE, Type>::kIsEnum;
 
   // Functions used in parsing and serialization. ===================
@@ -240,7 +240,7 @@ class MapTypeHandler<WireFormatLite::TYPE_MESSAGE, Type> {
                                                int default_enum);             \
     static inline size_t SpaceUsedInMapEntryLong(const TypeOnMemory& value);  \
     static inline size_t SpaceUsedInMapLong(const TypeOnMemory& value);       \
-    static inline size_t SpaceUsedInMapLong(const std::string& value);        \
+    static inline size_t SpaceUsedInMapLong(ConstStringParam value);          \
     static inline void AssignDefaultValue(TypeOnMemory* value);               \
     static inline const MapEntryAccessorType& DefaultIfNotInitialized(        \
         const TypeOnMemory& value, const TypeOnMemory& default_value);        \
@@ -467,11 +467,11 @@ inline const char* ReadSINT32(const char* ptr, int32* value) {
 }
 template <typename E>
 inline const char* ReadENUM(const char* ptr, E* value) {
-  *value = static_cast<E>(ReadVarint(&ptr));
+  *value = static_cast<E>(ReadVarint32(&ptr));
   return ptr;
 }
 inline const char* ReadBOOL(const char* ptr, bool* value) {
-  *value = static_cast<bool>(ReadVarint(&ptr));
+  *value = static_cast<bool>(ReadVarint32(&ptr));
   return ptr;
 }
 
@@ -643,8 +643,8 @@ inline bool MapTypeHandler<WireFormatLite::TYPE_MESSAGE, Type>::IsInitialized(
   template <typename Type>                                                    \
   inline size_t                                                               \
   MapTypeHandler<WireFormatLite::TYPE_##FieldType, Type>::SpaceUsedInMapLong( \
-      const std::string& value) {                                             \
-    return sizeof(value);                                                     \
+      ConstStringParam value) {                                               \
+    return sizeof(std::string);                                               \
   }                                                                           \
   template <typename Type>                                                    \
   inline void MapTypeHandler<WireFormatLite::TYPE_##FieldType, Type>::Clear(  \
