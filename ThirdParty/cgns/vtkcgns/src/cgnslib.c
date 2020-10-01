@@ -3995,7 +3995,7 @@ int cg_poly_elements_read(int file_number, int B, int Z, int S, cgsize_t *elemen
     if (connect_offset && section->connect_offset) {
         ConnectOffsetSize  = section->connect_offset->dim_vals[0];
         if (section->connect_offset->data &&
-                0 == strcmp(CG_SIZE_DATATYPE, section->connect->data_type)) {
+                0 == strcmp(CG_SIZE_DATATYPE, section->connect_offset->data_type)) {
             memcpy(connect_offset, section->connect_offset->data, (size_t)(ConnectOffsetSize*sizeof(cgsize_t)));
         } else {
             if (cgi_read_int_data(section->connect_offset->id, section->connect_offset->data_type,
