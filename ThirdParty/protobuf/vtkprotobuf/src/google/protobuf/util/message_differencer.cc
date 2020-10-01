@@ -576,12 +576,12 @@ bool MessageDifferencer::Compare(const Message& message1,
   bool unknown_compare_result = true;
   // Ignore unknown fields in EQUIVALENT mode
   if (message_field_comparison_ != EQUIVALENT) {
-    const UnknownFieldSet* unknown_field_set1 =
-        &reflection1->GetUnknownFields(message1);
-    const UnknownFieldSet* unknown_field_set2 =
-        &reflection2->GetUnknownFields(message2);
-    if (!CompareUnknownFields(message1, message2, *unknown_field_set1,
-                              *unknown_field_set2, parent_fields)) {
+    const UnknownFieldSet& unknown_field_set1 =
+        reflection1->GetUnknownFields(message1);
+    const UnknownFieldSet& unknown_field_set2 =
+        reflection2->GetUnknownFields(message2);
+    if (!CompareUnknownFields(message1, message2, unknown_field_set1,
+                              unknown_field_set2, parent_fields)) {
       if (reporter_ == NULL) {
         return false;
       }
@@ -813,7 +813,7 @@ bool MessageDifferencer::CompareWithFieldsInternal(
       continue;
     }
 
-    // By this point, field1 and field2 are guarenteed to point to the same
+    // By this point, field1 and field2 are guaranteed to point to the same
     // field, so we can now compare the values.
     if (IsIgnored(message1, message2, field1, *parent_fields)) {
       // Ignore this field. Report and move on.
@@ -1243,7 +1243,7 @@ bool MessageDifferencer::UnpackAny(const Message& any,
   }
   data->reset(dynamic_message_factory_->GetPrototype(desc)->New());
   std::string serialized_value = reflection->GetString(any, value_field);
-  if (!(*data)->ParseFromString(serialized_value)) {
+  if (!(*data)->ParsePartialFromString(serialized_value)) {
     GOOGLE_DLOG(ERROR) << "Failed to parse value for " << full_type_name;
     return false;
   }
@@ -1549,7 +1549,7 @@ bool MaximumMatcher::Match(int left, int right) {
 bool MaximumMatcher::FindArgumentPathDFS(int v, std::vector<bool>* visited) {
   (*visited)[v] = true;
   // We try to match those un-matched nodes on the right side first. This is
-  // the step that the navie greedy matching algorithm uses. In the best cases
+  // the step that the naive greedy matching algorithm uses. In the best cases
   // where the greedy algorithm can find a maximum matching, we will always
   // find a match in this step and the performance will be identical to the
   // greedy algorithm.
@@ -1561,7 +1561,7 @@ bool MaximumMatcher::FindArgumentPathDFS(int v, std::vector<bool>* visited) {
     }
   }
   // Then we try those already matched nodes and see if we can find an
-  // alternaive match for the node matched to them.
+  // alternative match for the node matched to them.
   // The greedy algorithm will stop before this and fail to produce the
   // correct result.
   for (int i = 0; i < count2_; ++i) {

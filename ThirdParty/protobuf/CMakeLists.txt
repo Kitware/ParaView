@@ -36,7 +36,7 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN 0)
 vtk_module_third_party(
   INTERNAL
     LICENSE_FILES "vtkprotobuf/LICENSE"
-    VERSION       "3.11.2"
+    VERSION       "3.13.0"
     STANDARD_INCLUDE_DIRS
   EXTERNAL
     PACKAGE Protobuf

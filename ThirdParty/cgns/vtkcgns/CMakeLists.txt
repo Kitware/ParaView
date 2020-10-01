@@ -65,11 +65,15 @@ option(CGNS_ENABLE_MEM_DEBUG "Enable or disable memory debugging" "OFF")
 else ()
 if (CMAKE_SIZEOF_VOID_P EQUAL 8)
   set(CGNS_ENABLE_64BIT ON)
-  set(CGNS_ENABLE_LFS OFF) # only needed on 32bit systems
 else ()
   set(CGNS_ENABLE_64BIT OFF)
-  set(CGNS_ENABLE_LFS ON)
 endif ()
+if ("${SIZE_OF_OFF_T}" LESS 8)
+  set(CGNS_ENABLE_LFS ON) # needed on 32bit systems
+else ()
+  set(CGNS_ENABLE_LFS OFF)
+endif ()
+
 set(CGNS_ENABLE_LEGACY OFF)
 set(CGNS_ENABLE_SCOPING ON)
 set(CGNS_ENABLE_BASE_SCOPE OFF)

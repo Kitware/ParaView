@@ -79,7 +79,7 @@ inline void WriteLengthDelimited(uint32 num, StringPiece val,
 //
 // Where the '-' represent the bytes which are vertically lined up with the
 // bytes of the stream. The proto parser requires its input to be presented
-// similarily with the extra
+// similarly with the extra
 // property that each chunk has kSlopBytes past its end that overlaps with the
 // first kSlopBytes of the next chunk, or if there is no next chunk at least its
 // still valid to read those bytes. Again, pictorially, we now have
@@ -239,6 +239,7 @@ class PROTOBUF_EXPORT EpsCopyInputStream {
   const char* InitFrom(io::ZeroCopyInputStream* zcis);
 
   const char* InitFrom(io::ZeroCopyInputStream* zcis, int limit) {
+    if (limit == -1) return InitFrom(zcis);
     overall_limit_ = limit;
     auto res = InitFrom(zcis);
     limit_ = limit - static_cast<int>(buffer_end_ - res);
@@ -579,8 +580,14 @@ inline uint32 ReadSize(const char** pp) {
 // function composition. We rely on the compiler to inline this.
 // Also in debug compiles having local scoped variables tend to generated
 // stack frames that scale as O(num fields).
-inline uint64 ReadVarint(const char** p) {
+inline uint64 ReadVarint64(const char** p) {
   uint64 tmp;
+  *p = VarintParse(*p, &tmp);
+  return tmp;
+}
+
+inline uint32 ReadVarint32(const char** p) {
+  uint32 tmp;
   *p = VarintParse(*p, &tmp);
   return tmp;
 }
@@ -735,13 +742,35 @@ PROTOBUF_EXPORT PROTOBUF_MUST_USE_RESULT const char* PackedSInt64Parser(
     void* object, const char* ptr, ParseContext* ctx);
 PROTOBUF_EXPORT PROTOBUF_MUST_USE_RESULT const char* PackedEnumParser(
     void* object, const char* ptr, ParseContext* ctx);
-PROTOBUF_EXPORT PROTOBUF_MUST_USE_RESULT const char* PackedEnumParser(
+
+template <typename T>
+PROTOBUF_MUST_USE_RESULT const char* PackedEnumParser(
     void* object, const char* ptr, ParseContext* ctx, bool (*is_valid)(int),
-    InternalMetadataWithArenaLite* metadata, int field_num);
-PROTOBUF_EXPORT PROTOBUF_MUST_USE_RESULT const char* PackedEnumParserArg(
+    InternalMetadata* metadata, int field_num) {
+  return ctx->ReadPackedVarint(
+      ptr, [object, is_valid, metadata, field_num](uint64 val) {
+        if (is_valid(val)) {
+          static_cast<RepeatedField<int>*>(object)->Add(val);
+        } else {
+          WriteVarint(field_num, val, metadata->mutable_unknown_fields<T>());
+        }
+      });
+}
+
+template <typename T>
+PROTOBUF_MUST_USE_RESULT const char* PackedEnumParserArg(
     void* object, const char* ptr, ParseContext* ctx,
     bool (*is_valid)(const void*, int), const void* data,
-    InternalMetadataWithArenaLite* metadata, int field_num);
+    InternalMetadata* metadata, int field_num) {
+  return ctx->ReadPackedVarint(
+      ptr, [object, is_valid, data, metadata, field_num](uint64 val) {
+        if (is_valid(data, val)) {
+          static_cast<RepeatedField<int>*>(object)->Add(val);
+        } else {
+          WriteVarint(field_num, val, metadata->mutable_unknown_fields<T>());
+        }
+      });
+}
 
 PROTOBUF_EXPORT PROTOBUF_MUST_USE_RESULT const char* PackedBoolParser(
     void* object, const char* ptr, ParseContext* ctx);
@@ -766,9 +795,6 @@ PROTOBUF_EXPORT PROTOBUF_MUST_USE_RESULT const char* UnknownGroupLiteParse(
 // UnknownFieldSet* to make the generated code isomorphic between full and lite.
 PROTOBUF_EXPORT PROTOBUF_MUST_USE_RESULT const char* UnknownFieldParse(
     uint32 tag, std::string* unknown, const char* ptr, ParseContext* ctx);
-PROTOBUF_EXPORT PROTOBUF_MUST_USE_RESULT const char* UnknownFieldParse(
-    uint32 tag, InternalMetadataWithArenaLite* metadata, const char* ptr,
-    ParseContext* ctx);
 
 }  // namespace internal
 }  // namespace protobuf
