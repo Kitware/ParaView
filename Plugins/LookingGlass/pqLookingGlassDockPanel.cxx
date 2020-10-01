@@ -238,6 +238,8 @@ void pqLookingGlassDockPanel::onRender()
 
     this->Widget = new QVTKOpenGLWindow(ctx);
     this->Widget->setFormat(QVTKOpenGLWindow::defaultFormat());
+    // Needed in case the window picks up a non-unit device pixel ratio on the host.
+    this->Widget->setCustomDevicePixelRatio(1);
 
     // we have to setup a close on main window close otherwise
     // qt will still think there is a toplevel window open and
