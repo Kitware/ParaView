@@ -88,10 +88,27 @@ protected:
     vtkInformation* infoTCoords = this->GetInputArrayInformation(1);
     vtkInformation* infoTangents = this->GetInputArrayInformation(2);
 
-    const char* normalsName = infoNormals ? infoNormals->Get(vtkDataObject::FIELD_NAME()) : nullptr;
-    const char* tcoordsName = infoNormals ? infoTCoords->Get(vtkDataObject::FIELD_NAME()) : nullptr;
-    const char* tangentsName =
-      infoNormals ? infoTangents->Get(vtkDataObject::FIELD_NAME()) : nullptr;
+    std::string normalsName;
+    std::string tcoordsName;
+    std::string tangentsName;
+
+    const char* normalField = infoNormals ? infoNormals->Get(vtkDataObject::FIELD_NAME()) : nullptr;
+    const char* tcoordField = infoTCoords ? infoTCoords->Get(vtkDataObject::FIELD_NAME()) : nullptr;
+    const char* tangentField =
+      infoTangents ? infoTangents->Get(vtkDataObject::FIELD_NAME()) : nullptr;
+
+    if (normalField)
+    {
+      normalsName = normalField;
+    }
+    if (tcoordField)
+    {
+      tcoordsName = tcoordField;
+    }
+    if (tangentField)
+    {
+      tangentsName = tangentField;
+    }
 
     if (inputMB)
     {
@@ -119,13 +136,23 @@ protected:
     return 1;
   }
 
-  void SetArrays(vtkDataSet* dataSet, const char* normal, const char* tcoord, const char* tangent)
+  void SetArrays(vtkDataSet* dataSet, const std::string& normal, const std::string& tcoord,
+    const std::string& tangent)
   {
     if (dataSet)
     {
-      dataSet->GetPointData()->SetActiveNormals(normal);
-      dataSet->GetPointData()->SetActiveTCoords(tcoord);
-      dataSet->GetPointData()->SetActiveTangents(tangent);
+      if (!normal.empty())
+      {
+        dataSet->GetPointData()->SetActiveNormals(normal.c_str());
+      }
+      if (!tcoord.empty())
+      {
+        dataSet->GetPointData()->SetActiveTCoords(tcoord.c_str());
+      }
+      if (!tangent.empty())
+      {
+        dataSet->GetPointData()->SetActiveTangents(tangent.c_str());
+      }
     }
   }
 
