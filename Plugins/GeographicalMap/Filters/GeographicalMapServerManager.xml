@@ -1,0 +1,145 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkGeoMapFetcher"
+                 label="Geographical Map Fetcher"
+                 name="GeoMapFetcher">
+      <Documentation long_help="Download an image map from a geolocation provider."
+                     short_help="Download an image">
+                     This source fetches an image from a geolocation provider based on the
+                     coordinates and the zoom level.
+                     An account is required to get an API key from the selected provider.
+      </Documentation>
+      <DoubleVectorProperty command="SetCenter"
+                            name="Center"
+                            number_of_elements="2"
+                            default_values="0 0"
+                            label="Lat/Lon">
+        <Documentation>Latitude and longitude of the center in degrees.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetDimension"
+                         name="Dimension"
+                         number_of_elements="2"
+                         default_values="500 500">
+        <Documentation>
+          Dimension of the image.
+          MapQuest: min 170x30, max 1920x1920.
+          GoogleMap: min 2x2, max 640x640 (2048x2048 for premium plan key).
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetZoomLevel"
+                         name="ZoomLevel"
+                         default_values="4"
+                         number_of_elements="1">
+        <IntRangeDomain min="0" max="18" name="range"/>
+        <Documentation>
+          Defines the zoom level of the map, which determines the magnification level of the map.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="Provider"
+        command="SetProvider"
+        number_of_elements="1"
+        default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="GoogleMap"/>
+          <Entry value="1" text="MapQuest"/>
+        </EnumerationDomain>
+        <Documentation>
+          Which provider to use. (An account is required)
+          GoogleMap: https://developers.google.com/maps/documentation/maps-static/get-api-key
+          MapQuest: https://developer.mapquest.com/plan_purchase/steps/business_edition/business_edition_free/register
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="MapType"
+        command="SetType"
+        number_of_elements="1"
+        default_values="2">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Road"/>
+          <Entry value="1" text="Hybrid"/>
+          <Entry value="2" text="Satellite"/>
+          <Entry value="3" text="Alternative"/>
+        </EnumerationDomain>
+        <Documentation>
+          Defines the map format to construct.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="Upscale"
+        command="SetUpscale"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If this property is enabled, the dimension are upscaled.
+          Note that the download of the map can be longer.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty name="APIKey"
+                            command="SetAPIKey"
+                            number_of_elements="1"
+                            label="API Key">
+        <Documentation>
+          API key used for the selected provider.
+          This key can be generated from the provider website when an account has been created.
+        </Documentation>
+      </StringVectorProperty>
+    </SourceProxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="filters">
+    <SourceProxy name="GeoMapConvert"
+                 class="vtkGeoMapConvertFilter"
+                 label="Geographical Map Conversion">
+      <Documentation
+        long_help="Convert an image in Lon/Lat projection to an other projection."
+        short_help="Convert an image to an other projection.">
+        Convert a 2D image data in Lon/Lat projection to structured grid in
+        an other projection supported by PROJ library.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input to the GeoConversion filter.
+        </Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetProjection"
+                         default_values="2"
+                         name="Projection"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Custom"/>
+          <Entry value="1" text="Ortographic"/>
+          <Entry value="2" text="Lambert93"/>
+        </EnumerationDomain>
+        <Documentation>
+          Set the preconfigured destination projection.
+          If Custom is selected, a valid PROJ4 string must be provided.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty name="PROJ4String"
+                            command="SetPROJ4String"
+                            number_of_elements="1"
+                            label="PROJ4">
+        <Documentation>
+          PROJ4 String used to configure the destination projection.
+          See documentation here: https://proj.org/usage/projections.html
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Projection"
+                                   value="0"/>
+        </Hints>
+      </StringVectorProperty>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

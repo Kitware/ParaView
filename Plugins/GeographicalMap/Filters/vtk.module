@@ -1,0 +1,11 @@
+NAME
+  GeographicalMap::vtkGeographicalMap
+LIBRARY_NAME
+  vtkGeographicalMap
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonExecutionModel
+  VTK::GeovisCore
+PRIVATE_DEPENDS
+  ParaView::VTKExtensionsCore
+  VTK::vtksys
