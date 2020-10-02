@@ -5,3 +5,4 @@ testing/scratch
 html/
 build/
 *.egg-info/
+dist/

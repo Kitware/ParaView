@@ -1,0 +1,7 @@
+.DS_Store
+data/GF-HP.cdb/
+data/test.cdb
+databases_toIgnore.json
+getBuild.sh
+copyCSS.sh
+test/
