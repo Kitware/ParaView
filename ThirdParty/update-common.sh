@@ -52,6 +52,14 @@ git_archive () {
         tar -C "$extractdir" -x
 }
 
+git_archive_all () {
+    local tmptarball="temp.tar"
+    git archive-all --prefix="" "$tmptarball"
+    mkdir -p "$extractdir/$name-reduced"
+    tar -C "$extractdir/$name-reduced" -xf "$tmptarball" $paths
+    rm -f "$tmptarball"
+}
+
 disable_custom_gitattributes() {
     pushd "${extractdir}/${name}-reduced"
     # Git does not allow custom attributes in a subdirectory where we
@@ -114,7 +122,7 @@ readonly extractdir="$workdir/extract"
 trap "rm -rf '$workdir'" EXIT
 
 # Get upstream
-git clone "$repo" "$upstreamdir"
+git clone --recursive "$repo" "$upstreamdir"
 
 if [ -n "$basehash" ]; then
     # Remove old worktrees
@@ -123,7 +131,7 @@ if [ -n "$basehash" ]; then
     git worktree add "$extractdir" "$basehash"
     # Clear out the working tree
     pushd "$extractdir"
-    git ls-files | xargs rm -v
+    git ls-files --recurse-submodules | xargs rm -v
     find . -type d -empty -delete
     popd
 else
@@ -135,6 +143,8 @@ fi
 # Extract the subset of upstream we care about
 pushd "$upstreamdir"
 git checkout "$tag"
+git submodule sync --recursive
+git submodule update --recursive --init
 readonly upstream_hash="$( git rev-parse HEAD )"
 readonly upstream_hash_short="$( git rev-parse --short=8 "$upstream_hash" )"
 readonly upstream_datetime="$( git rev-list "$upstream_hash" --format='%ci' -n 1 | grep -e "^$regex_date" )"
