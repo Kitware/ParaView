@@ -1,6 +1,7 @@
 import csv
 import ipywidgets
 import os
+import cinemasci
 from IPython.display import display
 
 class CinemaViewer():
@@ -31,13 +32,16 @@ class CinemaViewer():
         self.parameterKey2filepathMap = dict() # the key-value map that maps parameter combinations to filepaths
 
     def setLayoutToVertical(self):
-        self.layout = CinemaViewer.LayoutVertical 
-
+        self.layout = CinemaViewer.LayoutVertical
+        self.updateImages('',True)
+        
     def setLayoutToHorizontal(self):
-        self.layout = CinemaViewer.LayoutHorizontal 
-
-    def setHeight(self, height):
-        self.height = height
+        self.layout = CinemaViewer.LayoutHorizontal
+        self.updateImages('',True)
+        
+#    def setHeight(self, height):
+#        self.height = height
+#        self.updateImages('')
 
     def displayControls(self):
         with self.parameterValuesOutput:
@@ -101,7 +105,6 @@ class CinemaViewer():
                 else:
                     print(str(valuesDict[w.description]) + " is not an value of " + w.description)
                 
-    
     def hideParameterControl(self, name):
         for w in self.parameterValueWidgets:
             if (name == w.description):
@@ -164,107 +167,44 @@ class CinemaViewer():
         return cdatabases
 
     def readDataBaseHeader(self, path):
-        index2ParameterNameMap = []
-        with open(path+"/data.csv") as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=",")
-            # parse header
-            for row in csv_reader:
-                i = 0
-                index2ParameterNameMap = [j for j in range(len(row))]
-                for value in row:
-                    if value=="FILE":
-                        fileColumnIndex = i
-                    index2ParameterNameMap[i] = value
-                    i+=1
-                break
-                
-        return index2ParameterNameMap
+        cdb = cinemasci.new("cdb", {"path": path})
+        cdb.read_data_from_file()
+        return cdb.parameternames
 
     # =====================================================================================
     # determines for each column if it contains numeric values
     def determineNumericColumns(self, path):
-        index2isNumeric = []
-        with open(path+"/data.csv") as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=",")
-            
-            # skip header
-            for row in csv_reader:
-                break
-                
-            # determine type
-            for row in csv_reader:
-                for value in row:
-                    try:
-                        valueAsNumber = float(value)
-                        index2isNumeric.append(True)
-                    except ValueError:
-                        index2isNumeric.append(False)
-                break
-                
-        return index2isNumeric
+        cdb = cinemasci.new("cdb", {"path": path})
+        cdb.read_data_from_file()
+        return cdb.checkNumericColumns()
 
     # =====================================================================================
     # determines the set of possible parameter values for each column
     def readParameterValues(self, path, selectedParameters):
+        cdb = cinemasci.new("cdb", {"path": path})
+        cdb.read_data_from_file()
         index2isNumeric = self.determineNumericColumns(path)
         parameterValues = dict()
         
         for i in selectedParameters:
-            parameterValues[i] = set()
-        
-        with open(path+"/data.csv") as csv_file:
-            
-            csv_reader = csv.reader(csv_file, delimiter=",")
-            
-            # skip header
-            for row in csv_reader:
-                break;
-            
-            # read content
-            for row in csv_reader:
-                for i in selectedParameters:
-                    value = row[i]
-                    if index2isNumeric[i]:
-                        value = float(value)
-                    parameterValues[i].add(value)
-                
+            if index2isNumeric[i]:
+                parameterValues[i] = cdb.getParameterValues(selectedParameters[i])
         return parameterValues
-
+    
     # =====================================================================================
     # builds the a map that maps a combination of parameter values to a set of filepaths
     def buildParameterKey2FilepathMap(self, path, selectedParameters, selectedFilepaths):
         self.parameterKey2filepathMap.clear()
+        cdb = cinemasci.new("cdb", {"path": path})
+        cdb.read_data_from_file()
+        mapping = cdb.getFilepathMap(selectedParameters, selectedFilepaths)
         
-        index2isNumeric = self.determineNumericColumns(path)
-        
-        with open(path+"/data.csv") as csv_file:
-            
-            csv_reader = csv.reader(csv_file, delimiter=",")
-            
-            # skip header
-            for row in csv_reader:
-                break;
-            
-            # read content
-            for row in csv_reader:
-                filepaths = []
-                parameterKey = ""
-                for i in selectedParameters:
-                    value = row[i]
-                    if index2isNumeric[i]:
-                        value = str(float(value))
-                    
-                    parameterKey += value+"_"
-                    
-                for i in selectedFilepaths:
-                    filepaths.append(row[i])
-                
-                if self.parameterKey2filepathMap.get(parameterKey)==None:
-                    self.parameterKey2filepathMap[parameterKey] = []
-                
-                self.parameterKey2filepathMap[parameterKey] += filepaths
-        
-        return 
+        for element in mapping:
+            parameterKey = element[0]
+            if self.parameterKey2filepathMap.get(parameterKey)==None:
+                self.parameterKey2filepathMap[parameterKey] = []              
+            self.parameterKey2filepathMap[parameterKey] += element[1]
+        return
 
     # =====================================================================================
     # builds a parameter key based on widget values
@@ -422,21 +362,21 @@ class CinemaViewer():
                     display(w)
 
         else:
-             for i in range(0,len(files)):
-                 self.imageWidgets[i].layout.max_height = str(imgsize)+"px"
-                 self.imageWidgets[i].layout.max_width = str(imgsize)+"px"
+            for i in range(0,len(files)):
+                self.imageWidgets[i].layout.max_height = str(imgsize)+"px"
+                self.imageWidgets[i].layout.max_width = str(imgsize)+"px"
 
-             if (changeLayout):
-                 if self.layout == CinemaViewer.LayoutVertical:
-                     with self.imagesOutput:
-                         self.imagesOutput.clear_output()
-                         temp = ipywidgets.VBox(self.imageWidgets)
-                         display(temp)
-                 else:
-                     with self.imagesOutput:
-                         self.imagesOutput.clear_output()
-                         temp = ipywidgets.HBox(self.imageWidgets)
-                         display(temp)
+            if (changeLayout):
+                if self.layout == CinemaViewer.LayoutVertical:
+                    with self.imagesOutput:
+                        self.imagesOutput.clear_output()
+                        temp = ipywidgets.VBox(self.imageWidgets)
+                        display(temp)
+                else:
+                    with self.imagesOutput:
+                        self.imagesOutput.clear_output()
+                        temp = ipywidgets.HBox(self.imageWidgets)
+                        display(temp)
 
         for i in range(0,len(files)):
             self.imageWidgets[i].value = files[i]

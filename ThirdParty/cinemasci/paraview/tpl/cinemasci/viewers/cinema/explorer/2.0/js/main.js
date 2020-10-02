@@ -39,7 +39,7 @@ var currentDb;
     //whether or not the currentDb has extra axis ordering data
 var hasAxisOrdering = false; 
     //this can be overriden with HTTP params
-var databaseList = 'cinema/explorer/1.11/databases.json'; 
+var databaseList = 'cinema/explorer/2.0/databases.json'; 
 var databaseListType = 'json';
 
 var loaded = false;
@@ -122,7 +122,7 @@ if (databaseListType == "json") {
     jsonRequest.send(null);
 } else {
     // if there is a single DB set, pass that on
-    cinemaDatabases = db_create_explorer_database_list( databaseList )
+    cinemaDatabases = create_database_list( databaseList )
     // JSON.parse(`[ { "name" : "test", "directory" : "${databaseList}" } ]`)
     load_databases()
 }
