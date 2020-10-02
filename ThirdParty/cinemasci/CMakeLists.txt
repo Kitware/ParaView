@@ -1,38 +1,44 @@
 set(files
-  paraview/tpl/cinemasci/cis/colormap.py
+  paraview/tpl/cinemasci/cdb/__init__.py
   paraview/tpl/cinemasci/cis/channel.py
-  paraview/tpl/cinemasci/cis/write/file.py
-  paraview/tpl/cinemasci/cis/write/hdf5.py
-  paraview/tpl/cinemasci/cis/write/__init__.py
+  paraview/tpl/cinemasci/cis/colormap.py
   paraview/tpl/cinemasci/cis/image.py
-  paraview/tpl/cinemasci/cis/render.py
+  paraview/tpl/cinemasci/cis/__init__.py
+  paraview/tpl/cinemasci/cis/layer.py
   paraview/tpl/cinemasci/cis/read/file.py
   paraview/tpl/cinemasci/cis/read/hdf5.py
   paraview/tpl/cinemasci/cis/read/__init__.py
-  paraview/tpl/cinemasci/cis/__init__.py
-  paraview/tpl/cinemasci/cis/layer.py
-  paraview/tpl/cinemasci/cview/cinema_view.html
-  paraview/tpl/cinemasci/cview/cinema_explorer.html
-  paraview/tpl/cinemasci/cview/__main__.py
-  paraview/tpl/cinemasci/cview/__init__.py
-  paraview/tpl/cinemasci/cview/cinema/databases.js
-  paraview/tpl/cinemasci/cview/cinema/lib/d3.v4.min.js
-  paraview/tpl/cinemasci/cview/cinema/explorer/1.11/css/viewer.css
-  paraview/tpl/cinemasci/cview/cinema/explorer/1.11/databases.json
-  paraview/tpl/cinemasci/cview/cinema/explorer/1.11/js/main.js
-  paraview/tpl/cinemasci/cview/cinema/view/1.2/css/common.css
-  paraview/tpl/cinemasci/cview/cinema/view/1.2/css/select-css.css
-  paraview/tpl/cinemasci/cview/cinema/view/1.2/css/range-css.textClipping
-  paraview/tpl/cinemasci/cview/cinema/view/1.2/css/view.css
-  paraview/tpl/cinemasci/cview/cinema/view/1.2/css/range-css.css
-  paraview/tpl/cinemasci/cview/cinema/view/1.2/version.md
-  paraview/tpl/cinemasci/cdb/__init__.py
-  paraview/tpl/cinemasci/cview/cinema/view/1.2/copyright.md
-  paraview/tpl/cinemasci/cview/cinema/view/1.2/databases.json
-  paraview/tpl/cinemasci/cview/cinema/view/1.2/images/empty.png
-  paraview/tpl/cinemasci/cview/cinema/view/1.2/license.md
+  paraview/tpl/cinemasci/cis/render.py
+  paraview/tpl/cinemasci/cis/write/file.py
+  paraview/tpl/cinemasci/cis/write/hdf5.py
+  paraview/tpl/cinemasci/cis/write/__init__.py
   paraview/tpl/cinemasci/__init__.py
-  paraview/tpl/cinemasci/pynb/__init__.py)
+  paraview/tpl/cinemasci/pynb/__init__.py
+  paraview/tpl/cinemasci/server/__init__.py
+  paraview/tpl/cinemasci/server/__main__.py
+  paraview/tpl/cinemasci/viewers/cinema/explorer/2.0/css/viewer.css
+  paraview/tpl/cinemasci/viewers/cinema/explorer/2.0/databases.json
+  paraview/tpl/cinemasci/viewers/cinema/explorer/2.0/js/main.js
+  paraview/tpl/cinemasci/viewers/cinema_explorer.html
+  paraview/tpl/cinemasci/viewers/cinema/lib/d3.v4.min.js
+  paraview/tpl/cinemasci/viewers/cinema/lib/databases.js
+  paraview/tpl/cinemasci/viewers/cinema/view/2.0/copyright.md
+  paraview/tpl/cinemasci/viewers/cinema/view/2.0/css/common.css
+  paraview/tpl/cinemasci/viewers/cinema/view/2.0/css/range-css.css
+  paraview/tpl/cinemasci/viewers/cinema/view/2.0/css/range-css.textClipping
+  paraview/tpl/cinemasci/viewers/cinema/view/2.0/css/select-css.css
+  paraview/tpl/cinemasci/viewers/cinema/view/2.0/css/view.css
+  paraview/tpl/cinemasci/viewers/cinema/view/2.0/databases.json
+  paraview/tpl/cinemasci/viewers/cinema/view/2.0/images/empty.png
+  paraview/tpl/cinemasci/viewers/cinema/view/2.0/license.md
+  paraview/tpl/cinemasci/viewers/cinema/view/2.0/version.md
+  paraview/tpl/cinemasci/viewers/cinema_view.html
+  paraview/tpl/cinemasci/viewers/citation.md
+  paraview/tpl/cinemasci/viewers/__init__.py
+  paraview/tpl/cinemasci/viewers/license.md
+  paraview/tpl/cinemasci/viewers/readme.md
+  paraview/tpl/cinemasci/viewers/test_explorer.html
+  paraview/tpl/cinemasci/viewers/test_view.html)
 
 vtk_module_add_python_package(ParaView::CinemaSci
   FILES               ${files}
