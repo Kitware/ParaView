@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "@_paraview_auto_start_CLASS_NAME@Implementation.h"
 
 //-----------------------------------------------------------------------------
-@_paraview_auto_start_CLASS_NAME@Implementation::@_paraview_auto_start_CLASS_NAME@Implementation(QObject* _parent)
-  : QObject(_parent)
+@_paraview_auto_start_CLASS_NAME@Implementation::@_paraview_auto_start_CLASS_NAME@Implementation(QObject* p)
+  : QObject(p)
 {
   this->UserImplementation = new @_paraview_auto_start_CLASS_NAME@();
   setObjectName("@_paraview_auto_start_CLASS_NAME@");
