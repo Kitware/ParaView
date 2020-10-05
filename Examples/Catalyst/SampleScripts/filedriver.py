@@ -125,3 +125,4 @@ for time in timesteps:
             inputdescription.SetWholeExtent(wholeextent)
 
         catalyst.CoProcess(datadescription)
+catalyst.Finalize()
