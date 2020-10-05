@@ -31,6 +31,37 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     "\\.UnstructuredVolumeRenderingVectorComponent$")
 endif ()
 
+if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
+  list(APPEND test_exclusions
+    # Known-bad https://gitlab.kitware.com/paraview/paraview/-/issues/17433
+    "^pv\\.ServerConnectDialog$"
+    # Supposed to become obsolete eventually. Known to be flaky.
+    "^pv\\.FindWidget$"
+
+    # See https://gitlab.kitware.com/paraview/paraview/-/issues/20282
+    "\\.AnimationSetTimeCursor$"
+    "\\.ColorByCellDataStringArray$"
+    "\\.IndexedLookupInitialization$"
+    "\\.LoadStateMultiView$"
+    "\\.PreviewFontScaling$"
+    "\\.SaveColorMap$"
+    "\\.SelectPointsTrace$"
+    "\\.UndoRedo1$"
+    "\\.UnstructuredVolumeRenderingVectorComponent$"
+    "^pv\\.AnalyzeReaderWriterPlugin$"
+    "^pv\\.CompositeSurfaceSelection$"
+    "^pv\\.ExportFilteredColumnsSpreadsheet$"
+    "^pv\\.ExportSpreadsheetFormatting$"
+    "^pv\\.SaveStateAndScreenshot$"
+    "^pvcrs\\.FindDataDialog$"
+    "^pvcs\\.ColorOpacityTableEditorHistogram$"
+    "^pvcs\\.SplitViewTrace$"
+    "^pvcs-tile-display\\.LinkCameraFromView-1x1$"
+
+    # Not all machines have a new enough GPU to test IndeX (yet).
+    "^pv\\.IndeXRepresentation$")
+endif ()
+
 if ("$ENV{CC}" STREQUAL "icc")
   list(APPEND test_exclusions
     # Known-bad https://gitlab.kitware.com/paraview/paraview/-/issues/20108

@@ -20,6 +20,7 @@
             - build/bin/
             - build/lib/
             - build/VTK/Utilities/KWIML/vtkkwiml/test/kwiml_test
+            - build/VTK/Utilities/KWIML/vtkkwiml/test/kwiml_test.exe
 
             # Python packages go here
             - build/lib64/

@@ -6,6 +6,7 @@ include:
     # OS builds.
     - local: .gitlab/os-linux.yml
     - local: .gitlab/os-macos.yml
+    - local: .gitlab/os-windows.yml
 
 stages:
     - build
@@ -102,6 +103,28 @@ test:macos-python-qt:
         - build:macos-python-qt
     needs:
         - build:macos-python-qt
+
+# Windows
+
+build:windows-vs2019-mpi-qt:
+    extends:
+        - .windows_vs2019_mpi_qt
+        - .cmake_build_windows
+        - .windows_builder_tags
+        - .cmake_build_artifacts
+        - .run_manually
+
+test:windows-vs2019-mpi-qt:
+    extends:
+        - .windows_vs2019_mpi_qt
+        - .cmake_test_windows
+        - .windows_builder_tags
+        - .cmake_build_artifacts
+        - .run_automatically
+    dependencies:
+        - build:windows-vs2019-mpi-qt
+    needs:
+        - build:windows-vs2019-mpi-qt
 
 # Deployment
 
