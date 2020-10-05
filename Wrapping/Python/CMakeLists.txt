@@ -49,6 +49,7 @@ set(python_files
   paraview/spatiotemporalparallelism.py
   paraview/tests/__init__.py
   paraview/tests/validate_extracts.py
+  paraview/tests/verify_eyedomelighting.py
   paraview/tpl/__init__.py
   paraview/util/__init__.py
   paraview/util/vtkAlgorithm.py

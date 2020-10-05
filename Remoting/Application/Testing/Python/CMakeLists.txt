@@ -224,3 +224,13 @@ if (PYTHON_EXECUTABLE AND NOT PARAVIEW_BUILD_SHARED_LIBS)
       "PYTHONPATH=${CMAKE_BINARY_DIR}/${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}"
     )
 endif()
+
+# add test to verify eyedome lighting
+ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}"
+  NAME "ParaView::RemotingApplicationPython::VerifyEyeDomeLighting"
+  COMMAND $<TARGET_FILE:pvbatch>
+          -dr
+          -m paraview.tests.verify_eyedomelighting
+          -o "${CMAKE_BINARY_DIR}/Testing/Temporary/VerifyEyeDomeLighting.png"
+          -v DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/VerifyEyeDomeLighting.png})
+set_tests_properties("ParaView::RemotingApplicationPython::VerifyEyeDomeLighting" PROPERTIES LABELS "PARAVIEW")
