@@ -58,6 +58,10 @@ test:macos-python-qt:
         - .macos_builder_tags
         - .cmake_test_artifacts
         - .run_automatically
+    dependencies:
+        - build:macos-python-qt
+    needs:
+        - build:macos-python-qt
 
 # Deployment
 
