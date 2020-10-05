@@ -28,7 +28,7 @@
 ## Linux-specific scripts
 
 .spack_build_linux:
-    stage: package
+    stage: build
 
     variables:
         # This is needed as `configure` on certain packages fails when run as

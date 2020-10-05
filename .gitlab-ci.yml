@@ -34,7 +34,7 @@ stages:
 
 ## Spack
 
-package:spack-centos7:
+build:spack-centos7:
     extends:
         - .centos7
         - .spack_build_linux
