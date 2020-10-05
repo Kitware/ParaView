@@ -10,7 +10,6 @@ include:
 stages:
     - build
     - test
-    - package
 
 ################################################################################
 # Job declarations
@@ -78,10 +77,10 @@ build:documentation:
 
 ## Superbuild
 
-superbuild:
+build:superbuild:
     extends:
         - .run_superbuild_trigger
-    stage: package
+    stage: build
     variables:
         PARAVIEW_BRANCH: $CI_COMMIT_REF_NAME
         RSYNC_UPLOAD_ENABLE: "true"
