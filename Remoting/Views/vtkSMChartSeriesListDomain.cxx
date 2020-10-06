@@ -83,19 +83,24 @@ void vtkSMChartSeriesListDomain::PopulateArrayComponents(
 {
   if (arrayInfo && (this->HidePartialArrays == false || arrayInfo->GetIsPartial() == 0))
   {
-    if (arrayInfo->GetNumberOfComponents() > 1)
+    int dataType = arrayInfo->GetDataType();
+
+    if (dataType != VTK_STRING && dataType != VTK_UNICODE_STRING && dataType != VTK_VARIANT)
     {
-      for (int kk = 0; kk <= arrayInfo->GetNumberOfComponents(); kk++)
+      if (arrayInfo->GetNumberOfComponents() > 1)
       {
-        strings.push_back(vtkSMArrayListDomain::CreateMangledName(arrayInfo, kk));
+        for (int kk = 0; kk <= arrayInfo->GetNumberOfComponents(); kk++)
+        {
+          strings.push_back(vtkSMArrayListDomain::CreateMangledName(arrayInfo, kk));
+        }
       }
-    }
-    else
-    {
-      const char* arrayName = arrayInfo->GetName();
-      if (arrayName)
+      else
       {
-        strings.push_back(arrayName);
+        const char* arrayName = arrayInfo->GetName();
+        if (arrayName)
+        {
+          strings.push_back(arrayName);
+        }
       }
     }
   }
