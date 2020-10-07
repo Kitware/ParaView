@@ -554,6 +554,12 @@
              <string> The size of the camera's lens in world coordinates. Affects ray traced depth of field rendering.
              </string>
            </property>
+           <property name="minimum">
+            <double>0.0</double>
+           </property>
+           <property name="maximum">
+            <double>99999</double>
+           </property>
           </widget>
          </item>
          <item row="4" column="2">
@@ -567,6 +573,12 @@
           <widget class="QDoubleSpinBox" name="focalDistance">
            <property name="toolTip">
              <string>Depth of field rendering focus distance. Only affects ray traced renderers. 0 (default) disables it.</string>
+           </property>
+           <property name="minimum">
+            <double>0.0</double>
+           </property>
+           <property name="maximum">
+            <double>99999</double>
            </property>
           </widget>
          </item>
