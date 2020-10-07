@@ -57,7 +57,14 @@ if (CMAKE_Fortran_COMPILER_WORKS)
       needtocreategrid
       coprocess)
 
-  set(catalyst_fortran_using_mangling "${FortranCInterface_GLOBAL_FOUND}")
+  if (FortranCInterface_GLOBAL_PREFIX OR
+      FortranCInterface_GLOBAL_SUFFIX OR
+      (NOT FortranCInterface_GLOBAL_CASE STREQUAL "LOWER"))
+    set(catalyst_fortran_using_mangling "${FortranCInterface_GLOBAL_FOUND}")
+  else()
+    # otherwise there's no mangling necessary for Fortran/C interchange and
+    # hence we leave catalyst_fortran_using_mangling unset.
+  endif()
 
   list(APPEND classes
     FortranAdaptorAPI)
