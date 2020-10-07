@@ -13,6 +13,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/particles/Level_0/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/3GQP.pdb}"
   "DATA{${paraview_test_data_directory_input}/Data/can-restarts/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/CellDataWithNan.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/cloud_layers_1k.jpg}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphInput.vtp}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphTree/,REGEX:.*}"
@@ -154,6 +155,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CategoricalAutomaticAnnotationsInterB.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CategoricalAutomaticAnnotationsInterC.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CategoricalAutomaticAnnotationsInterD.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CategoriesWithNaN.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartAxisRangeAndLabelsA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartAxisRangeAndLabelsB.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ChartAxisRangeAndLabelsC.png}"
@@ -786,6 +788,7 @@ list(APPEND TESTS_WITH_BASELINES
   CalcParens.xml
   Calculator.xml
   CalculatorInput.xml
+  CategoriesWithNaN.xml
   ChangeGlyphRepVisibility.xml
   ChangingTimestepsInStateFiles.xml
   ChartAxisRangeAndLabels.xml
