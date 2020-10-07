@@ -238,8 +238,10 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   vtkNew<vtkCompositeDataDisplayAttributes> compositeAttributes;
   vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)
     ->SetCompositeDataDisplayAttributes(compositeAttributes);
+
+  vtkNew<vtkCompositeDataDisplayAttributes> compositeAttributesLOD;
   vtkCompositePolyDataMapper2::SafeDownCast(this->LODMapper)
-    ->SetCompositeDataDisplayAttributes(compositeAttributes);
+    ->SetCompositeDataDisplayAttributes(compositeAttributesLOD);
 
   vtkNew<vtkSelection> sel;
   this->Mapper->SetSelection(sel);
@@ -452,8 +454,7 @@ int vtkGeometryRepresentation::ProcessViewRequest(
       this->UpdateBlockAttrLOD = true;
     }
 
-    // Make following (LOD) render request to update.
-    if (lod && this->UpdateBlockAttrLOD)
+    if (lod && dataLOD && this->UpdateBlockAttrLOD)
     {
       this->UpdateBlockAttributes(this->LODMapper);
       this->UpdateBlockAttrLOD = false;
