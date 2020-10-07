@@ -10,8 +10,6 @@ include:
 stages:
     - build
     - test
-    - package
-    - deploy
 
 ################################################################################
 # Job declarations
@@ -34,7 +32,7 @@ stages:
 
 ## Spack
 
-package:spack-centos7:
+build:spack-centos7:
     extends:
         - .centos7
         - .spack_build_linux
@@ -66,7 +64,8 @@ test:macos-python-qt:
 # Deployment
 
 ## Documentation
-deploy:documentation:
+
+build:documentation:
     extends:
         - .centos7
         - .doxygen_build_linux
@@ -78,10 +77,10 @@ deploy:documentation:
 
 ## Superbuild
 
-superbuild:
+build:superbuild:
     extends:
         - .run_superbuild_trigger
-    stage: package
+    stage: build
     variables:
         PARAVIEW_BRANCH: $CI_COMMIT_REF_NAME
         RSYNC_UPLOAD_ENABLE: "true"

@@ -28,7 +28,7 @@
 ## Linux-specific scripts
 
 .spack_build_linux:
-    stage: package
+    stage: build
 
     variables:
         # This is needed as `configure` on certain packages fails when run as
@@ -91,7 +91,7 @@
     - git submodule update --init --recursive
 
 .doxygen_build_linux:
-    stage: deploy
+    stage: build
     environment:
       name: documentation
       url: https://kitware.github.io/paraview-docs/latest/cxx/

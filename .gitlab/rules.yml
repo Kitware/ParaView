@@ -39,6 +39,8 @@
 
 .run_superbuild_trigger:
     rules:
+        - if: '$CI_MERGE_REQUEST_ID'
+          when: never
         - if: '$CI_BRANCH_NAME == "nightly-master"'
           when: never
         - if: '$CI_PROJECT_PATH == "paraview/paraview"'
