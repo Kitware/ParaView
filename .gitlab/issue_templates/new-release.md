@@ -202,6 +202,7 @@ If making a non-RC release:
 
   - [ ] Post an announcement in the Announcements category on
         [discourse.paraview.org](https://discourse.paraview.org/).
+  - [ ] Request DoD vulnerability scan
 <!--
 If making a non-RC release:
 
