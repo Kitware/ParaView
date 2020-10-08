@@ -160,7 +160,10 @@ void pqLookingGlassDockPanel::setView(pqView* view)
   pqProxyWidget* proxyWidget = this->widget()->findChild<pqProxyWidget*>();
   if (proxyWidget)
   {
-    QObject::disconnect(proxyWidget, SIGNAL(changeFinished()), this->View, SLOT(tryRender()));
+    if (this->View)
+    {
+      QObject::disconnect(proxyWidget, SIGNAL(changeFinished()), this->View, SLOT(tryRender()));
+    }
     proxyWidget->parentWidget()->layout()->removeWidget(proxyWidget);
     proxyWidget->deleteLater();
   }
