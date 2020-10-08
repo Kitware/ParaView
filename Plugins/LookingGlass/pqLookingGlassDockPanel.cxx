@@ -406,8 +406,23 @@ void pqLookingGlassDockPanel::onRender()
 
 void pqLookingGlassDockPanel::onRenderOnLookingGlassClicked()
 {
-  this->setView(pqActiveObjects::instance().activeView());
+  auto view = pqActiveObjects::instance().activeView();
+
+  // If we don't have LG settings for this view yet, reset the focal plane to the center of rotation
+  QString settingsName = this->getSettingsProxyName(view);
+
+  // See if we have a settings proxy yet
+  auto pxm = view->getProxy()->GetSession()->GetSessionProxyManager();
+  bool firstRender = pxm->GetProxy("looking_glass", qPrintable(settingsName)) == nullptr;
+
+  this->setView(view);
   this->RenderNextFrame = true;
+
+  if (firstRender)
+  {
+    this->resetToCenterOfRotation();
+  }
+
   if (this->View)
   {
     this->View->forceRender();
@@ -565,12 +580,11 @@ vtkSMProxy* pqLookingGlassDockPanel::getSettingsForView(pqRenderView* view)
     return nullptr;
   }
 
-  std::string settingsName = view->getSMName().toStdString();
-  settingsName += "-LookingGlassSettings";
+  QString settingsName = this->getSettingsProxyName(view);
 
   // See if we have a settings proxy yet
   auto pxm = view->getProxy()->GetSession()->GetSessionProxyManager();
-  auto settings = pxm->GetProxy("looking_glass", settingsName.c_str());
+  auto settings = pxm->GetProxy("looking_glass", qPrintable(settingsName));
   if (!settings)
   {
     // Create a Looking Glass settings proxy for this view
@@ -582,7 +596,7 @@ vtkSMProxy* pqLookingGlassDockPanel::getSettingsForView(pqRenderView* view)
     controller->PreInitializeProxy(settings);
     vtkSMPropertyHelper(settings, "View").Set(view->getProxy());
     controller->PostInitializeProxy(settings);
-    pxm->RegisterProxy("looking_glass", settingsName.c_str(), settings);
+    pxm->RegisterProxy("looking_glass", qPrintable(settingsName), settings);
 
     // Set up a connection to remove the settings when the associated view is deleted
     pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
@@ -590,6 +604,14 @@ vtkSMProxy* pqLookingGlassDockPanel::getSettingsForView(pqRenderView* view)
   }
 
   return settings;
+}
+
+QString pqLookingGlassDockPanel::getSettingsProxyName(pqView* view)
+{
+  QString settingsName = view->getSMName();
+  settingsName += "-LookingGlassSettings";
+
+  return settingsName;
 }
 
 void pqLookingGlassDockPanel::reset()
