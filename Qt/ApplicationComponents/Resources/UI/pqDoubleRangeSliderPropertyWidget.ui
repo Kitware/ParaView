@@ -21,7 +21,7 @@
     <number>4</number>
    </property>
    <item row="0" column="0">
-    <widget class="QLabel" name="label_3">
+    <widget class="QLabel" name="MinLabel">
      <property name="text">
       <string>Minimum</string>
      </property>
@@ -34,7 +34,7 @@
     <widget class="pqDoubleRangeWidget" name="ThresholdBetween_0" native="true"/>
    </item>
    <item row="1" column="0">
-    <widget class="QLabel" name="label_4">
+    <widget class="QLabel" name="MaxLabel">
      <property name="text">
       <string>Maximum</string>
      </property>
