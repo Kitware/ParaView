@@ -1,0 +1,10 @@
+NAME
+  GeographicalMap
+DESCRIPTION
+  Download (with cURL) and convert map at specific coordinates
+REQUIRES_MODULES
+  ParaView::VTKExtensionsCore
+  VTK::CommonCore
+  VTK::CommonExecutionModel
+  VTK::GeovisCore
+  VTK::vtksys
