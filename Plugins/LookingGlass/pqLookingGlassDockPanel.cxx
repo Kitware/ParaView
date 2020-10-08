@@ -312,8 +312,10 @@ void pqLookingGlassDockPanel::onRender()
     aren->SetActiveCamera(newCam);
   }
 
-  double nearClippingLimit = vtkSMPropertyHelper(settings, "NearClippingLimit").GetAsDouble();
-  double farClippingLimit = vtkSMPropertyHelper(settings, "FarClippingLimit").GetAsDouble();
+  std::vector<double> clippingLimits =
+    vtkSMPropertyHelper(settings, "ClippingLimits").GetArray<double>();
+  double nearClippingLimit = clippingLimits[0];
+  double farClippingLimit = clippingLimits[1];
 
   // save the current size and temporarily set the new size to the render
   // framebuffer size
@@ -460,7 +462,9 @@ void pqLookingGlassDockPanel::pushFocalPlaneBack()
 
   double focalPlaneMovementFactor =
     vtkSMPropertyHelper(settings, "FocalPlaneMovementFactor").GetAsDouble();
-  double farClippingLimit = vtkSMPropertyHelper(settings, "FarClippingLimit").GetAsDouble();
+  std::vector<double> clippingLimits =
+    vtkSMPropertyHelper(settings, "ClippingLimits").GetArray<double>();
+  double farClippingLimit = clippingLimits[1];
 
   distance += focalPlaneMovementFactor * distance * (farClippingLimit - 1.0);
 
@@ -502,7 +506,9 @@ void pqLookingGlassDockPanel::pullFocalPlaneForward()
 
   double focalPlaneMovementFactor =
     vtkSMPropertyHelper(settings, "FocalPlaneMovementFactor").GetAsDouble();
-  double nearClippingLimit = vtkSMPropertyHelper(settings, "NearClippingLimit").GetAsDouble();
+  std::vector<double> clippingLimits =
+    vtkSMPropertyHelper(settings, "ClippingLimits").GetArray<double>();
+  double nearClippingLimit = clippingLimits[0];
 
   distance -= focalPlaneMovementFactor * distance * (1.0 - nearClippingLimit);
 

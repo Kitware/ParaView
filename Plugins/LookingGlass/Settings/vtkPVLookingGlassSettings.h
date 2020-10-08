@@ -49,11 +49,8 @@ public:
   vtkSetMacro(RenderRate, int);
   vtkGetMacro(RenderRate, int);
 
-  vtkSetMacro(NearClippingLimit, double);
-  vtkGetMacro(NearClippingLimit, double);
-
-  vtkSetMacro(FarClippingLimit, double);
-  vtkGetMacro(FarClippingLimit, double);
+  vtkSetVector2Macro(ClippingLimits, double);
+  vtkGetVector2Macro(ClippingLimits, double);
 
 protected:
   vtkPVLookingGlassSettings();
@@ -63,8 +60,7 @@ protected:
   double FocalPlaneMovementFactor;
   int DeviceIndex = 0;
   int RenderRate = 0;
-  double NearClippingLimit;
-  double FarClippingLimit;
+  double ClippingLimits[2];
 
   vtkCamera* GetActiveCamera();
 
