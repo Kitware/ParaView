@@ -38,6 +38,7 @@ public:
   int ReadString(char* str, size_t len);
   int ReadString(unsigned char* str, size_t len);
   int ReadInt32s(int* val, int num);
+  int ReadInt32sNoSwap(int* val, int num);
   int ReadInt64s(vtkTypeInt64* val, int num);
   int ReadDoubles(double* val, int num);
   void Seek(vtkTypeInt64 offset, bool rel = false);

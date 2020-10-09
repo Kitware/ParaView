@@ -35,6 +35,25 @@ int vtkSpyPlotIStream::ReadInt32s(int* val, int num)
 }
 
 //-----------------------------------------------------------------------------
+int vtkSpyPlotIStream::ReadInt32sNoSwap(int* val, int num)
+{
+  size_t len = 4 * num;
+
+  //
+  // We are not going to check the length of the read, rely on the
+  // read itself for errors.
+  //
+  // We are going to return the array unswapped. This is for performance.
+  // Calling funcitons will have to deal with unswapped data.
+  //
+  if (!(this->IStream->read(reinterpret_cast<char*>(val), len)))
+  {
+    return 0;
+  }
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
 int vtkSpyPlotIStream::ReadInt64s(vtkTypeInt64* val, int num)
 {
   int cc;
