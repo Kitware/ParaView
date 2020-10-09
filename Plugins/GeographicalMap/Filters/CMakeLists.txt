@@ -9,7 +9,7 @@ vtk_module_add_module(GeographicalMap::vtkGeographicalMap
   CLASSES ${classes})
 
 vtk_module_link(GeographicalMap::vtkGeographicalMap
-  PRIVATE ${CURL_LIBRARY})
+  PRIVATE CURL::libcurl)
 
 paraview_add_server_manager_xmls(
   XMLS GeographicalMapServerManager.xml)
