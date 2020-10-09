@@ -1,0 +1,12 @@
+NAME
+  zSpace::vtkZSpaceView
+LIBRARY_NAME
+  vtkZSpaceView
+DEPENDS
+  ParaView::RemotingViews
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  ParaView::RemotingCore
+  VTK::RenderingOpenGL2
