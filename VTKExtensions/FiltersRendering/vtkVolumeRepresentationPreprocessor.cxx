@@ -15,10 +15,11 @@
 
 #include "vtkVolumeRepresentationPreprocessor.h"
 #include "vtkCompositeDataIterator.h"
-#include "vtkCompositeDataToUnstructuredGridFilter.h"
 #include "vtkDataSetTriangleFilter.h"
+#include "vtkExtractBlock.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMergeBlocks.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkUnstructuredGrid.h"
@@ -105,18 +106,25 @@ vtkSmartPointer<vtkUnstructuredGrid> vtkVolumeRepresentationPreprocessor::Tetrah
 vtkSmartPointer<vtkDataSet> vtkVolumeRepresentationPreprocessor::ExtractDataSet(
   vtkCompositeDataSet* input)
 {
-  // We use vtkCompositeDataToUnstructuredGridFilter instead of using vtkExtractBlock since
-  // this filter merges partitions (or pieces) which may be selected into a single
-  // vtkUnstructuredGrid as
-  // needed by the volume mapper. Once we fix the volume mapper to support composite datasets
-  // better we should revert back to using vtkExtractBlock filter.
+  vtkNew<vtkMergeBlocks> merger;
+  if (this->ExtractedBlockIndex != 0)
+  {
+    vtkNew<vtkExtractBlock> extractor;
+    extractor->AddIndex(this->ExtractedBlockIndex);
+    extractor->SetInputData(input);
+    merger->SetInputConnection(extractor->GetOutputPort());
+  }
+  else
+  {
+    merger->SetInputData(input);
+  }
+
+  // Once we fix the volume mapper to support composite datasets
+  // better we should remove using vtkMergeBlocks.
   // ref: paraview/paraview#19955.
-  vtkNew<vtkCompositeDataToUnstructuredGridFilter> extractor;
-  extractor->SetSubTreeCompositeIndex(this->ExtractedBlockIndex);
-  extractor->SetInputData(input);
-  extractor->Update();
-  extractor->MergePointsOff();
-  return extractor->GetOutput();
+  merger->MergePointsOff();
+  merger->Update();
+  return vtkDataSet::SafeDownCast(merger->GetOutputDataObject(0));
 }
 
 //----------------------------------------------------------------------------

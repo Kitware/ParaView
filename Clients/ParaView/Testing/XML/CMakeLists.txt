@@ -87,6 +87,13 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/iron_protein.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/linesPolydata.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/manyTypes.vtu}"
+  "DATA{${paraview_test_data_directory_input}/Data/mb_with_pieces.vtm}"
+  "DATA{${paraview_test_data_directory_input}/Data/mb_with_pieces/pvi_Material_Remap2_0005_0_0.vtu}"
+  "DATA{${paraview_test_data_directory_input}/Data/mb_with_pieces/pvi_Material_Remap2_0005_0_1.vtu}"
+  "DATA{${paraview_test_data_directory_input}/Data/mb_with_pieces/pvi_Material_Remap2_0005_1_0.vtu}"
+  "DATA{${paraview_test_data_directory_input}/Data/mb_with_pieces/pvi_Material_Remap2_0005_1_1.vtu}"
+  "DATA{${paraview_test_data_directory_input}/Data/mb_with_pieces/pvi_Material_Remap2_0005_2_0.vtu}"
+  "DATA{${paraview_test_data_directory_input}/Data/mb_with_pieces/pvi_Material_Remap2_0005_2_1.vtu}"
   "DATA{${paraview_test_data_directory_input}/Data/multicomb_0.vts}"
   "DATA{${paraview_test_data_directory_input}/Data/multicomb_1.vts}"
   "DATA{${paraview_test_data_directory_input}/Data/multicomb_2.vts}"
@@ -876,6 +883,7 @@ list(APPEND TESTS_WITH_BASELINES
   LoadSaveStateVolume.xml
   ManyTypesXMLWriterReader.xml
   MergePointBlocks.xml
+  MergePiecesOnly.xml
   MoleculeBonds.xml
   MoleculeToLines.xml
   MultiBlockAttributes1.xml

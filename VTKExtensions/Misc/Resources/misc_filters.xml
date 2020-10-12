@@ -58,7 +58,7 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkDataObjectTreeToPointSetFilter"
+    <SourceProxy class="vtkMergeBlocks"
                  label="Merge Blocks"
                  name="MergeBlocks">
       <Documentation short_help="Appends vtkCompositeDataSet leaves into a single vtkUnstructuredGrid or vtkPolyData">
@@ -91,20 +91,16 @@
         Defaults to "Unstructured Grid".
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetSubTreeCompositeIndex"
+
+      <IntVectorProperty command="SetMergePartitionsOnly"
+                         name="MergePartitionsOnly"
                          default_values="0"
-                         is_internal="1"
-                         name="SubTreeCompositeIndex"
                          number_of_elements="1">
-        <CompositeTreeDomain mode="all"
-                             name="tree">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </CompositeTreeDomain>
-        <Documentation>Select the index of the subtree to be appended. For now,
-        this property is internal.</Documentation>
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, only paritions and pieces will be merged into a dataset each,
+          instead of merging everything into a single dataset.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetMergePoints"
                          default_values="1"

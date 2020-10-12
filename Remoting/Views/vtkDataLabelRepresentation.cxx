@@ -18,12 +18,12 @@
 #include "vtkActor2D.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCellCenters.h"
-#include "vtkCompositeDataToUnstructuredGridFilter.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkLabeledDataMapper.h"
 #include "vtkMPIMoveData.h"
 #include "vtkMaskPoints.h"
+#include "vtkMergeBlocks.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderView.h"
@@ -40,7 +40,7 @@ vtkDataLabelRepresentation::vtkDataLabelRepresentation()
   this->CellLabelVisibility = 0;
   this->MaximumNumberOfLabels = 100;
 
-  this->MergeBlocks = vtkCompositeDataToUnstructuredGridFilter::New();
+  this->MergeBlocks = vtkMergeBlocks::New();
 
   this->PointMask = vtkSmartPointer<vtkMaskPoints>::New();
   this->PointMask->SetOnRatio(1);

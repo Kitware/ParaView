@@ -32,7 +32,6 @@
 #include "vtkCellIntegrator.h"
 #include "vtkCleanArrays.h"
 #include "vtkCleanUnstructuredGrid.h"
-#include "vtkCompositeDataToUnstructuredGridFilter.h"
 #include "vtkDataSetToRectilinearGrid.h"
 //#include "vtkEnzoReader.h"
 #include "vtkEquivalenceSet.h"
@@ -208,7 +207,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int, char* [])
   PRINT_SELF(vtkCellIntegrator);
   PRINT_SELF(vtkCleanArrays);
   PRINT_SELF(vtkCleanUnstructuredGrid);
-  PRINT_SELF(vtkCompositeDataToUnstructuredGridFilter);
   PRINT_SELF(vtkCSVExporter);
   PRINT_SELF(vtkCSVWriter);
   PRINT_SELF(vtkDataSetToRectilinearGrid);

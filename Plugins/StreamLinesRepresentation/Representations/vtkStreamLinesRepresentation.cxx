@@ -18,12 +18,12 @@
 #include "vtkCellData.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkCommand.h"
-#include "vtkCompositeDataToUnstructuredGridFilter.h"
 #include "vtkExtentTranslator.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
+#include "vtkMergeBlocks.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -116,7 +116,7 @@ vtkStreamLinesRepresentation::vtkStreamLinesRepresentation()
   this->Actor->SetProperty(this->Property);
   this->Actor->SetEnableLOD(0);
 
-  this->MBMerger = vtkCompositeDataToUnstructuredGridFilter::New();
+  this->MBMerger = vtkMergeBlocks::New();
 
   vtkMath::UninitializeBounds(this->DataBounds);
   this->DataSize = 0;
