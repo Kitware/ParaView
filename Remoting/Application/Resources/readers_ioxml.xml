@@ -1149,6 +1149,19 @@
         <Documentation>This property sets which field data to use as time arrays to
         read. If set to Default, time steps are incremented integer values starting at zero.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetFixedLevel"
+                         name="MaximumNumberOfLevels"
+                         number_of_elements="1"
+                         default_values="128"
+                         panel_visibility="default">
+        <IntRangeDomain name="range" min="1" max="128" />
+        <Documentation>This property sets the maximum level to load. Setting it to
+          1 shows the coarse grid of trees, and setting it at or past maximum level
+          of the data will load the data at finest resolution. When set to
+          a value between (excluded) 1 and the maximum level of the trees, data will
+          be loaded at the required lower resolution, considerably faster.
+        </Documentation>
+      </IntVectorProperty>
     </Proxy>
     <!-- End XMLHyperTreeReaderCore -->
 
@@ -2414,6 +2427,9 @@
           proxygroup="internal_sources"
           proxyname="XMLHyperTreeGridReaderCore"
         />
+        <ExposedProperties>
+          <Property name="MaximumNumberOfLevels" />
+        </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
                             information_only="1"
