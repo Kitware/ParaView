@@ -69,10 +69,18 @@ catalyst = vtkPVCatalyst.vtkCPProcessor()
 #catalyst.Initialize()
 
 for script in sys.argv[2:]:
-    pipeline = vtkPVPythonCatalyst.vtkCPPythonScriptPipeline()
+    import os.path
     if rank == 0:
         print("Adding script ", script)
-    pipeline.Initialize(script)
+    if os.path.splitext(script)[1] == ".zip":
+        pipeline = vtkPVPythonCatalyst.vtkCPPythonScriptV2Pipeline()
+        pipeline.InitializeFromZIP(script)
+    elif os.path.isdir(script):
+        pipeline = vtkPVPythonCatalyst.vtkCPPythonScriptV2Pipeline()
+        pipeline.InitializeFromDirectory(script)
+    else:
+        pipeline = vtkPVPythonCatalyst.vtkCPPythonScriptPipeline()
+        pipeline.Initialize(script)
     catalyst.AddPipeline(pipeline)
 
 # we get the channel name here from the reader's dataset. if there
