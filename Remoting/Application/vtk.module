@@ -52,6 +52,7 @@ OPTIONAL_DEPENDS
   VTK::IOCityGML
   VTK::IOGDAL
   VTK::IOGeometry
+  VTK::IOCGNSReader
   VTK::IOH5part
   VTK::IOInfovis
   VTK::IOIoss
