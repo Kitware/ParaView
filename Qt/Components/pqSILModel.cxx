@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkGraph.h"
 #include "vtkInEdgeIterator.h"
 #include "vtkMemberFunctionCommand.h"
+#include "vtkNew.h"
 #include "vtkOutEdgeIterator.h"
 #include "vtkSMSILDomain.h"
 #include "vtkSMSILModel.h"
@@ -84,7 +85,7 @@ pqSILModel::~pqSILModel()
 void pqSILModel::update()
 {
   this->beginResetModel();
-  bool prev = this->blockSignals(true);
+  const bool prev = this->blockSignals(true);
   auto sil = this->SILDomain->GetSIL();
   this->SILModel->Initialize(sil);
   this->ModelIndexCache->clear();
@@ -92,22 +93,23 @@ void pqSILModel::update()
   // Update the list of hierarchies.
   this->Hierarchies.clear();
   this->HierarchyVertexIds.clear();
-
-  vtkStringArray* names =
-    vtkStringArray::SafeDownCast(sil->GetVertexData()->GetAbstractArray("Names"));
-  vtkAdjacentVertexIterator* iter = vtkAdjacentVertexIterator::New();
-  sil->GetAdjacentVertices(0, iter);
-  int childNo = 0;
-  while (iter->HasNext())
+  if (sil)
   {
-    vtkIdType vertexid = iter->Next();
-    QString hierarchyName = QString(names->GetValue(vertexid));
-    this->Hierarchies[hierarchyName] =
-      this->createIndex(childNo, 0, static_cast<quint32>(vertexid));
-    this->collectLeaves(vertexid, this->HierarchyVertexIds[hierarchyName]);
-    childNo++;
+    vtkStringArray* names =
+      vtkStringArray::SafeDownCast(sil->GetVertexData()->GetAbstractArray("Names"));
+    vtkNew<vtkAdjacentVertexIterator> iter;
+    sil->GetAdjacentVertices(0, iter);
+    int childNo = 0;
+    while (iter->HasNext())
+    {
+      vtkIdType vertexid = iter->Next();
+      QString hierarchyName = QString(names->GetValue(vertexid));
+      this->Hierarchies[hierarchyName] =
+        this->createIndex(childNo, 0, static_cast<quint32>(vertexid));
+      this->collectLeaves(vertexid, this->HierarchyVertexIds[hierarchyName]);
+      childNo++;
+    }
   }
-  iter->Delete();
   this->blockSignals(prev);
   this->endResetModel();
 }
