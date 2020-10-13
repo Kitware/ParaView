@@ -960,6 +960,9 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
   };
   std::map<vtkSMPropertyGroup*, EnumState> group_widget_status;
 
+  // group-widget name uniquification helper.
+  std::map<QString, int> group_widget_names;
+
   // step 3: now iterate over the `ordered_properties` list and create widgets
   // as needed.
   pqInterfaceTracker* interfaceTracker = pqApplicationCore::instance()->interfaceTracker();
@@ -1039,7 +1042,15 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
             ::add_decorators(gwidget, smgroup->GetHints());
 
             gwidget->setParent(this);
-            gwidget->setObjectName(QString(smgroup->GetPanelWidget()).remove(' '));
+            // we use group_widget_names to uniquify the names for group widgets
+            // when there are multiple groups of the same type (BUG #20271).
+            auto wdgName = QString(smgroup->GetPanelWidget()).remove(' ');
+            const auto suffixCount = group_widget_names[wdgName]++;
+            if (suffixCount != 0)
+            {
+              wdgName += QString::number(suffixCount);
+            }
+            gwidget->setObjectName(wdgName);
 
             auto item = pqProxyWidgetItem::newGroupItem(
               gwidget, QString(smgroup->GetXMLLabel()), this->ShowHeadersFooters, this);
