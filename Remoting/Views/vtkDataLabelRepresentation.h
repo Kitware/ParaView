@@ -38,7 +38,7 @@
 class vtkActor2D;
 class vtkCellCenters;
 class vtkCallbackCommand;
-class vtkCompositeDataToUnstructuredGridFilter;
+class vtkMergeBlocks;
 class vtkLabeledDataMapper;
 class vtkMaskPoints;
 class vtkProp3D;
@@ -157,7 +157,7 @@ protected:
 
   void UpdateTransform();
 
-  vtkCompositeDataToUnstructuredGridFilter* MergeBlocks;
+  vtkMergeBlocks* MergeBlocks;
 
   vtkSmartPointer<vtkMaskPoints> PointMask;
   vtkLabeledDataMapper* PointLabelMapper;

@@ -20,7 +20,7 @@
  * the data object is a data set, then the set is passed through a vtkDataSetTriangleFilter
  * before being output as a vtkUnstructuredGrid.  If the data object is a multiblock
  * dataset with at least one unstructured grid leaf node, then the unstructured grid
- * is extracted using vtkCompositeDataToUnstructuredGridFilter.  The TetrahedraOnly
+ * is extracted using vtkExtractBlock and vtkMergeBlocks.  The TetrahedraOnly
  * property may be set and it will be passed to the vtkDataSetTriangleFilter.
  *
  * @sa

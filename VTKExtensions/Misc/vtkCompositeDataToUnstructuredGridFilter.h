@@ -22,13 +22,18 @@
  * leaves of the input composite dataset to a single unstructure grid. The
  * subtree to be combined can be chosen using the SubTreeCompositeIndex. If
  * the SubTreeCompositeIndex is a leaf node, then no appending is required.
+ *
+ * @deprecated ParaView 5.9. Please use vtkMergeBlocks instead.
 */
 
 #ifndef vtkCompositeDataToUnstructuredGridFilter_h
 #define vtkCompositeDataToUnstructuredGridFilter_h
 
+#include "vtkLegacy.h"                    // for legacy
 #include "vtkPVVTKExtensionsMiscModule.h" // needed for export macro
 #include "vtkUnstructuredGridAlgorithm.h"
+
+#if !defined(VTK_LEGACY_REMOVE)
 
 class vtkCompositeDataSet;
 class vtkAppendFilter;
@@ -104,3 +109,4 @@ private:
 };
 
 #endif
+#endif // VTK_LEGACY_REMOVE

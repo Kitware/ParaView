@@ -1,9 +1,9 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkDataObjectTreeToPointSetFilter.h
+  Module:    vtkMergeBlocks.h
 
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  Copyright (c) Kitware, Inc.
   All rights reserved.
   See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
@@ -13,43 +13,32 @@
 
 =========================================================================*/
 /**
- * @class vtkDataObjectTreeToPointSetFilter
- * @brief Filter that merges blocks from a data object tree to a vtkPolyData of vtkUnstructuredGrid
+ * @class vtkMergeBlocks
+ * @brief merges blocks in a composite dataset to a dataset.
  *
- * This filter takes a vtkDataObjectTree as input and merges the blocks in the tree into a single
- * output vtkUnstructuredGrid if the ExtractSurfaces option is off. If the ExtractSurfaces option
- * is on, surfaces of non-vtkPolyData datasets in the input tree will be extracted and merged to
- * the output with vtkPolyData datasets.
+ * vtkMergeBlocks merges all blocks in a composite-dataset (rather any
+ * vtkDataObjectTree subclass) into a dataset (either vtkPolyData or
+ * vtkUnstructuredGrid based on `vtkMergeBlocks::OutputDataSetType`).
  *
- * @deprecated ParaView 5.9. Please use vtkMergeBlocks instead.
- */
+ * If vtkMergeBlocks::MergePartitionsOnly is true, then only
+ * vtkPartitionedDataSet (and vtkMultiPieceDataSet) blocks will be merged, thus
+ * largely preserving the tree structure.
+ *
+*/
 
-#ifndef vtkDataObjectTreeToPointSetFilter_h
-#define vtkDataObjectTreeToPointSetFilter_h
+#ifndef vtkMergeBlocks_h
+#define vtkMergeBlocks_h
 
-#include "vtkLegacy.h"                    // for legacy
-#include "vtkPVVTKExtensionsMiscModule.h" // For export macro
-#include "vtkPointSetAlgorithm.h"
+#include "vtkDataObjectAlgorithm.h"
+#include "vtkPVVTKExtensionsMiscModule.h" // needed for export macro
 
-#if !defined(VTK_LEGACY_REMOVE)
-class vtkAppendDataSets;
-class vtkDataObjectTree;
-class vtkDataSet;
-class VTKPVVTKEXTENSIONSMISC_EXPORT vtkDataObjectTreeToPointSetFilter : public vtkPointSetAlgorithm
+class vtkUnstructuredGrid;
+class VTKPVVTKEXTENSIONSMISC_EXPORT vtkMergeBlocks : public vtkDataObjectAlgorithm
 {
 public:
-  static vtkDataObjectTreeToPointSetFilter* New();
-  vtkTypeMacro(vtkDataObjectTreeToPointSetFilter, vtkPointSetAlgorithm);
+  static vtkMergeBlocks* New();
+  vtkTypeMacro(vtkMergeBlocks, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-
-  //@{
-  /**
-   * Get/Set the composite index of the subtree to be merged. By default set to
-   * 0 i.e. root, hence entire input composite dataset is merged.
-   */
-  vtkSetMacro(SubTreeCompositeIndex, unsigned int);
-  vtkGetMacro(SubTreeCompositeIndex, unsigned int);
-  //@}
 
   //@{
   /**
@@ -85,6 +74,18 @@ public:
 
   //@{
   /**
+   * When set to true, only vtkPartitionedDataSet and vtkMultiPieceDataSet
+   * instances are merged into a since vtkUnstructuredGrid leaving parent
+   * vtkMultiBlockDataSet or vtkPartitionedDataSetCollection structure largely
+   * unchanged.
+   */
+  vtkSetMacro(MergePartitionsOnly, bool);
+  vtkGetMacro(MergePartitionsOnly, bool);
+  vtkBooleanMacro(MergePartitionsOnly, bool);
+  //@}
+
+  //@{
+  /**
    * Get/Set the output type produced by this filter. Only blocks compatible with the output type
    * will be merged in the output. For example, if the output type is vtkPolyData, then
    * blocks of type vtkImageData, vtkStructuredGrid, etc. will not be merged - only vtkPolyData
@@ -93,38 +94,32 @@ public:
    * Valid values are VTK_POLY_DATA and VTK_UNSTRUCTURED_GRID defined in vtkType.h.
    * Defaults to VTK_UNSTRUCTURED_GRID.
    */
-  //@}
   vtkSetMacro(OutputDataSetType, int);
   vtkGetMacro(OutputDataSetType, int);
+  //@}
 
 protected:
-  vtkDataObjectTreeToPointSetFilter();
-  ~vtkDataObjectTreeToPointSetFilter() override;
-
-  int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) override;
-  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) override;
-
-  int FillInputPortInformation(int port, vtkInformation* info) override;
+  vtkMergeBlocks();
+  ~vtkMergeBlocks() override;
 
   /**
-   * Remove point/cell arrays not present on all processes.
+   * This is called by the superclass.
+   * This is the method you should override.
    */
-  void RemovePartialArrays(vtkDataSet* data);
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
+  int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
-  void ExecuteSubTree(vtkDataObjectTree* dot, vtkAppendDataSets* appender);
-
-  unsigned int SubTreeCompositeIndex;
   bool MergePoints;
   double Tolerance;
+  bool MergePartitionsOnly;
   bool ToleranceIsAbsolute;
   int OutputDataSetType;
 
 private:
-  vtkDataObjectTreeToPointSetFilter(const vtkDataObjectTreeToPointSetFilter&) = delete;
-  void operator=(const vtkDataObjectTreeToPointSetFilter&) = delete;
+  vtkMergeBlocks(const vtkMergeBlocks&) = delete;
+  void operator=(const vtkMergeBlocks&) = delete;
 };
 
 #endif
-#endif // VTK_LEGACY_REMOVE
