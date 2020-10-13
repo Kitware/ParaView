@@ -102,7 +102,7 @@ paraview_plugin_scan(
   PROVIDES_PLUGINS          <variable>
   [ENABLE_BY_DEFAULT        <ON|OFF>]
   [HIDE_PLUGINS_FROM_CACHE  <ON|OFF>]
-  [REQUIRES_MODULES         <variable>])
+  [REQUIRES_MODULES         <module>...])
 ```
 
   * `PLUGIN_FILES`: (Required) The list of plugin files to scan.
