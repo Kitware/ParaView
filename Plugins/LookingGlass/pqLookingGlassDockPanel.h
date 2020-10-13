@@ -21,6 +21,7 @@
 #include <QDockWidget>
 #include <QMap>
 #include <QPointer>
+#include <QString>
 
 class pqRenderView;
 class pqView;
@@ -93,6 +94,8 @@ protected:
 
   // Get the Looking Glass settings for the displayed view
   vtkSMProxy* getSettingsForView(pqRenderView* view);
+
+  QString getSettingsProxyName(pqView* view);
 
   void freeDisplayWindowResources();
 

@@ -45,37 +45,27 @@
                   value="2" />
           </EnumerationDomain>
       </IntVectorProperty>
-      <DoubleVectorProperty command="SetNearClippingLimit"
-          default_values="0.8"
-          name="NearClippingLimit"
+      <DoubleVectorProperty command="SetClippingLimits"
+          default_values="0.8 1.2"
+          name="ClippingLimits"
           panel_visibility="advanced"
-          number_of_elements="1">
+          number_of_elements="2"
+          panel_widget="double_range">
           <DoubleRangeDomain
-              max="1.5"
-              min="0.75"
+              max="2.0"
+              min="0.65"
               name="range" />
           <Documentation>
-      Set a limit for the ratio of the near clipping plane to the focal
-      distance. This is a mechanism to limit parallex and resulting
-      ghosting when using the looking glass display. The typical value
-      should be around 0.8.
+            Set a limit for the ratios of the near and far clipping planes to the focal
+            distance. This is a mechanism to limit parallax and resulting
+            ghosting when using the Looking Glass display. The typical range
+            should be around (0.8, 1.2).
           </Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetFarClippingLimit"
-          default_values="1.2"
-          name="FarClippingLimit"
-          panel_visibility="advanced"
-          number_of_elements="1">
-          <DoubleRangeDomain
-              max="1.5"
-              min="0.75"
-              name="range" />
-          <Documentation>
-      Set a limit for the ratio of the far clipping plane to the focal
-      distance. This is a mechanism to limit parallex and resulting
-      ghosting when using the looking glass display. The typical value
-      should be around 1.2.
-          </Documentation>
+          <Hints>
+            <MinimumLabel text="Near Clipping Limit"/>
+            <MaximumLabel text="Far Clipping Limit" />
+            <HideResetButton/>
+          </Hints>
       </DoubleVectorProperty>
     </Proxy>
   </ProxyGroup>

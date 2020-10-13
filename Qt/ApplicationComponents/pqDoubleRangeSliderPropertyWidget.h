@@ -40,6 +40,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * the "ThresholdRange" property on the Threshold filter's panel. It provides
 * two double sliders, one for min and one for max and has logic to ensure that
 * the min <= max.
+*
+* The appearance of this widget can be modified by hints in the property XML
+* definition. If a hint element named "HideResetButton" is present, the range
+* reset button will be hidden. If a hint element named "MinimumLabel" is present with
+* a "text" attribute, that text attribute will be used as the label text instead
+* of "Minimum". Similarly, the default "Maximum" label can be replaced with a
+* "MaximumLabel" element with a "text" attribute.
 */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqDoubleRangeSliderPropertyWidget : public pqPropertyWidget
 {

@@ -34,8 +34,8 @@ void vtkPVLookingGlassSettings::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "FocalPlaneMovementFactor: " << this->FocalPlaneMovementFactor << "\n";
   os << indent << "DeviceIndex: " << this->DeviceIndex << "\n";
   os << indent << "RenderRate: " << this->RenderRate << "\n";
-  os << indent << "NearClippingLimit: " << this->NearClippingLimit << "\n";
-  os << indent << "FarClippingLimit: " << this->FarClippingLimit << "\n";
+  os << indent << "ClippingLimits: " << this->ClippingLimits[0] << ", " << this->ClippingLimits[1]
+     << "\n";
 }
 
 vtkCamera* vtkPVLookingGlassSettings::GetActiveCamera()
