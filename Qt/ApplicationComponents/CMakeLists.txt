@@ -194,6 +194,7 @@ set(classes
   pqTransferFunctionWidgetPropertyWidget
   pqUndoRedoBehavior
   pqUndoRedoReaction
+  pqUsageLoggingBehavior
   pqUseSeparateColorMapReaction
   pqVCRToolbar
   pqVerifyRequiredPluginBehavior
@@ -271,6 +272,7 @@ set(resource_files
   Resources/pqApplicationComponents.qrc)
 
 set(qt_components
+  Network
   Widgets
   Svg)
 
@@ -306,7 +308,8 @@ vtk_module_add_module(ParaView::pqApplicationComponents
 vtk_module_link(ParaView::pqApplicationComponents
   PRIVATE
     Qt5::Widgets
-    Qt5::Svg)
+    Qt5::Svg
+    Qt5::Network)
 if (PARAVIEW_USE_QTHELP)
   vtk_module_link(ParaView::pqApplicationComponents
     PRIVATE
