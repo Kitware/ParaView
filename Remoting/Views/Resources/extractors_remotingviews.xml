@@ -2,7 +2,7 @@
   <ProxyGroup name="extract_writers">
     <!-- =================================================================== -->
     <ImageExtractWriterProxy name="PNG">
-      <StringVectorProperty name="FileName" number_of_elements="1" default_values="image_%.6ts%cm.png">
+      <StringVectorProperty name="FileName" number_of_elements="1" default_values="%p_%.6ts%cm.png">
         <Documentation>
           Specify the filename to use.
         </Documentation>
@@ -92,7 +92,7 @@
 
     <!-- =================================================================== -->
     <ImageExtractWriterProxy name="JPG">
-      <StringVectorProperty name="FileName" number_of_elements="1" default_values="image_%.6ts%cm.jpg">
+      <StringVectorProperty name="FileName" number_of_elements="1" default_values="%p_%.6ts%cm.jpg">
         <Documentation>
           Specify the filename to use.
         </Documentation>
