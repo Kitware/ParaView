@@ -22,6 +22,7 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
+#include "vtkSMDomain.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
@@ -212,7 +213,32 @@ void vtkInheritRepresentationProperties(vtkSMRepresentationProxy* repr, vtkSMSou
     }
     auto destVP = vtkSMVectorProperty::SafeDownCast(dest);
     auto sourceVP = vtkSMVectorProperty::SafeDownCast(source);
-    if (dest && source &&
+
+    // If we have a "Representation" property, check that the destination supports
+    // the representation type that is being copied over (#20274)
+    bool isInDomain = false;
+    if (dest && dest->GetNumberOfDomains() > 0)
+    {
+      vtkSMDomainIterator* destDomainIter = dest->NewDomainIterator();
+      destDomainIter->SetProperty(dest);
+      for (destDomainIter->Begin(); !destDomainIter->IsAtEnd(); destDomainIter->Next())
+      {
+        auto domain = destDomainIter->GetDomain();
+        if (domain->IsInDomain(source) == vtkSMDomain::IN_DOMAIN)
+        {
+          isInDomain = true;
+          break;
+        }
+      }
+      destDomainIter->Delete();
+    }
+    else
+    {
+      // No domains - anything goes
+      isInDomain = true;
+    }
+
+    if (dest && source && isInDomain &&
       // the property wasn't modified since initialization or if it is
       // "Representation" property -- (HACK)
       (dest->GetMTime() < initTimeStamp || strcmp("Representation", pname) == 0) &&
