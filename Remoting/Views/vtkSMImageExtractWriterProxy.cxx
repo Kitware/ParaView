@@ -23,6 +23,7 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSaveScreenshotProxy.h"
 #include "vtkVector.h"
+#include "vtkVectorOperators.h"
 
 #include <algorithm>
 #include <sstream>
@@ -53,6 +54,15 @@ public:
     camera->SetFocalPoint(this->FocalPoint.GetData());
     camera->SetPosition(this->Position.GetData());
     camera->SetViewUp(this->ViewUp.GetData());
+  }
+
+  void ResetPhiTheta()
+  {
+    this->Restore();
+    const auto fdistance = (this->FocalPoint - this->Position).Norm();
+    auto pos = this->FocalPoint + vtkVector3d(0, 0, fdistance);
+    this->Camera->SetPosition(pos.GetData());
+    this->Camera->SetViewUp(0, 1.0, 0);
   }
 };
 
@@ -221,7 +231,7 @@ bool vtkSMImageExtractWriterProxy::WriteInternal(vtkSMExtractsController* extrac
 
     for (double phi = 0; phi < 360; phi += 360.0 / phi_resolution)
     {
-      cameraState.Restore();
+      cameraState.ResetPhiTheta();
       camera->Azimuth(phi);
       for (double theta = 0; theta < 360; theta += 360.0 / theta_resolution)
       {
