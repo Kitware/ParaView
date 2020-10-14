@@ -69,6 +69,27 @@ std::string RelativePath(const std::string& root, const std::string& target)
   return vtksys::SystemTools::RelativePath(
     vtksys::SystemTools::CollapseFullPath(root), vtksys::SystemTools::CollapseFullPath(target));
 }
+
+std::string DefaultFilenamePrefix(vtkSMProxy* input)
+{
+  auto pxm = input->GetSessionProxyManager();
+  if (auto sname = pxm->GetProxyName("sources", input))
+  {
+    return sname;
+  }
+  else if (auto vname = pxm->GetProxyName("views", input))
+  {
+    return vname;
+  }
+  return "extract";
+}
+
+std::string DefaultFilename(vtkSMProxy* input, std::string pattern)
+{
+  const auto prefix = DefaultFilenamePrefix(input);
+  vtksys::SystemTools::ReplaceString(pattern, "%p", prefix);
+  return pattern;
+}
 }
 
 vtkStandardNewMacro(vtkSMExtractsController);
@@ -376,14 +397,23 @@ vtkSMProxy* vtkSMExtractsController::CreateExtractor(
 
   // this is done so that producer-consumer links are setup properly. Makes it easier
   // to delete the Extractor when the producer goes away.
+  vtkSMProxy* producerProxy = nullptr;
   if (auto port = vtkSMOutputPort::SafeDownCast(proxy))
   {
     vtkSMPropertyHelper(extractor, "Producer").Set(port->GetSourceProxy());
+    producerProxy = port->GetSourceProxy();
   }
   else
   {
     vtkSMPropertyHelper(extractor, "Producer").Set(proxy);
+    producerProxy = proxy;
   }
+
+  // update default filename.
+  vtkSMPropertyHelper(writer, "FileName")
+    .Set(::DefaultFilename(producerProxy, vtkSMPropertyHelper(writer, "FileName").GetAsString())
+           .c_str());
+
   controller->PostInitializeProxy(extractor);
   extractor->UpdateVTKObjects();
 

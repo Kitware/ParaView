@@ -1,14 +1,14 @@
 [
   {"type":"directory","name":"Testing/Temporary/WaveletHistogramExtracts/","contents":[
     {"type":"directory","name":"BatchExtracts","contents":[
-      {"type":"directory","name":"dataset_000000","contents":[
-        {"type":"file","name":"dataset_000000_0.vti"}
+      {"type":"directory","name":"Wavelet1_000000","contents":[
+        {"type":"file","name":"Wavelet1_000000_0.vti"}
       ]},
-      {"type":"file","name":"dataset_000000.pvti"},
-      {"type":"directory","name":"dataset_000005","contents":[
-        {"type":"file","name":"dataset_000005_0.vti"}
+      {"type":"file","name":"Wavelet1_000000.pvti"},
+      {"type":"directory","name":"Wavelet1_000005","contents":[
+        {"type":"file","name":"Wavelet1_000005_0.vti"}
       ]},
-      {"type":"file","name":"dataset_000005.pvti"},
+      {"type":"file","name":"Wavelet1_000005.pvti"},
       {"type":"file","name":"histogram_0.000000.png", "compare":true},
       {"type":"file","name":"histogram_0.111111.png"},
       {"type":"file","name":"histogram_0.222222.png"},
@@ -26,22 +26,22 @@
       {"type":"file","name":"renderview_0008.png", "compare":true}
     ]},
     {"type":"directory","name":"CoprocessingExtracts","contents":[
-      {"type":"directory","name":"dataset_000000","contents":[
-        {"type":"file","name":"dataset_000000_0.vti"}
+      {"type":"directory","name":"Wavelet1_000000","contents":[
+        {"type":"file","name":"Wavelet1_000000_0.vti"}
       ]},
-      {"type":"file","name":"dataset_000000.pvti"},
-      {"type":"directory","name":"dataset_000005","contents":[
-        {"type":"file","name":"dataset_000005_0.vti"}
+      {"type":"file","name":"Wavelet1_000000.pvti"},
+      {"type":"directory","name":"Wavelet1_000005","contents":[
+        {"type":"file","name":"Wavelet1_000005_0.vti"}
       ]},
-      {"type":"file","name":"dataset_000005.pvti"},
-      {"type":"directory","name":"dataset_000010","contents":[
-        {"type":"file","name":"dataset_000010_0.vti"}
+      {"type":"file","name":"Wavelet1_000005.pvti"},
+      {"type":"directory","name":"Wavelet1_000010","contents":[
+        {"type":"file","name":"Wavelet1_000010_0.vti"}
       ]},
-      {"type":"file","name":"dataset_000010.pvti"},
-      {"type":"directory","name":"dataset_000015","contents":[
-        {"type":"file","name":"dataset_000015_0.vti"}
+      {"type":"file","name":"Wavelet1_000010.pvti"},
+      {"type":"directory","name":"Wavelet1_000015","contents":[
+        {"type":"file","name":"Wavelet1_000015_0.vti"}
       ]},
-      {"type":"file","name":"dataset_000015.pvti"},
+      {"type":"file","name":"Wavelet1_000015.pvti"},
       {"type":"file","name":"histogram_0.000000.png", "compare":true},
       {"type":"file","name":"histogram_0.050000.png"},
       {"type":"file","name":"histogram_0.100000.png"},
@@ -74,14 +74,14 @@
       {"type":"file","name":"renderview_0018.png", "compare":true}
     ]},
     {"type":"directory","name":"ImmediateExtracts","contents":[
-      {"type":"directory","name":"dataset_000000","contents":[
-        {"type":"file","name":"dataset_000000_0.vti"}
+      {"type":"directory","name":"Wavelet1_000000","contents":[
+        {"type":"file","name":"Wavelet1_000000_0.vti"}
       ]},
-      {"type":"file","name":"dataset_000000.pvti"},
-      {"type":"directory","name":"dataset_000005","contents":[
-        {"type":"file","name":"dataset_000005_0.vti"}
+      {"type":"file","name":"Wavelet1_000000.pvti"},
+      {"type":"directory","name":"Wavelet1_000005","contents":[
+        {"type":"file","name":"Wavelet1_000005_0.vti"}
       ]},
-      {"type":"file","name":"dataset_000005.pvti"},
+      {"type":"file","name":"Wavelet1_000005.pvti"},
       {"type":"file","name":"histogram_0.000000.png", "compare":true},
       {"type":"file","name":"histogram_0.111111.png"},
       {"type":"file","name":"histogram_0.222222.png"},
