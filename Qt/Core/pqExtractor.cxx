@@ -61,6 +61,8 @@ pqExtractor::pqExtractor(const QString& group, const QString& name, vtkSMProxy* 
   auto qtconnector = this->getConnector();
   qtconnector->Connect(
     smproxy->GetProperty("Producer"), vtkCommand::ModifiedEvent, this, SLOT(producerChanged()));
+  qtconnector->Connect(
+    smproxy->GetProperty("Enable"), vtkCommand::ModifiedEvent, this, SIGNAL(enabledStateChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -97,6 +99,12 @@ bool pqExtractor::isDataExtractor() const
 }
 
 //-----------------------------------------------------------------------------
+bool pqExtractor::isEnabled() const
+{
+  return vtkSMExtractsController::IsExtractorEnabled(this->getProxy());
+}
+
+//-----------------------------------------------------------------------------
 void pqExtractor::producerChanged()
 {
   auto& internals = (*this->Internals);
@@ -120,4 +128,16 @@ void pqExtractor::producerChanged()
     Q_EMIT this->producerRemoved(olditem, this);
     Q_EMIT this->producerAdded(smitem, this);
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqExtractor::toggleEnabledState(pqView* view)
+{
+  if (view != nullptr && this->isImageExtractor() && this->producer() != view)
+  {
+    // view is not the producer, can't toggle enabled state.
+    return;
+  }
+
+  vtkSMExtractsController::SetExtractorEnabled(this->getProxy(), !this->isEnabled());
 }

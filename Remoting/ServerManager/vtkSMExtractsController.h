@@ -217,6 +217,16 @@ public:
     const SummaryParametersT& params = SummaryParametersT{});
   //@}
 
+  /**
+   * Returns true of the extractor is enabled.
+   */
+  static bool IsExtractorEnabled(vtkSMProxy* extractor);
+
+  /**
+   * Enable/disable an extractor.
+   */
+  static void SetExtractorEnabled(vtkSMProxy* extractor, bool val);
+
 protected:
   vtkSMExtractsController();
   ~vtkSMExtractsController();

@@ -322,7 +322,11 @@ public:
       break;
 
       case pqPipelineModel::Extractor:
-        return false;
+        if (auto extractor = qobject_cast<pqExtractor*>(this->Object))
+        {
+          newIcon = this->getVisibilityIcon(extractor, view);
+        }
+        break;
 
       default:
         break;
@@ -402,6 +406,24 @@ private:
     return view->getViewProxy()->CanDisplayData(port->getSourceProxy(), port->getPortNumber())
       ? PipelineModelIconType::EYEBALL_GRAY
       : PipelineModelIconType::LAST;
+  }
+
+  QString getVisibilityIcon(pqExtractor* extractor, pqView* view) const
+  {
+    if (!extractor)
+    {
+      return PipelineModelIconType::LAST;
+    }
+    auto producer = extractor->producer();
+    if (extractor->isImageExtractor() && view != producer)
+    {
+      // show no-icon.
+      return PipelineModelIconType::LAST;
+    }
+
+    // show icon based on enabled state.
+    return extractor->isEnabled() ? PipelineModelIconType::EYEBALL
+                                  : PipelineModelIconType::EYEBALL_GRAY;
   }
 
   QString getIconType(pqOutputPort* port) const
@@ -1363,6 +1385,16 @@ void pqPipelineModel::addExtractor(pqExtractor* egenerator)
     SLOT(updateData(pqServerManagerModelItem*)));
   this->connect(egenerator, SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
     SLOT(updateData(pqServerManagerModelItem*)));
+
+  // ensure the "enabled" icon is updated when enabled-state changes.
+  QPointer<pqPipelineModelDataItem> itemPtr = item;
+  QPointer<pqPipelineModel> self = this;
+  QObject::connect(egenerator, &pqExtractor::enabledStateChanged, [itemPtr, self]() {
+    if (itemPtr && self)
+    {
+      itemPtr->updateVisibilityIcon(self->View, false);
+    }
+  });
 }
 
 //-----------------------------------------------------------------------------
