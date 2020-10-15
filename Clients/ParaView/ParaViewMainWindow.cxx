@@ -278,6 +278,10 @@ ParaViewMainWindow::ParaViewMainWindow()
 
   // Final step, define application behaviors. Since we want all ParaView
   // behaviors, we use this convenience method.
+
+  // UsageLoggingBehavior needs to explicitly enabled for ParaView since it's
+  // disabled by default.
+  pqParaViewBehaviors::setEnableUsageLoggingBehavior(true);
   new pqParaViewBehaviors(this, this);
 }
 
