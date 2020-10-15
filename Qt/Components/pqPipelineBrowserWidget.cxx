@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqExtractor.h"
 #include "pqLiveInsituManager.h"
 #include "pqLiveInsituVisualizationManager.h"
 #include "pqOutputPort.h"
@@ -234,6 +235,12 @@ void pqPipelineBrowserWidget::handleIndexClicked(const QModelIndex& index_)
             itemIndex, QItemSelectionModel::ClearAndSelect);
         }
       }
+    }
+    else if (auto extractor = qobject_cast<pqExtractor*>(smModelItem))
+    {
+      // toggle enabled state for the extractor.
+      auto activeView = pqActiveObjects::instance().activeView();
+      extractor->toggleEnabledState(activeView);
     }
   }
 }

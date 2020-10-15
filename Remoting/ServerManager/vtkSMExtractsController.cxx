@@ -237,7 +237,7 @@ bool vtkSMExtractsController::IsTriggerActivated(vtkSMProxy* extractor)
     return false;
   }
 
-  if (vtkSMPropertyHelper(extractor, "Enable").GetAsInt() != 1)
+  if (!vtkSMExtractsController::IsExtractorEnabled(extractor))
   {
     // skipping, not enabled.
     return false;
@@ -619,6 +619,22 @@ std::string vtkSMExtractsController::GetSummaryTableFilenameColumnName(const std
 vtkTable* vtkSMExtractsController::GetSummaryTable() const
 {
   return this->SummaryTable.GetPointer();
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMExtractsController::IsExtractorEnabled(vtkSMProxy* extractor)
+{
+  return (extractor && vtkSMPropertyHelper(extractor, "Enable").GetAsInt() != 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMExtractsController::SetExtractorEnabled(vtkSMProxy* extractor, bool val)
+{
+  if (extractor)
+  {
+    vtkSMPropertyHelper(extractor, "Enable").Set(val ? 1 : 0);
+    extractor->UpdateVTKObjects();
+  }
 }
 
 //----------------------------------------------------------------------------

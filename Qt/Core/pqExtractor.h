@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include <QScopedPointer>
 
+class pqView;
+
 /**
  * @class pqExtractor
  * @brief pqProxy subclass for extractors
@@ -72,6 +74,19 @@ public:
    */
   bool isDataExtractor() const;
 
+  /**
+   * Returns true if this extractor is enabled.
+   */
+  bool isEnabled() const;
+
+  /**
+   * Convenience method to toggle enabled state. If `view` is non-null and the
+   * extractor is an image-extractor, then the view must be same as the producer
+   * for the extractor for this method to have any effect. For data-extractors,
+   * view is simply ignored.
+   */
+  void toggleEnabledState(pqView* view);
+
 Q_SIGNALS:
   //@{
   /**
@@ -82,6 +97,11 @@ Q_SIGNALS:
   void producerAdded(pqServerManagerModelItem* producer, pqExtractor* self);
   void producerRemoved(pqServerManagerModelItem* producer, pqExtractor* self);
   //@}
+
+  /**
+   * Fired when the enabled state for the extractor changes.
+   */
+  void enabledStateChanged();
 
 protected:
   void initialize() override;

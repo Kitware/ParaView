@@ -147,24 +147,24 @@ void pqExtractorsMenuReaction::updateEnableState(bool)
     {
       actn->setEnabled(false);
       actn->setVisible(this->HideDisabledActions ? false : true);
-
-      auto input = pqMenuReactionUtils::getInputProperty(prototype);
-
-      input->RemoveAllUncheckedProxies();
-      for (size_t cc = 0; cc < outputPorts.size(); cc++)
+      if (auto input = pqMenuReactionUtils::getInputProperty(prototype))
       {
-        pqOutputPort* port = outputPorts[cc];
-        input->AddUncheckedInputConnection(port->getSource()->getProxy(), port->getPortNumber());
-      }
+        input->RemoveAllUncheckedProxies();
+        for (size_t cc = 0; cc < outputPorts.size(); cc++)
+        {
+          pqOutputPort* port = outputPorts[cc];
+          input->AddUncheckedInputConnection(port->getSource()->getProxy(), port->getPortNumber());
+        }
 
-      vtkSMDomain* domain = NULL;
-      if (input && !input->IsInDomains(&domain)) // Wrong input domain
-      {
-        actn->setStatusTip(pqMenuReactionUtils::getDomainDisplayText(domain));
-      }
-      else // No Input
-      {
-        actn->setStatusTip("Requires an input");
+        vtkSMDomain* domain = NULL;
+        if (input && !input->IsInDomains(&domain)) // Wrong input domain
+        {
+          actn->setStatusTip(pqMenuReactionUtils::getDomainDisplayText(domain));
+        }
+        else // No Input
+        {
+          actn->setStatusTip("Requires an input");
+        }
       }
     }
   }
