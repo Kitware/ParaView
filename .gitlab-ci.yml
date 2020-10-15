@@ -39,6 +39,48 @@ build:spack-centos7:
         - .linux_builder_tags
         - .run_scheduled
 
+## OSmesa and Intel ICC
+
+build:linux-osmesa:
+    extends:
+        - .fedora31_osmesa
+        - .linux_builder_osmesa
+        - .linux_builder_tags
+        - .cmake_build_artifacts
+        - .run_automatically
+
+build:linux-icc:
+    extends:
+        - .fedora31_icc
+        - .linux_builder_icc
+        - .linux_builder_tags
+        - .cmake_build_artifacts
+        - .run_automatically
+
+test:linux-osmesa:
+    extends:
+        - .fedora31_osmesa
+        - .linux_tester_osmesa
+        - .linux_tester_tags
+        - .cmake_test_artifacts
+        - .run_automatically
+    dependencies:
+        - build:linux-osmesa
+    needs:
+        - build:linux-osmesa
+
+test:linux-icc:
+    extends:
+        - .fedora31_icc
+        - .linux_tester_icc
+        - .linux_tester_tags
+        - .cmake_test_artifacts
+        - .run_automatically
+    dependencies:
+        - build:linux-icc
+    needs:
+        - build:linux-icc
+
 # macOS
 
 build:macos-python-qt:

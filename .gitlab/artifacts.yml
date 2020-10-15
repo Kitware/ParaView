@@ -2,8 +2,7 @@
 
 .doxygen_log_artifacts:
     artifacts:
-        expire_in: 1 week
-        when: always
+        expire_in: 1 day
         paths:
             - compile_output.log
             - doxygen_output.log
@@ -14,10 +13,16 @@
     artifacts:
         expire_in: 1d
         paths:
+            # Logs of the build
+            - compile_output.log
+
             # The artifacts of the build.
             - build/bin/
             - build/lib/
             - build/VTK/Utilities/KWIML/vtkkwiml/test/kwiml_test
+
+            # Python packages go here
+            - build/lib64/
 
             # Needed for installation.
             - build/CMakeCache.txt
