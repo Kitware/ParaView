@@ -8,15 +8,28 @@
 # compatibility with many Linux distros while also providing easy ways to get
 # newer compilers.
 
-.centos7:
-    image: "kitware/paraview:ci-centos7-20200929"
-
+.linux:
     variables:
-        GIT_SUBMODULE_STRATEGY: none
-        LAUNCHER: "scl enable devtoolset-7 --"
         GIT_CLONE_PATH: $CI_BUILDS_DIR/gitlab-kitware-sciviz-ci
+        GIT_SUBMODULE_STRATEGY: none
 
-## Tags
+.centos7:
+    extends: .linux
+    image: "kitware/paraview:ci-centos7-20201005"
+    variables:
+        LAUNCHER: "scl enable devtoolset-7 --"
+
+.fedora31_icc:
+    extends: .linux
+    image: "kitware/paraview:ci-fedora31-icc-20201014"
+    variables:
+        CMAKE_CONFIGURATION: linux_shared_adios_mpi_python_icc
+
+.fedora31_osmesa:
+    extends: .linux
+    image: "kitware/paraview:ci-fedora31-20201014"
+    variables:
+        CMAKE_CONFIGURATION: linux_static_adios_mpi_offscreen_python_osmesa
 
 .linux_builder_tags:
     tags:
@@ -24,6 +37,13 @@
         - docker
         - linux
         - paraview
+
+.linux_tester_tags:
+    tags:
+        - docker
+        - paraview
+        - linux
+        - x11
 
 ## Linux-specific scripts
 
@@ -125,3 +145,55 @@
 
     interruptible: true
     timeout: 3 hours
+
+.before_script_build_linux: &before_script_build_linux
+        - sccache --start-server
+        - sccache --show-stats
+        - $LAUNCHER ctest -VV -S .gitlab/ci/ctest_configure.cmake
+        - $LAUNCHER ctest -VV -S .gitlab/ci/ctest_build.cmake &> $GIT_CLONE_PATH/compile_output.log
+        - sccache --show-stats
+
+.linux_builder_osmesa:
+    stage: build
+
+    script:
+        - *before_script_linux
+        - *before_script_build_linux
+
+    interruptible: true
+    timeout: 1 hours
+
+
+.linux_builder_icc:
+    stage: build
+
+    script:
+        - *before_script_linux
+        - source /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64 || true
+        - *before_script_build_linux
+
+    interruptible: true
+    timeout: 1 hours
+
+.linux_tester_osmesa:
+    stage: test
+
+    script:
+        - *before_script_linux
+        - export PATH="/usr/lib64/openmpi/bin:$PATH"
+        - $LAUNCHER ctest -V --output-on-failure -S .gitlab/ci/ctest_test.cmake
+
+    interruptible: true
+    timeout: 1 hours
+
+.linux_tester_icc:
+    stage: test
+
+    script:
+        - *before_script_linux
+        - source /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64 || true
+        - export PATH="/usr/lib64/openmpi/bin:$PATH"
+        - ctest -V --output-on-failure -S .gitlab/ci/ctest_test.cmake
+
+    interruptible: true
+    timeout: 1 hours
