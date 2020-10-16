@@ -174,6 +174,10 @@ public:
   // Get the shared memory info for the current bounding box and the time step.
   shm_info* get_shminfo(const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step);
 
+  // Get all shared memory infos that intersect (interior) with the given bounding box.
+  std::vector<shm_info*> get_shminfo_intersect(
+    const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step);
+
   // Returns the subset (piece) data (and optionally its shm_info), mapping shared memory if
   // necessary. Data will stay mapped until shm_cleanup() gets called.
   const mi::Uint8* get_subset_data_buffer(const mi::math::Bbox<mi::Float32, 3>& bbox,

@@ -124,6 +124,21 @@ void copy_brick_double_to_float(const mi::math::Bbox<mi::Sint32, 3>& copy_bbox_g
     src_buffer_bbox_global, sizeof(mi::Float64));
 }
 
+// In contrast to Bbox::intersects(), this does not consider bboxes intersecting when only their
+// boundaries intersect.
+inline bool bbox_interior_intersects(
+  const mi::math::Bbox<mi::Float32, 3>& box, const mi::math::Bbox<mi::Float32, 3>& other)
+{
+  for (mi::Size i = 0; i < 3; ++i)
+  {
+    if ((box.min[i] >= other.max[i]) || (box.max[i] <= other.min[i]))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
@@ -242,35 +257,78 @@ vtknvindex_volume_neighbor_data::vtknvindex_volume_neighbor_data(
           continue;
         }
 
-        // Retrieve neighbor information
-        const vtknvindex_host_properties::shm_info* shm_info =
-          cluster_props->get_shminfo(query_bbox, time_step);
+        // Retrieve neighbor information, i.e. from pieces that intersect with query_bbox.
+        //
+        // This may return multiple results if the pieces are not uniformly sized and therefore a
+        // single piece can have multiple neighbors per direction.
+        //
+        // If pieces are not disjoint (without considering ghosting), it can happen that the same
+        // border data is fetched/copied multiple times, since multiple piece might cover parts of
+        // query_bbox.
+        //
+        const std::vector<vtknvindex_host_properties::shm_info*> shm_info_vector =
+          cluster_props->get_shminfo_intersect(query_bbox, time_step);
 
-        if (!shm_info)
+        if (shm_info_vector.empty())
         {
           ERROR_LOG << "Could not access volume information for neighbor " << query_bbox << " of "
                     << piece_bbox << ".";
         }
-        else
+
+        Neighbor_vector neighbors;
+        for (vtknvindex_host_properties::shm_info* shm_info : shm_info_vector)
         {
+          if (!shm_info)
+          {
+            ERROR_LOG << "Received null pointer for shm  information for neighbor " << query_bbox
+                      << " of " << piece_bbox << ".";
+            break;
+          }
+
           const mi::math::Bbox<mi::Sint32, 3> data_bbox(shm_info->m_shm_bbox);
 
           // Clip border_bbox against the bbox of the actually available neighbor data, to handle
           // the case when border_bbox is larger than the bbox of the neighbor, e.g. when the border
           // size is set to 2 but the volume size of the neighbor is just 1.
-          border_bbox.min = mi::math::clamp(border_bbox.min, data_bbox.min, data_bbox.max);
-          border_bbox.max = mi::math::clamp(border_bbox.max, data_bbox.min, data_bbox.max);
+          //
+          // This also handles the case when there are multiple neighbors per direction, and no
+          // single neighbor alone has all the necessary data.
+          //
+          const mi::math::Bbox<mi::Sint32, 3> border_bbox_clipped(
+            mi::math::clamp(border_bbox.min, data_bbox.min, data_bbox.max),
+            mi::math::clamp(border_bbox.max, data_bbox.min, data_bbox.max));
 
           Neighbor_info* ni = new Neighbor_info();
           ni->direction = dir;
-          ni->border_bbox = border_bbox;
+          ni->border_bbox = border_bbox_clipped;
           ni->query_bbox = mi::math::Bbox<mi::Sint32, 3>(query_bbox);
           ni->data_bbox = data_bbox;
           ni->data_buffer = nullptr; // will be filled by fetch_data()
           ni->host_id = shm_info->m_host_id;
           ni->rank_id = shm_info->m_rank_id;
-          m_neighbors.push_back(ni);
+
+          if (border_bbox_clipped == border_bbox)
+          {
+            // Optimization for non-disjoint pieces: If this neighbor has the entire queried data
+            // available, then only use it and ignore all other neighbors, which will probably only
+            // have smaller parts of it. This won't prevent all duplicate copies, but catches the
+            // most common case.
+            for (auto& it : neighbors)
+            {
+              delete it;
+            }
+            neighbors.clear();
+            neighbors.push_back(ni);
+            break;
+          }
+          else
+          {
+            neighbors.push_back(ni);
+          }
         }
+
+        // Append the newly created neighbors
+        m_neighbors.insert(m_neighbors.end(), neighbors.begin(), neighbors.end());
       }
     }
   }
@@ -478,6 +536,45 @@ vtknvindex_host_properties::shm_info* vtknvindex_host_properties::get_shminfo(
     }
   }
   return NULL;
+}
+
+// ------------------------------------------------------------------------------------------------
+std::vector<vtknvindex_host_properties::shm_info*>
+vtknvindex_host_properties::get_shminfo_intersect(
+  const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step)
+{
+  std::vector<vtknvindex_host_properties::shm_info*> result;
+
+  auto shmit = m_shmlist.find(time_step);
+  if (shmit == m_shmlist.end())
+  {
+    ERROR_LOG << "The shared memory information in "
+                 "vtknvindex_host_properties::get_shminfo_intersect is not "
+                 "available for the time step: "
+              << time_step << ".";
+
+    return result;
+  }
+
+  std::vector<shm_info>& shmlist = shmit->second;
+  if (shmlist.empty())
+  {
+    ERROR_LOG
+      << "The shared memory list in vtknvindex_host_properties::get_shminfo_intersect is empty.";
+    return result;
+  }
+
+  for (shm_info& current_shm : shmlist)
+  {
+    // Important to use interior intersection here, i.e. bboxes that are just touching on their
+    // boundary are not considered intersecting.
+    if (bbox_interior_intersects(current_shm.m_shm_bbox, bbox))
+    {
+      result.push_back(&current_shm);
+    }
+  }
+
+  return result;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -735,7 +832,9 @@ void vtknvindex_host_properties::fetch_remote_volume_border_data(
       {
         for (auto it : *base_info->m_neighbors)
         {
-          if (it->border_bbox == f.border_bbox)
+          // Need to compare both border_bbox and data_bbox here, because there may be multiple
+          // requests for the same border_bbox in case pieces are not disjoint.
+          if (it->border_bbox == f.border_bbox && it->data_bbox == f.data_bbox)
           {
             it->border_data_buffer = std::move(buffer);
             found = true;

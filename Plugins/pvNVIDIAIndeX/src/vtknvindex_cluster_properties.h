@@ -114,8 +114,9 @@ public:
   // Return host_properties of the host this rank belongs to.
   vtknvindex_host_properties* get_host_properties(const mi::Sint32& rankid) const;
 
-  // Get the shared memory info for the given bounding box and time step, searching over all hosts.
-  const vtknvindex_host_properties::shm_info* get_shminfo(
+  // Get all shared memory infos that intersect with the given bounding box, searching over all
+  // hosts.
+  std::vector<vtknvindex_host_properties::shm_info*> get_shminfo_intersect(
     const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step);
 
   // Gather process information used for setting affinity

@@ -188,21 +188,19 @@ vtknvindex_host_properties* vtknvindex_cluster_properties::get_host_properties(
 }
 
 // ------------------------------------------------------------------------------------------------
-const vtknvindex_host_properties::shm_info* vtknvindex_cluster_properties::get_shminfo(
+std::vector<vtknvindex_host_properties::shm_info*>
+vtknvindex_cluster_properties::get_shminfo_intersect(
   const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step)
 {
-  const vtknvindex_host_properties::shm_info* info = nullptr;
+  std::vector<vtknvindex_host_properties::shm_info*> infos_all;
 
   for (auto& hostinfo : m_hostinfo)
   {
-    info = hostinfo.second->get_shminfo(bbox, time_step);
-    if (info)
-    {
-      break;
-    }
+    const auto infos_host = hostinfo.second->get_shminfo_intersect(bbox, time_step);
+    infos_all.insert(infos_all.end(), infos_host.begin(), infos_host.end());
   }
 
-  return info;
+  return infos_all;
 }
 
 // ------------------------------------------------------------------------------------------------
