@@ -51,15 +51,11 @@ mi::math::Bbox_struct<mi::Float32, 3> vtknvindex_affinity::get_subregion(mi::Uin
 }
 
 // ------------------------------------------------------------------------------------------------
-void vtknvindex_affinity::scene_dump_affinity_info(std::ostringstream& s)
+void vtknvindex_affinity::scene_dump_affinity_info(std::ostringstream& s) const
 {
-  s << "\n"
-    << "## User-defined data affinity."
-    << "\n";
-
-  s << "index::paraview_subdivision::nb_spatial_regions = " << m_spatial_subdivision.size() << "\n";
-  s << "index::paraview_subdivision::use_affinity_only = 0"
-    << "\n";
+  s << "## User-defined data affinity.\n"
+    << "index::paraview_subdivision::nb_spatial_regions = " << m_spatial_subdivision.size() << "\n"
+    << "index::paraview_subdivision::use_affinity_only = 0\n";
 
   for (mi::Size i = 0; i < m_spatial_subdivision.size(); ++i)
   {
@@ -258,15 +254,11 @@ mi::Sint32 vtknvindex_KDTree_affinity::get_node_subregion_index(mi::Uint32 inode
 }
 
 // ------------------------------------------------------------------------------------------------
-void vtknvindex_KDTree_affinity::scene_dump_affinity_info(std::ostringstream& s)
+void vtknvindex_KDTree_affinity::scene_dump_affinity_info(std::ostringstream& s) const
 {
-  s << "\n"
-    << "## User-defined data affinity (kd-tree)."
-    << "\n";
-
-  s << "index::paraview_subdivision::nb_spatial_regions = " << m_spatial_subdivision.size() << "\n";
-  s << "index::paraview_subdivision::use_affinity_only = 0"
-    << "\n";
+  s << "## User-defined data affinity (kd-tree).\n"
+    << "index::paraview_subdivision::nb_spatial_regions = " << m_spatial_subdivision.size() << "\n"
+    << "index::paraview_subdivision::use_affinity_only = 0\n";
 
   for (mi::Size i = 0; i < m_spatial_subdivision.size(); ++i)
   {
@@ -298,7 +290,7 @@ void vtknvindex_KDTree_affinity::serialize(mi::neuraylib::ISerializer* serialize
     serializer->write(&affinity.m_gpu_id, 1);
   }
 
-  // serialize kdtree cached data
+  // serialize kd-tree cached data
   const mi::Uint32 nb_nodes = static_cast<mi::Uint32>(m_kdtree.size());
   serializer->write(&nb_nodes, 1);
   for (mi::Size i = 0; i < nb_nodes; ++i)
@@ -325,7 +317,7 @@ void vtknvindex_KDTree_affinity::deserialize(mi::neuraylib::IDeserializer* deser
     m_spatial_subdivision.push_back(affinity);
   }
 
-  // deserialize kdtree cached data
+  // deserialize kd-tree cached data
   mi::Uint32 nb_nodes = 0;
   deserializer->read(&nb_nodes, 1);
   for (mi::Size i = 0; i < nb_nodes; ++i)

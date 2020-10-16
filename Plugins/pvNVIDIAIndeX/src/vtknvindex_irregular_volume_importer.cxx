@@ -136,7 +136,10 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
   mi::Uint8* shm_ivol = nullptr;
   mi::Float32 max_edge_length_sqr = 0.f;
 
-  INFO_LOG << "The bounding box requested by NVIDIA IndeX: " << bounding_box << ".";
+  INFO_LOG << "Importing unstructured volume data from "
+           << (subset_ptr == nullptr ? "shared" : "local") << " "
+           << "memory (" << shm_memory_name << ") on rank " << rank_id << ", "
+           << "data bbox " << shm_bbox << ", importer bbox " << bounding_box << ".";
 
   if (subset_ptr) // The data is available in local memory.
   {
@@ -150,8 +153,6 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
   }
   else // The data is in shared memory.
   {
-    INFO_LOG << "Using shared memory: " << shm_memory_name << " with bbox: " << shm_bbox << ".";
-
     shm_ivol = vtknvindex::util::get_vol_shm(shm_memory_name, shm_size);
 
     mi::Uint8* shm_offset = shm_ivol;

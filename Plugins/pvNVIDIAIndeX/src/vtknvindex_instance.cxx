@@ -878,16 +878,18 @@ bool vtknvindex_instance::setup_nvindex()
     if (vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() > 1)
       idebug_configuration->set_option("use_strict_domain_subdivision=1");
 
-#ifdef USE_KDTREE
-    // Enable KDTree affinity
+#ifdef VTKNVINDEX_USE_KDTREE
+    // Enable kd-tree affinity
     idebug_configuration->set_option("use_kdtree_subdivision=1");
 
     // TODO: Should this be set based on the number of GPUs when no MPI.
     idebug_configuration->set_option("subdivision_parts=4");
 
-    // Debug KDTree
+#if 0
+    // Debug kd-tree
     idebug_configuration->set_option("debug_kdtree_subdivision=1");
     idebug_configuration->set_option("dump_kdtree_subdivision=1");
+#endif
 #endif
 
     // Use pinned memory for staging buffer (enabled by default).

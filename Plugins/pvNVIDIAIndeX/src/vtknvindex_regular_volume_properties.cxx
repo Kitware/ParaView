@@ -511,7 +511,7 @@ void vtknvindex_regular_volume_properties::print_info() const
   INFO_LOG << "Scalar type: " << m_scalar_type;
   INFO_LOG << "Volume bbox: " << m_ivol_volume_extents;
   INFO_LOG << "Volume size: " << m_ivol_volume_extents.max - m_ivol_volume_extents.min;
-  INFO_LOG << "Voxel range: " << m_voxel_range;
+  INFO_LOG << "Data values: " << m_voxel_range;
   INFO_LOG << "Time series: " << ((m_is_timeseries_data) ? "Yes" : "No");
 }
 

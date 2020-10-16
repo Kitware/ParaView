@@ -28,18 +28,21 @@
 #ifndef vtknvindex_affinity_h
 #define vtknvindex_affinity_h
 
-//#define USE_KDTREE
-
 #include <fstream>
 #include <map>
 #include <vector>
 
 #include "vtkBoundingBox.h" // needed for vtkBoundingBox.
 
-#include <mi/dice.h>
 #include <mi/math/bbox.h>
 #include <mi/neuraylib/iserializer.h>
+
 #include <nv/index/iaffinity_information.h>
+#include <nv/index/version.h>
+
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 327600)
+#define VTKNVINDEX_USE_KDTREE
+#endif
 
 class vtknvindex_host_properties;
 
@@ -100,7 +103,7 @@ public:
   mi::math::Bbox_struct<mi::Float32, 3> get_subregion(mi::Uint32 index) const override;
 
   // Print the affinity information as part of the scene dump.
-  void scene_dump_affinity_info(std::ostringstream& s);
+  void scene_dump_affinity_info(std::ostringstream& s) const;
 
   // DiCE methods
   void serialize(mi::neuraylib::ISerializer* serializer) const override;
@@ -140,7 +143,7 @@ public:
     mi::Uint32 m_gpu_id;
   };
 
-  // Single kdtree node struct
+  // Single kd-tree node struct
   struct kd_node
   {
     kd_node()
@@ -196,7 +199,7 @@ public:
   void build(const std::vector<vtkBoundingBox>& raw_cuts, const std::vector<int>& raw_cuts_ranks);
 
   // Print the affinity information as part of the scene dump.
-  void scene_dump_affinity_info(std::ostringstream& s);
+  void scene_dump_affinity_info(std::ostringstream& s) const;
 
   // DiCE methods
   void serialize(mi::neuraylib::ISerializer* serializer) const override;

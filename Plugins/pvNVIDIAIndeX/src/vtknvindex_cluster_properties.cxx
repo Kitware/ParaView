@@ -77,26 +77,21 @@ size_t vtknvindex_irregular_volume_data::get_memory_size(const std::string& scal
 std::map<mi::Uint32, vtknvindex_cluster_properties*> vtknvindex_cluster_properties::s_instances;
 
 // ------------------------------------------------------------------------------------------------
-vtknvindex_cluster_properties::vtknvindex_cluster_properties(bool register_instance)
+vtknvindex_cluster_properties::vtknvindex_cluster_properties(bool use_kdtree)
   : m_rank_id(-1)
 {
-  if (register_instance)
-  {
-    // Register the instance
-    static mi::Uint32 instance_counter = 0;
-    instance_counter++;
-    m_instance_id = instance_counter;
-
-    s_instances[m_instance_id] = this;
-  }
-  else
-  {
-    m_instance_id = 0;
-  }
+  // Register the instance
+  static mi::Uint32 instance_counter = 0;
+  instance_counter++;
+  m_instance_id = instance_counter;
+  s_instances[m_instance_id] = this;
 
   m_affinity = new vtknvindex_affinity();
-#ifdef USE_KDTREE
-  m_affinity_kdtree = new vtknvindex_KDTree_affinity();
+#ifdef VTKNVINDEX_USE_KDTREE
+  if (use_kdtree)
+  {
+    m_affinity_kdtree = new vtknvindex_KDTree_affinity();
+  }
 #endif
 
   m_config_settings = new vtknvindex_config_settings();
@@ -157,6 +152,15 @@ nv::index::IAffinity_information* vtknvindex_cluster_properties::copy_affinity()
     return m_affinity_kdtree->copy();
   else
     return m_affinity->copy();
+}
+
+// ------------------------------------------------------------------------------------------------
+void vtknvindex_cluster_properties::scene_dump_affinity_info(std::ostringstream& s) const
+{
+  if (m_affinity_kdtree)
+    return m_affinity_kdtree->scene_dump_affinity_info(s);
+  else if (m_affinity)
+    return m_affinity->scene_dump_affinity_info(s);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -691,7 +695,7 @@ void vtknvindex_cluster_properties::print_info() const
   INFO_LOG << "Total number of MPI ranks: " << m_num_ranks;
   INFO_LOG << "Total number of hosts: " << m_hostinfo.size();
   INFO_LOG << "------------------";
-  INFO_LOG << "Regular volume properties: ";
+  INFO_LOG << "Data properties: ";
   m_regular_vol_properties->print_info();
 
   std::map<mi::Uint32, vtknvindex_host_properties*>::const_iterator it = m_hostinfo.begin();

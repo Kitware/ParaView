@@ -29,6 +29,7 @@
 #define vtknvindex_cluster_properties_h
 
 #include <map>
+#include <sstream>
 
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -88,9 +89,7 @@ struct vtknvindex_dataset_parameters
 class vtknvindex_cluster_properties
 {
 public:
-  // When register_instance is true, the newly created instance will be made available through
-  // get_instance().
-  vtknvindex_cluster_properties(bool register_instance = false);
+  vtknvindex_cluster_properties(bool use_kdtree);
   ~vtknvindex_cluster_properties();
 
   // Get general config settings.
@@ -101,6 +100,9 @@ public:
 
   // Creates a copy of ParaView's domain subdivision affinity.
   nv::index::IAffinity_information* copy_affinity() const;
+
+  // Print the affinity information as part of the scene dump.
+  void scene_dump_affinity_info(std::ostringstream& s) const;
 
   // Get kd-tree affinity, or null if it doesn't exists
   vtknvindex_KDTree_affinity* get_affinity_kdtree() const;
