@@ -199,6 +199,9 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
 {
   vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Initialization");
 
+  // Initialize and start IndeX (if not initialized yet and if this is an IndeX rank)
+  m_index_instance->init_index();
+
   m_is_mpi_rendering = (m_controller->GetNumberOfProcesses() > 1);
   const mi::Sint32 cur_global_rank = m_is_mpi_rendering ? m_controller->GetLocalProcessId() : 0;
 

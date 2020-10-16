@@ -76,9 +76,6 @@ vtknvindex_irregular_volume_representation::vtknvindex_irregular_volume_represen
 {
   m_controller = vtkMultiProcessController::GetGlobalController();
 
-  // Initialize and start IndeX
-  vtknvindex_instance::get()->init_index();
-
   this->ResampleToImageFilter = vtkResampleToImage::New();
   this->ResampleToImageFilter->SetSamplingDimensions(128, 128, 128);
 
