@@ -1,37 +1,37 @@
+<!-- nvindex_config.xml: NVIDIA IndeX for ParaView Plugin configuration file.
+     The plugin will look for this configuration file in the default ParaView
+     configuration directory (typically $HOME/.config/ParaView/) or, if it is
+     defined, in the directory specified by the environment variable
+     NVINDEX_PVPLUGIN_HOME. -->
 <index_config>
-    <!-- IndeX license string -->
-    <!-- Enable by removing <?ignore> section and adding your own IndeX License string -->
-    <?ignore
-        <license>
-            <vendor_key>input_vendor_key_here</vendor_key>
-            <secret_key>input_secret_key_here</secret_key>
-        </license>
-    <?>
+    <!-- NVIDIA IndeX license, can be used to override the default license. -->
+    <license>
+        <!-- <vendor_key>put_vendor_key_here</vendor_key> -->
+        <!-- <secret_key>put_secret_key_here</secret_key> -->
+    </license>
 
-    <!-- Network Settings -->
-    <!-- Enable by removing <?ignore> -->
-    <?ignore
-        <network>
-            <!-- Cluster Network Mode (Protocol): OFF, TCP, UDP, TCP_WITH_DISCOVERY -->
-            <cluster_mode>OFF</cluster_mode>
+    <!-- Network settings -->
+    <network>
+        <!-- Cluster network mode (protocol): OFF, TCP, UDP, TCP_WITH_DISCOVERY -->
+        <!-- <cluster_mode>TCP</cluster_mode> -->
 
-            <!-- Cluster interface address.
-            Sets the network interface to be used for outgoing packets.
-            If not set, any address is valid. The string may end with : and a port number to select
-            which port to listen to for UDP and TCP unicasting.
-            If no port is set and unicast only mode is set, port 10000 will be used.
-            -->
-            <cluster_interface_address>172.161.123.0/24:10001</cluster_interface_address>
+        <!-- Cluster interface address: Sets the network interface to be used
+             for outgoing packets. This may also be an interface name, but it
+             must be the same on all hosts. If not set, a network interface will
+             be chosen automatically, which might not always be the right one.
+             The string may end with ':' and a port number to select which port
+             to listen on for UDP and TCP unicast traffic. If no port is set and
+             unicast only mode is set, port 10000 will be used.
+        -->
+        <!-- <cluster_interface_address>172.161.123.0/24:10001</cluster_interface_address> -->
 
-            <!-- Multicast address. Only used when Cluster Network Mode is UDP -->
-            <multicast_address>224.1.3.2</multicast_address>
+        <!-- Multicast address. Only used when cluster_mode is set to UDP. -->
+        <!-- <multicast_address>224.1.3.2</multicast_address> -->
 
-            <!-- Discovery address. Only used when Cluster Network Mode is TCP_WITH_DISCOVERY -->
-            <discovery_address>224.1.3.3:5555</discovery_address>
+        <!-- Discovery address. Only used when cluster_mode is set to TCP_WITH_DISCOVERY. -->
+        <!-- <discovery_address>224.1.3.3:5555</discovery_address> -->
 
-            <!-- Enables or disabled the usage of RDMA Infiniband support in the networking layer. -->
-            <use_rdma>no</use_rdma>
-        </network>
-    <?>
-
+        <!-- Control usage of InfiniBand RDMA in the networking layer. -->
+        <!-- <use_rdma>no</use_rdma> -->
+    </network>
 </index_config>

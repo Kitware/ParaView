@@ -60,12 +60,9 @@ bool vtknvindex_xml_config_parser::open_config_file(const std::string& config_fi
 {
   m_root_elm = NULL;
 
-  std::string config_full_path;
-
-  if (!get_home_path(config_full_path))
+  const std::string config_full_path = get_config_full_path(config_filename);
+  if (config_full_path.empty())
     return false;
-
-  config_full_path += config_filename;
 
   // If config file doesn't exists, then we just ignore it quietly.
   if (!file_exists(config_full_path))
@@ -81,16 +78,24 @@ bool vtknvindex_xml_config_parser::open_config_file(const std::string& config_fi
 
   if (m_parser->Parse() != 1)
   {
-    ERROR_LOG << "XML Config Parser | Unable to parse the config file: " << config_filename << ".";
+    ERROR_LOG << "Unable to parse the NVIDIA IndeX plugin configuration file '" << config_full_path
+              << "'.";
     return false;
   }
 
   m_root_elm = m_parser->GetRootElement();
   if (std::string(m_root_elm->GetName()) != std::string("index_config"))
   {
-    ERROR_LOG << "XML Config Parser | The config file: '" << config_filename
-              << "' doesn't contain NVIDIA IndeX configuration parameter.";
+    ERROR_LOG << "The NVIDIA IndeX plugin configuration file '" << config_full_path
+              << "' is missing the 'index_config' element.";
     return false;
+  }
+
+  static bool first = true;
+  if (first)
+  {
+    first = false;
+    INFO_LOG << "Reading configuration file '" << config_full_path << "'.";
   }
 
   return true;
@@ -111,16 +116,17 @@ bool vtknvindex_xml_config_parser::get_license_strings(
     return false;
 
   vtkXMLDataElement* vendor_key_elm = license_elm->FindNestedElementWithName("vendor_key");
-  if (!vendor_key_elm)
-  {
-    ERROR_LOG << "XML Config Parser | The vendor key is not available.";
-    return false;
-  }
-
   vtkXMLDataElement* secret_key_elm = license_elm->FindNestedElementWithName("secret_key");
-  if (!secret_key_elm)
+
+  // Silently ignore if both are missing
+  if (!vendor_key_elm && !secret_key_elm)
+    return false;
+
+  // Warn if only one is defined
+  if (!vendor_key_elm || !secret_key_elm)
   {
-    ERROR_LOG << "XML Config Parser | The secret key is not available.";
+    ERROR_LOG << "Both 'vendor_key' and 'secret_key' must be specified in "
+                 "the NVIDIA IndeX plugin configuration file, ignored.";
     return false;
   }
 
@@ -179,6 +185,20 @@ bool vtknvindex_xml_config_parser::file_exists(const std::string& filename)
 }
 
 //-------------------------------------------------------------------------------------------------
+std::string vtknvindex_xml_config_parser::get_config_full_path(const std::string& config_filename)
+{
+  std::string home_path;
+  if (get_home_path(home_path))
+  {
+    return home_path + config_filename;
+  }
+  else
+  {
+    return "";
+  }
+}
+
+//-------------------------------------------------------------------------------------------------
 bool vtknvindex_xml_config_parser::get_home_path(std::string& home_path)
 {
   // get home path from environment
@@ -187,6 +207,20 @@ bool vtknvindex_xml_config_parser::get_home_path(std::string& home_path)
   if (env_home_path != NULL)
   {
     home_path = std::string(env_home_path);
+
+    static bool first = true;
+    if (!home_path.empty() && first)
+    {
+      first = false;
+      struct stat buffer;
+      if (stat(home_path.c_str(), &buffer) != 0 || ((buffer.st_mode & S_IFMT) != S_IFDIR))
+      {
+        WARN_LOG << "The path specified in the environment variable NVINDEX_PVPLUGIN_HOME "
+                 << "does not exist or is not a directory: '" << home_path << "'. "
+                 << "No configuration file will be loaded by the NVIDIA IndeX plugin.";
+        return false;
+      }
+    }
 
 #ifdef _WIN32
     home_path += "\\";
