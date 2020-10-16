@@ -182,12 +182,6 @@ void vtknvindex_irregular_volume_mapper::volume_changed()
 //-------------------------------------------------------------------------------------------------
 bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/, vtkVolume* vol)
 {
-
-#if defined(MI_VERSION_STRING) && defined(MI_DATE_STRING)
-  INFO_LOG << "NVIDIA IndeX for ParaView Plugin "
-           << "(build " << MI_VERSION_STRING << ", " << MI_DATE_STRING ").";
-#endif
-
   vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Initialization");
 
   const bool is_MPI = (m_controller->GetNumberOfProcesses() > 1);
