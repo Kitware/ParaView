@@ -161,9 +161,10 @@ inline mi::Uint8* get_vol_shm(const std::string& shmname, const mi::Uint64& shar
 {
 #ifdef _WIN32
   HANDLE hMapFile;
-
-  hMapFile = CreateFileMapping(
-    INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, shared_seg_size, shmname.c_str());
+  ULARGE_INTEGER liMaximumSize;
+  liMaximumSize.QuadPart = shared_seg_size;
+  hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, liMaximumSize.HighPart,
+    liMaximumSize.LowPart, shmname.c_str());
 
   if (hMapFile == NULL)
   {

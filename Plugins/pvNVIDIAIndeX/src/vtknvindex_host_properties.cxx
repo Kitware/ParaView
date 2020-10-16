@@ -171,7 +171,7 @@ vtknvindex_volume_neighbor_data::vtknvindex_volume_neighbor_data(
   const mi::Sint32 border_size = cluster_props->get_config_settings()->get_subcube_border();
   const mi::Uint32 ghost_levels = regular_volume_properties->get_ghost_levels();
 
-  if (ghost_levels >= border_size)
+  if (static_cast<mi::Sint32>(ghost_levels) >= border_size)
   {
     // Border already handled by VTK ghosting, nothing to do
     return;
@@ -731,7 +731,7 @@ void vtknvindex_host_properties::fetch_remote_volume_border_data(
       auto buffer = std::unique_ptr<mi::Uint8[]>(new mi::Uint8[buffer_size]);
 
       const int result = controller->Receive(buffer.get(), buffer_size, f.src_rank_id, COMM_TAG);
-      if (!result || controller->GetCount() != buffer_size)
+      if (!result || static_cast<mi::Size>(controller->GetCount()) != buffer_size)
       {
         ERROR_LOG << "MPI receive failed for border data " << f.border_bbox << " from rank "
                   << f.src_rank_id << " to rank " << f.dst_rank_id << ", buffer size "
