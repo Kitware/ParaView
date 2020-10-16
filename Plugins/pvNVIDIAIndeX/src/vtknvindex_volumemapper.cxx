@@ -228,27 +228,46 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
   m_scalar_array = this->GetScalars(image_piece, this->ScalarMode, this->ArrayAccessMode,
     this->ArrayId, this->ArrayName, cell_flag);
 
-  // check for scalar per cell values
-  if (cell_flag)
+  bool is_data_supported = true;
+
+  // Data can only have a single component (not RGB/HSV format)
+  const int components = m_scalar_array->GetNumberOfComponents();
+  if (components > 1)
   {
-    ERROR_LOG << "Scalar values per cell are not supported in NVIDIA IndeX.";
-    return false;
+    ERROR_LOG << "The data array '" << this->ArrayName << "' has " << components << " components, "
+              << "which is not supported by NVIDIA IndeX.";
+    is_data_supported = false;
   }
 
-  // check for valid data types
-  const std::string scalar_type = m_scalar_array->GetDataTypeAsString();
+  // Only per cell scalars are allowed
+  if (cell_flag > 0)
+  {
+    ERROR_LOG << "The data array '" << this->ArrayName << "' uses "
+              << (cell_flag == 1 ? "per cell" : "per field")
+              << " scalars, but only per point scalars are supported by NVIDIA IndeX "
+              << "(cellFlag is " << cell_flag << ").";
+    is_data_supported = false;
+  }
 
+  // Check for valid data types
+  const std::string scalar_type = m_scalar_array->GetDataTypeAsString();
   if (vtknvindex_regular_volume_properties::get_scalar_size(scalar_type) == 0)
   {
-    ERROR_LOG << "The scalar type: " << scalar_type << " is not supported by NVIDIA IndeX.";
+    ERROR_LOG << "The data array '" << this->ArrayName << "' uses the scalar type '" << scalar_type
+              << "', which is not supported by NVIDIA IndeX.";
     return false;
   }
-  else if (scalar_type == "double")
+  else if (scalar_type == "double" && is_data_supported)
   {
-    WARN_LOG
-      << "Datasets with scalar values in double precision are not natively supported by IndeX. "
-      << "The plug-in will proceed to convert those values from double to float with the "
-         "corresponding overhead.";
+    WARN_LOG << "The data array '" << this->ArrayName << "' has scalar values "
+             << "in double precision format, which is not natively supported by NVIDIA IndeX. "
+             << "The plug-in will proceed to convert the values from double to float with the "
+                "corresponding overhead.";
+  }
+
+  if (!is_data_supported)
+  {
+    return false;
   }
 
   m_subset_ptrs[0] = m_scalar_array->GetVoidPointer(0);
