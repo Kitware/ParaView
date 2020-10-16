@@ -151,6 +151,15 @@ nv::index::IAffinity_information* vtknvindex_cluster_properties::get_affinity() 
 }
 
 // ------------------------------------------------------------------------------------------------
+nv::index::IAffinity_information* vtknvindex_cluster_properties::copy_affinity() const
+{
+  if (m_affinity_kdtree && m_affinity_kdtree->get_nb_nodes() > 0)
+    return m_affinity_kdtree->copy();
+  else
+    return m_affinity->copy();
+}
+
+// ------------------------------------------------------------------------------------------------
 vtknvindex_KDTree_affinity* vtknvindex_cluster_properties::get_affinity_kdtree() const
 {
   return m_affinity_kdtree.get();
@@ -258,23 +267,16 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
 
   m_rankid_to_hostid[0] = 1;
 
-  std::vector<mi::Sint32> all_gpu_ids;
-  all_gpu_ids.push_back(nv::index::IAffinity_information::ANY_GPU);
-
   std::map<mi::Uint32, vtknvindex_host_properties*>::iterator shmit = m_hostinfo.find(1);
   if (shmit == m_hostinfo.end())
   {
     vtknvindex_host_properties* host_properties = new vtknvindex_host_properties(1, 0, host_name);
-
-    host_properties->set_gpuids(all_gpu_ids);
     host_properties->set_rankids(m_all_rank_ids);
-
     m_hostinfo[1] = host_properties;
   }
   else
   {
     vtknvindex_host_properties* host_properties = shmit->second;
-    host_properties->set_gpuids(all_gpu_ids);
     host_properties->set_rankids(m_all_rank_ids);
   }
 
@@ -353,10 +355,6 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
         time_step, current_rankid, ss.str(), current_bbox, shm_size, volume_data);
     }
   }
-
-  m_affinity->set_hostinfo(m_hostinfo);
-  if (m_affinity_kdtree)
-    m_affinity_kdtree->set_hostinfo(m_hostinfo);
 
   return true;
 }
@@ -445,12 +443,17 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
   }
   controller->AllGather(&cur_data_ptr, &all_data_ptrs[0], 1);
 
+// Define this to match local rank i to GPU i. Otherwise IndeX will to the assignment internally,
+// using all available GPUs.
+//#define VTKNVINDEX_MATCH_GPUS_TO_RANKS
+#ifdef VTKNVINDEX_MATCH_GPUS_TO_RANKS
   // Gather all gpu ids.
   mi::Sint32 gpu_id = current_localrank;
 
   std::vector<mi::Sint32> all_gpu_ids;
   all_gpu_ids.resize(m_num_ranks);
   controller->AllGather(&gpu_id, &all_gpu_ids[0], 1);
+#endif
 
   // Gather host names from all the ranks.
   std::vector<std::string> host_names;
@@ -562,10 +565,16 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
       return false;
     }
 
-    // Set affinity information for NVIDIA IndeX.
-    m_affinity->add_affinity(current_affinity, hostid, all_gpu_ids[i]);
+// Set affinity information for NVIDIA IndeX.
+#ifdef VTKNVINDEX_MATCH_GPUS_TO_RANKS
+    const mi::Uint32 gpu_id = all_gpu_ids[i];
+#else
+    // Let IndeX decide which GPU to use
+    const mi::Uint32 gpu_id = nv::index::IAffinity_information::ANY_GPU;
+#endif
+    m_affinity->add_affinity(current_affinity, hostid, gpu_id);
     if (m_affinity_kdtree)
-      m_affinity_kdtree->add_affinity(current_affinity, hostid, all_gpu_ids[i]);
+      m_affinity_kdtree->add_affinity(current_affinity, hostid, gpu_id);
 
     m_rankid_to_hostid[m_all_rank_ids[i]] = hostid;
 
@@ -577,7 +586,9 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
       vtknvindex_host_properties* host_properties =
         new vtknvindex_host_properties(hostid, current_rankid, host);
 
+#ifdef VTKNVINDEX_MATCH_GPUS_TO_RANKS
       host_properties->set_gpuids(all_gpu_ids);
+#endif
       host_properties->set_rankids(m_all_rank_ids);
 
       m_hostinfo[hostid] = host_properties;
@@ -585,7 +596,9 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
     else
     {
       vtknvindex_host_properties* host_properties = shmit->second;
+#ifdef VTKNVINDEX_MATCH_GPUS_TO_RANKS
       host_properties->set_gpuids(all_gpu_ids);
+#endif
       host_properties->set_rankids(m_all_rank_ids);
     }
 
@@ -652,11 +665,6 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
       host_props->create_volume_neighbor_info(this, time_step);
     }
   }
-
-  // Pass host information to the affinity
-  m_affinity->set_hostinfo(m_hostinfo);
-  if (m_affinity_kdtree)
-    m_affinity_kdtree->set_hostinfo(m_hostinfo);
 
   return true;
 }

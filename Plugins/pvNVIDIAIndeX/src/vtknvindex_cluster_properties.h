@@ -99,6 +99,9 @@ public:
   // Get ParaView's domain subdivision affinity.
   nv::index::IAffinity_information* get_affinity() const;
 
+  // Creates a copy of ParaView's domain subdivision affinity.
+  nv::index::IAffinity_information* copy_affinity() const;
+
   // Get kd-tree affinity, or null if it doesn't exists
   vtknvindex_KDTree_affinity* get_affinity_kdtree() const;
 

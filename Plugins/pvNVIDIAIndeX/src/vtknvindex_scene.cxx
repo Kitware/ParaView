@@ -162,8 +162,8 @@ void vtknvindex_scene::set_visibility(bool visibility)
         nv::index::IAffinity_information* affinity = m_cluster_properties->get_affinity();
 
         // NVIDIA IndeX session will take ownership of the affinity.
-        affinity->retain();
-        m_index_instance->m_iindex_session->set_affinity_information(affinity);
+        m_index_instance->m_iindex_session->set_affinity_information(
+          m_cluster_properties->copy_affinity());
 
         // Access the session instance from the database.
         mi::base::Handle<const nv::index::ISession> session(
@@ -236,9 +236,8 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
     INFO_LOG << s.str();
 
     // NVIDIA IndeX session will take ownership of the affinity.
-    affinity->retain();
-
-    m_index_instance->m_iindex_session->set_affinity_information(affinity);
+    m_index_instance->m_iindex_session->set_affinity_information(
+      m_cluster_properties->copy_affinity());
   }
 
   // GUI settings.
@@ -785,9 +784,8 @@ void vtknvindex_scene::update_volume(
     INFO_LOG << s.str();
 
     // NVIDIA IndeX session will take ownership of the affinity.
-    affinity->retain();
-
-    m_index_instance->m_iindex_session->set_affinity_information(affinity);
+    m_index_instance->m_iindex_session->set_affinity_information(
+      m_cluster_properties->copy_affinity());
   }
 
   // Create and setup the scene.

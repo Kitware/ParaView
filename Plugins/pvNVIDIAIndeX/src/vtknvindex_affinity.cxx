@@ -39,34 +39,15 @@ vtknvindex_affinity::vtknvindex_affinity()
 }
 
 // ------------------------------------------------------------------------------------------------
-vtknvindex_affinity::~vtknvindex_affinity()
-{
-  // empty
-}
-
-// ------------------------------------------------------------------------------------------------
 mi::Uint32 vtknvindex_affinity::get_nb_subregions() const
 {
   return static_cast<mi::Uint32>(m_spatial_subdivision.size());
 }
 
 // ------------------------------------------------------------------------------------------------
-void vtknvindex_affinity::set_hostinfo(std::map<mi::Uint32, vtknvindex_host_properties*>& host_info)
-{
-  m_host_info = host_info;
-  std::map<mi::Uint32, vtknvindex_host_properties*>::iterator it;
-
-  // Prepare a vector that is used to return correct gpu ids later.
-  // Based on a round-robin scheme.
-  for (it = m_host_info.begin(); it != m_host_info.end(); it++)
-    m_roundrobin_ids[it->first] = 0;
-}
-
-// ------------------------------------------------------------------------------------------------
 mi::math::Bbox_struct<mi::Float32, 3> vtknvindex_affinity::get_subregion(mi::Uint32 index) const
 {
-  const affinity_struct& spatial_subdivision = m_spatial_subdivision[index];
-  return spatial_subdivision.m_bbox;
+  return m_spatial_subdivision[index].m_bbox;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -75,51 +56,39 @@ void vtknvindex_affinity::scene_dump_affinity_info(std::ostringstream& s)
   s << "\n"
     << "## User-defined data affinity."
     << "\n";
-  s << "## Set the number of user-defined affinity information in the project file."
-    << "\n";
-
-  s << "index::domain_subdivision::nb_spatial_regions = " << m_final_spatial_subdivision.size()
-    << "\n";
-  s << "index::domain_subdivision::use_affinity_only = 0"
-    << "\n";
-
-  mi::Uint32 nb_elements = static_cast<mi::Uint32>(m_final_spatial_subdivision.size());
-  for (mi::Size i = 0; i < nb_elements; ++i)
-  {
-    affinity_struct& affinity = m_final_spatial_subdivision[i];
-    s << "index::domain_subdivision::spatial_region_" << i << "::bbox = " << affinity.m_bbox.min.x
-      << " " << affinity.m_bbox.min.y << " " << affinity.m_bbox.min.z << " "
-      << affinity.m_bbox.max.x << " " << affinity.m_bbox.max.y << " " << affinity.m_bbox.max.z
-      << "\n";
-    s << "index::domain_subdivision::affinity_information_" << i
-      << "::host = " << affinity.m_host_id << "\n";
-    s << "index::domain_subdivision::affinity_information_" << i << "::gpu = " << affinity.m_gpu_id
-      << "\n";
-  }
 
   s << "index::paraview_subdivision::nb_spatial_regions = " << m_spatial_subdivision.size() << "\n";
   s << "index::paraview_subdivision::use_affinity_only = 0"
     << "\n";
 
-  nb_elements = static_cast<mi::Uint32>(m_spatial_subdivision.size());
-  for (mi::Size i = 0; i < nb_elements; ++i)
+  for (mi::Size i = 0; i < m_spatial_subdivision.size(); ++i)
   {
-    affinity_struct& affinity = m_spatial_subdivision[i];
+    const affinity_struct& affinity = m_spatial_subdivision[i];
     s << "index::paraview_subdivision::spatial_region_" << i << "::bbox = " << affinity.m_bbox.min.x
       << " " << affinity.m_bbox.min.y << " " << affinity.m_bbox.min.z << " "
       << affinity.m_bbox.max.x << " " << affinity.m_bbox.max.y << " " << affinity.m_bbox.max.z
       << "\n";
     s << "index::paraview_subdivision::affinity_information_" << i
       << "::host = " << affinity.m_host_id << "\n";
-    s << "index::paraview_subdivision::affinity_information_" << i
-      << "::gpu = " << affinity.m_gpu_id << "\n";
+
+    if (affinity.m_gpu_id != ~0u)
+      s << "index::paraview_subdivision::affinity_information_" << i
+        << "::gpu = " << affinity.m_gpu_id << "\n";
   }
 }
 
+// ------------------------------------------------------------------------------------------------
 void vtknvindex_affinity::reset_affinity()
 {
   m_spatial_subdivision.clear();
-  m_final_spatial_subdivision.clear();
+}
+
+// ------------------------------------------------------------------------------------------------
+vtknvindex_affinity* vtknvindex_affinity::copy() const
+{
+  vtknvindex_affinity* new_affinity = new vtknvindex_affinity;
+  new_affinity->m_spatial_subdivision = m_spatial_subdivision;
+  return new_affinity;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -136,7 +105,7 @@ bool vtknvindex_affinity::get_affinity(const mi::math::Bbox_struct<mi::Float32, 
 {
   const mi::math::Bbox<mi::Float32, 3> subregion(subregion_st);
 
-  const mi::Uint32 nb_elements = static_cast<mi::Uint32>(m_spatial_subdivision.size());
+  const mi::Size nb_elements = m_spatial_subdivision.size();
   for (mi::Size i = 0; i < nb_elements; ++i)
   {
     const affinity_struct& affinity = m_spatial_subdivision[i];
@@ -144,23 +113,8 @@ bool vtknvindex_affinity::get_affinity(const mi::math::Bbox_struct<mi::Float32, 
     if (affinity.m_bbox.contains(subregion.min) && affinity.m_bbox.contains(subregion.max))
     {
       host_id = affinity.m_host_id;
-
-      auto it = m_host_info.find(affinity.m_host_id);
-      if (it != m_host_info.end())
-      {
-        const vtknvindex_host_properties* host_properties = it->second;
-        host_name->set_c_str(host_properties->get_hostname().c_str());
-      }
-
-      if (get_gpu_id(host_id, gpu_id))
-      {
-        // This is stored here only for the scene dump.
-        affinity_struct affinity_dump(subregion, host_id, gpu_id);
-        m_final_spatial_subdivision.push_back(affinity_dump);
-
-        return true;
-      }
-      return false;
+      gpu_id = affinity.m_gpu_id;
+      return true;
     }
   }
 
@@ -171,51 +125,30 @@ bool vtknvindex_affinity::get_affinity(const mi::math::Bbox_struct<mi::Float32, 
 // ------------------------------------------------------------------------------------------------
 void vtknvindex_affinity::serialize(mi::neuraylib::ISerializer* serializer) const
 {
-  const mi::Uint32 nb_elements = static_cast<mi::Uint32>(m_spatial_subdivision.size());
-  serializer->write(&nb_elements, 1);
+  const mi::Size nb_elements = m_spatial_subdivision.size();
+  serializer->write(&nb_elements);
   for (mi::Size i = 0; i < nb_elements; ++i)
   {
     const affinity_struct& affinity = m_spatial_subdivision[i];
     serializer->write(&affinity.m_bbox.min.x, 6);
-    serializer->write(&affinity.m_host_id, 1);
-    serializer->write(&affinity.m_gpu_id, 1);
+    serializer->write(&affinity.m_host_id);
+    serializer->write(&affinity.m_gpu_id);
   }
 }
 
 // ------------------------------------------------------------------------------------------------
 void vtknvindex_affinity::deserialize(mi::neuraylib::IDeserializer* deserializer)
 {
-  mi::Uint32 nb_elements = 0;
-  deserializer->read(&nb_elements, 1);
+  mi::Size nb_elements = 0;
+  deserializer->read(&nb_elements);
   for (mi::Size i = 0; i < nb_elements; ++i)
   {
     affinity_struct affinity;
     deserializer->read(&affinity.m_bbox.min.x, 6);
-    deserializer->read(&affinity.m_host_id, 1);
-    deserializer->read(&affinity.m_gpu_id, 1);
+    deserializer->read(&affinity.m_host_id);
+    deserializer->read(&affinity.m_gpu_id);
     m_spatial_subdivision.push_back(affinity);
   }
-}
-
-// ------------------------------------------------------------------------------------------------
-bool vtknvindex_affinity::get_gpu_id(mi::Sint32 host_id, mi::Uint32& gpu_id) const
-{
-  std::map<mi::Uint32, vtknvindex_host_properties*>::const_iterator it = m_host_info.find(host_id);
-  if (it == m_host_info.end())
-  {
-    ERROR_LOG << "The host properties for the host (id: " << host_id << ") are not available.";
-    return false;
-  }
-
-  const vtknvindex_host_properties* host_properties = it->second;
-  std::vector<mi::Sint32> host_gpu_ids;
-  host_properties->get_gpuids(host_gpu_ids);
-
-  mi::Sint32 idx = m_roundrobin_ids[host_id] % host_gpu_ids.size();
-  m_roundrobin_ids[host_id]++;
-  gpu_id = host_gpu_ids[idx];
-
-  return true;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -225,29 +158,19 @@ vtknvindex_KDTree_affinity::vtknvindex_KDTree_affinity()
 }
 
 // ------------------------------------------------------------------------------------------------
-vtknvindex_KDTree_affinity::~vtknvindex_KDTree_affinity()
-{
-  // empty
-}
-
-// ------------------------------------------------------------------------------------------------
-void vtknvindex_KDTree_affinity::set_hostinfo(
-  std::map<mi::Uint32, vtknvindex_host_properties*>& host_info)
-{
-  m_host_info = host_info;
-  std::map<mi::Uint32, vtknvindex_host_properties*>::iterator it;
-
-  // Prepare a vector that is used to return correct gpu ids later.
-  // Based on a round-robin scheme.
-  for (it = m_host_info.begin(); it != m_host_info.end(); it++)
-    m_roundrobin_ids[it->first] = 0;
-}
-
-// ------------------------------------------------------------------------------------------------
 void vtknvindex_KDTree_affinity::reset_affinity()
 {
   m_spatial_subdivision.clear();
-  m_final_spatial_subdivision.clear();
+  m_kdtree.clear();
+}
+
+// ------------------------------------------------------------------------------------------------
+vtknvindex_KDTree_affinity* vtknvindex_KDTree_affinity::copy() const
+{
+  vtknvindex_KDTree_affinity* new_affinity = new vtknvindex_KDTree_affinity;
+  new_affinity->m_spatial_subdivision = m_spatial_subdivision;
+  new_affinity->m_kdtree = m_kdtree;
+  return new_affinity;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -265,7 +188,7 @@ bool vtknvindex_KDTree_affinity::get_affinity(
 {
   const mi::math::Bbox<mi::Float32, 3> subregion(subregion_st);
 
-  const mi::Uint32 nb_elements = static_cast<mi::Uint32>(m_spatial_subdivision.size());
+  const mi::Size nb_elements = m_spatial_subdivision.size();
   for (mi::Size i = 0; i < nb_elements; ++i)
   {
     const affinity_struct& affinity = m_spatial_subdivision[i];
@@ -273,23 +196,8 @@ bool vtknvindex_KDTree_affinity::get_affinity(
     if (affinity.m_bbox.contains(subregion.min) && affinity.m_bbox.contains(subregion.max))
     {
       host_id = affinity.m_host_id;
-
-      auto it = m_host_info.find(affinity.m_host_id);
-      if (it != m_host_info.end())
-      {
-        const vtknvindex_host_properties* host_properties = it->second;
-        host_name->set_c_str(host_properties->get_hostname().c_str());
-      }
-
-      if (get_gpu_id(host_id, gpu_id))
-      {
-        // This is stored here only for the scene dump.
-        affinity_struct affinity_dump(subregion, host_id, gpu_id);
-        m_final_spatial_subdivision.push_back(affinity_dump);
-
-        return true;
-      }
-      return false;
+      gpu_id = affinity.m_gpu_id;
+      return true;
     }
   }
 
@@ -307,8 +215,7 @@ mi::Uint32 vtknvindex_KDTree_affinity::get_nb_subregions() const
 mi::math::Bbox_struct<mi::Float32, 3> vtknvindex_KDTree_affinity::get_subregion(
   mi::Uint32 index) const
 {
-  const affinity_struct& spatial_subdivision = m_spatial_subdivision[index];
-  return spatial_subdivision.m_bbox;
+  return m_spatial_subdivision[index].m_bbox;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -356,44 +263,24 @@ void vtknvindex_KDTree_affinity::scene_dump_affinity_info(std::ostringstream& s)
   s << "\n"
     << "## User-defined data affinity (kd-tree)."
     << "\n";
-  s << "## Set the number of user-defined affinity information in the project file."
-    << "\n";
-
-  s << "index::domain_subdivision::nb_spatial_regions = " << m_final_spatial_subdivision.size()
-    << "\n";
-  s << "index::domain_subdivision::use_affinity_only = 0"
-    << "\n";
-
-  mi::Uint32 nb_elements = static_cast<mi::Uint32>(m_final_spatial_subdivision.size());
-  for (mi::Size i = 0; i < nb_elements; ++i)
-  {
-    affinity_struct& affinity = m_final_spatial_subdivision[i];
-    s << "index::domain_subdivision::spatial_region_" << i << "::bbox = " << affinity.m_bbox.min.x
-      << " " << affinity.m_bbox.min.y << " " << affinity.m_bbox.min.z << " "
-      << affinity.m_bbox.max.x << " " << affinity.m_bbox.max.y << " " << affinity.m_bbox.max.z
-      << "\n";
-    s << "index::domain_subdivision::affinity_information_" << i
-      << "::host = " << affinity.m_host_id << "\n";
-    s << "index::domain_subdivision::affinity_information_" << i << "::gpu = " << affinity.m_gpu_id
-      << "\n";
-  }
 
   s << "index::paraview_subdivision::nb_spatial_regions = " << m_spatial_subdivision.size() << "\n";
   s << "index::paraview_subdivision::use_affinity_only = 0"
     << "\n";
 
-  nb_elements = static_cast<mi::Uint32>(m_spatial_subdivision.size());
-  for (mi::Size i = 0; i < nb_elements; ++i)
+  for (mi::Size i = 0; i < m_spatial_subdivision.size(); ++i)
   {
-    affinity_struct& affinity = m_spatial_subdivision[i];
+    const affinity_struct& affinity = m_spatial_subdivision[i];
     s << "index::paraview_subdivision::spatial_region_" << i << "::bbox = " << affinity.m_bbox.min.x
       << " " << affinity.m_bbox.min.y << " " << affinity.m_bbox.min.z << " "
       << affinity.m_bbox.max.x << " " << affinity.m_bbox.max.y << " " << affinity.m_bbox.max.z
       << "\n";
     s << "index::paraview_subdivision::affinity_information_" << i
       << "::host = " << affinity.m_host_id << "\n";
-    s << "index::paraview_subdivision::affinity_information_" << i
-      << "::gpu = " << affinity.m_gpu_id << "\n";
+
+    if (affinity.m_gpu_id != ~0u)
+      s << "index::paraview_subdivision::affinity_information_" << i
+        << "::gpu = " << affinity.m_gpu_id << "\n";
   }
 }
 
@@ -449,27 +336,6 @@ void vtknvindex_KDTree_affinity::deserialize(mi::neuraylib::IDeserializer* deser
     deserializer->read(&node.m_childs[0], 2);
     m_kdtree.push_back(node);
   }
-}
-
-// ------------------------------------------------------------------------------------------------
-bool vtknvindex_KDTree_affinity::get_gpu_id(mi::Sint32 host_id, mi::Uint32& gpu_id) const
-{
-  std::map<mi::Uint32, vtknvindex_host_properties*>::const_iterator it = m_host_info.find(host_id);
-  if (it == m_host_info.end())
-  {
-    ERROR_LOG << "The host properties for the host (id: " << host_id << ") are not available.";
-    return false;
-  }
-
-  const vtknvindex_host_properties* host_properties = it->second;
-  std::vector<mi::Sint32> host_gpu_ids;
-  host_properties->get_gpuids(host_gpu_ids);
-
-  mi::Sint32 idx = m_roundrobin_ids[host_id] % host_gpu_ids.size();
-  m_roundrobin_ids[host_id]++;
-  gpu_id = host_gpu_ids[idx];
-
-  return true;
 }
 
 // ------------------------------------------------------------------------------------------------

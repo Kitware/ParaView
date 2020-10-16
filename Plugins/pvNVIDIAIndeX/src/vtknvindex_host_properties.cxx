@@ -25,7 +25,10 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "vtknvindex_host_properties.h"
+
 #include <iostream>
+#include <sstream>
 
 #ifdef _WIN32
 #else // _WIN32
@@ -34,13 +37,11 @@
 
 #include "vtkMultiProcessController.h"
 
-#include "vtknvindex_forwarding_logger.h"
-#include "vtknvindex_host_properties.h"
-#include "vtknvindex_utilities.h"
-
 #include "vtknvindex_cluster_properties.h"
+#include "vtknvindex_forwarding_logger.h"
 #include "vtknvindex_regular_volume_properties.h"
 #include "vtknvindex_sparse_volume_importer.h"
+#include "vtknvindex_utilities.h"
 
 namespace
 {
@@ -522,21 +523,9 @@ void vtknvindex_host_properties::set_gpuids(std::vector<mi::Sint32> gpuids)
 }
 
 // ------------------------------------------------------------------------------------------------
-void vtknvindex_host_properties::get_gpuids(std::vector<mi::Sint32>& gpuids) const
-{
-  gpuids = m_gpuids;
-}
-
-// ------------------------------------------------------------------------------------------------
 void vtknvindex_host_properties::set_rankids(std::vector<mi::Sint32> rankids)
 {
   m_rankids = rankids;
-}
-
-// ------------------------------------------------------------------------------------------------
-void vtknvindex_host_properties::get_rankids(std::vector<mi::Sint32>& rankids) const
-{
-  rankids = m_rankids;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -768,30 +757,27 @@ void vtknvindex_host_properties::fetch_remote_volume_border_data(
 // ------------------------------------------------------------------------------------------------
 void vtknvindex_host_properties::print_info() const
 {
-  INFO_LOG << "Host name: " << m_hostname << " : hostid: " << m_hostid;
-  INFO_LOG << "------------------";
+  INFO_LOG << "Host name: " << m_hostname << ", hostid: " << m_hostid;
 
-  INFO_LOG << "Rank ids: " << m_rankids.size();
-  std::cout << "        PVPLN  init info : ";
-  for (mi::Uint32 i = 0; i < m_rankids.size(); ++i)
-    std::cout << m_rankids[i] << ", ";
-  std::cout << std::endl;
+  std::ostringstream os_ranks;
+  for (auto id : m_rankids)
+    os_ranks << id << " ";
+  INFO_LOG << "Rank ids: " << os_ranks.str();
 
-  INFO_LOG << "GPU ids: " << m_gpuids.size();
-  std::cout << "        PVPLN  init info : ";
-  for (mi::Uint32 i = 0; i < m_gpuids.size(); ++i)
-    std::cout << m_gpuids[i] << ", ";
-  std::cout << std::endl;
-
-  INFO_LOG << "Shared memory pieces [shmname, shmbbox]";
-  std::map<mi::Uint32, std::vector<shm_info> >::const_iterator shmit = m_shmlist.begin();
-  for (; shmit != m_shmlist.end(); ++shmit)
+  if (!m_gpuids.empty())
   {
-    const std::vector<shm_info>& shmlist = shmit->second;
-    for (mi::Uint32 i = 0; i < shmlist.size(); ++i)
+    std::ostringstream os_gpus;
+    for (mi::Uint32 id : m_gpuids)
+      os_gpus << id << " ";
+    INFO_LOG << "GPU ids: " << os_gpus.str();
+  }
+
+  INFO_LOG << "Shared memory pieces [shmname, shmbbox]:";
+  for (auto& shmit : m_shmlist)
+  {
+    for (const shm_info& info : shmit.second)
     {
-      INFO_LOG << "Time step: " << shmit->first << " " << shmlist[i].m_shm_name << ":"
-               << shmlist[i].m_shm_bbox;
+      INFO_LOG << "Time step: " << shmit.first << " " << info.m_shm_name << ":" << info.m_shm_bbox;
     }
   }
 }

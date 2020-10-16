@@ -34,8 +34,8 @@
 #include <string>
 #include <vector>
 
-#include <mi/base/interface_implement.h>
 #include <mi/math/bbox.h>
+#include <mi/neuraylib/dice.h>
 
 class vtknvindex_cluster_properties;
 class vtknvindex_host_properties;
@@ -181,11 +181,9 @@ public:
 
   // Set/get the GPU ids of the current host.
   void set_gpuids(std::vector<mi::Sint32> gpuids);
-  void get_gpuids(std::vector<mi::Sint32>& gpuids) const;
 
   // Set/get the MPI rank ids of the current host.
   void set_rankids(std::vector<mi::Sint32> rankids);
-  void get_rankids(std::vector<mi::Sint32>& rankids) const;
 
   // Get host name of the current host
   const std::string& get_hostname() const;
