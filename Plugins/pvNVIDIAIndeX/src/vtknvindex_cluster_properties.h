@@ -142,11 +142,26 @@ public:
   // Returns a previously registered instance of this class.
   static vtknvindex_cluster_properties* get_instance(mi::Uint32 instance_id);
 
+  // Store whether the associated representation is visible or not.
+  void set_visibility(bool visible);
+
+  // Returns whether this instance is active for rendering, i.e. if it is the visible instance with
+  // the hightest instance id.
+  bool is_active_instance() const;
+
+  // Activate this instance for rendering. Returns false if it was already active.
+  bool activate();
+
+  // Prints a warning (once) or info message when multiple instance are visible, explaining that
+  // only a single one of them will be rendered.
+  void warn_if_multiple_visible_instances(const std::string& active_array_name);
+
 private:
   vtknvindex_cluster_properties(const vtknvindex_cluster_properties&) = delete;
   void operator=(const vtknvindex_cluster_properties&) = delete;
 
   mi::Uint32 m_instance_id; // Identifier of this instance.
+  bool m_visible;           // Visibility of associated representation.
 
   mi::Sint32 m_rank_id;                                           // Rank id for the host.
   mi::base::Handle<vtknvindex_affinity> m_affinity;               // Affinity for NVIDIA IndeX.
@@ -160,6 +175,8 @@ private:
   std::map<std::string, mi::Uint32> m_hostname_to_hostid; // Host names to host ids.
   std::map<mi::Sint32, mi::Uint32> m_rankid_to_hostid;    // Rank_id to host id.
   std::map<mi::Uint32, vtknvindex_host_properties*> m_hostinfo; // Host_id to host_properties.
+
+  static mi::Uint32 s_active_instance; // Instance that is currently active for rendering.
 
   static std::map<mi::Uint32, vtknvindex_cluster_properties*>
     s_instances; // All registered instances.

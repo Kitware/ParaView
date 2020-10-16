@@ -532,6 +532,11 @@ void vtknvindex_irregular_volume_mapper::rtc_kernel_changed(vtknvindex_rtc_kerne
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol)
 {
+  if (!m_cluster_properties->is_active_instance())
+  {
+    return;
+  }
+
   // Ensure IceT is disabled in MPI mode, print warning only on first rank
   if (m_controller->GetNumberOfProcesses() > 1 && m_controller->GetLocalProcessId() == 0)
   {
@@ -598,6 +603,8 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
   // Wait all ranks finish to write volume data before the render starts.
   m_controller->Barrier();
 
+  bool needs_activate = m_cluster_properties->activate();
+
   if (m_index_instance->is_index_viewer() && m_index_instance->is_index_initialized())
   {
     vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Rendering");
@@ -622,10 +629,19 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
         }
 
         m_scene.create_scene(ren, vol, dice_transaction, vtknvindex_scene::VOLUME_TYPE_IRREGULAR);
+        needs_activate = true;
       }
       else if (m_volume_changed)
       {
         m_scene.update_volume(dice_transaction, vtknvindex_scene::VOLUME_TYPE_IRREGULAR);
+        needs_activate = true;
+      }
+
+      if (needs_activate)
+      {
+        m_cluster_properties->warn_if_multiple_visible_instances(this->GetArrayName());
+        m_scene.activate(dice_transaction.get());
+        m_config_settings_changed = true; // force setting region-of-interest
       }
 
       // Update scene parameters.
@@ -728,5 +744,5 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_irregular_volume_mapper::set_visibility(bool visibility)
 {
-  m_scene.set_visibility(visibility);
+  m_cluster_properties->set_visibility(visibility);
 }

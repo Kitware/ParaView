@@ -55,8 +55,8 @@ public:
   vtknvindex_scene();
   ~vtknvindex_scene();
 
-  // Set volume visibility
-  void set_visibility(bool visibility);
+  // Activate the current scene, will also be called when switching between different datasets.
+  void activate(mi::neuraylib::IDice_transaction* dice_transaction);
 
   // Setup scene for rendering in NVIDIA IndeX.
   void create_scene(vtkRenderer* ren, vtkVolume* vol,

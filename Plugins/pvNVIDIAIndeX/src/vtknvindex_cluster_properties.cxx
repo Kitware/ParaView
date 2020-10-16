@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <sstream>
 #include <string>
 
 #include "vtkFloatArray.h"
@@ -74,11 +75,15 @@ size_t vtknvindex_irregular_volume_data::get_memory_size(const std::string& scal
 }
 
 // ------------------------------------------------------------------------------------------------
+mi::Uint32 vtknvindex_cluster_properties::s_active_instance = 0;
+
+// ------------------------------------------------------------------------------------------------
 std::map<mi::Uint32, vtknvindex_cluster_properties*> vtknvindex_cluster_properties::s_instances;
 
 // ------------------------------------------------------------------------------------------------
 vtknvindex_cluster_properties::vtknvindex_cluster_properties(bool use_kdtree)
   : m_rank_id(-1)
+  , m_visible(true)
 {
   // Register the instance
   static mi::Uint32 instance_counter = 0;
@@ -725,5 +730,77 @@ vtknvindex_cluster_properties* vtknvindex_cluster_properties::get_instance(mi::U
   else
   {
     return nullptr;
+  }
+}
+
+// ------------------------------------------------------------------------------------------------
+void vtknvindex_cluster_properties::set_visibility(bool visible)
+{
+  m_visible = visible;
+}
+
+// ------------------------------------------------------------------------------------------------
+bool vtknvindex_cluster_properties::is_active_instance() const
+{
+  // Determine visible instance with the highest instance id.
+  mi::Uint32 max_visible_instance = 0;
+  for (auto& instances : s_instances)
+  {
+    if (instances.first > max_visible_instance && instances.second->m_visible)
+    {
+      max_visible_instance = instances.first;
+    }
+  }
+
+  return (max_visible_instance == get_instance_id());
+}
+
+// ------------------------------------------------------------------------------------------------
+bool vtknvindex_cluster_properties::activate()
+{
+  if (s_active_instance != get_instance_id())
+  {
+    s_active_instance = get_instance_id();
+    return true;
+  }
+  else
+  {
+    // Already active
+    return false;
+  }
+}
+
+// ------------------------------------------------------------------------------------------------
+void vtknvindex_cluster_properties::warn_if_multiple_visible_instances(
+  const std::string& active_array_name)
+{
+  mi::Uint32 visible_count = 0;
+  for (auto& instances : s_instances)
+  {
+    if (instances.second->m_visible)
+    {
+      visible_count++;
+    }
+  }
+
+  if (visible_count <= 1)
+  {
+    return;
+  }
+
+  std::ostringstream os;
+  os << "Multiple sources are marked as visible in the Pipeline Browser, but the NVIDIA IndeX "
+     << "plugin will only render the one that was added last (data array '" << active_array_name
+     << "').";
+
+  static bool already = false;
+  if (!already)
+  {
+    WARN_LOG << os.str() << " This warning will only be printed once.";
+    already = true;
+  }
+  else
+  {
+    INFO_LOG << os.str();
   }
 }
