@@ -28,8 +28,8 @@
 #ifndef vtknvindex_volumemapper_h
 #define vtknvindex_volumemapper_h
 
-#include <cstdio>
 #include <map>
+#include <set>
 #include <string>
 
 #include <nv/index/icamera.h>
@@ -149,6 +149,8 @@ private:
   std::vector<void*> m_subset_ptrs; // Array with pointers to scalars data for all time steps.
 
   mi::Float64 m_whole_bounds[6]; // Whole volume bounds.
+
+  std::set<std::string> m_data_array_warning_printed; // A warning was already printed for these
 
   vtknvindex_rtc_params_buffer m_volume_rtc_kernel; // The CUDA code applied to the current volume.
 

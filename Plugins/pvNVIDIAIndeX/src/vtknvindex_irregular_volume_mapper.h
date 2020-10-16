@@ -28,7 +28,7 @@
 #ifndef vtknvindex_irregular_volume_mapper_h
 #define vtknvindex_irregular_volume_mapper_h
 
-#include <cstdio>
+#include <set>
 #include <string>
 
 #include <nv/index/icamera.h>
@@ -146,6 +146,8 @@ private:
 
   std::vector<vtkBoundingBox> m_raw_cuts; // Raw cuts used to reconstruct kd-tree, optional.
   std::vector<int> m_raw_cuts_ranks;      // Ranks associated with the raw cuts.
+
+  std::set<std::string> m_data_array_warning_printed; // A warning was already printed for these
 
   mi::Float64 m_subregion_bounds[6]; // bounds when using ordered compositing.
   mi::Float64 m_whole_bounds[6];     // whole volume bounds.
