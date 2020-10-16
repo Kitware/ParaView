@@ -261,7 +261,7 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
   {
     WARN_LOG << "The data array '" << this->ArrayName << "' has scalar values "
              << "in double precision format, which is not natively supported by NVIDIA IndeX. "
-             << "The plug-in will proceed to convert the values from double to float with the "
+             << "The plugin will proceed to convert the values from double to float with the "
                 "corresponding overhead.";
   }
 
@@ -458,7 +458,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
     static bool IceT_was_enabled = false;
     if (!vtkPVRenderViewSettings::GetInstance()->GetDisableIceT())
     {
-      WARN_LOG << "IceT compositing must be disabled when using the NVIDIA IndeX plug-in with MPI, "
+      WARN_LOG << "IceT compositing must be disabled when using the NVIDIA IndeX plugin with MPI, "
                   "otherwise nothing will be rendered. "
                << "Please open 'Edit | Settings', go to the 'Render View' tab, activate 'Advanced "
                   "Properties' (gear icon) and check 'Disable IceT'. "
@@ -664,7 +664,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
   {
     static bool first = true;
     if (first)
-      ERROR_LOG << "The NVIDIA IndeX plug-in was not initialized! See the log output for details.";
+      ERROR_LOG << "The NVIDIA IndeX plugin was not initialized! See the log output for details.";
     first = false;
   }
 

@@ -101,7 +101,7 @@ void vtknvindex_performance_values::print_perf_values(
                   "--------------------------------------------------------------------------------"
                << "\n";
 
-    header_str << "NVIDIA IndeX ParaView plug-in version : " << index_instance->get_version()
+    header_str << "NVIDIA IndeX ParaView plugin version : " << index_instance->get_version()
                << "\n";
 
     const mi::base::Handle<nv::index::IIndex>& index = index_instance->get_interface();

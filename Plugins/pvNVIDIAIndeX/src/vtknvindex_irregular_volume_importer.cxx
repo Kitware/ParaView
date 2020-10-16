@@ -233,7 +233,7 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
         if (!gave_error)
         {
           ERROR_LOG << "Encountered non-tetrahedral cell with " << npts
-                    << " points. The NVIDIA IndeX plug-in currently "
+                    << " points. The NVIDIA IndeX plugin currently "
                        "supports tetrahedral cells only.";
           gave_error = true;
         }

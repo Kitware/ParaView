@@ -379,7 +379,7 @@ bool vtknvindex_instance::load_nvindex()
     return false;
   }
 
-  // Check that this IndeX library is compatible with this plug-in version
+  // Check that this IndeX library is compatible with this plugin version
   const std::string build_revision_str = NVIDIA_INDEX_LIBRARY_REVISION_STRING;
   const std::string library_revision_full_str = m_nvindex_interface->get_revision();
   bool revision_mismatch = false;
@@ -438,7 +438,7 @@ bool vtknvindex_instance::load_nvindex()
         // during ParaView startup. The message will however become visible when another error is
         // later triggered in Render().
         ERROR_LOG << "The loaded NVIDIA IndeX library build '" << library_revision_full_str
-                  << "' is not compatible with this plug-in version '" << get_version()
+                  << "' is not compatible with this plugin version '" << get_version()
                   << "', which was built against revision '" << build_revision_str << "' "
                   << "Please check your ParaView installation or get the matching IndeX libraries "
                   << "from the ParaView dependencies repository: "
@@ -479,7 +479,7 @@ bool vtknvindex_instance::load_nvindex()
   }
 
   // Access and log NVIDIA IndeX version.
-  INFO_LOG << "NVIDIA IndeX ParaView plug-in " << get_version() << " "
+  INFO_LOG << "NVIDIA IndeX ParaView plugin " << get_version() << " "
            << (revision_mismatch ? "(compiled against " + build_revision_str + ") " : "")
            << "using NVIDIA IndeX library " << m_nvindex_interface->get_version() << " (build "
            << library_revision_full_str << ").";
@@ -818,6 +818,8 @@ bool vtknvindex_instance::setup_nvindex()
 #if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 327600)
     // Reduce log output
     idebug_configuration->set_option("debug_configuration_quiet=yes");
+    // Set optimized flags
+    idebug_configuration->set_option("integration_flags=8");
 #endif
 
     // Don't pre-allocate buffers for rasterizer
@@ -829,7 +831,7 @@ bool vtknvindex_instance::setup_nvindex()
     // Disable IndeX parallel importing, given importeres are already parallelized.
     idebug_configuration->set_option("async_subset_load=0");
 
-    // Use strict domain subdivision only with multiples ranks.
+    // Use strict domain subdivision only with multiple ranks.
     if (vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() > 1)
       idebug_configuration->set_option("use_strict_domain_subdivision=1");
 

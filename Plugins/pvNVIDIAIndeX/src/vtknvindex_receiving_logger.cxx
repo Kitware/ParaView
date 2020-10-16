@@ -81,7 +81,7 @@ void vtknvindex_receiving_logger::message(mi::base::Message_severity level, cons
         already = true;
         message_str = std::string("Note: It is recommended to explicitly set the "
                                   "'cluster_interface_address' option. See the NVIDIA IndeX for "
-                                  "ParaView Plug-In User's Guide for details.\n") +
+                                  "ParaView Plugin User's Guide for details.\n") +
           prefix + message_str;
       }
     }

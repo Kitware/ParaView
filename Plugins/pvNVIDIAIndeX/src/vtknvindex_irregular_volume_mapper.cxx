@@ -230,7 +230,7 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
   {
     WARN_LOG << "The data array '" << this->ArrayName << "' has scalar values "
              << "in double precision format, which is not natively supported by NVIDIA IndeX. "
-             << "The plug-in will proceed to convert the values from double to float with the "
+             << "The plugin will proceed to convert the values from double to float with the "
              << "corresponding overhead.";
   }
 
@@ -300,7 +300,7 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
         if (!gave_error)
         {
           ERROR_LOG << "Encountered non-tetrahedral cell with " << npts
-                    << " points. The NVIDIA IndeX plug-in currently "
+                    << " points. The NVIDIA IndeX plugin currently "
                        "supports tetrahedral cells only.";
           gave_error = true;
         }
@@ -530,7 +530,7 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
     static bool IceT_was_enabled = false;
     if (!vtkPVRenderViewSettings::GetInstance()->GetDisableIceT())
     {
-      WARN_LOG << "IceT compositing must be disabled when using the NVIDIA IndeX plug-in with MPI, "
+      WARN_LOG << "IceT compositing must be disabled when using the NVIDIA IndeX plugin with MPI, "
                   "otherwise nothing will be rendered. "
                << "Please open 'Edit | Settings', go to the 'Render View' tab, activate 'Advanced "
                   "Properties' (gear icon) and check 'Disable IceT'. "
@@ -706,7 +706,7 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
   {
     static bool first = true;
     if (first)
-      ERROR_LOG << "The NVIDIA IndeX plug-in was not initialized! See the log output for details.";
+      ERROR_LOG << "The NVIDIA IndeX plugin was not initialized! See the log output for details.";
     first = false;
   }
 

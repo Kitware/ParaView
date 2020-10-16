@@ -33,7 +33,6 @@
 
 #include "vtknvindex_scene.h"
 
-#include <nv/index/idistributed_compute_algorithm.h>
 #include <nv/index/idistributed_data_import_callback.h>
 #include <nv/index/iirregular_volume_rendering_properties.h>
 #include <nv/index/ilight.h>

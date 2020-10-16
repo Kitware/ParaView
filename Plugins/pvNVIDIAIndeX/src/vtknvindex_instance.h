@@ -68,7 +68,7 @@ public:
   // Get the NVIDIA IndeX interface handle.
   mi::base::Handle<nv::index::IIndex>& get_interface();
 
-  // Plug-in version
+  // Plugin version
   const char* get_version() const;
 
 public:
