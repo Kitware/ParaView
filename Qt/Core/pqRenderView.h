@@ -360,7 +360,7 @@ private:
   void selectPolygonInternal(vtkIntArray* polygon, QList<pqOutputPort*>&, bool select_points,
     int selectionModifier, bool select_blocks);
 
-  void emitSelectionSignal(QList<pqOutputPort*>);
+  void emitSelectionSignal(QList<pqOutputPort*> outputPorts, int selectionModifier);
 
   void collectSelectionPorts(vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources, QList<pqOutputPort*>& pqPorts, int selectionModifier,

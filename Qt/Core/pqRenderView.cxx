@@ -545,11 +545,11 @@ void pqRenderView::selectOnSurface(int rect[4], int selectionModifier, const cha
 {
   QList<pqOutputPort*> opPorts;
   this->selectOnSurfaceInternal(rect, opPorts, false, selectionModifier, false, array);
-  this->emitSelectionSignal(opPorts);
+  this->emitSelectionSignal(opPorts, selectionModifier);
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderView::emitSelectionSignal(QList<pqOutputPort*> opPorts)
+void pqRenderView::emitSelectionSignal(QList<pqOutputPort*> opPorts, int selectionModifier)
 {
   // Fire selection event to let the world know that this view selected
   // something.
@@ -559,7 +559,11 @@ void pqRenderView::emitSelectionSignal(QList<pqOutputPort*> opPorts)
   }
   else
   {
-    Q_EMIT this->selected(0);
+    if (selectionModifier == pqView::PV_SELECTION_DEFAULT)
+    {
+      // Only emit an empty selection if we aren't modifying the current selection
+      Q_EMIT this->selected(0);
+    }
   }
 
   if (this->UseMultipleRepresentationSelection)
@@ -739,7 +743,7 @@ void pqRenderView::selectPointsOnSurface(int rect[4], int selectionModifier, con
   this->selectOnSurfaceInternal(rect, output_ports, true, selectionModifier, false, array);
   // Fire selection event to let the world know that this view selected
   // something.
-  this->emitSelectionSignal(output_ports);
+  this->emitSelectionSignal(output_ports, selectionModifier);
 }
 
 //-----------------------------------------------------------------------------
@@ -749,7 +753,7 @@ void pqRenderView::selectPolygonPoints(vtkIntArray* polygon, int selectionModifi
   this->selectPolygonInternal(polygon, output_ports, true, selectionModifier, false);
   // Fire selection event to let the world know that this view selected
   // something.
-  this->emitSelectionSignal(output_ports);
+  this->emitSelectionSignal(output_ports, selectionModifier);
 }
 
 //-----------------------------------------------------------------------------
@@ -759,7 +763,7 @@ void pqRenderView::selectPolygonCells(vtkIntArray* polygon, int selectionModifie
   this->selectPolygonInternal(polygon, output_ports, false, selectionModifier, false);
   // Fire selection event to let the world know that this view selected
   // something.
-  this->emitSelectionSignal(output_ports);
+  this->emitSelectionSignal(output_ports, selectionModifier);
 }
 
 //-----------------------------------------------------------------------------
@@ -829,7 +833,7 @@ void pqRenderView::selectFrustum(int rect[4])
         rect, selectedRepresentations, selectionSources, this->UseMultipleRepresentationSelection))
   {
     END_UNDO_EXCLUDE();
-    this->emitSelectionSignal(output_ports);
+    this->emitSelectionSignal(output_ports, pqView::PV_SELECTION_DEFAULT);
     return;
   }
 
@@ -851,7 +855,7 @@ void pqRenderView::selectFrustum(int rect[4])
 
   // Fire selection event to let the world know that this view selected
   // something.
-  this->emitSelectionSignal(output_ports);
+  this->emitSelectionSignal(output_ports, pqView::PV_SELECTION_DEFAULT);
 }
 
 //-----------------------------------------------------------------------------
@@ -868,7 +872,7 @@ void pqRenderView::selectFrustumPoints(int rect[4])
         rect, selectedRepresentations, selectionSources, this->UseMultipleRepresentationSelection))
   {
     END_UNDO_EXCLUDE();
-    this->emitSelectionSignal(output_ports);
+    this->emitSelectionSignal(output_ports, pqView::PV_SELECTION_DEFAULT);
     return;
   }
 
@@ -890,7 +894,7 @@ void pqRenderView::selectFrustumPoints(int rect[4])
 
   // Fire selection event to let the world know that this view selected
   // something.
-  this->emitSelectionSignal(output_ports);
+  this->emitSelectionSignal(output_ports, pqView::PV_SELECTION_DEFAULT);
 }
 
 //-----------------------------------------------------------------------------
@@ -901,7 +905,7 @@ void pqRenderView::selectBlock(int rectangle[4], int selectionModifier)
   this->selectOnSurfaceInternal(rectangle, opPorts, false, selectionModifier, true);
 
   this->blockSignals(block);
-  this->emitSelectionSignal(opPorts);
+  this->emitSelectionSignal(opPorts, selectionModifier);
 }
 
 //-----------------------------------------------------------------------------
