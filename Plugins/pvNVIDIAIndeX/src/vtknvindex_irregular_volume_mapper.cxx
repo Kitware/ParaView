@@ -591,6 +591,13 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
     return;
   }
 
+  bool needs_activate = m_cluster_properties->activate();
+  if (needs_activate)
+  {
+    // Importers might be triggered again, so data must be made available
+    m_is_data_prepared = false;
+  }
+
   // Prepare data to be rendered.
   if ((!m_is_data_prepared || m_volume_changed) && !prepare_data())
   {
@@ -602,8 +609,6 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
 
   // Wait all ranks finish to write volume data before the render starts.
   m_controller->Barrier();
-
-  bool needs_activate = m_cluster_properties->activate();
 
   if (m_index_instance->is_index_viewer() && m_index_instance->is_index_initialized())
   {

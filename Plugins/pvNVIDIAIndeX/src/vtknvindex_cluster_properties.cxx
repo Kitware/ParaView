@@ -107,14 +107,13 @@ vtknvindex_cluster_properties::vtknvindex_cluster_properties(bool use_kdtree)
 vtknvindex_cluster_properties::~vtknvindex_cluster_properties()
 {
   // Unlink shared memory and delete host properties.
-  std::map<mi::Uint32, vtknvindex_host_properties*>::iterator shmit = m_hostinfo.begin();
-  for (; shmit != m_hostinfo.end(); ++shmit)
+  for (auto& shmit : m_hostinfo)
   {
-    if (shmit->second)
+    vtknvindex_host_properties* host_props = shmit.second;
+    if (host_props)
     {
-      shmit->second->shm_cleanup(false);
-      delete shmit->second;
-      shmit->second = NULL;
+      host_props->shm_cleanup(true);
+      delete host_props;
     }
   }
 
@@ -295,10 +294,8 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
   for (mi::Uint32 time_step = 0; time_step < nb_time_steps; ++time_step)
   {
     std::stringstream ss;
-    ss << "pv_nvindex_shm_rank_";
-    ss << current_rankid;
-    ss << "_timestep_";
-    ss << time_step;
+    ss << "pv_nvindex_shm_instance_" << m_instance_id << "_rank_" << current_rankid << "_timestep_"
+       << time_step;
 
 #ifndef _WIN32
     ss << "_" << vtknvindex::util::get_process_user_name();
@@ -612,10 +609,8 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
     for (mi::Uint32 time_step = 0; time_step < nb_time_steps; ++time_step)
     {
       std::stringstream ss;
-      ss << "pv_nvindex_shm_rank_";
-      ss << current_rankid;
-      ss << "_timestep_";
-      ss << time_step;
+      ss << "pv_nvindex_shm_instance_" << m_instance_id << "_rank_" << current_rankid
+         << "_timestep_" << time_step;
 
 #ifndef _WIN32
       ss << "_" << vtknvindex::util::get_process_user_name();

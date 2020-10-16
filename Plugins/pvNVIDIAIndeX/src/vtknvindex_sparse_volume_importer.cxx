@@ -680,6 +680,8 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
 
   dice_transaction->execute_fragmented(&import_bricks_job, import_bricks_job.get_nb_fragments());
 
+  host_props->set_read_flag(time_step, shm_info->m_shm_name);
+
   if (free_buffer)
   {
     // Free temporary data buffer (used for double-float conversion)

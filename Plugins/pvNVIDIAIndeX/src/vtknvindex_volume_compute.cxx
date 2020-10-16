@@ -204,6 +204,8 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
 
   dice_transaction->execute_fragmented(&import_bricks_job, import_bricks_job.get_nb_fragments());
 
+  host_props->set_read_flag(time_step, shm_info->m_shm_name);
+
   if (free_buffer)
   {
     // Free temporary data buffer (used for double-float conversion)

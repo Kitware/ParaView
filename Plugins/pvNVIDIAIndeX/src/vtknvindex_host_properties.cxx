@@ -407,26 +407,57 @@ vtknvindex_host_properties::~vtknvindex_host_properties()
 // ------------------------------------------------------------------------------------------------
 void vtknvindex_host_properties::shm_cleanup(bool reset)
 {
-  for (auto& it : m_shmlist)
+  for (auto& timestep : m_shmlist)
   {
-    for (shm_info& current_shm : it.second)
+    bool all_shm_read = true;
+    if (!reset)
     {
-      if (current_shm.m_mapped_subset_ptr)
+      for (shm_info& current_shm : timestep.second)
       {
-        vtknvindex::util::unmap_shm(current_shm.m_mapped_subset_ptr, current_shm.m_size);
-        current_shm.m_mapped_subset_ptr = nullptr;
+        if (current_shm.m_subset_ptr == nullptr && !current_shm.m_read_flag)
+        {
+          all_shm_read = false;
+          break;
+        }
       }
 
-      // TODO: Only call unlink on the rank that created the shared memory
-
-      // Remove shared memory (skip when local subset was available)
-      if (!current_shm.m_subset_ptr)
+      if (!all_shm_read)
       {
+        // Not all shared memory have been read. Can't free individual ones after they have been
+        // read, because they might still be needed for boundary data access from other importers on
+        // the same host (fetching boundary data from remote hosts is not affected, as it fetches
+        // directly from the ranks that have the data).
+        continue;
+      }
+    }
+
+    for (shm_info& current_shm : timestep.second)
+    {
+      if (current_shm.m_subset_ptr == nullptr)
+      {
+        // Data is not in local memory
+        bool was_unmapped = false;
+
+        // Unmap the shared memory if it is currently mapped
+        if (current_shm.m_mapped_subset_ptr != nullptr)
+        {
+          vtknvindex::util::unmap_shm(current_shm.m_mapped_subset_ptr, current_shm.m_size);
+          current_shm.m_mapped_subset_ptr = nullptr;
+          was_unmapped = true;
+        }
+
+        // Unlink (delete) shared memory object.
+        if (was_unmapped || reset)
+        {
 #ifdef _WIN32
 // TODO: Unlink using windows functions
 #else  // _WIN32
-        shm_unlink(current_shm.m_shm_name.c_str());
+          if (shm_unlink(current_shm.m_shm_name.c_str()) == 0)
+          {
+            INFO_LOG << "Freed shared memory: " << current_shm.m_shm_name;
+          }
 #endif // _WIN32
+        }
       }
 
       // Also remove any fetched neighbor data
@@ -435,7 +466,9 @@ void vtknvindex_host_properties::shm_cleanup(bool reset)
   }
 
   if (reset)
+  {
     m_shmlist.clear();
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -464,6 +497,26 @@ void vtknvindex_host_properties::set_shminfo(mi::Uint32 time_step, mi::Sint32 ra
     ceil((shmvolume.y / subcube_size)) * ceil((shmvolume.z / subcube_size));
 
   m_shmref[shmname] = static_cast<mi::Uint32>(shm_reference_count);
+}
+
+// ------------------------------------------------------------------------------------------------
+void vtknvindex_host_properties::set_read_flag(mi::Uint32 time_step, std::string shmname)
+{
+  auto shmit = m_shmlist.find(time_step);
+  if (shmit != m_shmlist.end())
+  {
+    for (shm_info& info : shmit->second)
+    {
+      if (info.m_shm_name == shmname)
+      {
+        info.m_read_flag = true;
+        return;
+      }
+    }
+  }
+
+  ERROR_LOG << "Could not set read flag for shared memory information '" << shmname
+            << "' in time step " << time_step << ".";
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -580,7 +633,7 @@ vtknvindex_host_properties::get_shminfo_intersect(
 // ------------------------------------------------------------------------------------------------
 const mi::Uint8* vtknvindex_host_properties::get_subset_data_buffer(
   const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step,
-  const vtknvindex_host_properties::shm_info** shm_info_out)
+  const vtknvindex_host_properties::shm_info** shm_info_out, bool support_time_steps)
 {
   vtknvindex_host_properties::shm_info* shm_info = get_shminfo(bbox, time_step);
   if (shm_info_out)
@@ -598,9 +651,16 @@ const mi::Uint8* vtknvindex_host_properties::get_subset_data_buffer(
   if (shm_info->m_subset_ptr)
   {
     // Data is locally available in this rank, return directly
-    void** subdivision_pointers = static_cast<void**>(shm_info->m_subset_ptr);
-    // TODO: multiple timesteps only supported in non-MPI mode?
-    return reinterpret_cast<mi::Uint8*>(subdivision_pointers[time_step]);
+    if (support_time_steps)
+    {
+      void** subdivision_pointers = static_cast<void**>(shm_info->m_subset_ptr);
+      // TODO: multiple timesteps only supported in non-MPI mode?
+      return reinterpret_cast<const mi::Uint8*>(subdivision_pointers[time_step]);
+    }
+    else
+    {
+      return reinterpret_cast<const mi::Uint8*>(shm_info->m_subset_ptr);
+    }
   }
 
   // Data must be in shared memory, map it if not already the case

@@ -527,6 +527,13 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
   mi::Sint32 cur_time_step =
     m_cluster_properties->get_regular_volume_properties()->get_current_time_step();
 
+  bool needs_activate = m_cluster_properties->activate();
+  if (needs_activate)
+  {
+    // Importers might be triggered again, so data must be made available
+    m_time_step_data_prepared.clear();
+  }
+
   if (!is_data_prepared(cur_time_step) || m_volume_changed)
   {
     if (!prepare_data(cur_time_step))
@@ -566,8 +573,6 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
     // Wait for all ranks to finish writing volume data before the render starts.
     m_controller->Barrier();
   }
-
-  bool needs_activate = m_cluster_properties->activate();
 
   if (m_index_instance->is_index_viewer() && m_index_instance->is_index_initialized())
   {
