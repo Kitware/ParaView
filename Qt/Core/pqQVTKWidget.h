@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QVTKInteractor.h"
 #include "pqCoreModule.h"
+#include "pqQVTKWidgetBase.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
 #include "vtkRenderWindow.h"
@@ -113,7 +114,7 @@ protected:
   bool renderVTK();
   bool canRender();
 
-#if PARAVIEW_USING_QVTKOPENGLWIDGET
+#if PARAVIEW_USING_QVTKOPENGLSTEREOWIDGET
   void resizeEvent(QResizeEvent* evt) override;
 #endif
 
