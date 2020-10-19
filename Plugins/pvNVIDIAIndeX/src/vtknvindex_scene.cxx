@@ -153,7 +153,7 @@ void vtknvindex_scene::activate(mi::neuraylib::IDice_transaction* dice_transacti
     dice_transaction->access<nv::index::IStatic_scene_group>(
       m_index_instance->get_scene_geom_group()));
 
-  for (size_t i = 0; i < scene_geom_group->nb_elements(); ++i)
+  for (mi::Uint32 i = 0; i < scene_geom_group->nb_elements(); ++i)
   {
     const mi::neuraylib::Tag group_tag = scene_geom_group->get_scene_element(i);
     mi::base::Handle<const nv::index::IStatic_scene_group> group(

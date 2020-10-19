@@ -574,7 +574,7 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
     const mi::Uint32 gpu_id = all_gpu_ids[i];
 #else
     // Let IndeX decide which GPU to use
-    const mi::Uint32 gpu_id = nv::index::IAffinity_information::ANY_GPU;
+    const mi::Uint32 gpu_id = static_cast<mi::Uint32>(nv::index::IAffinity_information::ANY_GPU);
 #endif
     m_affinity->add_affinity(current_affinity, hostid, gpu_id);
     if (m_affinity_kdtree)

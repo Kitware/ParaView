@@ -97,7 +97,7 @@ void vtknvindex_affinity::add_affinity(
 
 // ------------------------------------------------------------------------------------------------
 bool vtknvindex_affinity::get_affinity(const mi::math::Bbox_struct<mi::Float32, 3>& subregion_st,
-  mi::Uint32& host_id, mi::IString* host_name, mi::Uint32& gpu_id) const
+  mi::Uint32& host_id, mi::IString* /*host_name*/, mi::Uint32& gpu_id) const
 {
   const mi::math::Bbox<mi::Float32, 3> subregion(subregion_st);
 
@@ -180,7 +180,7 @@ void vtknvindex_KDTree_affinity::add_affinity(
 // ------------------------------------------------------------------------------------------------
 bool vtknvindex_KDTree_affinity::get_affinity(
   const mi::math::Bbox_struct<mi::Float32, 3>& subregion_st, mi::Uint32& host_id,
-  mi::IString* host_name, mi::Uint32& gpu_id) const
+  mi::IString* /*host_name*/, mi::Uint32& gpu_id) const
 {
   const mi::math::Bbox<mi::Float32, 3> subregion(subregion_st);
 
