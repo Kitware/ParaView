@@ -49,14 +49,6 @@ build:linux-osmesa:
         - .cmake_build_artifacts
         - .run_manually
 
-build:linux-icc:
-    extends:
-        - .fedora31_icc
-        - .linux_builder_icc
-        - .linux_builder_tags
-        - .cmake_build_artifacts
-        - .run_manually
-
 test:linux-osmesa:
     extends:
         - .fedora31_osmesa
@@ -68,6 +60,14 @@ test:linux-osmesa:
         - build:linux-osmesa
     needs:
         - build:linux-osmesa
+
+build:linux-icc:
+    extends:
+        - .fedora31_icc
+        - .linux_builder_icc
+        - .linux_builder_tags
+        - .cmake_build_artifacts
+        - .run_manually
 
 test:linux-icc:
     extends:
