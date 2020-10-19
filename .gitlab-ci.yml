@@ -47,7 +47,7 @@ build:linux-osmesa:
         - .linux_builder_osmesa
         - .linux_builder_tags
         - .cmake_build_artifacts
-        - .run_automatically
+        - .run_manually
 
 build:linux-icc:
     extends:
@@ -55,7 +55,7 @@ build:linux-icc:
         - .linux_builder_icc
         - .linux_builder_tags
         - .cmake_build_artifacts
-        - .run_automatically
+        - .run_manually
 
 test:linux-osmesa:
     extends:
