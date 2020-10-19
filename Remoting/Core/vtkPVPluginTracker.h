@@ -33,10 +33,13 @@
 #include "vtkRemotingCoreModule.h" // needed for exports
 #include "vtkSmartPointer.h"       // needed for vtkSmartPointer
 
+#include <vector> // for std::vector
+
 class vtkPVPlugin;
 class vtkPVXMLElement;
 
 typedef bool (*vtkPluginSearchFunction)(const char*);
+typedef void (*vtkPluginListFunction)(const char* appname, std::vector<std::string>& names);
 
 class VTKREMOTINGCORE_EXPORT vtkPVPluginTracker : public vtkObject
 {
@@ -118,13 +121,16 @@ public:
   bool GetPluginAutoLoad(unsigned int index);
   //@}
 
+  //@{
   /**
    * Sets the function used to load static plugins.
    */
   static void RegisterStaticPluginSearchFunction(vtkPluginSearchFunction function);
+  static void RegisterStaticPluginListFunction(vtkPluginListFunction function);
 #ifndef VTK_LEGACY_REMOVE
   static VTK_LEGACY(void SetStaticPluginSearchFunction(vtkPluginSearchFunction function));
 #endif
+  //@}
 
   enum
   {
