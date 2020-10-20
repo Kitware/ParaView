@@ -31,6 +31,7 @@
 #include <sstream>
 
 #ifdef _WIN32
+#define NOMINMAX
 #include <windows.h>
 #else // _WIN32
 #include <dlfcn.h>

@@ -97,6 +97,9 @@ vtknvindex_cluster_properties::vtknvindex_cluster_properties(bool use_kdtree)
   {
     m_affinity_kdtree = new vtknvindex_KDTree_affinity();
   }
+#else
+  // prevent compile warning
+  (void)use_kdtree;
 #endif
 
   m_config_settings = new vtknvindex_config_settings();
