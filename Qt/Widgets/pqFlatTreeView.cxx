@@ -3727,7 +3727,7 @@ void pqFlatTreeView::drawData(QPainter& painter, int px, int py, const QModelInd
     {
       // Set the text color based on the highlighted state.
       painter.save();
-      QVariant color = this->Model->data(index, Qt::TextColorRole);
+      QVariant color = this->Model->data(index, Qt::ForegroundRole);
       if (selected)
       {
         painter.setPen(options.palette.color(QPalette::Normal, QPalette::HighlightedText));
