@@ -37,8 +37,13 @@
 #include <mi/math/bbox.h>
 #include <mi/neuraylib/iserializer.h>
 
-#include <nv/index/iaffinity_information.h>
 #include <nv/index/version.h>
+
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR <= 327600)
+#include <mi/neuraylib/istring.h>
+#endif
+
+#include <nv/index/iaffinity_information.h>
 
 #if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 327600)
 #define VTKNVINDEX_USE_KDTREE
