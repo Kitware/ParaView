@@ -39,47 +39,47 @@ build:spack-centos7:
         - .linux_builder_tags
         - .run_scheduled
 
-## OSmesa and Intel ICC
+## Linux
 
-build:linux-osmesa:
+build:fedora31-static-mpi-offscreen-osmesa-python:
     extends:
-        - .fedora31_osmesa
-        - .linux_builder_osmesa
+        - .fedora31_static_mpi_offscreen_osmesa_python
+        - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
         - .run_manually
 
-test:linux-osmesa:
+test:fedora31-static-mpi-offscreen-osmesa-python:
     extends:
-        - .fedora31_osmesa
-        - .linux_tester_osmesa
+        - .fedora31_static_mpi_offscreen_osmesa_python
+        - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
-        - build:linux-osmesa
+        - build:fedora31-static-mpi-offscreen-osmesa-python
     needs:
-        - build:linux-osmesa
+        - build:fedora31-static-mpi-offscreen-osmesa-python
 
-build:linux-icc:
+build:fedora31-shared-icc-mpi-python:
     extends:
-        - .fedora31_icc
-        - .linux_builder_icc
+        - .fedora31_shared_icc_mpi_python
+        - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
         - .run_manually
 
-test:linux-icc:
+test:fedora31-shared-icc-mpi-python:
     extends:
-        - .fedora31_icc
-        - .linux_tester_icc
+        - .fedora31_shared_icc_mpi_python
+        - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
-        - build:linux-icc
+        - build:fedora31-shared-icc-mpi-python
     needs:
-        - build:linux-icc
+        - build:fedora31-shared-icc-mpi-python
 
 # macOS
 

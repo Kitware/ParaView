@@ -12,8 +12,7 @@ ProcessorCount(nproc)
 # Default to a reasonable test timeout.
 set(CTEST_TEST_TIMEOUT 100)
 
-set(test_exclusions
-)
+set(test_exclusions)
 
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
   list(APPEND test_exclusions
@@ -32,21 +31,10 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "macos")
     "\\.UnstructuredVolumeRenderingVectorComponent$")
 endif ()
 
-if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "mpi")
-  set(ENV{OMPI_ALLOW_RUN_AS_ROOT_CONFIRM} "1")
-  set(ENV{OMPI_ALLOW_RUN_AS_ROOT} "1")
-
-  if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "linux")
-    list(APPEND test_exclusions 
-
-      # Known-bad https://gitlab.kitware.com/paraview/paraview/-/issues/20108
-      "^ParaViewExample-Catalyst$")
-  endif ()
-endif ()
-
-if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "icc")
-  set(ENV{CC}  "icc")
-  set(ENV{CXX} "icpc")
+if ("$ENV{CC}" STREQUAL "icc")
+  list(APPEND test_exclusions
+    # Known-bad https://gitlab.kitware.com/paraview/paraview/-/issues/20108
+    "^ParaViewExample-Catalyst$")
 endif ()
 
 string(REPLACE ";" "|" test_exclusions "${test_exclusions}")

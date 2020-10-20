@@ -36,5 +36,9 @@ configuration_flag(PARAVIEW_USE_PYTHON "python")
 # qt
 configuration_flag(PARAVIEW_USE_QT "qt")
 
-# ADIOS 
-configuration_flag(PARAVIEW_ENABLE_ADIOS "adios")
+# Shared/static
+if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "shared")
+  set(PARAVIEW_BUILD_SHARED_LIBS ON CACHE BOOL "")
+elseif ("$ENV{CMAKE_CONFIGURATION}" MATCHES "static")
+  set(PARAVIEW_BUILD_SHARED_LIBS OFF CACHE BOOL "")
+endif ()

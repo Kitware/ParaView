@@ -16,20 +16,45 @@
 .centos7:
     extends: .linux
     image: "kitware/paraview:ci-centos7-20201005"
+
     variables:
         LAUNCHER: "scl enable devtoolset-7 --"
 
-.fedora31_icc:
-    extends: .linux
-    image: "kitware/paraview:ci-fedora31-icc-20201014"
-    variables:
-        CMAKE_CONFIGURATION: linux_shared_adios_mpi_python_icc
-
-.fedora31_osmesa:
+.fedora31:
     extends: .linux
     image: "kitware/paraview:ci-fedora31-20201014"
+
+.fedora31_icc:
+    extends: .fedora31
+    image: "kitware/paraview:ci-fedora31-icc-20201014"
+
     variables:
-        CMAKE_CONFIGURATION: linux_static_adios_mpi_offscreen_python_osmesa
+        CC: icc
+        CXX: icpc
+
+.fedora_openmpi_addon:
+    variables:
+        # Needed to work with OpenMPI
+        OMPI_ALLOW_RUN_AS_ROOT: 1
+        OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
+        CMAKE_PREFIX_PATH: /usr/lib64/openmpi
+        LD_LIBRARY_PATH: /usr/lib64/openmpi/lib
+
+.fedora31_shared_icc_mpi_python:
+    extends:
+        - .fedora31_icc
+        - .fedora_openmpi_addon
+
+    variables:
+        CMAKE_CONFIGURATION: fedora31_shared_icc_mpi_python
+
+.fedora31_static_mpi_offscreen_osmesa_python:
+    extends:
+        - .fedora31
+        - .fedora_openmpi_addon
+
+    variables:
+        CMAKE_CONFIGURATION: fedora31_static_mpi_offscreen_osmesa_python
 
 .linux_builder_tags:
     tags:
@@ -46,6 +71,44 @@
         - x11
 
 ## Linux-specific scripts
+
+.before_script_linux: &before_script_linux
+    - .gitlab/ci/cmake.sh
+    - .gitlab/ci/ninja.sh
+    - .gitlab/ci/doxygen.sh
+    - .gitlab/ci/sccache.sh
+    - export PATH=$PWD/.gitlab:$PWD/.gitlab/cmake/bin:$PWD/.gitlab/doxygen/bin:$PATH
+    - cmake --version
+    - ninja --version
+    - doxygen --version
+    - "git submodule update --init --recursive || :"
+    - git submodule foreach --recursive cmake "-Dusername:STRING=$CI_PROJECT_NAMESPACE" "-Durl_prefix:STRING=https://$CI_SERVER_HOST" -P "$PWD/.gitlab/ci/fetch_submodule.cmake"
+    - git submodule sync --recursive
+    - git submodule update --init --recursive
+    # Enable the Intel compiler if required.
+    - '[ "$CC" = "icc" ] && source /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64 || true'
+
+.cmake_build_linux:
+    stage: build
+
+    script:
+        - *before_script_linux
+        - sccache --start-server
+        - sccache --show-stats
+        - $LAUNCHER ctest -VV -S .gitlab/ci/ctest_configure.cmake
+        - $LAUNCHER ctest -VV -S .gitlab/ci/ctest_build.cmake &> $GIT_CLONE_PATH/compile_output.log
+        - sccache --show-stats
+
+    interruptible: true
+
+.cmake_test_linux:
+    stage: test
+
+    script:
+        - *before_script_linux
+        - ctest -V --output-on-failure -S .gitlab/ci/ctest_test.cmake
+
+    interruptible: true
 
 .spack_build_linux:
     stage: build
@@ -96,20 +159,6 @@
         paths:
             - spack-cache/
 
-.before_script_linux: &before_script_linux
-    - .gitlab/ci/cmake.sh
-    - .gitlab/ci/ninja.sh
-    - .gitlab/ci/doxygen.sh
-    - .gitlab/ci/sccache.sh
-    - export PATH=$PWD/.gitlab:$PWD/.gitlab/cmake/bin:$PWD/.gitlab/doxygen/bin:$PATH
-    - cmake --version
-    - ninja --version
-    - doxygen --version
-    - "git submodule update --init --recursive || :"
-    - git submodule foreach --recursive cmake "-Dusername:STRING=$CI_PROJECT_NAMESPACE" "-Durl_prefix:STRING=https://$CI_SERVER_HOST" -P "$PWD/.gitlab/ci/fetch_submodule.cmake"
-    - git submodule sync --recursive
-    - git submodule update --init --recursive
-
 .doxygen_build_linux:
     stage: build
     environment:
@@ -145,55 +194,3 @@
 
     interruptible: true
     timeout: 3 hours
-
-.before_script_build_linux: &before_script_build_linux
-        - sccache --start-server
-        - sccache --show-stats
-        - $LAUNCHER ctest -VV -S .gitlab/ci/ctest_configure.cmake
-        - $LAUNCHER ctest -VV -S .gitlab/ci/ctest_build.cmake &> $GIT_CLONE_PATH/compile_output.log
-        - sccache --show-stats
-
-.linux_builder_osmesa:
-    stage: build
-
-    script:
-        - *before_script_linux
-        - *before_script_build_linux
-
-    interruptible: true
-    timeout: 1 hours
-
-
-.linux_builder_icc:
-    stage: build
-
-    script:
-        - *before_script_linux
-        - source /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64 || true
-        - *before_script_build_linux
-
-    interruptible: true
-    timeout: 1 hours
-
-.linux_tester_osmesa:
-    stage: test
-
-    script:
-        - *before_script_linux
-        - export PATH="/usr/lib64/openmpi/bin:$PATH"
-        - $LAUNCHER ctest -V --output-on-failure -S .gitlab/ci/ctest_test.cmake
-
-    interruptible: true
-    timeout: 1 hours
-
-.linux_tester_icc:
-    stage: test
-
-    script:
-        - *before_script_linux
-        - source /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64 || true
-        - export PATH="/usr/lib64/openmpi/bin:$PATH"
-        - ctest -V --output-on-failure -S .gitlab/ci/ctest_test.cmake
-
-    interruptible: true
-    timeout: 1 hours
