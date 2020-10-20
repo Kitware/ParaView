@@ -160,6 +160,7 @@ vtkRenderWindow* vtkPVProcessWindow::NewWindow()
 
   window->DoubleBufferOn();
   window->AlphaBitPlanesOn();
+  window->SetMultiSamples(0);
 
   vtkNew<vtkRenderer> renderer;
   renderer->SetBackground(1.0, 1.0, 1.0);

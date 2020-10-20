@@ -417,8 +417,11 @@ void vtkViewLayout::Paint(vtkViewport* vp)
   auto& internals = (*this->Internals);
   vtkOpenGLRenderUtilities::MarkDebugEvent("vtkViewLayout::Paint Start");
   auto renderer = vtkOpenGLRenderer::SafeDownCast(vp);
-
   assert(renderer != nullptr);
+
+  auto camera = renderer->GetActiveCamera();
+  const bool leftEye = camera->GetLeftEye() != 0;
+
   auto window = vtkOpenGLRenderWindow::SafeDownCast(renderer->GetRenderWindow());
   auto ostate = window->GetState();
 
@@ -459,11 +462,13 @@ void vtkViewLayout::Paint(vtkViewport* vp)
         {
           ostate->vtkglScissor(0, 0, size[0], size[1]);
         }
-        // only blit if the FBO has been created and initialized
         if (fbo->GetFBOIndex())
         {
+          vtkOpenGLCheckErrorMacro("Failed before paste-back");
           fbo->SaveCurrentBindingsAndBuffers(GL_READ_FRAMEBUFFER);
           fbo->Bind(GL_READ_FRAMEBUFFER);
+          fbo->ActivateReadBuffer(leftEye ? 0 : 1);
+
           const int extents[] = { 0, size[0], 0, size[1] };
           fbo->Blit(extents, extents, GL_COLOR_BUFFER_BIT, GL_NEAREST);
           fbo->RestorePreviousBindingsAndBuffers(GL_READ_FRAMEBUFFER);
