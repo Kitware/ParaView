@@ -13,8 +13,15 @@
 #include <string>
 #include <vtk_pugixml.h>
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+#define QT_ENDL endl
+#else
+#define QT_ENDL Qt::endl
+#endif
+
 #define pqErrorMacro(estr)                                                                         \
-  qDebug() << "Error in:" << endl << __FILE__ << ", line " << __LINE__ << endl << "" estr << endl;
+  qDebug() << "Error in:" << QT_ENDL << __FILE__ << ", line " << __LINE__ << QT_ENDL << "" estr    \
+           << QT_ENDL;
 
 // User interface
 //=============================================================================

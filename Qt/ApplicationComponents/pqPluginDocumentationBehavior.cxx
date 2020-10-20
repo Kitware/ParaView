@@ -47,6 +47,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cassert>
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+#define QT_ENDL endl
+#else
+#define QT_ENDL Qt::endl
+#endif
+
 //-----------------------------------------------------------------------------
 class pqPluginDocumentationBehavior::pqInternals
 {
@@ -120,7 +126,7 @@ void pqPluginDocumentationBehavior::updatePlugin(vtkPVPlugin* plugin)
     QTemporaryFile* file = new QTemporaryFile(this);
     if (!file->open())
     {
-      qCritical() << "Failed to create temporary files." << endl;
+      qCritical() << "Failed to create temporary files." << QT_ENDL;
       delete[] decoded_stream;
       decoded_stream = NULL;
       continue;
