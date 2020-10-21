@@ -2277,6 +2277,204 @@
         </Hints>
       </IntVectorProperty>
 
+      <IntVectorProperty name="UseToneMapping"
+                         command="SetUseToneMapping"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable / Disable tone mapping. Tone mapping is a technique to preserve the colors when the scene is too dark or too bright.
+          Refer to the settings for more configuration.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="Exposure"
+                            command="SetExposure"
+                            default_values="1.0"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="0.0" max="10.0" />
+        <Documentation>
+          Set the exposure coefficient.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="UseToneMapping"
+                 value="1" />
+              <Expression type="or">
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                         mode="visibility"
+                                         property="ToneMappingType"
+                                         value="2" />
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                         mode="visibility"
+                                         property="ToneMappingType"
+                                         value="3" />
+              </Expression>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ToneMappingType"
+                         command="SetToneMappingType"
+                         number_of_elements="1"
+                         default_values="3"
+                         panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="ToneMappingType"/>
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="Contrast"
+                            command="SetContrast"
+                            default_values="1.6773"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="Contrast"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Shoulder"
+                            command="SetShoulder"
+                            default_values="0.9714"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="Shoulder"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MidIn"
+                            command="SetMidIn"
+                            default_values="0.18"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="MidIn"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MidOut"
+                            command="SetMidOut"
+                            default_values="0.18"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="MidOut"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="HdrMax"
+                            command="SetHdrMax"
+                            default_values="11.0785"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="HdrMax"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="UseACES"
+                         command="SetUseACES"
+                         default_values="1"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="UseACES"/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty name="GenericFilmicPresets"
+                         command="SetGenericFilmicPresets"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="GenericFilmicPresets"/>
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="UseSSAO"
+                         command="SetUseSSAO"
+                         label="Use Ambient Occlusion"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable / Disable screen space ambient occlusion.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="UseSSAODefaultPresets"
+                            command="SetUseSSAODefaultPresets"
+                            default_values="1"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="UseSSAODefaultPresets"/>
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="Radius"
+                            command="SetRadius"
+                            default_values="0.5"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="Radius"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Bias"
+                            command="SetBias"
+                            default_values="0.01"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="Bias"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="KernelSize"
+                            command="SetKernelSize"
+                            default_values="32"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="KernelSize"/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty name="Blur"
+                            command="SetBlur"
+                            default_values="0"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="Blur"/>
+        </Hints>
+      </IntVectorProperty>
+
       <IntVectorProperty command="SetStereoCapableWindow"
                          default_values="none"
                          name="StereoCapableWindow"
@@ -3068,6 +3266,11 @@
         <Property name="OrientationAxesInteractivity"/>
         <Property name="OrientationAxesLabelColor"/>
         <Property name="OrientationAxesOutlineColor"/>
+      </PropertyGroup>
+      <PropertyGroup label="Render Passes">
+        <Property name="UseToneMapping"/>
+        <Property name="Exposure"/>
+        <Property name="UseSSAO"/>
       </PropertyGroup>
       <PropertyGroup name="Lights"
                      label="Lights"

@@ -810,6 +810,46 @@ public:
   //@}
 
   /**
+   * Defines tone mapping generic filmic presets.
+   */
+  enum GenericFilmicPresets
+  {
+    Custom = 0,
+    Default = 1,
+    Uncharted2 = 2
+  };
+
+  //@{
+  /**
+   * Tone Mapping options.
+   */
+  void SetUseToneMapping(bool v);
+  vtkGetMacro(UseToneMapping, bool);
+  void SetToneMappingType(int);
+  void SetExposure(double);
+  void SetContrast(double);
+  void SetShoulder(double);
+  void SetMidIn(double);
+  void SetMidOut(double);
+  void SetHdrMax(double);
+  void SetUseACES(bool);
+  void SetGenericFilmicPresets(int t);
+  //@}
+
+  //@{
+  /**
+   * SSAO options.
+   */
+  vtkSetMacro(UseSSAO, bool);
+  vtkGetMacro(UseSSAO, bool);
+  vtkSetMacro(UseSSAODefaultPresets, bool);
+  vtkSetMacro(Radius, double);
+  vtkSetMacro(KernelSize, int);
+  vtkSetMacro(Bias, double);
+  vtkSetMacro(Blur, bool);
+  //@}
+
+  /**
    * Copy internal fields that are used for rendering decision such as
    * remote/local rendering, composite and so on. This method was introduced
    * for the quad view so internal views could use the decision that were made
@@ -1183,6 +1223,15 @@ protected:
 
   bool UseFXAA;
   vtkNew<vtkFXAAOptions> FXAAOptions;
+
+  bool UseToneMapping;
+
+  bool UseSSAO;
+  bool UseSSAODefaultPresets;
+  double Radius;
+  int KernelSize;
+  double Bias;
+  bool Blur;
 
   double LODResolution;
   bool UseLightKit;

@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/spiaggia_di_mondello_1k.hdr" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/MapScalars/CheckBox" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/tabBar" command="set_tab_with_text" arguments="Render View" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton4" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRenderViewSettings/qt_scrollarea_viewport/Container/ProxyWidget/ToneMappingType/ComboBox" command="activated" arguments="GenericFilmic" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRenderViewSettings/qt_scrollarea_viewport/Container/ProxyWidget/GenericFilmicPresets/ComboBox" command="activated" arguments="Custom" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRenderViewSettings/qt_scrollarea_viewport/Container/ProxyWidget/Contrast/DoubleRangeWidget/Slider" command="set_int" arguments="40" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRenderViewSettings/qt_scrollarea_viewport/Container/ProxyWidget/Shoulder/DoubleRangeWidget/Slider" command="set_int" arguments="30" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRenderViewSettings/qt_scrollarea_viewport/Container/ProxyWidget/MidIn/DoubleRangeWidget/Slider" command="set_int" arguments="40" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRenderViewSettings/qt_scrollarea_viewport/Container/ProxyWidget/MidOut/DoubleRangeWidget/Slider" command="set_int" arguments="20" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/0QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/UseToneMapping/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/Exposure/DoubleRangeWidget/Slider" command="set_int" arguments="40" />
+  <pqevent object="pqClientMainWindow/axesToolbar/actionShowOrientationAxes" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/0QPushButton0" command="activate" arguments="" />
+</pqevents>

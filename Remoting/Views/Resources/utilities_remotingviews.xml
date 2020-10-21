@@ -248,6 +248,258 @@
         </Hints>
       </IntVectorProperty>
 
+      <!-- Tone Mapping -->
+      <IntVectorProperty name="ToneMappingType"
+                         number_of_elements="1"
+                         default_values="3"
+                         panel_visibility="advanced">
+        <Documentation>
+          Specify tone mapping type. Clamp, Reinhard and Exponential are simpler than the GenericFilmic
+          operator which can be fully parameterized to configure the shadows as well as the highlights.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Clamp" value="0" />
+          <Entry text="Reinhard" value="1" />
+          <Entry text="Exponential" value="2" />
+          <Entry text="GenericFilmic" value="3" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty name="GenericFilmicPresets"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <Documentation>
+          Use predefined presets for Generic Filmic. Using the default parameters it approximates the Academy Color Encoding System (ACES).
+          To use the popular “Uncharted 2” filmic tone mapping curve instead, set the property to Uncharted2.
+          Set this property to Custom to set custom parameters.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Custom" value="0" />
+          <Entry text="DefaultPresets" value="1" />
+          <Entry text="Uncharted2" value="2" />
+        </EnumerationDomain>
+        <Hints>
+          <!-- Visible if Generic Filmic -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ToneMappingType"
+                                       value="3"/>
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="Contrast"
+                            label="Contrast"
+                            default_values="1.6773"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="0.0" max="10.0" />
+        <Documentation>
+          Adjust the toe of the curve. Typically in [1-2].
+        </Documentation>
+        <Hints>
+          <!-- Visible if Generic Filmic AND GenericFilmicPresets set to Custom-->
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ToneMappingType"
+                                       value="3" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="GenericFilmicPresets"
+                                       value="0" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Shoulder"
+                            label="Shoulder"
+                            default_values="0.9714"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="0.0" max="10.0" />
+        <Documentation>
+          Limit the output in the shoulder region of the curve.
+          Typically in [0.9-1].
+        </Documentation>
+        <Hints>
+          <!-- Visible if Generic Filmic AND GenericFilmicPresets set to Custom-->
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ToneMappingType"
+                                       value="3" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="GenericFilmicPresets"
+                                       value="0" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MidIn"
+                            label="MidIn"
+                            default_values="0.18"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+        <Documentation>
+          Mid level anchor input in percent gray.
+        </Documentation>
+        <Hints>
+          <!-- Visible if Generic Filmic AND GenericFilmicPresets set to Custom-->
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ToneMappingType"
+                                       value="3" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="GenericFilmicPresets"
+                                       value="0" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MidOut"
+                            label="MidOut"
+                            default_values="0.18"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+        <Documentation>
+          Mid level anchor output in percent gray.
+        </Documentation>
+        <Hints>
+          <!-- Visible if Generic Filmic AND GenericFilmicPresets set to Custom-->
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ToneMappingType"
+                                       value="3" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="GenericFilmicPresets"
+                                       value="0" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="HdrMax"
+                            label="HdrMax"
+                            default_values="11.0785"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="1.0" max="10000.0" />
+        <Documentation>
+          Maximum HDR input that is not clipped.
+        </Documentation>
+        <Hints>
+          <!-- Visible if Generic Filmic AND GenericFilmicPresets set to Custom-->
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ToneMappingType"
+                                       value="3" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="GenericFilmicPresets"
+                                       value="0" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="UseACES"
+                         default_values="1"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable the Academy Color Encoding System (ACES).
+        </Documentation>
+        <Hints>
+          <!-- Visible if Generic Filmic AND GenericFilmicPresets set to Custom-->
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="ToneMappingType"
+                                       value="3" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="GenericFilmicPresets"
+                                       value="0" />
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
+      <!-- SSAO -->
+      <IntVectorProperty name="UseSSAODefaultPresets"
+                            label="Use Default Presets"
+                            default_values="1"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If enabled, the SSAO radius and bias will be calculated depending on
+          the size of the bounding box of the geometry. Disable to manually specify the radius and bias.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="Radius"
+                         default_values="0.5"
+                         label="SSAO hemisphere radius"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <Documentation>
+          Set the SSAO hemisphere radius.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="UseSSAODefaultPresets"
+                                       value="0"/>
+        </Hints>
+        <DoubleRangeDomain name="range" min="0.0" max="5.0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Bias"
+                            default_values="0.01"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+        <Documentation>
+          Set the SSAO bias when comparing samples.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="UseSSAODefaultPresets"
+                                       value="0"/>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="KernelSize"
+                            default_values="32"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <IntRangeDomain name="range" min="0" max="1024" />
+        <Documentation>
+          Set the SSAO number of samples.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="Blur"
+                            default_values="0"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable or disable the blurring of the ambient occlusion.
+          Blurring can help to improve the result if samples number is low.
+        </Documentation>
+      </IntVectorProperty>
+
       <DoubleVectorProperty name="LODThreshold"
         label="LOD Threshold"
         default_values="20.0"
@@ -450,6 +702,25 @@
         <Property name="FXAASubpixelContrastThreshold" />
         <Property name="FXAAUseHighQualityEndpoints" />
         <Property name="FXAAEndpointSearchIterations" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Tone Mapping Options">
+        <Property name="ToneMappingType" />
+        <Property name="GenericFilmicPresets" />
+        <Property name="Contrast" />
+        <Property name="Shoulder" />
+        <Property name="MidIn" />
+        <Property name="MidOut" />
+        <Property name="HdrMax" />
+        <Property name="UseACES" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Ambient Occlusion Options">
+        <Property name="UseSSAODefaultPresets" />
+        <Property name="Radius" />
+        <Property name="KernelSize" />
+        <Property name="Bias" />
+        <Property name="Blur" />
       </PropertyGroup>
 
       <PropertyGroup label="Interactive Rendering Options">

@@ -116,6 +116,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/sineWaves.csv}"
   "DATA{${paraview_test_data_directory_input}/Data/singleSphereAnimation.pvd}"
   "DATA{${paraview_test_data_directory_input}/Data/singleSphereAnimation/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/spiaggia_di_mondello_1k.hdr}"
   "DATA{${paraview_test_data_directory_input}/Data/SteeringDataGeneratorPlugin.xml}"
   "DATA{${paraview_test_data_directory_input}/Data/tensors.pvti}"
   "DATA{${paraview_test_data_directory_input}/Data/test_fielddata.vtk}"
@@ -439,6 +440,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SpherePointSource_InterA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SpherePointSource_InterB.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SplitViewTraceScreenshot.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SSAO.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SteeringDataGeneratorA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SteeringDataGeneratorB.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SteeringDataGeneratorC.png}"
@@ -481,6 +483,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplaySplitView-3x1-tile1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplaySplitView-3x1-tile2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TimeStepProgressBar_Inter.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ToneMapping.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TraceExodus.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TraceMultiViews.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TraceMultiViews_1.png}"
@@ -969,6 +972,7 @@ list(APPEND TESTS_WITH_BASELINES
   SliceWithPlaneMultiBlock.xml
   SortLineChartData.xml
   ScrollAreaNativeWidget.xml
+  SSAO.xml
   StepColorSpace.xml
   StockColors.xml
   StreamTracerSurface.xml
@@ -985,6 +989,7 @@ list(APPEND TESTS_WITH_BASELINES
   Text2D.xml
   TextBillboard3D.xml
   TextureUsages.xml
+  ToneMapping.xml
   UndoRedo.xml
   UndoRedo1.xml
   UndoRedo2.xml
