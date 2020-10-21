@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkDirectory.h>
 #include <vtkPVFileInformation.h>
 #include <vtkPVFileInformationHelper.h>
+#include <vtkPVSession.h>
 #include <vtkSMDirectoryProxy.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMPropertyHelper.h>
@@ -708,6 +709,7 @@ bool pqFileDialogModel::mkdir(const QString& dirName)
   {
     vtkSMDirectoryProxy* dirProxy = vtkSMDirectoryProxy::SafeDownCast(
       this->Implementation->getServer()->proxyManager()->NewProxy("misc", "Directory"));
+    dirProxy->SetLocation(vtkPVSession::SERVERS);
     ret = dirProxy->MakeDirectory(dirPath.toUtf8().data());
     dirProxy->Delete();
   }
