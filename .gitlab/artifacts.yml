@@ -66,6 +66,9 @@
             # CDash files.
             - build/DartConfiguration.tcl
 
+            # Virtual environment
+            - build/ci-venv/
+
 .cmake_test_artifacts:
     artifacts:
         expire_in: 1d

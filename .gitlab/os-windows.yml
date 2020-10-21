@@ -68,6 +68,9 @@
     - Set-Item -Force -Path "env:PATH" -Value "$pwdpath\.gitlab\qt\bin;$env:PATH"
     - cmake -P .gitlab/ci/download_index.cmake
     - Set-Item -Force -Path "env:PATH" -Value "$pwdpath\.gitlab\nvidia-index\lib;$env:PATH"
+    - cmake -P .gitlab/ci/download_python.cmake
+    - Set-Item -Force -Path "env:PATH" -Value "$pwdpath\.gitlab\python;$env:PATH"
+    - Set-Item -Force -Path "env:PYTHONHOME" -Value "$pwdpath\.gitlab\python"
 
 .cmake_build_windows:
     stage: build
@@ -75,6 +78,13 @@
     script:
         - *before_script_windows
         - *before_script_windows_deps
+        # Build and activate the venv
+        - python -m venv $pwdpath\build\ci-venv
+        # This may be necessary when running manually.
+        # Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+        - . .\build\ci-venv\Scripts\Activate.ps1
+        - pip install -qq -r $pwdpath\.gitlab\ci\requirements-phase1.txt
+        - pip install -qq -r $pwdpath\.gitlab\ci\requirements-phase2.txt
         - Set-Item -Force -Path "env:PATH" -Value "$env:PATH;$env:SCCACHE_PATH"
         - Invoke-Expression -Command .gitlab/ci/vcvarsall.ps1
         - sccache --start-server
@@ -91,6 +101,11 @@
     script:
         - *before_script_windows
         - *before_script_windows_deps
+        # Reuse the venv from the build step (avoids version changes between
+        # build and testing). This is set up manually because Activate.ps1
+        # doesn't seem to work for our extracted Python tarball.
+        - Set-Item -Force -Path "env:PATH" -Value "$pwdpath\build\ci-venv\Scripts;$env:PATH"
+        - Set-Item -Force -Path "env:PYTHONPATH" -Value "$pwdpath\build\ci-venv\Lib\site-packages"
         # Some tests run CMake steps, so we need a compiler environment.
         - Invoke-Expression -Command .gitlab/ci/vcvarsall.ps1
         - ctest --output-on-failure -V -S .gitlab/ci/ctest_test.cmake
