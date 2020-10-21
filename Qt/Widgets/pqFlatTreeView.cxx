@@ -3138,12 +3138,8 @@ int pqFlatTreeView::getDataWidth(const QModelIndex& index, const QFontMetrics& f
   }
   else
   {
-// Find the font width for the string.
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+    // Find the font width for the string.
     return fm.horizontalAdvance(indexData.toString());
-#else
-    return fm.width(indexData.toString());
-#endif
   }
 }
 

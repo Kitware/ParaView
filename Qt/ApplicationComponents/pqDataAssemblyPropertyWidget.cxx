@@ -153,9 +153,7 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
   // tree.
   auto sortmodel = new QSortFilterProxyModel(this);
   sortmodel->setSourceModel(dapmodel);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
   sortmodel->setRecursiveFilteringEnabled(true);
-#endif
   internals.Ui.tree->setModel(sortmodel);
 
   internals.StringListModel = new QStringListModel(this);

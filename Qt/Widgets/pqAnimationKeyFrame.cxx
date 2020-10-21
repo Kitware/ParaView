@@ -178,20 +178,10 @@ void pqAnimationKeyFrame::paint(QPainter* painter, const QStyleOptionGraphicsIte
     keyFrameRect.top() + 0.5 * keyFrameRect.height() + metrics.height() / 2.0 - 1.0);
   painter->drawText(pt, label);
 
-  double hAdvance;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
-  hAdvance = metrics.horizontalAdvance(label);
-#else
-  hAdvance = metrics.width(label);
-#endif
-  iconWidth -= hAdvance;
+  iconWidth -= metrics.horizontalAdvance(label);
 
   label = metrics.elidedText(endValue().toString(), Qt::ElideRight, qRound(halfWidth));
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
-  hAdvance = metrics.horizontalAdvance(label);
-#else
-  hAdvance = metrics.width(label);
-#endif
+  double hAdvance = metrics.horizontalAdvance(label);
   pt = QPointF(keyFrameRect.right() - hAdvance - 3.0,
     keyFrameRect.top() + 0.5 * keyFrameRect.height() + metrics.height() / 2.0 - 1.0);
   painter->drawText(pt, label);

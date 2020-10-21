@@ -62,14 +62,8 @@ pqPythonScriptEditor::pqPythonScriptEditor(QWidget* p)
 {
   this->pythonManager = NULL;
   this->TextEdit = new QTextEdit;
-// tab is 4 spaces
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+  // tab is 4 spaces
   this->TextEdit->setTabStopDistance(this->fontMetrics().horizontalAdvance("    "));
-#elif (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
-  this->TextEdit->setTabStopDistance(this->fontMetrics().width("    "));
-#else
-  this->TextEdit->setTabStopWidth(this->fontMetrics().width("    "));
-#endif
   this->setCentralWidget(this->TextEdit);
   this->createActions();
   this->createMenus();

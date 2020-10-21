@@ -164,7 +164,9 @@ endif ()
 
 vtk_module_find_package(
   PACKAGE     Qt5
-  COMPONENTS  ${qt_components})
+  COMPONENTS  ${qt_components}
+  VERSION     5.12
+  FORWARD_VERSION_REQ MINOR)
 
 set(CMAKE_AUTOMOC 1)
 set(CMAKE_AUTORCC 1)
