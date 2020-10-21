@@ -51,7 +51,7 @@
     - cmake -P .gitlab/ci/download_qt.cmake
     - export CMAKE_PREFIX_PATH=$PWD/.gitlab/qt
     - "git submodule update --init --recursive || :"
-    - git submodule foreach --recursive cmake "-Dusername:STRING=$CI_PROJECT_NAMESPACE" "-Durl_prefix:STRING=https://$CI_SERVER_HOST" -P "$PWD/.gitlab/ci/fetch_submodule.cmake"
+    - git submodule foreach --recursive cmake -P "$PWD/.gitlab/ci/fetch_submodule.cmake"
     - git submodule sync --recursive
     - git submodule update --init --recursive
 
@@ -60,7 +60,6 @@
 
     script:
         - *before_script_macos
-        - export GIT_CEILING_DIRECTORIES=$PWD
         - .gitlab/ci/sccache.sh
         # Allow the server to already be running.
         - "sccache --start-server || :"
