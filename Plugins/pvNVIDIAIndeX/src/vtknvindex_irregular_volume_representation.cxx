@@ -73,25 +73,17 @@ vtkStandardNewMacro(vtknvindex_irregular_volume_representation);
 
 //----------------------------------------------------------------------------
 vtknvindex_irregular_volume_representation::vtknvindex_irregular_volume_representation()
+  : Superclass()
 {
   m_controller = vtkMultiProcessController::GetGlobalController();
 
-  this->ResampleToImageFilter = vtkResampleToImage::New();
   this->ResampleToImageFilter->SetSamplingDimensions(128, 128, 128);
 
   this->Internals = new vtkInternals();
 
-  this->Preprocessor = vtkVolumeRepresentationPreprocessor::New();
   this->Preprocessor->SetTetrahedraOnly(1);
 
-  // Change the default mapper to NVIDIA IndeX irregular volume mapper.
-  this->DefaultMapper = vtknvindex_irregular_volume_mapper::New();
-  this->Property = vtkVolumeProperty::New();
-  this->Actor = vtkPVLODVolume::New();
-
-  this->Actor->SetProperty(this->Property);
   this->Actor->SetMapper(this->DefaultMapper);
-  vtkMath::UninitializeBounds(this->DataBounds);
 
   // Create NVIDIA IndeX cluster properties and application settings.
   m_cluster_properties = new vtknvindex_cluster_properties(true);
@@ -117,13 +109,7 @@ vtknvindex_irregular_volume_representation::vtknvindex_irregular_volume_represen
 //----------------------------------------------------------------------------
 vtknvindex_irregular_volume_representation::~vtknvindex_irregular_volume_representation()
 {
-  this->Preprocessor->Delete();
-
   this->DefaultMapper->shutdown();
-  this->DefaultMapper->Delete();
-
-  this->Property->Delete();
-  this->Actor->Delete();
 
   delete this->Internals;
   this->Internals = 0;
@@ -448,70 +434,20 @@ void vtknvindex_irregular_volume_representation::SetSamplingDimensions(int xdim,
 
 //***************************************************************************
 // Forwarded to Actor.
-
-//----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::SetOrientation(double x, double y, double z)
-{
-  this->Actor->SetOrientation(x, y, z);
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::SetOrigin(double x, double y, double z)
-{
-  this->Actor->SetOrigin(x, y, z);
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::SetPickable(int val)
-{
-  this->Actor->SetPickable(val);
-}
-//----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::SetPosition(double x, double y, double z)
-{
-  this->Actor->SetPosition(x, y, z);
-}
-//----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::SetScale(double x, double y, double z)
-{
-  this->Actor->SetScale(x, y, z);
-}
-
 //----------------------------------------------------------------------------
 void vtknvindex_irregular_volume_representation::SetVisibility(bool val)
 {
   DefaultMapper->set_visibility(val);
   update_index_roi();
 
-  this->Actor->SetVisibility(val ? 1 : 0);
   this->Superclass::SetVisibility(val);
-}
-
-//***************************************************************************
-// Forwarded to vtkVolumeProperty.
-//----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::SetInterpolationType(int val)
-{
-  this->Property->SetInterpolationType(val);
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::SetColor(vtkColorTransferFunction* lut)
-{
-  this->Property->SetColor(lut);
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::SetScalarOpacity(vtkPiecewiseFunction* pwf)
-{
-  this->Property->SetScalarOpacity(pwf);
 }
 
 //----------------------------------------------------------------------------
 void vtknvindex_irregular_volume_representation::SetScalarOpacityUnitDistance(double val)
 {
   static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)->opacity_changed();
-  this->Property->SetScalarOpacityUnitDistance(val);
+  this->Superclass::SetScalarOpacityUnitDistance(val);
 }
 
 //
