@@ -189,6 +189,7 @@ private:
   QCursor ZoomCursor;
   QTimer MouseMovingTimer;
   bool MouseMoving;
+  int MousePosition[2];
   vtkSMPVRepresentationProxy* CurrentRepresentation = nullptr;
 
   static QPointer<pqRenderViewSelectionReaction> ActiveReaction;

@@ -204,8 +204,7 @@ vtkDataObject* vtkSMTooltipSelectionPipeline::ConnectPVMoveSelectionToClient(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(
-  int association, double tooltipPos[2], std::string& tooltipText)
+bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(int association, std::string& tooltipText)
 {
   vtkSMSourceProxy* extractSource = this->ExtractInteractiveSelection;
   unsigned int extractOutputPort = extractSource->GetOutputPort((unsigned int)0)->GetPortIndex();
@@ -274,16 +273,6 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(
       tooltipTextStream << "\nType: "
                         << vtkSMCoreUtilities::GetStringForCellType(cell->GetCellType());
     }
-
-    // needed to position the tooltip
-    if (ds->GetNumberOfPoints() > 0)
-    {
-      ds->GetPoint(0, point);
-    }
-    else
-    {
-      point[0] = point[1] = point[2] = 0.0;
-    }
   }
 
   if (fieldData)
@@ -320,18 +309,6 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(
 
   tooltipTextStream << "</p>";
 
-  // tooltip position
-  double pos[3] = { point[0], point[1], point[2] };
-  vtkNew<vtkCoordinate> coordinate;
-  coordinate->SetCoordinateSystemToWorld();
-  coordinate->SetValue(point[0], point[1], point[2]);
-  int* dispPos = coordinate->GetComputedDisplayValue(this->PreviousView->GetRenderer());
-  pos[0] = dispPos[0];
-  pos[1] = dispPos[1];
-
-  // output parameters
-  tooltipPos[0] = pos[0];
-  tooltipPos[1] = pos[1];
   tooltipText = tooltipTextStream.str();
 
   this->TooltipEnabled = false;
