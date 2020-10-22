@@ -68,9 +68,10 @@ if (PARAVIEW_PLUGIN_VRPlugin_USE_VRPN)
 endif ()
 
 if (PARAVIEW_PLUGIN_VRPlugin_USE_VRUI)
-  set(sources
+  list(APPEND sources
     pqVRUIConnection.cxx
     pqVRUIConnection.h
+    vtkVRUIPipe.cxx
     vtkVRUIPipe.h
     vtkVRUIServerState.cxx
     vtkVRUIServerState.h
