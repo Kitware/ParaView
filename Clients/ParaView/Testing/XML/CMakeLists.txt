@@ -1163,6 +1163,7 @@ if(PARAVIEW_USE_PYTHON)
   list(APPEND TESTS_WITH_BASELINES
     ColorByComponentNames.xml # needs programmable filter
     LiveProgrammableSource.xml
+    ProgrammableAnnotation.xml
     PythonShellRunScript.xml
     SaveLoadStatePython.xml
     SelectionLabels.xml

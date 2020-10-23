@@ -303,7 +303,8 @@
   <Proxy group="filters" name="ProbeLine" icon=":/pqWidgets/Icons/pqPlotOverLine.svg" />
   <Proxy group="filters" name="ProbePoint" icon=":/pqWidgets/Icons/pqProbeLocation.svg" />
   <Proxy group="filters" name="ProcessIdScalars" />
-  <Proxy group="filters" name="ProgrammableFilter" icon=":/pqWidgets/Icons/pqProgrammableFilter24.png" />
+  <Proxy group="filters" name="ProgrammableAnnotation" icon=":/pqWidgets/Icons/pqProgrammableAnnotation.svg" />
+  <Proxy group="filters" name="ProgrammableFilter" icon=":/pqWidgets/Icons/pqProgrammableFilter.svg" />
   <Proxy group="filters" name="PythonAnnotation" />
   <Proxy group="filters" name="PythonCalculator" />
   <Proxy group="filters" name="QuadraturePointInterpolator" />

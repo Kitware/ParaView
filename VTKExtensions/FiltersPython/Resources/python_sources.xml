@@ -8,8 +8,8 @@
                      short_help="Executes a python script to produce data.">
                      This source will execute a python script to produce an
                      output dataset. The source keeps a copy of the python
-                     script in Script, and creates Interpretor, a python
-                     interpretor to run the script upon the first
+                     script in Script and creates a python
+                     Interpreter to run the script upon the first
                      execution. To execute external python scripts on the ParaView server, use:
                      execfile('full_path/script_name.py'). Documentation is found in the Programmable Filter
                      chapter of the ParaView Guide.</Documentation>
