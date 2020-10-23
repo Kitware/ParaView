@@ -167,7 +167,7 @@ public:
     if (root == 0)
     {
       this->Sizes.resize(this->KDTree.size() * 2);
-      this->ComputeSizes();
+      this->ComputeSizes(root, spacing);
     }
 
     const Cell& cell = this->KDTree[root];
@@ -254,7 +254,7 @@ private:
   // UpdateViewPositions().
   std::vector<int> Sizes;
 
-  const int* ComputeSizes(int root = 0)
+  const int* ComputeSizes(int root, const int spacing)
   {
     assert(2 * root + 1 < static_cast<int>(this->Sizes.size()));
 
@@ -271,19 +271,19 @@ private:
       return &this->Sizes[2 * root];
     }
 
-    const int* size0 = this->ComputeSizes(2 * root + 1);
-    const int* size1 = this->ComputeSizes(2 * root + 2);
+    const int* size0 = this->ComputeSizes(2 * root + 1, spacing);
+    const int* size1 = this->ComputeSizes(2 * root + 2, spacing);
 
     // now double the width (or height) based on the split direction.
     if (cell.Direction == vtkSMViewLayoutProxy::HORIZONTAL)
     {
-      this->Sizes[2 * root] = size0[0] + size1[0];
+      this->Sizes[2 * root] = size0[0] + size1[0] + spacing;
       this->Sizes[2 * root + 1] = std::max(size0[1], size1[1]);
     }
     else
     {
       this->Sizes[2 * root] = std::max(size0[0], size1[0]);
-      this->Sizes[2 * root + 1] = size0[1] + size1[1];
+      this->Sizes[2 * root + 1] = size0[1] + size1[1] + spacing;
     }
     return &this->Sizes[2 * root];
   }
