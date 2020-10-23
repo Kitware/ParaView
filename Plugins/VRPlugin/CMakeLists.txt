@@ -8,9 +8,6 @@ mark_as_advanced(PARAVIEW_PLUGIN_VRPlugin_USE_VRPN)
 option(PARAVIEW_PLUGIN_VRPlugin_USE_VRUI "Build VRPlugin with VRUI support" OFF)
 mark_as_advanced(PARAVIEW_PLUGIN_VRPlugin_USE_VRUI)
 
-# TODO: There's a QTSOCK preprocessor definition floating around. What should
-# be done with that?
-
 # TODO: Should something be done with the files in samples/?
 
 configure_file(
@@ -125,7 +122,8 @@ target_link_libraries(VRPlugin
     VTK::CommonCore
     VTK::CommonMath
     VTK::CommonTransforms
-    VTK::RenderingCore)
+    VTK::RenderingCore
+    Qt5::Network)
 
 if (PARAVIEW_PLUGIN_VRPlugin_USE_VRPN)
   target_link_libraries(VRPlugin
