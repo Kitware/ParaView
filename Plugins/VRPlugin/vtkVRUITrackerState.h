@@ -39,7 +39,7 @@ class vtkVRUITrackerState : public vtkObject
 public:
   static vtkVRUITrackerState* New();
   vtkTypeMacro(vtkVRUITrackerState, vtkObjectBase);
-  virtual void PrintSelf(ostream& os, vtkIndent indent);
+  virtual void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
   // Ditto.
@@ -67,7 +67,7 @@ public:
 
 protected:
   vtkVRUITrackerState();
-  ~vtkVRUITrackerState();
+  ~vtkVRUITrackerState() override;
 
   float Position[3];
   float UnitQuaternion[4];
