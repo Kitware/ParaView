@@ -438,6 +438,18 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF&)
   QPolygonF poly = this->timeBarPoly(this->CurrentTime);
   painter->drawPolygon(poly);
 
+  if (this->NewCurrentTime != this->CurrentTime)
+  {
+    double pos = this->positionFromTime(this->NewCurrentTime);
+    QVector<QPointF> pts;
+    pts.append(QPointF(pos - 1, rh - 1));
+    pts.append(QPointF(pos - 1, sr.height() + sr.top() - 2));
+    pts.append(QPointF(pos + 1, sr.height() + sr.top() - 2));
+    pts.append(QPointF(pos + 1, rh - 1));
+    painter->setBrush(QColor(200, 200, 200));
+    painter->drawPolygon(QPolygonF(pts));
+  }
+
   painter->restore();
 }
 
@@ -675,11 +687,15 @@ void pqAnimationModel::mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)
 
     if (this->NewCurrentTime != this->CurrentTime)
     {
-      Q_EMIT this->currentTimeSet(this->NewCurrentTime);
-      this->NewCurrentTime = this->CurrentTime;
+      if (this->CurrentTimeGrabbed)
+      {
+        Q_EMIT this->currentTimeSet(this->NewCurrentTime);
+      }
+      else
+      {
+        this->update();
+      }
     }
-
-    this->update();
     return;
   }
 
