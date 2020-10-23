@@ -260,6 +260,20 @@ int vtkSMStringVectorProperty::SetElement(unsigned int idx, const char* value)
 }
 
 //---------------------------------------------------------------------------
+int vtkSMStringVectorProperty::AppendElements(const std::vector<std::string>& newvalue)
+{
+  return this->Internals->AppendElements(
+    newvalue.data(), static_cast<unsigned int>(newvalue.size()));
+}
+
+//---------------------------------------------------------------------------
+int vtkSMStringVectorProperty::AppendUncheckedElements(const std::vector<std::string>& newvalue)
+{
+  return this->Internals->AppendUncheckedElements(
+    newvalue.data(), static_cast<unsigned int>(newvalue.size()));
+}
+
+//---------------------------------------------------------------------------
 unsigned int vtkSMStringVectorProperty::GetElementIndex(const char* value, int& exists)
 {
   unsigned int i;

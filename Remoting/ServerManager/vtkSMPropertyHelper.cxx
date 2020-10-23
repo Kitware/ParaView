@@ -494,6 +494,77 @@ inline void vtkSMPropertyHelper::SetPropertyArray(const vtkIdType* values, unsig
 #endif
 
 //----------------------------------------------------------------------------
+template <typename T>
+inline void vtkSMPropertyHelper::AppendPropertyArray(const T* values, unsigned int count)
+{
+  (void)values;
+  (void)count;
+}
+
+//----------------------------------------------------------------------------
+template <>
+inline void vtkSMPropertyHelper::AppendPropertyArray(const int* values, unsigned int count)
+{
+  if (this->Type == INT)
+  {
+    if (this->UseUnchecked)
+    {
+      this->IntVectorProperty->AppendUncheckedElements(values, count);
+    }
+    else
+    {
+      this->IntVectorProperty->AppendElements(values, count);
+    }
+  }
+  else
+  {
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
+  }
+}
+
+//----------------------------------------------------------------------------
+template <>
+inline void vtkSMPropertyHelper::AppendPropertyArray(const double* values, unsigned int count)
+{
+  if (this->Type == DOUBLE)
+  {
+    if (this->UseUnchecked)
+    {
+      this->DoubleVectorProperty->AppendUncheckedElements(values, count);
+    }
+    else
+    {
+      this->DoubleVectorProperty->AppendElements(values, count);
+    }
+  }
+  else
+  {
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
+  }
+}
+
+//----------------------------------------------------------------------------
+template <>
+inline void vtkSMPropertyHelper::AppendPropertyArray(const vtkIdType* values, unsigned int count)
+{
+  if (this->Type == IDTYPE)
+  {
+    if (this->UseUnchecked)
+    {
+      this->IdTypeVectorProperty->AppendUncheckedElements(values, count);
+    }
+    else
+    {
+      this->IdTypeVectorProperty->AppendElements(values, count);
+    }
+  }
+  else
+  {
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
+  }
+}
+
+//----------------------------------------------------------------------------
 vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProxy* proxy, const char* pname, bool quiet)
 {
   this->Proxy = proxy;
@@ -678,9 +749,21 @@ void vtkSMPropertyHelper::Set(const int* values, unsigned int count)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMPropertyHelper::Append(const int* values, unsigned int count)
+{
+  this->AppendPropertyArray(values, count);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMPropertyHelper::Set(unsigned int index, double value)
 {
   this->SetProperty<double>(index, value);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPropertyHelper::Append(const double* values, unsigned int count)
+{
+  this->AppendPropertyArray(values, count);
 }
 
 //----------------------------------------------------------------------------
@@ -718,6 +801,12 @@ void vtkSMPropertyHelper::Set(unsigned int index, vtkIdType value)
 void vtkSMPropertyHelper::Set(const vtkIdType* values, unsigned int count)
 {
   this->SetPropertyArray<vtkIdType>(values, count);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPropertyHelper::Append(const vtkIdType* values, unsigned int count)
+{
+  this->AppendPropertyArray(values, count);
 }
 
 //----------------------------------------------------------------------------

@@ -245,19 +245,19 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(vtkSMS
       // remove default values set by the XML if we created a brand new proxy.
       ids->SetNumberOfElements(0);
     }
-    unsigned int curValues = ids->GetNumberOfElements();
     vtkIdTypeArray* idList = vtkIdTypeArray::SafeDownCast(selection->GetSelectionList());
     if (idList)
     {
       vtkIdType numIDs = idList->GetNumberOfTuples();
       if (!use_composite && !use_hierarchical)
       {
-        ids->SetNumberOfElements(curValues + numIDs * 2);
+        std::vector<vtkIdType> newVals(2 * numIDs);
         for (vtkIdType cc = 0; cc < numIDs; cc++)
         {
-          ids->SetElement(curValues + 2 * cc, procID);
-          ids->SetElement(curValues + 2 * cc + 1, idList->GetValue(cc));
+          newVals[2 * cc] = procID;
+          newVals[2 * cc + 1] = idList->GetValue(cc);
         }
+        ids->AppendElements(newVals.data(), static_cast<unsigned int>(newVals.size()));
       }
       else if (use_composite)
       {
@@ -267,25 +267,28 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(vtkSMS
           composite_index = selProperties->Get(vtkSelectionNode::COMPOSITE_INDEX());
         }
 
-        ids->SetNumberOfElements(curValues + numIDs * 3);
+        std::vector<vtkIdType> newVals(3 * numIDs);
         for (vtkIdType cc = 0; cc < numIDs; cc++)
         {
-          ids->SetElement(curValues + 3 * cc, composite_index);
-          ids->SetElement(curValues + 3 * cc + 1, procID);
-          ids->SetElement(curValues + 3 * cc + 2, idList->GetValue(cc));
+          newVals[3 * cc] = composite_index;
+          newVals[3 * cc + 1] = procID;
+          newVals[3 * cc + 2] = idList->GetValue(cc);
         }
+        ids->AppendElements(newVals.data(), static_cast<unsigned int>(newVals.size()));
       }
       else if (use_hierarchical)
       {
         vtkIdType level = selProperties->Get(vtkSelectionNode::HIERARCHICAL_LEVEL());
         vtkIdType dsIndex = selProperties->Get(vtkSelectionNode::HIERARCHICAL_INDEX());
-        ids->SetNumberOfElements(curValues + numIDs * 3);
+
+        std::vector<vtkIdType> newVals(3 * numIDs);
         for (vtkIdType cc = 0; cc < numIDs; cc++)
         {
-          ids->SetElement(curValues + 3 * cc, level);
-          ids->SetElement(curValues + 3 * cc + 1, dsIndex);
-          ids->SetElement(curValues + 3 * cc + 2, idList->GetValue(cc));
+          newVals[3 * cc] = level;
+          newVals[3 * cc + 1] = dsIndex;
+          newVals[3 * cc + 2] = idList->GetValue(cc);
         }
+        ids->AppendElements(newVals.data(), static_cast<unsigned int>(newVals.size()));
       }
     }
   }

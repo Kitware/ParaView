@@ -109,6 +109,16 @@ public:
   int SetElements4(double value0, double value1, double value2, double value3);
 
   /**
+   * Append the values. The vector is resized as necessary.
+   */
+  int AppendElements(const double* values, unsigned int numValues);
+
+  /**
+   * Append the values to the unchecked elements. The vector is resized as necessary.
+   */
+  int AppendUncheckedElements(const double* values, unsigned int numValues);
+
+  /**
    * Returns the value of 1 element.
    */
   double GetElement(unsigned int idx);

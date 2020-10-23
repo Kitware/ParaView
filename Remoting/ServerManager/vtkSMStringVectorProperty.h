@@ -85,6 +85,16 @@ public:
   //@}
 
   /**
+   * Append the values. The vector is resized as necessary.
+   */
+  int AppendElements(const std::vector<std::string>& newvalue);
+
+  /**
+   * Append the values to the unchecked elements. The vector is resized as necessary.
+   */
+  int AppendUncheckedElements(const std::vector<std::string>& newvalue);
+
+  /**
    * Fills up the vtkStringList instance with the current value.
    */
   void GetElements(vtkStringList* list);
