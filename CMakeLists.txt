@@ -121,7 +121,7 @@ include(CheckCXXSourceRuns)
 file(READ "${vtk_cmake_dir}/vtkRequireLargeFilesSupport.cxx"
   VTK_REQUIRE_LARGE_FILE_SUPPORT_FILE)
 check_cxx_source_runs("${VTK_REQUIRE_LARGE_FILE_SUPPORT_FILE}"
-  CMAKE_REQUIRE_LARGE_FILE_SUPPORT "Support for 64 bit file systems")
+  CMAKE_REQUIRE_LARGE_FILE_SUPPORT)
 set(VTK_REQUIRE_LARGE_FILE_SUPPORT ${CMAKE_REQUIRE_LARGE_FILE_SUPPORT})
 
 #-----------------------------------------------------------------------------
