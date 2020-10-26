@@ -76,6 +76,9 @@ vtk_module_add_module(ParaView::Catalyst
   CLASSES ${classes}
   HEADERS ${headers})
 vtk_module_client_server_exclude()
+vtk_module_link(ParaView::Catalyst
+  PRIVATE
+    ParaView::paraview_plugins)
 
 if (catalyst_fortran_using_mangling)
   vtk_module_definitions(ParaView::Catalyst

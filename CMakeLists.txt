@@ -290,17 +290,31 @@ paraview_plugin_scan(
   PROVIDES_PLUGINS  paraview_plugins
   REQUIRES_MODULES  paraview_plugin_required_modules)
 
+set(paraview_client_directories
+  "${CMAKE_CURRENT_SOURCE_DIR}/Clients"
+  "${CMAKE_CURRENT_SOURCE_DIR}/Adaptors")
+vtk_module_find_modules(paraview_client_module_files ${paraview_client_directories})
+vtk_module_find_kits(paraview_client_kit_files ${paraview_client_directories})
+vtk_module_scan(
+  MODULE_FILES        ${paraview_client_module_files}
+  KIT_FILES           ${paraview_client_kit_files}
+  REQUEST_MODULES     ${paraview_client_requested_modules}
+  REJECT_MODULES      ${paraview_client_rejected_modules}
+  PROVIDES_MODULES    paraview_client_modules
+  PROVIDES_KITS       paraview_client_kits
+  REQUIRES_MODULES    paraview_client_required_modules
+  UNRECOGNIZED_MODULES paraview_client_unrecognized_modules
+  WANT_BY_DEFAULT     "${PARAVIEW_BUILD_ALL_MODULES}"
+  ENABLE_TESTS        "${PARAVIEW_BUILD_TESTING}")
+
 set(paraview_source_directories
   "${CMAKE_CURRENT_SOURCE_DIR}/Kits"
-  "${CMAKE_CURRENT_SOURCE_DIR}/Clients"
-  "${CMAKE_CURRENT_SOURCE_DIR}/Adaptors"
   "${CMAKE_CURRENT_SOURCE_DIR}/Qt"
   "${CMAKE_CURRENT_SOURCE_DIR}/VTKExtensions"
   "${CMAKE_CURRENT_SOURCE_DIR}/Web"
   "${CMAKE_CURRENT_SOURCE_DIR}/Remoting"
   "${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty"
   "${CMAKE_CURRENT_SOURCE_DIR}/Utilities")
-
 vtk_module_find_modules(paraview_module_files ${paraview_source_directories})
 vtk_module_find_kits(paraview_kit_files ${paraview_source_directories})
 vtk_module_scan(
@@ -308,6 +322,7 @@ vtk_module_scan(
   KIT_FILES           ${paraview_kit_files}
   REQUEST_MODULES     ${paraview_requested_modules}
                       ${paraview_plugin_required_modules}
+                      ${paraview_client_required_modules}
   REJECT_MODULES      ${paraview_rejected_modules}
   PROVIDES_MODULES    paraview_modules
   PROVIDES_KITS       paraview_kits
@@ -383,7 +398,10 @@ if (PARAVIEW_USE_EXTERNAL_VTK)
   endif ()
 else ()
   set(vtk_requested_modules)
-  foreach (vtk_module IN LISTS paraview_requested_modules paraview_plugin_required_modules)
+  foreach (vtk_module IN LISTS
+                paraview_requested_modules
+                paraview_plugin_required_modules
+                paraview_client_required_modules)
     if (vtk_module MATCHES "ParaView::")
       continue ()
     endif ()
@@ -558,6 +576,25 @@ vtk_module_build(
   TEST_INPUT_DATA_DIRECTORY   "${paraview_test_data_directory_input}"
   TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}")
 
+vtk_module_build(
+  MODULES             ${paraview_client_modules}
+  KITS                ${paraview_client_kits}
+  PACKAGE             ParaViewClients
+  INSTALL_EXPORT      ParaViewClients
+  INSTALL_HEADERS     "${PARAVIEW_INSTALL_DEVELOPMENT_FILES}"
+  HEADERS_DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/paraview${paraview_version_suffix}"
+  CMAKE_DESTINATION   "${paraview_cmake_destination}"
+  LICENSE_DESTINATION "${CMAKE_INSTALL_LICENSEDIR}"
+  HIERARCHY_DESTINATION "${CMAKE_INSTALL_LIBDIR}/vtk/hierarchy/${CMAKE_PROJECT_NAME}"
+  LIBRARY_NAME_SUFFIX "${PARAVIEW_CUSTOM_LIBRARY_SUFFIX}"
+  VERSION             "${PARAVIEW_VERSION}"
+  SOVERSION           "1"
+  TEST_DATA_TARGET    ParaViewData
+  BUILD_WITH_KITS     "${PARAVIEW_BUILD_WITH_KITS}"
+  USE_EXTERNAL        "${PARAVIEW_BUILD_WITH_EXTERNAL}"
+  TEST_INPUT_DATA_DIRECTORY   "${paraview_test_data_directory_input}"
+  TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}")
+
 include(vtkModuleJson)
 vtk_module_json(
   MODULES ${vtk_modules}
@@ -565,10 +602,14 @@ vtk_module_json(
 vtk_module_json(
   MODULES ${paraview_modules}
   OUTPUT "paraview-modules.json")
+vtk_module_json(
+  MODULES ${paraview_client_modules}
+  OUTPUT "paraview-client-modules.json")
 
 list(LENGTH vtk_modules vtk_modules_len)
 list(LENGTH paraview_modules paraview_modules_len)
-message(STATUS "Enabled modules: VTK(${vtk_modules_len}), ParaView(${paraview_modules_len})")
+list(LENGTH paraview_client_modules paraview_client_modules_len)
+message(STATUS "Enabled modules: VTK(${vtk_modules_len}), ParaView(${paraview_modules_len} + ${paraview_client_modules_len})")
 
 set(autoload_plugins)
 foreach (paraview_plugin IN LISTS paraview_plugins)
@@ -600,7 +641,8 @@ set(CMAKE_INSTALL_RPATH
   "${_paraview_CMAKE_INSTALL_RPATH_save}")
 
 vtk_module_wrap_client_server(
-  MODULES   ${paraview_modules}
+  MODULES   ${paraview_client_modules}
+            ${paraview_modules}
             ${vtk_modules}
   TARGET    paraview_client_server
   INSTALL_EXPORT ParaView)
@@ -655,6 +697,7 @@ if (PARAVIEW_USE_PYTHON)
 
   vtk_module_wrap_python(
     MODULES         ${paraview_modules}
+                    ${paraview_client_modules}
     INSTALL_EXPORT  ParaViewPython
     INSTALL_HEADERS "${PARAVIEW_INSTALL_DEVELOPMENT_FILES}"
     PYTHON_PACKAGE  "paraview.modules"

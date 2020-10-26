@@ -95,7 +95,7 @@ if (NOT BUILD_SHARED_LIBS)
   # provide/generate.
   set(_paraview_python_files)
   set(_paraview_python_modules)
-  foreach (_paraview_module IN LISTS paraview_modules)
+  foreach (_paraview_module IN LISTS paraview_modules paraview_client_modules)
     _vtk_module_get_module_property("${_paraview_module}"
       PROPERTY "python_modules"
       VARIABLE _paraview_module_python_files)
