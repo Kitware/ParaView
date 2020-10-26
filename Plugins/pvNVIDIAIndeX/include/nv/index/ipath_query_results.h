@@ -24,7 +24,7 @@ namespace index
 /// by a derived interface class that returns 3D related pick information such as 
 /// the normal or 1D/2D-texture coordinates at an intersection point.
 ///
-/// \ingroup scene_queries
+/// \ingroup nv_scene_queries
 ///
 class IPath_pick_result :
     public mi::base::Interface_declare<0x48da609d,0x1f76,0x4a53,0x91,0x06,0x92,0x26,0xdf,0x3e,0x86,0x7c,

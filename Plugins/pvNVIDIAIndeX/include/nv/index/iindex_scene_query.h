@@ -22,7 +22,7 @@ class IViewport_list;
 /// determining which rendered scene element a user has clicked on, or 
 /// entry lookup, which returns a single entry of a dataset.
 ///
-/// \ingroup scene_queries
+/// \ingroup nv_scene_queries
 ///
 class IIndex_scene_query :
     public mi::base::Interface_declare<0xd71c4a09,0xd2ac,0x428e,0xbf,0x6e,0x01,0x5f,0x9f,0xe3,0xfa,0x35>

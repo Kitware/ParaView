@@ -19,7 +19,7 @@ namespace index
 
 /// Interface for irregular volume scene elements.
 ///
-/// \ingroup nv_index_scene_description_shape
+/// \ingroup nv_index_scene_description_distributed_data
 ///
 class IIrregular_volume_scene_element :
     public  mi::base::Interface_declare<0xf844b38d,0xc764,0x4f55,0xae,0xda,0xa9,0x41,0x1f,0xeb,0x3,0x6b,

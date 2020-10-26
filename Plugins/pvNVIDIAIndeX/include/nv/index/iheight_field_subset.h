@@ -22,13 +22,14 @@ namespace index
 /// TODO: describe internal representation
 /// TODO: describe LOD info
 ///
-/// \ingroup nv_index_data_storage
+/// \ingroup nv_index_data_subsets
 ///
 class IHeight_field_subset_data_descriptor:
         public mi::base::Interface_declare<0x88014528,0xd6b8,0x4b17,0x9d,0x12,0x74,0x9c,0xe2,0x88,0x46,0x6b,
                                            IDistributed_data_subset_data_descriptor>
 {
 public:
+    /// Structual information regarding internal tile data representations. 
     struct Data_tile_info
     {
         mi::math::Vector_struct<mi::Sint32, 2>  tile_position;      ///< Position in tile local space of the
@@ -101,7 +102,7 @@ public:
 /// by all the height-field data tiles associated with a rectangular subregion of the entire scene/dataset. This
 /// interface class provides methods to input tile data for one or multiple attributes of a dataset.
 ///
-/// \ingroup nv_index_data_storage
+/// \ingroup nv_index_data_subsets
 ///
 class IHeight_field_subset:
         public mi::base::Interface_declare<0xe6fc895a,0xdd21,0x4f63,0xac,0x99,0x78,0xe3,0x4a,0x95,0x68,0x26,
@@ -142,7 +143,6 @@ public:
         DATA_TRANSFORMATION_NONE            = 0,  ///< Pass through unchanged
     };
 
-public:
 
     /// Returns the data descriptor of the subset.
     ///
@@ -214,12 +214,24 @@ public:
     /// Query the internal buffer information of the data-subset instance for a height-field data tile
     /// in otder to gain access to the internal buffer-data for direct write operations.
     ///
-    /// \param[in]  tile_subset_idx    height-field data tile subset index for which to query internal buffer.
+    /// \param[in]  tile_subset_idx     The height-field data tile subset index for which to query
+    ///                                 internal buffer.
     ///
     /// \returns                        An instance of \c Internal_buffer_info describing the internal
     ///                                 buffer data for direct use.
     ///
     virtual const Data_tile_buffer_info    access_tile_data_buffer(mi::Uint32  tile_subset_idx) = 0;
+
+    /// Query the internal buffer information of the data-subset instance for a height-field data tile
+    /// in otder to gain access to the internal buffer-data for direct write operations.
+    /// \note                           The const-qualifier of the interface method's signature leaves the
+    ///                                 instance of an implemented \c IHeight_field_subset interface untouched.
+    /// \param[in]  tile_subset_idx     The height-field data tile subset index for which to query
+    ///                                 internal buffer.
+    ///
+    /// \returns                        An instance of \c Internal_buffer_info describing the internal
+    ///                                 buffer data for direct use.
+    ///
     virtual const Data_tile_buffer_info    access_tile_data_buffer(mi::Uint32  tile_subset_idx) const = 0;
 
     /// Creates an RDMA buffer that is a wrapper for of the internal buffer.
@@ -250,9 +262,9 @@ public:
 
     /// Returns whether the given height value represent a hole in the heightfield.
     ///
-    /// \param[in] height Heightfield height value.
+    /// \param[in] height       Heightfield height value.
     ///
-    /// \return True if the given height value represents a hole.
+    /// \return                 Returns \c true if the given height value represents a hole.
     ///
     static inline bool is_hole(mi::Float32 height)
     {
@@ -267,9 +279,19 @@ public:
     /// This method allows to write a compact cache file of successfully loaded subset data to the file system
     /// for more efficient future loading operations.
     ///
+    /// \param[in] output_filename  Defines the output file.
+    ///
     /// \note: This API is currently not supported and will change in future releases.
     ///
     virtual bool store_internal_data_representation(const char* output_filename) const = 0;
+
+    /// This method allows to load a compact cache file of successfully loaded subset data to the file system
+    /// for more efficient future loading operations.
+    ///
+    /// \param[in] input_filename   Defines the input file.
+    ///
+    /// \note: This API is currently not supported and will change in future releases.
+    ///
     virtual bool load_internal_data_representation(const char*  input_filename) = 0;
 };
 

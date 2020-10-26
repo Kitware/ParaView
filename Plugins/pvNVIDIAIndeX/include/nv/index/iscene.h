@@ -19,7 +19,6 @@
 #include <nv/index/iparticle_volume_scene_element.h>
 #include <nv/index/ipipe_set.h>
 #include <nv/index/iregular_heightfield.h>
-#include <nv/index/iregular_volume.h>
 #include <nv/index/iscene_group.h>
 #include <nv/index/ishape.h>
 #include <nv/index/isparse_volume_scene_element.h>
@@ -114,18 +113,21 @@ public:
     ///@}
 
     ///////////////////////////////////////////////////////////////////////////////////
-    /// \name Creating shapes.
+    /// \name Creating higher-level object space shapes and image space shapes.
     ///@{
 
-    /// Creates a new shape of the given type, but does not yet add it to the
-    /// scene description.
+    /// Creates a new shape of the given type, but does not yet add it to the scene description.
+    ///
     /// \param[in] class_id Identifier of the type of shape
-    /// \return The new \c IScene
+    ///
+    /// \return     Returns an instance of \c IShape.
+    ///
     virtual IShape* create_shape(const mi::base::Uuid& class_id) const = 0;
 
-    /// Creates a new shape of the given type, but does not yet add it to the
-    /// scene description.
-    /// \return The new \c IScene
+    /// Creates a new shape of the given type, but does not yet add it to the scene description.
+    ///
+    /// \return     Returns an instance of \c IShape.
+    ///
     template<class T>
     T* create_shape() const
     {
@@ -153,32 +155,9 @@ public:
     }
     ///@}
 
-    /// Creates a new volume scene element from the given import configuration,
-    /// but does not yet add it to the scene description.
-    ///
-    /// The scene element can be transformed by specifying scaling, a rotation
-    /// around its local K-axis, and a translation. These transformations
-    /// generate the matrix that will be returned by \c
-    /// IRegular_volume::get_transform() and is applied to transform the scene
-    /// element from IJK to XYZ space.
-    ///
-    /// \param[in] scaling            Scaling; use (1, 1, 1) to disable.
-    /// \param[in] rotation_k         Rotation around the K-axis (in radians).
-    /// \param[in] translation        Translation; use (0, 0, 0) to remain at the origin.
-    /// \param[in] size               Size of the entire volume data in each dimension
-    ///                                 (in voxels).
-    /// \param[in] importer_callback  Distributed data import callback function.
-    /// \param[in] dice_transaction   The DiCE transaction.
-    ///
-    /// \return The new \c IRegular_volume instance.
-    ///
-    virtual IRegular_volume* create_volume(
-        const mi::math::Vector_struct<mi::Float32, 3>&          scaling,
-        mi::Float32                                             rotation_k,
-        const mi::math::Vector_struct<mi::Float32, 3>&          translation,
-        const mi::math::Vector_struct<mi::Uint32, 3>&           size,
-        nv::index::IDistributed_data_import_callback*           importer_callback,
-        mi::neuraylib::IDice_transaction*                       dice_transaction) const = 0;
+    ///////////////////////////////////////////////////////////////////////////////////
+    /// \name Creating higher-level object space shapes and image space shapes.
+    ///@{
 
     /// Creates a new irregular volume scene element from the given import configuration, but does not yet
     /// add it to the scene description.
@@ -354,6 +333,7 @@ public:
         const mi::math::Bbox_struct<mi::Float32, 3> &           ijk_bbox,
         nv::index::IDistributed_data_import_callback*           importer_callback,
         mi::neuraylib::IDice_transaction*                       dice_transaction) const = 0;
+    ///@}
 
     ///////////////////////////////////////////////////////////////////////////////////
     /// \name Bounding boxes and region of interest

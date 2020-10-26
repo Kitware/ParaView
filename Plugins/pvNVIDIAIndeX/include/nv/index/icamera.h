@@ -44,12 +44,12 @@ public:
     /// Set the basic camera parameters. A convenienve method for setting
     /// up basic camera parameters.
     ///
-    /// \param[in]  eye_point    Camera eye point
-    /// \param[in]  view_dir     Viewing direction
-    /// \param[in]  up_direction Up vector
+    /// \param[in]  eye_point       Camera eye point
+    /// \param[in]  view_direction  Viewing direction
+    /// \param[in]  up_direction    Up vector
     virtual void set(
         const mi::math::Vector_struct<mi::Float32, 3>& eye_point,
-        const mi::math::Vector_struct<mi::Float32, 3>& view_dir,
+        const mi::math::Vector_struct<mi::Float32, 3>& view_direction,
         const mi::math::Vector_struct<mi::Float32, 3>& up_direction) = 0;
 
     /// Sets the eye point (the origin of the camera's coordinate system).
@@ -63,9 +63,9 @@ public:
 
     /// Set the view direction.
     ///
-    /// \param[in] dir Camera direction vector.
+    /// \param[in] view_direction  Camera direction vector.
     /// \return true when succeeded.
-    virtual bool set_view_direction(const mi::math::Vector_struct<mi::Float32, 3>& dir) = 0;
+    virtual bool set_view_direction(const mi::math::Vector_struct<mi::Float32, 3>& view_direction) = 0;
 
     /// Returns the normalized view direction.
     ///
@@ -73,7 +73,7 @@ public:
     virtual mi::math::Vector_struct<mi::Float32, 3> get_view_direction() const = 0;
 
     /// Sets the up vector.
-    /// \param[in] up_direction Up vector, will be normalized.
+    /// \param[in] up_direction  Up vector, will be normalized.
     virtual void set_up_direction(const mi::math::Vector_struct<mi::Float32, 3>& up_direction) = 0;
 
     /// Returns the normalized up vector.

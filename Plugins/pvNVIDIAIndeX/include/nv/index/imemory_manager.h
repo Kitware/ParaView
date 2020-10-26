@@ -19,10 +19,9 @@ class ICuda_memory_buffer :
 public:
     /// Exposes the actual pointer to a internally managed CUDA device memory area.
     ///
-    /// \param[in]  offset
-    ///             Allows off-setting in the encapsulated CUDA device memory.
+    /// \param[in]  offset  Allows off-setting in the encapsulated CUDA device memory.
     ///
-    /// \returns    Returns the device pointer to the encapsulated CUDA memory.
+    /// \returns            Returns the device pointer to the encapsulated CUDA memory.
     ///
     virtual char* get(mi::Size offset = 0) const = 0;
 };
@@ -35,11 +34,11 @@ class ICuda_memory_manager :
 public:
     /// Requesting and allocating a linear memory on a CUDA device.
     ///
-    /// \param[in]  elements
-    ///             The number of elements of a given type (type size) to be hosted in allocated device memory.
+    /// \param[in]  elements    The number of elements of a given type (type size) to be
+    ///                         hosted in allocated device memory.
     ///
-    /// \param[in]  type_size
-    ///             The size of type of each of the elements that shall be stored in the allocated device memory.
+    /// \param[in]  type_size   The size of type of each of the elements that shall be
+    ///                         stored in the allocated device memory.
     ///
     /// \returns    Returns the requested CUDA device buffer encapsulated in an instance of \c ICuda_memory_buffer.
     ///
@@ -47,6 +46,14 @@ public:
         mi::Size elements,
         mi::Size type_size) const = 0;
     
+    /// Convenience function for requesting and allocating a linear memory on a CUDA device.
+    /// The template parameter denotes the type used for creating a linear CUDA buffer.
+    ///
+    /// \param[in]  elements    The number of elements of a given type (type size)
+    ///                         to be hosted in allocated device memory.
+    ///
+    /// \returns    Returns the requested CUDA device buffer encapsulated in an instance of \c ICuda_memory_buffer.
+    ///
     template<typename T>
     ICuda_memory_buffer* request_linear_device_memory(mi::Size elements) const
     {

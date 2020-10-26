@@ -27,38 +27,12 @@ class IConfig_settings :
                                        mi::neuraylib::IElement>
 {
 public:
-    /// Filtering modes (interpolation) for volume access. With post-classification the volume data
-    /// is filtered before applying the colormap, while with pre-classification the colormap is
-    /// applied before filtering.
-    /// In GPU rendering mode, all the filters below including those tagged as 'software' are
-    /// implemented using CUDA. Those filters that are are tagged 'hardware' leverage the
-    /// texture hardware, e.g., linear filters, exposed through CUDA to further optimize the
-    /// filtering performance.
-    ///
-    enum Volume_filtering_modes
-    {
-        /// Access a single voxel with nearest filtering (a.k.a. point filtering).
-        VOLUME_FILTER_NEAREST                    = 0,
-        /// Trilinear interpolation with post-classification, using texture hardware.
-        VOLUME_FILTER_TRILINEAR_POST_HW          = 1,
-        /// Trilinear interpolation with post-classification, using software filtering.
-        VOLUME_FILTER_TRILINEAR_POST_SW          = 2,
-        /// Trilinear interpolation with pre-classification, using software filtering.
-        VOLUME_FILTER_TRILINEAR_PRE_SW           = 3,
-        /// Tricubic Catmull-Rom interpolation with pre-classification, using software filtering.
-        VOLUME_FILTER_TRICUBIC_CATMULL           = 4,
-        /// Tricubic Catmull-Rom interpolation with pre-classification, using software filtering.
-        VOLUME_FILTER_TRICUBIC_CATMULL_POST_HW   = 5,
-        /// Tricubic B-spline interpolation with pre-classification, using software filtering.
-        VOLUME_FILTER_TRICUBIC_BSPLINE           = 6,
-        /// Tricubic B-spline interpolation with post-classification, using texture hardware.
-        VOLUME_FILTER_TRICUBIC_BSPLINE_POST_HW   = 7
-    };
-
     /// NVIDIA IndeX supports both a CUDA-based GPU or CPU renderers. The renderers can be switched
     /// at runtime. The GPU renderer gives the best performance especially when rendering large-scale
     /// data. Moreover, the GPU renderer has the complete and more comprehensive feature set compared
     /// to the CPU renderer. The CPU renderer is restricted to volume and heightfield rendering only.
+    ///
+    /// \deprecated CPU rendering mode is deprecated
     enum Rendering_mode
     {
         /// CPU rendering mode.
@@ -322,27 +296,6 @@ public:
     /// \return subcube border size
     virtual mi::Uint32 get_subcube_border_size() const = 0;
 
-    /// Controls whether CUDA compute tasks may access device memory as a CUDA
-    /// surface reference.
-    ///
-    /// A user-supplied compute task (such as a \c IRegular_volume_compute_task)
-    /// may read and write data in device memory (e.g. volume data), when a CUDA
-    /// implementation of the compute task is supplied. In this case surface
-    /// access must be enabled using the method. Otherwise the setting should be
-    /// left disabled (the default), as enabling it might result in a slight
-    /// performance penalty.
-    ///
-    /// \note This setting must be applied before memory is allocated by the
-    /// library.
-    ///
-    /// \param[in] enable              Enable read/write access to surface references.
-    //
-    virtual void set_cuda_compute_surface_access_enabled(bool enable) = 0;
-
-    /// Returns whether CUDA compute tasks may access device memory as a CUDA
-    /// surface reference.
-    virtual bool is_cuda_compute_surface_access_enabled() const = 0;
-
     /// Controls additional internal runtime checks for potential CUDA errors.
     ///
     /// \note These checks potentially impair runtime performance and should be only enabled
@@ -540,83 +493,6 @@ public:
     /// trade off between the rendering quality and the performance.
     ///@{
 
-    /// Returns the current volume filter mode.
-    /// \return volume filter mode
-    ///
-    /// \deprecated To be replaced by the scene attribute \c IVolume_filter_mode.
-    ///
-    virtual Volume_filtering_modes get_volume_filter() const = 0;
-
-    /// Sets the filter mode for volume rendering, which is used when sampling volume data.
-    /// (default: VOLUME_FILTER_NEAREST)
-    /// \param[in] filter Filter mode
-    ///
-    /// \deprecated To be replaced by the scene attribute \c IVolume_filter_mode.
-    ///
-    virtual void set_volume_filter(Volume_filtering_modes filter) = 0;
-
-    /// Returns whether RGBA-volume opacity mapping is enabled or disabled. The default is that
-    /// the RGBA-volume opacity mapping functionality is disabled.
-    ///
-    /// \returns    Returns \c true if RGBA-volume opacity mapping is enabled and
-    ///             \c false otherwise.
-    ///
-    virtual bool is_rgba_volume_opacity_mapping_enabled() const = 0;
-
-    /// Enable or disable the RGBA-volume opacity mapping. (default: false)
-    ///
-    /// \param[in] enable       Enables the RGBA-volume opacity mapping if (\c true)
-    ///                         otherwise the technique will be disabled (\c false).
-    ///
-    virtual void set_rgba_volume_opacity_mapping(bool enable) = 0;
-
-    /// Return if the ray segment accumulation technique is enabled or disabled.
-    ///
-    /// \return     Returns \c true if the ray segment accumulation technique is enabled and
-    ///             \c false otherwise.
-    ///
-    virtual bool get_ray_segment_accumulation_technique() const = 0;
-
-    /// Enable or disable the ray segment accumulation technique.
-    /// (default: false)
-    ///
-    /// \param[in] enable       Enables the ray segment ray segment accumulation technique
-    ///                         if (\c true) otherwise the technique will be disabled (\c false).
-    ///
-    virtual void set_ray_segment_accumulation_technique(bool enable) = 0;
-
-    /// Returns the minimum sampling step size.
-    /// \return minimum step size
-    virtual mi::Float32 get_step_size_min() const = 0;
-
-    /// Set the minimum sampling step size.
-    /// This defines the distance between two sampling points during volume raycasting.
-    /// When minimum and maximum step size are different a depth-dependent intermediate step size is
-    /// used. (default: 1.0)
-    /// 
-    /// \note A depth-dependent step size is currently not support, the given minimum step size is
-    ///       used as the actual step size.
-    ///
-    /// \param[in] min_step_size sampling Minimum step size
-    ///
-    virtual void set_step_size_min(mi::Float32 min_step_size) = 0;
-
-    /// Returns the maximum sampling step size.
-    /// \return current sampling step size maximum value
-    virtual mi::Float32 get_step_size_max() const = 0;
-
-    /// Sets the maximum sampling step size.
-    /// This defines the distance between two sampling points during volume raycasting.
-    /// When minimum and maximum step size are different a depth-dependent intermediate step size is
-    /// used. (default: 1.0)
-    ///
-    /// \note A depth-dependent step size is currently not support, the given minimum step size is
-    ///       used as the actual step size.
-    ///
-    /// \param[in] max_step_size Maximum sampling step
-    ///
-    virtual void set_step_size_max(mi::Float32 max_step_size) = 0;
-
     /// Returns the number of samples per pixel used during rendering.
     /// \returns current number samples.
     virtual mi::Uint32 get_rendering_samples() const = 0;
@@ -779,6 +655,7 @@ public:
     ///
     /// \return Threshold value.
     virtual mi::Float32 get_volume_picking_threshold() const = 0;
+
     ///@}
 };
 

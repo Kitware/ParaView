@@ -28,7 +28,7 @@ namespace index
 /// The ellipse is defined in image space, i.e., an ellipse is parallel to the view plane and always faces
 /// towards the viewer.
 ///
-/// \ingroup nv_index_scene_description_shape
+/// \ingroup nv_index_scene_description_image_shape
 ///
 class IEllipse :
         public mi::base::Interface_declare<0x570a1c6e,0xfab3,0x41f6,0x9d,0x0d,0xfe,0x47,0x68,0x60,0x8f,0xb0,

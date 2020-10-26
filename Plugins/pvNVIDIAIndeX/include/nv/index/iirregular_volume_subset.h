@@ -28,11 +28,10 @@ namespace index {
 /// 
 /// Attribute values can either be defined per vertex or per cell (see IIrregular_volume_subset::Attribute_affiliation).
 ///
-/// \note The current implementation of NVIDIA IndeX only allows for tetrahedral cells defining an irregular volume.
-///       While the interface allows to generate multiple attribute sets associated with the irregular volume dataset,
-///       only the first attribute set is regarded for rendering.
-/// 
-/// \ingroup nv_index_data_storage
+/// \note The current implementation of NVIDIA IndeX supports rendering of irregular volumes that
+///       use the following cell shapes: tetrahedron, pyramid, wedge/prism, hexahedron.
+///
+/// \ingroup nv_index_data_subsets
 ///
 class IIrregular_volume_subset :
     public mi::base::Interface_declare<0xac50a241,0x2b4a,0x4e07,0x98,0x9e,0x04,0xa3,0x21,0x95,0x31,0x2f,
@@ -102,9 +101,6 @@ public:
     
     /// Types of attribute set affiliations.
     ///
-    /// \note The currently only supported attribute affiliation allows for assigning attribute values to irregular 
-    ///       volume mesh vertices. Future affiliations will allow per cell attribute assignments.
-    ///
     enum Attribute_affiliation
     {
         ATTRIB_AFFIL_PER_VERTEX = 0x00,     ///< Per irregular volume mesh-vertex attribute.
@@ -112,9 +108,6 @@ public:
     };
     
     /// Types of attribute set values.
-    ///
-    /// The currently only supported attribute type is an 8bit unsigned integer type. Future types will encompass
-    /// different single channel as well as multi-channel attribute values with higher precision base types.
     ///
     enum Attribute_type
     {
@@ -237,11 +230,11 @@ public:
         mi::Uint32          attrib_index,
         Attribute_storage&  attrib_storage) const = 0;
 
-    /// -- Experimental (very experimental)
-
     /// GPU device id if the buffer is located on a GPU device.
     ///
     /// \returns GPU device id, negative values indicate that the data is currently not stored on any device.
+    ///
+    /// \note Experimental
     ///
     virtual mi::Sint32 get_gpu_device_id() const = 0;
 
@@ -251,24 +244,30 @@ public:
     /// \param[out] attrib_storage  The attribute storage for the given index.
     ///
     /// \return                     True when the attribute storage according to the passed index could be found, false otherwise.
-    //
+    ///
+    /// \note Experimental
+    ///
     virtual bool get_active_attribute_device_storage(
         mi::Uint32          attrib_index,
         Attribute_storage&  attrib_storage) const = 0;
 
+    /// \note Experimental
     virtual bool get_backup_attribute_device_storage(
         mi::Uint32          attrib_index,
         Attribute_storage&  attrib_storage) const = 0;
 
+    /// \note Experimental
     virtual bool swap_active_attribute_storage() = 0;
 
 
     /// Caching interface (preliminary). Returns true if cache is loaded.
+    ///
+    /// \note Experimental
+    ///
     virtual bool use_cache_file(
         const char*         filename,
         mi::Uint32          mode,
         mi::Uint32          flags) = 0;
-
 };
 
 } // namespace index

@@ -75,12 +75,13 @@ class IOut_of_memory_error :
                                        nv::index::IError>
 {
 public:
+    /// Failure codes that describe the potential issue.
     enum Failure_hint
     {
-        OOM_FAIL_HINT_NONE                          = 0x00u,
-        OOM_FAIL_INVALID_ALLOC_REQUEST              = 0x01u,
-        OOM_FAIL_FRAGMENTED_MEMORY                  = 0x02u,
-        OOM_FAIL_INSUFFICIENT_DYNAMIC_RESOURCES     = 0x04u
+        OOM_FAIL_HINT_NONE                          = 0x00u,    ///<! Unknown issue.
+        OOM_FAIL_INVALID_ALLOC_REQUEST              = 0x01u,    ///<! Denotes invalid allocation request.
+        OOM_FAIL_FRAGMENTED_MEMORY                  = 0x02u,    ///<! Denotes fragmented memory.
+        OOM_FAIL_INSUFFICIENT_DYNAMIC_RESOURCES     = 0x04u     ///<! Denoted insufficient memory resources for dynamic memory management.
     };
 
     /// Returns the amount of memory available on the specific memory system (i.e. host

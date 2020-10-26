@@ -29,7 +29,7 @@ namespace index
 /// determining the path (\c IScene_path) from the root to some given 
 /// scene element.
 ///
-/// \ingroup scene_queries
+/// \ingroup nv_scene_queries
 ///
 class IScene_visitor
 {

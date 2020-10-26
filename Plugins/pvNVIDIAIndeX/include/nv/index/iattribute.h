@@ -19,6 +19,7 @@ namespace index
 
 /// <em>Attributes</em> are a part of the scene description that provide a
 /// common mechanism for parameterized information used in processing.
+///
 /// Attributes define the rendered appearance of shapes and large-scale datasets
 /// and can be used to store meta-information in the scene description for later
 /// evaluation.  Attributes can therefore affect both the rendering as well as

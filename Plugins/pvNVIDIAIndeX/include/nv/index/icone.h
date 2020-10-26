@@ -24,7 +24,7 @@ namespace index
 /// is shaded using the material and light defined in the scene
 /// description.
 ///
-/// \ingroup nv_index_scene_description_shape
+/// \ingroup nv_index_scene_description_object_shape
 ///
 class ICone :
     public mi::base::Interface_declare<0xe2e95b32,0x858a,0x4cb7,0x80,0x91,0xf5,0xf7,0x42,0x5e,0x9a,0x04,

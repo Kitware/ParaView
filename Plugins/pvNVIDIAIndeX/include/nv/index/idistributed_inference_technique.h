@@ -144,7 +144,7 @@ public:
     virtual mi::neuraylib::Tag_struct get_meta_data() const { return mi::neuraylib::NULL_TAG; }
 
 protected: 
-    bool    m_enabled;
+    bool    m_enabled;  ///<! Flag is inference technique enabled as attribute in the scene description. 
 };
 
 } // namespace index

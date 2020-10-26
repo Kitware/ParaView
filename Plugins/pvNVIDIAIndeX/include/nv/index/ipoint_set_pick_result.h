@@ -21,7 +21,7 @@ namespace index
 /// The interface class sub classes from \c IScene_pick_result to provide additional 
 /// intersection results specific to \c IPoint_set scene elements.
 ///
-/// \ingroup scene_queries
+/// \ingroup nv_scene_queries
 ///
 class IPoint_set_pick_result :
     public mi::base::Interface_declare<0x22be608a,0x48da,0x4c6a,0xa7,0xb7,0x5e,0x5c,0xa3,0x66,0x15,0x99,

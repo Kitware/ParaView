@@ -38,6 +38,9 @@ public:
     ///   required to meet the configured redundancy level).
     /// - If disk swapping is enabled, offload database elements to disk.
     ///
+    /// \note Memory limits are ignored if memory usage tracking is not enabled (\see
+    ///      #set_memory_usage_tracking()).
+    ///
     /// \see #get_memory_limits(), #set_disk_swapping(), #get_disk_swapping(),
     ///      #mi::neuraylib::INetwork_configuration::set_redundancy_level(),
     ///      #mi::neuraylib::INetwork_configuration::get_redundancy_level()
@@ -85,6 +88,25 @@ public:
     ///
     /// \return                  The configured directory, or \c NULL if disabled.
     virtual const char* get_disk_swapping() const = 0;
+
+    /// Configures tracking of memory usage of the database.
+    ///
+    /// Tracking the memory usage of the database incurs a small overhead, and is disabled by
+    /// default. It is only needed if memory limits are enabled (\see set_memory_limits()), or for
+    /// debugging.
+    ///
+    /// This can only be configured before \NeurayProductName has been started.
+    ///
+    /// \see #get_memory_usage_tracking()
+    ///
+    /// \param flag                 \c true to enable, \c false to disable memory usage tracking.
+    /// \return                     0, in case of success, -1 in case of failure.
+    virtual Sint32 set_memory_usage_tracking( bool flag) = 0;
+
+    /// Indicates whether tracking of memory usage of the database is enabled.
+    ///
+    /// \see #set_memory_usage_tracking()
+    virtual bool get_memory_usage_tracking() const = 0;
 };
 
 /*@}*/ // end group mi_neuray_configuration

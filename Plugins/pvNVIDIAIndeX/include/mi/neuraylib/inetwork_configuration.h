@@ -169,6 +169,9 @@ public:
     /// IPv4 counterparts mentioned above. The address [::] means the ``any IPv6 interface''
     /// address.
     ///
+    /// It is also possible to specify an interface name instead of an address. DiCE will
+    /// then take the address from the interface.
+    ///
     /// This can only be configured before \NeurayProductName has been started.
     ///
     /// \see #get_cluster_interface()

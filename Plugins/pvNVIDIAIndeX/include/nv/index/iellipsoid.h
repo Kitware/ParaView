@@ -22,7 +22,7 @@ namespace index
 /// The center and radii are defined in the ellipsoid's local coordinate system. The surface of
 /// the ellipsoid is shaded using the material and light defined in the scene description.
 ///
-/// \ingroup nv_index_scene_description_shape
+/// \ingroup nv_index_scene_description_object_shape
 ///
 class IEllipsoid :
     public mi::base::Interface_declare<0xa22f3595,0xe462,0x44ef,0xa9,0x23,0x9b,0x1d,0xdc,0x7a,0xda,0x50,
@@ -66,7 +66,8 @@ public:
     ///
     /// \param[in]      c       The axis of the ellipsoid in z direction.
     ///
-    virtual void set_semi_axes(
+    /// \return true when succeeded.
+    virtual bool set_semi_axes(
         const mi::math::Vector_struct<mi::Float32, 3>& a,
         const mi::math::Vector_struct<mi::Float32, 3>& b,
         mi::Float32                                    c) = 0;

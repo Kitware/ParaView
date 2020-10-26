@@ -20,7 +20,7 @@ namespace index
 /// The interface class representing a shading model.
 ///
 /// A shading model defines the normal interpolation for shading that results in
-/// the illumination of a surface.  The shading model is considered in
+/// the illumination of a surface. The shading model is considered in
 /// combination with the material properties and the illumination model applied
 /// to the surface. Only one shading model can be active at a time.  Derived
 /// classes define the shading model to use when rendering a surface.

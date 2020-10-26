@@ -32,7 +32,7 @@ namespace index
 /// instance, traversing from the scene root through all other
 /// ancestors to the actual instance.
 ///
-/// \ingroup scene_queries
+/// \ingroup nv_scene_queries
 ///
 class IScene_path :
     public mi::base::Interface_declare<0xce092e73,0x46c6,0x492f,0x87,0x9b,0x6e,0x14,0x23,0x07,0x33,0x26>
@@ -73,7 +73,7 @@ public:
 /// information includes, for instance, the scene element's \c tag to clearly identify it
 /// and the intersection point in the scene element's IJK space.
 ///
-/// \ingroup scene_queries
+/// \ingroup nv_scene_queries
 ///
 class IScene_pick_result :
     public mi::base::Interface_declare<0x0e201838,0xf0e5,0x41f7,0xa4,0xe0,0xfc,0x02,0x43,0xe6,0x06,0xce>
@@ -192,7 +192,7 @@ public:
 /// of the cast ray with the scene elements and all query results are sorted in front to
 /// depth order in accordance to the camera position.
 ///
-/// \ingroup scene_queries
+/// \ingroup nv_scene_queries
 ///
 class IScene_pick_results :
     public mi::base::Interface_declare<0xe39d04d8,0x1176,0x44c5,0xb0,0xc9,0xd3,0xff,0xf5,0x79,0x04,0xba>
@@ -252,7 +252,7 @@ public:
 /// information includes, for instance, the scene element's \c tag to clearly identify it
 /// and the intersection point in the scene element's IJK space.
 ///
-/// \ingroup scene_queries
+/// \ingroup nv_scene_queries
 ///
 class IScene_lookup_result :
     public mi::base::Interface_declare<0x8832eb30,0x1c5e,0x4ab8,0x90,0x77,0xca,0x62,0x07,0xdb,0x3c,0x5c>

@@ -126,7 +126,7 @@ public:
 /// \note This shape type still supports the per-object supersampling, but the
 /// full screen antialiasing take precedence, see IConfig_settings::set_rendering_samples().
 ///
-/// \ingroup nv_index_scene_description_shape
+/// \ingroup nv_index_scene_description_object_shape
 ///
 class IPath_3D :
         public mi::base::Interface_declare<0xe284adf5,0x6beb,0x4792,0x84,0x36,0x95,0xc7,0x78,0xb9,0xff,0x8a,
@@ -155,7 +155,7 @@ public:
     
     /// Get the pointer to the array of path points. 
     ///
-    /// \return     The pointer to the array of path points.
+    /// \return     The pointer to the array of path points. nullptr when nb_points == 0.
     ///
     virtual const mi::math::Vector_struct<mi::Float32, 3>* get_points() const = 0;
     
@@ -171,7 +171,7 @@ public:
         
     /// Get the pointer to the array of radii per point.
     ///
-    /// \return     The pointer to the array of radii per point.
+    /// \return     The pointer to the array of radii per point. nullptr when radii are empty.
     ///
     virtual const mi::Float32* get_radii() const = 0;
     
@@ -189,7 +189,7 @@ public:
     
     /// Get the pointer to the array of colors per segment/point. 
     ///
-    /// \return     The pointer to the array of colors per segment/point.
+    /// \return     The pointer to the array of colors per segment/point. nullptr when colors are empty.
     ///
     virtual const mi::math::Color_struct* get_colors() const = 0;
     
@@ -207,7 +207,7 @@ public:
         
     /// Get the pointer to the array of color map indexes per segment/point. 
     ///
-    /// \return              The pointer to the array of color map indexes per segment/point.
+    /// \return              The pointer to the array of color map indexes per segment/point. nullptr when color map indices are empty 
     ///
     virtual const mi::Uint32* get_color_map_indexes() const = 0;
     
@@ -226,7 +226,7 @@ public:
     /// Get a pointer to the list of material ids. Zero based integer values with index to the list
     /// of materials defined in the scene description for the same group as this path
     ///
-    /// \return The pointer to the list of material ids.
+    /// \return The pointer to the list of material ids. nullptr when no material ids are set.
     ///
     virtual const mi::Uint32* get_material_ids() const = 0;
     
@@ -249,7 +249,7 @@ public:
 /// The path is represented by a collection of 3D points connected by an unique and 
 /// continuous line path. Every point contains data represented as colors.
 ///
-/// \ingroup nv_index_scene_description_shape
+/// \ingroup nv_index_scene_description_image_shape
 ///
 class IPath_2D :
         public mi::base::Interface_declare<0xae7cff77,0x114b,0x472e,0x9b,0x77,0x1b,0xde,0x7d,0x98,0xff,0x7d,
@@ -279,7 +279,7 @@ public:
     
     /// Get the pointer to the array of path points. 
     ///
-    /// \return     The pointer to the array of path points.
+    /// \return     The pointer to the array of path points. nullptr when points are empty 
     ///
     virtual const mi::math::Vector_struct<mi::Float32, 3>* get_points() const = 0;
     
@@ -295,7 +295,7 @@ public:
         
     /// Get the pointer to the array of radii per point.
     ///
-    /// \return     The pointer to the array of radii per point.
+    /// \return     The pointer to the array of radii per point. nullptr when radii are empty 
     ///
     virtual const mi::Float32* get_radii() const = 0;
     
@@ -313,7 +313,7 @@ public:
     
     /// Get the pointer to the array of colors per segment/point. 
     ///
-    /// \return     The pointer to the array of colors per segment/point.
+    /// \return     The pointer to the array of colors per segment/point. nullptr when colors are empty 
     ///
     virtual const mi::math::Color_struct* get_colors() const = 0;
     
@@ -331,7 +331,7 @@ public:
         
     /// Get the pointer to the array of color map indexes per segment/point. 
     ///
-    /// \return              The pointer to the array of color map indexes per segment/point.
+    /// \return              The pointer to the array of color map indexes per segment/point. nullptr when color map indices are empty 
     ///
     virtual const mi::Uint32* get_color_map_indexes() const = 0;
     
