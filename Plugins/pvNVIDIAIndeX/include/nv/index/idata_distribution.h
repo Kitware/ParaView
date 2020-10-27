@@ -248,7 +248,7 @@ class IDistributed_data_job_scheduler :
                                        mi::base::IInterface>
 {
 public:
-    /// Launching the user-implemented distrbuted data job.
+    /// Launching the user-implemented distributed data job.
     ///
     /// \param[in] job                  The user-implemented distributed data job 
     ///                                 for scheduling and cluster-wide execution.

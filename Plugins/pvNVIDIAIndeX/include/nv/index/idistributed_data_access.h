@@ -114,7 +114,7 @@ public:
     /// In particular, the destructor of the implemented interface
     /// class deletes the local data. 
     ///
-    /// \returns        Interface pointer to an \c IDistrbuted_data_subset instance
+    /// \returns        Interface pointer to an \c IDistributed_data_subset instance
     ///                 giving access a datasets data.
     ///
     virtual const IDistributed_data_subset* get_distributed_data_subset() const = 0;
