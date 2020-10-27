@@ -639,6 +639,15 @@
           <Property name="Position2Info" />
           <Property name="WindowLocation" />
           <Property name="TextActor" />
+          <Property name="ShowBorder" />
+          <Property name="BorderColor" />
+          <Property name="BorderThickness" />
+          <Property name="CornerRadius" />
+          <Property name="CornerResolution" />
+          <Property name="BackgroundColor" />
+          <Property name="BackgroundOpacity" />
+          <Property name="RightPadding" />
+          <Property name="TopPadding" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -653,7 +662,7 @@
       <SubProxy>
         <Proxy name="Prop2DProperty"
                proxygroup="properties"
-               proxyname="TextProperty"></Proxy>
+               proxyname="TextPropertyCentered"></Proxy>
         <ExposedProperties>
           <Property name="Justification" />
           <Property name="Orientation" />
@@ -1785,6 +1794,110 @@
           <Group name="props" />
         </ProxyGroupDomain>
       </ProxyProperty>
+
+      <IntVectorProperty animateable="0"
+                         command="SetShowBorder"
+                         default_values="2"
+                         name="ShowBorder"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Never"
+                 value="0" />
+          <Entry text="Always"
+                 value="1" />
+          <Entry text="Only on hover"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>
+          Set whether the border is always drawn, only on hover or never.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetBorderColor"
+                            default_values="1 1 1"
+                            name="BorderColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector_with_palette">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Set the color of the border.</Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetBorderThickness"
+                            default_values="1.0"
+                            name="BorderThickness"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="10"
+                           min="0"
+                           name="range" />
+        <Documentation>Set the thickness of the border.</Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetCornerRadiusStrength"
+                            default_values="0.0"
+                            name="CornerRadius"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Documentation>Set the radius of the round corners in percent of the maximum allowed.</Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetCornerResolution"
+                            default_values="20"
+                            name="CornerResolution"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <IntRangeDomain max="1000"
+                           min="0"
+                           name="range" />
+        <Documentation>Set the number of points that define each round corner.</Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetPolygonColor"
+                            default_values="1 1 1"
+                            name="BackgroundColor"
+                            label="Background Color"
+                            number_of_elements="3"
+                            panel_widget="color_selector_with_palette">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Set the color of the text background.</Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetPolygonOpacity"
+                            default_values="0.0"
+                            name="BackgroundOpacity"
+                            label="Background Opacity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Documentation>Set the opacity of the text background.</Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty  command="SetRightPadding"
+                          default_values="0.0"
+                          name="RightPadding"
+                          number_of_elements="1">
+        <IntRangeDomain max="500"
+                        min="0"
+                        name="range"
+                        resolution="2" />
+        <Documentation>Set the padding between the text and the right border in pixels unit.</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  command="SetTopPadding"
+                          default_values="0.0"
+                          name="TopPadding"
+                          number_of_elements="1">
+        <IntRangeDomain   max="500"
+                          min="0"
+                          name="range"/>
+        <Documentation>Set the padding between the text and the top border in pixels unit.</Documentation>
+      </IntVectorProperty>
+
     </Proxy>
     <!-- ================================================================== -->
     <Proxy class="vtkProgressBarRepresentation"
