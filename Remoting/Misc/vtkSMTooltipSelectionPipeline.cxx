@@ -203,6 +203,18 @@ vtkDataObject* vtkSMTooltipSelectionPipeline::ConnectPVMoveSelectionToClient(
     ->GetOutputDataObject(0);
 }
 
+#ifndef VTK_LEGACY_REMOVE
+//----------------------------------------------------------------------------
+bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(
+  int association, double pos[2], std::string& tooltipText)
+{
+  VTK_LEGACY_BODY("vtkSMTooltipSelectionPipeline::GetTooltipInfo", "ParaView 5.9");
+  pos[0] = 0.0;
+  pos[1] = 0.0;
+  return this->GetTooltipInfo(association, tooltipText);
+}
+#endif
+
 //----------------------------------------------------------------------------
 bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(int association, std::string& tooltipText)
 {
