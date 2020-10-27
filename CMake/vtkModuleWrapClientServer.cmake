@@ -17,6 +17,10 @@ arguments, respectively.
 _vtk_module_wrap_client_server_sources(<module> <sources> <classes>)
 ```
 #]==]
+
+cmake_policy(PUSH)
+cmake_policy(SET CMP0053 NEW)
+
 function (_vtk_module_wrap_client_server_sources module sources classes)
   _vtk_module_get_module_property("${module}"
     PROPERTY  "exclude_wrap"
@@ -426,3 +430,5 @@ function (vtk_module_client_server_exclude)
     PROPERTY  "client_server_exclude"
     VALUE     1)
 endfunction ()
+
+cmake_policy(POP)
