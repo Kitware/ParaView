@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/SplitHorizontal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/RenderView" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/SplitHorizontal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.4/CentralWidgetFrame/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/RenderView" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/SplitHorizontal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.6/CentralWidgetFrame/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/RenderView" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.3/TitleBar/TitleLabel" command="mousePress" arguments="1,1,0,44,11" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.3/TitleBar/TitleLabel" command="mouseRelease" arguments="1,0,0,44,11" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="UnstructuredCellTypes" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="Polynomial" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.4/TitleBar/TitleLabel" command="mousePress" arguments="1,1,0,25,7" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.4/TitleBar/TitleLabel" command="mouseRelease" arguments="1,0,0,25,7" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,11,4,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,11,4,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="DistanceToCenter" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.5/TitleBar/TitleLabel" command="mousePress" arguments="1,1,0,30,7" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.5/TitleBar/TitleLabel" command="mouseRelease" arguments="1,0,0,30,7" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,11,8,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,11,8,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="Polynomial" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.6/TitleBar/TitleLabel" command="mousePress" arguments="1,1,0,18,6" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.6/TitleBar/TitleLabel" command="mouseRelease" arguments="1,0,0,18,6" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,10,9,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,10,9,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="DistanceToCenter" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View/Preview" command="activate" arguments="Custom ..." />
+  <pqevent object="pqClientMainWindow/CustomResolutionDialog/resolutionX" command="set_string" arguments="800" />
+  <pqevent object="pqClientMainWindow/CustomResolutionDialog/resolutionY" command="set_string" arguments="500" />
+  <pqevent object="pqClientMainWindow/CustomResolutionDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveScreenshot" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/NestedViews.test.png" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SaveAllViews/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/SearchBox/AdvancedButton" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SeparatorWidth/IntRangeWidget/LineEdit" command="set_string" arguments="4" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/FontScaling/ComboBox" command="activated" arguments="Do not scale fonts" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/NestedViews.test.png" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/NestedViews.png" />
+</pqevents>
