@@ -64,7 +64,7 @@ public:
    * Get information about the tooltip to be displayed.
    * Return false if the method failed computing information.
    */
-  bool GetTooltipInfo(int association, double tooltipPos[2], std::string& tooltipText);
+  bool GetTooltipInfo(int association, std::string& tooltipText);
 
 protected:
   vtkSMTooltipSelectionPipeline();
