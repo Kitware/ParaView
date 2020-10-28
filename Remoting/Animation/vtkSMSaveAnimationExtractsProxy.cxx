@@ -25,6 +25,7 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTrace.h"
 #include "vtkWeakPointer.h"
 
 namespace
@@ -115,6 +116,10 @@ bool vtkSMSaveAnimationExtractsProxy::SaveExtracts()
     vtkErrorMacro("No animation scene found. Cannot generate extracts.");
     return false;
   }
+
+  SM_SCOPED_TRACE(SaveLayoutSizes);
+  SM_SCOPED_TRACE(SaveCameras);
+  SM_SCOPED_TRACE(SaveAnimationExtracts).arg("proxy", this);
 
   vtkNew<ExtractsWriter> writer;
   writer->Initialize(this);
