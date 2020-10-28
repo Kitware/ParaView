@@ -21,7 +21,7 @@ namespace index
 /// transformations applied by the scene description.
 /// The size is defined in 3D object space length.
 ///
-/// \ingroup nv_index_scene_description_shape
+/// \ingroup nv_index_scene_description_image_shape
 ///
 class IIcon_3D :
         public mi::base::Interface_declare<0x1f5f4ed8,0xf0ac,0x4aed,0x8d,0x16,0x80,0x86,0x19,0x9d,0xe9,0x26,

@@ -28,7 +28,7 @@ namespace index
 /// The circle is defined in image space, i.e., a circle is parallel to the view plane and always faces 
 /// towards the viewer.
 ///
-/// \ingroup nv_index_scene_description_shape
+/// \ingroup nv_index_scene_description_object_shape
 ///
 class ICircle :
         public mi::base::Interface_declare<0xf5617675,0x23cc,0x4f82,0xbc,0xf7,0x24,0x52,0x7e,0xd6,0xf7,0xe5,

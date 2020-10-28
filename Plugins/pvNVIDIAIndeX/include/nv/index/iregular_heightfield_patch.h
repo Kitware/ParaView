@@ -19,7 +19,7 @@ namespace index
 
 /// Distributed data storage class for regular heightfield scene elements.
 ///
-/// \ingroup nv_index_data_storage
+/// \ingroup nv_index_data_subsets
 ///
 class IRegular_heightfield_patch :
     public mi::base::Interface_declare<0xbf4f2ce,0xc58d,0x42d6,0x89,0x59,0xb7,0x82,0x35,0x70,0xe8,0x0d,

@@ -18,11 +18,11 @@ namespace index {
 /// The interface class representing a texture filter mode.
 ///
 /// A texture filter mode specifies what kind of interpolation of texture values
-/// is performed upon rendering a textured primitive (\c IPlane, \c IRegular_heightfield).
+/// is performed upon rendering a textured primitive (see \c nv::index::IPlane, \c nv::index::IRegular_heightfield).
 ///
 /// This scene attribute is used to control the texture filtering for 2D textures mapped
-/// mapped to surface compute primitives (i.e. \c IPlane, \c IRegular_heightfield) using
-/// a compute technique (\c IDistributed_compute_technique).
+/// mapped to surface compute primitives (i.e. \c nv::index::IPlane, \c nv::index::IRegular_heightfield) using
+/// a compute technique (see \c nv::index::IDistributed_data_job).
 ///
 /// \ingroup nv_index_scene_description_attribute
 ///

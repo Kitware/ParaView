@@ -189,7 +189,7 @@ public:
 /// scene description. Arbitrary textures can be mapped onto the heightfield by
 /// applying \c IDistributed_compute_technique.
 ///
-/// \ingroup nv_index_scene_description_shape
+/// \ingroup nv_index_scene_description_distributed_data
 ///
 class IRegular_heightfield :
     public mi::base::Interface_declare<0x7a8db268,0x1c5b,0x4579,0xa4,0x42,0x0d,0x5f,0xb5,0xaa,0x9d,0x5b,

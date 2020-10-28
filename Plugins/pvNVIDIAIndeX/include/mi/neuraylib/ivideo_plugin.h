@@ -25,7 +25,7 @@ class IPlugin_api;
 */
 
 /// Type of video encoder plugins
-#define MI_NEURAY_VIDEO_PLUGIN_TYPE "video v24"
+#define MI_NEURAY_VIDEO_PLUGIN_TYPE "video v25"
 
 /// A buffer for video data representing a frame.
 class IVideo_data : public

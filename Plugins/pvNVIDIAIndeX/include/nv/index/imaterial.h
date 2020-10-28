@@ -33,7 +33,7 @@ class IMaterial :
 {
 };
 
-/// An interface class representing a simple OpenGL material property.
+/// Simple OpenGL Phong material property.
 ///
 /// An implementation of the material base class provides the material properties for the standard
 /// Phong lighting model as implemented in OpenGL. The following terms define the material

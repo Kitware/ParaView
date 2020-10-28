@@ -36,13 +36,13 @@ public:
     ///
     virtual mi::Float64 get_tick() = 0;
 
-    /// The start point of the time internal in which a time-dependent visualization is defined.
+    /// The start point of the time interval in which a time-dependent visualization is defined.
     ///
     /// \return     Returns the start time of the time interval.
     ///
     virtual mi::Float64 get_start() const = 0;
 
-    /// The end point of the time internal in which a time-dependent visualization is defined.
+    /// The end point of the time interval in which a time-dependent visualization is defined.
     ///
     /// \return     Returns the end time of the time interval.
     ///

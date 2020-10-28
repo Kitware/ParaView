@@ -21,7 +21,7 @@ namespace index
 /// A polygon of n vertices defined in image space.
 /// The polygon always faces towards the viewer, i.e., the polygon is parallel to the view plane.
 ///
-/// \ingroup nv_index_scene_description_shape
+/// \ingroup nv_index_scene_description_image_shape
 ///
 class IPolygon :
     public mi::base::Interface_declare<0x6558d81b,0xe2de,0x4349,0x92,0xcf,0x86,0xd2,0x27,0x1b,0x3b,0xfc,

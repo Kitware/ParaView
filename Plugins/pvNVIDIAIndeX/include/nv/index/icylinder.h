@@ -25,7 +25,7 @@ namespace index
 /// the top and the bottom of the cylinder is open. The surface of the cylinder
 /// is shaded using the material and light defined in the hierarchical scene description.
 ///
-/// \ingroup nv_index_scene_description_shape
+/// \ingroup nv_index_scene_description_object_shape
 ///
 class ICylinder :
     public mi::base::Interface_declare<0x82b63cc6,0xcd9b,0x49af,0x90,0x8f,0x3a,0xcf,0x51,0x70,0x64,0x56,

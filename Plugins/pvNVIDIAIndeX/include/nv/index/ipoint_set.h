@@ -24,7 +24,7 @@ namespace index
 /// point geometry that may have arbitrary (per-vertex) attributes that impact
 /// the rendering attributes (such as 3D position, color and radius).
 ///
-/// \ingroup nv_index_scene_description_shape
+/// \ingroup nv_index_scene_description_image_shape
 ///
 class IPoint_set :
         public mi::base::Interface_declare<0x7dfbeee1,0x4fda,0x4b8f,0xb8,0xce,0x4e,0xa1,0x92,0xa1,0xb6,0xb1,

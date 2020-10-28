@@ -21,12 +21,12 @@ namespace index {
 ///
 /// An implementation of this class can be assigned as a scene description
 /// attribute to an compute-enabled scene element, such as \c IPlane, 
-/// \c IRegular_heightfield or \c IRegular_volume. When rendering a certain area
+/// \c IRegular_heightfield or \c ISparse_volume_scene_element. When rendering a certain area
 /// of the scene primitive (defined by the renderer), the compute technique is
 /// called and an instance of an \c IDistributed_compute_destination_buffer is passed. The
 /// compute technique fills this buffer for the required subregions of the
 /// distributed dataset. The renderer then maps either uses the generated data
-/// directly (\c IRegular_volume) or uses it as a texture mapped onto the defined
+/// directly (\c ISparse_volume_scene_element) or uses it as a texture mapped onto the defined
 /// 2D area (c IPlane and \c IRegular_heightfield).
 ///
 /// Typical use cases for the compute technique are to visualize data that result

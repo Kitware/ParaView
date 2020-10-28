@@ -16,7 +16,6 @@
 #include <nv/index/icluster_change_callback.h>
 #include <nv/index/idistributed_data_locality.h>
 #include <nv/index/ierror.h>
-#include <nv/index/iheightfield_interaction.h>
 #include <nv/index/iindex_canvas.h>
 #include <nv/index/iindex_scene_query.h>
 #include <nv/index/iopengl_application_buffer.h>
@@ -33,68 +32,253 @@
 //
 
 /// \defgroup nv_index NVIDIA IndeX API
+///
+/// \brief  The NVIDIA IndeX C++ library consists of pure virtual interfaces exposed through a single library entry point.
+///
+/// The NVIDIA IndeX C++ library exports a single factory function 
+/// \c nv_index_factory which returns an instance of the interface class \c nv::index::IIndex.
+/// The \c nv::index::IIndex interface enables an application to authenticate, configure, 
+/// start up, operate with, and shut down the NVIDIA IndeX library.
+/// Moreover, \c nv::index::IIndex represents the main or root interface for using 
+/// NVIDIA IndeX in applications.
+///
+/// The NVIDIA IndeX libary is composed by various API components. The interface class
+/// \c nv::index::IIndex gives access to the available API components.
+/// These API components expose the the use of the data distribution, rendering and computing
+/// functionalities and capabilities as well as the data structures that applications
+/// operate on.
+///
+/// The NVIDIA IndeX C++ API declares pure virtual interfaces and relies on Plain-Old-Datatypes
+/// only, which enables binary compatability on operating system platforms, i.e., the NVIDIA IndeX
+/// library supports all Linux distributions without explicit recompilation.
 
-/// \defgroup nv_index_configuration Configuration
+// ----------------------------------------------------------------------------------
+
+/// \defgroup nv_index_session NVIDIA IndeX Session
 /// \ingroup nv_index
 ///
-/// General configuration settings that control the behavior of NVIDIA IndeX.
+/// \brief A session aggregates the entire environment relevant for an user's workspace.
+///
+/// A session aggregates the entire environment relevant for an user's workspace.
+/// It contains the scene description and the data distribution, it facilitates different views 
+/// on the data, allows to create and browse the scene contents and gives access to the distributed data
+/// which exposes the assigned of data to nodes in the GPU cluster environment.
+
+// ----------------------------------------------------------------------------------
+
+/// \defgroup nv_index_data_representation Distributed Data Representation
+/// \ingroup nv_index
+///
+/// \brief Spatial decomposition enabling the distribution of data for distributed data visualization and computing. 
+///
+/// NVIDIA IndeX decomposes the entire space, which include the scene description, into 
+/// spatially disjoint \e subregions. These subregions are assigned to nodes in the GPU cluster
+/// environment and effectively prune the large-scale into smaller-sized portions (called 
+/// \e data \e subsets, see @ref nv_index_data_subsets) for parallel and distributed 
+/// data management.
+/// Merely the subregions are assigned to cluster nodes but the contents of the data subsets
+/// contained inside subregions is imported by each of the cluster nodes in parallel (see
+/// @ref nv_index_data_import). That is, the logical spatial decomposition including a scene
+/// declaration (see @ref nv_index_scene_description) is distributed to cluster nodes 
+/// whereas the effective large-scale data is routed through a single cluster node but
+/// imported by each and every cluster nodes individually. 
+
+/// \defgroup nv_index_data_subsets Distributed Data Subsets
+/// \ingroup nv_index_data_representation
+///
+/// \brief Data subsets represent major entities for distributed rendering and computing.
+///
+/// NVIDIA IndeX decomposes the scene into subregions. In particular the decomposition also 
+/// subdivides those scene elements that represent large-scale datasets 
+/// (see @ref nv_index_scene_description_distributed_data) into smaller-sized portions.
+/// These are called \e data \e subsets. Data subsets are contained inside subregions,
+/// i.e., each subregion that intersect part of the distributed dataset extent contains one 
+/// data subset of the distributed dataset.
+/// This way, data subsets represent the major entities for data distribution to cluster hosts and   
+/// GPUs, for parallel and scalable distributed rendering on GPU clusters and for
+/// parallel and scalable distributed data processing. 
+///
+/// For instance, the sparse volume dataset \c ISparse_volume_scene_element will be represented
+/// by many \c ISparse_volume_subset distributed to cluster nodes. Each of the volume's 
+/// subsets are rendered independently for scalable volume data visualization and each of the 
+/// subsets may be processed, analysed and manipulated in parallel for scalable and distributed 
+/// computing.  
+///
+/// Data subsets are distributed datatype specific and comprise tailored interfaces for
+/// efficient access of the internal type-specific data structures as well as efficient
+/// update of the internal data representation of a data subset contained in a subregion.
+/// For instance, the interface class \c ISparse_volume_subset exposes methods for
+/// writing new voxel values and thus updating the volume's data. Also, the interace class
+/// provides methods for querying the internal brick and level-of-detail structures and 
+/// attribute descriptions.
+
+/// \defgroup nv_index_data_import Distributed Data Import Mechanism
+/// \ingroup nv_index_data_representation
+///
+/// \brief Mechanism for efficient parallel and distributed data imports from arbitrary sources.
+///
+/// NVIDIA IndeX enables the data imports through a distributed import callback mechanism.
+/// The import callback is triggered by nodes in the cluster in parallel. Those cluster nodes
+/// that require the import of a data subset (see @ref nv_index_data_subsets) invoke the import 
+/// calback for the data subset. By means of such distributed data imports, large-scale datasets
+/// are never routed through a single cluster node, which would represent a major bottleneck, 
+/// e.g., when loading terabytes of data. Instead, the import of data subsets runs in parallel
+/// on each cluster node and by all cluster nodes in parallel as well.
+/// As a result, NVIDIA IndeX is able to import terabytes of volume data within a 2-3 minutes 
+/// rather than hours.
+/// 
+/// Besides this core mechanism that facilitates the accelerated data cluster-wide import of subset 
+/// data, applications can implement import callbacks allowing for (1) the suppport of proprietary 
+/// data formats and (2) any arbitrary data sources. 
+/// Data source for import can obviously be file system but could also be remote storage nodes, 
+/// Cloud storages (including AWS S3 cloud storage, Azure blob storage and GCP cloud bucket), or SQL 
+/// databases, for example. Applications are also able to create synthetic data from a compute source.
+///   
+/// An NVIDIA IndeX package ships extension that include importers, e.g., 
+/// for the commone <a href="https://www.openvdb.org/">OpenVDB</a> data representation,
+/// for the common <a href="https://bluware.com/data-solutions/vds/">VDS data format</a>
+/// or for plain raw data volume data.
+
+// ----------------------------------------------------------------------------------
+
+/// \defgroup nv_index_data_distribution Data Distribution
+/// \ingroup nv_index
+///
+/// \brief The distribution of data to nodes in the cluster may change over time but is always known and accessible by an application.
 ///
 
-/// \defgroup nv_index_data_access Data access
-/// \ingroup nv_index
-
-/// \defgroup nv_index_data_computing Data computing
-/// \ingroup nv_index
+/// \defgroup nv_index_data_locality Data Locality
+/// \ingroup nv_index_data_distribution
+///
+/// \brief Data locality information represents valuable knowledge, e.g., for running compute operations to the distributed data.
 ///
 
-/// \defgroup nv_index_data_edit Data editing
-/// \ingroup nv_index
+/// \defgroup nv_index_workload_balancing Workload Balancing
+/// \ingroup nv_index_data_distribution
+///
+/// \brief Redistribution of data may occur if the distribution in unbalanced.  
+///
 
-/// \defgroup nv_index_data_storage Data storage
-/// \ingroup nv_index
+// ----------------------------------------------------------------------------------
 
-/// \defgroup nv_index_error Errors
+/// \defgroup nv_index_scene_description Scene description
 /// \ingroup nv_index
+///
+/// \brief The scene description is hierarchical and resembles those of scene graphs for rendering.  
+///
+/// The scene description defines everything in the scene,
+/// including visible shapes, their attributes, and groups.
 
-/// \defgroup nv_index_performance_measurement Performance measurement
-/// \ingroup nv_index
+/// \defgroup nv_index_scene_description_distributed_data Distributed Datasets
+/// \ingroup nv_index_scene_description
+///
+/// \brief Large-scale datasets for rendering and processing are specified as \e scene \e elements in the hierarchical scene description.  
+///
+/// Shapes are a visible scene object. These are created by
+/// IScene::create_shape. The behavior of many shapes can be changed using the
+/// scene attributes. \see IAttribute
 
-/// \defgroup nv_index_rendering Rendering
-/// \ingroup nv_index
+/// \defgroup nv_index_scene_description_group Composing a Scene using Scene Groups
+/// \ingroup nv_index_scene_description
+///
+/// \brief Scene groups are basic building blocks for implementing the hierarchical scene descriptions and grouping scene elements.
+///
+/// Scene groups construct a scene in a hierarchical form.
+
+/// \defgroup nv_index_scene_description_shape Basic Shapes
+/// \ingroup nv_index_scene_description
+///
+/// \brief Shapes are categorized into higher-level 3D geometries and 2D image space objects.
+///
+/// Shapes are a visible scene object. These are created by
+/// IScene::create_shape. The behavior of many shapes can be changed using the
+/// scene attributes. \see IAttribute
+
+/// \defgroup nv_index_scene_description_object_shape Object Space Shapes
+/// \ingroup nv_index_scene_description_shape
+///
+/// \brief Higher-level shapes are defined in 3D space and can be co-rendered with large-scale datasets.
+///
+
+/// \defgroup nv_index_scene_description_image_shape Image Space Shapes
+/// \ingroup nv_index_scene_description_shape
+///
+/// \brief Image space shapes are defined in 2D space and can be co-rendered with large-scale datasets.
+///
 
 /// \defgroup nv_index_scene_description_attribute Scene attributes
 /// \ingroup nv_index_scene_description
+///
+/// \brief Attributes effect the distributed datasets or shapes through the hierarchical scene description.
+///
 /// Scene attributes provide a common mechanism for controlling other scene
 /// elements. These attributes can be created by IScene::create_attribute
 /// method.
 
-/// \defgroup nv_index_scene_description Scene description
+// ----------------------------------------------------------------------------------
+
+/// \defgroup nv_index_rendering Distributed Rendering
 /// \ingroup nv_index
-/// The scene description defines everything in the scene,
-/// including visible shapes, their attributes, and groups.
+///
+/// \brief \todo mn
+///
 
-/// \defgroup nv_index_scene_description_group Scene groups
-/// \ingroup nv_index_scene_description
-/// Scene groups construct a scene in a hierarchical form.
+// ----------------------------------------------------------------------------------
 
-/// \defgroup scene_queries Scene queries
+/// \defgroup nv_index_computing Distributed Computing
 /// \ingroup nv_index
+///
+/// \brief \todo mn
+///
 
-/// \defgroup xac XAC programs
+/// \defgroup nv_index_data_access Distributed Data Access
+/// \ingroup nv_index_computing
+///
+/// \brief \todo mn
+///
+
+/// \defgroup nv_index_data_edit Distributed Compute Jobs
+/// \ingroup nv_index_computing
+///
+/// \brief \todo mn
+///
+
+/// \defgroup nv_index_data_computing Distributed Rendering and Computing
+/// \ingroup nv_index_computing
+///
+/// \brief \todo mn
+///
+
+// ----------------------------------------------------------------------------------
+
+/// \defgroup xac NVIDIA IndeX Accelerated Computing Technology
 /// \ingroup nv_index
-/// IndeX Accelerated Compute interface programs.
-/// The IndeX Accelerated Compute (XAC) Interface enables programmers to add
-/// real-time compiled sampling programs into the IndeX volume rendering pipeline.
-/// XAC programs are written in the CUDA programming language.
+///
+/// \brief \todo mn
+///
+/// The NVIDIA IndeX Accelerated Computing (XAC) interfaces enable application-side
+/// programming of CUDA programs that are compiled and linked with the NVIDIA IndeX 
+/// infrastructure in realtime and then injected into the
+/// the NVIDIA IndeX rendering or computing pipelines. XAC programs enable user-defined
+/// distributed data 'shading' for high-fidelity scientific data visualization,
+/// user-defined ray-sampling for querying and analyzing distributed data,
+/// and GPU-based computing of the distributed data.
+/// XAC programs are written in the CUDA programming language and the XAC libraries
+/// provide additional CUDA routines specific to NVIDIA IndeX.
 
-/// \defgroup xac_scene XAC scene
+/// \defgroup xac_scene Sampling and Scene Information for XAC programs
 /// \ingroup xac
-/// Scene definition for XAC programs.
-/// For each rendered frame, IndeX performs a back-to-front ray
+///
+/// \brief \todo mn
+///
+/// The NVIDIA IndeX XAC programs For each rendered frame, NVIDIA IndeX performs a front-to-back ray
 /// casting procedure in a scene defined by an XAC class.
 
 /// \defgroup xac_obj XAC elements
 /// \ingroup xac
+///
+/// \brief \todo mn
+///
 /// Scene elements for XAC programs.
 /// Predefined elements that are part of the XAC interface can provide information
 /// about the current IndeX state as well as a set of geometric scene elements used.
@@ -102,6 +286,9 @@
 
 /// \defgroup xac_lib XAC functions
 /// \ingroup xac
+///
+/// \brief \todo mn
+///
 /// Functions and macros for XAC programs.
 /// The XAC interface also provides a set of convenience macros and functions for
 /// printing debugging information, transformation handling, basic shading
@@ -109,20 +296,53 @@
 
 /// \defgroup xac_compute XAC compute
 /// \ingroup xac
-/// IndeX Accelerated Compute (XAC) facilities for gpu accelerated computing of data.
-
-/// \defgroup nv_index_scene_description_shape Scene shapes
-/// \ingroup nv_index_scene_description
 ///
-/// Shapes are a visible scene object. These are created by
-/// IScene::create_shape. The behavior of many shapes can be changed using the
-/// scene attributes. \see IAttribute
+/// \brief \todo mn
+///
+/// NVIDIA IndeX Accelerated Compute (XAC) facilities for gpu accelerated computing of data.
+
+// ----------------------------------------------------------------------------------
+
+/// \defgroup nv_scene_queries Built-in Picking Operation
+/// \ingroup nv_index
+///
+/// \brief \todo mn
+///
+
+// ----------------------------------------------------------------------------------
+
+/// \defgroup nv_index_configuration Configuration
+/// \ingroup nv_index
+///
+/// \brief General configuration settings that control the behavior of NVIDIA IndeX.
+///
+/// General configuration settings that control the behavior of NVIDIA IndeX.
+///
+
+// ----------------------------------------------------------------------------------
 
 /// \defgroup nv_index_utilities Utilities
 /// \ingroup nv_index
+///
+/// \brief \todo mn
+///
 
-/// \defgroup nv_index_workload_balancing Workload balancing
+// ----------------------------------------------------------------------------------
+
+/// \defgroup nv_index_performance_measurement Performance measurement
 /// \ingroup nv_index
+///
+/// \brief \todo mn
+///
+
+// ----------------------------------------------------------------------------------
+
+/// \defgroup nv_index_error Errors
+/// \ingroup nv_index
+///
+/// \brief \todo mn
+///
+
 
 /// Common namespace for all NVIDIA APIs.
 namespace nv
@@ -130,11 +350,16 @@ namespace nv
 
 /// Namespace for NVIDIA IndeX library APIs.
 /// \ingroup nv_index
+//
 namespace index
 {
 
-/// Interface for configuring and querying the NVIDIA IndeX cluster settings.
+/// Configuration of the NVIDIA IndeX cluster environment.
+///
+/// Interface to set and query the NVIDIA IndeX cluster configuration.
+///
 /// \ingroup nv_index_configuration
+//
 class ICluster_configuration :
     public mi::base::Interface_declare<0x84fcac5c,0x25d1,0x4456,0x88,0x22,0xe4,0x92,0xec,0xee,0xea,0x1a>
 {
@@ -241,6 +466,7 @@ public:
 };
 
 /// API component for creating the user session in the NVIDIA IndeX library.
+///
 /// \ingroup nv_index
 ///
 class IIndex_session :
@@ -285,28 +511,6 @@ public:
     ///
     virtual void set_affinity_information(IAffinity_information* affinity_information) = 0;
 
-    /// Create an interface that enables to register and run heightfield compute or
-    /// query operations to the heightfield dataset.
-    /// \deprecated   This method will be removed in NVIDIA IndeX 1.5.
-    ///
-    /// \param[in] heightfield_tag          The tag references the heightfield scene
-    ///                                     element to which the interface enables
-    ///                                     operations.
-    /// \param[in] session_tag              The tag references the
-    ///                                     \c ISession.
-    /// \param[in] dice_transaction         The DiCE database transaction that the
-    ///                                     operation runs in.
-    ///
-    /// \return                             The interface \c IHeightfield_interaction enables
-    ///                                     compute and query operations to the given heightfield.
-    ///                                     If the tag doesn't reference a heightfield of the scene
-    ///                                     description then 0 will be returned.
-    ///
-    virtual IHeightfield_interaction* create_heightfield_interaction_interface(
-        mi::neuraylib::Tag_struct           heightfield_tag,
-        mi::neuraylib::Tag_struct           session_tag,
-        mi::neuraylib::IDice_transaction*   dice_transaction) const = 0;
-
     /// Update the NVIDIA IndeX library session. Depending on data
     /// and database changes, this updates a session's internal
     /// state. For instance, if a scene element was modified by the
@@ -338,6 +542,9 @@ typedef mi::Uint32  IFrame_identifier; ///< A frame's unique identifier.
 /// The frame results store information gathered during the rendering process. Such information
 /// include error information and the performance values.
 ///
+///
+/// \ingroup nv_index_rendering
+///
 class IFrame_results :
     public mi::base::Interface_declare<0xdbe8f991, 0xccbf, 0x4445, 0xad, 0x4d, 0x77, 0xf3, 0xd, 0x67, 0xcc, 0xff>
 {
@@ -367,6 +574,9 @@ public:
 
 /// List of rendering results for multi-view rendering. Each list
 /// entry contains the rendering results of a single viewport.
+///
+///
+/// \ingroup nv_index_rendering
 ///
 class IFrame_results_list :
     public mi::base::Interface_declare<0x9524bb73,0x4392,0x477b,0x9a,0x0f,0x5d,0xd6,0x10,0x32,0xc3,0x85>
@@ -451,6 +661,9 @@ public:
 };
 
 /// Interface class for creating NVIDIA IndeX built-in canvases such as a CUDA memory canvas.
+///
+/// \ingroup nv_index_rendering
+///
 class IIndex_canvas_creation_properties :
     public mi::base::Interface_declare<0x788ee4b1,0xa0eb,0x47e5,0x91,0xf0,0x92,0x0a,0x30,0xfa,0xad,0x11>
 {
@@ -463,6 +676,9 @@ public:
 };
 
 /// Interface class for creating NVIDIA IndeX built-in a CUDA memory canvas.
+///
+/// \ingroup nv_index_rendering
+///
 class IIndex_cuda_canvas_creation_properties :
     public mi::base::Interface_declare<0xae97ca4b,0xe8c5,0x4c5b,0xa7,0xe6,0xd6,0x10,0xfd,0xad,0xcf,0xe1, nv::index::IIndex_canvas_creation_properties>
 {
@@ -476,6 +692,9 @@ public:
 
 /// Implements the properties required by NVIDIA IndeX for creating a CUDA canvas.
 /// This implementation is to be moved to the application layer.
+///
+/// \ingroup nv_index_rendering
+///
 class Index_cuda_canvas_creation_properties : public mi::base::Interface_implement<nv::index::IIndex_cuda_canvas_creation_properties>
 {
 public:
@@ -498,7 +717,11 @@ public:
       : m_cuda_device_id(cuda_device_id),
         m_resolution(resolution) {}
 
+    /// A CUDA device hosts the canvas contents in the CUDA buffer.
+    ///  \return    Returns the CUDA device id that stores the canvas contents.  
     virtual mi::Sint32                                    get_cuda_device_id()  const { return m_cuda_device_id; }
+    /// A canvas has a given resolution.
+    ///  \return    Returns the resolutions of the canvas.  
     virtual const mi::math::Vector_struct<mi::Uint32, 2>& get_resolution()      const { return m_resolution;     }
 
 private:
@@ -508,10 +731,14 @@ private:
 
 /// Enables the rendering of a user-defined session/scene.
 ///
+///
+/// \ingroup nv_index_rendering
+///
 class IIndex_rendering :
     public mi::base::Interface_declare<0x435617a4,0x589b,0x47d9,0x99,0x17,0x05,0x82,0x7d,0x1d,0xfc,0x3e>
 {
 public:
+    /// Internal built-in canvas types for external use in an application. 
     enum Index_builtin_canvas_type
     {
         IDX_CANVAS_CUDA_MEMORY = 0u, ///< A canvas that allocates the framebuffer in CUDA memory.
@@ -658,6 +885,7 @@ public:
 /// functionality. Only one instance of this class may exist at the same time.
 /// It enables the configuration, start-up and shutdown of the NVIDIA IndeX
 /// library and exposes the library's API functionality through API components.
+///
 /// \ingroup nv_index
 ///
 class IIndex :
@@ -769,14 +997,14 @@ public:
     /// Registering a class for serialization allows communicating class instances through the
     /// serialization mechanism. It enables, for instance, storing database elements
     /// and jobs in the distributed database or communicating job results
-    /// (see mi::neuraylib::IFragmented_job::execute_fragment_remote()).
+    /// (see \c mi::neuraylib::IFragmented_job::execute_fragment_remote()).
     ///
     /// Registering a class for serialization can only be done before \product has been
     /// started.
     ///
     /// \param class_id     The class ID of the class that shall be registered for serialization.
     /// \param factory      The class factory.
-    /// \return             \c true if the class of was successfully registered
+    /// \return             Returns \c true if the class of was successfully registered
     ///                     for serialization, and \c false otherwise.
     virtual bool register_serializable_class(
         mi::base::Uuid                      class_id,
@@ -787,7 +1015,7 @@ public:
     /// Registering a class for serialization allows communicating class instances through the
     /// serialization mechanism. It enables, for instance, storing database elements
     /// and jobs in the distributed database or communicating job results
-    /// (see mi::neuraylib::IFragmented_job::execute_fragment_remote()).
+    /// (see \c mi::neuraylib::IFragmented_job::execute_fragment_remote()).
     ///
     /// Registering a class for serialization can only be done before \product has been
     /// started.
@@ -796,7 +1024,7 @@ public:
     /// convenience. It uses the default class factory mi::neuraylib::IUser_class_factory
     /// specialized for T.
     ///
-    /// \return             \c true if the class of type T was successfully registered
+    /// \return             Returns \c true if the class of type T was successfully registered
     ///                     for serialization, and \c false otherwise.
     template <class T>
     bool register_serializable_class() const
@@ -830,30 +1058,30 @@ public:
     virtual const char* get_revision() const = 0;
 
     /// Returns the NVIDIA driver version string
-    /// \return detected NVIDIA driver version string.
+    /// \return     Returns the detected NVIDIA driver version string.
     virtual const char* get_nvidia_driver_version() const = 0;
 
     /// Returns the CUDA runtime version number
-    /// \return detected CUDA runtime version.
+    /// \return     Returns the detected CUDA runtime version.
     virtual mi::Sint32 get_cuda_runtime_version() const = 0;
 
     /// The NVIDIA IndeX library may come with different API to support various
     /// domain specific interfaces for compute and rendering of large-scale data.
     /// The interface version of the NVIDIA IndeX library indicates the API.
     ///
-    /// \return     The NVIDIA IndeX API version.
+    /// \return     Returns the NVIDIA IndeX API version.
     ///
     virtual mi::Uint32 get_interface_version() const = 0;
 
     /// Returns the interface version of the DiCE library.
     ///
-    /// \return     The DiCE API version.
+    /// \return     Returns the DiCE API version.
     ///
     virtual mi::Uint32 get_dice_interface_version() const = 0;
 
     /// Returns the product version of the DiCE library.
     ///
-    /// \return     The DiCE product version.
+    /// \return     Returns the DiCE product version.
     ///
     virtual const char* get_dice_version() const = 0;
 
@@ -874,7 +1102,7 @@ public:
     /// The DiCE interface is available for further use.
     /// Please refer to the DiCE library API for details.
     ///
-    /// \return         Returns the DiCE interface.
+    /// \return         Exposes the DiCE interface.
     ///
     virtual mi::neuraylib::INeuray* get_dice_interface() = 0;
 };
@@ -890,6 +1118,7 @@ extern "C"
 ///
 /// It returns an instance of the main nv::index::IIndex interface, which can be used to
 /// configure, to start up, to operate with, and to shut down the NVIDIA IndeX library.
+///
 /// \ingroup nv_index
 ///
 /// \note       This function may be called only once in each process.

@@ -19,7 +19,7 @@ namespace index {
 
 /// Defines the vertices and per-vertex attributes of a subset of a triangle mesh.
 ///
-/// \ingroup nv_index_data_storage
+/// \ingroup nv_index_data_subsets
 ///
 class ITriangle_mesh_subset :
     public mi::base::Interface_declare<0x19fa1bbf,0xcda6,0x43d5,0x89,0x40,0x57,0x95,0x78,0x99,0xb5,0x3d,

@@ -9,6 +9,7 @@
 
 #include <mi/math/bbox.h>
 #include <mi/neuraylib/dice.h>
+#include <mi/neuraylib/istring.h>
 
 namespace nv
 {
@@ -32,7 +33,7 @@ namespace index
 /// and allows to optimize the alignment of the internal spatial decomposition to
 /// a given domain-specific spatial decomposition.
 ///
-/// \ingroup nv_index_data_storage
+/// \ingroup nv_index_data_locality
 ///
 class IAffinity_information :
     public mi::base::Interface_declare<0x3fbeb811,0xffd1,0x4521,0x33,0x21,0xbd,0x67,0x12,0x21,0x11,0x69,
@@ -59,10 +60,10 @@ public:
     ///                             the DiCE networking environment assigns/defines during startup automatically.
     ///
     /// \param[out] host_name       The name of the cluster machine/node where the subregion is supposed to be
-    ///                             stored, processed and rendered. If cluster node id and name don't match, then
-    ///                             the name will be used to query the correspondent id. That is, the name has priority
-    ///                             over the cluster node id. The cluster node name may be empty. Then, the id will
-    ///                             be used if available/valid.
+    ///                             stored, processed and rendered. If \c host_id and name don't match, then
+    ///                             \c host_name will be used to query the corresponding host id. That
+    ///                             is, the name has priority over the \c host_id. If \c host_name is
+    ///                             the empty string (which is the default), only \c host_id will be used.
     ///
     /// \param[out] device_id       The CUDA device id on the given cluster machine where the subregion is
     ///                             supposed to be stored, processed and rendered. If set to \c ANY_GPU
@@ -98,10 +99,10 @@ public:
 /// also able to direct the NVIDIA IndeX's spatial regions to machines and GPUs
 /// in the cluster where application/algorithm data is already stored.
 ///
-/// EXPERIMENTAL This feature is in an experimental state. Decent testing is
+/// \note This feature is in an experimental state. Decent testing is
 /// required and interfaces might change in the future.
 ///
-/// \ingroup nv_index_data_storage
+/// \ingroup nv_index_data_locality
 ///
 class IDomain_specific_subdivision :
     public mi::base::Interface_declare<0x1fefb212,0xffe1,0x1431,0x13,0x67,0xbd,0x17,0x13,0x31,0x41,0x6e,
@@ -137,17 +138,18 @@ public:
 /// This interface extends IDomain_specific_subdivision by providing topology information
 /// for efficient subregion sorting.
 ///
-/// \ingroup nv_index_data_storage
+/// \ingroup nv_index_data_locality
 ///
 class IDomain_specific_subdivision_topology :
     public mi::base::Interface_declare<0x25d72982,0x3cff,0x4f72,0x99,0x72,0x41,0x95,0xec,0x06,0x16,0x12,
                                        nv::index::IDomain_specific_subdivision>
 {
 public:
+    /// Subdivision schemes can rely on different topyologies
     enum Topology_type 
     {
-        TOPO_KD_TREE,
-        TOPO_OCTREE
+        TOPO_KD_TREE,   ///<! Kd-tree based topology.
+        TOPO_OCTREE     ///<! Octree-based topology.
     };
 
     /// Get type of topology, \see Topology_type. If not supported, topology will be ignored.
@@ -158,14 +160,15 @@ public:
     virtual mi::Uint32 get_nb_nodes() const = 0;
 
     /// Get the bounding box of the node \c inode.
-    /// \param inode Index of node.
+    /// \param inode    The node's index value.
+    /// \return         Returns the bounding box of the node.
     virtual mi::math::Bbox_struct<mi::Float32, 3> get_node_box(mi::Uint32 inode) const = 0;
 
     /// Get the number of children of node \c inode.
     /// Note that this expresses the number of available child slots, 
     /// but not the number of valid children.
     /// This means for a Kd-tree, you can always return 2, and for an Octree 8.
-    /// \param inode Index of node.
+    /// \param inode    The node's index value.
     virtual mi::Uint32 get_node_child_count(mi::Uint32 inode) const = 0;
 
     /// Get a child index of the node \c inode. Return -1 if no child at given \c ichild slot.

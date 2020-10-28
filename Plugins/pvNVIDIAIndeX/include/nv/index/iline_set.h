@@ -26,7 +26,7 @@ namespace index
 /// line geometry that may have arbitrary (per-segment) attributes that impact
 /// the rendering attributes (such as 3D position, color and width/radius).
 ///
-/// \ingroup nv_index_scene_description_shape
+/// \ingroup nv_index_scene_description_image_shape
 ///
 class ILine_set :
         public mi::base::Interface_declare<0xdd11bb4e,0x46ff,0x405b,0xbe,0x0f,0xa4,0x16,0x4f,0x10,0xbd,0x94,

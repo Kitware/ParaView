@@ -38,6 +38,7 @@ class IRendering_kernel_program :
                                        nv::index::IAttribute>
 {
 public:
+    /// Program options for executing the kernel programs.
     struct Program_options
     {
         mi::Sint32                                  max_registers;  ///< Define the maximum number of registers to use for the program.
@@ -335,12 +336,13 @@ public:
 ///
 /// The attribute is similar to \c IRendering_kernel_program_parameters, but instead of providing a
 /// user-defined buffer, it provides a fixed number of \e slots, where scene elements can be mapped
-/// to. These scene elements (e.g., \c IRegular_volume can then be accessed inside a
+/// to. These scene elements (e.g., \c ISparse_volume_scene_element can then be accessed inside a
 /// user-defined program using \c state.scene.access().
 ///
 /// For example, consider the mapping attribute is applied to \c IPlane, mapping an existing \c
-/// IRegular_volume to slot 1 by calling <tt>mapping_attribute.set_mapping(1, volume_tag)</tt>. A \c
-/// IVolume_sample_program also applied to the plane may then access the volume data as follows:
+/// ISparse_volume_scene_element to slot 1 by calling <tt>mapping_attribute.set_mapping(1,
+/// volume_tag)</tt>. A \c IVolume_sample_program also applied to the plane may then access the
+/// volume data as follows:
 ///
 /// \code
 /// NV_IDX_XAC_VERSION_1_0
@@ -385,7 +387,7 @@ public:
 
     /// Maps a scene element to a slot.
     ///
-    /// \param[in]  slot_idx   Slot index, must be less than \c get_nb_slots().
+    /// \param[in]  slot_idx   Slot index, must be less than #get_nb_slots().
     /// \param[in]  data_tag   Tag of a scene element. If \c NULL_TAG, an existing mapping is removed.
     ///
     /// \return     True is \c slot_idx is valid.
@@ -394,11 +396,11 @@ public:
         mi::Uint32                 slot_idx,
         mi::neuraylib::Tag_struct  data_tag) = 0;
 
-    ///
+    /// A query bounding box may be applied relative to the data point or given in absolute spatial 3D values.  
     enum Query_reference
     {
-        RELATIVE_QUERY_BOUNDING_BOX = 0, ///< 
-        ABSOLUTE_QUERY_BOUNDING_BOX = 1  ///< 
+        RELATIVE_QUERY_BOUNDING_BOX = 0, ///<! Relative to the given data points of a distributed dataset.
+        ABSOLUTE_QUERY_BOUNDING_BOX = 1  ///<! Spatial 3D bounding box given in absolute values in the local space.
     };
 
     /// Maps a scene element to a slot.
@@ -411,7 +413,7 @@ public:
     ///                         applied relative to each data point or whether the bounding box represents a 
     ///                         absolute spatial area for distributed data accessing.
     ///
-    /// \return     True is \c slot_idx is valid.
+    /// \return                 Returns \c true if \c slot_idx is valid.
     ///
     virtual bool set_mapping(
         mi::Uint32                                   slot_idx,
@@ -430,7 +432,8 @@ public:
         mi::Uint32                 slot_idx) const = 0;
 };
 
-/// An interface class representing rendering kernel programs applied to volume primitives (e.g., \c IRegular_volume).
+/// An interface class representing rendering kernel programs applied to volume primitives (e.g., \c
+/// ISparse_volume_scene_element).
 ///
 /// The programs applied to volumes are evaluated for each sample taken during the rendering process. An example of a
 /// volume sample program is:

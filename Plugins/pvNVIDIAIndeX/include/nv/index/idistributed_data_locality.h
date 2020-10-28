@@ -1,11 +1,11 @@
 /******************************************************************************
  * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
-/// \file
+/// \file  idistributed_data_locality.h
 /// \brief Interfaces for exposing the data distribution scheme.
 
-#ifndef NVIDIA_INDEX_IDATA_DISTRIBUTION_H
-#define NVIDIA_INDEX_IDATA_DISTRIBUTION_H
+#ifndef NVIDIA_INDEX_IDISTRIBUTED_DATA_LOCALITY_H
+#define NVIDIA_INDEX_IDISTRIBUTED_DATA_LOCALITY_H
 
 #include <mi/dice.h>
 #include <mi/base/interface_declare.h>
@@ -18,470 +18,712 @@ namespace nv
 namespace index
 {
 
-/// The interface class exposes data locality information.
+/// Unique identifier refering to a subregion.
 ///
-/// In general, the data representation that corresponds to a large-scale
-/// dataset is distributed in the cluster environment to enable
-/// scalable rendering and computing (based on a sort-last approach).
-/// The distribution scheme relies on a spatial subdivision
-/// of the entire scene space.
-/// Using the subdivision scheme, the data representation is partitioned
-/// into subsets that are distributed to and stored on the nodes in the
-/// cluster. Each subset is contained in its local space bounding box.
+/// NVIDIA IndeX decomposes the space/scene into smaller
+/// sized disjoined portions for distributed and parallel 
+/// processing and rendering. These smaller sized portions
+/// or regions are called \c subregions. Each subregion is
+/// represented by a bounding box and can be uniquely 
+/// identivied by an identifier. 
 ///
-/// The data locality provides the application the means to query where, i.e., on
-/// which node in the cluster, a subset of the data representation of the entire
-/// distributed dataset is stored. A node stores either none or a set of subsets.
-/// Furthermore, the data locality information provides the number of
-/// those 3D bounding boxes that correspond to the number of subsets
-/// stored on a given cluster node. Each of the bounding boxes can be
+/// \ingroup nv_index_data_locality
+///
+struct Subregion_identifier
+{
+    /// The actual identifier of the subregion refers to a unique 
+    /// spatial area of NVIDIA IndeX's spatial subdivision.
+    /// A valid identifier is positive integer greater zero.
+    ///
+    /// \note   Might need to be bumped to a mi::Uint64 type in the future.
+    ///
+    mi::Uint32      id; //<! Numerical value that serves as unique identifier.
+};
+
+/// Query modes enable the purposeful selection of data subsets for data localities.
+///
+/// NVIDIA IndeX manages the assignments of data subsets bound inside a 3D bounding box
+/// to hosts and GPUs in the cluster environments. A distributed data job (see \c IDistributed_data_job)
+/// runs against data subsets (see \c IData_subset). The job may be invoked for the
+/// entire set of data subsets that belong to a distributed dataset (see \c IDistributed_data) 
+/// or invoked for a subset of data subsets. The interface class 
+/// \c IDistributed_data_locality_query_mode enables an application to specify the set 
+/// of data subset that shall be consindered for distributed processing and analysis.
+/// Derived classes of the interface class implement different query methods. For instance,
+/// a the data subset selection for job execution commonly relies on the spatial selection, i.e., 
+/// a region of interest, in 3D space.
+///
+/// When implementing an \c IDistributed_data_job, the method \c IDistributed_data_job::get_scheduling_mode()
+/// has to expose a query method so that the internal NVIDIA IndeX infrastructure can schdule 
+/// the job to the user-specified subset data selection. 
+///
+/// \ingroup nv_index_data_locality
+///
+class IDistributed_data_locality_query_mode :
+    public mi::base::Interface_declare<0x841224fe, 0x3c17, 0x43b3, 0xa1, 0xc1, 0xba, 0x30, 0x72, 0xc8, 0x44, 0xf1>
+{
+public:
+    /// Query methods apply to a distributed dataset that is refered to by an unique identifier.
+    ///
+    /// Each query method applies to a single instance of a distributed dataset. The method 
+    /// #get_distributed_data_tag is expected to identify the distributed dataset by 
+    /// means of the unique identifier \c mi::neuraylib::Tag_struct. Each derived class
+    /// is expected to provide the identifier respectively.
+    ///
+    /// \return     Returns the \c mi::neuraylib::Tag_struct that uniquely identifiers 
+    ///             a distribute dataset in the scene description or DiCE's distributed
+    ///             data store.
+    ///
+    virtual const mi::neuraylib::Tag_struct& get_distributed_data_tag() const = 0;
+};
+
+/// Implements a query method that selection all data subsets of a distributed dataset for distributed job execution.
+///
+/// The class \c Distributed_data_locality_query_mode implements the base class 
+/// \c IDistributed_data_locality_query_mode. The purpose of the implementation is 
+/// to conveniently select the entire set of data subsets of a distributed dataset 
+/// for a job execution.
+///
+/// \ingroup nv_index_data_locality
+///
+class Distributed_data_locality_query_mode :
+    public mi::base::Interface_implement<nv::index::IDistributed_data_locality_query_mode>
+{
+public:
+    /// Instantiating a query method using the distributed dataset unique identifier.
+    ///
+    /// \param[in] tag      The \c mi::neuraylib::Tag_struct identifies the distributed dataset.
+    ///
+    Distributed_data_locality_query_mode(
+        const mi::neuraylib::Tag_struct& tag) : m_distribute_data_tag(tag) {}
+    /// Implements an empty default destructor.
+    virtual ~Distributed_data_locality_query_mode() {}
+
+    /// Implements query methods apply to a distributed dataset that is refered to by an unique identifier.
+    ///
+    /// \return     Return the \c mi::neuraylib::Tag_struct that uniquely identifiers 
+    ///             the entire distribute dataset.
+    /// 
+    virtual const mi::neuraylib::Tag_struct& get_distributed_data_tag() const { return m_distribute_data_tag; };
+
+private:
+    mi::neuraylib::Tag_struct m_distribute_data_tag;  ///<! Unique distributed dataset identifier.
+};
+
+/// Query modes to determine the data localities of data subsets inside a region of interest.
+///
+/// Deriving a data locality from the data distribution for a specific distributed dataset type 
+/// based on the bounding box, i.e., a region of interest, represents a fundamental operation.
+/// The present interface class \c IDistributed_data_subset_locality_query_mode
+/// allows for a specifying a bounding box along with the distributed dataset. 
+/// A data locality determined using this query method will include all data subsets that 
+/// are contained inside or just intersect the region of interest.
+///
+/// The interface method #get_spatial_coverage returns the bounding box that covers a spatial 
+/// area. All data subsets that are covered at least partially, will be considered in the 
+/// data locality.
+///
+/// \ingroup nv_index_data_locality
+///
+class IDistributed_data_subset_locality_query_mode :
+    public mi::base::Interface_declare<0x841224fe, 0x3c17, 0x43b3, 0xa2, 0xc4, 0xbc, 0x22, 0xa2, 0xa8, 0xcc, 0xa7,
+    nv::index::IDistributed_data_locality_query_mode>
+{
+public:
+    /// Spatial query methods let determine data localities based on a spatial coverage.
+    ///
+    /// The bounding box represented by \c mi::math::Bbox_struct<mi::Float32, 3> specify a spatial 
+    /// region of interest. All data subsets that are covered at least partially, will be
+    /// considered in a data locality.
+    ///
+    /// \return     Returns the a bounding box that represents a region of interest for
+    ///             determining the data locality. An invalid bounding box will be ingnored
+    ///             and the space that the entire distributed dataset covers will be
+    ///             considered instead. 
+    ///
+    virtual const mi::math::Bbox_struct<mi::Float32, 3>& get_spatial_coverage() const = 0;
+};
+
+/// Implements a query method that selection all data subsets of a distributed dataset covered by a region of interest.
+///
+/// The class \c Distributed_data_subset_locality_query_mode implements the base class 
+/// \c IDistributed_data_subset_locality_query_mode. The purpose of the implementation is 
+/// to conveniently determine all data subsets of a distributed dataset 
+/// that are inside or intersect a given spatial area.
+///
+/// \ingroup nv_index_data_locality
+///
+class Distributed_data_subset_locality_query_mode :
+    public mi::base::Interface_implement<nv::index::IDistributed_data_subset_locality_query_mode>
+{
+public:
+    /// Instantiating a query method using the distributed dataset unique identifier and a given region of interest.
+    ///
+    /// The spatial query is defined in continous space which requires a bounding box defined 
+    /// using floating-point min and max values. 
+    ///
+    /// \param[in] tag      The \c mi::neuraylib::Tag_struct identifies the distributed dataset.
+    ///
+    /// \param[in] coverage The bounding box specifies the region of interest for the locality query.
+    ///
+    Distributed_data_subset_locality_query_mode(
+        const mi::neuraylib::Tag_struct&                tag,
+        const mi::math::Bbox_struct<mi::Float32, 3>&    coverage)
+        : m_distribute_data_tag(tag),
+        m_spatial_coverage(coverage) {}
+
+    /// Instantiating a query method using the distributed dataset unique identifier and a given region of interest.
+    ///
+    /// The spatial query is defined in continous space but the region of interst here is defined 
+    /// using integert min and max values. The bounding box is converted to a floating-point
+    /// bounding box first.  
+    ///
+    /// \param[in] tag      The \c mi::neuraylib::Tag_struct identifies the distributed dataset.
+    ///
+    /// \param[in] coverage The bounding box specifies the region of interest for the locality query.
+    ///
+    Distributed_data_subset_locality_query_mode(
+        const mi::neuraylib::Tag_struct&                tag,
+        const mi::math::Bbox_struct<mi::Sint32, 3>&     coverage)
+        : m_distribute_data_tag(tag)
+    {
+        // Following is still unfortunate, i.e., the need to convert to float typed bbox.
+        m_spatial_coverage.min.x = static_cast<mi::Float32>(coverage.min.x);
+        m_spatial_coverage.min.y = static_cast<mi::Float32>(coverage.min.y);
+        m_spatial_coverage.min.z = static_cast<mi::Float32>(coverage.min.z);
+        m_spatial_coverage.max.x = static_cast<mi::Float32>(coverage.max.x);
+        m_spatial_coverage.max.y = static_cast<mi::Float32>(coverage.max.y);
+        m_spatial_coverage.max.z = static_cast<mi::Float32>(coverage.max.z);
+    }
+
+    /// Implements an empty default destructor.
+    virtual ~Distributed_data_subset_locality_query_mode() {}
+
+    /// Implements the query method that applies to a distributed dataset that is refered to by an unique identifier.
+    ///
+    /// \return     Return the \c mi::neuraylib::Tag_struct that uniquely identifies 
+    ///             the entire distributed dataset.
+    /// 
+    virtual const mi::neuraylib::Tag_struct& get_distributed_data_tag()           const { return m_distribute_data_tag; };
+
+    /// Implements the spatial query method let determine data localities based on a spatial coverage.
+    ///
+    /// The bounding box represented by \c mi::math::Bbox_struct<mi::Float32, 3> specify a spatial 
+    /// region of interest. All data subsets that are covered at least partially, will be
+    /// considered in a data locality.
+    ///
+    /// \return     Returns the a bounding box that represents a region of interest for
+    ///             determining the data locality. An invalid bounding box will be ingnored
+    ///             and the space that the entire distributed dataset covers will be
+    ///             considered instead. 
+    ///
+    virtual const mi::math::Bbox_struct<mi::Float32, 3>& get_spatial_coverage()   const { return m_spatial_coverage; };
+
+private:
+    mi::neuraylib::Tag_struct               m_distribute_data_tag;
+    mi::math::Bbox_struct<mi::Float32, 3>   m_spatial_coverage;
+};
+
+/// Height field specific query modes to determine the data localities of height field patches.
+///
+/// Deriving a data locality from the data distribution for a height field dataset 
+/// based on the 2D bounding box.
+/// A data locality determined using this query method will include all data subsets that 
+/// are contained inside or just intersect the region of interest.
+///
+/// In contrast to a sparse volume dataset (see \c ISparse_volume_scene_element) a height field
+/// is defined in 2.5D and its 2D support may intersect multiple subregion in 3D space along the
+/// height fields heiht-axis. 
+/// Analysis techniques that merly inspect height field data, e.g., to calculate an average
+/// height value only need to determine a single patch. For processing techniques that change the 
+/// elevation values, all patches that along the z axis need to be considered and updated after 
+/// the operation.
+/// To consider both, a height field query exposes to modes: globally unique or locally unique 
+/// height field data subsets.  
+///
+/// \ingroup nv_index_data_locality
+///
+class IDistributed_height_field_locality_query_mode :
+    public mi::base::Interface_declare<0xc985b49c,0xdb6a,0x4808,0x94,0x19,0xe8,0x3c,0xbb,0x69,0x77,0x59,
+        nv::index::IDistributed_data_locality_query_mode>
+{
+public:
+    /// Height field data locality query modes.
+    ///
+    /// This mode allows to query the height-field data locality of the data subsets
+    /// which are either globally unique or unique per host. Globally unique mode will
+    /// reference a single subset only once, while in per-host unique mode the
+    /// locality potentially references a subset multiple times, but only once per host.
+    ///
+    enum Height_field_locality_query_mode {
+        HEIGHT_FIELD_LOCALITY_QUERY_SUBSETS_UNIQUE_CLUSTER  = 0x01u, ///<! Data locality considers globally unique data subsets only.
+        HEIGHT_FIELD_LOCALITY_QUERY_SUBSETS_UNIQUE_PER_HOST = 0x02u  ///<! Data locality considers locally unique data subsets only.
+    };
+
+    /// The height field query mode defines if globally or locally unique data subsets shall be considered for the data locality.
+    ///
+    /// \return Returns if locally or globally unique data subsets shall be considered.
+    ///  
+    virtual Height_field_locality_query_mode get_query_mode()                   const = 0;
+    
+    /// Spatial query methods let determine data localities based on a 2D spatial coverage.
+    ///
+    /// The bounding box represented by \c mi::math::Bbox_struct<mi::Float32, 2> specifies 
+    /// a 2D area of interest. Only data subsets that are covered at least partially, will be
+    /// considered in a data locality.
+    ///
+    /// \return     Returns the a bounding box that represents a area of interest for
+    ///             determining the data locality.
+    ///
+    virtual const mi::math::Bbox_struct<mi::Float32, 2>& get_spatial_coverage() const = 0;
+};
+
+/// Implements the height field specific query mode height field patches.
+///
+/// \ingroup nv_index_data_locality
+///
+class Distributed_height_field_locality_query_mode :
+    public mi::base::Interface_implement<nv::index::IDistributed_height_field_locality_query_mode>
+{
+public:
+    /// Instantiating a query method using the distributed dataset unique identifier and a given region of interest.
+    ///
+    /// The spatial query is defined in continous space which requires a bounding box defined 
+    /// using floating-point min and max values. 
+    ///
+    /// \param[in] query_mode   Defines if either locally unique or cluster-wise unique height
+    ///                         field data shall be considered.
+    ///
+    /// \param[in] tag          The \c mi::neuraylib::Tag_struct identifies the distributed dataset.
+    ///
+    /// \param[in] coverage     The bounding box specifies the region of interest for the locality query.
+    ///
+    Distributed_height_field_locality_query_mode(
+        Height_field_locality_query_mode                query_mode,
+        const mi::neuraylib::Tag_struct&                tag,
+        const mi::math::Bbox_struct<mi::Float32, 2>&    coverage)
+        : m_query_mode(query_mode),
+          m_distribute_data_tag(tag),
+          m_spatial_coverage(coverage) {}
+
+    /// Instantiating a query method using the distributed dataset unique identifier and a given area of interest.
+    ///
+    /// The 2D spatial query is defined in continous space but the 2D area of interst here is defined 
+    /// using integert extents. The bounding area is converted to a floating-point
+    /// bounding area first.  
+    ///
+    /// \param[in] query_mode   Defines if either locally unique or cluster-wise unique height
+    ///                         field data shall be considered.
+    ///
+    /// \param[in] tag          The \c mi::neuraylib::Tag_struct identifies the distributed dataset.
+    ///
+    /// \param[in] coverage     The bounding box specifies the region of interest for the locality query.
+    ///
+    Distributed_height_field_locality_query_mode(
+        Height_field_locality_query_mode                query_mode,
+        const mi::neuraylib::Tag_struct&                tag,
+        const mi::math::Bbox_struct<mi::Sint32, 2>&     coverage)
+        : m_query_mode(query_mode), 
+          m_distribute_data_tag(tag)
+    {
+        // Following is still unfortunate, i.e., the need to convert to float typed bbox.
+        m_spatial_coverage.min.x = static_cast<mi::Float32>(coverage.min.x);
+        m_spatial_coverage.min.y = static_cast<mi::Float32>(coverage.min.y);
+        m_spatial_coverage.max.x = static_cast<mi::Float32>(coverage.max.x);
+        m_spatial_coverage.max.y = static_cast<mi::Float32>(coverage.max.y);
+    }
+
+    /// Implements an empty default destructor.
+    virtual ~Distributed_height_field_locality_query_mode() {}
+
+    /// implement the height field mode defines if globally or locally unique data subsets shall be considered for the data locality.
+    ///
+    /// \return     Returns if locally or globally unique data subsets shall be 
+    ///             considered in combination with the 2D area of interest.
+    /// 
+    virtual Height_field_locality_query_mode get_query_mode()                     const { return m_query_mode;          }
+
+    /// Implements the query method that applies to a height field dataset that is refered to by an unique identifier.
+    ///
+    /// \return     Return the \c mi::neuraylib::Tag_struct that uniquely identifies 
+    ///             the height field dataset.
+    /// 
+    virtual const mi::neuraylib::Tag_struct& get_distributed_data_tag()           const { return m_distribute_data_tag; }
+
+    /// Implements the spatial query method to determine data localities based on a 2D coverage.
+    ///
+    /// The 2D area represented by \c mi::math::Bbox_struct<mi::Float32, 2> specifies a spatial 
+    /// area of interest. All data subsets that are covered at least partially, will be
+    /// considered in a data locality.
+    ///
+    /// \return     Returns the a bounding box that represents a region of interest for
+    ///             determining the data locality. An invalid bounding box will be ingnored
+    ///             and the space that the entire distributed dataset covers will be
+    ///             considered instead. 
+    ///
+    virtual const mi::math::Bbox_struct<mi::Float32, 2>& get_spatial_coverage()   const { return m_spatial_coverage;    }
+
+private:
+    Height_field_locality_query_mode        m_query_mode;
+    mi::neuraylib::Tag_struct               m_distribute_data_tag;
+    mi::math::Bbox_struct<mi::Float32, 2>   m_spatial_coverage;
+};
+
+/// Data locality query mode for deprecated heightfield datasets.
+///
+/// \deprecated The \c IRegular_heightfield has been deprecated and will be removed.
+///
+/// \ingroup nv_index_data_locality
+///
+class IRegular_heightfield_locality_query_mode :
+    public mi::base::Interface_declare<0xde972a15, 0x1593, 0x4db3, 0xa0, 0x2f, 0xa, 0x3e, 0x46, 0xe0, 0x90, 0xc,
+        nv::index::IDistributed_data_locality_query_mode>
+{
+public:
+    /// Editing and a non-editing inspection mode produce different data localities.
+    /// \return     Returns \c true if the data locality query shall consider all heightfield 
+    ///             patches, e.g., for data editing and elevation changes operations and \c false
+    ///             if only single unique patches are required for data inspection (such as 
+    ///             the detection of a average height value of all elevation values).  
+    virtual bool is_editing_mode() const = 0;
+    /// The locality query only considers patches that cover or intersect a given 2D spatial area.
+    /// \return     Returns the 2D spatial area.
+    virtual const mi::math::Bbox_struct<mi::Uint32, 2>& get_spatial_coverage() const = 0;
+};
+
+/// Implements a data locality query mode for deprecated heightfield datasets.
+///
+/// \deprecated The \c IRegular_heightfield has been deprecated and will be removed.
+///
+/// \ingroup nv_index_data_locality
+///
+class Regular_heightfield_locality_query_mode :
+    public mi::base::Interface_implement<nv::index::IRegular_heightfield_locality_query_mode>
+{
+public:
+    /// Instantiating a query method for regular heightfield datasets.
+    ///
+    /// \param[in] tag          The \c mi::neuraylib::Tag_struct identifies the heighfield dataset.
+    ///
+    /// \param[in] coverage     The bounding box specifies the region of interest for the locality query.
+    ///
+    /// \param[in] editing_mode Defines if the locality mode shall consider heightfield patches 
+    ///                         for editing only or for non-editing data analysis.
+    ///
+    Regular_heightfield_locality_query_mode(
+        const mi::neuraylib::Tag_struct&                tag,
+        const mi::math::Bbox_struct<mi::Uint32, 2>&     coverage,
+        bool                                            editing_mode = false)
+        : m_editing_mode(editing_mode),
+          m_distribute_data_tag(tag),
+          m_spatial_coverage(coverage) {}
+    /// Implements an empty default destructor.
+    virtual ~Regular_heightfield_locality_query_mode() {}
+
+    /// Editing and a non-editing inspection mode produce different data localities.
+    /// \return     Returns \c true if the data locality query shall consider all heightfield 
+    ///             patches, e.g., for data editing and elevation changes operations and \c false
+    ///             if only single unique patches are required for data inspection (such as 
+    ///             the detection of a average height value of all elevation values).  
+    virtual bool                                         is_editing_mode()          const { return m_editing_mode; }
+    /// The distributed heightfield dataset
+    /// \return     Returns the unique identifier that refers to the heightfield datset.
+    virtual const mi::neuraylib::Tag_struct&             get_distributed_data_tag() const { return m_distribute_data_tag; }
+    /// The locality query only considers patches that cover or intersect a given 2D spatial area.
+    /// \return     Returns the 2D spatial area.
+    virtual const mi::math::Bbox_struct<mi::Uint32, 2>&  get_spatial_coverage()     const { return m_spatial_coverage; }
+
+private:
+    bool                                    m_editing_mode;
+    mi::neuraylib::Tag_struct               m_distribute_data_tag;
+    mi::math::Bbox_struct<mi::Uint32, 2>    m_spatial_coverage;
+};
+
+/// Data locality information for distributed datasets.
+///
+/// In general, the data representation of large-scale
+/// datasets is distributed in the cluster environment for efficient and 
+/// parallel scalable data processing and analysis and data rendering.
+/// NVIDIA IndeX's distribution scheme relies on a spatial subdivision
+/// of the entire scene space. 
+/// Using the subdivision scheme, the scene space is partitioned into subregion,
+/// i.e., smaller-sized spatial 3D areas. Such subregion directly 
+/// partition the dataset representation into 
+/// data subsets. Data subsets are stored on the nodes and GPUs distributed
+/// in the cluster environment. Each data subset is contained in its local
+/// space bounding box inside a subregion, wich is defined in the global
+/// subdivision space.
+///
+/// The data locality provides an application with the means to query where, i.e., on
+/// which node in the cluster, a data subset of the entire
+/// distributed dataset is stored. A node stores either none or a set of data 
+/// subsets. Furthermore, the data locality information provides the 
+/// bounding boxes that correspond each of to the data subsets
+/// stored on a given cluster node or GPU. Each of the bounding boxes can be
 /// accessed. The respective index then also corresponds to the distributed
 /// data subset.
 ///
 /// A common use case that requires the data locality is the invocation of
-/// parallel and distributed compute tasks applied to the distributed data.
-/// DiCE provides a fragmented job infrastructure (\c IFragmented_job) that allows
-/// invoking operations in the cluster.
-/// Each job invocation usually requires information about
-/// the number of operations (a.k.a. fragments) that shall be launched and the
-/// target cluster nodes to which the launched fragments shall be sent to
-/// process or analyse the distributed data.
+/// parallel and distributed data job that apply processing and analysis techniques
+/// to the distributed data subset in parallel (see \c IDistributed_data_job).
 ///
+/// \note   Additional more explicit convenience functionalities and methods
+///         will be added to the \c IDistributed_data_locality interface class
+///         soon.
 ///
-/// \deprecated This interface class is subject to change!
-///
-/// \ingroup nv_index_data_access
+/// \ingroup nv_index_data_locality
 ///
 class IDistributed_data_locality :
     public mi::base::Interface_declare<0x64624ed0,0x6e2a,0x48c9,0xb9,0x73,0x61,0x8d,0x32,0xd0,0x5e,0xf5,
                                        mi::neuraylib::ISerializable>
 {
 public:
-    /// The data representation is distributed to a number of machines in the cluster.
-    /// A cluster node hosts none or a subset of the distributed data.
-    /// The number of nodes that host a subset of the entire
-    /// dataset allows, for instance, setting up the fragmented job, i.e.,
-    /// the number of fragments a fragmented job shall be split into.
+    /// Data subsets are distributed to a number of hosts in a cluster.
     ///
-    /// \return             The number of cluster nodes that host a subset of
-    ///                     the entire data representation.
+    /// A cluster node hosts subset or none of the distributed data subsets.
+    /// The number of nodes that manage the data subsets of the entire
+    /// distributed dataset allows, for instance, setting up compute jobs and 
+    /// passing the compute executions explicitly the to nodes that store the
+    /// data subsets locally.
+    /// 
+    /// \note Please use the number of cluster nodes to iterate over all nodes
+    ///       that store data subsets.
+    ///
+    /// \return             The number of cluster nodes that manage a data subsets of
+    ///                     the entire distributed data representation.
     ///
     virtual mi::Uint32 get_nb_cluster_nodes() const = 0;
 
-    /// The data representation is distributed to the given cluster machines.
-    /// Each of the cluster machines has a unique id. The method returns the unique
-    /// ids of the cluster machines that store a subset of the data locally.
+    /// A set of data subsets on a specific cluster node with explicit host identifier.
+    ///
+    /// Each of the cluster node has a unique identifier. The method allows for
+    /// interating over all node identiviert that that store at least one data subset.
+    /// The node identifier can be used to send a job execution to the node.
+    /// For instance, the \c mi::neuraylib::Fragmented_job interface allow for 
+    /// explicit scheduling of job executions to nodes, i.e., node ids.
     ///
     /// \param[in] index    The index used to access one of the cluster nodes.
     ///                     The index must be given in the range from 0 to
-    ///                     \c get_nb_cluster_nodes().
+    ///                     #get_nb_cluster_nodes()-1.
     ///
-    /// \return             The indexed unique cluster machines id.
+    /// \code
+    /// const mi::Uint32 nb_nodes = locality->get_nb_cluster_nodes();
+    /// for(mi::Uint32 node_index=0; node_index<nb_nodes; ++node_index)
+    /// {
+    ///     const mi::Uint32 node_id = locality->get_cluster_node();
+    /// }
+    /// \endcode
+    ///
+    /// \return             Returns the indexed unique identifier of
+    ///                     a cluster node.
     ///
     virtual mi::Uint32 get_cluster_node(mi::Uint32 index) const = 0;
 
-    /// Each cluster node hosts none or a subset of the large-scale data representation.
+    /// A cluster node hosts a set of data subsets bound inside their local-space bounding box.
+    ///
     /// Each subset has its own bounding box in the scene element's local space.
-    /// The number of subsets stored locally, i.e., the number
-    /// of bounding boxes per cluster node, allows, for instance, a user-defined
-    /// compute algorithm to iterate over all subsets on a cluster machines.
+    /// This method returns number of buonding boxes which each representing a single 
+    /// data subset stored on a the cluster node. The number of bounding box, thus,
+    /// indicates the number of data subsets and allows, for instance, to schedule 
+    /// and appropriate number of executions to the node. 
+    /// That is, knowing the number of data subsets per cluster node 
+    /// enables an application to direct and appropriate number of executions to the 
+    /// nodes to implement a compute algorithms that operate on a data subset
+    /// granularity. 
     ///
-    /// \param[in] cluster_node_id      The id that references a cluster machine.
+    /// The method is typically used to iterate over all data subset bounding box
+    /// (i.e., data subsets) assigned to a a cluster node.
     ///
-    /// \return                         The number of data subsets
-    ///                                 stored locally on the cluster node.
+    /// \param[in] cluster_node_id      The unique identifier that references 
+    ///                                 a node in the cluster environment.
+    ///
+    /// \return                         The number of bounding boxes or data subsets
+    ///                                 repectively stored locally on the
+    ///                                 given cluster node.
     ///
     virtual mi::Size get_nb_bounding_box(mi::Uint32 cluster_node_id) const = 0;
 
-    /// The data subset stored locally on a cluster node is defined inside its bounding box.
-    /// The method allows iterating over all the bounding boxes
-    /// on a cluster machine, e.g., to implement compute techniques.
+    /// Each data subsets is stored on a cluster node are defined inside its local-space bounding box.
+    ///
+    /// Use this method to iterating over all the bounding boxes or data subsets
+    /// that are stored on the cluster node, e.g., to implement tailor-made 
+    /// job scheduling (see also \c \c mi::neuraylib::Fragmented_job).
     ///
     /// \param[in] cluster_node_id      The id that references a cluster node.
     ///                                 The index must be given in the range
-    ///                                 from 0 to \c get_nb_bounding_box().
+    ///                                 from 0 to #get_nb_cluster_nodes()-1.
     ///
-    /// \param[in] index                The index of the bounding box that references
+    /// \param[in] bounding_box_index   The index of the bounding box that references
     ///                                 the actual subset of the large-scale data
     ///                                 representation.
+    ///                                 The index must be given in the range
+    ///                                 from 0 to #get_nb_bounding_box()-1.
     ///
-    /// \return                         The data subset's bounding
-    ///                                 box in the scene element's local space.
+    /// \code
+    /// // Iterater over cluster host ids:
+    /// //
+    /// const mi::Uint32 nb_nodes = locality->get_nb_cluster_nodes();
+    /// for(mi::Uint32 node_index=0; node_index<nb_nodes; ++node_index)
+    /// {
+    ///     // Iterater over data subset bounding boxes on the given host (node_index):
+    ///     //
+    ///     const mi::Uint32 nb_boxes = locality->get_nb_bounding_box(node_index);
+    ///     for(mi::Uint32 bbox_index=0; bbox_index<nb_boxes; ++bbox_index)
+    ///     {
+    ///         const mi::math::Bbox_struct<mi::Sint32, 3> = locality->get_bounding_box(node_index, bbox_index);
+    ///     }
+    /// }
+    /// \endcode
+    ///
+    /// \return     Returns the data subset's bounding
+    ///             box in the scene element's local space.
     ///
     virtual const mi::math::Bbox_struct<mi::Sint32, 3> get_bounding_box(
         mi::Uint32 cluster_node_id,
-        mi::Uint32 index) const = 0;
-};
+        mi::Uint32 bounding_box_index) const = 0;
 
-/// The interface class exposes the locality information of a distributed regular volume dataset.
-///
-/// The interface method \c IData_distribution::retrieve_data_locality()
-/// returns the volume data locality.
-///
-///
-/// \deprecated This interface class is subject to change!
-///
-/// \ingroup nv_index_data_access
-///
-class IRegular_volume_data_locality :
-    public mi::base::Interface_declare<0x64624ed9,0x6e2a,0x48c9,0xa9,0x82,0x61,0x8d,0x32,0xd0,0x5e,0xf9,
-                                       IDistributed_data_locality>
-{
-public:
-    /// Creates means to edit the volume brick stored locally on a cluster node.
-    /// The method may only be called on the cluster machine that stores the data.
+    /// Each data subsets is stored on a cluster node are defined inside its local-space bounding box.
     ///
-    /// \param[in] dice_transaction     The DiCE transaction used that the tasks operates in.
-    ///
-    /// \param[in] cluster_node_id      The index of the cluster machine that stores
-    ///                                 a certain brick data.
-    ///
-    /// \param[in] index                The index of the bounding box that references
-    ///                                 the actual brick of the subset of bricks.
-    ///
-    /// \return                         Returns an NVIDIA IndeX instance of
-    ///                                 the interface class \c IRegular_volume_data_edit
-    ///                                 to edit the brick data contents.
-    ///
-    ///
-    virtual IRegular_volume_data_edit* create_data_edit(
-        mi::neuraylib::IDice_transaction*   dice_transaction,
-        mi::Uint32                          cluster_node_id,
-        mi::Uint32                          index) const = 0;
-
-    /// Creates means to access the volume brick stored locally on a cluster machine.
-    /// While the interface class \c IRegular_volume_data_access creates of copy of the
-    /// present interface method exposes direct access to the brick data stored locally
-    /// on a machine avoiding any data copies.
-    /// The method may only be called on the cluster node that stores the data.
-    ///
-    /// \deprecated This call is supposed to be removed soon as
-    ///             it used to be a workaround in the past.
-    ///
-    /// \param[in] dice_transaction     The DiCE transaction used for this operation.
-    ///
-    /// \param[in] cluster_node_id      The index of the cluster machine that stores
-    ///                                 a brick data.
-    ///
-    /// \param[in] index                The index of the bounding box that references
-    ///                                 the brick of the subset of bricks.
-    ///
-    /// \param[out] brick_bounding_box  The bounding box of the brick data stored
-    ///                                 locally. The bounding box may be larger than
-    ///                                 the bounding box returned by \c get_bounding_box
-    ///                                 because the raw brick data may be extended by
-    ///                                 an additional voxel boundary.
-    ///
-    /// \return                         Returns a pointer to the amplitude values of the
-    ///                                 local brick data.
-    ///
-    virtual mi::Uint8* access_local_data(
-        mi::neuraylib::IDice_transaction*       dice_transaction,
-        mi::Uint32                              cluster_node_id,
-        mi::Uint32                              index,
-        mi::math::Bbox_struct<mi::Uint32, 3>&   brick_bounding_box) const = 0;
-};
-
-/// The interface class exposes the locality information of a distributed sparse-volume dataset.
-///
-/// The interface method \c IData_distribution::retrieve_data_locality()
-/// returns the volume data locality.
-///
-/// \deprecated This interface class is subject to change!
-///
-/// \ingroup nv_index_data_access
-///
-class ISparse_volume_data_locality :
-    public mi::base::Interface_declare<0x860724fe,0x5c07,0x43b3,0xaa,0xc8,0xbc,0x3,0x72,0xc8,0x44,0xf8,
-                                       IDistributed_data_locality>
-{
-public:
-    /// Creates means to edit the sparse-volume subset stored locally on a cluster node.
-    /// The method may only be called on the cluster machine that stores the data.
-    ///
-    /// \param[in] dice_transaction     The DiCE transaction used that the tasks operates in.
-    ///
-    /// \param[in] cluster_node_id      The index of the cluster machine that stores
-    ///                                 a certain subset data.
-    ///
-    /// \param[in] index                The index of the bounding box that references
-    ///                                 the actual sparse-volume subset
-    ///
-    /// \return                         Returns an NVIDIA IndeX instance of
-    ///                                 the interface class \c ISparse_volume_data_edit
-    ///                                 to edit the sparse-volume subset data contents.
-    ///
-    virtual ISparse_volume_data_edit* create_data_edit(
-        mi::neuraylib::IDice_transaction*   dice_transaction,
-        mi::Uint32                          cluster_node_id,
-        mi::Uint32                          index) const = 0;
-};
-
-/// The interface class exposes the locality information of a distributed height-field dataset.
-///
-/// The interface method \c IData_distribution::retrieve_data_locality()
-/// returns the height-field data locality.
-///
-/// \deprecated This interface class is subject to change!
-///
-/// \ingroup nv_index_data_access
-///
-class IHeight_field_data_locality :
-    public mi::base::Interface_declare<0xb7e4caa4,0x36d7,0x4712,0xba,0x91,0x89,0x9d,0x70,0x3e,0x4c,0x7a,
-                                       IDistributed_data_locality>
-{
-public:
-};
-
-/// The interface class exposes the locality information of a distributed regular heightfield dataset.
-///
-/// The interface method \c IData_distribution::retrieve_data_locality()
-/// returns the volume data locality.
-///
-///
-/// \deprecated This interface class is subject to change!
-///
-/// \ingroup nv_index_data_access
-///
-class IRegular_heightfield_data_locality :
-    public mi::base::Interface_declare<0xe40bd2c9,0x0d82,0x4e03,0x9c,0x46,0x42,0x87,0x86,0xbb,0xee,0xdf,
-                                       IDistributed_data_locality>
-{
-public:
-    /// Creates means to edit the heightfield data stored locally on a cluster machine.
-    /// The method may only be called on the cluster node that stores the data.
-    ///
-    /// \param[in] dice_transaction     The DiCE transaction used for this operation.
-    /// \param[in] cluster_node_id      The index of the cluster node that stores
-    ///                                 a certain patch data.
-    /// \param[in] index                The index of the bounding box that references
-    ///                                 the actual patch of the sub set of patches.
-    ///
-    /// \return                         Returns an instance of an implementation of
-    ///                                 the interface class \c IRegular_heightfield_data_edit.
-    ///
-    ///
-    virtual IRegular_heightfield_data_edit* create_data_edit(
-        mi::neuraylib::IDice_transaction*   dice_transaction,
-        mi::Uint32                          cluster_node_id,
-        mi::Uint32                          index) const = 0;
-};
-
-/// The interface class exposes the locality information of a distributed regular volume dataset.
-///
-/// The interface method \c IData_distribution::retrieve_data_locality()
-/// returns the volume data locality.
-///
-///
-/// \deprecated This interface class is subject to change!
-///
-/// \ingroup nv_index_data_access
-///
-class IIrregular_volume_data_locality :
-    public mi::base::Interface_declare<0x1a783273,0xea49,0x4f86,0x97,0x44,0x24,0x5b,0xb5,0xef,0xe1,0x9d,
-                                       IDistributed_data_locality>
-{
-public:
-    /// Creates means to edit the volume brick stored locally on a cluster node.
-    /// The method may only be called on the cluster machine that stores the data.
-    ///
-    /// \param[in] dice_transaction     The DiCE transaction used that the tasks operates in.
-    ///
-    /// \param[in] cluster_node_id      The index of the cluster machine that stores
-    ///                                 a certain brick data.
-    ///
-    /// \param[in] index                The index of the bounding box that references
-    ///                                 the actual brick of the subset of bricks.
-    ///
-    /// \return                         Returns an NVIDIA IndeX instance of
-    ///                                 the interface class \c IRegular_volume_data_edit
-    ///                                 to edit the brick data contents.
-    ///
-    ///
-    virtual IIrregular_volume_data_edit* create_data_edit(
-        mi::neuraylib::IDice_transaction*   dice_transaction,
-        mi::Uint32                          cluster_node_id,
-        mi::Uint32                          index) const = 0;
-
-    /// The irregular volume data subset stored locally on a cluster node is
-    /// defined inside its bounding box.
+    /// The data subset stored on a cluster node is defined inside its bounding box.
     /// The method allows iterating over all the bounding boxes
     /// on a cluster machine, e.g., to implement compute techniques.
     ///
     /// \param[in] cluster_node_id      The id that references a cluster node.
     ///                                 The index must be given in the range
-    ///                                 from 0 to \c get_nb_bounding_box().
+    ///                                 from 0 to #get_nb_cluster_nodes()-1.
     ///
-    /// \param[in] index                The index of the bounding box that references
+    /// \param[in] bounding_box_index   The index of the bounding box that references
     ///                                 the actual subset of the large-scale data
     ///                                 representation.
+    ///                                 The index must be given in the range
+    ///                                 from 0 to #get_nb_bounding_box()-1.
     ///
-    /// \return                         The data subset's bounding
-    ///                                 box in the scene element's local space.
+    /// \return                         The subregion identifier that the data subset is assigned
+    ///                                 to, i.e., the spatial area that the data subset intersects and 
+    ///                                 is contained in.
     ///
-    virtual const mi::math::Bbox_struct<mi::Float32, 3> get_data_subset_bounding_box(
+    virtual Subregion_identifier get_subregion(
         mi::Uint32 cluster_node_id,
-        mi::Uint32 index) const = 0;
+        mi::Uint32 bounding_box_index) const = 0;
 };
 
-/// Interface class that exposes the data distribution in the cluster environment.
+class IDistributed_data_job_scheduler;
+
+/// Retrieving information about the data distribution and scheduling tasks against distributed data. 
+/// 
+/// The \c ISession exposes access to the \c IData_distribution interface class.
+/// The interface class grants general overview on the data distribution, i.e., 
+/// exposes the data locality for a distributed dataset or enables the application 
+/// to issue distribute jobs in the cluster environment.
 ///
-/// \deprecated This interface class is subject to change!
+/// \note   This interface class is going to expose additional details on the data distribution
+///         in the future.
 ///
-/// \ingroup nv_index_data_access
+/// \ingroup nv_index_data_distribution
 ///
 class IData_distribution :
     public mi::base::Interface_declare<0xc37caf77,0xe632,0x46ad,0x8c,0x19,0x6d,0x57,0x56,0x04,0xda,0x68,
                                        mi::neuraylib::IElement>
 {
 public:
-    /// Query the distribution of volume data in the cluster. The returned
-    /// instance of the class that implements interface \c IRegular_volume_data_locality
-    /// provides the cluster nodes where parts of the queried data including their
-    /// respective bounding boxes (brick bounding box) are stored.
+    /// Scheduler that directs distributed data jobs to nodes and GPUs for analyzing and processing large-scale datasets.
     ///
-    /// \param[in] scene_element_tag    The volume scene element tag that refers to
-    ///                                 data representation whose distribution shall
-    ///                                 be returned.
-    /// \param[in] query_bbox           The bounding box in scene element's local space.
-    ///                                 The data distribution will be exposed for the
-    ///                                 user-defined bounding box passed to the query.
-    /// \param[in] dice_transaction     The DiCE transaction that the operation runs in.
+    /// \return     Returns an instance of the job scheduler interface 
+    ///             \c IDistributed_data_job_scheduler that issues distributed data 
+    ///             analysis and processing techniques towards cluster nodes on a 
+    ///             data subset granularity.
     ///
-    /// \return                         Returns the data distribution scheme that
-    ///                                 corresponds to the query parameters.
-    ///
-    virtual IRegular_volume_data_locality* retrieve_data_locality(
-        mi::neuraylib::Tag_struct                       scene_element_tag,
-        const mi::math::Bbox_struct<mi::Uint32, 3>&     query_bbox,
-        mi::neuraylib::IDice_transaction*               dice_transaction) const = 0;
+    virtual IDistributed_data_job_scheduler* create_scheduler() const = 0;
 
-    /// Query the distribution of sparse-volume data in the cluster. The returned
-    /// instance of the class that implements interface \c ISparse_volume_data_locality
-    /// provides the cluster nodes where parts of the queried data including their
-    /// respective bounding boxes (subset bounding box) are stored.
+    /// Creating a data locality for the given query method and a given distributed dataset type.
     ///
-    /// \param[in] scene_element_tag    The sparse-volume scene element tag that refers to
-    ///                                 data representation whose distribution shall
-    ///                                 be returned.
-    /// \param[in] query_bbox           The bounding box in scene element's local space.
-    ///                                 The data distribution will be exposed for the
-    ///                                 user-defined bounding box passed to the query.
-    /// \param[in] dice_transaction     The DiCE transaction that the operation runs in.
-    ///
-    /// \return                         Returns the data distribution scheme that
-    ///                                 corresponds to the query parameters.
-    ///
-    virtual ISparse_volume_data_locality* retrieve_sparse_volume_data_locality(
-        mi::neuraylib::Tag_struct                       scene_element_tag,
-        const mi::math::Bbox_struct<mi::Sint32, 3>&     query_bbox,
-        mi::neuraylib::IDice_transaction*               dice_transaction) const = 0;
-
-    /// Height-field data locality query mode.
-    ///
-    /// This mode allows to query the height-field data locality of the data subsets
-    /// which are either globally unique or unique per host. Globally unique mode will
-    /// reference a single subset subset only once, while in per-host unique mode the
-    /// locality potentially references a subset multiple times, but only once per host.
-    ///
-    enum Height_field_locality_query_mode {
-        HFLOCALITY_SUBSETS_UNIQUE_GLOBAL    = 0x01u,
-        HFLOCALITY_SUBSETS_UNIQUE_PER_HOST  = 0x02u
-    };
-    /// Query the distribution of sparse-volume data in the cluster. The returned
-    /// instance of the class that implements interface \c ISparse_volume_data_locality
-    /// provides the cluster nodes where parts of the queried data including their
-    /// respective bounding boxes (subset bounding box) are stored.
-    ///
-    /// \param[in] scene_element_tag    The sparse-volume scene element tag that refers to
-    ///                                 data representation whose distribution shall
-    ///                                 be returned.
-    /// \param[in] query_bbox           The bounding box in scene element's local space.
-    ///                                 The data distribution will be exposed for the
-    ///                                 user-defined bounding box passed to the query.
-    /// \param[in] query_mode           Height field data locality query mode. 
-    ///                                 See Height_field_locality_query_mode.
-    /// \param[in] dice_transaction     The DiCE transaction that the operation runs in.
-    ///
-    /// \return                         Returns the data distribution scheme that
-    ///                                 corresponds to the query parameters.
-    ///
-    virtual IHeight_field_data_locality* retrieve_height_field_data_locality(
-        mi::neuraylib::Tag_struct                       scene_element_tag,
-        const mi::math::Bbox_struct<mi::Sint32, 2>&     query_bbox,
-        Height_field_locality_query_mode                query_mode,
-        mi::neuraylib::IDice_transaction*               dice_transaction) const = 0;
-
-    /// Query the distribution of heightfield data in the cluster. The returned
-    /// instance of the class that implements interface \c IRegular_heightfield_data_locality
-    /// provides the cluster nodes where parts of the queried data including their
-    /// respective 2D bounding boxes (patch bounding box) are stored.
-    ///
-    /// \param[in] scene_element_tag    The heightfield scene element tag that refers to
-    ///                                 data representation whose distribution shall be
-    ///                                 returned.
-    /// \param[in] query_patch          The bounding box in scene element's local space.
-    ///                                 The data distribution will be exposed for the
-    ///                                 user-defined bounding box passed to the query.
-    /// \param[in] dice_transaction     The DiCE transaction that the operation runs in.
-    ///
-    /// \return                         Returns the data distribution scheme that
-    ///                                 corresponds to the query parameters.
-    ///
-    virtual IRegular_heightfield_data_locality* retrieve_data_locality(
-        mi::neuraylib::Tag_struct                       scene_element_tag,
-        const mi::math::Bbox_struct<mi::Uint32, 2>&     query_patch,
-        mi::neuraylib::IDice_transaction*               dice_transaction) const = 0;
-
-    /// Query the distribution of heightfield data in the cluster. The returned
-    /// instance of the class that implements interface \c IRegular_heightfield_data_locality
-    /// provides the cluster nodes where parts of the queried data including their
-    /// respective 2D bounding boxes (patch bounding box) are stored.
-    /// Distributed heightfield patches may cover the same heightfield data area and
-    /// stored on multiple subregions along the z-direction (depth) in the scene.
-    /// That is, this query in contrast to the previous one returns all heightfield patches
-    /// in all intersected subregions, e.g., for applying cluster-wide editing
-    /// operations.
-    ///
-    /// \param[in] scene_element_tag    The heightfield scene element tag that refers to
-    ///                                 data representation whose distribution shall be
-    ///                                 returned.
-    /// \param[in] query_bbox           The bounding box in scene element's local space.
-    ///                                 The data distribution will be exposed for the
-    ///                                 user-defined bounding box passed to the query.
-    /// \param[in] dice_transaction     The DiCE transaction that the operation runs in.
-    ///
-    /// \return                         Returns the data distribution scheme that
-    ///                                 corresponds to the query parameters.
-    ///
-    virtual IRegular_heightfield_data_locality* retrieve_data_locality_for_editing(
-        mi::neuraylib::Tag_struct                       scene_element_tag,
-        const mi::math::Bbox_struct<mi::Uint32, 2>&     query_bbox,
-        mi::neuraylib::IDice_transaction*               dice_transaction) const = 0;
-
     /// Query the distribution of irregular volume data in the cluster. The returned
-    /// instance of the class that implements interface \c IRegular_volume_data_locality
+    /// instance of the class that implements interface \c IDistributed_data_locality
     /// provides the cluster nodes where parts of the queried data including their
     /// respective bounding boxes (brick bounding box) are stored.
     ///
-    /// \param[in] scene_element_tag    The volume scene element tag that refers to
-    ///                                 data representation whose distribution shall
-    ///                                 be returned.
-    /// \param[in] query_bbox           The bounding box in scene element's local space.
-    ///                                 The data distribution will be exposed for the
-    ///                                 user-defined bounding box passed to the query.
+    /// \param[in] class_id             Identifier of the distributed dataset type.
+    ///
+    /// \param[in] query_method         The query method used for determining a 
+    ///                                 data locality.
+    ///
     /// \param[in] dice_transaction     The DiCE transaction that the operation runs in.
     ///
-    /// \return                         Returns the data distribution scheme that
-    ///                                 corresponds to the query parameters.
+    /// \return                         Returns the data locality that
+    ///                                 corresponds to the query method.
     ///
-    virtual IIrregular_volume_data_locality* retrieve_data_locality(
-        mi::neuraylib::Tag_struct                       scene_element_tag,
-        const mi::math::Bbox_struct<mi::Float32, 3>&    query_bbox,
+    virtual IDistributed_data_locality* get_data_locality(
+        const mi::base::Uuid&                           class_id,
+        IDistributed_data_locality_query_mode*          query_method,
         mi::neuraylib::IDice_transaction*               dice_transaction) const = 0;
 
+
+    /// Convenience template functions for creating a typed data locality.
+    ///
+    /// The template parameter T defines distributed dataset type for which the 
+    /// data locality shall be determined. 
+    ///
+    /// \code
+    /// //
+    /// // Usage:
+    /// //
+    /// mi::base::Handle<const nv::index::IDistributed_data_locality> data_locality(
+    ///     data_distribution->get_data_locality<nv::index::ISparse_volume_scene_element>(query_method, dice_transaction));
+    /// \endcode
+    ///
+    /// \param[in] query_method         The query method used for determining a 
+    ///                                 data locality.
+    ///
+    /// \param[in] dice_transaction     The DiCE transaction that the operation runs in.
+    ///
+    /// \return                         Returns a typed data locality that
+    ///                                 corresponds to the query method.
+    ///
+    template <class T>
+    IDistributed_data_locality* get_data_locality(
+        IDistributed_data_locality_query_mode*          query_method,
+        mi::neuraylib::IDice_transaction*               dice_transaction) const
+    {
+        return get_data_locality(typename T::IID(), query_method, dice_transaction);
+    }
+
+    /// Convenience template functions for creating a typed data locality.
+    ///
+    /// Creates a data locality for a distributed dataset and a spatial query.
+    /// The template parameter T defines distributed dataset type for which the 
+    /// data locality shall be determined. 
+    ///
+    /// \code
+    /// //
+    /// // Usage:
+    /// //
+    /// mi::base::Handle<const nv::index::IDistributed_data_locality> data_locality(
+    ///     data_distribution->get_data_locality<nv::index::ISparse_volume_scene_element>(tag, bbox, dice_transaction));
+    /// \endcode
+    ///
+    /// \param[in] tag                  Specifies the distributed dataset for which the 
+    ///                                 data locality shall be determined.
+    ///
+    /// \param[in] query_bbox           Bounding box for specifiying a spatial query method 
+    ///                                 for determining a data locality.
+    ///
+    /// \param[in] dice_transaction     The DiCE transaction that the operation runs in.
+    ///
+    /// \return                         Returns a typed data locality that
+    ///                                 corresponds to the query method.
+    ///
+    template <class T>
+    IDistributed_data_locality* get_data_locality(
+        mi::neuraylib::Tag_struct                       tag,
+        const mi::math::Bbox_struct<mi::Float32, 3>&    query_bbox,
+        mi::neuraylib::IDice_transaction*               dice_transaction) const
+    {
+        mi::base::Handle<IDistributed_data_subset_locality_query_mode> selection(
+            new Distributed_data_subset_locality_query_mode(tag, query_bbox));
+        return get_data_locality(typename T::IID(), selection.get(), dice_transaction);
+    }
 };
 
 }} // namespace index / nv
 
-#endif // NVIDIA_INDEX_IDATA_DISTRIBUTION_H
+#endif // NVIDIA_INDEX_IDISTRIBUTED_DATA_LOCALITY_H

@@ -49,7 +49,7 @@ namespace index {
 /// be defined:
 ///
 /// - The scene in all viewport scopes must contain the same
-///   distributed data scene elements (i.e. \c IRegular_volume, \c
+///   distributed data scene elements (i.e. \c ISparse_volume_scene_element, \c
 ///   IRegular_heightfield) and a warning will be printed during
 ///   rendering when such a scene element is missing from one
 ///   viewport scope. The scene elements may still be localized and
@@ -65,14 +65,6 @@ namespace index {
 ///   data, all viewports must use the same compute technique.
 ///   Otherwise data may be recomputed constantly.
 ///
-/// - When the height values inside a heightfield are modified by an
-///   \c IDistributed_compute_algorithm so that the bounding box of
-///   the \c IRegular_heightfield changes, then the heightfield must
-///   not be localized in any viewport scope.
-///
-/// - Volume slices, i.e. \c ISection_scene_element and \c
-///   IVertical_profile_scene_element, have to be added to their
-///   parent \c IRegular_volume in global scope.
 ///
 /// \ingroup nv_index_rendering
 ///

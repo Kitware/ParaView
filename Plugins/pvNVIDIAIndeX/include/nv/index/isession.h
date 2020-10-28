@@ -26,14 +26,13 @@ namespace index {
 class IViewport;
 class IViewport_list;
 
-/// The abstract interface class representing a working session with the system.
-/// Such a \e session contains a configuration (\c IConfig_settings) and an scene
-/// (\c IScene).
+/// The \e session repreesnts the entire workspace with the NVIDIA IndeX environment.
+/// Besides allowing the user to configure (see \c nv::indeX::IConfig_settings) the system, 
+/// the session contains the scene (see \c nv::index::IScene) and gives access to the internal 
+/// data distribution schemes (see \c nv::index::IData_distribution).
+/// 
 ///
-/// In addition, this class makes available several factory methods, e.g., for creating a scene
-/// or a camera.
-///
-/// \ingroup nv_index
+/// \ingroup nv_index_session
 ///
 class ISession :
     public mi::base::Interface_declare<0x21638be2,0xab6b,0x4396,0x9a,0xb7,0x3b,0xa5,0xe2,0xc9,0xe0,0xe6,
@@ -41,28 +40,104 @@ class ISession :
 {
 public:
     ///////////////////////////////////////////////////////////////////////////////////
+    /// \name Creating a scene.
+    ///@{
+    /// Creates a new scene for the current session.
+    ///
+    /// \note Only a single scene can be created for each session.
+    ///
+    /// \param[in] dice_transaction     The DiCE transaction to store the scene in DiCE's
+    ///                                 distributed database.
+    ///
+    /// \return                         Returns the tag that references the created instance
+    ///                                 of a \c IScene interface class.
+    ///
+    virtual mi::neuraylib::Tag_struct create_scene(
+        mi::neuraylib::IDice_transaction* dice_transaction) = 0;
+
+    /// The scene is part of the session description and can be accessed.
+    ///
+    /// \return     Returns the tag that references an \c IScene interface.
+    ///
+    virtual mi::neuraylib::Tag_struct get_scene() const = 0;
+    ///@}
+
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    /// \name Traversing the scene.
+    ///@{
+
+    /// Visiting the scene by traversing through the entire scene description.
+    ///
+    /// \param[in] visitor              The application-side visitor traverses through
+    ///                                 the scene description and evaluates all scene
+    ///                                 elements.
+    ///
+    ///                                 \c TODO: The traversal order such as depth or
+    ///                                 breadth first shall be provided by the application
+    ///                                 in the future.
+    ///
+    /// \param[in] dice_transaction     The DiCE transaction that should be used for the
+    ///                                 traversal.
+    ///
+    virtual void visit(
+        IScene_visitor*                         visitor,
+        mi::neuraylib::IDice_transaction*       dice_transaction) const = 0;
+    ///@}
+
+    ///////////////////////////////////////////////////////////////////////////////////
     /// \name Creating a camera.
     ///@{
     /// Creates a new camera object.
     ///
     /// \param[in]  dice_transaction    The DiCE transaction to store the new camera in
     ///                                 DiCE's distributed database.
-    /// \param[in]  camera_type_iid     The UUID of the requested camera to be created.
+    /// \param[in]  camera_type_uuid    The UUID of the requested camera to be created.
     ///                                 By default a \c IPerspective_camera instance
     ///                                 is created.
     /// \param[in]  camera_name         The name for this camera. This name can be used
     ///                                 to lookup the camera tag using IDice_transaction::name_to_tag().
     ///                                 When it is 0, no name is assigned.
     ///
-    /// \return     Returns the tag that references the created instance of the \c ICamera interface camera.
+    /// \return     Returns the tag that references the created instance of the
+    ///             \c ICamera interface camera.
     ///             The caller takes ownership of the camera and is
-    ///             responsible for freeing it from the database by calling \c
-    ///             IDice_transaction::remove() when it is not needed anymore.
+    ///             responsible for freeing it from the database by calling
+    ///             \c IDice_transaction::remove() when it is not needed anymore.
     ///
     virtual mi::neuraylib::Tag_struct create_camera(
-        mi::neuraylib::IDice_transaction* dice_transaction,
-        const mi::base::Uuid& camera_type_uuid = IPerspective_camera::IID(),
-        const char*           camera_name = 0) const = 0;
+        mi::neuraylib::IDice_transaction*       dice_transaction,
+        const mi::base::Uuid&                   camera_type_uuid = IPerspective_camera::IID(),
+        const char*                             camera_name = 0) const = 0;
+    ///@}
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    /// \name Global configurations and states.
+    ///@{
+    /// Returns the configuration settings of this  session.
+    /// \return Tag of an \c IConfig_settings object
+    ///
+    virtual mi::neuraylib::Tag_struct get_config() const = 0;
+    ///@}
+    
+    ///////////////////////////////////////////////////////////////////////////////////
+    /// \name Data distribution.
+    ///@{
+    ///
+    /// Returns the factory that exposes access to the distributed large-scale datasets.
+    ///
+    /// \return     Returns the tag that references an instance of the \c IDistributed_data_access_factory
+    ///             interface class.
+    ///
+    virtual mi::neuraylib::Tag_struct get_data_access_factory() const = 0;
+
+    /// Returns the object that exposes the distribution of large-scale data in the cluster
+    /// environment.
+    ///
+    /// \return     Returns the tag that reference an instance of the \c IData_distribution
+    ///             interface class.
+    ///
+    virtual mi::neuraylib::Tag_struct get_distribution_layout() const = 0;
     ///@}
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -94,52 +169,6 @@ public:
     ///             anymore, i.e. by storing it in a \c mi::base::Handle.
     ///
     virtual ICanvas_viewport_list* create_canvas_viewport_list() const = 0;
-
-    ///@}
-
-    ///////////////////////////////////////////////////////////////////////////////////
-    /// \name Creating a scene.
-    ///@{
-    /// Creates a new scene for the current session.
-    ///
-    /// \note You can only create a single scene for each session.
-    ///
-    /// \param[in] dice_transaction     The DiCE transaction to store the scene in DiCE's
-    ///                                 distributed database.
-    ///
-    /// \return                         Returns the tag that references the created instance
-    ///                                 of a \c IScene interface class.
-    ///
-    virtual mi::neuraylib::Tag_struct create_scene(
-        mi::neuraylib::IDice_transaction* dice_transaction) = 0;
-
-    /// Returns the scene of the current session.
-    /// \return Tag of an \c IScene
-    ///
-    virtual mi::neuraylib::Tag_struct get_scene() const = 0;
-    ///@}
-
-
-    ///////////////////////////////////////////////////////////////////////////////////
-    /// \name Traversing the scene.
-    ///@{
-
-    /// Visiting the scene by traversing through the entire scene description.
-    ///
-    /// \param[in] visitor              The application-side visitor traverses through
-    ///                                 the scene description and evaluates all scene
-    ///                                 elements.
-    ///
-    ///                                 \c TODO: The traversal order such as depth or
-    ///                                 breadth first shall be provided by the application
-    ///                                 in the future.
-    ///
-    /// \param[in] dice_transaction     The DiCE transaction that should be used for the
-    ///                                 traversal.
-    ///
-    virtual void visit(
-        IScene_visitor*                         visitor,
-        mi::neuraylib::IDice_transaction*       dice_transaction) const = 0;
     ///@}
 
 
@@ -155,37 +184,18 @@ public:
     /// \return Returns an instance of the interface class \c IScene_convenience_manipulation, which
     ///         exposes means for conveniently manipulating a scene's configuration.
     ///
+    /// \deprecated The convenience manipulations was implemented on customer request but became 
+    ///             superfluous over time.
+    ///
     virtual IScene_convenience_manipulation* get_conveniences() const = 0;
     ///@}
 
-    ///////////////////////////////////////////////////////////////////////////////////
-    /// \name Data distribution.
-    ///@{
-    /// Returns the factory that exposes access to the distributed large-scale datasets.
-    ///
-    /// \return     Returns the tag that references an instance of the \c IDistributed_data_access_factory
-    ///             interface class.
-    ///
-    virtual mi::neuraylib::Tag_struct get_data_access_factory() const = 0;
-
-    /// Returns the object that exposes the distribution of large-scale data in the cluster
-    /// environment.
-    ///
-    /// \return     Returns the tag that reference an instance of the \c IData_distribution
-    ///             interface class.
-    ///
-    virtual mi::neuraylib::Tag_struct get_distribution_layout() const = 0;
-    ///@}
 
     ///////////////////////////////////////////////////////////////////////////////////
     /// \name Global configurations and states.
     ///@{
-    /// Returns the configuration settings of this  session.
-    /// \return Tag of an \c IConfig_settings object
+    /// Controls how the export will be performed by #export_session().
     ///
-    virtual mi::neuraylib::Tag_struct get_config() const = 0;
-
-    /// Controls how the export will be performed by export_session().
     enum Export_mode {
         /// .prj output format for use with the NVIDIA IndeX demo viewer
         EXPORT_FORMAT_PRJ  = 0x01,
@@ -246,7 +256,7 @@ public:
     /// Returns a textual representation of the internal state of the given
     /// scene element.
     ///
-    /// \see export_session()
+    /// \see #export_session()
     ///
     /// \param[in] scene_element_tag Tag of the IScene_element to be exported.
     /// \param[in] export_mode       Combination (bitwise or) of values from Export_mode.

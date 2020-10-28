@@ -21,7 +21,7 @@ namespace index
 
 /// Triangle mesh interface class that represents a large-scale triangle mesh in the scene description.
 ///
-/// \ingroup nv_index_scene_description_shape
+/// \ingroup nv_index_scene_description_distributed_data
 ///
 class ITriangle_mesh_scene_element :
     public  mi::base::Interface_declare<0x8fcb5afd,0x937f,0x40c9,0xb4,0xf6,0xe3,0x52,0x1d,0x9d,0xd4,0xcf,

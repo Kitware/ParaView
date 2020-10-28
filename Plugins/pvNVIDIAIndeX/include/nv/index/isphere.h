@@ -20,7 +20,7 @@ namespace index
 ///
 /// A simple sphere.
 ///
-/// \ingroup nv_index_scene_description_shape
+/// \ingroup nv_index_scene_description_object_shape
 ///
 class ISphere :
         public mi::base::Interface_declare<0x9b0af03a,0x177c,0x4127,0x9c,0x47,0x8b,0x5c,0xc8,0x36,0x92,0xaf,

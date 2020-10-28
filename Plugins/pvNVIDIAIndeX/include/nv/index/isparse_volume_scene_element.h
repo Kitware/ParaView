@@ -17,7 +17,7 @@ namespace index {
 
 /// Interface for sparse volume scene elements.
 ///
-/// \ingroup nv_index_scene_description_shape
+/// \ingroup nv_index_scene_description_distributed_data
 ///
 class ISparse_volume_scene_element :
     public  mi::base::Interface_declare<0xbb6ad4b7,0xd42c,0x47f7,0xb4,0x46,0xe1,0xb,0x1,0xb,0x76,0x1b,

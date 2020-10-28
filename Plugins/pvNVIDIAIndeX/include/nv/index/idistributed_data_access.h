@@ -11,7 +11,6 @@
 #include <mi/base/interface_declare.h>
 
 #include <nv/index/iheight_field_subset.h> // required by deprecated interface classes
-#include <nv/index/iregular_volume_data.h> // required by deprecated interface classes
 
 #include <nv/index/idistributed_data_subset.h>
 
@@ -20,27 +19,29 @@ namespace nv
 namespace index
 {
 
-/// Interface class for accessing distributed data.
+/// Interface class enabling custom distributed data accesses.
 ///
 /// The access functionality facilitates an application to 
-/// operate and make use of the data loaded into NVIDIA IndeX and 
-/// distributed to GPUs and nodes in the cluster environment. 
+/// operate and make use of the data distributed and uploaded  
+/// by NVIDIA IndeX to GPUs and nodes in the cluster environment. 
 /// User-defined computing algorithms, analyis techniques,
-/// data export strategies and 
-/// todays or future workflows can operate on distributed data 
-/// usig the access interfaces.
+/// data export strategies of
+/// todays or future workflows can make use of the distributed data 
+/// through the distributed data access interfaces.
 ///
 /// Distributed data can be queried from the
-/// cluster environment. A query bounding box given by
-/// the user defined the extent of the accesses data.
-/// NVIDIA IndeX library then manages the cluster-wide
-/// data access and returns a local copy of the data.
-/// The size of the bounding box affects the amount of
-/// data that needs to be routed through the network and the
-/// size of the memory allocated for the local data copy.
-/// Network bandwidth and system memory constrain the amount of 
-/// data that an application ma aim to request by means of the
-/// access functionality.
+/// cluster environment. A query bounding box provided by
+/// the application developer defines the extent used for 
+/// accessing distributed data.
+/// The NVIDIA IndeX library then manages the cluster-wide
+/// data access and returns a local copy of the data to the caller.
+/// The size of the bounding box defines the amount of
+/// data that is routed through the network and the amount of
+/// memory allocated for the local data copy.
+/// Typically, the available system memory on the calling node constrains 
+/// the amount of data that an application may request by means of the
+/// access functionality. The network bandwidth has an effect on the 
+/// the performance the 
 /// Distributed data export functionalities rely on
 /// the access functionality. An export strategy may, for instance,
 /// choose to either query all distributed data of a dataset at once
@@ -113,107 +114,10 @@ public:
     /// In particular, the destructor of the implemented interface
     /// class deletes the local data. 
     ///
-    /// \returns        Interface pointer to an \c IDistrbuted_data_subset instance
+    /// \returns        Interface pointer to an \c IDistributed_data_subset instance
     ///                 giving access a datasets data.
     ///
     virtual const IDistributed_data_subset* get_distributed_data_subset() const = 0;
-};
-
-// -------------------------------------------------------------------
-// Deprecated interfaces:
-//
-/// Interface class for accessing the distributed regular volume
-/// data.
-///
-/// The access functionality, for instance, allows implementing
-/// user-defined computing algorithms operating on the distributed
-/// volume data to facilitate todays and future workflow
-/// functionalities.
-///
-/// The amount of amplitude data queried from the
-/// cluster environment relies on the bounding box given by
-/// the user. The NVIDIA IndeX library then manages the cluster-wide
-/// data access and returns a local copy of the data.
-/// The size of the bounding box affects the amount of
-/// data that needs to be routed through the network and the
-/// size of the memory allocated for the local data copy.
-/// Since network bandwidth is limited and main memory is a
-/// scarce resource care needs to be taken when using the
-/// access functionality.
-/// The volume data export functionalities, which also rely on
-/// the access functionality, query multiple smaller sized data
-/// chucks in sequential order rather than accessing large
-/// amounts of data at once.
-///
-/// The interface class \c IDistributed_data_access_factory returns an
-/// interface specific to a volume scene element referred to by the
-/// element's tag.
-///
-/// \deprecated This class shall be removed as the deprecated regular
-///             volume data shall be removed as well.
-///
-/// \ingroup nv_index_data_access
-///
-class IRegular_volume_data_access :
-    public mi::base::Interface_declare<0x0b266cac,0x42c9,0x4b5e,0x9d,0xe5,0xbc,0x4c,0xc4,0x8c,0x7f,0x77>
-{
-public:
-    /// Querying the amplitude values of a regular volume
-    /// dataset. The query relies on the user-defined bounding box
-    /// and creates a local copy of the volume data. The
-    /// bounding box may be larger than the regular volume uploaded
-    /// to the cluster. In such a case, the access returns the
-    /// volume data contained in the both the user-defined
-    /// bounding box and extent that bounds the uploaded
-    /// volume data.
-    ///
-    /// \param[in] query_bbox           Defines the bounding box to perform
-    ///                                 the volume data access query. The
-    ///                                 bounding box is defined in the volume
-    ///                                 scene element's IJK space.
-    /// \param[in] dice_transaction     The DiCE transaction that the
-    ///                                 data access runs in.
-    ///
-    /// \return access status. Succeeded, when return values >=
-    /// 0. Failed when negative.
-    virtual mi::Sint32 access(
-        const mi::math::Bbox_struct<mi::Uint32, 3>&   query_bbox,
-        mi::neuraylib::IDice_transaction*             dice_transaction) = 0;
-
-    /// Getting the computed bounding volume in which the accessed
-    /// volume data is defined. The computed bounding box may be different
-    /// from the bounding box used to query the volume data if,
-    /// for instance, all or part of the uploaded data lies outside the
-    /// user-defined bounding box.
-    ///
-    /// \returns        The bounding box of the accessed regular volume
-    ///                 data. The bounding box is defined in the volume
-    ///                 scene element's local 3D space.
-    ///
-    virtual const mi::math::Bbox_struct<mi::Uint32, 3>& get_bounding_box() const = 0;
-
-    /// The volume scene element that corresponds to the accessed data.
-    ///
-    /// \returns        The unique tag that references the volume
-    ///                 scene element.
-    ///
-    virtual mi::neuraylib::Tag_struct get_scene_element() const = 0;
-
-    /// The accessed volume data is stored locally. The extent of the
-    /// stored data is defined by the computed bounding volume.
-    /// The method returns a pointer to an \c IRegular_volume_data
-    /// interface, giving access to the typed regular volume data.
-    /// The \c IRegular_volume_data_access interface class 'owns' the
-    /// volume data while the \c IRegular_volume_data only grants access
-    /// to the data, i.e. the destructor of the implemented interface
-    /// class deletes the local data. All further existing \c IRegular_volume_data
-    /// instances will then hold invalid data.
-    ///
-    /// \returns        Interface pointer to an \c IRegular_volume_data instance
-    ///                 giving access to the typed regular volume data. The volume
-    ///                 data is defined in Z-first and X-last order.
-    ///
-    virtual const IRegular_volume_data* get_volume_data() const = 0;
 };
 
 /// Interface class for accessing the distributed heightfield data.
@@ -336,28 +240,18 @@ class IDistributed_data_access_factory :
     mi::neuraylib::IElement>
 {
 public:
-    /// Exposes an interface class that allows accessing distributed volume data.
-    ///
-    /// \param[in] scene_element_tag            The unique tag that references the
-    ///                                         volume scene element for which the
-    ///                                         access interface shall be exposed.
-    /// \return                                 The interface that enables accessing
-    ///                                         volume data distributed in the
-    ///                                         cluster environment.
-    /// \deprecated
-    ///
-    virtual IRegular_volume_data_access* create_regular_volume_data_access(
-        mi::neuraylib::Tag_struct scene_element_tag) const = 0;
-
     /// Exposes an interface class that allows accessing distributed heightfield data.
     ///
     /// \param[in] scene_element_tag            The unique tag that references the
     ///                                         heightfield scene element for which the
     ///                                         access interface shall be exposed.
+    ///
     /// \return                                 The interface that enables accessing
     ///                                         heightfield data distributed in the
     ///                                         cluster environment.
-    /// \deprecated
+    ///
+    /// \deprecated                             The \c IRegular_heightfield interface
+    ///                                         will be removed in the future
     ///
     virtual IRegular_heightfield_data_access* create_regular_heightfield_data_access(
         mi::neuraylib::Tag_struct scene_element_tag) const = 0; 
@@ -370,7 +264,7 @@ public:
     /// \c nv::index::ISparse_volume_scene_element.
     ///
     /// \param[in] dataset_type             The UUID of the interface class that represents
-    ///                                     a subset of a large-scale dataset.
+    ///                                     a distributed dataset.
     /// 
     /// \param[in] scene_element_tag        The unique tag that references the
     ///                                     scene element of the distributed data type.
@@ -382,7 +276,28 @@ public:
         const mi::base::Uuid&               dataset_type,
         mi::neuraylib::Tag_struct           scene_element_tag) const = 0;
 
-    // Convenience function for creating typed data access.
+    /// Convenience function for creating data access for a given distributed dataset type.
+    ///
+    /// The instance is an implementation of the interface classes derived from
+    /// \c IDistributed_data_access. The factory creates these
+    /// instances based on just the UUID of distributed data class, such as
+    /// \c nv::index::ISparse_volume_scene_element.
+    ///
+    /// The template parameter defines the distributed dataset type of a large-scale dataset.
+    /// \code
+    /// //
+    /// // Usage:
+    /// //
+    /// mi::base::Handle<nv::index::IDistributed_data_access> volume_data_access(
+    ///     access_factory->create_distributed_data_access<nv::index::ISparse_volume_scene_element>(volume_tag));
+    /// \endcode
+    /// 
+    /// \param[in] scene_element_tag        The unique tag that references the
+    ///                                     scene element of the distributed data type.
+    ///
+    /// \return                             Returns the created distribute data access instance 
+    ///                                     for a specific distribute dataset type and element.
+    ///
     template <class T>
     IDistributed_data_access* create_distributed_data_access(
         mi::neuraylib::Tag_struct           scene_element_tag) const

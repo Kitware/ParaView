@@ -17,7 +17,9 @@ namespace nv
 namespace index
 {
 
-/// The interface class enables the distributed cluster-wide uploading of
+/// Import callback mechanism for implementing distributed and parallel data loading from arbitrary sources.
+///
+/// The \c IDistributed_data_import_callback interface enables the distributed cluster-wide uploading of
 /// large-scale data, such as 3D volumetric data or 2.5D height field surface data.
 /// In general, the distributed, parallel rendering and computing algorithms are based
 /// on a spatial decomposition scheme that subdivides the 3D space into subregions.
@@ -42,7 +44,7 @@ namespace index
 /// box is given in the dataset's local space and defines the 3D area for which 
 /// the data of the dataset subset need to be imported.
 ///
-/// \ingroup nv_index_data_storage
+/// \ingroup nv_index_data_import
 ///
 class IDistributed_data_import_callback :
     public mi::base::Interface_declare<0x61a87e48,0x910a,0x4f48,0xba,0xca,0x04,0x3b,0x9b,0xe2,0x62,0xec,
@@ -103,8 +105,8 @@ public:
 
     /// Shall provide the interface id that tells the NVIDIA IndeX library the kind of
     /// \c IDistributed_data_subset that the importer supports.
-    /// For instance, voxel data of a volume brick (\c IRegular_volume_brick) can represent unsigned int 8-bit values
-    /// (\c IRegular_volume_brick_8bit) 32-bit float values (\c IRegular_volume_brick_float32), or RGBA color values.
+    /// For instance, data of a sparse volume is handled by \c ISparse_volume_subset, which also
+    /// defines the data representation (e.g. uint8 or float).
     /// The library has to be aware of the kind of data to manage the internal data representation
     /// and memory allocations. 
     /// The factory class is able to create the appropriate instance of the data subset representation. 
@@ -136,7 +138,7 @@ public:
 /// default implementation, see IDistributed_data_import_callback for the documentation of the
 /// methods themselves.
 ///
-/// \ingroup nv_index_data_storage
+/// \ingroup nv_index_data_import
 ///
 template <mi::Uint32 id1, mi::Uint16 id2, mi::Uint16 id3,
           mi::Uint8 id4, mi::Uint8 id5, mi::Uint8 id6, mi::Uint8 id7,
@@ -317,7 +319,7 @@ public:
 /// default implementation, see IDistributed_data_import_callback for the documentation of the
 /// methods themselves.
 ///
-/// \ingroup nv_index_data_storage
+/// \ingroup nv_index_data_import
 ///
 template <mi::Uint32 id1, mi::Uint16 id2, mi::Uint16 id3,
           mi::Uint8 id4, mi::Uint8 id5, mi::Uint8 id6, mi::Uint8 id7,

@@ -22,7 +22,7 @@ namespace index
 
 /// The base class of all distributed datasets.
 ///
-/// \ingroup nv_index_scene_description_shape
+/// \ingroup nv_index_scene_description_distributed_data
 ///
 class IDistributed_data :
     public mi::base::Interface_declare<0xe7159219,0x4b05,0x4201,0x82,0x70,0x5a,0xaf,0xfc,0x8b,0xf4,0xdb,
@@ -50,7 +50,7 @@ public:
 
     /// A distributed dataset's extent in 3D space that shall be considered for
     /// rendering or computing can be restricted by a clip region.
-    /// The NVIDIA IndeX library only takes into account thoses parts of the
+    /// The NVIDIA IndeX library only takes into account those parts of the
     /// distributed dataset that lie inside of this. All parts outside of the
     /// region will be ignored.
     /// Changing the clip region, e.g., increasing its size, might result

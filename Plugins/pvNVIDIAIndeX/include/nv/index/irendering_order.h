@@ -17,8 +17,10 @@ namespace nv
 namespace index
 {
 
-/// \c IRendering_order defines a rendering priority for the raster
-/// shapes following in the scene description.
+/// Defines the rendering order of image space shape.
+///
+/// The attribute \c nv::index::IRendering_order defines a rendering priority 
+/// for the image space shapes declared in the scene description. 
 ///
 /// \ingroup nv_index_scene_description_attribute
 ///
@@ -27,14 +29,14 @@ class IRendering_order :
                                            nv::index::IAttribute>
 {
 public:
-    /// Set drawing priority order
+    /// Set drawing priority order.
     ///
-    /// \param[in] offset priority order offset
+    /// \param[in] offset The priority order offset.
     virtual void set_order(mi::Uint32 offset) = 0;
 
-    /// Get current drawing priority order
+    /// Get current drawing priority order.
     ///
-    /// \return current drawing priority order
+    /// \return Returns the current drawing priority order.
     virtual mi::Uint32 get_order() const = 0;
 
 };

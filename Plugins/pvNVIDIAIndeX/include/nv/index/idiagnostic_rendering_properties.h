@@ -41,16 +41,31 @@ public:
     /// Underlying datatype of a property.
     enum Property_type
     {
-        INVALID_TYPE,
-        SIGNED_INT32,
-        UNSIGNED_INT32,
-        FLOAT32
+        INVALID_TYPE,       ///<! Undefined/invalid type
+        SIGNED_INT32,       ///<! Signed 32-bit integer type.
+        UNSIGNED_INT32,     ///<! Unsigned 32-bit integer type.
+        FLOAT32             ///<! 32-bit floating-point type.
     };
 
+    /// Setting a property.
+    /// \param[in] prop     The property identifier.
+    /// \param[in] value    The value to be set along with the property.
+    /// \return             Returns success.
     virtual bool            set_property(mi::Sint32 prop, mi::Float64 value) = 0;
+    /// Getting a property.
+    /// \param[in] prop     The property identifier.
+    /// \return             Returns value for the given property identifier.
     virtual mi::Float64     get_property(mi::Sint32 prop) const = 0;
+    /// Get the number of the set property values.
+    /// \return             Returns number of properties.
     virtual mi::Uint32      get_property_count() const = 0;
+    /// Getting a property type for a property identifier.
+    /// \param[in] prop     The property identifier.
+    /// \return             Returns the property type.
     virtual Property_type   get_property_type(mi::Sint32 prop) const = 0;
+    /// Getting a property type as string for a property identifier.
+    /// \param[in] prop     The property identifier.
+    /// \return             Returns the property type as string.
     virtual const char*     get_property_name(mi::Sint32 prop) const = 0;
 };
 

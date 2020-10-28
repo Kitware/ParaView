@@ -215,7 +215,14 @@ public:
         return IIndex_canvas::FB_LAYER_UNDEFINED;
     }
 
-    /// \implements
+    /// Implemented render tile method of the canvas interface.
+    /// 
+    /// \param[in] layer_type       The type of the layer.
+    /// \param[in] area             The 2D bounding box of the tile covered in the screen space.
+    /// \param[in] buffer           The image buffer that contains the rendering inside the tile area.
+    ///
+    /// \implements \c IIndex_canvas::render_tile.
+    ///
     virtual void render_tile(
         mi::Uint32                                      /*layer_id*/,
         Frame_buffer_layer_type                         layer_type,
@@ -238,7 +245,12 @@ public:
         }
     }
 
-    /// \implements
+    /// Returns the canvas that hosts the rendered pixels.
+    ///
+    /// \return     The main memory canvas that contains the rendered image.
+    /// 
+    /// \implements \c IIndex_canvas::get_canvas.
+    ///
     virtual mi::neuraylib::ICanvas* get_canvas() const { return NULL; }
 };
 

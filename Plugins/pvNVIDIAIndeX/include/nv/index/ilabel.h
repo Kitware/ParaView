@@ -84,7 +84,7 @@ public:
 /// by the scene description. 
 /// The dimension (position, height, ...) is defined in the 3D object space.
 ///
-/// \ingroup nv_index_scene_description_shape
+/// \ingroup nv_index_scene_description_image_shape
 ///
 class ILabel_3D :
         public mi::base::Interface_declare<0x4967ddd0,0xbc19,0x45d4,0x88,0x4d,0x82,0xfa,0x68,0xd0,0x13,0x35,

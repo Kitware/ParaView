@@ -21,7 +21,7 @@ namespace index
 /// The interface class sub classes from \c IScene_pick_result to provide additional 
 /// intersection results specific to \c IHeightfield scene elements.
 ///
-/// \ingroup scene_queries
+/// \ingroup nv_scene_queries
 ///
 class IHeightfield_pick_result :
     public mi::base::Interface_declare<0x5634e199,0xb768,0x4512,0xba,0xe9,0xd7,0x70,0x50,0xa3,0x6c,0xc9,
