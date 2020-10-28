@@ -480,7 +480,7 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
 
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   const char* representationsToTry[] = { "UnstructuredGridRepresentation",
-    "StructuredGridRepresentation", "UniformGridRepresentation", "AMRRepresentation",
+    "StructuredGridRepresentation", "AMRRepresentation", "UniformGridRepresentation",
     "PVMoleculeRepresentation", "GeometryRepresentation", NULL };
   for (int cc = 0; representationsToTry[cc] != NULL; ++cc)
   {
