@@ -73,28 +73,17 @@ vtkStandardNewMacro(vtknvindex_irregular_volume_representation);
 
 //----------------------------------------------------------------------------
 vtknvindex_irregular_volume_representation::vtknvindex_irregular_volume_representation()
+  : Superclass()
 {
   m_controller = vtkMultiProcessController::GetGlobalController();
 
-  // Initialize and start IndeX
-  vtknvindex_instance::get()->init_index();
-
-  this->ResampleToImageFilter = vtkResampleToImage::New();
   this->ResampleToImageFilter->SetSamplingDimensions(128, 128, 128);
 
   this->Internals = new vtkInternals();
 
-  this->Preprocessor = vtkVolumeRepresentationPreprocessor::New();
   this->Preprocessor->SetTetrahedraOnly(1);
 
-  // Change the default mapper to NVIDIA IndeX irregular volume mapper.
-  this->DefaultMapper = vtknvindex_irregular_volume_mapper::New();
-  this->Property = vtkVolumeProperty::New();
-  this->Actor = vtkPVLODVolume::New();
-
-  this->Actor->SetProperty(this->Property);
   this->Actor->SetMapper(this->DefaultMapper);
-  vtkMath::UninitializeBounds(this->DataBounds);
 
   // Create NVIDIA IndeX cluster properties and application settings.
   m_cluster_properties = new vtknvindex_cluster_properties(true);
@@ -120,13 +109,7 @@ vtknvindex_irregular_volume_representation::vtknvindex_irregular_volume_represen
 //----------------------------------------------------------------------------
 vtknvindex_irregular_volume_representation::~vtknvindex_irregular_volume_representation()
 {
-  this->Preprocessor->Delete();
-
   this->DefaultMapper->shutdown();
-  this->DefaultMapper->Delete();
-
-  this->Property->Delete();
-  this->Actor->Delete();
 
   delete this->Internals;
   this->Internals = 0;
@@ -298,15 +281,15 @@ int vtknvindex_irregular_volume_representation::ProcessViewRequest(
     vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(inInfo->Get(vtkPVRenderView::VIEW()));
     auto ddm = vtkPVRenderViewDataDeliveryManager::SafeDownCast(view->GetDeliveryManager());
 
-#ifdef USE_KDTREE
+#ifdef VTKNVINDEX_USE_KDTREE
     if (m_controller->GetLocalProcessId() == 0)
     {
       DefaultMapper->set_raw_cuts(ddm->GetRawCuts(), ddm->GetRawCutsRankAssignments());
-
+#if 0
       const std::vector<vtkBoundingBox>& raw_cuts = ddm->GetRawCuts();
       const std::vector<int>& raw_cuts_ranks = ddm->GetRawCutsRankAssignments();
 
-      INFO_LOG << "RawCuts for process " << m_controller->GetLocalProcessId() << ": "
+      INFO_LOG << "Retrieved raw_cuts for process" << m_controller->GetLocalProcessId() << ": "
                << raw_cuts.size();
       for (size_t i = 0; i < raw_cuts.size(); ++i)
       {
@@ -314,19 +297,20 @@ int vtknvindex_irregular_volume_representation::ProcessViewRequest(
         {
           mi::Float64 bbox[6];
           raw_cuts[i].GetBounds(bbox);
-          INFO_LOG << "  cut " << i << ", rank " << raw_cuts_ranks[i] << ": " << bbox[0] << ", "
+          INFO_LOG << "  raw_cuts[ " << i << "], rank " << raw_cuts_ranks[i] << ": " << bbox[0] << ", "
                    << bbox[2] << ", " << bbox[4] << "; " << bbox[1] << ", " << bbox[3] << ", "
                    << bbox[5];
         }
         else
         {
-          INFO_LOG << "  cut " << i << ", rank " << raw_cuts_ranks[i] << ": invalid";
+          INFO_LOG << "  raw_cuts[ " << i << "], rank " << raw_cuts_ranks[i] << ": invalid";
         }
       }
-    }
 #endif
+    }
+#endif // VTKNVINDEX_USE_KDTREE
 
-    // Retrieve ParaView's KdTree in order to obtain domain subdivision bounding boxes.
+    // Retrieve ParaView's kd-tree in order to obtain domain subdivision bounding boxes.
     if (ddm->GetCuts().size() > 0 && controller != nullptr &&
       controller->GetLocalProcessId() < static_cast<int>(ddm->GetCuts().size()))
     {
@@ -450,70 +434,20 @@ void vtknvindex_irregular_volume_representation::SetSamplingDimensions(int xdim,
 
 //***************************************************************************
 // Forwarded to Actor.
-
-//----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::SetOrientation(double x, double y, double z)
-{
-  this->Actor->SetOrientation(x, y, z);
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::SetOrigin(double x, double y, double z)
-{
-  this->Actor->SetOrigin(x, y, z);
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::SetPickable(int val)
-{
-  this->Actor->SetPickable(val);
-}
-//----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::SetPosition(double x, double y, double z)
-{
-  this->Actor->SetPosition(x, y, z);
-}
-//----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::SetScale(double x, double y, double z)
-{
-  this->Actor->SetScale(x, y, z);
-}
-
 //----------------------------------------------------------------------------
 void vtknvindex_irregular_volume_representation::SetVisibility(bool val)
 {
   DefaultMapper->set_visibility(val);
   update_index_roi();
 
-  this->Actor->SetVisibility(val ? 1 : 0);
   this->Superclass::SetVisibility(val);
-}
-
-//***************************************************************************
-// Forwarded to vtkVolumeProperty.
-//----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::SetInterpolationType(int val)
-{
-  this->Property->SetInterpolationType(val);
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::SetColor(vtkColorTransferFunction* lut)
-{
-  this->Property->SetColor(lut);
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::SetScalarOpacity(vtkPiecewiseFunction* pwf)
-{
-  this->Property->SetScalarOpacity(pwf);
 }
 
 //----------------------------------------------------------------------------
 void vtknvindex_irregular_volume_representation::SetScalarOpacityUnitDistance(double val)
 {
   static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)->opacity_changed();
-  this->Property->SetScalarOpacityUnitDistance(val);
+  this->Superclass::SetScalarOpacityUnitDistance(val);
 }
 
 //

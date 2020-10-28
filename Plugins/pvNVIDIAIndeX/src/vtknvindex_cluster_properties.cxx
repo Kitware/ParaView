@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <sstream>
 #include <string>
 
 #include "vtkFloatArray.h"
@@ -74,29 +75,31 @@ size_t vtknvindex_irregular_volume_data::get_memory_size(const std::string& scal
 }
 
 // ------------------------------------------------------------------------------------------------
+mi::Uint32 vtknvindex_cluster_properties::s_active_instance = 0;
+
+// ------------------------------------------------------------------------------------------------
 std::map<mi::Uint32, vtknvindex_cluster_properties*> vtknvindex_cluster_properties::s_instances;
 
 // ------------------------------------------------------------------------------------------------
-vtknvindex_cluster_properties::vtknvindex_cluster_properties(bool register_instance)
+vtknvindex_cluster_properties::vtknvindex_cluster_properties(bool use_kdtree)
   : m_rank_id(-1)
+  , m_visible(true)
 {
-  if (register_instance)
-  {
-    // Register the instance
-    static mi::Uint32 instance_counter = 0;
-    instance_counter++;
-    m_instance_id = instance_counter;
-
-    s_instances[m_instance_id] = this;
-  }
-  else
-  {
-    m_instance_id = 0;
-  }
+  // Register the instance
+  static mi::Uint32 instance_counter = 0;
+  instance_counter++;
+  m_instance_id = instance_counter;
+  s_instances[m_instance_id] = this;
 
   m_affinity = new vtknvindex_affinity();
-#ifdef USE_KDTREE
-  m_affinity_kdtree = new vtknvindex_KDTree_affinity();
+#ifdef VTKNVINDEX_USE_KDTREE
+  if (use_kdtree)
+  {
+    m_affinity_kdtree = new vtknvindex_KDTree_affinity();
+  }
+#else
+  // prevent compile warning
+  (void)use_kdtree;
 #endif
 
   m_config_settings = new vtknvindex_config_settings();
@@ -107,14 +110,13 @@ vtknvindex_cluster_properties::vtknvindex_cluster_properties(bool register_insta
 vtknvindex_cluster_properties::~vtknvindex_cluster_properties()
 {
   // Unlink shared memory and delete host properties.
-  std::map<mi::Uint32, vtknvindex_host_properties*>::iterator shmit = m_hostinfo.begin();
-  for (; shmit != m_hostinfo.end(); ++shmit)
+  for (auto& shmit : m_hostinfo)
   {
-    if (shmit->second)
+    vtknvindex_host_properties* host_props = shmit.second;
+    if (host_props)
     {
-      shmit->second->shm_cleanup(false);
-      delete shmit->second;
-      shmit->second = NULL;
+      host_props->shm_cleanup(true);
+      delete host_props;
     }
   }
 
@@ -151,6 +153,24 @@ nv::index::IAffinity_information* vtknvindex_cluster_properties::get_affinity() 
 }
 
 // ------------------------------------------------------------------------------------------------
+nv::index::IAffinity_information* vtknvindex_cluster_properties::copy_affinity() const
+{
+  if (m_affinity_kdtree && m_affinity_kdtree->get_nb_nodes() > 0)
+    return m_affinity_kdtree->copy();
+  else
+    return m_affinity->copy();
+}
+
+// ------------------------------------------------------------------------------------------------
+void vtknvindex_cluster_properties::scene_dump_affinity_info(std::ostringstream& s) const
+{
+  if (m_affinity_kdtree)
+    return m_affinity_kdtree->scene_dump_affinity_info(s);
+  else if (m_affinity)
+    return m_affinity->scene_dump_affinity_info(s);
+}
+
+// ------------------------------------------------------------------------------------------------
 vtknvindex_KDTree_affinity* vtknvindex_cluster_properties::get_affinity_kdtree() const
 {
   return m_affinity_kdtree.get();
@@ -179,21 +199,19 @@ vtknvindex_host_properties* vtknvindex_cluster_properties::get_host_properties(
 }
 
 // ------------------------------------------------------------------------------------------------
-const vtknvindex_host_properties::shm_info* vtknvindex_cluster_properties::get_shminfo(
+std::vector<vtknvindex_host_properties::shm_info*>
+vtknvindex_cluster_properties::get_shminfo_intersect(
   const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step)
 {
-  const vtknvindex_host_properties::shm_info* info = nullptr;
+  std::vector<vtknvindex_host_properties::shm_info*> infos_all;
 
   for (auto& hostinfo : m_hostinfo)
   {
-    info = hostinfo.second->get_shminfo(bbox, time_step);
-    if (info)
-    {
-      break;
-    }
+    const auto infos_host = hostinfo.second->get_shminfo_intersect(bbox, time_step);
+    infos_all.insert(infos_all.end(), infos_host.begin(), infos_host.end());
   }
 
-  return info;
+  return infos_all;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -258,23 +276,16 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
 
   m_rankid_to_hostid[0] = 1;
 
-  std::vector<mi::Sint32> all_gpu_ids;
-  all_gpu_ids.push_back(nv::index::IAffinity_information::ANY_GPU);
-
   std::map<mi::Uint32, vtknvindex_host_properties*>::iterator shmit = m_hostinfo.find(1);
   if (shmit == m_hostinfo.end())
   {
     vtknvindex_host_properties* host_properties = new vtknvindex_host_properties(1, 0, host_name);
-
-    host_properties->set_gpuids(all_gpu_ids);
     host_properties->set_rankids(m_all_rank_ids);
-
     m_hostinfo[1] = host_properties;
   }
   else
   {
     vtknvindex_host_properties* host_properties = shmit->second;
-    host_properties->set_gpuids(all_gpu_ids);
     host_properties->set_rankids(m_all_rank_ids);
   }
 
@@ -286,10 +297,8 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
   for (mi::Uint32 time_step = 0; time_step < nb_time_steps; ++time_step)
   {
     std::stringstream ss;
-    ss << "pv_nvindex_shm_rank_";
-    ss << current_rankid;
-    ss << "_timestep_";
-    ss << time_step;
+    ss << "pv_nvindex_shm_instance_" << m_instance_id << "_rank_" << current_rankid << "_timestep_"
+       << time_step;
 
 #ifndef _WIN32
     ss << "_" << vtknvindex::util::get_process_user_name();
@@ -353,10 +362,6 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
         time_step, current_rankid, ss.str(), current_bbox, shm_size, volume_data);
     }
   }
-
-  m_affinity->set_hostinfo(m_hostinfo);
-  if (m_affinity_kdtree)
-    m_affinity_kdtree->set_hostinfo(m_hostinfo);
 
   return true;
 }
@@ -445,12 +450,17 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
   }
   controller->AllGather(&cur_data_ptr, &all_data_ptrs[0], 1);
 
+// Define this to match local rank i to GPU i. Otherwise IndeX will to the assignment internally,
+// using all available GPUs.
+//#define VTKNVINDEX_MATCH_GPUS_TO_RANKS
+#ifdef VTKNVINDEX_MATCH_GPUS_TO_RANKS
   // Gather all gpu ids.
   mi::Sint32 gpu_id = current_localrank;
 
   std::vector<mi::Sint32> all_gpu_ids;
   all_gpu_ids.resize(m_num_ranks);
   controller->AllGather(&gpu_id, &all_gpu_ids[0], 1);
+#endif
 
   // Gather host names from all the ranks.
   std::vector<std::string> host_names;
@@ -562,10 +572,16 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
       return false;
     }
 
-    // Set affinity information for NVIDIA IndeX.
-    m_affinity->add_affinity(current_affinity, hostid, all_gpu_ids[i]);
+// Set affinity information for NVIDIA IndeX.
+#ifdef VTKNVINDEX_MATCH_GPUS_TO_RANKS
+    const mi::Uint32 gpu_id = all_gpu_ids[i];
+#else
+    // Let IndeX decide which GPU to use
+    const mi::Uint32 gpu_id = static_cast<mi::Uint32>(nv::index::IAffinity_information::ANY_GPU);
+#endif
+    m_affinity->add_affinity(current_affinity, hostid, gpu_id);
     if (m_affinity_kdtree)
-      m_affinity_kdtree->add_affinity(current_affinity, hostid, all_gpu_ids[i]);
+      m_affinity_kdtree->add_affinity(current_affinity, hostid, gpu_id);
 
     m_rankid_to_hostid[m_all_rank_ids[i]] = hostid;
 
@@ -577,7 +593,9 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
       vtknvindex_host_properties* host_properties =
         new vtknvindex_host_properties(hostid, current_rankid, host);
 
+#ifdef VTKNVINDEX_MATCH_GPUS_TO_RANKS
       host_properties->set_gpuids(all_gpu_ids);
+#endif
       host_properties->set_rankids(m_all_rank_ids);
 
       m_hostinfo[hostid] = host_properties;
@@ -585,17 +603,17 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
     else
     {
       vtknvindex_host_properties* host_properties = shmit->second;
+#ifdef VTKNVINDEX_MATCH_GPUS_TO_RANKS
       host_properties->set_gpuids(all_gpu_ids);
+#endif
       host_properties->set_rankids(m_all_rank_ids);
     }
 
     for (mi::Uint32 time_step = 0; time_step < nb_time_steps; ++time_step)
     {
       std::stringstream ss;
-      ss << "pv_nvindex_shm_rank_";
-      ss << current_rankid;
-      ss << "_timestep_";
-      ss << time_step;
+      ss << "pv_nvindex_shm_instance_" << m_instance_id << "_rank_" << current_rankid
+         << "_timestep_" << time_step;
 
 #ifndef _WIN32
       ss << "_" << vtknvindex::util::get_process_user_name();
@@ -653,11 +671,6 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
     }
   }
 
-  // Pass host information to the affinity
-  m_affinity->set_hostinfo(m_hostinfo);
-  if (m_affinity_kdtree)
-    m_affinity_kdtree->set_hostinfo(m_hostinfo);
-
   return true;
 }
 
@@ -685,7 +698,7 @@ void vtknvindex_cluster_properties::print_info() const
   INFO_LOG << "Total number of MPI ranks: " << m_num_ranks;
   INFO_LOG << "Total number of hosts: " << m_hostinfo.size();
   INFO_LOG << "------------------";
-  INFO_LOG << "Regular volume properties: ";
+  INFO_LOG << "Data properties: ";
   m_regular_vol_properties->print_info();
 
   std::map<mi::Uint32, vtknvindex_host_properties*>::const_iterator it = m_hostinfo.begin();
@@ -715,5 +728,77 @@ vtknvindex_cluster_properties* vtknvindex_cluster_properties::get_instance(mi::U
   else
   {
     return nullptr;
+  }
+}
+
+// ------------------------------------------------------------------------------------------------
+void vtknvindex_cluster_properties::set_visibility(bool visible)
+{
+  m_visible = visible;
+}
+
+// ------------------------------------------------------------------------------------------------
+bool vtknvindex_cluster_properties::is_active_instance() const
+{
+  // Determine visible instance with the highest instance id.
+  mi::Uint32 max_visible_instance = 0;
+  for (auto& instances : s_instances)
+  {
+    if (instances.first > max_visible_instance && instances.second->m_visible)
+    {
+      max_visible_instance = instances.first;
+    }
+  }
+
+  return (max_visible_instance == get_instance_id());
+}
+
+// ------------------------------------------------------------------------------------------------
+bool vtknvindex_cluster_properties::activate()
+{
+  if (s_active_instance != get_instance_id())
+  {
+    s_active_instance = get_instance_id();
+    return true;
+  }
+  else
+  {
+    // Already active
+    return false;
+  }
+}
+
+// ------------------------------------------------------------------------------------------------
+void vtknvindex_cluster_properties::warn_if_multiple_visible_instances(
+  const std::string& active_array_name)
+{
+  mi::Uint32 visible_count = 0;
+  for (auto& instances : s_instances)
+  {
+    if (instances.second->m_visible)
+    {
+      visible_count++;
+    }
+  }
+
+  if (visible_count <= 1)
+  {
+    return;
+  }
+
+  std::ostringstream os;
+  os << "Multiple sources are marked as visible in the Pipeline Browser, but the NVIDIA IndeX "
+     << "plugin will only render the one that was added last (data array '" << active_array_name
+     << "').";
+
+  static bool already = false;
+  if (!already)
+  {
+    WARN_LOG << os.str() << " This warning will only be printed once.";
+    already = true;
+  }
+  else
+  {
+    INFO_LOG << os.str();
   }
 }

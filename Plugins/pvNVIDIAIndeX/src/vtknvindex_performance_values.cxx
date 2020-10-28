@@ -35,6 +35,8 @@
 #include "vtknvindex_instance.h"
 #include "vtknvindex_performance_values.h"
 
+#include <nv/index/version.h>
+
 //-------------------------------------------------------------------------------------------------
 vtknvindex_performance_values::vtknvindex_performance_values()
   : m_print_header(true)
@@ -99,12 +101,15 @@ void vtknvindex_performance_values::print_perf_values(
                   "--------------------------------------------------------------------------------"
                << "\n";
 
-    header_str << "NVIDIA IndeX ParaView plug-in version : " << index_instance->get_version()
+    header_str << "NVIDIA IndeX ParaView plugin version : " << index_instance->get_version()
                << "\n";
 
     const mi::base::Handle<nv::index::IIndex>& index = index_instance->get_interface();
 
-    header_str << "NVIDIA IndeX version                  : " << index->get_version() << ", "
+    header_str << "NVIDIA IndeX header file version:     : "
+               << NVIDIA_INDEX_LIBRARY_VERSION_QUALIFIED_STRING << ", "
+               << NVIDIA_INDEX_LIBRARY_REVISION_STRING << "\n";
+    header_str << "NVIDIA IndeX library build version    : " << index->get_version() << ", "
                << index->get_revision() << "\n";
     header_str << "DiCE library API interface version    : " << index->get_dice_interface_version()
                << "\n";

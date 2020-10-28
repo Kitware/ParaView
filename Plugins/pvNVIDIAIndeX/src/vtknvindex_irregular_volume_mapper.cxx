@@ -33,6 +33,7 @@
 #include <sstream>
 
 #ifdef _WIN32
+#define NOMINMAX
 #include <windows.h>
 #endif // _WIN32
 
@@ -182,13 +183,10 @@ void vtknvindex_irregular_volume_mapper::volume_changed()
 //-------------------------------------------------------------------------------------------------
 bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/, vtkVolume* vol)
 {
-
-#if defined(MI_VERSION_STRING) && defined(MI_DATE_STRING)
-  INFO_LOG << "NVIDIA IndeX for ParaView Plugin "
-           << "(build " << MI_VERSION_STRING << ", " << MI_DATE_STRING ").";
-#endif
-
   vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Initialization");
+
+  // Initialize and start IndeX (if not initialized yet and if this is an IndeX rank)
+  m_index_instance->init_index();
 
   const bool is_MPI = (m_controller->GetNumberOfProcesses() > 1);
   const mi::Sint32 cur_global_rank = is_MPI ? m_controller->GetLocalProcessId() : 0;
@@ -203,28 +201,51 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
   m_scalar_array = this->GetScalars(unstructured_grid, this->ScalarMode, this->ArrayAccessMode,
     this->ArrayId, this->ArrayName, cell_flag);
 
-  // Check for per point scalars and cell scalars
-  if (cell_flag != 0 && cell_flag != 1)
+  bool is_data_supported = true;
+
+  // Data can only have a single component (not RGB/HSV format)
+  const int components = m_scalar_array->GetNumberOfComponents();
+  if (components > 1)
   {
-    ERROR_LOG << "Only per point and per cell scalars are supported by NVIDIA IndeX (cellFlag is "
-              << cell_flag << ").";
-    return false;
+    ERROR_LOG << "The data array '" << this->ArrayName << "' has " << components << " components, "
+              << "which is not supported by NVIDIA IndeX.";
+    is_data_supported = false;
   }
 
-  // check for valid data types
+  // Only per point scalars and cell scalars are allowed
+  if (cell_flag != 0 && cell_flag != 1)
+  {
+    ERROR_LOG << "The data array '" << this->ArrayName << "' uses per field scalars, but "
+              << "only per point and per cell scalars are supported by NVIDIA IndeX (cellFlag is "
+              << cell_flag << ").";
+    is_data_supported = false;
+  }
+
+  // Check for valid data types
   const std::string scalar_type = m_scalar_array->GetDataTypeAsString();
   if (scalar_type != "unsigned char" && scalar_type != "unsigned short" && scalar_type != "float" &&
     scalar_type != "double")
   {
-    ERROR_LOG << "The scalar type: " << scalar_type << " is not supported by NVIDIA IndeX.";
-    return false;
+    ERROR_LOG << "The data array '" << this->ArrayName << "' uses the scalar type '" << scalar_type
+              << "', which is not supported for unstructured grids by NVIDIA IndeX.";
+    is_data_supported = false;
   }
-  else if (scalar_type == "double")
+  else if (scalar_type == "double" && is_data_supported)
   {
-    WARN_LOG
-      << "Datasets with scalar values in double precision are not natively supported by IndeX. "
-      << "The plug-in will proceed to convert those values from double to float with the "
-         "corresponding overhead.";
+    // Only print the warning once per data array, and do not repeat when switching between arrays.
+    if (m_data_array_warning_printed.find(this->ArrayName) == m_data_array_warning_printed.end())
+    {
+      WARN_LOG << "The data array '" << this->ArrayName << "' has scalar values "
+               << "in double precision format, which is not natively supported by NVIDIA IndeX. "
+               << "The plugin will proceed to convert the values from double to float with the "
+               << "corresponding overhead.";
+      m_data_array_warning_printed.emplace(this->ArrayName);
+    }
+  }
+
+  if (!is_data_supported)
+  {
+    return false;
   }
 
   if (true) //   (this->InputAnalyzedTime < this->MTime) || (this->InputAnalyzedTime <
@@ -288,7 +309,7 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
         if (!gave_error)
         {
           ERROR_LOG << "Encountered non-tetrahedral cell with " << npts
-                    << " points. The NVIDIA IndeX plug-in currently "
+                    << " points. The NVIDIA IndeX plugin currently "
                        "supports tetrahedral cells only.";
           gave_error = true;
         }
@@ -512,13 +533,18 @@ void vtknvindex_irregular_volume_mapper::rtc_kernel_changed(vtknvindex_rtc_kerne
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol)
 {
+  if (!m_cluster_properties->is_active_instance())
+  {
+    return;
+  }
+
   // Ensure IceT is disabled in MPI mode, print warning only on first rank
   if (m_controller->GetNumberOfProcesses() > 1 && m_controller->GetLocalProcessId() == 0)
   {
     static bool IceT_was_enabled = false;
     if (!vtkPVRenderViewSettings::GetInstance()->GetDisableIceT())
     {
-      WARN_LOG << "IceT compositing must be disabled when using the NVIDIA IndeX plug-in with MPI, "
+      WARN_LOG << "IceT compositing must be disabled when using the NVIDIA IndeX plugin with MPI, "
                   "otherwise nothing will be rendered. "
                << "Please open 'Edit | Settings', go to the 'Render View' tab, activate 'Advanced "
                   "Properties' (gear icon) and check 'Disable IceT'. "
@@ -566,6 +592,13 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
     return;
   }
 
+  bool needs_activate = m_cluster_properties->activate();
+  if (needs_activate)
+  {
+    // Importers might be triggered again, so data must be made available
+    m_is_data_prepared = false;
+  }
+
   // Prepare data to be rendered.
   if ((!m_is_data_prepared || m_volume_changed) && !prepare_data())
   {
@@ -602,10 +635,19 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
         }
 
         m_scene.create_scene(ren, vol, dice_transaction, vtknvindex_scene::VOLUME_TYPE_IRREGULAR);
+        needs_activate = true;
       }
       else if (m_volume_changed)
       {
         m_scene.update_volume(dice_transaction, vtknvindex_scene::VOLUME_TYPE_IRREGULAR);
+        needs_activate = true;
+      }
+
+      if (needs_activate)
+      {
+        m_cluster_properties->warn_if_multiple_visible_instances(this->GetArrayName());
+        m_scene.activate(dice_transaction.get());
+        m_config_settings_changed = true; // force setting region-of-interest
       }
 
       // Update scene parameters.
@@ -694,7 +736,7 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
   {
     static bool first = true;
     if (first)
-      ERROR_LOG << "The NVIDIA IndeX plug-in was not initialized! See the log output for details.";
+      ERROR_LOG << "The NVIDIA IndeX plugin was not initialized! See the log output for details.";
     first = false;
   }
 
@@ -708,5 +750,5 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_irregular_volume_mapper::set_visibility(bool visibility)
 {
-  m_scene.set_visibility(visibility);
+  m_cluster_properties->set_visibility(visibility);
 }

@@ -136,9 +136,6 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
   // Fetch shared memory details from host properties
   std::string shm_memory_name;
   mi::math::Bbox<mi::Float32, 3> shm_bbox_flt;
-  mi::Uint64 shmsize = 0;
-  void* pv_subdivision_ptr = NULL;
-  void* shm_ptr = NULL;
 
   vtknvindex_host_properties* host_props = m_cluster_properties->get_host_properties(rankid);
 
@@ -206,6 +203,8 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
     shm_info->m_neighbors.get());
 
   dice_transaction->execute_fragmented(&import_bricks_job, import_bricks_job.get_nb_fragments());
+
+  host_props->set_read_flag(time_step, shm_info->m_shm_name);
 
   if (free_buffer)
   {

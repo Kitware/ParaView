@@ -28,18 +28,26 @@
 #ifndef vtknvindex_affinity_h
 #define vtknvindex_affinity_h
 
-//#define USE_KDTREE
-
 #include <fstream>
 #include <map>
 #include <vector>
 
 #include "vtkBoundingBox.h" // needed for vtkBoundingBox.
 
-#include <mi/dice.h>
 #include <mi/math/bbox.h>
 #include <mi/neuraylib/iserializer.h>
+
+#include <nv/index/version.h>
+
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR <= 327600)
+#include <mi/neuraylib/istring.h>
+#endif
+
 #include <nv/index/iaffinity_information.h>
+
+#if (NVIDIA_INDEX_LIBRARY_REVISION_MAJOR > 327600)
+#define VTKNVINDEX_USE_KDTREE
+#endif
 
 class vtknvindex_host_properties;
 
@@ -56,7 +64,6 @@ class vtknvindex_affinity : public mi::neuraylib::Base<0x9bda367e, 0x755d, 0x47a
 {
 public:
   vtknvindex_affinity();
-  virtual ~vtknvindex_affinity();
 
   // Single affinity mapping from bbox to host_id, gpu_id.
   struct affinity_struct
@@ -80,15 +87,15 @@ public:
     mi::Uint32 m_gpu_id;
   };
 
-  // Set the host properties.
-  void set_hostinfo(std::map<mi::Uint32, vtknvindex_host_properties*>& host_info);
-
   // Reset all affinity information.
   void reset_affinity();
 
+  // Create a copy of this instance.
+  vtknvindex_affinity* copy() const;
+
   // Add ParaView's affinity information indicating where the data is located for a given bbox.
   void add_affinity(
-    const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 host_id = ~0u, mi::Uint32 gpu_id = ~0u);
+    const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 host_id, mi::Uint32 gpu_id = ~0u);
 
   // Get the set affinity information for a given bbox.
   bool get_affinity(const mi::math::Bbox_struct<mi::Float32, 3>& subregion, mi::Uint32& host_id,
@@ -101,23 +108,15 @@ public:
   mi::math::Bbox_struct<mi::Float32, 3> get_subregion(mi::Uint32 index) const override;
 
   // Print the affinity information as part of the scene dump.
-  void scene_dump_affinity_info(std::ostringstream& s);
+  void scene_dump_affinity_info(std::ostringstream& s) const;
 
   // DiCE methods
   void serialize(mi::neuraylib::ISerializer* serializer) const override;
   void deserialize(mi::neuraylib::IDeserializer* deserializer) override;
 
 private:
-  // Get a gpu id for the given host using robin-round scheme.
-  bool get_gpu_id(mi::Sint32 host_id, mi::Uint32& gpu_id) const;
-
-  mutable std::map<mi::Sint32, mi::Sint32>
-    m_roundrobin_ids; // Used in around-robin scheme to return gpu ids.
-  mutable std::vector<affinity_struct> m_final_spatial_subdivision; // Used only for the scene dump.
   std::vector<affinity_struct>
     m_spatial_subdivision; // List of bbox to gpu id/host id mapping from ParaView.
-  std::map<mi::Uint32, vtknvindex_host_properties*>
-    m_host_info; // The host id to host properties mapping.
 };
 
 class vtknvindex_KDTree_affinity
@@ -126,7 +125,6 @@ class vtknvindex_KDTree_affinity
 {
 public:
   vtknvindex_KDTree_affinity();
-  virtual ~vtknvindex_KDTree_affinity();
 
   // Single affinity mapping from bbox to host_id, gpu_id.
   struct affinity_struct
@@ -150,7 +148,7 @@ public:
     mi::Uint32 m_gpu_id;
   };
 
-  // Single kdtree node struct
+  // Single kd-tree node struct
   struct kd_node
   {
     kd_node()
@@ -164,15 +162,15 @@ public:
     mi::Sint32 m_childs[2];
   };
 
-  // Set the host properties.
-  void set_hostinfo(std::map<mi::Uint32, vtknvindex_host_properties*>& host_info);
-
   // Reset all affinity information.
   void reset_affinity();
 
+  // Create a copy of this instance.
+  vtknvindex_KDTree_affinity* copy() const;
+
   // Add ParaView's affinity information indicating where the data is located for a given bbox.
   void add_affinity(
-    const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 host_id = ~0u, mi::Uint32 gpu_id = ~0u);
+    const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 host_id, mi::Uint32 gpu_id = ~0u);
 
   // Get the set affinity information for a given bbox.
   bool get_affinity(const mi::math::Bbox_struct<mi::Float32, 3>& subregion, mi::Uint32& host_id,
@@ -206,27 +204,19 @@ public:
   void build(const std::vector<vtkBoundingBox>& raw_cuts, const std::vector<int>& raw_cuts_ranks);
 
   // Print the affinity information as part of the scene dump.
-  void scene_dump_affinity_info(std::ostringstream& s);
+  void scene_dump_affinity_info(std::ostringstream& s) const;
 
   // DiCE methods
   void serialize(mi::neuraylib::ISerializer* serializer) const override;
   void deserialize(mi::neuraylib::IDeserializer* deserializer) override;
 
 private:
-  // Get a gpu id for the given host using robin-round scheme.
-  bool get_gpu_id(mi::Sint32 host_id, mi::Uint32& gpu_id) const;
-
   // Recursively build kd-subtree from raw cuts.
   mi::Sint32 build_internal(const std::vector<mi::math::Bbox<mi::Float32, 3> >& bboxes,
     const std::vector<int>& ranks, size_t pos, size_t count, int& leaf_count);
 
-  mutable std::map<mi::Sint32, mi::Sint32>
-    m_roundrobin_ids; // Used in round-robin scheme to return gpu ids.
-  mutable std::vector<affinity_struct> m_final_spatial_subdivision; // Used only for the scene dump.
   std::vector<affinity_struct>
     m_spatial_subdivision; // List of bbox to gpu id/host id mapping from ParaView.
-  std::map<mi::Uint32, vtknvindex_host_properties*>
-    m_host_info; // The host id to host properties mapping.
 
   std::vector<kd_node> m_kdtree; // ParaView kd-tree nodes cached in an array.
 };

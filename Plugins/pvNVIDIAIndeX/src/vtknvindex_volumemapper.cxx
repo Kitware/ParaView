@@ -33,6 +33,7 @@
 #include <sstream>
 
 #ifdef _WIN32
+#define NOMINMAX
 #include <windows.h>
 #endif // _WIN32
 
@@ -199,6 +200,9 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
 {
   vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Initialization");
 
+  // Initialize and start IndeX (if not initialized yet and if this is an IndeX rank)
+  m_index_instance->init_index();
+
   m_is_mpi_rendering = (m_controller->GetNumberOfProcesses() > 1);
   const mi::Sint32 cur_global_rank = m_is_mpi_rendering ? m_controller->GetLocalProcessId() : 0;
 
@@ -228,27 +232,51 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkVolume* vol)
   m_scalar_array = this->GetScalars(image_piece, this->ScalarMode, this->ArrayAccessMode,
     this->ArrayId, this->ArrayName, cell_flag);
 
-  // check for scalar per cell values
-  if (cell_flag)
+  bool is_data_supported = true;
+
+  // Data can only have a single component (not RGB/HSV format)
+  const int components = m_scalar_array->GetNumberOfComponents();
+  if (components > 1)
   {
-    ERROR_LOG << "Scalar values per cell are not supported in NVIDIA IndeX.";
-    return false;
+    ERROR_LOG << "The data array '" << this->ArrayName << "' has " << components << " components, "
+              << "which is not supported by NVIDIA IndeX.";
+    is_data_supported = false;
   }
 
-  // check for valid data types
-  const std::string scalar_type = m_scalar_array->GetDataTypeAsString();
+  // Only per cell scalars are allowed
+  if (cell_flag > 0)
+  {
+    ERROR_LOG << "The data array '" << this->ArrayName << "' uses "
+              << (cell_flag == 1 ? "per cell" : "per field")
+              << " scalars, but only per point scalars are supported by NVIDIA IndeX "
+              << "(cellFlag is " << cell_flag << ").";
+    is_data_supported = false;
+  }
 
+  // Check for valid data types
+  const std::string scalar_type = m_scalar_array->GetDataTypeAsString();
   if (vtknvindex_regular_volume_properties::get_scalar_size(scalar_type) == 0)
   {
-    ERROR_LOG << "The scalar type: " << scalar_type << " is not supported by NVIDIA IndeX.";
+    ERROR_LOG << "The data array '" << this->ArrayName << "' uses the scalar type '" << scalar_type
+              << "', which is not supported by NVIDIA IndeX.";
     return false;
   }
-  else if (scalar_type == "double")
+  else if (scalar_type == "double" && is_data_supported)
   {
-    WARN_LOG
-      << "Datasets with scalar values in double precision are not natively supported by IndeX. "
-      << "The plug-in will proceed to convert those values from double to float with the "
-         "corresponding overhead.";
+    // Only print the warning once per data array, and do not repeat when switching between arrays.
+    if (m_data_array_warning_printed.find(this->ArrayName) == m_data_array_warning_printed.end())
+    {
+      WARN_LOG << "The data array '" << this->ArrayName << "' has scalar values "
+               << "in double precision format, which is not natively supported by NVIDIA IndeX. "
+               << "The plugin will proceed to convert the values from double to float with the "
+               << "corresponding overhead.";
+      m_data_array_warning_printed.emplace(this->ArrayName);
+    }
+  }
+
+  if (!is_data_supported)
+  {
+    return false;
   }
 
   m_subset_ptrs[0] = m_scalar_array->GetVoidPointer(0);
@@ -433,13 +461,18 @@ void vtknvindex_volumemapper::rtc_kernel_changed(vtknvindex_rtc_kernels kernel,
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
 {
+  if (!m_cluster_properties->is_active_instance())
+  {
+    return;
+  }
+
   // Ensure IceT is enabled in MPI mode, print warning only on first rank
   if (m_controller->GetNumberOfProcesses() > 1 && m_controller->GetLocalProcessId() == 0)
   {
     static bool IceT_was_enabled = false;
     if (!vtkPVRenderViewSettings::GetInstance()->GetDisableIceT())
     {
-      WARN_LOG << "IceT compositing must be disabled when using the NVIDIA IndeX plug-in with MPI, "
+      WARN_LOG << "IceT compositing must be disabled when using the NVIDIA IndeX plugin with MPI, "
                   "otherwise nothing will be rendered. "
                << "Please open 'Edit | Settings', go to the 'Render View' tab, activate 'Advanced "
                   "Properties' (gear icon) and check 'Disable IceT'. "
@@ -495,6 +528,13 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
   mi::Sint32 cur_time_step =
     m_cluster_properties->get_regular_volume_properties()->get_current_time_step();
 
+  bool needs_activate = m_cluster_properties->activate();
+  if (needs_activate)
+  {
+    // Importers might be triggered again, so data must be made available
+    m_time_step_data_prepared.clear();
+  }
+
   if (!is_data_prepared(cur_time_step) || m_volume_changed)
   {
     if (!prepare_data(cur_time_step))
@@ -549,10 +589,19 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
       if (!m_scene.scene_created())
       {
         m_scene.create_scene(ren, vol, dice_transaction, vtknvindex_scene::VOLUME_TYPE_REGULAR);
+        needs_activate = true;
       }
       else if (m_volume_changed)
       {
         m_scene.update_volume(dice_transaction, vtknvindex_scene::VOLUME_TYPE_REGULAR);
+        needs_activate = true;
+      }
+
+      if (needs_activate)
+      {
+        m_cluster_properties->warn_if_multiple_visible_instances(this->GetArrayName());
+        m_scene.activate(dice_transaction.get());
+        m_config_settings_changed = true; // force setting region-of-interest
       }
 
       // Update scene parameters
@@ -645,7 +694,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
   {
     static bool first = true;
     if (first)
-      ERROR_LOG << "The NVIDIA IndeX plug-in was not initialized! See the log output for details.";
+      ERROR_LOG << "The NVIDIA IndeX plugin was not initialized! See the log output for details.";
     first = false;
   }
 
@@ -691,5 +740,5 @@ bool vtknvindex_volumemapper::is_caching() const
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_volumemapper::set_visibility(bool visibility)
 {
-  m_scene.set_visibility(visibility);
+  m_cluster_properties->set_visibility(visibility);
 }

@@ -25,7 +25,10 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "vtknvindex_host_properties.h"
+
 #include <iostream>
+#include <sstream>
 
 #ifdef _WIN32
 #else // _WIN32
@@ -34,13 +37,11 @@
 
 #include "vtkMultiProcessController.h"
 
-#include "vtknvindex_forwarding_logger.h"
-#include "vtknvindex_host_properties.h"
-#include "vtknvindex_utilities.h"
-
 #include "vtknvindex_cluster_properties.h"
+#include "vtknvindex_forwarding_logger.h"
 #include "vtknvindex_regular_volume_properties.h"
 #include "vtknvindex_sparse_volume_importer.h"
+#include "vtknvindex_utilities.h"
 
 namespace
 {
@@ -123,6 +124,21 @@ void copy_brick_double_to_float(const mi::math::Bbox<mi::Sint32, 3>& copy_bbox_g
     src_buffer_bbox_global, sizeof(mi::Float64));
 }
 
+// In contrast to Bbox::intersects(), this does not consider bboxes intersecting when only their
+// boundaries intersect.
+inline bool bbox_interior_intersects(
+  const mi::math::Bbox<mi::Float32, 3>& box, const mi::math::Bbox<mi::Float32, 3>& other)
+{
+  for (mi::Size i = 0; i < 3; ++i)
+  {
+    if ((box.min[i] >= other.max[i]) || (box.max[i] <= other.min[i]))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
@@ -171,7 +187,7 @@ vtknvindex_volume_neighbor_data::vtknvindex_volume_neighbor_data(
   const mi::Sint32 border_size = cluster_props->get_config_settings()->get_subcube_border();
   const mi::Uint32 ghost_levels = regular_volume_properties->get_ghost_levels();
 
-  if (ghost_levels >= border_size)
+  if (static_cast<mi::Sint32>(ghost_levels) >= border_size)
   {
     // Border already handled by VTK ghosting, nothing to do
     return;
@@ -241,35 +257,78 @@ vtknvindex_volume_neighbor_data::vtknvindex_volume_neighbor_data(
           continue;
         }
 
-        // Retrieve neighbor information
-        const vtknvindex_host_properties::shm_info* shm_info =
-          cluster_props->get_shminfo(query_bbox, time_step);
+        // Retrieve neighbor information, i.e. from pieces that intersect with query_bbox.
+        //
+        // This may return multiple results if the pieces are not uniformly sized and therefore a
+        // single piece can have multiple neighbors per direction.
+        //
+        // If pieces are not disjoint (without considering ghosting), it can happen that the same
+        // border data is fetched/copied multiple times, since multiple piece might cover parts of
+        // query_bbox.
+        //
+        const std::vector<vtknvindex_host_properties::shm_info*> shm_info_vector =
+          cluster_props->get_shminfo_intersect(query_bbox, time_step);
 
-        if (!shm_info)
+        if (shm_info_vector.empty())
         {
           ERROR_LOG << "Could not access volume information for neighbor " << query_bbox << " of "
                     << piece_bbox << ".";
         }
-        else
+
+        Neighbor_vector neighbors;
+        for (vtknvindex_host_properties::shm_info* shm_info : shm_info_vector)
         {
+          if (!shm_info)
+          {
+            ERROR_LOG << "Received null pointer for shm  information for neighbor " << query_bbox
+                      << " of " << piece_bbox << ".";
+            break;
+          }
+
           const mi::math::Bbox<mi::Sint32, 3> data_bbox(shm_info->m_shm_bbox);
 
           // Clip border_bbox against the bbox of the actually available neighbor data, to handle
           // the case when border_bbox is larger than the bbox of the neighbor, e.g. when the border
           // size is set to 2 but the volume size of the neighbor is just 1.
-          border_bbox.min = mi::math::clamp(border_bbox.min, data_bbox.min, data_bbox.max);
-          border_bbox.max = mi::math::clamp(border_bbox.max, data_bbox.min, data_bbox.max);
+          //
+          // This also handles the case when there are multiple neighbors per direction, and no
+          // single neighbor alone has all the necessary data.
+          //
+          const mi::math::Bbox<mi::Sint32, 3> border_bbox_clipped(
+            mi::math::clamp(border_bbox.min, data_bbox.min, data_bbox.max),
+            mi::math::clamp(border_bbox.max, data_bbox.min, data_bbox.max));
 
           Neighbor_info* ni = new Neighbor_info();
           ni->direction = dir;
-          ni->border_bbox = border_bbox;
+          ni->border_bbox = border_bbox_clipped;
           ni->query_bbox = mi::math::Bbox<mi::Sint32, 3>(query_bbox);
           ni->data_bbox = data_bbox;
           ni->data_buffer = nullptr; // will be filled by fetch_data()
           ni->host_id = shm_info->m_host_id;
           ni->rank_id = shm_info->m_rank_id;
-          m_neighbors.push_back(ni);
+
+          if (border_bbox_clipped == border_bbox)
+          {
+            // Optimization for non-disjoint pieces: If this neighbor has the entire queried data
+            // available, then only use it and ignore all other neighbors, which will probably only
+            // have smaller parts of it. This won't prevent all duplicate copies, but catches the
+            // most common case.
+            for (auto& it : neighbors)
+            {
+              delete it;
+            }
+            neighbors.clear();
+            neighbors.push_back(ni);
+            break;
+          }
+          else
+          {
+            neighbors.push_back(ni);
+          }
         }
+
+        // Append the newly created neighbors
+        m_neighbors.insert(m_neighbors.end(), neighbors.begin(), neighbors.end());
       }
     }
   }
@@ -348,26 +407,57 @@ vtknvindex_host_properties::~vtknvindex_host_properties()
 // ------------------------------------------------------------------------------------------------
 void vtknvindex_host_properties::shm_cleanup(bool reset)
 {
-  for (auto& it : m_shmlist)
+  for (auto& timestep : m_shmlist)
   {
-    for (shm_info& current_shm : it.second)
+    bool all_shm_read = true;
+    if (!reset)
     {
-      if (current_shm.m_mapped_subset_ptr)
+      for (shm_info& current_shm : timestep.second)
       {
-        vtknvindex::util::unmap_shm(current_shm.m_mapped_subset_ptr, current_shm.m_size);
-        current_shm.m_mapped_subset_ptr = nullptr;
+        if (current_shm.m_subset_ptr == nullptr && !current_shm.m_read_flag)
+        {
+          all_shm_read = false;
+          break;
+        }
       }
 
-      // TODO: Only call unlink on the rank that created the shared memory
-
-      // Remove shared memory (skip when local subset was available)
-      if (!current_shm.m_subset_ptr)
+      if (!all_shm_read)
       {
+        // Not all shared memory have been read. Can't free individual ones after they have been
+        // read, because they might still be needed for boundary data access from other importers on
+        // the same host (fetching boundary data from remote hosts is not affected, as it fetches
+        // directly from the ranks that have the data).
+        continue;
+      }
+    }
+
+    for (shm_info& current_shm : timestep.second)
+    {
+      if (current_shm.m_subset_ptr == nullptr)
+      {
+        // Data is not in local memory
+        bool was_unmapped = false;
+
+        // Unmap the shared memory if it is currently mapped
+        if (current_shm.m_mapped_subset_ptr != nullptr)
+        {
+          vtknvindex::util::unmap_shm(current_shm.m_mapped_subset_ptr, current_shm.m_size);
+          current_shm.m_mapped_subset_ptr = nullptr;
+          was_unmapped = true;
+        }
+
+        // Unlink (delete) shared memory object.
+        if (was_unmapped || reset)
+        {
 #ifdef _WIN32
 // TODO: Unlink using windows functions
 #else  // _WIN32
-        shm_unlink(current_shm.m_shm_name.c_str());
+          if (shm_unlink(current_shm.m_shm_name.c_str()) == 0)
+          {
+            INFO_LOG << "Freed shared memory: " << current_shm.m_shm_name;
+          }
 #endif // _WIN32
+        }
       }
 
       // Also remove any fetched neighbor data
@@ -376,7 +466,9 @@ void vtknvindex_host_properties::shm_cleanup(bool reset)
   }
 
   if (reset)
+  {
     m_shmlist.clear();
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -405,6 +497,26 @@ void vtknvindex_host_properties::set_shminfo(mi::Uint32 time_step, mi::Sint32 ra
     ceil((shmvolume.y / subcube_size)) * ceil((shmvolume.z / subcube_size));
 
   m_shmref[shmname] = static_cast<mi::Uint32>(shm_reference_count);
+}
+
+// ------------------------------------------------------------------------------------------------
+void vtknvindex_host_properties::set_read_flag(mi::Uint32 time_step, std::string shmname)
+{
+  auto shmit = m_shmlist.find(time_step);
+  if (shmit != m_shmlist.end())
+  {
+    for (shm_info& info : shmit->second)
+    {
+      if (info.m_shm_name == shmname)
+      {
+        info.m_read_flag = true;
+        return;
+      }
+    }
+  }
+
+  ERROR_LOG << "Could not set read flag for shared memory information '" << shmname
+            << "' in time step " << time_step << ".";
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -480,9 +592,48 @@ vtknvindex_host_properties::shm_info* vtknvindex_host_properties::get_shminfo(
 }
 
 // ------------------------------------------------------------------------------------------------
+std::vector<vtknvindex_host_properties::shm_info*>
+vtknvindex_host_properties::get_shminfo_intersect(
+  const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step)
+{
+  std::vector<vtknvindex_host_properties::shm_info*> result;
+
+  auto shmit = m_shmlist.find(time_step);
+  if (shmit == m_shmlist.end())
+  {
+    ERROR_LOG << "The shared memory information in "
+                 "vtknvindex_host_properties::get_shminfo_intersect is not "
+                 "available for the time step: "
+              << time_step << ".";
+
+    return result;
+  }
+
+  std::vector<shm_info>& shmlist = shmit->second;
+  if (shmlist.empty())
+  {
+    ERROR_LOG
+      << "The shared memory list in vtknvindex_host_properties::get_shminfo_intersect is empty.";
+    return result;
+  }
+
+  for (shm_info& current_shm : shmlist)
+  {
+    // Important to use interior intersection here, i.e. bboxes that are just touching on their
+    // boundary are not considered intersecting.
+    if (bbox_interior_intersects(current_shm.m_shm_bbox, bbox))
+    {
+      result.push_back(&current_shm);
+    }
+  }
+
+  return result;
+}
+
+// ------------------------------------------------------------------------------------------------
 const mi::Uint8* vtknvindex_host_properties::get_subset_data_buffer(
   const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step,
-  const vtknvindex_host_properties::shm_info** shm_info_out)
+  const vtknvindex_host_properties::shm_info** shm_info_out, bool support_time_steps)
 {
   vtknvindex_host_properties::shm_info* shm_info = get_shminfo(bbox, time_step);
   if (shm_info_out)
@@ -500,9 +651,16 @@ const mi::Uint8* vtknvindex_host_properties::get_subset_data_buffer(
   if (shm_info->m_subset_ptr)
   {
     // Data is locally available in this rank, return directly
-    void** subdivision_pointers = static_cast<void**>(shm_info->m_subset_ptr);
-    // TODO: multiple timesteps only supported in non-MPI mode?
-    return reinterpret_cast<mi::Uint8*>(subdivision_pointers[time_step]);
+    if (support_time_steps)
+    {
+      void** subdivision_pointers = static_cast<void**>(shm_info->m_subset_ptr);
+      // TODO: multiple timesteps only supported in non-MPI mode?
+      return reinterpret_cast<const mi::Uint8*>(subdivision_pointers[time_step]);
+    }
+    else
+    {
+      return reinterpret_cast<const mi::Uint8*>(shm_info->m_subset_ptr);
+    }
   }
 
   // Data must be in shared memory, map it if not already the case
@@ -522,21 +680,9 @@ void vtknvindex_host_properties::set_gpuids(std::vector<mi::Sint32> gpuids)
 }
 
 // ------------------------------------------------------------------------------------------------
-void vtknvindex_host_properties::get_gpuids(std::vector<mi::Sint32>& gpuids) const
-{
-  gpuids = m_gpuids;
-}
-
-// ------------------------------------------------------------------------------------------------
 void vtknvindex_host_properties::set_rankids(std::vector<mi::Sint32> rankids)
 {
   m_rankids = rankids;
-}
-
-// ------------------------------------------------------------------------------------------------
-void vtknvindex_host_properties::get_rankids(std::vector<mi::Sint32>& rankids) const
-{
-  rankids = m_rankids;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -731,7 +877,7 @@ void vtknvindex_host_properties::fetch_remote_volume_border_data(
       auto buffer = std::unique_ptr<mi::Uint8[]>(new mi::Uint8[buffer_size]);
 
       const int result = controller->Receive(buffer.get(), buffer_size, f.src_rank_id, COMM_TAG);
-      if (!result || controller->GetCount() != buffer_size)
+      if (!result || static_cast<mi::Size>(controller->GetCount()) != buffer_size)
       {
         ERROR_LOG << "MPI receive failed for border data " << f.border_bbox << " from rank "
                   << f.src_rank_id << " to rank " << f.dst_rank_id << ", buffer size "
@@ -746,7 +892,9 @@ void vtknvindex_host_properties::fetch_remote_volume_border_data(
       {
         for (auto it : *base_info->m_neighbors)
         {
-          if (it->border_bbox == f.border_bbox)
+          // Need to compare both border_bbox and data_bbox here, because there may be multiple
+          // requests for the same border_bbox in case pieces are not disjoint.
+          if (it->border_bbox == f.border_bbox && it->data_bbox == f.data_bbox)
           {
             it->border_data_buffer = std::move(buffer);
             found = true;
@@ -768,30 +916,27 @@ void vtknvindex_host_properties::fetch_remote_volume_border_data(
 // ------------------------------------------------------------------------------------------------
 void vtknvindex_host_properties::print_info() const
 {
-  INFO_LOG << "Host name: " << m_hostname << " : hostid: " << m_hostid;
-  INFO_LOG << "------------------";
+  INFO_LOG << "Host name: " << m_hostname << ", hostid: " << m_hostid;
 
-  INFO_LOG << "Rank ids: " << m_rankids.size();
-  std::cout << "        PVPLN  init info : ";
-  for (mi::Uint32 i = 0; i < m_rankids.size(); ++i)
-    std::cout << m_rankids[i] << ", ";
-  std::cout << std::endl;
+  std::ostringstream os_ranks;
+  for (auto id : m_rankids)
+    os_ranks << id << " ";
+  INFO_LOG << "Rank ids: " << os_ranks.str();
 
-  INFO_LOG << "GPU ids: " << m_gpuids.size();
-  std::cout << "        PVPLN  init info : ";
-  for (mi::Uint32 i = 0; i < m_gpuids.size(); ++i)
-    std::cout << m_gpuids[i] << ", ";
-  std::cout << std::endl;
-
-  INFO_LOG << "Shared memory pieces [shmname, shmbbox]";
-  std::map<mi::Uint32, std::vector<shm_info> >::const_iterator shmit = m_shmlist.begin();
-  for (; shmit != m_shmlist.end(); ++shmit)
+  if (!m_gpuids.empty())
   {
-    const std::vector<shm_info>& shmlist = shmit->second;
-    for (mi::Uint32 i = 0; i < shmlist.size(); ++i)
+    std::ostringstream os_gpus;
+    for (mi::Uint32 id : m_gpuids)
+      os_gpus << id << " ";
+    INFO_LOG << "GPU ids: " << os_gpus.str();
+  }
+
+  INFO_LOG << "Shared memory pieces [shmname, shmbbox]:";
+  for (auto& shmit : m_shmlist)
+  {
+    for (const shm_info& info : shmit.second)
     {
-      INFO_LOG << "Time step: " << shmit->first << " " << shmlist[i].m_shm_name << ":"
-               << shmlist[i].m_shm_bbox;
+      INFO_LOG << "Time step: " << shmit.first << " " << info.m_shm_name << ":" << info.m_shm_bbox;
     }
   }
 }

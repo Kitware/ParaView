@@ -68,7 +68,7 @@ public:
   // Get the NVIDIA IndeX interface handle.
   mi::base::Handle<nv::index::IIndex>& get_interface();
 
-  // Plug-in version
+  // Plugin version
   const char* get_version() const;
 
 public:
@@ -102,7 +102,7 @@ private:
   bool unload_nvindex();
 
   // Authenticate NVIDIA IndeX license.
-  bool authenticate_nvindex();
+  mi::Sint32 authenticate_nvindex();
 
   // Setup and start NVIDIA IndeX library.
   bool setup_nvindex();
@@ -141,5 +141,9 @@ private:
 
   // IndeX instance
   static vtknvindex_instance* s_index_instance;
+
+  // Name of the configuration file for the plugin.
+  static const std::string s_config_filename;
 };
+
 #endif // vtknvindex_instance_h

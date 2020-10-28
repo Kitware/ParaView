@@ -34,8 +34,8 @@
 #include <string>
 #include <vector>
 
-#include <mi/base/interface_implement.h>
 #include <mi/math/bbox.h>
+#include <mi/neuraylib/dice.h>
 
 class vtknvindex_cluster_properties;
 class vtknvindex_host_properties;
@@ -132,6 +132,7 @@ public:
       , m_size(shm_size)
       , m_subset_ptr(subset_ptr)
       , m_mapped_subset_ptr(nullptr)
+      , m_read_flag(false)
     {
     }
 
@@ -149,6 +150,7 @@ public:
     mi::Uint64 m_size;
     void* m_subset_ptr;        // Non-null if data is local, otherwise it is in shared memory
     void* m_mapped_subset_ptr; // Non-null if shared memory buffer is mapped
+    bool m_read_flag;          // True if the data was read by at least one importer
 
     std::unique_ptr<vtknvindex_volume_neighbor_data> m_neighbors;
   };
@@ -166,6 +168,8 @@ public:
   void set_shminfo(mi::Uint32 time_step, mi::Sint32 rank_id, std::string shmname,
     mi::math::Bbox<mi::Float32, 3> shmbbox, mi::Uint64 shmsize, void* subset_ptr = NULL);
 
+  void set_read_flag(mi::Uint32 time_step, std::string shmname);
+
   // Get the shared memory data for the current bounding box and the time step.
   bool get_shminfo(const mi::math::Bbox<mi::Float32, 3>& bbox, std::string& shmname,
     mi::math::Bbox<mi::Float32, 3>& shmbbox, mi::Uint64& shmsize, void** subset_ptr,
@@ -174,18 +178,21 @@ public:
   // Get the shared memory info for the current bounding box and the time step.
   shm_info* get_shminfo(const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step);
 
+  // Get all shared memory infos that intersect (interior) with the given bounding box.
+  std::vector<shm_info*> get_shminfo_intersect(
+    const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step);
+
   // Returns the subset (piece) data (and optionally its shm_info), mapping shared memory if
   // necessary. Data will stay mapped until shm_cleanup() gets called.
   const mi::Uint8* get_subset_data_buffer(const mi::math::Bbox<mi::Float32, 3>& bbox,
-    mi::Uint32 time_step, const vtknvindex_host_properties::shm_info** shm_info_out = nullptr);
+    mi::Uint32 time_step, const vtknvindex_host_properties::shm_info** shm_info_out = nullptr,
+    bool support_time_steps = true);
 
   // Set/get the GPU ids of the current host.
   void set_gpuids(std::vector<mi::Sint32> gpuids);
-  void get_gpuids(std::vector<mi::Sint32>& gpuids) const;
 
   // Set/get the MPI rank ids of the current host.
   void set_rankids(std::vector<mi::Sint32> rankids);
-  void get_rankids(std::vector<mi::Sint32>& rankids) const;
 
   // Get host name of the current host
   const std::string& get_hostname() const;

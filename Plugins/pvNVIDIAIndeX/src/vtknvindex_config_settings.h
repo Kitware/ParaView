@@ -87,6 +87,10 @@ public:
   bool get_section_settings(
     std::map<std::string, std::string>& params, const std::string& section) const;
 
+  // Construct the full path to the xml config file, or an empty string if the configuration
+  // directory could not be set.
+  static std::string get_config_full_path(const std::string& config_filename);
+
 private:
   // utilities
   static bool file_exists(const std::string& filename);

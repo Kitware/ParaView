@@ -29,6 +29,7 @@
 #define vtknvindex_cluster_properties_h
 
 #include <map>
+#include <sstream>
 
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -88,9 +89,7 @@ struct vtknvindex_dataset_parameters
 class vtknvindex_cluster_properties
 {
 public:
-  // When register_instance is true, the newly created instance will be made available through
-  // get_instance().
-  vtknvindex_cluster_properties(bool register_instance = false);
+  vtknvindex_cluster_properties(bool use_kdtree);
   ~vtknvindex_cluster_properties();
 
   // Get general config settings.
@@ -98,6 +97,12 @@ public:
 
   // Get ParaView's domain subdivision affinity.
   nv::index::IAffinity_information* get_affinity() const;
+
+  // Creates a copy of ParaView's domain subdivision affinity.
+  nv::index::IAffinity_information* copy_affinity() const;
+
+  // Print the affinity information as part of the scene dump.
+  void scene_dump_affinity_info(std::ostringstream& s) const;
 
   // Get kd-tree affinity, or null if it doesn't exists
   vtknvindex_KDTree_affinity* get_affinity_kdtree() const;
@@ -111,8 +116,9 @@ public:
   // Return host_properties of the host this rank belongs to.
   vtknvindex_host_properties* get_host_properties(const mi::Sint32& rankid) const;
 
-  // Get the shared memory info for the given bounding box and time step, searching over all hosts.
-  const vtknvindex_host_properties::shm_info* get_shminfo(
+  // Get all shared memory infos that intersect with the given bounding box, searching over all
+  // hosts.
+  std::vector<vtknvindex_host_properties::shm_info*> get_shminfo_intersect(
     const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step);
 
   // Gather process information used for setting affinity
@@ -136,11 +142,26 @@ public:
   // Returns a previously registered instance of this class.
   static vtknvindex_cluster_properties* get_instance(mi::Uint32 instance_id);
 
+  // Store whether the associated representation is visible or not.
+  void set_visibility(bool visible);
+
+  // Returns whether this instance is active for rendering, i.e. if it is the visible instance with
+  // the hightest instance id.
+  bool is_active_instance() const;
+
+  // Activate this instance for rendering. Returns false if it was already active.
+  bool activate();
+
+  // Prints a warning (once) or info message when multiple instance are visible, explaining that
+  // only a single one of them will be rendered.
+  void warn_if_multiple_visible_instances(const std::string& active_array_name);
+
 private:
   vtknvindex_cluster_properties(const vtknvindex_cluster_properties&) = delete;
   void operator=(const vtknvindex_cluster_properties&) = delete;
 
   mi::Uint32 m_instance_id; // Identifier of this instance.
+  bool m_visible;           // Visibility of associated representation.
 
   mi::Sint32 m_rank_id;                                           // Rank id for the host.
   mi::base::Handle<vtknvindex_affinity> m_affinity;               // Affinity for NVIDIA IndeX.
@@ -154,6 +175,8 @@ private:
   std::map<std::string, mi::Uint32> m_hostname_to_hostid; // Host names to host ids.
   std::map<mi::Sint32, mi::Uint32> m_rankid_to_hostid;    // Rank_id to host id.
   std::map<mi::Uint32, vtknvindex_host_properties*> m_hostinfo; // Host_id to host_properties.
+
+  static mi::Uint32 s_active_instance; // Instance that is currently active for rendering.
 
   static std::map<mi::Uint32, vtknvindex_cluster_properties*>
     s_instances; // All registered instances.
