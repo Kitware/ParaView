@@ -1,7 +1,7 @@
 NAME
   GmshReader
 DESCRIPTION
-  Reader for visualization of high-order polynomial solutions under the Gmsh format
+  (Deprecated) Reader for visualization of high-order polynomial solutions under the Gmsh format
 REQUIRES_MODULES
   ParaView::VTKExtensionsCore
   VTK::CommonCore
