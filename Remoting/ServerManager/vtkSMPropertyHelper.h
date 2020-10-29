@@ -150,6 +150,7 @@ public:
   void Set(int value) { this->Set(0, value); }
   void Set(unsigned int index, int value);
   void Set(const int* values, unsigned int count);
+  void Append(const int* values, unsigned int count);
   int GetAsInt(unsigned int index = 0) const;
   unsigned int Get(int* values, unsigned int count = 1) const;
   std::vector<int> GetIntArray() const;
@@ -163,6 +164,7 @@ public:
   void Set(double value) { this->Set(0, value); }
   void Set(unsigned int index, double value);
   void Set(const double* values, unsigned int count);
+  void Append(const double* values, unsigned int count);
   double GetAsDouble(unsigned int index = 0) const;
   unsigned int Get(double* values, unsigned int count = 1) const;
   std::vector<double> GetDoubleArray() const;
@@ -177,6 +179,7 @@ public:
   void Set(vtkIdType value) { this->Set(0, value); }
   void Set(unsigned int index, vtkIdType value);
   void Set(const vtkIdType* values, unsigned int count);
+  void Append(const vtkIdType* values, unsigned int count);
   unsigned int Get(vtkIdType* values, unsigned int count = 1) const;
 #endif
   vtkIdType GetAsIdType(unsigned int index = 0) const;
@@ -310,6 +313,8 @@ private:
   template <typename T>
   void SetPropertyArray(const T* values, unsigned int count);
   void SetPropertyArrayIdType(const vtkIdType* values, unsigned int count);
+  template <typename T>
+  void AppendPropertyArray(const T* values, unsigned int count);
   template <typename T>
   bool CopyInternal(const vtkSMPropertyHelper& source);
 

@@ -163,6 +163,18 @@ int vtkSMIdTypeVectorProperty::SetElements(const vtkIdType* values, unsigned int
 }
 
 //---------------------------------------------------------------------------
+int vtkSMIdTypeVectorProperty::AppendElements(const vtkIdType* values, unsigned int num)
+{
+  return this->Internals->AppendElements(values, num);
+}
+
+//---------------------------------------------------------------------------
+int vtkSMIdTypeVectorProperty::AppendUncheckedElements(const vtkIdType* values, unsigned int num)
+{
+  return this->Internals->AppendUncheckedElements(values, num);
+}
+
+//---------------------------------------------------------------------------
 int vtkSMIdTypeVectorProperty::SetUncheckedElements(const vtkIdType* values)
 {
   return this->Internals->SetUncheckedElements(values);

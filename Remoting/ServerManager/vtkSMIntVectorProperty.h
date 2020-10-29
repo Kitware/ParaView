@@ -102,6 +102,16 @@ public:
   int SetElements3(int value0, int value1, int value2);
 
   /**
+   * Append the values. The vector is resized as necessary.
+   */
+  int AppendElements(const int* values, unsigned int numValues);
+
+  /**
+   * Append the values to the unchecked elements. The vector is resized as necessary.
+   */
+  int AppendUncheckedElements(const int* values, unsigned int numValues);
+
+  /**
    * Returns the value of 1 element.
    */
   int GetElement(unsigned int idx);

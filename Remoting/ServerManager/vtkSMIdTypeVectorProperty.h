@@ -100,6 +100,16 @@ public:
   int SetElements3(vtkIdType value0, vtkIdType value1, vtkIdType value2);
 
   /**
+   * Append the values. The vector is resized as necessary.
+   */
+  int AppendElements(const vtkIdType* values, unsigned int numValues);
+
+  /**
+   * Append the values to the unchecked elements. The vector is resized as necessary.
+   */
+  int AppendUncheckedElements(const vtkIdType* values, unsigned int numValues);
+
+  /**
    * Returns the value of 1 element.
    */
   vtkIdType GetElement(unsigned int idx);

@@ -297,6 +297,26 @@ public:
   }
 
   //---------------------------------------------------------------------------
+  int AppendUncheckedElements(const T* values, unsigned int numValues)
+  {
+    this->UncheckedValues.insert(std::end(this->UncheckedValues), values, values + numValues);
+    this->Property->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
+
+    return 1;
+  }
+
+  //---------------------------------------------------------------------------
+  int AppendElements(const T* values, unsigned int numValues)
+  {
+    this->Values.insert(std::end(this->Values), values, values + numValues);
+    this->Initialized = true;
+    this->Property->Modified();
+    this->ClearUncheckedElements();
+
+    return 1;
+  }
+
+  //---------------------------------------------------------------------------
   void Copy(vtkSMVectorPropertyTemplate<T>* dsrc)
   {
     if (dsrc && dsrc->Initialized)

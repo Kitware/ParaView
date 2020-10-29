@@ -192,6 +192,18 @@ int vtkSMDoubleVectorProperty::SetUncheckedElements(const double* values, unsign
 }
 
 //---------------------------------------------------------------------------
+int vtkSMDoubleVectorProperty::AppendElements(const double* values, unsigned int num)
+{
+  return this->Internals->AppendElements(values, num);
+}
+
+//---------------------------------------------------------------------------
+int vtkSMDoubleVectorProperty::AppendUncheckedElements(const double* values, unsigned int num)
+{
+  return this->Internals->AppendUncheckedElements(values, num);
+}
+
+//---------------------------------------------------------------------------
 int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* element)
 {
   int retVal;
