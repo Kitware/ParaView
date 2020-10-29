@@ -868,6 +868,9 @@ class ExtractorFilter(ProxyFilter):
             return True
         return super(ExtractorFilter, self).should_never_trace(prop)
 
+class SaveExtractsFilter(ProxyFilter):
+    def should_trace_in_ctor(self, prop): return True
+
 def SupplementalProxy(cls):
     """This function decorates a ProxyFilter. Designed to be
     used for supplemental proxies, so that we can centralize the logic
@@ -1318,6 +1321,26 @@ class SaveScreenshotOrAnimation(RenderingMixin, TraceItem):
         helperAccessor.finalize()
         del helperAccessor
         del helper
+        Trace.Output.append_separated(trace.raw_data())
+
+
+class SaveAnimationExtracts(TraceItem):
+    """Used by vtkSMSaveAnimationExtractsProxy to trace saving of extracts
+    generation."""
+    def __init__(self, proxy):
+        TraceItem.__init__(self)
+        assert(proxy is not None)
+
+        proxy = sm._getPyProxy(proxy)
+        accessor = ProxyAccessor("temporaryWriter", proxy)
+
+        trace = TraceOutput()
+        trace.append("# save extracts")
+        trace.append(\
+            accessor.trace_ctor("SaveExtracts", SaveExtractsFilter(),
+            skip_assignment=True))
+        del accessor
+        del proxy
         Trace.Output.append_separated(trace.raw_data())
 
 class LoadState(TraceItem):
