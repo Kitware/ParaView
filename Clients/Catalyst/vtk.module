@@ -22,6 +22,7 @@ TEST_DEPENDS
   VTK::TestingCore
 TEST_OPTIONAL_DEPENDS
   VTK::ParallelMPI
+  ParaView::PythonCatalyst
 TEST_LABELS
   Catalyst
   ParaView

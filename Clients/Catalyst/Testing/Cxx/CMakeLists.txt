@@ -2,13 +2,18 @@ vtk_add_test_cxx(vtkPVCatalystCxxTests tests
   NO_DATA NO_VALID NO_OUTPUT
   SimpleDriver.cxx
   SimpleDriver2.cxx
-  AdaptorDriver.cxx
-  )
+  AdaptorDriver.cxx)
 
 vtk_add_test_cxx(vtkPVCatalystCxxTests tests
   NO_VALID
   CPXMLPWriterPipeline.cxx
   )
+
+if (PARAVIEW_PLUGIN_ENABLE_VTKmFilters AND PARAVIEW_USE_VTKM)
+  vtk_add_test_cxx(vtkPVCatalystCxxTests tests
+    NO_VALID NO_DATA NO_OUTPUT
+    LoadVTKmFilterPluginDriver.cxx)
+endif()
 # the CoProcessingTestOutputs needs to be run with ${MPIEXEC} if
 # the executable was built with MPI because certain machines only
 # allow running MPI programs with the proper ${MPIEXEC}
