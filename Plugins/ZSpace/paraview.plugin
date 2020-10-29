@@ -1,0 +1,7 @@
+NAME
+  zSpace
+DESCRIPTION
+  Add a new view zSpaceView that let a user interact with a zSpace device directly
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::RenderingCore

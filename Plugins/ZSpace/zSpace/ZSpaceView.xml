@@ -1,0 +1,34 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="views">
+    <RenderViewProxy  name="zSpaceView"
+                      class="vtkPVZSpaceView"
+                      label="zSpace view"
+                      processes="client|renderserver|dataserver"
+                      base_proxygroup="views"
+                      base_proxyname="RenderView">
+    <Documentation>
+      This view allows to render the scene using Crystal Eyes stereo and interact
+      with it through a zSpace device. The zSpace device is composed of a high
+      definition 3D display coupled with an advanced mixed reality tracking system
+      and angle-awareness sensor. This view is designed to work on full screen
+      (or in a cave display). This plugin only works on Windows as the zSpace
+      SDK is only available on this OS.
+    </Documentation>
+
+    <DoubleVectorProperty command="SetInterPupillaryDistance"
+                          default_values="0.056"
+                          name="InterPupillaryDistance"
+                          number_of_elements="1"
+                          panel_visibility="advanced">
+      <DoubleRangeDomain  name="range"
+                          min="0"
+                          max="1"/>
+      <Documentation>
+        The physical separation, or inter-pupillary distance—between the eyes, measured in meters.
+        An IPD of zero disables stereo since the eyes are at the same location.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    </RenderViewProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
