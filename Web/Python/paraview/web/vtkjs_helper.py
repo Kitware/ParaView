@@ -44,11 +44,12 @@ def getRenameMap():
     view = simple.GetActiveView()
     renderer = view.GetClientSideObject().GetRenderer()
     viewProps = renderer.GetViewProps()
+    volumes = renderer.GetVolumes()
     idx = 1
     for viewProp in viewProps:
-        if not viewProp.GetVisibility():
-            continue
         if not viewProp.IsA('vtkActor'):
+            continue
+        if not viewProp.GetVisibility():
             continue
         bounds = viewProp.GetBounds()
         if bounds[0] > bounds[1]:
@@ -59,6 +60,18 @@ def getRenameMap():
         strIdx = '%s' % idx
         renameMap[strIdx] = findName(names, viewProp, strIdx)
         idx += 1
+    for volume in volumes:
+        if not volume.IsA('vtkVolume'):
+            continue
+        if not volume.GetVisibility():
+            continue
+        bounds = volume.GetBounds()
+        if bounds[0] > bounds[1]:
+            continue
+        strIdx = '%s' % idx
+        renameMap[strIdx] = findName(names, volume, strIdx)
+        idx += 1
+
     return renameMap
 
 
