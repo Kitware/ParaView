@@ -10890,6 +10890,25 @@
             <Property name="BackgroundTexture"/>
           </PropertyGroup>
 
+          <PropertyGroup label="Render Passes">
+            <Property name="UseToneMapping"/>
+            <Property name="Exposure"/>
+            <Property name="UseSSAO"/>
+            <Property name="UseSSAODefaultPresets"/>
+            <Property name="Radius"/>
+            <Property name="Bias"/>
+            <Property name="KernelSize"/>
+            <Property name="Blur"/>
+            <Property name="GenericFilmicPresets"/>
+            <Property name="ToneMappingType"/>
+            <Property name="Contrast"/>
+            <Property name="Shoulder"/>
+            <Property name="MidIn"/>
+            <Property name="MidOut"/>
+            <Property name="HdrMax"/>
+            <Property name="UseACES"/>
+          </PropertyGroup>
+
           <!-- Interactor -->
           <Property name="InteractionMode" panel_visibility="never"/>
           <Property name="Camera3DManipulators" panel_visibility="never"/>
