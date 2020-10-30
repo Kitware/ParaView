@@ -85,6 +85,9 @@ std::string vtkGetPluginFileNameFromName(const std::string& pluginname)
 using VectorOfSearchFunctions = std::vector<vtkPluginSearchFunction>;
 static VectorOfSearchFunctions RegisteredPluginSearchFunctions;
 
+using VectorOfListFunctions = std::vector<vtkPluginListFunction>;
+static VectorOfListFunctions RegisteredPluginListFunctions;
+
 std::vector<std::string> tokenize(const std::string& input, char delimiter)
 {
   std::vector<std::string> tokens;
@@ -291,8 +294,11 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLs(const char* appname)
     return;
   }
 
+#if BUILD_SHARED_LIBS
+  // it makes sense to look for plugin configuration xmls and such only for
+  // shared-builds. for static builds, it's not only not necessary, but also not
+  // correct as we're missing all statically linked plugins that are available.
   const std::string exe_dir = pm->GetSelfDir();
-
   if (!exe_dir.empty())
   {
 #if defined(__APPLE__)
@@ -305,8 +311,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLs(const char* appname)
         return;
       }
     }
-#endif
-
+#endif // defined(__APPLE__)
     // Load it from beside the executable.
     {
       auto conf = exe_dir + "/" + appname + ".conf";
@@ -317,8 +322,30 @@ void vtkPVPluginTracker::LoadPluginConfigurationXMLs(const char* appname)
       }
     }
   }
+#endif // BUILD_SHARED_LIBS
+
+  std::vector<std::string> names;
+  for (auto& listFunction : RegisteredPluginListFunctions)
+  {
+    if (listFunction)
+    {
+      listFunction(appname, names);
+    }
+  }
+
+  vtkNew<vtkPVXMLElement> root;
+  root->SetName("Plugins");
+  for (const auto& name : names)
+  {
+    vtkNew<vtkPVXMLElement> child;
+    child->SetName("Plugin");
+    child->AddAttribute("name", name.c_str());
+    root->AddNestedElement(child);
+  }
+  this->LoadPluginConfigurationXML(root, /*forceLoad=*/false);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVPluginTracker::LoadPluginConfigurationXMLConf(
   std::string const& exe_dir, std::string const& conf)
 {
@@ -633,6 +660,12 @@ bool vtkPVPluginTracker::GetPluginAutoLoad(unsigned int index)
 void vtkPVPluginTracker::RegisterStaticPluginSearchFunction(vtkPluginSearchFunction function)
 {
   RegisteredPluginSearchFunctions.push_back(function);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPluginTracker::RegisterStaticPluginListFunction(vtkPluginListFunction function)
+{
+  RegisteredPluginListFunctions.push_back(function);
 }
 
 #ifndef VTK_LEGACY_REMOVE

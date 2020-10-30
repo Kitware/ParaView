@@ -14,6 +14,11 @@ set(legacy_catalyst_pipelines
   PythonScriptTest.py
   )
 
+if (PARAVIEW_PLUGIN_ENABLE_VTKmFilters AND PARAVIEW_USE_VTKM)
+  list(APPEND legacy_catalyst_pipelines
+    CatalystLoadVTKmFilterPlugin.py)
+endif()
+
 paraview_add_test(
   PREFIX "Catalyst::Legacy::WaveletMiniApp"
   ARGS "$<TARGET_FILE:ParaView::pvbatch>" -sym -m paraview.demos.wavelet_miniapp -t 4 --size 21 -s

@@ -83,6 +83,7 @@ int vtkCPPythonStringPipeline::Initialize(const char* pythonString)
   loadPythonModules << "del _source" << std::endl;
   loadPythonModules << "del _code" << std::endl;
   loadPythonModules << "import " << this->ModuleName << std::endl;
+  loadPythonModules << "from paraview.modules import vtkPVCatalyst" << std::endl;
 
   vtkPythonInterpreter::RunSimpleString(loadPythonModules.str().c_str());
   return 1;

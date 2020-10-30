@@ -21,6 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h" // Required to get build options for paraview
 #include "vtkPVOptions.h"
+#include "vtkPVPluginTracker.h"
 #include "vtkProcessModule.h"
 #include "vtkSMObject.h"
 #include "vtkSMParaViewPipelineController.h"
@@ -30,6 +31,8 @@
 
 // for PARAVIEW_INSTALL_DIR and PARAVIEW_BINARY_DIR variables
 #include "vtkCPConfig.h"
+
+#include "ParaView_paraview_plugins.h"
 
 #include <assert.h>
 #include <sstream>
@@ -127,9 +130,13 @@ vtkCPCxxHelper* vtkCPCxxHelper::New()
   auto pm = vtkProcessModule::GetProcessModule();
   assert(pm != nullptr);
 
+  // register static plugins
+  ParaView_paraview_plugins_initialize();
+
+  vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLs("paraview");
+
   if (pm->GetSession() == nullptr)
   {
-
     // Setup default session.
     vtkIdType connectionId = vtkSMSession::ConnectToSelf();
     assert(connectionId != 0);

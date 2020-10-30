@@ -455,6 +455,7 @@ function (paraview_plugin_build)
 
       set(_paraview_build_declarations)
       set(_paraview_build_calls)
+      set(_paraview_build_names)
       foreach (_paraview_build_plugin IN LISTS _paraview_static_plugins)
         string(APPEND _paraview_build_declarations
           "PV_PLUGIN_IMPORT_INIT(${_paraview_build_plugin});\n")
@@ -471,6 +472,8 @@ function (paraview_plugin_build)
     }
     return true;
   }\n\n")
+        string(APPEND _paraview_build_names
+          "  names.push_back(\"${_paraview_build_plugin}\");\n")
       endforeach ()
 
       set(_paraview_build_include_content
@@ -487,11 +490,13 @@ function (paraview_plugin_build)
 ${_paraview_build_declarations}
 static bool ${_paraview_build_target_safe}_static_plugins_load(const char* name);
 static bool ${_paraview_build_target_safe}_static_plugins_search(const char* name);
+static void ${_paraview_build_target_safe}_static_plugins_list(const char* appname, std::vector<std::string>& names);
 
 static void ${_paraview_build_target_safe}_initialize()
 {
   vtkPVPluginLoader::RegisterLoadPluginCallback(${_paraview_build_target_safe}_static_plugins_load);
   vtkPVPluginTracker::RegisterStaticPluginSearchFunction(${_paraview_build_target_safe}_static_plugins_search);
+  vtkPVPluginTracker::RegisterStaticPluginListFunction(${_paraview_build_target_safe}_static_plugins_list);
 }
 
 static bool ${_paraview_build_target_safe}_static_plugins_func(const char* name, bool load);
@@ -504,6 +509,13 @@ static bool ${_paraview_build_target_safe}_static_plugins_load(const char* name)
 static bool ${_paraview_build_target_safe}_static_plugins_search(const char* name)
 {
   return ${_paraview_build_target_safe}_static_plugins_func(name, false);
+}
+
+static void ${_paraview_build_target_safe}_static_plugins_list(const char* appname, std::vector<std::string>& names)
+{
+${_paraview_build_names}
+  (void) appname;
+  (void) names;
 }
 
 static bool ${_paraview_build_target_safe}_static_plugins_func(const char* name, bool load)
