@@ -32,7 +32,7 @@
     <Proxy group="filters" name="PlotOnSortedLines" />
     <Proxy group="filters" name="PlotOnIntersectionCurves" />
     <Proxy group="filters" name="ProgrammableFilter" 
-            icon=":/pqWidgets/Icons/pqProgrammableFilter24.png"/>
+            icon=":/pqWidgets/Icons/pqProgrammableFilter.svg"/>
   </Category>
 
   <Category name="Statistics" menu_label="&amp;Statistics">

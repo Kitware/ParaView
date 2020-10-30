@@ -114,7 +114,8 @@
         <file>Icons/pqPolygonSelectSurfacePoint.svg</file>
         <file>Icons/pqPreview.svg</file>
         <file>Icons/pqProbeLocation.svg</file>
-        <file>Icons/pqProgrammableFilter24.png</file>
+        <file>Icons/pqProgrammableAnnotation.svg</file>
+        <file>Icons/pqProgrammableFilter.svg</file>
         <file>Icons/pqRamp24.png</file>
         <file>Icons/pqRenameWindow.svg</file>
         <file>Icons/pqRectilinearGrid16.png</file>

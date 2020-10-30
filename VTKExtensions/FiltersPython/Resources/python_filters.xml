@@ -299,8 +299,8 @@ annotation text.
                      short_help="Executes a python script to produce data.">
                      This filter will execute a python script to produce an
                      output dataset. The filter keeps a copy of the python
-                     script in Script, and creates Interpretor, a python
-                     interpretor to run the script upon the first
+                     script in Script and creates a python
+                     Interpreter to run the script upon the first
                      execution. To execute external python scripts on the ParaView server, use:
                      execfile('full_path/script_name.py'). Documentation is found in the Programmable Filter
                      chapter of the ParaView Guide.</Documentation>
@@ -432,6 +432,77 @@ annotation text.
       </DoubleVectorProperty>
 
       <!-- End ProgrammableFilter -->
+    </SourceProxy>
+
+    <SourceProxy class="vtkPythonProgrammableFilter"
+                 label="Programmable Annotation"
+                 name="ProgrammableAnnotation">
+      <Documentation long_help="Executes a user supplied python script on its input dataset to produce an output vtkTable containing a single tuple vtkStringArray to be displayed as a text."
+                     short_help="Executes a python script to produce a text.">
+                     This filter will execute a python script to produce a
+                     text. The text should be contained in a vtkTable containing a single vtkStringArray, itself
+                     containing a single tuple. The filter keeps a copy of the python
+                     script in Script and creates a python
+                     Interpreter to run the script upon the first
+                     execution. To execute external python scripts on the ParaView server, use:
+                     execfile('full_path/script_name.py'). Documentation is found in the Programmable Filter
+                     chapter of the ParaView Guide.</Documentation>
+      <InputProperty clean_command="RemoveAllInputs"
+                     command="AddInputConnection"
+                     multiple_input="1"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input(s) to the programmable
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetOutputDataSetType"
+                         default_values="19"
+                         name="OutputDataSetType"
+                         number_of_elements="1"
+                         panel_visibility="never">
+      </IntVectorProperty>
+      <StringVectorProperty command="SetScript"
+                            name="Script"
+                            number_of_elements="1"
+                            default_values="to = self.GetTableOutput()&#xA;arr = vtk.vtkStringArray()&#xA;arr.SetName(&#x22;Text&#x22;)&#xA;arr.SetNumberOfComponents(1)&#xA;arr.InsertNextValue(&#x22;YourString&#x22;)&#xA;to.AddColumn(arr)"
+                            panel_visibility="default">
+        <Hints>
+          <Widget type="multi_line" syntax="python" />
+        </Hints>
+        <Documentation>This property contains the text of a python program that
+        the programmable filter runs. To execute external python scripts on the ParaView server, use:
+        execfile('full_path/script_name.py'). Make sure to output a vtkTable containing a single vtkStringArray,
+        itself containing a single tuple</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="ClearParameters"
+                            command="SetParameterInternal"
+                            is_internal="1"
+                            name="Parameters"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPythonPath"
+                            name="PythonPath"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Documentation>A semi-colon (;) separated list of directories to add to
+        the python library search path.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <OutputPort index="0"
+                    name="Output-0"
+                    type="text" />
+        <Visibility replace_input="0" />
+      </Hints>
+      <!-- End ProgrammableAnnotation -->
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

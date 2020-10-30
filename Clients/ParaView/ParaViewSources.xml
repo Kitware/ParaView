@@ -60,14 +60,14 @@
   <Proxy group="sources" name="HyperTreeGridSource" />
   <Proxy group="sources" name="ImageMandelbrotSource" />
   <Proxy group="sources" name="LineSource" />
-  <Proxy group="sources" name="LiveProgrammableSource" />
+  <Proxy group="sources" name="LiveProgrammableSource" icon=":/pqWidgets/Icons/pqProgrammableFilter.svg" />
   <Proxy group="sources" name="LogoSource" />
   <Proxy group="sources" name="OutlineSource" />
   <Proxy group="sources" name="PlaneSource" />
   <Proxy group="sources" name="PointSource" />
   <Proxy group="sources" name="PolyLineSource" />
   <Proxy group="sources" name="PolyPointSource" />
-  <Proxy group="sources" name="ProgrammableSource" />
+  <Proxy group="sources" name="ProgrammableSource" icon=":/pqWidgets/Icons/pqProgrammableFilter.svg" />
   <Proxy group="sources" name="RTAnalyticSource" />
   <Proxy group="sources" name="RandomHyperTreeGridSource" />
   <Proxy group="sources" name="Ruler" icon=":/pqWidgets/Icons/pqRuler.svg"/>

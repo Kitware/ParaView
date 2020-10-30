@@ -162,7 +162,7 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>:/pqWidgets/Icons/pqProgrammableFilter24.png</normaloff>:/pqWidgets/Icons/pqProgrammableFilter24.png</iconset>
+       <normaloff>:/pqWidgets/Icons/pqProgrammableFilter.svg</normaloff>:/pqWidgets/Icons/pqProgrammableFilter.svg</iconset>
      </property>
      <property name="checkable">
       <bool>true</bool>

@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ProgrammableAnnotation" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Script/1pqPopOutWidget0/Script" command="set_string" arguments="inp = self.GetInput()&#xA;arrIn=inp.GetPointData().GetArray(&quot;RTData&quot;)&#xA;val= algs.mean(arrIn)&#xA;to = self.GetTableOutput()&#xA;arr = vtk.vtkStringArray()&#xA;arr.SetName(&quot;Text&quot;)&#xA;arr.SetNumberOfComponents(1)&#xA;arr.InsertNextValue(&quot;Mean Value: &quot; + str(val))&#xA;to.AddColumn(arr)" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+</pqevents>
