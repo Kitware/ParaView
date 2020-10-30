@@ -5,7 +5,7 @@ def find_webapp(appname):
     """Returns the path to the  is web app with given name is found in the package."""
 
     if platform.system() == "Darwin":
-        root = "Resources/web"
+        root = "Resources/"
     else:
         from paraview.servermanager import vtkSMProxyManager
         pv_version= "%d.%d" % (vtkSMProxyManager.GetVersionMajor(), vtkSMProxyManager.GetVersionMinor())
