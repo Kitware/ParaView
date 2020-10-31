@@ -27,17 +27,16 @@
 vtkStandardNewMacro(vtkBoundedPlaneSource);
 //----------------------------------------------------------------------------
 vtkBoundedPlaneSource::vtkBoundedPlaneSource()
+  : Center{ 0, 0, 0 }
+  , Normal{ 0, 0, 1 }
+  , BoundingBox{ 0, -1, 0, -1, 0, -1 }
+  , RefinementMode{ vtkBoundedPlaneSource::USE_RESOLUTION }
+  , Resolution{ 100 }
+  , CellSize{ 1.0 }
+  , Padding{ 0.0 }
 {
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
-
-  this->Center[0] = this->Center[1] = this->Center[2] = 0.0;
-  this->Normal[0] = this->Normal[1] = 0.0;
-  this->Normal[1] = 1.0;
-  this->Resolution = 100;
-  this->RefinementMode = USE_RESOLUTION;
-  this->CellSize = 1.0;
-  this->Padding = 0;
 }
 
 //----------------------------------------------------------------------------

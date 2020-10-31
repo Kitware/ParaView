@@ -26,10 +26,11 @@
 
 #include <cstdio> // for rename
 
-vtkStandardNewMacro(vtkPVGL2PSExporter)
+vtkStandardNewMacro(vtkPVGL2PSExporter);
 
-  //----------------------------------------------------------------------------
-  vtkPVGL2PSExporter::vtkPVGL2PSExporter()
+//----------------------------------------------------------------------------
+vtkPVGL2PSExporter::vtkPVGL2PSExporter()
+  : ExcludeCubeAxesActorsFromRasterization(true)
 {
 }
 

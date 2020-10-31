@@ -502,11 +502,13 @@ vtkCxxSetObjectMacro(vtkPVGlyphFilter, SourceTransform, vtkTransform);
 vtkPVGlyphFilter::vtkPVGlyphFilter()
   : VectorScaleMode(SCALE_BY_MAGNITUDE)
   , SourceTransform(nullptr)
+  , ScaleFactor(1.0)
   , GlyphMode(ALL_POINTS)
   , MaximumNumberOfSamplePoints(5000)
   , Seed(1)
   , Stride(1)
-  , Controller(0)
+  , Controller(nullptr)
+  , OutputPointsPrecision(vtkAlgorithm::DEFAULT_PRECISION)
   , Internals(new vtkPVGlyphFilter::vtkInternals())
 {
   this->SetController(vtkMultiProcessController::GetGlobalController());

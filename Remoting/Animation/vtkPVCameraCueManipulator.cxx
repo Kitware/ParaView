@@ -29,10 +29,11 @@
 vtkStandardNewMacro(vtkPVCameraCueManipulator);
 //------------------------------------------------------------------------------
 vtkPVCameraCueManipulator::vtkPVCameraCueManipulator()
+  : Mode(vtkPVCameraCueManipulator::PATH)
+  , InterpolationMode(vtkCameraInterpolator::INTERPOLATION_TYPE_LINEAR)
+  , CameraInterpolator(vtkCameraInterpolator::New())
+  , DataSourceProxy(nullptr)
 {
-  this->Mode = PATH;
-  this->CameraInterpolator = vtkCameraInterpolator::New();
-  this->DataSourceProxy = 0;
 }
 
 //------------------------------------------------------------------------------

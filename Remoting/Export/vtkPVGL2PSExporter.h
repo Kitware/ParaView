@@ -45,12 +45,13 @@ public:
    * If Write3DPropsAsRasterImage is true, add all instances of
    * vtkCubeAxesActors to the RenderExclusions.
    */
-  vtkSetMacro(ExcludeCubeAxesActorsFromRasterization, int)
-    vtkGetMacro(ExcludeCubeAxesActorsFromRasterization, int)
-      vtkBooleanMacro(ExcludeCubeAxesActorsFromRasterization, int)
-    //@}
+  vtkSetMacro(ExcludeCubeAxesActorsFromRasterization, int);
+  vtkGetMacro(ExcludeCubeAxesActorsFromRasterization, int);
+  vtkBooleanMacro(ExcludeCubeAxesActorsFromRasterization, int);
+  //@}
 
-    protected : vtkPVGL2PSExporter();
+protected:
+  vtkPVGL2PSExporter();
   ~vtkPVGL2PSExporter() override;
 
   void WriteData() override;
