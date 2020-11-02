@@ -125,6 +125,7 @@ test:windows-vs2019-kits-mpi-python-qt:
         - build:windows-vs2019-kits-mpi-python-qt
     needs:
         - build:windows-vs2019-kits-mpi-python-qt
+    timeout: 90 minutes
 
 build:windows-vs2019-qt:
     extends:
