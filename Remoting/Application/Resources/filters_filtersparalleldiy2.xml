@@ -187,7 +187,17 @@
         </DataTypeDomain>
         <Documentation>This property specifies the input.</Documentation>
       </InputProperty>
-      <!-- End GenerateGlobalIds -->
+      <DoubleVectorProperty name="Tolerance"
+                         command="SetTolerance"
+                         number_of_elements="1"
+                         default_values="0">
+      <Documentation short_help="The higher, the less overlaps are detected">
+        Cells are deflated by 0.5 * Tolerance before the cell overlaps are computed.
+        Deflating is done by translating each cell's faces and edges, in their normal direction,
+        by a vector of norm Tolerance.
+      </Documentation>
+      </DoubleVectorProperty>
+      <!-- End OverlappingCellsDetector -->
     </SourceProxy>
 
     <!-- ==================================================================== -->
