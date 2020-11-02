@@ -561,30 +561,28 @@ vtkStandardNewMacro(vtkSpreadSheetView);
 //----------------------------------------------------------------------------
 vtkSpreadSheetView::vtkSpreadSheetView()
   : Superclass(/*create_render_window=*/false)
+  , ShowExtractedSelection(false)
+  , GenerateCellConnectivity(false)
+  , TableStreamer(vtkSortedTableStreamer::New())
+  , TableSelectionMarker(vtkMarkSelectedRows::New())
+  , ReductionFilter(vtkReductionFilter::New())
+  , DeliveryFilter(vtkClientServerMoveData::New())
+  , NumberOfRows(0)
   , CRMICallbackTag(0)
   , PRMICallbackTag(0)
   , Identifier(0)
+  , Internals(new vtkSpreadSheetView::vtkInternals())
+  , SomethingUpdated(false)
+  , FieldAssociation(vtkDataObject::FIELD_ASSOCIATION_POINTS)
 {
-  this->NumberOfRows = 0;
-  this->ShowExtractedSelection = false;
-  this->TableStreamer = vtkSortedTableStreamer::New();
-  this->TableSelectionMarker = vtkMarkSelectedRows::New();
-
-  this->ReductionFilter = vtkReductionFilter::New();
   this->ReductionFilter->SetController(vtkMultiProcessController::GetGlobalController());
   this->ReductionFilter->SetPostGatherHelper(vtkNew<SpreadSheetViewMergeTables>().GetPointer());
-
-  this->DeliveryFilter = vtkClientServerMoveData::New();
   this->DeliveryFilter->SetOutputDataType(VTK_TABLE);
-
   this->ReductionFilter->SetInputConnection(this->TableStreamer->GetOutputPort());
 
-  this->Internals = new vtkInternals();
   this->Internals->MostRecentlyAccessedBlock = -1;
-
   this->Internals->Observer =
     vtkMakeMemberFunctionCommand(*this, &vtkSpreadSheetView::OnRepresentationUpdated);
-  this->SomethingUpdated = false;
 
   auto session = this->GetSession();
   assert(session);
@@ -596,7 +594,6 @@ vtkSpreadSheetView::vtkSpreadSheetView()
   {
     this->PRMICallbackTag = pController->AddRMICallback(::FetchRMI, this, FETCH_BLOCK_TAG);
   }
-  this->FieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
 }
 
 //----------------------------------------------------------------------------

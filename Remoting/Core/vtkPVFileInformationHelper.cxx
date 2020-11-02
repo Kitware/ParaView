@@ -26,14 +26,15 @@
 vtkStandardNewMacro(vtkPVFileInformationHelper);
 //-----------------------------------------------------------------------------
 vtkPVFileInformationHelper::vtkPVFileInformationHelper()
+  : Path(nullptr)
+  , WorkingDirectory(nullptr)
+  , DirectoryListing(0)
+  , SpecialDirectories(0)
+  , FastFileTypeDetection(1)
+  , ReadDetailedFileInformation(false)
+  , PathSeparator(nullptr)
 {
-  this->DirectoryListing = 0;
-  this->Path = 0;
-  this->WorkingDirectory = 0;
-  this->SpecialDirectories = 0;
   this->SetPath(".");
-  this->PathSeparator = 0;
-  this->FastFileTypeDetection = 1;
 #if defined(_WIN32) && !defined(__CYGWIN__)
   this->SetPathSeparator("\\");
 #else
