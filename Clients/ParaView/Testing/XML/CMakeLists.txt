@@ -1163,7 +1163,6 @@ if(PARAVIEW_USE_PYTHON)
   list(APPEND TESTS_WITH_BASELINES
     ColorByComponentNames.xml # needs programmable filter
     LiveProgrammableSource.xml
-    ProgrammableAnnotation.xml
     PythonShellRunScript.xml
     SaveLoadStatePython.xml
     SelectionLabels.xml
@@ -1210,6 +1209,7 @@ if(PARAVIEW_USE_PYTHON)
       ForceTimeDiamond.xml
       FreezeQueryMultiblock.xml
       IndexedLookupInitialization.xml # needs Python Calculator/numpy
+      ProgrammableAnnotation.xml
       SpreadSheetSelectionTrace.xml
       StructuredGridCellBlanking.xml
       TestFindDataMax.xml
