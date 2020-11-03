@@ -26,6 +26,7 @@
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 
 #include <string> // for std::string
+#include <vector> // for std::vector
 
 class vtkSMProxy;
 
@@ -42,6 +43,12 @@ public:
    * Returns the name of the property or nullptr when no such property is found.
    */
   static const char* GetFileNameProperty(vtkSMProxy*);
+
+  /**
+   * Returns list of all properties that accept filenames in order that they are
+   * defined.
+   */
+  static std::vector<std::string> GetFileNameProperties(vtkSMProxy* proxy);
 
   /**
    * Sanitize a label/name to be remove spaces, delimiters etc.
