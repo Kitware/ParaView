@@ -32,46 +32,52 @@ public:
   vtkTypeMacro(vtkSMPropertyGroup, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  // Description:
-  // Sets the name of the property group to \p name.
-  vtkSetStringMacro(Name)
+  //@{
+  /**
+   * Get/Sets the name of the property group to \p name.
+   */
+  vtkSetStringMacro(Name);
+  vtkGetStringMacro(Name);
+  //@}
 
-    // Description:
-    // Returns the name of the property group.
-    vtkGetStringMacro(Name)
+  //@{
+  /**
+   * Gets/Sets the name of the property group to \p name.
+   */
+  vtkSetStringMacro(XMLLabel);
+  vtkGetStringMacro(XMLLabel);
+  //@}
 
-    // Description:
-    // Sets the name of the property group to \p name.
-    vtkSetStringMacro(XMLLabel)
+  //@{
+  /**
+   * Get/Sets the name of the panel widget to use for the property group.
+   */
+  vtkSetStringMacro(PanelWidget);
+  vtkGetStringMacro(PanelWidget);
+  //@}
 
-    // Description:
-    // Returns the name of the property group.
-    vtkGetStringMacro(XMLLabel)
+  //@{
+  /**
+   * Get/Sets the panel visibility for the property group.
+   * @sa vtkSMProperty::SetPanelVisibility()
+   */
+  vtkSetStringMacro(PanelVisibility);
+  vtkGetStringMacro(PanelVisibility);
+  //@}
 
-    // Description:
-    // Sets the name of the panel widget to use for the property group.
-    vtkSetStringMacro(PanelWidget)
+  /**
+   * Returns true if the property group contains zero properties.
+   */
+  bool IsEmpty() const;
 
-    // Description:
-    // Gets the name of the panel widget to use for the property group.
-    vtkGetStringMacro(PanelWidget)
-
-    // Description:
-    // Sets the panel visibility for the property group.
-    //
-    // \see vtkSMProperty::SetPanelVisibility()
-    vtkSetStringMacro(PanelVisibility)
-
-    // Description:
-    // Returns the panel visibility for the property group.
-    vtkGetStringMacro(PanelVisibility)
-
-    // Description:
-    // Returns true if the property group contains zero properties.
-    bool IsEmpty() const;
-
-  // Description:
-  // Adds \p property to the group. function can be nullptr.
+  /**
+   * Adds \p property to the group.
+   * `name` is the name of the property. If nullptr, then the property's XML
+   * name is used.
+   * `function` is the role assigned to this property. If nullptr, the name
+   * (either specified as argument, or the XML name for the property) will be
+   * used.
+   */
   void AddProperty(const char* function, vtkSMProperty* property, const char* name = nullptr);
 
   /**
@@ -79,35 +85,44 @@ public:
    */
   const char* GetPropertyName(unsigned int index) const;
 
-  // Description:
-  // Returns the property at \p index.
+  /**
+   * Returns the property at \p index.
+   */
   vtkSMProperty* GetProperty(unsigned int index) const;
 
-  // Description:
-  // Returns the property associated with a given function, if any.
+  /**
+   * Returns the property associated with a given function, if any.
+   */
   vtkSMProperty* GetProperty(const char* function) const;
 
-  // Description:
-  // Given property in the group, returns its function. Will return nullptr if the
-  // property is not present in this group.
+  /**
+   * Given property in the group, returns its function. Will return nullptr if the
+   * property is not present in this group.
+   */
   const char* GetFunction(vtkSMProperty* property) const;
 
-  // Description:
-  // Returns the number of properties in the group.
+  /**
+   * Returns the number of properties in the group.
+   */
   unsigned int GetNumberOfProperties() const;
 
-  // Description:
-  // Returns the documentation for this proxy.
+  /**
+   * Returns the documentation for this proxy.
+   */
   vtkGetObjectMacro(Documentation, vtkSMDocumentation);
 
-  // Description:
-  // The server manager configuration XML may define <Hints /> element for
-  // a property. Hints are metadata associated with the property. The
-  // Server Manager does not (and should not) interpret the hints. Hints
-  // provide a mechanism to add GUI pertinant information to the server
-  // manager XML.  Returns the XML element for the hints associated with
-  // this property, if any, otherwise returns nullptr.
+  //@{
+  /**
+   * The server manager configuration XML may define `<Hints />` element
+   * for a property-group. Hints are metadata associated with the property-group.
+   * The Server Manager does not (and should not) interpret the hints.
+   * Hints provide a mechanism to add GUI pertinent information to the
+   * server manager XML.  Returns the XML element for the hints associated
+   * with this property, if any, otherwise returns `nullptr`;
+   */
   vtkGetObjectMacro(Hints, vtkPVXMLElement);
+  void SetHints(vtkPVXMLElement* hints);
+  //@}
 
 protected:
   vtkSMPropertyGroup();
@@ -116,9 +131,7 @@ protected:
   friend class vtkSMProxy;
   virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);
 
-  void SetHints(vtkPVXMLElement* hints);
   vtkPVXMLElement* Hints;
-
   vtkSMDocumentation* Documentation;
 
 private:
