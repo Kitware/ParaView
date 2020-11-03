@@ -523,7 +523,7 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::ZoomTo(vtkSMProxy* representation)
+void vtkSMRenderViewProxy::ZoomTo(vtkSMProxy* representation, bool closest)
 {
   vtkSMPropertyHelper helper(representation, "Input");
   vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy());
@@ -581,32 +581,44 @@ void vtkSMRenderViewProxy::ZoomTo(vtkSMProxy* representation)
       transform->Delete();
     }
   }
-  this->ResetCamera(bounds);
+  this->ResetCamera(bounds, closest);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::ResetCamera()
+void vtkSMRenderViewProxy::ResetCamera(bool closest)
 {
-  SM_SCOPED_TRACE(CallMethod).arg(this).arg("ResetCamera").arg("comment", "reset view to fit data");
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this)
+    .arg("ResetCamera")
+    .arg(closest)
+    .arg("comment", "reset view to fit data");
 
   this->GetSession()->PrepareProgress();
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "ResetCamera"
-         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this);
+  if (closest)
+  {
+    stream << "ResetCameraScreenSpace";
+  }
+  else
+  {
+    stream << "ResetCamera";
+  }
+  stream << vtkClientServerStream::End;
   this->ExecuteStream(stream);
   this->GetSession()->CleanupPendingProgress();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::ResetCamera(
-  double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
+  double xmin, double xmax, double ymin, double ymax, double zmin, double zmax, bool closest)
 {
   double bds[6] = { xmin, xmax, ymin, ymax, zmin, zmax };
-  this->ResetCamera(bds);
+  this->ResetCamera(bds, closest);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::ResetCamera(double bounds[6])
+void vtkSMRenderViewProxy::ResetCamera(double bounds[6], bool closest)
 {
   SM_SCOPED_TRACE(CallMethod)
     .arg(this)
@@ -617,12 +629,21 @@ void vtkSMRenderViewProxy::ResetCamera(double bounds[6])
     .arg(bounds[3])
     .arg(bounds[4])
     .arg(bounds[5])
+    .arg(closest)
     .arg("comment", "reset view to fit data bounds");
   this->CreateVTKObjects();
 
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "ResetCamera"
-         << vtkClientServerStream::InsertArray(bounds, 6) << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this);
+  if (closest)
+  {
+    stream << "ResetCameraScreenSpace";
+  }
+  else
+  {
+    stream << "ResetCamera";
+  }
+  stream << vtkClientServerStream::InsertArray(bounds, 6) << vtkClientServerStream::End;
   this->ExecuteStream(stream);
 }
 

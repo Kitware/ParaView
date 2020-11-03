@@ -1143,6 +1143,39 @@ void vtkPVRenderView::ResetCamera(double bounds[6])
 }
 
 //----------------------------------------------------------------------------
+// Note this is called on all processes.
+void vtkPVRenderView::ResetCameraScreenSpace()
+{
+  // Since ResetCameraScreenSpace() is accessible via a property on the view proxy, this
+  // method gets called directly (and on on the vtkSMRenderViewProxy). Hence
+  // we need to ensure things are updated explicitly and cannot rely on the View
+  // proxy to take care of updating the view.
+  this->Update();
+
+  // Remember, vtkRenderer::ResetCamera() calls
+  // vtkRenderer::ResetCameraClippingPlanes() with the given bounds.
+  double bounds[6];
+  this->GeometryBounds.GetBounds(bounds);
+  if (!this->LockBounds)
+  {
+    this->RenderView->GetRenderer()->ResetCameraScreenSpace(bounds);
+  }
+
+  this->InvokeEvent(vtkCommand::ResetCameraEvent);
+}
+
+//----------------------------------------------------------------------------
+// Note this is called on all processes.
+void vtkPVRenderView::ResetCameraScreenSpace(double bounds[6])
+{
+  if (!this->LockBounds)
+  {
+    this->RenderView->GetRenderer()->ResetCameraScreenSpace(bounds);
+  }
+  this->InvokeEvent(vtkCommand::ResetCameraEvent);
+}
+
+//----------------------------------------------------------------------------
 bool vtkPVRenderView::TestCollaborationCounter()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();

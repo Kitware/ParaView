@@ -126,6 +126,7 @@
         <file>Icons/pqReloadFile.svg</file>
         <file>Icons/pqReset.svg</file>
         <file>Icons/pqResetCamera.svg</file>
+        <file>Icons/pqResetCameraClosest.svg</file>
         <file>Icons/pqResetCenter.svg</file>
         <file>Icons/pqResetRange.svg</file>
         <file>Icons/pqResetRangeCustom.svg</file>
@@ -217,6 +218,7 @@
         <file>Icons/pqZMinus.svg</file>
         <file>Icons/pqZPlus.svg</file>
         <file>Icons/pqZoomToData.svg</file>
+        <file>Icons/pqZoomClosestToData.svg</file>
         <file>Icons/pqZoomToSelection.svg</file>
         <file>Icons/warning.png</file>
         <file>Icons/pvIcon.svg</file>

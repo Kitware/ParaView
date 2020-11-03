@@ -199,9 +199,9 @@ void pqRenderViewBase::initializeAfterObjectsCreated()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewBase::resetDisplay()
+void pqRenderViewBase::resetDisplay(bool closest)
 {
-  this->resetCamera();
+  this->resetCamera(closest);
 }
 
 //-----------------------------------------------------------------------------

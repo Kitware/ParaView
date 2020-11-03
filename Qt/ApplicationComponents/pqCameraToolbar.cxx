@@ -43,6 +43,8 @@ void pqCameraToolbar::constructor()
   ui.setupUi(this);
   new pqCameraReaction(ui.actionResetCamera, pqCameraReaction::RESET_CAMERA);
   new pqCameraReaction(ui.actionZoomToData, pqCameraReaction::ZOOM_TO_DATA);
+  new pqCameraReaction(ui.actionResetCameraClosest, pqCameraReaction::RESET_CAMERA_CLOSEST);
+  new pqCameraReaction(ui.actionZoomClosestToData, pqCameraReaction::ZOOM_CLOSEST_TO_DATA);
   new pqCameraReaction(ui.actionPositiveX, pqCameraReaction::RESET_POSITIVE_X);
   new pqCameraReaction(ui.actionNegativeX, pqCameraReaction::RESET_NEGATIVE_X);
   new pqCameraReaction(ui.actionPositiveY, pqCameraReaction::RESET_POSITIVE_Y);
@@ -58,6 +60,9 @@ void pqCameraToolbar::constructor()
   this->ZoomToDataAction = ui.actionZoomToData;
   this->ZoomToDataAction->setEnabled(pqActiveObjects::instance().activeSource() != 0);
 
+  this->ZoomClosestToDataAction = ui.actionZoomClosestToData;
+  this->ZoomClosestToDataAction->setEnabled(pqActiveObjects::instance().activeSource() != 0);
+
   QObject::connect(
     &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), this, SLOT(updateEnabledState()));
   QObject::connect(&pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)), this,
@@ -70,4 +75,5 @@ void pqCameraToolbar::updateEnabledState()
   pqView* view = pqActiveObjects::instance().activeView();
   pqPipelineSource* source = pqActiveObjects::instance().activeSource();
   this->ZoomToDataAction->setEnabled(source && view);
+  this->ZoomClosestToDataAction->setEnabled(source && view);
 }

@@ -86,7 +86,7 @@ public:
   /**
   * Resets the zoom level to 100%.
   */
-  void resetDisplay() override;
+  void resetDisplay(bool closest = false) override;
 
 protected Q_SLOTS:
   //@{
