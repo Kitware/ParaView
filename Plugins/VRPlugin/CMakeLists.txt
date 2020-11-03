@@ -8,6 +8,8 @@ mark_as_advanced(PARAVIEW_PLUGIN_VRPlugin_USE_VRPN)
 option(PARAVIEW_PLUGIN_VRPlugin_USE_VRUI "Build VRPlugin with VRUI support" OFF)
 mark_as_advanced(PARAVIEW_PLUGIN_VRPlugin_USE_VRUI)
 
+find_package(Qt5 REQUIRED COMPONENTS Network)
+
 # TODO: Should something be done with the files in samples/?
 
 configure_file(
