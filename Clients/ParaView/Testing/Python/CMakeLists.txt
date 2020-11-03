@@ -91,6 +91,7 @@ paraview_add_test_python(
   NO_VALID NO_RT
   ExportCSV.py
   LoadStateWithOptions.py
+  LoadStateWithDataSets.py
   Plot3DReader.py
   SaveDataWithArraySelection.py
   ReadTimeArray.py

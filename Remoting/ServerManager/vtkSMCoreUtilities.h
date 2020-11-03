@@ -54,6 +54,10 @@ public:
    * Sanitize a label/name to be remove spaces, delimiters etc.
    */
   static std::string SanitizeName(const char*);
+  static std::string SanitizeName(const std::string& name)
+  {
+    return vtkSMCoreUtilities::SanitizeName(name.c_str());
+  }
 
   //@{
   /**

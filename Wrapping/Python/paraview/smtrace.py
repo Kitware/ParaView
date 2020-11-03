@@ -76,6 +76,15 @@ if sys.version_info >= (3,):
 def _get_skip_rendering():
     return sm.vtkSMTrace.GetActiveTracer().GetSkipRenderingComponents()
 
+def _pretty_print(object, indent=4, width=80, prefix=""):
+    from pprint import pformat
+    offset = len(prefix)
+    txt = pformat(object, indent=indent, width=(width - offset))
+
+    # now lets indent all of the lines based on prefix length
+    spaces = "\n" + " " * offset
+    return prefix + spaces.join(txt.split("\n"))
+
 class TraceOutput:
   """Internal class used to collect the trace output. Everytime anything is pushed into
   this using the append API, we ensure that the trace is updated. Trace
@@ -1346,18 +1355,51 @@ class SaveAnimationExtracts(TraceItem):
 class LoadState(TraceItem):
     def __init__(self, filename, options):
         TraceItem.__init__(self)
+        self._filename = filename
+        self._options = options
+
+    def finalize(self):
+        import re
+
+        filename = self._filename
+        options = self._options
 
         options = sm._getPyProxy(options)
-        optionsAccessor = ProxyAccessor("temporaryOptions", options)
-
         trace = TraceOutput()
-        trace.append("# load state")
-        trace.append(\
-            optionsAccessor.trace_ctor("LoadState", ExporterProxyFilter(),
-              ctor_args="'%s'" % filename,
-              skip_assignment=True))
-        optionsAccessor.finalize() # so that it will get deleted.
-        del optionsAccessor
+        mode = options.SMProxy.GetProperty("LoadStateDataFileOptions").GetElement(0)
+        if mode == options.SMProxy.USE_FILES_FROM_STATE:
+            trace.append("# load state")
+            trace.append("LoadState('%s')" % filename)
+        elif mode == options.SMProxy.USE_DATA_DIRECTORY:
+            trace.append("# load state using data from chosen directory")
+            trace.append(\
+                    ["LoadState('%s'," % filename,
+                     "    data_directory='%s'," % options.DataDirectory,
+                     "    restrict_to_data_directory=%s)",
+                        True if options.OnlyUseFilesInDataDirectory else False])
+        elif mode == options.SMProxy.CHOOSE_FILES_EXPLICITLY:
+            iter = sm.PropertyIterator(options)
+            params = {}
+            for smprop in iter:
+                pname = iter.GetKey()
+                m = re.match(r"(\d+)\.(.+)", pname)
+                if m and options.IsPropertyModified(int(m.group(1)), m.group(2)):
+                    sid = m.group(1)
+                    readername = options.GetReaderName(int(sid))
+                    d = params.get(sid, {'name': readername, 'id' : sid})
+                    if smprop.GetNumberOfElements() == 1:
+                        d[m.group(2)] = smprop.GetElement(0)
+                    else:
+                        d[m.group(2)] = [smprop.GetElement(x) for x in range(smprop.GetNumberOfElements())]
+                    params[sid] = d
+            if params:
+                trace.append("# load state using specified data files")
+                trace.append("LoadState('%s'," % filename)
+                trace.append(_pretty_print(list(params.values()), prefix="    filenames=") + ")")
+            else:
+                # this happens when user didn't modify any paths.
+                trace.append("# load state")
+                trace.append("LoadState('%s')" % filename)
         del options
         Trace.Output.append_separated(trace.raw_data())
 

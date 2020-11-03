@@ -16,13 +16,16 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkFileSequenceParser.h"
+#include "vtkLogger.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVSession.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtkSMCoreUtilities.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMFileListDomain.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
@@ -44,124 +47,361 @@ using namespace vtksys;
 //---------------------------------------------------------------------------
 class vtkSMLoadStateOptionsProxy::vtkInternals
 {
+  vtkSmartPointer<vtkPVXMLElement> Hints;
+
 public:
   struct PropertyInfo
   {
+  private:
+    std::vector<std::string> OriginalFilePaths;
+
+  public:
     pugi::xml_node XMLElement;
     std::vector<std::string> FilePaths;
-    bool Modified;
-    PropertyInfo()
-      : Modified(false)
+    bool UpdateProxyName = false;
+
+    std::string GetPropertyXMLName() const { return this->XMLElement.attribute("name").value(); }
+
+    bool IsModified() const { return this->FilePaths != this->OriginalFilePaths; }
+    // Populate FilePaths using current XMLElement values.
+    void PopulateFilePaths()
     {
+      this->FilePaths.clear();
+      for (auto child : this->XMLElement.children("Element"))
+      {
+        this->FilePaths.push_back(child.attribute("value").value());
+      }
+      this->OriginalFilePaths = this->FilePaths;
+    }
+
+    void Update()
+    {
+      if (!this->IsModified())
+      {
+        return;
+      }
+      this->XMLElement.remove_attribute("number_of_elements");
+      this->XMLElement.append_attribute("number_of_elements") =
+        static_cast<int>(this->FilePaths.size());
+      while (this->XMLElement.remove_child("Element"))
+      {
+      }
+      int index = 0;
+      for (const auto& fname : this->FilePaths)
+      {
+        auto child = this->XMLElement.append_child("Element");
+        child.append_attribute("index") = index++;
+        child.append_attribute("value") = fname.c_str();
+      }
+    }
+
+    std::string GetSequenceName() const
+    {
+      vtkNew<vtkFileSequenceParser> sequenceParser;
+      if (auto element = this->XMLElement.child("Element"))
+      {
+        auto name = vtksys::SystemTools::GetFilenameName(element.attribute("value").value());
+        if (sequenceParser->ParseFileSequence(name.c_str()))
+        {
+          return sequenceParser->GetSequenceName();
+        }
+        return name;
+      }
+      return std::string();
+      ;
     }
   };
-  typedef std::map<int, std::map<std::string, PropertyInfo> > PropertiesMapType;
-  PropertiesMapType PropertiesMap;
-  std::map<int, pugi::xml_node> CollectionsMap;
+
+  // A map of { id : { property-name: PropertyInfo } }.
+  std::map<int, std::map<std::string, PropertyInfo> > PropertiesMap;
+
+  // A map that helps us identify the property (id, propertyname) given its
+  // exposed name.
+  std::map<std::string, std::pair<int, std::string> > ExposedPropertyNameMap;
+
+  // A map of proxy names used and their count: this is used to ensure each
+  // proxy gets a different names when coming up with exposed names for its
+  // properties to avoid issues with state files that have same registration
+  // name for multiple readers.
+  std::map<std::string, int> ProxyNamesUsed;
+
+  // The XML Document.
   pugi::xml_document StateXML;
 
-  void ProcessStateFile(pugi::xml_node node)
+  std::string GetExposedPropertyName(int id, const std::string& pname) const
   {
-    pugi::xpath_node_set proxies =
-      node.select_nodes("//ServerManagerState/Proxy[@group and @type]");
-    for (auto iter = proxies.begin(); iter != proxies.end(); ++iter)
+    for (auto pair : this->ExposedPropertyNameMap)
     {
-      this->ProcessProxy(iter->node());
+      const auto& tuple = pair.second;
+      if (tuple.first == id &&
+        (tuple.second == pname || tuple.second == vtkSMCoreUtilities::SanitizeName(pname)))
+      {
+        return pair.first;
+      }
     }
-    pugi::xpath_node_set collections =
-      node.select_nodes("//ServerManagerState/ProxyCollection[@name='sources']");
-    for (auto iter = collections.begin(); iter != collections.end(); ++iter)
+    return std::string();
+  }
+
+  void Process(vtkSMLoadStateOptionsProxy* self)
+  {
+    auto pxm = self->GetSessionProxyManager();
+    auto xpath_smstate = this->StateXML.select_node("//ServerManagerState");
+
+    this->PropertiesMap.clear();
+    this->ExposedPropertyNameMap.clear();
+    this->ProxyNamesUsed.clear();
+
+    // iterate over "Proxy" elements and find proxies/properties that have
+    // file-list domains.
+    // Let's build the `PropertiesMap` with information about that.
+    for (auto proxy : xpath_smstate.node().children("Proxy"))
     {
-      this->ProcessProxyCollection(iter->node());
+      if (strcmp(proxy.attribute("group").value(), "sources") != 0)
+      {
+        continue; // for now, skip non-source proxies.
+                  // I am not convinced this is correct, since we can have
+                  // textures, materials etc. but this is what we did
+                  // conventionally, so keep that intact for now.
+      }
+
+      auto prototype =
+        pxm->GetPrototypeProxy(proxy.attribute("group").value(), proxy.attribute("type").value());
+      if (!prototype)
+      {
+        vtkLogF(TRACE, "failed to find prototype for proxy (%s, %s); skipping",
+          proxy.attribute("group").value(), proxy.attribute("type").value());
+        continue;
+      }
+
+      auto properties = vtkSMCoreUtilities::GetFileNameProperties(prototype);
+      if (properties.size() == 0)
+      {
+        continue;
+      }
+
+      // `proxyname` is the registration name used for the proxy in the state.
+      // note, multiple proxies can have the same registration name.
+      const auto proxyname = this->GetProxyRegistrationName(proxy);
+
+      std::set<std::string> pset(properties.begin(), properties.end());
+      for (auto property : proxy.children("Property"))
+      {
+        if (pset.find(property.attribute("name").value()) != pset.end())
+        {
+          PropertyInfo info;
+          info.XMLElement = property;
+          info.PopulateFilePaths();
+
+          // if the proxy's registration name is based on the value of this property,
+          // we flag it, so we can change it when it's modified.
+          info.UpdateProxyName = (info.GetSequenceName() == proxyname);
+          const auto pname = property.attribute("name").value();
+          this->PropertiesMap[proxy.attribute("id").as_int()][pname] = info;
+        }
+      }
+
+      // Let's expose properties on `self` for the file properties on the reader
+      // from the state.
+      this->AddProperties(self, proxy, properties);
     }
   }
 
-  void ProcessProxy(pugi::xml_node node)
+  void UpdateStateXML()
   {
-    pugi::xml_attribute group = node.attribute("group");
-    pugi::xml_attribute type = node.attribute("type");
-
-    if (group.empty() || type.empty())
+    for (auto& pair1 : this->PropertiesMap)
     {
-      vtkGenericWarningMacro("Possibly invalid state file.");
-      return;
-    }
-
-    // Skip the filename domains from non-sources groups
-    if (strcmp(group.value(), "sources") != 0)
-    {
-      return;
-    }
-
-    vtkSMProxy* prototype =
-      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()->GetPrototypeProxy(
-        group.value(), type.value());
-    if (!prototype)
-    {
-      return;
-    }
-
-    std::set<std::string> filenameProperties = this->LocateFileNameProperties(prototype);
-    if (filenameProperties.empty())
-    {
-      return;
-    }
-
-    int proxyId = node.attribute("id").as_int();
-
-    pugi::xpath_variable_set vars;
-    vars.add("propertyname", pugi::xpath_type_string);
-    for (auto iter = filenameProperties.begin(); iter != filenameProperties.end(); ++iter)
-    {
-      vars.set("propertyname", iter->c_str());
-      pugi::xpath_node_set properties =
-        node.select_nodes("./Property[@name = string($propertyname)]", &vars);
-      for (auto pIter = properties.begin(); pIter != properties.end(); ++pIter)
+      const auto id = pair1.first;
+      for (auto& pair2 : pair1.second)
       {
-        PropertyInfo info;
-        info.XMLElement = pIter->node();
-        pugi::xpath_node_set elements = info.XMLElement.select_nodes("./Element");
-        for (auto eIter = elements.begin(); eIter != elements.end(); ++eIter)
+        auto& pinfo = pair2.second;
+        pinfo.Update();
+
+        // if this property's value was used to set the registration name for this proxy,
+        // let's update it to reflect the new files.
+        if (pinfo.UpdateProxyName)
         {
-          info.FilePaths.push_back(eIter->node().attribute("value").value());
+          this->SetProxyName(id, pinfo.GetSequenceName());
         }
-        this->PropertiesMap[proxyId][pIter->node().attribute("name").value()] = info;
       }
     }
   }
 
-  void ProcessProxyCollection(pugi::xml_node node)
+  int GetId(const std::string& pname) const
   {
-    pugi::xml_attribute name = node.attribute("name");
+    const auto query =
+      std::string("//ServerManagerState/ProxyCollection[@name='sources']/Item[@name=") + pname +
+      "]";
+    if (auto xpath_node = this->StateXML.select_node(query.c_str()))
+    {
+      return xpath_node.node().attribute("id").as_int();
+    }
+    return 0;
+  }
+
+  std::string GetProxyRegistrationName(int id) const
+  {
+    const auto query =
+      std::string("//ServerManagerState/ProxyCollection[@name='sources']/Item[@id=") +
+      std::to_string(id) + "]";
+    if (auto xpath_node = this->StateXML.select_node(query.c_str()))
+    {
+      return xpath_node.node().attribute("name").value();
+    }
+    return std::to_string(id);
+  }
+
+private:
+  void AddProperties(vtkSMLoadStateOptionsProxy* self, const pugi::xml_node& proxy,
+    const std::vector<std::string>& fproperties)
+  {
+    const std::string subproxyname{ proxy.attribute("id").value() };
+
+    auto pxm = self->GetSessionProxyManager();
+    auto prototype =
+      pxm->NewProxy(proxy.attribute("group").value(), proxy.attribute("type").value());
+    prototype->PrototypeOn();
+    prototype->SetLocation(0);
+    prototype->LoadXMLState(vtkInternals::ConvertXML(proxy), nullptr);
+
+    self->AddSubProxy(subproxyname.c_str(), prototype);
+    prototype->FastDelete();
+
+    // this is proxy's registration name; multiple proxies can have same
+    // registration name.
+    const auto proxyname = this->GetProxyRegistrationName(proxy);
+
+    // Let's come up with a unique name for properties on the reader-proxy to use for
+    // exposing them on `self`.
+    const auto baseName = this->GetUniqueProxyName(proxyname);
+
+    const int id = proxy.attribute("id").as_int();
+
+    std::ostringstream str;
+    str << proxyname.c_str() << " ("
+        /* << proxy.attribute("group").value() << ", "*/
+        << proxy.attribute("type").value() << ") (id=" << id << ")";
+    vtkNew<vtkSMPropertyGroup> group;
+    group->SetXMLLabel(str.str().c_str());
+    for (auto& pname : fproperties)
+    {
+      auto prop = prototype->GetProperty(pname.c_str());
+      prop->SetPanelVisibility("default");
+      prop->SetHints(nullptr); // remove any hints
+
+      const auto exposedName = vtkSMCoreUtilities::SanitizeName((baseName + pname).c_str());
+
+      self->ExposeSubProxyProperty(subproxyname.c_str(), pname.c_str(), exposedName.c_str());
+      group->AddProperty(exposedName.c_str(), prop);
+
+      this->ExposedPropertyNameMap[exposedName] = std::make_pair(id, pname);
+    }
+
+    // add hints for visibility stuff for the group.
+    group->SetHints(this->GetPropertyGroupHints());
+    self->AppendPropertyGroup(group);
+  }
+
+  std::string GetProxyRegistrationName(const pugi::xml_node& proxy) const
+  {
+    const auto query =
+      std::string("//ServerManagerState/ProxyCollection[@name='sources']/Item[@id=") +
+      proxy.attribute("id").value() + "]";
+    if (auto xpath_node = this->StateXML.select_node(query.c_str()))
+    {
+      return xpath_node.node().attribute("name").value();
+    }
+    return proxy.attribute("id").value();
+  }
+
+  void SetProxyName(int id, const std::string& name)
+  {
     if (name.empty())
     {
-      vtkGenericWarningMacro(
-        "Possibly invalid state file. Proxy Collection doesn't have a name attribute.");
       return;
     }
-
-    pugi::xpath_node_set items = node.select_nodes("./Item");
-    for (auto iter = items.begin(); iter != items.end(); ++iter)
+    const auto query =
+      std::string("//ServerManagerState/ProxyCollection[@name='sources']/Item[@id=") +
+      std::to_string(id) + "]";
+    if (auto xpath_node = this->StateXML.select_node(query.c_str()))
     {
-      int itemId = iter->node().attribute("id").as_int();
-      this->CollectionsMap[itemId] = iter->node();
+      xpath_node.node().attribute("name") = name.c_str();
     }
   }
 
-  std::set<std::string> LocateFileNameProperties(vtkSMProxy* proxy)
+  vtkPVXMLElement* GetPropertyGroupHints()
   {
-    std::set<std::string> fileNameProperties;
-    vtkSMPropertyIterator* piter = proxy->NewPropertyIterator();
-    for (piter->Begin(); !piter->IsAtEnd(); piter->Next())
+    if (this->Hints == nullptr)
     {
-      vtkSMProperty* property = piter->GetProperty();
-      if (property->FindDomain<vtkSMFileListDomain>() != nullptr)
-      {
-        fileNameProperties.insert(piter->GetKey());
-      }
+      //  <Hints>
+      //    <PropertyWidgetDecorator type="GenericDecorator"
+      //      mode="visibility"
+      //      property="LoadStateDataFileOptions"
+      //      value="2" />
+      //  </Hints>
+      this->Hints = vtkSmartPointer<vtkPVXMLElement>::New();
+      this->Hints->SetName("Hints");
+
+      vtkNew<vtkPVXMLElement> pwd;
+      pwd->SetName("PropertyWidgetDecorator");
+      pwd->SetAttribute("type", "GenericDecorator");
+      pwd->SetAttribute("mode", "visibility");
+      pwd->SetAttribute("property", "LoadStateDataFileOptions");
+      pwd->SetAttribute("value", "2");
+      this->Hints->AddNestedElement(pwd);
     }
-    piter->Delete();
-    return fileNameProperties;
+    return this->Hints;
+  }
+
+  std::string GetUniqueProxyName(const std::string& proxyname)
+  {
+    // note: this logic is based on what old code was doing to avoid having
+    // issues loading old Python scripts.
+
+    // Let's come up with a unique name for properties on the reader-proxy to use for
+    // exposing them on `self`.
+    std::string baseName = proxyname;
+    // Remove all '.'s in the name to avoid possible name collisions with the appended index
+    baseName.erase(std::remove(baseName.begin(), baseName.end(), '.'), baseName.end());
+    if (this->ProxyNamesUsed.find(baseName) != this->ProxyNamesUsed.end())
+    {
+      baseName.append(std::to_string(this->ProxyNamesUsed[baseName]++));
+    }
+    else
+    {
+      this->ProxyNamesUsed[baseName] = 1;
+    }
+    return baseName;
+  }
+
+public:
+  static vtkSmartPointer<vtkPVXMLElement> ConvertXML(const pugi::xml_node& proxy)
+  {
+    std::ostringstream stream;
+    proxy.print(stream);
+    vtkNew<vtkPVXMLParser> parser;
+    parser->Parse(stream.str().c_str());
+    return parser->GetRootElement();
+  }
+
+  static std::string HandleSubstitution(const std::string& path)
+  {
+    std::vector<std::string> pathComponents;
+    vtksys::SystemTools::SplitPath(path, pathComponents);
+    std::string variablePath;
+    if (vtksys::SystemTools::GetEnv(pathComponents[1].erase(0, 1), variablePath))
+    {
+      pathComponents.erase(pathComponents.begin(), pathComponents.begin() + 2);
+      std::vector<std::string> variablePathComponents;
+      vtksys::SystemTools::SplitPath(variablePath, variablePathComponents);
+      pathComponents.insert(
+        pathComponents.begin(), variablePathComponents.begin(), variablePathComponents.end());
+      return vtksys::SystemTools::JoinPath(pathComponents);
+    }
+    else
+    {
+      vtkLogF(WARNING, "Environment variable '%s' is not set.", pathComponents[1].c_str());
+    }
+    return path;
   }
 };
 
@@ -237,7 +477,6 @@ void ReplaceEnvironmentVariables(std::string& contents)
 bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
 {
   this->SetStateFileName(statefilename);
-
   std::ifstream xmlfile(statefilename);
   if (!xmlfile.is_open())
   {
@@ -248,8 +487,8 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
   auto contents = ::GetContents(xmlfile);
   ::ReplaceEnvironmentVariables(contents);
 
-  pugi::xml_parse_result result = this->Internals->StateXML.load_string(contents.c_str());
-
+  auto& internals = (*this->Internals);
+  auto result = internals.StateXML.load_string(contents.c_str());
   if (!result)
   {
     vtkErrorMacro(
@@ -257,85 +496,7 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
     return false;
   }
 
-  this->Internals->ProcessStateFile(this->Internals->StateXML);
-
-  vtkSMSessionProxyManager* pxm =
-    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-
-  std::map<std::string, int> namesUsed;
-
-  // Setup proxies for for explicit file change dialog
-  for (auto idIter = this->Internals->PropertiesMap.begin();
-       idIter != this->Internals->PropertiesMap.end(); idIter++)
-  {
-    pugi::xml_node proxyXML = idIter->second.begin()->second.XMLElement.parent();
-    vtkSmartPointer<vtkSMProxy> newReaderProxy;
-    newReaderProxy.TakeReference(
-      pxm->NewProxy(proxyXML.attribute("group").value(), proxyXML.attribute("type").value()));
-    newReaderProxy->PrototypeOn();
-    newReaderProxy->SetLocation(0);
-
-    // Property group to group properties by source
-    pugi::xml_document propertyGroup;
-    pugi::xml_node propertyGroupElement = propertyGroup.append_child("PropertyGroup");
-    propertyGroupElement.append_attribute("label").set_value(proxyXML.attribute("type").value());
-    propertyGroupElement.append_attribute("panel_widget").set_value("LoadStateOptionsDialog");
-
-    vtkNew<vtkPVXMLParser> XMLParser;
-    newReaderProxy->LoadXMLState(ConvertXML(XMLParser.Get(), proxyXML), nullptr);
-    std::string newProxyName = std::to_string(idIter->first);
-    this->AddSubProxy(newProxyName.c_str(), newReaderProxy.GetPointer());
-
-    std::string baseName =
-      this->Internals->CollectionsMap[idIter->first].attribute("name").as_string();
-
-    // Remove all '.'s in the name to avoid possible name collisions with the appended index
-    // If baseName is not unique for each proxy then the proxies are linked and their properties
-    // cannot
-    // be set separately if the property names are the same.
-    baseName.erase(std::remove(baseName.begin(), baseName.end(), '.'), baseName.end());
-
-    auto nameUseCount = namesUsed.find(baseName);
-    if (nameUseCount != namesUsed.end())
-    {
-      baseName.append(".").append(std::to_string(nameUseCount->second));
-      ++nameUseCount->second;
-    }
-    else
-    {
-      namesUsed[baseName] = 1;
-    }
-
-    for (auto pIter = idIter->second.begin(); pIter != idIter->second.end(); pIter++)
-    {
-      vtkSmartPointer<vtkSMProperty> property = newReaderProxy->GetProperty(pIter->first.c_str());
-      property->SetPanelVisibility("default");
-
-      // Hints to insure explicit file property only show up for that mode
-      pugi::xml_document hints;
-      pugi::xml_node widgetDecorator =
-        hints.append_child("Hints").append_child("PropertyWidgetDecorator");
-      widgetDecorator.append_attribute("type").set_value("GenericDecorator");
-      widgetDecorator.append_attribute("mode").set_value("visibility");
-      widgetDecorator.append_attribute("property").set_value("LoadStateDataFileOptions");
-      widgetDecorator.append_attribute("value").set_value("2");
-
-      property->SetHints(ConvertXML(XMLParser.Get(), hints));
-
-      pugi::xml_node propertyXML = pIter->second.XMLElement;
-      std::string exposedName = baseName;
-
-      exposedName.append(".").append(propertyXML.attribute("name").value());
-      this->ExposeSubProxyProperty(newProxyName.c_str(), propertyXML.attribute("name").value(),
-        exposedName.c_str(), 1 /*override*/);
-      propertyGroupElement.append_child("Property")
-        .append_attribute("name")
-        .set_value(exposedName.c_str());
-    }
-
-    this->NewPropertyGroup(ConvertXML(XMLParser.Get(), propertyGroup));
-  }
-
+  internals.Process(this);
   return true;
 }
 
@@ -417,152 +578,128 @@ bool vtkSMLoadStateOptionsProxy::Load()
   this->DataFileOptions = vtkSMPropertyHelper(this, "LoadStateDataFileOptions").GetAsInt();
   this->OnlyUseFilesInDataDirectory =
     (vtkSMPropertyHelper(this, "OnlyUseFilesInDataDirectory").GetAsInt() == 1);
+
+  auto& internals = (*this->Internals);
   switch (this->DataFileOptions)
   {
     case USE_FILES_FROM_STATE:
-    {
       // Nothing to do
       break;
-    }
+
     case USE_DATA_DIRECTORY:
-    {
-      for (auto idIter = this->Internals->PropertiesMap.begin();
-           idIter != this->Internals->PropertiesMap.end(); idIter++)
+      for (auto& pair : internals.PropertiesMap)
       {
-        for (auto pIter = idIter->second.begin(); pIter != idIter->second.end(); pIter++)
+        for (auto& pair2 : pair.second)
         {
-          vtkInternals::PropertyInfo& info = pIter->second;
-
-          if (pIter->first.find("FilePattern") == std::string::npos)
+          vtkInternals::PropertyInfo& info = pair2.second;
+          if (pair2.first.find("FilePattern") == std::string::npos)
           {
-            bool path = pIter->first.compare("FilePrefix") == 0;
-            if (this->LocateFilesInDirectory(
-                  info.FilePaths, path, this->OnlyUseFilesInDataDirectory))
-            {
-              info.Modified = true;
-            }
+            bool path = pair2.first.compare("FilePrefix") == 0;
+            this->LocateFilesInDirectory(info.FilePaths, path, this->OnlyUseFilesInDataDirectory);
           }
         }
       }
-
-      for (auto idIter = this->Internals->PropertiesMap.begin();
-           idIter != this->Internals->PropertiesMap.end(); idIter++)
-      {
-        std::string primaryFilename;
-        for (auto pIter = idIter->second.begin(); pIter != idIter->second.end(); pIter++)
-        {
-          vtkInternals::PropertyInfo& info = pIter->second;
-          if (!info.Modified)
-          {
-            continue;
-          }
-
-          for (auto fIter = info.FilePaths.begin(); fIter != info.FilePaths.end(); ++fIter)
-          {
-            std::string idx = std::to_string(std::distance(info.FilePaths.begin(), fIter));
-            info.XMLElement.find_child_by_attribute("Element", "index", idx.c_str())
-              .attribute("value")
-              .set_value(fIter->c_str());
-            if (primaryFilename.empty() && fIter->compare(0, 3, "XML") != 0)
-            {
-              primaryFilename = *fIter;
-            }
-          }
-
-          // Also fix up sources proxy collection. Get file sequence basename if needed.
-          if (!primaryFilename.empty() && info.FilePaths.size() > 1)
-          {
-            std::string filename = SystemTools::GetFilenameName(primaryFilename);
-            vtkNew<vtkFileSequenceParser> sequenceParser;
-            if (sequenceParser->ParseFileSequence(filename.c_str()))
-            {
-              filename = sequenceParser->GetSequenceName();
-            }
-            this->Internals->CollectionsMap[idIter->first].attribute("name").set_value(
-              filename.c_str());
-          }
-        }
-      }
-
       break;
-    }
+
     case CHOOSE_FILES_EXPLICITLY:
-    {
-      for (auto idIter = this->Internals->PropertiesMap.begin();
-           idIter != this->Internals->PropertiesMap.end(); idIter++)
+      for (auto& pair1 : internals.PropertiesMap)
       {
-        std::string primaryFilename;
-        vtkSMProxy* subProxy = this->GetSubProxy(std::to_string(idIter->first).c_str());
-        for (auto pIter = idIter->second.begin(); pIter != idIter->second.end(); pIter++)
+        vtkSMProxy* subProxy = this->GetSubProxy(std::to_string(pair1.first).c_str());
+        for (auto& pair2 : pair1.second)
         {
-          std::string propertyValue =
-            vtkSMPropertyHelper(subProxy, pIter->first.c_str()).GetAsString();
-          vtkInternals::PropertyInfo& info = pIter->second;
+          vtkInternals::PropertyInfo& info = pair2.second;
+          vtkSMPropertyHelper helper(subProxy, info.GetPropertyXMLName().c_str());
 
           // First check if environment variable shows up in user specified path
+          std::string propertyValue = helper.GetAsString();
           if (propertyValue.compare(0, 1, "$") == 0)
           {
-            std::vector<std::string> pathComponents;
-            SystemTools::SplitPath(propertyValue, pathComponents);
-            std::string variablePath;
-            if (SystemTools::GetEnv(pathComponents[1].erase(0, 1), variablePath))
-            {
-              pathComponents.erase(pathComponents.begin(), pathComponents.begin() + 2);
-              std::vector<std::string> variablePathComponents;
-              SystemTools::SplitPath(variablePath, variablePathComponents);
-              pathComponents.insert(pathComponents.begin(), variablePathComponents.begin(),
-                variablePathComponents.end());
-              propertyValue = SystemTools::JoinPath(pathComponents);
-            }
-            else
-            {
-              vtkWarningMacro("Environment variable " << pathComponents[1] << " is not set.");
-              continue;
-            }
+            info.FilePaths = { vtkInternals::HandleSubstitution(propertyValue) };
           }
-
-          // Clear out existing file names
-          while (info.XMLElement.remove_child("Element"))
+          else
           {
-          }
-
-          // Add the new file names
-          vtkSMPropertyHelper filenamePropHelper(subProxy, pIter->first.c_str());
-          for (unsigned int i = 0; i < filenamePropHelper.GetNumberOfElements(); ++i)
-          {
-            // Build up file name list from the current property value
-            pugi::xml_node newNode = info.XMLElement.append_child("Element");
-            newNode.append_attribute("index").set_value(std::to_string(i).c_str());
-            std::string filename = filenamePropHelper.GetAsString(i);
-            newNode.append_attribute("value").set_value(filename.c_str());
-            if (primaryFilename.empty())
+            info.FilePaths.clear();
+            for (unsigned int cc = 0, max = helper.GetNumberOfElements(); cc < max; ++cc)
             {
-              primaryFilename = filename;
+              info.FilePaths.push_back(helper.GetAsString(cc));
             }
           }
         }
-
-        // Also fix up sources proxy collection
-        std::string filename = SystemTools::GetFilenameName(primaryFilename);
-        vtkNew<vtkFileSequenceParser> sequenceParser;
-        if (sequenceParser->ParseFileSequence(filename.c_str()))
-        {
-          filename = sequenceParser->GetSequenceName();
-        }
-
-        this->Internals->CollectionsMap[idIter->first].attribute("name").set_value(
-          filename.c_str());
       }
       break;
+  }
+
+  // update State XML based on values from info.FilePaths for modified items.
+  internals.UpdateStateXML();
+
+  auto pxm = this->GetSessionProxyManager();
+  pxm->LoadXMLState(vtkInternals::ConvertXML(internals.StateXML));
+  return true;
+}
+
+//----------------------------------------------------------------------------
+vtkSMProperty* vtkSMLoadStateOptionsProxy::FindProperty(const char* name, int id, const char* pname)
+{
+  if (pname == nullptr)
+  {
+    return nullptr;
+  }
+
+  const auto& internals = *this->Internals;
+  if (id != 0)
+  {
+    const auto realname = internals.GetExposedPropertyName(id, pname);
+    if (auto prop = this->GetProperty(realname.c_str()))
+    {
+      return prop;
     }
   }
 
-  vtkSMSessionProxyManager* pxm =
-    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  vtkNew<vtkPVXMLParser> XMLParser;
-  pxm->LoadXMLState(ConvertXML(XMLParser.Get(), this->Internals->StateXML));
+  if (name != nullptr)
+  {
+    return this->FindProperty(nullptr, internals.GetId(name), pname);
+  }
+  return nullptr;
+}
 
-  return true;
+//----------------------------------------------------------------------------
+vtkSMProperty* vtkSMLoadStateOptionsProxy::FindLegacyProperty(const char* sanitizedName)
+{
+  if (sanitizedName == nullptr)
+  {
+    return nullptr;
+  }
+
+  auto& internals = (*this->Internals);
+  if (internals.ExposedPropertyNameMap.find(sanitizedName) !=
+    internals.ExposedPropertyNameMap.end())
+  {
+    return this->GetProperty(sanitizedName);
+  }
+  return nullptr;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMLoadStateOptionsProxy::GetReaderName(int id) const
+{
+  auto& internals = (*this->Internals);
+  return internals.GetProxyRegistrationName(id);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMLoadStateOptionsProxy::IsPropertyModified(int id, const char* pname)
+{
+  auto& internals = (*this->Internals);
+  auto iter = internals.PropertiesMap.find(id);
+  if (iter != internals.PropertiesMap.end())
+  {
+    auto iter2 = iter->second.find(vtkSMCoreUtilities::SanitizeName(pname));
+    if (iter2 != iter->second.end())
+    {
+      return iter2->second.IsModified();
+    }
+  }
+  return false;
 }
 
 //----------------------------------------------------------------------------

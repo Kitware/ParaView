@@ -4,13 +4,13 @@
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileLoadServerState" />
   <pqevent object="pqClientMainWindow/FileLoadServerStateDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/LoadStateDialog.pvsm" />
   <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/LoadStateDataFileOptions/ComboBox" command="activated" arguments="Choose File Names" />
-  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/tubeexo.FileName/FileChooser/FileButton" command="activate" arguments="" />
-  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/tubeexo.FileName/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/tube.exo" />
-  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/tubeexo.FilePrefix/FileChooser/FileButton" command="activate" arguments="" />
-  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/tubeexo.FilePrefix/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/tube.exo" />
-  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/tubeexo.XMLFileName/FileChooser/FileButton" command="activate" arguments="" />
-  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/tubeexo.XMLFileName/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/artifact.dta" />
-  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/blowvtk.FileNames/FileChooser/FileButton" command="activate" arguments="" />
-  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/blowvtk.FileNames/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/blow.vtk" />
+  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/tubeexoFileName/FileChooser/FileButton" command="activate" arguments="" />
+  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/tubeexoFileName/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/tube.exo" />
+  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/tubeexoFilePrefix/FileChooser/FileButton" command="activate" arguments="" />
+  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/tubeexoFilePrefix/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/tube.exo" />
+  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/tubeexoXMLFileName/FileChooser/FileButton" command="activate" arguments="" />
+  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/tubeexoXMLFileName/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/artifact.dta" />
+  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/blowvtkFileNames/FileChooser/FileButton" command="activate" arguments="" />
+  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/blowvtkFileNames/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/blow.vtk" />
   <pqevent object="LoadStateOptionsDialog/widget/OKButton" command="activate" arguments="" />
 </pqevents>
