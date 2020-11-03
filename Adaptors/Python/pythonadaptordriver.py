@@ -6,7 +6,7 @@
 #export LD_LIBRARY_PATH=<ParaView build directory>/bin:<Qt library directory>
 
 import mpi  # available through pyMPI
-print 'process ', mpi.rank, ' is running!'
+print('process ', mpi.rank, ' is running!')
 
 # set up for running paraview server in parallel
 import paraview
