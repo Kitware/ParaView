@@ -113,6 +113,12 @@ int pqTabbedMultiViewWidget::pqTabWidget::addAsTab(
   pqMultiViewWidget* wdg, pqTabbedMultiViewWidget* self)
 {
   int tab_count = this->count();
+  if (this->ReadOnly)
+  {
+    // Add one for the missing '+' button which is not present in ReadOnly mode.
+    // The logic later on assumes an additional tab.
+    tab_count++;
+  }
   vtkSMViewLayoutProxy* proxy = wdg->layoutManager();
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   pqProxy* item = smmodel->findItem<pqProxy*>(proxy);
