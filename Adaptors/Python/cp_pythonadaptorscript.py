@@ -72,7 +72,7 @@ def GetProxiesToDelete():
 def CreateProducer(datadescription, gridname):
   "Creates a producer proxy for the grid"
   if not datadescription.GetInputDescriptionByName(gridname):
-    raise RuntimeError, "Simulation input name '%s' does not exist" % gridname
+    raise RuntimeError("Simulation input name '%s' does not exist" % gridname)
   grid = datadescription.GetInputDescriptionByName(gridname).GetGrid()
   producer = TrivialProducer()
   producer.GetClientSideObject().SetOutput(grid)
