@@ -58,6 +58,14 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
     "^pvcs\\.SplitViewTrace$"
     "^pvcs-tile-display\\.LinkCameraFromView-1x1$"
 
+    # This test has some weird rendering artifacts. It looks like the Intel
+    # rendering bug, but our machines all use nVidia cards today.
+    "^paraviewPython-TestColorHistogram$"
+
+    # There are warnings about initialization order confusion, but there are
+    # then GL context errors. Not sure if these are related.
+    "^paraviewPython-TestCatalystClient$"
+
     # Not all machines have a new enough GPU to test IndeX (yet).
     "^pv\\.IndeXRepresentation$")
 endif ()
