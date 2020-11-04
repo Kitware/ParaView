@@ -470,6 +470,8 @@ void pqPythonShell::runScript()
         code.append(QString("__file__ = r'%1'\n").arg(filename));
         // Then append the file content
         code.append(file.readAll());
+        code.append("\n");
+        code.append("del __file__\n");
         this->executeScript(code.data());
       }
       else
