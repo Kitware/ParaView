@@ -179,7 +179,7 @@ public Q_SLOTS:
   * Forces a re-population of the menu. Any need to call this only after
   * addProxy() has been used to explicitly add entries.
   */
-  void populateMenu();
+  virtual void populateMenu();
 
 Q_SIGNALS:
   void triggered(const QString& group, const QString& name);
