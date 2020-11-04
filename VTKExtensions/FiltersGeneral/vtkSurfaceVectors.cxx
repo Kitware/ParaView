@@ -80,6 +80,7 @@ int vtkSurfaceVectors::RequestData(vtkInformation* vtkNotUsed(request),
 
   if (!inVectors || numPoints == 0)
   {
+    vtkErrorMacro("The input is empty");
     output->ShallowCopy(input);
     return 1;
   }
@@ -127,7 +128,14 @@ int vtkSurfaceVectors::RequestData(vtkInformation* vtkNotUsed(request),
 
         const vtkVector3d cross = v1.Cross(v2);
 
-        // We need to check for the orientation
+        // We check the current normal orientation against
+        // the computed one so far: if they have the same orientation
+        // (ie the scalar product is positive) we add it to normal
+        // otherwise we add its negated version.
+        //
+        // This ensures that two opposite normals don't cancel each other
+        // (for example (1, 0, 0) and (-1, 0, 0) gives the same general
+        // direction but the sum is zero).
         normal += cross.Dot(normal) > 0 ? cross : -cross;
       }
     }
