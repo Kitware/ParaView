@@ -85,6 +85,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <set>
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+#define QT_ENDL endl
+#else
+#define QT_ENDL Qt::endl
+#endif
+
 namespace
 {
 template <class T>
@@ -632,7 +638,7 @@ void pqSMAdaptor::setSelectionProperty(
 
   if (value.size() != 2)
   {
-    qCritical() << "Method expected a list of pairs. Incorrect API." << endl;
+    qCritical() << "Method expected a list of pairs. Incorrect API." << QT_ENDL;
     return;
   }
 
@@ -703,7 +709,7 @@ void pqSMAdaptor::setSelectionProperty(
   {
     if (value.size() != 2)
     {
-      qCritical() << "Method expected a list of pairs. Incorrect API." << endl;
+      qCritical() << "Method expected a list of pairs. Incorrect API." << QT_ENDL;
     }
     QString name = value[0].toString();
     int status = value[1].toInt();

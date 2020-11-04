@@ -6,6 +6,7 @@ include:
     # OS builds.
     - local: .gitlab/os-linux.yml
     - local: .gitlab/os-macos.yml
+    - local: .gitlab/os-windows.yml
 
 stages:
     - build
@@ -103,13 +104,62 @@ test:macos-python-qt:
     needs:
         - build:macos-python-qt
 
+# Windows
+
+build:windows-vs2019-kits-mpi-python-qt:
+    extends:
+        - .windows_vs2019_kits_mpi_python_qt
+        - .cmake_build_windows
+        - .windows_builder_tags
+        - .cmake_build_artifacts
+        - .run_manually
+
+test:windows-vs2019-kits-mpi-python-qt:
+    extends:
+        - .windows_vs2019_kits_mpi_python_qt
+        - .cmake_test_windows
+        - .windows_builder_tags
+        - .cmake_build_artifacts
+        - .run_automatically
+    dependencies:
+        - build:windows-vs2019-kits-mpi-python-qt
+    needs:
+        - build:windows-vs2019-kits-mpi-python-qt
+    timeout: 90 minutes
+    # There are some failing tests; in the interest of getting builds working,
+    # allow tests to fail (for now).
+    allow_failure: true
+
+build:windows-vs2019-qt:
+    extends:
+        - .windows_vs2019_qt
+        - .cmake_build_windows
+        - .windows_builder_tags
+        - .cmake_build_artifacts
+        - .run_manually
+
+test:windows-vs2019-qt:
+    extends:
+        - .windows_vs2019_qt
+        - .cmake_test_windows
+        - .windows_builder_tags
+        - .cmake_build_artifacts
+        - .run_automatically
+    dependencies:
+        - build:windows-vs2019-qt
+    needs:
+        - build:windows-vs2019-qt
+    # There are some failing tests; in the interest of getting builds working,
+    # allow tests to fail (for now).
+    allow_failure: true
+
 # Deployment
 
 ## Documentation
 
 build:documentation:
     extends:
-        - .centos7
+        - .fedora31
         - .doxygen_build_linux
         - .linux_builder_tags
         - .doxygen_log_artifacts

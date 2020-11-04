@@ -343,10 +343,19 @@ QList<pqView*> pqPipelineSource::getViews() const
 
   foreach (pqOutputPort* opPort, this->Internal->OutputPorts)
   {
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
     views.unite(QSet<pqView*>::fromList(opPort->getViews()));
+#else
+    auto const& port_views = opPort->getViews();
+    views.unite(QSet<pqView*>(port_views.begin(), port_views.end()));
+#endif
   }
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
   return QList<pqView*>::fromSet(views);
+#else
+  return QList<pqView*>(views.begin(), views.end());
+#endif
 }
 
 //-----------------------------------------------------------------------------

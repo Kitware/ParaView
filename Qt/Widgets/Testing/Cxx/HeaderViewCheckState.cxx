@@ -110,7 +110,7 @@ int HeaderViewCheckState(int argc, char* argv[])
   // click on checkbox in header and ensure all items get checked.
   QTestEventList events0;
   events0.addMouseClick(
-    Qt::LeftButton, Qt::NoModifier, QPoint(pqheader->sectionPosition(checkable_column) + 5, 5));
+    Qt::LeftButton, Qt::NoModifier, QPoint(pqheader->sectionPosition(checkable_column) + 8, 8));
   events0.addDelay(500);
   events0.simulate(pqheader->viewport());
 

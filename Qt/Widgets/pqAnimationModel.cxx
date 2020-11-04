@@ -361,7 +361,7 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF&)
   // draw the current time label
   QString timeLabString =
     QString::number(this->CurrentTime, this->TimeNotation.toLatin1(), this->TimePrecision);
-  double timeLabSize = metrics.width(timeLabString);
+  double timeLabSize = metrics.horizontalAdvance(timeLabString);
   double currentTimePos = this->positionFromTime(this->CurrentTime);
   double timeLabPos;
 
@@ -384,7 +384,7 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF&)
   // draw the other labels
   QString curLabString =
     QString::number(this->StartTime, this->TimeNotation.toLatin1(), this->TimePrecision);
-  double curLabSize = metrics.width(curLabString);
+  double curLabSize = metrics.horizontalAdvance(curLabString);
   QRectF curLabRect(labelRect.left(), labelRect.top(), curLabSize, rh);
 
   if (!curLabRect.intersects(timeLabRect))
@@ -396,7 +396,7 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF&)
   {
     double time = this->StartTime + (this->EndTime - this->StartTime) * (double)i / (double)num;
     curLabString = QString::number(time, this->TimeNotation.toLatin1(), this->TimePrecision);
-    curLabSize = metrics.width(curLabString);
+    curLabSize = metrics.horizontalAdvance(curLabString);
     double left = labelRect.left() + w * i - curLabSize / 2.0;
     curLabRect = QRectF(left, labelRect.top(), curLabSize, rh);
 
@@ -407,7 +407,7 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF&)
   }
 
   curLabString = QString::number(this->EndTime, this->TimeNotation.toLatin1(), this->TimePrecision);
-  curLabSize = metrics.width(curLabString);
+  curLabSize = metrics.horizontalAdvance(curLabString);
   curLabRect = QRectF(labelRect.right() - curLabSize, labelRect.top(), curLabSize, rh);
 
   if (!curLabRect.intersects(timeLabRect))

@@ -121,7 +121,7 @@ void vtkCTHSource::SetMaterialFieldName(int field_id, char* field_name, char* co
       char* end = strchr(comment, '!');
       std::string s(comment, end - comment);
       char n[13];
-      sprintf(n, " - %lu", i + 1);
+      sprintf(n, " - %zu", i + 1);
       s.append(n);
       MFieldNames[i][field_id] = s;
     }

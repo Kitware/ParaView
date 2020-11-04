@@ -87,9 +87,7 @@ pqSILWidget::pqSILWidget(const QString& activeCategory, QWidget* parentObject)
   // setup model
   this->ActiveModel = new pqProxySILModel(activeCategory, this);
   this->SortModel = new QSortFilterProxyModel(this);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
   this->SortModel->setRecursiveFilteringEnabled(true);
-#endif
   this->SortModel->setSourceModel(this->ActiveModel);
 }
 
@@ -162,21 +160,12 @@ void pqSILWidget::onModelReset()
     proxyModel->setSourceModel(this->Model);
 
     QSortFilterProxyModel* sortModel = new QSortFilterProxyModel(tree);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
     sortModel->setRecursiveFilteringEnabled(true);
-#endif
     sortModel->setSourceModel(proxyModel);
     tree->setModel(sortModel);
     tree->expandAll();
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
     new pqTreeViewSelectionHelper(tree);
-#else
-    // disable filtering for older Qt version where recursive filtering
-    // on a tree is not supported.
-    auto helper = new pqTreeViewSelectionHelper(tree);
-    helper->setFilterable(false);
-#endif
 
     this->TabWidget->addTab(tree, category);
   }

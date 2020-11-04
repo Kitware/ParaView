@@ -837,7 +837,7 @@ QVariant pqPipelineModel::data(const QModelIndex& idx, int role) const
       }
       break;
 
-    case Qt::TextColorRole:
+    case Qt::ForegroundRole:
     {
       if (idx.column() == 0 && server && server->getRemainingLifeTime() > -1 &&
         server->getRemainingLifeTime() <= 5)
