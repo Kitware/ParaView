@@ -3,6 +3,8 @@
 .doxygen_log_artifacts:
     artifacts:
         expire_in: 1 day
+        # Because build logs are in here, we should always upload artifacts.
+        when: always
         paths:
             - compile_output.log
             - doxygen_output.log
@@ -12,6 +14,8 @@
 .cmake_build_artifacts:
     artifacts:
         expire_in: 1d
+        # Because build logs are in here, we should always upload artifacts.
+        when: always
         paths:
             # Logs of the build
             - compile_output.log
@@ -20,6 +24,7 @@
             - build/bin/
             - build/lib/
             - build/VTK/Utilities/KWIML/vtkkwiml/test/kwiml_test
+            - build/VTK/Utilities/KWIML/vtkkwiml/test/kwiml_test.exe
 
             # Python packages go here
             - build/lib64/
@@ -64,6 +69,9 @@
 
             # CDash files.
             - build/DartConfiguration.tcl
+
+            # Virtual environment
+            - build/ci-venv/
 
 .cmake_test_artifacts:
     artifacts:

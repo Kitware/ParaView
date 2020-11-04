@@ -114,5 +114,5 @@ pqProxySelection pqProxySelectionUtilities::getPipelineProxies(const pqProxySele
     }
   }
 
-  return proxies.toList();
+  return proxies.values();
 }

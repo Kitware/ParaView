@@ -53,6 +53,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+#define QT_ENDL endl
+#else
+#define QT_ENDL Qt::endl
+#endif
+
 #include "ui_pqSelectionInputWidget.h"
 class pqSelectionInputWidget::UI : public Ui::pqSelectionInputWidget
 {
@@ -130,134 +136,123 @@ void pqSelectionInputWidget::updateLabels()
   QTextStream columnValues(&text, QIODevice::ReadWrite);
   if (strcmp(xmlname, "FrustumSelectionSource") == 0)
   {
-    columnValues << "Frustum Selection" << endl
-                 << "Elements: " << fieldTypeAsString << endl
-                 << endl
-                 << "Values:" << endl;
+    columnValues << "Frustum Selection" << QT_ENDL << "Elements: " << fieldTypeAsString << QT_ENDL
+                 << QT_ENDL << "Values:" << QT_ENDL;
     vtkSMProperty* dvp = this->SelectionSource->GetProperty("Frustum");
     QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(dvp);
     for (int cc = 0; cc < value.size(); cc++)
     {
       if ((cc % 4) == 0)
       {
-        columnValues << endl;
+        columnValues << QT_ENDL;
       }
       columnValues << value[cc].toDouble() << "\t";
     }
   }
   else if (strcmp(xmlname, "GlobalIDSelectionSource") == 0)
   {
-    columnValues << "Global ID Selection" << endl
-                 << "Elements: " << fieldTypeAsString << endl
-                 << endl
-                 << endl;
+    columnValues << "Global ID Selection" << QT_ENDL << "Elements: " << fieldTypeAsString << QT_ENDL
+                 << QT_ENDL << QT_ENDL;
     QList<QVariant> value =
       pqSMAdaptor::getMultipleElementProperty(this->SelectionSource->GetProperty("IDs"));
-    columnValues << "Global ID" << endl;
+    columnValues << "Global ID" << QT_ENDL;
     foreach (QVariant val, value)
     {
-      columnValues << val.toString() << endl;
+      columnValues << val.toString() << QT_ENDL;
     }
   }
   else if (strcmp(xmlname, "IDSelectionSource") == 0)
   {
-    columnValues << QString("ID Selection") << endl
-                 << "Elements: " << fieldTypeAsString << endl
-                 << endl
-                 << endl;
+    columnValues << QString("ID Selection") << QT_ENDL << "Elements: " << fieldTypeAsString
+                 << QT_ENDL << QT_ENDL << QT_ENDL;
     columnValues << "Process ID"
                  << "\t\t"
-                 << "Index" << endl;
+                 << "Index" << QT_ENDL;
     vtkSMProperty* idvp = this->SelectionSource->GetProperty("IDs");
     QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(idvp);
     for (int cc = 0; cc < value.size(); cc++)
     {
       if ((cc % 2) == 0)
       {
-        columnValues << endl;
+        columnValues << QT_ENDL;
       }
       columnValues << value[cc].toString() << "\t\t";
     }
   }
   else if (strcmp(xmlname, "CompositeDataIDSelectionSource") == 0)
   {
-    columnValues << QString("ID Selection") << endl
-                 << "Elements: " << fieldTypeAsString << endl
-                 << endl
-                 << endl;
+    columnValues << QString("ID Selection") << QT_ENDL << "Elements: " << fieldTypeAsString
+                 << QT_ENDL << QT_ENDL << QT_ENDL;
     columnValues << "Composite ID"
                  << "\t"
                  << "Process ID"
                  << "\t\t"
-                 << "Index" << endl;
+                 << "Index" << QT_ENDL;
     vtkSMProperty* idvp = this->SelectionSource->GetProperty("IDs");
     QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(idvp);
     for (int cc = 0; cc < value.size(); cc++)
     {
       if ((cc % 3) == 0)
       {
-        columnValues << endl;
+        columnValues << QT_ENDL;
       }
       columnValues << value[cc].toString() << "\t\t";
     }
   }
   else if (strcmp(xmlname, "HierarchicalDataIDSelectionSource") == 0)
   {
-    columnValues << QString("ID Selection") << endl
-                 << "Elements: " << fieldTypeAsString << endl
-                 << endl
-                 << endl;
+    columnValues << QString("ID Selection") << QT_ENDL << "Elements: " << fieldTypeAsString
+                 << QT_ENDL << QT_ENDL << QT_ENDL;
     columnValues << "Level"
                  << "\t\t"
                  << "Dataset"
                  << "\t\t"
-                 << "Index" << endl;
+                 << "Index" << QT_ENDL;
     vtkSMProperty* idvp = this->SelectionSource->GetProperty("IDs");
     QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(idvp);
     for (int cc = 0; cc < value.size(); cc++)
     {
       if ((cc % 3) == 0)
       {
-        columnValues << endl;
+        columnValues << QT_ENDL;
       }
       columnValues << value[cc].toString() << "\t\t";
     }
   }
   else if (strcmp(xmlname, "LocationSelectionSource") == 0)
   {
-    columnValues << "Location-based Selection" << endl << endl << endl;
-    columnValues << "Probe Locations" << endl;
+    columnValues << "Location-based Selection" << QT_ENDL << QT_ENDL << QT_ENDL;
+    columnValues << "Probe Locations" << QT_ENDL;
     vtkSMProperty* idvp = this->SelectionSource->GetProperty("Locations");
     QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(idvp);
     for (int cc = 0; cc < value.size(); cc++)
     {
       if ((cc % 3) == 0)
       {
-        columnValues << endl;
+        columnValues << QT_ENDL;
       }
       columnValues << value[cc].toString() << "\t\t";
     }
   }
   else if (strcmp(xmlname, "BlockSelectionSource") == 0)
   {
-    columnValues << "Block Selection" << endl << endl << endl;
-    columnValues << "Blocks" << endl;
+    columnValues << "Block Selection" << QT_ENDL << QT_ENDL << QT_ENDL;
+    columnValues << "Blocks" << QT_ENDL;
     vtkSMProperty* prop = this->SelectionSource->GetProperty("Blocks");
     QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(prop);
     foreach (const QVariant& value, values)
     {
-      columnValues << value.toString() << endl;
+      columnValues << value.toString() << QT_ENDL;
     }
   }
   else if (strcmp(xmlname, "ThresholdSelectionSource") == 0)
   {
-    columnValues << "Threshold Selection" << endl;
-    columnValues << "Elements: " << fieldTypeAsString << endl;
+    columnValues << "Threshold Selection" << QT_ENDL;
+    columnValues << "Elements: " << fieldTypeAsString << QT_ENDL;
     columnValues
       << "Array: "
       << pqSMAdaptor::getElementProperty(this->SelectionSource->GetProperty("ArrayName")).toString()
-      << endl
-      << endl;
+      << QT_ENDL << QT_ENDL;
     QList<QVariant> values =
       pqSMAdaptor::getMultipleElementProperty(this->SelectionSource->GetProperty("Thresholds"));
     for (int cc = 0; cc < values.size(); cc++)
@@ -266,7 +261,7 @@ void pqSelectionInputWidget::updateLabels()
       columnValues << value.toString();
       if (cc % 2)
       {
-        columnValues << endl;
+        columnValues << QT_ENDL;
       }
       else
       {
@@ -276,15 +271,14 @@ void pqSelectionInputWidget::updateLabels()
   }
   else if (strcmp(xmlname, "SelectionQuerySource") == 0)
   {
-    columnValues << "Query" << endl;
+    columnValues << "Query" << QT_ENDL;
     this->SelectionSource->UpdatePropertyInformation();
     columnValues << vtkSMPropertyHelper(this->SelectionSource, "UserFriendlyText").GetAsString()
-                 << endl
-                 << "Elements: " << fieldTypeAsString;
+                 << QT_ENDL << "Elements: " << fieldTypeAsString;
   }
   else
   {
-    columnValues << "None" << endl;
+    columnValues << "None" << QT_ENDL;
   }
 
   this->ui->textBrowser->setText(text);

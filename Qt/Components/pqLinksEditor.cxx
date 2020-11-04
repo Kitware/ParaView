@@ -69,6 +69,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // std
 #include <cassert>
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+#define QT_ENDL endl
+#else
+#define QT_ENDL Qt::endl
+#endif
+
 namespace
 {
 static QString propertyType(vtkSMProperty* p)
@@ -495,7 +501,7 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
           break;
         case pqLinksModel::Unknown:
         default:
-          qDebug() << "Unknown Link type:" << model->getLinkType(idx) << endl;
+          qDebug() << "Unknown Link type:" << model->getLinkType(idx) << QT_ENDL;
           break;
       }
 

@@ -149,7 +149,8 @@ public:
 
   const QString modificationTimeString() const
   {
-    return QDateTime::fromTime_t(this->ModificationTime).toString(Qt::SystemLocaleDate);
+    return QLocale::system().toString(
+      QDateTime::fromTime_t(this->ModificationTime), QLocale::ShortFormat);
   }
 
   qulonglong size() const { return static_cast<qulonglong>(this->Size); }

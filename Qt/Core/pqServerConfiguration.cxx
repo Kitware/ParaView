@@ -291,7 +291,7 @@ QString pqServerConfiguration::lookForCommand(QString command)
   QString whichCommand = "which";
 #endif
 
-  lookForProcess.start(whichCommand);
+  lookForProcess.start(whichCommand, QStringList());
   if (!lookForProcess.waitForFinished())
   {
     qCritical() << "Could not find \"" << whichCommand

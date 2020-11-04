@@ -15,14 +15,14 @@
 
 .centos7:
     extends: .linux
-    image: "kitware/paraview:ci-centos7-20201005"
+    image: "kitware/paraview:ci-centos7-20201103"
 
     variables:
         LAUNCHER: "scl enable devtoolset-7 --"
 
 .fedora31:
     extends: .linux
-    image: "kitware/paraview:ci-fedora31-20201014"
+    image: "kitware/paraview:ci-fedora31-20201104"
 
 .fedora31_icc:
     extends: .fedora31

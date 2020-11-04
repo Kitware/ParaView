@@ -26,43 +26,6 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkOrderedCompositeDistributor"
-                 name="OrderedCompositeDistributor">
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <Documentation>Set the input to the Ordered Composite Distributor
-        filter.</Documentation>
-      </InputProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetPassThrough"
-                         default_values="0"
-                         name="PassThrough"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Toggle whether to pass the data through without
-        compositing.</Documentation>
-      </IntVectorProperty>
-      <ProxyProperty command="SetPKdTree"
-                     name="PKdTree">
-        <ProxyGroupDomain name="groups">
-          <Group name="locators" />
-        </ProxyGroupDomain>
-        <Documentation>Set the vtkPKdTree to distribute with.</Documentation>
-      </ProxyProperty>
-      <StringVectorProperty command="SetOutputType"
-                            name="OutputType"
-                            number_of_elements="1">
-        <Documentation>When not empty, the output will be converted to the
-        given type.</Documentation>
-      </StringVectorProperty>
-      <!-- End OrderedCompositeDistributor -->
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
     <SourceProxy class="vtkMPIMoveData"
                  name="MPIMoveData">
       <InputProperty command="SetInputConnection"
