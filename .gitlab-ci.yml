@@ -159,7 +159,7 @@ test:windows-vs2019-qt:
 
 build:documentation:
     extends:
-        - .centos7
+        - .fedora31
         - .doxygen_build_linux
         - .linux_builder_tags
         - .doxygen_log_artifacts
