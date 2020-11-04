@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Install extra dependencies for ParaView
-yum install -y \
+dnf install -y --setopt=install_weak_deps=False \
    bzip2 patch \
    python3-twisted python3-autobahn \
    python3 python3-devel qt5-qtbase-devel qt5-qttools-devel \
@@ -14,4 +14,4 @@ yum install -y \
 
 python3 -m pip install wslink
 
-yum clean all
+dnf clean all
