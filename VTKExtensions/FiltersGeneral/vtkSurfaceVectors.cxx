@@ -25,6 +25,8 @@
 #include "vtkPolygon.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTriangle.h"
+#include "vtkVector.h"
+#include "vtkVectorOperators.h"
 
 vtkStandardNewMacro(vtkSurfaceVectors);
 
@@ -73,124 +75,97 @@ int vtkSurfaceVectors::RequestData(vtkInformation* vtkNotUsed(request),
   vtkDataSet* input = vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkDataSet* output = vtkDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  vtkIdType numPoints, pointId, i, cellId;
-  numPoints = input->GetNumberOfPoints();
+  const vtkIdType numPoints = input->GetNumberOfPoints();
   vtkDataArray* inVectors = this->GetInputArrayToProcess(0, inputVector);
 
-  if (!inVectors)
+  if (!inVectors || numPoints == 0)
   {
+    vtkErrorMacro("The input is empty");
     output->ShallowCopy(input);
     return 1;
   }
 
-  vtkDataArray* newVectors = 0;
-  vtkDoubleArray* newScalars = 0;
+  vtkDataArray* newVectors = nullptr;
+  vtkDoubleArray* newScalars = nullptr;
   vtkIdList* cellIds = vtkIdList::New();
   vtkIdList* ptIds = vtkIdList::New();
-  double p1[3];
-  double p2[3];
-  double p3[3];
-  double normal[3];
-  double tmp[3];
-  double v1[3], v2[3];
-  int count;
-  int cellType;
 
-  // We could generate both ...
-  if (numPoints)
+  if (this->ConstraintMode == vtkSurfaceVectors::PerpendicularScale)
   {
-    if (this->ConstraintMode == vtkSurfaceVectors::PerpendicularScale)
-    {
-      newScalars = vtkDoubleArray::New();
-      newScalars->SetNumberOfComponents(1);
-      newScalars->SetNumberOfTuples(numPoints);
-      newScalars->SetName("Perpendicular Scale");
-    }
-    else
-    {
-      newVectors = inVectors->NewInstance();
-      newVectors->SetNumberOfComponents(3);
-      newVectors->SetNumberOfTuples(numPoints);
-      newVectors->SetName(inVectors->GetName());
-    }
+    newScalars = vtkDoubleArray::New();
+    newScalars->SetNumberOfComponents(1);
+    newScalars->SetNumberOfTuples(numPoints);
+    newScalars->SetName("Perpendicular Scale");
+  }
+  else
+  {
+    newVectors = inVectors->NewInstance();
+    newVectors->SetNumberOfComponents(3);
+    newVectors->SetNumberOfTuples(numPoints);
+    newVectors->SetName(inVectors->GetName());
   }
 
-  for (pointId = 0; pointId < numPoints; ++pointId)
+  // Helper function to compute the normal of a point
+  const auto ComputeNormal = [&input, &cellIds, &ptIds]() -> const vtkVector3d {
+    vtkVector3d normal(0.0);
+    for (int i = 0; i < cellIds->GetNumberOfIds(); ++i)
+    {
+      const vtkIdType cellId = cellIds->GetId(i);
+      const vtkIdType cellType = input->GetCellType(cellId);
+
+      if (cellType == VTK_VOXEL || cellType == VTK_POLYGON || cellType == VTK_TRIANGLE ||
+        cellType == VTK_QUAD || cellType == VTK_PIXEL)
+      {
+        input->GetCellPoints(cellId, ptIds);
+
+        vtkVector3d p1, p2, p3;
+        input->GetPoint(ptIds->GetId(0), p1.GetData());
+        input->GetPoint(ptIds->GetId(1), p2.GetData());
+        input->GetPoint(ptIds->GetId(2), p3.GetData());
+
+        const vtkVector3d v1 = p2 - p1;
+        const vtkVector3d v2 = p3 - p1;
+
+        const vtkVector3d cross = v1.Cross(v2);
+
+        // We check the current normal orientation against
+        // the computed one so far: if they have the same orientation
+        // (ie the scalar product is positive) we add it to normal
+        // otherwise we add its negated version.
+        //
+        // This ensures that two opposite normals don't cancel each other
+        // (for example (1, 0, 0) and (-1, 0, 0) gives the same general
+        // direction but the sum is zero).
+        normal += cross.Dot(normal) > 0 ? cross : -cross;
+      }
+    }
+
+    return normal.Normalized();
+  };
+
+  for (vtkIdType pointId = 0; pointId < numPoints; ++pointId)
   {
     input->GetPointCells(pointId, cellIds);
-    // Compute the point normal.
-    count = 0;
-    normal[0] = normal[1] = normal[2] = 0.0;
-    for (i = 0; i < cellIds->GetNumberOfIds(); ++i)
+
+    const vtkVector3d normal = ComputeNormal();
+
+    vtkVector3d inVector;
+    inVectors->GetTuple(pointId, inVector.GetData());
+    const double k = normal.Dot(inVector);
+
+    switch (this->ConstraintMode)
     {
-      cellId = cellIds->GetId(i);
-      cellType = input->GetCellType(cellId);
-      if (cellType == VTK_VOXEL || cellType == VTK_POLYGON || cellType == VTK_TRIANGLE ||
-        cellType == VTK_QUAD)
-      {
-        input->GetCellPoints(cellId, ptIds);
-        input->GetPoint(ptIds->GetId(0), p1);
-        input->GetPoint(ptIds->GetId(1), p2);
-        input->GetPoint(ptIds->GetId(2), p3);
-        v1[0] = p2[0] - p1[0];
-        v1[1] = p2[1] - p1[1];
-        v1[2] = p2[2] - p1[2];
-        v2[0] = p3[0] - p1[0];
-        v2[1] = p3[1] - p1[1];
-        v2[2] = p3[2] - p1[2];
-        vtkMath::Cross(v1, v2, tmp);
-        ++count;
-        normal[0] += tmp[0];
-        normal[1] += tmp[1];
-        normal[2] += tmp[2];
-      }
-      if (cellType == VTK_PIXEL)
-      {
-        input->GetCellPoints(cellId, ptIds);
-        input->GetPoint(ptIds->GetId(0), p1);
-        input->GetPoint(ptIds->GetId(1), p2);
-        input->GetPoint(ptIds->GetId(2), p3);
-        v1[0] = p2[0] - p1[0];
-        v1[1] = p2[1] - p1[1];
-        v1[2] = p2[2] - p1[2];
-        v2[0] = p3[0] - p1[0];
-        v2[1] = p3[1] - p1[1];
-        v2[2] = p3[2] - p1[2];
-        vtkMath::Cross(v2, v1, tmp);
-        ++count;
-        normal[0] += tmp[0];
-        normal[1] += tmp[1];
-        normal[2] += tmp[2];
-      }
-    }
-    double inVector[3];
-    inVectors->GetTuple(pointId, inVector);
-    double k = 0.0;
-    if (count > 0)
-    {
-      vtkMath::Normalize(normal);
-      k = vtkMath::Dot(normal, inVector);
-      if (this->ConstraintMode == vtkSurfaceVectors::Parallel)
-      {
-        // Remove non orthogonal component.
-        inVector[0] = inVector[0] - (normal[0] * k);
-        inVector[1] = inVector[1] - (normal[1] * k);
-        inVector[2] = inVector[2] - (normal[2] * k);
-      }
-      else if (this->ConstraintMode == vtkSurfaceVectors::Perpendicular)
-      { // Keep only the orthogonal component.
-        inVector[0] = normal[0] * k;
-        inVector[1] = normal[1] * k;
-        inVector[2] = normal[2] * k;
-      }
-    }
-    if (newScalars)
-    {
-      newScalars->InsertValue(pointId, k);
-    }
-    if (newVectors)
-    {
-      newVectors->InsertTuple(pointId, inVector);
+      case vtkSurfaceVectors::Parallel:
+        inVector -= k * normal;
+        newVectors->InsertTuple(pointId, inVector.GetData());
+        break;
+      case vtkSurfaceVectors::Perpendicular:
+        inVector = k * normal;
+        newVectors->InsertTuple(pointId, inVector.GetData());
+        break;
+      default:
+        newScalars->InsertValue(pointId, k);
+        break;
     }
   }
 
