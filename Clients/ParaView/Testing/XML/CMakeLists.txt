@@ -398,6 +398,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RestoreDefaultTransferFunctionC.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReverseLegend_A.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ReverseLegend_B.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RotateAroundOriginTransform.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RulerA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RulerA_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/RulerB.png}"
@@ -935,6 +936,7 @@ list(APPEND TESTS_WITH_BASELINES
   ResampleWithDataset.xml
   RescaleToTemporal.xml
   ReverseLegend.xml
+  RotateAroundOriginTransform.xml
   RotateCamera90.xml
 #  SaveAnimationGeometry.xml
   SaveColorMap.xml
