@@ -28,12 +28,10 @@
 #include "vtkVersion.h"
 
 #if defined(_WIN32)
-#define _WIN32_IE 0x0400    // special folder support
-#define _WIN32_WINNT 0x0400 // shared folder support
-#include <cstring>          // for strcasecmp
-#include <direct.h>         // _getcwd
-#include <shlobj.h>         // SHGetFolderPath
-#include <windows.h>        // FindFirstFile, FindNextFile, FindClose, ...
+#include <cstring>   // for strcasecmp
+#include <direct.h>  // _getcwd
+#include <shlobj.h>  // SHGetFolderPath
+#include <windows.h> // FindFirstFile, FindNextFile, FindClose, ...
 #define vtkPVServerFileListingGetCWD _getcwd
 #else
 #include <cerrno>      // errno
