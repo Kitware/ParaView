@@ -24,6 +24,7 @@
 #include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVLogger.h"
 #include "vtkPVOptions.h"
 #include "vtkPVView.h"
 #include "vtkPVXMLElement.h"
@@ -645,6 +646,7 @@ int vtkSMViewProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElem
 //----------------------------------------------------------------------------
 vtkImageData* vtkSMViewProxy::CaptureWindow(int magX, int magY)
 {
+  vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "CaptureWindow");
   vtkSMViewProxyNS::CaptureHelper helper(this);
   if (auto img = helper.StereoCapture(magX, magY))
   {
@@ -742,9 +744,12 @@ int vtkSMViewProxy::WriteImage(const char* filename, const char* writerName, int
     return vtkErrorCode::UnknownError;
   }
 
+  vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "WriteImage to '%s'", filename);
+
   vtkSmartPointer<vtkImageData> shot;
   shot.TakeReference(this->CaptureWindow(magX, magY));
 
+  vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "Save image to disk");
   if (vtkProcessModule::GetProcessModule()->GetOptions()->GetSymmetricMPIMode())
   {
     return vtkSMUtilities::SaveImageOnProcessZero(shot, filename, writerName);

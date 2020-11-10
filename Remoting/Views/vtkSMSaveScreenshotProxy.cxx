@@ -20,6 +20,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVLogger.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
@@ -252,6 +253,7 @@ public:
     std::pair<vtkSmartPointer<vtkImageData>, vtkSmartPointer<vtkImageData> > result;
     if (this->BothEyes)
     {
+      vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "Capture stereo images");
       this->UpdateStereoMode(VTK_STEREO_LEFT, /*restoreable=*/false);
       result.first = this->CaptureImage();
       this->UpdateStereoMode(VTK_STEREO_RIGHT, /*restoreable=*/false);
@@ -259,6 +261,7 @@ public:
     }
     else
     {
+      vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "Capture image");
       result.first = this->CaptureImage();
     }
     return result;
@@ -547,6 +550,8 @@ bool vtkSMSaveScreenshotProxy::WriteImage(const char* fname, vtkTypeUInt32 locat
   {
     return SymmetricReturnCode(false);
   }
+
+  vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "Save captured image to '%s'", fname);
 
   auto pxm = this->GetSessionProxyManager();
   auto remoteWriter = vtkSmartPointer<vtkSMSourceProxy>::Take(
