@@ -101,8 +101,76 @@ function (paraview_server_manager_process)
       "The `TARGET` argument is required.")
   endif ()
 
+  # Topologically sort modules so that XML definitions that depend on each
+  # other are loaded in the right order.
+  set(_paraview_sm_process_sorted_modules ${_paraview_sm_process_MODULES})
+  set(_paraview_sm_process_module_stack ${_paraview_sm_process_MODULES})
+  set(_paraview_sm_process_module_seen)
+  while (_paraview_sm_process_module_stack)
+    list(POP_FRONT _paraview_sm_process_module_stack
+      _paraview_sm_process_module)
+    if (_paraview_sm_process_module IN_LIST _paraview_sm_process_module_seen)
+      continue ()
+    endif ()
+    list(APPEND _paraview_sm_process_module_seen
+      "${_paraview_sm_process_module}")
+
+    get_property(_paraview_sm_process_module_is_imported
+      TARGET    "${_paraview_sm_process_module}"
+      PROPERTY  IMPORTED)
+    if (_paraview_sm_process_module_is_imported)
+      _vtk_module_get_module_property("${_paraview_sm_process_module}"
+        PROPERTY  "depends"
+        VARIABLE  "_paraview_sm_process_depends")
+      _vtk_module_get_module_property("${_paraview_sm_process_module}"
+        PROPERTY  "private_depends"
+        VARIABLE  "_paraview_sm_process_private_depends")
+      _vtk_module_get_module_property("${_paraview_sm_process_module}"
+        PROPERTY  "optional_depends"
+        VARIABLE  "_paraview_sm_process_optional_depends")
+    else ()
+      get_property("_paraview_sm_process_depends" GLOBAL
+        PROPERTY "_vtk_module_${_paraview_sm_process_module}_depends")
+      get_property("_paraview_sm_process_private_depends" GLOBAL
+        PROPERTY "_vtk_module_${_paraview_sm_process_module}_private_depends")
+      get_property("_paraview_sm_process_optional_depends" GLOBAL
+        PROPERTY "_vtk_module_${_paraview_sm_process_module}_optional_depends")
+    endif ()
+
+    # Prune optional dependencies that do not exist.
+    set(_paraview_sm_process_optional_depends_exists)
+    foreach (_paraview_sm_process_optional_depend IN LISTS _paraview_sm_process_optional_depends)
+      if (TARGET "${_paraview_sm_process_optional_depend}")
+        list(APPEND _paraview_sm_process_optional_depends_exists
+          "${_paraview_sm_process_optional_depend}")
+      endif ()
+    endforeach ()
+
+    # Put all of the dependencies into a single variable.
+    set("_paraview_sm_process_${_paraview_sm_process_module}_all_depends"
+      ${_paraview_sm_process_depends}
+      ${_paraview_sm_process_private_depends}
+      ${_paraview_sm_process_optional_depends_exists})
+    list(APPEND _paraview_sm_process_module_stack
+      ${_paraview_sm_process_depends}
+      ${_paraview_sm_process_private_depends}
+      ${_paraview_sm_process_optional_depends_exists})
+  endwhile ()
+
+  # Topologically sort according to dependencies.
+  vtk_topological_sort(_paraview_sm_process_sorted_modules "_paraview_sm_process_" "_all_depends")
+
+  # Limit the sorted modules to those that are actually in the pass module list.
+  set(_paraview_sm_process_modules)
+  foreach (_paraview_sm_process_sorted_module IN LISTS _paraview_sm_process_sorted_modules)
+    if (_paraview_sm_process_sorted_module IN_LIST _paraview_sm_process_MODULES)
+      list(APPEND _paraview_sm_process_modules
+        "${_paraview_sm_process_sorted_module}")
+    endif ()
+  endforeach ()
+
   set(_paraview_sm_process_files)
-  foreach (_paraview_sm_process_module IN LISTS _paraview_sm_process_MODULES)
+  foreach (_paraview_sm_process_module IN LISTS _paraview_sm_process_modules)
     _vtk_module_get_module_property("${_paraview_sm_process_module}"
       PROPERTY  "paraview_server_manager_xml"
       VARIABLE  _paraview_sm_process_module_files)
