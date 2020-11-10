@@ -20,12 +20,13 @@
 #include "vtkPolyData.h"
 
 #if VTK_MODULE_ENABLE_ParaView_PythonCatalyst
+#include "vtkCPPythonScriptPipeline.h"
 #include "vtkCPPythonStringPipeline.h"
 #endif
 
 static const char* script=R"==(
 from paraview.simple import *
-LoadDistributedPlugin("VTKmFilters", remote=False, ns=globals())
+LoadDistributedPlugin("VTKmFilters", ns=globals())
 assert VTKmContour
 
 def DoCoProcessing(datadescription):
@@ -36,15 +37,39 @@ def RequestDataDescription(datadescription):
     datadescription.GetInputDescriptionByName('input').GenerateMeshOn()
 )==";
 
-int LoadVTKmFilterPluginDriver(int, char* argv[])
+int LoadVTKmFilterPluginDriver(int argc, char* argv[])
 {
   vtkNew<vtkCPProcessor> processor;
   processor->Initialize();
 
+  std::vector<std::string> scripts;
+  for (int cc = 0; cc < argc; ++cc)
+  {
+    if (strcmp(argv[cc], "--script") == 0 && (cc + 1) < argc)
+    {
+      scripts.push_back(argv[++cc]);
+    }
+  }
+
 #if VTK_MODULE_ENABLE_ParaView_PythonCatalyst
-  vtkNew<vtkCPPythonStringPipeline> pipeline;
-  pipeline->Initialize(script);
-  processor->AddPipeline(pipeline);
+  if (scripts.size() > 0)
+  {
+    for (auto& scriptfile : scripts)
+    {
+      vtkNew<vtkCPPythonScriptPipeline> pipeline;
+      pipeline->Initialize(scriptfile.c_str());
+      processor->AddPipeline(pipeline);
+    }
+  }
+  else
+  {
+    vtkNew<vtkCPPythonStringPipeline> pipeline;
+    pipeline->Initialize(script);
+    processor->AddPipeline(pipeline);
+  }
+#else
+  (void)script;
+  (void)scripts;
 #endif
 
   vtkNew<vtkCPDataDescription> dataDescription;

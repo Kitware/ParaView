@@ -2028,7 +2028,10 @@ def LoadPlugin(filename, remote=True, ns=None):
         LoadPlugin("myplugin", True, globals())  # to load on server
         LoadPlugin("myplugin", ns=globals())     # to load on server
 
-    Otherwise, the new functions will not appear in the global namespace."""
+    Otherwise, the new functions will not appear in the global namespace.
+
+    Note, remote=True has no effect when the connection is not remote.
+    """
 
     return LoadPlugins(filename, remote=remote, ns=ns)
 
@@ -2048,7 +2051,10 @@ def LoadPlugins(*args, **kwargs):
         LoadPlugins("myplugin", "myplugin2", remote=True, ns=globals())  # to load on server
         LoadPlugins("myplugin", "myplugin2", ns=globals())     # to load on server
 
-    Otherwise, the new functions will not appear in the global namespace."""
+    Otherwise, the new functions will not appear in the global namespace.
+
+    Note, remote=True has no effect when the connection is not remote.
+    """
 
     remote = True
     if 'remote' in kwargs:
@@ -2071,18 +2077,26 @@ def LoadDistributedPlugin(pluginname, remote=True, ns=None):
     """Loads a plugin that's distributed with the executable. This uses the
     information known about plugins distributed with ParaView to locate the
     shared library for the plugin to load. Raises a RuntimeError if the plugin
-    was not found."""
+    was not found.
+
+    Note, `remote=True` has no effect when running in batch mode (or Catalyst)
+    or when the active connection is not a client-server connection.
+    """
     if not servermanager.ActiveConnection:
         raise RuntimeError ("Cannot load a plugin without a session.")
+
+    conn = servermanager.ActiveConnection
+    do_remote = remote and conn.IsRemote()
+
     plm = servermanager.vtkSMProxyManager.GetProxyManager().GetPluginManager()
-    if remote:
+    if do_remote:
         session = servermanager.ActiveConnection.Session
         info = plm.GetRemoteInformation(session)
     else:
         info = plm.GetLocalInformation()
     for cc in range(0, info.GetNumberOfPlugins()):
         if info.GetPluginName(cc) == pluginname:
-            return LoadPlugin(info.GetPluginFileName(cc), remote, ns)
+            return LoadPlugin(info.GetPluginFileName(cc), do_remote, ns)
     raise RuntimeError ("Plugin '%s' not found" % pluginname)
 
 #==============================================================================

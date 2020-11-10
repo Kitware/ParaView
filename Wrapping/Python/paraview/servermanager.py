@@ -2375,7 +2375,10 @@ def LoadXML(xmlstring):
 def LoadPlugin(filename,  remote=True, connection=None):
     """ Given a filename and a session (optional, otherwise uses
     ActiveConnection), loads a plugin. It then updates the sources,
-    filters and rendering modules."""
+    filters and rendering modules.
+
+    remote=True has no effect when the connection is not remote.
+    """
 
     if not connection:
         connection = ActiveConnection
@@ -2383,7 +2386,7 @@ def LoadPlugin(filename,  remote=True, connection=None):
         raise RuntimeError ("Cannot load a plugin without a connection.")
     plm = vtkSMProxyManager.GetProxyManager().GetPluginManager()
 
-    if remote:
+    if remote and connection.IsRemote():
         status = plm.LoadRemotePlugin(filename, connection.Session)
     else:
         status = plm.LoadLocalPlugin(filename)
