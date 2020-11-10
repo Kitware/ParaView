@@ -112,7 +112,8 @@ void MergeCubeAxesBounds(double bounds[6], const vtkRenderState* rState)
 
   bbox.GetBounds(bounds);
 }
-};
+
+} // end of namespace
 
 vtkStandardNewMacro(vtkIceTCompositePass);
 vtkCxxSetObjectMacro(vtkIceTCompositePass, RenderPass, vtkRenderPass);
@@ -460,18 +461,25 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   double val = 0.;
   icetGetDoublev(ICET_COMPOSITE_TIME, &val);
   vtkTimerLog::InsertTimedEvent("ICET_COMPOSITE_TIME", val, 0);
+  vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "ICET_COMPOSITE_TIME: %lf", val);
   icetGetDoublev(ICET_BLEND_TIME, &val);
   vtkTimerLog::InsertTimedEvent("ICET_BLEND_TIME", val, 0);
+  vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "ICET_BLEND_TIME: %lf", val);
   icetGetDoublev(ICET_COMPRESS_TIME, &val);
   vtkTimerLog::InsertTimedEvent("ICET_COMPRESS_TIME", val, 0);
+  vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "ICET_COMPRESS_TIME: %lf", val);
   icetGetDoublev(ICET_COLLECT_TIME, &val);
   vtkTimerLog::InsertTimedEvent("ICET_COLLECT_TIME", val, 0);
+  vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "ICET_COLLECT_TIME: %lf", val);
   icetGetDoublev(ICET_RENDER_TIME, &val);
   vtkTimerLog::InsertTimedEvent("ICET_RENDER_TIME", val, 0);
+  vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "ICET_RENDER_TIME: %lf", val);
   icetGetDoublev(ICET_BUFFER_READ_TIME, &val);
   vtkTimerLog::InsertTimedEvent("ICET_BUFFER_READ_TIME", val, 0);
+  vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "ICET_BUFFER_READ_TIME: %lf", val);
   icetGetDoublev(ICET_BUFFER_WRITE_TIME, &val);
   vtkTimerLog::InsertTimedEvent("ICET_BUFFER_WRITE_TIME", val, 0);
+  vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "ICET_BUFFER_WRITE_TIME: %lf", val);
 
   vtkOpenGLRenderUtilities::MarkDebugEvent("vtkIceTCompositePass::Render End");
 }
