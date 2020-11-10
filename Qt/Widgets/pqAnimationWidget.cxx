@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationModel.h"
 #include "pqAnimationTrack.h"
 
+//-----------------------------------------------------------------------------
 pqAnimationWidget::pqAnimationWidget(QWidget* p)
   : Superclass(p)
 {
@@ -102,30 +103,31 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
     this->EnabledHeader, SIGNAL(sectionClicked(int)), this, SLOT(headerEnabledClicked(int)));
 }
 
-pqAnimationWidget::~pqAnimationWidget()
-{
-}
-
+//-----------------------------------------------------------------------------
 pqAnimationModel* pqAnimationWidget::animationModel() const
 {
   return this->Model;
 }
 
+//-----------------------------------------------------------------------------
 QHeaderView* pqAnimationWidget::createDeleteHeader() const
 {
   return this->CreateDeleteHeader;
 }
 
+//-----------------------------------------------------------------------------
 QHeaderView* pqAnimationWidget::enabledHeader() const
 {
   return this->EnabledHeader;
 }
 
+//-----------------------------------------------------------------------------
 QWidget* pqAnimationWidget::createDeleteWidget() const
 {
   return this->CreateDeleteWidget;
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationWidget::updateSizes()
 {
   this->CreateDeleteModel.clear();
@@ -151,14 +153,16 @@ void pqAnimationWidget::updateSizes()
   this->updateGeometries();
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationWidget::headerDblClicked(int which)
 {
   if (which > 0)
   {
-    Q_EMIT this->trackSelected(this->Model->track(which - 1));
+    emit this->trackSelected(this->Model->track(which - 1));
   }
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationWidget::updateGeometries()
 {
   int width1 = 0;
@@ -187,6 +191,8 @@ void pqAnimationWidget::updateGeometries()
 
   this->setViewportMargins(width1 + width2 + width3, 0, 0, 0);
 
+  emit this->timelineOffsetChanged(width1 + width2 + width3);
+
   QRect vg = this->contentsRect();
   this->CreateDeleteHeader->setGeometry(vg.left(), vg.top(), width1, vg.height());
   this->EnabledHeader->setGeometry(vg.left() + width1, vg.top(), width3, vg.height());
@@ -195,6 +201,7 @@ void pqAnimationWidget::updateGeometries()
   this->updateScrollBars();
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationWidget::scrollContentsBy(int dx, int dy)
 {
   if (dy)
@@ -207,6 +214,7 @@ void pqAnimationWidget::scrollContentsBy(int dx, int dy)
   this->Superclass::scrollContentsBy(dx, dy);
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationWidget::updateScrollBars()
 {
   int h = this->View->sizeHint().height();
@@ -237,6 +245,7 @@ void pqAnimationWidget::updateScrollBars()
   this->verticalScrollBar()->setRange(0, h - vsize.height());
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationWidget::updateWidgetPosition()
 {
   int s = this->verticalScrollBar()->value();
@@ -256,6 +265,7 @@ void pqAnimationWidget::updateWidgetPosition()
   }
 }
 
+//-----------------------------------------------------------------------------
 bool pqAnimationWidget::event(QEvent* e)
 {
   if (e->type() == QEvent::FontChange)
@@ -265,37 +275,50 @@ bool pqAnimationWidget::event(QEvent* e)
   return this->Superclass::event(e);
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationWidget::resizeEvent(QResizeEvent* e)
 {
   this->Superclass::resizeEvent(e);
   this->updateGeometries();
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationWidget::showEvent(QShowEvent* e)
 {
   this->Superclass::showEvent(e);
   this->updateGeometries();
 }
 
+//-----------------------------------------------------------------------------
+void pqAnimationWidget::wheelEvent(QWheelEvent* e)
+{
+  if (e->modifiers().testFlag(Qt::KeyboardModifier::NoModifier))
+  {
+    this->Superclass::wheelEvent(e);
+  }
+}
+
+//-----------------------------------------------------------------------------
 void pqAnimationWidget::headerDeleteClicked(int which)
 {
   if (which > 0)
   {
     if (which == this->CreateDeleteHeader->count() - 1)
     {
-      Q_EMIT this->createTrackClicked();
+      emit this->createTrackClicked();
     }
     else
     {
       pqAnimationTrack* t = this->Model->track(which - 1);
       if (t && t->isDeletable())
       {
-        Q_EMIT this->deleteTrackClicked(t);
+        emit this->deleteTrackClicked(t);
       }
     }
   }
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationWidget::headerEnabledClicked(int which)
 {
   if (which > 0)
@@ -303,7 +326,7 @@ void pqAnimationWidget::headerEnabledClicked(int which)
     pqAnimationTrack* track = this->Model->track(which - 1);
     if (track)
     {
-      Q_EMIT this->enableTrackClicked(track);
+      emit this->enableTrackClicked(track);
     }
   }
 }

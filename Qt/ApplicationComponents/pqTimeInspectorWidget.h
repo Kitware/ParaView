@@ -75,7 +75,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTimeInspectorWidget : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqTimeInspectorWidget(QWidget* parent = 0);
+  pqTimeInspectorWidget(QWidget* parent = nullptr);
   ~pqTimeInspectorWidget() override;
 
   /**

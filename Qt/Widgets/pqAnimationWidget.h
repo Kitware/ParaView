@@ -49,8 +49,8 @@ class PQWIDGETS_EXPORT pqAnimationWidget : public QAbstractScrollArea
   using Superclass = QAbstractScrollArea;
 
 public:
-  pqAnimationWidget(QWidget* p = 0);
-  ~pqAnimationWidget() override;
+  pqAnimationWidget(QWidget* p = nullptr);
+  ~pqAnimationWidget() override = default;
 
   pqAnimationModel* animationModel() const;
 
@@ -67,6 +67,8 @@ Q_SIGNALS:
   void trackSelected(pqAnimationTrack*);
   void deleteTrackClicked(pqAnimationTrack*);
   void createTrackClicked();
+  // emitted when the timeline offset is changed
+  void timelineOffsetChanged(int);
 
   /**
   * request enable/disabling of the track.
@@ -87,6 +89,7 @@ protected:
   bool event(QEvent* e) override;
   void resizeEvent(QResizeEvent* e) override;
   void showEvent(QShowEvent* e) override;
+  void wheelEvent(QWheelEvent* e) override;
 
 private:
   QGraphicsView* View;

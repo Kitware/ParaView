@@ -42,14 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqAnimationKeyFrame::pqAnimationKeyFrame(pqAnimationTrack* p)
   : QObject(p)
   , QGraphicsItem(p)
-  , NormalizedStartTime(0)
-  , NormalizedEndTime(1)
   , Rect(0, 0, 1, 1)
-{
-}
-
-//-----------------------------------------------------------------------------
-pqAnimationKeyFrame::~pqAnimationKeyFrame()
 {
 }
 
@@ -93,14 +86,12 @@ double pqAnimationKeyFrame::normalizedEndTime() const
 void pqAnimationKeyFrame::setNormalizedStartTime(double t)
 {
   this->NormalizedStartTime = t;
-  this->adjustRect();
 }
 
 //-----------------------------------------------------------------------------
 void pqAnimationKeyFrame::setNormalizedEndTime(double t)
 {
   this->NormalizedEndTime = t;
-  this->adjustRect();
 }
 
 //-----------------------------------------------------------------------------
@@ -125,6 +116,15 @@ void pqAnimationKeyFrame::setIcon(const QIcon& i)
 }
 
 //-----------------------------------------------------------------------------
+void pqAnimationKeyFrame::adjustRect(double startPos, double endPos)
+{
+  pqAnimationTrack* track = qobject_cast<pqAnimationTrack*>(this->parent());
+  QRectF trackRect = track->boundingRect();
+
+  this->setBoundingRect(QRectF(startPos, trackRect.top(), endPos - startPos, trackRect.height()));
+}
+
+//-----------------------------------------------------------------------------
 QRectF pqAnimationKeyFrame::boundingRect() const
 {
   return this->Rect;
@@ -137,20 +137,6 @@ void pqAnimationKeyFrame::setBoundingRect(const QRectF& r)
   this->Rect = r;
   this->addToIndex();
   this->update();
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationKeyFrame::adjustRect()
-{
-  pqAnimationTrack* track = qobject_cast<pqAnimationTrack*>(this->parent());
-  QRectF trackRect = track->boundingRect();
-
-  double w = trackRect.width();
-
-  double left = trackRect.left() + w * this->normalizedStartTime();
-  double right = trackRect.left() + w * this->normalizedEndTime();
-
-  this->setBoundingRect(QRectF(left, trackRect.top(), right - left, trackRect.height()));
 }
 
 //-----------------------------------------------------------------------------

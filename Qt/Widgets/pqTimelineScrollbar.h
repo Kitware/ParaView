@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqAnimationTrack.h
+   Module:    pqTimelineScrollbar.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,79 +30,67 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef pqAnimationTrack_h
-#define pqAnimationTrack_h
+#ifndef pqTimelineScrollbar_h
+#define pqTimelineScrollbar_h
 
 #include "pqWidgetsModule.h"
 
-#include <QGraphicsItem>
-#include <QList>
-#include <QObject>
+#include <QWidget>
 
-class pqAnimationKeyFrame;
+class QScrollBar;
+class QSpacerItem;
 
-// represents a track
-class PQWIDGETS_EXPORT pqAnimationTrack : public QObject, public QGraphicsItem
+class pqAnimationModel;
+
+/**
+* A widget offering a scrollbar useful to interact with the timeline
+* from the animation model.
+*/
+class PQWIDGETS_EXPORT pqTimelineScrollbar : public QWidget
 {
   Q_OBJECT
-  Q_INTERFACES(QGraphicsItem)
-  /**
-  * the property animated in this track
-  */
-  Q_PROPERTY(QVariant property READ property WRITE setProperty)
+
 public:
-  pqAnimationTrack(QObject* p = nullptr);
-  ~pqAnimationTrack() override;
+  pqTimelineScrollbar(QWidget* p = nullptr);
+  ~pqTimelineScrollbar() override = default;
 
   /**
-  * number of keyframes
+  * connects to an existing animation model
+  * if the parameter is nullptr, any already existing connection is removed
   */
-  int count();
-  /**
-  * get a keyframe
-  */
-  pqAnimationKeyFrame* keyFrame(int);
+  void setAnimationModel(pqAnimationModel* model);
 
   /**
-  * add a keyframe
+  * connects to an existing spacing constraint notifier
+  * if the parameter is nullptr, any already existing connection is removed
   */
-  pqAnimationKeyFrame* addKeyFrame();
+  void linkSpacing(QObject* spaceNotifier);
+
+protected Q_SLOTS:
+
   /**
-  * remove a keyframe
+  * called when the offset of the time scrollbar
+  * must be updated
   */
-  void removeKeyFrame(pqAnimationKeyFrame* frame);
+  void updateTimeScrollbar();
 
-  bool isDeletable() const { return this->Deletable; }
-  void setDeletable(bool d) { this->Deletable = d; }
+  /**
+  * called when the time scrollbar must be updated
+  */
+  void updateTimeScrollbarOffset(int);
 
-  QVariant property() const;
-
-  QRectF boundingRect() const override;
-
-public Q_SLOTS:
-  void setProperty(const QVariant& p);
-
-  void setBoundingRect(const QRectF& r);
-
-  void setEnabled(bool enable)
-  {
-    this->QGraphicsItem::setEnabled(enable);
-    Q_EMIT this->enabledChanged();
-  }
-
-Q_SIGNALS:
-  void propertyChanged();
-  void enabledChanged();
-
-protected:
-  void paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
+  /**
+  * called when the time scrollbar is being used in the GUI
+  */
+  void setTimeZoom(int);
 
 private:
-  bool Deletable = true;
-  QList<pqAnimationKeyFrame*> Frames;
-  QVariant Property;
+  QScrollBar* TimeScrollBar = nullptr;
+  QSpacerItem* ScrollBarSpacer = nullptr;
 
-  QRectF Rect;
+  QObject* SpacingNotifier = nullptr;
+
+  pqAnimationModel* AnimationModel = nullptr;
 };
 
-#endif // pqAnimationTrack_h
+#endif // pqTimelineScrollbar_h
