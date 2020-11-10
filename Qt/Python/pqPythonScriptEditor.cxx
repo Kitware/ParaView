@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqPythonManager.h"
 #include "pqPythonSyntaxHighlighter.h"
+#include "pqPythonTextArea.h"
 #include "pqSettings.h"
 
 #include <QAction>
@@ -46,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFontMetrics>
+#include <QHBoxLayout>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -58,24 +60,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqPythonScriptEditor::pqPythonScriptEditor(QWidget* p)
-  : Superclass(p)
+  : QMainWindow(p)
+  , TextArea(new pqPythonTextArea(this))
+  , pythonManager(nullptr)
 {
-  this->pythonManager = NULL;
-  this->TextEdit = new QTextEdit;
-  // tab is 4 spaces
-  this->TextEdit->setTabStopDistance(this->fontMetrics().horizontalAdvance("    "));
-  this->setCentralWidget(this->TextEdit);
+  this->setCentralWidget(this->TextArea);
+
   this->createActions();
   this->createMenus();
   this->createStatusBar();
   this->DefaultSaveDirectory = QDir::homePath();
   this->setCurrentFile("");
-  this->connect(
-    this->TextEdit->document(), SIGNAL(contentsChanged()), this, SLOT(documentWasModified()));
+  this->connect(this->TextArea->GetTextEdit()->document(), SIGNAL(contentsChanged()), this,
+    SLOT(documentWasModified()));
   this->resize(300, 450);
   pqApplicationCore::instance()->settings()->restoreState("PythonScriptEditor", *this);
   vtkPythonInterpreter::Initialize();
-  this->SyntaxHighlighter = new pqPythonSyntaxHighlighter(this->TextEdit, this);
 }
 
 //-----------------------------------------------------------------------------
@@ -83,8 +83,8 @@ void pqPythonScriptEditor::closeEvent(QCloseEvent* e)
 {
   if (this->maybeSave())
   {
-    this->TextEdit->clear();
-    this->TextEdit->document()->setModified(false);
+    this->TextArea->GetTextEdit()->clear();
+    this->TextArea->GetTextEdit()->document()->setModified(false);
     this->setWindowModified(false);
     e->accept();
     pqApplicationCore::instance()->settings()->saveState(*this, "PythonScriptEditor");
@@ -100,7 +100,7 @@ bool pqPythonScriptEditor::newFile()
 {
   if (this->maybeSave())
   {
-    this->TextEdit->clear();
+    this->TextArea->GetTextEdit()->clear();
     this->setCurrentFile("");
     return true;
   }
@@ -201,7 +201,7 @@ bool pqPythonScriptEditor::saveAs()
 //-----------------------------------------------------------------------------
 void pqPythonScriptEditor::documentWasModified()
 {
-  this->setWindowModified(this->TextEdit->document()->isModified());
+  this->setWindowModified(this->TextArea->GetTextEdit()->document()->isModified());
 }
 
 //-----------------------------------------------------------------------------
@@ -239,25 +239,27 @@ void pqPythonScriptEditor::createActions()
   this->cutAct->setShortcut(tr("Ctrl+X"));
   this->cutAct->setStatusTip(tr("Cut the current selection's contents to the "
                                 "clipboard"));
-  this->connect(this->cutAct, SIGNAL(triggered()), this->TextEdit, SLOT(cut()));
+  this->connect(this->cutAct, SIGNAL(triggered()), this->TextArea->GetTextEdit(), SLOT(cut()));
 
   this->copyAct = new QAction(tr("&Copy"), this);
   this->copyAct->setShortcut(tr("Ctrl+C"));
   this->copyAct->setStatusTip(tr("Copy the current selection's contents to the "
                                  "clipboard"));
-  this->connect(this->copyAct, SIGNAL(triggered()), this->TextEdit, SLOT(copy()));
+  this->connect(this->copyAct, SIGNAL(triggered()), this->TextArea->GetTextEdit(), SLOT(copy()));
 
   this->pasteAct = new QAction(tr("&Paste"), this);
   this->pasteAct->setShortcut(tr("Ctrl+V"));
   this->pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
                                   "selection"));
-  this->connect(this->pasteAct, SIGNAL(triggered()), this->TextEdit, SLOT(paste()));
+  this->connect(this->pasteAct, SIGNAL(triggered()), this->TextArea->GetTextEdit(), SLOT(paste()));
 
   this->saveAsMacroAct->setEnabled(false);
   this->cutAct->setEnabled(false);
   this->copyAct->setEnabled(false);
-  this->connect(this->TextEdit, SIGNAL(copyAvailable(bool)), this->cutAct, SLOT(setEnabled(bool)));
-  this->connect(this->TextEdit, SIGNAL(copyAvailable(bool)), this->copyAct, SLOT(setEnabled(bool)));
+  this->connect(this->TextArea->GetTextEdit(), SIGNAL(copyAvailable(bool)), this->cutAct,
+    SLOT(setEnabled(bool)));
+  this->connect(this->TextArea->GetTextEdit(), SIGNAL(copyAvailable(bool)), this->copyAct,
+    SLOT(setEnabled(bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -292,7 +294,7 @@ void pqPythonScriptEditor::createStatusBar()
 //-----------------------------------------------------------------------------
 bool pqPythonScriptEditor::maybeSave()
 {
-  if (this->TextEdit->document()->isModified())
+  if (this->TextArea->GetTextEdit()->document()->isModified())
   {
     QMessageBox::StandardButton ret;
     ret = QMessageBox::warning(this, tr("Script Editor"), tr("The document has been modified.\n"
@@ -313,7 +315,7 @@ bool pqPythonScriptEditor::maybeSave()
 //-----------------------------------------------------------------------------
 void pqPythonScriptEditor::setText(const QString& text)
 {
-  this->TextEdit->setPlainText(text);
+  this->TextArea->GetTextEdit()->setPlainText(text);
 }
 
 //-----------------------------------------------------------------------------
@@ -329,7 +331,7 @@ void pqPythonScriptEditor::loadFile(const QString& fileName)
 
   QTextStream in(&file);
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  this->TextEdit->setPlainText(in.readAll());
+  this->TextArea->GetTextEdit()->setPlainText(in.readAll());
   QApplication::restoreOverrideCursor();
 
   this->setCurrentFile(fileName);
@@ -349,7 +351,7 @@ bool pqPythonScriptEditor::saveFile(const QString& fileName)
 
   QTextStream out(&file);
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  out << this->TextEdit->toPlainText();
+  out << this->TextArea->GetTextEdit()->toPlainText();
   QApplication::restoreOverrideCursor();
 
   this->setCurrentFile(fileName);
@@ -362,7 +364,7 @@ bool pqPythonScriptEditor::saveFile(const QString& fileName)
 void pqPythonScriptEditor::setCurrentFile(const QString& fileName)
 {
   this->CurrentFile = fileName;
-  this->TextEdit->document()->setModified(false);
+  this->TextArea->GetTextEdit()->document()->setModified(false);
   this->setWindowModified(false);
 
   QString shownName;
@@ -387,5 +389,6 @@ QString pqPythonScriptEditor::strippedName(const QString& fullFileName)
 //-----------------------------------------------------------------------------
 void pqPythonScriptEditor::scrollToBottom()
 {
-  this->TextEdit->verticalScrollBar()->setValue(this->TextEdit->verticalScrollBar()->maximum());
+  this->TextArea->GetTextEdit()->verticalScrollBar()->setValue(
+    this->TextArea->GetTextEdit()->verticalScrollBar()->maximum());
 }

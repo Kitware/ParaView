@@ -35,7 +35,9 @@ set(classes
   pqPythonScriptEditor
   pqPythonShell
   pqPythonShellCompleter
-  pqPythonSyntaxHighlighter)
+  pqPythonSyntaxHighlighter
+  pqPythonLineNumberArea
+  pqPythonTextArea)
 
 set(ui_files
   pqPythonShell.ui)

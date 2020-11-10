@@ -1,0 +1,90 @@
+/*=========================================================================
+
+   Program: ParaView
+   Module:    pqPythonLineNumberArea.cxx
+
+   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.2.
+
+   See License_v1.2.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=========================================================================*/
+
+#include "pqPythonLineNumberArea.h"
+#include "pqPythonScriptEditor.h"
+#include "pqPythonUtils.h"
+
+#include <cmath>
+#include <iostream>
+
+#include <QPaintEvent>
+#include <QPainter>
+#include <QScrollBar>
+#include <QTextBlock>
+
+inline std::uint32_t GetNumberOfDigits(std::uint32_t i)
+{
+  return i > 0 ? (std::int32_t)std::log10((float)i) + 1 : 1;
+}
+
+QSize pqPythonLineNumberArea::sizeHint() const
+{
+  const std::uint32_t numberOfDigits =
+    GetNumberOfDigits(std::max(1, text.document()->blockCount()));
+#if QT_VERSION >= 0x050B00
+  const std::int32_t space =
+    13 + numberOfDigits * text.fontMetrics().horizontalAdvance(QLatin1Char('9'));
+#else
+  const std::int32_t space = 13 + numberOfDigits * text.fontMetrics().width(QLatin1Char('9'));
+#endif
+
+  return QSize{ space, text.height() };
+}
+
+void pqPythonLineNumberArea::paintEvent(QPaintEvent* event)
+{
+  QPainter painter(this);
+
+  painter.fillRect(event->rect(), Qt::lightGray);
+  painter.setFont(text.font());
+
+  const QSize size = this->sizeHint();
+
+  std::int32_t firstBlockId = std::max(0, GetFirstVisibleBlockId(text) - 1);
+  QTextBlock block = text.document()->findBlockByNumber(firstBlockId);
+
+  while (block.isValid() && block.isVisible())
+  {
+    const QTextCursor blockCursor(block);
+    const QRect blockCursorRect = this->text.cursorRect(blockCursor);
+
+    painter.setPen(
+      (this->text.textCursor().blockNumber() == firstBlockId) ? Qt::green : Qt::darkGray);
+    const QString number = QString::number(firstBlockId + 1);
+    painter.drawText(-5, blockCursorRect.y() + 2, size.width(), text.fontMetrics().height(),
+      Qt::AlignRight, number);
+
+    block = block.next();
+    firstBlockId++;
+  }
+}
