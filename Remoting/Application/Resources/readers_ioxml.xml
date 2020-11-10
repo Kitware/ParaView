@@ -2533,7 +2533,7 @@
                proxygroup="internal_sources"
                proxyname="XMLMultiBlockDataReaderCore"></Proxy>
         <ExposedProperties>
-          <PropertyGroup label="Cell/Point BAH Array Status"
+          <PropertyGroup label="Cell/Point Array Status"
                          name="CellPointArrayStatus"
                          panel_visibility="default"
                          panel_widget="ArrayStatus">
