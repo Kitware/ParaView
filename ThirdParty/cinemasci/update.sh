@@ -8,12 +8,13 @@ readonly name="cinemasci"
 readonly ownership="Cinemasci Python Upstream <kwrobot@kitware.com>"
 readonly subtree="ThirdParty/cinemasci/paraview/tpl"
 readonly repo="https://github.com/cinemascience/cinemasci.git"
-readonly tag="79c3cdbbc53c4b020191c09b5a37e04f5c807490"
+readonly tag="b98f6d62802f0d3ef8145ef999db7877cc079b75"
 
 readonly paths="
 .gitignore
 license.md
 cinemasci/__init__.py
+cinemasci/version.py
 cinemasci/cdb/
 cinemasci/cis/
 cinemasci/pynb/
