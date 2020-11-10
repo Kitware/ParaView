@@ -189,9 +189,17 @@ void vtkInSituInitializationHelper::AddPipeline(const std::string& path)
 
   vtkNew<vtkInSituPipelinePython> pipeline;
   pipeline->SetFileName(path.c_str());
+  vtkInSituInitializationHelper::AddPipeline(pipeline);
+}
 
-  auto& internals = (*vtkInSituInitializationHelper::Internals);
-  internals.Pipelines.push_back(vtkInternals::PipelineInfo{ pipeline, false, false, false });
+//----------------------------------------------------------------------------
+void vtkInSituInitializationHelper::AddPipeline(vtkInSituPipeline* pipeline)
+{
+  if (pipeline)
+  {
+    auto& internals = (*vtkInSituInitializationHelper::Internals);
+    internals.Pipelines.push_back(vtkInternals::PipelineInfo{ pipeline, false, false, false });
+  }
 }
 
 //----------------------------------------------------------------------------

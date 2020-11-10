@@ -30,6 +30,7 @@
 #==========================================================================
 set(classes
   vtkInSituPipeline
+  vtkInSituPipelineIO
   vtkInSituPipelinePython
   vtkInSituInitializationHelper)
 

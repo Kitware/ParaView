@@ -63,6 +63,13 @@ analysis.
   node with child nodes that provides paths to the Python scripts to load for
   in situ analysis.
 
+Additionally, one can provide a list of pre-compiled pipelines to use.
+
+* catalyst/pipelines: (optional) if present must be a 'list' or 'object' node
+  with child nodes that are objects that provide type and parameters for
+  hard-coded pipelines to use. Each object must be in accordance to the
+  protocol: 'pipeline'.
+
 In MPI-enabled builds, ParaView is by default initialized to use `MPI_COMM_WORLD`
 as the global communicator. A specific MPI communicator can be provided as
 follows:
@@ -108,3 +115,19 @@ The 'channel' protocol is as follows:
 ### protocol: 'finalize'
 
 Currently, this is empty.
+
+### protocol: 'pipeline'
+
+Defines type and parameters for a hard-coded pipeline.
+
+* type: (required) a string identifying the type of the pipeline. Currently
+  supported value is "io".
+
+When 'type' is 'io', the following attributes are supported.
+
+* filename: (required) a string representing a filename. `%ts` may be used to
+  replace with timestep or `%t` may be used to replace with time value. You can
+  use `printf` style format specifiers e.g. `%03t` etc. The filename may be used
+  to determine which supported writer to use for saving the data.
+
+* channel: (required) a string identifying the channel by its name.
