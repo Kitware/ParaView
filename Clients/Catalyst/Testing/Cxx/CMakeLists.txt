@@ -10,10 +10,16 @@ vtk_add_test_cxx(vtkPVCatalystCxxTests tests
   )
 
 if (PARAVIEW_PLUGIN_ENABLE_VTKmFilters AND PARAVIEW_USE_VTKM)
+  set(LoadVTKmFilterPluginDriver_ARGS
+        "--script"
+        "${CMAKE_CURRENT_LIST_DIR}/LoadVTKmFilterPlugin.py")
   vtk_add_test_cxx(vtkPVCatalystCxxTests tests
     NO_VALID NO_DATA NO_OUTPUT
-    LoadVTKmFilterPluginDriver.cxx)
+    LoadVTKmFilterPluginDriver.cxx
+    LoadVTKmFilterPluginDriverFromScript,LoadVTKmFilterPluginDriver.cxx)
+  unset(LoadVTKmFilterPluginDriver_ARGS)
 endif()
+
 # the CoProcessingTestOutputs needs to be run with ${MPIEXEC} if
 # the executable was built with MPI because certain machines only
 # allow running MPI programs with the proper ${MPIEXEC}
