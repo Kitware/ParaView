@@ -14,8 +14,11 @@ set(files
   paraview/tpl/cinemasci/cis/write/__init__.py
   paraview/tpl/cinemasci/__init__.py
   paraview/tpl/cinemasci/pynb/__init__.py
+  paraview/tpl/cinemasci/server/cinema_test.html
+  paraview/tpl/cinemasci/server/error_no-database.html
   paraview/tpl/cinemasci/server/__init__.py
   paraview/tpl/cinemasci/server/__main__.py
+  paraview/tpl/cinemasci/version.py
   paraview/tpl/cinemasci/viewers/cinema/explorer/2.0/css/viewer.css
   paraview/tpl/cinemasci/viewers/cinema/explorer/2.0/databases.json
   paraview/tpl/cinemasci/viewers/cinema/explorer/2.0/js/main.js
@@ -38,7 +41,8 @@ set(files
   paraview/tpl/cinemasci/viewers/license.md
   paraview/tpl/cinemasci/viewers/readme.md
   paraview/tpl/cinemasci/viewers/test_explorer.html
-  paraview/tpl/cinemasci/viewers/test_view.html)
+  paraview/tpl/cinemasci/viewers/test_view.html
+  paraview/tpl/cinemasci/viewers/version.md)
 
 vtk_module_add_python_package(ParaView::CinemaSci
   FILES               ${files}

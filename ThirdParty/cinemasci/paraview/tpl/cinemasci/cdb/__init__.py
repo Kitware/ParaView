@@ -1,6 +1,7 @@
 import os.path
 import sqlite3
 import pandas
+from ..  import version 
 
 class cdb:
     """Cinema Database Class
@@ -16,7 +17,6 @@ class cdb:
         - Example: `/0/90/temperature`
     """
 
-    Version = "0.5"
     DataFile = "data.csv"
     MetaDataDir = ".cinema"
     MetaDataFile = "cinema.json"
@@ -311,7 +311,8 @@ class cdb:
         # write out the csv file
         db_df[ordered].to_csv(self.datapath, index=False)
 
-        self.__write_cinema_metadata()
+        if False:
+            self.__write_cinema_metadata()
 
     def __write_cinema_metadata(self):
         mddir = os.path.join(self.path, cdb.MetaDataDir)
@@ -325,7 +326,7 @@ class cdb:
             cfile.write("    \"specversion\": \"{}\"\n".format(cdb.CinemaSpecVersion))
             cfile.write("  },\n" )
             cfile.write("  \"cinemasci\": {\n" )
-            cfile.write("    \"version\": \"{}\"\n".format(cdb.Version))
+            cfile.write("    \"version\": \"{}\"\n".format(version.Version))
             cfile.write("  }\n" )
             cfile.write("}\n")
 
