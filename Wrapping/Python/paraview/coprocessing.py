@@ -439,6 +439,9 @@ class CoProcessor(object):
             # we have a description of this channel but we don't need the grid so return
             return
 
+        if inputname in self.__ProducersMap:
+            raise RuntimeError("CreateProducer is being called multiple times for input '%s'" % inputname)
+
         producer = simple.PVTrivialProducer(guiName=inputname)
         producer.add_attribute("cpSimulationInput", inputname)
         # mark this as an input proxy so we can use cpstate.locate_simulation_inputs()
