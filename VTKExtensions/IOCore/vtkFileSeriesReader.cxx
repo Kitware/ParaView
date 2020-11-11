@@ -32,6 +32,7 @@
 #include "vtkInformationIntegerKey.h"
 #include "vtkInformationStringKey.h"
 #include "vtkInformationVector.h"
+#include "vtkLogger.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -71,11 +72,19 @@ public:
   int ChooseInput(vtkInformation* outInfo);
   std::vector<double> GetTimesForInput(int inputId, vtkInformation* outInfo);
 
+  // When set to true, `GetAggregateTimeInfo` will not add any TIME_STEPS or
+  // TIME_RANGE keys in the output information. This is useful to avoid adding
+  // time for single-file reads where the internal reader did not report any
+  // time nor did we have any overridden time.
+  // See paraview/paraview#20314 and paraview/paraview#19777 for two apparently
+  // conflicting use-cases that need to be supported.
+  void SetSkipTimeInOutput(bool val) { this->SkipTimeInOutput = val; }
 private:
   static vtkInformationIntegerKey* INDEX();
   typedef std::map<double, vtkSmartPointer<vtkInformation> > RangeMapType;
   RangeMapType RangeMap;
   std::map<int, vtkSmartPointer<vtkInformation> > InputLookup;
+  bool SkipTimeInOutput = false;
 };
 
 vtkInformationKeyMacro(vtkFileSeriesReaderTimeRanges, INDEX, Integer);
@@ -85,6 +94,7 @@ void vtkFileSeriesReaderTimeRanges::Reset()
 {
   this->RangeMap.clear();
   this->InputLookup.clear();
+  this->SkipTimeInOutput = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -180,6 +190,15 @@ int vtkFileSeriesReaderTimeRanges::GetAggregateTimeInfo(vtkInformation* outInfo)
   else
   {
     outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  }
+
+  // special-case: this is used to avoid making up time for non-temporal
+  // datasets as that can cause unnecessary updates (see
+  // paraview/paraview#20314).
+  if (this->SkipTimeInOutput)
+  {
+    outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
   }
   return 1;
 }
@@ -609,6 +628,9 @@ int vtkFileSeriesReader::RequestInformation(vtkInformation* request,
     // index.
     outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
     outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+    const bool override_time =
+      numFiles > 1 || (this->UseJsonMetaFile && this->Internal->TimeValues.size() == numFiles);
+    this->Internal->TimeRanges->SetSkipTimeInOutput(override_time == false);
     for (unsigned int i = 0; i < numFiles; i++)
     {
       double time = (double)i;
@@ -639,6 +661,10 @@ int vtkFileSeriesReader::RequestInformation(vtkInformation* request,
   // Now that we have collected all of the time information, set the aggregate
   // time steps in the output.
   this->Internal->TimeRanges->GetAggregateTimeInfo(outInfo);
+
+  vtkLogF(TRACE, "%s: has time: %d", vtkLogIdentifier(this),
+    outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()));
+
   return 1;
 }
 
