@@ -7,6 +7,9 @@ Modules may add filters to the UI by providing XML files.
 TODO: Document the ServerManager XML format.
 #]==]
 
+cmake_policy(PUSH)
+cmake_policy(SET CMP0057 NEW)
+
 #[==[.md
 ## Adding XMLs to modules
 
@@ -310,3 +313,5 @@ void ${_paraview_sm_process_files_TARGET}_initialize(std::vector<std::string>& x
   endif ()
   _vtk_module_install("${_paraview_sm_process_files_TARGET}")
 endfunction ()
+
+cmake_policy(POP)
