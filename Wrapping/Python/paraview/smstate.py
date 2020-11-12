@@ -105,7 +105,8 @@ def get_producers(proxy, filter, producer_set):
             get_producers(proxy.ScalarOpacityFunction, filter, producer_set)
     except AttributeError: pass
 
-def get_state(options=None, source_set=[], filter=None, raw=False):
+def get_state(options=None, source_set=[], filter=None, raw=False,
+        preamble=None, postamble=None):
     """Returns the state string"""
     if options:
         options = sm._getPyProxy(options)
@@ -156,7 +157,10 @@ def get_state(options=None, source_set=[], filter=None, raw=False):
     trace_config.SetSkipRenderingComponents(skipRenderingComponents)
 
     trace = smtrace.TraceOutput()
-    trace.append("# state file generated using %s" % simple.GetParaViewSourceVersion())
+    if preamble is None:
+        trace.append("# state file generated using %s" % simple.GetParaViewSourceVersion())
+    elif preamble:
+        trace.append(preamble)
     trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
     #--------------------------------------------------------------------------
@@ -342,12 +346,16 @@ def get_state(options=None, source_set=[], filter=None, raw=False):
             "SetActiveSource(%s)" % smtrace.Trace.get_accessor(simple.GetActiveSource()),
             "# ----------------------------------------------------------------"])
 
-    if options:
-        # add coda about extracts generation.
-        trace.append_separated(["",
-            "if __name__ == '__main__':",
-            "    # generate extracts",
-            "    SaveExtracts(ExtractsOutputDirectory='%s')" % options.ExtractsOutputDirectory])
+    if postamble is None:
+        if options:
+            # add coda about extracts generation.
+            trace.append_separated(["",
+                "if __name__ == '__main__':",
+                "    # generate extracts",
+                "    SaveExtracts(ExtractsOutputDirectory='%s')" % options.ExtractsOutputDirectory])
+    elif postamble:
+        trace.append_separated(postamble)
+
     del trace_config
     smtrace.stop_trace()
     #print (trace)
