@@ -17,6 +17,7 @@
 #include "vtkDataObject.h"
 #include "vtkExecutive.h"
 #include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
@@ -155,9 +156,17 @@ int vtkPVDReader::RequestDataObject(
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDReader::SetupOutputInformation(vtkInformation* outInfo)
+int vtkPVDReader::RequestInformation(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  this->Superclass::SetupOutputInformation(outInfo);
+  if (!this->Superclass::RequestInformation(request, inputVector, outputVector))
+  {
+    return 0;
+  }
+
+  int outputPort = request->Get(vtkDemandDrivenPipeline::FROM_OUTPUT_PORT());
+  outputPort = outputPort >= 0 ? outputPort : 0;
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   int index = this->GetAttributeIndex("timestep");
   int numTimeSteps = this->GetNumberOfAttributeValues(index);
@@ -192,4 +201,5 @@ void vtkPVDReader::SetupOutputInformation(vtkInformation* outInfo)
     timeRange[1] = timeSteps[numTimeSteps - 1];
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
   }
+  return 1;
 }
