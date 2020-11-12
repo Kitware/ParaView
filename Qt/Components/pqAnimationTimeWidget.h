@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include <vector>
 
+class pqAnimationScene;
 class vtkSMProxy;
 
 /**
@@ -61,7 +62,6 @@ class PQCOMPONENTS_EXPORT pqAnimationTimeWidget : public QWidget
 {
   Q_OBJECT
   Q_ENUMS(RealNumberNotation)
-  Q_PROPERTY(double timeValue READ timeValue WRITE setTimeValue NOTIFY timeValueChanged)
   Q_PROPERTY(QString playMode READ playMode WRITE setPlayMode NOTIFY playModeChanged)
   Q_PROPERTY(bool playModeReadOnly READ playModeReadOnly WRITE setPlayModeReadOnly)
   Q_PROPERTY(QString timeLabel READ timeLabel WRITE setTimeLabel)
@@ -72,7 +72,6 @@ class PQCOMPONENTS_EXPORT pqAnimationTimeWidget : public QWidget
 public:
   pqAnimationTimeWidget(QWidget* parent = 0);
   ~pqAnimationTimeWidget() override;
-
   using RealNumberNotation = pqDoubleLineEdit::RealNumberNotation;
 
   /**
@@ -80,6 +79,12 @@ public:
   * controlled/reflected by this widget.
   */
   vtkSMProxy* animationScene() const;
+
+  /**
+  * Set the animation scene which is reflected/controlled by this
+  * widget.
+  */
+  void setAnimationScene(pqAnimationScene* animationScene);
 
   //@{
   /**
@@ -90,13 +95,10 @@ public:
   const QList<QVariant>& timestepValues() const;
   //@}
 
-  //@{
   /**
-  * Get/set the current time value.
+  * Set the current animation time
   */
-  void setTimeValue(double time);
-  double timeValue() const;
-  //@}
+  void setCurrentTime(double t);
 
   /**
    * Return the notation used to display the number.
@@ -155,17 +157,10 @@ public:
   //@}
 
 Q_SIGNALS:
-  void timeValueChanged();
   void playModeChanged();
   void dummySignal();
 
 public Q_SLOTS:
-  /**
-  * Set the animation scene proxy which is reflected/controlled by this
-  * widget.
-  */
-  void setAnimationScene(vtkSMProxy* animationScene);
-
   /**
    * Set the notation used to display the number.
    * \sa notation()
@@ -177,6 +172,12 @@ public Q_SLOTS:
    * \sa precision()
    */
   void setPrecision(int precision);
+
+protected Q_SLOTS:
+  /**
+  * Update the current time in the widget GUI
+  */
+  void updateCurrentTime(double t);
 
 private:
   Q_DISABLE_COPY(pqAnimationTimeWidget)

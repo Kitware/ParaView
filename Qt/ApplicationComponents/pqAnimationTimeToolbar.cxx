@@ -55,7 +55,7 @@ void pqAnimationTimeToolbar::constructor()
 //-----------------------------------------------------------------------------
 void pqAnimationTimeToolbar::setAnimationScene(pqAnimationScene* scene)
 {
-  this->AnimationTimeWidget->setAnimationScene(scene ? scene->getProxy() : NULL);
+  this->AnimationTimeWidget->setAnimationScene(scene);
 }
 
 //-----------------------------------------------------------------------------

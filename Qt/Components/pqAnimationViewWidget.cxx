@@ -406,11 +406,8 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
       SIGNAL(currentTextChanged(const QString&)), scene->getProxy(),
       scene->getProxy()->GetProperty("PlayMode"));
 
-    // connect time
-    this->Internal->Links.addTraceablePropertyLink(this->Internal->AnimationTimeWidget, "timeValue",
-      SIGNAL(timeValueChanged()), scene->getProxy(),
-      scene->getProxy()->GetProperty("AnimationTime"));
-    this->Internal->AnimationTimeWidget->setAnimationScene(scene->getProxy());
+    // connect time widget to the scene
+    this->Internal->AnimationTimeWidget->setAnimationScene(scene);
     // connect start time
     this->Internal->Links.addTraceablePropertyLink(this->Internal->StartTime, "text",
       SIGNAL(editingFinished()), scene->getProxy(), scene->getProxy()->GetProperty("StartTime"));
@@ -576,6 +573,8 @@ void pqAnimationViewWidget::updateSceneTime()
 //-----------------------------------------------------------------------------
 void pqAnimationViewWidget::setCurrentTime(double t)
 {
+  BEGIN_UNDO_EXCLUDE();
+
   vtkSMProxy* animationScene = this->Internal->Scene->getProxy();
   {
     // Use another scope to prevent modifications to the TimeKeeper from
@@ -584,6 +583,8 @@ void pqAnimationViewWidget::setCurrentTime(double t)
     vtkSMPropertyHelper(animationScene, "AnimationTime").Set(t);
   }
   animationScene->UpdateVTKObjects();
+
+  END_UNDO_EXCLUDE();
 }
 
 //-----------------------------------------------------------------------------
