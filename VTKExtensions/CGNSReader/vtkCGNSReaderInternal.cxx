@@ -1199,14 +1199,9 @@ bool ReadBase(vtkCGNSReader* reader, const BaseInformation& baseInfo)
 }
 
 //------------------------------------------------------------------------------
-bool ReadGridForZone(
+bool ReadDataForZone(
   vtkCGNSReader* reader, const BaseInformation& baseInfo, const ZoneInformation& zoneInfo)
 {
-  if (!reader->GetLoadMesh())
-  {
-    return false;
-  } // mesh (aka grid) is not enabled.
-
   auto baseSelection = reader->GetBaseSelection();
   if (!baseSelection->ArrayIsEnabled(baseInfo.name))
   {
@@ -1223,6 +1218,18 @@ bool ReadGridForZone(
   }
 
   return true;
+}
+
+//------------------------------------------------------------------------------
+bool ReadGridForZone(
+  vtkCGNSReader* reader, const BaseInformation& baseInfo, const ZoneInformation& zoneInfo)
+{
+  if (!reader->GetLoadMesh())
+  {
+    return false;
+  } // mesh (aka grid) is not enabled.
+
+  return ReadDataForZone(reader, baseInfo, zoneInfo);
 }
 
 //------------------------------------------------------------------------------
