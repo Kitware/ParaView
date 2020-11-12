@@ -188,7 +188,7 @@ void vtkInSituInitializationHelper::AddPipeline(const std::string& path)
   }
 
   vtkNew<vtkInSituPipelinePython> pipeline;
-  pipeline->SetPipelinePath(path.c_str());
+  pipeline->SetFileName(path.c_str());
 
   auto& internals = (*vtkInSituInitializationHelper::Internals);
   internals.Pipelines.push_back(vtkInternals::PipelineInfo{ pipeline, false, false, false });

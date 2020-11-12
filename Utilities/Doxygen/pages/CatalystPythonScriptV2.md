@@ -1,148 +1,75 @@
-Anatomy of Catalyst Python Module (Version 2.0)  {#CatalystPythonScriptsV2}
-===============================================
+# Anatomy of Catalyst Python Module (Version 2.0)  {#CatalystPythonScriptsV2}
 
 This page describes the details of Python modules intended for use in Catalyst.
 This page covers features supported by ParaView 5.9 and later i.e. version 2.0.
 
-Basics
------
+## Basics
 
 Catalyst Python modules are simply Python scripts that use the `paraview`
-package to define data analysis and visualization pipelines. They can be
-structured as a standard `.py` file or collection of `.py` files (i.e. a Python package).
-The former is suitable for simple analysis scripts, while the latter is intended for
-more complex pipelines and use-cases.
+package to define data analysis and visualization pipelines. You use these
+modules to define the analysis pipelines to be executed in a
+Catalyst-instrumented simulation code, for example.
 
-When structured as a package, the directory containing the package (and all the
-`.py` files (modules) that comprise the package) can be zipped in to a `.zip`
-file with same name as as the package. Directly loading such a `.zip` archive is
-also supported by Catalyst. In fact, this is the recommended way for production
-runs on HPC systems.
+[Python](https://docs.python.org/3/tutorial/modules.html)
+defines a module as a file containing Python definitions and statements.
+The file name for a module is the name of the module suffixed by extension
+`.py`. Thus a module named `foo` will be in a file named `foo.py`.
 
-Catalyst adaptor developers can use `vtkCPPythonScriptV2Pipeline` to add
-vtkCPPipeline objects to the co-processor for version 2.0 Catalyst Python
-modules structured as a single `.py` file, or a package or `.zip` containing a
-package.
+[Packages](https://docs.python.org/3/tutorial/modules.html#packages) are a
+mechanism for structuring multiple modules. Essentially, if you place a bunch of
+.py files (aka modules) in a directory structure, that becomes a package! Of
+course, there's a little more to that and the
+[Python docs](https://docs.python.org/3/tutorial/modules.html#packages) are
+a highly recommended read. Similar to the convection to name a module using the
+file name, the name of the directory representing a Python package
+becomes the name of the package. A package can contain multiple directories
+(sub-packages) and Python files.
 
-Simulation codes that use Python for interfacing with Catalyst can leverage
-`paraview.catalyst.bridge` to deal with all the Catalyst initialization and
-update complexity. For such codes can use `paraview.catalyst.bridge.add_pipeline_v2`
-to register version 2.0 Catalyst Python scripts, packages or package-zips.
+When a Python module is *imported* into the application, the Python statements
+in the module are executed. Since a Python module is a file, the execution
+starts with the first statement in the file and continues till the end of the
+file is reached or an error is encountered.
 
+When a Python package is *imported*, the entry-point is defined by a file named
+`__init__.py` with in the package. Statements in this file are executed. In the
+simplest case, `__init__.py` can be an empty file, but it can also execute
+initialization code, including importing other modules, packages, sub-packages
+etc.
 
-Execution
----------
+Catalyst Python code can be structured as modules or packages. In either case,
+the module (or package) is imported and then functions or variables defined on
+the module (or package) are checked and invoked as described in following
+sections.
 
-Now, let's look at how and when the Python code in the Catalyst Python module is executed.
-The Catalyst co-processor (vtkCPProcessor) splits in situ pipeline execution into two stages:
-first is called **RequestDataDescription**, where meta-data is collected / updated and
-**CoProcess** where the analysis pipeline execution takes place.
+## vtkCPPythonScriptV2Pipeline
 
-The Catalyst module gets loaded, rather *imported*, the first time
-**RequestDataDescription** gets called. Thus, any statements that you have in
-the module script (or `__init__.py` for packages) will get executed at that point.
-This implies the following:
+Catalyst adaptors should use `vtkCPPythonScriptV2Pipeline` to execute scripts as
+described in this document. For older Catalyst Python scripts, i.e. those that
+use `RequestDataDescription` and `DoCoProcess` functions, should continue to
+use `vtkCPPythonScriptPipeline` and `vtkCPPythonStringPipeline` at this time.
+It is conceivable that we provide a wrapper that lets us use
+`vtkCPPythonScriptV2Pipeline` for these older script too, however, that has not
+been implemented at this time.
 
-1. Since RequestDataDescription pass is intended for gathering meta-data, it is not assured that the
-   simulation will provide any valid data at this stage. This means that any code that will get
-   executed at this stage cannot depend on simulation data to be available.
+## Structure
 
-2. If you are using Python package instead of a script or module, Python defines the entry point for the
-   package as a file named `__init__.py`. Thus, any code you have in this file will get executed.
-   Any code in other .py files in the package need not get executed unless explicitly imported in the
-   `__init__.py` file.
+Now, let's look at the structure of a Catalyst Python module. The same is
+applicable to a Python package as well.
 
-At the very least, the module must define a global variable named `options` which defines co-processing
-options like frequency of updates, output directories, etc. The following is the typical way of creating
-and initializing this options instance.
+### Visualization Pipeline
 
-```py
-# catalyst options
-from paraview.catalyst import Options
-options = Options()
-options.ExtractsOutputDirectory = "...."
-
-# global trigger params (optional)
-options.GlobalTrigger.UseStartTimeStep = ... # default=False
-options.GlobalTrigger.StartTimeStep = ...    # default=0
-options.GlobalTrigger.UseEndTimeStep = ..    # default=False
-options.GlobalTrigger.EndTimeStep = ...      # default=0
-options.GlobalTrigger.Frequency = ...        # default=1
-
-# live params (optional)
-options.EnableCatalystLive = ...                    # default=False
-options.CatalystLiveURL = ...                       # default="localhost:2222"
-options.CatalystLiveTrigger.UseStartTimeStep = ...  # default=False
-options.CatalystLiveTrigger.StartTimeStep = ...     # default=0
-options.CatalystLiveTrigger.UseEndTimeStep = ...    # default=False
-options.CatalystLiveTrigger.EndTimeStep = ...       # default=0
-options.CatalystLiveTrigger.Frequency = ...         # default=1
-
-```
-
-Once the module is imported, Catalyst evaluates the GlobalTrigger and CatalystLiveTrigger parameters
-(if EnableCatalystLive is set to True) to determine whether to continue with subsequent steps. If
-the trigger criteria is not statisfied further processing of the Catalyst modules is skipped until new
-**RequestDataDescription** when the trigger criteria is reevaluated.
-
-Next, Catalyst checks if the module has a function called `catalyst_request_data_description`. If defined,
-this function is called with current vtkCPDataDescription object as argument. This is only intended for
-very custom and advanced use-cases, including testing. Generally, users should not need to rely on any
-such `catalyst_` functions.
-
-After **RequestDataDescription** stage, the Catalyst co-processor will trigger **CoProcess** stage, unless
-it was skipped (based on GlobalTrigger and CatalystLiveTrigger parameters). In **CoProcess**, simulation has
-made its data available for analysis. Thus code can now rely on that for setup or execution.
-First time **CoProcess** gets called, Catalyst looks for presence of a global variable named **scripts**
-in the module. When present, this is a list of names of submodules that have code to setup analysis
-and visualization pipelines. Typically, these are simply ParaView Python scripts that define the visualization
-state -- same as the scripts used for `pvpython` or `pvbatch`. All submodules list in **scripts** variable
-are imported at this point. Since this happens during **CoProcess**, these scripts can safely rely on
-valid simulation data being present to setup pipeline state e.g. setting up filter parameters,
-color map ranges, etc. Note, this happens only the first time **CoProcess** is called, i.e. subsequent
-**CoProcess** calls don't cause the analysis scripts to be reimported.
-
-```py
-# this will cause a `pipeline.py` from the Python package to be imported
-# in first call to CoProcess
-scripts = ["pipeline"]
-```
-
-The submodule may define visualization state that includes extractors for generating extracts.
-These extractors may have their own triggers. Before proceeding further, Catalyst now checks if
-any triggers defined are activated for the current timestep. If not, the further processing of the module
-is skipped.
-
-Next, when not skipped, Catalyst checks for a function called `catalyst_initialize` in the module and all of
-the submodules imported via `scripts`. If present, this function is called, again with the current
-vtkCPDataDescription object as argument starting with the module and then on each of the submodules in the
-same order as in the `scripts` list. This is only called once; subsequent calls to **CoProcess** will skip this
-step. When not using a package, for example, `catalyst_initialize` is a good function to implement code to setup
-you analysis pipeline since its called once and you're assured that the simulation data is valid -- which is often
-necessary when setting up visualization pipelines.
-
-Next, Catalyst optionally calls the function `catalyst_coprocess`, if present, on the module and all
-the submodules imported via `scripts` in same order as `catalyst_initialize`. Again, this is generally
-not needed except for highly customized / advanced use-cases.
-
-Next, Catalyst will generate extracts using extractors created by the module (or its submodules). Finally,
-if `EnableCatalystLive` is true and the CatalystLiveTrigger is satisfied, Catalyst attempts to connect to
-ParaView GUI at the `CatalystLiveURL` for Live.
-
-These **RequestDataDescription** and **CoProcess** stages are repeated for the entire simulation run. On termination,
-Catalyst optionally calls `catalyst_finalize` on the module and submodules imported via `scripts`. Here, however, the
-submodules are finalized before that the top-level module/package is finalized.
-
-
-Visualization Pipeline
------------------------
-
-ParaView Python API, exposed via the `paraview.simple` module, is used to define the visualization and data
-pipeline. The API mimics actions one would take the GUI. For example, simple script to create a **Wavelet** source
+ParaView Python API, exposed via the `paraview.simple` module, is used to define
+the visualization and data analysis pipeline. The API mimics actions one would
+take the GUI. For example, simple script to create a **Wavelet** source and
 slice it, looks as follows:
 
 ```py
+# filename: sample1.py
 from paraview.simple import *
+from paraview import print_info
+
+# print start marker
+print_info("begin '%s'", __name__)
 
 wavelet1 = Wavelet(registrationName='Wavelet1')
 
@@ -151,6 +78,8 @@ slice1 = Slice(registrationName='Slice1', Input=wavelet1)
 slice1.SliceType = 'Plane'
 slice1.SliceType.Normal = [0, 0, 1]
 
+# print end marker
+print_info("end '%s'", __name__)
 ```
 
 This same code can be used in a Catalyst Python script to setup the visualization
@@ -163,111 +92,425 @@ In the Python script, when creating a source or a filter, one can pass in an
 optional argument `registrationName`.  When the script is being executed within
 Catalyst, Catalyst looks to see if the `registrationName` matches the name of a
 known channel. If so, the data producer type requested (in this case Wavelet) is
-ignored and instead is replaced by a producer that puts out simulation data on
-that channel.
+ignored and instead is replaced by a producer that provides simulation data as
+the output.
 
 The `paraview.demos.wavelet_miniapp` is a miniapp that acts as a simulation
 producing a time value `vtkImageData` dataset. So we can use it to run the above
-script.
-
-To do that, let's create a Python package. Create a directory, say
-`/tmp/sample` with the following contents:
+script as follows:
 
 ```
-/tmp/sample/
-/tmp/sample/__init__.py
-/tmp/sample/pipeline.py
+> pvbatch -m paraview.demos.wavelet_miniapp
+          --script .../sample1.py
+          --script-version 2
+          --timesteps 2
+
+(   0.550s) [pvbatch         ]              bridge.py:17    WARN| Warning: ParaView has been initialized before `initialize` is called
+(   1.830s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 1/2
+(   1.897s) [pvbatch         ]             sample1.py:6     INFO| begin 'sample1'
+(   1.933s) [pvbatch         ]             sample1.py:16    INFO| end 'sample1'
+(   1.933s) [pvbatch         ]        v2_internals.py:145   WARN| Module 'sample1' missing Catalyst 'options', will use a default options object
+(   1.936s) [pvbatch         ]vtkCPPythonScriptV2Help:432   WARN| script may not depend on simulation data; is that expected?
+(   1.937s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 2/2
+(   1.985s) [pvbatch         ]vtkCPPythonScriptV2Help:432   WARN| script may not depend on simulation data; is that expected?
 ```
 
-The `__init__.py` looks as follows:
+Let's inspect the warnings to understand what's going on.
+
+`bridge.py:17` warning can be ignored for now. The `INFO` messages are produced
+by `wavelet_miniapp.py` to provide information about the timestep as it
+progresses through the mock-simulation timesteps.
+
+`Module 'sample1' missing Catalyst 'options', will use a default options object`
+warning lets us know that the Catalyst will default 'options'. More on that
+later.
+
+`script may not depend on simulation data; is that expected?` tells us that the
+pipeline we've setup in this script does not use any data produced by the
+simulation at all. While there's nothing wrong with that, it's highly unlikely
+that that's the intent and hence this warning is posted.
+
+In our case, we want the `Wavelet` source to be replaced by the simulation data.
+As mentioned, this means the `registrationName` should match the simulation
+channel name. `wavelet_miniapp` uses **input** as the default channel name. It
+can be changed using `-c` (or `--channel`) command line argument. Let's
+rename the channel using `--channel`.
+
+```
+> pvbatch -m paraview.demos.wavelet_miniapp
+          --script .../sample1.py
+          --script-version 2
+          --timesteps 2
+          --channel Wavelet1
+
+(   0.563s) [pvbatch         ]              bridge.py:17    WARN| Warning: ParaView has been initialized before `initialize` is called
+(   1.876s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 1/2
+(   1.944s) [pvbatch         ]             sample1.py:6     INFO| begin 'sample1'
+(   2.069s) [pvbatch         ]             sample1.py:16    INFO| end 'sample1'
+(   2.069s) [pvbatch         ]        v2_internals.py:145   WARN| Module 'sample1' missing Catalyst 'options', will use a default options object
+(   2.072s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 2/2
+
+```
+
+Great! Now the warnings about simulation data have disappeared.
+
+The pipeline, however, still doesn't do anything significant.
+
+Also, the code in the module seems to execute only once, for the first timestep.
+This is confirmed by the fact that the `print_info` statements in `sample.py` only show
+up once in the output. This is because the code in the module gets executed
+only when its imported for the first time.
+Once imported, which happens on first timestep, the module is not re-imported and
+hence the code is not re-executed.
+
+To add code that gets executed each iteration, you can define a
+`catalyst_execute` function. Likewise, `catalyst_initialize` and
+`catalyst_finalize` functions may be defined too and they will get called for
+the first and after the last timestep respectively. Here's an example script
+to see that in action.
+
 ```py
-from paraview.catalyst import Options
-options = Options()
-
-scripts = ['pipeline']
-```
-
-The `pipeline.py` is simply the script shown earlier to create
-Wavelet and slice it.
-
-Now, we run the miniapp with this analysis module as follows:
-
-```bash
-> pvpython -m paraview.demos.wavelet_miniapp \
-           --script /tmp/sample
-```
-
-This will produce the following output
-```
-(   0.467s) [main thread     ]              bridge.py:18    WARN| Warning: ParaView has been initialized before `initialize` is called
-timestep: 1/100
-(   1.942s) [main thread     ]              detail.py:86    WARN| script may not depend on simulation data; is that expected?
-timestep: 2/100
-(   1.994s) [main thread     ]              detail.py:86    WARN| script may not depend on simulation data; is that expected?
-....
-```
-
-The warning message *"script may not depend on simulation data; is that expected?"* tells us that
-the script it not affected by any data the simulation is producing since none of
-its data producers have been replaced by a named channel. The default channel
-name that `wavelet_miniapp` uses is **input**. We can either change the
-`registrationName` for the `Wavelet` source in `pipeline.py` to
-`input` or pass optional argument `-c` to the `wavelet_miniapp` which lets us
-rename the channel as follows:
-
-```bash
-> ./bin/pvpython -m paraview.demos.wavelet_miniapp --script-version 2 -s /tmp/sample -c Wavelet1
-(   0.458s) [main thread     ]              bridge.py:18    WARN| Warning: ParaView has been initialized before `initialize` is called
-timestep: 1/100
-timestep: 2/100
-timestep: 3/100
-...
-
-```
-
-The script here does nothing significant so we don't see any results. Here's a
-tweak to the `pipeline.py` to make it show the rendering results for the slice.
-
-```py
-# pipeline.py
-
+# filename: sample2.py
 from paraview.simple import *
+from paraview import print_info
 
-wavelet1 = Wavelet(registrationName='Wavelet1')
+# print start marker
+print_info("begin '%s'", __name__)
 
+w = Wavelet(registrationName="Wavelet1")
+
+def catalyst_initialize():
+    print_info("in '%s::catalyst_initialize'", __name__)
+
+def catalyst_execute(info):
+    print_info("in '%s::catalyst_execute'", __name__)
+
+def catalyst_finalize():
+    print_info("in '%s::catalyst_finalize'", __name__)
+
+# print end marker
+print_info("end '%s'", __name__)
+```
+
+When executed using the `wavelet_miniapp` (this time, let's execute for 3
+timesteps just to make things a little clearer), we get the following:
+
+```
+> ./bin/pvbatch -m paraview.demos.wavelet_miniapp
+                --script /tmp/sample2.py
+                --script-version 2
+                --timesteps 3
+                --channel Wavelet1
+
+(   0.559s) [pvbatch         ]              bridge.py:17    WARN| Warning: ParaView has been initialized before `initialize` is called
+(   1.865s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 1/3
+(   1.933s) [pvbatch         ]             sample2.py:6     INFO| begin 'sample2'
+(   1.939s) [pvbatch         ]             sample2.py:20    INFO| end 'sample2'
+(   1.939s) [pvbatch         ]        v2_internals.py:145   WARN| Module 'sample2' missing Catalyst 'options', will use a default options object
+(   1.943s) [pvbatch         ]             sample2.py:11    INFO| in 'sample2::catalyst_initialize'
+(   1.943s) [pvbatch         ]             sample2.py:14    INFO| in 'sample2::catalyst_execute'
+(   1.943s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 2/3
+(   1.994s) [pvbatch         ]             sample2.py:14    INFO| in 'sample2::catalyst_execute'
+(   1.994s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 3/3
+(   2.043s) [pvbatch         ]             sample2.py:14    INFO| in 'sample2::catalyst_execute'
+(   2.044s) [pvbatch         ]             sample2.py:17    INFO| in 'sample2::catalyst_finalize'
+```
+
+Note that `catalyst_initialize` and `catalyst_finalize` only gets called once
+while `catalyst_execute` gets called for each iteration.
+
+The `info` object passed to `catalyst_initialize` can be used to obtain
+information about the current invocation which may be useful when writing
+code to execute per iteration.
+
+```
+> help(info)
+
+Help on Information in module paraview.catalyst.v2_internals object:
+
+class Information(builtins.object)
+ |  Information(dataDescription)
+ |
+ |  Provides information to the current `catalyst_execute` call.
+ |
+ |  Methods defined here:
+ |
+ |  __init__(self, dataDescription)
+ |      Initialize self.  See help(type(self)) for accurate signature.
+ |
+ |  ----------------------------------------------------------------------
+ |  Readonly properties defined here:
+ |
+ |  cycle
+ |      returns the current simulation cycle or timestep index
+ |
+ |  dataDescription
+ |      avoid using this unless absolutely sure what you're doing
+ |
+ |  time
+ |      returns the current simulation time
+ |
+ |  timestep
+ |      returns the current simulation cycle or timestep index
+```
+
+Here's a sample script that saves out an image each iteration.
+
+```py
+# filename: sample3.py
+from paraview.simple import *
+from paraview import print_info
+
+view = CreateRenderView()
+
+wavelet1 = Wavelet(registrationName="Wavelet1")
+
+# create a new 'Slice'
 slice1 = Slice(registrationName='Slice1', Input=wavelet1)
 slice1.SliceType = 'Plane'
 slice1.SliceType.Normal = [0, 0, 1]
 
-Show()
-view = Render()
+sliceDisplay = Show(slice1)
 
-def catalyst_coprocess(*args):
-    global view
-    ResetCamera(view)
-    Render(view)
+def catalyst_execute(info):
+    fname = "/tmp/output-%d.png" % info.timestep
+
+    # ensure camera is setup correctly
+    ResetCamera()
+
+    # save screenshot
+    print_info("time=%f, saving file: %s", info.time, fname)
+    SaveScreenshot(fname)
 ```
 
-Now, when you launch the `wavelet_miniapp`, it will show the rendering results
-on the screen as the simulation advances.
+Here's the result of executing this script with `wavelet_miniapp`:
 
-In this example, we are using `catalyst_coprocess` callback described earlier to
-execute certain actions per timestep. A more advanced analysis script would use
-extractors, in which case `catalyst_coprocess` is rarely needed.
+```
+> pvbatch -m paraview.demos.wavelet_miniapp
+          -s .../sample3.py
+          --script-version 2
+          --timesteps 3
+          -c Wavelet1
 
-Also note, in this example we simply use a directory for the Python package
-instead of archiving it in a `.zip`. This is useful for development and
-debugging purposes. However, for HPC / production runs, it's recommended that
-you create an archive once the package is finalized.
+(   0.558s) [pvbatch         ]              bridge.py:17    WARN| Warning: ParaView has been initialized before `initialize` is called
+(   1.840s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 1/3
+(   2.725s) [pvbatch         ]        v2_internals.py:145   WARN| Module 'sample3' missing Catalyst 'options', will use a default options object
+(   2.923s) [pvbatch         ]             sample3.py:23    INFO| time=0.000000, saving file: /tmp/output-0.png
+(   2.997s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 2/3
+(   3.278s) [pvbatch         ]             sample3.py:23    INFO| time=0.333333, saving file: /tmp/output-1.png
+(   3.327s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 3/3
+(   3.610s) [pvbatch         ]             sample3.py:23    INFO| time=0.666667, saving file: /tmp/output-2.png
 
-Debugging
----------
+```
+
+### Using Extractors
+
+In ParaView 5.9, we introduced a new pipeline object called **Extractors**.
+**Extractors** are items in the visualization pipeline that can save data or
+images per timestep. Extractors make it largely unnecessary to have any custom code
+to execute per iteration since one can simply use extracts
+to save out image extracts from views or data extracts from filters and other
+data producers.
+
+
+For example, `sample3.py` can be modified to use extractors as follows:
+
+```py
+# filename: sample4.py
+from paraview.simple import *
+from paraview import print_info
+
+view = CreateRenderView()
+
+wavelet1 = Wavelet(registrationName="Wavelet1")
+
+# create a new 'Slice'
+slice1 = Slice(registrationName='Slice1', Input=wavelet1)
+slice1.SliceType = 'Plane'
+slice1.SliceType.Normal = [0, 0, 1]
+
+sliceDisplay = Show(slice1)
+
+# create extractor
+extractor1 = CreateExtractor('PNG', view, registrationName='PNG1')
+# trace defaults for the extractor.
+# init the 'PNG' selected for 'Writer'
+extractor1.Writer.FileName = '/tmp/output-%ts.png'
+extractor1.Writer.ImageResolution = [800, 880]
+```
+
+This will produce an output like follows:
+```
+> pvbatch -m paraview.demos.wavelet_miniapp
+          -s .../sample3.py
+          --script-version 2
+          --timesteps 3
+          -c Wavelet1
+
+(   0.554s) [pvbatch         ]              bridge.py:17    WARN| Warning: ParaView has been initialized before `initialize` is called
+(   1.835s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 1/3
+(   2.823s) [pvbatch         ]        v2_internals.py:150   WARN| Module 'sample4' missing Catalyst 'options', will use a default options object
+(   3.208s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 2/3
+(   3.652s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 3/3
+```
+
+If you look at the generated results, `/tmp/output-0.png`, `/tmp/output-1.png`,
+etc. will be generated as with `sample3.py`. However, this time, we didn't need
+to add an explicit code to execute per iteration by providing `catalyst_execute`.
+The extractor achieve the same effect.
+
+Such Catalyst scripts that use extractors can be easily exported from the
+ParaView GUI using **File > Save Catalyst State**. Such an exported script will
+often how the following trailer:
+
+```py
+# exported Catalyst script
+...
+
+# ------------------------------------------------------------------------------
+# Catalyst options
+from paraview import catalyst
+options = catalyst.Options()
+options.GenerateCinemaSpecification = 1
+options.ExtractsOutputDirectory = "/tmp"
+
+# ------------------------------------------------------------------------------
+if __name__ == '__main__':
+    from paraview.simple import SaveExtractsUsingCatalystOptions
+    # Code for non in-situ environments; if executing in post-processing
+    # i.e. non-Catalyst mode, lets generate extracts using Catalyst options
+    SaveExtractsUsingCatalystOptions(options)
+```
+
+The `options` variable is setup with values chosen in the **Save Catalyst State** dialog.
+This is the *options* variable that we have been seeing warnings for in our
+runs so far.  If present, `options` must be of the type
+`paraview.catalyst.Options`. This is used to specify parameters that control how
+the code is executed e.g. location of output directory, Catalyst Live connection
+information etc. If not present, a default one is created.
+
+The following lists several of the important properties on `options` and their
+default values.
+
+```py
+# catalyst options
+from paraview.catalyst import Options
+options = Options()
+
+# directory under which to save all extracts
+# generated using Extractors defined in the pipeline, if any.
+# (optional, but recommended)
+options.ExtractsOutputDirectory = "...."
+
+# enable/disable Cinema database generation for
+# generated extracts (optional)
+options.GenerateCinemaSpecification = ...           # default=False
+
+# global trigger params (optional)
+options.GlobalTrigger.UseStartTimeStep = ...        # default=False
+options.GlobalTrigger.StartTimeStep = ...           # default=0
+options.GlobalTrigger.UseEndTimeStep = ..           # default=False
+options.GlobalTrigger.EndTimeStep = ...             # default=0
+options.GlobalTrigger.Frequency = ...               # default=1
+
+# live params (optional)
+options.EnableCatalystLive = ...                    # default=False
+options.CatalystLiveURL = ...                       # default="localhost:2222"
+options.CatalystLiveTrigger.UseStartTimeStep = ...  # default=False
+options.CatalystLiveTrigger.StartTimeStep = ...     # default=0
+options.CatalystLiveTrigger.UseEndTimeStep = ...    # default=False
+options.CatalystLiveTrigger.EndTimeStep = ...       # default=0
+options.CatalystLiveTrigger.Frequency = ...         # default=1
+
+```
+
+`options.ExtractsOutputDirectory` is handy to place all generated extracts under
+a specific directory. To use it, ensure that all extractor use a relative
+filename. The filename is then evaluated to be relative to the directory
+provided for `options.ExtractsOutputDirectory`
+
+### Using Python Package
+
+In previous section, we used a single .py file to demonstrate various
+aspects of Catalyst Python module. The same is applicable to a Python package.
+Take a simple package with directory structure as follows:
+
+```
+..../sample/
+           / __init__.py
+```
+
+The contents of `__init__.py` as `sample2.py` described earlier. Now, you can
+use this package together with the `wavelet_miniapp` as follows:
+
+
+```
+> ./bin/pvbatch -m paraview.demos.wavelet_miniapp
+                --script .../sample
+                --script-version 2
+                --timesteps 3
+                --channel Wavelet1
+
+(   0.570s) [pvbatch         ]              bridge.py:17    WARN| Warning: ParaView has been initialized before `initialize` is called
+(   1.856s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 1/3
+(   1.923s) [pvbatch         ]            __init__.py:6     INFO| begin 'sample'
+(   1.929s) [pvbatch         ]            __init__.py:20    INFO| end 'sample'
+(   1.929s) [pvbatch         ]        v2_internals.py:145   WARN| Module 'sample' missing Catalyst 'options', will use a default options object
+(   1.932s) [pvbatch         ]            __init__.py:11    INFO| in 'sample::catalyst_initialize'
+(   1.932s) [pvbatch         ]            __init__.py:14    INFO| in 'sample::catalyst_execute'
+(   1.933s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 2/3
+(   1.982s) [pvbatch         ]            __init__.py:14    INFO| in 'sample::catalyst_execute'
+(   1.982s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 3/3
+(   2.030s) [pvbatch         ]            __init__.py:14    INFO| in 'sample::catalyst_execute'
+(   2.030s) [pvbatch         ]            __init__.py:17    INFO| in 'sample::catalyst_finalize'
+```
+
+As you can see, it produces a very similar result to using `sample2.py`. This is
+of course a very simple script. For complex scripts, a package allows better
+code organization and reusability and hence can be very handy in those
+situations.
+
+The `__init__.py` file is the entry point. You can import other modules,
+packages, or sub-packages in it as needed.
+
+### Using ZIP archives
+
+Python supports importing modules and packages from within a ZIP archive without
+having to unzip the contents. This can be a very handy feature for Catalyst
+Python scripts. You can simply archive a package directory using the same name
+as the directory (adding extension `.zip`) and then use that instead of the
+.py file.
+
+For example, we can zip the `sample` directory as sample.zip use it as follows
+to produce almost identical result:
+
+```
+> pvbatch -m paraview.demos.wavelet_miniapp -s /tmp/sample.zip --script-version 2 --timesteps 3  -c Wavelet1
+
+(   0.551s) [pvbatch         ]              bridge.py:17    WARN| Warning: ParaView has been initialized before `initialize` is called
+(   1.992s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 1/3
+(   2.061s) [pvbatch         ]            __init__.py:6     INFO| begin 'sample'
+(   2.066s) [pvbatch         ]            __init__.py:20    INFO| end 'sample'
+(   2.066s) [pvbatch         ]        v2_internals.py:145   WARN| Module 'sample' missing Catalyst 'options', will use a default options object
+(   2.070s) [pvbatch         ]            __init__.py:11    INFO| in 'sample::catalyst_initialize'
+(   2.070s) [pvbatch         ]            __init__.py:14    INFO| in 'sample::catalyst_execute'
+(   2.070s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 2/3
+(   2.121s) [pvbatch         ]            __init__.py:14    INFO| in 'sample::catalyst_execute'
+(   2.121s) [pvbatch         ]     wavelet_miniapp.py:97    INFO| timestep: 3/3
+(   2.172s) [pvbatch         ]            __init__.py:14    INFO| in 'sample::catalyst_execute'
+(   2.172s) [pvbatch         ]            __init__.py:17    INFO| in 'sample::catalyst_finalize'
+```
+
+Note, currently it is required that the name of the zip archive and the name of
+the package directory must match.
+
+# Testing and Debugging
 
 The `pvpython`/`pvbatch` executables can be launched with a `-l` argument to
 generate detailed logs as follows:
 
 ```bash
-> pvpython -l=/tmp/log.txt,TRACE -m paraview.demos.wavelet_miniapp ...
+> pvbatch -l=/tmp/log.txt,TRACE -m paraview.demos.wavelet_miniapp ...
 ```
 
 Here, a `/tmp/log.txt` will all logging output will be generated. You can
@@ -277,5 +520,77 @@ to `/tmp/infolog.txt`
 
 ```bash
 > env PARAVIEW_LOG_CATALYST_VERBOSITY=INFO \
-      pvpython -l=/tmp/infolog.txt,INFO -m paraview.demos.wavelet_miniapp ...
+      pvbatch -l=/tmp/infolog.txt,INFO -m paraview.demos.wavelet_miniapp ...
+```
+
+
+## Mini-App: paraview.demos.wavelet\_miniapp
+
+The `wavelet_miniapp` that we used in several of the examples here is a simple
+stand-in for a simulation code. It uses the Wavelet (`vtkRTAnalyticSource`) internally
+to produce time-varying uniform rectilinear grid (`vtkImageData`). Command line
+options can be used to customize the run, including number of timesteps, etc.
+
+```
+> ./bin/pvbatch -m paraview.demos.wavelet_miniapp --help
+
+usage: wavelet_miniapp.py [-h] [-t TIMESTEPS] [--size SIZE] -s SCRIPT [--script-version SCRIPT_VERSION] [-d DELAY] [-c CHANNEL]
+
+Wavelet MiniApp for Catalyst testing
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -t TIMESTEPS, --timesteps TIMESTEPS
+                        number of timesteps to run the miniapp for (default: 100)
+  --size SIZE           number of samples in each coordinate direction (default: 101)
+  -s SCRIPT, --script SCRIPT
+                        path(s) to the Catalyst script(s) to use for in situ processing.
+                        Can be a .py file or a Python package zip or directory
+  --script-version SCRIPT_VERSION
+                        choose Catalyst analysis script version explicitly, otherwise it
+                        will be determined automatically. When specifying multiple scripts,
+                        this setting applies to all scripts.
+  -d DELAY, --delay DELAY
+                        delay (in seconds) between timesteps (default: 0.0)
+  -c CHANNEL, --channel CHANNEL
+                        Catalyst channel name (default: input)
+```
+
+To run in parallel using mpi, make sure that you use pvbatch in symmetric mode
+as follows:
+
+```
+> mpirun -np [num ranks] .../pvbatch -sym -m paraview.demos.wavelet_miniapp ....
+
+```
+
+## Mini-App: paraview.demos.filedriver\_minapp
+
+The `wavelet_miniapp` is a good miniapp to use as stand-in for a simulation code
+to debug issues with the Catalyst scripts. Another useful miniapp is the
+`filedriver_miniapp`. Unlike the `wavelet_miniapp` which can only produce a
+specific type of dataset, `filedriver_miniapp` uses files on disk and serves
+them as if they are being generated by a simulation.
+
+```
+> ./bin/pvbatch -m paraview.demos.filedriver_miniapp --help
+
+usage: filedriver_miniapp.py [-h] -s SCRIPT [--script-version SCRIPT_VERSION] [-d DELAY] [-c CHANNEL] -g GLOB
+
+File-based MiniApp for Catalyst testing
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -s SCRIPT, --script SCRIPT
+                        path(s) to the Catalyst script(s) to use for in situ processing.
+                        Can be a .py file or a Python package zip or directory
+  --script-version SCRIPT_VERSION
+                        choose Catalyst analysis script version explicitly, otherwise it
+                        will be determined automatically. When specifying multiple scripts, this setting
+                        applies to all scripts.
+  -d DELAY, --delay DELAY
+                        delay (in seconds) between timesteps (default: 0.0)
+  -c CHANNEL, --channel CHANNEL
+                        Catalyst channel name (default: input)
+  -g GLOB, --glob GLOB  Pattern to use to locate input filenames.
 ```

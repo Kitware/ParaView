@@ -12,202 +12,82 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPython.h" // must be first
-
 #include "vtkCPPythonScriptV2Pipeline.h"
 
-#include "vtkCPDataDescription.h"
+#include "vtkCPPythonScriptV2Helper.h"
 #include "vtkLogger.h"
 #include "vtkObjectFactory.h"
-#include "vtkPythonInterpreter.h"
-#include "vtkPythonUtil.h"
-#include "vtkSmartPyObject.h"
-
-class vtkCPPythonScriptV2Pipeline::vtkInternals
-{
-public:
-  vtkSmartPyObject APIModule;
-  vtkSmartPyObject Package;
-
-  bool LoadAPIModule()
-  {
-    if (this->APIModule)
-    {
-      return true;
-    }
-
-    this->APIModule.TakeReference(PyImport_ImportModule("paraview.catalyst.v2_internals"));
-    if (!this->APIModule)
-    {
-      vtkLogF(ERROR, "Failed to import required Python module 'paraview.catalyst.v2_internals'");
-      vtkInternals::FlushErrors();
-      return false;
-    }
-    return true;
-  }
-
-  static bool FlushErrors()
-  {
-    if (PyErr_Occurred())
-    {
-      PyErr_Print();
-      PyErr_Clear();
-      return false;
-    }
-    return true;
-  }
-};
 
 vtkStandardNewMacro(vtkCPPythonScriptV2Pipeline);
 //----------------------------------------------------------------------------
 vtkCPPythonScriptV2Pipeline::vtkCPPythonScriptV2Pipeline()
-  : Internals(new vtkCPPythonScriptV2Pipeline::vtkInternals())
+  : CoProcessHasBeenCalled(false)
 {
 }
 
 //----------------------------------------------------------------------------
 vtkCPPythonScriptV2Pipeline::~vtkCPPythonScriptV2Pipeline()
 {
-  delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
-bool vtkCPPythonScriptV2Pipeline::InitializeFromZIP(
-  const char* zipfilename, const char* packagename)
+bool vtkCPPythonScriptV2Pipeline::Initialize(const char* path)
 {
-  auto& internals = (*this->Internals);
-  vtkPythonInterpreter::Initialize();
-  vtkPythonScopeGilEnsurer gilEnsurer;
-
-  if (!internals.LoadAPIModule())
-  {
-    return false;
-  }
-
-  vtkSmartPyObject method(PyString_FromString("load_package_from_zip"));
-  vtkSmartPyObject archive(PyString_FromString(zipfilename));
-  vtkSmartPyObject package(packagename ? PyString_FromString(packagename) : nullptr);
-  internals.Package.TakeReference(PyObject_CallMethodObjArgs(
-    internals.APIModule, method, archive.GetPointer(), package.GetPointer(), nullptr));
-  if (!internals.Package)
-  {
-    vtkInternals::FlushErrors();
-    return false;
-  }
-  return true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkCPPythonScriptV2Pipeline::InitializeFromDirectory(const char* path)
-{
-  auto& internals = (*this->Internals);
-  vtkPythonInterpreter::Initialize();
-  vtkPythonScopeGilEnsurer gilEnsurer;
-
-  if (!internals.LoadAPIModule())
-  {
-    return false;
-  }
-
-  vtkSmartPyObject method(PyString_FromString("load_package_from_dir"));
-  vtkSmartPyObject archive(PyString_FromString(path));
-  internals.Package.TakeReference(
-    PyObject_CallMethodObjArgs(internals.APIModule, method, archive.GetPointer(), nullptr));
-  if (!internals.Package)
-  {
-    vtkInternals::FlushErrors();
-    return false;
-  }
-
-  return true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkCPPythonScriptV2Pipeline::InitializeFromScript(const char* pyfilename)
-{
-  auto& internals = (*this->Internals);
-  vtkPythonInterpreter::Initialize();
-  vtkPythonScopeGilEnsurer gilEnsurer;
-
-  if (!internals.LoadAPIModule())
-  {
-    return false;
-  }
-
-  vtkSmartPyObject method(PyString_FromString("load_module_from_file"));
-  vtkSmartPyObject archive(PyString_FromString(pyfilename));
-  internals.Package.TakeReference(
-    PyObject_CallMethodObjArgs(internals.APIModule, method, archive.GetPointer(), nullptr));
-  if (!internals.Package)
-  {
-    vtkInternals::FlushErrors();
-    return false;
-  }
-
-  return true;
+  return this->Helper->PrepareFromScript(path);
 }
 
 //----------------------------------------------------------------------------
 int vtkCPPythonScriptV2Pipeline::RequestDataDescription(vtkCPDataDescription* dataDescription)
 {
-  auto& internals = (*this->Internals);
-  if (!internals.Package || !internals.APIModule)
+  if (!this->CoProcessHasBeenCalled)
   {
-    return 0;
+    /**
+     * The new style Catalyst scripts may create pipeline immediately with the
+     * script is imported. If that happens, the pipeline creation may fail if the
+     * data producers are not ready with data. To avoid that case, for the first
+     * call to `RequestDataDescription` we skip the Python script entirely and
+     * simply request all meshes and fields. Since we do this only for the 1st
+     * timestep, it should not impact too much.
+     */
+    return 1;
   }
 
-  vtkPythonScopeGilEnsurer gilEnsurer;
-  vtkSmartPyObject method(PyString_FromString("request_data_description"));
-  vtkSmartPyObject pyarg(vtkPythonUtil::GetObjectFromPointer(dataDescription));
-  vtkSmartPyObject result(PyObject_CallMethodObjArgs(
-    internals.APIModule, method, pyarg.GetPointer(), internals.Package.GetPointer(), nullptr));
-  if (!result)
-  {
-    vtkInternals::FlushErrors();
-    return 0;
-  }
-  return 1;
+  return this->Helper->IsImported() && this->Helper->RequestDataDescription(dataDescription) ? 1
+                                                                                             : 0;
 }
 
 //----------------------------------------------------------------------------
 int vtkCPPythonScriptV2Pipeline::CoProcess(vtkCPDataDescription* dataDescription)
 {
-  auto& internals = (*this->Internals);
-  if (!internals.Package || !internals.APIModule)
+  if (!this->CoProcessHasBeenCalled)
   {
-    return 0;
+    // i.e. first invocation.
+    this->CoProcessHasBeenCalled = true;
+
+    if (!this->Helper->Import(dataDescription))
+    {
+      return false;
+    }
+    if (!this->Helper->CatalystInitialize(dataDescription))
+    {
+      return 0;
+    }
+
+    // let's make sure if the script has custom request_data_description
+    // it gets called since we skipped it earlier.
+    if (!this->RequestDataDescription(dataDescription))
+    {
+      return 0;
+    }
   }
 
-  vtkPythonScopeGilEnsurer gilEnsurer;
-  vtkSmartPyObject method(PyString_FromString("co_process"));
-  vtkSmartPyObject pyarg(vtkPythonUtil::GetObjectFromPointer(dataDescription));
-  vtkSmartPyObject result(PyObject_CallMethodObjArgs(
-    internals.APIModule, method, pyarg.GetPointer(), internals.Package.GetPointer(), nullptr));
-  if (!result)
-  {
-    vtkInternals::FlushErrors();
-    return 0;
-  }
-  return 1;
+  return this->Helper->IsImported() && this->Helper->CatalystExecute(dataDescription) ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
 int vtkCPPythonScriptV2Pipeline::Finalize()
 {
-  auto& internals = (*this->Internals);
-  if (internals.Package && internals.APIModule)
-  {
-    vtkPythonScopeGilEnsurer gilEnsurer;
-    vtkSmartPyObject method(PyString_FromString("finalize"));
-    vtkSmartPyObject result(PyObject_CallMethodObjArgs(
-      internals.APIModule, method, internals.Package.GetPointer(), nullptr));
-    if (!result)
-    {
-      vtkInternals::FlushErrors();
-      return 0;
-    }
-  }
-  internals.Package = nullptr;
+  this->Helper->CatalystFinalize();
   return this->Superclass::Finalize();
 }
 

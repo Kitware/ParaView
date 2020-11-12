@@ -274,7 +274,7 @@ void Initialize(int argc, char* argv[])
     if (ext == ".zip")
     {
       vtkNew<vtkCPPythonScriptV2Pipeline> pipeline;
-      pipeline->InitializeFromZIP(scripts[i]);
+      pipeline->Initialize(scripts[i]);
       Processor->AddPipeline(pipeline);
     }
     else

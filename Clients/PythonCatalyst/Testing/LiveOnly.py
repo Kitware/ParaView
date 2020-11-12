@@ -17,3 +17,5 @@ def catalyst_finalize():
     # let's confirm that.
     if not GetSources():
         raise RuntimeError("No sources found!")
+    else:
+        print("All ok")

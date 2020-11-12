@@ -74,7 +74,7 @@ for script in sys.argv[2:]:
         print("Adding script ", script)
     if os.path.splitext(script)[1] == ".zip":
         pipeline = vtkPVPythonCatalyst.vtkCPPythonScriptV2Pipeline()
-        pipeline.InitializeFromZIP(script)
+        pipeline.Initialize(script)
     elif os.path.isdir(script):
         pipeline = vtkPVPythonCatalyst.vtkCPPythonScriptV2Pipeline()
         pipeline.InitializeFromDirectory(script)
