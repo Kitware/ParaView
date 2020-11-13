@@ -163,6 +163,13 @@ Ordered compositing is used whenever ParaView is rendering translucent geometry 
 
 Adds a checkbox to the color opacity editor to enable freehand drawing mode. When checked, you can draw the opacity function with the mouse instead of placing points one by one.
 
+## Faithful rendering of meshes with significantly different cell sizes
+
+In some domains, it is typical to have cell sizes that vary by orders of magnitude in size. These meshes need special handling to render properly on graphics hardware that have limited floating-point precision. ParaView 5.9 provides coordinate scaling options to more faithfully render these meshes. A new property named **Coordinate Shift Scale Method** for mesh representations provides different options for when ParaView should shift and scale coordinate values to make better use of available floating-point range. By default, a single shift and scale is computed based on the mesh's bounding box. "Auto Shift Scale" is a good option for most meshes. "Near Focal Plane Shift Scale" and "Focal Point Shift Scale" will recompute the shift and scale based on the camera settings, which provides for the most faithful rendering of visible cells at the cost of occasional coordinate re-transformation and transfer to the graphics card.
+>![ShiftScaleImprovements](img/5.9.0/shift-scale-improvements.png)
+>
+> Zoomed view of a mesh region with very small coordinate values.  "Focal Point Shift Scale" method (left) fixes rendering problems with floating-point precision compared to the "Auto Shift Scale" coordinate rescaling method (right).
+
 ## vtkPVSliceMapper handles oriented images
 
 The display of axis-aligned slices from a volume image will respected the direction matrix set in `vtkImageData` datasets, such as those output by [3D Slicer](https://slicer.org).
