@@ -51,13 +51,8 @@ QSize pqPythonLineNumberArea::sizeHint() const
 {
   const std::uint32_t numberOfDigits =
     GetNumberOfDigits(std::max(1, text.document()->blockCount()));
-#if QT_VERSION >= 0x050B00
   const std::int32_t space =
     13 + numberOfDigits * text.fontMetrics().horizontalAdvance(QLatin1Char('9'));
-#else
-  const std::int32_t space = 13 + numberOfDigits * text.fontMetrics().width(QLatin1Char('9'));
-#endif
-
   return QSize{ space, text.height() };
 }
 
@@ -65,7 +60,9 @@ void pqPythonLineNumberArea::paintEvent(QPaintEvent* event)
 {
   QPainter painter(this);
 
-  painter.fillRect(event->rect(), Qt::lightGray);
+  const QPalette& palette = this->palette();
+
+  painter.fillRect(event->rect(), palette.window());
   painter.setFont(text.font());
 
   const QSize size = this->sizeHint();
@@ -78,8 +75,9 @@ void pqPythonLineNumberArea::paintEvent(QPaintEvent* event)
     const QTextCursor blockCursor(block);
     const QRect blockCursorRect = this->text.cursorRect(blockCursor);
 
-    painter.setPen(
-      (this->text.textCursor().blockNumber() == firstBlockId) ? Qt::green : Qt::darkGray);
+    painter.setPen((this->text.textCursor().blockNumber() == firstBlockId)
+        ? palette.text().color()
+        : palette.placeholderText().color());
     const QString number = QString::number(firstBlockId + 1);
     painter.drawText(-5, blockCursorRect.y() + 2, size.width(), text.fontMetrics().height(),
       Qt::AlignRight, number);

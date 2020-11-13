@@ -108,7 +108,6 @@ private:
   QAction* cutAct;
   QAction* copyAct;
   QAction* pasteAct;
-  QAction* undoAct;
 
   pqPythonManager* pythonManager;
 };
