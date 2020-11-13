@@ -9,6 +9,9 @@ these files along with ParaViewGMSHReaderPlugin.
 -For more information on Gmsh see http://geuz.org/gmsh/
 -For more information on ParaView see http://paraview.org/
 
+WARNING: this reader is deprecated in the favor of the GmshIO plugin.
+---------------------------------------------------------
+
 Contact Info:
 ------------
 

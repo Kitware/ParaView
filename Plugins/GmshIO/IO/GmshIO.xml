@@ -1,0 +1,136 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkGmshReader"
+                 label="Gmsh Reader"
+                 name="GmshReader">
+      <Documentation long_help="Read mesh and their data stored in .msh files."
+                     short_help="Read .msh files.">
+                     This Gmsh reader reads files stored in the .msh format.
+                     The expected file extension is .msh.
+                     The output of this reader is a multiblock data set.
+                     If physical groups are found, each group result in a block.
+                     Else 4 groups are created, 1 for each dimension.</Documentation>
+
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the Gmsh reader. </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty
+        name="CreateGmshCellIDArray"
+        command="SetCreateGmshCellIDArray"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if we create a cell data array containing Gmsh cell IDs.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="CreateGmshNodeIDArray"
+        command="SetCreateGmshNodeIDArray"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if we create a point data array containing Gmsh node IDs.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="CreateGmshEntityIDArray"
+        command="SetCreateGmshEntityIDArray"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if we create a cell data array containing Gmsh entity IDs.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="CreateGmshDimensionArray"
+        command="SetCreateGmshDimensionArray"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if we create a field data array containing the dimension for a dataset.
+        </Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="msh mesh"
+                       file_description="Gmsh Files" />
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+
+
+  <ProxyGroup name="writers">
+    <WriterProxy  name="GmshWriter"
+                  class="vtkGmshWriter"
+                  base_proxygroup="writers">
+      <Documentation short_help="Write Gmsh files">
+        Writer to meshes in Gmsh format.
+      </Documentation>
+
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkUnstructuredGrid"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty
+        name="WriteGmshSpecificArray"
+        command="SetWriteGmshSpecificArray"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if we write data arrays starting by "gmsh" (usually created by the Gmsh reader).
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="WriteAllTimeSteps"
+        command="SetWriteAllTimeSteps"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if all timesteps have to be saved for temporal data.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <Documentation>
+          The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+        <WriterFactory extensions="msh" file_description="Gmsh File Format"/>
+      </Hints>
+    </WriterProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

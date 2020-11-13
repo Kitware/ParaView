@@ -1,0 +1,7 @@
+NAME
+  GmshIO
+DESCRIPTION
+  Reader and writer for visualization of polynomial solutions under the Gmsh format
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::IOCore

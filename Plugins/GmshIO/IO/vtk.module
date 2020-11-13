@@ -1,0 +1,7 @@
+NAME
+  GmshIO::vtkGmshIO
+LIBRARY_NAME
+  vtkGmshIO
+DEPENDS
+  VTK::CommonCore
+  VTK::IOCore
