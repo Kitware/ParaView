@@ -1,4 +1,4 @@
-FROM kitware/paraview:ci-superbuild-fedora31-20201027
+FROM kitware/paraview:ci-superbuild-fedora33-20201112
 MAINTAINER Vicente Adolfo Bolea Sanchez <vicente.bolea@kitware.com>
 
 COPY install_deps.sh /root/install_deps.sh
