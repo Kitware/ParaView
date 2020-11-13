@@ -27,6 +27,7 @@ set(python_files
   paraview/cpstate.py
   paraview/demos/__init__.py
   paraview/demos/export_catalyst_state.py
+  paraview/demos/filedriver_miniapp.py
   paraview/demos/show_grid_as_background.py
   paraview/demos/wavelet_miniapp.py
   paraview/demos/wavelet_miniapp_plugin.py

@@ -6,6 +6,24 @@ add_subdirectory(Legacy)
 # New testing stuff is here
 vtk_module_test_data(
 
+  # Data files
+  "DATA{${paraview_test_data_directory_input}/Data/Wavelet/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/Wavelet/Wavelet1_000000/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/Wavelet/Wavelet1_000001/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/Wavelet/Wavelet1_000002/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/Wavelet/Wavelet1_000003/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/Wavelet/Wavelet1_000004/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/Wavelet/Wavelet1_000005/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/Wavelet/Wavelet1_000006/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/Wavelet/Wavelet1_000007/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/Wavelet/Wavelet1_000008/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/Wavelet/Wavelet1_000009/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/Wavelet/Wavelet1_000010/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/can_vtm/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/can_vtm/can_0/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/can_vtm/can_1/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/can_vtm/can_2/,REGEX:.*}"
+
   # baselines for WaveletHistogramExtracts
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_ImmediateExtracts_renderview_0000.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletHistogramExtracts_BatchExtracts_histogram_1.000000.png"
@@ -108,6 +126,43 @@ set_tests_properties(
       "Catalyst::WaveletMiniApp::MultiplePipelines::pipeline1.pipeline2")
 
 
+#---------------------------------------------------------------------
+# add tests for filedriver_miniapp
+set(filedriver_tests
+   ValidateChangingTime.py)
+
+paraview_add_test(
+  PREFIX "Catalyst::FileDriverMiniApp::Wavelet"
+  ARGS  "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym
+        -m paraview.demos.filedriver_miniapp
+        -g "${paraview_test_data_directory_output}/Testing/Data/Wavelet/*.pvti"
+        -s
+  TEST_SCRIPTS ${filedriver_tests})
+
+paraview_add_test_mpi(
+  PREFIX "Catalyst::MPI::FileDriverMiniApp::Wavelet"
+  ARGS  "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym
+        -m paraview.demos.filedriver_miniapp
+        -g "${paraview_test_data_directory_output}/Testing/Data/Wavelet/*.pvti"
+        -s
+  TEST_SCRIPTS ${filedriver_tests})
+
+paraview_add_test(
+  PREFIX "Catalyst::FileDriverMiniApp::Can"
+  ARGS  "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym
+        -m paraview.demos.filedriver_miniapp
+        -g "${paraview_test_data_directory_output}/Testing/Data/can_vtm/*.vtm"
+        -s
+  TEST_SCRIPTS ${filedriver_tests})
+
+paraview_add_test_mpi(
+  PREFIX "Catalyst::MPI::FileDriverMiniApp::Can"
+  ARGS  "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym
+        -m paraview.demos.filedriver_miniapp
+        -g "${paraview_test_data_directory_output}/Testing/Data/can_vtm/*.vtm"
+        -s
+  TEST_SCRIPTS ${filedriver_tests})
+unset(filedriver_tests)
 
 #---------------------------------------------------------------------
 # Let's add some full workflow tests.
