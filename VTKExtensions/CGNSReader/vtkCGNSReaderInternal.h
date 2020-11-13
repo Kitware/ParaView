@@ -290,6 +290,8 @@ public:
  * etc.).
  */
 bool ReadBase(vtkCGNSReader* reader, const BaseInformation& baseInfo);
+bool ReadDataForZone(
+  vtkCGNSReader* reader, const BaseInformation& baseInfo, const ZoneInformation& zoneInfo);
 bool ReadGridForZone(
   vtkCGNSReader* reader, const BaseInformation& baseInfo, const ZoneInformation& zoneInfo);
 bool ReadPatchesForBase(vtkCGNSReader* reader, const BaseInformation&);
