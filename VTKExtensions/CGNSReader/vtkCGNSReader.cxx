@@ -2063,6 +2063,8 @@ int vtkCGNSReader::GetUnstructuredZone(
   int base, int zone, int cellDim, int physicalDim, void* v_zsize, vtkMultiBlockDataSet* mbase)
 {
   cgsize_t* zsize = reinterpret_cast<cgsize_t*>(v_zsize);
+  auto& baseInfo = this->Internal->GetBase(base);
+  auto& zoneInfo = baseInfo.zones[zone];
 
   ////=========================================================================
   const bool warningIdTypeSize = sizeof(cgsize_t) > sizeof(vtkIdType);
@@ -2105,6 +2107,12 @@ int vtkCGNSReader::GetUnstructuredZone(
 
   std::vector<double> gridChildId;
   std::size_t nCoordsArray = 0;
+
+  if (CGNSRead::ReadDataForZone(this, baseInfo, zoneInfo) == false)
+  {
+    mbase->SetBlock(zone, vtkSmartPointer<vtkDataObject>());
+    return 0;
+  }
 
   vtkPrivate::getGridAndSolutionNames(base, gridCoordName, solutionNames, this);
   if (gridCoordName == "Null")
@@ -2996,8 +3004,6 @@ int vtkCGNSReader::GetUnstructuredZone(
     }
   }
   //
-  auto& baseInfo = this->Internal->GetBase(base);
-  auto& zoneInfo = baseInfo.zones[zone];
   const bool requiredPatch = CGNSRead::ReadPatchesForBase(this, baseInfo);
 
   // SetUp zone Blocks
