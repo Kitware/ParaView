@@ -201,6 +201,16 @@ protected:
   double timeFromTick(int tick);
   int tickFromTime(double pos);
   void drawForeground(QPainter* painter, const QRectF& rect) override;
+
+  /**
+  * Draws a label for the specified time in the specified row of the timeline.
+  * The user can enter painter or metrics parameters to customize it.
+  * A list of priorities must be entered: they define the zones where the label can't be drawn.
+  */
+  QRectF drawTimeLabel(double time, const QRectF& row, QPainter* painter,
+    const QFontMetrics& metrics, QList<const QRectF*> const& priorities);
+
+  void updateNewTime(QGraphicsSceneMouseEvent* mouseEvent);
   bool hitTestCurrentTimePoly(const QPointF& pos);
   pqAnimationTrack* hitTestTracks(const QPointF& pos);
   pqAnimationKeyFrame* hitTestKeyFrame(pqAnimationTrack* t, const QPointF& pos);

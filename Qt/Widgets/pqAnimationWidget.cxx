@@ -55,6 +55,7 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
   this->View->setFrameShape(QFrame::NoFrame);
   this->Model = new pqAnimationModel(this->View);
   this->View->setScene(this->Model);
+  this->View->setMouseTracking(true);
 
   this->CreateDeleteHeader = new QHeaderView(Qt::Vertical, this);
   this->CreateDeleteHeader->viewport()->setBackgroundRole(QPalette::Window);
