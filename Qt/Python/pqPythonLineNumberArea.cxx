@@ -51,8 +51,10 @@ QSize pqPythonLineNumberArea::sizeHint() const
 {
   const std::uint32_t numberOfDigits =
     GetNumberOfDigits(std::max(1, text.document()->blockCount()));
-  const std::int32_t space =
-    13 + numberOfDigits * text.fontMetrics().horizontalAdvance(QLatin1Char('9'));
+
+  const std::int32_t space = 2 * text.fontMetrics().horizontalAdvance(' ') +
+    numberOfDigits * text.fontMetrics().horizontalAdvance(QLatin1Char('9'));
+
   return QSize{ space, text.height() };
 }
 
