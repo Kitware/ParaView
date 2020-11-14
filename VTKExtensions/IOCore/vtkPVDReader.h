@@ -52,9 +52,8 @@ protected:
 
   int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
-
-  // Set TimeStepRange
-  void SetupOutputInformation(vtkInformation* outInfo) override;
+  int RequestInformation(vtkInformation* request, vtkInformationVector** vtkNotUsed(inputVector),
+    vtkInformationVector* outputVector) override;
 
 private:
   vtkPVDReader(const vtkPVDReader&) = delete;
