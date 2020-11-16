@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPythonScriptEditor_h
 
 #include "pqPythonModule.h"
+
 #include <QMainWindow>
 
 class QAction;
@@ -46,7 +47,7 @@ class PQPYTHON_EXPORT pqPythonScriptEditor : public QMainWindow
   Q_OBJECT
 
 public:
-  explicit pqPythonScriptEditor(QWidget* parent = 0);
+  explicit pqPythonScriptEditor(QWidget* parent = nullptr);
 
   void setSaveDialogDefaultDirectory(const QString& dir);
   void setPythonManager(pqPythonManager* manager);

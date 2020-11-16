@@ -31,11 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqPythonLineNumberArea.h"
+
 #include "pqPythonScriptEditor.h"
 #include "pqPythonUtils.h"
 
 #include <cmath>
-#include <iostream>
 
 #include <QPaintEvent>
 #include <QPainter>

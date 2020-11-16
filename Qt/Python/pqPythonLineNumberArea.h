@@ -35,47 +35,56 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPythonModule.h"
 
-#include <QTextEdit>
 #include <QWidget>
 
-/// @class pqPythonLineNumberArea
-/// @brief QWidget that displays line number for a QTextEdit.
-/// @details This widget is to be associated with a QTextEdit
-/// widget (stored as \ref text) this class. It displays the number
-/// of lines inside the \ref text and highlight the line where the
-/// cursor is.
-///
-/// This must be used inside a QHLayout and placed either left
-/// or right of the refered \ref text. The paintEvent is in charge
-/// of painting this widget.
+class QTextEdit;
+
+/**
+ * @class pqPythonLineNumberArea
+ * @brief QWidget that displays line number for a QTextEdit.
+ * @details This widget is to be associated with a QTextEdit
+ * widget (stored as \ref text) this class. It displays the number
+ * of lines inside the \ref text and highlight the line where the
+ * cursor is.
+ *
+ * This must be used inside a QHLayout and placed either left
+ * or right of the refered \ref text. The paintEvent is in charge
+ * of painting this widget.
+ */
 class PQPYTHON_EXPORT pqPythonLineNumberArea : public QWidget
 {
   Q_OBJECT
 
 public:
-  /// @brief Constructs a pqPythonLineNumberArea given a \ref text
-  /// @input[parent] the parent widget for the Qt ownership
-  /// @input[text] the text to display the line from
+  /* @brief Constructs a pqPythonLineNumberArea given a \ref text
+   * @input[parent] the parent widget for the Qt ownership
+   * @input[text] the text to display the line from
+   */
   explicit pqPythonLineNumberArea(QWidget* parent, const QTextEdit& text)
     : QWidget(parent)
     , text(text)
   {
   }
 
-  /// @brief Return the size hint based on the number of lines present in the \ref text
+  /**
+   * @brief Return the size hint based on the number of lines present in the \ref text
+   */
   QSize sizeHint() const override;
 
 protected:
-  /// @brief Paint the widget
-  /// @details This method paints the widget area by going through the
-  /// visible block inside \ref text. Are displayed the line number from
-  /// the \ref text in one color and the line containing the cursor
-  /// in another color.
-  /// @input[event] the pain event
+  /** @brief Paint the widget
+   * @details This method paints the widget area by going through the
+   * visible block inside \ref text. Are displayed the line number from
+   * the \ref text in one color and the line containing the cursor
+   * in another color.
+   * @input[event] the pain event
+   */
   void paintEvent(QPaintEvent* event) override;
 
 private:
-  /// @brief The text to display the number of line on
+  /**
+   * @brief The text to display the number of line on
+   */
   const QTextEdit& text;
 };
 
