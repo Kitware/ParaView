@@ -1,5 +1,5 @@
 NAME
-  MyTiffReader
+  MyTiffWriter
 DESCRIPTION
   An example plugin that adds a writer to the ParaView GUI. It is added in the
   file dialog when saving files.
