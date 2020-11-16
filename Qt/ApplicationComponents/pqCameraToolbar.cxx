@@ -49,8 +49,8 @@ void pqCameraToolbar::constructor()
   new pqCameraReaction(ui.actionNegativeY, pqCameraReaction::RESET_NEGATIVE_Y);
   new pqCameraReaction(ui.actionPositiveZ, pqCameraReaction::RESET_POSITIVE_Z);
   new pqCameraReaction(ui.actionNegativeZ, pqCameraReaction::RESET_NEGATIVE_Z);
-  new pqCameraReaction(ui.actionRotate90degCW, pqCameraReaction::ROTATE_CAMERA_CCW);
-  new pqCameraReaction(ui.actionRotate90degCCW, pqCameraReaction::ROTATE_CAMERA_CW);
+  new pqCameraReaction(ui.actionRotate90degCW, pqCameraReaction::ROTATE_CAMERA_CW);
+  new pqCameraReaction(ui.actionRotate90degCCW, pqCameraReaction::ROTATE_CAMERA_CCW);
 
   new pqRenderViewSelectionReaction(
     ui.actionZoomToBox, NULL, pqRenderViewSelectionReaction::ZOOM_TO_BOX);

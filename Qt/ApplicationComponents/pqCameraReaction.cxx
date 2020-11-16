@@ -123,11 +123,11 @@ void pqCameraReaction::onTriggered()
       break;
 
     case ROTATE_CAMERA_CW:
-      this->rotateCamera(90.0);
+      this->rotateCamera(-90.0);
       break;
 
     case ROTATE_CAMERA_CCW:
-      this->rotateCamera(-90.0);
+      this->rotateCamera(90.0);
       break;
   }
 }
