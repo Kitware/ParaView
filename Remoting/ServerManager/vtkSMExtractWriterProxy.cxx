@@ -71,7 +71,12 @@ std::string vtkSMExtractWriterProxy::GenerateExtractsFileName(
   // clang-format off
   vtksys::RegularExpression regex(R"=((%[.0-9]*)((ts)|(t)))=");
   // clang-format on
-  std::string name = vtksys::SystemTools::JoinPath({ rootdir, "/" + fname });
+
+  // `FileIsFullPath` check helps us support absolute paths provided on
+  // individual extractor.
+  std::string name = vtksys::SystemTools::FileIsFullPath(fname)
+    ? fname
+    : vtksys::SystemTools::JoinPath({ rootdir, "/" + fname });
   while (regex.find(name))
   {
     if (regex.match(2) == "ts")
