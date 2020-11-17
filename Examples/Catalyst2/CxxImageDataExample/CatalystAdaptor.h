@@ -5,7 +5,7 @@
 #include <catalyst.h>
 #include <conduit.hpp>
 #include <conduit_cpp_to_c.hpp>
-
+#include <cstring>
 #include <string>
 
 namespace CatalystAdaptor
