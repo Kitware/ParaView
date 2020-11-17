@@ -3,13 +3,14 @@ set(classes
   vtkParFlowMetaReader
 )
 
-find_package(nlohmann_json REQUIRED)
+vtk_module_find_package(
+  PACKAGE nlohmann_json)
 
 vtk_module_add_module(ParFlow::IO
   CLASSES ${classes}
 )
-target_link_libraries(IO
-  LINK_PUBLIC nlohmann_json::nlohmann_json
+vtk_module_link(ParFlow::IO
+  PUBLIC nlohmann_json::nlohmann_json
 )
 
 paraview_add_server_manager_xmls(
