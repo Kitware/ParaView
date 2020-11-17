@@ -72,7 +72,7 @@ if (PARAVIEW_USE_MPI)
     # FIXME: This is currently hard-coded to 2 since the maximum isn't
     # sensible. However, there is no command line flag to override the number
     # of processes to use for a given test, so instead, just use 2 for now.
-    "PARAVIEW_MPI_MAX_NUMPROCS=2")
+    "PARAVIEW_MPI_MAX_NUMPROCS=2") # See ParaViewTesting.cmake@@paraview_add_test_mpi
     #"PARAVIEW_MPI_MAX_NUMPROCS=${MPIEXEC_MAX_NUMPROCS}")
 
   if (MPI_PREFLAGS)

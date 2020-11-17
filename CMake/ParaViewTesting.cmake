@@ -361,6 +361,7 @@ function (paraview_add_tile_display_tests width height)
     ENVIRONMENT
       PV_SHARED_WINDOW_SIZE=800x600
       SMTESTDRIVER_MPI_NUMPROCS=${_paraview_add_tile_display_cpu_count}
+    NUMPROCS "${_paraview_add_tile_display_cpu_count}"
     _COMMAND_PATTERN
       --server "$<TARGET_FILE:ParaView::pvserver>"
         --enable-bt
@@ -393,6 +394,7 @@ function (paraview_add_cave_tests num_ranks config)
     ENVIRONMENT
       PV_SHARED_WINDOW_SIZE=400x300
       SMTESTDRIVER_MPI_NUMPROCS=${num_ranks}
+    NUMPROCS "${num_ranks}"
     _COMMAND_PATTERN
       --server "$<TARGET_FILE:ParaView::pvserver>"
         --enable-bt
@@ -433,6 +435,7 @@ function (paraview_add_test_mpi)
     _get_prefix(chosen_prefix "paraview-mpi" ${ARGN})
     _paraview_add_tests("paraview_add_test"
       PREFIX "${chosen_prefix}"
+      NUMPROCS 2 # See Utilities/TestDriver/CMakeLists.txt (PARAVIEW_MPI_MAX_NUMPROCS)
       _COMMAND_PATTERN
         --client-mpi
         __paraview_args__
