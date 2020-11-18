@@ -493,7 +493,9 @@ void pqTabbedMultiViewWidget::closeTab(int index)
     END_UNDO_SET();
   }
 
-  if (this->Internals->TabWidget->count() == 1)
+  // The '+' tab is missing if in readOnly mode. Account for that here.
+  int minimumNumberOfTabs = this->readOnly() ? 0 : 1;
+  if (this->Internals->TabWidget->count() == minimumNumberOfTabs)
   {
     this->Internals->setCurrentTab(this->createTab());
   }
