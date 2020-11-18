@@ -42,11 +42,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QScrollBar>
 #include <QTextBlock>
 
+//-----------------------------------------------------------------------------
 inline std::uint32_t GetNumberOfDigits(std::uint32_t i)
 {
-  return i > 0 ? static_cast<std::int32_t>(std::log10((float)i) + 1) : 1;
+  return i > 0 ? static_cast<std::int32_t>(std::log10(static_cast<float>(i)) + 1) : 1;
 }
 
+//-----------------------------------------------------------------------------
 QSize pqPythonLineNumberArea::sizeHint() const
 {
   const std::uint32_t numberOfDigits =
@@ -58,6 +60,7 @@ QSize pqPythonLineNumberArea::sizeHint() const
   return QSize{ space, text.height() };
 }
 
+//-----------------------------------------------------------------------------
 void pqPythonLineNumberArea::paintEvent(QPaintEvent* event)
 {
   QPainter painter(this);

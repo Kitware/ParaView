@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPythonTextArea.h"
 
-#include "pqPythonLineNumberArea.h"
-#include "pqPythonSyntaxHighlighter.h"
-#include "pqPythonUtils.h"
+#include <pqPythonLineNumberArea.h>
+#include <pqPythonSyntaxHighlighter.h>
+#include <pqPythonUtils.h>
 
 #include <QAbstractTextDocumentLayout>
 #include <QHBoxLayout>
@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QScrollBar>
 #include <QTextBlock>
 
+//-----------------------------------------------------------------------------
 pqPythonTextArea::pqPythonTextArea(QWidget* parent)
   : QWidget(parent)
   , TextEdit(new QTextEdit(this))

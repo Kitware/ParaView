@@ -35,7 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPythonModule.h"
 
-#include <QTextEdit>
+#include <QWidget>
+
+class QTextEdit;
 
 class pqPythonLineNumberArea;
 class pqPythonSyntaxHighlighter;
