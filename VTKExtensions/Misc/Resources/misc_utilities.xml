@@ -105,6 +105,34 @@
     </Proxy>
 
     <!-- ================================================================== -->
+    <Proxy class="vtkPVRotateAroundOriginTransform" label="RotateAroundOriginTransform" name="RotateAroundOriginTransform">
+      <DoubleVectorProperty command="SetOriginOfRotation"
+                            default_values="0.0 0.0 0.0"
+                            label="Origin of rotation"
+                            name="OriginOfRotation"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAbsoluteRotation"
+                            default_values="0.0 0.0 0.0"
+                            label="Rotate"
+                            information_property="RotationInfo"
+                            name="Rotation"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetAbsoluteRotation"
+                            default_values="0.0 0.0 0.0"
+                            information_only="1"
+                            name="RotationInfo"
+                            number_of_elements="3" />
+      <InputProperty is_internal="1" name="DummyInput" />
+      <PropertyGroup label="Origin of rotation" panel_widget="InteractiveHandle">
+        <Property function="WorldPosition" name="OriginOfRotation" />
+      </PropertyGroup>
+    </Proxy>
+
+    <!-- ================================================================== -->
   </ProxyGroup>
 
   <!-- ==================================================================== -->

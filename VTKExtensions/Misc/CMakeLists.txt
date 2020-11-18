@@ -45,6 +45,7 @@ set(classes
   vtkPVMergeTablesMultiBlock
   vtkPVPlane
   vtkPVTransform
+  vtkPVRotateAroundOriginTransform
   vtkReductionFilter
   vtkSelectionSerializer)
 
