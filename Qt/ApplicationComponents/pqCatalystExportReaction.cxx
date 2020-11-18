@@ -72,7 +72,7 @@ pqCatalystExportReaction::~pqCatalystExportReaction()
 QString pqCatalystExportReaction::exportScript()
 {
   pqFileDialog fileDialog(nullptr, pqCoreUtilities::mainWidget(), tr("Save Catalyst State:"),
-    QString(), "Python ZIP Archives (*.zip);;All files (*)");
+    QString(), "Python file (*.py);;All files (*)");
   fileDialog.setObjectName("SaveCatalystStateFileDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (!fileDialog.exec())
@@ -119,7 +119,7 @@ bool pqCatalystExportReaction::exportScript(const QString& filename)
     }
     return false;
   }
-  vtkSmartPyObject name(PyString_FromString("save_catalyst_package_as_zip"));
+  vtkSmartPyObject name(PyString_FromString("save_catalyst_state"));
   vtkSmartPyObject pyfilename(PyString_FromString(filename.toLocal8Bit().data()));
   vtkSmartPyObject pyproxy(vtkPythonUtil::GetObjectFromPointer(proxy));
   vtkSmartPyObject result(PyObject_CallMethodObjArgs(

@@ -47,6 +47,7 @@
 #include "vtkPVInSituModule.h" // For windows import/export of shared libraries
 
 class vtkCPCxxHelper;
+class vtkInSituPipeline;
 class vtkSMSourceProxy;
 
 #include <string> // for std::string
@@ -85,6 +86,11 @@ public:
    * zip-file which containing a Python package.
    */
   static void AddPipeline(const std::string& path);
+
+  /**
+   * Add a vtkInSituPipeline instance.
+   */
+  static void AddPipeline(vtkInSituPipeline* pipeline);
 
   /**
    * Specify the algorithm or data-producer proxy that produces the mesh for named

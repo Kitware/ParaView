@@ -52,6 +52,79 @@ bool verify(const std::string& protocol, const conduit::Node& n)
 }
 } // namespace scripts
 
+namespace pipeline
+{
+bool verify(const std::string& protocol, const conduit::Node& n)
+{
+  vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s: verify", protocol.c_str());
+  if (!n.dtype().is_object())
+  {
+    vtkLogF(ERROR, "node must be an 'object'.");
+    return false;
+  }
+
+  if (!n.has_child("type"))
+  {
+    vtkLogF(ERROR, "missing 'type'.");
+    return false;
+  }
+
+  if (n["type"].as_string() == "io")
+  {
+    if (!n.has_child("filename") || !n["filename"].dtype().is_string())
+    {
+      vtkLogF(ERROR, "missing 'filename' or not of type 'string'.");
+      return false;
+    }
+
+    if (!n.has_child("channel"))
+    {
+      vtkLogF(ERROR, "missing 'channel'.");
+      return false;
+    }
+    else if (!n["channel"].dtype().is_string())
+    {
+      vtkLogF(ERROR, "channel must be a string.");
+      return false;
+    }
+
+    return true;
+  }
+  else
+  {
+    vtkLogF(ERROR, "unsupported type '%s'", n["type"].as_string().c_str());
+    return false;
+  }
+}
+
+} // namespace pipeline
+namespace pipelines
+{
+bool verify(const std::string& protocol, const conduit::Node& n)
+{
+  vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s: verify", protocol.c_str());
+  if (!n.dtype().is_object() && !n.dtype().is_list())
+  {
+    vtkLogF(ERROR, "node must be an 'object' or 'list'.");
+    return false;
+  }
+  if (n.number_of_children() == 0)
+  {
+    vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "empty 'n' provided.");
+  }
+  auto iter = n.children();
+  while (iter.has_next())
+  {
+    auto& pipeline = iter.next();
+    if (!pipeline::verify(protocol + "::pipeline", pipeline))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+} // namespace pipelines
+
 bool verify(const std::string& protocol, const conduit::Node& n)
 {
   vtkVLogScopeF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "%s: verify", protocol.c_str());
@@ -71,9 +144,17 @@ bool verify(const std::string& protocol, const conduit::Node& n)
       return false;
     }
   }
+  else if (n.has_child("pipelines"))
+  {
+    // hard-coded pipelines.
+    if (!pipelines::verify(protocol + "::pipelines", n["pipelines"]))
+    {
+      return false;
+    }
+  }
   else
   {
-    vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "no 'scripts' provided.");
+    vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "no 'scripts' or 'pipelines' provided.");
   }
   if (n.has_child("mpi_comm"))
   {

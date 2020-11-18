@@ -1,7 +1,9 @@
 [
   {"type":"directory","name":"Testing/Temporary/MultiplePipelines","contents":[
-    {"type":"file","name":"pipeline1_000000.png", "compare": true},
-    {"type":"file","name":"pipeline1_000001.png"},
-    {"type":"file","name":"pipeline2_000001.png", "compare": true}
+    {"type":"file","name":"pipeline1_000001.png", "compare": true},
+    {"type":"file","name":"pipeline1_000004.png"},
+    {"type":"file","name":"pipeline1_000007.png"},
+    {"type":"file","name":"pipeline2_000002.png"},
+    {"type":"file","name":"pipeline2_000009.png", "compare": true}
   ]}
 ]

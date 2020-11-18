@@ -17,18 +17,23 @@
  * @brief vtkCPPipeline for Catalyst Python script / package version 2.0
  *
  * vtkCPPythonScriptV2Pipeline is intended to use with ParaView Python scripts
- * introduced in ParaView version 5.9. These Python scripts use extract
- * generators to define the extracts to be generated. The scripts that define
- * the analysis pipeline(s) are bundled in a Python package. This class is used
- * to use such packages in Catalyst.
+ * introduced in ParaView version 5.9. These Python scripts typically
+ * use extract generators to define the extracts to be generated.
+ * This class is used to use such packages in Catalyst.
  *
+ * For details on the supported Python scripts and how to use them to write in
+ * situ analysis, refer to
+ * ['Anatomy of Catalyst Python Module (Version 2.0)'](@ref CatalystPythonScriptsV2).
  */
 
 #ifndef vtkCPPythonScriptV2Pipeline_h
 #define vtkCPPythonScriptV2Pipeline_h
 
 #include "vtkCPPythonPipeline.h"
+#include "vtkNew.h"                    // for vtkNew
 #include "vtkPVPythonCatalystModule.h" // For windows import/export of shared libraries
+
+class vtkCPPythonScriptV2Helper;
 
 class VTKPVPYTHONCATALYST_EXPORT vtkCPPythonScriptV2Pipeline : public vtkCPPythonPipeline
 {
@@ -46,23 +51,7 @@ public:
    * the root node makes disk access thus avoid thrashing the IO subsystem and
    * improving load times.
    */
-  bool InitializeFromZIP(const char* zipfilename, const char* packagename = nullptr);
-
-  /**
-   * Use this method to initialize from a package that is not in a zip archive.
-   * This is primarily intended for debugging purposes. `InitializeFromZIP` is
-   * the preferred way.
-   *
-   * `path` is an absolute path to the Python package.
-   */
-  bool InitializeFromDirectory(const char* path);
-
-  /**
-   * Use this method to load a .py file. These files are generally used only for
-   * very simple analysis scripts which do not any analysis pipeline put just
-   * want to support Live, for example.
-   */
-  bool InitializeFromScript(const char* pyfilename);
+  bool Initialize(const char* filename);
 
   //@{
   /**
@@ -81,8 +70,8 @@ private:
   vtkCPPythonScriptV2Pipeline(const vtkCPPythonScriptV2Pipeline&) = delete;
   void operator=(const vtkCPPythonScriptV2Pipeline&) = delete;
 
-  class vtkInternals;
-  vtkInternals* Internals;
+  vtkNew<vtkCPPythonScriptV2Helper> Helper;
+  bool CoProcessHasBeenCalled;
 };
 
 #endif

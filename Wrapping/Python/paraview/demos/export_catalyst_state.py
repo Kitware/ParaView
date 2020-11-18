@@ -7,7 +7,7 @@ import argparse
 parser = argparse.ArgumentParser(\
     description="Generate Catalyst Python State")
 parser.add_argument("--output", type=str,
-    help="name for the output file (*.zip)", required=True)
+    help="name for the output file (*.py)", required=True)
 parser.add_argument("--extracts-dir", type=str,
     help="path to directory where to make the Catalyst script save generated extracts",
     required=True)
@@ -36,7 +36,7 @@ if os.path.exists(args.output):
     print("removing existing output file:", args.output)
     os.remove(args.output)
 
-from paraview.detail.catalyst_export import save_catalyst_package_as_zip
-save_catalyst_package_as_zip(args.output, options)
+from paraview.detail.catalyst_export import save_catalyst_state
+save_catalyst_state(args.output, options)
 
 assert os.path.exists(args.output)

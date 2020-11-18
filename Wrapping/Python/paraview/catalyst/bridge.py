@@ -57,17 +57,8 @@ def add_pipeline_v2(path):
     assert coprocessor is not None
 
     pipeline = vtkCPPythonScriptV2Pipeline()
-
-    if os.path.splitext(path)[1] == ".zip":
-        if not pipeline.InitializeFromZIP(path):
-            raise RuntimeError("Initialization failed!")
-    elif os.path.splitext(path)[1] == ".py":
-        if not pipeline.InitializeFromScript(path):
-            raise RuntimeError("Initialization failed!")
-    else:
-        if not pipeline.InitializeFromDirectory(path):
-            raise RuntimeError("Initialization failed!")
-
+    if not pipeline.Initialize(path):
+        raise RuntimeError("Initialization failed!")
     coprocessor.AddPipeline(pipeline)
 
 def add_pipeline(filename, version=0):

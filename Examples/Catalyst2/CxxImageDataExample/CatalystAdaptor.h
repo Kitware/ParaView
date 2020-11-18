@@ -5,7 +5,7 @@
 #include <catalyst.h>
 #include <conduit.hpp>
 #include <conduit_cpp_to_c.hpp>
-
+#include <cstring>
 #include <string>
 
 namespace CatalystAdaptor
@@ -23,7 +23,17 @@ void Initialize(int argc, char* argv[])
   conduit::Node node;
   for (int cc = 1; cc < argc; ++cc)
   {
-    node["catalyst/scripts/script" + std::to_string(cc - 1)].set_string(argv[cc]);
+    if (strcmp(argv[cc], "--output") == 0 && (cc + 1) < argc)
+    {
+      node["catalyst/pipelines/0/type"].set("io");
+      node["catalyst/pipelines/0/filename"].set(argv[cc + 1]);
+      node["catalyst/pipelines/0/channel"].set("grid");
+      ++cc;
+    }
+    else
+    {
+      node["catalyst/scripts/script" + std::to_string(cc - 1)].set_string(argv[cc]);
+    }
   }
   catalyst_initialize(conduit::c_node(&node));
 }

@@ -68,6 +68,7 @@ def main(args):
 
     # initialize Catalyst
     from paraview.catalyst import bridge
+    from paraview import print_info, print_warning
     bridge.initialize()
 
     # add analysis script
@@ -82,7 +83,7 @@ def main(args):
         rank = comm.Get_rank()
         num_ranks = comm.Get_size()
     except ImportError:
-        print("missing mpi4py, running in serial (non-distributed) mode")
+        print_warning("missing mpi4py, running in serial (non-distributed) mode")
         rank = 0
         num_ranks = 1
 
@@ -93,7 +94,7 @@ def main(args):
             time.sleep(args.delay)
 
         if rank == 0:
-            print("timestep: {0}/{1}".format(step+1, numsteps))
+            print_info("timestep: {0}/{1}".format(step+1, numsteps))
 
         # assume simulation time starts at 0
         time = step/float(numsteps)
