@@ -38,9 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextBlock>
 #include <QTextEdit>
 
-/// @brief Returns the id of the first visible block inside a QTextEdit
-/// @details Taken from
-/// https://stackoverflow.com/questions/2443358/how-to-add-lines-numbers-to-qtextedit/24596246#24596246
+/**
+ * @brief Returns the id of the first visible block inside a QTextEdit
+ * @details Taken from
+ * <a
+ * href="https://stackoverflow.com/questions/2443358/how-to-add-lines-numbers-to-qtextedit/24596246#24596246">Stackoverflow</a>
+ */
 inline std::int32_t GetFirstVisibleBlockId(const QTextEdit& text)
 {
   QTextCursor curs = QTextCursor(text.document());
