@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
     if (ext == ".zip")
     {
       vtkNew<vtkCPPythonScriptV2Pipeline> pipeline;
-      pipeline->InitializeFromZIP(script.c_str());
+      pipeline->Initialize(script.c_str());
       processor->AddPipeline(pipeline);
     }
     else

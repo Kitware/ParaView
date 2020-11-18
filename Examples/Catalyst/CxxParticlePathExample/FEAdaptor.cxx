@@ -119,7 +119,7 @@ void Initialize(std::vector<std::string>& scripts)
     if (ext == ".zip")
     {
       vtkNew<vtkCPPythonScriptV2Pipeline> pipeline;
-      pipeline->InitializeFromZIP(it->c_str());
+      pipeline->Initialize(it->c_str());
       Processor->AddPipeline(pipeline);
     }
     else

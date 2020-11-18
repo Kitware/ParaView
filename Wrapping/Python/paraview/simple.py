@@ -178,6 +178,11 @@ def CreateView(view_xml_name, detachedFromLayout=None, **params):
     # interactor hasn't already been set. This overcomes the problem where VTK
     # segfaults if the interactor is created after the window was created.
     view.MakeRenderWindowInteractor(True)
+
+    from .catalyst.detail import IsInsitu, RegisterView
+    if IsInsitu():
+        # tag the view to know which pipeline this came from.
+        RegisterView(view)
     return view
 
 # -----------------------------------------------------------------------------

@@ -25,10 +25,9 @@
 #define vtkInSituPipelinePython_h
 
 #include "vtkInSituPipeline.h"
+#include "vtkNew.h" //  for vtkNew.
 
-#include <memory> // for std::unique_ptr
-
-class vtkSMProxy;
+class vtkCPPythonScriptV2Helper;
 
 class VTKPVINSITU_EXPORT vtkInSituPipelinePython : public vtkInSituPipeline
 {
@@ -42,8 +41,8 @@ public:
    * Get/Set the path to either a .py file or a .zip file or a Python package
    * directory.
    */
-  vtkSetStringMacro(PipelinePath);
-  vtkGetStringMacro(PipelinePath);
+  vtkSetStringMacro(FileName);
+  vtkGetStringMacro(FileName);
   //@}
 
   //@{
@@ -55,32 +54,16 @@ public:
   bool Finalize() override;
   //@}
 
-  //@{
-  /**
-   * Internal methods. These are called by Python modules internal to ParaView
-   * and may change without notice. Should not be considered as part of ParaView
-   * API.
-   */
-  void SetOptions(vtkSMProxy* catalystOptions);
-  vtkGetObjectMacro(Options, vtkSMProxy);
-  static void RegisterExtractor(vtkSMProxy* extractor);
-  //@}
 protected:
   vtkInSituPipelinePython();
   ~vtkInSituPipelinePython();
-
-  bool IsLiveActivated();
-  void DoLive(int, double);
 
 private:
   vtkInSituPipelinePython(const vtkInSituPipelinePython&) = delete;
   void operator=(const vtkInSituPipelinePython&) = delete;
 
-  class vtkInternals;
-  std::unique_ptr<vtkInternals> Internals;
-  char* PipelinePath;
-
-  vtkSMProxy* Options;
+  vtkNew<vtkCPPythonScriptV2Helper> Helper;
+  char* FileName;
 };
 
 #endif

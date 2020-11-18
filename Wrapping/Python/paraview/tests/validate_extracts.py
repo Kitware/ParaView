@@ -63,6 +63,11 @@ if args.subdir is not None:
     node = find_directory(args.subdir, node)
     test_dir = os.path.join(args.root, args.subdir)
 
+# Check that directory exists since `os.walk()` does not fail
+# for non extant directories.
+if not os.path.isdir(test_dir):
+    raise RuntimeError("Missing directory: '%s'" % test_dir)
+
 # Validate directory structure.
 regressions_failure_count = 0
 for dirpath, dirs, files in os.walk(test_dir):

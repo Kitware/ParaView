@@ -6,59 +6,79 @@ from .. import logger
 
 from ..modules.vtkPVInSitu import vtkInSituInitializationHelper, vtkInSituPipelinePython
 
-ActiveDataDescription = None
-ActivePythonPipelineModule = None
+from ..modules.vtkPVPythonCatalyst import vtkCPPythonScriptV2Helper
 
-def SetActiveDataDescription(dataDesc, module):
-    global ActiveDataDescription, ActivePythonPipelineModule
-    ActiveDataDescription = dataDesc
-    ActivePythonPipelineModule = module
+def _get_active_helper():
+    return vtkCPPythonScriptV2Helper.GetActiveInstance()
+
+
+def _get_active_data_description():
+    if not IsInsitu():
+        return None
+    helper = _get_active_helper()
+    return helper.GetDataDescription()
+
 
 def IsInsitu():
     """Returns True if executing in an insitu environment, else false"""
-    global ActiveDataDescription
-    if vtkInSituInitializationHelper.IsInitialized():
-        # Catalyst 2.0
-        return True
-    # Legacy Catalyst
-    return ActiveDataDescription is not None
+    helper = _get_active_helper()
+    return (helper is not None)
+
+
+def IsLegacyCatalystAdaptor():
+    """Returns True if the active execution environment is from within a legacy
+    Catalyst adaptor implementation that uses vtkCPProcessor etc. manually,
+    instead of the Conduit-based in situ API"""
+    return _get_active_data_description() is not None
+
+def IsCatalystInSituAPI():
+    """Returns True if the active execution environment is from within
+    an implementation of the Conduit-based Catalyst In Situ API."""
+    return IsInsitu() and not IsLegacyCatalystAdaptor() and vtkInSituInitializationHelper.IsInitialized()
 
 def IsInsituInput(name):
-    global ActiveDataDescription
     if not name or not IsInsitu():
         return False
-
-    if vtkInSituInitializationHelper.IsInitialized():
-        # Catalyst 2.0
-        return vtkInSituInitializationHelper.GetProducer(name) != None
-    elif ActiveDataDescription.GetInputDescriptionByName(name) is not None:
+    dataDesc = _get_active_data_description()
+    if dataDesc:
         # Legacy Catalyst
+        if dataDesc.GetInputDescriptionByName(name) is not None:
+            return True
+    elif IsCatalystInSituAPI() and (vtkInSituInitializationHelper.GetProducer(name) is not None):
+        # Catalyst 2.0
         return True
     return False
+
 
 def RegisterExtractor(extractor):
     """Keeps track of extractors created inside a specific Catalyst
     script.  This is useful to ensure we only update the extractors for that
     current script when multiple scripts are being executed in the same run.
     """
-    global ActivePythonPipelineModule
     assert IsInsitu()
+    _get_active_helper().RegisterExtractor(extractor.SMProxy)
 
-    if vtkInSituInitializationHelper.IsInitialized():
-        # Catalyst 2.0
-        vtkInSituPipelinePython.RegisterExtractor(extractor.SMProxy)
+
+def RegisterView(view):
+    """Keeps track of views created inside a specific Catalyst
+    script.  This is useful to ensure we only update the views for the
+    current script when multiple scripts are being executed in the same run.
+    """
+    assert IsInsitu()
+    _get_active_helper().RegisterView(view.SMProxy)
+
+    if IsCatalystInSituAPI():
+        view.ViewTime = vtkInSituInitializationHelper.GetTime()
     else:
-        module = ActivePythonPipelineModule
-        if not hasattr(module, "_extractors"):
-            from vtkmodules.vtkCommonCore import vtkCollection
-            module._extractors = vtkCollection()
-        module._extractors.AddItem(extractor.SMProxy)
+        view.ViewTime = _get_active_data_description().GetTime()
+
 
 def CreateProducer(name):
-    global ActiveDataDescription, ActivePythonPipelineModule
     assert IsInsituInput(name)
-
-    if vtkInSituInitializationHelper.IsInitialized():
+    from . import log_level
+    from .. import log
+    log(log_level(), "creating producer for simulation input named '%s'")
+    if IsCatalystInSituAPI():
         # Catalyst 2.0
         from paraview import servermanager
         producer = servermanager._getPyProxy(vtkInSituInitializationHelper.GetProducer(name))
@@ -69,92 +89,16 @@ def CreateProducer(name):
         return producer
 
     # Legacy Catalyst
-    module = ActivePythonPipelineModule
-    if not hasattr(module, "_producer_map"):
-        module._producer_map = {}
-    if name in module._producer_map:
-        return module[name]
-
     from paraview import servermanager
-    dataDesc = ActiveDataDescription
-    ipdesc = dataDesc.GetInputDescriptionByName(name)
-
-    # eventually, we want the Catalyst C++ code to give use the vtkAlgorithm to
-    # use; e.g.
-    # servermanager._getPyProxy(ipdesc.GetProducer())
-
-    pxm = servermanager.ProxyManager()
-    producer = servermanager._getPyProxy(pxm.NewProxy("sources", "PVTrivialProducer2"))
-    controller = servermanager.ParaViewPipelineController()
-    controller.InitializeProxy(producer)
-    controller.RegisterPipelineProxy(producer, name)
+    helper = _get_active_helper()
+    producer = helper.GetTrivialProducer(name)
+    producer = servermanager._getPyProxy(producer)
 
     # since state file may have arbitrary properties being specified
     # on the original source, we ensure we ignore them
     producer.IgnoreUnknownSetRequests = True
-
-    vtkobject = producer.GetClientSideObject()
-    assert vtkobject
-    vtkobject.SetWholeExtent(ipdesc.GetWholeExtent())
-    vtkobject.SetOutput(ipdesc.GetGrid())
-    module._producer_map[name] = producer
     return producer
 
-
-def UpdateProducers():
-    global ActiveDataDescription, ActivePythonPipelineModule
-    assert IsInsitu()
-    dataDesc = ActiveDataDescription
-    module = ActivePythonPipelineModule
-    if not hasattr(module, "_producer_map"):
-        # implies that this state file has no producer!
-        # it is possibly, but most likely an error; let's warn.
-        logger.warning("script may not depend on simulation data; is that expected?")
-        return False
-
-    for name, producer in module._producer_map.items():
-        ipdesc = dataDesc.GetInputDescriptionByName(name)
-        assert ipdesc
-
-        vtkobject = producer.GetClientSideObject()
-        assert vtkobject
-        vtkobject.SetOutput(ipdesc.GetGrid(), dataDesc.GetTime())
-        vtkobject.SetWholeExtent(ipdesc.GetWholeExtent())
-        producer.MarkModified(producer.SMProxy)
-    return True
-
-
-def HasProducers():
-    global ActiveDataDescription, ActivePythonPipelineModule
-    assert IsInsitu()
-    dataDesc = ActiveDataDescription
-    module = ActivePythonPipelineModule
-    return hasattr(module, "_producer_map")
-
-def IsAnyTriggerActivated(cntr):
-    global ActivePythonPipelineModule
-    assert IsInsitu()
-
-    module = ActivePythonPipelineModule
-    if hasattr(module, "_extractors"):
-        return cntr.IsAnyTriggerActivated(module._extractors)
-
-    # if there are no extractors in this module, what should we do?
-    # I am leaning towards saying treat it as if they are activated since
-    # the user may have custom extract generation code.
-    from . import log_level
-    from .. import log
-    log(log_level(), "module has no extractors, treating as activated.")
-    return True
-
-def Extract(cntr):
-    global ActivePythonPipelineModule
-    assert IsInsitu()
-
-    module = ActivePythonPipelineModule
-    if hasattr(module, "_extractors"):
-        return cntr.Extract(module._extractors)
-    return False
 
 def InitializePythonEnvironment():
     """
@@ -180,65 +124,24 @@ def InitializePythonEnvironment():
     log(log_level(), "import paraview.modules.vtkPVCatalyst")
     from paraview.modules import vtkPVCatalyst
 
-
-def LoadPackageFromZip(zipfilename, packagename=None):
-    """Loads a zip file and imports a top-level package from it with the name
-    `packagename`. If packagename is None, then the basename for the zipfile is
-    used as the package name.
-
-    If import fails, this will throw appropriate Python import errors.
-
-    :returns: the module object for the package on success else None
-    """
-    import zipimport, os.path
-
+def RegisterPackageFromZip(zipfilename, packagename=None):
+    from . import importers
     zipfilename = _mpi_exchange_if_needed(zipfilename)
-    if packagename:
-        package = packagename
-    else:
-        basename = os.path.basename(zipfilename)
-        package = os.path.splitext(basename)[0]
-
-    z = zipimport.zipimporter(zipfilename)
-    assert z.is_package(package)
-    module = z.load_module(package)
-    module._pv_is_zip = True
-    return module
+    return importers.add_file(zipfilename, packagename)
 
 
-def LoadPackageFromDir(path):
-    import importlib.util, os.path
+def RegisterPackageFromDir(path):
+    import os.path
+    from . import importers
     packagename = os.path.basename(path)
     init_py = os.path.join(path, "__init__.py")
-    spec = importlib.util.spec_from_file_location(packagename, init_py)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+    return importers.add_file(init_py, packagename)
 
 
-def LoadModuleFromFile(fname):
-    import importlib.util, os.path
-    fname = _mpi_exchange_if_needed(fname)
-    modulename = os.path.basename(fname)
-    spec = importlib.util.spec_from_file_location(modulename, fname)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+def RegisterModuleFromFile(filename):
+    from . import importers
+    return importers.add_file(filename)
 
-def LoadSubmodule(name, module):
-    from . import log_level
-    from .. import log
-    import importlib, importlib.util, zipimport, os.path
-    log(log_level(), "importing '%s'", name)
-    if hasattr(module, "_pv_is_zip"):
-        z = zipimport.zipimporter(module.__path__[0])
-        s_module = z.load_module(name)
-    else:
-        spec = importlib.util.spec_from_file_location(name,
-                os.path.join(module.__path__[0], "%s.py" % name))
-        s_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(s_module)
-    return s_module
 
 _temp_directory = None
 def _mpi_exchange_if_needed(filename):

@@ -49,7 +49,14 @@ if (USE_CATALYST)
       NAME CxxImageDataExampleV2::SimplePipeline
       COMMAND CxxImageDataExampleV2
               ${CMAKE_CURRENT_SOURCE_DIR}/catalyst_pipeline.py)
-    set_tests_properties("CxxImageDataExampleV2::SimplePipeline"
+    add_test(
+      NAME CxxImageDataExampleV2::IOPipeline
+      COMMAND CxxImageDataExampleV2
+              --output "${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary/dataset-%04ts.vtpd")
+
+    set_tests_properties(
+        "CxxImageDataExampleV2::SimplePipeline"
+        "CxxImageDataExampleV2::IOPipeline"
       PROPERTIES
         FAIL_REGULAR_EXPRESSION "ERROR:;instances(s)? still around;ERR\\\|"
         SKIP_RETURN_CODE 125)

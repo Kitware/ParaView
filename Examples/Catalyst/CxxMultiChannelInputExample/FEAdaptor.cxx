@@ -29,7 +29,7 @@ FEAdaptor::FEAdaptor(int numScripts, char* scripts[])
     if (ext == ".zip")
     {
       vtkNew<vtkCPPythonScriptV2Pipeline> pipeline;
-      pipeline->InitializeFromZIP(scripts[i]);
+      pipeline->Initialize(scripts[i]);
       this->Processor->AddPipeline(pipeline);
     }
     else

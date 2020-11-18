@@ -33,6 +33,7 @@ set(classes
   vtkCPPythonAdaptorAPI
   vtkCPPythonPipeline
   vtkCPPythonScriptPipeline
+  vtkCPPythonScriptV2Helper
   vtkCPPythonScriptV2Pipeline
   vtkCPPythonStringPipeline)
 

@@ -58,8 +58,8 @@ vtk_module_test_data(
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletPhiThetaExtractsWithCinema_ImmediateExtracts_image_000001p_000.00t_000.00.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletPhiThetaExtractsWithCinema_ImmediateExtracts_image_000001p_000.00t_060.00.png"
 
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/MultiplePipelines_pipeline1_000000.png"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/MultiplePipelines_pipeline2_000001.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/MultiplePipelines_pipeline1_000001.png"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/MultiplePipelines_pipeline2_000009.png"
 
   # baselines for WaveletVolumeRenderWithCinema
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletVolumeRenderWithCinema_BatchExtracts_image_000000otf_0.png"
@@ -72,7 +72,10 @@ vtk_module_test_data(
 
 set(simple_scripts
   ValidateChangingInput.py
-  LiveOnly.py)
+  LiveOnly.py
+  CatalystScriptCustomCallbackVerifier.py
+  package_test
+  package_test_zip.zip)
 
 paraview_add_test(
   PREFIX "Catalyst::WaveletMiniApp"
@@ -82,6 +85,17 @@ paraview_add_test_mpi(
   PREFIX "Catalyst::MPI::WaveletMiniApp"
   ARGS   "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym -m paraview.demos.wavelet_miniapp -t 20 --size 21 --script-version 2 -s
   TEST_SCRIPTS ${simple_scripts})
+
+foreach (tname IN LISTS scripts)
+    set_tests_properties("Catalyst::WaveletMiniApp.${tname}"
+      PROPERTIES
+        PASS_REGULAR_EXPRESSION "All ok")
+    if (PARAVIEW_USE_MPI)
+        set_tests_properties("Catalyst::MPI::WaveletMiniApp.${tname}"
+          PROPERTIES
+            PASS_REGULAR_EXPRESSION "All ok")
+    endif()
+endforeach()
 
 #--------------------------------------------------------------------
 # add test to validate multiple analysis pipelines can be used.
@@ -98,12 +112,12 @@ paraview_add_test(
     ARGS   "$<TARGET_FILE:ParaView::pvbatch>"
            -sym
            -dr
-           -m paraview.demos.wavelet_miniapp -t 2 --size 21
+           -m paraview.demos.wavelet_miniapp -t 10 --size 21
            --script-version 2
            --channel Wavelet1
-           -s "${CMAKE_CURRENT_SOURCE_DIR}/pipeline1.zip"
+           -s "${CMAKE_CURRENT_SOURCE_DIR}/pipeline1.py"
            -s
-    TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/pipeline2.zip")
+    TEST_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/pipeline2.py")
 set_tests_properties(
   "Catalyst::WaveletMiniApp::MultiplePipelines::pipeline1.pipeline2"
   PROPERTIES
@@ -316,7 +330,7 @@ if (PARAVIEW_USE_QT)
       ARGS "$<TARGET_FILE:ParaView::pvpython>"
             -dr
             -m paraview.demos.export_catalyst_state
-            --output "${ttemp_dir}/${tname}.zip"
+            --output "${ttemp_dir}/${tname}.py"
             --extracts-dir "${ttemp_dir}/CoprocessingExtracts"
             ${cinema_args}
             --pvsm
@@ -333,7 +347,7 @@ if (PARAVIEW_USE_QT)
         PARAVIEW_OVERRIDE_EXTRACTS_OUTPUT_DIRECTORY=${ttemp_dir}/BatchExtracts
       ARGS "$<TARGET_FILE:ParaView::pvbatch>"
            -dr
-      TEST_SCRIPTS ${ttemp_dir}/${tname}.zip)
+      TEST_SCRIPTS ${ttemp_dir}/${tname}.py)
 
     set_tests_properties(
       "Catalyst::Workflow::BatchExecute.${tname}"
@@ -372,7 +386,7 @@ if (PARAVIEW_USE_QT)
             -sym -m paraview.demos.wavelet_miniapp -t 20 --size 21
             --channel Wavelet1
             --script-version 2 -s
-      TEST_SCRIPTS ${ttemp_dir}/${tname}.zip)
+      TEST_SCRIPTS ${ttemp_dir}/${tname}.py)
 
     set_tests_properties(
       "Catalyst::Workflow::WaveletMiniApp.${tname}"

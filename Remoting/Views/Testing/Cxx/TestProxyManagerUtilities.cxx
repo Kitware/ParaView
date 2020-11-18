@@ -154,6 +154,13 @@ std::set<vtkSMProxy*> CreatePipeline(
     result.insert(vtkSMPropertyHelper(lut, "ScalarOpacityFunction").GetAsProxy());
   }
 
+  // add material library explicitly, if present.
+  vtkNew<vtkSMParaViewPipelineController> contr;
+  if (auto materialLib = contr->FindMaterialLibrary(session))
+  {
+    result.insert(materialLib);
+  }
+
   return result;
 }
 }

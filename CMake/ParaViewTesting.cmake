@@ -211,7 +211,7 @@ function (_paraview_add_tests function)
       # to that file and reading it back in so we add a resource lock on the XML
       # file so that the pv.X, pvcx.X and pvcrs.X tests don't run simultaneously.
       # we only need to do this if the test isn't forced to be serial already.
-      if (NOT ${_paraview_add_tests_name}_FORCE_LOCK)
+      if (NOT IS_DIRECTORY "${_paraview_add_tests_script}" AND NOT ${_paraview_add_tests_name}_FORCE_LOCK)
         file(STRINGS "${_paraview_add_tests_script}" _paraview_add_tests_paraview_test_root REGEX PARAVIEW_TEST_ROOT)
       endif ()
       if (${_paraview_add_tests_name}_FORCE_LOCK OR _paraview_add_tests_paraview_test_root)

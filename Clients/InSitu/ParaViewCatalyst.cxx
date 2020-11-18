@@ -22,6 +22,7 @@
 #include "vtkCatalystBlueprint.h"
 #include "vtkConduitSource.h"
 #include "vtkInSituInitializationHelper.h"
+#include "vtkInSituPipelineIO.h"
 #include "vtkPVLogger.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
@@ -52,6 +53,21 @@ static bool update_producer_mesh_blueprint(
   algo->SetNode(node);
   vtkInSituInitializationHelper::MarkProducerModified(channel_name);
   return true;
+}
+
+static vtkSmartPointer<vtkInSituPipeline> create_precompiled_pipeline(const conduit::Node& node)
+{
+  if (node["type"].as_string() == "io")
+  {
+    vtkNew<vtkInSituPipelineIO> pipeline;
+    pipeline->SetFileName(node["filename"].as_string().c_str());
+    pipeline->SetChannelName(node["channel"].as_string().c_str());
+    return pipeline;
+  }
+  else
+  {
+    return nullptr;
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -106,11 +122,27 @@ void catalyst_initialize(const conduit_node* params)
       vtkLogF(WARNING, "Python support not enabled, 'catalyst/scripts' are ignored.");
     }
   }
-  else
+
+  if (cpp_params.has_path("catalyst/pipelines"))
+  {
+    auto& pipelines = cpp_params["catalyst/pipelines"];
+    auto iter = pipelines.children();
+    while (iter.has_next())
+    {
+      iter.next();
+      if (auto p = create_precompiled_pipeline(iter.node()))
+      {
+        vtkInSituInitializationHelper::AddPipeline(p);
+      }
+    }
+  }
+
+  if (!cpp_params.has_path("catalyst/scripts") && !cpp_params.has_path("catalyst/pipelines"))
   {
     // no catalyst initialization specified.
-    vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(),
-      "No Catalyst Python scripts specified. No analysis pipelines will be executed.");
+    vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(), "No Catalyst Python scripts or pre-compiled "
+                                                "pipelines specified. No analysis pipelines will "
+                                                "be executed.");
   }
 }
 
