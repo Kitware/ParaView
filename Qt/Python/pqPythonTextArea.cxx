@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqPythonTextArea.h"
+
 #include "pqPythonLineNumberArea.h"
 #include "pqPythonSyntaxHighlighter.h"
 #include "pqPythonUtils.h"

@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 inline std::uint32_t GetNumberOfDigits(std::uint32_t i)
 {
-  return i > 0 ? (std::int32_t)std::log10((float)i) + 1 : 1;
+  return i > 0 ? static_cast<std::int32_t>(std::log10((float)i) + 1) : 1;
 }
 
 QSize pqPythonLineNumberArea::sizeHint() const

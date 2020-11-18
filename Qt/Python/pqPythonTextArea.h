@@ -40,30 +40,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPythonLineNumberArea;
 class pqPythonSyntaxHighlighter;
 
-/// @class pqPythonTextArea
-/// @brief A python text editor widget
-/// @details Displays an editable text area with syntax
-/// python highlighting and line numbering.
+/**
+ * @class pqPythonTextArea
+ * @brief A python text editor widget
+ * @details Displays an editable text area with syntax
+ * python highlighting and line numbering.
+ */
 class PQPYTHON_EXPORT pqPythonTextArea : public QWidget
 {
   Q_OBJECT
 
 public:
-  /// @brief Construct a pqPythonTextArea
-  /// @input[parent] the parent widget for the Qt ownership
+  /**
+   * @brief Construct a pqPythonTextArea
+   * @input[parent] the parent widget for the Qt ownership
+   */
   explicit pqPythonTextArea(QWidget* parent);
 
-  /// @brief Returns the underlying \ref TextEdit
+  /**
+   * @brief Returns the underlying \ref TextEdit
+   */
   QTextEdit* GetTextEdit() { return this->TextEdit; }
 
 private:
-  /// @brief The editable text area
+  /**
+   * @brief The editable text area
+   */
   QTextEdit* TextEdit;
 
-  /// @brief The line number area widget
+  /**
+   * @brief The line number area widget
+   */
   pqPythonLineNumberArea* LineNumberArea;
 
-  /// @brief The syntax highlighter used to color the \ref TextEdit
+  /**
+   * @brief The syntax highlighter used to color the \ref TextEdit
+   */
   pqPythonSyntaxHighlighter* SyntaxHighlighter;
 };
 
