@@ -564,7 +564,34 @@ void ${_paraview_build_target_safe}_initialize()
       if (_paraview_build_required_exports)
         foreach (_paraview_build_required_export IN LISTS _paraview_build_required_exports)
           string(APPEND _paraview_build_required_exports_include_contents
-            "include(\"\${CMAKE_CURRENT_LIST_DIR}/${_paraview_build_required_export}-targets.cmake\")\n")
+            "include(\"\${CMAKE_CURRENT_LIST_DIR}/${_paraview_build_required_export}-targets.cmake\")\n"
+            "include(\"\${CMAKE_CURRENT_LIST_DIR}/${_paraview_build_required_export}-vtk-module-properties.cmake\")\n"
+            "\n")
+
+          get_property(_paraview_build_modules GLOBAL
+            PROPERTY "paraview_plugin_${_paraview_build_required_export}_modules")
+          if (_paraview_build_modules)
+            vtk_module_export_find_packages(
+              CMAKE_DESTINATION "${_paraview_build_CMAKE_DESTINATION}"
+              FILE_NAME         "${_paraview_build_required_export}-vtk-module-find-packages.cmake"
+              MODULES           ${_paraview_build_modules})
+
+            # TODO: The list of modules should be checked for their `_FOUND`
+            # variables being false and propagate it up through the parent
+            # project's `_FOUND` variable.
+            string(APPEND _paraview_build_required_exports_include_contents
+              "set(CMAKE_FIND_PACKAGE_NAME_save \"\${CMAKE_FIND_PACKAGE_NAME}\")\n"
+              "set(${_paraview_build_required_export}_FIND_QUIETLY \"\${\${CMAKE_FIND_PACKAGE_NAME}_FIND_QUIETLY}\")\n"
+              "set(${_paraview_build_required_export}_FIND_COMPONENTS)\n"
+              "set(CMAKE_FIND_PACKAGE_NAME \"${_paraview_build_required_export}\")\n"
+              "include(\"\${CMAKE_CURRENT_LIST_DIR}/${_paraview_build_required_export}-vtk-module-find-packages.cmake\")\n"
+              "set(CMAKE_FIND_PACKAGE_NAME \"\${CMAKE_FIND_PACKAGE_NAME_save}\")\n"
+              "unset(${_paraview_build_required_export}_FIND_QUIETLY)\n"
+              "unset(${_paraview_build_required_export}_FIND_COMPONENTS)\n"
+              "unset(CMAKE_FIND_PACKAGE_NAME_save)\n"
+              "\n"
+              "\n")
+          endif ()
         endforeach ()
       endif ()
       file(GENERATE
@@ -1000,6 +1027,10 @@ function (paraview_add_plugin name)
       RUNTIME_DESTINATION "${_paraview_plugin_subdir}"
       CMAKE_DESTINATION   "${_paraview_build_CMAKE_DESTINATION}"
       ${_paraview_add_plugin_MODULE_ARGS})
+
+    set_property(GLOBAL APPEND
+      PROPERTY
+        "paraview_plugin_${_paraview_add_plugin_MODULE_INSTALL_EXPORT}_modules" "${plugin_modules}")
 
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${_paraview_plugin_CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${_paraview_plugin_CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
