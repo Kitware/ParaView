@@ -68,6 +68,13 @@
         </Documentation>
       </IntVectorProperty>
 
+      <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+      </DoubleVectorProperty>
+
       <Hints>
         <ReaderFactory extensions="msh mesh"
                        file_description="Gmsh Files" />
