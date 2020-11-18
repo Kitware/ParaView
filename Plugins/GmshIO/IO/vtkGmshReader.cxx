@@ -594,7 +594,7 @@ void vtkGmshReader::FillGrid(vtkUnstructuredGrid* grid, int groupIdx, double tim
 void vtkGmshReader::FillOutputTimeInformation(vtkInformation* outInfo) const
 {
   const std::set<double>& timesteps = this->Internal->Timesteps;
-  if (timesteps.empty())
+  if (!timesteps.empty())
   {
     std::vector<double> inlineTimes(timesteps.size());
     double timeRange[2] = { inlineTimes.front(), inlineTimes.back() };
@@ -623,13 +623,13 @@ int vtkGmshReader::RequestData(
   }
 
   this->FillOutputTimeInformation(outInfo);
-
   const double actualTime = this->GetActualTime(outInfo);
   const int nbOfPhysGroups = this->Internal->Groups.size();
 
   vtkMultiBlockDataSet* root =
     vtkMultiBlockDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
   root->SetNumberOfBlocks(nbOfPhysGroups);
+  root->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), actualTime);
   for (int grpIdx = 0; grpIdx < nbOfPhysGroups; ++grpIdx)
   {
     vtkNew<vtkUnstructuredGrid> leaf;
@@ -646,6 +646,7 @@ int vtkGmshReader::RequestData(
     }
 
     root->SetBlock(grpIdx, leaf);
+    leaf->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), actualTime);
     root->GetMetaData(grpIdx)->Set(
       vtkCompositeDataSet::NAME(), this->Internal->Groups[grpIdx].Name);
   }
