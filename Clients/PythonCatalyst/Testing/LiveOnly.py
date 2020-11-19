@@ -1,5 +1,8 @@
+# script-version: 2.0
+
 # Test confirms that scripts with just the live triggers
 # are handled correctly by Catalyst
+
 
 #--------------------------------------
 # catalyst options

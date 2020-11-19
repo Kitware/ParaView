@@ -1,3 +1,5 @@
+# script-version: 1.0
+
 def RequestDataDescription(datadescription):
     for i in range(datadescription.GetNumberOfInputDescriptions()):
         datadescription.GetInputDescription(i).AllFieldsOn()

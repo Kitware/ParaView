@@ -1,3 +1,5 @@
+# script-version: 2.0
+
 r"""A test to ensure all custom functions supported by Catalyst
 Scripts V2 are called appropriately"""
 
