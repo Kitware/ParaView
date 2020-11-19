@@ -62,7 +62,7 @@ public:
    */
   explicit pqPythonLineNumberArea(QWidget* parent, const QTextEdit& text)
     : QWidget(parent)
-    , text(text)
+    , TextEdit(text)
   {
   }
 
@@ -85,7 +85,7 @@ private:
   /**
    * @brief The text to display the number of line on
    */
-  const QTextEdit& text;
+  const QTextEdit& TextEdit;
 };
 
 #endif // pqPythonLineNumberArea_h

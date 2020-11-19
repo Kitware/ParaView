@@ -52,12 +52,12 @@ inline std::uint32_t GetNumberOfDigits(std::uint32_t i)
 QSize pqPythonLineNumberArea::sizeHint() const
 {
   const std::uint32_t numberOfDigits =
-    GetNumberOfDigits(std::max(1, text.document()->blockCount()));
+    GetNumberOfDigits(std::max(1, this->TextEdit.document()->blockCount()));
 
-  const std::int32_t space = 2 * text.fontMetrics().horizontalAdvance(' ') +
-    numberOfDigits * text.fontMetrics().horizontalAdvance(QLatin1Char('9'));
+  const std::int32_t space = 2 * this->TextEdit.fontMetrics().horizontalAdvance(' ') +
+    numberOfDigits * this->TextEdit.fontMetrics().horizontalAdvance(QLatin1Char('9'));
 
-  return QSize{ space, text.height() };
+  return QSize{ space, this->TextEdit.height() };
 }
 
 //-----------------------------------------------------------------------------
@@ -68,24 +68,24 @@ void pqPythonLineNumberArea::paintEvent(QPaintEvent* event)
   const QPalette& palette = this->palette();
 
   painter.fillRect(event->rect(), palette.window());
-  painter.setFont(text.font());
+  painter.setFont(this->TextEdit.font());
 
   const QSize size = this->sizeHint();
 
-  std::int32_t firstBlockId = std::max(0, GetFirstVisibleBlockId(text) - 1);
-  QTextBlock block = text.document()->findBlockByNumber(firstBlockId);
+  std::int32_t firstBlockId = std::max(0, GetFirstVisibleBlockId(this->TextEdit) - 1);
+  QTextBlock block = this->TextEdit.document()->findBlockByNumber(firstBlockId);
 
   while (block.isValid() && block.isVisible())
   {
     const QTextCursor blockCursor(block);
-    const QRect blockCursorRect = this->text.cursorRect(blockCursor);
+    const QRect blockCursorRect = this->TextEdit.cursorRect(blockCursor);
 
-    painter.setPen((this->text.textCursor().blockNumber() == firstBlockId)
+    painter.setPen((this->TextEdit.textCursor().blockNumber() == firstBlockId)
         ? palette.text().color()
         : palette.placeholderText().color());
     const QString number = QString::number(firstBlockId + 1);
-    painter.drawText(-5, blockCursorRect.y() + 2, size.width(), text.fontMetrics().height(),
-      Qt::AlignRight, number);
+    painter.drawText(-5, blockCursorRect.y() + 2, size.width(),
+      this->TextEdit.fontMetrics().height(), Qt::AlignRight, number);
 
     block = block.next();
     firstBlockId++;
