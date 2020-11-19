@@ -76,19 +76,20 @@ struct GmshReaderInternal
   std::set<double> Timesteps;
 
   // Map a GmshPrimitive to a pair (vtkType, numberOfVertices)
-  static const std::unordered_map<GmshPrimitive, std::pair<int, int> > TRANSLATE_CELL;
+  static const std::unordered_map<GmshPrimitive, std::pair<int, int>, std::hash<GmshPrimitive> >
+    TRANSLATE_CELL;
 
   static constexpr const char* DIM_LABEL[4] = { "0-Points", "1-Curves", "2-Surfaces", "3-Volumes" };
 };
 
 constexpr const char* GmshReaderInternal::DIM_LABEL[4];
 
-const std::unordered_map<GmshPrimitive, std::pair<int, int> > GmshReaderInternal::TRANSLATE_CELL = {
-  { GmshPrimitive::POINT, { VTK_VERTEX, 1 } }, { GmshPrimitive::LINE, { VTK_LINE, 2 } },
-  { GmshPrimitive::TRIANGLE, { VTK_TRIANGLE, 3 } }, { GmshPrimitive::QUAD, { VTK_QUAD, 4 } },
-  { GmshPrimitive::TETRA, { VTK_TETRA, 4 } }, { GmshPrimitive::HEXA, { VTK_HEXAHEDRON, 8 } },
-  { GmshPrimitive::PRISM, { VTK_WEDGE, 6 } }, { GmshPrimitive::PYRAMID, { VTK_PYRAMID, 5 } }
-};
+const std::unordered_map<GmshPrimitive, std::pair<int, int>, std::hash<GmshPrimitive> >
+  GmshReaderInternal::TRANSLATE_CELL = { { GmshPrimitive::POINT, { VTK_VERTEX, 1 } },
+    { GmshPrimitive::LINE, { VTK_LINE, 2 } }, { GmshPrimitive::TRIANGLE, { VTK_TRIANGLE, 3 } },
+    { GmshPrimitive::QUAD, { VTK_QUAD, 4 } }, { GmshPrimitive::TETRA, { VTK_TETRA, 4 } },
+    { GmshPrimitive::HEXA, { VTK_HEXAHEDRON, 8 } }, { GmshPrimitive::PRISM, { VTK_WEDGE, 6 } },
+    { GmshPrimitive::PYRAMID, { VTK_PYRAMID, 5 } } };
 
 //-----------------------------------------------------------------------------
 namespace
