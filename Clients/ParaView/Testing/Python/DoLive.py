@@ -1,3 +1,6 @@
+# add comment to indicate version number for the script.
+# script-version: 2.0
+
 # A simple Catalyst analysis script that simple
 # connects to ParaView GUI via Catalyst Live
 

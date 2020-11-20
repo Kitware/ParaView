@@ -79,11 +79,11 @@ set(simple_scripts
 
 paraview_add_test(
   PREFIX "Catalyst::WaveletMiniApp"
-  ARGS   "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym -m paraview.demos.wavelet_miniapp -t 20 --size 21 --script-version 2 -s
+  ARGS   "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym -m paraview.demos.wavelet_miniapp -t 20 --size 21 -s
   TEST_SCRIPTS ${simple_scripts})
 paraview_add_test_mpi(
   PREFIX "Catalyst::MPI::WaveletMiniApp"
-  ARGS   "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym -m paraview.demos.wavelet_miniapp -t 20 --size 21 --script-version 2 -s
+  ARGS   "$<TARGET_FILE:ParaView::pvbatch>" -dr -sym -m paraview.demos.wavelet_miniapp -t 20 --size 21 -s
   TEST_SCRIPTS ${simple_scripts})
 
 foreach (tname IN LISTS scripts)
@@ -113,7 +113,6 @@ paraview_add_test(
            -sym
            -dr
            -m paraview.demos.wavelet_miniapp -t 10 --size 21
-           --script-version 2
            --channel Wavelet1
            -s "${CMAKE_CURRENT_SOURCE_DIR}/pipeline1.py"
            -s
@@ -385,7 +384,7 @@ if (PARAVIEW_USE_QT)
             -dr
             -sym -m paraview.demos.wavelet_miniapp -t 20 --size 21
             --channel Wavelet1
-            --script-version 2 -s
+            -s
       TEST_SCRIPTS ${ttemp_dir}/${tname}.py)
 
     set_tests_properties(

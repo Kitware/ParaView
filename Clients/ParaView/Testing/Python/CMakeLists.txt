@@ -198,7 +198,6 @@ if (PARAVIEW_USE_MPI AND MPIEXEC_EXECUTABLE)
     --script $<TARGET_FILE:ParaView::pvbatch> -sym
       -m paraview.demos.wavelet_miniapp
       -s ${CMAKE_CURRENT_SOURCE_DIR}/DoLive.py
-      --script-version 2
       -t 10
       --size 21
       --delay 2
