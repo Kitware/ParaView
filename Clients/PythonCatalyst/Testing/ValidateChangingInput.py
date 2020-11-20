@@ -1,4 +1,5 @@
 # Tests the simulation to ensure it is generating a time-varying dataset.
+# script-version: 2.0
 
 from paraview import catalyst
 options = catalyst.Options()

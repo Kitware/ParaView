@@ -1,3 +1,4 @@
+# script-version: 2.0
 # Catalyst state generated using paraview version 5.9.0-RC1-70-g9f7915dbb6
 
 #### import the simple module from the paraview

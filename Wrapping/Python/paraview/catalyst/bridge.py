@@ -7,7 +7,7 @@ code that such apps need to incorporate into their code to use Catalyst.
 # since we don't want to initialize ParaView yet.
 import paraview
 from paraview.modules.vtkPVCatalyst import vtkCPProcessor, vtkCPDataDescription
-from paraview.modules.vtkPVPythonCatalyst import vtkCPPythonScriptV2Pipeline, vtkCPPythonScriptPipeline
+from paraview.modules.vtkPVPythonCatalyst import vtkCPPythonScriptV2Pipeline, vtkCPPythonScriptPipeline, vtkCPPythonPipeline
 from paraview.modules.vtkRemotingCore import vtkProcessModule
 
 
@@ -71,13 +71,16 @@ def add_pipeline(filename, version=0):
     elif int(version) == 2:
         add_pipeline_v2(filename)
 
-    # if not, try to determine version using the filename.
-    elif os.path.splitext(filename)[1] == ".py":
-        # old style co-processing analysis script
-        add_pipeline_legacy(filename)
+    elif int(version) == 0:
+        # if not, try to determine version using the filename.
+        version = vtkCPPythonPipeline.DetectScriptVersion(filename)
+        if version == 0:
+            # default to version 1.0
+            version = 1
+        return add_pipeline(filename, version)
+
     else:
-        # new style co-processing analsys script package (zip or directory)
-        add_pipeline_v2(filename)
+        raise RuntimeError("Invalid version '%d'" % version)
 
 def coprocess(time, timestep, dataset, name="input", wholeExtent=None):
     global coprocessor

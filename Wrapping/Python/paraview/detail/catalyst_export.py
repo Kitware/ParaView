@@ -20,7 +20,8 @@ def _get_catalyst_state(options):
 
 def _get_catalyst_preamble(options):
     """returns the preamble text"""
-    return ["# Catalyst state generated using %s" % simple.GetParaViewSourceVersion()]
+    return ["# script-version: 2.0",
+            "# Catalyst state generated using %s" % simple.GetParaViewSourceVersion()]
 
 def _get_catalyst_postamble(options):
     """returns the postamble text"""

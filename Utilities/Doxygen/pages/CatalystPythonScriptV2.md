@@ -51,6 +51,14 @@ It is conceivable that we provide a wrapper that lets us use
 `vtkCPPythonScriptV2Pipeline` for these older script too, however, that has not
 been implemented at this time.
 
+`vtkCPPythonPipeline::DetectScriptVersion` may be used to detect the version
+number for the script. The logic relies on the file type and presence of certain
+comments in the header of the file to determine which version it may be.
+
+Adaptors may use `vtkCPPythonPipeline::CreatePipeline` to create appropriate
+`vtkCPPythonPipeline` subclass based on the script version.
+
+
 ## Structure
 
 Now, let's look at the structure of a Catalyst Python module. The same is
