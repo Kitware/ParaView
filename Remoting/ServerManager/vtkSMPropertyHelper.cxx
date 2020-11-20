@@ -544,6 +544,7 @@ inline void vtkSMPropertyHelper::AppendPropertyArray(const double* values, unsig
 }
 
 //----------------------------------------------------------------------------
+#if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
 template <>
 inline void vtkSMPropertyHelper::AppendPropertyArray(const vtkIdType* values, unsigned int count)
 {
@@ -563,6 +564,7 @@ inline void vtkSMPropertyHelper::AppendPropertyArray(const vtkIdType* values, un
     vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
   }
 }
+#endif
 
 //----------------------------------------------------------------------------
 vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProxy* proxy, const char* pname, bool quiet)
