@@ -6,7 +6,7 @@ dnf install -y --setopt=install_weak_deps=False \
    python3-twisted python3-autobahn \
    python3 python3-devel qt5-qtbase-devel qt5-qttools-devel \
    qt5-qtsvg-devel qt5-qtxmlpatterns-devel doxygen openmpi-devel \
-   python3-numpy openmpi-devel mesa-libOSMesa-devel \
+   python3-numpy mpich-devel mesa-libOSMesa-devel \
    python3-pandas python3-pandas-datareader \
    mesa-libOSMesa-devel mesa-libOSMesa \
    python3-sphinx python3-pip \

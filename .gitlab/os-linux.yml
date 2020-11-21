@@ -20,17 +20,22 @@
     variables:
         LAUNCHER: "scl enable devtoolset-7 --"
 
-.fedora31:
+.fedora33:
     extends: .linux
-    image: "kitware/paraview:ci-fedora31-20201104"
+    image: "kitware/paraview:ci-fedora33-20201118"
 
 .fedora31_icc:
-    extends: .fedora31
+    extends: .linux
     image: "kitware/paraview:ci-fedora31-icc-20201014"
 
     variables:
         CC: icc
         CXX: icpc
+
+.fedora_mpich_addon:
+    variables:
+        CMAKE_PREFIX_PATH: /usr/lib64/mpich
+        LD_LIBRARY_PATH: /usr/lib64/mpich/lib
 
 .fedora_openmpi_addon:
     variables:
@@ -48,13 +53,13 @@
     variables:
         CMAKE_CONFIGURATION: fedora31_shared_icc_mpi_python
 
-.fedora31_static_mpi_offscreen_osmesa_python:
+.fedora33_static_mpi_offscreen_osmesa_python:
     extends:
-        - .fedora31
-        - .fedora_openmpi_addon
+        - .fedora33
+        - .fedora_mpich_addon
 
     variables:
-        CMAKE_CONFIGURATION: fedora31_static_mpi_offscreen_osmesa_python
+        CMAKE_CONFIGURATION: fedora33_static_mpi_offscreen_osmesa_python
 
 .linux_builder_tags:
     tags:

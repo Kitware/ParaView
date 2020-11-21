@@ -32,7 +32,7 @@ endfunction ()
 function (_paraview_add_tests function)
   cmake_parse_arguments(_paraview_add_tests
     "FORCE_SERIAL;FORCE_LOCK"
-    "LOAD_PLUGIN;PLUGIN_PATH;CLIENT;TEST_DIRECTORY;TEST_DATA_TARGET;PREFIX;SUFFIX;_ENABLE_SUFFIX;_DISABLE_SUFFIX;BASELINE_DIR;DATA_DIRECTORY"
+    "LOAD_PLUGIN;PLUGIN_PATH;CLIENT;TEST_DIRECTORY;TEST_DATA_TARGET;PREFIX;SUFFIX;_ENABLE_SUFFIX;_DISABLE_SUFFIX;BASELINE_DIR;DATA_DIRECTORY;NUMPROCS"
     "_COMMAND_PATTERN;LOAD_PLUGINS;PLUGIN_PATHS;TEST_SCRIPTS;ENVIRONMENT;ARGS;CLIENT_ARGS"
     ${ARGN})
 
@@ -202,6 +202,11 @@ function (_paraview_add_tests function)
     set_property(TEST "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
       PROPERTY
         ENVIRONMENT "${_paraview_add_tests_ENVIRONMENT}")
+    if (DEFINED _paraview_add_tests_NUMPROCS)
+      set_property(TEST "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
+        PROPERTY
+          PROCESSORS "${_paraview_add_tests_NUMPROCS}")
+    endif ()
     if (${_paraview_add_tests_name}_FORCE_SERIAL OR _paraview_add_tests_FORCE_SERIAL)
       set_property(TEST "${_paraview_add_tests_PREFIX}.${_paraview_add_tests_name}"
         PROPERTY
@@ -356,6 +361,7 @@ function (paraview_add_tile_display_tests width height)
     ENVIRONMENT
       PV_SHARED_WINDOW_SIZE=800x600
       SMTESTDRIVER_MPI_NUMPROCS=${_paraview_add_tile_display_cpu_count}
+    NUMPROCS "${_paraview_add_tile_display_cpu_count}"
     _COMMAND_PATTERN
       --server "$<TARGET_FILE:ParaView::pvserver>"
         --enable-bt
@@ -388,6 +394,7 @@ function (paraview_add_cave_tests num_ranks config)
     ENVIRONMENT
       PV_SHARED_WINDOW_SIZE=400x300
       SMTESTDRIVER_MPI_NUMPROCS=${num_ranks}
+    NUMPROCS "${num_ranks}"
     _COMMAND_PATTERN
       --server "$<TARGET_FILE:ParaView::pvserver>"
         --enable-bt
@@ -428,6 +435,7 @@ function (paraview_add_test_mpi)
     _get_prefix(chosen_prefix "paraview-mpi" ${ARGN})
     _paraview_add_tests("paraview_add_test"
       PREFIX "${chosen_prefix}"
+      NUMPROCS 2 # See Utilities/TestDriver/CMakeLists.txt (PARAVIEW_MPI_MAX_NUMPROCS)
       _COMMAND_PATTERN
         --client-mpi
         __paraview_args__
