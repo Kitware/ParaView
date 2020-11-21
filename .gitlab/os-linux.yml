@@ -34,16 +34,14 @@
 
 .fedora_mpich_addon:
     variables:
-        CMAKE_PREFIX_PATH: /usr/lib64/mpich
-        LD_LIBRARY_PATH: /usr/lib64/mpich/lib
+        MODULES: mpi/mpich-x86_64
 
 .fedora_openmpi_addon:
     variables:
         # Needed to work with OpenMPI
         OMPI_ALLOW_RUN_AS_ROOT: 1
         OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
-        CMAKE_PREFIX_PATH: /usr/lib64/openmpi
-        LD_LIBRARY_PATH: /usr/lib64/openmpi/lib
+        MODULES: mpi/openmpi-x86_64
 
 .fedora31_shared_icc_mpi_python:
     extends:
@@ -115,6 +113,8 @@
     - git submodule foreach --recursive cmake "-Dusername:STRING=$CI_PROJECT_NAMESPACE" "-Durl_prefix:STRING=https://$CI_SERVER_HOST" -P "$PWD/.gitlab/ci/fetch_submodule.cmake"
     - git submodule sync --recursive
     - git submodule update --init --recursive
+    # Load any modules that may be necessary.
+    - '[ -n "$MODULES" ] && . /etc/profile.d/modules.sh && module load $MODULES'
     # Enable the Intel compiler if required.
     - '[ "$CC" = "icc" ] && source /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64 || true'
 
