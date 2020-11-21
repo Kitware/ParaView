@@ -42,25 +42,25 @@ build:spack-centos7:
 
 ## Linux
 
-build:fedora31-static-mpi-offscreen-osmesa-python:
+build:fedora33-static-mpi-offscreen-osmesa-python:
     extends:
-        - .fedora31_static_mpi_offscreen_osmesa_python
+        - .fedora33_static_mpi_offscreen_osmesa_python
         - .cmake_build_linux
         - .linux_builder_tags
         - .cmake_build_artifacts
         - .run_manually
 
-test:fedora31-static-mpi-offscreen-osmesa-python:
+test:fedora33-static-mpi-offscreen-osmesa-python:
     extends:
-        - .fedora31_static_mpi_offscreen_osmesa_python
+        - .fedora33_static_mpi_offscreen_osmesa_python
         - .cmake_test_linux
         - .linux_tester_tags
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
-        - build:fedora31-static-mpi-offscreen-osmesa-python
+        - build:fedora33-static-mpi-offscreen-osmesa-python
     needs:
-        - build:fedora31-static-mpi-offscreen-osmesa-python
+        - build:fedora33-static-mpi-offscreen-osmesa-python
 
 build:fedora31-shared-icc-mpi-python:
     extends:
@@ -159,7 +159,7 @@ test:windows-vs2019-qt:
 
 build:documentation:
     extends:
-        - .fedora31
+        - .fedora33
         - .doxygen_build_linux
         - .linux_builder_tags
         - .doxygen_log_artifacts

@@ -20,10 +20,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-int numberOfWrappedFunctions = 0;
-FunctionInfo* wrappedFunctions[1000];
-FunctionInfo* currentFunction;
-HierarchyInfo* hierarchyInfo = NULL;
+static int numberOfWrappedFunctions = 0;
+static FunctionInfo* wrappedFunctions[1000];
+static FunctionInfo* currentFunction;
+static HierarchyInfo* hierarchyInfo = NULL;
 
 /* make a guess about whether a class is wrapped */
 static int class_is_wrapped(const char* classname)
