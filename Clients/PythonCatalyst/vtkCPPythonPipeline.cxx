@@ -28,6 +28,7 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <cstdlib>
 #include <iostream>
