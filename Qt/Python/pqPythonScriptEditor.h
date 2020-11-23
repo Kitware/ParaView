@@ -33,22 +33,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPythonScriptEditor_h
 
 #include "pqPythonModule.h"
+
 #include <QMainWindow>
 
 class QAction;
 class QMenu;
-class QTextEdit;
 
 class pqPythonManager;
-class pqPythonSyntaxHighlighter;
+class pqPythonTextArea;
 
 class PQPYTHON_EXPORT pqPythonScriptEditor : public QMainWindow
 {
   Q_OBJECT
 
 public:
-  typedef QMainWindow Superclass;
-  pqPythonScriptEditor(QWidget* parent = 0);
+  explicit pqPythonScriptEditor(QWidget* parent = nullptr);
 
   void setSaveDialogDefaultDirectory(const QString& dir);
   void setPythonManager(pqPythonManager* manager);
@@ -93,7 +92,8 @@ private:
   void setCurrentFile(const QString& fileName);
   QString strippedName(const QString& fullFileName);
 
-  QTextEdit* TextEdit;
+  pqPythonTextArea* TextArea;
+
   QString CurrentFile;
   QString DefaultSaveDirectory;
 
@@ -111,8 +111,6 @@ private:
   QAction* pasteAct;
 
   pqPythonManager* pythonManager;
-
-  pqPythonSyntaxHighlighter* SyntaxHighlighter;
 };
 
 #endif

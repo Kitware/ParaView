@@ -30,12 +30,14 @@
 #==========================================================================
 set(classes
   pqPythonDebugLeaksView
+  pqPythonLineNumberArea
   pqPythonMacroSupervisor
   pqPythonManager
   pqPythonScriptEditor
   pqPythonShell
   pqPythonShellCompleter
-  pqPythonSyntaxHighlighter)
+  pqPythonSyntaxHighlighter
+  pqPythonTextArea)
 
 set(ui_files
   pqPythonShell.ui)
