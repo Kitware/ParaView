@@ -500,6 +500,9 @@ vtkCDIReader::~vtkCDIReader()
   delete[] this->DomainVarDataArray;
   this->DomainVarDataArray = nullptr;
 
+  delete[] this->DomainMask;
+  this->DomainMask = nullptr;
+
   vtkDebugMacro("Destructing other stuff..." << endl);
   if (this->PointDataArraySelection)
   {
