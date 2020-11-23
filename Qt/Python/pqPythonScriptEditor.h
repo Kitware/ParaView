@@ -32,8 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPythonScriptEditor_h
 #define _pqPythonScriptEditor_h
 
-#include "pqCoreUtilities.h"
 #include "pqPythonModule.h"
+
+#include "pqCoreUtilities.h"
+#include "pqPythonEditorActions.h"
 
 #include <QMainWindow>
 
@@ -41,7 +43,7 @@ class QAction;
 class QMenu;
 
 class pqPythonManager;
-class pqPythonTextArea;
+class pqPythonTabWidget;
 
 /**
  * @class pqPythonScriptEditor
@@ -96,22 +98,31 @@ public:
   void open(const QString& filename);
 
   /**
+   * @brief Updates the trace tab text
+   * and creates a new one if it doesn't exists
+   */
+  void updateTrace(const QString& str);
+
+  /**
+   * @brief Wraps up the trace tab
+   */
+  void stopTrace(const QString& str);
+
+  /**
    * @brief Utility function that provides a single instance
    * of the editor.
    */
-  static pqPythonScriptEditor* GetUniqueInstance()
+  static pqPythonScriptEditor* getUniqueInstance()
   {
     static pqPythonScriptEditor* instance = new pqPythonScriptEditor(pqCoreUtilities::mainWidget());
     return instance;
   }
 
-public Q_SLOTS:
   /**
-   * @brief Q_SLOT that sets the current buffer to \ref text
-   * @details Override the current buffer (even if it is not saved).
-   * This method is only used by the \ref pqTraceAction widget.
+   * @brief Triggers an macro list update
+   * if the PythonManager exists
    */
-  void setText(const QString& text);
+  static void updateMacroList();
 
 protected:
   /**
@@ -122,22 +133,17 @@ protected:
   void closeEvent(QCloseEvent* event) override;
 
 private:
-  void createActions();
-
   void createMenus();
 
   void createStatusBar();
-
-  pqPythonTextArea* TextArea;
 
   QMenu* fileMenu;
   QMenu* editMenu;
   QMenu* helpMenu;
 
-  QAction* exitAct;
-  QAction* cutAct;
-  QAction* copyAct;
-  QAction* pasteAct;
+  pqPythonTabWidget* TabWidget;
+
+  pqPythonEditorActions Actions;
 
   /**
    * @brief The python manager only used for the

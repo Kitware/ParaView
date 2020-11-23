@@ -23,11 +23,11 @@
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
 
   <!-- save trace -->
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog1Script.py" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog1Script.py" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog1Script.py" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog1Script.py" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
 
   <!-- run the traced script and compare output -->
   <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/runScriptButton" command="activate" arguments="" />
@@ -66,11 +66,11 @@
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
 
   <!-- save trace -->
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog4Script.py" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog4Script.py" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog4Script.py" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog4Script.py" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
 
   <!-- run the traced script and compare output -->
   <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/runScriptButton" command="activate" arguments="" />
@@ -108,11 +108,11 @@
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
 
   <!-- save trace -->
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog6Script.py" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog6Script.py" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog6Script.py" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog6Script.py" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
 
   <!-- run the traced script and compare output -->
   <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/runScriptButton" command="activate" arguments="" />
@@ -138,11 +138,11 @@
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
 
   <!-- save trace -->
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog7Script.py" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog7Script.py" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog7Script.py" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog7Script.py" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
 
   <!-- run the traced script and compare output -->
   <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/runScriptButton" command="activate" arguments="" />
@@ -170,11 +170,11 @@
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
 
   <!-- save trace -->
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog8Script.py" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog8Script.py" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog8Script.py" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog8Script.py" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
 
   <!-- run the traced script and compare output -->
   <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/runScriptButton" command="activate" arguments="" />
@@ -205,11 +205,11 @@
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
 
   <!-- save trace -->
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog11Script.py" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog11Script.py" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog11Script.py" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog11Script.py" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
 
   <!-- run the traced script and compare output -->
   <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/runScriptButton" command="activate" arguments="" />
@@ -237,11 +237,11 @@
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
 
   <!-- save trace -->
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog14Script.py" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog14Script.py" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog14Script.py" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/FindDataDialog14Script.py" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
+  <pqevent object="pqClientMainWindow/0pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
 
   <!-- run the traced script and compare output -->
   <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/runScriptButton" command="activate" arguments="" />

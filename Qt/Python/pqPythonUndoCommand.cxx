@@ -45,7 +45,7 @@ pqPythonUndoCommand::pqPythonUndoCommand(QTextEdit& text, pqPythonSyntaxHighligh
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonUndoCommand::SwapImpl(const pqPythonTextHistoryEntry& h)
+void pqPythonUndoCommand::swapImpl(const pqPythonTextHistoryEntry& h)
 {
   // We block all text signals (this is done to avoid pushing twice
   // the text in the undo stack)
@@ -62,7 +62,7 @@ void pqPythonUndoCommand::SwapImpl(const pqPythonTextHistoryEntry& h)
   }
 
   // Move the cursor
-  if (!h.IsEmpty())
+  if (!h.isEmpty())
   {
     QTextCursor cursor = this->Text.textCursor();
     cursor.setPosition(h.cursorPosition);
@@ -76,7 +76,7 @@ void pqPythonUndoCommand::SwapImpl(const pqPythonTextHistoryEntry& h)
 //-----------------------------------------------------------------------------
 void pqPythonUndoCommand::undo()
 {
-  this->SwapImpl(this->LastHistoryEntry);
+  this->swapImpl(this->LastHistoryEntry);
   this->TextLastHystoryEntry = this->LastHistoryEntry;
   this->Text.document()->setModified(true);
 }
@@ -84,6 +84,6 @@ void pqPythonUndoCommand::undo()
 //-----------------------------------------------------------------------------
 void pqPythonUndoCommand::redo()
 {
-  this->SwapImpl(this->CurrentHistoryEntry);
+  this->swapImpl(this->CurrentHistoryEntry);
   this->Text.document()->setModified(true);
 }

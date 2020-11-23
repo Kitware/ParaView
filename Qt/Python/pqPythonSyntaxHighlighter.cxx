@@ -139,7 +139,7 @@ bool pqPythonSyntaxHighlighter::eventFilter(QObject* obj, QEvent* ev)
   if (ev->type() == QEvent::KeyPress)
   {
     QKeyEvent* keyEvent = static_cast<QKeyEvent*>(ev);
-    if (keyEvent->key() == Qt::Key_Tab)
+    if (keyEvent->modifiers() == Qt::NoModifier && keyEvent->key() == Qt::Key_Tab)
     {
       this->TextEdit.textCursor().insertText(globals::kFourSpaces);
       return true;

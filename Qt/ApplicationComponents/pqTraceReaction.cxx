@@ -167,29 +167,22 @@ void pqTraceReaction::updateTrace()
 void pqTraceReaction::editTrace(const QString& trace, bool incremental)
 {
 #if VTK_MODULE_ENABLE_ParaView_pqPython
-  bool new_editor = false;
-  if (this->Editor == nullptr)
-  {
-    this->Editor = new pqPythonScriptEditor(pqCoreUtilities::mainWidget());
-    this->Editor->setPythonManager(pqPVApplicationCore::instance()->pythonManager());
-    new_editor = true;
-  }
+  pqPythonScriptEditor* editor = pqPythonScriptEditor::getUniqueInstance();
 
-  assert(this->Editor);
-  this->Editor->setText(trace);
-  this->Editor->show();
+  editor->setPythonManager(pqPVApplicationCore::instance()->pythonManager());
+  editor->show();
 
   // Scroll to bottom of the editor when addding content in an incremental trace
-  if (!new_editor && incremental)
+  if (incremental)
   {
-    this->Editor->scrollToBottom();
+    editor->updateTrace(trace);
+    editor->scrollToBottom();
   }
-
-  if (new_editor ||
-    incremental == false) // don't raise the window if we are just updating the trace.
+  else
   {
-    this->Editor->raise();
-    this->Editor->activateWindow();
+    editor->stopTrace(trace);
+    editor->raise();
+    editor->activateWindow();
   }
 #endif
 }

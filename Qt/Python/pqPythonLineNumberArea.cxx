@@ -42,17 +42,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QScrollBar>
 #include <QTextBlock>
 
+namespace details
+{
 //-----------------------------------------------------------------------------
-inline std::uint32_t GetNumberOfDigits(std::uint32_t i)
+inline std::uint32_t getNumberOfDigits(std::uint32_t i)
 {
   return i > 0 ? static_cast<std::int32_t>(std::log10(static_cast<float>(i)) + 1) : 1;
+}
 }
 
 //-----------------------------------------------------------------------------
 QSize pqPythonLineNumberArea::sizeHint() const
 {
   const std::uint32_t numberOfDigits =
-    GetNumberOfDigits(std::max(1, this->TextEdit.document()->blockCount()));
+    details::getNumberOfDigits(std::max(1, this->TextEdit.document()->blockCount()));
 
   const std::int32_t space = 2 * this->TextEdit.fontMetrics().horizontalAdvance(' ') +
     numberOfDigits * this->TextEdit.fontMetrics().horizontalAdvance(QLatin1Char('9'));
@@ -72,7 +75,7 @@ void pqPythonLineNumberArea::paintEvent(QPaintEvent* event)
 
   const QSize size = this->sizeHint();
 
-  std::int32_t firstBlockId = std::max(0, GetFirstVisibleBlockId(this->TextEdit) - 1);
+  std::int32_t firstBlockId = std::max(0, details::getFirstVisibleBlockId(this->TextEdit) - 1);
   QTextBlock block = this->TextEdit.document()->findBlockByNumber(firstBlockId);
 
   while (block.isValid() && block.isVisible())

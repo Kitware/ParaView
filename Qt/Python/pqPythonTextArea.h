@@ -34,18 +34,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqPythonTextArea_h
 
 #include "pqPythonModule.h"
+
+#include "pqPythonEditorActions.h"
+#include "pqPythonFileIO.h"
+#include "pqPythonLineNumberArea.h"
+#include "pqPythonSyntaxHighlighter.h"
 #include "pqPythonUndoCommand.h"
+#include "pqPythonUtils.h"
 
 #include <QKeyEvent>
+#include <QTextEdit>
 #include <QUndoStack>
 #include <QWidget>
-
-class QTextEdit;
-
-class pqPythonLineNumberArea;
-class pqPythonSyntaxHighlighter;
-class pqPythonUndoStack;
-class pqPythonFileIO;
 
 /**
  * @class pqPythonTextArea
@@ -67,97 +67,88 @@ public:
   /**
    * @brief Returns the underlying \ref TextEdit
    */
-  QTextEdit* GetTextEdit() { return this->TextEdit; }
+  QTextEdit* getTextEdit() { return this->TextEdit; }
 
-  /**
-   * @brief Returns a unique action that triggers an
-   * undo command on the text.
-   */
-  QAction* GetUndoAction();
-
-  /**
-   * @brief Returns a unique action that triggers an
-   * redo command on the text.
-   */
-  QAction* GetRedoAction();
-
-  /**
-   * @brief Returns the new file unique action
-   */
-  QAction* GetNewFileAction();
-
-  /**
-   * @brief Returns the open file unique action
-   */
-  QAction* GetOpenFileAction();
-
-  /**
-   * @brief Returns the save file unique action
-   */
-  QAction* GetSaveFileAction();
-
-  /**
-   * @brief Returns the save as file action.
-   * Compared to the SaveFile action, this one
-   * always open a dialog asking where to save the
-   * copy of the current opened buffer.
-   */
-  QAction* GetSaveFileAsAction();
-
-  /**
-   * @brief Same as \ref GetSaveFileAsAction
-   * but saves a copy of the buffer as a ParaView
-   * Python macro.
-   */
-  QAction* GetSaveFileAsMacroAction();
-
-  /**
-   * @brief Saves and closes the current opened
-   * buffer when a Qt close event occurs.
-   *
-   * Return false if the buffer has not been saved.
-   */
-  bool SaveOnClose();
+  bool saveOnClose();
 
   /**
    * @brief Opens a file in the editor.
    * Triggers a saving wizard if the current buffer
    * has not beed saved on the disk.
    */
-  bool OpenFile(const QString& filename);
+  bool openFile(const QString& filename);
 
   /**
    * @brief Sets the default save directory.
    * Only used for the directory displayed
    * when the save popup window is shown.
    */
-  void SetDefaultSaveDirectory(const QString& dir);
+  void setDefaultSaveDirectory(const QString& dir);
+
+  /**
+   * @brief Connects this widget to the set of actions
+   */
+  void connectActions(pqPythonEditorActions& actions);
+
+  /**
+   * @brief Disconnect this widget from the set of actions
+   */
+  void disconnectActions(pqPythonEditorActions& actions);
+
+  /**
+   * @brief Get filename associated with this buffer.
+   * Returns an empty string if no file is associated.
+   */
+  const QString& getFilename() const;
+
+  /**
+   * @brief Returns true if the buffer is empty
+   */
+  bool isEmpty() const;
+
+  /**
+   * @brief Returns true if the buffer has been modified
+   * but not saved
+   */
+  bool isDirty() const;
+
+  /**
+   * @brief Override the current buffer content
+   * with the referenced string
+   */
+  void setText(const QString& text);
 
 signals:
   /**
    * @brief Triggered when the current text
    * buffer is erased
    */
-  void BufferErased();
+  void bufferErased();
 
   /**
    * @brief Triggers after a file has been
    * successfuly opened in the current buffer.
    */
-  void FileOpened(const QString&);
+  void fileOpened(const QString&);
 
   /**
    * @brief Triggers after a successful
    * saves of the current buffer.
    */
-  void FileSaved(const QString&);
+  void fileSaved(const QString&);
 
   /**
    * @brief Triggers after a successful
    * copy of the current buffer to a new
    * file.
    */
-  void FileSavedAsMacro(const QString&);
+  void fileSavedAsMacro(const QString&);
+
+  /**
+   * @brief Emitted when the buffer content
+   * has been modified.
+   */
+  void contentChanged();
 
 protected:
   /**
@@ -168,25 +159,29 @@ protected:
   bool eventFilter(QObject* obj, QEvent* event) override;
 
 private:
+  void setupActions();
+
+  void setupMenus();
+
   /**
    * @brief The editable text area
    */
-  QTextEdit* TextEdit = nullptr;
+  QtStackPointer<QTextEdit> TextEdit;
 
   /**
    * @brief The line number area widget
    */
-  pqPythonLineNumberArea* LineNumberArea = nullptr;
+  QtStackPointer<pqPythonLineNumberArea> LineNumberArea;
 
   /**
    * @brief The syntax highlighter used to color the \ref TextEdit
    */
-  pqPythonSyntaxHighlighter* SyntaxHighlighter = nullptr;
+  QtStackPointer<pqPythonSyntaxHighlighter> SyntaxHighlighter;
 
   /**
    * @brief The IO module used to save the \ref TextEdit
    */
-  pqPythonFileIO* FileIO = nullptr;
+  QtStackPointer<pqPythonFileIO> FileIO;
 
   /**
    * @brief The text QUndoStack
@@ -199,16 +194,6 @@ private:
    * a text hystory, which we need for the \ref UndoStack.
    */
   pqPythonTextHistoryEntry lastEntry;
-
-  QAction* UndoAction = nullptr;
-
-  Qt::KeyboardModifier UndoMofidier = Qt::ControlModifier;
-  Qt::Key UndoKey = Qt::Key_Z;
-
-  QAction* RedoAction = nullptr;
-
-  Qt::KeyboardModifier RedoMofidier = Qt::ControlModifier;
-  Qt::Key RedoKey = Qt::Key_Y;
 };
 
 #endif // pqPythonTextArea_h
