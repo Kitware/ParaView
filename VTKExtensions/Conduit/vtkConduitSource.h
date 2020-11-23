@@ -52,6 +52,17 @@ public:
   void SetNode(const conduit_node* node);
   //@}
 
+  //@{
+  /**
+   * Mechanism to add global / field-data arrays.
+   *
+   * This is currently experimental and expected to change. It is experimental
+   * since it's unclear to the developer if Conduit Blueprint already supports
+   * specifying global fields i.e. without any association. Doesn't look like
+   * it, but if it does, this should be changed to directly leverage that.
+   */
+  void SetGlobalFieldsNode(const conduit_node* node);
+  //@}
 protected:
   vtkConduitSource();
   ~vtkConduitSource();

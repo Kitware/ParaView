@@ -18,9 +18,11 @@
 #include "vtkConduitArrayUtilities.h"
 #include "vtkDataArray.h"
 #include "vtkDataSetAttributes.h"
+#include "vtkDoubleArray.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkIntArray.h"
 #include "vtkLogger.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -28,6 +30,8 @@
 #include "vtkPoints.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSmartPointer.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringArray.h"
 #include "vtkStructuredGrid.h"
 #include "vtkUnstructuredGrid.h"
 
@@ -221,6 +225,7 @@ class vtkConduitSource::vtkInternals
 {
 public:
   const conduit::Node* Node = nullptr;
+  const conduit::Node* GlobalFieldsNode = nullptr;
 };
 
 vtkStandardNewMacro(vtkConduitSource);
@@ -245,6 +250,18 @@ void vtkConduitSource::SetNode(const conduit_node* node)
   if (internals.Node != cpp_node)
   {
     internals.Node = cpp_node;
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkConduitSource::SetGlobalFieldsNode(const conduit_node* node)
+{
+  const conduit::Node* cpp_node = conduit::cpp_node(node);
+  auto& internals = (*this->Internals);
+  if (internals.GlobalFieldsNode != cpp_node)
+  {
+    internals.GlobalFieldsNode = cpp_node;
     this->Modified();
   }
 }
@@ -334,6 +351,57 @@ int vtkConduitSource::RequestData(
       return 0;
     }
   }
+
+  if (internals.GlobalFieldsNode)
+  {
+    auto fd = output->GetFieldData();
+    auto& globalFields = (*internals.GlobalFieldsNode);
+    // this can be made very generic. For now, I am only processing known
+    // fields.
+    if (globalFields.has_path("time"))
+    {
+      // for compatibility with older Catalyst scripts.
+      vtkNew<vtkDoubleArray> timeValue;
+      timeValue->SetName("TimeValue");
+      timeValue->SetNumberOfTuples(1);
+      timeValue->SetTypedComponent(0, 0, globalFields["time"].to_float64());
+      fd->AddArray(timeValue);
+
+      // "time" is a better name than "TimeValue"
+      vtkNew<vtkDoubleArray> time;
+      time->SetName("time");
+      time->SetNumberOfTuples(1);
+      time->SetTypedComponent(0, 0, globalFields["time"].to_float64());
+      fd->AddArray(time);
+
+      // let's also set DATA_TIME_STEP.
+      output->GetInformation()->Set(
+        vtkDataObject::DATA_TIME_STEP(), globalFields["time"].to_float64());
+    }
+    if (globalFields.has_path("cycle"))
+    {
+      vtkNew<vtkIntArray> cycle;
+      cycle->SetName("cycle");
+      cycle->SetNumberOfTuples(1);
+      cycle->SetTypedComponent(0, 0, globalFields["cycle"].to_int64());
+      fd->AddArray(cycle);
+    }
+    if (globalFields.has_path("timestep"))
+    {
+      vtkNew<vtkIntArray> timestep;
+      timestep->SetName("timestep");
+      timestep->SetNumberOfTuples(1);
+      timestep->SetTypedComponent(0, 0, globalFields["timestep"].to_int64());
+      fd->AddArray(timestep);
+    }
+    if (globalFields.has_path("channel"))
+    {
+      vtkNew<vtkStringArray> channel;
+      channel->SetName("__CatalystChannel__");
+      channel->InsertNextValue(globalFields["channel"].as_string().c_str());
+      fd->AddArray(channel);
+    }
+  }
   return 1;
 }
 
@@ -348,6 +416,27 @@ int vtkConduitSource::RequestInformation(
 
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
+
+  auto& internals = (*this->Internals);
+  if (internals.GlobalFieldsNode == nullptr)
+  {
+    return 1;
+  }
+
+  auto& node = (*internals.GlobalFieldsNode);
+  if (node.has_path("time"))
+  {
+    double time = node["time"].to_float64();
+    double timesteps[2] = { time, time };
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &time, 1);
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timesteps, 2);
+  }
+  else
+  {
+    outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+  }
+
   return 1;
 }
 
