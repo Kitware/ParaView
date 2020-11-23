@@ -109,8 +109,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if VTK_MODULE_ENABLE_ParaView_pqPython
 #include "pqMacroReaction.h"
-#include "pqPythonManager.h"
 #include "pqTraceReaction.h"
+
+#include <pqPythonManager.h>
+#include <pqPythonScriptEditorReaction.h>
 #endif
 
 #include <QApplication>
@@ -347,6 +349,9 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   menu.addSeparator(); // --------------------------------------------------
   new pqTraceReaction(menu.addAction("Start Trace") << pqSetName("actionToolsStartStopTrace"),
     "Start Trace", "Stop Trace");
+  menu.addSeparator();
+  new pqPythonScriptEditorReaction(
+    menu.addAction("Python Script Editor") << pqSetName("actionToolsOpenScriptEditor"));
 #endif
 }
 

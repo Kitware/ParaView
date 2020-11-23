@@ -43,28 +43,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextCursor>
 #include <QTextEdit>
 
-#include <vtkPythonCompatibility.h>
-#include <vtkPythonInterpreter.h>
-#include <vtkSmartPyObject.h>
-
-class pqPythonSyntaxHighlighter::pqInternal
+namespace globals
 {
-public:
-  QPointer<QTextEdit> TextEdit;
-  vtkSmartPyObject PygmentsModule;
-  vtkSmartPyObject HighlightFunction;
-  vtkSmartPyObject PythonLexer;
-  vtkSmartPyObject HtmlFormatter;
-  bool IsSyntaxHighlighting;
-  bool ReplaceTabs;
-};
+constexpr const char* kFourSpaces = "    ";
+}
 
-pqPythonSyntaxHighlighter::pqPythonSyntaxHighlighter(QTextEdit* textEdit, QObject* p)
+//-----------------------------------------------------------------------------
+pqPythonSyntaxHighlighter::pqPythonSyntaxHighlighter(QObject* p, QTextEdit& textEdit)
   : Superclass(p)
-  , Internals(new pqPythonSyntaxHighlighter::pqInternal())
+  , TextEdit(textEdit)
 {
-  this->Internals->TextEdit = textEdit;
-  this->Internals->TextEdit->installEventFilter(this);
+  this->TextEdit.installEventFilter(this);
   vtkPythonInterpreter::Initialize();
 
   {
@@ -75,13 +64,13 @@ pqPythonSyntaxHighlighter::pqPythonSyntaxHighlighter(QTextEdit* textEdit, QObjec
     // import fails. `pygments` is totally optional for ParaView.
     PyObject *type, *value, *traceback;
     PyErr_Fetch(&type, &value, &traceback);
-    this->Internals->PygmentsModule.TakeReference(PyImport_ImportModule("pygments"));
+    this->PygmentsModule.TakeReference(PyImport_ImportModule("pygments"));
     PyErr_Restore(type, value, traceback);
 
-    if (this->Internals->PygmentsModule && this->Internals->TextEdit != NULL)
+    if (this->PygmentsModule)
     {
-      this->Internals->HighlightFunction.TakeReference(
-        PyObject_GetAttrString(this->Internals->PygmentsModule, "highlight"));
+      this->HighlightFunction.TakeReference(
+        PyObject_GetAttrString(this->PygmentsModule, "highlight"));
       vtkSmartPyObject lexersModule(PyImport_ImportModule("pygments.lexers"));
       vtkSmartPyObject formattersModule(PyImport_ImportModule("pygments.formatters.redtabhtml"));
       vtkSmartPyObject htmlFormatterClass;
@@ -104,47 +93,46 @@ pqPythonSyntaxHighlighter::pqPythonSyntaxHighlighter(QTextEdit* textEdit, QObjec
       vtkSmartPyObject pythonLexerClass(PyObject_GetAttrString(lexersModule, "PythonLexer"));
 #endif
       vtkSmartPyObject emptyTuple(Py_BuildValue("()"));
-      this->Internals->PythonLexer.TakeReference(PyObject_Call(pythonLexerClass, emptyTuple, NULL));
-      this->Internals->HtmlFormatter.TakeReference(
-        PyObject_Call(htmlFormatterClass, emptyTuple, NULL));
-      PyObject_SetAttrString(this->Internals->HtmlFormatter, "noclasses", Py_True);
-      PyObject_SetAttrString(this->Internals->HtmlFormatter, "nobackground", Py_True);
-      this->connect(
-        this->Internals->TextEdit.data(), SIGNAL(textChanged()), this, SLOT(rehighlightSyntax()));
+      this->PythonLexer.TakeReference(PyObject_Call(pythonLexerClass, emptyTuple, NULL));
+      this->HtmlFormatter.TakeReference(PyObject_Call(htmlFormatterClass, emptyTuple, NULL));
+      PyObject_SetAttrString(this->HtmlFormatter, "noclasses", Py_True);
+      PyObject_SetAttrString(this->HtmlFormatter, "nobackground", Py_True);
+    }
+    else
+    {
+      qWarning(
+        "The ParaView python module failed to load Pygment for the python syntax highlighting \
+        in the editor. Please verify that you have correctly installed the Python Pygment module if you want \
+        to have the syntax highlighting working in the editor");
     }
   }
 
-  this->Internals->IsSyntaxHighlighting = false;
-  // Replace tabs with 4 spaces
-  this->Internals->ReplaceTabs = true;
   // Use a fixed-width font for text edits displaying code
   QFont font("Monospace");
   // cause Qt to select an fixed-width font if Monospace isn't found
   font.setStyleHint(QFont::TypeWriter);
-  this->Internals->TextEdit->setFont(font);
+  this->TextEdit.setFont(font);
   // Set tab width equal to 4 spaces
-  QFontMetrics metrics = this->Internals->TextEdit->fontMetrics();
-  this->Internals->TextEdit->setTabStopDistance(metrics.horizontalAdvance("    "));
-  this->rehighlightSyntax();
+  QFontMetrics metrics = this->TextEdit.fontMetrics();
+  this->TextEdit.setTabStopDistance(metrics.horizontalAdvance(globals::kFourSpaces));
 }
 
-pqPythonSyntaxHighlighter::~pqPythonSyntaxHighlighter()
-{
-}
-
+//-----------------------------------------------------------------------------
 bool pqPythonSyntaxHighlighter::isReplacingTabs() const
 {
-  return this->Internals->ReplaceTabs;
+  return this->ReplaceTabs;
 }
 
+//-----------------------------------------------------------------------------
 void pqPythonSyntaxHighlighter::setReplaceTabs(bool replaceTabs)
 {
-  this->Internals->ReplaceTabs = replaceTabs;
+  this->ReplaceTabs = replaceTabs;
 }
 
-bool pqPythonSyntaxHighlighter::eventFilter(QObject*, QEvent* ev)
+//-----------------------------------------------------------------------------
+bool pqPythonSyntaxHighlighter::eventFilter(QObject* obj, QEvent* ev)
 {
-  if (!this->Internals->ReplaceTabs)
+  if (!this->ReplaceTabs)
   {
     return false;
   }
@@ -153,34 +141,25 @@ bool pqPythonSyntaxHighlighter::eventFilter(QObject*, QEvent* ev)
     QKeyEvent* keyEvent = static_cast<QKeyEvent*>(ev);
     if (keyEvent->key() == Qt::Key_Tab)
     {
-      if (!this->Internals->TextEdit.isNull())
-      {
-        this->Internals->TextEdit->textCursor().insertText("    ");
-      }
+      this->TextEdit.textCursor().insertText(globals::kFourSpaces);
       return true;
     }
   }
-  return false;
+
+  return QObject::eventFilter(obj, ev);
 }
 
-void pqPythonSyntaxHighlighter::rehighlightSyntax()
+//-----------------------------------------------------------------------------
+QString pqPythonSyntaxHighlighter::Highlight(const QString& text) const
 {
-  if (this->Internals->IsSyntaxHighlighting || !this->Internals->PygmentsModule ||
-    this->Internals->TextEdit.isNull())
-  {
-    return;
-  }
-  this->Internals->IsSyntaxHighlighting = true;
-  QString text = this->Internals->TextEdit->toPlainText();
-  int cursorPosition = this->Internals->TextEdit->textCursor().position();
-  int vScrollBarValue = this->Internals->TextEdit->verticalScrollBar()->value();
-  int hScrollBarValue = this->Internals->TextEdit->horizontalScrollBar()->value();
   int leadingWhiteSpaceLength = 0;
   int trailingWhiteSpaceLength = 0;
   while (leadingWhiteSpaceLength < text.length() && text.at(leadingWhiteSpaceLength).isSpace())
   {
     ++leadingWhiteSpaceLength;
   }
+
+  QString result;
   if (leadingWhiteSpaceLength < text.length())
   {
     while (trailingWhiteSpaceLength < text.length() &&
@@ -195,9 +174,9 @@ void pqPythonSyntaxHighlighter::rehighlightSyntax()
 
     vtkPythonScopeGilEnsurer gilEnsurer;
     vtkSmartPyObject unicode(PyUnicode_DecodeUTF8(bytes.data(), bytes.size(), NULL));
-    vtkSmartPyObject args(Py_BuildValue("OOO", unicode.GetPointer(),
-      this->Internals->PythonLexer.GetPointer(), this->Internals->HtmlFormatter.GetPointer()));
-    vtkSmartPyObject resultingText(PyObject_Call(this->Internals->HighlightFunction, args, NULL));
+    vtkSmartPyObject args(Py_BuildValue("OOO", unicode.GetPointer(), this->PythonLexer.GetPointer(),
+      this->HtmlFormatter.GetPointer()));
+    vtkSmartPyObject resultingText(PyObject_Call(this->HighlightFunction, args, NULL));
 
 #if PY_MAJOR_VERSION == 2
     vtkSmartPyObject resultingTextBytes(PyUnicode_AsUTF8String(resultingText));
@@ -208,28 +187,50 @@ void pqPythonSyntaxHighlighter::rehighlightSyntax()
     const char* resultingTextAsCString = PyUnicode_AsUTF8(resultingText);
 #endif
 
-    QString pygmentsOutput = QString::fromUtf8(resultingTextAsCString);
+    const QString pygmentsOutput = QString::fromUtf8(resultingTextAsCString);
 
     // the first span tag always should follow the pre tag like this; <pre ...><span
-    int startOfPre = pygmentsOutput.indexOf(">", pygmentsOutput.indexOf("<pre")) + 1;
-    int endOfPre = pygmentsOutput.lastIndexOf("</pre>");
-    QString startOfHtml = pygmentsOutput.left(startOfPre);
-    QString formatted = pygmentsOutput.mid(startOfPre, endOfPre - startOfPre).trimmed();
-    QString endOfHtml = pygmentsOutput.right(pygmentsOutput.length() - endOfPre).trimmed();
+    const int startOfPre = pygmentsOutput.indexOf(">", pygmentsOutput.indexOf("<pre")) + 1;
+    const int endOfPre = pygmentsOutput.lastIndexOf("</pre>");
+    const QString startOfHtml = pygmentsOutput.left(startOfPre);
+    const QString formatted = pygmentsOutput.mid(startOfPre, endOfPre - startOfPre).trimmed();
+    const QString endOfHtml = pygmentsOutput.right(pygmentsOutput.length() - endOfPre).trimmed();
+
     // The <pre ...> tag will ignore a newline immediately following the >,
     // so insert one to be ignored.  Similarly, the </pre> will ignore a
     // newline immediately preceding it, so put one in.  These quirks allow
     // inserting newlines at the beginning and end of the text and took a
     // long time to figure out.
-    QString result =
-      QString("%1\n%2%3%4\n%5")
-        .arg(startOfHtml, leadingWhitespace, formatted, trailingWhitespace, endOfHtml);
-    this->Internals->TextEdit->setHtml(result);
-    QTextCursor cursor = this->Internals->TextEdit->textCursor();
-    cursor.setPosition(cursorPosition);
-    this->Internals->TextEdit->setTextCursor(cursor);
-    this->Internals->TextEdit->verticalScrollBar()->setValue(vScrollBarValue);
-    this->Internals->TextEdit->horizontalScrollBar()->setValue(hScrollBarValue);
+    result = QString("%1\n%2%3%4\n%5")
+               .arg(startOfHtml, leadingWhitespace, formatted, trailingWhitespace, endOfHtml);
   }
-  this->Internals->IsSyntaxHighlighting = false;
+
+  return result;
+}
+
+//-----------------------------------------------------------------------------
+void pqPythonSyntaxHighlighter::ConnectHighligter() const
+{
+  connect(&this->TextEdit, &QTextEdit::textChanged, [this]() {
+    // We block all text signals (this is done to avoid pushing twice
+    // the text in the undo stack)
+    const bool oldState = this->TextEdit.blockSignals(true);
+
+    const QString text = this->TextEdit.toPlainText();
+    const int cursorPosition = this->TextEdit.textCursor().position();
+
+    this->TextEdit.setHtml(this->Highlight(text));
+    QTextCursor cursor = this->TextEdit.textCursor();
+    cursor.setPosition(cursorPosition);
+    this->TextEdit.setTextCursor(cursor);
+
+    const int vScrollBarValue = this->TextEdit.verticalScrollBar()->value();
+    this->TextEdit.verticalScrollBar()->setValue(vScrollBarValue);
+
+    const int hScrollBarValue = this->TextEdit.horizontalScrollBar()->value();
+    this->TextEdit.horizontalScrollBar()->setValue(hScrollBarValue);
+
+    // re-enable the signals
+    this->TextEdit.blockSignals(oldState);
+  });
 }

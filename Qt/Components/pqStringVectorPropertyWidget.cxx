@@ -383,7 +383,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     {
 #if VTK_MODULE_ENABLE_ParaView_pqPython
       vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "supports Python syntax highlighter.");
-      new pqPythonSyntaxHighlighter(textEdit, textEdit);
+      auto highlighter = new pqPythonSyntaxHighlighter(textEdit, *textEdit);
+      highlighter->ConnectHighligter();
 #else
       vtkVLogF(
         PARAVIEW_LOG_APPLICATION_VERBOSITY(), "Python not enabled, no syntax highlighter support.");

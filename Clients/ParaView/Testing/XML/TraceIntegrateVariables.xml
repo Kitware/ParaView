@@ -18,8 +18,8 @@
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
   <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
   <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceIntegrateVariables.py" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceIntegrateVariables.py" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceIntegrateVariables.py" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceIntegrateVariables.py" />
 
   <!-- Reset Session -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />

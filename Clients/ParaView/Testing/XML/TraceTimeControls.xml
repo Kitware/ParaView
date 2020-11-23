@@ -33,8 +33,8 @@
   <!-- save trace -->
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
   <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceTimeControls.py" />
-  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceTimeControls.py" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceTimeControls.py" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceTimeControls.py" />
 
   <!-- reset the state -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />

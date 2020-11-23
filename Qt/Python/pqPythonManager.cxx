@@ -65,16 +65,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 //-----------------------------------------------------------------------------
-class pqPythonManager::pqInternal
+struct pqPythonManager::pqInternal
 {
-public:
-  pqInternal()
-    : Editor(NULL)
-  {
-  }
-  ~pqInternal() { delete this->Editor; }
-
-  QPointer<pqPythonScriptEditor> Editor;
   QPointer<pqPythonMacroSupervisor> MacroSupervisor;
 };
 
@@ -256,15 +248,11 @@ void pqPythonManager::addMacro(const QString& fileName)
 //----------------------------------------------------------------------------
 void pqPythonManager::editMacro(const QString& fileName)
 {
-  // Create the editor if needed and only the first time
-  if (!this->Internal->Editor)
-  {
-    this->Internal->Editor = new pqPythonScriptEditor(pqCoreUtilities::mainWidget());
-    this->Internal->Editor->setPythonManager(this);
-  }
+  pqPythonScriptEditor* pyEditor = pqPythonScriptEditor::GetUniqueInstance();
 
-  this->Internal->Editor->show();
-  this->Internal->Editor->raise();
-  this->Internal->Editor->activateWindow();
-  this->Internal->Editor->open(fileName);
+  pyEditor->setPythonManager(this);
+  pyEditor->show();
+  pyEditor->raise();
+  pyEditor->activateWindow();
+  pyEditor->open(fileName);
 }

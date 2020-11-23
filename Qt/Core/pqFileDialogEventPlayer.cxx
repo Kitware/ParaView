@@ -115,7 +115,7 @@ bool pqFileDialogEventPlayer::playEvent(
   }
   if (Command == "copy")
   {
-    QStringList parts = fileString.split(';', QString::SkipEmptyParts);
+    QStringList parts = fileString.split(';', Qt::SkipEmptyParts);
     if (parts.size() != 2)
     {
       qCritical() << "Invalid argument to `copy`. Expecting paths separated by `;`.";
