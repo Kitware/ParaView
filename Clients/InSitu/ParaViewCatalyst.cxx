@@ -33,7 +33,7 @@
 #endif
 
 static bool update_producer_mesh_blueprint(
-  const std::string& channel_name, const conduit::Node* node)
+  const std::string& channel_name, const conduit::Node* node, const conduit::Node* global_fields)
 {
   auto producer = vtkInSituInitializationHelper::GetProducer(channel_name);
   if (producer == nullptr)
@@ -51,6 +51,7 @@ static bool update_producer_mesh_blueprint(
 
   auto algo = vtkConduitSource::SafeDownCast(producer->GetClientSideObject());
   algo->SetNode(node);
+  algo->SetGlobalFieldsNode(global_fields);
   vtkInSituInitializationHelper::MarkProducerModified(channel_name);
   return true;
 }
@@ -175,6 +176,8 @@ void catalyst_execute(const conduit_node* params)
   vtkVLogScopeF(
     PARAVIEW_LOG_CATALYST_VERBOSITY(), "co-processing for timestep=%d, time=%f", timestep, time);
 
+  conduit::Node globalFields;
+
   // catalyst/channels are used to communicate meshes.
   if (root.has_child("channels"))
   {
@@ -193,7 +196,14 @@ void catalyst_execute(const conduit_node* params)
         {
           vtkVLogF(PARAVIEW_LOG_CATALYST_VERBOSITY(),
             "Conduit Mesh blueprint validation succeeded for channel (%s)", channel_name.c_str());
-          update_producer_mesh_blueprint(channel_name, &mesh_node);
+
+          auto& fields = globalFields[channel_name];
+          fields["time"].set(time);
+          fields["timestep"].set(timestep);
+          fields["cycle"].set(timestep);
+          fields["channel"].set(channel_name);
+
+          update_producer_mesh_blueprint(channel_name, &mesh_node, &fields);
         }
         else
         {
