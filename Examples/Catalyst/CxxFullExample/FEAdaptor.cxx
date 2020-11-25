@@ -5,18 +5,16 @@
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
 #include <vtkCPProcessor.h>
-#include <vtkCPPythonScriptPipeline.h>
-#include <vtkCPPythonScriptV2Pipeline.h>
+#include <vtkCPPythonPipeline.h>
 #include <vtkCellData.h>
 #include <vtkCellType.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
+#include <vtkLogger.h>
 #include <vtkNew.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkUnstructuredGrid.h>
-
-#include <vtksys/SystemTools.hxx>
 
 namespace
 {
@@ -122,18 +120,13 @@ void Initialize(int numScripts, char* scripts[])
   }
   for (int i = 0; i < numScripts; i++)
   {
-    std::string ext = vtksys::SystemTools::GetFilenameLastExtension(scripts[i]);
-    if (ext == ".zip")
+    if (auto pipeline = vtkCPPythonPipeline::CreateAndInitializePipeline(scripts[i]))
     {
-      vtkNew<vtkCPPythonScriptV2Pipeline> pipeline;
-      pipeline->Initialize(scripts[i]);
       Processor->AddPipeline(pipeline);
     }
     else
     {
-      vtkNew<vtkCPPythonScriptPipeline> pipeline;
-      pipeline->Initialize(scripts[i]);
-      Processor->AddPipeline(pipeline);
+      vtkLogF(ERROR, "failed to setup pipeline for '%s'", scripts[i]);
     }
   }
 }

@@ -72,16 +72,11 @@ for script in sys.argv[2:]:
     import os.path
     if rank == 0:
         print("Adding script ", script)
-    if os.path.splitext(script)[1] == ".zip":
-        pipeline = vtkPVPythonCatalyst.vtkCPPythonScriptV2Pipeline()
-        pipeline.Initialize(script)
-    elif os.path.isdir(script):
-        pipeline = vtkPVPythonCatalyst.vtkCPPythonScriptV2Pipeline()
-        pipeline.InitializeFromDirectory(script)
-    else:
-        pipeline = vtkPVPythonCatalyst.vtkCPPythonScriptPipeline()
-        pipeline.Initialize(script)
-    catalyst.AddPipeline(pipeline)
+    pipeline = vtkPVPythonCatalyst.vtkCPPythonPipeline.CreateAndInitializePipeline(script)
+    if pipeline:
+        catalyst.AddPipeline(pipeline)
+    elif rank == 0:
+        print("failed to add pipeline for script:", script)
 
 # we get the channel name here from the reader's dataset. if there
 # isn't a channel name there we just assume that the channel name
