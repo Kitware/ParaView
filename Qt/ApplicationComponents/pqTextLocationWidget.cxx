@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 
 // Qt includes
-#include <QAbstractButton>
 #include <QString>
 
 //-----------------------------------------------------------------------------
@@ -105,15 +104,6 @@ pqTextLocationWidget::pqTextLocationWidget(
   {
     ui.radioButtonPosition->hide();
   }
-
-  auto interactiveCheckBox = parentObject->findChild<QAbstractButton*>("CheckBox");
-  if (interactiveCheckBox)
-  {
-    QObject::connect(
-      ui.radioButtonPosition, SIGNAL(toggled(bool)), interactiveCheckBox, SLOT(setEnabled(bool)));
-  }
-
-  ui.radioButtonPosition->setChecked(true);
 
   this->updateUI();
 }
