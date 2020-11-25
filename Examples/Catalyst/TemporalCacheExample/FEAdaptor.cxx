@@ -6,13 +6,13 @@
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
 #include <vtkCPProcessor.h>
-#include <vtkCPPythonScriptPipeline.h>
-#include <vtkCPPythonScriptV2Pipeline.h>
+#include <vtkCPPythonPipeline.h>
 #include <vtkCellData.h>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
 #include <vtkInformation.h>
 #include <vtkIntArray.h>
+#include <vtkLogger.h>
 #include <vtkNew.h>
 #include <vtkPointData.h>
 #include <vtkSMSourceProxy.h>
@@ -21,8 +21,6 @@
 #include <vtkTemporalStatistics.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkXMLDataSetWriter.h>
-
-#include <vtksys/SystemTools.hxx>
 
 namespace CPPPipeline
 {
@@ -270,18 +268,13 @@ void Initialize(int argc, char* argv[])
   // Python Pipelines
   for (int i = 0; i < numScripts; i++)
   {
-    std::string ext = vtksys::SystemTools::GetFilenameLastExtension(scripts[i]);
-    if (ext == ".zip")
+    if (auto pipeline = vtkCPPythonPipeline::CreateAndInitializePipeline(scripts[i]))
     {
-      vtkNew<vtkCPPythonScriptV2Pipeline> pipeline;
-      pipeline->Initialize(scripts[i]);
       Processor->AddPipeline(pipeline);
     }
     else
     {
-      vtkNew<vtkCPPythonScriptPipeline> pipeline;
-      pipeline->Initialize(scripts[i]);
-      Processor->AddPipeline(pipeline);
+      vtkLogF(ERROR, "failed to setup pipeline for '%s'", scripts[i]);
     }
   }
   // Optionally, the example C++ Pipeline too.

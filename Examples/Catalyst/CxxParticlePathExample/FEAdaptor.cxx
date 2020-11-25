@@ -5,18 +5,17 @@
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
 #include <vtkCPProcessor.h>
-#include <vtkCPPythonScriptPipeline.h>
-#include <vtkCPPythonScriptV2Pipeline.h>
+#include <vtkCPPythonPipeline.h>
 #include <vtkCellData.h>
 #include <vtkCellType.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
+#include <vtkLogger.h>
+#include <vtkLogger.h>
 #include <vtkNew.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkUnstructuredGrid.h>
-
-#include <vtksys/SystemTools.hxx>
 
 namespace
 {
@@ -113,20 +112,15 @@ void Initialize(std::vector<std::string>& scripts)
   {
     Processor->RemoveAllPipelines();
   }
-  for (std::vector<std::string>::iterator it = scripts.begin(); it != scripts.end(); it++)
+  for (const auto& script : scripts)
   {
-    std::string ext = vtksys::SystemTools::GetFilenameLastExtension(it->c_str());
-    if (ext == ".zip")
+    if (auto pipeline = vtkCPPythonPipeline::CreateAndInitializePipeline(script.c_str()))
     {
-      vtkNew<vtkCPPythonScriptV2Pipeline> pipeline;
-      pipeline->Initialize(it->c_str());
       Processor->AddPipeline(pipeline);
     }
     else
     {
-      vtkNew<vtkCPPythonScriptPipeline> pipeline;
-      pipeline->Initialize(it->c_str());
-      Processor->AddPipeline(pipeline);
+      vtkLogF(ERROR, "failed to setup pipeline for '%s'", script.c_str());
     }
   }
 }

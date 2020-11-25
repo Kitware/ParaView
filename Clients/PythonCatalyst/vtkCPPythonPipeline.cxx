@@ -218,6 +218,31 @@ vtkSmartPointer<vtkCPPythonPipeline> vtkCPPythonPipeline::CreatePipeline(
 }
 
 //----------------------------------------------------------------------------
+vtkSmartPointer<vtkCPPythonPipeline> vtkCPPythonPipeline::CreateAndInitializePipeline(
+  const char* fname, int default_version)
+{
+  if (auto pipeline = vtkCPPythonPipeline::CreatePipeline(fname, default_version))
+  {
+    if (auto v1 = vtkCPPythonScriptPipeline::SafeDownCast(pipeline))
+    {
+      if (v1->Initialize(fname))
+      {
+        return v1;
+      }
+    }
+    else if (auto v2 = vtkCPPythonScriptV2Pipeline::SafeDownCast(pipeline))
+    {
+      if (v2->Initialize(fname))
+      {
+        return v2;
+      }
+    }
+  }
+
+  return nullptr;
+}
+
+//----------------------------------------------------------------------------
 void vtkCPPythonPipeline::FixEOL(std::string& str)
 {
   const std::string from = "\\n";
