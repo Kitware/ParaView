@@ -5,8 +5,7 @@
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
 #include <vtkCPProcessor.h>
-#include <vtkCPPythonScriptPipeline.h>
-#include <vtkCPPythonScriptV2Pipeline.h>
+#include <vtkCPPythonPipeline.h>
 #include <vtkDataArray.h>
 #include <vtkDoubleArray.h>
 #include <vtkHyperTree.h>
@@ -18,26 +17,19 @@
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 
-#include <vtksys/SystemTools.hxx>
-
 FEAdaptor::FEAdaptor(int numScripts, char* scripts[])
 {
   this->Processor = vtkCPProcessor::New();
   this->Processor->Initialize();
   for (int i = 0; i < numScripts; i++)
   {
-    std::string ext = vtksys::SystemTools::GetFilenameLastExtension(scripts[i]);
-    if (ext == ".zip")
+    if (auto pipeline = vtkCPPythonPipeline::CreateAndInitializePipeline(scripts[i]))
     {
-      vtkNew<vtkCPPythonScriptV2Pipeline> pipeline;
-      pipeline->Initialize(scripts[i]);
       Processor->AddPipeline(pipeline);
     }
     else
     {
-      vtkNew<vtkCPPythonScriptPipeline> pipeline;
-      pipeline->Initialize(scripts[i]);
-      Processor->AddPipeline(pipeline);
+      vtkLogF(ERROR, "failed to setup pipeline for '%s'", scripts[i]);
     }
   }
 }
