@@ -45,7 +45,7 @@ public:
    * @sa `CreateAndInitializePipeline`.
    */
   static vtkSmartPointer<vtkCPPythonPipeline> CreatePipeline(
-    const char* fname, int default_version = 2);
+    const char* fname, int default_version = 1);
 
   /**
    * Same as `CreatePipeline`, except that if the pipeline instance is successfully
@@ -54,7 +54,7 @@ public:
    * If the Initialize failed, this will return nullptr.
    */
   static vtkSmartPointer<vtkCPPythonPipeline> CreateAndInitializePipeline(
-    const char* fname, int default_version = 2);
+    const char* fname, int default_version = 1);
 
 protected:
   /// For things like programmable filters that have a '\n' in their strings,
