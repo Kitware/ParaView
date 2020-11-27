@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyListDomain.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSettings.h"
@@ -123,6 +125,29 @@ int TestSettings(int argc, char* argv[])
   contourValuesProperty->SetElement(0, -2.0);
   contourValuesProperty->SetElement(1, -3.0);
   settings->SetProxySettings(contour);
+
+  auto contourLocatorProperty = vtkSMProxyProperty::SafeDownCast(contour->GetProperty("Locator"));
+  if (!contourLocatorProperty)
+  {
+    std::cerr << "No contour locator property in GenericContour\n";
+    return EXIT_FAILURE;
+  }
+
+  auto proxyListDomain = contourLocatorProperty->FindDomain<vtkSMProxyListDomain>();
+  vtkSMProxy* locator0 = proxyListDomain->GetProxy(0);
+  vtkSMProxy* locator1 = proxyListDomain->GetProxy(1);
+  contourLocatorProperty->SetProxy(0, locator1);
+  settings->SetProxySettings(contour);
+  contourLocatorProperty->SetProxy(0, locator0);
+
+  contour->ResetPropertiesToDefault();
+
+  if (strcmp(contourLocatorProperty->GetProxy(0)->GetXMLName(), locator1->GetXMLName()) != 0)
+  {
+    std::cerr << "Wrong selected locator. Should be " << locator1->GetXMLName() << std::endl;
+    std::cerr << *settings << std::endl;
+    return EXIT_FAILURE;
+  }
 
   vtkSMPropertyHelper(sphere, "Radius").Set(12);
   Json::Value state = vtkSMSettings::SerializeAsJSON(sphere);

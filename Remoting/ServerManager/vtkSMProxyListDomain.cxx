@@ -351,7 +351,7 @@ int vtkSMProxyListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_uncheck
   {
     vtkSMPropertyHelper helper(prop);
     helper.SetUseUnchecked(use_unchecked_values);
-    vtkSMProxy* values[1] = { this->GetProxy(0) };
+    vtkSMProxy* values[1] = { this->GetProxy(this->GetDefaultIndex()) };
     helper.Set(values, 1);
     return 1;
   }

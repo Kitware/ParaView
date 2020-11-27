@@ -28,6 +28,7 @@
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyListDomain.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringList.h"
@@ -250,6 +251,10 @@ public:
     {
       success = this->GetPropertySetting(settingName, inputProperty, maxPriority);
     }
+    else if (vtkSMProxyProperty* proxyProperty = vtkSMProxyProperty::SafeDownCast(property))
+    {
+      success = this->GetPropertySetting(settingName, proxyProperty, maxPriority);
+    }
 
     return success;
   }
@@ -360,45 +365,41 @@ public:
   //----------------------------------------------------------------------------
   bool GetPropertySetting(const char* settingName, vtkSMInputProperty* property, double maxPriority)
   {
+    vtkSMProxyProperty* proxyProp = property;
+    bool ret = this->GetPropertySetting(settingName, proxyProp, maxPriority);
+    property->SetInputConnection(0, property->GetProxy(0), 0);
+    return ret;
+  }
+
+  //----------------------------------------------------------------------------
+  bool GetPropertySetting(const char* settingName, vtkSMProxyProperty* property, double maxPriority)
+  {
     auto proxyListDomain = property->FindDomain<vtkSMProxyListDomain>();
     if (proxyListDomain)
     {
       // Now check whether this proxy is the one we want
-      std::string sourceSettingString(settingName);
-      sourceSettingString.append(".Selected");
-
-      std::string sourceName;
-      if (this->HasSetting(sourceSettingString.c_str(), maxPriority))
-      {
-        std::vector<std::string> selectedString;
-        this->GetSetting(sourceSettingString.c_str(), selectedString, maxPriority);
-        if (selectedString.size() > 0)
-        {
-          sourceName = selectedString[0];
-        }
-      }
-      else
-      {
-        return false;
-      }
-
       for (unsigned int ip = 0; ip < proxyListDomain->GetNumberOfProxies(); ++ip)
       {
         vtkSMProxy* listProxy = proxyListDomain->GetProxy(ip);
         if (listProxy)
         {
-          // Recurse on the proxy
-          bool success = this->GetProxySettings(settingName, listProxy, maxPriority);
+          std::string sourceSettingString(settingName);
+          bool success =
+            this->GetProxySettings(sourceSettingString.c_str(), listProxy, maxPriority);
           if (!success)
           {
             return false;
           }
 
-          // Now check whether it was selected
-          if (listProxy->GetXMLName() == sourceName)
+          sourceSettingString.append(".");
+          sourceSettingString.append(listProxy->GetXMLName());
+          sourceSettingString.append(".Selected");
+          Json::Value jsonValue =
+            this->GetSettingAtOrBelowPriority(sourceSettingString.c_str(), maxPriority);
+
+          if (jsonValue.asBool())
           {
-            // \TODO - probably not exactly what we need to do
-            property->SetInputConnection(0, listProxy, 0);
+            proxyListDomain->SetDefaultIndex(ip);
           }
         }
       }
@@ -475,6 +476,10 @@ public:
           else if (vtkSMInputProperty* inputProperty = vtkSMInputProperty::SafeDownCast(property))
           {
             success = this->GetPropertySetting(settingName, inputProperty, maxPriority);
+          }
+          else if (vtkSMProxyProperty* proxyProperty = vtkSMProxyProperty::SafeDownCast(property))
+          {
+            success = this->GetPropertySetting(settingName, proxyProperty, maxPriority);
           }
           else
           {
@@ -663,6 +668,39 @@ public:
   }
 
   //----------------------------------------------------------------------------
+  bool SetPropertySetting(const char* settingName, vtkSMProxyProperty* property)
+  {
+    auto proxyListDomain = property->FindDomain<vtkSMProxyListDomain>();
+    const char* currentProxyName = property->GetProxy(0)->GetXMLName();
+    if (proxyListDomain)
+    {
+      for (unsigned int ip = 0; ip < proxyListDomain->GetNumberOfProxies(); ++ip)
+      {
+        vtkSMProxy* listProxy = proxyListDomain->GetProxy(ip);
+        if (listProxy)
+        {
+          if (!this->SetProxySettings(settingName, listProxy, nullptr, true))
+          {
+            return false;
+          }
+
+          std::string sourceSettingString(settingName);
+          sourceSettingString.append(".");
+          sourceSettingString.append(listProxy->GetXMLName());
+          sourceSettingString.append(".Selected");
+
+          Json::Path valuePath(sourceSettingString.c_str());
+          Json::Value& jsonValue = valuePath.make(this->SettingCollections[0].Value);
+          jsonValue = (strcmp(listProxy->GetXMLName(), currentProxyName) == 0);
+          this->Modified();
+        }
+      }
+    }
+
+    return true;
+  }
+
+  //----------------------------------------------------------------------------
   // Description:
   // Set a property setting in the highest-priority collection.
   bool SetPropertySetting(const char* settingName, vtkSMProperty* property)
@@ -683,6 +721,10 @@ public:
                vtkSMStringVectorProperty::SafeDownCast(property))
     {
       return this->SetPropertySetting(settingName, stringVectorProperty);
+    }
+    else if (vtkSMProxyProperty* proxyProperty = vtkSMProxyProperty::SafeDownCast(property))
+    {
+      return this->SetPropertySetting(settingName, proxyProperty);
     }
 
     return false;
