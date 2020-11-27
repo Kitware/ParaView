@@ -497,6 +497,29 @@
       </DoubleVectorProperty>
     </Proxy>
 
+    <Proxy class="vtkTextProperty" name="TextPropertyCentered"
+           base_proxygroup="properties"
+           base_proxyname="TextProperty"
+           processes="client|dataserver|renderserver">
+      <!-- inherit TextProperty with a vertical justification defaulted to centered -->
+      <IntVectorProperty animateable="0"
+                         command="SetVerticalJustification"
+                         default_values="1"
+                         name="VerticalJustification"
+                         number_of_elements="1"
+                         override="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Bottom"
+                 value="0" />
+          <Entry text="Center"
+                 value="1" />
+          <Entry text="Top"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+    </Proxy>
+
   </ProxyGroup>
 
   <ProxyGroup name="additional_lights" label="Lights">

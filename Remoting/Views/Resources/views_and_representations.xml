@@ -9296,6 +9296,17 @@
                proxygroup="representations"
                proxyname="TextWidgetRepresentation"></Proxy>
         <ExposedProperties>
+
+          <Property name="ShowBorder" />
+          <Property name="BorderColor" />
+          <Property name="BorderThickness" />
+          <Property name="CornerRadius" />
+          <Property name="CornerResolution" />
+          <Property name="BackgroundColor" />
+          <Property name="BackgroundOpacity" />
+          <Property name="RightPadding" />
+          <Property name="TopPadding" />
+
           <!-- properties for Text -->
           <Property name="Orientation" panel_visibility="never"/>
           <PropertyGroup label="Font Properties" panel_widget="FontEditor">
