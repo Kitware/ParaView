@@ -39,21 +39,21 @@ for step in range(numtimesteps):
     inputdescription = datadescription.GetInputDescriptionByName("input")
 
     if inputdescription.GetIfGridIsNecessary() == True:
-	# since we do want to perform coprocessing, create grid and field data
-	points = vtk.vtkPoints()
-	for i in range(2):
-	    points.InsertNextPoint(float(i+mpi.rank), 0, 0)
-	    points.InsertNextPoint(float(i+mpi.rank), 0, 1)
-	    points.InsertNextPoint(float(i+mpi.rank), 1, 1)
-	    points.InsertNextPoint(float(i+mpi.rank), 1, 0)
+        # since we do want to perform coprocessing, create grid and field data
+        points = vtk.vtkPoints()
+        for i in range(2):
+            points.InsertNextPoint(float(i+mpi.rank), 0, 0)
+            points.InsertNextPoint(float(i+mpi.rank), 0, 1)
+            points.InsertNextPoint(float(i+mpi.rank), 1, 1)
+            points.InsertNextPoint(float(i+mpi.rank), 1, 0)
 
-	grid = vtk.vtkUnstructuredGrid()
-	grid.SetPoints(points)
-	pointIds = vtk.vtkIdList()
-	for i in range(8):
+        grid = vtk.vtkUnstructuredGrid()
+        grid.SetPoints(points)
+        pointIds = vtk.vtkIdList()
+        for i in range(8):
             pointIds.InsertNextId(i)
 
-	grid.InsertNextCell(vtk.VTK_HEXAHEDRON, pointIds)
+        grid.InsertNextCell(vtk.VTK_HEXAHEDRON, pointIds)
 
         pointdata = vtk.vtkDoubleArray()
         for point in range(grid.GetNumberOfPoints()):
