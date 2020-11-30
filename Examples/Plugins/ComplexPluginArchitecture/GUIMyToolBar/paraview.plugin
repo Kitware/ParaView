@@ -1,0 +1,7 @@
+NAME
+  GUIMyToolBar
+DESCRIPTION
+  An example plugin that implements an object panel for a source proxy and using a shared vtk module.
+REQUIRES_MODULES
+  ParaView::pqComponents
+  ComplexPluginArchitecture::Shared

@@ -1,0 +1,147 @@
+<ServerManagerConfiguration>
+  <!-- This is the server manager configuration XML. It defines the interface to
+       our new filter. As a rule of thumb, try to locate the configuration for
+       a filter already in ParaView (in Servers/ServerManager/Resources/*.xml)
+       that matches your filter and then model your xml on it -->
+  <ProxyGroup name="filters">
+   <SourceProxy name="MyElevationFilter" class="vtkMyElevationFilter" label="MyElevation">
+     <Documentation
+        long_help="Create point attribute array by projecting points onto an elevation vector."
+        short_help="Create a point array representing elevation.">
+          The Elevation filter generates point scalar values for an input data
+          set along a specified direction vector. The Input menu allows the user
+          to select the data set to which this filter will be applied. The Low
+          Point and High Point define a line onto which each point of the data
+          set is projected. The minimum scalar value is associated with the Low
+          Point, and the maximum scalar value is associated with the High Point.
+          The scalar value for each point in the data set is determined by the
+          location along the line to which that point projects.
+
+          The line can be specified interactively using the 3D line widget. See
+          section 7.4 for more information about this widget.
+     </Documentation>
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+      </InputProperty>
+
+      <DoubleVectorProperty
+         name="LowPoint"
+         label="Low Point"
+         command="SetLowPoint"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0 0 0" >
+         <BoundsDomain name="range" mode="normal" default_mode="min" >
+           <RequiredProperties>
+             <Property name="Input" function="Input" />
+           </RequiredProperties>
+         </BoundsDomain>
+         <Documentation>
+           Define one end of the line (small scalar values). Default is (0,0,0).
+         </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="HighPoint"
+         label="High Point"
+         command="SetHighPoint"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0 0 1" >
+         <BoundsDomain name="range" mode="normal" default_mode="max" >
+           <RequiredProperties>
+             <Property name="Input" function="Input" />
+           </RequiredProperties>
+         </BoundsDomain>
+         <Documentation>
+           Define other end of the line (large scalar values). Default is (0,0,1).
+         </Documentation>
+      </DoubleVectorProperty>
+
+      <PropertyGroup panel_widget="InteractiveLine">
+        <Property function="Point1WorldPosition" name="LowPoint" />
+        <Property function="Point2WorldPosition" name="HighPoint" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
+   <!-- End MyElevationFilter -->
+   </SourceProxy>
+   <SourceProxy name="MyOtherElevationFilter" class="vtkMyOtherElevationFilter" label="MyOtherElevation">
+     <Documentation
+        long_help="Create point attribute array by projecting points onto an elevation vector."
+        short_help="Create a point array representing elevation.">
+          The Elevation filter generates point scalar values for an input data
+          set along a specified direction vector. The Input menu allows the user
+          to select the data set to which this filter will be applied. The Low
+          Point and High Point define a line onto which each point of the data
+          set is projected. The minimum scalar value is associated with the Low
+          Point, and the maximum scalar value is associated with the High Point.
+          The scalar value for each point in the data set is determined by the
+          location along the line to which that point projects.
+
+          The line can be specified interactively using the 3D line widget. See
+          section 7.4 for more information about this widget.
+     </Documentation>
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+      </InputProperty>
+
+      <DoubleVectorProperty
+         name="LowPoint"
+         label="Low Point"
+         command="SetLowPoint"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0 0 0" >
+         <BoundsDomain name="range" mode="normal" default_mode="min" >
+           <RequiredProperties>
+             <Property name="Input" function="Input" />
+           </RequiredProperties>
+         </BoundsDomain>
+         <Documentation>
+           Define one end of the line (small scalar values). Default is (0,0,0).
+         </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="HighPoint"
+         label="High Point"
+         command="SetHighPoint"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0 0 1" >
+         <BoundsDomain name="range" mode="normal" default_mode="max" >
+           <RequiredProperties>
+             <Property name="Input" function="Input" />
+           </RequiredProperties>
+         </BoundsDomain>
+         <Documentation>
+           Define other end of the line (large scalar values). Default is (0,0,1).
+         </Documentation>
+      </DoubleVectorProperty>
+
+      <PropertyGroup panel_widget="InteractiveLine">
+        <Property function="Point1WorldPosition" name="LowPoint" />
+        <Property function="Point2WorldPosition" name="HighPoint" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
+   <!-- End MyOtherElevationFilter -->
+   </SourceProxy>
+
+ </ProxyGroup>
+</ServerManagerConfiguration>
