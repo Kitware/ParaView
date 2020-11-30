@@ -210,15 +210,15 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
     internals.AssemblyTreeModel->setUserCheckable(true);
 
     // monitor AssemblyTreeModel data changes.
-    QObject::connect(internals.AssemblyTreeModel, &pqDataAssemblyTreeModel::modelDataChanged, this,
-      &pqDataAssemblyPropertyWidget::assemblyTreeModified);
+    QObject::connect(internals.AssemblyTreeModel.data(), &pqDataAssemblyTreeModel::modelDataChanged,
+      this, &pqDataAssemblyPropertyWidget::assemblyTreeModified);
 
     // monitor StringListModel data changes.
-    QObject::connect(internals.StringListModel, &QAbstractItemModel::dataChanged, this,
+    QObject::connect(internals.StringListModel.data(), &QAbstractItemModel::dataChanged, this,
       &pqDataAssemblyPropertyWidget::stringListModified);
-    QObject::connect(internals.StringListModel, &QAbstractItemModel::rowsInserted, this,
+    QObject::connect(internals.StringListModel.data(), &QAbstractItemModel::rowsInserted, this,
       &pqDataAssemblyPropertyWidget::stringListModified);
-    QObject::connect(internals.StringListModel, &QAbstractItemModel::rowsRemoved, this,
+    QObject::connect(internals.StringListModel.data(), &QAbstractItemModel::rowsRemoved, this,
       &pqDataAssemblyPropertyWidget::stringListModified);
 
     // observe the property's domain to update the hierarchy when it changes.
