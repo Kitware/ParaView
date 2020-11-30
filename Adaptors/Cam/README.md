@@ -37,7 +37,7 @@ To build CAM5 and the Catalyst adaptor:
    such that `CAM_ROOT` points to the location for `cesm1_2_2` sources.
    By default the scripts assume that `cesm1_2_2` is stored in `~/src/cesm_1_2_2`.
 
-3. Set `PARAVIEW_BUILD_CATALYST_ADAPTORS` to `On` and build ParaView.
+3. Build ParaView.
 
     Patch `cesm1_2_2` sources to call the Catalyst Adaptor:
 
