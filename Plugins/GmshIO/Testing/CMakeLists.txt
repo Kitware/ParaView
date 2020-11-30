@@ -20,4 +20,16 @@ if (PARAVIEW_USE_QT AND BUILD_SHARED_LIBS)
     BASELINE_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
     TEST_DATA_TARGET ParaViewData
     TEST_SCRIPTS  ${module_tests})
+
+  paraview_add_client_server_tests(
+    LOAD_PLUGIN   "GmshIO"
+    BASELINE_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
+    TEST_DATA_TARGET ParaViewData
+    TEST_SCRIPTS  ${module_tests})
+
+  paraview_add_client_server_render_tests(
+    LOAD_PLUGIN   "GmshIO"
+    BASELINE_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
+    TEST_DATA_TARGET ParaViewData
+    TEST_SCRIPTS  ${module_tests})
 endif ()

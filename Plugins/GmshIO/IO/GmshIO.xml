@@ -88,7 +88,8 @@
                   class="vtkGmshWriter"
                   base_proxygroup="writers">
       <Documentation short_help="Write Gmsh files">
-        Writer to meshes in Gmsh format.
+        Write meshes with their data in a Gmsh file.
+	Write temporal dataset into a single file containing all the timesteps.
       </Documentation>
 
       <InputProperty name="Input"
@@ -139,5 +140,83 @@
         <WriterFactory extensions="msh" file_description="Gmsh File Format"/>
       </Hints>
     </WriterProxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="writers">
+    <PSWriterProxy class="vtkParallelSerialWriter"
+                   file_name_method="SetFileName"
+                   name="PGmshWriter"
+                   base_proxygroup="internal_writers"
+                   base_proxyname="ParallelSerialWriter">
+      <Documentation short_help="Write Gmsh files">
+        Write meshes with their data in a Gmsh file.
+	Write temporal dataset into a single file containing all the timesteps.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="writers"
+               proxyname="GmshWriter">
+        </Proxy>
+        <LinkProperties>
+          <Property name="Input" with_property="Input" />
+        </LinkProperties>
+      </SubProxy>
+
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkUnstructuredGrid"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty
+        name="WriteGmshSpecificArray"
+        command="SetWriteGmshSpecificArray"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if we write data arrays starting by "gmsh" (usually created by the Gmsh reader).
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="WriteAllTimeSteps"
+        command="SetWriteAllTimeSteps"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if all timesteps have to be saved for temporal data.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <Documentation>
+          The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+
+      <SubProxy>
+        <Proxy name="PostGatherHelper"
+               proxygroup="filters"
+               proxyname="AppendPolyData" />
+      </SubProxy>
+
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+        <WriterFactory extensions="msh" file_description="Gmsh File Format"/>
+        <UseDocumentationForLabels />
+      </Hints>
+    </PSWriterProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
