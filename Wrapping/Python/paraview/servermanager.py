@@ -1578,6 +1578,17 @@ class ArrayInformation(object):
         range = array.GetComponentRange(component)
         return (range[0], range[1])
 
+    def __eq__(self, other):
+        if (self is None and other is None):
+            return True
+        if (self is None or other is None):
+            return False
+
+        return self.Proxy == other.Proxy and self.FieldData == other.FieldData and self.Name == other.Name
+
+    def __neq__(self, other):
+        return not self.__eq__(other)
+
     if paraview.compatibility.GetVersion() <= 3.4:
        def Range(self, component=0):
            return self.GetRange(component)
