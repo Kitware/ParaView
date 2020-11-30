@@ -13,6 +13,8 @@ DEPENDS
   VTK::PythonInterpreter
 PRIVATE_DEPENDS
   ParaView::PythonInitializer
+  ParaView::RemotingServerManager
+  ParaView::VTKExtensionsCore
   VTK::ParallelCore
   VTK::WrappingPythonCore
 OPTIONAL_DEPENDS
