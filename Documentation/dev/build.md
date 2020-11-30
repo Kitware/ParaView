@@ -453,10 +453,6 @@ These variables should be documented once they're effective again.
   * `PARAVIEW_USE_EXTERNAL_VTK` (default `OFF`): Use an externally provided
     VTK. Note that ParaView has fairly narrow requirements for the VTK it can
     use, so only very recent versions are likely to work.
-  * `PARAVIEW_BUILD_CATALYST_ADAPTORS` (default `OFF`;
-    not available on Windows): If set,
-    ParaView's example Catalyst adaptors will be added as tests to the ParaView
-    test suite.
 -->
 ## Building editions
 
