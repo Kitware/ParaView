@@ -72,7 +72,7 @@ for script in sys.argv[2:]:
     import os.path
     if rank == 0:
         print("Adding script ", script)
-    pipeline = vtkPVPythonCatalyst.vtkCPPythonPipeline.CreateAndInitializePipeline(script)
+    pipeline = vtkPVPythonCatalyst.vtkCPPythonPipeline.NewAndInitializePipeline(script)
     if pipeline:
         catalyst.AddPipeline(pipeline)
     elif rank == 0:
