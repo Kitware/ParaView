@@ -53,7 +53,7 @@ class PQCOMPONENTS_EXPORT pqAnimationViewWidget : public QWidget
   typedef QWidget Superclass;
 
 public:
-  pqAnimationViewWidget(QWidget* parent = 0);
+  pqAnimationViewWidget(QWidget* parent = nullptr);
   ~pqAnimationViewWidget() override;
 
 public Q_SLOTS:
@@ -138,7 +138,7 @@ private:
   Q_DISABLE_COPY(pqAnimationViewWidget)
 
   class pqInternal;
-  pqInternal* Internal;
+  pqInternal* Internal = nullptr;
 };
 
 #endif

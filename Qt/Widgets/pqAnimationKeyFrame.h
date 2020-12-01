@@ -67,7 +67,7 @@ class PQWIDGETS_EXPORT pqAnimationKeyFrame : public QObject, public QGraphicsIte
   Q_INTERFACES(QGraphicsItem)
 public:
   pqAnimationKeyFrame(pqAnimationTrack* p);
-  ~pqAnimationKeyFrame() override;
+  ~pqAnimationKeyFrame() override = default;
 
   double normalizedStartTime() const;
   double normalizedEndTime() const;
@@ -84,7 +84,7 @@ public Q_SLOTS:
   void setEndValue(const QVariant&);
   void setIcon(const QIcon& icon);
   void setBoundingRect(const QRectF& r);
-  void adjustRect();
+  void adjustRect(double startPos, double endPos);
 
 Q_SIGNALS:
   void startValueChanged();
@@ -100,8 +100,8 @@ protected:
   void paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
 private:
-  double NormalizedStartTime;
-  double NormalizedEndTime;
+  double NormalizedStartTime = 0;
+  double NormalizedEndTime = 1;
   QVariant StartValue;
   QVariant EndValue;
   QIcon Icon;

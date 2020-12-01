@@ -38,13 +38,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAnimationKeyFrame.h"
 
+//-----------------------------------------------------------------------------
 pqAnimationTrack::pqAnimationTrack(QObject* p)
   : QObject(p)
-  , Deletable(true)
   , Rect(0, 0, 1, 1)
 {
 }
 
+//-----------------------------------------------------------------------------
 pqAnimationTrack::~pqAnimationTrack()
 {
   while (this->Frames.count())
@@ -53,6 +54,7 @@ pqAnimationTrack::~pqAnimationTrack()
   }
 }
 
+//-----------------------------------------------------------------------------
 int pqAnimationTrack::count()
 {
   return this->Frames.size();
@@ -63,28 +65,22 @@ pqAnimationKeyFrame* pqAnimationTrack::keyFrame(int i)
   return this->Frames[i];
 }
 
+//-----------------------------------------------------------------------------
 QRectF pqAnimationTrack::boundingRect() const
 {
   return this->Rect;
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationTrack::setBoundingRect(const QRectF& r)
 {
   this->removeFromIndex();
   this->Rect = r;
   this->addToIndex();
-  this->adjustKeyFrameRects();
   this->update();
 }
 
-void pqAnimationTrack::adjustKeyFrameRects()
-{
-  foreach (pqAnimationKeyFrame* f, this->Frames)
-  {
-    f->adjustRect();
-  }
-}
-
+//-----------------------------------------------------------------------------
 pqAnimationKeyFrame* pqAnimationTrack::addKeyFrame()
 {
   pqAnimationKeyFrame* frame = new pqAnimationKeyFrame(this);
@@ -93,6 +89,7 @@ pqAnimationKeyFrame* pqAnimationTrack::addKeyFrame()
   return frame;
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationTrack::removeKeyFrame(pqAnimationKeyFrame* frame)
 {
   int idx = this->Frames.indexOf(frame);
@@ -103,18 +100,21 @@ void pqAnimationTrack::removeKeyFrame(pqAnimationKeyFrame* frame)
   }
 }
 
+//-----------------------------------------------------------------------------
 QVariant pqAnimationTrack::property() const
 {
   return this->Property;
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationTrack::setProperty(const QVariant& p)
 {
   this->Property = p;
-  Q_EMIT this->propertyChanged();
+  emit this->propertyChanged();
   this->update();
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationTrack::paint(QPainter* p, const QStyleOptionGraphicsItem*, QWidget* widget)
 {
   // draw border for this track

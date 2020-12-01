@@ -25,8 +25,17 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1">
-   <property name="margin">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,1">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -74,6 +83,9 @@
     </widget>
    </item>
    <item>
+    <widget class="pqTimelineScrollbar" name="TimelineScrollbar" native="true"/>
+   </item>
+   <item>
     <widget class="pqAnimationWidget" name="AnimationWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -102,6 +114,12 @@
    <class>pqVCRToolbar</class>
    <extends>QWidget</extends>
    <header>pqVCRToolbar.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqTimelineScrollbar</class>
+   <extends>QWidget</extends>
+   <header>pqTimelineScrollbar.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
