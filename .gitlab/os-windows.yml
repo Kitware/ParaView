@@ -29,7 +29,7 @@
     variables:
         VCVARSALL: "${VS160COMNTOOLS}\\..\\..\\VC\\Auxiliary\\Build\\vcvarsall.bat"
         VCVARSPLATFORM: "x64"
-        VCVARSVERSION: "14.26"
+        VCVARSVERSION: "14.28"
 
 .windows_vs2019_kits_mpi_python_qt:
     extends: .windows_vs2019
@@ -48,7 +48,7 @@
 .windows_builder_tags:
     tags:
         - paraview # Since this is a bare runner, pin to a project.
-        - msvc-19.26
+        - msvc-19.28
         - nonconcurrent
         - shell
         - vs2019
