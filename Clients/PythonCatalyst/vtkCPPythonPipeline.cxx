@@ -283,3 +283,26 @@ std::string vtkCPPythonPipeline::GetPythonAddress(void* pointer)
   std::string value = aplus;
   return value;
 }
+
+//----------------------------------------------------------------------------
+vtkCPPythonPipeline* vtkCPPythonPipeline::NewPipeline(const char* fname, int default_version)
+{
+  if (auto sptr = vtkCPPythonPipeline::CreatePipeline(fname, default_version))
+  {
+    sptr->Register(nullptr);
+    return sptr;
+  }
+  return nullptr;
+}
+
+//----------------------------------------------------------------------------
+vtkCPPythonPipeline* vtkCPPythonPipeline::NewAndInitializePipeline(
+  const char* fname, int default_version)
+{
+  if (auto sptr = vtkCPPythonPipeline::CreateAndInitializePipeline(fname, default_version))
+  {
+    sptr->Register(nullptr);
+    return sptr;
+  }
+  return nullptr;
+}
