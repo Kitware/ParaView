@@ -72,7 +72,7 @@ git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ HEAD
 git fetch origin
 git checkout master
 git merge --ff-only origin/master
-git submodule update
+git submodule update --recursive --init
 git checkout -b update-to-v@VERSION@@RC@
 ```
   - Update `CMakeLists.txt`
