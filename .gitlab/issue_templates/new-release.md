@@ -30,11 +30,11 @@ Please remove this comment.
 
 # Update ParaView
 
-  - [ ] Update `master` branch for **paraview**
+  - [ ] Update `release` branch for **paraview**
 ```
 git fetch origin
-git checkout master
-git merge --ff-only origin/master
+git checkout release
+git merge --ff-only origin/release
 git submodule update --recursive --init
 ```
   - [ ] Update `version.txt` and tag the commit
@@ -47,35 +47,24 @@ git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ HEAD
   - Integrate changes to `master` branch
     - [ ] Create a merge request targeting `master` (do *not* add `Backport: release`)
     - [ ] `Do: merge`
-  - Update VTK's `paraview/release` branch
-    - [ ] Change directory to VTK source
-    - [ ] `git push origin <paraview-vtk-submodule-hash>:paraview/release`
-    - [ ] Update kwrobot with the new `paraview/release` branch rules
-  - Integrate changes to `release` branch
-    - [ ] Change directory to ParaView source. Stay on the `update-to-v@VERSION@@RC@` branch.
-    - [ ] `git config -f .gitmodules submodule.VTK.branch paraview/release`
-    - [ ] `git commit -m "release: follow VTK's paraview/release branch" .gitmodules`
-    - [ ] Merge new `release` branch into `master` using `-s ours`
-      - `git checkout master`
-      - `git merge --no-ff -s ours -m "Merge branch 'release'" update-to-v@VERSION@@RC@`
-    - [ ] `git push origin master update-to-v@VERSION@@RC@:release`
-    - [ ] Update kwrobot with the new `release` branch rules
+  - Integrate changes to `release` branch (push the `update-to-v@version@@RC@` branch to be the new `release` branch)
+    - [ ] `git push origin update-to-v@VERSION@@RC@:release`
   - Create tarballs
     - [ ] ParaView (`Utilities/Maintenance/create_tarballs.bash --txz --tgz --zip -v v@VERSION@@RC@`)
   - Upload tarballs to `paraview.org`
-    - [ ] `rsync -rptv $tarballs paraview.release:ParaView_Release/v@MAJOR@.@MINOR@/`
+    - [ ] `rsync -rptv $tarballs user@host:ParaView_Release/v@MAJOR@.@MINOR@/`
 
 # Update ParaView-Superbuild
-  - [ ] Update `master` branch for **paraview/paraview-superbuild**
+
+  - [ ] Update `release` branch for **paraview/paraview-superbuild**
 ```
 git fetch origin
-git checkout master
-git merge --ff-only origin/master
+git checkout release
+git merge --ff-only origin/release
 git submodule update
 git checkout -b update-to-v@VERSION@@RC@
 ```
   - Update `CMakeLists.txt`
-    - [ ] `git checkout -b update-to-v@VERSION@@RC@`
     - [ ] Update PARAVIEW_VERSION_DEFAULT to the release version (without RC*)
     - [ ] Set ParaView source selections in `CMakeLists.txt` and force explicit
       version in `CMakeLists.txt`:
@@ -99,9 +88,9 @@ git gitlab-push
 ```
   - Integrate changes to `master` branch
     - [ ] Create a merge request targeting `master`, title beginning with WIP (do *not* add `Backport: release` to description)
-    - [ ] Build binaries (`Do: test`)
-    - [ ] Download the binaries that have been generated in the dashboard results. They will be deleted within 24 hours.
-    - [ ] Remove explicit version forcing added in CMakeLists.txt and force push
+    - [ ] Build binaries (start all pipelines)
+    - [ ] Download the binaries that have been generated from the Pipeline build products. They will be deleted within 24 hours.
+    - [ ] Remove explicit version forcing added in `CMakeLists.txt` and force push
 ```
 git add CMakeLists.txt
 git commit --amend --no-edit
@@ -112,19 +101,8 @@ git gitlab-push -f
     - [ ] Get positive review
     - [ ] `Do: merge`
     - [ ] `git tag -a -m 'ParaView superbuild @VERSION@@RC@' v@VERSION@@RC@ HEAD`
-  - Update common-superbuild's `paraview/release` branch
-    - [ ] Change directory to superbuild source
-    - [ ] `git push origin <paraview-superbuild-submodule-hash>:paraview/release`
-    - [ ] Update `kwrobot` with the new `paraview/release` branch rules
   - Integrate changes to `release` branch
-    - [ ] Change directory to ParaView Superbuild source. Stay on the `update-to-v@VERSION@@RC@` branch.
-    - [ ] `git config -f .gitmodules submodule.superbuild.branch paraview/release`
-    - [ ] `git commit -m "release: follow common-superbuild's paraview/release branch" .gitmodules`
-    - [ ] Merge new `release` branch into `master` using `-s ours`
-      - `git checkout master`
-      - `git merge --no-ff -s ours -m "Merge branch 'release'" update-to-v@VERSION@@RC@`
     - [ ] `git push origin update-to-v@VERSION@@RC@:release`
-    - [ ] Update kwrobot with the new `release` branch rules
 
 # Sign macOS binaries
 

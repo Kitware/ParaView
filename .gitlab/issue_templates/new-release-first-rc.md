@@ -67,11 +67,11 @@ git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ HEAD
 
 # Update ParaView-Superbuild
 
-  - [ ] Update `release` branch for **paraview/paraview-superbuild**
+  - [ ] Update `master` branch for **paraview/paraview-superbuild**
 ```
 git fetch origin
-git checkout release
-git merge --ff-only origin/release
+git checkout master
+git merge --ff-only origin/master
 git submodule update
 git checkout -b update-to-v@VERSION@@RC@
 ```
@@ -85,6 +85,7 @@ set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
 ```
   - Update versions
     - [ ] Guide selections in `versions.cmake`
+    - [ ] `paraview_SOURCE_SELECTION` version in `README.md`
     - [ ] Docker: update default tag strings (in `Scripts/docker/ubuntu/development/Dockerfile`)
       - [ ] ARG PARAVIEW_TAG=v@VERSION@@RC@
       - [ ] ARG SUPERBUILD_TAG=v@VERSION@@RC@
@@ -96,9 +97,9 @@ git gitlab-push
 ```
   - Integrate changes to `master` branch
     - [ ] Create a merge request targeting `master`, title beginning with WIP (do *not* add `Backport: release` to description)
-    - [ ] Build binaries (`Do: test`)
-    - [ ] Download the binaries that have been generated in the dashboard results. They will be deleted within 24 hours.
-    - [ ] Remove explicit version forcing added in CMakeLists.txt, amend the commit, and force push
+    - [ ] Build binaries (start all pipelines)
+    - [ ] Download the binaries that have been generated from the Pipeline build products. They will be deleted within 24 hours.
+    - [ ] Remove explicit version forcing added in `CMakeLists.txt`, amend the commit, and force push
 ```
 git add CMakeLists.txt
 git commit --amend --no-edit
@@ -109,8 +110,20 @@ git gitlab-push -f
     - [ ] Get positive review
     - [ ] `Do: merge`
     - [ ] `git tag -a -m 'ParaView superbuild @VERSION@@RC@' v@VERSION@@RC@ HEAD`
+  - Update common-superbuild's `paraview/release` branch
+    - [ ] Change directory to superbuild source
+    - [ ] `git push origin <paraview-superbuild-submodule-hash>:paraview/release`
+    - [ ] Update `kwrobot` with the new `paraview/release` branch rules
+
   - Integrate changes to `release` branch
+    - [ ] Change directory to ParaView Superbuild source. Stay on the `update-to-v@VERSION@@RC@` branch.
+    - [ ] `git config -f .gitmodules submodule.superbuild.branch paraview/release`
+    - [ ] `git commit -m "release: follow common-superbuild's paraview/release branch" .gitmodules`
+    - [ ] Merge new `release` branch into `master` using `-s ours`
+      - `git checkout master`
+      - `git merge --no-ff -s ours -m "Merge branch 'release'" update-to-v@VERSION@@RC@`
     - [ ] `git push origin update-to-v@VERSION@@RC@:release`
+    - [ ] Update kwrobot with the new `release` branch rules
 
 # Sign macOS binaries
 
