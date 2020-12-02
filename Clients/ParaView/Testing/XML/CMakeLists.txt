@@ -419,6 +419,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectCellsTrace_2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectionByArray.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectionLinkParallelCoordinatesView.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectionLinkScriptingA.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectionLinkScriptingB.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectPointsFrustumTrace.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectPointsInteractiveTrace.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SelectPointsTrace.png}"
@@ -1183,9 +1185,10 @@ if(PARAVIEW_USE_PYTHON)
     RestoreArrayDefaultTransferFunction.xml
     RestoreDefaultTransferFunction.xml
     SelectCellsTrace.xml
+    SelectionLinkScripting.xml
     SelectPointsTrace.xml
-    TraceMultiViews.xml
     SplitViewTrace.xml
+    TraceMultiViews.xml
   )
   set(SelectCellsTrace_DISABLE_CRS TRUE)
   set(SelectPointsTrace_DISABLE_CRS TRUE)
@@ -1375,6 +1378,7 @@ set(SelectionLinkInitial_DISABLE_CRS TRUE)
 set(SelectionLinkMultiple_DISABLE_CRS TRUE)
 set(SelectionLinkRemove_DISABLE_CRS TRUE)
 set(SelectionLinkReaction_DISABLE_CRS TRUE)
+set(SelectionLinkScripting_DISABLE_CRS TRUE)
 set(ExpandSelection_DISABLE_CRS TRUE)
 set(ExportSelectionToCSV_DISABLE_CRS TRUE)
 set(BlockOpacities_DISABLE_CRS TRUE)
@@ -1517,6 +1521,7 @@ IF (PARAVIEW_USE_MPI)
   set(SelectionLinkMultiple_DISABLE_CS TRUE)
   set(SelectionLinkRemove_DISABLE_CS TRUE)
   set(SelectionLinkReaction_DISABLE_CS TRUE)
+  set(SelectionLinkScripting_DISABLE_CS TRUE)
 
   if (PARAVIEW_USE_PYTHON)
     set (TraceStatisticsFilter_DISABLE_CS TRUE)

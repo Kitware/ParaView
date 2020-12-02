@@ -700,6 +700,14 @@ void pqLinksModel::addSelectionLink(
   link->Delete();
   Q_EMIT this->linkAdded(pqLinksModel::Selection);
   CLEAR_UNDO_STACK();
+
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("AddSelectionLink")
+    .arg(inputProxy)
+    .arg(outputProxy)
+    .arg(name.toLocal8Bit().data())
+    .arg(convertToIndices)
+    .arg("comment", "link selection between two objects");
 }
 
 void pqLinksModel::removeLink(const QModelIndex& idx)
@@ -725,6 +733,11 @@ void pqLinksModel::removeLink(const QString& name)
     pxm->UnRegisterLink(name.toLocal8Bit().data());
     this->emitLinkRemoved(name);
     CLEAR_UNDO_STACK();
+
+    SM_SCOPED_TRACE(CallFunction)
+      .arg("RemoveLink")
+      .arg(name.toLocal8Bit().data())
+      .arg("comment", "Remove any link given its name");
   }
 }
 
