@@ -133,13 +133,13 @@ Show(Text(Text="$A^2$"))
 
 
 Binary checklist
-    - [ ] macOS
-    - [ ] Linux
-    - [ ] Linux osmesa
-    - [ ] Windows MPI (.exe)
-    - [ ] Windows MPI (.zip)
-    - [ ] Windows no-MPI (.exe)
-    - [ ] Windows no-MPI (.zip)
+  - [ ] macOS
+  - [ ] Linux
+  - [ ] Linux osmesa
+  - [ ] Windows MPI (.exe)
+  - [ ] Windows MPI (.zip)
+  - [ ] Windows no-MPI (.exe)
+  - [ ] Windows no-MPI (.zip)
 
 # Upload binaries
 
