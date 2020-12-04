@@ -1162,6 +1162,17 @@
           be loaded at the required lower resolution, considerably faster.
         </Documentation>
       </IntVectorProperty>
+      <DoubleVectorProperty name="BoundingBoxByCoordinates"
+                        command="SetCoordinatesBoundingBox"
+                        number_of_elements="6"
+                        default_values="-1.79769e+308 1.79769e+308 -1.79769e+308 1.79769e+308 -1.79769e+308 1.79769e+308" >
+        <Documentation>This property sets the bounding box to select HyperTrees.
+          HyperTrees completely included or intersecting with the bounding box will be
+          selected and fully loaded (no partial tree).
+	  The 6 fields are coordinates of the bounding box, in the following order:
+          Xmin, Xmax, Ymin, Ymax, Zmin, Zmax.
+        </Documentation>
+      </DoubleVectorProperty>
     </Proxy>
     <!-- End XMLHyperTreeReaderCore -->
 
@@ -2429,6 +2440,9 @@
         />
         <ExposedProperties>
           <Property name="MaximumNumberOfLevels" />
+        </ExposedProperties>
+        <ExposedProperties>
+          <Property name="BoundingBoxByCoordinates" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
