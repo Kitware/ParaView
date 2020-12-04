@@ -31,6 +31,7 @@ class IIndex_canvas :
     public mi::base::Interface_declare<0x46c5a5f7,0x31de,0x468d,0x9b,0x6c,0xb0,0x35,0x77,0xed,0xfe,0x61>
 {
 public:
+    /// Frame buffer layer types that are or will be supported by a canvas layer.
     enum Frame_buffer_layer_type
     {
         FB_LAYER_UNDEFINED  = 0u,    ///< Undefined frame buffer.

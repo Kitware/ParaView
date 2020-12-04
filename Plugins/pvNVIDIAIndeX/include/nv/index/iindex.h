@@ -718,7 +718,7 @@ public:
         m_resolution(resolution) {}
 
     /// A CUDA device hosts the canvas contents in the CUDA buffer.
-    ///  \return    Returns the CUDA device id that stores the canvas contents.  
+    ///  \return    Returns the CUDA device id that stores the canvas contents.
     virtual mi::Sint32                                    get_cuda_device_id()  const { return m_cuda_device_id; }
     /// A canvas has a given resolution.
     ///  \return    Returns the resolutions of the canvas.  
@@ -999,13 +999,16 @@ public:
     /// and jobs in the distributed database or communicating job results
     /// (see \c mi::neuraylib::IFragmented_job::execute_fragment_remote()).
     ///
-    /// Registering a class for serialization can only be done before \product has been
+    /// Registering a class for serialization can only be done before DiCE library has been
     /// started.
     ///
     /// \param class_id     The class ID of the class that shall be registered for serialization.
+    ///
     /// \param factory      The class factory.
+    ///
     /// \return             Returns \c true if the class of was successfully registered
     ///                     for serialization, and \c false otherwise.
+    ///
     virtual bool register_serializable_class(
         mi::base::Uuid                      class_id,
         mi::neuraylib::IUser_class_factory* factory) const = 0;
@@ -1017,7 +1020,7 @@ public:
     /// and jobs in the distributed database or communicating job results
     /// (see \c mi::neuraylib::IFragmented_job::execute_fragment_remote()).
     ///
-    /// Registering a class for serialization can only be done before \product has been
+    /// Registering a class for serialization can only be done before DiCE library has been
     /// started.
     ///
     /// This templated member function is a wrapper of the non-template variant for the user's
@@ -1058,11 +1061,15 @@ public:
     virtual const char* get_revision() const = 0;
 
     /// Returns the NVIDIA driver version string
+    ///
     /// \return     Returns the detected NVIDIA driver version string.
+    ///
     virtual const char* get_nvidia_driver_version() const = 0;
 
     /// Returns the CUDA runtime version number
+    ///
     /// \return     Returns the detected CUDA runtime version.
+    ///
     virtual mi::Sint32 get_cuda_runtime_version() const = 0;
 
     /// The NVIDIA IndeX library may come with different API to support various

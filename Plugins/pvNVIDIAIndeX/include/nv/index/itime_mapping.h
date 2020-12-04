@@ -24,7 +24,7 @@ namespace index
 /// The user has the ability to specify and implement a custom clock pulse generator to steer the
 /// time-dependent visualization of large-scale data.
 ///
-/// \ingroup nv_index_scene_description_attribute
+/// \ingroup nv_index_utilities
 ///
 class IClock_pulse_generator :
         public mi::base::Interface_declare<0xaaf6c278,0xf36f,0x4d00,0x83,0xd6,0xff,0x9e,0x4a,0xb3,0x2d,0x57>
@@ -66,7 +66,11 @@ public:
     /// \return     Returns the number of time steps.
     ///
     virtual mi::Uint64 get_nb_time_steps() const = 0;
-    virtual void set_nb_time_steps(mi::Uint64) = 0;
+    /// The number of time steps (or key frames) a distributed large-scale dataset shall provide.
+    ///
+    /// \param[in] steps    The number of time steps.
+    ///
+    virtual void set_nb_time_steps(mi::Uint64 steps) = 0;
 
     /// Maps a absolute point in time to a time step.
     ///

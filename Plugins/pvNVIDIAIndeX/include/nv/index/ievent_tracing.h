@@ -1,23 +1,28 @@
 /******************************************************************************
  * Copyright 2020 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
-/// \file
+/// \file ievent_tracing.h
 /// \brief API for recording and reading tracing events.
+///
+/// \ingroup nv_index_performance_measurement
 ///
 /// The IndeX event tracing API is suitable for logging performance values or
 /// monitoring. Besides logging individual values, namespaces exist to provide
 /// groupding for individual events.
 ///
 /// Event tracing works in 2 steps:
-///     - Recording phase : record an event of format <namespace, namespace id, event name, event value>
+///     - Recording phase: record an event of format <namespace, namespace id, event name, event value>
 ///     - Collection phase: all events are collected once per render call inside
 ///       the library. The application is given the trace list through the registered
-///       callback (\c ITrace_collection_handler).
+///       callback (see \c ITrace_collection_handler).
 ///
 /// \attention The strings given to the record calls will be accessed during the
 ///            collection phase as well, so they should have a longer lifetime.
 ///            It is strongly recommended to use string literals:
-/// \code event_tracing->record("mynamespace", 33, "my_event", 200);
+/// \code
+/// // Usage:
+/// event_tracing->record("mynamespace", 33, "my_event", 200);
+/// \endcode
 
 #ifndef NVIDIA_INDEX_ITRACE_EVENTS_H
 #define NVIDIA_INDEX_ITRACE_EVENTS_H
@@ -30,6 +35,7 @@ namespace nv {
 namespace index {
 
 /// Value types for trace events.
+/// \ingroup nv_index_performance_measurement
 enum ITrace_event_type
 {
     NONE            = 0x00,
@@ -42,6 +48,7 @@ enum ITrace_event_type
 };
 
 /// Iterator for accessing individual trace events.
+/// \ingroup nv_index_performance_measurement
 class ITrace_event_iterator
     : public mi::base::Interface_declare<0x55d30b9a,0x4927,0x4150,0x90,0x63,0xd6,0xd6,0x8a,0x40,0xbf,0xf0>
 {
@@ -84,6 +91,8 @@ public:
     virtual void get_value(mi::Float64& value) const = 0;
 };
 
+/// \ingroup nv_index_performance_measurement
+
 /// Interface for reading traces from a collection.
 class ITrace_collection
     : public mi::base::Interface_declare<0xe05ed2f7,0x71da,0x4211,0x87,0x1b,0x46,0xfd,0x3f,0xb8,0x8a,0xbd>
@@ -107,14 +116,17 @@ public:
 };
 
 /// Callback interface for handling a trace collection.
+/// \ingroup nv_index_performance_measurement
 class ITrace_collection_handler
     : public mi::base::Interface_declare<0xb9b64b1b,0x8349,0x4099,0xbe,0x2b,0x86,0x5f,0xca,0x04,0xe0,0x92>
 {
 public:
+    /// Handle a trace collection.
     virtual void handle(ITrace_collection* collection) = 0;
 };
 
 /// Main class that handles trace event collection and recording.
+/// \ingroup nv_index_performance_measurement
 class IEvent_tracing
     : public mi::base::Interface_declare<0x5c604cf0,0xb4ac,0x4c19,0xb8,0xf8,0x2d,0x1c,0xeb,0xa6,0x9c,0xff>
 {

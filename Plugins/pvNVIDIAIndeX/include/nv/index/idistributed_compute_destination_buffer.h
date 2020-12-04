@@ -294,8 +294,8 @@ public:
     {
         Buffer_layout                           layout;         ///<! The buffer layout can be either 1- or 2-dimensional.
         /// Texture destination buffer format.
-        Buffer_format                           format;         ///<! Buffer format desprition
-        mi::math::Bbox_struct<mi::Float32, 2>   covered_area;   ///<! Covered 2d area in screen space
+        Buffer_format                           format;         ///<! Buffer format desprition.
+        mi::math::Bbox_struct<mi::Float32, 2>   covered_area;   ///<! Covered 2d area in screen space.
         mi::math::Vector_struct<mi::Uint32, 2>  resolution;     ///<! Resolution of the buffer.
     };
 

@@ -42,6 +42,7 @@ public:
     ///////////////////////////////////////////////////////////////////////////////////
     /// \name Creating a scene.
     ///@{
+
     /// Creates a new scene for the current session.
     ///
     /// \note Only a single scene can be created for each session.
@@ -60,6 +61,7 @@ public:
     /// \return     Returns the tag that references an \c IScene interface.
     ///
     virtual mi::neuraylib::Tag_struct get_scene() const = 0;
+
     ///@}
 
 
@@ -88,6 +90,7 @@ public:
     ///////////////////////////////////////////////////////////////////////////////////
     /// \name Creating a camera.
     ///@{
+
     /// Creates a new camera object.
     ///
     /// \param[in]  dice_transaction    The DiCE transaction to store the new camera in
@@ -109,20 +112,24 @@ public:
         mi::neuraylib::IDice_transaction*       dice_transaction,
         const mi::base::Uuid&                   camera_type_uuid = IPerspective_camera::IID(),
         const char*                             camera_name = 0) const = 0;
+
     ///@}
 
     ///////////////////////////////////////////////////////////////////////////////////
     /// \name Global configurations and states.
     ///@{
+
     /// Returns the configuration settings of this  session.
     /// \return Tag of an \c IConfig_settings object
     ///
     virtual mi::neuraylib::Tag_struct get_config() const = 0;
+
     ///@}
     
     ///////////////////////////////////////////////////////////////////////////////////
     /// \name Data distribution.
     ///@{
+
     ///
     /// Returns the factory that exposes access to the distributed large-scale datasets.
     ///
@@ -138,11 +145,13 @@ public:
     ///             interface class.
     ///
     virtual mi::neuraylib::Tag_struct get_distribution_layout() const = 0;
+
     ///@}
 
     ///////////////////////////////////////////////////////////////////////////////////
     /// \name Multi-view support.
     ///@{
+
     /// Creates a new viewport.
     ///
     /// \return     Returns the new \c IViewport object. The caller
@@ -169,12 +178,14 @@ public:
     ///             anymore, i.e. by storing it in a \c mi::base::Handle.
     ///
     virtual ICanvas_viewport_list* create_canvas_viewport_list() const = 0;
+
     ///@}
 
 
     ///////////////////////////////////////////////////////////////////////////////////
     /// \name Convenience interface class.
     ///@{
+
     /// The convenience interface class allows an application-writer to perform common manipulations
     /// on a scene's configuration and, thus, reduces the efforts for tinker with the hierarchical
     /// scene description.
@@ -188,12 +199,14 @@ public:
     ///             superfluous over time.
     ///
     virtual IScene_convenience_manipulation* get_conveniences() const = 0;
+
     ///@}
 
 
     ///////////////////////////////////////////////////////////////////////////////////
     /// \name Global configurations and states.
     ///@{
+
     /// Controls how the export will be performed by #export_session().
     ///
     enum Export_mode {
@@ -268,6 +281,7 @@ public:
         mi::Uint32                        export_mode,
         mi::IString*                      output,
         mi::neuraylib::IDice_transaction* dice_transaction) const = 0;
+        
     ///@}
 };
 

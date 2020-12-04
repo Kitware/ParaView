@@ -124,8 +124,11 @@ public:
     /// Returns if the pre-integrated volume rendering is enabled or disabled.
     virtual bool                        get_preintegrated_volume_rendering() const = 0;
 
-    /// Internal debugging options.
+    /// Internal debugging options applied to the visualization.
+    /// \param[in] o    Debug option applied to the visualization.   
     virtual void                        set_debug_visualization_option(mi::Uint32 o) = 0;
+    /// Internal debugging options applied to the visualization.
+    /// \return         Returns the applied debug option.  
     virtual mi::Uint32                  get_debug_visualization_option() const = 0;
 };
 
