@@ -1,0 +1,108 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- =================================================================== -->
+    <SourceProxy name="OpenPMDReader"
+                 label="openPMD Reader"
+                 class="paraview.algorithms.openpmd.openPMDReader"
+                 si_class="vtkSIPythonSourceProxy">
+
+      <Documentation>
+        Reader for openPMD files.
+      </Documentation>
+
+      <OutputPort index="0" name="Meshes" />
+      <OutputPort index="1" name="Particles" />
+
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>Specify the file name.</Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty information_only="1" name="TimestepValues" repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+
+      <StringVectorProperty name="ArraysInfo"
+        command="GetDataArraySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="Arrays"
+        command="GetDataArraySelection"
+        information_property="ArraysInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="ArraysInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the arrays to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SpeciesInfo"
+        command="GetSpeciesSelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="Species"
+        command="GetSpeciesSelection"
+        information_property="SpeciesInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="SpeciesInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the species to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="cell" />
+        </Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ParticleArraysInfo"
+        command="GetParticleArraySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="ParticleArrays"
+        command="GetParticleArraySelection"
+        information_property="ParticleArraysInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="ParticleArraysInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the particle-arrays to read.</Documentation>
+        <Hints>
+          <ArraySelectionWidget icon_type="point" />
+        </Hints>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="pmd" file_description="openPMD files" />
+      </Hints>
+
+      <!-- end of OpenPMDReader -->
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

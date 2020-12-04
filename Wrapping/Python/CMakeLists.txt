@@ -2,6 +2,8 @@ set(python_files
   paraview/__init__.py
   paraview/_backwardscompatibilityhelper.py
   paraview/_colorMaps.py
+  paraview/algorithms/__init__.py
+  paraview/algorithms/openpmd.py
   paraview/apps/__init__.py
   paraview/apps/__main__.py
   paraview/apps/_internals.py
