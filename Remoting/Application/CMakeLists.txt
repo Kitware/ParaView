@@ -372,5 +372,10 @@ if (TARGET VTK::IOIoss AND FALSE) # disabling for now
     Resources/readers_ioioss.xml)
 endif()
 
+if (PARAVIEW_USE_PYTHON)
+  list(APPEND xml_files
+    Resources/readers_openpmd.xml)
+endif()
+
 paraview_add_server_manager_xmls(
   XMLS  ${xml_files})
