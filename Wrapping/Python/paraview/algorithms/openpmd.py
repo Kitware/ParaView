@@ -1,14 +1,14 @@
 from vtkmodules.util.vtkAlgorithm import VTKPythonAlgorithmBase
-import numpy as np
 
 from .. import print_error
 
 try:
+    import numpy as np
     import openpmd_api as io
     _has_openpmd = True
 except ImportError as ie:
     print_error(
-        "Failed to import 'openpmd_api'. Algorithms in this module may "
+        "Missing required Python modules/packages. Algorithms in this module may "
         "not work as expected! \n {0}".format(ie))
     _has_openpmd = False
 
