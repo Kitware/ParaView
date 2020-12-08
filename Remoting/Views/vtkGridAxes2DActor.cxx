@@ -249,10 +249,9 @@ void vtkGridAxes2DActor::GetActors(vtkPropCollection* props)
         this->UpdateGeometry(vp, true);
       }
     }
+    this->PlaneActor->GetActors(props);
+    this->Labels->GetActors(props);
   }
-
-  this->PlaneActor->GetActors(props);
-  this->Labels->GetActors(props);
 }
 
 //----------------------------------------------------------------------------
