@@ -132,7 +132,7 @@ public:
 
 protected:
   vtkCPProcessor();
-  virtual ~vtkCPProcessor();
+  ~vtkCPProcessor() override;
 
   /// Create a new instance of the InitializationHelper.
   virtual vtkObject* NewInitializationHelper();
