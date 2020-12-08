@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkCPPythonScriptV2Pipeline.h"
 
+#include "vtkCPDataDescription.h"
 #include "vtkCPPythonScriptV2Helper.h"
 #include "vtkLogger.h"
 #include "vtkObjectFactory.h"
@@ -52,8 +53,10 @@ int vtkCPPythonScriptV2Pipeline::RequestDataDescription(vtkCPDataDescription* da
     return 1;
   }
 
-  return this->Helper->IsImported() && this->Helper->RequestDataDescription(dataDescription) ? 1
-                                                                                             : 0;
+  return (this->Helper->IsImported() && this->Helper->RequestDataDescription(dataDescription) &&
+           dataDescription->GetIfAnyGridNecessary())
+    ? 1
+    : 0;
 }
 
 //----------------------------------------------------------------------------
