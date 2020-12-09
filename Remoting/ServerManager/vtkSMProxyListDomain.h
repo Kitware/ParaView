@@ -162,6 +162,14 @@ public:
    */
   int SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values) override;
 
+  //@{
+  /**
+   * Set and Get the default proxy index.
+   */
+  vtkSetMacro(DefaultIndex, unsigned int);
+  vtkGetMacro(DefaultIndex, unsigned int);
+  //@}
+
   /**
    * Sets log name for each of the proxy in the domain using the prefix
    * provided.
@@ -193,6 +201,8 @@ protected:
 
   friend class vtkSMProxyProperty;
   void SetProxies(vtkSMProxy** proxies, unsigned int count);
+
+  unsigned int DefaultIndex = 0;
 
 private:
   vtkSMProxyListDomain(const vtkSMProxyListDomain&) = delete;
