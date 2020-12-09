@@ -22,8 +22,17 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 if (res)
-  message(FATAL_ERROR
-    "Failed to get the remote url for the submodule: ${err}")
+  execute_process(
+    COMMAND "${GIT_COMMAND}" config --get remote.origin.url
+    OUTPUT_VARIABLE remote_url
+    RESULT_VARIABLE res
+    ERROR_VARIABLE err
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+  if (res)
+    message(FATAL_ERROR
+      "Failed to get the remote url for the submodule: ${err}")
+  endif ()
 endif ()
 
 # Take the "directory" of the source project path and append the "filename" of
