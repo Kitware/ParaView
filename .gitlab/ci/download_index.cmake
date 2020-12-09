@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 3.12)
 
 set(index_url_root "https://www.paraview.org/files/dependencies")
 
-set(index_version "5.9.20201028")
+set(index_version "5.9.20201204")
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "vs2019")
   set(index_subdir "nvidia-index-libs-${index_version}-windows-x64")
-  set(sha256sum "5e79126201d1b7dc33367168d3e11dc0c04e5d79e8e5caa0f778dd0aa774c92d")
+  set(sha256sum "a238ebf9d63ca56f5f3253302368731be1f2a58cc65c19275d4c676b59266859")
 else ()
   message(FATAL_ERROR
     "Unknown platform for IndeX")
