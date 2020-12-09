@@ -53,11 +53,11 @@ struct PhysicalGroup
   std::string Name = "";
 
   vtkSmartPointer<vtkIntArray> EntityIds;
-  std::unordered_map<unsigned long, unsigned long> CellCorrespondence;
+  std::unordered_map<std::size_t, std::size_t> CellCorrespondence;
 
   // Elements by type ------------
   gmsh::vectorpair ElemType;       // [typeIndex]
-  Array2D<unsigned long> ElemTags; // [typeIndex]{tags}
+  Array2D<std::size_t> ElemTags;   // [typeIndex]{tags}
   Array2D<vtkIdType> ElemNodeTags; // [typeIndex]{nodeTags}
   // -------------------- Elements
 
@@ -69,7 +69,7 @@ struct GmshReaderInternal
 {
   vtkSmartPointer<vtkPoints> NodesCoords;
   vtkSmartPointer<vtkIntArray> NodeIds;
-  std::vector<unsigned long> NodeCorrespondence;
+  std::vector<std::size_t> NodeCorrespondence;
 
   std::vector<PhysicalGroup> Groups;
   bool IsLoaded = false;
@@ -94,9 +94,8 @@ const std::unordered_map<GmshPrimitive, std::pair<int, int>, std::hash<GmshPrimi
 //-----------------------------------------------------------------------------
 namespace
 {
-void GetElements(gmsh::vectorpair& elemTypes, Array2D<unsigned long>& elemTags,
-  Array2D<vtkIdType>& nodeTags, const std::vector<unsigned long>& correspondence, int dim,
-  int entity)
+void GetElements(gmsh::vectorpair& elemTypes, Array2D<std::size_t>& elemTags,
+  Array2D<vtkIdType>& nodeTags, const std::vector<std::size_t>& correspondence, int dim, int entity)
 {
   elemTypes.clear();
   elemTags.clear();
@@ -104,11 +103,11 @@ void GetElements(gmsh::vectorpair& elemTypes, Array2D<unsigned long>& elemTags,
   std::vector<int> gmshTypes;
 
   {
-    Array2D<unsigned long> nodeTagsUL;
+    Array2D<std::size_t> nodeTagsUL;
     gmsh::model::mesh::getElements(gmshTypes, elemTags, nodeTagsUL, dim, entity);
-    // Convert unsigned long nodeTagsUL 2Dvector to a vtkIdType 2Dvector
+    // Convert std::size_t nodeTagsUL 2Dvector to a vtkIdType 2Dvector
     nodeTags.resize(nodeTagsUL.size());
-    for (size_t i = 0; i < nodeTagsUL.size(); ++i)
+    for (std::size_t i = 0; i < nodeTagsUL.size(); ++i)
     {
       nodeTags[i].resize(nodeTagsUL[i].size());
       std::copy(nodeTagsUL[i].begin(), nodeTagsUL[i].end(), nodeTags[i].begin());
@@ -124,7 +123,7 @@ void GetElements(gmsh::vectorpair& elemTypes, Array2D<unsigned long>& elemTags,
     if (vtkTypeAndDimIt != GmshReaderInternal::TRANSLATE_CELL.end())
     {
       elemTypes[i] = vtkTypeAndDimIt->second;
-      for (unsigned long j = 0; j < nodeTags[i].size(); ++j)
+      for (std::size_t j = 0; j < nodeTags[i].size(); ++j)
       {
         nodeTags[i][j] = correspondence[nodeTags[i][j]];
       }
@@ -160,10 +159,10 @@ vtkGmshReader::~vtkGmshReader()
 //-----------------------------------------------------------------------------
 int vtkGmshReader::LoadNodes()
 {
-  std::vector<unsigned long> gmshTags;
+  std::vector<std::size_t> gmshTags;
   std::vector<double> gmshCoords, _dummy;
   gmsh::model::mesh::getNodes(gmshTags, gmshCoords, _dummy, -1, -1, false, false);
-  const unsigned long nbNodes = gmshTags.size();
+  const std::size_t nbNodes = gmshTags.size();
 
   if (nbNodes == 0)
   {
@@ -190,7 +189,7 @@ int vtkGmshReader::LoadNodes()
 
   this->Internal->NodeCorrespondence.resize((*max) + 1);
 
-  for (unsigned long i = 0; i < nbNodes; ++i)
+  for (std::size_t i = 0; i < nbNodes; ++i)
   {
     this->Internal->NodeIds->SetValue(i, gmshTags[i]);
     this->Internal->NodeCorrespondence[gmshTags[i]] = i;
@@ -255,7 +254,7 @@ void vtkGmshReader::FillGroupElements(PhysicalGroup& group) const
     std::vector<int> entities;
     gmsh::model::getEntitiesForPhysicalGroup(group.Dimension, group.Tag, entities);
     gmsh::vectorpair tmpElmTypes;
-    Array2D<unsigned long> tmpElmTags;
+    Array2D<std::size_t> tmpElmTags;
     Array2D<vtkIdType> tmpNodeTags;
 
     for (int entity : entities)
@@ -274,10 +273,10 @@ void vtkGmshReader::FillGroupElements(PhysicalGroup& group) const
   }
 
   group.CellCorrespondence.clear();
-  unsigned long counter = 0;
+  std::size_t counter = 0;
   for (const auto& tags : group.ElemTags)
   {
-    for (unsigned long tag : tags)
+    for (std::size_t tag : tags)
     {
       group.CellCorrespondence[tag] = counter;
       ++counter;
@@ -298,25 +297,25 @@ void vtkGmshReader::FillGroupEntities(PhysicalGroup& group) const
     gmsh::vectorpair dimTags;
     gmsh::model::getEntities(dimTags, group.Dimension);
     tags.resize(dimTags.size());
-    for (size_t i = 0; i < dimTags.size(); ++i)
+    for (std::size_t i = 0; i < dimTags.size(); ++i)
     {
       tags[i] = dimTags[i].second;
     }
   }
-  const unsigned long nbCells = group.CellCorrespondence.size();
+  const std::size_t nbCells = group.CellCorrespondence.size();
   group.EntityIds = vtkSmartPointer<vtkIntArray>::New();
   group.EntityIds->SetName("gmshEntityId");
   group.EntityIds->SetNumberOfComponents(1);
   group.EntityIds->SetNumberOfTuples(nbCells);
 
   std::vector<int> _dummy;
-  Array2D<unsigned long> elemTags, _dummyy;
+  Array2D<std::size_t> elemTags, _dummyy;
   for (const auto& entityTag : tags)
   {
     gmsh::model::mesh::getElements(_dummy, elemTags, _dummyy, group.Dimension, entityTag);
     for (const auto& tagsByType : elemTags)
     {
-      for (unsigned long elmTag : tagsByType)
+      for (std::size_t elmTag : tagsByType)
       {
         group.EntityIds->SetValue(group.CellCorrespondence[elmTag], entityTag);
       }
@@ -328,7 +327,7 @@ void vtkGmshReader::FillGroupEntities(PhysicalGroup& group) const
 void vtkGmshReader::FillSubDataArray(int viewTag, int viewIdx, int step)
 {
   std::string dataType, name;
-  std::vector<unsigned long> tags;
+  std::vector<std::size_t> tags;
   std::vector<double> data;
   int nbOfComponents;
   double time;
@@ -346,7 +345,7 @@ void vtkGmshReader::FillSubDataArray(int viewTag, int viewIdx, int step)
     const int nbOfTuples = tags.size();
 
     // Translate node tags into vtk indexes
-    for (unsigned long& t : tags)
+    for (std::size_t& t : tags)
     {
       t = this->Internal->NodeCorrespondence[t];
     }
@@ -372,7 +371,7 @@ void vtkGmshReader::FillSubDataArray(int viewTag, int viewIdx, int step)
   {
     for (PhysicalGroup& group : this->Internal->Groups)
     {
-      const unsigned long nbOfCells = group.CellCorrespondence.size();
+      const std::size_t nbOfCells = group.CellCorrespondence.size();
 
       vtkSmartPointer<vtkDoubleArray> vtkData = vtkSmartPointer<vtkDoubleArray>::New();
       vtkData->SetName(name.c_str());
@@ -380,14 +379,14 @@ void vtkGmshReader::FillSubDataArray(int viewTag, int viewIdx, int step)
       vtkData->SetNumberOfTuples(nbOfCells);
 
       // Set actual values for vtkData
-      for (unsigned long tagIdx = 0; tagIdx < tags.size(); ++tagIdx)
+      for (std::size_t tagIdx = 0; tagIdx < tags.size(); ++tagIdx)
       {
-        const unsigned long& cellTag = tags[tagIdx];
+        const std::size_t& cellTag = tags[tagIdx];
         const auto findTagIt = group.CellCorrespondence.find(cellTag);
 
         if (findTagIt != group.CellCorrespondence.end())
         {
-          const unsigned long newTag = group.CellCorrespondence[cellTag];
+          const std::size_t newTag = group.CellCorrespondence[cellTag];
           vtkData->SetTuple(newTag, &data[tagIdx * nbOfComponents]);
         }
       }
@@ -521,7 +520,7 @@ void vtkGmshReader::FillGrid(vtkUnstructuredGrid* grid, int groupIdx, double tim
 
   // Preallocate the destination grid for cells
   const PhysicalGroup& group = this->Internal->Groups[groupIdx];
-  const unsigned long nbCells = group.CellCorrespondence.size();
+  const std::size_t nbCells = group.CellCorrespondence.size();
   grid->AllocateEstimate(nbCells, 8);
 
   vtkNew<vtkIntArray> cellIds;
@@ -529,11 +528,11 @@ void vtkGmshReader::FillGrid(vtkUnstructuredGrid* grid, int groupIdx, double tim
   cellIds->SetNumberOfComponents(1);
   cellIds->SetNumberOfTuples(nbCells);
 
-  for (unsigned long elmIdx = 0, counter = 0; elmIdx < group.ElemType.size(); ++elmIdx)
+  for (std::size_t elmIdx = 0, counter = 0; elmIdx < group.ElemType.size(); ++elmIdx)
   {
     const int vtkType = group.ElemType[elmIdx].first;
     const int nbOfComponents = group.ElemType[elmIdx].second;
-    for (size_t i = 0; i < group.ElemTags[elmIdx].size(); ++i)
+    for (std::size_t i = 0; i < group.ElemTags[elmIdx].size(); ++i)
     {
       grid->InsertNextCell(
         vtkType, nbOfComponents, &group.ElemNodeTags[elmIdx][i * nbOfComponents]);
@@ -564,7 +563,7 @@ void vtkGmshReader::FillGrid(vtkUnstructuredGrid* grid, int groupIdx, double tim
     }
     else
     {
-      for (size_t i = 0; i < data.Times.size(); ++i)
+      for (std::size_t i = 0; i < data.Times.size(); ++i)
       {
         if (data.Times[i] == time)
         {

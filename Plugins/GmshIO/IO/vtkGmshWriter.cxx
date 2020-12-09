@@ -47,7 +47,7 @@ struct GmshWriterInternal
   std::vector<std::string> CellViews;
   std::string ModelName;
 
-  std::vector<unsigned long> CellDataIndex;
+  std::vector<std::size_t> CellDataIndex;
 
   double* TimeSteps = nullptr;
   unsigned int NumberOfTimeSteps = 0;
@@ -76,7 +76,7 @@ namespace
 // Reorder voxel vertices as hexahedron vertices to support it with Gmsh.
 // `cellArray` contains a lot a cell vertices, while `idx` is the index of the
 // first vertex for the current voxel
-void OrderVoxel(std::vector<unsigned long>& cellArray, unsigned long idx)
+void OrderVoxel(std::vector<std::size_t>& cellArray, std::size_t idx)
 {
   std::swap(cellArray[idx + 2], cellArray[idx + 3]);
   std::swap(cellArray[idx + 6], cellArray[idx + 7]);
@@ -85,20 +85,20 @@ void OrderVoxel(std::vector<unsigned long>& cellArray, unsigned long idx)
 // Reorder pixel vertices as quad vertices to support it with Gmsh.
 // `cellArray` contains a lot a cell vertices, while `idx` is the index of the
 // first vertex for the current pixel
-void OrderPixel(std::vector<unsigned long>& cellArray, unsigned long idx)
+void OrderPixel(std::vector<std::size_t>& cellArray, std::size_t idx)
 {
   std::swap(cellArray[idx + 2], cellArray[idx + 3]);
 }
 
 // Transform VTK types not supported by Gmsh (like triange strips or polylines)
 // as simpler primitives.
-void AddTriangulatedCell(std::vector<unsigned long>& nodeTags,
-  std::vector<unsigned long>& newTypeIndexes, const std::vector<unsigned long>& oldTypeIndexes,
+void AddTriangulatedCell(std::vector<std::size_t>& nodeTags,
+  std::vector<std::size_t>& newTypeIndexes, const std::vector<std::size_t>& oldTypeIndexes,
   GmshWriterInternal* internal, vtkIdType& cellCounterId, const int dim)
 {
-  for (unsigned long idx : oldTypeIndexes)
+  for (std::size_t idx : oldTypeIndexes)
   {
-    const unsigned long vtkIdx = idx - 1u;
+    const std::size_t vtkIdx = idx - 1u;
     vtkCell* cell = internal->Input->GetCell(vtkIdx);
     vtkNew<vtkIdList> ptIds;
     vtkNew<vtkPoints> points;
@@ -120,7 +120,7 @@ void AddTriangulatedCell(std::vector<unsigned long>& nodeTags,
 
 // Add every supported VTK cells in the gmsh model by type.
 void FillCells(const int modelTag, GmshWriterInternal* internal,
-  std::vector<unsigned long> idxPerType[], vtkUnstructuredGrid* input, vtkDataArray* offsets,
+  std::vector<std::size_t> idxPerType[], vtkUnstructuredGrid* input, vtkDataArray* offsets,
   vtkDataArray* connectivity)
 {
   vtkIdType cellCounterId = 1;
@@ -129,7 +129,7 @@ void FillCells(const int modelTag, GmshWriterInternal* internal,
 
   for (unsigned char currentType = 1; currentType < GmshWriterInternal::MAX_TAG; ++currentType)
   {
-    std::vector<unsigned long>& indexes = idxPerType[currentType];
+    std::vector<std::size_t>& indexes = idxPerType[currentType];
     if (indexes.empty())
     {
       continue;
@@ -144,10 +144,10 @@ void FillCells(const int modelTag, GmshWriterInternal* internal,
     }
 
     // Add cells for this vtk type
-    std::vector<unsigned long> gmshNodeTags;
-    for (unsigned long idx : indexes)
+    std::vector<std::size_t> gmshNodeTags;
+    for (std::size_t idx : indexes)
     {
-      const unsigned long vtkIdx = idx - 1;
+      const std::size_t vtkIdx = idx - 1;
       const int beginCell = gmshNodeTags.size();
       long offsetBegin = static_cast<long>(*offsets->GetTuple(vtkIdx));
       long offsetEnd = static_cast<long>(*offsets->GetTuple(vtkIdx + 1));
@@ -171,7 +171,7 @@ void FillCells(const int modelTag, GmshWriterInternal* internal,
     }
 
     // Generate gmsh ids
-    std::vector<unsigned long> gmshIds(indexes.size());
+    std::vector<std::size_t> gmshIds(indexes.size());
     std::iota(gmshIds.begin(), gmshIds.end(), cellCounterId);
     cellCounterId += gmshIds.size();
 
@@ -231,7 +231,7 @@ void vtkGmshWriter::LoadNodes()
     }
   }
 
-  std::vector<unsigned long> gmshTags(numTuples);
+  std::vector<std::size_t> gmshTags(numTuples);
   std::iota(gmshTags.begin(), gmshTags.end(), 1u);
 
   gmsh::model::mesh::addNodes(
@@ -246,7 +246,7 @@ void vtkGmshWriter::LoadCells()
   // Build list of gmsh indexes per type
   vtkCellArray* cells = input->GetCells();
   vtkUnsignedCharArray* cellType = input->GetCellTypesArray();
-  std::vector<unsigned long> indexesPerTypes[GmshWriterInternal::MAX_TAG];
+  std::vector<std::size_t> indexesPerTypes[GmshWriterInternal::MAX_TAG];
 
   for (vtkIdType i = 0; i < cells->GetNumberOfCells(); ++i)
   {
@@ -277,7 +277,7 @@ void vtkGmshWriter::LoadNodeData()
   const vtkIdType numTuples =
     pointData->GetAbstractArray(pointData->GetArrayName(0))->GetNumberOfTuples();
   // Generate Gmsh tags
-  std::vector<unsigned long> tags(numTuples);
+  std::vector<std::size_t> tags(numTuples);
   std::iota(tags.begin(), tags.end(), 1);
 
   for (int arrayId = 0; arrayId < numVtkArrays; ++arrayId)
@@ -321,7 +321,7 @@ void vtkGmshWriter::LoadCellData()
 
   const int vtkArrayOffset = this->Internal->NodeViews.size();
   // Generate Gmsh tags
-  std::vector<unsigned long> tags(this->Internal->CellDataIndex.size());
+  std::vector<std::size_t> tags(this->Internal->CellDataIndex.size());
   std::iota(tags.begin(), tags.end(), 1);
 
   for (int arrayId = 0; arrayId < numVtkArrays; ++arrayId)
@@ -335,7 +335,7 @@ void vtkGmshWriter::LoadCellData()
     // Store it in a structure Gmsh can understand
     std::vector<double> gmshData(this->Internal->CellDataIndex.size() * numComponents);
     vtkIdType counter = 0;
-    for (unsigned long idx : this->Internal->CellDataIndex)
+    for (std::size_t idx : this->Internal->CellDataIndex)
     {
       for (int j = 0; j < numComponents; ++j)
       {
