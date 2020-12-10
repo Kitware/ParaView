@@ -22,7 +22,7 @@
 
 .fedora33:
     extends: .linux
-    image: "kitware/paraview:ci-fedora33-20201118"
+    image: "kitware/paraview:ci-fedora33-20201202"
 
 .fedora31_icc:
     extends: .linux
@@ -34,16 +34,18 @@
 
 .fedora_mpich_addon:
     variables:
-        CMAKE_PREFIX_PATH: /usr/lib64/mpich
-        LD_LIBRARY_PATH: /usr/lib64/mpich/lib
+        MODULES: mpi/mpich-x86_64
+        # Even with SHM size of 512m, SIGBUS still happened. Let's just use the
+        # network instead for reliability.
+        # https://wiki.mpich.org/mpich/index.php/Frequently_Asked_Questions#Q:_Why_MPI_Put_raises_SIGBUS_error_inside_docker.3F
+        MPIR_CVAR_NOLOCAL: 1
 
 .fedora_openmpi_addon:
     variables:
         # Needed to work with OpenMPI
         OMPI_ALLOW_RUN_AS_ROOT: 1
         OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
-        CMAKE_PREFIX_PATH: /usr/lib64/openmpi
-        LD_LIBRARY_PATH: /usr/lib64/openmpi/lib
+        MODULES: mpi/openmpi-x86_64
 
 .fedora31_shared_icc_mpi_python:
     extends:
@@ -77,6 +79,15 @@
     variables:
         CMAKE_CONFIGURATION: fedora33_shared_mpi_python_core
 
+.fedora33_shared_debug_mpi_python_qt:
+    extends:
+        - .fedora33
+        - .fedora_mpich_addon
+
+    variables:
+        CMAKE_CONFIGURATION: fedora33_shared_mpi_python_qt
+        CMAKE_BUILD_TYPE: Debug
+
 .linux_builder_tags:
     tags:
         - build
@@ -106,6 +117,8 @@
     - git submodule foreach --recursive cmake "-Dusername:STRING=$CI_PROJECT_NAMESPACE" "-Durl_prefix:STRING=https://$CI_SERVER_HOST" -P "$PWD/.gitlab/ci/fetch_submodule.cmake"
     - git submodule sync --recursive
     - git submodule update --init --recursive
+    # Load any modules that may be necessary.
+    - '[ -n "$MODULES" ] && . /etc/profile.d/modules.sh && module load $MODULES'
     # Enable the Intel compiler if required.
     - '[ "$CC" = "icc" ] && source /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64 || true'
 
