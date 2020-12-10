@@ -8,7 +8,7 @@
         "url"   : "https://gitlab.kitware.com/paraview/paraview.git"
     },
     "bugs": {
-        "url"   : "http://www.paraview.org/Bug/my_view_page.php"
+        "url"   : "https://gitlab.kitware.com/paraview/paraview/-/issues"
     },
     "keywords": [
         "Large data visualization",
