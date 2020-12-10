@@ -1,7 +1,7 @@
 # Stock CI builds test everything possible (platforms will disable modules as
 # needed).
 set(PARAVIEW_BUILD_LEGACY_REMOVE ON CACHE BOOL "")
-set(PARAVIEW_BUILD_TESTING WANT CACHE BOOL "")
+set(PARAVIEW_BUILD_TESTING WANT CACHE STRING "")
 set(PARAVIEW_BUILD_EXAMPLES ON CACHE BOOL "")
 
 set(VTK_DEBUG_LEAKS ON CACHE BOOL "")

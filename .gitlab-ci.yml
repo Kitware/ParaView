@@ -54,7 +54,7 @@ test:fedora33-static-mpi-offscreen-osmesa-python:
     extends:
         - .fedora33_static_mpi_offscreen_osmesa_python
         - .cmake_test_linux
-        - .linux_tester_tags
+        - .linux_builder_tags
         - .cmake_test_artifacts
         - .run_automatically
     dependencies:
@@ -82,8 +82,31 @@ test:fedora31-shared-icc-mpi-python:
     needs:
         - build:fedora31-shared-icc-mpi-python
 
+build:fedora33-shared-debug-mpi-python-qt:
+    extends:
+        - .fedora33_shared_debug_mpi_python_qt
+        - .cmake_build_linux
+        - .linux_builder_tags
+        - .cmake_build_artifacts
+        - .run_manually
 
-## editions
+test:fedora33-shared-debug-mpi-python-qt:
+    extends:
+        - .fedora33_shared_debug_mpi_python_qt
+        - .cmake_test_linux
+        - .linux_tester_tags
+        - .cmake_test_artifacts
+        - .run_automatically
+    dependencies:
+        - build:fedora33-shared-debug-mpi-python-qt
+    needs:
+        - build:fedora33-shared-debug-mpi-python-qt
+    timeout: 90 minutes
+    # some tests are failing. investigation needed
+    allow_failure: true
+
+## Catalyst editions
+
 build:fedora33-shared-mpi-core:
     extends:
         - .fedora33_shared_mpi_core
