@@ -970,6 +970,16 @@ function (paraview_add_plugin name)
         "The `MODULE_FILES` argument requires `MODULES` to be provided.")
     endif ()
 
+    if (_paraview_build_ADD_INSTALL_RPATHS)
+      if (APPLE)
+        list(INSERT CMAKE_INSTALL_RPATH 0
+          "@loader_path")
+      elseif (UNIX)
+        list(INSERT CMAKE_INSTALL_RPATH 0
+          "$ORIGIN")
+      endif ()
+    endif ()
+
     set(_paraview_add_plugin_module_install_export_args)
     if (DEFINED _paraview_add_plugin_MODULE_INSTALL_EXPORT)
       list(APPEND _paraview_add_plugin_module_install_export_args
