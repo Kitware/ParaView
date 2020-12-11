@@ -52,6 +52,7 @@ set(classes
   vtkSMAnimationFrameWindowDomain
   vtkSMAnimationScene
   vtkSMAnimationSceneGeometryWriter
+  vtkSMAnimationSceneWebWriter
   vtkSMAnimationSceneProxy
   vtkSMAnimationSceneWriter
   vtkSMSaveAnimationExtractsProxy

@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqFileMenuBuilder.h"
 
 #include "pqAboutDialogReaction.h"
+#include "pqAnimatedExportReaction.h"
 #include "pqAnimationTimeToolbar.h"
 #include "pqApplicationCore.h"
 #include "pqApplicationSettingsReaction.h"
@@ -178,6 +179,11 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   new pqSaveAnimationGeometryReaction(ui.actionFileSaveGeometry);
 
   new pqExportReaction(ui.actionExport);
+#if VTK_MODULE_ENABLE_ParaView_pqPython
+  new pqAnimatedExportReaction(ui.actionAnimatedExport);
+#else
+  ui.actionAnimatedExport->setEnabled(false);
+#endif
   new pqSaveExtractsReaction(ui.actionFileSaveExtracts);
   new pqSaveDataReaction(ui.actionFileSaveData);
 

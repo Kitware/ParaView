@@ -1815,6 +1815,7 @@ endif()
 #   script
 #----------------------------------------------------------------------
 set(paraview_python_verify_tests
+  AnimatedExportScene
   ExportSceneSpreadSheetView
 )
 
