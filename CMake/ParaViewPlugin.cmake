@@ -289,7 +289,7 @@ paraview_plugin_build(
     themselves. Each plugin lives in a directory of its name in
     `<RUNTIME_DESTINATION>/<LIBRARY_SUBDIRECTORY>` (for Windows) or
     `<LIBRARY_DESTINATION>/<LIBRARY_SUBDIRECTORY>` for other platforms.
-  * `ADD_INSTALL_RPATHS`: (Defaults to `OFF`) If specified, an RPATH to load
+  * `ADD_INSTALL_RPATHS`: (Defaults to `ON`) If specified, an RPATH to load
     dependent libraries from the `LIBRARY_DESTINATION` from the plugins will be
     added.
   * `PLUGINS_FILE_NAME`: The name of the XML plugin file to generate for the
@@ -334,7 +334,7 @@ function (paraview_plugin_build)
   endif ()
 
   if (NOT DEFINED _paraview_build_ADD_INSTALL_RPATHS)
-    set(_paraview_build_ADD_INSTALL_RPATHS OFF)
+    set(_paraview_build_ADD_INSTALL_RPATHS ON)
   endif ()
   if (_paraview_build_ADD_INSTALL_RPATHS)
     if (NOT _paraview_build_LIBRARY_SUBDIRECTORY STREQUAL "")
@@ -968,6 +968,16 @@ function (paraview_add_plugin name)
     if (NOT _paraview_add_plugin_MODULES)
       message(FATAL_ERROR
         "The `MODULE_FILES` argument requires `MODULES` to be provided.")
+    endif ()
+
+    if (_paraview_build_ADD_INSTALL_RPATHS)
+      if (APPLE)
+        list(INSERT CMAKE_INSTALL_RPATH 0
+          "@loader_path")
+      elseif (UNIX)
+        list(INSERT CMAKE_INSTALL_RPATH 0
+          "$ORIGIN")
+      endif ()
     endif ()
 
     set(_paraview_add_plugin_module_install_export_args)
