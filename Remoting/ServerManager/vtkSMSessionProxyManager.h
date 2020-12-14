@@ -447,13 +447,16 @@ public:
   /**
    * Returns the XML state for the proxy manager. If a non-empty set of proxies
    * is passed, then state is limited to those chosen proxies.
+   * If forceRestriction is true, then state will be limited even when the
+   * restrictionSet is non-empty.
    *
    * Unlike `SaveXMLState`, this does not fire the `vtkCommand::SaveStateEvent`.
    * This API is primarily intended for use-cases where complete application XML
    * state is not being saved.
    */
   vtkSmartPointer<vtkPVXMLElement> GetXMLState() { return this->GetXMLState({}); }
-  vtkSmartPointer<vtkPVXMLElement> GetXMLState(const std::set<vtkSMProxy*>& restrictionSet);
+  vtkSmartPointer<vtkPVXMLElement> GetXMLState(
+    const std::set<vtkSMProxy*>& restrictionSet, bool forceRestriction = false);
   //@}
 
   /**
