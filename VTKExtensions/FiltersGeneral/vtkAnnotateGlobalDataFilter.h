@@ -13,32 +13,30 @@
 
 =========================================================================*/
 /**
- * @class   vtkAnnotateGlobalDataFilter
- * @brief   filter for annotating with global data
- * (designed for ExodusII reader).
+ * @class vtkAnnotateGlobalDataFilter
+ * @brief filter for annotating with global / field data
  *
- * vtkAnnotateGlobalDataFilter provides a simpler API for creating text
- * annotations using vtkPythonAnnotationFilter. Instead of users specifying the
- * annotation expression, this filter determines the expression based on the
- * array selected by limiting the scope of the functionality. This filter only
- * allows the user to annotate using "global-data" aka field data and specify
- * the string prefix to use.
- * If the field array chosen has as many elements as number of timesteps, the
- * array is assumed to be "temporal" and indexed using the current timestep.
-*/
+ * vtkAnnotateGlobalDataFilter is a filter that can be used to generate a
+ * vtkTable with a string that contains the contents of a global / field data
+ * array. It also supports extracting temporal field data arrays that
+ * vtkExodusIIReader produces for "global-data". These are simply arrays that
+ * have as many tuples are number of timesteps. The filter then extracts only
+ * the tuple associated with the current time-step.
+ */
 
 #ifndef vtkAnnotateGlobalDataFilter_h
 #define vtkAnnotateGlobalDataFilter_h
 
-#include "vtkPVVTKExtensionsFiltersPythonModule.h" //needed for exports
-#include "vtkPythonAnnotationFilter.h"
+#include "vtkPVVTKExtensionsFiltersGeneralModule.h" //needed for exports
+#include "vtkTableAlgorithm.h"
 
-class VTKPVVTKEXTENSIONSFILTERSPYTHON_EXPORT vtkAnnotateGlobalDataFilter
-  : public vtkPythonAnnotationFilter
+class vtkMultiProcessController;
+
+class VTKPVVTKEXTENSIONSFILTERSGENERAL_EXPORT vtkAnnotateGlobalDataFilter : public vtkTableAlgorithm
 {
 public:
   static vtkAnnotateGlobalDataFilter* New();
-  vtkTypeMacro(vtkAnnotateGlobalDataFilter, vtkPythonAnnotationFilter);
+  vtkTypeMacro(vtkAnnotateGlobalDataFilter, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
@@ -73,16 +71,26 @@ public:
   vtkGetStringMacro(Format);
   //@}
 
+  //@{
+  /**
+   * Get/Set the controller to use.
+   */
+  void SetController(vtkMultiProcessController*);
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  //@}
 protected:
   vtkAnnotateGlobalDataFilter();
   ~vtkAnnotateGlobalDataFilter() override;
 
-  void EvaluateExpression() override;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
 
   char* Prefix;
   char* Postfix;
   char* FieldArrayName;
   char* Format;
+  vtkMultiProcessController* Controller;
 
 private:
   vtkAnnotateGlobalDataFilter(const vtkAnnotateGlobalDataFilter&) = delete;
