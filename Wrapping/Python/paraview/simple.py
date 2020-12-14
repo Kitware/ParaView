@@ -993,7 +993,7 @@ def GetAllSettings():
     Get a list of Strings, that return valid Proxies using
     the GetSettingsProxy function"""
     settingsList = []
-    pxm = simple.servermanager.ProxyManager()
+    pxm = servermanager.ProxyManager()
     pdm = pxm.GetProxyDefinitionManager()
     iter = pdm.NewSingleGroupIterator("settings")
     iter.GoToFirstItem()
