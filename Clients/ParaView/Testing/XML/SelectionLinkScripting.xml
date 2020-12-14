@@ -1,0 +1,76 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Force viewport to be 300 by 300 -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
+
+  <!-- Toggle python shell -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Python Shell" />
+
+  <!-- Create 2 spheres -->
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/consoleWidget" command="executeCommand" arguments="s1 = Sphere()" />
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/consoleWidget" command="executeCommand" arguments="s2 = Sphere()" />
+
+  <!-- Start python trace -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
+  <pqevent object="TraceOptionsDialog/widget/OKButton" command="activate" arguments="" />
+
+  <!-- Add selection link -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuExtractors" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageLinks" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/addButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/comboBox" command="activated" arguments="Selection Link" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page_3/ObjectTreeSelection1" command="expand" arguments="2.0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page_3/ObjectTreeSelection1" command="setCurrent" arguments="2.0.0.0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page_3/ObjectTreeSelection2" command="expand" arguments="2.0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page_3/ObjectTreeSelection2" command="setCurrent" arguments="2.0.1.0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/buttonBox/1QPushButton0" command="activate" arguments="" />
+
+  <!-- Show sphere 1 -->
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,14,7,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,14,7,/0:0/0:1" />
+  <!-- Select some cells -->
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/actionSelectSurfaceCells" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mousePress" arguments="(0.36437,0.161716,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseMove" arguments="(0.641217,0.536304,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1QVTKOpenGLNativeWidget0" command="mouseRelease" arguments="(0.641217,0.536304,1,0,0)" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/SelectionLinkScriptingA.png" width="300" height="300" />
+
+  <!-- Hide sphere 1 and show sphere 2 -->
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,10,6,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,10,6,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,10,11,/0:0/1:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,10,11,/0:0/1:1" />
+
+  <!-- Stop python trace -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
+  <!-- Save trace -->
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/SelectionLinkScripting.py" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/SelectionLinkScripting.py" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
+  <!-- Compare selection -->
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/SelectionLinkScriptingA.png" width="300" height="300" />
+
+  <!-- Remove selectionLink (also clears selection) -->
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/consoleWidget" command="executeCommand" arguments="RemoveSelectionLink(&quot;Link0&quot;)" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/SelectionLinkScriptingB.png" width="300" height="300" />
+
+  <!-- Hide sphere 2 to be in the same state that before the script -->
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,10,11,/0:0/1:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,10,11,/0:0/1:1" />
+  <!-- Run the traced script and compare with same result image as before -->
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/runScriptButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/PythonShellRunScriptDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/SelectionLinkScripting.py" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/SelectionLinkScriptingA.png" width="300" height="300" />
+
+  <!-- Remove selectionLink (also clears selection) -->
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/consoleWidget" command="executeCommand" arguments="RemoveLink(&quot;Link0&quot;)" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Clients/ParaView/Testing/Data/Baseline/SelectionLinkScriptingB.png" width="300" height="300" />
+
+</pqevents>
