@@ -1303,7 +1303,7 @@ void vtkSMSessionProxyManager::CollectReferredProxies(
 
 //---------------------------------------------------------------------------
 vtkSmartPointer<vtkPVXMLElement> vtkSMSessionProxyManager::GetXMLState(
-  const std::set<vtkSMProxy*>& restrictionSet)
+  const std::set<vtkSMProxy*>& restrictionSet, bool forceRestriction)
 {
   vtkNew<vtkPVXMLElement> rootElement;
   rootElement->SetName("ServerManagerState");
@@ -1365,6 +1365,11 @@ vtkSmartPointer<vtkPVXMLElement> vtkSMSessionProxyManager::GetXMLState(
         if (visited_proxies.find(proxy) != visited_proxies.end())
         {
           // proxy has been saved.
+          continue;
+        }
+        if (restrictionSet.empty() && forceRestriction)
+        {
+          // caller is explictly forcing restriction of the state.
           continue;
         }
         if (!restrictionSet.empty() && restrictionSet.find(proxy) == restrictionSet.end())
