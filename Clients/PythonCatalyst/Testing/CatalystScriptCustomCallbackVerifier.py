@@ -22,10 +22,11 @@ def catalyst_execute(info):
     pass
 
 @update_counter
-def RequestDataDescription(info):
+def RequestDataDescription(dataDescription):
     """this is an intentionally undocumented callback.
     don't rely on it"""
-    pass
+    for i in range(dataDescription.GetNumberOfInputDescriptions()):
+        dataDescription.GetInputDescription(i).GenerateMeshOn()
 
 @update_counter
 def catalyst_finalize():
