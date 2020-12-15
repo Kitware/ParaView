@@ -187,7 +187,7 @@ test:windows-vs2019-kits-mpi-python-qt:
     extends:
         - .windows_vs2019_kits_mpi_python_qt
         - .cmake_test_windows
-        - .windows_builder_tags
+        - .windows_test_tags
         - .cmake_build_artifacts
         - .run_automatically
     dependencies:
@@ -211,7 +211,7 @@ test:windows-vs2019-qt:
     extends:
         - .windows_vs2019_qt
         - .cmake_test_windows
-        - .windows_builder_tags
+        - .windows_test_tags
         - .cmake_build_artifacts
         - .run_automatically
     dependencies:
