@@ -173,6 +173,8 @@ public:
    */
   void ResetCamera();
   void ResetCamera(double bounds[6]);
+  void ResetCameraScreenSpace();
+  void ResetCameraScreenSpace(double bounds[6]);
   //@}
 
   /**

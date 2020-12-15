@@ -76,7 +76,7 @@ public:
   * It is essential to call this resetCamera, to ensure that the reset camera
   * action gets pushed on the interaction undo stack.
   */
-  void resetCamera() override;
+  void resetCamera(bool closest = false) override;
 
   /**
   * Resets the center of rotation to the focal point.

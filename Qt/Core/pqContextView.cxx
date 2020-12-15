@@ -174,7 +174,7 @@ bool pqContextView::supportsSelection() const
 
 //-----------------------------------------------------------------------------
 /// Resets the zoom level to 100%.
-void pqContextView::resetDisplay()
+void pqContextView::resetDisplay(bool vtkNotUsed(closest))
 {
   vtkSMContextViewProxy* proxy = this->getContextViewProxy();
   if (proxy)
