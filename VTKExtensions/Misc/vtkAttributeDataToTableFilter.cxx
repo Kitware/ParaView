@@ -194,7 +194,7 @@ void vtkAttributeDataToTableFilter::PassFieldData(vtkFieldData* output, vtkField
       arr->SetNumberOfTuples(max_count);
 
       vtkNew<vtkUnsignedCharArray> maskArray;
-      maskArray->SetName((std::string(arr->GetName()) + "__vtkValidMask__").c_str());
+      maskArray->SetName(("__vtkValidMask__" + std::string(arr->GetName())).c_str());
       maskArray->SetNumberOfTuples(max_count);
       maskArray->FillValue(static_cast<unsigned char>(1));
       output->AddArray(maskArray);

@@ -711,8 +711,7 @@ bool vtkSpreadSheetView::IsColumnInternal(const char* columnName)
 {
   const char* result{ nullptr };
   return (columnName == nullptr || strcmp(columnName, "__vtkIsSelected__") == 0) ||
-      (((result = std::strstr(columnName, "__vtkValidMask__")) != nullptr &&
-        strcmp(result, "__vtkValidMask__") == 0))
+      (std::strstr(columnName, "__vtkValidMask__") == columnName)
     ? true
     : false;
 }
@@ -966,7 +965,7 @@ bool vtkSpreadSheetView::IsDataValid(vtkIdType row, vtkIdType col)
 
   if (auto columnName = this->GetColumnName(col))
   {
-    const std::string maskColumnName(std::string(columnName) + "__vtkValidMask__");
+    const std::string maskColumnName("__vtkValidMask__" + std::string(columnName));
     auto maskArray =
       vtkUnsignedCharArray::SafeDownCast(block->GetColumnByName(maskColumnName.c_str()));
     if (maskArray && maskArray->GetNumberOfTuples() > blockOffset &&
