@@ -103,58 +103,6 @@ def execute(self):
     self.SetComputedAnnotationValue("%s" % result)
     return True
 
-
-def execute_on_global_data(self):
-    """Called by vtkAnnotateGlobalDataFilter."""
-    inputDO = self.GetCurrentInputDataObject()
-    if not inputDO:
-        return True
-
-    inputs = [dsa.WrapDataObject(inputDO)]
-    association = self.GetArrayAssociation()
-    ns = _get_ns(self, inputs[0], association)
-    if self.GetFieldArrayName() not in ns:
-        print("Failed to locate global array '%s'." % self.GetFieldArrayName(), file=sys.stderr)
-        raise RuntimeError("Failed to locate global array")
-
-    array = ns[self.GetFieldArrayName()]
-    chosen_element = array
-    try:
-        # if the array has as many elements as the timesteps, pick the element
-        # matching the current timestep.
-        if self.GetNumberOfTimeSteps() > 0 and \
-            array.shape[0] == self.GetNumberOfTimeSteps():
-                chosen_element = array[ns["time_index"]]
-
-        # if the array has as many elements as the `mode_shape_range`, pick the
-        # element matching the `mode_shape` (BUG #0015322).
-        elif "mode_shape" in ns and "mode_shape_range" in ns and \
-            ns["mode_shape_range"].shape[1] == 2 and \
-            array.shape[0] == (ns["mode_shape_range"].GetValue(1) - ns["mode_shape_range"].GetValue(0) + 1):
-                chosen_element = array[ns["mode_shape"].GetValue(0) - ns["mode_shape_range"].GetValue(0)]
-        elif array.shape[0] == 1:
-            # for single element arrays, just extract the value.
-            # This avoids the extra () when converting to string
-            # (see BUG #15321).
-            chosen_element = array[0]
-    except AttributeError: pass
-
-    try:
-        # hack for string array.
-        if chosen_element.IsA("vtkStringArray"):
-            chosen_element = chosen_element.GetValue(0)
-    except: pass
-    expression = self.GetPrefix() if self.GetPrefix() else ""
-    try:
-        if type(chosen_element) is not dsa.VTKNoneArray:
-            expression += self.GetFormat() % (chosen_element,)
-    except TypeError:
-        expression += chosen_element
-        print("Warning: invalid format for Annotate Global Data")
-    expression += self.GetPostfix() if self.GetPostfix() else ""
-    self.SetComputedAnnotationValue(expression)
-    return True
-
 def execute_on_attribute_data(self, evaluate_locally):
     """Called by vtkAnnotateAttributeDataFilter."""
     inputDO = self.GetCurrentInputDataObject()

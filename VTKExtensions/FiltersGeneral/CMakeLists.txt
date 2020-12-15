@@ -29,6 +29,7 @@
 #
 #==========================================================================
 set(classes
+  vtkAnnotateGlobalDataFilter
   vtkCellIntegrator
   vtkCleanUnstructuredGrid
   vtkCleanUnstructuredGridCells

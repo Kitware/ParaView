@@ -31,7 +31,6 @@
 
 set(classes
   vtkAnnotateAttributeDataFilter
-  vtkAnnotateGlobalDataFilter
   vtkCDBWriter
   vtkPythonAnnotationFilter
   vtkPythonCalculator
