@@ -904,8 +904,7 @@ void pqColorAnnotationsWidget::saveAsNewPreset()
     return;
   }
 
-  this->saveAsPreset(
-    ui.presetName->text().toStdString().c_str(), !ui.saveAnnotations->isChecked(), false);
+  this->saveAsPreset(qPrintable(ui.presetName->text()), !ui.saveAnnotations->isChecked(), false);
 }
 
 //-----------------------------------------------------------------------------
