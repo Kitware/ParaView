@@ -54,6 +54,16 @@
         - vs2019
         - windows
 
+.windows_test_tags:
+    tags:
+        - paraview # Since this is a bare runner, pin to a project.
+        - msvc-19.28
+        - nonconcurrent
+        - shell
+        - vs2019
+        - windows
+        - test # Some machines have trouble running tests.
+
 ## Windows-specific scripts
 
 .before_script_windows: &before_script_windows
