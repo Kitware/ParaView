@@ -248,7 +248,7 @@ public:
     {
       for (const auto& pair : partial_flags)
       {
-        auto validArrayName = pair.first + "__vtkValidMask__";
+        auto validArrayName = "__vtkValidMask__" + pair.first;
         if (dsa->GetAbstractArray(validArrayName.c_str()))
         {
           // a valid mask array may have already been added by an earlier
@@ -256,8 +256,7 @@ public:
           continue;
         }
 
-        const char* suffix = std::strstr(pair.first.c_str(), "__vtkValidMask__");
-        if (suffix != nullptr && strlen(suffix) == strlen("__vtkValidMask__"))
+        if (pair.first.find("__vtkValidMask__") == 0)
         {
           // don't add a validity mask for a validity mask array added by an
           // earlier filter such as vtkAttributeDataToTableFilter.
@@ -265,7 +264,7 @@ public:
         }
 
         auto validArray = vtkUnsignedCharArray::New();
-        validArray->SetName((pair.first + "__vtkValidMask__").c_str());
+        validArray->SetName(("__vtkValidMask__" + pair.first).c_str());
         validArray->SetNumberOfTuples(dsa->GetNumberOfTuples());
         validArray->FillValue(pair.second ? 1 : 0);
         dsa->AddArray(validArray);
