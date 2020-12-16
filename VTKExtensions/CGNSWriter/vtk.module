@@ -21,3 +21,4 @@ TEST_DEPENDS
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::TestingCore
+  ParaView::VTKExtensionsCore
