@@ -26,6 +26,8 @@
 
 .fedora31_icc:
     extends: .linux
+    # XXX(icc): See note below about git-lfs. That can be removed once this
+    # image contains git-lfs in it.
     image: "kitware/paraview:ci-fedora31-icc-20201014"
 
     variables:
@@ -113,6 +115,9 @@
     - cmake --version
     - ninja --version
     - doxygen --version
+    # XXX(icc): The icc container lacks git-lfs. A rebuild of the container
+    # will be necessary.
+    - '[ "$CC" = "icc" ] && dnf install --setopt=install_weak_deps=False -y git-lfs'
     - "git submodule update --init --recursive || :"
     - git submodule foreach --recursive cmake "-Dusername:STRING=$CI_PROJECT_NAMESPACE" "-Durl_prefix:STRING=https://$CI_SERVER_HOST" -P "$PWD/.gitlab/ci/fetch_submodule.cmake"
     - git submodule sync --recursive
