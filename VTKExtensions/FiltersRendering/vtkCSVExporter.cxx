@@ -269,7 +269,7 @@ void vtkCSVExporter::WriteData(vtkFieldData* data)
       }
 
       auto validMask = vtkUnsignedCharArray::SafeDownCast(
-        data->GetArray((std::string(name) + "__vtkValidMask__").c_str()));
+        data->GetArray(("__vtkValidMask__" + std::string(name)).c_str()));
       int numComps = array->GetNumberOfComponents();
       for (int comp = 0; comp < numComps; comp++)
       {

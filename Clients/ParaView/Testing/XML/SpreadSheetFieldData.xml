@@ -9,17 +9,30 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/pqSpreadSheetViewDecorator/Attribute" command="activated" arguments="Field Data" />
 
 
-  <!-- test various columns -->
-  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0"
-    property="modelItemData" arguments="5.0,6" />
+  <!-- test various columns; args are `row.column,value` -->
 
+  <!-- row 0 -->
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0"
+    property="modelItemData" arguments="0.0,1" />
   <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0"
     property="modelItemData" arguments="0.1,1" />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0"
+    property="modelItemData" arguments="0.2,2" />
 
+  <!-- row 1 -->
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0"
+    property="modelItemData" arguments="1.0,2" />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0"
+    property="modelItemData" arguments="1.1," />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0"
+    property="modelItemData" arguments="1.2,3" />
+
+  <!-- row 5 -->
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0"
+    property="modelItemData" arguments="5.0,6" />
   <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0"
     property="modelItemData" arguments="5.1," />
-
   <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0"
-    property="modelItemData" arguments="0.2,1" />
+    property="modelItemData" arguments="5.2," />
 
 </pqevents>

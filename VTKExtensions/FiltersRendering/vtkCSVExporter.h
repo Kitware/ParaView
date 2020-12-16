@@ -41,7 +41,7 @@
  *
  * In STREAM_ROWS mode, the exporter supports invalid / empty cells. When
  * writing each column in `WriteData` call, for each column-name an
- * vtkUnsignedCharArray with the name `{COLUMN-NAME}__vtkValidMask__` is looked
+ * vtkUnsignedCharArray with the name `__vtkValidMask__{COLUMN_NAME}` is looked
  * up. If found, it's value is used to determine if that cell is to written out
  * or not.
  */
