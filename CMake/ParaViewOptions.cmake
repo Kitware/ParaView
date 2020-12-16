@@ -495,7 +495,7 @@ if (NOT PARAVIEW_ENABLE_NONESSENTIAL)
   # This ensures that we don't ever enable certain problematic
   # modules when PARAVIEW_ENABLE_NONESSENTIAL is OFF.
   list(APPEND paraview_rejected_modules
-    ParaView::cgns
+    VTK::cgns
     VTK::hdf5
     VTK::netcdf
     VTK::ogg
