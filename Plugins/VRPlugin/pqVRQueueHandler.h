@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  pqVRQueueHandler.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef vtkVRQueueHandler_h
-#define vtkVRQueueHandler_h
+#ifndef pqVRQueueHandler_h
+#define pqVRQueueHandler_h
 
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
@@ -91,4 +91,4 @@ private:
   static QPointer<pqVRQueueHandler> Instance;
 };
 
-#endif
+#endif // pqVRQueueHandler_h

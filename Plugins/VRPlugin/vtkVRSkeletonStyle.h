@@ -48,15 +48,15 @@ class vtkVRSkeletonStyle : public vtkVRInteractorStyle
 public:
   static vtkVRSkeletonStyle* New();
   vtkTypeMacro(vtkVRSkeletonStyle, vtkVRInteractorStyle) void PrintSelf(
-    ostream& os, vtkIndent indent);
+    ostream& os, vtkIndent indent) override;
 
 protected:
   vtkVRSkeletonStyle();
   ~vtkVRSkeletonStyle();
 
-  virtual void HandleButton(const vtkVREvent& event);
-  virtual void HandleAnalog(const vtkVREvent& event);
-  virtual void HandleTracker(const vtkVREvent& event);
+  virtual void HandleButton(const vtkVREvent& event) override;
+  virtual void HandleAnalog(const vtkVREvent& event) override;
+  virtual void HandleTracker(const vtkVREvent& event) override;
 
   bool EnableReport;
 

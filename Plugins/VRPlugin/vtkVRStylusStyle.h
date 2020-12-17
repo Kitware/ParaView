@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRStylusStyle.h
+   Module:  vtkVRStylusStyle.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -35,15 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * vtkVRStylusStyle is an interaction style that uses the position of the
  * stylus in screen space (for example the stylus of the zSpace) to modify a 4x4 matrix.
- * Only the position of the stylus is used, the rotation has no effect.
- * Only works with render view proxy.
+ * Only the location of the stylus is used, the rotation has no effect.
+ * Only works with RenderView proxy.
  */
-#ifndef vtkVRStylusStyle_h_
-#define vtkVRStylusStyle_h_
+#ifndef vtkVRStylusStyle_h
+#define vtkVRStylusStyle_h
 
 #include "vtkVRTrackStyle.h"
-
-struct vtkVREventData;
+struct vtkVREvent;
 
 class vtkVRStylusStyle : public vtkVRTrackStyle
 {
@@ -56,8 +55,8 @@ protected:
   vtkVRStylusStyle();
   ~vtkVRStylusStyle() override = default;
 
-  void HandleButton(const vtkVREventData& data) override;
-  void HandleTracker(const vtkVREventData& data) override;
+  void HandleButton(const vtkVREvent& event) override;
+  void HandleTracker(const vtkVREvent& event) override;
 
   bool EnableTranslate;
   bool EnableRotate;
@@ -70,4 +69,4 @@ private:
   bool PositionRecorded;
 };
 
-#endif // vtkVRStylusStyle.h_
+#endif // vtkVRStylusStyle_h

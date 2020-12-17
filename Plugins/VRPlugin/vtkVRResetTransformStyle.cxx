@@ -210,7 +210,3 @@ float vtkVRResetTransformStyle::GetSpeedFactor(vtkCamera* cam)
   pos[2] *= pos[2];
   return sqrt(pos[0] + pos[1] + pos[2]);
 }
-
-// ----------------------------------------------------------------------------
-// Update() method
-// WRS: Why don't all the interactor styles have the Update() method?

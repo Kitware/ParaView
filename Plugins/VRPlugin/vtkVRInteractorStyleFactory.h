@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  vtkVRInteractorStyleFactory.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -56,7 +56,7 @@ public:
 
   // Description:
   // Get a list of action descriptions for the styles (e.g. "Grab", "Track",
-  // etc).
+  //   etc).
   std::vector<std::string> GetInteractorStyleDescriptions();
 
   // Description:
@@ -65,12 +65,12 @@ public:
 
   // Description:
   // Create a new interactor style instance. The input string
-  // must be in the vector returned by GetInteractorStyleClassNames().
+  //   must be in the vector returned by GetInteractorStyleClassNames().
   vtkVRInteractorStyle* NewInteractorStyleFromClassName(const std::string&);
 
   // Description:
   // Create a new interactor style instance. The input string
-  // must be in the vector returned by GetInteractorStyleDescriptions().
+  //   must be in the vector returned by GetInteractorStyleDescriptions().
   vtkVRInteractorStyle* NewInteractorStyleFromDescription(const std::string&);
 
   friend class pqVRStarter;
@@ -82,8 +82,12 @@ protected:
   static void SetInstance(vtkVRInteractorStyleFactory*);
   static vtkVRInteractorStyleFactory* Instance;
 
-  std::vector<std::string> InteractorStyleClassNames;
-  std::vector<std::string> InteractorStyleDescriptions;
+  std::vector<std::string> InteractorStyleClassNames; // store the name of each Interactor class
+  std::vector<std::string>
+    InteractorStyleDescriptions; // store a short description of each Interactor
+  std::vector<std::string> InteractorStyleNewMethods; // store the New() method of each Interactor
+                                                      // // WRS-TODO: this was deleted in "Kitware"
+                                                      // version.  Why?
 };
 
 #endif // vtkVRInteractorStyleFactory_h

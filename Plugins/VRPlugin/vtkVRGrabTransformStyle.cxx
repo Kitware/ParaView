@@ -362,7 +362,3 @@ float vtkVRGrabTransformStyle::GetSpeedFactor(vtkCamera* cam, vtkMatrix4x4* mvma
 
   return result;
 }
-
-// ----------------------------------------------------------------------------
-// Update() method
-// WRS: Why don't all the interactor styles have the Update() method?

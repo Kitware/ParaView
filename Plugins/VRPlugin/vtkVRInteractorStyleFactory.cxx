@@ -1,7 +1,8 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  vtkVRInteractorStyleFactory.cxx
+
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -31,15 +32,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 
 #include "vtkVRInteractorStyleFactory.h"
-
 #include "vtkObjectFactory.h"
+
+// Includes all the interaction styles:
 #include "vtkVRControlSliceOrientationStyle.h"
 #include "vtkVRControlSlicePositionStyle.h"
+#include "vtkVRGrabPointStyle.h"
+#include "vtkVRGrabTransformStyle.h"
 #include "vtkVRGrabWorldStyle.h"
-#include "vtkVRMovePointStyle.h"
+#include "vtkVRSkeletonStyle.h"
 #include "vtkVRSpaceNavigatorGrabWorldStyle.h"
 #include "vtkVRStylusStyle.h"
+#include "vtkVRStylusStyle.h"
 #include "vtkVRTrackStyle.h"
+#include "vtkVRVirtualHandStyle.h"
 #include "vtkVRVirtualHandStyle.h"
 
 //-----------------------------------------------------------------------------
@@ -47,8 +53,17 @@ vtkStandardNewMacro(vtkVRInteractorStyleFactory);
 vtkVRInteractorStyleFactory* vtkVRInteractorStyleFactory::Instance = nullptr;
 
 //-----------------------------------------------------------------------------
+// Constructor() method
+//   This is where all the InteractorStyle classes are connected to the VR Plugin.
+//   This should be the ONLY place where interactor styles are mentioned by name.
+//   TODO: figure out how to store an array of New() methods so the
+//     NewInteractorStyleFromClassName() method doesn't have to explicitly
+//     refer to named classes.
 vtkVRInteractorStyleFactory::vtkVRInteractorStyleFactory()
 {
+#if 0 /* TODO: (WRS) We need to figure out how to store an array of New methods */
+  this->InteractorStyleNewMethods.push_back((vtkVRInteractorStyle *)(vtkVRTrackStyle::New));
+#endif
   // Add TrackStyle
   this->InteractorStyleClassNames.push_back("vtkVRTrackStyle");
   this->InteractorStyleDescriptions.push_back("Track");
@@ -56,6 +71,14 @@ vtkVRInteractorStyleFactory::vtkVRInteractorStyleFactory()
   // Add GrabWorldStyle
   this->InteractorStyleClassNames.push_back("vtkVRGrabWorldStyle");
   this->InteractorStyleDescriptions.push_back("Grab");
+
+  // Add GrabTransformStyle
+  this->InteractorStyleClassNames.push_back("vtkVRGrabTransformStyle");
+  this->InteractorStyleDescriptions.push_back("Grab Transform");
+
+  // Add GrabPointStyle
+  this->InteractorStyleClassNames.push_back("vtkVRGrabPointStyle");
+  this->InteractorStyleDescriptions.push_back("Grab Point");
 
   // Add ControlSlicePositionStyle
   this->InteractorStyleClassNames.push_back("vtkVRControlSlicePositionStyle");
@@ -65,10 +88,19 @@ vtkVRInteractorStyleFactory::vtkVRInteractorStyleFactory()
   this->InteractorStyleClassNames.push_back("vtkVRControlSliceOrientationStyle");
   this->InteractorStyleDescriptions.push_back("Slice Orientation");
 
-  // Add SpaceNavigatorGrabWorldStye
+  // Add SpaceNavigatorGrabWorldStyle
   this->InteractorStyleClassNames.push_back("vtkVRSpaceNavigatorGrabWorldStyle");
   this->InteractorStyleDescriptions.push_back("Space Navigator Grab");
 
+  // Add SpaceNavigatorGrabWorldStyle
+  this->InteractorStyleClassNames.push_back("vtkVRStylusStyle");
+  this->InteractorStyleDescriptions.push_back("zSpace Stylus");
+
+  // Add SpaceNavigatorGrabWorldStyle
+  this->InteractorStyleClassNames.push_back("vtkVRVirtualHandStyle");
+  this->InteractorStyleDescriptions.push_back("Virtual Hand");
+
+#if 0 /* WRS-TODO: wait until I implement these */
   // Add Virtual Hand - DJZ
   this->InteractorStyleClassNames.push_back("vtkVRVirtualHandStyle");
   this->InteractorStyleDescriptions.push_back("Virtual Hand");
@@ -76,10 +108,13 @@ vtkVRInteractorStyleFactory::vtkVRInteractorStyleFactory()
   // Add Stylus style
   this->InteractorStyleClassNames.push_back("vtkVRStylusStyle");
   this->InteractorStyleDescriptions.push_back("Stylus");
+#endif
 
-  // Add Move Point style
-  this->InteractorStyleClassNames.push_back("vtkVRMovePointStyle");
-  this->InteractorStyleDescriptions.push_back("Move Point");
+#if 0 /* For the end-user, there is no need to see the Skeleton style code */
+  // Add SkeletonStyle
+  this->InteractorStyleClassNames.push_back("vtkVRSkeletonStyle");
+  this->InteractorStyleDescriptions.push_back("Skeleton");
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -124,11 +159,11 @@ std::vector<std::string> vtkVRInteractorStyleFactory::GetInteractorStyleDescript
 //-----------------------------------------------------------------------------
 std::string vtkVRInteractorStyleFactory::GetDescriptionFromClassName(const std::string& className)
 {
-  for (size_t i = 0; i < this->InteractorStyleClassNames.size(); ++i)
+  for (size_t count = 0; count < this->InteractorStyleClassNames.size(); ++count)
   {
-    if (this->InteractorStyleClassNames[i] == className)
+    if (this->InteractorStyleClassNames[count] == className)
     {
-      return this->InteractorStyleDescriptions[i];
+      return this->InteractorStyleDescriptions[count];
     }
   }
   return std::string("Unknown");
@@ -138,13 +173,26 @@ std::string vtkVRInteractorStyleFactory::GetDescriptionFromClassName(const std::
 vtkVRInteractorStyle* vtkVRInteractorStyleFactory::NewInteractorStyleFromClassName(
   const std::string& name)
 {
-  if (name == "vtkVRTrackStyle")
+  // WRS-TODO: this is probably where we cause ParaView to crash if there are missing styles
+  if (name == "vtkVRSkeletonStyle")
+  {
+    return vtkVRSkeletonStyle::New();
+  }
+  else if (name == "vtkVRTrackStyle")
   {
     return vtkVRTrackStyle::New();
   }
   else if (name == "vtkVRGrabWorldStyle")
   {
     return vtkVRGrabWorldStyle::New();
+  }
+  else if (name == "vtkVRGrabTransformStyle")
+  {
+    return vtkVRGrabTransformStyle::New();
+  }
+  else if (name == "vtkVRGrabPointStyle")
+  {
+    return vtkVRGrabPointStyle::New();
   }
   else if (name == "vtkVRControlSlicePositionStyle")
   {
@@ -158,17 +206,13 @@ vtkVRInteractorStyle* vtkVRInteractorStyleFactory::NewInteractorStyleFromClassNa
   {
     return vtkVRSpaceNavigatorGrabWorldStyle::New();
   }
-  else if (name == "vtkVRVirtualHandStyle")
-  {
-    return vtkVRVirtualHandStyle::New();
-  }
   else if (name == "vtkVRStylusStyle")
   {
     return vtkVRStylusStyle::New();
   }
-  else if (name == "vtkVRMovePointStyle")
+  else if (name == "vtkVRVirtualHandStyle")
   {
-    return vtkVRMovePointStyle::New();
+    return vtkVRVirtualHandStyle::New();
   }
 
   return nullptr;
@@ -178,11 +222,11 @@ vtkVRInteractorStyle* vtkVRInteractorStyleFactory::NewInteractorStyleFromClassNa
 vtkVRInteractorStyle* vtkVRInteractorStyleFactory::NewInteractorStyleFromDescription(
   const std::string& desc)
 {
-  for (size_t i = 0; i < this->InteractorStyleDescriptions.size(); ++i)
+  for (size_t count = 0; count < this->InteractorStyleDescriptions.size(); ++count)
   {
-    if (this->InteractorStyleDescriptions[i] == desc)
+    if (this->InteractorStyleDescriptions[count] == desc)
     {
-      return this->NewInteractorStyleFromClassName(this->InteractorStyleClassNames[i]);
+      return this->NewInteractorStyleFromClassName(this->InteractorStyleClassNames[count]);
     }
   }
   return nullptr;
@@ -199,9 +243,9 @@ void vtkVRInteractorStyleFactory::PrintSelf(ostream& os, vtkIndent indent)
   }
   os << indent << "Known interactor styles:" << endl;
   vtkIndent iindent = indent.GetNextIndent();
-  for (size_t i = 0; i < this->InteractorStyleClassNames.size(); ++i)
+  for (size_t count = 0; count < this->InteractorStyleClassNames.size(); ++count)
   {
-    os << iindent << "\"" << this->InteractorStyleDescriptions[i] << "\" ("
-       << this->InteractorStyleClassNames[i] << ")\n";
+    os << iindent << "\"" << this->InteractorStyleDescriptions[count] << "\" ("
+       << this->InteractorStyleClassNames[count] << ")\n";
   }
 }

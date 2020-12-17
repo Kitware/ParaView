@@ -16,6 +16,7 @@
 #ifndef vtkPVVRConfig_h
 #define vtkPVVRConfig_h
 
+/* Set these "macros" to be defined as "0" or "1" throughout the plugin code */
 #cmakedefine01 PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
 #cmakedefine01 PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
 

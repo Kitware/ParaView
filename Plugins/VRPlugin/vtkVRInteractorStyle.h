@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  vtkVRInteractorStyle.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -43,7 +43,7 @@ class vtkSMProxyLocator;
 class vtkSMProxy;
 class vtkSMDoubleVectorProperty;
 class vtkStringList;
-struct vtkVREventData;
+struct vtkVREvent;
 
 class vtkVRInteractorStyle : public vtkObject
 {
@@ -68,7 +68,12 @@ public:
   vtkSetStringMacro(ControlledPropertyName);
   vtkGetStringMacro(ControlledPropertyName);
 
-  virtual bool HandleEvent(const vtkVREventData& data);
+  virtual bool HandleEvent(const vtkVREvent& event);
+
+  /// Update() called to update all the remote vtkObjects and perhaps even to render.
+  ///   Typically processing intensive operations go here. The method should not
+  ///   be called from within the handler and is reserved to be called from an
+  ///   external interaction style manager.
   virtual bool Update();
 
   // Description:
@@ -109,9 +114,9 @@ protected:
   vtkVRInteractorStyle();
   virtual ~vtkVRInteractorStyle();
 
-  virtual void HandleButton(const vtkVREventData& data);
-  virtual void HandleAnalog(const vtkVREventData& data);
-  virtual void HandleTracker(const vtkVREventData& data);
+  virtual void HandleButton(const vtkVREvent& event);
+  virtual void HandleAnalog(const vtkVREvent& event);
+  virtual void HandleTracker(const vtkVREvent& event);
 
   static std::vector<std::string> Tokenize(std::string input);
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRQueue.h
+   Module:  vtkVRQueue.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -53,13 +53,13 @@ struct vtkTracker
 
 struct vtkAnalog
 {
-  int num_channel;                        // how many channels
+  int num_channels;                       // how many channels
   double channel[VTK_ANALOG_CHANNEL_MAX]; // channel diliever analog values
 };
 
 struct vtkButton
 {
-  int button; // Which button (numbered from zero)
+  int button; // Which button (zero-based)
   int state;  // New state (0 = off, 1 = on)
 };
 
@@ -69,7 +69,7 @@ union vtkVREventCommonData {
   vtkButton button;
 };
 
-struct vtkVREventData
+struct vtkVREvent
 {
   std::string connId;
   std::string name; // Specified from configuration
@@ -85,11 +85,11 @@ public:
   vtkTypeMacro(vtkVRQueue, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  void Enqueue(const vtkVREventData& data);
+  void Enqueue(const vtkVREvent& event);
   bool IsEmpty() const;
-  bool TryDequeue(vtkVREventData& data);
-  bool TryDequeue(std::queue<vtkVREventData>& data);
-  void Dequeue(vtkVREventData& data);
+  bool TryDequeue(vtkVREvent& event);
+  bool TryDequeue(std::queue<vtkVREvent>& event);
+  void Dequeue(vtkVREvent& event);
 
 protected:
   vtkVRQueue();
@@ -99,7 +99,7 @@ private:
   vtkVRQueue(const vtkVRQueue&) = delete;
   void operator=(const vtkVRQueue&) = delete;
 
-  std::queue<vtkVREventData> Queue;
+  std::queue<vtkVREvent> Queue;
   mutable vtkNew<vtkMutexLock> Mutex;
   vtkNew<vtkConditionVariable> CondVar;
 };

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRSpaceNavigatorGrabWorldStyle.cxx
+   Module:  vtkVRSpaceNavigatorGrabWorldStyle.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -31,44 +31,53 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "vtkVRSpaceNavigatorGrabWorldStyle.h"
 
-#include "vtkCamera.h"
-#include "vtkMath.h"
+#include "vtkCamera.h" /* needed by vtkSMRenderViewProxy.h */
+#include "vtkMath.h"   /* needed for Cross product function */
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProxyLocator.h"
-#include "vtkSMRenderViewProxy.h"
-#include "vtkVRQueue.h"
+#include "vtkSMRenderViewProxy.h" /* for acquiring the active camera */
+#include "vtkVRQueue.h"           /* for the vtkVREvent structure */
 
 #include <algorithm>
 #include <sstream>
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkVRSpaceNavigatorGrabWorldStyle)
+vtkStandardNewMacro(vtkVRSpaceNavigatorGrabWorldStyle);
 
-  // ----------------------------------------------------------------------------
-  vtkVRSpaceNavigatorGrabWorldStyle::vtkVRSpaceNavigatorGrabWorldStyle()
+// ----------------------------------------------------------------------------
+// Constructor method
+vtkVRSpaceNavigatorGrabWorldStyle::vtkVRSpaceNavigatorGrabWorldStyle()
   : Superclass()
 {
   this->AddAnalogRole("Move");
 }
 
 // ----------------------------------------------------------------------------
+// Destructor method
 vtkVRSpaceNavigatorGrabWorldStyle::~vtkVRSpaceNavigatorGrabWorldStyle()
 {
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRSpaceNavigatorGrabWorldStyle::HandleAnalog(const vtkVREventData& data)
+// PrintSelf() method
+void vtkVRSpaceNavigatorGrabWorldStyle::PrintSelf(ostream& os, vtkIndent indent)
 {
-  std::string role = this->GetAnalogRole(data.name);
+  this->Superclass::PrintSelf(os, indent);
+}
+
+// ----------------------------------------------------------------------------
+// HandleAnalog() method
+void vtkVRSpaceNavigatorGrabWorldStyle::HandleAnalog(const vtkVREvent& event)
+{
+  std::string role = this->GetAnalogRole(event.name);
+
   if (role == "Move")
   {
-    // Values for Space Navigator
-    if (data.data.analog.num_channel != 6)
+    // A Space Navigator will have 6 analog data streams.  Ignore data
+    //   if this input does not match this parameter of the Space Navigator.
+    if (event.data.analog.num_channels != 6)
     {
       return;
     }
@@ -77,48 +86,54 @@ void vtkVRSpaceNavigatorGrabWorldStyle::HandleAnalog(const vtkVREventData& data)
     if (viewProxy)
     {
       vtkCamera* camera;
-      double pos[3], fp[3], up[3], dir[3];
-      const double* channel = data.data.analog.channel;
+#define MOVEMENT_FACTOR 0.05
+      double camera_location[3];
+      double focal_point[3];
+      double up_vector[3];
+      double forward_vector[3];
+      double orient[3];
+      const double* analog_input = event.data.analog.channel;
 
       camera = viewProxy->GetActiveCamera();
 
-      camera->GetPosition(pos);
-      camera->GetFocalPoint(fp);
-      camera->GetDirectionOfProjection(dir);
+      camera->GetPosition(camera_location);
+      camera->GetFocalPoint(focal_point);
+      camera->GetDirectionOfProjection(forward_vector);
       camera->OrthogonalizeViewUp();
-      camera->GetViewUp(up);
+      camera->GetViewUp(up_vector);
 
       // Apply up-down motion
       for (int i = 0; i < 3; i++)
       {
-        double dx = 0.05 * channel[2] * up[i];
-        pos[i] += dx;
-        fp[i] += dx;
+        double dx = MOVEMENT_FACTOR * analog_input[2] * up_vector[i];
+
+        camera_location[i] += dx;
+        focal_point[i] += dx;
       }
 
       // Apply right-left motion
-      double r[3];
-      vtkMath::Cross(dir, up, r);
+      double side_vector[3];
+      vtkMath::Cross(forward_vector, up_vector, side_vector);
 
       for (int i = 0; i < 3; i++)
       {
-        double dx = -0.05 * channel[0] * r[i];
-        pos[i] += dx;
-        fp[i] += dx;
+        double dx = -MOVEMENT_FACTOR * analog_input[0] * side_vector[i];
+
+        camera_location[i] += dx;
+        focal_point[i] += dx;
       }
 
-      camera->SetPosition(pos);
-      camera->SetFocalPoint(fp);
+      // Set the two calculated camera values
+      camera->SetPosition(camera_location);
+      camera->SetFocalPoint(focal_point);
 
-      camera->Dolly(pow(1.01, channel[1]));
-      camera->Elevation(1.0 * channel[3]);
-      camera->Azimuth(1.0 * channel[5]);
-      camera->Roll(1.0 * channel[4]);
+      // Set all the other camera values
+      camera->Dolly(
+        pow(1.01, analog_input[1])); /* WRS: why the use of pow()?  And why doesn't this use the
+                                        forward_vector? */
+      camera->Elevation(1.0 * analog_input[3]);
+      camera->Azimuth(1.0 * analog_input[5]);
+      camera->Roll(1.0 * analog_input[4]);
     }
   }
-}
-
-void vtkVRSpaceNavigatorGrabWorldStyle::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
 }

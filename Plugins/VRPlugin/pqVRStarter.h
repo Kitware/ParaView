@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqVRStarter.h
+   Module:  pqVRStarter.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -52,7 +52,7 @@ class pqVRStarter : public QObject
   typedef QObject Superclass;
 
 public:
-  pqVRStarter(QObject* p = 0);
+  pqVRStarter(QObject* _parent = 0);
   ~pqVRStarter();
 
   /// Creates and initiates the vtkVRConnectionManager thread the vtkVRQueue and
@@ -65,9 +65,10 @@ public:
 
 private:
   Q_DISABLE_COPY(pqVRStarter)
+
   class pqInternals;
   pqInternals* Internals;
   bool IsShutdown;
 };
 
-#endif
+#endif // pqVRStarter_h

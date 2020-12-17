@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRVirtualHandStyle.cxx
+   Module:  vtkVRVirtualHandStyle.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkStandardNewMacro(vtkVRVirtualHandStyle)
 
   // -----------------------------------------------------------------------------
+  // Constructor method
   vtkVRVirtualHandStyle::vtkVRVirtualHandStyle()
   : Superclass()
 {
@@ -71,18 +72,44 @@ vtkStandardNewMacro(vtkVRVirtualHandStyle)
 }
 
 // -----------------------------------------------------------------------------
+// Destructor method
 vtkVRVirtualHandStyle::~vtkVRVirtualHandStyle()
 {
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRVirtualHandStyle::HandleButton(const vtkVREventData& data)
+// PrintSelf() method
+void vtkVRVirtualHandStyle::PrintSelf(ostream& os, vtkIndent indent)
 {
-  std::string role = this->GetButtonRole(data.name);
+  this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "CurrentButton: " << this->CurrentButton << endl;
+  os << indent << "PrevButton: " << this->PrevButton << endl;
+  os << indent << "EventPress: " << this->EventPress << endl;
+  os << indent << "EventRelease: " << this->EventPress << endl;
+
+  os << indent << "CurrentTrackerMatrix:" << endl;
+  this->CurrentTrackerMatrix->PrintSelf(os, indent.GetNextIndent());
+
+  os << indent << "InverseTrackerMatrix:" << endl;
+  this->InverseTrackerMatrix->PrintSelf(os, indent.GetNextIndent());
+
+  os << indent << "CachedModelMatrix:" << endl;
+  this->CachedModelMatrix->PrintSelf(os, indent.GetNextIndent());
+
+  os << indent << "NewModelMatrix:" << endl;
+  this->NewModelMatrix->PrintSelf(os, indent.GetNextIndent());
+}
+
+// ----------------------------------------------------------------------------
+// HandleButton() method
+void vtkVRVirtualHandStyle::HandleButton(const vtkVREvent& event)
+{
+  std::string role = this->GetButtonRole(event.name);
   if (role == "Grab world")
   {
 
-    this->CurrentButton = data.data.button.state;
+    this->CurrentButton = event.data.button.state;
 
     if (this->CurrentButton == true && this->PrevButton == false)
     {
@@ -98,12 +125,13 @@ void vtkVRVirtualHandStyle::HandleButton(const vtkVREventData& data)
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRVirtualHandStyle::HandleTracker(const vtkVREventData& data)
+// HandleTracker() method
+void vtkVRVirtualHandStyle::HandleTracker(const vtkVREvent& event)
 {
-  std::string role = this->GetTrackerRole(data.name);
+  std::string role = this->GetTrackerRole(event.name);
   if (role == "Tracker")
   {
-    this->CurrentTrackerMatrix->DeepCopy(data.data.tracker.matrix);
+    this->CurrentTrackerMatrix->DeepCopy(event.data.tracker.matrix);
 
     if (this->EventPress)
     {
@@ -138,27 +166,4 @@ void vtkVRVirtualHandStyle::HandleTracker(const vtkVREventData& data)
       this->EventRelease = false;
     }
   }
-}
-
-// ----------------------------------------------------------------------------
-void vtkVRVirtualHandStyle::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-
-  os << indent << "CurrentButton: " << this->CurrentButton << endl;
-  os << indent << "PrevButton: " << this->PrevButton << endl;
-  os << indent << "EventPress: " << this->EventPress << endl;
-  os << indent << "EventRelease: " << this->EventPress << endl;
-
-  os << indent << "CurrentTrackerMatrix:" << endl;
-  this->CurrentTrackerMatrix->PrintSelf(os, indent.GetNextIndent());
-
-  os << indent << "InverseTrackerMatrix:" << endl;
-  this->InverseTrackerMatrix->PrintSelf(os, indent.GetNextIndent());
-
-  os << indent << "CachedModelMatrix:" << endl;
-  this->CachedModelMatrix->PrintSelf(os, indent.GetNextIndent());
-
-  os << indent << "NewModelMatrix:" << endl;
-  this->NewModelMatrix->PrintSelf(os, indent.GetNextIndent());
 }

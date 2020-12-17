@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRStylusStyle.cxx
+   Module:  vtkVRStylusStyle.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkStandardNewMacro(vtkVRStylusStyle);
 
 // -----------------------------------------------------------------------------
+// Constructor method
 vtkVRStylusStyle::vtkVRStylusStyle()
   : Superclass()
 {
@@ -58,44 +59,59 @@ vtkVRStylusStyle::vtkVRStylusStyle()
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRStylusStyle::HandleButton(const vtkVREventData& data)
+// Destructor method
+
+// ----------------------------------------------------------------------------
+// PrintSelf() method
+void vtkVRStylusStyle::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "EnableTranslate: " << this->EnableTranslate << endl;
+  os << indent << "EnableRotate: " << this->EnableRotate << endl;
+}
+
+// ----------------------------------------------------------------------------
+// HandleButton() method
+void vtkVRStylusStyle::HandleButton(const vtkVREvent& event)
 {
   this->PositionRecorded = false;
 
-  std::string role = this->GetButtonRole(data.name);
+  std::string role = this->GetButtonRole(event.name);
   if (role == "Translate world")
   {
-    this->EnableTranslate = data.data.button.state;
+    this->EnableTranslate = event.data.button.state;
   }
   else if (role == "Rotate world")
   {
-    this->EnableRotate = data.data.button.state;
+    this->EnableRotate = event.data.button.state;
   }
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRStylusStyle::HandleTracker(const vtkVREventData& data)
+// HandleTracker() method
+void vtkVRStylusStyle::HandleTracker(const vtkVREvent& event)
 {
-  if (this->GetTrackerRole(data.name) == "Tracker")
+  if (this->GetTrackerRole(event.name) == "Tracker")
   {
     if (!this->PositionRecorded)
     {
-      this->LastRecordedPosition[0] = data.data.tracker.matrix[3];
-      this->LastRecordedPosition[1] = data.data.tracker.matrix[7];
-      this->LastRecordedPosition[2] = data.data.tracker.matrix[11];
+      this->LastRecordedPosition[0] = event.data.tracker.matrix[3];
+      this->LastRecordedPosition[1] = event.data.tracker.matrix[7];
+      this->LastRecordedPosition[2] = event.data.tracker.matrix[11];
       this->PositionRecorded = true;
       return;
     }
 
     double diffPosition[3];
 
-    diffPosition[0] = data.data.tracker.matrix[3] - this->LastRecordedPosition[0];
-    diffPosition[1] = data.data.tracker.matrix[7] - this->LastRecordedPosition[1];
-    diffPosition[2] = data.data.tracker.matrix[11] - this->LastRecordedPosition[2];
+    diffPosition[0] = event.data.tracker.matrix[3] - this->LastRecordedPosition[0];
+    diffPosition[1] = event.data.tracker.matrix[7] - this->LastRecordedPosition[1];
+    diffPosition[2] = event.data.tracker.matrix[11] - this->LastRecordedPosition[2];
 
-    this->LastRecordedPosition[0] = data.data.tracker.matrix[3];
-    this->LastRecordedPosition[1] = data.data.tracker.matrix[7];
-    this->LastRecordedPosition[2] = data.data.tracker.matrix[11];
+    this->LastRecordedPosition[0] = event.data.tracker.matrix[3];
+    this->LastRecordedPosition[1] = event.data.tracker.matrix[7];
+    this->LastRecordedPosition[2] = event.data.tracker.matrix[11];
 
     vtkSMRenderViewProxy* rvProxy = vtkSMRenderViewProxy::SafeDownCast(this->ControlledProxy);
 
@@ -184,13 +200,4 @@ void vtkVRStylusStyle::HandleTracker(const vtkVREventData& data)
         "This interactor style only works with render view proxy, ignoring interaction...");
     }
   }
-}
-
-// ----------------------------------------------------------------------------
-void vtkVRStylusStyle::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-
-  os << indent << "EnableTranslate: " << this->EnableTranslate << endl;
-  os << indent << "EnableRotate: " << this->EnableRotate << endl;
 }

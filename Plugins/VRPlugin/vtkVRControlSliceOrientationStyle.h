@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  vtkVRControlSliceOrientationStyle.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -46,18 +46,18 @@ public:
 
   int GetControlledPropertySize() override { return 3; }
 
-  /// called to update all the remote vtkObjects and perhaps even to render.
-  /// Typically processing intensive operations go here. The method should not
-  /// be called from within the handler and is reserved to be called from an
-  /// external interaction style manager.
+  /// Update() called to update all the remote vtkObjects and perhaps even to render.
+  ///   Typically processing intensive operations go here. The method should not
+  ///   be called from within the handler and is reserved to be called from an
+  ///   external interaction style manager.
   bool Update() override;
 
 protected:
   vtkVRControlSliceOrientationStyle();
   ~vtkVRControlSliceOrientationStyle() override;
 
-  void HandleButton(const vtkVREventData& data) override;
-  void HandleTracker(const vtkVREventData& data) override;
+  void HandleButton(const vtkVREvent& event) override;
+  void HandleTracker(const vtkVREvent& event) override;
 
   bool Enabled;
   bool InitialOrientationRecorded;
@@ -70,8 +70,9 @@ protected:
   vtkNew<vtkMatrix4x4> InitialInvertedPose;
 
 private:
-  vtkVRControlSliceOrientationStyle(const vtkVRControlSliceOrientationStyle&) = delete;
-  void operator=(const vtkVRControlSliceOrientationStyle&) = delete;
+  vtkVRControlSliceOrientationStyle(
+    const vtkVRControlSliceOrientationStyle&) = delete;              // Not implemented
+  void operator=(const vtkVRControlSliceOrientationStyle&) = delete; // Not implemented
 };
 
-#endif
+#endif // vtkVRControlSliceOrientationStyle_h

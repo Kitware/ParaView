@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRGrabWorldStyle.h
+   Module:  vtkVRGrabWorldStyle.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef vtkVRGrabWorldStyle_h_
-#define vtkVRGrabWorldStyle_h_
+#ifndef vtkVRGrabWorldStyle_h
+#define vtkVRGrabWorldStyle_h
 
 #include "vtkNew.h"
 #include "vtkVRTrackStyle.h"
@@ -40,7 +40,7 @@ class vtkMatrix4x4;
 class vtkSMRenderViewProxy;
 class vtkSMDoubleVectorProperty;
 class vtkSMIntVectorProperty;
-struct vtkVREventData;
+struct vtkVREvent;
 
 class vtkVRGrabWorldStyle : public vtkVRTrackStyle
 {
@@ -53,14 +53,16 @@ protected:
   vtkVRGrabWorldStyle();
   ~vtkVRGrabWorldStyle() override;
 
-  void HandleButton(const vtkVREventData& data) override;
-  void HandleTracker(const vtkVREventData& data) override;
+  void HandleButton(const vtkVREvent& event) override;
+  void HandleTracker(const vtkVREvent& event) override;
 
-  bool EnableTranslate;
-  bool EnableRotate;
+  bool EnableTranslate; /* mirrors the button assigned the "Translate World" role */
+  bool EnableRotate;    /* mirrors the button assigned the "Rotate World" role */
 
-  bool IsInitialTransRecorded;
-  bool IsInitialRotRecorded;
+  bool IsInitialTransRecorded; /* flag indicating that we're in the middle of a translation
+                                  operation */
+  bool IsInitialRotRecorded; /* flag indicating that we're in the middle of a rotation operation */
+                             /* NOTE: only one of translation or rotation can be active at a time */
 
   vtkNew<vtkMatrix4x4> InverseInitialTransMatrix;
   vtkNew<vtkMatrix4x4> InverseInitialRotMatrix;
@@ -69,10 +71,11 @@ protected:
   vtkNew<vtkMatrix4x4> CachedRotMatrix;
 
 private:
-  vtkVRGrabWorldStyle(const vtkVRGrabWorldStyle&) = delete;
-  void operator=(const vtkVRGrabWorldStyle&) = delete;
+  vtkVRGrabWorldStyle(const vtkVRGrabWorldStyle&) = delete; // Not implemented
+  void operator=(const vtkVRGrabWorldStyle&) = delete;      // Not implemented
 
-  float GetSpeedFactor(vtkCamera* cam);
+  float GetSpeedFactor(vtkCamera* cam, vtkMatrix4x4* mvmatrix); /* WRS: what does this do? */
+  vtkCamera* GetCamera();
 };
 
-#endif // vtkVRGrabWorldStyle.h_
+#endif // vtkVRGrabWorldStyle_h

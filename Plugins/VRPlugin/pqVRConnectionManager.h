@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef vtkVRConnectionManager_h
-#define vtkVRConnectionManager_h
+#ifndef pqVRConnectionManager_h
+#define pqVRConnectionManager_h
 #include "vtkPVVRConfig.h"
 
 #include <QObject>
@@ -96,4 +96,4 @@ private:
   static QPointer<pqVRConnectionManager> Instance;
 };
 
-#endif // vtkVRConnectionManager_h
+#endif // pqVRConnectionManager_h

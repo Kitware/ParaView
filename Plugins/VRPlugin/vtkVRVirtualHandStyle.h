@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRVirtualHandStyle.h
+   Module:  vtkVRVirtualHandStyle.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -33,14 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define vtkVRVirtualHandStyle_h
 
 #include "vtkNew.h"
-#include "vtkVRTrackStyle.h"
+#include "vtkVRTrackStyle.h" // WRS-TODO: why include "vtkVRTrackStyle.h" and not "vtkVRInteractorStyle.h"?  Test the latter
 
 class vtkCamera;
 class vtkMatrix4x4;
 class vtkSMRenderViewProxy;
 class vtkSMDoubleVectorProperty;
 class vtkSMIntVectorProperty;
-struct vtkVREventData;
+struct vtkVREvent;
 
 class vtkVRVirtualHandStyle : public vtkVRTrackStyle
 {
@@ -51,10 +51,10 @@ public:
 
 protected:
   vtkVRVirtualHandStyle();
-  ~vtkVRVirtualHandStyle();
+  ~vtkVRVirtualHandStyle(); // WRS-TODO: no "override" here?  Others have it.
 
-  void HandleButton(const vtkVREventData& data) override;
-  void HandleTracker(const vtkVREventData& data) override;
+  void HandleButton(const vtkVREvent& event) override;
+  void HandleTracker(const vtkVREvent& event) override;
 
   bool CurrentButton;
   bool PrevButton;
@@ -72,4 +72,4 @@ private:
   void operator=(const vtkVRVirtualHandStyle&) = delete;
 };
 
-#endif // vtkVRVirtualHandStyle.h
+#endif // vtkVRVirtualHandStyle_h
