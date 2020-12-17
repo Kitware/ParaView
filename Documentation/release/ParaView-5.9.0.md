@@ -88,6 +88,10 @@ There are smaller but still notable ray tracing updates and bug fixes in this re
 
 ## NVIDIA IndeX plugin improvements
 
+>![IndeXDKRZ](img/5.9.0/IndeX-PV5.9.jpg)
+>
+> Unstructured grid rendered with NVIDIA IndeX in ParaView. Dataset courtesy DKRZ German Climate Research Center.
+
 ### Unstructured grids
 
 The NVIDIA IndeX plugin is now more efficient when loading and rendering large unstructured grids, thanks to an optimized data subdivision that does not require any manual configuration.
