@@ -28,7 +28,6 @@ configure_file(
   COPYONLY)
 
 set(paraview_cmake_module_files
-
   # Compatibility
   paraview-use-file-compat.cmake
   paraview-use-file-deprecated.cmake

@@ -444,12 +444,12 @@ paraview_require_module(
 paraview_require_module(
   CONDITION PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL
   MODULES   VTK::IOAMR
+            VTK::IOCGNSReader
             VTK::IOCityGML
             VTK::IOCONVERGECFD
             VTK::IOIoss
             VTK::IOH5part
             VTK::IONetCDF
-            VTK::IOCGNSReader
             VTK::IOOggTheora
             VTK::IOParallelExodus
             VTK::IOParallelLSDyna
