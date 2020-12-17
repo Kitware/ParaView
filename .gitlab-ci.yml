@@ -195,9 +195,6 @@ test:windows-vs2019-kits-mpi-python-qt:
     needs:
         - build:windows-vs2019-kits-mpi-python-qt
     timeout: 90 minutes
-    # There are some failing tests; in the interest of getting builds working,
-    # allow tests to fail (for now).
-    allow_failure: true
 
 build:windows-vs2019-qt:
     extends:
@@ -218,9 +215,6 @@ test:windows-vs2019-qt:
         - build:windows-vs2019-qt
     needs:
         - build:windows-vs2019-qt
-    # There are some failing tests; in the interest of getting builds working,
-    # allow tests to fail (for now).
-    allow_failure: true
 
 # Deployment
 

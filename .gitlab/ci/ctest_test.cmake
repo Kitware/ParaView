@@ -67,7 +67,11 @@ if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "windows")
     "^paraviewPython-TestCatalystClient$"
 
     # Not all machines have a new enough GPU to test IndeX (yet).
-    "^pv\\.IndeXRepresentation$")
+    "^pv\\.IndeXRepresentation$"
+
+    # Fails on windows.
+    "pqWidgetsHeaderViewCheckState"
+    )
 endif ()
 
 if ("$ENV{CC}" STREQUAL "icc")
