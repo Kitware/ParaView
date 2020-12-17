@@ -106,6 +106,14 @@ public:
   QIcon customIndicatorIcon(const QString& role) const;
   //@}
 
+  /**
+   * For testing purposes only. Returns the position of the painted checkbox in
+   * the most recent paint call. Note, currently we only support at most one
+   * checkable section. We will need to change this API if we start
+   * supporting multiple checkable sections.
+   */
+  QRect lastCheckRect() const { return this->CheckRect; }
+
 Q_SIGNALS:
   void customIndicatorClicked(int section, const QPoint& pt, const QString& role);
 
