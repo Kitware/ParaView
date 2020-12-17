@@ -787,7 +787,7 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
 
 
     @exportRpc("viewport.image.push.quality")
-    def setViewQuality(self, viewId, quality, ratio = 1):
+    def setViewQuality(self, viewId, quality, ratio=1, updateLinkedView=True):
         sView = self.getView(viewId)
         if not sView:
             return { 'error': 'Unable to get view with id %s' % viewId }
