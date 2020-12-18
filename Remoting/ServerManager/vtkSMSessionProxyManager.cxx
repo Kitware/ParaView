@@ -1305,7 +1305,7 @@ void vtkSMSessionProxyManager::CollectReferredProxies(
 vtkSmartPointer<vtkPVXMLElement> vtkSMSessionProxyManager::GetXMLState(
   const std::set<vtkSMProxy*>& restrictionSet, bool forceRestriction)
 {
-  vtkNew<vtkPVXMLElement> rootElement;
+  vtkSmartPointer<vtkPVXMLElement> rootElement = vtkSmartPointer<vtkPVXMLElement>::New();
   rootElement->SetName("ServerManagerState");
 
   // Set version number on the state element.
