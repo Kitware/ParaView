@@ -200,7 +200,7 @@ read_all_submodules () {
         export GIT_INDEX_FILE
         git add .gitmodules 2>/dev/null
         git rm --cached "$displaypath" >&2
-        GIT_ALTERNATE_OBJECT_DIRECTORIES="$gitdir/objects" git read-tree -i --prefix="$sm_path/" "$sha1"
+        GIT_ALTERNATE_OBJECT_DIRECTORIES="$gitdir/objects" git read-tree -i --prefix="$displaypath/" "$sha1"
         echo "$gitdir/objects"
     ' | \
         tr '\n' ':'
