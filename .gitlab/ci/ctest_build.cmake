@@ -30,14 +30,6 @@ foreach (target IN LISTS targets_to_build)
     ctest_submit(PARTS Build)
 endforeach ()
 
-file(GLOB logs
-  "${CTEST_BINARY_DIRECTORY}/superbuild/*/stamp/*-build-*.log"
-  "${CTEST_BINARY_DIRECTORY}/superbuild/*/stamp/*-install-*.log")
-if (logs)
-  list(APPEND CTEST_NOTES_FILES ${logs})
-  ctest_submit(PARTS Notes)
-endif ()
-
 if (build_result)
   message(FATAL_ERROR
     "Failed to build")
