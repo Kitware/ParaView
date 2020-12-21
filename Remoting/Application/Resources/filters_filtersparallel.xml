@@ -1449,6 +1449,14 @@
         per piece will be chosen at random; otherwise the unique value will
         match the id of the process.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetCellScalarsFlag"
+                         default_values="0"
+                         name="CellScalars"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>The value of this property determines whether to output
+        the array as point data or cell data.</Documentation>
+      </IntVectorProperty>
       <!-- End ProcessIdScalars -->
     </SourceProxy>
 
