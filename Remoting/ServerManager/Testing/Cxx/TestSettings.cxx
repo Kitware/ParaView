@@ -46,6 +46,8 @@ int TestSettings(int argc, char* argv[])
   cout << settingString;
 
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
+  // cleanup because vtkInitialixationHelper looks for settings on disk
+  settings->ClearAllSettings();
   settings->AddCollectionFromString(settingString, 1.0);
 
   const char* higherPrioritySettingsString = "{\n"
@@ -129,7 +131,7 @@ int TestSettings(int argc, char* argv[])
   auto contourLocatorProperty = vtkSMProxyProperty::SafeDownCast(contour->GetProperty("Locator"));
   if (!contourLocatorProperty)
   {
-    std::cerr << "No contour locator property in GenericContour\n";
+    std::cerr << "No contour locator property in GenericContour" << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -140,11 +142,13 @@ int TestSettings(int argc, char* argv[])
   settings->SetProxySettings(contour);
   contourLocatorProperty->SetProxy(0, locator0);
 
+  settings->GetProxySettings(contour);
   contour->ResetPropertiesToDefault();
 
   if (strcmp(contourLocatorProperty->GetProxy(0)->GetXMLName(), locator1->GetXMLName()) != 0)
   {
-    std::cerr << "Wrong selected locator. Should be " << locator1->GetXMLName() << std::endl;
+    std::cerr << "Wrong selected locator. Has " << contourLocatorProperty->GetProxy(0)->GetXMLName()
+              << " instead of " << locator1->GetXMLName() << std::endl;
     std::cerr << *settings << std::endl;
     return EXIT_FAILURE;
   }
@@ -160,6 +164,9 @@ int TestSettings(int argc, char* argv[])
     cerr << "Failed to DeserializeFromJSON." << endl;
     return EXIT_FAILURE;
   }
+
+  // avoid writing our test settings on disk.
+  settings->ClearAllSettings();
   session->Delete();
   vtkInitializationHelper::Finalize();
   return EXIT_SUCCESS;
