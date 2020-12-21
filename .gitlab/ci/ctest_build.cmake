@@ -9,25 +9,25 @@ ctest_start(APPEND)
 set(targets_to_build "all")
 
 foreach (target IN LISTS targets_to_build)
-    set(build_args)
+  set(build_args)
+  if (NOT target STREQUAL "all")
+    list(APPEND build_args TARGET ${target})
+  endif ()
+
+  if (CTEST_CMAKE_GENERATOR MATCHES "Make")
+    # Drop the `-i` flag without remorse.
+    set(CTEST_BUILD_COMMAND "make -j 4 ${CTEST_BUILD_FLAGS}")
+
     if (NOT target STREQUAL "all")
-      list(APPEND build_args TARGET ${target})
+      set(CTEST_BUILD_COMMAND "${CTEST_BUILD_COMMAND} ${target}")
     endif ()
+  endif ()
 
-    if (CTEST_CMAKE_GENERATOR MATCHES "Make")
-      # Drop the `-i` flag without remorse.
-      set(CTEST_BUILD_COMMAND "make -j 4 ${CTEST_BUILD_FLAGS}")
+  ctest_build(
+    RETURN_VALUE    build_result
+    ${build_args})
 
-      if (NOT target STREQUAL "all")
-          set(CTEST_BUILD_COMMAND "${CTEST_BUILD_COMMAND} ${target}")
-      endif ()
-    endif ()
-
-    ctest_build(
-        RETURN_VALUE    build_result
-        ${build_args})
-
-    ctest_submit(PARTS Build)
+  ctest_submit(PARTS Build)
 endforeach ()
 
 if (build_result)
