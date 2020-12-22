@@ -14,12 +14,6 @@ configuration_flag(PARAVIEW_BUILD_WITH_KITS "kits")
 # mpi
 configuration_flag(PARAVIEW_USE_MPI "mpi")
 
-# Set RPATH with MPI
-if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "mpi")
-  set(CMAKE_INSTALL_RPATH "/usr/lib64/openmpi")
-  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-endif ()
-
 # offscreen
 configuration_flag(VTK_DEFAULT_RENDER_WINDOW_OFFSCREEN "offscreen")
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "offscreen")
