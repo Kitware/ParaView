@@ -46,12 +46,9 @@
 #include "vtkVRUIPipe.h"
 #include "vtkVRUIServerState.h"
 #include "vtkVRUITrackerState.h"
-
 #include <QDateTime>
 #include <QDebug>
 #include <QMutex>
-#include <QTcpSocket>
-
 #include <algorithm>
 #include <iostream>
 #include <pqDataRepresentation.h>
@@ -60,6 +57,15 @@
 #include <vtkCamera.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
+#ifdef QTSOCK
+#include <QTcpSocket>
+#else
+#include <fcntl.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#endif
 
 // ----------------------------------------------------------------------------
 class pqVRUIConnection::pqInternals
@@ -68,7 +74,11 @@ public:
   // --------------------------------------------------------------------------
   pqInternals()
   {
-    this->Socket = nullptr;
+#ifdef QTSOCK
+    this->Socket = false;
+#else
+    this->Socket = -1;
+#endif
     this->Active = false;
     this->Pipe = 0;
     this->State = 0;
@@ -91,7 +101,11 @@ public:
     }
   }
 
+#ifdef QTSOCK
   QTcpSocket* Socket;
+#else
+  int Socket;
+#endif
   bool Active;
   vtkVRUIPipe* Pipe;
   vtkVRUIServerState* State;
@@ -103,13 +117,46 @@ public:
   // --------------------------------------------------------------------------
   void initSocket(std::string address, std::string port)
   {
-    this->Socket = new QTcpSocket();
+#ifdef QTSOCK
+    this->Socket = new QTcpSocket;
 #ifdef VRUI_ENABLE_DEBUG
     qDebug() << QString(address.c_str()) << "::" << QString(port.c_str()).toInt();
 #endif
 
     this->Socket->connectToHost(QString(address.c_str()),
       QString(port.c_str()).toInt()); // ReadWrite?
+#else
+    struct sockaddr_in client_addr;
+    struct hostent* hp;
+
+    this->Socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (this->Socket < 0)
+    {
+#ifdef VRUI_ENABLE_DEBUG
+      qDebug() << "Error opening stream socket";
+      abort();
+#endif
+    }
+
+    /* Name socket using file system name */
+    hp = gethostbyname(address.c_str());
+    if (hp == 0)
+    {
+      fprintf(stderr, "%s: unknown host\n", address.c_str());
+      return;
+    }
+    bcopy(hp->h_addr, &client_addr.sin_addr, hp->h_length);
+
+    client_addr.sin_family = AF_INET;
+    client_addr.sin_port = htons((uint16_t)atoi(port.c_str()));
+
+    if (::connect(this->Socket, (struct sockaddr*)&client_addr, sizeof(struct sockaddr_in)) < 0)
+    { /* TODO: why is this "sockaddr", when the type is "sockaddr_in" ?? */
+      close(this->Socket);
+      perror("connecting stream socket");
+      return;
+    }
+#endif
   }
 
   // --------------------------------------------------------------------------
@@ -642,12 +689,12 @@ void pqVRUIConnection::getNextPacket()
 // ----------------------------------------------------------------------------
 void pqVRUIConnection::newAnalogValue(std::vector<float>* data)
 {
-  vtkVREventData temp;
+  vtkVREvent temp;
   temp.connId = this->Address;
   temp.name = name(ANALOG_EVENT);
   temp.eventType = ANALOG_EVENT;
   temp.timeStamp = QDateTime::currentDateTime().toTime_t();
-  temp.data.analog.num_channel = (int)(*data).size();
+  temp.data.analog.num_channels = (int)(*data).size();
   for (unsigned int i = 0; i < (*data).size(); ++i)
   {
     temp.data.analog.channel[i] = (*data)[i];
@@ -658,7 +705,7 @@ void pqVRUIConnection::newAnalogValue(std::vector<float>* data)
 // ----------------------------------------------------------------------------
 void pqVRUIConnection::newButtonValue(int state, int button)
 {
-  vtkVREventData temp;
+  vtkVREvent temp;
   temp.connId = this->Address;
   temp.name = this->name(BUTTON_EVENT, button);
   temp.eventType = BUTTON_EVENT;
@@ -671,7 +718,7 @@ void pqVRUIConnection::newButtonValue(int state, int button)
 // ----------------------------------------------------------------------------
 void pqVRUIConnection::newTrackerValue(vtkSmartPointer<vtkVRUITrackerState> data, int sensor)
 {
-  vtkVREventData temp;
+  vtkVREvent temp;
   temp.connId = this->Address;
   temp.name = name(TRACKER_EVENT, sensor);
   temp.eventType = TRACKER_EVENT;

@@ -34,6 +34,10 @@ set(sources
   vtkVRControlSliceOrientationStyle.h
   vtkVRControlSlicePositionStyle.cxx
   vtkVRControlSlicePositionStyle.h
+  vtkVRGrabPointStyle.cxx
+  vtkVRGrabPointStyle.h
+  vtkVRGrabTransformStyle.cxx
+  vtkVRGrabTransformStyle.h
   vtkVRGrabWorldStyle.cxx
   vtkVRGrabWorldStyle.h
   vtkVRInteractorStyle.cxx
@@ -44,6 +48,8 @@ set(sources
   vtkVRMovePointStyle.h
   vtkVRQueue.cxx
   vtkVRQueue.h
+  vtkVRSkeletonStyle.cxx
+  vtkVRSkeletonStyle.h
   vtkVRSpaceNavigatorGrabWorldStyle.cxx
   vtkVRSpaceNavigatorGrabWorldStyle.h
   vtkVRStylusStyle.cxx

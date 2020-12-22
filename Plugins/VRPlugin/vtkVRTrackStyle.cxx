@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRTrackStyle.cxx
+   Module:  vtkVRTrackStyle.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,12 +29,22 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
+/***********************************************************************/
+/*                                                                     */
+/* Style for the head tracking interface -- vtkVRTrackStyle            */
+/*                                                                     */
+/* NOTES:                                                              */
+/*    * The simplest of interface styles -- simply maps head tracking  */
+/*        data to the eye location.                                    */
+/*                                                                     */
+/*    * It is expected that the RenderView EyeTransformMatrix is the   */
+/*        property that will be connected to the head tracker.         */
+/*                                                                     */
+/***********************************************************************/
 #include "vtkVRTrackStyle.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
@@ -47,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkStandardNewMacro(vtkVRTrackStyle)
 
   // ----------------------------------------------------------------------------
+  // Constructor method
   vtkVRTrackStyle::vtkVRTrackStyle()
   : Superclass()
 {
@@ -54,27 +65,32 @@ vtkStandardNewMacro(vtkVRTrackStyle)
 }
 
 // ----------------------------------------------------------------------------
+// Destructor method
 vtkVRTrackStyle::~vtkVRTrackStyle()
 {
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRTrackStyle::HandleTracker(const vtkVREventData& data)
+// PrintSelf() method
+void vtkVRTrackStyle::PrintSelf(ostream& os, vtkIndent indent)
 {
-  std::string role = this->GetTrackerRole(data.name);
+  this->Superclass::PrintSelf(os, indent);
+}
+
+// ----------------------------------------------------------------------------
+// HandleTracker() method
+void vtkVRTrackStyle::HandleTracker(const vtkVREvent& event)
+{
+  std::string role = this->GetTrackerRole(event.name);
+
   if (role == "Tracker")
   {
     if (this->ControlledProxy && this->ControlledPropertyName != NULL &&
       this->ControlledPropertyName[0] != '\0')
     {
       vtkSMPropertyHelper(this->ControlledProxy, this->ControlledPropertyName)
-        .Set(data.data.tracker.matrix, 16);
+        .Set(event.data.tracker.matrix, 16);
       this->ControlledProxy->UpdateVTKObjects();
     }
   }
-}
-
-void vtkVRTrackStyle::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
 }

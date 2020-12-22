@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRTrackStyle.h
+   Module:  vtkVRTrackStyle.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef vtkVRTrackStyle_h_
-#define vtkVRTrackStyle_h_
+#ifndef vtkVRTrackStyle_h
+#define vtkVRTrackStyle_h
 
 #include "vtkVRInteractorStyle.h"
 
@@ -40,25 +40,25 @@ class vtkSMProxy;
 class vtkSMRenderViewProxy;
 class vtkTransform;
 
-struct vtkVREventData;
+struct vtkVREvent;
 
 class vtkVRTrackStyle : public vtkVRInteractorStyle
 {
 public:
   static vtkVRTrackStyle* New();
-  vtkTypeMacro(vtkVRTrackStyle, vtkVRInteractorStyle);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  vtkTypeMacro(vtkVRTrackStyle, vtkVRInteractorStyle) void PrintSelf(
+    ostream& os, vtkIndent indent) override;
 
   int GetControlledPropertySize() override { return 16; }
 
 protected:
   vtkVRTrackStyle();
   ~vtkVRTrackStyle() override;
-  void HandleTracker(const vtkVREventData& data) override;
+  void HandleTracker(const vtkVREvent& event) override;
 
 private:
-  vtkVRTrackStyle(const vtkVRTrackStyle&) = delete;
-  void operator=(const vtkVRTrackStyle&) = delete;
+  vtkVRTrackStyle(const vtkVRTrackStyle&) = delete; // Not implemented.
+  void operator=(const vtkVRTrackStyle&) = delete;  // Not implemented.
 };
 
-#endif // vtkVRTrackStyle.h_
+#endif // vtkVRTrackStyle_h

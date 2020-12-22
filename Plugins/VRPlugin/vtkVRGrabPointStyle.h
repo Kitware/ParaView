@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRStylusStyle.h
+   Module:  vtkVRGrabPointStyle.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,44 +29,53 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-/**
- * @class   vtkVRStylusStyle
- * @brief   an interaction style to control translation and rotation with a stylus
- *
- * vtkVRStylusStyle is an interaction style that uses the position of the
- * stylus in screen space (for example the stylus of the zSpace) to modify a 4x4 matrix.
- * Only the location of the stylus is used, the rotation has no effect.
- * Only works with RenderView proxy.
- */
-#ifndef vtkVRStylusStyle_h
-#define vtkVRStylusStyle_h
+#ifndef vtkVRGrabPointStyle_h
+#define vtkVRGrabPointStyle_h
 
-#include "vtkVRTrackStyle.h"
+#include "vtkNew.h"
+#include "vtkVRInteractorStyle.h"
+
+class vtkCamera;
+class vtkMatrix4x4;
+class vtkSMRenderViewProxy;
+class vtkSMDoubleVectorProperty;
+class vtkSMIntVectorProperty;
 struct vtkVREvent;
 
-class vtkVRStylusStyle : public vtkVRTrackStyle
+class vtkVRGrabPointStyle : public vtkVRInteractorStyle
 {
 public:
-  static vtkVRStylusStyle* New();
-  vtkTypeMacro(vtkVRStylusStyle, vtkVRTrackStyle);
+  static vtkVRGrabPointStyle* New();
+  vtkTypeMacro(vtkVRGrabPointStyle, vtkVRInteractorStyle);
   void PrintSelf(ostream& os, vtkIndent indent) override;
+  int GetControlledPropertySize() override { return 3; }
+
+  /// Update() called to update all the remote vtkObjects and perhaps even to render.
+  ///   Typically processing intensive operations go here. The method should not
+  ///   be called from within the handler and is reserved to be called from an
+  ///   external interaction style manager.
+  bool Update() override;
 
 protected:
-  vtkVRStylusStyle();
-  ~vtkVRStylusStyle() override = default;
+  vtkVRGrabPointStyle();
+  ~vtkVRGrabPointStyle() override;
 
   void HandleButton(const vtkVREvent& event) override;
   void HandleTracker(const vtkVREvent& event) override;
 
-  bool EnableTranslate;
-  bool EnableRotate;
+  bool EnableNavigate;    /* mirrors the button assigned the "Navigate World" role */
+  bool IsInitialRecorded; /* flag indicating that we're in the middle of a navigation operation */
+  double Origin[4];
+
+  vtkNew<vtkMatrix4x4> SavedModelViewMatrix;
+  vtkNew<vtkMatrix4x4> SavedInverseWandMatrix;
 
 private:
-  vtkVRStylusStyle(const vtkVRStylusStyle&) = delete;
-  void operator=(const vtkVRStylusStyle&) = delete;
+  vtkVRGrabPointStyle(const vtkVRGrabPointStyle&) = delete; // Not implemented
+  void operator=(const vtkVRGrabPointStyle&) = delete;      // Not implemented
 
-  double LastRecordedPosition[3];
-  bool PositionRecorded;
+  float GetSpeedFactor(vtkCamera* cam); // WRS-TODO: what does this do?
+  vtkCamera* GetCamera();               // WRS-TODO: how is this used?
 };
 
-#endif // vtkVRStylusStyle_h
+#endif // vtkVRGrabPointStyle_h

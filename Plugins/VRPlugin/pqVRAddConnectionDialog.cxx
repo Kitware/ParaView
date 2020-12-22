@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  pqVRAddConnectionDialog.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -303,25 +303,26 @@ void pqVRAddConnectionDialog::accept()
 }
 
 //-----------------------------------------------------------------------------
-void pqVRAddConnectionDialog::keyPressEvent(QKeyEvent* e)
+void pqVRAddConnectionDialog::keyPressEvent(QKeyEvent* event)
 {
   // Disable the default behavior of clicking "Ok" when enter is pressed
-  if (!e->modifiers() || (e->modifiers() & Qt::KeypadModifier && e->key() == Qt::Key_Enter))
+  if (!event->modifiers() ||
+    (event->modifiers() & Qt::KeypadModifier && event->key() == Qt::Key_Enter))
   {
-    switch (e->key())
+    switch (event->key())
     {
       case Qt::Key_Enter:
       case Qt::Key_Return:
         if (this->Internals->insertInput->hasFocus())
         {
           this->Internals->insertInput->click();
-          e->accept();
+          event->accept();
           return;
         }
         return;
     }
   }
-  QDialog::keyPressEvent(e);
+  QDialog::keyPressEvent(event);
 }
 
 //-----------------------------------------------------------------------------

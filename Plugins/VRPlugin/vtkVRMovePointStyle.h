@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkVRTrackStyle.h"
 
-struct vtkVREventData;
+struct vtkVREvent;
 
 class vtkVRMovePointStyle : public vtkVRTrackStyle
 {
@@ -56,8 +56,8 @@ protected:
   vtkVRMovePointStyle();
   ~vtkVRMovePointStyle() override = default;
 
-  void HandleButton(const vtkVREventData& data) override;
-  void HandleTracker(const vtkVREventData& data) override;
+  void HandleButton(const vtkVREvent& data) override;
+  void HandleTracker(const vtkVREvent& data) override;
 
   bool EnableMovePoint;
 

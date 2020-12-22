@@ -59,7 +59,7 @@ vtkVRMovePointStyle::vtkVRMovePointStyle()
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRMovePointStyle::HandleButton(const vtkVREventData& data)
+void vtkVRMovePointStyle::HandleButton(const vtkVREvent& data)
 {
   this->PositionRecorded = false;
 
@@ -71,7 +71,7 @@ void vtkVRMovePointStyle::HandleButton(const vtkVREventData& data)
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRMovePointStyle::HandleTracker(const vtkVREventData& data)
+void vtkVRMovePointStyle::HandleTracker(const vtkVREvent& data)
 {
   if (this->GetTrackerRole(data.name) != "Tracker")
   {

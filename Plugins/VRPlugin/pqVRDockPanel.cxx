@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  pqVRDockPanel.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -216,7 +216,7 @@ void pqVRDockPanel::editConnection(QListWidgetItem* item)
   // Lookup connection
   QString connName = item->text();
   pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
-  (void)mgr;
+  (void)mgr; // Avoid unusued local variable warning if VRPN and VRUI not enabled
 
   pqVRAddConnectionDialog dialog(this);
   bool set = false;
@@ -269,7 +269,7 @@ void pqVRDockPanel::addConnection()
   if (dialog.exec() == QDialog::Accepted)
   {
     pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
-    (void)mgr;
+    (void)mgr; // Avoid unusued local variable warning if VRPN and VRUI not enabled
     dialog.updateConnection();
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
     if (dialog.isVRPN())
@@ -298,7 +298,7 @@ void pqVRDockPanel::removeConnection()
   }
   QString name = item->text();
   pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
-  (void)mgr;
+  (void)mgr; // Avoid unusued local variable warning if VRPN and VRUI not enabled
 
   pqVRAddConnectionDialog dialog(this);
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
@@ -442,7 +442,7 @@ void pqVRDockPanel::setActiveView(pqView* view)
 {
   pqRenderView* rview = qobject_cast<pqRenderView*>(view);
 
-  // Remove any RenderView.* entries in the combobox
+  // Remove any RenderView entries in the combobox
   Qt::MatchFlags matchFlags = Qt::MatchStartsWith | Qt::MatchCaseSensitive;
   int ind = this->Internals->proxyCombo->findText("RenderView", matchFlags);
   while (ind != -1)
@@ -644,22 +644,36 @@ void pqVRDockPanel::updateDebugLabel()
 }
 
 //-----------------------------------------------------------------------------
+// createName() -- this method returns the string that will appear in the
+//   "Interactions:" list in the Qt VR Panel for the individual given "*style".
 QString pqVRDockPanel::pqInternals::createName(vtkVRInteractorStyle* style)
 {
+  QString description;  // A one-line description of the interaction (style, object, property)
+  QString className;    // The name of the style's VTK class (e.g. vtkVRTrackStyle)
+  QString styleName;    // A human readable version of the style
+  QString objectName;   // The object onto which the style interacts
+  QString propertyName; // The property of the object which the style affects
+
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* model = core->getServerManagerModel();
   vtkVRInteractorStyleFactory* styleFactory = vtkVRInteractorStyleFactory::GetInstance();
 
-  QString className = style->GetClassName();
-  QString desc =
+  className = style->GetClassName();
+  styleName =
     QString::fromStdString(styleFactory->GetDescriptionFromClassName(className.toStdString()));
+
   vtkSMProxy* smControlledProxy = style->GetControlledProxy();
   pqProxy* pqControlledProxy = model->findItem<pqProxy*>(smControlledProxy);
-  QString name =
-    QString("%1 on %2's %3")
-      .arg(desc)
-      .arg(pqControlledProxy ? pqControlledProxy->getSMName() : smControlledProxy->GetXMLLabel())
-      .arg(style->GetControlledPropertyName());
 
-  return name;
+  // WRS-TODO: I don't know why "<error>" occurs, there will always be a selected Proxy -- should be
+  // investigated
+  objectName =
+    (pqControlledProxy ? pqControlledProxy->getSMName()
+                       : (smControlledProxy ? smControlledProxy->GetXMLLabel() : "<error>"));
+  propertyName =
+    (strlen(style->GetControlledPropertyName()) ? style->GetControlledPropertyName() : "--");
+
+  description = QString("%1 on %2's %3").arg(styleName).arg(objectName).arg(propertyName);
+
+  return description;
 }

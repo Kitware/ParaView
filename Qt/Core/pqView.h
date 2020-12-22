@@ -143,7 +143,7 @@ public Q_SLOTS:
   * For example, reset the camera or zoom level.
   * The default implementation does nothing, but subclasses may override.
   */
-  virtual void resetDisplay(bool closest = false) {}
+  virtual void resetDisplay(bool closest = false) { (void)closest; }
 
 public:
   /**

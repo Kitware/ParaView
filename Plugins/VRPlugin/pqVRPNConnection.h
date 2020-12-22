@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    ParaViewVRPN.h
+   Module:  pqVRPNConnection.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -119,27 +119,27 @@ public:
   /// Access to analog map
   std::map<std::string, std::string> analogMap() { return this->AnalogMapping; }
   /// Access to analog map
-  void setAnalogMap(const std::map<std::string, std::string>& m)
+  void setAnalogMap(const std::map<std::string, std::string>& mapping)
   {
-    this->AnalogMapping = m;
+    this->AnalogMapping = mapping;
     this->AnalogPresent = (this->AnalogMapping.size() > 0);
   }
 
   /// Access to button map
   std::map<std::string, std::string> buttonMap() { return this->ButtonMapping; }
   /// Access to button map
-  void setButtonMap(const std::map<std::string, std::string>& m)
+  void setButtonMap(const std::map<std::string, std::string>& mapping)
   {
-    this->ButtonMapping = m;
+    this->ButtonMapping = mapping;
     this->ButtonPresent = (this->ButtonMapping.size() > 0);
   }
 
   /// Access to tracker map
   std::map<std::string, std::string> trackerMap() { return this->TrackerMapping; }
   /// Access to tracker map
-  void setTrackerMap(const std::map<std::string, std::string>& m)
+  void setTrackerMap(const std::map<std::string, std::string>& mapping)
   {
-    this->TrackerMapping = m;
+    this->TrackerMapping = mapping;
     this->TrackerPresent = (this->TrackerMapping.size() > 0);
   }
 

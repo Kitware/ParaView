@@ -27,8 +27,9 @@
 #include <vrpn_Text.h>
 #include <vrpn_Tracker.h>
 
-void VRPN_CALLBACK handleAnalogChange(void* userdata, const vrpn_ANALOGCB b);
-void VRPN_CALLBACK handleButtonChange(void* userdata, vrpn_BUTTONCB b);
-void VRPN_CALLBACK handleTrackerChange(void* userdata, const vrpn_TRACKERCB t);
+void VRPN_CALLBACK handleAnalogChange(void* userdata, const vrpn_ANALOGCB analog_value);
+void VRPN_CALLBACK handleButtonChange(
+  void* userdata, vrpn_BUTTONCB button_value); // WRS-TODO: why no "const" here?
+void VRPN_CALLBACK handleTrackerChange(void* userdata, const vrpn_TRACKERCB tracker_value);
 
 #endif // vtkVRPNCallBackHandlers_h

@@ -302,9 +302,9 @@ void pqVRConnectionManager::configureConnections(vtkPVXMLElement* xml, vtkSMProx
           const char* address = child->GetAttributeOrEmpty("address");
           (void)name;
           (void)address;
-// TODO: Need to throw some warning if VRPN is used when not
-// compiled. For now we will simply ignore VRPN configuration
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+          // TODO: Need to throw some warning if VRPN is used when not
+          // compiled. For now we will simply ignore VRPN configuration
           pqVRPNConnection* device = new pqVRPNConnection(this);
           device->setName(name);
           device->setAddress(address);
@@ -314,9 +314,9 @@ void pqVRConnectionManager::configureConnections(vtkPVXMLElement* xml, vtkSMProx
         }
         else if (strcmp(child->GetName(), "VRUIConnection") == 0)
         {
-// TODO: Need to throw some warning if VRUI is used when not
-// compiled. For now we will simply ignore VRUI configuration
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+          // TODO: Need to throw some warning if VRUI is used when not
+          // compiled. For now we will simply ignore VRUI configuration
           const char* name = child->GetAttributeOrEmpty("name");
           const char* address = child->GetAttributeOrEmpty("address");
           const char* port = child->GetAttribute("port");

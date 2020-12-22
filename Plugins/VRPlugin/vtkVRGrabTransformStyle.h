@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRSpaceNavigatorGrabWorldStyle.h
+   Module:  vtkVRGrabTransfromStyle.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,36 +29,45 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef vtkVRSpaceNavigatorGrabWorldStyle_h_
-#define vtkVRSpaceNavigatorGrabWorldStyle_h_
+#ifndef vtkVRGrabTransfromStyle_h
+#define vtkVRGrabTransfromStyle_h
 
-#include "vtkVRInteractorStyle.h"
+#include "vtkNew.h"
+#include "vtkVRTrackStyle.h"
 
+class vtkCamera;
+class vtkMatrix4x4;
+class vtkSMRenderViewProxy;
 class vtkSMDoubleVectorProperty;
 class vtkSMIntVectorProperty;
-class vtkSMProxy;
-class vtkSMRenderViewProxy;
-class vtkTransform;
-
 struct vtkVREvent;
 
-class vtkVRSpaceNavigatorGrabWorldStyle : public vtkVRInteractorStyle
+class vtkVRGrabTransformStyle : public vtkVRTrackStyle
 {
 public:
-  static vtkVRSpaceNavigatorGrabWorldStyle* New();
-  vtkTypeMacro(vtkVRSpaceNavigatorGrabWorldStyle, vtkVRInteractorStyle) void PrintSelf(
-    ostream& os, vtkIndent indent) override;
+  static vtkVRGrabTransformStyle* New();
+  vtkTypeMacro(vtkVRGrabTransformStyle, vtkVRTrackStyle);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
-  vtkVRSpaceNavigatorGrabWorldStyle();
-  ~vtkVRSpaceNavigatorGrabWorldStyle() override;
+  vtkVRGrabTransformStyle();
+  ~vtkVRGrabTransformStyle() override;
 
-  void HandleAnalog(const vtkVREvent& event) override;
+  void HandleButton(const vtkVREvent& event) override;
+  void HandleTracker(const vtkVREvent& event) override;
+
+  bool EnableNavigate;    /* mirrors the button assigned the "Navigate World" role */
+  bool IsInitialRecorded; /* flag indicating that we're in the middle of a navigation operation */
+
+  vtkNew<vtkMatrix4x4> SavedModelViewMatrix;
+  vtkNew<vtkMatrix4x4> SavedInverseWandMatrix;
 
 private:
-  vtkVRSpaceNavigatorGrabWorldStyle(
-    const vtkVRSpaceNavigatorGrabWorldStyle&) = delete;              // Not implemented
-  void operator=(const vtkVRSpaceNavigatorGrabWorldStyle&) = delete; // Not implemented
+  vtkVRGrabTransformStyle(const vtkVRGrabTransformStyle&) = delete;
+  void operator=(const vtkVRGrabTransformStyle&) = delete;
+
+  float GetSpeedFactor(vtkCamera* cam, vtkMatrix4x4* mvmatrix); /* WRS-TODO: what does this do? */
+  vtkCamera* GetCamera();                                       // WRS-TODO: how is this used?
 };
 
-#endif // vtkVRSpaceNavigatorGrabWorldStyle_h
+#endif // vtkVRGrabTransfromStyle_h

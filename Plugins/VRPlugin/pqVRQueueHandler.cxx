@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  vtkVRQueueHandler.cxx
+   Module:  pqVRQueueHandler.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -158,20 +158,20 @@ void pqVRQueueHandler::stop()
 void pqVRQueueHandler::processEvents()
 {
   assert(this->Internals->Queue != NULL);
-  std::queue<vtkVREventData> events;
+  std::queue<vtkVREvent> events;
   this->Internals->Queue->TryDequeue(events);
 
   // Loop through the event queue and pass events to InteractorStyles
   while (!events.empty())
   {
-    vtkVREventData data = events.front();
+    vtkVREvent event = events.front(); /* get first event on the queue */
     events.pop();
     vtkVRInteractorStyle* style;
     for (this->Internals->Styles->InitTraversal();
          (style =
              vtkVRInteractorStyle::SafeDownCast(this->Internals->Styles->GetNextItemAsObject()));)
     {
-      if (style->HandleEvent(data))
+      if (style->HandleEvent(event))
       {
         break;
       }
@@ -214,6 +214,18 @@ void pqVRQueueHandler::render()
 }
 
 //----------------------------------------------------------------------------
+/* Sample PVVR <VRInteractorStyles> configuration:            */
+/*                                                            */
+/*   <VRInteractorStyles>                                     */
+/*      <Style class="vtkVRStyleGrabNRotateWorld">            */
+/*        <Button name="wiimote.A"/>                          */
+/*        <Tracker name="wiimote.tracker"/>                   */
+/*      </Style>                                              */
+/*      <Style class="vtkVRWandTrackingStyle">                */
+/*        <Event name="wiitracker.hand" type = "tracker"/>    */
+/*      </Style>                                              */
+/*   </VRInteractorStyles>                                    */
+/*                                                            */
 void pqVRQueueHandler::configureStyles(vtkPVXMLElement* xml, vtkSMProxyLocator* locator)
 {
   if (!xml)
