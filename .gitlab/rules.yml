@@ -31,12 +31,6 @@
           when: on_success
         - when: never
 
-.merged_only:
-    rules:
-        - if: '$CI_PROJECT_PATH == "paraview/paraview"'
-          when: on_success
-        - when: never
-
 .run_superbuild_trigger:
     rules:
         - if: '$CI_MERGE_REQUEST_ID'
