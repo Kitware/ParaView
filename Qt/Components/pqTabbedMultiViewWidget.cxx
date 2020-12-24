@@ -202,9 +202,12 @@ class pqTabbedMultiViewWidget::pqInternals
 {
   bool DecorationsVisibility = true;
 
+  // keeps tracks of pqMultiViewWidget instances.
+  QMultiMap<pqServer*, QPointer<pqMultiViewWidget> > TabWidgets;
+
 public:
   QPointer<pqTabWidget> TabWidget;
-  QMultiMap<pqServer*, QPointer<pqMultiViewWidget> > TabWidgets;
+
   QPointer<QWidget> FullScreenWindow;
   QPointer<QWidget> NewTabWidget;
 
@@ -254,25 +257,22 @@ public:
     QObject::connect(widget, &pqMultiViewWidget::frameActivated,
       [this, widget]() { this->TabWidget->setCurrentWidget(widget); });
 
-    int tab_index = this->TabWidget->addAsTab(widget, self);
     auto server =
       pqApplicationCore::instance()->getServerManagerModel()->findServer(vlayout->GetSession());
+
     this->TabWidgets.insert(server, widget);
+    int tab_index = this->TabWidget->addAsTab(widget, self);
     return tab_index;
   }
 
-  int tabIndex(vtkSMProxy* vlayout)
+  /**
+   * this will return -1 if vlayout is hidden.
+   */
+  int tabIndex(vtkSMProxy* vlayout) const
   {
-    const int count = this->TabWidget->count();
-    for (int cc = 0; cc < count; ++cc)
+    if (auto widget = this->findWidget(vlayout))
     {
-      if (auto mvwidget = qobject_cast<pqMultiViewWidget*>(this->TabWidget->widget(cc)))
-      {
-        if (mvwidget->layoutManager() == vlayout)
-        {
-          return cc;
-        }
-      }
+      return this->TabWidget->indexOf(widget);
     }
     return -1;
   }
@@ -284,6 +284,61 @@ public:
       this->TabWidget->setCurrentIndex(index);
     }
   }
+
+  /**
+   * Returns pqMultiViewWidget instance given a vlayout, if any. Else
+   * nullptr.
+   */
+  pqMultiViewWidget* findWidget(vtkSMProxy* vlayout) const
+  {
+    for (auto pqmvwidget : this->widgets())
+    {
+      if (pqmvwidget && pqmvwidget->layoutManager() == vlayout)
+      {
+        return pqmvwidget;
+      }
+    }
+    return nullptr;
+  }
+
+  void removeTab(vtkSMProxy* vlayout)
+  {
+    auto widget = this->findWidget(vlayout);
+    if (widget == nullptr)
+    {
+      return;
+    }
+
+    const auto index = this->TabWidget->indexOf(widget);
+    if (index != -1)
+    {
+      if (index == this->TabWidget->currentIndex())
+      {
+        this->TabWidget->setCurrentIndex((index - 1) > 0 ? (index - 1) : 0);
+      }
+      this->TabWidget->removeTab(index);
+    }
+
+    auto server =
+      pqApplicationCore::instance()->getServerManagerModel()->findServer(vlayout->GetSession());
+    this->TabWidgets.remove(server, widget);
+  }
+
+  // removes all tabs associated with a server.
+  void removeTabs(pqServer* server)
+  {
+    auto wdgs = this->TabWidgets.values(server);
+    for (auto widget : wdgs)
+    {
+      if (widget)
+      {
+        this->removeTab(widget->layoutManager());
+      }
+    }
+    this->TabWidgets.remove(server);
+  }
+
+  QList<QPointer<pqMultiViewWidget> > widgets() const { return this->TabWidgets.values(); }
 };
 
 //-----------------------------------------------------------------------------
@@ -412,26 +467,10 @@ void pqTabbedMultiViewWidget::proxyAdded(pqProxy* proxy)
 //-----------------------------------------------------------------------------
 void pqTabbedMultiViewWidget::proxyRemoved(pqProxy* proxy)
 {
+  auto& internals = (*this->Internals);
   if (proxy->getSMGroup() == "layouts" && proxy->getProxy()->IsA("vtkSMViewLayoutProxy"))
   {
-    vtkSMProxy* smproxy = proxy->getProxy();
-
-    QList<QPointer<pqMultiViewWidget> > widgets = this->Internals->TabWidgets.values();
-    foreach (QPointer<pqMultiViewWidget> widget, widgets)
-    {
-      if (widget && widget->layoutManager() == smproxy)
-      {
-        this->Internals->TabWidgets.remove(proxy->getServer(), widget);
-        int index = this->Internals->TabWidget->indexOf(widget);
-        if (this->Internals->TabWidget->currentWidget() == widget)
-        {
-          this->Internals->TabWidget->setCurrentIndex(((index - 1) > 0) ? (index - 1) : 0);
-        }
-        this->Internals->TabWidget->removeTab(index);
-        delete widget;
-        break;
-      }
-    }
+    internals.removeTab(proxy->getProxy());
   }
 }
 
@@ -439,18 +478,8 @@ void pqTabbedMultiViewWidget::proxyRemoved(pqProxy* proxy)
 void pqTabbedMultiViewWidget::serverRemoved(pqServer* server)
 {
   // remove all tabs corresponding to the closed session.
-  QList<QPointer<pqMultiViewWidget> > widgets = this->Internals->TabWidgets.values(server);
-  foreach (pqMultiViewWidget* widget, widgets)
-  {
-    int cur_index = this->Internals->TabWidget->indexOf(widget);
-    if (cur_index != -1)
-    {
-      this->Internals->TabWidget->removeTab(cur_index);
-    }
-    delete widget;
-  }
-
-  this->Internals->TabWidgets.remove(server);
+  auto& internals = (*this->Internals);
+  internals.removeTabs(server);
 }
 
 //-----------------------------------------------------------------------------
@@ -615,7 +644,7 @@ QSize pqTabbedMultiViewWidget::clientSize() const
 //-----------------------------------------------------------------------------
 void pqTabbedMultiViewWidget::lockViewSize(const QSize& viewSize)
 {
-  QList<QPointer<pqMultiViewWidget> > widgets = this->Internals->TabWidgets.values();
+  QList<QPointer<pqMultiViewWidget> > widgets = this->Internals->widgets();
   foreach (QPointer<pqMultiViewWidget> widget, widgets)
   {
     if (widget)
