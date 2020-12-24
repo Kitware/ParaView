@@ -27,6 +27,8 @@ OPTIONAL_DEPENDS
 
   # These affect the public API.
   ParaView::pqPython
+TEST_DEPENDS
+  ParaView::RemotingViews
 TEST_LABELS
   ParaView
 EXCLUDE_WRAP
