@@ -55,15 +55,19 @@ git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ HEAD
     - [ ] Change directory to ParaView source. Stay on the `update-to-v@VERSION@@RC@` branch.
     - [ ] `git config -f .gitmodules submodule.VTK.branch paraview/release`
     - [ ] `git commit -m "release: follow VTK's paraview/release branch" .gitmodules`
+    - [ ] Update `.gitlab/ci/cdash-groups.json` to track the `release` CDash groups
     - [ ] Merge new `release` branch into `master` using `-s ours`
       - `git checkout master`
       - `git merge --no-ff -s ours -m "Merge branch 'release'" update-to-v@VERSION@@RC@`
     - [ ] `git push origin master update-to-v@VERSION@@RC@:release`
     - [ ] Update kwrobot with the new `release` branch rules
+    - [ ] Run [this script][cdash-update-groups] to update the CDash groups (must be done after a nightly run to ensure all builds are in the `release` group).
   - Create tarballs
     - [ ] ParaView (`Utilities/Maintenance/create_tarballs.bash --txz --tgz --zip -v v@VERSION@@RC@`)
   - Upload tarballs to `paraview.org`
     - [ ] `rsync -rptv $tarballs paraview.release:ParaView_Release/v@MAJOR@.@MINOR@/`
+
+[cdash-update-groups]: https://gitlab.kitware.com/utils/cdash-utils/-/blob/master/cdash-update-groups.py
 
 # Update ParaView-Superbuild
 
