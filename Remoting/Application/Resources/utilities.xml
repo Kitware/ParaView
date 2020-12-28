@@ -871,9 +871,16 @@
       </IntVectorProperty>
 
       <ProxyProperty name="GlobalTrigger">
+        <ProxyGroupDomain name="groups">
+          <Group name="extract_triggers" />
+        </ProxyGroupDomain>
         <ProxyListDomain name="proxy_list">
-          <Proxy group="extract_triggers" name="TimeStep" />
+          <Proxy group="extract_triggers"
+                 name="TimeStep" />
+          <Proxy group="extract_triggers"
+                 name="TimeValue" />
         </ProxyListDomain>
+        <Documentation>This property sets the parameters of the trigger.</Documentation>
       </ProxyProperty>
 
       <IntVectorProperty name="EnableCatalystLive"

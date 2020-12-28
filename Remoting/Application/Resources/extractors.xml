@@ -10,10 +10,18 @@
         </Documentation>
       </IntVectorProperty>
 
-      <ProxyProperty name="Trigger">
+      <ProxyProperty name="Trigger"
+                     label="Trigger">
+        <ProxyGroupDomain name="groups">
+          <Group name="extract_triggers" />
+        </ProxyGroupDomain>
         <ProxyListDomain name="proxy_list">
-          <Proxy group="extract_triggers" name="TimeStep" />
+          <Proxy group="extract_triggers"
+                 name="TimeStep" />
+          <Proxy group="extract_triggers"
+                 name="TimeValue" />
         </ProxyListDomain>
+        <Documentation>This property sets the parameters of the trigger.</Documentation>
       </ProxyProperty>
       <ProxyProperty name="Writer">
         <ProxyListDomain name="proxy_list" />
@@ -84,5 +92,68 @@
         <Property name="UseEndTimeStep" function="PropertyCheckBox" />
       </PropertyGroup>
     </ExtractTriggerProxy>
+
+
+
+    <ExtractTriggerProxy name="TimeValue">
+
+      <IntVectorProperty name="UseStartTimeValue"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, **StartTimeValue** will be used to delay the activation of this
+          trigger.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="StartTimeValue"
+                         number_of_elements="1"
+                         default_values="0">
+        <Documentation>
+          Specify the time value to at which this trigger is evaluated. This used only
+          if **UseStartTimeValue** is enabled.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="UseEndTimeValue"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, **EndTimeValue** will be used to delay the activation of this
+          trigger.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="EndTimeValue"
+                         number_of_elements="1"
+                         default_values="0">
+        <Documentation>
+          Specify the time value to at which this trigger is evaluated. This used only
+          if **UseEndTimeValue** is enabled.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Length"
+                         number_of_elements="1"
+                         default_values="1">
+        <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          Specify the time value length.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Start Time Value" panel_widget="CheckableProperty">
+        <Property name="StartTimeValue" function="Property" />
+        <Property name="UseStartTimeValue" function="PropertyCheckBox" />
+      </PropertyGroup>
+
+      <PropertyGroup label="End Time Value" panel_widget="CheckableProperty">
+        <Property name="EndTimeValue" function="Property" />
+        <Property name="UseEndTimeValue" function="PropertyCheckBox" />
+      </PropertyGroup>
+    </ExtractTriggerProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>

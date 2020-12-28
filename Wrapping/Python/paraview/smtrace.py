@@ -864,7 +864,7 @@ class ScalarBarProxyFilter(ProxyFilter):
 class ExtractorFilter(ProxyFilter):
     def should_trace_in_ctor(self, prop): return False
     def should_never_trace(self, prop):
-        if prop.get_property_name() in ["Trigger", "Writer"]:
+        if prop.get_property_name() in ["Writer"]:
             return True
         return super(ExtractorFilter, self).should_never_trace(prop)
 

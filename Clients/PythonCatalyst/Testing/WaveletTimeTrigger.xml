@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Cut" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/show3DWidget" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,15,12,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,15,12,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveX" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/axesToolbar/actionShowOrientationAxes" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuExtractors" />
+  <pqevent object="pqClientMainWindow/menubar/menuExtractors/Image" command="activate" arguments="PNG" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Trigger/ProxySelectionWidget/comboBox" command="activated" arguments="TimeValue" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Trigger/ProxySelectionWidget/frame/ChosenProxyWidget/Length/DoubleLineEdit0" command="set_string" arguments=".5" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- save pvsm state -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveServerState" />
+  <pqevent object="pqClientMainWindow/FileSaveServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/WaveletTimeTrigger.pvsm" />
+
+  <!-- generate extracts now -->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionGenerateExtracts" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/FileButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/pqFileDialog" command="removeDir" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/pqFileDialog" command="makeDir" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
+
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ExtractsOutputDirectory/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/ImmediateExtracts" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/widget/ApplyButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ProxyWidgetDialog/widget/OKButton" command="activate" arguments="" />
+</pqevents>

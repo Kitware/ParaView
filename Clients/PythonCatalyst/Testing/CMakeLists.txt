@@ -68,6 +68,11 @@ vtk_module_test_data(
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletVolumeRenderWithCinema_CoprocessingExtracts_image_000000otf_4.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletVolumeRenderWithCinema_ImmediateExtracts_image_000000otf_0.png"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletVolumeRenderWithCinema_ImmediateExtracts_image_000000otf_4.png"
+
+  # baselines for WaveletTimeTrigger
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletTimeTrigger_BatchExtracts_RenderView1_000000.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletTimeTrigger_ImmediateExtracts_RenderView1_000000.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/WaveletTimeTrigger_CoprocessingExtracts_RenderView1_000000.png}"
 )
 
 set(simple_scripts
@@ -242,7 +247,8 @@ if (PARAVIEW_USE_QT)
   find_python_module(pandas pandas_found)
 
   set(catalyst_tests
-    WaveletHistogramExtracts.xml)
+    WaveletHistogramExtracts.xml
+    WaveletTimeTrigger.xml)
 
   if (pandas_found)
     list(APPEND catalyst_tests
