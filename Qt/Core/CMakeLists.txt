@@ -76,6 +76,7 @@ set(classes
   pqPipelineRepresentation
   pqPipelineSource
   pqPlotMatrixView
+  pqPluginLocationInterface
   pqPluginManager
   pqProgressManager
   pqPropertyLinks

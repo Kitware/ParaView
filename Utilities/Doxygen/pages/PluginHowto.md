@@ -1044,6 +1044,39 @@ paraview_add_plugin(Autostart
   SOURCES pqMyApplicationStarter.cxx ${interfaces})
 ```
 
+#### Getting the Location of a Dynamically-Loaded Plugin
+
+Some dynamically-loaded plugins include data or text files in the same
+directory as the plugin binary object (DLL or shared object). To locate
+these files at runtime, plugins can register a callback that is notified
+with the file system location of the plugin when it is loaded. To do this,
+we need to provide a `QObject` subclass (`pqMyLocationPlugin`) with a
+method to store the plugin location.
+
+```cpp
+class pqMyPluginLocation : public QObject
+{
+Q_OBJECT
+public:
+  // Callback when plugin is loaded.
+  void StoreLocation(const char* location);
+};
+```
+
+The `CMakeLists.txt` looks as follows:
+
+```cmake
+# Macro for adding the location callback. We specify the class name and the
+# method to call with the filesystem location as `CLASS_NAME` and `STORE`
+# arguments. It returns the interface and sources created in the variables
+# passed to the `INTERFACES` and `SOURCES` arguments.
+paraview_plugin_add_location(
+  CLASS_NAME pqMyPluginLocation  # the class name for our class
+  STORE  StoreLocation           # the method to call when the plugin is loaded
+  INTERFACES interfaces
+  SOURCES sources)
+```
+
 #### Adding new Representations for 3D View using Plugins
 
 ParaView's 3D view the most commonly used view for showing polygonal or

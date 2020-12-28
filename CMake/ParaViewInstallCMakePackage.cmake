@@ -57,6 +57,8 @@ set(paraview_cmake_module_files
   pqDockWindowImplementation.h.in
   pqGraphLayoutStrategyImplementation.cxx.in
   pqGraphLayoutStrategyImplementation.h.in
+  pqPluginLocationImplementation.cxx.in
+  pqPluginLocationImplementation.h.in
   pqPropertyWidgetInterface.cxx.in
   pqPropertyWidgetInterface.h.in
   pqServerManagerModelImplementation.cxx.in
