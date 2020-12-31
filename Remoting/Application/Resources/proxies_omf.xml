@@ -1,0 +1,47 @@
+<ServerManagerConfiguration>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+    <SourceProxy name="OMFReader"
+                 label="OMFReader"
+                 class="vtkOMFReader">
+      <Documentation short_help="Read OMF files.">
+        Reader for OMF (Open Mining Format) files.
+      </Documentation>
+      <StringVectorProperty
+            name="FileName"
+            animateable="0"
+            command="SetFileName"
+            number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property sets the OMF file to be read.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="omf"
+                       file_description="Open Mining Format (.omf) Files" />
+      </Hints>
+
+      <StringVectorProperty name="DataElementInfo"
+        command="GetDataElementArraySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+      <StringVectorProperty
+        name="DataElements"
+        command="GetDataElementArraySelection"
+        information_property="DataElementInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="DataElementInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select which data elements to read.</Documentation>
+      </StringVectorProperty>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
