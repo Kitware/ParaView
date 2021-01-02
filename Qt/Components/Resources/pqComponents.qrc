@@ -184,10 +184,13 @@
         <file>Icons/pqSurfaceSelectionPointDataInteractive.svg</file>
         <file>Icons/pqSurfaceSelectionPointInteractive.svg</file>
         <file>Icons/pqSurfaceSelectionPoint.svg</file>
-        <file>Icons/pqTextAlignRight16.png</file>
-        <file>Icons/pqTextAlignLeft16.png</file>
-        <file>Icons/pqTextAlignCenter16.png</file>
-        <file>Icons/pqTextAlignJustified16.png</file>
+        <file>Icons/pqTextAlignRight.svg</file>
+        <file>Icons/pqTextAlignLeft.svg</file>
+        <file>Icons/pqTextAlignCenter.svg</file>
+        <file>Icons/pqTextAlignJustified.svg</file>
+        <file>Icons/pqTextVerticalAlignCenter.svg</file>
+        <file>Icons/pqTextVerticalAlignTop.svg</file>
+        <file>Icons/pqTextVerticalAlignBottom.svg</file>
         <file>Icons/pqThreshold.svg</file>
         <file>Icons/pqToggleLock.svg</file>
         <file>Icons/pqToolbar.svg</file>

@@ -9306,6 +9306,9 @@
           <Property name="BackgroundOpacity" />
           <Property name="RightPadding" />
           <Property name="TopPadding" />
+          <Property name="LineOffset" />
+          <Property name="LineSpacing" />
+          <Property name="CellOffset" />
 
           <!-- properties for Text -->
           <Property name="Orientation" panel_visibility="never"/>
@@ -9319,6 +9322,7 @@
             <Property name="Shadow" function="Shadow"/>
             <Property name="FontSize" function="Size"/>
             <Property name="Justification" function="Justification"/>
+            <Property name="VerticalJustification" function="VerticalJustification"/>
           </PropertyGroup>
           <!-- properties for Text Position-->
           <PropertyGroup label="Text Position" panel_widget="TextLocationEditor">

@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyGroupWidget.h"
 
+class QActionGroup;
 class vtkSMPropertyGroup;
 
 /**
@@ -47,7 +48,10 @@ class vtkSMPropertyGroup;
 class PQAPPLICATIONCOMPONENTS_EXPORT pqFontPropertyWidget : public pqPropertyGroupWidget
 {
   Q_OBJECT
-  Q_PROPERTY(QString justification READ justification WRITE setJustification)
+  Q_PROPERTY(
+    QString HorizontalJustification READ HorizontalJustification WRITE setHorizontalJustification)
+  Q_PROPERTY(
+    QString VerticalJustification READ VerticalJustification WRITE setVerticalJustification)
 
   typedef pqPropertyGroupWidget Superclass;
 
@@ -55,16 +59,23 @@ public:
   pqFontPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
   ~pqFontPropertyWidget() override;
 
-  QString justification() const;
+  QString HorizontalJustification() const;
+  QString VerticalJustification() const;
 Q_SIGNALS:
-  void justificationChanged(QString&);
+  void horizontalJustificationChanged(QString&);
+  void verticalJustificationChanged(QString&);
 
 protected:
-  void setJustification(QString&);
-  void setupJustificationButton();
+  void setHorizontalJustification(QString&);
+  void setVerticalJustification(QString&);
+  void setupHorizontalJustificationButton();
+  void setupVerticalJustificationButton();
+  void UpdateToolButtonIcon(QString& str, QToolButton* justification);
+  QActionGroup* CreateFontActionGroup(QToolButton* justification);
 
 protected Q_SLOTS:
-  void changeJustificationIcon(QAction*);
+  void changeHorizontalJustificationIcon(QAction*);
+  void changeVerticalJustificationIcon(QAction*);
   void onFontFamilyChanged();
 
 private:
