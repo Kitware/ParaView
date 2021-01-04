@@ -23,20 +23,40 @@
  * This view is designed to work on full screen (or in a cave display).
  *
  * This only works on Windows as the zSpace SDK is only available on this OS.
+ *
+ * This class holds a vtkZSpaceSDKManager object to communicate with the zSpace SDK :
+ * -  get the camera view and projection matrix from the zSpace sdk and give it to the
+ *    actual camera
+ * -  handle interactions by getting stylus state from zSpace sdk and invoking event for the zSpace
+ * interactor style.
+ *    Notice that the interactor style responds to a Button3DEvent or Move3DEvent, so
+ *    the EventDataDevice3D device, input and action need to be set for each action.
+ *    Here is the list of associations ( in the format Device + Input + Action ) :
+ *      - MiddleButton of the stylus : GenericTracker  + Trigger + Press/Release
+ *      - RightButton of the stylus  : RightController + Trigger + Press/Release
+ *      - LeftButton of the stylus   : LeftController  + Trigger + Press/Release
+ *
+ *    Please refer to vtkZSpaceInteractorStyle to know what are the possible interactions.
+ *
+ * Notice that this PVView stores the current/last world event position and orientation
+ * to simulate the RenderWindowInteractor3D behavior, as ParaView doesn't support
+ * a RenderWindowInteractor3D for instance. This should be removed when this feature is supported.
  */
 
-#ifndef vtkPVPanoramicProjectionView_h
-#define vtkPVPanoramicProjectionView_h
+#ifndef vtkPVZSpaceView_h
+#define vtkPVZSpaceView_h
 
+#include "vtkDataObject.h"
 #include "vtkNew.h" // for vtkNew
 #include "vtkPVRenderView.h"
 #include "vtkZSpaceViewModule.h" // for export macro
 
-#include "vtkActor.h"
-#include "vtkLineSource.h"
-#include "vtkVector.h"
-
-#include <zSpace.h>
+class vtkZSpaceInteractorStyle;
+class vtkZSpaceSDKManager;
+class vtkZSpaceRayActor;
+class vtkProp3D;
+class vtkEventDataDevice3D;
+class vtkZSpaceCamera;
 
 class VTKZSPACEVIEW_EXPORT vtkPVZSpaceView : public vtkPVRenderView
 {
@@ -46,89 +66,101 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Get the x position of the upper left corner of the zSpace display
-   * in the virtual desktop.
+   * Called when a ResetCameraEvent is fired. Call zSpaceSDKManager::CalculateFit
+   * to update the viewer scale, near and far plane given by the zSpace SDK.
    */
-  vtkGetMacro(WindowX, int);
+  void ResetCamera();
+  void ResetCamera(double bounds[6]);
+  //@}
 
   /**
-   * Get the y position of the upper left corner of the zSpace display
-   * in the virtual desktop.
+   * Overriden to give to the Interactor the zSpaceInteractorStyle.
    */
-  vtkGetMacro(WindowY, int);
+  void SetInteractionMode(int mode) override;
 
   /**
-   * Get the x resolution in pixels of the zSpace display.
+   * Set the physical distance between eyes on the glasses
+   * Delegate to zSpace SDK manager.
+   * Default is 0.056f.
    */
-  vtkGetMacro(WindowWidth, int);
+  void SetInterPupillaryDistance(float);
 
   /**
-   * Get the y resolution in pixels of the zSpace display.
+   * If true, perform picking every frame
+   * Delegate to zSpaceInteractorStyle.
+   * Default is true.
    */
-  vtkGetMacro(WindowHeight, int);
+  void SetInteractivePicking(bool);
 
   /**
-   * Get the number of stylus connected to the zSpace device.
+   * Draw or not the ray stylus
+   * Delegate to zSpace renderer.
+   * Default is true.
    */
-  vtkGetMacro(StylusTargets, int);
+  void SetDrawStylus(bool);
 
   /**
-   * Get the number of glasses connected to the zSpace device.
+   * Perform an hardware picking with a ray defined by the ZSpaceSDKManager
+   * ray transform. Configure the camera to be at the origin of the
+   * ray, looking in the direction of the ray, and pick the center of
+   * the viewport.
+   * Restore previous camera settings at the end.
    */
-  vtkGetMacro(HeadTargets, int);
+  void SelectWithRay(vtkProp3D* prop = nullptr);
+
+  //@{
+  /**
+   * Select the field association used when picking.
+   * Default is vtkDataObject::FIELD_ASSOCIATION_CELLS.
+   */
+  vtkSetClampMacro(PickingFieldAssociation, int, vtkDataObject::FIELD_ASSOCIATION_POINTS,
+    vtkDataObject::FIELD_ASSOCIATION_CELLS);
+  vtkGetMacro(PickingFieldAssociation, int);
+  //@}
+
+  //@{
+  /**
+   * Get/Set the current world event position and orientation.
+   * This is needed to simulate the RenderWindowInteractor3D behavior.
+   */
+  vtkGetVector3Macro(WorldEventPosition, double);
+  vtkSetVector3Macro(WorldEventPosition, double);
+  vtkGetVector4Macro(WorldEventOrientation, double);
+  vtkSetVector4Macro(WorldEventOrientation, double);
+  //@}
+
+  //@{
+  /**
+   * Get/Set the last world event position and orientation.
+   * This is needed to simulate the RenderWindowInteractor3D behavior.
+   */
+  vtkGetVector3Macro(LastWorldEventPosition, double);
+  vtkSetVector3Macro(LastWorldEventPosition, double);
+  vtkGetVector4Macro(LastWorldEventOrientation, double);
+  vtkSetVector4Macro(LastWorldEventOrientation, double);
+  //@}
 
   /**
-   * Get the number of secondary targets connected to the zSpace device.
+   * All transformations applied to actors with the stylus can be
+   * reset with this method.
    */
-  vtkGetMacro(SecondaryTargets, int);
-
-  /**
-   * Get/Set the distance between the eyes in meters.
-   */
-  vtkGetMacro(InterPupillaryDistance, float);
-  vtkSetClampMacro(InterPupillaryDistance, float, 0.f, 1.f);
-
-  /**
-   * Compute camera position, view up, focal point and frustum near and far clip
-   * From the scene bounding box. Compute the bounding box and call CalculateFit
-   * with corresponding parameters.
-   */
-  void UpdateZSpaceFrustumParameters(bool setPosition = false);
+  void ResetAllUserTransforms();
 
 protected:
   vtkPVZSpaceView();
   ~vtkPVZSpaceView() override;
 
+  /**
+   * Update zSpace SDK manager, the camera and render as usual.
+   */
   void Render(bool interactive, bool skip_rendering) override;
 
   /**
-   * Initialize the zSpace SDK and check for the zSpace devices :
-   * the display, the stylus and the head trackers.
-   */
-  void InitializeZSpace();
-
-  /**
-   * Update the position of the stylus and head trakers.
-   */
-  void UpdateTrackers();
-
-  /**
-   * Get the view and projection matrix from zSpace and give them
-   * to the active camera.
-   */
-  void UpdateCamera();
-
-  /**
    * Give to the zSpace SDK the scene bounds to let it choose the best
-   * viewer scale, near and far clip. If setPosition is true,
-   * the camera position is set with the zSpace advised position.
+   * viewer scale, near and far clip. The camera position is set with the
+   * zSpace advised position.
    */
-  void CalculateFit(double* bounds, bool setPosition = false);
-
-  /**
-   * Called when a command vtkCommand::ResetCameraEvent is fired.
-   */
-  void ResetCamera();
+  void CalculateFit(double* bounds);
 
   /**
    * Override ResetCameraClippingRange to disable automatic clipping range
@@ -136,34 +168,68 @@ protected:
    */
   void ResetCameraClippingRange() override{};
 
+  /**
+   * Update WorldEventPosition and WorldEventOrientation, then
+   * call event functions depending on the zSpace buttons states.
+   */
+  void HandleInteractions();
+
+  //@{
+  /**
+   * LeftButton event function (invoke Button3DEvent)
+   * Initiate a clip : choose a clipping plane origin
+   * and normal with the stylus.
+   */
+  void OnLeftButtonDown(vtkEventDataDevice3D*);
+  void OnLeftButtonUp(vtkEventDataDevice3D*);
+  //@}
+
+  //@{
+  /**
+   * MiddleButton event function (invoke Button3DEvent)
+   * Allows to position a prop with the stylus.
+   */
+  void OnMiddleButtonDown(vtkEventDataDevice3D*);
+  void OnMiddleButtonUp(vtkEventDataDevice3D*);
+  //@}
+
+  //@{
+  /**
+   * LeftButton event function (invoke Button3DEvent)
+   * Perform an hardware picking with the stylus
+   * and show picked data if ShowPickedData is true.
+   */
+  void OnRightButtonDown(vtkEventDataDevice3D*);
+  void OnRightButtonUp(vtkEventDataDevice3D*);
+  //@}
+
+  /**
+   * Invoke a Move3DEvent
+   * Called at each step.
+   */
+  void OnStylusMove();
+
 private:
   vtkPVZSpaceView(const vtkPVZSpaceView&) = delete;
   void operator=(const vtkPVZSpaceView&) = delete;
 
-  ZCContext ZSpaceContext = nullptr;
-  ZCHandle DisplayHandle = nullptr;
-  ZCHandle BufferHandle = nullptr;
-  ZCHandle ViewportHandle = nullptr;
-  ZCHandle FrustumHandle = nullptr;
-  ZCHandle StylusHandle = nullptr;
+  friend class vtkPVZSpaceViewInteractorStyle;
 
-  int WindowX = 0;
-  int WindowY = 0;
+  vtkNew<vtkZSpaceSDKManager> ZSpaceSDKManager;
+  vtkNew<vtkZSpaceInteractorStyle> ZSpaceInteractorStyle;
+  vtkNew<vtkZSpaceRayActor> StylusRayActor;
+  vtkNew<vtkZSpaceCamera> ZSpaceCamera;
 
-  int WindowWidth = 0;
-  int WindowHeight = 0;
+  bool DrawStylus = true;
 
-  // Inter pupillary distance in meters
-  float InterPupillaryDistance = 0.056f;
+  // The field association used when picking with the ray
+  int PickingFieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
 
-  // Store the type for each detected display devices
-  std::vector<std::string> Displays;
-  // The number of stylus
-  int StylusTargets;
-  // The number of glasses
-  int HeadTargets;
-  // Additional targets
-  int SecondaryTargets;
+  double WorldEventPosition[3] = {};
+  double WorldEventOrientation[4] = {};
+
+  double LastWorldEventPosition[3] = {};
+  double LastWorldEventOrientation[4] = {};
 };
 
 #endif
