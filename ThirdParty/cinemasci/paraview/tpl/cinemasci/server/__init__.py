@@ -11,6 +11,7 @@ from os import access
 from os import R_OK
 import pathlib
 import json
+import cinemasci
 
 #
 # global variables - can't seem to add an instance variable to the
@@ -28,6 +29,34 @@ def set_install_path():
     # edit the path to get the correct installation path
     CinemaInstallPath = CinemaInstallPath.strip("/server")
     CinemaInstallPath = "/" + CinemaInstallPath + "/viewers"
+
+def verify_cinema_database( viewer, cdb, assetname ):
+    result = False
+
+    if viewer == "view":
+        # this is the default case
+        if assetname is None:
+            assetname = "FILE"
+
+        db = cinemasci.new("cdb", {"path": cdb})
+        db.read_data_from_file()
+
+        if db.parameter_exists(assetname):
+            result = True
+        else:
+            print("")
+            print("ERROR: Cinema viewer \'view\' is looking for a column named \'{}\', but the".format(assetname)) 
+            print("       the cinema database \'{}\' doesn't have one.".format(cdb)) 
+            print("")
+            print("       use \'--assetname <name>\' where <name> is one of these possible values") 
+            print("       that were found in \'{}\':".format(cdb))
+            print("")
+            print("           \"" + ' '.join(db.get_parameter_names()) + "\"")
+            print("")
+    else:
+        result = True
+
+    return result 
 
 #
 # CinemaSimpleReqestHandler
@@ -193,14 +222,15 @@ def run_cinema_server( viewer, data, port, assetname="FILE"):
 
     chdir(datadir)
 
-    set_install_path()
-    cin_handler = CinemaSimpleRequestHandler
-    cin_handler.base_path = cinemadir
-    cin_handler.verbose   = False
-    cin_handler.viewer    = viewer
-    cin_handler.assetname = assetname
-    with socketserver.TCPServer(("", port), cin_handler) as httpd:
-        urlstring = "{}:{}".format(localhost, port)
-        print(urlstring)
-        httpd.serve_forever()
+    if verify_cinema_database(viewer, cinemadir, assetname) :
+        set_install_path()
+        cin_handler = CinemaSimpleRequestHandler
+        cin_handler.base_path = cinemadir
+        cin_handler.verbose   = False
+        cin_handler.viewer    = viewer
+        cin_handler.assetname = assetname
+        with socketserver.TCPServer(("", port), cin_handler) as httpd:
+            urlstring = "{}:{}".format(localhost, port)
+            print(urlstring)
+            httpd.serve_forever()
 
