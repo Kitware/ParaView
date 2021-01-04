@@ -105,6 +105,9 @@ class cdb:
             mapping.append((parameterKey, filepaths))
         return mapping
         
+    def get_parameter_names(self):
+        return self.parameternames
+
     def parameter_exists(self, parameter):
         """Check if a parameter exists
         """
