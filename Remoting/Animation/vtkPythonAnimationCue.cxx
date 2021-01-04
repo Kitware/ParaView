@@ -70,6 +70,10 @@ void vtkPythonAnimationCue::HandleStartCueEvent()
   {
     return;
   }
+
+  // Initialize Python is not already initialized.
+  vtkPythonInterpreter::Initialize();
+
   vtkPythonScopeGilEnsurer gilEnsurer;
 
   if (!this->Internals->Module ||
