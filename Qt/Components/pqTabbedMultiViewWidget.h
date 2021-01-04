@@ -96,6 +96,11 @@ public:
    */
   pqMultiViewWidget* findTab(vtkSMViewLayoutProxy*) const;
 
+  /**
+   * Set the current active tab.
+   */
+  void setCurrentTab(int index);
+
 Q_SIGNALS:
   /**
   * fired when lockViewSize() is called.
