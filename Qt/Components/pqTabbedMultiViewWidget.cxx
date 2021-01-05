@@ -524,8 +524,7 @@ int pqTabbedMultiViewWidget::createTab(pqServer* server)
     vlayout->FastDelete();
     END_UNDO_SET();
 
-    auto& internals = (*this->Internals);
-    return internals.tabIndex(vlayout);
+    return this->Internals->tabIndex(vlayout);
   }
   return -1;
 }
@@ -767,4 +766,10 @@ pqMultiViewWidget* pqTabbedMultiViewWidget::findTab(vtkSMViewLayoutProxy* layout
     }
   }
   return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::setCurrentTab(int index)
+{
+  this->Internals->setCurrentTab(index);
 }

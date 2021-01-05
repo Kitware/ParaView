@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqTabbedMultiViewWidget.h"
 #include "vtkNew.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVOpenGLInformation.h"
@@ -153,11 +154,18 @@ void pqDefaultViewBehavior::onServerCreation(pqServer* server)
   {
     pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
     const QString viewType = vtkPVGeneralSettings::GetInstance()->GetDefaultViewType();
+
     if (viewType != "None" && !viewType.isEmpty() &&
       RCInfo::Supports(this->ClientCapabilities, RCInfo::OPENGL))
     {
       // When a server is created, we create a new render view for it.
-      if (auto pqview = builder->createView(viewType, server))
+      if (viewType == "Empty")
+      {
+        auto tmvwidget = qobject_cast<pqTabbedMultiViewWidget*>(core->manager("MULTIVIEW_WIDGET"));
+        // Create a new multi tabbed widget and set it active
+        tmvwidget->setCurrentTab(tmvwidget->createTab(server));
+      }
+      else if (auto pqview = builder->createView(viewType, server))
       {
         // let's put this view under a layout.
         builder->addToLayout(pqview);
