@@ -91,6 +91,7 @@ class IVolume_device_data_buffer :
     public mi::base::Interface_declare<0x60d74933,0xd556,0x49de,0xaa,0xbc,0x5d,0xa7,0xaa,0xc1,0x4c,0x50>
 {
 public:
+    /// Verify if a data subset is valid.
     virtual bool                                is_valid() const = 0;
 
     /// Voxel format of the volume data.
@@ -515,14 +516,22 @@ public:
     //   APIs added
     //
 
-    /// Flags used for specifying 
+    /// Flags used for specifying the data generation process.
     enum Sub_data_gen_flags
     {
-        SUB_DATA_GEN_DEFAULT                = 0x00u,
-        SUB_DATA_GEN_INCLUDE_BORDER_VOXELS  = 0x01u,
-        SUB_DATA_GEN_NO_CLIP_REQUEST_VOLUME = 0x02u
+        SUB_DATA_GEN_DEFAULT                = 0x00u,    ///<! Default generation mode.
+        SUB_DATA_GEN_INCLUDE_BORDER_VOXELS  = 0x01u,    ///<! Volume data generation with included border voxel.
+        SUB_DATA_GEN_NO_CLIP_REQUEST_VOLUME = 0x02u     ///<! Ignoring clip request
     };
 
+    /// Generating a volume data buffer for use by the application.
+    /// \param[in] subdata_attrib_idx   The attribute index.
+    /// \param[in] subdata_position     The position as an anchor that specifies a request bounding box together with the extent.
+    /// \param[in] subdata_extent       The extent that specifies a request bounding box together with the position.
+    /// \param[in] subdata_flags        Flags specifying a generation mode.
+    ///
+    /// \return     Returns the volume data buffer encapsulated by an instance
+    ///             of an \c IVolume_device_data_buffer interface implementation.
     virtual IVolume_device_data_buffer* generate_volume_sub_data_device(
                                                 mi::Uint32                             subdata_attrib_idx,
                                                 mi::math::Vector_struct<mi::Sint32, 3> subdata_position,

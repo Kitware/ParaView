@@ -104,8 +104,11 @@ public:
     /// Returns the override radius applied to a particle volume scene element (\c Iparticle_volume_scene_element).
     virtual mi::Float32                 get_override_fixed_radius() const = 0;
 
-    /// Internal debugging options.
+    /// Internal debugging options applied to the visualization.
+    /// \param[in] o    Debug option applied to the visualization.   
     virtual void                        set_debug_visualization_option(mi::Uint32 o) = 0;
+    /// Internal debugging options applied to the visualization.
+    /// \return         Returns the applied debug option.  
     virtual mi::Uint32                  get_debug_visualization_option() const = 0;
 };
 
