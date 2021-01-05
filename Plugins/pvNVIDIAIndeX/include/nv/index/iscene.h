@@ -229,6 +229,15 @@ public:
         nv::index::IDistributed_data_import_callback*           importer_callback,
         mi::neuraylib::IDice_transaction*                       dice_transaction) const = 0;
 
+    /// Creates a new pipe set scene element from the given import configuration, but does not yet
+    /// add it to the scene description.
+    ///
+    /// \param[in] bbox                         The object space bounding box.
+    /// \param[in] importer_callback            Distributed data import callback function.
+    /// \param[in] dice_transaction             The DiCE transaction.
+    ///
+    /// \return                                 Returns a new \c IPipe_set instance.
+    ///
     virtual IPipe_set* create_pipe_set(
         const mi::math::Bbox_struct<mi::Float32, 3>&                bbox,
         nv::index::IDistributed_data_import_callback*               importer_callback,

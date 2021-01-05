@@ -245,8 +245,6 @@ class IRegular_heightfield_data_edit :
 {
 public:
     /// Applies the given compute task on the current heightfield patch with a given bounding box.
-    /// This invokes #compute_with_bounding_box() method of the compute task to determine the relevant 
-    /// area of interest.
     ///
     /// \param[in] compute_task     The height field compute task performs the editing
     ///                             operation and can be any user-defined

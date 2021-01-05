@@ -124,22 +124,24 @@ class IRay_sampling_query
     : public mi::base::Interface_declare<0xd2f21a06,0xb509,0x40df,0x82,0xd1,0x91,0xc1,0x1c,0xe4,0xc3,0xf>
 {
 public:
-    /// Returns true if this query is valid.
+    /// Verifying if the query is valid.
+    /// \return     Returns \c true if this query is valid.
     virtual bool is_valid() const = 0;
 
-
-    /// Set maximum number of samples to be taken per ray.
+    /// Each ray can sample the scene data multiple times.
+    /// \param[in] num  Set the maximum number of samples to be taken per ray.
     virtual void set_max_samples(mi::Uint32 num) = 0;
 
-    /// Get maximum number of samples to be taken per ray.
+    /// Each ray can sample the scene data multiple times.
+    /// \returns    Returns the maximum number of samples to be taken per ray.
     virtual mi::Uint32 get_max_samples() const = 0;
 
 
     /// Ray to be sampled. Defined in world space and restricted by a range for the t-parameter.
     struct Ray {
-        mi::math::Vector_struct<mi::Float32, 3>   origin;
-        mi::math::Vector_struct<mi::Float32, 3>   direction;   ///< ray direction, normalized
-        mi::math::Vector_struct<mi::Float32, 2>   range;       ///< min/max range of the ray t-parameter
+        mi::math::Vector_struct<mi::Float32, 3>   origin;       ///<! Ray origin.
+        mi::math::Vector_struct<mi::Float32, 3>   direction;    ///<! Normalized ray direction.
+        mi::math::Vector_struct<mi::Float32, 2>   range;        ///<! The min/max range of the ray t-parameter.
     };
 
 
@@ -147,15 +149,18 @@ public:
     /// 
     /// \param[in] rays     World space rays, up to get_limit(MAX_RAYS).
     /// \param[in] nb_rays  Number of rays provided, less or equal get_limit(MAX_RAYS).
-    /// \return false if rays are invalid or too many.
+    /// \return             Returns \c false if rays are invalid or too many.
     /// 
     virtual bool set_rays(const Ray* rays, mi::Uint32 nb_rays) = 0;
-     
-    /// Returns number of rays in this query.
+    
+    /// Many query rays can be launched at a time. 
+    /// \returns Returns number of rays in this query.
     virtual mi::Uint32  get_nb_rays() const = 0;
 
-    /// Get ray of index \c i.
-    virtual const Ray*  get_ray(mi::Uint32 i) const = 0;
+    /// Selcting a single ray from the bunch of rays.
+    /// \param[in] index    Get the ray for the identified y the given index.
+    /// \return             Returns the requested ray. 
+    virtual const Ray*  get_ray(mi::Uint32 index) const = 0;
 };
 
 
