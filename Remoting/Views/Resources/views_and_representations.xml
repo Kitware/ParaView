@@ -1917,7 +1917,7 @@
         command="SetCamera3DManipulators"
         argument_is_array="1"
         number_of_elements="9"
-        default_values="4 1 2 3 4 1 2 4 6"
+        default_values="4 1 2 3 4 7 2 4 6"
         panel_visibility="never">
         <Documentation>
           Set the interactions mode for 3D interaction. The values are specified
@@ -1937,6 +1937,7 @@
           <Entry text="Rotate" value="4" />
           <Entry text="Multi-Rotate" value="5" />
           <Entry text="ZoomToMouse" value="6" />
+          <Entry text="SkyboxRotate" value="7" />
         </EnumerationDomain>
       </IntVectorProperty>
 

@@ -40,6 +40,7 @@ set(classes
   vtkPVTrackballPan
   vtkPVTrackballRoll
   vtkPVTrackballRotate
+  vtkPVTrackballSkyboxRotate
   vtkPVTrackballZoom
   vtkPVTrackballZoomToMouse
   vtkTrackballPan)
