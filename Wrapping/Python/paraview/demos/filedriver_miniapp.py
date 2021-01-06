@@ -89,13 +89,12 @@ def main(args):
     step = 0
     numsteps = len(timesteps)
     for time in timesteps:
-        step += 1
         if args.delay > 0:
             import time
             time.sleep(args.delay)
 
         if rank == 0:
-            print_info("timestep: {0}/{1}".format(step, numsteps))
+            print_info("timestep: {0} of {1}".format((step+1), numsteps))
 
         dataset, wholeExtent = read_dataset(reader, time, rank, num_ranks)
 
@@ -105,6 +104,7 @@ def main(args):
 
         del dataset
         del wholeExtent
+        step += 1
 
     # finalize Catalyst
     bridge.finalize()
