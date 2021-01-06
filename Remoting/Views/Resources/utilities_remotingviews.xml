@@ -270,7 +270,7 @@
                          panel_visibility="advanced">
         <Documentation>
           Use predefined presets for Generic Filmic. Using the default parameters it approximates the Academy Color Encoding System (ACES).
-          To use the popular “Uncharted 2” filmic tone mapping curve instead, set the property to Uncharted2.
+          To use the popular "Uncharted 2" filmic tone mapping curve instead, set the property to Uncharted2.
           Set this property to Custom to set custom parameters.
         </Documentation>
         <EnumerationDomain name="enum">
