@@ -101,7 +101,7 @@ test:fedora33-shared-debug-mpi-python-qt:
         - build:fedora33-shared-debug-mpi-python-qt
     needs:
         - build:fedora33-shared-debug-mpi-python-qt
-    timeout: 90 minutes
+    timeout: 120 minutes
     # some tests are failing. investigation needed
     allow_failure: true
 
