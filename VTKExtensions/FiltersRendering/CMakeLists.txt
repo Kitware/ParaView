@@ -35,6 +35,7 @@ set(classes
   vtkBlockDeliveryPreprocessor
   vtkClientServerMoveData
   vtkCSVExporter
+  vtkDataTabulator
   vtkImageCompressor
   vtkImageTransparencyFilter
   vtkLZ4Compressor

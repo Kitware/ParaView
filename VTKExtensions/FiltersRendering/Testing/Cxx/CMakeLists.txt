@@ -12,6 +12,7 @@ vtk_add_test_cxx(vtkPVVTKExtensionsRenderingCxxTests tests
 # This was basically ignored in the previous version.
 #  TestResampledAMRImageSourceWithPointData.cxx
   TestImageCompressors.cxx
+  TestDataTabulator.cxx
   )
 
 #if (EXISTS "${smooth_flash}")

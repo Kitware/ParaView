@@ -33,7 +33,7 @@
 #include "vtkPVDataRepresentation.h"
 #include "vtkRemotingViewsModule.h" //needed for exports
 
-class vtkBlockDeliveryPreprocessor;
+class vtkDataTabulator;
 class vtkCleanArrays;
 class VTKREMOTINGVIEWS_EXPORT vtkSpreadSheetRepresentation : public vtkPVDataRepresentation
 {
@@ -95,10 +95,10 @@ protected:
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   vtkNew<vtkCleanArrays> CleanArrays;
-  vtkNew<vtkBlockDeliveryPreprocessor> DataConditioner;
+  vtkNew<vtkDataTabulator> DataConditioner;
 
   vtkNew<vtkCleanArrays> ExtractedCleanArrays;
-  vtkNew<vtkBlockDeliveryPreprocessor> ExtractedDataConditioner;
+  vtkNew<vtkDataTabulator> ExtractedDataConditioner;
 
 private:
   vtkSpreadSheetRepresentation(const vtkSpreadSheetRepresentation&) = delete;
