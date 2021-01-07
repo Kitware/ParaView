@@ -60,6 +60,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/can.ex2}"
   "DATA{${paraview_test_data_directory_input}/Data/cgns_np01/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/cgns_np04/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/bc_struct.cgns}"
   "DATA{${paraview_test_data_directory_input}/Data/comb.q}"
   "DATA{${paraview_test_data_directory_input}/Data/combxyz.bin}"
   "DATA{${paraview_test_data_directory_input}/Data/cow.vtp}"

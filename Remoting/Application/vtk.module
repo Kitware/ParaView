@@ -48,6 +48,7 @@ OPTIONAL_DEPENDS
   VTK::ImagingSources
   VTK::InteractionWidgets
   VTK::IOADIOS2
+  VTK::IOCGNSReader
   VTK::IOFides
   VTK::IOCityGML
   VTK::IOGDAL

@@ -31,6 +31,6 @@ OPTIONAL_DEPENDS
 TEST_DEPENDS
   VTK::CommonSystem
   VTK::TestingCore
-  ParaView::VTKExtensionsCGNSReader
+  VTK::IOCGNSReader
 TEST_LABELS
   ParaView

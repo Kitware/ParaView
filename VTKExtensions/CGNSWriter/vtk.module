@@ -11,13 +11,14 @@ GROUPS
 DEPENDS
   VTK::IOCore
 PRIVATE_DEPENDS
-  ParaView::cgns
+  VTK::cgns
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::CommonExecutionModel
   VTK::FiltersCore
 TEST_DEPENDS
-  ParaView::VTKExtensionsCGNSReader
+  VTK::IOCGNSReader
   VTK::CommonCore
   VTK::CommonDataModel
   VTK::TestingCore
+  ParaView::VTKExtensionsCore

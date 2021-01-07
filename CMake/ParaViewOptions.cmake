@@ -444,6 +444,7 @@ paraview_require_module(
 paraview_require_module(
   CONDITION PARAVIEW_BUILD_CANONICAL AND PARAVIEW_ENABLE_NONESSENTIAL
   MODULES   VTK::IOAMR
+            VTK::IOCGNSReader
             VTK::IOCityGML
             VTK::IOCONVERGECFD
             VTK::IOIoss
@@ -494,7 +495,7 @@ if (NOT PARAVIEW_ENABLE_NONESSENTIAL)
   # This ensures that we don't ever enable certain problematic
   # modules when PARAVIEW_ENABLE_NONESSENTIAL is OFF.
   list(APPEND paraview_rejected_modules
-    ParaView::cgns
+    VTK::cgns
     VTK::hdf5
     VTK::netcdf
     VTK::ogg

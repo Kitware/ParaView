@@ -1,7 +1,0 @@
-NAME
-  ParaView::cgns
-LIBRARY_NAME
-  vtkcgns
-DEPENDS
-  VTK::hdf5
-THIRD_PARTY
