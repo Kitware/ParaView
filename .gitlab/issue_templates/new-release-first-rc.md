@@ -44,6 +44,7 @@ echo @VERSION@@RC@ > version.txt
 git commit -m 'Update version number to @VERSION@@RC@' version.txt
 git tag -a -m 'ParaView @VERSION@@RC@' v@VERSION@@RC@ HEAD
 ```
+  - [ ] Remove obsolete setting migrations from `CMake/ParaViewMigrations.cmake`
   - Integrate changes to `master` branch
     - [ ] Create a merge request targeting `master` (do *not* add `Backport: release`)
     - [ ] `Do: merge`
