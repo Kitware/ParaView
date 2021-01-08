@@ -349,52 +349,56 @@ succeeds.
 
 ### Testing ###
 
-ParaView has a [buildbot](http://buildbot.net) instance watching for merge requests
-to test.  A developer must issue a command to buildbot to enable builds:
+ParaView uses [GitLab CI][] to test merge requests, configured by the top-level
+`.gitlab-ci.yml` file.  Results may be seen both on the merge request's
+pipeline page and on the [ParaView CDash Page][].  Filtered CDash results
+showing just the pipeline's jobs can be reached by selecting the `cdash-commit`
+job in the `External` stage of the pipeline. Note that due to GitLab changes,
+the `External` stage may be in a separate pipeline for the same commit.
 
-    Do: test
+Lint build jobs run automatically after every push. Heavier jobs require a
+manual trigger to run:
 
-The buildbot user (@buildbot) will respond with a comment linking to the CDash
-results when it schedules builds.
+* Merge request authors may visit their merge request's pipeline and click the
+  "Play" button on one or more jobs manually.  If the merge request has the
+  "Allow commits from members who can merge to the target branch" check box
+  enabled, ParaView maintainers may use the "Play" button too.
 
-The `Do: test` command accepts the following arguments:
+* [ParaView GitLab Project Developers][] may trigger CI on a merge request by
+  adding a comment with a command among the [comment trailing
+  lines](#trailing-lines):
 
-  * `--oneshot`
-        only build the *current* hash of the branch; updates will not be built
-        using this command
-  * `--stop`
-        clear the list of commands for the merge request
-  * `--superbuild`
-        build the superbuilds related to the project
-  * `--clear`
-        clear previous commands before adding this command
-  * `--regex-include <arg>` or `-i <arg>`
-        only build on builders matching `<arg>` (a Python regular expression)
-  * `--regex-exclude <arg>` or `-e <arg>`
-        excludes builds on builders matching `<arg>` (a Python regular
-        expression)
+        Do: test
 
-Multiple `Do: test` commands may be given in separate comments. A new `Do: test`
-command must be explicitly issued for each branch update for which testing is
-desired. Buildbot may skip tests for older branch updates that have not started
-before a test for a new update is requested.
+  `@kwrobot` will add an award emoji to the comment to indicate that it
+  was processed and also trigger all manual jobs in the merge request's
+  pipeline.
 
-Builder names always follow this pattern:
+  The `Do: test` command accepts the following arguments:
 
-        project-host-os-libtype-buildtype+feature1+feature2
+  * `--named <regex>`, `-n <regex>`: Trigger jobs matching `<regex>` anywhere
+    in their name.  Job names may be seen on the merge request's pipeline page.
+  * `--stage <stage>`, `-s <stage>`: Only affect jobs in a given stage. Stage
+    names may be seen on the merge request's pipeline page.  Note that the
+    names are determined by what is in the `.gitlab-ci.yml` file and may be
+    capitalized in the web page, so lowercasing the webpage's display name for
+    stages may be required.
+  * `--action <action>`, `-a <action>`: The action to perform on the jobs.
+    Possible actions:
 
-  * project: always `paraview` for paraview
-  * host: the buildbot host
-  * os: one of `windows`, `osx`, or `linux`
-  * libtype: `shared` or `static`
-  * buildtype: `release` or `debug`
-  * feature: alphabetical list of features enabled for the build
+    * `manual` (the default): Start jobs awaiting manual interaction.
+    * `unsuccessful`: Start or restart jobs which have not completed
+      successfully.
+    * `failed`: Restart jobs which have completed, but without success.
+    * `completed`: Restart all completed jobs.
 
-For a list of all builders, see:
+If the merge request topic branch is updated by a push, a new manual trigger
+using one of the above methods is needed to start CI again. Currently running
+jobs will generally be canceled automatically.
 
-  * [paraview-expected](https://buildbot.kitware.com/builders?category=paraview-expected)
-  * [paraview-superbuild](https://buildbot.kitware.com/builders?category=paraview-superbuild)
-  * [paraview-experimental](https://buildbot.kitware.com/builders?category=paraview-experimental)
+[GitLab CI]: https://gitlab.kitware.com/help/ci/README.md
+[ParaView CDash Page]: https://open.cdash.org/index.php?project=ParaView
+[ParaView GitLab Project Developers]: https://gitlab.kitware.com/cmake/cmake/-/settings/members
 
 Revise a Topic
 --------------
