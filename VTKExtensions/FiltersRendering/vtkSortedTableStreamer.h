@@ -30,13 +30,13 @@
 #include "vtkTableAlgorithm.h"
 #include <utility> // for std::pair
 
-class vtkCompositeDataSet;
 class vtkDataArray;
+class vtkIdTypeArray;
 class vtkMultiProcessController;
+class vtkPartitionedDataSet;
 class vtkStringArray;
 class vtkTable;
 class vtkUnsignedIntArray;
-class vtkIdTypeArray;
 
 class VTKPVVTKEXTENSIONSFILTERSRENDERING_EXPORT vtkSortedTableStreamer : public vtkTableAlgorithm
 {
@@ -137,11 +137,11 @@ private:
   vtkSortedTableStreamer(const vtkSortedTableStreamer&) = delete;
   void operator=(const vtkSortedTableStreamer&) = delete;
 
-  vtkSmartPointer<vtkTable> MergeBlocks(vtkCompositeDataSet* cd);
+  vtkSmartPointer<vtkTable> MergeBlocks(vtkPartitionedDataSet* cd);
   vtkSmartPointer<vtkUnsignedIntArray> GenerateCompositeIndexArray(
-    vtkCompositeDataSet* cd, vtkIdType maxSize);
+    vtkPartitionedDataSet* cd, vtkIdType maxSize);
   std::pair<vtkSmartPointer<vtkStringArray>, vtkSmartPointer<vtkIdTypeArray> >
-  GenerateBlockNameArray(vtkCompositeDataSet* cd, vtkIdType maxSize);
+  GenerateBlockNameArray(vtkPartitionedDataSet* cd, vtkIdType maxSize);
 };
 
 #endif

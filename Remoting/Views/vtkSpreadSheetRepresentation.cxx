@@ -14,8 +14,8 @@
 =========================================================================*/
 #include "vtkSpreadSheetRepresentation.h"
 
-#include "vtkBlockDeliveryPreprocessor.h"
 #include "vtkCleanArrays.h"
+#include "vtkDataTabulator.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
@@ -27,16 +27,16 @@ vtkStandardNewMacro(vtkSpreadSheetRepresentation);
 vtkSpreadSheetRepresentation::vtkSpreadSheetRepresentation()
 {
   this->SetNumberOfInputPorts(3);
-  this->DataConditioner->SetGenerateOriginalIds(1);
-  this->DataConditioner->SetFlattenTable(true);
+  this->DataConditioner->SetGenerateOriginalIds(true);
+  this->DataConditioner->SetSplitComponents(true);
   this->DataConditioner->SetSplitComponentsNamingMode(
     vtkSplitColumnComponents::NUMBERS_WITH_UNDERSCORES);
   this->CleanArrays->SetInputConnection(this->DataConditioner->GetOutputPort());
   this->CleanArrays->SetFillPartialArrays(true);
   this->CleanArrays->SetMarkFilledPartialArrays(true);
 
-  this->ExtractedDataConditioner->SetGenerateOriginalIds(0);
-  this->ExtractedDataConditioner->SetFlattenTable(true);
+  this->ExtractedDataConditioner->SetGenerateOriginalIds(false);
+  this->ExtractedDataConditioner->SetSplitComponents(true);
   this->ExtractedDataConditioner->SetSplitComponentsNamingMode(
     vtkSplitColumnComponents::NUMBERS_WITH_UNDERSCORES);
   this->ExtractedCleanArrays->SetInputConnection(this->ExtractedDataConditioner->GetOutputPort());
