@@ -99,6 +99,7 @@ include(vtkSupportMacros)
 
 include(CMakeDependentOption)
 include(ParaViewOptions)
+include(ParaViewMigrations)
 
 #------------------------------------------------------------------------------
 # Choose static or shared libraries.
