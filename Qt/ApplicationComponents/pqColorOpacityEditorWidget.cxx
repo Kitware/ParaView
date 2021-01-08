@@ -454,7 +454,7 @@ void pqColorOpacityEditorWidget::setScalarOpacityFunctionProxy(pqSMProxy sofProx
   if (internals.ScalarOpacityFunctionProxy)
   {
     pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
-    vtkSMPVRepresentationProxy* proxy = static_cast<vtkSMPVRepresentationProxy*>(repr->getProxy());
+    vtkSMPVRepresentationProxy* proxy = vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
 
     // When representation changes, we have to initialize the opacity widget when
     // "MultiComponentsMapping" is modified
@@ -514,7 +514,7 @@ void pqColorOpacityEditorWidget::multiComponentsMappingChanged(vtkObject* vtkNot
   unsigned long vtkNotUsed(event), void* clientData, void* vtkNotUsed(callData))
 {
   pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
-  vtkSMPVRepresentationProxy* proxy = static_cast<vtkSMPVRepresentationProxy*>(repr->getProxy());
+  vtkSMPVRepresentationProxy* proxy = vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
 
   if (proxy->GetVolumeIndependentRanges())
   {
@@ -540,7 +540,7 @@ void pqColorOpacityEditorWidget::initializeOpacityEditor(vtkPiecewiseFunction* p
 {
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
   pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
-  vtkSMPVRepresentationProxy* proxy = static_cast<vtkSMPVRepresentationProxy*>(repr->getProxy());
+  vtkSMPVRepresentationProxy* proxy = vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
   vtkScalarsToColors* stc = nullptr;
   vtkSMProperty* separateProperty = proxy->GetProperty("UseSeparateColorMap");
   bool sepEnabled = vtkSMPropertyHelper(separateProperty).GetAsInt() != 0;

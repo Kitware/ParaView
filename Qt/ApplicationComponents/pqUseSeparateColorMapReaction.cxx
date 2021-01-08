@@ -109,7 +109,7 @@ void pqUseSeparateColorMapReaction::onTriggered()
 {
   // Disable Multi Components Mapping
   pqDataRepresentation* repr = this->CachedRepresentation.data();
-  vtkSMPVRepresentationProxy* proxy = static_cast<vtkSMPVRepresentationProxy*>(repr->getProxy());
+  vtkSMPVRepresentationProxy* proxy = vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
   vtkSMProperty* mcmProperty = proxy->GetProperty("MultiComponentsMapping");
   if (vtkSMPropertyHelper(mcmProperty).GetAsInt() == 1)
   {
