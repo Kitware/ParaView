@@ -69,6 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCompositeDataInformationTreeModel.h"
 #include "pqCoreUtilities.h"
 #include "pqDataAssemblyTreeModel.h"
+#include "pqDoubleLineEdit.h"
 #include "pqNonEditableStyledItemDelegate.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
@@ -78,6 +79,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTimeKeeper.h"
 
 // ParaView components includes
+
+static QString formatTime(double time)
+{
+  auto settings = vtkPVGeneralSettings::GetInstance();
+  const auto precision = settings->GetAnimationTimePrecision();
+  const auto notation =
+    static_cast<pqDoubleLineEdit::RealNumberNotation>(settings->GetAnimationTimeNotation());
+  return pqDoubleLineEdit::formatDouble(time, notation, precision);
+}
 
 class pqProxyInformationWidget::pqUi : public Ui::pqProxyInformationWidget
 {
@@ -270,18 +280,16 @@ void pqProxyInformationWidget::updateInformation()
   this->Ui->timeValues->blockSignals(true);
   //
 
-  int precision = vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision();
-  char notation = vtkPVGeneralSettings::GetInstance()->GetAnimationTimeNotation();
-
   if (tsv)
   {
-    unsigned int numElems = tsv->GetNumberOfElements();
+    const unsigned int numElems = tsv->GetNumberOfElements();
     for (unsigned int i = 0; i < numElems; i++)
     {
       QTreeWidgetItem* item = new QTreeWidgetItem(this->Ui->timeValues);
       item->setData(0, Qt::DisplayRole, i);
-      item->setData(1, Qt::DisplayRole, QString::number(tsv->GetElement(i), notation, precision));
-      item->setData(1, Qt::ToolTipRole, QString::number(tsv->GetElement(i), notation, precision));
+      auto label = ::formatTime(tsv->GetElement(i));
+      item->setData(1, Qt::DisplayRole, label);
+      item->setData(1, Qt::ToolTipRole, label);
       item->setFlags(item->flags() | Qt::ItemIsEditable);
     }
   }
@@ -385,15 +393,18 @@ void pqProxyInformationWidget::fillDataInformation(vtkPVDataInformation* dataInf
   if (dataInformation->GetHasTime())
   {
     this->Ui->dataTimeLabel->setVisible(true);
-    const char* timeLabel = dataInformation->GetTimeLabel();
-    this->Ui->dataTimeLabel->setText(QString("Current data %2: %1")
-                                       .arg(dataInformation->GetTime())
-                                       .arg(timeLabel ? timeLabel : "time"));
-    this->Ui->groupDataTime->setTitle(timeLabel);
+    const char* timeLabel =
+      dataInformation->GetTimeLabel() ? dataInformation->GetTimeLabel() : "time";
+    auto capitalizedTimeLabel = vtksys::SystemTools::Capitalized(timeLabel);
+    this->Ui->dataTimeLabel->setText(
+      QString("Current data %2: %1").arg(::formatTime(dataInformation->GetTime())).arg(timeLabel));
+    this->Ui->groupDataTime->setTitle(capitalizedTimeLabel.c_str());
+    this->Ui->timeValues->setHeaderLabels({ "Index", capitalizedTimeLabel.c_str() });
   }
   else
   {
     this->Ui->groupDataTime->setTitle(tr("Time"));
+    this->Ui->timeValues->setHeaderLabels({ "Index", "Time" });
   }
 
   vtkPVDataSetAttributesInformation* info[6];
