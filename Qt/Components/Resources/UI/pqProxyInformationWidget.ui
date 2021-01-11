@@ -825,6 +825,9 @@
         <property name="columnCount">
          <number>2</number>
         </property>
+        <attribute name="headerDefaultSectionSize">
+         <number>50</number>
+        </attribute>
         <column>
          <property name="text">
           <string>Index</string>
@@ -832,7 +835,7 @@
         </column>
         <column>
          <property name="text">
-          <string>Value</string>
+          <string>Time</string>
          </property>
         </column>
        </widget>
