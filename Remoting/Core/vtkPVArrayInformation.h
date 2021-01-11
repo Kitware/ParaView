@@ -31,6 +31,7 @@
 #include "vtkRemotingCoreModule.h" //needed for exports
 
 #include <string> // for std::string
+#include <vector> // for std::vector
 
 class vtkAbstractArray;
 class vtkClientServerStream;
@@ -132,12 +133,6 @@ public:
    */
   int Compare(vtkPVArrayInformation* info);
 
-  /**
-   * Merge (union) ranges into this object.
-   */
-  void AddRanges(vtkPVArrayInformation* info);
-  void AddFiniteRanges(vtkPVArrayInformation* info);
-
   void DeepCopy(vtkPVArrayInformation* info);
 
   /**
@@ -192,9 +187,24 @@ public:
   int HasInformationKey(const char* location, const char* name);
   //@}
 
+  //@{
+  /**
+   * For string arrays, this returns first few non-empty values.
+   */
+  int GetNumberOfStringValues();
+  const char* GetStringValue(int);
+  //@}
+
 protected:
   vtkPVArrayInformation();
   ~vtkPVArrayInformation() override;
+
+  /**
+   * Merge (union) ranges/values into this object.
+   */
+  void AddRanges(vtkPVArrayInformation* info);
+  void AddFiniteRanges(vtkPVArrayInformation* info);
+  void AddValues(vtkPVArrayInformation* info);
 
   int IsPartial;
   int DataType;
@@ -203,6 +213,7 @@ protected:
   char* Name;
   double* Ranges;
   double* FiniteRanges;
+  std::vector<std::string> StringValues;
 
   // this array is used to store existing information keys (location/name pairs)
 

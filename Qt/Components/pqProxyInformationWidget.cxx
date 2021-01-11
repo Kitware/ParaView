@@ -460,23 +460,36 @@ void pqProxyInformationWidget::fillDataInformation(vtkPVDataInformation* dataInf
         QTreeWidgetItem* item = new QTreeWidgetItem(this->Ui->dataArrays);
         item->setData(0, Qt::DisplayRole, arrayInfo->GetName());
         item->setData(0, Qt::DecorationRole, pixmaps[k]);
-        QString dataType = vtkImageScalarTypeNameMacro(arrayInfo->GetDataType());
-        item->setData(1, Qt::DisplayRole, dataType);
+        item->setData(1, Qt::DisplayRole, vtkImageScalarTypeNameMacro(arrayInfo->GetDataType()));
         int numComponents = arrayInfo->GetNumberOfComponents();
-        QString dataRange;
-        double range[2];
-        for (int j = 0; j < numComponents; j++)
+        if (arrayInfo->GetDataType() == VTK_STRING)
         {
-          if (j != 0)
+          QStringList values;
+          for (int j = 0; j < arrayInfo->GetNumberOfStringValues(); ++j)
           {
-            dataRange.append(", ");
+            values.push_back(arrayInfo->GetStringValue(j));
           }
-          arrayInfo->GetComponentRange(j, range);
-          QString componentRange = QString("[%1, %2]").arg(range[0]).arg(range[1]);
-          dataRange.append(componentRange);
+          auto csv = values.join(",");
+          item->setData(2, Qt::DisplayRole, csv);
+          item->setData(2, Qt::ToolTipRole, csv);
         }
-        item->setData(2, Qt::DisplayRole, dataType == "string" ? tr("NA") : dataRange);
-        item->setData(2, Qt::ToolTipRole, dataRange);
+        else
+        {
+          QString dataRange;
+          double range[2];
+          for (int j = 0; j < numComponents; j++)
+          {
+            if (j != 0)
+            {
+              dataRange.append(", ");
+            }
+            arrayInfo->GetComponentRange(j, range);
+            QString componentRange = QString("[%1, %2]").arg(range[0]).arg(range[1]);
+            dataRange.append(componentRange);
+          }
+          item->setData(2, Qt::DisplayRole, dataRange);
+          item->setData(2, Qt::ToolTipRole, dataRange);
+        }
         item->setFlags(item->flags() | Qt::ItemIsEditable);
         if (arrayInfo->GetIsPartial())
         {
