@@ -90,20 +90,20 @@ def main(args):
     numsteps = args.timesteps
     for step in range(numsteps):
         if args.delay > 0:
-            import time
             time.sleep(args.delay)
 
-        if rank == 0:
-            print_info("timestep: {0}/{1}".format(step+1, numsteps))
-
         # assume simulation time starts at 0
-        time = step/float(numsteps)
+        timevalue = step/float(numsteps)
+
+        if rank == 0:
+            print_info("timestep: {0}/{1}; timevalue: {2}".format(step+1, numsteps, timevalue))
+
 
         dataset, wholeExtent = create_dataset(step, args, rank, num_ranks)
 
         # "perform" coprocessing.  results are outputted only if
-        # the passed in script says we should at time/step
-        bridge.coprocess(time, step, dataset, name=args.channel, wholeExtent=wholeExtent)
+        # the passed in script says we should at timevalue/step
+        bridge.coprocess(timevalue, step, dataset, name=args.channel, wholeExtent=wholeExtent)
 
         del dataset
         del wholeExtent

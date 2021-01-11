@@ -27,6 +27,8 @@
 
 #include "vtkSMProxy.h"
 
+#include <list>
+
 class vtkSMExtractsController;
 
 class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMExtractTriggerProxy : public vtkSMProxy
@@ -48,6 +50,16 @@ protected:
 private:
   vtkSMExtractTriggerProxy(const vtkSMExtractTriggerProxy&) = delete;
   void operator=(const vtkSMExtractTriggerProxy&) = delete;
+
+  /**
+   * Queue of time values that we keep for the TimeValue trigger to keep
+   * track of the most recent time values to determine if we should
+   * output at this time step or not, based on whether or not we think
+   * we're closest to the next instance we should output.
+   */
+  std::list<double> TimeStepLengths;
+  double LastTimeValue;
+  double LastOutputTimeValue;
 };
 
 #endif

@@ -1,0 +1,18 @@
+[
+  {"type":"directory","name":"Testing/Temporary/WaveletTimeTrigger/","contents":[
+    {"type":"directory","name":"BatchExtracts","contents":[
+      {"type":"file","name":"RenderView1_000000.png", "compare":true},
+      {"type":"file","name":"RenderView1_000005.png"}
+    ]},
+    {"type":"directory","name":"ImmediateExtracts","contents":[
+      {"type":"file","name":"RenderView1_000000.png", "compare":true},
+      {"type":"file","name":"RenderView1_000005.png"}
+    ]},
+    {"type":"directory","name":"CoprocessingExtracts","contents":[
+      {"type":"file","name":"RenderView1_000000.png", "compare":true},
+      {"type":"file","name":"RenderView1_000010.png"}
+    ]},
+    {"type":"file","name":"WaveletTimeTrigger.pvsm"},
+    {"type":"file","name":"WaveletTimeTrigger.py"}
+  ]}
+]
