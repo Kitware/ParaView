@@ -145,9 +145,6 @@ bool vtkSMAnimationSceneWriter::Save()
   this->AnimationScene->SetLoop(0);
 
   bool status = this->SaveInitialize(this->StartFileCount);
-  bool cachingFlag = this->AnimationScene->GetForceDisableCaching();
-  this->AnimationScene->SetForceDisableCaching(true);
-
   if (status)
   {
     this->Saving = true;
@@ -163,7 +160,6 @@ bool vtkSMAnimationSceneWriter::Save()
 
   // Restore scene parameters, if changed.
   this->AnimationScene->SetLoop(loop);
-  this->AnimationScene->SetForceDisableCaching(cachingFlag);
 
   return status && (!this->SaveFailed);
 }
