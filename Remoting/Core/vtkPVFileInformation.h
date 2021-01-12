@@ -73,12 +73,34 @@ public:
     DIRECTORY_GROUP
   };
 
+  //@{
   /**
    * Helper that returns whether a FileType is a
    * directory (DIRECTORY, DRIVE, NETWORK_ROOT, etc...)
    * Or in other words, a type that we can do a DirectoryListing on.
    */
   static bool IsDirectory(int t);
+  bool IsDirectory() const { return vtkPVFileInformation::IsDirectory(this->Type); }
+  //@}
+
+  //@{
+  /**
+   * Helper that returns true if file-type is a group i.e.
+   * either a FILE_GROUP or a DIRECTORY_GROUP.
+   */
+  static bool IsGroup(int type)
+  {
+    switch (type)
+    {
+      case FILE_GROUP:
+      case DIRECTORY_GROUP:
+        return true;
+      default:
+        return false;
+    }
+  }
+  bool IsGroup() const { return vtkPVFileInformation::IsGroup(this->Type); }
+  //@}
 
   /**
    * Initializes the information object.
