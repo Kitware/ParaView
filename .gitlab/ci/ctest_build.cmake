@@ -30,13 +30,16 @@ foreach (target IN LISTS targets_to_build)
   ctest_submit(PARTS Build)
 endforeach ()
 
-file(GLOB logs
-  "${CTEST_SOURCE_DIRECTORY}/compile_output.log"
-  "${CTEST_SOURCE_DIRECTORY}/doxygen_output.log"
-  "${CTEST_SOURCE_DIRECTORY}/prepare_output.log")
-if (logs)
-  list(APPEND CTEST_NOTES_FILES ${logs})
-  ctest_submit(PARTS Notes)
+# Only upload build logs if the build fails.
+if (build_result)
+  file(GLOB logs
+    "${CTEST_SOURCE_DIRECTORY}/compile_output.log"
+    "${CTEST_SOURCE_DIRECTORY}/doxygen_output.log"
+    "${CTEST_SOURCE_DIRECTORY}/prepare_output.log")
+  if (logs)
+    list(APPEND CTEST_NOTES_FILES ${logs})
+    ctest_submit(PARTS Notes)
+  endif ()
 endif ()
 
 if (build_result)
