@@ -102,7 +102,7 @@ struct Printer
     char buffer[256];
 
     std::ostringstream stream;
-    stream << self->GetPrefix() ? self->GetPrefix() : "";
+    stream << (self->GetPrefix() ? self->GetPrefix() : "");
 
     vtkDataArrayAccessor<ArrayT> accessor(array);
     const auto numComps = array->GetNumberOfComponents();
@@ -122,7 +122,7 @@ struct Printer
       }
       stream << " )";
     }
-    stream << self->GetPostfix() ? self->GetPostfix() : "";
+    stream << (self->GetPostfix() ? self->GetPostfix() : "");
     this->OutputArray->SetValue(0, stream.str());
   }
 
@@ -134,7 +134,7 @@ struct Printer
     char buffer[256];
 
     std::ostringstream stream;
-    stream << self->GetPrefix() ? self->GetPrefix() : "";
+    stream << (self->GetPrefix() ? self->GetPrefix() : "");
 
     const auto numComps = array->GetNumberOfComponents();
     if (numComps == 1)
@@ -154,7 +154,7 @@ struct Printer
       }
       stream << " )";
     }
-    stream << self->GetPostfix() ? self->GetPostfix() : "";
+    stream << (self->GetPostfix() ? self->GetPostfix() : "");
     this->OutputArray->SetValue(0, stream.str());
   }
 };
@@ -184,7 +184,8 @@ vtkAnnotateGlobalDataFilter::~vtkAnnotateGlobalDataFilter()
 }
 
 //----------------------------------------------------------------------------
-int vtkAnnotateGlobalDataFilter::FillInputPortInformation(int port, vtkInformation* info)
+int vtkAnnotateGlobalDataFilter::FillInputPortInformation(
+  int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
   return 1;

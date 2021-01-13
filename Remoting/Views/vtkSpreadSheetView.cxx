@@ -706,7 +706,6 @@ bool vtkSpreadSheetView::IsColumnInternal(vtkIdType index)
 //----------------------------------------------------------------------------
 bool vtkSpreadSheetView::IsColumnInternal(const char* columnName)
 {
-  const char* result{ nullptr };
   return (columnName == nullptr || strcmp(columnName, "__vtkIsSelected__") == 0) ||
       (std::strstr(columnName, "__vtkValidMask__") == columnName)
     ? true
