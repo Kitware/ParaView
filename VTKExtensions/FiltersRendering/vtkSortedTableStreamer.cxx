@@ -1357,7 +1357,7 @@ vtkSortedTableStreamer::~vtkSortedTableStreamer()
 }
 
 //----------------------------------------------------------------------------
-int vtkSortedTableStreamer::FillInputPortInformation(int port, vtkInformation* info)
+int vtkSortedTableStreamer::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPartitionedDataSet");
   return 1;
@@ -1419,7 +1419,7 @@ vtkSmartPointer<vtkUnsignedIntArray> vtkSortedTableStreamer::GenerateCompositeIn
       const unsigned int tuple[2] = { static_cast<unsigned int>(
                                         metadata->Get(vtkDataTabulator::HIERARCHICAL_LEVEL())),
         static_cast<unsigned int>(metadata->Get(vtkDataTabulator::HIERARCHICAL_INDEX())) };
-      for (vtkIdType cc = 0, max = table->GetNumberOfRows(); cc < max; ++cc)
+      for (vtkIdType rows = 0, maxRows = table->GetNumberOfRows(); rows < maxRows; ++rows)
       {
         compositeIndex->InsertNextTypedTuple(tuple);
       }
@@ -1427,7 +1427,7 @@ vtkSmartPointer<vtkUnsignedIntArray> vtkSortedTableStreamer::GenerateCompositeIn
     else if (metadata->Has(vtkDataTabulator::COMPOSITE_INDEX()))
     {
       const unsigned int composite_index = metadata->Get(vtkDataTabulator::COMPOSITE_INDEX());
-      for (vtkIdType cc = 0, max = table->GetNumberOfRows(); cc < max; ++cc)
+      for (vtkIdType rows = 0, maxRows = table->GetNumberOfRows(); rows < maxRows; ++rows)
       {
         compositeIndex->InsertNextTypedTuple(&composite_index);
       }
