@@ -112,7 +112,7 @@ public Q_SLOTS:
   void editMacro(const QString& fileName);
 
 private:
-  class pqInternal;
+  struct pqInternal;
   pqInternal* Internal;
 };
 #endif

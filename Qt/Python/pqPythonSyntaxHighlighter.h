@@ -46,7 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QTextEdit;
 class QUndoStack;
-class pqPythonTextHistoryEntry;
+
+struct pqPythonTextHistoryEntry;
 
 /**
  * This class is a helper object to attach to a QTextEdit to add Python
