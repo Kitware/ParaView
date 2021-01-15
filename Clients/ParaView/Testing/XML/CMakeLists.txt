@@ -1815,9 +1815,14 @@ endif()
 #   script
 #----------------------------------------------------------------------
 set(paraview_python_verify_tests
-  AnimatedExportScene
   ExportSceneSpreadSheetView
 )
+
+if (PARAVIEW_ENABLE_WEB)
+  list(APPEND paraview_python_verify_tests
+    AnimatedExportScene
+  )
+endif()
 
 if (PARAVIEW_USE_PYTHON)
   foreach(test_name ${paraview_python_verify_tests})

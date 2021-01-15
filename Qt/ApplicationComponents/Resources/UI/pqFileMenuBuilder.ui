@@ -173,6 +173,10 @@
    </property>
   </action>
   <action name="actionAnimatedExport">
+  <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqExportAnimatedScene.svg</normaloff>:/pqWidgets/Icons/pqExportAnimatedScene.svg</iconset>
+   </property>
    <property name="text">
     <string>Export Animated Scene...</string>
    </property>
