@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqHelpWindow.h"
 #include "ui_pqHelpWindow.h"
+#include "vtkPVConfig.h" // for PARAVIEW_USE_QTWEBENGINE
 
 #include <cassert>
 
@@ -72,7 +73,7 @@ public:
   void setUrl(const QUrl& url) override { this->Widget->setUrl(url); }
 };
 
-#ifdef PARAVIEW_USE_QTWEBENGINE
+#if PARAVIEW_USE_QTWEBENGINE
 #include "pqHelpWindowWebEngine.h"
 typedef pqBrowserTemplate<pqWebView> PQBROWSER_TYPE;
 #else

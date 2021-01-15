@@ -1148,7 +1148,7 @@ function (paraview_add_plugin name)
       TARGET      "${_paraview_build_plugin}_qch"
       ${_paraview_build_plugin_doc_source_args}
       DEPENDS     "${_paraview_build_plugin}_doc"
-      PATTERNS    "*.html" "*.css" "*.png" "*.jpg")
+      PATTERNS    "*.html" "*.css" "*.png" "*.jpg" "*.js")
 
     list(APPEND _paraview_add_plugin_extra_include_dirs
       "${CMAKE_CURRENT_BINARY_DIR}")
