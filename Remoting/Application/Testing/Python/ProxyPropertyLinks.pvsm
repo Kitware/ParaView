@@ -110,65 +110,6 @@
         <Domain name="bool" id="262.UseAnimationTime.bool"/>
       </Property>
     </Proxy>
-    <Proxy group="misc" type="ColorPalette" id="268" servers="0">
-      <Property name="BackgroundColor" id="268.BackgroundColor" number_of_elements="3">
-        <Element index="0" value="0.32"/>
-        <Element index="1" value="0.34"/>
-        <Element index="2" value="0.43"/>
-        <Domain name="range" id="268.BackgroundColor.range"/>
-      </Property>
-      <Property name="EdgeColor" id="268.EdgeColor" number_of_elements="3">
-        <Element index="0" value="0"/>
-        <Element index="1" value="0"/>
-        <Element index="2" value="0.5"/>
-        <Domain name="range" id="268.EdgeColor.range"/>
-      </Property>
-      <Property name="ForegroundColor" id="268.ForegroundColor" number_of_elements="3">
-        <Element index="0" value="1"/>
-        <Element index="1" value="1"/>
-        <Element index="2" value="1"/>
-        <Domain name="range" id="268.ForegroundColor.range"/>
-      </Property>
-      <Property name="SelectionColor" id="268.SelectionColor" number_of_elements="3">
-        <Element index="0" value="1"/>
-        <Element index="1" value="0"/>
-        <Element index="2" value="1"/>
-        <Domain name="range" id="268.SelectionColor.range"/>
-      </Property>
-      <Property name="SurfaceColor" id="268.SurfaceColor" number_of_elements="3">
-        <Element index="0" value="1"/>
-        <Element index="1" value="1"/>
-        <Element index="2" value="1"/>
-        <Domain name="range" id="268.SurfaceColor.range"/>
-      </Property>
-      <Property name="TextAnnotationColor" id="268.TextAnnotationColor" number_of_elements="3">
-        <Element index="0" value="1"/>
-        <Element index="1" value="1"/>
-        <Element index="2" value="1"/>
-        <Domain name="range" id="268.TextAnnotationColor.range"/>
-      </Property>
-      <Link global_name="BackgroundColor" proxy="272" property="Background"/>
-      <Link global_name="EdgeColor" proxy="4533" property="EdgeColor"/>
-      <Link global_name="EdgeColor" proxy="4622" property="EdgeColor"/>
-      <Link global_name="EdgeColor" proxy="4711" property="EdgeColor"/>
-      <Link global_name="ForegroundColor" proxy="272" property="OrientationAxesOutlineColor"/>
-      <Link global_name="ForegroundColor" proxy="4533" property="AmbientColor"/>
-      <Link global_name="ForegroundColor" proxy="4533" property="CubeAxesColor"/>
-      <Link global_name="ForegroundColor" proxy="4622" property="AmbientColor"/>
-      <Link global_name="ForegroundColor" proxy="4622" property="CubeAxesColor"/>
-      <Link global_name="ForegroundColor" proxy="4711" property="AmbientColor"/>
-      <Link global_name="ForegroundColor" proxy="4711" property="CubeAxesColor"/>
-      <Link global_name="SelectionColor" proxy="4533" property="SelectionColor"/>
-      <Link global_name="SelectionColor" proxy="4622" property="SelectionColor"/>
-      <Link global_name="SelectionColor" proxy="4711" property="SelectionColor"/>
-      <Link global_name="SurfaceColor" proxy="4533" property="BackfaceDiffuseColor"/>
-      <Link global_name="SurfaceColor" proxy="4533" property="DiffuseColor"/>
-      <Link global_name="SurfaceColor" proxy="4622" property="BackfaceDiffuseColor"/>
-      <Link global_name="SurfaceColor" proxy="4622" property="DiffuseColor"/>
-      <Link global_name="SurfaceColor" proxy="4711" property="BackfaceDiffuseColor"/>
-      <Link global_name="SurfaceColor" proxy="4711" property="DiffuseColor"/>
-      <Link global_name="TextAnnotationColor" proxy="272" property="OrientationAxesLabelColor"/>
-    </Proxy>
     <Proxy group="misc" type="ViewLayout" id="269" servers="16">
       <Layout number_of_elements="1">
         <Item direction="0" fraction="0.5" view="272"/>
@@ -2437,9 +2378,6 @@
     <ProxyCollection name="animation">
       <Item id="261" name="AnimationScene0"/>
       <Item id="262" name="TimeAnimationCue0"/>
-    </ProxyCollection>
-    <ProxyCollection name="global_properties">
-      <Item id="268" name="ColorPalette"/>
     </ProxyCollection>
     <ProxyCollection name="layouts">
       <Item id="269" name="ViewLayout0"/>
