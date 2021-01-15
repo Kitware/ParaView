@@ -45,6 +45,9 @@ int TestValidateProxies(int argc, char* argv[])
   exceptions.insert(std::pair<std::string, std::string>("extract_writers", "JPG"));
   exceptions.insert(std::pair<std::string, std::string>("extract_writers", "PNG"));
   exceptions.insert(std::pair<std::string, std::string>("extract_writers", "CinemaVolumetricPNG"));
+
+  // requires reader factory
+  exceptions.insert(std::pair<std::string, std::string>("sources", "EnsembleDataReader"));
 #if BUILD_SHARED_LIBS
 #else
   // not sure why this reader is failing in static builds; skipping for now.
