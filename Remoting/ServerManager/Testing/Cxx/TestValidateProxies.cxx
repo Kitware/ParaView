@@ -48,11 +48,9 @@ int TestValidateProxies(int argc, char* argv[])
 
   // requires reader factory
   exceptions.insert(std::pair<std::string, std::string>("sources", "EnsembleDataReader"));
-#if BUILD_SHARED_LIBS
-#else
-  // not sure why this reader is failing in static builds; skipping for now.
+
+  // reports errors when required Python modules are missing.
   exceptions.insert(std::pair<std::string, std::string>("sources", "OpenPMDReader"));
-#endif
   (void)argc;
 
   int exitCode = EXIT_SUCCESS;
