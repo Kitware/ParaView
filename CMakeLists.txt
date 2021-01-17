@@ -519,6 +519,12 @@ else ()
   mark_as_advanced(VTK_PYTHON_FULL_THREADSAFE)
   cmake_dependent_option(VTK_USE_TK "Build VTK with Tk support" OFF
     "PARAVIEW_USE_PYTHON" OFF)
+  
+  cmake_dependent_option(PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE
+    "Explicitly indicate that the Python library is debuggable" OFF
+    "WIN32;PARAVIEW_USE_PYTHON" OFF)
+  mark_as_advanced(PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE)
+  set(VTK_WINDOWS_PYTHON_DEBUGGABLE ${PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE})
 
   vtk_module_build(
     MODULES             ${vtk_modules}
@@ -668,6 +674,7 @@ if (PARAVIEW_USE_PYTHON)
       MODULE_DESTINATION  "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}"
       CMAKE_DESTINATION   "${paraview_cmake_destination}/vtk"
       LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+      USE_DEBUG_SUFFIX    "${PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE}"
       WRAPPED_MODULES vtk_python_wrapped_modules
       TARGET          VTK::vtkpythonmodules)
 
@@ -705,6 +712,7 @@ if (PARAVIEW_USE_PYTHON)
     MODULE_DESTINATION  "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}"
     CMAKE_DESTINATION   "${paraview_cmake_destination}"
     LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    USE_DEBUG_SUFFIX    "${PARAVIEW_WINDOWS_PYTHON_DEBUGGABLE}"
     WRAPPED_MODULES paraview_python_wrapped_modules
     TARGET          ParaView::pvpythonmodules
     DEPENDS         VTK::vtkpythonmodules)
