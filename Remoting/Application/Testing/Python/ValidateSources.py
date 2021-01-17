@@ -8,7 +8,7 @@ sources = servermanager.sources.__dict__
 for source in sources:
   try:
     sys.stderr.write('Creating %s...'%(source))
-    if source in ["GenericIOReader"]:
+    if source in ["GenericIOReader", 'EnsembleDataReader', 'openPMDReader']:
         print(sys.stderr.write("...skipping (in exclusion list).\n"))
         continue
     s = sources[source]()
