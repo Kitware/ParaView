@@ -119,8 +119,18 @@ public:
    */
   bool SaveOnClose();
 
+  /**
+   * @brief Opens a file in the editor.
+   * Triggers a saving wizard if the current buffer
+   * has not beed saved on the disk.
+   */
   bool OpenFile(const QString& filename);
 
+  /**
+   * @brief Sets the default save directory.
+   * Only used for the directory displayed
+   * when the save popup window is shown.
+   */
   void SetDefaultSaveDirectory(const QString& dir);
 
 signals:
