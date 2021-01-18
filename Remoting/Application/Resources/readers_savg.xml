@@ -1,0 +1,31 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- =================================================================== -->
+    <SourceProxy name="SAVGReader"
+                 label="SAVG Reader"
+                 class="paraview.algorithms.savgreader.SAVGReader"
+                 si_class="vtkSIPythonSourceProxy">
+
+      <Documentation>
+        Reader for NIST SAVG files.
+      </Documentation>
+
+      <OutputPort index="0" name="Geometry" />
+
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>Specify the file name.</Documentation>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="savg" file_description="SAVG files" />
+      </Hints>
+
+      <!-- end of SAVGReader -->
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

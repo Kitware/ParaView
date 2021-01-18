@@ -4,6 +4,7 @@ set(python_files
   paraview/_colorMaps.py
   paraview/algorithms/__init__.py
   paraview/algorithms/openpmd.py
+  paraview/algorithms/savgreader.py
   paraview/apps/__init__.py
   paraview/apps/__main__.py
   paraview/apps/_internals.py
