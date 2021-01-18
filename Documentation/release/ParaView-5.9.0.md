@@ -567,9 +567,21 @@ Also removed in this release is the ability to import Cinema databases. The impo
 
 CMake 3.12 is now required to build ParaView.
 
+## Minimum Qt version
+
+Qt 5.12 is now the minimum supported version required to build ParaView.
+
+## Proxy XML toposort
+
+Proxy XML files are now sorted in module dependency order before collating into a ServerManager target. This allows Proxy entries to depend on each other properly.
+
 ## Autoload plugin options
 
 `PARAVIEW_PLUGIN_AUTOLOAD_<PLUGIN>` options have been made available once again.
+
+## Plugin RPATH entries are improved
+
+By default, `paraview_plugin_build(ADD_INSTALL_RPATHS)` is now `ON` if not specified. This ensures that installed plugins can load modules beside them properly out of the box.
 
 ## vtkStdString removal
 
