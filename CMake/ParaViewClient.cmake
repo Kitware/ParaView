@@ -285,7 +285,7 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
   endif ()
 
   include("${_ParaViewClient_cmake_dir}/paraview-find-package-helpers.cmake" OPTIONAL)
-  find_package(Qt5 REQUIRED QUIET COMPONENTS Core Widgets OPTIONAL_COMPONENTS WebEngineWidgets)
+  find_package(Qt5 REQUIRED QUIET COMPONENTS Core Widgets)
 
   # CMake 3.13 started using Qt5's version variables to detect what version
   # of Qt's tools to run for autorcc. However, they are looked up using the
@@ -378,6 +378,7 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
       Qt5::Widgets
       VTK::vtksys)
   if (PARAVIEW_USE_QTWEBENGINE)
+    find_package(Qt5 REQUIRED QUIET COMPONENTS WebEngineWidgets)
     target_link_libraries("${_paraview_client_NAME}"
       PRIVATE Qt5::WebEngineWidgets)
   endif ()
