@@ -51,20 +51,24 @@ void pqPythonUndoCommand::SwapImpl(const pqPythonTextHistoryEntry& h)
   // the text in the undo stack)
   const bool oldState = this->Text.blockSignals(true);
 
-  this->Text.setUpdatesEnabled(false);
-  this->Text.setHtml(this->Highlighter->Highlight(h.content));
-  this->Text.setUpdatesEnabled(true);
-
-  // Move the cursor
-  if (!h.IsEmpty())
+  const QString highlightedText = this->Highlighter->Highlight(h.content);
+  if (!highlightedText.isEmpty())
   {
-    QTextCursor cursor = this->Text.textCursor();
-    cursor.setPosition(h.cursorPosition);
-    this->Text.setTextCursor(cursor);
-  }
+    this->Text.setUpdatesEnabled(false);
+    this->Text.setHtml(this->Highlighter->Highlight(h.content));
+    this->Text.setUpdatesEnabled(true);
 
-  // re-enable the signals
-  this->Text.blockSignals(oldState);
+    // Move the cursor
+    if (!h.IsEmpty())
+    {
+      QTextCursor cursor = this->Text.textCursor();
+      cursor.setPosition(h.cursorPosition);
+      this->Text.setTextCursor(cursor);
+    }
+
+    // re-enable the signals
+    this->Text.blockSignals(oldState);
+  }
 };
 
 //-----------------------------------------------------------------------------

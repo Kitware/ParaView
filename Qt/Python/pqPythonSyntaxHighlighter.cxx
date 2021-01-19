@@ -100,10 +100,10 @@ pqPythonSyntaxHighlighter::pqPythonSyntaxHighlighter(QObject* p, QTextEdit& text
     }
     else
     {
-      qWarning(
-        "The ParaView python module failed to load Pygment for the python syntax highlighting \
-        in the editor. Please verify that you have correctly installed the Python Pygment module if you want \
-        to have the syntax highlighting working in the editor");
+      qInfo("The ParaView python module didn't load Pygment for the python syntax highlighting"
+            "in the editor. Please verify that you have correctly installed the Python Pygment "
+            "module if you want"
+            "to have the syntax highlighting working in the editor");
     }
   }
 
@@ -160,7 +160,7 @@ QString pqPythonSyntaxHighlighter::Highlight(const QString& text) const
   }
 
   QString result;
-  if (leadingWhiteSpaceLength < text.length())
+  if (this->PygmentsModule && leadingWhiteSpaceLength < text.length())
   {
     while (trailingWhiteSpaceLength < text.length() &&
       text.at(text.length() - 1 - trailingWhiteSpaceLength).isSpace())
@@ -212,25 +212,26 @@ QString pqPythonSyntaxHighlighter::Highlight(const QString& text) const
 void pqPythonSyntaxHighlighter::ConnectHighligter() const
 {
   connect(&this->TextEdit, &QTextEdit::textChanged, [this]() {
-    // We block all text signals (this is done to avoid pushing twice
-    // the text in the undo stack)
-    const bool oldState = this->TextEdit.blockSignals(true);
-
     const QString text = this->TextEdit.toPlainText();
     const int cursorPosition = this->TextEdit.textCursor().position();
 
-    this->TextEdit.setHtml(this->Highlight(text));
-    QTextCursor cursor = this->TextEdit.textCursor();
-    cursor.setPosition(cursorPosition);
-    this->TextEdit.setTextCursor(cursor);
+    const QString highlightedText = this->Highlight(text);
+    if (!highlightedText.isEmpty())
+    {
+      const bool oldState = this->TextEdit.blockSignals(true);
 
-    const int vScrollBarValue = this->TextEdit.verticalScrollBar()->value();
-    this->TextEdit.verticalScrollBar()->setValue(vScrollBarValue);
+      this->TextEdit.setHtml(this->Highlight(text));
+      QTextCursor cursor = this->TextEdit.textCursor();
+      cursor.setPosition(cursorPosition);
+      this->TextEdit.setTextCursor(cursor);
 
-    const int hScrollBarValue = this->TextEdit.horizontalScrollBar()->value();
-    this->TextEdit.horizontalScrollBar()->setValue(hScrollBarValue);
+      const int vScrollBarValue = this->TextEdit.verticalScrollBar()->value();
+      this->TextEdit.verticalScrollBar()->setValue(vScrollBarValue);
 
-    // re-enable the signals
-    this->TextEdit.blockSignals(oldState);
+      const int hScrollBarValue = this->TextEdit.horizontalScrollBar()->value();
+      this->TextEdit.horizontalScrollBar()->setValue(hScrollBarValue);
+
+      this->TextEdit.blockSignals(oldState);
+    }
   });
 }
