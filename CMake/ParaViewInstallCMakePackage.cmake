@@ -65,8 +65,6 @@ set(paraview_cmake_module_files
   pqToolBarImplementation.h.in
   pqTreeLayoutStrategyImplementation.cxx.in
   pqTreeLayoutStrategyImplementation.h.in
-  pqViewFrameActionGroupImplementation.cxx.in
-  pqViewFrameActionGroupImplementation.h.in
 
   # ServerManager API
   ParaViewServerManager.cmake
