@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqServerConfiguration.h"
 
+#include "pqQtDeprecated.h"
 #include "pqServerResource.h"
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
@@ -638,7 +639,7 @@ void pqServerConfiguration::setStartupToCommand(
   vtkPVXMLElement* xmlCommand =
     startupElement->FindNestedElementByName(CommandXMLString.toUtf8().data());
 
-  QStringList commandList = command_str.split(" ", QString::SkipEmptyParts);
+  QStringList commandList = command_str.split(" ", PV_QT_SKIP_EMPTY_PARTS);
   assert(commandList.size() >= 1);
 
   xmlCommand->SetAttribute("exec", commandList[0].toLocal8Bit().data());

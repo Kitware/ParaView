@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqServerConnectDialog.h"
+#include "pqQtDeprecated.h"
 #include "ui_pqServerConnectDialog.h"
 
 #include "pqApplicationCore.h"
@@ -765,7 +766,7 @@ void pqServerConnectDialog::fetchServers()
 
   QRegExp regExp("pvsc\\s+([^\\s]+)\\s+(.+)");
   QTextStream stream(&pvsc_sources, QIODevice::ReadOnly);
-  foreach (const QString& line, stream.readAll().split("\n", QString::SkipEmptyParts))
+  foreach (const QString& line, stream.readAll().split("\n", PV_QT_SKIP_EMPTY_PARTS))
   {
     QString cleaned_line = line.trimmed();
     if (regExp.exactMatch(cleaned_line))

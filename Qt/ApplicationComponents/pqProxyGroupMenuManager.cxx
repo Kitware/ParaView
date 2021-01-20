@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqManageFavoritesReaction.h"
 #include "pqPVApplicationCore.h"
+#include "pqQtDeprecated.h"
 #include "pqServerManagerModel.h"
 #include "pqSetData.h"
 #include "pqSetName.h"
@@ -362,10 +363,10 @@ void pqProxyGroupMenuManager::loadRecentlyUsedItems()
   if (settings->contains(key))
   {
     QString list = settings->value(key).toString();
-    QStringList parts = list.split("|", QString::SkipEmptyParts);
+    QStringList parts = list.split("|", PV_QT_SKIP_EMPTY_PARTS);
     foreach (QString part, parts)
     {
-      QStringList pieces = part.split(";", QString::SkipEmptyParts);
+      QStringList pieces = part.split(";", PV_QT_SKIP_EMPTY_PARTS);
       if (pieces.size() == 2)
       {
         QPair<QString, QString> aKey(pieces[0], pieces[1]);
@@ -408,7 +409,7 @@ void pqProxyGroupMenuManager::populateFavoritesMenu()
 
     for (const QPair<QString, QString>& key : this->Internal->Favorites)
     {
-      QStringList categories = key.second.split(";", QString::SkipEmptyParts);
+      QStringList categories = key.second.split(";", PV_QT_SKIP_EMPTY_PARTS);
       bool isCategory = key.first.compare("categories") == 0;
       QString filter = isCategory ? QString("") : categories.takeLast();
       if (!isCategory)
@@ -466,7 +467,7 @@ QAction* pqProxyGroupMenuManager::getAddToCategoryAction(const QString& path)
   {
     if (key.first == "filters")
     {
-      QStringList categories = key.second.split(";", QString::SkipEmptyParts);
+      QStringList categories = key.second.split(";", PV_QT_SKIP_EMPTY_PARTS);
       QString filter = categories.takeLast();
       categories.removeLast();
       if (path == categories.join(";"))
@@ -490,10 +491,10 @@ void pqProxyGroupMenuManager::loadFavoritesItems()
   if (settings->contains(key))
   {
     QString list = settings->value(key).toString();
-    QStringList parts = list.split("|", QString::SkipEmptyParts);
+    QStringList parts = list.split("|", PV_QT_SKIP_EMPTY_PARTS);
     for (const QString& part : parts)
     {
-      QStringList pieces = part.split(";", QString::SkipEmptyParts);
+      QStringList pieces = part.split(";", PV_QT_SKIP_EMPTY_PARTS);
       if (pieces.size() >= 2)
       {
         QString group = pieces.takeFirst();
@@ -638,7 +639,7 @@ void pqProxyGroupMenuManager::updateMenuStyle()
 
   for (auto bm : this->Internal->Favorites)
   {
-    QStringList path = bm.second.split(";", QString::SkipEmptyParts);
+    QStringList path = bm.second.split(";", PV_QT_SKIP_EMPTY_PARTS);
     QString filter = path.takeLast();
     if (QAction* action = this->getAction(bm.first, filter))
     {

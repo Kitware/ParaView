@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialogFilter.h"
 #include "pqFileDialogModel.h"
 #include "pqFileDialogRecentDirsModel.h"
+#include "pqQtDeprecated.h"
 #include "pqServer.h"
 #include "pqSettings.h"
 
@@ -77,12 +78,6 @@ public:
 
 #include <QtGlobal>
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-#define QT_SKIP_EMPTY_PARTS Qt::SkipEmptyParts
-#else
-#define QT_SKIP_EMPTY_PARTS QString::SkipEmptyParts
-#endif
-
 namespace
 {
 
@@ -90,13 +85,13 @@ QStringList MakeFilterList(const QString& filter)
 {
   if (filter.contains(";;"))
   {
-    return filter.split(";;", QT_SKIP_EMPTY_PARTS);
+    return filter.split(";;", PV_QT_SKIP_EMPTY_PARTS);
   }
 
   // check if '\n' is being used as separator.
   // (not sure why, but the old code was doing it, and if some applications
   // are relying on it, I don't want to break them right now).
-  return filter.split('\n', QT_SKIP_EMPTY_PARTS);
+  return filter.split('\n', PV_QT_SKIP_EMPTY_PARTS);
 }
 
 QStringList GetWildCardsFromFilter(const QString& filter)
@@ -116,7 +111,7 @@ QStringList GetWildCardsFromFilter(const QString& filter)
   }
 
   // separated by spaces or semi-colons
-  QStringList fs = f.split(QRegExp("[\\s+;]"), QT_SKIP_EMPTY_PARTS);
+  QStringList fs = f.split(QRegExp("[\\s+;]"), PV_QT_SKIP_EMPTY_PARTS);
 
   // add a *.ext.* for every *.ext we get to support file groups
   QStringList ret = fs;
@@ -754,7 +749,7 @@ void pqFileDialog::onModelReset()
   // the separator is always the unix separator
   QChar separator = '/';
 
-  QStringList parents = currentPath.split(separator, QT_SKIP_EMPTY_PARTS);
+  QStringList parents = currentPath.split(separator, PV_QT_SKIP_EMPTY_PARTS);
 
   // put our root back in
   if (parents.count())
@@ -957,7 +952,7 @@ void pqFileDialog::onTextEdited(const QString& str)
   if (str.size() > 0)
   {
     // convert the typed information to be impl.FileNames
-    impl.FileNames = str.split(impl.FileNamesSeperator, QT_SKIP_EMPTY_PARTS);
+    impl.FileNames = str.split(impl.FileNamesSeperator, PV_QT_SKIP_EMPTY_PARTS);
   }
   else
   {

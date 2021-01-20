@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqExpandableTableView.h"
+#include "pqQtDeprecated.h"
 
 #include <QAbstractItemDelegate>
 #include <QApplication>
@@ -126,7 +127,7 @@ void pqExpandableTableView::keyPressEvent(QKeyEvent* e)
     {
       // Split the lines in the text
       QString text = mimeData->text();
-      QStringList lines = text.split("\n", QString::SkipEmptyParts);
+      QStringList lines = text.split("\n", PV_QT_SKIP_EMPTY_PARTS);
       for (int row = 0; row < std::min(lines.size(), numModelRows); ++row)
       {
         // Split within each line

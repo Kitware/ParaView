@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOptions.h"
 #include "pqPVApplicationCore.h"
 #include "pqPersistentMainWindowStateBehavior.h"
+#include "pqQtDeprecated.h"
 #include "pqRenderView.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
@@ -104,7 +105,7 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
     if (strchr(server_url, '|') != NULL)
     {
       // We should connect multiple times
-      QStringList urls = QString(server_url).split(QRegExp("\\|"), QString::SkipEmptyParts);
+      QStringList urls = QString(server_url).split(QRegExp("\\|"), PV_QT_SKIP_EMPTY_PARTS);
       foreach (QString url, urls)
       {
         if (!pqServerConnectReaction::connectToServer(pqServerResource(url)))

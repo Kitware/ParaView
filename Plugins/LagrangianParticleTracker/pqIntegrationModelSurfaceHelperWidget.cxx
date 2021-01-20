@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringArray.h"
 
 #include "pqExpandableTableView.h"
+#include "pqQtDeprecated.h"
 
 #include <QComboBox>
 #include <QGridLayout>
@@ -368,7 +369,7 @@ void pqIntegrationModelSurfaceHelperWidget::setArrayToGenerate(const QList<QVari
     }
     int nLeafs = (i + 2)->toInt();
     int nComponents = (i + 3)->toInt();
-    QStringList dataValues = (i + 4)->toString().split(';', QString::SkipEmptyParts);
+    QStringList dataValues = (i + 4)->toString().split(';', PV_QT_SKIP_EMPTY_PARTS);
     if (dataValues.size() != nLeafs * nComponents)
     {
       qCritical() << "Unexpected number of values" << dataValues.size() << " "

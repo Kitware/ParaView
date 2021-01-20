@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // self
 #include "pqFavoritesDialog.h"
+#include "pqQtDeprecated.h"
 #include "ui_pqFavoritesDialog.h"
 
 // Qt
@@ -271,10 +272,10 @@ void pqFavoritesDialog::populateFavoritesTree()
   if (settings->contains(key))
   {
     QString settingValue = settings->value(key).toString();
-    QStringList bmList = settingValue.split("|", QString::SkipEmptyParts);
+    QStringList bmList = settingValue.split("|", PV_QT_SKIP_EMPTY_PARTS);
     for (QString bm : bmList)
     {
-      QStringList bmPath = bm.split(";", QString::SkipEmptyParts);
+      QStringList bmPath = bm.split(";", PV_QT_SKIP_EMPTY_PARTS);
       if (bmPath.size() >= 2)
       {
         QString group = bmPath.takeFirst();

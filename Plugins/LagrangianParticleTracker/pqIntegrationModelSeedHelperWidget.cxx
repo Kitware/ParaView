@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqLineEdit.h"
 #include "pqPropertiesPanel.h"
+#include "pqQtDeprecated.h"
 
 #include <QComboBox>
 #include <QGridLayout>
@@ -341,7 +342,7 @@ void pqIntegrationModelSeedHelperWidget::setArrayToGenerate(const QList<QVariant
     }
     // Recover values
     int nComponents = (i + 3)->toInt();
-    QStringList dataStrings = (i + 4)->toString().split(';', QString::SkipEmptyParts);
+    QStringList dataStrings = (i + 4)->toString().split(';', PV_QT_SKIP_EMPTY_PARTS);
     if (constOrFlow == vtkLagrangianSeedHelper::CONSTANT)
     {
       QList<pqLineEdit*> lines = gb->findChildren<pqLineEdit*>();

@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqAddToFavoritesReaction.h"
+#include "pqQtDeprecated.h"
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
@@ -93,7 +94,7 @@ void pqAddToFavoritesReaction::addToFavorites(QAction* parent)
     value = settings->value(key).toString();
   }
   QString settingValue = settings->value(key).toString();
-  QStringList bmList = settingValue.split("|", QString::SkipEmptyParts);
+  QStringList bmList = settingValue.split("|", PV_QT_SKIP_EMPTY_PARTS);
   for (QString bm : bmList)
   {
     if (bm == filterId)

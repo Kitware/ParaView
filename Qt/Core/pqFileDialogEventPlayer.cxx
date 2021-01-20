@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqFileDialogEventPlayer.h"
 #include "pqCoreTestUtility.h"
+#include "pqQtDeprecated.h"
 
 #include "pqEventDispatcher.h"
 #include "pqFileDialog.h"
@@ -115,7 +116,7 @@ bool pqFileDialogEventPlayer::playEvent(
   }
   if (Command == "copy")
   {
-    QStringList parts = fileString.split(';', Qt::SkipEmptyParts);
+    QStringList parts = fileString.split(';', PV_QT_SKIP_EMPTY_PARTS);
     if (parts.size() != 2)
     {
       qCritical() << "Invalid argument to `copy`. Expecting paths separated by `;`.";

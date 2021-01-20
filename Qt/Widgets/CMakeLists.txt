@@ -137,6 +137,10 @@ source_group("Resources" FILES
 # import Qt build settings
 set(${vtk-module}_NO_HeaderTest 1)
 
+set(headers
+  pqQtDeprecated.h
+)
+
 set(CMAKE_AUTOMOC 1)
 set(CMAKE_AUTORCC 1)
 set(CMAKE_AUTOUIC 1)
@@ -145,7 +149,8 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
 vtk_module_add_module(ParaView::pqWidgets
   CLASSES ${classes}
   SOURCES ${ui_files}
-          ${resource_files})
+          ${resource_files}
+  HEADERS ${headers})
 vtk_module_link(ParaView::pqWidgets
   PUBLIC
     Qt5::Core
