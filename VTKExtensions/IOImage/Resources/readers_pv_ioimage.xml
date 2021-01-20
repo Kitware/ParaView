@@ -886,7 +886,7 @@
                             name="DimensionInfo">
         <StringArrayHelper />
       </StringVectorProperty>
-      <StringVectorProperty animatelable="0"
+      <StringVectorProperty animateable="0"
                             command="SetXDimension"
                             name="XDimension"
                             number_of_elements="1"
@@ -899,7 +899,7 @@
           </RequiredProperties>
         </StringListDomain>
       </StringVectorProperty>
-      <StringVectorProperty animatelable="0"
+      <StringVectorProperty animateable="0"
                             command="SetYDimension"
                             name="YDimension"
                             number_of_elements="1"
@@ -912,7 +912,7 @@
           </RequiredProperties>
         </StringListDomain>
       </StringVectorProperty>
-      <StringVectorProperty animatelable="0"
+      <StringVectorProperty animateable="0"
                             command="SetZDimension"
                             name="ZDimension"
                             default_values="DEPTH"
@@ -940,7 +940,7 @@
                          information_only="1">
         <SimpleIntInformationHelper/>
       </IntVectorProperty>
-      <StringVectorProperty animatelable="0"
+      <StringVectorProperty animateable="0"
                             command="SetFixedDimension1"
                             name="FixedDimension1"
                             label="Fixed Dimension 1"
@@ -968,7 +968,7 @@
           </RequiredProperties>
         </IntRangeDomain>
       </IntVectorProperty>
-      <StringVectorProperty animatelable="0"
+      <StringVectorProperty animateable="0"
                             command="SetFixedDimension2"
                             name="FixedDimension2"
                             label="Fixed Dimension 2"
