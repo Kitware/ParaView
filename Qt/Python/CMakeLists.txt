@@ -30,6 +30,7 @@
 #==========================================================================
 set(classes
   pqPythonDebugLeaksView
+  pqPythonFileIO
   pqPythonLineNumberArea
   pqPythonMacroSupervisor
   pqPythonManager
@@ -37,7 +38,8 @@ set(classes
   pqPythonShell
   pqPythonShellCompleter
   pqPythonSyntaxHighlighter
-  pqPythonTextArea)
+  pqPythonTextArea
+  pqPythonUndoCommand)
 
 set(ui_files
   pqPythonShell.ui)

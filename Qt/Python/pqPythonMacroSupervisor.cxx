@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreUtilities.h"
 #include "pqPythonManager.h"
-#include <vtksys/SystemTools.hxx>
+#include "vtksys/SystemTools.hxx"
 
 #include <QAction>
 #include <QApplication>
