@@ -50,6 +50,7 @@ else ()
   endmacro ()
 endif ()
 
+add_example(Plugins/AddPQProxy)
 add_example(Plugins/Autostart)
 add_example(Plugins/DockWidget)
 add_example(Plugins/ElevationFilter)

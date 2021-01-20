@@ -1,0 +1,7 @@
+NAME
+  AddPQProxy
+DESCRIPTION
+  This example plugins add a new render view that uses a dedicated pqMyRenderView classes when instanciated.
+REQUIRES_MODULES
+  ParaView::pqComponents
+  ParaView::RemotingViews

@@ -1,0 +1,12 @@
+<ParaViewPlugin>
+  <ServerManagerConfiguration>
+    <ProxyGroup name="views">
+      <RenderViewProxy name="MyRenderView" class="vtkPVRenderView"
+                       label="My Render View"
+                       processes="client|renderserver|dataserver"
+                       base_proxygroup="views"
+                       base_proxyname="RenderView">
+      </RenderViewProxy>
+    </ProxyGroup>
+  </ServerManagerConfiguration>
+</ParaViewPlugin>
