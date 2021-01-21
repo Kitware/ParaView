@@ -665,6 +665,10 @@
                proxyname="TextPropertyCentered"></Proxy>
         <ExposedProperties>
           <Property name="Justification" />
+          <Property name="VerticalJustification" />
+          <Property name="LineOffset" />
+          <Property name="LineSpacing" />
+          <Property name="CellOffset" />
           <Property name="Orientation" />
           <Property name="Color" />
           <Property name="Opacity" />

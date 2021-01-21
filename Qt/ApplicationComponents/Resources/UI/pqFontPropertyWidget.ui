@@ -132,9 +132,18 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="Justification">
+      <widget class="QToolButton" name="HorizontalJustification">
        <property name="text">
         <string>...</string>
+       </property>
+       <property name="popupMode">
+        <enum>QToolButton::InstantPopup</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="VerticalJustification">
+       <property name="text">
        </property>
        <property name="popupMode">
         <enum>QToolButton::InstantPopup</enum>
