@@ -172,6 +172,21 @@
     <string>Export Scene...</string>
    </property>
   </action>
+  <action name="actionAnimatedExport">
+  <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqExportAnimatedScene.svg</normaloff>:/pqWidgets/Icons/pqExportAnimatedScene.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Export Animated Scene...</string>
+   </property>
+   <property name="toolTip">
+    <string>Save scene for all timesteps by playing the animation step by step</string>
+   </property>
+   <property name="statusTip">
+    <string>Save scene for all timesteps</string>
+   </property>
+  </action>
   <action name="actionFileSaveWindowArrangement">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
@@ -233,6 +248,7 @@
   <addaction name="actionFileSaveData"/>
   <addaction name="actionFileSaveScreenshot"/>
   <addaction name="actionExport"/>
+  <addaction name="actionAnimatedExport"/>
   <addaction name="separator"/>
   <addaction name="actionFileSaveAnimation"/>
   <addaction name="actionFileSaveExtracts"/>

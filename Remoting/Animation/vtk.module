@@ -18,12 +18,14 @@ PRIVATE_DEPENDS
   VTK::CommonComputationalGeometry
   VTK::CommonSystem
   VTK::IOImage
+  VTK::IOExport
   VTK::vtksys
 OPTIONAL_DEPENDS
   VTK::IOFFMPEG
   VTK::IOOggTheora
   # These affect the public API.
   VTK::PythonInterpreter
+  VTK::Python
   VTK::WrappingPythonCore
 TEST_DEPENDS
   VTK::TestingCore

@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="TimeSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionAnimatedExport" />
+  <pqevent object="pqClientMainWindow/ExportAnimatedSceneFileDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/AnimatedExportScene.vtkjs" />
+  <pqevent object="pqClientMainWindow/ExportAnimatedSceneFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/AnimatedExportScene" />
+</pqevents>

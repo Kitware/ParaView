@@ -160,6 +160,7 @@ set(classes
   pqResetScalarRangeReaction
   pqResetDefaultSettingsReaction
   pqSaveAnimationGeometryReaction
+  pqAnimatedExportReaction
   pqSaveAnimationReaction
   pqSaveDataReaction
   pqSaveExtractsReaction
