@@ -75,6 +75,14 @@ public:
 };
 #include "ui_pqFileDialog.h"
 
+#include <QtGlobal>
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#define QT_SKIP_EMPTY_PARTS Qt::SkipEmptyParts
+#else
+#define QT_SKIP_EMPTY_PARTS QString::SkipEmptyParts
+#endif
+
 namespace
 {
 
@@ -82,13 +90,13 @@ QStringList MakeFilterList(const QString& filter)
 {
   if (filter.contains(";;"))
   {
-    return filter.split(";;", QString::SkipEmptyParts);
+    return filter.split(";;", QT_SKIP_EMPTY_PARTS);
   }
 
   // check if '\n' is being used as separator.
   // (not sure why, but the old code was doing it, and if some applications
   // are relying on it, I don't want to break them right now).
-  return filter.split('\n', QString::SkipEmptyParts);
+  return filter.split('\n', QT_SKIP_EMPTY_PARTS);
 }
 
 QStringList GetWildCardsFromFilter(const QString& filter)
@@ -108,7 +116,7 @@ QStringList GetWildCardsFromFilter(const QString& filter)
   }
 
   // separated by spaces or semi-colons
-  QStringList fs = f.split(QRegExp("[\\s+;]"), QString::SkipEmptyParts);
+  QStringList fs = f.split(QRegExp("[\\s+;]"), QT_SKIP_EMPTY_PARTS);
 
   // add a *.ext.* for every *.ext we get to support file groups
   QStringList ret = fs;
@@ -746,7 +754,7 @@ void pqFileDialog::onModelReset()
   // the separator is always the unix separator
   QChar separator = '/';
 
-  QStringList parents = currentPath.split(separator, QString::SkipEmptyParts);
+  QStringList parents = currentPath.split(separator, QT_SKIP_EMPTY_PARTS);
 
   // put our root back in
   if (parents.count())
@@ -949,7 +957,7 @@ void pqFileDialog::onTextEdited(const QString& str)
   if (str.size() > 0)
   {
     // convert the typed information to be impl.FileNames
-    impl.FileNames = str.split(impl.FileNamesSeperator, QString::SkipEmptyParts);
+    impl.FileNames = str.split(impl.FileNamesSeperator, QT_SKIP_EMPTY_PARTS);
   }
   else
   {
