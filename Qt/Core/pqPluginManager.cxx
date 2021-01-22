@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
+#include "pqQtDeprecated.h"
 #include "pqServer.h"
 #include "pqServerConfiguration.h"
 #include "pqServerManagerModel.h"
@@ -273,7 +274,7 @@ QStringList pqPluginManager::pluginPaths(pqServer* session, bool remote)
   vtkSMPluginManager* mgr = vtkSMProxyManager::GetProxyManager()->GetPluginManager();
   QString paths =
     remote ? mgr->GetRemotePluginSearchPaths(session->session()) : mgr->GetLocalPluginSearchPaths();
-  return paths.split(';', QString::SkipEmptyParts);
+  return paths.split(';', PV_QT_SKIP_EMPTY_PARTS);
 }
 
 //-----------------------------------------------------------------------------

@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActionGroupInterface.h"
 #include "pqApplicationCore.h"
 #include "pqInterfaceTracker.h"
+#include "pqQtDeprecated.h"
 
 #include <QMainWindow>
 #include <QMenu>
@@ -102,7 +103,7 @@ void pqPluginActionGroupBehavior::addPluginInterface(QObject* iface)
   }
 
   QString name = agi->groupName();
-  QStringList splitName = name.split('/', QString::SkipEmptyParts);
+  QStringList splitName = name.split('/', PV_QT_SKIP_EMPTY_PARTS);
 
   if (splitName.size() == 2 && splitName[0] == "ToolBar")
   {

@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEventDispatcher.h"
 
 #include "pqPluginTreeWidget.h"
+#include "pqQtDeprecated.h"
 
 #include <QDebug>
 #include <QTreeWidget>
@@ -52,7 +53,7 @@ pqPluginTreeWidgetEventPlayer::~pqPluginTreeWidgetEventPlayer()
 QModelIndex pqPluginTreeWidgetEventPlayerGetIndex(
   const QString& str_index, QTreeView* treeView, bool& error)
 {
-  QStringList indices = str_index.split(".", QString::SkipEmptyParts);
+  QStringList indices = str_index.split(".", PV_QT_SKIP_EMPTY_PARTS);
   QModelIndex index;
   for (int cc = 0; (cc + 1) < indices.size(); cc += 2)
   {
@@ -113,7 +114,7 @@ bool pqPluginTreeWidgetEventPlayer::playEvent(
     int column = regExp0.cap(2).toInt();
     int check_state = regExp0.cap(3).toInt();
 
-    QStringList indices = str_index.split(".", QString::SkipEmptyParts);
+    QStringList indices = str_index.split(".", PV_QT_SKIP_EMPTY_PARTS);
     QTreeWidgetItem* cur_item = NULL;
     foreach (QString cur_index, indices)
     {

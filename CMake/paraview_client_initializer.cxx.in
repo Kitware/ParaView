@@ -43,8 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "@_paraview_client_MAIN_WINDOW_INCLUDE@"
 
 #include "pqOptions.h"
-#include "pqPluginManager.h"
 #include "pqPVApplicationCore.h"
+#include "pqPluginManager.h"
+#include "pqQtDeprecated.h"
 #include "pqSettings.h"
 #include "vtkPVConfig.h"
 #include "vtkPVLogger.h"
@@ -133,11 +134,7 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
   // Load required application plugins.
   vtkVLogStartScopeF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "req-plugins", "load required plugins: `@_paraview_client_REQUIRED_PLUGINS@`");
   QString plugin_string = "@_paraview_client_REQUIRED_PLUGINS@";
-#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
-  QStringList plugin_list = plugin_string.split(';',QString::SkipEmptyParts);
-#else
-  QStringList plugin_list = plugin_string.split(';',Qt::SkipEmptyParts);
-#endif
+  QStringList plugin_list = plugin_string.split(';',PV_QT_SKIP_EMPTY_PARTS);
   foreach (const QString plugin_name, plugin_list)
   {
     if (!loader->LoadPluginByName(plugin_name.toLatin1().data()))
@@ -151,11 +148,7 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
   // Load optional plugins.
   vtkVLogStartScopeF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "opt-plugins", "load optional plugins: `@_paraview_client_OPTIONAL_PLUGINS@`");
   plugin_string = "@_paraview_client_OPTIONAL_PLUGINS@";
-#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
-  plugin_list = plugin_string.split(';',QString::SkipEmptyParts);
-#else
-  plugin_list = plugin_string.split(';',Qt::SkipEmptyParts);
-#endif
+  plugin_list = plugin_string.split(';', PV_QT_SKIP_EMPTY_PARTS);
   foreach (const QString plugin_name, plugin_list)
   {
     if (!loader->LoadPluginByName(plugin_name.toLatin1().data()))

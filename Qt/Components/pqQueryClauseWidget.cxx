@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqQueryClauseWidget.h"
+#include "pqQtDeprecated.h"
 #include "ui_pqQueryClauseWidget.h"
 #include "ui_pqQueryCompositeTreeDialog.h"
 
@@ -610,7 +611,7 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
       if (!this->Internals->value->text().isEmpty())
       {
         QStringList queryList;
-        QStringList parts = this->Internals->value->text().split(',', QString::SkipEmptyParts);
+        QStringList parts = this->Internals->value->text().split(',', PV_QT_SKIP_EMPTY_PARTS);
         foreach (QString part, parts)
         {
           values << part;
@@ -700,7 +701,7 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
         else
         {
           QStringList parts =
-            this->Internals->value_block->text().split(',', QString::SkipEmptyParts);
+            this->Internals->value_block->text().split(',', PV_QT_SKIP_EMPTY_PARTS);
           foreach (QString part, parts)
           {
             values << part;

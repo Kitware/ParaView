@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqQuickLaunchDialog.h"
+#include "pqQtDeprecated.h"
 #include "ui_pqQuickLaunchDialog.h"
 // Server Manager Includes.
 
@@ -200,7 +201,7 @@ void pqQuickLaunchDialog::updateSearch()
 
   const QStringList keys = this->Internal->Items.keys();
   const QStringList searchComponents =
-    this->Internal->SearchString.split(" ", QString::SkipEmptyParts);
+    this->Internal->SearchString.split(" ", PV_QT_SKIP_EMPTY_PARTS);
 
   QList<QStringList> searchExpressions;
   fillPermutations(searchExpressions, searchComponents);

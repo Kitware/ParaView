@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// \date 3/27/2006
 
 #include "pqFlatTreeView.h"
+#include "pqQtDeprecated.h"
 
 #include <QAbstractItemModel>
 #include <QApplication>
@@ -861,14 +862,14 @@ QModelIndex pqFlatTreeView::getRelativeIndex(const QString& id, const QModelInde
   }
 
   // Separate the row list and the column.
-  QStringList list = id.split("|", QString::SkipEmptyParts);
+  QStringList list = id.split("|", PV_QT_SKIP_EMPTY_PARTS);
   if (list.size() == 2)
   {
     // Get the column from the last argument.
     int column = list.last().toInt();
 
     // Get the list of row hierarchy from the first argument.
-    list = list.first().split("/", QString::SkipEmptyParts);
+    list = list.first().split("/", PV_QT_SKIP_EMPTY_PARTS);
     if (list.size() > 0)
     {
       QModelIndex index = root;

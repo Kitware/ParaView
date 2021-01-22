@@ -58,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLineEdit.h"
 #include "pqPopOutWidget.h"
 #include "pqProxySILModel.h"
+#include "pqQtDeprecated.h"
 #include "pqSILModel.h"
 #include "pqSILWidget.h"
 #include "pqSMAdaptor.h"
@@ -214,7 +215,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
         else
         {
           QStringList lextensions =
-            QString(extensions).split(QRegExp("\\s+"), QString::SkipEmptyParts);
+            QString(extensions).split(QRegExp("\\s+"), PV_QT_SKIP_EMPTY_PARTS);
           supportedExtensions.push_back(
             QString("%1 (*.%2)").arg(file_description).arg(lextensions.join(" *.")));
         }

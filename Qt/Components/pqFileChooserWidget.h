@@ -34,9 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqFileChooserWidget_h
 
 #include "pqComponentsModule.h"
+#include "pqQtDeprecated.h"
+
 #include <QString>
 #include <QStringList>
 #include <QWidget>
+
 class QLineEdit;
 class pqServer;
 
@@ -145,7 +148,7 @@ public:
   */
   static QStringList splitFilenames(const QString& filesString)
   {
-    return filesString.split(";", QString::SkipEmptyParts);
+    return filesString.split(";", PV_QT_SKIP_EMPTY_PARTS);
   }
   static QString joinFilenames(const QStringList& filesList) { return filesList.join(";"); }
 
