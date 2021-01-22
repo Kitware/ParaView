@@ -855,9 +855,200 @@
        <Hints>
           <ReaderFactory extensions="H" file_description="SEP file (Plugin)"/>
        </Hints>
-       <StringVectorProperty name="FileName" command="SetFileName" animateable="0" number_of_elements="1">
-           <FileListDomain name="files"/>
-       </StringVectorProperty>
+
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the SEP
+        reader.</Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty command="SetOutputGridDimension"
+                         name="OutputGridDimension"
+                         number_of_elements="1"
+                         default_values="3"
+                         panel_visibility="always" >
+        <EnumerationDomain name="enum">
+          <Entry text="2D"
+                 value="2" />
+          <Entry text="3D"
+                 value="3" />
+        </EnumerationDomain>
+        <Documentation>This property specifies the dimension of the output data set.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="GetAllDimensions"
+                            information_only="1"
+                            name="DimensionInfo">
+        <StringArrayHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetXDimension"
+                            name="XDimension"
+                            number_of_elements="1"
+                            default_values="CDP"
+                            panel_visibility="default">
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="DimensionInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetYDimension"
+                            name="YDimension"
+                            number_of_elements="1"
+                            default_values="LINE"
+                            panel_visibility="default">
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="DimensionInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetZDimension"
+                            name="ZDimension"
+                            default_values="DEPTH"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="DimensionInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="OutputGridDimension"
+                                   value="3">
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="FixedDimensionRange"
+                         command="GetFixedDimRange"
+                         number_of_elements="2"
+                         default_values="0 0"
+                         information_only="1">
+        <SimpleIntInformationHelper/>
+      </IntVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetFixedDimension1"
+                            name="FixedDimension1"
+                            label="Fixed Dimension 1"
+                            default_values="OFFSET"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="DimensionInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetFixedDimensionValue1"
+                         name="FixedDimensionValue1"
+                         label="Fixed Dimension 1 Value"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="default">
+        <IntRangeDomain name="range"
+                        default_mode="min">
+          <RequiredProperties>
+            <Property name="FixedDimensionRange"
+                      function="Range"/>
+          </RequiredProperties>
+        </IntRangeDomain>
+      </IntVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetFixedDimension2"
+                            name="FixedDimension2"
+                            label="Fixed Dimension 2"
+                            default_values="DEPTH"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="DimensionInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="OutputGridDimension"
+                                   value="2">
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetFixedDimensionValue2"
+                         name="FixedDimensionValue2"
+                         label="Fixed Dimension 2 Value"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="default">
+        <IntRangeDomain name="range"
+                        default_mode="min">
+          <RequiredProperties>
+            <Property name="FixedDimensionRange"
+                      function="Range"/>
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="OutputGridDimension"
+                                   value="2">
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="GetAllRanges"
+                            information_only="1"
+                            panel_visibility="default"
+                            repeat_command="1"
+                            number_of_elements_per_command="2"
+                            name="RangesInformation"
+                            si_class="vtkSIDataArrayProperty">
+      </StringVectorProperty>
+
+      <IntVectorProperty command="SetExtentSplitMode"
+                         name="ExtentSplitMode"
+                         number_of_elements="1"
+                         default_values="3"
+                         panel_visibility="advanced" >
+        <EnumerationDomain name="enum">
+          <Entry text="XSlab"
+                 value="0" />
+          <Entry text="YSlab"
+                 value="1" />
+          <Entry text="ZSlab"
+                 value="2" />
+          <Entry text="Block"
+                 value="3" />
+        </EnumerationDomain>
+        <Documentation>This property specifies the extent mode.
+        </Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup panel_widget="Line"
+                     label="Dimensions setup">
+        <Property name="XDimension" />
+        <Property name="YDimension" />
+        <Property name="ZDimension" />
+        <Property name="FixedDimension1" />
+        <Property name="FixedDimensionValue1" />
+        <Property name="FixedDimension2" />
+        <Property name="FixedDimensionValue2" />
+      </PropertyGroup>
     </SourceProxy>
 
     <!-- ============================================================= -->
