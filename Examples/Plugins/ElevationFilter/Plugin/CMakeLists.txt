@@ -1,5 +1,6 @@
 paraview_add_plugin(ElevationFilter
   VERSION "1.0"
+  DOCUMENTATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Documentation"
   MODULES ElevationFilters
   MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/ElevationFilters/vtk.module")
 

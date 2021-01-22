@@ -3,7 +3,8 @@ NAME
 DESCRIPTION
   An example paraview plugin containing server manager xml and the server
   manager classes to build. This plugin can be loaded on the server side.
-  It also demonstrates testing within an external plugin.
+  It also demonstrates testing within an external plugin
+  as well as how to add custom documentation.
 REQUIRES_MODULES
   VTK::CommonCore
   VTK::FiltersCore

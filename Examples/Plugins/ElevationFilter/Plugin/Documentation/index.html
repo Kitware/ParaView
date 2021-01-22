@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <h1>Elevation filter example</h1>
+
+  <p>
+    This is the documentation for the elevation filter plugin example.
+    Below are images of what are implemented in this plugin.
+  </p>
+  <p id="no-js">
+    To see the carousel containing images of this plugin you can activate
+    `PARAVIEW_USE_WEBENGINE` in CMake.
+  </p>
+
+  <div class="slideshow-container">
+
+    <div class="mySlides fade">
+      <div class="numbertext">1 / 2</div>
+      <img src="sphere.jpg" style="width:100%">
+      <div class="text">Before Filter</div>
+    </div>
+
+    <div class="mySlides fade">
+      <div class="numbertext">2 / 2</div>
+      <img src="elevation.jpg" style="width:100%">
+      <div class="text">Filter Result</div>
+    </div>
+
+    <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+    <a class="next" onclick="plusSlides(1)">&#10095;</a>
+
+  </div>
+  <br>
+
+  <script src="animation.js"></script>
+</body>
+</html>

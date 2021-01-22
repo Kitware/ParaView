@@ -377,6 +377,11 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
       ParaView::pqApplicationComponents
       Qt5::Widgets
       VTK::vtksys)
+  if (PARAVIEW_USE_QTWEBENGINE)
+    find_package(Qt5 REQUIRED QUIET COMPONENTS WebEngineWidgets)
+    target_link_libraries("${_paraview_client_NAME}"
+      PRIVATE Qt5::WebEngineWidgets)
+  endif ()
 
   set(_paraview_client_export)
   if (DEFINED _paraview_client_EXPORT)

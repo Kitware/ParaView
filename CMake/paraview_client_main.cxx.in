@@ -39,6 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pq@_paraview_client_NAME@Initializer.h"
 #include "vtkPVConfig.h"
+
+#if PARAVIEW_USE_QTWEBENGINE
+#include <QWebEngineUrlScheme>
+#endif
+
 // See Applications/ParaView/CMakeLists.txt for why this is necessary.
 #cmakedefine01 _paraview_client_have_plugins
 #if _paraview_client_have_plugins
@@ -90,6 +95,15 @@ int main(int argc, char* argv[])
 
 #if _paraview_client_have_plugins
 @_paraview_client_plugins_calls@
+#endif
+
+#if PARAVIEW_USE_QTWEBENGINE
+{
+  QWebEngineUrlScheme qtHelpScheme("qthelp");
+  qtHelpScheme.setFlags(
+    {QWebEngineUrlScheme::LocalScheme, QWebEngineUrlScheme::LocalAccessAllowed});
+  QWebEngineUrlScheme::registerScheme(qtHelpScheme);
+}
 #endif
 
   // always request a non-stereo format; when using quadbuffer stereo, we

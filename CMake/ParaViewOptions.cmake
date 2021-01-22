@@ -132,11 +132,10 @@ cmake_dependent_option(PARAVIEW_USE_QT
   "Enable Qt-support needed for graphical UI" "${qt_gui_default}"
   "PARAVIEW_BUILD_CANONICAL;PARAVIEW_ENABLE_RENDERING;PARAVIEW_ENABLE_NONESSENTIAL" OFF)
 
-# Add an option to enable using Qt Webkit for widgets, as needed.
-# Default is OFF. We don't want to depend on WebKit unless absolutely needed.
-# FIXME: Move this to the module which cares.
+# Add an option to enable using Qt WebEngine for widgets, as needed.
+# Default is OFF. We don't want to depend on WebEngine unless absolutely needed.
 cmake_dependent_option(PARAVIEW_USE_QTWEBENGINE
-  "Use Qt WebKit components as needed." OFF
+  "Use Qt WebEngine components as needed." OFF
   "PARAVIEW_USE_QT" OFF)
 mark_as_advanced(PARAVIEW_USE_QTWEBENGINE)
 
@@ -146,6 +145,10 @@ cmake_dependent_option(PARAVIEW_USE_QTHELP
   "Use Qt Help infrastructure as needed." ON
   "PARAVIEW_USE_QT" OFF)
 mark_as_advanced(PARAVIEW_USE_QTHELP)
+
+if (PARAVIEW_USE_QTHELP AND NOT PARAVIEW_USE_QTWEBENGINE)
+  message(STATUS "Using 'QtHelp' without 'QtWebEngine' will ignore embedded javascript and *.js files for documentation")
+endif()
 
 #========================================================================
 # FEATURE OPTIONS:
