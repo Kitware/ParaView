@@ -15,9 +15,10 @@
 #include "vtkCPPythonScriptV2Pipeline.h"
 
 #include "vtkCPDataDescription.h"
+#include "vtkCPInputDataDescription.h"
 #include "vtkCPPythonScriptV2Helper.h"
-#include "vtkLogger.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVLogger.h"
 
 vtkStandardNewMacro(vtkCPPythonScriptV2Pipeline);
 //----------------------------------------------------------------------------
@@ -50,6 +51,14 @@ int vtkCPPythonScriptV2Pipeline::RequestDataDescription(vtkCPDataDescription* da
      * simply request all meshes and fields. Since we do this only for the 1st
      * timestep, it should not impact too much.
      */
+    vtkVLogF(
+      PARAVIEW_LOG_CATALYST_VERBOSITY(), "script not imported yet; enabling all meshes/fields.");
+    for (unsigned int cc = 0, max = dataDescription->GetNumberOfInputDescriptions(); cc < max; ++cc)
+    {
+      auto ipdesc = dataDescription->GetInputDescription(cc);
+      ipdesc->AllFieldsOn();
+      ipdesc->GenerateMeshOn();
+    }
     return 1;
   }
 
