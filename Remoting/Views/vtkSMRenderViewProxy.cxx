@@ -31,7 +31,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
-#include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVEncodeSelectionForServer.h"
 #include "vtkPVLastSelectionInformation.h"
@@ -708,11 +707,10 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(int x, int y, unsigned
 
   // get data information
   vtkPVDataInformation* info = repr->GetRepresentedDataInformation();
-  vtkPVCompositeDataInformation* compositeInfo = info->GetCompositeDataInformation();
 
   // get selection in order to determine which block of the data set
   // set was selected (if it is a composite data set)
-  if (compositeInfo && compositeInfo->GetDataIsComposite())
+  if (info->IsCompositeDataSet())
   {
     vtkSMProxy* selectionSource = vtkSMProxy::SafeDownCast(sources->GetItemAsObject(0));
 
