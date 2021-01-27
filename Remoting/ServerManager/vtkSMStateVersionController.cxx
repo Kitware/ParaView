@@ -857,7 +857,8 @@ struct Process_5_9_to_5_10
 {
   bool operator()(xml_document& document)
   {
-    return HandleSpreadsheetRepresentationCompositeDataSetIndex(document);
+    return HandleSpreadsheetRepresentationCompositeDataSetIndex(document) &&
+      HandleExtractBlock(document);
   }
 
   static void ConvertCompositeIdsToSelectors(pugi::xml_node& node)
@@ -883,6 +884,19 @@ struct Process_5_9_to_5_10
       ConvertCompositeIdsToSelectors(node);
     }
 
+    return true;
+  }
+
+  static bool HandleExtractBlock(xml_document& document)
+  {
+    auto xpath_set = document.select_nodes("//ServerManagerState/Proxy[@group='filters' and "
+                                           "@type='ExtractBlock']/Property[@name='BlockIndices']");
+    for (auto xpath_node : xpath_set)
+    {
+      auto node = xpath_node.node();
+      node.attribute("name").set_value("Selectors");
+      ConvertCompositeIdsToSelectors(node);
+    }
     return true;
   }
 };

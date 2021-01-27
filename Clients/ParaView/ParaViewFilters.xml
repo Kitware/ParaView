@@ -12,7 +12,7 @@
     <Proxy group="filters" name="StreamTracer" />
     <Proxy group="filters" name="WarpVector" />
     <Proxy group="filters" name="GroupDataSets" />
-    <Proxy group="filters" name="ExtractHierarchicalLevel" />
+    <Proxy group="filters" name="ExtractBlock" />
   </Category>
   <Category name="CosmoTools" menu_label="&amp;CosmoTools" show_in_toolbar="0">
     <Proxy group="filters" name="ANLHaloFinder" />
@@ -91,7 +91,7 @@
     <Proxy group="filters" name="AMRConnectivity" />
     <Proxy group="filters" name="AMRFragmentIntegration" />
     <Proxy group="filters" name="AMRFragmentsFilter" />
-    <Proxy group="filters" name="ExtractHierarchicalLevel" />
+    <Proxy group="filters" name="ExtractBlock" />
     <Proxy group="filters" name="ExtractHierarchicalDataSets" />
   </Category>
   <Category name="AMR" menu_label="&amp;AMR">
@@ -106,7 +106,7 @@
     <Proxy group="filters" name="AMRToMultiBlock" />
     <Proxy group="filters" name="AMRCutPlane" />
     <Proxy group="filters" name="OverlappingLevelIdScalars" />
-    <Proxy group="filters" name="ExtractHierarchicalLevel" />
+    <Proxy group="filters" name="ExtractBlock" />
     <Proxy group="filters" name="ExtractHierarchicalDataSets" />
   </Category>
   <Category name="Quadrature Points" menu_label="&amp;Quadrature Points">
@@ -211,7 +211,7 @@
   <Proxy group="filters" name="ElevationFilter" />
   <Proxy group="filters" name="EnvironmentAnnotation" />
   <Proxy group="filters" name="EvenlySpacedStreamlines2D" />
-  <Proxy group="filters" name="ExtractBlock" />
+  <Proxy group="filters" name="ExtractBlock" icon=":/pqWidgets/Icons/pqGroupExtract.svg" />
   <Proxy group="filters" name="ExtractComponent" />
   <Proxy group="filters" name="ExtractEdges" />
   <Proxy group="filters" name="ExtractEnclosedPoints" />
@@ -219,7 +219,6 @@
   <Proxy group="filters" name="ExtractGeometry" />
   <Proxy group="filters" name="ExtractGrid" icon=":/pqWidgets/Icons/pqExtractGrid.svg" />
   <Proxy group="filters" name="ExtractHierarchicalDataSets" />
-  <Proxy group="filters" name="ExtractHierarchicalLevel" icon=":/pqWidgets/Icons/pqGroupExtract.svg" />
   <Proxy group="filters" name="ExtractHistogram" icon=":/pqWidgets/Icons/pqHistogram24.png" />
   <Proxy group="filters" name="ExtractLocation" />
   <Proxy group="filters" name="ExtractSelection" icon=":/pqWidgets/Icons/pqExtractSelection.svg" />

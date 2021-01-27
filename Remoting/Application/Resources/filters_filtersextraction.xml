@@ -2,8 +2,8 @@
   <ProxyGroup name="filters">
     <!-- ==================================================================== -->
     <SourceProxy class="vtkExtractBlock"
-                 label="Extract Block"
-                 name="ExtractBlock">
+                 label="Extract Block (Legacy)"
+                 name="ExtractBlockLegacy">
       <Documentation long_help="This filter extracts a range of blocks from a multiblock dataset."
                      short_help="Extract block.">This filter extracts a range
                      of groups from a multiblock dataset</Documentation>
@@ -25,18 +25,16 @@
                          number_of_elements_per_command="1"
                          panel_visibility="default"
                          repeat_command="1">
-        <CompositeTreeDomain mode="all"
-                             name="tree">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </CompositeTreeDomain>
         <Hints>
           <WidgetHeight number_of_rows="20" />
         </Hints>
         <Documentation>This property lists the ids of the blocks to extract
-        from the input multiblock dataset.</Documentation>
+          from the input multiblock dataset.</Documentation>
+        <CompositeTreeDomain name="tree">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </CompositeTreeDomain>
       </IntVectorProperty>
       <IntVectorProperty command="SetPruneOutput"
                          default_values="1"
@@ -56,7 +54,62 @@
         non-null child block, then that node is removed. To preserve these
         parent nodes, set this flag to true.</Documentation>
       </IntVectorProperty>
-      <!-- End ExtractBlock -->
+      <!-- End ExtractBlockLegacy -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy name="ExtractBlock" class="vtkExtractBlockUsingDataAssembly" label="Extract Block">
+      <Documentation long_help="Extract chosen blocks from composite datasets"
+        short_help="Extract block">
+        Extract selected blocks from a composite dataset.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMultiBlockDataSet" />
+          <DataType value="vtkUniformGridAMR" />
+          <DataType value="vtkPartitionedDataSetCollection" />
+        </DataTypeDomain>
+        <Documentation>Specify the input to this filter.</Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="Assembly"
+        command="SetAssemblyName"
+        number_of_elements="1"
+        default_values="Hierarchy">
+        <DataAssemblyListDomain name="data_assembly_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </DataAssemblyListDomain>
+        <Documentation>
+          Select which assembly is used when specify selectors
+          to choose blocks to extract.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Selectors"
+        command="AddSelector"
+        clean_command="ClearSelectors"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          Sepecify the selectors for the data assembly chosen using **Assembly**
+          to choose the blocks to extract from the input dataset.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Blocks" panel_widget="DataAssemblyEditor">
+        <Property name="Assembly"  function="ActiveAssembly" />
+        <Property name="Selectors" function="Selectors" />
+      </PropertyGroup>
+
+      <!-- end of ExtractBlock -->
     </SourceProxy>
 
     <!-- ==================================================================== -->
@@ -83,15 +136,10 @@
                          name="SelectedDataSets"
                          number_of_elements_per_command="2"
                          repeat_command="1">
-        <CompositeTreeDomain mode="amr"
-                             name="tree">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </CompositeTreeDomain>
-        <Documentation>This property provides a list of datasets to
-        extract.</Documentation>
+        <Documentation>
+          Specify a pair, level and dataset index, for every dataset
+          from the input AMR dataset to extract.
+        </Documentation>
       </IntVectorProperty>
       <!-- End ExtractDataSets -->
     </SourceProxy>
@@ -209,11 +257,15 @@
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkExtractLevel"
-                 label="Extract Level"
+                 label="Extract Level (Legacy)"
                  name="ExtractHierarchicalLevel">
       <Documentation long_help="This filter extracts a range of groups from a hierarchical dataset."
                      short_help="Extract level.">This filter extracts a range
                      of levels from a hierarchical dataset</Documentation>
+        <Deprecated deprecated_in="5.10" to_remove_in="5.11">
+          **Extract Level** has been deprecated. **Extract Block** now supports
+          extract levels from AMR datasets as well and hence this filter is unnecessary.
+        </Deprecated>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -232,13 +284,6 @@
                          number_of_elements_per_command="1"
                          panel_visibility="default"
                          repeat_command="1">
-        <CompositeTreeDomain mode="amr"
-                             name="tree">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </CompositeTreeDomain>
         <Documentation>This property lists the levels to extract from the input
         hierarchical dataset.</Documentation>
       </IntVectorProperty>

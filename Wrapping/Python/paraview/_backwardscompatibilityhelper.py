@@ -340,6 +340,25 @@ def setattr(proxy, pname, value):
                 "SpreadSheetRepresentation no longer uses 'CompositeDataSetIndex' but instead "
                 "supports 'Selectors' to select blocks.")
 
+
+    if pname == "BlockIndices" and proxy.SMProxy.GetXMLName() == "ExtractBlock":
+        if paraview.compatibility.GetVersion() < 5.10:
+            selectors = ["//*[@cid='%s']" % cid for cid in value]
+            return proxy.GetProperty("Selectors").SetData(selectors)
+        else:
+            raise NotSupportedException(
+                "ExtractBlock no longer uses 'BlockIndices' but instead "
+                "supports 'Selectors' to select blocks.")
+
+    if pname in ["MaintainStructure", "PruneOutput"] and proxy.SMProxy.GetXMLName() == "ExtractBlock":
+        if paraview.compatibility.GetVersion() < 5.10:
+            return
+        else:
+            raise NotSupportedException(
+                "ExtractBlock no longer supported '%s'. Simply remove it." % pname)
+
+
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -691,6 +710,29 @@ def getattr(proxy, pname):
                     "Since ParaView 5.10, SpreadSheetRepresentation no longer "
                     "supports 'CompositeDataSetIndex' and it has been replaced by "
                     "'BlockVisibilities'.")
+
+    if proxy.SMProxy.GetXMLName() == "ExtractBlock":
+        if pname == "BlockIndices":
+            if paraview.compatibility.GetVersion() < 5.10:
+                return []
+            else:
+                raise NotSupportedException(
+                        "Since ParaView 5.10, 'BlockIndices' on 'ExtractBlock' "
+                        "has been replaced by 'Selectors'.")
+        elif pname == "PruneOutput":
+            if paraview.compatibility.GetVersion() < 5.10:
+                return 1
+            else:
+                raise NotSupportedException(
+                        "Since ParaView 5.10, 'PruneOutput' on 'ExtractBlock' "
+                        "is no longer supported. Simply remove it.")
+        elif pname == "MaintainStructure":
+            if paraview.compatibility.GetVersion() < 5.10:
+                return 1
+            else:
+                raise NotSupportedException(
+                        "Since ParaView 5.10, 'MaintainStructure' on 'ExtractBlock' "
+                        "is no longer supported. Simply remove it.")
     raise Continue()
 
 def GetProxy(module, key, **kwargs):

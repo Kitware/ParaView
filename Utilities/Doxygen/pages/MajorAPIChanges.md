@@ -31,6 +31,16 @@ vtkPVDataInformation. This is possible since vtkPVDataInformation no
 longer includes vtkPVCompositeDataInformation.
 
 
+###Extract Block###
+
+**Extract Block** filter now internally uses `vtkExtractBlockUsingDataAssembly`
+instead of `vtkExtractBlock`. Thus, the filter now uses selectors to select
+which blocks to extracts instead of composite indices. For applications
+requiring the older form, **ExtractBlockLegacy** proxy is still available. It
+may be worthwhile however to replace the code to use the new selector-based
+extract block filter. A composite index can be converted to a selector string as
+`//*[@cid='%d']` where `%d` is replaced by the actual composite index.
+
 Changes in 5.9
 --------------
 
