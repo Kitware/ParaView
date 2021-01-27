@@ -310,13 +310,19 @@ QVariant pqDataAssemblyTreeModel::data(const QModelIndex& indx, int role) const
 {
   auto& internals = (*this->Internals);
   const auto assembly = internals.DataAssembly.GetPointer();
+  if (!assembly)
+  {
+    return QVariant();
+  }
+
   const auto node = ::getNodeID(indx);
   switch (role)
   {
     case Qt::DisplayRole:
     case Qt::ToolTipRole:
-      return assembly->GetNodeName(node);
-      break;
+      return assembly->HasAttribute(node, "label")
+        ? assembly->GetAttributeOrDefault(node, "label", "")
+        : assembly->GetNodeName(node);
   }
 
   try
@@ -475,4 +481,21 @@ QStringList pqDataAssemblyTreeModel::checkedNodes() const
 
   assembly->Visit(visitor, vtkDataAssembly::TraversalOrder::BreadthFirst);
   return paths;
+}
+
+//-----------------------------------------------------------------------------
+int pqDataAssemblyTreeModel::nodeId(const QModelIndex& idx) const
+{
+  return ::getNodeID(idx);
+}
+
+//-----------------------------------------------------------------------------
+QList<int> pqDataAssemblyTreeModel::nodeId(const QModelIndexList& idxes) const
+{
+  QList<int> result;
+  for (auto& idx : idxes)
+  {
+    result.push_back(::getNodeID(idx));
+  }
+  return result;
 }

@@ -73,6 +73,15 @@ public:
 
   //@{
   /**
+   * Given a QModelIndex, returns the vtkDataAssembly node id, if any.
+   * -1 is returned for invalid index.
+   */
+  int nodeId(const QModelIndex& idx) const;
+  QList<int> nodeId(const QModelIndexList& idxes) const;
+  //@}
+
+  //@{
+  /**
    * Get/Set the check state for Qt::Checked for nodes selected using the path
    * names specified.
    *
