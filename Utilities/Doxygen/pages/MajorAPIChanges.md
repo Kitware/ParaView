@@ -4,6 +4,33 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
+Changes in 5.10
+----------------
+
+###Changes to vtkPVDataInformation###
+
+vtkPVDataInformation no longer builds a complete composite data hierarchy
+information. Thus, `vtkPVCompositeDataInformation` is no longer populated
+and hence removed. This simplifies the logic in vtkPVDataInformation
+considerably.
+
+vtkPVDataInformation now provides access to`vtkDataAssembly`
+representing the hierarchy for composite datasets. This can be used by
+application to support cases where information about the composite
+data hierarchy is needed. For vtkPartitionedDataSetCollection, which can
+have other assemblies associated with it, vtkPVDataInformation also
+collects those.
+
+For composite datasets, vtkPVDataInformation now gathers information
+about all unique leaf datatypes. This is useful for applications to
+determine exactly what type of datasets a composite dataset is comprised
+of.
+
+vtkPVTemporalDataInformation is now simply a subclass of
+vtkPVDataInformation. This is possible since vtkPVDataInformation no
+longer includes vtkPVCompositeDataInformation.
+
+
 Changes in 5.9
 --------------
 

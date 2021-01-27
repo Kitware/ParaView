@@ -16,6 +16,7 @@ PRIVATE_DEPENDS
   VTK::CommonDataModel
   VTK::CommonExecutionModel
   VTK::CommonSystem
+  VTK::FiltersExtraction
   VTK::IOLegacy # for vtkGraphReader/vtkGraphWriter
   VTK::vtksys
 OPTIONAL_DEPENDS

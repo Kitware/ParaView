@@ -39,11 +39,8 @@ set(classes
   vtkPVAlgorithmPortsInformation
   vtkPVArrayInformation
   vtkPVClassNameInformation
-  vtkPVCompositeDataInformation
-  vtkPVCompositeDataInformationIterator
   vtkPVDataAssemblyInformation
   vtkPVDataInformation
-  vtkPVDataInformationHelper
   vtkPVDataSetAttributesInformation
   vtkPVDataSizeInformation
   vtkPVDisableStackTraceSignalHandler
@@ -52,7 +49,6 @@ set(classes
   vtkPVEnvironmentInformationHelper
   vtkPVFileInformation
   vtkPVFileInformationHelper
-  vtkPVGenericAttributeInformation
   vtkPVInformation
   vtkPVLogInformation
   vtkPVMemoryUseInformation

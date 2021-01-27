@@ -24,27 +24,34 @@
 #include "vtkCollection.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
+#include "vtkCompositeDataSetRange.h"
 #include "vtkDataArray.h"
+#include "vtkDataAssembly.h"
+#include "vtkDataAssemblyUtilities.h"
+#include "vtkDataObjectTree.h"
+#include "vtkDataObjectTreeRange.h"
 #include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
 #include "vtkExecutive.h"
 #include "vtkExplicitStructuredGrid.h"
-#include "vtkGenericDataSet.h"
+#include "vtkExtractBlockUsingDataAssembly.h"
 #include "vtkGraph.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkMath.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkMultiPieceDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
-#include "vtkPVCompositeDataInformation.h"
-#include "vtkPVCompositeDataInformationIterator.h"
-#include "vtkPVDataInformationHelper.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVInformationKeys.h"
+#include "vtkPVLogger.h"
+#include "vtkPartitionedDataSet.h"
+#include "vtkPartitionedDataSetCollection.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSelection.h"
@@ -52,101 +59,174 @@
 #include "vtkStructuredGrid.h"
 #include "vtkTable.h"
 #include "vtkUniformGrid.h"
+#include "vtkUniformGridAMR.h"
 
 #include <algorithm>
+#include <cassert>
 #include <map>
+#include <numeric>
 #include <set>
 #include <string>
 #include <vector>
 
+class vtkPVDataInformationAccumulator
+{
+  vtkNew<vtkPVDataInformation> Current;
+
+public:
+  std::set<int> UniqueBlockTypes;
+  vtkPVDataInformation* operator()(vtkPVDataInformation* info, vtkDataObject* dobj)
+  {
+    if (!dobj)
+    {
+      return info;
+    }
+    assert(vtkCompositeDataSet::SafeDownCast(dobj) == nullptr);
+
+    this->Current->Initialize();
+    this->Current->CopyFromDataObject(dobj);
+    if (this->Current->GetDataSetType() != -1)
+    {
+      assert(this->Current->GetCompositeDataSetType() == -1);
+      this->UniqueBlockTypes.insert(this->Current->GetDataSetType());
+      info->AddInformation(this->Current);
+    }
+    return info;
+  }
+
+  void AddFieldDataOnly(vtkPVDataInformation* info, vtkDataObject* dobj)
+  {
+    this->Current->Initialize();
+    auto fdi = this->Current->GetFieldDataInformation();
+    fdi->CopyFromDataObject(dobj);
+    if (fdi->GetNumberOfArrays() > 0)
+    {
+      info->GetFieldDataInformation()->AddInformation(fdi);
+    }
+  }
+};
+
+namespace
+{
+
+void MergeBounds(double bds[6], const double obds[6])
+{
+  vtkBoundingBox bbox(bds);
+  bbox.AddBounds(obds);
+  if (bbox.IsValid())
+  {
+    bbox.GetBounds(bds);
+  }
+}
+
+void MergeExtent(int ext[6], const int oext[6])
+{
+  for (int dim = 0; dim < 3; ++dim)
+  {
+    if (oext[2 * dim] <= oext[2 * dim + 1])
+    {
+      if (ext[2 * dim] <= ext[2 * dim + 1])
+      {
+        ext[2 * dim] = std::min(ext[2 * dim], oext[2 * dim]);
+        ext[2 * dim + 1] = std::max(ext[2 * dim + 1], oext[2 * dim + 1]);
+      }
+      else
+      {
+        ext[2 * dim] = oext[2 * dim];
+        ext[2 * dim + 1] = oext[2 * dim + 1];
+      }
+    }
+  }
+}
+
+void MergeRange(double range[2], const double orange[2])
+{
+  if (orange[0] <= orange[1])
+  {
+    if (range[0] <= range[1])
+    {
+      range[0] = std::min(range[0], orange[0]);
+      range[1] = std::max(range[1], orange[1]);
+    }
+    else
+    {
+      range[0] = orange[0];
+      range[1] = orange[1];
+    }
+  }
+}
+}
+
 vtkStandardNewMacro(vtkPVDataInformation);
-
-std::map<std::string, std::string> helpers;
-
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
 {
-  this->PointDataInformation = vtkPVDataSetAttributesInformation::New();
-  this->CellDataInformation = vtkPVDataSetAttributesInformation::New();
-  this->FieldDataInformation = vtkPVDataSetAttributesInformation::New();
-  this->VertexDataInformation = vtkPVDataSetAttributesInformation::New();
-  this->EdgeDataInformation = vtkPVDataSetAttributesInformation::New();
-  this->RowDataInformation = vtkPVDataSetAttributesInformation::New();
-  this->CompositeDataInformation = vtkPVCompositeDataInformation::New();
-  this->PointArrayInformation = vtkPVArrayInformation::New();
-
-  // Update field association information on the all the
-  // vtkPVDataSetAttributesInformation instances.
-  for (int cc = 0; cc < vtkDataObject::NUMBER_OF_ASSOCIATIONS; cc++)
-  {
-    if (vtkPVDataSetAttributesInformation* dsa = this->GetAttributeInformation(cc))
-    {
-      dsa->SetFieldAssociation(cc);
-    }
-  }
+  this->Initialize();
 }
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::~vtkPVDataInformation()
 {
-  this->PointDataInformation->Delete();
-  this->PointDataInformation = nullptr;
-  this->CellDataInformation->Delete();
-  this->CellDataInformation = nullptr;
-  this->FieldDataInformation->Delete();
-  this->FieldDataInformation = nullptr;
-  this->VertexDataInformation->Delete();
-  this->VertexDataInformation = nullptr;
-  this->EdgeDataInformation->Delete();
-  this->EdgeDataInformation = nullptr;
-  this->RowDataInformation->Delete();
-  this->RowDataInformation = nullptr;
-  this->CompositeDataInformation->Delete();
-  this->CompositeDataInformation = nullptr;
-  this->PointArrayInformation->Delete();
-  this->PointArrayInformation = nullptr;
-  this->SetDataClassName(nullptr);
-  this->SetCompositeDataClassName(nullptr);
-  this->SetCompositeDataSetName(nullptr);
-  this->SetTimeLabel(nullptr);
+  this->SetSubsetSelector(nullptr);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyParametersToStream(vtkMultiProcessStream& str)
 {
-  str << 828792 << this->PortNumber;
+  str << 828792 << this->PortNumber << std::string(this->SubsetSelector ? SubsetSelector : "")
+      << std::string(this->SubsetAssemblyName ? this->SubsetAssemblyName : "");
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyParametersFromStream(vtkMultiProcessStream& str)
 {
   int magic_number;
-  str >> magic_number >> this->PortNumber;
+  std::string path, name;
+  str >> magic_number >> this->PortNumber >> path >> name;
   if (magic_number != 828792)
   {
     vtkErrorMacro("Magic number mismatch.");
   }
+  this->SetSubsetSelector(path.empty() ? nullptr : path.c_str());
+  this->SetSubsetAssemblyName(name.empty() ? nullptr : name.c_str());
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
-  vtkIndent i2 = indent.GetNextIndent();
+  auto i2 = indent.GetNextIndent();
+
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "PortNumber: " << this->PortNumber << endl;
+  os << indent << "SubsetSelector: " << (this->SubsetSelector ? this->SubsetSelector : "(nullptr)")
+     << endl;
+  os << indent << "SubsetAssemblyName: "
+     << (this->SubsetAssemblyName ? this->SubsetAssemblyName : "(nullptr)") << endl;
   os << indent << "DataSetType: " << this->DataSetType << endl;
   os << indent << "CompositeDataSetType: " << this->CompositeDataSetType << endl;
-  os << indent << "NumberOfPoints: " << this->NumberOfPoints << endl;
-  os << indent << "NumberOfCells: " << this->NumberOfCells << endl;
-  os << indent << "NumberOfEdges: " << this->NumberOfEdges << endl;
-  os << indent << "NumberOfRows: " << this->NumberOfRows << endl;
-  os << indent << "NumberOfTrees: " << this->NumberOfTrees << endl;
-  os << indent << "NumberOfVertices: " << this->NumberOfVertices << endl;
-  os << indent << "NumberOfLeaves: " << this->NumberOfLeaves << endl;
-  os << indent << "NumberOfDataSets: " << this->NumberOfDataSets << endl;
+  os << indent << "FirstLeafCompositeIndex: " << this->FirstLeafCompositeIndex << endl;
+  os << indent << "UniqueBlockTypes: ";
+  for (size_t cc = 0; cc < this->UniqueBlockTypes.size(); ++cc)
+  {
+    if (cc > 0 && (cc % 8) == 0)
+    {
+      os << endl << i2;
+    }
+    os << this->UniqueBlockTypes[cc];
+  }
+  os << endl;
+
+  os << indent << "NumberOfPoints: " << this->GetNumberOfPoints() << endl;
+  os << indent << "NumberOfCells: " << this->GetNumberOfCells() << endl;
+  os << indent << "NumberOfVertices: " << this->GetNumberOfVertices() << endl;
+  os << indent << "NumberOfEdges: " << this->GetNumberOfEdges() << endl;
+  os << indent << "NumberOfRows: " << this->GetNumberOfRows() << endl;
+  os << indent << "NumberOfTrees: " << this->GetNumberOfTrees() << endl;
+  os << indent << "NumberOfLeaves: " << this->GetNumberOfLeaves() << endl;
+  os << indent << "NumberOfAMRLevels: " << this->GetNumberOfAMRLevels() << endl;
+  os << indent << "NumberOfDataSets: " << this->GetNumberOfDataSets() << endl;
   os << indent << "MemorySize: " << this->MemorySize << endl;
-  os << indent << "PolygonCount: " << this->PolygonCount << endl;
   os << indent << "Bounds: " << this->Bounds[0] << ", " << this->Bounds[1] << ", "
      << this->Bounds[2] << ", " << this->Bounds[3] << ", " << this->Bounds[4] << ", "
      << this->Bounds[5] << endl;
@@ -155,83 +235,58 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
      << this->Extent[5] << endl;
 
   os << indent << "PointDataInformation " << endl;
-  this->PointDataInformation->PrintSelf(os, i2);
+  this->GetPointDataInformation()->PrintSelf(os, i2);
   os << indent << "CellDataInformation " << endl;
-  this->CellDataInformation->PrintSelf(os, i2);
+  this->GetCellDataInformation()->PrintSelf(os, i2);
   os << indent << "VertexDataInformation" << endl;
-  this->VertexDataInformation->PrintSelf(os, i2);
+  this->GetVertexDataInformation()->PrintSelf(os, i2);
   os << indent << "EdgeDataInformation" << endl;
-  this->EdgeDataInformation->PrintSelf(os, i2);
+  this->GetEdgeDataInformation()->PrintSelf(os, i2);
   os << indent << "RowDataInformation" << endl;
-  this->RowDataInformation->PrintSelf(os, i2);
+  this->GetRowDataInformation()->PrintSelf(os, i2);
   os << indent << "FieldDataInformation " << endl;
-  this->FieldDataInformation->PrintSelf(os, i2);
-  os << indent << "CompositeDataInformation " << endl;
-  this->CompositeDataInformation->PrintSelf(os, i2);
+  this->GetFieldDataInformation()->PrintSelf(os, i2);
   os << indent << "PointArrayInformation " << endl;
-  this->PointArrayInformation->PrintSelf(os, i2);
+  this->GetPointArrayInformation()->PrintSelf(os, i2);
 
-  os << indent << "DataClassName: " << (this->DataClassName ? this->DataClassName : "(none)")
+  os << indent << "HasTime: " << this->HasTime << endl;
+  os << indent << "Time: " << this->Time << endl;
+  os << indent << "TimeRange: " << this->TimeRange[0] << ", " << this->TimeRange[1] << endl;
+  os << indent << "TimeLabel: " << (this->TimeLabel.empty() ? "(none)" : this->TimeLabel.c_str())
      << endl;
-  os << indent << "CompositeDataClassName: "
-     << (this->CompositeDataClassName ? this->CompositeDataClassName : "(none)") << endl;
-  os << indent << "CompositeDataSetName: "
-     << (this->CompositeDataSetName ? this->CompositeDataSetName : "(none)") << endl;
-
-  os << indent << "TimeSpan: " << this->TimeSpan[0] << ", " << this->TimeSpan[1] << endl;
   os << indent << "NumberOfTimeSteps: " << this->NumberOfTimeSteps << endl;
-
-  if (this->TimeLabel)
-  {
-    os << indent << "TimeLabel: " << this->TimeLabel << endl;
-  }
 }
 
 //----------------------------------------------------------------------------
 vtkPVDataSetAttributesInformation* vtkPVDataInformation::GetAttributeInformation(
-  int fieldAssociation)
+  int fieldAssociation) const
 {
   switch (fieldAssociation)
   {
     case vtkDataObject::FIELD_ASSOCIATION_POINTS:
-      return this->PointDataInformation;
-
     case vtkDataObject::FIELD_ASSOCIATION_CELLS:
-      return this->CellDataInformation;
-
-    case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
-      return this->VertexDataInformation;
-
-    case vtkDataObject::FIELD_ASSOCIATION_EDGES:
-      return this->EdgeDataInformation;
-
-    case vtkDataObject::FIELD_ASSOCIATION_ROWS:
-      return this->RowDataInformation;
-
     case vtkDataObject::FIELD_ASSOCIATION_NONE:
-      return this->FieldDataInformation;
+    case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
+    case vtkDataObject::FIELD_ASSOCIATION_EDGES:
+    case vtkDataObject::FIELD_ASSOCIATION_ROWS:
+      return this->AttributeInformations[fieldAssociation];
+    default:
+      return nullptr;
   }
-
-  return nullptr;
 }
 
 //----------------------------------------------------------------------------
-vtkTypeInt64 vtkPVDataInformation::GetNumberOfElements(int type)
+vtkTypeInt64 vtkPVDataInformation::GetNumberOfElements(int elementType) const
 {
-  switch (type)
+  switch (elementType)
   {
     case vtkDataObject::POINT:
-      return this->GetNumberOfPoints();
     case vtkDataObject::CELL:
-      return this->GetNumberOfCells();
     case vtkDataObject::FIELD:
-      return this->FieldDataInformation->GetMaximumNumberOfTuples();
     case vtkDataObject::VERTEX:
-      return this->GetNumberOfVertices();
     case vtkDataObject::EDGE:
-      return this->GetNumberOfEdges();
     case vtkDataObject::ROW:
-      return this->GetNumberOfRows();
+      return this->NumberOfElements[elementType];
     default:
       return 0;
   }
@@ -242,495 +297,51 @@ void vtkPVDataInformation::Initialize()
 {
   this->DataSetType = -1;
   this->CompositeDataSetType = -1;
-  this->NumberOfPoints = 0;
-  this->NumberOfCells = 0;
-  this->NumberOfEdges = 0;
-  this->NumberOfRows = 0;
+  this->FirstLeafCompositeIndex = 0;
+  this->UniqueBlockTypes.clear();
+
+  for (int cc = 0; cc < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; ++cc)
+  {
+    this->NumberOfElements[cc] = 0;
+    this->AttributeInformations[cc]->Initialize();
+    this->AttributeInformations[cc]->SetFieldAssociation(cc);
+  }
+
   this->NumberOfTrees = 0;
-  this->NumberOfVertices = 0;
   this->NumberOfLeaves = 0;
+  this->NumberOfAMRLevels = 0;
   this->NumberOfDataSets = 0;
   this->MemorySize = 0;
-  this->PolygonCount = 0;
   this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
   this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
   this->Extent[0] = this->Extent[2] = this->Extent[4] = VTK_INT_MAX;
   this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_INT_MAX;
-  this->PointDataInformation->Initialize();
-  this->CellDataInformation->Initialize();
-  this->VertexDataInformation->Initialize();
-  this->EdgeDataInformation->Initialize();
-  this->RowDataInformation->Initialize();
-  this->FieldDataInformation->Initialize();
-  this->CompositeDataInformation->Initialize();
+
   this->PointArrayInformation->Initialize();
-  this->SetDataClassName(nullptr);
-  this->SetCompositeDataClassName(nullptr);
-  this->SetCompositeDataSetName(nullptr);
-  this->TimeSpan[0] = VTK_DOUBLE_MAX;
-  this->TimeSpan[1] = -VTK_DOUBLE_MAX;
-  this->HasTime = 0;
+  this->HasTime = false;
   this->Time = 0.0;
+  this->TimeRange[0] = VTK_DOUBLE_MAX;
+  this->TimeRange[1] = -VTK_DOUBLE_MAX;
+  this->TimeLabel.clear();
   this->NumberOfTimeSteps = 0;
-  this->SetTimeLabel(nullptr);
-}
 
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::DeepCopy(
-  vtkPVDataInformation* dataInfo, bool copyCompositeInformation /*=true*/)
-{
-  int idx;
-  double* bounds;
-  int* ext;
-
-  this->DataSetType = dataInfo->GetDataSetType();
-  this->CompositeDataSetType = dataInfo->GetCompositeDataSetType();
-  this->SetDataClassName(dataInfo->GetDataClassName());
-  this->SetCompositeDataClassName(dataInfo->GetCompositeDataClassName());
-  this->SetCompositeDataSetName(dataInfo->GetCompositeDataSetName());
-
-  this->NumberOfDataSets = dataInfo->NumberOfDataSets;
-
-  this->NumberOfPoints = dataInfo->GetNumberOfPoints();
-  this->NumberOfCells = dataInfo->GetNumberOfCells();
-  this->NumberOfEdges = dataInfo->GetNumberOfEdges();
-  this->NumberOfRows = dataInfo->GetNumberOfRows();
-  this->NumberOfTrees = dataInfo->GetNumberOfTrees();
-  this->NumberOfVertices = dataInfo->GetNumberOfVertices();
-  this->NumberOfLeaves = dataInfo->GetNumberOfLeaves();
-  this->MemorySize = dataInfo->GetMemorySize();
-  this->PolygonCount = dataInfo->GetPolygonCount();
-
-  bounds = dataInfo->GetBounds();
-  for (idx = 0; idx < 6; ++idx)
-  {
-    this->Bounds[idx] = bounds[idx];
-  }
-  ext = dataInfo->GetExtent();
-  for (idx = 0; idx < 6; ++idx)
-  {
-    this->Extent[idx] = ext[idx];
-  }
-
-  // Copy attribute information.
-  this->PointDataInformation->DeepCopy(dataInfo->GetPointDataInformation());
-  this->CellDataInformation->DeepCopy(dataInfo->GetCellDataInformation());
-  this->VertexDataInformation->DeepCopy(dataInfo->GetVertexDataInformation());
-  this->EdgeDataInformation->DeepCopy(dataInfo->GetEdgeDataInformation());
-  this->RowDataInformation->DeepCopy(dataInfo->GetRowDataInformation());
-  this->FieldDataInformation->DeepCopy(dataInfo->GetFieldDataInformation());
-  if (copyCompositeInformation)
-  {
-    this->CompositeDataInformation->AddInformation(dataInfo->GetCompositeDataInformation());
-  }
-  this->PointArrayInformation->AddInformation(dataInfo->GetPointArrayInformation());
-
-  double* timespan;
-  timespan = dataInfo->GetTimeSpan();
-  this->TimeSpan[0] = timespan[0];
-  this->TimeSpan[1] = timespan[1];
-  this->NumberOfTimeSteps = dataInfo->GetNumberOfTimeSteps();
-  this->SetTimeLabel(dataInfo->GetTimeLabel());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::AddFromMultiPieceDataSet(vtkCompositeDataSet* data)
-{
-  vtkCompositeDataIterator* iter = data->NewIterator();
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-  {
-    vtkDataObject* dobj = iter->GetCurrentDataObject();
-    if (dobj)
-    {
-      vtkPVDataInformation* dinf = vtkPVDataInformation::New();
-      dinf->CopyFromObject(dobj);
-      dinf->SetDataClassName(dobj->GetClassName());
-      dinf->DataSetType = dobj->GetDataObjectType();
-      this->AddInformation(dinf, /*addingParts=*/1);
-      dinf->FastDelete();
-    }
-  }
-  iter->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyFromCompositeDataSetInitialize(vtkCompositeDataSet* data)
-{
-  this->Initialize();
-  this->CompositeDataInformation->CopyFromObject(data);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyFromCompositeDataSetFinalize(vtkCompositeDataSet* data)
-{
-  this->SetCompositeDataClassName(data->GetClassName());
-  this->CompositeDataSetType = data->GetDataObjectType();
-  if (this->DataSetType == -1)
-  {
-    // This is a composite dataset with no non-empty leaf node. Set some data
-    // type (Look at BUG #7144).
-    this->SetDataClassName("vtkDataSet");
-    this->DataSetType = VTK_DATA_SET;
-  }
-
-  // Copy Field Data information, if any
-  vtkFieldData* fd = data->GetFieldData();
-  if (fd && fd->GetNumberOfArrays() > 0)
-  {
-    if (this->FieldDataInformation->GetNumberOfArrays() > 0)
-    {
-      // Issue #17793. We need to take extra care when merging field data
-      // information to ensure that we don't mark arrays only present on the
-      // non-leaf node as partial.
-      vtkNew<vtkPVDataSetAttributesInformation> myfdInformation;
-      myfdInformation->CopyFromFieldData(fd);
-
-      std::set<std::string> my_unique_arrays;
-      for (int cc = 0, max = myfdInformation->GetNumberOfArrays(); cc < max; ++cc)
-      {
-        const char* aname = myfdInformation->GetArrayInformation(cc)->GetName();
-        if (aname && this->FieldDataInformation->GetArrayInformation(aname) == nullptr)
-        {
-          my_unique_arrays.insert(aname);
-        }
-      }
-      this->FieldDataInformation->AddInformation(myfdInformation);
-      // now unmark arrays in my_unique_arrays as not partial.
-      for (const auto& aname : my_unique_arrays)
-      {
-        if (auto ainfo = this->FieldDataInformation->GetArrayInformation(aname.c_str()))
-        {
-          ainfo->SetIsPartial(0);
-        }
-      }
-    }
-    else
-    {
-      this->FieldDataInformation->CopyFromFieldData(fd);
-    }
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
-{
-  this->CopyFromCompositeDataSetInitialize(data);
-
-  unsigned int numDataSets = this->CompositeDataInformation->GetNumberOfChildren();
-  if (this->CompositeDataInformation->GetDataIsMultiPiece())
-  {
-    // For vtkMultiPieceDataSet, the vtkPVCompositeDataInformation does not
-    // give us individual piece information, we collect that explicitly.
-    this->AddFromMultiPieceDataSet(data);
-  }
-  else
-  {
-    for (unsigned int cc = 0; cc < numDataSets; cc++)
-    {
-      vtkPVDataInformation* childInfo = this->CompositeDataInformation->GetDataInformation(cc);
-      if (childInfo)
-      {
-        this->AddInformation(childInfo, /*addingParts=*/1);
-      }
-    }
-  }
-
-  this->CopyFromCompositeDataSetFinalize(data);
-
-  // AddInformation should have updated NumberOfDataSets correctly to count
-  // number of non-zero datasets. We don't need to fix it here.
-  // this->NumberOfDataSets = numDataSets;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyCommonMetaData(vtkDataObject* data, vtkInformation* pinfo)
-{
-  // Gather some common stuff
-  if (pinfo)
-  {
-    if (pinfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()))
-    {
-      double* times = pinfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
-      this->TimeSpan[0] = times[0];
-      this->TimeSpan[1] = times[1];
-    }
-    if (pinfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
-    {
-      this->NumberOfTimeSteps = pinfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    }
-  }
-
-  this->SetTimeLabel((pinfo && pinfo->Has(vtkPVInformationKeys::TIME_LABEL_ANNOTATION()))
-      ? pinfo->Get(vtkPVInformationKeys::TIME_LABEL_ANNOTATION())
-      : nullptr);
-
-  vtkInformation* dinfo = data->GetInformation();
-  if (dinfo->Has(vtkDataObject::DATA_TIME_STEP()))
-  {
-    double time = dinfo->Get(vtkDataObject::DATA_TIME_STEP());
-    this->Time = time;
-    this->HasTime = 1;
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
-{
-  int idx;
-  double* bds;
-  int* ext = nullptr;
-
-  this->SetDataClassName(data->GetClassName());
-  this->DataSetType = data->GetDataObjectType();
-
-  this->NumberOfDataSets = 1;
-
-  switch (this->DataSetType)
-  {
-    case VTK_IMAGE_DATA:
-      ext = static_cast<vtkImageData*>(data)->GetExtent();
-      break;
-    case VTK_STRUCTURED_GRID:
-      ext = static_cast<vtkStructuredGrid*>(data)->GetExtent();
-      break;
-    case VTK_EXPLICIT_STRUCTURED_GRID:
-      ext = static_cast<vtkExplicitStructuredGrid*>(data)->GetExtent();
-      break;
-    case VTK_RECTILINEAR_GRID:
-      ext = static_cast<vtkRectilinearGrid*>(data)->GetExtent();
-      break;
-    case VTK_UNIFORM_GRID:
-      ext = static_cast<vtkUniformGrid*>(data)->GetExtent();
-      break;
-    case VTK_UNSTRUCTURED_GRID:
-    case VTK_POLY_DATA:
-      this->PolygonCount = data->GetNumberOfCells();
-      break;
-  }
-  if (ext)
-  {
-    for (idx = 0; idx < 6; ++idx)
-    {
-      this->Extent[idx] = ext[idx];
-    }
-  }
-
-  this->NumberOfPoints = data->GetNumberOfPoints();
-
-  // We do not want to get the number of dual cells from an octree
-  // because this triggers generation of connectivity arrays.
-  if (data->GetDataObjectType() != VTK_HYPER_OCTREE)
-  {
-    this->NumberOfCells = data->GetNumberOfCells();
-  }
-#if 0
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  ostream *tmpFile = pm->GetLogFile();
-  if (tmpFile)
-    {
-    if (data->GetSource())
-      {
-      *tmpFile << "output of " << data->GetSource()->GetClassName()
-               << " contains\n";
-      }
-    else if (data->GetProducerPort())
-      {
-      *tmpFile << "output of "
-               << data->GetProducerPort()->GetProducer()->GetClassName()
-               << " contains\n";
-      }
-    *tmpFile << "\t" << this->NumberOfPoints << " points" << endl;
-    *tmpFile << "\t" << this->NumberOfCells << " cells" << endl;
-    }
-#endif
-
-  if (this->NumberOfPoints > 0)
-  {
-    bds = data->GetBounds();
-    for (idx = 0; idx < 6; ++idx)
-    {
-      this->Bounds[idx] = bds[idx];
-    }
-  }
-  this->MemorySize = data->GetActualMemorySize();
-
-  vtkPointSet* ps = vtkPointSet::SafeDownCast(data);
-  if (ps && ps->GetPoints())
-  {
-    this->PointArrayInformation->CopyFromObject(ps->GetPoints()->GetData());
-  }
-
-  // Copy Point Data information
-  if (this->NumberOfPoints > 0)
-  {
-    this->PointDataInformation->CopyFromDataSetAttributes(data->GetPointData());
-  }
-
-  // Copy Cell Data information
-  if (this->NumberOfCells > 0)
-  {
-    this->CellDataInformation->CopyFromDataSetAttributes(data->GetCellData());
-  }
-
-  // Copy Field Data information, if any
-  vtkFieldData* fd = data->GetFieldData();
-  if (fd && fd->GetNumberOfArrays() > 0)
-  {
-    this->FieldDataInformation->CopyFromFieldData(fd);
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyFromGenericDataSet(vtkGenericDataSet* data)
-{
-  int idx;
-  double* bds;
-
-  this->SetDataClassName(data->GetClassName());
-  this->DataSetType = data->GetDataObjectType();
-
-  this->NumberOfDataSets = 1;
-  this->NumberOfPoints = data->GetNumberOfPoints();
-  if (!this->NumberOfPoints)
-  {
-    return;
-  }
-  // We do not want to get the number of dual cells from an octree
-  // because this triggers generation of connectivity arrays.
-  if (data->GetDataObjectType() != VTK_HYPER_OCTREE)
-  {
-    this->NumberOfCells = data->GetNumberOfCells();
-  }
-  bds = data->GetBounds();
-  for (idx = 0; idx < 6; ++idx)
-  {
-    this->Bounds[idx] = bds[idx];
-  }
-  this->MemorySize = data->GetActualMemorySize();
-  switch (this->DataSetType)
-  {
-    case VTK_POLY_DATA:
-      this->PolygonCount = data->GetNumberOfCells();
-      break;
-  }
-
-  // Copy Point Data information
-  if (this->NumberOfPoints > 0)
-  {
-    this->PointDataInformation->CopyFromGenericAttributesOnPoints(data->GetAttributes());
-  }
-
-  // Copy Cell Data information
-  if (this->NumberOfCells > 0)
-  {
-    this->CellDataInformation->CopyFromGenericAttributesOnCells(data->GetAttributes());
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyFromSelection(vtkSelection* data)
-{
-  this->SetDataClassName(data->GetClassName());
-  this->DataSetType = data->GetDataObjectType();
-  this->NumberOfDataSets = 1;
-
-  this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
-  this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
-
-  this->MemorySize = data->GetActualMemorySize();
-  this->NumberOfCells = 0;
-  this->NumberOfPoints = 0;
-
-  this->FieldDataInformation->CopyFromFieldData(data->GetFieldData());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyFromGraph(vtkGraph* data)
-{
-  this->SetDataClassName(data->GetClassName());
-  this->DataSetType = data->GetDataObjectType();
-  this->NumberOfDataSets = 1;
-
-  this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
-  this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
-
-  if (data->GetPoints())
-    data->GetPoints()->GetBounds(this->Bounds);
-
-  this->MemorySize = data->GetActualMemorySize();
-  this->NumberOfEdges = data->GetNumberOfEdges();
-  this->NumberOfVertices = data->GetNumberOfVertices();
-  this->NumberOfRows = 0;
-
-  if (this->NumberOfVertices > 0)
-  {
-    this->VertexDataInformation->CopyFromFieldData(data->GetVertexData());
-  }
-  if (this->NumberOfEdges > 0)
-  {
-    this->EdgeDataInformation->CopyFromFieldData(data->GetEdgeData());
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyFromTable(vtkTable* data)
-{
-  this->SetDataClassName(data->GetClassName());
-  this->DataSetType = data->GetDataObjectType();
-  this->NumberOfDataSets = 1;
-
-  this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
-  this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
-
-  this->MemorySize = data->GetActualMemorySize();
-  this->NumberOfCells = 0;
-  this->NumberOfPoints = 0;
-  this->NumberOfRows = data->GetNumberOfRows();
-
-  if (this->NumberOfRows > 0)
-  {
-    this->RowDataInformation->CopyFromFieldData(data->GetRowData());
-  }
-  this->FieldDataInformation->CopyFromFieldData(data->GetFieldData());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyFromHyperTreeGrid(vtkHyperTreeGrid* data)
-{
-  this->NumberOfTrees = data->GetMaxNumberOfTrees();
-  this->NumberOfCells = data->GetNumberOfVertices();
-  this->NumberOfLeaves = data->GetNumberOfLeaves();
-
-  int idx;
-  double* bds;
-
-  this->SetDataClassName(data->GetClassName());
-  this->DataSetType = data->GetDataObjectType();
-
-  this->NumberOfDataSets = 1;
-
-  bds = data->GetBounds();
-  for (idx = 0; idx < 6; ++idx)
-  {
-    this->Bounds[idx] = bds[idx];
-  }
-  this->MemorySize = data->GetActualMemorySize();
-
-  this->CellDataInformation->CopyFromDataSetAttributes(data->GetCellData());
-
-  // Copy Field Data information, if any
-  vtkFieldData* fd = data->GetFieldData();
-  if (fd && fd->GetNumberOfArrays() > 0)
-  {
-    this->FieldDataInformation->CopyFromFieldData(fd);
-  }
+  this->Hierarchy->Initialize();
+  this->DataAssembly->Initialize();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromObject(vtkObject* object)
 {
+  this->Initialize();
+
+  if (object == nullptr)
+  {
+    return;
+  }
+
   vtkDataObject* dobj = vtkDataObject::SafeDownCast(object);
-  vtkInformation* info = nullptr;
+
+  vtkInformation* pipelineInfo = nullptr;
   // Handle the case where the a vtkAlgorithmOutput is passed instead of
   // the data object. vtkSMPart uses vtkAlgorithmOutput.
   if (!dobj)
@@ -749,7 +360,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
       {
         algOutput = algOutput->GetProducer()->GetInputConnection(0, 0);
       }
-      info = algOutput->GetProducer()->GetOutputInformation(this->PortNumber);
+      pipelineInfo = algOutput->GetProducer()->GetOutputInformation(this->PortNumber);
       dobj = algOutput->GetProducer()->GetOutputDataObject(algOutput->GetIndex());
     }
     else if (algo)
@@ -762,8 +373,8 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
         // Don't gather any data information from the hypothetical null source.
         return;
       }
-      info = algo->GetExecutive()->GetOutputInformation(this->PortNumber);
-      if (!info || vtkDataObject::GetData(info) == nullptr)
+      pipelineInfo = algo->GetExecutive()->GetOutputInformation(this->PortNumber);
+      if (!pipelineInfo || vtkDataObject::GetData(pipelineInfo) == nullptr)
       {
         return;
       }
@@ -778,324 +389,310 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
     return;
   }
 
-  vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(dobj);
-  if (cds)
+  vtkSmartPointer<vtkDataObject> subset;
+  if (vtkCompositeDataSet::SafeDownCast(dobj) && this->SubsetSelector != nullptr)
   {
-    this->CopyFromCompositeDataSet(cds);
-    this->CopyCommonMetaData(dobj, info);
-    return;
-  }
-
-  // vtkHyperTreeGrid inherits vtkDataSet, so we check for it first:
-  vtkHyperTreeGrid* htg = vtkHyperTreeGrid::SafeDownCast(dobj);
-  if (htg)
-  {
-    this->CopyFromHyperTreeGrid(htg);
-    this->CopyCommonMetaData(htg, info);
-  }
-
-  vtkDataSet* ds = vtkDataSet::SafeDownCast(dobj);
-  if (ds)
-  {
-    this->CopyFromDataSet(ds);
-    this->CopyCommonMetaData(dobj, info);
-    return;
-  }
-
-  vtkGenericDataSet* ads = vtkGenericDataSet::SafeDownCast(dobj);
-  if (ads)
-  {
-    this->CopyFromGenericDataSet(ads);
-    this->CopyCommonMetaData(dobj, info);
-    return;
-  }
-
-  vtkGraph* graph = vtkGraph::SafeDownCast(dobj);
-  if (graph)
-  {
-    this->CopyFromGraph(graph);
-    this->CopyCommonMetaData(dobj, info);
-    return;
-  }
-
-  vtkTable* table = vtkTable::SafeDownCast(dobj);
-  if (table)
-  {
-    this->CopyFromTable(table);
-    this->CopyCommonMetaData(dobj, info);
-    return;
-  }
-
-  vtkSelection* selection = vtkSelection::SafeDownCast(dobj);
-  if (selection)
-  {
-    this->CopyFromSelection(selection);
-    this->CopyCommonMetaData(dobj, info);
-    return;
-  }
-
-  const char* cname = dobj->GetClassName();
-  vtkPVDataInformationHelper* dhelper = vtkPVDataInformation::FindHelper(cname);
-  if (dhelper)
-  {
-    dhelper->CopyFromDataObject(this, dobj);
-    this->CopyCommonMetaData(dobj, info);
-    dhelper->Delete();
-    return;
-  }
-
-  // Because custom applications may implement their own data
-  // object types, this isn't an error condition - just
-  // display the name of the data object and return quietly.
-  this->SetDataClassName(dobj->GetClassName());
-  this->CopyCommonMetaData(dobj, info);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi)
-{
-  this->AddInformation(pvi, 0);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi, int addingParts)
-{
-  vtkPVDataInformation* info;
-  int i;
-  int* ext;
-
-  info = vtkPVDataInformation::SafeDownCast(pvi);
-  if (info == nullptr)
-  {
-    vtkErrorMacro("Could not cast object to data information.");
-    return;
-  }
-
-  if (!addingParts)
-  {
-    this->SetCompositeDataClassName(info->GetCompositeDataClassName());
-    this->SetCompositeDataSetName(info->GetCompositeDataSetName());
-    this->CompositeDataSetType = info->CompositeDataSetType;
-    this->CompositeDataInformation->AddInformation(info->CompositeDataInformation);
-  }
-
-  if (info->NumberOfDataSets == 0)
-  {
-    return;
-  }
-
-  if (this->NumberOfPoints == 0 && this->NumberOfCells == 0 && this->NumberOfDataSets == 0 &&
-    this->NumberOfRows == 0 && this->NumberOfVertices == 0 && this->NumberOfEdges == 0 &&
-    this->FieldDataInformation->GetNumberOfArrays() == 0)
-  {
-    // Just copy the other array information.
-    this->DeepCopy(info, !addingParts);
-    return;
-  }
-
-  // For data set, lets pick the common super class.
-  // This supports Heterogeneous collections.
-  // We need a new classification: Structured.
-  // This would allow extracting grid from mixed structured collections.
-  if (this->DataSetType != info->GetDataSetType())
-  { // IsTypeOf method will not work here.  Must be done manually.
-    if (this->DataSetType == -1)
-    {
-      this->DataSetType = info->GetDataSetType();
-      this->SetDataClassName(info->GetDataClassName());
-    }
-    else if (this->DataSetType == VTK_IMAGE_DATA || this->DataSetType == VTK_RECTILINEAR_GRID ||
-      this->DataSetType == VTK_DATA_SET || info->GetDataSetType() == VTK_IMAGE_DATA ||
-      info->GetDataSetType() == VTK_RECTILINEAR_GRID || info->GetDataSetType() == VTK_DATA_SET)
-    {
-      this->DataSetType = VTK_DATA_SET;
-      this->SetDataClassName("vtkDataSet");
-    }
-    else
-    {
-      if (this->DataSetType == VTK_GENERIC_DATA_SET ||
-        info->GetDataSetType() == VTK_GENERIC_DATA_SET)
-      {
-        this->DataSetType = VTK_GENERIC_DATA_SET;
-        this->SetDataClassName("vtkGenericDataSet");
-      }
-      else
-      {
-        this->DataSetType = VTK_POINT_SET;
-        this->SetDataClassName("vtkPointSet");
-      }
-    }
-  }
-
-  // Empty data set? Ignore bounds, extent and array info.
-  if (info->GetNumberOfCells() == 0 && info->GetNumberOfPoints() == 0 &&
-    info->GetNumberOfRows() == 0 && info->GetNumberOfVertices() == 0 &&
-    info->GetNumberOfEdges() == 0)
-  {
-    return;
-  }
-
-  switch (this->DataSetType)
-  {
-    case VTK_POLY_DATA:
-      this->PolygonCount += info->GetNumberOfCells();
-      break;
-  }
-  if (addingParts)
-  {
-    // Adding data information of parts
-    this->NumberOfDataSets += info->GetNumberOfDataSets();
+    subset = this->GetSubset(dobj);
   }
   else
   {
-    // Adding data information of 1 part across processors
-    if (this->GetCompositeDataClassName())
+    subset = dobj;
+  }
+
+  vtkPVDataInformationAccumulator accumulator;
+  if (auto cd = vtkCompositeDataSet::SafeDownCast(subset))
+  {
+    decltype(this->FirstLeafCompositeIndex) leaf_index = 0;
+    using Opts = vtk::CompositeDataSetOptions;
+    for (const auto& item : vtk::Range(cd, Opts::None))
     {
-      // Composite data blocks are not distributed across processors.
-      // Simply add their number.
-      this->NumberOfDataSets += info->GetNumberOfDataSets();
-    }
-    else
-    {
-      // Simple data blocks are distributed across processors, use
-      // the largest number (actually, NumberOfDataSets should always
-      // be 1 since the data information is for a part)
-      if (this->NumberOfDataSets < info->GetNumberOfDataSets())
+      if (leaf_index == 0)
       {
-        this->NumberOfDataSets = info->GetNumberOfDataSets();
+        leaf_index = item.GetFlatIndex();
+      }
+      if (item)
+      {
+        assert(vtkCompositeDataSet::SafeDownCast(item) == nullptr);
+        accumulator(this, item);
       }
     }
-  }
 
-  vtkBoundingBox bbox;
-  bbox.AddBounds(this->Bounds);
-  bbox.AddBounds(info->GetBounds());
-  if (bbox.IsValid())
-  {
-    bbox.GetBounds(this->Bounds);
-  }
-  else
-  {
-    this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
-    this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
-  }
+    // we miss the root node in the above iteration; the key is field data.
+    // just handle it separately.
+    accumulator.AddFieldDataOnly(this, subset);
 
-  // Extents are only a little harder.
-  ext = info->GetExtent();
-  if ((ext[0] > ext[1]) || (ext[2] > ext[3]) || (ext[4] > ext[5]))
-  {
-    // ext is invalid. ignore it.
-  }
-  else if ((this->Extent[0] > this->Extent[1]) || (this->Extent[2] > this->Extent[3]) ||
-    (this->Extent[4] > this->Extent[5]))
-  {
-    std::copy(ext, ext + 6, this->Extent);
-  }
-  else
-  {
-    for (i = 0; i < 3; ++i)
+    // if cd is a data-object tree, the iteration also misses non-leaf nodes and their
+    // field data; so process that too.
+    if (auto dtree = vtkDataObjectTree::SafeDownCast(cd))
     {
-      int j = i * 2;
-      if (ext[j] < this->Extent[j])
+      using DTOpts = vtk::DataObjectTreeOptions;
+      for (const auto& item : vtk::Range(dtree, DTOpts::TraverseSubTree))
       {
-        this->Extent[j] = ext[j];
-      }
-      ++j;
-      if (ext[j] > this->Extent[j])
-      {
-        this->Extent[j] = ext[j];
+        if (auto nonleaf = vtkCompositeDataSet::SafeDownCast(item))
+        {
+          accumulator.AddFieldDataOnly(this, nonleaf);
+        }
       }
     }
+
+    this->CompositeDataSetType = subset->GetDataObjectType();
+    this->FirstLeafCompositeIndex = leaf_index;
+    vtkDataAssemblyUtilities::GenerateHierarchy(cd, this->Hierarchy);
+    if (auto pdc = vtkPartitionedDataSetCollection::SafeDownCast(cd))
+    {
+      this->DataAssembly->DeepCopy(pdc->GetDataAssembly());
+    }
+    else if (auto amr = vtkUniformGridAMR::SafeDownCast(subset))
+    {
+      this->NumberOfAMRLevels = amr->GetNumberOfLevels();
+    }
+  }
+  else if (subset)
+  {
+    accumulator(this, subset);
   }
 
-  // Now for the messy part, all of the arrays.
-  if (this->NumberOfPoints > 0 && info->GetNumberOfPoints() > 0)
+  this->UniqueBlockTypes.clear();
+  if (this->CompositeDataSetType != -1)
   {
-    this->PointArrayInformation->AddInformation(info->GetPointArrayInformation());
-    this->PointDataInformation->AddInformation(info->GetPointDataInformation());
-  }
-  else if (info->GetNumberOfPoints() > 0)
-  {
-    this->PointArrayInformation->DeepCopy(info->GetPointArrayInformation());
-    this->PointDataInformation->DeepCopy(info->GetPointDataInformation());
-  }
-  if (this->NumberOfCells > 0 && info->GetNumberOfCells() > 0)
-  {
-    this->CellDataInformation->AddInformation(info->GetCellDataInformation());
-  }
-  else if (info->GetNumberOfCells() > 0)
-  {
-    this->CellDataInformation->DeepCopy(info->GetCellDataInformation());
-  }
-  if (this->NumberOfPoints > 0 && info->GetNumberOfPoints() > 0)
-  {
-    this->VertexDataInformation->AddInformation(info->GetVertexDataInformation());
-  }
-  else if (info->GetNumberOfPoints() > 0)
-  {
-    this->VertexDataInformation->DeepCopy(info->GetVertexDataInformation());
-  }
-  if (this->NumberOfCells > 0 && info->GetNumberOfCells() > 0)
-  {
-    this->EdgeDataInformation->AddInformation(info->GetEdgeDataInformation());
-  }
-  else if (info->GetNumberOfCells() > 0)
-  {
-    this->EdgeDataInformation->DeepCopy(info->GetEdgeDataInformation());
-  }
-  if (this->NumberOfRows > 0 && info->GetNumberOfRows() > 0)
-  {
-    this->RowDataInformation->AddInformation(info->GetRowDataInformation());
-  }
-  else if (info->GetNumberOfRows() > 0)
-  {
-    this->RowDataInformation->DeepCopy(info->GetRowDataInformation());
-  }
-  this->FieldDataInformation->AddInformation(info->GetFieldDataInformation());
-  //  this->GenericAttributesInformation->AddInformation(info->GetGenericAttributesInformation());
-
-  this->NumberOfPoints += info->GetNumberOfPoints();
-  this->NumberOfCells += info->GetNumberOfCells();
-  this->NumberOfEdges += info->GetNumberOfEdges();
-  this->MemorySize += info->GetMemorySize();
-  this->NumberOfRows += info->GetNumberOfRows();
-
-  double* times = info->GetTimeSpan();
-  if (times[0] < this->TimeSpan[0])
-  {
-    this->TimeSpan[0] = times[0];
-  }
-  if (times[1] > this->TimeSpan[1])
-  {
-    this->TimeSpan[1] = times[1];
+    this->UniqueBlockTypes.insert(this->UniqueBlockTypes.end(),
+      accumulator.UniqueBlockTypes.begin(), accumulator.UniqueBlockTypes.end());
   }
 
-  int numTimeSteps = info->GetNumberOfTimeSteps();
-  if (numTimeSteps > this->NumberOfTimeSteps)
-  {
-    this->NumberOfTimeSteps = numTimeSteps;
-  }
+  // Copy information from `pipelineInfo`
+  this->CopyFromPipelineInformation(pipelineInfo);
 
-  if (!this->HasTime && info->GetHasTime())
+  // Copy data time.
+  auto dinfo = dobj->GetInformation();
+  if (dinfo && dinfo->Has(vtkDataObject::DATA_TIME_STEP()))
   {
-    this->Time = info->GetTime();
-    this->HasTime = 1;
+    this->Time = dinfo->Get(vtkDataObject::DATA_TIME_STEP());
+    this->HasTime = true;
   }
-
-  this->SetTimeLabel(info->GetTimeLabel());
 }
 
 //----------------------------------------------------------------------------
-const char* vtkPVDataInformation::GetPrettyDataTypeString()
+void vtkPVDataInformation::CopyFromPipelineInformation(vtkInformation* pinfo)
 {
-  int dataType = this->DataSetType;
-  const char* className = this->DataClassName;
-  if (this->CompositeDataSetType >= 0)
+  // Gather some common stuff
+  if (pinfo)
   {
-    dataType = this->CompositeDataSetType;
-    className = this->CompositeDataClassName;
+    if (pinfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()) &&
+      pinfo->Length(vtkStreamingDemandDrivenPipeline::TIME_RANGE()) == 2)
+    {
+      const double* times = pinfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+      this->TimeRange[0] = times[0];
+      this->TimeRange[1] = times[1];
+    }
+
+    if (pinfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
+    {
+      this->NumberOfTimeSteps = pinfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    }
+
+    if (pinfo->Has(vtkPVInformationKeys::TIME_LABEL_ANNOTATION()))
+    {
+      this->TimeLabel = pinfo->Get(vtkPVInformationKeys::TIME_LABEL_ANNOTATION());
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::CopyFromDataObject(vtkDataObject* dobj)
+{
+  if (!dobj)
+  {
+    return;
+  }
+  assert(vtkCompositeDataSet::SafeDownCast(dobj) == nullptr);
+  assert(this->DataSetType == -1); // ensure that we're not accidentally accumulating.
+
+  this->DataSetType = dobj->GetDataObjectType();
+  this->MemorySize = dobj->GetActualMemorySize();
+  this->NumberOfDataSets = 1;
+
+  for (int cc = 0; cc < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; ++cc)
+  {
+    this->AttributeInformations[cc]->CopyFromDataObject(dobj);
+    switch (cc)
+    {
+      case vtkDataObject::FIELD:
+        // for field data, we get the maximum number of tuples in field data.
+        this->NumberOfElements[cc] = this->AttributeInformations[cc]->GetMaximumNumberOfTuples();
+        break;
+
+      default:
+        this->NumberOfElements[cc] = dobj->GetNumberOfElements(cc);
+        break;
+    }
   }
 
+  if (auto ds = vtkDataSet::SafeDownCast(dobj))
+  {
+    ds->GetBounds(this->Bounds);
+    if (auto img = vtkImageData::SafeDownCast(ds))
+    {
+      img->GetExtent(this->Extent);
+    }
+    else if (auto rg = vtkRectilinearGrid::SafeDownCast(ds))
+    {
+      rg->GetExtent(this->Extent);
+    }
+    else if (auto sg = vtkStructuredGrid::SafeDownCast(ds))
+    {
+      sg->GetExtent(this->Extent);
+    }
+    else if (auto esg = vtkExplicitStructuredGrid::SafeDownCast(ds))
+    {
+      esg->GetExtent(this->Extent);
+    }
+
+    if (auto ps = vtkPointSet::SafeDownCast(dobj))
+    {
+      if (ps->GetPoints() && ps->GetPoints()->GetData())
+      {
+        this->PointArrayInformation->CopyFromArray(ps->GetPoints()->GetData());
+        // irrespective of the name used by the internally vtkDataArray, always
+        // rename the points as "Points" so the application always identifies
+        // them as such.
+        this->PointArrayInformation->SetName("Points");
+      }
+    }
+  }
+  else if (auto htg = vtkHyperTreeGrid::SafeDownCast(dobj))
+  {
+    // for vtkHyperTreeGrid, leaves and trees are counted specially.
+    this->NumberOfTrees = htg->GetMaxNumberOfTrees();
+    this->NumberOfLeaves = htg->GetNumberOfLeaves();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::AddInformation(vtkPVInformation* oinfo)
+{
+  auto other = vtkPVDataInformation::SafeDownCast(oinfo);
+  if (other == nullptr)
+  {
+    return;
+  }
+  if (this->DataSetType == -1)
+  {
+    this->DeepCopy(other);
+    return;
+  }
+
+  this->DataSetType =
+    vtkDataObjectTypes::GetCommonBaseTypeId(this->DataSetType, other->DataSetType);
+  this->CompositeDataSetType = vtkDataObjectTypes::GetCommonBaseTypeId(
+    this->CompositeDataSetType, other->CompositeDataSetType);
+  this->FirstLeafCompositeIndex =
+    std::max(this->FirstLeafCompositeIndex, other->FirstLeafCompositeIndex);
+  this->NumberOfTrees += other->NumberOfTrees;
+  this->NumberOfLeaves += other->NumberOfLeaves; // TODO: max?
+  this->NumberOfAMRLevels = std::max(this->NumberOfAMRLevels, other->NumberOfAMRLevels);
+  this->NumberOfDataSets += other->NumberOfDataSets;
+  this->MemorySize += other->MemorySize;
+  ::MergeBounds(this->Bounds, other->Bounds);
+  ::MergeExtent(this->Extent, other->Extent);
+  if (other->HasTime)
+  {
+    if (this->HasTime && this->Time != other->Time)
+    {
+      vtkLogF(WARNING, "time mismatch: %lf != %lf", this->Time, other->Time);
+    }
+    this->HasTime = other->HasTime;
+    this->Time = other->Time;
+  }
+  ::MergeRange(this->TimeRange, other->TimeRange);
+  if (!other->TimeLabel.empty())
+  {
+    if (!this->TimeLabel.empty() && this->TimeLabel != other->TimeLabel)
+    {
+      vtkLogF(WARNING, "time-label mismatch: '%s' != '%s'", this->TimeLabel.c_str(),
+        other->TimeLabel.c_str());
+    }
+    this->TimeLabel = other->TimeLabel;
+  }
+
+  // TODO: not sure what's the best way.
+  this->NumberOfTimeSteps = std::max(this->NumberOfTimeSteps, other->NumberOfTimeSteps);
+
+  std::set<int> types;
+  std::copy(this->UniqueBlockTypes.begin(), this->UniqueBlockTypes.end(),
+    std::inserter(types, types.end()));
+  std::copy(other->UniqueBlockTypes.begin(), other->UniqueBlockTypes.end(),
+    std::inserter(types, types.end()));
+
+  this->UniqueBlockTypes.clear();
+  this->UniqueBlockTypes.insert(this->UniqueBlockTypes.end(), types.begin(), types.end());
+
+  for (int cc = 0; cc < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; ++cc)
+  {
+    switch (cc)
+    {
+      case vtkDataObject::FIELD:
+        this->NumberOfElements[cc] =
+          std::max(this->NumberOfElements[cc], other->NumberOfElements[cc]);
+      default:
+        this->NumberOfElements[cc] += other->NumberOfElements[cc];
+    }
+
+    this->AttributeInformations[cc]->AddInformation(other->AttributeInformations[cc]);
+  }
+  this->PointArrayInformation->AddInformation(other->PointArrayInformation, vtkDataObject::POINT);
+
+  // How to merge assemblies/structure?
+  // we don't do anything currently since they are expected to be same on all
+  // ranks.
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::DeepCopy(vtkPVDataInformation* other)
+{
+  if (!other || other->DataSetType == -1)
+  {
+    this->Initialize();
+    return;
+  }
+
+  this->DataSetType = other->DataSetType;
+  this->CompositeDataSetType = other->CompositeDataSetType;
+  this->FirstLeafCompositeIndex = other->FirstLeafCompositeIndex;
+  this->NumberOfTrees = other->NumberOfTrees;
+  this->NumberOfLeaves = other->NumberOfLeaves;
+  this->NumberOfAMRLevels = other->NumberOfAMRLevels;
+  this->NumberOfDataSets = other->NumberOfDataSets;
+  this->MemorySize = other->MemorySize;
+  std::copy(other->Bounds, other->Bounds + 6, this->Bounds);
+  std::copy(other->Extent, other->Extent + 6, this->Extent);
+  this->HasTime = other->HasTime;
+  this->Time = other->Time;
+  std::copy(other->TimeRange, other->TimeRange + 2, this->TimeRange);
+  this->TimeLabel = other->TimeLabel;
+  this->NumberOfTimeSteps = other->NumberOfTimeSteps;
+  this->UniqueBlockTypes = other->UniqueBlockTypes;
+  std::copy(other->NumberOfElements,
+    other->NumberOfElements + vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES, this->NumberOfElements);
+  for (int cc = 0; cc < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; ++cc)
+  {
+    this->AttributeInformations[cc]->DeepCopy(other->AttributeInformations[cc]);
+  }
+  this->PointArrayInformation->DeepCopy(other->PointArrayInformation);
+  this->Hierarchy->DeepCopy(other->Hierarchy);
+  this->DataAssembly->DeepCopy(other->DataAssembly);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVDataInformation::GetPrettyDataTypeString() const
+{
+  const int dataType =
+    this->CompositeDataSetType == -1 ? this->DataSetType : this->CompositeDataSetType;
+  return vtkPVDataInformation::GetPrettyDataTypeString(dataType);
+}
+//----------------------------------------------------------------------------
+const char* vtkPVDataInformation::GetPrettyDataTypeString(int dataType)
+{
+  const char* className = vtkPVDataInformation::GetDataSetTypeAsString(dataType);
   switch (dataType)
   {
     case VTK_POLY_DATA:
@@ -1167,192 +764,191 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString()
     case VTK_PARTITIONED_DATA_SET_COLLECTION:
       return "Partitioned Dataset Collection";
     default:
-      vtkPVDataInformationHelper* dhelper = vtkPVDataInformation::FindHelper(this->DataClassName);
-      if (dhelper)
-      {
-        const char* namestr = dhelper->GetPrettyDataTypeString();
-        dhelper->Delete();
-        return namestr;
-      }
+      break;
   }
-
   return (className && className[0]) ? className : "UnknownType";
 }
 
 //----------------------------------------------------------------------------
-const char* vtkPVDataInformation::GetDataSetTypeAsString()
+const char* vtkPVDataInformation::GetDataSetTypeAsString(int type)
 {
-  if (this->DataSetType == -1)
-  {
-    return "UnknownType";
-  }
-  else
-  {
-    return vtkDataObjectTypes::GetClassNameFromTypeId(this->DataSetType);
-  }
+  return (type == -1 ? "UnknownType" : vtkDataObjectTypes::GetClassNameFromTypeId(type));
 }
 
 //----------------------------------------------------------------------------
-// Need to do this manually.
-bool vtkPVDataInformation::DataSetTypeIsA(const char* type)
+bool vtkPVDataInformation::DataSetTypeIsA(const char* type) const
 {
-  if (strcmp(type, "vtkDataObject") == 0)
-  { // Every type is of type vtkDataObject.
+  const int targetTypeId = vtkDataObjectTypes::GetTypeIdFromClassName(type);
+  if (targetTypeId == -1)
+  {
+    vtkErrorMacro("Unknown data object type '" << (type ? type : "(nullptr)") << "'.");
+    return false;
+  }
+
+  return this->DataSetTypeIsA(targetTypeId);
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVDataInformation::DataSetTypeIsA(int typeId) const
+{
+  if (this->CompositeDataSetType != -1 &&
+    vtkDataObjectTypes::TypeIdIsA(this->CompositeDataSetType, typeId))
+  {
     return true;
   }
-
-  if (strcmp(type, "vtkDataSet") == 0)
-  { // Every type is of type vtkDataObject.
-    if (this->DataSetType == VTK_POLY_DATA || this->DataSetType == VTK_STRUCTURED_GRID ||
-      this->DataSetType == VTK_UNSTRUCTURED_GRID || this->DataSetType == VTK_IMAGE_DATA ||
-      this->DataSetType == VTK_RECTILINEAR_GRID ||
-      this->DataSetType == VTK_EXPLICIT_STRUCTURED_GRID ||
-      this->DataSetType == VTK_STRUCTURED_POINTS)
-    {
-      return true;
-    }
-  }
-  if (strcmp(type, this->GetDataSetTypeAsString()) == 0)
-  { // If class names are the same, then they are of the same type.
-    return true;
-  }
-  if (strcmp(type, "vtkHyperTreeGrid") == 0)
-  {
-    if (this->DataSetType == VTK_HYPER_TREE_GRID ||
-      this->DataSetType == VTK_UNIFORM_HYPER_TREE_GRID)
-    {
-      return true;
-    }
-  }
-  if (strcmp(type, "vtkPointSet") == 0)
-  {
-    if (this->DataSetType == VTK_POLY_DATA || this->DataSetType == VTK_STRUCTURED_GRID ||
-      this->DataSetType == VTK_UNSTRUCTURED_GRID ||
-      this->DataSetType == VTK_EXPLICIT_STRUCTURED_GRID)
-    {
-      return true;
-    }
-  }
-  if (strcmp(type, "vtkStructuredData") == 0)
-  {
-    if (this->DataSetType == VTK_IMAGE_DATA || this->DataSetType == VTK_STRUCTURED_GRID ||
-      this->DataSetType == VTK_RECTILINEAR_GRID ||
-      this->DataSetType == VTK_EXPLICIT_STRUCTURED_GRID)
-    {
-      return true;
-    }
-  }
-  if (strcmp(type, "vtkImageData") == 0)
-  {
-    if (this->DataSetType == VTK_IMAGE_DATA || this->DataSetType == VTK_UNIFORM_GRID ||
-      this->DataSetType == VTK_STRUCTURED_POINTS)
-    {
-      return true;
-    }
-  }
-  if (strcmp(type, "vtkGraph") == 0)
-  {
-    if (this->DataSetType == VTK_GRAPH || this->DataSetType == VTK_TREE ||
-      this->DataSetType == VTK_DIRECTED_GRAPH || this->DataSetType == VTK_UNDIRECTED_GRAPH ||
-      this->DataSetType == VTK_DIRECTED_ACYCLIC_GRAPH || this->DataSetType == VTK_REEB_GRAPH ||
-      this->DataSetType == VTK_MOLECULE)
-    {
-      return true;
-    }
-  }
-  return false;
+  return vtkDataObjectTypes::TypeIdIsA(this->DataSetType, typeId);
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVDataInformation::IsDataStructured()
+bool vtkPVDataInformation::HasDataSetType(const char* type) const
 {
-  switch (this->DataSetType)
+  const int targetTypeId = vtkDataObjectTypes::GetTypeIdFromClassName(type);
+  if (targetTypeId == -1)
   {
-    case VTK_IMAGE_DATA:
-    case VTK_STRUCTURED_GRID:
-    case VTK_EXPLICIT_STRUCTURED_GRID:
-    case VTK_RECTILINEAR_GRID:
-    case VTK_UNIFORM_GRID:
-    case VTK_GENERIC_DATA_SET:
-      return true;
+    vtkErrorMacro("Unknown data object type '" << (type ? type : "(nullptr)") << "'.");
+    return false;
   }
-  return false;
+
+  return this->HasDataSetType(targetTypeId);
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVDataInformation::IsAttributeValid(int fieldAssociation)
+bool vtkPVDataInformation::HasDataSetType(int typeId) const
 {
-  // CompositeDataSet are not analysed by this method
-  if (this->CompositeDataSetType >= 0)
+  if (this->DataSetTypeIsA(typeId))
   {
     return true;
   }
 
-  switch (fieldAssociation)
+  if (this->CompositeDataSetType != -1)
   {
-    case vtkDataObject::FIELD_ASSOCIATION_NONE:
-      return true;
-      break;
-    case vtkDataObject::FIELD_ASSOCIATION_POINTS:
-    case vtkDataObject::FIELD_ASSOCIATION_CELLS:
-      return this->DataSetTypeIsA("vtkDataSet");
-      break;
-    case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
-    case vtkDataObject::FIELD_ASSOCIATION_EDGES:
-      return this->DataSetTypeIsA("vtkGraph");
-      break;
-    case vtkDataObject::FIELD_ASSOCIATION_ROWS:
-      return this->DataSetType == VTK_TABLE;
-      break;
-    default:
-      return false;
-      break;
-  }
-}
-
-//----------------------------------------------------------------------------
-vtkPVDataInformation* vtkPVDataInformation::GetDataInformationForCompositeIndex(int index)
-{
-  return this->GetDataInformationForCompositeIndex(&index);
-}
-
-//----------------------------------------------------------------------------
-vtkPVDataInformation* vtkPVDataInformation::GetDataInformationForCompositeIndex(int* index)
-{
-  if (*index == 0)
-  {
-    (*index)--;
-    return this;
-  }
-
-  (*index)--;
-  return this->CompositeDataInformation->GetDataInformationForCompositeIndex(index);
-}
-
-//----------------------------------------------------------------------------
-unsigned int vtkPVDataInformation::GetNumberOfBlockLeafs(bool skipEmpty)
-{
-  vtkNew<vtkPVCompositeDataInformationIterator> iter;
-  iter->SetDataInformation(this);
-  unsigned int nLeafs = 0;
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-  {
-    vtkPVDataInformation* info = iter->GetCurrentDataInformation();
-    if (info)
+    for (auto& leafType : this->UniqueBlockTypes)
     {
-      vtkPVCompositeDataInformation* cinfo = info->GetCompositeDataInformation();
-      if (!cinfo->GetDataIsComposite() || cinfo->GetDataIsMultiPiece())
+      if (vtkDataObjectTypes::TypeIdIsA(leafType, typeId))
       {
-        nLeafs++;
+        return true;
       }
     }
-    else if (!skipEmpty)
+  }
+
+  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVDataInformation::IsDataStructured() const
+{
+  // if this->DataSetType is structured, means even for composite datasets
+  // all non-null leaves are structured.
+  if (this->DataSetType != -1 &&
+    vtkPVDataInformation::GetExtentType(this->DataSetType) == VTK_3D_EXTENT)
+  {
+    return true;
+  }
+
+  if (this->CompositeDataSetType != -1 && this->UniqueBlockTypes.size() > 0)
+  {
+    for (auto& type : this->UniqueBlockTypes)
     {
-      // without skipEmpty, nullptr data are counted as well.
-      nLeafs++;
+      if (vtkPVDataInformation::GetExtentType(type) != VTK_3D_EXTENT)
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVDataInformation::HasStructuredData() const
+{
+  if (this->DataSetType != -1 &&
+    vtkPVDataInformation::GetExtentType(this->DataSetType) == VTK_3D_EXTENT)
+  {
+    return true;
+  }
+
+  if (this->CompositeDataSetType != -1 && this->UniqueBlockTypes.size() > 0)
+  {
+    for (auto& type : this->UniqueBlockTypes)
+    {
+      if (vtkPVDataInformation::GetExtentType(type) == VTK_3D_EXTENT)
+      {
+        return true;
+      }
     }
   }
-  return nLeafs;
+  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVDataInformation::HasUnstructuredData() const
+{
+  // TODO: this needs improvement. currently this will return true for "base classes"
+  if (vtkPVDataInformation::GetExtentType(this->DataSetType) != VTK_3D_EXTENT)
+  {
+    return true;
+  }
+
+  if (this->CompositeDataSetType != -1 && this->UniqueBlockTypes.size() > 0)
+  {
+    for (auto& type : this->UniqueBlockTypes)
+    {
+      if (vtkPVDataInformation::GetExtentType(type) != VTK_3D_EXTENT)
+      {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVDataInformation::IsAttributeValid(int fieldAssociation) const
+{
+  auto f = [&fieldAssociation](int dtype) {
+    switch (fieldAssociation)
+    {
+      case vtkDataObject::FIELD_ASSOCIATION_NONE:
+        return true;
+
+      case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+      case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+        return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_DATA_SET);
+
+      case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
+      case vtkDataObject::FIELD_ASSOCIATION_EDGES:
+        return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_GRAPH);
+
+      case vtkDataObject::FIELD_ASSOCIATION_ROWS:
+        return vtkDataObjectTypes::TypeIdIsA(dtype, VTK_TABLE);
+
+      default:
+        return false;
+    }
+  };
+
+  if (this->IsCompositeDataSet())
+  {
+    for (auto& type : this->UniqueBlockTypes)
+    {
+      if (f(type))
+      {
+        return true;
+      }
+    }
+
+    if (this->UniqueBlockTypes.empty())
+    {
+      // if uniqueBlockTypesLength is empty, we most likely don't
+      // have complete input data information and hence we cant determine which
+      // attribute is valid conclusively yet. Just return true.
+      // Fixes issue with paraviewPython-AppendAttributes test.
+      return true;
+    }
+  }
+  return f(this->DataSetType);
 }
 
 //----------------------------------------------------------------------------
@@ -1360,390 +956,255 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
   *css << vtkClientServerStream::Reply;
-  *css << this->DataClassName << this->DataSetType << this->NumberOfDataSets << this->NumberOfPoints
-       << this->NumberOfCells << this->NumberOfRows << this->NumberOfTrees << this->NumberOfVertices
-       << this->NumberOfLeaves << this->MemorySize << this->PolygonCount << this->Time
-       << this->HasTime << this->NumberOfTimeSteps << this->TimeLabel << this->NumberOfEdges
+  *css << this->DataSetType << this->CompositeDataSetType << this->FirstLeafCompositeIndex
+       << this->NumberOfTrees << this->NumberOfLeaves << this->NumberOfAMRLevels
+       << this->NumberOfDataSets << this->MemorySize
        << vtkClientServerStream::InsertArray(this->Bounds, 6)
-       << vtkClientServerStream::InsertArray(this->Extent, 6);
+       << vtkClientServerStream::InsertArray(this->Extent, 6) << this->HasTime << this->Time
+       << vtkClientServerStream::InsertArray(this->TimeRange, 2) << this->TimeLabel
+       << this->NumberOfTimeSteps << vtkClientServerStream::InsertArray(this->NumberOfElements,
+                                       vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES);
 
-  size_t length;
-  const unsigned char* data;
-  vtkClientServerStream dcss;
+  *css << static_cast<int>(this->UniqueBlockTypes.size());
+  if (this->UniqueBlockTypes.size() > 0)
+  {
+    *css << vtkClientServerStream::InsertArray(
+      &this->UniqueBlockTypes.front(), static_cast<int>(this->UniqueBlockTypes.size()));
+  }
 
-  this->PointArrayInformation->CopyToStream(&dcss);
-  dcss.GetData(&data, &length);
-  *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
+  vtkClientServerStream temp;
+  this->PointArrayInformation->CopyToStream(&temp);
+  *css << temp;
 
-  dcss.Reset();
+  for (int cc = 0; cc < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; ++cc)
+  {
+    temp.Reset();
+    this->AttributeInformations[cc]->CopyToStream(&temp);
+    *css << temp;
+  }
 
-  this->PointDataInformation->CopyToStream(&dcss);
-  dcss.GetData(&data, &length);
-  *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
-
-  dcss.Reset();
-
-  this->CellDataInformation->CopyToStream(&dcss);
-  dcss.GetData(&data, &length);
-  *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
-
-  dcss.Reset();
-
-  this->VertexDataInformation->CopyToStream(&dcss);
-  dcss.GetData(&data, &length);
-  *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
-
-  dcss.Reset();
-
-  this->EdgeDataInformation->CopyToStream(&dcss);
-  dcss.GetData(&data, &length);
-  *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
-
-  dcss.Reset();
-
-  this->RowDataInformation->CopyToStream(&dcss);
-  dcss.GetData(&data, &length);
-  *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
-
-  *css << this->CompositeDataClassName;
-  *css << this->CompositeDataSetType;
-  *css << this->CompositeDataSetName;
-
-  dcss.Reset();
-
-  this->CompositeDataInformation->CopyToStream(&dcss);
-  dcss.GetData(&data, &length);
-  *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
-
-  dcss.Reset();
-
-  this->FieldDataInformation->CopyToStream(&dcss);
-  dcss.GetData(&data, &length);
-  *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
-
-  *css << vtkClientServerStream::InsertArray(this->TimeSpan, 2);
+  if (this->CompositeDataSetType != -1)
+  {
+    *css << this->DataAssembly->SerializeToXML(vtkIndent());
+    *css << this->Hierarchy->SerializeToXML(vtkIndent());
+  }
 
   *css << vtkClientServerStream::End;
 }
 
-// Macros used to make it easy to insert/remove entries when serializing
-// to/from a stream.
-
-#define CSS_ARGUMENT_BEGIN()                                                                       \
-  {                                                                                                \
-  int _vtk__css_argument_int_counter = 0
-
-#define CSS_GET_NEXT_ARGUMENT(css, msg, var)                                                       \
-  css->GetArgument(msg, _vtk__css_argument_int_counter++, var)
-
-#define CSS_GET_NEXT_ARGUMENT2(css, msg, var, len)                                                 \
-  css->GetArgument(msg, _vtk__css_argument_int_counter++, var, len)
-
-#define CSS_GET_CUR_INDEX() _vtk__css_argument_int_counter
-
-#define CSS_ARGUMENT_END() }
-
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
 {
-  CSS_ARGUMENT_BEGIN();
+  // argument counter.
+  int argument = 0;
 
-  const char* dataclassname = nullptr;
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &dataclassname))
+  if (!css->GetArgument(0, argument++, &this->DataSetType) ||
+    !css->GetArgument(0, argument++, &this->CompositeDataSetType) ||
+    !css->GetArgument(0, argument++, &this->FirstLeafCompositeIndex) ||
+    !css->GetArgument(0, argument++, &this->NumberOfTrees) ||
+    !css->GetArgument(0, argument++, &this->NumberOfLeaves) ||
+    !css->GetArgument(0, argument++, &this->NumberOfAMRLevels) ||
+    !css->GetArgument(0, argument++, &this->NumberOfDataSets) ||
+    !css->GetArgument(0, argument++, &this->MemorySize) ||
+    !css->GetArgument(0, argument++, this->Bounds, 6) ||
+    !css->GetArgument(0, argument++, this->Extent, 6) ||
+    !css->GetArgument(0, argument++, &this->HasTime) ||
+    !css->GetArgument(0, argument++, &this->Time) ||
+    !css->GetArgument(0, argument++, this->TimeRange, 2) ||
+    !css->GetArgument(0, argument++, &this->TimeLabel) ||
+    !css->GetArgument(0, argument++, &this->NumberOfTimeSteps) ||
+    !css->GetArgument(
+      0, argument++, this->NumberOfElements, vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES))
   {
-    vtkErrorMacro("Error parsing class name of data.");
-    return;
-  }
-  this->SetDataClassName(dataclassname);
-
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->DataSetType))
-  {
-    vtkErrorMacro("Error parsing data set type.");
-    return;
-  }
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfDataSets))
-  {
-    vtkErrorMacro("Error parsing number of datasets.");
-    return;
-  }
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfPoints))
-  {
-    vtkErrorMacro("Error parsing number of points.");
-    return;
-  }
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfCells))
-  {
-    vtkErrorMacro("Error parsing number of cells.");
-    return;
-  }
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfRows))
-  {
-    vtkErrorMacro("Error parsing number of cells.");
-    return;
-  }
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfTrees))
-  {
-    vtkErrorMacro("Error parsing number of trees.");
-    return;
-  }
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfVertices))
-  {
-    vtkErrorMacro("Error parsing number of vertices.");
-    return;
-  }
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfLeaves))
-  {
-    vtkErrorMacro("Error parsing number of leaves.");
-    return;
-  }
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->MemorySize))
-  {
-    vtkErrorMacro("Error parsing memory size.");
-    return;
-  }
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->PolygonCount))
-  {
-    vtkErrorMacro("Error parsing memory size.");
-    return;
-  }
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->Time))
-  {
-    vtkErrorMacro("Error parsing Time.");
-    return;
-  }
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->HasTime))
-  {
-    vtkErrorMacro("Error parsing has-time.");
-    return;
-  }
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfTimeSteps))
-  {
-    vtkErrorMacro("Error parsing number of time steps.");
-    return;
-  }
-  const char* timeLabel = nullptr;
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &timeLabel))
-  {
-    vtkErrorMacro("Error parsing time label.");
-    return;
-  }
-  this->SetTimeLabel(timeLabel);
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfEdges))
-  {
-    vtkErrorMacro("Error parsing number of edges.");
-    return;
-  }
-  if (!CSS_GET_NEXT_ARGUMENT2(css, 0, this->Bounds, 6))
-  {
-    vtkErrorMacro("Error parsing bounds.");
-    return;
-  }
-  if (!CSS_GET_NEXT_ARGUMENT2(css, 0, this->Extent, 6))
-  {
-    vtkErrorMacro("Error parsing extent.");
+    this->Initialize();
+    vtkErrorMacro("Error parsing stream.");
     return;
   }
 
-  vtkTypeUInt32 length;
-  std::vector<unsigned char> data;
-  vtkClientServerStream dcss;
-
-  // Point array information.
-  if (!css->GetArgumentLength(0, CSS_GET_CUR_INDEX(), &length))
+  // read UniqueBlockTypes.
+  int uniqueBlockTypesLength;
+  if (!css->GetArgument(0, argument++, &uniqueBlockTypesLength))
   {
-    vtkErrorMacro("Error parsing length of point data information.");
+    this->Initialize();
+    vtkErrorMacro("Error parsing stream.");
     return;
   }
-  data.resize(length);
-  if (!css->GetArgument(0, CSS_GET_CUR_INDEX(), &*data.begin(), length))
+  this->UniqueBlockTypes.resize(uniqueBlockTypesLength);
+  if (uniqueBlockTypesLength > 0 &&
+    !css->GetArgument(0, argument++, &this->UniqueBlockTypes[0], uniqueBlockTypesLength))
   {
-    vtkErrorMacro("Error parsing point data information.");
-    return;
-  }
-  dcss.SetData(&*data.begin(), length);
-  this->PointArrayInformation->CopyFromStream(&dcss);
-  CSS_GET_CUR_INDEX()++;
-
-  // Point data array information.
-  if (!css->GetArgumentLength(0, CSS_GET_CUR_INDEX(), &length))
-  {
-    vtkErrorMacro("Error parsing length of point data information.");
-    return;
-  }
-  data.resize(length);
-  if (!css->GetArgument(0, CSS_GET_CUR_INDEX(), &*data.begin(), length))
-  {
-    vtkErrorMacro("Error parsing point data information.");
-    return;
-  }
-  dcss.SetData(&*data.begin(), length);
-  this->PointDataInformation->CopyFromStream(&dcss);
-  CSS_GET_CUR_INDEX()++;
-
-  // Cell data array information.
-  if (!css->GetArgumentLength(0, CSS_GET_CUR_INDEX(), &length))
-  {
-    vtkErrorMacro("Error parsing length of cell data information.");
-    return;
-  }
-  data.resize(length);
-  if (!css->GetArgument(0, CSS_GET_CUR_INDEX(), &*data.begin(), length))
-  {
-    vtkErrorMacro("Error parsing cell data information.");
-    return;
-  }
-  dcss.SetData(&*data.begin(), length);
-  this->CellDataInformation->CopyFromStream(&dcss);
-  CSS_GET_CUR_INDEX()++;
-
-  // Vertex data array information.
-  if (!css->GetArgumentLength(0, CSS_GET_CUR_INDEX(), &length))
-  {
-    vtkErrorMacro("Error parsing length of cell data information.");
-    return;
-  }
-  data.resize(length);
-  if (!css->GetArgument(0, CSS_GET_CUR_INDEX(), &*data.begin(), length))
-  {
-    vtkErrorMacro("Error parsing cell data information.");
-    return;
-  }
-  dcss.SetData(&*data.begin(), length);
-  this->VertexDataInformation->CopyFromStream(&dcss);
-  CSS_GET_CUR_INDEX()++;
-
-  // Edge data array information.
-  if (!css->GetArgumentLength(0, CSS_GET_CUR_INDEX(), &length))
-  {
-    vtkErrorMacro("Error parsing length of cell data information.");
-    return;
-  }
-  data.resize(length);
-  if (!css->GetArgument(0, CSS_GET_CUR_INDEX(), &*data.begin(), length))
-  {
-    vtkErrorMacro("Error parsing cell data information.");
-    return;
-  }
-  dcss.SetData(&*data.begin(), length);
-  this->EdgeDataInformation->CopyFromStream(&dcss);
-  CSS_GET_CUR_INDEX()++;
-
-  // Row data array information.
-  if (!css->GetArgumentLength(0, CSS_GET_CUR_INDEX(), &length))
-  {
-    vtkErrorMacro("Error parsing length of cell data information.");
-    return;
-  }
-  data.resize(length);
-  if (!css->GetArgument(0, CSS_GET_CUR_INDEX(), &*data.begin(), length))
-  {
-    vtkErrorMacro("Error parsing cell data information.");
-    return;
-  }
-  dcss.SetData(&*data.begin(), length);
-  this->RowDataInformation->CopyFromStream(&dcss);
-  CSS_GET_CUR_INDEX()++;
-
-  const char* compositedataclassname = nullptr;
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &compositedataclassname))
-  {
-    vtkErrorMacro("Error parsing class name of data.");
-    return;
-  }
-  this->SetCompositeDataClassName(compositedataclassname);
-
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->CompositeDataSetType))
-  {
-    vtkErrorMacro("Error parsing data set type.");
+    this->Initialize();
+    vtkErrorMacro("Error parsing stream.");
     return;
   }
 
-  const char* compositedatasetname = nullptr;
-  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &compositedatasetname))
+  vtkClientServerStream temp;
+  if (!css->GetArgument(0, argument++, &temp))
   {
-    vtkErrorMacro("Error parsing composite dataset name of data.");
+    this->Initialize();
+    vtkErrorMacro("Error parsing stream.");
     return;
   }
-  this->SetCompositeDataSetName(compositedatasetname);
+  this->PointArrayInformation->CopyFromStream(&temp);
 
-  // Composite data information.
-  if (!css->GetArgumentLength(0, CSS_GET_CUR_INDEX(), &length))
+  for (int cc = 0; cc < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; ++cc)
   {
-    vtkErrorMacro("Error parsing length of cell data information.");
-    return;
-  }
-  data.resize(length);
-  if (!css->GetArgument(0, CSS_GET_CUR_INDEX(), &*data.begin(), length))
-  {
-    vtkErrorMacro("Error parsing cell data information.");
-    return;
-  }
-  dcss.SetData(&*data.begin(), length);
-  if (dcss.GetNumberOfMessages() > 0)
-  {
-    this->CompositeDataInformation->CopyFromStream(&dcss);
-  }
-  else
-  {
-    this->CompositeDataInformation->Initialize();
-  }
-  CSS_GET_CUR_INDEX()++;
-
-  // Field data array information.
-  if (!css->GetArgumentLength(0, CSS_GET_CUR_INDEX(), &length))
-  {
-    vtkErrorMacro("Error parsing length of field data information.");
-    return;
-  }
-
-  data.resize(length);
-  if (!css->GetArgument(0, CSS_GET_CUR_INDEX(), &*data.begin(), length))
-  {
-    vtkErrorMacro("Error parsing field data information.");
-    return;
-  }
-  dcss.SetData(&*data.begin(), length);
-  this->FieldDataInformation->CopyFromStream(&dcss);
-  CSS_GET_CUR_INDEX()++;
-
-  if (!CSS_GET_NEXT_ARGUMENT2(css, 0, this->TimeSpan, 2))
-  {
-    vtkErrorMacro("Error parsing timespan.");
-    return;
-  }
-
-  CSS_ARGUMENT_END();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::RegisterHelper(const char* classname, const char* helper)
-{
-  helpers[classname] = helper;
-}
-
-//----------------------------------------------------------------------------
-vtkPVDataInformationHelper* vtkPVDataInformation::FindHelper(const char* classname)
-{
-  std::map<std::string, std::string>::iterator iter =
-    helpers.find(classname ? classname : std::string());
-  if (iter != helpers.end())
-  {
-    std::string helperclassname = iter->second;
-    auto obj = vtkClientServerStreamInstantiator::CreateInstance(helperclassname.c_str());
-    vtkPVDataInformationHelper* helper = vtkPVDataInformationHelper::SafeDownCast(obj);
-    if (!helper)
+    temp.Reset();
+    if (!css->GetArgument(0, argument++, &temp))
     {
-      obj->Delete();
+      this->Initialize();
+      vtkErrorMacro("Error parsing stream.");
+      return;
     }
-    return helper;
+    this->AttributeInformations[cc]->CopyFromStream(&temp);
   }
-  return nullptr;
+
+  if (this->CompositeDataSetType != -1)
+  {
+    std::string hierarchy, assembly;
+    if (!css->GetArgument(0, argument++, &assembly) ||
+      !this->DataAssembly->InitializeFromXML(assembly.c_str()) ||
+      !css->GetArgument(0, argument++, &hierarchy) ||
+      !this->Hierarchy->InitializeFromXML(hierarchy.c_str()))
+    {
+      this->Initialize();
+      vtkErrorMacro("Error parsing stream.");
+      return;
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation* vtkPVDataInformation::GetArrayInformation(
-  const char* arrayname, int attribute_type)
+  const char* arrayname, int attribute_type) const
 {
   vtkPVDataSetAttributesInformation* attrInfo = this->GetAttributeInformation(attribute_type);
   return attrInfo ? attrInfo->GetArrayInformation(arrayname) : nullptr;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVDataInformation::GetExtentType(int type)
+{
+  // types defined in vtkType.h
+  switch (type)
+  {
+    case VTK_EXPLICIT_STRUCTURED_GRID:
+    case VTK_STRUCTURED_POINTS:
+    case VTK_STRUCTURED_GRID:
+    case VTK_RECTILINEAR_GRID:
+    case VTK_IMAGE_DATA:
+    case VTK_UNIFORM_GRID:
+      return VTK_3D_EXTENT;
+
+    case VTK_POLY_DATA:
+    case VTK_UNSTRUCTURED_GRID:
+    case VTK_PIECEWISE_FUNCTION:
+    case VTK_DATA_OBJECT:
+    case VTK_DATA_SET:
+    case VTK_POINT_SET:
+    case VTK_COMPOSITE_DATA_SET:
+    case VTK_MULTIGROUP_DATA_SET:
+    case VTK_MULTIBLOCK_DATA_SET:
+    case VTK_HIERARCHICAL_DATA_SET:
+    case VTK_HIERARCHICAL_BOX_DATA_SET:
+    case VTK_GENERIC_DATA_SET:
+    case VTK_HYPER_OCTREE:
+    case VTK_TEMPORAL_DATA_SET:
+    case VTK_TABLE:
+    case VTK_GRAPH:
+    case VTK_TREE:
+    case VTK_SELECTION:
+    case VTK_DIRECTED_GRAPH:
+    case VTK_UNDIRECTED_GRAPH:
+    case VTK_MULTIPIECE_DATA_SET:
+    case VTK_DIRECTED_ACYCLIC_GRAPH:
+    case VTK_ARRAY_DATA:
+    case VTK_REEB_GRAPH:
+    case VTK_UNIFORM_GRID_AMR:
+    case VTK_NON_OVERLAPPING_AMR:
+    case VTK_OVERLAPPING_AMR:
+    case VTK_HYPER_TREE_GRID:
+    case VTK_MOLECULE:
+    case VTK_PISTON_DATA_OBJECT:
+    case VTK_PATH:
+    case VTK_UNSTRUCTURED_GRID_BASE:
+    case VTK_PARTITIONED_DATA_SET:
+    case VTK_PARTITIONED_DATA_SET_COLLECTION:
+    case VTK_UNIFORM_HYPER_TREE_GRID:
+      return VTK_PIECES_EXTENT;
+
+    default:
+      vtkLogF(ERROR, "Unknown type: %d", type);
+      return VTK_PIECES_EXTENT;
+  }
+}
+
+//----------------------------------------------------------------------------
+vtkSmartPointer<vtkDataObject> vtkPVDataInformation::GetSubset(vtkDataObject* dobj) const
+{
+  auto cd = vtkCompositeDataSet::SafeDownCast(dobj);
+  if (!this->SubsetSelector || cd == nullptr)
+  {
+    return dobj;
+  }
+
+  vtkNew<vtkExtractBlockUsingDataAssembly> extractor;
+  extractor->SetInputDataObject(dobj);
+  extractor->SetAssemblyName(this->SubsetAssemblyName);
+  extractor->SetSelector(this->SubsetSelector);
+  extractor->Update();
+  return extractor->GetOutputDataObject(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::SetSubsetAssemblyNameToHierarchy()
+{
+  this->SetSubsetAssemblyName(vtkDataAssemblyUtilities::HierarchyName());
+}
+
+//----------------------------------------------------------------------------
+vtkDataAssembly* vtkPVDataInformation::GetHierarchy() const
+{
+  return this->IsCompositeDataSet() ? this->Hierarchy.Get() : nullptr;
+}
+
+//----------------------------------------------------------------------------
+vtkDataAssembly* vtkPVDataInformation::GetDataAssembly(const char* assemblyName) const
+{
+  if (assemblyName && strcmp(vtkDataAssemblyUtilities::HierarchyName(), assemblyName) == 0)
+  {
+    return this->GetHierarchy();
+  }
+  return this->GetDataAssembly();
+}
+
+//----------------------------------------------------------------------------
+vtkDataAssembly* vtkPVDataInformation::GetDataAssembly() const
+{
+  return vtkDataObjectTypes::TypeIdIsA(
+           this->CompositeDataSetType, VTK_PARTITIONED_DATA_SET_COLLECTION)
+    ? this->DataAssembly.Get()
+    : nullptr;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVDataInformation::GetUniqueBlockType(unsigned int index) const
+{
+  return index < this->GetNumberOfUniqueBlockTypes() ? this->UniqueBlockTypes[index] : -1;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkPVDataInformation::GetBlockName(vtkTypeUInt64 cid) const
+{
+  if (this->DataSetTypeIsA(VTK_MULTIBLOCK_DATA_SET))
+  {
+    auto hierarchy = this->GetHierarchy();
+    const auto selector = vtkDataAssemblyUtilities::GetSelectorForCompositeId(cid, hierarchy);
+    const auto nodes = hierarchy->SelectNodes({ selector });
+    if (nodes.size() >= 1)
+    {
+      return hierarchy->GetAttributeOrDefault(nodes.front(), "label", "");
+    }
+  }
+  return {};
 }

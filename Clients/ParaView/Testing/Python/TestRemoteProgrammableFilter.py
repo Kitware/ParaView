@@ -24,6 +24,8 @@ def testScript(programmableFilter, script):
     programmableFilter.Script = script + textwrap.dedent('''
         passedArray = vtk.vtkIntArray()
         passedArray.SetName('%s')
+        passedArray.SetNumberOfTuples(1)
+        passedArray.SetValue(0, 1)
         self.GetOutput().GetFieldData().AddArray(passedArray)''' % arrayName)
 
     programmableFilter.UpdatePipeline()

@@ -137,8 +137,8 @@ bool pqInputDataTypeDecorator::processState() const
       vtkPVDataInformation* dataInfo = cur_input->getDataInformation();
       for (std::size_t i = 0; i < parts.size(); ++i)
       {
-        bool match = (dataInfo->IsDataStructured() && !strcmp(parts[i].c_str(), "Structured")) ||
-          (dataInfo->DataSetTypeIsA(parts[i].c_str()));
+        const bool match = (parts[i] == "Structured") ? dataInfo->IsDataStructured()
+                                                      : dataInfo->DataSetTypeIsA(parts[i].c_str());
         if (match)
         {
           return !exclude;
