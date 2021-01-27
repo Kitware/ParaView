@@ -163,6 +163,17 @@
         equal to the power of 2 greater than or equal to the chosen value.</Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="LoadBalanceAcrossAllBlocks"
+        command="SetLoadBalanceAcrossAllBlocks"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When checked, for datasets with multiple blocks,
+          the filter will try to load balance across all blocks otherwise each block is separately
+          load balanced.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="PreservePartitionsInOutput"
         command="SetPreservePartitionsInOutput"
         number_of_elements="1"
