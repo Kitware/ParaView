@@ -29,62 +29,68 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqProxyInformationWidget_h
-#define _pqProxyInformationWidget_h
+#ifndef pqProxyInformationWidget_h
+#define pqProxyInformationWidget_h
 
 #include "pqComponentsModule.h"
-#include <QPointer>
+#include <QScopedPointer>
 #include <QWidget>
 
 class pqOutputPort;
-class QModelIndex;
-class vtkEventQtSlotConnect;
 class vtkPVDataInformation;
 
 /**
-* Widget which provides information about an output port of a source proxy
-*/
+ * @class pqProxyInformationWidget
+ * @brief Widget to show information about data produced by an algorithm
+ *
+ * pqProxyInformationWidget is intended to show meta-data about the data
+ * produced by a VTK algorithm. In ParaView, that maps to representing
+ * meta-data available in `vtkPVDataInformation`.
+ *
+ * pqProxyInformationWidget uses `pqActiveObjects` to monitor the active
+ * output-port and updates to show data-information for the data produced by the
+ * active output-port, if any.
+ *
+ */
 class PQCOMPONENTS_EXPORT pqProxyInformationWidget : public QWidget
 {
-  Q_OBJECT
+  Q_OBJECT;
+  using Superclass = QWidget;
+
 public:
-  /**
-  * constructor
-  */
   pqProxyInformationWidget(QWidget* p = 0);
-  /**
-  * destructor
-  */
   ~pqProxyInformationWidget() override;
 
   /**
-  * get the proxy for which properties are displayed
-  */
-  pqOutputPort* getOutputPort();
+   * Returns the output port from whose data information this widget is
+   * currently showing.
+   */
+  pqOutputPort* outputPort() const;
+
+  /**
+   * Returns the `vtkPVDataInformation` currently shown.
+   */
+  vtkPVDataInformation* dataInformation() const;
 
 public Q_SLOTS:
-  void updateInformation();
-
   /**
   * Set the display whose properties we want to edit.
   */
   void setOutputPort(pqOutputPort* outputport);
 
 private Q_SLOTS:
-  void onCurrentChanged(const QModelIndex& item);
 
-  // This is used to ensure that we don't have extra space in the
-  // dataTypeProperties QStackedWidget.
-  void onDataTypePropertiesWidgetChanged(int);
-
-private:
-  void fillDataInformation(vtkPVDataInformation* info);
+  /**
+   * Updates the UI using current vtkPVDataInformation.
+   */
+  void updateUI();
+  void updateSubsetUI();
 
 private:
-  QPointer<pqOutputPort> OutputPort;
-  vtkEventQtSlotConnect* VTKConnect;
-  class pqUi;
-  pqUi* Ui;
+  Q_DISABLE_COPY(pqProxyInformationWidget);
+
+  class pqInternals;
+  QScopedPointer<pqInternals> Internals;
 };
 
 #endif
