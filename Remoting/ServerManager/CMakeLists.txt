@@ -79,6 +79,7 @@ set(classes
   vtkSMCompoundSourceProxyDefinitionBuilder
   vtkSMCoreUtilities
   vtkSMDataAssemblyDomain
+  vtkSMDataAssemblyListDomain
   vtkSMDataExtractWriterProxy
   vtkSMDataSourceProxy
   vtkSMDataTypeDomain

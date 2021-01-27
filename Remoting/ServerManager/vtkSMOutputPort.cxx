@@ -133,6 +133,7 @@ void vtkSMOutputPort::GatherDataInformation()
   this->DataInformation->Initialize();
   this->DataInformation->SetPortNumber(this->PortIndex);
   this->SourceProxy->GatherInformation(this->DataInformation);
+  this->DataInformation->Modified();
 
   this->DataAssemblyInformation->Initialize();
   this->DataAssemblyInformation->SetPortNumber(this->PortIndex);
@@ -154,6 +155,7 @@ void vtkSMOutputPort::GatherTemporalDataInformation()
   this->TemporalDataInformation->Initialize();
   this->TemporalDataInformation->SetPortNumber(this->PortIndex);
   this->SourceProxy->GatherInformation(this->TemporalDataInformation);
+  this->TemporalDataInformation->Modified();
 
   this->TemporalDataInformationValid = true;
   this->SourceProxy->GetSession()->CleanupPendingProgress();

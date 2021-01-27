@@ -16,8 +16,6 @@
 
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVCompositeDataInformation.h"
-#include "vtkPVCompositeDataInformationIterator.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMInputProperty.h"
@@ -29,98 +27,35 @@ vtkStandardNewMacro(vtkSMCompositeTreeDomain);
 vtkCxxSetObjectMacro(vtkSMCompositeTreeDomain, Information, vtkPVDataInformation);
 //----------------------------------------------------------------------------
 vtkSMCompositeTreeDomain::vtkSMCompositeTreeDomain()
+  : Information(nullptr)
+  , Mode(vtkSMCompositeTreeDomain::ALL)
+  , DefaultMode(vtkSMCompositeTreeDomain::DEFAULT)
+  , DataInformationTimeStamp(0)
 {
-  this->Information = nullptr;
-  this->LastInformation = nullptr;
-  this->Mode = ALL;
-  this->DefaultMode = DEFAULT;
-  this->Source = nullptr;
-  this->SourcePort = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMCompositeTreeDomain::~vtkSMCompositeTreeDomain()
 {
-  this->Source = nullptr;
-  this->SourcePort = 0;
   this->SetInformation(nullptr);
+}
+
+//---------------------------------------------------------------------------
+vtkDataAssembly* vtkSMCompositeTreeDomain::GetHierarchy() const
+{
+  return this->Information ? this->Information->GetHierarchy() : nullptr;
 }
 
 //---------------------------------------------------------------------------
 void vtkSMCompositeTreeDomain::Update(vtkSMProperty*)
 {
-  this->Source = nullptr;
-  this->SourcePort = 0;
-  this->SetInformation(nullptr);
+  this->SetInformation(this->GetInputDataInformation("Input"));
 
-  vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(this->GetRequiredProperty("Input"));
-  if (pp)
+  const auto stamp = this->Information ? this->Information->GetMTime() : 0;
+  if (this->DataInformationTimeStamp != stamp)
   {
-    this->Update(pp);
-  }
-}
-
-//---------------------------------------------------------------------------
-void vtkSMCompositeTreeDomain::InvokeModifiedIfChanged()
-{
-  if (this->Information != this->LastInformation ||
-    (this->Information && this->UpdateTime < this->Information->GetMTime()))
-  {
-    this->LastInformation = this->Information;
-    this->UpdateTime.Modified();
+    this->DataInformationTimeStamp = stamp;
     this->DomainModified();
-  }
-}
-
-//---------------------------------------------------------------------------
-vtkSMSourceProxy* vtkSMCompositeTreeDomain::GetSource()
-{
-  return this->Source.GetPointer();
-}
-
-//---------------------------------------------------------------------------
-void vtkSMCompositeTreeDomain::Update(vtkSMInputProperty* ip)
-{
-  unsigned int i;
-  unsigned int numProxs = ip->GetNumberOfUncheckedProxies();
-  for (i = 0; i < numProxs; i++)
-  {
-    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(ip->GetUncheckedProxy(i));
-    if (sp)
-    {
-      vtkPVDataInformation* info =
-        sp->GetDataInformation(ip->GetUncheckedOutputPortForConnection(i));
-      if (!info)
-      {
-        continue;
-      }
-      this->Source = sp;
-      this->SourcePort = ip->GetUncheckedOutputPortForConnection(i);
-      this->SetInformation(info);
-      this->InvokeModifiedIfChanged();
-      return;
-    }
-  }
-
-  // In case there is no valid unchecked proxy, use the actual
-  // proxy values
-  numProxs = ip->GetNumberOfProxies();
-  for (i = 0; i < numProxs; i++)
-  {
-    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(ip->GetProxy(i));
-    if (sp)
-    {
-      vtkPVDataInformation* info = sp->GetDataInformation(ip->GetOutputPortForConnection(i));
-      if (!info)
-      {
-        continue;
-      }
-      this->Source = sp;
-      this->SourcePort = ip->GetOutputPortForConnection(i);
-      this->SetInformation(info);
-      this->InvokeModifiedIfChanged();
-      return;
-    }
   }
 }
 
@@ -200,22 +135,8 @@ int vtkSMCompositeTreeDomain::SetDefaultValues(vtkSMProperty* property, bool use
   {
     if (this->Mode == LEAVES || this->DefaultMode == NONEMPTY_LEAF)
     {
-      vtkNew<vtkPVCompositeDataInformationIterator> iter;
-      iter->SetDataInformation(this->Information);
-      int index = -1;
-      for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-      {
-        index++;
-        if (vtkPVDataInformation* info = iter->GetCurrentDataInformation())
-        {
-          vtkPVCompositeDataInformation* cinfo = info->GetCompositeDataInformation();
-          if (!cinfo->GetDataIsComposite() || cinfo->GetDataIsMultiPiece())
-          {
-            break;
-          }
-        }
-      }
-      if (index != -1)
+      int index = static_cast<int>(this->Information->GetFirstLeafCompositeIndex());
+      if (index != 0)
       {
         const bool repeatable = (ivp->GetRepeatCommand() == 1);
         const int num_elements_per_command = ivp->GetNumberOfElementsPerCommand();
@@ -271,5 +192,4 @@ void vtkSMCompositeTreeDomain::PrintSelf(ostream& os, vtkIndent indent)
       os << "UNKNOWN";
   }
   os << endl;
-  os << indent << "SourcePort: " << this->SourcePort << endl;
 }

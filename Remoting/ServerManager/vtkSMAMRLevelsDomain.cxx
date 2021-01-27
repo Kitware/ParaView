@@ -15,7 +15,6 @@
 #include "vtkSMAMRLevelsDomain.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
@@ -30,9 +29,7 @@ vtkSMAMRLevelsDomain::~vtkSMAMRLevelsDomain() = default;
 void vtkSMAMRLevelsDomain::Update(vtkSMProperty*)
 {
   auto* dataInfo = this->GetInputInformation();
-  auto* compDataInfo = dataInfo ? dataInfo->GetCompositeDataInformation() : nullptr;
-  unsigned int numberOfLevels = compDataInfo ? compDataInfo->GetNumberOfAMRLevels() : 0;
-
+  int numberOfLevels = dataInfo ? dataInfo->GetNumberOfAMRLevels() : 0;
   std::vector<vtkEntry> entries;
   entries.emplace_back(0, numberOfLevels - 1);
   this->SetEntries(entries);

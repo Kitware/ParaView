@@ -18,6 +18,11 @@
  * vtkSMIntVectorProperty values to valid \c flat-index for a
  * vtkCompositeDataSet.
  *
+ * vtkSMCompositeTreeDomain should be considered deprecated. New code should no
+ * longer use this domain. Developers are encouraged to update filters to not
+ * rely on composite-index and instead use selectors to select blocks. See
+ * vtkSMDataAssemblyDomain.
+ *
  * vtkSMCompositeTreeDomain can be added to a vtkSMIntVectorProperty. This
  * domain requires a vtkSMInputProperty which is used to provide the input to
  * the filter. This domain obtains data information from the input selected on
@@ -70,18 +75,17 @@
  *     </RequiredProperties>
  *   </CompositeTreeDomain>
  * \endcode
-*/
+ */
 
 #ifndef vtkSMCompositeTreeDomain_h
 #define vtkSMCompositeTreeDomain_h
 
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMDomain.h"
-#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
 class vtkPVDataInformation;
 class vtkSMInputProperty;
-class vtkSMSourceProxy;
+class vtkDataAssembly;
 
 class VTKREMOTINGSERVERMANAGER_EXPORT vtkSMCompositeTreeDomain : public vtkSMDomain
 {
@@ -106,18 +110,9 @@ public:
   //@}
 
   /**
-   * Returns the source proxy whose data information is returned by
-   * GetInformation().
+   * Returns vtkDataAssembly representing the hierarchy
    */
-  vtkSMSourceProxy* GetSource();
-
-  //@{
-  /**
-   * Returns the port for the source proxy from which the data information is
-   * obtained by GetInformation().
-   */
-  vtkGetMacro(SourcePort, int);
-  //@}
+  vtkDataAssembly* GetHierarchy() const;
 
   /**
    * Is the (unchecked) value of the property in the domain? Overwritten by
@@ -178,28 +173,18 @@ protected:
   ~vtkSMCompositeTreeDomain() override;
 
   int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
-
-  /**
-   * Internal implementation called by Update(vtkSMProperty*);
-   */
-  void Update(vtkSMInputProperty* iproperty);
-
-  void InvokeModifiedIfChanged();
-
   void SetInformation(vtkPVDataInformation*);
+
   vtkPVDataInformation* Information;
-
-  vtkTimeStamp UpdateTime;
-  vtkPVDataInformation* LastInformation; // not reference counted.
-
-  vtkWeakPointer<vtkSMSourceProxy> Source;
   int Mode;
   int DefaultMode;
-  int SourcePort;
 
 private:
   vtkSMCompositeTreeDomain(const vtkSMCompositeTreeDomain&) = delete;
   void operator=(const vtkSMCompositeTreeDomain&) = delete;
+
+  // Used to determine if the domain has really changed.
+  vtkMTimeType DataInformationTimeStamp;
 };
 
 #endif
