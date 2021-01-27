@@ -97,12 +97,6 @@ vtkSMOutputPort* pqOutputPort::getOutputPortProxy() const
 }
 
 //-----------------------------------------------------------------------------
-vtkDataAssembly* pqOutputPort::dataAssembly() const
-{
-  return this->getOutputPortProxy()->GetDataAssembly();
-}
-
-//-----------------------------------------------------------------------------
 vtkPVDataInformation* pqOutputPort::getDataInformation() const
 {
   vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(this->getSource()->getProxy());

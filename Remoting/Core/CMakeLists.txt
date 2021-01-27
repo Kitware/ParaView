@@ -39,7 +39,6 @@ set(classes
   vtkPVAlgorithmPortsInformation
   vtkPVArrayInformation
   vtkPVClassNameInformation
-  vtkPVDataAssemblyInformation
   vtkPVDataInformation
   vtkPVDataSetAttributesInformation
   vtkPVDataSizeInformation

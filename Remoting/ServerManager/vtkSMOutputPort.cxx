@@ -21,7 +21,6 @@
 #include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVClassNameInformation.h"
-#include "vtkPVDataAssemblyInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVTemporalDataInformation.h"
 #include "vtkPVXMLElement.h"
@@ -41,7 +40,6 @@ vtkSMOutputPort::vtkSMOutputPort()
 {
   this->ClassNameInformation = vtkPVClassNameInformation::New();
   this->DataInformation = vtkPVDataInformation::New();
-  this->DataAssemblyInformation = vtkPVDataAssemblyInformation::New();
   this->TemporalDataInformation = vtkPVTemporalDataInformation::New();
   this->ClassNameInformationValid = 0;
   this->DataInformationValid = false;
@@ -58,7 +56,6 @@ vtkSMOutputPort::~vtkSMOutputPort()
   this->SetSourceProxy(nullptr);
   this->ClassNameInformation->Delete();
   this->DataInformation->Delete();
-  this->DataAssemblyInformation->Delete();
   this->TemporalDataInformation->Delete();
 }
 
@@ -84,16 +81,6 @@ vtkPVTemporalDataInformation* vtkSMOutputPort::GetTemporalDataInformation()
     this->GatherTemporalDataInformation();
   }
   return this->TemporalDataInformation;
-}
-
-//----------------------------------------------------------------------------
-vtkDataAssembly* vtkSMOutputPort::GetDataAssembly()
-{
-  if (!this->DataInformationValid)
-  {
-    this->GetDataInformation();
-  }
-  return this->DataAssemblyInformation->GetDataAssembly();
 }
 
 //----------------------------------------------------------------------------
@@ -135,9 +122,6 @@ void vtkSMOutputPort::GatherDataInformation()
   this->SourceProxy->GatherInformation(this->DataInformation);
   this->DataInformation->Modified();
 
-  this->DataAssemblyInformation->Initialize();
-  this->DataAssemblyInformation->SetPortNumber(this->PortIndex);
-  this->SourceProxy->GatherInformation(this->DataAssemblyInformation);
   this->DataInformationValid = true;
   this->SourceProxy->GetSession()->CleanupPendingProgress();
 }
