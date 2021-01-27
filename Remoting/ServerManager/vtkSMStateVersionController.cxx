@@ -852,6 +852,41 @@ struct Process_5_8_to_5_9
   }
 };
 
+//===========================================================================
+struct Process_5_9_to_5_10
+{
+  bool operator()(xml_document& document)
+  {
+    return HandleSpreadsheetRepresentationCompositeDataSetIndex(document);
+  }
+
+  static void ConvertCompositeIdsToSelectors(pugi::xml_node& node)
+  {
+    for (auto child : node.children("Element"))
+    {
+      auto value_attribute = child.attribute("value");
+      value_attribute.set_value(
+        (std::string("//*[@cid='") + value_attribute.value() + "']").c_str());
+    }
+  }
+
+  static bool HandleSpreadsheetRepresentationCompositeDataSetIndex(xml_document& document)
+  {
+    auto xpath_set = document.select_nodes(
+      "//ServerManagerState/Proxy[@group='representations' and "
+      "@type='SpreadSheetRepresentation']/Property[@name='CompositeDataSetIndex']");
+    for (auto xpath_node : xpath_set)
+    {
+      // convert CompositeDataSetIndex to "BlockVisibilities".
+      auto node = xpath_node.node();
+      node.attribute("name").set_value("BlockVisibilities");
+      ConvertCompositeIdsToSelectors(node);
+    }
+
+    return true;
+  }
+};
+
 } // end of namespace
 
 vtkStandardNewMacro(vtkSMStateVersionController);
@@ -957,6 +992,13 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
     Process_5_8_to_5_9 converter;
     status = converter(document);
     version = vtkSMVersion(5, 9, 0);
+  }
+
+  if (status && (version < vtkSMVersion(5, 10, 0)))
+  {
+    Process_5_9_to_5_10 converter;
+    status = converter(document);
+    version = vtkSMVersion(5, 10, 0);
   }
 
   if (status)

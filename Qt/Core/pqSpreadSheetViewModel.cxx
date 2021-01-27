@@ -40,8 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkPVArrayInformation.h"
-#include "vtkPVCompositeDataInformation.h"
-#include "vtkPVCompositeDataInformationIterator.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSMCoreUtilities.h"
@@ -552,60 +550,6 @@ bool pqSpreadSheetViewModel::isDataValid(const QModelIndex& idx) const
 
   vtkSpreadSheetView* view = this->GetView();
   return view->IsDataValid(idx.row(), idx.column());
-}
-
-//-----------------------------------------------------------------------------
-void pqSpreadSheetViewModel::resetCompositeDataSetIndex()
-{
-  if (!this->activeRepresentation())
-  {
-    return;
-  }
-
-  vtkSMProxy* reprProxy = this->activeRepresentation()->getProxy();
-  int cur_index = vtkSMPropertyHelper(reprProxy, "CompositeDataSetIndex").GetAsInt();
-
-  pqOutputPort* input_port = this->activeRepresentation()->getOutputPortFromInput();
-  vtkSMSourceProxy* inputProxy =
-    vtkSMSourceProxy::SafeDownCast(input_port->getSource()->getProxy());
-  vtkSMSourceProxy* extractSelection = inputProxy->GetSelectionOutput(input_port->getPortNumber());
-  if (!extractSelection)
-  {
-    return;
-  }
-
-  vtkPVDataInformation* mbInfo = extractSelection->GetDataInformation();
-  if (!mbInfo || !mbInfo->GetCompositeDataClassName())
-  {
-    return;
-  }
-
-  vtkPVDataInformation* blockInfo = mbInfo->GetDataInformationForCompositeIndex(cur_index);
-  if (blockInfo && blockInfo->GetNumberOfPoints() > 0)
-  {
-    return;
-  }
-
-  // find first index with non-empty points.
-  vtkPVCompositeDataInformationIterator* iter = vtkPVCompositeDataInformationIterator::New();
-  iter->SetDataInformation(mbInfo);
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-  {
-    vtkPVDataInformation* curInfo = iter->GetCurrentDataInformation();
-    if (!curInfo || curInfo->GetCompositeDataClassName() != nullptr)
-    {
-      continue;
-    }
-    if (curInfo->GetDataSetType() != -1 && curInfo->GetNumberOfPoints() > 0)
-    {
-      cur_index = static_cast<int>(iter->GetCurrentFlatIndex());
-      break;
-    }
-  }
-  iter->Delete();
-
-  vtkSMPropertyHelper(reprProxy, "CompositeDataSetIndex").Set(cur_index);
-  reprProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

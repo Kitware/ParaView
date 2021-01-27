@@ -9176,31 +9176,46 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty clean_command="RemoveAllCompositeDataSetIndices"
-                         command="AddCompositeDataSetIndex"
-                         name="CompositeDataSetIndex"
-                         number_of_elements_per_command="1"
-                         number_of_elements="1"
-                         default_values="0"
-                         panel_visibility="default"
-                         repeat_command="1">
-        <CompositeTreeDomain mode="all" name="tree">
+
+      <StringVectorProperty name="Assembly"
+        command="SetActiveAssemblyForSelectors"
+        number_of_elements="1"
+        default_values="Hierarchy">
+        <DataAssemblyListDomain name="data_assembly">
           <RequiredProperties>
             <Property function="Input" name="Input" />
           </RequiredProperties>
-        </CompositeTreeDomain>
-        <Hints>
-          <WidgetHeight number_of_rows="20" />
-        </Hints>
+        </DataAssemblyListDomain>
         <Documentation>
-          In case of composite datasets, set the list of flat indices to
-          show in the spreadsheet view. If the input is not a composite dataset
-          the value is ignored. If nothing is selected for composite dataset, it
-          is same as selecting the root node i.e. all blocks in the dataset.
-          Note, then multiple blocks are being shown in the spreadsheet view,
-          partial arrays, if any are skipped.
+          Select which assembly is used when specify selectors
+          to choose blocks to show for composite datasets.
         </Documentation>
-      </IntVectorProperty>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="BlockSelectors"
+        command="AddSelector"
+        clean_command="ClearSelectors"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        panel_visibility="multiblock_inspector"
+        default_values="/">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify selectors to limit the view
+          to a chosen subset of blocks.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Blocks" panel_widget="DataAssemblyEditor">
+        <Property name="Assembly" function="ActiveAssembly" />
+        <Property name="BlockSelectors" function="Selectors" />
+      </PropertyGroup>
+
       <InputProperty command="SetInputConnection"
                      is_internal="1"
                      name="InternalInput1"
@@ -9208,9 +9223,6 @@
         <Documentation>Internal property. Please don't touch
         this.</Documentation>
       </InputProperty>
-      <Hints>
-        <InitializationHelper class="vtkSMSpreadSheetRepresentationInitializationHelper" />
-      </Hints>
       <!-- end of SpreadSheetRepresentation -->
     </SpreadSheetRepresentationProxy>
     <!-- =================================================================== -->

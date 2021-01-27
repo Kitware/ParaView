@@ -59,18 +59,26 @@ void vtkSpreadSheetRepresentation::SetFieldAssociation(int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkSpreadSheetRepresentation::AddCompositeDataSetIndex(unsigned int val)
+void vtkSpreadSheetRepresentation::AddSelector(const char* selector)
 {
-  this->DataConditioner->AddCompositeDataSetIndex(val);
-  this->ExtractedDataConditioner->AddCompositeDataSetIndex(val);
+  this->DataConditioner->AddSelector(selector);
+  this->ExtractedDataConditioner->AddSelector(selector);
   this->MarkModified();
 }
 
 //----------------------------------------------------------------------------
-void vtkSpreadSheetRepresentation::RemoveAllCompositeDataSetIndices()
+void vtkSpreadSheetRepresentation::ClearSelectors()
 {
-  this->DataConditioner->RemoveAllCompositeDataSetIndices();
-  this->ExtractedDataConditioner->RemoveAllCompositeDataSetIndices();
+  this->DataConditioner->ClearSelectors();
+  this->ExtractedDataConditioner->ClearSelectors();
+  this->MarkModified();
+}
+
+//----------------------------------------------------------------------------
+void vtkSpreadSheetRepresentation::SetActiveAssemblyForSelectors(const char* name)
+{
+  this->DataConditioner->SetActiveAssemblyForSelectors(name);
+  this->ExtractedDataConditioner->SetActiveAssemblyForSelectors(name);
   this->MarkModified();
 }
 

@@ -99,7 +99,6 @@ pqSpreadSheetView::pqSpreadSheetView(const QString& group, const QString& name,
     SLOT(onAddRepresentation(pqRepresentation*)));
   QObject::connect(this, SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)), this,
     SLOT(updateRepresentationVisibility(pqRepresentation*, bool)));
-  QObject::connect(this, SIGNAL(beginRender()), this, SLOT(onBeginRender()));
   QObject::connect(this, SIGNAL(endRender()), this, SLOT(onEndRender()));
 
   QObject::connect(&this->Internal->SelectionModel, SIGNAL(selection(vtkSMSourceProxy*)), this,
@@ -171,17 +170,6 @@ void pqSpreadSheetView::updateRepresentationVisibility(pqRepresentation* repr, b
   pqDataRepresentation* dataRepr = qobject_cast<pqDataRepresentation*>(repr);
   this->Internal->Model->setActiveRepresentation(dataRepr);
   Q_EMIT this->showing(dataRepr);
-}
-
-//-----------------------------------------------------------------------------
-void pqSpreadSheetView::onBeginRender()
-{
-  // If in "selection-only" mode, and showing composite dataset, we want to make
-  // sure that we are shown a block with non-empty cells/points (if possible).
-  if (vtkSMPropertyHelper(this->getProxy(), "SelectionOnly").GetAsInt() != 0)
-  {
-    this->Internal->Model->resetCompositeDataSetIndex();
-  }
 }
 
 //-----------------------------------------------------------------------------
