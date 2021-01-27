@@ -85,6 +85,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewResolutionPropertyWidget.h"
 #include "pqViewTypePropertyWidget.h"
 #include "pqYoungsMaterialPropertyWidget.h"
+#include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
 
@@ -105,8 +106,12 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
 {
   // handle properties that specify custom panel widgets
   const char* custom_widget = smProperty->GetPanelWidget();
-  if (!custom_widget)
+  if (custom_widget == nullptr)
   {
+    if (smProperty->FindDomain<vtkSMCompositeTreeDomain>() != nullptr)
+    {
+      return new pqDataAssemblyPropertyWidget(smProxy, smProperty, parentWidget);
+    }
     return nullptr;
   }
 

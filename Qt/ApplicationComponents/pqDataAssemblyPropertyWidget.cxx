@@ -32,12 +32,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataAssemblyPropertyWidget.h"
 #include "ui_pqDataAssemblyPropertyWidget.h"
 
+#include "pqComboBoxDomain.h"
 #include "pqCoreUtilities.h"
 #include "pqDataAssemblyTreeModel.h"
 #include "pqPropertyLinks.h"
+#include "pqSignalAdaptors.h"
 #include "pqTreeViewExpandState.h"
 #include "pqTreeViewSelectionHelper.h"
 #include "vtkCommand.h"
+#include "vtkDataAssemblyUtilities.h"
+#include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMDataAssemblyDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
@@ -106,12 +110,19 @@ private:
 /**
  * A quick way to support use of pqDataAssemblyPropertyWidget for single
  * properties or property groups. When single property, it's treated as a group
- * with just 1 property for function chosenPaths.
+ * with just 1 property for function Selectors.
  */
 vtkSmartPointer<vtkSMPropertyGroup> createGroup(vtkSMProperty* property)
 {
   vtkNew<vtkSMPropertyGroup> group;
-  group->AddProperty("chosenPaths", property);
+  if (property->FindDomain<vtkSMDataAssemblyDomain>())
+  {
+    group->AddProperty("Selectors", property);
+  }
+  else if (property->FindDomain<vtkSMCompositeTreeDomain>())
+  {
+    group->AddProperty("CompositeIndices", property);
+  }
   return group;
 }
 }
@@ -122,8 +133,14 @@ public:
   Ui::DataAssemblyPropertyWidget Ui;
   QPointer<pqDataAssemblyTreeModel> AssemblyTreeModel;
   QPointer<QStringListModel> StringListModel;
-  QStringList ChosenPaths;
+  QStringList Selectors;
+  std::vector<unsigned int> CompositeIndices;
   bool BlockUpdates = false;
+
+  bool InCompositeIndicesMode = false;
+  bool LeafNodesOnly = false;
+
+  vtkDataAssembly* assembly() const { return this->AssemblyTreeModel->dataAssembly(); }
 };
 
 //-----------------------------------------------------------------------------
@@ -154,14 +171,14 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
   auto sortmodel = new QSortFilterProxyModel(this);
   sortmodel->setSourceModel(dapmodel);
   sortmodel->setRecursiveFilteringEnabled(true);
-  internals.Ui.tree->setModel(sortmodel);
+  internals.Ui.hierarchy->setModel(sortmodel);
 
   internals.StringListModel = new QStringListModel(this);
   internals.Ui.table->setModel(internals.StringListModel);
 
   // change pqTreeView header.
-  internals.Ui.tree->setupCustomHeader(/*use_pqHeaderView=*/true);
-  new pqTreeViewSelectionHelper(internals.Ui.tree);
+  internals.Ui.hierarchy->setupCustomHeader(/*use_pqHeaderView=*/true);
+  new pqTreeViewSelectionHelper(internals.Ui.hierarchy);
 
   // hookup add button
   QObject::connect(internals.Ui.add, &QAbstractButton::clicked, [this](bool) {
@@ -203,7 +220,7 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
     iinternals.StringListModel->setStringList(QStringList());
   });
 
-  if (auto smproperty = smgroup->GetProperty("chosenPaths"))
+  if (auto smproperty = smgroup->GetProperty("Selectors"))
   {
     internals.AssemblyTreeModel->setUserCheckable(true);
 
@@ -231,11 +248,52 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
         domain, vtkCommand::DomainModifiedEvent, this, SLOT(updateDataAssembly(vtkObject*)));
       this->updateDataAssembly(domain);
     }
-    this->addPropertyLink(this, "chosenPaths", SIGNAL(chosenPathsChanged()), smproperty);
+    this->addPropertyLink(this, "selectors", SIGNAL(selectorsChanged()), smproperty);
+  }
+  else if (smproperty = smgroup->GetProperty("CompositeIndices"))
+  {
+    internals.InCompositeIndicesMode = true;
+
+    internals.AssemblyTreeModel->setUserCheckable(true);
+
+    // hide the tab bar since we don't show the list of strings for in this mode.
+    internals.Ui.tabWidget->tabBar()->hide();
+
+    // monitor AssemblyTreeModel data changes.
+    QObject::connect(internals.AssemblyTreeModel.data(), &pqDataAssemblyTreeModel::modelDataChanged,
+      this, &pqDataAssemblyPropertyWidget::assemblyTreeModified);
+
+    // observe the property's domain to update the hierarchy when it changes.
+    auto domain = smproperty->FindDomain<vtkSMCompositeTreeDomain>();
+    if (!domain)
+    {
+      qWarning("Missing vtkSMCompositeTreeDomain domain.");
+    }
+    else
+    {
+      // indicates if we should only returns composite indices for leaf nodes.
+      internals.LeafNodesOnly == (domain->GetMode() == vtkSMCompositeTreeDomain::LEAVES);
+
+      pqCoreUtilities::connect(
+        domain, vtkCommand::DomainModifiedEvent, this, SLOT(updateDataAssembly(vtkObject*)));
+      this->updateDataAssembly(domain);
+    }
+    this->addPropertyLink(this, "compositeIndices", SIGNAL(compositeIndicesChanged()), smproperty);
   }
   else
   {
     internals.AssemblyTreeModel->setUserCheckable(false);
+  }
+
+  if (auto smproperty = smgroup->GetProperty("ActiveAssembly"))
+  {
+    auto adaptor = new pqSignalAdaptorComboBox(internals.Ui.assemblyCombo);
+    new pqComboBoxDomain(internals.Ui.assemblyCombo, smproperty);
+    this->addPropertyLink(adaptor, "currentText", SIGNAL(currentTextChanged(QString)), smproperty);
+  }
+  else
+  {
+    internals.Ui.assemblyCombo->hide();
   }
 }
 
@@ -251,12 +309,32 @@ void pqDataAssemblyPropertyWidget::assemblyTreeModified(int role)
     return;
   }
 
-  if (role == Qt::CheckStateRole)
+  if (role != Qt::CheckStateRole)
   {
-    QScopedValueRollback<bool> rollback(internals.BlockUpdates, true);
-    internals.ChosenPaths = internals.AssemblyTreeModel->checkedNodes();
-    internals.StringListModel->setStringList(internals.ChosenPaths);
-    Q_EMIT this->chosenPathsChanged();
+    return;
+  }
+
+  QScopedValueRollback<bool> rollback(internals.BlockUpdates, true);
+  internals.Selectors = internals.AssemblyTreeModel->checkedNodes();
+  internals.StringListModel->setStringList(internals.Selectors);
+  Q_EMIT this->selectorsChanged();
+
+  if (internals.InCompositeIndicesMode)
+  {
+    // compute composite indices.
+    if (auto assembly = internals.assembly())
+    {
+      std::vector<std::string> selectors(internals.Selectors.size());
+      std::transform(internals.Selectors.begin(), internals.Selectors.end(), selectors.begin(),
+        [](const QString& str) { return str.toStdString(); });
+      internals.CompositeIndices = vtkDataAssemblyUtilities::GenerateCompositeIndicesFromSelectors(
+        assembly, selectors, internals.LeafNodesOnly);
+    }
+    else
+    {
+      internals.CompositeIndices.clear();
+    }
+    Q_EMIT this->compositeIndicesChanged();
   }
 }
 
@@ -269,61 +347,96 @@ void pqDataAssemblyPropertyWidget::stringListModified()
     return;
   }
   QScopedValueRollback<bool> rollback(internals.BlockUpdates, true);
-  internals.ChosenPaths = internals.StringListModel->stringList();
-  internals.AssemblyTreeModel->setCheckedNodes(internals.ChosenPaths);
-  Q_EMIT this->chosenPathsChanged();
+  internals.Selectors = internals.StringListModel->stringList();
+  internals.AssemblyTreeModel->setCheckedNodes(internals.Selectors);
+  Q_EMIT this->selectorsChanged();
 }
 
 //-----------------------------------------------------------------------------
 void pqDataAssemblyPropertyWidget::updateDataAssembly(vtkObject* sender)
 {
+  vtkDataAssembly* assembly = nullptr;
+  const char* name = "(?)";
   if (auto domain = vtkSMDataAssemblyDomain::SafeDownCast(sender))
   {
-    auto& internals = (*this->Internals);
-    pqTreeViewExpandState helper;
-    helper.save(internals.Ui.tree);
-    internals.AssemblyTreeModel->setDataAssembly(domain->GetDataAssembly());
-    internals.AssemblyTreeModel->setCheckedNodes(internals.ChosenPaths);
-    internals.Ui.tree->setRootIndex(internals.Ui.tree->model()->index(0, 0));
-    internals.Ui.tree->expandToDepth(2);
-    helper.restore(internals.Ui.tree);
+    assembly = domain->GetDataAssembly();
+    name = domain->GetDataAssemblyName();
   }
+  else if (auto cdomain = vtkSMCompositeTreeDomain::SafeDownCast(sender))
+  {
+    assembly = cdomain->GetHierarchy();
+    name = "Hierarchy";
+  }
+  auto& internals = (*this->Internals);
+  pqTreeViewExpandState helper;
+  helper.save(internals.Ui.hierarchy);
+  internals.AssemblyTreeModel->setDataAssembly(assembly);
+  internals.AssemblyTreeModel->setCheckedNodes(internals.Selectors);
+  internals.Ui.tabWidget->setTabText(0, name);
+  internals.Ui.hierarchy->setRootIndex(internals.Ui.hierarchy->model()->index(0, 0));
+  internals.Ui.hierarchy->expandToDepth(2);
+  helper.restore(internals.Ui.hierarchy);
 }
 
 //-----------------------------------------------------------------------------
-void pqDataAssemblyPropertyWidget::setChosenPaths(const QStringList& paths)
+void pqDataAssemblyPropertyWidget::setSelectors(const QStringList& paths)
 {
   auto& internals = (*this->Internals);
-  internals.ChosenPaths = paths;
+  internals.Selectors = paths;
 
   QScopedValueRollback<bool> rollback(internals.BlockUpdates, true);
   internals.AssemblyTreeModel->setCheckedNodes(paths);
   internals.StringListModel->setStringList(paths);
-  Q_EMIT this->chosenPathsChanged();
+  Q_EMIT this->selectorsChanged();
 }
 
 //-----------------------------------------------------------------------------
-const QStringList& pqDataAssemblyPropertyWidget::chosenPaths() const
+const QStringList& pqDataAssemblyPropertyWidget::selectors() const
 {
   auto& internals = (*this->Internals);
-  return internals.ChosenPaths;
+  return internals.Selectors;
 }
 
 //-----------------------------------------------------------------------------
-void pqDataAssemblyPropertyWidget::setChosenPaths(const QList<QVariant>& paths)
+void pqDataAssemblyPropertyWidget::setSelectors(const QList<QVariant>& paths)
 {
   QStringList string_paths;
   std::transform(paths.begin(), paths.end(), std::back_inserter(string_paths),
     [](const QVariant& value) { return value.toString(); });
-  this->setChosenPaths(string_paths);
+  this->setSelectors(string_paths);
 }
 
 //-----------------------------------------------------------------------------
-QList<QVariant> pqDataAssemblyPropertyWidget::chosenPathsAsVariantList() const
+QList<QVariant> pqDataAssemblyPropertyWidget::selectorsAsVariantList() const
 {
   QList<QVariant> variant_paths;
-  const auto& string_paths = this->chosenPaths();
+  const auto& string_paths = this->selectors();
   std::transform(string_paths.begin(), string_paths.end(), std::back_inserter(variant_paths),
     [](const QString& value) { return QVariant(value); });
   return variant_paths;
+}
+
+//-----------------------------------------------------------------------------
+void pqDataAssemblyPropertyWidget::setCompositeIndices(const QList<QVariant>& values)
+{
+  std::vector<unsigned int> indices(values.size());
+  std::transform(values.begin(), values.end(), indices.begin(),
+    [](const QVariant& var) { return var.value<unsigned int>(); });
+
+  auto& internals = (*this->Internals);
+  internals.CompositeIndices = indices;
+  // TODO:
+  Q_EMIT this->compositeIndicesChanged();
+}
+
+//-----------------------------------------------------------------------------
+QList<QVariant> pqDataAssemblyPropertyWidget::compositeIndicesAsVariantList() const
+{
+  const auto& internals = (*this->Internals);
+  QList<QVariant> result;
+  for (const auto& item : internals.CompositeIndices)
+  {
+    result.push_back(item);
+  }
+  return result;
 }

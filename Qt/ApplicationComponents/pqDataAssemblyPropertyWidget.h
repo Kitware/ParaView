@@ -46,14 +46,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * support getting/setting the list of chosen paths based on the
  * vtkDataAssembly. In the future, we will add support for additional properties
  * such as color, opacity etc.
+ *
+ * This widget is primarily intended for vtkSMDataAssemblyDomain. However, to
+ * support legacy code that uses vtkSMCompositeTreeDomain, we add ability to
+ * this widget to support that use-case as well. Thus,
+ * pqDataAssemblyPropertyWidget replaces `pqCompositeTreePropertyWidget` until
+ * we fully deprecate using composite-indices for subsetting of composite
+ * datasets.
  */
 class vtkObject;
 class PQAPPLICATIONCOMPONENTS_EXPORT pqDataAssemblyPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
   typedef pqPropertyWidget Superclass;
-  Q_PROPERTY(QList<QVariant> chosenPaths READ chosenPathsAsVariantList WRITE setChosenPaths NOTIFY
-      chosenPathsChanged);
+  Q_PROPERTY(QList<QVariant> selectors READ selectorsAsVariantList WRITE setSelectors NOTIFY
+      selectorsChanged);
+  Q_PROPERTY(QList<QVariant> compositeIndices READ compositeIndicesAsVariantList WRITE
+      setCompositeIndices NOTIFY compositeIndicesChanged);
 
 public:
   pqDataAssemblyPropertyWidget(
@@ -66,14 +75,23 @@ public:
   /**
    * API for getting/setting selected/chosen path strings.
    */
-  void setChosenPaths(const QStringList& paths);
-  const QStringList& chosenPaths() const;
-  void setChosenPaths(const QList<QVariant>& paths);
-  QList<QVariant> chosenPathsAsVariantList() const;
+  void setSelectors(const QStringList& paths);
+  const QStringList& selectors() const;
+  void setSelectors(const QList<QVariant>& paths);
+  QList<QVariant> selectorsAsVariantList() const;
+  //@}
+
+  //@{
+  /**
+   * API for getting/settings composite indices.
+   */
+  void setCompositeIndices(const QList<QVariant>& values);
+  QList<QVariant> compositeIndicesAsVariantList() const;
   //@}
 
 Q_SIGNALS:
-  void chosenPathsChanged();
+  void selectorsChanged();
+  void compositeIndicesChanged();
 
 private Q_SLOTS:
   void updateDataAssembly(vtkObject* sender);

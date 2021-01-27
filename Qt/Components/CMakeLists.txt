@@ -57,7 +57,6 @@ set(classes
   pqComponentsTestUtility
   pqCompositeDataInformationTreeModel
   pqCompositePropertyWidgetDecorator
-  pqCompositeTreePropertyWidget
   pqContextMenuInterface
   pqCustomFilterDefinitionModel
   pqCustomFilterDefinitionWizard

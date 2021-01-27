@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>253</width>
-    <height>209</height>
+    <width>271</width>
+    <height>301</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,7 +36,7 @@
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>Assembly</string>
+       <string>Hierarchy</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <property name="leftMargin">
@@ -52,12 +52,15 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="pqTreeView" name="tree">
-         <property name="uniformRowHeights">
+        <widget class="pqTreeView" name="hierarchy">
+         <property name="alternatingRowColors">
           <bool>true</bool>
          </property>
-         <property name="headerHidden">
+         <property name="rootIsDecorated">
           <bool>false</bool>
+         </property>
+         <property name="uniformRowHeights">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -172,6 +175,13 @@
        </item>
       </layout>
      </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="assemblyCombo">
+     <property name="toolTip">
+      <string>Select active assembly to use.</string>
+     </property>
     </widget>
    </item>
   </layout>
