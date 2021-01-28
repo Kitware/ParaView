@@ -1,0 +1,7 @@
+NAME
+  ComplexModuleArchitecture::Filters
+DEPENDS
+  VTK::FiltersCore
+PRIVATE_DEPENDS
+  ComplexPluginArchitecture::Shared
+  ComplexModuleArchitecture::Core
