@@ -1,5 +1,9 @@
 set(classes
-  vtkPVZSpaceView)
+  vtkPVZSpaceView
+  vtkZSpaceRayActor
+  vtkZSpaceSDKManager
+  vtkZSpaceInteractorStyle
+  vtkZSpaceCamera)
 
 vtk_module_find_package(
   PACKAGE zSpace)

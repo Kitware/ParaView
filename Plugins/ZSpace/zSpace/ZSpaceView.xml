@@ -13,6 +13,9 @@
       and angle-awareness sensor. This view is designed to work on full screen
       (or in a cave display). This plugin only works on Windows as the zSpace
       SDK is only available on this OS.
+      The stylus is used to interact with the scene :
+      The middle button allows to position an actor, the right button performs an hardware
+      picking to inspect the data, and the left button initiate a clip on the data.
     </Documentation>
 
     <DoubleVectorProperty command="SetInterPupillaryDistance"
@@ -28,6 +31,45 @@
         An IPD of zero disables stereo since the eyes are at the same location.
       </Documentation>
     </DoubleVectorProperty>
+
+    <IntVectorProperty command="SetDrawStylus"
+                       default_values="1"
+                       name="DrawStylus"
+                       panel_visibility="advanced"
+                       number_of_elements="1">
+      <BooleanDomain name="bool" />
+      <Documentation>Set the visibility of the stylus ray.</Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty command="SetInteractivePicking"
+                       default_values="1"
+                       name="InteractivePicking"
+                       panel_visibility="advanced"
+                       number_of_elements="1">
+      <BooleanDomain name="bool" />
+      <Documentation>Set whether the picking of actor is done in real time or not.</Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+      name="PickingFieldAssociation"
+      command="SetPickingFieldAssociation"
+      number_of_elements="1"
+      default_values="1"
+      label="Picking Field Association"
+      panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry value="1" text="Select Cells"/>
+          <Entry value="0" text="Select Points"/>
+        </EnumerationDomain>
+        <Documentation>Choose whether the ray is used to pick cells, or points.
+        </Documentation>
+    </IntVectorProperty>
+
+    <Property name="ResetUserTransforms"
+              command="ResetAllUserTransforms"
+              panel_visibility="advanced">
+      <Documentation></Documentation>
+    </Property>
 
     </RenderViewProxy>
   </ProxyGroup>
