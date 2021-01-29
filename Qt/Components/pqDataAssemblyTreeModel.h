@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsModule.h" // for exports
 #include <QAbstractItemModel>
+#include <QPair>          // for QPair
 #include <QScopedPointer> // for QScopedPointer.
 
 class vtkDataAssembly;
@@ -45,8 +46,12 @@ class vtkDataAssembly;
  * pqDataAssemblyTreeModel builds a tree-model from a vtkDataAssembly.
  * The vtkDataAssembly to shown is set using `setDataAssembly`.
  * To allow user-settable check-states, use `setUserCheckable(true)`.
- * The model doesn't support any additional custom properties. One is expected
- * to use a proxy model to store additional meta-data associated with nodes.
+ *
+ * One can store additional data associated with nodes using custom roles
+ * (`Qt::UserRole`). For custom roles, one can define how a value for that
+ * specific role get inherited by child nodes or overridden when set on a parent
+ * node. This is done using `setRoleProperty`.
+ *
  */
 class PQCOMPONENTS_EXPORT pqDataAssemblyTreeModel : public QAbstractItemModel
 {
@@ -85,6 +90,11 @@ public:
    * Get/Set the check state for Qt::Checked for nodes selected using the path
    * names specified.
    *
+   * `setCheckedNodes` has effect as `setData(.., Qt::CheckStateRole)`, only differing
+   * in how the values are specified. For `setCheckedNodes`, one only lists the
+   * selectors for checked nodes, while `setData` accept pairs where the first
+   * value is the selector while the second value is the check state.
+   *
    * @note checking a node causes all it child nodes to be checked as well.
    * @note `checkedNodes()` may not returns exactly the same paths passed to
    *       `setCheckedNodes` even if the check-states were not changed in
@@ -94,6 +104,60 @@ public:
    */
   void setCheckedNodes(const QStringList& paths);
   QStringList checkedNodes() const;
+  //@}
+
+  /**
+   * For custom roles, use this function to convert that role into a role that
+   * can be used in `data()` to get a boolean indicating if the value is derived
+   * or explicitly set.
+   */
+  static int GetIsDerivedRole(int role) { return -role; }
+
+  /**
+   * Supported role properties. `Standard` implies no special handling i.e. the
+   * role does not affect the value of the value for child nodes in the
+   * hierarchy. `Inherited` means for any node, if a value for this role is not
+   * explicitly specified, then it is inherited from its parent node. Likewise,
+   * if one sets a explicitly on a node (using `setData`), the it overrides
+   * values for this role on all children recursively.
+   * `InheritedUntilOverridden` is similar to `Inherited` except that the
+   * recursion down the subtree stops when a child node with an explicitly set
+   * value is encountered.
+   */
+  enum RoleProperties
+  {
+    Standard,
+    Inherited,
+    InheritedUntilOverridden,
+  };
+
+  //@{
+  /**
+   * Set properties for custom roles. If none specified, Standard is assumed.
+   * For `Qt::CheckStateRole`, it is initialized to `Inherited`.
+   */
+  void setRoleProperty(int role, RoleProperties property);
+  RoleProperties roleProperty(int role) const;
+  //@}
+
+  //@{
+  /**
+   * Get/Set the values for a specific role using selectors. The values are
+   * specified as a list of pairs which pair comprising of a selector and the
+   * associated value for that selector. This model is not capable of generating
+   * advanced selectors, so `data()` will simply return paths as selectors.
+   * `setData` can use any for for selector specification supported by the
+   * underlying `vtkDataAssembly`.
+   *
+   * This model does not cache set values. When `setData` is called, nodes
+   * matching the selectors are immediately located and updated. Hence, if this
+   * method is called before any assembly is set, the values will be lost. In
+   * this case, `setData` will return false.
+   *
+   * @sa vtkDataAssembly::SelectNodes
+   */
+  bool setData(const QList<QPair<QString, QVariant> >& values, int role);
+  QList<QPair<QString, QVariant> > data(int role) const;
   //@}
 
   //@{
