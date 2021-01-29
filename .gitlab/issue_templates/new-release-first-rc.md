@@ -124,11 +124,13 @@ git gitlab-push -f
     - [ ] Change directory to ParaView Superbuild source. Stay on the `update-to-v@VERSION@@RC@` branch.
     - [ ] `git config -f .gitmodules submodule.superbuild.branch paraview/release`
     - [ ] `git commit -m "release: follow common-superbuild's paraview/release branch" .gitmodules`
+    - [ ] Update `.gitlab/ci/cdash-groups.json` to track the `release` CDash groups
     - [ ] Merge new `release` branch into `master` using `-s ours`
       - `git checkout master`
       - `git merge --no-ff -s ours -m "Merge branch 'release'" update-to-v@VERSION@@RC@`
     - [ ] `git push origin update-to-v@VERSION@@RC@:release`
     - [ ] Update kwrobot with the new `release` branch rules
+    - [ ] Run [this script][cdash-update-groups] to update the CDash groups (must be done after a nightly run to ensure all builds are in the `release` group).
 
 # Sign macOS binaries
 
