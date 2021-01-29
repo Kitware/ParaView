@@ -536,7 +536,7 @@ vtkSMProxy* vtkCPPythonScriptV2Helper::GetTrivialProducer(const char* inputname)
   controller->InitializeProxy(producer);
   if (auto tp = vtkPVTrivialProducer::SafeDownCast(producer->GetClientSideObject()))
   {
-    tp->SetOutput(ipdesc->GetGrid());
+    tp->SetOutput(ipdesc->GetGrid(), this->DataDescription->GetTime());
     tp->SetWholeExtent(ipdesc->GetWholeExtent());
   }
   producer->UpdateVTKObjects();
