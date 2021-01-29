@@ -52,8 +52,17 @@ void pqImageTip::showTip(const QPixmap& image, const QPoint& pos)
 {
   static pqImageTip* instance = 0;
 
-  if (instance && instance->isVisible() && instance->pixmap() &&
-    instance->pixmap()->cacheKey() == image.cacheKey())
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+  QPixmap* pixmap = instance ? instance->pixmap() : nullptr;
+  bool pixmapIsNull = pixmap == nullptr;
+  qint64 pixmapCacheKey = pixmap ? pixmap->cacheKey() : 0;
+#else
+  QPixmap pixmap = instance ? instance->pixmap(Qt::ReturnByValue) : QPixmap();
+  bool pixmapIsNull = pixmap.isNull();
+  qint64 pixmapCacheKey = pixmap.cacheKey();
+#endif
+
+  if (instance && instance->isVisible() && !pixmapIsNull && pixmapCacheKey == image.cacheKey())
     return;
 
   QToolTip::showText(QPoint(), "");
