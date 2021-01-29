@@ -22,6 +22,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 
+#include <cstring>
 #include <fstream>
 #include <signal.h>
 #include <stdio.h>
