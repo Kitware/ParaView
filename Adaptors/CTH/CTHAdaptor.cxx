@@ -91,7 +91,7 @@ void pvspy_fil(char* filename, int len, char* /*runid*/, int* /*error*/)
       if (tok && strstr(tok, "*paraview"))
       {
         script = strtok(0, " ");
-        len = strlen(script) + 1;
+        len = static_cast<int>(strlen(script) + 1);
         break;
       }
     }
