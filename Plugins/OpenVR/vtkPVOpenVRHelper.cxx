@@ -101,6 +101,7 @@
 #include "pqOpenVRControls.h"
 #include "pqPipelineSource.h"
 
+#include <cmath>
 #include <sstream>
 
 #include <QCoreApplication>

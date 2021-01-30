@@ -67,6 +67,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/timer.h"
 
 #include <algorithm>
+#include <cmath>
 #include <numeric>
 #include <random>
 #include <thread>

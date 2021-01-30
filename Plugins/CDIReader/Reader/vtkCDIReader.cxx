@@ -61,6 +61,7 @@
 #include "cdi.h"
 #include "vtk_netcdf.h"
 
+#include <cmath>
 #include <sstream>
 
 using namespace std;

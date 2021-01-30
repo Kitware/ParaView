@@ -28,6 +28,7 @@
 #include "nlohmann/json.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <sstream>
 
 using json = nlohmann::json;

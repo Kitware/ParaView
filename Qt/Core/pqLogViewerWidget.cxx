@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 
 #include <cassert>
+#include <cmath>
 
 //-----------------------------------------------------------------------------
 const int RAW_DATA_ROLE = Qt::UserRole + 1;

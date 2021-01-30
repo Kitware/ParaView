@@ -59,6 +59,7 @@ using Ui::pqMemoryInspectorPanelForm;
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
 
+#include <cmath>
 #include <map>
 using std::map;
 using std::pair;

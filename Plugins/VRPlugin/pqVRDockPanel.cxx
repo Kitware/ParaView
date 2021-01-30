@@ -72,6 +72,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtksys/FStream.hxx>
 
+#include <cmath>
+
 class pqVRDockPanel::pqInternals : public Ui::VRDockPanel
 {
 public:

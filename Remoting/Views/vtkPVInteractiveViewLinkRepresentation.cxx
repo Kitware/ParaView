@@ -17,6 +17,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkRenderer.h"
 
+#include <cmath>
+
 vtkStandardNewMacro(vtkPVInteractiveViewLinkRepresentation);
 
 //----------------------------------------------------------------------------

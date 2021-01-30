@@ -35,6 +35,8 @@
 #include "vtkTextProperty.h"
 #include "vtkXYChartRepresentation.h"
 
+#include <cmath>
+
 bool vtkPVXYChartView::IgnoreNegativeLogAxisWarning = false;
 
 class vtkPVXYChartView::vtkInternals
