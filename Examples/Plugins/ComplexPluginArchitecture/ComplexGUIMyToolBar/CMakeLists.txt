@@ -12,9 +12,9 @@ list(APPEND interfaces
 list(APPEND sources
   ${toolbar_sources})
 
-paraview_add_plugin(GUIMyToolBar
+paraview_add_plugin(ComplexGUIMyToolBar
   VERSION "1.0"
   UI_INTERFACES ${interfaces}
   SOURCES ${sources})
 
-target_link_libraries(GUIMyToolBar PRIVATE ComplexPluginArchitecture::Shared)
+target_link_libraries(ComplexGUIMyToolBar PRIVATE ComplexPluginArchitecture::Shared)
