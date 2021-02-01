@@ -91,10 +91,13 @@ void vtkSMMaterialLibraryProxy::Synchronize()
     vtkClientServerStream res = this->GetLastResult(vtkPVSession::RENDER_SERVER_ROOT);
     std::string resbuf = "";
     res.GetArgument(0, 0, &resbuf);
-    vtkClientServerStream stream2;
-    stream2 << vtkClientServerStream::Invoke << VTKOBJECT(this) << "ReadBuffer" << resbuf
-            << vtkClientServerStream::End;
-    this->ExecuteStream(stream2, false, vtkProcessModule::CLIENT);
+    if (!resbuf.empty())
+    {
+      vtkClientServerStream stream2;
+      stream2 << vtkClientServerStream::Invoke << VTKOBJECT(this) << "ReadBuffer" << resbuf
+              << vtkClientServerStream::End;
+      this->ExecuteStream(stream2, false, vtkProcessModule::CLIENT);
+    }
   }
 
   vtkOSPRayMaterialLibrary* ml = vtkOSPRayMaterialLibrary::SafeDownCast(
