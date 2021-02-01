@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 
 #include <algorithm>
+#include <cmath>
 #include <sstream>
 
 // ----------------------------------------------------------------------------

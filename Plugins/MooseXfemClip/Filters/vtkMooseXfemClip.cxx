@@ -31,6 +31,8 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
 
+#include <cmath>
+
 vtkStandardNewMacro(vtkMooseXfemClip);
 
 //----------------------------------------------------------------------------

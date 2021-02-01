@@ -21,6 +21,8 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
 
+#include <cmath>
+
 vtkStandardNewMacro(vtkSMExtentDomain);
 
 //---------------------------------------------------------------------------

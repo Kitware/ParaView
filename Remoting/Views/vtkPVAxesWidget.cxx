@@ -29,6 +29,8 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
+#include <cmath>
+
 vtkStandardNewMacro(vtkPVAxesWidget);
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);

@@ -39,6 +39,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkTransform.h"
 #include "vtkZSpaceRayActor.h"
 
+#include <cmath>
 #include <sstream>
 
 vtkStandardNewMacro(vtkZSpaceInteractorStyle);

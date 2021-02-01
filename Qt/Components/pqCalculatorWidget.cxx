@@ -45,6 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QRegularExpression>
 #include <QtDebug>
 
+#include <cmath>
+
 class pqCalculatorWidget::pqInternals : public Ui::CalculatorWidget
 {
 public:

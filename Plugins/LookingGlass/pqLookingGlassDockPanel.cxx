@@ -45,6 +45,8 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkTextureObject.h"
 
+#include <cmath>
+
 namespace
 {
 

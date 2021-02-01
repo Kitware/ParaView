@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMDoubleRangeDomain.h>
 #include <vtkSMDoubleVectorProperty.h>
 
+#include <cmath>
+
 ///////////////////////////////////////////////////////////////////////////
 // pqSampleScalarWidget::pqImplementation
 

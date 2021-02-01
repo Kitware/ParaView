@@ -22,6 +22,7 @@
 #include "vtkStdString.h"
 #include "vtkStringList.h"
 
+#include <cmath>
 #include <vector>
 
 vtkStandardNewMacro(vtkSMStringListDomain);

@@ -19,6 +19,8 @@
 #include "vtkParametricSpline.h"
 #include "vtkPoints.h"
 
+#include <cmath>
+
 vtkStandardNewMacro(vtkCameraInterpolator2);
 //----------------------------------------------------------------------------
 vtkCameraInterpolator2::vtkCameraInterpolator2()

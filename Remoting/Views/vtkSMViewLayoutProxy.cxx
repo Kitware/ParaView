@@ -41,6 +41,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <queue>
 
 class vtkSMViewLayoutProxy::vtkInternals
