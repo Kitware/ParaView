@@ -4467,12 +4467,6 @@
                       panel_visibility="advanced" />
             <Property name="NonlinearSubdivisionLevel"
                       panel_visibility="advanced" />
-            <Property name="BlockVisibility"
-                      panel_visibility="never" />
-            <Property name="BlockColor"
-                      panel_visibility="never" />
-            <Property name="BlockOpacity"
-                      panel_visibility="never" />
             <Property name="BlockColorsDistinctValues"
                       panel_visibility="advanced" />
             <Property name="UseDataPartitions"
@@ -4485,6 +4479,18 @@
             <Property name="OSPRayScaleArray" />
             <Property name="OSPRayScaleFunction" />
             <Property name="OSPRayMaterial" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Blocks"
+                         panel_widget="DataAssemblyEditor"
+                         panel_visibility="multiblock_inspector">
+            <!--
+               place holder for future work
+               <Property name="Assembly"       function="ActiveAssembly" />
+            -->
+            <Property name="BlockSelectors" function="Selectors" />
+            <Property name="BlockColors"    function="Colors" />
+            <Property name="BlockOpacities" function="Opacities" />
           </PropertyGroup>
 
         </ExposedProperties>
@@ -12547,38 +12553,90 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <IntVectorProperty name="BlockVisibility"
-                         command="SetBlockVisibility"
-                         clean_command="RemoveBlockVisibilities"
-                         number_of_elements_per_command="2"
-                         repeatable="1">
+
+      <StringVectorProperty name="Assembly"
+        command="SetActiveAssembly"
+        number_of_elements="1"
+        default_values="Hierarchy"
+        panel_visibility="multiblock_inspector">
+        <DataAssemblyListDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </DataAssemblyListDomain>
         <Documentation>
-          Set the visibility for blocks. In Python, assign the value from an interleaved
-          list of block indices and visibilities, e.g., [index1, visibility1, index2, visibility2, ...].
-          The list does not need to contain all block indices.
+          Select which assembly is used when specify selectors
+          to choose block visibilities, block colors, etc. for composite datasets.
         </Documentation>
-      </IntVectorProperty>
-      <DoubleMapProperty name="BlockColor"
-                         command="SetBlockColor"
-                         clean_command="RemoveBlockColors"
-                         number_of_components="3"
-                         repeatable="1">
+      </StringVectorProperty>
+
+      <StringVectorProperty name="BlockSelectors"
+        command="AddBlockSelector"
+        clean_command="RemoveAllBlockSelectors"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        panel_visibility="multiblock_inspector"
+        number_of_elements="1"
+        default_values="/">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
         <Documentation>
-          Set the colors for blocks.
-          In Python, assign the value from a dictionary of the form
-          {index1:, [r1, g1, b1], index2: [r2, g2, b2], ...}.
+          For composite datasets, specify selectors to limit the view
+          to a chosen subset of blocks.
         </Documentation>
-      </DoubleMapProperty>
-      <DoubleMapProperty name="BlockOpacity"
-                         command="SetBlockOpacity"
-                         clean_command="RemoveBlockOpacities"
-                         number_of_components="1"
-                         repeatable="1">
+      </StringVectorProperty>
+
+      <StringVectorProperty name="BlockColors"
+                            command="SetBlockColor"
+                            clean_command="RemoveAllBlockColors"
+                            element_types="2 1 1 1"
+                            number_of_elements_per_command="4"
+                            repeat_command="1"
+                            panel_visibility="multiblock_inspector">
+         <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
         <Documentation>
-          Set the opacity for blocks.
-          In Python, assign the value from a dictionary of the form {index1:, [a1], index2: [a2], ...}.
+          For composite datasets, specify colors associated with selectors
+          on the assembly chosen using **Assembly**.
         </Documentation>
-      </DoubleMapProperty>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="BlockOpacities"
+                            command="SetBlockOpacity"
+                            clean_command="RemoveAllBlockOpacities"
+                            element_types="2 1"
+                            number_of_elements_per_command="2"
+                            repeat_command="1"
+                            panel_visibility="multiblock_inspector">
+         <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify opacities associated with selectors
+          on the assembly chosen using **Assembly**.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Blocks"
+                     panel_widget="DataAssemblyEditor"
+                     panel_visibility="multiblock_inspector">
+        <Property name="Assembly"       function="ActiveAssembly" />
+        <Property name="BlockSelectors" function="Selectors" />
+        <Property name="BlockColors"    function="Colors" />
+        <Property name="BlockOpacities" function="Opacities" />
+      </PropertyGroup>
+
       <IntVectorProperty command="SetBlockColorsDistinctValues"
                          default_values="7"
                          name="BlockColorsDistinctValues"

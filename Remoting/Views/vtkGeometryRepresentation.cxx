@@ -20,12 +20,15 @@
 #include "vtkCallbackCommand.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataDisplayAttributes.h"
-#include "vtkCompositeDataIterator.h"
 #include "vtkCompositePolyDataMapper2.h"
+#include "vtkDataAssembly.h"
+#include "vtkDataAssemblyUtilities.h"
 #include "vtkDataObjectTreeIterator.h"
+#include "vtkDataObjectTreeRange.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkIntArray.h"
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 #include "vtkMultiBlockDataSet.h"
@@ -130,9 +133,13 @@ protected:
     auto clone = vtkSmartPointer<vtkDataObject>::Take(inputDO->NewInstance());
     clone->ShallowCopy(inputDO);
     outputMB->SetBlock(0, clone);
-
     this->SetArrays(vtkDataSet::SafeDownCast(clone), normalsName, tcoordsName, tangentsName);
+    // if we created a MB out of a non-composite dataset, we add this array to
+    // make it possible for `PopulateBlockAttributes` to be aware of that.
 
+    vtkNew<vtkIntArray> marker;
+    marker->SetName("vtkGeometryRepresentationMultiBlockMaker");
+    outputMB->GetFieldData()->AddArray(marker);
     return 1;
   }
 
@@ -203,6 +210,7 @@ void vtkGeometryRepresentation::HandleGeometryRepresentationProgress(
   }
 }
 
+//----------------------------------------------------------------------------
 vtkGeometryRepresentation::vtkGeometryRepresentation()
 {
   this->GeometryFilter = vtkPVGeometryFilter::New();
@@ -267,6 +275,9 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
 
   this->UseShaderReplacements = false;
   this->ShaderReplacementsString = "";
+
+  // By default, show everything.
+  this->AddBlockSelector("/");
 }
 
 //----------------------------------------------------------------------------
@@ -445,7 +456,10 @@ int vtkGeometryRepresentation::ProcessViewRequest(
 
     if (data && (this->BlockAttributeTime < data->GetMTime() || this->BlockAttrChanged))
     {
-      this->UpdateBlockAttributes(this->Mapper);
+      if (auto cmapper = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper))
+      {
+        this->PopulateBlockAttributes(cmapper->GetCompositeDataDisplayAttributes(), data);
+      }
       this->BlockAttributeTime.Modified();
       this->BlockAttrChanged = false;
 
@@ -456,7 +470,10 @@ int vtkGeometryRepresentation::ProcessViewRequest(
 
     if (lod && dataLOD && this->UpdateBlockAttrLOD)
     {
-      this->UpdateBlockAttributes(this->LODMapper);
+      if (auto cmapper = vtkCompositePolyDataMapper2::SafeDownCast(this->LODMapper))
+      {
+        this->PopulateBlockAttributes(cmapper->GetCompositeDataDisplayAttributes(), dataLOD);
+      }
       this->UpdateBlockAttrLOD = false;
     }
   }
@@ -809,7 +826,7 @@ bool vtkGeometryRepresentation::NeedsOrderedCompositing()
 
   // Check is BlockOpacities has any value not 0 or 1.
   if (std::accumulate(this->BlockOpacities.begin(), this->BlockOpacities.end(), false,
-        [](bool result, const std::pair<unsigned int, double>& apair) {
+        [](bool result, const std::pair<std::string, double>& apair) {
           return result || (apair.second > 0.0 && apair.second < 1.0);
         }))
   {
@@ -1257,163 +1274,158 @@ void vtkGeometryRepresentation::SetGenerateFeatureEdges(bool val)
 }
 
 //----------------------------------------------------------------------------
-void vtkGeometryRepresentation::SetBlockVisibility(unsigned int index, bool visible)
+void vtkGeometryRepresentation::AddBlockSelector(const char* selector)
 {
-  this->BlockVisibilities[index] = visible;
-  this->BlockAttrChanged = true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkGeometryRepresentation::GetBlockVisibility(unsigned int index) const
-{
-  auto it = this->BlockVisibilities.find(index);
-  if (it == this->BlockVisibilities.cend())
+  if (selector != nullptr && this->BlockSelectors.insert(selector).second)
   {
-    return true;
-  }
-  return it->second;
-}
-
-//----------------------------------------------------------------------------
-void vtkGeometryRepresentation::RemoveBlockVisibility(unsigned int index, bool)
-{
-  auto it = this->BlockVisibilities.find(index);
-  if (it == this->BlockVisibilities.cend())
-  {
-    return;
-  }
-  this->BlockVisibilities.erase(it);
-  this->BlockAttrChanged = true;
-}
-
-//----------------------------------------------------------------------------
-void vtkGeometryRepresentation::RemoveBlockVisibilities()
-{
-  this->BlockVisibilities.clear();
-  this->BlockAttrChanged = true;
-}
-
-//----------------------------------------------------------------------------
-void vtkGeometryRepresentation::SetBlockColor(unsigned int index, double r, double g, double b)
-{
-  std::array<double, 3> color = { { r, g, b } };
-  this->BlockColors[index] = color;
-  this->BlockAttrChanged = true;
-}
-
-//----------------------------------------------------------------------------
-void vtkGeometryRepresentation::SetBlockColor(unsigned int index, double* color)
-{
-  if (color)
-  {
-    this->SetBlockColor(index, color[0], color[1], color[2]);
+    this->BlockAttrChanged = true;
   }
 }
 
 //----------------------------------------------------------------------------
-double* vtkGeometryRepresentation::GetBlockColor(unsigned int index)
+void vtkGeometryRepresentation::RemoveAllBlockSelectors()
 {
-  auto it = this->BlockColors.find(index);
-  if (it == this->BlockColors.cend())
+  if (!this->BlockSelectors.empty())
   {
-    return nullptr;
-  }
-  return it->second.data();
-}
-
-//----------------------------------------------------------------------------
-void vtkGeometryRepresentation::RemoveBlockColor(unsigned int index)
-{
-  auto it = this->BlockColors.find(index);
-  if (it == this->BlockColors.cend())
-  {
-    return;
-  }
-  this->BlockColors.erase(it);
-  this->BlockAttrChanged = true;
-}
-
-//----------------------------------------------------------------------------
-void vtkGeometryRepresentation::RemoveBlockColors()
-{
-  this->BlockColors.clear();
-  this->BlockAttrChanged = true;
-}
-
-//----------------------------------------------------------------------------
-void vtkGeometryRepresentation::SetBlockOpacity(unsigned int index, double opacity)
-{
-  this->BlockOpacities[index] = opacity;
-  this->BlockAttrChanged = true;
-}
-
-//----------------------------------------------------------------------------
-void vtkGeometryRepresentation::SetBlockOpacity(unsigned int index, double* opacity)
-{
-  if (opacity)
-  {
-    this->SetBlockOpacity(index, *opacity);
+    this->BlockSelectors.clear();
+    this->BlockAttrChanged = true;
   }
 }
 
 //----------------------------------------------------------------------------
-double vtkGeometryRepresentation::GetBlockOpacity(unsigned int index)
+void vtkGeometryRepresentation::SetBlockColor(const char* selector, double r, double g, double b)
 {
-  auto it = this->BlockOpacities.find(index);
-  if (it == this->BlockOpacities.cend())
+  if (selector != nullptr)
   {
-    return 0.0;
+    auto iter = this->BlockColors.find(selector);
+    if (iter == this->BlockColors.end())
+    {
+      this->BlockColors.insert(std::make_pair(selector, vtkVector3d(r, g, b)));
+      this->BlockAttrChanged = true;
+    }
+    else if (iter->second != vtkVector3d(r, g, b))
+    {
+      iter->second = vtkVector3d(r, g, b);
+      this->BlockAttrChanged = true;
+    }
   }
-  return it->second;
 }
 
 //----------------------------------------------------------------------------
-void vtkGeometryRepresentation::RemoveBlockOpacity(unsigned int index)
+void vtkGeometryRepresentation::RemoveAllBlockColors()
 {
-  auto it = this->BlockOpacities.find(index);
-  if (it == this->BlockOpacities.cend())
+  if (!this->BlockColors.empty())
   {
-    return;
+    this->BlockColors.clear();
+    this->BlockAttrChanged = true;
   }
-  this->BlockOpacities.erase(it);
-  this->BlockAttrChanged = true;
 }
 
 //----------------------------------------------------------------------------
-void vtkGeometryRepresentation::RemoveBlockOpacities()
+void vtkGeometryRepresentation::SetBlockOpacity(const char* selector, double alpha)
 {
-  this->BlockOpacities.clear();
-  this->BlockAttrChanged = true;
-}
-
-//----------------------------------------------------------------------------
-void vtkGeometryRepresentation::UpdateBlockAttributes(vtkMapper* mapper)
-{
-  auto cpm = vtkCompositePolyDataMapper2::SafeDownCast(mapper);
-  if (!cpm)
+  if (selector != nullptr)
   {
-    vtkErrorMacro(<< "Invalid mapper!");
+    auto iter = this->BlockOpacities.find(selector);
+    if (iter == this->BlockOpacities.end())
+    {
+      this->BlockOpacities.insert(std::make_pair(selector, alpha));
+      this->BlockAttrChanged = true;
+    }
+    else if (iter->second != alpha)
+    {
+      iter->second = alpha;
+      this->BlockAttrChanged = true;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::RemoveAllBlockOpacities()
+{
+  if (!this->BlockOpacities.empty())
+  {
+    this->BlockOpacities.clear();
+    this->BlockAttrChanged = true;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::PopulateBlockAttributes(
+  vtkCompositeDataDisplayAttributes* attrs, vtkDataObject* data) const
+{
+  attrs->RemoveBlockVisibilities();
+  attrs->RemoveBlockOpacities();
+  attrs->RemoveBlockColors();
+
+  auto dtree = vtkDataObjectTree::SafeDownCast(data);
+  if (dtree == nullptr ||
+    dtree->GetFieldData()->GetArray("vtkGeometryRepresentationMultiBlockMaker") != nullptr)
+  {
+    if (dtree)
+    {
+      attrs->SetBlockVisibility(dtree, true); // make the root visible.
+    }
     return;
   }
 
-  cpm->RemoveBlockVisibilities();
-  for (auto const& item : this->BlockVisibilities)
+  vtkNew<vtkDataAssembly> hierarchy;
+  if (!vtkDataAssemblyUtilities::GenerateHierarchy(dtree, hierarchy))
   {
-    cpm->SetBlockVisibility(item.first, item.second);
+    return;
   }
 
-  cpm->RemoveBlockColors();
-  for (auto const& item : this->BlockColors)
+  std::unordered_map<unsigned int, vtkDataObject*> cid_to_dobj;
+  cid_to_dobj[0u] = dtree;
+  for (const auto& ref : vtk::Range(dtree,
+         vtk::DataObjectTreeOptions::TraverseSubTree | vtk::DataObjectTreeOptions::SkipEmptyNodes))
   {
-    auto& arr = item.second;
-    double color[3] = { arr[0], arr[1], arr[2] };
-    cpm->SetBlockColor(item.first, color);
+    cid_to_dobj[ref.GetFlatIndex()] = ref.GetDataObject();
   }
 
-  cpm->RemoveBlockOpacities();
-  for (auto const& item : this->BlockOpacities)
+  // Handle visibilities.
+  if (!this->BlockSelectors.empty())
   {
-    cpm->SetBlockOpacity(item.first, item.second);
+    // if no selectors are specified, we treat it as if no visibility overrides
+    // are provided.
+    attrs->SetBlockVisibility(dtree, false); // start by marking root invisible first.
+    std::vector<std::string> selectors(this->BlockSelectors.begin(), this->BlockSelectors.end());
+    const auto cids = vtkDataAssemblyUtilities::GetSelectedCompositeIds(selectors, hierarchy);
+    for (const auto& id : cids)
+    {
+      auto iter = cid_to_dobj.find(id);
+      if (iter != cid_to_dobj.end())
+      {
+        attrs->SetBlockVisibility(iter->second, true);
+      }
+    }
+  }
+
+  // Handle color.
+  for (const auto& item : this->BlockColors)
+  {
+    const auto ids = vtkDataAssemblyUtilities::GetSelectedCompositeIds({ item.first }, hierarchy);
+    for (const auto& id : ids)
+    {
+      auto iter = cid_to_dobj.find(id);
+      if (iter != cid_to_dobj.end())
+      {
+        attrs->SetBlockColor(iter->second, item.second.GetData());
+      }
+    }
+  }
+
+  for (const auto& item : this->BlockOpacities)
+  {
+    const auto ids = vtkDataAssemblyUtilities::GetSelectedCompositeIds({ item.first }, hierarchy);
+    for (const auto& id : ids)
+    {
+      auto iter = cid_to_dobj.find(id);
+      if (iter != cid_to_dobj.end())
+      {
+        attrs->SetBlockOpacity(iter->second, item.second);
+      }
+    }
   }
 }
 
@@ -1470,26 +1482,15 @@ void vtkGeometryRepresentation::ComputeVisibleDataBounds()
   if (this->VisibleDataBoundsTime < this->GetPipelineDataTime() ||
     (this->BlockAttrChanged && this->VisibleDataBoundsTime < this->BlockAttributeTime))
   {
-    vtkDataObject* dataObject = this->MultiBlockMaker->GetOutputDataObject(0);
-    vtkNew<vtkCompositeDataDisplayAttributes> cdAttributes;
     // If the input data is a composite dataset, use the currently set values for block
     // visibility rather than the cached ones from the last render.  This must be computed
     // in the REQUEST_UPDATE pass but the data is only copied to the mapper in the
     // REQUEST_RENDER pass.  This constructs a dummy vtkCompositeDataDisplayAttributes
     // with only the visibilities set and calls the helper function to compute the visible
     // bounds with that.
-    if (vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(dataObject))
-    {
-      auto iter = vtkSmartPointer<vtkCompositeDataIterator>::Take(cd->NewIterator());
-      for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-      {
-        auto visible = this->BlockVisibilities.find(iter->GetCurrentFlatIndex());
-        if (visible != this->BlockVisibilities.end())
-        {
-          cdAttributes->SetBlockVisibility(iter->GetCurrentDataObject(), visible->second);
-        }
-      }
-    }
+    vtkDataObject* dataObject = this->MultiBlockMaker->GetOutputDataObject(0);
+    vtkNew<vtkCompositeDataDisplayAttributes> cdAttributes;
+    this->PopulateBlockAttributes(cdAttributes, dataObject);
     this->GetBounds(dataObject, this->VisibleDataBounds, cdAttributes);
     this->VisibleDataBoundsTime.Modified();
   }

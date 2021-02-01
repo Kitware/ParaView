@@ -858,7 +858,14 @@ struct Process_5_9_to_5_10
   bool operator()(xml_document& document)
   {
     return HandleSpreadsheetRepresentationCompositeDataSetIndex(document) &&
-      HandleExtractBlock(document);
+      HandleExtractBlock(document) && HandleRepresentationBlockVisibility(document) &&
+      HandleRepresentationBlockColor(document) && HandleRepresentationBlockOpacity(document);
+  }
+
+  static std::string GetSelector(unsigned int cid)
+  {
+    return std::string("//*[@cid='") + std::to_string(cid) + "']";
+    ;
   }
 
   static void ConvertCompositeIdsToSelectors(pugi::xml_node& node)
@@ -866,8 +873,7 @@ struct Process_5_9_to_5_10
     for (auto child : node.children("Element"))
     {
       auto value_attribute = child.attribute("value");
-      value_attribute.set_value(
-        (std::string("//*[@cid='") + value_attribute.value() + "']").c_str());
+      value_attribute.set_value(GetSelector(value_attribute.as_uint()).c_str());
     }
   }
 
@@ -896,6 +902,163 @@ struct Process_5_9_to_5_10
       auto node = xpath_node.node();
       node.attribute("name").set_value("Selectors");
       ConvertCompositeIdsToSelectors(node);
+    }
+    return true;
+  }
+
+  static bool HandleRepresentationBlockVisibility(xml_document& document)
+  {
+    bool warn_about_hidden_blocks = false;
+    auto xpath_set = document.select_nodes("//ServerManagerState/Proxy[@group='representations']/"
+                                           "Property[@name='BlockVisibility']");
+    for (auto xpath_node : xpath_set)
+    {
+      auto node = xpath_node.node();
+      const int numElements = node.attribute("number_of_elements").as_int();
+      if (numElements == 0)
+      {
+        // if no overrides were specified, simply remove the property.
+        node.parent().remove_child(node);
+        continue;
+      }
+
+      node.attribute("name").set_value("BlockSelectors");
+
+      std::vector<std::pair<unsigned int, bool> > visibilities(numElements / 2);
+      for (auto child : node.children("Element"))
+      {
+        const int index = child.attribute("index").as_int();
+        auto& pair = visibilities.at(index / 2);
+        if (index % 2 == 0)
+        {
+          pair.first = child.attribute("value").as_uint();
+        }
+        else
+        {
+          pair.second = (child.attribute("value").as_int() == 1);
+        }
+      }
+
+      while (auto child = node.child("Element"))
+      {
+        node.remove_child(child);
+      }
+
+      // convert to selectors.
+      int index = 0;
+      for (auto& pair : visibilities)
+      {
+        if (pair.second)
+        {
+          auto child = node.append_child("Element");
+          child.append_attribute("index").set_value(index++);
+          child.append_attribute("value").set_value(GetSelector(pair.first).c_str());
+        }
+        else
+        {
+          warn_about_hidden_blocks = true;
+        }
+      }
+      node.attribute("number_of_elements").set_value(index);
+    }
+
+    if (warn_about_hidden_blocks)
+    {
+      vtkGenericWarningMacro("The state have blocks that were hidden explicitly. "
+                             "Due to changes in the way block visibilities are specified, this may "
+                             "not get loaded correctly.");
+    }
+    return true;
+  }
+
+  static bool HandleRepresentationBlockColor(xml_document& document)
+  {
+    auto xpath_set = document.select_nodes("//ServerManagerState/Proxy[@group='representations']/"
+                                           "Property[@name='BlockColor']");
+    for (auto xpath_node : xpath_set)
+    {
+      std::vector<std::tuple<unsigned int, double, double, double> > colors;
+
+      auto node = xpath_node.node();
+      node.attribute("name").set_value("BlockColors");
+      // not is the weird map property, so the XML is strange looking.
+      for (auto element : node.children("Element"))
+      {
+        const unsigned int id = element.attribute("index").as_uint();
+        double rgb[3];
+        int index = 0;
+        for (auto value : element.children("Value"))
+        {
+          assert(index < 3);
+          rgb[index++] = value.attribute("value").as_double();
+        }
+        colors.emplace_back(id, rgb[0], rgb[1], rgb[2]);
+      }
+
+      while (auto child = node.child("Element"))
+      {
+        node.remove_child(child);
+      }
+
+      int index = 0;
+      for (const auto& tuple : colors)
+      {
+        auto child = node.append_child("Element");
+        child.append_attribute("index").set_value(index++);
+        child.append_attribute("value").set_value(GetSelector(std::get<0>(tuple)).c_str());
+
+        child = node.append_child("Element");
+        child.append_attribute("index").set_value(index++);
+        child.append_attribute("value").set_value(std::get<1>(tuple));
+
+        child = node.append_child("Element");
+        child.append_attribute("index").set_value(index++);
+        child.append_attribute("value").set_value(std::get<2>(tuple));
+
+        child = node.append_child("Element");
+        child.append_attribute("index").set_value(index++);
+        child.append_attribute("value").set_value(std::get<3>(tuple));
+      }
+      node.attribute("number_of_elements").set_value(index);
+    }
+    return true;
+  }
+
+  static bool HandleRepresentationBlockOpacity(xml_document& document)
+  {
+    auto xpath_set = document.select_nodes("//ServerManagerState/Proxy[@group='representations']/"
+                                           "Property[@name='BlockOpacity']");
+    for (auto xpath_node : xpath_set)
+    {
+      std::vector<std::tuple<unsigned int, double> > opacities;
+
+      auto node = xpath_node.node();
+      node.attribute("name").set_value("BlockOpacities");
+      // not is the weird map property, so the XML is strange looking.
+      for (auto element : node.children("Element"))
+      {
+        const unsigned int id = element.attribute("index").as_uint();
+        const double alpha = element.child("Value").attribute("value").as_double();
+        opacities.emplace_back(id, alpha);
+      }
+
+      while (auto child = node.child("Element"))
+      {
+        node.remove_child(child);
+      }
+
+      int index = 0;
+      for (const auto& tuple : opacities)
+      {
+        auto child = node.append_child("Element");
+        child.append_attribute("index").set_value(index++);
+        child.append_attribute("value").set_value(GetSelector(std::get<0>(tuple)).c_str());
+
+        child = node.append_child("Element");
+        child.append_attribute("index").set_value(index++);
+        child.append_attribute("value").set_value(std::get<1>(tuple));
+      }
+      node.attribute("number_of_elements").set_value(index);
     }
     return true;
   }
