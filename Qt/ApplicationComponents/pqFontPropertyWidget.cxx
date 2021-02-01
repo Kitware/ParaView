@@ -258,16 +258,16 @@ void pqFontPropertyWidget::setupHorizontalJustificationButton()
   QAction* leftAlign =
     new QAction(QIcon(":/pqWidgets/Icons/pqTextAlignLeft.svg"), tr("Left"), actionGroup);
   leftAlign->setIconVisibleInMenu(true);
-  QAction* rightAlign =
-    new QAction(QIcon(":/pqWidgets/Icons/pqTextAlignRight.svg"), tr("Right"), actionGroup);
-  rightAlign->setIconVisibleInMenu(true);
   QAction* centerAlign =
     new QAction(QIcon(":/pqWidgets/Icons/pqTextAlignCenter.svg"), tr("Center"), actionGroup);
   centerAlign->setIconVisibleInMenu(true);
+  QAction* rightAlign =
+    new QAction(QIcon(":/pqWidgets/Icons/pqTextAlignRight.svg"), tr("Right"), actionGroup);
+  rightAlign->setIconVisibleInMenu(true);
   QMenu* popup = new QMenu(this);
   popup->addAction(leftAlign);
-  popup->addAction(rightAlign);
   popup->addAction(centerAlign);
+  popup->addAction(rightAlign);
   ui.HorizontalJustification->setMenu(popup);
   QObject::connect(actionGroup, SIGNAL(triggered(QAction*)), this,
     SLOT(changeHorizontalJustificationIcon(QAction*)));
@@ -279,19 +279,19 @@ void pqFontPropertyWidget::setupVerticalJustificationButton()
   Ui::FontPropertyWidget& ui = this->Internals->Ui;
   QActionGroup* actionGroup = new QActionGroup(this);
   actionGroup->setExclusive(true);
+  QAction* topAlign =
+    new QAction(QIcon(":/pqWidgets/Icons/pqTextVerticalAlignTop.svg"), tr("Top"), actionGroup);
+  topAlign->setIconVisibleInMenu(true);
   QAction* centerAlign = new QAction(
     QIcon(":/pqWidgets/Icons/pqTextVerticalAlignCenter.svg"), tr("Center"), actionGroup);
   centerAlign->setIconVisibleInMenu(true);
   QAction* bottomAlign = new QAction(
     QIcon(":/pqWidgets/Icons/pqTextVerticalAlignBottom.svg"), tr("Bottom"), actionGroup);
   bottomAlign->setIconVisibleInMenu(true);
-  QAction* topAlign =
-    new QAction(QIcon(":/pqWidgets/Icons/pqTextVerticalAlignTop.svg"), tr("Top"), actionGroup);
-  topAlign->setIconVisibleInMenu(true);
   QMenu* popup = new QMenu(this);
+  popup->addAction(topAlign);
   popup->addAction(centerAlign);
   popup->addAction(bottomAlign);
-  popup->addAction(topAlign);
   ui.VerticalJustification->setMenu(popup);
   QObject::connect(actionGroup, SIGNAL(triggered(QAction*)), this,
     SLOT(changeVerticalJustificationIcon(QAction*)));
