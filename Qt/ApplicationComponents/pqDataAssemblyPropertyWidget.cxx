@@ -620,13 +620,17 @@ void hookupTableView(QTableView* view, TableModel* model, QAbstractButton* addBu
 }
 
 //=================================================================================
-QList<QVariant> colorsToVariantList(const QList<QPair<QString, QVariant> >& colors)
+template <typename T1>
+QList<QVariant> colorsToVariantList(const QList<QPair<T1, QVariant> >& colors)
 {
   QList<QVariant> result;
   for (const auto& pair : colors)
   {
     result.push_back(pair.first);
-    auto color = pair.second.value<QColor>();
+
+    const QVariant& variant = pair.second;
+
+    auto color = variant.value<QColor>();
     result.push_back(color.redF());
     result.push_back(color.greenF());
     result.push_back(color.blueF());
@@ -635,7 +639,8 @@ QList<QVariant> colorsToVariantList(const QList<QPair<QString, QVariant> >& colo
 }
 
 //=================================================================================
-QList<QVariant> opacitiesToVariantList(const QList<QPair<QString, QVariant> >& opacities)
+template <typename T1>
+QList<QVariant> opacitiesToVariantList(const QList<QPair<T1, QVariant> >& opacities)
 {
   QList<QVariant> result;
   for (const auto& pair : opacities)
@@ -1049,28 +1054,22 @@ void pqDataAssemblyPropertyWidget::assemblyTreeModified(int role)
     return;
   }
   QScopedValueRollback<bool> rollback(internals.BlockUpdates, true);
+  auto assembly = internals.assembly();
 
   if (role == Qt::CheckStateRole)
   {
     internals.Selectors = internals.AssemblyTreeModel->checkedNodes();
     internals.SelectorsTableModel->setData(internals.Selectors);
-
-    if (internals.InCompositeIndicesMode)
+    internals.CompositeIndices.clear();
+    if (assembly != nullptr && internals.InCompositeIndicesMode)
     {
       // compute composite indices.
-      if (auto assembly = internals.assembly())
-      {
-        std::vector<std::string> selectors(internals.Selectors.size());
-        std::transform(internals.Selectors.begin(), internals.Selectors.end(), selectors.begin(),
-          [](const QString& str) { return str.toStdString(); });
-        internals.CompositeIndices = compositeIndicesToVariantList(
-          vtkDataAssemblyUtilities::GenerateCompositeIndicesFromSelectors(
-            assembly, selectors, internals.LeafNodesOnly));
-      }
-      else
-      {
-        internals.CompositeIndices.clear();
-      }
+      std::vector<std::string> selectors(internals.Selectors.size());
+      std::transform(internals.Selectors.begin(), internals.Selectors.end(), selectors.begin(),
+        [](const QString& str) { return str.toStdString(); });
+      internals.CompositeIndices =
+        compositeIndicesToVariantList(vtkDataAssemblyUtilities::GetSelectedCompositeIds(
+          selectors, assembly, nullptr, internals.LeafNodesOnly));
     }
     Q_EMIT this->selectorsChanged();
   }
@@ -1079,6 +1078,21 @@ void pqDataAssemblyPropertyWidget::assemblyTreeModified(int role)
     const auto colors = internals.AssemblyTreeModel->data(detail::ColorRole);
     internals.ColorsTableModel->setData(colors);
     internals.Colors = colorsToVariantList(colors);
+    internals.CompositeIndexColors.clear();
+    if (assembly != nullptr && internals.InCompositeIndicesMode)
+    {
+      // convert selector:colors map to composite-index:color map.
+      QList<QPair<unsigned int, QVariant> > idColors;
+      for (const auto& pair : colors)
+      {
+        auto ids =
+          vtkDataAssemblyUtilities::GetSelectedCompositeIds({ pair.first.toStdString() }, assembly);
+        Q_ASSERT(ids.size() == 1);
+        idColors.push_back(qMakePair(ids.front(), pair.second));
+      }
+      internals.CompositeIndexColors = colorsToVariantList(idColors);
+    }
+
     Q_EMIT this->colorsChanged();
   }
   else if (role == detail::OpacityRole)
@@ -1086,6 +1100,21 @@ void pqDataAssemblyPropertyWidget::assemblyTreeModified(int role)
     const auto opacities = internals.AssemblyTreeModel->data(detail::OpacityRole);
     internals.OpacitiesTableModel->setData(opacities);
     internals.Opacities = opacitiesToVariantList(opacities);
+    internals.CompositeIndexOpacities.clear();
+    if (assembly != nullptr && internals.InCompositeIndicesMode)
+    {
+      // convert selector:opacities map to composite-index:opacities map.
+      QList<QPair<unsigned int, QVariant> > idOpacities;
+      for (const auto& pair : opacities)
+      {
+        auto ids =
+          vtkDataAssemblyUtilities::GetSelectedCompositeIds({ pair.first.toStdString() }, assembly);
+        Q_ASSERT(ids.size() == 1);
+        idOpacities.push_back(qMakePair(ids.front(), pair.second));
+      }
+      internals.CompositeIndexOpacities = opacitiesToVariantList(idOpacities);
+    }
+
     Q_EMIT this->opacitiesChanged();
   }
 }
