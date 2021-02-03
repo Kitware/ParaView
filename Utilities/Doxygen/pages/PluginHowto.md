@@ -999,6 +999,32 @@ If you give the name of an existing menu, then the commands will be added to
 that menu rather than create a new one.  So, for example, if the `GROUP_NAME`
 is `MenuBar/File`, the commands will be added to the bottom of the *File* menu.
 
+#### Adding a Context Menu
+
+Context menus are popup menus created when a user right-clicks inside a view
+(typically a render-view, but possible with any view). You can register a plugin
+that will create a context menu with items specific to the object underneath the
+cursor at the time the user right-clicks. The first instance of
+`pqContextMenuInterface` that returns a non-null menu is used; returning a
+null menu indicates the object(s) selected when the user right clicks are not
+relevant to your interface. For this reason, your subclass should avoid creating
+menus unrelated to a specific application or object type.
+
+To add a `pqContextMenuInterface` subclass to ParaView, simply pass your class
+name to the `UI_INTERFACES` argument of `paraview_add_plugin()` and the source,
+as usual, to the `SOURCES` argument:
+
+```cmake
+paraview_add_plugin(FancyMenu
+  ...
+  UI_INTERFACES FancyMenu
+  SOURCES FancyMenu.h FancyMenu.cxx
+  ...
+)
+```
+
+See the `Examples/Plugins/ContextMenu` directory for a simple example.
+
 #### Autostart Plugins
 
 This refers to a plugin which needs to be notified when ParaView starts up or

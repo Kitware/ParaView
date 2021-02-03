@@ -1,0 +1,6 @@
+NAME
+  ContextMenu
+DESCRIPTION
+  An example plugin that implements a render-view context menu.
+REQUIRES_MODULES
+  ParaView::pqComponents
