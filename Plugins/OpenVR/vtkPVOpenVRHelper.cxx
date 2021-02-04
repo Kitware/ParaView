@@ -763,24 +763,20 @@ void vtkPVOpenVRHelper::SetRightTriggerMode(std::string const& text)
 
   if (text == "Grab")
   {
-    this->GetStyle()->MapInputToAction(
-      vtkEventDataDevice::RightController, vtkEventDataDeviceInput::Trigger, VTKIS_POSITION_PROP);
+    this->GetStyle()->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_POSITION_PROP);
   }
   else if (text == "Pick")
   {
-    this->GetStyle()->MapInputToAction(
-      vtkEventDataDevice::RightController, vtkEventDataDeviceInput::Trigger, VTKIS_POSITION_PROP);
+    this->GetStyle()->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_POSITION_PROP);
     this->GetStyle()->GrabWithRayOn();
   }
   else if (text == "Interactive Crop")
   {
-    this->GetStyle()->MapInputToAction(
-      vtkEventDataDevice::RightController, vtkEventDataDeviceInput::Trigger, VTKIS_CLIP);
+    this->GetStyle()->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_CLIP);
   }
   else if (text == "Probe")
   {
-    this->GetStyle()->MapInputToAction(
-      vtkEventDataDevice::RightController, vtkEventDataDeviceInput::Trigger, VTKIS_PICK);
+    this->GetStyle()->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_PICK);
   }
 }
 
@@ -2688,7 +2684,8 @@ void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
 
   this->Renderer = vtkOpenVRRenderer::New();
   this->RenderWindow->AddRenderer(this->Renderer);
-  this->Interactor = vtkOpenVRRenderWindowInteractor::New();
+  auto ovriren = vtkOpenVRRenderWindowInteractor::New();
+  this->Interactor = ovriren;
   this->RenderWindow->SetInteractor(this->Interactor);
 
   this->Renderer->SetUseImageBasedLighting(pvRenderer->GetUseImageBasedLighting());
@@ -2714,8 +2711,14 @@ void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
   this->RenderWindow->GetDashboardOverlay()->AddObserver(
     vtkCommand::LoadStateEvent, this, &vtkPVOpenVRHelper::EventCallback, 1.0);
 
-  this->Style->MapInputToAction(
-    vtkEventDataDevice::RightController, vtkEventDataDeviceInput::Trigger, VTKIS_PICK);
+  this->Style->MapInputToAction(vtkCommand::Select3DEvent, VTKIS_PICK);
+  ovriren->AddAction("/actions/vtk/in/ShowMenu", false, [this](vtkEventData* ed) {
+    vtkEventDataForDevice* edd = ed->GetAsEventDataForDevice();
+    if (edd && edd->GetAction() == vtkEventDataAction::Press)
+    {
+      this->ToggleShowControls();
+    }
+  });
 
   this->Renderer->RemoveCuller(this->Renderer->GetCullers()->GetLastItem());
   this->Renderer->SetBackground(pvRenderer->GetBackground());
