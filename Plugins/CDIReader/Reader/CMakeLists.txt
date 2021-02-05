@@ -1,17 +1,27 @@
 set(classes
   vtkCDIReader)
+if (PARAVIEW_USE_QT)
+   find_package(Qt5 COMPONENTS Widgets)  
+endif()
 
-set(sources
-  ThirdParty/cdilib.c)
 
-set(private_headers
-  ThirdParty/cdi.h)
 
-set(CMAKE_C_STANDARD 99)
+
+set (sources
+    vtkCDIReader.cxx
+    vtkCDIReader.h
+    cdi_tools.cxx
+    cdi_tools.h
+    helpers.cxx
+    helpers.h
+    projections.cxx
+    projections.h
+    )
+
 vtk_module_add_module(CDIReader::vtkCDIReader
   CLASSES ${classes}
   SOURCES ${sources}
-  PRIVATE_HEADERS ${private_headers})
+)
 
 if (TARGET VTK::ParallelMPI)
   # FIXME: The API should not depend on this.
@@ -20,13 +30,22 @@ if (TARGET VTK::ParallelMPI)
       PARAVIEW_USE_MPI)
 endif ()
 
-vtk_module_definitions(CDIReader::vtkCDIReader
-  PRIVATE
-    # Please leave these definitions in here and do not change them. We use the
-    # cdi library to read both, netCDF2 and netCDF4 data.
-    HAVE_LIBNETCDF
-    HAVE_NETCDF2
-    HAVE_NETCDF4)
+
+find_package(CDI)
+message(STATUS "Use CDI version ${CDI_VERSION}")
+
+vtk_module_include(CDIReader::vtkCDIReader
+    PRIVATE $<BUILD_INTERFACE:${CDI_INCLUDE_DIRS}>)
+vtk_module_link(CDIReader::vtkCDIReader
+    PRIVATE ${CDI_LIBRARIES})
+
+
+if (PARAVIEW_BUILD_CDI_WITH_GRIB)  
+  vtk_module_include(CDIReader::vtkCDIReader
+    PRIVATE $<BUILD_INTERFACE:${ECCODES_INCLUDE_DIRS}>)
+  vtk_module_link(CDIReader::vtkCDIReader
+    PRIVATE ${ECCODES_LIBRARIES})
+endif ()
 
 paraview_add_server_manager_xmls(
   XMLS  CDIReader.xml)

@@ -6,6 +6,7 @@ DEPENDS
   ParaView::VTKExtensionsCore
   VTK::CommonCore
   VTK::CommonExecutionModel
+  VTK::GUISupportQt
 PRIVATE_DEPENDS
   ParaView::VTKExtensionsIOCore
   VTK::netcdf
