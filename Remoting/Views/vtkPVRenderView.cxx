@@ -2670,7 +2670,8 @@ void vtkPVRenderView::SetBackgroundMode(int val)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
-  vtkOSPRayRendererNode::SetBackgroundMode(val, ren);
+  vtkOSPRayRendererNode::SetBackgroundMode(
+    static_cast<vtkOSPRayRendererNode::BackgroundMode>(val), ren);
 #else
   (void)val;
 #endif
