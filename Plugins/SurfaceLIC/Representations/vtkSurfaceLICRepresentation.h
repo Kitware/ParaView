@@ -20,7 +20,7 @@
 #ifndef vtkSurfaceLICRepresentation_h
 #define vtkSurfaceLICRepresentation_h
 
-#include "vtkGeometryRepresentation.h"
+#include "vtkGeometryRepresentationWithFaces.h"
 #include "vtkSurfaceLICRepresentationsModule.h" // for export macro
 
 class vtkInformation;
@@ -29,11 +29,11 @@ class vtkInformationRequestKey;
 class vtkCompositeSurfaceLICMapper;
 
 class VTKSURFACELICREPRESENTATIONS_EXPORT vtkSurfaceLICRepresentation
-  : public vtkGeometryRepresentation
+  : public vtkGeometryRepresentationWithFaces
 {
 public:
   static vtkSurfaceLICRepresentation* New();
-  vtkTypeMacro(vtkSurfaceLICRepresentation, vtkGeometryRepresentation);
+  vtkTypeMacro(vtkSurfaceLICRepresentation, vtkGeometryRepresentationWithFaces);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
