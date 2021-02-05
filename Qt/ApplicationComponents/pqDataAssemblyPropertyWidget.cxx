@@ -728,10 +728,19 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
 {
   this->setShowLabel(false);
 
+  // grab hints from the group.
+  auto groupHints = smgroup->GetHints()
+    ? smgroup->GetHints()->FindNestedElementByName("DataAssemblyPropertyWidget")
+    : nullptr;
+
+  int tempValue; // use to make `GetScalarAttribute` calls compact.
   const int iconSize = std::max(this->style()->pixelMetric(QStyle::PM_SmallIconSize), 16);
 
   auto& internals = (*this->Internals);
   internals.Ui.setupUi(this);
+  internals.Ui.label->setVisible(
+    groupHints && groupHints->GetScalarAttribute("show_label", &tempValue) && tempValue == 1);
+  internals.Ui.label->setText(smgroup->GetXMLLabel());
   internals.Ui.hierarchy->header()->setDefaultSectionSize(iconSize + 4);
   internals.Ui.hierarchy->header()->setMinimumSectionSize(iconSize + 4);
 
@@ -777,18 +786,8 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
   QVariant usingCompositeIndices;
   if (auto smproperty = smgroup->GetProperty("Selectors"))
   {
-    bool userCheckable = true;
-    if (auto hint = smgroup->GetHints()
-        ? smgroup->GetHints()->FindNestedElementByName("DataAssemblyPropertyWidget")
-        : nullptr)
-    {
-      int value = 1;
-      if (hint->GetScalarAttribute("is_checkable", &value))
-      {
-        userCheckable = (value == 1);
-      }
-    }
-
+    const bool userCheckable = (groupHints == nullptr ||
+      !groupHints->GetScalarAttribute("is_checkable", &tempValue) || tempValue == 1);
     if (!userCheckable)
     {
       internals.Ui.tabWidget->removeTab(internals.Ui.tabWidget->indexOf(internals.Ui.selectorsTab));
@@ -822,8 +821,8 @@ pqDataAssemblyPropertyWidget::pqDataAssemblyPropertyWidget(
       usingCompositeIndices = true;
 
       // indicates if we should only returns composite indices for leaf nodes.
-      internals.LeafNodesOnly == (vtkSMCompositeTreeDomain::SafeDownCast(domain)->GetMode() ==
-                                   vtkSMCompositeTreeDomain::LEAVES);
+      internals.LeafNodesOnly = (vtkSMCompositeTreeDomain::SafeDownCast(domain)->GetMode() ==
+        vtkSMCompositeTreeDomain::LEAVES);
 
       // remove selectors tab, since it's not supported in composite-ids mode.
       internals.Ui.tabWidget->removeTab(internals.Ui.tabWidget->indexOf(internals.Ui.selectorsTab));
