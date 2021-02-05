@@ -162,6 +162,13 @@ public:
    */
   static QString number(double value);
 
+  /**
+   * Setups up appearance for buttons such as Apply button
+   * that we want to draw user's attention to when enabled. Currently, this
+   * changes the palette to use a green background when enabled.
+   */
+  static void initializeClickMeButton(QAbstractButton* button);
+
 private:
   static QWidget* findMainWindow();
   static QPointer<QWidget> MainWidget;

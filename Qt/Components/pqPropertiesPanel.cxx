@@ -226,10 +226,7 @@ public:
     this->Ui.ViewButtons->layout()->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
     // change the apply button palette so it is green when it is enabled.
-    QPalette applyPalette = this->Ui.Accept->palette();
-    applyPalette.setColor(QPalette::Active, QPalette::Button, QColor(161, 213, 135));
-    applyPalette.setColor(QPalette::Inactive, QPalette::Button, QColor(161, 213, 135));
-    this->Ui.Accept->setPalette(applyPalette);
+    pqCoreUtilities::initializeClickMeButton(this->Ui.Accept);
 
     this->AutoApplyTimer.setSingleShot(true);
     panel->connect(&this->AutoApplyTimer, SIGNAL(timeout()), SLOT(apply()));
