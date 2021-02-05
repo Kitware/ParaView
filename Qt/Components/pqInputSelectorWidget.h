@@ -32,15 +32,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqInputSelectorWidget_h
 #define pqInputSelectorWidget_h
 
-#include "pqComponentsModule.h"
+#include "pqComponentsModule.h" // for exports
 #include "pqPropertyWidget.h"
-#include "pqSMProxy.h"
+#include "pqSMProxy.h"       // for pqSMProxy.
+#include "pqTimer.h"         // for pqTimer
+#include "vtkSmartPointer.h" // for vtkSmartPointer
 
-class pqPipelineInputComboBox;
+class QComboBox;
+class vtkSMProxy;
 
 /**
-* Property widget that can be used to set an existing pipeline connection as a
-* proxy property.
+ * @class pqInputSelectorWidget
+ * @brief widget for input property to choose a pipeline input.
+ *
+ * Generally, pqProxyWidget does not show widget for input properties. This is
+ * by design since changing input to filters is generally not a thing we let the
+ * user treat at same level as changing other properties. In some cases,
+ * however, we may want to show a combo-box to let user pick the input from the
+ * available pipeline proxies. pqInputSelectorWidget is designed for such
+ * exceptional cases. To use this widget for a vtkSMInputProperty, set
+ * `panel_widget` attribute to `input_selector`.
+ *
 */
 class PQCOMPONENTS_EXPORT pqInputSelectorWidget : public pqPropertyWidget
 {
@@ -52,6 +64,10 @@ public:
   pqInputSelectorWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
   ~pqInputSelectorWidget() override;
 
+  /**
+   * Chosen port. This returns `vtkSmartPointer<vtkSMOutputPort>`
+   * for the chosen port. if any.
+   */
   pqSMProxy selectedInput() const;
 
 public Q_SLOTS:
@@ -60,10 +76,14 @@ public Q_SLOTS:
 Q_SIGNALS:
   void selectedInputChanged();
 
-private:
-  Q_DISABLE_COPY(pqInputSelectorWidget)
+private Q_SLOTS:
+  void updateComboBox();
 
-  pqPipelineInputComboBox* Selector;
+private:
+  Q_DISABLE_COPY(pqInputSelectorWidget);
+  QComboBox* ComboBox;
+  vtkWeakPointer<vtkSMProxy> ChosenPort;
+  pqTimer UpdateComboBoxTimer;
 };
 
 #endif

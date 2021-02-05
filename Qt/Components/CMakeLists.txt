@@ -109,7 +109,6 @@ set(classes
   pqOutputPortComboBox
   pqPipelineAnnotationFilterModel
   pqPipelineBrowserWidget
-  pqPipelineInputComboBox
   pqPipelineModel
   pqPipelineModelSelectionAdaptor
   pqPipelineTimeKeyFrameEditor
