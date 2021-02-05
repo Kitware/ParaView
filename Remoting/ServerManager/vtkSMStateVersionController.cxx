@@ -25,6 +25,7 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSelectionNode.h"
 #include "vtkWeakPointer.h"
 
 #include <algorithm>
@@ -859,7 +860,8 @@ struct Process_5_9_to_5_10
   {
     return HandleSpreadsheetRepresentationCompositeDataSetIndex(document) &&
       HandleExtractBlock(document) && HandleRepresentationBlockVisibility(document) &&
-      HandleRepresentationBlockColor(document) && HandleRepresentationBlockOpacity(document);
+      HandleRepresentationBlockColor(document) && HandleRepresentationBlockOpacity(document) &&
+      HandleSelectionQuerySource(document);
   }
 
   static std::string GetSelector(unsigned int cid)
@@ -1060,6 +1062,34 @@ struct Process_5_9_to_5_10
       }
       node.attribute("number_of_elements").set_value(index);
     }
+    return true;
+  }
+
+  static bool HandleSelectionQuerySource(xml_document& document)
+  {
+    // convert CompositeIndex to Selectors
+    auto xpath_set = document.select_nodes(
+      "//ServerManagerState/Proxy[@group='sources' and @type='SelectionQuerySource']/"
+      "Property[@name='CompositeIndex']");
+    for (auto xpath_node : xpath_set)
+    {
+      auto node = xpath_node.node();
+      node.attribute("name").set_value("Selectors");
+      ConvertCompositeIdsToSelectors(node);
+    }
+
+    // convert FieldType to ElementType.
+    xpath_set = document.select_nodes(
+      "//ServerManagerState/Proxy[@group='sources' and @type='SelectionQuerySource']/"
+      "Property[@name='FieldType']");
+    for (auto xpath_node : xpath_set)
+    {
+      auto node = xpath_node.node();
+      node.attribute("name").set_value("ElementType");
+      auto value = node.child("Element").attribute("value");
+      value.set_value(vtkSelectionNode::ConvertSelectionFieldToAttributeType(value.as_int()));
+    }
+
     return true;
   }
 };

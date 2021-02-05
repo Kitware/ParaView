@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 #include <QPointer>
+#include <QSignalBlocker>
 
 #include <cassert>
 
@@ -76,18 +77,14 @@ public:
       pqApplicationCore::instance()->manager("SELECTION_MANAGER"));
 
     this->Ui.setupUi(self);
-    this->Ui.verticalLayout->setMargin(pqPropertiesPanel::suggestedMargin());
-    this->Ui.verticalLayout->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
-    this->Ui.horizontalLayout->setMargin(pqPropertiesPanel::suggestedMargin());
-    this->Ui.horizontalLayout->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
+    this->Ui.gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->Ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
+    this->Ui.gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
     self->connect(this->SelectionManager, SIGNAL(selectionChanged(pqOutputPort*)),
       SLOT(showSelectedData(pqOutputPort*)));
     self->connect(
       this->Ui.showTypeComboBox, SIGNAL(currentIndexChanged(int)), SLOT(updateFieldType()));
-    self->connect(
-      this->Ui.invertSelectionCheckBox, SIGNAL(toggled(bool)), SLOT(invertSelection(bool)));
-
     this->showSelectedData(this->SelectionManager->getSelectedPort(), self);
   }
 
@@ -119,9 +116,6 @@ public:
 
       vtkSMProxy* repr = pxm->NewProxy("representations", "SpreadSheetRepresentation");
       repr->PrototypeOn();
-      // we always want to show all the blocks in the dataset, since we don't have a
-      // block chooser widget in this dialog.
-      vtkSMPropertyHelper(repr, "CompositeDataSetIndex").Set(0);
       repr->UpdateVTKObjects();
 
       vtkSMViewProxy* view =
@@ -163,7 +157,6 @@ public:
     bool prev = this->Ui.showTypeComboBox->blockSignals(true);
     pqFindDataCreateSelectionFrame::populateSelectionTypeCombo(this->Ui.showTypeComboBox, port);
     this->Ui.showTypeComboBox->blockSignals(prev);
-    this->Ui.invertSelectionCheckBox->setEnabled(port != nullptr);
     if (port)
     {
       vtkSMPropertyHelper(this->RepresentationProxy, "Input")
@@ -178,23 +171,31 @@ public:
         // We only do this if the selection is "new" so that is user is
         // interactively updating the selection and he picked a specified
         // attribute type, we don't force change it on him/her.
-        int index = this->Ui.showTypeComboBox->findData(
-          vtkSelectionNode::ConvertSelectionFieldToAttributeType(
-            vtkSMPropertyHelper(selectionSource, "FieldType").GetAsInt()));
+        int index = -1;
+        if (auto ftProperty = selectionSource->GetProperty("FieldType"))
+        {
+          // old-style properties
+          index = this->Ui.showTypeComboBox->findData(
+            vtkSelectionNode::ConvertSelectionFieldToAttributeType(
+              vtkSMPropertyHelper(ftProperty).GetAsInt()));
+        }
+        else if (auto etProperty = selectionSource->GetProperty("ElementType"))
+        {
+          // new-style properties.
+          index = this->Ui.showTypeComboBox->findData(vtkSMPropertyHelper(etProperty).GetAsInt());
+        }
         if (index != -1)
         {
-          prev = this->Ui.showTypeComboBox->blockSignals(true);
+          const QSignalBlocker blocker(this->Ui.showTypeComboBox);
           this->Ui.showTypeComboBox->setCurrentIndex(index);
-          this->Ui.showTypeComboBox->blockSignals(prev);
+          this->Ui.showTypeComboBox->setEnabled(true);
+        }
+        else
+        {
+          this->Ui.showTypeComboBox->setEnabled(false);
         }
       }
       this->updateFieldType();
-
-      bool checked =
-        selectionSource && (vtkSMPropertyHelper(selectionSource, "InsideOut").GetAsInt() != 0);
-      prev = this->Ui.invertSelectionCheckBox->blockSignals(true);
-      this->Ui.invertSelectionCheckBox->setChecked(checked);
-      this->Ui.invertSelectionCheckBox->blockSignals(prev);
     }
   }
 
@@ -256,30 +257,6 @@ pqOutputPort* pqFindDataCurrentSelectionFrame::showingPort() const
 void pqFindDataCurrentSelectionFrame::updateFieldType()
 {
   this->Internals->updateFieldType();
-}
-
-//-----------------------------------------------------------------------------
-void pqFindDataCurrentSelectionFrame::invertSelection(bool val)
-{
-  Ui::FindDataCurrentSelectionFrame& ui = this->Internals->Ui;
-  ui.invertSelectionCheckBox->blockSignals(true);
-  ui.invertSelectionCheckBox->setChecked(val);
-  ui.invertSelectionCheckBox->blockSignals(false);
-
-  pqOutputPort* port = this->showingPort();
-  if (port)
-  {
-    vtkSMSourceProxy* selectionSource = port->getSelectionInput();
-    if (selectionSource)
-    {
-      vtkSMPropertyHelper(selectionSource, "InsideOut").Set(val ? 1 : 0);
-      selectionSource->UpdateVTKObjects();
-      port->renderAllViews();
-
-      // update spread sheet
-      this->Internals->updateSpreadSheet();
-    }
-  }
 }
 
 //-----------------------------------------------------------------------------

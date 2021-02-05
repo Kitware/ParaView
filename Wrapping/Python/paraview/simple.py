@@ -2164,9 +2164,17 @@ def _select(seltype, query=None, proxy=None):
         # This ends up being true for all cells.
         query = "id >= 0"
 
+    from paraview.vtk import vtkDataObject
+
     # Note, selSource is not registered with the proxy manager.
     selSource = servermanager.sources.SelectionQuerySource()
-    selSource.FieldType = seltype
+    if seltype.lower() == "point":
+        elementType = vtkDataObject.POINT
+    elif seltype.lower() == "cell":
+        elementType = vtkDataObject.CELL
+    else:
+        elementType = seltype
+    selSource.ElementType = elementType
     selSource.QueryString = str(query)
     proxy.SMProxy.SetSelectionInput(proxy.Port, selSource.SMProxy, 0)
     return selSource

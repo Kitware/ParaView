@@ -37,8 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 class QComboBox;
-class vtkSMProperty;
+class QIcon;
 class vtkSMDomain;
+class vtkSMProperty;
+
 /**
 * combo box domain
 * observes the domain for a combo box and updates accordingly.
@@ -74,6 +76,12 @@ public:
   vtkSMProperty* getProperty() const;
   vtkSMDomain* getDomain() const;
   const QStringList& getUserStrings() const;
+
+  /**
+   * Returns an icon for the provided field association.
+   * This isn't the best place for this API, but leaving this here for now.
+   */
+  static QIcon getIcon(int fieldAssociation);
 
 public Q_SLOTS:
   void domainChanged();

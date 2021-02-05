@@ -28,10 +28,13 @@
 #ifndef vtkQuerySelectionSource_h
 #define vtkQuerySelectionSource_h
 
+#include "vtkDataObject.h"                      // for vtkDataObject
 #include "vtkPVVTKExtensionsExtractionModule.h" //needed for exports
 #include "vtkSelectionAlgorithm.h"
+#include <string> // for std::string
+#include <vector> // for std::vector
 
-class vtkAbstractArray;
+class vtkMultiProcessController;
 
 class VTKPVVTKEXTENSIONSEXTRACTION_EXPORT vtkQuerySelectionSource : public vtkSelectionAlgorithm
 {
@@ -42,6 +45,15 @@ public:
 
   //@{
   /**
+   * Get/Set the parallel controller. Initialized to
+   * `vtkMultiProcessController::GetGlobalController` in the constructor.
+   */
+  void SetController(vtkMultiProcessController*);
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  //@}
+
+  //@{
+  /**
    * Set/get the query expression string.
    */
   vtkSetStringMacro(QueryString);
@@ -49,28 +61,50 @@ public:
   //@}
 
   //@{
-  vtkSetMacro(CompositeIndex, int);
-  vtkGetMacro(CompositeIndex, int);
+  /**
+   * AssemblyName to choose an assembly and Selectors for that assembly to limit
+   * selection to specific blocks.
+   */
+  vtkSetStringMacro(AssemblyName);
+  vtkGetStringMacro(AssemblyName);
+  void AddSelector(const char*);
+  void ClearSelectors();
   //@}
 
-  vtkSetMacro(HierarchicalLevel, int);
-  vtkGetMacro(HierarchicalLevel, int);
+  //@{
+  /**
+   * Get/Set AMR level and index to use. Note, while VTK uses `unsigned int` for
+   * amr level and index numbers we use `int`s in this API  and use -1 to
+   * indicate that no AMR level/index has been specified.
+   */
+  vtkSetClampMacro(AMRLevel, int, -1, VTK_INT_MAX);
+  vtkGetMacro(AMRLevel, int);
+  vtkSetClampMacro(AMRIndex, int, -1, VTK_INT_MAX);
+  vtkGetMacro(AMRIndex, int);
+  //@}
 
-  vtkSetMacro(HierarchicalIndex, int);
-  vtkGetMacro(HierarchicalIndex, int);
-
-  vtkSetMacro(ProcessID, int);
+  //@{
+  /**
+   * Get/Set which process to limit the selection to. `-1` is treated as
+   * all processes.
+   */
+  vtkSetClampMacro(ProcessID, int, -1, VTK_INT_MAX);
   vtkGetMacro(ProcessID, int);
+  //@}
 
-  // Possible values are as defined by
-  // vtkSelectionNode::SelectionField.
-  vtkSetMacro(FieldType, int);
-  vtkGetMacro(FieldType, int);
+  //@{
+  /**
+   * Set/Get which types of elements are being selected.
+   * Accepted values are defined in `vtkDataObject::AttributeTypes`. Note,
+   * `vtkDataObject::FIELD` and `vtkDataObject::POINT_THEN_CELL` are not
+   * supported.
+   */
+  vtkSetClampMacro(ElementType, int, vtkDataObject::POINT, vtkDataObject::ROW);
+  vtkGetMacro(ElementType, int);
+  //@}
 
   /**
    * This merely reconstructs the query as a user friendly text eg. "IDs >= 12".
-   * ( Makes you want to wonder if we should support parsing input query text as
-   * well ;) )
    */
   const char* GetUserFriendlyText();
 
@@ -78,8 +112,8 @@ public:
   /**
    * Set/get the invert selection flag.
    */
-  vtkSetMacro(Inverse, int);
-  vtkGetMacro(Inverse, int);
+  vtkSetMacro(Inverse, bool);
+  vtkGetMacro(Inverse, bool);
   //@}
 
   //@{
@@ -95,28 +129,23 @@ protected:
 
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
-
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
-
-  int FieldType;
-
-  char* QueryString;
-
-  int CompositeIndex;
-  int HierarchicalIndex;
-  int HierarchicalLevel;
-  int ProcessID;
-  int NumberOfLayers;
 
 private:
   vtkQuerySelectionSource(const vtkQuerySelectionSource&) = delete;
   void operator=(const vtkQuerySelectionSource&) = delete;
 
-  class vtkInternals;
-  vtkInternals* Internals;
-
-  int Inverse;
+  vtkMultiProcessController* Controller;
+  char* QueryString;
+  int ElementType;
+  char* AssemblyName;
+  std::vector<std::string> Selectors;
+  int AMRLevel;
+  int AMRIndex;
+  int ProcessID;
+  int NumberOfLayers;
+  bool Inverse;
 };
 
 #endif

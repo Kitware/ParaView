@@ -133,6 +133,11 @@ pqComboBoxDomain::~pqComboBoxDomain()
   delete this->Internal;
 }
 
+QIcon pqComboBoxDomain::getIcon(int fieldAssociation)
+{
+  return ::get_icon(fieldAssociation);
+}
+
 void pqComboBoxDomain::addString(const QString& str)
 {
   this->Internal->UserStrings.push_back(str);

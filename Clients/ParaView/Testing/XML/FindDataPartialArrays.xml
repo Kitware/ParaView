@@ -22,14 +22,16 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionQuery" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/criteria" command="activated" arguments="Elevation" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/condition" command="activated" arguments="is &gt;=" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause1/valueStackedWidget/singleValue/value" command="set_string" arguments="0.5" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/runQuery" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/outputWidgetDock/outputWidget/stackedWidget/page/treeView" command="setCurrent" arguments="0.1" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/extractSelection" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/Input/1QComboBox0" command="activated" arguments="GroupDatasets1" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/ElementType/ComboBox" command="activated" arguments="Cell" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget0/1QComboBox0" command="activated" arguments="Elevation" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget0/1QComboBox1" command="activated" arguments="is &gt;=" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget0/1QWidget0/value" command="set_string" arguments="0.5" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/findData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/informationExpander/label" command="mousePress" arguments="1,1,0,114,7" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/informationExpander/label" command="mouseRelease" arguments="1,0,0,114,7" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/extract" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />

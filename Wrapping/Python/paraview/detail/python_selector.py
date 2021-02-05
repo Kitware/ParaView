@@ -42,11 +42,12 @@ def _create_id_array(dataobject, attributeType):
                 np.arange(dataobject.GetNumberOfElements(attributeType)))
 
 def maskarray_is_valid(maskArray):
-    """Validates that the maskArray is either a VTKArray or a
-    VTKCompositeDataArrays or a NoneArray other returns false."""
+    """Validates that the maskArray is either a VTKArray,
+    VTKCompositeDataArray, ndarray or a NoneArray other returns false."""
     return maskArray is dsa.NoneArray or \
         isinstance(maskArray, dsa.VTKArray) or \
-        isinstance(maskArray, dsa.VTKCompositeDataArray)
+        isinstance(maskArray, dsa.VTKCompositeDataArray) or \
+        isinstance(maskArray, np.ndarray)
 
 def execute(inputDO, selectionNode, insidednessArrayName, outputDO):
     field_type = selectionNode.GetFieldType()

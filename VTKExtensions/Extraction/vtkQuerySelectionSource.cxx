@@ -18,52 +18,68 @@
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <sstream>
 #include <vector>
 #include <vtksys/SystemTools.hxx>
 
-class vtkQuerySelectionSource::vtkInternals
-{
-};
-
 vtkStandardNewMacro(vtkQuerySelectionSource);
+vtkCxxSetObjectMacro(vtkQuerySelectionSource, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkQuerySelectionSource::vtkQuerySelectionSource()
+  : Controller(nullptr)
+  , QueryString(nullptr)
+  , ElementType(vtkDataObject::CELL)
+  , AssemblyName(nullptr)
+  , Selectors()
+  , AMRLevel(-1)
+  , AMRIndex(-1)
+  , ProcessID(-1)
+  , NumberOfLayers(0)
+  , Inverse(false)
 {
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
-
-  this->Internals = new vtkInternals();
-
-  this->FieldType = vtkSelectionNode::CELL;
-  this->QueryString = nullptr;
-  this->CompositeIndex = -1;
-  this->HierarchicalIndex = -1;
-  this->HierarchicalLevel = -1;
-  this->ProcessID = -1;
-  this->Inverse = 0;
-  this->NumberOfLayers = 0;
+  this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
 //----------------------------------------------------------------------------
 vtkQuerySelectionSource::~vtkQuerySelectionSource()
 {
-  delete this->Internals;
-  this->Internals = nullptr;
+  this->SetController(nullptr);
+  this->SetAssemblyName(nullptr);
 }
 
 //----------------------------------------------------------------------------
+void vtkQuerySelectionSource::AddSelector(const char* selector)
+{
+  if (selector)
+  {
+    this->Selectors.push_back(selector);
+    this->Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkQuerySelectionSource::ClearSelectors()
+{
+  if (!this->Selectors.empty())
+  {
+    this->Selectors.clear();
+    this->Modified();
+  }
+}
+
+//------------------------------------------------------------------------------
 int vtkQuerySelectionSource::RequestInformation(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
-  // We can handle multiple piece request.
-  vtkInformation* info = outputVector->GetInformationObject(0);
-  info->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
   return 1;
 }
 
@@ -71,48 +87,47 @@ int vtkQuerySelectionSource::RequestInformation(vtkInformation* vtkNotUsed(reque
 int vtkQuerySelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
-  vtkSelection* output = vtkSelection::GetData(outputVector);
-  vtkSelectionNode* selNode = vtkSelectionNode::New();
+  auto output = vtkSelection::GetData(outputVector, 0);
+  auto selNode = vtkSelectionNode::New();
   output->AddNode(selNode);
-  selNode->Delete();
+  selNode->FastDelete();
 
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  int piece = 0;
-  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()))
+  const int rank = this->Controller ? this->Controller->GetLocalProcessId() : -1;
+  if (this->ProcessID != -1 && this->Controller != nullptr &&
+    this->Controller->GetLocalProcessId() != this->ProcessID)
   {
-    piece = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
-  }
-
-  if (this->ProcessID >= 0 && piece != this->ProcessID)
-  {
+    // empty selection on this rank since.
     return 1;
   }
 
-  vtkInformation* props = selNode->GetProperties();
+  auto properties = selNode->GetProperties();
 
   // Add qualifiers.
-  if (this->CompositeIndex >= 0)
+  for (const auto& selector : this->Selectors)
   {
-    props->Set(vtkSelectionNode::COMPOSITE_INDEX(), this->CompositeIndex);
+    properties->Append(vtkSelectionNode::SELECTORS(), selector.c_str());
+  }
+  if (this->AssemblyName != nullptr)
+  {
+    properties->Set(vtkSelectionNode::ASSEMBLY_NAME(), this->AssemblyName);
   }
 
-  if (this->HierarchicalLevel >= 0)
+  if (this->AMRLevel != -1)
   {
-    props->Set(vtkSelectionNode::HIERARCHICAL_LEVEL(), this->HierarchicalLevel);
+    properties->Set(vtkSelectionNode::HIERARCHICAL_LEVEL(), this->AMRLevel);
   }
 
-  if (this->HierarchicalIndex >= 0)
+  if (this->AMRIndex != -1)
   {
-    props->Set(vtkSelectionNode::HIERARCHICAL_INDEX(), this->HierarchicalIndex);
+    properties->Set(vtkSelectionNode::HIERARCHICAL_INDEX(), this->AMRIndex);
   }
 
-  props->Set(vtkSelectionNode::FIELD_TYPE(), this->FieldType);
-  props->Set(vtkSelectionNode::CONTENT_TYPE(), vtkSelectionNode::QUERY);
-  props->Set(vtkSelectionNode::INVERSE(), this->Inverse);
-  props->Set(vtkSelectionNode::CONNECTED_LAYERS(), this->NumberOfLayers);
-
+  properties->Set(vtkSelectionNode::FIELD_TYPE(),
+    vtkSelectionNode::ConvertAttributeTypeToSelectionField(this->ElementType));
+  properties->Set(vtkSelectionNode::CONTENT_TYPE(), vtkSelectionNode::QUERY);
+  properties->Set(vtkSelectionNode::INVERSE(), this->Inverse ? 1 : 0);
+  properties->Set(vtkSelectionNode::CONNECTED_LAYERS(), this->NumberOfLayers);
   selNode->SetQueryString(this->QueryString);
-
   return 1;
 }
 

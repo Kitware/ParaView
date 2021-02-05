@@ -153,6 +153,7 @@ set(classes
   vtkSMReaderReloadHelper
   vtkSMRemoteObject
   vtkSMRemoteObjectUpdateUndoElement
+  vtkSMSelectionQueryDomain
   vtkSMSelfGeneratingSourceProxy
   vtkSMServerStateLocator
   vtkSMSession

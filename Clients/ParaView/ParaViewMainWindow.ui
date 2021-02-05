@@ -391,6 +391,18 @@
     </layout>
    </widget>
   </widget>
+  <widget class="QDockWidget" name="findDataDock">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Find Data</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="pqFindDataWidget" name="findDataPanel"/>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -486,6 +498,12 @@
    <class>pqLightsInspector</class>
    <extends>QWidget</extends>
    <header>pqLightsInspector.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqFindDataWidget</class>
+   <extends>QWidget</extends>
+   <header>pqFindDataWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

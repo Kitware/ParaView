@@ -31,7 +31,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqSelectionInputWidget.h"
 
+#include "pqApplicationCore.h"
+#include "pqOutputPort.h"
+#include "pqPipelineSource.h"
+#include "pqProxy.h"
+#include "pqSMAdaptor.h"
+#include "pqSelectionManager.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkSMFieldDataDomain.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyManager.h"
@@ -43,14 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QTextStream>
 #include <QtDebug>
-
-#include "pqApplicationCore.h"
-#include "pqOutputPort.h"
-#include "pqPipelineSource.h"
-#include "pqProxy.h"
-#include "pqSMAdaptor.h"
-#include "pqSelectionManager.h"
-
 #include <string>
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
@@ -64,30 +63,6 @@ class pqSelectionInputWidget::UI : public Ui::pqSelectionInputWidget
 {
 };
 
-namespace
-{
-/// given vtkSelectionNode::SelectionField, returns a string for it.
-const char* getSelectionFieldTypeAsString(int fieldType)
-{
-  switch (fieldType)
-  {
-    case vtkSelectionNode::CELL:
-      return "Cells";
-    case vtkSelectionNode::POINT:
-      return "Points";
-    case vtkSelectionNode::FIELD:
-      return "Fields (not supported)";
-    case vtkSelectionNode::VERTEX:
-      return "Vertices";
-    case vtkSelectionNode::EDGE:
-      return "Edges";
-    case vtkSelectionNode::ROW:
-      return "Rows";
-    default:
-      return "Unknown (not supported)";
-  }
-}
-}
 //-----------------------------------------------------------------------------
 pqSelectionInputWidget::pqSelectionInputWidget(QWidget* _parent)
   : QWidget(_parent)
@@ -126,11 +101,18 @@ void pqSelectionInputWidget::updateLabels()
 
   this->ui->label->setText("Copied Selection");
 
-  int fieldType =
-    pqSMAdaptor::getElementProperty(this->SelectionSource->GetProperty("FieldType")).toInt();
-
-  const char* fieldTypeAsString = getSelectionFieldTypeAsString(fieldType);
-
+  QString fieldTypeAsString("Unknown");
+  if (auto smproperty = this->SelectionSource->GetProperty("FieldType"))
+  {
+    fieldTypeAsString = vtkSMFieldDataDomain::GetElementTypeAsString(
+      vtkSelectionNode::ConvertSelectionFieldToAttributeType(
+        vtkSMPropertyHelper(smproperty).GetAsInt()));
+  }
+  else if ((smproperty = this->SelectionSource->GetProperty("ElementType")))
+  {
+    fieldTypeAsString =
+      vtkSMFieldDataDomain::GetElementTypeAsString(vtkSMPropertyHelper(smproperty).GetAsInt());
+  }
   const char* xmlname = this->SelectionSource->GetXMLName();
   QString text = QString("Type: ");
   QTextStream columnValues(&text, QIODevice::ReadWrite);

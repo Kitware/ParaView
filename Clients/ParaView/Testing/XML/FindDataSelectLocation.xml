@@ -5,28 +5,29 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionQuery" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause0/criteria" command="activated" arguments="Cell" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause0/valueStackedWidget/location/value_x" command="set_string" arguments="4" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause0/valueStackedWidget/location/value_y" command="key" arguments="16777217" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause0/valueStackedWidget/location/value_y" command="set_string" arguments="4" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause0/valueStackedWidget/location/value_z" command="set_string" arguments="4" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause0/valueStackedWidget/location/value_z" command="key" arguments="16777217" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/runQuery" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/extractSelection" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/Input/1QComboBox0" command="activated" arguments="Wavelet1" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/ElementType/ComboBox" command="activated" arguments="Cell" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget0/1QComboBox0" command="activated" arguments="Cell" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget0/1QWidget0/value_x" command="set_string" arguments="4" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget0/1QWidget0/value_y" command="set_string" arguments="4" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget0/1QWidget0/value_z" command="set_string" arguments="4" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/findData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/extract" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,41,13,/0:0/0:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,41,13,/0:0/0:0" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/selectionType" command="activated" arguments="Point(s)" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause0/criteria" command="activated" arguments="Point" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause0/valueStackedWidget/locationWithTolerance/location_x" command="set_string" arguments="-" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause0/valueStackedWidget/locationWithTolerance/location_x" command="set_string" arguments="-2" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause0/valueStackedWidget/locationWithTolerance/location_z" command="key" arguments="16777217" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause0/valueStackedWidget/locationWithTolerance/location_z" command="set_string" arguments="-" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause0/valueStackedWidget/locationWithTolerance/location_z" command="set_string" arguments="-2" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/1QScrollArea0/qt_scrollarea_viewport/1QWidget0/queryClause0/valueStackedWidget/locationWithTolerance/location_y" command="set_string" arguments="2" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/runQuery" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FindDataDialog/extractSelection" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/ElementType/ComboBox" command="activated" arguments="Point" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget0/1QWidget0/value_x" command="set_string" arguments="-2" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget0/1QWidget0/value_y" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget0/1QWidget0/value_z" command="set_string" arguments="-2" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/container/1pqProxyWidget0/QueryString/1QWidget0/1QWidget0/value_tolerance" command="set_string" arguments="0" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/findData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/findDataDock/findDataScrollArea/scrollArea/qt_scrollarea_viewport/findDataWidget/extract" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/findDataDock/qt_dockwidget_closebutton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.517241,0.432836,1,1,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.734483,0.467164,1,0,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.734483,0.467164,1,0,0)" />

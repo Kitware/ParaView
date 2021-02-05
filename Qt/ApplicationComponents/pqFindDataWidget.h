@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  pqFindDataWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,67 +29,59 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqFindDataCurrentSelectionFrame_h
-#define pqFindDataCurrentSelectionFrame_h
+#ifndef pqFindDataWidget_h
+#define pqFindDataWidget_h
 
-#include "pqComponentsModule.h"
+#include "pqApplicationComponentsModule.h" // for exports
+#include <QScopedPointer>                  // for QScopedPointer
 #include <QWidget>
 
+/**
+ * @class pqFindDataWidget
+ * @brief Widget to find data using selection queries.
+ *
+ * @section DeveloperNotes Developer Notes
+ *
+ * * Currently, this simply uses `pqFindDataCurrentSelectionFrame` to show
+ *   current selection. We should modernize/cleanup that code and maybe just
+ *   merge that code with this class to avoid confusion.
+ *
+ */
+
+class pqServer;
+class pqPipelineSource;
 class pqOutputPort;
 
-/**
-* pqFindDataCurrentSelectionFrame is designed to be used by pqFindDataDialog.
-* pqFindDataDialog uses this class to show the current selection in a
-* spreadsheet view. This class encapsulates the logic to monitor the current
-* selection by tracking the pqSelectionManager and then showing the results in
-* the spreadsheet.
-*/
-class PQCOMPONENTS_EXPORT pqFindDataCurrentSelectionFrame : public QWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqFindDataWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
 
 public:
-  pqFindDataCurrentSelectionFrame(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-  ~pqFindDataCurrentSelectionFrame() override;
+  pqFindDataWidget(QWidget* parent = nullptr);
+  ~pqFindDataWidget() override;
 
-  /**
-  * return the port from which this frame is showing the selected data, if
-  * any.
-  */
-  pqOutputPort* showingPort() const;
+  pqServer* server() const;
 
-Q_SIGNALS:
+public Q_SLOTS:
   /**
-  * signal fired to indicate the selected port that currently being shown in
-  * the frame.
-  */
-  void showing(pqOutputPort*);
+   * Set the server to use.
+   */
+  void setServer(pqServer* server);
 
 private Q_SLOTS:
   /**
-  * show the selected data from the given output port in the frame.
-  */
-  void showSelectedData(pqOutputPort*);
-
-  /**
-  * update the field-type set of the internal spreadsheet view based on the
-  * value in the combo-box.
-  */
-  void updateFieldType();
-
-  /**
-  * update the data shown in the spreadsheet aka render the spreadsheet.
-  */
-  void updateSpreadSheet();
+   * Ensure we don't have any references to ab proxy being deleted.
+   */
+  void aboutToRemove(pqPipelineSource*);
 
 private:
-  Q_DISABLE_COPY(pqFindDataCurrentSelectionFrame)
+  Q_DISABLE_COPY(pqFindDataWidget);
 
   class pqInternals;
-  friend class pqInternals;
+  QScopedPointer<pqInternals> Internals;
 
-  pqInternals* Internals;
+  void handleSelectionChanged(pqOutputPort*);
 };
 
 #endif

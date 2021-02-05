@@ -77,6 +77,7 @@ public:
    * \li \c view_resolution: pqViewResolutionPropertyWidget
    * \li \c pause_livesource: pqPauseLiveSourcePropertyWidget
    * \li \c data_assembly_editor: pqDataAssemblyPropertyWidget
+   * \li \c selection_query : pqSelectionQueryPropertyWidget
    */
   pqPropertyWidget* createWidgetForProperty(
     vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parentWidget) override;

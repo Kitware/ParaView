@@ -101,6 +101,7 @@ set(classes
   pqExtractorsMenuReaction
   pqFileNamePropertyWidget
   pqFiltersMenuReaction
+  pqFindDataWidget
   pqFontPropertyWidget
   pqGenericPropertyWidgetDecorator
   pqGlyphScaleFactorPropertyWidget
@@ -169,6 +170,7 @@ set(classes
   pqSaveStateReaction
   pqScalarBarVisibilityReaction
   pqSearchItemReaction
+  pqSelectionQueryPropertyWidget
   pqSelectionReaction
   pqSeriesEditorPropertyWidget
   pqServerConnectReaction
@@ -251,6 +253,7 @@ set(ui_files
   Resources/UI/pqEmptyView.ui
   Resources/UI/pqExampleVisualizationsDialog.ui
   Resources/UI/pqFileMenuBuilder.ui
+  Resources/UI/pqFindDataWidget.ui
   Resources/UI/pqFontPropertyWidget.ui
   Resources/UI/pqHandlePropertyWidget.ui
   Resources/UI/pqImageCompressorWidget.ui

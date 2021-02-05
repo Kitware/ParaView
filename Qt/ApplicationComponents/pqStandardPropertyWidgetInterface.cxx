@@ -74,6 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPauseLiveSourcePropertyWidget.h"
 #include "pqPropertyCollectionWidget.h"
 #include "pqProxyEditorPropertyWidget.h"
+#include "pqSelectionQueryPropertyWidget.h"
 #include "pqSeriesEditorPropertyWidget.h"
 #include "pqSessionTypeDecorator.h"
 #include "pqShaderReplacementsSelectorPropertyWidget.h"
@@ -212,6 +213,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
   else if (name == "data_assembly_editor")
   {
     return new pqDataAssemblyPropertyWidget(smProxy, smProperty, parentWidget);
+  }
+  else if (name == "selection_query")
+  {
+    return new pqSelectionQueryPropertyWidget(smProxy, smProperty, parentWidget);
   }
 
   // *** NOTE: When adding new types, please update the header documentation ***

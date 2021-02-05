@@ -83,10 +83,8 @@ public:
     this->PointLabelsMenu.setObjectName("PointLabelsMenu");
 
     this->Ui.setupUi(self);
-    this->Ui.interactiveSelectionColor->setVisible(false);
-    this->Ui.labelPropertiesInteractiveSelection->setVisible(false);
-    this->Ui.horizontalLayout->setMargin(pqPropertiesPanel::suggestedMargin());
-    this->Ui.horizontalLayout->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
+    this->Ui.mainLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->Ui.mainLayout->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
 
     this->Ui.cellLabelsButton->setMenu(&this->CellLabelsMenu);
     this->Ui.pointLabelsButton->setMenu(&this->PointLabelsMenu);
@@ -500,63 +498,6 @@ void pqFindDataSelectionDisplayFrame::showFrustum(bool val)
 }
 
 //-----------------------------------------------------------------------------
-void pqFindDataSelectionDisplayFrame::setUseVerticalLayout(bool vertical)
-{
-  // we support this so that we can add this widget in a dock panel to allow
-  // each access to these properties.
-  if (this->useVerticalLayout() == vertical)
-  {
-    return;
-  }
-
-  Ui::FindDataSelectionDisplayFrame& ui = this->Internals->Ui;
-  delete this->layout();
-  ui.horizontalLayout = nullptr;
-
-  if (vertical)
-  {
-    this->Internals->Ui.interactiveSelectionColor->setVisible(true);
-    this->Internals->Ui.labelPropertiesInteractiveSelection->setVisible(true);
-
-    QVBoxLayout* vbox = new QVBoxLayout(this);
-    vbox->setMargin(pqPropertiesPanel::suggestedMargin());
-    vbox->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
-    vbox->addWidget(ui.cellLabelsButton);
-    vbox->addWidget(ui.pointLabelsButton);
-
-    QHBoxLayout* hbox = new QHBoxLayout();
-    hbox->addWidget(ui.selectionColor);
-    hbox->addStretch();
-    hbox->addWidget(ui.showFrustumButton);
-    hbox->addWidget(ui.labelPropertiesSelection);
-    vbox->addLayout(hbox);
-
-    hbox = new QHBoxLayout();
-    hbox->addWidget(ui.interactiveSelectionColor);
-    hbox->addStretch();
-    hbox->addWidget(ui.labelPropertiesInteractiveSelection);
-    vbox->addLayout(hbox);
-    vbox->addStretch();
-  }
-  else
-  {
-    QHBoxLayout* hbox = new QHBoxLayout(this);
-    hbox->setMargin(pqPropertiesPanel::suggestedMargin());
-    hbox->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
-    hbox->addWidget(ui.selectionColor);
-    hbox->addWidget(ui.cellLabelsButton);
-    hbox->addWidget(ui.pointLabelsButton);
-    hbox->addWidget(ui.showFrustumButton);
-    hbox->addWidget(ui.labelPropertiesSelection);
-  }
-}
-
-//-----------------------------------------------------------------------------
-bool pqFindDataSelectionDisplayFrame::useVerticalLayout() const
-{
-  return qobject_cast<QVBoxLayout*>(this->layout()) != nullptr;
-}
-
 void pqFindDataSelectionDisplayFrame::updateInteractiveSelectionLabelProperties()
 {
   vtkSMProxy* selectionProxy =
