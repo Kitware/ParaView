@@ -1,6 +1,11 @@
 ###############################################################################
 # For python scripts for testing.
 #
+# These tests depend on target ParaView::RemotingMisc, which may not
+# exist in the edition being built. Exit
+if (NOT TARGET ParaView::RemotingMisc)
+  return()
+endif ()
 # Add python script names here.
 set(PY_TESTS
   PVDWriter.py,NO_VALID
