@@ -12,6 +12,10 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+/**
+ * This test iterates over defined proxies and verifies that they can be instantiated.
+ */
+
 #include "vtkInitializationHelper.h"
 #include "vtkLogger.h"
 #include "vtkNew.h"
@@ -29,6 +33,13 @@ PURPOSE.  See the above copyright notice for more information.
 
 int TestValidateProxies(int argc, char* argv[])
 {
+  // Create a new session.
+  auto session = vtkSMSession::New();
+  auto pxm = session->GetSessionProxyManager();
+  auto pdm = pxm->GetProxyDefinitionManager();
+
+  // Some proxies should not be instantiated or depend on a proxy that might not be present
+  // in the current edition.
   std::set<std::pair<std::string, std::string> > exceptions;
   exceptions.insert(std::pair<std::string, std::string>("internal_writers", "FileSeriesWriter"));
   exceptions.insert(
@@ -36,6 +47,7 @@ int TestValidateProxies(int argc, char* argv[])
   exceptions.insert(
     std::pair<std::string, std::string>("internal_writers", "ParallelSerialWriter"));
   exceptions.insert(std::pair<std::string, std::string>("internal_writers", "ParallelWriterBase"));
+  exceptions.insert(std::pair<std::string, std::string>("writers", "PPLYWriter"));
   exceptions.insert(
     std::pair<std::string, std::string>("internal_writers", "XMLDataObjectWriterBase"));
   exceptions.insert(std::pair<std::string, std::string>("internal_views", "XYChartViewBase"));
@@ -44,7 +56,15 @@ int TestValidateProxies(int argc, char* argv[])
     std::pair<std::string, std::string>("internal_readers", "VisItSeriesReaderBase"));
   exceptions.insert(std::pair<std::string, std::string>("extract_writers", "JPG"));
   exceptions.insert(std::pair<std::string, std::string>("extract_writers", "PNG"));
+  if (!pdm->HasDefinition("writers", "PPLYWriter"))
+  {
+    exceptions.insert(std::pair<std::string, std::string>("extract_writers", "PLY"));
+  }
   exceptions.insert(std::pair<std::string, std::string>("extract_writers", "CinemaVolumetricPNG"));
+  if (!pdm->HasDefinition("misc", "SaveAnimationExtracts"))
+  {
+    exceptions.insert(std::pair<std::string, std::string>("pythontracing", "PythonStateOptions"));
+  }
 
   // requires reader factory
   exceptions.insert(std::pair<std::string, std::string>("sources", "EnsembleDataReader"));
@@ -57,10 +77,6 @@ int TestValidateProxies(int argc, char* argv[])
   vtkInitializationHelper::Initialize(argv[0], vtkProcessModule::PROCESS_CLIENT);
 
   int counter = 0;
-  // Create a new session.
-  auto session = vtkSMSession::New();
-  auto pxm = session->GetSessionProxyManager();
-  auto pdm = pxm->GetProxyDefinitionManager();
   auto defnIter = pdm->NewIterator();
   for (defnIter->InitTraversal(); !defnIter->IsDoneWithTraversal(); defnIter->GoToNextItem())
   {
@@ -68,6 +84,7 @@ int TestValidateProxies(int argc, char* argv[])
       std::pair<std::string, std::string>(defnIter->GetGroupName(), defnIter->GetProxyName());
     if (exceptions.find(key) != exceptions.end())
     {
+      vtkLogF(INFO, "Skipping: (`%s`, `%s`)", key.first.c_str(), key.second.c_str());
       continue;
     }
 
