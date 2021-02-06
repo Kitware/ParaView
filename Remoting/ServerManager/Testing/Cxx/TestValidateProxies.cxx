@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notice for more information.
 int TestValidateProxies(int argc, char* argv[])
 {
   // Create a new session.
-  auto session = vtkSMSession::New();
+  vtkNew<vtkSMSession> session;
   auto pxm = session->GetSessionProxyManager();
   auto pdm = pxm->GetProxyDefinitionManager();
 
@@ -74,7 +74,8 @@ int TestValidateProxies(int argc, char* argv[])
   vtkInitializationHelper::Initialize(argv[0], vtkProcessModule::PROCESS_CLIENT);
 
   int counter = 0;
-  auto defnIter = pdm->NewIterator();
+  vtkSmartPointer<vtkPVProxyDefinitionIterator> defnIter;
+  defnIter.TakeReference(pdm->NewIterator());
   for (defnIter->InitTraversal(); !defnIter->IsDoneWithTraversal(); defnIter->GoToNextItem())
   {
     auto key = PairType(defnIter->GetGroupName(), defnIter->GetProxyName());
@@ -98,10 +99,8 @@ int TestValidateProxies(int argc, char* argv[])
       proxy->Delete();
     }
   }
-  defnIter->Delete();
   pxm = nullptr;
   pdm = nullptr;
-  session->Delete();
   vtkInitializationHelper::Finalize();
 
   vtkLogF(INFO, "Validated %d proxy definitions (excluding %d)", counter,
