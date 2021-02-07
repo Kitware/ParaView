@@ -776,7 +776,8 @@ bool pqServerLauncher::processCommand(
   QObject::connect(process, SIGNAL(readyReadStandardError()), this, SLOT(readStandardError()));
   QObject::connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
 
-  process->start(command);
+  QStringList args;
+  process->start(command, args);
 
   // wait for process to start.
   // waitForStarted() may block until the process starts. That is generally a short
