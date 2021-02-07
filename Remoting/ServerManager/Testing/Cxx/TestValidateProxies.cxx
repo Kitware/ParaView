@@ -26,6 +26,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 
+#include "vtkDummyController.h"
+
 #include <algorithm>
 #include <set>
 #include <string>
@@ -33,6 +35,10 @@ PURPOSE.  See the above copyright notice for more information.
 
 int TestValidateProxies(int argc, char* argv[])
 {
+  vtkNew<vtkDummyController> contr;
+  contr->Initialize(&argc, &argv);
+  vtkMultiProcessController::SetGlobalController(contr);
+
   // Create a new session.
   vtkNew<vtkSMSession> session;
   auto pxm = session->GetSessionProxyManager();
