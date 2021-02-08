@@ -416,6 +416,10 @@ function (paraview_plugin_build)
         "The requested ${_paraview_build_plugin} plugin is not a ParaView plugin.")
     endif ()
 
+    # Make a variable for where the plugin should go.
+    set(_paraview_build_plugin_directory
+      "${_paraview_build_plugin_destination}/${_paraview_build_plugin}")
+
     # TODO: Support external plugins?
     get_filename_component(_paraview_build_plugin_dir "${_paraview_build_plugin_file}" DIRECTORY)
     file(RELATIVE_PATH _paraview_build_plugin_subdir "${CMAKE_SOURCE_DIR}" "${_paraview_build_plugin_dir}")
