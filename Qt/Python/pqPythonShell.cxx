@@ -465,14 +465,14 @@ void pqPythonShell::runScript()
       QFile file(filename);
       if (file.open(QIODevice::ReadOnly))
       {
-        QByteArray code;
+        QString code;
         // First inject code to let the script know its own path
         code.append(QString("__file__ = r'%1'\n").arg(filename));
         // Then append the file content
         code.append(file.readAll());
         code.append("\n");
         code.append("del __file__\n");
-        this->executeScript(code.data());
+        this->executeScript(code.toLocal8Bit().data());
       }
       else
       {

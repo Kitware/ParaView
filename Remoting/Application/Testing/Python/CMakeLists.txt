@@ -1,13 +1,20 @@
 ###############################################################################
 # For python scripts for testing.
 #
+# These tests depend on target ParaView::RemotingMisc, which may not
+# exist in the edition being built. Exit
+if (NOT TARGET ParaView::RemotingMisc)
+  return()
+endif ()
+
 # Add python script names here.
 set(PY_TESTS
-  AnimationCache.py,NO_VALID
   Animation.py
+  AnimationCache.py,NO_VALID
   AxesGridTestGridLines.py
   CellIntegrator.py,NO_VALID
   ChangeTimeSteps.py
+  CompositeDataFieldArraysInformation.py,NO_VALID
   ColorAttributeTypeBackwardsCompatibility.py,NO_VALID
   ColorPaletteInStateFile.py
   CSVWriterReader.py,NO_VALID
@@ -18,7 +25,6 @@ set(PY_TESTS
   LookupTable.py,NO_VALID
   MultiServer.py,NO_VALID
   PointGaussianProperties.py
-  CompositeDataFieldArraysInformation.py,NO_VALID
   ProgrammableFilterProperties.py,NO_VALID
   ProgrammableFilter.py,NO_VALID
   ProxyBackwardsCompatibilityTest.py,NO_VALID

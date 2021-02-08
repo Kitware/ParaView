@@ -104,53 +104,59 @@ int TestSettings(int argc, char* argv[])
   }
 
   // Test saving different number of repeatable property values
-  vtkSmartPointer<vtkSMProxy> contour;
-  contour.TakeReference(pxm->NewProxy("filters", "Contour"));
-  controller->PreInitializeProxy(contour);
-  vtkSMPropertyHelper(contour, "Input").Set(sphere);
-  controller->PostInitializeProxy(contour);
-
-  vtkSMDoubleVectorProperty* contourValuesProperty =
-    vtkSMDoubleVectorProperty::SafeDownCast(contour->GetProperty("ContourValues"));
-  if (!contourValuesProperty)
+  // NOTE: Contour property is not available in all editions, so it's possible the
+  // Contour filter is not defined. Handle that case.
+  if (pxm->HasDefinition("filters", "Contour"))
   {
-    std::cerr << "No contour values property in GenericContour\n";
-    return EXIT_FAILURE;
-  }
+    vtkSmartPointer<vtkSMProxy> contour;
+    contour.TakeReference(pxm->NewProxy("filters", "Contour"));
+    controller->PreInitializeProxy(contour);
+    vtkSMPropertyHelper(contour, "Input").Set(sphere);
+    controller->PostInitializeProxy(contour);
 
-  // Double vector property resize
-  contourValuesProperty->SetNumberOfElements(1);
-  contourValuesProperty->SetElement(0, -1.0);
-  settings->SetProxySettings(contour);
+    vtkSMDoubleVectorProperty* contourValuesProperty =
+      vtkSMDoubleVectorProperty::SafeDownCast(contour->GetProperty("ContourValues"));
+    if (!contourValuesProperty)
+    {
+      std::cerr << "No contour values property in GenericContour\n";
+      return EXIT_FAILURE;
+    }
 
-  contourValuesProperty->SetNumberOfElements(2);
-  contourValuesProperty->SetElement(0, -2.0);
-  contourValuesProperty->SetElement(1, -3.0);
-  settings->SetProxySettings(contour);
+    // Double vector property resize
+    contourValuesProperty->SetNumberOfElements(1);
+    contourValuesProperty->SetElement(0, -1.0);
+    settings->SetProxySettings(contour);
 
-  auto contourLocatorProperty = vtkSMProxyProperty::SafeDownCast(contour->GetProperty("Locator"));
-  if (!contourLocatorProperty)
-  {
-    std::cerr << "No contour locator property in GenericContour" << std::endl;
-    return EXIT_FAILURE;
-  }
+    contourValuesProperty->SetNumberOfElements(2);
+    contourValuesProperty->SetElement(0, -2.0);
+    contourValuesProperty->SetElement(1, -3.0);
+    settings->SetProxySettings(contour);
 
-  auto proxyListDomain = contourLocatorProperty->FindDomain<vtkSMProxyListDomain>();
-  vtkSMProxy* locator0 = proxyListDomain->GetProxy(0);
-  vtkSMProxy* locator1 = proxyListDomain->GetProxy(1);
-  contourLocatorProperty->SetProxy(0, locator1);
-  settings->SetProxySettings(contour);
-  contourLocatorProperty->SetProxy(0, locator0);
+    auto contourLocatorProperty = vtkSMProxyProperty::SafeDownCast(contour->GetProperty("Locator"));
+    if (!contourLocatorProperty)
+    {
+      std::cerr << "No contour locator property in GenericContour" << std::endl;
+      return EXIT_FAILURE;
+    }
 
-  settings->GetProxySettings(contour);
-  contour->ResetPropertiesToDefault();
+    auto proxyListDomain = contourLocatorProperty->FindDomain<vtkSMProxyListDomain>();
+    vtkSMProxy* locator0 = proxyListDomain->GetProxy(0);
+    vtkSMProxy* locator1 = proxyListDomain->GetProxy(1);
+    contourLocatorProperty->SetProxy(0, locator1);
+    settings->SetProxySettings(contour);
+    contourLocatorProperty->SetProxy(0, locator0);
 
-  if (strcmp(contourLocatorProperty->GetProxy(0)->GetXMLName(), locator1->GetXMLName()) != 0)
-  {
-    std::cerr << "Wrong selected locator. Has " << contourLocatorProperty->GetProxy(0)->GetXMLName()
-              << " instead of " << locator1->GetXMLName() << std::endl;
-    std::cerr << *settings << std::endl;
-    return EXIT_FAILURE;
+    settings->GetProxySettings(contour);
+    contour->ResetPropertiesToDefault();
+
+    if (strcmp(contourLocatorProperty->GetProxy(0)->GetXMLName(), locator1->GetXMLName()) != 0)
+    {
+      std::cerr << "Wrong selected locator. Has "
+                << contourLocatorProperty->GetProxy(0)->GetXMLName() << " instead of "
+                << locator1->GetXMLName() << std::endl;
+      std::cerr << *settings << std::endl;
+      return EXIT_FAILURE;
+    }
   }
 
   vtkSMPropertyHelper(sphere, "Radius").Set(12);

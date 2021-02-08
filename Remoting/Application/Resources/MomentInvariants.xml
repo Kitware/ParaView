@@ -132,11 +132,6 @@ There are 4 possibilities:
           Pattern field name to use.
         </Documentation>
       </StringVectorProperty>
-      <IntVectorProperty name="Order"
-                     command="SetOrder"
-                     number_of_elements="1"
-                     default_values="2">
-      </IntVectorProperty>
       <IntVectorProperty name="NumberOfIntegrationSteps"
                      command="SetNumberOfIntegrationSteps"
                      number_of_elements="1"

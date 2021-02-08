@@ -12,11 +12,11 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}"
 
 # Adding both plugins
 set("_paraview_plugin_default_ComplexModuleArchitecture" ON)
-set("_paraview_plugin_default_GUIMyToolBar" ON)
+set("_paraview_plugin_default_ComplexGUIMyToolBar" ON)
 paraview_plugin_scan(
-  PLUGIN_FILES      
+  PLUGIN_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/ComplexModuleArchitecture/paraview.plugin"
-    "${CMAKE_CURRENT_SOURCE_DIR}/GUIMyToolBar/paraview.plugin"
+    "${CMAKE_CURRENT_SOURCE_DIR}/ComplexGUIMyToolBar/paraview.plugin"
   PROVIDES_PLUGINS  plugins
   REQUIRES_MODULES  required_modules)
 

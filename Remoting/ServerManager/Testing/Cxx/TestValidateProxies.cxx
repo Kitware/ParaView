@@ -12,6 +12,10 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+/**
+ * This test iterates over defined proxies and verifies that they can be instantiated.
+ */
+
 #include "vtkInitializationHelper.h"
 #include "vtkLogger.h"
 #include "vtkNew.h"
@@ -22,6 +26,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 
+#include "vtkDummyController.h"
+
 #include <algorithm>
 #include <set>
 #include <string>
@@ -29,45 +35,59 @@ PURPOSE.  See the above copyright notice for more information.
 
 int TestValidateProxies(int argc, char* argv[])
 {
-  std::set<std::pair<std::string, std::string> > exceptions;
-  exceptions.insert(std::pair<std::string, std::string>("internal_writers", "FileSeriesWriter"));
-  exceptions.insert(
-    std::pair<std::string, std::string>("internal_writers", "ParallelFileSeriesWriter"));
-  exceptions.insert(
-    std::pair<std::string, std::string>("internal_writers", "ParallelSerialWriter"));
-  exceptions.insert(std::pair<std::string, std::string>("internal_writers", "ParallelWriterBase"));
-  exceptions.insert(
-    std::pair<std::string, std::string>("internal_writers", "XMLDataObjectWriterBase"));
-  exceptions.insert(std::pair<std::string, std::string>("internal_views", "XYChartViewBase"));
-  exceptions.insert(std::pair<std::string, std::string>("internal_views", "XYChartViewBase4Axes"));
-  exceptions.insert(
-    std::pair<std::string, std::string>("internal_readers", "VisItSeriesReaderBase"));
-  exceptions.insert(std::pair<std::string, std::string>("extract_writers", "JPG"));
-  exceptions.insert(std::pair<std::string, std::string>("extract_writers", "PNG"));
-  exceptions.insert(std::pair<std::string, std::string>("extract_writers", "CinemaVolumetricPNG"));
+  vtkNew<vtkDummyController> contr;
+  contr->Initialize(&argc, &argv);
+  vtkMultiProcessController::SetGlobalController(contr);
+
+  // Create a new session.
+  vtkNew<vtkSMSession> session;
+  auto pxm = session->GetSessionProxyManager();
+  auto pdm = pxm->GetProxyDefinitionManager();
+
+  // Some proxies should not be instantiated or depend on a proxy that might not be present
+  // in the current edition.
+  using PairType = std::pair<std::string, std::string>;
+  std::set<PairType> exceptions;
+  exceptions.insert(PairType("internal_writers", "FileSeriesWriter"));
+  exceptions.insert(PairType("internal_writers", "ParallelFileSeriesWriter"));
+  exceptions.insert(PairType("internal_writers", "ParallelSerialWriter"));
+  exceptions.insert(PairType("internal_writers", "ParallelWriterBase"));
+  exceptions.insert(PairType("writers", "PPLYWriter"));
+  exceptions.insert(PairType("internal_writers", "XMLDataObjectWriterBase"));
+  exceptions.insert(PairType("internal_views", "XYChartViewBase"));
+  exceptions.insert(PairType("internal_views", "XYChartViewBase4Axes"));
+  exceptions.insert(PairType("internal_readers", "VisItSeriesReaderBase"));
+  exceptions.insert(PairType("extract_writers", "JPG"));
+  exceptions.insert(PairType("extract_writers", "PNG"));
+  if (!pdm->HasDefinition("writers", "PPLYWriter"))
+  {
+    exceptions.insert(PairType("extract_writers", "PLY"));
+  }
+  exceptions.insert(PairType("extract_writers", "CinemaVolumetricPNG"));
+  if (!pdm->HasDefinition("misc", "SaveAnimationExtracts"))
+  {
+    exceptions.insert(PairType("pythontracing", "PythonStateOptions"));
+  }
 
   // requires reader factory
-  exceptions.insert(std::pair<std::string, std::string>("sources", "EnsembleDataReader"));
+  exceptions.insert(PairType("sources", "EnsembleDataReader"));
 
   // reports errors when required Python modules are missing.
-  exceptions.insert(std::pair<std::string, std::string>("sources", "OpenPMDReader"));
+  exceptions.insert(PairType("sources", "OpenPMDReader"));
   (void)argc;
 
   int exitCode = EXIT_SUCCESS;
   vtkInitializationHelper::Initialize(argv[0], vtkProcessModule::PROCESS_CLIENT);
 
   int counter = 0;
-  // Create a new session.
-  auto session = vtkSMSession::New();
-  auto pxm = session->GetSessionProxyManager();
-  auto pdm = pxm->GetProxyDefinitionManager();
-  auto defnIter = pdm->NewIterator();
+  vtkSmartPointer<vtkPVProxyDefinitionIterator> defnIter;
+  defnIter.TakeReference(pdm->NewIterator());
   for (defnIter->InitTraversal(); !defnIter->IsDoneWithTraversal(); defnIter->GoToNextItem())
   {
-    auto key =
-      std::pair<std::string, std::string>(defnIter->GetGroupName(), defnIter->GetProxyName());
+    auto key = PairType(defnIter->GetGroupName(), defnIter->GetProxyName());
     if (exceptions.find(key) != exceptions.end())
     {
+      vtkLogF(INFO, "Skipping: (`%s`, `%s`)", key.first.c_str(), key.second.c_str());
       continue;
     }
 
@@ -85,10 +105,8 @@ int TestValidateProxies(int argc, char* argv[])
       proxy->Delete();
     }
   }
-  defnIter->Delete();
   pxm = nullptr;
   pdm = nullptr;
-  session->Delete();
   vtkInitializationHelper::Finalize();
 
   vtkLogF(INFO, "Validated %d proxy definitions (excluding %d)", counter,
