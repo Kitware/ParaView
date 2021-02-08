@@ -53,7 +53,7 @@ void pqImageTip::showTip(const QPixmap& image, const QPoint& pos)
   static pqImageTip* instance = 0;
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
-  QPixmap* pixmap = instance ? instance->pixmap() : nullptr;
+  const QPixmap* pixmap = instance ? instance->pixmap() : nullptr;
   bool pixmapIsNull = pixmap == nullptr;
   qint64 pixmapCacheKey = pixmap ? pixmap->cacheKey() : 0;
 #else
