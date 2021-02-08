@@ -141,6 +141,7 @@ set(classes
   pqManagePluginsReaction
   pqMasterOnlyReaction
   pqMenuReactionUtils
+  pqMetaDataPropertyWidget
   pqModelTransformSupportBehavior
   pqMoleculePropertyWidget
   pqMultiComponentsDecorator
@@ -164,7 +165,7 @@ set(classes
   pqPropertyCollectionWidget
   pqProxyGroupMenuManager
   pqReaction
-  pqMetaDataPropertyWidget
+  pqRearrangeLayoutReaction
   pqReloadFilesReaction
   pqRenameProxyReaction
   pqRenderViewSelectionReaction
