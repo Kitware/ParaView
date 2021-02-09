@@ -104,6 +104,22 @@
         - linux
         - x11
 
+.linux_qt_builder_tags:
+    tags:
+        - build
+        - docker
+        - linux
+        - linux-3.17 # needed to run Qt binaries from Fedora 33
+        - paraview
+
+.linux_qt_tester_tags:
+    tags:
+        - docker
+        - paraview
+        - linux
+        - linux-3.17
+        - x11
+
 ## Linux-specific scripts
 
 .before_script_linux: &before_script_linux
