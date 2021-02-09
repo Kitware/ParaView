@@ -212,6 +212,23 @@ tasks:
     category. For readers and writers, this is required since ParaView GUI
     needs to know what extensions your reader/writer supports etc.
 
+## Plugin Resources
+
+Plugins may access resources relative to themselves by using the
+`paraview_plugin_add_location` interface to get the location of the plugin at
+runtime. Note that this only works when built as a shared plugin. For static
+plugins, the path will come in as a `nullptr`. If a plugin with resources
+intends to support resources, it is recommended to use a `.qrc` file to embed
+the resources into the plugin.
+
+For installation of resources, the `_paraview_build_plugin_directory` variable
+contains the location of the plugin under the build and install prefixes. Build
+resources may be placed under
+`"${CMAKE_BINARY_DIR}/${_paraview_build_plugin_directory}"` and installed with
+`DESTINATION "${_paraview_build_plugin_directory}"`. The plugin itself belongs
+to the `${_paraview_build_PLUGINS_COMPONENT}` component, so resources should
+generally use a component with a related name.
+
 ## Examples
 
 ### XML Plugins

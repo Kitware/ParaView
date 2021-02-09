@@ -389,14 +389,14 @@ function (paraview_plugin_build)
     LIBRARY_SUBDIRECTORY
     ${_paraview_build_extra_destinations})
 
-  if (NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${_paraview_build_RUNTIME_DESTINATION}")
+  if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${_paraview_build_RUNTIME_DESTINATION}")
   endif ()
   if (NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${_paraview_build_LIBRARY_DESTINATION}")
   endif ()
-  if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${_paraview_build_LIBRARY_DESTINATION}")
+  if (NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${_paraview_build_LIBRARY_DESTINATION}")
   endif ()
 
   if (WIN32)
@@ -415,6 +415,10 @@ function (paraview_plugin_build)
       message(FATAL_ERROR
         "The requested ${_paraview_build_plugin} plugin is not a ParaView plugin.")
     endif ()
+
+    # Make a variable for where the plugin should go.
+    set(_paraview_build_plugin_directory
+      "${_paraview_build_plugin_destination}/${_paraview_build_plugin}")
 
     # TODO: Support external plugins?
     get_filename_component(_paraview_build_plugin_dir "${_paraview_build_plugin_file}" DIRECTORY)
