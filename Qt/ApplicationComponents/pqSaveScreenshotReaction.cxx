@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqSettings.h"
 #include "pqTabbedMultiViewWidget.h"
+#include "pqUndoStack.h"
 #include "pqView.h"
 #include "vtkImageData.h"
 #include "vtkNew.h"
@@ -128,6 +129,7 @@ QString pqSaveScreenshotReaction::promptFileName(
 //-----------------------------------------------------------------------------
 void pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
 {
+  SCOPED_UNDO_EXCLUDE();
   pqView* view = pqActiveObjects::instance().activeView();
   if (!view)
   {
