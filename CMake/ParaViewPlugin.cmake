@@ -1823,7 +1823,7 @@ paraview_plugin_add_location(
 function (paraview_plugin_add_location)
   cmake_parse_arguments(_paraview_location
     ""
-    "CLASS_NAME;INTERFACES;SOURCES"
+    "CLASS_NAME;INTERFACES;SOURCES;STORE"
     ""
     ${ARGN})
 
