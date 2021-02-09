@@ -3324,6 +3324,13 @@ void vtkPVRenderView::SetViewTime(double value)
 void vtkPVRenderView::SetEnableOSPRay(bool v)
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  if (!vtkOSPRayPass::IsSupported())
+  {
+    vtkWarningMacro(
+      "Refusing to enable OSPRay because it is not supported running in this configuration.");
+    // Force disable.
+    v = false;
+  }
   if (this->Internals->IsInOSPRay == v)
   {
     return;
