@@ -83,9 +83,7 @@ void vtkPVZSpaceView::SetInteractionMode(int mode)
         break;
     }
   }
-  this->ZSpaceCamera->SetPosition(0.0, 0.0, 1.0);
   this->SetActiveCamera(this->ZSpaceCamera);
-  this->ResetCamera();
 }
 
 //----------------------------------------------------------------------------
@@ -137,9 +135,13 @@ void vtkPVZSpaceView::CalculateFit(double* bounds)
   center[1] = (bounds[2] + bounds[3]) / 2.0;
   center[2] = (bounds[4] + bounds[5]) / 2.0;
 
-  this->ZSpaceCamera->SetPosition(position[0], position[1], position[2]);
+  double vn[3];
+  this->ZSpaceCamera->GetViewPlaneNormal(vn);
+
   this->ZSpaceCamera->SetViewUp(viewUp[0], viewUp[1], viewUp[2]);
   this->ZSpaceCamera->SetFocalPoint(center[0], center[1], center[2]);
+  this->ZSpaceCamera->SetPosition(center[0] + vn[0] * position[0], center[1] + vn[1] * position[1],
+    center[2] + vn[2] * position[2]);
 
   // Set the near and far clip depending on the vtk clipping range and the viewer scale
   this->GetRenderer()->ResetCameraClippingRange(bounds);
@@ -201,10 +203,11 @@ void vtkPVZSpaceView::HandleInteractions()
   this->WorldEventPosition[1] += camPos[1];
   this->WorldEventPosition[2] += camPos[2];
 
-  vtkNew<vtkEventDataButton3D> ed3d;
+  vtkNew<vtkEventDataDevice3D> ed3d;
   ed3d->SetWorldPosition(this->WorldEventPosition);
   ed3d->SetWorldOrientation(this->WorldEventOrientation);
-  ed3d->SetInput(vtkEventDataDeviceInput::Trigger);
+  // We only have one stylus
+  ed3d->SetDevice(vtkEventDataDevice::RightController);
 
   switch (this->ZSpaceSDKManager->GetLeftButtonState())
   {
@@ -297,10 +300,9 @@ void vtkPVZSpaceView::OnMiddleButtonDown(vtkEventDataDevice3D* ed3d)
 {
   this->ZSpaceSDKManager->SetMiddleButtonState(vtkZSpaceSDKManager::Pressed);
 
-  ed3d->SetDevice(vtkEventDataDevice::GenericTracker);
   ed3d->SetAction(vtkEventDataAction::Press);
 
-  this->Interactor->InvokeEvent(vtkCommand::Button3DEvent, ed3d);
+  this->Interactor->InvokeEvent(vtkCommand::PositionProp3DEvent, ed3d);
 }
 
 //------------------------------------------------------------------------------
@@ -308,10 +310,9 @@ void vtkPVZSpaceView::OnMiddleButtonUp(vtkEventDataDevice3D* ed3d)
 {
   this->ZSpaceSDKManager->SetMiddleButtonState(vtkZSpaceSDKManager::None);
 
-  ed3d->SetDevice(vtkEventDataDevice::GenericTracker);
   ed3d->SetAction(vtkEventDataAction::Release);
 
-  this->Interactor->InvokeEvent(vtkCommand::Button3DEvent, ed3d);
+  this->Interactor->InvokeEvent(vtkCommand::PositionProp3DEvent, ed3d);
 }
 
 //------------------------------------------------------------------------------
@@ -319,11 +320,11 @@ void vtkPVZSpaceView::OnRightButtonDown(vtkEventDataDevice3D* ed3d)
 {
   this->ZSpaceSDKManager->SetRightButtonState(vtkZSpaceSDKManager::Pressed);
 
-  ed3d->SetDevice(vtkEventDataDevice::RightController);
+  ed3d->SetType(vtkCommand::Select3DEvent);
   ed3d->SetAction(vtkEventDataAction::Press);
 
   // Start selecting some vtkWidgets that respond to this event
-  this->Interactor->InvokeEvent(vtkCommand::Button3DEvent, ed3d);
+  this->Interactor->InvokeEvent(vtkCommand::Select3DEvent, ed3d);
 
   this->StylusRayActor->SetVisibility(false);
 }
@@ -333,11 +334,11 @@ void vtkPVZSpaceView::OnRightButtonUp(vtkEventDataDevice3D* ed3d)
 {
   this->ZSpaceSDKManager->SetRightButtonState(vtkZSpaceSDKManager::None);
 
-  ed3d->SetDevice(vtkEventDataDevice::RightController);
+  ed3d->SetType(vtkCommand::Select3DEvent);
   ed3d->SetAction(vtkEventDataAction::Release);
 
   // End selecting some vtkWidgets that respond to this event
-  this->Interactor->InvokeEvent(vtkCommand::Button3DEvent, ed3d);
+  this->Interactor->InvokeEvent(vtkCommand::Select3DEvent, ed3d);
 
   this->StylusRayActor->SetVisibility(this->DrawStylus);
 }
@@ -347,10 +348,10 @@ void vtkPVZSpaceView::OnLeftButtonDown(vtkEventDataDevice3D* ed3d)
 {
   this->ZSpaceSDKManager->SetLeftButtonState(vtkZSpaceSDKManager::Pressed);
 
-  ed3d->SetDevice(vtkEventDataDevice::LeftController);
+  ed3d->SetType(vtkCommand::Select3DEvent);
   ed3d->SetAction(vtkEventDataAction::Press);
 
-  this->Interactor->InvokeEvent(vtkCommand::Button3DEvent, ed3d);
+  this->Interactor->InvokeEvent(vtkCommand::Pick3DEvent, ed3d);
 }
 
 //------------------------------------------------------------------------------
@@ -358,20 +359,19 @@ void vtkPVZSpaceView::OnLeftButtonUp(vtkEventDataDevice3D* ed3d)
 {
   this->ZSpaceSDKManager->SetLeftButtonState(vtkZSpaceSDKManager::None);
 
-  ed3d->SetDevice(vtkEventDataDevice::LeftController);
   ed3d->SetAction(vtkEventDataAction::Release);
 
-  this->Interactor->InvokeEvent(vtkCommand::Button3DEvent, ed3d);
+  this->Interactor->InvokeEvent(vtkCommand::Pick3DEvent, ed3d);
 }
 
 //------------------------------------------------------------------------------
 void vtkPVZSpaceView::OnStylusMove()
 {
-  vtkNew<vtkEventDataMove3D> ed;
+  vtkNew<vtkEventDataDevice3D> ed;
+  ed->SetDevice(vtkEventDataDevice::RightController);
+  ed->SetType(vtkCommand::Move3DEvent);
   ed->SetWorldPosition(this->WorldEventPosition);
   ed->SetWorldOrientation(this->WorldEventOrientation);
-
-  ed->SetDevice(vtkEventDataDevice::RightController);
 
   this->Interactor->InvokeEvent(vtkCommand::Move3DEvent, ed);
 }
@@ -389,7 +389,6 @@ void vtkPVZSpaceView::SelectWithRay(vtkProp3D* vtkNotUsed(prop))
   vtkTransform* rayTransform = this->ZSpaceSDKManager->GetStylusTransformRowMajor();
 
   double* p0 = this->WorldEventPosition;
-
   double pin[4] = { 0.0, 0.0, 1.0, 1.0 };
   double dop[4];
   rayTransform->MultiplyPoint(pin, dop);

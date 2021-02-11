@@ -68,7 +68,8 @@ public:
   /**
    * Override generic event bindings to call the corresponding action.
    */
-  void OnButton3D(vtkEventData* edata) override;
+  void OnPick3D(vtkEventData* edata) override;
+  void OnPositionProp3D(vtkEventData* edata) override;
   void OnMove3D(vtkEventData* edata) override;
   //@}
 
@@ -107,13 +108,6 @@ public:
    * else to its max length.
    */
   void UpdateRay(vtkEventDataDevice3D*);
-
-  /**
-   * Map controller inputs to actions.
-   * Actions are defined by a VTKIS_*STATE*, interaction entry points,
-   * and the corresponding method for interaction.
-   */
-  void MapInputToAction(vtkEventDataDevice device, vtkEventDataDeviceInput input, int state);
 
   /**
    * Set the zSpaceRayActor that is used to draw the ray stylus.
@@ -156,12 +150,6 @@ protected:
   bool HardwareSelect();
 
   /**
-   * inline function that returns by reference the state in InputMap defined by a device
-   * and an input.
-   */
-  int& GetStateByReference(const vtkEventDataDevice& device, const vtkEventDataDeviceInput& input);
-
-  /**
    * From the selection 'sel', find the corresponding dataset 'ds' and the point/cell id 'aid'.
    */
   bool FindDataSet(vtkSelection* sel, vtkSmartPointer<vtkDataSet>& ds, vtkIdType& aid);
@@ -201,15 +189,6 @@ protected:
   // The text actor is linked to this prop
   vtkProp3D* PickedInteractionProp = nullptr;
   vtkNew<vtkTextActor> TextActor;
-
-  // vtkEventDataNumberOfDevices and vtkEventDataNumberOfInputs are numbers defined in
-  // vtkEventData.h. Clang format could see "vtkEventDataNumberOfDevices *" as a pointer
-  // so disable formatting to make sure the space will stay here
-  // clang-format off
-  std::array<int, vtkEventDataNumberOfDevices * vtkEventDataNumberOfInputs> InputMap = {
-    VTKIS_NONE
-  };
-  // clang-format on
 
   vtkZSpaceRayActor* ZSpaceRayActor;
   vtkPVZSpaceView* ZSpaceView;
