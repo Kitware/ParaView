@@ -86,7 +86,8 @@ pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
 
   if (!this->Server || !this->Server->isRemote())
   {
-    this->Ui->remoteGroup->setEnabled(false);
+    // hide the remote group
+    this->Ui->remoteGroup->setVisible(false);
     helpText = "Local plugins are automatically searched for in %1.";
     QStringList serverPaths = pm->pluginPaths(NULL, false);
     helpText = helpText.arg(serverPaths.join(", "));
