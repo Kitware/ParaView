@@ -140,6 +140,13 @@ public:
    */
   virtual unsigned int GetNumberOfInputConnections(const char* function);
 
+  /**
+   * Returns a given required property of the given function.
+   * Function is a string associated with the require property
+   * in the XML file.
+   */
+  vtkSMProperty* GetRequiredProperty(const char* function);
+
 protected:
   vtkSMDomain();
   ~vtkSMDomain() override;
@@ -181,13 +188,6 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem);
 
   friend class vtkSMProperty;
-
-  /**
-   * Returns a given required property of the given function.
-   * Function is a string associated with the require property
-   * in the XML file.
-   */
-  vtkSMProperty* GetRequiredProperty(const char* function);
 
   /**
    * Remove the given property from the required properties list.
