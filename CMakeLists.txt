@@ -111,9 +111,9 @@ set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 #------------------------------------------------------------------------------
 # Protect against a stampede of static links at the same time.
 if (NOT PARAVIEW_BUILD_SHARED_LIBS)
-  set(pv_exe_job_link_pool static_exe_link)
+  set(CMAKE_JOB_POOL_LINK static_exe_link)
   set_property(GLOBAL APPEND PROPERTY
-    JOB_POOLS static_exe_link=1)
+    JOB_POOLS "${CMAKE_JOB_POOL_LINK}=1")
 endif ()
 
 #-----------------------------------------------------------------------------
