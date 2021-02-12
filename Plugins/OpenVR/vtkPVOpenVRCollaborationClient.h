@@ -26,10 +26,12 @@
 #include <set>        // for ivar
 #include <vector>     // for sig
 
+class vtkBoxWidget2;
 class vtkImplicitPlaneWidget2;
-class vtkOpenVRRenderer;
+class vtkOpenGLRenderer;
 class vtkPVOpenVRCollaborationClientInternal;
 class vtkPVOpenVRHelper;
+class vtkOpenVRCameraPose;
 class vtkOpenVRModel;
 
 class vtkPVOpenVRCollaborationClient : public vtkObject
@@ -39,7 +41,7 @@ public:
   vtkTypeMacro(vtkPVOpenVRCollaborationClient, vtkObject);
 
   void SetHelper(vtkPVOpenVRHelper*);
-  bool Connect(vtkOpenVRRenderer* ren);
+  bool Connect(vtkOpenGLRenderer* ren);
   bool Disconnect();
 
   // call frequently to handle messages
@@ -55,15 +57,20 @@ public:
   void GoToSavedLocation(int pos);
   void SetCurrentLocation(int val) { this->CurrentLocation = val; }
   void SetLogCallback(std::function<void(std::string const& data, void* cd)> cb, void* clientData);
+  void GoToPose(vtkOpenVRCameraPose const& pose, double* collabTrans, double* collabDir);
 
   void RemoveAllCropPlanes();
-  void UpdateCropPlanes(std::set<vtkImplicitPlaneWidget2*> const&);
+  void UpdateCropPlane(size_t i, vtkImplicitPlaneWidget2*);
+
+  void RemoveAllThickCrops();
+  void UpdateThickCrop(size_t i, vtkBoxWidget2*);
 
   void UpdateRay(vtkOpenVRModel*, vtkEventDataDevice);
 
   void ShowBillboard(std::vector<std::string> const& vals);
+  void HideBillboard();
 
-  void AddPointToSource(double const* pt);
+  void AddPointToSource(std::string const& name, double const* pt);
   void ClearPointSource();
 
 protected:

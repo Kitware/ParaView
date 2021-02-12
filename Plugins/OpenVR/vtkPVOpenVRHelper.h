@@ -25,41 +25,31 @@
 
 #include "vtkNew.h" // for ivars
 #include "vtkObject.h"
-#include "vtkSmartPointer.h" // for ivar
 
 #include <array>  // for method sig
 #include <map>    // for ivar
-#include <set>    // for ivar
 #include <vector> // for ivar
 
 class pqOpenVRControls;
-class vtkActor;
-class vtkBoxWidget2;
+class QVTKOpenGLWindow;
 class vtkCallbackCommand;
-class vtkDataSet;
-class vtkDistanceWidget;
 class vtkEventData;
-class vtkImplicitPlaneWidget2;
+class vtkOpenGLCamera;
+class vtkOpenGLRenderer;
+class vtkOpenGLRenderWindow;
 class vtkOpenVRCameraPose;
-class vtkOpenVRInteractorStyle;
-class vtkOpenVRPanelWidget;
-class vtkOpenVRPanelRepresentation;
-class vtkOpenVRRenderWindowInteractor;
-class vtkOpenVRRenderer;
-class vtkOpenVRRenderWindow;
-class vtkPlaneSource;
-class vtkProp;
+class vtkOpenVRPolyfill;
 class vtkPropCollection;
 class vtkPVOpenVRCollaborationClient;
-class vtkPVDataRepresentation;
+class vtkPVOpenVRExporter;
+class vtkPVOpenVRWidgets;
 class vtkPVRenderView;
 class vtkPVXMLElement;
 class vtkQWidgetWidget;
+class vtkRenderWindowInteractor;
 class vtkSMProxy;
 class vtkSMProxyLocator;
 class vtkSMViewProxy;
-class vtkTextActor3D;
-class vtkTexture;
 class vtkTransform;
 
 // helper class to store information per location
@@ -88,6 +78,18 @@ public:
    */
   virtual void SendToOpenVR(vtkSMViewProxy* view);
 
+  /**
+   * Instead of sending to VR hardware, attach to the current
+   * view and use that for didplay.
+   */
+  virtual void AttachToCurrentView(vtkSMViewProxy* view);
+
+  /**
+   * Display a window showing a stabilized view of what the headset is showing
+   * Useful for screen sharing/presentations/video
+   */
+  void ShowVRView();
+
   // called when a view is removed from PV
   void ViewRemoved(vtkSMViewProxy* view);
 
@@ -105,11 +107,15 @@ public:
   vtkSetMacro(MultiSample, bool);
   vtkGetMacro(MultiSample, bool);
 
+  // hide base stations
+  virtual void SetBaseStationVisibility(bool);
+  vtkGetMacro(BaseStationVisibility, bool);
+
   // set the initial thickness in world coordinates for
   // thick crop planes. 0 indicates automatic
   // setting. It defaults to 0
-  vtkSetMacro(DefaultCropThickness, double);
-  vtkGetMacro(DefaultCropThickness, double);
+  void SetDefaultCropThickness(double);
+  double GetDefaultCropThickness();
 
   // Save/Load the state for VR
   void LoadState(vtkPVXMLElement*, vtkSMProxyLocator*);
@@ -133,6 +139,10 @@ public:
   bool CollaborationDisconnect();
   void GoToSavedLocation(int, double*, double*);
 
+  // bring other collaborators to you
+  void ComeToMe();
+  void collabGoToPose(vtkOpenVRCameraPose* pose, double* collabTrans, double* collabDir);
+
   // are we currently in VR
   bool InVR() { return this->Interactor != nullptr; }
 
@@ -141,19 +151,23 @@ public:
    * Add/remove crop planes and thick crops
    */
   void AddACropPlane(double* origin, double* normal);
-  void RemoveAllCropPlanes();
+  void collabRemoveAllCropPlanes();
+  void collabUpdateCropPlane(int count, double* origin, double* normal);
   void AddAThickCrop(vtkTransform* t);
-  void SetNumberOfCropPlanes(int);
-  void UpdateCropPlane(int count, double* origin, double* normal);
+  void collabRemoveAllThickCrops();
+  void collabUpdateThickCrop(int count, double* matrix);
   void SetCropSnapping(int val);
+  void RemoveAllCropPlanesAndThickCrops();
   //@}
 
   // show the billboard with the provided text
   void ShowBillboard(std::string const& text, bool updatePosition, std::string const& tfile);
+  void HideBillboard();
 
   // add a point to the currently selected source in PV
   // if it accepts points
   void AddPointToSource(double const* pnt);
+  void collabAddPointToSource(std::string const& name, double const* pnt);
 
   //@{
   // set/show the pqOpenVRControls GUI elements
@@ -167,17 +181,35 @@ public:
   void TakeMeasurement();
   void RemoveMeasurement();
 
-  vtkGetObjectMacro(Style, vtkOpenVRInteractorStyle);
-
   // set what the right trigger will do when pressed
   void SetRightTriggerMode(std::string const& mode);
 
-  vtkGetObjectMacro(Renderer, vtkOpenVRRenderer);
+  vtkGetObjectMacro(Renderer, vtkOpenGLRenderer);
 
   void SaveCameraPose(int loc);
   void LoadCameraPose(int loc);
   void SetScaleFactor(float val);
   void SetMotionFactor(float val);
+
+  void SetHoverPick(bool);
+
+  // allow the user to edit a scalar field
+  // in VR
+  void SetEditableField(std::string);
+  std::string GetEditableField();
+
+  void SetEditableFieldValue(std::string name);
+
+  void LoadLocationState(int slot);
+
+  vtkGetObjectMacro(AddedProps, vtkPropCollection);
+
+  vtkGetObjectMacro(SMView, vtkSMViewProxy);
+
+  vtkSetMacro(NeedStillRender, bool);
+
+  // forward to widgets helper
+  vtkGetObjectMacro(Widgets, vtkPVOpenVRWidgets);
 
 protected:
   vtkPVOpenVRHelper();
@@ -189,62 +221,51 @@ protected:
   pqOpenVRControls* OpenVRControls;
 
   // state settings that the helper loads
-  bool CropSnapping;
   bool MultiSample;
-  double DefaultCropThickness;
+  bool BaseStationVisibility;
 
   std::string RightTriggerMode;
 
   void ApplyState();
   void RecordState();
 
-  vtkDataSet* LastPickedDataSet;
-  vtkIdType LastPickedCellId;
-  vtkPVDataRepresentation* LastPickedRepresentation;
-  vtkProp* LastPickedProp;
-  vtkDataSet* PreviousPickedDataSet;
-  vtkIdType PreviousPickedCellId;
-  vtkPVDataRepresentation* PreviousPickedRepresentation;
-  std::vector<vtkIdType> SelectedCells;
+  std::string FieldValues;
 
-  vtkNew<vtkOpenVRPanelWidget> NavWidget;
-  vtkNew<vtkOpenVRPanelRepresentation> NavRepresentation;
-  vtkNew<vtkTextActor3D> TextActor3D;
-  vtkNew<vtkPlaneSource> ImagePlane;
-  vtkNew<vtkActor> ImageActor;
+  vtkRenderWindowInteractor* Interactor;
 
-  std::set<vtkImplicitPlaneWidget2*> CropPlanes;
-  std::set<vtkBoxWidget2*> ThickCrops;
-
-  vtkOpenVRInteractorStyle* Style;
-  vtkOpenVRRenderWindowInteractor* Interactor;
   bool InteractorEventCallback(vtkObject* object, unsigned long event, void* calldata);
   bool EventCallback(vtkObject* object, unsigned long event, void* calldata);
 
-  void HideBillboard();
   void HandleDeleteEvent(vtkObject* caller);
-  void HandlePickEvent(vtkObject* caller, void* calldata);
-  void MoveToNextImage();
-  void MoveToNextCell();
   void UpdateBillboard(bool updatePosition);
 
-  vtkDistanceWidget* DistanceWidget;
   vtkPVRenderView* View;
   vtkSMViewProxy* SMView;
-  vtkOpenVRRenderer* Renderer;
-  vtkOpenVRRenderWindow* RenderWindow;
+  vtkOpenGLRenderer* Renderer;
+  vtkOpenGLRenderWindow* RenderWindow;
   vtkPropCollection* AddedProps;
   vtkTimeStamp PropUpdateTime;
 
+  vtkOpenVRPolyfill* OpenVRPolyfill;
+
   bool NeedStillRender;
 
+  // quit the event loop
+  bool Done;
+
   void SaveLocationState(int slot);
-  void LoadLocationState();
-  int LoadLocationValue;
 
   std::map<int, vtkPVOpenVRHelperLocation> Locations;
+  int LoadLocationValue;
 
-  vtkSmartPointer<vtkEventData> LastEventData;
+  void DoOneEvent();
+
+  QVTKOpenGLWindow* ObserverWidget = nullptr;
+  vtkNew<vtkOpenGLCamera> ObserverCamera;
+  void RenderVRView();
+
+  vtkNew<vtkPVOpenVRExporter> Exporter;
+  vtkNew<vtkPVOpenVRWidgets> Widgets;
 
 private:
   vtkPVOpenVRHelper(const vtkPVOpenVRHelper&) = delete;
