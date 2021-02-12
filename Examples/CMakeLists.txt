@@ -43,6 +43,12 @@ if (ParaView_BINARY_DIR)
     endif()
   endfunction ()
 else ()
+  if (NOT BUILD_SHARED_LIBS)
+    set(CMAKE_JOB_POOL_LINK static_exe_link)
+    set_property(GLOBAL APPEND PROPERTY
+      JOB_POOLS "${CMAKE_JOB_POOL_LINK}=1")
+  endif ()
+
   find_package(ParaView REQUIRED)
 
   macro (add_example dir)
