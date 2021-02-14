@@ -75,6 +75,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyCollectionWidget.h"
 #include "pqProxyEditorPropertyWidget.h"
 #include "pqSeriesEditorPropertyWidget.h"
+#include "pqSessionTypeDecorator.h"
 #include "pqShaderReplacementsSelectorPropertyWidget.h"
 #include "pqShowWidgetDecorator.h"
 #include "pqSpherePropertyWidget.h"
@@ -365,6 +366,10 @@ pqPropertyWidgetDecorator* pqStandardPropertyWidgetInterface::createWidgetDecora
   if (type == "CompositeDecorator")
   {
     return new pqCompositePropertyWidgetDecorator(config, widget);
+  }
+  if (type == "SessionTypeDecorator")
+  {
+    return new pqSessionTypeDecorator(config, widget);
   }
 
   // *** NOTE: When adding new types, please update the header documentation ***

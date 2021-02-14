@@ -173,6 +173,7 @@ set(classes
   pqSeriesEditorPropertyWidget
   pqServerConnectReaction
   pqServerDisconnectReaction
+  pqSessionTypeDecorator
   pqSetMainWindowTitleReaction
   pqShowHideAllReaction
   pqShowWidgetDecorator
