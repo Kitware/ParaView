@@ -1,5 +1,3 @@
-set(PARAVIEW_ENABLE_ADIOS ON CACHE BOOL "")
-
 if ("$ENV{CMAKE_CONFIGURATION}" MATCHES "offscreen")
   set(VTK_USE_X OFF CACHE BOOL "")
 else ()

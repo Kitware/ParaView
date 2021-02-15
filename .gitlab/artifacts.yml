@@ -33,6 +33,7 @@
             - build/CMakeCache.txt
             - build/build.ninja
             - build/rules.ninja
+            - build/CMakeFiles/rules.ninja
             - build/Clients/ParaView/Documentation/paraview.qch
             - build/cmake_install.cmake
             - build/*/cmake_install.cmake
