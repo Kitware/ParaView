@@ -16,6 +16,7 @@
 #include "se_create_data.h"
 
 #include "Grid.h"
+#include "Grid.txx"
 
 #include "vtkCPDataDescription.h"
 #include "vtkCPInputDataDescription.h"
