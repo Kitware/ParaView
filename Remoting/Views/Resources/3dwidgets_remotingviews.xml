@@ -1813,7 +1813,7 @@
                  value="2" />
         </EnumerationDomain>
         <Documentation>
-          Set whether the border is always drawn, only on hover or never.
+          Set whether the border is always drawn, only on interaction or never.
         </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetBorderColor"
