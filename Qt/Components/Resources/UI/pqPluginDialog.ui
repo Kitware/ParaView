@@ -13,8 +13,8 @@
   <property name="windowTitle">
    <string>Plugin Manager</string>
   </property>
-  <layout class="QGridLayout">
-   <item row="0" column="0" colspan="2">
+  <layout class="QVBoxLayout">
+   <item>
     <widget class="QLabel" name="HelpText">
      <property name="text">
       <string>TextLabel</string>
@@ -24,153 +24,159 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QGroupBox" name="remoteGroup">
+   <item>
+    <widget class="QSplitter" name="splitter">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="title">
-      <string>Remote Plugins</string>
-     </property>
-     <layout class="QGridLayout">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <item row="2" column="2">
-       <spacer>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+     <layout class="QHBoxLayout">
+      <item>
+       <widget class="QGroupBox" name="remoteGroup">
+        <property name="title">
+         <string>Remote Plugins</string>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="0" rowspan="2" colspan="5">
-       <widget class="pqPluginTreeWidget" name="remotePlugins">
-        <property name="contextMenuPolicy">
-         <enum>Qt::NoContextMenu</enum>
-        </property>
-        <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarAsNeeded</enum>
-        </property>
-        <property name="selectionMode">
-         <enum>QAbstractItemView::ExtendedSelection</enum>
-        </property>
-        <column>
-         <property name="text">
-          <string>1</string>
+        <layout class="QGridLayout">
+         <property name="leftMargin">
+          <number>0</number>
          </property>
-        </column>
+         <item row="2" column="2">
+          <spacer>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="0" column="0" rowspan="2" colspan="5">
+          <widget class="pqPluginTreeWidget" name="remotePlugins">
+           <property name="contextMenuPolicy">
+            <enum>Qt::NoContextMenu</enum>
+           </property>
+           <property name="horizontalScrollBarPolicy">
+            <enum>Qt::ScrollBarAsNeeded</enum>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::ExtendedSelection</enum>
+           </property>
+           <column>
+            <property name="text">
+             <string>1</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QPushButton" name="loadRemote">
+           <property name="text">
+            <string>Load New ...</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="4">
+          <widget class="QPushButton" name="removeRemote">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Remove</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QPushButton" name="loadSelected_Remote">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Load Selected</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QPushButton" name="loadRemote">
-        <property name="text">
-         <string>Load New ...</string>
+      <item>
+       <widget class="QGroupBox" name="localGroup">
+        <property name="title">
+         <string>Local Plugins</string>
         </property>
-       </widget>
-      </item>
-      <item row="2" column="4">
-       <widget class="QPushButton" name="removeRemote">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Remove</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QPushButton" name="loadSelected_Remote">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Load Selected</string>
-        </property>
+        <layout class="QGridLayout">
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <item row="3" column="2">
+          <spacer>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="0" column="0" rowspan="2" colspan="4">
+          <widget class="pqPluginTreeWidget" name="localPlugins">
+           <property name="contextMenuPolicy">
+            <enum>Qt::NoContextMenu</enum>
+           </property>
+           <property name="horizontalScrollBarPolicy">
+            <enum>Qt::ScrollBarAsNeeded</enum>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::ExtendedSelection</enum>
+           </property>
+           <column>
+            <property name="text">
+             <string>1</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+         <item row="3" column="3">
+          <widget class="QPushButton" name="removeLocal">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Remove</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QPushButton" name="loadLocal">
+           <property name="text">
+            <string>Load New ...</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QPushButton" name="loadSelected_Local">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Load Selected</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QGroupBox" name="localGroup">
-     <property name="title">
-      <string>Local Plugins</string>
-     </property>
-     <layout class="QGridLayout">
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <item row="3" column="2">
-       <spacer>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="0" rowspan="2" colspan="4">
-       <widget class="pqPluginTreeWidget" name="localPlugins">
-        <property name="contextMenuPolicy">
-         <enum>Qt::NoContextMenu</enum>
-        </property>
-        <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarAsNeeded</enum>
-        </property>
-        <property name="selectionMode">
-         <enum>QAbstractItemView::ExtendedSelection</enum>
-        </property>
-        <column>
-         <property name="text">
-          <string>1</string>
-         </property>
-        </column>
-       </widget>
-      </item>
-      <item row="3" column="3">
-       <widget class="QPushButton" name="removeLocal">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Remove</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QPushButton" name="loadLocal">
-        <property name="text">
-         <string>Load New ...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QPushButton" name="loadSelected_Local">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Load Selected</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="2">
+   <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -219,9 +225,9 @@
  </connections>
  <customwidgets>
   <customwidget>
-    <class>pqPluginTreeWidget</class>
-    <extends>QTreeWidget</extends>
-    <header>pqPluginTreeWidget.h</header>
+   <class>pqPluginTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>pqPluginTreeWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
