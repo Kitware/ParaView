@@ -319,3 +319,18 @@ vtkSMSourceProxy* pqOutputPort::getSourceProxy() const
   return this->getSource() ? vtkSMSourceProxy::SafeDownCast(this->getSource()->getProxy())
                            : nullptr;
 }
+
+//-----------------------------------------------------------------------------
+QString pqOutputPort::prettyName() const
+{
+  auto source = this->getSource();
+  Q_ASSERT(source);
+  if (source->getNumberOfOutputPorts() > 1)
+  {
+    return QString("%1: %2").arg(source->getSMName()).arg(this->getPortName());
+  }
+  else
+  {
+    return source->getSMName();
+  }
+}

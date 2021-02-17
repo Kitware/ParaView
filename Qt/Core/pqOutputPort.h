@@ -171,6 +171,11 @@ public:
   */
   void setSelectionInput(vtkSMSourceProxy* src, int port);
 
+  /**
+   * Returns a user friendly name for this port.
+   */
+  QString prettyName() const;
+
 public Q_SLOTS:
   /**
   * This method updates all render modules to which all
