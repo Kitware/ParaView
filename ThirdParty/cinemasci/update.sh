@@ -8,7 +8,7 @@ readonly name="cinemasci"
 readonly ownership="Cinemasci Python Upstream <kwrobot@kitware.com>"
 readonly subtree="ThirdParty/cinemasci/paraview/tpl"
 readonly repo="https://github.com/cinemascience/cinemasci.git"
-readonly tag="c333df4d345f7b066774dfa6cb48f3e8b73aece4"
+readonly tag="377d04985005a9a52b18dc54cee9279e28e97946"
 
 readonly paths="
 .gitignore
