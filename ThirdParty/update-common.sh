@@ -42,6 +42,22 @@
 # For convenience, the function may use the "git_archive" function which
 # does a standard "git archive" extraction using the (optional) "paths"
 # variable to only extract a subset of the source tree.
+#
+# Dependencies
+#
+# To update third party packages from git repositories with submodule,
+# you will need to install the "git-archive-all" Python package with
+#
+#   pip install git-archive-all
+#
+# or install it from https://github.com/Kentzo/git-archive-all.
+#
+# This package installs a script named "git-archive-all" where pip
+# installs executables. If you run pip under your user privileges (i.e.,
+# not using "sudo"), this location may be $HOME/.local/bin. Make sure
+# that directory is in your path so that git can find the
+# "git-archive-all" script.
+#
 ########################################################################
 
 ########################################################################
