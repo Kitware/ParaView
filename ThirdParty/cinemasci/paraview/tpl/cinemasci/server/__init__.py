@@ -11,7 +11,7 @@ from os import access
 from os import R_OK
 import pathlib
 import json
-import cinemasci
+from .. import cdb
 
 #
 # global variables - can't seem to add an instance variable to the
@@ -30,7 +30,7 @@ def set_install_path():
     CinemaInstallPath = CinemaInstallPath.strip("/server")
     CinemaInstallPath = "/" + CinemaInstallPath + "/viewers"
 
-def verify_cinema_database( viewer, cdb, assetname ):
+def verify_cinema_database( viewer, cdatabase, assetname ):
     result = False
 
     if viewer == "view":
@@ -38,7 +38,7 @@ def verify_cinema_database( viewer, cdb, assetname ):
         if assetname is None:
             assetname = "FILE"
 
-        db = cinemasci.new("cdb", {"path": cdb})
+        db = cdb.cdb(cdatabase)
         db.read_data_from_file()
 
         if db.parameter_exists(assetname):
@@ -46,10 +46,10 @@ def verify_cinema_database( viewer, cdb, assetname ):
         else:
             print("")
             print("ERROR: Cinema viewer \'view\' is looking for a column named \'{}\', but the".format(assetname)) 
-            print("       the cinema database \'{}\' doesn't have one.".format(cdb)) 
+            print("       the cinema database \'{}\' doesn't have one.".format(cdatabase)) 
             print("")
             print("       use \'--assetname <name>\' where <name> is one of these possible values") 
-            print("       that were found in \'{}\':".format(cdb))
+            print("       that were found in \'{}\':".format(cdatabase))
             print("")
             print("           \"" + ' '.join(db.get_parameter_names()) + "\"")
             print("")
