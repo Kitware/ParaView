@@ -24,6 +24,12 @@
  * not added to the domain. If you want to support field data, then use `enable_field_data="1"`
  * attribute in the XML configuration.
  *
+ * By default, the domain is assumed to represent field
+ * associations and hence the enumeration text is populated as "Point Data",
+ * "Cell Data", etc. To use element types for text, add attribute
+ * `use_element_types="1"` to the XML. In that case, the domain is populated
+ * with "Point", "Cell", etc.
+ *
  * @section DefaultValue Selecting the default value
  *
  * vtkSMFieldDataDomain picks the default value to be the first attribute type that has non empty
@@ -74,6 +80,12 @@ public:
   static const char* GetAttributeTypeAsString(int attrType);
 
   /**
+   * Convenience method to return the string for an element type. Will return nullptr
+   * for unsupported or invalid type.
+   */
+  static const char* GetElementTypeAsString(int attrType);
+
+  /**
    * Updates the available field data based on the input dataset type, if possible.
    * The provided property is not used.
    */
@@ -91,6 +103,8 @@ protected:
 
   // When true, "Field Data" option is added to the domain.
   bool EnableFieldDataSelection;
+
+  bool UseElementTypes;
 
 private:
   vtkSMFieldDataDomain(const vtkSMFieldDataDomain&) = delete;
