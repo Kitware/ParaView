@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.13)
 project(CxxMultiChannelInputExampleV2 LANGUAGES C CXX)
 
+include (GNUInstallDirs)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+
 #------------------------------------------------------------------------------
 # since we use C++11 in this example.
 set(CMAKE_CXX_STANDARD 11)

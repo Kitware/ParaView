@@ -10,27 +10,18 @@ if (ParaView_BINARY_DIR)
 
     add_test(
       NAME    "ParaViewExample-${dir}"
-      COMMAND "${CMAKE_CTEST_COMMAND}"
-              --build-generator
-                "${CMAKE_GENERATOR}"
-              --build-and-test
-                "${CMAKE_CURRENT_SOURCE_DIR}/${dir}"
-                "${CMAKE_CURRENT_BINARY_DIR}/${dir}"
-              --build-options
-                "-DBUILD_TESTING:BOOL=ON"
-                "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
-                "-DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}"
-                "-DParaView_DIR:PATH=${paraview_cmake_build_dir}"
-              --test-command
-                "${CMAKE_CTEST_COMMAND}"
-                  -C $<CONFIGURATION>)
-    if (WIN32)
-      set(example_path "$ENV{PATH};${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-      string(REPLACE ";" "\;" example_path "${example_path}")
-      set_property(TEST "ParaViewExample-${dir}" APPEND
-        PROPERTY
-          ENVIRONMENT "PATH=${example_path}")
-    endif ()
+      COMMAND "${CMAKE_COMMAND}"
+              "-Dconfig=$<CONFIGURATION>"
+              "-Dgenerator=${CMAKE_GENERATOR}"
+              "-Dsource=${CMAKE_CURRENT_SOURCE_DIR}"
+              "-Dbinary=${CMAKE_CURRENT_BINARY_DIR}"
+              "-Dexample_dir=${dir}"
+              "-Dbuild_type=${CMAKE_BUILD_TYPE}"
+              "-Dshared=${BUILD_SHARED_LIBS}"
+              "-Dparaview_dir=${paraview_cmake_build_dir}"
+              "-Dctest=${CMAKE_CTEST_COMMAND}"
+              "-Dparaview_binary_dir=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+              -P "${CMAKE_CURRENT_LIST_DIR}/RunExample.cmake")
     set_property(TEST "ParaViewExample-${dir}" APPEND
       PROPERTY
         SKIP_REGULAR_EXPRESSION "Skipping example")
