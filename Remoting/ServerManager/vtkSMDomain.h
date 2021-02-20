@@ -126,12 +126,16 @@ public:
    */
   vtkSMProperty* GetProperty();
 
+  //@{
   /**
-   * Helper method to get vtkPVDataInformation from input proxy connected to the
+   * Helper methods to get vtkPVDataInformation from input proxy connected to the
    * required property with the given function and provided input index.
    */
   virtual vtkPVDataInformation* GetInputDataInformation(
     const char* function, unsigned int index = 0);
+  virtual vtkPVDataInformation* GetInputSubsetDataInformation(
+    unsigned int compositeIndex, const char* function, unsigned int index = 0);
+  //@}
 
   /**
    * Helper method to get the number of input connections hence the number of available

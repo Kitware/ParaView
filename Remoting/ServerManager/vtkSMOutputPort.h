@@ -32,7 +32,10 @@
 
 #include "vtkRemotingServerManagerModule.h" //needed for exports
 #include "vtkSMProxy.h"
-#include "vtkWeakPointer.h" // needed by SourceProxy pointer
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer
+#include "vtkWeakPointer.h"  // needed for vtkWeakPointer
+
+#include <map> // needed for std::map
 
 class vtkCollection;
 class vtkPVClassNameInformation;
@@ -56,6 +59,28 @@ public:
    * vtkCommand::UpdateInformationEvent event.
    */
   virtual vtkPVDataInformation* GetDataInformation();
+
+  //@{
+  /**
+   * For composite datasets, `GetDataInformation` returns summary data information for
+   * all blocks combined. However, applications may require information about
+   * specific subset of blocks. In that case, one can use this API. Internally,
+   * the data information is cached per selector / assembly-name pair. That way,
+   * if the data information is not re-gathered unless changed.
+   *
+   * @arg \c selector the selector expression
+   * @arg \c assemblyName name of the assembly to use to apply the selector
+   *         to to determine the subset. If none specified, hierarchy is assumed.
+   */
+  vtkPVDataInformation* GetSubsetDataInformation(
+    const char* selector, const char* assemblyName = nullptr);
+  //@}
+
+  /**
+   * A `GetSubsetDataInformation` overload that uses composite index. It is only
+   * supported for multiblock datasets.
+   */
+  vtkPVDataInformation* GetSubsetDataInformation(unsigned int compositeIndex);
 
   /**
    * Returns data information collected over all timesteps provided by the
@@ -145,6 +170,9 @@ protected:
 
   vtkPVTemporalDataInformation* TemporalDataInformation;
   bool TemporalDataInformationValid;
+
+  std::map<std::string, std::map<int, vtkSmartPointer<vtkPVDataInformation> > >
+    SubsetDataInformations;
 
 private:
   vtkSMOutputPort(const vtkSMOutputPort&) = delete;

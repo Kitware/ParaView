@@ -323,10 +323,12 @@ public:
 
   // The currently shown output port.
   QPointer<pqOutputPort> Port;
-  vtkSmartPointer<vtkPVDataInformation> DataInformation;
   vtkNew<vtkPVDataInformation> SubsetDataInformation;
 
-  vtkSMProxy* sourceProxy() const { return this->Port ? this->Port->getSourceProxy() : nullptr; }
+  vtkSMSourceProxy* sourceProxy() const
+  {
+    return this->Port ? this->Port->getSourceProxy() : nullptr;
+  }
 
   // returns true of we want to show any subset of the data information.
   bool showSubsetInformation() const
@@ -335,28 +337,32 @@ public:
     return (selModel && selModel->currentIndex().isValid());
   }
 
-  vtkPVDataInformation* subsetDataInformation(vtkSMProxy* proxy, vtkPVDataInformation* dinfo) const
+  vtkPVDataInformation* subsetDataInformation() const
   {
-    if (!this->showSubsetInformation())
+    auto dinfo = this->Port ? this->Port->getDataInformation() : nullptr;
+    if (!this->showSubsetInformation() || !this->Port)
     {
       return dinfo;
     }
+
     auto selModel = this->activeSelectionModel();
     auto assembly = this->activeGrouping();
     assert(selModel && assembly);
-    auto nodeId = assembly == this->HierarchyModel.dataAssembly()
-      ? this->HierarchyModel.nodeId(selModel->currentIndex())
-      : this->AssemblyModel.nodeId(selModel->currentIndex());
 
-    auto& subsetInfo = this->SubsetDataInformation;
-    subsetInfo->Initialize();
-    subsetInfo->SetPortNumber(dinfo->GetPortNumber());
-    subsetInfo->SetSubsetSelector(assembly->GetNodePath(nodeId).c_str());
-    subsetInfo->SetSubsetAssemblyName(assembly == this->HierarchyModel.dataAssembly()
-        ? vtkDataAssemblyUtilities::HierarchyName()
-        : "Assembly");
-    proxy->GatherInformation(subsetInfo);
-    return subsetInfo;
+    const bool useHierarchy = assembly == this->HierarchyModel.dataAssembly();
+    auto nodeId = useHierarchy ? this->HierarchyModel.nodeId(selModel->currentIndex())
+                               : this->AssemblyModel.nodeId(selModel->currentIndex());
+
+    if (useHierarchy && nodeId == vtkDataAssembly::GetRootNode())
+    {
+      // if root is selected on the hierarchy, it's simply the full info.
+      return dinfo;
+    }
+
+    return this->sourceProxy()->GetSubsetDataInformation(
+      /*outputIdx=*/dinfo->GetPortNumber(),
+      /*selector=*/assembly->GetNodePath(nodeId).c_str(),
+      /*assemblyName=*/useHierarchy ? vtkDataAssemblyUtilities::HierarchyName() : "Assembly");
   }
 
   // populate filename related widgets
@@ -659,12 +665,10 @@ void pqProxyInformationWidget::updateSubsetUI()
 {
   auto& internals = (*this->Internals);
   auto& ui = (this->Internals->Ui);
-  auto proxy = internals.sourceProxy();
-  auto dinfo = this->dataInformation();
 
   // all the following depends on subset data information, if the user chose to
   // see only part of the hierarchy.
-  auto subsetInfo = internals.subsetDataInformation(proxy, dinfo);
+  auto subsetInfo = internals.subsetDataInformation();
   internals.setDataStatistics(subsetInfo);
   internals.setDataArrays(subsetInfo);
 }

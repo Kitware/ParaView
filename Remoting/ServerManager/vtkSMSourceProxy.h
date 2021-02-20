@@ -142,6 +142,29 @@ public:
   vtkPVDataInformation* GetDataInformation(unsigned int outputIdx);
   //@}
 
+  //@{
+  /**
+   * For composite datasets, `GetDataInformation` returns summary data information for
+   * all blocks combined. However, applications may require information about
+   * specific subset of blocks. In that case, one can use this API. Internally,
+   * the data information is cached per selector / assembly-name pair. That way,
+   * if the data information is not re-gathered unless changed.
+   *
+   * @arg \c selector the selector expression
+   * @arg \c assemblyName name of the assembly to use to apply the selector
+   *         to to determine the subset. If none specified, hierarchy is assumed.
+   */
+  vtkPVDataInformation* GetSubsetDataInformation(
+    unsigned int outputIdx, const char* selector, const char* assemblyName = nullptr);
+  //@}
+
+  /**
+   * A `GetSubsetDataInformation` overload that uses composite index. It is only
+   * supported for multiblock datasets.
+   */
+  vtkPVDataInformation* GetSubsetDataInformation(
+    unsigned int outputIdx, unsigned int compositeIndex);
+
   /**
    * Creates extract selection proxies for each output port if not already
    * created.
