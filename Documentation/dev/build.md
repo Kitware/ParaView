@@ -42,7 +42,7 @@ CMake 3.12 or higher is needed.
 ###### Others
 `sudo yum install python3-devel openmpi-devel mesa-libGL-devel libX11-devel libXt-devel qt5-qtbase-devel qt5-qtx11extras-devel qt5-qttools-devel qt5-qtxmlpatterns-devel tbb-devel ninja-build git`
 
-###### Environement
+###### Environment
 ```sh
 alias ninja=ninja-build
 export PATH=$PATH:/usr/lib64/openmpi/bin/
