@@ -76,9 +76,7 @@ set(classes
   pqFavoritesDialog
   pqFavoritesTreeWidget
   pqFileChooserWidget
-  pqFindDataCreateSelectionFrame
   pqFindDataCurrentSelectionFrame
-  pqFindDataDialog
   pqFindDataSelectionDisplayFrame
   pqHighlightItemDelegate
   pqImageTip
@@ -103,7 +101,6 @@ set(classes
   pqLogViewerDialog
   pqMemoryInspectorPanel
   pqMultiBlockInspectorWidget
-  pqMultiQueryClauseWidget
   pqMultiViewWidget
   pqOrbitCreatorDialog
   pqOutputPortComboBox
@@ -132,7 +129,6 @@ set(classes
   pqProxySelectionWidget
   pqProxyWidget
   pqProxyWidgetDialog
-  pqQueryClauseWidget
   pqRecentFilesMenu
   pqRemoteCommandDialog
   pqRemoteCommandTemplateDialog
@@ -206,9 +202,7 @@ set(ui_files
   Resources/UI/pqCustomFilterManager.ui
   Resources/UI/pqCustomViewpointButtonDialog.ui
   Resources/UI/pqDisplayRepresentationWidget.ui
-  Resources/UI/pqFindDataCreateSelectionFrame.ui
   Resources/UI/pqFindDataCurrentSelectionFrame.ui
-  Resources/UI/pqFindDataDialog.ui
   Resources/UI/pqFindDataSelectionDisplayFrame.ui
   Resources/UI/pqItemViewSearchWidget.ui
   Resources/UI/pqKeyFrameEditor.ui
@@ -231,8 +225,6 @@ set(ui_files
   Resources/UI/pqProxySelectionWidget.ui
   Resources/UI/pqProxyWidgetDialog.ui
   Resources/UI/pqPythonAnimationCue.ui
-  Resources/UI/pqQueryClauseWidget.ui
-  Resources/UI/pqQueryCompositeTreeDialog.ui
   Resources/UI/pqRemoteCommandDialogForm.ui
   Resources/UI/pqRemoteCommandTemplateDialogForm.ui
   Resources/UI/pqRescaleRangeDialog.ui

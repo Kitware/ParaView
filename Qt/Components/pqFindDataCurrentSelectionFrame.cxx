@@ -33,13 +33,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqFindDataCurrentSelectionFrame.h"
 
 #include "pqApplicationCore.h"
-#include "pqFindDataCreateSelectionFrame.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqPropertiesPanel.h"
 #include "pqSelectionManager.h"
 #include "pqServer.h"
 #include "pqSpreadSheetViewModel.h"
+#include "vtkDataObject.h"
+#include "vtkPVDataInformation.h"
+#include "vtkSMFieldDataDomain.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
@@ -51,6 +53,63 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSignalBlocker>
 
 #include <cassert>
+
+namespace
+{
+// copied from `pqFindDataCreateSelectionFrame::populateSelectionTypeCombo`.
+// `pqFindDataCreateSelectionFrame` class was removed. Until we rewrite this
+// class as well, just copying this piece of code over.
+void populateSelectionTypeCombo(QComboBox* cbox, pqOutputPort* port)
+{
+  if (port == NULL)
+  {
+    cbox->clear();
+    return;
+  }
+
+  // preserve the selection type, if possible.
+  const QString currentText = cbox->currentText();
+
+  cbox->clear();
+  vtkPVDataInformation* dataInfo = port->getDataInformation();
+  for (int attributeType = vtkDataObject::POINT;
+       attributeType < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; ++attributeType)
+  {
+    if (dataInfo->IsAttributeValid(attributeType))
+    {
+      const char* label = vtkSMFieldDataDomain::GetAttributeTypeAsString(attributeType);
+      switch (attributeType)
+      {
+        case vtkDataObject::POINT:
+          cbox->addItem(QIcon(":/pqWidgets/Icons/pqPointData.svg"), label, attributeType);
+          break;
+
+        case vtkDataObject::CELL:
+          cbox->addItem(QIcon(":/pqWidgets/Icons/pqCellData.svg"), label, attributeType);
+          break;
+
+        case vtkDataObject::VERTEX:
+          cbox->addItem(QIcon(":/pqWidgets/Icons/pqCellData.svg"), label, attributeType);
+          break;
+
+        case vtkDataObject::EDGE:
+          cbox->addItem(QIcon(":/pqWidgets/Icons/pqEdgeCenterData.svg"), label, attributeType);
+          break;
+
+        case vtkDataObject::ROW:
+          cbox->addItem(QIcon(":/pqWidgets/Icons/pqSpreadsheet.svg"), label, attributeType);
+          break;
+      }
+    }
+  }
+
+  int index = cbox->findText(currentText);
+  if (index != -1)
+  {
+    cbox->setCurrentIndex(index);
+  }
+}
+}
 
 class pqFindDataCurrentSelectionFrame::pqInternals
 {
@@ -155,7 +214,7 @@ public:
     this->setupSpreadsheet(port ? port->getServer() : nullptr);
 
     bool prev = this->Ui.showTypeComboBox->blockSignals(true);
-    pqFindDataCreateSelectionFrame::populateSelectionTypeCombo(this->Ui.showTypeComboBox, port);
+    ::populateSelectionTypeCombo(this->Ui.showTypeComboBox, port);
     this->Ui.showTypeComboBox->blockSignals(prev);
     if (port)
     {

@@ -46,6 +46,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *   current selection. We should modernize/cleanup that code and maybe just
  *   merge that code with this class to avoid confusion.
  *
+ * * Currently, this simply uses `pqFindDataSelectionDisplayFrame` to allow
+ *   editing current selection's display properties. We should modernize that
+ *   code and maybe just move it to this class to avoid confusion.
  */
 
 class pqServer;

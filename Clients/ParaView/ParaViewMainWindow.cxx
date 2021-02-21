@@ -149,8 +149,11 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->tabifyDockWidget(
     this->Internals->colorMapEditorDock, this->Internals->collaborationPanelDock);
   this->tabifyDockWidget(this->Internals->colorMapEditorDock, this->Internals->lightInspectorDock);
+  this->tabifyDockWidget(this->Internals->colorMapEditorDock, this->Internals->findDataDock);
+  this->tabifyDockWidget(
+    this->Internals->colorMapEditorDock, this->Internals->multiBlockInspectorDock);
 
-  this->Internals->selectionDisplayDock->hide();
+  this->Internals->findDataDock->hide();
   this->Internals->animationViewDock->hide();
   this->Internals->statisticsDock->hide();
   this->Internals->comparativePanelDock->hide();
@@ -169,7 +172,6 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->viewPropertiesDock);
   this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->displayPropertiesDock);
   this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->informationDock);
-  this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->multiBlockInspectorDock);
 
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
 
@@ -239,6 +241,9 @@ ParaViewMainWindow::ParaViewMainWindow()
   /// Provide access to the color-editor panel for the application.
   pqApplicationCore::instance()->registerManager(
     "COLOR_EDITOR_PANEL", this->Internals->colorMapEditorDock);
+
+  // Provide access to the find data panel for the application.
+  pqApplicationCore::instance()->registerManager("FIND_DATA_PANEL", this->Internals->findDataDock);
 
   // Populate application menus with actions.
   pqParaViewMenuBuilders::buildFileMenu(*this->Internals->menu_File);

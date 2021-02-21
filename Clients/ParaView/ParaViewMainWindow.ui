@@ -197,7 +197,7 @@
           <x>0</x>
           <y>0</y>
           <width>68</width>
-          <height>146</height>
+          <height>229</height>
          </rect>
         </property>
        </widget>
@@ -244,7 +244,7 @@
     <string>Multi-block Inspector</string>
    </property>
    <attribute name="dockWidgetArea">
-    <number>1</number>
+    <number>2</number>
    </attribute>
    <widget class="pqMultiBlockInspectorWidget" name="multiBlockInspectorPanel"/>
   </widget>
@@ -256,7 +256,7 @@
     <string>Light Inspector</string>
    </property>
    <attribute name="dockWidgetArea">
-    <number>1</number>
+    <number>2</number>
    </attribute>
    <widget class="pqLightsInspector" name="lightInspectorPanel"/>
   </widget>
@@ -271,28 +271,6 @@
     <number>2</number>
    </attribute>
    <widget class="pqColorMapEditor" name="colorMapEditorPanel"/>
-  </widget>
-  <widget class="QDockWidget" name="selectionDisplayDock">
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="allowedAreas">
-    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
-   </property>
-   <property name="windowTitle">
-    <string>Selection Display Inspector</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="pqFindDataSelectionDisplayFrame" name="selectionDisplayWidget">
-    <property name="useVerticalLayout" stdset="0">
-     <bool>true</bool>
-    </property>
-   </widget>
   </widget>
   <widget class="QDockWidget" name="displayPropertiesDock">
    <property name="allowedAreas">
@@ -401,7 +379,39 @@
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="pqFindDataWidget" name="findDataPanel"/>
+   <widget class="QWidget" name="findDataScrollArea">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QScrollArea" name="scrollArea">
+       <property name="minimumSize">
+        <size>
+         <width>300</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="pqFindDataWidget" name="findDataWidget">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>300</width>
+          <height>68</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
  </widget>
  <customwidgets>
@@ -468,12 +478,6 @@
    <class>pqColorMapEditor</class>
    <extends>QWidget</extends>
    <header>pqColorMapEditor.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>pqFindDataSelectionDisplayFrame</class>
-   <extends>QWidget</extends>
-   <header>pqFindDataSelectionDisplayFrame.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
