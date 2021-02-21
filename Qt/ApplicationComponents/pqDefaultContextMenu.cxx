@@ -49,7 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "vtkDataObject.h"
 #include "vtkNew.h"
-#include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkSMArrayListDomain.h"
@@ -129,9 +128,12 @@ bool pqDefaultContextMenu::contextMenu(QMenu* menu, pqView* viewContext, const Q
     this->PickedRepresentation = repr;
 
     vtkPVDataInformation* info = repr->getInputDataInformation();
-    vtkPVCompositeDataInformation* compositeInfo = info->GetCompositeDataInformation();
-    if (compositeInfo && compositeInfo->GetDataIsComposite())
+    // Hiding the block specific parameters for now.
+    // We'll need to revisit if want to preserve these or let MultiBlock Inspector be the
+    // way for users to handle this.
+    if (info->IsCompositeDataSet())
     {
+#if 0
       bool multipleBlocks = this->PickedBlocks.size() > 1;
 
       if (multipleBlocks)
@@ -140,8 +142,8 @@ bool pqDefaultContextMenu::contextMenu(QMenu* menu, pqView* viewContext, const Q
       }
       else
       {
-        QString blockName = this->lookupBlockName(blockIndex);
-        menu->addAction(QString("Block '%1'").arg(blockName));
+        const auto blockName = info->GetBlockName(static_cast<vtkTypeInt64>(blockIndex));
+        menu->addAction(QString("Block '%1'").arg(blockName.c_str()));
       }
       menu->addSeparator();
 
@@ -181,6 +183,7 @@ bool pqDefaultContextMenu::contextMenu(QMenu* menu, pqView* viewContext, const Q
       this->connect(unsetBlockOpacityAction, SIGNAL(triggered()), this, SLOT(unsetBlockOpacity()));
 
       menu->addSeparator();
+#endif
     }
 
     QAction* action;
@@ -224,8 +227,7 @@ bool pqDefaultContextMenu::contextMenu(QMenu* menu, pqView* viewContext, const Q
     if (repr)
     {
       vtkPVDataInformation* info = repr->getInputDataInformation();
-      vtkPVCompositeDataInformation* compositeInfo = info->GetCompositeDataInformation();
-      if (compositeInfo && compositeInfo->GetDataIsComposite())
+      if (info->IsCompositeDataSet())
       {
         QAction* showAllBlocksAction = menu->addAction("Show All Blocks");
         this->connect(showAllBlocksAction, SIGNAL(triggered()), this, SLOT(showAllBlocks()));
@@ -645,6 +647,8 @@ namespace
 const char* findBlockName(
   int flatIndexTarget, int& flatIndexCurrent, vtkPVCompositeDataInformation* currentInfo)
 {
+// FIXME:
+#if 0
   // An interior block shouldn't be selected, only blocks with geometry can be
   if (flatIndexCurrent == flatIndexTarget)
   {
@@ -682,6 +686,7 @@ const char* findBlockName(
       }
     }
   }
+#endif
   return nullptr;
 }
 }
@@ -689,6 +694,8 @@ const char* findBlockName(
 //-----------------------------------------------------------------------------
 QString pqDefaultContextMenu::lookupBlockName(unsigned int flatIndex) const
 {
+  return QString(); // FIXME
+#if 0
   vtkPVDataInformation* info = this->PickedRepresentation->getRepresentedDataInformation();
   if (!info)
   {
@@ -706,4 +713,5 @@ QString pqDefaultContextMenu::lookupBlockName(unsigned int flatIndex) const
   {
     return QString();
   }
+#endif
 }
