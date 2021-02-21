@@ -82,3 +82,12 @@
         paths:
             # Debugging logs
             - build/Testing/Temporary/Last*.log
+
+.cmake_tidy_artifacts:
+    artifacts:
+        expire_in: 1d
+        # Because build logs are in here, we should always upload artifacts.
+        when: always
+        paths:
+            # Logs of the build
+            - compile_output.log
