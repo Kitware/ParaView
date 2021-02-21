@@ -55,7 +55,6 @@ set(classes
   pqComparativeVisPanel
   pqComponentsInit
   pqComponentsTestUtility
-  pqCompositeDataInformationTreeModel
   pqCompositePropertyWidgetDecorator
   pqContextMenuInterface
   pqCustomFilterDefinitionModel

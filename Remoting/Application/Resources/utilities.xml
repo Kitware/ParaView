@@ -722,6 +722,55 @@
       <ProxyProperty name="Writer" command="SetWriter" />
     </SourceProxy>
 
+    <!-- ================================================================= -->
+    <Proxy name="MultiBlockInspectorHelper">
+      <Documentation>
+        An internal proxy that is used by pqMultiBlockInspectorWidget
+        to aid in creating appropriate UI for allowing users to inspect
+        composite datasets and view/edit appearance properties.
+      </Documentation>
+
+      <InputProperty name="Input" />
+
+      <StringVectorProperty name="Assembly"
+        number_of_elements="1"
+        default_values="Hierarchy">
+        <DataAssemblyListDomain name="data_assembly_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </DataAssemblyListDomain>
+        <Documentation>
+          Select which assembly is used when specify selectors
+          to choose blocks to show for composite datasets.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Selectors"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+        <DataAssemblyDomain name="data_assembly">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ActiveAssembly" name="Assembly" />
+          </RequiredProperties>
+        </DataAssemblyDomain>
+        <Documentation>
+          For composite datasets, specify selectors to limit the view
+          to a chosen subset of blocks.
+        </Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="AssemblyOnly" panel_widget="DataAssemblyEditor">
+        <Property name="Assembly"  function="ActiveAssembly" />
+        <Property name="Selectors" function="Selectors" />
+        <Hints>
+          <DataAssemblyPropertyWidget is_checkable="0" />
+        </Hints>
+      </PropertyGroup>
+      <!-- end of MultiBlockInspectorHelper -->
+    </Proxy>
+
     <!-- End of group "misc" -->
   </ProxyGroup>
 

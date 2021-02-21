@@ -9180,7 +9180,8 @@
       <StringVectorProperty name="Assembly"
         command="SetActiveAssemblyForSelectors"
         number_of_elements="1"
-        default_values="Hierarchy">
+        default_values="Hierarchy"
+        panel_visibility="multiblock_inspector">
         <DataAssemblyListDomain name="data_assembly">
           <RequiredProperties>
             <Property function="Input" name="Input" />
@@ -9192,7 +9193,7 @@
         </Documentation>
       </StringVectorProperty>
 
-      <StringVectorProperty name="BlockSelectors"
+      <StringVectorProperty name="BlockVisibilities"
         command="AddSelector"
         clean_command="ClearSelectors"
         repeat_command="1"
@@ -9211,9 +9212,10 @@
         </Documentation>
       </StringVectorProperty>
 
-      <PropertyGroup label="Blocks" panel_widget="DataAssemblyEditor">
+      <PropertyGroup label="Blocks" panel_widget="DataAssemblyEditor"
+        panel_visibility="multiblock_inspector">
         <Property name="Assembly" function="ActiveAssembly" />
-        <Property name="BlockSelectors" function="Selectors" />
+        <Property name="BlockVisibilities" function="Selectors" />
       </PropertyGroup>
 
       <InputProperty command="SetInputConnection"

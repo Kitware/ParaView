@@ -634,7 +634,10 @@ SET (TESTS_WITH_INLINE_COMPARES
   LogColorMapToggle.xml
   MemoryInspectorPanel.xml
   Molecule.xml
-  MultiBlockInspectorSelection.xml
+  # temporary disabling since we don't support
+  # selection in the MB-inspector right now.
+  # (see #20525)
+  # MultiBlockInspectorSelection.xml
   NestedViews.xml
   NonlinearSubdivisionDisplay.xml
   PartitionedDataSet.xml
